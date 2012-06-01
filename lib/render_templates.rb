@@ -11,16 +11,6 @@ class BaseTemplate
     @template_classes
   end
 
-  def self.template_classes_nocamel
-    # Yes, oh Rails, I stealz you so bad
-    @template_classes.map{|tc| tc.to_s.
-            gsub(/::/, '/').
-            gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-            gsub(/([a-z\d])([A-Z])/,'\1_\2').
-            tr("-", "_").
-            downcase }
-  end
-
   # We're ignoring locals for now. Shut up.
   def render(obj = Object.new, locals = {})
     output = template.result(obj.instance_eval {binding})
@@ -98,6 +88,20 @@ class SectionParagraphTemplate < BaseTemplate
   end
 end
 
+class SectionUlistTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class="ulist">
+        <ul>
+          <% content.each do |li| %>
+            <li><p><%= li %></p></li>
+          <% end %>
+        </ul>
+      </div>
+    EOF
+  end
+end
+
 =begin
 ../gitscm-next/templates/section_colist.html.erb
 <div class="colist arabic">
@@ -168,14 +172,6 @@ end
   <div class="content">
     <%= content %>
   </div>
-</div>
-../gitscm-next/templates/section_ulist.html.erb
-<div class="ulist">
-  <ul>
-    <% content.each do |li| %>
-      <li><p><%= li %></p></li>
-    <% end %>
-  </ul>
 </div>
 ../gitscm-next/templates/section_verse.html.erb
 <div class="verseblock">

@@ -72,23 +72,16 @@ module Asciidoc
   class Renderer
     # Public: Initialize an Asciidoc::Renderer object.
     #
-    # template_dir - the String pathname of the directory containing template
-    #                files that should be used for subsequent render requests.
     def initialize(options={})
       @debug = !!options[:debug]
 
-      # files = Dir.glob(File.join(template_dir, '*')).select{|f| File.stat(f).file?}
       @views = {}
-      puts "Here are the template classes we know about: #{BaseTemplate.template_classes_nocamel.inspect}"
-      @views['document'] = DocumentTemplate.new
-      @views['section'] = SectionTemplate.new
-      @views['section_anchor'] = SectionAnchorTemplate.new
-      @views['section_paragraph'] = SectionParagraphTemplate.new
-      # @views = files.inject({}) do |view_hash, view|
-      #   name = File.basename(view).split('.').first
-      #   view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>'))
-      # end
-      #
+      puts "Here are the template classes we know about: #{BaseTemplate.template_classes.inspect}"
+      BaseTemplate.template_classes.each do |tc|
+        view = tc.to_s.underscore.gsub(/_template$/, '')
+        @views[view] = tc.new
+      end
+
       @render_stack = []
     end
 
@@ -96,7 +89,7 @@ module Asciidoc
     #
     # view   - the String view template name.
     # object - the Object to be passed to Tilt as an evaluation scope.
-    # locals - the optional Hash of locals to be passed to Tile (default {})
+    # locals - the optional Hash of locals to be passed to Tilt (default {}) (also ignored, really)
     def render(view, object, locals={})
       @render_stack.push([view, object])
       if @views[view].nil?
