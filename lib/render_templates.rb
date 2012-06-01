@@ -88,6 +88,23 @@ class SectionParagraphTemplate < BaseTemplate
   end
 end
 
+class SectionDlistTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class="dlist">
+        <dl>
+          <% content.each do |dt, dd| %>
+            <dt class="hdlist1"><%= dt %></dt>
+            <% unless dd.nil? || dd.empty? %>
+              <dd><%= dd %></dd>
+            <% end %>
+          <% end %>
+        </dl>
+      </div>
+    EOF
+  end
+end
+
 class SectionUlistTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
@@ -110,17 +127,6 @@ end
       <li><p><%= li %></p></li>
     <% end %>
   </ol>
-</div>
-../gitscm-next/templates/section_dlist.html.erb
-<div class="dlist">
-  <dl>
-    <% content.each do |dt, dd| %>
-      <dt class="hdlist1"><%= dt %></dt>
-      <% unless dd.nil? || dd.empty? %>
-        <dd><%= dd %></dd>
-      <% end %>
-    <% end %>
-  </dl>
 </div>
 ../gitscm-next/templates/section_example.html.erb
 <div class="exampleblock">
