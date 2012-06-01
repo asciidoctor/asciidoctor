@@ -1,0 +1,8 @@
+#!/bin/env ruby
+
+$:.unshift File.dirname(__FILE__) + '/../lib'
+
+require 'emerson'
+require 'emerson/cli'
+
+Emerson::Cli.new.run
