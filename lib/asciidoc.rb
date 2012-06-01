@@ -66,6 +66,7 @@ module Asciidoc
     'backtick'   => '`'
   )
 
+  require 'render_templates'
   # Public: Methods for rendering Asciidoc Documents, Sections, and Blocks
   # using Tile-compatible templates.
   class Renderer
@@ -73,15 +74,21 @@ module Asciidoc
     #
     # template_dir - the String pathname of the directory containing template
     #                files that should be used for subsequent render requests.
-    def initialize(template_dir, options={})
+    def initialize(options={})
       @debug = !!options[:debug]
 
-      files = Dir.glob(File.join(template_dir, '*')).select{|f| File.stat(f).file?}
-      @views = files.inject({}) do |view_hash, view|
-        name = File.basename(view).split('.').first
-        view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>'))
-      end
-
+      # files = Dir.glob(File.join(template_dir, '*')).select{|f| File.stat(f).file?}
+      @views = {}
+      puts "Here are the template classes we know about: #{BaseTemplate.template_classes_nocamel.inspect}"
+      @views['document'] = DocumentTemplate.new
+      @views['section'] = SectionTemplate.new
+      @views['section_anchor'] = SectionAnchorTemplate.new
+      @views['section_paragraph'] = SectionParagraphTemplate.new
+      # @views = files.inject({}) do |view_hash, view|
+      #   name = File.basename(view).split('.').first
+      #   view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>'))
+      # end
+      #
       @render_stack = []
     end
 
@@ -92,6 +99,11 @@ module Asciidoc
     # locals - the optional Hash of locals to be passed to Tile (default {})
     def render(view, object, locals={})
       @render_stack.push([view, object])
+      if @views[view].nil?
+        raise "Couldn't find a view in @views for #{view}"
+      else
+        puts "View for #{view} is #{@views[view]}, object is #{object}"
+      end
       ret = @views[view].render(object, locals)
 
       if @debug
@@ -199,6 +211,9 @@ module Asciidoc
     # rendered and returned as content that can be included in the
     # parent block's template.
     def render
+      puts "Now attempting to render for #{context} my own bad #{self}"
+      puts "Parent is #{@parent}"
+      puts "Renderer is #{renderer}"
       renderer.render("section_#{context}", self)
     end
 
@@ -290,7 +305,7 @@ module Asciidoc
               gsub(/(^|\W)'([^']+)'/m, '\1<em>\2</em>').
               gsub(/(^|\W)_([^_]+)_/m, '\1<em>\2</em>').
               gsub(/\*([^\*]+)\*/m, '<strong>\1</strong>').
-              gsub(/(?<!\\)\{(\w[\w\-]+\w)\}/) { INTRINSICS[$1] }.
+              gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) {"#{$1}#{INTRINSICS[$2]}" }. # Don't have lookbehind so have to capture and re-insert
               gsub(/\\([\{\}\-])/, '\1').
               gsub(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>').
               gsub(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
@@ -377,12 +392,14 @@ module Asciidoc
     # Public: Get the Asciidoc::Renderer instance being used for the ancestor
     # Asciidoc::Document instance.
     def renderer
+      puts "Section#renderer:  Looking for my renderer up in #{@parent}"
       @parent.renderer
     end
 
     # Public: Get the rendered String content for this Section and all its child
     # Blocks.
     def render
+      puts "Now rendering section for #{self}"
       renderer.render('section', self)
     end
 
@@ -397,7 +414,10 @@ module Asciidoc
     #   section.content
     #   "<div class=\"paragraph\"><p>foo</p></div>\n<div class=\"paragraph\"><p>bar</p></div>\n<div class=\"paragraph\"><p>baz</p></div>"
     def content
-      @blocks.map{|block| block.render}.join
+      @blocks.map do |block|
+        puts "Rendering block #{block}"
+        block.render
+      end.join
     end
 
     # Public: Get the Integer number of blocks in the section.
@@ -513,6 +533,9 @@ module Asciidoc
     # Public: Get the Hash of document references
     attr_reader :references
 
+    # Need these for pseudo-template yum
+    attr_reader :header, :preamble
+
     # Public: Initialize an Asciidoc object.
     #
     # data  - The String Asciidoc source document.
@@ -527,14 +550,18 @@ module Asciidoc
     #     incfile = File.join(base, inc)
     #     File.read(incfile)
     #   end
-    def initialize(name, data, &block)
-      raw_source = data.dup
+    def initialize(data, &block)
+      raw_source = []
       @defines = {}
       @references = {}
 
-      include_regexp = /^include::([^\[]+)\[\]\s*\n/
-      while inc = raw_source.match(include_regexp)
-        raw_source.sub!(include_regexp){|st| yield inc[1]}
+      include_regexp = /^include::([^\[]+)\[\]\s*\n?\z/
+      data.each do |line|
+        if inc = line.match(include_regexp)
+          raw_source.concat(File.readlines(inc[1]))
+        else
+          raw_source << line
+        end
       end
 
       ifdef_regexp = /^(ifdef|ifndef)::([^\[]+)\[\]/
@@ -542,7 +569,7 @@ module Asciidoc
       defattr_regexp = /^:([^:]+):\s*(.*)\s*$/
       conditional_regexp = /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/
       skip_to = nil
-      @lines = raw_source.each_line.inject([]) do |lines, line|
+      @lines = raw_source.each.inject([]) do |lines, line|
         if !skip_to.nil?
           skip_to = nil if line.match(skip_to)
         elsif match = line.match(ifdef_regexp)
@@ -586,6 +613,25 @@ module Asciidoc
       end
     end
 
+    def splain
+      if @header
+        puts "Header is #{@header}"
+      else
+        puts "No header"
+      end
+      if @preamble
+        puts "Preamble is #{@preamble}"
+      else
+        puts "No preamble"
+      end
+      puts "I have #{@root.blocks.count} blocks"
+      @root.blocks.each_with_index do |block, i|
+        puts "Block ##{i} is a #{block.class}"
+        puts "Name is #{block.name}"
+        puts "=" * 40
+      end
+    end
+
     # Public: Render the Asciidoc document using Tilt-compatible templates in
     # the specified path.
     #
@@ -598,12 +644,11 @@ module Asciidoc
     #
     #   doc.render(template_dir)
     #   => "<h1>Doc Title</h1>\n<div class=\"section\">\n  <div class=\"paragraph\"><p>Foo</p></div>\n</div>\n"
-    def render(template_dir)
-      @renderer = Renderer.new(template_dir)
-      html = @renderer.render('document', @root, :header => @header, :preamble => @preamble)
-      @renderer = nil
+    def render
+      @renderer ||= Renderer.new
+      puts "Document#renderer is #{@renderer}"
 
-      html
+      html = self.renderer.render('document', @root, :header => @header, :preamble => @preamble)
     end
 
     private
