@@ -78,6 +78,18 @@ class SectionAnchorTemplate < BaseTemplate
   end
 end
 
+class SectionLiteralTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class="literalblock">
+        <div class="content">
+          <pre><tt><%= content %></tt></pre>
+        </div>
+      </div>
+    EOF
+  end
+end
+
 class SectionParagraphTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
@@ -140,12 +152,6 @@ end
 </div>
 ../gitscm-next/templates/section_listing.html.erb
 <div class="listingblock">
-  <div class="content">
-    <pre><tt><%= content %></tt></pre>
-  </div>
-</div>
-../gitscm-next/templates/section_literal.html.erb
-<div class="literalblock">
   <div class="content">
     <pre><tt><%= content %></tt></pre>
   </div>
