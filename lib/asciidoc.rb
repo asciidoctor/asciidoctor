@@ -1,9 +1,8 @@
 require 'cgi'
 require 'erb'
-require 'tilt'
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
-# using Tilt-compatible templates.
+# using erb templates.
 #
 # Asciidoc documents are comprised of a header followed by zero or more
 # sections, and sections are comprised of blocks of content.  For example:
@@ -67,8 +66,9 @@ module Asciidoc
   )
 
   require 'render_templates'
+
   # Public: Methods for rendering Asciidoc Documents, Sections, and Blocks
-  # using Tile-compatible templates.
+  # using erb templates.
   class Renderer
     # Public: Initialize an Asciidoc::Renderer object.
     #
@@ -76,6 +76,8 @@ module Asciidoc
       @debug = !!options[:debug]
 
       @views = {}
+
+      # Load up all the template classes that we know how to render
       puts "Here are the template classes we know about: #{BaseTemplate.template_classes.inspect}"
       BaseTemplate.template_classes.each do |tc|
         view = tc.to_s.underscore.gsub(/_template$/, '')
@@ -88,9 +90,9 @@ module Asciidoc
     # Public: Render an Asciidoc object with a specified view template.
     #
     # view   - the String view template name.
-    # object - the Object to be passed to Tilt as an evaluation scope.
+    # object - the Object to be used as an evaluation scope.
     # locals - the optional Hash of locals to be passed to Tilt (default {}) (also ignored, really)
-    def render(view, object, locals={})
+    def render(view, object, locals = {})
       @render_stack.push([view, object])
       if @views[view].nil?
         raise "Couldn't find a view in @views for #{view}"
@@ -259,51 +261,51 @@ module Asciidoc
       end
     end
 
-      private
+    private
 
-        # Private: Return a String HTML version of the source string, with
-        # Asciidoc characters converted and HTML entities escaped.
-        #
-        # string - The String source string in Asciidoc format.
-        #
-        # Examples
-        #
-        #   asciidoc_string = "Make 'this' <emphasized>"
-        #   htmlify(asciidoc_string)
-        #   => "Make <em>this</em> &lt;emphasized&gt;"
-        def htmlify(string)
-          unless string.nil?
-            html = string.dup
+      # Private: Return a String HTML version of the source string, with
+      # Asciidoc characters converted and HTML entities escaped.
+      #
+      # string - The String source string in Asciidoc format.
+      #
+      # Examples
+      #
+      #   asciidoc_string = "Make 'this' <emphasized>"
+      #   htmlify(asciidoc_string)
+      #   => "Make <em>this</em> &lt;emphasized&gt;"
+      def htmlify(string)
+        unless string.nil?
+          html = string.dup
 
-            # Convert reference links to "link:" asciidoc for later HTMLification.
-            # This ensures that eg. "<<some reference>>" is turned into a link but
-            # "`<<<<<` and `>>>>>` are conflict markers" is not.  This is much
-            # easier before the HTML is escaped and <> are turned into entities.
-            html.gsub!( /(^|[^<])<<([^<>,]+)(,([^>]*))?>>/ ) { "#{$1}link:##{$2}[" + ($4.nil?? document.references[$2] : $4).to_s + "]" }
+          # Convert reference links to "link:" asciidoc for later HTMLification.
+          # This ensures that eg. "<<some reference>>" is turned into a link but
+          # "`<<<<<` and `>>>>>` are conflict markers" is not.  This is much
+          # easier before the HTML is escaped and <> are turned into entities.
+          html.gsub!( /(^|[^<])<<([^<>,]+)(,([^>]*))?>>/ ) { "#{$1}link:##{$2}[" + ($4.nil?? document.references[$2] : $4).to_s + "]" }
 
-            # Do the same with URLs
-            html.gsub!( /(^|[^`])(https?:\/\/[^\[ ]+)(\[+[^\]]*\]+)?/ ) do
-              pre=$1
-              url=$2
-              link=( $3 || $2 ).gsub( /(^\[|\]$)/,'' )
-              link = url if link.empty?
+          # Do the same with URLs
+          html.gsub!( /(^|[^`])(https?:\/\/[^\[ ]+)(\[+[^\]]*\]+)?/ ) do
+            pre=$1
+            url=$2
+            link=( $3 || $2 ).gsub( /(^\[|\]$)/,'' )
+            link = url if link.empty?
 
-              "#{pre}link:#{url}[#{link}]"
-            end
-
-            CGI.escapeHTML(html).
-              gsub(REGEXP[:biblio], '<a name="\1">[\1]</a>').
-              gsub(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }.
-              gsub(/``(.*?)''/m, '&#147;\1&#148;').
-              gsub(/(^|\W)'([^']+)'/m, '\1<em>\2</em>').
-              gsub(/(^|\W)_([^_]+)_/m, '\1<em>\2</em>').
-              gsub(/\*([^\*]+)\*/m, '<strong>\1</strong>').
-              gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) {"#{$1}#{INTRINSICS[$2]}" }. # Don't have lookbehind so have to capture and re-insert
-              gsub(/\\([\{\}\-])/, '\1').
-              gsub(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>').
-              gsub(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
+            "#{pre}link:#{url}[#{link}]"
           end
+
+          CGI.escapeHTML(html).
+            gsub(REGEXP[:biblio], '<a name="\1">[\1]</a>').
+            gsub(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }.
+            gsub(/``(.*?)''/m, '&#147;\1&#148;').
+            gsub(/(^|\W)'([^']+)'/m, '\1<em>\2</em>').
+            gsub(/(^|\W)_([^_]+)_/m, '\1<em>\2</em>').
+            gsub(/\*([^\*]+)\*/m, '<strong>\1</strong>').
+            gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) {"#{$1}#{INTRINSICS[$2]}" }. # Don't have lookbehind so have to capture and re-insert
+            gsub(/\\([\{\}\-])/, '\1').
+            gsub(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>').
+            gsub(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
         end
+      end
   end
 
   # Public: Methods for managing sections of Asciidoc content in a document.
@@ -513,7 +515,7 @@ module Asciidoc
   end
 
   # Public: Methods for parsing Asciidoc documents and rendering them
-  # using Tilt-compatible templates.
+  # using erb templates.
   class Document
 
     # Public: Get the String document source.
@@ -539,10 +541,7 @@ module Asciidoc
     #
     #   base = File.dirname(filename)
     #   data = File.readlines(filename)
-    #   doc  = Asciidoc.new(data) do |inc|
-    #     incfile = File.join(base, inc)
-    #     File.read(incfile)
-    #   end
+    #   doc  = Asciidoc.new(data)
     def initialize(data, &block)
       raw_source = []
       @defines = {}
@@ -562,9 +561,39 @@ module Asciidoc
       defattr_regexp = /^:([^:]+):\s*(.*)\s*$/
       conditional_regexp = /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/
       skip_to = nil
-      @lines = raw_source.each.inject([]) do |lines, line|
+      continuing_value = nil
+      continuing_key = nil
+      @lines = []
+      raw_source.each do |line|
         if !skip_to.nil?
           skip_to = nil if line.match(skip_to)
+        elsif !continuing_value.nil?
+          close_continue = false
+          # Lines that start with whitespace are a continuation,
+          # so gobble them up into `value`
+          if match = line.match(/\s+(.+)\s+\+\s*$/)
+            continuing_value += match[1]
+          elsif match = line.match(/\s+(.+)/)
+            # If this continued line doesn't end with a +, then this
+            # is the end of the continuation, no matter what the next
+            # line does.
+            continuing_value += match[1]
+            close_continue = true
+          else
+            # If this line doesn't start with whitespace, then it's
+            # not a valid continuation line, so TODO FIGURE THIS OUT.
+            # Possibly we don't care about this crap, and we just
+            # look for a properly whitespace-opening and close it out
+            # if there's no + on the end.
+            close_continue = true
+            raise "Yeah, you can't do that here: #{__FILE__}:#{__LINE__}"
+          end
+          if close_continue
+            puts "Closing out continuation for key #{continuing_key}, final value: '#{continuing_value}'"
+            @defines[continuing_key] = continuing_value
+            continuing_key = nil
+            continuing_value = nil
+          end
         elsif match = line.match(ifdef_regexp)
           attr = match[2]
           skip = case match[1]
@@ -573,16 +602,24 @@ module Asciidoc
                  end
           skip_to = /^endif::#{attr}\[\]\s*\n/ if skip
         elsif match = line.match(defattr_regexp)
-          @defines[match[1]] = match[2]
+          key = match[1]
+          value = match[2]
+          if match = value.match(/(.+)\s+\+\s*$/)
+            # continuation line, grab lines until we run out of continuation lines
+            continuing_key = key
+            continuing_value = match[1]  # strip off the spaces and +
+            puts "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
+          else
+            @defines[key] = value
+            puts "Defines[#{key}] is '#{value}'"
+          end
         elsif !line.match(endif_regexp)
           while match = line.match(conditional_regexp)
             value = @defines.has_key?(match[1]) ? match[2] : ''
             line.sub!(conditional_regexp, value)
           end
-          lines << line unless line.match(REGEXP[:comment])
+          @lines << line unless line.match(REGEXP[:comment])
         end
-
-        lines
       end
 
       # Process bibliography references, so they're available when text
@@ -596,9 +633,13 @@ module Asciidoc
       @source = @lines.join
 
       @root = next_section(@lines)
+      # After processing blocks, if the first block is a Section, pull it out
+      # as the @header.
       if @root.blocks.first.is_a?(Section)
         @header = @root.blocks.shift
       else
+        # Otherwise, make a new Section, and pull off all leading Block objects
+        # and concat them as the @preamble.
         @preamble = Section.new(self)
         while @root.blocks.first.is_a?(Block)
           @preamble << @root.blocks.shift
@@ -614,6 +655,7 @@ module Asciidoc
       end
       if @preamble
         puts "Preamble is #{@preamble}"
+        puts "It has #{@preamble.blocks.count} blocks."
       else
         puts "No preamble"
       end
@@ -625,18 +667,8 @@ module Asciidoc
       end
     end
 
-    # Public: Render the Asciidoc document using Tilt-compatible templates in
-    # the specified path.
+    # Public: Render the Asciidoc document using erb templates
     #
-    # template_base - The String pathname of the directory containing templates.
-    #
-    # Examples
-    #
-    #   Dir.entries(template_dir)
-    #   => ['.', '..', 'document.html.erb', 'section.html.erb', 'section_paragraph.html.erb', ...]
-    #
-    #   doc.render(template_dir)
-    #   => "<h1>Doc Title</h1>\n<div class=\"section\">\n  <div class=\"paragraph\"><p>Foo</p></div>\n</div>\n"
     def render
       @renderer ||= Renderer.new
       puts "Document#renderer is #{@renderer}"
@@ -746,16 +778,21 @@ module Asciidoc
       # * Based on the type of content block, grab lines to the end of the block.
       # * Return a new Asciidoc::Block or Asciidoc::Section instance with the
       #   content set to the grabbed lines.
-      def next_block(lines, parent=self)
+      def next_block(lines, parent = self)
         # Skip ahead to the block content
-        while lines.any? && lines.first.strip.empty?
-          lines.shift
-        end
+        skip_blank(lines)
 
         return nil if lines.empty?
 
+        # NOTE: An anchor looks like this:
+        #   [[foo]] bar
+        # with the inside [foo] (including brackets) as match[1]
         if match = lines.first.match(REGEXP[:anchor])
+          # NOTE: This second regexp strips off the brackets from [foo], though
+          # the way the REGEXP[:anchor] is setup, I don't think it would
+          # be possible for it to match without the pairs of brackets.
           anchor = match[1].match(/^\[(.*)\]/) ? $1 : match[1]
+          # NOTE: Set @references['foo'] = '[foo]'
           @references[anchor] = match[1]
           lines.shift
         else
