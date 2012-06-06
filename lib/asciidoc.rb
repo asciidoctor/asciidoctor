@@ -30,66 +30,66 @@ require 'erb'
 #   html = doc.render(template_path)
 module Asciidoc
   REGEXP = {
-    # "Wooble"  ||  Wooble
-    :name     => /^(["A-Za-z].*)\s*$/,  # I believe this fails to require " chars to be paired (TODO)
-
-    # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
-    :line     => /^([=\-~^\+])+\s*$/,
-
-    # [verse]
-    :verse    => /^\[verse\]\s*$/,
-
-    # [NOTE]
-    :note     => /^\[NOTE\]\s*$/,
-
-    # foo::  ||  foo;;
-    :dlist    => /^(\s*)(\S.*)(::|;;)\s*$/,
-
-    # 1.Foo  ||  1. Foo  ||  . Foo
-    :olist    => /^\s*(\d+\.|\. )(.*)$/,
-
-    # * Foo  ||  - Foo
-    :ulist    => /^\s*([\*\-])\s+(.*)$/,
-
-    # .Foo   but not  . Foo or ..Foo
-    :title    => /^\.([^\s\.].*)\s*$/,
-
-    # ____
-    :quote    => /^_{4,}\s*$/,
-
-    # <1> Foo
-    :colist   => /^(\<\d+\>)\s*(.*)/,
-
-    # --
-    :oblock   => /^\-\-\s*$/,
-
     # [[Foo]]  (also allows, say, [[[]] or [[[Foo[f]], but I don't think it is supposed to (TODO))
     :anchor   => /^\[(\[.+\])\]\s*$/,
 
     # [[[Foo]]]  (does not suffer quite the same malady as :anchor, but almost. Allows [ but not ] in internal capture
     :biblio   => /\[\[\[([^\]]+)\]\]\]/,
 
+    # [caption="Foo"]
+    :caption  => /^\[caption=\"([^\"]+)\"\]/,
+
+    # <1> Foo
+    :colist   => /^(\<\d+\>)\s*(.*)/,
+
     # // (and then whatever)
     :comment  => /^\/\/\s/,
 
-    # ----
-    :listing  => /^\-{4,}\s*$/,
+    # +   (note that Asciidoc appears to allow continuations using + at the end of the previous line and indenting
+    #      the following line (as in :lit_par))
+    :continue => /^\+\s*$/,
+
+    # foo::  ||  foo;;
+    :dlist    => /^(\s*)(\S.*)(::|;;)\s*$/,
 
     # ====
     :example  => /^={4,}\s*$/,
+
+    # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
+    :line     => /^([=\-~^\+])+\s*$/,
+
+    # ----
+    :listing  => /^\-{4,}\s*$/,
 
     # ....
     :lit_blk  => /^\.{4,}\s*$/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
-    :lit_par  => /^([ \t]+.*)$/,
+    :lit_par  => /^([ \t]+.*)$/
 
-    # [caption="Foo"]
-    :caption  => /^\[caption=\"([^\"]+)\"\]/,
+    # "Wooble"  ||  Wooble
+    :name     => /^(["A-Za-z].*)\s*$/,  # I believe this fails to require " chars to be paired (TODO)
 
-    # +   (note that Asciidoc appears to allow continuations using + at the end of the previous line and indenting
-    #      the following line (as in :lit_par))
-    :continue => /^\+\s*$/
+    # [NOTE]
+    :note     => /^\[NOTE\]\s*$/,
+
+    # --
+    :oblock   => /^\-\-\s*$/,
+
+    # 1.Foo  ||  1. Foo  ||  . Foo
+    :olist    => /^\s*(\d+\.|\. )(.*)$/,
+
+    # ____
+    :quote    => /^_{4,}\s*$/,
+
+    # .Foo   but not  . Foo or ..Foo
+    :title    => /^\.([^\s\.].*)\s*$/,
+
+    # * Foo  ||  - Foo
+    :ulist    => /^\s*([\*\-])\s+(.*)$/,
+
+    # [verse]
+    :verse    => /^\[verse\]\s*$/,
   }
   /(^|[^\\])\{(\w[\w\-]+\w)\}/
 
