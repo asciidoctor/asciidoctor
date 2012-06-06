@@ -17,6 +17,9 @@ class Asciidoc::Document
   # Need these for pseudo-template yum
   attr_reader :header, :preamble
 
+  # Root element of the parsed document
+  attr_reader :root
+
   # Public: Initialize an Asciidoc object.
   #
   # data  - The String Asciidoc source document.
