@@ -65,7 +65,7 @@ module Asciidoc
     :lit_blk  => /^\.{4,}\s*$/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
-    :lit_par  => /^([ \t]+.*)$/
+    :lit_par  => /^([ \t]+.*)$/,
 
     # "Wooble"  ||  Wooble
     :name     => /^(["A-Za-z].*)\s*$/,  # I believe this fails to require " chars to be paired (TODO)
@@ -89,7 +89,7 @@ module Asciidoc
     :ulist    => /^\s*([\*\-])\s+(.*)$/,
 
     # [verse]
-    :verse    => /^\[verse\]\s*$/,
+    :verse    => /^\[verse\]\s*$/
   }
   /(^|[^\\])\{(\w[\w\-]+\w)\}/
 
