@@ -110,47 +110,48 @@ class Asciidoc::Block
 
   private
 
-    # Private: Return a String HTML version of the source string, with
-    # Asciidoc characters converted and HTML entities escaped.
-    #
-    # string - The String source string in Asciidoc format.
-    #
-    # Examples
-    #
-    #   asciidoc_string = "Make 'this' <emphasized>"
-    #   htmlify(asciidoc_string)
-    #   => "Make <em>this</em> &lt;emphasized&gt;"
-    def htmlify(string)
-      unless string.nil?
-        html = string.dup
+  # Private: Return a String HTML version of the source string, with
+  # Asciidoc characters converted and HTML entities escaped.
+  #
+  # string - The String source string in Asciidoc format.
+  #
+  # Examples
+  #
+  #   asciidoc_string = "Make 'this' <emphasized>"
+  #   htmlify(asciidoc_string)
+  #   => "Make <em>this</em> &lt;emphasized&gt;"
+  def htmlify(string)
+    unless string.nil?
+      html = string.dup
 
-        # Convert reference links to "link:" asciidoc for later HTMLification.
-        # This ensures that eg. "<<some reference>>" is turned into a link but
-        # "`<<<<<` and `>>>>>` are conflict markers" is not.  This is much
-        # easier before the HTML is escaped and <> are turned into entities.
-        html.gsub!( /(^|[^<])<<([^<>,]+)(,([^>]*))?>>/ ) { "#{$1}link:##{$2}[" + ($4.nil?? document.references[$2] : $4).to_s + "]" }
+      # Convert reference links to "link:" asciidoc for later HTMLification.
+      # This ensures that eg. "<<some reference>>" is turned into a link but
+      # "`<<<<<` and `>>>>>` are conflict markers" is not.  This is much
+      # easier before the HTML is escaped and <> are turned into entities.
+      html.gsub!( /(^|[^<])<<([^<>,]+)(,([^>]*))?>>/ ) { "#{$1}link:##{$2}[" + ($4.nil? ? document.references[$2] : $4).to_s + "]" }
 
-        # Do the same with URLs
-        html.gsub!( /(^|[^`])(https?:\/\/[^\[ ]+)(\[+[^\]]*\]+)?/ ) do
-          pre=$1
-          url=$2
-          link=( $3 || $2 ).gsub( /(^\[|\]$)/,'' )
-          link = url if link.empty?
+      # Do the same with URLs
+      html.gsub!( /(^|[^`])(https?:\/\/[^\[ ]+)(\[+[^\]]*\]+)?/ ) do
+        pre=$1
+        url=$2
+        link=( $3 || $2 ).gsub( /(^\[|\]$)/,'' )
+        link = url if link.empty?
 
-          "#{pre}link:#{url}[#{link}]"
-        end
-
-        CGI.escapeHTML(html).
-          gsub(Asciidoc::REGEXP[:biblio], '<a name="\1">[\1]</a>').
-          gsub(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }.
-          gsub(/``(.*?)''/m, '&#147;\1&#148;').
-          gsub(/(^|\W)'([^']+)'/m, '\1<em>\2</em>').
-          gsub(/(^|\W)_([^_]+)_/m, '\1<em>\2</em>').
-          gsub(/\*([^\*]+)\*/m, '<strong>\1</strong>').
-          gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + Asciidocs::INTRINSICS[$2] }. # Don't have lookbehind so have to capture and re-insert
-          gsub(/\\([\{\}\-])/, '\1').
-          gsub(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>').
-          gsub(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
+        "#{pre}link:#{url}[#{link}]"
       end
+
+      CGI.escapeHTML(html).
+        gsub(Asciidoc::REGEXP[:biblio], '<a name="\1">[\1]</a>').
+        gsub(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }.
+        gsub(/``(.*?)''/m, '&#147;\1&#148;').
+        gsub(/(^|\W)'([^']+)'/m, '\1<em>\2</em>').
+        gsub(/(^|\W)_([^_]+)_/m, '\1<em>\2</em>').
+        gsub(/\*([^\*]+)\*/m, '<strong>\1</strong>').
+        gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + Asciidocs::INTRINSICS[$2] }. # Don't have lookbehind so have to capture and re-insert
+        gsub(/\\([\{\}\-])/, '\1').
+        gsub(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>').
+        gsub(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
     end
+  end
+  # end private
 end
