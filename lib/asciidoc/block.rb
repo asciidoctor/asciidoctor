@@ -147,7 +147,7 @@ class Asciidoc::Block
         gsub(/(^|\W)'([^']+)'/m, '\1<em>\2</em>').
         gsub(/(^|\W)_([^_]+)_/m, '\1<em>\2</em>').
         gsub(/\*([^\*]+)\*/m, '<strong>\1</strong>').
-        gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + Asciidocs::INTRINSICS[$2] }. # Don't have lookbehind so have to capture and re-insert
+        gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + Asciidoc::INTRINSICS[$2] }. # Don't have lookbehind so have to capture and re-insert
         gsub(/\\([\{\}\-])/, '\1').
         gsub(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>').
         gsub(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
