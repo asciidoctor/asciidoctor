@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'pp'
+require 'ap'
 require 'lib/emerson'
 
 lines = File.readlines("test/fixtures/asciidoc_index.txt")
