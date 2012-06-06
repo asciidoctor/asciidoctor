@@ -288,10 +288,11 @@ class Asciidoc::Document
       anchor = nil
     end
 
-    puts "About to do the next section thing, and first line is:"
+    puts "/"*64
+    puts "#{__FILE__}:#{__LINE__} - First two lines are:"
     puts lines.first
     puts lines[1]
-    puts "**************"
+    puts "/"*64
 
     block = nil
     title = nil
@@ -520,10 +521,11 @@ class Asciidoc::Document
   def next_section(lines)
     section = Section.new(self)
 
-    puts "About to do the section thing, and first line is:"
+    puts "%"*64
+    puts "#{__FILE__}:#{__LINE__} - First two lines are:"
     puts lines.first
     puts lines[1]
-    puts "**************"
+    puts "%"*64
 
     # Skip ahead to the next section definition
     while lines.any? && section.name.nil?
