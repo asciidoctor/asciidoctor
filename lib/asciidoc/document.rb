@@ -303,19 +303,6 @@ class Asciidoc::Document
       this_line = lines.shift
       next_line = lines.first || ''
 
-      # TRY
-      if this_line.match(REGEXP[:name])
-        puts "This line matches REGEXP[:name]:"
-        puts this_line
-        if next_line.match(REGEXP[:line])
-          puts "Next line matched REGEXP[:line]:"
-        else
-          puts "Why didn't this line match REGEXP[:line], I wonder?"
-        end
-        puts next_line
-        puts (this_line.size - next_line.size).abs
-      end
-
       if this_line.match(REGEXP[:comment])
         next
       elsif match = this_line.match(REGEXP[:title])
@@ -513,7 +500,7 @@ class Asciidoc::Document
   #   source
   #   => "GREETINGS\n---------\nThis is my doc.\n\nSALUTATIONS\n-----------\nIt is awesome."
   #
-  #   doc = Asciidoc.new(source)
+  #   doc = Asciidoc::Document.new(source)
   #
   #   doc.next_section
   #   ["GREETINGS", [:paragraph, "This is my doc."]]
@@ -536,12 +523,12 @@ class Asciidoc::Document
       if match = this_line.match(REGEXP[:anchor])
         section.anchor = match[1]
       elsif is_section_heading?(this_line, next_line)
-        header = this_line.match(REGEXP[:name])
-        if anchor = header[1].match(/^(.*)\[\[([^\]]+)\]\]\s*$/)
-          section.name   = anchor[1]
-          section.anchor = anchor[2]
+        header_match = this_line.match(REGEXP[:name])
+        if anchor_match = header_match[1].match(REGEXP[:anchor_embedded])
+          section.name   = anchor_match[1]
+          section.anchor = anchor_match[2]
         else
-          section.name = header[1]
+          section.name = header_match[1]
         end
         section.level = section_level(next_line)
         lines.shift
@@ -583,9 +570,7 @@ class Asciidoc::Document
     end
 
     while section_lines.any?
-      while section_lines.any? && section_lines.first.strip.empty?
-        section_lines.shift
-      end
+      skip_blank(section_lines)
 
       section << next_block(section_lines, section) if section_lines.any?
     end
