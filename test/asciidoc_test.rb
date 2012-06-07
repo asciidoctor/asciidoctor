@@ -11,6 +11,6 @@ class ProjectTest < Test::Unit::TestCase
   end
 
   def test_is_section_heading
-    assert @doc.is_section_heading?("AsciiDoc Home Page", "==================")
+    assert @doc.send(:is_section_heading?, "AsciiDoc Home Page", "==================")
   end
 end
