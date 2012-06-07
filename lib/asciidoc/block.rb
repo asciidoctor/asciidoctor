@@ -64,7 +64,7 @@ class Asciidoc::Block
   #
   # Examples
   #
-  #   block = Block.new(:paragraph, ['`This` is what happens when you <meet> a stranger in the <alps>!']
+  #   block = Asciidoc::Block.new(:paragraph, ['`This` is what happens when you <meet> a stranger in the <alps>!'])
   #   block.content
   #   => ["<em>This</em> is what happens when you &lt;meet&gt; a stranger in the &lt;alps&gt;!"]
   #
@@ -132,9 +132,9 @@ class Asciidoc::Block
 
       # Do the same with URLs
       html.gsub!( /(^|[^`])(https?:\/\/[^\[ ]+)(\[+[^\]]*\]+)?/ ) do
-        pre=$1
-        url=$2
-        link=( $3 || $2 ).gsub( /(^\[|\]$)/,'' )
+        pre = $1
+        url = $2
+        link = ( $3 || $2 ).gsub( /(^\[|\]$)/,'' )
         link = url if link.empty?
 
         "#{pre}link:#{url}[#{link}]"
