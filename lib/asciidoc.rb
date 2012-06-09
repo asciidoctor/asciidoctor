@@ -85,6 +85,9 @@ module Asciidoc
     # ____
     :quote            => /^_{4,}\s*$/,
 
+    # ****
+    :sidebar_blk          => /^\*{4,}\s*$/,
+
     # .Foo   but not  . Foo or ..Foo
     :title            => /^\.([^\s\.].*)\s*$/,
 

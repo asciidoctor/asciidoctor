@@ -444,6 +444,15 @@ class Asciidoc::Document
         lines.unshift( this_line ) unless this_line.nil?
 
         block = Block.new(parent, :literal, buffer)
+      elsif this_line.match(REGEXP[:sidebar_blk])
+        # example is surrounded by '****' (4 or more '*' chars) lines
+        this_line = lines.shift
+        while !this_line.nil? && !this_line.match(REGEXP[:sidebar_blk])
+          buffer << this_line
+          this_line = lines.shift
+        end
+
+        block = Block.new(parent, :sidebar, buffer)
       else
         # paragraph is contiguous nonblank/noncontinuation lines
         while !this_line.nil? && !this_line.strip.empty?

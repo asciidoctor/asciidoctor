@@ -75,6 +75,23 @@ class SectionAnchorTemplate < BaseTemplate
   end
 end
 
+class SectionDlistTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='dlist'>
+        <dl>
+          <% content.each do |dt, dd| %>
+            <dt class='hdlist1'><%= dt %></dt>
+            <% unless dd.nil? || dd.empty? %>
+              <dd><%= dd %></dd>
+            <% end %>
+          <% end %>
+        </dl>
+      </div>
+    EOF
+  end
+end
+
 class SectionLiteralTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
@@ -97,18 +114,13 @@ class SectionParagraphTemplate < BaseTemplate
   end
 end
 
-class SectionDlistTemplate < BaseTemplate
+class SectionSidebarTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
-      <div class='dlist'>
-        <dl>
-          <% content.each do |dt, dd| %>
-            <dt class='hdlist1'><%= dt %></dt>
-            <% unless dd.nil? || dd.empty? %>
-              <dd><%= dd %></dd>
-            <% end %>
-          <% end %>
-        </dl>
+      <div class='sidebarblock'>
+        <div class='content'>
+          <p><%= content %></p>
+        </div>
       </div>
     EOF
   end
