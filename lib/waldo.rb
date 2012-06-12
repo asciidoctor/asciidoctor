@@ -3,11 +3,11 @@ require 'rubygems'
 $:.unshift(File.dirname(__FILE__))
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
 
-require 'emerson/errors'
-require 'emerson/string'
-require 'emerson/version'
+require 'waldo/errors'
+require 'waldo/string'
+require 'waldo/version'
 
-require 'emerson/asciidoc'
+require 'waldo/asciidoc'
 
-module Emerson
+module Waldo
 end

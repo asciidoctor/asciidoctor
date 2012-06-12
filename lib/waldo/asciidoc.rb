@@ -124,10 +124,10 @@ module Asciidoc
     'backtick'   => '`'
   )
 
-  require 'emerson/asciidoc/block'
-  require 'emerson/asciidoc/document'
-  require 'emerson/asciidoc/list_item'
-  require 'emerson/asciidoc/render_templates'
-  require 'emerson/asciidoc/renderer'
-  require 'emerson/asciidoc/section'
+  require 'waldo/asciidoc/block'
+  require 'waldo/asciidoc/document'
+  require 'waldo/asciidoc/list_item'
+  require 'waldo/asciidoc/render_templates'
+  require 'waldo/asciidoc/renderer'
+  require 'waldo/asciidoc/section'
 end

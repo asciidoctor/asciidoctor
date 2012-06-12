@@ -1,5 +1,5 @@
 # Base project exception
-module Emerson
+module Waldo
   class ProjectError < StandardError; end
 end
 

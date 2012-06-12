@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'test/unit'
 
-require "#{File.expand_path(File.dirname(__FILE__))}/../lib/emerson.rb"
+require "#{File.expand_path(File.dirname(__FILE__))}/../lib/waldo.rb"
 
 require 'mocha'
 require 'htmlentities'
@@ -62,4 +62,3 @@ def context(*args, &block)
 end
 
 $contexts = []
-

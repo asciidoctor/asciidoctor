@@ -2,7 +2,7 @@
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
 
-require 'emerson'
-require 'emerson/cli'
+require 'waldo'
+require 'waldo/cli'
 
-Emerson::Cli.new.run
+Waldo::Cli.new.run
