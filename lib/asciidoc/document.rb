@@ -256,6 +256,47 @@ class Asciidoc::Document
     segment
   end
 
+  # Private: Return all the lines from `lines` until we run out of lines,
+  #   find a blank line without :include_blank => true, or find a line
+  #   for which the given block evals to true.
+  #
+  # lines   - the Array of String lines.
+  # options - an optional Hash of processing options:
+  #           * :break_on_blank_lines may be used to specify to break on blank lines
+  #           * :preserve_last_line may be used to specify that the String
+  #               causing the method to stop processing lines should be
+  #               pushed back onto the `lines` Array.
+  #
+  # Returns the Array of lines from the next segment.
+  #
+  # Examples
+  #
+  #   content
+  #   => ["First paragraph\n", "Second paragraph\n", "Open block\n", "\n", "Can have blank lines\n", "--\n", "\n", "In a different segment\n"]
+  #
+  #   grab_lines_until(content)
+  #   => ["First paragraph\n", "Second paragraph\n", "Open block\n"]
+  #
+  #   content
+  #   => ["In a different segment\n"]
+  def grab_lines_until(lines, options = {}, &block)
+    buffer = []
+
+    while (this_line = lines.shift)
+      puts "Processing line: '#{this_line}'"
+      finis = this_line.nil?
+      finis ||= true if options[:break_on_blank_lines] && this_line.strip.empty?
+      finis ||= true if block && value = yield(this_line)
+      if finis
+        lines.unshift(this_line) if options[:preserve_last_line] and ! this_line.nil?
+        break
+      end
+
+      buffer << this_line
+    end
+    buffer
+  end
+
   # Private: Return the next block from the section.
   #
   # * Skip over blank lines to find the start of the next content block.
@@ -274,7 +315,6 @@ class Asciidoc::Document
     # with the inside [foo] (including brackets) as match[1]
     if match = lines.first.match(REGEXP[:anchor])
       puts "Found an anchor in line:\n\t#{lines.first}"
-      puts "I have decided the match[1] is #{match[1]}"
       # NOTE: This expression conditionally strips off the brackets from
       # [foo], though REGEXP[:anchor] won't actually match without
       # match[1] being bracketed, so the condition isn't necessary.
@@ -316,16 +356,11 @@ class Asciidoc::Document
         # `anchor` at this point is only the `foo` part that was stripped out
         # after matching.  TODO: Need a way to test this.
         lines.unshift(this_line)
-        puts "----> Pushing back '#{anchor}'" unless anchor.nil?
         lines.unshift(anchor) unless anchor.nil?
         block = next_section(lines)
       elsif this_line.match(REGEXP[:oblock])
         # oblock is surrounded by '--' lines and has zero or more blocks inside
-        this_line = lines.shift
-        while !this_line.nil? && !this_line.match(REGEXP[:oblock])
-          buffer << this_line
-          this_line = lines.shift
-        end
+        buffer = grab_lines_until(lines) { |line| line.match(REGEXP[:oblock]) }
 
         while buffer.any? && buffer.last.strip.empty?
           buffer.pop
@@ -401,69 +436,38 @@ class Asciidoc::Document
         block.buffer = pairs
       elsif this_line.match(REGEXP[:verse])
         # verse is preceded by [verse] and lasts until a blank line
-        this_line = lines.shift
-        while !this_line.nil? && !this_line.strip.empty?
-          buffer << this_line
-          this_line = lines.shift
-        end
-
+        buffer = grab_lines_until(lines, :break_on_blank_lines => true)
         block = Block.new(parent, :verse, buffer)
       elsif this_line.match(REGEXP[:note])
         # note is an admonition preceded by [NOTE] and lasts until a blank line
-        this_line = lines.shift
-        while !this_line.nil? && !this_line.strip.empty? && !this_line.match( REGEXP[:continue] )
-          buffer << this_line
-          this_line = lines.shift
-        end
-
+        buffer = grab_lines_until(lines, :break_on_blank_lines => true) {|line| line.match( REGEXP[:continue] ) }
         block = Block.new(parent, :note, buffer)
       elsif text = [:listing, :example].detect{|t| this_line.match( REGEXP[t] )}
-        this_line = lines.shift
-        while !this_line.nil? && !this_line.match( REGEXP[text] )
-          buffer << this_line
-          this_line = lines.shift
-        end
-
+        buffer = grab_lines_until(lines) {|line| line.match( REGEXP[text] )}
         block = Block.new(parent, text, buffer)
       elsif this_line.match( REGEXP[:quote] )
         block = Block.new(parent, :quote)
-
-        this_line = lines.shift
-        while !this_line.nil? && !this_line.match( REGEXP[:quote] )
-          buffer << this_line
-          this_line = lines.shift
-        end
+        buffer = grab_lines_until(lines) {|line| line.match( REGEXP[:quote] ) }
 
         while buffer.any?
           block.blocks << next_block(buffer, block)
         end
       elsif this_line.match(REGEXP[:lit_blk])
         # example is surrounded by '....' (4 or more '.' chars) lines
-        this_line = lines.shift
-        while !this_line.nil? && !this_line.match(REGEXP[:lit_blk])
-          buffer << this_line
-          this_line = lines.shift
-        end
-
+        buffer = grab_lines_until(lines) {|line| line.match( REGEXP[:lit_blk] ) }
         block = Block.new(parent, :literal, buffer)
       elsif this_line.match(REGEXP[:lit_par])
         # literal paragraph is contiguous lines starting with
         # one or more space or tab characters
-        while !this_line.nil? && this_line.match(REGEXP[:lit_par])
-          buffer << this_line
-          this_line = lines.shift
-        end
-        lines.unshift( this_line ) unless this_line.nil?
+
+        # So we need to actually include this one in the grab_lines group
+        lines.unshift( this_line )
+        buffer = grab_lines_until(lines, :preserve_last_line => true) {|line| ! line.match( REGEXP[:lit_par] ) }
 
         block = Block.new(parent, :literal, buffer)
       elsif this_line.match(REGEXP[:sidebar_blk])
         # example is surrounded by '****' (4 or more '*' chars) lines
-        this_line = lines.shift
-        while !this_line.nil? && !this_line.match(REGEXP[:sidebar_blk])
-          buffer << this_line
-          this_line = lines.shift
-        end
-
+        buffer = grab_lines_until(lines) {|line| line.match( REGEXP[:sidebar_blk] ) }
         block = Block.new(parent, :sidebar, buffer)
       else
         # paragraph is contiguous nonblank/noncontinuation lines
