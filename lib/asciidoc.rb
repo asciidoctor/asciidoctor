@@ -53,6 +53,9 @@ module Asciidoc
     :continue         => /^\+\s*$/,
 
     # foo::  ||  foo;;
+    # Should be followed by a definition line, e.g.,
+    # foo::
+    #    That which precedes 'bar' (see also, bar)
     :dlist            => /^(\s*)(\S.*)(::|;;)\s*$/,
 
     # ====
