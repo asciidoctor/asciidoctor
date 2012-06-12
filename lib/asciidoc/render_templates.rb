@@ -51,12 +51,9 @@ class SectionTemplate < BaseTemplate
     @template ||= ERB.new <<-EOF
       <div class='sect<%= level %>'>
         <% if !anchor.nil? %>
-          <a name='<%= anchor %>'>
+          <a name='<%= anchor %>'></a>
         <% end %>
         <h<%= level + 1 %> id='<%= section_id %>'><%= name %></h<%= level + 1 %>>
-        <% if !anchor.nil? %>
-          </a>
-        <% end %>
         <% if level == 1 %>
           <div class='sectionbody'><%= content %></div>
         <% else %>
