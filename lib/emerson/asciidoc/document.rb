@@ -138,7 +138,10 @@ class Asciidoc::Document
 
   # We need to be able to return some semblance of a title
   def title
-    @title ||= self.root.title if self.root
+    if self.root
+      @title ||= self.root.title || self.root.name
+    end
+    @title
   end
 
   def splain
