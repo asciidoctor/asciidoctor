@@ -136,6 +136,11 @@ class Asciidoc::Document
     end
   end
 
+  # We need to be able to return some semblance of a title
+  def title
+    @title ||= self.root.title if self.root
+  end
+
   def splain
     if @header
       puts "Header is #{@header}"
