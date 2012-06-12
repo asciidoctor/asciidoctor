@@ -216,6 +216,7 @@ class Asciidoc::Document
     skip_blank(lines)
 
     # Grab lines until the first blank line not inside an open block
+    # or listing
     in_oblock = false
     in_listing = false
     while lines.any?
@@ -225,19 +226,14 @@ class Asciidoc::Document
       if !in_oblock && !in_listing
         if this_line.strip.empty?
           # From the Asciidoc user's guide:
-          #   Another list or a literal paragraph immediately following a list item will be implicitly included in the list item
+          #   Another list or a literal paragraph immediately following
+          #   a list item will be implicitly included in the list item
           next_nonblank = lines.detect{|l| !l.strip.empty?}
           if !next_nonblank.nil? &&
              ( alternate_ending.nil? ||
                !next_nonblank.match(alternate_ending)
-             ) &&
-             ( next_nonblank.match(REGEXP[:ulist])  ||
-               next_nonblank.match(REGEXP[:olist])  ||
-               next_nonblank.match(REGEXP[:colist]) ||
-               next_nonblank.match(REGEXP[:dlist])  ||
-               next_nonblank.match(REGEXP[:lit_par]) ||
-               next_nonblank.match(REGEXP[:continue])
-             )
+             ) && [:ulist, :olist, :colist, :dlist, :lit_par, :continue].
+                  find { |pattern| next_nonblank.match(REGEXP[pattern]) }
 
              # Pull blank lines into the segment, so the next thing up for processing
              # will be the next nonblank line.
@@ -309,7 +305,14 @@ class Asciidoc::Document
         title = match[1]
       elsif match = this_line.match(REGEXP[:caption])
         caption = match[1]
-      elsif this_line.match(REGEXP[:name]) && next_line.match(REGEXP[:line]) && (this_line.size - next_line.size).abs <= 1
+      elsif is_section_heading?(this_line, next_line)
+        # If we've come to a new section, then we've found the end of this
+        # current block.  Likewise if we'd found an unassigned anchor, push
+        # it back as well, so it can go with this next heading.
+        # NOTE - I don't think this will assign the anchor properly. Anchors
+        # only match with double brackets - [[foo]], but what's stored in
+        # `anchor` at this point is only the `foo` part that was stripped out
+        # after matching.  TODO: Need a way to test this.
         lines.unshift(this_line)
         lines.unshift(anchor) unless anchor.nil?
         block = next_section(lines)
@@ -341,7 +344,9 @@ class Asciidoc::Document
             item.blocks << next_block(item_segment, block)
           end
 
-          if item.blocks.any? && item.blocks.first.is_a?(Block) && (item.blocks.first.context == :paragraph || item.blocks.first.context == :literal)
+          if item.blocks.any? &&
+             item.blocks.first.is_a?(Block) &&
+             (item.blocks.first.context == :paragraph || item.blocks.first.context == :literal)
             item.content = item.blocks.shift.buffer.map{|l| l.strip}.join("\n")
           end
 
@@ -354,6 +359,7 @@ class Asciidoc::Document
         lines.unshift(this_line) unless this_line.nil?
 
         block.buffer = items
+
       elsif match = this_line.match(REGEXP[:dlist])
         pairs = []
         block = Block.new(parent, :dlist)
@@ -375,7 +381,9 @@ class Asciidoc::Document
             dd.blocks << next_block(dd_segment, block)
           end
 
-          if dd.blocks.any? && dd.blocks.first.is_a?(Block) && (dd.blocks.first.context == :paragraph || dd.blocks.first.context == :literal)
+          if dd.blocks.any? &&
+             dd.blocks.first.is_a?(Block) &&
+             (dd.blocks.first.context == :paragraph || dd.blocks.first.context == :literal)
             dd.content = dd.blocks.shift.buffer.map{|l| l.strip}.join("\n")
           end
 
