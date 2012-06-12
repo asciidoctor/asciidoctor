@@ -61,6 +61,15 @@ module Asciidoc
     # ====
     :example          => /^={4,}\s*$/,
 
+    # == Foo
+    # Yields a Level 2 title, so exactly the same as
+    #   Foo
+    #   ~~~
+    # would yield.  match[1] is the == sequence, whose
+    # length determines the level, and match[2] is the
+    # title itself.
+    :level_title      => /^(={2,5})\s+(\S.*)\s*$/,
+
     # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
     :line             => /^([=\-~^\+])+\s*$/,
 
