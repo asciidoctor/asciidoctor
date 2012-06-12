@@ -270,12 +270,14 @@ class Asciidoc::Document
     return nil if lines.empty?
 
     # NOTE: An anchor looks like this:
-    #   [[foo]] bar
+    #   [[foo]]
     # with the inside [foo] (including brackets) as match[1]
     if match = lines.first.match(REGEXP[:anchor])
-      # NOTE: This second regexp strips off the brackets from [foo], though
-      # the way the REGEXP[:anchor] is setup, I don't think it would
-      # be possible for it to match without the pairs of brackets.
+      puts "Found an anchor in line:\n\t#{lines.first}"
+      puts "I have decided the match[1] is #{match[1]}"
+      # NOTE: This expression conditionally strips off the brackets from
+      # [foo], though REGEXP[:anchor] won't actually match without
+      # match[1] being bracketed, so the condition isn't necessary.
       anchor = match[1].match(/^\[(.*)\]/) ? $1 : match[1]
       # NOTE: Set @references['foo'] = '[foo]'
       @references[anchor] = match[1]
@@ -314,6 +316,7 @@ class Asciidoc::Document
         # `anchor` at this point is only the `foo` part that was stripped out
         # after matching.  TODO: Need a way to test this.
         lines.unshift(this_line)
+        puts "----> Pushing back '#{anchor}'" unless anchor.nil?
         lines.unshift(anchor) unless anchor.nil?
         block = next_section(lines)
       elsif this_line.match(REGEXP[:oblock])
@@ -332,14 +335,15 @@ class Asciidoc::Document
         while buffer.any?
           block.blocks << next_block(buffer, block)
         end
-      elsif list = [:olist, :ulist, :colist].detect{|l| this_line.match( REGEXP[l] )}
+
+      elsif list_type = [:olist, :ulist, :colist].detect{|l| this_line.match( REGEXP[l] )}
         items = []
-        block = Block.new(parent, list)
-        while !this_line.nil? && match = this_line.match(REGEXP[list])
+        block = Block.new(parent, list_type)
+        while !this_line.nil? && match = this_line.match(REGEXP[list_type])
           item = ListItem.new
 
           lines.unshift match[2].lstrip.sub(/^\./, '\.')
-          item_segment = list_item_segment(lines, :alt_ending => REGEXP[list])
+          item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type])
           while item_segment.any?
             item.blocks << next_block(item_segment, block)
           end
@@ -538,6 +542,7 @@ class Asciidoc::Document
       this_line = lines.shift
       next_line = lines.first || ''
       if match = this_line.match(REGEXP[:anchor])
+        puts "#{__FILE__}#{__LINE__}: Found an anchor '#{match[1]}'"
         section.anchor = match[1]
       elsif is_section_heading?(this_line, next_line)
         header_match = this_line.match(REGEXP[:name])
@@ -550,6 +555,12 @@ class Asciidoc::Document
         section.level = section_level(next_line)
         lines.shift
       end
+    end
+
+    if section.anchor
+      puts "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have a SECTION anchor, yo: '#{section.anchor}'"
+    else
+      puts "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have NO SECTION anchor for section #{section.name}"
     end
 
     if !section.anchor.nil?
@@ -586,11 +597,14 @@ class Asciidoc::Document
       end
     end
 
+    # Now parse section_lines into Blocks
     while section_lines.any?
       skip_blank(section_lines)
 
       section << next_block(section_lines, section) if section_lines.any?
     end
+
+    puts "#{__FILE__}:#{__LINE__} Final SECTION anchor is: '#{section.anchor.inspect}'"
 
     section
   end
