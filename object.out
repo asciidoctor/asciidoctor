@@ -1,17 +1,21 @@
 Defines[keywords] is 'AsciiDoc, DocBook, EPUB, PDF, ebooks, slideshow, slidy, man page'
 continuing key: description with partial value: 'AsciiDoc is a text document format for writing notes, '
 Closing out continuation for key description, final value: 'AsciiDoc is a text document format for writing notes, documentation, articles, books, ebooks, slideshows,   web pages, man pages and blogs.  AsciiDoc files can betranslated to many formats including HTML, PDF, EPUB, man page.'
+
 About to do the section thing, and first line is:
 AsciiDoc Home Page
 ==================
+
 **************
 About to do the next section thing, and first line is:
 .{revdate}: AsciiDoc {revnumber} Released
 ************************************************************************
+
 **************
 About to do the next section thing, and first line is:
 'Stuart Rackham'
 ************************************************************************
+
 **************
 About to do the next section thing, and first line is:
 Introduction
@@ -22,9 +26,11 @@ Introduction
 Next line matched REGEXP[:line]:
 ------------
 0
+
 About to do the section thing, and first line is:
 Introduction
 ------------
+
 **************
 About to do the next section thing, and first line is:
 {description}
