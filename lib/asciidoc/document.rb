@@ -512,10 +512,80 @@ class Asciidoc::Document
     end
   end
 
-  def is_section_heading?(line1, line2)
+  # == is level 0, === is level 1, etc.
+  def single_line_section_level(line)
+    [line.length - 1, 0].max
+  end
+
+  def is_single_line_section_heading?(line)
+    !line.nil? && line.match(REGEXP[:level_title])
+  end
+
+  def is_two_line_section_heading?(line1, line2)
     !line1.nil? && !line2.nil? &&
     line1.match(REGEXP[:name]) && line2.match(REGEXP[:line]) &&
     (line1.size - line2.size).abs <= 1
+  end
+
+  def is_section_heading?(line1, line2 = nil)
+    is_single_line_section_heading?(line1) ||
+    is_two_line_section_heading?(line1, line2)
+  end
+
+  # Private: Extracts the name, level and (optional) embedded anchor from a
+  #          1- or 2-line section heading.
+  #
+  # Returns an array of a String, Integer, and String or nil.
+  #
+  # Examples
+  #
+  #   line1
+  #   => "Foo\n"
+  #   line2
+  #   => "~~~\n"
+  #
+  #   name, level, anchor = extract_section_heading(line1, line2)
+  #
+  #   name
+  #   => "Foo"
+  #   level
+  #   => 2
+  #   anchor
+  #   => nil
+  #
+  #   line1
+  #   => "==== Foo\n"
+  #
+  #   name, level, anchor = extract_section_heading(line1)
+  #
+  #   name
+  #   => "Foo"
+  #   level
+  #   => 3
+  #   anchor
+  #   => nil
+  #
+  def extract_section_heading(line1, line2 = nil)
+    puts "Processing line1: #{line1.chomp}, line2: #{line2.chomp}"
+    sect_name = sect_anchor = nil
+    sect_level = 0
+
+    if is_single_line_section_heading?(line1)
+      header_match = line1.match(REGEXP[:level_title])
+      sect_name = header_match[2]
+      sect_level = single_line_section_level(header_match[1])
+    elsif is_two_line_section_heading?(line1, line2)
+      header_match = line1.match(REGEXP[:name])
+      if anchor_match = header_match[1].match(REGEXP[:anchor_embedded])
+        sect_name   = anchor_match[1]
+        sect_anchor = anchor_match[2]
+      else
+        sect_name = header_match[1]
+      end
+      sect_level = section_level(line2)
+    end
+    puts "Returning #{sect_name}, #{sect_level}, and #{sect_anchor}"
+    return [sect_name, sect_level, sect_anchor]
   end
 
   # Private: Return the next section from the document.
@@ -549,15 +619,8 @@ class Asciidoc::Document
         puts "#{__FILE__}#{__LINE__}: Found an anchor '#{match[1]}'"
         section.anchor = match[1]
       elsif is_section_heading?(this_line, next_line)
-        header_match = this_line.match(REGEXP[:name])
-        if anchor_match = header_match[1].match(REGEXP[:anchor_embedded])
-          section.name   = anchor_match[1]
-          section.anchor = anchor_match[2]
-        else
-          section.name = header_match[1]
-        end
-        section.level = section_level(next_line)
-        lines.shift
+        section.name, section.level, section.anchor = extract_section_heading(this_line, next_line)
+        lines.shift unless is_single_line_section_heading?(this_line)
       end
     end
 
@@ -580,13 +643,16 @@ class Asciidoc::Document
       next_line = lines.first
 
       if is_section_heading?(this_line, next_line)
-        if section_level(next_line) <= section.level
+        _, this_level, _ = extract_section_heading(this_line, next_line)
+        # A section can't contain a section level lower than itself,
+        # so this signifies the end of the section.
+        if this_level <= section.level
           lines.unshift this_line
           lines.unshift section_lines.pop if section_lines.any? && section_lines.last.match(REGEXP[:anchor])
           break
         else
           section_lines << this_line
-          section_lines << lines.shift
+          section_lines << lines.shift unless is_single_line_section_heading?(this_line)
         end
       elsif this_line.match(REGEXP[:listing])
         section_lines << this_line
