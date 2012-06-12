@@ -7,7 +7,7 @@ require 'emerson/errors'
 require 'emerson/string'
 require 'emerson/version'
 
-require 'asciidoc'
+require 'emerson/asciidoc'
 
 module Emerson
 end

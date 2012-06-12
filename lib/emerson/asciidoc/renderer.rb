@@ -1,4 +1,3 @@
-require 'asciidoc/render_templates'
 # Public: Methods for rendering Asciidoc Documents, Sections, and Blocks
 # using erb templates.
 class Asciidoc::Renderer

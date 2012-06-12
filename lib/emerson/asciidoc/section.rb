@@ -102,8 +102,10 @@ class Asciidoc::Section
   #   "<div class=\"paragraph\"><p>foo</p></div>\n<div class=\"paragraph\"><p>bar</p></div>\n<div class=\"paragraph\"><p>baz</p></div>"
   def content
     @blocks.map do |block|
-      puts "Rendering block #{block}"
-      block.render
+      puts "Begin rendering block #{block.is_a?(Asciidoc::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoc::Block) ? block.context : 'n/a' })"
+      poo = block.render
+      puts "===> Done rendering block #{block.is_a?(Asciidoc::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoc::Block) ? block.context : 'n/a' })"
+      poo
     end.join
   end
 

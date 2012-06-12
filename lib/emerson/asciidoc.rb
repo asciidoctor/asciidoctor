@@ -124,9 +124,10 @@ module Asciidoc
     'backtick'   => '`'
   )
 
-  require 'asciidoc/block'
-  require 'asciidoc/document'
-  require 'asciidoc/list_item'
-  require 'asciidoc/renderer'
-  require 'asciidoc/section'
+  require 'emerson/asciidoc/block'
+  require 'emerson/asciidoc/document'
+  require 'emerson/asciidoc/list_item'
+  require 'emerson/asciidoc/render_templates'
+  require 'emerson/asciidoc/renderer'
+  require 'emerson/asciidoc/section'
 end
