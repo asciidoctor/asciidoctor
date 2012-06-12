@@ -24,25 +24,41 @@ end
 class DocumentTemplate < BaseTemplate
   def template
     @template ||= ::ERB.new <<-EOF
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="generator" content="AsciiDoc 8.6.7" />
+    <meta name="description" content="AsciiDoc is a text document format for writing notes,  documentation, articles, books, ebooks, slideshows,    web pages, man pages and blogs.  AsciiDoc files can be translated to many formats including HTML, PDF, EPUB,  man page." />
+    <meta name="keywords" content="AsciiDoc, DocBook, EPUB, PDF, ebooks, slideshow, slidy, man page" />
+    <title>AsciiDoc Home Page</title>
+    <link rel="stylesheet" href="http://www.methods.co.nz/asciidoc/asciidoc.css" type="text/css" />
+    <link rel="stylesheet" href="http://www.methods.co.nz/asciidoc/layout2.css" type="text/css" />
+  </head>
+  <body>
       <div class='man-page'>
-        <div id='header'>
-          <% if document %>
-            <% if document.header %>
-              <h2><%= document.header.name %></h2>
-              <div class='sectionbody'><%= document.header.content %></div>
-            <% elsif document.preamble %>
-              <div class=preamble'>
-                <div class='sectionbody'>
-                  <%= document.preamble.content %>
-                </div>
+      <div id='header'>
+        <% if document %>
+          <% if document.header %>
+            <h2><%= document.header.name %></h2>
+            <div class='sectionbody'><%= document.header.content %></div>
+          <% elsif document.preamble %>
+            <div class=preamble'>
+              <div class='sectionbody'>
+                <%= document.preamble.content %>
               </div>
-            <% end %>
+            </div>
           <% end %>
-        </div>
-
-        <%= content %>
+        <% end %>
       </div>
-    EOF
+
+      <%= content %>
+
+    </div>
+  </body>
+</html>
+EOF
   end
 end
 
