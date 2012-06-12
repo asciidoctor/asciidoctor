@@ -656,11 +656,9 @@ class Asciidoc::Document
         end
       elsif this_line.match(REGEXP[:listing])
         section_lines << this_line
+        section_lines.concat grab_lines_until(lines) {|line| line.match( REGEXP[:listing] ) }
+        # Also grab the last line, if there is one
         this_line = lines.shift
-        while !this_line.nil? && !this_line.match(REGEXP[:listing])
-          section_lines << this_line
-          this_line = lines.shift
-        end
         section_lines << this_line unless this_line.nil?
       else
         section_lines << this_line
