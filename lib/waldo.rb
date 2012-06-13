@@ -10,4 +10,7 @@ require 'waldo/version'
 require 'waldo/asciidoc'
 
 module Waldo
+  def self.debug(*args)
+    puts *args unless ENV['SUPPRESS_DEBUG']
+  end
 end

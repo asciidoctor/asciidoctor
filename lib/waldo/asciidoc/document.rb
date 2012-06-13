@@ -17,8 +17,8 @@ class Asciidoc::Document
   # Need these for pseudo-template yum
   attr_reader :header, :preamble
 
-  # Root element of the parsed document
-  attr_reader :root
+  # Public: Get the Array of elements (really Blocks or Sections) for the document
+  attr_reader :elements
 
   # Public: Initialize an Asciidoc object.
   #
@@ -29,10 +29,11 @@ class Asciidoc::Document
   # Examples
   #
   #   base = File.dirname(filename)
-  #   data = File.readlines(filename)
-  #   doc  = Asciidoc.new(data)
+  #   data = File.read(filename)
+  #   doc  = Asciidoc::Document.new(data)
   def initialize(data, &block)
     raw_source = []
+    @elements = []
     @defines = {}
     @references = {}
 
@@ -49,17 +50,18 @@ class Asciidoc::Document
     endif_regexp = /^endif::/
     defattr_regexp = /^:([^:]+):\s*(.*)\s*$/
     conditional_regexp = /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/
+
     skip_to = nil
     continuing_value = nil
     continuing_key = nil
     @lines = []
     raw_source.each do |line|
-      if !skip_to.nil?
+      if skip_to
         skip_to = nil if line.match(skip_to)
-      elsif !continuing_value.nil?
+      elsif continuing_value
         close_continue = false
-        # Lines that start with whitespace are a continuation,
-        # so gobble them up into `value`
+        # Lines that start with whitespace and end with a '+' are
+        # a continuation, so gobble them up into `value`
         if match = line.match(/\s+(.+)\s+\+\s*$/)
           continuing_value += match[1]
         elsif match = line.match(/\s+(.+)/)
@@ -70,15 +72,11 @@ class Asciidoc::Document
           close_continue = true
         else
           # If this line doesn't start with whitespace, then it's
-          # not a valid continuation line, so TODO FIGURE THIS OUT.
-          # Possibly we don't care about this crap, and we just
-          # look for a properly whitespace-opening and close it out
-          # if there's no + on the end.
+          # not a valid continuation line, so push it back for processing
           close_continue = true
-          raise "Yeah, you can't do that here: #{__FILE__}:#{__LINE__}"
+          raw_source.unshift(line)
         end
         if close_continue
-          puts "Closing out continuation for key #{continuing_key}, final value: '#{continuing_value}'"
           @defines[continuing_key] = continuing_value
           continuing_key = nil
           continuing_value = nil
@@ -97,10 +95,10 @@ class Asciidoc::Document
           # continuation line, grab lines until we run out of continuation lines
           continuing_key = key
           continuing_value = match[1]  # strip off the spaces and +
-          puts "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
+          Waldo.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
         else
           @defines[key] = value
-          puts "Defines[#{key}] is '#{value}'"
+          Waldo.debug "Defines[#{key}] is '#{value}'"
         end
       elsif !line.match(endif_regexp)
         while match = line.match(conditional_regexp)
@@ -121,25 +119,32 @@ class Asciidoc::Document
 
     @source = @lines.join
 
-    @root = next_section(@lines)
-    # After processing blocks, if the first block is a Section, pull it out
-    # as the @header.
-    if @root.blocks.first.is_a?(Section)
-      @header = @root.blocks.shift
+    # Now @lines into elements
+    while @lines.any?
+      skip_blank(@lines)
+
+      @elements << next_block(@lines) if @lines.any?
+    end
+
+    # Try to find a @header from the Section blocks we have (if any).
+    if (@elements.size == 1) && @elements.first.is_a?(Section)
+      # If our whole document is contained in a single Section,
+      # then look inside it for a @header section.
+      root = @elements.first.blocks
     else
-      # Otherwise, make a new Section, and pull off all leading Block objects
-      # and concat them as the @preamble.
-      @preamble = Section.new(self)
-      while @root.blocks.first.is_a?(Block)
-        @preamble << @root.blocks.shift
-      end
+      # Otherwise, start at the top.
+      root = @elements
+    end
+
+    if root.first.is_a?(Section)
+      @header = root.shift
     end
   end
 
   # We need to be able to return some semblance of a title
   def title
-    if self.root
-      @title ||= self.root.title || self.root.name
+    if @elements.first
+      @title ||= @elements.first.title || @elements.first.name
     end
     @title
   end
@@ -156,8 +161,8 @@ class Asciidoc::Document
     else
       puts "No preamble"
     end
-    puts "I have #{@root.blocks.count} blocks"
-    @root.blocks.each_with_index do |block, i|
+    puts "I have #{@elements.count} elements"
+    @elements.each_with_index do |block, i|
       puts "Block ##{i} is a #{block.class}"
       puts "Name is #{block.name}"
       puts "=" * 40
@@ -168,9 +173,16 @@ class Asciidoc::Document
   #
   def render
     @renderer ||= Renderer.new
-    puts "Document#renderer is #{@renderer}"
+    html = self.renderer.render('document', self, :header => @header, :preamble => @preamble)
+  end
 
-    html = self.renderer.render('document', @root, :header => @header, :preamble => @preamble)
+  def content
+    html_pieces = []
+    @elements.each do |element|
+      Waldo::debug "Rendering element: #{element}"
+      html_pieces << element.render
+    end
+    html_pieces.join("\n")
   end
 
   private
@@ -265,7 +277,7 @@ class Asciidoc::Document
   end
 
   # Private: Return all the lines from `lines` until we run out of lines,
-  #   find a blank line without :include_blank => true, or find a line
+  #   find a blank line with :break_on_blank_lines => true, or find a line
   #   for which the given block evals to true.
   #
   # lines   - the Array of String lines.
@@ -291,7 +303,7 @@ class Asciidoc::Document
     buffer = []
 
     while (this_line = lines.shift)
-      puts "Processing line: '#{this_line}'"
+      Waldo.debug "Processing line: '#{this_line}'"
       finis = this_line.nil?
       finis ||= true if options[:break_on_blank_lines] && this_line.strip.empty?
       finis ||= true if block && value = yield(this_line)
@@ -322,7 +334,7 @@ class Asciidoc::Document
     #   [[foo]]
     # with the inside [foo] (including brackets) as match[1]
     if match = lines.first.match(REGEXP[:anchor])
-      puts "Found an anchor in line:\n\t#{lines.first}"
+      Waldo.debug "Found an anchor in line:\n\t#{lines.first}"
       # NOTE: This expression conditionally strips off the brackets from
       # [foo], though REGEXP[:anchor] won't actually match without
       # match[1] being bracketed, so the condition isn't necessary.
@@ -334,11 +346,11 @@ class Asciidoc::Document
       anchor = nil
     end
 
-    puts "/"*64
-    puts "#{__FILE__}:#{__LINE__} - First two lines are:"
-    puts lines.first
-    puts lines[1]
-    puts "/"*64
+    Waldo.debug "/"*64
+    Waldo.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Waldo.debug lines.first
+    Waldo.debug lines[1]
+    Waldo.debug "/"*64
 
     block = nil
     title = nil
@@ -351,10 +363,14 @@ class Asciidoc::Document
 
       if this_line.match(REGEXP[:comment])
         next
+
       elsif match = this_line.match(REGEXP[:title])
         title = match[1]
+        skip_blank(lines)
+
       elsif match = this_line.match(REGEXP[:caption])
         caption = match[1]
+
       elsif is_section_heading?(this_line, next_line)
         # If we've come to a new section, then we've found the end of this
         # current block.  Likewise if we'd found an unassigned anchor, push
@@ -366,6 +382,7 @@ class Asciidoc::Document
         lines.unshift(this_line)
         lines.unshift(anchor) unless anchor.nil?
         block = next_section(lines)
+
       elsif this_line.match(REGEXP[:oblock])
         # oblock is surrounded by '--' lines and has zero or more blocks inside
         buffer = grab_lines_until(lines) { |line| line.match(REGEXP[:oblock]) }
@@ -442,17 +459,21 @@ class Asciidoc::Document
         end
         lines.unshift(this_line) unless this_line.nil?
         block.buffer = pairs
+
       elsif this_line.match(REGEXP[:verse])
         # verse is preceded by [verse] and lasts until a blank line
         buffer = grab_lines_until(lines, :break_on_blank_lines => true)
         block = Block.new(parent, :verse, buffer)
+
       elsif this_line.match(REGEXP[:note])
         # note is an admonition preceded by [NOTE] and lasts until a blank line
         buffer = grab_lines_until(lines, :break_on_blank_lines => true) {|line| line.match( REGEXP[:continue] ) }
         block = Block.new(parent, :note, buffer)
+
       elsif text = [:listing, :example].detect{|t| this_line.match( REGEXP[t] )}
         buffer = grab_lines_until(lines) {|line| line.match( REGEXP[text] )}
         block = Block.new(parent, text, buffer)
+
       elsif this_line.match( REGEXP[:quote] )
         block = Block.new(parent, :quote)
         buffer = grab_lines_until(lines) {|line| line.match( REGEXP[:quote] ) }
@@ -460,10 +481,12 @@ class Asciidoc::Document
         while buffer.any?
           block.blocks << next_block(buffer, block)
         end
+
       elsif this_line.match(REGEXP[:lit_blk])
         # example is surrounded by '....' (4 or more '.' chars) lines
         buffer = grab_lines_until(lines) {|line| line.match( REGEXP[:lit_blk] ) }
         block = Block.new(parent, :literal, buffer)
+
       elsif this_line.match(REGEXP[:lit_par])
         # literal paragraph is contiguous lines starting with
         # one or more space or tab characters
@@ -473,10 +496,12 @@ class Asciidoc::Document
         buffer = grab_lines_until(lines, :preserve_last_line => true) {|line| ! line.match( REGEXP[:lit_par] ) }
 
         block = Block.new(parent, :literal, buffer)
+
       elsif this_line.match(REGEXP[:sidebar_blk])
         # example is surrounded by '****' (4 or more '*' chars) lines
         buffer = grab_lines_until(lines) {|line| line.match( REGEXP[:sidebar_blk] ) }
         block = Block.new(parent, :sidebar, buffer)
+
       else
         # paragraph is contiguous nonblank/noncontinuation lines
         while !this_line.nil? && !this_line.strip.empty?
@@ -574,7 +599,7 @@ class Asciidoc::Document
   #   => nil
   #
   def extract_section_heading(line1, line2 = nil)
-    puts "Processing line1: #{line1.chomp}, line2: #{line2.chomp}"
+    Waldo.debug "Processing line1: #{line1.chomp}, line2: #{line2.chomp}"
     sect_name = sect_anchor = nil
     sect_level = 0
 
@@ -592,7 +617,7 @@ class Asciidoc::Document
       end
       sect_level = section_level(line2)
     end
-    puts "Returning #{sect_name}, #{sect_level}, and #{sect_anchor}"
+    Waldo.debug "Returning #{sect_name}, #{sect_level}, and #{sect_anchor}"
     return [sect_name, sect_level, sect_anchor]
   end
 
@@ -613,29 +638,22 @@ class Asciidoc::Document
   def next_section(lines)
     section = Section.new(self)
 
-    puts "%"*64
-    puts "#{__FILE__}:#{__LINE__} - First two lines are:"
-    puts lines.first
-    puts lines[1]
-    puts "%"*64
+    Waldo.debug "%"*64
+    Waldo.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Waldo.debug lines.first
+    Waldo.debug lines[1]
+    Waldo.debug "%"*64
 
     # Skip ahead to the next section definition
     while lines.any? && section.name.nil?
       this_line = lines.shift
       next_line = lines.first || ''
       if match = this_line.match(REGEXP[:anchor])
-        puts "#{__FILE__}#{__LINE__}: Found an anchor '#{match[1]}'"
         section.anchor = match[1]
       elsif is_section_heading?(this_line, next_line)
         section.name, section.level, section.anchor = extract_section_heading(this_line, next_line)
         lines.shift unless is_single_line_section_heading?(this_line)
       end
-    end
-
-    if section.anchor
-      puts "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have a SECTION anchor, yo: '#{section.anchor}'"
-    else
-      puts "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have NO SECTION anchor for section #{section.name}"
     end
 
     if !section.anchor.nil?
@@ -680,7 +698,7 @@ class Asciidoc::Document
       section << next_block(section_lines, section) if section_lines.any?
     end
 
-    puts "#{__FILE__}:#{__LINE__} Final SECTION anchor is: '#{section.anchor.inspect}'"
+    Waldo.debug "#{__FILE__}:#{__LINE__} Final SECTION anchor is: '#{section.anchor.inspect}'"
 
     section
   end

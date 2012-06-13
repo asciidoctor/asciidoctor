@@ -39,7 +39,7 @@ class Asciidoc::Block
 
   # Public: Get the Asciidoc::Document instance to which this Block belongs
   def document
-    @parent.is_a?(Document) ? @parent : @parent.document
+    @parent.is_a?(Asciidoc::Document) ? @parent : @parent.document
   end
 
   # Public: Get the Asciidoc::Renderer instance being used for the ancestor
@@ -53,9 +53,9 @@ class Asciidoc::Block
   # rendered and returned as content that can be included in the
   # parent block's template.
   def render
-    puts "Now attempting to render for #{context} my own bad #{self}"
-    puts "Parent is #{@parent}"
-    puts "Renderer is #{renderer}"
+    Waldo.debug "Now attempting to render for #{context} my own bad #{self}"
+    Waldo.debug "Parent is #{@parent}"
+    Waldo.debug "Renderer is #{renderer}"
     renderer.render("section_#{context}", self)
   end
 
