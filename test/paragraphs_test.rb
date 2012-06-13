@@ -24,11 +24,11 @@ context "Paragraphs" do
 
   context "special" do
     test "note multiline syntax" do
-      assert_xpath "//img[@alt='note']", render_string("[NOTE]\nThis is a winner.")
+      assert_xpath "//div[@class='admonitionblock']", render_string("[NOTE]\nThis is a winner.")
     end
 
     test "note inline syntax" do
-      assert_xpath "//img[@alt='note']", render_string("NOTE: This is important, fool!")
+      assert_xpath "//div[@class='admonitionblock']", render_string("NOTE: This is important, fool!")
     end
   end
 end
