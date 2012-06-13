@@ -357,6 +357,7 @@ class Asciidoc::Document
     block = nil
     title = nil
     caption = nil
+    source_type = nil
     buffer = []
     while lines.any? && block.nil?
       buffer.clear
@@ -368,6 +369,10 @@ class Asciidoc::Document
 
       elsif match = this_line.match(REGEXP[:title])
         title = match[1]
+        skip_blank(lines)
+
+      elsif match = this_line.match(REGEXP[:listing_source])
+        source_type = match[1]
         skip_blank(lines)
 
       elsif match = this_line.match(REGEXP[:caption])
@@ -473,9 +478,9 @@ class Asciidoc::Document
         buffer = grab_lines_until(lines, :break_on_blank_lines => true) {|line| line.match( REGEXP[:continue] ) }
         block = Block.new(parent, :note, buffer)
 
-      elsif text = [:listing, :example].detect{|t| this_line.match( REGEXP[t] )}
-        buffer = grab_lines_until(lines) {|line| line.match( REGEXP[text] )}
-        block = Block.new(parent, text, buffer)
+      elsif block_type = [:listing, :example].detect{|t| this_line.match( REGEXP[t] )}
+        buffer = grab_lines_until(lines) {|line| line.match( REGEXP[block_type] )}
+        block = Block.new(parent, block_type, buffer)
 
       elsif this_line.match( REGEXP[:quote] )
         block = Block.new(parent, :quote)
@@ -520,6 +525,8 @@ class Asciidoc::Document
         if buffer.any? && admonition = buffer.first.match(/^NOTE:\s*/)
           buffer[0] = admonition.post_match
           block = Block.new(parent, :note, buffer)
+        elsif source_type
+          block = Block.new(parent, :listing, buffer)
         else
           block = Block.new(parent, :paragraph, buffer)
         end

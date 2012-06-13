@@ -17,8 +17,12 @@ context "Paragraphs" do
       assert_xpath "//pre/tt", render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
     end
 
-    test "code paragraph" do
-      assert_xpath "//div[@class='highlight']", render_string("[source,perl]\ndie 'zomg perl sucks';")
+    test "listing paragraph" do
+      assert_xpath "//div[@class='highlight']", render_string("----\nblah blah blah\n----")
+    end
+
+    test "source code paragraph" do
+      assert_xpath "//div[@class='highlight']", render_string("[source, perl]\ndie 'zomg perl sucks';")
     end
   end
 

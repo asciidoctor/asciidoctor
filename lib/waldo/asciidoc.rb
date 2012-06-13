@@ -77,6 +77,10 @@ module Asciidoc
     # ----
     :listing          => /^\-{4,}\s*$/,
 
+    # [source, ruby]
+    # Treats the next paragraph as a :listing block
+    :listing_source   => /^\[source,\s*([^\]]+)\]\s*$/,
+
     # ....
     :lit_blk          => /^\.{4,}\s*$/,
 

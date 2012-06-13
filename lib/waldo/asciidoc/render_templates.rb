@@ -88,6 +88,20 @@ class SectionDlistTemplate < BaseTemplate
   end
 end
 
+class SectionListingTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='listingblock'>
+        <div class='content'>
+          <div class='highlight'>
+            <pre><%= content %></pre>
+          </div>
+        </div>
+      </div>
+    EOF
+  end
+end
+
 class SectionLiteralTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
@@ -176,12 +190,6 @@ end
         <pre><tt><%= content %></tt></pre>
       </div>
     </div>
-  </div>
-</div>
-../gitscm-next/templates/section_listing.html.erb
-<div class='listingblock'>
-  <div class='content'>
-    <pre><tt><%= content %></tt></pre>
   </div>
 </div>
 ../gitscm-next/templates/section_oblock.html.erb
