@@ -48,8 +48,9 @@ module Asciidoc
     # // (and then whatever)
     :comment          => /^\/\/\s/,
 
-    # +   (note that Asciidoc appears to allow continuations using + at the end of the previous line and indenting
-    #      the following line (as in :lit_par))
+    # +   Note that Asciidoc appears to allow continuations using + at
+    #     the end of the previous line and indenting
+    #     the following line (as in :lit_par)
     :continue         => /^\+\s*$/,
 
     # foo::  ||  foo;;
@@ -98,7 +99,11 @@ module Asciidoc
     :quote            => /^_{4,}\s*$/,
 
     # ****
-    :sidebar_blk          => /^\*{4,}\s*$/,
+    :sidebar_blk      => /^\*{4,}\s*$/,
+
+    #     and blah blah blah
+    # ^^^^  <--- whitespace
+    :starts_with_whitespace => /\s+(.+)\s+\+\s*$/,
 
     # .Foo   but not  . Foo or ..Foo
     :title            => /^\.([^\s\.].*)\s*$/,

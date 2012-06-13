@@ -29,8 +29,8 @@ class Asciidoc::Document
   # Examples
   #
   #   base = File.dirname(filename)
-  #   data = File.readlines(filename)
-  #   doc  = Asciidoc.new(data)
+  #   data = File.read(filename)
+  #   doc  = Asciidoc::Document.new(data)
   def initialize(data, &block)
     raw_source = []
     @defines = {}
@@ -54,12 +54,12 @@ class Asciidoc::Document
     continuing_key = nil
     @lines = []
     raw_source.each do |line|
-      if !skip_to.nil?
+      if skip_to
         skip_to = nil if line.match(skip_to)
-      elsif !continuing_value.nil?
+      elsif continuing_value
         close_continue = false
-        # Lines that start with whitespace are a continuation,
-        # so gobble them up into `value`
+        # Lines that start with whitespace and end with a '+' are
+        # a continuation, so gobble them up into `value`
         if match = line.match(/\s+(.+)\s+\+\s*$/)
           continuing_value += match[1]
         elsif match = line.match(/\s+(.+)/)
@@ -259,7 +259,7 @@ class Asciidoc::Document
   end
 
   # Private: Return all the lines from `lines` until we run out of lines,
-  #   find a blank line without :include_blank => true, or find a line
+  #   find a blank line with :break_on_blank_lines => true, or find a line
   #   for which the given block evals to true.
   #
   # lines   - the Array of String lines.
@@ -345,10 +345,13 @@ class Asciidoc::Document
 
       if this_line.match(REGEXP[:comment])
         next
+
       elsif match = this_line.match(REGEXP[:title])
         title = match[1]
+
       elsif match = this_line.match(REGEXP[:caption])
         caption = match[1]
+
       elsif is_section_heading?(this_line, next_line)
         # If we've come to a new section, then we've found the end of this
         # current block.  Likewise if we'd found an unassigned anchor, push
@@ -360,6 +363,7 @@ class Asciidoc::Document
         lines.unshift(this_line)
         lines.unshift(anchor) unless anchor.nil?
         block = next_section(lines)
+
       elsif this_line.match(REGEXP[:oblock])
         # oblock is surrounded by '--' lines and has zero or more blocks inside
         buffer = grab_lines_until(lines) { |line| line.match(REGEXP[:oblock]) }
@@ -436,17 +440,21 @@ class Asciidoc::Document
         end
         lines.unshift(this_line) unless this_line.nil?
         block.buffer = pairs
+
       elsif this_line.match(REGEXP[:verse])
         # verse is preceded by [verse] and lasts until a blank line
         buffer = grab_lines_until(lines, :break_on_blank_lines => true)
         block = Block.new(parent, :verse, buffer)
+
       elsif this_line.match(REGEXP[:note])
         # note is an admonition preceded by [NOTE] and lasts until a blank line
         buffer = grab_lines_until(lines, :break_on_blank_lines => true) {|line| line.match( REGEXP[:continue] ) }
         block = Block.new(parent, :note, buffer)
+
       elsif text = [:listing, :example].detect{|t| this_line.match( REGEXP[t] )}
         buffer = grab_lines_until(lines) {|line| line.match( REGEXP[text] )}
         block = Block.new(parent, text, buffer)
+
       elsif this_line.match( REGEXP[:quote] )
         block = Block.new(parent, :quote)
         buffer = grab_lines_until(lines) {|line| line.match( REGEXP[:quote] ) }
@@ -454,10 +462,12 @@ class Asciidoc::Document
         while buffer.any?
           block.blocks << next_block(buffer, block)
         end
+
       elsif this_line.match(REGEXP[:lit_blk])
         # example is surrounded by '....' (4 or more '.' chars) lines
         buffer = grab_lines_until(lines) {|line| line.match( REGEXP[:lit_blk] ) }
         block = Block.new(parent, :literal, buffer)
+
       elsif this_line.match(REGEXP[:lit_par])
         # literal paragraph is contiguous lines starting with
         # one or more space or tab characters
@@ -467,10 +477,12 @@ class Asciidoc::Document
         buffer = grab_lines_until(lines, :preserve_last_line => true) {|line| ! line.match( REGEXP[:lit_par] ) }
 
         block = Block.new(parent, :literal, buffer)
+
       elsif this_line.match(REGEXP[:sidebar_blk])
         # example is surrounded by '****' (4 or more '*' chars) lines
         buffer = grab_lines_until(lines) {|line| line.match( REGEXP[:sidebar_blk] ) }
         block = Block.new(parent, :sidebar, buffer)
+
       else
         # paragraph is contiguous nonblank/noncontinuation lines
         while !this_line.nil? && !this_line.strip.empty?
@@ -618,18 +630,11 @@ class Asciidoc::Document
       this_line = lines.shift
       next_line = lines.first || ''
       if match = this_line.match(REGEXP[:anchor])
-        Waldo.debug "#{__FILE__}#{__LINE__}: Found an anchor '#{match[1]}'"
         section.anchor = match[1]
       elsif is_section_heading?(this_line, next_line)
         section.name, section.level, section.anchor = extract_section_heading(this_line, next_line)
         lines.shift unless is_single_line_section_heading?(this_line)
       end
-    end
-
-    if section.anchor
-      Waldo.debug "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have a SECTION anchor, yo: '#{section.anchor}'"
-    else
-      Waldo.debug "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have NO SECTION anchor for section #{section.name}"
     end
 
     if !section.anchor.nil?
