@@ -6,7 +6,7 @@ context "Text" do
   end
 
   test "quotes" do
-    rendered = render_string("\"Where?,\" she said, flipping through her copy of 'The New Yorker.'")
+    rendered = render_string("``Where?,'' she said, flipping through her copy of `The New Yorker.'")
     assert_match /&rdquo;/, rendered
     assert_match /&ldquo;/, rendered
     assert_match /&rsquo;/, rendered
@@ -14,7 +14,7 @@ context "Text" do
   end
 
   test "separator" do
-    assert_xpath "//hr", "This is separated.\n\n''''\n\n...from this!", 1
+    assert_xpath "//hr", render_string("This is separated.\n\n''''\n\n...from this!"), 1
   end
 
   context "basic styling" do 
@@ -35,7 +35,7 @@ context "Text" do
     end
 
     test "superscript" do
-      assert_xpath "//super", @rendered 
+      assert_xpath "//sup", @rendered 
     end
 
     test "subscript" do
@@ -43,7 +43,7 @@ context "Text" do
     end
 
     test "backticks" do
-      assert_xpath "//tt", "This is `totally cool`." 
+      assert_xpath "//tt", render_string("This is `totally cool`.")
     end
 
     test "combined styles" do
@@ -54,7 +54,7 @@ context "Text" do
     end
 
     test "characters" do
-      rendered_chars = "**B**__I__++M++"
+      rendered_chars = render_string("**B**__I__++M++")
       assert_xpath "//strong", rendered_chars 
       assert_xpath "//em", rendered_chars 
       assert_xpath "//tt", rendered_chars 

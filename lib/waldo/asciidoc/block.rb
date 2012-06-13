@@ -142,11 +142,19 @@ class Asciidoc::Block
 
       html = CGI.escapeHTML(html)
       html.gsub!(Asciidoc::REGEXP[:biblio], '<a name="\1">[\1]</a>')
+      html.gsub!(/``(.*?)''/m, '&ldquo;\1&rdquo;')
+      html.gsub!(/`(.*?)'/m, '&lsquo;\1&rsquo;')
       html.gsub!(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }
-      html.gsub!(/``(.*?)''/m, '&#147;\1&#148;')
-      html.gsub!(/(^|\W)'([^']+)'/m, '\1<em>\2</em>')
-      html.gsub!(/(^|\W)_([^_]+)_/m, '\1<em>\2</em>')
-      html.gsub!(/\*([^\*]+)\*/m, '<strong>\1</strong>')
+      html.gsub!(/\_\_([^\_]+)\_\_/m, '<em>\1</em>')
+      html.gsub!(/\*\*([^\*]+)\*\*/m, '<strong>\1</strong>')
+      html.gsub!(/\+\+([^\+]+)\+\+/m, '<tt>\1</tt>')
+      html.gsub!(/\^\^([^\^]+)\^\^/m, '<sup>\1</sup>')
+      html.gsub!(/\~\~([^\~]+)\~\~/m, '<sub>\1</sub>')
+      html.gsub!(/(?:^|[\s\W\A])\*([^\*]+)\*(?:$|[\s\W\z])/m, '<strong>\1</strong>')
+      html.gsub!(/(?:^|[\s\W\A])_([^_]+)_(?:$|[\s\W\z])/m, '<em>\1</em>')
+      html.gsub!(/(?:^|[\s\W\A])\+([^\+]+)\+(?:$|[\s\W\z])/m, '<tt>\1</tt>')
+      html.gsub!(/(?:^|[\s\W\A])\^([^\^]+)\^(?:$|[\s\W\z])/m, '<sup>\1</sup>')
+      html.gsub!(/(?:^|[\s\W\A])\~([^\~]+)\~(?:$|[\s\W\z])/m, '<sub>\1</sub>')
 
       # Don't have lookbehind so have to capture and re-insert
       html.gsub!(/(^|[^\\])\{(\w[\w\-]+\w)\}/) do
