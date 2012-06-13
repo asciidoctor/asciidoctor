@@ -60,7 +60,6 @@ Gem::Specification.new do |s|
     README.md
     Rakefile
     bin/waldo
-    waldo.gemspec
     lib/waldo.rb
     lib/waldo/asciidoc.rb
     lib/waldo/asciidoc/block.rb
@@ -80,6 +79,7 @@ Gem::Specification.new do |s|
     test/fixtures/asciidoc_index.txt
     test/fixtures/ascshort.txt
     test/test_helper.rb
+    waldo.gemspec
   ]
   # = MANIFEST =
 
