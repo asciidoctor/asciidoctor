@@ -7,6 +7,8 @@ require 'mocha'
 require 'htmlentities'
 require 'nokogiri'
 
+ENV['SUPPRESS_DEBUG'] = 'true'
+
 class Test::Unit::TestCase
   def sample_doc_path(name)
     name = name.to_s

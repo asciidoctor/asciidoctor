@@ -9,7 +9,6 @@ class Asciidoc::Renderer
     @views = {}
 
     # Load up all the template classes that we know how to render
-    puts "Here are the template classes we know about: #{BaseTemplate.template_classes.inspect}"
     BaseTemplate.template_classes.each do |tc|
       view = tc.to_s.underscore.gsub(/_template$/, '')
       @views[view] = tc.new
@@ -28,7 +27,7 @@ class Asciidoc::Renderer
     if @views[view].nil?
       raise "Couldn't find a view in @views for #{view}"
     else
-      puts "View for #{view} is #{@views[view]}, object is #{object}"
+      Waldo.debug "View for #{view} is #{@views[view]}, object is #{object}"
     end
     ret = @views[view].render(object, locals)
 

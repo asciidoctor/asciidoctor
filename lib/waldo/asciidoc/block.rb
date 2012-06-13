@@ -53,9 +53,9 @@ class Asciidoc::Block
   # rendered and returned as content that can be included in the
   # parent block's template.
   def render
-    puts "Now attempting to render for #{context} my own bad #{self}"
-    puts "Parent is #{@parent}"
-    puts "Renderer is #{renderer}"
+    Waldo.debug "Now attempting to render for #{context} my own bad #{self}"
+    Waldo.debug "Parent is #{@parent}"
+    Waldo.debug "Renderer is #{renderer}"
     renderer.render("section_#{context}", self)
   end
 

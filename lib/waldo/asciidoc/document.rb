@@ -93,10 +93,10 @@ class Asciidoc::Document
           # continuation line, grab lines until we run out of continuation lines
           continuing_key = key
           continuing_value = match[1]  # strip off the spaces and +
-          puts "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
+          Waldo.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
         else
           @defines[key] = value
-          puts "Defines[#{key}] is '#{value}'"
+          Waldo.debug "Defines[#{key}] is '#{value}'"
         end
       elsif !line.match(endif_regexp)
         while match = line.match(conditional_regexp)
@@ -164,8 +164,6 @@ class Asciidoc::Document
   #
   def render
     @renderer ||= Renderer.new
-    puts "Document#renderer is #{@renderer}"
-
     html = self.renderer.render('document', @root, :header => @header, :preamble => @preamble)
   end
 
@@ -287,7 +285,7 @@ class Asciidoc::Document
     buffer = []
 
     while (this_line = lines.shift)
-      puts "Processing line: '#{this_line}'"
+      Waldo.debug "Processing line: '#{this_line}'"
       finis = this_line.nil?
       finis ||= true if options[:break_on_blank_lines] && this_line.strip.empty?
       finis ||= true if block && value = yield(this_line)
@@ -318,7 +316,7 @@ class Asciidoc::Document
     #   [[foo]]
     # with the inside [foo] (including brackets) as match[1]
     if match = lines.first.match(REGEXP[:anchor])
-      puts "Found an anchor in line:\n\t#{lines.first}"
+      Waldo.debug "Found an anchor in line:\n\t#{lines.first}"
       # NOTE: This expression conditionally strips off the brackets from
       # [foo], though REGEXP[:anchor] won't actually match without
       # match[1] being bracketed, so the condition isn't necessary.
@@ -330,11 +328,11 @@ class Asciidoc::Document
       anchor = nil
     end
 
-    puts "/"*64
-    puts "#{__FILE__}:#{__LINE__} - First two lines are:"
-    puts lines.first
-    puts lines[1]
-    puts "/"*64
+    Waldo.debug "/"*64
+    Waldo.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Waldo.debug lines.first
+    Waldo.debug lines[1]
+    Waldo.debug "/"*64
 
     block = nil
     title = nil
@@ -570,7 +568,7 @@ class Asciidoc::Document
   #   => nil
   #
   def extract_section_heading(line1, line2 = nil)
-    puts "Processing line1: #{line1.chomp}, line2: #{line2.chomp}"
+    Waldo.debug "Processing line1: #{line1.chomp}, line2: #{line2.chomp}"
     sect_name = sect_anchor = nil
     sect_level = 0
 
@@ -588,7 +586,7 @@ class Asciidoc::Document
       end
       sect_level = section_level(line2)
     end
-    puts "Returning #{sect_name}, #{sect_level}, and #{sect_anchor}"
+    Waldo.debug "Returning #{sect_name}, #{sect_level}, and #{sect_anchor}"
     return [sect_name, sect_level, sect_anchor]
   end
 
@@ -609,18 +607,18 @@ class Asciidoc::Document
   def next_section(lines)
     section = Section.new(self)
 
-    puts "%"*64
-    puts "#{__FILE__}:#{__LINE__} - First two lines are:"
-    puts lines.first
-    puts lines[1]
-    puts "%"*64
+    Waldo.debug "%"*64
+    Waldo.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Waldo.debug lines.first
+    Waldo.debug lines[1]
+    Waldo.debug "%"*64
 
     # Skip ahead to the next section definition
     while lines.any? && section.name.nil?
       this_line = lines.shift
       next_line = lines.first || ''
       if match = this_line.match(REGEXP[:anchor])
-        puts "#{__FILE__}#{__LINE__}: Found an anchor '#{match[1]}'"
+        Waldo.debug "#{__FILE__}#{__LINE__}: Found an anchor '#{match[1]}'"
         section.anchor = match[1]
       elsif is_section_heading?(this_line, next_line)
         section.name, section.level, section.anchor = extract_section_heading(this_line, next_line)
@@ -629,9 +627,9 @@ class Asciidoc::Document
     end
 
     if section.anchor
-      puts "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have a SECTION anchor, yo: '#{section.anchor}'"
+      Waldo.debug "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have a SECTION anchor, yo: '#{section.anchor}'"
     else
-      puts "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have NO SECTION anchor for section #{section.name}"
+      Waldo.debug "#{__FILE__}:#{__LINE__} (#{__method__}) - WE have NO SECTION anchor for section #{section.name}"
     end
 
     if !section.anchor.nil?
@@ -676,7 +674,7 @@ class Asciidoc::Document
       section << next_block(section_lines, section) if section_lines.any?
     end
 
-    puts "#{__FILE__}:#{__LINE__} Final SECTION anchor is: '#{section.anchor.inspect}'"
+    Waldo.debug "#{__FILE__}:#{__LINE__} Final SECTION anchor is: '#{section.anchor.inspect}'"
 
     section
   end

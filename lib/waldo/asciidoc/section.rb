@@ -79,14 +79,14 @@ class Asciidoc::Section
   # Public: Get the Asciidoc::Renderer instance being used for the ancestor
   # Asciidoc::Document instance.
   def renderer
-    puts "Section#renderer:  Looking for my renderer up in #{@parent}"
+    Waldo.debug "Section#renderer:  Looking for my renderer up in #{@parent}"
     @parent.renderer
   end
 
   # Public: Get the rendered String content for this Section and all its child
   # Blocks.
   def render
-    puts "Now rendering section for #{self}"
+    Waldo.debug "Now rendering section for #{self}"
     renderer.render('section', self)
   end
 
@@ -102,9 +102,9 @@ class Asciidoc::Section
   #   "<div class=\"paragraph\"><p>foo</p></div>\n<div class=\"paragraph\"><p>bar</p></div>\n<div class=\"paragraph\"><p>baz</p></div>"
   def content
     @blocks.map do |block|
-      puts "Begin rendering block #{block.is_a?(Asciidoc::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoc::Block) ? block.context : 'n/a' })"
+      Waldo.debug "Begin rendering block #{block.is_a?(Asciidoc::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoc::Block) ? block.context : 'n/a' })"
       poo = block.render
-      puts "===> Done rendering block #{block.is_a?(Asciidoc::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoc::Block) ? block.context : 'n/a' })"
+      Waldo.debug "===> Done rendering block #{block.is_a?(Asciidoc::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoc::Block) ? block.context : 'n/a' })"
       poo
     end.join
   end
