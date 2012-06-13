@@ -17,8 +17,8 @@ class Asciidoc::Document
   # Need these for pseudo-template yum
   attr_reader :header, :preamble
 
-  # Root element of the parsed document
-  attr_reader :root
+  # Public: Get the Array of elements (really Blocks or Sections) for the document
+  attr_reader :elements
 
   # Public: Initialize an Asciidoc object.
   #
@@ -33,6 +33,7 @@ class Asciidoc::Document
   #   doc  = Asciidoc::Document.new(data)
   def initialize(data, &block)
     raw_source = []
+    @elements = []
     @defines = {}
     @references = {}
 
@@ -49,6 +50,7 @@ class Asciidoc::Document
     endif_regexp = /^endif::/
     defattr_regexp = /^:([^:]+):\s*(.*)\s*$/
     conditional_regexp = /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/
+
     skip_to = nil
     continuing_value = nil
     continuing_key = nil
@@ -117,25 +119,32 @@ class Asciidoc::Document
 
     @source = @lines.join
 
-    @root = next_section(@lines)
-    # After processing blocks, if the first block is a Section, pull it out
-    # as the @header.
-    if @root.blocks.first.is_a?(Section)
-      @header = @root.blocks.shift
+    # Now @lines into elements
+    while @lines.any?
+      skip_blank(@lines)
+
+      @elements << next_block(@lines) if @lines.any?
+    end
+
+    # Try to find a @header from the Section blocks we have (if any).
+    if (@elements.size == 1) && @elements.first.is_a?(Section)
+      # If our whole document is contained in a single Section,
+      # then look inside it for a @header section.
+      root = @elements.first.blocks
     else
-      # Otherwise, make a new Section, and pull off all leading Block objects
-      # and concat them as the @preamble.
-      @preamble = Section.new(self)
-      while @root.blocks.first.is_a?(Block)
-        @preamble << @root.blocks.shift
-      end
+      # Otherwise, start at the top.
+      root = @elements
+    end
+
+    if root.first.is_a?(Section)
+      @header = root.shift
     end
   end
 
   # We need to be able to return some semblance of a title
   def title
-    if self.root
-      @title ||= self.root.title || self.root.name
+    if @elements.first
+      @title ||= @elements.first.title || @elements.first.name
     end
     @title
   end
@@ -152,8 +161,8 @@ class Asciidoc::Document
     else
       puts "No preamble"
     end
-    puts "I have #{@root.blocks.count} blocks"
-    @root.blocks.each_with_index do |block, i|
+    puts "I have #{@elements.count} elements"
+    @elements.each_with_index do |block, i|
       puts "Block ##{i} is a #{block.class}"
       puts "Name is #{block.name}"
       puts "=" * 40
@@ -164,7 +173,16 @@ class Asciidoc::Document
   #
   def render
     @renderer ||= Renderer.new
-    html = self.renderer.render('document', @root, :header => @header, :preamble => @preamble)
+    html = self.renderer.render('document', self, :header => @header, :preamble => @preamble)
+  end
+
+  def content
+    html_pieces = []
+    @elements.each do |element|
+      Waldo::debug "Rendering element: #{element}"
+      html_pieces << element.render
+    end
+    html_pieces.join("\n")
   end
 
   private

@@ -6,8 +6,8 @@ class ProjectTest < Test::Unit::TestCase
     @doc = Asciidoc::Document.new(File.readlines(sample_doc_path(:asciidoc_index)))
   end
 
-  def test_root_name
-    assert_equal "AsciiDoc Home Page", @doc.root.name
+  def test_title
+    assert_equal "AsciiDoc Home Page", @doc.title
   end
 
   def test_is_section_heading

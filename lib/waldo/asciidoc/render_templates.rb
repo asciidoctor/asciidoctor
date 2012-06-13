@@ -26,17 +26,15 @@ class DocumentTemplate < BaseTemplate
     @template ||= ::ERB.new <<-EOF
       <div class='man-page'>
       <div id='header'>
-        <% if document %>
-          <% if document.header %>
-            <h2><%= document.header.name %></h2>
-            <div class='sectionbody'><%= document.header.content %></div>
-          <% elsif document.preamble %>
-            <div class=preamble'>
-              <div class='sectionbody'>
-                <%= document.preamble.content %>
-              </div>
+        <% if header %>
+          <h2><%= header.name %></h2>
+          <div class='sectionbody'><%= header.content %></div>
+        <% elsif preamble %>
+          <div class=preamble'>
+            <div class='sectionbody'>
+              <%= preamble.content %>
             </div>
-          <% end %>
+          </div>
         <% end %>
       </div>
 
