@@ -124,6 +124,9 @@ class SectionParagraphTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='paragraph'>
+        <% if !title.nil? %>
+          <div class='title'><%= title %></div>
+        <% end %>
         <p><%= content %></p>
       </div>
     EOF
