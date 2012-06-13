@@ -17,6 +17,10 @@ class Test::Unit::TestCase
     File.join(File.dirname(__FILE__), "fixtures", (name.include?(".") ? name : "#{name}.txt"))
   end
 
+  def example_document(name)
+    Asciidoc::Document.new(File.readlines(sample_doc_path(name)))
+  end
+
   def assert_difference(expression, difference = 1, message = nil, &block)
     expressions = [expression]
 
