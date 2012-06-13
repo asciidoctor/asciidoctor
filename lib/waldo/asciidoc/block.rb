@@ -39,7 +39,7 @@ class Asciidoc::Block
 
   # Public: Get the Asciidoc::Document instance to which this Block belongs
   def document
-    @parent.is_a?(Document) ? @parent : @parent.document
+    @parent.is_a?(Asciidoc::Document) ? @parent : @parent.document
   end
 
   # Public: Get the Asciidoc::Renderer instance being used for the ancestor
