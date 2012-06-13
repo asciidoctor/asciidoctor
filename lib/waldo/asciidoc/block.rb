@@ -140,17 +140,29 @@ class Asciidoc::Block
         "#{pre}link:#{url}[#{link}]"
       end
 
-      CGI.escapeHTML(html).
-        gsub(Asciidoc::REGEXP[:biblio], '<a name="\1">[\1]</a>').
-        gsub(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }.
-        gsub(/``(.*?)''/m, '&#147;\1&#148;').
-        gsub(/(^|\W)'([^']+)'/m, '\1<em>\2</em>').
-        gsub(/(^|\W)_([^_]+)_/m, '\1<em>\2</em>').
-        gsub(/\*([^\*]+)\*/m, '<strong>\1</strong>').
-        gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + Asciidoc::INTRINSICS[$2] }. # Don't have lookbehind so have to capture and re-insert
-        gsub(/\\([\{\}\-])/, '\1').
-        gsub(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>').
-        gsub(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
+      html = CGI.escapeHTML(html)
+      html.gsub!(Asciidoc::REGEXP[:biblio], '<a name="\1">[\1]</a>')
+      html.gsub!(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }
+      html.gsub!(/``(.*?)''/m, '&#147;\1&#148;')
+      html.gsub!(/(^|\W)'([^']+)'/m, '\1<em>\2</em>')
+      html.gsub!(/(^|\W)_([^_]+)_/m, '\1<em>\2</em>')
+      html.gsub!(/\*([^\*]+)\*/m, '<strong>\1</strong>')
+
+      # Don't have lookbehind so have to capture and re-insert
+      html.gsub!(/(^|[^\\])\{(\w[\w\-]+\w)\}/) do
+        if self.document.defines.has_key?($2)
+          $1 + self.document.defines[$2]
+        elsif Asciidoc::INTRINSICS.has_key?($2)
+          $1 + Asciidoc::INTRINSICS[$2]
+        else
+          "#{$1}{#{$2}}"
+        end
+      end
+
+      html.gsub!(/\\([\{\}\-])/, '\1')
+      html.gsub!(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>')
+      html.gsub!(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
+      html
     end
   end
   # end private

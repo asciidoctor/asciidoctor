@@ -11,6 +11,9 @@ class Asciidoc::Document
   # to render this Document.
   attr_reader :renderer
 
+  # Public: Get the Hash of definitions
+  attr_reader :defines
+
   # Public: Get the Hash of document references
   attr_reader :references
 
