@@ -599,7 +599,7 @@ class Asciidoc::Document
   #   => nil
   #
   def extract_section_heading(line1, line2 = nil)
-    Waldo.debug "Processing line1: #{line1.chomp}, line2: #{line2.chomp}"
+    Waldo.debug "Processing line1: #{line1.chomp rescue 'nil'}, line2: #{line2.chomp rescue 'nil'}"
     sect_name = sect_anchor = nil
     sect_level = 0
 
