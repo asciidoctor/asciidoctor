@@ -145,16 +145,23 @@ class Asciidoc::Block
       html.gsub!(/``(.*?)''/m, '&ldquo;\1&rdquo;')
       html.gsub!(/`(.*?)'/m, '&lsquo;\1&rsquo;')
       html.gsub!(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }
+      html.gsub!(/([\s\W])#(.+?)#([\s\W])/, '\1\2\3')
+
+      # "Unconstrained" quotes
       html.gsub!(/\_\_([^\_]+)\_\_/m, '<em>\1</em>')
       html.gsub!(/\*\*([^\*]+)\*\*/m, '<strong>\1</strong>')
       html.gsub!(/\+\+([^\+]+)\+\+/m, '<tt>\1</tt>')
       html.gsub!(/\^\^([^\^]+)\^\^/m, '<sup>\1</sup>')
       html.gsub!(/\~\~([^\~]+)\~\~/m, '<sub>\1</sub>')
-      html.gsub!(/(?:^|[\s\W\A])\*([^\*]+)\*(?:$|[\s\W\z])/m, '<strong>\1</strong>')
-      html.gsub!(/(?:^|[\s\W\A])_([^_]+)_(?:$|[\s\W\z])/m, '<em>\1</em>')
-      html.gsub!(/(?:^|[\s\W\A])\+([^\+]+)\+(?:$|[\s\W\z])/m, '<tt>\1</tt>')
-      html.gsub!(/(?:^|[\s\W\A])\^([^\^]+)\^(?:$|[\s\W\z])/m, '<sup>\1</sup>')
-      html.gsub!(/(?:^|[\s\W\A])\~([^\~]+)\~(?:$|[\s\W\z])/m, '<sub>\1</sub>')
+
+      # "Constrained" quotes, which must be bounded by white space or
+      # common punctuation characters
+      html.gsub!(/([\s\W])\*([^\*]+)\*([\s\W])/m, '\1<strong>\2</strong>\3')
+      html.gsub!(/([\s\W])'(.+?)'([\s\W])/m, '\1<em>\2</em>\3')
+      html.gsub!(/([\s\W])_([^_]+)_([\s\W])/m, '\1<em>\2</em>\3')
+      html.gsub!(/([\s\W])\+([^\+]+)\+([\s\W])/m, '\1<tt>\2</tt>\3')
+      html.gsub!(/([\s\W])\^([^\^]+)\^([\s\W])/m, '\1<sup>\2</sup>\3')
+      html.gsub!(/([\s\W])\~([^\~]+)\~([\s\W])/m, '\1<sub>\2</sub>\3')
 
       # Don't have lookbehind so have to capture and re-insert
       html.gsub!(/(^|[^\\])\{(\w[\w\-]+\w)\}/) do

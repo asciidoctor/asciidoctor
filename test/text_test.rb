@@ -17,6 +17,14 @@ context "Text" do
     assert_xpath "//hr", render_string("This is separated.\n\n''''\n\n...from this!"), 1
   end
 
+  test "emphasized quotes" do
+    assert_xpath "//em", render_string("An 'emphatic' no")
+  end
+
+  test "unquoted text" do
+    assert_no_match /#/, render_string("An #unquoted# word")
+  end
+
   context "basic styling" do 
     setup do
       @rendered = render_string("A *BOLD* word.  An _italic_ word.  A +mono+ word.  ^superscript!^ and some ~subscript~.")
