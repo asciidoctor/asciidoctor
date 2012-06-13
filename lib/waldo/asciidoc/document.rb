@@ -119,26 +119,26 @@ class Asciidoc::Document
 
     @source = @lines.join
 
-    # Now @lines into elements
+    # Now parse @lines into elements
     while @lines.any?
       skip_blank(@lines)
 
       @elements << next_block(@lines) if @lines.any?
     end
 
-    # Try to find a @header from the Section blocks we have (if any).
-    if (@elements.size == 1) && @elements.first.is_a?(Section)
-      # If our whole document is contained in a single Section,
-      # then look inside it for a @header section.
-      root = @elements.first.blocks
-    else
-      # Otherwise, start at the top.
-      root = @elements
+    Waldo.debug "Found #{@elements.size} elements:"
+    @elements.each do |el|
+      Waldo.debug el
     end
 
-    if root.first.is_a?(Section)
-      @header = root.shift
+    root = @elements.first
+    # Try to find a @header from the Section blocks we have (if any).
+    if root.is_a?(Section) && root.level == 0
+      @header = @elements.shift
+      @elements = @header.blocks + @elements
+      @header.clear_blocks
     end
+
   end
 
   # We need to be able to return some semblance of a title
@@ -155,16 +155,11 @@ class Asciidoc::Document
     else
       puts "No header"
     end
-    if @preamble
-      puts "Preamble is #{@preamble}"
-      puts "It has #{@preamble.blocks.count} blocks."
-    else
-      puts "No preamble"
-    end
+
     puts "I have #{@elements.count} elements"
     @elements.each_with_index do |block, i|
       puts "Block ##{i} is a #{block.class}"
-      puts "Name is #{block.name}"
+      puts "Name is #{block.name rescue 'n/a'}"
       puts "=" * 40
     end
   end
@@ -381,6 +376,7 @@ class Asciidoc::Document
         # after matching.  TODO: Need a way to test this.
         lines.unshift(this_line)
         lines.unshift(anchor) unless anchor.nil?
+        Waldo.debug "SENDING to next_section with lines[0] = #{lines.first}"
         block = next_section(lines)
 
       elsif this_line.match(REGEXP[:oblock])
@@ -697,8 +693,6 @@ class Asciidoc::Document
 
       section << next_block(section_lines, section) if section_lines.any?
     end
-
-    Waldo.debug "#{__FILE__}:#{__LINE__} Final SECTION anchor is: '#{section.anchor.inspect}'"
 
     section
   end
