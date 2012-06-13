@@ -39,8 +39,12 @@ class Test::Unit::TestCase
     end
   end
 
-  def assert_xpath(xpath, html)
-    if Nokogiri::HTML::DocumentFragment.parse(html).xpath(".#{xpath}").empty?
+  def assert_xpath(xpath, html, count = nil)
+    results = Nokogiri::HTML::DocumentFragment.parse(html).xpath(".#{xpath}")
+
+    if (count && results.length != count)
+      fail "XPath #{xpath} yielded #{results.length} elements rather than #{count} for:\n#{html}"
+    elsif (count.nil? && results.empty?)
       fail "XPath #{xpath} not found in:\n#{html}"
     else
       assert true
