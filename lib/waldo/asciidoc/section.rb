@@ -172,6 +172,21 @@ class Asciidoc::Section
     @blocks << block
   end
 
+  # Public: Clear this Section's list of blocks.
+  #
+  #   section = Section.new
+  #
+  #   section << 'foo'
+  #   section << 'bar'
+  #   section.blocks
+  #   => ["foo", "bar"]
+  #   section.clear_blocks
+  #   section.blocks
+  #   => []
+  def clear_blocks
+    @blocks = []
+  end
+
   # Public: Insert a content block at the specified index in this section's
   # list of blocks.
   #
