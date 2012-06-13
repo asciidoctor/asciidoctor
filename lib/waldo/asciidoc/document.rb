@@ -70,15 +70,11 @@ class Asciidoc::Document
           close_continue = true
         else
           # If this line doesn't start with whitespace, then it's
-          # not a valid continuation line, so TODO FIGURE THIS OUT.
-          # Possibly we don't care about this crap, and we just
-          # look for a properly whitespace-opening and close it out
-          # if there's no + on the end.
+          # not a valid continuation line, so push it back for processing
           close_continue = true
-          raise "Yeah, you can't do that here: #{__FILE__}:#{__LINE__}"
+          raw_source.unshift(line)
         end
         if close_continue
-          puts "Closing out continuation for key #{continuing_key}, final value: '#{continuing_value}'"
           @defines[continuing_key] = continuing_value
           continuing_key = nil
           continuing_value = nil
