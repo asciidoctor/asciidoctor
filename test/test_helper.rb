@@ -7,14 +7,12 @@ require 'mocha'
 require 'htmlentities'
 
 class Test::Unit::TestCase
-  def sample_file_path(name)
-    name = name.to_s
-    File.join(File.dirname(__FILE__), "fixtures", "files", (name.include?(".") ? name : "#{name}.#{name}"))
-  end
-
   def sample_doc_path(name)
     name = name.to_s
-    File.join(File.dirname(__FILE__), "fixtures", (name.include?(".") ? name : "#{name}.txt"))
+    unless name.include?('.')
+      name = "#{name}.txt"
+    end
+    File.join(File.dirname(__FILE__), "fixtures", name )
   end
 
   def example_document(name)
