@@ -27,7 +27,7 @@ class DocumentTemplate < BaseTemplate
       <div class='man-page'>
       <div id='header'>
         <% if header %>
-          <h2><%= header.name %></h2>
+          <h1><%= header.name %></h1>
           <div class='sectionbody'><%= header.content %></div>
         <% elsif preamble %>
           <div class=preamble'>
