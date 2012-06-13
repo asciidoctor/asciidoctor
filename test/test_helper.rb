@@ -61,7 +61,7 @@ class Test::Unit::TestCase
   end
 
   def render_string(src)
-    Asciidoc::Document.new(("Header\n======\n\n" + src).split("\n")).render
+    Asciidoc::Document.new(src.split("\n")).render
   end
 end
 
