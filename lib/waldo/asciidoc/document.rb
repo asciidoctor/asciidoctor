@@ -11,7 +11,7 @@ class Asciidoc::Document
   # to render this Document.
   attr_reader :renderer
 
-  # Public: Get the Hash of definitions
+  # Public: Get the Hash of defines
   attr_reader :defines
 
   # Public: Get the Hash of document references
@@ -146,8 +146,12 @@ class Asciidoc::Document
 
   # We need to be able to return some semblance of a title
   def title
-    if @elements.first
-      @title ||= @elements.first.title || @elements.first.name
+    return @title if @title
+
+    if @header
+      @title = @header.title || @header.name
+    elsif @elements.first
+      @title = @elements.first.title || @elements.first.name
     end
     @title
   end
