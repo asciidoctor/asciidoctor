@@ -109,7 +109,6 @@ module Asciidoc
     # [verse]
     :verse            => /^\[verse\]\s*$/
   }
-  /(^|[^\\])\{(\w[\w\-]+\w)\}/
 
   INTRINSICS = Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(
     'startsb'    => '[',
