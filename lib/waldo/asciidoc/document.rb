@@ -366,6 +366,7 @@ class Asciidoc::Document
 
       elsif match = this_line.match(REGEXP[:title])
         title = match[1]
+        skip_blank(lines)
 
       elsif match = this_line.match(REGEXP[:caption])
         caption = match[1]
