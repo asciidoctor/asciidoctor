@@ -35,6 +35,10 @@ class Test::Unit::TestCase
       assert_equal(before[i] + difference, e.call, error)
     end
   end
+
+  def assert_xpath(xpath, html)
+    !Nokogiri::HTML::DocumentFragment.parse(html).xpath(".#{xpath}").empty?
+  end
 end
 
 # test/spec/mini 3
