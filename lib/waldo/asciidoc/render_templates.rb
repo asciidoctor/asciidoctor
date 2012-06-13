@@ -100,6 +100,26 @@ class SectionLiteralTemplate < BaseTemplate
   end
 end
 
+class SectionNoteTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='admonitionblock'>
+        <table>
+          <tr>
+            <td class='icon'></td>
+            <td class='content'>
+              <% if !title.nil? %>
+                <div class='title'><%= title %></div>
+              <% end %>
+              <%= content %>
+            </td>
+          </tr>
+        </table>
+      </div>
+    EOF
+  end
+end
+
 class SectionParagraphTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
@@ -160,15 +180,6 @@ end
   <div class='content'>
     <pre><tt><%= content %></tt></pre>
   </div>
-</div>
-../gitscm-next/templates/section_note.html.erb
-<div class='admonitionblock'>
-  <table>
-    <tr>
-      <td class='icon'><div class='title'>Note</div></td>
-      <td class='content'><%= content %></td>
-    </tr>
-  </table>
 </div>
 ../gitscm-next/templates/section_oblock.html.erb
 <div class='openblock'>
