@@ -151,10 +151,13 @@ class Asciidoc::Block
       # Don't have lookbehind so have to capture and re-insert
       html.gsub!(/(^|[^\\])\{(\w[\w\-]+\w)\}/) do
         if self.document.defines.has_key?($2)
+          # Substitute from user defines first
           $1 + self.document.defines[$2]
         elsif Asciidoc::INTRINSICS.has_key?($2)
+          # Then do intrinsics
           $1 + Asciidoc::INTRINSICS[$2]
         else
+          # leave everything else alone
           "#{$1}{#{$2}}"
         end
       end
