@@ -10,8 +10,17 @@ class Test::Unit::TestCase
   def sample_doc_path(name)
     name = name.to_s
     unless name.include?('.')
-      name = "#{name}.txt"
+      ['asciidoc', 'txt'].each do |ext|
+        if File.exist?(fixture_path("#{name}.#{ext}"))
+          name = "#{name}.#{ext}"
+          break
+        end
+      end
     end
+    fixture_path(name)
+  end
+
+  def fixture_path(name)
     File.join(File.dirname(__FILE__), "fixtures", name )
   end
 
