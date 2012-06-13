@@ -65,6 +65,12 @@ class Test::Unit::TestCase
   end
 end
 
+###
+# 
+# Context goodness provided by @citrusbyte's contest
+#
+###
+
 # Test::Unit loads a default test if the suite is empty, whose purpose is to
 # fail. Since having empty contexts is a common practice, we decided to
 # overwrite TestSuite#empty? in order to allow them. Having a failure when no
