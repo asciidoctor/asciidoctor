@@ -41,6 +41,10 @@ class Test::Unit::TestCase
   def assert_xpath(xpath, html)
     !Nokogiri::HTML::DocumentFragment.parse(html).xpath(".#{xpath}").empty?
   end
+
+  def render_string(src)
+    Asciidoc::Document.new(src.split("\n")).render
+  end
 end
 
 # test/spec/mini 3
