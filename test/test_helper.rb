@@ -52,7 +52,7 @@ class Test::Unit::TestCase
   end
 
   def render_string(src)
-    Asciidoc::Document.new(src.split("\n")).render
+    Asciidoc::Document.new(("Header\n======\n\n" + src).split("\n")).render
   end
 end
 
@@ -65,8 +65,8 @@ def context(*args, &block)
   return super unless (name = args.first) && block
 
   klass = Class.new(Test::Unit::TestCase) do
-    def self.test(name, &block)
-      define_method("test_#{name.to_s.gsub(/\W/,'_')}", &block) if block
+    def self.test(desc, &block)
+      define_method("test_#{name.to_s.downcase}_#{desc.to_s.gsub(/\W/,'_')}", &block) if block
     end
     def self.xtest(*args) end
     def self.context(*args, &block) instance_eval(&block) end
