@@ -5,15 +5,10 @@ require 'erb'
 $:.unshift(File.dirname(__FILE__))
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
 
+require 'asciidoctor/debug'
 require 'asciidoctor/errors'
 require 'asciidoctor/string'
 require 'asciidoctor/version'
-
-module Asciidoctor
-  def self.debug(*args)
-    puts *args unless ENV['SUPPRESS_DEBUG']
-  end
-end
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
 # using erb templates.
