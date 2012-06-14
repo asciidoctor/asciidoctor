@@ -151,8 +151,13 @@ class Asciidoctor::Document
     if @header
       @title = @header.title || @header.name
     elsif @elements.first
-      @title = @elements.first.title || @elements.first.name
+      @title = @elements.first.title
+      # Blocks don't have a :name method, but Sections do
+      @title ||= @elements.first.name if @elements.first.respond_to? :name
     end
+    # Really can't return a nil here
+    @title ||= ''
+
     @title
   end
 
