@@ -2,10 +2,10 @@
 #
 # Examples
 #
-#   block = Waldo::Asciidoc::Block.new(:paragraph, ["`This` is a <test>"])
+#   block = Asciidoctor::Block.new(:paragraph, ["`This` is a <test>"])
 #   block.content
 #   => ["<em>This</em> is a &lt;test&gt;"]
-class Waldo::Asciidoc::Block
+class Asciidoctor::Block
   # Public: Get the Symbol context for this section block.
   attr_reader :context
 
@@ -24,7 +24,7 @@ class Waldo::Asciidoc::Block
   # Public: Get/Set the String block caption.
   attr_accessor :caption
 
-  # Public: Initialize an Waldo::Asciidoc::Block object.
+  # Public: Initialize an Asciidoctor::Block object.
   #
   # parent  - The parent Asciidoc Object.
   # context - The Symbol context name for the type of content.
@@ -37,13 +37,13 @@ class Waldo::Asciidoc::Block
     @blocks = []
   end
 
-  # Public: Get the Waldo::Asciidoc::Document instance to which this Block belongs
+  # Public: Get the Asciidoctor::Document instance to which this Block belongs
   def document
-    @parent.is_a?(Waldo::Asciidoc::Document) ? @parent : @parent.document
+    @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
   end
 
-  # Public: Get the Waldo::Asciidoc::Renderer instance being used for the ancestor
-  # Waldo::Asciidoc::Document instance.
+  # Public: Get the Asciidoctor::Renderer instance being used for the ancestor
+  # Asciidoctor::Document instance.
   def renderer
     @parent.renderer
   end
@@ -53,9 +53,9 @@ class Waldo::Asciidoc::Block
   # rendered and returned as content that can be included in the
   # parent block's template.
   def render
-    Waldo.debug "Now attempting to render for #{context} my own bad #{self}"
-    Waldo.debug "Parent is #{@parent}"
-    Waldo.debug "Renderer is #{renderer}"
+    Asciidoctor.debug "Now attempting to render for #{context} my own bad #{self}"
+    Asciidoctor.debug "Parent is #{@parent}"
+    Asciidoctor.debug "Renderer is #{renderer}"
     renderer.render("section_#{context}", self)
   end
 
@@ -64,7 +64,7 @@ class Waldo::Asciidoc::Block
   #
   # Examples
   #
-  #   block = Waldo::Asciidoc::Block.new(:paragraph, ['`This` is what happens when you <meet> a stranger in the <alps>!'])
+  #   block = Asciidoctor::Block.new(:paragraph, ['`This` is what happens when you <meet> a stranger in the <alps>!'])
   #   block.content
   #   => ["<em>This</em> is what happens when you &lt;meet&gt; a stranger in the &lt;alps&gt;!"]
   #
@@ -141,8 +141,8 @@ class Waldo::Asciidoc::Block
       end
 
       html = CGI.escapeHTML(html)
-      html.gsub!(Asciidoc::REGEXP[:biblio], '<a name="\1">[\1]</a>')
-      html.gsub!(Asciidoc::REGEXP[:ruler], '<hr>\n')
+      html.gsub!(Asciidoctor::REGEXP[:biblio], '<a name="\1">[\1]</a>')
+      html.gsub!(Asciidoctor::REGEXP[:ruler], '<hr>\n')
       html.gsub!(/``(.*?)''/m, '&ldquo;\1&rdquo;')
       html.gsub!(/`(.*?)'/m, '&lsquo;\1&rsquo;')
       html.gsub!(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }
@@ -169,9 +169,9 @@ class Waldo::Asciidoc::Block
         if self.document.defines.has_key?($2)
           # Substitute from user defines first
           $1 + self.document.defines[$2]
-        elsif Waldo::Asciidoc::INTRINSICS.has_key?($2)
+        elsif Asciidoctor::INTRINSICS.has_key?($2)
           # Then do intrinsics
-          $1 + Waldo::Asciidoc::INTRINSICS[$2]
+          $1 + Asciidoctor::INTRINSICS[$2]
         else
           # leave everything else alone
           "#{$1}{#{$2}}"

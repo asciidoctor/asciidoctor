@@ -1,5 +1,19 @@
+require 'rubygems'
 require 'cgi'
 require 'erb'
+
+$:.unshift(File.dirname(__FILE__))
+$:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
+
+require 'asciidoctor/errors'
+require 'asciidoctor/string'
+require 'asciidoctor/version'
+
+module Asciidoctor
+  def self.debug(*args)
+    puts *args unless ENV['SUPPRESS_DEBUG']
+  end
+end
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
 # using erb templates.
@@ -26,9 +40,9 @@ require 'erb'
 #
 #   lines = File.readlines(filename)
 #
-#   doc  = Asciidoc::Document.new(lines)
+#   doc  = Asciidoctor::Document.new(lines)
 #   html = doc.render(template_path)
-module Asciidoc
+module Asciidoctor
   REGEXP = {
     # [[Foo]]  (also allows, say, [[[]] or [[[Foo[f]], but I don't think it is supposed to (TODO))
     :anchor           => /^\[(\[.+\])\]\s*$/,
@@ -102,6 +116,9 @@ module Asciidoc
     # ____
     :quote            => /^_{4,}\s*$/,
 
+    # ____
+    :ruler            => /^'{3,}\s*$/,
+
     # ****
     :sidebar_blk      => /^\*{4,}\s*$/,
 
@@ -132,10 +149,11 @@ module Asciidoc
     'backtick'   => '`'
   )
 
-  require 'waldo/asciidoc/block'
-  require 'waldo/asciidoc/document'
-  require 'waldo/asciidoc/list_item'
-  require 'waldo/asciidoc/render_templates'
-  require 'waldo/asciidoc/renderer'
-  require 'waldo/asciidoc/section'
+  require 'asciidoctor/block'
+  require 'asciidoctor/document'
+  require 'asciidoctor/list_item'
+  require 'asciidoctor/render_templates'
+  require 'asciidoctor/renderer'
+  require 'asciidoctor/section'
+
 end

@@ -1,13 +1,13 @@
 # Public: Methods for parsing Asciidoc documents and rendering them
 # using erb templates.
-class Asciidoc::Document
+class Asciidoctor::Document
 
-  include Asciidoc
+  include Asciidoctor
 
   # Public: Get the String document source.
   attr_reader :source
 
-  # Public: Get the Asciidoc::Renderer instance currently being used
+  # Public: Get the Asciidoctor::Renderer instance currently being used
   # to render this Document.
   attr_reader :renderer
 
@@ -33,7 +33,7 @@ class Asciidoc::Document
   #
   #   base = File.dirname(filename)
   #   data = File.read(filename)
-  #   doc  = Asciidoc::Document.new(data)
+  #   doc  = Asciidoctor::Document.new(data)
   def initialize(data, &block)
     raw_source = []
     @elements = []
@@ -98,10 +98,10 @@ class Asciidoc::Document
           # continuation line, grab lines until we run out of continuation lines
           continuing_key = key
           continuing_value = match[1]  # strip off the spaces and +
-          Waldo.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
+          Asciidoctor.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
         else
           @defines[key] = value
-          Waldo.debug "Defines[#{key}] is '#{value}'"
+          Asciidoctor.debug "Defines[#{key}] is '#{value}'"
         end
       elsif !line.match(endif_regexp)
         while match = line.match(conditional_regexp)
@@ -129,9 +129,9 @@ class Asciidoc::Document
       @elements << next_block(@lines) if @lines.any?
     end
 
-    Waldo.debug "Found #{@elements.size} elements:"
+    Asciidoctor.debug "Found #{@elements.size} elements:"
     @elements.each do |el|
-      Waldo.debug el
+      Asciidoctor.debug el
     end
 
     root = @elements.first
@@ -181,7 +181,7 @@ class Asciidoc::Document
   def content
     html_pieces = []
     @elements.each do |element|
-      Waldo::debug "Rendering element: #{element}"
+      Asciidoctor::debug "Rendering element: #{element}"
       html_pieces << element.render
     end
     html_pieces.join("\n")
@@ -305,7 +305,7 @@ class Asciidoc::Document
     buffer = []
 
     while (this_line = lines.shift)
-      Waldo.debug "Processing line: '#{this_line}'"
+      Asciidoctor.debug "Processing line: '#{this_line}'"
       finis = this_line.nil?
       finis ||= true if options[:break_on_blank_lines] && this_line.strip.empty?
       finis ||= true if block && value = yield(this_line)
@@ -324,7 +324,7 @@ class Asciidoc::Document
   # * Skip over blank lines to find the start of the next content block.
   # * Use defined regular expressions to determine the type of content block.
   # * Based on the type of content block, grab lines to the end of the block.
-  # * Return a new Asciidoc::Block or Asciidoc::Section instance with the
+  # * Return a new Asciidoctor::Block or Asciidoctor::Section instance with the
   #   content set to the grabbed lines.
   def next_block(lines, parent = self)
     # Skip ahead to the block content
@@ -336,7 +336,7 @@ class Asciidoc::Document
     #   [[foo]]
     # with the inside [foo] (including brackets) as match[1]
     if match = lines.first.match(REGEXP[:anchor])
-      Waldo.debug "Found an anchor in line:\n\t#{lines.first}"
+      Asciidoctor.debug "Found an anchor in line:\n\t#{lines.first}"
       # NOTE: This expression conditionally strips off the brackets from
       # [foo], though REGEXP[:anchor] won't actually match without
       # match[1] being bracketed, so the condition isn't necessary.
@@ -348,11 +348,11 @@ class Asciidoc::Document
       anchor = nil
     end
 
-    Waldo.debug "/"*64
-    Waldo.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
-    Waldo.debug lines.first
-    Waldo.debug lines[1]
-    Waldo.debug "/"*64
+    Asciidoctor.debug "/"*64
+    Asciidoctor.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Asciidoctor.debug lines.first
+    Asciidoctor.debug lines[1]
+    Asciidoctor.debug "/"*64
 
     block = nil
     title = nil
@@ -388,7 +388,7 @@ class Asciidoc::Document
         # after matching.  TODO: Need a way to test this.
         lines.unshift(this_line)
         lines.unshift(anchor) unless anchor.nil?
-        Waldo.debug "SENDING to next_section with lines[0] = #{lines.first}"
+        Asciidoctor.debug "SENDING to next_section with lines[0] = #{lines.first}"
         block = next_section(lines)
 
       elsif this_line.match(REGEXP[:oblock])
@@ -609,7 +609,7 @@ class Asciidoc::Document
   #   => nil
   #
   def extract_section_heading(line1, line2 = nil)
-    Waldo.debug "Processing line1: #{line1.chomp rescue 'nil'}, line2: #{line2.chomp rescue 'nil'}"
+    Asciidoctor.debug "Processing line1: #{line1.chomp rescue 'nil'}, line2: #{line2.chomp rescue 'nil'}"
     sect_name = sect_anchor = nil
     sect_level = 0
 
@@ -627,7 +627,7 @@ class Asciidoc::Document
       end
       sect_level = section_level(line2)
     end
-    Waldo.debug "Returning #{sect_name}, #{sect_level}, and #{sect_anchor}"
+    Asciidoctor.debug "Returning #{sect_name}, #{sect_level}, and #{sect_anchor}"
     return [sect_name, sect_level, sect_anchor]
   end
 
@@ -638,7 +638,7 @@ class Asciidoc::Document
   #   source
   #   => "GREETINGS\n---------\nThis is my doc.\n\nSALUTATIONS\n-----------\nIt is awesome."
   #
-  #   doc = Asciidoc::Document.new(source)
+  #   doc = Asciidoctor::Document.new(source)
   #
   #   doc.next_section
   #   ["GREETINGS", [:paragraph, "This is my doc."]]
@@ -648,11 +648,11 @@ class Asciidoc::Document
   def next_section(lines)
     section = Section.new(self)
 
-    Waldo.debug "%"*64
-    Waldo.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
-    Waldo.debug lines.first
-    Waldo.debug lines[1]
-    Waldo.debug "%"*64
+    Asciidoctor.debug "%"*64
+    Asciidoctor.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Asciidoctor.debug lines.first
+    Asciidoctor.debug lines[1]
+    Asciidoctor.debug "%"*64
 
     # Skip ahead to the next section definition
     while lines.any? && section.name.nil?

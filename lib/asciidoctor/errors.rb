@@ -1,5 +1,5 @@
 # Base project exception
-module Waldo
+module Asciidoctor
   class ProjectError < StandardError; end
 end
 

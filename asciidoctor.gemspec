@@ -12,10 +12,10 @@ Gem::Specification.new do |s|
   ## Leave these as is they will be modified for you by the rake gemspec task.
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
-  s.name              = 'waldo'
+  s.name              = 'asciidoctor'
   s.version           = '0.0.1'
-  s.date              = '2012-06-12'
-  s.rubyforge_project = 'waldo'
+  s.date              = '2012-06-14'
+  s.rubyforge_project = 'asciidoctor'
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   s.require_paths = %w[lib]
 
   ## If your gem includes any executables, list them here.
-  s.executables = ["waldo"]
+  s.executables = ["asciidoctor"]
 
   ## Specify any RDoc options here. You'll want to add your README and
   ## LICENSE files to the extra_rdoc_files list.
@@ -60,27 +60,29 @@ Gem::Specification.new do |s|
     LICENSE
     README.md
     Rakefile
-    bin/waldo
-    lib/waldo.rb
-    lib/waldo/asciidoc.rb
-    lib/waldo/asciidoc/block.rb
-    lib/waldo/asciidoc/document.rb
-    lib/waldo/asciidoc/list_item.rb
-    lib/waldo/asciidoc/render_templates.rb
-    lib/waldo/asciidoc/renderer.rb
-    lib/waldo/asciidoc/section.rb
-    lib/waldo/errors.rb
-    lib/waldo/string.rb
-    lib/waldo/version.rb
+    asciidoctor.gemspec
+    bin/asciidoctor
+    lib/asciidoctor.rb
+    lib/asciidoctor/block.rb
+    lib/asciidoctor/document.rb
+    lib/asciidoctor/errors.rb
+    lib/asciidoctor/list_item.rb
+    lib/asciidoctor/render_templates.rb
+    lib/asciidoctor/renderer.rb
+    lib/asciidoctor/section.rb
+    lib/asciidoctor/string.rb
+    lib/asciidoctor/version.rb
     noof.rb
-    object.out
-    parsed_index_doc.txt
     test/asciidoc_test.rb
     test/fixtures/asciidoc.txt
     test/fixtures/asciidoc_index.txt
     test/fixtures/ascshort.txt
+    test/fixtures/list_elements.asciidoc
+    test/headers_test.rb
+    test/list_elements_test.rb
+    test/paragraphs_test.rb
     test/test_helper.rb
-    waldo.gemspec
+    test/text_test.rb
   ]
   # = MANIFEST =
 

@@ -1,13 +1,13 @@
 require 'fileutils'
 require 'test/unit'
 
-require "#{File.expand_path(File.dirname(__FILE__))}/../lib/waldo.rb"
+require "#{File.expand_path(File.dirname(__FILE__))}/../lib/asciidoctor.rb"
 
 require 'mocha'
 require 'htmlentities'
 require 'nokogiri'
 
-#ENV['SUPPRESS_DEBUG'] = 'true'
+ENV['SUPPRESS_DEBUG'] = 'true'
 
 class Test::Unit::TestCase
   def sample_doc_path(name)
@@ -28,7 +28,7 @@ class Test::Unit::TestCase
   end
 
   def example_document(name)
-    Asciidoc::Document.new(File.readlines(sample_doc_path(name)))
+    Asciidoctor::Document.new(File.readlines(sample_doc_path(name)))
   end
 
   def assert_difference(expression, difference = 1, message = nil, &block)
@@ -61,7 +61,7 @@ class Test::Unit::TestCase
   end
 
   def render_string(src)
-    Asciidoc::Document.new(src.split("\n")).render
+    Asciidoctor::Document.new(src.split("\n")).render
   end
 end
 

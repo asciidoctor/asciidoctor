@@ -1,7 +1,7 @@
 # Public: Methods for rendering Asciidoc Documents, Sections, and Blocks
 # using erb templates.
-class Asciidoc::Renderer
-  # Public: Initialize an Asciidoc::Renderer object.
+class Asciidoctor::Renderer
+  # Public: Initialize an Asciidoctor::Renderer object.
   #
   def initialize(options={})
     @debug = !!options[:debug]
@@ -27,7 +27,7 @@ class Asciidoc::Renderer
     if @views[view].nil?
       raise "Couldn't find a view in @views for #{view}"
     else
-      Waldo.debug "View for #{view} is #{@views[view]}, object is #{object}"
+      Asciidoctor.debug "View for #{view} is #{@views[view]}, object is #{object}"
     end
     ret = @views[view].render(object, locals)
 

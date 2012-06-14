@@ -4,7 +4,7 @@
 #
 # Examples
 #
-#   section = Asciidoc::Section.new
+#   section = Asciidoctor::Section.new
 #   section.name = 'DESCRIPTION'
 #   section.anchor = 'DESCRIPTION'
 #
@@ -17,7 +17,7 @@
 #   section << new_block
 #   section.size
 #   => 1
-class Asciidoc::Section
+class Asciidoctor::Section
   # Public: Get/Set the Integer section level.
   attr_accessor :level
 
@@ -36,7 +36,7 @@ class Asciidoc::Section
   # Public: Get the Array of section blocks.
   attr_reader :blocks
 
-  # Public: Initialize an Asciidoc::Section object.
+  # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
   def initialize(parent)
@@ -71,22 +71,22 @@ class Asciidoc::Section
     "_#{name && name.downcase.gsub(' ','_')}"
   end
 
-  # Public: Get the Asciidoc::Document instance to which this Block belongs
+  # Public: Get the Asciidoctor::Document instance to which this Block belongs
   def document
-    @parent.is_a?(Asciidoc::Document) ? @parent : @parent.document
+    @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
   end
 
-  # Public: Get the Asciidoc::Renderer instance being used for the ancestor
-  # Asciidoc::Document instance.
+  # Public: Get the Asciidoctor::Renderer instance being used for the ancestor
+  # Asciidoctor::Document instance.
   def renderer
-    Waldo.debug "Section#renderer:  Looking for my renderer up in #{@parent}"
+    Asciidoctor.debug "Section#renderer:  Looking for my renderer up in #{@parent}"
     @parent.renderer
   end
 
   # Public: Get the rendered String content for this Section and all its child
   # Blocks.
   def render
-    Waldo.debug "Now rendering section for #{self}"
+    Asciidoctor.debug "Now rendering section for #{self}"
     renderer.render('section', self)
   end
 
@@ -102,9 +102,9 @@ class Asciidoc::Section
   #   "<div class=\"paragraph\"><p>foo</p></div>\n<div class=\"paragraph\"><p>bar</p></div>\n<div class=\"paragraph\"><p>baz</p></div>"
   def content
     @blocks.map do |block|
-      Waldo.debug "Begin rendering block #{block.is_a?(Asciidoc::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoc::Block) ? block.context : 'n/a' })"
+      Asciidoctor.debug "Begin rendering block #{block.is_a?(Asciidoctor::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
       poo = block.render
-      Waldo.debug "===> Done rendering block #{block.is_a?(Asciidoc::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoc::Block) ? block.context : 'n/a' })"
+      Asciidoctor.debug "===> Done rendering block #{block.is_a?(Asciidoctor::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
       poo
     end.join
   end

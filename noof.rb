@@ -1,10 +1,10 @@
 require 'rubygems'
 require 'ap'
-require 'lib/waldo'
+require 'lib/asciidoctor'
 
 lines = File.readlines("test/fixtures/asciidoc_index.txt")
 #lines = File.read("test/fixtures/asciidoc_index.txt")
-doc = Asciidoc::Document.new(lines)
+doc = Asciidoctor::Document.new(lines)
 doc.splain
 
 foo = doc.render
