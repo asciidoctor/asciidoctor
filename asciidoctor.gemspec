@@ -64,6 +64,7 @@ Gem::Specification.new do |s|
     bin/asciidoctor
     lib/asciidoctor.rb
     lib/asciidoctor/block.rb
+    lib/asciidoctor/debug.rb
     lib/asciidoctor/document.rb
     lib/asciidoctor/errors.rb
     lib/asciidoctor/list_item.rb
@@ -73,7 +74,7 @@ Gem::Specification.new do |s|
     lib/asciidoctor/string.rb
     lib/asciidoctor/version.rb
     noof.rb
-    test/asciidoc_test.rb
+    test/document_test.rb
     test/fixtures/asciidoc.txt
     test/fixtures/asciidoc_index.txt
     test/fixtures/ascshort.txt
