@@ -5,11 +5,6 @@ require 'erb'
 $:.unshift(File.dirname(__FILE__))
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
 
-require 'asciidoctor/debug'
-require 'asciidoctor/errors'
-require 'asciidoctor/string'
-require 'asciidoctor/version'
-
 # Public: Methods for parsing Asciidoc input files and rendering documents
 # using erb templates.
 #
@@ -145,10 +140,13 @@ module Asciidoctor
   )
 
   require 'asciidoctor/block'
+  require 'asciidoctor/debug'
   require 'asciidoctor/document'
+  require 'asciidoctor/errors'
   require 'asciidoctor/list_item'
   require 'asciidoctor/render_templates'
   require 'asciidoctor/renderer'
   require 'asciidoctor/section'
-
+  require 'asciidoctor/string'
+  require 'asciidoctor/version'
 end
