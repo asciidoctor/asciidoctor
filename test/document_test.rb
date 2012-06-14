@@ -12,7 +12,7 @@ class DocumentTest < Test::Unit::TestCase
 
   def test_with_no_title
     d = Asciidoctor::Document.new("Snorf")
-    assert_equal '', d.title
+    assert_nil d.title
   end
 
   def test_is_section_heading
