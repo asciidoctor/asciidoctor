@@ -155,8 +155,6 @@ class Asciidoctor::Document
       # Blocks don't have a :name method, but Sections do
       @title ||= @elements.first.name if @elements.first.respond_to? :name
     end
-    # Really can't return a nil here
-    @title ||= ''
 
     @title
   end
