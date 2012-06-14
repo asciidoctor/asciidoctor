@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ProjectTest < Test::Unit::TestCase
+class DocumentTest < Test::Unit::TestCase
   # setup for test
   def setup
     @doc = Asciidoctor::Document.new(File.readlines(sample_doc_path(:asciidoc_index)))
@@ -8,6 +8,11 @@ class ProjectTest < Test::Unit::TestCase
 
   def test_title
     assert_equal "AsciiDoc Home Page", @doc.title
+  end
+
+  def test_with_no_title
+    d = Asciidoctor::Document.new("Snorf")
+    assert_equal '', d.title
   end
 
   def test_is_section_heading
