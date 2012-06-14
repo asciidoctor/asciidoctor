@@ -19,15 +19,15 @@ Gem::Specification.new do |s|
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
-  s.summary     = "Render Asciidoc to HTML."
+  s.summary     = "Pure Ruby Asciidoc to HTML rendering."
   s.description = "Render all the AsciiDocs! The time, she is now, for all good renders."
 
   ## List the primary authors. If there are a bunch of authors, it's probably
   ## better to set the email to an email list or something. If you don't have
   ## a custom homepage, consider using your GitHub URL or the like.
-  s.authors  = ["Jeremy McAnally", "Ryan Waldron"]
-  s.email    = 'jeremy@github.com'
-  s.homepage = 'http://github.com'
+  s.authors  = ["Ryan Waldron", "Jeremy McAnally"]
+  s.email    = 'rew@erebor.com'
+  s.homepage = 'http://github.com/erebor/asciidoctor'
 
   ## This gets added to the $LOAD_PATH so that 'lib/NAME.rb' can be required as
   ## require 'NAME.rb' or'/lib/NAME/file.rb' can be as require 'NAME/file.rb'
