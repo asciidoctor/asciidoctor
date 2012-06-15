@@ -7,10 +7,8 @@ context "Text" do
 
   test "quotes" do
     rendered = render_string("``Where?,'' she said, flipping through her copy of `The New Yorker.'")
-    assert_match /&rdquo;/, rendered
-    assert_match /&ldquo;/, rendered
-    assert_match /&rsquo;/, rendered
-    assert_match /&lsquo;/, rendered
+    assert_match /&ldquo;Where\?,&rdquo;/, rendered
+    assert_match /&lsquo;The New Yorker.&rsquo;/, rendered
   end
 
   test "separator" do
@@ -23,6 +21,10 @@ context "Text" do
 
   test "unquoted text" do
     assert_no_match /#/, render_string("An #unquoted# word")
+  end
+
+  test "backtick-escaped text followed by single-quoted text" do
+    assert_match /<tt>foo<\/tt>/, render_string(%Q(run `foo` 'dog'))
   end
 
   context "basic styling" do 
