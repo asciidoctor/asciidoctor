@@ -143,8 +143,16 @@ class Asciidoctor::Block
       html = CGI.escapeHTML(html)
       html.gsub!(Asciidoctor::REGEXP[:biblio], '<a name="\1">[\1]</a>')
       html.gsub!(Asciidoctor::REGEXP[:ruler], '<hr>\n')
-      html.gsub!(/``(.*?)''/m, '&ldquo;\1&rdquo;')
-      html.gsub!(/`(.*?)'/m, '&lsquo;\1&rsquo;')
+      html.gsub!(/``([^`']*?)''/m, '&ldquo;\1&rdquo;')
+      html.gsub!(/`(?>[^`']*?)'/m, '&lsquo;\1&rsquo;')
+
+      # TODO: This text thus quoted is supposed to be rendered as an
+      # "inline literal passthrough", meaning that it is rendered
+      # in a monospace font, but also doesn't go through any further
+      # text substitution, except for special character substitution.
+      # So we need to technically pull this text out, sha it and store
+      # a marker and replace it after the other gsub!s are done in here.
+      # See:  http://www.methods.co.nz/asciidoc/userguide.html#X80
       html.gsub!(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }
       html.gsub!(/([\s\W])#(.+?)#([\s\W])/, '\1\2\3')
 
