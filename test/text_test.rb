@@ -27,29 +27,29 @@ context "Text" do
     assert_match /<tt>foo<\/tt>/, render_string(%Q(run `foo` 'dog'))
   end
 
-  context "basic styling" do 
+  context "basic styling" do
     setup do
       @rendered = render_string("A *BOLD* word.  An _italic_ word.  A +mono+ word.  ^superscript!^ and some ~subscript~.")
     end
 
     test "bold" do
-      assert_xpath "//strong", @rendered 
+      assert_xpath "//strong", @rendered
     end
 
     test "italic" do
-      assert_xpath "//em", @rendered 
+      assert_xpath "//em", @rendered
     end
 
     test "monospaced" do
-      assert_xpath "//tt", @rendered 
+      assert_xpath "//tt", @rendered
     end
 
     test "superscript" do
-      assert_xpath "//sup", @rendered 
+      assert_xpath "//sup", @rendered
     end
 
     test "subscript" do
-      assert_xpath "//sub", @rendered 
+      assert_xpath "//sub", @rendered
     end
 
     test "backticks" do
@@ -58,16 +58,16 @@ context "Text" do
 
     test "combined styles" do
       rendered = render_string("Winning *big _time_* in the +city *boyeeee*+.")
-      
+
       assert_xpath "//strong/em", rendered
       assert_xpath "//tt/strong", rendered
     end
 
     test "characters" do
       rendered_chars = render_string("**B**__I__++M++")
-      assert_xpath "//strong", rendered_chars 
-      assert_xpath "//em", rendered_chars 
-      assert_xpath "//tt", rendered_chars 
+      assert_xpath "//strong", rendered_chars
+      assert_xpath "//em", rendered_chars
+      assert_xpath "//tt", rendered_chars
     end
-  end  
+  end
 end
