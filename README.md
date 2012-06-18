@@ -1,8 +1,6 @@
 Asciidoctor
 ===========
 
-# DESCRIPTION
-
 Asciidoctor is a pure-ruby processor for turning [Asciidoc](http://www.methods.co.nz/asciidoc/index.html)
 documents into HTML (and, eventually, other formats perhaps).
 
@@ -16,7 +14,7 @@ testing that out.
 The initial code on which asciidoctor is based was from the Git SCM site repo,
 [gitscm-next](https://github.com/github/gitscm-next).
 
-# INSTALLATION
+# Installation
 
 NOTE: This gem is very immature.  Thus, you should only use it if you have a high
 tolerance for bugs, failures, and generally bad and intemperate behavior.
@@ -29,7 +27,21 @@ Or if you prefer bundler:
 
     bundle install 'asciidoctor'
 
-# USAGE
+# Usage
+
+To render a file of Asciidoc-marked-up text to html
+
+    lines = File.readlines("your_file.asc")
+    doc = Asciidoctor::Document.new(lines)
+    html = doc.render
+    File.open("your_file.html", "w+") do |file|
+      file.puts html
+    end
+
+Render an Asciidoc-formatted string
+
+    doc = Asciidoctor::Document.new("*This* is it.")
+    puts doc.render
 
 For more usage examples, see the test suite.
 
