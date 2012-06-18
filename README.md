@@ -105,4 +105,4 @@ time of a major release, support for that Ruby version may be dropped.
 Copyright (c) 2012 Ryan Waldron.
 See [LICENSE][] for details.
 
-[license]: https://github.com/jnunemaker/twitter/blob/master/LICENSE.md
+[license]: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE.md
