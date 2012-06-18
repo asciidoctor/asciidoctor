@@ -1,69 +1,108 @@
-RakeGem
-=======
+Asciidoctor
+===========
 
 # DESCRIPTION
 
-Ever wanted to manage your RubyGem in a sane way without having to resort to
-external dependencies like Jeweler or Hoe? Ever thought that Rake and a hand
-crafted gemspec should be enough to deal with these problems? If so, then
-RakeGem is here to make your life awesome!
+Asciidoctor is a pure-ruby processor for turning [Asciidoc](http://www.methods.co.nz/asciidoc/index.html)
+documents into HTML (and, eventually, other formats perhaps).
 
-RakeGem is not a library. It is just a few simple file templates that you can
-copy into your project and easily customize to match your specific needs. It
-ships with a few Rake tasks to help you keep your gemspec up-to-date, build
-a gem, and release your library and gem to the world.
+Currently, asciidoctor uses some simple built-in ERB templates to style the output
+in a way tht roughly matches the default HTML output of the native Python processor.
 
-RakeGem assumes you are using Git. This makes the Rake tasks easy to write. If
-you are using something else, you should be able to get RakeGem up and running
-with your system without too much editing.
+Asciidoctor currently works with Ruby 1.8.7 and 1.9.3, though I don't know of any
+reason it shouldn't work with more exotic Ruby versions, and would welcome help in
+testing that out.
 
-The RakeGem tasks were inspired by the
-[Sinatra](http://github.com/sinatra/sinatra) project.
+The initial code on which asciidoctor is based was from the Git SCM site repo,
+[gitscm-next](https://github.com/github/gitscm-next).
 
 # INSTALLATION
 
-Take a look at `Rakefile` and `NAME.gemspec`. For new projects, you can start
-with these files and edit a few lines to make them fit into your library. If
-you have an existing project, you'll probably want to take the RakeGem
-versions and copy any custom stuff from your existing Rakefile and gemspec
-into them. As long as you're careful, the rake tasks should keep working.
+NOTE: This gem is very immature.  Thus, you should only use it if you have a high
+tolerance for bugs, failures, and generally bad and intemperate behavior.
 
-# ASSUMPTIONS
+To install the gem:
 
-RakeGem makes a few assumptions. You will either need to satisfy these
-assumptions or modify the rake tasks to work with your setup.
+    gem install 'asciidoctor'
 
-You should have a file named `lib/NAME.rb` (where NAME is the name of your
-library) that contains a version line. It should look something like this:
+Or if you prefer bundler:
 
-    module NAME
-      VERSION = '0.1.0'
-    end
+    bundle install 'asciidoctor'
 
-It is important that you use the constant `VERSION` and that it appear on a
-line by itself.
+# USAGE
 
-# UPDATING THE VERSION
+For more usage examples, see the test suite.
 
-In order to make a new release, you'll want to update the version. With
-RakeGem, you only need to do that in the `lib/NAME.rb` file. Everything else
-will use this find the canonical version of the library.
+## Contributing
+In the spirit of [free software][free-sw], **everyone** is encouraged to help
+improve this project.
 
-# TASKS
+[free-sw]: http://www.fsf.org/licensing/essays/free-sw.html
 
-RakeGem provides three rake tasks:
+Here are some ways *you* can contribute:
 
-`rake gemspec` will update your gemspec with the latest version (taken from
-the `lib/NAME.rb` file) and file list (as reported by `git ls-files`).
+* by using alpha, beta, and prerelease versions
+* by reporting bugs
+* by suggesting new features
+* by writing or editing documentation
+* by writing specifications
+* by writing code (**no patch is too small**: fix typos, add comments, clean up
+  inconsistent whitespace)
+* by refactoring code
+* by fixing [issues][]
+* by reviewing patches
 
-`rake build` will update your gemspec, build your gemspec into a gem, and
-place it in the `pkg` directory.
+[issues]: https://github.com/erebor/asciidoctor/issues
 
-`rake release` will update your gemspec, build your gem, make a commit with
-the message `Release 0.1.0` (with the correct version, obviously), tag the
-commit with `v0.1.0` (again with the correct version), and push the `master`
-branch and new tag to `origin`.
+## Submitting an Issue
+We use the [GitHub issue tracker][issues] to track bugs and features. Before
+submitting a bug report or feature request, check to make sure it hasn't
+already been submitted. When submitting a bug report, please include a [Gist][]
+that includes any details that may help reproduce the bug, including your gem
+version, Ruby version, and operating system.
 
-Keep in mind that these are just simple Rake tasks and you can edit them
-however you please. Don't want to auto-commit or auto-push? Just delete those
-lines. You can bend RakeGem to your own needs. That's the whole point!
+Most importantly, since asciidoctor is a text processor, reproducing most bugs
+requires that we have some snippet of text on which asciidoctor exhibits the
+bad behavior.
+
+Ideally, a bug report should include a pull request with failing specs.
+
+[gist]: https://gist.github.com/
+
+## Submitting a Pull Request
+1. [Fork the repository.][fork]
+2. [Create a topic branch.][branch]
+3. Add tests for your unimplemented feature or bug fix.
+4. Run `bundle exec rake`. If your tests pass, return to step 3.
+5. Implement your feature or bug fix.
+6. Run `bundle exec rake`. If your tests fail, return to step 5.
+7. Add documentation for your feature or bug fix.
+8. If your changes are not 100% documented, go back to step 7.
+9. Add, commit, and push your changes.
+10. [Submit a pull request.][pr]
+
+[fork]: http://help.github.com/fork-a-repo/
+[branch]: http://learn.github.com/p/branching.html
+[pr]: http://help.github.com/send-pull-requests/
+
+## Supported Ruby Versions
+This library aims to support the following Ruby implementations:
+
+* Ruby 1.8.7
+* Ruby 1.9.3
+
+If something doesn't work on one of these interpreters, it should be considered
+a bug.
+
+If you would like this library to support another Ruby version, you may
+volunteer to be a maintainer. Being a maintainer entails making sure all tests
+run and pass on that implementation. When something breaks on your
+implementation, you will be personally responsible for providing patches in a
+timely fashion. If critical issues for a particular implementation exist at the
+time of a major release, support for that Ruby version may be dropped.
+
+## Copyright
+Copyright (c) 2012 Ryan Waldron.
+See [LICENSE][] for details.
+
+[license]: https://github.com/jnunemaker/twitter/blob/master/LICENSE.md

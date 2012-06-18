@@ -14,13 +14,13 @@ Gem::Specification.new do |s|
   ## the sub! line in the Rakefile
   s.name              = 'asciidoctor'
   s.version           = '0.0.1'
-  s.date              = '2012-06-14'
+  s.date              = '2012-06-18'
   s.rubyforge_project = 'asciidoctor'
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
   s.summary     = "Pure Ruby Asciidoc to HTML rendering."
-  s.description = "Render all the AsciiDocs! The time, she is now, for all good renders."
+  s.description = "A pure Ruby processor to turn Asciidoc-formatted documents into HTML (and, eventually, other formats perhaps)."
 
   ## List the primary authors. If there are a bunch of authors, it's probably
   ## better to set the email to an email list or something. If you don't have
