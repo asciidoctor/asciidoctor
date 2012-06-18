@@ -143,8 +143,8 @@ class Asciidoctor::Block
       html = CGI.escapeHTML(html)
       html.gsub!(Asciidoctor::REGEXP[:biblio], '<a name="\1">[\1]</a>')
       html.gsub!(Asciidoctor::REGEXP[:ruler], '<hr>\n')
-      html.gsub!(/``([^`']*?)''/m, '&ldquo;\1&rdquo;')
-      html.gsub!(/`(?>[^`']*?)'/m, '&lsquo;\1&rsquo;')
+      html.gsub!(/``([^`']*)''/m, '&ldquo;\1&rdquo;')
+      html.gsub!(/(?:\s|^)`([^`']*)'/m, '&lsquo;\1&rsquo;')
 
       # TODO: This text thus quoted is supposed to be rendered as an
       # "inline literal passthrough", meaning that it is rendered
