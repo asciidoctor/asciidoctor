@@ -94,8 +94,9 @@ class Asciidoctor::Document
       elsif match = line.match(defattr_regexp)
         key = match[1]
         value = match[2]
-        if match = value.match(/(.+)\s+\+\s*$/)
-          # continuation line, grab lines until we run out of continuation lines
+        if match = value.match(Asciidoctor::REGEXP[:attr_continue])
+          # attribute value continuation line; grab lines until we run out
+          # of continuation lines
           continuing_key = key
           continuing_value = match[1]  # strip off the spaces and +
           Asciidoctor.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
@@ -257,7 +258,7 @@ class Asciidoctor::Document
           if !next_nonblank.nil? &&
              ( alternate_ending.nil? ||
                !next_nonblank.match(alternate_ending)
-             ) && [:ulist, :olist, :colist, :dlist, :lit_par, :continue].
+             ) && [:ulist, :olist, :colist, :dlist, :lit_par].
                   find { |pattern| next_nonblank.match(REGEXP[pattern]) }
 
              # Pull blank lines into the segment, so the next thing up for processing
@@ -478,7 +479,7 @@ class Asciidoctor::Document
 
       elsif this_line.match(REGEXP[:note])
         # note is an admonition preceded by [NOTE] and lasts until a blank line
-        buffer = grab_lines_until(lines, :break_on_blank_lines => true) {|line| line.match( REGEXP[:continue] ) }
+        buffer = grab_lines_until(lines, :break_on_blank_lines => true)
         block = Block.new(parent, :note, buffer)
 
       elsif block_type = [:listing, :example].detect{|t| this_line.match( REGEXP[t] )}
@@ -516,7 +517,6 @@ class Asciidoctor::Document
       else
         # paragraph is contiguous nonblank/noncontinuation lines
         while !this_line.nil? && !this_line.strip.empty?
-          break if this_line.match(REGEXP[:continue])
           if this_line.match( REGEXP[:listing] ) || this_line.match( REGEXP[:oblock] )
             lines.unshift this_line
             break

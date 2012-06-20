@@ -40,6 +40,13 @@ module Asciidoctor
     # Foowhatevs [[Bar]]
     :anchor_embedded  => /^(.*)\[\[([^\]]+)\]\]\s*$/,
 
+    # +   Attribute values treat lines ending with ' +' as a continuation,
+    #     not a line-break as elsewhere in the document, where this is
+    #     a forced line break. This should be the same regexp as :line_break,
+    #     below, but it gets its own entry because readability ftw, even
+    #     though repeating regexps ftl.
+    :attr_continue    => /(.*)(?:^|\s)\+$/,
+
     # [[[Foo]]]  (does not suffer quite the same malady as :anchor, but almost. Allows [ but not ] in internal capture
     :biblio           => /\[\[\[([^\]]+)\]\]\]/,
 
@@ -51,11 +58,6 @@ module Asciidoctor
 
     # // (and then whatever)
     :comment          => /^\/\/\s/,
-
-    # +   Note that Asciidoc appears to allow continuations using + at
-    #     the end of the previous line and indenting
-    #     the following line (as in :lit_par)
-    :continue         => /^\+\s*$/,
 
     # foo::  ||  foo;;
     # Should be followed by a definition line, e.g.,
@@ -77,6 +79,13 @@ module Asciidoctor
 
     # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
     :line             => /^([=\-~^\+])+\s*$/,
+
+    # +   From the Asciidoc User Guide: "A plus character preceded by at
+    #     least one space character at the end of a non-blank line forces
+    #     a line break. It generates a line break (br) tag for HTML outputs.
+    # +      (would match and capture '')
+    # Foo +  (would and capture 'Foo')
+    :line_break       => /(.*)(?:^|\s)\+$/,
 
     # ----
     :listing          => /^\-{4,}\s*$/,
@@ -138,6 +147,10 @@ module Asciidoctor
     'backslash'  => "\\",
     'backtick'   => '`'
   )
+
+  HTML_ELEMENTS = {
+    'br-asciidoctor' => '<br/>'
+  }
 
   require 'asciidoctor/block'
   require 'asciidoctor/debug'

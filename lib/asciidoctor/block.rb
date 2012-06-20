@@ -69,7 +69,7 @@ class Asciidoctor::Block
   #   => ["<em>This</em> is what happens when you &lt;meet&gt; a stranger in the &lt;alps&gt;!"]
   #
   # TODO:
-  # * forced line breaks
+  # * forced line breaks (partly done, at least in regular paragraphs)
   # * bold, mono
   # * double/single quotes
   # * super/sub script
@@ -104,7 +104,11 @@ class Asciidoctor::Block
     when :verse
       htmlify( @buffer.map{ |l| l.strip }.join( "\n" ) )
     else
-      htmlify( @buffer.map{ |l| l.lstrip }.join )
+      lines = @buffer.map do |line|
+        line.strip
+        line.gsub(Asciidoctor::REGEXP[:line_break], '\1{br-asciidoctor}')
+      end
+      htmlify( lines.join )
     end
   end
 
@@ -180,7 +184,10 @@ class Asciidoctor::Block
         elsif Asciidoctor::INTRINSICS.has_key?($2)
           # Then do intrinsics
           $1 + Asciidoctor::INTRINSICS[$2]
+        elsif Asciidoctor::HTML_ELEMENTS.has_key?($2)
+          $1 + Asciidoctor::HTML_ELEMENTS[$2]
         else
+          Asciidoctor.debug "Bailing on key: #{$2}"
           # leave everything else alone
           "#{$1}{#{$2}}"
         end
@@ -189,6 +196,7 @@ class Asciidoctor::Block
       html.gsub!(/\\([\{\}\-])/, '\1')
       html.gsub!(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>')
       html.gsub!(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
+      html.gsub!(Asciidoctor::REGEXP[:line_break], '\1<br/>')
       html
     end
   end
