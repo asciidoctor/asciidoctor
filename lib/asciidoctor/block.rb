@@ -39,13 +39,14 @@ class Asciidoctor::Block
 
   # Public: Get the Asciidoctor::Document instance to which this Block belongs
   def document
-    @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
+    return @document if @document
+    @document = (@parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document)
   end
 
   # Public: Get the Asciidoctor::Renderer instance being used for the ancestor
   # Asciidoctor::Document instance.
   def renderer
-    @parent.renderer
+    document.renderer
   end
 
   # Public: Get the rendered String content for this Block.  If the block
