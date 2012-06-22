@@ -449,16 +449,18 @@ class Asciidoctor::Document
 
       elsif match = this_line.match(REGEXP[:ulist])
         items = []
-        level = match[1].length
         list_type = :ulist
-        puts "Creating :ulist block of level #{level}"
         block = Block.new(parent, list_type)
-        block.level = level
+        puts "Created :ulist block: #{block}"
+        last_item_level = nil
         while !this_line.nil? && match = this_line.match(REGEXP[list_type])
+          level = match[1].length
+
           item = ListItem.new
+          item.level = level
+          puts "Created ListItem #{item} with match[2]: #{match[2]} and level: #{item.level}"
 
           lines.unshift match[2].lstrip.sub(/^\./, '\.')
-          puts "After unshift, lines.first is #{lines[0]}"
           item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type])
           while item_segment.any?
             item.blocks << next_block(item_segment, block)
@@ -470,7 +472,15 @@ class Asciidoctor::Document
             item.content = item.blocks.shift.buffer.map{|l| l.strip}.join("\n")
           end
 
-          items << item
+          if items.any? && (level > items.last.level)
+            puts "--> Putting this new level #{level} ListItem under my pops, #{items.last} (level: #{items.last.level})"
+            items.last.blocks << item
+          else
+            puts "Stacking new list item in parent block's blocks"
+            items << item
+          end
+
+          last_item_level = item.level
 
           skip_blank(lines)
 

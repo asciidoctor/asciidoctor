@@ -140,9 +140,13 @@ class Asciidoctor::Block
       end
     when :oblock, :quote
       blocks.map{|block| block.render}.join
-    when :olist, :ulist, :colist
+    when :olist, :colist
       @buffer.map do |li|
         htmlify(li.content) + li.blocks.map{|block| block.render}.join
+      end
+    when :ulist
+      @buffer.map do |li|
+        li.render
       end
     when :listing
       @buffer.map{|l| CGI.escapeHTML(l).gsub(/(<\d+>)/,'<b>\1</b>')}.join
