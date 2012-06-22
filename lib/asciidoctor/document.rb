@@ -241,6 +241,10 @@ class Asciidoctor::Document
   #   => ["In a different segment\n"]
   def list_item_segment(lines, options={})
     alternate_ending = options[:alt_ending]
+    list_types = Array(options[:list_types]) || [:ulist, :olist, :colist, :dlist]
+    # We know we want to include :lit_par types, even if we have specified, say,
+    # only :ulist type list entries.
+    list_types << :lit_par unless list_types.include? :lit_par
     segment = []
 
     skip_blank(lines)
@@ -259,14 +263,16 @@ class Asciidoctor::Document
           #   Another list or a literal paragraph immediately following
           #   a list item will be implicitly included in the list item
           next_nonblank = lines.detect{|l| !l.strip.empty?}
-          if !next_nonblank.nil? &&
+
+          # If there are blank lines ahead, but there's at least one
+          # more non-blank line that doesn't trigger an alternate_ending
+          # for the block of lines, then vacuum up all the blank lines
+          # into this segment and continue with the next non-blank line.
+          if next_nonblank &&
              ( alternate_ending.nil? ||
                !next_nonblank.match(alternate_ending)
-             ) && [:ulist, :olist, :colist, :dlist, :lit_par].
-                  find { |pattern| next_nonblank.match(REGEXP[pattern]) }
+             ) && list_types.find { |list_type| next_nonblank.match(REGEXP[list_type]) }
 
-             # Pull blank lines into the segment, so the next thing up for processing
-             # will be the next nonblank line.
              while lines.first.strip.empty?
                segment << this_line
                this_line = lines.shift
@@ -274,7 +280,7 @@ class Asciidoctor::Document
           else
             break
           end
-        elsif !alternate_ending.nil? && this_line.match(alternate_ending)
+        elsif alternate_ending && this_line.match(alternate_ending)
           lines.unshift this_line
           break
         end
@@ -452,6 +458,7 @@ class Asciidoctor::Document
           item = ListItem.new
 
           lines.unshift match[2].lstrip.sub(/^\./, '\.')
+          puts "After unshift, lines.first is #{lines[0]}"
           item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type])
           while item_segment.any?
             item.blocks << next_block(item_segment, block)
@@ -552,6 +559,7 @@ class Asciidoctor::Document
         block = Block.new(parent, :sidebar, buffer)
 
       else
+        puts "I'm in paragraph now"
         # paragraph is contiguous nonblank/noncontinuation lines
         while !this_line.nil? && !this_line.strip.empty?
           if this_line.match( REGEXP[:listing] ) || this_line.match( REGEXP[:oblock] )
@@ -568,6 +576,8 @@ class Asciidoctor::Document
         elsif source_type
           block = Block.new(parent, :listing, buffer)
         else
+          puts "Making a new paragraph with buffer: #{buffer}"
+          puts "Its proud parent is #{parent}"
           block = Block.new(parent, :paragraph, buffer)
         end
       end
