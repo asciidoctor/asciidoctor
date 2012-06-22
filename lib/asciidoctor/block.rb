@@ -64,6 +64,34 @@ class Asciidoctor::Block
     renderer.render("section_#{context}", self)
   end
 
+  def puts_indented(level, *args)
+    thing = " "*level*2
+    args.each do |arg|
+      puts "#{thing}#{arg}"
+    end
+  end
+
+  def splain(parent_level = 0)
+    parent_level += 1
+    puts_indented(parent_level, "Block title: #{title}") unless self.title.nil?
+    puts_indented(parent_level, "Block anchor: #{anchor}") unless self.anchor.nil?
+    puts_indented(parent_level, "Block caption: #{caption}") unless self.caption.nil?
+    puts_indented(parent_level, "Block level: #{level}") unless self.level.nil?
+    puts_indented(parent_level, "Block context: #{context}") unless self.context.nil?
+
+    puts_indented(parent_level, "Blocks: #{@blocks.count}")
+
+    puts_indented(parent_level, "Buffer: #{@buffer}") if @blocks.count == 0
+
+    @blocks.each_with_index do |block, i|
+      puts_indented(parent_level, "BBlock ##{i} is a #{block.class}")
+      puts_indented(parent_level, "Name is #{block.name rescue 'n/a'}")
+      puts_indented(parent_level, "=" * 40)
+      block.splain(parent_level) if block.respond_to? :splain
+    end
+    nil
+  end
+
   # Public: Get an HTML-ified version of the source buffer, with special
   # Asciidoc characters and entities converted to their HTML equivalents.
   #

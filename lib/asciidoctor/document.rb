@@ -41,6 +41,7 @@ class Asciidoctor::Document
     @references = {}
 
     include_regexp = /^include::([^\[]+)\[\]\s*\n?\z/
+
     data.each do |line|
       if inc = line.match(include_regexp)
         raw_source.concat(File.readlines(inc[1]))
@@ -169,10 +170,13 @@ class Asciidoctor::Document
 
     puts "I have #{@elements.count} elements"
     @elements.each_with_index do |block, i|
+      puts "v" * 60
       puts "Block ##{i} is a #{block.class}"
       puts "Name is #{block.name rescue 'n/a'}"
-      puts "=" * 40
+      block.splain(0) if block.respond_to? :splain
+      puts "^" * 60
     end
+    nil
   end
 
   # Public: Render the Asciidoc document using erb templates
