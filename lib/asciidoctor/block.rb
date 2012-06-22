@@ -76,7 +76,11 @@ class Asciidoctor::Block
         Asciidoctor.puts_indented(parent_level, "Buffer ##{i} is a #{buf.class}")
         Asciidoctor.puts_indented(parent_level, "Name is #{buf.name rescue 'n/a'}")
 
-        buf.splain(parent_level) if buf.respond_to? :splain
+        if buf.respond_to? :splain
+          buf.splain(parent_level)
+        else
+          Asciidoctor.puts_indented(parent_level, "Buffer: #{buf}")
+        end
         Asciidoctor.puts_indented(parent_level, "^" * (60 - parent_level*2))
       end
     else
