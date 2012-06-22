@@ -115,7 +115,7 @@ module Asciidoctor
     # ____
     :quote            => /^_{4,}\s*$/,
 
-    # ____
+    # ''''
     :ruler            => /^'{3,}\s*$/,
 
     # ****
@@ -129,7 +129,14 @@ module Asciidoctor
     :title            => /^\.([^\s\.].*)\s*$/,
 
     # * Foo  ||  - Foo
-    :ulist            => /^\s*([\*\-])\s+(.*)$/,
+    # TODO: unordered list elements should allow up to 5 *,
+    # but the way we're handling this at the moment, this
+    # would likely conflict with the sidebar_blk above. So
+    # we're limiting it to 3-deep on the * stuff for now.
+    #
+    # NOTE: The docs are inconclusive about how these are
+    # treated when they intermix.
+    :ulist            => /^ \s* (- | \*{1,3}) \s+ (.*) $/x,
 
     # [verse]
     :verse            => /^\[verse\]\s*$/
