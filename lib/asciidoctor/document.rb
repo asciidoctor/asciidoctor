@@ -408,9 +408,42 @@ class Asciidoctor::Document
           block.blocks << next_block(buffer, block)
         end
 
-      elsif list_type = [:olist, :ulist, :colist].detect{|l| this_line.match( REGEXP[l] )}
+      elsif list_type = [:olist, :colist].detect{|l| this_line.match( REGEXP[l] )}
         items = []
+        puts "Creating block of type: #{list_type}"
         block = Block.new(parent, list_type)
+        while !this_line.nil? && match = this_line.match(REGEXP[list_type])
+          item = ListItem.new
+
+          lines.unshift match[2].lstrip.sub(/^\./, '\.')
+          item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type])
+          while item_segment.any?
+            item.blocks << next_block(item_segment, block)
+          end
+
+          if item.blocks.any? &&
+             item.blocks.first.is_a?(Block) &&
+             (item.blocks.first.context == :paragraph || item.blocks.first.context == :literal)
+            item.content = item.blocks.shift.buffer.map{|l| l.strip}.join("\n")
+          end
+
+          items << item
+
+          skip_blank(lines)
+
+          this_line = lines.shift
+        end
+        lines.unshift(this_line) unless this_line.nil?
+
+        block.buffer = items
+
+      elsif match = this_line.match(REGEXP[:ulist])
+        items = []
+        level = match[1].length
+        list_type = :ulist
+        puts "Creating :ulist block of level #{level}"
+        block = Block.new(parent, list_type)
+        block.level = level
         while !this_line.nil? && match = this_line.match(REGEXP[list_type])
           item = ListItem.new
 
@@ -541,6 +574,16 @@ class Asciidoctor::Document
     block.caption ||= caption
 
     block
+  end
+
+  # Private: Get the Integer ulist level based on the characters
+  # in front of the list item text.
+  #
+  # line - the String line containing the list item
+  def ulist_level(line)
+    if m = line.strip.match(/^(- | \*{1,3})\s+/x)
+      return m[1].length
+    end
   end
 
   # Private: Get the Integer section level based on the characters

@@ -18,6 +18,10 @@ class Asciidoctor::Block
   # Public: Get/Set the String section anchor name.
   attr_accessor :anchor
 
+  # Public: Get/Set the Integer block level (for nested elements, like
+  # list elements).
+  attr_accessor :level
+
   # Public: Get/Set the String block title.
   attr_accessor :title
 
