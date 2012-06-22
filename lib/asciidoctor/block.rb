@@ -64,30 +64,40 @@ class Asciidoctor::Block
     renderer.render("section_#{context}", self)
   end
 
-  def puts_indented(level, *args)
-    thing = " "*level*2
-    args.each do |arg|
-      puts "#{thing}#{arg}"
-    end
-  end
-
   def splain(parent_level = 0)
     parent_level += 1
-    puts_indented(parent_level, "Block title: #{title}") unless self.title.nil?
-    puts_indented(parent_level, "Block anchor: #{anchor}") unless self.anchor.nil?
-    puts_indented(parent_level, "Block caption: #{caption}") unless self.caption.nil?
-    puts_indented(parent_level, "Block level: #{level}") unless self.level.nil?
-    puts_indented(parent_level, "Block context: #{context}") unless self.context.nil?
+    Asciidoctor.puts_indented(parent_level, "Block title: #{title}") unless self.title.nil?
+    Asciidoctor.puts_indented(parent_level, "Block anchor: #{anchor}") unless self.anchor.nil?
+    Asciidoctor.puts_indented(parent_level, "Block caption: #{caption}") unless self.caption.nil?
+    Asciidoctor.puts_indented(parent_level, "Block level: #{level}") unless self.level.nil?
+    Asciidoctor.puts_indented(parent_level, "Block context: #{context}") unless self.context.nil?
 
-    puts_indented(parent_level, "Blocks: #{@blocks.count}")
+    Asciidoctor.puts_indented(parent_level, "Blocks: #{@blocks.count}")
 
-    puts_indented(parent_level, "Buffer: #{@buffer}") if @blocks.count == 0
+    if buffer.is_a? Enumerable
+      buffer.each_with_index do |buf, i|
+        Asciidoctor.puts_indented(parent_level, "v" * (60 - parent_level*2))
+        Asciidoctor.puts_indented(parent_level, "Buffer ##{i} is a #{buf.class}")
+        Asciidoctor.puts_indented(parent_level, "Name is #{buf.name rescue 'n/a'}")
+
+        buf.splain(parent_level) if buf.respond_to? :splain
+        Asciidoctor.puts_indented(parent_level, "^" * (60 - parent_level*2))
+      end
+    else
+      if buffer.respond_to? :splain
+        buffer.splain(parent_level)
+      else
+        Asciidoctor.puts_indented(parent_level, "Buffer: #{@buffer}")
+      end
+    end
 
     @blocks.each_with_index do |block, i|
-      puts_indented(parent_level, "BBlock ##{i} is a #{block.class}")
-      puts_indented(parent_level, "Name is #{block.name rescue 'n/a'}")
-      puts_indented(parent_level, "=" * 40)
+      Asciidoctor.puts_indented(parent_level, "v" * (60 - parent_level*2))
+      Asciidoctor.puts_indented(parent_level, "Block ##{i} is a #{block.class}")
+      Asciidoctor.puts_indented(parent_level, "Name is #{block.name rescue 'n/a'}")
+
       block.splain(parent_level) if block.respond_to? :splain
+      Asciidoctor.puts_indented(parent_level, "^" * (60 - parent_level*2))
     end
     nil
   end
