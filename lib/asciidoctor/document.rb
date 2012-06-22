@@ -131,7 +131,7 @@ class Asciidoctor::Document
       @elements << next_block(@lines) if @lines.any?
     end
 
-    Asciidoctor.debug "Found #{@elements.size} elements:"
+    Asciidoctor.debug "Found #{@elements.size} elements in this document:"
     @elements.each do |el|
       Asciidoctor.debug el
     end
@@ -262,7 +262,8 @@ class Asciidoctor::Document
     buffer
   end
 
-  # Private: Strip off and return the list item segment (one or more contiguous blocks) from the Array of lines.
+  # Private: Return the Array of lines constituting the next list item segment, removing
+  #          them from the 'lines' Array passed in.
   #
   # lines   - the Array of String lines.
   # options - an optional Hash of processing options:
@@ -273,6 +274,7 @@ class Asciidoctor::Document
   #           * :list_level may be used to specify a mimimum list item level to
   #             include. If this is specified, then break if we find a list item
   #             of a lower level.
+  #
   # Returns the Array of lines from the next segment.
   #
   # Examples
@@ -303,13 +305,11 @@ class Asciidoctor::Document
     in_listing = false
     while lines.any?
       this_line = lines.shift
+      puts "----->  Processing: #{this_line}"
       in_oblock = !in_oblock if this_line.match(REGEXP[:oblock])
       in_listing = !in_listing if this_line.match(REGEXP[:listing])
       if !in_oblock && !in_listing
         if this_line.strip.empty?
-          # From the Asciidoc user's guide:
-          #   Another list or a literal paragraph immediately following
-          #   a list item will be implicitly included in the list item
           next_nonblank = lines.detect{|l| !l.strip.empty?}
 
           # If there are blank lines ahead, but there's at least one
@@ -342,11 +342,23 @@ class Asciidoctor::Document
           lines.unshift this_line
           break
         end
+
+        # From the Asciidoc user's guide:
+        #   Another list or a literal paragraph immediately following
+        #   a list item will be implicitly included in the list item
+
+        # Thus, the list_level stuff may be wrong here.
       end
 
       segment << this_line
     end
 
+    puts "Returning this:"
+    puts segment.inspect
+    puts "*"*40
+    puts "Top of lines queue is:"
+    puts lines.first
+    puts "*"*40
     segment
   end
 
@@ -358,34 +370,35 @@ class Asciidoctor::Document
     last_item_level = nil
     this_line = lines.shift
 
-    while !this_line.nil? && match = this_line.match(REGEXP[list_type])
+    while this_line && match = this_line.match(REGEXP[list_type])
       level = match[1].length
 
-      item = ListItem.new
-      item.level = level
-      puts "Created ListItem #{item} with match[2]: #{match[2]} and level: #{item.level}"
+      list_item = ListItem.new
+      list_item.level = level
+      puts "Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
 
       lines.unshift match[2].lstrip.sub(/^\./, '\.')
       item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type], :list_level => level)
       while item_segment.any?
-        item.blocks << next_block(item_segment, block)
+        list_item.blocks << next_block(item_segment, block)
       end
 
-      if item.blocks.any? &&
-         item.blocks.first.is_a?(Block) &&
-         (item.blocks.first.context == :paragraph || item.blocks.first.context == :literal)
-        item.content = item.blocks.shift.buffer.map{|l| l.strip}.join("\n")
+      first_block = list_item.blocks.first
+      if first_block.is_a?(Block) &&
+         (first_block.context == :paragraph || first_block.context == :literal)
+        list_item.content = first_block.buffer.map{|l| l.strip}.join("\n")
+        list_item.blocks.shift
       end
 
       if items.any? && (level > items.last.level)
         puts "--> Putting this new level #{level} ListItem under my pops, #{items.last} (level: #{items.last.level})"
-        items.last.blocks << item
+        items.last.blocks << list_item
       else
         puts "Stacking new list item in parent block's blocks"
-        items << item
+        items << list_item
       end
 
-      last_item_level = item.level
+      last_item_level = list_item.level
 
       skip_blank(lines)
 
