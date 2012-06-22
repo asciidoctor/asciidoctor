@@ -21,9 +21,9 @@ class Asciidoctor::ListItem
   end
 
   def render
-    output = "<ul><li><p>#{content} (HTMLIFY) "
+    output = "<li><p>#{content} (HTMLIFY) "
     output += blocks.map{|block| block.render}.join
-    output += "</p></li></ul>"
+    output += "</p></li>"
   end
 
   def splain(parent_level = 0)
