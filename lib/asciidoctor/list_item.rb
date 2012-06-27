@@ -9,12 +9,21 @@ class Asciidoctor::ListItem
   # Public: Get/Set the String list item anchor name.
   attr_accessor :anchor
 
+  # Public: Get/Set the Integer list level (for nesting list elements).
+  attr_accessor :level
+
   # Public: Initialize an Asciidoctor::ListItem object.
   #
   # content - the String content (default '')
   def initialize(content='')
     @content = content
     @blocks  = []
+  end
+
+  def render
+    output = "<li><p>#{content} (HTMLIFY) "
+    output += blocks.map{|block| block.render}.join
+    output += "</p></li>"
   end
 
   def splain(parent_level = 0)

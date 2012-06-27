@@ -164,9 +164,9 @@ class SectionUlistTemplate < BaseTemplate
     @template ||= ERB.new <<-EOF
       <div class='ulist'>
         <ul>
-          <% content.each do |li| %>
-            <li><p><%= li %></p></li>
-          <% end %>
+        <% content.each do |li| %>
+          <%= li %>
+        <% end %>
         </ul>
       </div>
     EOF

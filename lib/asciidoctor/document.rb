@@ -131,7 +131,7 @@ class Asciidoctor::Document
       @elements << next_block(@lines) if @lines.any?
     end
 
-    Asciidoctor.debug "Found #{@elements.size} elements:"
+    Asciidoctor.debug "Found #{@elements.size} elements in this document:"
     @elements.each do |el|
       Asciidoctor.debug el
     end
@@ -221,71 +221,6 @@ class Asciidoctor::Document
     nil
   end
 
-  # Private: Strip off and return the list item segment (one or more contiguous blocks) from the Array of lines.
-  #
-  # lines   - the Array of String lines.
-  # options - an optional Hash of processing options:
-  #           * :alt_ending may be used to specify a regular expression match other than
-  #             a blank line to signify the end of the segment.
-  # Returns the Array of lines from the next segment.
-  #
-  # Examples
-  #
-  #   content
-  #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n", "Open block\n", "\n", "Can have blank lines\n", "--\n", "\n", "In a different segment\n"]
-  #
-  #   list_item_segment(content)
-  #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n", "Open block\n", "\n", "Can have blank lines\n", "--\n"]
-  #
-  #   content
-  #   => ["In a different segment\n"]
-  def list_item_segment(lines, options={})
-    alternate_ending = options[:alt_ending]
-    segment = []
-
-    skip_blank(lines)
-
-    # Grab lines until the first blank line not inside an open block
-    # or listing
-    in_oblock = false
-    in_listing = false
-    while lines.any?
-      this_line = lines.shift
-      in_oblock = !in_oblock if this_line.match(REGEXP[:oblock])
-      in_listing = !in_listing if this_line.match(REGEXP[:listing])
-      if !in_oblock && !in_listing
-        if this_line.strip.empty?
-          # From the Asciidoc user's guide:
-          #   Another list or a literal paragraph immediately following
-          #   a list item will be implicitly included in the list item
-          next_nonblank = lines.detect{|l| !l.strip.empty?}
-          if !next_nonblank.nil? &&
-             ( alternate_ending.nil? ||
-               !next_nonblank.match(alternate_ending)
-             ) && [:ulist, :olist, :colist, :dlist, :lit_par].
-                  find { |pattern| next_nonblank.match(REGEXP[pattern]) }
-
-             # Pull blank lines into the segment, so the next thing up for processing
-             # will be the next nonblank line.
-             while lines.first.strip.empty?
-               segment << this_line
-               this_line = lines.shift
-             end
-          else
-            break
-          end
-        elsif !alternate_ending.nil? && this_line.match(alternate_ending)
-          lines.unshift this_line
-          break
-        end
-      end
-
-      segment << this_line
-    end
-
-    segment
-  end
-
   # Private: Return all the lines from `lines` until we run out of lines,
   #   find a blank line with :break_on_blank_lines => true, or find a line
   #   for which the given block evals to true.
@@ -327,6 +262,230 @@ class Asciidoctor::Document
     buffer
   end
 
+  # Private: Return the Array of lines constituting the next list item segment, removing
+  #          them from the 'lines' Array passed in.
+  #
+  # lines   - the Array of String lines.
+  # options - an optional Hash of processing options:
+  #           * :alt_ending may be used to specify a regular expression match other than
+  #             a blank line to signify the end of the segment.
+  #           * :list_types may be used to specify list item pattern to include. May
+  #             be either a single Symbol or an Array of Symbols.
+  #           * :list_level may be used to specify a mimimum list item level to
+  #             include. If this is specified, then break if we find a list item
+  #             of a lower level.
+  #
+  # Returns the Array of lines from the next segment.
+  #
+  # Examples
+  #
+  #   content
+  #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n", "Open block\n", "\n", "Can have blank lines\n", "--\n", "\n", "In a different segment\n"]
+  #
+  #   list_item_segment(content)
+  #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n", "Open block\n", "\n", "Can have blank lines\n", "--\n"]
+  #
+  #   content
+  #   => ["In a different segment\n"]
+  def list_item_segment(lines, options={})
+    alternate_ending = options[:alt_ending]
+    list_types = Array(options[:list_types]) || [:ulist, :olist, :colist, :dlist]
+    list_level = options[:list_level].to_i
+
+    # We know we want to include :lit_par types, even if we have specified, say,
+    # only :ulist type list entries.
+    list_types << :lit_par unless list_types.include? :lit_par
+    segment = []
+
+    skip_blank(lines)
+
+    # Grab lines until the first blank line not inside an open block
+    # or listing
+    in_oblock = false
+    in_listing = false
+    while lines.any?
+      this_line = lines.shift
+      puts "----->  Processing: #{this_line}"
+      in_oblock = !in_oblock if this_line.match(REGEXP[:oblock])
+      in_listing = !in_listing if this_line.match(REGEXP[:listing])
+      if !in_oblock && !in_listing
+        if this_line.strip.empty?
+          next_nonblank = lines.detect{|l| !l.strip.empty?}
+
+          # If there are blank lines ahead, but there's at least one
+          # more non-blank line that doesn't trigger an alternate_ending
+          # for the block of lines, then vacuum up all the blank lines
+          # into this segment and continue with the next non-blank line.
+          if next_nonblank &&
+             ( alternate_ending.nil? ||
+               !next_nonblank.match(alternate_ending)
+             ) && list_types.find { |list_type| next_nonblank.match(REGEXP[list_type]) }
+
+             while lines.first.strip.empty?
+               segment << this_line
+               this_line = lines.shift
+             end
+          else
+            break
+          end
+
+        # Have we come to a line matching an alternate_ending regexp?
+        elsif alternate_ending && this_line.match(alternate_ending)
+          lines.unshift this_line
+          break
+
+        # Do we have a minimum list_level, and have come to a list item
+        # line with a lower level?
+        elsif list_level &&
+              list_types.find { |list_type| this_line.match(REGEXP[list_type]) } &&
+              ($1.length < list_level)
+          lines.unshift this_line
+          break
+        end
+
+        # From the Asciidoc user's guide:
+        #   Another list or a literal paragraph immediately following
+        #   a list item will be implicitly included in the list item
+
+        # Thus, the list_level stuff may be wrong here.
+      end
+
+      segment << this_line
+    end
+
+    puts "*"*40
+    puts "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__}: Returning this:"
+    puts segment.inspect
+    puts "*"*10
+    puts "Top of lines queue is:"
+    puts lines.first
+    puts "*"*40
+    segment
+  end
+
+  def build_ulist_item(lines, block, match = nil)
+    list_type = :ulist
+    this_line = lines.shift
+    return nil unless this_line
+
+    match ||= this_line.match(REGEXP[list_type])
+    if match.nil?
+      lines.unshift(this_line)
+      return nil
+    end
+
+    level = match[1].length
+
+    list_item = ListItem.new
+    list_item.level = level
+    puts "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
+
+    # Prevent bullet list text starting with . from being treated as a paragraph
+    # title or some other unseemly thing in list_item_segment. I think. (NOTE)
+    lines.unshift match[2].lstrip.sub(/^\./, '\.')
+
+    item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type])
+#    item_segment = list_item_segment(lines)
+    while item_segment.any?
+      list_item.blocks << next_block(item_segment, block)
+    end
+
+    puts "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
+
+    first_block = list_item.blocks.first
+    if first_block.is_a?(Block) &&
+       (first_block.context == :paragraph || first_block.context == :literal)
+      list_item.content = first_block.buffer.map{|l| l.strip}.join("\n")
+      list_item.blocks.shift
+    end
+
+    list_item
+  end
+
+  def build_ulist(lines, parent = nil)
+    items = []
+    list_type = :ulist
+    block = Block.new(parent, list_type)
+    puts "Created :ulist block: #{block}"
+    last_item_level = nil
+
+    while lines.any? && match = lines.first.match(REGEXP[list_type])
+
+      this_item_level = match[1].length
+      if last_item_level && last_item_level < this_item_level
+        # If this :uline level is down one, put it in a Block of
+        # its own
+        list_item = next_block(lines, block)
+        items << list_item
+      else
+        list_item = build_ulist_item(lines, block, match)
+
+        if items.any? && (list_item.level > items.last.level)
+          puts "--> Putting this new level #{list_item.level} ListItem under my pops, #{items.last} (level: #{items.last.level})"
+          items.last.blocks << list_item
+        else
+          puts "Stacking new list item in parent block's blocks"
+          items << list_item
+        end
+      end
+
+      last_item_level = this_item_level
+
+      skip_blank(lines)
+    end
+
+    block.buffer = items
+    block
+  end
+
+  def build_ulist_ref(lines, parent = nil)
+    items = []
+    list_type = :ulist
+    block = Block.new(parent, list_type)
+    puts "Created :ulist block: #{block}"
+    last_item_level = nil
+    this_line = lines.shift
+
+    while this_line && match = this_line.match(REGEXP[list_type])
+      level = match[1].length
+
+      list_item = ListItem.new
+      list_item.level = level
+      puts "Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
+
+      lines.unshift match[2].lstrip.sub(/^\./, '\.')
+      item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type], :list_level => level)
+      while item_segment.any?
+        list_item.blocks << next_block(item_segment, block)
+      end
+
+      first_block = list_item.blocks.first
+      if first_block.is_a?(Block) &&
+         (first_block.context == :paragraph || first_block.context == :literal)
+        list_item.content = first_block.buffer.map{|l| l.strip}.join("\n")
+        list_item.blocks.shift
+      end
+
+      if items.any? && (level > items.last.level)
+        puts "--> Putting this new level #{level} ListItem under my pops, #{items.last} (level: #{items.last.level})"
+        items.last.blocks << list_item
+      else
+        puts "Stacking new list item in parent block's blocks"
+        items << list_item
+      end
+
+      last_item_level = list_item.level
+
+      skip_blank(lines)
+
+      this_line = lines.shift
+    end
+    lines.unshift(this_line) unless this_line.nil?
+
+    block.buffer = items
+    block
+  end
+
   # Private: Return the next block from the section.
   #
   # * Skip over blank lines to find the start of the next content block.
@@ -357,7 +516,7 @@ class Asciidoctor::Document
     end
 
     Asciidoctor.debug "/"*64
-    Asciidoctor.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
     Asciidoctor.debug lines.first
     Asciidoctor.debug lines[1]
     Asciidoctor.debug "/"*64
@@ -412,8 +571,9 @@ class Asciidoctor::Document
           block.blocks << next_block(buffer, block)
         end
 
-      elsif list_type = [:olist, :ulist, :colist].detect{|l| this_line.match( REGEXP[l] )}
+      elsif list_type = [:olist, :colist].detect{|l| this_line.match( REGEXP[l] )}
         items = []
+        puts "Creating block of type: #{list_type}"
         block = Block.new(parent, list_type)
         while !this_line.nil? && match = this_line.match(REGEXP[list_type])
           item = ListItem.new
@@ -439,6 +599,11 @@ class Asciidoctor::Document
         lines.unshift(this_line) unless this_line.nil?
 
         block.buffer = items
+
+      elsif match = this_line.match(REGEXP[:ulist])
+
+        lines.unshift(this_line)
+        block = build_ulist(lines, parent)
 
       elsif match = this_line.match(REGEXP[:dlist])
         pairs = []
@@ -535,6 +700,7 @@ class Asciidoctor::Document
         elsif source_type
           block = Block.new(parent, :listing, buffer)
         else
+          puts "Proud parent #{parent} getting a new paragraph with buffer: #{buffer}"
           block = Block.new(parent, :paragraph, buffer)
         end
       end
@@ -545,6 +711,16 @@ class Asciidoctor::Document
     block.caption ||= caption
 
     block
+  end
+
+  # Private: Get the Integer ulist level based on the characters
+  # in front of the list item text.
+  #
+  # line - the String line containing the list item
+  def ulist_level(line)
+    if m = line.strip.match(/^(- | \*{1,3})\s+/x)
+      return m[1].length
+    end
   end
 
   # Private: Get the Integer section level based on the characters
@@ -656,7 +832,7 @@ class Asciidoctor::Document
     section = Section.new(self)
 
     Asciidoctor.debug "%"*64
-    Asciidoctor.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
     Asciidoctor.debug lines.first
     Asciidoctor.debug lines[1]
     Asciidoctor.debug "%"*64

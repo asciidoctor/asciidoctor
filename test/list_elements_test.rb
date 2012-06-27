@@ -29,7 +29,7 @@ context "Bulleted lists (:ulist)" do
     end
 
     test "nested elements (2) with asterisks" do
-      output = render_string("Blah\n====\n* Foo\n** Boo\n* Blech")
+      output = render_string("* Foo\n** Boo\n* Blech")
       assert_xpath '//ul', output, 2
       assert_xpath '//ul/li', output, 3
     end
