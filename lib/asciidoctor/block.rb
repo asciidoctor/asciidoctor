@@ -33,6 +33,10 @@ class Asciidoctor::Block
   # parent  - The parent Asciidoc Object.
   # context - The Symbol context name for the type of content.
   # buffer  - The Array buffer of source data.
+
+  # TODO: Don't really need the parent, just the document (for access
+  # both to its renderer, as well as its references and other defined
+  # elements). Would probably be better to pass in just the document.
   def initialize(parent, context, buffer=nil)
     @parent = parent
     @context = context
@@ -121,6 +125,10 @@ class Asciidoctor::Block
   # * double/single quotes
   # * super/sub script
   def content
+
+    puts "For the record, buffer is:"
+    puts @buffer.inspect
+
     case @context
     when :dlist
       @buffer.map do |dt, dd|
@@ -146,7 +154,7 @@ class Asciidoctor::Block
       end
     when :ulist
       @buffer.map do |li|
-        li.render
+        li.render + li.blocks.map{|block| block.render}.join
       end
     when :listing
       @buffer.map{|l| CGI.escapeHTML(l).gsub(/(<\d+>)/,'<b>\1</b>')}.join

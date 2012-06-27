@@ -353,16 +353,92 @@ class Asciidoctor::Document
       segment << this_line
     end
 
-    puts "Returning this:"
-    puts segment.inspect
     puts "*"*40
+    puts "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__}: Returning this:"
+    puts segment.inspect
+    puts "*"*10
     puts "Top of lines queue is:"
     puts lines.first
     puts "*"*40
     segment
   end
 
+  def build_ulist_item(lines, block, match = nil)
+    list_type = :ulist
+    this_line = lines.shift
+    return nil unless this_line
+
+    match ||= this_line.match(REGEXP[list_type])
+    if match.nil?
+      lines.unshift(this_line)
+      return nil
+    end
+
+    level = match[1].length
+
+    list_item = ListItem.new
+    list_item.level = level
+    puts "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
+
+    # Prevent bullet list text starting with . from being treated as a paragraph
+    # title or some other unseemly thing in list_item_segment. I think. (NOTE)
+    lines.unshift match[2].lstrip.sub(/^\./, '\.')
+
+    item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type])
+#    item_segment = list_item_segment(lines)
+    while item_segment.any?
+      list_item.blocks << next_block(item_segment, block)
+    end
+
+    puts "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
+
+    first_block = list_item.blocks.first
+    if first_block.is_a?(Block) &&
+       (first_block.context == :paragraph || first_block.context == :literal)
+      list_item.content = first_block.buffer.map{|l| l.strip}.join("\n")
+      list_item.blocks.shift
+    end
+
+    list_item
+  end
+
   def build_ulist(lines, parent = nil)
+    items = []
+    list_type = :ulist
+    block = Block.new(parent, list_type)
+    puts "Created :ulist block: #{block}"
+    last_item_level = nil
+
+    while lines.any? && match = lines.first.match(REGEXP[list_type])
+
+      this_item_level = match[1].length
+      if last_item_level && last_item_level < this_item_level
+        # If this :uline level is down one, put it in a Block of
+        # its own
+        list_item = next_block(lines, block)
+        items << list_item
+      else
+        list_item = build_ulist_item(lines, block, match)
+
+        if items.any? && (list_item.level > items.last.level)
+          puts "--> Putting this new level #{list_item.level} ListItem under my pops, #{items.last} (level: #{items.last.level})"
+          items.last.blocks << list_item
+        else
+          puts "Stacking new list item in parent block's blocks"
+          items << list_item
+        end
+      end
+
+      last_item_level = this_item_level
+
+      skip_blank(lines)
+    end
+
+    block.buffer = items
+    block
+  end
+
+  def build_ulist_ref(lines, parent = nil)
     items = []
     list_type = :ulist
     block = Block.new(parent, list_type)
@@ -440,7 +516,7 @@ class Asciidoctor::Document
     end
 
     Asciidoctor.debug "/"*64
-    Asciidoctor.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
     Asciidoctor.debug lines.first
     Asciidoctor.debug lines[1]
     Asciidoctor.debug "/"*64
@@ -608,7 +684,6 @@ class Asciidoctor::Document
         block = Block.new(parent, :sidebar, buffer)
 
       else
-        puts "I'm in paragraph now"
         # paragraph is contiguous nonblank/noncontinuation lines
         while !this_line.nil? && !this_line.strip.empty?
           if this_line.match( REGEXP[:listing] ) || this_line.match( REGEXP[:oblock] )
@@ -625,8 +700,7 @@ class Asciidoctor::Document
         elsif source_type
           block = Block.new(parent, :listing, buffer)
         else
-          puts "Making a new paragraph with buffer: #{buffer}"
-          puts "Its proud parent is #{parent}"
+          puts "Proud parent #{parent} getting a new paragraph with buffer: #{buffer}"
           block = Block.new(parent, :paragraph, buffer)
         end
       end
@@ -758,7 +832,7 @@ class Asciidoctor::Document
     section = Section.new(self)
 
     Asciidoctor.debug "%"*64
-    Asciidoctor.debug "#{__FILE__}:#{__LINE__} - First two lines are:"
+    Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
     Asciidoctor.debug lines.first
     Asciidoctor.debug lines[1]
     Asciidoctor.debug "%"*64
