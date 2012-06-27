@@ -407,29 +407,23 @@ class Asciidoctor::Document
     list_type = :ulist
     block = Block.new(parent, list_type)
     puts "Created :ulist block: #{block}"
-    last_item_level = nil
+    first_item_level = nil
 
     while lines.any? && match = lines.first.match(REGEXP[list_type])
 
       this_item_level = match[1].length
-      if last_item_level && last_item_level < this_item_level
-        # If this :uline level is down one, put it in a Block of
-        # its own
+
+      if first_item_level && first_item_level < this_item_level
+        # If this next :uline level is down one from the
+        # current Block's, put it in a Block of its own
         list_item = next_block(lines, block)
-        items << list_item
       else
         list_item = build_ulist_item(lines, block, match)
-
-        if items.any? && (list_item.level > items.last.level)
-          puts "--> Putting this new level #{list_item.level} ListItem under my pops, #{items.last} (level: #{items.last.level})"
-          items.last.blocks << list_item
-        else
-          puts "Stacking new list item in parent block's blocks"
-          items << list_item
-        end
+        # Set the base item level for this Block
+        first_item_level ||= list_item.level
       end
 
-      last_item_level = this_item_level
+      items << list_item
 
       skip_blank(lines)
     end
