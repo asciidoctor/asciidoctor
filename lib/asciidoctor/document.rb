@@ -220,23 +220,25 @@ class Asciidoctor::Document
     nil
   end
 
-  # Private: Return all the lines from `lines` until we run out of lines,
-  #   find a blank line with :break_on_blank_lines => true, or find a line
-  #   for which the given block evals to true.
+  # Private: Return all the lines from `lines` until we (1) run out them,
+  #   (2) find a blank line with :break_on_blank_lines => true, or (3) find
+  #   a line for which the given block evals to true.
   #
-  # lines   - the Array of String lines.
+  # lines   - the Array of Strings to process
   # options - an optional Hash of processing options:
-  #           * :break_on_blank_lines may be used to specify to break on blank lines
+  #           * :break_on_blank_lines may be used to specify to break on
+  #               blank lines
   #           * :preserve_last_line may be used to specify that the String
   #               causing the method to stop processing lines should be
   #               pushed back onto the `lines` Array.
   #
-  # Returns the Array of lines from the next segment.
+  # Returns the Array of lines forming the next segment.
   #
   # Examples
   #
   #   content
-  #   => ["First paragraph\n", "Second paragraph\n", "Open block\n", "\n", "Can have blank lines\n", "--\n", "\n", "In a different segment\n"]
+  #   => ["First paragraph\n", "Second paragraph\n", "Open block\n", "\n",
+  #       "Can have blank lines\n", "--\n", "\n", "In a different segment\n"]
   #
   #   grab_lines_until(content)
   #   => ["First paragraph\n", "Second paragraph\n", "Open block\n"]
@@ -260,28 +262,31 @@ class Asciidoctor::Document
     buffer
   end
 
-  # Private: Return the Array of lines constituting the next list item segment, removing
-  #          them from the 'lines' Array passed in.
+  # Private: Return the Array of lines constituting the next list item
+  #          segment, removing them from the 'lines' Array passed in.
   #
   # lines   - the Array of String lines.
   # options - an optional Hash of processing options:
-  #           * :alt_ending may be used to specify a regular expression match other than
-  #             a blank line to signify the end of the segment.
-  #           * :list_types may be used to specify list item pattern to include. May
-  #             be either a single Symbol or an Array of Symbols.
-  #           * :list_level may be used to specify a mimimum list item level to
-  #             include. If this is specified, then break if we find a list item
-  #             of a lower level.
+  #           * :alt_ending may be used to specify a regular expression match
+  #             other than a blank line to signify the end of the segment.
+  #           * :list_types may be used to specify list item patterns to
+  #             include. May be either a single Symbol or an Array of Symbols.
+  #           * :list_level may be used to specify a mimimum list item level
+  #             to include. If this is specified, then break if we find a list
+  #             item of a lower level.
   #
-  # Returns the Array of lines from the next segment.
+  # Returns the Array of lines forming the next segment.
   #
   # Examples
   #
   #   content
-  #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n", "Open block\n", "\n", "Can have blank lines\n", "--\n", "\n", "In a different segment\n"]
+  #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n",
+  #       "Open block\n", "\n", "Can have blank lines\n", "--\n", "\n",
+  #       "In a different segment\n"]
   #
   #   list_item_segment(content)
-  #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n", "Open block\n", "\n", "Can have blank lines\n", "--\n"]
+  #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n",
+  #       "Open block\n", "\n", "Can have blank lines\n", "--\n"]
   #
   #   content
   #   => ["In a different segment\n"]
@@ -290,8 +295,8 @@ class Asciidoctor::Document
     list_types = Array(options[:list_types]) || [:ulist, :olist, :colist, :dlist]
     list_level = options[:list_level].to_i
 
-    # We know we want to include :lit_par types, even if we have specified, say,
-    # only :ulist type list entries.
+    # We know we want to include :lit_par types, even if we have specified,
+    # say, only :ulist type list entries.
     list_types << :lit_par unless list_types.include? :lit_par
     segment = []
 
@@ -355,7 +360,7 @@ class Asciidoctor::Document
     puts "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__}: Returning this:"
     puts segment.inspect
     puts "*"*10
-    puts "Top of lines queue is:"
+    puts "Leaving #{__method__}: Top of lines queue is:"
     puts lines.first
     puts "*"*40
     segment
@@ -547,7 +552,7 @@ class Asciidoctor::Document
         # after matching.  TODO: Need a way to test this.
         lines.unshift(this_line)
         lines.unshift(anchor) unless anchor.nil?
-        Asciidoctor.debug "SENDING to next_section with lines[0] = #{lines.first}"
+        Asciidoctor.debug "#{__method__}: SENDING to next_section with lines[0] = #{lines.first}"
         block = next_section(lines)
 
       elsif this_line.match(REGEXP[:oblock])
