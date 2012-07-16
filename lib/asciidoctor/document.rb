@@ -789,7 +789,7 @@ class Asciidoctor::Document
   #   => nil
   #
   def extract_section_heading(line1, line2 = nil)
-    Asciidoctor.debug "Processing line1: #{line1.chomp rescue 'nil'}, line2: #{line2.chomp rescue 'nil'}"
+    Asciidoctor.debug "#{__method__} -> line1: #{line1.chomp rescue 'nil'}, line2: #{line2.chomp rescue 'nil'}"
     sect_name = sect_anchor = nil
     sect_level = 0
 
@@ -807,7 +807,7 @@ class Asciidoctor::Document
       end
       sect_level = section_level(line2)
     end
-    Asciidoctor.debug "Returning #{sect_name}, #{sect_level}, and #{sect_anchor}"
+    Asciidoctor.debug "#{__method__} -> Returning #{sect_name}, #{sect_level} (anchor: '#{sect_anchor || '<none>'}')"
     return [sect_name, sect_level, sect_anchor]
   end
 
@@ -860,11 +860,16 @@ class Asciidoctor::Document
 
       if is_section_heading?(this_line, next_line)
         _, this_level, _ = extract_section_heading(this_line, next_line)
-        # A section can't contain a section level lower than itself,
-        # so this signifies the end of the section.
+
         if this_level <= section.level
+          # A section can't contain a section level lower than itself,
+          # so this signifies the end of the section.
           lines.unshift this_line
-          lines.unshift section_lines.pop if section_lines.any? && section_lines.last.match(REGEXP[:anchor])
+          if section_lines.any? && section_lines.last.match(REGEXP[:anchor])
+            # Put back the anchor that came before this new-section line
+            # on which we're bailing.
+            lines.unshift section_lines.pop
+          end
           break
         else
           section_lines << this_line
@@ -881,7 +886,7 @@ class Asciidoctor::Document
       end
     end
 
-    # Now parse section_lines into Blocks
+    # Now parse section_lines into Blocks belonging to the current Section
     while section_lines.any?
       skip_blank(section_lines)
 
