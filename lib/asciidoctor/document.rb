@@ -31,7 +31,6 @@ class Asciidoctor::Document
   #
   # Examples
   #
-  #   base = File.dirname(filename)
   #   data = File.read(filename)
   #   doc  = Asciidoctor::Document.new(data)
   def initialize(data, &block)
@@ -249,11 +248,10 @@ class Asciidoctor::Document
 
     while (this_line = lines.shift)
       Asciidoctor.debug "Processing line: '#{this_line}'"
-      finis = this_line.nil?
       finis ||= true if options[:break_on_blank_lines] && this_line.strip.empty?
       finis ||= true if block && value = yield(this_line)
       if finis
-        lines.unshift(this_line) if options[:preserve_last_line] and ! this_line.nil?
+        lines.unshift(this_line) if options[:preserve_last_line]
         break
       end
 
