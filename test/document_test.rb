@@ -11,7 +11,7 @@ class DocumentTest < Test::Unit::TestCase
   end
 
   def test_with_no_title
-    d = Asciidoctor::Document.new("Snorf")
+    d = Asciidoctor::Document.new(["Snorf"])
     assert_nil d.title
   end
 

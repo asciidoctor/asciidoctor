@@ -25,13 +25,13 @@ class Asciidoctor::Document
 
   # Public: Initialize an Asciidoc object.
   #
-  # data  - The String Asciidoc source document.
+  # data  - The Array of Strings holding the Asciidoc source document.
   # block - A block that can be used to retrieve external Asciidoc
   #         data to include in this document.
   #
   # Examples
   #
-  #   data = File.read(filename)
+  #   data = File.readlines(filename)
   #   doc  = Asciidoctor::Document.new(data)
   def initialize(data, &block)
     raw_source = []
