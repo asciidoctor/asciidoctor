@@ -715,7 +715,7 @@ class Asciidoctor::Document
   #
   # line - the String line containing the list item
   def ulist_level(line)
-    if m = line.strip.match(/^(- | \*{1,3})\s+/x)
+    if m = line.strip.match(/^(- | \*{1,5})\s+/x)
       return m[1].length
     end
   end
