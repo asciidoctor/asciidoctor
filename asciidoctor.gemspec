@@ -49,7 +49,6 @@ Gem::Specification.new do |s|
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
   s.add_development_dependency('mocha')
-  s.add_development_dependency('nokogiri')
   s.add_development_dependency('htmlentities')
 
   ## Leave this section as-is. It will be automatically generated from the
