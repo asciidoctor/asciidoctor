@@ -157,6 +157,7 @@ class Asciidoctor::Block
         li.render + li.blocks.map{|block| block.render}.join
       end
     when :listing
+      puts "YOOOOOOOOOOO"
       @buffer.map{|l| CGI.escapeHTML(l).gsub(/(<\d+>)/,'<b>\1</b>')}.join
     when :literal
       htmlify( @buffer.join.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' ))
@@ -235,6 +236,8 @@ class Asciidoctor::Block
       html.gsub!(/([\s\W])\^([^\^]+)\^([\s\W])/m, '\1<sup>\2</sup>\3')
       html.gsub!(/([\s\W])\~([^\~]+)\~([\s\W])/m, '\1<sub>\2</sub>\3')
 
+      # Attribute substitution
+      #
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
       html.gsub!(/ (^|[^\\]) \{ (\w[\w\-]+\w) \} /x) do
         if self.document.defines.has_key?($2)
@@ -247,8 +250,11 @@ class Asciidoctor::Block
           $1 + Asciidoctor::HTML_ELEMENTS[$2]
         else
           Asciidoctor.debug "Bailing on key: #{$2}"
-          # leave everything else alone
-          "#{$1}{#{$2}}"
+          # delete the line if it has a bad attribute
+          # TODO: According to AsciiDoc, we're supposed to delete any line
+          # containing a bad attribute. Eek! Can't do that here via gsub!.
+          # (See `subs_attrs` function in asciidoc.py for many gory details.)
+          ''
         end
       end
 
