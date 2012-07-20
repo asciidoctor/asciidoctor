@@ -6,6 +6,7 @@ require "#{File.expand_path(File.dirname(__FILE__))}/../lib/asciidoctor.rb"
 require 'mocha'
 require 'htmlentities'
 require 'nokogiri'
+require 'pending'
 
 ENV['SUPPRESS_DEBUG'] ||= 'true'
 
