@@ -14,8 +14,9 @@ context "Attributes" do
   end
 
   test "ignores lines with bad attributes" do
-    output = render_string("This is\nblah blah {foobarbaz}\nall there is.")
-    assert_equal 'Yo, Tanglefoot!', output
+    html = render_string("This is\nblah blah {foobarbaz}\nall there is.")
+    result = Nokogiri::HTML(html)
+    assert_equal 'This is all there is.', result.css("p").first.content.strip
   end
 
   # See above - AsciiDoc says we're supposed to delete lines with bad
@@ -26,6 +27,12 @@ context "Attributes" do
   #   result = Nokogiri::HTML(html)
   #   assert_equal("Look, a {gobbledygook}", result.css("p").first.content.strip)
   # end
+
+  test "substitutes inside unordered list items" do
+    html = render_string(":foo: bar\n* snort at the {foo}\n* yawn")
+    result = Nokogiri::HTML(html)
+    assert_match /snort at the bar/, result.css("li").first.content.strip
+  end
 
   test "deletes an existing attribute" do
     pending "Not done yet"

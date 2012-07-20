@@ -153,23 +153,68 @@ class Asciidoctor::Block
         htmlify(li.content) + li.blocks.map{|block| block.render}.join
       end
     when :ulist
-      @buffer.map do |li|
-        li.render + li.blocks.map{|block| block.render}.join
+      @buffer.map do |element|
+        if element.is_a? Asciidoctor::ListItem
+          element.content = sub_attributes(element.content)
+        end
+        # TODO - not sure why tests work the same whether or not this is commented out.
+        # I think that I am likely not yet testing unordered list items with no block
+        # content. Still and all, it seems like this should be all done by list_item.render .
+        element.render # + element.blocks.map{|block| block.render}.join
       end
     when :listing
-      puts "YOOOOOOOOOOO"
       @buffer.map{|l| CGI.escapeHTML(l).gsub(/(<\d+>)/,'<b>\1</b>')}.join
     when :literal
       htmlify( @buffer.join.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' ))
     when :verse
-      htmlify( @buffer.map{ |l| l.strip }.join( "\n" ) )
+      htmlify( sub_attributes(@buffer).map{ |l| l.strip }.join( "\n" ) )
     else
-      lines = @buffer.map do |line|
+      lines = sub_attributes(@buffer).map do |line|
         line.strip
         line.gsub(Asciidoctor::REGEXP[:line_break], '\1{br-asciidoctor}')
       end
-      htmlify( lines.join )
+      lines = htmlify( lines.join )
+      sub_attributes(lines)  # got to clean up the br-asciidoctor line-break
     end
+  end
+
+  # Attribute substitution
+  #
+  # TODO: Tom all the docs
+  def sub_attributes(lines)
+    if lines.is_a? String
+      return_string = true
+      lines = Array(lines)
+    end
+
+    result = lines.map do |line|
+      puts "#{__method__} -> Processing line: #{line}"
+      # gsub! doesn't have lookbehind, so we have to capture and re-insert
+      line.gsub(/ (^|[^\\]) \{ (\w[\w\-_]+\w) \} /x) do
+        if self.document.defines.has_key?($2)
+          # Substitute from user defines first
+          $1 + self.document.defines[$2]
+        elsif Asciidoctor::INTRINSICS.has_key?($2)
+          # Then do intrinsics
+          $1 + Asciidoctor::INTRINSICS[$2]
+        elsif Asciidoctor::HTML_ELEMENTS.has_key?($2)
+          $1 + Asciidoctor::HTML_ELEMENTS[$2]
+        else
+          Asciidoctor.debug "Bailing on key: #{$2}"
+          # delete the line if it has a bad attribute
+          # TODO: According to AsciiDoc, we're supposed to delete any line
+          # containing a bad attribute. Eek! Can't do that here via gsub!.
+          # (See `subs_attrs` function in asciidoc.py for many gory details.)
+          "{ZZZZZ}"
+        end
+      end
+    end
+    puts "#{__method__} -> result looks like #{result.inspect}"
+    result.reject! {|l| l =~ /\{ZZZZZ\}/}
+    if return_string
+      result = result.join
+    end
+    result
   end
 
   private
@@ -235,28 +280,6 @@ class Asciidoctor::Block
       html.gsub!(/([\s\W])\+([^\+]+)\+([\s\W])/m, '\1<tt>\2</tt>\3')
       html.gsub!(/([\s\W])\^([^\^]+)\^([\s\W])/m, '\1<sup>\2</sup>\3')
       html.gsub!(/([\s\W])\~([^\~]+)\~([\s\W])/m, '\1<sub>\2</sub>\3')
-
-      # Attribute substitution
-      #
-      # gsub! doesn't have lookbehind, so we have to capture and re-insert
-      html.gsub!(/ (^|[^\\]) \{ (\w[\w\-]+\w) \} /x) do
-        if self.document.defines.has_key?($2)
-          # Substitute from user defines first
-          $1 + self.document.defines[$2]
-        elsif Asciidoctor::INTRINSICS.has_key?($2)
-          # Then do intrinsics
-          $1 + Asciidoctor::INTRINSICS[$2]
-        elsif Asciidoctor::HTML_ELEMENTS.has_key?($2)
-          $1 + Asciidoctor::HTML_ELEMENTS[$2]
-        else
-          Asciidoctor.debug "Bailing on key: #{$2}"
-          # delete the line if it has a bad attribute
-          # TODO: According to AsciiDoc, we're supposed to delete any line
-          # containing a bad attribute. Eek! Can't do that here via gsub!.
-          # (See `subs_attrs` function in asciidoc.py for many gory details.)
-          ''
-        end
-      end
 
       html.gsub!(/\\([\{\}\-])/, '\1')
       html.gsub!(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>')
