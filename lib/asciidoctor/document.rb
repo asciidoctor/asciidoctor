@@ -23,6 +23,26 @@ class Asciidoctor::Document
   # Public: Get the Array of elements (really Blocks or Sections) for the document
   attr_reader :elements
 
+  # Public: Convert a string to a legal attribute name.
+  #
+  # name  - The String holding the Asciidoc attribute name.
+  #
+  # Returns a String with the legal name.
+  #
+  # Examples
+  #
+  #   sanitize_attribute_name('Foo Bar')
+  #   => 'foobar'
+  #
+  #   sanitize_attribute_name('foo')
+  #   => 'foo'
+  #
+  #   sanitize_attribute_name('Foo 3 #-Billy')
+  #   => 'foo3-billy'
+  def sanitize_attribute_name(name)
+    name.gsub(/[^\w\-_]/, '').downcase
+  end
+
   # Public: Initialize an Asciidoc object.
   #
   # data  - The Array of Strings holding the Asciidoc source document.
@@ -92,7 +112,7 @@ class Asciidoctor::Document
                end
         skip_to = /^endif::#{attr}\[\]\s*\n/ if skip
       elsif match = line.match(defattr_regexp)
-        key = match[1]
+        key = sanitize_attribute_name(match[1])
         value = match[2]
         if match = value.match(Asciidoctor::REGEXP[:attr_continue])
           # attribute value continuation line; grab lines until we run out

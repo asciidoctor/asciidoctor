@@ -20,4 +20,9 @@ class DocumentTest < Test::Unit::TestCase
     assert @doc.send(:is_section_heading?, "=== AsciiDoc Home Page")
   end
 
+  def test_sanitize_attribute_name
+    assert_equal 'foobar', @doc.sanitize_attribute_name("Foo Bar")
+    assert_equal 'foo', @doc.sanitize_attribute_name("foo")
+    assert_equal 'foo3-bar', @doc.sanitize_attribute_name("Foo 3^ # - Bar[")
+  end
 end
