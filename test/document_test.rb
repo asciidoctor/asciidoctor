@@ -3,7 +3,7 @@ require 'test_helper'
 class DocumentTest < Test::Unit::TestCase
   # setup for test
   def setup
-    @doc = Asciidoctor::Document.new(File.readlines(sample_doc_path(:asciidoc_index)))
+    @doc = example_document(:asciidoc_index)
   end
 
   def test_title
