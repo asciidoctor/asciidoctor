@@ -11,6 +11,11 @@ context "Attributes" do
     assert_equal nil, doc.defines['frog']
   end
 
+  test "doesn't choke when deleting a non-existing attribute" do
+    doc = document_from_string(":frog!:")
+    assert_equal nil, doc.defines['frog']
+  end
+
   test "render properly with simple names" do
     html = render_string(":frog: Tanglefoot\nYo, {frog}!")
     result = Nokogiri::HTML(html)
@@ -44,7 +49,7 @@ context "Attributes" do
     assert_match /snort at the bar/, result.css("li").first.content.strip
   end
 
-  test "deletes an existing attribute" do
+  test "renders attribute until it's deleted" do
     pending "Not working yet (will require adding element-specific attributes or early attr substitution during parsing)"
     # html = render_string(":foo: bar\nCrossing the {foo}\n\n:foo!:\nBelly up to the {foo}")
     # result = Nokogiri::HTML(html)
@@ -52,26 +57,24 @@ context "Attributes" do
     # assert_no_match /Belly up to the bar/, result.css("p").last.content.strip
   end
 
-  test "doesn't choke when deleting a non-existing attribute" do
-    pending "Not done yet"
-  end
-
   test "doesn't disturb escaped attribute-looking things" do
     pending "Not done yet"
   end
 
-  test "doesn't subsitute attributes inside code blocks" do
+  test "doesn't substitute attributes inside code blocks" do
     pending "whut?"
   end
 
-  test "doesn't subsitute attributes inside literal blocks" do
+  test "doesn't substitute attributes inside literal blocks" do
     pending "whut?"
   end
 
   test "Intrinsics" do
-    html = render_string("Look, a {caret}")
-    result = Nokogiri::HTML(html)
-    assert_equal("Look, a ^", result.css("p").first.content.strip)
+    Asciidoctor::INTRINSICS.each_pair do |key, value|
+      html = render_string("Look, a {#{key}} is here")
+      result = Nokogiri::HTML(html)
+      assert_equal("Look, a #{value} is here", result.css("p").first.content.strip)
+    end
   end
 
 end
