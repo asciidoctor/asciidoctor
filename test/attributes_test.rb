@@ -16,7 +16,7 @@ context "Attributes" do
   test "ignores lines with bad attributes" do
     html = render_string("This is\nblah blah {foobarbaz}\nall there is.")
     result = Nokogiri::HTML(html)
-    assert_equal 'This is all there is.', result.css("p").first.content.strip
+    assert_no_match /blah blah/m, result.css("p").first.content.strip
   end
 
   # See above - AsciiDoc says we're supposed to delete lines with bad
