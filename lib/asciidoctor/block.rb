@@ -174,7 +174,7 @@ class Asciidoctor::Block
         line.gsub(Asciidoctor::REGEXP[:line_break], '\1{br-asciidoctor}')
       end
       lines = htmlify( lines.join )
-      sub_attributes(lines)  # got to clean up the br-asciidoctor line-break
+      sub_html_attributes(lines)  # got to clean up the br-asciidoctor line-break
     end
   end
 
@@ -182,6 +182,7 @@ class Asciidoctor::Block
   #
   # TODO: Tom all the docs
   def sub_attributes(lines)
+    puts "Entering #{__method__} from #{caller[0]}"
     if lines.is_a? String
       return_string = true
       lines = Array(lines)
@@ -190,7 +191,7 @@ class Asciidoctor::Block
     result = lines.map do |line|
       puts "#{__method__} -> Processing line: #{line}"
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
-      line.gsub(/ (^|[^\\]) \{ (\w[\w\-_]+\w) \} /x) do
+      f = line.gsub(/ (^|[^\\]) \{ (\w[\w\-_]+\w) \} /x) do
         if self.document.defines.has_key?($2)
           # Substitute from user defines first
           $1 + self.document.defines[$2]
@@ -208,9 +209,39 @@ class Asciidoctor::Block
           "{ZZZZZ}"
         end
       end
+      puts "#{__method__} -> Processed line: #{f}"
+      f
     end
     puts "#{__method__} -> result looks like #{result.inspect}"
     result.reject! {|l| l =~ /\{ZZZZZ\}/}
+
+    if return_string
+      result = result.join
+    end
+    result
+  end
+
+  def sub_html_attributes(lines)
+    puts "Entering #{__method__} from #{caller[0]}"
+    if lines.is_a? String
+      return_string = true
+      lines = Array(lines)
+    end
+
+    result = lines.map do |line|
+      puts "#{__method__} -> Processing line: #{line}"
+      # gsub! doesn't have lookbehind, so we have to capture and re-insert
+      line.gsub(/ (^|[^\\]) \{ (\w[\w\-_]+\w) \} /x) do
+        if Asciidoctor::HTML_ELEMENTS.has_key?($2)
+          $1 + Asciidoctor::HTML_ELEMENTS[$2]
+        else
+          $1 + "{#{$2}}"
+        end
+      end
+    end
+    puts "#{__method__} -> result looks like #{result.inspect}"
+    result.reject! {|l| l =~ /\{ZZZZZ\}/}
+
     if return_string
       result = result.join
     end

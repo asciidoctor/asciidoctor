@@ -57,8 +57,16 @@ context "Attributes" do
     # assert_no_match /Belly up to the bar/, result.css("p").last.content.strip
   end
 
-  test "doesn't disturb escaped attribute-looking things" do
-    pending "Not done yet"
+  test "doesn't disturb attribute-looking things escaped with backslash" do
+    html = render_string(":foo: bar\nThis is a \\{foo} day.")
+    result = Nokogiri::HTML(html)
+    assert_equal 'This is a {foo} day.', result.css('p').first.content.strip
+  end
+
+  test "doesn't disturb attribute-looking things escaped with literals" do
+    html = render_string(":foo: bar\nThis is a +++{foo}+++ day.")
+    result = Nokogiri::HTML(html)
+    assert_equal 'This is a {foo} day.', result.css('p').first.content.strip
   end
 
   test "doesn't substitute attributes inside code blocks" do
