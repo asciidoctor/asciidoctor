@@ -71,7 +71,8 @@ class Asciidoctor::Document
 
     ifdef_regexp = /^(ifdef|ifndef)::([^\[]+)\[\]/
     endif_regexp = /^endif::/
-    defattr_regexp = /^:([^:]+):\s*(.*)\s*$/
+    defattr_regexp = /^:([^:!]+):\s*(.*)\s*$/
+    delete_attr_regexp = /^:([^:]+)!:\s*$/
     conditional_regexp = /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/
 
     skip_to = nil
@@ -124,6 +125,9 @@ class Asciidoctor::Document
           @defines[key] = value
           Asciidoctor.debug "Defines[#{key}] is '#{value}'"
         end
+      elsif match = line.match(delete_attr_regexp)
+        key = sanitize_attribute_name(match[1])
+        @defines.delete(key)
       elsif !line.match(endif_regexp)
         while match = line.match(conditional_regexp)
           value = @defines.has_key?(match[1]) ? match[2] : ''

@@ -1,6 +1,16 @@
 require 'test_helper'
 
 context "Attributes" do
+  test "creates an attribute" do
+    doc = document_from_string(":frog: Tanglefoot")
+    assert_equal doc.defines['frog'], 'Tanglefoot'
+  end
+
+  test "deletes an attribute" do
+    doc = document_from_string(":frog: Tanglefoot\n:frog!:")
+    assert_equal nil, doc.defines['frog']
+  end
+
   test "render properly with simple names" do
     html = render_string(":frog: Tanglefoot\nYo, {frog}!")
     result = Nokogiri::HTML(html)
@@ -35,7 +45,11 @@ context "Attributes" do
   end
 
   test "deletes an existing attribute" do
-    pending "Not done yet"
+    pending "Not working yet (will require adding element-specific attributes or early attr substitution during parsing)"
+    # html = render_string(":foo: bar\nCrossing the {foo}\n\n:foo!:\nBelly up to the {foo}")
+    # result = Nokogiri::HTML(html)
+    # assert_match /Crossing the bar/, result.css("p").first.content.strip
+    # assert_no_match /Belly up to the bar/, result.css("p").last.content.strip
   end
 
   test "doesn't choke when deleting a non-existing attribute" do
