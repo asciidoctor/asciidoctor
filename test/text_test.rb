@@ -1,11 +1,15 @@
 require 'test_helper'
 
 context "Text" do
+  test 'escaped text markup' do
+    pending "Not done yet"
+  end
+
   test "line breaks" do
     assert_xpath "//br", render_string("Well this is +\njust fine and dandy, isn't it?"), 1
   end
 
-  test "quotes" do
+  test "single- and double-quoted text" do
     rendered = render_string("``Where?,'' she said, flipping through her copy of `The New Yorker.'")
     assert_match /&ldquo;Where\?,&rdquo;/, rendered
     assert_match /&lsquo;The New Yorker.&rsquo;/, rendered
@@ -15,7 +19,7 @@ context "Text" do
     assert_xpath "//hr", render_string("This is separated.\n\n''''\n\n...from this!"), 1
   end
 
-  test "emphasized quotes" do
+  test "emphasized text" do
     assert_xpath "//em", render_string("An 'emphatic' no")
   end
 
@@ -32,7 +36,7 @@ context "Text" do
       @rendered = render_string("A *BOLD* word.  An _italic_ word.  A +mono+ word.  ^superscript!^ and some ~subscript~.")
     end
 
-    test "bold" do
+    test "strong" do
       assert_xpath "//strong", @rendered
     end
 
@@ -56,14 +60,14 @@ context "Text" do
       assert_xpath "//tt", render_string("This is `totally cool`.")
     end
 
-    test "combined styles" do
+    test "nested styles" do
       rendered = render_string("Winning *big _time_* in the +city *boyeeee*+.")
 
       assert_xpath "//strong/em", rendered
       assert_xpath "//tt/strong", rendered
     end
 
-    test "characters" do
+    test "unconstrained quotes" do
       rendered_chars = render_string("**B**__I__++M++")
       assert_xpath "//strong", rendered_chars
       assert_xpath "//em", rendered_chars
