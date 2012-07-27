@@ -83,9 +83,19 @@ module Asciidoctor
     # +   From the Asciidoc User Guide: "A plus character preceded by at
     #     least one space character at the end of a non-blank line forces
     #     a line break. It generates a line break (br) tag for HTML outputs.
-    # +      (would match and capture '')
+    #
+    #     This is the correct regexp to match what the User Guide actually
+    #     says to do:
+    #     :line_break        => /^(.*(?:\S+)+.*)\s\+$/,
+    #
+    # But the regexp we're using (below), is what asciidoc *actually*
+    # does for HTML output, courtesy of the default html4.conf file (under
+    # the [replacements2] section).
+    #
+    # +      (would not match because there's no space before +)
+    #  +     (would match and capture '')
     # Foo +  (would and capture 'Foo')
-    :line_break       => /(.*)(?:^|\s)\+$/,
+    :line_break       => /^(.*)\s\+$/,
 
     # ----
     :listing          => /^\-{4,}\s*$/,
