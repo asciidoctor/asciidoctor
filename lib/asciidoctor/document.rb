@@ -35,10 +35,11 @@ class Asciidoctor::Document
   #   doc  = Asciidoctor::Document.new(data)
   def initialize(data, options = {}, &block)
     @elements = []
-    @defines = {}
 
     reader = Reader.new(data)
 
+    # pseudo-delegation :)
+    @defines = reader.defines
     @references = reader.references
 
     # Now parse @lines into elements
