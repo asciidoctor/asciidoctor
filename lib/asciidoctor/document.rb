@@ -4,9 +4,6 @@ class Asciidoctor::Document
 
   include Asciidoctor
 
-  # Public: Get the Reader object to access the Asciidoc source lines
-  attr_reader :reader
-
   # Public: Get the Asciidoctor::Renderer instance currently being used
   # to render this Document.
   attr_reader :renderer
@@ -36,7 +33,7 @@ class Asciidoctor::Document
   def initialize(data, options = {}, &block)
     @elements = []
 
-    reader = Reader.new(data)
+    reader = Reader.new(data, &block)
 
     # pseudo-delegation :)
     @defines = reader.defines
@@ -118,7 +115,7 @@ class Asciidoctor::Document
   # Private: Return the Array of lines constituting the next list item
   #          segment, removing them from the 'lines' Array passed in.
   #
-  # lines   - the Array of String lines.
+  # reader  - the Reader instance from which to get input.
   # options - an optional Hash of processing options:
   #           * :alt_ending may be used to specify a regular expression match
   #             other than a blank line to signify the end of the segment.
@@ -132,17 +129,17 @@ class Asciidoctor::Document
   #
   # Examples
   #
-  #   content
-  #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n",
+  #   reader = Asciidoctor::Reader.new(
+  #      ["First paragraph\n", "+\n", "Second paragraph\n", "--\n",
   #       "Open block\n", "\n", "Can have blank lines\n", "--\n", "\n",
-  #       "In a different segment\n"]
+  #       "In a different segment\n"])
   #
-  #   list_item_segment(content)
+  #   list_item_segment(reader)
   #   => ["First paragraph\n", "+\n", "Second paragraph\n", "--\n",
   #       "Open block\n", "\n", "Can have blank lines\n", "--\n"]
   #
-  #   content
-  #   => ["In a different segment\n"]
+  #   reader.peek_line
+  #   => "In a different segment\n"
   def list_item_segment(reader, options={})
     alternate_ending = options[:alt_ending]
     list_types = Array(options[:list_types]) || [:ulist, :olist, :colist, :dlist]
