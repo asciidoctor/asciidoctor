@@ -147,19 +147,17 @@ class Asciidoctor::Reader
 
   # Private: Strip off leading blank lines in the Array of lines.
   #
-  # lines - the Array of String lines.
-  #
   # Returns nil.
   #
   # Examples
   #
-  #   content
+  #   @lines
   #   => ["\n", "\t\n", "Foo\n", "Bar\n", "\n"]
   #
-  #   skip_blank(content)
+  #   skip_blank
   #   => nil
   #
-  #   lines
+  #   @lines
   #   => ["Foo\n", "Bar\n"]
   def skip_blank
     while @lines.any? && @lines.first.strip.empty?
@@ -185,7 +183,7 @@ class Asciidoctor::Reader
     @lines.first.dup if @lines.first
   end
 
-  # Public: Push String line onto queue of source data lines, unless line is nil.
+  # Public: Push String `line` onto queue of source data lines, unless `line` is nil.
   #
   # Returns nil
   def unshift(line)

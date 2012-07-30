@@ -2,7 +2,7 @@
 #
 # Examples
 #
-#   block = Asciidoctor::Block.new(:paragraph, ["`This` is a <test>"])
+#   block = Asciidoctor::Block.new(document, :paragraph, ["`This` is a <test>"])
 #   block.content
 #   => ["<em>This</em> is a &lt;test&gt;"]
 class Asciidoctor::Block
@@ -115,7 +115,9 @@ class Asciidoctor::Block
   #
   # Examples
   #
-  #   block = Asciidoctor::Block.new(:paragraph, ['`This` is what happens when you <meet> a stranger in the <alps>!'])
+  #   doc = Asciidoctor::Document.new([])
+  #   block = Asciidoctor::Block.new(doc, :paragraph,
+  #             ['`This` is what happens when you <meet> a stranger in the <alps>!'])
   #   block.content
   #   => ["<em>This</em> is what happens when you &lt;meet&gt; a stranger in the &lt;alps&gt;!"]
   #
