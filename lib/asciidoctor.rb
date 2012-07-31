@@ -166,6 +166,7 @@ module Asciidoctor
   require 'asciidoctor/debug'
   require 'asciidoctor/document'
   require 'asciidoctor/errors'
+  require 'asciidoctor/lexer'
   require 'asciidoctor/list_item'
   require 'asciidoctor/reader'
   require 'asciidoctor/render_templates'
