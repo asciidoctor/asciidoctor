@@ -36,7 +36,7 @@ class Asciidoctor::Lexer
       # match[1] being bracketed, so the condition isn't necessary.
       anchor = match[1].match(/^\[(.*)\]/) ? $1 : match[1]
       # NOTE: Set @references['foo'] = '[foo]'
-      @references[anchor] = match[1]
+      parent.document.references[anchor] = match[1]
       reader.get_line
     else
       anchor = nil
@@ -476,8 +476,6 @@ class Asciidoctor::Lexer
     block.buffer = items
     block
   end
-
-  private
 
   # Private: Get the Integer section level based on the characters
   # used in the ASCII line under the section name.
