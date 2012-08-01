@@ -44,11 +44,12 @@ Gem::Specification.new do |s|
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
   s.add_dependency('json')
-  s.add_dependency('nokogiri')
+  s.add_dependency('tilt')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
   s.add_development_dependency('mocha')
+  s.add_development_dependency('nokogiri')
   s.add_development_dependency('htmlentities')
   s.add_development_dependency('pending')
 

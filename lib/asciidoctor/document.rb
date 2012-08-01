@@ -4,10 +4,6 @@ class Asciidoctor::Document
 
   include Asciidoctor
 
-  # Public: Get the Asciidoctor::Renderer instance currently being used
-  # to render this Document.
-  attr_reader :renderer
-
   # Public: Get the Hash of defines
   attr_reader :defines
 
@@ -32,6 +28,7 @@ class Asciidoctor::Document
   #   doc  = Asciidoctor::Document.new(data)
   def initialize(data, options = {}, &block)
     @elements = []
+    @options = options
 
     reader = Reader.new(data, &block)
 
@@ -94,11 +91,19 @@ class Asciidoctor::Document
     nil
   end
 
+  def renderer
+    return @renderer if @renderer
+    render_options = {}
+    if @options[:template_dir]
+      render_options[:template_dir] = @options[:template_dir]
+    end
+    @renderer = Renderer.new(render_options)
+  end
+
   # Public: Render the Asciidoc document using erb templates
   #
   def render
-    @renderer ||= Renderer.new
-    html = self.renderer.render('document', self, :header => @header, :preamble => @preamble)
+    html = renderer.render('document', self, :header => @header, :preamble => @preamble)
   end
 
   def content

@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'cgi'
 require 'erb'
+require 'tilt'
 
 $:.unshift(File.dirname(__FILE__))
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
