@@ -1,14 +1,9 @@
-# Public: Methods for to parse and build objects from Asciidoc lines
+# Public: Methods to parse and build objects from Asciidoc lines
 class Asciidoctor::Lexer
 
   include Asciidoctor
 
   # Public: Make sure the Lexer object doesn't get initialized.
-  #
-  # Examples
-  #
-  #   data   = File.readlines(filename)
-  #   reader = Asciidoctor::Reader.new(data)
   def initialize
     raise 'Au contraire, mon frere. No lexer instances will be running around.'
   end
