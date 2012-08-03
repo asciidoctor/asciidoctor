@@ -50,7 +50,11 @@ class Asciidoctor::Reader
 
     data.each do |line|
       if inc = line.match(include_regexp)
-        raw_source.concat(File.readlines(inc[1]))
+        if block_given?
+          raw_source << yield(inc[1])
+        else
+          raw_source.concat(File.readlines(inc[1]))
+        end
       else
         raw_source << line
       end
