@@ -98,7 +98,7 @@ class Asciidoctor::Lexer
 
       elsif list_type = [:olist, :colist].detect{|l| this_line.match( REGEXP[l] )}
         items = []
-        puts "Creating block of type: #{list_type}"
+        Asciidoctor.debug "Creating block of type: #{list_type}"
         block = Block.new(parent, list_type)
         while !this_line.nil? && match = this_line.match(REGEXP[list_type])
           item = ListItem.new
@@ -226,7 +226,7 @@ class Asciidoctor::Lexer
         elsif source_type
           block = Block.new(parent, :listing, buffer)
         else
-          puts "Proud parent #{parent} getting a new paragraph with buffer: #{buffer}"
+          Asciidoctor.debug "Proud parent #{parent} getting a new paragraph with buffer: #{buffer}"
           block = Block.new(parent, :paragraph, buffer)
         end
       end
@@ -285,7 +285,7 @@ class Asciidoctor::Lexer
     in_listing = false
     while reader.has_lines?
       this_line = reader.get_line
-      puts "----->  Processing: #{this_line}"
+      Asciidoctor.debug "----->  Processing: #{this_line}"
       in_oblock = !in_oblock if this_line.match(REGEXP[:oblock])
       in_listing = !in_listing if this_line.match(REGEXP[:listing])
       if !in_oblock && !in_listing
@@ -334,13 +334,13 @@ class Asciidoctor::Lexer
       segment << this_line
     end
 
-    puts "*"*40
-    puts "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__}: Returning this:"
-    puts segment.inspect
-    puts "*"*10
-    puts "Leaving #{__method__}: Top of reader queue is:"
-    puts reader.peek_line
-    puts "*"*40
+    Asciidoctor.debug "*"*40
+    Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__}: Returning this:"
+    Asciidoctor.debug segment.inspect
+    Asciidoctor.debug "*"*10
+    Asciidoctor.debug "Leaving #{__method__}: Top of reader queue is:"
+    Asciidoctor.debug reader.peek_line
+    Asciidoctor.debug "*"*40
     segment
   end
 
@@ -369,7 +369,7 @@ class Asciidoctor::Lexer
 
     list_item = ListItem.new
     list_item.level = level
-    puts "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
+    Asciidoctor.debug "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
 
     # Prevent bullet list text starting with . from being treated as a paragraph
     # title or some other unseemly thing in list_item_segment. I think. (NOTE)
@@ -381,7 +381,7 @@ class Asciidoctor::Lexer
       list_item.blocks << next_block(item_segment, block)
     end
 
-    puts "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
+    Asciidoctor.debug "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
 
     first_block = list_item.blocks.first
     if first_block.is_a?(Block) &&
@@ -397,7 +397,7 @@ class Asciidoctor::Lexer
     items = []
     list_type = :ulist
     block = Block.new(parent, list_type)
-    puts "Created :ulist block: #{block}"
+    Asciidoctor.debug "Created :ulist block: #{block}"
     first_item_level = nil
 
     while reader.has_lines? && match = reader.peek_line.match(REGEXP[list_type])
@@ -427,7 +427,7 @@ class Asciidoctor::Lexer
     items = []
     list_type = :ulist
     block = Block.new(parent, list_type)
-    puts "Created :ulist block: #{block}"
+    Asciidoctor.debug "Created :ulist block: #{block}"
     last_item_level = nil
     this_line = lines.shift
 
@@ -436,7 +436,7 @@ class Asciidoctor::Lexer
 
       list_item = ListItem.new
       list_item.level = level
-      puts "Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
+      Asciidoctor.debug "Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
 
       lines.unshift match[2].lstrip.sub(/^\./, '\.')
       item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type], :list_level => level)
@@ -452,10 +452,10 @@ class Asciidoctor::Lexer
       end
 
       if items.any? && (level > items.last.level)
-        puts "--> Putting this new level #{level} ListItem under my pops, #{items.last} (level: #{items.last.level})"
+        Asciidoctor.debug "--> Putting this new level #{level} ListItem under my pops, #{items.last} (level: #{items.last.level})"
         items.last.blocks << list_item
       else
-        puts "Stacking new list item in parent block's blocks"
+        Asciidoctor.debug "Stacking new list item in parent block's blocks"
         items << list_item
       end
 

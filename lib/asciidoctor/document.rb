@@ -75,18 +75,18 @@ class Asciidoctor::Document
 
   def splain
     if @header
-      puts "Header is #{@header}"
+      Asciidoctor.debug "Header is #{@header}"
     else
-      puts "No header"
+      Asciidoctor.debug "No header"
     end
 
-    puts "I have #{@elements.count} elements"
+    Asciidoctor.debug "I have #{@elements.count} elements"
     @elements.each_with_index do |block, i|
-      puts "v" * 60
-      puts "Block ##{i} is a #{block.class}"
-      puts "Name is #{block.name rescue 'n/a'}"
+      Asciidoctor.debug "v" * 60
+      Asciidoctor.debug "Block ##{i} is a #{block.class}"
+      Asciidoctor.debug "Name is #{block.name rescue 'n/a'}"
       block.splain(0) if block.respond_to? :splain
-      puts "^" * 60
+      Asciidoctor.debug "^" * 60
     end
     nil
   end

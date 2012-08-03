@@ -16,22 +16,22 @@ class Asciidoctor::Renderer
 
     # If user passed in a template dir, let them override our base templates
     if template_dir = options.delete(:template_dir)
-      puts "Views going in are like so:"
+      Asciidoctor.debug "Views going in are like so:"
       @views.each_pair do |k, v|
-        puts "#{k}: #{v}"
+        Asciidoctor.debug "#{k}: #{v}"
       end
-      puts "="*60
+      Asciidoctor.debug "="*60
       # Grab the files in the top level of the directory (we're not traversing)
       files = Dir.glob(File.join(template_dir, '*')).select{|f| File.stat(f).file?}
       files.inject(@views) do |view_hash, view|
         name = File.basename(view).split('.').first
         view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>'))
       end
-      puts "Views are now like so:"
+      Asciidoctor.debug "Views are now like so:"
       @views.each_pair do |k, v|
-        puts "#{k}: #{v}"
+        Asciidoctor.debug "#{k}: #{v}"
       end
-      puts "="*60
+      Asciidoctor.debug "="*60
     end
 
     @render_stack = []

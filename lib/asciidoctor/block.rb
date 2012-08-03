@@ -128,8 +128,8 @@ class Asciidoctor::Block
   # * super/sub script
   def content
 
-    puts "For the record, buffer is:"
-    puts @buffer.inspect
+    Asciidoctor.debug "For the record, buffer is:"
+    Asciidoctor.debug @buffer.inspect
 
     case @context
     when :dlist
@@ -184,14 +184,14 @@ class Asciidoctor::Block
   #
   # TODO: Tom all the docs
   def sub_attributes(lines)
-    puts "Entering #{__method__} from #{caller[0]}"
+    Asciidoctor.debug "Entering #{__method__} from #{caller[0]}"
     if lines.is_a? String
       return_string = true
       lines = Array(lines)
     end
 
     result = lines.map do |line|
-      puts "#{__method__} -> Processing line: #{line}"
+      Asciidoctor.debug "#{__method__} -> Processing line: #{line}"
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
       f = line.gsub(/ (^|[^\\]) \{ (\w[\w\-_]+\w) \} /x) do
         if self.document.defines.has_key?($2)
@@ -211,10 +211,10 @@ class Asciidoctor::Block
           "{ZZZZZ}"
         end
       end
-      puts "#{__method__} -> Processed line: #{f}"
+      Asciidoctor.debug "#{__method__} -> Processed line: #{f}"
       f
     end
-    puts "#{__method__} -> result looks like #{result.inspect}"
+    Asciidoctor.debug "#{__method__} -> result looks like #{result.inspect}"
     result.reject! {|l| l =~ /\{ZZZZZ\}/}
 
     if return_string
@@ -224,14 +224,14 @@ class Asciidoctor::Block
   end
 
   def sub_html_attributes(lines)
-    puts "Entering #{__method__} from #{caller[0]}"
+    Asciidoctor.debug "Entering #{__method__} from #{caller[0]}"
     if lines.is_a? String
       return_string = true
       lines = Array(lines)
     end
 
     result = lines.map do |line|
-      puts "#{__method__} -> Processing line: #{line}"
+      Asciidoctor.debug "#{__method__} -> Processing line: #{line}"
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
       line.gsub(/ (^|[^\\]) \{ (\w[\w\-_]+\w) \} /x) do
         if Asciidoctor::HTML_ELEMENTS.has_key?($2)
@@ -241,7 +241,7 @@ class Asciidoctor::Block
         end
       end
     end
-    puts "#{__method__} -> result looks like #{result.inspect}"
+    Asciidoctor.debug "#{__method__} -> result looks like #{result.inspect}"
     result.reject! {|l| l =~ /\{ZZZZZ\}/}
 
     if return_string

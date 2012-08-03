@@ -136,10 +136,10 @@ class Asciidoctor::Reader
       end
     end
 
-    puts "About to leave Reader#init, and references is #{@references.inspect}"
+    Asciidoctor.debug "About to leave Reader#init, and references is #{@references.inspect}"
     @source = @lines.join
-    puts "Leaving Reader#init, and I have #{@lines.count} lines"
-    puts "Also, has_lines? is #{self.has_lines?}"
+    Asciidoctor.debug "Leaving Reader#init, and I have #{@lines.count} lines"
+    Asciidoctor.debug "Also, has_lines? is #{self.has_lines?}"
   end
 
   # Public: Check whether there are any lines left to read.
