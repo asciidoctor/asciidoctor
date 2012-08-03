@@ -1,23 +1,27 @@
 Asciidoctor
 ===========
 
-Asciidoctor is a pure-ruby processor for turning [Asciidoc](http://www.methods.co.nz/asciidoc/index.html)
-documents into HTML (and, eventually, other formats perhaps).
+Asciidoctor is a pure-ruby processor for turning
+[Asciidoc](http://www.methods.co.nz/asciidoc/index.html) documents
+into HTML (and, eventually, other formats perhaps).
 
-Currently, asciidoctor uses some simple built-in ERB templates to style the output
-in a way tht roughly matches the default HTML output of the native Python processor.
+Currently, asciidoctor uses some simple built-in ERB templates to
+style the output in a way tht roughly matches the default HTML output
+of the native Python processor.
 
-Asciidoctor currently works with Ruby 1.8.7 and 1.9.3, though I don't know of any
-reason it shouldn't work with more exotic Ruby versions, and would welcome help in
-testing that out.
+Asciidoctor currently works with Ruby 1.8.7 and 1.9.3, though I don't
+know of any reason it shouldn't work with more exotic Ruby versions,
+and would welcome help in testing that out.
 
-The initial code on which asciidoctor is based was from the Git SCM site repo,
-[gitscm-next](https://github.com/github/gitscm-next).
+The initial code on which asciidoctor is based was from the Git SCM
+site repo, [gitscm-next](https://github.com/github/gitscm-next).
 
 # Installation
 
-NOTE: This gem is very immature.  Thus, you should only use it if you have a high
-tolerance for bugs, failures, and generally bad and intemperate behavior.
+NOTE: This gem is very immature, and as yet only supports a small
+subset of Asciidoc features.  Thus, you should only use it if you have
+a high tolerance for bugs, failures, and generally bad and intemperate
+behavior.
 
 To install the gem:
 
@@ -43,6 +47,29 @@ Render an Asciidoc-formatted string
     doc = Asciidoctor::Document.new("*This* is it.")
     puts doc.render
 
+Asciidoctor allows you to override the default template used to render
+almost any individual Asciidoc elements. If you provide a directory of
+[Tilt](https://github.com/rtomayko/tilt)-compatible templates, named
+in a way Asciidoctor can figure out which template goes with which
+element, Asciidoctor will use the templates in this directory instead
+of its built-in templates for any elements for which it finds a
+matching template.  It will use its default templates for everything
+else.
+
+    doc = Asciidoctor::Document.new("*This* is it.", :template_dir => 'templates')
+    puts doc.render
+
+The Document and Section templates should begin with `document.` and
+`section.`, respectively. The file extension will depend on which
+Tilt-compatible format you've chosen. For ERB, they would be
+`document.html.erb` and `section.html.erb`, for instance.
+
+Specific elements, like a Paragraph or Anchor, would begin with
+`section_<element>.`. So to override the default Paragraph template
+with an ERB template you'd put a file called
+`section_paragraph.html.erb` in the template directory you pass in to
+`Document.new`.
+
 For more usage examples, see the test suite.
 
 ## Contributing
@@ -67,17 +94,19 @@ Here are some ways *you* can contribute:
 [issues]: https://github.com/erebor/asciidoctor/issues
 
 ## Submitting an Issue
-We use the [GitHub issue tracker][issues] to track bugs and features. Before
-submitting a bug report or feature request, check to make sure it hasn't
-already been submitted. When submitting a bug report, please include a [Gist][]
-that includes any details that may help reproduce the bug, including your gem
-version, Ruby version, and operating system.
+We use the [GitHub issue tracker][issues] to track bugs and
+features. Before submitting a bug report or feature request, check to
+make sure it hasn't already been submitted. When submitting a bug
+report, please include a [Gist][] that includes any details that may
+help reproduce the bug, including your gem version, Ruby version, and
+operating system.
 
-Most importantly, since asciidoctor is a text processor, reproducing most bugs
-requires that we have some snippet of text on which asciidoctor exhibits the
-bad behavior.
+Most importantly, since asciidoctor is a text processor, reproducing
+most bugs requires that we have some snippet of text on which
+asciidoctor exhibits the bad behavior.
 
-Ideally, a bug report should include a pull request with failing specs.
+An ideal bug report would include a pull request with failing
+specs.
 
 [gist]: https://gist.github.com/
 
@@ -103,15 +132,16 @@ This library aims to support the following Ruby implementations:
 * Ruby 1.8.7
 * Ruby 1.9.3
 
-If something doesn't work on one of these interpreters, it should be considered
-a bug.
+If something doesn't work on one of these interpreters, it should be
+considered a bug.
 
-If you would like this library to support another Ruby version, you may
-volunteer to be a maintainer. Being a maintainer entails making sure all tests
-run and pass on that implementation. When something breaks on your
-implementation, you will be personally responsible for providing patches in a
-timely fashion. If critical issues for a particular implementation exist at the
-time of a major release, support for that Ruby version may be dropped.
+If you would like this library to support another Ruby version, you
+may volunteer to be a maintainer. Being a maintainer entails making
+sure all tests run and pass on that implementation. When something
+breaks on your implementation, you will be personally responsible for
+providing patches in a timely fashion. If critical issues for a
+particular implementation exist at the time of a major release,
+support for that Ruby version may be dropped.
 
 ## Copyright
 Copyright (c) 2012 Ryan Waldron.
