@@ -148,7 +148,7 @@ class Asciidoctor::Lexer
           reader.get_line if reader.has_lines? && reader.peek_line.strip.empty?
 
           dd_segment = Reader.new(list_item_segment(reader, :alt_ending => this_dlist))
-          while dd_segment.any?
+          while dd_segment.has_lines?
             dd.blocks << next_block(dd_segment, block)
           end
 
@@ -602,7 +602,7 @@ class Asciidoctor::Lexer
 
     if !section.anchor.nil?
       anchor_id = section.anchor.match(/^\[(.*)\]/) ? $1 : section.anchor
-      @references[anchor_id] = section.anchor
+      parent.document.references[anchor_id] = section.anchor
       section.anchor = anchor_id
     end
 
@@ -633,7 +633,7 @@ class Asciidoctor::Lexer
         section_lines << this_line
         section_lines.concat reader.grab_lines_until {|line| line.match( REGEXP[:listing] ) }
         # Also grab the last line, if there is one
-        this_line = lines.shift
+        this_line = reader.get_line
         section_lines << this_line unless this_line.nil?
       else
         section_lines << this_line
