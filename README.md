@@ -5,16 +5,19 @@ Asciidoctor is a pure-ruby processor for turning
 [Asciidoc](http://www.methods.co.nz/asciidoc/index.html) documents
 into HTML (and, eventually, other formats perhaps).
 
-Currently, asciidoctor uses some simple built-in ERB templates to
-style the output in a way tht roughly matches the default HTML output
-of the native Python processor.
+Asciidoctor uses simple built-in ERB templates to style the output in
+a way that roughly matches the default HTML output of the native
+Python processor. You can override this behavior by providing
+[Tilt]-compatible templates. See the Usage section for more details.
 
 Asciidoctor currently works with Ruby 1.8.7 and 1.9.3, though I don't
 know of any reason it shouldn't work with more exotic Ruby versions,
 and would welcome help in testing that out.
 
-The initial code on which asciidoctor is based was from the Git SCM
-site repo, [gitscm-next](https://github.com/github/gitscm-next).
+The initial code from which asciidoctor started was from the [Git SCM
+site repo][gitscm-next].
+
+[gitscm-next]: https://github.com/github/gitscm-next
 
 # Installation
 
@@ -49,12 +52,11 @@ Render an Asciidoc-formatted string
 
 Asciidoctor allows you to override the default template used to render
 almost any individual Asciidoc elements. If you provide a directory of
-[Tilt](https://github.com/rtomayko/tilt)-compatible templates, named
-in a way Asciidoctor can figure out which template goes with which
-element, Asciidoctor will use the templates in this directory instead
-of its built-in templates for any elements for which it finds a
-matching template.  It will use its default templates for everything
-else.
+[Tilt]-compatible templates, named in a way Asciidoctor can figure out
+which template goes with which element, Asciidoctor will use the
+templates in this directory instead of its built-in templates for any
+elements for which it finds a matching template.  It will use its
+default templates for everything else.
 
     doc = Asciidoctor::Document.new("*This* is it.", :template_dir => 'templates')
     puts doc.render
@@ -71,6 +73,8 @@ with an ERB template you'd put a file called
 `Document.new`.
 
 For more usage examples, see the test suite.
+
+[Tilt]: https://github.com/rtomayko/tilt
 
 ## Contributing
 In the spirit of [free software][free-sw], **everyone** is encouraged to help
