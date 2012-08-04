@@ -97,19 +97,24 @@ class Asciidoctor::Document
     nil
   end
 
-  def renderer
+  def renderer(options = {})
     return @renderer if @renderer
     render_options = {}
+    # Load up relevant Document @options
     if @options[:template_dir]
       render_options[:template_dir] = @options[:template_dir]
     end
+    # Override Document @option settings with options passed in
+    render_options.merge! options
+
     @renderer = Renderer.new(render_options)
   end
 
   # Public: Render the Asciidoc document using erb templates
   #
-  def render
-    html = renderer.render('document', self, :header => @header, :preamble => @preamble)
+  def render(options = {})
+    r = renderer(options)
+    html = r.render('document', self, :header => @header, :preamble => @preamble)
   end
 
   def content
