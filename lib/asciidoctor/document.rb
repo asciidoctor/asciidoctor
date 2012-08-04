@@ -30,17 +30,17 @@ class Asciidoctor::Document
     @elements = []
     @options = options
 
-    reader = Reader.new(data, &block)
+    @reader = Reader.new(data, &block)
 
     # pseudo-delegation :)
-    @defines = reader.defines
-    @references = reader.references
+    @defines = @reader.defines
+    @references = @reader.references
 
     # Now parse @lines into elements
-    while reader.has_lines?
-      reader.skip_blank
+    while @reader.has_lines?
+      @reader.skip_blank
 
-      @elements << Lexer.next_block(reader, self) if reader.has_lines?
+      @elements << Lexer.next_block(@reader, self) if @reader.has_lines?
     end
 
     Asciidoctor.debug "Found #{@elements.size} elements in this document:"
@@ -56,6 +56,11 @@ class Asciidoctor::Document
       @header.clear_blocks
     end
 
+  end
+
+  # Make the raw source for the Document available.
+  def source
+    @reader.source if @reader
   end
 
   # We need to be able to return some semblance of a title
