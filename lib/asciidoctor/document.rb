@@ -72,6 +72,7 @@ class Asciidoctor::Document
 
     @title
   end
+  alias :name :title
 
   def splain
     if @header
