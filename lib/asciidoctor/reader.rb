@@ -46,6 +46,8 @@ class Asciidoctor::Reader
     @defines = {}
     @references = {}
 
+    data = data.split("\n") if data.is_a? String
+
     include_regexp = /^include::([^\[]+)\[\]\s*\n?\z/
 
     data.each do |line|
