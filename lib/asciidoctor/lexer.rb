@@ -8,6 +8,14 @@ class Asciidoctor::Lexer
     raise 'Au contraire, mon frere. No lexer instances will be running around.'
   end
 
+  def self.document_from_parent(parent)
+    if parent.is_a? Document
+      parent
+    else
+      parent.document
+    end
+  end
+
   # Return the next block from the Reader.
   #
   # * Skip over blank lines to find the start of the next content block.
@@ -31,7 +39,7 @@ class Asciidoctor::Lexer
       # match[1] being bracketed, so the condition isn't necessary.
       anchor = match[1].match(/^\[(.*)\]/) ? $1 : match[1]
       # NOTE: Set @references['foo'] = '[foo]'
-      parent.document.references[anchor] = match[1]
+      document_from_parent(parent).references[anchor] = match[1]
       reader.get_line
     else
       anchor = nil
@@ -93,7 +101,8 @@ class Asciidoctor::Lexer
 
         block = Block.new(parent, :oblock, [])
         while buffer.has_lines?
-          block.blocks << next_block(buffer, block)
+          new_block = next_block(buffer, block)
+          block.blocks << new_block unless new_block.nil?
         end
 
       elsif list_type = [:olist, :colist].detect{|l| this_line.match( REGEXP[l] )}
@@ -106,7 +115,8 @@ class Asciidoctor::Lexer
           reader.unshift match[2].lstrip.sub(/^\./, '\.')
           item_segment = Reader.new(list_item_segment(reader, :alt_ending => REGEXP[list_type]))
           while item_segment.has_lines?
-            item.blocks << next_block(item_segment, block)
+            new_block = next_block(item_segment, block)
+            item.blocks << new_block unless new_block.nil?
           end
 
           if item.blocks.any? &&
@@ -149,7 +159,8 @@ class Asciidoctor::Lexer
 
           dd_segment = Reader.new(list_item_segment(reader, :alt_ending => this_dlist))
           while dd_segment.has_lines?
-            dd.blocks << next_block(dd_segment, block)
+            new_block = next_block(dd_segment, block)
+            dd.blocks << new_block unless new_block.nil?
           end
 
           if dd.blocks.any? &&
@@ -185,8 +196,9 @@ class Asciidoctor::Lexer
         block = Block.new(parent, :quote)
         buffer = Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:quote] ) })
 
-        while buffer.any?
-          block.blocks << next_block(reader, block)
+        while buffer.has_lines?
+          new_block = next_block(reader, block)
+          block.blocks << new_block unless new_block.nil?
         end
 
       elsif this_line.match(REGEXP[:lit_blk])
@@ -378,7 +390,8 @@ class Asciidoctor::Lexer
     item_segment = Reader.new(list_item_segment(reader, :alt_ending => REGEXP[list_type]))
 #    item_segment = list_item_segment(reader)
     while item_segment.has_lines?
-      list_item.blocks << next_block(item_segment, block)
+      new_block = next_block(item_segment, block)
+      list_item.blocks << new_block unless new_block.nil?
     end
 
     Asciidoctor.debug "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
@@ -441,7 +454,8 @@ class Asciidoctor::Lexer
       lines.unshift match[2].lstrip.sub(/^\./, '\.')
       item_segment = list_item_segment(lines, :alt_ending => REGEXP[list_type], :list_level => level)
       while item_segment.any?
-        list_item.blocks << next_block(item_segment, block)
+        new_block = next_block(item_segment, block)
+        list_item.blocks << new_block unless new_block.nil?
       end
 
       first_block = list_item.blocks.first
@@ -563,14 +577,14 @@ class Asciidoctor::Lexer
     return [sect_name, sect_level, sect_anchor]
   end
 
-  # Private: Return the next section from the document.
+  # Private: Return the next section from the Reader.
   #
   # Examples
   #
   #   source
   #   => "GREETINGS\n---------\nThis is my doc.\n\nSALUTATIONS\n-----------\nIt is awesome."
   #
-  #   doc = Asciidoctor::Document.new(source)
+  #   TODO: doc = Asciidoctor::Document.new(source)
   #
   #   doc.next_section
   #   ["GREETINGS", [:paragraph, "This is my doc."]]
@@ -602,7 +616,7 @@ class Asciidoctor::Lexer
 
     if !section.anchor.nil?
       anchor_id = section.anchor.match(/^\[(.*)\]/) ? $1 : section.anchor
-      parent.document.references[anchor_id] = section.anchor
+      document_from_parent(parent).references[anchor_id] = section.anchor
       section.anchor = anchor_id
     end
 
@@ -645,7 +659,8 @@ class Asciidoctor::Lexer
     while section_reader.has_lines?
       section_reader.skip_blank
 
-      section << next_block(section_reader, section) if section_reader.has_lines?
+      new_block = next_block(section_reader, section) if section_reader.has_lines?
+      section << new_block unless new_block.nil?
     end
 
     section
