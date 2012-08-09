@@ -197,7 +197,7 @@ class Asciidoctor::Lexer
         buffer = Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:quote] ) })
 
         while buffer.has_lines?
-          new_block = next_block(reader, block)
+          new_block = next_block(buffer, block)
           block.blocks << new_block unless new_block.nil?
         end
 
