@@ -55,7 +55,7 @@ class Asciidoctor::Section
   # Returns the String section name
   def name
     @name && 
-    @name.gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + Asciidocs::INTRINSICS[$2] }.
+    @name.gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + Asciidoctor::INTRINSICS[$2] }.
           gsub( /`([^`]+)`/, '<tt>\1</tt>' )
   end
 
