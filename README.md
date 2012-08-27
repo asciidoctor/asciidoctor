@@ -14,7 +14,7 @@ Asciidoctor currently works with Ruby 1.8.7 and 1.9.3, though I don't
 know of any reason it shouldn't work with more exotic Ruby versions,
 and would welcome help in testing that out.
 
-The initial code from which asciidoctor started was from the [Git SCM
+The initial code from which Asciidoctor started was from the [Git SCM
 site repo][gitscm-next].
 
 [gitscm-next]: https://github.com/github/gitscm-next
