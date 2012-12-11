@@ -273,7 +273,7 @@ class Asciidoctor::Block
       html.gsub!( /(^|[^<])<<([^<>,]+)(,([^>]*))?>>/ ) { "#{$1}link:##{$2}[" + ($4.nil? ? document.references[$2] : $4).to_s + "]" }
 
       # Do the same with URLs
-      html.gsub!( /(^|[^`])(https?:\/\/[^\[ ]+)(\[+[^\]]*\]+)?/ ) do
+      html.gsub!( /(^|[^(`|link:)])(https?:\/\/[^\[ ]+)(\[+[^\]]*\]+)?/ ) do
         pre = $1
         url = $2
         link = ( $3 || $2 ).gsub( /(^\[|\]$)/,'' )
