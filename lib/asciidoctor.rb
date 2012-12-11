@@ -29,10 +29,23 @@ $:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
 #
 # Examples:
 #
-#   lines = File.readlines(filename)
+# Use built-in templates:
 #
-#   doc  = Asciidoctor::Document.new(lines)
-#   html = doc.render(template_path)
+#   lines = File.readlines("your_file.asc")
+#   doc = Asciidoctor::Document.new(lines)
+#   html = doc.render
+#   File.open("your_file.html", "w+") do |file|
+#     file.puts html
+#   end
+#
+# Use custom (Tilt-supported) templates:
+#
+#   lines = File.readlines("your_file.asc")
+#   doc = Asciidoctor::Document.new(lines, :template_dir => 'templates')
+#   html = doc.render
+#   File.open("your_file.html", "w+") do |file|
+#     file.puts html
+#   end
 module Asciidoctor
   REGEXP = {
     # [[Foo]]  (also allows, say, [[[]] or [[[Foo[f]], but I don't think it is supposed to (TODO))
