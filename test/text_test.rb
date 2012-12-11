@@ -24,7 +24,11 @@ context "Text" do
   end
 
   test "emphasized text with escaped single quote" do
-    assert_xpath "//em[text()=\"Johnny's\"]", render_string("It's 'Johnny\'s' phone")
+    assert_xpath "//em[text()=\"Johnny's\"]", render_string("It's 'Johnny\\'s' phone")
+  end
+
+  test "escaped single quote is restore as single quote" do
+    assert_xpath "//p[contains(text(), \"Let's do it!\")]", render_string("Let\\'s do it!")
   end
 
   test "emphasized text at end of line" do
