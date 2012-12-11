@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'ap'
-require 'lib/asciidoctor'
+require_relative 'lib/asciidoctor'
 
 lines = File.readlines("test/fixtures/asciidoc_index.txt")
 #lines = File.read("test/fixtures/asciidoc_index.txt")
