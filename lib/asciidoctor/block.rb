@@ -192,8 +192,9 @@ class Asciidoctor::Block
 
     result = lines.map do |line|
       Asciidoctor.debug "#{__method__} -> Processing line: #{line}"
+      f = sub_special_chars(line)
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
-      f = line.gsub(/ (^|[^\\]) \{ (\w[\w\-_]+\w) \} /x) do
+      f = f.gsub(/ (^|[^\\]) \{ (\w([\w\-_]+)?\w) \} /x) do
         if self.document.defines.has_key?($2)
           # Substitute from user defines first
           $1 + self.document.defines[$2]
@@ -282,7 +283,6 @@ class Asciidoctor::Block
         "#{pre}link:#{url}[#{link}]"
       end
 
-      html = CGI.escapeHTML(html)
       html.gsub!(Asciidoctor::REGEXP[:biblio], '<a name="\1">[\1]</a>')
       html.gsub!(Asciidoctor::REGEXP[:ruler], '<hr>\n')
       html.gsub!(/``([^`']*)''/m, '&ldquo;\1&rdquo;')
@@ -320,6 +320,10 @@ class Asciidoctor::Block
       html.gsub!(Asciidoctor::REGEXP[:line_break], '\1<br/>')
       html
     end
+  end
+
+  def sub_special_chars(str)
+    str.gsub(/[#{Asciidoctor::SPECIAL_CHARS.keys.join}]/) {|match| Asciidoctor::SPECIAL_CHARS[match] }
   end
   # end private
 end

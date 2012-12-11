@@ -167,15 +167,37 @@ module Asciidoctor
   INTRINSICS = Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(
     'startsb'    => '[',
     'endsb'      => ']',
+    'brvbar'     => '|',
     'caret'      => '^',
     'asterisk'   => '*',
     'tilde'      => '~',
     'litdd'      => '--',
     'plus'       => '+',
-    'apostrophe' => "'",
-    'backslash'  => "\\",
-    'backtick'   => '`'
+    'apostrophe' => '\'',
+    'backslash'  => '\\',
+    'backtick'   => '`',
+    'empty'      => '',
+    'sp'         => ' ',
+    'two-colons' => '::',
+    'two-semicolons' => ';;',
+    'nbsp'       => '&#160;',
+    'deg'        => '&#176;',
+    'zwsp'       => '&#8203;',
+    'lsquo'      => '&#8216;',
+    'rsquo'      => '&#8217;',
+    'ldquo'      => '&#8220;',
+    'rdquo'      => '&#8221;',
+    'wj'         => '&#8288;',
+    'amp'        => '&',
+    'lt'         => '<',
+    'gt'         => '>',
   )
+
+  SPECIAL_CHARS = {
+    '<' => '&lt;',
+    '>' => '&gt;',
+    '&' => '&amp;'
+  }
 
   HTML_ELEMENTS = {
     'br-asciidoctor' => '<br/>'

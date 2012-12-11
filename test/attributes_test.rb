@@ -77,12 +77,26 @@ context "Attributes" do
     pending "whut?"
   end
 
-  test "Intrinsics" do
-    Asciidoctor::INTRINSICS.each_pair do |key, value|
-      html = render_string("Look, a {#{key}} is here")
-      result = Nokogiri::HTML(html)
-      assert_equal("Look, a #{value} is here", result.css("p").first.content.strip)
+  context "intrinsics" do
+
+    test "substitute intrinsics" do
+      Asciidoctor::INTRINSICS.each_pair do |key, value|
+        html = render_string("Look, a {#{key}} is here")
+        # can't use Nokogiri because it interprets the HTML entities and we can't match them
+        assert_match /Look, a #{Regexp.escape(value)} is here/, html
+      end
     end
+
+    test "don't escape intrinsic substitutions" do
+      html = render_string('happy{nbsp}together')
+      assert_match /happy&#160;together/, html
+    end
+
+    test "escape special characters" do
+      html = render_string('<node>&</node>')
+      assert_match /&lt;node&gt;&amp;&lt;\/node&gt;/, html
+    end
+    
   end
 
 end
