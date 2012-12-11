@@ -68,7 +68,7 @@ class Asciidoctor::Section
   #   section.section_id
   #   => "_foo"
   def section_id
-    "_#{name && name.downcase.gsub(' ','_')}"
+    "_#{name && name.downcase.gsub(/\W+/,'_').gsub(/_+$/, '')}".tr_s('_', '_')
   end
 
   # Public: Get the Asciidoctor::Document instance to which this Block belongs

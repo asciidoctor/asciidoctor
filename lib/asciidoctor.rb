@@ -29,10 +29,23 @@ $:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
 #
 # Examples:
 #
-#   lines = File.readlines(filename)
+# Use built-in templates:
 #
-#   doc  = Asciidoctor::Document.new(lines)
-#   html = doc.render(template_path)
+#   lines = File.readlines("your_file.asc")
+#   doc = Asciidoctor::Document.new(lines)
+#   html = doc.render
+#   File.open("your_file.html", "w+") do |file|
+#     file.puts html
+#   end
+#
+# Use custom (Tilt-supported) templates:
+#
+#   lines = File.readlines("your_file.asc")
+#   doc = Asciidoctor::Document.new(lines, :template_dir => 'templates')
+#   html = doc.render
+#   File.open("your_file.html", "w+") do |file|
+#     file.puts html
+#   end
 module Asciidoctor
   REGEXP = {
     # [[Foo]]  (also allows, say, [[[]] or [[[Foo[f]], but I don't think it is supposed to (TODO))
@@ -57,8 +70,13 @@ module Asciidoctor
     # <1> Foo
     :colist           => /^(\<\d+\>)\s*(.*)/,
 
+    # ////
+    # comment block
+    # ////
+    :comment_blk      => /^\/{4,}\s*$/,
+
     # // (and then whatever)
-    :comment          => /^\/\/\s/,
+    :comment          => /^\/\/[^\/]/,
 
     # foo::  ||  foo;;
     # Should be followed by a definition line, e.g.,
@@ -126,7 +144,7 @@ module Asciidoctor
     # ____
     :quote            => /^_{4,}\s*$/,
 
-    # ''''
+    # '''
     :ruler            => /^'{3,}\s*$/,
 
     # ****
@@ -149,15 +167,37 @@ module Asciidoctor
   INTRINSICS = Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(
     'startsb'    => '[',
     'endsb'      => ']',
+    'brvbar'     => '|',
     'caret'      => '^',
     'asterisk'   => '*',
     'tilde'      => '~',
     'litdd'      => '--',
     'plus'       => '+',
-    'apostrophe' => "'",
-    'backslash'  => "\\",
-    'backtick'   => '`'
+    'apostrophe' => '\'',
+    'backslash'  => '\\',
+    'backtick'   => '`',
+    'empty'      => '',
+    'sp'         => ' ',
+    'two-colons' => '::',
+    'two-semicolons' => ';;',
+    'nbsp'       => '&#160;',
+    'deg'        => '&#176;',
+    'zwsp'       => '&#8203;',
+    'lsquo'      => '&#8216;',
+    'rsquo'      => '&#8217;',
+    'ldquo'      => '&#8220;',
+    'rdquo'      => '&#8221;',
+    'wj'         => '&#8288;',
+    'amp'        => '&',
+    'lt'         => '<',
+    'gt'         => '>',
   )
+
+  SPECIAL_CHARS = {
+    '<' => '&lt;',
+    '>' => '&gt;',
+    '&' => '&amp;'
+  }
 
   HTML_ELEMENTS = {
     'br-asciidoctor' => '<br/>'
