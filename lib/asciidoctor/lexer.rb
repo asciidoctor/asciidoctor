@@ -659,8 +659,10 @@ class Asciidoctor::Lexer
     while section_reader.has_lines?
       section_reader.skip_blank
 
-      new_block = next_block(section_reader, section) if section_reader.has_lines?
-      section << new_block unless new_block.nil?
+      if section_reader.has_lines?
+        new_block = next_block(section_reader, section)
+        section << new_block unless new_block.nil?
+      end
     end
 
     section

@@ -12,6 +12,11 @@ context "Paragraphs" do
     assert_xpath "//p", rendered, 2
   end
 
+  test "no duplicate block before next section" do
+    rendered = render_string("Title\n=====\n\nPreamble.\n\n== First Section\n\nParagraph 1\n\nParagraph 2\n\n\n== Second Section\n\nLast words")
+    assert_xpath '//p[text()="Paragraph 2"]', rendered, 1
+  end
+
   context "code" do
     test "literal paragraph" do
       assert_xpath "//pre/tt", render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
