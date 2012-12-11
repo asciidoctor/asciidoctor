@@ -16,7 +16,7 @@ context "Text" do
   end
 
   test "separator" do
-    assert_xpath "//hr", render_string("This is separated.\n\n''''\n\n...from this!"), 1
+    assert_xpath "//hr", render_string("This is separated.\n\n'''\n\n...from this!"), 1
   end
 
   test "emphasized text" do
