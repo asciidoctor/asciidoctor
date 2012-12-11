@@ -23,6 +23,22 @@ context "Text" do
     assert_xpath "//em", render_string("An 'emphatic' no")
   end
 
+  test "emphasized text with escaped single quote" do
+    assert_xpath "//em[text()=\"Johnny's\"]", render_string("It's 'Johnny\'s' phone")
+  end
+
+  test "emphasized text at end of line" do
+    assert_xpath "//em", render_string("This library is 'awesome'")
+  end
+
+  test "emphasized text at beginning of line" do
+    assert_xpath "//em", render_string("'drop' it")
+  end
+
+  test "emphasized text across line" do
+    assert_xpath "//em", render_string("'check it'")
+  end
+
   test "unquoted text" do
     assert_no_match /#/, render_string("An #unquoted# word")
   end

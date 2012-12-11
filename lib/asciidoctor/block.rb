@@ -307,12 +307,12 @@ class Asciidoctor::Block
 
       # "Constrained" quotes, which must be bounded by white space or
       # common punctuation characters
-      html.gsub!(/([\s\W])\*([^\*]+)\*([\s\W])/m, '\1<strong>\2</strong>\3')
-      html.gsub!(/([\s\W])'(.+?)'([\s\W])/m, '\1<em>\2</em>\3')
-      html.gsub!(/([\s\W])_([^_]+)_([\s\W])/m, '\1<em>\2</em>\3')
-      html.gsub!(/([\s\W])\+([^\+]+)\+([\s\W])/m, '\1<tt>\2</tt>\3')
-      html.gsub!(/([\s\W])\^([^\^]+)\^([\s\W])/m, '\1<sup>\2</sup>\3')
-      html.gsub!(/([\s\W])\~([^\~]+)\~([\s\W])/m, '\1<sub>\2</sub>\3')
+      html.gsub!(/(^|\s|\W)\*([^\*]+)\*(\s|\W|$)/m, '\1<strong>\2</strong>\3')
+      html.gsub!(/(^|\s|\W)'(.+?)'(\s|\W|$)/m, '\1<em>\2</em>\3')
+      html.gsub!(/(^|\s|\W)_([^_]+)_(\s|\W|$)/m, '\1<em>\2</em>\3')
+      html.gsub!(/(^|\s|\W)\+([^\+]+)\+(\s|\W|$)/m, '\1<tt>\2</tt>\3')
+      html.gsub!(/(^|\s|\W)\^([^\^]+)\^(\s|\W|$)/m, '\1<sup>\2</sup>\3')
+      html.gsub!(/(^|\s|\W)\~([^\~]+)\~(\s|\W|$)/m, '\1<sub>\2</sub>\3')
 
       html.gsub!(/\\([\{\}\-])/, '\1')
       html.gsub!(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>')
