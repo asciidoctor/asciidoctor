@@ -63,7 +63,11 @@ class Asciidoctor::Lexer
       this_line = reader.get_line
       next_line = reader.peek_line || ''
 
-      if this_line.match(REGEXP[:comment])
+      if this_line.match(REGEXP[:comment_blk])
+        Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) })
+        next
+
+      elsif this_line.match(REGEXP[:comment])
         next
 
       elsif match = this_line.match(REGEXP[:title])
@@ -659,8 +663,10 @@ class Asciidoctor::Lexer
     while section_reader.has_lines?
       section_reader.skip_blank
 
-      new_block = next_block(section_reader, section) if section_reader.has_lines?
-      section << new_block unless new_block.nil?
+      if section_reader.has_lines?
+        new_block = next_block(section_reader, section)
+        section << new_block unless new_block.nil?
+      end
     end
 
     section

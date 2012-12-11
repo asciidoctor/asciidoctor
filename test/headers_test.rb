@@ -7,13 +7,21 @@ context "Headers" do
 
   context "level 1" do 
     test "with multiline syntax" do
-      assert_xpath "//h2", render_string("My Section\n-----------")
+      assert_xpath "//h2[@id='_my_section']", render_string("My Section\n-----------")
     end
 
     test "with single line syntax" do
-      assert_xpath "//h2", render_string("== My Title")
+      assert_xpath "//h2[@id='_my_title']", render_string("== My Title")
     end
-  end  
+
+    test "with non-word character" do
+      assert_xpath "//h2[@id='_where_s_the_love']", render_string("== Where's the love?")
+    end
+
+    test "with sequential non-word characters" do
+      assert_xpath "//h2[@id='_what_the_is_that']", render_string('== What the #@$ is that')
+    end
+  end
 
   context "level 2" do 
     test "with multiline syntax" do

@@ -192,8 +192,9 @@ class Asciidoctor::Block
 
     result = lines.map do |line|
       Asciidoctor.debug "#{__method__} -> Processing line: #{line}"
+      f = sub_special_chars(line)
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
-      f = line.gsub(/ (^|[^\\]) \{ (\w[\w\-_]+\w) \} /x) do
+      f = f.gsub(/ (^|[^\\]) \{ (\w([\w\-_]+)?\w) \} /x) do
         if self.document.defines.has_key?($2)
           # Substitute from user defines first
           $1 + self.document.defines[$2]
@@ -273,7 +274,7 @@ class Asciidoctor::Block
       html.gsub!( /(^|[^<])<<([^<>,]+)(,([^>]*))?>>/ ) { "#{$1}link:##{$2}[" + ($4.nil? ? document.references[$2] : $4).to_s + "]" }
 
       # Do the same with URLs
-      html.gsub!( /(^|[^`])(https?:\/\/[^\[ ]+)(\[+[^\]]*\]+)?/ ) do
+      html.gsub!( /(^|[^(`|link:)])(https?:\/\/[^\[ ]+)(\[+[^\]]*\]+)?/ ) do
         pre = $1
         url = $2
         link = ( $3 || $2 ).gsub( /(^\[|\]$)/,'' )
@@ -282,7 +283,6 @@ class Asciidoctor::Block
         "#{pre}link:#{url}[#{link}]"
       end
 
-      html = CGI.escapeHTML(html)
       html.gsub!(Asciidoctor::REGEXP[:biblio], '<a name="\1">[\1]</a>')
       html.gsub!(Asciidoctor::REGEXP[:ruler], '<hr>\n')
       html.gsub!(/``([^`']*)''/m, '&ldquo;\1&rdquo;')
@@ -307,12 +307,14 @@ class Asciidoctor::Block
 
       # "Constrained" quotes, which must be bounded by white space or
       # common punctuation characters
-      html.gsub!(/([\s\W])\*([^\*]+)\*([\s\W])/m, '\1<strong>\2</strong>\3')
-      html.gsub!(/([\s\W])'(.+?)'([\s\W])/m, '\1<em>\2</em>\3')
-      html.gsub!(/([\s\W])_([^_]+)_([\s\W])/m, '\1<em>\2</em>\3')
-      html.gsub!(/([\s\W])\+([^\+]+)\+([\s\W])/m, '\1<tt>\2</tt>\3')
-      html.gsub!(/([\s\W])\^([^\^]+)\^([\s\W])/m, '\1<sup>\2</sup>\3')
-      html.gsub!(/([\s\W])\~([^\~]+)\~([\s\W])/m, '\1<sub>\2</sub>\3')
+      html.gsub!(/(^|\s|\W)\*([^\*]+)\*(\s|\W|$)/m, '\1<strong>\2</strong>\3')
+      html.gsub!(/(^|\s|\W)'(.+?)'(\s|\W|$)/m, '\1<em>\2</em>\3')
+      # restore escaped single quotes after processing emphasis
+      html.gsub!(/(\w)\\'(\w)/, '\1\'\2')
+      html.gsub!(/(^|\s|\W)_([^_]+)_(\s|\W|$)/m, '\1<em>\2</em>\3')
+      html.gsub!(/(^|\s|\W)\+([^\+]+)\+(\s|\W|$)/m, '\1<tt>\2</tt>\3')
+      html.gsub!(/(^|\s|\W)\^([^\^]+)\^(\s|\W|$)/m, '\1<sup>\2</sup>\3')
+      html.gsub!(/(^|\s|\W)\~([^\~]+)\~(\s|\W|$)/m, '\1<sub>\2</sub>\3')
 
       html.gsub!(/\\([\{\}\-])/, '\1')
       html.gsub!(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>')
@@ -320,6 +322,10 @@ class Asciidoctor::Block
       html.gsub!(Asciidoctor::REGEXP[:line_break], '\1<br/>')
       html
     end
+  end
+
+  def sub_special_chars(str)
+    str.gsub(/[#{Asciidoctor::SPECIAL_CHARS.keys.join}]/) {|match| Asciidoctor::SPECIAL_CHARS[match] }
   end
   # end private
 end
