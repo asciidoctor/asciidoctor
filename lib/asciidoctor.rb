@@ -57,8 +57,13 @@ module Asciidoctor
     # <1> Foo
     :colist           => /^(\<\d+\>)\s*(.*)/,
 
+    # ////
+    # comment block
+    # ////
+    :comment_blk      => /^\/{4,}\s*$/,
+
     # // (and then whatever)
-    :comment          => /^\/\/\s/,
+    :comment          => /^\/\/[^\/]/,
 
     # foo::  ||  foo;;
     # Should be followed by a definition line, e.g.,

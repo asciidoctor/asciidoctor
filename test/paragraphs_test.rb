@@ -40,4 +40,14 @@ context "Paragraphs" do
       assert_xpath "//div[@class='admonitionblock']", render_string("NOTE: This is important, fool!")
     end
   end
+
+  context "comments" do
+    test "line comment" do
+      assert_no_match /comment/, render_string("first paragraph\n\n//comment\n\nsecond paragraph")
+    end
+
+    test "comment block" do
+      assert_no_match /comment/, render_string("first paragraph\n\n////\ncomment\n////\n\nsecond paragraph")
+    end
+  end
 end
