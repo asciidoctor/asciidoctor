@@ -126,7 +126,8 @@ class Asciidoctor::Reader
           value = @defines.has_key?(match[1]) ? match[2] : ''
           line.sub!(conditional_regexp, value)
         end
-        @lines << line unless line.match(REGEXP[:comment])
+        # leave line comments in as they play a role in flow (such as a list divider)
+        @lines << line
       end
     end
 
