@@ -62,9 +62,9 @@ To render an AsciiDoc-formatted string:
  puts doc.render
 
 Asciidoctor allows you to override the default template used to render
-almost any individual AsciiDoc elements. If you provide a directory of
-{tilt}[Tilt]-compatible templates, named in a way Asciidoctor can
-figure out which template goes with which element, Asciidoctor will
+almost any individual AsciiDoc element. If you provide a directory of
+{tilt}[Tilt]-compatible templates, named in such a way that Asciidoctor
+can figure out which template goes with which element, Asciidoctor will
 use the templates in this directory instead of its built-in templates
 for any elements for which it finds a matching template. It will
 fallback to its default templates for everything else.
@@ -74,13 +74,13 @@ fallback to its default templates for everything else.
 
 The Document and Section templates should begin with `document.` and
 `section.`, respectively. The file extension will depend on which
-Tilt-compatible format you've chosen. For ERB, they would be
+Tilt-compatible format you've chosen. For ERB, the template names would be
 `document.html.erb` and `section.html.erb`, for instance. For Haml, they
-will be `document.html.haml` and `section.html.haml`.
+would be `document.html.haml` and `section.html.haml`.
 
-Specific elements, like a Paragraph or Anchor, would begin with
-`section_<element>.`. To override the default Paragraph template with
-an ERB template, you'd put a file called `section_paragraph.html.erb`
+Templates for specific elements, like a Paragraph or Anchor, would begin
+with `section_<element>.`. For instance, to override the default Paragraph
+template with an ERB template, put a file called `section_paragraph.html.erb`
 in the template directory you pass in to `Document.new`.
 
 For more usage examples, see the test suite.
