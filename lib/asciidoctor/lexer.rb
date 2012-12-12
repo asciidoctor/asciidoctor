@@ -68,6 +68,7 @@ class Asciidoctor::Lexer
         next
 
       elsif this_line.match(REGEXP[:comment])
+        reader.skip_blank
         next
 
       elsif match = this_line.match(REGEXP[:title])
