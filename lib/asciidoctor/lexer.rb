@@ -68,6 +68,7 @@ class Asciidoctor::Lexer
         next
 
       elsif this_line.match(REGEXP[:comment])
+        reader.skip_blank
         next
 
       elsif match = this_line.match(REGEXP[:title])
@@ -423,15 +424,18 @@ class Asciidoctor::Lexer
 
       if first_item_level && first_item_level < this_item_level
         # If this next :uline level is down one from the
-        # current Block's, put it in a Block of its own
-        list_item = next_block(reader, block)
+        # current Block's, append it to content of the current list item
+        items.last.blocks << next_block(reader, block)
+      elsif first_item_level && first_item_level > this_item_level
+        break
       else
         list_item = build_ulist_item(reader, block, match)
         # Set the base item level for this Block
         first_item_level ||= list_item.level
       end
 
-      items << list_item
+      items << list_item unless list_item.nil?
+      list_item = nil
 
       reader.skip_blank
     end
