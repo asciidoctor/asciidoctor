@@ -50,7 +50,7 @@ class Test::Unit::TestCase
   end
 
   def assert_xpath(xpath, html, count = nil)
-    results = Nokogiri::HTML::DocumentFragment.parse(html).xpath(".#{xpath}")
+    results = Nokogiri::HTML::DocumentFragment.parse(html).xpath("#{xpath.sub('/', './')}")
 
     if (count && results.length != count)
       flunk "XPath #{xpath} yielded #{results.length} elements rather than #{count} for:\n#{html}"
