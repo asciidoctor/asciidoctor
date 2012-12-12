@@ -76,7 +76,7 @@ module Asciidoctor
     :comment_blk      => /^\/{4,}\s*$/,
 
     # // (and then whatever)
-    :comment          => /^\/\/[^\/]/,
+    :comment          => /^\/\/([^\/]|$)/,
 
     # foo::  ||  foo;;
     # Should be followed by a definition line, e.g.,
