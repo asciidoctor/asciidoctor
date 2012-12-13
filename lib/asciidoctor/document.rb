@@ -11,7 +11,7 @@ class Asciidoctor::Document
   attr_reader :references
 
   # Need these for pseudo-template yum
-  attr_reader :header, :preamble
+  attr_reader :header
 
   # Public: Get the Array of elements (really Blocks or Sections) for the document
   attr_reader :elements
@@ -114,7 +114,7 @@ class Asciidoctor::Document
   #
   def render(options = {})
     r = renderer(options)
-    html = r.render('document', self, :header => @header, :preamble => @preamble)
+    html = r.render('document', self, :header => @header)
   end
 
   def content
@@ -123,7 +123,7 @@ class Asciidoctor::Document
       Asciidoctor::debug "Rendering element: #{element}"
       html_pieces << element.render
     end
-    html_pieces.join("\n")
+    html_pieces.join
   end
 
 end

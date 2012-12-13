@@ -28,19 +28,22 @@ class DocumentTemplate < BaseTemplate
       <div id='header'>
         <% if header %>
           <h1><%= header.name %></h1>
-          <div class='sectionbody'><%= header.content %></div>
-        <% elsif preamble %>
-          <div class=preamble'>
-            <div class='sectionbody'>
-              <%= preamble.content %>
-            </div>
-          </div>
         <% end %>
       </div>
-
       <%= content %>
-
     </div>
+    EOF
+  end
+end
+
+class SectionPreambleTemplate < BaseTemplate
+  def template
+    @template ||= ::ERB.new <<-EOF
+      <div id='preamble'>
+        <div class='sectionbody'>
+          <%= content %>
+        </div>
+      </div>
     EOF
   end
 end

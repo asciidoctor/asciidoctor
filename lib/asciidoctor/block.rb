@@ -148,7 +148,7 @@ class Asciidoctor::Block
 
         [html_dt, html_dd]
       end
-    when :oblock, :quote
+    when :preamble, :oblock, :quote
       blocks.map{|block| block.render}.join
     when :olist, :colist
       @buffer.map do |li|
@@ -250,6 +250,21 @@ class Asciidoctor::Block
     end
     result
   end
+
+  # Public: Append a sub-block to this section block
+  #
+  # block - The new sub-block.
+  #
+  #   block = Block.new(parent, :preamble)
+  #
+  #   block << Block.new(block, :paragraph, 'p1')
+  #   block << Block.new(block, :paragraph, 'p2')
+  #   block.blocks
+  #   => ["p1", "p2"]
+  def <<(block)
+    @blocks << block
+  end
+
 
   private
 
