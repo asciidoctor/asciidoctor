@@ -4,8 +4,8 @@ class Asciidoctor::Document
 
   include Asciidoctor
 
-  # Public: Get the Hash of defines
-  attr_reader :defines
+  # Public: Get the Hash of attributes
+  attr_reader :attributes
 
   # Public: Get the Hash of document references
   attr_reader :references
@@ -33,7 +33,7 @@ class Asciidoctor::Document
     @reader = Reader.new(data, &block)
 
     # pseudo-delegation :)
-    @defines = @reader.defines
+    @attributes = @reader.attributes
     @references = @reader.references
 
     # Now parse @lines into elements
