@@ -59,16 +59,16 @@ class Asciidoctor::Section
           gsub( /`([^`]+)`/, '<tt>\1</tt>' )
   end
 
-  # Public: Get the String section id
+  # Public: Get the String section id prefixed with value of idprefix attribute, otherwise an underscore
   #
   # Examples
   #
-  #   section = Section.new
+  #   section = Section.new(parent)
   #   section.name = "Foo"
   #   section.section_id
   #   => "_foo"
   def section_id
-    "_#{name && name.downcase.gsub(/\W+/,'_').gsub(/_+$/, '')}".tr_s('_', '_')
+    self.document.attributes.fetch('idprefix', '_') + "#{name && name.downcase.gsub(/\W+/,'_').gsub(/_+$/, '')}".tr_s('_', '_')
   end
 
   # Public: Get the Asciidoctor::Document instance to which this Block belongs

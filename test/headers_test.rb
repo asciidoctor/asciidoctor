@@ -2,15 +2,15 @@ require 'test_helper'
 
 context "Headers" do
   test "document title with multiline syntax" do
-    assert_xpath "//h1[text() = 'My Title']", render_string("My Title\n=======")
+    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("My Title\n=======")
   end
 
   test "document title with single-line syntax" do
-    assert_xpath "//h1[text() = 'My Title']", render_string("= My Title")
+    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title")
   end
 
   test "document title with symmetric syntax" do
-    assert_xpath "//h1[text() = 'My Title']", render_string("= My Title =")
+    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title =")
   end
 
   context "level 1" do 
@@ -40,6 +40,14 @@ context "Headers" do
 
     test "with trailing whitespace" do
       assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", render_string("== My Title ")
+    end
+
+    test "with custom blank idprefix" do
+      assert_xpath "//h2[@id='my_title'][text() = 'My Title']", render_string(":idprefix:\n\n== My Title ")
+    end
+
+    test "with custom non-blank idprefix" do
+      assert_xpath "//h2[@id='ref_my_title'][text() = 'My Title']", render_string(":idprefix: ref_\n\n== My Title ")
     end
   end
 
