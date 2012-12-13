@@ -148,7 +148,7 @@ class Asciidoctor::Block
 
         [html_dt, html_dd]
       end
-    when :oblock, :quote
+    when :oblock, :quote, :sidebar
       blocks.map{|block| block.render}.join
     when :olist, :colist
       @buffer.map do |li|

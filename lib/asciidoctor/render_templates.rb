@@ -152,7 +152,10 @@ class SectionSidebarTemplate < BaseTemplate
     @template ||= ERB.new <<-EOF
       <div class='sidebarblock'>
         <div class='content'>
-          <p><%= content %></p>
+          <% if !title.nil? %>
+            <div class='title'><%= title %></div>
+          <% end %>
+          <%= content %>
         </div>
       </div>
     EOF

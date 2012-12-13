@@ -110,6 +110,18 @@ class Asciidoctor::Lexer
           block.blocks << new_block unless new_block.nil?
         end
 
+      # needs to come before list detection
+      elsif this_line.match(REGEXP[:sidebar_blk])
+        # sidebar is surrounded by '****' (4 or more '*' chars) lines
+        # FIXME violates DRY because it's a duplication of quote parsing
+        block = Block.new(parent, :sidebar)
+        buffer = Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:sidebar_blk] ) })
+
+        while buffer.has_lines?
+          new_block = next_block(buffer, block)
+          block.blocks << new_block unless new_block.nil?
+        end
+
       elsif list_type = [:olist, :colist].detect{|l| this_line.match( REGEXP[l] )}
         items = []
         Asciidoctor.debug "Creating block of type: #{list_type}"
@@ -220,11 +232,6 @@ class Asciidoctor::Lexer
         buffer = reader.grab_lines_until(:preserve_last_line => true) {|line| ! line.match( REGEXP[:lit_par] ) }
 
         block = Block.new(parent, :literal, buffer)
-
-      elsif this_line.match(REGEXP[:sidebar_blk])
-        # example is surrounded by '****' (4 or more '*' chars) lines
-        buffer = reader.grab_lines_until {|line| line.match( REGEXP[:sidebar_blk] ) }
-        block = Block.new(parent, :sidebar, buffer)
 
       else
         # paragraph is contiguous nonblank/noncontinuation lines
