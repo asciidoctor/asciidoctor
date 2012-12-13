@@ -24,9 +24,6 @@ class Asciidoctor::Section
   # Public: Set the String section name.
   attr_writer :name
 
-  # Public: Get/Set the String section title.
-  attr_accessor :title
-
   # Public: Get/Set the String section caption.
   attr_accessor :caption
 
@@ -107,6 +104,11 @@ class Asciidoctor::Section
       Asciidoctor.debug "===> Done rendering block #{block.is_a?(Asciidoctor::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
       poo
     end.join
+  end
+
+  # Public: The title of this section, an alias of the section name
+  def title
+    @name
   end
 
   # Public: Get the Integer number of blocks in the section.

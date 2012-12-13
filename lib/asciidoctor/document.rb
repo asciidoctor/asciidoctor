@@ -10,7 +10,7 @@ class Asciidoctor::Document
   # Public: Get the Hash of document references
   attr_reader :references
 
-  # Need these for pseudo-template yum
+  # The section level 0 element
   attr_reader :header
 
   # Public: Get the Array of elements (really Blocks or Sections) for the document
@@ -29,12 +29,20 @@ class Asciidoctor::Document
   def initialize(data, options = {}, &block)
     @elements = []
     @options = options
+    @options[:header_footer] = @options.fetch(:header_footer, true)
 
     @reader = Reader.new(data, &block)
 
     # pseudo-delegation :)
     @attributes = @reader.attributes
     @references = @reader.references
+
+    # dynamic intrinstic attribute values
+    @attributes['doctype'] ||= DEFAULT_DOCTYPE
+    now = Time.new
+    @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
+    @attributes['localtime'] ||= now.strftime('%H:%m:%S %Z')
+    @attributes['asciidoctor-version'] = VERSION
 
     # Now parse @lines into elements
     while @reader.has_lines?
@@ -48,11 +56,11 @@ class Asciidoctor::Document
       Asciidoctor.debug el
     end
 
+    # split off the level 0 section, if present
     root = @elements.first
-    # Try to find a @header from the Section blocks we have (if any).
     if root.is_a?(Section) && root.level == 0
       @header = @elements.shift
-      @elements = @header.blocks + @elements
+      @elements = @header.blocks
       @header.clear_blocks
     end
 
@@ -63,21 +71,33 @@ class Asciidoctor::Document
     @reader.source if @reader
   end
 
-  # We need to be able to return some semblance of a title
+  def level
+    0
+  end
+
+  # The title explicitly defined in the document attributes
   def title
-    return @title if @title
+    @attributes['title']
+  end
+
+  # We need to be able to return some semblance of a title
+  def doctitle
+    # cached value
+    return @doctitle if @doctitle
 
     if @header
-      @title = @header.title || @header.name
+      @doctitle = @header.title
     elsif @elements.first
-      @title = @elements.first.title
-      # Blocks don't have a :name method, but Sections do
-      @title ||= @elements.first.name if @elements.first.respond_to? :name
+      @doctitle = @elements.first.title
     end
 
-    @title
+    @doctitle
   end
-  alias :name :title
+  alias :name :doctitle
+
+  def notitle
+    @attributes.has_key? 'notitle'
+  end
 
   def splain
     if @header
@@ -110,11 +130,13 @@ class Asciidoctor::Document
     @renderer = Renderer.new(render_options)
   end
 
-  # Public: Render the Asciidoc document using erb templates
-  #
+  # Public: Render the Asciidoc document using the templates
+  # loaded by Renderer. If a :template_dir is not specified,
+  # or a template is missing, the renderer will fall back to
+  # using the appropriate built-in template.
   def render(options = {})
     r = renderer(options)
-    html = r.render('document', self, :header => @header)
+    @options.merge(options)[:header_footer] ? r.render('document', self) : content
   end
 
   def content

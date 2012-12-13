@@ -24,14 +24,29 @@ end
 class DocumentTemplate < BaseTemplate
   def template
     @template ||= ::ERB.new <<-EOF
-      <div class='man-page'>
-      <div id='header'>
-        <% if header %>
-          <h1><%= header.name %></h1>
-        <% end %>
-      </div>
-      <%= content %>
-    </div>
+      <!DOCTYPE html>
+      <html lang='en'>
+        <head>
+          <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+          <meta name='generator' content='Asciidoctor <%= attributes["asciidoctor-version"] %>'>
+          <title><%= title ? title : (doctitle ? doctitle : '') %></title>
+        </head>
+        <body class='<%= attributes["doctype"] %>'>
+          <div id='header'>
+            <% if doctitle %>
+              <h1><%= doctitle %></h1>
+            <% end %>
+          </div>
+          <div id='content'>
+            <%= content %>
+          </div>
+          <div id='footer'>
+            <div id='footer-text'>
+              Last updated <%= [attributes['localdate'], attributes['localtime']].join(' ') %>
+            </div>
+          </div>
+        </body>
+      </html>
     EOF
   end
 end
