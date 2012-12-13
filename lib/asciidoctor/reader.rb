@@ -6,8 +6,8 @@ class Asciidoctor::Reader
   # Public: Get the String document source.
   attr_reader :source
 
-  # Public: Get the Hash of defines
-  attr_reader :defines
+  # Public: Get the Hash of attributes
+  attr_reader :attributes
 
   attr_reader :references
 
@@ -43,7 +43,7 @@ class Asciidoctor::Reader
   #   reader = Asciidoctor::Reader.new(data)
   def initialize(data = [], &block)
     raw_source = []
-    @defines = {}
+    @attributes = {}
     @references = {}
 
     data = data.split("\n") if data.is_a? String
@@ -94,15 +94,15 @@ class Asciidoctor::Reader
           raw_source.unshift(line)
         end
         if close_continue
-          @defines[continuing_key] = continuing_value
+          @attributes[continuing_key] = continuing_value
           continuing_key = nil
           continuing_value = nil
         end
       elsif match = line.match(ifdef_regexp)
         attr = match[2]
         skip = case match[1]
-               when 'ifdef';  !@defines.has_key?(attr)
-               when 'ifndef'; @defines.has_key?(attr)
+               when 'ifdef';  !@attributes.has_key?(attr)
+               when 'ifndef'; @attributes.has_key?(attr)
                end
         skip_to = /^endif::#{attr}\[\]\s*\n/ if skip
       elsif match = line.match(defattr_regexp)
@@ -115,15 +115,15 @@ class Asciidoctor::Reader
           continuing_value = match[1]  # strip off the spaces and +
           Asciidoctor.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
         else
-          @defines[key] = value
+          @attributes[key] = value
           Asciidoctor.debug "Defines[#{key}] is '#{value}'"
         end
       elsif match = line.match(delete_attr_regexp)
         key = sanitize_attribute_name(match[1])
-        @defines.delete(key)
+        @attributes.delete(key)
       elsif !line.match(endif_regexp)
         while match = line.match(conditional_regexp)
-          value = @defines.has_key?(match[1]) ? match[2] : ''
+          value = @attributes.has_key?(match[1]) ? match[2] : ''
           line.sub!(conditional_regexp, value)
         end
         # leave line comments in as they play a role in flow (such as a list divider)

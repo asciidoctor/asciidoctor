@@ -50,7 +50,8 @@ class Test::Unit::TestCase
   end
 
   def assert_xpath(xpath, html, count = nil)
-    results = Nokogiri::HTML::DocumentFragment.parse(html).xpath("#{xpath.sub('/', './')}")
+    doc = (html =~ /\s*<!DOCTYPE/) ? Nokogiri::HTML::Document.parse(html) : Nokogiri::HTML::DocumentFragment.parse(html)
+    results = doc.xpath("#{xpath.sub('/', './')}")
 
     if (count && results.length != count)
       flunk "XPath #{xpath} yielded #{results.length} elements rather than #{count} for:\n#{html}"
@@ -61,12 +62,12 @@ class Test::Unit::TestCase
     end
   end
 
-  def document_from_string(src)
-    Asciidoctor::Document.new(src.split("\n"))
+  def document_from_string(src, opts = {})
+    Asciidoctor::Document.new(src.split("\n"), opts)
   end
 
-  def render_string(src)
-    document_from_string(src).render
+  def render_string(src, opts = {})
+    document_from_string(src, opts).render
   end
 end
 
