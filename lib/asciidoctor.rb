@@ -88,13 +88,19 @@ module Asciidoctor
     :example          => /^={4,}\s*$/,
 
     # == Foo
-    # Yields a Level 2 title, so exactly the same as
-    #   Foo
-    #   ~~~
-    # would yield.  match[1] is the == sequence, whose
-    # length determines the level, and match[2] is the
-    # title itself.
-    :level_title      => /^(={2,5})\s+(\S.*)\s*$/,
+    # ^ yields a level 2 title
+    #
+    # == Foo ==
+    # ^ also yields a level 2 title
+    #
+    # both equivalent to this two-line version:
+    # Foo
+    # ~~~
+    #
+    # match[1] is the delimiter, whose length determines the level
+    # match[2] is the title itself
+    # match[3] is an optional repeat of the delimiter, which is dropped
+    :level_title      => /^(={1,5})\s+(\S.*?)\s*(\s\1)?$/,
 
     # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
     :line             => /^([=\-~^\+])+\s*$/,
