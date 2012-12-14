@@ -58,6 +58,7 @@ class Asciidoctor::Lexer
     caption = nil
     source_type = nil
     buffer = []
+    context = parent.is_a?(Block) ? parent.context : nil
     while reader.has_lines? && block.nil?
       buffer.clear
       this_line = reader.get_line
@@ -115,7 +116,7 @@ class Asciidoctor::Lexer
         Asciidoctor.debug "Creating block of type: #{list_type}"
         block = Block.new(parent, list_type)
         while !this_line.nil? && match = this_line.match(REGEXP[list_type])
-          item = ListItem.new
+          item = ListItem.new(block)
 
           reader.unshift match[2].lstrip.sub(/^\./, '\.')
           item_segment = Reader.new(list_item_segment(reader, :alt_ending => REGEXP[list_type]))
@@ -124,11 +125,7 @@ class Asciidoctor::Lexer
             item.blocks << new_block unless new_block.nil?
           end
 
-          if item.blocks.any? &&
-             item.blocks.first.is_a?(Block) &&
-             (item.blocks.first.context == :paragraph || item.blocks.first.context == :literal)
-            item.content = item.blocks.shift.buffer.map{|l| l.strip}.join("\n")
-          end
+          item.fold_first
 
           items << item
 
@@ -148,38 +145,29 @@ class Asciidoctor::Lexer
       elsif match = this_line.match(REGEXP[:dlist])
         pairs = []
         block = Block.new(parent, :dlist)
+        # allows us to capture until we find a labeled item using the same delimiter (::, :::, :::: or ;;)
+        sibling_matcher = REGEXP[:dlist_siblings][match[3]]
 
-        this_dlist = Regexp.new(/^#{match[1]}(.*)#{match[3]}\s*$/)
+        begin
+          dt = ListItem.new(block, match[2])
+          dt.anchor = match[1] unless match[1].nil?
+          dd = ListItem.new(block, match[5])
 
-        while !this_line.nil? && match = this_line.match(this_dlist)
-          if anchor = match[1].match( /\[\[([^\]]+)\]\]/ )
-            dt = ListItem.new( $` + $' )
-            dt.anchor = anchor[1]
-          else
-            dt = ListItem.new( match[1] )
-          end
-          dd = ListItem.new
-          # workaround eg. git-config OPTIONS --get-colorbool
-          reader.get_line if reader.has_lines? && reader.peek_line.strip.empty?
-
-          dd_segment = Reader.new(list_item_segment(reader, :alt_ending => this_dlist))
+          dd_segment = Reader.new(list_item_segment(reader, :alt_ending => sibling_matcher))
           while dd_segment.has_lines?
             new_block = next_block(dd_segment, block)
             dd.blocks << new_block unless new_block.nil?
           end
 
-          if dd.blocks.any? &&
-             dd.blocks.first.is_a?(Block) &&
-             (dd.blocks.first.context == :paragraph || dd.blocks.first.context == :literal)
-            dd.content = dd.blocks.shift.buffer.map{|l| l.strip}.join("\n")
-          end
+          dd.fold_first
 
           pairs << [dt, dd]
 
+          # this skip_blank might be redundant
           reader.skip_blank
-
           this_line = reader.get_line
-        end
+        end while !this_line.nil? && match = this_line.match(sibling_matcher)
+
         reader.unshift(this_line) unless this_line.nil?
         block.buffer = pairs
 
@@ -217,7 +205,9 @@ class Asciidoctor::Lexer
 
         # So we need to actually include this one in the grab_lines group
         reader.unshift this_line
-        buffer = reader.grab_lines_until(:preserve_last_line => true) {|line| ! line.match( REGEXP[:lit_par] ) }
+        buffer = reader.grab_lines_until(:preserve_last_line => true) {|line|
+          (context == :dlist && line.match(REGEXP[:dlist])) || !line.match(REGEXP[:lit_par])
+        }
 
         block = Block.new(parent, :literal, buffer)
 
@@ -228,14 +218,10 @@ class Asciidoctor::Lexer
 
       else
         # paragraph is contiguous nonblank/noncontinuation lines
-        while !this_line.nil? && !this_line.strip.empty?
-          if this_line.match( REGEXP[:listing] ) || this_line.match( REGEXP[:oblock] )
-            reader.unshift this_line
-            break
-          end
-          buffer << this_line
-          this_line = reader.get_line
-        end
+        reader.unshift this_line
+        buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true) {|line|
+          (context == :dlist && line.match(REGEXP[:dlist])) || line.match(REGEXP[:listing]) || line.match(REGEXP[:oblock])
+        }
 
         if buffer.any? && admonition = buffer.first.match(/^NOTE:\s*/)
           buffer[0] = admonition.post_match
@@ -249,9 +235,14 @@ class Asciidoctor::Lexer
       end
     end
 
-    block.anchor  ||= anchor
-    block.title   ||= title
-    block.caption ||= caption
+    # when looking for nested content, a series of
+    # line comments or a comment block could leave us
+    # without a block
+    if !block.nil?
+      block.anchor  ||= anchor
+      block.title   ||= title
+      block.caption ||= caption
+    end
 
     block
   end
@@ -384,7 +375,7 @@ class Asciidoctor::Lexer
 
     level = match[1].length
 
-    list_item = ListItem.new
+    list_item = ListItem.new(block)
     list_item.level = level
     Asciidoctor.debug "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
 
@@ -401,12 +392,7 @@ class Asciidoctor::Lexer
 
     Asciidoctor.debug "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
 
-    first_block = list_item.blocks.first
-    if first_block.is_a?(Block) &&
-       (first_block.context == :paragraph || first_block.context == :literal)
-      list_item.content = first_block.buffer.map{|l| l.strip}.join("\n")
-      list_item.blocks.shift
-    end
+    list_item.fold_first
 
     list_item
   end
@@ -455,7 +441,7 @@ class Asciidoctor::Lexer
     while this_line && match = this_line.match(REGEXP[list_type])
       level = match[1].length
 
-      list_item = ListItem.new
+      list_item = ListItem.new(block)
       list_item.level = level
       Asciidoctor.debug "Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
 
@@ -466,12 +452,7 @@ class Asciidoctor::Lexer
         list_item.blocks << new_block unless new_block.nil?
       end
 
-      first_block = list_item.blocks.first
-      if first_block.is_a?(Block) &&
-         (first_block.context == :paragraph || first_block.context == :literal)
-        list_item.content = first_block.buffer.map{|l| l.strip}.join("\n")
-        list_item.blocks.shift
-      end
+      list_item.fold_first
 
       if items.any? && (level > items.last.level)
         Asciidoctor.debug "--> Putting this new level #{level} ListItem under my pops, #{items.last} (level: #{items.last.level})"

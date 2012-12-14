@@ -86,8 +86,16 @@ module Asciidoctor
     # Should be followed by a definition line, e.g.,
     # foo::
     #    That which precedes 'bar' (see also, bar)
-    :dlist            => /^(\s*)(\S.*)(::|;;)\s*$/,
-
+    #:dlist            => /^(\s*)(\S.*)(::|;;)\s*$/,
+    #:dlist            => /^\s*(\w.*?)(::(?::(?::)?)?|;;)(\s+(.*))?$/,
+    :dlist            => /^\s*(?:\[\[([^\]]*)\]\])?(\w.*?)(:{2,4}|;;)(\s+(.*))?$/,
+    :dlist_siblings   => {
+                           # (?:.*?[^:])? a non-capturing group which grabs longest sequence of characters that doesn't end with colon
+                           '::' => /^\s*(?:\[\[([^\]]*)\]\])?(\w(?:.*[^:])?)(::)(\s+(.*))?$/,
+                           ':::' => /^\s*(?:\[\[([^\]]*)\]\])?(\w(?:.*[^:])?)(:::)(\s+(.*))?$/,
+                           '::::' => /^\s*(?:\[\[([^\]]*)\]\])?(\w(?:.*[^:])?)(::::)(\s+(.*))?$/,
+                           ';;' => /^\s*(?:\[\[([^\]]*)\]\])?(\w.*)(;;)(\s+(.*))?$/
+                         },
     # ====
     :example          => /^={4,}\s*$/,
 

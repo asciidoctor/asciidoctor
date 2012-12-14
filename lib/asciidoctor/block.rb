@@ -9,6 +9,9 @@ class Asciidoctor::Block
   # Public: Get the Symbol context for this section block.
   attr_reader :context
 
+  # Public: Create alias for context to be consistent w/ AsciiDoc
+  alias :blockname :context
+
   # Public: Get the Array of sub-blocks for this section block.
   attr_reader :blocks
 
@@ -54,6 +57,7 @@ class Asciidoctor::Block
   # Public: Get the Asciidoctor::Renderer instance being used for the ancestor
   # Asciidoctor::Document instance.
   def renderer
+    # wouldn't @parent.renderer work here? I believe so
     document.renderer
   end
 
@@ -132,38 +136,16 @@ class Asciidoctor::Block
     Asciidoctor.debug @buffer.inspect
 
     case @context
-    when :dlist
-      @buffer.map do |dt, dd|
-        if !dt.anchor.nil? && !dt.anchor.empty?
-          html_dt = "<a id=#{dt.anchor}></a>" + htmlify(dt.content)
-        else
-          html_dt = htmlify(dt.content)
-        end
-        if dd.content.empty?
-          html_dd = ''
-        else
-          html_dd = "<p>#{htmlify(dd.content)}</p>"
-        end
-        html_dd += dd.blocks.map{|block| block.render}.join
-
-        [html_dt, html_dd]
-      end
     when :preamble, :oblock, :quote
       blocks.map{|block| block.render}.join
-    when :olist, :colist
+    when :colist
       @buffer.map do |li|
-        htmlify(li.content) + li.blocks.map{|block| block.render}.join
+        htmlify(li.text) + li.blocks.map{|block| block.render}.join
       end
-    when :ulist
-      @buffer.map do |element|
-        if element.is_a? Asciidoctor::ListItem
-          element.content = sub_attributes(element.content)
-        end
-        # TODO - not sure why tests work the same whether or not this is commented out.
-        # I think that I am likely not yet testing unordered list items with no block
-        # content. Still and all, it seems like this should be all done by list_item.render .
-        element.render # + element.blocks.map{|block| block.render}.join
-      end
+    # lists get iterated in template
+    # list items recurse into this block when their text and content methods are called
+    when :ulist, :olist, :dlist
+      @buffer
     when :listing
       @buffer.map{|l| CGI.escapeHTML(l).gsub(/(<\d+>)/,'<b>\1</b>')}.join
     when :literal
