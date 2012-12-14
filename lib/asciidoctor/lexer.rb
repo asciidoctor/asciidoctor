@@ -344,7 +344,7 @@ class Asciidoctor::Lexer
 
     Asciidoctor.debug "*"*40
     Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__}: Returning this:"
-    Asciidoctor.debug segment.inspect
+    #Asciidoctor.debug segment.inspect
     Asciidoctor.debug "*"*10
     Asciidoctor.debug "Leaving #{__method__}: Top of reader queue is:"
     Asciidoctor.debug reader.peek_line

@@ -132,8 +132,8 @@ class Asciidoctor::Block
   # * super/sub script
   def content
 
-    Asciidoctor.debug "For the record, buffer is:"
-    Asciidoctor.debug @buffer.inspect
+    #Asciidoctor.debug "For the record, buffer is:"
+    #Asciidoctor.debug @buffer.inspect
 
     case @context
     when :preamble, :oblock, :quote
@@ -197,7 +197,7 @@ class Asciidoctor::Block
       Asciidoctor.debug "#{__method__} -> Processed line: #{f}"
       f
     end
-    Asciidoctor.debug "#{__method__} -> result looks like #{result.inspect}"
+    #Asciidoctor.debug "#{__method__} -> result looks like #{result.inspect}"
     result.reject! {|l| l =~ /\{ZZZZZ\}/}
 
     if return_string
@@ -224,7 +224,7 @@ class Asciidoctor::Block
         end
       end
     end
-    Asciidoctor.debug "#{__method__} -> result looks like #{result.inspect}"
+    #Asciidoctor.debug "#{__method__} -> result looks like #{result.inspect}"
     result.reject! {|l| l =~ /\{ZZZZZ\}/}
 
     if return_string
