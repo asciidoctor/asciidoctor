@@ -187,6 +187,36 @@ class SectionSidebarTemplate < BaseTemplate
   end
 end
 
+class SectionQuoteTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='quoteblock'>
+        <% if !title.nil? %>
+          <div class='title'><%= title %></div>
+        <% end %>
+        <div class='content'>
+          <p><%= content %></p>
+        </div>
+      </div>
+    EOF
+  end
+end
+
+class SectionVerseTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='verseblock'>
+        <% if !title.nil? %>
+          <div class='title'><%= title %></div>
+        <% end %>
+        <pre class='content'>
+          <p><%= content %></p>
+        </pre>
+      </div>
+    EOF
+  end
+end
+
 class SectionUlistTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
