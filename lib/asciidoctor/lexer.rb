@@ -679,8 +679,8 @@ class Asciidoctor::Lexer
       blocks = section.blocks.take_while {|b| !b.is_a? Section}
       if !blocks.empty?
         # QUESTION Should we propagate the buffer?
-        #preamble = Block.new(section, :preamble, blocks.reduce {|a, b| a.buffer + b.buffer}) 
-        preamble = Block.new(section, :preamble) 
+        #preamble = Block.new(section, :preamble, blocks.reduce {|a, b| a.buffer + b.buffer})
+        preamble = Block.new(section, :preamble)
         blocks.each { preamble << section.delete_at(0) }
         section.insert(0, preamble)
       end
