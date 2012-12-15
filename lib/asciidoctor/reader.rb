@@ -174,6 +174,17 @@ class Asciidoctor::Reader
     nil
   end
 
+  # Skip the next line if it's a list continuation character
+  # 
+  # Returns nil
+  def skip_list_continuation
+    if !@lines.empty? && @lines.first.chomp == '+'
+      @lines.shift
+    end
+
+    nil
+  end
+
   # Public: Get the next line of source data. Consumes the line returned.
   #
   # Returns the String of the next line of the source data if data is present.

@@ -220,8 +220,15 @@ class Asciidoctor::Lexer
         # paragraph is contiguous nonblank/noncontinuation lines
         reader.unshift this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true) {|line|
-          (context == :dlist && line.match(REGEXP[:dlist])) || line.match(REGEXP[:listing]) || line.match(REGEXP[:oblock])
+          (context == :dlist && line.match(REGEXP[:dlist])) ||
+          ([:ulist, :olist, :dlist].include?(context) && line.chomp == '+') ||
+          line.match(REGEXP[:listing]) ||
+          line.match(REGEXP[:oblock])
         }
+
+        if [:ulist, :olist, :dlist].include? context
+          reader.skip_list_continuation
+        end
 
         if buffer.any? && admonition = buffer.first.match(/^NOTE:\s*/)
           buffer[0] = admonition.post_match
