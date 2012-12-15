@@ -162,31 +162,4 @@ class Asciidoctor::Document
     html_pieces.join
   end
 
-  # TODO test me!
-  def collect_attributes(attrs, attributes, posattrs = [])
-    # TODO walk be properly rather than using split
-    attrs.split(/\s*,\s*/).each_with_index do |entry, i|
-      key, val = entry.split(/\s*=\s*/) 
-      if !val.nil?
-        val.gsub!(/^(['"])(.*)\1$/, '\2') unless val.nil?
-        attributes[key] = val
-      else
-        attributes[i] = key
-        # positional attribute has a known key
-        if posattrs.size >= (i + 1)
-          attributes[posattrs[i]] = key
-        end 
-      end
-    end
-  end
-
-  def rekey_positional_attributes(attributes, posattrs)
-    posattrs.each_with_index do |key, i|
-      val = attributes[i]
-      if !val.nil?
-        attributes[key] = val
-      end
-    end
-  end
-
 end
