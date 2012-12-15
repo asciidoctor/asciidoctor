@@ -39,6 +39,19 @@ context "Paragraphs" do
     test "note inline syntax" do
       assert_xpath "//div[@class='admonitionblock']", render_string("NOTE: This is important, fool!")
     end
+
+    test "sidebar block" do
+      input = <<-EOS
+== Section
+
+.Sidebar
+****
+Content goes here
+****
+      EOS
+      result = render_string(input)
+      assert_xpath "//*[@class='sidebarblock']//p", result, 1
+    end
   end
 
   context "comments" do
