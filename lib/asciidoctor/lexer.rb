@@ -234,6 +234,12 @@ class Asciidoctor::Lexer
           (context == :dlist && line.match(REGEXP[:dlist])) || !line.match(REGEXP[:lit_par])
         }
 
+        # trim off the indentation that put us in this literal paragraph
+        if !buffer.empty? && match = buffer.first.match(/^([[:blank:]]+)/)
+          offset = match[1].length
+          buffer = buffer.map {|l| l.slice(offset..-1)}
+        end
+
         block = Block.new(parent, :literal, buffer)
 
       elsif this_line.match(REGEXP[:sidebar_blk])

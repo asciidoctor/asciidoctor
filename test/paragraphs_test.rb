@@ -18,8 +18,24 @@ context "Paragraphs" do
   end
 
   context "code" do
-    test "literal paragraph" do
+    test "single-line literal paragraphs" do
+      output = render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
       assert_xpath "//pre/tt", render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
+    end
+
+    test "multi-line literal paragraph" do
+      input = <<-EOS
+Install instructions:
+
+ yum install ruby rubygems
+ gem install asciidoctor
+
+You're good to go!
+      EOS
+      # TODO push this into the render_string helper, but need to update assertions to deal w/ endlines
+      output = Asciidoctor::Document.new(input.lines.entries).render
+      assert_xpath "//pre/tt", output, 1
+      assert_match /^gem install asciidoctor/, output, "Indendation should be trimmed from literal block"
     end
 
     test "listing paragraph" do
