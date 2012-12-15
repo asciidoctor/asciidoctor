@@ -164,9 +164,9 @@ class Asciidoctor::Block
     when :ulist, :olist, :dlist
       @buffer
     when :listing
-      @buffer.map{|l| CGI.escapeHTML(l).gsub(/(<\d+>)/,'<b>\1</b>')}.join
+      sub_special_chars(@buffer.join).gsub(/&lt;(\d+)&gt;/, '<b>\1</b>')
     when :literal
-      htmlify( @buffer.join.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' ))
+      sub_special_chars(@buffer.join)
     when :quote, :verse, :admonition
       if !@buffer.nil?
         htmlify(sub_attributes(@buffer).map{ |l| l.strip }.join( "\n" ))
