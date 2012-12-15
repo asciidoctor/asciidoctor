@@ -148,7 +148,7 @@ class Asciidoctor::Block
 
         [html_dt, html_dd]
       end
-    when :oblock, :quote
+    when :preamble, :oblock, :quote
       blocks.map{|block| block.render}.join
     when :olist, :colist
       @buffer.map do |li|
@@ -195,9 +195,9 @@ class Asciidoctor::Block
       f = sub_special_chars(line)
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
       f = f.gsub(/ (^|[^\\]) \{ (\w([\w\-_]+)?\w) \} /x) do
-        if self.document.defines.has_key?($2)
-          # Substitute from user defines first
-          $1 + self.document.defines[$2]
+        if self.document.attributes.has_key?($2)
+          # Substitute from user attributes first
+          $1 + self.document.attributes[$2]
         elsif Asciidoctor::INTRINSICS.has_key?($2)
           # Then do intrinsics
           $1 + Asciidoctor::INTRINSICS[$2]
@@ -250,6 +250,21 @@ class Asciidoctor::Block
     end
     result
   end
+
+  # Public: Append a sub-block to this section block
+  #
+  # block - The new sub-block.
+  #
+  #   block = Block.new(parent, :preamble)
+  #
+  #   block << Block.new(block, :paragraph, 'p1')
+  #   block << Block.new(block, :paragraph, 'p2')
+  #   block.blocks
+  #   => ["p1", "p2"]
+  def <<(block)
+    @blocks << block
+  end
+
 
   private
 

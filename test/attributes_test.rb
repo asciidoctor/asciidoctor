@@ -3,17 +3,17 @@ require 'test_helper'
 context "Attributes" do
   test "creates an attribute" do
     doc = document_from_string(":frog: Tanglefoot")
-    assert_equal doc.defines['frog'], 'Tanglefoot'
+    assert_equal doc.attributes['frog'], 'Tanglefoot'
   end
 
   test "deletes an attribute" do
     doc = document_from_string(":frog: Tanglefoot\n:frog!:")
-    assert_equal nil, doc.defines['frog']
+    assert_equal nil, doc.attributes['frog']
   end
 
   test "doesn't choke when deleting a non-existing attribute" do
     doc = document_from_string(":frog!:")
-    assert_equal nil, doc.defines['frog']
+    assert_equal nil, doc.attributes['frog']
   end
 
   test "render properly with simple names" do

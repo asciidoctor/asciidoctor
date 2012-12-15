@@ -673,6 +673,19 @@ class Asciidoctor::Lexer
       end
     end
 
+    # detect preamble and push it into a block
+    # QUESTION make this an operation on Section?
+    if section.level == 0
+      blocks = section.blocks.take_while {|b| !b.is_a? Section}
+      if !blocks.empty?
+        # QUESTION Should we propagate the buffer?
+        #preamble = Block.new(section, :preamble, blocks.reduce {|a, b| a.buffer + b.buffer}) 
+        preamble = Block.new(section, :preamble) 
+        blocks.each { preamble << section.delete_at(0) }
+        section.insert(0, preamble)
+      end
+    end
+
     section
   end
 

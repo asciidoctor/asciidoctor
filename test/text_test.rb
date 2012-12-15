@@ -16,7 +16,8 @@ context "Text" do
   end
 
   test "separator" do
-    assert_xpath "//hr", render_string("This is separated.\n\n'''\n\n...from this!"), 1
+    # for some reason, the html enclosure breaks the xpath //*[@id='content']//hr
+    assert_xpath "//*[@id='content']//hr", render_string("This is separated.\n\n'''\n\n...from this!"), 1
   end
 
   test "emphasized text" do
