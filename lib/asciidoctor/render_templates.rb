@@ -150,7 +150,7 @@ class SectionAdmonitionTemplate < BaseTemplate
           <tr>
             <td class='icon'>
               <% if attr? :caption %>
-              <div class='title'><%= attr :caption %>
+              <div class='title'><%= attr :caption %></div>
               <% end %>
             </td>
             <td class='content'>
@@ -199,7 +199,18 @@ class SectionQuoteTemplate < BaseTemplate
           <div class='title'><%= title %></div>
         <% end %>
         <div class='content'>
-          <p><%= content %></p>
+          <%= content %>
+        </div>
+        <div class='attribution'>
+          <% if attr? :citetitle %>
+            <em><%= attr :citetitle %></em>
+          <% end %>
+          <% if attr? :attribution %>
+            <% if attr? :citetitle %>
+            <br/>
+            <% end %>
+            <%= "&#8212; " + attr(:attribution) %>
+          <% end %>
         </div>
       </div>
     EOF
@@ -214,8 +225,19 @@ class SectionVerseTemplate < BaseTemplate
           <div class='title'><%= title %></div>
         <% end %>
         <pre class='content'>
-          <p><%= content %></p>
+          <%= content %>
         </pre>
+        <div class='attribution'>
+          <% if attr? :citetitle %>
+            <em><%= attr :citetitle %></em>
+          <% end %>
+          <% if attr? :attribution %>
+            <% if attr? :citetitle %>
+            <br/>
+            <% end %>
+            <%= "&#8212; " + attr(:attribution) %>
+          <% end %>
+        </div>
       </div>
     EOF
   end
