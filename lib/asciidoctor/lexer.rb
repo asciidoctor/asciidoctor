@@ -77,7 +77,7 @@ class Asciidoctor::Lexer
         reader.skip_blank
 
       elsif match = this_line.match(REGEXP[:attr_list_blk])
-        document_from_parent(parent).collect_attributes(match[1], attributes) 
+        document_from_parent(parent).collect_attributes(match[1], attributes)
         reader.skip_blank
 
       elsif is_section_heading?(this_line, next_line)
@@ -91,6 +91,13 @@ class Asciidoctor::Lexer
 
       elsif match = this_line.match(REGEXP[:title])
         title = match[1]
+        reader.skip_blank
+
+      elsif match = this_line.match(REGEXP[:image_blk])
+        document_from_parent(parent).collect_attributes(match[2], attributes, ['alt', 'width', 'height'])
+        block = Block.new(parent, :image)
+        # FIXME this seems kind of one-off here
+        attributes['target'] = block.sub_attributes(match[1])
         reader.skip_blank
 
       elsif this_line.match(REGEXP[:oblock])

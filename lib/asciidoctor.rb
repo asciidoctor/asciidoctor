@@ -106,6 +106,9 @@ module Asciidoctor
     # ====
     :example          => /^={4,}\s*$/,
 
+    # image::filename.png[Caption]
+    :image_blk        => /^image::(\S+?)\[(.*?)\]$/,
+
     # == Foo
     # ^ yields a level 2 title
     #
