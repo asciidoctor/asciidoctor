@@ -437,9 +437,9 @@ class Asciidoctor::Lexer
     Asciidoctor.debug "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
 
     # Restore first line of list item
-    # Prevent bullet list text starting with . from being treated as a paragraph
+    # Also prevent bullet list text starting with . from being treated as a paragraph
     # title or some other unseemly thing in list_item_segment. I think. (NOTE)
-    reader.unshift match[2].lstrip.sub(/^\./, '\.') + "\n"
+    reader.unshift match[2].lstrip.sub(/^\./, '\.')
 
     item_segment = Reader.new(list_item_segment(reader, :alt_ending => REGEXP[list_type]))
 #    item_segment = list_item_segment(reader)
