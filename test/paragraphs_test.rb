@@ -94,11 +94,21 @@ context "Paragraphs" do
 
   context "special" do
     test "note multiline syntax" do
-      assert_xpath "//div[@class='admonitionblock']", render_string("[NOTE]\nThis is a winner.")
+      Asciidoctor::ADMONITION_STYLES.each do |style|
+        assert_xpath "//div[@class='admonitionblock']", render_string("[#{style}]\nThis is a winner.")
+      end
+    end
+
+    test "note block syntax" do
+      Asciidoctor::ADMONITION_STYLES.each do |style|
+        assert_xpath "//div[@class='admonitionblock']", render_string("[#{style}]\n====\nThis is a winner.\n====")
+      end
     end
 
     test "note inline syntax" do
-      assert_xpath "//div[@class='admonitionblock']", render_string("NOTE: This is important, fool!")
+      Asciidoctor::ADMONITION_STYLES.each do |style|
+        assert_xpath "//div[@class='admonitionblock']", render_string("#{style}: This is important, fool!")
+      end
     end
   end
 
