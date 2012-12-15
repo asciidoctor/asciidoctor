@@ -94,6 +94,98 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
     end
   end
+
+  context "List continuations" do
+    test "Adjacent list continuation line attaches following paragraph" do
+      input = <<-EOS
+Lists
+=====
+
+* Item one, paragraph one
++
+Item one, paragraph two
++
+* Item two
+      EOS
+      output = render_string(input)
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 2
+      assert_xpath '//ul/li[1]/p', output, 1
+      assert_xpath '//ul/li[1]//p', output, 2
+      assert_xpath '//ul/li[1]//p[text() = "Item one, paragraph one"]', output, 1
+      assert_xpath '//ul/li[1]//p[text() = "Item one, paragraph two"]', output, 1
+    end
+
+    test "Adjacent list continuation line attaches following block" do
+      input = <<-EOS
+Lists
+=====
+
+* Item one, paragraph one
++
+....
+Item one, literal block
+....
++
+* Item two
+      EOS
+      output = render_string(input)
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 2
+      assert_xpath '//ul/li[1]/p', output, 1
+      assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@class = "literalblock"]', output, 1
+    end
+
+    test "Consecutive blocks in list continuation attach to list item" do
+      input = <<-EOS
+Lists
+=====
+
+* Item one, paragraph one
++
+....
+Item one, literal block
+....
++
+____
+Item one, quote block
+____
++
+* Item two
+      EOS
+      output = render_string(input)
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 2
+      assert_xpath '//ul/li[1]/p', output, 1
+      assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@class = "literalblock"]', output, 1
+      assert_xpath '(//ul/li[1]/p/following-sibling::*)[2][@class = "quoteblock"]', output, 1
+    end
+
+    # NOTE this differs from AsciiDoc behavior, but is more logical
+    test "Consecutive list continuation lines are folded" do
+      input = <<-EOS
+Lists
+=====
+
+* Item one, paragraph one
++
++
+Item one, paragraph two
++
++
+* Item two
++
++
+      EOS
+      output = render_string(input)
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 2
+      assert_xpath '//ul/li[1]/p', output, 1
+      assert_xpath '//ul/li[1]//p', output, 2
+      assert_xpath '//ul/li[1]//p[text() = "Item one, paragraph one"]', output, 1
+      assert_xpath '//ul/li[1]//p[text() = "Item one, paragraph two"]', output, 1
+    end
+  end
 end
 
 context "Ordered lists (:olist)" do

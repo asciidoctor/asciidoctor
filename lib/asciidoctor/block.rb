@@ -316,7 +316,7 @@ class Asciidoctor::Block
       html.gsub!(/\\([\{\}\-])/, '\1')
       html.gsub!(/linkgit:([^\]]+)\[(\d+)\]/, '<a href="\1.html">\1(\2)</a>')
       html.gsub!(/link:([^\[]+)(\[+[^\]]*\]+)/ ) { "<a href=\"#{$1}\">#{$2.gsub( /(^\[|\]$)/,'' )}</a>" }
-      html.gsub!(Asciidoctor::REGEXP[:line_break], '\1<br/>')
+      html.sub!(Asciidoctor::REGEXP[:line_break], '\1<br/>')
       html
     end
   end

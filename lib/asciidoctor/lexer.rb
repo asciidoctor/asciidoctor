@@ -28,6 +28,7 @@ class Asciidoctor::Lexer
     reader.skip_blank
 
     return nil unless reader.has_lines?
+    context = parent.is_a?(Block) ? parent.context : nil
 
     # NOTE: An anchor looks like this:
     #   [[foo]]
@@ -45,6 +46,11 @@ class Asciidoctor::Lexer
       anchor = nil
     end
 
+    # skip a list continuation character if we're processing a list
+    if LIST_CONTEXTS.include?(context)
+      reader.skip_list_continuation
+    end
+
     Asciidoctor.debug "/"*64
     Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
     Asciidoctor.debug reader.peek_line
@@ -58,7 +64,6 @@ class Asciidoctor::Lexer
     caption = nil
     source_type = nil
     buffer = []
-    context = parent.is_a?(Block) ? parent.context : nil
     while reader.has_lines? && block.nil?
       buffer.clear
       this_line = reader.get_line
@@ -221,12 +226,12 @@ class Asciidoctor::Lexer
         reader.unshift this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true) {|line|
           (context == :dlist && line.match(REGEXP[:dlist])) ||
-          ([:ulist, :olist, :dlist].include?(context) && line.chomp == '+') ||
+          ([:ulist, :olist, :dlist].include?(context) && line.chomp == LIST_CONTINUATION) ||
           line.match(REGEXP[:listing]) ||
           line.match(REGEXP[:oblock])
         }
 
-        if [:ulist, :olist, :dlist].include? context
+        if LIST_CONTEXTS.include?(context)
           reader.skip_list_continuation
         end
 
