@@ -6,6 +6,9 @@ class Asciidoctor::Reader
   # Public: Get the String document source.
   attr_reader :source
 
+  # Public: Get the String Array of lines parsed from the source
+  attr_reader :lines
+
   # Public: Get the Hash of attributes
   attr_reader :attributes
 
@@ -41,9 +44,9 @@ class Asciidoctor::Reader
   #
   #   data   = File.readlines(filename)
   #   reader = Asciidoctor::Reader.new(data)
-  def initialize(data = [], &block)
+  def initialize(data = [], attributes = {}, &block)
     raw_source = []
-    @attributes = {}
+    @attributes = attributes
     @references = {}
 
     data = data.split("\n") if data.is_a? String

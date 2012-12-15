@@ -31,10 +31,13 @@ class Asciidoctor::Document
     @options = options
     @options[:header_footer] = @options.fetch(:header_footer, true)
 
-    @reader = Reader.new(data, &block)
+    @attributes = {}
+    @attributes['sectids'] = nil
+
+    @reader = Reader.new(data, @attributes, &block)
 
     # pseudo-delegation :)
-    @attributes = @reader.attributes
+    #@attributes = @reader.attributes
     @references = @reader.references
 
     # dynamic intrinstic attribute values
@@ -42,6 +45,7 @@ class Asciidoctor::Document
     now = Time.new
     @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
     @attributes['localtime'] ||= now.strftime('%H:%m:%S %Z')
+    @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']].join(' ')
     @attributes['asciidoctor-version'] = VERSION
 
     # Now parse @lines into elements
@@ -69,6 +73,16 @@ class Asciidoctor::Document
   # Make the raw source for the Document available.
   def source
     @reader.source if @reader
+  end
+
+  def attr(name, default = nil)
+    default.nil? ? @attributes[name.to_s] : @attributes.fetch(name.to_s, default)
+    #default.nil? ? @attributes[name.to_s.tr('_', '-')] : @attributes.fetch(name.to_s.tr('_', '-'), default)
+  end
+
+  def attr?(name)
+    @attributes.has_key? name.to_s
+    #@attributes.has_key? name.to_s.tr('_', '-')
   end
 
   def level
@@ -146,6 +160,33 @@ class Asciidoctor::Document
       html_pieces << element.render
     end
     html_pieces.join
+  end
+
+  # TODO test me!
+  def collect_attributes(attrs, attributes, posattrs = [])
+    # TODO walk be properly rather than using split
+    attrs.split(/\s*,\s*/).each_with_index do |entry, i|
+      key, val = entry.split(/\s*=\s*/) 
+      if !val.nil?
+        val.gsub!(/^(['"])(.*)\1$/, '\2') unless val.nil?
+        attributes[key] = val
+      else
+        attributes[i] = key
+        # positional attribute has a known key
+        if posattrs.size >= (i + 1)
+          attributes[posattrs[i]] = key
+        end 
+      end
+    end
+  end
+
+  def rekey_positional_attributes(attributes, posattrs)
+    posattrs.each_with_index do |key, i|
+      val = attributes[i]
+      if !val.nil?
+        attributes[key] = val
+      end
+    end
   end
 
 end
