@@ -97,7 +97,9 @@ class Asciidoctor::Lexer
         collect_attributes(match[2], attributes, ['alt', 'width', 'height'])
         block = Block.new(parent, :image)
         # FIXME this seems kind of one-off here
-        attributes['target'] = block.sub_attributes(match[1])
+        target = block.sub_attributes(match[1])
+        attributes['target'] = target
+        attributes['alt'] ||= File.basename(target, File.extname(target))
         reader.skip_blank
 
       elsif this_line.match(REGEXP[:oblock])
