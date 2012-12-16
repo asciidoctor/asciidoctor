@@ -1,4 +1,4 @@
-# Public: Methods for managing items for Asciidoctor olists, ulist, and dlists.
+# Public: Methods for managing items for AsciiDoc olists, ulist, and dlists.
 class Asciidoctor::ListItem
   # Public: Get the Array of Blocks from the list item's continuation.
   attr_reader :blocks
