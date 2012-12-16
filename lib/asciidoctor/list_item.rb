@@ -1,10 +1,7 @@
-# Public: Methods for managing items for Asciidoc olists, ulist, and dlists.
+# Public: Methods for managing items for Asciidoctor olists, ulist, and dlists.
 class Asciidoctor::ListItem
   # Public: Get the Array of Blocks from the list item's continuation.
   attr_reader :blocks
-
-  # Public: Get/Set the String content.
-  attr_accessor :content
 
   # Public: Get/Set the String list item anchor name.
   attr_accessor :anchor
@@ -14,22 +11,58 @@ class Asciidoctor::ListItem
 
   # Public: Initialize an Asciidoctor::ListItem object.
   #
-  # content - the String content (default '')
-  def initialize(content='')
-    @content = content
-    @blocks  = []
+  # parent - The parent list block for this list item
+  # text - the String text (default '')
+  def initialize(parent, text='')
+    @parent = parent
+    @text = text
+    @blocks = []
   end
 
-  def render
-    output = "<li><p>#{content} (HTMLIFY)</p>"
-    output += blocks.map{|block| block.render}.join
-    output += "</li>"
+  def text=(new_text)
+    @text = new_text
+  end
+
+  def text
+    # this will allow the text to be processed
+    ::Asciidoctor::Block.new(self, nil, [@text]).content
+  end
+
+  def document
+    @parent.document
+  end
+
+  def content
+    # create method for !blocks.empty?
+    if !blocks.empty?
+      blocks.map{|block| block.render}.join
+    else
+      nil
+    end
+  end
+
+  # Public: Fold the first paragraph block into the text
+  def fold_first
+    # looking for :literal here allows indentation of paragraph content, then strip indent
+    if !blocks.empty? && blocks.first.is_a?(Asciidoctor::Block) &&
+        (blocks.first.context == :paragraph || blocks.first.context == :literal)
+      block = blocks.shift
+      if !@text.nil? && !@text.empty?
+        block.buffer.unshift(@text)
+      end
+
+      if block.context == :literal
+        @text = block.buffer.map {|l| l.lstrip}.join("\n")
+      else
+        @text = block.buffer.join("\n")
+      end
+    end
   end
 
   def splain(parent_level = 0)
     parent_level += 1
-    Asciidoctor.puts_indented(parent_level, "List Item anchor: #{anchor}") unless self.anchor.nil?
-    Asciidoctor.puts_indented(parent_level, "Content: #{content}") unless self.content.nil?
+    Asciidoctor.puts_indented(parent_level, "List Item anchor: #{@anchor}") unless @anchor.nil?
+    Asciidoctor.puts_indented(parent_level, "Text: #{@text}") unless @text.nil?
 
     Asciidoctor.puts_indented(parent_level, "Blocks: #{@blocks.count}")
 

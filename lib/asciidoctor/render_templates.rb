@@ -95,9 +95,19 @@ class SectionDlistTemplate < BaseTemplate
       <div class='dlist'>
         <dl>
           <% content.each do |dt, dd| %>
-            <dt class='hdlist1'><%= dt %></dt>
-            <% unless dd.nil? || dd.empty? %>
-              <dd><%= dd %></dd>
+            <dt class='hdlist1'>
+              <% if !dt.anchor.nil? and !dt.anchor.empty? %>
+              <a id='<%= dt.anchor %>'></a>
+              <% end %>
+              <%= dt.text %>
+            </dt>
+            <% unless dd.nil? %>
+              <dd>
+                <p><%= dd.text %></p>
+                <% if !dd.blocks.empty? %>
+                <%= dd.content %> 
+                <% end %>
+              </dd>
             <% end %>
           <% end %>
         </dl>
@@ -180,15 +190,69 @@ class SectionSidebarTemplate < BaseTemplate
   end
 end
 
+class SectionQuoteTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='quoteblock'>
+        <% if !title.nil? %>
+          <div class='title'><%= title %></div>
+        <% end %>
+        <div class='content'>
+          <p><%= content %></p>
+        </div>
+      </div>
+    EOF
+  end
+end
+
+class SectionVerseTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='verseblock'>
+        <% if !title.nil? %>
+          <div class='title'><%= title %></div>
+        <% end %>
+        <pre class='content'>
+          <p><%= content %></p>
+        </pre>
+      </div>
+    EOF
+  end
+end
+
 class SectionUlistTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='ulist'>
         <ul>
         <% content.each do |li| %>
-          <%= li %>
+          <li>
+            <p><%= li.text %></p>
+            <% if !li.blocks.empty? %>
+            <%= li.content %>
+            <% end %>
+          </li>
         <% end %>
         </ul>
+      </div>
+    EOF
+  end
+end
+
+class SectionOlistTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='olist arabic'>
+        <ol class='arabic'>
+        <% content.each do |li| %>
+          <li>
+            <p><%= li.text %></p>
+            <% if !li.blocks.empty? %>
+            <%= li.content %>
+            <% end %>
+          </li>
+        <% end %>
+        </ol>
       </div>
     EOF
   end

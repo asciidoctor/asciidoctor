@@ -139,7 +139,7 @@ class Asciidoctor::Reader
       end
     end
 
-    Asciidoctor.debug "About to leave Reader#init, and references is #{@references.inspect}"
+    #Asciidoctor.debug "About to leave Reader#init, and references is #{@references.inspect}"
     @source = @lines.join
     Asciidoctor.debug "Leaving Reader#init, and I have #{@lines.count} lines"
     Asciidoctor.debug "Also, has_lines? is #{self.has_lines?}"
@@ -168,6 +168,17 @@ class Asciidoctor::Reader
   #   => ["Foo\n", "Bar\n"]
   def skip_blank
     while @lines.any? && @lines.first.strip.empty?
+      @lines.shift
+    end
+
+    nil
+  end
+
+  # Skip the next line if it's a list continuation character
+  # 
+  # Returns nil
+  def skip_list_continuation
+    if !@lines.empty? && @lines.first.chomp == '+'
       @lines.shift
     end
 
