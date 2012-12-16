@@ -3,4 +3,6 @@ before_install:
   - gem install mocha
   - gem install htmlentities
   - gem install pending
+  - gem install nokogiri
+  - gem install json
 
