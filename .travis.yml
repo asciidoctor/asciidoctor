@@ -1,0 +1,2 @@
+before_install:
+  - gem install tilt
