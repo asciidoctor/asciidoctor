@@ -12,6 +12,9 @@ class Asciidoctor::Block
   # Public: Create alias for context to be consistent w/ AsciiDoc
   alias :blockname :context
 
+  # Public: Get the Hash of attributes for this block
+  attr_reader :attributes
+
   # Public: Get the Array of sub-blocks for this section block.
   attr_reader :blocks
 
@@ -20,6 +23,7 @@ class Asciidoctor::Block
 
   # Public: Get/Set the String section anchor name.
   attr_accessor :anchor
+  alias :id :anchor
 
   # Public: Get/Set the Integer block level (for nested elements, like
   # list elements).
@@ -44,7 +48,7 @@ class Asciidoctor::Block
     @parent = parent
     @context = context
     @buffer = buffer
-
+    @attributes = {}
     @blocks = []
   end
 
@@ -52,6 +56,19 @@ class Asciidoctor::Block
   def document
     return @document if @document
     @document = (@parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document)
+  end
+
+  def attr(name, default = nil)
+    default.nil? ? @attributes.fetch(name.to_s, self.document.attr(name)) :
+        @attributes.fetch(name.to_s, self.document.attr(name, default))
+  end
+
+  def attr?(name)
+    @attributes.has_key?(name.to_s) || self.document.attr?(name)
+  end
+
+  def update_attributes(attributes)
+    @attributes.update(attributes)
   end
 
   # Public: Get the Asciidoctor::Renderer instance being used for the ancestor
@@ -136,7 +153,7 @@ class Asciidoctor::Block
     #Asciidoctor.debug @buffer.inspect
 
     case @context
-    when :preamble, :oblock, :quote, :sidebar
+    when :preamble, :oblock, :quote, :example, :sidebar
       blocks.map{|block| block.render}.join
     when :colist
       @buffer.map do |li|
@@ -147,11 +164,15 @@ class Asciidoctor::Block
     when :ulist, :olist, :dlist
       @buffer
     when :listing
-      @buffer.map{|l| CGI.escapeHTML(l).gsub(/(<\d+>)/,'<b>\1</b>')}.join
+      sub_special_chars(@buffer.join).gsub(/&lt;(\d+)&gt;/, '<b>\1</b>')
     when :literal
-      htmlify( @buffer.join.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' ))
-    when :verse
-      htmlify( sub_attributes(@buffer).map{ |l| l.strip }.join( "\n" ) )
+      sub_special_chars(@buffer.join)
+    when :quote, :verse, :admonition
+      if !@buffer.nil?
+        htmlify(sub_attributes(@buffer).map{ |l| l.strip }.join( "\n" ))
+      else
+        blocks.map{|block| block.render}.join
+      end
     else
       lines = sub_attributes(@buffer).map do |line|
         line.strip
@@ -246,7 +267,6 @@ class Asciidoctor::Block
   def <<(block)
     @blocks << block
   end
-
 
   private
 

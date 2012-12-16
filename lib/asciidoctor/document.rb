@@ -31,10 +31,13 @@ class Asciidoctor::Document
     @options = options
     @options[:header_footer] = @options.fetch(:header_footer, true)
 
-    @reader = Reader.new(data, &block)
+    @attributes = {}
+    @attributes['sectids'] = nil
+
+    @reader = Reader.new(data, @attributes, &block)
 
     # pseudo-delegation :)
-    @attributes = @reader.attributes
+    #@attributes = @reader.attributes
     @references = @reader.references
 
     # dynamic intrinstic attribute values
@@ -42,6 +45,7 @@ class Asciidoctor::Document
     now = Time.new
     @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
     @attributes['localtime'] ||= now.strftime('%H:%m:%S %Z')
+    @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']].join(' ')
     @attributes['asciidoctor-version'] = VERSION
 
     # Now parse @lines into elements
@@ -69,6 +73,16 @@ class Asciidoctor::Document
   # Make the raw source for the Document available.
   def source
     @reader.source if @reader
+  end
+
+  def attr(name, default = nil)
+    default.nil? ? @attributes[name.to_s] : @attributes.fetch(name.to_s, default)
+    #default.nil? ? @attributes[name.to_s.tr('_', '-')] : @attributes.fetch(name.to_s.tr('_', '-'), default)
+  end
+
+  def attr?(name)
+    @attributes.has_key? name.to_s
+    #@attributes.has_key? name.to_s.tr('_', '-')
   end
 
   def level
