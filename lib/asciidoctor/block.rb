@@ -301,7 +301,7 @@ class Asciidoctor::Block
       end
 
       html.gsub!(Asciidoctor::REGEXP[:biblio], '<a name="\1">[\1]</a>')
-      html.gsub!(Asciidoctor::REGEXP[:ruler], '<hr>\n')
+      html.gsub!(Asciidoctor::REGEXP[:ruler], "<hr>\n")
       html.gsub!(/``([^`']*)''/m, '&ldquo;\1&rdquo;')
       html.gsub!(/(?:\s|^)`([^`']*)'/m, '&lsquo;\1&rsquo;')
 
