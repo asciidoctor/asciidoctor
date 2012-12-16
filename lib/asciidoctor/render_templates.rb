@@ -242,9 +242,7 @@ class SectionVerseTemplate < BaseTemplate
         <% if !title.nil? %>
           <div class='title'><%= title %></div>
         <% end %>
-        <pre class='content'>
-          <%= content %>
-        </pre>
+        <pre class='content'><%= content %></pre>
         <div class='attribution'>
           <% if attr? :citetitle %>
             <em><%= attr :citetitle %></em>

@@ -212,6 +212,7 @@ class Asciidoctor::Lexer
       elsif this_line.match(REGEXP[:listing])
         rekey_positional_attributes(attributes, ['style', 'language', 'linenums'])
         buffer = reader.grab_lines_until {|line| line.match( REGEXP[:listing] )}
+        buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :listing, buffer)
 
       elsif this_line.match(REGEXP[:quote])
@@ -236,6 +237,7 @@ class Asciidoctor::Lexer
       elsif this_line.match(REGEXP[:lit_blk])
         # example is surrounded by '....' (4 or more '.' chars) lines
         buffer = reader.grab_lines_until {|line| line.match( REGEXP[:lit_blk] ) }
+        buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :literal, buffer)
 
       elsif this_line.match(REGEXP[:lit_par])
@@ -252,6 +254,7 @@ class Asciidoctor::Lexer
         if !buffer.empty? && match = buffer.first.match(/^([[:blank:]]+)/)
           offset = match[1].length
           buffer = buffer.map {|l| l.slice(offset..-1)}
+          buffer.last.chomp!
         end
 
         block = Block.new(parent, :literal, buffer)
@@ -262,6 +265,7 @@ class Asciidoctor::Lexer
         rekey_positional_attributes(attributes, ['style', 'language', 'linenums'])
         reader.unshift(this_line)
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
+        buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :listing, buffer)
 
       elsif admonition_style = ADMONITION_STYLES.detect{|s| attributes[0] == s}
@@ -300,6 +304,7 @@ class Asciidoctor::Lexer
           attributes['name'] = admonition[1].downcase
           attributes['caption'] ||= admonition[1].capitalize
         else
+          buffer.last.chomp! unless buffer.empty?
           Asciidoctor.debug "Proud parent #{parent} getting a new paragraph with buffer: #{buffer}"
           block = Block.new(parent, :paragraph, buffer)
         end
