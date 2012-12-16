@@ -72,6 +72,7 @@ You're good to go!
       output = render_string("[quote]\nFamous quote.")
       assert_xpath '//*[@class = "quoteblock"]', output, 1
       assert_xpath '//*[@class = "quoteblock"]//p', output, 0
+      assert_xpath '//*[@class = "quoteblock"]//*[contains(text(), "Famous quote.")]', output, 1
     end
 
     test "verse paragraph" do
