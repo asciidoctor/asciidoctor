@@ -126,6 +126,19 @@ You're good to go!
         assert_xpath "//div[@class='admonitionblock']", render_string("#{style}: This is important, fool!")
       end
     end
+
+    test "sidebar block" do
+      input = <<-EOS
+== Section
+
+.Sidebar
+****
+Content goes here
+****
+      EOS
+      result = render_string(input)
+      assert_xpath "//*[@class='sidebarblock']//p", result, 1
+    end
   end
 
   context "comments" do

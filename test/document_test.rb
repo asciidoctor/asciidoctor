@@ -10,7 +10,7 @@ class DocumentTest < Test::Unit::TestCase
     assert_equal "AsciiDoc Home Page", @doc.doctitle
     assert_equal 14, @doc.elements.size
     assert_equal :preamble, @doc.elements[0].context
-    assert_true @doc.elements[1].is_a? ::Asciidoctor::Section
+    assert @doc.elements[1].is_a? ::Asciidoctor::Section
   end
 
   def test_with_no_title
