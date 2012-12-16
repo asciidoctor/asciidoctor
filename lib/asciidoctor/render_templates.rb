@@ -28,10 +28,10 @@ class DocumentTemplate < BaseTemplate
       <html lang='en'>
         <head>
           <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-          <meta name='generator' content='Asciidoctor <%= attributes["asciidoctor-version"] %>'>
+          <meta name='generator' content='Asciidoctor <%= attr "asciidoctor-version" %>'>
           <title><%= title ? title : (doctitle ? doctitle : '') %></title>
         </head>
-        <body class='<%= attributes["doctype"] %>'>
+        <body class='<%= attr :doctype %>'>
           <div id='header'>
             <% if doctitle %>
               <h1><%= doctitle %></h1>
@@ -42,7 +42,7 @@ class DocumentTemplate < BaseTemplate
           </div>
           <div id='footer'>
             <div id='footer-text'>
-              Last updated <%= [attributes['localdate'], attributes['localtime']].join(' ') %>
+              Last updated <%= attr :localdatetime %>
             </div>
           </div>
         </body>
@@ -142,13 +142,17 @@ class SectionLiteralTemplate < BaseTemplate
   end
 end
 
-class SectionNoteTemplate < BaseTemplate
+class SectionAdmonitionTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='admonitionblock'>
         <table>
           <tr>
-            <td class='icon'></td>
+            <td class='icon'>
+              <% if attr? :caption %>
+              <div class='title'><%= attr :caption %></div>
+              <% end %>
+            </td>
             <td class='content'>
               <% if !title.nil? %>
                 <div class='title'><%= title %></div>
@@ -190,6 +194,21 @@ class SectionSidebarTemplate < BaseTemplate
   end
 end
 
+class SectionExampleTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='exampleblock'>
+        <div class='content'>
+          <% if !title.nil? %>
+            <div class='title'><%= title %></div>
+          <% end %>
+          <%= content %>
+        </div>
+      </div>
+    EOF
+  end
+end
+
 class SectionQuoteTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
@@ -198,7 +217,18 @@ class SectionQuoteTemplate < BaseTemplate
           <div class='title'><%= title %></div>
         <% end %>
         <div class='content'>
-          <p><%= content %></p>
+          <%= content %>
+        </div>
+        <div class='attribution'>
+          <% if attr? :citetitle %>
+            <em><%= attr :citetitle %></em>
+          <% end %>
+          <% if attr? :attribution %>
+            <% if attr? :citetitle %>
+            <br/>
+            <% end %>
+            <%= "&#8212; " + attr(:attribution) %>
+          <% end %>
         </div>
       </div>
     EOF
@@ -213,8 +243,19 @@ class SectionVerseTemplate < BaseTemplate
           <div class='title'><%= title %></div>
         <% end %>
         <pre class='content'>
-          <p><%= content %></p>
+          <%= content %>
         </pre>
+        <div class='attribution'>
+          <% if attr? :citetitle %>
+            <em><%= attr :citetitle %></em>
+          <% end %>
+          <% if attr? :attribution %>
+            <% if attr? :citetitle %>
+            <br/>
+            <% end %>
+            <%= "&#8212; " + attr(:attribution) %>
+          <% end %>
+        </div>
       </div>
     EOF
   end
@@ -253,6 +294,25 @@ class SectionOlistTemplate < BaseTemplate
           </li>
         <% end %>
         </ol>
+      </div>
+    EOF
+  end
+end
+
+class SectionImageTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='imageblock'>
+        <div class='content'>
+          <% if attr :link %>
+          <a class='image' href='<%= attr :link%>'><img src='<%= attr :target %>' alt='<%= attr :alt %>'/></a>
+          <% else %>
+          <img src='<%= attr :target %>' alt='<%= attr :alt %>'/>
+          <% end %>
+        </div>
+        <% if title %>
+        <div class='title'><%= title %></div>
+        <% end %>
       </div>
     EOF
   end

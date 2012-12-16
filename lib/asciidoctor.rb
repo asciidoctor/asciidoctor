@@ -69,11 +69,16 @@ module Asciidoctor
     #     though repeating regexps ftl.
     :attr_continue    => /^(.*)[[:blank:]]\+[[:blank:]]*$/,
 
+    # An attribute list above a block element
+    #
+    # Can be strictly positional:
+    # [quote, Adam Smith, Wealth of Nations]
+    # Or can have name/value pairs
+    # [NOTE, caption="Good to know"]
+    :attr_list_blk    => /^\[(\w.*)\]$/,
+
     # [[[Foo]]]  (does not suffer quite the same malady as :anchor, but almost. Allows [ but not ] in internal capture
     :biblio           => /\[\[\[([^\]]+)\]\]\]/,
-
-    # [caption="Foo"]
-    :caption          => /^\[caption=\"([^\"]+)\"\]/,
 
     # <1> Foo
     :colist           => /^(\<\d+\>)\s*(.*)/,
@@ -90,11 +95,9 @@ module Asciidoctor
     # Should be followed by a definition line, e.g.,
     # foo::
     #    That which precedes 'bar' (see also, bar)
-    #:dlist            => /^(\s*)(\S.*)(::|;;)\s*$/,
-    #:dlist            => /^\s*(\w.*?)(::(?::(?::)?)?|;;)(\s+(.*))?$/,
     :dlist            => /^\s*(?:\[\[([^\]]*)\]\])?(\w.*?)(:{2,4}|;;)(\s+(.*))?$/,
     :dlist_siblings   => {
-                           # (?:.*?[^:])? a non-capturing group which grabs longest sequence of characters that doesn't end with colon
+                           # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
                            '::' => /^\s*(?:\[\[([^\]]*)\]\])?(\w(?:.*[^:])?)(::)(\s+(.*))?$/,
                            ':::' => /^\s*(?:\[\[([^\]]*)\]\])?(\w(?:.*[^:])?)(:::)(\s+(.*))?$/,
                            '::::' => /^\s*(?:\[\[([^\]]*)\]\])?(\w(?:.*[^:])?)(::::)(\s+(.*))?$/,
@@ -102,6 +105,9 @@ module Asciidoctor
                          },
     # ====
     :example          => /^={4,}\s*$/,
+
+    # image::filename.png[Caption]
+    :image_blk        => /^image::(\S+?)\[(.*?)\]$/,
 
     # == Foo
     # ^ yields a level 2 title
@@ -133,10 +139,6 @@ module Asciidoctor
     # ----
     :listing          => /^\-{4,}\s*$/,
 
-    # [source, ruby]
-    # Treats the next paragraph as a :listing block
-    :listing_source   => /^\[source,\s*([^\]]+)\]\s*$/,
-
     # ....
     :lit_blk          => /^\.{4,}\s*$/,
 
@@ -145,9 +147,6 @@ module Asciidoctor
 
     # "Wooble"  ||  Wooble
     :name             => /^(["A-Za-z].*)\s*$/,  # I believe this fails to require " chars to be paired (TODO)
-
-    # [NOTE]
-    :note             => /^\[NOTE\]\s*$/,
 
     # --
     :oblock           => /^\-\-\s*$/,
@@ -172,11 +171,10 @@ module Asciidoctor
     :title            => /^\.([^\s\.].*)\s*$/,
 
     # * Foo  ||  - Foo
-    :ulist            => /^ \s* (- | \*{1,5}) \s+ (.*) $/x,
-
-    # [verse]
-    :verse            => /^\[verse\]\s*$/
+    :ulist            => /^ \s* (- | \*{1,5}) \s+ (.*) $/x
   }
+
+  ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
 
   INTRINSICS = Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(
     'startsb'    => '[',

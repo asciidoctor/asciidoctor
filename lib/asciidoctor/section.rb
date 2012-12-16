@@ -29,6 +29,10 @@ class Asciidoctor::Section
 
   # Public: Get/Set the String section anchor name.
   attr_accessor :anchor
+  alias :id :anchor
+
+  # Public: Get the Hash of attributes for this block
+  attr_accessor :attributes
 
   # Public: Get the Array of section blocks.
   attr_reader :blocks
@@ -38,6 +42,7 @@ class Asciidoctor::Section
   # parent - The parent Asciidoc Object.
   def initialize(parent)
     @parent = parent
+    @attributes = {}
     @blocks = []
   end
 
@@ -58,6 +63,8 @@ class Asciidoctor::Section
 
   # Public: Get the String section id prefixed with value of idprefix attribute, otherwise an underscore
   #
+  # Section ID synthesis can be disabled by undefining the sectids attribute.
+  #
   # Examples
   #
   #   section = Section.new(parent)
@@ -65,12 +72,29 @@ class Asciidoctor::Section
   #   section.section_id
   #   => "_foo"
   def section_id
-    self.document.attributes.fetch('idprefix', '_') + "#{name && name.downcase.gsub(/\W+/,'_').gsub(/_+$/, '')}".tr_s('_', '_')
+    if self.document.attributes.has_key? 'sectids'
+      self.document.attributes.fetch('idprefix', '_') + "#{name && name.downcase.gsub(/\W+/,'_').gsub(/_+$/, '')}".tr_s('_', '_')
+    else
+      nil
+    end
   end
 
   # Public: Get the Asciidoctor::Document instance to which this Block belongs
   def document
     @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
+  end
+
+  def attr(name, default = nil)
+    default.nil? ? @attributes.fetch(name.to_s, self.document.attr(name)) :
+        @attributes.fetch(name.to_s, self.document.attr(name, default))
+  end
+
+  def attr?(name)
+    @attributes.has_key?(name.to_s) || self.document.attr?(name)
+  end
+
+  def update_attributes(attributes)
+    @attributes.update(attributes)
   end
 
   # Public: Get the Asciidoctor::Renderer instance being used for the ancestor

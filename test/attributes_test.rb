@@ -78,6 +78,35 @@ context "Attributes" do
     pending "whut?"
   end
 
+  context "Block attributes" do
+    test "Position attributes assigned to block" do
+      input = <<-EOS
+[quote, Name, Source]
+____
+A famous quote.
+____
+      EOS
+      doc = document_from_string(input)
+      qb = doc.elements.first
+      assert_equal 'quote', qb.attributes['style']
+      assert_equal 'quote', qb.attr(:style)
+      assert_equal 'Name', qb.attributes['attribution']
+      assert_equal 'Source', qb.attributes['citetitle']
+    end
+
+    test "Block attributes are additive" do
+      input = <<-EOS
+[id='foo']
+[role='lead']
+A paragraph.
+      EOS
+      doc = document_from_string(input)
+      para = doc.elements.first
+      assert_equal 'foo', para.id
+      assert_equal 'lead', para.attributes['role']
+    end
+  end
+
   context "intrinsics" do
 
     test "substitute intrinsics" do

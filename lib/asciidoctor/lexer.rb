@@ -62,8 +62,9 @@ class Asciidoctor::Lexer
     block = nil
     title = nil
     caption = nil
-    source_type = nil
     buffer = []
+    attributes = {}
+    context = parent.is_a?(Block) ? parent.context : nil
     while reader.has_lines? && block.nil?
       buffer.clear
       this_line = reader.get_line
@@ -71,35 +72,35 @@ class Asciidoctor::Lexer
 
       if this_line.match(REGEXP[:comment_blk])
         Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) })
-        next
 
       elsif this_line.match(REGEXP[:comment])
         reader.skip_blank
-        next
+
+      elsif match = this_line.match(REGEXP[:attr_list_blk])
+        collect_attributes(match[1], attributes)
+        reader.skip_blank
+
+      elsif is_section_heading?(this_line, next_line)
+        # If we've come to a new section, then we've found the end of this
+        # current block.  Likewise if we'd found an unassigned anchor, push
+        #
+        # FIXME when slurping up next section, give back trailing anchor to following section
+        reader.unshift(this_line)
+        Asciidoctor.debug "#{__method__}: SENDING to next_section with lines[0] = #{reader.peek_line}"
+        block = next_section(reader, parent)
 
       elsif match = this_line.match(REGEXP[:title])
         title = match[1]
         reader.skip_blank
 
-      elsif match = this_line.match(REGEXP[:listing_source])
-        source_type = match[1]
+      elsif match = this_line.match(REGEXP[:image_blk])
+        collect_attributes(match[2], attributes, ['alt', 'width', 'height'])
+        block = Block.new(parent, :image)
+        # FIXME this seems kind of one-off here
+        target = block.sub_attributes(match[1])
+        attributes['target'] = target
+        attributes['alt'] ||= File.basename(target, File.extname(target))
         reader.skip_blank
-
-      elsif match = this_line.match(REGEXP[:caption])
-        caption = match[1]
-
-      elsif is_section_heading?(this_line, next_line)
-        # If we've come to a new section, then we've found the end of this
-        # current block.  Likewise if we'd found an unassigned anchor, push
-        # it back as well, so it can go with this next heading.
-        # NOTE - I don't think this will assign the anchor properly. Anchors
-        # only match with double brackets - [[foo]], but what's stored in
-        # `anchor` at this point is only the `foo` part that was stripped out
-        # after matching.  TODO: Need a way to test this.
-        reader.unshift(this_line)
-        reader.unshift(anchor) unless anchor.nil?
-        Asciidoctor.debug "#{__method__}: SENDING to next_section with lines[0] = #{reader.peek_line}"
-        block = next_section(reader, parent)
 
       elsif this_line.match(REGEXP[:oblock])
         # oblock is surrounded by '--' lines and has zero or more blocks inside
@@ -132,6 +133,7 @@ class Asciidoctor::Lexer
         items = []
         Asciidoctor.debug "Creating block of type: #{list_type}"
         block = Block.new(parent, list_type)
+        attributes['style'] ||= 'arabic'
         while !this_line.nil? && match = this_line.match(REGEXP[list_type])
           item = ListItem.new(block)
 
@@ -155,11 +157,11 @@ class Asciidoctor::Lexer
         block.buffer = items
 
       elsif match = this_line.match(REGEXP[:ulist])
-
         reader.unshift(this_line)
         block = build_ulist(reader, parent)
 
       elsif match = this_line.match(REGEXP[:dlist])
+        # TODO build_dlist method?
         pairs = []
         block = Block.new(parent, :dlist)
         # allows us to capture until we find a labeled item using the same delimiter (::, :::, :::: or ;;)
@@ -187,28 +189,48 @@ class Asciidoctor::Lexer
 
         reader.unshift(this_line) unless this_line.nil?
         block.buffer = pairs
-
-      elsif this_line.match(REGEXP[:verse])
-        # verse is preceded by [verse] and lasts until a blank line
-        buffer = reader.grab_lines_until(:break_on_blank_lines => true)
-        block = Block.new(parent, :verse, buffer)
-
-      elsif this_line.match(REGEXP[:note])
-        # note is an admonition preceded by [NOTE] and lasts until a blank line
-        buffer = reader.grab_lines_until(:break_on_blank_lines => true)
-        block = Block.new(parent, :note, buffer)
-
-      elsif block_type = [:listing, :example].detect{|t| this_line.match( REGEXP[t] )}
-        buffer = reader.grab_lines_until {|line| line.match( REGEXP[block_type] )}
-        block = Block.new(parent, block_type, buffer)
-
-      elsif this_line.match( REGEXP[:quote] )
-        block = Block.new(parent, :quote)
-        buffer = Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:quote] ) })
+    
+      # FIXME violates DRY because it's a duplication of other block parsing
+      elsif this_line.match(REGEXP[:example])
+        # example is surrounded by lines with 4 or more '=' chars
+        rekey_positional_attributes(attributes, ['style'])
+        if admonition_style = ADMONITION_STYLES.detect {|s| attributes['style'] == s}
+          block = Block.new(parent, :admonition)
+          attributes['name'] = admonition_style.downcase
+          attributes['caption'] ||= admonition_style.capitalize
+        else
+          block = Block.new(parent, :example)
+        end
+        buffer = Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:example] ) })
 
         while buffer.has_lines?
           new_block = next_block(buffer, block)
           block.blocks << new_block unless new_block.nil?
+        end
+
+      # FIXME violates DRY w/ non-delimited block listing
+      elsif this_line.match(REGEXP[:listing])
+        rekey_positional_attributes(attributes, ['style', 'language', 'linenums'])
+        buffer = reader.grab_lines_until {|line| line.match( REGEXP[:listing] )}
+        block = Block.new(parent, :listing, buffer)
+
+      elsif this_line.match(REGEXP[:quote])
+        # multi-line verse or quote is surrounded by a block delimiter
+        rekey_positional_attributes(attributes, ['style', 'attribution', 'citetitle'])
+        quote_context = (attributes['style'] == 'verse' ? :verse : :quote)
+        buffer = Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:quote] ) })
+
+        # only quote can have other section elements (as as section block)
+        section_body = (quote_context == :quote)
+
+        if section_body
+          block = Block.new(parent, quote_context)
+          while buffer.has_lines?
+            new_block = next_block(buffer, block)
+            block.blocks << new_block unless new_block.nil?
+          end
+        else
+          block = Block.new(parent, quote_context, buffer.lines)
         end
 
       elsif this_line.match(REGEXP[:lit_blk])
@@ -226,7 +248,37 @@ class Asciidoctor::Lexer
           (context == :dlist && line.match(REGEXP[:dlist])) || !line.match(REGEXP[:lit_par])
         }
 
+        # trim off the indentation that put us in this literal paragraph
+        if !buffer.empty? && match = buffer.first.match(/^([[:blank:]]+)/)
+          offset = match[1].length
+          buffer = buffer.map {|l| l.slice(offset..-1)}
+        end
+
         block = Block.new(parent, :literal, buffer)
+
+      ## these switches based on style need to come immediately before the else ##
+
+      elsif attributes[0] == 'source'
+        rekey_positional_attributes(attributes, ['style', 'language', 'linenums'])
+        reader.unshift(this_line)
+        buffer = reader.grab_lines_until(:break_on_blank_lines => true)
+        block = Block.new(parent, :listing, buffer)
+
+      elsif admonition_style = ADMONITION_STYLES.detect{|s| attributes[0] == s}
+        # an admonition preceded by [*TYPE*] and lasts until a blank line
+        reader.unshift(this_line)
+        buffer = reader.grab_lines_until(:break_on_blank_lines => true)
+        block = Block.new(parent, :admonition, buffer)
+        attributes['style'] = admonition_style
+        attributes['name'] = admonition_style.downcase
+        attributes['caption'] ||= admonition_style.capitalize
+
+      elsif quote_context = [:quote, :verse].detect{|s| attributes[0] == s.to_s}
+        # single-paragraph verse or quote is preceded by [verse] or [quote], respectively, and lasts until a blank line
+        rekey_positional_attributes(attributes, ['style', 'attribution', 'citetitle'])
+        reader.unshift(this_line)
+        buffer = reader.grab_lines_until(:break_on_blank_lines => true)
+        block = Block.new(parent, quote_context, buffer)
 
       else
         # paragraph is contiguous nonblank/noncontinuation lines
@@ -234,7 +286,6 @@ class Asciidoctor::Lexer
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true) {|line|
           (context == :dlist && line.match(REGEXP[:dlist])) ||
           ([:ulist, :olist, :dlist].include?(context) && line.chomp == LIST_CONTINUATION) ||
-          line.match(REGEXP[:listing]) ||
           line.match(REGEXP[:oblock])
         }
 
@@ -242,11 +293,12 @@ class Asciidoctor::Lexer
           reader.skip_list_continuation
         end
 
-        if buffer.any? && admonition = buffer.first.match(/^NOTE:\s*/)
+        if !buffer.empty? && admonition = buffer.first.match(Regexp.new('^(' + ADMONITION_STYLES.join('|') + '):\s+'))
           buffer[0] = admonition.post_match
-          block = Block.new(parent, :note, buffer)
-        elsif source_type
-          block = Block.new(parent, :listing, buffer)
+          block = Block.new(parent, :admonition, buffer)
+          attributes['style'] = admonition[1]
+          attributes['name'] = admonition[1].downcase
+          attributes['caption'] ||= admonition[1].capitalize
         else
           Asciidoctor.debug "Proud parent #{parent} getting a new paragraph with buffer: #{buffer}"
           block = Block.new(parent, :paragraph, buffer)
@@ -258,9 +310,10 @@ class Asciidoctor::Lexer
     # line comments or a comment block could leave us
     # without a block
     if !block.nil?
-      block.anchor  ||= anchor
-      block.title   ||= title
-      block.caption ||= caption
+      block.anchor   ||= (anchor || attributes['id'])
+      block.title    ||= title
+      block.caption  ||= caption
+      block.update_attributes(attributes)
     end
 
     block
@@ -398,7 +451,8 @@ class Asciidoctor::Lexer
     list_item.level = level
     Asciidoctor.debug "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
 
-    # Prevent bullet list text starting with . from being treated as a paragraph
+    # Restore first line of list item
+    # Also prevent bullet list text starting with . from being treated as a paragraph
     # title or some other unseemly thing in list_item_segment. I think. (NOTE)
     reader.unshift match[2].lstrip.sub(/^\./, '\.')
 
@@ -492,6 +546,32 @@ class Asciidoctor::Lexer
 
     block.buffer = items
     block
+  end
+
+  def self.collect_attributes(attrs, attributes, posattrs = [])
+    # TODO walk be properly rather than using split
+    attrs.split(/\s*,\s*/).each_with_index do |entry, i|
+      key, val = entry.split(/\s*=\s*/) 
+      if !val.nil?
+        val.gsub!(/^(['"])(.*)\1$/, '\2') unless val.nil?
+        attributes[key] = val
+      else
+        attributes[i] = key
+        # positional attribute has a known key
+        if posattrs.size >= (i + 1)
+          attributes[posattrs[i]] = key
+        end 
+      end
+    end
+  end
+
+  def self.rekey_positional_attributes(attributes, posattrs)
+    posattrs.each_with_index do |key, i|
+      val = attributes[i]
+      if !val.nil?
+        attributes[key] = val
+      end
+    end
   end
 
   # Private: Get the Integer section level based on the characters
@@ -651,12 +731,6 @@ class Asciidoctor::Lexer
           section_lines << this_line
           section_lines << reader.get_line unless is_single_line_section_heading?(this_line)
         end
-      elsif this_line.match(REGEXP[:listing])
-        section_lines << this_line
-        section_lines.concat reader.grab_lines_until {|line| line.match( REGEXP[:listing] ) }
-        # Also grab the last line, if there is one
-        this_line = reader.get_line
-        section_lines << this_line unless this_line.nil?
       else
         section_lines << this_line
       end
