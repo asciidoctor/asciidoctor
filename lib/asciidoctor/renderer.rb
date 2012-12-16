@@ -62,8 +62,8 @@ class Asciidoctor::Renderer
                      if stack_obj.context == :dlist
                        dt_list = stack_obj.buffer.map{|dt,dd| dt.content.strip}.join(', ')
                        "BLOCK :dlist (#{dt_list})"
-                     else
-                       "BLOCK #{stack_obj.context.inspect}"
+                     #else
+                     #  "BLOCK #{stack_obj.context.inspect}"
                      end
                    else stack_obj.class
                    end
@@ -71,7 +71,7 @@ class Asciidoctor::Renderer
         prefix << '  '
       end
       STDERR.puts '-' * 80
-      STDERR.puts ret.inspect
+      #STDERR.puts ret.inspect
       STDERR.puts '=' * 80
       STDERR.puts
     end
