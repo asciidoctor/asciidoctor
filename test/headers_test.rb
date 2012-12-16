@@ -2,7 +2,38 @@ require 'test_helper'
 
 context "Headers" do
   test "document title with multiline syntax" do
-    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("My Title\n=======")
+    title = "My Title"
+    chars = "=" * title.length
+    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
+    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
+  end
+
+  test "document title with multiline syntax, give a char" do
+    title = "My Title"
+    chars = "=" * (title.length + 1)
+    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
+    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
+  end
+
+  test "document title with multiline syntax, take a char" do
+    title = "My Title"
+    chars = "=" * (title.length - 1)
+    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
+    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
+  end
+
+  test "not enough chars for a multiline document title" do
+    title = "My Title"
+    chars = "=" * (title.length - 2)
+    assert_xpath '//h1', render_string(title + "\n" + chars), 0
+    assert_xpath '//h1', render_string(title + "\n" + chars + "\n"), 0
+  end
+
+  test "too many chars for a multiline document title" do
+    title = "My Title"
+    chars = "=" * (title.length + 2)
+    assert_xpath '//h1', render_string(title + "\n" + chars), 0
+    assert_xpath '//h1', render_string(title + "\n" + chars + "\n"), 0
   end
 
   test "document title with single-line syntax" do

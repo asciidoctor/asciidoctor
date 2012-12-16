@@ -601,7 +601,8 @@ class Asciidoctor::Lexer
   def self.is_two_line_section_heading?(line1, line2)
     !line1.nil? && !line2.nil? &&
     line1.match(REGEXP[:name]) && line2.match(REGEXP[:line]) &&
-    (line1.size - line2.size).abs <= 1
+    # chomp so that a (non-visible) endline does not impact calculation
+    (line1.chomp.size - line2.chomp.size).abs <= 1
   end
 
   def self.is_section_heading?(line1, line2 = nil)
