@@ -284,6 +284,25 @@ class SectionOlistTemplate < BaseTemplate
   end
 end
 
+class SectionImageTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+      <div class='imageblock'>
+        <div class='content'>
+          <% if attr :link %>
+          <a class='image' href='<%= attr :link%>'><img src='<%= attr :target %>' alt='<%= attr :alt %>'/></a>
+          <% else %>
+          <img src='<%= attr :target %>' alt='<%= attr :alt %>'/>
+          <% end %>
+        </div>
+        <% if title %>
+        <div class='title'><%= title %></div>
+        <% end %>
+      </div>
+    EOF
+  end
+end
+
 =begin
 ../gitscm-next/templates/section_colist.html.erb
 <div class='colist arabic'>
