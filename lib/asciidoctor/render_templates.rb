@@ -242,9 +242,7 @@ class SectionVerseTemplate < BaseTemplate
         <% if !title.nil? %>
           <div class='title'><%= title %></div>
         <% end %>
-        <pre class='content'>
-          <%= content %>
-        </pre>
+        <pre class='content'><%= content %></pre>
         <div class='attribution'>
           <% if attr? :citetitle %>
             <em><%= attr :citetitle %></em>
@@ -317,48 +315,3 @@ class SectionImageTemplate < BaseTemplate
     EOF
   end
 end
-
-=begin
-../gitscm-next/templates/section_colist.html.erb
-<div class='colist arabic'>
-  <ol>
-    <% content.each do |li| %>
-      <li><p><%= li %></p></li>
-    <% end %>
-  </ol>
-</div>
-../gitscm-next/templates/section_example.html.erb
-<div class='exampleblock'>
-  <div class='content'>
-    <div class='literalblock'>
-      <div class='content'>
-        <pre><tt><%= content %></tt></pre>
-      </div>
-    </div>
-  </div>
-</div>
-../gitscm-next/templates/section_oblock.html.erb
-<div class='openblock'>
-  <div class='content'>
-    <%= content %>
-  </div>
-</div>
-../gitscm-next/templates/section_olist.html.erb
-<div class='olist arabic'>
-  <ol class='arabic'>
-    <% content.each do |li| %>
-      <li><p><%= li %></p></li>
-    <% end %>
-  </ol>
-</div>
-../gitscm-next/templates/section_quote.html.erb
-<div class='quoteblock'>
-  <div class='content'>
-    <%= content %>
-  </div>
-</div>
-../gitscm-next/templates/section_verse.html.erb
-<div class='verseblock'>
-  <pre class='content'><%= content %></pre>
-</div>
-=end

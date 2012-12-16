@@ -32,10 +32,9 @@ Install instructions:
 
 You're good to go!
       EOS
-      # TODO push this into the render_string helper, but need to update assertions to deal w/ endlines
-      output = Asciidoctor::Document.new(input.lines.entries).render
+      output = render_string(input)
       assert_xpath "//pre/tt", output, 1
-      assert_match /^gem install asciidoctor/, output, "Indendation should be trimmed from literal block"
+      assert_match /^gem install asciidoctor/, output, "Indentation should be trimmed from literal block"
     end
 
     test "listing paragraph" do
@@ -72,6 +71,7 @@ You're good to go!
       output = render_string("[quote]\nFamous quote.")
       assert_xpath '//*[@class = "quoteblock"]', output, 1
       assert_xpath '//*[@class = "quoteblock"]//p', output, 0
+      assert_xpath '//*[@class = "quoteblock"]//*[contains(text(), "Famous quote.")]', output, 1
     end
 
     test "verse paragraph" do
