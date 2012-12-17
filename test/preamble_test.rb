@@ -85,4 +85,28 @@ Section paragraph 1.
     assert_xpath '//h2[@id="_first_section"]/preceding::p', result, 1
   end
 
+  test 'preamble in book doctype' do
+      input = <<-EOS
+Book
+====
+:doctype: book
+
+Back then...
+
+= Chapter One
+
+It was a dark and stormy night...
+
+= Chapter Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      d = document_from_string(input)
+      assert_equal 'book', d.doctype 
+      output = d.render
+      assert_xpath '//h1', output, 3
+      assert_xpath '//*[@id="preamble"]//p[text() = "Back then..."]', output, 1
+  end
+
 end

@@ -754,8 +754,8 @@ class Asciidoctor::Lexer
     end
 
     # detect preamble and push it into a block
-    # QUESTION make this an operation on Section?
-    if section.level == 0
+    # QUESTION make this an operation on Section named extract_preamble?
+    if section.level == 0 && parent.is_a?(Document) && parent.elements.empty?
       blocks = section.blocks.take_while {|b| !b.is_a? Section}
       if !blocks.empty?
         # QUESTION Should we propagate the buffer?
