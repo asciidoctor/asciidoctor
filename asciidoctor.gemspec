@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'asciidoctor'
-  s.version           = '0.0.5'
-  s.date              = '2012-12-11'
+  s.version           = '0.0.6'
+  s.date              = '2012-12-17'
   s.rubyforge_project = 'asciidoctor'
 
   ## Make sure your summary is short. The description may be as long
@@ -59,7 +59,7 @@ Gem::Specification.new do |s|
   # = MANIFEST =
   s.files = %w[
     LICENSE
-    README.md
+    README.asciidoc
     Rakefile
     asciidoctor.gemspec
     bin/asciidoctor
@@ -86,11 +86,13 @@ Gem::Specification.new do |s|
     test/headers_test.rb
     test/lexer_test.rb
     test/links_test.rb
-    test/list_elements_test.rb
+    test/lists_test.rb
     test/paragraphs_test.rb
+    test/preamble_test.rb
     test/reader_test.rb
     test/test_helper.rb
     test/text_test.rb
+    vendor/asciidoc/stylesheets/asciidoc.min.css
   ]
   # = MANIFEST =
 
