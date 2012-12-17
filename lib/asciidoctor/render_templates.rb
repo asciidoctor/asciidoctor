@@ -51,7 +51,7 @@ class DocumentTemplate < BaseTemplate
   end
 end
 
-class SectionPreambleTemplate < BaseTemplate
+class BlockPreambleTemplate < BaseTemplate
   def template
     @template ||= ::ERB.new <<-EOF
       <div id='preamble'>
@@ -81,15 +81,7 @@ class SectionTemplate < BaseTemplate
   end
 end
 
-class SectionAnchorTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <a name='<%= content %>'></a>
-    EOF
-  end
-end
-
-class SectionDlistTemplate < BaseTemplate
+class BlockDlistTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='dlist'>
@@ -116,7 +108,7 @@ class SectionDlistTemplate < BaseTemplate
   end
 end
 
-class SectionListingTemplate < BaseTemplate
+class BlockListingTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='listingblock'>
@@ -130,7 +122,7 @@ class SectionListingTemplate < BaseTemplate
   end
 end
 
-class SectionLiteralTemplate < BaseTemplate
+class BlockLiteralTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='literalblock'>
@@ -142,7 +134,7 @@ class SectionLiteralTemplate < BaseTemplate
   end
 end
 
-class SectionAdmonitionTemplate < BaseTemplate
+class BlockAdmonitionTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='admonitionblock'>
@@ -166,7 +158,7 @@ class SectionAdmonitionTemplate < BaseTemplate
   end
 end
 
-class SectionParagraphTemplate < BaseTemplate
+class BlockParagraphTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='paragraph'>
@@ -179,7 +171,7 @@ class SectionParagraphTemplate < BaseTemplate
   end
 end
 
-class SectionSidebarTemplate < BaseTemplate
+class BlockSidebarTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='sidebarblock'>
@@ -194,7 +186,7 @@ class SectionSidebarTemplate < BaseTemplate
   end
 end
 
-class SectionExampleTemplate < BaseTemplate
+class BlockExampleTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='exampleblock'>
@@ -209,7 +201,7 @@ class SectionExampleTemplate < BaseTemplate
   end
 end
 
-class SectionQuoteTemplate < BaseTemplate
+class BlockQuoteTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='quoteblock'>
@@ -235,7 +227,7 @@ class SectionQuoteTemplate < BaseTemplate
   end
 end
 
-class SectionVerseTemplate < BaseTemplate
+class BlockVerseTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='verseblock'>
@@ -259,7 +251,7 @@ class SectionVerseTemplate < BaseTemplate
   end
 end
 
-class SectionUlistTemplate < BaseTemplate
+class BlockUlistTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='ulist'>
@@ -278,7 +270,7 @@ class SectionUlistTemplate < BaseTemplate
   end
 end
 
-class SectionOlistTemplate < BaseTemplate
+class BlockOlistTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='olist arabic'>
@@ -297,7 +289,7 @@ class SectionOlistTemplate < BaseTemplate
   end
 end
 
-class SectionImageTemplate < BaseTemplate
+class BlockImageTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
       <div class='imageblock'>
