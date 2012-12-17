@@ -177,6 +177,7 @@ module Asciidoctor
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
 
   INTRINSICS = Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(
+    {
     'startsb'    => '[',
     'endsb'      => ']',
     'brvbar'     => '|',
@@ -203,6 +204,7 @@ module Asciidoctor
     'amp'        => '&',
     'lt'         => '<',
     'gt'         => '>',
+    }
   )
 
   SPECIAL_CHARS = {
