@@ -63,7 +63,7 @@ class Test::Unit::TestCase
   end
 
   def document_from_string(src, opts = {})
-    Asciidoctor::Document.new(src.split("\n"), opts)
+    Asciidoctor::Document.new(src.lines.entries, opts)
   end
 
   def render_string(src, opts = {})

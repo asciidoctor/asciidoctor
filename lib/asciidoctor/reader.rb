@@ -83,12 +83,12 @@ class Asciidoctor::Reader
         # Lines that start with whitespace and end with a '+' are
         # a continuation, so gobble them up into `value`
         if match = line.match(/\s+(.+)\s+\+\s*$/)
-          continuing_value += match[1]
+          continuing_value += ' ' + match[1]
         elsif match = line.match(/\s+(.+)/)
           # If this continued line doesn't end with a +, then this
           # is the end of the continuation, no matter what the next
           # line does.
-          continuing_value += match[1]
+          continuing_value += ' ' + match[1]
           close_continue = true
         else
           # If this line doesn't start with whitespace, then it's

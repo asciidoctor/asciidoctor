@@ -6,6 +6,16 @@ context "Attributes" do
     assert_equal doc.attributes['frog'], 'Tanglefoot'
   end
 
+  test "creates an attribute by fusing a multi-line value" do
+    str = <<-EOS
+:description: This is the first +
+              Ruby implementation of +
+              AsciiDoc.
+    EOS
+    doc = document_from_string(str)
+    assert_equal doc.attributes['description'], 'This is the first Ruby implementation of AsciiDoc.'
+  end
+
   test "deletes an attribute" do
     doc = document_from_string(":frog: Tanglefoot\n:frog!:")
     assert_equal nil, doc.attributes['frog']
