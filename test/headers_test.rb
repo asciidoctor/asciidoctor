@@ -1,47 +1,49 @@
 require 'test_helper'
 
 context "Headers" do
-  test "document title with multiline syntax" do
-    title = "My Title"
-    chars = "=" * title.length
-    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
-    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
-  end
+  context "document title" do
+    test "document title with multiline syntax" do
+      title = "My Title"
+      chars = "=" * title.length
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
+    end
 
-  test "document title with multiline syntax, give a char" do
-    title = "My Title"
-    chars = "=" * (title.length + 1)
-    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
-    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
-  end
+    test "document title with multiline syntax, give a char" do
+      title = "My Title"
+      chars = "=" * (title.length + 1)
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
+    end
 
-  test "document title with multiline syntax, take a char" do
-    title = "My Title"
-    chars = "=" * (title.length - 1)
-    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
-    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
-  end
+    test "document title with multiline syntax, take a char" do
+      title = "My Title"
+      chars = "=" * (title.length - 1)
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
+    end
 
-  test "not enough chars for a multiline document title" do
-    title = "My Title"
-    chars = "=" * (title.length - 2)
-    assert_xpath '//h1', render_string(title + "\n" + chars), 0
-    assert_xpath '//h1', render_string(title + "\n" + chars + "\n"), 0
-  end
+    test "not enough chars for a multiline document title" do
+      title = "My Title"
+      chars = "=" * (title.length - 2)
+      assert_xpath '//h1', render_string(title + "\n" + chars), 0
+      assert_xpath '//h1', render_string(title + "\n" + chars + "\n"), 0
+    end
 
-  test "too many chars for a multiline document title" do
-    title = "My Title"
-    chars = "=" * (title.length + 2)
-    assert_xpath '//h1', render_string(title + "\n" + chars), 0
-    assert_xpath '//h1', render_string(title + "\n" + chars + "\n"), 0
-  end
+    test "too many chars for a multiline document title" do
+      title = "My Title"
+      chars = "=" * (title.length + 2)
+      assert_xpath '//h1', render_string(title + "\n" + chars), 0
+      assert_xpath '//h1', render_string(title + "\n" + chars + "\n"), 0
+    end
 
-  test "document title with single-line syntax" do
-    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title")
-  end
+    test "document title with single-line syntax" do
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title")
+    end
 
-  test "document title with symmetric syntax" do
-    assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title =")
+    test "document title with symmetric syntax" do
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title =")
+    end
   end
 
   context "level 1" do 
@@ -110,5 +112,38 @@ context "Headers" do
     test "with single line syntax" do
       assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", render_string("===== My Title")
     end
-  end  
+  end
+
+  context "book doctype" do
+    test "document title with level 0 headings" do
+      input = <<-EOS
+Book
+====
+:doctype: book
+
+= Chapter One
+
+It was a dark and stormy night...
+
+= Chapter Two
+
+They couldn't believe their eyes when...
+
+== Interlude
+
+While they were waiting...
+
+= Chapter Three
+
+That's all she wrote!
+      EOS
+
+      output = render_string(input)
+      assert_xpath '//h1', output, 4
+      assert_xpath '//h2', output, 1
+      assert_xpath '//h1[@id="_chapter_one"][text() = "Chapter One"]', output, 1
+      assert_xpath '//h1[@id="_chapter_two"][text() = "Chapter Two"]', output, 1
+      assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
+    end
+  end
 end
