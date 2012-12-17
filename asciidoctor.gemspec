@@ -92,7 +92,6 @@ Gem::Specification.new do |s|
     test/reader_test.rb
     test/test_helper.rb
     test/text_test.rb
-    vendor/asciidoc/stylesheets/asciidoc.min.css
   ]
   # = MANIFEST =
 
