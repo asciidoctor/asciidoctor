@@ -364,3 +364,11 @@ class BlockImageTemplate < BaseTemplate
     EOF
   end
 end
+
+class BlockRulerTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<hr>
+    EOF
+  end
+end

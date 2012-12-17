@@ -140,14 +140,4 @@ Content goes here
       assert_xpath "//*[@class='sidebarblock']//p", result, 1
     end
   end
-
-  context "comments" do
-    test "line comment" do
-      assert_no_match /comment/, render_string("first paragraph\n\n//comment\n\nsecond paragraph")
-    end
-
-    test "comment block" do
-      assert_no_match /comment/, render_string("first paragraph\n\n////\ncomment\n////\n\nsecond paragraph")
-    end
-  end
 end

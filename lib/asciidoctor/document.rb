@@ -72,7 +72,10 @@ class Asciidoctor::Document
     while @reader.has_lines?
       @reader.skip_blank
 
-      @elements << Lexer.next_block(@reader, self) if @reader.has_lines?
+      if @reader.has_lines?
+        block = Lexer.next_block(@reader, self)
+        @elements << block unless block.nil?
+      end
     end
 
     Asciidoctor.debug "Found #{@elements.size} elements in this document:"
