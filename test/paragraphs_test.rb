@@ -20,7 +20,7 @@ context "Paragraphs" do
   context "code" do
     test "single-line literal paragraphs" do
       output = render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
-      assert_xpath "//pre/tt", render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
+      assert_xpath "//pre", render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
     end
 
     test "multi-line literal paragraph" do
@@ -33,16 +33,16 @@ Install instructions:
 You're good to go!
       EOS
       output = render_string(input)
-      assert_xpath "//pre/tt", output, 1
+      assert_xpath "//pre", output, 1
       assert_match /^gem install asciidoctor/, output, "Indentation should be trimmed from literal block"
     end
 
     test "listing paragraph" do
-      assert_xpath "//div[@class='highlight']", render_string("----\nblah blah blah\n----")
+      assert_xpath "//pre[@class='highlight']", render_string("----\nblah blah blah\n----")
     end
 
     test "source code paragraph" do
-      assert_xpath "//div[@class='highlight']", render_string("[source, perl]\ndie 'zomg perl sucks';")
+      assert_xpath "//pre[@class='highlight perl']", render_string("[source, perl]\ndie 'zomg perl sucks';")
     end
   end
 

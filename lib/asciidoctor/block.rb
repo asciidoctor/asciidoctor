@@ -86,7 +86,7 @@ class Asciidoctor::Block
     Asciidoctor.debug "Now attempting to render for #{context} my own bad #{self}"
     Asciidoctor.debug "Parent is #{@parent}"
     Asciidoctor.debug "Renderer is #{renderer}"
-    renderer.render("section_#{context}", self)
+    renderer.render("block_#{context}", self)
   end
 
   def splain(parent_level = 0)
