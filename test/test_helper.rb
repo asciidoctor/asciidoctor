@@ -69,6 +69,11 @@ class Test::Unit::TestCase
   def render_string(src, opts = {})
     document_from_string(src, opts).render
   end
+
+  def parse_header_metadata(source)
+    reader = Asciidoctor::Reader.new source.lines.entries
+    [Asciidoctor::Lexer.parse_header_metadata(reader), reader]
+  end
 end
 
 ###

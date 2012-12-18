@@ -33,7 +33,7 @@ context "Attributes" do
   end
 
   test "convert multi-word names and render" do
-    html = render_string("Main Header\n===========\n:My frog: Tanglefoot\nYo, {myfrog}!")
+    html = render_string("Main Header\n===========\n:My frog: Tanglefoot\n\nYo, {myfrog}!")
     result = Nokogiri::HTML(html)
     assert_equal 'Yo, Tanglefoot!', result.css("p").first.content.strip
   end

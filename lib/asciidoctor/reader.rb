@@ -177,6 +177,37 @@ class Asciidoctor::Reader
     nil
   end
 
+  # Public: Consume consecutive lines containing line- or block-level comments.
+  #
+  # Returns the Array of lines that were consumed
+  #
+  # Examples
+  #   @lines
+  #   => ["// foo\n", "////\n", "foo bar\n", "////\n", "actual text\n"]
+  #
+  #   comment_lines = consume_comments
+  #   => ["// foo\n", "////\n", "foo bar\n", "////\n"]
+  #
+  #   @lines
+  #   => ["actual text\n"]
+  def consume_comments
+    comment_lines = []
+    while !@lines.empty?
+      next_line = peek_line
+      if next_line.match(REGEXP[:comment_blk])
+        comment_lines << get_line
+        comment_lines.push *(grab_lines_until(:preserve_last_line => true) {|line| line.match(REGEXP[:comment_blk])})
+        comment_lines << get_line
+      elsif next_line.match(REGEXP[:comment])
+        comment_lines << get_line
+      else
+        break
+      end
+    end
+
+    comment_lines
+  end
+
   # Skip the next line if it's a list continuation character
   # 
   # Returns nil
