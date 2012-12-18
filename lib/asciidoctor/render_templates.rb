@@ -58,6 +58,9 @@ class DocumentTemplate < BaseTemplate
     <% if attr? :description %><meta name='description' content='<%= attr :description %>'><% end %>
     <% if attr? :keywords %><meta name='keywords' content='<%= attr :keywords %>'><% end %>
     <title><%= title ? title : (doctitle ? doctitle : '') %></title>
+    <% unless attr(:stylesheet, '').empty? %>
+    <link rel='stylesheet' href='<%= attr(:stylesdir, '') + attr(:stylesheet) %>' type='text/css'>
+    <% end %>
   </head>
   <body class='<%= attr :doctype %>'>
     <div id='header'>
