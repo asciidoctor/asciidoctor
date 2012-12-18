@@ -8,14 +8,35 @@ class DocumentTest < Test::Unit::TestCase
 
   def test_title
     assert_equal "AsciiDoc Home Page", @doc.doctitle
+    assert_equal "AsciiDoc Home Page", @doc.name
     assert_equal 14, @doc.elements.size
     assert_equal :preamble, @doc.elements[0].context
     assert @doc.elements[1].is_a? ::Asciidoctor::Section
   end
 
   def test_with_no_title
-    d = Asciidoctor::Document.new(["Snorf"])
+    d = document_from_string("Snorf")
     assert_nil d.doctitle
+    assert_nil d.name
+    assert !d.has_header
+    assert_nil d.header
+  end
+
+  def test_with_explicit_title
+   d = document_from_string("= Title\n:title: Document Title\n\npreamble\n\n== Section") 
+   assert_equal 'Document Title', d.doctitle
+   assert_equal 'Document Title', d.title
+   assert d.has_header
+   assert_equal 'Title', d.header.title
+   assert_equal 'Title', d.first_section.title
+  end
+
+  def test_empty_document
+    d = document_from_string('')
+    assert d.elements.empty?
+    assert_nil d.doctitle
+    assert !d.has_header
+    assert_nil d.header
   end
 
   def test_with_header_footer

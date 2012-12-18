@@ -57,7 +57,7 @@ class Asciidoctor::Section
   # Returns the String section name
   def name
     @name && 
-    @name.gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + Asciidoctor::INTRINSICS[$2] }.
+    @name.gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + (attr?($2) ? attr($2) : Asciidoctor::INTRINSICS[$2]) }.
           gsub( /`([^`]+)`/, '<tt>\1</tt>' )
   end
 
@@ -132,7 +132,7 @@ class Asciidoctor::Section
 
   # Public: The title of this section, an alias of the section name
   def title
-    @name
+    name
   end
 
   # Public: Get the Integer number of blocks in the section.
