@@ -58,14 +58,8 @@ class DocumentTemplate < BaseTemplate
     <% if attr? :description %><meta name='description' content='<%= attr :description %>'><% end %>
     <% if attr? :keywords %><meta name='keywords' content='<%= attr :keywords %>'><% end %>
     <title><%= doctitle %></title>
-    <% if attr?(:stylesheet) %>
-    <% if attr(:stylesheet).empty? %>
-    <style>
-<%= IO.read('#{File.join(File.dirname(__FILE__), '../../vendor/asciidoc/stylesheets', 'asciidoc.min.css')}') %>
-    </style>
-    <% else %>
-    <link rel='stylesheet' href='<%= attr :stylesheet %>' type='text/css'>
-    <% end %>
+    <% unless attr(:stylesheet, '').empty? %>
+    <link rel='stylesheet' href='<%= attr(:stylesdir, '') + attr(:stylesheet) %>' type='text/css'>
     <% end %>
   </head>
   <body class='<%= doctype %>'>
