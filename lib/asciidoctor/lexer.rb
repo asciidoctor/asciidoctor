@@ -71,7 +71,7 @@ class Asciidoctor::Lexer
       next_line = reader.peek_line || ''
 
       if this_line.match(REGEXP[:comment_blk])
-        Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) })
+        reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) }
         reader.skip_blank
 
       elsif this_line.match(REGEXP[:comment])
