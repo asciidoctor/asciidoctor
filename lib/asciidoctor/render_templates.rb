@@ -14,51 +14,83 @@ class BaseTemplate
   # We're ignoring locals for now. Shut up.
   def render(obj = Object.new, locals = {})
     output = template.result(obj.instance_eval {binding})
+    self.is_a?(DocumentTemplate) ? output.gsub(/^\s*\n/, '') : output
   end
 
   def template
     raise "You chilluns need to make your own template"
+  end
+
+  # create template matter to insert an attribute if the variable has a value
+  def attribute(name, var = nil)
+    var = var.nil? ? name : var
+    if var.is_a? Symbol
+      '<%= attr?(:' + var.to_s + ') ? ' + '\' ' + name + '=\\\'\' + attr(:' + var.to_s + ') + \'\\\'\' : \'\' %>'
+    else
+      '<%= ' + var + ' ? ' + '\' ' + name + '=\\\'\' + ' + var + ' + \'\\\'\' : \'\' %>'
+    end
+  end
+
+  # create template matter to insert a style class if the variable has a value
+  def styleclass(key)
+    '<%= attr?(:' + key.to_s + ') ? \' \' + attr(:' + key.to_s + ') : \'\' %>'
+  end
+
+  # create template matter to insert an id if one is specified for the block
+  def id
+    attribute('id')
+  end
+
+  # create template matter to insert a style class from the role attribute if specified
+  def role
+    styleclass(:role)
   end
 end
 
 class DocumentTemplate < BaseTemplate
   def template
     @template ||= ::ERB.new <<-EOF
-      <!DOCTYPE html>
-      <html lang='en'>
-        <head>
-          <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-          <meta name='generator' content='Asciidoctor <%= attr "asciidoctor-version" %>'>
-          <title><%= title ? title : (doctitle ? doctitle : '') %></title>
-        </head>
-        <body class='<%= attr :doctype %>'>
-          <div id='header'>
-            <% if doctitle %>
-              <h1><%= doctitle %></h1>
-            <% end %>
-          </div>
-          <div id='content'>
-            <%= content %>
-          </div>
-          <div id='footer'>
-            <div id='footer-text'>
-              Last updated <%= attr :localdatetime %>
-            </div>
-          </div>
-        </body>
-      </html>
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta http-equiv='Content-Type' content='text/html; charset=<%= attr :encoding %>'>
+    <meta name='generator' content='Asciidoctor <%= attr 'asciidoctor-version' %>'>
+    <% if attr? :description %><meta name='description' content='<%= attr :description %>'><% end %>
+    <% if attr? :keywords %><meta name='keywords' content='<%= attr :keywords %>'><% end %>
+    <title><%= title ? title : (doctitle ? doctitle : '') %></title>
+    <% unless attr(:stylesheet, '').empty? %>
+    <link rel='stylesheet' href='<%= attr(:stylesdir, '') + attr(:stylesheet) %>' type='text/css'>
+    <% end %>
+  </head>
+  <body class='<%= attr :doctype %>'>
+    <div id='header'>
+      <% if !notitle && doctitle %>
+        <h1><%= doctitle %></h1>
+        <% if attr? :author %><span id='author'><%= attr :author %></span><br><% end %>
+      <% end %>
+    </div>
+    <div id='content'>
+<%= content %>
+    </div>
+    <div id='footer'>
+      <div id='footer-text'>
+        Last updated <%= attr :localdatetime %>
+      </div>
+    </div>
+  </body>
+</html>
     EOF
   end
 end
 
-class SectionPreambleTemplate < BaseTemplate
+class BlockPreambleTemplate < BaseTemplate
   def template
     @template ||= ::ERB.new <<-EOF
-      <div id='preamble'>
-        <div class='sectionbody'>
-          <%= content %>
-        </div>
-      </div>
+<div id='preamble'>
+  <div class='sectionbody'>
+<%= content %>
+  </div>
+</div>
     EOF
   end
 end
@@ -66,252 +98,256 @@ end
 class SectionTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
-      <div class='sect<%= level %>'>
-        <% if !anchor.nil? %>
-          <a name='<%= anchor %>'></a>
+<div class='sect<%= level %>'>
+  <h<%= level + 1 %> id='<%= id ? id : section_id %>'><%= name %></h<%= level + 1 %>>
+  <% if level == 1 %>
+  <div class='sectionbody'>
+<%= content %>
+  </div>
+  <% else %>
+<%= content %>
+  <% end %>
+</div>
+    EOF
+  end
+end
+
+class BlockDlistTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='dlist#{role}'>
+  <% if title %>
+  <div class='title'><%= title %></div>
+  <% end %>
+  <dl>
+    <% content.each do |dt, dd| %>
+    <dt class='hdlist1'>
+      <% unless dt.anchor.nil? || dt.anchor.empty? %>
+      <a id='<%= dt.anchor %>'></a>
+      <% end %>
+      <%= dt.text %>
+    </dt>
+    <% unless dd.nil? %>
+    <dd>
+      <p><%= dd.text %></p>
+      <% unless dd.blocks.empty? %>
+<%= dd.content %> 
+      <% end %>
+    </dd>
+    <% end %>
+    <% end %>
+  </dl>
+</div>
+    EOF
+  end
+end
+
+class BlockListingTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='listingblock#{role}'>
+  <% if title %>
+  <div class='title'><%= title %></div>
+  <% end %>
+  <div class='content monospaced'>
+    <pre class='highlight#{styleclass(:language)}'><code><%= content %></code></pre>
+  </div>
+</div>
+    EOF
+  end
+end
+
+class BlockLiteralTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='literalblock#{role}'>
+  <% if title %>
+  <div class='title'><%= title %></div>
+  <% end %>
+  <div class='content monospaced'>
+    <pre><%= content %></pre>
+  </div>
+</div>
+    EOF
+  end
+end
+
+class BlockAdmonitionTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='admonitionblock#{role}'>
+  <table>
+    <tr>
+      <td class='icon'>
+        <% if attr? :caption %>
+        <div class='title'><%= attr :caption %></div>
         <% end %>
-        <h<%= level + 1 %> id='<%= section_id %>'><%= name %></h<%= level + 1 %>>
-        <% if level == 1 %>
-          <div class='sectionbody'><%= content %></div>
-        <% else %>
-          <%= content %>
-        <% end %>
-      </div>
-    EOF
-  end
-end
-
-class SectionAnchorTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <a name='<%= content %>'></a>
-    EOF
-  end
-end
-
-class SectionDlistTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='dlist'>
-        <dl>
-          <% content.each do |dt, dd| %>
-            <dt class='hdlist1'>
-              <% if !dt.anchor.nil? and !dt.anchor.empty? %>
-              <a id='<%= dt.anchor %>'></a>
-              <% end %>
-              <%= dt.text %>
-            </dt>
-            <% unless dd.nil? %>
-              <dd>
-                <p><%= dd.text %></p>
-                <% if !dd.blocks.empty? %>
-                <%= dd.content %> 
-                <% end %>
-              </dd>
-            <% end %>
-          <% end %>
-        </dl>
-      </div>
-    EOF
-  end
-end
-
-class SectionListingTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='listingblock'>
-        <div class='content'>
-          <div class='highlight'>
-            <pre><%= content %></pre>
-          </div>
-        </div>
-      </div>
-    EOF
-  end
-end
-
-class SectionLiteralTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='literalblock'>
-        <div class='content'>
-          <pre><tt><%= content %></tt></pre>
-        </div>
-      </div>
-    EOF
-  end
-end
-
-class SectionAdmonitionTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='admonitionblock'>
-        <table>
-          <tr>
-            <td class='icon'>
-              <% if attr? :caption %>
-              <div class='title'><%= attr :caption %></div>
-              <% end %>
-            </td>
-            <td class='content'>
-              <% if !title.nil? %>
-                <div class='title'><%= title %></div>
-              <% end %>
-              <%= content %>
-            </td>
-          </tr>
-        </table>
-      </div>
-    EOF
-  end
-end
-
-class SectionParagraphTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='paragraph'>
-        <% if !title.nil? %>
-          <div class='title'><%= title %></div>
-        <% end %>
-        <p><%= content %></p>
-      </div>
-    EOF
-  end
-end
-
-class SectionSidebarTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='sidebarblock'>
-        <div class='content'>
-          <% if !title.nil? %>
-            <div class='title'><%= title %></div>
-          <% end %>
-          <%= content %>
-        </div>
-      </div>
-    EOF
-  end
-end
-
-class SectionExampleTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='exampleblock'>
-        <div class='content'>
-          <% if !title.nil? %>
-            <div class='title'><%= title %></div>
-          <% end %>
-          <%= content %>
-        </div>
-      </div>
-    EOF
-  end
-end
-
-class SectionQuoteTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='quoteblock'>
-        <% if !title.nil? %>
-          <div class='title'><%= title %></div>
-        <% end %>
-        <div class='content'>
-          <%= content %>
-        </div>
-        <div class='attribution'>
-          <% if attr? :citetitle %>
-            <em><%= attr :citetitle %></em>
-          <% end %>
-          <% if attr? :attribution %>
-            <% if attr? :citetitle %>
-            <br/>
-            <% end %>
-            <%= "&#8212; " + attr(:attribution) %>
-          <% end %>
-        </div>
-      </div>
-    EOF
-  end
-end
-
-class SectionVerseTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='verseblock'>
-        <% if !title.nil? %>
-          <div class='title'><%= title %></div>
-        <% end %>
-        <pre class='content'><%= content %></pre>
-        <div class='attribution'>
-          <% if attr? :citetitle %>
-            <em><%= attr :citetitle %></em>
-          <% end %>
-          <% if attr? :attribution %>
-            <% if attr? :citetitle %>
-            <br/>
-            <% end %>
-            <%= "&#8212; " + attr(:attribution) %>
-          <% end %>
-        </div>
-      </div>
-    EOF
-  end
-end
-
-class SectionUlistTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='ulist'>
-        <ul>
-        <% content.each do |li| %>
-          <li>
-            <p><%= li.text %></p>
-            <% if !li.blocks.empty? %>
-            <%= li.content %>
-            <% end %>
-          </li>
-        <% end %>
-        </ul>
-      </div>
-    EOF
-  end
-end
-
-class SectionOlistTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='olist arabic'>
-        <ol class='arabic'>
-        <% content.each do |li| %>
-          <li>
-            <p><%= li.text %></p>
-            <% if !li.blocks.empty? %>
-            <%= li.content %>
-            <% end %>
-          </li>
-        <% end %>
-        </ol>
-      </div>
-    EOF
-  end
-end
-
-class SectionImageTemplate < BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOF
-      <div class='imageblock'>
-        <div class='content'>
-          <% if attr :link %>
-          <a class='image' href='<%= attr :link%>'><img src='<%= attr :target %>' alt='<%= attr :alt %>'/></a>
-          <% else %>
-          <img src='<%= attr :target %>' alt='<%= attr :alt %>'/>
-          <% end %>
-        </div>
-        <% if title %>
+      </td>
+      <td class='content'>
+        <% unless title.nil? %>
         <div class='title'><%= title %></div>
         <% end %>
-      </div>
+        <%= content %>
+      </td>
+    </tr>
+  </table>
+</div>
+    EOF
+  end
+end
+
+class BlockParagraphTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='paragraph#{role}'>
+  <% unless title.nil? %>
+  <div class='title'><%= title %></div>
+  <% end %>
+  <p><%= content %></p>
+</div>
+    EOF
+  end
+end
+
+class BlockSidebarTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='sidebarblock#{role}'>
+  <div class='content'>
+    <% unless title.nil? %>
+    <div class='title'><%= title %></div>
+    <% end %>
+<%= content %>
+  </div>
+</div>
+    EOF
+  end
+end
+
+class BlockExampleTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='exampleblock#{role}'>
+  <div class='content'>
+    <% unless title.nil? %>
+    <div class='title'><%= title %></div>
+    <% end %>
+<%= content %>
+  </div>
+</div>
+    EOF
+  end
+end
+
+class BlockQuoteTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='quoteblock#{role}'>
+  <% unless title.nil? %>
+  <div class='title'><%= title %></div>
+  <% end %>
+  <div class='content'>
+<%= content %>
+  </div>
+  <div class='attribution'>
+    <% if attr? :citetitle %>
+    <em><%= attr :citetitle %></em>
+    <% end %>
+    <% if attr? :attribution %>
+    <% if attr? :citetitle %>
+    <br/>
+    <% end %>
+    <%= '&#8212; ' + attr(:attribution) %>
+    <% end %>
+  </div>
+</div>
+    EOF
+  end
+end
+
+class BlockVerseTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='verseblock#{role}'>
+  <% unless title.nil? %>
+  <div class='title'><%= title %></div>
+  <% end %>
+  <pre class='content'><%= content %></pre>
+  <div class='attribution'>
+    <% if attr? :citetitle %>
+    <em><%= attr :citetitle %></em>
+    <% end %>
+    <% if attr? :attribution %>
+    <% if attr? :citetitle %>
+    <br/>
+    <% end %>
+    <%= '&#8212; ' + attr(:attribution) %>
+    <% end %>
+  </div>
+</div>
+    EOF
+  end
+end
+
+class BlockUlistTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='ulist#{role}'>
+  <% unless title.nil? %>
+  <div class='title'><%= title %></div>
+  <% end %>
+  <ul>
+  <% content.each do |li| %>
+    <li>
+      <p><%= li.text %></p>
+      <% unless li.blocks.empty? %>
+<%= li.content %>
+      <% end %>
+    </li>
+  <% end %>
+  </ul>
+</div>
+    EOF
+  end
+end
+
+class BlockOlistTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='olist <%= attr :style %>#{role}'>
+  <% unless title.nil? %>
+  <div class='title'><%= title %></div>
+  <% end %>
+  <ol class='<%= attr :style %>'#{attribute('start', :start)}>
+  <% content.each do |li| %>
+    <li>
+      <p><%= li.text %></p>
+      <% unless li.blocks.empty? %>
+<%= li.content %>
+      <% end %>
+    </li>
+  <% end %>
+  </ol>
+</div>
+    EOF
+  end
+end
+
+class BlockImageTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='imageblock#{role}'>
+  <div class='content'>
+    <% if attr :link %>
+    <a class='image' href='<%= attr :link %>'><img src='<%= attr :target %>' alt='<%= attr :alt %>'#{attribute('width', :width)}#{attribute('height', :height)}></a>
+    <% else %>
+    <img src='<%= attr :target %>' alt='<%= attr :alt %>'#{attribute('width', :width)}#{attribute('height', :height)}>
+    <% end %>
+  </div>
+  <% if title %>
+  <div class='title'><%= title %></div>
+  <% end %>
+</div>
     EOF
   end
 end

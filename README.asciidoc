@@ -1,7 +1,10 @@
 [float]
 Asciidoctor
 ===========
+:asciidoctor: http://github.com/erebor/asciidoctor
+:asciidoc: http://www.methods.co.nz/asciidoc/index.html
 :gitscm-next: https://github.com/github/gitscm-next
+:templates: https://github.com/erebor/asciidoctor/blob/master/lib/asciidoctor/render_templates.rb
 :tilt: https://github.com/rtomayko/tilt
 :freesoftware: http://www.fsf.org/licensing/essays/free-sw.html
 :issues: https://github.com/erebor/asciidoctor/issues
@@ -11,11 +14,9 @@ Asciidoctor
 :pr: http://help.github.com/send-pull-requests/
 :license: https://github.com/erebor/asciidoctor/blob/master/LICENSE
 
-http://github.com/erebor/asciidoctor[Asciidoctor] is a pure-Ruby
-processor for turning
-http://www.methods.co.nz/asciidoc/index.html[AsciiDoc] documents or
-strings into HTML (and, eventually other formats as well...'stay
-tuned!').
+{asciidoctor}[Asciidoctor] is a pure-Ruby processor for turning
+{asciidoc}[AsciiDoc] documents or strings into HTML (and, eventually
+other formats as well...'stay tuned!').
 
 Asciidoctor uses simple built-in ERB templates to style the output in
 a way that roughly matches the default HTML output of the native
@@ -32,10 +33,10 @@ The initial code from which Asciidoctor started was from the
 
 == Installation
 
-NOTE: This gem is very immature, and as yet only supports a small
-subset of AsciiDoc features. Thus, you should only use it if you have
-a high tolerance for bugs, failures, and generally bad and intemperate
-behavior.
+NOTE: This gem is very immature, and as yet only supports a small subset
+of AsciiDoc features (but it's getting better!). Thus, you should only
+use it if you have a high tolerance for bugs, failures, and generally
+bad and intemperate behavior.
 
 To install the gem:
 
@@ -61,27 +62,29 @@ To render an AsciiDoc-formatted string:
  doc = Asciidoctor::Document.new("*This* is it.")
  puts doc.render
 
-Asciidoctor allows you to override the default template used to render
-almost any individual AsciiDoc element. If you provide a directory of
-{tilt}[Tilt]-compatible templates, named in such a way that Asciidoctor
-can figure out which template goes with which element, Asciidoctor will
-use the templates in this directory instead of its built-in templates
-for any elements for which it finds a matching template. It will
-fallback to its default templates for everything else.
+Asciidoctor allows you to override the {templates}[built-in templates]
+used to render almost any individual AsciiDoc element. If you provide a
+directory of {tilt}[Tilt]-compatible templates, named in such a way that
+Asciidoctor can figure out which template goes with which element,
+Asciidoctor will use the templates in this directory instead of its
+built-in templates for any elements for which it finds a matching
+template. It will fallback to its default templates for everything else.
 
  doc = Asciidoctor::Document.new("*This* is it.", :template_dir => 'templates')
  puts doc.render
 
 The Document and Section templates should begin with `document.` and
-`section.`, respectively. The file extension will depend on which
-Tilt-compatible format you've chosen. For ERB, the template names would be
-`document.html.erb` and `section.html.erb`, for instance. For Haml, they
-would be `document.html.haml` and `section.html.haml`.
+`section.`, respectively. The file extension is used by Tilt to
+determine which view framework it will use to use to render the
+template. For instance, if you want to write the template in ERB, you'd
+name these two templates `document.html.erb` and `section.html.erb`. To
+use Haml, you'd name them `document.html.haml` and `section.html.haml`.
 
-Templates for specific elements, like a Paragraph or Anchor, would begin
-with `section_<element>.`. For instance, to override the default Paragraph
-template with an ERB template, put a file called `section_paragraph.html.erb`
-in the template directory you pass in to `Document.new`.
+Templates for block elements, like a Paragraph or Sidebar, would begin
+with `block_<style>.`. For instance, to override the default Paragraph
+template with an ERB template, put a file named
+`block_paragraph.html.erb` in the template directory you pass to the
+`Document` constructor using the `template_dir` option.
 
 For more usage examples, see the test suite.
 
@@ -154,3 +157,5 @@ support for that Ruby version may be dropped.
 
 Copyright (c) 2012 Ryan Waldron.
 See {license}[LICENSE] for details.
+
+// vim: tw=72

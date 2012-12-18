@@ -33,6 +33,7 @@ class Asciidoctor::Document
 
     @attributes = {}
     @attributes['sectids'] = nil
+    @attributes['encoding'] = 'UTF-8'
 
     @reader = Reader.new(data, @attributes, &block)
 
