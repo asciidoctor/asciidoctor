@@ -57,18 +57,20 @@ class DocumentTemplate < BaseTemplate
     <meta name='generator' content='Asciidoctor <%= attr 'asciidoctor-version' %>'>
     <% if attr? :description %><meta name='description' content='<%= attr :description %>'><% end %>
     <% if attr? :keywords %><meta name='keywords' content='<%= attr :keywords %>'><% end %>
-    <title><%= title ? title : (doctitle ? doctitle : '') %></title>
+    <title><%= doctitle %></title>
     <% unless attr(:stylesheet, '').empty? %>
     <link rel='stylesheet' href='<%= attr(:stylesdir, '') + attr(:stylesheet) %>' type='text/css'>
     <% end %>
   </head>
-  <body class='<%= attr :doctype %>'>
+  <body class='<%= doctype %>'>
+    <% unless noheader %>
     <div id='header'>
-      <% if !notitle && doctitle %>
-        <h1><%= doctitle %></h1>
-        <% if attr? :author %><span id='author'><%= attr :author %></span><br><% end %>
+      <% unless notitle || !has_header %>
+      <h1><%= header.title %></h1>
+      <% if attr? :author %><span id='author'><%= attr :author %></span><br><% end %>
       <% end %>
     </div>
+    <% end %>
     <div id='content'>
 <%= content %>
     </div>
@@ -98,8 +100,12 @@ end
 class SectionTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
-<div class='sect<%= level %>'>
-  <h<%= level + 1 %> id='<%= id ? id : section_id %>'><%= name %></h<%= level + 1 %>>
+<% if level == 0 %>
+<h1 id='<%= id ? id : section_id %>'><%= title %></h1>
+<%= content %>
+<% else %>
+<div class='sect<%= level %>#{role}'>
+  <h<%= level + 1 %> id='<%= id ? id : section_id %>'><%= title %></h<%= level + 1 %>>
   <% if level == 1 %>
   <div class='sectionbody'>
 <%= content %>
@@ -108,6 +114,7 @@ class SectionTemplate < BaseTemplate
 <%= content %>
   <% end %>
 </div>
+<% end %>
     EOF
   end
 end

@@ -1,5 +1,20 @@
 # Public: Methods for parsing Asciidoc documents and rendering them
 # using erb templates.
+#
+# There are several strategies for getting the title of the document:
+#
+# doctitle - value of title attribute, if assigned and non-empty,
+#            otherwise title of first section in document, if present
+#            otherwise nil
+# name - an alias of doctitle
+# title - value of the title attribute, or nil if not present
+# first_section.title - title of first section in document, if present
+# header.title - title of section level 0
+#
+# Keep in mind that you'll want to honor these document settings:
+#
+# notitle - The h1 heading should not be shown
+# noheader - The header block (h1 heading, author, revision info) should not be shown
 class Asciidoctor::Document
 
   include Asciidoctor
@@ -18,7 +33,9 @@ class Asciidoctor::Document
 
   # Public: Initialize an Asciidoc object.
   #
-  # data  - The Array of Strings holding the Asciidoc source document.
+  # data - The Array of Strings holding the Asciidoc source document.
+  # options - A Hash of options to control processing, such as disabling
+  #           the header/footer (:header_footer) or attribute overrides (:attributes)
   # block - A block that can be used to retrieve external Asciidoc
   #         data to include in this document.
   #
@@ -38,7 +55,6 @@ class Asciidoctor::Document
     @reader = Reader.new(data, @attributes, &block)
 
     # pseudo-delegation :)
-    #@attributes = @reader.attributes
     @references = @reader.references
 
     # dynamic intrinstic attribute values
@@ -48,6 +64,9 @@ class Asciidoctor::Document
     @attributes['localtime'] ||= now.strftime('%H:%m:%S %Z')
     @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']].join(' ')
     @attributes['asciidoctor-version'] = VERSION
+    if options.has_key? :attributes
+      @attributes.update(options[:attributes])
+    end
 
     # Now parse @lines into elements
     while @reader.has_lines?
@@ -65,7 +84,13 @@ class Asciidoctor::Document
     root = @elements.first
     if root.is_a?(Section) && root.level == 0
       @header = @elements.shift
-      @elements = @header.blocks
+      # a book has multiple level 0 sections
+      if doctype == 'book'
+        @elements = @header.blocks + @elements
+      # an article only has one level 0 section
+      else
+        @elements = @header.blocks
+      end
       @header.clear_blocks
     end
 
@@ -86,6 +111,10 @@ class Asciidoctor::Document
     #@attributes.has_key? name.to_s.tr('_', '-')
   end
 
+  def doctype
+    @attributes['doctype']
+  end
+
   def level
     0
   end
@@ -97,21 +126,30 @@ class Asciidoctor::Document
 
   # We need to be able to return some semblance of a title
   def doctitle
-    # cached value
-    return @doctitle if @doctitle
-
-    if @header
-      @doctitle = @header.title
-    elsif @elements.first
-      @doctitle = @elements.first.title
+    if !(title = @attributes.fetch('title', '')).empty?
+      title
+    elsif !(sect = first_section).nil? && !sect.title.empty?
+      sect.title
+    else
+      nil
     end
-
-    @doctitle
   end
   alias :name :doctitle
 
   def notitle
     @attributes.has_key? 'notitle'
+  end
+
+  def noheader
+    @attributes.has_key? 'noheader'
+  end
+
+  def first_section
+    has_header ? @header : @elements.detect{|e| e.is_a? Section}
+  end
+
+  def has_header
+    !@header.nil?
   end
 
   def splain
@@ -155,6 +193,9 @@ class Asciidoctor::Document
   end
 
   def content
+    # per AsciiDoc-spec, remove the title after rendering the header
+    @attributes.delete('title')
+
     html_pieces = []
     @elements.each do |element|
       Asciidoctor::debug "Rendering element: #{element}"

@@ -59,6 +59,13 @@ context "Attributes" do
     assert_match /snort at the bar/, result.css("li").first.content.strip
   end
 
+  test "substitutes inside heading" do
+    output = render_string(":prefix: Cool\n\n== {prefix} Title\n\ncontent")
+    result = Nokogiri::HTML(output)
+    assert_match /Cool Title/, result.css('h2').first.content
+    assert_match /_cool_title/, result.css('h2').first.attr('id')
+  end
+
   test "renders attribute until it's deleted" do
     pending "Not working yet (will require adding element-specific attributes or early attr substitution during parsing)"
     # html = render_string(":foo: bar\nCrossing the {foo}\n\n:foo!:\nBelly up to the {foo}")
