@@ -238,8 +238,8 @@ class Asciidoctor::Reader
   # Public: Push String `line` onto queue of source data lines, unless `line` is nil.
   #
   # Returns nil
-  def unshift(line)
-    @lines.unshift(line) if line
+  def unshift(*line)
+    @lines.unshift(*line) if line
     nil
   end
 

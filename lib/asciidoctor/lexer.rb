@@ -742,7 +742,7 @@ class Asciidoctor::Lexer
       reader.skip_blank
     end
 
-    comment_lines.each {|l| reader.unshift l}
+    reader.unshift *comment_lines
     metadata
   end
 
