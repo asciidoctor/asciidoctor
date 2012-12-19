@@ -72,12 +72,18 @@ class Asciidoctor::Lexer
 
       if this_line.match(REGEXP[:comment_blk])
         Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) })
+        reader.skip_blank
 
       elsif this_line.match(REGEXP[:comment])
         reader.skip_blank
 
       elsif match = this_line.match(REGEXP[:attr_list_blk])
         collect_attributes(match[1], attributes)
+        reader.skip_blank
+
+      # we're letting ruler have attributes
+      elsif this_line.match(REGEXP[:ruler])
+        block = Block.new(parent, :ruler)
         reader.skip_blank
 
       elsif is_section_heading?(this_line, next_line)
