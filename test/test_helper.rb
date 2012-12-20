@@ -3,7 +3,11 @@ require 'test/unit'
 
 require "#{File.expand_path(File.dirname(__FILE__))}/../lib/asciidoctor.rb"
 
-require 'mocha/setup'
+begin
+  require 'mocha/setup'
+rescue LoadError
+  require 'mocha'
+end
 require 'htmlentities'
 require 'nokogiri'
 require 'pending'
@@ -68,6 +72,11 @@ class Test::Unit::TestCase
 
   def render_string(src, opts = {})
     document_from_string(src, opts).render
+  end
+
+  def parse_header_metadata(source)
+    reader = Asciidoctor::Reader.new source.lines.entries
+    [Asciidoctor::Lexer.parse_header_metadata(reader), reader]
   end
 end
 

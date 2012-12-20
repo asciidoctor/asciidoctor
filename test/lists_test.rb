@@ -3,31 +3,31 @@ require 'test_helper'
 context "Bulleted lists (:ulist)" do
   context "Simple lists" do
     test "dash elements with no blank lines" do
-      output = render_string("Blah\n====\n- Foo\n- Boo\n- Blech")
+      output = render_string("Blah\n====\n\n- Foo\n- Boo\n- Blech")
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 3
     end
 
     test "dash elements with blank lines" do
-      output = render_string("Blah\n====\n- Foo\n\n- Boo\n\n- Blech")
+      output = render_string("Blah\n====\n\n- Foo\n\n- Boo\n\n- Blech")
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 3
     end
 
     test "asterisk elements with no blank lines" do
-      output = render_string("Blah\n====\n* Foo\n* Boo\n* Blech")
+      output = render_string("Blah\n====\n\n* Foo\n* Boo\n* Blech")
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 3
     end
 
     test "asterisk elements with blank lines should merge lists" do
-      output = render_string("Blah\n====\n* Foo\n\n* Boo\n\n* Blech")
+      output = render_string("Blah\n====\n\n* Foo\n\n* Boo\n\n* Blech")
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 3
     end
 
     test "asterisk elements with blank lines separated by line comment should not merge lists" do
-      output = render_string("Blah\n====\n* Foo\n* Boo\n\n//\n\n* Blech")
+      output = render_string("Blah\n====\n\n* Foo\n* Boo\n\n//\n\n* Blech")
       assert_xpath '//ul', output, 2
       assert_xpath '(//ul)[1]/li', output, 2
       assert_xpath '(//ul)[2]/li', output, 1
@@ -36,7 +36,7 @@ context "Bulleted lists (:ulist)" do
 
   context "Lists with inline markup" do
     test "Quoted text" do
-      output = render_string("Blah\n====\n- I am *strong*.\n- I am 'stressed'.\n- I am `inflexible`.")
+      output = render_string("Blah\n====\n\n- I am *strong*.\n- I am 'stressed'.\n- I am `inflexible`.")
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 3
       assert_xpath '(//ul/li)[1]//strong', output, 1
@@ -55,7 +55,7 @@ context "Bulleted lists (:ulist)" do
 
   context "Nested lists" do
     test "nested mixed elements (asterisk and dash)" do
-      output = render_string("Blah\n====\n- Foo\n* Boo\n- Blech")
+      output = render_string("Blah\n====\n\n- Foo\n* Boo\n- Blech")
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 3
     end
@@ -68,7 +68,7 @@ context "Bulleted lists (:ulist)" do
     end
 
     test "nested elements (3) with asterisks" do
-      output = render_string("Blah\n====\n* Foo\n** Boo\n*** Snoo\n* Blech")
+      output = render_string("Blah\n====\n\n* Foo\n** Boo\n*** Snoo\n* Blech")
       assert_xpath '//ul', output, 3
       assert_xpath '(//ul)[1]/li', output, 2
       assert_xpath '((//ul)[1]/li//ul)[1]/li', output, 1
@@ -76,7 +76,7 @@ context "Bulleted lists (:ulist)" do
     end
 
     test "nested elements (4) with asterisks" do
-      output = render_string("Blah\n====\n* Foo\n** Boo\n*** Snoo\n**** Froo\n* Blech")
+      output = render_string("Blah\n====\n\n* Foo\n** Boo\n*** Snoo\n**** Froo\n* Blech")
       assert_xpath '//ul', output, 4
       assert_xpath '(//ul)[1]/li', output, 2
       assert_xpath '((//ul)[1]/li//ul)[1]/li', output, 1
@@ -85,7 +85,7 @@ context "Bulleted lists (:ulist)" do
     end
 
     test "nested elements (5) with asterisks" do
-      output = render_string("Blah\n====\n* Foo\n** Boo\n*** Snoo\n**** Froo\n***** Groo\n* Blech")
+      output = render_string("Blah\n====\n\n* Foo\n** Boo\n*** Snoo\n**** Froo\n***** Groo\n* Blech")
       assert_xpath '//ul', output, 5
       assert_xpath '(//ul)[1]/li', output, 2
       assert_xpath '((//ul)[1]/li//ul)[1]/li', output, 1
@@ -191,7 +191,7 @@ end
 context "Ordered lists (:olist)" do
   context "Simple lists" do
     test "dot elements with no blank lines" do
-      output = render_string("Blah\n====\n\n. Foo\n. Boo\n. Blech")
+      output = render_string("Blah\n\n====\n\n. Foo\n. Boo\n. Blech")
       assert_xpath '//ol', output, 1
       assert_xpath '//ol/li', output, 3
     end
