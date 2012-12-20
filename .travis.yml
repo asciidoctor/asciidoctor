@@ -1,8 +1,5 @@
-before_install:
-  - gem install tilt
-  - gem install mocha
-  - gem install htmlentities
-  - gem install pending
-  - gem install nokogiri
-  - gem install json
+language: ruby
+rvm:
+  - "1.9.3"
+  - "1.8.7"
 

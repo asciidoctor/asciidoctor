@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'asciidoctor'
-  s.version           = '0.0.5'
-  s.date              = '2012-12-11'
+  s.version           = '0.0.7'
+  s.date              = '2012-12-19'
   s.rubyforge_project = 'asciidoctor'
 
   ## Make sure your summary is short. The description may be as long
@@ -43,7 +43,6 @@ Gem::Specification.new do |s|
 
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
-  s.add_dependency('json')
   s.add_dependency('tilt')
 
   ## List your development dependencies here. Development dependencies are
@@ -52,14 +51,16 @@ Gem::Specification.new do |s|
   s.add_development_dependency('nokogiri')
   s.add_development_dependency('htmlentities')
   s.add_development_dependency('pending')
+  s.add_development_dependency('rake')
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
   ## THE MANIFEST COMMENTS, they are used as delimiters by the task.
   # = MANIFEST =
   s.files = %w[
+    Gemfile
     LICENSE
-    README.md
+    README.asciidoc
     Rakefile
     asciidoctor.gemspec
     bin/asciidoctor
@@ -78,6 +79,7 @@ Gem::Specification.new do |s|
     lib/asciidoctor/version.rb
     noof.rb
     test/attributes_test.rb
+    test/blocks_test.rb
     test/document_test.rb
     test/fixtures/asciidoc.txt
     test/fixtures/asciidoc_index.txt
@@ -86,8 +88,9 @@ Gem::Specification.new do |s|
     test/headers_test.rb
     test/lexer_test.rb
     test/links_test.rb
-    test/list_elements_test.rb
+    test/lists_test.rb
     test/paragraphs_test.rb
+    test/preamble_test.rb
     test/reader_test.rb
     test/test_helper.rb
     test/text_test.rb
