@@ -44,6 +44,7 @@ class Asciidoctor::Section
     @parent = parent
     @attributes = {}
     @blocks = []
+    @name = nil
   end
 
   # Public: Get the String section name with intrinsics converted
