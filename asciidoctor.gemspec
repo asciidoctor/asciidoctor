@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   ## the sub! line in the Rakefile
   s.name              = 'asciidoctor'
   s.version           = '0.0.7'
-  s.date              = '2012-12-17'
+  s.date              = '2012-12-19'
   s.rubyforge_project = 'asciidoctor'
 
   ## Make sure your summary is short. The description may be as long
@@ -57,6 +57,7 @@ Gem::Specification.new do |s|
   ## THE MANIFEST COMMENTS, they are used as delimiters by the task.
   # = MANIFEST =
   s.files = %w[
+    Gemfile
     LICENSE
     README.asciidoc
     Rakefile
@@ -77,6 +78,7 @@ Gem::Specification.new do |s|
     lib/asciidoctor/version.rb
     noof.rb
     test/attributes_test.rb
+    test/blocks_test.rb
     test/document_test.rb
     test/fixtures/asciidoc.txt
     test/fixtures/asciidoc_index.txt
