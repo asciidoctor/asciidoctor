@@ -60,12 +60,15 @@ task :coverage do
   sh "open coverage/index.html"
 end
 
-require 'rdoc/task'
-Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "#{name} #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+begin
+  require 'rdoc/task'
+  Rake::RDocTask.new do |rdoc|
+    rdoc.rdoc_dir = 'rdoc'
+    rdoc.title = "#{name} #{version}"
+    rdoc.rdoc_files.include('README*')
+    rdoc.rdoc_files.include('lib/**/*.rb')
+  end
+rescue 'something'
 end
 
 desc "Open an irb session preloaded with this library"
