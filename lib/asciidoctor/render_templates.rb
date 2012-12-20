@@ -65,9 +65,15 @@ class DocumentTemplate < BaseTemplate
   <body class='<%= doctype %>'>
     <% unless noheader %>
     <div id='header'>
-      <% unless notitle || !has_header %>
+      <% if has_header %>
+      <% unless notitle %>
       <h1><%= header.title %></h1>
+      <% end %>
       <% if attr? :author %><span id='author'><%= attr :author %></span><br><% end %>
+      <% if attr? :email %><span id='email' class='monospaced'>&lt;<%= attr :email %>&gt;</span><br><% end %>
+      <% if attr? :revnumber %><span id='revnumber'>version <%= attr :revnumber %><%= attr?(:revdate) ? ',' : '' %></span><% end %>
+      <% if attr? :revdate %><span id='revdate'><%= attr :revdate %></span><% end %>
+      <% if attr? :revremark %><br><span id='revremark'><%= attr :revremark %></span><% end %>
       <% end %>
     </div>
     <% end %>

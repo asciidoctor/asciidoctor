@@ -71,7 +71,7 @@ class Asciidoctor::Lexer
       next_line = reader.peek_line || ''
 
       if this_line.match(REGEXP[:comment_blk])
-        Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) })
+        reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) }
         reader.skip_blank
 
       elsif this_line.match(REGEXP[:comment])
@@ -621,10 +621,14 @@ class Asciidoctor::Lexer
     is_two_line_section_heading?(line1, line2)
   end
 
+  def self.is_title_section?(section, parent)
+    section.level == 0 && parent.is_a?(Document) && parent.elements.empty?
+  end
+
   # Private: Extracts the name, level and (optional) embedded anchor from a
   #          1- or 2-line section heading.
   #
-  # Returns an array of a String, Integer, and String or nil.
+  # Returns an array of [String, Integer, String, Boolean] or nil.
   #
   # Examples
   #
@@ -633,7 +637,7 @@ class Asciidoctor::Lexer
   #   line2
   #   => "~~~\n"
   #
-  #   name, level, anchor = extract_section_heading(line1, line2)
+  #   name, level, anchor, single = extract_section_heading(line1, line2)
   #
   #   name
   #   => "Foo"
@@ -641,11 +645,13 @@ class Asciidoctor::Lexer
   #   => 2
   #   anchor
   #   => nil
+  #   single
+  #   => false
   #
   #   line1
   #   => "==== Foo\n"
   #
-  #   name, level, anchor = extract_section_heading(line1)
+  #   name, level, anchor, single = extract_section_heading(line1)
   #
   #   name
   #   => "Foo"
@@ -653,16 +659,20 @@ class Asciidoctor::Lexer
   #   => 3
   #   anchor
   #   => nil
+  #   single
+  #   => true
   #
   def self.extract_section_heading(line1, line2 = nil)
     Asciidoctor.debug "#{__method__} -> line1: #{line1.chomp rescue 'nil'}, line2: #{line2.chomp rescue 'nil'}"
     sect_name = sect_anchor = nil
     sect_level = 0
 
+    single_line = false
     if is_single_line_section_heading?(line1)
       header_match = line1.match(REGEXP[:level_title])
       sect_name = header_match[2]
       sect_level = single_line_section_level(header_match[1])
+      single_line = true
     elsif is_two_line_section_heading?(line1, line2)
       header_match = line1.match(REGEXP[:name])
       if anchor_match = header_match[1].match(REGEXP[:anchor_embedded])
@@ -674,7 +684,66 @@ class Asciidoctor::Lexer
       sect_level = section_level(line2)
     end
     Asciidoctor.debug "#{__method__} -> Returning #{sect_name}, #{sect_level} (anchor: '#{sect_anchor || '<none>'}')"
-    return [sect_name, sect_level, sect_anchor]
+    return [sect_name, sect_level, sect_anchor, single_line]
+  end
+
+  # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).
+  #
+  # Returns the Hash of header metadata
+  #
+  # Examples
+  #
+  #  parse_header_metadata(Reader.new ["Author Name <author@example.org>\n", "v1.0, 2012-12-21: Coincide w/ end of world.\n"])
+  #  => {'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
+  #         'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.'}
+  def self.parse_header_metadata(reader)
+    # capture consecutive comment lines so we can reinsert them after the header
+    comment_lines = reader.consume_comments
+
+    metadata = {}
+    if reader.has_lines? && !reader.peek_line.strip.empty?
+      author_line = reader.get_line
+      match = author_line.match /^\s*([\w\-]+)(?: +([\w\-]+))?(?: +([\w\-]+))?(?: +<([^>]+)>)?\s*$/
+      if match
+        metadata['firstname'] = fname = match[1].tr('_', ' ')
+        metadata['author'] = fname
+        metadata['authorinitials'] = fname[0, 1]
+        if !match[2].nil? && !match[3].nil?
+          metadata['middlename'] = mname = match[2].tr('_', ' ')
+          metadata['lastname'] = lname = match[3].tr('_', ' ')
+          metadata['author'] = [fname, mname, lname].join ' '
+          metadata['authorinitials'] = [fname[0, 1], mname[0, 1], lname[0, 1]].join
+        elsif !match[2].nil?
+          metadata['lastname'] = lname = match[2].tr('_', ' ')
+          metadata['author'] = [fname, lname].join ' '
+          metadata['authorinitials'] = [fname[0, 1], lname[0, 1]].join
+        end
+        metadata['email'] = match[4] unless match[4].nil?
+      else
+        metadata['author'] = metadata['firstname'] = author_line.strip.squeeze(' ')
+        metadata['authorinitials'] = metadata['firstname'][0, 1]
+      end
+
+      # capture consecutive comment lines so we can reinsert them after the header
+      comment_lines += reader.consume_comments
+
+      if reader.has_lines? && !reader.peek_line.strip.empty?
+        rev_line = reader.get_line 
+        match = rev_line.match /^\s*(?:\D*(.*?),)?(?:\s*(.*?))(?:\s*:\s*(.*)\s*)?$/
+        if match
+          metadata['revdate'] = match[2]
+          metadata['revnumber'] = match[1] unless match[1].nil?
+          metadata['revremark'] = match[3] unless match[3].nil?
+        else
+          metadata['revdate'] = rev_line.strip
+        end
+      end
+
+      reader.skip_blank
+    end
+
+    reader.unshift *comment_lines
+    metadata
   end
 
   # Private: Return the next section from the Reader.
@@ -709,8 +778,8 @@ class Asciidoctor::Lexer
       if match = this_line.match(REGEXP[:anchor])
         section.anchor = match[1]
       elsif is_section_heading?(this_line, next_line)
-        section.name, section.level, section.anchor = extract_section_heading(this_line, next_line)
-        reader.get_line unless is_single_line_section_heading?(this_line)
+        section.name, section.level, section.anchor, single_line = extract_section_heading(this_line, next_line)
+        reader.get_line unless single_line
       end
     end
 
@@ -720,6 +789,10 @@ class Asciidoctor::Lexer
       section.anchor = anchor_id
     end
 
+    if (title_section = is_title_section? section, parent)
+      parent.attributes.update(parse_header_metadata(reader))
+    end
+
     # Grab all the lines that belong to this section
     section_lines = []
     while reader.has_lines?
@@ -727,7 +800,7 @@ class Asciidoctor::Lexer
       next_line = reader.peek_line
 
       if is_section_heading?(this_line, next_line)
-        _, this_level, _ = extract_section_heading(this_line, next_line)
+        _, this_level = extract_section_heading(this_line, next_line)
 
         if this_level <= section.level
           # A section can't contain a section level lower than itself,
@@ -761,7 +834,7 @@ class Asciidoctor::Lexer
 
     # detect preamble and push it into a block
     # QUESTION make this an operation on Section named extract_preamble?
-    if section.level == 0 && parent.is_a?(Document) && parent.elements.empty?
+    if title_section
       blocks = section.blocks.take_while {|b| !b.is_a? Section}
       if !blocks.empty?
         # QUESTION Should we propagate the buffer?
