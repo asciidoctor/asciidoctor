@@ -1,6 +1,10 @@
 require 'test_helper'
 
 context "Text" do
+  test "proper encoding to handle utf8 characters in document" do
+    assert_xpath "//p", example_document(:encoding).render, 1
+  end
+
   test 'escaped text markup' do
     pending "Not done yet"
   end

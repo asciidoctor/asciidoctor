@@ -1,0 +1,1 @@
+Gregory Romé has written an AsciiDoc plugin for the Redmine project management application.

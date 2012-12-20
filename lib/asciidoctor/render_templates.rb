@@ -50,6 +50,7 @@ end
 class DocumentTemplate < BaseTemplate
   def template
     @template ||= ::ERB.new <<-EOF
+<%#encoding:UTF-8%>
 <!DOCTYPE html>
 <html lang='en'>
   <head>
