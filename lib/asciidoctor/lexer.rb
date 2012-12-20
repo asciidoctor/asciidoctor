@@ -707,21 +707,21 @@ class Asciidoctor::Lexer
       if match
         metadata['firstname'] = fname = match[1].tr('_', ' ')
         metadata['author'] = fname
-        metadata['authorinitials'] = fname[0]
+        metadata['authorinitials'] = fname[0, 1]
         if !match[2].nil? && !match[3].nil?
           metadata['middlename'] = mname = match[2].tr('_', ' ')
           metadata['lastname'] = lname = match[3].tr('_', ' ')
           metadata['author'] = [fname, mname, lname].join ' '
-          metadata['authorinitials'] = [fname[0], mname[0], lname[0]].join
+          metadata['authorinitials'] = [fname[0, 1], mname[0, 1], lname[0, 1]].join
         elsif !match[2].nil?
           metadata['lastname'] = lname = match[2].tr('_', ' ')
           metadata['author'] = [fname, lname].join ' '
-          metadata['authorinitials'] = [fname[0], lname[0]].join
+          metadata['authorinitials'] = [fname[0, 1], lname[0, 1]].join
         end
         metadata['email'] = match[4] unless match[4].nil?
       else
-        metadata['author'] = metadata['firstname'] = author_line.strip.gsub /\s+/, ' '
-        metadata['authorinitials'] = metadata['firstname'][0]
+        metadata['author'] = metadata['firstname'] = author_line.strip.squeeze(' ')
+        metadata['authorinitials'] = metadata['firstname'][0, 1]
       end
 
       # capture consecutive comment lines so we can reinsert them after the header

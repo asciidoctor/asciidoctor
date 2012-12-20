@@ -3,7 +3,11 @@ require 'test/unit'
 
 require "#{File.expand_path(File.dirname(__FILE__))}/../lib/asciidoctor.rb"
 
-require 'mocha/setup'
+begin
+  require 'mocha/setup'
+rescue LoadError
+  require 'mocha'
+end
 require 'htmlentities'
 require 'nokogiri'
 require 'pending'
