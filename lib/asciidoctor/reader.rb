@@ -150,9 +150,9 @@ class Asciidoctor::Reader
 
   # Public: Check whether there are any lines left to read.
   #
-  # Returns true if @lines.any? is true, or false otherwise.
+  # Returns true if !@lines.empty? is true, or false otherwise.
   def has_lines?
-    @lines.any?
+    !@lines.empty?
   end
 
   # Private: Strip off leading blank lines in the Array of lines.
@@ -170,18 +170,49 @@ class Asciidoctor::Reader
   #   @lines
   #   => ["Foo\n", "Bar\n"]
   def skip_blank
-    while @lines.any? && @lines.first.strip.empty?
+    while has_lines? && @lines.first.strip.empty?
       @lines.shift
     end
 
     nil
   end
 
+  # Public: Consume consecutive lines containing line- or block-level comments.
+  #
+  # Returns the Array of lines that were consumed
+  #
+  # Examples
+  #   @lines
+  #   => ["// foo\n", "////\n", "foo bar\n", "////\n", "actual text\n"]
+  #
+  #   comment_lines = consume_comments
+  #   => ["// foo\n", "////\n", "foo bar\n", "////\n"]
+  #
+  #   @lines
+  #   => ["actual text\n"]
+  def consume_comments
+    comment_lines = []
+    while !@lines.empty?
+      next_line = peek_line
+      if next_line.match(REGEXP[:comment_blk])
+        comment_lines << get_line
+        comment_lines.push *(grab_lines_until(:preserve_last_line => true) {|line| line.match(REGEXP[:comment_blk])})
+        comment_lines << get_line
+      elsif next_line.match(REGEXP[:comment])
+        comment_lines << get_line
+      else
+        break
+      end
+    end
+
+    comment_lines
+  end
+
   # Skip the next line if it's a list continuation character
   # 
   # Returns nil
   def skip_list_continuation
-    if !@lines.empty? && @lines.first.chomp == '+'
+    if has_lines? && @lines.first.chomp == '+'
       @lines.shift
     end
 
@@ -204,11 +235,11 @@ class Asciidoctor::Reader
     @lines.first.dup if @lines.first
   end
 
-  # Public: Push String `line` onto queue of source data lines, unless `line` is nil.
+  # Public: Push Array of string `lines` onto queue of source data lines, unless `lines` has no non-nil values.
   #
   # Returns nil
-  def unshift(line)
-    @lines.unshift(line) if line
+  def unshift(*lines)
+    @lines.unshift(*lines) if lines.any?
     nil
   end
 
