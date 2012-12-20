@@ -65,7 +65,13 @@ class Asciidoctor::Document
     @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']].join(' ')
     @attributes['asciidoctor-version'] = VERSION
     if options.has_key? :attributes
-      @attributes.update(options[:attributes])
+      options[:attributes].delete_if {|k, v|
+        negative_key = (v.nil? || k[-1] == '!')
+        @attributes.delete(k.chomp '!') if negative_key
+        negative_key
+      }
+
+      @attributes.update(options[:attributes]) unless options.empty?
     end
 
     # Now parse @lines into elements
