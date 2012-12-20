@@ -18,6 +18,8 @@ Asciidoctor
 {asciidoc}[AsciiDoc] documents or strings into HTML (and, eventually
 other formats as well...'stay tuned!').
 
+image::https://travis-ci.org/erebor/asciidoctor.png?branch=master["Build Status", link="https://travis-ci.org/erebor/asciidoctor"]
+
 Asciidoctor uses simple built-in ERB templates to style the output in
 a way that roughly matches the default HTML output of the native
 Python processor. You can override this behavior by providing
