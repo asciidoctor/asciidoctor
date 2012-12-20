@@ -192,7 +192,7 @@ class Asciidoctor::Document
   # using the appropriate built-in template.
   def render(options = {})
     r = renderer(options)
-    @options.merge(options)[:header_footer] ? r.render('document', self) : content
+    @options.merge(options)[:header_footer] ? r.render('document', self) : r.render('embedded', self)
   end
 
   def content

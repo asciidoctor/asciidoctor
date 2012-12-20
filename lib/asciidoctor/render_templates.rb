@@ -14,7 +14,7 @@ class BaseTemplate
   # We're ignoring locals for now. Shut up.
   def render(obj = Object.new, locals = {})
     output = template.result(obj.instance_eval {binding})
-    self.is_a?(DocumentTemplate) ? output.gsub(/^\s*\n/, '') : output
+    (self.is_a?(DocumentTemplate) || self.is_a?(EmbeddedTemplate)) ? output.gsub(/^\s*\n/, '') : output
   end
 
   def template
@@ -88,6 +88,15 @@ class DocumentTemplate < BaseTemplate
     </div>
   </body>
 </html>
+    EOF
+  end
+end
+
+class EmbeddedTemplate < BaseTemplate
+  def template
+    @template ||= ::ERB.new <<-EOF
+<%#encoding:UTF-8%>
+<%= content %>
     EOF
   end
 end
@@ -213,6 +222,7 @@ end
 class BlockParagraphTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
+<%#encoding:UTF-8%>
 <div#{id} class='paragraph#{role}'>
   <% unless title.nil? %>
   <div class='title'><%= title %></div>
