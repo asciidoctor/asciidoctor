@@ -68,7 +68,7 @@ begin
     rdoc.rdoc_files.include('README*')
     rdoc.rdoc_files.include('lib/**/*.rb')
   end
-rescue 'something'
+rescue
 end
 
 desc "Open an irb session preloaded with this library"
