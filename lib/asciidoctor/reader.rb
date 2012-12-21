@@ -44,102 +44,17 @@ class Asciidoctor::Reader
   #
   #   data   = File.readlines(filename)
   #   reader = Asciidoctor::Reader.new(data)
-  def initialize(data = [], attributes = {}, &block)
-    raw_source = []
-    @attributes = attributes
+  def initialize(data = [], attributes = nil, &block)
     @references = {}
 
-    data = data.split("\n") if data.is_a? String
+    data = data.lines.entries if data.is_a? String
 
-    include_regexp = /^include::([^\[]+)\[\]\s*\n?\z/
-
-    data.each do |line|
-      if inc = line.match(include_regexp)
-        if block_given?
-          raw_source << yield(inc[1])
-        else
-          raw_source.concat(File.readlines(inc[1]))
-        end
-      else
-        raw_source << line
-      end
-    end
-
-    ifdef_regexp = /^(ifdef|ifndef)::([^\[]+)\[\]/
-    endif_regexp = /^endif::/
-    defattr_regexp = /^:([^:!]+):\s*(.*)\s*$/
-    delete_attr_regexp = /^:([^:]+)!:\s*$/
-    conditional_regexp = /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/
-
-    skip_to = nil
-    continuing_value = nil
-    continuing_key = nil
-    @lines = []
-    raw_source.each do |line|
-      if skip_to
-        skip_to = nil if line.match(skip_to)
-      elsif continuing_value
-        close_continue = false
-        # Lines that start with whitespace and end with a '+' are
-        # a continuation, so gobble them up into `value`
-        if match = line.match(/\s+(.+)\s+\+\s*$/)
-          continuing_value += ' ' + match[1]
-        elsif match = line.match(/\s+(.+)/)
-          # If this continued line doesn't end with a +, then this
-          # is the end of the continuation, no matter what the next
-          # line does.
-          continuing_value += ' ' + match[1]
-          close_continue = true
-        else
-          # If this line doesn't start with whitespace, then it's
-          # not a valid continuation line, so push it back for processing
-          close_continue = true
-          raw_source.unshift(line)
-        end
-        if close_continue
-          @attributes[continuing_key] = continuing_value
-          continuing_key = nil
-          continuing_value = nil
-        end
-      elsif match = line.match(ifdef_regexp)
-        attr = match[2]
-        skip = case match[1]
-               when 'ifdef';  !@attributes.has_key?(attr)
-               when 'ifndef'; @attributes.has_key?(attr)
-               end
-        skip_to = /^endif::#{attr}\[\]\s*\n/ if skip
-      elsif match = line.match(defattr_regexp)
-        key = sanitize_attribute_name(match[1])
-        value = match[2]
-        if match = value.match(Asciidoctor::REGEXP[:attr_continue])
-          # attribute value continuation line; grab lines until we run out
-          # of continuation lines
-          continuing_key = key
-          continuing_value = match[1]  # strip off the spaces and +
-          Asciidoctor.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
-        else
-          @attributes[key] = value
-          Asciidoctor.debug "Defines[#{key}] is '#{value}'"
-        end
-      elsif match = line.match(delete_attr_regexp)
-        key = sanitize_attribute_name(match[1])
-        @attributes.delete(key)
-      elsif !line.match(endif_regexp)
-        while match = line.match(conditional_regexp)
-          value = @attributes.has_key?(match[1]) ? match[2] : ''
-          line.sub!(conditional_regexp, value)
-        end
-        # leave line comments in as they play a role in flow (such as a list divider)
-        @lines << line
-      end
-    end
-
-    # Process bibliography references, so they're available when text
-    # before the reference is being rendered.
-    @lines.each do |line|
-      if biblio = line.match(REGEXP[:biblio])
-        @references[biblio[1]] = "[#{biblio[1]}]"
-      end
+    # if attributes are nil, we assume this is a preprocessed string
+    if attributes.nil?
+      @lines = data
+    else
+      @attributes = attributes
+      process(data)
     end
 
     #Asciidoctor.debug "About to leave Reader#init, and references is #{@references.inspect}"
@@ -279,6 +194,102 @@ class Asciidoctor::Reader
       buffer << this_line
     end
     buffer
+  end
+
+  # Private: Process raw input, used for the outermost reader.
+  def process(data)
+
+    raw_source = []
+    include_regexp = /^include::([^\[]+)\[\]\s*\n?\z/
+
+    data.each do |line|
+      if inc = line.match(include_regexp)
+        if block_given?
+          raw_source << yield(inc[1])
+        else
+          raw_source.concat(File.readlines(inc[1]))
+        end
+      else
+        raw_source << line
+      end
+    end
+
+    ifdef_regexp = /^(ifdef|ifndef)::([^\[]+)\[\]/
+    endif_regexp = /^endif::/
+    defattr_regexp = /^:([^:!]+):\s*(.*)\s*$/
+    delete_attr_regexp = /^:([^:]+)!:\s*$/
+    conditional_regexp = /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/
+
+    skip_to = nil
+    continuing_value = nil
+    continuing_key = nil
+    @lines = []
+    raw_source.each do |line|
+      if skip_to
+        skip_to = nil if line.match(skip_to)
+      elsif continuing_value
+        close_continue = false
+        # Lines that start with whitespace and end with a '+' are
+        # a continuation, so gobble them up into `value`
+        if match = line.match(/\s+(.+)\s+\+\s*$/)
+          continuing_value += ' ' + match[1]
+        elsif match = line.match(/\s+(.+)/)
+          # If this continued line doesn't end with a +, then this
+          # is the end of the continuation, no matter what the next
+          # line does.
+          continuing_value += ' ' + match[1]
+          close_continue = true
+        else
+          # If this line doesn't start with whitespace, then it's
+          # not a valid continuation line, so push it back for processing
+          close_continue = true
+          raw_source.unshift(line)
+        end
+        if close_continue
+          @attributes[continuing_key] = continuing_value
+          continuing_key = nil
+          continuing_value = nil
+        end
+      elsif match = line.match(ifdef_regexp)
+        attr = match[2]
+        skip = case match[1]
+               when 'ifdef';  !@attributes.has_key?(attr)
+               when 'ifndef'; @attributes.has_key?(attr)
+               end
+        skip_to = /^endif::#{attr}\[\]\s*\n/ if skip
+      elsif match = line.match(defattr_regexp)
+        key = sanitize_attribute_name(match[1])
+        value = match[2]
+        if match = value.match(Asciidoctor::REGEXP[:attr_continue])
+          # attribute value continuation line; grab lines until we run out
+          # of continuation lines
+          continuing_key = key
+          continuing_value = match[1]  # strip off the spaces and +
+          Asciidoctor.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
+        else
+          @attributes[key] = value
+          Asciidoctor.debug "Defines[#{key}] is '#{value}'"
+        end
+      elsif match = line.match(delete_attr_regexp)
+        key = sanitize_attribute_name(match[1])
+        @attributes.delete(key)
+      elsif !line.match(endif_regexp)
+        while match = line.match(conditional_regexp)
+          value = @attributes.has_key?(match[1]) ? match[2] : ''
+          line.sub!(conditional_regexp, value)
+        end
+        # leave line comments in as they play a role in flow (such as a list divider)
+        @lines << line
+      end
+    end
+
+    # Process bibliography references, so they're available when text
+    # before the reference is being rendered.
+    @lines.each do |line|
+      if biblio = line.match(REGEXP[:biblio])
+        @references[biblio[1]] = "[#{biblio[1]}]"
+      end
+    end
   end
 
 end
