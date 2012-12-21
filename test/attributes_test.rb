@@ -144,6 +144,25 @@ A paragraph.
       assert_equal 'lead', para.attributes['role']
     end
 
+    test "Last wins for id attribute" do
+      input = <<-EOS
+[[bar]]
+[[foo]]
+== Section
+
+paragraph
+
+[[baz]]
+[id='coolio']
+=== Section
+      EOS
+      doc = document_from_string(input)
+      sec = doc.first_section
+      assert_equal 'foo', sec.id
+      subsec = sec.blocks.last
+      assert_equal 'coolio', subsec.id
+    end
+
     test "Trailing block attributes reassociate with following section" do
       input = <<-EOS
 [[one]]

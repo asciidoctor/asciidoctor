@@ -20,23 +20,6 @@ class Asciidoctor::Lexer
     reader.skip_blank
 
     return nil unless reader.has_lines?
-    context = parent.is_a?(Block) ? parent.context : nil
-    attributes = {}
-
-    # NOTE: An anchor looks like this:
-    #   [[foo]]
-    # with the inside [foo] (including brackets) as match[1]
-    if match = reader.peek_line.match(REGEXP[:anchor])
-      Asciidoctor.debug "Found an anchor in line:\n\t#{reader.peek_line}"
-      attributes['id'] = parent.document.references[match[1]] = match[1]
-      reader.get_line
-      reader.skip_blank
-    end
-
-    # skip a list continuation character if we're processing a list
-    if LIST_CONTEXTS.include?(context)
-      reader.skip_list_continuation
-    end
 
     Asciidoctor.debug "/"*64
     Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
@@ -46,17 +29,29 @@ class Asciidoctor::Lexer
     reader.unshift tmp_line
     Asciidoctor.debug "/"*64
 
+    context = parent.is_a?(Block) ? parent.context : nil
     block = nil
     title = nil
     caption = nil
     buffer = []
-    context = parent.is_a?(Block) ? parent.context : nil
+    attributes = {}
+
+    # skip a list continuation character if we're processing a list
+    if LIST_CONTEXTS.include?(context)
+      reader.skip_list_continuation
+    end
+
     while reader.has_lines? && block.nil?
       buffer.clear
       this_line = reader.get_line
       next_line = reader.peek_line || ''
 
-      if this_line.match(REGEXP[:comment_blk])
+      if match = this_line.match(REGEXP[:anchor])
+        Asciidoctor.debug "Found an anchor in line:\n\t#{this_line}"
+        attributes['id'] = parent.document.references[match[1]] = match[1]
+        reader.skip_blank
+
+      elsif this_line.match(REGEXP[:comment_blk])
         reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) }
         reader.skip_blank
 
