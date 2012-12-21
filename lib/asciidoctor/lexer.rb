@@ -94,16 +94,16 @@ class Asciidoctor::Lexer
         attributes['alt'] ||= File.basename(target, File.extname(target))
         reader.skip_blank
 
-      elsif this_line.match(REGEXP[:oblock])
-        # oblock is surrounded by '--' lines and has zero or more blocks inside
-        buffer = Reader.new(reader.grab_lines_until { |line| line.match(REGEXP[:oblock]) })
+      elsif this_line.match(REGEXP[:open_blk])
+        # an open block is surrounded by '--' lines and has zero or more blocks inside
+        buffer = Reader.new(reader.grab_lines_until { |line| line.match(REGEXP[:open_blk]) })
 
         # Strip lines off end of block - not implemented yet
         # while buffer.has_lines? && buffer.last.strip.empty?
         #   buffer.pop
         # end
 
-        block = Block.new(parent, :oblock, [])
+        block = Block.new(parent, :open, [])
         while buffer.has_lines?
           new_block = next_block(buffer, block)
           block.blocks << new_block unless new_block.nil?
@@ -282,7 +282,7 @@ class Asciidoctor::Lexer
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true) {|line|
           (context == :dlist && line.match(REGEXP[:dlist])) ||
           ([:ulist, :olist, :dlist].include?(context) && line.chomp == LIST_CONTINUATION) ||
-          line.match(REGEXP[:oblock])
+          line.match(REGEXP[:open_blk])
         }
 
         if LIST_CONTEXTS.include?(context)
@@ -368,7 +368,7 @@ class Asciidoctor::Lexer
     while reader.has_lines?
       this_line = reader.get_line
       Asciidoctor.debug "----->  Processing: #{this_line}"
-      in_oblock = !in_oblock if this_line.match(REGEXP[:oblock])
+      in_oblock = !in_oblock if this_line.match(REGEXP[:open_blk])
       in_listing = !in_listing if this_line.match(REGEXP[:listing])
       if !in_oblock && !in_listing
         if this_line.strip.empty?

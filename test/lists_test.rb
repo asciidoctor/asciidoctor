@@ -297,6 +297,22 @@ context "Labeled lists (:dlist)" do
       output = render_string("term1::def1\nterm2::def2")
       assert_xpath '//dl', output, 0
     end
+
+    test "open block inside definition list" do
+      input = <<-EOS
+term::
++
+--
+Open block as definition of term.
+
+And some more detail...
+--
+anotherterm:: def
+      EOS
+      output = render_string input
+      assert_xpath '//dl/dd//p', output, 3
+      assert_xpath '(//dl/dd)[1]//*[@class="openblock"]//p', output, 2
+    end
   end
 
   context "Nested lists" do

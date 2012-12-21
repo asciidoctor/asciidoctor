@@ -153,7 +153,7 @@ class Asciidoctor::Block
     #Asciidoctor.debug @buffer.inspect
 
     case @context
-    when :preamble, :oblock, :example, :sidebar
+    when :preamble, :open, :example, :sidebar
       blocks.map{|block| block.render}.join
     when :colist
       @buffer.map do |li|
