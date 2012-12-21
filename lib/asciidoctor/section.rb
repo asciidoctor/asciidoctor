@@ -11,8 +11,8 @@
 #   section.size
 #   => 0
 #
-#   section.section_id
-#   => "_description"
+#   section.id
+#   => "description"
 #
 #   section << new_block
 #   section.size
@@ -37,11 +37,15 @@ class Asciidoctor::Section
   # Public: Get the Array of section blocks.
   attr_reader :blocks
 
+  # Public: Get the parent (Section or Document) of this Section
+  attr_reader :parent
+
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
   def initialize(parent)
     @parent = parent
+    @document = @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
     @attributes = {}
     @blocks = []
     @name = nil
@@ -70,9 +74,9 @@ class Asciidoctor::Section
   #
   #   section = Section.new(parent)
   #   section.name = "Foo"
-  #   section.section_id
+  #   section.generate_id
   #   => "_foo"
-  def section_id
+  def generate_id
     if self.document.attributes.has_key? 'sectids'
       self.document.attributes.fetch('idprefix', '_') + "#{name && name.downcase.gsub(/\W+/,'_').gsub(/_+$/, '')}".tr_s('_', '_')
     else
@@ -82,7 +86,7 @@ class Asciidoctor::Section
 
   # Public: Get the Asciidoctor::Document instance to which this Block belongs
   def document
-    @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
+    @document
   end
 
   def attr(name, default = nil)

@@ -56,11 +56,11 @@ module Asciidoctor
   LIST_CONTINUATION = '+'
 
   REGEXP = {
-    # [[Foo]]  (also allows, say, [[[]] or [[[Foo[f]], but I don't think it is supposed to (TODO))
-    :anchor           => /^\[(\[.+\])\]\s*$/,
+    # [[Foo]]
+    :anchor           => /^\[\[([^\[]+)\]\]\s*$/,
 
     # Foowhatevs [[Bar]]
-    :anchor_embedded  => /^(.*)\[\[([^\]]+)\]\]\s*$/,
+    :anchor_embedded  => /^(.*?)\s*\[\[([^\[]+)\]\]\s*$/,
 
     # +   Attribute values treat lines ending with ' +' as a continuation,
     #     not a line-break as elsewhere in the document, where this is
@@ -122,7 +122,7 @@ module Asciidoctor
     # match[1] is the delimiter, whose length determines the level
     # match[2] is the title itself
     # match[3] is an optional repeat of the delimiter, which is dropped
-    :level_title      => /^(={1,5})\s+(\S.*?)\s*(\s\1)?$/,
+    :level_title      => /^(={1,5})\s+(\S.*?)\s*(?:\[\[([^\[]+)\]\]\s*)?(\s\1)?$/,
 
     # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
     :line             => /^([=\-~^\+])+\s*$/,

@@ -46,6 +46,7 @@ class Asciidoctor::Block
   # elements). Would probably be better to pass in just the document.
   def initialize(parent, context, buffer=nil)
     @parent = parent
+    @document = @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
     @context = context
     @buffer = buffer
     @attributes = {}
@@ -55,8 +56,7 @@ class Asciidoctor::Block
 
   # Public: Get the Asciidoctor::Document instance to which this Block belongs
   def document
-    return @document if @document
-    @document = (@parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document)
+    @document
   end
 
   def attr(name, default = nil)

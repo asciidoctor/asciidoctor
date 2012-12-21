@@ -106,6 +106,10 @@ class Asciidoctor::Document
 
   end
 
+  def document
+    self
+  end
+
   # Make the raw source for the Document available.
   def source
     @reader.source if @reader
