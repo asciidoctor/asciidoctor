@@ -581,9 +581,9 @@ class Asciidoctor::Lexer
   end
 
   # Private: Get the Integer section level based on the characters
-  # used in the ASCII line under the section name.
+  # used in the ASCII line under the section title.
   #
-  # line - the String line from under the section name.
+  # line - the String line from under the section title.
   def self.section_level(line)
     char = line.strip.chars.to_a.uniq
     case char
@@ -620,7 +620,7 @@ class Asciidoctor::Lexer
     section.level == 0 && parent.is_a?(Document) && parent.elements.empty?
   end
 
-  # Private: Extracts the name, level and (optional) embedded anchor from a
+  # Private: Extracts the title, level and (optional) embedded anchor from a
   #          1- or 2-line section heading.
   #
   # Returns an array of [String, Integer, String, Boolean] or nil.
@@ -632,9 +632,9 @@ class Asciidoctor::Lexer
   #   line2
   #   => "~~~\n"
   #
-  #   name, level, anchor, single = extract_section_heading(line1, line2)
+  #   title, level, anchor, single = extract_section_heading(line1, line2)
   #
-  #   name
+  #   title
   #   => "Foo"
   #   level
   #   => 2
@@ -646,9 +646,9 @@ class Asciidoctor::Lexer
   #   line1
   #   => "==== Foo\n"
   #
-  #   name, level, anchor, single = extract_section_heading(line1)
+  #   title, level, anchor, single = extract_section_heading(line1)
   #
-  #   name
+  #   title
   #   => "Foo"
   #   level
   #   => 3
@@ -659,13 +659,13 @@ class Asciidoctor::Lexer
   #
   def self.extract_section_heading(line1, line2 = nil)
     Asciidoctor.debug "#{__method__} -> line1: #{line1.chomp rescue 'nil'}, line2: #{line2.chomp rescue 'nil'}"
-    sect_name = sect_anchor = nil
+    sect_title = sect_anchor = nil
     sect_level = 0
 
     single_line = false
     if is_single_line_section_heading?(line1)
       header_match = line1.match(REGEXP[:level_title])
-      sect_name = header_match[2]
+      sect_title = header_match[2]
       sect_anchor = header_match[3]
       sect_level = single_line_section_level(header_match[1])
       single_line = true
@@ -673,15 +673,15 @@ class Asciidoctor::Lexer
       # TODO could be optimized into a single regexp
       header_match = line1.match(REGEXP[:name])
       if anchor_match = header_match[1].match(REGEXP[:anchor_embedded])
-        sect_name   = anchor_match[1]
+        sect_title   = anchor_match[1]
         sect_anchor = anchor_match[2]
       else
-        sect_name = header_match[1]
+        sect_title = header_match[1]
       end
       sect_level = section_level(line2)
     end
-    Asciidoctor.debug "#{__method__} -> Returning #{sect_name}, #{sect_level} (anchor: '#{sect_anchor || '<none>'}')"
-    return [sect_name, sect_level, sect_anchor, single_line]
+    Asciidoctor.debug "#{__method__} -> Returning #{sect_title}, #{sect_level} (anchor: '#{sect_anchor || '<none>'}')"
+    return [sect_title, sect_level, sect_anchor, single_line]
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).
@@ -758,10 +758,10 @@ class Asciidoctor::Lexer
   #   // and to hold attributes extracted from header
   #   doc = Document.new([])
   #
-  #   Lexer.next_section(reader, doc).name
+  #   Lexer.next_section(reader, doc).title
   #   => "GREETINGS"
   #
-  #   Lexer.next_section(reader, doc).name
+  #   Lexer.next_section(reader, doc).title
   #   => "SALUTATIONS"
   def self.next_section(reader, parent)
     section = Section.new(parent)
@@ -776,7 +776,7 @@ class Asciidoctor::Lexer
 
     this_line = reader.get_line
     next_line = reader.peek_line || ''
-    section.name, section.level, section.anchor, single_line = extract_section_heading(this_line, next_line)
+    section.title, section.level, section.anchor, single_line = extract_section_heading(this_line, next_line)
     # generate an anchor if one was not *embedded* in the heading line
     section.anchor ||= section.generate_id
     reader.get_line unless single_line

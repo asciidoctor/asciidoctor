@@ -71,7 +71,7 @@ class Asciidoctor::ListItem
       @blocks.each_with_index do |block, i|
         Asciidoctor.puts_indented(parent_level, "v" * (60 - parent_level*2))
         Asciidoctor.puts_indented(parent_level, "Block ##{i} is a #{block.class}")
-        Asciidoctor.puts_indented(parent_level, "Name is #{block.name rescue 'n/a'}")
+        Asciidoctor.puts_indented(parent_level, "Name is #{block.title rescue 'n/a'}")
         Asciidoctor.puts_indented(parent_level, "=" * 40)
         block.splain(parent_level) if block.respond_to? :splain
         Asciidoctor.puts_indented(parent_level, "^" * (60 - parent_level*2))

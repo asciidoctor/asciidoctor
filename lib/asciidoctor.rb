@@ -145,8 +145,8 @@ module Asciidoctor
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
     :lit_par          => /^([ \t]+.*)$/,
 
-    # "Wooble"  ||  Wooble
-    :name             => /^(["A-Za-z].*)\s*$/,  # I believe this fails to require " chars to be paired (TODO)
+    # At least one alphanumeric character
+    :name             => /^(.*[\w].*?)\s*$/,
 
     # --
     :oblock           => /^\-\-\s*$/,

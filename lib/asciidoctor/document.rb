@@ -177,7 +177,7 @@ class Asciidoctor::Document
     @elements.each_with_index do |block, i|
       Asciidoctor.debug "v" * 60
       Asciidoctor.debug "Block ##{i} is a #{block.class}"
-      Asciidoctor.debug "Name is #{block.name rescue 'n/a'}"
+      Asciidoctor.debug "Name is #{block.title rescue 'n/a'}"
       block.splain(0) if block.respond_to? :splain
       Asciidoctor.debug "^" * 60
     end
