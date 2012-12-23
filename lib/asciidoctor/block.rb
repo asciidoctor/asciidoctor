@@ -198,7 +198,7 @@ class Asciidoctor::Block
       Asciidoctor.debug "#{__method__} -> Processing line: #{line}"
       f = sub_special_chars(line)
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
-      f = f.gsub(/(^|[^\\])\{(\w([\w\-]+)?\w)\}/) do
+      f = f.gsub(/ (^|[^\\]) \{ (\w([\w\-]+)?\w) \} /x) do
         if self.document.attributes.has_key?($2)
           # Substitute from user attributes first
           $1 + self.document.attributes[$2]
@@ -238,7 +238,7 @@ class Asciidoctor::Block
     result = lines.map do |line|
       Asciidoctor.debug "#{__method__} -> Processing line: #{line}"
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
-      line.gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) do
+      line.gsub(/ (^|[^\\]) \{ (\w[\w\-]+\w) \} /x) do
         if Asciidoctor::HTML_ELEMENTS.has_key?($2)
           $1 + Asciidoctor::HTML_ELEMENTS[$2]
         else
