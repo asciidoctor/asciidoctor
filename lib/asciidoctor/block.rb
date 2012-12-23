@@ -51,7 +51,6 @@ class Asciidoctor::Block
     @buffer = buffer
     @attributes = {}
     @blocks = []
-    @document = nil
   end
 
   # Public: Get the Asciidoctor::Document instance to which this Block belongs
