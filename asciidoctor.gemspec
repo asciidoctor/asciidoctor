@@ -65,6 +65,7 @@ Gem::Specification.new do |s|
     asciidoctor.gemspec
     bin/asciidoctor
     lib/asciidoctor.rb
+    lib/asciidoctor/attribute_list.rb
     lib/asciidoctor/block.rb
     lib/asciidoctor/debug.rb
     lib/asciidoctor/document.rb

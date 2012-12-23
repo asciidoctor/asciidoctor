@@ -60,7 +60,7 @@ class Asciidoctor::Lexer
         reader.skip_blank
 
       elsif match = this_line.match(REGEXP[:attr_list_blk])
-        collect_attributes(match[1], attributes)
+        AttributeList.new(match[1]).parse_into(attributes)
         reader.skip_blank
 
       # we're letting ruler have attributes
@@ -86,7 +86,7 @@ class Asciidoctor::Lexer
         reader.skip_blank
 
       elsif match = this_line.match(REGEXP[:image_blk])
-        collect_attributes(match[2], attributes, ['alt', 'width', 'height'])
+        AttributeList.new(match[2]).parse_into(attributes, ['alt', 'width', 'height'])
         block = Block.new(parent, :image)
         # FIXME this seems kind of one-off here
         target = block.sub_attributes(match[1])
@@ -185,7 +185,7 @@ class Asciidoctor::Lexer
       # FIXME violates DRY because it's a duplication of other block parsing
       elsif this_line.match(REGEXP[:example])
         # example is surrounded by lines with 4 or more '=' chars
-        rekey_positional_attributes(attributes, ['style'])
+        AttributeList.rekey(attributes, ['style'])
         if admonition_style = ADMONITION_STYLES.detect {|s| attributes['style'] == s}
           block = Block.new(parent, :admonition)
           attributes['name'] = admonition_style.downcase
@@ -202,14 +202,14 @@ class Asciidoctor::Lexer
 
       # FIXME violates DRY w/ non-delimited block listing
       elsif this_line.match(REGEXP[:listing])
-        rekey_positional_attributes(attributes, ['style', 'language', 'linenums'])
+        AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
         buffer = reader.grab_lines_until {|line| line.match( REGEXP[:listing] )}
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :listing, buffer)
 
       elsif this_line.match(REGEXP[:quote])
         # multi-line verse or quote is surrounded by a block delimiter
-        rekey_positional_attributes(attributes, ['style', 'attribution', 'citetitle'])
+        AttributeList.rekey(attributes, ['style', 'attribution', 'citetitle'])
         quote_context = (attributes['style'] == 'verse' ? :verse : :quote)
         buffer = Reader.new(reader.grab_lines_until {|line| line.match( REGEXP[:quote] ) })
 
@@ -253,14 +253,14 @@ class Asciidoctor::Lexer
 
       ## these switches based on style need to come immediately before the else ##
 
-      elsif attributes[0] == 'source'
-        rekey_positional_attributes(attributes, ['style', 'language', 'linenums'])
+      elsif attributes[1] == 'source'
+        AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
         reader.unshift(this_line)
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :listing, buffer)
 
-      elsif admonition_style = ADMONITION_STYLES.detect{|s| attributes[0] == s}
+      elsif admonition_style = ADMONITION_STYLES.detect{|s| attributes[1] == s}
         # an admonition preceded by [*TYPE*] and lasts until a blank line
         reader.unshift(this_line)
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
@@ -269,9 +269,9 @@ class Asciidoctor::Lexer
         attributes['name'] = admonition_style.downcase
         attributes['caption'] ||= admonition_style.capitalize
 
-      elsif quote_context = [:quote, :verse].detect{|s| attributes[0] == s.to_s}
+      elsif quote_context = [:quote, :verse].detect{|s| attributes[1] == s.to_s}
         # single-paragraph verse or quote is preceded by [verse] or [quote], respectively, and lasts until a blank line
-        rekey_positional_attributes(attributes, ['style', 'attribution', 'citetitle'])
+        AttributeList.rekey(attributes, ['style', 'attribution', 'citetitle'])
         reader.unshift(this_line)
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
         block = Block.new(parent, quote_context, buffer)
@@ -548,32 +548,6 @@ class Asciidoctor::Lexer
 
     block.buffer = items
     block
-  end
-
-  def self.collect_attributes(attrs, attributes, posattrs = [])
-    # TODO walk be properly rather than using split
-    attrs.split(/\s*,\s*/).each_with_index do |entry, i|
-      key, val = entry.split(/\s*=\s*/) 
-      if !val.nil?
-        val.gsub!(/^(['"])(.*)\1$/, '\2') unless val.nil?
-        attributes[key] = val
-      else
-        attributes[i] = key
-        # positional attribute has a known key
-        if posattrs.size >= (i + 1)
-          attributes[posattrs[i]] = key
-        end 
-      end
-    end
-  end
-
-  def self.rekey_positional_attributes(attributes, posattrs)
-    posattrs.each_with_index do |key, i|
-      val = attributes[i]
-      if !val.nil?
-        attributes[key] = val
-      end
-    end
   end
 
   # Private: Get the Integer section level based on the characters
