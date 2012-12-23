@@ -54,7 +54,7 @@ class Asciidoctor::Reader
       @lines = data
     else
       @attributes = attributes
-      process(data)
+      process(data, &block)
     end
 
     #Asciidoctor.debug "About to leave Reader#init, and references is #{@references.inspect}"
@@ -197,7 +197,7 @@ class Asciidoctor::Reader
   end
 
   # Private: Process raw input, used for the outermost reader.
-  def process(data)
+  def process(data, &block)
 
     raw_source = []
     include_regexp = /^include::([^\[]+)\[\]\s*\n?\z/
@@ -205,9 +205,9 @@ class Asciidoctor::Reader
     data.each do |line|
       if inc = line.match(include_regexp)
         if block_given?
-          raw_source << yield(inc[1])
+          raw_source.concat yield(inc[1])
         else
-          raw_source.concat(File.readlines(inc[1]))
+          raw_source.concat File.readlines(inc[1])
         end
       else
         raw_source << line
