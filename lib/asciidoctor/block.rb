@@ -50,6 +50,7 @@ class Asciidoctor::Block
     @buffer = buffer
     @attributes = {}
     @blocks = []
+    @document = nil
   end
 
   # Public: Get the Asciidoctor::Document instance to which this Block belongs
@@ -197,7 +198,7 @@ class Asciidoctor::Block
       Asciidoctor.debug "#{__method__} -> Processing line: #{line}"
       f = sub_special_chars(line)
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
-      f = f.gsub(/ (^|[^\\]) \{ (\w([\w\-_]+)?\w) \} /x) do
+      f = f.gsub(/ (^|[^\\]) \{ (\w([\w\-]+)?\w) \} /x) do
         if self.document.attributes.has_key?($2)
           # Substitute from user attributes first
           $1 + self.document.attributes[$2]
@@ -237,7 +238,7 @@ class Asciidoctor::Block
     result = lines.map do |line|
       Asciidoctor.debug "#{__method__} -> Processing line: #{line}"
       # gsub! doesn't have lookbehind, so we have to capture and re-insert
-      line.gsub(/ (^|[^\\]) \{ (\w[\w\-_]+\w) \} /x) do
+      line.gsub(/ (^|[^\\]) \{ (\w[\w\-]+\w) \} /x) do
         if Asciidoctor::HTML_ELEMENTS.has_key?($2)
           $1 + Asciidoctor::HTML_ELEMENTS[$2]
         else
@@ -312,7 +313,7 @@ class Asciidoctor::Block
       # a marker and replace it after the other gsub!s are done in here.
       # See:  http://www.methods.co.nz/asciidoc/userguide.html#X80
       html.gsub!(/`([^`]+)`/m) { "<tt>#{$1.gsub( '*', '{asterisk}' ).gsub( '\'', '{apostrophe}' )}</tt>" }
-      html.gsub!(/([\s\W])#(.+?)#([\s\W])/, '\1\2\3')
+      html.gsub!(/(\W)#(.+?)#(\W)/, '\1\2\3')
 
       # "Unconstrained" quotes
       html.gsub!(/\_\_([^\_]+)\_\_/m, '<em>\1</em>')

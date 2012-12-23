@@ -31,7 +31,7 @@ class Asciidoctor::Reader
   #   sanitize_attribute_name('Foo 3 #-Billy')
   #   => 'foo3-billy'
   def sanitize_attribute_name(name)
-    name.gsub(/[^\w\-_]/, '').downcase
+    name.gsub(/[^\w\-]/, '').downcase
   end
 
   # Public: Initialize the Reader object.
@@ -270,7 +270,7 @@ class Asciidoctor::Reader
     while (this_line = self.get_line)
       Asciidoctor.debug "Processing line: '#{this_line}'"
       finis ||= true if options[:break_on_blank_lines] && this_line.strip.empty?
-      finis ||= true if block && value = yield(this_line)
+      finis ||= true if block && yield(this_line)
       if finis
         self.unshift(this_line) if options[:preserve_last_line]
         break
