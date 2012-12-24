@@ -152,7 +152,9 @@ class BlockDlistTemplate < BaseTemplate
     </dt>
     <% unless dd.nil? %>
     <dd>
+      <% unless dd.text.empty? %>
       <p><%= dd.text %></p>
+      <% end %>
       <% unless dd.blocks.empty? %>
 <%= dd.content %> 
       <% end %>
@@ -256,6 +258,21 @@ class BlockExampleTemplate < BaseTemplate
     <% unless title.nil? %>
     <div class='title'><%= title %></div>
     <% end %>
+<%= content %>
+  </div>
+</div>
+    EOF
+  end
+end
+
+class BlockOpenTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<div#{id} class='openblock#{role}'>
+  <% unless title.nil? %>
+  <div class='title'><%= title %></div>
+  <% end %>
+  <div class='content'>
 <%= content %>
   </div>
 </div>

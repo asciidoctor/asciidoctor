@@ -39,4 +39,101 @@ context "Blocks" do
       assert_equal 1, d.elements.size
     end
   end
+
+  context "Example Blocks" do
+    test "can render example block" do
+      input = <<-EOS
+====
+This is an example of an example block.
+
+How crazy is that?
+====
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="exampleblock"]//p', output, 2
+    end
+  end
+
+  context "Open Blocks" do
+    test "can render open block" do
+      input = <<-EOS
+--
+This is an open block.
+
+It can span multiple lines.
+--
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="openblock"]//p', output, 2
+    end
+
+    test "open block can contain another block" do
+      input = <<-EOS
+--
+This is an open block.
+
+It can span multiple lines.
+
+____
+It can hold great quotes like this one.
+____
+--
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="openblock"]//p', output, 3
+      assert_xpath '//*[@class="openblock"]//*[@class="quoteblock"]', output, 1
+    end
+  end
+
+  context "Images" do
+    test "can render block image with alt text" do
+      input = <<-EOS
+image::images/tiger.png[Tiger]
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
+    test "can render block image with auto-generated alt text" do
+      input = <<-EOS
+image::images/tiger.png[]
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="tiger"]', output, 1
+    end
+
+    test "can render block image with alt text and height and width" do
+      input = <<-EOS
+image::images/tiger.png[Tiger, 200, 300]
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"][@width="200"][@height="300"]', output, 1
+    end
+
+    test "can render block image with link" do
+      input = <<-EOS
+image::images/tiger.png[Tiger, link='http://en.wikipedia.org/wiki/Tiger']
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
+    test "can render block image with caption" do
+      input = <<-EOS
+.The AsciiDoc Tiger
+image::images/tiger.png[Tiger]
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+      assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "The AsciiDoc Tiger"]', output, 1
+    end
+  end
 end
