@@ -1,6 +1,8 @@
 module Asciidoctor
+  @show_debug = nil
+
   def self.debug(*args)
-    puts *args if self.show_debug_output?
+    puts args if self.show_debug_output?
   end
 
   def self.set_debug(value)

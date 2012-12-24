@@ -45,6 +45,7 @@ class Asciidoctor::Document
   #   doc  = Asciidoctor::Document.new(data)
   def initialize(data, options = {}, &block)
     @elements = []
+    @renderer = nil
     @options = options
     @options[:header_footer] = @options.fetch(:header_footer, true)
 
