@@ -57,7 +57,7 @@ class Asciidoctor::Renderer
       STDERR.puts "Rendering:"
       @render_stack.each do |stack_view, stack_obj|
         obj_info = case stack_obj
-                   when Asciidoctor::Section; "SECTION #{stack_obj.name}"
+                   when Asciidoctor::Section; "SECTION #{stack_obj.title}"
                    when Asciidoctor::Block;
                      if stack_obj.context == :dlist
                        dt_list = stack_obj.buffer.map{|dt,dd| dt.content.strip}.join(', ')

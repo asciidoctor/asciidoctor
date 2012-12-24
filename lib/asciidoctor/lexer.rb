@@ -8,14 +8,6 @@ class Asciidoctor::Lexer
     raise 'Au contraire, mon frere. No lexer instances will be running around.'
   end
 
-  def self.document_from_parent(parent)
-    if parent.is_a? Document
-      parent
-    else
-      parent.document
-    end
-  end
-
   # Return the next block from the Reader.
   #
   # * Skip over blank lines to find the start of the next content block.
@@ -23,33 +15,11 @@ class Asciidoctor::Lexer
   # * Based on the type of content block, grab lines to the end of the block.
   # * Return a new Asciidoctor::Block or Asciidoctor::Section instance with the
   #   content set to the grabbed lines.
-  def self.next_block(reader, parent = self)
+  def self.next_block(reader, parent)
     # Skip ahead to the block content
     reader.skip_blank
 
     return nil unless reader.has_lines?
-    context = parent.is_a?(Block) ? parent.context : nil
-
-    # NOTE: An anchor looks like this:
-    #   [[foo]]
-    # with the inside [foo] (including brackets) as match[1]
-    if match = reader.peek_line.match(REGEXP[:anchor])
-      Asciidoctor.debug "Found an anchor in line:\n\t#{reader.peek_line}"
-      # NOTE: This expression conditionally strips off the brackets from
-      # [foo], though REGEXP[:anchor] won't actually match without
-      # match[1] being bracketed, so the condition isn't necessary.
-      anchor = match[1].match(/^\[(.*)\]/) ? $1 : match[1]
-      # NOTE: Set @references['foo'] = '[foo]'
-      document_from_parent(parent).references[anchor] = match[1]
-      reader.get_line
-    else
-      anchor = nil
-    end
-
-    # skip a list continuation character if we're processing a list
-    if LIST_CONTEXTS.include?(context)
-      reader.skip_list_continuation
-    end
 
     Asciidoctor.debug "/"*64
     Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
@@ -59,18 +29,29 @@ class Asciidoctor::Lexer
     reader.unshift tmp_line
     Asciidoctor.debug "/"*64
 
+    context = parent.is_a?(Block) ? parent.context : nil
     block = nil
     title = nil
     caption = nil
     buffer = []
     attributes = {}
-    context = parent.is_a?(Block) ? parent.context : nil
+
+    # skip a list continuation character if we're processing a list
+    if LIST_CONTEXTS.include?(context)
+      reader.skip_list_continuation
+    end
+
     while reader.has_lines? && block.nil?
       buffer.clear
       this_line = reader.get_line
       next_line = reader.peek_line || ''
 
-      if this_line.match(REGEXP[:comment_blk])
+      if match = this_line.match(REGEXP[:anchor])
+        Asciidoctor.debug "Found an anchor in line:\n\t#{this_line}"
+        attributes['id'] = parent.document.references[match[1]] = match[1]
+        reader.skip_blank
+
+      elsif this_line.match(REGEXP[:comment_blk])
         reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) }
         reader.skip_blank
 
@@ -86,11 +67,15 @@ class Asciidoctor::Lexer
         block = Block.new(parent, :ruler)
         reader.skip_blank
 
-      elsif is_section_heading?(this_line, next_line)
-        # If we've come to a new section, then we've found the end of this
-        # current block.  Likewise if we'd found an unassigned anchor, push
-        #
-        # FIXME when slurping up next section, give back trailing anchor to following section
+      # If we've come to a new section, then we need to recurse into it. Treat it
+      # as a whole as our current block. Pull any attributes that got orphaned
+      # from the previous block. (Previous does not mean sibling, just where
+      # whereever we broke from the last block in document order).
+      elsif is_section_heading? this_line, next_line
+        if parent.document.attributes.has_key? 'orphaned'
+          attributes.update(parent.document.attributes['orphaned'])
+          parent.document.attributes.delete('orphaned')
+        end
         reader.unshift(this_line)
         Asciidoctor.debug "#{__method__}: SENDING to next_section with lines[0] = #{reader.peek_line}"
         block = next_section(reader, parent)
@@ -317,14 +302,19 @@ class Asciidoctor::Lexer
       end
     end
 
-    # when looking for nested content, a series of
-    # line comments or a comment block could leave us
-    # without a block
+    # when looking for nested content, one or more line comments, comment
+    # blocks or trailing attribute lists could leave us without a block,
+    # so handle accordingly
     if !block.nil?
-      block.anchor   ||= (anchor || attributes['id'])
-      block.title    ||= title
-      block.caption  ||= caption
+      block.anchor    = attributes['id'] if attributes.has_key?('id')
+      block.title   ||= title
+      block.caption ||= caption
       block.update_attributes(attributes)
+    # if the block ended with unrooted attributes, then give them
+    # to the next block; this seems like a hack, but it really
+    # is the simplest solution to this problem
+    elsif !attributes.empty?
+      parent.document.attributes['orphaned'] = attributes
     end
 
     block
@@ -586,9 +576,9 @@ class Asciidoctor::Lexer
   end
 
   # Private: Get the Integer section level based on the characters
-  # used in the ASCII line under the section name.
+  # used in the ASCII line under the section title.
   #
-  # line - the String line from under the section name.
+  # line - the String line from under the section title.
   def self.section_level(line)
     char = line.strip.chars.to_a.uniq
     case char
@@ -600,7 +590,7 @@ class Asciidoctor::Lexer
     end
   end
 
-  # == is level 0, === is level 1, etc.
+  # = is level 0, == is level 1, etc.
   def self.single_line_section_level(line)
     [line.length - 1, 0].max
   end
@@ -625,7 +615,7 @@ class Asciidoctor::Lexer
     section.level == 0 && parent.is_a?(Document) && parent.elements.empty?
   end
 
-  # Private: Extracts the name, level and (optional) embedded anchor from a
+  # Private: Extracts the title, level and (optional) embedded anchor from a
   #          1- or 2-line section heading.
   #
   # Returns an array of [String, Integer, String, Boolean] or nil.
@@ -637,9 +627,9 @@ class Asciidoctor::Lexer
   #   line2
   #   => "~~~\n"
   #
-  #   name, level, anchor, single = extract_section_heading(line1, line2)
+  #   title, level, anchor, single = extract_section_heading(line1, line2)
   #
-  #   name
+  #   title
   #   => "Foo"
   #   level
   #   => 2
@@ -651,9 +641,9 @@ class Asciidoctor::Lexer
   #   line1
   #   => "==== Foo\n"
   #
-  #   name, level, anchor, single = extract_section_heading(line1)
+  #   title, level, anchor, single = extract_section_heading(line1)
   #
-  #   name
+  #   title
   #   => "Foo"
   #   level
   #   => 3
@@ -664,27 +654,29 @@ class Asciidoctor::Lexer
   #
   def self.extract_section_heading(line1, line2 = nil)
     Asciidoctor.debug "#{__method__} -> line1: #{line1.chomp rescue 'nil'}, line2: #{line2.chomp rescue 'nil'}"
-    sect_name = sect_anchor = nil
+    sect_title = sect_anchor = nil
     sect_level = 0
 
     single_line = false
     if is_single_line_section_heading?(line1)
       header_match = line1.match(REGEXP[:level_title])
-      sect_name = header_match[2]
+      sect_title = header_match[2]
+      sect_anchor = header_match[3]
       sect_level = single_line_section_level(header_match[1])
       single_line = true
     elsif is_two_line_section_heading?(line1, line2)
+      # TODO could be optimized into a single regexp
       header_match = line1.match(REGEXP[:name])
       if anchor_match = header_match[1].match(REGEXP[:anchor_embedded])
-        sect_name   = anchor_match[1]
+        sect_title   = anchor_match[1]
         sect_anchor = anchor_match[2]
       else
-        sect_name = header_match[1]
+        sect_title = header_match[1]
       end
       sect_level = section_level(line2)
     end
-    Asciidoctor.debug "#{__method__} -> Returning #{sect_name}, #{sect_level} (anchor: '#{sect_anchor || '<none>'}')"
-    return [sect_name, sect_level, sect_anchor, single_line]
+    Asciidoctor.debug "#{__method__} -> Returning #{sect_title}, #{sect_level} (anchor: '#{sect_anchor || '<none>'}')"
+    return [sect_title, sect_level, sect_anchor, single_line]
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).
@@ -748,19 +740,25 @@ class Asciidoctor::Lexer
 
   # Private: Return the next section from the Reader.
   #
+  # The assumption is made that this method is entered with the cursor
+  # positioned at a section line.
+  #
   # Examples
   #
   #   source
   #   => "GREETINGS\n---------\nThis is my doc.\n\nSALUTATIONS\n-----------\nIt is awesome."
   #
-  #   TODO: doc = Asciidoctor::Document.new(source)
+  #   reader = Reader.new(source.lines.entries)
+  #   // create empty document to parent the section
+  #   // and to hold attributes extracted from header
+  #   doc = Document.new([])
   #
-  #   doc.next_section
-  #   ["GREETINGS", [:paragraph, "This is my doc."]]
+  #   Lexer.next_section(reader, doc).title
+  #   => "GREETINGS"
   #
-  #   doc.next_section
-  #   ["SALUTATIONS", [:paragraph, "It is awesome."]]
-  def self.next_section(reader, parent = self)
+  #   Lexer.next_section(reader, doc).title
+  #   => "SALUTATIONS"
+  def self.next_section(reader, parent)
     section = Section.new(parent)
 
     Asciidoctor.debug "%"*64
@@ -771,23 +769,12 @@ class Asciidoctor::Lexer
     reader.unshift tmp_line
     Asciidoctor.debug "%"*64
 
-    # Skip ahead to the next section definition
-    while reader.has_lines? && section.name.nil?
-      this_line = reader.get_line
-      next_line = reader.peek_line || ''
-      if match = this_line.match(REGEXP[:anchor])
-        section.anchor = match[1]
-      elsif is_section_heading?(this_line, next_line)
-        section.name, section.level, section.anchor, single_line = extract_section_heading(this_line, next_line)
-        reader.get_line unless single_line
-      end
-    end
-
-    if !section.anchor.nil?
-      anchor_id = section.anchor.match(/^\[(.*)\]/) ? $1 : section.anchor
-      document_from_parent(parent).references[anchor_id] = section.anchor
-      section.anchor = anchor_id
-    end
+    this_line = reader.get_line
+    next_line = reader.peek_line || ''
+    section.title, section.level, section.anchor, single_line = extract_section_heading(this_line, next_line)
+    # generate an anchor if one was not *embedded* in the heading line
+    section.anchor ||= section.generate_id
+    reader.get_line unless single_line
 
     if (title_section = is_title_section? section, parent)
       parent.attributes.update(parse_header_metadata(reader))
@@ -799,22 +786,18 @@ class Asciidoctor::Lexer
       this_line = reader.get_line
       next_line = reader.peek_line
 
-      if is_section_heading?(this_line, next_line)
-        _, this_level = extract_section_heading(this_line, next_line)
+      if is_section_heading? this_line, next_line
+        _, this_level, _, single_line = extract_section_heading(this_line, next_line)
 
+        # A section can't contain a broader (lower level) to itself or a sibling section,
+        # so this signifies the end of this section. The attributes leading up to this
+        # section will be carried over through the 'orphaned' attribute of the document.
         if this_level <= section.level
-          # A section can't contain a section level lower than itself,
-          # so this signifies the end of the section.
           reader.unshift this_line
-          if section_lines.any? && section_lines.last.match(REGEXP[:anchor])
-            # Put back the anchor that came before this new-section line
-            # on which we're bailing.
-            reader.unshift section_lines.pop
-          end
           break
         else
           section_lines << this_line
-          section_lines << reader.get_line unless is_single_line_section_heading?(this_line)
+          section_lines << reader.get_line unless single_line
         end
       else
         section_lines << this_line
@@ -824,12 +807,8 @@ class Asciidoctor::Lexer
     section_reader = Reader.new(section_lines)
     # Now parse section_lines into Blocks belonging to the current Section
     while section_reader.has_lines?
-      section_reader.skip_blank
-
-      if section_reader.has_lines?
-        new_block = next_block(section_reader, section)
-        section << new_block unless new_block.nil?
-      end
+      new_block = next_block(section_reader, section)
+      section << new_block unless new_block.nil?
     end
 
     # detect preamble and push it into a block

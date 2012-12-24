@@ -117,11 +117,11 @@ class SectionTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
 <% if level == 0 %>
-<h1 id='<%= id ? id : section_id %>'><%= title %></h1>
+<h1#{id}><%= title %></h1>
 <%= content %>
 <% else %>
 <div class='sect<%= level %>#{role}'>
-  <h<%= level + 1 %> id='<%= id ? id : section_id %>'><%= title %></h<%= level + 1 %>>
+  <h<%= level + 1 %>#{id}><%= title %></h<%= level + 1 %>>
   <% if level == 1 %>
   <div class='sectionbody'>
 <%= content %>
