@@ -48,7 +48,8 @@ class Asciidoctor::Lexer
 
       if match = this_line.match(REGEXP[:anchor])
         Asciidoctor.debug "Found an anchor in line:\n\t#{this_line}"
-        attributes['id'] = parent.document.references[match[1]] = match[1]
+        attributes['id'] = match[1]
+        parent.document.references[match[1]] = "[#{match[1]}]"
         reader.skip_blank
 
       elsif this_line.match(REGEXP[:comment_blk])
