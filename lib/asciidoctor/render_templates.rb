@@ -336,7 +336,7 @@ end
 class BlockUlistTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
-<div#{id} class='ulist#{role}'>
+<div#{id} class='ulist#{styleclass(:style)}#{role}'>
   <% unless title.nil? %>
   <div class='title'><%= title %></div>
   <% end %>

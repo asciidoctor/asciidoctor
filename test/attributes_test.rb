@@ -81,8 +81,8 @@ context "Attributes" do
   end
 
   test "doesn't disturb attribute-looking things escaped with literals" do
-    html = render_string(":foo: bar\nThis is a +++{foo}+++ day.")
-    result = Nokogiri::HTML(html)
+    #html = render_string(":foo: bar\nThis is a +++{foo}+++ day.")
+    #result = Nokogiri::HTML(html)
     #assert_equal 'This is a {foo} day.', result.css('p').first.content.strip
     pending "Don't yet have inline passthrough working"
   end

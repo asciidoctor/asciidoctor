@@ -1,7 +1,7 @@
 require 'test_helper'
 
 context "Headers" do
-  context "document title" do
+  context "document title (level 0)" do
     test "document title with multiline syntax" do
       title = "My Title"
       chars = "=" * title.length
@@ -111,6 +111,112 @@ context "Headers" do
 
     test "with single line syntax" do
       assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", render_string("===== My Title")
+    end
+  end
+
+  context "heading patterns in blocks" do
+    test "should not interpret a listing block as a heading" do
+      input = <<-EOS
+Section
+-------
+
+----
+code
+----
+
+fin.
+      EOS
+      output = render_string input
+      assert_xpath "//h2", output, 1
+    end
+
+    test "should not interpret an open block as a heading" do
+      input = <<-EOS
+Section
+-------
+
+--
+ha
+--
+
+fin.
+      EOS
+      output = render_string input
+      assert_xpath "//h2", output, 1
+    end
+
+    test "should not interpret an attribute list as a heading" do
+      input = <<-EOS
+Section
+=======
+
+preamble
+
+[TIP]
+====
+This should be a tip, not a heading.
+====
+      EOS
+      output = render_string input
+      assert_xpath "//*[@class='admonitionblock']//p[text() = 'This should be a tip, not a heading.']", output, 1
+    end
+
+    test "should not match a heading in a labeled list" do
+      input = <<-EOS
+Section
+-------
+
+term1::
++
+----
+list = [1, 2, 3];
+----
+term2::
+== not a heading
+term3:: def
+
+//
+
+fin.
+      EOS
+      output = render_string input
+      assert_xpath "//h2", output, 1
+      assert_xpath "//dl", output, 1
+    end
+
+    test "should not match a heading in a bulleted list" do
+      input = <<-EOS
+Section
+-------
+
+* first
++
+----
+list = [1, 2, 3];
+----
++
+* second
+== not a heading
+* third
+
+fin.
+      EOS
+      output = render_string input
+      assert_xpath "//h2", output, 1
+      assert_xpath "//ul", output, 1
+    end
+
+    test "should not match a heading in a block" do
+      input = <<-EOS
+====
+
+== not a heading
+
+====
+      EOS
+      output = render_string input
+      assert_xpath "//h2", output, 0
+      assert_xpath "//*[@class='exampleblock']//p[text() = '== not a heading']", output, 1
     end
   end
 
