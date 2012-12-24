@@ -35,13 +35,31 @@ class ReaderTest < Test::Unit::TestCase
       second = reader.peek_line
       assert_equal "foo", second
     end
+
+    test "unshift puts line onto Reader instance for the next get_line" do
+      reader = Asciidoctor::Reader.new(["foo"])
+      reader.unshift("bar")
+      assert_equal "bar", reader.get_line
+      assert_equal "foo", reader.get_line
+    end
   end
 
-  test "unshift puts line onto Reader instance for the next get_line" do
-    reader = Asciidoctor::Reader.new(["foo"])
-    reader.unshift("bar")
-    assert_equal "bar", reader.get_line
-    assert_equal "foo", reader.get_line
+  context "Include files" do
+    test "block is called to handle an include macro" do
+      input = <<-EOS
+first line
+
+include::include-file.asciidoc[]
+
+last line
+      EOS
+      attributes = {}
+      reader = Asciidoctor::Reader.new(input.lines.entries, attributes) {|inc|
+        ":file: #{inc}\n\nmiddle line".lines.entries
+      }
+      expected = {'file' => 'include-file.asciidoc'}
+      assert_equal expected, attributes
+    end
   end
 
   def test_grab_lines_until
