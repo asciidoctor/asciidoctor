@@ -1,18 +1,18 @@
-# Public: Methods for managing sections of Asciidoc content in a document.
+# Public: Methods for managing sections of AsciiDoc content in a document.
 # The section responds as an Array of content blocks by delegating
 # block-related methods to its @blocks Array.
 #
 # Examples
 #
 #   section = Asciidoctor::Section.new
-#   section.name = 'DESCRIPTION'
+#   section.title = 'DESCRIPTION'
 #   section.anchor = 'DESCRIPTION'
 #
 #   section.size
 #   => 0
 #
-#   section.section_id
-#   => "_description"
+#   section.id
+#   => "description"
 #
 #   section << new_block
 #   section.size
@@ -21,8 +21,8 @@ class Asciidoctor::Section
   # Public: Get/Set the Integer section level.
   attr_accessor :level
 
-  # Public: Set the String section name.
-  attr_writer :name
+  # Public: Set the String section title.
+  attr_writer :title
 
   # Public: Get/Set the String section caption.
   attr_accessor :caption
@@ -37,29 +37,38 @@ class Asciidoctor::Section
   # Public: Get the Array of section blocks.
   attr_reader :blocks
 
+  # Public: Get the parent (Section or Document) of this Section
+  attr_reader :parent
+
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
   def initialize(parent)
     @parent = parent
+    @document = @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
     @attributes = {}
     @blocks = []
     @name = nil
   end
 
-  # Public: Get the String section name with intrinsics converted
+  # Public: Get the String section title with intrinsics converted
   #
   # Examples
   #
-  #   section.name = "git-web{litdd}browse(1) Manual Page"
-  #   section.name
-  #   => "git-web--browse(1) Manual Page"
+  #   section.title = "Foo 3^ # {litdd} Bar(1)"
+  #   section.title
+  #   => "Foo 3^ # -- Bar(1)"
   #
-  # Returns the String section name
-  def name
-    @name && 
-    @name.gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + (attr?($2) ? attr($2) : Asciidoctor::INTRINSICS[$2]) }.
+  # Returns the String section title
+  def title
+    @title && 
+    @title.gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + (attr?($2) ? attr($2) : Asciidoctor::INTRINSICS[$2]) }.
           gsub( /`([^`]+)`/, '<tt>\1</tt>' )
+  end
+
+  # Public: The name of this section, an alias of the section title
+  def name
+    title
   end
 
   # Public: Get the String section id prefixed with value of idprefix attribute, otherwise an underscore
@@ -69,12 +78,12 @@ class Asciidoctor::Section
   # Examples
   #
   #   section = Section.new(parent)
-  #   section.name = "Foo"
-  #   section.section_id
+  #   section.title = "Foo"
+  #   section.generate_id
   #   => "_foo"
-  def section_id
+  def generate_id
     if self.document.attributes.has_key? 'sectids'
-      self.document.attributes.fetch('idprefix', '_') + "#{name && name.downcase.gsub(/\W+/,'_').gsub(/_+$/, '')}".tr_s('_', '_')
+      self.document.attributes.fetch('idprefix', '_') + "#{title && title.downcase.gsub(/\W+/,'_').gsub(/_+$/, '')}".tr_s('_', '_')
     else
       nil
     end
@@ -82,7 +91,7 @@ class Asciidoctor::Section
 
   # Public: Get the Asciidoctor::Document instance to which this Block belongs
   def document
-    @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
+    @document
   end
 
   def attr(name, default = nil)
@@ -124,16 +133,11 @@ class Asciidoctor::Section
   #   "<div class=\"paragraph\"><p>foo</p></div>\n<div class=\"paragraph\"><p>bar</p></div>\n<div class=\"paragraph\"><p>baz</p></div>"
   def content
     @blocks.map do |block|
-      Asciidoctor.debug "Begin rendering block #{block.is_a?(Asciidoctor::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
+      Asciidoctor.debug "Begin rendering block #{block.is_a?(Asciidoctor::Section) ? block.title : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
       poo = block.render
-      Asciidoctor.debug "===> Done rendering block #{block.is_a?(Asciidoctor::Section) ? block.name : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
+      Asciidoctor.debug "===> Done rendering block #{block.is_a?(Asciidoctor::Section) ? block.title : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
       poo
     end.join
-  end
-
-  # Public: The title of this section, an alias of the section name
-  def title
-    name
   end
 
   # Public: Get the Integer number of blocks in the section.
