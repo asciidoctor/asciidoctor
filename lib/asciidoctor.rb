@@ -149,7 +149,7 @@ module Asciidoctor
     :name             => /^(.*[\w].*?)\s*$/,
 
     # --
-    :oblock           => /^\-\-\s*$/,
+    :open_blk         => /^\-\-\s*$/,
 
     # 1.Foo  ||  1. Foo  ||  . Foo
     :olist            => /^\s*(\d+\.|\. )(.*)$/,
