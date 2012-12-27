@@ -72,7 +72,7 @@ class Asciidoctor::Document
         negative_key
       }
 
-      @attributes.update(options[:attributes]) unless options.empty?
+      @attributes.update(options[:attributes]) unless options[:attributes].empty?
     end
 
     # Now parse @lines into elements
