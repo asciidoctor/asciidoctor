@@ -52,6 +52,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('htmlentities')
   s.add_development_dependency('pending')
   s.add_development_dependency('rake')
+  s.add_development_dependency('rdoc', '~> 3.12')
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
