@@ -24,30 +24,30 @@ require 'strscan'
 class Asciidoctor::AttributeList
 
   # Public: Regular expressions for detecting the boundary of a value
-  @@BOUNDARY_PATTERNS = {
+  BOUNDARY_PATTERNS = {
     '"' => /.*?[^\\](?=")/,
     '\'' => /.*?[^\\](?=')/,
     ',' => /.*?(?=[ \t]*(,|$))/
   }
 
   # Public: Regular expressions for unescaping quoted characters
-  @@UNESCAPE_PATTERNS = {
+  UNESCAPE_PATTERNS = {
     '\\"' => /\\"/,
     '\\\'' => /\\'/ 
   }
 
   # Public: Regular expressions for skipping blanks and delimiters
-  @@SKIP_PATTERNS = {
+  SKIP_PATTERNS = {
     :blank => /[ \t]+/,
     ',' => /[ \t]*(,|$)/
   }
 
   # Public: A regular expression for an attribute name
   # TODO named attributes cannot contain dash characters
-  @@NAME_PATTERN = /[A-Za-z:_][A-Za-z:_\-\.]*/
+  NAME_PATTERN = /[A-Za-z:_][A-Za-z:_\-\.]*/
 
   # Public: A regular expression for splitting a comma-separated string
-  @@CSV_SPLIT_PATTERN = /[ \t]*,[ \t]*/
+  CSV_SPLIT_PATTERN = /[ \t]*,[ \t]*/
 
   def initialize(source, quotes = ['\'', '"'], delimiter = ',', escape_char = '\\')
     @scanner = ::StringScanner.new source
@@ -157,7 +157,7 @@ class Asciidoctor::AttributeList
     else
       # example: options="opt1,opt2,opt3"
       if name == 'options'
-        value.split(@@CSV_SPLIT_PATTERN).each do |o|
+        value.split(CSV_SPLIT_PATTERN).each do |o|
           @attributes['option-' + o] = nil
         end
       end
@@ -173,28 +173,28 @@ class Asciidoctor::AttributeList
       quote + scan_to_delimiter
     else
       @scanner.get_byte
-      value.gsub(@@UNESCAPE_PATTERNS[@escape_char + quote], quote)
+      value.gsub(UNESCAPE_PATTERNS[@escape_char + quote], quote)
     end
   end
 
   def skip_blank
-    @scanner.skip @@SKIP_PATTERNS[:blank]
+    @scanner.skip SKIP_PATTERNS[:blank]
   end
 
   def skip_delimiter
-    @scanner.skip @@SKIP_PATTERNS[@delimiter]
+    @scanner.skip SKIP_PATTERNS[@delimiter]
   end
 
   def scan_name
-    @scanner.scan @@NAME_PATTERN
+    @scanner.scan NAME_PATTERN
   end
 
   def scan_to_delimiter
-    @scanner.scan @@BOUNDARY_PATTERNS[@delimiter]
+    @scanner.scan BOUNDARY_PATTERNS[@delimiter]
   end
 
   def scan_to_quote(quote)
-    @scanner.scan @@BOUNDARY_PATTERNS[quote]
+    @scanner.scan BOUNDARY_PATTERNS[quote]
   end
 
 end
