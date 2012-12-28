@@ -53,6 +53,15 @@ class Test::Unit::TestCase
     end
   end
 
+  def node_from_string(html, xpath = nil)
+    doc = (html =~ /\s*<!DOCTYPE/) ? Nokogiri::HTML::Document.parse(html) : Nokogiri::HTML::DocumentFragment.parse(html)
+    if xpath.nil?
+      doc
+    else
+      doc.xpath("#{xpath.sub('/', './')}").first
+    end
+  end
+
   def assert_xpath(xpath, html, count = nil)
     doc = (html =~ /\s*<!DOCTYPE/) ? Nokogiri::HTML::Document.parse(html) : Nokogiri::HTML::DocumentFragment.parse(html)
     results = doc.xpath("#{xpath.sub('/', './')}")

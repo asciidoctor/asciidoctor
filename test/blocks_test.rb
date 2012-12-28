@@ -55,6 +55,66 @@ How crazy is that?
     end
   end
 
+  context "Preformatted Blocks" do
+    test "should preserve endlines in literal block" do
+      input = <<-EOS
+....
+line one
+
+line two
+
+line three
+....
+EOS
+      output = render_string(input)
+      assert_xpath '//pre', output, 1
+      assert_xpath '//pre/text()', output, 1
+      text = node_from_string(output, '//pre/text()').content
+      lines = text.lines.entries 
+      assert_equal 5, lines.size
+      assert_equal ([] << "line one\n" << "\n" << "line two\n" << "\n" << "line three"), lines
+    end
+
+    test "should preserve endlines in listing block" do
+      input = <<-EOS
+----
+line one
+
+line two
+
+line three
+----
+EOS
+      output = render_string(input)
+      assert_xpath '//pre/code', output, 1
+      assert_xpath '//pre/code/text()', output, 1
+      text = node_from_string(output, '//pre/code/text()').content
+      lines = text.lines.entries 
+      assert_equal 5, lines.size
+      assert_equal ([] << "line one\n" << "\n" << "line two\n" << "\n" << "line three"), lines
+    end
+
+    test "should preserve endlines in verse block" do
+      input = <<-EOS
+[verse]
+____
+line one
+
+line two
+
+line three
+____
+EOS
+      output = render_string(input)
+      assert_xpath '//*[@class="verseblock"]/pre', output, 1
+      assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
+      text = node_from_string(output, '//*[@class="verseblock"]/pre/text()').content
+      lines = text.lines.entries 
+      assert_equal 5, lines.size
+      assert_equal ([] << "line one\n" << "\n" << "line two\n" << "\n" << "line three"), lines
+    end
+  end
+
   context "Open Blocks" do
     test "can render open block" do
       input = <<-EOS

@@ -217,6 +217,7 @@ module Asciidoctor
     'br-asciidoctor' => '<br/>'
   }
 
+  require 'asciidoctor/attribute_list'
   require 'asciidoctor/block'
   require 'asciidoctor/debug'
   require 'asciidoctor/document'
