@@ -62,7 +62,7 @@ end
 
 begin
   require 'rdoc/task'
-  Rake::RDocTask.new do |rdoc|
+  RDoc::Task.new do |rdoc|
     rdoc.rdoc_dir = 'rdoc'
     rdoc.title = "#{name} #{version}"
     rdoc.markup = 'tomdoc'
