@@ -24,58 +24,139 @@ context "Lexer" do
     assert !Asciidoctor::Lexer.is_title_section?(another_section, section.document)
   end
 
-  test "test_collect_unnamed_attributes" do
+  test "collect unnamed attribute" do
+    attributes = {}
+    line = 'quote'
+    expected = {1 => 'quote'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect unnamed attribute double-quoted" do
+    attributes = {}
+    line = '"quote"'
+    expected = {1 => 'quote'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect unnamed attribute double-quoted containing escaped quote" do
+    attributes = {}
+    line = '"ba\"zaar"'
+    expected = {1 => 'ba"zaar'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect unnamed attribute single-quoted" do
+    attributes = {}
+    line = '\'quote\''
+    expected = {1 => 'quote'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect unnamed attribute single-quoted containing escaped quote" do
+    attributes = {}
+    line = '\'ba\\\'zaar\''
+    expected = {1 => 'ba\'zaar'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect unnamed attribute with dangling delimiter" do
+    attributes = {}
+    line = 'quote , '
+    expected = {1 => 'quote'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect unnamed attributes" do
     attributes = {}
     line = "first, second one, third"
-    Asciidoctor::Lexer.collect_attributes(line, attributes)
-    assert_equal 3, attributes.length
-    assert_equal 'first', attributes[0]
-    assert_equal 'second one', attributes[1]
-    assert_equal 'third', attributes[2]
+    expected = {1 => 'first', 2 => 'second one', 3 => 'third'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
   end
 
-  test "test_collect_named_attributes" do
+  test "collect named attribute" do
+    attributes = {}
+    line = 'foo=bar'
+    expected = {'foo' => 'bar'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect named attribute double-quoted" do
+    attributes = {}
+    line = 'foo="bar"'
+    expected = {'foo' => 'bar'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect named attribute single-quoted" do
+    attributes = {}
+    line = 'foo=\'bar\''
+    expected = {'foo' => 'bar'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect named attributes unquoted" do
+    attributes = {}
+    line = "first=value, second=two, third=3"
+    expected = {'first' => 'value', 'second' => 'two', 'third' => '3'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect named attributes quoted" do
     attributes = {}
     line = "first='value', second=\"value two\", third=three"
-    Asciidoctor::Lexer.collect_attributes(line, attributes)
-    assert_equal 3, attributes.length
-    assert_equal 'value', attributes['first']
-    assert_equal 'value two', attributes['second']
-    assert_equal 'three', attributes['third']
+    expected = {'first' => 'value', 'second' => 'value two', 'third' => 'three'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
   end
 
-  test "test_collect_mixed_named_and_unnamed_attributes" do
+  test "collect named attributes quoted containing non-semantic spaces" do
     attributes = {}
-    line = "first, second=\"value two\", third=three"
-    Asciidoctor::Lexer.collect_attributes(line, attributes)
-    assert_equal 3, attributes.length
-    assert_equal 'first', attributes[0]
-    assert_equal 'value two', attributes['second']
-    assert_equal 'three', attributes['third']
+    line = "     first    =     'value', second     =\"value two\"     , third=       three      "
+    expected = {'first' => 'value', 'second' => 'value two', 'third' => 'three'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
   end
 
-  test "test_collect_and_rekey_unnamed_attributes" do
+  test "collect mixed named and unnamed attributes" do
+    attributes = {}
+    line = "first, second=\"value two\", third=three, Sherlock Holmes"
+    expected = {1 => 'first', 'second' => 'value two', 'third' => 'three', 4 => 'Sherlock Holmes'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect options attribute" do
+    attributes = {}
+    line = "quote, options='opt1,opt2 , opt3'"
+    expected = {1 => 'quote', 'options' => 'opt1,opt2 , opt3', 'option-opt1' => nil, 'option-opt2' => nil, 'option-opt3' => nil}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect and rekey unnamed attributes" do
     attributes = {}
     line = "first, second one, third, fourth"
-    Asciidoctor::Lexer.collect_attributes(line, attributes, ['a', 'b', 'c'])
-    assert_equal 7, attributes.length
-    assert_equal 'first', attributes['a']
-    assert_equal 'second one', attributes['b']
-    assert_equal 'third', attributes['c']
-    assert_equal 'first', attributes[0]
-    assert_equal 'second one', attributes[1]
-    assert_equal 'third', attributes[2]
-    assert_equal 'fourth', attributes[3]
+    expected = {1 => 'first', 2 => 'second one', 3 => 'third', 4 => 'fourth', 'a' => 'first', 'b' => 'second one', 'c' => 'third'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes, ['a', 'b', 'c'])
+    assert_equal expected, attributes
   end
 
-  test "test_rekey_positional_attributes" do
-    attributes = {0 => 'source', 1 => 'java'}
-    Asciidoctor::Lexer.rekey_positional_attributes(attributes, ['style', 'language', 'linenums'])
-    assert_equal 4, attributes.length
-    assert_equal 'source', attributes[0]
-    assert_equal 'java', attributes[1]
-    assert_equal 'source', attributes['style']
-    assert_equal 'java', attributes['language']
+  test "rekey positional attributes" do
+    attributes = {1 => 'source', 2 => 'java'}
+    expected = {1 => 'source', 2 => 'java', 'style' => 'source', 'language' => 'java'}
+    Asciidoctor::AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
+    assert_equal expected, attributes
   end
 
   test "test_parse_author_first" do
