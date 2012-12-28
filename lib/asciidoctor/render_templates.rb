@@ -1,4 +1,7 @@
 class BaseTemplate
+  BLANK_LINES_PATTERN = /^\s*\n/
+  LINE_FEED_ENTITY = "&#10;" # or &#x0A;
+
   def initialize
   end
 
@@ -14,7 +17,7 @@ class BaseTemplate
   # We're ignoring locals for now. Shut up.
   def render(obj = Object.new, locals = {})
     output = template.result(obj.instance_eval {binding})
-    (self.is_a?(DocumentTemplate) || self.is_a?(EmbeddedTemplate)) ? output.gsub(/^\s*\n/, '') : output
+    (self.is_a?(DocumentTemplate) || self.is_a?(EmbeddedTemplate)) ? output.gsub(BLANK_LINES_PATTERN, '').gsub(LINE_FEED_ENTITY, "\n") : output
   end
 
   def template
@@ -175,7 +178,7 @@ class BlockListingTemplate < BaseTemplate
   <div class='title'><%= title %></div>
   <% end %>
   <div class='content monospaced'>
-    <pre class='highlight#{styleclass(:language)}'><code><%= content %></code></pre>
+    <pre class='highlight#{styleclass(:language)}'><code><%= content.gsub("\n", LINE_FEED_ENTITY) %></code></pre>
   </div>
 </div>
     EOF
@@ -190,7 +193,7 @@ class BlockLiteralTemplate < BaseTemplate
   <div class='title'><%= title %></div>
   <% end %>
   <div class='content monospaced'>
-    <pre><%= content %></pre>
+    <pre><%= content.gsub("\n", LINE_FEED_ENTITY) %></pre>
   </div>
 </div>
     EOF
@@ -313,7 +316,7 @@ class BlockVerseTemplate < BaseTemplate
   <% unless title.nil? %>
   <div class='title'><%= title %></div>
   <% end %>
-  <pre class='content'><%= content %></pre>
+  <pre class='content'><%= content.gsub("\n", LINE_FEED_ENTITY) %></pre>
   <div class='attribution'>
     <% if attr? :citetitle %>
     <em><%= attr :citetitle %></em>
