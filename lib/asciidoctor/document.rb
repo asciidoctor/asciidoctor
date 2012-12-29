@@ -92,6 +92,7 @@ class Asciidoctor::Document
 
     # split off the level 0 section, if present
     root = @elements.first
+    @header = nil
     if root.is_a?(Section) && root.level == 0
       @header = @elements.shift
       # a book has multiple level 0 sections

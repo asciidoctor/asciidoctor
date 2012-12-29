@@ -9,14 +9,20 @@ class Asciidoctor::ListItem
   # Public: Get/Set the Integer list level (for nesting list elements).
   attr_accessor :level
 
+  # Public: Get/Set the String used to mark this list item
+  attr_accessor :marker
+
+  attr_reader :parent
+
   # Public: Initialize an Asciidoctor::ListItem object.
   #
   # parent - The parent list block for this list item
-  # text - the String text (default '')
-  def initialize(parent, text='')
+  # text - the String text (default nil)
+  def initialize(parent, text=nil)
     @parent = parent
     @text = text
     @blocks = []
+    @level = parent.level
   end
 
   def text=(new_text)
@@ -43,19 +49,15 @@ class Asciidoctor::ListItem
 
   # Public: Fold the first paragraph block into the text
   def fold_first
-    # looking for :literal here allows indentation of paragraph content, then strip indent
-    if !blocks.empty? && blocks.first.is_a?(Asciidoctor::Block) &&
-        (blocks.first.context == :paragraph || blocks.first.context == :literal)
+    if parent.context == :dlist && !blocks.empty? && blocks.first.is_a?(Asciidoctor::Block) &&
+        ((blocks.first.context == :paragraph && blocks.first.buffer != Asciidoctor::LIST_CONTINUATION) ||
+        (blocks.first.context == :literal && blocks.first.attr(:options, []).include?('listparagraph')))
       block = blocks.shift
       if !@text.nil? && !@text.empty?
         block.buffer.unshift(@text)
       end
 
-      if block.context == :literal
-        @text = block.buffer.map {|l| l.lstrip}.join("\n")
-      else
-        @text = block.buffer.join("\n")
-      end
+      @text = block.buffer.join("\n")
     end
   end
 
