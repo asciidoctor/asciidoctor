@@ -926,13 +926,13 @@ class Asciidoctor::Lexer
         marker = '1.'
       when :loweralpha
         if validate
-          expected = ('a'.ord + ordinal).chr
+          expected = ('a'[0].ord + ordinal).chr
           actual = marker.chomp('.')
         end
         marker = 'a.'
       when :upperalpha
         if validate
-          expected = ('A'.ord + ordinal).chr
+          expected = ('A'[0].ord + ordinal).chr
           actual = marker.chomp('.')
         end
         marker = 'A.'
