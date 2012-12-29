@@ -57,6 +57,9 @@ class Asciidoctor::Reader
       process(data, &block)
     end
 
+    # just in case we got some nils floating at the end of our lines after reading a funky document
+    @lines.pop while !@lines.empty? && @lines.last.nil?
+
     #Asciidoctor.debug "About to leave Reader#init, and references is #{@references.inspect}"
     @source = @lines.join
     Asciidoctor.debug "Leaving Reader#init, and I have #{@lines.count} lines"
@@ -111,7 +114,7 @@ class Asciidoctor::Reader
       next_line = peek_line
       if next_line.match(REGEXP[:comment_blk])
         comment_lines << get_line
-        comment_lines.push *(grab_lines_until(:preserve_last_line => true) {|line| line.match(REGEXP[:comment_blk])})
+        comment_lines.push(*(grab_lines_until(:preserve_last_line => true) {|line| line.match(REGEXP[:comment_blk])}))
         comment_lines << get_line
       elsif next_line.match(REGEXP[:comment])
         comment_lines << get_line
@@ -168,6 +171,9 @@ class Asciidoctor::Reader
   #           * :preserve_last_line may be used to specify that the String
   #               causing the method to stop processing lines should be
   #               pushed back onto the `lines` Array.
+  #           * :grab_last_line may be used to specify that the String
+  #               causing the method to stop processing lines should be
+  #               included in the lines being returned
   #
   # Returns the Array of lines forming the next segment.
   #
@@ -182,12 +188,14 @@ class Asciidoctor::Reader
   def grab_lines_until(options = {}, &block)
     buffer = []
 
+    finis = false
     while (this_line = self.get_line)
       Asciidoctor.debug "Processing line: '#{this_line}'"
-      finis ||= true if options[:break_on_blank_lines] && this_line.strip.empty?
-      finis ||= true if block && yield(this_line)
+      finis = true if options[:break_on_blank_lines] && this_line.strip.empty?
+      finis = true if !finis && block && yield(this_line)
       if finis
         self.unshift(this_line) if options[:preserve_last_line]
+        buffer << this_line if options[:grab_last_line]
         break
       end
 

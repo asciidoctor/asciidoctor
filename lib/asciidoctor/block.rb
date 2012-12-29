@@ -35,6 +35,9 @@ class Asciidoctor::Block
   # Public: Get/Set the String block caption.
   attr_accessor :caption
 
+  # Public: Get the Section or Block which is the parent of this block
+  attr_reader :parent
+
   # Public: Initialize an Asciidoctor::Block object.
   #
   # parent  - The parent Asciidoc Object.

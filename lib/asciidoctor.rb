@@ -53,14 +53,31 @@ module Asciidoctor
 
   LIST_CONTEXTS = [:ulist, :olist, :dlist]
 
+  ORDERED_LIST_STYLES = [:arabic, :loweralpha, :lowerroman, :upperalpha, :upperroman]
+
+  ORDERED_LIST_MARKER_PATTERNS = {
+    :arabic => /\d+[\.>]/,
+    :loweralpha => /[a-z]\./,
+    :upperalpha => /[A-Z]\./,
+    :lowerroman => /[ivx]+\)/,
+    :upperroman => /[IVX]+\)/
+  }
+
   LIST_CONTINUATION = '+'
 
   REGEXP = {
     # [[Foo]]
+    # ']' characters must be escaped with a backslash
     :anchor           => /^\[\[([^\[]+)\]\]\s*$/,
 
     # Foowhatevs [[Bar]]
+    # ']' characters must be escaped with a backslash
     :anchor_embedded  => /^(.*?)\s*\[\[([^\[]+)\]\]\s*$/,
+
+    # matches any block delimiter:
+    #   open, listing, example, literal, comment, quote, sidebar, passthrough, table
+    # NOTE position most common blocks towards the front of the pattern
+    :any_blk          => /^(?:\-\-|(?:\-|=|\.|\/|_|\*\+){4,}|\|={3,})\s*$/,
 
     # +   Attribute values treat lines ending with ' +' as a continuation,
     #     not a line-break as elsewhere in the document, where this is
@@ -77,7 +94,16 @@ module Asciidoctor
     # [NOTE, caption="Good to know"]
     :attr_list_blk    => /^\[(\w.*)\]$/,
 
+    # attribute list or anchor (indicates a paragraph break)
+    # ']' characters must be escaped with a backslash
+    :attr_line        => /^\[(\w.*|\[[^\[]+\])\]$/,
+
+    # The author info line the appears immediately following the document title
+    # John Doe <john@anonymous.com>
+    :author_info      => /^\s*([\w\-]+)(?: +([\w\-]+))?(?: +([\w\-]+))?(?: +<([^>]+)>)?\s*$/,
+
     # [[[Foo]]]  (does not suffer quite the same malady as :anchor, but almost. Allows [ but not ] in internal capture
+    # ']' characters must be escaped with a backslash
     :biblio           => /\[\[\[([^\]]+)\]\]\]/,
 
     # <1> Foo
@@ -108,6 +134,9 @@ module Asciidoctor
 
     # image::filename.png[Caption]
     :image_blk        => /^image::(\S+?)\[(.*?)\]$/,
+
+    # whitespace at the beginning of the line
+    :leading_blanks   => /^([ \t]*)/,
 
     # == Foo
     # ^ yields a level 2 title
@@ -151,11 +180,21 @@ module Asciidoctor
     # --
     :open_blk         => /^\-\-\s*$/,
 
-    # 1.Foo  ||  1. Foo  ||  . Foo
-    :olist            => /^\s*(\d+\.|\. )(.*)$/,
+    # . Foo (up to 5 consecutive dots)
+    # 1. Foo (arabic, default)
+    # a. Foo (loweralpha)
+    # A. Foo (upperalpha)
+    # i. Foo (lowerroman)
+    # I. Foo (upperroman)
+    :olist            => /^\s*(\d+\.|[a-z]\.|[ivx]+\)|\.{1,5}) +(.*)$/i,
 
     # ____
     :quote            => /^_{4,}\s*$/,
+
+    # The document revision info line the appears immediately following the
+    # document title author info line, if present
+    # v1.0, 2013-01-01: Ring in the new year release
+    :revision_info    => /^\s*(?:\D*(.*?),)?(?:\s*(.*?))(?:\s*:\s*(.*)\s*)?$/,
 
     # '''
     :ruler            => /^'{3,}\s*$/,
@@ -170,7 +209,8 @@ module Asciidoctor
     # .Foo   but not  . Foo or ..Foo
     :title            => /^\.([^\s\.].*)\s*$/,
 
-    # * Foo  ||  - Foo
+    # * Foo (up to 5 consecutive asterisks)
+    # - Foo
     :ulist            => /^ \s* (- | \*{1,5}) \s+ (.*) $/x
   }
 
