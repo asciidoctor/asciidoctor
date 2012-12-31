@@ -79,6 +79,12 @@ class Test::Unit::TestCase
     Asciidoctor::Document.new(src.lines.entries, opts)
   end
 
+  def block_from_string(src, opts = {})
+    opts[:header_footer] = false
+    doc = Asciidoctor::Document.new(src.lines.entries, opts)
+    doc.elements.first
+  end
+
   def render_string(src, opts = {})
     document_from_string(src, opts).render
   end

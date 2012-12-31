@@ -49,8 +49,9 @@ class Asciidoctor::AttributeList
   # Public: A regular expression for splitting a comma-separated string
   CSV_SPLIT_PATTERN = /[ \t]*,[ \t]*/
 
-  def initialize(source, quotes = ['\'', '"'], delimiter = ',', escape_char = '\\')
+  def initialize(source, document = nil, quotes = ['\'', '"'], delimiter = ',', escape_char = '\\')
     @scanner = ::StringScanner.new source
+    @document = document
     @quotes = quotes
     @escape_char = escape_char
     @delimiter = delimiter
@@ -145,23 +146,26 @@ class Asciidoctor::AttributeList
     end
 
     if value.nil?
+      resolved_name = @document ? Asciidoctor::Substituters.sub_attributes(name, @document) : name
       if !(posname = posattrs[index]).nil?
-        @attributes[posname] = name
+        @attributes[posname] = resolved_name
       else
-        #@attributes[index + 1] = name
+        #@attributes[index + 1] = resolved_name
       end
       # not sure if we want to always assign the positional key
-      @attributes[index + 1] = name
+      @attributes[index + 1] = resolved_name
       # not sure if I want this assignment or not
-      #@attributes[name] = nil
+      #@attributes[resolved_name] = nil
     else
+      # TODO single-quoted attributes should get normal substitutions, not just attributes
+      resolved_value = @document ? Asciidoctor::Substituters.sub_attributes(value, @document) : value
       # example: options="opt1,opt2,opt3"
       if name == 'options'
-        value.split(CSV_SPLIT_PATTERN).each do |o|
+        resolved_value.split(CSV_SPLIT_PATTERN).each do |o|
           @attributes['option-' + o] = nil
         end
       end
-      @attributes[name] = value
+      @attributes[name] = resolved_value
     end
 
     true

@@ -1,10 +1,8 @@
 require 'rubygems'
-require 'cgi'
 require 'erb'
-require 'tilt'
 
 $:.unshift(File.dirname(__FILE__))
-$:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
+#$:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
 # using erb templates.
@@ -67,12 +65,10 @@ module Asciidoctor
 
   REGEXP = {
     # [[Foo]]
-    # ']' characters must be escaped with a backslash
-    :anchor           => /^\[\[([^\[]+)\]\]\s*$/,
+    :anchor           => /^\[\[([^\[\]]+)\]\]\s*$/,
 
     # Foowhatevs [[Bar]]
-    # ']' characters must be escaped with a backslash
-    :anchor_embedded  => /^(.*?)\s*\[\[([^\[]+)\]\]\s*$/,
+    :anchor_embedded  => /^(.*?)\s*\[\[([^\[\]]+)\]\]\s*$/,
 
     # matches any block delimiter:
     #   open, listing, example, literal, comment, quote, sidebar, passthrough, table
@@ -95,16 +91,23 @@ module Asciidoctor
     :attr_list_blk    => /^\[(\w.*)\]$/,
 
     # attribute list or anchor (indicates a paragraph break)
-    # ']' characters must be escaped with a backslash
-    :attr_line        => /^\[(\w.*|\[[^\[]+\])\]$/,
+    :attr_line        => /^\[(\w.*|\[[^\[\]]+\])\]$/,
+
+    # attribute reference
+    # {foo}
+    :attr_ref         => /(\\?)\{(\w|\w[\w\-]*\w)(\\?)\}/,
 
     # The author info line the appears immediately following the document title
     # John Doe <john@anonymous.com>
     :author_info      => /^\s*([\w\-]+)(?: +([\w\-]+))?(?: +([\w\-]+))?(?: +<([^>]+)>)?\s*$/,
 
     # [[[Foo]]]  (does not suffer quite the same malady as :anchor, but almost. Allows [ but not ] in internal capture
-    # ']' characters must be escaped with a backslash
-    :biblio           => /\[\[\[([^\]]+)\]\]\]/,
+    :biblio           => /\[\[\[([^\[\]]+)\]\]\]/,
+
+    # callout reference inside literal text
+    # <1>
+    # special characters will already be replaced, hence their use in the regex
+    :calloutref       => /&lt;(\d+)&gt;/,
 
     # <1> Foo
     :colist           => /^(\<\d+\>)\s*(.*)/,
@@ -135,8 +138,11 @@ module Asciidoctor
     # image::filename.png[Caption]
     :image_blk        => /^image::(\S+?)\[(.*?)\]$/,
 
+    # image:filename.png[Alt]
+    :image_macro      => /\\?image:([^\[]+)(?:\[([^\]]*)\])/,
+
     # whitespace at the beginning of the line
-    :leading_blanks   => /^([ \t]*)/,
+    :leading_blanks   => /^([[:blank:]]*)/,
 
     # == Foo
     # ^ yields a level 2 title
@@ -153,9 +159,6 @@ module Asciidoctor
     # match[3] is an optional repeat of the delimiter, which is dropped
     :level_title      => /^(={1,5})\s+(\S.*?)\s*(?:\[\[([^\[]+)\]\]\s*)?(\s\1)?$/,
 
-    # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
-    :line             => /^([=\-~^\+])+\s*$/,
-
     # +   From the Asciidoc User Guide: "A plus character preceded by at
     #     least one space character at the end of a non-blank line forces
     #     a line break. It generates a line break (br) tag for HTML outputs.
@@ -163,7 +166,15 @@ module Asciidoctor
     # +      (would not match because there's no space before +)
     #  +     (would match and capture '')
     # Foo +  (would and capture 'Foo')
-    :line_break       => /([[:blank:]])\+[[:blank:]]*$/,
+    :line_break       => /^(.*)[[:blank:]]\+[[:blank:]]*$/,
+
+    # inline link and some inline link macro
+    # FIXME revisit!
+    :link_inline      => /(^|link:|\s|>)(\\?https?:\/\/[^\[ ]*[^\. \[])(?:\[((?:\\\]|[^\]])*?)\])?/,
+
+    # inline link macro
+    # link:path[label]
+    :link_macro       => /\\?link:([^\[ ]+)(?:\[((?:\\\]|[^\]])*?)\])/,
 
     # ----
     :listing          => /^\-{4,}\s*$/,
@@ -172,10 +183,7 @@ module Asciidoctor
     :lit_blk          => /^\.{4,}\s*$/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
-    :lit_par          => /^([ \t]+.*)$/,
-
-    # At least one alphanumeric character
-    :name             => /^(.*[\w].*?)\s*$/,
+    :lit_par          => /^([[:blank:]]+.*)$/,
 
     # --
     :open_blk         => /^\-\-\s*$/,
@@ -187,6 +195,19 @@ module Asciidoctor
     # i. Foo (lowerroman)
     # I. Foo (upperroman)
     :olist            => /^\s*(\d+\.|[a-z]\.|[ivx]+\)|\.{1,5}) +(.*)$/i,
+
+    # inline passthrough macros
+    # +++text+++
+    # $$text$$
+    # pass:quotes[text]
+    :passthrough_macro => /\\?(?:(\+{3}|\${2})(.*?)\1|pass:([a-z,]*)\[((?:\\\]|[^\]])*?)\])/,
+
+    # inline literal passthrough macro
+    # `text`
+    :passthrough_lit  => /(^|[^`\w])(\\?`([^`\s]|[^`\s].*?\S)`)(?![`\w])/m,
+
+    # placeholder for extracted passthrough text
+    :pass_placeholder => /\x0(\d+)\x0/,
 
     # ____
     :quote            => /^_{4,}\s*$/,
@@ -202,6 +223,10 @@ module Asciidoctor
     # ****
     :sidebar_blk      => /^\*{4,}\s*$/,
 
+    # \' within a word
+    :single_quote_esc => /(\w)\\'(\w)/,
+    #:single_quote_esc => /(\w|=)\\'(\w)/,
+
     #     and blah blah blah
     # ^^^^  <--- whitespace
     :starts_with_whitespace => /\s+(.+)\s+\+\s*$/,
@@ -209,9 +234,20 @@ module Asciidoctor
     # .Foo   but not  . Foo or ..Foo
     :title            => /^\.([^\s\.].*)\s*$/,
 
+    # does not begin with a dot and has at least one alphanumeric character
+    :heading_name     => /^((?=.*\w+.*)[^\.].*?)\s*$/,
+
+    # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
+    :heading_line     => /^([=\-~^\+])+\s*$/,
+
     # * Foo (up to 5 consecutive asterisks)
     # - Foo
-    :ulist            => /^ \s* (- | \*{1,5}) \s+ (.*) $/x
+    :ulist            => /^ \s* (- | \*{1,5}) \s+ (.*) $/x,
+
+    # inline xref macro
+    # <<id,reftext>> (special characters have already been escaped, hence the entity references)
+    # xref:id[reftext]
+    :xref_macro       => /\\?(?:&lt;&lt;([\w":].*?)&gt;&gt;|xref:([\w":].*?)\[(.*?)\])/m
   }
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
@@ -225,7 +261,7 @@ module Asciidoctor
     'asterisk'   => '*',
     'tilde'      => '~',
     'litdd'      => '--',
-    'plus'       => '+',
+    'plus'       => '&#43;',
     'apostrophe' => '\'',
     'backslash'  => '\\',
     'backtick'   => '`',
@@ -253,15 +289,85 @@ module Asciidoctor
     '&' => '&amp;'
   }
 
-  HTML_ELEMENTS = {
-    'br-asciidoctor' => '<br/>'
+  SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
+
+  # unconstrained quotes:: can appear anywhere
+  # constrained quotes:: must be bordered by non-word characters
+  # NOTE these substituions are processed in the order they appear here and
+  # the order in which they are replaced is important
+  QUOTE_SUBS = [
+
+    # **strong**
+    [:strong, :unconstrained, /(?:\[([^\]]+?)\])?\*\*(.+?)\*\*/m],
+
+    # *strong*
+    [:strong, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?\*(\S|\S.*?\S)\*(?=\W|$)/m],
+
+    # ``double-quoted''
+    [:double, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?``(\S|\S.*?\S)''(?=\W|$)/m],
+
+    # 'emphasis'
+    [:emphasis, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?=\W|$)/m],
+
+    # `single-quoted'
+    [:single, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?=\W|$)/m],
+
+    # ++monospaced++
+    [:monospaced, :unconstrained, /(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m],
+
+    # +monospaced+
+    [:monospaced, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?=\W|$)/m],
+
+    # __emphasis__
+    [:emphasis, :unconstrained, /(?:\[([^\]]+?)\])?\_\_(.+?)\_\_/m],
+
+    # _emphasis_
+    [:emphasis, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?_(\S|\S.*?\S)_(?=\W|$)/m],
+
+    # ##unquoted##
+    [:none, :unconstrained, /(?:\[([^\]]+?)\])?##(.+?)##/m],
+
+    # #unquoted#
+    [:none, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?=\W|$)/m],
+
+    # ^superscript^
+    [:superscript, :unconstrained, /(?:\[([^\]]+?)\])?\^(.+?)\^/m],
+
+    # ~subscript~
+    [:subscript, :unconstrained, /(?:\[([^\]]+?)\])?\~(.+?)\~/m]
+  ]
+
+  # NOTE in Ruby 1.8.7, [^\\] does not match start of line,
+  # so we need to match it explicitly
+  REPLACEMENTS = {
+    # (C)
+    /(^|[^\\])\(C\)/ => '\1&#169;', 
+    # (R)
+    /(^|[^\\])\(R\)/ => '\1&#174;', 
+    # (TM)
+    /(^|[^\\])\(TM\)/ => '\1&#8482;', 
+    # foo--bar
+    /(\w)--(?=\w)/ => '\1&#8212;',
+    # and so on...
+    
+    # restore entities; TODO needs cleanup
+    /&amp;(#[a-z0-9]+;)/i => '&\1'
   }
 
+  # modules
+  require 'asciidoctor/substituters'
+
+  # abstract classes
+  require 'asciidoctor/abstract_node'
+  require 'asciidoctor/abstract_block'
+
+  # concrete classes
   require 'asciidoctor/attribute_list'
   require 'asciidoctor/block'
   require 'asciidoctor/debug'
   require 'asciidoctor/document'
   require 'asciidoctor/errors'
+  require 'asciidoctor/inline'
   require 'asciidoctor/lexer'
   require 'asciidoctor/list_item'
   require 'asciidoctor/reader'

@@ -19,8 +19,8 @@ context "Text" do
 
   test "single- and double-quoted text" do
     rendered = render_string("``Where?,'' she said, flipping through her copy of `The New Yorker.'")
-    assert_match /&ldquo;Where\?,&rdquo;/, rendered
-    assert_match /&lsquo;The New Yorker.&rsquo;/, rendered
+    assert_match /&#8220;Where\?,&#8221;/, rendered
+    assert_match /&#8216;The New Yorker.&#8217;/, rendered
   end
 
   test "separator" do
