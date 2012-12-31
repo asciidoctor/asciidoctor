@@ -261,7 +261,7 @@ module Asciidoctor
     'asterisk'   => '*',
     'tilde'      => '~',
     'litdd'      => '--',
-    'plus'       => '+',
+    'plus'       => '&#43;',
     'apostrophe' => '\'',
     'backslash'  => '\\',
     'backtick'   => '`',
