@@ -19,6 +19,9 @@ class Asciidoctor::Document
 
   include Asciidoctor
 
+  # Public: The context of this node. Always :document.
+  attr_reader :context
+
   # Public: Get the Hash of attributes
   attr_reader :attributes
 
@@ -44,6 +47,7 @@ class Asciidoctor::Document
   #   data = File.readlines(filename)
   #   doc  = Asciidoctor::Document.new(data)
   def initialize(data, options = {}, &block)
+    @context = :document
     @elements = []
     @renderer = nil
     @options = options

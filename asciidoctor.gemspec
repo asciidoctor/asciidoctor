@@ -65,11 +65,14 @@ Gem::Specification.new do |s|
     asciidoctor.gemspec
     bin/asciidoctor
     lib/asciidoctor.rb
+    lib/asciidoctor/abstract_block.rb
+    lib/asciidoctor/abstract_node.rb
     lib/asciidoctor/attribute_list.rb
     lib/asciidoctor/block.rb
     lib/asciidoctor/debug.rb
     lib/asciidoctor/document.rb
     lib/asciidoctor/errors.rb
+    lib/asciidoctor/inline.rb
     lib/asciidoctor/lexer.rb
     lib/asciidoctor/list_item.rb
     lib/asciidoctor/reader.rb
@@ -77,6 +80,7 @@ Gem::Specification.new do |s|
     lib/asciidoctor/renderer.rb
     lib/asciidoctor/section.rb
     lib/asciidoctor/string.rb
+    lib/asciidoctor/substituters.rb
     lib/asciidoctor/version.rb
     noof.rb
     test/attributes_test.rb
@@ -93,6 +97,7 @@ Gem::Specification.new do |s|
     test/paragraphs_test.rb
     test/preamble_test.rb
     test/reader_test.rb
+    test/substitutions_test.rb
     test/test_helper.rb
     test/text_test.rb
   ]

@@ -1,9 +1,92 @@
 require 'test_helper'
 
-context "Links" do
+context 'Links' do
 
-  test "absolute url with link prefix" do
-    assert_xpath "//a[@href='http://asciidoc.org']", render_string("We're parsing link:http://asciidoc.org[AsciiDoc] markup")
+  test 'qualified url inline with text' do
+    assert_xpath "//a[@href='http://asciidoc.org'][text() = 'http://asciidoc.org']", render_string("The AsciiDoc project is located at http://asciidoc.org.")
+  end
+
+  test 'qualified url with label' do
+    assert_xpath "//a[@href='http://asciidoc.org'][text() = 'AsciiDoc']", render_string("We're parsing http://asciidoc.org[AsciiDoc] markup")
+  end
+
+  test 'qualified url with label containing escaped right square bracket' do
+    assert_xpath "//a[@href='http://asciidoc.org'][text() = '[Ascii]Doc']", render_string("We're parsing http://asciidoc.org[[Ascii\\]Doc] markup")
+  end
+
+  test 'qualified url with label using link macro' do
+    assert_xpath "//a[@href='http://asciidoc.org'][text() = 'AsciiDoc']", render_string("We're parsing link:http://asciidoc.org[AsciiDoc] markup")
+  end
+
+  test 'qualified url using macro syntax with multi-line label inline with text' do
+    assert_xpath %{//a[@href='http://asciidoc.org'][text() = 'AsciiDoc\nmarkup']}, render_string("We're parsing link:http://asciidoc.org[AsciiDoc\nmarkup]")
+  end
+
+  test 'qualified url using invalid link macro should not create link' do
+    assert_xpath '//a', render_string('link:http://asciidoc.org is the project page for AsciiDoc.'), 0
+  end
+
+  test 'escaped inline qualified url should not create link' do
+    assert_xpath '//a', render_string('\http://asciidoc.org is the project page for AsciiDoc.'), 0
+  end
+
+  test 'escaped inline qualified url using macro syntax should not create link' do
+    assert_xpath '//a', render_string('\http://asciidoc.org[AsciiDoc] is the key to good docs.'), 0
+  end
+
+  test 'qualified url containing whitespace using macro syntax should not create link' do
+    assert_xpath '//a', render_string('I often need to refer to the chapter on link:http://asciidoc.org?q=attribute references[Attribute References].'), 0
+  end
+
+  test 'qualified url containing an encoded space using macro syntax should create a link' do
+    assert_xpath '//a', render_string('I often need to refer to the chapter on link:http://asciidoc.org?q=attribute%20references[Attribute References].'), 1
+  end
+
+  test 'xref using angled bracket syntax' do
+    doc = document_from_string '<<tigers>>'
+    doc.references['tigers'] = '[tigers]'
+    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
+  end
+
+  test 'xref using angled bracket syntax with label' do
+    assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string('<<tigers,About Tigers>>'), 1
+  end
+
+  test 'xref using angled bracket syntax inline with text' do
+    assert_xpath '//a[@href="#tigers"][text() = "about tigers"]', render_string('Want to learn <<tigers,about tigers>>?'), 1
+  end
+
+  test 'xref using angled bracket syntax with multi-line label inline with text' do
+    assert_xpath %{//a[@href="#tigers"][text() = "about\ntigers"]}, render_string("Want to learn <<tigers,about\ntigers>>?"), 1
+  end
+
+  test 'xref using macro syntax' do
+    doc = document_from_string 'xref:tigers[]'
+    doc.references['tigers'] = '[tigers]'
+    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
+  end
+
+  test 'xref using macro syntax with label' do
+    assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string('xref:tigers[About Tigers]'), 1
+  end
+
+  test 'xref using macro syntax inline with text' do
+    assert_xpath '//a[@href="#tigers"][text() = "about tigers"]', render_string('Want to learn xref:tigers[about tigers]?'), 1
+  end
+
+  test 'xref using macro syntax with multi-line label inline with text' do
+    assert_xpath %{//a[@href="#tigers"][text() = "about\ntigers"]}, render_string("Want to learn xref:tigers[about\ntigers]?"), 1
+  end
+
+  test 'xref using invalid macro syntax does not create link' do
+    doc = document_from_string 'xref:tigers'
+    doc.references['tigers'] = '[tigers]'
+    assert_xpath '//a', doc.render, 0
+  end
+
+  test 'xref creates link for unknown reference' do
+    doc = document_from_string '<<tigers>>'
+    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
 end

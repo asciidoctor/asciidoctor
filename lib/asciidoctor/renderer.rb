@@ -16,6 +16,7 @@ class Asciidoctor::Renderer
 
     # If user passed in a template dir, let them override our base templates
     if template_dir = options.delete(:template_dir)
+      require 'tilt'
       Asciidoctor.debug "Views going in are like so:"
       @views.each_pair do |k, v|
         Asciidoctor.debug "#{k}: #{v}"
@@ -44,7 +45,7 @@ class Asciidoctor::Renderer
   # locals - the optional Hash of locals to be passed to Tilt (default {}) (also ignored, really)
   def render(view, object, locals = {})
     @render_stack.push([view, object])
-    if @views[view].nil?
+    if !@views.has_key? view
       raise "Couldn't find a view in @views for #{view}"
     else
       Asciidoctor.debug "View for #{view} is #{@views[view]}, object is #{object}"

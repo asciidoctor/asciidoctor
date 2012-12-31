@@ -1,30 +1,20 @@
 # Public: Methods for managing items for AsciiDoc olists, ulist, and dlists.
-class Asciidoctor::ListItem
-  # Public: Get the Array of Blocks from the list item's continuation.
-  attr_reader :blocks
-
-  # Public: Get/Set the String list item anchor name.
-  attr_accessor :anchor
-
-  # Public: Get/Set the Integer list level (for nesting list elements).
-  attr_accessor :level
+class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
 
   # Public: Get/Set the String used to mark this list item
   attr_accessor :marker
-
-  attr_reader :parent
 
   # Public: Initialize an Asciidoctor::ListItem object.
   #
   # parent - The parent list block for this list item
   # text - the String text (default nil)
-  def initialize(parent, text=nil)
-    @parent = parent
+  def initialize(parent, text = nil)
+    super(parent, :list_item)
     @text = text
-    @blocks = []
     @level = parent.level
   end
 
+  # QUESTION should we allow this access?
   def text=(new_text)
     @text = new_text
   end
@@ -32,10 +22,6 @@ class Asciidoctor::ListItem
   def text
     # this will allow the text to be processed
     ::Asciidoctor::Block.new(self, nil, [@text]).content
-  end
-
-  def document
-    @parent.document
   end
 
   def content
