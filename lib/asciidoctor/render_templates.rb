@@ -1,6 +1,17 @@
 class BaseTemplate
   BLANK_LINES_PATTERN = /^\s*\n/
-  LINE_FEED_ENTITY = "&#10;" # or &#x0A;
+  LINE_FEED_ENTITY = '&#10;' # or &#x0A;
+
+  QUOTED_TAGS = {
+    :emphasis => ['<em>', '</em>'],
+    :strong => ['<strong>', '</strong>'],
+    :monospaced => ['<tt>', '</tt>'],
+    :superscript => ['<sup>', '</sup>'],
+    :subscript => ['<sub>', '</sub>'],
+    :double => [Asciidoctor::INTRINSICS['ldquo'], Asciidoctor::INTRINSICS['rdquo']],
+    :single => [Asciidoctor::INTRINSICS['lsquo'], Asciidoctor::INTRINSICS['rsquo']],
+    :none => ['', '']
+  }
 
   def initialize
   end
@@ -35,8 +46,8 @@ class BaseTemplate
   end
 
   # create template matter to insert a style class if the variable has a value
-  def styleclass(key)
-    '<%= attr?(:' + key.to_s + ') ? \' \' + attr(:' + key.to_s + ') : \'\' %>'
+  def styleclass(key, offset = true)
+    '<%= attr?(:' + key.to_s + ') ? ' + (offset ? '\' \' + ' : '') + 'attr(:' + key.to_s + ') : \'\' %>'
   end
 
   # create template matter to insert an id if one is specified for the block
@@ -400,6 +411,59 @@ class BlockRulerTemplate < BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
 <hr>
+    EOF
+  end
+end
+
+class InlineBreakTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<%= text %><br>
+    EOF
+  end
+end
+
+class InlineCalloutTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<b><%= text %></b>
+    EOF
+  end
+end
+
+class InlineQuotedTemplate < BaseTemplate
+  # we use double quotes for the class attribute to prevent quote processing
+  # seems hackish, though AsciiDoc has this same issue
+  def template
+    @template ||= ERB.new <<-EOF
+<%= QUOTED_TAGS[type].first %><% 
+if attr? :role %><span class="#{styleclass(:role, false)}"><%
+end %><%= text %><%
+if attr? :role %></span><%
+end %><%= QUOTED_TAGS[type].last %>
+    EOF
+  end
+end
+
+class InlineLinkTemplate < BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<a href='<%= target %>'><%= text %></a>
+    EOF
+  end
+end
+
+class InlineImageTemplate < BaseTemplate
+  def template
+    # care is taken here to avoid a space inside the optional <a> tag
+    @template ||= ERB.new <<-EOF
+<span class='image#{role}'>
+  <%
+  if attr :link %><a class='image' href='<%= attr :link %>'><%
+  end %><img src='<%= target %>' alt='<%= attr :alt %>'#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
+  if attr :link%></a><% end
+  %>
+</span>
     EOF
   end
 end

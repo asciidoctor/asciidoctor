@@ -32,6 +32,12 @@ context "Attributes" do
     assert_equal 'Yo, Tanglefoot!', result.css("p").first.content.strip
   end
 
+  test "render properly with single character name" do
+    html = render_string(":r: Ruby\n\nR is for {r}!")
+    result = Nokogiri::HTML(html)
+    assert_equal 'R is for Ruby!', result.css("p").first.content.strip
+  end
+
   test "convert multi-word names and render" do
     html = render_string("Main Header\n===========\n:My frog: Tanglefoot\n\nYo, {myfrog}!")
     result = Nokogiri::HTML(html)

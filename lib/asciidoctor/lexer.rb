@@ -73,8 +73,11 @@ class Asciidoctor::Lexer
 
       if match = this_line.match(REGEXP[:anchor])
         Asciidoctor.debug "Found an anchor in line:\n\t#{this_line}"
-        attributes['id'] = match[1]
-        parent.document.references[match[1]] = "[#{match[1]}]"
+        id, reftext = match[1].split(',')
+        reftext ||= '[' + id + ']'
+        attributes['id'] = id
+        # AsciiDoc always use [id] as the reftext, but I'd like to do better in Asciidoctor
+        parent.document.references[id] = reftext
         reader.skip_blank
 
       elsif this_line.match(REGEXP[:comment_blk])
@@ -85,7 +88,7 @@ class Asciidoctor::Lexer
         reader.skip_blank
 
       elsif match = this_line.match(REGEXP[:attr_list_blk])
-        AttributeList.new(match[1]).parse_into(attributes)
+        AttributeList.new(match[1], parent.document).parse_into(attributes)
         reader.skip_blank
 
       # we're letting ruler have attributes
@@ -113,11 +116,9 @@ class Asciidoctor::Lexer
         reader.skip_blank
 
       elsif match = this_line.match(REGEXP[:image_blk])
-        AttributeList.new(match[2]).parse_into(attributes, ['alt', 'width', 'height'])
         block = Block.new(parent, :image)
-        # FIXME this seems kind of a one-off solution here
-        target = block.sub_attributes(match[1])
-        attributes['target'] = target
+        AttributeList.new(match[2], parent.document).parse_into(attributes, ['alt', 'width', 'height'])
+        attributes['target'] = target = Asciidoctor::Substituters.sub_attributes(match[1], parent.document)
         attributes['alt'] ||= File.basename(target, File.extname(target))
         reader.skip_blank
 
@@ -240,6 +241,7 @@ class Asciidoctor::Lexer
             block.blocks << new_block unless new_block.nil?
           end
         else
+          buffer.lines.last.chomp! unless buffer.lines.empty?
           block = Block.new(parent, quote_context, buffer.lines)
         end
 
@@ -289,6 +291,7 @@ class Asciidoctor::Lexer
         # an admonition preceded by [*TYPE*] and lasts until a blank line
         reader.unshift(this_line)
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
+        buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :admonition, buffer)
         attributes['style'] = admonition_style
         attributes['name'] = admonition_style.downcase
@@ -299,6 +302,7 @@ class Asciidoctor::Lexer
         AttributeList.rekey(attributes, ['style', 'attribution', 'citetitle'])
         reader.unshift(this_line)
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
+        buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, quote_context, buffer)
 
       else
@@ -331,7 +335,7 @@ class Asciidoctor::Lexer
     # blocks or trailing attribute lists could leave us without a block,
     # so handle accordingly
     if !block.nil?
-      block.anchor    = attributes['id'] if attributes.has_key?('id')
+      block.id        = attributes['id'] if attributes.has_key?('id')
       block.title   ||= title
       block.caption ||= caption
       block.update_attributes(attributes)
@@ -356,7 +360,7 @@ class Asciidoctor::Lexer
     list_block = Block.new(parent, list_type)
     items = []
     list_block.buffer = items
-    if parent.is_a?(Block) && parent.context == list_type
+    if parent.context == list_type
       list_block.level = parent.level + 1
     else
       list_block.level = 1
@@ -375,7 +379,7 @@ class Asciidoctor::Lexer
         # popping out of a nested list by matching an ancestor's list marker
         this_item_level = list_block.level + 1
         p = parent
-        while (p.context rescue nil) == list_type
+        while p.context == list_type
           if marker == p.buffer.first.marker
             this_item_level = p.level
             break
@@ -425,7 +429,7 @@ class Asciidoctor::Lexer
 
     begin
       dt = ListItem.new(block, match[2])
-      dt.anchor = match[1] unless match[1].nil?
+      dt.id = match[1] unless match[1].nil?
       dd = ListItem.new(block, match[5])
 
       dd_reader = Reader.new grab_lines_for_list_item(reader, :dlist, sibling_pattern)
@@ -634,7 +638,7 @@ class Asciidoctor::Lexer
 
   def self.is_two_line_section_heading?(line1, line2)
     !line1.nil? && !line2.nil? &&
-    line1.match(REGEXP[:name]) && line2.match(REGEXP[:line]) &&
+    line1.match(REGEXP[:heading_name]) && line2.match(REGEXP[:heading_line]) &&
     # chomp so that a (non-visible) endline does not impact calculation
     (line1.chomp.size - line2.chomp.size).abs <= 1
   end
@@ -648,7 +652,7 @@ class Asciidoctor::Lexer
     section.level == 0 && parent.is_a?(Document) && parent.elements.empty?
   end
 
-  # Private: Extracts the title, level and (optional) embedded anchor from a
+  # Private: Extracts the title, level and (optional) embedded id from a
   #          1- or 2-line section heading.
   #
   # Returns an array of [String, Integer, String, Boolean] or nil.
@@ -658,13 +662,13 @@ class Asciidoctor::Lexer
   #   [line1, line2]
   #   # => ["Foo\n", "~~~\n"]
   #
-  #   title, level, anchor, single = extract_section_heading(line1, line2)
+  #   title, level, id, single = extract_section_heading(line1, line2)
   #
   #   title
   #   # => "Foo"
   #   level
   #   # => 2
-  #   anchor
+  #   id
   #   # => nil
   #   single
   #   # => false
@@ -672,13 +676,13 @@ class Asciidoctor::Lexer
   #   line1
   #   # => "==== Foo\n"
   #
-  #   title, level, anchor, single = extract_section_heading(line1)
+  #   title, level, id, single = extract_section_heading(line1)
   #
   #   title
   #   # => "Foo"
   #   level
   #   # => 3
-  #   anchor
+  #   id
   #   # => nil
   #   single
   #   # => true
@@ -697,7 +701,7 @@ class Asciidoctor::Lexer
       single_line = true
     elsif is_two_line_section_heading?(line1, line2)
       # TODO could be optimized into a single regexp
-      header_match = line1.match(REGEXP[:name])
+      header_match = line1.match(REGEXP[:heading_name])
       if anchor_match = header_match[1].match(REGEXP[:anchor_embedded])
         sect_title   = anchor_match[1]
         sect_anchor = anchor_match[2]
@@ -811,9 +815,9 @@ class Asciidoctor::Lexer
 
     this_line = reader.get_line
     next_line = reader.peek_line || ''
-    section.title, section.level, section.anchor, single_line = extract_section_heading(this_line, next_line)
-    # generate an anchor if one was not *embedded* in the heading line
-    section.anchor ||= section.generate_id
+    section.title, section.level, section.id, single_line = extract_section_heading(this_line, next_line)
+    # generate an id if one was not *embedded* in the heading line
+    section.id ||= section.generate_id
     reader.get_line unless single_line
 
     if (title_section = is_title_section? section, parent)

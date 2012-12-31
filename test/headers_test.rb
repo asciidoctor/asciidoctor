@@ -37,6 +37,12 @@ context "Headers" do
       assert_xpath '//h1', render_string(title + "\n" + chars + "\n"), 0
     end
 
+    test "document title with multiline syntax cannot begin with a dot" do
+      title = ".My Title"
+      chars = "=" * title.length
+      assert_xpath '//h1', render_string(title + "\n" + chars), 0
+    end
+
     test "document title with single-line syntax" do
       assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title")
     end
@@ -49,6 +55,12 @@ context "Headers" do
   context "level 1" do 
     test "with multiline syntax" do
       assert_xpath "//h2[@id='_my_section'][text() = 'My Section']", render_string("My Section\n-----------")
+    end
+
+    test "heading title with multiline syntax cannot begin with a dot" do
+      title = ".My Title"
+      chars = "-" * title.length
+      assert_xpath '//h2', render_string(title + "\n" + chars), 0
     end
 
     test "with single-line syntax" do

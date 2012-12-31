@@ -17,38 +17,19 @@
 #   section << new_block
 #   section.size
 #   => 1
-class Asciidoctor::Section
-  # Public: Get/Set the Integer section level.
-  attr_accessor :level
+class Asciidoctor::Section < Asciidoctor::AbstractBlock
+
+  include Asciidoctor::Substituters
 
   # Public: Set the String section title.
   attr_writer :title
-
-  # Public: Get/Set the String section caption.
-  attr_accessor :caption
-
-  # Public: Get/Set the String section anchor name.
-  attr_accessor :anchor
-  alias :id :anchor
-
-  # Public: Get the Hash of attributes for this block
-  attr_accessor :attributes
-
-  # Public: Get the Array of section blocks.
-  attr_reader :blocks
-
-  # Public: Get the parent (Section or Document) of this Section
-  attr_reader :parent
 
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
   def initialize(parent)
-    @parent = parent
-    @document = @parent.is_a?(Asciidoctor::Document) ? @parent : @parent.document
-    @attributes = {}
-    @blocks = []
-    @name = nil
+    super(parent, :section)
+    @title = nil
   end
 
   # Public: Get the String section title with intrinsics converted
@@ -61,9 +42,14 @@ class Asciidoctor::Section
   #
   # Returns the String section title
   def title
-    @title && 
-    @title.gsub(/(^|[^\\])\{(\w[\w\-]+\w)\}/) { $1 + (attr?($2) ? attr($2) : Asciidoctor::INTRINSICS[$2]) }.
-          gsub( /`([^`]+)`/, '<tt>\1</tt>' )
+    # prevent from rendering multiple times
+    if defined?(@processed_title)
+      @processed_title
+    elsif @title
+      @processed_title = apply_title_subs(@title)
+    else
+      @title
+    end
   end
 
   # Public: The name of this section, an alias of the section title
@@ -89,36 +75,11 @@ class Asciidoctor::Section
     end
   end
 
-  # Public: Get the Asciidoctor::Document instance to which this Block belongs
-  def document
-    @document
-  end
-
-  def attr(name, default = nil)
-    default.nil? ? @attributes.fetch(name.to_s, self.document.attr(name)) :
-        @attributes.fetch(name.to_s, self.document.attr(name, default))
-  end
-
-  def attr?(name)
-    @attributes.has_key?(name.to_s) || self.document.attr?(name)
-  end
-
-  def update_attributes(attributes)
-    @attributes.update(attributes)
-  end
-
-  # Public: Get the Asciidoctor::Renderer instance being used for the ancestor
-  # Asciidoctor::Document instance.
-  def renderer
-    Asciidoctor.debug "Section#renderer:  Looking for my renderer up in #{@parent}"
-    @parent.renderer
-  end
-
   # Public: Get the rendered String content for this Section and all its child
   # Blocks.
   def render
     Asciidoctor.debug "Now rendering section for #{self}"
-    renderer.render('section', self)
+    renderer.render(@context.to_s, self)
   end
 
   # Public: Get the String section content by aggregating rendered section blocks.
@@ -187,20 +148,6 @@ class Asciidoctor::Section
   #   => ["foo"]
   def delete_at(i)
     @blocks.delete_at(i)
-  end
-
-  # Public: Append a content block to this section's list of blocks.
-  #
-  # block - The new section block.
-  #
-  #   section = Section.new
-  #
-  #   section << 'foo'
-  #   section << 'bar'
-  #   section.blocks
-  #   => ["foo", "bar"]
-  def <<(block)
-    @blocks << block
   end
 
   # Public: Clear this Section's list of blocks.
