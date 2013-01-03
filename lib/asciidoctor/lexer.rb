@@ -437,6 +437,7 @@ class Asciidoctor::Lexer
   # Returns nothing
   def self.catalog_inline_anchors(text, document)
     text.scan(REGEXP[:anchor_macro]) {
+      next if $&.start_with? '\\'
       id, reftext = $1.split(',')
       document.references[id] = reftext || '[' + id + ']'
     }

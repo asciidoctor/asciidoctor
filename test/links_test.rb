@@ -58,6 +58,13 @@ context 'Links' do
     assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
   end
 
+  test 'escaped inline ref' do
+    doc = document_from_string 'Here you can read about tigers.\[[tigers]]'
+    output = doc.render
+    assert !doc.references.has_key?('tigers')
+    assert_xpath '//a[@id = "tigers"]', output, 0
+  end
+
   test 'xref using angled bracket syntax' do
     doc = document_from_string '<<tigers>>'
     doc.references['tigers'] = '[tigers]'
