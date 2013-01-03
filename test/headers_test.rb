@@ -76,7 +76,7 @@ context "Headers" do
     end
 
     test "with non-word character" do
-      assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where's the love?\"]", render_string("== Where's the love?")
+      assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where#{[8217].pack('U*')}s the love?\"]", render_string("== Where's the love?")
     end
 
     test "with sequential non-word characters" do

@@ -8,19 +8,19 @@ context "Lexer" do
   end
 
   test "test_is_title_section" do
-    section = Asciidoctor::Section.new(Asciidoctor::Document.new([]))
+    section = Asciidoctor::Section.new(Asciidoctor::Document.new)
     section.level = 0
     assert Asciidoctor::Lexer.is_title_section?(section, section.document)
   end
 
   test "test_is_not_title_section" do
-    section = Asciidoctor::Section.new(Asciidoctor::Document.new([]))
+    section = Asciidoctor::Section.new(Asciidoctor::Document.new)
     section.level = 1
     assert !Asciidoctor::Lexer.is_title_section?(section, section.document)
     section.level = 0
-    another_section = Asciidoctor::Section.new(Asciidoctor::Document.new([]))
-    another_section.level = 0 
-    section.document.elements << section
+    another_section = Asciidoctor::Section.new(Asciidoctor::Document.new)
+    another_section.level = 0
+    section.document << section
     assert !Asciidoctor::Lexer.is_title_section?(another_section, section.document)
   end
 

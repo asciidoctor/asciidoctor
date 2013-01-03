@@ -13,54 +13,56 @@
 #
 # Keep in mind that you'll want to honor these document settings:
 #
-# notitle - The h1 heading should not be shown
+# notitle  - The h1 heading should not be shown
 # noheader - The header block (h1 heading, author, revision info) should not be shown
-class Asciidoctor::Document
+class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
   include Asciidoctor
-
-  # Public: The context of this node. Always :document.
-  attr_reader :context
-
-  # Public: Get the Hash of attributes
-  attr_reader :attributes
 
   # Public: Get the Hash of document references
   attr_reader :references
 
-  # The section level 0 element
+  # The section level 0 block
   attr_reader :header
-
-  # Public: Get the Array of elements (really Blocks or Sections) for the document
-  attr_reader :elements
 
   # Public: Initialize an Asciidoc object.
   #
-  # data - The Array of Strings holding the Asciidoc source document.
+  # data    - The Array of Strings holding the Asciidoc source document. (default: [])
   # options - A Hash of options to control processing, such as disabling
   #           the header/footer (:header_footer) or attribute overrides (:attributes)
-  # block - A block that can be used to retrieve external Asciidoc
-  #         data to include in this document.
+  #           (default: {})
+  # block   - A block that can be used to retrieve external Asciidoc
+  #           data to include in this document.
   #
   # Examples
   #
   #   data = File.readlines(filename)
   #   doc  = Asciidoctor::Document.new(data)
-  def initialize(data, options = {}, &block)
-    @context = :document
-    @elements = []
+  def initialize(data = [], options = {}, &block)
+    super(self, :document)
+    @references = {}
     @renderer = nil
     @options = options
     @options[:header_footer] = @options.fetch(:header_footer, true)
 
-    @attributes = {}
-    @attributes['sectids'] = nil
+    @attributes['sectids'] = true
     @attributes['encoding'] = 'UTF-8'
 
-    @reader = Reader.new(data, @attributes, &block)
+    attribute_overrides = options[:attributes] || {}
+    attribute_overrides.each {|key, val|
+      # a nil or negative key undefines the attribute 
+      if (val.nil? || key[-1..-1] == '!')
+        @attributes.delete(key.chomp '!')
+      # otherwise it's an attribute assignment
+      else
+        @attributes[key] = val
+      end
+    }
 
-    # pseudo-delegation :)
-    @references = @reader.references
+    @attributes['backend'] ||= DEFAULT_BACKEND
+    update_backend_attributes()
+
+    @reader = Reader.new(data, self, attribute_overrides, &block)
 
     # dynamic intrinstic attribute values
     @attributes['doctype'] ||= DEFAULT_DOCTYPE
@@ -68,51 +70,41 @@ class Asciidoctor::Document
     @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
     @attributes['localtime'] ||= now.strftime('%H:%m:%S %Z')
     @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']].join(' ')
+    # docdate and doctime should default to localdate and localtime if not otherwise set
+    @attributes['docdate'] ||= @attributes['localdate']
+    @attributes['doctime'] ||= @attributes['localtime']
     @attributes['asciidoctor-version'] = VERSION
-    if options.has_key? :attributes
-      options[:attributes].delete_if {|k, v|
-        negative_key = (v.nil? || k[-1] == '!')
-        @attributes.delete(k.chomp '!') if negative_key
-        negative_key
-      }
 
-      @attributes.update(options[:attributes]) unless options[:attributes].empty?
-    end
-
-    # Now parse @lines into elements
+    # Now parse @lines into blocks
     while @reader.has_lines?
       @reader.skip_blank
 
       if @reader.has_lines?
         block = Lexer.next_block(@reader, self)
-        @elements << block unless block.nil?
+        self << block unless block.nil?
       end
     end
 
-    Asciidoctor.debug "Found #{@elements.size} elements in this document:"
-    @elements.each do |el|
+    Asciidoctor.debug "Found #{@blocks.size} blocks in this document:"
+    @blocks.each do |el|
       Asciidoctor.debug el
     end
 
     # split off the level 0 section, if present
-    root = @elements.first
+    root = @blocks.first
     @header = nil
     if root.is_a?(Section) && root.level == 0
-      @header = @elements.shift
+      @header = @blocks.shift
       # a book has multiple level 0 sections
       if doctype == 'book'
-        @elements = @header.blocks + @elements
+        @blocks = @header.blocks + @blocks
       # an article only has one level 0 section
       else
-        @elements = @header.blocks
+        @blocks = @header.blocks
       end
       @header.clear_blocks
     end
 
-  end
-
-  def document
-    self
   end
 
   # Make the raw source for the Document available.
@@ -120,22 +112,8 @@ class Asciidoctor::Document
     @reader.source if @reader
   end
 
-  def attr(name, default = nil)
-    default.nil? ? @attributes[name.to_s] : @attributes.fetch(name.to_s, default)
-    #default.nil? ? @attributes[name.to_s.tr('_', '-')] : @attributes.fetch(name.to_s.tr('_', '-'), default)
-  end
-
-  def attr?(name)
-    @attributes.has_key? name.to_s
-    #@attributes.has_key? name.to_s.tr('_', '-')
-  end
-
   def doctype
     @attributes['doctype']
-  end
-
-  def level
-    0
   end
 
   # The title explicitly defined in the document attributes
@@ -164,11 +142,20 @@ class Asciidoctor::Document
   end
 
   def first_section
-    has_header ? @header : @elements.detect{|e| e.is_a? Section}
+    has_header? ? @header : @blocks.detect{|e| e.is_a? Section}
   end
 
-  def has_header
+  def has_header?
     !@header.nil?
+  end
+
+  # Public: Update the backend attributes to reflect a change in the selected backend
+  def update_backend_attributes()
+    backend = @attributes['backend']
+    basebackend = backend.sub(/[[:digit:]]+$/, '')
+    @attributes['backend-' + backend] = 1
+    @attributes['basebackend'] = basebackend
+    @attributes['basebackend-' + basebackend] = 1
   end
 
   def splain
@@ -178,8 +165,8 @@ class Asciidoctor::Document
       Asciidoctor.debug "No header"
     end
 
-    Asciidoctor.debug "I have #{@elements.count} elements"
-    @elements.each_with_index do |block, i|
+    Asciidoctor.debug "I have #{@blocks.count} blocks"
+    @blocks.each_with_index do |block, i|
       Asciidoctor.debug "v" * 60
       Asciidoctor.debug "Block ##{i} is a #{block.class}"
       Asciidoctor.debug "Name is #{block.title rescue 'n/a'}"
@@ -196,6 +183,7 @@ class Asciidoctor::Document
     if @options[:template_dir]
       render_options[:template_dir] = @options[:template_dir]
     end
+    render_options[:backend] = @attributes.fetch('backend', 'html5')
     # Override Document @option settings with options passed in
     render_options.merge! options
 
@@ -215,12 +203,12 @@ class Asciidoctor::Document
     # per AsciiDoc-spec, remove the title after rendering the header
     @attributes.delete('title')
 
-    html_pieces = []
-    @elements.each do |element|
-      Asciidoctor::debug "Rendering element: #{element}"
-      html_pieces << element.render
+    buffer = []
+    @blocks.each do |block|
+      Asciidoctor::debug "Rendering block: #{block}"
+      buffer << block.render
     end
-    html_pieces.join
+    buffer.join
   end
 
 end

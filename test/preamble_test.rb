@@ -106,7 +106,7 @@ They couldn't believe their eyes when...
       assert_equal 'book', d.doctype 
       output = d.render
       assert_xpath '//h1', output, 3
-      assert_xpath '//*[@id="preamble"]//p[text() = "Back then..."]', output, 1
+      assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{[8230].pack('U*')}"]}, output, 1
   end
 
 end

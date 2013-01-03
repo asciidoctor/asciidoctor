@@ -97,6 +97,7 @@ Gem::Specification.new do |s|
     test/paragraphs_test.rb
     test/preamble_test.rb
     test/reader_test.rb
+    test/renderer_test.rb
     test/substitutions_test.rb
     test/test_helper.rb
     test/text_test.rb

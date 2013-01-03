@@ -19,24 +19,24 @@ context "Blocks" do
   context "Comments" do
     test "line comment between paragraphs" do
       output = render_string("first paragraph\n\n//comment\n\nsecond paragraph")
-      assert_no_match /comment/, output
+      assert_no_match(/comment/, output)
       assert_xpath '//p', output, 2
     end
 
     test "comment block between paragraphs" do
       output = render_string("first paragraph\n\n////\ncomment\n////\n\nsecond paragraph")
-      assert_no_match /comment/, output
+      assert_no_match(/comment/, output)
       assert_xpath '//p', output, 2
     end
 
     test "can render with block comment at end of document with trailing endlines" do
       output = render_string("Paragraph\n\n////\nblock comment\n////\n\n")
-      assert_no_match /block comment/, output
+      assert_no_match(/block comment/, output)
     end
 
     test "trailing endlines after block comment at end of document does not create paragraph" do
       d = document_from_string("Paragraph\n\n////\nblock comment\n////\n\n")
-      assert_equal 1, d.elements.size
+      assert_equal 1, d.blocks.size
     end
   end
 
@@ -72,7 +72,8 @@ EOS
       text = node_from_string(output, '//pre/text()').content
       lines = text.lines.entries 
       assert_equal 5, lines.size
-      assert_equal ([] << "line one\n" << "\n" << "line two\n" << "\n" << "line three"), lines
+      expected = "line one\n\nline two\n\nline three".lines.entries
+      assert_equal expected, lines
     end
 
     test "should preserve endlines in listing block" do
@@ -91,7 +92,8 @@ EOS
       text = node_from_string(output, '//pre/code/text()').content
       lines = text.lines.entries 
       assert_equal 5, lines.size
-      assert_equal ([] << "line one\n" << "\n" << "line two\n" << "\n" << "line three"), lines
+      expected = "line one\n\nline two\n\nline three".lines.entries
+      assert_equal expected, lines
     end
 
     test "should preserve endlines in verse block" do
@@ -111,7 +113,8 @@ EOS
       text = node_from_string(output, '//*[@class="verseblock"]/pre/text()').content
       lines = text.lines.entries 
       assert_equal 5, lines.size
-      assert_equal ([] << "line one\n" << "\n" << "line two\n" << "\n" << "line three"), lines
+      expected = "line one\n\nline two\n\nline three".lines.entries
+      assert_equal expected, lines
     end
   end
 

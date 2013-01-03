@@ -9,58 +9,37 @@ class Asciidoctor::Reader
   # Public: Get the String Array of lines parsed from the source
   attr_reader :lines
 
-  # Public: Get the Hash of attributes
-  attr_reader :attributes
-
-  attr_reader :references
-
-  # Public: Convert a string to a legal attribute name.
-  #
-  # name  - The String holding the Asciidoc attribute name.
-  #
-  # Returns a String with the legal name.
-  #
-  # Examples
-  #
-  #   sanitize_attribute_name('Foo Bar')
-  #   => 'foobar'
-  #
-  #   sanitize_attribute_name('foo')
-  #   => 'foo'
-  #
-  #   sanitize_attribute_name('Foo 3 #-Billy')
-  #   => 'foo3-billy'
-  def sanitize_attribute_name(name)
-    name.gsub(/[^\w\-]/, '').downcase
-  end
-
   # Public: Initialize the Reader object.
   #
-  # data  - The Array of Strings holding the Asciidoc source document.
-  # block - A block that can be used to retrieve external Asciidoc
-  #         data to include in this document.
+  # data       - The Array of Strings holding the Asciidoc source document. The
+  #              original instance of this Array is not modified
+  # document   - The document with which this reader is associated. Used to access
+  #              document attributes
+  # overrides  - A Hash of attributes that were passed to the Document and should
+  #              prevent attribute assignments or removals of matching keys found in
+  #              the document
+  # block      - A block that can be used to retrieve external Asciidoc
+  #              data to include in this document.
   #
   # Examples
   #
   #   data   = File.readlines(filename)
-  #   reader = Asciidoctor::Reader.new(data)
-  def initialize(data = [], attributes = nil, &block)
-    @references = {}
-
-    data = data.lines.entries if data.is_a? String
-
-    # if attributes are nil, we assume this is a preprocessed string
-    if attributes.nil?
-      @lines = data
+  #   reader = Asciidoctor::Reader.new data
+  def initialize(data = [], document = nil, overrides = nil, &block)
+    # if document is nil, we assume this is a preprocessed string
+    if document.nil?
+      @lines = data.is_a?(String) ? data.lines.entries : data.dup
+    elsif !data.empty?
+      @overrides = overrides || {}
+      @document = document
+      process(data.is_a?(String) ? data.lines.entries : data, &block)
     else
-      @attributes = attributes
-      process(data, &block)
+      @lines = []
     end
 
     # just in case we got some nils floating at the end of our lines after reading a funky document
-    @lines.pop while !@lines.empty? && @lines.last.nil?
+    @lines.pop until @lines.empty? || !@lines.last.nil?
 
-    #Asciidoctor.debug "About to leave Reader#init, and references is #{@references.inspect}"
     @source = @lines.join
     Asciidoctor.debug "Leaving Reader#init, and I have #{@lines.count} lines"
     Asciidoctor.debug "Also, has_lines? is #{self.has_lines?}"
@@ -71,6 +50,13 @@ class Asciidoctor::Reader
   # Returns true if !@lines.empty? is true, or false otherwise.
   def has_lines?
     !@lines.empty?
+  end
+
+  # Public: Check whether this reader is empty (contains no lines)
+  #
+  # Returns true if @lines.empty? is true, otherwise false.
+  def empty?
+    @lines.empty?
   end
 
   # Private: Strip off leading blank lines in the Array of lines.
@@ -156,8 +142,18 @@ class Asciidoctor::Reader
   # Public: Push Array of string `lines` onto queue of source data lines, unless `lines` has no non-nil values.
   #
   # Returns nil
-  def unshift(*lines)
-    @lines.unshift(*lines) if lines.any?
+  def unshift(*new_lines)
+    @lines.unshift(*new_lines) if !new_lines.empty?
+    nil
+  end
+
+  # Public: Chomp the String on the last line if this reader contains at least one line
+  #
+  # Delegates to chomp!
+  #
+  # Returns nil
+  def chomp_last!
+    @lines.last.chomp! unless @lines.empty?
     nil
   end
 
@@ -204,14 +200,33 @@ class Asciidoctor::Reader
     buffer
   end
 
+  # Public: Convert a string to a legal attribute name.
+  #
+  # name  - The String holding the Asciidoc attribute name.
+  #
+  # Returns a String with the legal name.
+  #
+  # Examples
+  #
+  #   sanitize_attribute_name('Foo Bar')
+  #   => 'foobar'
+  #
+  #   sanitize_attribute_name('foo')
+  #   => 'foo'
+  #
+  #   sanitize_attribute_name('Foo 3 #-Billy')
+  #   => 'foo3-billy'
+  def sanitize_attribute_name(name)
+    name.gsub(/[^\w\-]/, '').downcase
+  end
+
   # Private: Process raw input, used for the outermost reader.
   def process(data, &block)
 
     raw_source = []
-    include_regexp = /^include::([^\[]+)\[\]\s*\n?\z/
 
     data.each do |line|
-      if inc = line.match(include_regexp)
+      if inc = line.match(REGEXP[:include_macro])
         if block_given?
           raw_source.concat yield(inc[1])
         else
@@ -221,12 +236,6 @@ class Asciidoctor::Reader
         raw_source << line
       end
     end
-
-    ifdef_regexp = /^(ifdef|ifndef)::([^\[]+)\[\]/
-    endif_regexp = /^endif::/
-    defattr_regexp = /^:([^:!]+):\s*(.*)\s*$/
-    delete_attr_regexp = /^:([^:]+)!:\s*$/
-    conditional_regexp = /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/
 
     skip_to = nil
     continuing_value = nil
@@ -239,51 +248,59 @@ class Asciidoctor::Reader
         close_continue = false
         # Lines that start with whitespace and end with a '+' are
         # a continuation, so gobble them up into `value`
-        if match = line.match(/\s+(.+)\s+\+\s*$/)
-          continuing_value += ' ' + match[1]
-        elsif match = line.match(/\s+(.+)/)
-          # If this continued line doesn't end with a +, then this
-          # is the end of the continuation, no matter what the next
-          # line does.
-          continuing_value += ' ' + match[1]
+        if line.match(REGEXP[:attr_continue])
+          continuing_value += ' ' + $1
+        # An empty line ends a continuation
+        elsif line.strip.empty?
+          raw_source.unshift(line)
           close_continue = true
         else
-          # If this line doesn't start with whitespace, then it's
-          # not a valid continuation line, so push it back for processing
+          # If this continued line isn't empty and doesn't end with a +, then
+          # this is the end of the continuation, no matter what the next line
+          # does.
+          continuing_value += ' ' + line.strip
           close_continue = true
-          raw_source.unshift(line)
         end
         if close_continue
-          @attributes[continuing_key] = continuing_value
+          unless attribute_overridden? continuing_key
+            @document.attributes[continuing_key] = apply_attribute_value_subs(continuing_value)
+          end
           continuing_key = nil
           continuing_value = nil
         end
-      elsif match = line.match(ifdef_regexp)
-        attr = match[2]
-        skip = case match[1]
-               when 'ifdef';  !@attributes.has_key?(attr)
-               when 'ifndef'; @attributes.has_key?(attr)
+      elsif line.match(REGEXP[:ifdef_macro])
+        attr = $2
+        skip = case $1
+               when 'ifdef';  !@document.attributes.has_key?(attr)
+               when 'ifndef'; @document.attributes.has_key?(attr)
                end
         skip_to = /^endif::#{attr}\[\]\s*\n/ if skip
-      elsif match = line.match(defattr_regexp)
-        key = sanitize_attribute_name(match[1])
-        value = match[2]
-        if match = value.match(Asciidoctor::REGEXP[:attr_continue])
+      elsif line.match(REGEXP[:attr_assign])
+        key = sanitize_attribute_name($1)
+        value = $2
+        if value.match(REGEXP[:attr_continue])
           # attribute value continuation line; grab lines until we run out
           # of continuation lines
           continuing_key = key
-          continuing_value = match[1]  # strip off the spaces and +
+          continuing_value = $1  # strip off the spaces and +
           Asciidoctor.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
         else
-          @attributes[key] = value
-          Asciidoctor.debug "Defines[#{key}] is '#{value}'"
+          unless attribute_overridden? key
+            @document.attributes[key] = apply_attribute_value_subs(value)
+            Asciidoctor.debug "Defines[#{key}] is '#{@document.attributes[key]}'"
+            if key == 'backend'
+              @document.update_backend_attributes()
+            end
+          end
         end
-      elsif match = line.match(delete_attr_regexp)
-        key = sanitize_attribute_name(match[1])
-        @attributes.delete(key)
-      elsif !line.match(endif_regexp)
-        while match = line.match(conditional_regexp)
-          value = @attributes.has_key?(match[1]) ? match[2] : ''
+      elsif line.match(REGEXP[:attr_delete])
+        key = sanitize_attribute_name($1)
+        unless attribute_overridden? key
+          @document.attributes.delete(key)
+        end
+      elsif !line.match(REGEXP[:endif_macro])
+        while line.match(REGEXP[:attr_conditional])
+          value = @document.attributes.has_key?($1) ? $2 : ''
           line.sub!(conditional_regexp, value)
         end
         # leave line comments in as they play a role in flow (such as a list divider)
@@ -293,11 +310,51 @@ class Asciidoctor::Reader
 
     # Process bibliography references, so they're available when text
     # before the reference is being rendered.
-    @lines.each do |line|
-      if biblio = line.match(REGEXP[:biblio])
-        @references[biblio[1]] = "[#{biblio[1]}]"
-      end
-    end
+    # FIXME we don't have support for bibliography lists yet, so disable for now
+    # plus, this should be done while we are walking lines above
+    #@lines.each do |line|
+    #  if biblio = line.match(REGEXP[:biblio])
+    #    @document.references[biblio[1]] = "[#{biblio[1]}]"
+    #  end
+    #end
+
+    #Asciidoctor.debug "About to leave Reader#process, and references is #{@document.references.inspect}"
   end
 
+  # Internal: Determine if the attribute has been overridden in the document options
+  #
+  # key - The attribute key to check
+  #
+  # Returns true if the attribute has been overridden, false otherwise
+  def attribute_overridden?(key)
+    @overrides.has_key?(key) || @overrides.has_key?(key + '!')
+  end
+
+  # Internal: Apply substitutions to the attribute value
+  #
+  # If the value is an inline passthrough macro (e.g., pass:[text]), then
+  # apply the substitutions defined on the macro to the text. Otherwise,
+  # apply the verbatim substitutions to the value.
+  #
+  # value - The String attribute value on which to perform substitutions
+  #
+  # Returns The String value with substitutions performed.
+  def apply_attribute_value_subs(value)
+    if value.match(REGEXP[:pass_macro_basic])
+      # copy match for Ruby 1.8.7 compat
+      m = $~
+      subs = []
+      if !m[1].empty?
+        sub_options = Asciidoctor::Substituters::COMPOSITE_SUBS.keys + Asciidoctor::Substituters::COMPOSITE_SUBS[:normal]
+        subs = m[1].split(',').map {|sub| sub.to_sym} & sub_options
+      end
+      if !subs.empty?
+        @document.apply_subs(m[2], subs)
+      else
+        m[2]
+      end
+    else
+      @document.apply_header_subs(value)
+    end
+  end
 end

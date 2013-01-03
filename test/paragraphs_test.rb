@@ -1,25 +1,26 @@
 require 'test_helper'
 
 context "Paragraphs" do
-  test "rendered correctly" do
-    assert_xpath "//p", render_string("Plain text for the win.\n\nYes, plainly."), 2
-  end
+  context 'Normal' do
+    test "rendered correctly" do
+      assert_xpath "//p", render_string("Plain text for the win.\n\nYes, plainly."), 2
+    end
 
-  test "with title" do
-    rendered = render_string(".Titled\nParagraph.\n\nWinning")
-    
-    assert_xpath "//div[@class='title']", rendered
-    assert_xpath "//p", rendered, 2
-  end
+    test "with title" do
+      rendered = render_string(".Titled\nParagraph.\n\nWinning")
+      
+      assert_xpath "//div[@class='title']", rendered
+      assert_xpath "//p", rendered, 2
+    end
 
-  test "no duplicate block before next section" do
-    rendered = render_string("Title\n=====\n\nPreamble.\n\n== First Section\n\nParagraph 1\n\nParagraph 2\n\n\n== Second Section\n\nLast words")
-    assert_xpath '//p[text()="Paragraph 2"]', rendered, 1
+    test "no duplicate block before next section" do
+      rendered = render_string("Title\n=====\n\nPreamble.\n\n== First Section\n\nParagraph 1\n\nParagraph 2\n\n\n== Second Section\n\nLast words")
+      assert_xpath '//p[text()="Paragraph 2"]', rendered, 1
+    end
   end
 
   context "code" do
     test "single-line literal paragraphs" do
-      output = render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
       assert_xpath "//pre", render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
     end
 
@@ -34,7 +35,7 @@ You're good to go!
       EOS
       output = render_string(input)
       assert_xpath "//pre", output, 1
-      assert_match /^gem install asciidoctor/, output, "Indentation should be trimmed from literal block"
+      assert_match(/^gem install asciidoctor/, output, "Indentation should be trimmed from literal block")
     end
 
     test "listing paragraph" do

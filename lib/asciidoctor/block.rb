@@ -7,8 +7,6 @@
 #   => ["<em>This</em> is a &lt;test&gt;"]
 class Asciidoctor::Block < Asciidoctor::AbstractBlock
 
-  include Asciidoctor::Substituters
-
   # Public: Create alias for context to be consistent w/ AsciiDoc
   alias :blockname :context
 
@@ -17,6 +15,9 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
 
   # Public: Get/Set the String block title.
   attr_accessor :title
+
+  # Public: Get/Set the caption for this block
+  attr_accessor :caption
 
   # Public: Initialize an Asciidoctor::Block object.
   #
@@ -28,7 +29,6 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
     super(parent, context)
     @buffer = buffer
     @title = nil
-    @passthroughs = []
   end
 
   # Public: Get the rendered String content for this Block.  If the block
@@ -89,7 +89,7 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   #
   # Examples
   #
-  #   doc = Asciidoctor::Document.new([])
+  #   doc = Asciidoctor::Document.new
   #   block = Asciidoctor::Block.new(doc, :paragraph,
   #             ['`This` is what happens when you <meet> a stranger in the <alps>!'])
   #   block.content

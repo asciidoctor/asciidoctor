@@ -9,8 +9,20 @@ context "Text" do
     assert_xpath "//p", example_document(:encoding).render(:header_footer => false), 1
   end
 
+  # NOTE this test ensures we have the encoding line on block templates too
+  test "proper encoding to handle utf8 characters in arbitrary block" do
+    input = []
+    input << "[verse]\n"
+    input.concat(File.readlines(sample_doc_path(:encoding)))
+    doc = Asciidoctor::Document.new
+    reader = Asciidoctor::Reader.new input
+    block = Asciidoctor::Lexer.next_block(reader, doc)
+    assert_xpath '//pre', block.render.gsub(/^\s*\n/, ''), 1
+  end
+
   test 'escaped text markup' do
-    pending "Not done yet"
+    assert_match(/All your &lt;em&gt;inline&lt;\/em&gt; markup belongs to &lt;strong&gt;us&lt;\/strong&gt;!/,
+        render_string('All your <em>inline</em> markup belongs to <strong>us</strong>!'))
   end
 
   test "line breaks" do
@@ -19,8 +31,8 @@ context "Text" do
 
   test "single- and double-quoted text" do
     rendered = render_string("``Where?,'' she said, flipping through her copy of `The New Yorker.'")
-    assert_match /&#8220;Where\?,&#8221;/, rendered
-    assert_match /&#8216;The New Yorker.&#8217;/, rendered
+    assert_match(/&#8220;Where\?,&#8221;/, rendered)
+    assert_match(/&#8216;The New Yorker.&#8217;/, rendered)
   end
 
   test "separator" do
@@ -32,11 +44,15 @@ context "Text" do
     assert_xpath "//em", render_string("An 'emphatic' no")
   end
 
+  test "emphasized text with single quote" do
+    assert_xpath "//em[text()=\"Johnny#{[8217].pack('U*')}s\"]", render_string("It's 'Johnny's' phone")
+  end
+
   test "emphasized text with escaped single quote" do
     assert_xpath "//em[text()=\"Johnny's\"]", render_string("It's 'Johnny\\'s' phone")
   end
 
-  test "escaped single quote is restore as single quote" do
+  test "escaped single quote is restored as single quote" do
     assert_xpath "//p[contains(text(), \"Let's do it!\")]", render_string("Let\\'s do it!")
   end
 
@@ -53,11 +69,11 @@ context "Text" do
   end
 
   test "unquoted text" do
-    assert_no_match /#/, render_string("An #unquoted# word")
+    assert_no_match(/#/, render_string("An #unquoted# word"))
   end
 
   test "backtick-escaped text followed by single-quoted text" do
-    assert_match /<tt>foo<\/tt>/, render_string(%Q(run `foo` 'dog'))
+    assert_match(/<tt>foo<\/tt>/, render_string(%Q(run `foo` 'dog')))
   end
 
   context "basic styling" do

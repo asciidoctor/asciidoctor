@@ -46,7 +46,7 @@ module Asciidoctor
         when :quotes
           text = sub_quotes(text)
         when :attributes
-          text = Substituters.sub_attributes(text.lines.entries, self.document).join
+          text = sub_attributes(text.lines.entries).join
         when :replacements
           text = sub_replacements(text)
         when :macros
@@ -66,11 +66,11 @@ module Asciidoctor
 
     # Public: Apply normal substitutions.
     #
-    # lines  - A String Array containing the lines of text process
+    # lines  - The lines of text to process. Can be a String or a String Array 
     #
     # returns - A String with normal substitutions performed
     def apply_normal_subs(lines)
-      apply_subs(lines.join)
+      apply_subs(lines.is_a?(Array) ? lines.join : lines)
     end
 
     # Public: Apply substitutions for titles.
@@ -91,13 +91,13 @@ module Asciidoctor
       apply_subs(lines.join, COMPOSITE_SUBS[:verbatim])
     end
 
-    # Public: Apply substitutions for header metadata
+    # Public: Apply substitutions for header metadata and attribute assignments
     #
-    # lines  - A String Array containing the lines of text process
+    # text    - String containing the text process
     #
-    # returns - A String Array with header substitutions performed
-    def apply_header_subs(lines)
-      apply_subs(lines, [:specialcharacters, :attributes])
+    # returns - A String with header substitutions performed
+    def apply_header_subs(text)
+      apply_subs(text, [:specialcharacters, :attributes])
     end
 
     # Public: Apply substitutions for passthrough text
@@ -117,7 +117,7 @@ module Asciidoctor
     def extract_passthroughs(text)
       result = text.dup
 
-      result.gsub!(Asciidoctor::REGEXP[:passthrough_macro]) {
+      result.gsub!(REGEXP[:pass_macro]) {
         # copy match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -136,7 +136,7 @@ module Asciidoctor
         "\x0" + (@passthroughs.size - 1).to_s + "\x0"
       } unless !(result.include?('+++') || result.include?('$$') || result.include?('pass:'))
 
-      result.gsub!(Asciidoctor::REGEXP[:passthrough_lit]) {
+      result.gsub!(REGEXP[:pass_lit]) {
         # copy match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -156,8 +156,8 @@ module Asciidoctor
     #
     # returns The String text with the passthrough text restored
     def restore_passthroughs(text)
-      return text if !text.include?("\x0")
-      text.gsub(Asciidoctor::REGEXP[:pass_placeholder]) {
+      return text if @passthroughs.nil? || @passthroughs.empty? || !text.include?("\x0")
+      text.gsub(REGEXP[:pass_placeholder]) {
         pass = @passthroughs[$1.to_i];
         text = apply_subs(pass[:text], pass.fetch(:subs, []))
         pass[:literal] ? Inline.new(self, :quoted, text, :type => :monospaced).render : text
@@ -173,9 +173,9 @@ module Asciidoctor
     # returns The String text with special characters replaced
     def sub_specialcharacters(text)
       # this syntax only available in Ruby 1.9
-      #text.gsub(Asciidoctor::SPECIAL_CHARS_PATTERN, Asciidoctor::SPECIAL_CHARS)
+      #text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS)
 
-      text.gsub(Asciidoctor::SPECIAL_CHARS_PATTERN) { Asciidoctor::SPECIAL_CHARS[$&] }
+      text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
     end
 
     # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc)
@@ -185,12 +185,10 @@ module Asciidoctor
     # returns The String text with quoted text rendered using the backend templates
     def sub_quotes(text)
       result = text.dup
-      Asciidoctor::QUOTE_SUBS.each {|type, scope, pattern|
+      QUOTE_SUBS.each {|type, scope, pattern|
         result.gsub!(pattern) { transform_quoted_text($~, type, scope) }
       }
-
-      # unescape escaped single quotes after processing
-      result.gsub(Asciidoctor::REGEXP[:single_quote_esc], '\1\'\2')
+      result
     end
 
     # Public: Substitute replacement characters (e.g., copyright, trademark, etc)
@@ -200,7 +198,7 @@ module Asciidoctor
     # returns The String text with the replacement characters substituted
     def sub_replacements(text)
       result = text.dup
-      Asciidoctor::REPLACEMENTS.each {|pattern, replacement|
+      REPLACEMENTS.each {|pattern, replacement|
         result.gsub!(pattern, replacement)
       }
       result
@@ -219,20 +217,21 @@ module Asciidoctor
     #--
     # NOTE it's necessary to perform this substitution line-by-line
     # so that a missing key doesn't wipe out the whole block of data
-    def self.sub_attributes(data, document)
+    def sub_attributes(data)
       return data if data.nil? || data.empty?
-      lines = data.is_a?(String) ? [data] : data
+      # normalizes data type to an array (string becomes single-element array)
+      lines = Array(data)
 
       result = lines.map {|line|
         reject = false
         subject = line.dup
-        subject.gsub!(Asciidoctor::REGEXP[:attr_ref]) {
+        subject.gsub!(REGEXP[:attr_ref]) {
           if !$1.empty? || !$3.empty?
             '{' + $2 + '}'
           elsif document.attributes.has_key? $2
             document.attributes[$2]
-          elsif Asciidoctor::INTRINSICS.has_key? $2
-            Asciidoctor::INTRINSICS[$2]
+          elsif INTRINSICS.has_key? $2
+            INTRINSICS[$2]
           else
             Asciidoctor.debug 'Missing attribute: ' + $2 + ', line marked for removal'
             reject = true
@@ -259,14 +258,14 @@ module Asciidoctor
       result = text.dup
 
       # inline images, image:target.ext[Alt]
-      result.gsub!(Asciidoctor::REGEXP[:image_macro]) {
+      result.gsub!(REGEXP[:image_macro]) {
         # copy match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        target = Substituters.sub_attributes(m[1], self.document)
+        target = sub_attributes(m[1])
         attrs = parse_attributes(m[2], ['alt', 'width', 'height'])
         if !attrs.has_key?('alt') || attrs['alt'].empty?
           attrs['alt'] = File.basename(target, File.extname(target))
@@ -275,7 +274,7 @@ module Asciidoctor
       } unless !result.include?('image:')
 
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
-      result.gsub!(Asciidoctor::REGEXP[:link_inline]) {
+      result.gsub!(REGEXP[:link_inline]) {
         # copy match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -288,12 +287,12 @@ module Asciidoctor
         end
         prefix = (m[1] != 'link:' ? m[1] : '')
         target = m[2]
-        text = !m[3].nil? ? Substituters.sub_attributes(m[3].gsub('\]', ']'), self.document) : ''
-        prefix + Inline.new(self, :link, (!text.empty? ? text : target), :target => target).render
+        text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
+        prefix + Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
       } unless !result.include?('http')
 
       # inline link macros, link:target[text]
-      result.gsub!(Asciidoctor::REGEXP[:link_macro]) {
+      result.gsub!(REGEXP[:link_macro]) {
         # copy match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -301,11 +300,11 @@ module Asciidoctor
           next m[0][1..-1]
         end
         target = m[1]
-        text = Substituters.sub_attributes(m[2].gsub('\]', ']'), self.document)
-        Inline.new(self, :link, (!text.empty? ? text : target), :target => target).render
+        text = sub_attributes(m[2].gsub('\]', ']'))
+        Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
       } unless !result.include?('link:')
 
-      result.gsub!(Asciidoctor::REGEXP[:xref_macro]) {
+      result.gsub!(REGEXP[:xref_macro]) {
         # copy match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -318,7 +317,7 @@ module Asciidoctor
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
         end
-        Inline.new(self, :link, reftext || document.references.fetch(id, '[' + id + ']'), :target => '#' + id).render
+        Inline.new(self, :anchor, reftext, :type => :xref, :target => id).render
       }
 
       result
@@ -330,7 +329,7 @@ module Asciidoctor
     #
     # returns The String with the callout references rendered using the backend templates
     def sub_callouts(text)
-      text.gsub(Asciidoctor::REGEXP[:calloutref]) { Inline.new(self, :callout, $1).render }
+      text.gsub(REGEXP[:calloutref]) { Inline.new(self, :callout, $1).render }
     end
 
     # Public: Substitute post replacements
