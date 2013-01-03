@@ -49,9 +49,9 @@ class Asciidoctor::AttributeList
   # Public: A regular expression for splitting a comma-separated string
   CSV_SPLIT_PATTERN = /[ \t]*,[ \t]*/
 
-  def initialize(source, document = nil, quotes = ['\'', '"'], delimiter = ',', escape_char = '\\')
+  def initialize(source, block = nil, quotes = ['\'', '"'], delimiter = ',', escape_char = '\\')
     @scanner = ::StringScanner.new source
-    @document = document
+    @block = block
     @quotes = quotes
     @escape_char = escape_char
     @delimiter = delimiter
@@ -97,11 +97,16 @@ class Asciidoctor::AttributeList
   end
 
   def parse_attribute(index = 0, posattrs = [])
+    single_quoted_value = false
     skip_blank
+    first = @scanner.peek(1)
     # example: "quote" || 'quote'
-    if @quotes.include? @scanner.peek(1)
+    if @quotes.include? first
       value = nil
       name = parse_attribute_value @scanner.get_byte
+      if first == '\''
+        single_quoted_value = true
+      end
     else
       name = scan_name
 
@@ -137,6 +142,9 @@ class Asciidoctor::AttributeList
           # example: foo="bar" || foo='bar' || foo="ba\"zaar" || foo='ba\'zaar' || foo='ba"zaar' (all spaces ignored)
           if @quotes.include? c
             value = parse_attribute_value c
+            if c == '\''
+              single_quoted_value = true
+            end
           # example: foo=bar (all spaces ignored)
           elsif !c.nil?
             value = c + scan_to_delimiter
@@ -146,7 +154,7 @@ class Asciidoctor::AttributeList
     end
 
     if value.nil?
-      resolved_name = @document ? Asciidoctor::Substituters.sub_attributes(name, @document) : name
+      resolved_name = single_quoted_value && !@block.nil? ? @block.apply_normal_subs(name) : name
       if !(posname = posattrs[index]).nil?
         @attributes[posname] = resolved_name
       else
@@ -157,13 +165,14 @@ class Asciidoctor::AttributeList
       # not sure if I want this assignment or not
       #@attributes[resolved_name] = nil
     else
-      # TODO single-quoted attributes should get normal substitutions, not just attributes
-      resolved_value = @document ? Asciidoctor::Substituters.sub_attributes(value, @document) : value
+      resolved_value = value
       # example: options="opt1,opt2,opt3"
       if name == 'options'
         resolved_value.split(CSV_SPLIT_PATTERN).each do |o|
           @attributes['option-' + o] = nil
         end
+      elsif single_quoted_value && !@block.nil?
+        resolved_value = @block.apply_normal_subs(value)
       end
       @attributes[name] = resolved_value
     end

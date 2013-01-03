@@ -16,7 +16,7 @@ List
       assert_xpath '//ul/li', output, 3
     end
 
-    test "dash elements with blank lines should merge lists" do
+    test "dash elements separated by blank lines should merge lists" do
       input = <<-EOS
 List
 ====
@@ -24,6 +24,7 @@ List
 - Foo
 
 - Boo
+
 
 - Blech
       EOS
@@ -148,7 +149,7 @@ List
       assert_xpath '//ul/li', output, 3
     end
 
-    test "asterisk elements with blank lines should merge lists" do
+    test "asterisk elements separated by blank lines should merge lists" do
       input = <<-EOS
 List
 ====
@@ -156,6 +157,7 @@ List
 * Foo
 
 * Boo
+
 
 * Blech
       EOS
@@ -340,6 +342,7 @@ List
 
 * Boo
 
+
 - Blech
       EOS
       output = render_string input
@@ -496,6 +499,7 @@ List
 
 . Boo
 
+
 * Blech
       EOS
       output = render_string input
@@ -559,8 +563,8 @@ Item one, paragraph two
       assert_xpath '//ul/li', output, 2
       assert_xpath '//ul/li[1]/p', output, 1
       assert_xpath '//ul/li[1]//p', output, 2
-      assert_xpath '//ul/li[1]//p[text() = "Item one, paragraph one"]', output, 1
-      assert_xpath '//ul/li[1]//p[text() = "Item one, paragraph two"]', output, 1
+      assert_xpath '//ul/li[1]/p[text() = "Item one, paragraph one"]', output, 1
+      assert_xpath '//ul/li[1]/*[@class = "paragraph"]/p[text() = "Item one, paragraph two"]', output, 1
     end
 
     test "adjacent list continuation line attaches following block" do
@@ -610,7 +614,7 @@ ____
 
     # NOTE this differs from AsciiDoc behavior, but is more logical
     test "consecutive list continuation lines are folded" do
-      return pending "rework test to support more compliant behavior"
+      return pending "Rework test to support more compliant behavior"
       input = <<-EOS
 Lists
 =====
@@ -652,7 +656,7 @@ List
       assert_xpath '//ol/li', output, 3
     end
 
-    test "dot elements with blank lines should merge lists" do
+    test "dot elements separated by blank lines should merge lists" do
       input = <<-EOS
 List
 ====
@@ -661,6 +665,7 @@ List
 
 . Boo
 
+
 . Blech
       EOS
       output = render_string input
@@ -668,7 +673,7 @@ List
       assert_xpath '//ol/li', output, 3
     end
 
-    test "dot elements with blank lines separated by line comment should not merge lists" do
+    test "dot elements separated by line comment offset by blank lines should not merge lists" do
       input = <<-EOS
 List
 ====
@@ -970,6 +975,35 @@ anotherterm:: def
       output = render_string input
       assert_xpath '//dl/dd//p', output, 3
       assert_xpath '(//dl/dd)[1]//*[@class="openblock"]//p', output, 2
+    end
+
+    test "paragraph attached by a list continuation in a labeled list" do
+      input = <<-EOS
+term1:: def
++
+more detail
++
+term2:: def
+      EOS
+      output = render_string input
+      assert_xpath '(//dl/dd)[1]//p', output, 2
+      assert_xpath '(//dl/dd)[1]/p/following-sibling::*[@class="paragraph"]/p[text() = "more detail"]', output, 1
+    end
+
+    # FIXME!
+    test "paragraph attached by a list continuation to a multi-line element in a labeled list" do
+      input = <<-EOS
+term1::
+def
++
+more detail
++
+term2:: def
+      EOS
+      output = render_string input
+      pending "We're assuming the list continuation would be the first line after the term"
+      #assert_xpath '(//dl/dd)[1]//p', output, 2
+      #assert_xpath '(//dl/dd)[1]/p/following-sibling::*[@class="paragraph"]/p[text() = "more detail"]', output, 1
     end
 
     test "verse paragraph inside a labeled list" do

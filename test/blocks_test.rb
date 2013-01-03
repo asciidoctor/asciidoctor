@@ -36,7 +36,7 @@ context "Blocks" do
 
     test "trailing endlines after block comment at end of document does not create paragraph" do
       d = document_from_string("Paragraph\n\n////\nblock comment\n////\n\n")
-      assert_equal 1, d.elements.size
+      assert_equal 1, d.blocks.size
     end
   end
 

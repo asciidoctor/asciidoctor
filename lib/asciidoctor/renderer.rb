@@ -8,10 +8,19 @@ class Asciidoctor::Renderer
 
     @views = {}
 
-    # Load up all the template classes that we know how to render
-    BaseTemplate.template_classes.each do |tc|
-      view = tc.to_s.underscore.gsub(/_template$/, '')
-      @views[view] = tc.new
+    backend = options[:backend]
+    case backend
+    when 'html5', 'docbook45'
+      require 'asciidoctor/backends/' + backend
+      # Load up all the template classes that we know how to render for this backend
+      ::Asciidoctor::BaseTemplate.template_classes.each do |tc|
+        if tc.to_s.downcase.include?('::' + backend + '::')
+          view = tc.to_s.nuke(/^.*::/).underscore.nuke(/_template$/)
+          @views[view] = tc.new(view)
+        end
+      end
+    else
+      Asciidoctor.debug 'No built-in templates for backend: ' + backend
     end
 
     # If user passed in a template dir, let them override our base templates
@@ -79,5 +88,11 @@ class Asciidoctor::Renderer
 
     @render_stack.pop
     ret
+  end
+
+  def views
+    readonly_views = @views.dup
+    readonly_views.freeze
+    readonly_views
   end
 end

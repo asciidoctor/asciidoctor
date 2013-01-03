@@ -10,14 +10,23 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
   # QUESTION should this be writable? and for Block, should it delegate to parent?
   attr_accessor :level
 
-  # Public: Get/Set the caption for this block
-  attr_accessor :caption
-
   def initialize(parent, context)
     super(parent, context)
     @blocks = []
     @id = nil
-    @level = nil
+    @level = (context == :document ? 0 : nil)
+  end
+
+  # Public: Determine whether this Block contains block content
+  #
+  # returns Whether this Block has block content
+  #
+  #--
+  # TODO we still need another method that answers
+  # whether this Block *can* have block content
+  # that should be the option 'sectionbody'
+  def has_section_body?
+    !blocks.empty?
   end
 
   # Public: Append a content block to this block's list of blocks.

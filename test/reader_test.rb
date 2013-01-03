@@ -9,7 +9,7 @@ class ReaderTest < Test::Unit::TestCase
 
   context "has_lines?" do
     test "returns false for empty document" do
-      assert ! Asciidoctor::Reader.new.has_lines?
+      assert !Asciidoctor::Reader.new.has_lines?
     end
 
     test "returns true with lines remaining" do
@@ -44,6 +44,114 @@ class ReaderTest < Test::Unit::TestCase
     end
   end
 
+  context "Grab lines" do
+    test "Grab until end" do
+      input = <<-EOS
+This is one paragraph.
+
+This is another paragraph.
+      EOS
+
+      lines = input.lines.entries
+      reader = Asciidoctor::Reader.new(lines)
+      result = reader.grab_lines_until
+      assert_equal 3, result.size
+      assert_equal lines, result
+      assert !reader.has_lines?
+      assert reader.empty?
+    end
+
+    test "Grab until blank line" do
+      input = <<-EOS
+This is one paragraph.
+
+This is another paragraph.
+      EOS
+
+      lines = input.lines.entries
+      reader = Asciidoctor::Reader.new(lines)
+      result = reader.grab_lines_until :break_on_blank_lines => true
+      assert_equal 1, result.size
+      assert_equal lines.first, result.first
+      assert_equal lines.last, reader.peek_line
+    end
+
+    test "Grab until blank line preserving last line" do
+      input = <<-EOS
+This is one paragraph.
+
+This is another paragraph.
+      EOS
+
+      lines = input.lines.entries
+      reader = Asciidoctor::Reader.new(lines)
+      result = reader.grab_lines_until :break_on_blank_lines => true, :preserve_last_line => true
+      assert_equal 1, result.size
+      assert_equal lines.first, result.first
+      assert_equal "\n", reader.peek_line
+    end
+
+    test "Grab until condition" do
+      input = <<-EOS
+--
+This is one paragraph inside the block.
+
+This is another paragraph inside the block.
+--
+
+This is a paragraph outside the block.
+      EOS
+
+      lines = input.lines.entries
+      reader = Asciidoctor::Reader.new(lines)
+      reader.get_line
+      result = reader.grab_lines_until {|line| line.chomp == '--' }
+      assert_equal 3, result.size
+      assert_equal lines[1, 3], result
+      assert_equal "\n", reader.peek_line
+    end
+
+    test "Grab until condition with last line" do
+      input = <<-EOS
+--
+This is one paragraph inside the block.
+
+This is another paragraph inside the block.
+--
+
+This is a paragraph outside the block.
+      EOS
+
+      lines = input.lines.entries
+      reader = Asciidoctor::Reader.new(lines)
+      reader.get_line
+      result = reader.grab_lines_until(:grab_last_line => true) {|line| line.chomp == '--' }
+      assert_equal 4, result.size
+      assert_equal lines[1, 4], result
+      assert_equal "\n", reader.peek_line
+    end
+
+    test "Grab until condition with last line and preserving last line" do
+      input = <<-EOS
+--
+This is one paragraph inside the block.
+
+This is another paragraph inside the block.
+--
+
+This is a paragraph outside the block.
+      EOS
+
+      lines = input.lines.entries
+      reader = Asciidoctor::Reader.new(lines)
+      reader.get_line
+      result = reader.grab_lines_until(:grab_last_line => true, :preserve_last_line => true) {|line| line.chomp == '--' }
+      assert_equal 4, result.size
+      assert_equal lines[1, 4], result
+      assert_equal "--\n", reader.peek_line
+    end
+  end
+
   context "Include files" do
     test "block is called to handle an include macro" do
       input = <<-EOS
@@ -53,22 +161,46 @@ include::include-file.asciidoc[]
 
 last line
       EOS
-      attributes = {}
-      reader = Asciidoctor::Reader.new(input.lines.entries, attributes) {|inc|
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc) {|inc|
         ":file: #{inc}\n\nmiddle line".lines.entries
       }
-      expected = {'file' => 'include-file.asciidoc'}
-      assert_equal expected, attributes
+      assert_equal 'include-file.asciidoc', doc.attributes['file']
     end
   end
 
-  def test_grab_lines_until
-    pending "Not tested yet"
+  # TODO these tests could be expanded
+  context 'Conditional blocks' do
+    test 'ifdef with defined attribute includes block' do
+      input = <<-EOS
+:holygrail:
+
+ifdef::holygrail[]
+There is a holy grail!
+endif::holygrail[]
+      EOS
+       
+      reader = Asciidoctor::Reader.new(input.lines.entries, Asciidoctor::Document.new)
+      assert_match /There is a holy grail!/, reader.lines.join
+    end
+
+    test 'ifndef with undefined attribute includes block' do
+      input = <<-EOS
+ifndef::holygrail[]
+Our quest continues to find the holy grail!
+endif::holygrail[]
+      EOS
+
+      reader = Asciidoctor::Reader.new(input.lines.entries, Asciidoctor::Document.new)
+      assert_match /Our quest continues to find the holy grail!/, reader.lines.join
+    end
   end
 
-  def test_sanitize_attribute_name
-    assert_equal 'foobar', @reader.sanitize_attribute_name("Foo Bar")
-    assert_equal 'foo', @reader.sanitize_attribute_name("foo")
-    assert_equal 'foo3-bar', @reader.sanitize_attribute_name("Foo 3^ # - Bar[")
+  context 'Text processing' do
+    test 'sanitize attribute name' do
+      assert_equal 'foobar', @reader.sanitize_attribute_name("Foo Bar")
+      assert_equal 'foo', @reader.sanitize_attribute_name("foo")
+      assert_equal 'foo3-bar', @reader.sanitize_attribute_name("Foo 3^ # - Bar[")
+    end
   end
 end

@@ -9,8 +9,20 @@ context "Text" do
     assert_xpath "//p", example_document(:encoding).render(:header_footer => false), 1
   end
 
+  # NOTE this test ensures we have the encoding line on block templates too
+  test "proper encoding to handle utf8 characters in arbitrary block" do
+    input = []
+    input << "[verse]\n"
+    input.concat(File.readlines(sample_doc_path(:encoding)))
+    doc = Asciidoctor::Document.new
+    reader = Asciidoctor::Reader.new input
+    block = Asciidoctor::Lexer.next_block(reader, doc)
+    assert_xpath '//pre', block.render.gnuke(/^\s*\n/), 1
+  end
+
   test 'escaped text markup' do
-    pending "Not done yet"
+    assert_match /All your &lt;em&gt;inline&lt;\/em&gt; markup belongs to &lt;strong&gt;us&lt;\/strong&gt;!/,
+        render_string('All your <em>inline</em> markup belongs to <strong>us</strong>!')
   end
 
   test "line breaks" do
@@ -32,11 +44,15 @@ context "Text" do
     assert_xpath "//em", render_string("An 'emphatic' no")
   end
 
+  test "emphasized text with single quote" do
+    assert_xpath "//em[text()=\"Johnny#{[8217].pack('U*')}s\"]", render_string("It's 'Johnny's' phone")
+  end
+
   test "emphasized text with escaped single quote" do
     assert_xpath "//em[text()=\"Johnny's\"]", render_string("It's 'Johnny\\'s' phone")
   end
 
-  test "escaped single quote is restore as single quote" do
+  test "escaped single quote is restored as single quote" do
     assert_xpath "//p[contains(text(), \"Let's do it!\")]", render_string("Let\\'s do it!")
   end
 
