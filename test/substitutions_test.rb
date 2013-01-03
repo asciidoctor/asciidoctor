@@ -9,7 +9,7 @@ context 'Substitutions' do
       para = block_from_string("[blue]'http://asciidoc.org[AsciiDoc]' & [red]*Ruby*\n&#167; Making +++<u>documentation</u>+++ together +\nsince (C) {inception_year}.")
       para.document.attributes['inception_year'] = '2012'
       result = para.apply_normal_subs(para.buffer) 
-      assert_equal %{<em><span class="blue"><a href='http://asciidoc.org'>AsciiDoc</a></span></em> &amp; <strong><span class="red">Ruby</span></strong>\n&#167; Making <u>documentation</u> together<br>\nsince &#169; 2012.}, result
+      assert_equal %{<em><span class="blue"><a href="http://asciidoc.org">AsciiDoc</a></span></em> &amp; <strong><span class="red">Ruby</span></strong>\n&#167; Making <u>documentation</u> together<br>\nsince &#169; 2012.}, result
     end
   end
 
@@ -106,7 +106,8 @@ context 'Substitutions' do
 
     test 'escaped single-quotes inside emphasized words are restored' do
       para = block_from_string(%q{'Here\'s Johnny!'})
-      assert_equal %q{<em>Here's Johnny!</em>}, para.sub_quotes(para.buffer.join)
+      # NOTE the \' is replaced with ' by the :replacements substitution, later in the substitution pipeline
+      assert_equal %q{<em>Here\'s Johnny!</em>}, para.sub_quotes(para.buffer.join)
     end
 
     test 'single-line constrained emphasized underline variation string' do
@@ -200,33 +201,33 @@ context 'Substitutions' do
   context 'Macros' do
     test 'a single-line link macro should be interpreted as a link' do
       para = block_from_string('link:/home.html[]')
-      assert_equal %q{<a href='/home.html'>/home.html</a>}, para.sub_macros(para.buffer.join)
+      assert_equal %q{<a href="/home.html">/home.html</a>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a single-line link macro with text should be interpreted as a link' do
       para = block_from_string('link:/home.html[Home]')
-      assert_equal %q{<a href='/home.html'>Home</a>}, para.sub_macros(para.buffer.join)
+      assert_equal %q{<a href="/home.html">Home</a>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a single-line raw url should be interpreted as a link' do
       para = block_from_string('http://google.com')
-      assert_equal %q{<a href='http://google.com'>http://google.com</a>}, para.sub_macros(para.buffer.join)
+      assert_equal %q{<a href="http://google.com">http://google.com</a>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a single-line raw url with text should be interpreted as a link' do
       para = block_from_string('http://google.com[Google]')
-      assert_equal %q{<a href='http://google.com'>Google</a>}, para.sub_macros(para.buffer.join)
+      assert_equal %q{<a href="http://google.com">Google</a>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a multi-line raw url with text should be interpreted as a link' do
       para = block_from_string("http://google.com[Google\nHomepage]")
-      assert_equal %{<a href='http://google.com'>Google\nHomepage</a>}, para.sub_macros(para.buffer.join)
+      assert_equal %{<a href="http://google.com">Google\nHomepage</a>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a multi-line raw url with attribute as text should be interpreted as a link with resolved attribute' do
       para = block_from_string("http://google.com[{google_homepage}]")
       para.document.attributes['google_homepage'] = 'Google Homepage'
-      assert_equal %q{<a href='http://google.com'>Google Homepage</a>}, para.sub_macros(para.buffer.join)
+      assert_equal %q{<a href="http://google.com">Google Homepage</a>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a single-line escaped raw url should not be interpreted as a link' do
@@ -236,22 +237,22 @@ context 'Substitutions' do
 
     test 'a single-line image macro should be interpreted as an image' do
       para = block_from_string('image:tiger.png[]')
-      assert_equal %{<span class='image'>\n  <img src='tiger.png' alt='tiger'>\n</span>}, para.sub_macros(para.buffer.join)
+      assert_equal %{<span class="image">\n  <img src="tiger.png" alt="tiger">\n</span>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a single-line image macro with text should be interpreted as an image with alt text' do
       para = block_from_string('image:tiger.png[Tiger]')
-      assert_equal %{<span class='image'>\n  <img src='tiger.png' alt='Tiger'>\n</span>}, para.sub_macros(para.buffer.join)
+      assert_equal %{<span class="image">\n  <img src="tiger.png" alt="Tiger">\n</span>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a single-line image macro with text and dimensions should be interpreted as an image with alt text and dimensions' do
       para = block_from_string('image:tiger.png[Tiger, 200, 100]')
-      assert_equal %{<span class='image'>\n  <img src='tiger.png' alt='Tiger' width='200' height='100'>\n</span>}, para.sub_macros(para.buffer.join)
+      assert_equal %{<span class="image">\n  <img src="tiger.png" alt="Tiger" width="200" height="100">\n</span>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a single-line image macro with text and link should be interpreted as a linked image with alt text' do
       para = block_from_string('image:tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]')
-      assert_equal %{<span class='image'>\n  <a class='image' href='http://en.wikipedia.org/wiki/Tiger'><img src='tiger.png' alt='Tiger'></a>\n</span>}, para.sub_macros(para.buffer.join)
+      assert_equal %{<span class="image">\n  <a class="image" href="http://en.wikipedia.org/wiki/Tiger"><img src="tiger.png" alt="Tiger"></a>\n</span>}, para.sub_macros(para.buffer.join)
     end
   end
 

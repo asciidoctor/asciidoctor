@@ -1,4 +1,6 @@
 class Asciidoctor::AbstractNode
+  include Asciidoctor::Substituters
+
   # Public: Get the element which is the parent of this node
   attr_reader :parent
 
@@ -15,7 +17,7 @@ class Asciidoctor::AbstractNode
   attr_reader :attributes
 
   def initialize(parent, context)
-    @parent = parent
+    @parent = (context != :document ? parent : nil)
     if !parent.nil?
       @document = parent.is_a?(Asciidoctor::Document) ? parent : parent.document
     else
@@ -23,15 +25,24 @@ class Asciidoctor::AbstractNode
     end
     @context = context
     @attributes = {}
+    @passthroughs = []
   end
 
   def attr(name, default = nil)
-    default.nil? ? @attributes.fetch(name.to_s, self.document.attr(name)) :
-        @attributes.fetch(name.to_s, self.document.attr(name, default))
+    if self == @document
+      default.nil? ? @attributes[name.to_s] : @attributes.fetch(name.to_s, default)
+    else
+      default.nil? ? @attributes.fetch(name.to_s, @document.attr(name)) :
+          @attributes.fetch(name.to_s, @document.attr(name, default))
+    end
   end
 
   def attr?(name)
-    @attributes.has_key?(name.to_s) || self.document.attr?(name)
+    if self == @document
+      @attributes.has_key? name.to_s
+    else
+      @attributes.has_key?(name.to_s) || @document.attr?(name)
+    end
   end
 
   def update_attributes(attributes)

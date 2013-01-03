@@ -19,8 +19,6 @@
 #   => 1
 class Asciidoctor::Section < Asciidoctor::AbstractBlock
 
-  include Asciidoctor::Substituters
-
   # Public: Set the String section title.
   attr_writer :title
 
@@ -61,6 +59,8 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #
   # Section ID synthesis can be disabled by undefining the sectids attribute.
   #
+  # TODO document the substitutions
+  #
   # Examples
   #
   #   section = Section.new(parent)
@@ -68,8 +68,9 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #   section.generate_id
   #   => "_foo"
   def generate_id
-    if self.document.attributes.has_key? 'sectids'
-      self.document.attributes.fetch('idprefix', '_') + "#{title && title.downcase.gsub(/\W+/,'_').gsub(/_+$/, '')}".tr_s('_', '_')
+    if !title.to_s.empty? && document.attr?('sectids')
+      document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, '_').
+          gsub(/\W+/, '_').tr_s('_', '_').gsub(/^_?(.*?)_?$/, '\1')
     else
       nil
     end

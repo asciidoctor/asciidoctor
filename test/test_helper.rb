@@ -62,14 +62,21 @@ class Test::Unit::TestCase
     end
   end
 
-  def assert_xpath(xpath, html, count = nil)
-    doc = (html =~ /\s*<!DOCTYPE/) ? Nokogiri::HTML::Document.parse(html) : Nokogiri::HTML::DocumentFragment.parse(html)
+  def assert_xpath(xpath, content, count = nil)
+    match = content.match(/\s*<!DOCTYPE (.*)/)
+    if !match
+      doc = Nokogiri::HTML::DocumentFragment.parse(content)
+    elsif match[1].start_with? 'html'
+      doc = Nokogiri::HTML::Document.parse(content)
+    else
+      doc = Nokogiri::XML::Document.parse(content)
+    end
     results = doc.xpath("#{xpath.sub('/', './')}")
 
     if (count && results.length != count)
-      flunk "XPath #{xpath} yielded #{results.length} elements rather than #{count} for:\n#{html}"
+      flunk "XPath #{xpath} yielded #{results.length} elements rather than #{count} for:\n#{content}"
     elsif (count.nil? && results.empty?)
-      flunk "XPath #{xpath} not found in:\n#{html}"
+      flunk "XPath #{xpath} not found in:\n#{content}"
     else
       assert true
     end
@@ -82,7 +89,7 @@ class Test::Unit::TestCase
   def block_from_string(src, opts = {})
     opts[:header_footer] = false
     doc = Asciidoctor::Document.new(src.lines.entries, opts)
-    doc.elements.first
+    doc.blocks.first
   end
 
   def render_string(src, opts = {})
