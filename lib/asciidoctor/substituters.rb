@@ -336,7 +336,7 @@ module Asciidoctor
           Asciidoctor.debug 'Missing reference for anchor ' + id
         end
         Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
-      }
+      } unless !result.include?('[[')
 
       result
     end
