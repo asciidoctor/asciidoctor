@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   ## List the primary authors. If there are a bunch of authors, it's probably
   ## better to set the email to an email list or something. If you don't have
   ## a custom homepage, consider using your GitHub URL or the like.
-  s.authors  = ["Ryan Waldron", "Jeremy McAnally"]
+  s.authors  = ["Ryan Waldron", "Dan Allen", "Jeremy McAnally"]
   s.email    = 'rew@erebor.com'
   s.homepage = 'http://github.com/erebor/asciidoctor'
 

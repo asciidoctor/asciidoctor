@@ -4,6 +4,7 @@ Asciidoctor
 :asciidoctor: http://github.com/erebor/asciidoctor
 :asciidoc: http://www.methods.co.nz/asciidoc/index.html
 :gitscm-next: https://github.com/github/gitscm-next
+:asciidoctorseed: https://github.com/github/gitscm-next/commits/master/lib/asciidoc.rb
 :templates: https://github.com/erebor/asciidoctor/blob/master/lib/asciidoctor/render_templates.rb
 :tilt: https://github.com/rtomayko/tilt
 :freesoftware: http://www.fsf.org/licensing/essays/free-sw.html
@@ -31,7 +32,8 @@ know of any reason it shouldn't work with more exotic Ruby versions,
 and would welcome help in testing that out.
 
 The initial code from which Asciidoctor started was from the
-{gitscm-next}[Git SCM site repo].
+{gitscm-next}[Git SCM site repo]. Refer to commit history of
+{asciidoctorseed}[asciidoc.rb] to view the initial contributions.
 
 == Installation
 
