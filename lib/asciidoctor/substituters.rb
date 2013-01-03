@@ -7,7 +7,7 @@ module Asciidoctor
     COMPOSITE_SUBS = {
       :none => [],
       :normal => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements],
-      :verbatim => [:specialcharacters, :callout]
+      :verbatim => [:specialcharacters, :callouts]
     }
 
     # Internal: A String Array of passthough (unprocessed) text captured from this block
@@ -56,7 +56,7 @@ module Asciidoctor
         when :post_replacements
           text = sub_post_replacements(text)
         else
-          Asciidoctor.debug "Unknown substitution " + type.to_s
+          puts "asciidoctor: WARNING: unknown substitution type " + type.to_s
         end
       }
       text = restore_passthroughs(text) if passthroughs
