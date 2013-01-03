@@ -992,6 +992,7 @@ term2:: def
 
     # FIXME!
     test "paragraph attached by a list continuation to a multi-line element in a labeled list" do
+      return pending "We're assuming the list continuation would be the first line after the term"
       input = <<-EOS
 term1::
 def
@@ -1000,8 +1001,7 @@ more detail
 +
 term2:: def
       EOS
-      output = render_string input
-      pending "We're assuming the list continuation would be the first line after the term"
+      #output = render_string input
       #assert_xpath '(//dl/dd)[1]//p', output, 2
       #assert_xpath '(//dl/dd)[1]/p/following-sibling::*[@class="paragraph"]/p[text() = "more detail"]', output, 1
     end

@@ -133,7 +133,7 @@ endif::holygrail[]
     test "ignores lines with bad attributes" do
       html = render_string("This is\nblah blah {foobarbaz}\nall there is.")
       result = Nokogiri::HTML(html)
-      assert_no_match /blah blah/m, result.css("p").first.content.strip
+      assert_no_match(/blah blah/m, result.css("p").first.content.strip)
     end
 
     test "attribute value gets interpretted when rendering" do
@@ -155,14 +155,14 @@ endif::holygrail[]
     test "substitutes inside unordered list items" do
       html = render_string(":foo: bar\n* snort at the {foo}\n* yawn")
       result = Nokogiri::HTML(html)
-      assert_match /snort at the bar/, result.css("li").first.content.strip
+      assert_match(/snort at the bar/, result.css("li").first.content.strip)
     end
 
     test "substitutes inside heading" do
       output = render_string(":prefix: Cool\n\n== {prefix} Title\n\ncontent")
       result = Nokogiri::HTML(output)
-      assert_match /Cool Title/, result.css('h2').first.content
-      assert_match /_cool_title/, result.css('h2').first.attr('id')
+      assert_match(/Cool Title/, result.css('h2').first.content)
+      assert_match(/_cool_title/, result.css('h2').first.attr('id'))
     end
 
     test 'renders attribute until it is deleted' do
@@ -194,7 +194,7 @@ puts 'The forecast for today is {forecast}'
 ----
       EOS
       output = render_string(input)
-      assert_match /\{forecast\}/, output
+      assert_match(/\{forecast\}/, output)
     end
 
     test 'does not substitute attributes inside literal blocks' do
@@ -207,7 +207,7 @@ of the attribute named foo in your document.
 ....
        EOS
       output = render_string(input)
-      assert_match /\{foo\}/, output
+      assert_match(/\{foo\}/, output)
     end
   end
 
@@ -217,18 +217,18 @@ of the attribute named foo in your document.
       Asciidoctor::INTRINSICS.each_pair do |key, value|
         html = render_string("Look, a {#{key}} is here")
         # can't use Nokogiri because it interprets the HTML entities and we can't match them
-        assert_match /Look, a #{Regexp.escape(value)} is here/, html
+        assert_match(/Look, a #{Regexp.escape(value)} is here/, html)
       end
     end
 
     test "don't escape intrinsic substitutions" do
       html = render_string('happy{nbsp}together')
-      assert_match /happy&#160;together/, html
+      assert_match(/happy&#160;together/, html)
     end
 
     test "escape special characters" do
       html = render_string('<node>&</node>')
-      assert_match /&lt;node&gt;&amp;&lt;\/node&gt;/, html
+      assert_match(/&lt;node&gt;&amp;&lt;\/node&gt;/, html)
     end
     
   end

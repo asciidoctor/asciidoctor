@@ -21,8 +21,8 @@ context "Text" do
   end
 
   test 'escaped text markup' do
-    assert_match /All your &lt;em&gt;inline&lt;\/em&gt; markup belongs to &lt;strong&gt;us&lt;\/strong&gt;!/,
-        render_string('All your <em>inline</em> markup belongs to <strong>us</strong>!')
+    assert_match(/All your &lt;em&gt;inline&lt;\/em&gt; markup belongs to &lt;strong&gt;us&lt;\/strong&gt;!/,
+        render_string('All your <em>inline</em> markup belongs to <strong>us</strong>!'))
   end
 
   test "line breaks" do
@@ -31,8 +31,8 @@ context "Text" do
 
   test "single- and double-quoted text" do
     rendered = render_string("``Where?,'' she said, flipping through her copy of `The New Yorker.'")
-    assert_match /&#8220;Where\?,&#8221;/, rendered
-    assert_match /&#8216;The New Yorker.&#8217;/, rendered
+    assert_match(/&#8220;Where\?,&#8221;/, rendered)
+    assert_match(/&#8216;The New Yorker.&#8217;/, rendered)
   end
 
   test "separator" do
@@ -69,11 +69,11 @@ context "Text" do
   end
 
   test "unquoted text" do
-    assert_no_match /#/, render_string("An #unquoted# word")
+    assert_no_match(/#/, render_string("An #unquoted# word"))
   end
 
   test "backtick-escaped text followed by single-quoted text" do
-    assert_match /<tt>foo<\/tt>/, render_string(%Q(run `foo` 'dog'))
+    assert_match(/<tt>foo<\/tt>/, render_string(%Q(run `foo` 'dog')))
   end
 
   context "basic styling" do

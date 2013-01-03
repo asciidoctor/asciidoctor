@@ -162,7 +162,7 @@ include::include-file.asciidoc[]
 last line
       EOS
       doc = Asciidoctor::Document.new
-      reader = Asciidoctor::Reader.new(input.lines.entries, doc) {|inc|
+      Asciidoctor::Reader.new(input.lines.entries, doc) {|inc|
         ":file: #{inc}\n\nmiddle line".lines.entries
       }
       assert_equal 'include-file.asciidoc', doc.attributes['file']
@@ -181,7 +181,7 @@ endif::holygrail[]
       EOS
        
       reader = Asciidoctor::Reader.new(input.lines.entries, Asciidoctor::Document.new)
-      assert_match /There is a holy grail!/, reader.lines.join
+      assert_match(/There is a holy grail!/, reader.lines.join)
     end
 
     test 'ifndef with undefined attribute includes block' do
@@ -192,7 +192,7 @@ endif::holygrail[]
       EOS
 
       reader = Asciidoctor::Reader.new(input.lines.entries, Asciidoctor::Document.new)
-      assert_match /Our quest continues to find the holy grail!/, reader.lines.join
+      assert_match(/Our quest continues to find the holy grail!/, reader.lines.join)
     end
   end
 

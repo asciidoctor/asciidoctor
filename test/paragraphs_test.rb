@@ -21,7 +21,6 @@ context "Paragraphs" do
 
   context "code" do
     test "single-line literal paragraphs" do
-      output = render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
       assert_xpath "//pre", render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
     end
 
@@ -36,7 +35,7 @@ You're good to go!
       EOS
       output = render_string(input)
       assert_xpath "//pre", output, 1
-      assert_match /^gem install asciidoctor/, output, "Indentation should be trimmed from literal block"
+      assert_match(/^gem install asciidoctor/, output, "Indentation should be trimmed from literal block")
     end
 
     test "listing paragraph" do

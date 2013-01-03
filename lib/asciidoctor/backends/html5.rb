@@ -1,7 +1,7 @@
 class Asciidoctor::BaseTemplate
 
   # create template matter to insert a style class from the role attribute if specified
-  def role
+  def style_class
     attrvalue(:role)
   end
 end
@@ -82,7 +82,7 @@ class SectionTemplate < ::Asciidoctor::BaseTemplate
 <h1#{id}><%= title %></h1>
 <%= content %>
 <% else %>
-<div class="sect<%= level %>#{role}">
+<div class="sect<%= level %>#{style_class}">
   <h<%= level + 1 %>#{id}><%= title %></h<%= level + 1 %>>
   <% if level == 1 %>
   <div class="sectionbody">
@@ -101,7 +101,7 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="dlist#{role}">
+<div#{id} class="dlist#{style_class}">
   <% if title %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -134,7 +134,7 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="listingblock#{role}">
+<div#{id} class="listingblock#{style_class}">
   <% if title %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -150,7 +150,7 @@ class BlockLiteralTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="literalblock#{role}">
+<div#{id} class="literalblock#{style_class}">
   <% if title %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -166,7 +166,7 @@ class BlockAdmonitionTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="admonitionblock#{role}">
+<div#{id} class="admonitionblock#{style_class}">
   <table>
     <tr>
       <td class="icon">
@@ -191,7 +191,7 @@ class BlockParagraphTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="paragraph#{role}">
+<div#{id} class="paragraph#{style_class}">
   <% unless title.nil? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -205,7 +205,7 @@ class BlockSidebarTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="sidebarblock#{role}">
+<div#{id} class="sidebarblock#{style_class}">
   <div class="content">
     <% unless title.nil? %>
     <div class="title"><%= title %></div>
@@ -221,7 +221,7 @@ class BlockExampleTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="exampleblock#{role}">
+<div#{id} class="exampleblock#{style_class}">
   <div class="content">
     <% unless title.nil? %>
     <div class="title"><%= title %></div>
@@ -237,7 +237,7 @@ class BlockOpenTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="openblock#{role}">
+<div#{id} class="openblock#{style_class}">
   <% unless title.nil? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -253,7 +253,7 @@ class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="quoteblock#{role}">
+<div#{id} class="quoteblock#{style_class}">
   <% unless title.nil? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -280,7 +280,7 @@ class BlockVerseTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="verseblock#{role}">
+<div#{id} class="verseblock#{style_class}">
   <% unless title.nil? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -305,7 +305,7 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="ulist#{attrvalue(:style)}#{role}">
+<div#{id} class="ulist#{attrvalue(:style)}#{style_class}">
   <% unless title.nil? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -328,7 +328,7 @@ class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="olist <%= attr :style %>#{role}">
+<div#{id} class="olist <%= attr :style %>#{style_class}">
   <% unless title.nil? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -351,7 +351,7 @@ class BlockImageTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="imageblock#{role}">
+<div#{id} class="imageblock#{style_class}">
   <div class="content">
     <% if attr :link %>
     <a class="image" href="<%= attr :link %>"><img src="<%= attr :target %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}></a>
@@ -434,7 +434,7 @@ class InlineImageTemplate < ::Asciidoctor::BaseTemplate
   def template
     # care is taken here to avoid a space inside the optional <a> tag
     @template ||= ERB.new <<-EOS
-<span class="image#{role}">
+<span class="image#{style_class}">
   <%
   if attr :link %><a class="image" href="<%= attr :link %>"><%
   end %><img src="<%= target %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
