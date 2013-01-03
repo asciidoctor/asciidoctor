@@ -320,6 +320,24 @@ module Asciidoctor
         Inline.new(self, :anchor, reftext, :type => :xref, :target => id).render
       }
 
+      result.gsub!(REGEXP[:anchor_macro]) {
+        # copy match for Ruby 1.8.7 compat
+        m = $~
+        # honor the escape
+        if m[0].start_with? '\\'
+          next m[0][1..-1]
+        end
+        id, reftext = m[1].split(',')
+        if reftext.nil?
+          reftext = '[' + id + ']' 
+        end
+        # NOTE the reftext should also match what's in our references dic
+        if !document.references.has_key? id
+          Asciidoctor.debug 'Missing reference for anchor ' + id
+        end
+        Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
+      }
+
       result
     end
 
