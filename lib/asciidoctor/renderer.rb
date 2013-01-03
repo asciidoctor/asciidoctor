@@ -14,9 +14,11 @@ class Asciidoctor::Renderer
       require 'asciidoctor/backends/' + backend
       # Load up all the template classes that we know how to render for this backend
       ::Asciidoctor::BaseTemplate.template_classes.each do |tc|
-        if tc.to_s.downcase.include?('::' + backend + '::')
-          view = tc.to_s.nuke(/^.*::/).underscore.nuke(/_template$/)
-          @views[view] = tc.new(view)
+        if tc.to_s.downcase.include?('::' + backend + '::') # optimization
+          view_name, view_backend = self.class.extract_view_mapping(tc)
+          if view_backend == backend
+            @views[view_name] = tc.new(view_name)
+          end
         end
       end
     else
@@ -95,4 +97,49 @@ class Asciidoctor::Renderer
     readonly_views.freeze
     readonly_views
   end
+
+  # Internal: Extracts the view name and backend from a qualified Ruby class
+  #
+  # The purpose of this method is to determine the view name and backend to
+  # which a built-in template class maps. We can make certain assumption since
+  # we have control over these class names. The Asciidoctor:: prefix and
+  # Template suffix are stripped as the first step in the conversion.
+  #
+  # qualified_class - The Class or String qualified class name from which to extract the view name and backend
+  #
+  # Examples
+  #
+  #   Renderer.extract_view_mapping(Asciidoctor::HTML5::DocumentTemplate)
+  #   # => ['document', 'html5']
+  #
+  #   Renderer.extract_view_mapping(Asciidoctor::DocBook45::BlockSidebarTemplate)
+  #   # => ['block_sidebar', 'docbook45']
+  #
+  # Returns A two-element String Array mapped as [view_name, backend], where backend may be nil
+  def self.extract_view_mapping(qualified_class)
+    view_name, backend = qualified_class.to_s.
+        gsub(/^Asciidoctor::/, '').
+        gsub(/Template$/, '').
+        split('::').reverse
+    view_name = camelcase_to_underscore(view_name)
+    backend = backend.downcase unless backend.nil?
+    [view_name, backend]
+  end
+
+  # Internal: Convert a CamelCase word to an underscore-delimited word
+  #
+  # Examples
+  #
+  #   Renderer.camelcase_to_underscore('BlockSidebar')
+  #   # => 'block_sidebar'
+  #
+  #   Renderer.camelcase_to_underscore('BlockUlist')
+  #   # => 'block_ulist'
+  #
+  # Returns the String converted from CamelCase to underscore-delimited
+  def self.camelcase_to_underscore(str)
+    str.gsub(/([[:upper:]]+)([[:upper:]][[:alpha:]])/, '\1_\2').
+        gsub(/([[:lower:]])([[:upper:]])/, '\1_\2').downcase
+  end
+
 end

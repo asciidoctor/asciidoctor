@@ -152,7 +152,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # Public: Update the backend attributes to reflect a change in the selected backend
   def update_backend_attributes()
     backend = @attributes['backend']
-    basebackend = backend.nuke(/[[:digit:]]+$/)
+    basebackend = backend.sub(/[[:digit:]]+$/, '')
     @attributes['backend-' + backend] = 1
     @attributes['basebackend'] = basebackend
     @attributes['basebackend-' + basebackend] = 1

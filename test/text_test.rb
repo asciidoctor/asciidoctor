@@ -17,7 +17,7 @@ context "Text" do
     doc = Asciidoctor::Document.new
     reader = Asciidoctor::Reader.new input
     block = Asciidoctor::Lexer.next_block(reader, doc)
-    assert_xpath '//pre', block.render.gnuke(/^\s*\n/), 1
+    assert_xpath '//pre', block.render.gsub(/^\s*\n/, ''), 1
   end
 
   test 'escaped text markup' do

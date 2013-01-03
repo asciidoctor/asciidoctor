@@ -275,7 +275,7 @@ class Asciidoctor::Lexer
         if !buffer.empty?
           offset = buffer.map {|line| line.match(REGEXP[:leading_blanks])[1].length }.min
           if offset > 0
-            buffer = buffer.map {|l| l.nuke(/^\s{1,#{offset}}/) }
+            buffer = buffer.map {|l| l.sub(/^\s{1,#{offset}}/, '') }
           end
           buffer.last.chomp!
         end

@@ -68,9 +68,9 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #   section.generate_id
   #   => "_foo"
   def generate_id
-    if self.document.attributes.has_key? 'sectids'
-      (self.document.attributes.fetch('idprefix', '_') +
-          (title ? title.downcase.gsub(/&#[0-9]+;/, '_').gsub(/\W+/, '_').trim('_').tr_s('_', '_') : ''))
+    if !title.to_s.empty? && document.attr?('sectids')
+      document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, '_').
+          gsub(/\W+/, '_').tr_s('_', '_').gsub(/^_?(.*?)_?$/, '\1')
     else
       nil
     end

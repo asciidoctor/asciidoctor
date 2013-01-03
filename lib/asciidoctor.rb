@@ -410,6 +410,5 @@ module Asciidoctor
   require 'asciidoctor/reader'
   require 'asciidoctor/renderer'
   require 'asciidoctor/section'
-  require 'asciidoctor/string'
   require 'asciidoctor/version'
 end

@@ -20,7 +20,7 @@ class Asciidoctor::BaseTemplate
   # We're ignoring locals for now. Shut up.
   def render(obj = Object.new, locals = {})
     output = template.result(obj.instance_eval { binding })
-    (view == 'document' || view == 'embedded') ? output.gnuke(BLANK_LINES_PATTERN).gsub(LINE_FEED_ENTITY, "\n") : output
+    (view == 'document' || view == 'embedded') ? output.gsub(BLANK_LINES_PATTERN, '').gsub(LINE_FEED_ENTITY, "\n") : output
   end
 
   def template

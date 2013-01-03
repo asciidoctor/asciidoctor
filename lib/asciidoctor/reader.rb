@@ -217,7 +217,7 @@ class Asciidoctor::Reader
   #   sanitize_attribute_name('Foo 3 #-Billy')
   #   => 'foo3-billy'
   def sanitize_attribute_name(name)
-    name.gnuke(/[^\w\-]/).downcase
+    name.gsub(/[^\w\-]/, '').downcase
   end
 
   # Private: Process raw input, used for the outermost reader.
