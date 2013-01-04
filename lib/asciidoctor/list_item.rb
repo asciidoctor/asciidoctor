@@ -39,7 +39,7 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
   def fold_first(continuation_connects_first_block = false)
     if !blocks.empty? && blocks.first.is_a?(Asciidoctor::Block) &&
         ((blocks.first.context == :paragraph && !continuation_connects_first_block) ||
-        (parent.context == :dlist && blocks.first.context == :literal && blocks.first.attr(:options, []).include?('listparagraph')))
+        (parent.context == :dlist && blocks.first.context == :literal && blocks.first.attr('options', []).include?('listparagraph')))
       block = blocks.shift
       if !@text.nil? && !@text.empty?
         block.buffer.unshift(@text)

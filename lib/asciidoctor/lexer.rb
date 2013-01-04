@@ -315,8 +315,7 @@ class Asciidoctor::Lexer
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, quote_context, buffer)
 
-      else
-        # paragraph is contiguous nonblank/noncontinuation lines
+      else # paragraph, contiguous nonblank/noncontinuation lines
         reader.unshift this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true) {|line|
           (context == :dlist && line.match(REGEXP[:dlist])) ||
@@ -326,6 +325,8 @@ class Asciidoctor::Lexer
           (context == :ulist && [:olist, :dlist].detect {|c| line.match(REGEXP[c])}) ||
           line.match(REGEXP[:attr_line])
         }
+
+        catalog_inline_anchors(buffer.join, parent.document)
 
         if !buffer.empty? && admonition = buffer.first.match(Regexp.new('^(' + ADMONITION_STYLES.join('|') + '):\s+'))
           buffer[0] = admonition.post_match
@@ -429,6 +430,22 @@ class Asciidoctor::Lexer
     list_block
   end
 
+  # Internal: Catalog any inline anchors found in the text, but don't process them
+  #
+  # text - The String text in which to look for inline anchors
+  #
+  # Returns nothing
+  def self.catalog_inline_anchors(text, document)
+    text.scan(REGEXP[:anchor_macro]) {
+      # alias match for Ruby 1.8.7 compat
+      m = $~
+      next if m[0].start_with? '\\'
+      id, reftext = m[1].split(',')
+      document.references[id] = reftext || '[' + id + ']'
+    }
+    nil
+  end
+
   # Internal: Parse and construct a labeled (e.g., definition) list Block from the current position of the Reader
   #
   # reader    - The Reader from which to retrieve the labeled list
@@ -440,15 +457,13 @@ class Asciidoctor::Lexer
     pairs = []
     block = Block.new(parent, :dlist)
     # allows us to capture until we find a labeled item using the same delimiter (::, :::, :::: or ;;)
-    sibling_pattern = REGEXP[:dlist_siblings][match[3]]
+    sibling_pattern = REGEXP[:dlist_siblings][match[2]]
 
     begin
-      dt = ListItem.new(block, match[2])
-      unless match[1].nil?
-        dt.id = match[1]
-        dt.attributes['reftext'] = '[' + match[1] + ']'
-      end
-      dd = ListItem.new(block, match[5])
+      catalog_inline_anchors(match[1], parent.document)
+
+      dt = ListItem.new(block, match[1])
+      dd = ListItem.new(block, match[4])
 
       dd_reader = Reader.new grab_lines_for_list_item(reader, :dlist, sibling_pattern)
       continuation_connects_first_block = (dd_reader.has_lines? && dd_reader.peek_line.chomp == LIST_CONTINUATION)
