@@ -42,6 +42,29 @@ context 'Links' do
     assert_xpath '//a', render_string('I often need to refer to the chapter on link:http://asciidoc.org?q=attribute%20references[Attribute References].'), 1
   end
 
+  test 'inline ref' do
+    doc = document_from_string 'Here you can read about tigers.[[tigers]]'
+    output = doc.render
+    assert_equal '[tigers]', doc.references['tigers']
+    assert_xpath '//a[@id = "tigers"]', output, 1
+    assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
+  end
+
+  test 'inline ref with reftext' do
+    doc = document_from_string 'Here you can read about tigers.[[tigers,Tigers]]'
+    output = doc.render
+    assert_equal 'Tigers', doc.references['tigers']
+    assert_xpath '//a[@id = "tigers"]', output, 1
+    assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
+  end
+
+  test 'escaped inline ref' do
+    doc = document_from_string 'Here you can read about tigers.\[[tigers]]'
+    output = doc.render
+    assert !doc.references.has_key?('tigers')
+    assert_xpath '//a[@id = "tigers"]', output, 0
+  end
+
   test 'xref using angled bracket syntax' do
     doc = document_from_string '<<tigers>>'
     doc.references['tigers'] = '[tigers]'

@@ -198,9 +198,6 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
   <% content.each do |dt, dd| %>
   <varlistentry>
     <term>
-      <% unless dt.id.to_s.empty? %>
-      <anchor id="<%= dt.id %>" xreflabel="<%= dt.attr(:reftext) %>"/>
-      <% end %>
       <%= dt.text %>
     </term>
     <% unless dd.nil? %>
@@ -385,11 +382,14 @@ class InlineAnchorTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
 <% if type == :xref
-%><% if text.nil?
+%><%
+  if text.nil?
 %><xref linkend="<%= target %>"/><%
-else
+  else
 %><link linkend="<%= target %>"><%= text %></link><%
-end %><%
+  end %><%
+elsif type == :ref
+%><anchor id="<%= target %>" xreflabel="<%= text %>"/><%
 else
 %><ulink url="<%= target %>"><%= text %></ulink><%
 end %>
