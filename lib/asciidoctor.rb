@@ -73,6 +73,9 @@ module Asciidoctor
     # Foowhatevs [[Bar]]
     :anchor_embedded  => /^(.*?)\s*\[\[([^\[\]]+)\]\]\s*$/,
 
+    # [[ref]] (anywhere inline)
+    :anchor_macro     => /\\?\[\[([\w":].*?)\]\]/,
+
     # matches any block delimiter:
     #   open, listing, example, literal, comment, quote, sidebar, passthrough, table
     # NOTE position most common blocks towards the front of the pattern
@@ -134,17 +137,21 @@ module Asciidoctor
     # // (and then whatever)
     :comment          => %r{^//([^/].*|)$},
 
-    # foo::  ||  foo;;
-    # Should be followed by a definition line, e.g.,
+    # foo::  ||  foo::: || foo:::: || foo;;
+    # Should be followed by a definition, on the same line...
+    # foo:: That which precedes 'bar' (see also, <<bar>>)
+    # ...or on a separate line
     # foo::
-    #    That which precedes 'bar' (see also, bar)
-    :dlist            => /^\s*(?:\[\[([^\]]*)\]\])?(\w.*?)(:{2,4}|;;)(\s+(.*))?$/,
+    #   That which precedes 'bar' (see also, <<bar>>)
+    # The term may be an attribute reference
+    # {term_foo}:: {def_foo}
+    :dlist            => /^\s*(.*?)(:{2,4}|;;)(\s+(.*))?$/,
     :dlist_siblings   => {
                            # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-                           '::' => /^\s*(?:\[\[([^\]]*)\]\])?(\w(?:.*[^:])?)(::)(\s+(.*))?$/,
-                           ':::' => /^\s*(?:\[\[([^\]]*)\]\])?(\w(?:.*[^:])?)(:::)(\s+(.*))?$/,
-                           '::::' => /^\s*(?:\[\[([^\]]*)\]\])?(\w(?:.*[^:])?)(::::)(\s+(.*))?$/,
-                           ';;' => /^\s*(?:\[\[([^\]]*)\]\])?(\w.*)(;;)(\s+(.*))?$/
+                           '::' => /^\s*((?:.*[^:])?)(::)(\s+(.*))?$/,
+                           ':::' => /^\s*((?:.*[^:])?)(:::)(\s+(.*))?$/,
+                           '::::' => /^\s*((?:.*[^:])?)(::::)(\s+(.*))?$/,
+                           ';;' => /^\s*(.*)(;;)(\s+(.*))?$/
                          },
     # ====
     :example          => /^={4,}\s*$/,

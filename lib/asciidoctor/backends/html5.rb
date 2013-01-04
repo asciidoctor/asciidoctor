@@ -108,9 +108,6 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
   <dl>
     <% content.each do |dt, dd| %>
     <dt class="hdlist1">
-      <% unless dt.id.to_s.empty? %>
-      <a id="<%= dt.id %>"></a>
-      <% end %>
       <%= dt.text %>
     </dt>
     <% unless dd.nil? %>
@@ -422,6 +419,8 @@ class InlineAnchorTemplate < ::Asciidoctor::BaseTemplate
 <%
 if type == :xref
 %><a href="#<%= target %>"><%= text || document.references.fetch(target, '[' + target + ']') %></a><%
+elsif type == :ref
+%><a id="<%= target %>"></a><%
 else
 %><a href="<%= target %>"><%= text %></a><%
 end

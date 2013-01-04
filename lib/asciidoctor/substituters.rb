@@ -7,7 +7,7 @@ module Asciidoctor
     COMPOSITE_SUBS = {
       :none => [],
       :normal => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements],
-      :verbatim => [:specialcharacters, :callout]
+      :verbatim => [:specialcharacters, :callouts]
     }
 
     # Internal: A String Array of passthough (unprocessed) text captured from this block
@@ -56,7 +56,7 @@ module Asciidoctor
         when :post_replacements
           text = sub_post_replacements(text)
         else
-          Asciidoctor.debug "Unknown substitution " + type.to_s
+          puts "asciidoctor: WARNING: unknown substitution type " + type.to_s
         end
       }
       text = restore_passthroughs(text) if passthroughs
@@ -118,7 +118,7 @@ module Asciidoctor
       result = text.dup
 
       result.gsub!(REGEXP[:pass_macro]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
@@ -137,7 +137,7 @@ module Asciidoctor
       } unless !(result.include?('+++') || result.include?('$$') || result.include?('pass:'))
 
       result.gsub!(REGEXP[:pass_lit]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
@@ -259,7 +259,7 @@ module Asciidoctor
 
       # inline images, image:target.ext[Alt]
       result.gsub!(REGEXP[:image_macro]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
@@ -275,7 +275,7 @@ module Asciidoctor
 
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
       result.gsub!(REGEXP[:link_inline]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
@@ -293,7 +293,7 @@ module Asciidoctor
 
       # inline link macros, link:target[text]
       result.gsub!(REGEXP[:link_macro]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
@@ -305,7 +305,7 @@ module Asciidoctor
       } unless !result.include?('link:')
 
       result.gsub!(REGEXP[:xref_macro]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
@@ -319,6 +319,24 @@ module Asciidoctor
         end
         Inline.new(self, :anchor, reftext, :type => :xref, :target => id).render
       }
+
+      result.gsub!(REGEXP[:anchor_macro]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        # honor the escape
+        if m[0].start_with? '\\'
+          next m[0][1..-1]
+        end
+        id, reftext = m[1].split(',')
+        if reftext.nil?
+          reftext = '[' + id + ']' 
+        end
+        # NOTE the reftext should also match what's in our references dic
+        if !document.references.has_key? id
+          Asciidoctor.debug 'Missing reference for anchor ' + id
+        end
+        Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
+      } unless !result.include?('[[')
 
       result
     end
