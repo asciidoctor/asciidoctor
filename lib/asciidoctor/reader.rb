@@ -230,7 +230,10 @@ class Asciidoctor::Reader
         if block_given?
           raw_source.concat yield(inc[1])
         else
-          raw_source.concat File.readlines(inc[1])
+          # need to be able to sanitize the filename and lock it down to the
+          # current directory and any subdirectories of the current dir.
+          # TODO: This doesn't work, so we're disabling it for now.
+          # raw_source.concat File.readlines(File.join(Dir.pwd, File.expand_path(inc[1])))
         end
       else
         raw_source << line
