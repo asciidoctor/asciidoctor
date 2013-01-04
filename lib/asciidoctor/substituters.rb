@@ -118,7 +118,7 @@ module Asciidoctor
       result = text.dup
 
       result.gsub!(REGEXP[:pass_macro]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
@@ -137,7 +137,7 @@ module Asciidoctor
       } unless !(result.include?('+++') || result.include?('$$') || result.include?('pass:'))
 
       result.gsub!(REGEXP[:pass_lit]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
@@ -259,7 +259,7 @@ module Asciidoctor
 
       # inline images, image:target.ext[Alt]
       result.gsub!(REGEXP[:image_macro]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
@@ -275,7 +275,7 @@ module Asciidoctor
 
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
       result.gsub!(REGEXP[:link_inline]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
@@ -293,7 +293,7 @@ module Asciidoctor
 
       # inline link macros, link:target[text]
       result.gsub!(REGEXP[:link_macro]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
@@ -305,7 +305,7 @@ module Asciidoctor
       } unless !result.include?('link:')
 
       result.gsub!(REGEXP[:xref_macro]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
@@ -321,7 +321,7 @@ module Asciidoctor
       }
 
       result.gsub!(REGEXP[:anchor_macro]) {
-        # copy match for Ruby 1.8.7 compat
+        # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
