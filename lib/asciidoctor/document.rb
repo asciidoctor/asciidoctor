@@ -25,6 +25,9 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # The section level 0 block
   attr_reader :header
 
+  # Public: Base directory for rendering this document
+  attr_reader :base_directory
+
   # Public: Initialize an Asciidoc object.
   #
   # data    - The Array of Strings holding the Asciidoc source document. (default: [])
@@ -44,6 +47,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @renderer = nil
     @options = options
     @options[:header_footer] = @options.fetch(:header_footer, true)
+    @base_directory = options[:base_directory] || Dir.pwd
 
     @attributes['sectids'] = true
     @attributes['encoding'] = 'UTF-8'

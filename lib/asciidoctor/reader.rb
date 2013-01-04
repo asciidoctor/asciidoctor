@@ -230,10 +230,7 @@ class Asciidoctor::Reader
         if block_given?
           raw_source.concat yield(inc[1])
         else
-          # need to be able to sanitize the filename and lock it down to the
-          # current directory and any subdirectories of the current dir.
-          # TODO: This doesn't work, so we're disabling it for now.
-          # raw_source.concat File.readlines(File.join(Dir.pwd, File.expand_path(inc[1])))
+          raw_source.concat File.readlines(build_secure_path(inc[1]))
         end
       else
         raw_source << line
@@ -359,5 +356,26 @@ class Asciidoctor::Reader
     else
       @document.apply_header_subs(value)
     end
+  end
+
+  # Internal: Builds a secure path to avoid path explotation
+  #
+  # Takes a relative path, expands it, trims the working path from it,
+  # then joins it to the working path. This prevents the renderer from
+  # accessing paths outside its working directory (e.g., /etc/passwd),
+  # and from using relative back references to access other data (e.g.,
+  # "../../../etc/passwd").
+  #
+  # relative_path - The path to secure.  Should be relative to the
+  #                 base directory.
+  #
+  # Returns a String of the secured path.
+  def build_secure_path(path)
+    # For paths that are relative to the current base directory, this won't
+    # hurt anything. For paths that aren't, they'll get shoved down into the
+    # current directory to keep them from nosing about where they shouldn't
+    # in the filesystem.
+    relative_path = File.expand_path(path).sub(/^#{@document.base_directory}/, '')
+    File.join(@document.base_directory, relative_path)
   end
 end
