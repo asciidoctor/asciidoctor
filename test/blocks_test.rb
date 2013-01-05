@@ -70,7 +70,7 @@ EOS
       assert_xpath '//pre', output, 1
       assert_xpath '//pre/text()', output, 1
       text = node_from_string(output, '//pre/text()').content
-      lines = text.lines.entries 
+      lines = text.lines.entries
       assert_equal 5, lines.size
       expected = "line one\n\nline two\n\nline three".lines.entries
       assert_equal expected, lines
@@ -90,7 +90,7 @@ EOS
       assert_xpath '//pre/code', output, 1
       assert_xpath '//pre/code/text()', output, 1
       text = node_from_string(output, '//pre/code/text()').content
-      lines = text.lines.entries 
+      lines = text.lines.entries
       assert_equal 5, lines.size
       expected = "line one\n\nline two\n\nline three".lines.entries
       assert_equal expected, lines
@@ -111,7 +111,7 @@ EOS
       assert_xpath '//*[@class="verseblock"]/pre', output, 1
       assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
       text = node_from_string(output, '//*[@class="verseblock"]/pre/text()').content
-      lines = text.lines.entries 
+      lines = text.lines.entries
       assert_equal 5, lines.size
       expected = "line one\n\nline two\n\nline three".lines.entries
       assert_equal expected, lines
@@ -320,7 +320,7 @@ image::asciidoctor.png[Asciidoctor]
       block = block_from_string input, :attributes => {'docdir' => basedir}
       doc = block.document
       assert doc.attr('safepaths') == true
-    
+
       assert_equal File.join(basedir, 'images'), block.normalize_assetpath('images')
       assert_equal File.join(basedir, 'etc/images'), block.normalize_assetpath('/etc/images')
       assert_equal File.join(basedir, 'images'), block.normalize_assetpath('../../images')
@@ -334,7 +334,7 @@ image::asciidoctor.png[Asciidoctor]
       block = block_from_string input, :attributes => {'docdir' => basedir, 'safepaths' => false}
       doc = block.document
       assert doc.attr('safepaths') == false
-    
+
       assert_equal File.join(basedir, 'images'), block.normalize_assetpath('images')
       assert_equal '/etc/images', block.normalize_assetpath('/etc/images')
       assert_equal File.expand_path(File.join(basedir, '../../images')), block.normalize_assetpath('../../images')

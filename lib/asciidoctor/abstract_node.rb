@@ -156,7 +156,7 @@ class Asciidoctor::AbstractNode
   #  normalize_assetpath('../images')
   #  # => "/path/to/docdir/images"
   #
-  #  # given these fixtures 
+  #  # given these fixtures
   #  document.attr('docdir')
   #  # => "/path/to/docdir"
   #  document.attr('safepaths')
@@ -180,7 +180,7 @@ class Asciidoctor::AbstractNode
     else
       assetpath = assetpath.cleanpath.to_s
     end
-  
+
     if document.attr('safepaths', true)
       relative_assetdir = Pathname.new(assetpath).relative_path_from(Pathname.new(inputpath)).to_s
       if relative_assetdir.start_with?('..')
