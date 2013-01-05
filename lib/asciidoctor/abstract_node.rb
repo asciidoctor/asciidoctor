@@ -127,7 +127,7 @@ class Asciidoctor::AbstractNode
     else
       image_path = normalize_assetpath(target_image)
     end
-    'data:' + mimetype + ';base64,' + Base64.strict_encode64(IO.read(image_path))
+    'data:' + mimetype + ';base64,' + Base64.encode64(IO.read(image_path)).delete("\n")
   end
 
   # Public: Normalize the specified asset directory to a concrete directory path
