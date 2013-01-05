@@ -198,5 +198,147 @@ image::images/tiger.png[Tiger]
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "The AsciiDoc Tiger"]', output, 1
     end
+
+    test 'can resolve image relative to imagesdir' do
+      input = <<-EOS
+:imagesdir: images
+
+image::tiger.png[Tiger]
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
+    test 'can resolve image relative to imagesdir' do
+      input = <<-EOS
+:imagesdir: images
+
+image::tiger.png[Tiger]
+      EOS
+
+      doc = document_from_string input
+      assert_equal 'images', doc.attributes['imagesdir']
+      output = doc.render
+      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
+    test 'embeds base64-encoded data uri for image when data-uri attribute is set' do
+      input = <<-EOS
+:data-uri:
+:imagesdir: fixtures
+
+image::dot.gif[Dot]
+      EOS
+
+      doc = document_from_string input, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_equal 'fixtures', doc.attributes['imagesdir']
+      output = doc.render
+      assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
+    # this test will cause a warning to be printed to the console (until we have a message facility)
+    test 'does not allow access to ancestor directories to read image if safepaths attribute is set' do
+      input = <<-EOS
+:data-uri:
+:imagesdir: ../fixtures
+
+image::dot.gif[Dot]
+      EOS
+
+      doc = document_from_string input, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_equal '../fixtures', doc.attributes['imagesdir']
+      output = doc.render
+      assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+  end
+
+  context 'Admonition icons' do
+    test 'can resolve icon relative to default iconsdir' do
+      input = <<-EOS
+:icons:
+
+[TIP]
+You can use icons for admonitions by setting the 'icons' attribute.
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="images/icons/tip.png"][@alt="Tip"]', output, 1
+    end
+
+    test 'can resolve icon relative to custom iconsdir' do
+      input = <<-EOS
+:icons:
+:iconsdir: icons
+
+[TIP]
+You can use icons for admonitions by setting the 'icons' attribute.
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="icons/tip.png"][@alt="Tip"]', output, 1
+    end
+
+    test 'embeds base64-encoded data uri for icon when data-uri attribute is set' do
+      input = <<-EOS
+:icons:
+:iconsdir: fixtures
+:iconstype: gif
+:data-uri:
+
+[TIP]
+You can use icons for admonitions by setting the 'icons' attribute.
+      EOS
+
+      output = render_string input, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
+    end
+
+    test 'does not allow access to ancestor directories to read icon if safepaths attribute is set' do
+      input = <<-EOS
+:icons:
+:iconsdir: ../fixtures
+:iconstype: gif
+:data-uri:
+
+[TIP]
+You can use icons for admonitions by setting the 'icons' attribute.
+      EOS
+
+      output = render_string input, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
+    end
+  end
+
+  context 'Image paths' do
+
+    test 'restricts access to ancestor directories when safepaths is enabled' do
+      input = <<-EOS
+image::asciidoctor.png[Asciidoctor]
+      EOS
+      basedir = File.dirname(__FILE__)
+      block = block_from_string input, :attributes => {'docdir' => basedir}
+      doc = block.document
+      assert doc.attr('safepaths') == true
+    
+      assert_equal File.join(basedir, 'images'), block.normalize_assetpath('images')
+      assert_equal File.join(basedir, 'etc/images'), block.normalize_assetpath('/etc/images')
+      assert_equal File.join(basedir, 'images'), block.normalize_assetpath('../../images')
+    end
+
+    test "doesn't restrict access to ancestor directories when safepaths is disabled" do
+      input = <<-EOS
+image::asciidoctor.png[Asciidoctor]
+      EOS
+      basedir = File.dirname(__FILE__)
+      block = block_from_string input, :attributes => {'docdir' => basedir, 'safepaths' => false}
+      doc = block.document
+      assert doc.attr('safepaths') == false
+    
+      assert_equal File.join(basedir, 'images'), block.normalize_assetpath('images')
+      assert_equal '/etc/images', block.normalize_assetpath('/etc/images')
+      assert_equal File.expand_path(File.join(basedir, '../../images')), block.normalize_assetpath('../../images')
+    end
+
   end
 end

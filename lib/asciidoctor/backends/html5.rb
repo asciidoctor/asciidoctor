@@ -167,7 +167,9 @@ class BlockAdmonitionTemplate < ::Asciidoctor::BaseTemplate
   <table>
     <tr>
       <td class="icon">
-        <% if attr? :caption %>
+        <% if attr? :icons %>
+        <img src="<%= icon_uri(attr :name) %>" alt="<%= attr :caption %>">
+        <% else %>
         <div class="title"><%= attr :caption %></div>
         <% end %>
       </td>
@@ -351,9 +353,9 @@ class BlockImageTemplate < ::Asciidoctor::BaseTemplate
 <div#{id} class="imageblock#{style_class}">
   <div class="content">
     <% if attr :link %>
-    <a class="image" href="<%= attr :link %>"><img src="<%= attr :target %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}></a>
+    <a class="image" href="<%= attr :link %>"><img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}></a>
     <% else %>
-    <img src="<%= attr :target %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}>
+    <img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}>
     <% end %>
   </div>
   <% if title %>
@@ -436,7 +438,7 @@ class InlineImageTemplate < ::Asciidoctor::BaseTemplate
 <span class="image#{style_class}">
   <%
   if attr :link %><a class="image" href="<%= attr :link %>"><%
-  end %><img src="<%= target %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
+  end %><img src="<%= image_uri(target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
   if attr :link%></a><% end
   %>
 </span>
