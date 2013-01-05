@@ -287,6 +287,13 @@ module Asciidoctor
         end
         prefix = (m[1] != 'link:' ? m[1] : '')
         target = m[2]
+        # strip the <> around the link
+        if prefix.end_with? '&lt;'
+          prefix = prefix[0..-5]
+        end
+        if target.end_with? '&gt;'
+          target = target[0..-5]
+        end
         text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
         prefix + Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
       } unless !result.include?('http')
@@ -347,7 +354,15 @@ module Asciidoctor
     #
     # returns The String with the callout references rendered using the backend templates
     def sub_callouts(text)
-      text.gsub(REGEXP[:calloutref]) { Inline.new(self, :callout, $1).render }
+      text.gsub(REGEXP[:callout_render]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        # honor the escape
+        if m[0].start_with? '\\'
+          next '&lt' + m[1] + '&gt;'
+        end
+        Inline.new(self, :callout, m[1], :id => document.callouts.read_next_id).render
+      }
     end
 
     # Public: Substitute post replacements

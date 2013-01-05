@@ -71,6 +71,7 @@ Gem::Specification.new do |s|
     lib/asciidoctor/backends/base_template.rb
     lib/asciidoctor/backends/docbook45.rb
     lib/asciidoctor/backends/html5.rb
+    lib/asciidoctor/callouts.rb
     lib/asciidoctor/block.rb
     lib/asciidoctor/debug.rb
     lib/asciidoctor/document.rb
