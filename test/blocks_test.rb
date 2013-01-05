@@ -319,11 +319,11 @@ image::asciidoctor.png[Asciidoctor]
       basedir = File.dirname(__FILE__)
       block = block_from_string input, :attributes => {'docdir' => basedir}
       doc = block.document
-      assert doc.attr('safepaths') == true
+      assert doc.attr('safe-paths') == true
 
-      assert_equal File.join(basedir, 'images'), block.normalize_assetpath('images')
-      assert_equal File.join(basedir, 'etc/images'), block.normalize_assetpath('/etc/images')
-      assert_equal File.join(basedir, 'images'), block.normalize_assetpath('../../images')
+      assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
+      assert_equal File.join(basedir, 'etc/images'), block.normalize_asset_path('/etc/images')
+      assert_equal File.join(basedir, 'images'), block.normalize_asset_path('../../images')
     end
 
     test "doesn't restrict access to ancestor directories when safepaths is disabled" do
@@ -335,9 +335,9 @@ image::asciidoctor.png[Asciidoctor]
       doc = block.document
       assert doc.attr('safepaths') == false
 
-      assert_equal File.join(basedir, 'images'), block.normalize_assetpath('images')
-      assert_equal '/etc/images', block.normalize_assetpath('/etc/images')
-      assert_equal File.expand_path(File.join(basedir, '../../images')), block.normalize_assetpath('../../images')
+      assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
+      assert_equal '/etc/images', block.normalize_asset_path('/etc/images')
+      assert_equal File.expand_path(File.join(basedir, '../../images')), block.normalize_asset_path('../../images')
     end
 
   end

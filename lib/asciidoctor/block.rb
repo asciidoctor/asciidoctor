@@ -83,6 +83,7 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
       block.splain(parent_level) if block.respond_to? :splain
       Asciidoctor.puts_indented(parent_level, "^" * (60 - parent_level*2))
     end
+    
     nil
   end
 
