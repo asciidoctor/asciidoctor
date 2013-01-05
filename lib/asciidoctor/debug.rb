@@ -14,9 +14,10 @@ module Asciidoctor
   end
 
   def self.puts_indented(level, *args)
-    thing = " "*level*2
+    indentation = " " * level * 2
+
     args.each do |arg|
-      self.debug "#{thing}#{arg}"
+      self.debug "#{indentation}#{arg}"
     end
   end
 end

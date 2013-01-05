@@ -83,8 +83,8 @@ class Asciidoctor::AttributeList
     AttributeList.rekey(@attributes, posattrs)
   end
 
-  def self.rekey(attributes, posattrs)
-    posattrs.each_with_index do |key, index|
+  def self.rekey(attributes, pos_attrs)
+    pos_attrs.each_with_index do |key, index|
       pos = index + 1
       unless (val = attributes[pos]).nil?
         attributes[key] = val
@@ -96,7 +96,7 @@ class Asciidoctor::AttributeList
     attributes
   end
 
-  def parse_attribute(index = 0, posattrs = [])
+  def parse_attribute(index = 0, pos_attrs = [])
     single_quoted_value = false
     skip_blank
     first = @scanner.peek(1)
@@ -155,8 +155,8 @@ class Asciidoctor::AttributeList
 
     if value.nil?
       resolved_name = single_quoted_value && !@block.nil? ? @block.apply_normal_subs(name) : name
-      if !(posname = posattrs[index]).nil?
-        @attributes[posname] = resolved_name
+      if !(pos_name = pos_attrs[index]).nil?
+        @attributes[pos_name] = resolved_name
       else
         #@attributes[index + 1] = resolved_name
       end

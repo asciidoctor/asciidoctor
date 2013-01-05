@@ -197,6 +197,7 @@ class Asciidoctor::Reader
 
       buffer << this_line
     end
+
     buffer
   end
 
@@ -222,7 +223,6 @@ class Asciidoctor::Reader
 
   # Private: Process raw input, used for the outermost reader.
   def process(data, &block)
-
     raw_source = []
 
     data.each do |line|
@@ -241,6 +241,7 @@ class Asciidoctor::Reader
     continuing_value = nil
     continuing_key = nil
     @lines = []
+
     raw_source.each do |line|
       if skip_to
         skip_to = nil if line.match(skip_to)
@@ -375,7 +376,7 @@ class Asciidoctor::Reader
     # hurt anything. For paths that aren't, they'll get shoved down into the
     # current directory to keep them from nosing about where they shouldn't
     # in the filesystem.
-    relative_path = File.expand_path(path).sub(/^#{@document.basedir}/, '')
-    File.join(@document.basedir, relative_path)
+    relative_path = File.expand_path(path).sub(/^#{@document.base_dir}/, '')
+    File.join(@document.base_dir, relative_path)
   end
 end
