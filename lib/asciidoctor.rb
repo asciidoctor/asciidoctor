@@ -124,10 +124,12 @@ module Asciidoctor
     # callout reference inside literal text
     # <1>
     # special characters will already be replaced, hence their use in the regex
-    :calloutref       => /&lt;(\d+)&gt;/,
+    :callout_render   => /\\?&lt;(\d+)&gt;/,
+    # ...but not while scanning
+    :callout_scan     => /\\?<(\d+)>/,
 
     # <1> Foo
-    :colist           => /^(\<\d+\>)\s*(.*)/,
+    :colist           => /^<?(\d+)> (.*)/,
 
     # ////
     # comment block
@@ -191,7 +193,7 @@ module Asciidoctor
 
     # inline link and some inline link macro
     # FIXME revisit!
-    :link_inline      => %r{(^|link:|\s|>)(\\?https?://[^\[ ]*[^\. \[])(?:\[((?:\\\]|[^\]])*?)\])?},
+    :link_inline      => %r{(^|link:|\s|>|&lt;)(\\?https?://[^\[ ]*[^\. \[])(?:\[((?:\\\]|[^\]])*?)\])?},
 
     # inline link macro
     # link:path[label]
@@ -408,6 +410,7 @@ module Asciidoctor
   require 'asciidoctor/attribute_list'
   require 'asciidoctor/backends/base_template'
   require 'asciidoctor/block'
+  require 'asciidoctor/callouts'
   require 'asciidoctor/debug'
   require 'asciidoctor/document'
   require 'asciidoctor/errors'

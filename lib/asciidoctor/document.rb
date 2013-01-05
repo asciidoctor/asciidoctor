@@ -22,6 +22,9 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # Public: Get the Hash of document references
   attr_reader :references
 
+  # Public: Get the Hash of callouts
+  attr_reader :callouts
+
   # The section level 0 block
   attr_reader :header
 
@@ -44,6 +47,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   def initialize(data = [], options = {}, &block)
     super(self, :document)
     @references = {}
+    @callouts = Callouts.new
     @renderer = nil
     @options = options
     @options[:header_footer] = @options.fetch(:header_footer, true)
@@ -88,6 +92,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
         self << block unless block.nil?
       end
     end
+
+    @callouts.rewind
 
     Asciidoctor.debug "Found #{@blocks.size} blocks in this document:"
     @blocks.each do |el|

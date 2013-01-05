@@ -159,31 +159,32 @@ class Asciidoctor::Lexer
           block.blocks << new_block unless new_block.nil?
         end
 
-      elsif list_type = [:colist].detect{|l| this_line.match( REGEXP[l] )}
+      elsif match = this_line.match(REGEXP[:colist])
+        Asciidoctor.debug "Creating block of type: :colist"
+        block = Block.new(parent, :colist)
+        attributes['style'] = 'arabic'
         items = []
-        Asciidoctor.debug "Creating block of type: #{list_type}"
-        block = Block.new(parent, list_type)
-        attributes['style'] ||= 'arabic'
-        while !this_line.nil? && match = this_line.match(REGEXP[list_type])
-          item = ListItem.new(block)
-
-          # Store first line as the text of the list item
-          item.text = match[2]
-          list_item_reader = Reader.new grab_lines_for_list_item(reader, list_type)
-          while item_reader.has_lines?
-            new_block = next_block(list_item_reader, block)
-            item.blocks << new_block unless new_block.nil?
-          end
-
-          items << item
-
-          reader.skip_blank
-
-          this_line = reader.get_line
-        end
-        reader.unshift(this_line) unless this_line.nil?
-
         block.buffer = items
+        reader.unshift this_line
+        expected_index = 1
+        begin
+          if match[1].to_i != expected_index
+            puts "asciidoctor: WARNING: callout list item index: expected #{expected_index} got #{match[1]}"
+          end
+          list_item = next_list_item(reader, block, match)
+          expected_index += 1
+          if !list_item.nil?
+            items << list_item
+            coids = parent.document.callouts.callout_ids(items.size)
+            if !coids.empty?
+              list_item.attributes['coids'] = coids
+            else
+              puts 'asciidoctor: WARNING: no callouts refer to list item ' + items.size.to_s
+            end
+          end
+        end while reader.has_lines? && match = reader.peek_line.match(REGEXP[:colist])
+
+        block.document.callouts.next_list
 
       elsif match = this_line.match(REGEXP[:ulist])
         AttributeList.rekey(attributes, ['style'])
@@ -321,6 +322,7 @@ class Asciidoctor::Lexer
           (context == :dlist && line.match(REGEXP[:dlist])) ||
           line.match(REGEXP[:open_blk]) ||
           # total hack job, we need to rethink this in a more generic way
+          # what about :colist?
           (context == :olist && [:ulist, :dlist].detect {|c| line.match(REGEXP[c])}) ||
           (context == :ulist && [:olist, :dlist].detect {|c| line.match(REGEXP[c])}) ||
           line.match(REGEXP[:attr_line])
@@ -355,6 +357,10 @@ class Asciidoctor::Lexer
         block.document.references[block.id] = block.title
       end
       block.update_attributes(attributes)
+
+      if block.context == :listing || block.context == :literal
+        catalog_callouts(block.buffer.join, block.document)
+      end
     # if the block ended with unrooted attributes, then give them
     # to the next block; this seems like a hack, but it really
     # is the simplest solution to this problem
@@ -430,9 +436,25 @@ class Asciidoctor::Lexer
     list_block
   end
 
+  # Internal: Catalog any callouts found in the text, but don't process them
+  #
+  # text     - The String of text in which to look for callouts
+  # document - The current document on which the callouts are stored
+  #
+  # Returns nothing
+  def self.catalog_callouts(text, document)
+    text.scan(REGEXP[:callout_scan]) {
+      # alias match for Ruby 1.8.7 compat
+      m = $~
+      next if m[0].start_with? '\\'
+      document.callouts.register(m[1])
+    }
+  end
+
   # Internal: Catalog any inline anchors found in the text, but don't process them
   #
-  # text - The String text in which to look for inline anchors
+  # text     - The String text in which to look for inline anchors
+  # document - The current document on which the references are stored
   #
   # Returns nothing
   def self.catalog_inline_anchors(text, document)
@@ -489,7 +511,8 @@ class Asciidoctor::Lexer
     block
   end
 
-  # Internal: Parse and construct the next ListItem for the current bulleted (unordered or ordered) list Block.
+  # Internal: Parse and construct the next ListItem for the current bulleted
+  # (unordered or ordered) list Block, callout lists included.
   #
   # First collect and process all the lines that constitute the next list item
   # for the parent list (according to its type). Next, parse those lines into
@@ -539,7 +562,7 @@ class Asciidoctor::Lexer
   # Internal: Collect the lines belonging to the current list item.
   #
   # Definition lists (:dlist) are handled slightly differently than regular
-  # lists (:olist or :ulist):
+  # lists (:olist, :colist or :ulist):
   #
   # Regular lists - grab lines until another list item is found, or the
   # block is broken by a terminator (such as a line comment or a blank line).
@@ -549,7 +572,7 @@ class Asciidoctor::Lexer
   # are more lenient about allowing blank lines.
   #
   # reader          - The Reader from which to retrieve the lines.
-  # list_type       - The context Symbol of the list (:ulist, :olist or :dlist)
+  # list_type       - The context Symbol of the list (:ulist, :olist, :colist or :dlist)
   # sibling_pattern - A Regexp that matches a sibling of this list item (default: nil)
   # phase           - The Symbol representing the parsing phase (:collect or :process) (default: :process)
   #
@@ -621,7 +644,7 @@ class Asciidoctor::Lexer
         else
           buffer << this_line
         end
-      # :olist & :ulist
+      # :ulist, :olist & :colist
       else
         if continuation == :active && !this_line.strip.empty?
           # swallow the continuation into a blank line in the process phase
@@ -912,12 +935,12 @@ class Asciidoctor::Lexer
         end while (!this_line.nil? && match = this_line.match(REGEXP[:dlist]))
         reader.unshift this_line unless this_line.nil?
 
-      elsif (list_type = [:ulist, :olist].detect {|t| this_line.match(REGEXP[t])})
+      elsif (list_type = [:ulist, :olist, :colist].detect {|t| this_line.match(REGEXP[t])})
         begin
           section_lines << this_line
           section_lines.concat grab_lines_for_list_item(reader, list_type, nil, :collect)
           this_line = reader.get_line
-        end while !this_line.nil? && (list_type = [:ulist, :olist].detect {|t| this_line.match(REGEXP[t])})
+        end while !this_line.nil? && (list_type = [:ulist, :olist, :colist].detect {|t| this_line.match(REGEXP[t])})
         reader.unshift this_line unless this_line.nil?
 
       elsif is_section_heading? this_line, next_line
