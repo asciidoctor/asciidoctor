@@ -22,11 +22,11 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # Public: Get the Hash of document references
   attr_reader :references
 
-  # The section level 0 block
+  # Public: The section level 0 block
   attr_reader :header
 
   # Public: Base directory for rendering this document
-  attr_reader :base_directory
+  attr_reader :basedir
 
   # Public: Initialize an Asciidoc object.
   #
@@ -47,12 +47,19 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @renderer = nil
     @options = options
     @options[:header_footer] = @options.fetch(:header_footer, true)
-    @base_directory = options[:base_directory] || Dir.pwd
+    @basedir = options[:basedir] || Dir.pwd
 
     @attributes['sectids'] = true
     @attributes['encoding'] = 'UTF-8'
 
     attribute_overrides = options[:attributes] || {}
+    # the only way to set the safepaths attribute is via the document options
+    if !attribute_overrides.has_key? 'safepaths'
+      attribute_overrides['safepaths'] = true
+    end
+    if !attribute_overrides.has_key? 'docdir'
+      attribute_overrides['docdir'] = Dir.pwd
+    end
     attribute_overrides.each {|key, val|
       # a nil or negative key undefines the attribute 
       if (val.nil? || key[-1..-1] == '!')
@@ -78,6 +85,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['docdate'] ||= @attributes['localdate']
     @attributes['doctime'] ||= @attributes['localtime']
     @attributes['asciidoctor-version'] = VERSION
+    @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', 'images'), 'icons')
 
     # Now parse @lines into blocks
     while @reader.has_lines?
