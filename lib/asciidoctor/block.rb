@@ -39,7 +39,9 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
     Asciidoctor.debug "Now attempting to render for #{context} my own bad #{self}"
     Asciidoctor.debug "Parent is #{@parent}"
     Asciidoctor.debug "Renderer is #{renderer}"
-    renderer.render("block_#{context}", self)
+    out = renderer.render("block_#{context}", self)
+    @document.callouts.next_list if context == :colist
+    out
   end
 
   def splain(parent_level = 0)
@@ -102,13 +104,9 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
     case @context
     when :preamble, :open, :example, :sidebar
       blocks.map{|block| block.render}.join
-    when :colist
-      @buffer.map do |li|
-        htmlify(li.text) + li.blocks.map{|block| block.render}.join
-      end
     # lists get iterated in the template (for now)
     # list items recurse into this block when their text and content methods are called
-    when :ulist, :olist, :dlist
+    when :ulist, :olist, :dlist, :colist
       @buffer
     when :listing, :literal
       apply_literal_subs(@buffer)

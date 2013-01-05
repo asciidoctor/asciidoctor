@@ -344,6 +344,26 @@ class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
+class BlockColistTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOS
+<%#encoding:UTF-8%>
+<div#{id} class="colist <%= attr :style %>#{style_class}">
+  <% unless title.nil? %>
+  <div class="title"><%= title %></div>
+  <% end %>
+  <ol>
+  <% content.each do |li| %>
+    <li>
+      <p><%= li.text %></p>
+    </li>
+  <% end %>
+  </ol>
+</div>
+    EOS
+  end
+end
+
 class BlockImageTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS

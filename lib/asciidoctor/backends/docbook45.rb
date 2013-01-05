@@ -189,6 +189,25 @@ class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
+class BlockColistTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOF
+<%#encoding:UTF-8%>
+<calloutlist#{id}#{role}#{xreflabel}>
+  #{title}
+  <% content.each do |li| %>
+    <callout arearefs="<%= li.attr :coids %>">
+      <para><%= li.text %></para>
+      <% if li.has_section_body? %>
+<%= li.content %>
+      <% end %>
+    </callout>
+  <% end %>
+</calloutlist>
+    EOF
+  end
+end
+
 class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
@@ -229,7 +248,7 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
     @template ||= ERB.new <<-EOF
 <%#encoding:UTF-8%>
 <% if title.nil? %>
-<programlisting#{id}#{role}#{xreflabel} language="<%= attr :language %>" linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= content.gsub("\n", LINE_FEED_ENTITY) %></programlisting>
+<programlisting#{id}#{role}#{xreflabel}#{attribute('language', :language)} linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= content.gsub("\n", LINE_FEED_ENTITY) %></programlisting>
 <% else %>
 <formalpara#{id}#{role}#{xreflabel}>
   <title><%= title %></title>

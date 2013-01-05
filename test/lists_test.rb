@@ -1291,3 +1291,216 @@ detail1
     end
   end
 end
+
+context 'Callout lists' do
+  test 'listing block with sequential callouts followed by adjacent callout list' do
+    input = <<-EOS
+----
+require 'asciidoctor' # <1>
+doc = Asciidoctor::Document.new('Hello, World!') # <2>
+puts doc.render # <3>
+----
+<1> Describe the first line
+<2> Describe the second line
+<3> Describe the third line
+    EOS
+    output = render_string input, :attributes => {'backend' => 'docbook45'}
+    assert_xpath '//programlisting', output, 1
+    assert_xpath '//programlisting//co', output, 3
+    assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting//co)[2][@id = "CO1-2"]', output, 1
+    assert_xpath '(//programlisting//co)[3][@id = "CO1-3"]', output, 1
+    assert_xpath '//programlisting/following-sibling::calloutlist/callout', output, 3
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[1][@arearefs = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[2][@arearefs = "CO1-2"]', output, 1
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[3][@arearefs = "CO1-3"]', output, 1
+  end
+
+  test 'listing block with sequential callouts followed by non-adjacent callout list' do
+    input = <<-EOS
+----
+require 'asciidoctor' # <1>
+doc = Asciidoctor::Document.new('Hello, World!') # <2>
+puts doc.render # <3>
+----
+
+Paragraph.
+
+<1> Describe the first line
+<2> Describe the second line
+<3> Describe the third line
+    EOS
+    output = render_string input, :attributes => {'backend' => 'docbook45'}
+    assert_xpath '//programlisting', output, 1
+    assert_xpath '//programlisting//co', output, 3
+    assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting//co)[2][@id = "CO1-2"]', output, 1
+    assert_xpath '(//programlisting//co)[3][@id = "CO1-3"]', output, 1
+    assert_xpath '//programlisting/following-sibling::*[1][self::simpara]', output, 1
+    assert_xpath '//programlisting/following-sibling::calloutlist/callout', output, 3
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[1][@arearefs = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[2][@arearefs = "CO1-2"]', output, 1
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[3][@arearefs = "CO1-3"]', output, 1
+  end
+
+  test 'listing block with a callout that refers to two different lines' do
+    input = <<-EOS
+----
+require 'asciidoctor' # <1>
+doc = Asciidoctor::Document.new('Hello, World!') # <2>
+puts doc.render # <2>
+----
+<1> Import the library
+<2> Where the magic happens
+    EOS
+    output = render_string input, :attributes => {'backend' => 'docbook45'}
+    assert_xpath '//programlisting', output, 1
+    assert_xpath '//programlisting//co', output, 3
+    assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting//co)[2][@id = "CO1-2"]', output, 1
+    assert_xpath '(//programlisting//co)[3][@id = "CO1-3"]', output, 1
+    assert_xpath '//programlisting/following-sibling::calloutlist/callout', output, 2
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[1][@arearefs = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[2][@arearefs = "CO1-2 CO1-3"]', output, 1
+  end
+
+  test 'listing block with non-sequential callouts followed by adjacent callout list' do
+    input = <<-EOS
+----
+require 'asciidoctor' # <2>
+doc = Asciidoctor::Document.new('Hello, World!') # <3>
+puts doc.render # <1>
+----
+<1> Describe the first line
+<2> Describe the second line
+<3> Describe the third line
+    EOS
+    output = render_string input, :attributes => {'backend' => 'docbook45'}
+    assert_xpath '//programlisting', output, 1
+    assert_xpath '//programlisting//co', output, 3
+    assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting//co)[2][@id = "CO1-2"]', output, 1
+    assert_xpath '(//programlisting//co)[3][@id = "CO1-3"]', output, 1
+    assert_xpath '//programlisting/following-sibling::calloutlist/callout', output, 3
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[1][@arearefs = "CO1-3"]', output, 1
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[2][@arearefs = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[3][@arearefs = "CO1-2"]', output, 1
+  end
+
+  test 'two listing blocks can share the same callout list' do
+    input = <<-EOS
+.Import library
+----
+require 'asciidoctor' # <1>
+----
+
+.Use library
+----
+doc = Asciidoctor::Document.new('Hello, World!') # <2>
+puts doc.render # <3>
+----
+
+<1> Describe the first line
+<2> Describe the second line
+<3> Describe the third line
+    EOS
+    output = render_string input, :attributes => {'backend' => 'docbook45'}
+    assert_xpath '//programlisting', output, 2
+    assert_xpath '(//programlisting)[1]//co', output, 1
+    assert_xpath '(//programlisting)[1]//co[@id = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting)[2]//co', output, 2
+    assert_xpath '((//programlisting)[2]//co)[1][@id = "CO1-2"]', output, 1
+    assert_xpath '((//programlisting)[2]//co)[2][@id = "CO1-3"]', output, 1
+    assert_xpath '(//calloutlist/callout)[1][@arearefs = "CO1-1"]', output, 1
+    assert_xpath '(//calloutlist/callout)[2][@arearefs = "CO1-2"]', output, 1
+    assert_xpath '(//calloutlist/callout)[3][@arearefs = "CO1-3"]', output, 1
+  end
+
+  test 'two listing blocks each followed by an adjacent callout list' do
+    input = <<-EOS
+.Import library
+----
+require 'asciidoctor' # <1>
+----
+<1> Describe the first line
+
+.Use library
+----
+doc = Asciidoctor::Document.new('Hello, World!') # <1>
+puts doc.render # <2>
+----
+<1> Describe the second line
+<2> Describe the third line
+    EOS
+    output = render_string input, :attributes => {'backend' => 'docbook45'}
+    assert_xpath '//programlisting', output, 2
+    assert_xpath '(//programlisting)[1]//co', output, 1
+    assert_xpath '(//programlisting)[1]//co[@id = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting)[2]//co', output, 2
+    assert_xpath '((//programlisting)[2]//co)[1][@id = "CO2-1"]', output, 1
+    assert_xpath '((//programlisting)[2]//co)[2][@id = "CO2-2"]', output, 1
+    assert_xpath '//calloutlist', output, 2
+    assert_xpath '(//calloutlist)[1]/callout', output, 1
+    assert_xpath '((//calloutlist)[1]/callout)[1][@arearefs = "CO1-1"]', output, 1
+    assert_xpath '(//calloutlist)[2]/callout', output, 2
+    assert_xpath '((//calloutlist)[2]/callout)[1][@arearefs = "CO2-1"]', output, 1
+    assert_xpath '((//calloutlist)[2]/callout)[2][@arearefs = "CO2-2"]', output, 1
+  end
+
+  test 'callout list with block content' do
+    input = <<-EOS
+----
+require 'asciidoctor' # <1>
+doc = Asciidoctor::Document.new('Hello, World!') # <2>
+puts doc.render # <3>
+----
+<1> Imports the library
+as a RubyGem
+<2> Creates a new document
+* Scans the lines for known blocks
+* Converts the lines into blocks
+<3> Renders the document
++
+You can write this to file rather than printing to stdout.
+    EOS
+    output = render_string input, :attributes => {'backend' => 'docbook45'}
+    assert_xpath '//calloutlist', output, 1
+    assert_xpath '//calloutlist/callout', output, 3
+    assert_xpath '(//calloutlist/callout)[1]/*', output, 1
+    assert_xpath '(//calloutlist/callout)[2]/para', output, 1
+    assert_xpath '(//calloutlist/callout)[2]/itemizedlist', output, 1
+    assert_xpath '(//calloutlist/callout)[3]/para', output, 1
+    assert_xpath '(//calloutlist/callout)[3]/simpara', output, 1
+  end
+
+  test 'escaped callout should not be interpreted as a callout' do
+    input = <<-EOS
+----
+require 'asciidoctor' # \\<1>
+----
+    EOS
+    output = render_string input, :attributes => {'backend' => 'docbook45'}
+    assert_xpath '//co', output, 0
+  end
+
+  test 'literal block with callouts' do
+    input = <<-EOS
+....
+Roses are red <1>
+Violets are blue <2>
+....
+
+
+<1> And so is Ruby
+<2> But violet is more like purple
+    EOS
+    output = render_string input, :attributes => {'backend' => 'docbook45'}
+    assert_xpath '//literallayout', output, 1
+    assert_xpath '//literallayout//co', output, 2
+    assert_xpath '(//literallayout//co)[1][@id = "CO1-1"]', output, 1
+    assert_xpath '(//literallayout//co)[2][@id = "CO1-2"]', output, 1
+    assert_xpath '//literallayout/following-sibling::*[1][self::calloutlist]/callout', output, 2
+    assert_xpath '(//literallayout/following-sibling::*[1][self::calloutlist]/callout)[1][@arearefs = "CO1-1"]', output, 1
+    assert_xpath '(//literallayout/following-sibling::*[1][self::calloutlist]/callout)[2][@arearefs = "CO1-2"]', output, 1
+  end
+end
