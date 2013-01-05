@@ -909,7 +909,7 @@ class Asciidoctor::Lexer
           section_lines << this_line
           section_lines.concat grab_lines_for_list_item(reader, :dlist, sibling_pattern, :collect)
           this_line = reader.get_line
-        end while (match = this_line.match(REGEXP[:dlist]))
+        end while (!this_line.nil? && match = this_line.match(REGEXP[:dlist]))
         reader.unshift this_line unless this_line.nil?
 
       elsif (list_type = [:ulist, :olist].detect {|t| this_line.match(REGEXP[t])})
