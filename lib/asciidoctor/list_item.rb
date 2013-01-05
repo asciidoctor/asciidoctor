@@ -34,12 +34,13 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
   #
   # Given: this list item has at least one block
   # When: the first block is not connected by a list continuation
-  # And: the first block is a paragraph or additionally, for labeled lists, a literal paragraph (indented line),
+  # And: the first block is a paragraph, indented wrapped paragraph or, for labeled lists, a non-adjacent literal paragraph,
   # Then: then join the list text and the first block with an endline
-  def fold_first(continuation_connects_first_block = false)
+  def fold_first(continuation_connects_first_block = false, content_adjacent = false)
     if !blocks.empty? && blocks.first.is_a?(Asciidoctor::Block) &&
         ((blocks.first.context == :paragraph && !continuation_connects_first_block) ||
-        (parent.context == :dlist && blocks.first.context == :literal && blocks.first.attr('options', []).include?('listparagraph')))
+        ((parent.context == :dlist || content_adjacent) && blocks.first.context == :literal &&
+            blocks.first.attr('options', []).include?('listparagraph')))
       block = blocks.shift
       if !@text.nil? && !@text.empty?
         block.buffer.unshift(@text)
