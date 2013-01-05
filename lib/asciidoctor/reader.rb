@@ -375,7 +375,7 @@ class Asciidoctor::Reader
     # hurt anything. For paths that aren't, they'll get shoved down into the
     # current directory to keep them from nosing about where they shouldn't
     # in the filesystem.
-    relative_path = File.expand_path(path).sub(/^#{@document.base_directory}/, '')
-    File.join(@document.base_directory, relative_path)
+    relative_path = File.expand_path(path).sub(/^#{@document.basedir}/, '')
+    File.join(@document.basedir, relative_path)
   end
 end

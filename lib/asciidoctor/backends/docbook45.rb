@@ -349,7 +349,7 @@ class BlockImageTemplate < ::Asciidoctor::BaseTemplate
   #{title}
   <mediaobject>
     <imageobject>
-      <imagedata fileref="<%= attr :target %>"#{attribute('contentwidth', :width)}#{attribute('contentdepth', :height)}/>
+      <imagedata fileref="<%= image_uri(attr :target) %>"#{attribute('contentwidth', :width)}#{attribute('contentdepth', :height)}/>
     </imageobject>
     <textobject><phrase><%= attr :alt %></phrase></textobject>
   </mediaobject>
@@ -421,7 +421,7 @@ class InlineImageTemplate < ::Asciidoctor::BaseTemplate
     @template ||= ERB.new <<-EOF
 <inlinemediaobject>
   <imageobject>
-    <imagedata fileref="<%= target %>"#{attribute('width', :width)}#{attribute('depth', :height)}/>
+    <imagedata fileref="<%= image_uri(target) %>"#{attribute('width', :width)}#{attribute('depth', :height)}/>
   </imageobject>
   <textobject><phrase><%= attr :alt %></phrase></textobject>
 </inlinemediaobject>

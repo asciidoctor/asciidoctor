@@ -183,7 +183,7 @@ last line
       reader = Asciidoctor::Reader.new(["foo"], doc)
       secure_path = reader.build_secure_path(naughty_path)
       assert naughty_path != secure_path
-      assert_match /^#{doc.base_directory}/, secure_path
+      assert_match(/^#{doc.basedir}/, secure_path)
     end
 
     test "keeps naughty relative paths from getting outside" do
@@ -192,7 +192,7 @@ last line
       reader = Asciidoctor::Reader.new(["foo"], doc)
       secure_path = reader.build_secure_path(naughty_path)
       assert naughty_path != secure_path
-      assert_match /^#{doc.base_directory}/, secure_path
+      assert_match(/^#{doc.basedir}/, secure_path)
     end
   end
 
