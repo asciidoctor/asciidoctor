@@ -69,6 +69,38 @@ List
       assert_xpath '(//ul)[2]/preceding-sibling::*[@class = "title"][text() = "Also"]', output, 1
     end
 
+    test 'a non-indented wrapped line is folded into text of list item' do
+      input = <<-EOS
+List
+====
+
+- Foo
+wrapped content
+- Boo
+- Blech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li[1]/*', output, 1
+      assert_xpath "//ul/li[1]/p[text() = 'Foo\nwrapped content']", output, 1
+    end
+
+    test 'an indented wrapped line is unindented and folded into text of list item' do
+      input = <<-EOS
+List
+====
+
+- Foo
+  wrapped content
+- Boo
+- Blech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li[1]/*', output, 1
+      assert_xpath "//ul/li[1]/p[text() = 'Foo\nwrapped content']", output, 1
+    end
+
     test "a literal paragraph offset by blank lines in list content is appended as a literal block" do
       input = <<-EOS
 List

@@ -515,7 +515,16 @@ class Asciidoctor::Lexer
     # first skip the line with the marker
     reader.get_line
     list_item_reader = Reader.new grab_lines_for_list_item(reader, list_block.context)
-    continuation_connects_first_block = list_item_reader.peek_line == "\n"
+    subsequent_line = list_item_reader.peek_line
+
+    if !subsequent_line.nil?
+      continuation_connects_first_block = (subsequent_line == "\n")
+      content_adjacent = !subsequent_line.strip.empty?
+    else
+      continuation_connects_first_block = false
+      content_adjacent = false
+    end
+
     while list_item_reader.has_lines?
       new_block = next_block(list_item_reader, list_block)
       list_item.blocks << new_block unless new_block.nil?
@@ -523,7 +532,7 @@ class Asciidoctor::Lexer
 
     Asciidoctor.debug "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
 
-    list_item.fold_first(continuation_connects_first_block)
+    list_item.fold_first(continuation_connects_first_block, content_adjacent)
     list_item
   end
 
