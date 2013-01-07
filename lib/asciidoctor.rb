@@ -52,7 +52,9 @@ module Asciidoctor
   # Backend determines the format of the rendered output, default to html5
   DEFAULT_BACKEND = 'html5'
 
-  LIST_CONTEXTS = [:ulist, :olist, :dlist]
+  LIST_CONTEXTS = [:ulist, :olist, :dlist, :colist]
+
+  NESTABLE_LIST_CONTEXTS = [:ulist, :olist, :dlist]
 
   ORDERED_LIST_STYLES = [:arabic, :loweralpha, :lowerroman, :upperalpha, :upperroman]
 
@@ -79,7 +81,7 @@ module Asciidoctor
     # matches any block delimiter:
     #   open, listing, example, literal, comment, quote, sidebar, passthrough, table
     # NOTE position most common blocks towards the front of the pattern
-    :any_blk          => %r{^(?:\-\-|(?:\-|=|\.|/|_|\*\+){4,}|\|={3,})\s*$},
+    :any_blk          => %r{^(?:\-\-|(?:\-|=|\.|/|_|\*|\+){4,}|\|={3,})\s*$},
 
     # :foo: bar
     :attr_assign      => /^:([^:!]+):\s*(.*)\s*$/,
@@ -105,7 +107,7 @@ module Asciidoctor
     # [NOTE, caption="Good to know"]
     # Can be defined by an attribute
     # [{lead}]
-    :attr_list_blk    => /^\[([\w\{].*)\]$/,
+    :blk_attr_list    => /^\[([\w\{].*)\]$/,
 
     # attribute list or anchor (indicates a paragraph break)
     :attr_line        => /^\[([\w\{].*|\[[^\[\]]+\])\]$/,
@@ -147,13 +149,13 @@ module Asciidoctor
     #   That which precedes 'bar' (see also, <<bar>>)
     # The term may be an attribute reference
     # {term_foo}:: {def_foo}
-    :dlist            => /^\s*(.*?)(:{2,4}|;;)(\s+(.*))?$/,
+    :dlist            => /^\s*(.*?)(:{2,4}|;;)(?:[[:blank:]]+(.*))?$/,
     :dlist_siblings   => {
                            # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-                           '::' => /^\s*((?:.*[^:])?)(::)(\s+(.*))?$/,
-                           ':::' => /^\s*((?:.*[^:])?)(:::)(\s+(.*))?$/,
-                           '::::' => /^\s*((?:.*[^:])?)(::::)(\s+(.*))?$/,
-                           ';;' => /^\s*(.*)(;;)(\s+(.*))?$/
+                           '::' => /^\s*((?:.*[^:])?)(::)(?:[[:blank:]]+(.*))?$/,
+                           ':::' => /^\s*((?:.*[^:])?)(:::)(?:[[:blank:]]+(.*))?$/,
+                           '::::' => /^\s*((?:.*[^:])?)(::::)(?:[[:blank:]]+(.*))?$/,
+                           ';;' => /^\s*(.*)(;;)(?:[[:blank:]]+(.*))?$/
                          },
     # ====
     :example          => /^={4,}\s*$/,
