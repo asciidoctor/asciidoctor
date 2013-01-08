@@ -61,24 +61,26 @@ class Asciidoctor::Reader
 
   # Private: Strip off leading blank lines in the Array of lines.
   #
-  # Returns nil.
-  #
   # Examples
   #
   #   @lines
   #   => ["\n", "\t\n", "Foo\n", "Bar\n", "\n"]
   #
   #   skip_blank
-  #   => nil
+  #   => 2
   #
   #   @lines
   #   => ["Foo\n", "Bar\n"]
+  #
+  # Returns an Integer of the number of lines skipped
   def skip_blank
+    skipped = 0
     while has_lines? && @lines.first.strip.empty?
       @lines.shift
+      skipped += 1
     end
 
-    nil
+    skipped
   end
 
   # Public: Consume consecutive lines containing line- or block-level comments.
@@ -103,6 +105,32 @@ class Asciidoctor::Reader
         comment_lines.push(*(grab_lines_until(:preserve_last_line => true) {|line| line.match(REGEXP[:comment_blk])}))
         comment_lines << get_line
       elsif next_line.match(REGEXP[:comment])
+        comment_lines << get_line
+      else
+        break
+      end
+    end
+
+    comment_lines
+  end
+
+  # Public: Consume consecutive lines containing line comments.
+  #
+  # Returns the Array of lines that were consumed
+  #
+  # Examples
+  #   @lines
+  #   => ["// foo\n", "bar\n"]
+  #
+  #   comment_lines = consume_comments
+  #   => ["// foo\n"]
+  #
+  #   @lines
+  #   => ["bar\n"]
+  def consume_line_comments
+    comment_lines = []
+    while !@lines.empty?
+      if peek_line.match(REGEXP[:comment])
         comment_lines << get_line
       else
         break
@@ -188,6 +216,7 @@ class Asciidoctor::Reader
     while (this_line = self.get_line)
       Asciidoctor.debug "Processing line: '#{this_line}'"
       finis = true if options[:break_on_blank_lines] && this_line.strip.empty?
+      finis = true if options[:break_on_list_continuation] && this_line.chomp == LIST_CONTINUATION
       finis = true if !finis && block && yield(this_line)
       if finis
         self.unshift(this_line) if options[:preserve_last_line]
@@ -195,7 +224,11 @@ class Asciidoctor::Reader
         break
       end
 
-      buffer << this_line
+      if options[:skip_line_comments] && this_line.match(REGEXP[:comment])
+        # skip it
+      else
+        buffer << this_line
+      end
     end
 
     buffer

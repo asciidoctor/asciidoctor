@@ -14,11 +14,6 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
     @level = parent.level
   end
 
-  # QUESTION should we allow this access?
-  def text=(new_text)
-    @text = new_text
-  end
-
   def text
     # this will allow the text to be processed
     ::Asciidoctor::Block.new(self, nil, [@text]).content
@@ -33,21 +28,26 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
   # Here are the rules for when a folding occurs:
   #
   # Given: this list item has at least one block
-  # When: the first block is not connected by a list continuation
-  # And: the first block is a paragraph, indented wrapped paragraph or, for labeled lists, a non-adjacent literal paragraph,
-  # Then: then join the list text and the first block with an endline
+  # When: the first block is a paragraph that's not connected by a list continuation
+  # Or: the first block is an indented paragraph that's adjacent (wrapped line)
+  # Or: the first block is an indented paragraph that's not connected by a list continuation
+  # Then: then drop the first block and fold it's content (buffer) into the list text
+  #
+  # Returns nothing
   def fold_first(continuation_connects_first_block = false, content_adjacent = false)
     if !blocks.empty? && blocks.first.is_a?(Asciidoctor::Block) &&
         ((blocks.first.context == :paragraph && !continuation_connects_first_block) ||
-        ((parent.context == :dlist || content_adjacent) && blocks.first.context == :literal &&
+        ((content_adjacent || !continuation_connects_first_block) && blocks.first.context == :literal &&
             blocks.first.attr('options', []).include?('listparagraph')))
+
       block = blocks.shift
-      if !@text.nil? && !@text.empty?
+      unless @text.to_s.empty?
         block.buffer.unshift(@text)
       end
 
       @text = block.buffer.join("\n")
     end
+    nil
   end
 
   def splain(parent_level = 0)
