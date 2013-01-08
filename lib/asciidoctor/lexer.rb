@@ -46,10 +46,17 @@ class Asciidoctor::Lexer
   # 
   # Returns a Section or Block object holding the parsed content of the processed lines
   def self.next_block(reader, parent)
+    itemtext = parent.attributes['itemtext']
+    parent.attributes.delete('itemtext') if itemtext
     # Skip ahead to the block content
-    reader.skip_blank
+    skipped = reader.skip_blank
 
+    # bail if we've reached the end of the section content
     return nil unless reader.has_lines?
+
+    if itemtext && skipped > 0
+      itemtext = nil
+    end
 
     Asciidoctor.debug "/"*64
     Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
@@ -93,12 +100,12 @@ class Asciidoctor::Lexer
       elsif this_line.match(REGEXP[:comment])
         reader.skip_blank
 
-      elsif match = this_line.match(REGEXP[:attr_list_blk])
+      elsif match = this_line.match(REGEXP[:blk_attr_list])
         AttributeList.new(parent.document.sub_attributes(match[1]), parent).parse_into(attributes)
         reader.skip_blank
 
-      # we're letting ruler have attributes
-      elsif this_line.match(REGEXP[:ruler])
+      # NOTE we're letting ruler have attributes
+      elsif !itemtext && this_line.match(REGEXP[:ruler])
         block = Block.new(parent, :ruler)
         reader.skip_blank
 
@@ -117,11 +124,11 @@ class Asciidoctor::Lexer
         Asciidoctor.debug "#{__method__}: SENDING to next_section with lines[0] = #{reader.peek_line}"
         block = next_section(reader, parent)
 
-      elsif match = this_line.match(REGEXP[:title])
+      elsif !itemtext && match = this_line.match(REGEXP[:title])
         title = match[1]
         reader.skip_blank
 
-      elsif match = this_line.match(REGEXP[:image_blk])
+      elsif !itemtext && match = this_line.match(REGEXP[:image_blk])
         block = Block.new(parent, :image)
         AttributeList.new(parent.document.sub_attributes(match[2])).parse_into(attributes, ['alt', 'width', 'height'])
         target = block.sub_attributes(match[1])
@@ -170,6 +177,7 @@ class Asciidoctor::Lexer
         reader.unshift this_line
         expected_index = 1
         begin
+          # might want to move this check to a validate method
           if match[1].to_i != expected_index
             puts "asciidoctor: WARNING: callout list item index: expected #{expected_index} got #{match[1]}"
           end
@@ -211,6 +219,7 @@ class Asciidoctor::Lexer
         end
 
       elsif match = this_line.match(REGEXP[:dlist])
+        reader.unshift this_line
         block = next_labeled_list(reader, match, parent)
     
       # FIXME violates DRY because it's a duplication of other block parsing
@@ -271,7 +280,7 @@ class Asciidoctor::Lexer
         # So we need to actually include this one in the grab_lines group
         reader.unshift this_line
         buffer = reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true) {|line|
-          context == :dlist && line.match(REGEXP[:dlist])
+          line.match(REGEXP[:any_blk])
         }
 
         # trim off the indentation equivalent to the size of the least indented line
@@ -320,19 +329,17 @@ class Asciidoctor::Lexer
 
       else # paragraph, contiguous nonblank/noncontinuation lines
         reader.unshift this_line
-        buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true) {|line|
-          (context == :dlist && line.match(REGEXP[:dlist])) ||
-          line.match(REGEXP[:open_blk]) ||
-          # total hack job, we need to rethink this in a more generic way
-          # what about :colist?
-          (context == :olist && [:ulist, :dlist].detect {|c| line.match(REGEXP[c])}) ||
-          (context == :ulist && [:olist, :dlist].detect {|c| line.match(REGEXP[c])}) ||
-          line.match(REGEXP[:attr_line])
+        buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true, :skip_line_comments => true) {|line|
+          line.match(REGEXP[:any_blk]) || line.match(REGEXP[:attr_line]) ||
+          # next list item can be directly adjacent to paragraph of previous list item
+          context == :dlist && line.match(REGEXP[:dlist])
+          # not sure if there are any cases when we need this check for other list types
+          #LIST_CONTEXTS.include?(context) && line.match(REGEXP[context])
         }
 
         catalog_inline_anchors(buffer.join, parent.document)
 
-        if !buffer.empty? && admonition = buffer.first.match(Regexp.new('^(' + ADMONITION_STYLES.join('|') + '):\s+'))
+        if !itemtext && !buffer.empty? && admonition = buffer.first.match(Regexp.new('^(' + ADMONITION_STYLES.join('|') + '):\s+'))
           buffer[0] = admonition.post_match
           block = Block.new(parent, :admonition, buffer)
           attributes['style'] = admonition[1]
@@ -393,8 +400,7 @@ class Asciidoctor::Lexer
 
     while reader.has_lines? && match = reader.peek_line.match(REGEXP[list_type])
 
-      marker = (list_type == :olist && !(match[1].start_with? '.')) ?
-          resolve_ordered_list_marker(match[1]) : match[1]
+      marker = resolve_list_marker(list_type, match[1])
 
       # if we are moving to the next item, and the marker is different
       # determine if we are moving up or down in nesting
@@ -480,125 +486,138 @@ class Asciidoctor::Lexer
   def self.next_labeled_list(reader, match, parent)
     pairs = []
     block = Block.new(parent, :dlist)
-    # allows us to capture until we find a labeled item using the same delimiter (::, :::, :::: or ;;)
+    block.buffer = pairs
+    # allows us to capture until we find a labeled item
+    # that uses the same delimiter (::, :::, :::: or ;;)
     sibling_pattern = REGEXP[:dlist_siblings][match[2]]
 
     begin
-      catalog_inline_anchors(match[1], parent.document)
+      pairs << next_list_item(reader, block, match, sibling_pattern)
+    end while reader.has_lines? && match = reader.peek_line.match(sibling_pattern)
 
-      dt = ListItem.new(block, match[1])
-      dd = ListItem.new(block, match[4])
-
-      dd_reader = Reader.new grab_lines_for_list_item(reader, :dlist, sibling_pattern)
-      continuation_connects_first_block = (dd_reader.has_lines? && dd_reader.peek_line.chomp == LIST_CONTINUATION)
-      if continuation_connects_first_block
-        dd_reader.get_line
-      end
-      while dd_reader.has_lines?
-        new_block = next_block(dd_reader, block)
-        dd.blocks << new_block unless new_block.nil?
-      end
-
-      dd.fold_first(continuation_connects_first_block)
-
-      pairs << [dt, dd]
-
-      # this skip_blank might be redundant
-      reader.skip_blank
-      this_line = reader.get_line
-    end while !this_line.nil? && match = this_line.match(sibling_pattern)
-
-    reader.unshift(this_line) unless this_line.nil?
-    block.buffer = pairs
     block
   end
 
   # Internal: Parse and construct the next ListItem for the current bulleted
-  # (unordered or ordered) list Block, callout lists included.
+  # (unordered or ordered) list Block, callout lists included, or the next
+  # term ListItem and definition ListItem pair for the labeled list Block.
   #
-  # First collect and process all the lines that constitute the next list item
-  # for the parent list (according to its type). Next, parse those lines into
-  # blocks and associate them with the ListItem. Finally, fold the first block
+  # First collect and process all the lines that constitute the next list
+  # item for the parent list (according to its type). Next, parse those lines
+  # into blocks and associate them with the ListItem (in the case of a
+  # labeled list, the definition ListItem). Finally, fold the first block
   # into the item's text attribute according to rules described in ListItem.
   #
-  # reader      - The Reader from which to retrieve the next list item
-  # list_block  - The parent list Block of this ListItem. Also provides access to the list type.
-  # match       - The match Array which contains the marker and text (first-line) of the ListItem
+  # reader        - The Reader from which to retrieve the next list item
+  # list_block    - The parent list Block of this ListItem. Also provides access to the list type.
+  # match         - The match Array which contains the marker and text (first-line) of the ListItem
+  # sibling_trait - The list marker or the Regexp to match a sibling item
   #
-  # Returns the next ListItem for the parent list Block.
-  def self.next_list_item(reader, list_block, match)
-    list_item = ListItem.new(list_block)
-    ordinal = list_block.buffer.size
-    list_item.marker = list_block.context == :olist ?
-        resolve_ordered_list_marker(match[1], ordinal, true) : match[1]
+  # Returns the next ListItem or ListItem pair (depending on the list type)
+  # for the parent list Block.
+  def self.next_list_item(reader, list_block, match, sibling_trait = nil)
+    list_type = list_block.context
 
-    Asciidoctor.debug "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with match[2]: #{match[2]} and level: #{list_item.level}"
-
-    # Store first line as the text of the list item
-    list_item.text = match[2]
-
-    # first skip the line with the marker
-    reader.get_line
-    list_item_reader = Reader.new grab_lines_for_list_item(reader, list_block.context)
-    subsequent_line = list_item_reader.peek_line
-
-    if !subsequent_line.nil?
-      continuation_connects_first_block = (subsequent_line == "\n")
-      content_adjacent = !subsequent_line.strip.empty?
+    if list_type == :dlist
+      list_term = ListItem.new(list_block, match[1])
+      list_item = ListItem.new(list_block, match[3])
+      has_text = !match[3].to_s.empty?
     else
-      continuation_connects_first_block = false
-      content_adjacent = false
+      # Create list item using first line as the text of the list item
+      list_item = ListItem.new(list_block, match[2])
+
+      if !sibling_trait
+        sibling_trait = resolve_list_marker(list_type, match[1], list_block.buffer.size, true)
+      end
+      list_item.marker = sibling_trait
+      has_text = true
     end
 
-    while list_item_reader.has_lines?
-      new_block = next_block(list_item_reader, list_block)
-      list_item.blocks << new_block unless new_block.nil?
+    Asciidoctor.debug "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with text: #{list_type == :dlist ? match[3] : match[2]} and level: #{list_item.level}"
+
+    # first skip the line with the marker / term
+    reader.get_line
+    list_item_reader = Reader.new grab_lines_for_list_item(reader, list_type, sibling_trait, has_text)
+    if list_item_reader.has_lines?
+      comment_lines = list_item_reader.consume_line_comments
+      subsequent_line = list_item_reader.peek_line
+      list_item_reader.unshift(*comment_lines) unless comment_lines.empty? 
+
+      if !subsequent_line.nil?
+        continuation_connects_first_block = (subsequent_line == "\n")
+        content_adjacent = !subsequent_line.strip.empty?
+      else
+        continuation_connects_first_block = false
+        content_adjacent = false
+      end
+
+      # only relevant for :dlist
+      list_block.attributes['itemtext'] = true if !has_text
+
+      while list_item_reader.has_lines?
+        new_block = next_block(list_item_reader, list_block)
+        list_item.blocks << new_block unless new_block.nil?
+      end
+
+      list_item.fold_first(continuation_connects_first_block, content_adjacent)
     end
 
     Asciidoctor.debug "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
 
-    list_item.fold_first(continuation_connects_first_block, content_adjacent)
-    list_item
+    list_type == :dlist ? [list_term, list_item] : list_item
   end
 
-  # Internal: Collect the lines belonging to the current list item.
+  # Internal: Collect the lines belonging to the current list item, navigating
+  # through all the rules that determine what comprises a list item.
   #
-  # Definition lists (:dlist) are handled slightly differently than regular
-  # lists (:olist, :colist or :ulist):
-  #
-  # Regular lists - grab lines until another list item is found, or the
-  # block is broken by a terminator (such as a line comment or a blank line).
-  #
-  # Definition lists - grab lines until a sibling list item is found, or the
-  # block is broken by a terminator (such as a line comment). Definition lists
-  # are more lenient about allowing blank lines.
+  # Grab lines until a sibling list item is found, or the block is broken by a
+  # terminator (such as a line comment). Definition lists are more greedy if
+  # they don't have optional inline item text...they want that text
   #
   # reader          - The Reader from which to retrieve the lines.
-  # list_type       - The context Symbol of the list (:ulist, :olist, :colist or :dlist)
-  # sibling_pattern - A Regexp that matches a sibling of this list item (default: nil)
+  # list_type       - The Symbol context of the list (:ulist, :olist, :colist or :dlist)
+  # sibling_trait   - A Regexp that matches a sibling of this list item or String list marker 
+  #                   of the items in this list (default: nil)
+  # has_text        - Whether the list item has text defined inline (always true except for labeled lists)
   # phase           - The Symbol representing the parsing phase (:collect or :process) (default: :process)
   #
   # Returns an Array of lines belonging to the current list item.
-  def self.grab_lines_for_list_item(reader, list_type, sibling_pattern = nil, phase = :process)
+  def self.grab_lines_for_list_item(reader, list_type, sibling_trait = nil, has_text = true, phase = :process)
     buffer = []
-    next_item_pattern = sibling_pattern ? sibling_pattern : REGEXP[list_type]
 
-    # three states: :inactive, :active & :frozen
+    # three states for continuation: :inactive, :active & :frozen
     # :frozen signifies we've detected sequential continuation lines &
     # continuation is not permitted until reset 
     continuation = :inactive
-    rescued_stray_paragraph = false
+
+    # if we are within a nested list, we don't throw away the list
+    # continuation marks because they will be processed when grabbing
+    # the lines for those nested lists
+    within_nested_list = false
+
+    # a detached continuation is a list continuation that follows a blank line
+    # it gets associated with the outermost block
+    detached_continuation = nil
+
     while reader.has_lines?
       this_line = reader.get_line
+
+      # if we've arrived at a sibling item in this list, we've captured
+      # the complete list item and can begin processing it
+      # the remainder of the method determines whether we've reached
+      # the termination of the list
+      break if is_sibling_list_item?(this_line, list_type, sibling_trait)
+
       prev_line = buffer.empty? ? nil : buffer.last.chomp
-      break if this_line.match(next_item_pattern)
 
       if prev_line == LIST_CONTINUATION
         if continuation == :inactive
           continuation = :active
-          buffer.pop if phase == :process && list_type != :dlist
+          has_text = true
+          buffer[buffer.size - 1] = "\n" if phase == :process && !within_nested_list
         end
 
+        # dealing with adjacent list continuations (which is really a syntax error)
         if this_line.chomp == LIST_CONTINUATION
           if continuation != :frozen
             continuation = :frozen
@@ -609,63 +628,79 @@ class Asciidoctor::Lexer
         end
       end
 
-      if match = this_line.match(REGEXP[:any_blk])
+      # a delimited block immediately breaks the list unless preceded
+      # by a list continuation (they are harsh like that ;0)
+      if (match = this_line.match(REGEXP[:any_blk])) ||
+        # technically attr_line only breaks if ensuing line is not a list item
+        # which really means attr_line only breaks if it's acting as a block delimiter
+        (list_type == :dlist && match = this_line.match(REGEXP[:attr_line]))
         terminator = match[0].rstrip
         if continuation == :active
           buffer << this_line
+          # grab all the lines in the block, leaving the delimiters in place
           # we're being more strict here about the terminator, but I think that's a good thing
           buffer.concat reader.grab_lines_until(:grab_last_line => true) {|line| line.rstrip == terminator }
           continuation = :inactive
         else
           break
         end
-      elsif list_type == :dlist
-        # labeled lists permit interspersed blank lines in certain
-        # circumstances, so we have to do some detective work to figure out
-        # when to break
-        if !prev_line.nil? && prev_line.strip.empty?
-          if this_line.match(REGEXP[:comment]) || this_line.match(REGEXP[:title])
-            break 
-          # allow for repeat literal paragraphs offset by blank lines
-          elsif this_line.match(REGEXP[:lit_par])
+      else
+        if continuation == :active && !this_line.strip.empty?
+          # literal paragraphs have special considerations (and this is one of 
+          # two entry points into one)
+          # if we don't process it as a whole, then a line in it that looks like a
+          # list item will throw off the exit from it
+          if this_line.match(REGEXP[:lit_par])
             reader.unshift this_line
-            buffer.concat reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true)
-            rescued_stray_paragraph = true
+            buffer.concat reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true, :break_on_list_continuation => true)
           else
-            if this_line.match(REGEXP[:dlist])
-              # reset if we get a new list item context
-              rescued_stray_paragraph = false
-              buffer << this_line
-            elsif rescued_stray_paragraph
+            if !within_nested_list && NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
+              within_nested_list = true
+            end
+            buffer << this_line
+          end
+          continuation = :inactive
+        elsif !prev_line.nil? && prev_line.strip.empty?
+          # advance to the next line of content
+          if this_line.strip.empty?
+            reader.skip_blank
+            this_line = reader.get_line 
+            if this_line.nil?
               break
-            else
+            end
+          end
+
+          if this_line.chomp == LIST_CONTINUATION
+            detached_continuation = buffer.size
+            buffer << this_line
+          else
+            # has_text is only relevant for dlist, which is more greedy until it has text for an item
+            # for all other lists, has_text is always true
+            # in this block, we have to see whether we hold on to the list
+            if has_text && !within_nested_list
+              # slurp up any literal paragraph offset by blank lines
+              if this_line.match(REGEXP[:lit_par])
+                reader.unshift this_line
+                buffer.concat reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true, :break_on_list_continuation => true)
+              elsif NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
+                buffer.pop unless within_nested_list
+                buffer << this_line
+                within_nested_list = true
+              else
+                break
+              end
+            else # only dlist in need of item text, so slurp it up!
+              buffer.pop unless within_nested_list
               buffer << this_line
-              rescued_stray_paragraph = true
+              has_text = true
             end
           end
         else
-          buffer << this_line
-        end
-      # :ulist, :olist & :colist
-      else
-        if continuation == :active && !this_line.strip.empty?
-          # swallow the continuation into a blank line in the process phase
-          buffer << "\n" if phase == :process
-          buffer << this_line
-          continuation = :inactive
-        # bulleted and numbered lists are divided by blank lines unless followed by a list
-        elsif !prev_line.nil? && prev_line.strip.empty?
-          # a literal must have a trailing blank line or else it will suck up the next list item
-          if this_line.match(REGEXP[:lit_par])
-            reader.unshift this_line
-            buffer.concat reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true)
-          elsif LIST_CONTEXTS.select{|t| t != list_type}.detect { |t| this_line.match(REGEXP[t]) }
-            buffer << this_line
-          else
-            break
+          if !within_nested_list && NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
+            within_nested_list = true
           end
-        else
           buffer << this_line
+          has_text = true if !this_line.strip.empty?
         end
       end
       this_line = nil
@@ -674,27 +709,19 @@ class Asciidoctor::Lexer
     reader.unshift this_line if !this_line.nil?
 
     if phase == :process
-      
-      # NOTE this is hackish, but since we process differently than ulist & olist
-      # we need to do the line continuation substitution post-scan
-      # we also need to hold on to the first line continuation because an endline
-      # alone doesn't tell us that the first paragraph was attached via a line continuation
-      if list_type == :dlist && buffer.size > 0 && buffer.first == "+\n"
-        first = buffer.shift
-        buffer = buffer.map {|l| l == "+\n" ? "\n" : l}
-        buffer.unshift(first)
+      if detached_continuation
+        buffer.delete_at detached_continuation
       end
 
       # QUESTION should we strip these trailing endlines?
-      buffer.pop while buffer.last == "\n"
+      #buffer.pop while buffer.last == "\n"
 
-      # We do need to replace the trailing continuation
-      if list_type != :dlist && buffer.last == "+\n"
+      # We do need to replace the optional trailing continuation
+      # a blank line would have served the same purpose in the document
+      if !buffer.empty? && buffer.last.chomp == LIST_CONTINUATION
         buffer.pop
-        # QUESTION do we strip the endlines exposed by popping the list continuation?
-        #buffer.pop while buffer.last == "\n"
-        #buffer.push "\n"
       end
+      #puts "BUFFER>#{buffer.join}<BUFFER"
     end
 
     buffer
@@ -930,19 +957,19 @@ class Asciidoctor::Lexer
 
       elsif (match = this_line.match(REGEXP[:dlist]))
         begin
-          sibling_pattern = REGEXP[:dlist_siblings][match[3]]
+          sibling_pattern = REGEXP[:dlist_siblings][match[2]]
           section_lines << this_line
-          section_lines.concat grab_lines_for_list_item(reader, :dlist, sibling_pattern, :collect)
+          section_lines.concat grab_lines_for_list_item(reader, :dlist, sibling_pattern, !match[3].to_s.empty?, :collect)
           this_line = reader.get_line
         end while (!this_line.nil? && match = this_line.match(REGEXP[:dlist]))
         reader.unshift this_line unless this_line.nil?
 
-      elsif (list_type = [:ulist, :olist, :colist].detect {|t| this_line.match(REGEXP[t])})
+      elsif (list_type = [:ulist, :olist, :colist].detect {|ctx| this_line.match(REGEXP[ctx])})
         begin
           section_lines << this_line
-          section_lines.concat grab_lines_for_list_item(reader, list_type, nil, :collect)
+          section_lines.concat grab_lines_for_list_item(reader, list_type, resolve_list_marker(list_type, $1), true, :collect)
           this_line = reader.get_line
-        end while !this_line.nil? && (list_type = [:ulist, :olist, :colist].detect {|t| this_line.match(REGEXP[t])})
+        end while !this_line.nil? && (list_type = [:ulist, :olist, :colist].detect {|ctx| this_line.match(REGEXP[ctx])})
         reader.unshift this_line unless this_line.nil?
 
       elsif is_section_heading? this_line, next_line
@@ -984,6 +1011,32 @@ class Asciidoctor::Lexer
     end
 
     section
+  end
+
+  # Internal: Resolve the 0-index marker for this list item
+  #
+  # For ordered lists, match the marker used for this list item against the
+  # known list markers and determine which marker is the first (0-index) marker
+  # in its number series.
+  #
+  # For callout lists, return <1>.
+  #
+  # For bulleted lists, return the marker as passed to this method.
+  #
+  # list_type  - The Symbol context of the list
+  # marker     - The String marker for this list item
+  # ordinal    - The position of this list item in the list
+  # validate   - Whether to validate the value of the marker
+  #
+  # Returns the String 0-index marker for this list item
+  def self.resolve_list_marker(list_type, marker, ordinal = 0, validate = false)
+    if list_type == :olist && !marker.start_with?('.')
+      resolve_ordered_list_marker(marker, ordinal, validate)
+    elsif list_type == :colist
+      '<1>'
+    else
+      marker
+    end
   end
 
   # Internal: Resolve the 0-index marker for this ordered list item
@@ -1050,6 +1103,35 @@ class Asciidoctor::Lexer
     end
 
     marker
+  end
+
+  # Internal: Determine whether the this line is a sibling list item
+  # according to the list type and trait (marker) provided.
+  #
+  # line          - The String line to check
+  # list_type     - The context of the list (:olist, :ulist, :colist, :dlist)
+  # sibling_trait - The String marker for the list or the Regexp to match a sibling 
+  #
+  # Returns a Boolean indicating whether this line is a sibling list item given
+  # the criteria provided
+  def self.is_sibling_list_item?(line, list_type, sibling_trait)
+    if sibling_trait.is_a?(Regexp)
+      matcher = sibling_trait
+      expected_marker = false
+    else
+      matcher = REGEXP[list_type]
+      expected_marker = sibling_trait
+    end
+
+    if m = line.match(matcher)
+      if expected_marker
+        expected_marker == resolve_list_marker(list_type, m[1])
+      else
+        true
+      end
+    else
+      false
+    end
   end
 
   # Internal: Converts a Roman numeral to an integer value.

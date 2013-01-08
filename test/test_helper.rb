@@ -96,6 +96,11 @@ class Test::Unit::TestCase
     document_from_string(src, opts).render
   end
 
+  def render_embedded_string(src, opts = {})
+    opts[:header_footer] = false
+    document_from_string(src, opts).render
+  end
+
   def parse_header_metadata(source)
     reader = Asciidoctor::Reader.new source.lines.entries
     [Asciidoctor::Lexer.parse_header_metadata(reader), reader]
