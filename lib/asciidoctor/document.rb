@@ -29,7 +29,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   attr_reader :header
 
   # Public: Base directory for rendering this document
-  attr_reader :basedir
+  attr_reader :base_dir
 
   # Public: Initialize an Asciidoc object.
   #
@@ -51,19 +51,18 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @renderer = nil
     @options = options
     @options[:header_footer] = @options.fetch(:header_footer, true)
-    @basedir = options[:basedir] || Dir.pwd
+    @base_dir = options[:base_dir] || Dir.pwd
 
     @attributes['sectids'] = true
     @attributes['encoding'] = 'UTF-8'
 
     attribute_overrides = options[:attributes] || {}
+
     # the only way to set the safepaths attribute is via the document options
-    if !attribute_overrides.has_key? 'safepaths'
-      attribute_overrides['safepaths'] = true
-    end
-    if !attribute_overrides.has_key? 'docdir'
-      attribute_overrides['docdir'] = Dir.pwd
-    end
+    attribute_overrides['safe-paths'] ||= true
+
+    attribute_overrides['docdir'] ||= Dir.pwd
+    
     attribute_overrides.each {|key, val|
       # a nil or negative key undefines the attribute 
       if (val.nil? || key[-1..-1] == '!')
@@ -75,19 +74,22 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     }
 
     @attributes['backend'] ||= DEFAULT_BACKEND
-    update_backend_attributes()
+    update_backend_attributes
 
     @reader = Reader.new(data, self, attribute_overrides, &block)
 
     # dynamic intrinstic attribute values
     @attributes['doctype'] ||= DEFAULT_DOCTYPE
+
     now = Time.new
     @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
     @attributes['localtime'] ||= now.strftime('%H:%m:%S %Z')
     @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']].join(' ')
+    
     # docdate and doctime should default to localdate and localtime if not otherwise set
     @attributes['docdate'] ||= @attributes['localdate']
     @attributes['doctime'] ||= @attributes['localtime']
+    
     @attributes['asciidoctor-version'] = VERSION
     @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', 'images'), 'icons')
 
@@ -196,12 +198,16 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
   def renderer(options = {})
     return @renderer if @renderer
+    
     render_options = {}
+
     # Load up relevant Document @options
     if @options[:template_dir]
       render_options[:template_dir] = @options[:template_dir]
     end
+    
     render_options[:backend] = @attributes.fetch('backend', 'html5')
+    
     # Override Document @option settings with options passed in
     render_options.merge! options
 
@@ -226,6 +232,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       Asciidoctor::debug "Rendering block: #{block}"
       buffer << block.render
     end
+
     buffer.join
   end
 

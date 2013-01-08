@@ -37,8 +37,10 @@ module Asciidoctor
 
       multiline = lines.is_a?(Array)
       text = multiline ? lines.join : lines
+
       passthroughs = subs.include?(:macros)
       text = extract_passthroughs(text) if passthroughs
+      
       subs.each {|type|
         case type
         when :specialcharacters
@@ -124,6 +126,7 @@ module Asciidoctor
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
+
         # TODO warn if we don't recognize the sub
         if m[1] == '$$'
           subs = [:specialcharacters]
@@ -132,6 +135,7 @@ module Asciidoctor
         else
           subs = []
         end
+
         @passthroughs << {:text => m[2] || m[4].gsub('\]', ']'), :subs => subs}
         "\x0" + (@passthroughs.size - 1).to_s + "\x0"
       } unless !(result.include?('+++') || result.include?('$$') || result.include?('pass:'))
@@ -139,10 +143,12 @@ module Asciidoctor
       result.gsub!(REGEXP[:pass_lit]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
+
         # honor the escape
         if m[2].start_with? '\\'
           next m[1] + m[2][1..-1]
         end
+        
         @passthroughs << {:text => m[3], :subs => [:specialcharacters], :literal => true}
         m[1] + "\x0" + (@passthroughs.size - 1).to_s + "\x0"
       } unless !result.include?('`')
@@ -157,6 +163,7 @@ module Asciidoctor
     # returns The String text with the passthrough text restored
     def restore_passthroughs(text)
       return text if @passthroughs.nil? || @passthroughs.empty? || !text.include?("\x0")
+      
       text.gsub(REGEXP[:pass_placeholder]) {
         pass = @passthroughs[$1.to_i];
         text = apply_subs(pass[:text], pass.fetch(:subs, []))
@@ -185,9 +192,11 @@ module Asciidoctor
     # returns The String text with quoted text rendered using the backend templates
     def sub_quotes(text)
       result = text.dup
+
       QUOTE_SUBS.each {|type, scope, pattern|
         result.gsub!(pattern) { transform_quoted_text($~, type, scope) }
       }
+      
       result
     end
 
@@ -198,9 +207,11 @@ module Asciidoctor
     # returns The String text with the replacement characters substituted
     def sub_replacements(text)
       result = text.dup
+
       REPLACEMENTS.each {|pattern, replacement|
         result.gsub!(pattern, replacement)
       }
+      
       result
     end
 
@@ -219,6 +230,7 @@ module Asciidoctor
     # so that a missing key doesn't wipe out the whole block of data
     def sub_attributes(data)
       return data if data.nil? || data.empty?
+
       # normalizes data type to an array (string becomes single-element array)
       lines = Array(data)
 
@@ -400,6 +412,7 @@ module Asciidoctor
     def parse_attributes(attrline, posattrs = ['role'])
       return nil if attrline.nil?
       return {} if attrline.empty?
+      
       AttributeList.new(attrline, self).parse(posattrs)
     end
   end

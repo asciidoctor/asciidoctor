@@ -18,11 +18,13 @@ class Asciidoctor::AbstractNode
 
   def initialize(parent, context)
     @parent = (context != :document ? parent : nil)
+
     if !parent.nil?
       @document = parent.is_a?(Asciidoctor::Document) ? parent : parent.document
     else
       @document = nil
     end
+    
     @context = context
     @attributes = {}
     @passthroughs = []
@@ -92,15 +94,15 @@ class Asciidoctor::AbstractNode
   # The return value of this method can be safely used in an image tag.
   #
   # target_image - A String path to the target image
-  # assetdir_key - The String attribute key used to lookup the directory where
+  # asset_dir_key - The String attribute key used to lookup the directory where
   #                the image is located (default: 'imagesdir')
   #
   # Returns A String reference or data URI for the target image
-  def image_uri(target_image, assetdir_key = 'imagesdir')
+  def image_uri(target_image, asset_dir_key = 'imagesdir')
     if document.attr? 'data-uri'
-      generate_data_uri(target_image, assetdir_key)
-    elsif assetdir_key && attr?(assetdir_key)
-      File.join(document.attr(assetdir_key), target_image)
+      generate_data_uri(target_image, asset_dir_key)
+    elsif asset_dir_key && attr?(asset_dir_key)
+      File.join(document.attr(asset_dir_key), target_image)
     else
       target_image
     end
@@ -114,19 +116,20 @@ class Asciidoctor::AbstractNode
   # can be used in an image tag.
   #
   # target_image - A String path to the target image
-  # assetdir_key - The String attribute key used to lookup the directory where
+  # asset_dir_key - The String attribute key used to lookup the directory where
   #                the image is located (default: nil)
   #
   # Returns A String data URI containing the content of the target image
-  def generate_data_uri(target_image, assetdir_key = nil)
+  def generate_data_uri(target_image, asset_dir_key = nil)
     require 'base64'
 
     mimetype = 'image/' + File.extname(target_image)[1..-1]
-    if assetdir_key
-      image_path = File.join(normalize_assetpath(document.attr(assetdir_key, '.'), assetdir_key), target_image)
+    if asset_dir_key
+      image_path = File.join(normalize_asset_path(document.attr(asset_dir_key, '.'), asset_dir_key), target_image)
     else
-      image_path = normalize_assetpath(target_image)
+      image_path = normalize_asset_path(target_image)
     end
+
     'data:' + mimetype + ';base64,' + Base64.encode64(IO.read(image_path)).delete("\n")
   end
 
@@ -134,9 +137,9 @@ class Asciidoctor::AbstractNode
   #
   # The most important functionality in this method is to prevent the asset directory
   # from resolving to a directory outside of the chroot directory (which defaults to docdir)
-  # if the 'safepaths' attribute is true (the default).
+  # if the 'safe-paths' attribute is true (the default).
   #
-  # assetdir     - The String asset directory as provided in the configuration
+  # asset_dir    - The String asset directory as provided in the configuration
   # asset_name   - The String name of the property being resolved (for use in
   #                the warning message) (default: 'asset directory')
   #
@@ -145,55 +148,58 @@ class Asciidoctor::AbstractNode
   #  # given these fixtures
   #  document.attr('docdir')
   #  # => "/path/to/docdir"
-  #  document.attr('safepaths')
+  #  document.attr('safe-paths')
   #  # => true
   #
   #  # then
-  #  normalize_assetpath('images')
+  #  normalize_asset_path('images')
   #  # => "/path/to/docdir/images"
-  #  normalize_assetpath('/etc/images')
+  #  normalize_asset_path('/etc/images')
   #  # => "/path/to/docdir/images"
-  #  normalize_assetpath('../images')
+  #  normalize_asset_path('../images')
   #  # => "/path/to/docdir/images"
   #
   #  # given these fixtures
   #  document.attr('docdir')
   #  # => "/path/to/docdir"
-  #  document.attr('safepaths')
+  #  document.attr('safe-paths')
   #  # => false
   #
   #  # then
-  #  normalize_assetpath('images')
+  #  normalize_asset_path('images')
   #  # => "/path/to/docdir/images"
-  #  normalize_assetpath('/etc/images')
+  #  normalize_asset_path('/etc/images')
   #  # => "/etc/images"
-  #  normalize_assetpath('../images')
+  #  normalize_asset_path('../images')
   #  # => "/path/to/images"
   #
   # Returns The normalized asset directory as a String
-  def normalize_assetpath(assetdir, asset_name = 'asset directory')
+  def normalize_asset_path(asset_dir, asset_name = 'asset directory')
     require 'pathname'
-    inputpath = File.expand_path(document.attr('docdir'))
-    assetpath = Pathname.new(assetdir)
-    if assetpath.relative?
-      assetpath = File.expand_path(File.join(inputpath, assetdir))
+
+    input_path = File.expand_path(document.attr('docdir'))
+    asset_path = Pathname.new(asset_dir)
+    
+    if asset_path.relative?
+      asset_path = File.expand_path(File.join(input_path, asset_dir))
     else
-      assetpath = assetpath.cleanpath.to_s
+      asset_path = asset_path.cleanpath.to_s
     end
 
     if document.attr('safepaths', true)
-      relative_assetdir = Pathname.new(assetpath).relative_path_from(Pathname.new(inputpath)).to_s
-      if relative_assetdir.start_with?('..')
+      relative_asset_dir = Pathname.new(asset_path).relative_path_from(Pathname.new(input_path)).to_s
+      if relative_asset_dir.start_with?('..')
         puts 'asciidoctor: WARNING: ' + asset_name + ' has illegal reference to ancestor of docdir'
-        relative_assetdir.sub!(/^(?:\.\.\/)*/, '')
+        relative_asset_dir.sub!(/^(?:\.\.\/)*/, '')
         # just to be absolutely sure ;)
-        if relative_assetdir[0..0] == '.'
-          raise 'Substitution of parent path references failed for ' + relative_assetdir
+        if relative_asset_dir[0..0] == '.'
+          raise 'Substitution of parent path references failed for ' + relative_asset_dir
         end
-        assetpath = File.expand_path(File.join(inputpath, relative_assetdir))
+        asset_path = File.expand_path(File.join(input_path, relative_asset_dir))
       end
     end
-    assetpath
+
+    asset_path
   end
 
 end

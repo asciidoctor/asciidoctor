@@ -54,6 +54,7 @@ class Asciidoctor::Lexer
     Asciidoctor.debug "/"*64
     Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
     Asciidoctor.debug reader.peek_line
+
     tmp_line = reader.get_line
     Asciidoctor.debug reader.peek_line
     reader.unshift tmp_line
@@ -82,6 +83,7 @@ class Asciidoctor::Lexer
           attributes['reftext'] = reftext
           parent.document.references[id] = reftext
         end
+
         reader.skip_blank
 
       elsif this_line.match(REGEXP[:comment_blk])
@@ -1059,6 +1061,7 @@ class Asciidoctor::Lexer
     value = value.downcase
     digits = { 'i' => 1, 'v' => 5, 'x' => 10 }
     result = 0
+    
     (0..value.length - 1).each {|i|
       digit = digits[value[i..i]]
       if i + 1 < value.length && digits[value[i+1..i+1]] > digit
@@ -1067,6 +1070,7 @@ class Asciidoctor::Lexer
         result += digit
       end
     }
+
     result
   end
 end

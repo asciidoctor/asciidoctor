@@ -96,9 +96,9 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   def content
     @blocks.map do |block|
       Asciidoctor.debug "Begin rendering block #{block.is_a?(Asciidoctor::Section) ? block.title : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
-      poo = block.render
+      block_content = block.render
       Asciidoctor.debug "===> Done rendering block #{block.is_a?(Asciidoctor::Section) ? block.title : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
-      poo
+      block_content
     end.join
   end
 

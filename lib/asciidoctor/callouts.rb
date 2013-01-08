@@ -28,6 +28,7 @@ class Asciidoctor::Callouts
   def register(li_ordinal)
     current_list << {:ordinal => li_ordinal.to_i, :id => (id = generate_next_callout_id)}
     @co_index += 1
+
     id
   end
 
@@ -41,10 +42,13 @@ class Asciidoctor::Callouts
   def read_next_id
     id = nil
     list = current_list
+
     if @co_index <= list.size
       id = list[@co_index - 1][:id]
     end
+
     @co_index += 1
+
     id
   end
 
@@ -73,10 +77,13 @@ class Asciidoctor::Callouts
   # Returns nothing
   def next_list
     @list_index += 1
+
     if @lists.size < @list_index
       @lists << []
     end
+
     @co_index = 1
+
     nil
   end
 
@@ -87,6 +94,7 @@ class Asciidoctor::Callouts
   def rewind
     @list_index = 1
     @co_index = 1
+    
     nil
   end
 
