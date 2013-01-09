@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   ## the sub! line in the Rakefile
   s.name              = 'asciidoctor'
   s.version           = '0.0.8'
-  s.date              = '2013-01-04'
+  s.date              = '2013-01-09'
   s.rubyforge_project = 'asciidoctor'
 
   ## Make sure your summary is short. The description may be as long
@@ -43,15 +43,15 @@ Gem::Specification.new do |s|
 
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
-  s.add_dependency('tilt')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
+  s.add_development_dependency('htmlentities')
   s.add_development_dependency('mocha')
   s.add_development_dependency('nokogiri')
-  s.add_development_dependency('htmlentities')
   s.add_development_dependency('pending')
   s.add_development_dependency('rake')
+  s.add_development_dependency('tilt')
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
@@ -71,8 +71,8 @@ Gem::Specification.new do |s|
     lib/asciidoctor/backends/base_template.rb
     lib/asciidoctor/backends/docbook45.rb
     lib/asciidoctor/backends/html5.rb
-    lib/asciidoctor/callouts.rb
     lib/asciidoctor/block.rb
+    lib/asciidoctor/callouts.rb
     lib/asciidoctor/debug.rb
     lib/asciidoctor/document.rb
     lib/asciidoctor/errors.rb
@@ -91,8 +91,10 @@ Gem::Specification.new do |s|
     test/fixtures/asciidoc.txt
     test/fixtures/asciidoc_index.txt
     test/fixtures/ascshort.txt
+    test/fixtures/dot.gif
     test/fixtures/encoding.asciidoc
     test/fixtures/list_elements.asciidoc
+    test/fixtures/tip.gif
     test/headers_test.rb
     test/lexer_test.rb
     test/links_test.rb
