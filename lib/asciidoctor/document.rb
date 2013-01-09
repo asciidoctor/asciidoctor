@@ -46,7 +46,11 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   #   doc  = Asciidoctor::Document.new(data)
   def initialize(data = [], options = {}, &block)
     super(self, :document)
-    @references = {}
+    @references = {
+      :ids => {},
+      :links => [],
+      :images => []
+    }
     @callouts = Callouts.new
     @renderer = nil
     @options = options
@@ -128,6 +132,18 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       @header.clear_blocks
     end
 
+  end
+
+  def register(type, value)
+    if type == :ids
+      if value.is_a?(Array)
+        @references[:ids][value[0]] = (value[1] || '[' + value[0] + ']')
+      else
+        @references[:ids][value] = '[' + value + ']'
+      end
+    elsif @options[:catalog_assets]
+      @references[type] << value
+    end
   end
 
   # Make the raw source for the Document available.
@@ -237,6 +253,10 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     end
 
     buffer.join
+  end
+
+  def to_s
+    %[#{super.to_s} - #{doctitle}]  
   end
 
 end

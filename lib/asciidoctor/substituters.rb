@@ -60,7 +60,7 @@ module Asciidoctor
         when :post_replacements
           text = sub_post_replacements(text)
         else
-          puts "asciidoctor: WARNING: unknown substitution type " + type.to_s
+          puts "asciidoctor: WARNING: unknown substitution type #{type}"
         end
       }
       text = restore_passthroughs(text) if passthroughs
@@ -145,7 +145,8 @@ module Asciidoctor
         end
 
         @passthroughs << {:text => m[2] || m[4].gsub('\]', ']'), :subs => subs}
-        "\x0" + (@passthroughs.size - 1).to_s + "\x0"
+        index = @passthroughs.size - 1
+        "\x0#{index}\x0"
       } unless !(result.include?('+++') || result.include?('$$') || result.include?('pass:'))
 
       result.gsub!(REGEXP[:pass_lit]) {
@@ -154,11 +155,12 @@ module Asciidoctor
 
         # honor the escape
         if m[2].start_with? '\\'
-          next m[1] + m[2][1..-1]
+          next "#{m[1]}#{m[2][1..-1]}"
         end
         
         @passthroughs << {:text => m[3], :subs => [:specialcharacters], :literal => true}
-        m[1] + "\x0" + (@passthroughs.size - 1).to_s + "\x0"
+        index = @passthroughs.size - 1
+        "#{m[1]}\x0#{index}\x0"
       } unless !result.include?('`')
 
       result
@@ -247,13 +249,13 @@ module Asciidoctor
         subject = line.dup
         subject.gsub!(REGEXP[:attr_ref]) {
           if !$1.empty? || !$3.empty?
-            '{' + $2 + '}'
+            "{#$2}"
           elsif document.attributes.has_key? $2
             document.attributes[$2]
           elsif INTRINSICS.has_key? $2
             INTRINSICS[$2]
           else
-            Asciidoctor.debug 'Missing attribute: ' + $2 + ', line marked for removal'
+            Asciidoctor.debug "Missing attribute: #$2, line marked for removal"
             reject = true
             break '{undefined}'
           end
@@ -286,6 +288,7 @@ module Asciidoctor
           next m[0][1..-1]
         end
         target = sub_attributes(m[1])
+        document.register(:images, target)
         attrs = parse_attributes(m[2], ['alt', 'width', 'height'])
         if !attrs.has_key?('alt') || attrs['alt'].empty?
           attrs['alt'] = File.basename(target, File.extname(target))
@@ -299,7 +302,7 @@ module Asciidoctor
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
-          next m[1] + m[2][1..-1] + (m[3] || '')
+          next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
         # not a valid macro syntax w/o trailing square brackets
         # we probably shouldn't even get here...our regex is doing too much
         elsif m[1] == 'link:' && m[3].nil?
@@ -314,8 +317,9 @@ module Asciidoctor
         if target.end_with? '&gt;'
           target = target[0..-5]
         end
+        document.register(:links, target)
         text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
-        prefix + Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
+        "#{prefix}#{Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render}"
       } unless !result.include?('http')
 
       # inline link macros, link:target[text]
@@ -327,6 +331,7 @@ module Asciidoctor
           next m[0][1..-1]
         end
         target = m[1]
+        document.register(:links, target)
         text = sub_attributes(m[2].gsub('\]', ']'))
         Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
       } unless !result.include?('link:')
@@ -339,7 +344,9 @@ module Asciidoctor
           next m[0][1..-1]
         end
         if !m[1].nil?
-          id, reftext = m[1].split(',')
+          id, reftext = m[1].split(',', 2)
+          id.sub!(/^("|)(.*)\1$/, '\2')
+          reftext.sub!(/^("|)(.*)\1$/m, '\2') unless reftext.nil?
         else
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
@@ -355,12 +362,15 @@ module Asciidoctor
           next m[0][1..-1]
         end
         id, reftext = m[1].split(',')
+        id.sub!(/^("|)(.*)\1$/, '\2')
         if reftext.nil?
-          reftext = '[' + id + ']' 
+          reftext = "[#{id}]"
+        else
+          reftext.sub!(/^("|)(.*)\1$/m, '\2')
         end
         # NOTE the reftext should also match what's in our references dic
-        if !document.references.has_key? id
-          Asciidoctor.debug 'Missing reference for anchor ' + id
+        if !document.references[:ids].has_key? id
+          Asciidoctor.debug "Missing reference for anchor #{id}"
         end
         Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
       } unless !result.include?('[[')
@@ -379,7 +389,7 @@ module Asciidoctor
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
-          next '&lt' + m[1] + '&gt;'
+          next "&lt#{m[1]}&gt;"
         end
         Inline.new(self, :callout, m[1], :id => document.callouts.read_next_id).render
       }
@@ -405,7 +415,7 @@ module Asciidoctor
       if match[0].start_with? '\\'
         match[0][1..-1]
       elsif scope == :constrained
-        (match[1] || '') + Inline.new(self, :quoted, match[3], :type => type, :attributes => parse_attributes(match[2])).render
+        "#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :attributes => parse_attributes(match[2])).render}"
       else
         Inline.new(self, :quoted, match[2], :type => type, :attributes => parse_attributes(match[1])).render
       end

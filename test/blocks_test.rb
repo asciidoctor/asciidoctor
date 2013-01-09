@@ -16,27 +16,87 @@ context "Blocks" do
     end
   end
 
-  context "Comments" do
-    test "line comment between paragraphs" do
-      output = render_string("first paragraph\n\n//comment\n\nsecond paragraph")
-      assert_no_match(/comment/, output)
+  context 'Comments' do
+    test 'line comment between paragraphs offset by blank lines' do
+      input = <<-EOS
+first paragraph
+
+// line comment
+
+second paragraph
+      EOS
+      output = render_embedded_string input
+      assert_no_match(/line comment/, output)
       assert_xpath '//p', output, 2
     end
 
-    test "comment block between paragraphs" do
-      output = render_string("first paragraph\n\n////\ncomment\n////\n\nsecond paragraph")
-      assert_no_match(/comment/, output)
+    test 'adjacent line comment between paragraphs' do
+      input = <<-EOS
+first line
+// line comment
+second line
+      EOS
+      output = render_embedded_string input
+      assert_no_match(/line comment/, output)
+      assert_xpath '//p', output, 1
+      assert_xpath "//p[1][text()='first line\nsecond line']", output, 1
+    end
+
+    test 'comment block between paragraphs offset by blank lines' do
+      input = <<-EOS
+first paragraph
+
+////
+block comment
+////
+
+second paragraph
+      EOS
+      output = render_embedded_string input
+      assert_no_match(/block comment/, output)
+      assert_xpath '//p', output, 2
+    end
+
+    test 'adjacent comment block between paragraphs' do
+      input = <<-EOS
+first paragraph
+////
+block comment
+////
+second paragraph
+      EOS
+      output = render_embedded_string input
+      assert_no_match(/block comment/, output)
       assert_xpath '//p', output, 2
     end
 
     test "can render with block comment at end of document with trailing endlines" do
-      output = render_string("Paragraph\n\n////\nblock comment\n////\n\n")
+      input = <<-EOS
+paragraph
+
+////
+block comment
+////
+
+
+      EOS
+      output = render_embedded_string input
       assert_no_match(/block comment/, output)
     end
 
     test "trailing endlines after block comment at end of document does not create paragraph" do
-      d = document_from_string("Paragraph\n\n////\nblock comment\n////\n\n")
+      input = <<-EOS
+paragraph
+
+////
+block comment
+////
+
+
+      EOS
+      d = document_from_string input
       assert_equal 1, d.blocks.size
+      assert_xpath '//p', d.render, 1
     end
   end
 
@@ -56,6 +116,21 @@ How crazy is that?
   end
 
   context "Preformatted Blocks" do
+    test 'should separate adjacent paragraphs and listing into blocks' do
+      input = <<-EOS
+paragraph 1
+----
+listing content
+----
+paragraph 2
+      EOS
+      
+      output = render_embedded_string input
+      assert_xpath '/*[@class="paragraph"]/p', output, 2
+      assert_xpath '/*[@class="listingblock"]', output, 1
+      assert_xpath '(/*[@class="paragraph"]/following-sibling::*)[1][@class="listingblock"]', output, 1
+    end
+
     test "should preserve endlines in literal block" do
       input = <<-EOS
 ....

@@ -46,8 +46,8 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
 
   def splain(parent_level = 0)
     parent_level += 1
+    Asciidoctor.puts_indented(parent_level, "Block id: #{id}") unless self.id.nil?
     Asciidoctor.puts_indented(parent_level, "Block title: #{title}") unless self.title.nil?
-    Asciidoctor.puts_indented(parent_level, "Block anchor: #{anchor}") unless self.anchor.nil?
     Asciidoctor.puts_indented(parent_level, "Block caption: #{caption}") unless self.caption.nil?
     Asciidoctor.puts_indented(parent_level, "Block level: #{level}") unless self.level.nil?
     Asciidoctor.puts_indented(parent_level, "Block context: #{context}") unless self.context.nil?
@@ -122,5 +122,9 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
     else
       apply_normal_subs(@buffer)
     end
+  end
+
+  def to_s
+    %[#{super.to_s} - #@context [blocks:#{@blocks.size}]]
   end
 end

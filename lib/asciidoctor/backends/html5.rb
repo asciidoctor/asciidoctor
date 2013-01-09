@@ -449,7 +449,7 @@ class InlineAnchorTemplate < ::Asciidoctor::BaseTemplate
     @template ||= ERB.new <<-EOS
 <%
 if type == :xref
-%><a href="#<%= target %>"><%= text || document.references.fetch(target, '[' + target + ']') %></a><%
+%><a href="#<%= target %>"><%= text || document.references[:ids].fetch(target, '[' + target + ']') %></a><%
 elsif type == :ref
 %><a id="<%= target %>"></a><%
 else

@@ -19,6 +19,11 @@ context 'Substitutions' do
       assert_equal '&#8220;a few quoted words&#8221;', para.sub_quotes(para.buffer.join)
     end
 
+    test 'escaped single-line double-quoted string' do
+      para = block_from_string(%q{\``a few quoted words''})
+      assert_equal %q(&#8216;`a few quoted words&#8217;'), para.sub_quotes(para.buffer.join)
+    end
+
     test 'multi-line double-quoted string' do
       para = block_from_string(%Q{``a few\nquoted words''})
       assert_equal "&#8220;a few\nquoted words&#8221;", para.sub_quotes(para.buffer.join)
@@ -37,6 +42,11 @@ context 'Substitutions' do
     test 'single-line single-quoted string' do
       para = block_from_string(%q{`a few quoted words'})
       assert_equal '&#8216;a few quoted words&#8217;', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped single-line single-quoted string' do
+      para = block_from_string(%q{\`a few quoted words'})
+      assert_equal %(`a few quoted words'), para.sub_quotes(para.buffer.join)
     end
 
     test 'multi-line single-quoted string' do
@@ -59,6 +69,11 @@ context 'Substitutions' do
       assert_equal 'a few words', para.sub_quotes(para.buffer.join)
     end
 
+    test 'escaped single-line constrained unquoted string' do
+      para = block_from_string(%q{\#a few words#})
+      assert_equal '#a few words#', para.sub_quotes(para.buffer.join)
+    end
+
     test 'multi-line constrained unquoted string' do
       para = block_from_string(%Q{#a few\nwords#})
       assert_equal "a few\nwords", para.sub_quotes(para.buffer.join)
@@ -69,6 +84,11 @@ context 'Substitutions' do
       assert_equal '--anything goes ', para.sub_quotes(para.buffer.join)
     end
 
+    test 'escaped single-line unconstrained unquoted string' do
+      para = block_from_string(%q{\##--anything goes ##})
+      assert_equal '#--anything goes #', para.sub_quotes(para.buffer.join)
+    end
+
     test 'multi-line unconstrained unquoted string' do
       para = block_from_string(%Q{##--anything\ngoes ##})
       assert_equal "--anything\ngoes ", para.sub_quotes(para.buffer.join)
@@ -77,6 +97,11 @@ context 'Substitutions' do
     test 'single-line constrained strong string' do
       para = block_from_string(%q{*a few strong words*})
       assert_equal '<strong>a few strong words</strong>', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped single-line constrained strong string' do
+      para = block_from_string(%q{\*a few strong words*})
+      assert_equal '*a few strong words*', para.sub_quotes(para.buffer.join)
     end
 
     test 'multi-line constrained strong string' do
@@ -92,6 +117,11 @@ context 'Substitutions' do
     test 'single-line constrained quote variation emphasized string' do
       para = block_from_string(%q{'a few emphasized words'})
       assert_equal '<em>a few emphasized words</em>', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped single-line constrained quote variation emphasized string' do
+      para = block_from_string(%q{\'a few emphasized words'})
+      assert_equal %q('a few emphasized words'), para.sub_quotes(para.buffer.join)
     end
 
     test 'multi-line constrained emphasized quote variation string' do
@@ -115,6 +145,11 @@ context 'Substitutions' do
       assert_equal '<em>a few emphasized words</em>', para.sub_quotes(para.buffer.join)
     end
 
+    test 'escaped single-line constrained emphasized underline variation string' do
+      para = block_from_string(%q{\_a few emphasized words_})
+      assert_equal '_a few emphasized words_', para.sub_quotes(para.buffer.join)
+    end
+
     test 'multi-line constrained emphasized underline variation string' do
       para = block_from_string(%Q{_a few\nemphasized words_})
       assert_equal "<em>a few\nemphasized words</em>", para.sub_quotes(para.buffer.join)
@@ -126,6 +161,12 @@ context 'Substitutions' do
       assert_equal '<tt>a few &lt;{monospaced}&gt; words</tt>', para.apply_normal_subs(para.buffer)
     end
 
+    test 'escaped single-line constrained monospaced string' do
+      para = block_from_string(%q{\`a few <monospaced> words`})
+      # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+      assert_equal '`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.buffer)
+    end
+
     test 'multi-line constrained monospaced string' do
       para = block_from_string(%Q{`a few\n<\{monospaced\}> words`})
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
@@ -135,6 +176,11 @@ context 'Substitutions' do
     test 'single-line unconstrained strong chars' do
       para = block_from_string(%q{**Git**Hub})
       assert_equal '<strong>Git</strong>Hub', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped single-line unconstrained strong chars' do
+      para = block_from_string(%q{\**Git**Hub})
+      assert_equal '<strong>*Git</strong>*Hub', para.sub_quotes(para.buffer.join)
     end
 
     test 'multi-line unconstrained strong chars' do
@@ -152,9 +198,20 @@ context 'Substitutions' do
       assert_equal %q{Git<strong><span class="blue">Hub</span></strong>}, para.sub_quotes(para.buffer.join)
     end
 
+    # TODO this is not the same result as AsciiDoc, though I don't understand why AsciiDoc gets what it gets
+    test 'escaped unconstrained strong chars with role' do
+      para = block_from_string(%q{Git\[blue]**Hub**})
+      assert_equal %q{Git[blue]<strong>*Hub</strong>*}, para.sub_quotes(para.buffer.join)
+    end
+
     test 'single-line unconstrained emphasized chars' do
       para = block_from_string(%q{__Git__Hub})
       assert_equal '<em>Git</em>Hub', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped single-line unconstrained emphasized chars' do
+      para = block_from_string(%q{\__Git__Hub})
+      assert_equal '__Git__Hub', para.sub_quotes(para.buffer.join)
     end
 
     test 'multi-line unconstrained emphasized chars' do
@@ -167,9 +224,19 @@ context 'Substitutions' do
       assert_equal %q{<em><span class="gray">Git</span></em>Hub}, para.sub_quotes(para.buffer.join)
     end
 
+    test 'escaped unconstrained emphasis chars with role' do
+      para = block_from_string(%q{\[gray]__Git__Hub})
+      assert_equal %q{[gray]__Git__Hub}, para.sub_quotes(para.buffer.join)
+    end
+
     test 'single-line unconstrained monospaced chars' do
       para = block_from_string(%q{Git++Hub++})
       assert_equal 'Git<tt>Hub</tt>', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped single-line unconstrained monospaced chars' do
+      para = block_from_string(%q{Git\++Hub++})
+      assert_equal 'Git+<tt>Hub</tt>+', para.sub_quotes(para.buffer.join)
     end
 
     test 'multi-line unconstrained monospaced chars' do
@@ -182,6 +249,11 @@ context 'Substitutions' do
       assert_equal 'x<sup>2</sup> = x * x, e = mc<sup>2</sup>, there\'s a 1<sup>st</sup> time for everything', para.sub_quotes(para.buffer.join)
     end
 
+    test 'escaped single-line superscript chars' do
+      para = block_from_string(%q{x\^2^ = x * x})
+      assert_equal 'x^2^ = x * x', para.sub_quotes(para.buffer.join)
+    end
+
     test 'multi-line superscript chars' do
       para = block_from_string(%Q{x^(n\n+\n1)^})
       assert_equal "x<sup>(n\n+\n1)</sup>", para.sub_quotes(para.buffer.join)
@@ -190,6 +262,11 @@ context 'Substitutions' do
     test 'single-line subscript chars' do
       para = block_from_string(%q{H~2~O})
       assert_equal 'H<sub>2</sub>O', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped single-line subscript chars' do
+      para = block_from_string(%q{H\~2~O})
+      assert_equal 'H~2~O', para.sub_quotes(para.buffer.join)
     end
 
     test 'multi-line subscript chars' do
@@ -266,6 +343,15 @@ context 'Substitutions' do
       assert para.passthroughs.first[:subs].empty?
     end
 
+    test 'collect multi-line inline triple plus passthroughs' do
+      para = block_from_string("+++<code>inline\ncode</code>+++")
+      result = para.extract_passthroughs(para.buffer.join)
+      assert_equal "\x0" + '0' + "\x0", result
+      assert_equal 1, para.passthroughs.size
+      assert_equal "<code>inline\ncode</code>", para.passthroughs.first[:text]
+      assert para.passthroughs.first[:subs].empty?
+    end
+
     test 'collect inline double dollar passthroughs' do
       para = block_from_string('$$<code>{code}</code>$$')
       result = para.extract_passthroughs(para.buffer.join)
@@ -275,12 +361,30 @@ context 'Substitutions' do
       assert_equal [:specialcharacters], para.passthroughs.first[:subs]
     end
 
+    test 'collect multi-line inline double dollar passthroughs' do
+      para = block_from_string("$$<code>\n{code}\n</code>$$")
+      result = para.extract_passthroughs(para.buffer.join)
+      assert_equal "\x0" + '0' + "\x0", result
+      assert_equal 1, para.passthroughs.size
+      assert_equal "<code>\n{code}\n</code>", para.passthroughs.first[:text]
+      assert_equal [:specialcharacters], para.passthroughs.first[:subs]
+    end
+
     test 'collect passthroughs from inline pass macro' do
-      para = block_from_string(%q{pass:specialcharacters,quotes[<code>['code'\]</code>]})
+      para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['code'\\]</code>]})
       result = para.extract_passthroughs(para.buffer.join)
       assert_equal "\x0" + '0' + "\x0", result
       assert_equal 1, para.passthroughs.size
       assert_equal %q{<code>['code']</code>}, para.passthroughs.first[:text]
+      assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
+    end
+
+    test 'collect multi-line passthroughs from inline pass macro' do
+      para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['more\ncode'\\]</code>]})
+      result = para.extract_passthroughs(para.buffer.join)
+      assert_equal "\x0" + '0' + "\x0", result
+      assert_equal 1, para.passthroughs.size
+      assert_equal %Q{<code>['more\ncode']</code>}, para.passthroughs.first[:text]
       assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
     end
 

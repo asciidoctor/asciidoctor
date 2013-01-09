@@ -228,7 +228,7 @@ module Asciidoctor
     # +++text+++
     # $$text$$
     # pass:quotes[text]
-    :pass_macro       => /\\?(?:(\+{3}|\${2})(.*?)\1|pass:([a-z,]*)\[((?:\\\]|[^\]])*?)\])/,
+    :pass_macro       => /\\?(?:(\+{3}|\${2})(.*?)\1|pass:([a-z,]*)\[((?:\\\]|[^\]])*?)\])/m,
 
     # passthrough macro allowed in value of attribute assignment
     # pass:[text]
@@ -300,7 +300,6 @@ module Asciidoctor
     'caret'      => '^',
     'asterisk'   => '*',
     'tilde'      => '~',
-    'litdd'      => '--',
     'plus'       => '&#43;',
     'apostrophe' => '\'',
     'backslash'  => '\\',
@@ -341,7 +340,7 @@ module Asciidoctor
   QUOTE_SUBS = [
 
     # **strong**
-    [:strong, :unconstrained, /(?:\[([^\]]+?)\])?\*\*(.+?)\*\*/m],
+    [:strong, :unconstrained, /\\?(?:\[([^\]]+?)\])?\*\*(.+?)\*\*/m],
 
     # *strong*
     [:strong, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?\*(\S|\S.*?\S)\*(?=\W|$)/m],
@@ -356,28 +355,28 @@ module Asciidoctor
     [:single, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?=\W|$)/m],
 
     # ++monospaced++
-    [:monospaced, :unconstrained, /(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m],
+    [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m],
 
     # +monospaced+
     [:monospaced, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?=\W|$)/m],
 
     # __emphasis__
-    [:emphasis, :unconstrained, /(?:\[([^\]]+?)\])?\_\_(.+?)\_\_/m],
+    [:emphasis, :unconstrained, /\\?(?:\[([^\]]+?)\])?\_\_(.+?)\_\_/m],
 
     # _emphasis_
     [:emphasis, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?_(\S|\S.*?\S)_(?=\W|$)/m],
 
     # ##unquoted##
-    [:none, :unconstrained, /(?:\[([^\]]+?)\])?##(.+?)##/m],
+    [:none, :unconstrained, /\\?(?:\[([^\]]+?)\])?##(.+?)##/m],
 
     # #unquoted#
     [:none, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?=\W|$)/m],
 
     # ^superscript^
-    [:superscript, :unconstrained, /(?:\[([^\]]+?)\])?\^(.+?)\^/m],
+    [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(.+?)\^/m],
 
     # ~subscript~
-    [:subscript, :unconstrained, /(?:\[([^\]]+?)\])?\~(.+?)\~/m]
+    [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\~(.+?)\~/m]
   ]
 
   # NOTE in Ruby 1.8.7, [^\\] does not match start of line,
@@ -390,6 +389,8 @@ module Asciidoctor
     [/(^|[^\\])\(R\)/, '\1&#174;'],
     # (TM)
     [/(^|[^\\])\(TM\)/, '\1&#8482;'],
+    # foo -- bar
+    [/ -- /, '&#8201;&#8212;&#8201;'],
     # foo--bar
     [/(\w)--(?=\w)/, '\1&#8212;'],
     # ellipsis
