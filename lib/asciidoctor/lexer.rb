@@ -267,11 +267,12 @@ class Asciidoctor::Lexer
           block = Block.new(parent, quote_context, block_reader.lines)
         end
 
-      elsif this_line.match(REGEXP[:lit_blk])
-        # example is surrounded by '....' (4 or more '.' chars) lines
-        buffer = reader.grab_lines_until {|line| line.match( REGEXP[:lit_blk] ) }
+      elsif blk_ctx = [:literal, :pass].detect{|blk_ctx| this_line.match(REGEXP[blk_ctx])}
+        # literal is surrounded by '....' (4 or more '.' chars) lines
+        # pass is surrounded by '++++' (4 or more '+' chars) lines
+        buffer = reader.grab_lines_until {|line| line.match( REGEXP[blk_ctx] ) }
         buffer.last.chomp! unless buffer.empty?
-        block = Block.new(parent, :literal, buffer)
+        block = Block.new(parent, blk_ctx, buffer)
 
       elsif this_line.match(REGEXP[:lit_par])
         # literal paragraph is contiguous lines starting with

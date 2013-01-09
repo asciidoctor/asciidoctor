@@ -111,6 +111,8 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
       @buffer
     when :listing, :literal
       apply_literal_subs(@buffer)
+    when :pass
+      apply_passthrough_subs(@buffer)
     when :quote, :verse, :admonition
       if !@buffer.nil?
         apply_normal_subs(@buffer)

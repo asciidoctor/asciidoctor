@@ -379,8 +379,7 @@ class Asciidoctor::Reader
       m = $~
       subs = []
       if !m[1].empty?
-        sub_options = Asciidoctor::Substituters::COMPOSITE_SUBS.keys + Asciidoctor::Substituters::COMPOSITE_SUBS[:normal]
-        subs = m[1].split(',').map {|sub| sub.to_sym} & sub_options
+        subs = @document.resolve_subs(m[1])
       end
       if !subs.empty?
         @document.apply_subs(m[2], subs)
