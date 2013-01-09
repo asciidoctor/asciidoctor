@@ -58,8 +58,11 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
     attribute_overrides = options[:attributes] || {}
 
-    # the only way to set the safepaths attribute is via the document options
+    # the only way to set the safe-paths attribute is via the document options
     attribute_overrides['safe-paths'] ||= true
+    # the only way to set the include-depth attribute is via the document options
+    # 10 is the AsciiDoc default, though currently Asciidoctor only supports 1 level
+    attribute_overrides['include-depth'] ||= 1
 
     attribute_overrides['docdir'] ||= Dir.pwd
     

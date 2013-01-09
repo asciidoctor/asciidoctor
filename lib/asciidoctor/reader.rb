@@ -260,10 +260,16 @@ class Asciidoctor::Reader
 
     data.each do |line|
       if inc = line.match(REGEXP[:include_macro])
+        # assume that if a block is given, the developer wants
+        # to handle when and how to process the include
         if block_given?
           raw_source.concat yield(inc[1])
-        else
+        elsif inc[0].start_with?('\\')
+          raw_source << line[1..-1]
+        elsif @document.attr('include-depth', 0) > 0
           raw_source.concat File.readlines(build_secure_path(inc[1]))
+        else
+          raw_source << line
         end
       else
         raw_source << line

@@ -167,6 +167,46 @@ last line
       }
       assert_equal 'include-file.asciidoc', doc.attributes['file']
     end
+
+    test 'escaped include macro is left unprocessed' do
+      input = <<-EOS
+\\include::include-file.asciidoc[]
+      EOS
+      para = block_from_string input
+      assert_equal 1, para.buffer.size
+      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+    end
+
+    test 'include macro not at start of line is ignored' do
+      input = <<-EOS
+ include::include-file.asciidoc[]
+      EOS
+      para = block_from_string input
+      assert_equal 1, para.buffer.size
+      # NOTE the space gets stripped because the line is treated as an inline literal
+      assert_equal :literal, para.context
+      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+    end
+
+    test 'include macro is disabled when include-depth attribute is 0' do
+      input = <<-EOS
+include::include-file.asciidoc[]
+      EOS
+      para = block_from_string input, :attributes => { 'include-depth' => 0 }
+      assert_equal 1, para.buffer.size
+      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+    end
+
+    test 'include-depth cannot be set by document' do
+      input = <<-EOS
+:include-depth: 1
+
+include::include-file.asciidoc[]
+      EOS
+      para = block_from_string input, :attributes => { 'include-depth' => 0 }
+      assert_equal 1, para.buffer.size
+      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+    end
   end
 
   context 'build_secure_path' do
