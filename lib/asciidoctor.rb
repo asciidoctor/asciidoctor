@@ -284,7 +284,7 @@ module Asciidoctor
     :endif_macro      => /^endif::/,
 
     # include::chapter1.ad[]
-    :include_macro    => /^include::([^\[]+)\[\]\s*\n?\z/
+    :include_macro    => /^\\?include::([^\[]+)\[\]\s*\n?\z/
   }
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
