@@ -22,12 +22,19 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # Public: Set the String section title.
   attr_writer :title
 
+  # Public: Get/Set the Integer index of this section within the parent block
+  attr_accessor :index
+
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
   def initialize(parent)
     super(parent, :section)
     @title = nil
+    if @level.nil? && !parent.nil?
+      @level = parent.level + 1
+    end
+    @index = 0
   end
 
   # Public: Get the String section title with intrinsics converted
@@ -199,5 +206,57 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #   => 1
   def index(&block)
     @blocks.index(&block)
+  end
+
+  # Public: Get the section number for the current Section
+  #
+  # The section number is a unique, dot separated String
+  # where each entry represents one level of nesting and
+  # the value of each entry is the 1-based index of
+  # the Section amongst its sibling Sections
+  #
+  # delimiter - the delimiter to separate the number for each level
+  # append    - the String to append at the end of the section number
+  #             or Boolean to indicate the delimiter should not be
+  #             appended to the final level
+  #             (default: nil)
+  #
+  # Examples
+  #
+  #   sect1 = Section.new(document)
+  #   sect1.level = 1
+  #   sect1_1 = Section.new(sect1)
+  #   sect1_1.level = 2
+  #   sect1_2 = Section.new(sect1)
+  #   sect1_2.level = 2
+  #   sect1 << sect1_1
+  #   sect1 << sect1_2
+  #   sect1_1_1 = Section.new(sect1_1)
+  #   sect1_1_1.level = 3
+  #   sect1_1 << sect1_1_1
+  #
+  #   sect1.sectnum
+  #   # => 1.
+  #
+  #   sect1_1.sectnum
+  #   # => 1.1.
+  #
+  #   sect1_2.sectnum
+  #   # => 1.2.
+  #
+  #   sect1_1_1.sectnum
+  #   # => 1.1.1.
+  #
+  #   sect1_1_1.sectnum(',', false)
+  #   # => 1,1,1
+  #
+  # Returns the section number as a String
+  def sectnum(delimiter = '.', append = nil)
+    append ||= (append == false ? '' : delimiter)
+    if !@level.nil? && @level > 1 && @parent.is_a?(::Asciidoctor::Section)
+      "#{@parent.sectnum(delimiter)}#{@index + 1}#{append}"
+    else
+      "#{@index + 1}#{append}"
+    end
   end
 end

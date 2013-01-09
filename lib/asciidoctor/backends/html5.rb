@@ -83,7 +83,7 @@ class SectionTemplate < ::Asciidoctor::BaseTemplate
 <%= content %>
 <% else %>
 <div class="sect<%= level %>#{style_class}">
-  <h<%= level + 1 %>#{id}><%= title %></h<%= level + 1 %>>
+  <h<%= level + 1 %>#{id}><% if attr? :numbered %><%= sectnum %> <% end %><%= title %></h<%= level + 1 %>>
   <% if level == 1 %>
   <div class="sectionbody">
 <%= content %>
