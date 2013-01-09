@@ -85,10 +85,10 @@ class Asciidoctor::Lexer
         attributes['id'] = id
         # AsciiDoc always use [id] as the reftext in HTML output,
         # but I'd like to do better in Asciidoctor
-        #parent.document.references[id] = '[' + id + ']'
+        #parent.document.register(:ids, id)
         if reftext
           attributes['reftext'] = reftext
-          parent.document.references[id] = reftext
+          parent.document.register(:ids, [id, reftext])
         end
 
         reader.skip_blank
@@ -134,6 +134,7 @@ class Asciidoctor::Lexer
         target = block.sub_attributes(match[1])
         if !target.to_s.empty?
           attributes['target'] = target
+          block.document.register(:images, target)
           attributes['alt'] ||= File.basename(target, File.extname(target))
         else
           # drop the line if target resolves to nothing
@@ -364,7 +365,7 @@ class Asciidoctor::Lexer
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
       if block.id && block.title && !attributes.has_key?('reftext')
-        block.document.references[block.id] = block.title
+        block.document.register(:ids, [block.id, block.title])
       end
       block.update_attributes(attributes)
 
@@ -472,7 +473,11 @@ class Asciidoctor::Lexer
       m = $~
       next if m[0].start_with? '\\'
       id, reftext = m[1].split(',')
-      document.references[id] = reftext || '[' + id + ']'
+      id.sub!(/^("|)(.*)\1$/, '\2')
+      if !reftext.nil?
+        reftext.sub!(/^("|)(.*)\1$/m, '\2')
+      end
+      document.register(:ids, [id, reftext])
     }
     nil
   end
