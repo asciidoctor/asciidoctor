@@ -126,6 +126,92 @@ context "Headers" do
     end
   end
 
+  context 'Section Numbering' do
+    test 'should create section number with one entry for level 1' do
+      sect1 = Asciidoctor::Section.new(nil)
+      sect1.level = 1
+      assert_equal '1.', sect1.sectnum
+    end
+
+    test 'should create section number with two entries for level 2' do
+      sect1 = Asciidoctor::Section.new(nil)
+      sect1.level = 1
+      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1 << sect1_1
+      assert_equal '1.1.', sect1_1.sectnum
+    end
+
+    test 'should create section number with three entries for level 3' do
+      sect1 = Asciidoctor::Section.new(nil)
+      sect1.level = 1
+      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1 << sect1_1
+      sect1_1_1 = Asciidoctor::Section.new(sect1_1)
+      sect1_1 << sect1_1_1
+      assert_equal '1.1.1.', sect1_1_1.sectnum
+    end
+
+    test 'should create section number for second section in level' do
+      sect1 = Asciidoctor::Section.new(nil)
+      sect1.level = 1
+      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1 << sect1_1
+      sect1_2 = Asciidoctor::Section.new(sect1)
+      sect1 << sect1_2
+      assert_equal '1.2.', sect1_2.sectnum
+    end
+
+    test 'sectnum should use specified delimiter and append string' do
+      sect1 = Asciidoctor::Section.new(nil)
+      sect1.level = 1
+      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1 << sect1_1
+      sect1_1_1 = Asciidoctor::Section.new(sect1_1)
+      sect1_1 << sect1_1_1
+      assert_equal '1,1,1,', sect1_1_1.sectnum(',')
+      assert_equal '1:1:1', sect1_1_1.sectnum(':', false)
+    end
+
+    test 'should render section numbers when numbered attribute is set' do
+      input = <<-EOS
+= Title
+:numbered:
+
+== Section_1 
+
+text
+
+=== Section_1_1
+
+text
+
+==== Section_1_1_1
+
+text
+
+== Section_2
+
+text
+
+=== Section_2_1
+
+text
+
+=== Section_2_2
+
+text
+      EOS
+    
+      output = render_string input
+      assert_xpath '//h2[@id="_section_1"][starts-with(text(), "1. ")]', output, 1
+      assert_xpath '//h3[@id="_section_1_1"][starts-with(text(), "1.1. ")]', output, 1
+      assert_xpath '//h4[@id="_section_1_1_1"][starts-with(text(), "1.1.1. ")]', output, 1
+      assert_xpath '//h2[@id="_section_2"][starts-with(text(), "2. ")]', output, 1
+      assert_xpath '//h3[@id="_section_2_1"][starts-with(text(), "2.1. ")]', output, 1
+      assert_xpath '//h3[@id="_section_2_2"][starts-with(text(), "2.2. ")]', output, 1
+    end
+  end
+
   context "heading patterns in blocks" do
     test "should not interpret a listing block as a heading" do
       input = <<-EOS

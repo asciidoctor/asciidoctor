@@ -63,6 +63,7 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
 <%#encoding:UTF-8%>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE <%= doctype %> PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<% if attr? :numbered %><?asciidoc-numbered?><% end %>
 <% if doctype == 'book' %>
 <book lang="en">
   <bookinfo>
