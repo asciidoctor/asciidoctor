@@ -341,6 +341,15 @@ class BlockVerseTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
+class BlockPassTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOS
+<%#encoding:UTF-8%>
+<%= content %>
+    EOS
+  end
+end
+
 class BlockImageTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOF

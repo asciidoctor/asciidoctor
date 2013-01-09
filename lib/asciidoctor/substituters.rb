@@ -10,6 +10,8 @@ module Asciidoctor
       :verbatim => [:specialcharacters, :callouts]
     }
 
+    SUB_OPTIONS = COMPOSITE_SUBS.keys + COMPOSITE_SUBS[:normal]
+
     # Internal: A String Array of passthough (unprocessed) text captured from this block
     attr_reader :passthroughs
 
@@ -108,7 +110,12 @@ module Asciidoctor
     #
     # returns - A String Array with passthrough substitutions performed
     def apply_passthrough_subs(lines)
-      apply_subs(lines, [:attributes, :macros])
+      if attr? 'subs'
+        subs = resolve_subs(attr('subs'))
+      else
+        subs = [:attributes, :macros]
+      end
+      apply_subs(lines.join, subs)
     end
 
     # Internal: Extract the passthrough text from the document for reinsertion after processing.
@@ -131,7 +138,8 @@ module Asciidoctor
         if m[1] == '$$'
           subs = [:specialcharacters]
         elsif !m[3].nil? && !m[3].empty?
-          subs = m[3].split(',').map {|sub| sub.to_sym}
+          #subs = m[3].split(',').map {|sub| sub.to_sym}
+          subs = resolve_subs(m[3])
         else
           subs = []
         end
@@ -414,6 +422,20 @@ module Asciidoctor
       return {} if attrline.empty?
       
       AttributeList.new(attrline, self).parse(posattrs)
+    end
+
+    # Internal: Resolve the list of comma-delimited subs against the possible options.
+    #
+    # subs - A comma-delimited String of substitution aliases
+    #
+    # returns An Array of Symbols representing the substitution operation
+    def resolve_subs(subs)
+      candidates = subs.split(',').map {|sub| sub.strip.to_sym}
+      resolved = candidates & SUB_OPTIONS 
+      if (invalid = candidates - resolved).size > 0
+        puts "asciidoctor: WARNING: invalid passthrough macro substitution operation#{invalid.size > 1 ? 's' : ''}: #{invalid * ', '}"
+      end 
+      resolved
     end
   end
 end

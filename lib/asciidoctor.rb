@@ -205,7 +205,7 @@ module Asciidoctor
     :listing          => /^\-{4,}\s*$/,
 
     # ....
-    :lit_blk          => /^\.{4,}\s*$/,
+    :literal          => /^\.{4,}\s*$/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
     :lit_par          => /^([[:blank:]]+.*)$/,
@@ -220,6 +220,9 @@ module Asciidoctor
     # i. Foo (lowerroman)
     # I. Foo (upperroman)
     :olist            => /^\s*(\d+\.|[a-z]\.|[ivx]+\)|\.{1,5}) +(.*)$/i,
+
+    # ++++
+    :pass             => /^\+{4,}\s*$/,
 
     # inline passthrough macros
     # +++text+++

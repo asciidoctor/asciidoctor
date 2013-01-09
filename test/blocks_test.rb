@@ -151,6 +151,52 @@ ____
     end
   end
 
+  context 'Passthrough Blocks' do
+    test 'can parse a passthrough block' do
+      input = <<-EOS
+++++
+This is a passthrough block.
+++++
+      EOS
+
+      block = block_from_string input
+      assert !block.nil?
+      assert_equal 1, block.buffer.size
+      assert_equal 'This is a passthrough block.', block.buffer.first
+    end
+
+    test 'performs passthrough subs on a passthrough block' do
+      input = <<-EOS
+:type: passthrough
+
+++++
+This is a '{type}' block.
+http://asciidoc.org
+++++
+      EOS
+
+      expected = %(This is a 'passthrough' block.\n<a href="http://asciidoc.org">http://asciidoc.org</a>\n)
+      output = render_embedded_string input
+      assert_equal expected, output
+    end
+
+    test 'passthrough block honors explicit subs list' do
+      input = <<-EOS
+:type: passthrough
+
+[subs="attributes, quotes"]
+++++
+This is a '{type}' block.
+http://asciidoc.org
+++++
+      EOS
+
+      expected = %(This is a <em>passthrough</em> block.\nhttp://asciidoc.org\n)
+      output = render_embedded_string input
+      assert_equal expected, output
+    end
+  end
+
   context "Images" do
     test "can render block image with alt text" do
       input = <<-EOS
