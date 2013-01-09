@@ -24,7 +24,7 @@ context 'Document' do
       assert !renderer.nil?
       views = renderer.views
       assert !views.nil?
-      assert_equal 24, views.size
+      assert_equal 25, views.size
       assert views.has_key? 'document'
       assert views['document'].is_a?(Asciidoctor::HTML5::DocumentTemplate)
     end
@@ -39,7 +39,7 @@ context 'Document' do
       assert !renderer.nil?
       views = renderer.views
       assert !views.nil?
-      assert_equal 24, views.size
+      assert_equal 25, views.size
       assert views.has_key? 'document'
       assert views['document'].is_a?(Asciidoctor::DocBook45::DocumentTemplate)
     end
