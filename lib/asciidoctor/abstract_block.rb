@@ -1,8 +1,4 @@
 class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
-  # Public: Get/Set the String list item anchor name.
-  # deprecated, use id instead
-  alias :anchor :id
-
   # Public: Get the Array of Asciidoctor::AbstractBlock sub-blocks for this block
   attr_reader :blocks
 

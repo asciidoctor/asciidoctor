@@ -39,7 +39,7 @@ class Asciidoctor::Renderer
       files = Dir.glob(File.join(template_dir, '*')).select{|f| File.stat(f).file?}
       files.inject(@views) do |view_hash, view|
         name = File.basename(view).split('.').first
-        view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>'))
+        view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>', :attr_wrapper => '"'))
       end
       
       Asciidoctor.debug "Views are now like so:"

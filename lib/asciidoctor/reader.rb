@@ -354,7 +354,7 @@ class Asciidoctor::Reader
     # plus, this should be done while we are walking lines above
     #@lines.each do |line|
     #  if biblio = line.match(REGEXP[:biblio])
-    #    @document.references[biblio[1]] = "[#{biblio[1]}]"
+    #    @document.register(:ids, biblio[1])
     #  end
     #end
 

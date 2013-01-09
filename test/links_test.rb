@@ -49,7 +49,7 @@ context 'Links' do
   test 'inline ref' do
     doc = document_from_string 'Here you can read about tigers.[[tigers]]'
     output = doc.render
-    assert_equal '[tigers]', doc.references['tigers']
+    assert_equal '[tigers]', doc.references[:ids]['tigers']
     assert_xpath '//a[@id = "tigers"]', output, 1
     assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
   end
@@ -57,7 +57,7 @@ context 'Links' do
   test 'inline ref with reftext' do
     doc = document_from_string 'Here you can read about tigers.[[tigers,Tigers]]'
     output = doc.render
-    assert_equal 'Tigers', doc.references['tigers']
+    assert_equal 'Tigers', doc.references[:ids]['tigers']
     assert_xpath '//a[@id = "tigers"]', output, 1
     assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
   end
@@ -65,18 +65,22 @@ context 'Links' do
   test 'escaped inline ref' do
     doc = document_from_string 'Here you can read about tigers.\[[tigers]]'
     output = doc.render
-    assert !doc.references.has_key?('tigers')
+    assert !doc.references[:ids].has_key?('tigers')
     assert_xpath '//a[@id = "tigers"]', output, 0
   end
 
   test 'xref using angled bracket syntax' do
     doc = document_from_string '<<tigers>>'
-    doc.references['tigers'] = '[tigers]'
+    doc.references[:ids]['tigers'] = '[tigers]'
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
   test 'xref using angled bracket syntax with label' do
     assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string('<<tigers,About Tigers>>'), 1
+  end
+
+  test 'xref using angled bracket syntax with quoted label' do
+    assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string('<<tigers,"About Tigers">>'), 1
   end
 
   test 'xref using angled bracket syntax inline with text' do
@@ -89,7 +93,7 @@ context 'Links' do
 
   test 'xref using macro syntax' do
     doc = document_from_string 'xref:tigers[]'
-    doc.references['tigers'] = '[tigers]'
+    doc.references[:ids]['tigers'] = '[tigers]'
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
@@ -107,13 +111,28 @@ context 'Links' do
 
   test 'xref using invalid macro syntax does not create link' do
     doc = document_from_string 'xref:tigers'
-    doc.references['tigers'] = '[tigers]'
+    doc.references[:ids]['tigers'] = '[tigers]'
     assert_xpath '//a', doc.render, 0
   end
 
   test 'xref creates link for unknown reference' do
     doc = document_from_string '<<tigers>>'
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
+  end
+
+  test 'anchor creates reference' do
+    doc = document_from_string "[[tigers]]Tigers roam here."
+    assert_equal({'tigers' => '[tigers]'}, doc.references[:ids])
+  end
+
+  test 'anchor with label creates reference' do
+    doc = document_from_string "[[tigers,Tigers]]Tigers roam here."
+    assert_equal({'tigers' => 'Tigers'}, doc.references[:ids])
+  end
+
+  test 'anchor with quoted label creates reference' do
+    doc = document_from_string %([["tigers","Tigers roam here"]]Tigers roam here.)
+    assert_equal({'tigers' => "Tigers roam here"}, doc.references[:ids])
   end
 
 end

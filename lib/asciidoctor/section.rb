@@ -6,7 +6,7 @@
 #
 #   section = Asciidoctor::Section.new
 #   section.title = 'DESCRIPTION'
-#   section.anchor = 'DESCRIPTION'
+#   section.id = 'DESCRIPTION'
 #
 #   section.size
 #   => 0
@@ -257,6 +257,14 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
       "#{@parent.sectnum(delimiter)}#{@index + 1}#{append}"
     else
       "#{@index + 1}#{append}"
+    end
+  end
+
+  def to_s
+    if @title
+      "#{super.to_s} - #@title [blocks:#{@blocks.size}]"
+    else
+      super.to_s
     end
   end
 end
