@@ -112,10 +112,10 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
     </dt>
     <% unless dd.nil? %>
     <dd>
-      <% if dd.has_text? %>
+      <% if dd.text? %>
       <p><%= dd.text %></p>
       <% end %>
-      <% if dd.has_section_body? %>
+      <% if dd.blocks? %>
 <%= dd.content %>
       <% end %>
     </dd>
@@ -321,7 +321,7 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
   <% content.each do |li| %>
     <li>
       <p><%= li.text %></p>
-      <% if li.has_section_body? %>
+      <% if li.blocks? %>
 <%= li.content %>
       <% end %>
     </li>
@@ -344,7 +344,7 @@ class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
   <% content.each do |li| %>
     <li>
       <p><%= li.text %></p>
-      <% if li.has_section_body? %>
+      <% if li.blocks? %>
 <%= li.content %>
       <% end %>
     </li>

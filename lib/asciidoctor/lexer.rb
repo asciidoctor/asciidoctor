@@ -706,7 +706,7 @@ class Asciidoctor::Lexer
     Asciidoctor.debug "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
 
     if list_type == :dlist
-      unless list_item.has_text? || !list_item.blocks.empty?
+      unless list_item.text? || list_item.blocks?
         list_item = nil
       end
       [list_term, list_item]
@@ -804,8 +804,12 @@ class Asciidoctor::Lexer
               :break_on_blank_lines => true,
               :break_on_list_continuation => true)
           else
-            if !within_nested_list && NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
+            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
               within_nested_list = true
+              if nested_list_type == :dlist && $~[3].to_s.empty?
+                # get greedy again
+                has_text = false
+              end
             end
             buffer << this_line
           end
@@ -825,8 +829,8 @@ class Asciidoctor::Lexer
           else
             # has_text is only relevant for dlist, which is more greedy until it has text for an item
             # for all other lists, has_text is always true
-            # in this block, we have to see whether we hold on to the list
-            if has_text && !within_nested_list
+            # in this block, we have to see whether we stay in the list
+            if has_text
               # slurp up any literal paragraph offset by blank lines
               if this_line.match(REGEXP[:lit_par])
                 reader.unshift this_line
@@ -834,28 +838,38 @@ class Asciidoctor::Lexer
                   :preserve_last_line => true,
                   :break_on_blank_lines => true,
                   :break_on_list_continuation => true)
+              # TODO any way to combine this with the check after skipping blank lines?
               elsif is_sibling_list_item?(this_line, list_type, sibling_trait)
-                buffer.pop unless within_nested_list
+                #buffer.pop unless within_nested_list
                 break
-              elsif NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
-                buffer.pop unless within_nested_list
+              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
+                #buffer.pop unless within_nested_list
                 buffer << this_line
                 within_nested_list = true
+                if nested_list_type == :dlist && $~[3].to_s.empty?
+                  # get greedy again
+                  has_text = false
+                end
               else
                 break
               end
             else # only dlist in need of item text, so slurp it up!
+              # pop the blank line so it's not interpretted as a list continuation
               buffer.pop unless within_nested_list
               buffer << this_line
               has_text = true
             end
           end
         else
-          if !within_nested_list && NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
+          has_text = true if !this_line.strip.empty?
+          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
             within_nested_list = true
+            if nested_list_type == :dlist && $~[3].to_s.empty?
+              # get greedy again
+              has_text = false
+            end
           end
           buffer << this_line
-          has_text = true if !this_line.strip.empty?
         end
       end
       this_line = nil

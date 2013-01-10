@@ -27,7 +27,7 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
   # TODO we still need another method that answers
   # whether this Block *can* have block content
   # that should be the option 'sectionbody'
-  def has_section_body?
+  def blocks?
     !blocks.empty?
   end
 

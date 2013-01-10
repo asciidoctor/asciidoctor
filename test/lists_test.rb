@@ -588,6 +588,31 @@ List
       assert_xpath '((//ul)[1]/li//ol)[1]/li', output, 1
     end
 
+    test 'list item with literal content should not consume nested list of different type' do
+      input = <<-EOS
+List
+====
+
+- bullet
+
+  literal
+  but not
+  hungry
+
+. numbered
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//li', output, 2
+      assert_xpath '//ul//ol', output, 1
+      assert_xpath '//ul/li/p', output, 1
+      assert_xpath '//ul/li/p[text()="bullet"]', output, 1
+      assert_xpath '//ul/li/p/following-sibling::*[@class="literalblock"]', output, 1
+      assert_xpath %(//ul/li/p/following-sibling::*[@class="literalblock"]//pre[text()="literal\nbut not\nhungry"]), output, 1
+      assert_xpath '//*[@class="literalblock"]/following-sibling::*[@class="olist arabic"]', output, 1
+      assert_xpath '//*[@class="literalblock"]/following-sibling::*[@class="olist arabic"]//p[text()="numbered"]', output, 1
+    end
+
     test "lines with alternating markers of bulleted and labeled list types separated by blank lines should be nested" do
       input = <<-EOS
 List
@@ -2159,6 +2184,31 @@ detached
       assert_xpath '//*[@class="dlist"]//dd/p[text()="def1"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]/p[text()="detached"]', output, 1
+    end
+
+    test 'nested term with definition does not consume following heading' do
+      input = <<-EOS
+== Lists
+
+term::
+  def
+  nestedterm;;
+    nesteddef
+
+Detached
+~~~~~~~~
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//*[@class="dlist"]/dl', output, 2
+      assert_xpath '//*[@class="dlist"]//dd', output, 2
+      assert_xpath '//*[@class="dlist"]/dl//dl', output, 1
+      assert_xpath '//*[@class="dlist"]/dl//dl/dt', output, 1
+      assert_xpath '((//*[@class="dlist"])[1]//dd)[1]/p[text()="def"]', output, 1
+      assert_xpath '((//*[@class="dlist"])[1]//dd)[1]/p/following-sibling::*[@class="dlist"]', output, 1
+      assert_xpath '((//*[@class="dlist"])[1]//dd)[1]/p/following-sibling::*[@class="dlist"]//dd/p[text()="nesteddef"]', output, 1
+      assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="sect2"]', output, 1
+      assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="sect2"]/h3[text()="Detached"]', output, 1
     end
   
     test 'line attached by continuation is appended as paragraph if term has inline definition followed by detached paragraph' do

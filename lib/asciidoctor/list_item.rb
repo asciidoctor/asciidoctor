@@ -14,7 +14,7 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
     @level = parent.level
   end
 
-  def has_text?
+  def text?
     !@text.to_s.empty?
   end
 
@@ -24,7 +24,7 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
   end
 
   def content
-    has_section_body? ? blocks.map {|b| b.render }.join : nil
+    blocks? ? blocks.map {|b| b.render }.join : nil
   end
 
   # Public: Fold the first paragraph block into the text
