@@ -702,7 +702,14 @@ class Asciidoctor::Lexer
 
     Asciidoctor.debug "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
 
-    list_type == :dlist ? [list_term, list_item] : list_item
+    if list_type == :dlist
+      unless list_item.has_text? || !list_item.blocks.empty?
+        list_item = nil
+      end
+      [list_term, list_item]
+    else
+      list_item
+    end
   end
 
   # Internal: Collect the lines belonging to the current list item, navigating

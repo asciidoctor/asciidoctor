@@ -916,6 +916,22 @@ term2::
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
+    test "multi-line element with multiple terms" do
+      input = <<-EOS
+term1::
+term2::
+def2
+      EOS
+      output = render_string input
+      assert_xpath '//dl', output, 1
+      assert_xpath '//dl/dt', output, 2
+      assert_xpath '//dl/dd', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dt', output, 1
+      assert_xpath '(//dl/dt)[1][normalize-space(text()) = "term1"]', output, 1
+      assert_xpath '(//dl/dt)[2]/following-sibling::dd', output, 1
+      assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
+    end
+
     test "multi-line elements with blank line before paragraph content" do
       input = <<-EOS
 term1::

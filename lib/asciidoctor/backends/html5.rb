@@ -112,7 +112,7 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
     </dt>
     <% unless dd.nil? %>
     <dd>
-      <% unless dd.text.to_s.empty? %>
+      <% if dd.has_text? %>
       <p><%= dd.text %></p>
       <% end %>
       <% if dd.has_section_body? %>

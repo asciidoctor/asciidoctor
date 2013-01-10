@@ -14,6 +14,10 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
     @level = parent.level
   end
 
+  def has_text?
+    !@text.to_s.empty?
+  end
+
   def text
     # this will allow the text to be processed
     ::Asciidoctor::Block.new(self, nil, [@text]).content
