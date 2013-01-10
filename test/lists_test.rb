@@ -1366,6 +1366,29 @@ term2:: def2
       assert_xpath '(//dl//dl/dt)[2]/following-sibling::dd/p[text() = "detail2"]', output, 1
     end
 
+    test "multi-line element with indented nested element" do
+      input = <<-EOS
+term1::
+  def1
+  label1;;
+   detail1
+term2::
+  def2
+      EOS
+      output = render_string input
+      assert_xpath '//dl', output, 2
+      assert_xpath '//dl//dl', output, 1
+      assert_xpath '(//dl)[1]/dt', output, 2
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '((//dl)[1]/dt)[1][normalize-space(text()) = "term1"]', output, 1
+      assert_xpath '((//dl)[1]/dt)[1]/following-sibling::dd/p[text() = "def1"]', output, 1
+      assert_xpath '//dl//dl/dt', output, 1
+      assert_xpath '//dl//dl/dt[normalize-space(text()) = "label1"]', output, 1
+      assert_xpath '//dl//dl/dt/following-sibling::dd/p[text() = "detail1"]', output, 1
+      assert_xpath '((//dl)[1]/dt)[2][normalize-space(text()) = "term2"]', output, 1
+      assert_xpath '((//dl)[1]/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
+    end
+
     test "mixed single and multi-line elements with indented nested elements" do
       input = <<-EOS
 term1:: def1
@@ -1849,6 +1872,7 @@ term1::
 notnestedterm:::
 +
   literal
+notnestedterm:::
       EOS
   
       output = render_embedded_string input
@@ -1856,8 +1880,7 @@ notnestedterm:::
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p', output, 0
       assert_xpath '//*[@class="dlist"]//dd/*[@class="literalblock"]', output, 2
-      assert_xpath %((//*[@class="dlist"]//dd/*[@class="literalblock"])[1]//pre[text()="  literal\nnotnestedterm:::"]), output, 1
-      assert_xpath '(//*[@class="dlist"]//dd/*[@class="literalblock"])[2]//pre[text()="literal"]', output, 1
+      assert_xpath %(//*[@class="dlist"]//dd/*[@class="literalblock"]//pre[text()="  literal\nnotnestedterm:::"]), output, 2
     end
   
     test 'line attached by continuation is appended as paragraph if term has no inline definition' do
@@ -1926,8 +1949,7 @@ detached
   
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
-      assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath '//*[@class="dlist"]//dd/*', output, 0
+      assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="exampleblock"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="exampleblock"]//p[text()="detached"]', output, 1
     end
@@ -1943,8 +1965,7 @@ detached
   
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
-      assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath '//*[@class="dlist"]//dd/*', output, 0
+      assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="verseblock"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="verseblock"]/pre[text()="detached"]', output, 1
     end
@@ -1960,8 +1981,7 @@ detached
   
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
-      assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath '//*[@class="dlist"]//dd/*', output, 0
+      assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]/p[text()="detached"]', output, 1
     end

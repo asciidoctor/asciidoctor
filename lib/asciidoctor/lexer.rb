@@ -416,6 +416,9 @@ class Asciidoctor::Lexer
         # So we need to actually include this one in the grab_lines group
         reader.unshift this_line
         buffer = reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true) {|line|
+          # labeled list terms can be indented, but a preceding blank indicates
+          # we are in a list continuation and therefore literals should be strictly literal
+          (context == :dlist && skipped == 0 && line.match(REGEXP[:dlist])) ||
           line.match(REGEXP[:any_blk])
         }
 
@@ -796,7 +799,10 @@ class Asciidoctor::Lexer
           # list item will throw off the exit from it
           if this_line.match(REGEXP[:lit_par])
             reader.unshift this_line
-            buffer.concat reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true, :break_on_list_continuation => true)
+            buffer.concat reader.grab_lines_until(
+              :preserve_last_line => true,
+              :break_on_blank_lines => true,
+              :break_on_list_continuation => true)
           else
             if !within_nested_list && NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
               within_nested_list = true
@@ -824,7 +830,10 @@ class Asciidoctor::Lexer
               # slurp up any literal paragraph offset by blank lines
               if this_line.match(REGEXP[:lit_par])
                 reader.unshift this_line
-                buffer.concat reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true, :break_on_list_continuation => true)
+                buffer.concat reader.grab_lines_until(
+                  :preserve_last_line => true,
+                  :break_on_blank_lines => true,
+                  :break_on_list_continuation => true)
               elsif is_sibling_list_item?(this_line, list_type, sibling_trait)
                 buffer.pop unless within_nested_list
                 break
@@ -867,6 +876,7 @@ class Asciidoctor::Lexer
       buffer.pop
     end
     #puts "BUFFER>#{buffer.join}<BUFFER"
+    #puts "BUFFER>#{buffer}<BUFFER"
 
     buffer
   end
