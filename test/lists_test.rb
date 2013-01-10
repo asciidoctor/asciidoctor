@@ -613,6 +613,26 @@ List
       assert_xpath '//*[@class="literalblock"]/following-sibling::*[@class="olist arabic"]//p[text()="numbered"]', output, 1
     end
 
+    test 'nested list item does not eat the title of the following detached block' do
+      input = <<-EOS
+List
+====
+
+- bullet
+  * nested bullet 1
+  * nested bullet 2
+
+.Title
+....
+literal
+....
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//*[@class="ulist"]/ul', output, 2
+      assert_xpath '(//*[@class="ulist"])[1]/following-sibling::*[@class="literalblock"]', output, 1
+      assert_xpath '(//*[@class="ulist"])[1]/following-sibling::*[@class="literalblock"]/*[@class="title"]', output, 1
+    end
+
     test "lines with alternating markers of bulleted and labeled list types separated by blank lines should be nested" do
       input = <<-EOS
 List
