@@ -125,6 +125,6 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   end
 
   def to_s
-    %[#{super.to_s} - #@context [blocks:#{@blocks.size}]]
+    "#{super.to_s} - #@context [blocks:#{@blocks.size}]"
   end
 end

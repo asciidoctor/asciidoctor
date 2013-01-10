@@ -2,26 +2,9 @@ require 'test_helper'
 
 context "Lexer" do
 
-  test "test_is_section_heading" do
-    assert Asciidoctor::Lexer.is_section_heading?("AsciiDoc Home Page", "==================")
-    assert Asciidoctor::Lexer.is_section_heading?("=== AsciiDoc Home Page")
-  end
-
-  test "test_is_title_section" do
-    section = Asciidoctor::Section.new(Asciidoctor::Document.new)
-    section.level = 0
-    assert Asciidoctor::Lexer.is_title_section?(section, section.document)
-  end
-
-  test "test_is_not_title_section" do
-    section = Asciidoctor::Section.new(Asciidoctor::Document.new)
-    section.level = 1
-    assert !Asciidoctor::Lexer.is_title_section?(section, section.document)
-    section.level = 0
-    another_section = Asciidoctor::Section.new(Asciidoctor::Document.new)
-    another_section.level = 0
-    section.document << section
-    assert !Asciidoctor::Lexer.is_title_section?(another_section, section.document)
+  test "test_is_section_title" do
+    assert Asciidoctor::Lexer.is_section_title?('AsciiDoc Home Page', '==================')
+    assert Asciidoctor::Lexer.is_section_title?('=== AsciiDoc Home Page')
   end
 
   test "collect unnamed attribute" do

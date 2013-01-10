@@ -1861,7 +1861,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]/p[text()="para"]', output, 1
     end
   
-    test 'line attached by continuation offset by blank line and line comment is appended as paragraph if term has no inline definition' do
+    test 'appends line as paragraph if attached by continuation following blank line and line comment when term has no inline definition' do
       input = <<-EOS
 == Lists
 

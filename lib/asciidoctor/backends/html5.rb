@@ -248,6 +248,15 @@ class BlockOpenTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
+class BlockPassTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOS
+<%#encoding:UTF-8%>
+<%= content %>
+    EOS
+  end
+end
+
 class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
@@ -362,15 +371,6 @@ class BlockColistTemplate < ::Asciidoctor::BaseTemplate
   <% end %>
   </ol>
 </div>
-    EOS
-  end
-end
-
-class BlockPassTemplate < ::Asciidoctor::BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOS
-<%#encoding:UTF-8%>
-<%= content %>
     EOS
   end
 end
