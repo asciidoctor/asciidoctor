@@ -128,7 +128,7 @@ class Asciidoctor::Lexer
       section = initialize_section(reader, parent, attributes)
       # clear attributes, except for title which carries over
       # section title to next block of content
-      attributes = attributes.keep_if {|k, v| k == 'title'}
+      attributes = attributes.delete_if {|k, v| k != 'title'}
       current_level = section.level
       expected_next_levels = [current_level + 1]
     end
