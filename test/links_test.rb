@@ -26,6 +26,18 @@ context 'Links' do
     assert_xpath '//a[@href="http://asciidoc.org"][text()="http://asciidoc.org"]', render_string('<http://asciidoc.org> is the project page for AsciiDoc.'), 1
   end
 
+  test 'qualified url surrounded by round brackets' do
+    assert_xpath '//a[@href="http://asciidoc.org"][text()="http://asciidoc.org"]', render_string('(http://asciidoc.org) is the project page for AsciiDoc.'), 1
+  end
+
+  test 'qualified url adjacent to text in square brackets' do
+    assert_xpath '//a[@href="http://asciidoc.org"][text()="AsciiDoc"]', render_string(']http://asciidoc.org[AsciiDoc] project page.'), 1
+  end
+
+  test 'qualified url adjacent to text in round brackets' do
+    assert_xpath '//a[@href="http://asciidoc.org"][text()="AsciiDoc"]', render_string(')http://asciidoc.org[AsciiDoc] project page.'), 1
+  end
+
   test 'qualified url using invalid link macro should not create link' do
     assert_xpath '//a', render_string('link:http://asciidoc.org is the project page for AsciiDoc.'), 0
   end

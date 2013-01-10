@@ -82,6 +82,9 @@ class Asciidoctor::Reader
 
     skipped
   end
+  # Create alias of skip_blank named skip_blank_lines for readability
+  # TODO likely want to drop the original method name
+  alias :skip_blank_lines :skip_blank
 
   # Public: Consume consecutive lines containing line- or block-level comments.
   #
@@ -96,11 +99,13 @@ class Asciidoctor::Reader
   #
   #   @lines
   #   => ["actual text\n"]
-  def consume_comments
+  def consume_comments(opts = {})
     comment_lines = []
     while !@lines.empty?
       next_line = peek_line
-      if next_line.match(REGEXP[:comment_blk])
+      if opts[:include_blanks] && next_line.strip.empty?
+        comment_lines << get_line
+      elsif next_line.match(REGEXP[:comment_blk])
         comment_lines << get_line
         comment_lines.push(*(grab_lines_until(:preserve_last_line => true) {|line| line.match(REGEXP[:comment_blk])}))
         comment_lines << get_line
@@ -158,6 +163,9 @@ class Asciidoctor::Reader
   def get_line
     @lines.shift
   end
+  # QUESTION what about advance?
+  # Create an alias of get_line named next_line for readability
+  alias :next_line :get_line
 
   # Public: Get the next line of source data. Does not consume the line returned.
   #
@@ -192,6 +200,8 @@ class Asciidoctor::Reader
   # options - an optional Hash of processing options:
   #           * :break_on_blank_lines may be used to specify to break on
   #               blank lines
+  #           * :skip_first_line may be used to tell the reader to advance
+  #               beyond the first line before beginning the scan
   #           * :preserve_last_line may be used to specify that the String
   #               causing the method to stop processing lines should be
   #               pushed back onto the `lines` Array.
@@ -213,6 +223,7 @@ class Asciidoctor::Reader
     buffer = []
 
     finis = false
+    get_line if options[:skip_first_line]
     while (this_line = self.get_line)
       Asciidoctor.debug "Processing line: '#{this_line}'"
       finis = true if options[:break_on_blank_lines] && this_line.strip.empty?

@@ -98,31 +98,31 @@ context "Headers" do
 
   context "level 2" do 
     test "with multiline syntax" do
-      assert_xpath "//h3[@id='_my_section'][text() = 'My Section']", render_string("My Section\n~~~~~~~~~~~")
+      assert_xpath "//h3[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n~~~~~~~~~~~")
     end
 
     test "with single line syntax" do
-      assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", render_string("=== My Title")
+      assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n=== My Title")
     end
   end  
 
   context "level 3" do 
     test "with multiline syntax" do
-      assert_xpath "//h4[@id='_my_section'][text() = 'My Section']", render_string("My Section\n^^^^^^^^^^")
+      assert_xpath "//h4[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n^^^^^^^^^^")
     end
 
     test "with single line syntax" do
-      assert_xpath "//h4[@id='_my_title'][text() = 'My Title']", render_string("==== My Title")
+      assert_xpath "//h4[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n==== My Title")
     end
   end
 
   context "level 4" do 
     test "with multiline syntax" do
-      assert_xpath "//h5[@id='_my_section'][text() = 'My Section']", render_string("My Section\n++++++++++")
+      assert_xpath "//h5[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n++++++++++")
     end
 
     test "with single line syntax" do
-      assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", render_string("===== My Title")
+      assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n===== My Title")
     end
   end
 
@@ -209,6 +209,28 @@ text
       assert_xpath '//h2[@id="_section_2"][starts-with(text(), "2. ")]', output, 1
       assert_xpath '//h3[@id="_section_2_1"][starts-with(text(), "2.1. ")]', output, 1
       assert_xpath '//h3[@id="_section_2_2"][starts-with(text(), "2.2. ")]', output, 1
+    end
+
+    test 'blocks should have level' do
+      input = <<-EOS
+= Title
+
+preamble
+
+== Section 1
+
+paragraph
+
+=== Section 1.1
+
+paragraph
+      EOS
+      doc = document_from_string input
+      assert_equal 0, doc.blocks[0].level
+      assert_equal 1, doc.blocks[1].level
+      assert_equal 1, doc.blocks[1].blocks[0].level
+      assert_equal 2, doc.blocks[1].blocks[1].level
+      assert_equal 2, doc.blocks[1].blocks[1].blocks[0].level
     end
   end
 

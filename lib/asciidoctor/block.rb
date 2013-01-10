@@ -31,6 +31,10 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
     @title = nil
   end
 
+  def title?
+    !@title.to_s.empty?
+  end
+
   # Public: Get the rendered String content for this Block.  If the block
   # has child blocks, the content method should cause them to be
   # rendered and returned as content that can be included in the
@@ -125,6 +129,6 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   end
 
   def to_s
-    %[#{super.to_s} - #@context [blocks:#{@blocks.size}]]
+    "#{super.to_s} - #@context [blocks:#{@blocks.size}]"
   end
 end

@@ -134,11 +134,9 @@ module Asciidoctor
           next m[0][1..-1]
         end
 
-        # TODO warn if we don't recognize the sub
         if m[1] == '$$'
           subs = [:specialcharacters]
         elsif !m[3].nil? && !m[3].empty?
-          #subs = m[3].split(',').map {|sub| sub.to_sym}
           subs = resolve_subs(m[3])
         else
           subs = []
@@ -232,7 +230,6 @@ module Asciidoctor
     # If an attribute referenced in the line is missing, the line is dropped.
     #
     # text     - The String text to process
-    # document - The document to which this text belongs, required to access global attributes map
     #
     # returns The String text with the attribute references replaced with attribute values
     #--
@@ -288,7 +285,7 @@ module Asciidoctor
           next m[0][1..-1]
         end
         target = sub_attributes(m[1])
-        document.register(:images, target)
+        @document.register(:images, target)
         attrs = parse_attributes(m[2], ['alt', 'width', 'height'])
         if !attrs.has_key?('alt') || attrs['alt'].empty?
           attrs['alt'] = File.basename(target, File.extname(target))
@@ -317,7 +314,7 @@ module Asciidoctor
         if target.end_with? '&gt;'
           target = target[0..-5]
         end
-        document.register(:links, target)
+        @document.register(:links, target)
         text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
         "#{prefix}#{Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render}"
       } unless !result.include?('http')
@@ -331,7 +328,7 @@ module Asciidoctor
           next m[0][1..-1]
         end
         target = m[1]
-        document.register(:links, target)
+        @document.register(:links, target)
         text = sub_attributes(m[2].gsub('\]', ']'))
         Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
       } unless !result.include?('link:')
@@ -369,7 +366,7 @@ module Asciidoctor
           reftext.sub!(/^("|)(.*)\1$/m, '\2')
         end
         # NOTE the reftext should also match what's in our references dic
-        if !document.references[:ids].has_key? id
+        if !@document.references[:ids].has_key? id
           Asciidoctor.debug "Missing reference for anchor #{id}"
         end
         Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
