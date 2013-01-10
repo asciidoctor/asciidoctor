@@ -110,7 +110,7 @@ class Asciidoctor::AbstractNode
 
   # Public: Generate a data URI that can be used to embed an image in the output document
   #
-  # First, and foremost, the target image path is cleaned if the 'safepaths' attribute is
+  # First, and foremost, the target image path is cleaned if the 'safe-paths' attribute is
   # set (on by default) to prevent access to ancestor paths in the filesystem. The
   # image data is then read and converted to Base64. Finally, a data URI is built which
   # can be used in an image tag.
@@ -186,7 +186,7 @@ class Asciidoctor::AbstractNode
       asset_path = asset_path.cleanpath.to_s
     end
 
-    if document.attr('safepaths', true)
+    if document.attr('safe-paths', true)
       relative_asset_dir = Pathname.new(asset_path).relative_path_from(Pathname.new(input_path)).to_s
       if relative_asset_dir.start_with?('..')
         puts 'asciidoctor: WARNING: ' + asset_name + ' has illegal reference to ancestor of docdir'

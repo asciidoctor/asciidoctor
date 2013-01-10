@@ -359,7 +359,7 @@ image::dot.gif[Dot]
     end
 
     # this test will cause a warning to be printed to the console (until we have a message facility)
-    test 'does not allow access to ancestor directories to read image if safepaths attribute is set' do
+    test 'does not allow access to ancestor directories to read image if safe-paths attribute is set' do
       input = <<-EOS
 :data-uri:
 :imagesdir: ../fixtures
@@ -415,7 +415,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
-    test 'does not allow access to ancestor directories to read icon if safepaths attribute is set' do
+    test 'does not allow access to ancestor directories to read icon if safe-paths attribute is set' do
       input = <<-EOS
 :icons:
 :iconsdir: ../fixtures
@@ -433,7 +433,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 
   context 'Image paths' do
 
-    test 'restricts access to ancestor directories when safepaths is enabled' do
+    test 'restricts access to ancestor directories when safe-paths is enabled' do
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
@@ -447,14 +447,14 @@ image::asciidoctor.png[Asciidoctor]
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('../../images')
     end
 
-    test "doesn't restrict access to ancestor directories when safepaths is disabled" do
+    test "doesn't restrict access to ancestor directories when safe-paths is disabled" do
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
       basedir = File.dirname(__FILE__)
-      block = block_from_string input, :attributes => {'docdir' => basedir, 'safepaths' => false}
+      block = block_from_string input, :attributes => {'docdir' => basedir, 'safe-paths' => false}
       doc = block.document
-      assert doc.attr('safepaths') == false
+      assert doc.attr('safe-paths') == false
 
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
       assert_equal '/etc/images', block.normalize_asset_path('/etc/images')
