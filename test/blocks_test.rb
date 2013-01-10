@@ -331,19 +331,6 @@ image::tiger.png[Tiger]
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
-    test 'can resolve image relative to imagesdir' do
-      input = <<-EOS
-:imagesdir: images
-
-image::tiger.png[Tiger]
-      EOS
-
-      doc = document_from_string input
-      assert_equal 'images', doc.attributes['imagesdir']
-      output = doc.render
-      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
-    end
-
     test 'embeds base64-encoded data uri for image when data-uri attribute is set' do
       input = <<-EOS
 :data-uri:

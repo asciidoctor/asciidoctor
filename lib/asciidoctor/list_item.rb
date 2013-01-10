@@ -70,4 +70,8 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
     end
     nil
   end
+
+  def to_s
+    "#{super.to_s} - #@context [text:#@text, blocks:#{@blocks.size}]"
+  end
 end

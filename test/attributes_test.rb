@@ -328,7 +328,7 @@ paragraph
       assert_equal 'coolio', subsec.id
     end
 
-    test "Trailing block attributes reassociate with following section" do
+    test "trailing block attributes tranfer to the following section" do
       input = <<-EOS
 [[one]]
 
@@ -360,7 +360,6 @@ content
       assert_equal 'sub', subsection.id
       section_two = doc.blocks.last
       assert_equal 'classy', section_two.attr(:role)
-      assert !doc.attributes.has_key?('orphaned')
     end
   end
 

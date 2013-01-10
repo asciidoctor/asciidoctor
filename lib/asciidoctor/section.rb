@@ -5,14 +5,14 @@
 # Examples
 #
 #   section = Asciidoctor::Section.new
-#   section.title = 'DESCRIPTION'
-#   section.id = 'DESCRIPTION'
+#   section.title = 'Section 1'
+#   section.id = 'sect1'
 #
 #   section.size
 #   => 0
 #
 #   section.id
-#   => "description"
+#   => "sect1"
 #
 #   section << new_block
 #   section.size
@@ -28,10 +28,10 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
-  def initialize(parent)
+  def initialize(parent = nil, level = nil)
     super(parent, :section)
     @title = nil
-    if @level.nil? && !parent.nil?
+    if level.nil? && !parent.nil?
       @level = parent.level + 1
     end
     @index = 0
@@ -41,9 +41,9 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #
   # Examples
   #
-  #   section.title = "Foo 3^ # {litdd} Bar(1)"
+  #   section.title = "Foo 3^ # {two-colons} Bar(1)"
   #   section.title
-  #   => "Foo 3^ # -- Bar(1)"
+  #   => "Foo 3^ # :: Bar(1)"
   #
   # Returns the String section title
   def title
@@ -109,105 +109,6 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
     end.join
   end
 
-  # Public: Get the Integer number of blocks in the section.
-  #
-  # Examples
-  #
-  #   section = Section.new
-  #
-  #   section.size
-  #   => 0
-  #
-  #   section << 'foo'
-  #   section << 'bar'
-  #   section.size
-  #   => 2
-  def size
-    @blocks.size
-  end
-
-  # Public: Get the element at i in the array of section blocks.
-  #
-  # i - The Integer array index number.
-  #
-  #   section = Section.new
-  #
-  #   section << 'foo'
-  #   section << 'bar'
-  #   section[1]
-  #   => "bar"
-  def [](i)
-    @blocks[i]
-  end
-
-  # Public: Delete the element at i in the array of section blocks,
-  # returning that element or nil if i is out of range.
-  #
-  # i - The Integer array index number.
-  #
-  #   section = Section.new
-  #
-  #   section << 'foo'
-  #   section << 'bar'
-  #   section.delete_at(1)
-  #   => "bar"
-  #
-  #   section.blocks
-  #   => ["foo"]
-  def delete_at(i)
-    @blocks.delete_at(i)
-  end
-
-  # Public: Clear this Section's list of blocks.
-  #
-  #   section = Section.new
-  #
-  #   section << 'foo'
-  #   section << 'bar'
-  #   section.blocks
-  #   => ["foo", "bar"]
-  #   section.clear_blocks
-  #   section.blocks
-  #   => []
-  def clear_blocks
-    @blocks = []
-  end
-
-  # Public: Insert a content block at the specified index in this section's
-  # list of blocks.
-  #
-  # i - The Integer array index number.
-  # val = The content block to insert.
-  #
-  #   section = Section.new
-  #
-  #   section << 'foo'
-  #   section << 'baz'
-  #   section.insert(1, 'bar')
-  #   section.blocks
-  #   ["foo", "bar", "baz"]
-  def insert(i, block)
-    @blocks.insert(i, block)
-  end
-
-  # Public: Get the Integer index number of the first content block element
-  # for which the provided block returns true.  Returns nil if no match is
-  # found.
-  #
-  # block - A block that can be used to determine whether a supplied element
-  #         is a match.
-  #
-  #   section = Section.new
-  #
-  #   section << 'foo'
-  #   section << 'bar'
-  #   section << 'baz'
-  #   section.index{|el| el =~ /^ba/}
-  #   => 1
-  def index(&block)
-    @blocks.index(&block)
-  end
-
   # Public: Get the section number for the current Section
   #
   # The section number is a unique, dot separated String
@@ -262,7 +163,11 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
 
   def to_s
     if @title
-      "#{super.to_s} - #@title [blocks:#{@blocks.size}]"
+      if @level && @index
+        %[#{super.to_s} - #{sectnum} #@title [blocks:#{@blocks.size}]]
+      else
+        %[#{super.to_s} - #@title [blocks:#{@blocks.size}]]
+      end
     else
       super.to_s
     end
