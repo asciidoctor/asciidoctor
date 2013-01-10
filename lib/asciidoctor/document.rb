@@ -58,6 +58,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @options[:header_footer] = @options.fetch(:header_footer, true)
     @base_dir = options[:base_dir] || Dir.pwd
 
+    @attributes['asciidoctor'] = true
+    @attributes['asciidoctor-version'] = VERSION
     @attributes['sectids'] = true
     @attributes['encoding'] = 'UTF-8'
 
@@ -98,7 +100,6 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['docdate'] ||= @attributes['localdate']
     @attributes['doctime'] ||= @attributes['localtime']
     
-    @attributes['asciidoctor-version'] = VERSION
     @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', 'images'), 'icons')
 
     # Now parse the lines in the reader into blocks
