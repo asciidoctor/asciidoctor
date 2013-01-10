@@ -476,14 +476,8 @@ class Asciidoctor::Lexer
         # NOTE we need this logic because the reader is processing line
         # comments and that might leave us w/ an empty buffer
         if buffer.empty?
-          last_line = reader.get_line
-          if reader.has_lines?
-            # restore a non-blank line that caused the paragraph break
-            reader.unshift last_line unless last_line.strip.empty?
-            next
-          else
-            break 
-          end
+          reader.get_line
+          break
         end
 
         catalog_inline_anchors(buffer.join, parent.document)
