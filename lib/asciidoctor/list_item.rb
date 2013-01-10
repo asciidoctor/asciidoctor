@@ -14,13 +14,17 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
     @level = parent.level
   end
 
+  def text?
+    !@text.to_s.empty?
+  end
+
   def text
     # this will allow the text to be processed
     ::Asciidoctor::Block.new(self, nil, [@text]).content
   end
 
   def content
-    has_section_body? ? blocks.map {|b| b.render }.join : nil
+    blocks? ? blocks.map {|b| b.render }.join : nil
   end
 
   # Public: Fold the first paragraph block into the text
@@ -69,5 +73,9 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
       end
     end
     nil
+  end
+
+  def to_s
+    "#{super.to_s} - #@context [text:#@text, blocks:#{@blocks.size}]"
   end
 end

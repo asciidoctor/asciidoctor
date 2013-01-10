@@ -2,15 +2,20 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
   # Public: Get the Array of Asciidoctor::AbstractBlock sub-blocks for this block
   attr_reader :blocks
 
-  # Public: Get/Set the Integer section level in which this block resides
-  # QUESTION should this be writable? and for Block, should it delegate to parent?
+  # Public: Set the Integer level of this Section or the Section level in which this Block resides
   attr_accessor :level
 
   def initialize(parent, context)
     super(parent, context)
     @blocks = []
     @id = nil
-    @level = (context == :document ? 0 : nil)
+    if context == :document
+      @level = 0
+    elsif !parent.nil? && !self.is_a?(Asciidoctor::Section)
+      @level = parent.level
+    else
+      @level = nil
+    end
     @next_section_index = 0 
   end
 
@@ -22,8 +27,22 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
   # TODO we still need another method that answers
   # whether this Block *can* have block content
   # that should be the option 'sectionbody'
-  def has_section_body?
+  def blocks?
     !blocks.empty?
+  end
+
+  # Public: Get the element at i in the array of blocks.
+  #
+  # i - The Integer array index number.
+  #
+  #   section = Section.new
+  #
+  #   section << 'foo'
+  #   section << 'bar'
+  #   section[1]
+  #   => "bar"
+  def [](i)
+    @blocks[i]
   end
 
   # Public: Append a content block to this block's list of blocks.
@@ -45,6 +64,73 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
       assign_index(block)
     end
     @blocks << block
+  end
+
+  # Public: Insert a content block at the specified index in this block's
+  # list of blocks.
+  #
+  # i - The Integer array index number.
+  # val = The content block to insert.
+  #
+  #   section = Section.new
+  #
+  #   section << 'foo'
+  #   section << 'baz'
+  #   section.insert(1, 'bar')
+  #   section.blocks
+  #   ["foo", "bar", "baz"]
+  def insert(i, block)
+    @blocks.insert(i, block)
+  end
+
+  # Public: Delete the element at i in the array of section blocks,
+  # returning that element or nil if i is out of range.
+  #
+  # i - The Integer array index number.
+  #
+  #   section = Section.new
+  #
+  #   section << 'foo'
+  #   section << 'bar'
+  #   section.delete_at(1)
+  #   => "bar"
+  #
+  #   section.blocks
+  #   => ["foo"]
+  def delete_at(i)
+    @blocks.delete_at(i)
+  end
+
+  # Public: Clear this Block's list of blocks.
+  #
+  #   section = Section.new
+  #
+  #   section << 'foo'
+  #   section << 'bar'
+  #   section.blocks
+  #   => ["foo", "bar"]
+  #   section.clear_blocks
+  #   section.blocks
+  #   => []
+  def clear_blocks
+    @blocks = []
+  end
+
+  # Public: Get the Integer number of blocks in this block
+  #
+  # Examples
+  #
+  #   section = Section.new
+  #
+  #   section.size
+  #   => 0
+  #
+  #   section << 'foo'
+  #   section << 'bar'
+  #   section.size
+  #   => 2
+  def size
+    @blocks.size
   end
 
   # Public: Get the Array of child Section objects

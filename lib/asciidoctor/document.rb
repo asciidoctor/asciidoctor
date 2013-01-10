@@ -46,6 +46,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   #   doc  = Asciidoctor::Document.new(data)
   def initialize(data = [], options = {}, &block)
     super(self, :document)
+    @header = nil
     @references = {
       :ids => {},
       :links => [],
@@ -57,6 +58,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @options[:header_footer] = @options.fetch(:header_footer, true)
     @base_dir = options[:base_dir] || Dir.pwd
 
+    @attributes['asciidoctor'] = true
+    @attributes['asciidoctor-version'] = VERSION
     @attributes['sectids'] = true
     @attributes['encoding'] = 'UTF-8'
 
@@ -97,39 +100,18 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['docdate'] ||= @attributes['localdate']
     @attributes['doctime'] ||= @attributes['localtime']
     
-    @attributes['asciidoctor-version'] = VERSION
     @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', 'images'), 'icons')
 
-    # Now parse @lines into blocks
-    while @reader.has_lines?
-      @reader.skip_blank
-
-      if @reader.has_lines?
-        block = Lexer.next_block(@reader, self)
-        self << block unless block.nil?
-      end
-    end
+    # Now parse the lines in the reader into blocks
+    Lexer.parse(@reader, self) 
+    # or we could make it...
+    #self << *Lexer.parse(@reader, self)
 
     @callouts.rewind
 
     Asciidoctor.debug "Found #{@blocks.size} blocks in this document:"
     @blocks.each do |el|
       Asciidoctor.debug el
-    end
-
-    # split off the level 0 section, if present
-    root = @blocks.first
-    @header = nil
-    if root.is_a?(Section) && root.level == 0
-      @header = @blocks.shift
-      # a book has multiple level 0 sections
-      if doctype == 'book'
-        @blocks = @header.blocks + @blocks
-      # an article only has one level 0 section
-      else
-        @blocks = @header.blocks
-      end
-      @header.clear_blocks
     end
 
   end
@@ -160,6 +142,11 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['title']
   end
 
+  def title=(title)
+    @header = Section.new self
+    @header.title = title
+  end
+
   # We need to be able to return some semblance of a title
   def doctitle
     if !(title = @attributes.fetch('title', '')).empty?
@@ -180,6 +167,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes.has_key? 'noheader'
   end
 
+  # QUESTION move to AbstractBlock?
   def first_section
     has_header? ? @header : @blocks.detect{|e| e.is_a? Section}
   end

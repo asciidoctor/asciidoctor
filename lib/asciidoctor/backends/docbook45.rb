@@ -142,7 +142,7 @@ class BlockAdmonitionTemplate < ::Asciidoctor::BaseTemplate
 <%#encoding:UTF-8%>
 <<%= attr :name %>#{id}#{role}#{xreflabel}>
   #{title}
-  <% if has_section_body? %>
+  <% if blocks? %>
 <%= content %>
   <% else %>
   <simpara><%= content.chomp %></simpara>
@@ -161,7 +161,7 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
   <% content.each do |li| %>
     <listitem>
       <simpara><%= li.text %></simpara>
-      <% if li.has_section_body? %>
+      <% if li.blocks? %>
 <%= li.content %>
       <% end %>
     </listitem>
@@ -180,7 +180,7 @@ class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
   <% content.each do |li| %>
     <listitem>
       <simpara><%= li.text %></simpara>
-      <% if li.has_section_body? %>
+      <% if li.blocks? %>
 <%= li.content %>
       <% end %>
     </listitem>
@@ -199,7 +199,7 @@ class BlockColistTemplate < ::Asciidoctor::BaseTemplate
   <% content.each do |li| %>
     <callout arearefs="<%= li.attr :coids %>">
       <para><%= li.text %></para>
-      <% if li.has_section_body? %>
+      <% if li.blocks? %>
 <%= li.content %>
       <% end %>
     </callout>
@@ -222,8 +222,10 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
     </term>
     <% unless dd.nil? %>
     <listitem>
+      <% if dd.text? %>
       <simpara><%= dd.text %></simpara>
-      <% if dd.has_section_body? %>
+      <% end %>
+      <% if dd.blocks? %>
 <%= dd.content %>
       <% end %>
     </listitem>

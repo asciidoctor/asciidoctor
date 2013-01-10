@@ -169,21 +169,6 @@ module Asciidoctor
     # whitespace at the beginning of the line
     :leading_blanks   => /^([[:blank:]]*)/,
 
-    # == Foo
-    # ^ yields a level 2 title
-    #
-    # == Foo ==
-    # ^ also yields a level 2 title
-    #
-    # both equivalent to this two-line version:
-    # Foo
-    # ~~~
-    #
-    # match[1] is the delimiter, whose length determines the level
-    # match[2] is the title itself
-    # match[3] is an optional repeat of the delimiter, which is dropped
-    :section_heading      => /^(={1,5})\s+(\S.*?)\s*(?:\[\[([^\[]+)\]\]\s*)?(\s\1)?$/,
-
     # +   From the Asciidoc User Guide: "A plus character preceded by at
     #     least one space character at the end of a non-blank line forces
     #     a line break. It generates a line break (br) tag for HTML outputs.
@@ -195,7 +180,7 @@ module Asciidoctor
 
     # inline link and some inline link macro
     # FIXME revisit!
-    :link_inline      => %r{(^|link:|\s|>|&lt;)(\\?https?://[^\[ ]*[^\. \[])(?:\[((?:\\\]|[^\]])*?)\])?},
+    :link_inline      => %r{(^|link:|\s|>|&lt;|[\(\)\]])(\\?https?://[^\[ ]*[^\. \)\[])(?:\[((?:\\\]|[^\]])*?)\])?},
 
     # inline link macro
     # link:path[label]
@@ -263,11 +248,26 @@ module Asciidoctor
     # .Foo   but not  . Foo or ..Foo
     :title            => /^\.([^\s\.].*)\s*$/,
 
+    # == Foo
+    # ^ yields a level 2 title
+    #
+    # == Foo ==
+    # ^ also yields a level 2 title
+    #
+    # both equivalent to this two-line version:
+    # Foo
+    # ~~~
+    #
+    # match[1] is the delimiter, whose length determines the level
+    # match[2] is the title itself
+    # match[3] is an optional repeat of the delimiter, which is dropped
+    :section_title     => /^(={1,5})\s+(\S.*?)\s*(?:\[\[([^\[]+)\]\]\s*)?(\s\1)?$/,
+
     # does not begin with a dot and has at least one alphanumeric character
-    :heading_name     => /^((?=.*\w+.*)[^\.].*?)\s*$/,
+    :section_name      => /^((?=.*\w+.*)[^\.].*?)\s*$/,
 
     # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
-    :heading_line     => /^([=\-~^\+])+\s*$/,
+    :section_underline => /^([=\-~^\+])+\s*$/,
 
     # * Foo (up to 5 consecutive asterisks)
     # - Foo

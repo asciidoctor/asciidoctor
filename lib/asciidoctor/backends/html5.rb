@@ -112,10 +112,10 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
     </dt>
     <% unless dd.nil? %>
     <dd>
-      <% unless dd.text.to_s.empty? %>
+      <% if dd.text? %>
       <p><%= dd.text %></p>
       <% end %>
-      <% if dd.has_section_body? %>
+      <% if dd.blocks? %>
 <%= dd.content %>
       <% end %>
     </dd>
@@ -248,6 +248,15 @@ class BlockOpenTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
+class BlockPassTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOS
+<%#encoding:UTF-8%>
+<%= content %>
+    EOS
+  end
+end
+
 class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOS
@@ -312,7 +321,7 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
   <% content.each do |li| %>
     <li>
       <p><%= li.text %></p>
-      <% if li.has_section_body? %>
+      <% if li.blocks? %>
 <%= li.content %>
       <% end %>
     </li>
@@ -335,7 +344,7 @@ class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
   <% content.each do |li| %>
     <li>
       <p><%= li.text %></p>
-      <% if li.has_section_body? %>
+      <% if li.blocks? %>
 <%= li.content %>
       <% end %>
     </li>
@@ -362,15 +371,6 @@ class BlockColistTemplate < ::Asciidoctor::BaseTemplate
   <% end %>
   </ol>
 </div>
-    EOS
-  end
-end
-
-class BlockPassTemplate < ::Asciidoctor::BaseTemplate
-  def template
-    @template ||= ERB.new <<-EOS
-<%#encoding:UTF-8%>
-<%= content %>
     EOS
   end
 end

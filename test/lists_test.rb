@@ -588,6 +588,51 @@ List
       assert_xpath '((//ul)[1]/li//ol)[1]/li', output, 1
     end
 
+    test 'list item with literal content should not consume nested list of different type' do
+      input = <<-EOS
+List
+====
+
+- bullet
+
+  literal
+  but not
+  hungry
+
+. numbered
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//li', output, 2
+      assert_xpath '//ul//ol', output, 1
+      assert_xpath '//ul/li/p', output, 1
+      assert_xpath '//ul/li/p[text()="bullet"]', output, 1
+      assert_xpath '//ul/li/p/following-sibling::*[@class="literalblock"]', output, 1
+      assert_xpath %(//ul/li/p/following-sibling::*[@class="literalblock"]//pre[text()="literal\nbut not\nhungry"]), output, 1
+      assert_xpath '//*[@class="literalblock"]/following-sibling::*[@class="olist arabic"]', output, 1
+      assert_xpath '//*[@class="literalblock"]/following-sibling::*[@class="olist arabic"]//p[text()="numbered"]', output, 1
+    end
+
+    test 'nested list item does not eat the title of the following detached block' do
+      input = <<-EOS
+List
+====
+
+- bullet
+  * nested bullet 1
+  * nested bullet 2
+
+.Title
+....
+literal
+....
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//*[@class="ulist"]/ul', output, 2
+      assert_xpath '(//*[@class="ulist"])[1]/following-sibling::*[@class="literalblock"]', output, 1
+      assert_xpath '(//*[@class="ulist"])[1]/following-sibling::*[@class="literalblock"]/*[@class="title"]', output, 1
+    end
+
     test "lines with alternating markers of bulleted and labeled list types separated by blank lines should be nested" do
       input = <<-EOS
 List
@@ -913,6 +958,22 @@ term2::
       assert_xpath '(//dl/dt)[1][normalize-space(text()) = "term1"]', output, 1
       assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "def1"]', output, 1
       assert_xpath '(//dl/dt)[2][normalize-space(text()) = "term2"]', output, 1
+      assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
+    end
+
+    test "multi-line element with multiple terms" do
+      input = <<-EOS
+term1::
+term2::
+def2
+      EOS
+      output = render_string input
+      assert_xpath '//dl', output, 1
+      assert_xpath '//dl/dt', output, 2
+      assert_xpath '//dl/dd', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dt', output, 1
+      assert_xpath '(//dl/dt)[1][normalize-space(text()) = "term1"]', output, 1
+      assert_xpath '(//dl/dt)[2]/following-sibling::dd', output, 1
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
@@ -1348,6 +1409,29 @@ term2:: def2
       assert_xpath '(//dl//dl/dt)[1]/following-sibling::dd/p[text() = "detail1"]', output, 1
       assert_xpath '(//dl//dl/dt)[2][normalize-space(text()) = "label2"]', output, 1
       assert_xpath '(//dl//dl/dt)[2]/following-sibling::dd/p[text() = "detail2"]', output, 1
+    end
+
+    test "multi-line element with indented nested element" do
+      input = <<-EOS
+term1::
+  def1
+  label1;;
+   detail1
+term2::
+  def2
+      EOS
+      output = render_string input
+      assert_xpath '//dl', output, 2
+      assert_xpath '//dl//dl', output, 1
+      assert_xpath '(//dl)[1]/dt', output, 2
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '((//dl)[1]/dt)[1][normalize-space(text()) = "term1"]', output, 1
+      assert_xpath '((//dl)[1]/dt)[1]/following-sibling::dd/p[text() = "def1"]', output, 1
+      assert_xpath '//dl//dl/dt', output, 1
+      assert_xpath '//dl//dl/dt[normalize-space(text()) = "label1"]', output, 1
+      assert_xpath '//dl//dl/dt/following-sibling::dd/p[text() = "detail1"]', output, 1
+      assert_xpath '((//dl)[1]/dt)[2][normalize-space(text()) = "term2"]', output, 1
+      assert_xpath '((//dl)[1]/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
     test "mixed single and multi-line elements with indented nested elements" do
@@ -1833,6 +1917,7 @@ term1::
 notnestedterm:::
 +
   literal
+notnestedterm:::
       EOS
   
       output = render_embedded_string input
@@ -1840,8 +1925,7 @@ notnestedterm:::
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p', output, 0
       assert_xpath '//*[@class="dlist"]//dd/*[@class="literalblock"]', output, 2
-      assert_xpath %((//*[@class="dlist"]//dd/*[@class="literalblock"])[1]//pre[text()="  literal\nnotnestedterm:::"]), output, 1
-      assert_xpath '(//*[@class="dlist"]//dd/*[@class="literalblock"])[2]//pre[text()="literal"]', output, 1
+      assert_xpath %(//*[@class="dlist"]//dd/*[@class="literalblock"]//pre[text()="  literal\nnotnestedterm:::"]), output, 2
     end
   
     test 'line attached by continuation is appended as paragraph if term has no inline definition' do
@@ -1861,7 +1945,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]/p[text()="para"]', output, 1
     end
   
-    test 'line attached by continuation offset by blank line and line comment is appended as paragraph if term has no inline definition' do
+    test 'appends line as paragraph if attached by continuation following blank line and line comment when term has no inline definition' do
       input = <<-EOS
 == Lists
 
@@ -1910,8 +1994,7 @@ detached
   
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
-      assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath '//*[@class="dlist"]//dd/*', output, 0
+      assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="exampleblock"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="exampleblock"]//p[text()="detached"]', output, 1
     end
@@ -1927,8 +2010,7 @@ detached
   
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
-      assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath '//*[@class="dlist"]//dd/*', output, 0
+      assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="verseblock"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="verseblock"]/pre[text()="detached"]', output, 1
     end
@@ -1944,8 +2026,7 @@ detached
   
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
-      assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath '//*[@class="dlist"]//dd/*', output, 0
+      assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]/p[text()="detached"]', output, 1
     end
@@ -2123,6 +2204,31 @@ detached
       assert_xpath '//*[@class="dlist"]//dd/p[text()="def1"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]/p[text()="detached"]', output, 1
+    end
+
+    test 'nested term with definition does not consume following heading' do
+      input = <<-EOS
+== Lists
+
+term::
+  def
+  nestedterm;;
+    nesteddef
+
+Detached
+~~~~~~~~
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//*[@class="dlist"]/dl', output, 2
+      assert_xpath '//*[@class="dlist"]//dd', output, 2
+      assert_xpath '//*[@class="dlist"]/dl//dl', output, 1
+      assert_xpath '//*[@class="dlist"]/dl//dl/dt', output, 1
+      assert_xpath '((//*[@class="dlist"])[1]//dd)[1]/p[text()="def"]', output, 1
+      assert_xpath '((//*[@class="dlist"])[1]//dd)[1]/p/following-sibling::*[@class="dlist"]', output, 1
+      assert_xpath '((//*[@class="dlist"])[1]//dd)[1]/p/following-sibling::*[@class="dlist"]//dd/p[text()="nesteddef"]', output, 1
+      assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="sect2"]', output, 1
+      assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="sect2"]/h3[text()="Detached"]', output, 1
     end
   
     test 'line attached by continuation is appended as paragraph if term has inline definition followed by detached paragraph' do

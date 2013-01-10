@@ -272,6 +272,21 @@ http://asciidoc.org
     end
   end
 
+  context 'Metadata' do
+    test 'block title above section gets carried over to first block in section' do
+      input = <<-EOS
+.Title
+== Section
+
+paragraph
+      EOS
+      output = render_string input
+      assert_xpath '//*[@class="paragraph"]', output, 1
+      assert_xpath '//*[@class="paragraph"]/*[@class="title"][text() = "Title"]', output, 1
+      assert_xpath '//*[@class="paragraph"]/p[text() = "paragraph"]', output, 1
+    end
+  end
+
   context "Images" do
     test "can render block image with alt text" do
       input = <<-EOS
@@ -328,19 +343,6 @@ image::tiger.png[Tiger]
       EOS
 
       output = render_string input
-      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
-    end
-
-    test 'can resolve image relative to imagesdir' do
-      input = <<-EOS
-:imagesdir: images
-
-image::tiger.png[Tiger]
-      EOS
-
-      doc = document_from_string input
-      assert_equal 'images', doc.attributes['imagesdir']
-      output = doc.render
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
@@ -462,4 +464,5 @@ image::asciidoctor.png[Asciidoctor]
     end
 
   end
+
 end
