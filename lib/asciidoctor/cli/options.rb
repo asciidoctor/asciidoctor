@@ -54,7 +54,7 @@ module Asciidoctor
                   'A list of attributes, key value pair separated by =, to override in the document') do |attribs|
             attribs.each do |attrib|
               tokens = attrib.split("=")
-              @attributes[tokens[0].to_symbol] = tokens[1]
+              @attributes[tokens[0].to_sym] = tokens[1]
             end
           end
           opts.on('-t', '--template-dir DIR', 'Directory containing a non built in template to be used') do |template_dir|
