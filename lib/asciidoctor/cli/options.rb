@@ -61,9 +61,6 @@ module Asciidoctor
             self.template_directory = template_dir
           end
 
-          opts.separator ''
-          opts.separator "Common options:"
-
           opts.on_tail("-h", "--help", "Show this message") do
             puts opts
             exit
@@ -84,6 +81,7 @@ module Asciidoctor
             puts opts
             exit
           end
+          # TODO: support stdin, probably using ARGF and ARGF.to_io
         rescue OptionParser::InvalidOption, OptionParser::MissingArgument
           puts $!.to_s
           puts opts
