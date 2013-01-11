@@ -53,16 +53,53 @@ class Test::Unit::TestCase
     end
   end
 
-  def node_from_string(html, xpath = nil)
-    doc = (html =~ /\s*<!DOCTYPE/) ? Nokogiri::HTML::Document.parse(html) : Nokogiri::HTML::DocumentFragment.parse(html)
-    if xpath.nil?
-      doc
-    else
-      doc.xpath("#{xpath.sub('/', './')}").first
+  def xmlnodes_at_css(css, content, count = nil)
+    xmlnodes_at_path(:css, css, content)
+  end
+
+  def xmlnodes_at_xpath(css, content, count = nil)
+    xmlnodes_at_path(:css, css, content)
+  end
+
+  def xmlnodes_at_path(type, path, content, count = nil)
+    doc = xmldoc_from_string content
+    case type
+      when :xpath
+        results = doc.xpath("#{path.sub('/', './')}")
+      when :css
+        results = doc.css(path)
     end
+    count == 1 ? results.first : results
+  end
+
+  def assert_css(css, content, count = nil)
+    assert_path(:css, css, content, count)
   end
 
   def assert_xpath(xpath, content, count = nil)
+    assert_path(:xpath, xpath, content, count)
+  end
+
+  def assert_path(type, path, content, count = nil)
+    case type
+    when :xpath
+      type_name = 'XPath'
+    when :css
+      type_name = 'CSS'
+    end
+
+    results = xmlnodes_at_path type, path, content
+
+    if (count && results.length != count)
+      flunk "#{type_name} #{path} yielded #{results.length} elements rather than #{count} for:\n#{content}"
+    elsif (count.nil? && results.empty?)
+      flunk "#{type_name} #{path} not found in:\n#{content}"
+    else
+      assert true
+    end
+  end
+
+  def xmldoc_from_string(content)
     match = content.match(/\s*<!DOCTYPE (.*)/)
     if !match
       doc = Nokogiri::HTML::DocumentFragment.parse(content)
@@ -70,15 +107,6 @@ class Test::Unit::TestCase
       doc = Nokogiri::HTML::Document.parse(content)
     else
       doc = Nokogiri::XML::Document.parse(content)
-    end
-    results = doc.xpath("#{xpath.sub('/', './')}")
-
-    if (count && results.length != count)
-      flunk "XPath #{xpath} yielded #{results.length} elements rather than #{count} for:\n#{content}"
-    elsif (count.nil? && results.empty?)
-      flunk "XPath #{xpath} not found in:\n#{content}"
-    else
-      assert true
     end
   end
 

@@ -25,4 +25,5 @@ class Asciidoctor::Inline < Asciidoctor::AbstractNode
   def render
     renderer.render("inline_#{@context}", self).chomp
   end
+
 end

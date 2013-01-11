@@ -144,7 +144,7 @@ EOS
       output = render_string(input)
       assert_xpath '//pre', output, 1
       assert_xpath '//pre/text()', output, 1
-      text = node_from_string(output, '//pre/text()').content
+      text = xmlnodes_at_xpath('//pre/text()', output, 1).text
       lines = text.lines.entries
       assert_equal 5, lines.size
       expected = "line one\n\nline two\n\nline three".lines.entries
@@ -153,6 +153,7 @@ EOS
 
     test "should preserve endlines in listing block" do
       input = <<-EOS
+[source]
 ----
 line one
 
@@ -164,7 +165,7 @@ EOS
       output = render_string(input)
       assert_xpath '//pre/code', output, 1
       assert_xpath '//pre/code/text()', output, 1
-      text = node_from_string(output, '//pre/code/text()').content
+      text = xmlnodes_at_xpath('//pre/code/text()', output, 1).text
       lines = text.lines.entries
       assert_equal 5, lines.size
       expected = "line one\n\nline two\n\nline three".lines.entries
@@ -185,7 +186,7 @@ EOS
       output = render_string(input)
       assert_xpath '//*[@class="verseblock"]/pre', output, 1
       assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
-      text = node_from_string(output, '//*[@class="verseblock"]/pre/text()').content
+      text = xmlnodes_at_xpath('//*[@class="verseblock"]/pre/text()', output, 1).text
       lines = text.lines.entries
       assert_equal 5, lines.size
       expected = "line one\n\nline two\n\nline three".lines.entries

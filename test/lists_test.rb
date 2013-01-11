@@ -2362,6 +2362,7 @@ end
 context 'Callout lists' do
   test 'listing block with sequential callouts followed by adjacent callout list' do
     input = <<-EOS
+[source]
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
@@ -2385,6 +2386,7 @@ puts doc.render # <3>
 
   test 'listing block with sequential callouts followed by non-adjacent callout list' do
     input = <<-EOS
+[source]
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
@@ -2412,6 +2414,7 @@ Paragraph.
 
   test 'listing block with a callout that refers to two different lines' do
     input = <<-EOS
+[source]
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
@@ -2433,6 +2436,7 @@ puts doc.render # <2>
 
   test 'listing block with non-sequential callouts followed by adjacent callout list' do
     input = <<-EOS
+[source]
 ----
 require 'asciidoctor' # <2>
 doc = Asciidoctor::Document.new('Hello, World!') # <3>
@@ -2457,11 +2461,13 @@ puts doc.render # <1>
   test 'two listing blocks can share the same callout list' do
     input = <<-EOS
 .Import library
+[source]
 ----
 require 'asciidoctor' # <1>
 ----
 
 .Use library
+[source]
 ----
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
 puts doc.render # <3>
@@ -2486,12 +2492,14 @@ puts doc.render # <3>
   test 'two listing blocks each followed by an adjacent callout list' do
     input = <<-EOS
 .Import library
+[source]
 ----
 require 'asciidoctor' # <1>
 ----
 <1> Describe the first line
 
 .Use library
+[source]
 ----
 doc = Asciidoctor::Document.new('Hello, World!') # <1>
 puts doc.render # <2>
@@ -2516,6 +2524,7 @@ puts doc.render # <2>
 
   test 'callout list with block content' do
     input = <<-EOS
+[source]
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
@@ -2542,6 +2551,7 @@ You can write this to file rather than printing to stdout.
 
   test 'escaped callout should not be interpreted as a callout' do
     input = <<-EOS
+[source]
 ----
 require 'asciidoctor' # \\<1>
 ----

@@ -18,8 +18,8 @@ class Asciidoctor::BaseTemplate
       # example: <% if attr? 'foo' %><bar><%= attr 'foo' %></bar><% end %>
       '<% if attr? \'' + key + '\' %><' + name + '><%= attr \'' + key + '\' %></' + name + '><% end %>'
     else
-      # example: <% unless foo.nil? %><bar><%= foo %></bar><% end %>
-      '<% unless ' + key + '.nil? %><' + name + '><%= ' + key + ' %></' + name + '><% end %>'
+      # example: <% unless foo.to_s.empty? %><bar><%= foo %></bar><% end %>
+      '<% unless ' + key + '.to_s.empty? %><' + name + '><%= ' + key + ' %></' + name + '><% end %>'
     end
   end
 end
@@ -49,7 +49,7 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
     <% if (attr? :revnumber) || (attr? :revremark) %>
     <revhistory>
       #{tag 'revision', :revnumber}
-      #{tag 'revdate', :revdate}
+      #{tag 'date', :revdate}
       #{tag 'authorinitials', :authorinitials}
       #{tag 'revremark', :revremark}
     </revhistory>
@@ -63,6 +63,7 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
 <%#encoding:UTF-8%>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE <%= doctype %> PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<% if attr? :toc %><?asciidoc-toc?><% end %>
 <% if attr? :numbered %><?asciidoc-numbered?><% end %>
 <% if doctype == 'book' %>
 <book lang="en">
@@ -124,7 +125,7 @@ class BlockParagraphTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
 <%#encoding:UTF-8%>
-<% if title.nil? %>
+<% if !title? %>
 <simpara#{id}#{role}#{xreflabel}><%= content %></simpara>
 <% else %>
 <formalpara#{id}#{role}#{xreflabel}>
@@ -250,13 +251,21 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
 <%#encoding:UTF-8%>
-<% if title.nil? %>
+<% if !title? %>
+<% if (attr :style) == 'source' %>
 <programlisting#{id}#{role}#{xreflabel}#{attribute('language', :language)} linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= content.gsub("\n", LINE_FEED_ENTITY) %></programlisting>
+<% else %>
+<screen#{id}#{role}#{xreflabel}><%= content.gsub("\n", LINE_FEED_ENTITY) %></screen>
+<% end %>
 <% else %>
 <formalpara#{id}#{role}#{xreflabel}>
   <title><%= title %></title>
   <para>
+    <% if (attr :style) == 'source' %>
     <programlisting language="<%= attr :language %>" linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= content.gsub("\n", LINE_FEED_ENTITY) %></programlisting>
+    <% else %>
+    <screen><%= content.gsub("\n", LINE_FEED_ENTITY) %></screen>
+    <% end %>
   </para>
 </formalpara>
 <% end %>
@@ -268,12 +277,14 @@ class BlockLiteralTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= ERB.new <<-EOF
 <%#encoding:UTF-8%>
-<% if title.nil? %>
+<% if !title? %>
 <literallayout#{id}#{role}#{xreflabel} class="monospaced"><%= content.gsub("\n", LINE_FEED_ENTITY) %></literallayout>
 <% else %>
 <formalpara#{id}#{role}#{xreflabel}>
   <title><%= title %></title>
-  <literallayout class="monospaced"><%= content.gsub("\n", LINE_FEED_ENTITY) %></literallayout>
+  <para>
+    <literallayout class="monospaced"><%= content.gsub("\n", LINE_FEED_ENTITY) %></literallayout>
+  </para>
 </formalpara>
 <% end %>
     EOF
@@ -318,7 +329,11 @@ class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
     #{tag 'citetitle', :citetitle}
   </attribution>
   <% end %>
+<% if !buffer.nil? %>
+<simpara><%= content %></simpara>
+<% else %>
 <%= content %>
+<% end %>
 </blockquote>
     EOF
   end
@@ -349,6 +364,45 @@ class BlockPassTemplate < ::Asciidoctor::BaseTemplate
     @template ||= ERB.new <<-EOS
 <%#encoding:UTF-8%>
 <%= content %>
+    EOS
+  end
+end
+
+class BlockTableTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOS
+<%#encoding:UTF-8%>
+<<%= title? ? 'table' : 'informaltable'%>#{id}#{role}#{xreflabel} frame="<%= attr :frame, 'all'%>"
+    rowsep="<%= ['none', 'cols'].include?(attr :grid) ? 0 : 1 %>" colsep="<%= ['none', 'rows'].include?(attr :grid) ? 0 : 1 %>">
+  #{title}
+  <tgroup cols="<%= attr :colcount %>">
+    <% columns.each do |col| %>
+    <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= col.attr((attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
+    <% end %>
+    <% [:head, :foot, :body].select {|tsec| !rows[tsec].empty? }.each do |tsec| %>
+    <t<%= tsec %>>
+      <% rows[tsec].each do |row| %>
+      <row>
+        <% row.each do |cell| %>
+        <entry#{attribute('align', 'cell.attr :halign')}#{attribute('valign', 'cell.attr :valign')}<%
+        if cell.colspan %> namest="col_<%= cell.column.attr :colnumber %>" nameend="col_<%= (cell.column.attr :colnumber) + cell.colspan - 1 %>"<%
+        end %><% if cell.rowspan %> morerows="<%= cell.rowspan - 1 %>"<% end %>><%
+        if tsec == :head %><%= cell.text %><%
+        else %><%
+        case cell.attr(:style)
+          when :asciidoc %><%= cell.content %><%
+          when :verse %><literallayout><%= cell.text.gsub("\n", LINE_FEED_ENTITY) %></literallayout><%
+          when :literal %><literallayout class="monospaced"><%= cell.text.gsub("\n", LINE_FEED_ENTITY) %></literallayout><%
+          when :header %><% cell.content.each do |text| %><simpara><emphasis role="strong"><%= text %></emphasis></simpara><% end %><%
+          else %><% cell.content.each do |text| %><simpara><%= text %></simpara><% end %><%
+        %><% end %><% end %></entry>
+        <% end %>
+      </row>
+      <% end %>
+    </t<%= tsec %>>
+    <% end %>
+  </tgroup>
+</<%= title? ? 'table' : 'informaltable'%>>
     EOS
   end
 end

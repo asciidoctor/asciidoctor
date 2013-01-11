@@ -122,7 +122,7 @@ context "Lexer" do
   test "collect options attribute" do
     attributes = {}
     line = "quote, options='opt1,opt2 , opt3'"
-    expected = {1 => 'quote', 'options' => 'opt1,opt2 , opt3', 'option-opt1' => nil, 'option-opt2' => nil, 'option-opt3' => nil}
+    expected = {1 => 'quote', 'options' => 'opt1,opt2 , opt3', 'opt1-option' => nil, 'opt2-option' => nil, 'opt3-option' => nil}
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
     assert_equal expected, attributes
   end

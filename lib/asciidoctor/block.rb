@@ -31,6 +31,8 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
     @title = nil
   end
 
+  # Public: A convenience method that indicates whether the title instance
+  # variable is blank (nil or empty)
   def title?
     !@title.to_s.empty?
   end

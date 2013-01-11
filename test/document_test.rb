@@ -24,7 +24,7 @@ context 'Document' do
       assert !renderer.nil?
       views = renderer.views
       assert !views.nil?
-      assert_equal 25, views.size
+      assert_equal 26, views.size
       assert views.has_key? 'document'
       assert views['document'].is_a?(Asciidoctor::HTML5::DocumentTemplate)
     end
@@ -39,7 +39,7 @@ context 'Document' do
       assert !renderer.nil?
       views = renderer.views
       assert !views.nil?
-      assert_equal 25, views.size
+      assert_equal 26, views.size
       assert views.has_key? 'document'
       assert views['document'].is_a?(Asciidoctor::DocBook45::DocumentTemplate)
     end
@@ -181,6 +181,18 @@ chapter body
       assert_xpath '/book', result, 1
       assert_xpath '/book/bookinfo/date', result, 1
       assert_xpath '/book/simpara[text() = "text"]', result, 1
+    end
+
+    test 'do not override explicit author initials' do
+      input = <<-EOS
+= AsciiDoc
+Stuart Rackham <founder@asciidoc.org>
+:Author Initials: SJR
+
+more info...
+      EOS
+      output = render_string input, :attributes => {'backend' => 'docbook45'}
+      assert_xpath '/article/articleinfo/authorinitials[text()="SJR"]', output, 1
     end
   end
 end

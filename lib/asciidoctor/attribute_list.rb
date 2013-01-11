@@ -169,7 +169,7 @@ class Asciidoctor::AttributeList
       # example: options="opt1,opt2,opt3"
       if name == 'options'
         resolved_value.split(CSV_SPLIT_PATTERN).each do |o|
-          @attributes['option-' + o] = nil
+          @attributes[o + '-option'] = nil
         end
       elsif single_quoted_value && !@block.nil?
         resolved_value = @block.apply_normal_subs(value)
