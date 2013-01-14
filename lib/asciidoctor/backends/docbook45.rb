@@ -375,6 +375,11 @@ class BlockTableTemplate < ::Asciidoctor::BaseTemplate
 <<%= title? ? 'table' : 'informaltable'%>#{id}#{role}#{xreflabel} frame="<%= attr :frame, 'all'%>"
     rowsep="<%= ['none', 'cols'].include?(attr :grid) ? 0 : 1 %>" colsep="<%= ['none', 'rows'].include?(attr :grid) ? 0 : 1 %>">
   #{title}
+  <% if attr? :width %>
+  <?dbhtml table-width="<%= attr :width %>"?>
+  <?dbfo table-width="<%= attr :width %>"?>
+  <?dblatex table-width="<%= attr :width %>"?>
+  <% end %>
   <tgroup cols="<%= attr :colcount %>">
     <% columns.each do |col| %>
     <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= col.attr((attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
