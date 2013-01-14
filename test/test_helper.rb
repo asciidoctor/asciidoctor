@@ -58,7 +58,7 @@ class Test::Unit::TestCase
   end
 
   def xmlnodes_at_xpath(css, content, count = nil)
-    xmlnodes_at_path(:css, css, content)
+    xmlnodes_at_path(:xpath, css, content)
   end
 
   def xmlnodes_at_path(type, path, content, count = nil)
