@@ -41,8 +41,6 @@ class Asciidoctor::Reader
     @lines.pop until @lines.empty? || !@lines.last.nil?
 
     @source = @lines.join
-    Asciidoctor.debug "Leaving Reader#init, and I have #{@lines.count} lines"
-    Asciidoctor.debug "Also, has_lines? is #{self.has_lines?}"
   end
 
   # Public: Check whether there are any lines left to read.
@@ -230,7 +228,7 @@ class Asciidoctor::Reader
     break_on_blank_lines = options[:break_on_blank_lines]
     break_on_list_continuation = options[:break_on_list_continuation]
     while (this_line = self.get_line)
-      Asciidoctor.debug "Processing line: '#{this_line}'"
+      Asciidoctor.debug { "Reader processing line: '#{this_line}'" }
       finis = true if terminator && this_line.chomp == terminator
       finis = true if !finis && break_on_blank_lines && this_line.strip.empty?
       finis = true if !finis && break_on_list_continuation && this_line.chomp == LIST_CONTINUATION
@@ -340,11 +338,9 @@ class Asciidoctor::Reader
           # of continuation lines
           continuing_key = key
           continuing_value = $1  # strip off the spaces and +
-          Asciidoctor.debug "continuing key: #{continuing_key} with partial value: '#{continuing_value}'"
         else
           unless attribute_overridden? key
             @document.attributes[key] = apply_attribute_value_subs(value)
-            Asciidoctor.debug "Defines[#{key}] is '#{@document.attributes[key]}'"
             if key == 'backend'
               @document.update_backend_attributes()
             end
@@ -374,8 +370,6 @@ class Asciidoctor::Reader
     #    @document.register(:ids, biblio[1])
     #  end
     #end
-
-    #Asciidoctor.debug "About to leave Reader#process, and references is #{@document.references.inspect}"
   end
 
   # Internal: Determine if the attribute has been overridden in the document options

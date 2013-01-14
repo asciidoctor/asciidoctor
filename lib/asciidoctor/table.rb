@@ -118,9 +118,9 @@ module Asciidoctor
     # rendered and returned as content that can be included in the
     # parent block's template.
     def render
-      Asciidoctor.debug "Now attempting to render for table my own bad #{self}"
-      Asciidoctor.debug "Parent is #{@parent}"
-      Asciidoctor.debug "Renderer is #{renderer}"
+      Asciidoctor.debug { "Now attempting to render for table my own bad #{self}" }
+      Asciidoctor.debug { "Parent is #{@parent}" }
+      Asciidoctor.debug { "Renderer is #{renderer}" }
       renderer.render('block_table', self) 
     end
   
