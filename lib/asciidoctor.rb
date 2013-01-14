@@ -52,6 +52,11 @@ module Asciidoctor
   # Backend determines the format of the rendered output, default to html5
   DEFAULT_BACKEND = 'html5'
 
+  # Default page widths for calculating absolute widths
+  DEFAULT_PAGE_WIDTHS = {
+    'docbook' => 425
+  }
+
   LIST_CONTEXTS = [:ulist, :olist, :dlist, :colist]
 
   NESTABLE_LIST_CONTEXTS = [:ulist, :olist, :dlist]
@@ -80,8 +85,12 @@ module Asciidoctor
 
     # matches any block delimiter:
     #   open, listing, example, literal, comment, quote, sidebar, passthrough, table
-    # NOTE position most common blocks towards the front of the pattern
-    :any_blk          => %r{^(?:\-\-|(?:\-|=|\.|/|_|\*|\+){4,}|\|={3,})\s*$},
+    # NOTE position the most common blocks towards the front of the pattern
+    :any_blk          => %r{^(?:\-\-|(?:\-|=|\.|/|_|\*|\+){4,}|[\|!]={3,})\s*$},
+
+    # optimization when scanning lines for blocks
+    # NOTE accessing the first element before calling ord is first Ruby 1.8.7 compat
+    :any_blk_ord      => %w(- = . / _ * + | !).map {|c| c[0].ord },
 
     # :foo: bar
     :attr_assign      => /^:([^:!]+):\s*(.*)\s*$/,
@@ -140,6 +149,9 @@ module Asciidoctor
 
     # // (and then whatever)
     :comment          => %r{^//([^/].*|)$},
+
+    # 29
+    :digits           => /^\d+$/,
 
     # foo::  ||  foo::: || foo:::: || foo;;
     # Should be followed by a definition, on the same line...
@@ -245,8 +257,28 @@ module Asciidoctor
     # an alternative if our backend generated single-quoted html/xml attributes
     #:single_quote_esc => /(\w|=)\\'(\w)/,
 
+    # |===
+    # |table
+    # |===
+    :table            => /^\|={3,}\s*$/,
+
+    # !===
+    # !table
+    # !===
+    :table_nested     => /^!={3,}\s*$/,
+
+    # 1*h,2*,^3e
+    :table_colspec    => /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+)?([a-z])?$/,
+
+    # 2.3+<.>m
+    # TODO might want to use step-wise scan rather than this mega-regexp
+    :table_cellspec => {
+      :start => /^[[:blank:]]*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?\|/,
+      :end => /[[:blank:]]+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
+    },
+
     # .Foo   but not  . Foo or ..Foo
-    :title            => /^\.([^\s\.].*)\s*$/,
+    :blk_title        => /^\.([^\s\.].*)\s*$/,
 
     # == Foo
     # ^ yields a level 2 title
@@ -426,5 +458,6 @@ module Asciidoctor
   require 'asciidoctor/reader'
   require 'asciidoctor/renderer'
   require 'asciidoctor/section'
+  require 'asciidoctor/table'
   require 'asciidoctor/version'
 end

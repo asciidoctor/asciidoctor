@@ -105,9 +105,9 @@ class Asciidoctor::Reader
       next_line = peek_line
       if opts[:include_blanks] && next_line.strip.empty?
         comment_lines << get_line
-      elsif next_line.match(REGEXP[:comment_blk])
+      elsif match = next_line.match(REGEXP[:comment_blk])
         comment_lines << get_line
-        comment_lines.push(*(grab_lines_until(:preserve_last_line => true) {|line| line.match(REGEXP[:comment_blk])}))
+        comment_lines.push(*(grab_lines_until(:terminator => match[0], :preserve_last_line => true)))
         comment_lines << get_line
       elsif next_line.match(REGEXP[:comment])
         comment_lines << get_line
@@ -224,10 +224,16 @@ class Asciidoctor::Reader
 
     finis = false
     get_line if options[:skip_first_line]
+    # save options to locals for minor optimization
+    terminator = options[:terminator]
+    terminator.chomp! if terminator
+    break_on_blank_lines = options[:break_on_blank_lines]
+    break_on_list_continuation = options[:break_on_list_continuation]
     while (this_line = self.get_line)
       Asciidoctor.debug "Processing line: '#{this_line}'"
-      finis = true if options[:break_on_blank_lines] && this_line.strip.empty?
-      finis = true if options[:break_on_list_continuation] && this_line.chomp == LIST_CONTINUATION
+      finis = true if terminator && this_line.chomp == terminator
+      finis = true if !finis && break_on_blank_lines && this_line.strip.empty?
+      finis = true if !finis && break_on_list_continuation && this_line.chomp == LIST_CONTINUATION
       finis = true if !finis && block && yield(this_line)
       if finis
         self.unshift(this_line) if options[:preserve_last_line]

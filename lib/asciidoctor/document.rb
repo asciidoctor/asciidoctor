@@ -31,6 +31,9 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # Public: Base directory for rendering this document
   attr_reader :base_dir
 
+  # Public: Indicates whether this document is being rendered in a nested context.
+  attr_reader :nested
+
   # Public: Initialize an Asciidoc object.
   #
   # data    - The Array of Strings holding the Asciidoc source document. (default: [])
@@ -55,6 +58,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @callouts = Callouts.new
     @renderer = nil
     @options = options
+    @nested = @options.fetch(:nested, false)
     @options[:header_footer] = @options.fetch(:header_footer, true)
     @base_dir = options[:base_dir] || Dir.pwd
 
@@ -86,7 +90,12 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['backend'] ||= DEFAULT_BACKEND
     update_backend_attributes
 
-    @reader = Reader.new(data, self, attribute_overrides, &block)
+    if @nested
+      # don't need to do the extra processing within our own document
+      @reader = Reader.new(data)
+    else
+      @reader = Reader.new(data, self, attribute_overrides, &block)
+    end
 
     # dynamic intrinstic attribute values
     @attributes['doctype'] ||= DEFAULT_DOCTYPE
@@ -180,6 +189,12 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   def update_backend_attributes()
     backend = @attributes['backend']
     basebackend = backend.sub(/[[:digit:]]+$/, '')
+    page_width = DEFAULT_PAGE_WIDTHS[basebackend]
+    if page_width
+      @attributes['pagewidth'] = page_width
+    else
+      @attributes.delete('pagewidth')
+    end
     @attributes['backend-' + backend] = 1
     @attributes['basebackend'] = basebackend
     @attributes['basebackend-' + basebackend] = 1
