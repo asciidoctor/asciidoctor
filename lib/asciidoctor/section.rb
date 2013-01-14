@@ -36,11 +36,15 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # Public: The name of this section, an alias of the section title
   alias :name :title
 
-  # Public: Get the String section id prefixed with value of idprefix attribute, otherwise an underscore
+  # Public: Generate a String id for this section.
   #
-  # Section ID synthesis can be disabled by undefining the sectids attribute.
+  # The generated id is prefixed with value of the 'idprefix' attribute, which
+  # is an underscore by default.
   #
-  # TODO document the substitutions
+  # Section id synthesis can be disabled by undefining the 'sectids' attribute.
+  #
+  # If the generated id is already in use in the document, a count is appended
+  # until a unique id is found.
   #
   # Examples
   #
@@ -48,10 +52,23 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #   section.title = "Foo"
   #   section.generate_id
   #   => "_foo"
+  #
+  #   another_section = Section.new(parent)
+  #   another_section.title = "Foo"
+  #   another_section.generate_id
+  #   => "_foo_1"
   def generate_id
-    if !title.to_s.empty? && document.attr?('sectids')
-      document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, '_').
+    if document.attr?('sectids')
+      base_id = document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, '_').
           gsub(/\W+/, '_').tr_s('_', '_').gsub(/^_?(.*?)_?$/, '\1')
+      gen_id = base_id
+      cnt = 2
+      while document.references[:ids].has_key? gen_id 
+        gen_id = "#{base_id}_#{cnt}" 
+        cnt += 1
+      end 
+      document.references[:ids][gen_id] = title
+      gen_id
     else
       nil
     end

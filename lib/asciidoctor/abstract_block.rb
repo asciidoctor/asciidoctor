@@ -31,6 +31,10 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
 
   # Public: Get the String title of this Block with title substitions applied
   #
+  # The following substitutions are applied to block and section titles:
+  #
+  # :specialcharacters, :quotes, :replacements, :macros, :attributes and :post_replacements
+  #
   # Examples
   #
   #   block.title = "Foo 3^ # {two-colons} Bar(1)"
