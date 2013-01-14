@@ -136,7 +136,11 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
   <div class="title"><%= title %></div>
   <% end %>
   <div class="content monospaced">
+    <% if (attr :style) == 'source' %>
     <pre class="highlight#{attrvalue(:language)}"><code><%= content.gsub("\n", LINE_FEED_ENTITY) %></code></pre>
+    <% else %>
+    <pre><%= content.gsub("\n", LINE_FEED_ENTITY) %></pre>
+    <% end %>
   </div>
 </div>
     EOS
@@ -371,6 +375,53 @@ class BlockColistTemplate < ::Asciidoctor::BaseTemplate
   <% end %>
   </ol>
 </div>
+    EOS
+  end
+end
+
+class BlockTableTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= ERB.new <<-EOS
+<%#encoding:UTF-8%>
+<table#{id} class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%>#{style_class}" style="<%
+if !(attr? 'autowidth-option') %>width: <%= attr :tablepcwidth %>%; <% end %><%
+if attr? :float %>float: <%= attr :float %>; <% end %>">
+  <% if title? %>
+  <caption class="title"><%= title %></caption>
+  <% end %>
+  <% if (attr :rowcount) >= 0 %> 
+  <colgroup>
+    <% if attr? 'autowidth-option' %>
+    <% columns.each do |col| %>
+    <col>
+    <% end %>
+    <% else %>
+    <% columns.each do |col| %>
+    <col style="width: <%= col.attr :colpcwidth %>%;">
+    <% end %>
+    <% end %>
+  </colgroup>
+  <% [:head, :foot, :body].select {|tsec| !rows[tsec].empty? }.each do |tsec| %>
+  <t<%= tsec %>>
+    <% rows[tsec].each do |row| %>
+    <tr>
+      <% row.each do |cell| %>
+      <<%= tsec == :head ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}><%
+      if tsec == :head %><%= cell.text %><% else %><%
+      case cell.attr(:style)
+        when :asciidoc %><div><%= cell.content %></div><%
+        when :verse %><div class="verse"><%= cell.text.gsub("\n", LINE_FEED_ENTITY) %></div><%
+        when :literal %><div class="literal monospaced"><pre><%= cell.text.gsub("\n", LINE_FEED_ENTITY) %></pre></div><%
+        when :header %><% cell.content.each do |text| %><p class="tableblock header"><%= text %></p><% end %><%
+        else %><% cell.content.each do |text| %><p class="tableblock"><%= text %></p><% end %><%
+      end %><% end %></<%= tsec == :head ? 'th' : 'td' %>>
+      <% end %>
+    </tr>
+    <% end %>
+  </t<%= tsec %>>
+  <% end %>
+  <% end %>
+</table>
     EOS
   end
 end

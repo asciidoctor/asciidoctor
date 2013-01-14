@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'test_helper'
 
 context "Headers" do
@@ -93,6 +94,14 @@ context "Headers" do
 
     test "with custom non-blank idprefix" do
       assert_xpath "//h2[@id='ref_my_title'][text() = 'My Title']", render_string(":idprefix: ref_\n\n== My Title ")
+    end
+
+    test 'with multibyte characters' do
+      input = <<-EOS
+== Asciidoctor in 中文
+      EOS
+      output = render_string input
+      assert_xpath '//h2[@id="_asciidoctor_in"][text()="Asciidoctor in 中文"]', output
     end
   end
 

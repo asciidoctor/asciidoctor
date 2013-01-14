@@ -39,7 +39,7 @@ You're good to go!
     end
 
     test "listing paragraph" do
-      assert_xpath "//pre[@class='highlight']", render_string("----\nblah blah blah\n----")
+      assert_xpath "//pre[@class='highlight']", render_string("[source]\n----\nblah blah blah\n----")
     end
 
     test "source code paragraph" do

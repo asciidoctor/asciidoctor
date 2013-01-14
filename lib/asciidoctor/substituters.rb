@@ -386,7 +386,7 @@ module Asciidoctor
         m = $~
         # honor the escape
         if m[0].start_with? '\\'
-          next "&lt#{m[1]}&gt;"
+          next "&lt;#{m[1]}&gt;"
         end
         Inline.new(self, :callout, m[1], :id => document.callouts.read_next_id).render
       }
