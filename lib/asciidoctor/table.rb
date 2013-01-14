@@ -197,7 +197,7 @@ module Asciidoctor
         update_attributes(attributes)
       end
       if @attributes['style'] == :asciidoc
-        @inner_document = Document.new(@text, :header_footer => false, :nested => true, :attributes => @document.attributes)
+        @inner_document = Document.new(@text, :header_footer => false, :parent => @document)
       end
     end
   
@@ -264,7 +264,7 @@ module Asciidoctor
         @format = Table::DEFAULT_DATA_FORMAT
       end
   
-      if @format == 'psv' && !attributes.has_key?('separator') && table.document.nested
+      if @format == 'psv' && !attributes.has_key?('separator') && table.document.nested?
         @delimiter = '!'
       else
         @delimiter = attributes.fetch('separator', Table::DEFAULT_DELIMITERS[@format])

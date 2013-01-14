@@ -1626,7 +1626,7 @@ continued
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath %(//*[@class="dlist"]//dd/p/em[text()="'"]), output, 1
-      assert_xpath %(//*[@class="dlist"]//dd/p[text()="\ncontinued"]), output, 1
+      assert_xpath %(//*[@class="dlist"]//dd/p[normalize-space(text())="continued"]), output, 1
     end
   
     test 'folds text that looks like title offset by blank line' do
@@ -2060,7 +2060,8 @@ continued
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath %(//*[@class="dlist"]//dd/p[text()="def1\ncontinued\ncontinued"]), output, 1
+      # NOTE the extra endline is added as a result of whitespace in the ERB template
+      assert_xpath %(//*[@class="dlist"]//dd/p[text()="def1\ncontinued\n\ncontinued"]), output, 1
     end
   
     test 'folds text from inline definition and line following comment line' do

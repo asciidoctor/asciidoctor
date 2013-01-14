@@ -1,11 +1,19 @@
+# An abstract base class that provides methods for definining and rendering the
+# backend templates. Concrete subclasses must implement the template method.
+#
+# NOTE we must use double quotes for attribute values in the HTML/XML output to
+# prevent quote processing. This requirement seems hackish, but AsciiDoc has
+# this same issue.
 class Asciidoctor::BaseTemplate
   BLANK_LINES_PATTERN = /^\s*\n/
   LINE_FEED_ENTITY = '&#10;' # or &#x0A;
 
   attr_reader :view
+  attr_reader :eruby
 
-  def initialize(view)
+  def initialize(view, eruby)
     @view = view
+    @eruby = eruby
   end
 
   def self.inherited(klass)
@@ -17,10 +25,49 @@ class Asciidoctor::BaseTemplate
     @template_classes
   end
 
-  # We're ignoring locals for now. Shut up.
-  def render(obj = Object.new, locals = {})
-    output = template.result(obj.instance_eval { binding })
-    (view == 'document' || view == 'embedded') ? output.gsub(BLANK_LINES_PATTERN, '').gsub(LINE_FEED_ENTITY, "\n") : output
+  # Public: Render this template in the execution context of
+  # the supplied concrete instance of Asciidoctor::AbstractNode.
+  #
+  # This method invokes the template method on this instance to retrieve the
+  # template data and then evaluates that template in the context of the
+  # supplied concrete instance of Asciidoctor::AbstractNode. This instance is
+  # accessible to the template data via the local variable named 'template'.
+  #
+  # If the compact flag on the document's renderer is true and the view context is
+  # document or embedded, then blank lines in the output are compacted. Otherwise,
+  # the rendered output is returned unprocessed.
+  #
+  # node   - The concrete instance of AsciiDoctor::AbstractNode to render
+  # locals - A Hash of additional variables. Not currently in use.
+  def render(node = Object.new, locals = {})
+    # this is hot code, so we inline both calls rather than capture output to a local variable
+    if node.renderer.compact && (@view == 'document' || @view == 'embedded')
+      compact(template.result(node.get_binding(self)))
+    else
+      template.result(node.get_binding(self))
+    end
+  end
+
+  # Public: Compact blank lines in the provided text. This method also restores
+  # every HTML line feed entity found with an endline character.
+  #
+  # text  - the String to process
+  #
+  # returns the text with blank lines removed and HTML line feed entities
+  # converted to an endline character.
+  def compact(str)
+    str.gsub(BLANK_LINES_PATTERN, '').gsub(LINE_FEED_ENTITY, "\n")
+  end
+
+  # Public: Preserve endlines by replacing them with the HTML line feed entity.
+  #
+  # If the compact flag on the document's renderer is true, perform the
+  # replacement. Otherwise, return the text unprocessed.
+  #
+  # text  - the String to process
+  # node  - the concrete instance of Asciidoctor::AbstractNode being rendered
+  def preserve_endlines(str, node)
+    node.renderer.compact ? str.gsub("\n", LINE_FEED_ENTITY) : str
   end
 
   def template
@@ -49,6 +96,6 @@ class Asciidoctor::BaseTemplate
 
   # create template matter to insert an id if one is specified for the block
   def id
-    attribute('id', 'id')
+    attribute('id', '@id')
   end
 end

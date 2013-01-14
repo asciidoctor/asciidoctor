@@ -384,7 +384,9 @@ output file name is used.
       assert_equal 2, tbody.size  
       body_cell_1_3 = tbody[0][2]
       assert !body_cell_1_3.inner_document.nil?
-      assert body_cell_1_3.inner_document.nested
+      assert body_cell_1_3.inner_document.nested?
+      assert_equal doc, body_cell_1_3.inner_document.parent_document
+      assert_equal doc.renderer, body_cell_1_3.inner_document.renderer
       output = doc.render
 
       assert_css 'table > tbody > tr', output, 2
