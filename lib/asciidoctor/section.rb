@@ -19,9 +19,6 @@
 #   => 1
 class Asciidoctor::Section < Asciidoctor::AbstractBlock
 
-  # Public: Set the String section title.
-  attr_writer :title
-
   # Public: Get/Set the Integer index of this section within the parent block
   attr_accessor :index
 
@@ -30,37 +27,14 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # parent - The parent Asciidoc Object.
   def initialize(parent = nil, level = nil)
     super(parent, :section)
-    @title = nil
     if level.nil? && !parent.nil?
       @level = parent.level + 1
     end
     @index = 0
   end
 
-  # Public: Get the String section title with intrinsics converted
-  #
-  # Examples
-  #
-  #   section.title = "Foo 3^ # {two-colons} Bar(1)"
-  #   section.title
-  #   => "Foo 3^ # :: Bar(1)"
-  #
-  # Returns the String section title
-  def title
-    # prevent from rendering multiple times
-    if defined?(@processed_title)
-      @processed_title
-    elsif @title
-      @processed_title = apply_title_subs(@title)
-    else
-      @title
-    end
-  end
-
   # Public: The name of this section, an alias of the section title
-  def name
-    title
-  end
+  alias :name :title
 
   # Public: Get the String section id prefixed with value of idprefix attribute, otherwise an underscore
   #

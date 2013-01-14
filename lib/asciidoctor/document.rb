@@ -160,7 +160,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   def doctitle
     if !(title = @attributes.fetch('title', '')).empty?
       title
-    elsif !(sect = first_section).nil? && !sect.title.empty?
+    elsif !(sect = first_section).nil? && sect.title?
       sect.title
     else
       nil

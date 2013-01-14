@@ -5,10 +5,14 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
   # Public: Set the Integer level of this Section or the Section level in which this Block resides
   attr_accessor :level
 
+  # Public: Set the String block title.
+  attr_writer :title
+
   def initialize(parent, context)
     super(parent, context)
     @blocks = []
     @id = nil
+    @title = nil
     if context == :document
       @level = 0
     elsif !parent.nil? && !self.is_a?(Asciidoctor::Section)
@@ -17,6 +21,32 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
       @level = nil
     end
     @next_section_index = 0 
+  end
+
+  # Public: A convenience method that indicates whether the title instance
+  # variable is blank (nil or empty)
+  def title?
+    !@title.to_s.empty?
+  end
+
+  # Public: Get the String title of this Block with title substitions applied
+  #
+  # Examples
+  #
+  #   block.title = "Foo 3^ # {two-colons} Bar(1)"
+  #   block.title
+  #   => "Foo 3^ # :: Bar(1)"
+  #
+  # Returns the String title of this Block
+  def title
+    # prevent substitutions from being applied multiple times
+    if defined?(@subbed_title)
+      @subbed_title
+    elsif @title
+      @subbed_title = apply_title_subs(@title)
+    else
+      @title
+    end
   end
 
   # Public: Determine whether this Block contains block content

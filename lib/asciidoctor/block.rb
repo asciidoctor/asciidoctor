@@ -13,9 +13,6 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   # Public: Get/Set the original Array content for this section block.
   attr_accessor :buffer
 
-  # Public: Get/Set the String block title.
-  attr_accessor :title
-
   # Public: Get/Set the caption for this block
   attr_accessor :caption
 
@@ -28,13 +25,6 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   def initialize(parent, context, buffer = nil)
     super(parent, context)
     @buffer = buffer
-    @title = nil
-  end
-
-  # Public: A convenience method that indicates whether the title instance
-  # variable is blank (nil or empty)
-  def title?
-    !@title.to_s.empty?
   end
 
   # Public: Get the rendered String content for this Block.  If the block
