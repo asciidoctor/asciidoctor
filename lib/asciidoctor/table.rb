@@ -62,7 +62,18 @@ module Asciidoctor
       @caption = nil
       @rows = Rows.new([], [], [])
       @columns = []
-      @attributes['tablepcwidth'] ||= attributes.fetch('width', '100%').chomp('%')
+
+      unless @attributes.has_key? 'tablepcwidth'
+        # smell like we need a utility method here
+        # to resolve an integer width from potential bogus input
+        pcwidth = attributes['width']
+        pcwidth_intval = pcwidth.to_i.abs
+        if pcwidth_intval == 0 && pcwidth != "0" || pcwidth_intval > 100
+          pcwidth_intval = 100
+        end
+        @attributes['tablepcwidth'] = pcwidth_intval
+      end
+
       if @document.attributes.has_key? 'pagewidth'
         @attributes['tableabswidth'] ||=
             ((@attributes['tablepcwidth'].to_f / 100) * @document.attributes['pagewidth']).round
