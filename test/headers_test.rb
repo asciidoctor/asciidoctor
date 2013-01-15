@@ -412,6 +412,41 @@ fin.
     end
   end
 
+  context 'Table of Contents' do
+    test 'should render table of contents if toc attribute is set' do
+      input = <<-EOS
+Article
+=======
+:toc:
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+
+=== Interlude
+
+While they were waiting...
+
+== Section Three
+
+That's all she wrote!
+      EOS
+      output = render_string input
+      assert_xpath '//*[@id="toc"]', output, 1
+      assert_xpath '//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol', output, 1
+      assert_xpath '//*[@id="toc"]//ol', output, 2
+      assert_xpath '//*[@id="toc"]/ol/li', output, 4
+      assert_xpath '//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol/li/ol/li', output, 1
+      assert_xpath '//*[@id="toc"]/ol/li/ol/li/a[@href="#_interlude"][text()="2.1. Interlude"]', output, 1
+    end
+  end
+
   context "book doctype" do
     test "document title with level 0 headings" do
       input = <<-EOS
