@@ -1,23 +1,28 @@
 # Public: Methods for rendering Asciidoc Documents, Sections, and Blocks
-# using erb templates.
+# using eRuby templates.
 class Asciidoctor::Renderer
+  attr_reader :compact
+
   # Public: Initialize an Asciidoctor::Renderer object.
   #
   def initialize(options={})
     @debug = !!options[:debug]
 
     @views = {}
+    @compact = options[:compact]
 
     backend = options[:backend]
     case backend
     when 'html5', 'docbook45'
+      eruby = load_eruby options[:eruby]
+      #Asciidoctor.require_library 'asciidoctor/backends/' + backend
       require 'asciidoctor/backends/' + backend
       # Load up all the template classes that we know how to render for this backend
-      ::Asciidoctor::BaseTemplate.template_classes.each do |tc|
+      Asciidoctor::BaseTemplate.template_classes.each do |tc|
         if tc.to_s.downcase.include?('::' + backend + '::') # optimization
           view_name, view_backend = self.class.extract_view_mapping(tc)
           if view_backend == backend
-            @views[view_name] = tc.new(view_name)
+            @views[view_name] = tc.new(view_name, eruby)
           end
         end
       end
@@ -27,7 +32,7 @@ class Asciidoctor::Renderer
 
     # If user passed in a template dir, let them override our base templates
     if template_dir = options.delete(:template_dir)
-      require 'tilt'
+      Asciidoctor.require_library 'tilt'
 
       Asciidoctor.debug {
         msg = []
@@ -105,6 +110,25 @@ class Asciidoctor::Renderer
     readonly_views = @views.dup
     readonly_views.freeze
     readonly_views
+  end
+
+  # Internal: Load the eRuby implementation
+  #
+  # name - the String name of the eRuby implementation (default: 'erb')
+  #
+  # returns the eRuby implementation class
+  def load_eruby(name)
+    if name.nil? || !['erb', 'erubis'].include?(name)
+      name = 'erb'
+    end
+
+    Asciidoctor.require_library name
+
+    if name == 'erb'
+      ::ERB
+    elsif name == 'erubis'
+      ::Erubis::FastEruby
+    end
   end
 
   # Internal: Extracts the view name and backend from a qualified Ruby class

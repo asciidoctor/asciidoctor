@@ -363,7 +363,7 @@ class Asciidoctor::Lexer
         reader.unshift this_line
         block = next_labeled_list(reader, match, parent)
 
-      elsif delimited_blk && (match = this_line.match(document.nested ? REGEXP[:table_nested] : REGEXP[:table]))
+      elsif delimited_blk && (match = this_line.match(document.nested? ? REGEXP[:table_nested] : REGEXP[:table]))
         # table is surrounded by lines starting with a | followed by 3 or more '=' chars
         terminator = match[0]
         AttributeList.rekey(attributes, ['style'])

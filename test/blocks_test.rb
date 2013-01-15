@@ -141,14 +141,22 @@ line two
 line three
 ....
 EOS
-      output = render_string(input)
-      assert_xpath '//pre', output, 1
-      assert_xpath '//pre/text()', output, 1
-      text = xmlnodes_at_xpath('//pre/text()', output, 1).text
-      lines = text.lines.entries
-      assert_equal 5, lines.size
-      expected = "line one\n\nline two\n\nline three".lines.entries
-      assert_equal expected, lines
+      [true, false].each {|compact|
+        output = render_string input, :compact => compact
+        assert_xpath '//pre', output, 1
+        assert_xpath '//pre/text()', output, 1
+        text = xmlnodes_at_xpath('//pre/text()', output, 1).text
+        lines = text.lines.entries
+        assert_equal 5, lines.size
+        expected = "line one\n\nline two\n\nline three".lines.entries
+        assert_equal expected, lines
+        blank_lines = output.scan(/\n[[:blank:]]*\n/).size
+        if compact
+          assert_equal 2, blank_lines
+        else
+          assert blank_lines > 2
+        end
+      }
     end
 
     test "should preserve endlines in listing block" do
@@ -162,14 +170,22 @@ line two
 line three
 ----
 EOS
-      output = render_string(input)
-      assert_xpath '//pre/code', output, 1
-      assert_xpath '//pre/code/text()', output, 1
-      text = xmlnodes_at_xpath('//pre/code/text()', output, 1).text
-      lines = text.lines.entries
-      assert_equal 5, lines.size
-      expected = "line one\n\nline two\n\nline three".lines.entries
-      assert_equal expected, lines
+      [true, false].each {|compact|
+        output = render_string input, :compact => compact
+        assert_xpath '//pre/code', output, 1
+        assert_xpath '//pre/code/text()', output, 1
+        text = xmlnodes_at_xpath('//pre/code/text()', output, 1).text
+        lines = text.lines.entries
+        assert_equal 5, lines.size
+        expected = "line one\n\nline two\n\nline three".lines.entries
+        assert_equal expected, lines
+        blank_lines = output.scan(/\n[[:blank:]]*\n/).size
+        if compact
+          assert_equal 2, blank_lines
+        else
+          assert blank_lines > 2
+        end
+      }
     end
 
     test "should preserve endlines in verse block" do
@@ -183,14 +199,22 @@ line two
 line three
 ____
 EOS
-      output = render_string(input)
-      assert_xpath '//*[@class="verseblock"]/pre', output, 1
-      assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
-      text = xmlnodes_at_xpath('//*[@class="verseblock"]/pre/text()', output, 1).text
-      lines = text.lines.entries
-      assert_equal 5, lines.size
-      expected = "line one\n\nline two\n\nline three".lines.entries
-      assert_equal expected, lines
+      [true, false].each {|compact|
+        output = render_string input, :compact => compact
+        assert_xpath '//*[@class="verseblock"]/pre', output, 1
+        assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
+        text = xmlnodes_at_xpath('//*[@class="verseblock"]/pre/text()', output, 1).text
+        lines = text.lines.entries
+        assert_equal 5, lines.size
+        expected = "line one\n\nline two\n\nline three".lines.entries
+        assert_equal expected, lines
+        blank_lines = output.scan(/\n[[:blank:]]*\n/).size
+        if compact
+          assert_equal 2, blank_lines
+        else
+          assert blank_lines > 2
+        end
+      }
     end
   end
 
@@ -251,9 +275,9 @@ http://asciidoc.org
 ++++
       EOS
 
-      expected = %(This is a 'passthrough' block.\n<a href="http://asciidoc.org">http://asciidoc.org</a>\n)
+      expected = %(This is a 'passthrough' block.\n<a href="http://asciidoc.org">http://asciidoc.org</a>)
       output = render_embedded_string input
-      assert_equal expected, output
+      assert_equal expected, output.strip
     end
 
     test 'passthrough block honors explicit subs list' do
@@ -267,9 +291,9 @@ http://asciidoc.org
 ++++
       EOS
 
-      expected = %(This is a <em>passthrough</em> block.\nhttp://asciidoc.org\n)
+      expected = %(This is a <em>passthrough</em> block.\nhttp://asciidoc.org)
       output = render_embedded_string input
-      assert_equal expected, output
+      assert_equal expected, output.strip
     end
   end
 

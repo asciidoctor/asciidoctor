@@ -48,6 +48,7 @@ context 'Document' do
       assert_equal 26, views.size
       assert views.has_key? 'document'
       assert views['document'].is_a?(Asciidoctor::HTML5::DocumentTemplate)
+      assert_equal 'ERB', views['document'].eruby.to_s
     end
 
     test 'built-in DocBook45 views are registered when backend is docbook45' do
@@ -63,6 +64,19 @@ context 'Document' do
       assert_equal 26, views.size
       assert views.has_key? 'document'
       assert views['document'].is_a?(Asciidoctor::DocBook45::DocumentTemplate)
+      assert_equal 'ERB', views['document'].eruby.to_s
+    end
+  
+    test 'can set erubis as eRuby implementation' do
+      doc = Asciidoctor::Document.new [], :eruby => 'erubis' 
+      assert $LOADED_FEATURES.detect {|p| p == 'erubis.rb' || p.end_with?('/erubis.rb') }.nil?
+      renderer = doc.renderer
+      assert $LOADED_FEATURES.detect {|p| p == 'erubis.rb' || p.end_with?('/erubis.rb') }
+      views = renderer.views
+      assert !views.nil?
+      assert views.has_key? 'document'
+      assert_equal 'Erubis::FastEruby', views['document'].eruby.to_s
+      assert_equal 'Erubis::FastEruby', views['document'].template.class.to_s
     end
   end
 

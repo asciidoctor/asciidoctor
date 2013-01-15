@@ -58,8 +58,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # Public: Base directory for rendering this document
   attr_reader :base_dir
 
-  # Public: Indicates whether this document is being rendered in a nested context.
-  attr_reader :nested
+  # Public: A reference to the parent document of this nested document.
+  attr_reader :parent_document
 
   # Public: Initialize an Asciidoc object.
   #
@@ -77,6 +77,15 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   #   puts doc.render
   def initialize(data = [], options = {}, &block)
     super(self, :document)
+    @renderer = nil
+
+    if options[:parent]
+      @parent_document = options.delete(:parent)
+      # should we dup here?
+      options[:attributes] = @parent_document.attributes
+      @renderer = @parent_document.renderer
+    end
+
     @header = nil
     @references = {
       :ids => {},
@@ -84,10 +93,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       :images => []
     }
     @callouts = Callouts.new
-    @renderer = nil
     @options = options
     @safe = @options.fetch(:safe, SECURE_MODE).to_i.abs
-    @nested = @options.fetch(:nested, false)
     @options[:header_footer] = @options.fetch(:header_footer, true)
     @base_dir = options[:base_dir] || Dir.pwd
 
@@ -117,7 +124,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['backend'] ||= DEFAULT_BACKEND
     update_backend_attributes
 
-    if @nested
+    if nested?
       # don't need to do the extra processing within our own document
       @reader = Reader.new(data)
     else
@@ -167,6 +174,10 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     end
   end
 
+  def nested?
+    !@parent_document.nil?
+  end
+
   # Make the raw source for the Document available.
   def source
     @reader.source if @reader
@@ -208,7 +219,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
   # QUESTION move to AbstractBlock?
   def first_section
-    has_header? ? @header : @blocks.detect{|e| e.is_a? Section}
+    has_header? ? @header : (@blocks || []).detect{|e| e.is_a? Section}
   end
 
   def has_header?
@@ -248,7 +259,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     nil
   end
 
-  def renderer(options = {})
+  def renderer(opts = {})
     return @renderer if @renderer
     
     render_options = {}
@@ -259,9 +270,11 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     end
     
     render_options[:backend] = @attributes.fetch('backend', 'html5')
+    render_options[:eruby] = @options.fetch(:eruby, 'erb')
+    render_options[:compact] = @options.fetch(:compact, false)
     
     # Override Document @option settings with options passed in
-    render_options.merge! options
+    render_options.merge! opts
 
     @renderer = Renderer.new(render_options)
   end
@@ -270,15 +283,15 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # loaded by Renderer. If a :template_dir is not specified,
   # or a template is missing, the renderer will fall back to
   # using the appropriate built-in template.
-  def render(options = {})
-    r = renderer(options)
-    @options.merge(options)[:header_footer] ? r.render('document', self) : r.render('embedded', self)
+  def render(opts = {})
+    r = renderer(opts)
+    @options.merge(opts)[:header_footer] ? r.render('document', self) : r.render('embedded', self)
   end
 
   def content
     # per AsciiDoc-spec, remove the title after rendering the header
     @attributes.delete('title')
-    @blocks.map(&:render).join
+    @blocks.map {|b| b.render }.join
   end
 
   def to_s

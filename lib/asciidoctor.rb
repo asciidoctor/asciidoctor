@@ -1,11 +1,11 @@
 require 'rubygems'
-require 'erb'
+require 'strscan'
 
 $:.unshift(File.dirname(__FILE__))
 #$:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
-# using erb templates.
+# using eRuby templates.
 #
 # Asciidoc documents comprise a header followed by zero or more sections.
 # Sections are composed of blocks of content.  For example:
@@ -464,6 +464,27 @@ module Asciidoctor
     # restore entities; TODO needs cleanup
     [/&amp;(#[a-z0-9]+;)/i, '&\1']
   ]
+
+  # Internal: Prior to invoking Kernel#require, issues a warning urging a
+  # manual require if running in a threaded environment.
+  #
+  # name  - the String name of the library to require.
+  #
+  # returns nothing
+  def self.require_library(name)
+    if Thread.list.size > 1
+      main_script = "#{name}.rb"
+      main_script_path_segment = "/#{name}.rb"
+      if !$LOADED_FEATURES.detect {|p| p == main_script || p.end_with?(main_script_path_segment) }.nil?
+        return
+      else
+        warn "WARN: asciidoctor is autoloading '#{name}' in threaded environment. " +
+           "The use of an explicit require '#{name}' statement is recommended."
+      end
+    end
+    require name
+    nil
+  end
 
   # modules
   require 'asciidoctor/substituters'
