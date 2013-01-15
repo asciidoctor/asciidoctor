@@ -528,7 +528,7 @@ class Asciidoctor::Lexer
       block.caption ||= caption unless block.is_a?(Section)
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
-      if block.id && block.title && !attributes.has_key?('reftext')
+      if block.id && block.title? && !attributes.has_key?('reftext')
         document.register(:ids, [block.id, block.title])
       end
       block.update_attributes(attributes)
