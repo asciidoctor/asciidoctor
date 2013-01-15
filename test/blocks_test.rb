@@ -355,14 +355,14 @@ image::tiger.png[Tiger]
 image::dot.gif[Dot]
       EOS
 
-      doc = document_from_string input, :attributes => {'docdir' => File.dirname(__FILE__)}
+      doc = document_from_string input, :safe => Asciidoctor::SAFE_MODE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal 'fixtures', doc.attributes['imagesdir']
       output = doc.render
       assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
     # this test will cause a warning to be printed to the console (until we have a message facility)
-    test 'does not allow access to ancestor directories to read image if safe-paths attribute is set' do
+    test 'cleans reference to ancestor directories before reading image if safe mode level is at least SAFE_MODE' do
       input = <<-EOS
 :data-uri:
 :imagesdir: ../fixtures
@@ -370,7 +370,7 @@ image::dot.gif[Dot]
 image::dot.gif[Dot]
       EOS
 
-      doc = document_from_string input, :attributes => {'docdir' => File.dirname(__FILE__)}
+      doc = document_from_string input, :safe => Asciidoctor::SAFE_MODE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal '../fixtures', doc.attributes['imagesdir']
       output = doc.render
       assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
@@ -403,7 +403,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="icons/tip.png"][@alt="Tip"]', output, 1
     end
 
-    test 'embeds base64-encoded data uri for icon when data-uri attribute is set' do
+    test 'embeds base64-encoded data uri of icon when data-uri attribute is set and safe mode level is less than SECURE_MODE' do
       input = <<-EOS
 :icons:
 :iconsdir: fixtures
@@ -414,11 +414,26 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = render_string input, :attributes => {'docdir' => File.dirname(__FILE__)}
+      output = render_string input, :safe => Asciidoctor::SAFE_MODE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
-    test 'does not allow access to ancestor directories to read icon if safe-paths attribute is set' do
+    test 'does not embed base64-encoded data uri of icon when safe mode level is at least SECURE_MODE' do
+      input = <<-EOS
+:icons:
+:iconsdir: fixtures
+:iconstype: gif
+:data-uri:
+
+[TIP]
+You can use icons for admonitions by setting the 'icons' attribute.
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="fixtures/tip.gif"][@alt="Tip"]', output, 1
+    end
+
+    test 'cleans reference to ancestor directories before reading icon if safe mode level is at least SAFE_MODE' do
       input = <<-EOS
 :icons:
 :iconsdir: ../fixtures
@@ -429,35 +444,35 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = render_string input, :attributes => {'docdir' => File.dirname(__FILE__)}
+      output = render_string input, :safe => Asciidoctor::SAFE_MODE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
   end
 
   context 'Image paths' do
 
-    test 'restricts access to ancestor directories when safe-paths is enabled' do
+    test 'restricts access to ancestor directories when safe mode level is at least SAFE_MODE' do
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
       basedir = File.dirname(__FILE__)
       block = block_from_string input, :attributes => {'docdir' => basedir}
       doc = block.document
-      assert doc.attr('safe-paths') == true
+      assert doc.safe >= Asciidoctor::SAFE_MODE
 
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
       assert_equal File.join(basedir, 'etc/images'), block.normalize_asset_path('/etc/images')
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('../../images')
     end
 
-    test "doesn't restrict access to ancestor directories when safe-paths is disabled" do
+    test 'does not restrict access to ancestor directories when safe mode is disabled' do
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
       basedir = File.dirname(__FILE__)
-      block = block_from_string input, :attributes => {'docdir' => basedir, 'safe-paths' => false}
+      block = block_from_string input, :safe => Asciidoctor::UNSAFE_MODE, :attributes => {'docdir' => basedir}
       doc = block.document
-      assert doc.attr('safe-paths') == false
+      assert doc.safe == Asciidoctor::UNSAFE_MODE
 
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
       assert_equal '/etc/images', block.normalize_asset_path('/etc/images')

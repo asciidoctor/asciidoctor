@@ -161,7 +161,7 @@ include::include-file.asciidoc[]
 
 last line
       EOS
-      doc = Asciidoctor::Document.new
+      doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SAFE_MODE
       Asciidoctor::Reader.new(input.lines.entries, doc) {|inc|
         ":file: #{inc}\n\nmiddle line".lines.entries
       }
