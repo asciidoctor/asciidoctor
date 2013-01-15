@@ -19,6 +19,33 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
   include Asciidoctor
 
+  # Public A read-only integer value indicating the level of security that
+  # should be enforced while processing this document. The value must be
+  # set in the Document constructor using the :safe option.
+  #
+  # A value of 0 (UNSAFE_MODE) disables any of the security features enforced
+  # by Asciidoctor (Ruby is still subject to its own restrictions).
+  #
+  # A value of 1 (SAFE_MODE) closely parallels safe mode in AsciiDoc. In particular,
+  # it prevents access to files which reside outside of the parent directory
+  # of the source file and disables any macro other than the include macro.
+  #
+  # A value of 10 (SECURE_MODE) disallows the document from attempting to read
+  # files from the file system and including the contents of them into the
+  # document. In particular, it disallows use of the include::[] macro and the
+  # embedding of binary content (data uri), stylesheets and JavaScripts
+  # referenced by the document. (Asciidoctor and trusted extensions may still
+  # be allowed to embed trusted content into the document). Since Asciidoctor
+  # is aiming for wide adoption, this value is the default and is recommended
+  # for server-side deployments.
+  #
+  # A value of 100 (PARANOID_MODE) is planned to disallow the use of
+  # passthrough macros and prevents the document from setting any known
+  # attributes in addition to all the security features of SECURE_MODE. Please
+  # note that this level is not currently implemented (and therefore not
+  # enforced)!
+  attr_reader :safe
+
   # Public: Get the Hash of document references
   attr_reader :references
 
@@ -37,8 +64,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # Public: Initialize an Asciidoc object.
   #
   # data    - The Array of Strings holding the Asciidoc source document. (default: [])
-  # options - A Hash of options to control processing, such as disabling
-  #           the header/footer (:header_footer) or attribute overrides (:attributes)
+  # options - A Hash of options to control processing, such as setting the safe mode (:safe),
+  #           suppressing the header/footer (:header_footer) and attribute overrides (:attributes)
   #           (default: {})
   # block   - A block that can be used to retrieve external Asciidoc
   #           data to include in this document.
@@ -47,6 +74,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   #
   #   data = File.readlines(filename)
   #   doc  = Asciidoctor::Document.new(data)
+  #   puts doc.render
   def initialize(data = [], options = {}, &block)
     super(self, :document)
     @header = nil
@@ -58,6 +86,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @callouts = Callouts.new
     @renderer = nil
     @options = options
+    @safe = @options.fetch(:safe, SECURE_MODE).to_i.abs
     @nested = @options.fetch(:nested, false)
     @options[:header_footer] = @options.fetch(:header_footer, true)
     @base_dir = options[:base_dir] || Dir.pwd
@@ -69,11 +98,9 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
     attribute_overrides = options[:attributes] || {}
 
-    # the only way to set the safe-paths attribute is via the document options
-    attribute_overrides['safe-paths'] = true unless attribute_overrides.has_key?('safe-paths')
     # the only way to set the include-depth attribute is via the document options
     # 10 is the AsciiDoc default, though currently Asciidoctor only supports 1 level
-    attribute_overrides['include-depth'] ||= 1
+    attribute_overrides['include-depth'] ||= 10
 
     attribute_overrides['docdir'] ||= Dir.pwd
     

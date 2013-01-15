@@ -274,16 +274,22 @@ class Asciidoctor::Reader
   # Private: Process raw input, used for the outermost reader.
   def process(data, &block)
     raw_source = []
+    include_depth = @document.attr('include-depth', 0).to_i
 
     data.each do |line|
       if inc = line.match(REGEXP[:include_macro])
-        # assume that if a block is given, the developer wants
-        # to handle when and how to process the include
-        if block_given?
-          raw_source.concat yield(inc[1])
-        elsif inc[0].start_with?('\\')
+        if inc[0].start_with? '\\'
           raw_source << line[1..-1]
-        elsif @document.attr('include-depth', 0) > 0
+        # if running in SECURE_MODE or greater, don't process
+        # this directive (or should we swallow it?)
+        elsif @document.safe >= SECURE_MODE
+          raw_source << line
+        # assume that if a block is given, the developer wants
+        # to handle when and how to process the include, even
+        # if the include-depth attribute is 0
+        elsif block_given?
+          raw_source.concat yield(inc[1])
+        elsif include_depth > 0
           raw_source.concat File.readlines(build_secure_path(inc[1]))
         else
           raw_source << line
