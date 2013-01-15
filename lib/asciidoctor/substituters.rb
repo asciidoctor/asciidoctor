@@ -252,7 +252,7 @@ module Asciidoctor
           elsif INTRINSICS.has_key? $2
             INTRINSICS[$2]
           else
-            Asciidoctor.debug "Missing attribute: #$2, line marked for removal"
+            Asciidoctor.debug { "Missing attribute: #$2, line marked for removal" }
             reject = true
             break '{undefined}'
           end
@@ -367,7 +367,7 @@ module Asciidoctor
         end
         # NOTE the reftext should also match what's in our references dic
         if !@document.references[:ids].has_key? id
-          Asciidoctor.debug "Missing reference for anchor #{id}"
+          Asciidoctor.debug { "Missing reference for anchor #{id}" }
         end
         Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
       } unless !result.include?('[[')

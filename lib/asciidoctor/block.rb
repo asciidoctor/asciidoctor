@@ -32,11 +32,9 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   # rendered and returned as content that can be included in the
   # parent block's template.
   def render
-    Asciidoctor.debug "Now attempting to render for #{context} my own bad #{self}"
-    Asciidoctor.debug "Parent is #{@parent}"
-    Asciidoctor.debug "Renderer is #{renderer}"
-    out = renderer.render("block_#{context}", self)
-    @document.callouts.next_list if context == :colist
+    Asciidoctor.debug { "Now rendering #{@context} block for #{self}" }
+    out = renderer.render("block_#{@context}", self)
+    @document.callouts.next_list if @context == :colist
     out
   end
 
@@ -95,12 +93,9 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   #   => ["<em>This</em> is what happens when you &lt;meet&gt; a stranger in the &lt;alps&gt;!"]
   def content
 
-    #Asciidoctor.debug "For the record, buffer is:"
-    #Asciidoctor.debug @buffer.inspect
-
     case @context
     when :preamble, :open, :example, :sidebar
-      blocks.map{|block| block.render}.join
+      @blocks.map(&:render).join
     # lists get iterated in the template (for now)
     # list items recurse into this block when their text and content methods are called
     when :ulist, :olist, :dlist, :colist
@@ -113,7 +108,7 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
       if !@buffer.nil?
         apply_normal_subs(@buffer)
       else
-        blocks.map{|block| block.render}.join
+        @blocks.map(&:render).join
       end
     else
       apply_normal_subs(@buffer)

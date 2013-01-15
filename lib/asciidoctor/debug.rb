@@ -1,8 +1,8 @@
 module Asciidoctor
   @show_debug = nil
 
-  def self.debug(*args)
-    puts args if self.show_debug_output?
+  def self.debug
+    puts yield if self.show_debug_output?
   end
 
   def self.set_debug(value)
@@ -17,7 +17,7 @@ module Asciidoctor
     indentation = " " * level * 2
 
     args.each do |arg|
-      self.debug "#{indentation}#{arg}"
+      self.debug { "#{indentation}#{arg}" }
     end
   end
 end

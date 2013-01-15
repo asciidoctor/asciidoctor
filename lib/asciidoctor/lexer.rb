@@ -218,15 +218,18 @@ class Asciidoctor::Lexer
       options.delete(:text)
     end
 
-    Asciidoctor.debug "/"*64
-    Asciidoctor.debug "#{File.basename(__FILE__)}:#{__LINE__} -> #{__method__} - First two lines are:"
-    Asciidoctor.debug reader.peek_line
-
-    tmp_line = reader.get_line
-    Asciidoctor.debug reader.peek_line
-    reader.unshift tmp_line
-    Asciidoctor.debug "/"*64
-
+    Asciidoctor.debug {
+      msg = []
+      msg << '/' * 64
+      msg << 'next_block() - First two lines are:'
+      msg << reader.peek_line
+      tmp_line = reader.get_line
+      msg << reader.peek_line
+      reader.unshift tmp_line
+      msg << '/' * 64
+      msg * "\n"
+    }
+    
     parse_metadata = options[:parse_metadata] || true
     parse_sections = options[:parse_sections] || false
 
@@ -241,7 +244,6 @@ class Asciidoctor::Lexer
         reader.next_line
         next
       elsif parse_sections && context.nil? && is_next_line_section?(reader)
-        Asciidoctor.debug "#{__method__}: SENDING to next_section with lines[0] = #{reader.peek_line}"
         block, attributes = next_section(reader, parent, attributes)
         break
       end
@@ -309,7 +311,6 @@ class Asciidoctor::Lexer
         end
 
       elsif match = this_line.match(REGEXP[:colist])
-        Asciidoctor.debug "Creating block of type: :colist"
         block = Block.new(parent, :colist)
         attributes['style'] = 'arabic'
         items = []
@@ -513,7 +514,6 @@ class Asciidoctor::Lexer
           attributes['caption'] ||= admonition[1].capitalize
         else
           buffer.last.chomp!
-          Asciidoctor.debug "Proud parent #{parent} getting a new paragraph with buffer: #{buffer}"
           block = Block.new(parent, :paragraph, buffer)
         end
       end
@@ -576,7 +576,7 @@ class Asciidoctor::Lexer
     else
       list_block.level = 1
     end
-    Asciidoctor.debug "Created #{list_type} block: #{list_block}"
+    Asciidoctor.debug { "Created #{list_type} block: #{list_block}" }
 
     while reader.has_lines? && (match = reader.peek_line.match(REGEXP[list_type]))
 
@@ -713,8 +713,6 @@ class Asciidoctor::Lexer
       has_text = true
     end
 
-    Asciidoctor.debug "#{__FILE__}:#{__LINE__}: Created ListItem #{list_item} with text: #{list_type == :dlist ? match[3] : match[2]} and level: #{list_item.level}"
-
     # first skip the line with the marker / term
     reader.get_line
     list_item_reader = Reader.new grab_lines_for_list_item(reader, list_type, sibling_trait, has_text)
@@ -741,8 +739,6 @@ class Asciidoctor::Lexer
 
       list_item.fold_first(continuation_connects_first_block, content_adjacent)
     end
-
-    Asciidoctor.debug "\n\nlist_item has #{list_item.blocks.count} blocks, and first is a #{list_item.blocks.first.class} with context #{list_item.blocks.first.context rescue 'n/a'}\n\n"
 
     if list_type == :dlist
       unless list_item.text? || list_item.blocks?
@@ -1107,7 +1103,6 @@ class Asciidoctor::Lexer
         reader.get_line
       end
     end
-    Asciidoctor.debug "#{__method__} -> Returning #{sect_title}, #{sect_level} (id: '#{sect_id || '<none>'}')"
     return [sect_id, sect_title, sect_level, single_line]
   end
 
@@ -1230,7 +1225,6 @@ class Asciidoctor::Lexer
       terminator = match[0]
       reader.grab_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator)
     elsif match = next_line.match(REGEXP[:anchor])
-      Asciidoctor.debug "Found an anchor in line:\n\t#{next_line}"
       id, reftext = match[1].split(',')
       attributes['id'] = id
       # AsciiDoc always use [id] as the reftext in HTML output,

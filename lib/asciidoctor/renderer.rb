@@ -22,18 +22,20 @@ class Asciidoctor::Renderer
         end
       end
     else
-      Asciidoctor.debug 'No built-in templates for backend: ' + backend
+      Asciidoctor.debug { "No built-in templates for backend: #{backend}" }
     end
 
     # If user passed in a template dir, let them override our base templates
     if template_dir = options.delete(:template_dir)
       require 'tilt'
 
-      Asciidoctor.debug "Views going in are like so:"
-      @views.each_pair do |k, v|
-        Asciidoctor.debug "#{k}: #{v}"
-      end
-      Asciidoctor.debug "="*60
+      Asciidoctor.debug {
+        msg = []
+        msg << "Views going in are like so:"
+        msg << @views.map {|k, v| "#{k}: #{v}"}
+        msg << '=' * 60
+        msg * "\n"
+      }
       
       # Grab the files in the top level of the directory (we're not traversing)
       files = Dir.glob(File.join(template_dir, '*')).select{|f| File.stat(f).file?}
@@ -41,12 +43,14 @@ class Asciidoctor::Renderer
         name = File.basename(view).split('.').first
         view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>', :attr_wrapper => '"'))
       end
-      
-      Asciidoctor.debug "Views are now like so:"
-      @views.each_pair do |k, v|
-        Asciidoctor.debug "#{k}: #{v}"
-      end
-      Asciidoctor.debug "="*60
+
+      Asciidoctor.debug {
+        msg = []
+        msg << "Views going in are like so:"
+        msg << @views.map {|k, v| "#{k}: #{v}"}
+        msg << '=' * 60
+        msg * "\n"
+      }
     end
 
     @render_stack = []
@@ -63,7 +67,7 @@ class Asciidoctor::Renderer
     if !@views.has_key? view
       raise "Couldn't find a view in @views for #{view}"
     else
-      Asciidoctor.debug "View for #{view} is #{@views[view]}, object is #{object}"
+      Asciidoctor.debug { "View for #{view} is #{@views[view]}, object is #{object}" }
     end
     
     ret = @views[view].render(object, locals)
