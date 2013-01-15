@@ -58,16 +58,16 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #   another_section.generate_id
   #   => "_foo_1"
   def generate_id
-    if document.attr?('sectids')
-      base_id = document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, '_').
+    if @document.attr?('sectids')
+      base_id = @document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, '_').
           gsub(/\W+/, '_').tr_s('_', '_').gsub(/^_?(.*?)_?$/, '\1')
       gen_id = base_id
       cnt = 2
-      while document.references[:ids].has_key? gen_id 
+      while @document.references[:ids].has_key? gen_id 
         gen_id = "#{base_id}_#{cnt}" 
         cnt += 1
       end 
-      document.references[:ids][gen_id] = title
+      @document.references[:ids][gen_id] = title
       gen_id
     else
       nil
@@ -77,8 +77,8 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # Public: Get the rendered String content for this Section and all its child
   # Blocks.
   def render
-    Asciidoctor.debug "Now rendering section for #{self}"
-    renderer.render(@context.to_s, self)
+    Asciidoctor.debug { "Now rendering section for #{self}" }
+    renderer.render('section', self)
   end
 
   # Public: Get the String section content by aggregating rendered section blocks.
@@ -92,12 +92,7 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #   section.content
   #   "<div class=\"paragraph\"><p>foo</p></div>\n<div class=\"paragraph\"><p>bar</p></div>\n<div class=\"paragraph\"><p>baz</p></div>"
   def content
-    @blocks.map do |block|
-      Asciidoctor.debug "Begin rendering block #{block.is_a?(Asciidoctor::Section) ? block.title : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
-      block_content = block.render
-      Asciidoctor.debug "===> Done rendering block #{block.is_a?(Asciidoctor::Section) ? block.title : 'n/a'} #{block} (context: #{block.is_a?(Asciidoctor::Block) ? block.context : 'n/a' })"
-      block_content
-    end.join
+    @blocks.map(&:render).join
   end
 
   # Public: Get the section number for the current Section

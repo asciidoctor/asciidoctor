@@ -145,11 +145,14 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
     @callouts.rewind
 
-    Asciidoctor.debug "Found #{@blocks.size} blocks in this document:"
-    @blocks.each do |el|
-      Asciidoctor.debug el
-    end
-
+    Asciidoctor.debug {
+      msg = []
+      msg << "Found #{@blocks.size} blocks in this document:"
+      @blocks.each {|b|
+        msg << b
+      }
+      msg * "\n"
+    }
   end
 
   def register(type, value)
@@ -275,14 +278,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   def content
     # per AsciiDoc-spec, remove the title after rendering the header
     @attributes.delete('title')
-
-    buffer = []
-    @blocks.each do |block|
-      Asciidoctor::debug "Rendering block: #{block}"
-      buffer << block.render
-    end
-
-    buffer.join
+    @blocks.map(&:render).join
   end
 
   def to_s
