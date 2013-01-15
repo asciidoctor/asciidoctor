@@ -19,9 +19,6 @@
 #   => 1
 class Asciidoctor::Section < Asciidoctor::AbstractBlock
 
-  # Public: Set the String section title.
-  attr_writer :title
-
   # Public: Get/Set the Integer index of this section within the parent block
   attr_accessor :index
 
@@ -30,43 +27,24 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # parent - The parent Asciidoc Object.
   def initialize(parent = nil, level = nil)
     super(parent, :section)
-    @title = nil
     if level.nil? && !parent.nil?
       @level = parent.level + 1
     end
     @index = 0
   end
 
-  # Public: Get the String section title with intrinsics converted
-  #
-  # Examples
-  #
-  #   section.title = "Foo 3^ # {two-colons} Bar(1)"
-  #   section.title
-  #   => "Foo 3^ # :: Bar(1)"
-  #
-  # Returns the String section title
-  def title
-    # prevent from rendering multiple times
-    if defined?(@processed_title)
-      @processed_title
-    elsif @title
-      @processed_title = apply_title_subs(@title)
-    else
-      @title
-    end
-  end
-
   # Public: The name of this section, an alias of the section title
-  def name
-    title
-  end
+  alias :name :title
 
-  # Public: Get the String section id prefixed with value of idprefix attribute, otherwise an underscore
+  # Public: Generate a String id for this section.
   #
-  # Section ID synthesis can be disabled by undefining the sectids attribute.
+  # The generated id is prefixed with value of the 'idprefix' attribute, which
+  # is an underscore by default.
   #
-  # TODO document the substitutions
+  # Section id synthesis can be disabled by undefining the 'sectids' attribute.
+  #
+  # If the generated id is already in use in the document, a count is appended
+  # until a unique id is found.
   #
   # Examples
   #
@@ -74,10 +52,23 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #   section.title = "Foo"
   #   section.generate_id
   #   => "_foo"
+  #
+  #   another_section = Section.new(parent)
+  #   another_section.title = "Foo"
+  #   another_section.generate_id
+  #   => "_foo_1"
   def generate_id
-    if !title.to_s.empty? && document.attr?('sectids')
-      document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, '_').
+    if document.attr?('sectids')
+      base_id = document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, '_').
           gsub(/\W+/, '_').tr_s('_', '_').gsub(/^_?(.*?)_?$/, '\1')
+      gen_id = base_id
+      cnt = 2
+      while document.references[:ids].has_key? gen_id 
+        gen_id = "#{base_id}_#{cnt}" 
+        cnt += 1
+      end 
+      document.references[:ids][gen_id] = title
+      gen_id
     else
       nil
     end

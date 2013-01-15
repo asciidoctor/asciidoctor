@@ -46,9 +46,6 @@ module Asciidoctor
     # Public: A compiled Regexp to match a blank line
     BLANK_LINE_PATTERN = /\n[[:blank:]]*\n/
   
-    # Public: Get/Set the String table title.
-    attr_accessor :title
-
     # Public: Get/Set the String caption (unused, necessary for compatibility w/ next_block)
     attr_accessor :caption
   
@@ -61,8 +58,7 @@ module Asciidoctor
   
     def initialize(parent, attributes)
       super(parent, :table)
-      # QUESTION since these are on block, should they go to AbstractBlock?
-      @title = nil
+      # QUESTION since caption is on block, should it go to AbstractBlock?
       @caption = nil
       @rows = Rows.new([], [], [])
       @columns = []
@@ -71,12 +67,6 @@ module Asciidoctor
         @attributes['tableabswidth'] ||=
             ((@attributes['tablepcwidth'].to_f / 100) * @document.attributes['pagewidth']).round
       end
-    end
-  
-    # Public: A convenience method that indicates whether the title instance
-    # variable is blank (nil or empty)
-    def title?
-      !@title.to_s.empty?
     end
   
     # Internal: Creates the Column objects from the column spec
