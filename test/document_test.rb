@@ -4,12 +4,33 @@ context 'Document' do
 
   context 'Example document' do
     test 'test_title' do
-      @doc = example_document(:asciidoc_index)
-      assert_equal 'AsciiDoc Home Page', @doc.doctitle
-      assert_equal 'AsciiDoc Home Page', @doc.name
-      assert_equal 14, @doc.blocks.size
-      assert_equal :preamble, @doc.blocks[0].context
-      assert @doc.blocks[1].is_a? ::Asciidoctor::Section
+      doc = example_document(:asciidoc_index)
+      assert_equal 'AsciiDoc Home Page', doc.doctitle
+      assert_equal 'AsciiDoc Home Page', doc.name
+      assert_equal 14, doc.blocks.size
+      assert_equal :preamble, doc.blocks[0].context
+      assert doc.blocks[1].is_a? ::Asciidoctor::Section
+    end
+  end
+
+  context 'Default settings' do
+    test 'safe mode level set to SECURE_MODE by default' do
+      doc = Asciidoctor::Document.new
+      assert_equal Asciidoctor::SECURE_MODE, doc.safe
+    end
+
+    test 'safe mode level can be set in the constructor' do
+      doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SAFE_MODE
+      assert_equal Asciidoctor::SAFE_MODE, doc.safe
+    end
+
+    test 'safe model level cannot be modified' do
+      doc = Asciidoctor::Document.new
+      begin
+        doc.safe = Asciidoctor::UNSAFE_MODE
+        flunk 'safe mode property of Asciidoctor::Document should not be writable!' 
+      rescue
+      end
     end
   end
 

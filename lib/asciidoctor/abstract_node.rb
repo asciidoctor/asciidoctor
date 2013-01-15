@@ -79,7 +79,7 @@ class Asciidoctor::AbstractNode
     if attr? 'icon'
       image_uri(attr('icon'), nil)
     else
-      image_uri(name + '.' + document.attr('iconstype', 'png'), 'iconsdir')
+      image_uri(name + '.' + @document.attr('iconstype', 'png'), 'iconsdir')
     end
   end
 
@@ -88,8 +88,10 @@ class Asciidoctor::AbstractNode
   # The target image is resolved relative to the directory retrieved from the
   # specified attribute key, if provided.
   #
-  # If the 'data-uri' attribute is set on the document, the image will be
-  # safely converted to a data URI by reading it from the same directory.
+  # If the 'data-uri' attribute is set on the document, and the safe mode level
+  # is less than SECURE_MODE, the image will be safely converted to a data URI
+  # by reading it from the same directory. If neither of these conditions
+  # are satisfied, a relative path (i.e., URL) will be returned.
   #
   # The return value of this method can be safely used in an image tag.
   #
@@ -99,10 +101,10 @@ class Asciidoctor::AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
-    if document.attr? 'data-uri'
+    if @document.safe < Asciidoctor::SECURE_MODE && @document.attr?('data-uri')
       generate_data_uri(target_image, asset_dir_key)
     elsif asset_dir_key && attr?(asset_dir_key)
-      File.join(document.attr(asset_dir_key), target_image)
+      File.join(@document.attr(asset_dir_key), target_image)
     else
       target_image
     end
@@ -110,10 +112,10 @@ class Asciidoctor::AbstractNode
 
   # Public: Generate a data URI that can be used to embed an image in the output document
   #
-  # First, and foremost, the target image path is cleaned if the 'safe-paths' attribute is
-  # set (on by default) to prevent access to ancestor paths in the filesystem. The
-  # image data is then read and converted to Base64. Finally, a data URI is built which
-  # can be used in an image tag.
+  # First, and foremost, the target image path is cleaned if the document safe mode level
+  # is set to at least SAFE_MODE (a condition which is true by default) to prevent access
+  # to ancestor paths in the filesystem. The image data is then read and converted to
+  # Base64. Finally, a data URI is built which can be used in an image tag.
   #
   # target_image - A String path to the target image
   # asset_dir_key - The String attribute key used to lookup the directory where
@@ -125,7 +127,7 @@ class Asciidoctor::AbstractNode
 
     mimetype = 'image/' + File.extname(target_image)[1..-1]
     if asset_dir_key
-      image_path = File.join(normalize_asset_path(document.attr(asset_dir_key, '.'), asset_dir_key), target_image)
+      image_path = File.join(normalize_asset_path(@document.attr(asset_dir_key, '.'), asset_dir_key), target_image)
     else
       image_path = normalize_asset_path(target_image)
     end
@@ -135,9 +137,10 @@ class Asciidoctor::AbstractNode
 
   # Public: Normalize the specified asset directory to a concrete directory path
   #
-  # The most important functionality in this method is to prevent the asset directory
-  # from resolving to a directory outside of the chroot directory (which defaults to docdir)
-  # if the 'safe-paths' attribute is true (the default).
+  # The most important functionality in this method is to prevent the asset directory from
+  # resolving to a directory outside of the chroot directory (which defaults to the
+  # directory of the source file, stored in the 'docdir' attribute) if the document safe
+  # level is set to SAFE_MODE or greater (a condition which is true by default).
   #
   # asset_dir    - The String asset directory as provided in the configuration
   # asset_name   - The String name of the property being resolved (for use in
@@ -148,7 +151,7 @@ class Asciidoctor::AbstractNode
   #  # given these fixtures
   #  document.attr('docdir')
   #  # => "/path/to/docdir"
-  #  document.attr('safe-paths')
+  #  document.safe >= Asciidoctor::SAFE_MODE
   #  # => true
   #
   #  # then
@@ -162,7 +165,7 @@ class Asciidoctor::AbstractNode
   #  # given these fixtures
   #  document.attr('docdir')
   #  # => "/path/to/docdir"
-  #  document.attr('safe-paths')
+  #  document.safe >= Asciidoctor::SAFE_MODE
   #  # => false
   #
   #  # then
@@ -177,7 +180,7 @@ class Asciidoctor::AbstractNode
   def normalize_asset_path(asset_dir, asset_name = 'asset directory')
     require 'pathname'
 
-    input_path = File.expand_path(document.attr('docdir'))
+    input_path = File.expand_path(@document.attr('docdir'))
     asset_path = Pathname.new(asset_dir)
     
     if asset_path.relative?
@@ -186,7 +189,7 @@ class Asciidoctor::AbstractNode
       asset_path = asset_path.cleanpath.to_s
     end
 
-    if document.attr('safe-paths', true)
+    if @document.safe >= Asciidoctor::SAFE_MODE
       relative_asset_dir = Pathname.new(asset_path).relative_path_from(Pathname.new(input_path)).to_s
       if relative_asset_dir.start_with?('..')
         puts 'asciidoctor: WARNING: ' + asset_name + ' has illegal reference to ancestor of docdir'
