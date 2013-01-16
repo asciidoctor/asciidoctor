@@ -1,5 +1,3 @@
-require 'strscan'
-
 # Public: Handles parsing AsciiDoc attribute lists into a Hash of key/value
 # pairs. By default, attributes must each be separated by a comma and quotes
 # may be used around the value. If a key is not detected, the value is assigned

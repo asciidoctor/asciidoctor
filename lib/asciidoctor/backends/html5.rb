@@ -9,7 +9,7 @@ end
 module Asciidoctor::HTML5
 class DocumentTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ::ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,7 +54,7 @@ end
 
 class EmbeddedTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ::ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <%= content %>
     EOS
@@ -63,7 +63,7 @@ end
 
 class BlockPreambleTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ::ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div id="preamble">
   <div class="sectionbody">
@@ -76,15 +76,15 @@ end
 
 class SectionTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <% if level == 0 %>
 <h1#{id}><%= title %></h1>
 <%= content %>
 <% else %>
-<div class="sect<%= level %>#{style_class}">
-  <h<%= level + 1 %>#{id}><% if attr? :numbered %><%= sectnum %> <% end %><%= title %></h<%= level + 1 %>>
-  <% if level == 1 %>
+<div class="sect<%= @level %>#{style_class}">
+  <h<%= @level + 1 %>#{id}><% if attr? :numbered %><%= sectnum %> <% end %><%= title %></h<%= @level + 1 %>>
+  <% if @level == 1 %>
   <div class="sectionbody">
 <%= content %>
   </div>
@@ -99,7 +99,7 @@ end
 
 class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="dlist#{style_class}">
   <% if title %>
@@ -129,7 +129,7 @@ end
 
 class BlockListingTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="listingblock#{style_class}">
   <% if title %>
@@ -137,9 +137,9 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
   <% end %>
   <div class="content monospaced">
     <% if (attr :style) == 'source' %>
-    <pre class="highlight#{attrvalue(:language)}"><code><%= content.gsub("\n", LINE_FEED_ENTITY) %></code></pre>
+    <pre class="highlight#{attrvalue(:language)}"><code><%= template.preserve_endlines(content, self) %></code></pre>
     <% else %>
-    <pre><%= content.gsub("\n", LINE_FEED_ENTITY) %></pre>
+    <pre><%= template.preserve_endlines(content, self) %></pre>
     <% end %>
   </div>
 </div>
@@ -149,14 +149,14 @@ end
 
 class BlockLiteralTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="literalblock#{style_class}">
   <% if title %>
   <div class="title"><%= title %></div>
   <% end %>
   <div class="content monospaced">
-    <pre><%= content.gsub("\n", LINE_FEED_ENTITY) %></pre>
+    <pre><%= template.preserve_endlines(content, self) %></pre>
   </div>
 </div>
     EOS
@@ -165,7 +165,7 @@ end
 
 class BlockAdmonitionTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="admonitionblock#{style_class}">
   <table>
@@ -192,7 +192,7 @@ end
 
 class BlockParagraphTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="paragraph#{style_class}">
   <% unless title.nil? %>
@@ -206,7 +206,7 @@ end
 
 class BlockSidebarTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="sidebarblock#{style_class}">
   <div class="content">
@@ -222,7 +222,7 @@ end
 
 class BlockExampleTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="exampleblock#{style_class}">
   <div class="content">
@@ -238,7 +238,7 @@ end
 
 class BlockOpenTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="openblock#{style_class}">
   <% unless title.nil? %>
@@ -254,7 +254,7 @@ end
 
 class BlockPassTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <%= content %>
     EOS
@@ -263,7 +263,7 @@ end
 
 class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="quoteblock#{style_class}">
   <% unless title.nil? %>
@@ -290,13 +290,13 @@ end
 
 class BlockVerseTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="verseblock#{style_class}">
   <% unless title.nil? %>
   <div class="title"><%= title %></div>
   <% end %>
-  <pre class="content"><%= content.gsub("\n", LINE_FEED_ENTITY) %></pre>
+  <pre class="content"><%= template.preserve_endlines(content, self) %></pre>
   <div class="attribution">
     <% if attr? :citetitle %>
     <em><%= attr :citetitle %></em>
@@ -315,7 +315,7 @@ end
 
 class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="ulist#{attrvalue(:style)}#{style_class}">
   <% unless title.nil? %>
@@ -338,7 +338,7 @@ end
 
 class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="olist <%= attr :style %>#{style_class}">
   <% unless title.nil? %>
@@ -361,7 +361,7 @@ end
 
 class BlockColistTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="colist <%= attr :style %>#{style_class}">
   <% unless title.nil? %>
@@ -381,7 +381,7 @@ end
 
 class BlockTableTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <table#{id} class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%>#{style_class}" style="<%
 if !(attr? 'autowidth-option') %>width: <%= attr :tablepcwidth %>%; <% end %><%
@@ -392,26 +392,26 @@ if attr? :float %>float: <%= attr :float %>; <% end %>">
   <% if (attr :rowcount) >= 0 %> 
   <colgroup>
     <% if attr? 'autowidth-option' %>
-    <% columns.each do |col| %>
+    <% @columns.each do |col| %>
     <col>
     <% end %>
     <% else %>
-    <% columns.each do |col| %>
+    <% @columns.each do |col| %>
     <col style="width: <%= col.attr :colpcwidth %>%;">
     <% end %>
     <% end %>
   </colgroup>
   <% [:head, :foot, :body].select {|tsec| !rows[tsec].empty? }.each do |tsec| %>
   <t<%= tsec %>>
-    <% rows[tsec].each do |row| %>
+    <% @rows[tsec].each do |row| %>
     <tr>
       <% row.each do |cell| %>
       <<%= tsec == :head ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}><%
       if tsec == :head %><%= cell.text %><% else %><%
       case cell.attr(:style)
         when :asciidoc %><div><%= cell.content %></div><%
-        when :verse %><div class="verse"><%= cell.text.gsub("\n", LINE_FEED_ENTITY) %></div><%
-        when :literal %><div class="literal monospaced"><pre><%= cell.text.gsub("\n", LINE_FEED_ENTITY) %></pre></div><%
+        when :verse %><div class="verse"><%= template.preserve_endlines(cell.text, self) %></div><%
+        when :literal %><div class="literal monospaced"><pre><%= template.preserve_endlines(cell.text, self) %></pre></div><%
         when :header %><% cell.content.each do |text| %><p class="tableblock header"><%= text %></p><% end %><%
         else %><% cell.content.each do |text| %><p class="tableblock"><%= text %></p><% end %><%
       end %><% end %></<%= tsec == :head ? 'th' : 'td' %>>
@@ -428,7 +428,7 @@ end
 
 class BlockImageTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="imageblock#{style_class}">
   <div class="content">
@@ -448,7 +448,7 @@ end
 
 class BlockRulerTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <hr>
     EOS
   end
@@ -456,7 +456,7 @@ end
 
 class InlineBreakTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%= text %><br>
     EOS
   end
@@ -464,7 +464,7 @@ end
 
 class InlineCalloutTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <b><%= text %></b>
     EOS
   end
@@ -482,29 +482,27 @@ class InlineQuotedTemplate < ::Asciidoctor::BaseTemplate
     :none => ['', '']
   }
 
-  # we use double quotes for the class attribute to prevent quote processing
-  # seems hackish, though AsciiDoc has this same issue
   def template
-    @template ||= ERB.new <<-EOS
-<%= #{self.class}::QUOTED_TAGS[type].first %><%
+    @template ||= @eruby.new <<-EOS
+<% tags = template.class::QUOTED_TAGS[@type] %><%= tags.first %><%
 if attr? :role %><span#{attribute('class', :role)}><%
-end %><%= text %><%
+end %><%= @text %><%
 if attr? :role %></span><%
-end %><%= #{self.class}::QUOTED_TAGS[type].last %>
+end %><%= tags.last %>
     EOS
   end
 end
 
 class InlineAnchorTemplate < ::Asciidoctor::BaseTemplate
   def template
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <%
 if type == :xref
-%><a href="#<%= target %>"><%= text || document.references[:ids].fetch(target, '[' + target + ']') %></a><%
-elsif type == :ref
-%><a id="<%= target %>"></a><%
+%><a href="#<%= @target %>"><%= @text || @document.references[:ids].fetch(@target, '[' + @target + ']') %></a><%
+elsif @type == :ref
+%><a id="<%= @target %>"></a><%
 else
-%><a href="<%= target %>"><%= text %></a><%
+%><a href="<%= @target %>"><%= @text %></a><%
 end
 %>
     EOS
@@ -514,7 +512,7 @@ end
 class InlineImageTemplate < ::Asciidoctor::BaseTemplate
   def template
     # care is taken here to avoid a space inside the optional <a> tag
-    @template ||= ERB.new <<-EOS
+    @template ||= @eruby.new <<-EOS
 <span class="image#{style_class}">
   <%
   if attr :link %><a class="image" href="<%= attr :link %>"><%

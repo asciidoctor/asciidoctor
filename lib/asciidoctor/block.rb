@@ -95,7 +95,7 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
 
     case @context
     when :preamble, :open, :example, :sidebar
-      @blocks.map(&:render).join
+      @blocks.map {|b| b.render }.join
     # lists get iterated in the template (for now)
     # list items recurse into this block when their text and content methods are called
     when :ulist, :olist, :dlist, :colist
@@ -108,7 +108,7 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
       if !@buffer.nil?
         apply_normal_subs(@buffer)
       else
-        @blocks.map(&:render).join
+        @blocks.map {|b| b.render }.join
       end
     else
       apply_normal_subs(@buffer)
@@ -116,6 +116,6 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   end
 
   def to_s
-    "#{super.to_s} - #@context [blocks:#{@blocks.size}]"
+    "#{super.to_s} - #@context [blocks:#{(@blocks || []).size}]"
   end
 end

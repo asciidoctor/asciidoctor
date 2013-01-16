@@ -92,7 +92,7 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #   section.content
   #   "<div class=\"paragraph\"><p>foo</p></div>\n<div class=\"paragraph\"><p>bar</p></div>\n<div class=\"paragraph\"><p>baz</p></div>"
   def content
-    @blocks.map(&:render).join
+    @blocks.map {|b| b.render }.join
   end
 
   # Public: Get the section number for the current Section

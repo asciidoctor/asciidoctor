@@ -1,4 +1,8 @@
+# Public: An abstract base class that provides state and methods for managing a
+# node of AsciiDoc content. The state and methods on this class are comment to
+# all content segments in an AsciiDoc document.
 class Asciidoctor::AbstractNode
+
   include Asciidoctor::Substituters
 
   # Public: Get the element which is the parent of this node
@@ -47,8 +51,38 @@ class Asciidoctor::AbstractNode
     end
   end
 
+  # Public: Get the execution context of this object (via Kernel#binding).
+  #
+  # This method is used to set the 'self' reference as well as local variables
+  # that map to this method's arguments during the evaluation of a backend
+  # template.
+  #
+  # Each object in Ruby has a binding context that can be used to set the 'self'
+  # reference in an evaluation context. Any arguments passed to this
+  # method are also available in the execution environment.
+  #
+  # template -  The BaseTemplate instance in which this binding will be active.
+  #             Bound to the local variable of the same name, template.
+  #
+  # returns the execution context for this object so it can be be transferred to
+  # the backend template and binds the method arguments as local variables in
+  # that same environment.
+  def get_binding template
+    binding
+  end
+
+  # Public: Update the attributes of this node with the new values in
+  # the attributes argument.
+  #
+  # If an attribute already exists with the same key, it's value will
+  # be overridden.
+  #
+  # attributes - A Hash of attributes to assign to this node.
+  #
+  # returns nothing
   def update_attributes(attributes)
     @attributes.update(attributes)
+    nil
   end
 
   # Public: Get the Asciidoctor::Renderer instance being used for the
@@ -123,7 +157,7 @@ class Asciidoctor::AbstractNode
   #
   # Returns A String data URI containing the content of the target image
   def generate_data_uri(target_image, asset_dir_key = nil)
-    require 'base64'
+    Asciidoctor.require_library 'base64'
 
     mimetype = 'image/' + File.extname(target_image)[1..-1]
     if asset_dir_key
@@ -178,7 +212,8 @@ class Asciidoctor::AbstractNode
   #
   # Returns The normalized asset directory as a String
   def normalize_asset_path(asset_dir, asset_name = 'asset directory')
-    require 'pathname'
+    # TODO we may use pathname enough to make it a top-level require
+    Asciidoctor.require_library 'pathname'
 
     input_path = File.expand_path(@document.attr('docdir'))
     asset_path = Pathname.new(asset_dir)

@@ -76,6 +76,6 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
   end
 
   def to_s
-    "#{super.to_s} - #@context [text:#@text, blocks:#{@blocks.size}]"
+    "#{super.to_s} - #@context [text:#@text, blocks:#{(@blocks || []).size}]"
   end
 end
