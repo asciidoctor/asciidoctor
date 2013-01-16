@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'asciidoctor'
-  s.version           = '0.0.8'
-  s.date              = '2013-01-09'
+  s.version           = '0.0.9'
+  s.date              = '2013-01-16'
   s.rubyforge_project = 'asciidoctor'
 
   ## Make sure your summary is short. The description may be as long
@@ -85,6 +85,7 @@ Gem::Specification.new do |s|
     lib/asciidoctor/renderer.rb
     lib/asciidoctor/section.rb
     lib/asciidoctor/substituters.rb
+    lib/asciidoctor/table.rb
     lib/asciidoctor/version.rb
     noof.rb
     test/attributes_test.rb
@@ -95,8 +96,8 @@ Gem::Specification.new do |s|
     test/fixtures/ascshort.txt
     test/fixtures/dot.gif
     test/fixtures/encoding.asciidoc
-    test/fixtures/list_elements.asciidoc
     test/fixtures/include-file.asciidoc
+    test/fixtures/list_elements.asciidoc
     test/fixtures/tip.gif
     test/headers_test.rb
     test/lexer_test.rb
@@ -107,6 +108,7 @@ Gem::Specification.new do |s|
     test/reader_test.rb
     test/renderer_test.rb
     test/substitutions_test.rb
+    test/tables_test.rb
     test/test_helper.rb
     test/text_test.rb
   ]
