@@ -101,6 +101,10 @@ module Asciidoctor
 
   LIST_CONTINUATION = '+'
 
+  BLANK_LINES_PATTERN = /^\s*\n/
+
+  LINE_FEED_ENTITY = '&#10;' # or &#x0A;
+
   REGEXP = {
     # [[Foo]]
     :anchor           => /^\[\[([^\[\]]+)\]\]\s*$/,

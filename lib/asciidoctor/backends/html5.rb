@@ -8,6 +8,26 @@ end
 
 module Asciidoctor::HTML5
 class DocumentTemplate < ::Asciidoctor::BaseTemplate
+  def render_outline(node, to_depth = 2)
+    toc_level = nil
+    sections = node.sections
+    unless sections.empty?
+      toc_level, indent = ''
+      unless node.is_a?(::Asciidoctor::Document)
+        indent = '    ' * (node.document.doctype == 'book' ? node.level + 1 : node.level)
+      end
+      toc_level << "#{indent}<ol>\n"
+      sections.each do |section|
+        toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{section.sectnum} #{section.title}</a></li>\n"
+        if section.level < to_depth && (child_toc_level = render_outline(section, to_depth))
+          toc_level << "#{indent}  <li>\n#{child_toc_level}\n#{indent}  </li>\n"
+        end
+      end
+      toc_level << "#{indent}</ol>"
+    end
+    toc_level
+  end
+
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
@@ -19,11 +39,17 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
     <% if attr? :description %><meta name="description" content="<%= attr :description %>"><% end %>
     <% if attr? :keywords %><meta name="keywords" content="<%= attr :keywords %>"><% end %>
     <title><%= doctitle %></title>
+    <% if attr? :toc %>
+    <style>
+#toc > ol { padding-left: 0; }
+#toc ol { list-style-type: none; }
+    </style>
+    <% end %>
     <% unless attr(:stylesheet, '').empty? %>
     <link rel="stylesheet" href="<%= attr(:stylesdir, '') + attr(:stylesheet) %>" type="text/css">
     <% end %>
   </head>
-  <body class="<%= doctype %>">
+  <body#{attribute('id', :'css-signature')} class="<%= doctype %>"<% if attr? 'max-width' %> style="max-width: <%= attr 'max-width' %>;"<% end %>>
     <% unless noheader %>
     <div id="header">
       <% if has_header? %>
@@ -35,6 +61,12 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
       <% if attr? :revnumber %><span id="revnumber">version <%= attr :revnumber %><%= attr?(:revdate) ? ',' : '' %></span><% end %>
       <% if attr? :revdate %><span id="revdate"><%= attr :revdate %></span><% end %>
       <% if attr? :revremark %><br><span id="revremark"><%= attr :revremark %></span><% end %>
+      <% end %>
+      <% if attr? :toc %>
+      <div id="toc">
+        <div id="toctitle"><%= attr 'toc-title', 'Table of Contents' %></div>
+<%= template.render_outline(self, (attr :toclevels, 2).to_i) %>
+      </div>
       <% end %>
     </div>
     <% end %>
