@@ -152,7 +152,26 @@ This is a paragraph outside the block.
     end
   end
 
-  context "Include files" do
+  context 'Include Macro' do
+    test 'include macro is disabled by default' do
+      input = <<-EOS
+include::include-file.asciidoc[]
+      EOS
+      para = block_from_string input, :attributes => { 'include-depth' => 0 }
+      assert_equal 1, para.buffer.size
+      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+    end
+
+    test 'include macro is enabled when safe mode is less than SECURE' do
+      input = <<-EOS
+include::fixtures/include-file.asciidoc[]
+      EOS
+
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      output = doc.render
+      assert_match(/included content/, output)
+    end
+
     test "block is called to handle an include macro" do
       input = <<-EOS
 first line
@@ -161,7 +180,7 @@ include::include-file.asciidoc[]
 
 last line
       EOS
-      doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SAFE_MODE
+      doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SafeMode::SAFE
       Asciidoctor::Reader.new(input.lines.entries, doc) {|inc|
         ":file: #{inc}\n\nmiddle line".lines.entries
       }
@@ -192,7 +211,7 @@ last line
       input = <<-EOS
 include::include-file.asciidoc[]
       EOS
-      para = block_from_string input, :attributes => { 'include-depth' => 0 }
+      para = block_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'include-depth' => 0 }
       assert_equal 1, para.buffer.size
       assert_equal 'include::include-file.asciidoc[]', para.buffer.join
     end
@@ -203,25 +222,25 @@ include::include-file.asciidoc[]
 
 include::include-file.asciidoc[]
       EOS
-      para = block_from_string input, :attributes => { 'include-depth' => 0 }
+      para = block_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'include-depth' => 0 }
       assert_equal 1, para.buffer.size
       assert_equal 'include::include-file.asciidoc[]', para.buffer.join
     end
   end
 
-  context 'build_secure_path' do
+  context 'build secure asset path' do
     test 'allows us to specify a path relative to the current dir' do
       doc = Asciidoctor::Document.new
       reader = Asciidoctor::Reader.new(["foo"], doc)
       legit_path = Dir.pwd + "/foo"
-      assert_equal legit_path, reader.build_secure_path(legit_path)
+      assert_equal legit_path, doc.normalize_asset_path(legit_path)
     end
 
     test "keeps naughty absolute paths from getting outside" do
       naughty_path = "/etc/passwd"
       doc = Asciidoctor::Document.new
       reader = Asciidoctor::Reader.new(["foo"], doc)
-      secure_path = reader.build_secure_path(naughty_path)
+      secure_path = doc.normalize_asset_path(naughty_path)
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)
     end
@@ -230,7 +249,7 @@ include::include-file.asciidoc[]
       naughty_path = "safe/ok/../../../../../etc/passwd"
       doc = Asciidoctor::Document.new
       reader = Asciidoctor::Reader.new(["foo"], doc)
-      secure_path = reader.build_secure_path(naughty_path)
+      secure_path = doc.normalize_asset_path(naughty_path)
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)
     end

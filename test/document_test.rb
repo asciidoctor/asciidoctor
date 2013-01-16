@@ -14,20 +14,20 @@ context 'Document' do
   end
 
   context 'Default settings' do
-    test 'safe mode level set to SECURE_MODE by default' do
+    test 'safe mode level set to SECURE by default' do
       doc = Asciidoctor::Document.new
-      assert_equal Asciidoctor::SECURE_MODE, doc.safe
+      assert_equal Asciidoctor::SafeMode::SECURE, doc.safe
     end
 
     test 'safe mode level can be set in the constructor' do
-      doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SAFE_MODE
-      assert_equal Asciidoctor::SAFE_MODE, doc.safe
+      doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SafeMode::SAFE
+      assert_equal Asciidoctor::SafeMode::SAFE, doc.safe
     end
 
     test 'safe model level cannot be modified' do
       doc = Asciidoctor::Document.new
       begin
-        doc.safe = Asciidoctor::UNSAFE_MODE
+        doc.safe = Asciidoctor::SafeMode::UNSAFE
         flunk 'safe mode property of Asciidoctor::Document should not be writable!' 
       rescue
       end

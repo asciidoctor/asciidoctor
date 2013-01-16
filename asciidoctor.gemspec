@@ -95,6 +95,7 @@ Gem::Specification.new do |s|
     test/fixtures/dot.gif
     test/fixtures/encoding.asciidoc
     test/fixtures/list_elements.asciidoc
+    test/fixtures/include-file.asciidoc
     test/fixtures/tip.gif
     test/headers_test.rb
     test/lexer_test.rb
