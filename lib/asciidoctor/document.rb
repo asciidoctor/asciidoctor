@@ -23,14 +23,14 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # should be enforced while processing this document. The value must be
   # set in the Document constructor using the :safe option.
   #
-  # A value of 0 (UNSAFE_MODE) disables any of the security features enforced
+  # A value of 0 (UNSAFE) disables any of the security features enforced
   # by Asciidoctor (Ruby is still subject to its own restrictions).
   #
-  # A value of 1 (SAFE_MODE) closely parallels safe mode in AsciiDoc. In particular,
+  # A value of 1 (SAFE) closely parallels safe mode in AsciiDoc. In particular,
   # it prevents access to files which reside outside of the parent directory
   # of the source file and disables any macro other than the include macro.
   #
-  # A value of 10 (SECURE_MODE) disallows the document from attempting to read
+  # A value of 10 (SECURE) disallows the document from attempting to read
   # files from the file system and including the contents of them into the
   # document. In particular, it disallows use of the include::[] macro and the
   # embedding of binary content (data uri), stylesheets and JavaScripts
@@ -39,11 +39,10 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # is aiming for wide adoption, this value is the default and is recommended
   # for server-side deployments.
   #
-  # A value of 100 (PARANOID_MODE) is planned to disallow the use of
-  # passthrough macros and prevents the document from setting any known
-  # attributes in addition to all the security features of SECURE_MODE. Please
-  # note that this level is not currently implemented (and therefore not
-  # enforced)!
+  # A value of 100 (PARANOID) is planned to disallow the use of passthrough
+  # macros and prevents the document from setting any known attributes in
+  # addition to all the security features of SafeMode::SECURE. Please note that
+  # this level is not currently implemented (and therefore not enforced)!
   attr_reader :safe
 
   # Public: Get the Hash of document references
@@ -94,9 +93,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     }
     @callouts = Callouts.new
     @options = options
-    @safe = @options.fetch(:safe, SECURE_MODE).to_i.abs
+    @safe = @options.fetch(:safe, SafeMode::SECURE).to_i
     @options[:header_footer] = @options.fetch(:header_footer, true)
-    @base_dir = options[:base_dir] || Dir.pwd
 
     @attributes['asciidoctor'] = true
     @attributes['asciidoctor-version'] = VERSION
@@ -109,7 +107,14 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     # 10 is the AsciiDoc default, though currently Asciidoctor only supports 1 level
     attribute_overrides['include-depth'] ||= 10
 
-    attribute_overrides['docdir'] ||= Dir.pwd
+    # TODO we should go with one or the other, this is confusing
+    # for now, base_dir takes precedence if set
+    if options.has_key? :base_dir
+      @base_dir = attribute_overrides['docdir'] = options[:base_dir]
+    else
+      attribute_overrides['docdir'] ||= Dir.pwd
+      @base_dir = attribute_overrides['docdir']
+    end
     
     attribute_overrides.each {|key, val|
       # a nil or negative key undefines the attribute 

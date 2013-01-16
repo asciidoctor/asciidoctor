@@ -278,9 +278,9 @@ class Asciidoctor::Reader
       if inc = line.match(REGEXP[:include_macro])
         if inc[0].start_with? '\\'
           raw_source << line[1..-1]
-        # if running in SECURE_MODE or greater, don't process
+        # if running in SafeMode::SECURE or greater, don't process
         # this directive (or should we swallow it?)
-        elsif @document.safe >= SECURE_MODE
+        elsif @document.safe >= SafeMode::SECURE
           raw_source << line
         # assume that if a block is given, the developer wants
         # to handle when and how to process the include, even
@@ -288,7 +288,7 @@ class Asciidoctor::Reader
         elsif block_given?
           raw_source.concat yield(inc[1])
         elsif include_depth > 0
-          raw_source.concat File.readlines(build_secure_path(inc[1]))
+          raw_source.concat File.readlines(@document.normalize_asset_path(inc[1], 'include file'))
         else
           raw_source << line
         end
@@ -412,26 +412,5 @@ class Asciidoctor::Reader
     else
       @document.apply_header_subs(value)
     end
-  end
-
-  # Internal: Builds a secure path to avoid path explotation
-  #
-  # Takes a relative path, expands it, trims the working path from it,
-  # then joins it to the working path. This prevents the renderer from
-  # accessing paths outside its working directory (e.g., /etc/passwd),
-  # and from using relative back references to access other data (e.g.,
-  # "../../../etc/passwd").
-  #
-  # relative_path - The path to secure.  Should be relative to the
-  #                 base directory.
-  #
-  # Returns a String of the secured path.
-  def build_secure_path(path)
-    # For paths that are relative to the current base directory, this won't
-    # hurt anything. For paths that aren't, they'll get shoved down into the
-    # current directory to keep them from nosing about where they shouldn't
-    # in the filesystem.
-    relative_path = File.expand_path(path).sub(/^#{@document.base_dir}/, '')
-    File.join(@document.base_dir, relative_path)
   end
 end
