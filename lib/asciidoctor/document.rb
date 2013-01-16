@@ -255,20 +255,23 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   end
 
   def splain
-    if @header
-      Asciidoctor.debug "Header is #{@header}"
-    else
-      Asciidoctor.debug "No header"
-    end
+    Asciidoctor.debug {
+      msg = ''
+      if @header
+        msg = "Header is #{@header}"
+      else
+        msg = "No header"
+      end
 
-    Asciidoctor.debug "I have #{@blocks.count} blocks"
-    @blocks.each_with_index do |block, i|
-      Asciidoctor.debug "v" * 60
-      Asciidoctor.debug "Block ##{i} is a #{block.class}"
-      Asciidoctor.debug "Name is #{block.title rescue 'n/a'}"
-      block.splain(0) if block.respond_to? :splain
-      Asciidoctor.debug "^" * 60
-    end
+      msg += "I have #{@blocks.count} blocks"
+      @blocks.each_with_index do |block, i|
+        msg += "v" * 60
+        msg += "Block ##{i} is a #{block.class}"
+        msg += "Name is #{block.title rescue 'n/a'}"
+        block.splain(0) if block.respond_to? :splain
+        msg += "^" * 60
+      end
+    }
     nil
   end
 
