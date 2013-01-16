@@ -39,11 +39,11 @@ You're good to go!
     end
 
     test "listing paragraph" do
-      assert_xpath "//pre[@class='highlight']", render_string("[source]\n----\nblah blah blah\n----")
+      assert_xpath "//pre[@class='highlight']/code", render_string("[source]\n----\nblah blah blah\n----")
     end
 
     test "source code paragraph" do
-      assert_xpath "//pre[@class='highlight perl']", render_string("[source, perl]\ndie 'zomg perl sucks';")
+      assert_xpath "//pre[@class='highlight']/code[@class='perl']", render_string("[source, perl]\ndie 'zomg perl sucks';")
     end
   end
 

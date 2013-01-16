@@ -505,4 +505,64 @@ image::asciidoctor.png[Asciidoctor]
 
   end
 
+  context 'Source code' do
+    test 'should highlight source if source-highlighter attribute is coderay' do
+      input = <<-EOS
+:source-highlighter: coderay
+
+[source, ruby]
+----
+require 'coderay'
+
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
+----
+      EOS
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_xpath '//pre[@class="highlight CodeRay"]/code[@class="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
+      assert_match(/\.CodeRay \{/, output)
+    end
+
+    test 'should highlight source inline if source-highlighter attribute is coderay and coderay-css is style' do
+      input = <<-EOS
+:source-highlighter: coderay
+:coderay-css: style
+
+[source, ruby]
+----
+require 'coderay'
+
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
+----
+      EOS
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_xpath '//pre[@class="highlight CodeRay"]/code[@class="ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
+      assert_no_match(/\.CodeRay \{/, output)
+    end
+
+    test 'should include remote highlight.js assets if source-highlighter attribute is highlightjs' do
+      input = <<-EOS
+:source-highlighter: highlightjs
+
+[source, javascript]
+----
+<link rel="stylesheet" href="styles/default.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+----
+      EOS
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_match(/<link .*highlight\.js/, output)
+      assert_match(/<script .*highlight\.js/, output)
+      assert_match(/hljs.initHighlightingOnLoad/, output)
+    end
+
+    test 'document cannot turn on source highlighting if safe mode is at least SECURE' do
+      input = <<-EOS
+:source-highlighter: coderay
+      EOS
+      doc = document_from_string input
+      assert doc.attributes['source-highlighter'].nil?
+    end
+  end
+
 end

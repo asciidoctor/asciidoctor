@@ -28,6 +28,14 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
     toc_level
   end
 
+  # Internal: Generate the default stylesheet for CodeRay
+  #
+  # returns the default CodeRay stylesheet as a String
+  def default_coderay_stylesheet
+    Asciidoctor.require_library 'coderay'
+    ::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
+  end
+
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
@@ -46,7 +54,26 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
     </style>
     <% end %>
     <% unless attr(:stylesheet, '').empty? %>
-    <link rel="stylesheet" href="<%= attr(:stylesdir, '') + attr(:stylesheet) %>" type="text/css">
+    <link rel="stylesheet" href="<%= File.join((attr :stylesdir, '.'), (attr :stylesheet)) %>">
+    <% end %>
+    <%
+    case attr 'source-highlighter' %><%
+    when 'coderay' %>
+    <style>
+pre.highlight { border: none; background-color: #F8F8F8; }
+pre.highlight code, pre.highlight pre { color: #333; }
+pre.highlight span.line-numbers { display: inline-block; margin-right: 4px; padding: 1px 4px; }
+pre.highlight .line-numbers { background-color: #D5F6F6; color: gray; }
+pre.highlight .line-numbers pre { color: gray; }
+<% if (attr 'coderay-css', 'class') == 'class' %><%= template.default_coderay_stylesheet %><% end %>
+    </style><%
+    when 'highlightjs' %>
+    <link rel="stylesheet" href="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/styles/<%= (attr 'highlightjs-theme', 'default') %>.min.css">
+    <style>
+pre code { background-color: #F8F8F8; padding: 0; }
+    </style>
+    <script src="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
     <% end %>
   </head>
   <body#{attribute('id', :'css-signature')} class="<%= doctype %>"<% if attr? 'max-width' %> style="max-width: <%= attr 'max-width' %>;"<% end %>>
@@ -169,7 +196,7 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
   <% end %>
   <div class="content monospaced">
     <% if (attr :style) == 'source' %>
-    <pre class="highlight#{attrvalue(:language)}"><code><%= template.preserve_endlines(content, self) %></code></pre>
+    <pre class="highlight<% if attr('source-highlighter') == 'coderay' %> CodeRay<% end %>"><code#{attribute('class', :language)}><%= template.preserve_endlines(content, self) %></code></pre>
     <% else %>
     <pre><%= template.preserve_endlines(content, self) %></pre>
     <% end %>

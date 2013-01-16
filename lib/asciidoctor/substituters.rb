@@ -92,7 +92,12 @@ module Asciidoctor
     #
     # returns - A String with literal (verbatim) substitutions performed
     def apply_literal_subs(lines)
-      apply_subs(lines.join, COMPOSITE_SUBS[:verbatim])
+      if @document.attr('basebackend') == 'html' && attr('style') == 'source' &&
+        @document.attr('source-highlighter') == 'coderay' && attr?('language')
+        sub_callouts(highlight_source(lines.join))
+      else
+        apply_subs(lines.join, COMPOSITE_SUBS[:verbatim])
+      end
     end
 
     # Public: Apply substitutions for header metadata and attribute assignments
@@ -443,6 +448,21 @@ module Asciidoctor
         puts "asciidoctor: WARNING: invalid passthrough macro substitution operation#{invalid.size > 1 ? 's' : ''}: #{invalid * ', '}"
       end 
       resolved
+    end
+
+    # Public: Highlight the source code if a source highlighter is defined
+    # on the document, otherwise return the text unprocessed
+    #
+    # source - the source code String to highlight
+    #
+    # returns the highlighted source code, if a source highlighter is defined
+    # on the document, otherwise the unprocessed text
+    def highlight_source(source)
+      Asciidoctor.require_library 'coderay'
+      ::CodeRay::Duo[attr('language', 'text').to_sym, :html, {
+          :css => @document.attr('coderay-css', 'class').to_sym,
+          :line_numbers => (attr?('linenums') ? @document.attr('coderay-linenums-mode', 'table').to_sym : nil),
+          :line_number_anchors => false}].highlight(source).chomp
     end
   end
 end

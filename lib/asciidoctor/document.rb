@@ -83,6 +83,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       # should we dup here?
       options[:attributes] = @parent_document.attributes
       @renderer = @parent_document.renderer
+    else
+      @parent_document = nil
     end
 
     @header = nil
@@ -114,6 +116,12 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     else
       attribute_overrides['docdir'] ||= Dir.pwd
       @base_dir = attribute_overrides['docdir']
+    end
+
+    # restrict document from setting source-highlighter in SECURE safe mode
+    # it can only be set via the constructor
+    if @safe >= SafeMode::SECURE
+      attribute_overrides['source-highlighter'] ||= nil
     end
     
     attribute_overrides.each {|key, val|
