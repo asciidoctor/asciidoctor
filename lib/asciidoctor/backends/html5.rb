@@ -137,7 +137,7 @@ class SectionTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<% if level == 0 %>
+<% if @level == 0 %>
 <h1#{id}><%= title %></h1>
 <%= content %>
 <% else %>
@@ -152,6 +152,14 @@ class SectionTemplate < ::Asciidoctor::BaseTemplate
   <% end %>
 </div>
 <% end %>
+    EOS
+  end
+end
+
+class BlockFloatingTitleTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOS
+<h<%= @level + 1 %>#{id} class="#{attrvalue :style, false}#{style_class}"><%= title %></h<%= @level + 1 %>>
     EOS
   end
 end

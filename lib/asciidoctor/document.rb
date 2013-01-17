@@ -150,11 +150,12 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     now = Time.new
     @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
     @attributes['localtime'] ||= now.strftime('%H:%m:%S %Z')
-    @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']].join(' ')
+    @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']] * ' '
     
-    # docdate and doctime should default to localdate and localtime if not otherwise set
+    # docdate and doctime default to localdate and localtime if not otherwise set
     @attributes['docdate'] ||= @attributes['localdate']
     @attributes['doctime'] ||= @attributes['localtime']
+    @attributes['docdatetime'] ||= [@attributes['localdate'], @attributes['localtime']] * ' '
     
     @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', 'images'), 'icons')
 

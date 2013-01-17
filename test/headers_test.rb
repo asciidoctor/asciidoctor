@@ -198,6 +198,119 @@ text
     end
   end
 
+  context 'Floating Title' do
+    test 'should create floating title if style is float' do
+      input = <<-EOS
+[float]
+= Plain Ol' Heading
+
+not in section
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/h1[@id="_plain_ol_heading"]', output, 1
+      assert_xpath '/h1[@class="float"]', output, 1
+      assert_xpath %(/h1[@class="float"][text()="Plain Ol' Heading"]), output, 1
+      assert_xpath '/h1/following-sibling::*[@class="paragraph"]', output, 1
+      assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p', output, 1
+      assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
+    end
+
+    test 'should create floating title if style is discrete' do
+      input = <<-EOS
+[discrete]
+=== Plain Ol' Heading
+
+not in section
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/h3', output, 1
+      assert_xpath '/h3[@id="_plain_ol_heading"]', output, 1
+      assert_xpath '/h3[@class="discrete"]', output, 1
+      assert_xpath %(/h3[@class="discrete"][text()="Plain Ol' Heading"]), output, 1
+      assert_xpath '/h3/following-sibling::*[@class="paragraph"]', output, 1
+      assert_xpath '/h3/following-sibling::*[@class="paragraph"]/p', output, 1
+      assert_xpath '/h3/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
+    end
+
+    test 'floating title should be a block with context floating_title' do
+      input = <<-EOS
+[float]
+=== Plain Ol' Heading
+
+not in section
+      EOS
+
+      doc = document_from_string input
+      floatingtitle = doc.blocks.first
+      assert floatingtitle.is_a?(Asciidoctor::Block)
+      assert !floatingtitle.is_a?(Asciidoctor::Section)
+      assert_equal :floating_title, floatingtitle.context
+    end
+
+    test 'should not include floating title in toc' do
+      input = <<-EOS
+:toc:
+
+== Section One
+
+[float]
+=== Miss Independent
+
+== Section Two
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@id="toc"]', output, 1
+      assert_xpath %(//*[@id="toc"]//a[contains(text(), " Section ")]), output, 2
+      assert_xpath %(//*[@id="toc"]//a[text()="Miss Independent"]), output, 0
+    end
+
+    test 'should not set id on floating title if sectids attribute is unset' do
+      input = <<-EOS
+[float]
+=== Plain Ol' Heading
+
+not in section
+      EOS
+
+      output = render_embedded_string input, :attributes => {'sectids' => nil}
+      assert_xpath '/h3', output, 1
+      assert_xpath '/h3[@id="_plain_ol_heading"]', output, 0
+      assert_xpath '/h3[@class="float"]', output, 1
+    end
+
+    test 'should use explicit id for floating title if specified' do
+      input = <<-EOS
+[[free]]
+[float]
+== Plain Ol' Heading
+
+not in section
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/h2', output, 1
+      assert_xpath '/h2[@id="free"]', output, 1
+      assert_xpath '/h2[@class="float"]', output, 1
+    end
+
+    test 'should add role to class attribute on floating title' do
+      input = <<-EOS
+[float, role="isolated"]
+== Plain Ol' Heading
+
+not in section
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/h2', output, 1
+      assert_xpath '/h2[@id="_plain_ol_heading"]', output, 1
+      assert_xpath '/h2[@class="float isolated"]', output, 1
+    end
+  end
+
   context 'Section Numbering' do
     test 'should create section number with one entry for level 1' do
       sect1 = Asciidoctor::Section.new(nil)
