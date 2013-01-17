@@ -48,7 +48,7 @@ class Asciidoctor::Lexer
     attributes = parse_block_metadata_lines(reader, document)
 
     # by processing the header here, we enforce its position at head of the document  
-    next_level = is_next_line_section? reader
+    next_level = is_next_line_section? reader, attributes
     if next_level == 0
       title_info = parse_section_title(reader) 
       document.title = title_info[1]
@@ -107,7 +107,7 @@ class Asciidoctor::Lexer
     # NOTE we could drop a hint in the attributes to indicate
     # that we are at a section title (so we don't have to check)
     if parent.is_a?(Document) && parent.blocks.empty? &&
-        (parent.has_header? || !is_next_line_section?(reader))
+        (parent.has_header? || !is_next_line_section?(reader, attributes))
 
       if parent.has_header?
         preamble = Block.new(parent, :preamble)
@@ -147,7 +147,7 @@ class Asciidoctor::Lexer
     while reader.has_lines?
       parse_block_metadata_lines(reader, section, attributes)
 
-      next_level = is_next_line_section?(reader)
+      next_level = is_next_line_section? reader, attributes
       if next_level
         doctype = parent.document.doctype
         if next_level == 0 && doctype != 'book'
@@ -243,7 +243,7 @@ class Asciidoctor::Lexer
       if parse_metadata && parse_block_metadata_line(reader, document, attributes, options)
         reader.next_line
         next
-      elsif parse_sections && context.nil? && is_next_line_section?(reader)
+      elsif parse_sections && context.nil? && is_next_line_section?(reader, attributes)
         block, attributes = next_section(reader, parent, attributes)
         break
       end
@@ -487,7 +487,26 @@ class Asciidoctor::Lexer
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, quote_context, buffer)
 
-      else # paragraph, contiguous nonblank/noncontinuation lines
+      # a floating (i.e., discrete) title
+      elsif ['float', 'discrete'].include?(attributes[1]) && is_section_title?(this_line, reader.peek_line)
+        attributes['style'] = attributes[1]
+        reader.unshift this_line
+        float_id, float_title, float_level, _ = parse_section_title reader
+        block = Block.new(parent, :floating_title)
+        if float_id.nil? || float_id.empty?
+          # FIXME remove hack of creating throwaway Section to get at the generate_id method
+          tmp_sect = Section.new(parent)
+          tmp_sect.title = float_title
+          block.id = tmp_sect.generate_id
+        else
+          block.id = float_id
+          @document.register(:ids, [float_id, float_title])
+        end
+        block.level = float_level
+        block.title = float_title
+
+      # a paragraph - contiguous nonblank/noncontinuation lines
+      else
         reader.unshift this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true, :skip_line_comments => true) {|line|
           delimited_block?(line) || line.match(REGEXP[:attr_line]) ||
@@ -978,14 +997,12 @@ class Asciidoctor::Lexer
 
   # Internal: Checks if the next line on the Reader is a section title
   #
-  # This is a more efficient version of #is_section_title? and should
-  # eventually replace its usage.
-  #
   # reader - the source Reader
   #
   # returns the section level if the Reader is positioned at a section title,
   # false otherwise
-  def self.is_next_line_section?(reader)
+  def self.is_next_line_section?(reader, attributes)
+    return false if !attributes[1].nil? && ['float', 'discrete'].include?(attributes[1])
     if reader.has_lines?
       line1 = reader.get_line
       line2 = reader.peek_line
@@ -1079,7 +1096,7 @@ class Asciidoctor::Lexer
     line1 = reader.get_line
     sect_id = nil
     sect_title = nil
-    sect_level = 0
+    sect_level = -1
     single_line = true
 
     if match = line1.match(REGEXP[:section_title])

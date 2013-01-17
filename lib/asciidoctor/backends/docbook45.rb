@@ -113,13 +113,22 @@ class SectionTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%>
-<<%= document.doctype == 'book' && level <= 1 ? 'chapter' : 'section' %>#{id}#{role}#{xreflabel}>
+<<%= document.doctype == 'book' && @level <= 1 ? 'chapter' : 'section' %>#{id}#{role}#{xreflabel}>
   #{title}
 <%= content %>
-</<%= document.doctype == 'book' && level <= 1 ? 'chapter' : 'section' %>>
+</<%= document.doctype == 'book' && @level <= 1 ? 'chapter' : 'section' %>>
     EOF
   end
 end
+
+class BlockFloatingTitleTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOS
+<bridgehead#{id}#{role}#{xreflabel} renderas="sect<%= @level %>"><%= title %></bridgehead>
+    EOS
+  end
+end
+
 
 class BlockParagraphTemplate < ::Asciidoctor::BaseTemplate
   def template
