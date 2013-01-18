@@ -73,13 +73,12 @@ module Asciidoctor
 
         begin
           opts.parse!(args)
-          self[:input_file] = args[0]
+          self[:input_file] = args[0] # TODO: this will have to change somehow if we start supporting STDIN
           if self[:input_file].nil? or self[:input_file].empty?
             puts "Missing input file"
             puts opts
             exit
           end
-          # TODO: support stdin, probably using ARGF and ARGF.to_io
         rescue OptionParser::InvalidOption, OptionParser::MissingArgument
           puts $!.to_s
           puts opts
