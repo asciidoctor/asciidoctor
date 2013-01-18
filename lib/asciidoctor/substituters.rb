@@ -250,14 +250,24 @@ module Asciidoctor
         reject = false
         subject = line.dup
         subject.gsub!(REGEXP[:attr_ref]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # escaped attribute
           if !$1.empty? || !$3.empty?
             "{#$2}"
-          elsif document.attributes.has_key? $2
-            document.attributes[$2]
-          elsif INTRINSICS.has_key? $2
-            INTRINSICS[$2]
+          elsif m[2].start_with?('counter:')
+            args = m[2].split(':')
+            @document.counter(args[1], args[2]) 
+          elsif m[2].start_with?('counter2:')
+            args = m[2].split(':')
+            @document.counter(args[1], args[2]) 
+            ''
+          elsif document.attributes.has_key? m[2]
+            @document.attributes[m[2]]
+          elsif INTRINSICS.has_key? m[2]
+            INTRINSICS[m[2]]
           else
-            Asciidoctor.debug { "Missing attribute: #$2, line marked for removal" }
+            Asciidoctor.debug { "Missing attribute: #{m[2]}, line marked for removal" }
             reject = true
             break '{undefined}'
           end

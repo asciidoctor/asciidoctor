@@ -159,7 +159,8 @@ module Asciidoctor
 
     # attribute reference
     # {foo}
-    :attr_ref         => /(\\?)\{(\w|\w[\w\-]*\w)(\\?)\}/,
+    # {counter:pcount:1}
+    :attr_ref         => /(\\?)\{(\w|\w[\w\-:]*\w)(\\?)\}/,
 
     # The author info line the appears immediately following the document title
     # John Doe <john@anonymous.com>
