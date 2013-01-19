@@ -2,7 +2,7 @@
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
 
-require 'asciidoctor'
-require 'asciidoctor/cli'
+require 'rubygems'
+require 'asciidoctor/cli/invoker'
 
-Asciidoctor::Cli.new.run
+Asciidoctor::Cli::Invoker.new(ARGV).invoke!

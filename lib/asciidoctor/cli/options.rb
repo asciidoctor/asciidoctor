@@ -8,16 +8,17 @@ module Asciidoctor
     class Options < Hash
 
       def initialize(options = {})
-        self[:input_file] = options[:input_file]
-        self[:output_file] = options[:output_file]
-        self[:header_footer] = options.fetch(:header_footer, true)
-        self[:template_directory] = options[:template_directory]
+        self[:input_file] = options[:input_file] || nil
+        self[:output_file] = options[:output_file] || nil
+        self[:suppress_header_footer] = options[:suppress_header_footer] || true
+        self[:template_directory] = options[:template_directory] || nil
         self[:doctype] = options[:doctype] || :article
-        self[:verbose] = options.fetch(:verbose, false)
-        self[:attributes] = options[:attributes] || {}
+        self[:verbose] = options[:verbose] || false
+        self[:attributes] = options[:verbose] || {}
         self[:backend] = options[:backend] || :html5
         self[:base_dir] = options[:base_dir] || Dir.pwd
-        self[:destination_dir] = options[:destination_dir]
+        self[:destination_dir] = options[:destination_dir] || nil
+        self[:trace] = false
       end
 
       def self.parse!(args)
@@ -39,8 +40,8 @@ module Asciidoctor
           opts.on('-o', '--output-file FILE', 'Output file') do |output_file|
             self[:output_file] = output_file
           end
-          opts.on('-s', '--no-headers-footer', 'Suppress the output of headers and footers') do |suppress_header_footer|
-            self[:header_footer] = false
+          opts.on('-s', '--[no]u-headers-footer', 'Suppress the output of headers and footers') do |suppress_header_footer|
+            self[:suppress_header_footer] = true
           end
           opts.on('-a', '--attribute key1=value,key2=value,keyN=value', Array,
                   'A list of attributes, key value pair separated by =, to override in the document') do |attribs|
@@ -58,6 +59,9 @@ module Asciidoctor
           opts.on('-D', '--destination-dir DIR', 'Destination output directory') do |dest_dir|
             self[:destination_dir] = dest_dir
           end
+          opts.on('--trace', 'Include backtrace information on errors') do |trace|
+            self[:trace] = true
+          end
 
           opts.on_tail("-h", "--help", "Show this message") do
             puts opts
@@ -73,12 +77,13 @@ module Asciidoctor
 
         begin
           opts.parse!(args)
-          self[:input_file] = args[0] # TODO: this will have to change somehow if we start supporting STDIN
+          self[:input_file] = args[0]
           if self[:input_file].nil? or self[:input_file].empty?
             puts "Missing input file"
             puts opts
             exit
           end
+          # TODO: support stdin, probably using ARGF and ARGF.to_io
         rescue OptionParser::InvalidOption, OptionParser::MissingArgument
           puts $!.to_s
           puts opts
