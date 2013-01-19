@@ -495,7 +495,7 @@ image::asciidoctor.png[Asciidoctor]
 image::asciidoctor.png[Asciidoctor]
       EOS
       basedir = File.dirname(Pathname.new(__FILE__).realpath)
-      block = block_from_string input, :attributes => {'docdir' => basedir, 'safe-paths' => false}
+      block = block_from_string input, :safe => Asciidoctor::SafeMode::UNSAFE, :attributes => {'docdir' => basedir}
       doc = block.document
       assert doc.safe == Asciidoctor::SafeMode::UNSAFE
 
