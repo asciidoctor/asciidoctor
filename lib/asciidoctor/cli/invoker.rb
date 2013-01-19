@@ -19,8 +19,18 @@ module Asciidoctor
       end
 
       def invoke!
-        data = File.new(@options[:input_file]).readlines
-        Asciidoctor::Document.new(data, @options).render
+        begin
+          data = File.new(@options[:input_file]).readlines
+          rendered_output = Asciidoctor::Document.new(data, @options).render
+          output_stream = @options[:output_file] ? File.new(@options[:output_file], 'w') : $stdout
+          output_stream.puts rendered_output
+        rescue Exception => e
+          raise e if @options[:trace] || SystemExit === ex
+          $stderr.print "#{e.class}: " if e.class != RuntimeError
+          $stderr.puts e.message
+          $stderr.puts '  Use --trace for backtrace'
+          exit 1
+        end
       end
     end
   end

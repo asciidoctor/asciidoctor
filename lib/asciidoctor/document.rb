@@ -1,3 +1,5 @@
+require 'asciidoctor'
+
 # Public: Methods for parsing Asciidoc documents and rendering them
 # using erb templates.
 #
