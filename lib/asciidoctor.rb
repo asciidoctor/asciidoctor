@@ -89,6 +89,14 @@ module Asciidoctor
     'docbook' => 425
   }
 
+  # Default extensions for the respective base backends
+  DEFAULT_EXTENSIONS = {
+    'html' => '.html',
+    'docbook' => '.xml',
+    'asciidoc' => '.ad',
+    'markdown' => '.md'
+  }
+
   LIST_CONTEXTS = [:ulist, :olist, :dlist, :colist]
 
   NESTABLE_LIST_CONTEXTS = [:ulist, :olist, :dlist]
