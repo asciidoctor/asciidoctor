@@ -1,5 +1,3 @@
-require 'asciidoctor'
-
 # Public: Methods for parsing Asciidoc documents and rendering them
 # using erb templates.
 #
@@ -113,17 +111,18 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
     # TODO we should go with one or the other, this is confusing
     # for now, base_dir takes precedence if set
-    if options.has_key? :base_dir
+    if !options[:base_dir].nil?
       @base_dir = attribute_overrides['docdir'] = options[:base_dir]
     else
       attribute_overrides['docdir'] ||= Dir.pwd
       @base_dir = attribute_overrides['docdir']
     end
 
-    # restrict document from setting source-highlighter in SECURE safe mode
-    # it can only be set via the constructor
+    # restrict document from setting source-highlighter or backend in SECURE
+    # safe mode; can only be set via the constructor
     if @safe >= SafeMode::SECURE
       attribute_overrides['source-highlighter'] ||= nil
+      attribute_overrides['backend'] ||= DEFAULT_BACKEND
     end
     
     attribute_overrides.each {|key, val|
@@ -137,6 +136,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     }
 
     @attributes['backend'] ||= DEFAULT_BACKEND
+    @attributes['doctype'] ||= DEFAULT_DOCTYPE
     update_backend_attributes
 
     if nested?
@@ -147,8 +147,6 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     end
 
     # dynamic intrinstic attribute values
-    @attributes['doctype'] ||= DEFAULT_DOCTYPE
-
     now = Time.new
     @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
     @attributes['localtime'] ||= now.strftime('%H:%m:%S %Z')
@@ -251,9 +249,17 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     else
       @attributes.delete('pagewidth')
     end
-    @attributes['backend-' + backend] = 1
+    @attributes["backend-#{backend}"] = 1
     @attributes['basebackend'] = basebackend
-    @attributes['basebackend-' + basebackend] = 1
+    @attributes["basebackend-#{basebackend}"] = 1
+    # REVIEW cases for the next two assignments
+    @attributes["#{backend}-#{@attributes['doctype']}"] = 1
+    @attributes["#{basebackend}-#{@attributes['doctype']}"] = 1
+    ext = DEFAULT_EXTENSIONS[basebackend] || '.html'
+    @attributes['outfilesuffix'] = ext
+    file_type = ext[1..-1]
+    @attributes['filetype'] = file_type
+    @attributes["filetype-#{file_type}"] = 1
   end
 
   def splain

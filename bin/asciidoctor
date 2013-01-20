@@ -1,8 +1,11 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.dirname(__FILE__) + '/../lib'
+$:.unshift File.join(File.dirname(__FILE__), '../lib')
 
 require 'rubygems'
+require 'optparse'
+require 'asciidoctor'
+require 'asciidoctor/cli/options'
 require 'asciidoctor/cli/invoker'
 
 Asciidoctor::Cli::Invoker.new(ARGV).invoke!

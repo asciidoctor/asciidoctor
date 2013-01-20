@@ -100,9 +100,11 @@ Gem::Specification.new do |s|
     test/fixtures/list_elements.asciidoc
     test/fixtures/tip.gif
     test/headers_test.rb
+    test/invoker_test.rb
     test/lexer_test.rb
     test/links_test.rb
     test/lists_test.rb
+    test/option_test.rb
     test/paragraphs_test.rb
     test/preamble_test.rb
     test/reader_test.rb
