@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.join(File.dirname(__FILE__), '../lib')
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
-require 'rubygems'
-require 'optparse'
 require 'asciidoctor'
 require 'asciidoctor/cli/options'
 require 'asciidoctor/cli/invoker'
 
-Asciidoctor::Cli::Invoker.new(ARGV).invoke!
+# pass ARGV.dup?
+invoker = Asciidoctor::Cli::Invoker.new(ARGV)
+invoker.invoke!
+exit invoker.code

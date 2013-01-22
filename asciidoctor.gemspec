@@ -96,15 +96,17 @@ Gem::Specification.new do |s|
     test/fixtures/ascshort.txt
     test/fixtures/dot.gif
     test/fixtures/encoding.asciidoc
+    test/fixtures/filename\ with\ spaces.asciidoc
     test/fixtures/include-file.asciidoc
     test/fixtures/list_elements.asciidoc
+    test/fixtures/sample.asciidoc
     test/fixtures/tip.gif
     test/headers_test.rb
     test/invoker_test.rb
     test/lexer_test.rb
     test/links_test.rb
     test/lists_test.rb
-    test/option_test.rb
+    test/options_test.rb
     test/paragraphs_test.rb
     test/preamble_test.rb
     test/reader_test.rb
