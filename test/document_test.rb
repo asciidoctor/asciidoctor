@@ -34,6 +34,112 @@ context 'Document' do
     end
   end
 
+  context 'Load APIs' do
+    test 'should load input file' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      doc = Asciidoctor.load(File.new(sample_input_path), :safe => Asciidoctor::SafeMode::SAFE)
+      assert_equal 'Document Title', doc.doctitle
+      assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
+      assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
+    end
+
+    test 'should load input file from filename' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      doc = Asciidoctor.load_file(sample_input_path, :safe => Asciidoctor::SafeMode::SAFE)
+      assert_equal 'Document Title', doc.doctitle
+      assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
+      assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
+    end
+
+    test 'should load input IO' do
+      input = StringIO.new(<<-EOS)
+Document Title
+==============
+
+preamble
+      EOS
+      doc = Asciidoctor.load(input, :safe => Asciidoctor::SafeMode::SAFE)
+      assert_equal 'Document Title', doc.doctitle
+      assert !doc.attr?('docfile')
+      assert_equal doc.base_dir, doc.attr('docdir')
+    end
+
+    test 'should load input string' do
+      input = <<-EOS
+Document Title
+==============
+
+preamble
+      EOS
+      doc = Asciidoctor.load(input, :safe => Asciidoctor::SafeMode::SAFE)
+      assert_equal 'Document Title', doc.doctitle
+      assert !doc.attr?('docfile')
+      assert_equal doc.base_dir, doc.attr('docdir')
+    end
+
+    test 'should load input string array' do
+      input = <<-EOS
+Document Title
+==============
+
+preamble
+      EOS
+      doc = Asciidoctor.load(input.lines.entries, :safe => Asciidoctor::SafeMode::SAFE)
+      assert_equal 'Document Title', doc.doctitle
+      assert !doc.attr?('docfile')
+      assert_equal doc.base_dir, doc.attr('docdir')
+    end
+  end
+
+  context 'Render APIs' do
+    test 'should render document to string' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      output = Asciidoctor.render_file(sample_input_path)
+      assert !output.empty?
+      assert_xpath '/html', output, 1
+      assert_xpath '/html/head', output, 1
+      assert_xpath '/html/body', output, 1
+      assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
+      assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+    end
+
+    test 'should render document in place' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      sample_output_path = fixture_path('sample.html')
+      begin
+        Asciidoctor.render_file(sample_input_path, :in_place => true)
+        assert File.exist?(sample_output_path)
+        output = File.read(sample_output_path)
+        assert !output.empty?
+        assert_xpath '/html', output, 1
+        assert_xpath '/html/head', output, 1
+        assert_xpath '/html/body', output, 1
+        assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
+        assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+      ensure
+        FileUtils::rm(sample_output_path)
+      end
+    end
+
+    test 'should render document to file' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      sample_output_path = fixture_path('result.html')
+      begin
+        Asciidoctor.render_file(sample_input_path, :to_file => sample_output_path)
+        assert File.exist?(sample_output_path)
+        output = File.read(sample_output_path)
+        assert !output.empty?
+        assert_xpath '/html', output, 1
+        assert_xpath '/html/head', output, 1
+        assert_xpath '/html/body', output, 1
+        assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
+        assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+      ensure
+        FileUtils::rm(sample_output_path)
+      end
+    end
+  end
+
   context 'Renderer' do
     test 'built-in HTML5 views are registered by default' do
       doc = document_from_string ''

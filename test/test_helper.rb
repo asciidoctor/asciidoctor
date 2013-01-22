@@ -30,7 +30,7 @@ class Test::Unit::TestCase
   end
 
   def fixture_path(name)
-    File.join(File.dirname(__FILE__), "fixtures", name )
+    File.join(File.dirname(__FILE__), 'fixtures', name)
   end
 
   def example_document(name)
