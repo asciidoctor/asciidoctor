@@ -217,6 +217,12 @@ context 'Invoker' do
     assert_xpath '//h2[not(@id)]', output
   end
 
+  test 'default CLI mode should be unsafe' do
+    invoker = invoke_cli_to_buffer %w(-o /dev/null)
+    doc = invoker.document
+    assert_equal Asciidoctor::SafeMode::UNSAFE, doc.safe
+  end
+
   test 'should set safe mode if specified' do
     invoker = invoke_cli_to_buffer %w(--safe -o /dev/null)
     doc = invoker.document
