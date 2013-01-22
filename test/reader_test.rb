@@ -237,7 +237,7 @@ include::include-file.asciidoc[]
     end
 
     test "keeps naughty absolute paths from getting outside" do
-      naughty_path = "/etc/passwd"
+      naughty_path = "#{disk_root}etc/passwd"
       doc = Asciidoctor::Document.new
       reader = Asciidoctor::Reader.new(["foo"], doc)
       secure_path = doc.normalize_asset_path(naughty_path)
