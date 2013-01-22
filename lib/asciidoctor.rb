@@ -569,7 +569,7 @@ module Asciidoctor
     if in_place && input.is_a?(File)
       to_file = File.join(File.dirname(input.path), "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
     elsif to_file
-      to_file = File.absolute_path(to_file, doc.base_dir) 
+      to_file = doc.normalize_asset_path(to_file)
       if !File.directory?(File.dirname(to_file))
         to_file = nil
       end

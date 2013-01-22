@@ -130,8 +130,6 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       @base_dir = attribute_overrides['docdir'] = File.expand_path(options[:base_dir])
     end
 
-    # restrict document from setting source-highlighter or backend in SECURE
-    # safe mode; can only be set via the constructor
     if @safe >= SafeMode::SECURE
       # restrict document from setting source-highlighter or backend
       attribute_overrides['source-highlighter'] ||= nil
@@ -165,8 +163,6 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     end
 
     # dynamic intrinstic attribute values
-    @attributes['doctype'] ||= DEFAULT_DOCTYPE
-
     now = Time.new
     @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
     @attributes['localtime'] ||= now.strftime('%H:%M:%S %Z')
