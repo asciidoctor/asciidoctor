@@ -113,6 +113,73 @@ How crazy is that?
       output = render_string input
       assert_xpath '//*[@class="exampleblock"]//p', output, 2
     end
+
+    test "assigns sequential numbered caption to example block with title" do
+      input = <<-EOS
+.Writing Docs with AsciiDoc
+====
+Here's how you write AsciiDoc.
+
+You just write.
+====
+
+.Writing Docs with DocBook
+====
+Here's how you write DocBook.
+
+You futz with XML.
+====
+      EOS
+
+      doc = document_from_string input
+      output = doc.render
+      assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Example 1. Writing Docs with AsciiDoc"]', output, 1
+      assert_xpath '(//*[@class="exampleblock"])[2]/*[@class="title"][text()="Example 2. Writing Docs with DocBook"]', output, 1
+      assert_equal 2, doc.attributes['example-number']
+    end
+
+    test "assigns sequential character caption to example block with title" do
+      input = <<-EOS
+:example-number: @
+
+.Writing Docs with AsciiDoc
+====
+Here's how you write AsciiDoc.
+
+You just write.
+====
+
+.Writing Docs with DocBook
+====
+Here's how you write DocBook.
+
+You futz with XML.
+====
+      EOS
+
+      doc = document_from_string input
+      output = doc.render
+      assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Example A. Writing Docs with AsciiDoc"]', output, 1
+      assert_xpath '(//*[@class="exampleblock"])[2]/*[@class="title"][text()="Example B. Writing Docs with DocBook"]', output, 1
+      assert_equal 'B', doc.attributes['example-number']
+    end
+
+    test "explicit caption is used if provided" do
+      input = <<-EOS
+[caption="Look! "]
+.Writing Docs with AsciiDoc
+====
+Here's how you write AsciiDoc.
+
+You just write.
+====
+      EOS
+
+      doc = document_from_string input
+      output = doc.render
+      assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
+      assert !doc.attributes.has_key?('example-number')
+    end
   end
 
   context "Preformatted Blocks" do
@@ -355,9 +422,11 @@ image::images/tiger.png[Tiger, link='http://en.wikipedia.org/wiki/Tiger']
 image::images/tiger.png[Tiger]
       EOS
 
-      output = render_string input
+      doc = document_from_string input
+      output = doc.render
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
-      assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "The AsciiDoc Tiger"]', output, 1
+      assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Figure 1. The AsciiDoc Tiger"]', output, 1
+      assert_equal 1, doc.attributes['figure-number']
     end
 
     test 'can resolve image relative to imagesdir' do
@@ -479,7 +548,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
-      basedir = File.dirname(__FILE__)
+      basedir = File.expand_path File.dirname(__FILE__)
       block = block_from_string input, :attributes => {'docdir' => basedir}
       doc = block.document
       assert doc.safe >= Asciidoctor::SafeMode::SAFE
@@ -493,7 +562,7 @@ image::asciidoctor.png[Asciidoctor]
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
-      basedir = File.dirname(__FILE__)
+      basedir = File.expand_path File.dirname(__FILE__)
       block = block_from_string input, :safe => Asciidoctor::SafeMode::UNSAFE, :attributes => {'docdir' => basedir}
       doc = block.document
       assert doc.safe == Asciidoctor::SafeMode::UNSAFE
