@@ -33,52 +33,25 @@ module Asciidoctor
 
         begin
           @timings = {}
-          attrs = @options[:attributes]
           infile = @options[:input_file]
-          # these three attributes just seem unsafe and pointless, so let's hold off on setting them
-          #attrs['asciidoctor-file'] = File.expand_path($PROGRAM_NAME)
-          #attrs['asciidoctor-dir'] = File.expand_path(File.join(File.dirname(__FILE__), '../../..'))
-          #attrs['asciidoctor-args'] = ARGV * ' '
-          start = Time.now
+          outfile = @options[:output_file]
           if infile == '-'
             # allow use of block to supply stdin, particularly useful for tests
-            if block_given?
-              content = yield
-              if content.is_a?(String)
-                lines = content.lines.entries
-              elsif content.is_a?(IO)
-                lines = content.readlines
-              else
-                lines = content
-              end
-            else
-              lines = STDIN.readlines
-            end
+            input = block_given? ? yield : STDIN
           else
-            infile_mtime = File.mtime(infile)
-            # hold off on setting infile and indir until we get a better sense of their purpose
-            attrs['docfile'] = File.expand_path(infile)
-            attrs['docdir'] = File.expand_path(File.dirname(infile))
-            attrs['docname'] = File.basename(infile, File.extname(infile))
-            attrs['docdate'] = infile_mtime.strftime('%Y-%m-%d')
-            attrs['doctime'] = infile_mtime.strftime('%H:%M:%S %Z')
-            attrs['docdatetime'] = [attrs['docdate'], attrs['doctime']] * ' '
-            lines = File.new(infile).readlines
+            input = File.new(infile)
           end
-          timings[:read] = Time.now - start
           start = Time.now
-          @document = Asciidoctor::Document.new(lines, @options)
+          @document = Asciidoctor.load(input, @options)
           timings[:parse] = Time.now - start
           start = Time.now
           output = @document.render
           timings[:render] = Time.now - start
           if @options[:verbose]
-            puts "Time to read source file: #{timings[:render]}"
-            puts "Time to parse source: #{timings[:parse]}"
+            puts "Time to read and parse source: #{timings[:parse]}"
             puts "Time to render document: #{timings[:render]}"
             puts "Total time to read, parse and render: #{timings.reduce(0) {|sum, (k, v)| sum += v}}"
           end
-          outfile = @options[:output_file]
           if outfile == '/dev/null'
             # output nothing
           elsif outfile == '-' || (infile == '-' && (outfile.nil? || outfile.empty?))
@@ -92,7 +65,7 @@ module Asciidoctor
               end
               outfile = File.join(destination_dir, "#{@document.attributes['docname']}#{@document.attributes['outfilesuffix']}")
             else
-              outfile = File.expand_path outfile
+              outfile = @document.normalize_asset_path outfile
             end
 
             # this assignment is primarily for testing or other post analysis
