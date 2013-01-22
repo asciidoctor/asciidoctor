@@ -169,7 +169,7 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="dlist#{style_class}">
-  <% if title %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <dl>
@@ -199,7 +199,7 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="listingblock#{style_class}">
-  <% if title %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <div class="content monospaced">
@@ -219,7 +219,7 @@ class BlockLiteralTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="literalblock#{style_class}">
-  <% if title %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <div class="content monospaced">
@@ -245,7 +245,7 @@ class BlockAdmonitionTemplate < ::Asciidoctor::BaseTemplate
         <% end %>
       </td>
       <td class="content">
-        <% unless title.nil? %>
+        <% if title? %>
         <div class="title"><%= title %></div>
         <% end %>
         <%= content %>
@@ -262,7 +262,7 @@ class BlockParagraphTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="paragraph#{style_class}">
-  <% unless title.nil? %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <p><%= content %></p>
@@ -277,7 +277,7 @@ class BlockSidebarTemplate < ::Asciidoctor::BaseTemplate
 <%#encoding:UTF-8%>
 <div#{id} class="sidebarblock#{style_class}">
   <div class="content">
-    <% unless title.nil? %>
+    <% if title? %>
     <div class="title"><%= title %></div>
     <% end %>
 <%= content %>
@@ -292,10 +292,10 @@ class BlockExampleTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="exampleblock#{style_class}">
+  <% if title? %>
+  <div class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></div>
+  <% end %>
   <div class="content">
-    <% unless title.nil? %>
-    <div class="title"><%= title %></div>
-    <% end %>
 <%= content %>
   </div>
 </div>
@@ -308,7 +308,7 @@ class BlockOpenTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="openblock#{style_class}">
-  <% unless title.nil? %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <div class="content">
@@ -333,7 +333,7 @@ class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="quoteblock#{style_class}">
-  <% unless title.nil? %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <div class="content">
@@ -360,7 +360,7 @@ class BlockVerseTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="verseblock#{style_class}">
-  <% unless title.nil? %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <pre class="content"><%= template.preserve_endlines(content, self) %></pre>
@@ -385,7 +385,7 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="ulist#{attrvalue(:style)}#{style_class}">
-  <% unless title.nil? %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <ul>
@@ -408,7 +408,7 @@ class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="olist <%= attr :style %>#{style_class}">
-  <% unless title.nil? %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <ol class="<%= attr :style %>"#{attribute('start', :start)}>
@@ -431,7 +431,7 @@ class BlockColistTemplate < ::Asciidoctor::BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
 <div#{id} class="colist <%= attr :style %>#{style_class}">
-  <% unless title.nil? %>
+  <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <ol>
@@ -454,7 +454,7 @@ class BlockTableTemplate < ::Asciidoctor::BaseTemplate
 if !(attr? 'autowidth-option') %>width: <%= attr :tablepcwidth %>%; <% end %><%
 if attr? :float %>float: <%= attr :float %>; <% end %>">
   <% if title? %>
-  <caption class="title"><%= title %></caption>
+  <caption class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></caption>
   <% end %>
   <% if (attr :rowcount) >= 0 %> 
   <colgroup>
@@ -505,8 +505,8 @@ class BlockImageTemplate < ::Asciidoctor::BaseTemplate
     <img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}>
     <% end %>
   </div>
-  <% if title %>
-  <div class="title"><%= title %></div>
+  <% if title? %>
+  <div class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></div>
   <% end %>
 </div>
     EOS

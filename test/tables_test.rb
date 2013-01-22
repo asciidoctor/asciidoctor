@@ -39,7 +39,7 @@ context 'Tables' do
 |=======
       EOS
       output = render_embedded_string input
-      assert_xpath '/table/caption[@class="title"][text()="Simple psv table"]', output, 1
+      assert_xpath '/table/caption[@class="title"][text()="Table 1. Simple psv table"]', output, 1
       assert_xpath '/table/caption/following-sibling::colgroup', output, 1
     end
 
@@ -217,7 +217,7 @@ I am getting in shape!
       output = render_embedded_string input
       assert_css 'table', output, 1
       assert_css 'table[style~="width: 80%;"]', output, 1
-      assert_xpath '/table/caption[@class="title"][text()="Horizontal and vertical source data"]', output, 1
+      assert_xpath '/table/caption[@class="title"][text()="Table 1. Horizontal and vertical source data"]', output, 1
       assert_css 'table > colgroup > col', output, 4
       assert_css 'table > colgroup > col:nth-child(1)[@style~="width: 17%;"]', output, 1
       assert_css 'table > colgroup > col:nth-child(2)[@style~="width: 11%;"]', output, 1

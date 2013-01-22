@@ -241,6 +241,78 @@ of the attribute named foo in your document.
       html = render_string('<node>&</node>')
       assert_match(/&lt;node&gt;&amp;&lt;\/node&gt;/, html)
     end
+
+    test 'creates counter' do
+      input = <<-EOS
+{counter:mycounter}
+      EOS
+
+      doc = document_from_string input
+      output = doc.render
+      assert_equal 1, doc.attributes['mycounter']
+      assert_xpath '//p[text()="1"]', output, 1
+    end
+
+    test 'creates counter silently' do
+      input = <<-EOS
+{counter2:mycounter}
+      EOS
+
+      doc = document_from_string input
+      output = doc.render
+      assert_equal 1, doc.attributes['mycounter']
+      assert_xpath '//p[text()="1"]', output, 0
+    end
+
+    test 'creates counter with numeric seed value' do
+      input = <<-EOS
+{counter2:mycounter:10}
+      EOS
+
+      doc = document_from_string input
+      doc.render
+      assert_equal 10, doc.attributes['mycounter']
+    end
+
+    test 'creates counter with character seed value' do
+      input = <<-EOS
+{counter2:mycounter:A}
+      EOS
+
+      doc = document_from_string input
+      doc.render
+      assert_equal 'A', doc.attributes['mycounter']
+    end
+
+    test 'increments counter with numeric value' do
+      input = <<-EOS
+:mycounter: 1
+
+{counter:mycounter}
+
+{mycounter}
+      EOS
+
+      doc = document_from_string input
+      output = doc.render
+      assert_equal 2, doc.attributes['mycounter']
+      assert_xpath '//p[text()="2"]', output, 2
+    end
+
+    test 'increments counter with character value' do
+      input = <<-EOS
+:mycounter: @
+
+{counter:mycounter}
+
+{mycounter}
+      EOS
+
+      doc = document_from_string input
+      output = doc.render
+      assert_equal 'A', doc.attributes['mycounter']
+      assert_xpath '//p[text()="A"]', output, 2
+    end
     
   end
 

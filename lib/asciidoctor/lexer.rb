@@ -236,8 +236,6 @@ class Asciidoctor::Lexer
     document = parent.document
     context = parent.is_a?(Block) ? parent.context : nil
     block = nil
-    title = nil
-    caption = nil
 
     while reader.has_lines? && block.nil?
       if parse_metadata && parse_block_metadata_line(reader, document, attributes, options)
@@ -275,6 +273,11 @@ class Asciidoctor::Lexer
           attributes['target'] = target
           document.register(:images, target)
           attributes['alt'] ||= File.basename(target, File.extname(target))
+          # hmmm, this assignment seems like a one-off
+          block.title = attributes['title']
+          if block.title? && attributes['caption'].to_s.empty?
+            attributes['caption'] = "Figure #{document.counter('figure-number')}. "
+          end
         else
           # drop the line if target resolves to nothing
           block = nil
@@ -369,6 +372,11 @@ class Asciidoctor::Lexer
         AttributeList.rekey(attributes, ['style'])
         table_reader = Reader.new reader.grab_lines_until(:terminator => terminator, :skip_line_comments => true)
         block = next_table(table_reader, parent, attributes)
+        # hmmm, this assignment seems like a one-off
+        block.title = attributes['title']
+        if block.title? && attributes['caption'].to_s.empty?
+          attributes['caption'] = "Table #{document.counter('table-number')}. "
+        end
     
       # FIXME violates DRY because it's a duplication of other block parsing
       elsif delimited_blk && (match = this_line.match(REGEXP[:example]))
@@ -381,6 +389,11 @@ class Asciidoctor::Lexer
           attributes['caption'] ||= admonition_style.capitalize
         else
           block = Block.new(parent, :example)
+          # hmmm, this assignment seems like a one-off
+          block.title = attributes['title']
+          if block.title? && attributes['caption'].to_s.empty?
+            attributes['caption'] = "Example #{document.counter('example-number')}. "
+          end
         end
         buffer = Reader.new reader.grab_lines_until(:terminator => terminator)
 
@@ -543,8 +556,8 @@ class Asciidoctor::Lexer
     # so handle accordingly
     if !block.nil?
       block.id        = attributes['id'] if attributes.has_key?('id')
-      block.title   ||= (attributes['title'] || title)
-      block.caption ||= caption unless block.is_a?(Section)
+      block.title     = attributes['title'] unless block.title?
+      block.caption ||= attributes['caption'] unless block.is_a?(Section)
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
       if block.id && block.title? && !attributes.has_key?('reftext')

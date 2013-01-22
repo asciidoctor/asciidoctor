@@ -48,6 +48,9 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # Public: Get the Hash of document references
   attr_reader :references
 
+  # Public: Get the Hash of document counters
+  attr_reader :counters
+
   # Public: Get the Hash of callouts
   attr_reader :callouts
 
@@ -93,6 +96,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       :links => [],
       :images => []
     }
+    @counters = {}
     @callouts = Callouts.new
     @options = options
     @safe = @options.fetch(:safe, SafeMode::SECURE).to_i
@@ -174,6 +178,47 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       }
       msg * "\n"
     }
+  end
+
+  # Public: Get the named counter and take the next number in the sequence.
+  #
+  # name  - the String name of the counter
+  # seed  - the initial value as a String or Integer
+  #
+  # returns the next number in the sequence for the specified counter
+  def counter(name, seed = nil)
+    if !@counters.has_key? name
+      if seed.nil?
+        seed = nextval(@attributes.has_key?(name) ? @attributes[name] : 0)
+      elsif seed.to_i.to_s == seed
+        seed = seed.to_i
+      end
+      @counters[name] = seed
+    else
+      @counters[name] = nextval(@counters[name])
+    end
+
+    (@attributes[name] = @counters[name])
+  end
+
+  # Internal: Get the next value in the sequence.
+  #
+  # Handles both integer and character sequences.
+  #
+  # current - the value to increment as a String or Integer
+  #
+  # returns the next value in the sequence according to the current value's type
+  def nextval(current)
+    if current.is_a?(Integer)
+      current + 1
+    else
+      intval = current.to_i
+      if intval.to_s != current.to_s
+        (current[0].ord + 1).chr
+      else
+        intval + 1 
+      end
+    end
   end
 
   def register(type, value)
