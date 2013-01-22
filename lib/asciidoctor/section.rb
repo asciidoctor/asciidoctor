@@ -58,7 +58,7 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   #   another_section.generate_id
   #   => "_foo_1"
   def generate_id
-    if @document.attr?('sectids')
+    if @document.attr? 'sectids'
       base_id = @document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, '_').
           gsub(/\W+/, '_').tr_s('_', '_').gsub(/^_?(.*?)_?$/, '\1')
       gen_id = base_id
@@ -67,7 +67,7 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
         gen_id = "#{base_id}_#{cnt}" 
         cnt += 1
       end 
-      @document.references[:ids][gen_id] = title
+      @document.register(:ids, [gen_id, title])
       gen_id
     else
       nil
