@@ -173,9 +173,9 @@ class Asciidoctor::AbstractNode
   #
   # The most important functionality in this method is to prevent the asset
   # reference from resolving to a directory outside of the chroot directory
-  # (which defaults to the directory of the source file, stored in the 'docdir'
-  # attribute) if the document safe level is set to SafeMode::SAFE or greater
-  # (a condition which is true by default).
+  # (which defaults to the directory of the source file, stored in the base_dir
+  # instance variable on Document) if the document safe level is set to
+  # SafeMode::SAFE or greater (a condition which is true by default).
   #
   # asset_ref    - the String asset file or directory referenced in the document
   #                or configuration attribute
@@ -185,28 +185,28 @@ class Asciidoctor::AbstractNode
   # Examples
   #
   #  # given these fixtures
-  #  document.attr('docdir')
-  #  # => "/path/to/docdir"
+  #  document.base_dir
+  #  # => "/path/to/chroot"
   #  document.safe >= Asciidoctor::SafeMode::SAFE
   #  # => true
   #
   #  # then
   #  normalize_asset_path('images')
-  #  # => "/path/to/docdir/images"
+  #  # => "/path/to/chroot/images"
   #  normalize_asset_path('/etc/images')
-  #  # => "/path/to/docdir/images"
+  #  # => "/path/to/chroot/images"
   #  normalize_asset_path('../images')
-  #  # => "/path/to/docdir/images"
+  #  # => "/path/to/chroot/images"
   #
   #  # given these fixtures
-  #  document.attr('docdir')
-  #  # => "/path/to/docdir"
+  #  document.base_dir
+  #  # => "/path/to/chroot"
   #  document.safe >= Asciidoctor::SafeMode::SAFE
   #  # => false
   #
   #  # then
   #  normalize_asset_path('images')
-  #  # => "/path/to/docdir/images"
+  #  # => "/path/to/chroot/images"
   #  normalize_asset_path('/etc/images')
   #  # => "/etc/images"
   #  normalize_asset_path('../images')
@@ -221,7 +221,7 @@ class Asciidoctor::AbstractNode
     # TODO we may use pathname enough to make it a top-level require
     Asciidoctor.require_library 'pathname'
 
-    input_path = File.expand_path(@document.attr('docdir'))
+    input_path = @document.base_dir
     asset_path = Pathname.new(asset_ref)
     
     if asset_path.relative?

@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'pathname'
 require 'test/unit'
 
 require "#{File.expand_path(File.dirname(__FILE__))}/../lib/asciidoctor.rb"
@@ -132,6 +133,39 @@ class Test::Unit::TestCase
   def parse_header_metadata(source)
     reader = Asciidoctor::Reader.new source.lines.entries
     [Asciidoctor::Lexer.parse_header_metadata(reader), reader]
+  end
+
+  def invoke_cli_to_buffer(argv = [], filename = 'sample.asciidoc', &block)
+    invoke_cli(argv, filename, [StringIO.new, StringIO.new], &block)
+  end
+
+  def invoke_cli(argv = [], filename = 'sample.asciidoc', buffers = nil, &block)
+    if filename.nil? || filename == '-' || ::Pathname.new(filename).absolute?
+      filepath = filename
+    else
+      filepath = File.join(File.dirname(__FILE__), 'fixtures', filename)
+    end
+    invoker = Asciidoctor::Cli::Invoker.new(argv + [filepath])
+    if buffers
+      invoker.redirect_streams(*buffers)
+    end
+    invoker.invoke! &block
+    invoker
+  end
+
+  def redirect_streams
+    old_stdout = $stdout
+    old_stderr = $stderr
+    stdout = StringIO.new
+    stderr = StringIO.new
+    $stdout = stdout
+    $stderr = stderr
+    begin
+      yield(stdout, stderr)
+    ensure
+      $stdout = old_stdout
+      $stderr = old_stderr
+    end
   end
 end
 
