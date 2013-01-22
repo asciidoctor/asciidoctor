@@ -165,6 +165,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     end
 
     # dynamic intrinstic attribute values
+    @attributes['doctype'] ||= DEFAULT_DOCTYPE
+
     now = Time.new
     @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
     @attributes['localtime'] ||= now.strftime('%H:%M:%S %Z')

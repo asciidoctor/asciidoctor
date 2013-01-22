@@ -104,39 +104,48 @@ context 'Invoker' do
 
   test 'should output to file name based on input file name' do
     sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.html'))
-    invoker = invoke_cli
-    doc = invoker.document
-    assert_equal sample_outpath, doc.attr('outfile')
-    assert File.exist?(sample_outpath)
-    output = File.read(sample_outpath)
-    FileUtils::rm(sample_outpath)
-    assert !output.empty?
-    assert_xpath '/html', output, 1
-    assert_xpath '/html/head', output, 1
-    assert_xpath '/html/body', output, 1
-    assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
-    assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+    begin
+      invoker = invoke_cli
+      doc = invoker.document
+      assert_equal sample_outpath, doc.attr('outfile')
+      assert File.exist?(sample_outpath)
+      output = File.read(sample_outpath)
+      assert !output.empty?
+      assert_xpath '/html', output, 1
+      assert_xpath '/html/head', output, 1
+      assert_xpath '/html/body', output, 1
+      assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
+      assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+    ensure
+      FileUtils::rm(sample_outpath)
+    end
   end
 
   test 'should output to file in destination directory if set' do
     destination_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp'))
     sample_outpath = File.join(destination_path, 'sample.html')
-    FileUtils::mkdir(destination_path)
-    invoker = invoke_cli %w(-D test/tmp)
-    doc = invoker.document
-    assert_equal sample_outpath, doc.attr('outfile')
-    assert File.exist?(sample_outpath)
-    FileUtils::rm(sample_outpath)
-    FileUtils::rmdir(destination_path)
+    begin
+      FileUtils::mkdir_p(destination_path) 
+      invoker = invoke_cli %w(-D test/tmp)
+      doc = invoker.document
+      assert_equal sample_outpath, doc.attr('outfile')
+      assert File.exist?(sample_outpath)
+    ensure
+      FileUtils::rm(sample_outpath)
+      FileUtils::rmdir(destination_path)
+    end
   end
 
   test 'should output to file specified' do
     sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample-output.html'))
-    invoker = invoke_cli %W(-o #{sample_outpath})
-    doc = invoker.document
-    assert_equal sample_outpath, doc.attr('outfile')
-    assert File.exist?(sample_outpath)
-    FileUtils::rm(sample_outpath)
+    begin
+      invoker = invoke_cli %W(-o #{sample_outpath})
+      doc = invoker.document
+      assert_equal sample_outpath, doc.attr('outfile')
+      assert File.exist?(sample_outpath)
+    ensure
+      FileUtils::rm(sample_outpath)
+    end
   end
 
   test 'should suppress header footer if specified' do
@@ -217,10 +226,10 @@ context 'Invoker' do
     assert_xpath '//h2[not(@id)]', output
   end
 
-  test 'default CLI mode should be unsafe' do
+  test 'default mode for cli should be unsafe' do
     invoker = invoke_cli_to_buffer %w(-o /dev/null)
     doc = invoker.document
-    assert_equal Asciidoctor::SafeMode::UNSAFE, doc.safe
+    assert_equal Asciidoctor::SafeMode::UNSAFE, doc.safe 
   end
 
   test 'should set safe mode if specified' do

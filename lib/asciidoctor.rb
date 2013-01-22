@@ -482,6 +482,121 @@ module Asciidoctor
     [/&amp;(#[a-z0-9]+;)/i, '&\1']
   ]
 
+  # Public: Parse the AsciiDoc source input into an Asciidoctor::Document
+  #
+  # Accepts input as an IO (or StringIO), String or String Array object. If the
+  # input is a File, information about the file is stored in attributes on the
+  # Document object.
+  #
+  # input   - the AsciiDoc source as a IO, String or Array.
+  # options - a Hash of options to control processing (default: {})
+  #           see Asciidoctor::Document#initialize for details
+  # block   - a callback block for handling include::[] directives
+  #
+  # returns the Asciidoctor::Document
+  def self.load(input, options = {}, &block)
+    lines = nil
+    if input.is_a?(File)
+      options[:attributes] ||= {}
+      attrs = options[:attributes]
+      lines = input.readlines
+      input_mtime = input.mtime
+      input_path = File.expand_path(input.path)
+      # hold off on setting infile and indir until we get a better sense of their purpose
+      attrs['docfile'] = input_path
+      attrs['docdir'] = File.dirname(input_path)
+      attrs['docname'] = File.basename(input_path, File.extname(input_path))
+      attrs['docdate'] = input_mtime.strftime('%Y-%m-%d')
+      attrs['doctime'] = input_mtime.strftime('%H:%M:%S %Z')
+      attrs['docdatetime'] = [attrs['docdate'], attrs['doctime']] * ' '
+    elsif input.respond_to?(:readlines)
+      input.rewind rescue nil
+      lines = input.readlines
+    elsif input.is_a?(String)
+      lines = input.lines.entries
+    elsif input.is_a?(Array)
+      lines = input.dup
+    else
+      raise "Unsupported input type: #{input.class}"
+    end
+
+    Document.new(lines, options, &block) 
+  end
+
+  # Public: Parse the contents of the AsciiDoc source file into an Asciidoctor::Document
+  #
+  # Accepts input as an IO, String or String Array object. If the
+  # input is a File, information about the file is stored in
+  # attributes on the Document.
+  #
+  # input   - the String AsciiDoc source filename
+  # options - a Hash of options to control processing (default: {})
+  #           see Asciidoctor::Document#initialize for details
+  # block   - a callback block for handling include::[] directives
+  #
+  # returns the Asciidoctor::Document
+  def self.load_file(filename, options = {}, &block)
+    Asciidoctor.load(File.new(filename), options, &block)
+  end
+
+  # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and render it
+  # to the specified backend format
+  #
+  # Accepts input as an IO, String or String Array object. If the
+  # input is a File, information about the file is stored in
+  # attributes on the Document.
+  #
+  # If the :in_place option is true, and the input is a File, the output is
+  # written to a file adjacent to the input file with an extension that
+  # corresponds to the backend format. Otherwise, if the :to_file option is
+  # specified, the file is written to that file. If :to_file is not an absolute
+  # path, it is resolved relative to the Document#base_dir. If neither option
+  # is set, the rendered output is returned.
+  #
+  # input   - the String AsciiDoc source filename
+  # options - a Hash of options to control processing (default: {})
+  #           see Asciidoctor::Document#initialize for details
+  # block   - a callback block for handling include::[] directives
+  #
+  # returns nothing if the rendered output String is written to a file,
+  # otherwise the rendered output String is returned
+  def self.render(input, options = {}, &block)
+    in_place = options.delete(:in_place) || false
+    to_file = options.delete(:to_file)
+
+    doc = Asciidoctor.load(input, options, &block)
+
+    if in_place && input.is_a?(File)
+      to_file = File.join(File.dirname(input.path), "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
+    elsif to_file
+      to_file = File.absolute_path(to_file, doc.base_dir) 
+      if !File.directory?(File.dirname(to_file))
+        to_file = nil
+      end
+    end
+
+    if !to_file.nil?
+      File.open(to_file, 'w') {|file| file.write doc.render }
+      nil
+    else
+      doc.render
+    end
+  end
+
+  # Public: Parse the contents of the AsciiDoc source file into an Asciidoctor::Document
+  # and render it to the specified backend format
+  #
+  # input   - the String AsciiDoc source filename
+  # options - a Hash of options to control processing (default: {})
+  #           see Asciidoctor::Document#initialize for details
+  # block   - a callback block for handling include::[] directives
+  #
+  # returns nothing if the rendered output String is written to a file,
+  # otherwise the rendered output String is returned
+  def self.render_file(filename, options = {}, &block)
+    Asciidoctor.render(File.new(filename), options, &block)
+  end
+
   # Internal: Prior to invoking Kernel#require, issues a warning urging a
   # manual require if running in a threaded environment.
   #
