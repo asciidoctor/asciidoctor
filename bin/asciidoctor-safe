@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+
+require 'asciidoctor'
+require 'asciidoctor/cli/options'
+require 'asciidoctor/cli/invoker'
+
+# pass ARGV.dup?
+options = Asciidoctor::Cli::Options.new({'safe' => Asciidoctor::SafeMode::SAFE}).parse! ARGV
+invoker = Asciidoctor::Cli::Invoker.new(options)
+invoker.invoke!
+exit invoker.code
