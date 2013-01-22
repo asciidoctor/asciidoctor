@@ -10,7 +10,7 @@ module Asciidoctor
         self[:attributes] = options[:attributes] || {}
         self[:input_file] = options[:input_file] || nil
         self[:output_file] = options[:output_file] || nil
-        self[:safe] = options[:safe] || nil
+        self[:safe] = options[:safe] || Asciidoctor::SafeMode::UNSAFE
         self[:header_footer] = options[:header_footer] || true
         self[:template_dir] = options[:template_dir] || nil
         if options[:doctype]
