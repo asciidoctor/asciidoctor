@@ -54,7 +54,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # Public: The section level 0 block
   attr_reader :header
 
-  # Public: Base directory for rendering this document
+  # Public: Base directory for rendering this document. Defaults to directory of the source file.
+  # If the source is a string, defaults to the current directory.
   attr_reader :base_dir
 
   # Public: A reference to the parent document of this nested document.
@@ -82,6 +83,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       @parent_document = options.delete(:parent)
       # should we dup here?
       options[:attributes] = @parent_document.attributes
+      options[:safe] ||= @parent_document.safe
+      options[:base_dir] ||= @parent_document.base_dir
       @renderer = @parent_document.renderer
     else
       @parent_document = nil
@@ -109,20 +112,29 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     # 10 is the AsciiDoc default, though currently Asciidoctor only supports 1 level
     attribute_overrides['include-depth'] ||= 10
 
-    # TODO we should go with one or the other, this is confusing
-    # for now, base_dir takes precedence if set
-    if !options[:base_dir].nil?
-      @base_dir = attribute_overrides['docdir'] = options[:base_dir]
+    # if the base_dir option is specified, it overrides docdir as the root for relative paths
+    # otherwise, the base_dir is the directory of the source file (docdir) or the current
+    # directory of the input is a string
+    if options[:base_dir].nil?
+      if attribute_overrides['docdir']
+        @base_dir = attribute_overrides['docdir'] = File.expand_path(attribute_overrides['docdir'])
+      else
+        # perhaps issue a warning here?
+        @base_dir = attribute_overrides['docdir'] = Dir.pwd
+      end
     else
-      attribute_overrides['docdir'] ||= Dir.pwd
-      @base_dir = attribute_overrides['docdir']
+      @base_dir = attribute_overrides['docdir'] = File.expand_path(options[:base_dir])
     end
 
-    # restrict document from setting source-highlighter or backend in SECURE
-    # safe mode; can only be set via the constructor
     if @safe >= SafeMode::SECURE
+      # restrict document from setting source-highlighter or backend
       attribute_overrides['source-highlighter'] ||= nil
       attribute_overrides['backend'] ||= DEFAULT_BACKEND
+      # restrict document from seeing the docdir and trim docfile to relative path
+      if attribute_overrides.has_key?('docfile') && @parent_document.nil?
+        attribute_overrides['docfile'] = attribute_overrides['docfile'][(attribute_overrides['docdir'].length + 1)..-1]
+      end
+      attribute_overrides['docdir'] = ''
     end
     
     attribute_overrides.each {|key, val|
@@ -139,7 +151,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['doctype'] ||= DEFAULT_DOCTYPE
     update_backend_attributes
 
-    if nested?
+    if !@parent_document.nil?
       # don't need to do the extra processing within our own document
       @reader = Reader.new(data)
     else
@@ -149,12 +161,14 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     # dynamic intrinstic attribute values
     now = Time.new
     @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
-    @attributes['localtime'] ||= now.strftime('%H:%m:%S %Z')
-    @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']].join(' ')
+    @attributes['localtime'] ||= now.strftime('%H:%M:%S %Z')
+    @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']] * ' '
     
-    # docdate and doctime should default to localdate and localtime if not otherwise set
+    # docdate, doctime and docdatetime should default to
+    # localdate, localtime and localdatetime if not otherwise set
     @attributes['docdate'] ||= @attributes['localdate']
     @attributes['doctime'] ||= @attributes['localtime']
+    @attributes['docdatetime'] ||= @attributes['localdatetime']
     
     @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', 'images'), 'icons')
 
