@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'pathname'
 
 context "Blocks" do
   context "Rulers" do
@@ -548,7 +549,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
-      basedir = File.expand_path File.dirname(__FILE__)
+      basedir = File.dirname(Pathname.new(__FILE__).realpath)
       block = block_from_string input, :attributes => {'docdir' => basedir}
       doc = block.document
       assert doc.safe >= Asciidoctor::SafeMode::SAFE
@@ -562,7 +563,7 @@ image::asciidoctor.png[Asciidoctor]
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
-      basedir = File.expand_path File.dirname(__FILE__)
+      basedir = File.dirname(Pathname.new(__FILE__).realpath)
       block = block_from_string input, :safe => Asciidoctor::SafeMode::UNSAFE, :attributes => {'docdir' => basedir}
       doc = block.document
       assert doc.safe == Asciidoctor::SafeMode::UNSAFE
