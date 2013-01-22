@@ -92,8 +92,8 @@ endif::holygrail[]
       assert_equal nil, doc.attributes['cash']
     end
 
-    test 'backend attributes are updated if backend attribute is defined in document' do
-      doc = document_from_string(':backend: docbook45')
+    test 'backend attributes are updated if backend attribute is defined in document and safe mode is less than SECURE' do
+      doc = document_from_string(':backend: docbook45', :safe => Asciidoctor::SafeMode::SAFE)
       assert_equal 'docbook45', doc.attributes['backend']
       assert doc.attributes.has_key? 'backend-docbook45'
       assert_equal 'docbook', doc.attributes['basebackend']
@@ -101,7 +101,7 @@ endif::holygrail[]
     end
 
     test 'backend attributes defined in document options overrides backend attribute in document' do
-      doc = document_from_string(':backend: docbook45', :attributes => {'backend' => 'html5'})
+      doc = document_from_string(':backend: docbook45', :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'backend' => 'html5'})
       assert_equal 'html5', doc.attributes['backend']
       assert doc.attributes.has_key? 'backend-html5'
       assert_equal 'html', doc.attributes['basebackend']
@@ -219,6 +219,32 @@ of the attribute named foo in your document.
        EOS
       output = render_string(input)
       assert_match(/\{foo\}/, output)
+    end
+
+    test 'does not show docdir and shows relative docfile if safe mode is SECURE or greater' do
+      input = <<-EOS
+* docdir: {docdir}
+* docfile: {docfile}
+      EOS
+
+      docdir = Dir.pwd
+      docfile = File.join(docdir, 'sample.asciidoc')
+      output = render_embedded_string input, :attributes => {'docdir' => docdir, 'docfile' => docfile}
+      assert_xpath '//li[1]/p[text()="docdir: "]', output, 1
+      assert_xpath '//li[2]/p[text()="docfile: sample.asciidoc"]', output, 1
+    end
+
+    test 'shows absolute docdir and docfile paths if safe mode is less than SECURE' do
+      input = <<-EOS
+* docdir: {docdir}
+* docfile: {docfile}
+      EOS
+
+      docdir = Dir.pwd
+      docfile = File.join(docdir, 'sample.asciidoc')
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => docdir, 'docfile' => docfile}
+      assert_xpath %(//li[1]/p[text()="docdir: #{docdir}"]), output, 1
+      assert_xpath %(//li[2]/p[text()="docfile: #{docfile}"]), output, 1
     end
   end
 
