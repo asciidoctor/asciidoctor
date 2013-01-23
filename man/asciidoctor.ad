@@ -33,7 +33,7 @@ Security Settings
     source is read from a stream. Can be used as a way to chroot the execution
     of the program.
 
-*-S, --safe--mode*='SAFE_MODE'::
+*-S, --safe-mode*='SAFE_MODE'::
     Set safe mode level explicity: 'unsafe', 'safe', 'secure'. Defaults to
     'secure'. Disables potentially dangerous macros in source files, such as
     include::[].
