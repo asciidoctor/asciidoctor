@@ -16,6 +16,14 @@ require 'pending'
 ENV['SUPPRESS_DEBUG'] ||= 'true'
 
 class Test::Unit::TestCase
+  def windows?
+    RbConfig::CONFIG['host_os'] =~ /win|ming/
+  end
+
+  def disk_root
+    "#{windows? ? File.expand_path(__FILE__).split('/').first : nil}/"
+  end
+
   def sample_doc_path(name)
     name = name.to_s
     unless name.include?('.')

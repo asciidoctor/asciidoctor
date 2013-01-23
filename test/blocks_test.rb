@@ -555,7 +555,7 @@ image::asciidoctor.png[Asciidoctor]
       assert doc.safe >= Asciidoctor::SafeMode::SAFE
 
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
-      assert_equal File.join(basedir, 'etc/images'), block.normalize_asset_path('/etc/images')
+      assert_equal File.join(basedir, 'etc/images'), block.normalize_asset_path("#{disk_root}etc/images")
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('../../images')
     end
 
@@ -569,7 +569,8 @@ image::asciidoctor.png[Asciidoctor]
       assert doc.safe == Asciidoctor::SafeMode::UNSAFE
 
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
-      assert_equal '/etc/images', block.normalize_asset_path('/etc/images')
+      absolute_path = "#{disk_root}etc/images"
+      assert_equal absolute_path, block.normalize_asset_path(absolute_path)
       assert_equal File.expand_path(File.join(basedir, '../../images')), block.normalize_asset_path('../../images')
     end
 
