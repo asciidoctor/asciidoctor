@@ -26,7 +26,6 @@ module Asciidoctor
             @options = nil
           end
         end
-        puts @options
       end
 
       def invoke!
