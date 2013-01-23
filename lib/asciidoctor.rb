@@ -566,8 +566,11 @@ module Asciidoctor
   # written to a file adjacent to the input file with an extension that
   # corresponds to the backend format. Otherwise, if the :to_file option is
   # specified, the file is written to that file. If :to_file is not an absolute
-  # path, it is resolved relative to the Document#base_dir. If neither option
-  # is set, the rendered output is returned.
+  # path, it is resolved relative to the Document#base_dir. If either option is
+  # set, the header and footer are rendered by default (writing to a file
+  # implies creating a standalone document). If neither option is set, the
+  # header and footer are not rendered by default and the rendered output is
+  # returned.
   #
   # input   - the String AsciiDoc source filename
   # options - a Hash of options to control processing (default: {})
@@ -579,6 +582,10 @@ module Asciidoctor
   def self.render(input, options = {}, &block)
     in_place = options.delete(:in_place) || false
     to_file = options.delete(:to_file)
+
+    if !options.has_key?(:header_footer) && (in_place || to_file)
+      options[:header_footer] = true
+    end
 
     doc = Asciidoctor.load(input, options, &block)
 

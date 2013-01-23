@@ -42,7 +42,7 @@ class Test::Unit::TestCase
   end
 
   def example_document(name)
-    Asciidoctor::Document.new(File.readlines(sample_doc_path(name)))
+    Asciidoctor::Document.new(File.readlines(sample_doc_path(name)), :header_footer => true)
   end
 
   def assert_difference(expression, difference = 1, message = nil, &block)
@@ -120,6 +120,7 @@ class Test::Unit::TestCase
   end
 
   def document_from_string(src, opts = {})
+    opts[:header_footer] = true unless opts.has_key?(:header_footer)
     Asciidoctor::Document.new(src.lines.entries, opts)
   end
 

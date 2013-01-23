@@ -112,7 +112,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @callouts = Callouts.new
     @options = options
     @safe = @options.fetch(:safe, SafeMode::SECURE).to_i
-    @options[:header_footer] = @options.fetch(:header_footer, true)
+    @options[:header_footer] = @options.fetch(:header_footer, false)
 
     @attributes['asciidoctor'] = ''
     @attributes['asciidoctor-version'] = VERSION
