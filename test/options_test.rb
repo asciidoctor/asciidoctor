@@ -23,14 +23,14 @@ context 'Options' do
     options = Asciidoctor::Cli::Options.parse!(%w(-a imagesdir=images,icons test/fixtures/sample.asciidoc))
 
     assert_equal 'images', options[:attributes]['imagesdir']
-    assert_equal 1, options[:attributes]['icons']
+    assert_equal '', options[:attributes]['icons']
   end
 
   test 'multiple attribute arguments' do
     options = Asciidoctor::Cli::Options.parse!(%w(-a imagesdir=images -a icons test/fixtures/sample.asciidoc))
 
     assert_equal 'images', options[:attributes]['imagesdir']
-    assert_equal 1, options[:attributes]['icons']
+    assert_equal '', options[:attributes]['icons']
   end
 
 end

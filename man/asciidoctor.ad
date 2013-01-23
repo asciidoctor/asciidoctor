@@ -48,12 +48,15 @@ Document Settings
 
 *-a, --attribute*='ATTRIBUTE'::
     Define, override or delete a document attribute. Command-line attributes
-    take precedence over attributes defined in the source file. +
-    'ATTRIBUTE' is formatted as a key-value pair, in the form 'NAME=VALUE'.
-    Values containing spaces should be enclosed in double-quote characters.
-    Alternate acceptable forms are 'NAME' (the 'VALUE' defaults to an empty
-    string) and 'NAME!' (delete the 'NAME' attribute). +
-    This option may be specified more than once. 
+    take precedence over attributes defined in the source file.
++
+'ATTRIBUTE' is formatted as a key-value pair, in the form 'NAME=VALUE'. Values
+containing spaces should be enclosed in double-quote characters.  Alternate
+acceptable forms are 'NAME' (the 'VALUE' defaults to an empty string), 'NAME!'
+(deletes the 'NAME' attribute) and 'NAME=VALUE@' (does not override 'NAME'
+attribute if already defined in the source file).
++
+This option may be specified more than once. 
 
 *-b, --backend*='BACKEND'::
     Backend output file format: 'docbook45' or 'html5'.  You can also use the
