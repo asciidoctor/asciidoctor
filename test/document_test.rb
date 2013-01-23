@@ -94,7 +94,7 @@ preamble
   context 'Render APIs' do
     test 'should render document to string' do
       sample_input_path = fixture_path('sample.asciidoc')
-      output = Asciidoctor.render_file(sample_input_path)
+      output = Asciidoctor.render_file(sample_input_path, :header_footer => true)
       assert !output.empty?
       assert_xpath '/html', output, 1
       assert_xpath '/html/head', output, 1
@@ -174,7 +174,7 @@ preamble
     end
   
     test 'can set erubis as eRuby implementation' do
-      doc = Asciidoctor::Document.new [], :eruby => 'erubis' 
+      doc = Asciidoctor::Document.new [], :eruby => 'erubis', :header_footer => true
       assert $LOADED_FEATURES.detect {|p| p == 'erubis.rb' || p.end_with?('/erubis.rb') }.nil?
       renderer = doc.renderer
       assert $LOADED_FEATURES.detect {|p| p == 'erubis.rb' || p.end_with?('/erubis.rb') }
