@@ -9,7 +9,7 @@ context 'Attributes' do
 
     test 'creates an attribute by fusing a multi-line value' do
       str = <<-EOS
-:description: This is the first +
+:description: This is the first      +
               Ruby implementation of +
               AsciiDoc.
       EOS
