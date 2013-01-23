@@ -86,7 +86,7 @@ endif::holygrail[]
     end
 
     test 'attribute undefined in document options cannot be assigned in document' do
-      doc = document_from_string(':cash: money', :attributes => {'cash!' => 1 })
+      doc = document_from_string(':cash: money', :attributes => {'cash!' => '' })
       assert_equal nil, doc.attributes['cash']
       doc = document_from_string(':cash: money', :attributes => {'cash' => nil })
       assert_equal nil, doc.attributes['cash']

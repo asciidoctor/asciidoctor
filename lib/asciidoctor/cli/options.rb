@@ -51,7 +51,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   'document type to use when rendering output: [article, book] (default: article)') do |doc_type|
             self[:attributes]['doctype'] = doc_type
           end
-          opts.on('-o', '--output-file FILE', 'output file (default: based on input file path); use - to output to STDOUT') do |output_file|
+          opts.on('-o', '--out-file FILE', 'output file (default: based on input file path); use - to output to STDOUT') do |output_file|
             self[:output_file] = output_file
           end
           opts.on('--safe',
@@ -67,6 +67,9 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts.on('-s', '--no-header-footer', 'suppress output of header and footer (default: false)') do
             self[:header_footer] = false
+          end
+          opts.on('-n', '--section-numbers', 'auto-number section titles in the HTML backend; disabled by default') do
+            self[:attributes]['numbered'] = ''
           end
           opts.on('-e', '--eruby [ERUBY]', ['erb', 'erubis'],
                   'specify eRuby implementation to render built-in templates: [erb, erubis] (default: erb)') do |eruby|
@@ -89,7 +92,7 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-B', '--base-dir DIR', 'base directory containing the document and resources (default: directory of source file)') do |base_dir|
             self[:base_dir] = base_dir
           end
-          opts.on('-D', '--destination-dir DIR', 'destination output directory (default: directory of source file)') do |dest_dir|
+          opts.on('-D', '--dest-dir DIR', 'destination output directory (default: directory of source file)') do |dest_dir|
             self[:destination_dir] = dest_dir
           end
           opts.on('--trace', 'include backtrace information on errors (default: false)') do |trace|

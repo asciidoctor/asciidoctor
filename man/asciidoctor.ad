@@ -1,0 +1,151 @@
+asciidoctor(1)
+==============
+:doctype: manpage
+
+
+NAME
+----
+asciidoctor - converts an AsciiDoc source file to HTML, DocBook and other formats
+
+
+SYNOPSIS
+--------
+*asciidoctor* ['OPTION']... 'FILE'
+
+
+DESCRIPTION
+-----------
+The asciidoctor(1) command converts the AsciiDoc source file 'FILE' to HTML 5,
+DocBook 4.5 and other output formats.
+
+If 'FILE' is '-' then the AsciiDoc source is read from standard input.
+
+
+OPTIONS
+-------
+
+Security Settings
+~~~~~~~~~~~~~~~~~
+
+*-B, --base-dir*='DIR'::
+    Base directory containing the document and resources. Defaults to the
+    directory containing the source file, or the working directory if the
+    source is read from a stream. Can be used as a way to chroot the execution
+    of the program.
+
+*-S, --safe--mode*='SAFE_MODE'::
+    Set safe mode level explicity: 'unsafe', 'safe', 'secure'. Defaults to
+    'secure'. Disables potentially dangerous macros in source files, such as
+    include::[].
+
+*--safe*::
+    Set safe mode to 'safe' from the default safe mode of 'secure'. Enables
+    include macros, but restricts access to ancestor paths of source file.
+    Provided for compatibility with the asciidoc command.
+
+Document Settings
+~~~~~~~~~~~~~~~~~
+
+*-a, --attribute*='ATTRIBUTE'::
+    Define, override or delete a document attribute. Command-line attributes
+    take precedence over attributes defined in the source file. +
+    'ATTRIBUTE' is formatted as a key-value pair, in the form 'NAME=VALUE'.
+    Values containing spaces should be enclosed in double-quote characters.
+    Alternate acceptable forms are 'NAME' (the 'VALUE' defaults to an empty
+    string) and 'NAME!' (delete the 'NAME' attribute). +
+    This option may be specified more than once. 
+
+*-b, --backend*='BACKEND'::
+    Backend output file format: 'docbook45' or 'html5'.  You can also use the
+    backend alias names 'html' (aliased to 'html5') or 'docbook' (aliased to
+    'docbook45'). Defaults to 'html5'.
+
+*-d, --doctype*='DOCTYPE'::
+    Document type: 'article' or 'book'. Sets the root element when using the
+    'docbook' backend and the style class on the HTML body element when using
+    the 'html' backend. The 'book' document type allows multiple level-0
+    section titles in a single document. Defaults to 'article'.
+
+Rendering Control
+~~~~~~~~~~~~~~~~~
+
+*-C, --compact*::
+    Compact the output by removing blank lines. Not enabled by default.
+
+*-D, --dest-dir*='DIR'::
+    Destination output directory. Defaults to the directory containing the
+    source file, or the working directory if the source is read from a stream.
+
+*-e, --eruby*::
+    Specifies the eRuby implementation to use for rendering the built-in
+    templates. Supported values are 'erb' and 'erubis'. Defaults to 'erb'.
+
+*-n, --section-numbers*::
+    Auto-number section titles. Synonym for *--attribute numbered*.
+
+*-o, --out-file*='OUT_FILE'::
+    Write output to file 'OUT_FILE'. Defaults to the base name of the input
+    file suffixed with 'backend' extension. If the input is read from standard
+    input, then the output file defaults to stdout. If 'OUT_FILE' is '-' then
+    the standard output is also used.
+
+*-s, --no-header-footer*::
+    Suppress the document header and footer in the output.
+
+*-T, --template-dir*='DIR'::
+    Directory containing custom render templates that override one or more
+    templates from the the built-in set.
+
+Processing Information
+~~~~~~~~~~~~~~~~~~~~~~
+
+*--trace*::
+    Include backtrace information on errors. Not enabled by default.
+
+*-v, --verbose*::
+    Verbosely print processing information and configuration file checks to
+    stderr.
+
+Program Information
+~~~~~~~~~~~~~~~~~~~
+
+*-h, --help*::
+    Show the help message.
+
+*-V, --version*::
+    Print program version number.
+
+
+EXIT STATUS
+-----------
+*0*::
+    Success
+
+*1*::
+    Failure (syntax or usage error; configuration error; document processing
+    failure; unexpected error).
+
+
+BUGS
+----
+See the *Asciidoctor* issue tracker: <**https://github.com/erebor/asciidoctor/issues?state=open**>
+
+
+AUTHORS
+-------
+*Asciidoctor* was written by Ryan Waldron, Dan Allen and other contributors.
+*AsciiDoc* was written by Stuart Rackham and has received contributions from
+many other individuals.
+
+
+RESOURCES
+---------
+Git source repository on GitHub: <**https://github.com/erebor/asciidoctor**>
+
+Main web site: <**http://asciidoctor.org**>
+
+
+COPYING
+-------
+Copyright \(C) Ryan Waldron. Free use of this software is granted under the
+terms of the MIT License.
