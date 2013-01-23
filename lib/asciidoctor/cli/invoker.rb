@@ -14,7 +14,7 @@ module Asciidoctor
         @code = 0
         @timings = {}
         options = options.flatten
-        if (!options.empty?) && (options.first === Asciidoctor::Cli::Options)
+        if !options.empty? && options.first.is_a?(Asciidoctor::Cli::Options)
           @options = options.first
         elsif options.first.is_a? Hash
           @options = Asciidoctor::Cli::Options.new(options)
@@ -26,6 +26,7 @@ module Asciidoctor
             @options = nil
           end
         end
+        puts @options
       end
 
       def invoke!
