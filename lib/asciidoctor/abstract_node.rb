@@ -166,7 +166,13 @@ class Asciidoctor::AbstractNode
       image_path = normalize_asset_path(target_image)
     end
 
-    'data:' + mimetype + ';base64,' + Base64.encode64(IO.read(image_path)).delete("\n")
+    bindata = nil
+    if IO.respond_to? :binread
+      bindata = IO.binread(image_path)
+    else
+      bindata = File.open(image_path, 'rb') {|file| file.read }
+    end
+    'data:' + mimetype + ';base64,' + Base64.encode64(bindata).delete("\n")
   end
 
   # Public: Normalize the asset file or directory to a concrete and rinsed path
