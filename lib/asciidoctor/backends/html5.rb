@@ -13,17 +13,27 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
     sections = node.sections
     unless sections.empty?
       toc_level, indent = ''
+      nested = true
       unless node.is_a?(::Asciidoctor::Document)
-        indent = '    ' * (node.document.doctype == 'book' ? node.level + 1 : node.level)
-      end
-      toc_level << "#{indent}<ol>\n"
-      sections.each do |section|
-        toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{section.sectnum} #{section.title}</a></li>\n"
-        if section.level < to_depth && (child_toc_level = render_outline(section, to_depth))
-          toc_level << "#{indent}  <li>\n#{child_toc_level}\n#{indent}  </li>\n"
+        if node.document.doctype == 'book'
+          indent = '    ' * node.level unless node.level == 0
+          nested = node.level > 0
+        else
+          indent = '    ' * node.level
         end
       end
-      toc_level << "#{indent}</ol>"
+      toc_level << "#{indent}<ol>\n" if nested
+      sections.each do |section|
+        toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{section.level > 0 ? section.sectnum('.', ' ') : ''}#{section.title}</a></li>\n"
+        if section.level < to_depth && (child_toc_level = render_outline(section, to_depth))
+          if section.document.doctype != 'book' || section.level > 0
+            toc_level << "#{indent}  <li>\n#{child_toc_level}\n#{indent}  </li>\n"
+          else
+            toc_level << "#{indent}#{child_toc_level}\n"
+          end
+        end
+      end
+      toc_level << "#{indent}</ol>" if nested
     end
     toc_level
   end
