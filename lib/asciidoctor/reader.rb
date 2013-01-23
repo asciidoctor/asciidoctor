@@ -310,7 +310,7 @@ class Asciidoctor::Reader
         # Lines that start with whitespace and end with a '+' are
         # a continuation, so gobble them up into `value`
         if line.match(REGEXP[:attr_continue])
-          continuing_value += ' ' + $1
+          continuing_value += ' ' + $1.rstrip
         # An empty line ends a continuation
         elsif line.strip.empty?
           raw_source.unshift(line)
@@ -343,7 +343,7 @@ class Asciidoctor::Reader
           # attribute value continuation line; grab lines until we run out
           # of continuation lines
           continuing_key = key
-          continuing_value = $1  # strip off the spaces and +
+          continuing_value = $1.rstrip  # strip off the spaces and +
         else
           unless attribute_overridden? key
             @document.attributes[key] = apply_attribute_value_subs(value)

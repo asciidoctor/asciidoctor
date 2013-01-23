@@ -105,9 +105,9 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @safe = @options.fetch(:safe, SafeMode::SECURE).to_i
     @options[:header_footer] = @options.fetch(:header_footer, true)
 
-    @attributes['asciidoctor'] = true
+    @attributes['asciidoctor'] = ''
     @attributes['asciidoctor-version'] = VERSION
-    @attributes['sectids'] = true
+    @attributes['sectids'] = ''
     @attributes['encoding'] = 'UTF-8'
 
     attribute_overrides = options[:attributes] || {}
@@ -301,6 +301,9 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # Public: Update the backend attributes to reflect a change in the selected backend
   def update_backend_attributes()
     backend = @attributes['backend']
+    if BACKEND_ALIASES.has_key? backend
+      backend = @attributes['backend'] = BACKEND_ALIASES[backend]
+    end
     basebackend = backend.sub(/[[:digit:]]+$/, '')
     page_width = DEFAULT_PAGE_WIDTHS[basebackend]
     if page_width
@@ -308,17 +311,17 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     else
       @attributes.delete('pagewidth')
     end
-    @attributes["backend-#{backend}"] = 1
+    @attributes["backend-#{backend}"] = ''
     @attributes['basebackend'] = basebackend
-    @attributes["basebackend-#{basebackend}"] = 1
+    @attributes["basebackend-#{basebackend}"] = ''
     # REVIEW cases for the next two assignments
-    @attributes["#{backend}-#{@attributes['doctype']}"] = 1
-    @attributes["#{basebackend}-#{@attributes['doctype']}"] = 1
+    @attributes["#{backend}-#{@attributes['doctype']}"] = ''
+    @attributes["#{basebackend}-#{@attributes['doctype']}"] = ''
     ext = DEFAULT_EXTENSIONS[basebackend] || '.html'
     @attributes['outfilesuffix'] = ext
     file_type = ext[1..-1]
     @attributes['filetype'] = file_type
-    @attributes["filetype-#{file_type}"] = 1
+    @attributes["filetype-#{file_type}"] = ''
   end
 
   def splain

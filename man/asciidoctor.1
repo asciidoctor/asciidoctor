@@ -1,0 +1,208 @@
+'\" t
+.\"     Title: asciidoctor
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
+.\"      Date: 01/22/2013
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "ASCIIDOCTOR" "1" "01/22/2013" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+asciidoctor \- converts an AsciiDoc source file to HTML, DocBook and other formats
+.SH "SYNOPSIS"
+.sp
+\fBasciidoctor\fR [\fIOPTION\fR]\&... \fIFILE\fR
+.SH "DESCRIPTION"
+.sp
+The asciidoctor(1) command converts the AsciiDoc source file \fIFILE\fR to HTML 5, DocBook 4\&.5 and other output formats\&.
+.sp
+If \fIFILE\fR is \fI\-\fR then the AsciiDoc source is read from standard input\&.
+.SH "OPTIONS"
+.SS "Security Settings"
+.PP
+\fB\-B, \-\-base\-dir\fR=\fIDIR\fR
+.RS 4
+Base directory containing the document and resources\&. Defaults to the directory containing the source file, or the working directory if the source is read from a stream\&. Can be used as a way to chroot the execution of the program\&.
+.RE
+.PP
+\fB\-S, \-\-safe\-mode\fR=\fISAFE_MODE\fR
+.RS 4
+Set safe mode level explicity:
+\fIunsafe\fR,
+\fIsafe\fR,
+\fIsecure\fR\&. Defaults to
+\fIsecure\fR\&. Disables potentially dangerous macros in source files, such as include::[]\&.
+.RE
+.PP
+\fB\-\-safe\fR
+.RS 4
+Set safe mode to
+\fIsafe\fR
+from the default safe mode of
+\fIsecure\fR\&. Enables include macros, but restricts access to ancestor paths of source file\&. Provided for compatibility with the asciidoc command\&.
+.RE
+.SS "Document Settings"
+.PP
+\fB\-a, \-\-attribute\fR=\fIATTRIBUTE\fR
+.RS 4
+Define, override or delete a document attribute\&. Command\-line attributes take precedence over attributes defined in the source file\&.
+
+\fIATTRIBUTE\fR
+is formatted as a key\-value pair, in the form
+\fINAME=VALUE\fR\&. Values containing spaces should be enclosed in double\-quote characters\&. Alternate acceptable forms are
+\fINAME\fR
+(the
+\fIVALUE\fR
+defaults to an empty string) and
+\fINAME!\fR
+(delete the
+\fINAME\fR
+attribute)\&.
+
+This option may be specified more than once\&.
+.RE
+.PP
+\fB\-b, \-\-backend\fR=\fIBACKEND\fR
+.RS 4
+Backend output file format:
+\fIdocbook45\fR
+or
+\fIhtml5\fR\&. You can also use the backend alias names
+\fIhtml\fR
+(aliased to
+\fIhtml5\fR) or
+\fIdocbook\fR
+(aliased to
+\fIdocbook45\fR)\&. Defaults to
+\fIhtml5\fR\&.
+.RE
+.PP
+\fB\-d, \-\-doctype\fR=\fIDOCTYPE\fR
+.RS 4
+Document type:
+\fIarticle\fR
+or
+\fIbook\fR\&. Sets the root element when using the
+\fIdocbook\fR
+backend and the style class on the HTML body element when using the
+\fIhtml\fR
+backend\&. The
+\fIbook\fR
+document type allows multiple level\-0 section titles in a single document\&. Defaults to
+\fIarticle\fR\&.
+.RE
+.SS "Rendering Control"
+.PP
+\fB\-C, \-\-compact\fR
+.RS 4
+Compact the output by removing blank lines\&. Not enabled by default\&.
+.RE
+.PP
+\fB\-D, \-\-dest\-dir\fR=\fIDIR\fR
+.RS 4
+Destination output directory\&. Defaults to the directory containing the source file, or the working directory if the source is read from a stream\&.
+.RE
+.PP
+\fB\-e, \-\-eruby\fR
+.RS 4
+Specifies the eRuby implementation to use for rendering the built\-in templates\&. Supported values are
+\fIerb\fR
+and
+\fIerubis\fR\&. Defaults to
+\fIerb\fR\&.
+.RE
+.PP
+\fB\-n, \-\-section\-numbers\fR
+.RS 4
+Auto\-number section titles\&. Synonym for
+\fB\-\-attribute numbered\fR\&.
+.RE
+.PP
+\fB\-o, \-\-out\-file\fR=\fIOUT_FILE\fR
+.RS 4
+Write output to file
+\fIOUT_FILE\fR\&. Defaults to the base name of the input file suffixed with
+\fIbackend\fR
+extension\&. If the input is read from standard input, then the output file defaults to stdout\&. If
+\fIOUT_FILE\fR
+is
+\fI\-\fR
+then the standard output is also used\&.
+.RE
+.PP
+\fB\-s, \-\-no\-header\-footer\fR
+.RS 4
+Suppress the document header and footer in the output\&.
+.RE
+.PP
+\fB\-T, \-\-template\-dir\fR=\fIDIR\fR
+.RS 4
+Directory containing custom render templates that override one or more templates from the the built\-in set\&.
+.RE
+.SS "Processing Information"
+.PP
+\fB\-\-trace\fR
+.RS 4
+Include backtrace information on errors\&. Not enabled by default\&.
+.RE
+.PP
+\fB\-v, \-\-verbose\fR
+.RS 4
+Verbosely print processing information and configuration file checks to stderr\&.
+.RE
+.SS "Program Information"
+.PP
+\fB\-h, \-\-help\fR
+.RS 4
+Show the help message\&.
+.RE
+.PP
+\fB\-V, \-\-version\fR
+.RS 4
+Print program version number\&.
+.RE
+.SH "EXIT STATUS"
+.PP
+\fB0\fR
+.RS 4
+Success
+.RE
+.PP
+\fB1\fR
+.RS 4
+Failure (syntax or usage error; configuration error; document processing failure; unexpected error)\&.
+.RE
+.SH "BUGS"
+.sp
+See the \fBAsciidoctor\fR issue tracker: <\fBhttps://github\&.com/erebor/asciidoctor/issues?state=open\fR>
+.SH "AUTHORS"
+.sp
+\fBAsciidoctor\fR was written by Ryan Waldron, Dan Allen and other contributors\&. \fBAsciiDoc\fR was written by Stuart Rackham and has received contributions from many other individuals\&.
+.SH "RESOURCES"
+.sp
+Git source repository on GitHub: <\fBhttps://github\&.com/erebor/asciidoctor\fR>
+.sp
+Main web site: <\fBhttp://asciidoctor\&.org\fR>
+.SH "COPYING"
+.sp
+Copyright (C) Ryan Waldron\&. Free use of this software is granted under the terms of the MIT License\&.
