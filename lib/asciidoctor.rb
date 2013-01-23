@@ -57,19 +57,29 @@ module Asciidoctor
     # the source file and disables any macro other than the include::[] macro.
     SAFE = 1;
 
-    # A safe mode level that disallows the document from attempting to read files
-    # from the file system and including the contents of them into the document.
-    # This value disallows use of the include::[] macro and the embedding of
-    # binary content (data uri), stylesheets and JavaScripts referenced by the
-    # document. (Asciidoctor and trusted extensions may still be allowed to embed
-    # trusted content into the document). Since Asciidoctor is aiming for wide
-    # adoption, this value is the default and is recommended for server-side
-    # deployments.
-    SECURE = 10;
+    # A safe mode level that disallows the document from setting attributes
+    # that would affect the rendering of the document, in addition to all the
+    # security features of SafeMode::SAFE. For instance, this level disallows
+    # changing the backend or the source-highlighter using an attribute defined
+    # in the source document. This is the most fundamental level of security
+    # for server-side deployments (hence the name).
+    SERVER = 10;
+
+    # A safe mode level that disallows the document from attempting to read
+    # files from the file system and including the contents of them into the
+    # document, in additional to all the security features of SafeMode::SERVER.
+    # For instance, this level disallows use of the include::[] macro and the
+    # embedding of binary content (data uri), stylesheets and JavaScripts
+    # referenced by the document.(Asciidoctor and trusted extensions may still
+    # be allowed to embed trusted content into the document).
+    #
+    # Since Asciidoctor is aiming for wide adoption, this level is the default
+    # and is recommended for server-side deployments.
+    SECURE = 20;
 
     # A planned safe mode level that disallows the use of passthrough macros and
     # prevents the document from setting any known attributes, in addition to all
-    # the security features of SafeMode::SECURE
+    # the security features of SafeMode::SECURE.
     #
     # Please note that this level is not currently implemented (and therefore not
     # enforced)!
@@ -556,8 +566,11 @@ module Asciidoctor
   # written to a file adjacent to the input file with an extension that
   # corresponds to the backend format. Otherwise, if the :to_file option is
   # specified, the file is written to that file. If :to_file is not an absolute
-  # path, it is resolved relative to the Document#base_dir. If neither option
-  # is set, the rendered output is returned.
+  # path, it is resolved relative to the Document#base_dir. If either option is
+  # set, the header and footer are rendered by default (writing to a file
+  # implies creating a standalone document). If neither option is set, the
+  # header and footer are not rendered by default and the rendered output is
+  # returned.
   #
   # input   - the String AsciiDoc source filename
   # options - a Hash of options to control processing (default: {})
@@ -569,6 +582,10 @@ module Asciidoctor
   def self.render(input, options = {}, &block)
     in_place = options.delete(:in_place) || false
     to_file = options.delete(:to_file)
+
+    if !options.has_key?(:header_footer) && (in_place || to_file)
+      options[:header_footer] = true
+    end
 
     doc = Asciidoctor.load(input, options, &block)
 

@@ -92,7 +92,7 @@ endif::holygrail[]
       assert_equal nil, doc.attributes['cash']
     end
 
-    test 'backend attributes are updated if backend attribute is defined in document and safe mode is less than SECURE' do
+    test 'backend attributes are updated if backend attribute is defined in document and safe mode is less than SERVER' do
       doc = document_from_string(':backend: docbook45', :safe => Asciidoctor::SafeMode::SAFE)
       assert_equal 'docbook45', doc.attributes['backend']
       assert doc.attributes.has_key? 'backend-docbook45'
@@ -221,7 +221,7 @@ of the attribute named foo in your document.
       assert_match(/\{foo\}/, output)
     end
 
-    test 'does not show docdir and shows relative docfile if safe mode is SECURE or greater' do
+    test 'does not show docdir and shows relative docfile if safe mode is SERVER or greater' do
       input = <<-EOS
 * docdir: {docdir}
 * docfile: {docfile}
@@ -229,12 +229,12 @@ of the attribute named foo in your document.
 
       docdir = Dir.pwd
       docfile = File.join(docdir, 'sample.asciidoc')
-      output = render_embedded_string input, :attributes => {'docdir' => docdir, 'docfile' => docfile}
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docdir' => docdir, 'docfile' => docfile}
       assert_xpath '//li[1]/p[text()="docdir: "]', output, 1
       assert_xpath '//li[2]/p[text()="docfile: sample.asciidoc"]', output, 1
     end
 
-    test 'shows absolute docdir and docfile paths if safe mode is less than SECURE' do
+    test 'shows absolute docdir and docfile paths if safe mode is less than SERVER' do
       input = <<-EOS
 * docdir: {docdir}
 * docfile: {docfile}

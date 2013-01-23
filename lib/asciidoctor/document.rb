@@ -30,14 +30,23 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # it prevents access to files which reside outside of the parent directory
   # of the source file and disables any macro other than the include macro.
   #
-  # A value of 10 (SECURE) disallows the document from attempting to read
-  # files from the file system and including the contents of them into the
-  # document. In particular, it disallows use of the include::[] macro and the
-  # embedding of binary content (data uri), stylesheets and JavaScripts
-  # referenced by the document. (Asciidoctor and trusted extensions may still
-  # be allowed to embed trusted content into the document). Since Asciidoctor
-  # is aiming for wide adoption, this value is the default and is recommended
-  # for server-side deployments.
+  # A value of 10 (SERVER) disallows the document from setting attributes that
+  # would affect the rendering of the document, in addition to all the security
+  # features of SafeMode::SAFE. For instance, this value disallows changing the
+  # backend or the source-highlighter using an attribute defined in the source
+  # document. This is the most fundamental level of security for server-side
+  # deployments (hence the name).
+  #
+  # A value of 20 (SECURE) disallows the document from attempting to read files
+  # from the file system and including the contents of them into the document,
+  # in addition to all the security features of SafeMode::SECURE. In
+  # particular, it disallows use of the include::[] macro and the embedding of
+  # binary content (data uri), stylesheets and JavaScripts referenced by the
+  # document. (Asciidoctor and trusted extensions may still be allowed to embed
+  # trusted content into the document).
+  #
+  # Since Asciidoctor is aiming for wide adoption, 20 (SECURE) is the default
+  # value and is recommended for server-side deployments.
   #
   # A value of 100 (PARANOID) is planned to disallow the use of passthrough
   # macros and prevents the document from setting any known attributes in
@@ -103,7 +112,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @callouts = Callouts.new
     @options = options
     @safe = @options.fetch(:safe, SafeMode::SECURE).to_i
-    @options[:header_footer] = @options.fetch(:header_footer, true)
+    @options[:header_footer] = @options.fetch(:header_footer, false)
 
     @attributes['asciidoctor'] = ''
     @attributes['asciidoctor-version'] = VERSION
@@ -130,7 +139,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       @base_dir = attribute_overrides['docdir'] = File.expand_path(options[:base_dir])
     end
 
-    if @safe >= SafeMode::SECURE
+    if @safe >= SafeMode::SERVER
       # restrict document from setting source-highlighter or backend
       attribute_overrides['source-highlighter'] ||= nil
       attribute_overrides['backend'] ||= DEFAULT_BACKEND
