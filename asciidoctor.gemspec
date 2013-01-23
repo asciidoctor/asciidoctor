@@ -87,6 +87,8 @@ Gem::Specification.new do |s|
     lib/asciidoctor/substituters.rb
     lib/asciidoctor/table.rb
     lib/asciidoctor/version.rb
+    man/asciidoctor.ad
+    man/asciidoctor.1
     noof.rb
     test/attributes_test.rb
     test/blocks_test.rb

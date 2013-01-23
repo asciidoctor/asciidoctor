@@ -6,7 +6,6 @@ require 'asciidoctor'
 require 'asciidoctor/cli/options'
 require 'asciidoctor/cli/invoker'
 
-# pass ARGV.dup?
 invoker = Asciidoctor::Cli::Invoker.new(ARGV)
 invoker.invoke!
 exit invoker.code

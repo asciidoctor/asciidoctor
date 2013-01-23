@@ -6,8 +6,8 @@ require 'asciidoctor'
 require 'asciidoctor/cli/options'
 require 'asciidoctor/cli/invoker'
 
-# pass ARGV.dup?
-options = Asciidoctor::Cli::Options.new({'safe' => Asciidoctor::SafeMode::SAFE}).parse! ARGV
+options = Asciidoctor::Cli::Options.parse! ARGV
+options[:safe] = Asciidoctor::SafeMode::SAFE
 invoker = Asciidoctor::Cli::Invoker.new(options)
 invoker.invoke!
 exit invoker.code
