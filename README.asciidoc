@@ -1,11 +1,11 @@
-[float]
 Asciidoctor
 ===========
-:asciidoctor: http://github.com/erebor/asciidoctor
-:asciidoc: http://www.methods.co.nz/asciidoc/index.html
+:asciidoctor: http://asciidoctor.org
+:asciidoctor-source: http://github.com/erebor/asciidoctor
+:asciidoc: http://asciidoc.org
 :gitscm-next: https://github.com/github/gitscm-next
-:asciidoctorseed: https://github.com/github/gitscm-next/commits/master/lib/asciidoc.rb
-:templates: https://github.com/erebor/asciidoctor/blob/master/lib/asciidoctor/render_templates.rb
+:asciidoctor-seed: https://github.com/github/gitscm-next/commits/master/lib/asciidoc.rb
+:templates: https://github.com/erebor/asciidoctor/blob/master/lib/asciidoctor/backends
 :tilt: https://github.com/rtomayko/tilt
 :freesoftware: http://www.fsf.org/licensing/essays/free-sw.html
 :issues: https://github.com/erebor/asciidoctor/issues
@@ -14,33 +14,38 @@ Asciidoctor
 :branch: http://learn.github.com/p/branching.html
 :pr: http://help.github.com/send-pull-requests/
 :license: https://github.com/erebor/asciidoctor/blob/master/LICENSE
+:idprefix:
 
-{asciidoctor}[Asciidoctor] is a pure-Ruby processor for turning
-{asciidoc}[AsciiDoc] documents or strings into HTML (and, eventually
-other formats as well...'stay tuned!').
+{asciidoctor}[Asciidoctor] is a pure Ruby processor for converting
+{asciidoc}[AsciiDoc] source files and strings into HTML 5, DocBook 4.5
+and other formats.
 
 image::https://travis-ci.org/erebor/asciidoctor.png?branch=master["Build Status", link="https://travis-ci.org/erebor/asciidoctor"]
 
-Asciidoctor uses simple built-in ERB templates to style the output in
-a way that roughly matches the default HTML output of the native
-Python processor. You can override this behavior by providing
-{tilt}[Tilt]-compatible templates. See the xref:usage[Usage section]
-for more details.
+Asciidoctor uses a set of built-in ERB templates to render the document
+to HTML 5 or DocBook 4.5. We've matched the rendered output as close as
+possible to the default output of the native Python processor. You can
+override this behavior by providing {tilt}[Tilt]-compatible templates.
+See the xref:usage[Usage section] for more details.
 
-Asciidoctor currently works with Ruby 1.8.7 and 1.9.3, though I don't
-know of any reason it shouldn't work with more exotic Ruby versions,
-and would welcome help in testing that out.
+Asciidoctor currently works (read as 'tested') with Ruby 1.8.7, Ruby
+1.9.3 and JRuby 1.7.2 (on Linux, Mac and Windows). We expect it will
+work with other versions of Ruby as well and would welcome help in
+testing it out.
 
-The initial code from which Asciidoctor started was from the
+The initial code from which Asciidoctor started emerged from the
 {gitscm-next}[Git SCM site repo]. Refer to commit history of
-{asciidoctorseed}[asciidoc.rb] to view the initial contributions.
+{asciidoctor-seed}[asciidoc.rb] to view the initial contributions and
+individual contributors.
+
+The source code can now be found in the {asciidoctor-source}[Asciidoctor
+source repository] on GitHub.
 
 == Installation
 
-NOTE: This gem is very immature, and as yet only supports a small subset
-of AsciiDoc features (but it's getting better!). Thus, you should only
-use it if you have a high tolerance for bugs, failures, and generally
-bad and intemperate behavior.
+NOTE: We are working hard to make Asciidoctor a drop-in replacement for
+AsciiDoc. We're very close, with nearly 600 tests that ensure
+compatibility. The march is on towards full compliance and beyond.
 
 To install the gem:
 
@@ -52,20 +57,61 @@ Or if you prefer bundler:
 
 == Usage
 
-To render a file containing AsciiDoc markup to HTML:
+To use Asciidoctor in your application, you first need to require the
+library:
 
- lines = File.readlines('your_file.asciidoc')
- doc = Asciidoctor::Document.new(lines)
- html = doc.render
- File.open('your_file.html', 'w+') do |file|
-   file.puts html
- end
+ require 'asciidoctor'
 
+With that in place, you can start processing AsciiDoc documents.
+
+.Loading a document
+To parse a file into an `Asciidoctor::Document` object:
+
+ doc = Asciidoctor.load_file('your_file.asciidoc')
+
+You can get information about the document:
+
+ puts doc.doctitle
+ puts doc.attributes
+
+More than likely, you want to just render the document.
+
+.Rendering files
+To render a file containing AsciiDoc markup to HTML 5:
+
+ Asciidoctor.render_file('your_file.asciidoc', :in_place => true)
+
+The command will output to the file `your_file.html` in the same
+directory. You can render the file to DocBook 4.5 by setting the
+`backend` attribute to 'docbook':
+
+ Asciidoctor.render_file('your_file.asciidoc', :in_place => true,
+   :attributes => {'backend' => 'docbook'})
+
+The command will output to the file `your_file.xml` in the same
+directory. (If you're on Linux, you can view the file using yelp).
+
+.Rendering strings
 To render an AsciiDoc-formatted string:
 
- doc = Asciidoctor::Document.new("*This* is it.")
- puts doc.render
+ puts Asciidoctor.render('*This* is it.')
 
+When rendering a string, the header and footer are excluded by default
+to make Asciidoctor consistent with other lightweight markup engines
+like Markdown. If you want the header and footer, just declare it as
+an option:
+
+ puts Asciidoctor.render('*This* is it.', :header_footer => true)
+
+Now you'll get a full HTML 5 file. As before, you can also produce
+DocBook 4.5:
+
+ puts Asciidoctor.render('*This* is it.', :header_footer => true,
+   :attributes => {'backend' => 'docbook'})
+
+If you don't like the output you see, you can change it. Any of it!
+
+.Custom templates
 Asciidoctor allows you to override the {templates}[built-in templates]
 used to render almost any individual AsciiDoc element. If you provide a
 directory of {tilt}[Tilt]-compatible templates, named in such a way that
@@ -74,8 +120,8 @@ Asciidoctor will use the templates in this directory instead of its
 built-in templates for any elements for which it finds a matching
 template. It will fallback to its default templates for everything else.
 
- doc = Asciidoctor::Document.new("*This* is it.", :template_dir => 'templates')
- puts doc.render
+ puts Asciidoctor.render('*This* is it.', :header_footer => true,
+   :template_dir => 'templates')
 
 The Document and Section templates should begin with `document.` and
 `section.`, respectively. The file extension is used by Tilt to
@@ -90,7 +136,14 @@ template with an ERB template, put a file named
 `block_paragraph.html.erb` in the template directory you pass to the
 `Document` constructor using the `template_dir` option.
 
-For more usage examples, see the test suite.
+.Commandline
+If you don't like all this Ruby code just to render AsciiDoc, there's a
+commandline interface (cli) named `asciidoctor`. It should be available
+on your PATH after installing the gem. The `asciidoctor` command a
+drop-in replacement for the `asciidoc` command from the AsciiDoc Python
+distribution.
+
+For more usage examples, see the (massive) test suite.
 
 == Contributing
 
@@ -104,8 +157,11 @@ Here are some ways *you* can contribute:
 * by suggesting new features
 * by writing or editing documentation
 * by writing specifications
-* by writing code ('No patch is too small.' Fix typos, add comments,
-  clean up inconsistent whitespace, etc.)
+* by writing code -- 'No patch is too small.'
+** fix typos
+** add comments
+** clean up inconsistent whitespace
+** write tests!
 * by refactoring code
 * by fixing {issues}[issues]
 * by reviewing patches
@@ -145,6 +201,7 @@ This library aims to support the following Ruby implementations:
 
 * Ruby 1.8.7
 * Ruby 1.9.3
+* JRuby 1.7.2
 
 If something doesn't work on one of these interpreters, it should be
 considered a bug.
