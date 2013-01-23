@@ -512,7 +512,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
-    test 'does not embed base64-encoded data uri of icon when safe mode level is at least SECURE' do
+    test 'does not embed base64-encoded data uri of icon when safe mode level is SECURE or greater' do
       input = <<-EOS
 :icons:
 :iconsdir: fixtures
@@ -627,11 +627,11 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       assert_match(/hljs.initHighlightingOnLoad/, output)
     end
 
-    test 'document cannot turn on source highlighting if safe mode is at least SECURE' do
+    test 'document cannot turn on source highlighting if safe mode is at least SERVER' do
       input = <<-EOS
 :source-highlighter: coderay
       EOS
-      doc = document_from_string input
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SERVER
       assert doc.attributes['source-highlighter'].nil?
     end
   end
