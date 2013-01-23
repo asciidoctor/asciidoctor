@@ -1,6 +1,7 @@
 Document Title
 ==============
 Doc Writer <thedoc@asciidoctor.org>
+:idprefix: id_
 
 Preamble paragraph.
 

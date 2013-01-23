@@ -202,17 +202,25 @@ context 'Invoker' do
   end
 
   test 'should set attribute with value' do
-    invoker = invoke_cli_to_buffer %w(-a idprefix=id -s -o -)
+    invoker = invoke_cli_to_buffer %w(--trace -a idprefix=id -s -o -)
     doc = invoker.document
     assert_equal 'id', doc.attr('idprefix')
     output = invoker.read_output
     assert_xpath '//h2[@id="idsection_a"]', output, 1
   end
 
+  test 'should not set attribute ending in @ if defined in document' do
+    invoker = invoke_cli_to_buffer %w(--trace -a idprefix=id@ -s -o -)
+    doc = invoker.document
+    assert_equal 'id_', doc.attr('idprefix')
+    output = invoker.read_output
+    assert_xpath '//h2[@id="id_section_a"]', output, 1
+  end
+
   test 'should set attribute with no value' do
     invoker = invoke_cli_to_buffer %w(-a icons -s -o -)
     doc = invoker.document
-    assert_equal 1, doc.attr('icons')
+    assert_equal '', doc.attr('icons')
     output = invoker.read_output
     assert_xpath '//*[@class="admonitionblock"]//img[@alt="Note"]', output, 1
   end

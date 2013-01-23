@@ -141,14 +141,22 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       attribute_overrides['docdir'] = ''
     end
     
-    attribute_overrides.each {|key, val|
+    attribute_overrides.delete_if {|key, val|
+      verdict = false
       # a nil or negative key undefines the attribute 
-      if (val.nil? || key[-1..-1] == '!')
+      if val.nil? || key[-1..-1] == '!'
         @attributes.delete(key.chomp '!')
       # otherwise it's an attribute assignment
       else
+        # a value ending in @ indicates this attribute does not override
+        # an attribute with the same key in the document souce
+        if val.is_a?(String) && val.end_with?('@')
+          val.chop!
+          verdict = true
+        end
         @attributes[key] = val
       end
+      verdict
     }
 
     @attributes['backend'] ||= DEFAULT_BACKEND

@@ -83,7 +83,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   'these attributes take precedence over attributes defined in the source file') do |attribs|
             attribs.each do |attrib|
               tokens = attrib.split('=')
-              self[:attributes][tokens[0]] = tokens[1] || 1
+              self[:attributes][tokens[0]] = tokens[1] || ''
             end
           end
           opts.on('-T', '--template-dir DIR', 'directory containing custom render templates the override the built-in set') do |template_dir|
