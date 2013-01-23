@@ -32,7 +32,7 @@ module Asciidoctor
       end
 
       def parse!(args)
-        opts = OptionParser.new do |opts|
+        opts_parser = OptionParser.new do |opts|
           opts.banner = <<-EOS
 Usage: asciidoctor [OPTION]... [FILE]
 Translate the AsciiDoc source FILE into the backend output format (e.g., HTML 5, DocBook 4.5, etc.)
@@ -113,7 +113,7 @@ Example: asciidoctor -b html5 source.asciidoc
         end
 
         begin
-          opts.parse!(args)
+          opts_parser.parse!(args)
           if args.size > 1
             $stderr.puts 'asciidoctor: FAILED: too many arguments'
             return 1
@@ -121,7 +121,7 @@ Example: asciidoctor -b html5 source.asciidoc
 
           self[:input_file] = args.first
           if self[:input_file].nil? || self[:input_file].empty?
-            $stdout.puts opts
+            $stdout.puts opts_parser
             return 0
             #exit
           # should we be doing this check in the options parser?
@@ -132,7 +132,7 @@ Example: asciidoctor -b html5 source.asciidoc
           end
         rescue OptionParser::InvalidOption, OptionParser::MissingArgument
           $stderr.puts $!.to_s
-          $stdout.puts opts
+          $stdout.puts opts_parser
           return 1
           #exit
         end
