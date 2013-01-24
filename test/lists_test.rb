@@ -113,6 +113,7 @@ second wrapped line
       output = render_embedded_string input
       assert_css 'ul', output, 1
       assert_css 'ul li', output, 2
+      # NOTE for some reason, we're getting an extra line after the indented line
       lines = xmlnodes_at_xpath('(//ul/li)[1]/p', output, 1).text.gsub(/\n[[:space:]]*\n/, "\n").lines.entries
       assert_equal 3, lines.size
       assert_equal 'list item 1', lines[0].chomp

@@ -915,10 +915,8 @@ class Asciidoctor::Lexer
                   }
               # TODO any way to combine this with the check after skipping blank lines?
               elsif is_sibling_list_item?(this_line, list_type, sibling_trait)
-                #buffer.pop unless within_nested_list
                 break
               elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
-                #buffer.pop unless within_nested_list
                 buffer << this_line
                 within_nested_list = true
                 if nested_list_type == :dlist && $~[3].to_s.empty?
