@@ -101,6 +101,25 @@ List
       assert_xpath "//ul/li[1]/p[text() = 'Foo\nwrapped content']", output, 1
     end
 
+    test 'wrapped list item with hanging indent followed by non-indented line' do
+      input = <<-EOS
+== Lists
+
+- list item 1
+  // not line comment
+second wrapped line
+- list item 2
+      EOS
+      output = render_embedded_string input
+      assert_css 'ul', output, 1
+      assert_css 'ul li', output, 2
+      lines = xmlnodes_at_xpath('(//ul/li)[1]/p', output, 1).text.gsub(/\n[[:space:]]*\n/, "\n").lines.entries
+      assert_equal 3, lines.size
+      assert_equal 'list item 1', lines[0].chomp
+      assert_equal '  // not line comment', lines[1].chomp
+      assert_equal 'second wrapped line', lines[2].chomp
+    end
+
     test "a literal paragraph offset by blank lines in list content is appended as a literal block" do
       input = <<-EOS
 List
@@ -145,6 +164,24 @@ para
       assert_xpath '((//ul/li)[1]/*[@class="literalblock"])[1]//pre[text() = "literal"]', output, 1
       assert_xpath '(//ul/li)[1]/*[@class="literalblock"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '(//ul/li)[1]/*[@class="literalblock"]/following-sibling::*[@class="paragraph"]/p[text()="para"]', output, 1
+    end
+
+    test 'appends line as paragraph if attached by continuation following line comment' do
+      input = <<-EOS
+- list item 1
+// line comment
++
+paragraph in list item 1
+
+- list item 2
+      EOS
+      output = render_embedded_string input 
+      assert_css 'ul', output, 1
+      assert_css 'ul li', output, 2
+      assert_xpath '(//ul/li)[1]/p[text()="list item 1"]', output, 1
+      assert_xpath '(//ul/li)[1]/p/following-sibling::*[@class="paragraph"]', output, 1
+      assert_xpath '(//ul/li)[1]/p/following-sibling::*[@class="paragraph"]/p[text()="paragraph in list item 1"]', output, 1
+      assert_xpath '(//ul/li)[2]/p[text()="list item 2"]', output, 1
     end
 
     test "a literal paragraph with a line that appears as a list item that is followed by a continuation should create two blocks" do
@@ -569,6 +606,27 @@ List
       assert_xpath '((//ul)[1]/li//ol)[1]/li', output, 1
     end
 
+    test 'three levels of alternating unordered and ordered elements' do
+      input = <<-EOS
+== Lists
+
+* bullet 1
+. numbered 1.1
+** bullet 1.1.1
+* bullet 2
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.ulist', output, 2
+      assert_css '.olist', output, 1
+      assert_css '.ulist > ul > li > p', output, 3
+      assert_css '.ulist > ul > li > p + .olist', output, 1
+      assert_css '.ulist > ul > li > p + .olist > ol > li > p', output, 1
+      assert_css '.ulist > ul > li > p + .olist > ol > li > p + .ulist', output, 1
+      assert_css '.ulist > ul > li > p + .olist > ol > li > p + .ulist > ul > li > p', output, 1
+      assert_css '.ulist > ul > li + li > p', output, 1
+    end
+
     test "lines with alternating markers of unordered and ordered list types separated by blank lines should be nested" do
       input = <<-EOS
 List
@@ -734,6 +792,291 @@ ____
       assert_xpath '//ul/li[1]/p', output, 1
       assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@class = "literalblock"]', output, 1
       assert_xpath '(//ul/li[1]/p/following-sibling::*)[2][@class = "quoteblock"]', output, 1
+    end
+
+    test 'list item with hanging indent followed by block attached by list continuation' do
+      input = <<-EOS
+== Lists
+
+. list item 1
+  continued
++
+--
+open block in list item 1
+--
+
+. list item 2
+      EOS
+      output = render_embedded_string input
+      assert_css 'ol', output, 1
+      assert_css 'ol li', output, 2
+      assert_xpath %((//ol/li)[1]/p[text()="list item 1\ncontinued"]), output, 1
+      assert_xpath '(//ol/li)[1]/p/following-sibling::*[@class="openblock"]', output, 1
+      assert_xpath '(//ol/li)[1]/p/following-sibling::*[@class="openblock"]//p[text()="open block in list item 1"]', output, 1
+      assert_xpath %((//ol/li)[2]/p[text()="list item 2"]), output, 1
+    end
+
+    test 'list item paragraph in list item and nested list item' do
+      input = <<-EOS
+== Lists
+
+. list item 1
++
+list item 1 paragraph
+
+* nested list item
++
+nested list item paragraph
+
+. list item 2
+      EOS
+      output = render_embedded_string input
+      assert_css '.olist ol', output, 1
+      assert_css '.olist ol > li', output, 2
+      assert_css '.ulist ul', output, 1
+      assert_css '.ulist ul > li', output, 1
+      assert_xpath '(//ol/li)[1]/*', output, 3
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p', output, 1
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p[text()="list item 1"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[2]/self::div[@class="paragraph"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[3]/self::div[@class="ulist"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[3]/self::div[@class="ulist"]/ul/li', output, 1
+      assert_xpath '((//ol/li)[1]/*)[3]/self::div[@class="ulist"]/ul/li/p[text()="nested list item"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[3]/self::div[@class="ulist"]/ul/li/p/following-sibling::div[@class="paragraph"]', output, 1
+    end
+
+    test 'trailing list continuations should attach to list items at respective levels' do
+      input = <<-EOS
+== Lists
+
+. list item 1
++
+* nested list item 1
+* nested list item 2
++
+paragraph for nested list item 2
+
++
+paragraph for list item 1
+
+. list item 2
+      EOS
+      output = render_embedded_string input 
+      assert_css '.olist ol', output, 1
+      assert_css '.olist ol > li', output, 2
+      assert_css '.ulist ul', output, 1
+      assert_css '.ulist ul > li', output, 2
+      assert_css '.olist .ulist', output, 1
+      assert_xpath '(//ol/li)[1]/*', output, 3
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p', output, 1
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p[text()="list item 1"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[2]/self::div[@class="ulist"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/*', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/p', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/div[@class="paragraph"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[3]/self::div[@class="paragraph"]', output, 1
+    end
+
+    test 'wip trailing list continuations should attach to list items of different types at respective levels' do
+      input = <<-EOS
+== Lists
+
+* bullet 1
+. numbered 1.1
+** bullet 1.1.1
+
++
+numbered 1.1 paragraph
+
++
+bullet 1 paragraph
+
+* bullet 2
+      EOS
+      output = render_embedded_string input 
+
+      assert_xpath '(//ul)[1]/li', output, 2
+
+      assert_xpath '((//ul)[1]/li[1])/*', output, 3
+      assert_xpath '(((//ul)[1]/li[1])/*)[1]/self::p[text()="bullet 1"]', output, 1
+      assert_xpath '(((//ul)[1]/li[1])/*)[2]/ol', output, 1
+      assert_xpath '(((//ul)[1]/li[1])/*)[3]/self::div[@class="paragraph"]/p[text()="bullet 1 paragraph"]', output, 1
+
+      assert_xpath '((//ul)[1]/li)[1]/div/ol/li', output, 1
+      assert_xpath '((//ul)[1]/li)[1]/div/ol/li/*', output, 3
+      assert_xpath '(((//ul)[1]/li)[1]/div/ol/li/*)[1]/self::p[text()="numbered 1.1"]', output, 1
+      assert_xpath '(((//ul)[1]/li)[1]/div/ol/li/*)[2]/self::div[@class="ulist"]', output, 1
+      assert_xpath '(((//ul)[1]/li)[1]/div/ol/li/*)[3]/self::div[@class="paragraph"]/p[text()="numbered 1.1 paragraph"]', output, 1
+
+      assert_xpath '((//ul)[1]/li)[1]/div/ol/li/div[@class="ulist"]/ul/li', output, 1
+      assert_xpath '((//ul)[1]/li)[1]/div/ol/li/div[@class="ulist"]/ul/li/*', output, 1
+      assert_xpath '((//ul)[1]/li)[1]/div/ol/li/div[@class="ulist"]/ul/li/p[text()="bullet 1.1.1"]', output, 1
+    end
+
+    test 'repeated list continuations should attach to list items at respective levels' do
+      input = <<-EOS
+== Lists
+
+. list item 1
+
+* nested list item 1
++
+--
+open block for nested list item 1
+--
++
+* nested list item 2
++
+paragraph for nested list item 2
+
++
+paragraph for list item 1
+
+. list item 2
+      EOS
+      output = render_embedded_string input 
+      assert_css '.olist ol', output, 1
+      assert_css '.olist ol > li', output, 2
+      assert_css '.ulist ul', output, 1
+      assert_css '.ulist ul > li', output, 2
+      assert_css '.olist .ulist', output, 1
+      assert_xpath '(//ol/li)[1]/*', output, 3
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p', output, 1
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p[text()="list item 1"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[2]/self::div[@class="ulist"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[1]/*', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[1]/p', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[1]/div[@class="openblock"]', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/*', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/p', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/div[@class="paragraph"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[3]/self::div[@class="paragraph"]', output, 1
+    end
+
+    test 'repeated list continuations attached directly to list item should attach to list items at respective levels' do
+      input = <<-EOS
+== Lists
+
+. list item 1
++
+* nested list item 1
++
+--
+open block for nested list item 1
+--
++
+* nested list item 2
++
+paragraph for nested list item 2
+
++
+paragraph for list item 1
+
+. list item 2
+      EOS
+      output = render_embedded_string input 
+      assert_css '.olist ol', output, 1
+      assert_css '.olist ol > li', output, 2
+      assert_css '.ulist ul', output, 1
+      assert_css '.ulist ul > li', output, 2
+      assert_css '.olist .ulist', output, 1
+      assert_xpath '(//ol/li)[1]/*', output, 3
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p', output, 1
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p[text()="list item 1"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[2]/self::div[@class="ulist"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[1]/*', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[1]/p', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[1]/div[@class="openblock"]', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/*', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/p', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/div[@class="paragraph"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[3]/self::div[@class="paragraph"]', output, 1
+    end
+
+    test 'repeated list continuations should attach to list items at respective levels ignoring blank lines' do
+      input = <<-EOS
+== Lists
+
+. list item 1
++
+* nested list item 1
++
+--
+open block for nested list item 1
+--
++
+* nested list item 2
++
+paragraph for nested list item 2
+
+
++
+paragraph for list item 1
+
+. list item 2
+      EOS
+      output = render_embedded_string input 
+      assert_css '.olist ol', output, 1
+      assert_css '.olist ol > li', output, 2
+      assert_css '.ulist ul', output, 1
+      assert_css '.ulist ul > li', output, 2
+      assert_css '.olist .ulist', output, 1
+      assert_xpath '(//ol/li)[1]/*', output, 3
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p', output, 1
+      assert_xpath '((//ol/li)[1]/*)[1]/self::p[text()="list item 1"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[2]/self::div[@class="ulist"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[1]/*', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[1]/p', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[1]/div[@class="openblock"]', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/*', output, 2
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/p', output, 1
+      assert_xpath '(((//ol/li)[1]/*)[2]/self::div[@class="ulist"]/ul/li)[2]/div[@class="paragraph"]', output, 1
+      assert_xpath '((//ol/li)[1]/*)[3]/self::div[@class="paragraph"]', output, 1
+    end
+
+    test 'trailing list continuations should ignore preceding blank lines' do
+      input = <<-EOS
+== Lists
+
+* bullet 1
+** bullet 1.1
+*** bullet 1.1.1
++
+--
+open block
+--
+
+
++
+bullet 1.1 paragraph
+
+
++
+bullet 1 paragraph
+
+* bullet 2
+      EOS
+      output = render_embedded_string input 
+
+      assert_xpath '((//ul)[1]/li[1])/*', output, 3
+      assert_xpath '(((//ul)[1]/li[1])/*)[1]/self::p[text()="bullet 1"]', output, 1
+      assert_xpath '(((//ul)[1]/li[1])/*)[2]/self::div[@class="ulist"]', output, 1
+      assert_xpath '(((//ul)[1]/li[1])/*)[3]/self::div[@class="paragraph"]/p[text()="bullet 1 paragraph"]', output, 1
+
+      assert_xpath '((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li', output, 1
+      assert_xpath '((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li/*', output, 3
+      assert_xpath '(((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li/*)[1]/self::p[text()="bullet 1.1"]', output, 1
+      assert_xpath '(((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li/*)[2]/self::div[@class="ulist"]', output, 1
+      assert_xpath '(((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li/*)[3]/self::div[@class="paragraph"]/p[text()="bullet 1.1 paragraph"]', output, 1
+
+      assert_xpath '((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li/div[@class="ulist"]/ul/li', output, 1
+      assert_xpath '((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li/div[@class="ulist"]/ul/li/*', output, 2
+      assert_xpath '(((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li/div[@class="ulist"]/ul/li/*)[1]/self::p', output, 1
+      assert_xpath '(((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li/div[@class="ulist"]/ul/li/*)[2]/self::div[@class="openblock"]', output, 1
     end
 
     # NOTE this is not consistent w/ AsciiDoc output, but this is some screwy input anyway
@@ -1135,30 +1478,36 @@ anotherterm:: def
       assert_xpath '(//dl/dd)[1]//*[@class="openblock"]//p', output, 2
     end
 
-    test "paragraph attached by a list continuation in a labeled list" do
+    test "paragraph attached by a list continuation on either side in a labeled list" do
       input = <<-EOS
-term1:: def
+term1:: def1
 +
 more detail
 +
-term2:: def
+term2:: def2
       EOS
       output = render_string input
+      assert_xpath '(//dl/dt)[1][normalize-space(text())="term1"]', output, 1
+      assert_xpath '(//dl/dt)[2][normalize-space(text())="term2"]', output, 1
       assert_xpath '(//dl/dd)[1]//p', output, 2
+      assert_xpath '((//dl/dd)[1]//p)[1][text()="def1"]', output, 1
       assert_xpath '(//dl/dd)[1]/p/following-sibling::*[@class="paragraph"]/p[text() = "more detail"]', output, 1
     end
 
-    test "paragraph attached by a list continuation to a multi-line element in a labeled list" do
+    test "paragraph attached by a list continuation on either side to a multi-line element in a labeled list" do
       input = <<-EOS
 term1::
-def
+def1
 +
 more detail
 +
-term2:: def
+term2:: def2
       EOS
       output = render_string input
+      assert_xpath '(//dl/dt)[1][normalize-space(text())="term1"]', output, 1
+      assert_xpath '(//dl/dt)[2][normalize-space(text())="term2"]', output, 1
       assert_xpath '(//dl/dd)[1]//p', output, 2
+      assert_xpath '((//dl/dd)[1]//p)[1][text()="def1"]', output, 1
       assert_xpath '(//dl/dd)[1]/p/following-sibling::*[@class="paragraph"]/p[text() = "more detail"]', output, 1
     end
 
@@ -1473,7 +1822,7 @@ end
 
 context 'Labeled lists redux' do
 
-  context 'Item without text inline' do
+  context 'Label without text on same line' do
 
     test 'folds text from subsequent line' do
       input = <<-EOS
@@ -1519,6 +1868,24 @@ term2:: def2
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 2
       assert_xpath '(//*[@class="dlist"]//dd)[1]/p[text()="def1"]', output, 1
+    end
+
+    test 'paragraph offset by blank lines does not break list if label does not have inline text' do
+      input = <<-EOS
+== Lists
+
+term1::
+
+def1
+
+term2:: def2
+      EOS
+  
+      output = render_embedded_string input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 2
+      assert_css 'dl > dd', output, 2
+      assert_xpath '(//dl/dd)[1]/p[text()="def1"]', output, 1
     end
   
     test 'folds text from first line after comment line' do
@@ -1857,6 +2224,62 @@ term2:: def2
       assert_xpath '(//*[@class="dlist"]//dd)[1]/p', output, 0
       assert_xpath '(//*[@class="dlist"]//dd)[1]//ul/li', output, 3
       assert_xpath '(//*[@class="dlist"]//dd)[2]/p[text()="def2"]', output, 1
+    end
+
+    test 'appends indented list to first term that is adjacent to second term' do
+      input = <<-EOS
+== Lists
+
+label 1::
+  definition 1
+
+  * one
+  * two
+  * three
+label 2::
+  definition 2
+
+paragraph
+      EOS
+      output = render_embedded_string input
+      assert_css '.dlist > dl', output, 1
+      assert_css '.dlist dt', output, 2
+      assert_xpath '(//*[@class="dlist"]//dt)[1][normalize-space(text())="label 1"]', output, 1
+      assert_xpath '(//*[@class="dlist"]//dt)[2][normalize-space(text())="label 2"]', output, 1
+      assert_css '.dlist dd', output, 2
+      assert_xpath '(//*[@class="dlist"]//dd)[1]/p[text()="definition 1"]', output, 1
+      assert_xpath '(//*[@class="dlist"]//dd)[2]/p[text()="definition 2"]', output, 1
+      assert_xpath '(//*[@class="dlist"]//dd)[1]/p/following-sibling::*[@class="ulist"]', output, 1
+      assert_xpath '(//*[@class="dlist"]//dd)[1]/p/following-sibling::*[@class="ulist"]//li', output, 3
+      assert_css '.dlist + .paragraph', output, 1
+    end
+
+    test 'appends indented list to first term that is attached by a continuation and adjacent to second term' do
+      input = <<-EOS
+== Lists
+
+label 1::
+  definition 1
++
+  * one
+  * two
+  * three
+label 2::
+  definition 2
+
+paragraph
+      EOS
+      output = render_embedded_string input
+      assert_css '.dlist > dl', output, 1
+      assert_css '.dlist dt', output, 2
+      assert_xpath '(//*[@class="dlist"]//dt)[1][normalize-space(text())="label 1"]', output, 1
+      assert_xpath '(//*[@class="dlist"]//dt)[2][normalize-space(text())="label 2"]', output, 1
+      assert_css '.dlist dd', output, 2
+      assert_xpath '(//*[@class="dlist"]//dd)[1]/p[text()="definition 1"]', output, 1
+      assert_xpath '(//*[@class="dlist"]//dd)[2]/p[text()="definition 2"]', output, 1
+      assert_xpath '(//*[@class="dlist"]//dd)[1]/p/following-sibling::*[@class="ulist"]', output, 1
+      assert_xpath '(//*[@class="dlist"]//dd)[1]/p/following-sibling::*[@class="ulist"]//li', output, 3
+      assert_css '.dlist + .paragraph', output, 1
     end
   
     test 'appends list and paragraph block when line following list attached by continuation' do

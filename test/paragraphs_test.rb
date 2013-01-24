@@ -17,6 +17,28 @@ context "Paragraphs" do
       rendered = render_string("Title\n=====\n\nPreamble.\n\n== First Section\n\nParagraph 1\n\nParagraph 2\n\n\n== Second Section\n\nLast words")
       assert_xpath '//p[text()="Paragraph 2"]', rendered, 1
     end
+
+    test 'does not treat wrapped line as a list item' do
+      input = <<-EOS
+paragraph
+. wrapped line
+      EOS
+
+      output = render_embedded_string input 
+      assert_css 'p', output, 1
+      assert_xpath %(//p[text()="paragraph\n. wrapped line"]), output, 1
+    end
+
+    test 'does not treat wrapped line as a block title' do
+      input = <<-EOS
+paragraph
+.wrapped line
+      EOS
+
+      output = render_embedded_string input 
+      assert_css 'p', output, 1
+      assert_xpath %(//p[text()="paragraph\n.wrapped line"]), output, 1
+    end
   end
 
   context "code" do

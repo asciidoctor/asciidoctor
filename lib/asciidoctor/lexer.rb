@@ -869,7 +869,11 @@ class Asciidoctor::Lexer
             buffer.concat reader.grab_lines_until(
               :preserve_last_line => true,
               :break_on_blank_lines => true,
-              :break_on_list_continuation => true)
+              :break_on_list_continuation => true) {|line|
+                # we may be in an indented list disguised as a literal paragraph
+                # so we need to make sure we don't slurp up a legitimate sibling
+                list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
+            }
           else
             if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
               within_nested_list = true
@@ -904,7 +908,11 @@ class Asciidoctor::Lexer
                 buffer.concat reader.grab_lines_until(
                   :preserve_last_line => true,
                   :break_on_blank_lines => true,
-                  :break_on_list_continuation => true)
+                  :break_on_list_continuation => true) {|line|
+                    # we may be in an indented list disguised as a literal paragraph
+                    # so we need to make sure we don't slurp up a legitimate sibling
+                    list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
+                  }
               # TODO any way to combine this with the check after skipping blank lines?
               elsif is_sibling_list_item?(this_line, list_type, sibling_trait)
                 #buffer.pop unless within_nested_list
@@ -956,8 +964,8 @@ class Asciidoctor::Lexer
     if !buffer.empty? && buffer.last.chomp == LIST_CONTINUATION
       buffer.pop
     end
-    #puts "BUFFER>#{buffer.join}<BUFFER"
-    #puts "BUFFER>#{buffer}<BUFFER"
+    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join}<BUFFER"
+    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer}<BUFFER"
 
     buffer
   end
