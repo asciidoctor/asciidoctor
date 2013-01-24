@@ -139,11 +139,51 @@ template with an ERB template, put a file named
 .Commandline
 If you don't like all this Ruby code just to render AsciiDoc, there's a
 commandline interface (cli) named `asciidoctor`. It should be available
-on your PATH after installing the gem. The `asciidoctor` command a
+on your PATH after installing the gem. The `asciidoctor` command is a
 drop-in replacement for the `asciidoc` command from the AsciiDoc Python
 distribution.
 
 For more usage examples, see the (massive) test suite.
+
+== Differences from AsciiDoc
+
+While Asciidoctor aims to be compliant with the AsciiDoc syntax, there are some differences which are important to keep in mind. In some cases, it's to enforce a rule we believe is too lax or ambiguous in AsciiDoc. In other cases, it's a tradeoff for speed, smarter processing or a feature we just haven't yet implemented. (You'll also notice that Asciidoctor is about 20x faster than AsciiDoc).
+
+Here are the known cases where Asciidoctor differs from AsciiDoc:
+
+* In Asciidoctor, safe mode is on by default when using the API (safe mode level SECURE),
+* Asciidoctor safe mode is even more safe than AsciiDoc's safe mode
+* Asciidoctor enforces symmetric block delimiters (the length of start and end delimiters for a block must match)
+* Section title underlines must be within +/- 1 of the length of the title (AsciiDoc is +/- 3)
+* Asciidoctor's default HTML backend matches AsciiDoc's HTML 5 backend (whereas XHTML 1.1 is the default HTML backend in AsciiDoc)
+* Asciidoctor handles inline anchors more cleanly
+** AsciiDoc adds an `<a>` tag in the line and that markup gets caught in the generated id
+** Asciidoctor promotes the id of the anchor as the section id
+* Asciidoctor strips XML entities from the section title before generating the id (makes for cleaner section ids)
+* Asciidoctor use `<tt>` instead of `<span class="monospace">` around inline literal text in the HTML backend
+* Asciidoctor is much more lenient about attribute list parsing (double quotes are rarely needed)
+* Asciidoctor creates xref labels using the text from the linked section title when rendering HTML to match how DocBook works
+* Asciidoctor allows commas to be used in xref labels, whereas AsciiDoc cuts off the label at the location of the first comma
+* Asciidoctor removes indentation for non-literal paragraphs in a list item
+** In general, Asciidoctor handles whitespace much more intelligently
+* In Asciidoctor, a ruler can have attributes
+* Asciidoctor skips over line comments in tables, whereas AsciiDoc does not
+* Asciidoctor uses its own API rather than a command line invocation to handle table cells that have AsciiDoc content
+* Asciidoctor supports resolving variables from parent document in table cells with AsciiDoc content
+* AsciiDoc doesn't carry over the doctype attribute passed from the commandline when rendering AsciiDoc content cells, whereas Asciidoctor does
+* Asciidoctor strips the file extension from the target image when generating alt text if no alt text is provided
+* Asciidoctor reifies the toc in the header of the document instead of relying on JavaScript to create it
+* Asciidoctor is nice about using a section title syntax inside a delimited block by simply ignoring it (AsciiDoc issues warnings)
+* Asciidoctor honors the alternate style name "discrete" for a floating title (i.e., [discrete])
+* Asciidoctor supports syntax highlighting of listing or literal blocks that have the "source" style out of the box
+** Asciidoctor honors the source-highlighter values `coderay` and `highlightjs`, using CodeRay or highlight.js, respectively
+** Asciidoctor does not currently support Pygments for source highlighting
+* Asciidoctor sets these additional intrinsic attributes
+`asciidoctor`:: indicates Asciidoctor is being used; useful for conditional processing
+`asciidoctor-version`:: indicates which version of Asciidoctor is in use
+* Asciidoctor does not support deprecated tables (you don't want them anyway)
+
+If there's a difference you don't see in this list, check the {issues}[issue tracker] to see if it's an outstanding feature, or file an issue to report the difference.
 
 == Contributing
 
@@ -194,7 +234,6 @@ An ideal bug report would include a pull request with failing specs.
 . Add, commit, and push your changes.
 . {pr}[Submit a pull request].
 
-
 == Supported Ruby Versions
 
 This library aims to support the following Ruby implementations:
@@ -216,7 +255,7 @@ support for that Ruby version may be dropped.
 
 == Copyright
 
-Copyright (c) 2012 Ryan Waldron.
+Copyright (C) 2012 Ryan Waldron.
 See {license}[LICENSE] for details.
 
 // vim: tw=72
