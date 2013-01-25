@@ -118,6 +118,11 @@ endif::holygrail[]
       assert_equal "Yo, Tanglefoot!\nBeat Spiderman!", result.css("p").first.content.strip
     end
 
+    test 'attribute lookup is not case sensitive' do
+      result = render_embedded_string(":He-Man: The most powerful man in the universe\n\n{He-Man}")
+      assert_xpath '//p[text()="The most powerful man in the universe"]', result, 1
+    end
+
     test "render properly with single character name" do
       html = render_string(":r: Ruby\n\nR is for {r}!")
       result = Nokogiri::HTML(html)

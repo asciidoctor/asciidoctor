@@ -252,20 +252,21 @@ module Asciidoctor
         subject.gsub!(REGEXP[:attr_ref]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
+          key = m[2].downcase
           # escaped attribute
           if !$1.empty? || !$3.empty?
             "{#$2}"
           elsif m[2].start_with?('counter:')
             args = m[2].split(':')
-            @document.counter(args[1], args[2]) 
+            @document.counter(args[1], args[2])
           elsif m[2].start_with?('counter2:')
             args = m[2].split(':')
-            @document.counter(args[1], args[2]) 
+            @document.counter(args[1], args[2])
             ''
-          elsif document.attributes.has_key? m[2]
-            @document.attributes[m[2]]
-          elsif INTRINSICS.has_key? m[2]
-            INTRINSICS[m[2]]
+          elsif document.attributes.has_key? key
+            @document.attributes[key]
+          elsif INTRINSICS.has_key? key
+            INTRINSICS[key]
           else
             Asciidoctor.debug { "Missing attribute: #{m[2]}, line marked for removal" }
             reject = true
@@ -356,7 +357,7 @@ module Asciidoctor
           next m[0][1..-1]
         end
         if !m[1].nil?
-          id, reftext = m[1].split(',', 2)
+          id, reftext = m[1].split(/ *, */, 2)
           id.sub!(/^("|)(.*)\1$/, '\2')
           reftext.sub!(/^("|)(.*)\1$/m, '\2') unless reftext.nil?
         else
@@ -373,7 +374,7 @@ module Asciidoctor
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        id, reftext = m[1].split(',')
+        id, reftext = m[1].split(/ *, */)
         id.sub!(/^("|)(.*)\1$/, '\2')
         if reftext.nil?
           reftext = "[#{id}]"
