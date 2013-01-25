@@ -362,8 +362,9 @@ class Asciidoctor::Reader
           value = @document.attributes.has_key?($1) ? $2 : ''
           line.sub!(conditional_regexp, value)
         end
-        # leave line comments in as they play a role in flow (such as a list divider)
-        @lines << line
+        # append the line, but normalize line ending to LF (purging occurrences of CRLF)
+        # NOTE leave line comments in as they play a role in flow (such as a list divider)
+        @lines << "#{line.chomp}\n"
       end
     end
 
