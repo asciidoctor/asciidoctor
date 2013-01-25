@@ -234,7 +234,7 @@ module Asciidoctor
     :example          => /^={4,}\s*$/,
 
     # image::filename.png[Caption]
-    :image_blk        => /^image::(\S+?)\[(.*?)\]$/,
+    :image_blk        => /^image::(\S+?)\[(.*?)\]\s*$/,
 
     # image:filename.png[Alt]
     :image_macro      => /\\?image:([^\[]+)(?:\[([^\]]*)\])/,
