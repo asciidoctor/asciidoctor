@@ -231,7 +231,7 @@ include::include-file.asciidoc[]
   context 'build secure asset path' do
     test 'allows us to specify a path relative to the current dir' do
       doc = Asciidoctor::Document.new
-      reader = Asciidoctor::Reader.new(["foo"], doc)
+      Asciidoctor::Reader.new(["foo"], doc)
       legit_path = Dir.pwd + "/foo"
       assert_equal legit_path, doc.normalize_asset_path(legit_path)
     end
@@ -239,7 +239,7 @@ include::include-file.asciidoc[]
     test "keeps naughty absolute paths from getting outside" do
       naughty_path = "#{disk_root}etc/passwd"
       doc = Asciidoctor::Document.new
-      reader = Asciidoctor::Reader.new(["foo"], doc)
+      Asciidoctor::Reader.new(["foo"], doc)
       secure_path = doc.normalize_asset_path(naughty_path)
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)
@@ -248,7 +248,7 @@ include::include-file.asciidoc[]
     test "keeps naughty relative paths from getting outside" do
       naughty_path = "safe/ok/../../../../../etc/passwd"
       doc = Asciidoctor::Document.new
-      reader = Asciidoctor::Reader.new(["foo"], doc)
+      Asciidoctor::Reader.new(["foo"], doc)
       secure_path = doc.normalize_asset_path(naughty_path)
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)
