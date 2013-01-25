@@ -284,6 +284,22 @@ EOS
         end
       }
     end
+
+    test 'should process block with CRLF endlines' do
+      input = <<-EOS
+[source]\r
+----\r
+source line 1\r
+source line 2\r
+----\r
+      EOS
+
+      output = render_embedded_string input
+      assert_no_match(/\[source\]/, output)
+      assert_xpath '/*[@class="listingblock"]//pre', output, 1
+      assert_xpath '/*[@class="listingblock"]//pre/code', output, 1
+      assert_xpath %(/*[@class="listingblock"]//pre/code[text()="source line 1\nsource line 2"]), output, 1
+    end
   end
 
   context "Open Blocks" do

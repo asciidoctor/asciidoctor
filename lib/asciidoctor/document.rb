@@ -388,7 +388,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # using the appropriate built-in template.
   def render(opts = {})
     r = renderer(opts)
-    @options.merge(opts)[:header_footer] ? r.render('document', self) : r.render('embedded', self)
+    @options.merge(opts)[:header_footer] ? r.render('document', self).strip : r.render('embedded', self)
   end
 
   def content
