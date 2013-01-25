@@ -103,11 +103,11 @@ class Asciidoctor::Reader
       next_line = peek_line
       if opts[:include_blanks] && next_line.strip.empty?
         comment_lines << get_line
-      elsif match = next_line.match(REGEXP[:comment_blk])
+      elsif match = REGEXP[:comment_blk].match(next_line)
         comment_lines << get_line
         comment_lines.push(*(grab_lines_until(:terminator => match[0], :preserve_last_line => true)))
         comment_lines << get_line
-      elsif next_line.match(REGEXP[:comment])
+      elsif REGEXP[:comment].match(next_line)
         comment_lines << get_line
       else
         break
@@ -133,7 +133,7 @@ class Asciidoctor::Reader
   def consume_line_comments
     comment_lines = []
     while !@lines.empty?
-      if peek_line.match(REGEXP[:comment])
+      if REGEXP[:comment].match(peek_line)
         comment_lines << get_line
       else
         break
@@ -239,7 +239,7 @@ class Asciidoctor::Reader
         break
       end
 
-      if options[:skip_line_comments] && this_line.match(REGEXP[:comment])
+      if options[:skip_line_comments] && REGEXP[:comment].match(this_line)
         # skip it
       else
         buffer << this_line
@@ -275,7 +275,7 @@ class Asciidoctor::Reader
     include_depth = @document.attr('include-depth', 0).to_i
 
     data.each do |line|
-      if inc = line.match(REGEXP[:include_macro])
+      if inc = REGEXP[:include_macro].match(line)
         if inc[0].start_with? '\\'
           raw_source << line[1..-1]
         # if running in SafeMode::SECURE or greater, don't process
@@ -304,12 +304,12 @@ class Asciidoctor::Reader
 
     raw_source.each do |line|
       if skip_to
-        skip_to = nil if line.match(skip_to)
+        skip_to = nil if skip_to.match(line)
       elsif continuing_value
         close_continue = false
         # Lines that start with whitespace and end with a '+' are
         # a continuation, so gobble them up into `value`
-        if line.match(REGEXP[:attr_continue])
+        if REGEXP[:attr_continue].match(line)
           continuing_value += ' ' + $1.rstrip
         # An empty line ends a continuation
         elsif line.strip.empty?
@@ -329,17 +329,17 @@ class Asciidoctor::Reader
           continuing_key = nil
           continuing_value = nil
         end
-      elsif line.match(REGEXP[:ifdef_macro])
+      elsif REGEXP[:ifdef_macro].match(line)
         attr = $2
         skip = case $1
                when 'ifdef';  !@document.attributes.has_key?(attr)
                when 'ifndef'; @document.attributes.has_key?(attr)
                end
         skip_to = /^endif::#{attr}\[\]\s*\n/ if skip
-      elsif line.match(REGEXP[:attr_assign])
+      elsif REGEXP[:attr_assign].match(line)
         key = sanitize_attribute_name($1)
         value = $2
-        if value.match(REGEXP[:attr_continue])
+        if REGEXP[:attr_continue].match(value)
           # attribute value continuation line; grab lines until we run out
           # of continuation lines
           continuing_key = key
@@ -352,13 +352,13 @@ class Asciidoctor::Reader
             end
           end
         end
-      elsif line.match(REGEXP[:attr_delete])
+      elsif REGEXP[:attr_delete].match(line)
         key = sanitize_attribute_name($1)
         unless attribute_overridden? key
           @document.attributes.delete(key)
         end
-      elsif !line.match(REGEXP[:endif_macro])
-        while line.match(REGEXP[:attr_conditional])
+      elsif !REGEXP[:endif_macro].match(line)
+        while REGEXP[:attr_conditional].match(line)
           value = @document.attributes.has_key?($1) ? $2 : ''
           line.sub!(conditional_regexp, value)
         end
@@ -372,7 +372,7 @@ class Asciidoctor::Reader
     # FIXME we don't have support for bibliography lists yet, so disable for now
     # plus, this should be done while we are walking lines above
     #@lines.each do |line|
-    #  if biblio = line.match(REGEXP[:biblio])
+    #  if biblio = REGEXP[:biblio].match(line)
     #    @document.register(:ids, biblio[1])
     #  end
     #end
@@ -397,7 +397,7 @@ class Asciidoctor::Reader
   #
   # Returns The String value with substitutions performed.
   def apply_attribute_value_subs(value)
-    if value.match(REGEXP[:pass_macro_basic])
+    if REGEXP[:pass_macro_basic].match(value)
       # copy match for Ruby 1.8.7 compat
       m = $~
       subs = []

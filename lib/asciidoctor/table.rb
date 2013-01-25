@@ -304,7 +304,7 @@ module Asciidoctor
     #
     # returns MatchData if the line contains the delimiter, false otherwise
     def match_delimiter(line)
-      line.match @delimiter_re
+      @delimiter_re.match(line)
     end
   
     # Public: Skip beyond the matched delimiter because it was a false positive
