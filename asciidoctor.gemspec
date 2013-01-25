@@ -104,7 +104,6 @@ Gem::Specification.new do |s|
     test/fixtures/list_elements.asciidoc
     test/fixtures/sample.asciidoc
     test/fixtures/tip.gif
-    test/headers_test.rb
     test/invoker_test.rb
     test/lexer_test.rb
     test/links_test.rb
@@ -114,6 +113,7 @@ Gem::Specification.new do |s|
     test/preamble_test.rb
     test/reader_test.rb
     test/renderer_test.rb
+    test/sections_test.rb
     test/substitutions_test.rb
     test/tables_test.rb
     test/test_helper.rb
