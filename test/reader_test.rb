@@ -283,6 +283,20 @@ endif::holygrail[]
   end
 
   context 'Text processing' do
+    test 'should clean CRLF from end of lines' do
+      input = <<-EOS
+source\r
+with\r
+CRLF\r
+endlines\r
+      EOS
+
+      reader = Asciidoctor::Reader.new(input.lines.entries, Asciidoctor::Document.new)
+      reader.lines.each do |line|
+        assert !line.end_with?("\r\n")
+      end
+    end
+
     test 'sanitize attribute name' do
       assert_equal 'foobar', @reader.sanitize_attribute_name("Foo Bar")
       assert_equal 'foo', @reader.sanitize_attribute_name("foo")
