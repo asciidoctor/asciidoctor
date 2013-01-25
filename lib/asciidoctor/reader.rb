@@ -303,6 +303,8 @@ class Asciidoctor::Reader
     @lines = []
 
     raw_source.each do |line|
+      # normalize line ending to LF (purging occurrences of CRLF)
+      line = "#{line.chomp}\n"
       if skip_to
         skip_to = nil if line.match(skip_to)
       elsif continuing_value
@@ -362,9 +364,8 @@ class Asciidoctor::Reader
           value = @document.attributes.has_key?($1) ? $2 : ''
           line.sub!(conditional_regexp, value)
         end
-        # append the line, but normalize line ending to LF (purging occurrences of CRLF)
         # NOTE leave line comments in as they play a role in flow (such as a list divider)
-        @lines << "#{line.chomp}\n"
+        @lines << line
       end
     end
 
