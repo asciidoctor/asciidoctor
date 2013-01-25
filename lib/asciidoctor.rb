@@ -190,8 +190,8 @@ module Asciidoctor
     # John Doe <john@anonymous.com>
     :author_info      => /^\s*([\w\-]+)(?: +([\w\-]+))?(?: +([\w\-]+))?(?: +<([^>]+)>)?\s*$/,
 
-    # [[[Foo]]]  (does not suffer quite the same malady as :anchor, but almost. Allows [ but not ] in internal capture
-    :biblio           => /\[\[\[([^\[\]]+)\]\]\]/,
+    # [[[Foo]]] (anywhere inline)
+    :biblio_macro     => /\\?\[\[\[([\w:][\w:\.-]*?)\]\]\]/,
 
     # callout reference inside literal text
     # <1>
@@ -232,6 +232,11 @@ module Asciidoctor
                          },
     # ====
     :example          => /^={4,}\s*$/,
+
+    # footnote:[text]
+    # footnoteref:[id,text]
+    # footnoteref:[id]
+    :footnote_macro   => /\\?(footnote|footnoteref):\[((?:\\\]|[^\]])*?)\]/m,
 
     # image::filename.png[Caption]
     :image_blk        => /^image::(\S+?)\[(.*?)\]\s*$/,

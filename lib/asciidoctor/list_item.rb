@@ -46,10 +46,10 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
 
       block = blocks.shift
       unless @text.to_s.empty?
-        block.buffer.unshift(@text)
+        block.buffer.unshift("#@text\n")
       end
 
-      @text = block.buffer.join("\n")
+      @text = block.buffer.join
     end
     nil
   end

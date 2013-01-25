@@ -365,6 +365,7 @@ class Asciidoctor::Lexer
       elsif match = this_line.match(REGEXP[:dlist])
         reader.unshift this_line
         block = next_labeled_list(reader, match, parent)
+        AttributeList.rekey(attributes, ['style'])
 
       elsif delimited_blk && (match = this_line.match(document.nested? ? REGEXP[:table_nested] : REGEXP[:table]))
         # table is surrounded by lines starting with a | followed by 3 or more '=' chars
@@ -987,6 +988,15 @@ class Asciidoctor::Lexer
       section.id ||= section.generate_id
     end
 
+    if attributes[1]
+      section.sectname = attributes[1]
+      section.special = true
+      if section.sectname == 'appendix'
+        attributes['caption'] = "Appendix #{parent.document.counter('appendix-number', 'A')}: "
+      end
+    else
+      section.sectname = "sect#{section.level}"
+    end
     section.update_attributes(attributes)
     reader.skip_blank
 

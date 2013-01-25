@@ -19,6 +19,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
   include Asciidoctor
 
+  Footnote = Struct.new(:index, :id, :text)
+
   # Public A read-only integer value indicating the level of security that
   # should be enforced while processing this document. The value must be
   # set in the Document constructor using the :safe option.
@@ -105,6 +107,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @header = nil
     @references = {
       :ids => {},
+      :footnotes => [],
       :links => [],
       :images => []
     }
@@ -258,6 +261,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       else
         @references[:ids][value] = '[' + value + ']'
       end
+    elsif type == :footnotes
+      @references[:footnotes] << value
     elsif @options[:catalog_assets]
       @references[type] << value
     end
