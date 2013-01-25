@@ -483,7 +483,7 @@ module Asciidoctor
     # (TM)
     [/(^|[^\\])\(TM\)/, '\1&#8482;'],
     # foo -- bar
-    [/ -- /, '&#8201;&#8212;&#8201;'],
+    [/(^|\n| )-- /, '&#8201;&#8212;&#8201;'],
     # foo--bar
     [/(\w)--(?=\w)/, '\1&#8212;'],
     # ellipsis
@@ -492,6 +492,14 @@ module Asciidoctor
     [/(\w)'(\w)/, '\1&#8217;\2'],
     # escaped single quotes
     [/(\w)\\'(\w)/, '\1\'\2'],
+    # right arrow ->
+    [/(^|[^\\])-&gt;/, '\1&#8594;'],
+    # right double arrow =>
+    [/(^|[^\\])=&gt;/, '\1&#8658;'],
+    # left arrow <-
+    [/(^|[^\\])&lt;-/, '\1&#8592;'],
+    # right left arrow <=
+    [/(^|[^\\])&lt;=/, '\1&#8656;'],
     # and so on...
     
     # restore entities; TODO needs cleanup
