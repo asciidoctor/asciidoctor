@@ -517,7 +517,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       input = <<-EOS
 :icons:
 :iconsdir: fixtures
-:iconstype: gif
+:icontype: gif
 :data-uri:
 
 [TIP]
@@ -532,7 +532,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       input = <<-EOS
 :icons:
 :iconsdir: fixtures
-:iconstype: gif
+:icontype: gif
 :data-uri:
 
 [TIP]
@@ -547,7 +547,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       input = <<-EOS
 :icons:
 :iconsdir: ../fixtures
-:iconstype: gif
+:icontype: gif
 :data-uri:
 
 [TIP]

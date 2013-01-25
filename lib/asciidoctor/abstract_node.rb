@@ -97,7 +97,7 @@ class Asciidoctor::AbstractNode
   # If the 'icon' attribute is set on this block, the name is ignored and the
   # value of this attribute is used as the  target image path. Otherwise,
   # construct a target image path by concatenating the value of the 'iconsdir'
-  # attribute, the icon name and the value of the 'iconstype' attribute
+  # attribute, the icon name and the value of the 'icontype' attribute
   # (defaulting to 'png').
   #
   # The target image path is then passed through the #image_uri() method.  If
@@ -113,7 +113,7 @@ class Asciidoctor::AbstractNode
     if attr? 'icon'
       image_uri(attr('icon'), nil)
     else
-      image_uri(name + '.' + @document.attr('iconstype', 'png'), 'iconsdir')
+      image_uri(name + '.' + @document.attr('icontype', 'png'), 'iconsdir')
     end
   end
 
