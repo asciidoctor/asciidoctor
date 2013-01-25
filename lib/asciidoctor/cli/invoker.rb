@@ -50,7 +50,7 @@ module Asciidoctor
           if @options[:verbose]
             puts "Time to read and parse source: #{timings[:parse]}"
             puts "Time to render document: #{timings[:render]}"
-            puts "Total time to read, parse and render: #{timings.reduce(0) {|sum, (k, v)| sum += v}}"
+            puts "Total time to read, parse and render: #{timings.reduce(0) {|sum, (_, v)| sum += v}}"
           end
           if outfile == '/dev/null'
             # output nothing

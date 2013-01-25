@@ -158,7 +158,7 @@ class Test::Unit::TestCase
     if buffers
       invoker.redirect_streams(*buffers)
     end
-    invoker.invoke! &block
+    invoker.invoke!(&block)
     invoker
   end
 
