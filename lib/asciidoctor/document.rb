@@ -140,7 +140,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     end
 
     if @safe >= SafeMode::SERVER
-      # restrict document from setting source-highlighter or backend
+      # restrict document from setting source-highlighter and backend
       attribute_overrides['source-highlighter'] ||= nil
       attribute_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
@@ -148,6 +148,10 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
         attribute_overrides['docfile'] = attribute_overrides['docfile'][(attribute_overrides['docdir'].length + 1)..-1]
       end
       attribute_overrides['docdir'] = ''
+      # restrict document from enabling icons
+      if @safe >= SafeMode::SECURE
+        attribute_overrides['icons'] ||= nil
+      end
     end
     
     attribute_overrides.delete_if {|key, val|
