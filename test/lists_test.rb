@@ -33,6 +33,25 @@ List
       assert_xpath '//ul/li', output, 3
     end
 
+    test 'dash elements with interspersed line comments should be skipped and not break list' do
+      input = <<-EOS
+== List
+
+- Foo
+// line comment
+// another line comment
+- Boo
+// line comment
+more text
+// another line comment
+- Blech
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 3
+      assert_xpath %((//ul/li)[2]/p[text()="Boo\nmore text"]), output, 1
+    end
+
     test "dash elements separated by a line comment offset by blank lines should not merge lists" do
       input = <<-EOS
 List
@@ -281,6 +300,25 @@ List
       output = render_string input
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 3
+    end
+
+    test 'asterisk elements with interspersed line comments should be skipped and not break list' do
+      input = <<-EOS
+== List
+
+* Foo
+// line comment
+// another line comment
+* Boo
+// line comment
+more text
+// another line comment
+* Blech
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 3
+      assert_xpath %((//ul/li)[2]/p[text()="Boo\nmore text"]), output, 1
     end
 
     test "asterisk elements separated by a line comment offset by blank lines should not merge lists" do
@@ -1141,6 +1179,25 @@ List
       output = render_string input
       assert_xpath '//ol', output, 1
       assert_xpath '//ol/li', output, 3
+    end
+
+    test 'dot elements with interspersed line comments should be skipped and not break list' do
+      input = <<-EOS
+== List
+
+. Foo
+// line comment
+// another line comment
+. Boo
+// line comment
+more text
+// another line comment
+. Blech
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//ol', output, 1
+      assert_xpath '//ol/li', output, 3
+      assert_xpath %((//ol/li)[2]/p[text()="Boo\nmore text"]), output, 1
     end
 
     test "dot elements separated by line comment offset by blank lines should not merge lists" do
