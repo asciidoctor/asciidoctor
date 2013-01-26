@@ -346,12 +346,12 @@ class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
-  <div class="content">
+  <blockquote class="content">
 <%= content %>
-  </div>
+  </blockquote>
   <div class="attribution">
     <% if attr? :citetitle %>
-    <em><%= attr :citetitle %></em>
+    <cite><%= attr :citetitle %></cite>
     <% end %>
     <% if attr? :attribution %>
     <% if attr? :citetitle %>
@@ -376,7 +376,7 @@ class BlockVerseTemplate < ::Asciidoctor::BaseTemplate
   <pre class="content"><%= template.preserve_endlines(content, self) %></pre>
   <div class="attribution">
     <% if attr? :citetitle %>
-    <em><%= attr :citetitle %></em>
+    <cite><%= attr :citetitle %></cite>
     <% end %>
     <% if attr? :attribution %>
     <% if attr? :citetitle %>
