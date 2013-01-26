@@ -346,7 +346,7 @@ class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
-  <blockquote class="content">
+  <blockquote>
 <%= content %>
   </blockquote>
   <div class="attribution">
