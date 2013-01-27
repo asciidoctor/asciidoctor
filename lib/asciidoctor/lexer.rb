@@ -252,8 +252,8 @@ class Asciidoctor::Lexer
 
       # NOTE I've haven't decided whether I want this check here or in
       # parse_block_metadata (where it is currently)
-      #if this_line.match(REGEXP[:comment_blk])
-      #  reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) }
+      #if REGEXP[:comment_blk].match(this_line)
+      #  reader.grab_lines_until {|line| REGEXP[:comment_blk].match(line) }
       #  reader.skip_blank
       #  # NOTE we should break here because we have found a block, it
       #  # just happens to be nil...if we keep going we potentially overrun
@@ -261,11 +261,11 @@ class Asciidoctor::Lexer
       #  break
 
       # NOTE we're letting ruler have attributes
-      if !options[:text] && this_line.match(REGEXP[:ruler])
+      if !options[:text] && REGEXP[:ruler].match(this_line)
         block = Block.new(parent, :ruler)
         reader.skip_blank
 
-      elsif !options[:text] && (match = this_line.match(REGEXP[:image_blk]))
+      elsif !options[:text] && (match = REGEXP[:image_blk].match(this_line))
         block = Block.new(parent, :image)
         AttributeList.new(document.sub_attributes(match[2])).parse_into(attributes, ['alt', 'width', 'height'])
         target = block.sub_attributes(match[1])
@@ -284,7 +284,7 @@ class Asciidoctor::Lexer
         end
         reader.skip_blank
 
-      elsif delimited_blk && (match = this_line.match(REGEXP[:open_blk]))
+      elsif delimited_blk && (match = REGEXP[:open_blk].match(this_line))
         # an open block is surrounded by '--' lines and has zero or more blocks inside
         terminator = match[0]
         buffer = Reader.new reader.grab_lines_until(:terminator => terminator)
@@ -301,7 +301,7 @@ class Asciidoctor::Lexer
         end
 
       # needs to come before list detection
-      elsif delimited_blk && (match = this_line.match(REGEXP[:sidebar_blk]))
+      elsif delimited_blk && (match = REGEXP[:sidebar_blk].match(this_line))
         # sidebar is surrounded by '****' (4 or more '*' chars) lines
         terminator = match[0]
         # FIXME violates DRY because it's a duplication of quote parsing
@@ -313,7 +313,7 @@ class Asciidoctor::Lexer
           block.blocks << new_block unless new_block.nil?
         end
 
-      elsif match = this_line.match(REGEXP[:colist])
+      elsif match = REGEXP[:colist].match(this_line)
         block = Block.new(parent, :colist)
         attributes['style'] = 'arabic'
         items = []
@@ -336,16 +336,16 @@ class Asciidoctor::Lexer
               puts 'asciidoctor: WARNING: no callouts refer to list item ' + items.size.to_s
             end
           end
-        end while reader.has_lines? && match = reader.peek_line.match(REGEXP[:colist])
+        end while reader.has_lines? && match = REGEXP[:colist].match(reader.peek_line)
 
         document.callouts.next_list
 
-      elsif match = this_line.match(REGEXP[:ulist])
+      elsif match = REGEXP[:ulist].match(this_line)
         AttributeList.rekey(attributes, ['style'])
         reader.unshift(this_line)
         block = next_outline_list(reader, :ulist, parent)
 
-      elsif match = this_line.match(REGEXP[:olist])
+      elsif match = REGEXP[:olist].match(this_line)
         AttributeList.rekey(attributes, ['style'])
         reader.unshift(this_line)
         block = next_outline_list(reader, :olist, parent)
@@ -357,12 +357,12 @@ class Asciidoctor::Lexer
             #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES.first).to_s
             attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || ORDERED_LIST_STYLES.first).to_s
           else
-            style = ORDERED_LIST_STYLES.detect{|s| marker.match(ORDERED_LIST_MARKER_PATTERNS[s]) }
+            style = ORDERED_LIST_STYLES.detect{|s| ORDERED_LIST_MARKER_PATTERNS[s].match(marker) }
             attributes['style'] = (style || ORDERED_LIST_STYLES.first).to_s
           end
         end
 
-      elsif match = this_line.match(REGEXP[:dlist])
+      elsif match = REGEXP[:dlist].match(this_line)
         reader.unshift this_line
         block = next_labeled_list(reader, match, parent)
 
@@ -379,7 +379,7 @@ class Asciidoctor::Lexer
         end
     
       # FIXME violates DRY because it's a duplication of other block parsing
-      elsif delimited_blk && (match = this_line.match(REGEXP[:example]))
+      elsif delimited_blk && (match = REGEXP[:example].match(this_line))
         # example is surrounded by lines with 4 or more '=' chars
         terminator = match[0]
         AttributeList.rekey(attributes, ['style'])
@@ -403,14 +403,14 @@ class Asciidoctor::Lexer
         end
 
       # FIXME violates DRY w/ non-delimited block listing
-      elsif delimited_blk && (match = this_line.match(REGEXP[:listing]))
+      elsif delimited_blk && (match = REGEXP[:listing].match(this_line))
         terminator = match[0]
         AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
         buffer = reader.grab_lines_until(:terminator => terminator)
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :listing, buffer)
 
-      elsif delimited_blk && (match = this_line.match(REGEXP[:quote]))
+      elsif delimited_blk && (match = REGEXP[:quote].match(this_line))
         # multi-line verse or quote is surrounded by a block delimiter
         terminator = match[0]
         AttributeList.rekey(attributes, ['style', 'attribution', 'citetitle'])
@@ -431,7 +431,7 @@ class Asciidoctor::Lexer
           block = Block.new(parent, quote_context, block_reader.lines)
         end
 
-      elsif delimited_blk && (blk_ctx = [:literal, :pass].detect{|t| this_line.match(REGEXP[t])})
+      elsif delimited_blk && (blk_ctx = [:literal, :pass].detect{|t| REGEXP[t].match(this_line)})
         # literal is surrounded by '....' (4 or more '.' chars) lines
         # pass is surrounded by '++++' (4 or more '+' chars) lines
         terminator = $~[0]
@@ -443,7 +443,7 @@ class Asciidoctor::Lexer
         end
         block = Block.new(parent, blk_ctx, buffer)
 
-      elsif this_line.match(REGEXP[:lit_par])
+      elsif REGEXP[:lit_par].match(this_line)
         # literal paragraph is contiguous lines starting with
         # one or more space or tab characters
 
@@ -452,13 +452,13 @@ class Asciidoctor::Lexer
         buffer = reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true) {|line|
           # labeled list terms can be indented, but a preceding blank indicates
           # we are in a list continuation and therefore literals should be strictly literal
-          (context == :dlist && skipped == 0 && line.match(REGEXP[:dlist])) ||
+          (context == :dlist && skipped == 0 && REGEXP[:dlist].match(line)) ||
           delimited_block?(line)
         }
 
         # trim off the indentation equivalent to the size of the least indented line
         if !buffer.empty?
-          offset = buffer.map {|line| line.match(REGEXP[:leading_blanks])[1].length }.min
+          offset = buffer.map {|line| REGEXP[:leading_blanks].match(line)[1].length }.min
           if offset > 0
             buffer = buffer.map {|l| l.sub(/^\s{1,#{offset}}/, '') }
           end
@@ -522,11 +522,11 @@ class Asciidoctor::Lexer
       else
         reader.unshift this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true, :skip_line_comments => true) {|line|
-          delimited_block?(line) || line.match(REGEXP[:attr_line]) ||
+          delimited_block?(line) || REGEXP[:attr_line].match(line) ||
           # next list item can be directly adjacent to paragraph of previous list item
-          context == :dlist && line.match(REGEXP[:dlist])
+          context == :dlist && REGEXP[:dlist].match(line)
           # not sure if there are any cases when we need this check for other list types
-          #LIST_CONTEXTS.include?(context) && line.match(REGEXP[context])
+          #LIST_CONTEXTS.include?(context) && REGEXP[context].match(line)
         }
 
         # NOTE we need this logic because the reader is processing line
@@ -581,12 +581,12 @@ class Asciidoctor::Lexer
   # to do any subsequent regexp
   def self.delimited_block?(line)
     # naive match
-    #line.match(REGEXP[:any_blk])
+    #REGEXP[:any_blk].match(line)
 
     # attempt at better performance
     if line.length > 0
       # NOTE accessing the first element before calling ord is first Ruby 1.8.7 compat
-      REGEXP[:any_blk_ord].include?(line[0..0][0].ord) ? line.match(REGEXP[:any_blk]) : nil
+      REGEXP[:any_blk_ord].include?(line[0..0][0].ord) ? REGEXP[:any_blk].match(line) : nil
     else
       nil
     end
@@ -610,7 +610,7 @@ class Asciidoctor::Lexer
     end
     Asciidoctor.debug { "Created #{list_type} block: #{list_block}" }
 
-    while reader.has_lines? && (match = reader.peek_line.match(REGEXP[list_type]))
+    while reader.has_lines? && (match = REGEXP[list_type].match(reader.peek_line))
 
       marker = resolve_list_marker(list_type, match[1])
 
@@ -705,7 +705,7 @@ class Asciidoctor::Lexer
 
     begin
       pairs << next_list_item(reader, block, match, sibling_pattern)
-    end while reader.has_lines? && match = reader.peek_line.match(sibling_pattern)
+    end while reader.has_lines? && match = sibling_pattern.match(reader.peek_line)
 
     block
   end
@@ -847,7 +847,7 @@ class Asciidoctor::Lexer
       if (match = delimited_block?(this_line)) ||
         # technically attr_line only breaks if ensuing line is not a list item
         # which really means attr_line only breaks if it's acting as a block delimiter
-        (list_type == :dlist && match = this_line.match(REGEXP[:attr_line]))
+        (list_type == :dlist && match = REGEXP[:attr_line].match(this_line))
         terminator = match[0]
         if continuation == :active
           buffer << this_line
@@ -864,7 +864,7 @@ class Asciidoctor::Lexer
           # two entry points into one)
           # if we don't process it as a whole, then a line in it that looks like a
           # list item will throw off the exit from it
-          if this_line.match(REGEXP[:lit_par])
+          if REGEXP[:lit_par].match(this_line)
             reader.unshift this_line
             buffer.concat reader.grab_lines_until(
               :preserve_last_line => true,
@@ -875,7 +875,7 @@ class Asciidoctor::Lexer
                 list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
             }
           else
-            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
+            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| REGEXP[ctx].match(this_line) }
               within_nested_list = true
               if nested_list_type == :dlist && $~[3].to_s.empty?
                 # get greedy again
@@ -903,7 +903,7 @@ class Asciidoctor::Lexer
             # in this block, we have to see whether we stay in the list
             if has_text
               # slurp up any literal paragraph offset by blank lines
-              if this_line.match(REGEXP[:lit_par])
+              if REGEXP[:lit_par].match(this_line)
                 reader.unshift this_line
                 buffer.concat reader.grab_lines_until(
                   :preserve_last_line => true,
@@ -916,7 +916,7 @@ class Asciidoctor::Lexer
               # TODO any way to combine this with the check after skipping blank lines?
               elsif is_sibling_list_item?(this_line, list_type, sibling_trait)
                 break
-              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
+              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| REGEXP[ctx].match(this_line) }
                 buffer << this_line
                 within_nested_list = true
                 if nested_list_type == :dlist && $~[3].to_s.empty?
@@ -935,7 +935,7 @@ class Asciidoctor::Lexer
           end
         else
           has_text = true if !this_line.strip.empty?
-          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
+          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| REGEXP[ctx].match(this_line) }
             within_nested_list = true
             if nested_list_type == :dlist && $~[3].to_s.empty?
               # get greedy again
@@ -1051,7 +1051,7 @@ class Asciidoctor::Lexer
   end
 
   def self.is_single_line_section_title?(line1)
-    if !line1.nil? && (match = line1.match(REGEXP[:section_title]))
+    if !line1.nil? && (match = REGEXP[:section_title].match(line1))
       single_line_section_level match[1]
     else
       false
@@ -1059,8 +1059,8 @@ class Asciidoctor::Lexer
   end
 
   def self.is_two_line_section_title?(line1, line2)
-    if !line1.nil? && !line2.nil? && line1.match(REGEXP[:section_name]) &&
-        line2.match(REGEXP[:section_underline]) &&
+    if !line1.nil? && !line2.nil? && REGEXP[:section_name].match(line1) &&
+        REGEXP[:section_underline].match(line2) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line1.chomp.size - line2.chomp.size).abs <= 1
       section_level line2
@@ -1118,14 +1118,14 @@ class Asciidoctor::Lexer
     sect_level = -1
     single_line = true
 
-    if match = line1.match(REGEXP[:section_title])
+    if match = REGEXP[:section_title].match(line1)
       sect_id = match[3]
       sect_title = match[2]
       sect_level = single_line_section_level match[1]
     else
       line2 = reader.peek_line
-      if !line2.nil? && (name_match = line1.match(REGEXP[:section_name])) &&
-        line2.match(REGEXP[:section_underline]) &&
+      if !line2.nil? && (name_match = REGEXP[:section_name].match(line1)) &&
+        REGEXP[:section_underline].match(line2) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line1.chomp.size - line2.chomp.size).abs <= 1
         if anchor_match = name_match[1].match(REGEXP[:anchor_embedded]) 
@@ -1163,7 +1163,7 @@ class Asciidoctor::Lexer
     author_initials = metadata['authorinitials']
     if reader.has_lines? && !reader.peek_line.strip.empty?
       author_line = reader.get_line
-      match = author_line.match(REGEXP[:author_info])
+      match = REGEXP[:author_info].match(author_line)
       if match
         metadata['firstname'] = fname = match[1].tr('_', ' ')
         metadata['author'] = fname
@@ -1192,7 +1192,7 @@ class Asciidoctor::Lexer
 
       if reader.has_lines? && !reader.peek_line.strip.empty?
         rev_line = reader.get_line 
-        match = rev_line.match(REGEXP[:revision_info])
+        match = REGEXP[:revision_info].match(rev_line)
         if match
           metadata['revdate'] = match[2]
           metadata['revnumber'] = match[1] unless match[1].nil?
@@ -1253,14 +1253,14 @@ class Asciidoctor::Lexer
   def self.parse_block_metadata_line(reader, parent, attributes, options = {})
     return false if !reader.has_lines?
     next_line = reader.peek_line
-    if next_line.match(REGEXP[:comment])
+    if REGEXP[:comment].match(next_line)
       # do nothing, we'll skip it
     # QUESTION should we parse block comments here instead of next_block?
     # disable until we can agree what the current line is coming in
-    elsif match = next_line.match(REGEXP[:comment_blk])
+    elsif match = REGEXP[:comment_blk].match(next_line)
       terminator = match[0]
       reader.grab_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator)
-    elsif match = next_line.match(REGEXP[:anchor])
+    elsif match = REGEXP[:anchor].match(next_line)
       id, reftext = match[1].split(',')
       attributes['id'] = id
       # AsciiDoc always use [id] as the reftext in HTML output,
@@ -1270,12 +1270,12 @@ class Asciidoctor::Lexer
         attributes['reftext'] = reftext
         parent.document.register(:ids, [id, reftext])
       end
-    elsif match = next_line.match(REGEXP[:blk_attr_list])
+    elsif match = REGEXP[:blk_attr_list].match(next_line)
       AttributeList.new(parent.document.sub_attributes(match[1]), parent.document).parse_into(attributes)
     # NOTE title doesn't apply to section, but we need to stash it for the first block
     # TODO need test for this getting passed on to first block after section if found above section
     # TODO should issue an error if this is found above the document title
-    elsif !options[:text] && (match = next_line.match(REGEXP[:blk_title]))
+    elsif !options[:text] && (match = REGEXP[:blk_title].match(next_line))
       attributes['title'] = match[1]
     else
       return false
@@ -1332,7 +1332,7 @@ class Asciidoctor::Lexer
   #
   # Returns the String of the first marker in this number series 
   def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false)
-    number_style = ORDERED_LIST_STYLES.detect {|s| marker.match(ORDERED_LIST_MARKER_PATTERNS[s]) }
+    number_style = ORDERED_LIST_STYLES.detect {|s| ORDERED_LIST_MARKER_PATTERNS[s].match(marker) }
     expected = actual = nil
     case number_style
       when :arabic
@@ -1394,7 +1394,7 @@ class Asciidoctor::Lexer
       expected_marker = sibling_trait
     end
 
-    if m = line.match(matcher)
+    if m = matcher.match(line)
       if expected_marker
         expected_marker == resolve_list_marker(list_type, m[1])
       else
@@ -1523,7 +1523,7 @@ class Asciidoctor::Lexer
     specs = []
 
     # check for deprecated syntax
-    if m = records.match(REGEXP[:digits])
+    if m = REGEXP[:digits].match(records)
       1.upto(m[0].to_i) {
         specs << {'width' => 1}
       }
@@ -1532,7 +1532,7 @@ class Asciidoctor::Lexer
 
     records.split(',').each {|record|
       # TODO might want to use scan rather than this mega-regexp
-      if m = record.match(REGEXP[:table_colspec])
+      if m = REGEXP[:table_colspec].match(record)
         spec = {}
         if m[2]
           # make this an operation
@@ -1578,7 +1578,7 @@ class Asciidoctor::Lexer
     spec = (pos == :end ? {} : nil)
     rest = line
 
-    if m = line.match(REGEXP[:table_cellspec][pos]) 
+    if m = REGEXP[:table_cellspec][pos].match(line) 
       spec = {}
       return [spec, line] if m[0].strip.empty?
       rest = (pos == :start ? m.post_match : m.pre_match)
