@@ -19,6 +19,7 @@ module Asciidoctor
     # Public: A Hash mapping styles abbreviations to styles that can be applied
     # to a table column or cell
     TEXT_STYLES = {
+      'd' => :none,
       's' => :strong,
       'e' => :emphasis,
       'm' => :monospaced,
@@ -407,8 +408,14 @@ module Asciidoctor
       @buffer = ''
       if format == 'psv'
         cell_spec = take_cell_spec
-        repeat = cell_spec.fetch('repeatcol', 1)
-        cell_spec.delete('repeatcol')
+        if cell_spec.nil?
+          puts 'asciidoctor: ERROR: table missing leading separator, recovering automatically'
+          cell_spec = {}
+          repeat = 1
+        else
+          repeat = cell_spec.fetch('repeatcol', 1)
+          cell_spec.delete('repeatcol')
+        end
       else
         cell_spec = nil
         repeat = 1

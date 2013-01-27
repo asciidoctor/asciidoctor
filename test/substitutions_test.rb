@@ -357,6 +357,14 @@ context 'Substitutions' do
       assert_equal %(Sentence text<span class="footnote">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>.), para.sub_macros(para.buffer.join)
     end
 
+    test 'a footnote macro may contain a macro' do
+      para = block_from_string('Share your code. footnote:[http://github.com[GitHub]]')
+      assert_equal %(Share your code. <span class="footnote">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>), para.sub_macros(para.buffer.join)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote1 = para.document.references[:footnotes][0]
+      assert_equal '<a href="http://github.com">GitHub</a>', footnote1.text
+    end
+
     test 'should increment index of subsequent footnote macros' do
       para = block_from_string("Sentence text footnote:[An example footnote.]. Sentence text footnote:[Another footnote.].")
       assert_equal %(Sentence text <span class="footnote">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>. Sentence text <span class="footnote">[<a id="_footnoteref_2" href="#_footnote_2" title="View footnote." class="footnote">2</a>]</span>.), para.sub_macros(para.buffer.join)
@@ -364,7 +372,7 @@ context 'Substitutions' do
       footnote1 = para.document.references[:footnotes][0]
       assert_equal 1, footnote1.index
       assert footnote1.id.nil?
-      assert "An example footnote.", footnote1.text
+      assert_equal "An example footnote.", footnote1.text
       footnote2 = para.document.references[:footnotes][1]
       assert_equal 2, footnote2.index
       assert footnote2.id.nil?

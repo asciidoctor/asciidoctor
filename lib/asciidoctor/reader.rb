@@ -359,7 +359,7 @@ class Asciidoctor::Reader
       elsif !line.match(REGEXP[:endif_macro])
         while line.match(REGEXP[:attr_conditional])
           value = @document.attributes.has_key?($1) ? $2 : ''
-          line.sub!(conditional_regexp, value)
+          line.sub!(REGEXP[:attr_conditional], value)
         end
         # NOTE leave line comments in as they play a role in flow (such as a list divider)
         @lines << line

@@ -292,174 +292,202 @@ module Asciidoctor
 
       result = text.dup
 
-      # inline images, image:target.ext[Alt]
-      result.gsub!(REGEXP[:image_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
-        target = sub_attributes(m[1])
-        @document.register(:images, target)
-        attrs = parse_attributes(m[2], ['alt', 'width', 'height'])
-        if !attrs.has_key?('alt') || attrs['alt'].empty?
-          attrs['alt'] = File.basename(target, File.extname(target))
-        end
-        Inline.new(self, :image, nil, :target => target, :attributes => attrs).render
-      } unless !result.include?('image:')
+      # some look ahead assertions to cut unnecessary regex calls
+      found = {}
+      found[:square_bracket] = result.include?('[')
+      found[:round_bracket] = result.include?('(')
+      found[:macroish] = (found[:square_bracket] && result.include?(':'))
+      found[:macroish_short_form] = (found[:square_bracket] && result.include?(':['))
+      found[:uri] = result.include?('://')
 
-      result.gsub!(REGEXP[:indexterm_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
+      if found[:macroish] && result.include?('image:')
+        # image:filename.png[Alt Text]
+        result.gsub!(REGEXP[:image_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[0].start_with? '\\'
+            next m[0][1..-1]
+          end
+          target = sub_attributes(m[1])
+          @document.register(:images, target)
+          attrs = parse_attributes(m[2], ['alt', 'width', 'height'])
+          if !attrs.has_key?('alt') || attrs['alt'].empty?
+            attrs['alt'] = File.basename(target, File.extname(target))
+          end
+          Inline.new(self, :image, nil, :target => target, :attributes => attrs).render
+        }
+      end
 
-        terms = (m[1] || m[2]).strip.tr("\n", ' ').gsub('\]', ']').split(REGEXP[:csv_delimiter])
-        document.register(:indexterms, [*terms])
-        Inline.new(self, :indexterm, text, :attributes => {'terms' => terms}).render
-      }
+      if found[:macroish_short_form] || found[:round_bracket]
+        # indexterm:[Tigers,Big cats]
+        # (((Tigers,Big cats)))
+        result.gsub!(REGEXP[:indexterm_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[0].start_with? '\\'
+            next m[0][1..-1]
+          end
 
-      result.gsub!(REGEXP[:indexterm2_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
+          terms = (m[1] || m[2]).strip.tr("\n", ' ').gsub('\]', ']').split(REGEXP[:csv_delimiter])
+          document.register(:indexterms, [*terms])
+          Inline.new(self, :indexterm, text, :attributes => {'terms' => terms}).render
+        }
+      
+        # indexterm2:[Tigers]
+        # ((Tigers))
+        result.gsub!(REGEXP[:indexterm2_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[0].start_with? '\\'
+            next m[0][1..-1]
+          end
 
-        text = (m[1] || m[2]).strip.tr("\n", ' ').gsub('\]', ']')
-        document.register(:indexterms, [text])
-        Inline.new(self, :indexterm, text, :type => :visible).render
-      }
+          text = (m[1] || m[2]).strip.tr("\n", ' ').gsub('\]', ']')
+          document.register(:indexterms, [text])
+          Inline.new(self, :indexterm, text, :type => :visible).render
+        }
+      end
 
-      # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
-      result.gsub!(REGEXP[:link_inline]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[2].start_with? '\\'
-          next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
-        # not a valid macro syntax w/o trailing square brackets
-        # we probably shouldn't even get here...our regex is doing too much
-        elsif m[1] == 'link:' && m[3].nil?
-          next m[0]
-        end
-        prefix = (m[1] != 'link:' ? m[1] : '')
-        target = m[2]
-        # strip the <> around the link
-        if prefix.end_with? '&lt;'
-          prefix = prefix[0..-5]
-        end
-        if target.end_with? '&gt;'
-          target = target[0..-5]
-        end
-        @document.register(:links, target)
-        text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
-        "#{prefix}#{Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render}"
-      } unless !result.include?('http')
+      if found[:uri]
+        # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
+        result.gsub!(REGEXP[:link_inline]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[2].start_with? '\\'
+            next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
+          # not a valid macro syntax w/o trailing square brackets
+          # we probably shouldn't even get here...our regex is doing too much
+          elsif m[1] == 'link:' && m[3].nil?
+            next m[0]
+          end
+          prefix = (m[1] != 'link:' ? m[1] : '')
+          target = m[2]
+          # strip the <> around the link
+          if prefix.end_with? '&lt;'
+            prefix = prefix[0..-5]
+          end
+          if target.end_with? '&gt;'
+            target = target[0..-5]
+          end
+          @document.register(:links, target)
+          text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
+          "#{prefix}#{Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render}"
+        }
+      end
 
-      # inline link macros, link:target[text]
-      result.gsub!(REGEXP[:link_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
-        target = m[1]
-        @document.register(:links, target)
-        text = sub_attributes(m[2].gsub('\]', ']'))
-        Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
-      } unless !result.include?('link:')
+      if found[:macroish] && result.include?('link:')
+        # inline link macros, link:target[text]
+        result.gsub!(REGEXP[:link_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[0].start_with? '\\'
+            next m[0][1..-1]
+          end
+          target = m[1]
+          @document.register(:links, target)
+          text = sub_attributes(m[2].gsub('\]', ']'))
+          Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
+        }
+      end
 
-      result.gsub!(REGEXP[:footnote_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
-        if m[1] == 'footnote'
-          # hmmmm
-          text = restore_passthroughs(m[2])
-          id = nil
-          index = @document.counter('footnote-number')
-          @document.register(:footnotes, Document::Footnote.new(index, id, text))
-          type = nil
-          target = nil
-        else
-          id, text = m[2].split(/ *, */, 2)
-          if !text.nil?
+      if found[:macroish_short_form] && result.include?('footnote')
+        result.gsub!(REGEXP[:footnote_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[0].start_with? '\\'
+            next m[0][1..-1]
+          end
+          if m[1] == 'footnote'
             # hmmmm
-            text = restore_passthroughs(text)
+            text = restore_passthroughs(m[2])
+            id = nil
             index = @document.counter('footnote-number')
             @document.register(:footnotes, Document::Footnote.new(index, id, text))
-            type = :ref
+            type = nil
             target = nil
           else
-            fn = @document.references[:footnotes].find {|fn| fn.id == id }
-            target = id
-            id = nil
-            index = fn.index
-            text = fn.text
-            type = :xref
+            id, text = m[2].split(/ *, */, 2)
+            if !text.nil?
+              # hmmmm
+              text = restore_passthroughs(text)
+              index = @document.counter('footnote-number')
+              @document.register(:footnotes, Document::Footnote.new(index, id, text))
+              type = :ref
+              target = nil
+            else
+              fn = @document.references[:footnotes].find {|fn| fn.id == id }
+              target = id
+              id = nil
+              index = fn.index
+              text = fn.text
+              type = :xref
+            end
           end
-        end
-        Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).render
-      } unless !result.include?('footnote')
+          Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).render
+        }
+      end
 
-      result.gsub!(REGEXP[:xref_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
-        if !m[1].nil?
-          id, reftext = m[1].split(REGEXP[:csv_delimiter], 2)
+      if found[:macroish] || result.include?('&lt;&lt;')
+        result.gsub!(REGEXP[:xref_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[0].start_with? '\\'
+            next m[0][1..-1]
+          end
+          if !m[1].nil?
+            id, reftext = m[1].split(REGEXP[:csv_delimiter], 2)
+            id.sub!(/^("|)(.*)\1$/, '\2')
+            reftext.sub!(/^("|)(.*)\1$/m, '\2') unless reftext.nil?
+          else
+            id = m[2]
+            reftext = !m[3].empty? ? m[3] : nil
+          end
+          Inline.new(self, :anchor, reftext, :type => :xref, :target => id).render
+        }
+      end
+
+      if found[:square_bracket] && result.include?('[[[')
+        result.gsub!(REGEXP[:biblio_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[0].start_with? '\\'
+            next m[0][1..-1]
+          end
+          id = reftext = m[1]
+          Inline.new(self, :anchor, reftext, :type => :bibref, :target => id).render
+        }
+      end
+
+      if found[:square_bracket] && result.include?('[[')
+        result.gsub!(REGEXP[:anchor_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[0].start_with? '\\'
+            next m[0][1..-1]
+          end
+          id, reftext = m[1].split(REGEXP[:csv_delimiter])
           id.sub!(/^("|)(.*)\1$/, '\2')
-          reftext.sub!(/^("|)(.*)\1$/m, '\2') unless reftext.nil?
-        else
-          id = m[2]
-          reftext = !m[3].empty? ? m[3] : nil
-        end
-        Inline.new(self, :anchor, reftext, :type => :xref, :target => id).render
-      }
-
-      result.gsub!(REGEXP[:biblio_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
-        id = reftext = m[1]
-        Inline.new(self, :anchor, reftext, :type => :bibref, :target => id).render
-      } unless !result.include?('[[[')
-
-      result.gsub!(REGEXP[:anchor_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
-        id, reftext = m[1].split(REGEXP[:csv_delimiter])
-        id.sub!(/^("|)(.*)\1$/, '\2')
-        if reftext.nil?
-          reftext = "[#{id}]"
-        else
-          reftext.sub!(/^("|)(.*)\1$/m, '\2')
-        end
-        # NOTE the reftext should also match what's in our references dic
-        if !@document.references[:ids].has_key? id
-          Asciidoctor.debug { "Missing reference for anchor #{id}" }
-        end
-        Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
-      } unless !result.include?('[[')
+          if reftext.nil?
+            reftext = "[#{id}]"
+          else
+            reftext.sub!(/^("|)(.*)\1$/m, '\2')
+          end
+          # NOTE the reftext should also match what's in our references dic
+          if !@document.references[:ids].has_key? id
+            Asciidoctor.debug { "Missing reference for anchor #{id}" }
+          end
+          Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
+        }
+      end
 
       result
     end
