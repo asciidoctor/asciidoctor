@@ -45,6 +45,7 @@ class Asciidoctor::Lexer
   def self.parse(reader, document)
     # process and plow away any attribute lines that proceed the first block so
     # we can get at the document title, if present, then begin parsing blocks
+    reader.skip_blank_lines
     attributes = parse_block_metadata_lines(reader, document)
 
     # by processing the header here, we enforce its position at head of the document  
@@ -1224,6 +1225,7 @@ class Asciidoctor::Lexer
   # returns the Hash of attributes including any metadata found
   def self.parse_block_metadata_lines(reader, parent, attributes = {}, options = {})
     while parse_block_metadata_line(reader, parent, attributes, options)
+      # discard the line just processed
       reader.next_line
       reader.skip_blank_lines
     end
