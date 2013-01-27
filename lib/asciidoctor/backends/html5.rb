@@ -483,6 +483,16 @@ class BlockColistTemplate < ::Asciidoctor::BaseTemplate
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
+  <% if attr? :icons %>
+  <table>
+    <% content.each_with_index do |li, i| %>
+    <tr>
+      <td><img src="<%= icon_uri("callouts/\#{i + 1}") %>" alt="<%= i + 1 %>"></td>
+      <td><%= li.text %></td>
+    </tr> 
+    <% end %>
+  </table>
+  <% else %>
   <ol>
   <% content.each do |li| %>
     <li>
@@ -490,6 +500,7 @@ class BlockColistTemplate < ::Asciidoctor::BaseTemplate
     </li>
   <% end %>
   </ol>
+  <% end %>
 </div>
     EOS
   end
@@ -581,7 +592,7 @@ end
 class InlineCalloutTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<b><%= text %></b>
+<% if attr? :icons %><img src="<%= icon_uri("callouts/\#@text") %>" alt="<%= @text %>"><% else %><b>&lt;<%= @text %>&gt;</b><% end %>
     EOS
   end
 end
