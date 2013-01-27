@@ -39,6 +39,48 @@ paragraph
       assert_css 'p', output, 1
       assert_xpath %(//p[text()="paragraph\n.wrapped line"]), output, 1
     end
+
+    test 'expands index term macros in DocBook backend' do
+      input = <<-EOS
+Here is an index entry for ((tigers)).
+indexterm:[Big cats,Tigers,Siberian Tiger]
+Here is an index entry for indexterm2:[Linux].
+(((Operating Systems,Linux,Fedora)))
+Note that multi-entry terms generate separate index entries.
+      EOS
+
+      output = render_embedded_string input, :attributes => {'backend' => 'docbook45'}
+      assert_xpath '/simpara', output, 1
+      term1 = (xmlnodes_at_xpath '(//indexterm)[1]', output, 1).first
+      assert_equal '<indexterm><primary>tigers</primary></indexterm>', term1.to_s
+      assert term1.next.content.start_with?('tigers')
+
+      term2 = (xmlnodes_at_xpath '(//indexterm)[2]', output, 1).first
+      term2_elements = term2.elements
+      assert_equal 3, term2_elements.size
+      assert_equal '<primary>Big cats</primary>', term2_elements[0].to_s
+      assert_equal '<secondary>Tigers</secondary>', term2_elements[1].to_s
+      assert_equal '<tertiary>Siberian Tiger</tertiary>', term2_elements[2].to_s
+
+      term3 = (xmlnodes_at_xpath '(//indexterm)[3]', output, 1).first
+      term3_elements = term3.elements
+      assert_equal 2, term3_elements.size
+      assert_equal '<primary>Tigers</primary>', term3_elements[0].to_s
+      assert_equal '<secondary>Siberian Tiger</secondary>', term3_elements[1].to_s
+
+      term4 = (xmlnodes_at_xpath '(//indexterm)[4]', output, 1).first
+      term4_elements = term4.elements
+      assert_equal 1, term4_elements.size
+      assert_equal '<primary>Siberian Tiger</primary>', term4_elements[0].to_s
+
+      term5 = (xmlnodes_at_xpath '(//indexterm)[5]', output, 1).first
+      assert_equal '<indexterm><primary>Linux</primary></indexterm>', term5.to_s
+      assert term5.next.content.start_with?('Linux')
+
+      assert_xpath '(//indexterm)[6]/*', output, 3
+      assert_xpath '(//indexterm)[7]/*', output, 2
+      assert_xpath '(//indexterm)[8]/*', output, 1
+    end
   end
 
   context "code" do

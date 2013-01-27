@@ -109,7 +109,8 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       :ids => {},
       :footnotes => [],
       :links => [],
-      :images => []
+      :images => [],
+      :indexterms => []
     }
     @counters = {}
     @callouts = Callouts.new
@@ -259,16 +260,19 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   end
 
   def register(type, value)
-    if type == :ids
+    case type
+    when :ids
       if value.is_a?(Array)
         @references[:ids][value[0]] = (value[1] || '[' + value[0] + ']')
       else
         @references[:ids][value] = '[' + value + ']'
       end
-    elsif type == :footnotes
-      @references[:footnotes] << value
-    elsif @options[:catalog_assets]
+    when :footnotes, :indexterms
       @references[type] << value
+    else
+      if @options[:catalog_assets]
+        @references[type] << value
+      end
     end
   end
 

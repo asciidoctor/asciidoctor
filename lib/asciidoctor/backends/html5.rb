@@ -666,4 +666,13 @@ end
     EOS
   end
 end
+
+class InlineIndextermTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOS
+<% if type == :visible %><%= @text %><% end %>
+    EOS
+  end
+end
+
 end
