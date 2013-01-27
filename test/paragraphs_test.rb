@@ -80,7 +80,7 @@ You're good to go!
       output = render_string("[quote, A famous person, A famous book (1999)]\n____\nFamous quote.\n____")
       assert_xpath '//*[@class = "quoteblock"]', output, 1
       assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
-      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/em[text() = "A famous book (1999)"]', output, 1
+      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "A famous book (1999)"]', output, 1
       # TODO I can't seem to match the attribution (author) w/ xpath
     end
 
