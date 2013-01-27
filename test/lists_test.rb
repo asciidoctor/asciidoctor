@@ -3110,4 +3110,27 @@ Violets are blue <2>
     assert_xpath '(//literallayout/following-sibling::*[1][self::calloutlist]/callout)[1][@arearefs = "CO1-1"]', output, 1
     assert_xpath '(//literallayout/following-sibling::*[1][self::calloutlist]/callout)[2][@arearefs = "CO1-2"]', output, 1
   end
+
+  test 'callout list with icons enabled' do
+    input = <<-EOS
+[source]
+----
+require 'asciidoctor' # <1>
+doc = Asciidoctor::Document.new('Hello, World!') # <2>
+puts doc.render # <3>
+----
+<1> Describe the first line
+<2> Describe the second line
+<3> Describe the third line
+    EOS
+    output = render_embedded_string input, :attributes => {'icons' => ''}
+    assert_css '.listingblock code > img', output, 3
+    (1..3).each do |i|
+      assert_xpath %((/div[@class="listingblock"]//code/img)[#{i}][@src="images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
+    end
+    assert_css '.colist table td img', output, 3
+    (1..3).each do |i|
+      assert_xpath %((/div[@class="colist arabic"]//td/img)[#{i}][@src="images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
+    end
+  end
 end
