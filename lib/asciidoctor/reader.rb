@@ -37,9 +37,6 @@ class Asciidoctor::Reader
       @lines = []
     end
 
-    # just in case we got some nils floating at the end of our lines after reading a funky document
-    @lines.pop until @lines.empty? || !@lines.last.nil?
-
     @source = @lines.join
   end
 

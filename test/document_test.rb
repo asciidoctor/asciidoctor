@@ -212,6 +212,23 @@ preamble
      assert_equal 'Title', doc.first_section.title
     end
 
+    test 'should recognize document title when preceded by blank lines' do
+      input = <<-EOS
+:doctype: book
+
+= Title
+
+preamble
+
+== Section 1
+
+text
+      EOS
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_css '#header h1', output, 1
+      assert_css '#content h1', output, 0
+    end
+     
     test 'test_empty_document' do
       doc = document_from_string('')
       assert doc.blocks.empty?
