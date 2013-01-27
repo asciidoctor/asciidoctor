@@ -487,7 +487,14 @@ module Asciidoctor
     #
     # returns The String with the post replacements rendered using the backend templates
     def sub_post_replacements(text)
-      text.gsub(REGEXP[:line_break]) { Inline.new(self, :break, $1, :type => :line).render }
+      if @document.attr? 'hardbreaks'
+        lines = text.lines.entries
+        return text if lines.size == 1
+        last = lines.pop
+        "#{lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(' +'), :type => :line).render } * "\n"}\n#{last}"
+      else
+        text.gsub(REGEXP[:line_break]) { Inline.new(self, :break, $1, :type => :line).render }
+      end
     end
 
     # Internal: Transform (render) a quoted text region

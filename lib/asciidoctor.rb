@@ -139,7 +139,7 @@ module Asciidoctor
   # Pattern:
   # (?:\[((?:\\\]|[^\]])*?)\])
   # Matches:
-  # [enclosed text here] or [enclosed text here]
+  # [enclosed text here] or [enclosed [text\] here]
   REGEXP = {
     # [[Foo]]
     :anchor           => /^\[\[([^\[\]]+)\]\]\s*$/,
