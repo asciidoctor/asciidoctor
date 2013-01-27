@@ -331,6 +331,75 @@ context 'Substitutions' do
       para = block_from_string('image:tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]')
       assert_equal %{<span class="image">\n  <a class="image" href="http://en.wikipedia.org/wiki/Tiger"><img src="tiger.png" alt="Tiger"></a>\n</span>}, para.sub_macros(para.buffer.join)
     end
+
+    test 'a single-line footnote macro should be registered and rendered as a footnote' do
+      para = block_from_string('Sentence text footnote:[An example footnote.].')
+      assert_equal %(Sentence text <span class="footnote">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>.), para.sub_macros(para.buffer.join)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote = para.document.references[:footnotes].first
+      assert_equal 1, footnote.index
+      assert footnote.id.nil?
+      assert_equal 'An example footnote.', footnote.text
+    end
+
+    test 'a multi-line footnote macro should be registered and rendered as a footnote' do
+      para = block_from_string("Sentence text footnote:[An example footnote\nwith wrapped text.].")
+      assert_equal %(Sentence text <span class="footnote">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>.), para.sub_macros(para.buffer.join)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote = para.document.references[:footnotes].first
+      assert_equal 1, footnote.index
+      assert footnote.id.nil?
+      assert_equal "An example footnote\nwith wrapped text.", footnote.text
+    end
+
+    test 'a footnote macro can be directly adjacent to preceding word' do
+      para = block_from_string('Sentence textfootnote:[An example footnote.].')
+      assert_equal %(Sentence text<span class="footnote">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>.), para.sub_macros(para.buffer.join)
+    end
+
+    test 'should increment index of subsequent footnote macros' do
+      para = block_from_string("Sentence text footnote:[An example footnote.]. Sentence text footnote:[Another footnote.].")
+      assert_equal %(Sentence text <span class="footnote">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>. Sentence text <span class="footnote">[<a id="_footnoteref_2" href="#_footnote_2" title="View footnote." class="footnote">2</a>]</span>.), para.sub_macros(para.buffer.join)
+      assert_equal 2, para.document.references[:footnotes].size
+      footnote1 = para.document.references[:footnotes][0]
+      assert_equal 1, footnote1.index
+      assert footnote1.id.nil?
+      assert "An example footnote.", footnote1.text
+      footnote2 = para.document.references[:footnotes][1]
+      assert_equal 2, footnote2.index
+      assert footnote2.id.nil?
+      assert_equal "Another footnote.", footnote2.text
+    end
+
+    test 'a footnoteref macro with id and single-line text should be registered and rendered as a footnote' do
+      para = block_from_string('Sentence text footnoteref:[ex1, An example footnote.].')
+      assert_equal %(Sentence text <span class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>.), para.sub_macros(para.buffer.join)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote = para.document.references[:footnotes].first
+      assert_equal 1, footnote.index
+      assert_equal 'ex1', footnote.id
+      assert_equal 'An example footnote.', footnote.text
+    end
+
+    test 'a footnoteref macro with id and multi-line text should be registered and rendered as a footnote' do
+      para = block_from_string("Sentence text footnoteref:[ex1, An example footnote\nwith wrapped text.].")
+      assert_equal %(Sentence text <span class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>.), para.sub_macros(para.buffer.join)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote = para.document.references[:footnotes].first
+      assert_equal 1, footnote.index
+      assert_equal 'ex1', footnote.id
+      assert_equal "An example footnote\nwith wrapped text.", footnote.text
+    end
+
+    test 'a footnoteref macro with id should refer to footnoteref with same id' do
+      para = block_from_string('Sentence text footnoteref:[ex1, An example footnote.]. Sentence text footnoteref:[ex1].')
+      assert_equal %(Sentence text <span class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>. Sentence text <span class="footnoteref">[<a href="#_footnote_1" title="View footnote." class="footnote">1</a>]</span>.), para.sub_macros(para.buffer.join)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote = para.document.references[:footnotes].first
+      assert_equal 1, footnote.index
+      assert_equal 'ex1', footnote.id
+      assert_equal 'An example footnote.', footnote.text
+    end
   end
 
   context 'Passthroughs' do
