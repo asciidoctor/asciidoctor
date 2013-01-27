@@ -209,6 +209,16 @@ context "Lexer" do
     assert_equal 'TB', metadata['authorinitials']
   end
 
+  test "test_parse_author_with_single_quote" do
+    metadata, = parse_header_metadata 'Stephen O\'Grady <founder@redmonk.com>'
+    assert_equal 5, metadata.size
+    assert_equal 'Stephen O\'Grady', metadata['author']
+    assert_equal 'Stephen', metadata['firstname']
+    assert_equal 'O\'Grady', metadata['lastname']
+    assert_equal 'founder@redmonk.com', metadata['email']
+    assert_equal 'SO', metadata['authorinitials']
+  end
+
   test "test_parse_author_with_underscore" do
     metadata, = parse_header_metadata 'Tim_E Fella'
     assert_equal 4, metadata.size

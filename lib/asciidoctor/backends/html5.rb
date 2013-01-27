@@ -1,8 +1,13 @@
 class Asciidoctor::BaseTemplate
 
   # create template matter to insert a style class from the role attribute if specified
-  def style_class
+  def role_class
     attrvalue(:role)
+  end
+
+  # create template matter to insert a style class from the style attribute if specified
+  def style_class(sibling = true)
+    attrvalue(:style, sibling)
   end
 end
 
@@ -24,7 +29,7 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
       end
       toc_level << "#{indent}<ol>\n" if nested
       sections.each do |section|
-        toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{section.level > 0 ? section.sectnum('.', '. ') : ''}#{section.title}</a></li>\n"
+        toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{!section.special && section.level > 0 ? "#{section.sectnum} " : ''}#{section.attr('caption')}#{section.title}</a></li>\n"
         if section.level < to_depth && (child_toc_level = render_outline(section, to_depth))
           if section.document.doctype != 'book' || section.level > 0
             toc_level << "#{indent}  <li>\n#{child_toc_level}\n#{indent}  </li>\n"
@@ -110,9 +115,20 @@ pre code { background-color: #F8F8F8; padding: 0; }
     <div id="content">
 <%= content %>
     </div>
+    <% if !@references[:footnotes].empty? %>
+    <div id="footnotes">
+      <hr>
+      <% @references[:footnotes].each do |fn| %>
+      <div class="footnote" id="_footnote_<%= fn.index %>">
+        <a href="#_footnoteref_<%= fn.index %>"><%= fn.index %></a>. <%= fn.text %>
+      </div>
+      <% end %>
+    </div>
+    <% end %>
     <div id="footer">
       <div id="footer-text">
-        Last updated <%= attr :localdatetime %>
+        <% if attr? :revnumber %>Version <%= attr :revnumber %><br><% end %>
+        Last updated <%= attr :docdatetime %>
       </div>
     </div>
   </body>
@@ -151,8 +167,8 @@ class SectionTemplate < ::Asciidoctor::BaseTemplate
 <h1#{id}><%= title %></h1>
 <%= content %>
 <% else %>
-<div class="sect<%= @level %>#{style_class}">
-  <h<%= @level + 1 %>#{id}><% if attr? :numbered %><%= sectnum %> <% end %><%= title %></h<%= @level + 1 %>>
+<div class="sect<%= @level %>#{role_class}">
+  <h<%= @level + 1 %>#{id}><% if !@special && (attr? :numbered) %><%= sectnum %> <% end %><%= attr :caption %><%= title %></h<%= @level + 1 %>>
   <% if @level == 1 %>
   <div class="sectionbody">
 <%= content %>
@@ -169,7 +185,7 @@ end
 class BlockFloatingTitleTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<h<%= @level + 1 %>#{id} class="#{attrvalue :style, false}#{style_class}"><%= title %></h<%= @level + 1 %>>
+<h<%= @level + 1 %>#{id} class="#{style_class false}#{role_class}"><%= title %></h<%= @level + 1 %>>
     EOS
   end
 end
@@ -178,13 +194,35 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="dlist#{style_class}">
+<% if (attr :style) == 'qanda' %>
+<div#{id} class="qlist#{style_class}#{role_class}">
+  <% if title? %>
+  <div class="title"><%= title %></div>
+  <% end %>
+  <ol>
+  <% content.each do |dt, dd| %>
+    <li>
+      <p><em><%= dt.text %></em></p>
+      <% unless dd.nil? %>
+      <% if dd.text? %>
+      <p><%= dd.text %></p>
+      <% end %>
+      <% if dd.blocks? %>
+<%= dd.content %>
+      <% end %>
+      <% end %>
+    </li>
+  <% end %>
+  </ol>
+</div>
+<% else %>
+<div#{id} class="dlist#{style_class}#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
   <dl>
     <% content.each do |dt, dd| %>
-    <dt class="hdlist1">
+    <dt<% if !(attr? :style) %> class="hdlist1"<% end %>>
       <%= dt.text %>
     </dt>
     <% unless dd.nil? %>
@@ -200,6 +238,7 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
     <% end %>
   </dl>
 </div>
+<% end %>
     EOS
   end
 end
@@ -208,7 +247,7 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="listingblock#{style_class}">
+<div#{id} class="listingblock#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -228,7 +267,7 @@ class BlockLiteralTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="literalblock#{style_class}">
+<div#{id} class="literalblock#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -244,7 +283,7 @@ class BlockAdmonitionTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="admonitionblock#{style_class}">
+<div#{id} class="admonitionblock#{role_class}">
   <table>
     <tr>
       <td class="icon">
@@ -271,7 +310,7 @@ class BlockParagraphTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="paragraph#{style_class}">
+<div#{id} class="paragraph#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -285,7 +324,7 @@ class BlockSidebarTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="sidebarblock#{style_class}">
+<div#{id} class="sidebarblock#{role_class}">
   <div class="content">
     <% if title? %>
     <div class="title"><%= title %></div>
@@ -301,7 +340,7 @@ class BlockExampleTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="exampleblock#{style_class}">
+<div#{id} class="exampleblock#{role_class}">
   <% if title? %>
   <div class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></div>
   <% end %>
@@ -317,7 +356,7 @@ class BlockOpenTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="openblock#{style_class}">
+<div#{id} class="openblock#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -342,7 +381,7 @@ class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="quoteblock#{style_class}">
+<div#{id} class="quoteblock#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -369,7 +408,7 @@ class BlockVerseTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="verseblock#{style_class}">
+<div#{id} class="verseblock#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -394,7 +433,7 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="ulist#{attrvalue(:style)}#{style_class}">
+<div#{id} class="ulist#{style_class}#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -417,7 +456,7 @@ class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="olist <%= attr :style %>#{style_class}">
+<div#{id} class="olist#{style_class}#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -440,7 +479,7 @@ class BlockColistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="colist <%= attr :style %>#{style_class}">
+<div#{id} class="colist#{style_class}#{role_class}">
   <% if title? %>
   <div class="title"><%= title %></div>
   <% end %>
@@ -460,7 +499,7 @@ class BlockTableTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<table#{id} class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%>#{style_class}" style="<%
+<table#{id} class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%>#{role_class}" style="<%
 if !(attr? 'autowidth-option') %>width: <%= attr :tablepcwidth %>%; <% end %><%
 if attr? :float %>float: <%= attr :float %>; <% end %>">
   <% if title? %>
@@ -507,7 +546,7 @@ class BlockImageTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%>
-<div#{id} class="imageblock#{style_class}">
+<div#{id} class="imageblock#{role_class}">
   <div class="content">
     <% if attr :link %>
     <a class="image" href="<%= attr :link %>"><img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}></a>
@@ -578,6 +617,8 @@ if type == :xref
 %><a href="#<%= @target %>"><%= @text || @document.references[:ids].fetch(@target, '[' + @target + ']') %></a><%
 elsif @type == :ref
 %><a id="<%= @target %>"></a><%
+elsif @type == :bibref
+%><a id="<%= @target %>"></a>[<%= @target %>]<%
 else
 %><a href="<%= @target %>"><%= @text %></a><%
 end
@@ -590,13 +631,27 @@ class InlineImageTemplate < ::Asciidoctor::BaseTemplate
   def template
     # care is taken here to avoid a space inside the optional <a> tag
     @template ||= @eruby.new <<-EOS
-<span class="image#{style_class}">
+<span class="image#{role_class}">
   <%
   if attr :link %><a class="image" href="<%= attr :link %>"><%
   end %><img src="<%= image_uri(target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
   if attr :link%></a><% end
   %>
 </span>
+    EOS
+  end
+end
+
+class InlineFootnoteTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOS
+<%
+if type == :xref
+%><span class="footnoteref">[<a href="#_footnote_<%= attr :index %>" title="View footnote." class="footnote"><%= attr :index %></a>]</span><%
+else
+%><span class="footnote"<% if @id %> id="_footnote_<%= @id %>"<% end %>>[<a id="_footnoteref_<%= attr :index %>" href="#_footnote_<%= attr :index %>" title="View footnote." class="footnote"><%= attr :index %></a>]</span><%
+end
+%>
     EOS
   end
 end

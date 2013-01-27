@@ -349,6 +349,42 @@ module Asciidoctor
         Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
       } unless !result.include?('link:')
 
+      result.gsub!(REGEXP[:footnote_macro]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        # honor the escape
+        if m[0].start_with? '\\'
+          next m[0][1..-1]
+        end
+        if m[1] == 'footnote'
+          # hmmmm
+          text = restore_passthroughs(m[2])
+          id = nil
+          index = @document.counter('footnote-number')
+          @document.register(:footnotes, Document::Footnote.new(index, id, text))
+          type = nil
+          target = nil
+        else
+          id, text = m[2].split(/ *, */, 2)
+          if !text.nil?
+            # hmmmm
+            text = restore_passthroughs(text)
+            index = @document.counter('footnote-number')
+            @document.register(:footnotes, Document::Footnote.new(index, id, text))
+            type = :ref
+            target = nil
+          else
+            fn = @document.references[:footnotes].find {|fn| fn.id == id }
+            target = id
+            id = nil
+            index = fn.index
+            text = fn.text
+            type = :xref
+          end
+        end
+        Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).render
+      } unless !result.include?('footnote')
+
       result.gsub!(REGEXP[:xref_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -366,6 +402,17 @@ module Asciidoctor
         end
         Inline.new(self, :anchor, reftext, :type => :xref, :target => id).render
       }
+
+      result.gsub!(REGEXP[:biblio_macro]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        # honor the escape
+        if m[0].start_with? '\\'
+          next m[0][1..-1]
+        end
+        id = reftext = m[1]
+        Inline.new(self, :anchor, reftext, :type => :bibref, :target => id).render
+      } unless !result.include?('[[[')
 
       result.gsub!(REGEXP[:anchor_macro]) {
         # alias match for Ruby 1.8.7 compat

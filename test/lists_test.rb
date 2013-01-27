@@ -879,7 +879,7 @@ paragraph for list item 1
       assert_xpath '((//ol/li)[1]/*)[3]/self::div[@class="paragraph"]', output, 1
     end
 
-    test 'wip trailing list continuations should attach to list items of different types at respective levels' do
+    test 'trailing list continuations should attach to list items of different types at respective levels' do
       input = <<-EOS
 == Lists
 
@@ -1819,6 +1819,55 @@ detail1
       assert_xpath '//dl//dl/dt/following-sibling::dd/p[text() = "detail1"]', output, 1
     end
   end
+
+  context 'Special lists' do
+    test 'should render glossary list with proper semantics' do
+      input = <<-EOS
+[glossary]
+term 1:: def 1
+term 2:: def 2
+      EOS
+      output = render_embedded_string input
+      assert_css '.dlist.glossary', output, 1
+      assert_css '.dlist dt:not([class])', output, 2
+    end
+
+    test 'should render qanda list with proper semantics' do
+      input = <<-EOS
+[qanda]
+Question one::
+        Answer one.
+Question two::
+        Answer two.
+      EOS
+      output = render_embedded_string input
+      assert_css '.qlist.qanda', output, 1
+      assert_css '.qlist ol', output, 1
+      assert_css '.qlist ol li', output, 2
+      assert_css '.qlist ol li:nth-child(1) p em', output, 1
+      assert_css '.qlist ol li:nth-child(1) p', output, 2
+    end
+
+    test 'should render bibliography list with proper semantics' do
+      input = <<-EOS
+[bibliography]
+- [[[taoup]]] Eric Steven Raymond. 'The Art of Unix
+  Programming'. Addison-Wesley. ISBN 0-13-142901-9.
+- [[[walsh-muellner]]] Norman Walsh & Leonard Muellner.
+  'DocBook - The Definitive Guide'. O'Reilly & Associates. 1999.
+  ISBN 1-56592-580-7.
+      EOS
+      output = render_embedded_string input
+      assert_css '.ulist.bibliography', output, 1
+      assert_css '.ulist.bibliography ul', output, 1
+      assert_css '.ulist.bibliography ul li', output, 2
+      assert_css '.ulist.bibliography ul li p', output, 2
+      assert_css '.ulist.bibliography ul li:nth-child(1) p a#taoup', output, 1
+      assert_xpath '//a/*', output, 0
+      text = xmlnodes_at_xpath '(//a)[1]/following-sibling::text()', output, 1
+      assert text.text.start_with?('[taoup] ')
+    end
+  end
 end
 
 context 'Labeled lists redux' do
@@ -2484,8 +2533,7 @@ continued
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
-      # NOTE the extra endline is added as a result of whitespace in the ERB template
-      assert_xpath %(//*[@class="dlist"]//dd/p[text()="def1\ncontinued\n\ncontinued"]), output, 1
+      assert_xpath %(//*[@class="dlist"]//dd/p[text()="def1\ncontinued\ncontinued"]), output, 1
     end
   
     test 'folds text from inline definition and line following comment line' do

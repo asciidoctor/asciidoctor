@@ -22,6 +22,12 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # Public: Get/Set the Integer index of this section within the parent block
   attr_accessor :index
 
+  # Public: Get/Set the section name of this section
+  attr_accessor :sectname
+
+  # Public: Get/Set the flag to indicate whether this is a special section or a child of one
+  attr_accessor :special
+
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
@@ -29,6 +35,11 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
     super(parent, :section)
     if level.nil? && !parent.nil?
       @level = parent.level + 1
+    end
+    if parent.is_a?(::Asciidoctor::Section) && parent.special
+      @special = true
+    else
+      @special = false
     end
     @index = 0
   end

@@ -419,6 +419,120 @@ paragraph
     end
   end
 
+  context 'Special sections' do
+    test 'should assign sectname and caption to appendix section' do
+      input = <<-EOS
+[appendix]
+== Attribute Options
+
+Details
+      EOS
+
+      output = block_from_string input
+      assert_equal 'appendix', output.sectname
+      assert_equal 'Appendix A: ', output.attr('caption')
+    end
+
+    test 'should render appendix title prefixed with caption' do
+      input = <<-EOS
+[appendix]
+== Attribute Options
+
+Details
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
+    end
+
+    test 'should increment appendix number for each appendix section' do
+      input = <<-EOS
+[appendix]
+== Attribute Options
+
+Details
+
+[appendix]
+== Migration
+
+Details
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '(//h2)[1][text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '(//h2)[2][text()="Appendix B: Migration"]', output, 1
+    end
+
+    test 'should not number special sections or subsections' do
+      input = <<-EOS
+:numbered:
+
+== Section One
+
+[appendix]
+== Attribute Options
+
+Details
+
+[appendix]
+== Migration
+
+Details
+
+=== Gotchas
+
+Details
+
+[glossary]
+== Glossary
+
+Terms
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '(//h2)[1][text()="1. Section One"]', output, 1
+      assert_xpath '(//h2)[2][text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '(//h2)[3][text()="Appendix B: Migration"]', output, 1
+      assert_xpath '(//h3)[1][text()="Gotchas"]', output, 1
+      assert_xpath '(//h2)[4][text()="Glossary"]', output, 1
+    end
+
+    test 'should not number special sections or subsections in toc' do
+      input = <<-EOS
+:numbered:
+:toc:
+
+== Section One
+
+[appendix]
+== Attribute Options
+
+Details
+
+[appendix]
+== Migration
+
+Details
+
+=== Gotchas
+
+Details
+
+[glossary]
+== Glossary
+
+Terms
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="1. Section One"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="Appendix B: Migration"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="Gotchas"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="Glossary"]', output, 1
+    end
+  end
+
   context "heading patterns in blocks" do
     test "should not interpret a listing block as a heading" do
       input = <<-EOS

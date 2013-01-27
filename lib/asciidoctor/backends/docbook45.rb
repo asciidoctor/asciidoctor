@@ -113,10 +113,10 @@ class SectionTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%>
-<<%= document.doctype == 'book' && @level <= 1 ? 'chapter' : 'section' %>#{id}#{role}#{xreflabel}>
+<<%= @special ? @sectname : (document.doctype == 'book' && @level <= 1 ? 'chapter' : 'section') %>#{id}#{role}#{xreflabel}>
   #{title}
 <%= content %>
-</<%= document.doctype == 'book' && @level <= 1 ? 'chapter' : 'section' %>>
+</<%= @special ? @sectname : (document.doctype == 'book' && @level <= 1 ? 'chapter' : 'section') %>>
     EOF
   end
 end
@@ -166,6 +166,19 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%>
+<% if (attr :style) == 'bibliography' %>
+<bibliodiv#{id}#{role}#{xreflabel}>
+  #{title}
+  <% content.each do |li| %>
+    <bibliomixed>
+      <bibliomisc><%= li.text %></bibliomisc>
+      <% if li.blocks? %>
+<%= li.content %>
+      <% end %>
+    </bibliomixed>
+  <% end %>
+</bibliodiv>
+<% else %>
 <itemizedlist#{id}#{role}#{xreflabel}>
   #{title}
   <% content.each do |li| %>
@@ -177,6 +190,7 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
     </listitem>
   <% end %>
 </itemizedlist>
+<% end %>
     EOF
   end
 end
@@ -220,29 +234,51 @@ class BlockColistTemplate < ::Asciidoctor::BaseTemplate
 end
 
 class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
+  LIST_TAGS = {
+    'labeled' => {
+      :list => 'variablelist',
+      :entry => 'varlistentry',
+      :term => 'term',
+      :item => 'listitem'
+    },
+    'qanda' => {
+      :list => 'qandaset',
+      :entry => 'qandaentry',
+      :term => 'question',
+      :item => 'answer'
+    },
+    'glossary' => {
+      :list => nil,
+      :entry => 'glossentry',
+      :term => 'glossterm',
+      :item => 'glossdef'
+    }
+  }
+
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%>
-<variablelist#{id}#{role}#{xreflabel}>
+<% tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled']) %>
+<% if tags[:list] %><<%= tags[:list] %>#{id}#{role}#{xreflabel}><% end %>
   #{title}
   <% content.each do |dt, dd| %>
-  <varlistentry>
-    <term>
+  <<%= tags[:entry] %>>
+    <<%= tags[:term] %>>
       <%= dt.text %>
-    </term>
+    </<%= tags[:term] %>>
     <% unless dd.nil? %>
-    <listitem>
+    <<%= tags[:item] %>>
       <% if dd.text? %>
       <simpara><%= dd.text %></simpara>
       <% end %>
       <% if dd.blocks? %>
 <%= dd.content %>
       <% end %>
-    </listitem>
+    </<%= tags[:item] %>>
     <% end %>
-  </varlistentry>
+  </<%= tags[:entry] %>>
   <% end %>
-</variablelist>
+<% if tags[:list] %></<%= tags[:list] %>><% end %>
     EOF
   end
 end
@@ -489,6 +525,8 @@ class InlineAnchorTemplate < ::Asciidoctor::BaseTemplate
   end %><%
 elsif @type == :ref
 %><anchor id="<%= @target %>" xreflabel="<%= @text %>"/><%
+elsif @type == :bibref
+%><anchor id="<%= @target %>" xreflabel="[<%= @target %>]"/>[<%= @target %>]<%
 else
 %><ulink url="<%= @target %>"><%= @text %></ulink><%
 end %>
@@ -506,6 +544,20 @@ class InlineImageTemplate < ::Asciidoctor::BaseTemplate
   <textobject><phrase><%= attr :alt %></phrase></textobject>
 </inlinemediaobject>
     EOF
+  end
+end
+
+class InlineFootnoteTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOS
+<%
+if type == :xref
+%><footnoteref linkend="<%= @target %>"/><%
+else
+%><footnote#{id}><simpara><%= @text %></simpara></footnote><%
+end
+%>
+    EOS
   end
 end
 
