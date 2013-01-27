@@ -496,7 +496,7 @@ image::dot.gif[Dot]
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = render_string input
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
       assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="images/icons/tip.png"][@alt="Tip"]', output, 1
     end
 
@@ -509,7 +509,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = render_string input
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
       assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="icons/tip.png"][@alt="Tip"]', output, 1
     end
 
@@ -539,7 +539,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = render_string input
+      output = render_string input, :attributes => {'icons' => ''}
       assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="fixtures/tip.gif"][@alt="Tip"]', output, 1
     end
 
