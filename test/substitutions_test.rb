@@ -400,6 +400,151 @@ context 'Substitutions' do
       assert_equal 'ex1', footnote.id
       assert_equal 'An example footnote.', footnote.text
     end
+
+    test 'a single-line index term macro with a primary term should be registered as an index reference' do
+      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      macros = ['indexterm:[Tigers]', '(((Tigers)))']
+      macros.each do |macro|
+        para = block_from_string("#{sentence}#{macro}")
+        output = para.sub_macros(para.buffer.join)
+        assert_equal sentence, output
+        assert_equal 1, para.document.references[:indexterms].size
+        assert_equal ['Tigers'], para.document.references[:indexterms].first
+      end
+    end
+
+    test 'a single-line primary index term macro with primary and secondary terms should be registered as an index reference' do
+      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      macros = ['indexterm:[Big cats, Tigers]', '(((Big cats, Tigers)))']
+      macros.each do |macro|
+        para = block_from_string("#{sentence}#{macro}")
+        output = para.sub_macros(para.buffer.join)
+        assert_equal sentence, output
+        assert_equal 1, para.document.references[:indexterms].size
+        assert_equal ['Big cats', 'Tigers'], para.document.references[:indexterms].first
+      end
+    end
+
+    test 'a single-line primary index term macro with primary, secondary and tertiary terms should be registered as an index reference' do
+      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      macros = ['indexterm:[Big cats,Tigers , Panthera tigris]', '(((Big cats,Tigers , Panthera tigris)))']
+      macros.each do |macro|
+        para = block_from_string("#{sentence}#{macro}")
+        output = para.sub_macros(para.buffer.join)
+        assert_equal sentence, output
+        assert_equal 1, para.document.references[:indexterms].size
+        assert_equal ['Big cats', 'Tigers', 'Panthera tigris'], para.document.references[:indexterms].first
+      end
+    end
+
+    test 'a multi-line index term macro should be compacted and registered as an index reference' do
+      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      macros = ["indexterm:[Panthera\ntigris]", "(((Panthera\ntigris)))"]
+      macros.each do |macro|
+        para = block_from_string("#{sentence}#{macro}")
+        output = para.sub_macros(para.buffer.join)
+        assert_equal sentence, output
+        assert_equal 1, para.document.references[:indexterms].size
+        assert_equal ['Panthera tigris'], para.document.references[:indexterms].first
+      end
+    end
+
+    test 'normal substitutions are performed on an index term macro' do
+      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      macros = ['indexterm:[*Tigers*]', '(((*Tigers*)))']
+      macros.each do |macro|
+        para = block_from_string("#{sentence}#{macro}")
+        output = para.apply_normal_subs(para.buffer)
+        assert_equal sentence, output
+        assert_equal 1, para.document.references[:indexterms].size
+        assert_equal ['<strong>Tigers</strong>'], para.document.references[:indexterms].first
+      end
+    end
+
+    test 'registers multiple index term macros' do
+      sentence = "The tiger (Panthera tigris) is the largest cat species."
+      macros = "(((Tigers)))\n(((Animals,Cats)))"
+      para = block_from_string("#{sentence}\n#{macros}")
+      output = para.sub_macros(para.buffer.join)
+      assert_equal sentence, output.rstrip
+      assert_equal 2, para.document.references[:indexterms].size
+      assert_equal ['Tigers'], para.document.references[:indexterms][0]
+      assert_equal ['Animals', 'Cats'], para.document.references[:indexterms][1]
+    end
+
+    test 'an index term macro with round bracket syntax may contain round brackets in term' do
+      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      macro = '(((Tiger (Panthera tigris))))'
+      para = block_from_string("#{sentence}#{macro}")
+      output = para.sub_macros(para.buffer.join)
+      assert_equal sentence, output
+      assert_equal 1, para.document.references[:indexterms].size
+      assert_equal ['Tiger (Panthera tigris)'], para.document.references[:indexterms].first
+    end
+
+    test 'an index term macro with square bracket syntax may contain square brackets in term' do
+      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      macro = 'indexterm:[Tiger [Panthera tigris\\]]'
+      para = block_from_string("#{sentence}#{macro}")
+      output = para.sub_macros(para.buffer.join)
+      assert_equal sentence, output
+      assert_equal 1, para.document.references[:indexterms].size
+      assert_equal ['Tiger [Panthera tigris]'], para.document.references[:indexterms].first
+    end
+
+    test 'a single-line index term 2 macro should be registered as an index reference and retain term inline' do
+      sentence = 'The tiger (Panthera tigris) is the largest cat species.'
+      macros = ['The indexterm2:[tiger] (Panthera tigris) is the largest cat species.', 'The ((tiger)) (Panthera tigris) is the largest cat species.']
+      macros.each do |macro|
+        para = block_from_string(macro)
+        output = para.sub_macros(para.buffer.join)
+        assert_equal sentence, output
+        assert_equal 1, para.document.references[:indexterms].size
+        assert_equal ['tiger'], para.document.references[:indexterms].first
+      end
+    end
+
+    test 'a multi-line index term 2 macro should be compacted and registered as an index reference and retain term inline' do
+      sentence = 'The panthera tigris is the largest cat species.'
+      macros = ["The indexterm2:[ panthera\ntigris ] is the largest cat species.", "The (( panthera\ntigris )) is the largest cat species."]
+      macros.each do |macro|
+        para = block_from_string(macro)
+        output = para.sub_macros(para.buffer.join)
+        assert_equal sentence, output
+        assert_equal 1, para.document.references[:indexterms].size
+        assert_equal ['panthera tigris'], para.document.references[:indexterms].first
+      end
+    end
+
+    test 'registers multiple index term 2 macros' do
+      sentence = "The ((tiger)) (Panthera tigris) is the largest ((cat)) species."
+      para = block_from_string(sentence)
+      output = para.sub_macros(para.buffer.join)
+      assert_equal 'The tiger (Panthera tigris) is the largest cat species.', output
+      assert_equal 2, para.document.references[:indexterms].size
+      assert_equal ['tiger'], para.document.references[:indexterms][0]
+      assert_equal ['cat'], para.document.references[:indexterms][1]
+    end
+
+    test 'normal substitutions are performed on an index term 2 macro' do
+      sentence = 'The ((*tiger*)) (Panthera tigris) is the largest cat species.'
+      para = block_from_string sentence
+      output = para.apply_normal_subs(para.buffer)
+      assert_equal 'The <strong>tiger</strong> (Panthera tigris) is the largest cat species.', output
+      assert_equal 1, para.document.references[:indexterms].size
+      assert_equal ['<strong>tiger</strong>'], para.document.references[:indexterms].first
+    end
+
+    test 'index term 2 macro with round bracket syntex should not interfer with index term macro with round bracket syntax' do
+      sentence = "The ((panthera tigris)) is the largest cat species.\n(((Big cats,Tigers)))"
+      para = block_from_string sentence
+      output = para.sub_macros(para.buffer.join)
+      assert_equal "The panthera tigris is the largest cat species.\n", output
+      terms = para.document.references[:indexterms]
+      assert_equal 2, terms.size
+      assert_equal ['Big cats', 'Tigers'], terms[0]
+      assert_equal ['panthera tigris'], terms[1]
+    end
   end
 
   context 'Passthroughs' do

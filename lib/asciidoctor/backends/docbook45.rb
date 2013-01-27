@@ -568,4 +568,23 @@ class InlineCalloutTemplate < ::Asciidoctor::BaseTemplate
     EOF
   end
 end
+
+class InlineIndextermTemplate < ::Asciidoctor::BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOS
+<% if type == :visible %><indexterm><primary><%= @text %></primary></indexterm><%= @text %><%
+else %><% terms = (attr :terms); numterms = terms.size %><%
+if numterms > 2 %><indexterm>
+  <primary><%= terms[0] %></primary><secondary><%= terms[1] %></secondary><tertiary><%= terms[2] %></tertiary>
+</indexterm>
+<% end %><%
+if numterms > 1 %><indexterm>
+  <primary><%= terms[numterms - 2] %></primary><secondary><%= terms[numterms - 1] %></secondary>
+</indexterm>
+<% end %><indexterm>
+  <primary><%= terms[numterms - 1] %></primary>
+</indexterm><% end %>
+    EOS
+  end
+end
 end

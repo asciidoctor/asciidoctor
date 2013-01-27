@@ -309,6 +309,32 @@ module Asciidoctor
         Inline.new(self, :image, nil, :target => target, :attributes => attrs).render
       } unless !result.include?('image:')
 
+      result.gsub!(REGEXP[:indexterm_macro]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        # honor the escape
+        if m[0].start_with? '\\'
+          next m[0][1..-1]
+        end
+
+        terms = (m[1] || m[2]).strip.tr("\n", ' ').gsub('\]', ']').split(REGEXP[:csv_delimiter])
+        document.register(:indexterms, [*terms])
+        Inline.new(self, :indexterm, text, :attributes => {'terms' => terms}).render
+      }
+
+      result.gsub!(REGEXP[:indexterm2_macro]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        # honor the escape
+        if m[0].start_with? '\\'
+          next m[0][1..-1]
+        end
+
+        text = (m[1] || m[2]).strip.tr("\n", ' ').gsub('\]', ']')
+        document.register(:indexterms, [text])
+        Inline.new(self, :indexterm, text, :type => :visible).render
+      }
+
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
       result.gsub!(REGEXP[:link_inline]) {
         # alias match for Ruby 1.8.7 compat
@@ -393,7 +419,7 @@ module Asciidoctor
           next m[0][1..-1]
         end
         if !m[1].nil?
-          id, reftext = m[1].split(/ *, */, 2)
+          id, reftext = m[1].split(REGEXP[:csv_delimiter], 2)
           id.sub!(/^("|)(.*)\1$/, '\2')
           reftext.sub!(/^("|)(.*)\1$/m, '\2') unless reftext.nil?
         else
@@ -421,7 +447,7 @@ module Asciidoctor
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        id, reftext = m[1].split(/ *, */)
+        id, reftext = m[1].split(REGEXP[:csv_delimiter])
         id.sub!(/^("|)(.*)\1$/, '\2')
         if reftext.nil?
           reftext = "[#{id}]"

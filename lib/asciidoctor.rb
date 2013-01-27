@@ -133,6 +133,13 @@ module Asciidoctor
 
   LINE_FEED_ENTITY = '&#10;' # or &#x0A;
 
+  # The following pattern, which appears frequently, captures the contents between square brackets,
+  # ignoring escaped closing brackets (closing brackets prefixed with a backslash '\' character)
+  #
+  # Pattern:
+  # (?:\[((?:\\\]|[^\]])*?)\])
+  # Matches:
+  # [enclosed text here] or [enclosed text here]
   REGEXP = {
     # [[Foo]]
     :anchor           => /^\[\[([^\[\]]+)\]\]\s*$/,
@@ -211,6 +218,11 @@ module Asciidoctor
     # // (and then whatever)
     :comment          => %r{^//([^/].*|)$},
 
+    # one,two
+    # one, two
+    # one , two
+    :csv_delimiter    => /[[:space:]]*,[[:space:]]*/,
+
     # 29
     :digits           => /^\d+$/,
 
@@ -243,6 +255,14 @@ module Asciidoctor
 
     # image:filename.png[Alt]
     :image_macro      => /\\?image:([^\[]+)(?:\[([^\]]*)\])/,
+
+    # indexterm:[Tigers,Big cats]
+    # (((Tigers,Big cats)))
+    :indexterm_macro  => /\\?(?:indexterm:(?:\[((?:\\\]|[^\]])*?)\])|\(\(\((.*?)\)\)\)(?!\)))/m,
+
+    # indexterm2:[Tigers]
+    # ((Tigers))
+    :indexterm2_macro  => /\\?(?:indexterm2:(?:\[((?:\\\]|[^\]])*?)\])|\(\((.*?)\)\)(?!\)))/m,
 
     # whitespace at the beginning of the line
     :leading_blanks   => /^([[:blank:]]*)/,
