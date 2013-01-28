@@ -132,6 +132,24 @@ context 'Links' do
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
+  test 'xref shows label from title of target for forward and backward references in html backend' do
+    input = <<-EOS
+== Section A
+
+<\<_section_b>>
+
+== Section B
+
+<\<_section_a>>
+    EOS
+    
+    output = render_embedded_string input
+    assert_xpath '//h2[@id="_section_a"][text()="Section A"]', output, 1
+    assert_xpath '//a[@href="#_section_a"][text()="Section A"]', output, 1
+    assert_xpath '//h2[@id="_section_b"][text()="Section B"]', output, 1
+    assert_xpath '//a[@href="#_section_b"][text()="Section B"]', output, 1
+  end
+
   test 'anchor creates reference' do
     doc = document_from_string "[[tigers]]Tigers roam here."
     assert_equal({'tigers' => '[tigers]'}, doc.references[:ids])

@@ -75,13 +75,12 @@ class Asciidoctor::BaseTemplate
   # create template matter to insert an attribute if the variable has a value
   def attribute(name, key)
     type = key.is_a?(Symbol) ? :attr : :var
-    key = key.to_s
     if type == :attr
       # example: <% if attr? 'foo' %> bar="<%= attr 'foo' %>"<% end %>
-      '<% if attr? \'' + key + '\' %> ' + name + '="<%= attr \'' + key.to_s + '\' %>"<% end %>'
+      %(<% if attr? '#{key}' %> #{name}="<%= attr '#{key}' %>"<% end %>)
     else
       # example: <% if foo %> bar="<%= foo %>"<% end %>
-      '<% if ' + key + ' %> ' + name + '="<%= ' + key + ' %>"<% end %>'
+      %(<% if #{key} %> #{name}="<%= #{key} %>"<% end %>)
     end
   end
 
@@ -89,7 +88,7 @@ class Asciidoctor::BaseTemplate
   def attrvalue(key, sibling = true)
     delimiter = sibling ? ' ' : ''
     # example: <% if attr? 'foo' %><%= attr 'foo' %><% end %>
-    '<% if attr? \'' + key.to_s + '\' %>' + delimiter + '<%= attr \'' + key.to_s + '\' %><% end %>'
+    %(<% if attr? '#{key}' %>#{delimiter}<%= attr '#{key}' %><% end %>)
   end
 
   # create template matter to insert an id if one is specified for the block

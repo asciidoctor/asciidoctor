@@ -179,6 +179,12 @@ class Asciidoctor::AttributeList
   end
 
   def parse_attribute_value(quote)
+    # empty quoted value
+    if @scanner.peek(1) == quote
+      @scanner.get_byte 
+      return ''
+    end
+
     value = scan_to_quote quote
     if value.nil?
       quote + scan_to_delimiter

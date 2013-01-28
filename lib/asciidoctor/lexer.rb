@@ -276,7 +276,7 @@ class Asciidoctor::Lexer
           attributes['alt'] ||= File.basename(target, File.extname(target))
           # hmmm, this assignment seems like a one-off
           block.title = attributes['title']
-          if block.title? && attributes['caption'].to_s.empty?
+          if block.title? && attributes['caption'].nil?
             attributes['caption'] = "Figure #{document.counter('figure-number')}. "
           end
         else
@@ -376,7 +376,7 @@ class Asciidoctor::Lexer
         block = next_table(table_reader, parent, attributes)
         # hmmm, this assignment seems like a one-off
         block.title = attributes['title']
-        if block.title? && attributes['caption'].to_s.empty?
+        if block.title? && attributes['caption'].nil?
           attributes['caption'] = "Table #{document.counter('table-number')}. "
         end
     
@@ -393,7 +393,7 @@ class Asciidoctor::Lexer
           block = Block.new(parent, :example)
           # hmmm, this assignment seems like a one-off
           block.title = attributes['title']
-          if block.title? && attributes['caption'].to_s.empty?
+          if block.title? && attributes['caption'].nil?
             attributes['caption'] = "Example #{document.counter('example-number')}. "
           end
         end
@@ -993,7 +993,7 @@ class Asciidoctor::Lexer
       section.sectname = attributes[1]
       section.special = true
       if section.sectname == 'appendix'
-        attributes['caption'] = "Appendix #{parent.document.counter('appendix-number', 'A')}: "
+        attributes['caption'] ||= "Appendix #{parent.document.counter('appendix-number', 'A')}: "
       end
     else
       section.sectname = "sect#{section.level}"
