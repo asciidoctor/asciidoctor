@@ -413,7 +413,7 @@ context 'Substitutions' do
       end
     end
 
-    test 'a single-line primary index term macro with primary and secondary terms should be registered as an index reference' do
+    test 'a single-line index term macro with primary and secondary terms should be registered as an index reference' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macros = ['indexterm:[Big cats, Tigers]', '(((Big cats, Tigers)))']
       macros.each do |macro|
@@ -425,7 +425,7 @@ context 'Substitutions' do
       end
     end
 
-    test 'a single-line primary index term macro with primary, secondary and tertiary terms should be registered as an index reference' do
+    test 'a single-line index term macro with primary, secondary and tertiary terms should be registered as an index reference' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macros = ['indexterm:[Big cats,Tigers , Panthera tigris]', '(((Big cats,Tigers , Panthera tigris)))']
       macros.each do |macro|
@@ -619,10 +619,28 @@ context 'Substitutions' do
   end
 
   context 'Post replacements' do
-    test 'line break' do
+    test 'line break inserted after line with line break character' do
       para = block_from_string("First line +\nSecond line")
       result = para.apply_subs(para.buffer, :post_replacements)
       assert_equal "First line<br>\n", result.first
+    end
+
+    test 'line break inserted after line wrap with hardbreaks enabled' do
+      para = block_from_string("First line\nSecond line", :attributes => {'hardbreaks' => ''})
+      result = para.apply_subs(para.buffer, :post_replacements)
+      assert_equal "First line<br>\n", result.first
+    end
+
+    test 'line break character stripped from end of line with hardbreaks enabled' do
+      para = block_from_string("First line +\nSecond line", :attributes => {'hardbreaks' => ''})
+      result = para.apply_subs(para.buffer, :post_replacements)
+      assert_equal "First line<br>\n", result.first
+    end
+
+    test 'line break not inserted for single line with hardbreaks enabled' do
+      para = block_from_string("First line", :attributes => {'hardbreaks' => ''})
+      result = para.apply_subs(para.buffer, :post_replacements)
+      assert_equal "First line", result.first
     end
   end
 end
