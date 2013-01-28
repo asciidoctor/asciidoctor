@@ -58,6 +58,23 @@ context 'Tables' do
       assert_xpath '/table/tbody/tr/td[2]/p[text()="a | there"]', output, 1
     end
 
+    test 'should auto recover with warning if missing leading separator on first cell' do
+      input = <<-EOS
+|===
+A | here| a | there
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 4
+      assert_css 'table > tbody > tr', output, 1
+      assert_css 'table > tbody > tr > td', output, 4
+      assert_xpath '/table/tbody/tr/td[1]/p[text()="A"]', output, 1
+      assert_xpath '/table/tbody/tr/td[2]/p[text()="here"]', output, 1
+      assert_xpath '/table/tbody/tr/td[3]/p[text()="a"]', output, 1
+      assert_xpath '/table/tbody/tr/td[4]/p[text()="there"]', output, 1
+    end
+
     test 'performs normal substitutions on cell content' do
       input = <<-EOS
 :show_title: Cool new show
@@ -242,7 +259,7 @@ I am getting in shape!
 |1 >s|2 |3 |4
 ^|5 2.2+^.^|6 .3+<.>m|7
 ^|8
-|9 2+>|10
+d|9 2+>|10
 |===
       EOS
       output = render_embedded_string input
@@ -267,7 +284,8 @@ I am getting in shape!
 
       assert_css 'table tr:nth-child(3) > td:nth-child(1).halign-center.valign-top p em', output, 1
 
-      assert_css 'table tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p em', output, 1
+      assert_css 'table tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p', output, 1
+      assert_css 'table tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p em', output, 0
       assert_css 'table tr:nth-child(4) > td:nth-child(2).halign-right.valign-top[colspan="2"] p tt', output, 1
     end
 

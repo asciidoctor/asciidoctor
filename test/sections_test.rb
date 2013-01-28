@@ -28,6 +28,16 @@ context 'Sections' do
       assert_equal 'section_one', sec.id
     end
 
+    test 'synthetic id separator can be customized' do
+      sec = block_from_string(":idseparator: -\n\n== Section One")
+      assert_equal '_section-one', sec.id
+    end
+
+    test 'synthetic id separator can be set to blank' do
+      sec = block_from_string(":idseparator:\n\n== Section One")
+      assert_equal '_sectionone', sec.id
+    end
+
     test 'synthetic ids can be disabled' do
       sec = block_from_string(":sectids!:\n\n== Section One\n")
       assert sec.id.nil?

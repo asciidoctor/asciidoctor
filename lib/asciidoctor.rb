@@ -253,7 +253,7 @@ module Asciidoctor
     # image::filename.png[Caption]
     :image_blk        => /^image::(\S+?)\[(.*?)\]\s*$/,
 
-    # image:filename.png[Alt]
+    # image:filename.png[Alt Text]
     :image_macro      => /\\?image:([^\[]+)(?:\[([^\]]*)\])/,
 
     # indexterm:[Tigers,Big cats]
@@ -278,7 +278,7 @@ module Asciidoctor
 
     # inline link and some inline link macro
     # FIXME revisit!
-    :link_inline      => %r{(^|link:|\s|>|&lt;|[\(\)\]])(\\?https?://[^\[ ]*[^\. \)\[])(?:\[((?:\\\]|[^\]])*?)\])?},
+    :link_inline      => %r{(^|link:|\s|>|&lt;|[\(\)\[\]])(\\?https?://[^\[ ]*[^\. \)\[])(?:\[((?:\\\]|[^\]])*?)\])?},
 
     # inline link macro
     # link:path[label]
@@ -528,7 +528,7 @@ module Asciidoctor
     # and so on...
     
     # restore entities; TODO needs cleanup
-    [/&amp;(#[a-z0-9]+;)/i, '&\1']
+    [/(^|[^\\])&amp;(#[a-z0-9]+;)/i, '\1&\2']
   ]
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document

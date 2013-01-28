@@ -16,10 +16,10 @@ class Asciidoctor::BaseTemplate
     key = key.to_s
     if type == :attr
       # example: <% if attr? 'foo' %><bar><%= attr 'foo' %></bar><% end %>
-      '<% if attr? \'' + key + '\' %><' + name + '><%= attr \'' + key + '\' %></' + name + '><% end %>'
+      %(<% if attr? '#{key}' %><#{name}><%= attr '#{key}' %></#{name}><% end %>)
     else
       # example: <% unless foo.to_s.empty? %><bar><%= foo %></bar><% end %>
-      '<% unless ' + key + '.to_s.empty? %><' + name + '><%= ' + key + ' %></' + name + '><% end %>'
+      %(<% unless #{key}.to_s.empty? %><#{name}><%= #{key} %></#{name}><% end %>)
     end
   end
 end

@@ -23,6 +23,14 @@ context "Lexer" do
     assert_equal expected, attributes
   end
 
+  test "collect empty unnamed attribute double-quoted" do
+    attributes = {}
+    line = '""'
+    expected = {1 => ''}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
   test "collect unnamed attribute double-quoted containing escaped quote" do
     attributes = {}
     line = '"ba\"zaar"'
@@ -35,6 +43,14 @@ context "Lexer" do
     attributes = {}
     line = '\'quote\''
     expected = {1 => 'quote'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test "collect empty unnamed attribute single-quoted" do
+    attributes = {}
+    line = '\'\''
+    expected = {1 => ''}
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
     assert_equal expected, attributes
   end
@@ -79,12 +95,28 @@ context "Lexer" do
     assert_equal expected, attributes
   end
 
+  test 'collect named attribute with double-quoted empty value' do
+    attributes = {}
+    line = 'height=100,caption="",link="images/octocat.png"'
+    expected = {'height' => '100', 'caption' => '', 'link' => 'images/octocat.png'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes 
+  end
+
   test "collect named attribute single-quoted" do
     attributes = {}
     line = 'foo=\'bar\''
     expected = {'foo' => 'bar'}
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
     assert_equal expected, attributes
+  end
+
+  test 'collect named attribute with single-quoted empty value' do
+    attributes = {}
+    line = "height=100,caption='',link='images/octocat.png'"
+    expected = {'height' => '100', 'caption' => '', 'link' => 'images/octocat.png'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes 
   end
 
   test "collect named attributes unquoted" do
