@@ -66,7 +66,7 @@ begin
   RDoc::Task.new do |rdoc|
     rdoc.rdoc_dir = 'rdoc'
     rdoc.title = "#{name} #{version}"
-    rdoc.markup = 'tomdoc'
+    rdoc.markup = 'tomdoc' if rdoc.respond_to?(:markup)
     rdoc.rdoc_files.include('README*')
     rdoc.rdoc_files.include('lib/**/*.rb')
   end
