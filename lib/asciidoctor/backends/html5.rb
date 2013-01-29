@@ -217,6 +217,28 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
   <% end %>
   </ol>
 </div>
+<% elsif (attr :style) == 'horizontal' %>
+<div#{id} class="hdlist#{role_class}">
+  #{title_div}
+  <table>
+    <colgroup>
+      <col<% if attr? :labelwidth %> style="width: <%= attr :labelwidth %>%;"<% end %>>
+      <col<% if attr? :itemwidth %> style="width: <%= attr :itemwidth %>%;"<% end %>>
+    </colgroup>
+    <% content.each do |dt, dd| %>
+    <tr>
+      <td class="hdlist1<% if attr? 'strong-option' %> strong<% end %>">
+        <%= dt.text %>
+        <br>
+      </td>
+      <td class="hdlist2"><% unless dd.nil? %><% if dd.text? %>
+        <p style="margin-top: 0"><%= dd.text %></p><% end %><% if dd.blocks? %>
+<%= dd.content %><% end %><% end %>
+      </td>
+    </tr>
+    <% end %>
+  </table>
+</div>
 <% else %>
 <div#{id} class="dlist#{style_class}#{role_class}">
   #{title_div}

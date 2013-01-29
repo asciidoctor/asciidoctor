@@ -1889,6 +1889,33 @@ term 2:: def 2
       assert_css '.dlist dt:not([class])', output, 2
     end
 
+    test 'should render horizontal list with proper markup' do
+      input = <<-EOS
+[horizontal]
+first term:: definition
++
+more detail
+
+second term:: definition
+      EOS
+      output = render_embedded_string input
+      assert_css '.hdlist', output, 1
+      assert_css '.hdlist table', output, 1
+      assert_css '.hdlist table colgroup col', output, 2
+      assert_css '.hdlist table tr', output, 2
+      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td', output, 2
+      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td[@class="hdlist1"]', output, 1
+      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td[@class="hdlist2"]', output, 1
+      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td[@class="hdlist2"]/p', output, 1
+      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td[@class="hdlist2"]/p/following-sibling::*[@class="paragraph"]', output, 1
+      assert_xpath '((//tr)[1]/td)[1][normalize-space(text())="first term"]', output, 1
+      assert_xpath '((//tr)[1]/td)[2]/p[normalize-space(text())="definition"]', output, 1
+
+      assert_xpath '/*[@class="hdlist"]/table/tr[2]/td', output, 2
+      assert_xpath '((//tr)[2]/td)[1][normalize-space(text())="second term"]', output, 1
+      assert_xpath '((//tr)[2]/td)[2]/p[normalize-space(text())="definition"]', output, 1
+    end
+
     test 'should render qanda list with proper semantics' do
       input = <<-EOS
 [qanda]
