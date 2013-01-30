@@ -610,19 +610,21 @@ context 'Substitutions' do
       assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
     end
 
+    # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs without subs' do
-      para = block_from_string("\x0" + '0' + "\x0")
+      para = block_from_string("some \x0" + '0' + "\x0 to study")
       para.passthroughs << {:text => '<code>inline code</code>', :subs => []}
       result = para.restore_passthroughs(para.buffer.join)
-      assert_equal '<code>inline code</code>', result
+      assert_equal "some <code>inline code</code> to study", result
     end
 
+    # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     # TODO add two entries to ensure index lookup is working correctly (0 indx could be ambiguous)
     test 'restore inline passthroughs with subs' do
-      para = block_from_string("\x0" + '0' + "\x0")
+      para = block_from_string("some \x0" + '0' + "\x0 to study")
       para.passthroughs << {:text => '<code>{code}</code>', :subs => [:specialcharacters]}
       result = para.restore_passthroughs(para.buffer.join)
-      assert_equal '&lt;code&gt;{code}&lt;/code&gt;', result
+      assert_equal 'some &lt;code&gt;{code}&lt;/code&gt; to study', result
     end
   end
 

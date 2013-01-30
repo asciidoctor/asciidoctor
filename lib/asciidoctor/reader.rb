@@ -301,7 +301,7 @@ class Asciidoctor::Reader
 
     raw_source.each do |line|
       # normalize line ending to LF (purging occurrences of CRLF)
-      line = "#{line.chomp}\n"
+      line = "#{line.rstrip}\n"
       if skip_to
         skip_to = nil if line.match(skip_to)
       elsif continuing_value
