@@ -58,15 +58,16 @@ Or if you prefer bundler:
 == Usage
 
 Asciidoctor has both a command line interface (CLI) and an API. The
-CLI is a drop-in replacement for the `asciidoc` command of the python
-implementation. The API, of course, is for integration with other
+CLI is a drop-in replacement for the `asciidoc.py` command from the
+python implementation. The API is intended for integration with other
 software projects and is suitable for server-side applications, such
 as Rails, Sinatra and GitHub.
 
-=== Command line
+=== Command line interface (CLI)
 
-After installing the `asciidoctor` gem, you can invoke the CLI as
-simply as:
+After installing the `asciidoctor` gem, the `asciidoctor` commandline
+interface should be available on your PATH after installing the gem.
+To invoke it, simply execute:
 
  asciidoctor <asciidoc_file>
 
@@ -78,12 +79,13 @@ There are many other options available and full help is provided via:
 
  asciidoctor --help
 
-, or in the man page. There is also an `asciidoctor-safe` command, which
-turns on safe mode, preventing access to files outside the parent
-directory of the source file. This is very similar to the safe mode
-of `asciidoc.py`.
+, or in the http://asciidoctor.org/man/asciidoctor[man page].
 
-=== Asciidoctor API
+There is also an `asciidoctor-safe` command, which turns on safe mode
+by default, preventing access to files outside the parent directory of
+the source file. This mode is very similar to the safe mode of `asciidoc.py`.
+
+=== Ruby API
 
 To use Asciidoctor in your application, you first need to require the
 gem:
@@ -163,13 +165,6 @@ with `block_<style>.`. For instance, to override the default Paragraph
 template with an ERB template, put a file named
 `block_paragraph.html.erb` in the template directory you pass to the
 `Document` constructor using the `template_dir` option.
-
-.Commandline
-If you don't like all this Ruby code just to render AsciiDoc, there's a
-commandline interface (cli) named `asciidoctor`. It should be available
-on your PATH after installing the gem. The `asciidoctor` command is a
-drop-in replacement for the `asciidoc` command from the AsciiDoc Python
-distribution.
 
 For more usage examples, see the (massive) test suite.
 
