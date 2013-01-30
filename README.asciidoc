@@ -77,7 +77,10 @@ and a full help is provided:
 
  asciidoctor --help
 
-and also in the man page.
+and in the man page. There is also an `asciidoctor-safe` command which 
+turns on safe mode which prevents access to files outside the parent
+directory of the source file. This is very similar to the safe mode
+of `asciidoc`.
 
 === Asciidoctor API
 
