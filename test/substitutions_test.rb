@@ -633,20 +633,20 @@ context 'Substitutions' do
       assert_equal "First line<br>\n", result.first
     end
 
-    test 'line break inserted after line wrap with linebreaks enabled' do
-      para = block_from_string("First line\nSecond line", :attributes => {'linebreaks' => ''})
+    test 'line break inserted after line wrap with hardbreaks enabled' do
+      para = block_from_string("First line\nSecond line", :attributes => {'hardbreaks' => ''})
       result = para.apply_subs(para.buffer, :post_replacements)
       assert_equal "First line<br>\n", result.first
     end
 
-    test 'line break character stripped from end of line with linebreaks enabled' do
-      para = block_from_string("First line +\nSecond line", :attributes => {'linebreaks' => ''})
+    test 'line break character stripped from end of line with hardbreaks enabled' do
+      para = block_from_string("First line +\nSecond line", :attributes => {'hardbreaks' => ''})
       result = para.apply_subs(para.buffer, :post_replacements)
       assert_equal "First line<br>\n", result.first
     end
 
-    test 'line break not inserted for single line with linebreaks enabled' do
-      para = block_from_string("First line", :attributes => {'linebreaks' => ''})
+    test 'line break not inserted for single line with hardbreaks enabled' do
+      para = block_from_string("First line", :attributes => {'hardbreaks' => ''})
       result = para.apply_subs(para.buffer, :post_replacements)
       assert_equal "First line", result.first
     end
