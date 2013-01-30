@@ -808,6 +808,66 @@ Item one, literal block
       assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@class = "literalblock"]', output, 1
     end
 
+    test "adjacent list continuation line attaches following block with block attributes" do
+      input = <<-EOS
+Lists
+=====
+
+* Item one, paragraph one
++
+[[beck]]
+.Read the following aloud to yourself
+[source, ruby]
+----
+5.times { print "Odelay!" }
+----
+ 
+* Item two
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 2
+      assert_xpath '//ul/li[1]/p', output, 1
+      assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@id="beck"][@class = "listingblock"]', output, 1
+      assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@id="beck"]/div[@class="title"][starts-with(text(),"Read")]', output, 1
+      assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@id="beck"]//code[@class="ruby"][starts-with(text(),"5.times")]', output, 1
+    end
+
+    test 'trailing block attribute line attached by continuation should not create block' do
+      input = <<-EOS
+Lists
+=====
+
+* Item one, paragraph one
++
+[source]
+ 
+* Item two
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 2
+      assert_xpath '//ul/li[1]/*', output, 1
+      assert_xpath '//ul/li//*[@class="listingblock"]', output, 0
+    end
+
+    test 'trailing block title line attached by continuation should not create block' do
+      input = <<-EOS
+Lists
+=====
+
+* Item one, paragraph one
++
+.Disappears into the ether
+ 
+* Item two
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 2
+      assert_xpath '//ul/li[1]/*', output, 1
+    end
+
     test "consecutive blocks in list continuation attach to list item" do
       input = <<-EOS
 Lists
