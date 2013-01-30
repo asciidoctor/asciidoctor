@@ -1,12 +1,28 @@
 require 'test_helper'
 
 context "Text" do
-  test "proper encoding to handle utf8 characters in document" do
-    assert_xpath "//p", example_document(:encoding).render, 1
+  test "proper encoding to handle utf8 characters in document using html backend" do
+    output = example_document(:encoding).render
+    assert_xpath '//p', output, 2
+    assert_xpath '//a', output, 1
   end
 
-  test "proper encoding to handle utf8 characters in embedded document" do
-    assert_xpath "//p", example_document(:encoding).render(:header_footer => false), 1
+  test "proper encoding to handle utf8 characters in embedded document using html backend" do
+    output = example_document(:encoding, :header_footer => false).render
+    assert_xpath '//p', output, 2
+    assert_xpath '//a', output, 1
+  end
+
+  test "proper encoding to handle utf8 characters in document using docbook backend" do
+    output = example_document(:encoding, :attributes => {'backend' => 'docbook'}).render
+    assert_xpath '//simpara', output, 2
+    assert_xpath '//ulink', output, 1
+  end
+
+  test "proper encoding to handle utf8 characters in embedded document using docbook backend" do
+    output = example_document(:encoding, :header_footer => false, :attributes => {'backend' => 'docbook'}).render
+    assert_xpath '//simpara', output, 2
+    assert_xpath '//ulink', output, 1
   end
 
   # NOTE this test ensures we have the encoding line on block templates too
