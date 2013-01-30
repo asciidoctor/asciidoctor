@@ -278,11 +278,11 @@ module Asciidoctor
 
     # inline link and some inline link macro
     # FIXME revisit!
-    :link_inline      => %r{(^|link:|\s|>|&lt;|[\(\)\[\]])(\\?https?://[^\[ ]*[^\. \)\[])(?:\[((?:\\\]|[^\]])*?)\])?},
+    :link_inline      => %r{(^|link:|\s|>|&lt;|[\(\)\[\]])(\\?https?://[^\s\[<]*[^\s\.\)\[<])(?:\[((?:\\\]|[^\]])*?)\])?},
 
     # inline link macro
     # link:path[label]
-    :link_macro       => /\\?link:([^\[ ]+)(?:\[((?:\\\]|[^\]])*?)\])/,
+    :link_macro       => /\\?link:([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/,
 
     # ----
     :listing          => /^\-{4,}\s*$/,

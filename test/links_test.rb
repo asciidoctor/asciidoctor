@@ -50,12 +50,24 @@ context 'Links' do
     assert_xpath '//a', render_string('\http://asciidoc.org[AsciiDoc] is the key to good docs.'), 0
   end
 
+  test 'inline qualified url followed by an endline should not include endline in link' do
+    assert_xpath '//a[@href="http://github.com/asciidoctor"]', render_string("The source code for Asciidoctor can be found at http://github.com/asciidoctor\nwhich is a GitHub organization."), 1
+  end
+
+  test 'qualified url divided by endline using macro syntax should not create link' do
+    assert_xpath '//a', render_string("The source code for Asciidoctor can be found at link:http://github.com/asciidoctor\n[]which is a GitHub organization."), 0
+  end
+
   test 'qualified url containing whitespace using macro syntax should not create link' do
     assert_xpath '//a', render_string('I often need to refer to the chapter on link:http://asciidoc.org?q=attribute references[Attribute References].'), 0
   end
 
   test 'qualified url containing an encoded space using macro syntax should create a link' do
     assert_xpath '//a', render_string('I often need to refer to the chapter on link:http://asciidoc.org?q=attribute%20references[Attribute References].'), 1
+  end
+
+  test 'inline quoted qualified url should not consume surrounding angled brackets' do
+    assert_xpath '//a[@href="http://github.com/asciidoctor"]', render_string('Asciidoctor GitHub organization: <**http://github.com/asciidoctor**>'), 1
   end
 
   test 'inline ref' do
