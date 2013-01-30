@@ -41,8 +41,9 @@ class Test::Unit::TestCase
     File.join(File.expand_path(File.dirname(__FILE__)), 'fixtures', name)
   end
 
-  def example_document(name)
-    Asciidoctor::Document.new(File.readlines(sample_doc_path(name)), :header_footer => true)
+  def example_document(name, opts = {})
+    opts[:header_footer] = true unless opts.has_key?(:header_footer)
+    Asciidoctor::Document.new(File.readlines(sample_doc_path(name)), opts)
   end
 
   def assert_difference(expression, difference = 1, message = nil, &block)
