@@ -57,6 +57,30 @@ Or if you prefer bundler:
 
 == Usage
 
+Asciidoctor has both a command line interfac which can be used for 
+everyday usage and an API for use in other projects. The command
+is a drop in replacement for the `asciidoc` command of the python
+implementation. The API, of course, is for integration with other
+software projects and is suitable for server side applications such as
+Rails, Sinatra and Github!
+
+=== Command line
+
+After asciidoctor has been installed the simplest invocation is:
+
+ asciidoctor <asciidoc_file>
+
+This will use the built-in defaults for options and create a new file
+with the same base name, but with the .html extension in the same 
+directory as the input file. There are many other options available 
+and a full help is provided:
+
+ asciidoctor --help
+
+and also in the man page.
+
+=== Asciidoctor API
+
 To use Asciidoctor in your application, you first need to require the
 library:
 
