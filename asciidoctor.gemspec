@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'asciidoctor'
-  s.version           = '0.0.9'
-  s.date              = '2013-01-16'
+  s.version           = '0.1.0'
+  s.date              = '2013-01-30'
   s.rubyforge_project = 'asciidoctor'
 
   ## Make sure your summary is short. The description may be as long
@@ -67,6 +67,7 @@ Gem::Specification.new do |s|
     Rakefile
     asciidoctor.gemspec
     bin/asciidoctor
+    bin/asciidoctor-safe
     lib/asciidoctor.rb
     lib/asciidoctor/abstract_block.rb
     lib/asciidoctor/abstract_node.rb
@@ -76,6 +77,8 @@ Gem::Specification.new do |s|
     lib/asciidoctor/backends/html5.rb
     lib/asciidoctor/block.rb
     lib/asciidoctor/callouts.rb
+    lib/asciidoctor/cli/invoker.rb
+    lib/asciidoctor/cli/options.rb
     lib/asciidoctor/debug.rb
     lib/asciidoctor/document.rb
     lib/asciidoctor/errors.rb
@@ -88,9 +91,8 @@ Gem::Specification.new do |s|
     lib/asciidoctor/substituters.rb
     lib/asciidoctor/table.rb
     lib/asciidoctor/version.rb
-    man/asciidoctor.ad
     man/asciidoctor.1
-    noof.rb
+    man/asciidoctor.ad
     test/attributes_test.rb
     test/blocks_test.rb
     test/document_test.rb
@@ -99,7 +101,6 @@ Gem::Specification.new do |s|
     test/fixtures/ascshort.txt
     test/fixtures/dot.gif
     test/fixtures/encoding.asciidoc
-    test/fixtures/filename\ with\ spaces.asciidoc
     test/fixtures/include-file.asciidoc
     test/fixtures/list_elements.asciidoc
     test/fixtures/sample.asciidoc
