@@ -92,7 +92,7 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-B', '--base-dir DIR', 'base directory containing the document and resources (default: directory of source file)') do |base_dir|
             self[:base_dir] = base_dir
           end
-          opts.on('-D', '--dest-dir DIR', 'destination output directory (default: directory of source file)') do |dest_dir|
+          opts.on('-D', '--destination-dir DIR', 'destination output directory (default: directory of source file)') do |dest_dir|
             self[:destination_dir] = dest_dir
           end
           opts.on('--trace', 'include backtrace information on errors (default: false)') do |trace|

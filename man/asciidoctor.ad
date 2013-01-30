@@ -75,7 +75,7 @@ Rendering Control
 *-C, --compact*::
     Compact the output by removing blank lines. Not enabled by default.
 
-*-D, --dest-dir*='DIR'::
+*-D, --destination-dir*='DIR'::
     Destination output directory. Defaults to the directory containing the
     source file, or the working directory if the source is read from a stream.
 
@@ -131,7 +131,7 @@ EXIT STATUS
 
 BUGS
 ----
-See the *Asciidoctor* issue tracker: <**https://github.com/erebor/asciidoctor/issues?state=open**>
+See the *Asciidoctor* issue tracker: <**https://github.com/asciidoctor/asciidoctor/issues?state=open**>
 
 
 AUTHORS
@@ -143,9 +143,11 @@ many other individuals.
 
 RESOURCES
 ---------
-Git source repository on GitHub: <**https://github.com/erebor/asciidoctor**>
+Git source repository on GitHub: <**https://github.com/asciidoctor/asciidoctor**>
 
-Main web site: <**http://asciidoctor.org**>
+Project web site: <**http://asciidoctor.org**>
+
+GitHub organization: <**http://github.com/asciidoctor**>
 
 
 COPYING
