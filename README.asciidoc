@@ -81,7 +81,7 @@ There are many other options available and full help is provided via:
 , or in the man page. There is also an `asciidoctor-safe` command, which
 turns on safe mode, preventing access to files outside the parent
 directory of the source file. This is very similar to the safe mode
-of `asciidoc`.
+of `asciidoc.py`.
 
 === Asciidoctor API
 
