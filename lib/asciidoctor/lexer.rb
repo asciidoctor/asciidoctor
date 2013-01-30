@@ -846,22 +846,23 @@ class Asciidoctor::Lexer
 
       # a delimited block immediately breaks the list unless preceded
       # by a list continuation (they are harsh like that ;0)
-      if (match = delimited_block?(this_line)) ||
-        # technically attr_line only breaks if ensuing line is not a list item
-        # which really means attr_line only breaks if it's acting as a block delimiter
-        (list_type == :dlist && match = this_line.match(REGEXP[:attr_line]))
-        terminator = match[0]
+      if match = delimited_block?(this_line)
         if continuation == :active
           buffer << this_line
           # grab all the lines in the block, leaving the delimiters in place
           # we're being more strict here about the terminator, but I think that's a good thing
+          terminator = match[0]
           buffer.concat reader.grab_lines_until(:terminator => terminator, :grab_last_line => true)
           continuation = :inactive
         else
           break
         end
+      # technically attr_line only breaks if ensuing line is not a list item
+      # which really means attr_line only breaks if it's acting as a block delimiter
+      elsif list_type == :dlist && continuation != :active && this_line.match(REGEXP[:attr_line])
+        break
       else
-        if continuation == :active && !this_line.strip.empty?
+        if continuation == :active && !this_line.chomp.empty?
           # literal paragraphs have special considerations (and this is one of 
           # two entry points into one)
           # if we don't process it as a whole, then a line in it that looks like a
@@ -876,6 +877,10 @@ class Asciidoctor::Lexer
                 # so we need to make sure we don't slurp up a legitimate sibling
                 list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
             }
+            continuation = :inactive
+          # let block metadata play out until we find the block
+          elsif this_line.match(REGEXP[:blk_title]) || this_line.match(REGEXP[:attr_line])
+            buffer << this_line
           else
             if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
               within_nested_list = true
@@ -885,12 +890,12 @@ class Asciidoctor::Lexer
               end
             end
             buffer << this_line
+            continuation = :inactive
           end
-          continuation = :inactive
-        elsif !prev_line.nil? && prev_line.strip.empty?
+        elsif !prev_line.nil? && prev_line.chomp.empty?
           # advance to the next line of content
-          if this_line.strip.empty?
-            reader.skip_blank
+          if this_line.chomp.empty?
+            reader.skip_blank_lines
             this_line = reader.get_line 
             # if we hit eof or a sibling, stop reading
             break if this_line.nil? || is_sibling_list_item?(this_line, list_type, sibling_trait)
@@ -936,7 +941,7 @@ class Asciidoctor::Lexer
             end
           end
         else
-          has_text = true if !this_line.strip.empty?
+          has_text = true if !this_line.chomp.empty?
           if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
             within_nested_list = true
             if nested_list_type == :dlist && $~[3].to_s.empty?
@@ -956,8 +961,8 @@ class Asciidoctor::Lexer
       buffer.delete_at detached_continuation
     end
 
-    # QUESTION should we strip these trailing endlines?
-    #buffer.pop while buffer.last == "\n"
+    # strip trailing blank lines to prevent empty blocks
+    buffer.pop while !buffer.empty? && buffer.last.strip.empty?
 
     # We do need to replace the optional trailing continuation
     # a blank line would have served the same purpose in the document
