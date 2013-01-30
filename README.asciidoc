@@ -241,6 +241,7 @@ This library aims to support the following Ruby implementations:
 * Ruby 1.8.7
 * Ruby 1.9.3
 * JRuby 1.7.2
+* Rubinius 1.2.4
 
 If something doesn't work on one of these interpreters, it should be
 considered a bug.
