@@ -515,7 +515,7 @@ module Asciidoctor
     #
     # returns The String with the post replacements rendered using the backend templates
     def sub_post_replacements(text)
-      if @document.attr? 'linebreaks'
+      if @document.attr? 'hardbreaks'
         lines = text.lines.entries
         return text if lines.size == 1
         last = lines.pop
