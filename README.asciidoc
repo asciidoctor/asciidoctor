@@ -1,19 +1,19 @@
 Asciidoctor
 ===========
 :asciidoctor: http://asciidoctor.org
-:asciidoctor-source: http://github.com/erebor/asciidoctor
+:asciidoctor-source: http://github.com/asciidoctor/asciidoctor
 :asciidoc: http://asciidoc.org
 :gitscm-next: https://github.com/github/gitscm-next
 :asciidoctor-seed: https://github.com/github/gitscm-next/commits/master/lib/asciidoc.rb
-:templates: https://github.com/erebor/asciidoctor/blob/master/lib/asciidoctor/backends
+:templates: https://github.com/asciidoctor/asciidoctor/blob/master/lib/asciidoctor/backends
 :tilt: https://github.com/rtomayko/tilt
 :freesoftware: http://www.fsf.org/licensing/essays/free-sw.html
-:issues: https://github.com/erebor/asciidoctor/issues
+:issues: https://github.com/asciidoctor/asciidoctor/issues
 :gist: https://gist.github.com
 :fork: http://help.github.com/fork-a-repo/
 :branch: http://learn.github.com/p/branching.html
 :pr: http://help.github.com/send-pull-requests/
-:license: https://github.com/erebor/asciidoctor/blob/master/LICENSE
+:license: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE
 :idprefix:
 
 {asciidoctor}[Asciidoctor] is a pure Ruby processor for converting
@@ -22,7 +22,7 @@ and other formats. It's
 http://rubygems.org/gems/asciidoctor[published as a RubyGem] and is
 available under the MIT open source license.
 
-image::https://travis-ci.org/erebor/asciidoctor.png?branch=master["Build Status", link="https://travis-ci.org/erebor/asciidoctor"]
+image::https://travis-ci.org/asciidoctor/asciidoctor.png?branch=master["Build Status", link="https://travis-ci.org/asciidoctor/asciidoctor"]
 
 Asciidoctor uses a set of built-in ERB templates to render the document
 to HTML 5 or DocBook 4.5. We've matched the rendered output as close as
