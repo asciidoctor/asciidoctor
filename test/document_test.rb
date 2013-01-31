@@ -138,6 +138,30 @@ preamble
         FileUtils::rm(sample_output_path)
       end
     end
+
+    test ':in_place must not be used with :to_file' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      sample_output_path = fixture_path('result.html')
+      assert_raise ArgumentError do
+        Asciidoctor.render_file(sample_input_path, :to_file => sample_output_path, :in_place => true)
+      end
+    end
+
+    test ':in_place must not be used with :to_dir' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      sample_output_path = fixture_path('result.html')
+      assert_raise ArgumentError do
+        Asciidoctor.render_file(sample_input_path, :to_dir => '', :in_place => true)
+      end
+    end
+
+    test 'output should be relative to :to_dir' do
+      raise NotImplementedError
+    end
+
+    test 'output file should be :to_dir + :to_file' do
+      raise NotImplementedError
+    end
   end
 
   context 'Renderer' do

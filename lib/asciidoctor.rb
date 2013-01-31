@@ -615,8 +615,11 @@ module Asciidoctor
   def self.render(input, options = {}, &block)
     in_place = options.delete(:in_place) || false
     to_file = options.delete(:to_file)
+    to_dir = options.delete(:to_dir)
 
-    if !options.has_key?(:header_footer) && (in_place || to_file)
+    raise ArgumentError, ":in_place must not accompany :to_dir or :to_file" if (in_place && (to_file || to_dir))
+
+    if !options.has_key?(:header_footer) && (in_place || to_file || to_dir)
       options[:header_footer] = true
     end
 
