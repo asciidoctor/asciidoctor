@@ -32,7 +32,7 @@ module Asciidoctor
       end
 
       def parse!(args)
-        argErrors = 0;
+        arg_errors = 0
         opts_parser = OptionParser.new do |opts|
           opts.banner = <<-EOS
 Usage: asciidoctor [OPTION]... [FILE]
@@ -50,7 +50,7 @@ Example: asciidoctor -b html5 source.asciidoc
               self[:attributes]['backend'] = backend
             else
               $stdout.puts("Allowed backends are 'html5' and 'docbook45'")
-              argErrors += 1
+              arg_errors += 1
             end
           end
           opts.on('-d', '--doctype [DOCTYPE]', '%w',
@@ -59,7 +59,7 @@ Example: asciidoctor -b html5 source.asciidoc
               self[:attributes]['doctype'] = doc_type
             else
               $stdout.puts("Allowed doctypes are 'article' and 'book'")
-              argErrors +=1
+              arg_errors +=1
             end
           end
           opts.on('-o', '--out-file FILE', 'output file (default: based on input file path); use - to output to STDOUT') do |output_file|
@@ -74,11 +74,11 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-S', '--safe-mode [SAFE_MODE]', '%w',
                   'set safe mode level explicitly: [unsafe, safe, secure] (default: secure)',
                   'disables potentially dangerous macros in source files, such as include::[]') do |safe_mode|
-            if ['unsafe', 'safe', 'secure'].includ? safe_mode
+            if ['unsafe', 'safe', 'secure'].include? safe_mode
               self[:safe] = Asciidoctor::SafeMode.const_get(safe_mode.upcase)
             else
               $stdout.puts("Allowed values for safe-mode are 'unsafe', 'safe' and 'secure'")
-              argErrors +=1
+              arg_errors +=1
             end
           end
           opts.on('-s', '--no-header-footer', 'suppress output of header and footer (default: false)') do
@@ -93,7 +93,7 @@ Example: asciidoctor -b html5 source.asciidoc
               self[:eruby] = eruby
             else
               $stdout.puts("Allowed values for eruby are 'erb' and 'erubis'")
-              argErrors+=1
+              arg_errors+=1
             end
           end
           opts.on('-C', '--compact', 'compact the output by removing blank lines (default: false)') do
@@ -151,6 +151,11 @@ Example: asciidoctor -b html5 source.asciidoc
             return 1
             #exit
           end
+          if arg_errors >0
+            $stdout.puts("Aborting..")
+            exit 1
+          end
+
         rescue OptionParser::InvalidOption, OptionParser::MissingArgument
           $stderr.puts $!.to_s
           $stdout.puts opts_parser
@@ -158,10 +163,6 @@ Example: asciidoctor -b html5 source.asciidoc
           #exit
         end
         self
-        if argErrors >0
-          $stdout.puts("Aborting..")
-          exit 1
-        end
 
       end # parse()
 
