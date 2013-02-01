@@ -630,10 +630,7 @@ module Asciidoctor
     elsif to_dir && to_file.nil?
       to_file = File.join(to_dir, "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
     elsif to_dir && to_file
-      puts "::DEBUG:: #{to_dir} is dir? #{File.directory? to_dir}"
-      puts "::DEBUG:: #{to_file}"
       to_file = File.join(to_dir, File.basename(to_file))
-      puts "::DEBUG:: #{to_file}"
     elsif to_file
       to_file = doc.normalize_asset_path(to_file)
       if !File.directory?(File.dirname(to_file))
