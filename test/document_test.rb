@@ -138,6 +138,73 @@ preamble
         FileUtils::rm(sample_output_path)
       end
     end
+
+    test ':in_place must not be used with :to_file' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      sample_output_path = fixture_path('result.html')
+      assert_raise ArgumentError do
+        begin
+          Asciidoctor.render_file(sample_input_path, :to_file => sample_output_path, :in_place => true)
+        ensure
+          FileUtils::rm(sample_output_path) if File.exists? sample_output_path
+        end
+      end
+    end
+
+    test ':in_place must not be used with :to_dir' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      sample_output_path = fixture_path('result.html')
+      assert_raise ArgumentError do
+        begin
+          Asciidoctor.render_file(sample_input_path, :to_dir => '', :in_place => true)
+        ensure
+          FileUtils::rm(sample_output_path) if File.exists? sample_output_path
+        end
+      end
+    end
+
+    test 'output should be relative to :to_dir' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      output_dir = File.join(File.dirname(fixture_path('result.html')), "test_output")
+      Dir.mkdir output_dir if !File.exists? output_dir
+      sample_output_file = File.join(output_dir, "sample.html")
+      begin
+        Asciidoctor.render_file(sample_input_path, :to_dir => output_dir)
+        assert File.exists? sample_output_file
+      ensure
+        FileUtils::rm(sample_output_file) if File.exists? sample_output_file
+        Dir.rmdir output_dir
+      end
+    end
+
+    test 'output file should be File.join(:to_dir, :to_file)' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      output_dir = File.join(File.dirname(fixture_path('result.html')), "test_output")
+      Dir.mkdir output_dir if !File.exists? output_dir
+      sample_output_file = "result.html"
+      final_output_file = File.join(output_dir, sample_output_file)
+      begin
+        Asciidoctor.render_file(sample_input_path, :to_dir => output_dir, :to_file => sample_output_file)
+        assert File.exists? final_output_file
+      ensure
+        FileUtils::rm(final_output_file) if File.exists? final_output_file
+        Dir.rmdir output_dir
+      end
+    end
+
+    test 'output file should be in the correct location if :to_dir and :to_file reference the same directory' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      output_dir = File.join(File.dirname(fixture_path('result.html')), "test_output")
+      Dir.mkdir output_dir if !File.exists? output_dir
+      final_output_file = File.join(output_dir, "result.html")
+      begin
+        Asciidoctor.render_file(sample_input_path, :to_dir => output_dir, :to_file => final_output_file)
+        assert File.exists? final_output_file
+      ensure
+        FileUtils::rm(final_output_file) if File.exists? final_output_file
+        Dir.rmdir output_dir
+      end
+    end
   end
 
   context 'Renderer' do

@@ -615,8 +615,11 @@ module Asciidoctor
   def self.render(input, options = {}, &block)
     in_place = options.delete(:in_place) || false
     to_file = options.delete(:to_file)
+    to_dir = options.delete(:to_dir)
 
-    if !options.has_key?(:header_footer) && (in_place || to_file)
+    raise ArgumentError, ":in_place must not accompany :to_dir or :to_file" if (in_place && (to_file || to_dir))
+
+    if !options.has_key?(:header_footer) && (in_place || to_file || to_dir)
       options[:header_footer] = true
     end
 
@@ -624,6 +627,10 @@ module Asciidoctor
 
     if in_place && input.is_a?(File)
       to_file = File.join(File.dirname(input.path), "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
+    elsif to_dir && to_file.nil?
+      to_file = File.join(to_dir, "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
+    elsif to_dir && to_file
+      to_file = File.join(to_dir, File.basename(to_file))
     elsif to_file
       to_file = doc.normalize_asset_path(to_file)
       if !File.directory?(File.dirname(to_file))
