@@ -115,11 +115,11 @@ context 'Invoker' do
   end
 
   test 'should output to file in destination directory if set' do
-    destination_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp'))
+    destination_path = File.expand_path(File.join(File.dirname(__FILE__), 'test_output'))
     sample_outpath = File.join(destination_path, 'sample.html')
     begin
       FileUtils::mkdir_p(destination_path) 
-      invoker = invoke_cli %w(-D test/tmp)
+      invoker = invoke_cli %w(-D test/test_output)
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
