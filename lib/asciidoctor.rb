@@ -638,25 +638,26 @@ module Asciidoctor
       to_file = File.join(File.dirname(input.path), "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
     elsif write_to_target
       if to_dir
-        to_dir = doc.normalize_asset_path(to_dir)
+        to_dir = doc.normalize_asset_path(to_dir, 'to_dir', false)
         if to_file
           # normalize again, to_file could have dirty bits
-          to_file = doc.normalize_asset_path(File.expand_path(File.join(to_dir, to_file)))
+          to_file = doc.normalize_asset_path(File.expand_path(to_file, to_dir), 'to_file', false)
+          # reestablish to_dir as the final target directory (in the case to_file had directory segments)
+          to_dir = File.dirname(to_file)
         else
           to_file = File.join(to_dir, "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
         end
       elsif to_file
-        to_file = doc.normalize_asset_path(to_file)
+        to_file = doc.normalize_asset_path(to_file, 'to_file', false)
+        to_dir = File.dirname(to_file)
       end
 
-      to_dir = File.dirname(to_file)
       if !File.directory? to_dir
         if mkdirs
           require_library 'fileutils'
           FileUtils.mkdir_p to_dir
         else
-          puts "asciidoctor: WARNING: target directory does not exist: #{to_dir}"
-          to_file = nil
+          raise IOError, "target directory does not exist: #{to_dir}"
         end
       end
     end
