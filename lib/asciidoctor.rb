@@ -195,7 +195,7 @@ module Asciidoctor
 
     # The author info line the appears immediately following the document title
     # John Doe <john@anonymous.com>
-    :author_info      => /^\s*([\w\-']+)(?: +([\w\-']+))?(?: +([\w\-']+))?(?: +<([^>]+)>)?\s*$/,
+    :author_info      => /^\s*(\w[\w\-'\.]*)(?: +(\w[\w\-'\.]*))?(?: +(\w[\w\-'\.]*))?(?: +<([^>]+)>)?\s*$/,
 
     # [[[Foo]]] (anywhere inline)
     :biblio_macro     => /\\?\[\[\[([\w:][\w:\.-]*?)\]\]\]/,
