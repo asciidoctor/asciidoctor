@@ -251,6 +251,17 @@ context "Lexer" do
     assert_equal 'SO', metadata['authorinitials']
   end
 
+  test "parse author with dotted initial" do
+    metadata, = parse_header_metadata 'Heiko W. Rupp <hwr@example.de>'
+    assert_equal 6, metadata.size
+    assert_equal 'Heiko W. Rupp', metadata['author']
+    assert_equal 'Heiko', metadata['firstname']
+    assert_equal 'W.', metadata['middlename']
+    assert_equal 'Rupp', metadata['lastname']
+    assert_equal 'hwr@example.de', metadata['email']
+    assert_equal 'HWR', metadata['authorinitials']
+  end
+
   test "test_parse_author_with_underscore" do
     metadata, = parse_header_metadata 'Tim_E Fella'
     assert_equal 4, metadata.size
