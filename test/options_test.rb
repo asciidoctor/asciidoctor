@@ -2,11 +2,43 @@ require 'test_helper'
 require 'asciidoctor/cli/options'
 
 context 'Options' do
+  test 'should return error code 0 when help flag is present' do
+    redirect_streams do |stdout, stderr|
+      exitval = Asciidoctor::Cli::Options.parse!(%w(-h))
+      assert_equal 0, exitval
+      assert_match(/^Usage:/, stdout.string)
+    end
+  end
+
   test 'should return error code 1 when invalid option present' do
     redirect_streams do |stdout, stderr|
-      opts = Asciidoctor::Cli::Options.parse!(%w(--foobar))
-      assert_equal 1, opts
-      assert_equal 'invalid option: --foobar', stderr.string.chomp
+      exitval = Asciidoctor::Cli::Options.parse!(%w(--foobar))
+      assert_equal 1, exitval
+      assert_equal 'asciidoctor: invalid option: --foobar', stderr.string.chomp
+    end
+  end
+
+  test 'should return error code 1 when option has invalid argument' do
+    redirect_streams do |stdout, stderr|
+      exitval = Asciidoctor::Cli::Options.parse!(%w(-b foo input.ad))
+      assert_equal 1, exitval
+      assert_equal 'asciidoctor: invalid argument: -b foo', stderr.string.chomp
+    end
+  end
+
+  test 'should return error code 1 when option is missing required argument' do
+    redirect_streams do |stdout, stderr|
+      exitval = Asciidoctor::Cli::Options.parse!(%w(-b))
+      assert_equal 1, exitval
+      assert_equal 'asciidoctor: option missing argument: -b', stderr.string.chomp
+    end
+  end
+
+  test 'should return error code 1 when unparsed option remains' do
+    redirect_streams do |stdout, stderr|
+      exitval = Asciidoctor::Cli::Options.parse!(%w(-b docbook extra junk input.ad))
+      assert_equal 1, exitval
+      assert_equal 'asciidoctor: FAILED: too many arguments (unparsed arguments: \'extra\', \'junk\')', stderr.string.chomp
     end
   end
 

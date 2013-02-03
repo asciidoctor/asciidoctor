@@ -75,7 +75,7 @@ context 'Invoker' do
   test 'should report usage if no input file given' do
     redirect_streams do |stdout, stderr|
       invoke_cli [], nil
-      assert_match(/Usage:/, stdout.string)
+      assert_match(/Usage:/, stderr.string)
     end
   end
 
