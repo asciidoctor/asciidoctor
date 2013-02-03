@@ -602,8 +602,8 @@ module Asciidoctor
   # path, it is resolved relative to :to_dir, if given, otherwise the
   # Document#base_dir. If the target directory does not exist, it will not be
   # created unless the :mkdirs option is set to true. If the file cannot be
-  # written because the target directory does not exist, the rendered output is
-  # instead returned.
+  # written because the target directory does not exist, or because it falls
+  # outside of the Document#base_dir in safe mode, an IOError is raised.
   #
   # If the output is going to be written to a file, the header and footer are
   # rendered unless specified otherwise (writing to a file implies creating a
