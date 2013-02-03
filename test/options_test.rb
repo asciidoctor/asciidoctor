@@ -34,11 +34,11 @@ context 'Options' do
     end
   end
 
-  test 'should return error code 1 when unparsed option remains' do
+  test 'should emit warning when unparsed options remain' do
     redirect_streams do |stdout, stderr|
-      exitval = Asciidoctor::Cli::Options.parse!(%w(-b docbook extra junk input.ad))
-      assert_equal 1, exitval
-      assert_equal 'asciidoctor: FAILED: too many arguments (unparsed arguments: \'extra\', \'junk\')', stderr.string.chomp
+      options = Asciidoctor::Cli::Options.parse!(%w(-b docbook extra junk test/fixtures/sample.asciidoc))
+      assert options.is_a? Hash
+      assert_equal 'asciidoctor: WARNING: extra arguments detected (unparsed arguments: \'extra\', \'junk\')', stderr.string.chomp
     end
   end
 

@@ -118,9 +118,8 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts_parser.parse!(args)
           if args.size > 0
-            # QUESTION should this just be a warning?
-            $stderr.puts "asciidoctor: FAILED: too many arguments (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '})"
-            return 1
+            # warn, but don't panic; we may have enough to proceed, so we won't force a failure
+            $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '})"
           end
 
           if self[:input_file].nil? || self[:input_file].empty?
