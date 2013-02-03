@@ -688,7 +688,8 @@ module Asciidoctor
   #
   # name  - the String name of the library to require.
   #
-  # returns true if require was necessary, false if not
+  # returns false if the library is detected on the load path or the return
+  # value of delegating to Kernel#require
   def self.require_library(name)
     if Thread.list.size > 1
       main_script = "#{name}.rb"
