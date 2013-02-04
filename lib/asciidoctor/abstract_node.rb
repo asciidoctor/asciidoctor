@@ -223,7 +223,7 @@ class Asciidoctor::AbstractNode
   # TODO this method is missing a coordinate; it should be able to resolve
   # both the directory reference and the path to an asset in it; callers
   # of this method are still doing a File.join to finish the task
-  def normalize_asset_path(asset_ref, asset_name = 'path')
+  def normalize_asset_path(asset_ref, asset_name = 'path', autocorrect = true)
     # TODO we may use pathname enough to make it a top-level require
     Asciidoctor.require_library 'pathname'
 
@@ -239,7 +239,11 @@ class Asciidoctor::AbstractNode
     if @document.safe >= Asciidoctor::SafeMode::SAFE
       relative_asset_path = Pathname.new(asset_path).relative_path_from(Pathname.new(input_path)).to_s
       if relative_asset_path.start_with?('..')
-        puts 'asciidoctor: WARNING: ' + asset_name + ' has illegal reference to ancestor of base directory'
+        if autocorrect
+          puts 'asciidoctor: WARNING: ' + asset_name + ' has illegal reference to ancestor of base directory'
+        else
+          raise SecurityError, "#{asset_name} has reference to path outside of base directory, disallowed in safe mode: #{asset_path}"
+        end
         relative_asset_path.sub!(/^(?:\.\.\/)*/, '')
         # just to be absolutely sure ;)
         if relative_asset_path[0..0] == '.'

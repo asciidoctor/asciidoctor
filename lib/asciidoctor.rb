@@ -596,14 +596,19 @@ module Asciidoctor
   # attributes on the Document.
   #
   # If the :in_place option is true, and the input is a File, the output is
-  # written to a file adjacent to the input file with an extension that
+  # written to a file adjacent to the input file, having an extension that
   # corresponds to the backend format. Otherwise, if the :to_file option is
   # specified, the file is written to that file. If :to_file is not an absolute
-  # path, it is resolved relative to the Document#base_dir. If either option is
-  # set, the header and footer are rendered by default (writing to a file
-  # implies creating a standalone document). If neither option is set, the
-  # header and footer are not rendered by default and the rendered output is
-  # returned.
+  # path, it is resolved relative to :to_dir, if given, otherwise the
+  # Document#base_dir. If the target directory does not exist, it will not be
+  # created unless the :mkdirs option is set to true. If the file cannot be
+  # written because the target directory does not exist, or because it falls
+  # outside of the Document#base_dir in safe mode, an IOError is raised.
+  #
+  # If the output is going to be written to a file, the header and footer are
+  # rendered unless specified otherwise (writing to a file implies creating a
+  # standalone document). Otherwise, the header and footer are not rendered by
+  # default and the rendered output is returned.
   #
   # input   - the String AsciiDoc source filename
   # options - a Hash of options to control processing (default: {})
@@ -615,23 +620,49 @@ module Asciidoctor
   def self.render(input, options = {}, &block)
     in_place = options.delete(:in_place) || false
     to_file = options.delete(:to_file)
+    to_dir = options.delete(:to_dir)
+    mkdirs = options.delete(:mkdirs) || false
 
-    if !options.has_key?(:header_footer) && (in_place || to_file)
+    write_in_place = in_place && input.is_a?(File)
+    write_to_target = to_file || to_dir
+
+    raise ArgumentError, ':in_place with input file must not accompany :to_dir or :to_file' if write_in_place && write_to_target
+
+    if !options.has_key?(:header_footer) && (write_in_place || write_to_target)
       options[:header_footer] = true
     end
 
     doc = Asciidoctor.load(input, options, &block)
 
-    if in_place && input.is_a?(File)
+    if write_in_place
       to_file = File.join(File.dirname(input.path), "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
-    elsif to_file
-      to_file = doc.normalize_asset_path(to_file)
-      if !File.directory?(File.dirname(to_file))
-        to_file = nil
+    elsif write_to_target
+      if to_dir
+        to_dir = doc.normalize_asset_path(to_dir, 'to_dir', false)
+        if to_file
+          # normalize again, to_file could have dirty bits
+          to_file = doc.normalize_asset_path(File.expand_path(to_file, to_dir), 'to_file', false)
+          # reestablish to_dir as the final target directory (in the case to_file had directory segments)
+          to_dir = File.dirname(to_file)
+        else
+          to_file = File.join(to_dir, "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
+        end
+      elsif to_file
+        to_file = doc.normalize_asset_path(to_file, 'to_file', false)
+        to_dir = File.dirname(to_file)
+      end
+
+      if !File.directory? to_dir
+        if mkdirs
+          require_library 'fileutils'
+          FileUtils.mkdir_p to_dir
+        else
+          raise IOError, "target directory does not exist: #{to_dir}"
+        end
       end
     end
 
-    if !to_file.nil?
+    if to_file
       File.open(to_file, 'w') {|file| file.write doc.render }
       nil
     else
@@ -658,20 +689,20 @@ module Asciidoctor
   #
   # name  - the String name of the library to require.
   #
-  # returns nothing
+  # returns false if the library is detected on the load path or the return
+  # value of delegating to Kernel#require
   def self.require_library(name)
     if Thread.list.size > 1
       main_script = "#{name}.rb"
       main_script_path_segment = "/#{name}.rb"
       if !$LOADED_FEATURES.detect {|p| p == main_script || p.end_with?(main_script_path_segment) }.nil?
-        return
+        return false
       else
         warn "WARN: asciidoctor is autoloading '#{name}' in threaded environment. " +
            "The use of an explicit require '#{name}' statement is recommended."
       end
     end
     require name
-    nil
   end
 
   # modules
