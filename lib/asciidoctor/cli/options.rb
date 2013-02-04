@@ -44,10 +44,10 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-v', '--verbose', 'enable verbose mode (default: false)') do |verbose|
             self[:verbose] = true
           end
-          opts.on('-b', '--backend [BACKEND]', ['html5', 'docbook45'], 'set output format (i.e., backend): [html5, docbook45] (default: html5)') do |backend|
+          opts.on('-b', '--backend BACKEND', ['html5', 'docbook45'], 'set output format (i.e., backend): [html5, docbook45] (default: html5)') do |backend|
             self[:attributes]['backend'] = backend
           end
-          opts.on('-d', '--doctype [DOCTYPE]', ['article', 'book'],
+          opts.on('-d', '--doctype DOCTYPE', ['article', 'book'],
                   'document type to use when rendering output: [article, book] (default: article)') do |doc_type|
             self[:attributes]['doctype'] = doc_type
           end
@@ -60,7 +60,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   'provided for compatibility with the asciidoc command') do
             self[:safe] = Asciidoctor::SafeMode::SAFE
           end
-          opts.on('-S', '--safe-mode [SAFE_MODE]', ['unsafe', 'safe', 'secure'],
+          opts.on('-S', '--safe-mode SAFE_MODE', ['unsafe', 'safe', 'secure'],
                   'set safe mode level explicitly: [unsafe, safe, secure] (default: secure)',
                   'disables potentially dangerous macros in source files, such as include::[]') do |safe_mode|
             self[:safe] = Asciidoctor::SafeMode.const_get(safe_mode.upcase)
@@ -71,7 +71,7 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-n', '--section-numbers', 'auto-number section titles in the HTML backend; disabled by default') do
             self[:attributes]['numbered'] = ''
           end
-          opts.on('-e', '--eruby [ERUBY]', ['erb', 'erubis'],
+          opts.on('-e', '--eruby ERUBY', ['erb', 'erubis'],
                   'specify eRuby implementation to render built-in templates: [erb, erubis] (default: erb)') do |eruby|
             self[:eruby] = eruby
           end
@@ -102,39 +102,41 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on_tail('-h', '--help', 'show this message') do
             $stdout.puts opts
             return 0
-            #exit
           end
 
           opts.on_tail('-V', '--version', 'display the version') do
             $stdout.puts "Asciidoctor #{Asciidoctor::VERSION} [http://asciidoctor.org]"
             return 0
-            #exit
           end
+          
         end
 
         begin
+          # shave off the file to process so that options errors appear correctly
+          if args.last && (args.last == '-' || !args.last.start_with?('-'))
+            self[:input_file] = args.pop
+          end
           opts_parser.parse!(args)
-          if args.size > 1
-            $stderr.puts 'asciidoctor: FAILED: too many arguments'
-            return 1
+          if args.size > 0
+            # warn, but don't panic; we may have enough to proceed, so we won't force a failure
+            $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '})"
           end
 
-          self[:input_file] = args.first
           if self[:input_file].nil? || self[:input_file].empty?
-            $stdout.puts opts_parser
-            return 0
-            #exit
-          # should we be doing this check in the options parser?
+            $stderr.puts opts_parser
+            return 1
           elsif self[:input_file] != '-' && !File.exist?(self[:input_file])
             $stderr.puts "asciidoctor: FAILED: input file #{self[:input_file]} missing"
             return 1
-            #exit
           end
-        rescue OptionParser::InvalidOption, OptionParser::MissingArgument
-          $stderr.puts $!.to_s
+        rescue OptionParser::MissingArgument
+          $stderr.puts "asciidoctor: option #{$!.message}"
           $stdout.puts opts_parser
           return 1
-          #exit
+        rescue OptionParser::InvalidOption, OptionParser::InvalidArgument
+          $stderr.puts "asciidoctor: #{$!.message}"
+          $stdout.puts opts_parser
+          return 1
         end
         self
       end # parse()
