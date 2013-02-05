@@ -75,13 +75,13 @@ To invoke it, simply execute:
 
 This will use the built-in defaults for options and create a new file
 in the same directory as the input file, with the same base name, but
-with the .html extention.
+with the .html extension.
 
 There are many other options available and full help is provided via:
 
  asciidoctor --help
 
-, or in the http://asciidoctor.org/man/asciidoctor[man page].
+or in the http://asciidoctor.org/man/asciidoctor[man page].
 
 There is also an `asciidoctor-safe` command, which turns on safe mode
 by default, preventing access to files outside the parent directory of
