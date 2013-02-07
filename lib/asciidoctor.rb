@@ -330,7 +330,7 @@ module Asciidoctor
     # The document revision info line the appears immediately following the
     # document title author info line, if present
     # v1.0, 2013-01-01: Ring in the new year release
-    :revision_info    => /^\s*(?:\D*(.*?),)?(?:\s*(.*?))(?:\s*:\s*(.*)\s*)?$/,
+    :revision_info    => /^(?:\D*(.*?),)?(?:\s*(?!:)(.*?))(?:\s*(?!^):\s*(.*))?$/,
 
     # '''
     :ruler            => /^'{3,}\s*$/,
