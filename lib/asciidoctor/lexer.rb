@@ -1208,13 +1208,13 @@ class Asciidoctor::Lexer
 
       if reader.has_lines? && !reader.peek_line.strip.empty?
         rev_line = reader.get_line 
-        match = rev_line.match(REGEXP[:revision_info])
-        if match
-          metadata['revdate'] = match[2]
-          metadata['revnumber'] = match[1] unless match[1].nil?
-          metadata['revremark'] = match[3] unless match[3].nil?
+        if match = rev_line.match(REGEXP[:revision_info])
+          metadata['revdate'] = match[2].strip
+          metadata['revnumber'] = match[1].rstrip unless match[1].nil?
+          metadata['revremark'] = match[3].rstrip unless match[3].nil?
         else
-          metadata['revdate'] = rev_line.strip
+          # throw it back
+          reader.unshift rev_line
         end
       end
 
