@@ -279,6 +279,15 @@ providing patches in a timely fashion. If critical issues for a
 particular implementation exist at the time of a major release,
 support for that Ruby version may be dropped.
 
+== Authors
+
+*Asciidoctor* was written by Ryan Waldron, Dan Allen and
+https://github.com/asciidoctor/asciidoctor/graphs/contributors[other
+contributors].
+
+*AsciiDoc* was written by Stuart Rackham and has received
+contributions from many other individuals.
+
 == Copyright
 
 Copyright (C) 2012 Ryan Waldron.
