@@ -87,10 +87,10 @@ context 'Invoker' do
     end
   end
 
-  test 'should fail with too many arguments if extra arguments are included' do
+  test 'should warn if extra arguments are detected' do
     redirect_streams do |stdout, stderr|
       invoker = invoke_cli %w(-o /dev/null extra arguments sample.asciidoc), nil
-      assert_match(/too many arguments/, stderr.string)
+      assert_match(/extra arguments detected/, stderr.string)
       assert_equal 1, invoker.code
     end
   end
