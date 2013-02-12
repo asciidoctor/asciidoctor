@@ -129,6 +129,9 @@ module Asciidoctor
 
   LIST_CONTINUATION = '+'
 
+  LINE_BREAK = ' +'
+
+  # NOTE allows for empty space in line as it could be left by the template engine
   BLANK_LINES_PATTERN = /^\s*\n/
 
   LINE_FEED_ENTITY = '&#10;' # or &#x0A;
@@ -142,10 +145,10 @@ module Asciidoctor
   # [enclosed text here] or [enclosed [text\] here]
   REGEXP = {
     # [[Foo]]
-    :anchor           => /^\[\[([^\[\]]+)\]\]\s*$/,
+    :anchor           => /^\[\[([^\[\]]+)\]\]$/,
 
     # Foowhatevs [[Bar]]
-    :anchor_embedded  => /^(.*?)\s*\[\[([^\[\]]+)\]\]\s*$/,
+    :anchor_embedded  => /^(.*?)\s*\[\[([^\[\]]+)\]\]$/,
 
     # [[ref]] (anywhere inline)
     :anchor_macro     => /\\?\[\[([\w":].*?)\]\]/,
@@ -153,14 +156,16 @@ module Asciidoctor
     # matches any block delimiter:
     #   open, listing, example, literal, comment, quote, sidebar, passthrough, table
     # NOTE position the most common blocks towards the front of the pattern
-    :any_blk          => %r{^(?:\-\-|(?:\-|=|\.|/|_|\*|\+){4,}|[\|!]={3,})\s*$},
+    :any_blk          => %r{^(?:\-\-|(?:\-|=|\.|/|_|\*|\+){4,}|[\|!]={3,})$},
 
     # optimization when scanning lines for blocks
     # NOTE accessing the first element before calling ord is first Ruby 1.8.7 compat
     :any_blk_ord      => %w(- = . / _ * + | !).map {|c| c[0].ord },
 
     # :foo: bar
-    :attr_assign      => /^:([^:!]+):\s*(.*)\s*$/,
+    # :Author: Dan
+    # :numbered!:
+    :attr_entry       => /^:(\w.*?):(?:[[:blank:]]+(.*))?$/,
 
     # {name?value}
     :attr_conditional => /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/,
@@ -173,7 +178,7 @@ module Asciidoctor
     :attr_continue    => /^[[:blank:]]*(.*)[[:blank:]]\+[[:blank:]]*$/,
 
     # :foo!:
-    :attr_delete      => /^:([^:]+)!:\s*$/,
+    :attr_delete      => /^:([^:]+)!:$/,
 
     # An attribute list above a block element
     #
@@ -185,17 +190,17 @@ module Asciidoctor
     # [{lead}]
     :blk_attr_list    => /^\[([\w\{].*)\]$/,
 
-    # attribute list or anchor (indicates a paragraph break)
+    # block attribute list or block id (bulk query)
     :attr_line        => /^\[([\w\{].*|\[[^\[\]]+\])\]$/,
 
     # attribute reference
     # {foo}
     # {counter:pcount:1}
-    :attr_ref         => /(\\?)\{(\w|\w[\w\-:]*\w)(\\?)\}/,
+    :attr_ref         => /(\\?)\{(\w+(?:[\-:]\w+)*)(\\?)\}/,
 
     # The author info line the appears immediately following the document title
     # John Doe <john@anonymous.com>
-    :author_info      => /^\s*(\w[\w\-'\.]*)(?: +(\w[\w\-'\.]*))?(?: +(\w[\w\-'\.]*))?(?: +<([^>]+)>)?\s*$/,
+    :author_info      => /^\s*(\w[\w\-'\.]*)(?: +(\w[\w\-'\.]*))?(?: +(\w[\w\-'\.]*))?(?: +<([^>]+)>)?$/,
 
     # [[[Foo]]] (anywhere inline)
     :biblio_macro     => /\\?\[\[\[([\w:][\w:\.-]*?)\]\]\]/,
@@ -213,10 +218,10 @@ module Asciidoctor
     # ////
     # comment block
     # ////
-    :comment_blk      => %r{^/{4,}\s*$},
+    :comment_blk      => %r{^/{4,}$},
 
     # // (and then whatever)
-    :comment          => %r{^//([^/].*|)$},
+    :comment          => %r{^//(?:[^/]|$)},
 
     # one,two
     # one, two
@@ -243,7 +248,7 @@ module Asciidoctor
                            ';;' => /^\s*(.*)(;;)(?:[[:blank:]]+(.*))?$/
                          },
     # ====
-    :example          => /^={4,}\s*$/,
+    :example          => /^={4,}$/,
 
     # footnote:[text]
     # footnoteref:[id,text]
@@ -251,7 +256,7 @@ module Asciidoctor
     :footnote_macro   => /\\?(footnote|footnoteref):\[((?:\\\]|[^\]])*?)\]/m,
 
     # image::filename.png[Caption]
-    :image_blk        => /^image::(\S+?)\[(.*?)\]\s*$/,
+    :image_blk        => /^image::(\S+?)\[(.*?)\]$/,
 
     # image:filename.png[Alt Text]
     :image_macro      => /\\?image:([^\[]+)(?:\[([^\]]*)\])/,
@@ -274,7 +279,7 @@ module Asciidoctor
     # +      (would not match because there's no space before +)
     #  +     (would match and capture '')
     # Foo +  (would and capture 'Foo')
-    :line_break       => /^(.*)[[:blank:]]\+[[:blank:]]*$/,
+    :line_break       => /^(.*)[[:blank:]]\+$/,
 
     # inline link and some inline link macro
     # FIXME revisit!
@@ -285,16 +290,16 @@ module Asciidoctor
     :link_macro       => /\\?link:([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/,
 
     # ----
-    :listing          => /^\-{4,}\s*$/,
+    :listing          => /^\-{4,}$/,
 
     # ....
-    :literal          => /^\.{4,}\s*$/,
+    :literal          => /^\.{4,}$/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
     :lit_par          => /^([[:blank:]]+.*)$/,
 
     # --
-    :open_blk         => /^\-\-\s*$/,
+    :open_blk         => /^\-\-$/,
 
     # . Foo (up to 5 consecutive dots)
     # 1. Foo (arabic, default)
@@ -305,7 +310,7 @@ module Asciidoctor
     :olist            => /^\s*(\d+\.|[a-z]\.|[ivx]+\)|\.{1,5}) +(.*)$/i,
 
     # ++++
-    :pass             => /^\+{4,}\s*$/,
+    :pass             => /^\+{4,}$/,
 
     # inline passthrough macros
     # +++text+++
@@ -325,7 +330,7 @@ module Asciidoctor
     :pass_placeholder => /\x0(\d+)\x0/,
 
     # ____
-    :quote            => /^_{4,}\s*$/,
+    :quote            => /^_{4,}$/,
 
     # The document revision info line the appears immediately following the
     # document title author info line, if present
@@ -333,25 +338,28 @@ module Asciidoctor
     :revision_info    => /^(?:\D*(.*?),)?(?:\s*(?!:)(.*?))(?:\s*(?!^):\s*(.*))?$/,
 
     # '''
-    :ruler            => /^'{3,}\s*$/,
+    :ruler            => /^'{3,}$/,
 
     # ****
-    :sidebar_blk      => /^\*{4,}\s*$/,
+    :sidebar_blk      => /^\*{4,}$/,
 
     # \' within a word
     :single_quote_esc => /(\w)\\'(\w)/,
     # an alternative if our backend generated single-quoted html/xml attributes
     #:single_quote_esc => /(\w|=)\\'(\w)/,
 
+    # used for sanitizing attribute names
+    :illegal_attr_name_chars => /[^\w\-]/,
+
     # |===
     # |table
     # |===
-    :table            => /^\|={3,}\s*$/,
+    :table            => /^\|={3,}$/,
 
     # !===
     # !table
     # !===
-    :table_nested     => /^!={3,}\s*$/,
+    :table_nested     => /^!={3,}$/,
 
     # 1*h,2*,^3e
     :table_colspec    => /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+)?([a-z])?$/,
@@ -364,7 +372,7 @@ module Asciidoctor
     },
 
     # .Foo   but not  . Foo or ..Foo
-    :blk_title        => /^\.([^\s\.].*)\s*$/,
+    :blk_title        => /^\.([^\s\.].*)$/,
 
     # == Foo
     # ^ yields a level 2 title
@@ -379,13 +387,13 @@ module Asciidoctor
     # match[1] is the delimiter, whose length determines the level
     # match[2] is the title itself
     # match[3] is an inline anchor, which becomes the section id
-    :section_title     => /^(={1,5})\s+(\S.*?)\s*(?:\[\[([^\[]+)\]\]\s*)?(?:\s\1)?$/,
+    :section_title     => /^(={1,5})\s+(\S.*?)(?:\s*\[\[([^\[]+)\]\])?(?:\s+\1)?$/,
 
     # does not begin with a dot and has at least one alphanumeric character
-    :section_name      => /^((?=.*\w+.*)[^\.].*?)\s*$/,
+    :section_name      => /^((?=.*\w+.*)[^\.].*?)$/,
 
     # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
-    :section_underline => /^([=\-~^\+])+\s*$/,
+    :section_underline => /^([=\-~^\+])+$/,
 
     # * Foo (up to 5 consecutive asterisks)
     # - Foo
@@ -398,14 +406,20 @@ module Asciidoctor
 
     # ifdef::basebackend-html[]
     # ifndef::theme[]
-    :ifdef_macro      => /^(ifdef|ifndef)::([^\[]+)\[\]/,
-
+    # ifeval::["{asciidoctor-version}" >= "0.1.0"]
+    # ifdef::asciidoctor[Asciidoctor!]
     # endif::theme[]
     # endif::basebackend-html[]
-    :endif_macro      => /^endif::/,
+    # endif::[]
+    :ifdef_macro      => /^[\\]?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,\+])\S+?)?)\[(.+)?\]$/,
+
+    # "{asciidoctor-version}" >= "0.1.0"
+    :eval_expr        => /^(\S.*?)[[:blank:]]*(==|!=|<=|>=|<|>)[[:blank:]]*(\S.*)$/,
+    # ...or if we want to be more strict up front about what's on each side
+    #:eval_expr        => /^(true|false|("|'|)\{\w+(?:\-\w+)*\}\2|("|')[^\3]*\3|\-?\d+(?:\.\d+)*)[[:blank:]]*(==|!=|<=|>=|<|>)[[:blank:]]*(true|false|("|'|)\{\w+(?:\-\w+)*\}\6|("|')[^\7]*\7|\-?\d+(?:\.\d+)*)$/,
 
     # include::chapter1.ad[]
-    :include_macro    => /^\\?include::([^\[]+)\[\]\s*\n?\z/
+    :include_macro    => /^\\?include::([^\[]+)\[\]$/
   }
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
@@ -683,6 +697,14 @@ module Asciidoctor
   def self.render_file(filename, options = {}, &block)
     Asciidoctor.render(File.new(filename), options, &block)
   end
+
+  # NOTE still contemplating this method
+  #def self.parse_document_header(input, options = {})
+  #  document = Asciidoctor::Document.new [], options
+  #  reader = Asciidoctor::Reader.new input, document, true
+  #  Asciidoctor::Lexer.parse_document_header reader, document
+  #  document
+  #end
 
   # Internal: Prior to invoking Kernel#require, issues a warning urging a
   # manual require if running in a threaded environment.

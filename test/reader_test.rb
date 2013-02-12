@@ -7,13 +7,13 @@ class ReaderTest < Test::Unit::TestCase
     @reader = Asciidoctor::Reader.new @src_data
   end
 
-  context "has_lines?" do
+  context "has_more_lines?" do
     test "returns false for empty document" do
-      assert !Asciidoctor::Reader.new.has_lines?
+      assert !Asciidoctor::Reader.new.has_more_lines?
     end
 
     test "returns true with lines remaining" do
-      assert @reader.has_lines?, "Yo, didn't work"
+      assert @reader.has_more_lines?, "Yo, didn't work"
     end
   end
 
@@ -57,7 +57,7 @@ This is another paragraph.
       result = reader.grab_lines_until
       assert_equal 3, result.size
       assert_equal lines, result
-      assert !reader.has_lines?
+      assert !reader.has_more_lines?
       assert reader.empty?
     end
 
@@ -181,10 +181,14 @@ include::include-file.asciidoc[]
 last line
       EOS
       doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SafeMode::SAFE
-      Asciidoctor::Reader.new(input.lines.entries, doc) {|inc|
-        ":file: #{inc}\n\nmiddle line".lines.entries
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true) {|inc|
+        ":includefile: #{inc}\n\nmiddle line".lines.entries
       }
-      assert_equal 'include-file.asciidoc', doc.attributes['file']
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_match(/^:includefile: include-file.asciidoc$/, lines.join)
     end
 
     test 'escaped include macro is left unprocessed' do
@@ -231,7 +235,7 @@ include::include-file.asciidoc[]
   context 'build secure asset path' do
     test 'allows us to specify a path relative to the current dir' do
       doc = Asciidoctor::Document.new
-      Asciidoctor::Reader.new(["foo"], doc)
+      Asciidoctor::Reader.new([], doc, true)
       legit_path = Dir.pwd + "/foo"
       assert_equal legit_path, doc.normalize_asset_path(legit_path)
     end
@@ -239,7 +243,7 @@ include::include-file.asciidoc[]
     test "keeps naughty absolute paths from getting outside" do
       naughty_path = "#{disk_root}etc/passwd"
       doc = Asciidoctor::Document.new
-      Asciidoctor::Reader.new(["foo"], doc)
+      Asciidoctor::Reader.new([], doc, true)
       secure_path = doc.normalize_asset_path(naughty_path)
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)
@@ -248,26 +252,247 @@ include::include-file.asciidoc[]
     test "keeps naughty relative paths from getting outside" do
       naughty_path = "safe/ok/../../../../../etc/passwd"
       doc = Asciidoctor::Document.new
-      Asciidoctor::Reader.new(["foo"], doc)
+      Asciidoctor::Reader.new([], doc, true)
       secure_path = doc.normalize_asset_path(naughty_path)
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)
     end
   end
 
-  # TODO these tests could be expanded
-  context 'Conditional blocks' do
+  context 'Conditional Inclusions' do
+    test 'preprocess_next_line returns true if cursor advanced' do
+      input = <<-EOS
+ifdef::asciidoctor[]
+Asciidoctor!
+endif::asciidoctor[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      assert reader.preprocess_next_line == true
+    end
+
+    test 'preprocess_next_line returns false if cursor not advanced' do
+      input = <<-EOS
+content
+ifdef::asciidoctor[]
+Asciidoctor!
+endif::asciidoctor[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      assert reader.preprocess_next_line == false
+    end
+
+    test 'preprocess_next_line returns nil if cursor advanced past end of source' do
+      input = <<-EOS
+ifdef::foobar[]
+swallowed content
+endif::foobar[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      assert reader.preprocess_next_line.nil?
+    end
+
     test 'ifdef with defined attribute includes block' do
       input = <<-EOS
-:holygrail:
-
 ifdef::holygrail[]
 There is a holy grail!
 endif::holygrail[]
       EOS
        
-      reader = Asciidoctor::Reader.new(input.lines.entries, Asciidoctor::Document.new)
-      assert_match(/There is a holy grail!/, reader.lines.join)
+      doc = Asciidoctor::Document.new [], :attributes => {'holygrail' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'There is a holy grail!', lines.join.strip
+    end
+
+    test 'ifdef with defined attribute includes text in brackets' do
+      input = <<-EOS
+On our quest we go...
+ifdef::holygrail[There is a holy grail!]
+There was much rejoicing.
+      EOS
+       
+      doc = Asciidoctor::Document.new [], :attributes => {'holygrail' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal "On our quest we go...\nThere is a holy grail!\nThere was much rejoicing.", lines.join.strip
+    end
+
+    test 'include with non-matching nested exclude' do
+      input = <<-EOS
+ifdef::grail[]
+holy
+ifdef::swallow[]
+swallow
+endif::swallow[]
+grail
+endif::grail[]
+      EOS
+       
+      doc = Asciidoctor::Document.new [], :attributes => {'grail' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal "holy\ngrail", lines.join.strip
+    end
+
+    test 'nested excludes with same condition' do
+      input = <<-EOS
+ifndef::grail[]
+ifndef::grail[]
+not here
+endif::grail[]
+endif::grail[]
+      EOS
+       
+      doc = Asciidoctor::Document.new [], :attributes => {'grail' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal '', lines.join.strip
+    end
+
+    test 'include with nested exclude of inverted condition' do
+      input = <<-EOS
+ifdef::grail[]
+holy
+ifndef::grail[]
+not here
+endif::grail[]
+grail
+endif::grail[]
+      EOS
+       
+      doc = Asciidoctor::Document.new [], :attributes => {'grail' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal "holy\ngrail", lines.join.strip
+    end
+
+    test 'exclude with matching nested exclude' do
+      input = <<-EOS
+poof
+ifdef::swallow[]
+no
+ifdef::swallow[]
+swallow
+endif::swallow[]
+here
+endif::swallow[]
+gone
+      EOS
+       
+      doc = Asciidoctor::Document.new [], :attributes => {'grail' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal "poof\ngone", lines.join.strip
+    end
+
+    test 'exclude with nested include using shorthand end' do
+      input = <<-EOS
+poof
+ifndef::grail[]
+no grail
+ifndef::swallow[]
+or swallow
+endif::[]
+in here
+endif::[]
+gone
+      EOS
+       
+      doc = Asciidoctor::Document.new [], :attributes => {'grail' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal "poof\ngone", lines.join.strip
+    end
+
+    test 'ifdef with one alternative attribute set includes content' do
+      input = <<-EOS
+ifdef::holygrail,swallow[]
+Our quest is complete!
+endif::holygrail,swallow[]
+      EOS
+
+      doc = Asciidoctor::Document.new [], :attributes => {'swallow' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'Our quest is complete!', lines.join.strip
+    end
+
+    test 'ifdef with no alternative attributes set does not include content' do
+      input = <<-EOS
+ifdef::holygrail,swallow[]
+Our quest is complete!
+endif::holygrail,swallow[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal '', lines.join.strip
+    end
+
+    test 'ifdef with all required attributes set includes content' do
+      input = <<-EOS
+ifdef::holygrail+swallow[]
+Our quest is complete!
+endif::holygrail+swallow[]
+      EOS
+
+      doc = Asciidoctor::Document.new [], :attributes => {'holygrail' => '', 'swallow' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'Our quest is complete!', lines.join.strip
+    end
+
+    test 'ifdef with missing required attributes does not include content' do
+      input = <<-EOS
+ifdef::holygrail+swallow[]
+Our quest is complete!
+endif::holygrail+swallow[]
+      EOS
+
+      doc = Asciidoctor::Document.new [], :attributes => {'holygrail' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal '', lines.join.strip
     end
 
     test 'ifndef with undefined attribute includes block' do
@@ -277,8 +502,220 @@ Our quest continues to find the holy grail!
 endif::holygrail[]
       EOS
 
-      reader = Asciidoctor::Reader.new(input.lines.entries, Asciidoctor::Document.new)
-      assert_match(/Our quest continues to find the holy grail!/, reader.lines.join)
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'Our quest continues to find the holy grail!', lines.join.strip
+    end
+
+    test 'ifndef with one alternative attribute set includes content' do
+      input = <<-EOS
+ifndef::holygrail,swallow[]
+Our quest is complete!
+endif::holygrail,swallow[]
+      EOS
+
+      doc = Asciidoctor::Document.new [], :attributes => {'swallow' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'Our quest is complete!', lines.join.strip
+    end
+
+    test 'ifndef with no alternative attributes set includes content' do
+      input = <<-EOS
+ifndef::holygrail,swallow[]
+Our quest is complete!
+endif::holygrail,swallow[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'Our quest is complete!', lines.join.strip
+    end
+
+    test 'ifndef with any required attributes set does not include content' do
+      input = <<-EOS
+ifndef::holygrail+swallow[]
+Our quest is complete!
+endif::holygrail+swallow[]
+      EOS
+
+      doc = Asciidoctor::Document.new [], :attributes => {'swallow' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal '', lines.join.strip
+    end
+
+    test 'ifndef with no required attributes set includes content' do
+      input = <<-EOS
+ifndef::holygrail+swallow[]
+Our quest is complete!
+endif::holygrail+swallow[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'Our quest is complete!', lines.join.strip
+    end
+
+    test 'escaped ifdef is unescaped and ignored' do
+      input = <<-EOS
+\\ifdef::holygrail[]
+content
+\\endif::holygrail[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal "ifdef::holygrail[]\ncontent\nendif::holygrail[]", lines.join.strip
+    end
+
+    test 'ifeval comparing double-quoted attribute to matching string is included' do
+      input = <<-EOS
+ifeval::["{gem}" == "asciidoctor"]
+Asciidoctor it is!
+endif::[]
+      EOS
+
+      doc = Asciidoctor::Document.new [], :attributes => {'gem' => 'asciidoctor'}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'Asciidoctor it is!', lines.join.strip
+    end
+
+    test 'ifeval comparing single-quoted attribute to matching string is included' do
+      input = <<-EOS
+ifeval::['{gem}' == 'asciidoctor']
+Asciidoctor it is!
+endif::[]
+      EOS
+
+      doc = Asciidoctor::Document.new [], :attributes => {'gem' => 'asciidoctor'}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'Asciidoctor it is!', lines.join.strip
+    end
+
+    test 'ifeval comparing quoted attribute to non-matching string is ignored' do
+      input = <<-EOS
+ifeval::['{gem}' == 'asciidoctor']
+Asciidoctor it is!
+endif::[]
+      EOS
+
+      doc = Asciidoctor::Document.new [], :attributes => {'gem' => 'tilt'}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal '', lines.join.strip
+    end
+
+    test 'ifeval comparing attribute to lower version number is included' do
+      input = <<-EOS
+ifeval::['{asciidoctor-version}' >= '0.1.0']
+That version will do!
+endif::[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'That version will do!', lines.join.strip
+    end
+
+    test 'ifeval comparing attribute to self is included' do
+      input = <<-EOS
+ifeval::['{asciidoctor-version}' == '{asciidoctor-version}']
+Of course it's the same!
+endif::[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'Of course it\'s the same!', lines.join.strip
+    end
+
+    test 'ifeval arguments can be mirrored' do
+      input = <<-EOS
+ifeval::["0.1.0" <= "{asciidoctor-version}"]
+That version will do!
+endif::[]
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'That version will do!', lines.join.strip
+    end
+
+    test 'ifeval matching numeric comparison is included' do
+      input = <<-EOS
+ifeval::[{rings} == 1]
+One ring to rule them all!
+endif::[]
+      EOS
+
+      doc = Asciidoctor::Document.new [], :attributes => {'rings' => 1}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal 'One ring to rule them all!', lines.join.strip
+    end
+
+    test 'ifdef with no target is ignored' do
+      input = <<-EOS
+ifdef::[]
+content
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal "ifdef::[]\ncontent", lines.join.strip
     end
   end
 
@@ -291,7 +728,7 @@ CRLF\r
 endlines\r
       EOS
 
-      reader = Asciidoctor::Reader.new(input.lines.entries, Asciidoctor::Document.new)
+      reader = Asciidoctor::Reader.new(input.lines.entries, Asciidoctor::Document.new, true)
       reader.lines.each do |line|
         assert !line.end_with?("\r\n")
       end

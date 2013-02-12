@@ -94,7 +94,7 @@ pre code { background-color: #F8F8F8; padding: 0; }
     <script>hljs.initHighlightingOnLoad();</script>
     <% end %>
   </head>
-  <body#{attribute('id', :'css-signature')} class="<%= doctype %>"<% if attr? 'max-width' %> style="max-width: <%= attr 'max-width' %>;"<% end %>>
+  <body#{id} class="<%= doctype %>"<% if attr? 'max-width' %> style="max-width: <%= attr 'max-width' %>;"<% end %>>
     <% unless noheader %>
     <div id="header">
       <% if has_header? %>
@@ -109,7 +109,7 @@ pre code { background-color: #F8F8F8; padding: 0; }
       <% end %>
       <% if attr? :toc %>
       <div id="toc">
-        <div id="toctitle"><%= attr 'toc-title', 'Table of Contents' %></div>
+        <div id="toctitle"><%= attr 'toc-title' %></div>
 <%= template.render_outline(self, (attr :toclevels, 2).to_i) %>
       </div>
       <% end %>
@@ -266,7 +266,7 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="listingblock#{role_class}">
-  #{title_div}
+  #{title_div :caption => true}
   <div class="content monospaced">
     <% if (attr :style) == 'source' %>
     <pre class="highlight<% if attr('source-highlighter') == 'coderay' %> CodeRay<% end %>"><code#{attribute('class', :language)}><%= template.preserve_endlines(content, self) %></code></pre>
