@@ -7,6 +7,11 @@ context 'Attributes' do
       assert_equal 'Tanglefoot', doc.attributes['frog']
     end
 
+    test 'requires a space after colon following attribute name' do
+      doc = document_from_string 'foo:bar'
+      assert_equal nil, doc.attributes['foo']
+    end
+
     test 'creates an attribute by fusing a multi-line value' do
       str = <<-EOS
 :description: This is the first      +
@@ -130,9 +135,15 @@ endif::holygrail[]
     end
 
     test "convert multi-word names and render" do
-      html = render_string("Main Header\n===========\n:My frog: Tanglefoot\n\nYo, {myfrog}!")
-      result = Nokogiri::HTML(html)
-      assert_equal 'Yo, Tanglefoot!', result.css("p").first.content.strip
+      input = <<-EOS
+Main Header
+===========
+:My frog: Tanglefoot
+
+Yo, {myfrog}!
+      EOS
+      output = render_string input
+      assert_xpath '(//p)[1][text()="Yo, Tanglefoot!"]', output, 1
     end
 
     test "ignores lines with bad attributes" do
@@ -182,11 +193,18 @@ To use {gem_name}, the first thing to do is to import it in your Ruby source fil
     end
 
     test 'renders attribute until it is deleted' do
-      pending 'This requires that we consume attributes as the document is being lexed, not up front'
-      #output = render_string(":foo: bar\n\nCrossing the {foo}\n\n:foo!:\nBelly up to the {foo}")
-      # result = Nokogiri::HTML(html)
-      # assert_match /Crossing the bar/, result.css("p").first.content.strip
-      # assert_no_match /Belly up to the bar/, result.css("p").last.content.strip
+      input = <<-EOS
+:foo: bar
+
+Crossing the {foo}.
+
+:foo!:
+
+Belly up to the {foo}.
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//p[text()="Crossing the bar."]', output, 1
+      assert_xpath '//p[text()="Belly up to the bar."]', output, 0
     end
 
     test 'does not disturb attribute-looking things escaped with backslash' do
@@ -419,6 +437,22 @@ paragraph
       assert_equal 'foo', sec.id
       subsec = sec.blocks.last
       assert_equal 'coolio', subsec.id
+    end
+
+    test 'block id above document title sets id on document' do
+      input = <<-EOS
+[[reference]]
+Reference Manual
+================
+:css-signature: refguide
+
+preamble
+      EOS
+      doc = document_from_string input
+      assert_equal 'reference', doc.id 
+      assert_equal 'refguide', doc.attr('css-signature')
+      output = doc.render
+      assert_xpath '//body[@id="reference"]', output, 1
     end
 
     test "trailing block attributes tranfer to the following section" do

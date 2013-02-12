@@ -3,7 +3,7 @@ require 'test_helper'
 context 'Document' do
 
   context 'Example document' do
-    test 'test_title' do
+    test 'document title' do
       doc = example_document(:asciidoc_index)
       assert_equal 'AsciiDoc Home Page', doc.doctitle
       assert_equal 'AsciiDoc Home Page', doc.name
@@ -297,15 +297,23 @@ text
       assert_css '#content h1', output, 0
     end
      
-    test 'test_empty_document' do
-      doc = document_from_string('')
+    test 'should not choke on empty source' do
+      doc = Asciidoctor::Document.new ''
       assert doc.blocks.empty?
       assert_nil doc.doctitle
       assert !doc.has_header?
       assert_nil doc.header
     end
 
-    test 'test_with_metadata' do
+    test 'should not choke on nil source' do
+      doc = Asciidoctor::Document.new nil
+      assert doc.blocks.empty?
+      assert_nil doc.doctitle
+      assert !doc.has_header?
+      assert_nil doc.header
+    end
+
+    test 'with metadata' do
       input = <<-EOS
 = AsciiDoc
 Stuart Rackham <founder@asciidoc.org>
@@ -323,7 +331,7 @@ more info...
       assert_xpath '//*[@id="header"]/span[@id="revremark"][text() = "See changelog."]', output, 1
     end
 
-    test 'test_with_header_footer' do
+    test 'with header footer' do
       result = render_string("= Title\n\npreamble")
       assert_xpath '/html', result, 1
       assert_xpath '//*[@id="header"]', result, 1
@@ -331,12 +339,29 @@ more info...
       assert_xpath '//*[@id="preamble"]', result, 1
     end
 
-    test 'test_with_no_header_footer' do
+    test 'no header footer' do
       result = render_string("= Title\n\npreamble", :header_footer => false)
       assert_xpath '/html', result, 0
       assert_xpath '/*[@id="header"]', result, 0
       assert_xpath '/*[@id="footer"]', result, 0
       assert_xpath '/*[@id="preamble"]', result, 1
+    end
+
+    test 'parse header only' do
+      input = <<-EOS
+= Document Title
+Author Name
+:foo: bar
+
+preamble
+      EOS
+
+      doc = document_from_string input, :parse_header_only => true
+      assert_equal 'Document Title', doc.doctitle
+      assert_equal 'Author Name', doc.author
+      assert_equal 'bar', doc.attributes['foo']
+      # there would be at least 1 block had it parsed beyond the header
+      assert_equal 0, doc.blocks.size
     end
 
     test 'renders footnotes in footer' do
@@ -439,6 +464,34 @@ more info...
       EOS
       output = render_string input, :attributes => {'backend' => 'docbook45'}
       assert_xpath '/article/articleinfo/authorinitials[text()="SJR"]', output, 1
+    end
+
+    test 'attribute entry can appear immediately after document title' do
+      input = <<-EOS
+Reference Guide
+===============
+:toc:
+
+preamble
+      EOS
+      doc = document_from_string input
+      assert doc.attr?('toc')
+      assert_equal '', doc.attr('toc')
+    end
+
+    test 'attribute entry can appear before author line under document title' do
+      input = <<-EOS
+Reference Guide
+===============
+:toc:
+Dan Allen
+
+preamble
+      EOS
+      doc = document_from_string input
+      assert doc.attr?('toc')
+      assert_equal '', doc.attr('toc')
+      assert_equal 'Dan Allen', doc.attr('author')
     end
   end
 end
