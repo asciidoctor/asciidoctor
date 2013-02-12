@@ -240,7 +240,7 @@ class Asciidoctor::AbstractNode
       relative_asset_path = Pathname.new(asset_path).relative_path_from(Pathname.new(input_path)).to_s
       if relative_asset_path.start_with?('..')
         if autocorrect
-          puts 'asciidoctor: WARNING: ' + asset_name + ' has illegal reference to ancestor of base directory'
+          puts "asciidoctor: WARNING: #{asset_name} has illegal reference to ancestor of base directory"
         else
           raise SecurityError, "#{asset_name} has reference to path outside of base directory, disallowed in safe mode: #{asset_path}"
         end

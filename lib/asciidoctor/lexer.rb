@@ -40,28 +40,56 @@ class Asciidoctor::Lexer
   #
   # reader   - the Reader holding the source lines of the document
   # document - the empty Document into which the lines will be parsed
+  # options  - a Hash of options to control processing
   #
   # returns the Document object
-  def self.parse(reader, document)
-    # process and plow away any attribute lines that proceed the first block so
-    # we can get at the document title, if present, then begin parsing blocks
-    reader.skip_blank_lines
-    attributes = parse_block_metadata_lines(reader, document)
+  def self.parse(reader, document, options = {})
+    block_attributes = parse_document_header(reader, document)
 
-    # by processing the header here, we enforce its position at head of the document  
-    next_level = is_next_line_section? reader, attributes
-    if next_level == 0
-      title_info = parse_section_title(reader) 
-      document.title = title_info[1]
-      parse_header_metadata(reader, document)
-    end
-
-    while reader.has_lines?
-      new_section, attributes = next_section(reader, document, attributes)
-      document << new_section unless new_section.nil?
+    unless options[:header_only]
+      while reader.has_more_lines?
+        new_section, block_attributes = next_section(reader, document, block_attributes)
+        document << new_section unless new_section.nil?
+      end
     end
 
     document
+  end
+
+  # Public: Parses the document header of the AsciiDoc source read from the Reader
+  #
+  # Reads the AsciiDoc source from the Reader until the end of the document
+  # header is reached. The Document object is populated with information from
+  # the header (document title, document attributes, etc). The document
+  # attributes are then saved to establish a save point to which to rollback
+  # after parsing is complete.
+  #
+  # This method assumes that there are no blank lines at the start of the document,
+  # which are automatically removed by the reader.
+  #
+  # returns the Hash of orphan block attributes captured above the header
+  def self.parse_document_header(reader, document)
+    # capture any lines of block-level metadata and plow away any comment lines
+    # that precede first block
+    block_attributes = parse_block_metadata_lines(reader, document)
+
+    # check if the first line is the document title
+    # if so, add a header to the document and parse the header metadata
+    if is_next_line_document_title?(reader, block_attributes)
+      document.id, document.title, _, _ = parse_section_title(reader)
+      # should this be encapsulated in document?
+      if document.id.nil? && block_attributes.has_key?('id')
+        document.id = block_attributes.delete('id')
+      end
+      parse_header_metadata(reader, document)
+    end
+ 
+    document.clear_playback_attributes block_attributes
+    document.save_attributes
+ 
+    # NOTE these are the block-level attributes (not document attributes) that
+    # precede the first line of content (document title, first section or first block)
+    block_attributes
   end
 
   # Public: Return the next section from the Reader.
@@ -145,18 +173,18 @@ class Asciidoctor::Lexer
     #
     # We have to parse all the metadata lines before continuing with the loop,
     # otherwise subsequent metadata lines get interpreted as block content
-    while reader.has_lines?
+    while reader.has_more_lines?
       parse_block_metadata_lines(reader, section, attributes)
 
       next_level = is_next_line_section? reader, attributes
       if next_level
         doctype = parent.document.doctype
         if next_level == 0 && doctype != 'book'
-          puts "asciidoctor: ERROR: only book doctypes can contain level 0 sections"
+          puts "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
         end
         if next_level > current_level || (section.is_a?(Document) && next_level == 0)
           unless expected_next_levels.nil? || expected_next_levels.include?(next_level)
-            puts "asciidoctor: WARNING: section title out of sequence: " +
+            puts "asciidoctor: WARNING: line #{reader.lineno + 1}: section title out of sequence: " +
                 "expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, " +
                 "got level #{next_level}"
           end
@@ -210,10 +238,10 @@ class Asciidoctor::Lexer
   # Returns a Section or Block object holding the parsed content of the processed lines
   def self.next_block(reader, parent, attributes = {}, options = {})
     # Skip ahead to the block content
-    skipped = reader.skip_blank
+    skipped = reader.skip_blank_lines
 
     # bail if we've reached the end of the section content
-    return nil unless reader.has_lines?
+    return nil unless reader.has_more_lines?
 
     if options[:text] && skipped > 0
       options.delete(:text)
@@ -223,10 +251,7 @@ class Asciidoctor::Lexer
       msg = []
       msg << '/' * 64
       msg << 'next_block() - First two lines are:'
-      msg << reader.peek_line
-      tmp_line = reader.get_line
-      msg << reader.peek_line
-      reader.unshift tmp_line
+      msg.concat reader.peek_lines(2)
       msg << '/' * 64
       msg * "\n"
     }
@@ -238,9 +263,9 @@ class Asciidoctor::Lexer
     context = parent.is_a?(Block) ? parent.context : nil
     block = nil
 
-    while reader.has_lines? && block.nil?
+    while reader.has_more_lines? && block.nil?
       if parse_metadata && parse_block_metadata_line(reader, document, attributes, options)
-        reader.next_line
+        reader.advance
         next
       elsif parse_sections && context.nil? && is_next_line_section?(reader, attributes)
         block, attributes = next_section(reader, parent, attributes)
@@ -249,22 +274,12 @@ class Asciidoctor::Lexer
 
       this_line = reader.get_line
 
-      delimited_blk = delimited_block? this_line
-
-      # NOTE I've haven't decided whether I want this check here or in
-      # parse_block_metadata (where it is currently)
-      #if this_line.match(REGEXP[:comment_blk])
-      #  reader.grab_lines_until {|line| line.match( REGEXP[:comment_blk] ) }
-      #  reader.skip_blank
-      #  # NOTE we should break here because we have found a block, it
-      #  # just happens to be nil...if we keep going we potentially overrun
-      #  # a section heading which is not processed in this anymore
-      #  break
+      delimited_blk = is_delimited_block? this_line
 
       # NOTE we're letting ruler have attributes
       if !options[:text] && this_line.match(REGEXP[:ruler])
         block = Block.new(parent, :ruler)
-        reader.skip_blank
+        reader.skip_blank_lines
 
       elsif !options[:text] && (match = this_line.match(REGEXP[:image_blk]))
         block = Block.new(parent, :image)
@@ -274,16 +289,17 @@ class Asciidoctor::Lexer
           attributes['target'] = target
           document.register(:images, target)
           attributes['alt'] ||= File.basename(target, File.extname(target))
-          # hmmm, this assignment seems like a one-off
           block.title = attributes['title']
-          if block.title? && attributes['caption'].nil?
-            attributes['caption'] = "Figure #{document.counter('figure-number')}. "
+          if block.title? && !attributes.has_key?('caption') && !block.attr?('caption')
+            number = document.counter('figure-number')
+            attributes['caption'] = "#{document.attributes['figure-caption']} #{number}. "
+            Document::AttributeEntry.new('figure-number', number).save_to(attributes)
           end
         else
           # drop the line if target resolves to nothing
           block = nil
         end
-        reader.skip_blank
+        reader.skip_blank_lines
 
       elsif delimited_blk && (match = this_line.match(REGEXP[:open_blk]))
         # an open block is surrounded by '--' lines and has zero or more blocks inside
@@ -291,12 +307,12 @@ class Asciidoctor::Lexer
         buffer = Reader.new reader.grab_lines_until(:terminator => terminator)
 
         # Strip lines off end of block - not implemented yet
-        # while buffer.has_lines? && buffer.last.strip.empty?
+        # while buffer.has_more_lines? && buffer.last.strip.empty?
         #   buffer.pop
         # end
 
         block = Block.new(parent, :open)
-        while buffer.has_lines?
+        while buffer.has_more_lines?
           new_block = next_block(buffer, block)
           block.blocks << new_block unless new_block.nil?
         end
@@ -309,7 +325,7 @@ class Asciidoctor::Lexer
         block = Block.new(parent, :sidebar)
         buffer = Reader.new reader.grab_lines_until(:terminator => terminator)
 
-        while buffer.has_lines?
+        while buffer.has_more_lines?
           new_block = next_block(buffer, block)
           block.blocks << new_block unless new_block.nil?
         end
@@ -319,12 +335,12 @@ class Asciidoctor::Lexer
         attributes['style'] = 'arabic'
         items = []
         block.buffer = items
-        reader.unshift this_line
+        reader.unshift_line this_line
         expected_index = 1
         begin
           # might want to move this check to a validate method
           if match[1].to_i != expected_index
-            puts "asciidoctor: WARNING: callout list item index: expected #{expected_index} got #{match[1]}"
+            puts "asciidoctor: WARNING: line #{reader.lineno + 1}: callout list item index: expected #{expected_index} got #{match[1]}"
           end
           list_item = next_list_item(reader, block, match)
           expected_index += 1
@@ -334,21 +350,21 @@ class Asciidoctor::Lexer
             if !coids.empty?
               list_item.attributes['coids'] = coids
             else
-              puts 'asciidoctor: WARNING: no callouts refer to list item ' + items.size.to_s
+              puts "asciidoctor: WARNING: line #{reader.lineno}: no callouts refer to list item #{items.size}"
             end
           end
-        end while reader.has_lines? && match = reader.peek_line.match(REGEXP[:colist])
+        end while reader.has_more_lines? && match = reader.peek_line.match(REGEXP[:colist])
 
         document.callouts.next_list
 
       elsif match = this_line.match(REGEXP[:ulist])
         AttributeList.rekey(attributes, ['style'])
-        reader.unshift(this_line)
+        reader.unshift_line this_line
         block = next_outline_list(reader, :ulist, parent)
 
       elsif match = this_line.match(REGEXP[:olist])
         AttributeList.rekey(attributes, ['style'])
-        reader.unshift(this_line)
+        reader.unshift_line this_line
         block = next_outline_list(reader, :olist, parent)
         # QUESTION move this logic to next_outline_list?
         if !(attributes.has_key? 'style') && !(block.attributes.has_key? 'style')
@@ -364,7 +380,7 @@ class Asciidoctor::Lexer
         end
 
       elsif match = this_line.match(REGEXP[:dlist])
-        reader.unshift this_line
+        reader.unshift_line this_line
         block = next_labeled_list(reader, match, parent)
         AttributeList.rekey(attributes, ['style'])
 
@@ -374,10 +390,11 @@ class Asciidoctor::Lexer
         AttributeList.rekey(attributes, ['style'])
         table_reader = Reader.new reader.grab_lines_until(:terminator => terminator, :skip_line_comments => true)
         block = next_table(table_reader, parent, attributes)
-        # hmmm, this assignment seems like a one-off
         block.title = attributes['title']
-        if block.title? && attributes['caption'].nil?
-          attributes['caption'] = "Table #{document.counter('table-number')}. "
+        if block.title? && !attributes.has_key?('caption') && !block.attr?('caption')
+          number = document.counter('table-number')
+          attributes['caption'] = "#{document.attributes['table-caption']} #{number}. "
+          Document::AttributeEntry.new('table-number', number).save_to(attributes)
         end
     
       # FIXME violates DRY because it's a duplication of other block parsing
@@ -387,19 +404,20 @@ class Asciidoctor::Lexer
         AttributeList.rekey(attributes, ['style'])
         if admonition_style = ADMONITION_STYLES.detect {|s| attributes['style'] == s}
           block = Block.new(parent, :admonition)
-          attributes['name'] = admonition_style.downcase
-          attributes['caption'] ||= admonition_style.capitalize
+          attributes['name'] = admonition_name = admonition_style.downcase
+          attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
         else
           block = Block.new(parent, :example)
-          # hmmm, this assignment seems like a one-off
           block.title = attributes['title']
-          if block.title? && attributes['caption'].nil?
-            attributes['caption'] = "Example #{document.counter('example-number')}. "
+          if block.title? && !attributes.has_key?('caption') && !block.attr?('caption')
+            number = document.counter('example-number')
+            attributes['caption'] = "#{document.attributes['example-caption']} #{number}. "
+            Document::AttributeEntry.new('example-number', number).save_to(attributes)
           end
         end
         buffer = Reader.new reader.grab_lines_until(:terminator => terminator)
 
-        while buffer.has_lines?
+        while buffer.has_more_lines?
           new_block = next_block(buffer, block)
           block.blocks << new_block unless new_block.nil?
         end
@@ -411,6 +429,13 @@ class Asciidoctor::Lexer
         buffer = reader.grab_lines_until(:terminator => terminator)
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :listing, buffer)
+        block.title = attributes['title']
+        if document.attributes.has_key?('listing-caption') &&
+            block.title? && !attributes.has_key?('caption') && !block.attr?('caption')
+          number = document.counter('listing-number')
+          attributes['caption'] = "#{document.attributes['listing-caption']} #{number}. "
+          Document::AttributeEntry.new('listing-number', number).save_to(attributes)
+        end
 
       elsif delimited_blk && (match = this_line.match(REGEXP[:quote]))
         # multi-line verse or quote is surrounded by a block delimiter
@@ -424,7 +449,7 @@ class Asciidoctor::Lexer
 
         if section_body
           block = Block.new(parent, quote_context)
-          while block_reader.has_lines?
+          while block_reader.has_more_lines?
             new_block = next_block(block_reader, block)
             block.blocks << new_block unless new_block.nil?
           end
@@ -450,12 +475,12 @@ class Asciidoctor::Lexer
         # one or more space or tab characters
 
         # So we need to actually include this one in the grab_lines group
-        reader.unshift this_line
+        reader.unshift_line this_line
         buffer = reader.grab_lines_until(:preserve_last_line => true, :break_on_blank_lines => true) {|line|
           # labeled list terms can be indented, but a preceding blank indicates
           # we are in a list continuation and therefore literals should be strictly literal
           (context == :dlist && skipped == 0 && line.match(REGEXP[:dlist])) ||
-          delimited_block?(line)
+          is_delimited_block?(line)
         }
 
         # trim off the indentation equivalent to the size of the least indented line
@@ -479,25 +504,25 @@ class Asciidoctor::Lexer
 
       elsif attributes[1] == 'source'
         AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
-        reader.unshift(this_line)
+        reader.unshift_line this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :listing, buffer)
 
       elsif admonition_style = ADMONITION_STYLES.detect{|s| attributes[1] == s}
         # an admonition preceded by [<TYPE>] and lasts until a blank line
-        reader.unshift(this_line)
+        reader.unshift_line this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :admonition, buffer)
         attributes['style'] = admonition_style
-        attributes['name'] = admonition_style.downcase
-        attributes['caption'] ||= admonition_style.capitalize
+        attributes['name'] = admonition_name = admonition_style.downcase
+        attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
 
       elsif quote_context = [:quote, :verse].detect{|s| attributes[1] == s.to_s}
         # single-paragraph verse or quote is preceded by [verse] or [quote], respectively, and lasts until a blank line
         AttributeList.rekey(attributes, ['style', 'attribution', 'citetitle'])
-        reader.unshift(this_line)
+        reader.unshift_line this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, quote_context, buffer)
@@ -505,7 +530,7 @@ class Asciidoctor::Lexer
       # a floating (i.e., discrete) title
       elsif ['float', 'discrete'].include?(attributes[1]) && is_section_title?(this_line, reader.peek_line)
         attributes['style'] = attributes[1]
-        reader.unshift this_line
+        reader.unshift_line this_line
         float_id, float_title, float_level, _ = parse_section_title reader
         block = Block.new(parent, :floating_title)
         if float_id.nil? || float_id.empty?
@@ -522,9 +547,9 @@ class Asciidoctor::Lexer
 
       # a paragraph - contiguous nonblank/noncontinuation lines
       else
-        reader.unshift this_line
+        reader.unshift_line this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :preserve_last_line => true, :skip_line_comments => true) {|line|
-          delimited_block?(line) || line.match(REGEXP[:attr_line]) ||
+          is_delimited_block?(line) || line.match(REGEXP[:attr_line]) ||
           # next list item can be directly adjacent to paragraph of previous list item
           context == :dlist && line.match(REGEXP[:dlist])
           # not sure if there are any cases when we need this check for other list types
@@ -544,8 +569,8 @@ class Asciidoctor::Lexer
           buffer[0] = admonition.post_match
           block = Block.new(parent, :admonition, buffer)
           attributes['style'] = admonition[1]
-          attributes['name'] = admonition[1].downcase
-          attributes['caption'] ||= admonition[1].capitalize
+          attributes['name'] = admonition_name = admonition[1].downcase
+          attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
         else
           buffer.last.chomp!
           block = Block.new(parent, :paragraph, buffer)
@@ -581,7 +606,7 @@ class Asciidoctor::Lexer
   #--
   # TODO could use the match value as a lookup for the block type so we don't have
   # to do any subsequent regexp
-  def self.delimited_block?(line)
+  def self.is_delimited_block?(line)
     # naive match
     #line.match(REGEXP[:any_blk])
 
@@ -612,7 +637,7 @@ class Asciidoctor::Lexer
     end
     Asciidoctor.debug { "Created #{list_type} block: #{list_block}" }
 
-    while reader.has_lines? && (match = reader.peek_line.match(REGEXP[list_type]))
+    while reader.has_more_lines? && (match = reader.peek_line.match(REGEXP[list_type]))
 
       marker = resolve_list_marker(list_type, match[1])
 
@@ -648,7 +673,7 @@ class Asciidoctor::Lexer
       items << list_item unless list_item.nil?
       list_item = nil
 
-      reader.skip_blank
+      reader.skip_blank_lines
     end
 
     list_block
@@ -707,7 +732,7 @@ class Asciidoctor::Lexer
 
     begin
       pairs << next_list_item(reader, block, match, sibling_pattern)
-    end while reader.has_lines? && match = reader.peek_line.match(sibling_pattern)
+    end while reader.has_more_lines? && match = reader.peek_line.match(sibling_pattern)
 
     block
   end
@@ -750,14 +775,19 @@ class Asciidoctor::Lexer
     # first skip the line with the marker / term
     reader.get_line
     list_item_reader = Reader.new grab_lines_for_list_item(reader, list_type, sibling_trait, has_text)
-    if list_item_reader.has_lines?
+    if list_item_reader.has_more_lines?
       comment_lines = list_item_reader.consume_line_comments
       subsequent_line = list_item_reader.peek_line
       list_item_reader.unshift(*comment_lines) unless comment_lines.empty? 
 
       if !subsequent_line.nil?
         continuation_connects_first_block = (subsequent_line == "\n")
-        content_adjacent = !subsequent_line.strip.empty?
+        # if there's no continuation connecting the first block, then
+        # treat the lines as paragraph text (activated when has_text = false)
+        if !continuation_connects_first_block && list_type != :dlist
+          has_text = false
+        end
+        content_adjacent = !subsequent_line.chomp.empty?
       else
         continuation_connects_first_block = false
         content_adjacent = false
@@ -766,7 +796,7 @@ class Asciidoctor::Lexer
       # only relevant for :dlist
       options = {:text => !has_text}
 
-      while list_item_reader.has_lines?
+      while list_item_reader.has_more_lines?
         new_block = next_block(list_item_reader, list_block, {}, options)
         list_item.blocks << new_block unless new_block.nil?
       end
@@ -815,7 +845,7 @@ class Asciidoctor::Lexer
     # it gets associated with the outermost block
     detached_continuation = nil
 
-    while reader.has_lines?
+    while reader.has_more_lines?
       this_line = reader.get_line
 
       # if we've arrived at a sibling item in this list, we've captured
@@ -846,7 +876,7 @@ class Asciidoctor::Lexer
 
       # a delimited block immediately breaks the list unless preceded
       # by a list continuation (they are harsh like that ;0)
-      if match = delimited_block?(this_line)
+      if match = is_delimited_block?(this_line)
         if continuation == :active
           buffer << this_line
           # grab all the lines in the block, leaving the delimiters in place
@@ -868,7 +898,7 @@ class Asciidoctor::Lexer
           # if we don't process it as a whole, then a line in it that looks like a
           # list item will throw off the exit from it
           if this_line.match(REGEXP[:lit_par])
-            reader.unshift this_line
+            reader.unshift_line this_line
             buffer.concat reader.grab_lines_until(
               :preserve_last_line => true,
               :break_on_blank_lines => true,
@@ -879,7 +909,7 @@ class Asciidoctor::Lexer
             }
             continuation = :inactive
           # let block metadata play out until we find the block
-          elsif this_line.match(REGEXP[:blk_title]) || this_line.match(REGEXP[:attr_line])
+          elsif this_line.match(REGEXP[:blk_title]) || this_line.match(REGEXP[:attr_line]) || this_line.match(REGEXP[:attr_entry])
             buffer << this_line
           else
             if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
@@ -911,7 +941,7 @@ class Asciidoctor::Lexer
             if has_text
               # slurp up any literal paragraph offset by blank lines
               if this_line.match(REGEXP[:lit_par])
-                reader.unshift this_line
+                reader.unshift_line this_line
                 buffer.concat reader.grab_lines_until(
                   :preserve_last_line => true,
                   :break_on_blank_lines => true,
@@ -955,20 +985,21 @@ class Asciidoctor::Lexer
       this_line = nil
     end
 
-    reader.unshift this_line if !this_line.nil?
+    reader.unshift_line this_line if !this_line.nil?
 
     if detached_continuation
       buffer.delete_at detached_continuation
     end
 
     # strip trailing blank lines to prevent empty blocks
-    buffer.pop while !buffer.empty? && buffer.last.strip.empty?
+    buffer.pop while !buffer.empty? && buffer.last.chomp.empty?
 
     # We do need to replace the optional trailing continuation
     # a blank line would have served the same purpose in the document
     if !buffer.empty? && buffer.last.chomp == LIST_CONTINUATION
       buffer.pop
     end
+
     #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join}<BUFFER"
     #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer}<BUFFER"
 
@@ -997,14 +1028,19 @@ class Asciidoctor::Lexer
     if attributes[1]
       section.sectname = attributes[1]
       section.special = true
-      if section.sectname == 'appendix'
-        attributes['caption'] ||= "Appendix #{parent.document.counter('appendix-number', 'A')}: "
+      document = parent.document
+      if section.sectname == 'appendix' &&
+          !attributes.has_key?('caption') &&
+          !document.attributes.has_key?('caption')
+        number = document.counter('appendix-number', 'A')
+        attributes['caption'] = "#{document.attributes['appendix-caption']} #{number}: "
+        Document::AttributeEntry.new('appendix-number', number).save_to(attributes)
       end
     else
       section.sectname = "sect#{section.level}"
     end
     section.update_attributes(attributes)
-    reader.skip_blank
+    reader.skip_blank_lines
 
     section
   end
@@ -1014,7 +1050,7 @@ class Asciidoctor::Lexer
   #
   # line - the String line from under the section title.
   def self.section_level(line)
-    char = line.strip.chars.to_a.uniq
+    char = line.chomp.chars.to_a.uniq
     case char
     when ['=']; 0
     when ['-']; 1
@@ -1032,21 +1068,25 @@ class Asciidoctor::Lexer
 
   # Internal: Checks if the next line on the Reader is a section title
   #
-  # reader - the source Reader
+  # reader     - the source Reader
+  # attributes - a Hash of attributes collected above the current line
   #
   # returns the section level if the Reader is positioned at a section title,
   # false otherwise
   def self.is_next_line_section?(reader, attributes)
     return false if !attributes[1].nil? && ['float', 'discrete'].include?(attributes[1])
-    if reader.has_lines?
-      line1 = reader.get_line
-      line2 = reader.peek_line
-      reader.unshift line1
-    else
-      return false
-    end
+    return false if !reader.has_more_lines?
+    is_section_title?(*reader.peek_lines(2))
+  end
 
-    is_section_title?(line1, line2)
+  # Internal: Convenience API for checking if the next line on the Reader is the document title
+  #
+  # reader     - the source Reader
+  # attributes - a Hash of attributes collected above the current line
+  #
+  # returns true if the Reader is positioned at the document title, false otherwise
+  def self.is_next_line_document_title?(reader, attributes)
+    is_next_line_section?(reader, attributes) == 0
   end
 
   # Public: Checks if these lines are a section title
@@ -1172,15 +1212,14 @@ class Asciidoctor::Lexer
   #  # => {'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
   #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.'}
   def self.parse_header_metadata(reader, document = nil)
-    # capture consecutive comment lines so we can reinsert them after the header
-    comment_lines = reader.consume_comments
+    # NOTE this will discard away any comment lines, but not skip blank lines
+    process_attribute_entries(reader, document)
 
-    metadata = !document.nil? ? document.attributes : {}
-    author_initials = metadata['authorinitials']
-    if reader.has_lines? && !reader.peek_line.strip.empty?
+    metadata = {}
+
+    if reader.has_more_lines? && !reader.peek_line.chomp.empty?
       author_line = reader.get_line
-      match = author_line.match(REGEXP[:author_info])
-      if match
+      if match = author_line.match(REGEXP[:author_info])
         metadata['firstname'] = fname = match[1].tr('_', ' ')
         metadata['author'] = fname
         metadata['authorinitials'] = fname[0, 1]
@@ -1200,13 +1239,10 @@ class Asciidoctor::Lexer
         metadata['authorinitials'] = metadata['firstname'][0, 1]
       end
 
-      # hack because of incorrect order of attribute processing
-      metadata['authorinitials'] = author_initials unless author_initials.nil?
+      # NOTE this will discard away any comment lines, but not skip blank lines
+      process_attribute_entries(reader, document)
 
-      # capture consecutive comment lines so we can reinsert them after the header
-      comment_lines += reader.consume_comments
-
-      if reader.has_lines? && !reader.peek_line.strip.empty?
+      if reader.has_more_lines? && !reader.peek_line.chomp.empty?
         rev_line = reader.get_line 
         if match = rev_line.match(REGEXP[:revision_info])
           metadata['revdate'] = match[2].strip
@@ -1214,14 +1250,25 @@ class Asciidoctor::Lexer
           metadata['revremark'] = match[3].rstrip unless match[3].nil?
         else
           # throw it back
-          reader.unshift rev_line
+          reader.unshift_line rev_line
         end
       end
 
-      reader.skip_blank
+      # NOTE this will discard away any comment lines, but not skip blank lines
+      process_attribute_entries(reader, document)
+
+      reader.skip_blank_lines
+
+      # apply header subs and assign to document
+      if !document.nil?
+        metadata.map do |key, val|
+          val = document.apply_header_subs(val)
+          document.attributes[key] = val if !document.attributes.has_key?(key)
+          val
+        end
+      end
     end
 
-    reader.unshift(*comment_lines)
     metadata
   end
 
@@ -1241,7 +1288,7 @@ class Asciidoctor::Lexer
   def self.parse_block_metadata_lines(reader, parent, attributes = {}, options = {})
     while parse_block_metadata_line(reader, parent, attributes, options)
       # discard the line just processed
-      reader.next_line
+      reader.advance
       reader.skip_blank_lines
     end
     attributes
@@ -1268,15 +1315,15 @@ class Asciidoctor::Lexer
   #
   # returns true if the line contains metadata, otherwise false
   def self.parse_block_metadata_line(reader, parent, attributes, options = {})
-    return false if !reader.has_lines?
+    return false if !reader.has_more_lines?
     next_line = reader.peek_line
-    if next_line.match(REGEXP[:comment])
-      # do nothing, we'll skip it
-    # QUESTION should we parse block comments here instead of next_block?
-    # disable until we can agree what the current line is coming in
-    elsif match = next_line.match(REGEXP[:comment_blk])
+    if (commentish = next_line.start_with?('//')) && (match = next_line.match(REGEXP[:comment_blk]))
       terminator = match[0]
-      reader.grab_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator)
+      reader.grab_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :preprocess => false)
+    elsif commentish && next_line.match(REGEXP[:comment])
+      # do nothing, we'll skip it
+    elsif !options[:text] && (match = next_line.match(REGEXP[:attr_entry]))
+      process_attribute_entry(reader, parent, attributes, match)
     elsif match = next_line.match(REGEXP[:anchor])
       id, reftext = match[1].split(',')
       attributes['id'] = id
@@ -1290,7 +1337,6 @@ class Asciidoctor::Lexer
     elsif match = next_line.match(REGEXP[:blk_attr_list])
       AttributeList.new(parent.document.sub_attributes(match[1]), parent.document).parse_into(attributes)
     # NOTE title doesn't apply to section, but we need to stash it for the first block
-    # TODO need test for this getting passed on to first block after section if found above section
     # TODO should issue an error if this is found above the document title
     elsif !options[:text] && (match = next_line.match(REGEXP[:blk_title]))
       attributes['title'] = match[1]
@@ -1299,6 +1345,59 @@ class Asciidoctor::Lexer
     end
 
     true
+  end
+
+  def self.process_attribute_entries(reader, parent, attributes = nil)
+    reader.skip_comment_lines
+    while process_attribute_entry(reader, parent, attributes)
+      # discard line just processed
+      reader.advance
+      reader.skip_comment_lines
+    end
+  end
+
+  def self.process_attribute_entry(reader, parent, attributes = nil, match = nil)
+    match ||= reader.has_more_lines? ? reader.peek_line.match(REGEXP[:attr_entry]) : nil
+    if match
+      name = match[1]
+      value = match[2].nil? ? '' : match[2]
+      if value.end_with? LINE_BREAK
+        value.chop!.rstrip!
+        reader.advance
+        while reader.has_more_lines?
+          next_line = reader.peek_line.strip
+          break if next_line.empty?
+          if next_line.end_with? LINE_BREAK
+            value = "#{value} #{next_line.chop.rstrip}"
+            reader.advance
+          else
+            value = "#{value} #{next_line}"
+            break
+          end
+        end
+      end
+
+      if name.end_with?('!')
+        # a nil value signals the attribute should be deleted (undefined)
+        value = nil
+        name = name.chop
+      end
+
+      name = sanitize_attribute_name(name)
+      accessible = true
+      if !parent.nil?
+        accessible = value.nil? ?
+            parent.document.delete_attribute(name) :
+            parent.document.set_attribute(name, value)
+      end
+
+      if !attributes.nil?
+        Document::AttributeEntry.new(name, value).save_to(attributes) if accessible
+      end
+      true
+    else
+      false
+    end
   end
 
   # Internal: Resolve the 0-index marker for this list item
@@ -1387,6 +1486,7 @@ class Asciidoctor::Lexer
     end
 
     if validate && expected != actual
+      # FIXME I need a reader reference or line number to report line number
       puts "asciidoctor: WARNING: list item index: expected #{expected}, got #{actual}"
     end
 
@@ -1442,7 +1542,7 @@ class Asciidoctor::Lexer
     table_reader.skip_blank_lines
 
     parser_ctx = Asciidoctor::Table::ParserContext.new(table, attributes)
-    while table_reader.has_lines?
+    while table_reader.has_more_lines?
       line = table_reader.get_line
 
       if parser_ctx.format == 'psv'
@@ -1507,7 +1607,7 @@ class Asciidoctor::Lexer
 
       table_reader.skip_blank_lines unless parser_ctx.cell_open?
 
-      if !table_reader.has_lines?
+      if !table_reader.has_more_lines?
         parser_ctx.close_cell true
       end
     end
@@ -1597,7 +1697,7 @@ class Asciidoctor::Lexer
 
     if m = line.match(REGEXP[:table_cellspec][pos]) 
       spec = {}
-      return [spec, line] if m[0].strip.empty?
+      return [spec, line] if m[0].chomp.empty?
       rest = (pos == :start ? m.post_match : m.pre_match)
       if m[1]
         colspec, rowspec = m[1].split '.'
@@ -1627,6 +1727,26 @@ class Asciidoctor::Lexer
     end 
 
     [spec, rest]
+  end
+
+  # Public: Convert a string to a legal attribute name.
+  #
+  # name  - the String name of the attribute
+  #
+  # Returns a String with the legal AsciiDoc attribute name.
+  #
+  # Examples
+  #
+  #   sanitize_attribute_name('Foo Bar')
+  #   => 'foobar'
+  #
+  #   sanitize_attribute_name('foo')
+  #   => 'foo'
+  #
+  #   sanitize_attribute_name('Foo 3 #-Billy')
+  #   => 'foo3-billy'
+  def self.sanitize_attribute_name(name)
+    name.gsub(REGEXP[:illegal_attr_name_chars], '').downcase
   end
 
   # Internal: Converts a Roman numeral to an integer value.

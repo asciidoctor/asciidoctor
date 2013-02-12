@@ -33,6 +33,7 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   # parent block's template.
   def render
     Asciidoctor.debug { "Now rendering #{@context} block for #{self}" }
+    @document.playback_attributes @attributes
     out = renderer.render("block_#{@context}", self)
     @document.callouts.next_list if @context == :colist
     out

@@ -90,6 +90,7 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # Blocks.
   def render
     Asciidoctor.debug { "Now rendering section for #{self}" }
+    @document.playback_attributes @attributes
     renderer.render('section', self)
   end
 

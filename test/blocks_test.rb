@@ -99,6 +99,15 @@ block comment
       assert_equal 1, d.blocks.size
       assert_xpath '//p', d.render, 1
     end
+
+    test 'line starting with three slashes should not be line comment' do
+      input = <<-EOS
+/// not a line comment
+      EOS
+
+      output = render_embedded_string input
+      assert !output.strip.empty?, "Line should be emitted => #{input.rstrip}"
+    end
   end
 
   context "Example Blocks" do
@@ -180,6 +189,72 @@ You just write.
       output = doc.render
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
       assert !doc.attributes.has_key?('example-number')
+    end
+
+    test 'automatic caption can be turned off and on and modified' do
+      input = <<-EOS
+.first example
+====
+an example
+====
+
+:caption:
+
+.second example
+====
+another example
+====
+
+:caption!:
+:example-caption: Exhibit
+
+.third example
+====
+yet another example
+====
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/*[@class="exampleblock"]', output, 3
+      assert_xpath '(/*[@class="exampleblock"])[1]/*[@class="title"][starts-with(text(), "Example ")]', output, 1
+      assert_xpath '(/*[@class="exampleblock"])[2]/*[@class="title"][text()="second example"]', output, 1
+      assert_xpath '(/*[@class="exampleblock"])[3]/*[@class="title"][starts-with(text(), "Exhibit ")]', output, 1
+    end
+  end
+
+  context 'Admonition Blocks' do
+    test 'caption block-level attribute should be used as caption' do
+       input = <<-EOS
+:tip-caption: Pro Tip
+
+[caption="Pro Tip"]
+TIP: Override the caption of an admonition block using an attribute entry
+       EOS
+
+       output = render_embedded_string input
+       assert_xpath '/*[@class="admonitionblock"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
+    end
+
+    test 'can override caption of admonition block using document attribute' do
+       input = <<-EOS
+:tip-caption: Pro Tip
+
+TIP: Override the caption of an admonition block using an attribute entry
+       EOS
+
+       output = render_embedded_string input
+       assert_xpath '/*[@class="admonitionblock"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
+    end
+
+    test 'blank caption document attribute should not blank admonition block caption' do
+       input = <<-EOS
+:caption:
+
+TIP: Override the caption of an admonition block using an attribute entry
+       EOS
+
+       output = render_embedded_string input
+       assert_xpath '/*[@class="admonitionblock"]//*[@class="icon"]/*[@class="title"][text()="Tip"]', output, 1
     end
   end
 
@@ -393,6 +468,30 @@ paragraph
       assert_xpath '//*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="paragraph"]/*[@class="title"][text() = "Title"]', output, 1
       assert_xpath '//*[@class="paragraph"]/p[text() = "paragraph"]', output, 1
+    end
+
+    test 'block title above document title gets carried over to preamble' do
+      input = <<-EOS
+.Block title
+= Document Title
+
+preamble
+      EOS
+      output = render_string input
+      assert_xpath '//*[@id="preamble"]//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
+    end
+
+    test 'block title above document title gets carried over to first block in first section if no preamble' do
+      input = <<-EOS
+.Block title
+= Document Title
+
+== First Section 
+
+paragraph
+      EOS
+      output = render_string input
+      assert_xpath '//*[@class="sect1"]//*[@class="paragraph"]/*[@class="title"][text() = "Block title"]', output, 1
     end
   end
 

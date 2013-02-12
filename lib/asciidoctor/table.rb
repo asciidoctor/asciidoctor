@@ -133,6 +133,7 @@ module Asciidoctor
       Asciidoctor.debug { "Now attempting to render for table my own bad #{self}" }
       Asciidoctor.debug { "Parent is #{@parent}" }
       Asciidoctor.debug { "Renderer is #{renderer}" }
+      @document.playback_attributes @attributes
       renderer.render('block_table', self) 
     end
   
@@ -394,7 +395,7 @@ module Asciidoctor
     def close_open_cell(next_cell_spec = {})
       push_cell_spec next_cell_spec
       close_cell(true) if cell_open?
-      next_line
+      advance
       nil
     end
   
@@ -498,7 +499,7 @@ module Asciidoctor
   
     # Internal: Advance to the next line (which may come after the parser begins processing
     # the next line if the last cell had wrapped content).
-    def next_line
+    def advance
       @linenum += 1
     end
   
