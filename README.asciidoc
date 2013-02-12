@@ -75,13 +75,13 @@ To invoke it, simply execute:
 
 This will use the built-in defaults for options and create a new file
 in the same directory as the input file, with the same base name, but
-with the .html extention.
+with the .html extension.
 
 There are many other options available and full help is provided via:
 
  asciidoctor --help
 
-, or in the http://asciidoctor.org/man/asciidoctor[man page].
+or in the http://asciidoctor.org/man/asciidoctor[man page].
 
 There is also an `asciidoctor-safe` command, which turns on safe mode
 by default, preventing access to files outside the parent directory of
@@ -278,6 +278,15 @@ breaks on your implementation, you will be personally responsible for
 providing patches in a timely fashion. If critical issues for a
 particular implementation exist at the time of a major release,
 support for that Ruby version may be dropped.
+
+== Authors
+
+*Asciidoctor* was written by Ryan Waldron, Dan Allen and
+https://github.com/asciidoctor/asciidoctor/graphs/contributors[other
+contributors].
+
+*AsciiDoc* was written by Stuart Rackham and has received
+contributions from many other individuals.
 
 == Copyright
 
