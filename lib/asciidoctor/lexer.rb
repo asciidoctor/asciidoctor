@@ -1363,13 +1363,11 @@ class Asciidoctor::Lexer
       value = match[2].nil? ? '' : match[2]
       if value.end_with? LINE_BREAK
         value.chop!.rstrip!
-        reader.advance
-        while reader.has_more_lines?
+        while reader.advance
           next_line = reader.peek_line.strip
           break if next_line.empty?
           if next_line.end_with? LINE_BREAK
             value = "#{value} #{next_line.chop.rstrip}"
-            reader.advance
           else
             value = "#{value} #{next_line}"
             break
