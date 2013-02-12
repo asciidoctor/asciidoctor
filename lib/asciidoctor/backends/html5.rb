@@ -143,7 +143,8 @@ end
 class EmbeddedTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= content %>
+<%#encoding:UTF-8%><% unless notitle || !has_header? %><h1#{id}><%= header.title %></h1>
+<% end %><%= content %>
     EOS
   end
 end

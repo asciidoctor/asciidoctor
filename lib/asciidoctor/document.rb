@@ -132,6 +132,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['asciidoctor-version'] = VERSION
     @attributes['sectids'] = ''
     @attributes['encoding'] = 'UTF-8'
+    @attributes['notitle'] = '' if !@options[:header_footer]
 
     # language strings
     # TODO load these based on language settings
