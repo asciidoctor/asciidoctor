@@ -306,6 +306,11 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @reader.source.join if @reader
   end
 
+  # Make the raw source lines for the Document available.
+  def source_lines
+    @reader.source if @reader
+  end
+
   def doctype
     @attributes['doctype']
   end
