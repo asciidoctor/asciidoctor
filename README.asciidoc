@@ -16,38 +16,29 @@ Asciidoctor
 :license: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE
 :idprefix:
 
-{asciidoctor}[Asciidoctor] is a pure Ruby processor for converting
-{asciidoc}[AsciiDoc] source files and strings into HTML 5, DocBook 4.5
-and other formats. It's
-http://rubygems.org/gems/asciidoctor[published as a RubyGem] and is
-available under the MIT open source license.
+{asciidoctor}[Asciidoctor] is a pure Ruby processor for converting {asciidoc}[AsciiDoc] source files and strings into HTML 5, DocBook 4.5 and other formats.
+It's http://rubygems.org/gems/asciidoctor[published as a RubyGem] and is available under the MIT open source license.
 
 image::https://travis-ci.org/asciidoctor/asciidoctor.png?branch=master["Build Status", link="https://travis-ci.org/asciidoctor/asciidoctor"]
 
-Asciidoctor uses a set of built-in ERB templates to render the document
-to HTML 5 or DocBook 4.5. We've matched the rendered output as close as
-possible to the default output of the native Python processor. You can
-override this behavior by providing {tilt}[Tilt]-compatible templates.
+Asciidoctor uses a set of built-in ERB templates to render the document to HTML 5 or DocBook 4.5.
+We've matched the rendered output as close as possible to the default output of the native Python processor.
+You can override this behavior by providing {tilt}[Tilt]-compatible templates.
 See the xref:usage[Usage section] for more details.
 
-Asciidoctor currently works (read as 'tested') with Ruby 1.8.7, Ruby
-1.9.3 and JRuby 1.7.2 (on Linux, Mac and Windows). We expect it will
-work with other versions of Ruby as well and would welcome help in
-testing it out.
+Asciidoctor currently works (read as 'tested') with Ruby 1.8.7, Ruby 1.9.3 and JRuby 1.7.2 and Rubinius 1.2.4 (on Linux, Mac and Windows).
+We expect it will work with other versions of Ruby as well and would welcome help in testing it out.
 
-The initial code from which Asciidoctor started emerged from the
-{gitscm-next}[Git SCM site repo]. Refer to commit history of
-{asciidoctor-seed}[asciidoc.rb] to view the initial contributions and
-individual contributors.
+The initial code from which Asciidoctor started emerged from the {gitscm-next}[Git SCM site repo].
+Refer to commit history of {asciidoctor-seed}[asciidoc.rb] to view the initial contributions and individual contributors.
 
-The source code can now be found in the {asciidoctor-source}[Asciidoctor
-source repository] on GitHub.
+The source code can now be found in the {asciidoctor-source}[Asciidoctor source repository] on GitHub.
 
 == Installation
 
-NOTE: We are working hard to make Asciidoctor a drop-in replacement for
-AsciiDoc. We're very close, with nearly 600 tests that ensure
-compatibility. The march is on towards full compliance and beyond.
+NOTE: We're working hard to make Asciidoctor a drop-in replacement for AsciiDoc.
+We're very close, with over 700 tests that ensure compatibility.
+The march is on towards full compliance and beyond.
 
 To install the gem:
 
@@ -59,23 +50,18 @@ Or if you prefer bundler:
 
 == Usage
 
-Asciidoctor has both a command line interface (CLI) and an API. The
-CLI is a drop-in replacement for the `asciidoc.py` command from the
-python implementation. The API is intended for integration with other
-software projects and is suitable for server-side applications, such
-as Rails, Sinatra and GitHub.
+Asciidoctor has both a command line interface (CLI) and an API.
+The CLI is a drop-in replacement for the +asciidoc.py+ command from the python implementation.
+The API is intended for integration with other software projects and is suitable for server-side applications, such as Rails, Sinatra and GitHub.
 
 === Command line interface (CLI)
 
-After installing the `asciidoctor` gem, the `asciidoctor` commandline
-interface should be available on your PATH after installing the gem.
+After installing the +asciidoctor+ gem, the +asciidoctor+ commandline interface should be available on your PATH after installing the gem.
 To invoke it, simply execute:
 
  asciidoctor <asciidoc_file>
 
-This will use the built-in defaults for options and create a new file
-in the same directory as the input file, with the same base name, but
-with the .html extension.
+This will use the built-in defaults for options and create a new file in the same directory as the input file, with the same base name, but with the .html extension.
 
 There are many other options available and full help is provided via:
 
@@ -83,21 +69,19 @@ There are many other options available and full help is provided via:
 
 or in the http://asciidoctor.org/man/asciidoctor[man page].
 
-There is also an `asciidoctor-safe` command, which turns on safe mode
-by default, preventing access to files outside the parent directory of
-the source file. This mode is very similar to the safe mode of `asciidoc.py`.
+There is also an +asciidoctor-safe+ command, which turns on safe mode by default, preventing access to files outside the parent directory of the source file.
+This mode is very similar to the safe mode of +asciidoc.py+.
 
 === Ruby API
 
-To use Asciidoctor in your application, you first need to require the
-gem:
+To use Asciidoctor in your application, you first need to require the gem:
 
  require 'asciidoctor'
 
 With that in place, you can start processing AsciiDoc documents.
 
 .Loading a document
-To parse a file into an `Asciidoctor::Document` object:
+To parse a file into an +Asciidoctor::Document+ object:
 
  doc = Asciidoctor.load_file('your_file.asciidoc')
 
@@ -113,85 +97,79 @@ To render a file containing AsciiDoc markup to HTML 5:
 
  Asciidoctor.render_file('your_file.asciidoc', :in_place => true)
 
-The command will output to the file `your_file.html` in the same
-directory. You can render the file to DocBook 4.5 by setting the
-`backend` attribute to 'docbook':
+The command will output to the file +your_file.html+ in the same directory.
+You can render the file to DocBook 4.5 by setting the +backend+ attribute to 'docbook':
 
  Asciidoctor.render_file('your_file.asciidoc', :in_place => true,
    :attributes => {'backend' => 'docbook'})
 
-The command will output to the file `your_file.xml` in the same
-directory. (If you're on Linux, you can view the file using yelp).
+The command will output to the file +your_file.xml+ in the same directory.
+(If you're on Linux, you can view the file using yelp).
 
 .Rendering strings
 To render an AsciiDoc-formatted string:
 
  puts Asciidoctor.render('*This* is it.')
 
-When rendering a string, the header and footer are excluded by default
-to make Asciidoctor consistent with other lightweight markup engines
-like Markdown. If you want the header and footer, just declare it as
-an option:
+When rendering a string, the header and footer are excluded by default to make Asciidoctor consistent with other lightweight markup engines like Markdown.
+If you want the header and footer, just enable it using the +:header_footer+ option:
 
  puts Asciidoctor.render('*This* is it.', :header_footer => true)
 
-Now you'll get a full HTML 5 file. As before, you can also produce
-DocBook 4.5:
+Now you'll get a full HTML 5 file.
+As before, you can also produce DocBook 4.5:
 
  puts Asciidoctor.render('*This* is it.', :header_footer => true,
    :attributes => {'backend' => 'docbook'})
 
-If you don't like the output you see, you can change it. Any of it!
+If you don't like the output you see, you can change it.
+Any of it!
 
 .Custom templates
-Asciidoctor allows you to override the {templates}[built-in templates]
-used to render almost any individual AsciiDoc element. If you provide a
-directory of {tilt}[Tilt]-compatible templates, named in such a way that
-Asciidoctor can figure out which template goes with which element,
-Asciidoctor will use the templates in this directory instead of its
-built-in templates for any elements for which it finds a matching
-template. It will fallback to its default templates for everything else.
+Asciidoctor allows you to override the {templates}[built-in templates] used to render almost any individual AsciiDoc element.
+If you provide a directory of {tilt}[Tilt]-compatible templates, named in such a way that Asciidoctor can figure out which template goes with which element, Asciidoctor will use the templates in this directory instead of its built-in templates for any elements for which it finds a matching template.
+It will fallback to its default templates for everything else.
 
  puts Asciidoctor.render('*This* is it.', :header_footer => true,
    :template_dir => 'templates')
 
-The Document and Section templates should begin with `document.` and
-`section.`, respectively. The file extension is used by Tilt to
-determine which view framework it will use to use to render the
-template. For instance, if you want to write the template in ERB, you'd
-name these two templates `document.html.erb` and `section.html.erb`. To
-use Haml, you'd name them `document.html.haml` and `section.html.haml`.
+The Document and Section templates should begin with +document.+ and +section.+, respectively.
+The file extension is used by Tilt to determine which view framework it will use to use to render the template.
+For instance, if you want to write the template in ERB, you'd name these two templates +document.html.erb+ and +section.html.erb+.
+To use Haml, you'd name them +document.html.haml+ and +section.html.haml+.
 
-Templates for block elements, like a Paragraph or Sidebar, would begin
-with `block_<style>.`. For instance, to override the default Paragraph
-template with an ERB template, put a file named
-`block_paragraph.html.erb` in the template directory you pass to the
-`Document` constructor using the `template_dir` option.
+Templates for block elements, like a Paragraph or Sidebar, would begin with +block_<style>.+.
+For instance, to override the default Paragraph template with an ERB template, put a file named +block_paragraph.html.erb+ in the template directory you pass to the +Document+ constructor using the +:template_dir+ option.
 
 For more usage examples, see the (massive) test suite.
 
 == Differences from AsciiDoc
 
-While Asciidoctor aims to be compliant with the AsciiDoc syntax, there are some differences which are important to keep in mind. In some cases, it's to enforce a rule we believe is too lax or ambiguous in AsciiDoc. In other cases, it's a tradeoff for speed, smarter processing or a feature we just haven't yet implemented. (You'll also notice that Asciidoctor is about 20x faster than AsciiDoc).
+While Asciidoctor aims to be compliant with the AsciiDoc syntax, there are some differences which are important to keep in mind.
+In some cases, it's to enforce a rule we believe is too lax or ambiguous in AsciiDoc.
+In other cases, it's a tradeoff for speed, smarter processing or a feature we just haven't yet implemented.
+(You'll also notice that Asciidoctor executes about 25x as fast as AsciiDoc).
 
 Here are the known cases where Asciidoctor differs from AsciiDoc:
 
-* In Asciidoctor, safe mode is on by default when using the API (safe mode level SECURE),
+* Asciidoctor enables safe mode by default when using the API (+SafeMode::SECURE+)
 * Asciidoctor safe mode is even more safe than AsciiDoc's safe mode
-* Asciidoctor enforces symmetric block delimiters (the length of start and end delimiters for a block must match)
-* Section title underlines must be within +/- 1 of the length of the title (AsciiDoc is +/- 3)
+* Asciidoctor enforces symmetric block delimiters (the length of start and end delimiters for a block must match!)
+* Section title underlines must be within 1 character of the length of the title (AsciiDoc allows an offset of 3)
 * Asciidoctor's default HTML backend matches AsciiDoc's HTML 5 backend (whereas XHTML 1.1 is the default HTML backend in AsciiDoc)
 * Asciidoctor handles inline anchors more cleanly
-** AsciiDoc adds an `<a>` tag in the line and that markup gets caught in the generated id
+** AsciiDoc adds an +<a>+ tag in the line and that markup gets caught in the generated id
 ** Asciidoctor promotes the id of the anchor as the section id
 * Asciidoctor strips XML entities from the section title before generating the id (makes for cleaner section ids)
-* Asciidoctor use `<tt>` instead of `<span class="monospace">` around inline literal text in the HTML backend
+* Asciidoctor use +<tt>+ instead of +<span class="monospace">+ around inline literal text in the HTML backend
 * Asciidoctor is much more lenient about attribute list parsing (double quotes are rarely needed)
 * Asciidoctor creates xref labels using the text from the linked section title when rendering HTML to match how DocBook works
 * Asciidoctor allows commas to be used in xref labels, whereas AsciiDoc cuts off the label at the location of the first comma
 * Asciidoctor removes indentation for non-literal paragraphs in a list item
-** In general, Asciidoctor handles whitespace much more intelligently
-* In Asciidoctor, a ruler can have attributes
++
+NOTE: In general, Asciidoctor handles whitespace much more intelligently
++
+* In Asciidoctor, a horizontal ruler can have attributes
 * Asciidoctor skips over line comments in tables, whereas AsciiDoc does not
 * Asciidoctor uses its own API rather than a command line invocation to handle table cells that have AsciiDoc content
 * Asciidoctor supports resolving variables from parent document in table cells with AsciiDoc content
@@ -199,21 +177,36 @@ Here are the known cases where Asciidoctor differs from AsciiDoc:
 * Asciidoctor strips the file extension from the target image when generating alt text if no alt text is provided
 * Asciidoctor reifies the toc in the header of the document instead of relying on JavaScript to create it
 * Asciidoctor is nice about using a section title syntax inside a delimited block by simply ignoring it (AsciiDoc issues warnings)
-* Asciidoctor honors the alternate style name "discrete" for a floating title (i.e., [discrete])
+* Asciidoctor honors the alternate style name "discrete" for a floating title (i.e., +[discrete]+)
 * Asciidoctor supports syntax highlighting of listing or literal blocks that have the "source" style out of the box
-** Asciidoctor honors the source-highlighter values `coderay` and `highlightjs`, using CodeRay or highlight.js, respectively
+** Asciidoctor honors the source-highlighter values +coderay+ and +highlightjs+, using CodeRay or highlight.js, respectively
 ** Asciidoctor does not currently support Pygments for source highlighting
 * Asciidoctor sets these additional intrinsic attributes
-`asciidoctor`:: indicates Asciidoctor is being used; useful for conditional processing
-`asciidoctor-version`:: indicates which version of Asciidoctor is in use
++asciidoctor+:: indicates Asciidoctor is being used; useful for conditional processing
++asciidoctor-version+:: indicates which version of Asciidoctor is in use
 * Asciidoctor does not support deprecated tables (you don't want them anyway)
+* Use can set the extension for icons using the +icontype+ attribute (AsciiDoc defaults to .png)
+* AsciiDoc uses the +<blockquote>+ and +<cite>+ tags in the HTML output for quote blocks, requiring some additional styling to match AsciiDoc
++
+  blockquote.content { padding: 0; margin; 0 }
+  cite { color: navy; }
++
+* Asciidoctor does not support the deprecated index term syntax (`++` and `+++`)
+* Asciidoctor does not yet ship w/ a stylesheet, must provide your own using the +stylesheet+ attribute
+* Asciidoctor introduces the +hardbreaks+ attribute, which inserts a line break character after each line of wrapped text
+* Asciidoctor introduces the +idseparator+ attribute to customize the separator used in generated section ids (AsciiDoc hardcodes +_+)
+* Asciidoctor does not support system evaluation macros
+* Asciidoctor does not support displaying comments
+* Asciidoctor properly calculates author initials if attribute reference is used in name
+* Asciidoctor allows the document id to be set using [[id]] above the document header (adds id attribute to +<body>+ tag)
+* Assigning value to the +listing-caption+ attribute will enable automatic captions for listings (like examples, tables and figures)
+* The +ifeval::[]+ macro is constrained for the strict purpose of comparing values of attributes
 
 If there's a difference you don't see in this list, check the {issues}[issue tracker] to see if it's an outstanding feature, or file an issue to report the difference.
 
 == Contributing
 
-In the spirit of {freesoftware}[free software], 'everyone' is
-encouraged to help improve this project.
+In the spirit of {freesoftware}[free software], 'everyone' is encouraged to help improve this project.
 
 Here are some ways *you* can contribute:
 
@@ -233,16 +226,11 @@ Here are some ways *you* can contribute:
 
 == Submitting an Issue
 
-We use the {issues}[GitHub issue tracker] associated with this project
-to track bugs and features.  Before submitting a bug report or feature
-request, check to make sure it hasn't already been submitted. When
-submitting a bug report, please include a {gist}[Gist] that includes
-any details that may help reproduce the bug, including your gem
-version, Ruby version, and operating system.
+We use the {issues}[GitHub issue tracker] associated with this project to track bugs and features.
+Before submitting a bug report or feature request, check to make sure it hasn't already been submitted.
+When submitting a bug report, please include a {gist}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
 
-Most importantly, since Asciidoctor is a text processor, reproducing
-most bugs requires that we have some snippet of text on which
-Asciidoctor exhibits the bad behavior.
+Most importantly, since Asciidoctor is a text processor, reproducing most bugs requires that we have some snippet of text on which Asciidoctor exhibits the bad behavior.
 
 An ideal bug report would include a pull request with failing specs.
 
@@ -251,9 +239,11 @@ An ideal bug report would include a pull request with failing specs.
 . {fork}[Fork the repository].
 . {branch}[Create a topic branch].
 . Add tests for your unimplemented feature or bug fix.
-. Run `bundle exec rake`. If your tests pass, return to step 3.
+. Run +bundle exec rake+.
+If your tests pass, return to step 3.
 . Implement your feature or bug fix.
-. Run `bundle exec rake`. If your tests fail, return to step 5.
+. Run +bundle exec rake+.
+If your tests fail, return to step 5.
 . Add documentation for your feature or bug fix.
 . If your changes are not 100% documented, go back to step 7.
 . Add, commit, and push your changes.
@@ -268,29 +258,20 @@ This library aims to support the following Ruby implementations:
 * JRuby 1.7.2
 * Rubinius 1.2.4
 
-If something doesn't work on one of these interpreters, it should be
-considered a bug.
+If something doesn't work on one of these interpreters, it should be considered a bug.
 
-If you would like this library to support another Ruby version, you
-may volunteer to be a maintainer. Being a maintainer entails making
-sure all tests run and pass on that implementation. When something
-breaks on your implementation, you will be personally responsible for
-providing patches in a timely fashion. If critical issues for a
-particular implementation exist at the time of a major release,
-support for that Ruby version may be dropped.
+If you would like this library to support another Ruby version, you may volunteer to be a maintainer.
+Being a maintainer entails making sure all tests run and pass on that implementation.
+When something breaks on your implementation, you will be personally responsible for providing patches in a timely fashion.
+If critical issues for a particular implementation exist at the time of a major release, support for that Ruby version may be dropped.
 
 == Authors
 
-*Asciidoctor* was written by Ryan Waldron, Dan Allen and
-https://github.com/asciidoctor/asciidoctor/graphs/contributors[other
-contributors].
+*Asciidoctor* was written by Ryan Waldron, Dan Allen and https://github.com/asciidoctor/asciidoctor/graphs/contributors[other contributors].
 
-*AsciiDoc* was written by Stuart Rackham and has received
-contributions from many other individuals.
+*AsciiDoc* was written by Stuart Rackham and has received contributions from many other individuals.
 
 == Copyright
 
 Copyright (C) 2012 Ryan Waldron.
 See {license}[LICENSE] for details.
-
-// vim: tw=72
