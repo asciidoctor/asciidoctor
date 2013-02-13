@@ -545,6 +545,17 @@ image::images/tiger.png[Tiger]
       assert_equal 1, doc.attributes['figure-number']
     end
 
+    test 'should pass through image that is a uri reference' do
+      input = <<-EOS
+:imagesdir: images
+
+image::http://asciidoc.org/images/tiger.png[Tiger]
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//img[@src="http://asciidoc.org/images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
     test 'can resolve image relative to imagesdir' do
       input = <<-EOS
 :imagesdir: images
