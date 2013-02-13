@@ -77,11 +77,15 @@ class Asciidoctor::Lexer
     # if so, add a header to the document and parse the header metadata
     if is_next_line_document_title?(reader, block_attributes)
       document.id, document.title, _, _ = parse_section_title(reader)
-      # should this be encapsulated in document?
+      # QUESTION: should this be encapsulated in document?
       if document.id.nil? && block_attributes.has_key?('id')
         document.id = block_attributes.delete('id')
       end
       parse_header_metadata(reader, document)
+    end
+
+    if document.attributes.has_key? 'doctitle'
+      document.title = document.attributes['doctitle']
     end
  
     document.clear_playback_attributes block_attributes

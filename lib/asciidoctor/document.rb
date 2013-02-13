@@ -166,6 +166,15 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       @base_dir = @attribute_overrides['docdir'] = File.expand_path(options[:base_dir])
     end
 
+    # allow common attributes backend and doctype to be set using options hash
+    unless @options[:backend].nil?
+      @attribute_overrides['backend'] = @options[:backend]
+    end
+
+    unless @options[:doctype].nil?
+      @attribute_overrides['doctype'] = @options[:doctype]
+    end
+
     if @safe >= SafeMode::SERVER
       # restrict document from setting source-highlighter and backend
       @attribute_overrides['source-highlighter'] ||= nil
@@ -316,7 +325,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   end
 
   def title=(title)
-    @header = Section.new self
+    @header ||= Section.new self
     @header.title = title
   end
 
