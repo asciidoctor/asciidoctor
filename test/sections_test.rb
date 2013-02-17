@@ -473,6 +473,25 @@ Details
       assert_xpath '(//h2)[2][text()="Appendix B: Migration"]', output, 1
     end
 
+    test 'should not number level 4 section' do
+      input = <<-EOS
+:numbered:
+
+== Level_1
+
+=== Level_2
+
+==== Level_3
+
+===== Level_4
+
+text
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//h5', output, 1
+      assert_xpath '//h5[text()="Level_4"]', output, 1
+    end
+
     test 'should not number special sections or subsections' do
       input = <<-EOS
 :numbered:

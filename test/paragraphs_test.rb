@@ -102,11 +102,19 @@ You're good to go!
       assert_match(/^gem install asciidoctor/, output, "Indentation should be trimmed from literal block")
     end
 
+    test "literal paragraph" do
+      assert_xpath "//*[@class='literalblock']//pre[text()='blah blah blah']", render_string("[literal]\nblah blah blah")
+    end
+
     test "listing paragraph" do
-      assert_xpath "//pre[@class='highlight']/code", render_string("[source]\n----\nblah blah blah\n----")
+      assert_xpath "//*[@class='listingblock']//pre[text()='blah blah blah']", render_string("[listing]\nblah blah blah")
     end
 
     test "source code paragraph" do
+      assert_xpath "//pre[@class='highlight']/code", render_string("[source]\nblah blah blah")
+    end
+
+    test "source code paragraph with language" do
       assert_xpath "//pre[@class='highlight']/code[@class='perl']", render_string("[source, perl]\ndie 'zomg perl sucks';")
     end
   end

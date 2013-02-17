@@ -239,10 +239,18 @@ context 'Invoker' do
     assert_equal Asciidoctor::SafeMode::SAFE, doc.safe
   end
 
-  test 'should set safe mode to specified level if specified' do
-    invoker = invoke_cli_to_buffer %w(-S safe -o /dev/null)
-    doc = invoker.document
-    assert_equal Asciidoctor::SafeMode::SAFE, doc.safe
+  test 'should set safe mode to specified level' do
+    levels = {
+      'unsafe' => Asciidoctor::SafeMode::UNSAFE,
+      'safe'   => Asciidoctor::SafeMode::SAFE,
+      'server' => Asciidoctor::SafeMode::SERVER,
+      'secure' => Asciidoctor::SafeMode::SECURE,
+    }
+    levels.each do |name, const|
+      invoker = invoke_cli_to_buffer %W(-S #{name} -o /dev/null)
+      doc = invoker.document
+      assert_equal const, doc.safe
+    end
   end
 
   test 'should set eRuby impl if specified' do

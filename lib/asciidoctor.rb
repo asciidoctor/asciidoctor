@@ -128,6 +128,11 @@ module Asciidoctor
     '~~~'  => :fenced_code
   }
 
+  BREAK_LINES = {
+    %q{'''} => :ruler,
+    '<<<'   => :page_break
+  }
+
   LIST_CONTEXTS = [:ulist, :olist, :dlist, :colist]
 
   NESTABLE_LIST_CONTEXTS = [:ulist, :olist, :dlist]
@@ -135,7 +140,7 @@ module Asciidoctor
   ORDERED_LIST_STYLES = [:arabic, :loweralpha, :lowerroman, :upperalpha, :upperroman]
 
   ORDERED_LIST_MARKER_PATTERNS = {
-    :arabic => /\d+[\.>]/,
+    :arabic => /\d+[.>]/,
     :loweralpha => /[a-z]\./,
     :upperalpha => /[A-Z]\./,
     :lowerroman => /[ivx]+\)/,
@@ -211,10 +216,10 @@ module Asciidoctor
 
     # The author info line the appears immediately following the document title
     # John Doe <john@anonymous.com>
-    :author_info      => /^\s*(\w[\w\-'\.]*)(?: +(\w[\w\-'\.]*))?(?: +(\w[\w\-'\.]*))?(?: +<([^>]+)>)?$/,
+    :author_info      => /^\s*(\w[\w\-'.]*)(?: +(\w[\w\-'.]*))?(?: +(\w[\w\-'.]*))?(?: +<([^>]+)>)?$/,
 
     # [[[Foo]]] (anywhere inline)
-    :biblio_macro     => /\\?\[\[\[([\w:][\w:\.-]*?)\]\]\]/,
+    :biblio_macro     => /\\?\[\[\[([\w:][\w:.-]*?)\]\]\]/,
 
     # callout reference inside literal text
     # <1>
@@ -294,7 +299,7 @@ module Asciidoctor
 
     # inline link and some inline link macro
     # FIXME revisit!
-    :link_inline      => %r{(^|link:|\s|>|&lt;|[\(\)\[\]])(\\?https?://[^\s\[<]*[^\s\.\)\[<])(?:\[((?:\\\]|[^\]])*?)\])?},
+    :link_inline      => %r{(^|link:|\s|>|&lt;|[\(\)\[\]])(\\?(?:https?|ftp)://[^\s\[<]*[^\s.\)\[<])(?:\[((?:\\\]|[^\]])*?)\])?},
 
     # inline link macro
     # link:path[label]
@@ -319,6 +324,10 @@ module Asciidoctor
     # i. Foo (lowerroman)
     # I. Foo (upperroman)
     :olist            => /^\s*(\d+\.|[a-z]\.|[ivx]+\)|\.{1,5}) +(.*)$/i,
+
+    # ''' (ruler)
+    # <<< (pagebreak)
+    :break_line        => /^('|<){3,}$/,
 
     # ++++
     #:pass             => /^\+{4,}$/,
@@ -349,7 +358,7 @@ module Asciidoctor
     :revision_info    => /^(?:\D*(.*?),)?(?:\s*(?!:)(.*?))(?:\s*(?!^):\s*(.*))?$/,
 
     # '''
-    :ruler            => /^'{3,}$/,
+    #:ruler            => /^'{3,}$/,
 
     # ****
     #:sidebar_blk      => /^\*{4,}$/,
@@ -383,7 +392,11 @@ module Asciidoctor
     },
 
     # .Foo   but not  . Foo or ..Foo
-    :blk_title        => /^\.([^\s\.].*)$/,
+    :blk_title        => /^\.([^\s.].*)$/,
+
+    :dbl_quoted       => /^("|)(.*)\1$/,
+
+    :m_dbl_quoted     => /^("|)(.*)\1$/m,
 
     # == Foo
     # ^ yields a level 2 title
@@ -401,7 +414,7 @@ module Asciidoctor
     :section_title     => /^(={1,5})\s+(\S.*?)(?:\s*\[\[([^\[]+)\]\])?(?:\s+\1)?$/,
 
     # does not begin with a dot and has at least one alphanumeric character
-    :section_name      => /^((?=.*\w+.*)[^\.].*?)$/,
+    :section_name      => /^((?=.*\w+.*)[^.].*?)$/,
 
     # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
     :section_underline => /^([=\-~^\+])+$/,
@@ -538,7 +551,7 @@ module Asciidoctor
     # (TM)
     [/(^|[^\\])\(TM\)/, '\1&#8482;'],
     # foo -- bar
-    [/(^|\n| )-- /, '&#8201;&#8212;&#8201;'],
+    [/(^|\n| )--( |\n|$)/, '&#8201;&#8212;&#8201;'],
     # foo--bar
     [/(\w)--(?=\w)/, '\1&#8212;'],
     # ellipsis

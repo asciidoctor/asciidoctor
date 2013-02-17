@@ -35,6 +35,30 @@ class Renderer
     if template_dir = options.delete(:template_dir)
       Helpers.require_library 'tilt'
 
+      template_glob = '*'
+      if (engine = options[:template_engine])
+        template_glob = "*.#{engine}"
+        # example: templates/haml
+        if File.directory? File.join(template_dir, engine)
+          template_dir = File.join template_dir, engine
+        end
+      end
+
+      # example: templates/html5 or templates/haml/html5
+      if File.directory? File.join(template_dir, options[:backend])
+        template_dir = File.join template_dir, options[:backend]
+      end
+
+      view_opts = {
+        :erb =>  { :trim => '<>' },
+        :haml => { :attr_wrapper => '"', :ugly => true, :escape_attrs => false },
+        :slim => { :disable_escape => true, :sort_attrs => false, :pretty => false }
+      }
+
+      if backend == 'html5'
+        view_opts[:haml][:format] = view_opts[:slim][:format] = :html5
+      end
+
       Debug.debug {
         msg = []
         msg << "Views going in are like so:"
@@ -42,13 +66,31 @@ class Renderer
         msg << '=' * 60
         msg * "\n"
       }
+
+      slim_loaded = false
+      helpers = nil
       
       # Grab the files in the top level of the directory (we're not traversing)
-      files = Dir.glob(File.join(template_dir, '*')).select{|f| File.stat(f).file?}
-      files.inject(@views) do |view_hash, view|
-        name = File.basename(view).split('.').first
-        view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>', :attr_wrapper => '"'))
+      Dir.glob(File.join(template_dir, template_glob)).
+          select{|f| File.file? f }.each do |template|
+        basename = File.basename(template)
+        if basename == 'helpers.rb'
+          helpers = template
+          next
+        end
+        name_parts = basename.split('.')
+        next if name_parts.size < 2
+        view_name = name_parts.first 
+        ext_name = name_parts.last
+        if ext_name == 'slim' && !slim_loaded
+          # slim doesn't get loaded by Tilt
+          Helpers.require_library 'slim'
+        end
+        next unless Tilt.registered? ext_name
+        @views[view_name] = Tilt.new(template, nil, view_opts[ext_name.to_sym])
       end
+
+      require helpers unless helpers.nil?
 
       Debug.debug {
         msg = []
