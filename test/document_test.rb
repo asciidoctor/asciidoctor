@@ -255,7 +255,7 @@ preamble
   end
 
   context 'Structure' do
-    test 'test_with_no_title' do
+    test 'document with no doctitle' do
       doc = document_from_string('Snorf')
       assert_nil doc.doctitle
       assert_nil doc.name
@@ -263,7 +263,22 @@ preamble
       assert_nil doc.header
     end
 
-    test 'test_with_explicit_title' do
+    test 'document with doctitle defined as attribute entry' do
+     input = <<-EOS
+:doctitle: Document Title
+
+preamble
+
+== First Section
+     EOS
+     doc = document_from_string input
+     assert_equal 'Document Title', doc.doctitle
+     assert doc.has_header?
+     assert_equal 'Document Title', doc.header.title
+     assert_equal 'Document Title', doc.first_section.title
+    end
+
+    test 'document with title attribute entry overrides doctitle' do
      input = <<-EOS
 = Title
 :title: Document Title
@@ -278,6 +293,23 @@ preamble
      assert doc.has_header?
      assert_equal 'Title', doc.header.title
      assert_equal 'Title', doc.first_section.title
+    end
+
+    test 'document with doctitle attribute entry overrides header title and doctitle' do
+     input = <<-EOS
+= Title
+:doctitle: Override
+
+preamble
+
+== First Section
+     EOS
+     doc = document_from_string input
+     assert_equal 'Override', doc.doctitle
+     assert_nil doc.title
+     assert doc.has_header?
+     assert_equal 'Override', doc.header.title
+     assert_equal 'Override', doc.first_section.title
     end
 
     test 'should recognize document title when preceded by blank lines' do
@@ -399,7 +431,7 @@ finally a reference to the second footnote footnoteref:[note2].
   end
 
   context 'Backends and Doctypes' do 
-    test 'test_html5_backend_doctype_article' do
+    test 'html5 backend doctype article' do
       result = render_string("= Title\n\npreamble", :attributes => {'backend' => 'html5'})
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="article"]', result, 1
@@ -407,7 +439,7 @@ finally a reference to the second footnote footnoteref:[note2].
       assert_xpath '/html//*[@id="preamble"]//p[text() = "preamble"]', result, 1
     end
 
-    test 'test_html5_backend_doctype_book' do
+    test 'html5 backend doctype book' do
       result = render_string("= Title\n\npreamble", :attributes => {'backend' => 'html5', 'doctype' => 'book'})
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="book"]', result, 1
@@ -415,7 +447,7 @@ finally a reference to the second footnote footnoteref:[note2].
       assert_xpath '/html//*[@id="preamble"]//p[text() = "preamble"]', result, 1
     end
 
-    test 'test_docbook45_backend_doctype_article' do
+    test 'docbook45 backend doctype article' do
       input = <<-EOS
 = Title
 
@@ -434,14 +466,14 @@ section body
       assert_xpath '/article/section[@id = "_first_section"]/simpara[text() = "section body"]', result, 1
     end
 
-    test 'test_docbook45_backend_doctype_article_no_title' do
+    test 'docbook45 backend doctype article no title' do
       result = render_string('text', :attributes => {'backend' => 'docbook45'})
       assert_xpath '/article', result, 1
       assert_xpath '/article/articleinfo/date', result, 1
       assert_xpath '/article/simpara[text() = "text"]', result, 1
     end
 
-    test 'test_docbook45_backend_doctype_book' do
+    test 'docbook45 backend doctype book' do
       input = <<-EOS
 = Title
 
@@ -460,11 +492,31 @@ chapter body
       assert_xpath '/book/chapter[@id = "_first_chapter"]/simpara[text() = "chapter body"]', result, 1
     end
 
-    test 'test_docbook45_backend_doctype_book_no_title' do
+    test 'docbook45 backend doctype book no title' do
       result = render_string('text', :attributes => {'backend' => 'docbook45', 'doctype' => 'book'})
       assert_xpath '/book', result, 1
       assert_xpath '/book/bookinfo/date', result, 1
       assert_xpath '/book/simpara[text() = "text"]', result, 1
+    end
+
+    test 'should be able to set backend using :backend option key' do
+      doc = Asciidoctor::Document.new([], :backend => 'html5')
+      assert_equal 'html5', doc.attributes['backend']
+    end
+
+    test ':backend option should override backend attribute' do
+      doc = Asciidoctor::Document.new([], :backend => 'html5', :attributes => {'backend' => 'docbook45'})
+      assert_equal 'html5', doc.attributes['backend']
+    end
+
+    test 'should be able to set doctype using :doctype option key' do
+      doc = Asciidoctor::Document.new([], :doctype => 'book')
+      assert_equal 'book', doc.attributes['doctype']
+    end
+
+    test ':doctype option should override doctype attribute' do
+      doc = Asciidoctor::Document.new([], :doctype => 'book', :attributes => {'doctype' => 'article'})
+      assert_equal 'book', doc.attributes['doctype']
     end
 
     test 'do not override explicit author initials' do
