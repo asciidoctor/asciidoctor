@@ -335,6 +335,7 @@ more info...
       result = render_string("= Title\n\npreamble")
       assert_xpath '/html', result, 1
       assert_xpath '//*[@id="header"]', result, 1
+      assert_xpath '//*[@id="header"]/h1', result, 1
       assert_xpath '//*[@id="footer"]', result, 1
       assert_xpath '//*[@id="preamble"]', result, 1
     end
@@ -342,9 +343,21 @@ more info...
     test 'no header footer' do
       result = render_string("= Title\n\npreamble", :header_footer => false)
       assert_xpath '/html', result, 0
+      assert_xpath '/h1', result, 0
       assert_xpath '/*[@id="header"]', result, 0
       assert_xpath '/*[@id="footer"]', result, 0
       assert_xpath '/*[@id="preamble"]', result, 1
+    end
+
+    test 'wip enable title when no header footer' do
+      result = render_string("= Title\n\npreamble", :header_footer => false, :attributes => {'notitle!' => ''})
+      assert_xpath '/html', result, 0
+      assert_xpath '/h1', result, 1
+      assert_xpath '/*[@id="header"]', result, 0
+      assert_xpath '/*[@id="footer"]', result, 0
+      assert_xpath '/*[@id="preamble"]', result, 1
+      assert_xpath '(/*)[1]/self::h1', result, 1
+      assert_xpath '(/*)[2]/self::*[@id="preamble"]', result, 1
     end
 
     test 'parse header only' do
