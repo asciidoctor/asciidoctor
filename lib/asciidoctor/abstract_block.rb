@@ -1,4 +1,5 @@
-class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
+module Asciidoctor
+class AbstractBlock < AbstractNode
   # Public: Get the Array of Asciidoctor::AbstractBlock sub-blocks for this block
   attr_reader :blocks
 
@@ -15,7 +16,7 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
     @title = nil
     if context == :document
       @level = 0
-    elsif !parent.nil? && !self.is_a?(Asciidoctor::Section)
+    elsif !parent.nil? && !self.is_a?(Section)
       @level = parent.level
     else
       @level = nil
@@ -94,7 +95,7 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
   #
   # Returns nothing.
   def <<(block)
-    if block.is_a?(Asciidoctor::Section)
+    if block.is_a?(Section)
       assign_index(block)
     end
     @blocks << block
@@ -183,7 +184,7 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
   # returns an Array of Section objects
   def sections
     @blocks.inject([]) {|collector, block|
-      collector << block if block.is_a?(Asciidoctor::Section)
+      collector << block if block.is_a?(Section)
       collector
     }
   end
@@ -209,10 +210,11 @@ class Asciidoctor::AbstractBlock < Asciidoctor::AbstractNode
   def reindex_sections
     @next_section_index = 0
     @blocks.each {|block|
-      if block.is_a?(Asciidoctor::Section)
+      if block.is_a?(Section)
         assign_index(block)
         block.reindex_sections
       end
     }
   end
+end
 end

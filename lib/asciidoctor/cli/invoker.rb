@@ -14,12 +14,12 @@ module Asciidoctor
         @code = 0
         @timings = {}
         options = options.flatten
-        if !options.empty? && options.first.is_a?(Asciidoctor::Cli::Options)
+        if !options.empty? && options.first.is_a?(Cli::Options)
           @options = options.first
         elsif options.first.is_a? Hash
-          @options = Asciidoctor::Cli::Options.new(options)
+          @options = Cli::Options.new(options)
         else
-          @options = Asciidoctor::Cli::Options.parse!(options)
+          @options = Cli::Options.parse!(options)
           # hmmm
           if @options.is_a?(Integer)
             @code = @options

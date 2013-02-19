@@ -1,5 +1,6 @@
+module Asciidoctor
 # Public: Methods for managing items for AsciiDoc olists, ulist, and dlists.
-class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
+class ListItem < AbstractBlock
 
   # Public: Get/Set the String used to mark this list item
   attr_accessor :marker
@@ -20,7 +21,7 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
 
   def text
     # this will allow the text to be processed
-    ::Asciidoctor::Block.new(self, nil, [@text]).content
+    Block.new(self, nil, [@text]).content
   end
 
   def content
@@ -39,7 +40,7 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
   #
   # Returns nothing
   def fold_first(continuation_connects_first_block = false, content_adjacent = false)
-    if !blocks.empty? && blocks.first.is_a?(Asciidoctor::Block) &&
+    if !blocks.empty? && blocks.first.is_a?(Block) &&
         ((blocks.first.context == :paragraph && !continuation_connects_first_block) ||
         ((content_adjacent || !continuation_connects_first_block) && blocks.first.context == :literal &&
             blocks.first.attr('options', []).include?('listparagraph')))
@@ -56,20 +57,20 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
 
   def splain(parent_level = 0)
     parent_level += 1
-    Asciidoctor.puts_indented(parent_level, "List Item anchor: #{@anchor}") unless @anchor.nil?
-    Asciidoctor.puts_indented(parent_level, "Text: #{@text}") unless @text.nil?
+    Debug.puts_indented(parent_level, "List Item anchor: #{@anchor}") unless @anchor.nil?
+    Debug.puts_indented(parent_level, "Text: #{@text}") unless @text.nil?
 
-    Asciidoctor.puts_indented(parent_level, "Blocks: #{@blocks.count}")
+    Debug.puts_indented(parent_level, "Blocks: #{@blocks.count}")
 
     if @blocks.any?
-      Asciidoctor.puts_indented(parent_level, "Blocks content (#{@blocks.count}):")
+      Debug.puts_indented(parent_level, "Blocks content (#{@blocks.count}):")
       @blocks.each_with_index do |block, i|
-        Asciidoctor.puts_indented(parent_level, "v" * (60 - parent_level*2))
-        Asciidoctor.puts_indented(parent_level, "Block ##{i} is a #{block.class}")
-        Asciidoctor.puts_indented(parent_level, "Name is #{block.title rescue 'n/a'}")
-        Asciidoctor.puts_indented(parent_level, "=" * 40)
+        Debug.puts_indented(parent_level, "v" * (60 - parent_level*2))
+        Debug.puts_indented(parent_level, "Block ##{i} is a #{block.class}")
+        Debug.puts_indented(parent_level, "Name is #{block.title rescue 'n/a'}")
+        Debug.puts_indented(parent_level, "=" * 40)
         block.splain(parent_level) if block.respond_to? :splain
-        Asciidoctor.puts_indented(parent_level, "^" * (60 - parent_level*2))
+        Debug.puts_indented(parent_level, "^" * (60 - parent_level*2))
       end
     end
     nil
@@ -78,4 +79,5 @@ class Asciidoctor::ListItem < Asciidoctor::AbstractBlock
   def to_s
     "#{super.to_s} - #@context [text:#@text, blocks:#{(@blocks || []).size}]"
   end
+end
 end

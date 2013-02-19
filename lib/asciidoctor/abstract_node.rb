@@ -1,9 +1,10 @@
+module Asciidoctor
 # Public: An abstract base class that provides state and methods for managing a
 # node of AsciiDoc content. The state and methods on this class are comment to
 # all content segments in an AsciiDoc document.
-class Asciidoctor::AbstractNode
+class AbstractNode
 
-  include Asciidoctor::Substituters
+  include Substituters
 
   # Public: Get the element which is the parent of this node
   attr_reader :parent
@@ -24,7 +25,7 @@ class Asciidoctor::AbstractNode
     @parent = (context != :document ? parent : nil)
 
     if !parent.nil?
-      @document = parent.is_a?(Asciidoctor::Document) ? parent : parent.document
+      @document = parent.is_a?(Document) ? parent : parent.document
     else
       @document = nil
     end
@@ -135,7 +136,7 @@ class Asciidoctor::AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
-    if @document.safe < Asciidoctor::SafeMode::SECURE && @document.attr?('data-uri')
+    if @document.safe < SafeMode::SECURE && @document.attr?('data-uri')
       generate_data_uri(target_image, asset_dir_key)
     elsif asset_dir_key && attr?(asset_dir_key)
       File.join(@document.attr(asset_dir_key), target_image)
@@ -157,7 +158,7 @@ class Asciidoctor::AbstractNode
   #
   # Returns A String data URI containing the content of the target image
   def generate_data_uri(target_image, asset_dir_key = nil)
-    Asciidoctor.require_library 'base64'
+    Helpers.require_library 'base64'
 
     mimetype = 'image/' + File.extname(target_image)[1..-1]
     if asset_dir_key
@@ -225,7 +226,7 @@ class Asciidoctor::AbstractNode
   # of this method are still doing a File.join to finish the task
   def normalize_asset_path(asset_ref, asset_name = 'path', autocorrect = true)
     # TODO we may use pathname enough to make it a top-level require
-    Asciidoctor.require_library 'pathname'
+    Helpers.require_library 'pathname'
 
     input_path = @document.base_dir
     asset_path = Pathname.new(asset_ref)
@@ -236,7 +237,7 @@ class Asciidoctor::AbstractNode
       asset_path = asset_path.cleanpath.to_s
     end
 
-    if @document.safe >= Asciidoctor::SafeMode::SAFE
+    if @document.safe >= SafeMode::SAFE
       relative_asset_path = Pathname.new(asset_path).relative_path_from(Pathname.new(input_path)).to_s
       if relative_asset_path.start_with?('..')
         if autocorrect
@@ -256,4 +257,5 @@ class Asciidoctor::AbstractNode
     asset_path
   end
 
+end
 end

@@ -10,7 +10,7 @@ module Asciidoctor
         self[:attributes] = options[:attributes] || {}
         self[:input_file] = options[:input_file] || nil
         self[:output_file] = options[:output_file] || nil
-        self[:safe] = options[:safe] || Asciidoctor::SafeMode::UNSAFE
+        self[:safe] = options[:safe] || SafeMode::UNSAFE
         self[:header_footer] = options[:header_footer] || true
         self[:template_dir] = options[:template_dir] || nil
         if options[:doctype]
@@ -58,12 +58,12 @@ Example: asciidoctor -b html5 source.asciidoc
                   'set safe mode to safe (default: secure)',
                   'enables include macros, but restricts access to ancestor paths of source file',
                   'provided for compatibility with the asciidoc command') do
-            self[:safe] = Asciidoctor::SafeMode::SAFE
+            self[:safe] = SafeMode::SAFE
           end
           opts.on('-S', '--safe-mode SAFE_MODE', ['unsafe', 'safe', 'secure'],
                   'set safe mode level explicitly: [unsafe, safe, secure] (default: secure)',
                   'disables potentially dangerous macros in source files, such as include::[]') do |safe_mode|
-            self[:safe] = Asciidoctor::SafeMode.const_get(safe_mode.upcase)
+            self[:safe] = SafeMode.const_get(safe_mode.upcase)
           end
           opts.on('-s', '--no-header-footer', 'suppress output of header and footer (default: false)') do
             self[:header_footer] = false
