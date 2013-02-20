@@ -14,9 +14,14 @@ class Inline < AbstractNode
     super(parent, context)
 
     @text = text 
-    @id = opts[:id] if opts.has_key?(:id)
-    @type = opts[:type] if opts.has_key?(:type)
-    @target = opts[:target] if opts.has_key?(:target)
+
+    #@id = opts[:id] if opts.has_key?(:id)
+    #@type = opts[:type] if opts.has_key?(:type)
+    #@target = opts[:target] if opts.has_key?(:target)
+
+    @id = opts[:id]
+    @type = opts[:type]
+    @target = opts[:target]
     
     if opts.has_key?(:attributes) && (attributes = opts[:attributes]).is_a?(Hash)
       update_attributes(opts[:attributes]) unless attributes.empty?

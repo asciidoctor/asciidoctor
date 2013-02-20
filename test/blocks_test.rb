@@ -2,7 +2,7 @@ require 'test_helper'
 require 'pathname'
 
 context "Blocks" do
-  context "Rulers" do
+  context 'Line Breaks' do
     test "ruler" do
       output = render_string("'''")
       assert_xpath '//*[@id="content"]/hr', output, 1
@@ -14,6 +14,13 @@ context "Blocks" do
       assert_xpath '//*[@id="content"]/hr', output, 1
       assert_xpath '//*[@id="content"]/hr/preceding-sibling::*', output, 1
       assert_xpath '//*[@id="content"]/hr/following-sibling::*', output, 1
+    end
+
+    test "page break" do
+      output = render_embedded_string("page 1\n\n<<<\n\npage 2")
+      assert_xpath '/*[@style="page-break-after: always"]', output, 1
+      assert_xpath '/*[@style="page-break-after: always"]/preceding-sibling::div/p[text()="page 1"]', output, 1
+      assert_xpath '/*[@style="page-break-after: always"]/following-sibling::div/p[text()="page 2"]', output, 1
     end
   end
 

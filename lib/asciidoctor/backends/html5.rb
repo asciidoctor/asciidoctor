@@ -12,13 +12,13 @@ class BaseTemplate
   end
 
   def title_div(opts = {})
-    %(<% if title? %><div class="title">#{opts.has_key?(:caption) ? '<% unless @caption.nil? %><%= @caption %><% end %>' : ''}<%= title %></div><% end %>)
+    %(<% if title? %><div class="title">#{opts.has_key?(:caption) ? '<%= @caption %>' : ''}<%= title %></div><% end %>)
   end
 end
 
 module HTML5
 class DocumentTemplate < BaseTemplate
-  def render_outline(node, to_depth = 2)
+  def self.outline(node, to_depth = 2)
     toc_level = nil
     sections = node.sections
     unless sections.empty?
@@ -35,7 +35,7 @@ class DocumentTemplate < BaseTemplate
       toc_level << "#{indent}<ol>\n" if nested
       sections.each do |section|
         toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{!section.special && section.level > 0 ? "#{section.sectnum} " : ''}#{section.attr('caption')}#{section.title}</a></li>\n"
-        if section.level < to_depth && (child_toc_level = render_outline(section, to_depth))
+        if section.level < to_depth && (child_toc_level = outline(section, to_depth))
           if section.document.doctype != 'book' || section.level > 0
             toc_level << "#{indent}  <li>\n#{child_toc_level}\n#{indent}  </li>\n"
           else
@@ -51,7 +51,7 @@ class DocumentTemplate < BaseTemplate
   # Internal: Generate the default stylesheet for CodeRay
   #
   # returns the default CodeRay stylesheet as a String
-  def default_coderay_stylesheet
+  def self.default_coderay_stylesheet
     Helpers.require_library 'coderay'
     ::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
   end
@@ -59,7 +59,7 @@ class DocumentTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><!DOCTYPE html>
-<html lang="en">
+<html lang="<%= attr :lang, 'en' %>">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>">
     <meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>">
@@ -73,7 +73,7 @@ class DocumentTemplate < BaseTemplate
     </style>
     <% end %>
     <% unless attr(:stylesheet, '').empty? %>
-    <link rel="stylesheet" href="<%= File.join((attr :stylesdir, '.'), (attr :stylesheet)) %>">
+    <link rel="stylesheet" href="<%= (attr? :stylesdir) ? File.join((attr :stylesdir), (attr :stylesheet)) : (attr :stylesheet) %>">
     <% end %>
     <%
     case attr 'source-highlighter' %><%
@@ -84,7 +84,7 @@ pre.highlight code, pre.highlight pre { color: #333; }
 pre.highlight span.line-numbers { display: inline-block; margin-right: 4px; padding: 1px 4px; }
 pre.highlight .line-numbers { background-color: #D5F6F6; color: gray; }
 pre.highlight .line-numbers pre { color: gray; }
-<% if (attr 'coderay-css', 'class') == 'class' %><%= template.default_coderay_stylesheet %><% end %>
+<% if (attr 'coderay-css', 'class') == 'class' %><%= template.class.default_coderay_stylesheet %><% end %>
     </style><%
     when 'highlightjs' %>
     <link rel="stylesheet" href="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/styles/<%= (attr 'highlightjs-theme', 'default') %>.min.css">
@@ -92,7 +92,7 @@ pre.highlight .line-numbers pre { color: gray; }
 pre code { background-color: #F8F8F8; padding: 0; }
     </style>
     <script src="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
+    <script>hljs.initHighlightingOnLoad()</script>
     <% end %>
   </head>
   <body#{id} class="<%= doctype %>"<% if attr? 'max-width' %> style="max-width: <%= attr 'max-width' %>;"<% end %>>
@@ -100,7 +100,7 @@ pre code { background-color: #F8F8F8; padding: 0; }
     <div id="header">
       <% if has_header? %>
       <% unless notitle %>
-      <h1><%= header.title %></h1>
+      <h1><%= @header.title %></h1>
       <% end %>
       <% if attr? :author %><span id="author"><%= attr :author %></span><br><% end %>
       <% if attr? :email %><span id="email" class="monospaced">&lt;<%= attr :email %>&gt;</span><br><% end %>
@@ -111,7 +111,7 @@ pre code { background-color: #F8F8F8; padding: 0; }
       <% if attr? :toc %>
       <div id="toc">
         <div id="toctitle"><%= attr 'toc-title' %></div>
-<%= template.render_outline(self, (attr :toclevels, 2).to_i) %>
+<%= template.class.outline(self, (attr :toclevels, 2).to_i) %>
       </div>
       <% end %>
     </div>
@@ -119,10 +119,10 @@ pre code { background-color: #F8F8F8; padding: 0; }
     <div id="content">
 <%= content %>
     </div>
-    <% if !@references[:footnotes].empty? %>
+    <% if footnotes? %>
     <div id="footnotes">
       <hr>
-      <% @references[:footnotes].each do |fn| %>
+      <% footnotes.each do |fn| %>
       <div class="footnote" id="_footnote_<%= fn.index %>">
         <a href="#_footnoteref_<%= fn.index %>"><%= fn.index %></a>. <%= fn.text %>
       </div>
@@ -171,7 +171,7 @@ if @level == 0 %>
 <%= content %>
 <% else %>
 <div class="sect<%= @level %>#{role_class}">
-  <h<%= @level + 1 %>#{id}><% if !@special && (attr? :numbered) %><%= sectnum %> <% end %><%= attr :caption %><%= title %></h<%= @level + 1 %>>
+  <h<%= @level + 1 %>#{id}><% if !@special && (attr? :numbered) && @level < 4 %><%= sectnum %> <% end %><%= attr :caption %><%= title %></h<%= @level + 1 %>>
   <% if @level == 1 %>
   <div class="sectionbody">
 <%= content %>
@@ -197,7 +197,7 @@ class BlockDlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><%
-if (attr :style) == 'qanda' %>
+if attr? :style, 'qanda' %>
 <div#{id} class="qlist#{style_class}#{role_class}">
   #{title_div}
   <ol>
@@ -216,7 +216,7 @@ if (attr :style) == 'qanda' %>
   <% end %>
   </ol>
 </div>
-<% elsif (attr :style) == 'horizontal' %>
+<% elsif attr? :style, 'horizontal' %>
 <div#{id} class="hdlist#{role_class}">
   #{title_div}
   <table>
@@ -270,8 +270,8 @@ class BlockListingTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="listingblock#{role_class}">
   #{title_div :caption => true}
   <div class="content monospaced">
-    <% if (attr :style) == 'source' %>
-    <pre class="highlight<% if attr('source-highlighter') == 'coderay' %> CodeRay<% end %>"><code#{attribute('class', :language)}><%= template.preserve_endlines(content, self) %></code></pre>
+    <% if attr? :style, 'source' %>
+    <pre class="highlight<% if attr? 'source-highlighter', 'coderay' %> CodeRay<% end %>"><code#{attribute('class', :language)}><%= template.preserve_endlines(content, self) %></code></pre>
     <% else %>
     <pre><%= template.preserve_endlines(content, self) %></pre>
     <% end %>
@@ -319,12 +319,17 @@ class BlockAdmonitionTemplate < BaseTemplate
 end
 
 class BlockParagraphTemplate < BaseTemplate
+  def paragraph(id, role, title, content)
+    %(<div#{id && " id=\"#{id}\""} class=\"paragraph#{role && " #{role}"}\">
+  #{title && "<div class=\"title\">#{title}</div>"}  
+  <p>#{content}</p>
+</div>)
+  end
+
   def template
+    # very hot piece of code, optimized for speed
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="paragraph#{role_class}">
-  #{title_div}
-  <p><%= content %></p>
-</div>
+<%#encoding:UTF-8%><%= template.paragraph(@id, (attr 'role'), title? ? title : nil, content) %>
     EOS
   end
 end
@@ -370,9 +375,7 @@ end
 
 class BlockPassTemplate < BaseTemplate
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= content %>
-    EOS
+    :content
   end
 end
 
@@ -390,9 +393,9 @@ class BlockQuoteTemplate < BaseTemplate
     <% end %>
     <% if attr? :attribution %>
     <% if attr? :citetitle %>
-    <br/>
+    <br>
     <% end %>
-    <%= '&#8212; ' + attr(:attribution) %>
+    <%= "&#8212; \#{attr :attribution}" %>
     <% end %>
   </div>
 </div>
@@ -412,9 +415,9 @@ class BlockVerseTemplate < BaseTemplate
     <% end %>
     <% if attr? :attribution %>
     <% if attr? :citetitle %>
-    <br/>
+    <br>
     <% end %>
-    <%= '&#8212; ' + attr(:attribution) %>
+    <%= "&#8212; \#{attr :attribution}" %>
     <% end %>
   </div>
 </div>
@@ -428,11 +431,11 @@ class BlockUlistTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="ulist#{style_class}#{role_class}">
   #{title_div}
   <ul>
-  <% content.each do |li| %>
+  <% content.each do |item| %>
     <li>
-      <p><%= li.text %></p>
-      <% if li.blocks? %>
-<%= li.content %>
+      <p><%= item.text %></p>
+      <% if item.blocks? %>
+<%= item.content %>
       <% end %>
     </li>
   <% end %>
@@ -448,11 +451,11 @@ class BlockOlistTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="olist#{style_class}#{role_class}">
   #{title_div}
   <ol class="<%= attr :style %>"#{attribute('start', :start)}>
-  <% content.each do |li| %>
+  <% content.each do |item| %>
     <li>
-      <p><%= li.text %></p>
-      <% if li.blocks? %>
-<%= li.content %>
+      <p><%= item.text %></p>
+      <% if item.blocks? %>
+<%= item.content %>
       <% end %>
     </li>
   <% end %>
@@ -469,18 +472,18 @@ class BlockColistTemplate < BaseTemplate
   #{title_div}
   <% if attr? :icons %>
   <table>
-    <% content.each_with_index do |li, i| %>
+    <% content.each_with_index do |item, i| %>
     <tr>
       <td><img src="<%= icon_uri("callouts/\#{i + 1}") %>" alt="<%= i + 1 %>"></td>
-      <td><%= li.text %></td>
-    </tr> 
+      <td><%= item.text %></td>
+    </tr>
     <% end %>
   </table>
   <% else %>
   <ol>
-  <% content.each do |li| %>
+  <% content.each do |item| %>
     <li>
-      <p><%= li.text %></p>
+      <p><%= item.text %></p>
     </li>
   <% end %>
   </ol>
@@ -499,10 +502,10 @@ if attr? :float %>float: <%= attr :float %>; <% end %>">
   <% if title? %>
   <caption class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></caption>
   <% end %>
-  <% if (attr :rowcount) >= 0 %> 
+  <% if (attr :rowcount) >= 0 %>
   <colgroup>
     <% if attr? 'autowidth-option' %>
-    <% @columns.each do |col| %>
+    <% @columns.each do %>
     <col>
     <% end %>
     <% else %>
@@ -511,7 +514,7 @@ if attr? :float %>float: <%= attr :float %>; <% end %>">
     <% end %>
     <% end %>
   </colgroup>
-  <% [:head, :foot, :body].select {|tsec| !rows[tsec].empty? }.each do |tsec| %>
+  <% [:head, :foot, :body].select {|tsec| !@rows[tsec].empty? }.each do |tsec| %>
   <t<%= tsec %>>
     <% @rows[tsec].each do |row| %>
     <tr>
@@ -539,9 +542,11 @@ end
 class BlockImageTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="imageblock#{role_class}">
+<%#encoding:UTF-8%><div#{id} class="imageblock#{style_class}#{role_class}"<% if (attr? :align) || (attr? :float)
+%> style="<% if attr? :align %>text-align: <%= attr :align %><% if attr? :float %>; <% end %><% end %><% if attr? :float %>float: <%= attr :float %><% end %>"<% end
+%>>
   <div class="content">
-    <% if attr :link %>
+    <% if attr? :link %>
     <a class="image" href="<%= attr :link %>"><img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}></a>
     <% else %>
     <img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}>
@@ -561,10 +566,18 @@ class BlockRulerTemplate < BaseTemplate
   end
 end
 
+class BlockPageBreakTemplate < BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOS
+<%#encoding:UTF-8%><div style="page-break-after: always"></div>
+    EOS
+  end
+end
+
 class InlineBreakTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= text %><br>
+<%#encoding:UTF-8%><%= "\#@text<br>" %>
     EOS
   end
 end
@@ -584,35 +597,47 @@ class InlineQuotedTemplate < BaseTemplate
     :monospaced => ['<tt>', '</tt>'],
     :superscript => ['<sup>', '</sup>'],
     :subscript => ['<sub>', '</sub>'],
-    :double => [INTRINSICS['ldquo'], INTRINSICS['rdquo']],
-    :single => [INTRINSICS['lsquo'], INTRINSICS['rsquo']],
-    :none => ['', '']
+    :double => ['&#8220;', '&#8221;'],
+    :single => ['&#8216;', '&#8217;']
+    #:none => ['', '']
   }
 
+  def quote(text, type, role)
+    start_tag, end_tag = QUOTED_TAGS[type] || ['', '']
+    if role
+      "#{start_tag}<span class=\"#{role}\">#{text}</span>#{end_tag}"
+    else
+      "#{start_tag}#{text}#{end_tag}"
+    end
+  end
+
   def template
+    # very hot piece of code, optimized for speed
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><% tags = template.class::QUOTED_TAGS[@type] %><%= tags.first %><%
-if attr? :role %><span#{attribute('class', :role)}><%
-end %><%= @text %><%
-if attr? :role %></span><%
-end %><%= tags.last %>
+<%#encoding:UTF-8%><%= template.quote(@text, @type, attr('role')) %>
     EOS
   end
 end
 
 class InlineAnchorTemplate < BaseTemplate
+  def anchor(target, text, type, document, window = nil)
+    case type
+    when :xref
+      text = document.references[:ids].fetch(target, "[#{target}]") if text.nil?
+      %(<a href="##{target}">#{text}</a>)
+    when :ref
+      %(<a id="#{target}"></a>)
+    when :bibref
+      %(<a id="#{target}"></a>[#{target}])
+    when :link
+      %(<a href="#{target}"#{window && " target=\"#{window}\""}>#{text}</a>)
+    end
+  end
+
   def template
+    # hot piece of code, optimized for speed
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%
-if type == :xref
-%><a href="#<%= @target %>"><%= @text || @document.references[:ids].fetch(@target, '[' + @target + ']') %></a><%
-elsif @type == :ref
-%><a id="<%= @target %>"></a><%
-elsif @type == :bibref
-%><a id="<%= @target %>"></a>[<%= @target %>]<%
-else
-%><a href="<%= @target %>"><%= @text %></a><%
-end %>
+<%#encoding:UTF-8%><%= template.anchor(@target, @text, @type, @document, @type == :link ? attr('window') : nil) %>
     EOS
   end
 end
@@ -623,9 +648,9 @@ class InlineImageTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><span class="image#{role_class}">
   <%
-  if attr :link %><a class="image" href="<%= attr :link %>"><%
-  end %><img src="<%= image_uri(target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
-  if attr :link%></a><% end
+  if attr? :link %><a class="image" href="<%= attr :link %>"><%
+  end %><img src="<%= image_uri(@target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
+  if attr? :link%></a><% end
   %>
 </span>
     EOS
@@ -636,10 +661,10 @@ class InlineFootnoteTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><%
-if type == :xref
-%><span class="footnoteref">[<a href="#_footnote_<%= attr :index %>" title="View footnote." class="footnote"><%= attr :index %></a>]</span><%
+if @type == :xref
+%><span class="footnoteref">[<a class="footnote" href="#_footnote_<%= attr :index %>" title="View footnote."><%= attr :index %></a>]</span><%
 else
-%><span class="footnote"<% if @id %> id="_footnote_<%= @id %>"<% end %>>[<a id="_footnoteref_<%= attr :index %>" href="#_footnote_<%= attr :index %>" title="View footnote." class="footnote"><%= attr :index %></a>]</span><%
+%><span class="footnote"<% if @id %> id="_footnote_<%= @id %>"<% end %>>[<a id="_footnoteref_<%= attr :index %>" class="footnote" href="#_footnote_<%= attr :index %>" title="View footnote."><%= attr :index %></a>]</span><%
 end %>
     EOS
   end
@@ -648,7 +673,7 @@ end
 class InlineIndextermTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><% if type == :visible %><%= @text %><% end %>
+<%#encoding:UTF-8%><%= "\#{@type == :visible ? @text : ''}" %>
     EOS
   end
 end

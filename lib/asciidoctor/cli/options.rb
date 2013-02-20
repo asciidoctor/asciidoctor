@@ -55,13 +55,13 @@ Example: asciidoctor -b html5 source.asciidoc
             self[:output_file] = output_file
           end
           opts.on('--safe',
-                  'set safe mode to safe (default: secure)',
+                  'set safe mode level to safe (default: unsafe)',
                   'enables include macros, but restricts access to ancestor paths of source file',
                   'provided for compatibility with the asciidoc command') do
             self[:safe] = SafeMode::SAFE
           end
-          opts.on('-S', '--safe-mode SAFE_MODE', ['unsafe', 'safe', 'secure'],
-                  'set safe mode level explicitly: [unsafe, safe, secure] (default: secure)',
+          opts.on('-S', '--safe-mode SAFE_MODE', ['unsafe', 'safe', 'server', 'secure'],
+                  'set safe mode level explicitly: [unsafe, safe, server, secure] (default: unsafe)',
                   'disables potentially dangerous macros in source files, such as include::[]') do |safe_mode|
             self[:safe] = SafeMode.const_get(safe_mode.upcase)
           end

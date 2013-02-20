@@ -34,14 +34,16 @@ Security Settings
     of the program.
 
 *-S, --safe-mode*='SAFE_MODE'::
-    Set safe mode level explicity: 'unsafe', 'safe', 'secure'. Defaults to
-    'secure'. Disables potentially dangerous macros in source files, such as
-    include::[].
+    Set safe mode level: 'unsafe', 'safe', 'server' or 'secure'. Disables
+    potentially dangerous macros in source files, such as include::[]. If not
+    set, the safe mode level defaults to 'unsafe' when Asciidoctor is invoked
+    using this script.
 
 *--safe*::
-    Set safe mode to 'safe' from the default safe mode of 'secure'. Enables
-    include macros, but restricts access to ancestor paths of source file.
-    Provided for compatibility with the asciidoc command.
+    Set safe mode level to 'safe'. Enables include macros, but restricts access
+    to ancestor paths of source file. Provided for compatibility with the
+    asciidoc command. If not set, the safe mode level defaults to 'unsafe' when
+    Asciidoctor is invoked using this script.
 
 Document Settings
 ~~~~~~~~~~~~~~~~~
@@ -97,7 +99,8 @@ Rendering Control
 
 *-T, --template-dir*='DIR'::
     Directory containing custom render templates that override one or more
-    templates from the the built-in set.
+    templates from the the built-in set. If there is a folder in the directory
+    that matches the backend, the templates from that folder will be used.
 
 Processing Information
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -137,6 +140,7 @@ See the *Asciidoctor* issue tracker: <**https://github.com/asciidoctor/asciidoct
 AUTHORS
 -------
 *Asciidoctor* was written by Ryan Waldron, Dan Allen and other contributors.
+
 *AsciiDoc* was written by Stuart Rackham and has received contributions from
 many other individuals.
 
@@ -148,6 +152,8 @@ Git source repository on GitHub: <**https://github.com/asciidoctor/asciidoctor**
 Project web site: <**http://asciidoctor.org**>
 
 GitHub organization: <**http://github.com/asciidoctor**>
+
+Mailinglist / forum: <**http://discuss.asciidoctor.org**>
 
 
 COPYING
