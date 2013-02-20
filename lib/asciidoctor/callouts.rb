@@ -1,5 +1,6 @@
+module Asciidoctor
 # Public: Maintains a catalog of callouts and their associations.
-class Asciidoctor::Callouts
+class Callouts
   def initialize
     @lists = []
     @list_index = 0
@@ -114,4 +115,5 @@ class Asciidoctor::Callouts
   def generate_callout_id(list_index, co_index)
     "CO#{list_index}-#{co_index}"
   end
+end
 end

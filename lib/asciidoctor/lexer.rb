@@ -1,3 +1,4 @@
+module Asciidoctor
 # Public: Methods to parse lines of AsciiDoc into an object hierarchy
 # representing the structure of the document. All methods are class methods and
 # should be invoked from the Lexer class. The main entry point is ::next_block.
@@ -20,9 +21,9 @@
 #   block = Lexer.next_block(reader, doc)
 #   block.class
 #   # => Asciidoctor::Block
-class Asciidoctor::Lexer
+class Lexer
 
-  include Asciidoctor
+  BlockMatchData = Struct.new(:name, :tip, :terminator)
 
   # Public: Make sure the Lexer object doesn't get initialized.
   #
@@ -251,7 +252,7 @@ class Asciidoctor::Lexer
       options.delete(:text)
     end
 
-    Asciidoctor.debug {
+    Debug.debug {
       msg = []
       msg << '/' * 64
       msg << 'next_block() - First two lines are:'
@@ -278,14 +279,19 @@ class Asciidoctor::Lexer
 
       this_line = reader.get_line
 
-      delimited_blk = is_delimited_block? this_line
+      block_context = nil
+      terminator = nil
+      if delimited_blk_match = is_delimited_block?(this_line, true)
+        block_context = delimited_blk_match.name
+        terminator = delimited_blk_match.terminator
+      end
 
       # NOTE we're letting ruler have attributes
-      if !options[:text] && this_line.match(REGEXP[:ruler])
+      if !options[:text] && block_context.nil? && this_line.match(REGEXP[:ruler])
         block = Block.new(parent, :ruler)
         reader.skip_blank_lines
 
-      elsif !options[:text] && (match = this_line.match(REGEXP[:image_blk]))
+      elsif !options[:text] && block_context.nil? && (match = this_line.match(REGEXP[:image_blk]))
         block = Block.new(parent, :image)
         AttributeList.new(document.sub_attributes(match[2])).parse_into(attributes, ['alt', 'width', 'height'])
         target = block.sub_attributes(match[1])
@@ -305,9 +311,8 @@ class Asciidoctor::Lexer
         end
         reader.skip_blank_lines
 
-      elsif delimited_blk && (match = this_line.match(REGEXP[:open_blk]))
+      elsif block_context == :open
         # an open block is surrounded by '--' lines and has zero or more blocks inside
-        terminator = match[0]
         buffer = Reader.new reader.grab_lines_until(:terminator => terminator)
 
         # Strip lines off end of block - not implemented yet
@@ -315,18 +320,17 @@ class Asciidoctor::Lexer
         #   buffer.pop
         # end
 
-        block = Block.new(parent, :open)
+        block = Block.new(parent, block_context)
         while buffer.has_more_lines?
           new_block = next_block(buffer, block)
           block.blocks << new_block unless new_block.nil?
         end
 
       # needs to come before list detection
-      elsif delimited_blk && (match = this_line.match(REGEXP[:sidebar_blk]))
+      elsif block_context == :sidebar
         # sidebar is surrounded by '****' (4 or more '*' chars) lines
-        terminator = match[0]
         # FIXME violates DRY because it's a duplication of quote parsing
-        block = Block.new(parent, :sidebar)
+        block = Block.new(parent, block_context)
         buffer = Reader.new reader.grab_lines_until(:terminator => terminator)
 
         while buffer.has_more_lines?
@@ -334,7 +338,7 @@ class Asciidoctor::Lexer
           block.blocks << new_block unless new_block.nil?
         end
 
-      elsif match = this_line.match(REGEXP[:colist])
+      elsif block_context.nil? && (match = this_line.match(REGEXP[:colist]))
         block = Block.new(parent, :colist)
         attributes['style'] = 'arabic'
         items = []
@@ -361,12 +365,12 @@ class Asciidoctor::Lexer
 
         document.callouts.next_list
 
-      elsif match = this_line.match(REGEXP[:ulist])
+      elsif block_context.nil? && (match = this_line.match(REGEXP[:ulist]))
         AttributeList.rekey(attributes, ['style'])
         reader.unshift_line this_line
         block = next_outline_list(reader, :ulist, parent)
 
-      elsif match = this_line.match(REGEXP[:olist])
+      elsif block_context.nil? && (match = this_line.match(REGEXP[:olist]))
         AttributeList.rekey(attributes, ['style'])
         reader.unshift_line this_line
         block = next_outline_list(reader, :olist, parent)
@@ -383,14 +387,13 @@ class Asciidoctor::Lexer
           end
         end
 
-      elsif match = this_line.match(REGEXP[:dlist])
+      elsif block_context.nil? && (match = this_line.match(REGEXP[:dlist]))
         reader.unshift_line this_line
         block = next_labeled_list(reader, match, parent)
         AttributeList.rekey(attributes, ['style'])
 
-      elsif delimited_blk && (match = this_line.match(document.nested? ? REGEXP[:table_nested] : REGEXP[:table]))
+      elsif block_context == :table
         # table is surrounded by lines starting with a | followed by 3 or more '=' chars
-        terminator = match[0]
         AttributeList.rekey(attributes, ['style'])
         table_reader = Reader.new reader.grab_lines_until(:terminator => terminator, :skip_line_comments => true)
         block = next_table(table_reader, parent, attributes)
@@ -402,16 +405,15 @@ class Asciidoctor::Lexer
         end
     
       # FIXME violates DRY because it's a duplication of other block parsing
-      elsif delimited_blk && (match = this_line.match(REGEXP[:example]))
+      elsif block_context == :example
         # example is surrounded by lines with 4 or more '=' chars
-        terminator = match[0]
         AttributeList.rekey(attributes, ['style'])
         if admonition_style = ADMONITION_STYLES.detect {|s| attributes['style'] == s}
           block = Block.new(parent, :admonition)
           attributes['name'] = admonition_name = admonition_style.downcase
           attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
         else
-          block = Block.new(parent, :example)
+          block = Block.new(parent, block_context)
           block.title = attributes['title']
           if block.title? && !attributes.has_key?('caption') && !block.attr?('caption')
             number = document.counter('example-number')
@@ -427,9 +429,15 @@ class Asciidoctor::Lexer
         end
 
       # FIXME violates DRY w/ non-delimited block listing
-      elsif delimited_blk && (match = this_line.match(REGEXP[:listing]))
-        terminator = match[0]
-        AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
+      elsif block_context == :listing || block_context == :fenced_code
+        if block_context == :fenced_code
+          attributes['style'] = 'source'
+          lang = this_line[3..-1].strip
+          attributes['language'] = lang unless lang.empty?
+          terminator = terminator[0..2] if terminator.length > 3
+        else
+          AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
+        end
         buffer = reader.grab_lines_until(:terminator => terminator)
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :listing, buffer)
@@ -441,14 +449,13 @@ class Asciidoctor::Lexer
           Document::AttributeEntry.new('listing-number', number).save_to(attributes)
         end
 
-      elsif delimited_blk && (match = this_line.match(REGEXP[:quote]))
+      elsif block_context == :quote
         # multi-line verse or quote is surrounded by a block delimiter
-        terminator = match[0]
         AttributeList.rekey(attributes, ['style', 'attribution', 'citetitle'])
         quote_context = (attributes['style'] == 'verse' ? :verse : :quote)
         block_reader = Reader.new reader.grab_lines_until(:terminator => terminator)
 
-        # only quote can have other section elements (as as section block)
+        # only quote can have other section elements (as section block)
         section_body = (quote_context == :quote)
 
         if section_body
@@ -462,17 +469,16 @@ class Asciidoctor::Lexer
           block = Block.new(parent, quote_context, block_reader.lines)
         end
 
-      elsif delimited_blk && (blk_ctx = [:literal, :pass].detect{|t| this_line.match(REGEXP[t])})
+      elsif block_context == :literal || block_context == :pass
         # literal is surrounded by '....' (4 or more '.' chars) lines
         # pass is surrounded by '++++' (4 or more '+' chars) lines
-        terminator = $~[0]
         buffer = reader.grab_lines_until(:terminator => terminator)
         buffer.last.chomp! unless buffer.empty?
         # a literal can masquerade as a listing
         if attributes[1] == 'listing'
-          blk_ctx = :listing
+          block_context = :listing
         end
-        block = Block.new(parent, blk_ctx, buffer)
+        block = Block.new(parent, block_context, buffer)
 
       elsif this_line.match(REGEXP[:lit_par])
         # literal paragraph is contiguous lines starting with
@@ -607,17 +613,37 @@ class Asciidoctor::Lexer
   # Public: Determines whether this line is the start of any of the delimited blocks
   #
   # returns the match data if this line is the first line of a delimited block or nil if not
-  #--
-  # TODO could use the match value as a lookup for the block type so we don't have
-  # to do any subsequent regexp
-  def self.is_delimited_block?(line)
-    # naive match
-    #line.match(REGEXP[:any_blk])
+  def self.is_delimited_block?(line, return_match_data = false)
+    line_len = line.length
+    # optimized for best performance
+    if line_len > 2
+      if line_len == 3
+        tip = line.chop
+        tl = 2
+      else
+        tip = line[0..3]
+        tl = 4
 
-    # attempt at better performance
-    if line.length > 0
-      # NOTE accessing the first element before calling ord is first Ruby 1.8.7 compat
-      REGEXP[:any_blk_ord].include?(line[0..0][0].ord) ? line.match(REGEXP[:any_blk]) : nil
+        # special case for fenced code blocks
+        tip_alt = tip.chop
+        if tip_alt == '```' || tip_alt == '~~~'
+          tip = tip_alt
+          tl = 3
+        end
+      end
+
+      if DELIMITED_BLOCKS.has_key? tip
+        # if tip is the full line
+        if tl == line_len - 1
+          return_match_data ? BlockMatchData.new(DELIMITED_BLOCKS[tip], tip, tip) : true
+        elsif match = line.match(REGEXP[:any_blk])
+          return_match_data ? BlockMatchData.new(DELIMITED_BLOCKS[tip], tip, match[0]) : true
+        else
+          nil
+        end
+      else
+        nil
+      end
     else
       nil
     end
@@ -639,7 +665,7 @@ class Asciidoctor::Lexer
     else
       list_block.level = 1
     end
-    Asciidoctor.debug { "Created #{list_type} block: #{list_block}" }
+    Debug.debug { "Created #{list_type} block: #{list_block}" }
 
     while reader.has_more_lines? && (match = reader.peek_line.match(REGEXP[list_type]))
 
@@ -880,13 +906,12 @@ class Asciidoctor::Lexer
 
       # a delimited block immediately breaks the list unless preceded
       # by a list continuation (they are harsh like that ;0)
-      if match = is_delimited_block?(this_line)
+      if match = is_delimited_block?(this_line, true)
         if continuation == :active
           buffer << this_line
           # grab all the lines in the block, leaving the delimiters in place
           # we're being more strict here about the terminator, but I think that's a good thing
-          terminator = match[0]
-          buffer.concat reader.grab_lines_until(:terminator => terminator, :grab_last_line => true)
+          buffer.concat reader.grab_lines_until(:terminator => match.terminator, :grab_last_line => true)
           continuation = :inactive
         else
           break
@@ -1543,7 +1568,7 @@ class Asciidoctor::Lexer
 
     table_reader.skip_blank_lines
 
-    parser_ctx = Asciidoctor::Table::ParserContext.new(table, attributes)
+    parser_ctx = Table::ParserContext.new(table, attributes)
     while table_reader.has_more_lines?
       line = table_reader.get_line
 
@@ -1772,4 +1797,5 @@ class Asciidoctor::Lexer
 
     result
   end
+end
 end

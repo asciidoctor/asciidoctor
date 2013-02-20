@@ -703,6 +703,49 @@ image::asciidoctor.png[Asciidoctor]
   end
 
   context 'Source code' do
+    test 'should support fenced code block using backticks' do
+      input = <<-EOS
+```
+puts "Hello, World!"
+```
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.listingblock', output, 1
+      assert_css '.listingblock pre code', output, 1
+      assert_css '.listingblock pre code:not([class])', output, 1
+    end
+
+    test 'should support fenced code block using tildes' do
+      input = <<-EOS
+~~~
+puts "Hello, World!"
+~~~
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.listingblock', output, 1
+      assert_css '.listingblock pre code', output, 1
+      assert_css '.listingblock pre code:not([class])', output, 1
+    end
+
+    test 'should support fenced code blocks with languages' do
+      input = <<-EOS
+```ruby
+puts "Hello, World!"
+```
+
+~~~ javascript
+alert("Hello, World!")
+~~~
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.listingblock', output, 2
+      assert_css '.listingblock pre code.ruby', output, 1
+      assert_css '.listingblock pre code.javascript', output, 1
+    end
+
     test 'should highlight source if source-highlighter attribute is coderay' do
       input = <<-EOS
 :source-highlighter: coderay

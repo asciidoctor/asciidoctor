@@ -113,6 +113,21 @@ module Asciidoctor
     'markdown' => '.md'
   }
 
+  DELIMITED_BLOCKS = {
+    '--'   => :open,
+    '----' => :listing,
+    '....' => :literal,
+    '====' => :example,
+    '****' => :sidebar,
+    '____' => :quote,
+    '++++' => :pass,
+    '|===' => :table,
+    '!===' => :table,
+    '////' => :comment,
+    '```'  => :fenced_code,
+    '~~~'  => :fenced_code
+  }
+
   LIST_CONTEXTS = [:ulist, :olist, :dlist, :colist]
 
   NESTABLE_LIST_CONTEXTS = [:ulist, :olist, :dlist]
@@ -156,11 +171,7 @@ module Asciidoctor
     # matches any block delimiter:
     #   open, listing, example, literal, comment, quote, sidebar, passthrough, table
     # NOTE position the most common blocks towards the front of the pattern
-    :any_blk          => %r{^(?:\-\-|(?:\-|=|\.|/|_|\*|\+){4,}|[\|!]={3,})$},
-
-    # optimization when scanning lines for blocks
-    # NOTE accessing the first element before calling ord is first Ruby 1.8.7 compat
-    :any_blk_ord      => %w(- = . / _ * + | !).map {|c| c[0].ord },
+    :any_blk          => %r{^(?:--|(?:-|\.|=|\*|_|\+|/){4,}|[\|!]={3,}|(?:`|~){3,}.*)$},
 
     # :foo: bar
     # :Author: Dan
@@ -248,7 +259,7 @@ module Asciidoctor
                            ';;' => /^\s*(.*)(;;)(?:[[:blank:]]+(.*))?$/
                          },
     # ====
-    :example          => /^={4,}$/,
+    #:example          => /^={4,}$/,
 
     # footnote:[text]
     # footnoteref:[id,text]
@@ -290,16 +301,16 @@ module Asciidoctor
     :link_macro       => /\\?link:([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/,
 
     # ----
-    :listing          => /^\-{4,}$/,
+    #:listing          => /^\-{4,}$/,
 
     # ....
-    :literal          => /^\.{4,}$/,
+    #:literal          => /^\.{4,}$/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
     :lit_par          => /^([[:blank:]]+.*)$/,
 
     # --
-    :open_blk         => /^\-\-$/,
+    #:open_blk         => /^\-\-$/,
 
     # . Foo (up to 5 consecutive dots)
     # 1. Foo (arabic, default)
@@ -310,7 +321,7 @@ module Asciidoctor
     :olist            => /^\s*(\d+\.|[a-z]\.|[ivx]+\)|\.{1,5}) +(.*)$/i,
 
     # ++++
-    :pass             => /^\+{4,}$/,
+    #:pass             => /^\+{4,}$/,
 
     # inline passthrough macros
     # +++text+++
@@ -330,7 +341,7 @@ module Asciidoctor
     :pass_placeholder => /\x0(\d+)\x0/,
 
     # ____
-    :quote            => /^_{4,}$/,
+    #:quote            => /^_{4,}$/,
 
     # The document revision info line the appears immediately following the
     # document title author info line, if present
@@ -341,7 +352,7 @@ module Asciidoctor
     :ruler            => /^'{3,}$/,
 
     # ****
-    :sidebar_blk      => /^\*{4,}$/,
+    #:sidebar_blk      => /^\*{4,}$/,
 
     # \' within a word
     :single_quote_esc => /(\w)\\'(\w)/,
@@ -354,12 +365,12 @@ module Asciidoctor
     # |===
     # |table
     # |===
-    :table            => /^\|={3,}$/,
+    #:table            => /^\|={3,}$/,
 
     # !===
     # !table
     # !===
-    :table_nested     => /^!={3,}$/,
+    #:table_nested     => /^!={3,}$/,
 
     # 1*h,2*,^3e
     :table_colspec    => /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+)?([a-z])?$/,
@@ -673,7 +684,7 @@ module Asciidoctor
 
       if !File.directory? to_dir
         if mkdirs
-          require_library 'fileutils'
+          Helpers.require_library 'fileutils'
           FileUtils.mkdir_p to_dir
         else
           raise IOError, "target directory does not exist: #{to_dir}"
@@ -705,35 +716,16 @@ module Asciidoctor
 
   # NOTE still contemplating this method
   #def self.parse_document_header(input, options = {})
-  #  document = Asciidoctor::Document.new [], options
-  #  reader = Asciidoctor::Reader.new input, document, true
-  #  Asciidoctor::Lexer.parse_document_header reader, document
+  #  document = Document.new [], options
+  #  reader = Reader.new input, document, true
+  #  Lexer.parse_document_header reader, document
   #  document
   #end
 
-  # Internal: Prior to invoking Kernel#require, issues a warning urging a
-  # manual require if running in a threaded environment.
-  #
-  # name  - the String name of the library to require.
-  #
-  # returns false if the library is detected on the load path or the return
-  # value of delegating to Kernel#require
-  def self.require_library(name)
-    if Thread.list.size > 1
-      main_script = "#{name}.rb"
-      main_script_path_segment = "/#{name}.rb"
-      if !$LOADED_FEATURES.detect {|p| p == main_script || p.end_with?(main_script_path_segment) }.nil?
-        return false
-      else
-        warn "WARN: asciidoctor is autoloading '#{name}' in threaded environment. " +
-           "The use of an explicit require '#{name}' statement is recommended."
-      end
-    end
-    require name
-  end
-
   # modules
+  require 'asciidoctor/debug'
   require 'asciidoctor/substituters'
+  require 'asciidoctor/helpers'
 
   # abstract classes
   require 'asciidoctor/abstract_node'
@@ -744,9 +736,8 @@ module Asciidoctor
   require 'asciidoctor/backends/base_template'
   require 'asciidoctor/block'
   require 'asciidoctor/callouts'
-  require 'asciidoctor/debug'
   require 'asciidoctor/document'
-  require 'asciidoctor/errors'
+  #require 'asciidoctor/errors'
   require 'asciidoctor/inline'
   require 'asciidoctor/lexer'
   require 'asciidoctor/list_item'
@@ -754,5 +745,7 @@ module Asciidoctor
   require 'asciidoctor/renderer'
   require 'asciidoctor/section'
   require 'asciidoctor/table'
+
+  # info
   require 'asciidoctor/version'
 end

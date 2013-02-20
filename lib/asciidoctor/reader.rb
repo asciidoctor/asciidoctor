@@ -1,7 +1,6 @@
+module Asciidoctor
 # Public: Methods for retrieving lines from AsciiDoc source files
-class Asciidoctor::Reader
-
-  include Asciidoctor
+class Reader
 
   # Public: Get the document source as a String Array of lines.
   attr_reader :source
@@ -525,7 +524,7 @@ class Asciidoctor::Reader
     skip_line_comments = options[:skip_line_comments]
     preprocess = options.fetch(:preprocess, true)
     while !(this_line = get_line(preprocess)).nil?
-      Asciidoctor.debug { "Reader processing line: '#{this_line}'" }
+      Debug.debug { "Reader processing line: '#{this_line}'" }
       finis = true if terminator && this_line.chomp == terminator
       finis = true if !finis && break_on_blank_lines && this_line.strip.empty?
       finis = true if !finis && break_on_list_continuation && this_line.chomp == LIST_CONTINUATION
@@ -561,7 +560,7 @@ class Asciidoctor::Reader
   #   sanitize_attribute_name('Foo 3 #-Billy')
   #   => 'foo3-billy'
   def sanitize_attribute_name(name)
-    Asciidoctor::Lexer.sanitize_attribute_name(name)
+    Lexer.sanitize_attribute_name(name)
   end
 
   # Private: Resolve the value of one side of the expression
@@ -629,4 +628,5 @@ class Asciidoctor::Reader
     #end
     nil
   end
+end
 end
