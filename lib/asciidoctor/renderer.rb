@@ -1,6 +1,7 @@
+module Asciidoctor
 # Public: Methods for rendering Asciidoc Documents, Sections, and Blocks
 # using eRuby templates.
-class Asciidoctor::Renderer
+class Renderer
   attr_reader :compact
 
   # Public: Initialize an Asciidoctor::Renderer object.
@@ -15,10 +16,10 @@ class Asciidoctor::Renderer
     case backend
     when 'html5', 'docbook45'
       eruby = load_eruby options[:eruby]
-      #Asciidoctor.require_library 'asciidoctor/backends/' + backend
+      #Helpers.require_library 'asciidoctor/backends/' + backend
       require 'asciidoctor/backends/' + backend
       # Load up all the template classes that we know how to render for this backend
-      Asciidoctor::BaseTemplate.template_classes.each do |tc|
+      BaseTemplate.template_classes.each do |tc|
         if tc.to_s.downcase.include?('::' + backend + '::') # optimization
           view_name, view_backend = self.class.extract_view_mapping(tc)
           if view_backend == backend
@@ -27,14 +28,14 @@ class Asciidoctor::Renderer
         end
       end
     else
-      Asciidoctor.debug { "No built-in templates for backend: #{backend}" }
+      Debug.debug { "No built-in templates for backend: #{backend}" }
     end
 
     # If user passed in a template dir, let them override our base templates
     if template_dir = options.delete(:template_dir)
-      Asciidoctor.require_library 'tilt'
+      Helpers.require_library 'tilt'
 
-      Asciidoctor.debug {
+      Debug.debug {
         msg = []
         msg << "Views going in are like so:"
         msg << @views.map {|k, v| "#{k}: #{v}"}
@@ -49,7 +50,7 @@ class Asciidoctor::Renderer
         view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>', :attr_wrapper => '"'))
       end
 
-      Asciidoctor.debug {
+      Debug.debug {
         msg = []
         msg << "Views going in are like so:"
         msg << @views.map {|k, v| "#{k}: #{v}"}
@@ -72,7 +73,7 @@ class Asciidoctor::Renderer
     if !@views.has_key? view
       raise "Couldn't find a view in @views for #{view}"
     else
-      Asciidoctor.debug { "View for #{view} is #{@views[view]}, object is #{object}" }
+      Debug.debug { "View for #{view} is #{@views[view]}, object is #{object}" }
     end
     
     ret = @views[view].render(object, locals)
@@ -83,8 +84,8 @@ class Asciidoctor::Renderer
       STDERR.puts "Rendering:"
       @render_stack.each do |stack_view, stack_obj|
         obj_info = case stack_obj
-                   when Asciidoctor::Section; "SECTION #{stack_obj.title}"
-                   when Asciidoctor::Block;
+                   when Section; "SECTION #{stack_obj.title}"
+                   when Block;
                      if stack_obj.context == :dlist
                        dt_list = stack_obj.buffer.map{|dt,dd| dt.content.strip}.join(', ')
                        "BLOCK :dlist (#{dt_list})"
@@ -122,7 +123,7 @@ class Asciidoctor::Renderer
       name = 'erb'
     end
 
-    Asciidoctor.require_library name
+    Helpers.require_library name
 
     if name == 'erb'
       ::ERB
@@ -175,4 +176,5 @@ class Asciidoctor::Renderer
         gsub(/([[:lower:]])([[:upper:]])/, '\1_\2').downcase
   end
 
+end
 end

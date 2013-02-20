@@ -1,5 +1,6 @@
+module Asciidoctor
 # Public: Methods for managing inline elements in AsciiDoc block
-class Asciidoctor::Inline < Asciidoctor::AbstractNode
+class Inline < AbstractNode
   # Public: Get the text of this inline element
   attr_reader :text
 
@@ -26,4 +27,5 @@ class Asciidoctor::Inline < Asciidoctor::AbstractNode
     renderer.render("inline_#{@context}", self).chomp
   end
 
+end
 end

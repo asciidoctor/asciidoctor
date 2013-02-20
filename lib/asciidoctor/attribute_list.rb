@@ -1,3 +1,4 @@
+module Asciidoctor
 # Public: Handles parsing AsciiDoc attribute lists into a Hash of key/value
 # pairs. By default, attributes must each be separated by a comma and quotes
 # may be used around the value. If a key is not detected, the value is assigned
@@ -19,7 +20,7 @@
 #    attrlist.parse(['style', 'attribution', 'citetitle'])
 #    => {'style' => 'quote', 'attribution' => 'Famous Person', 'citetitle' => 'Famous Book (2001)'} 
 #
-class Asciidoctor::AttributeList
+class AttributeList
 
   # Public: Regular expressions for detecting the boundary of a value
   BOUNDARY_PATTERNS = {
@@ -214,4 +215,5 @@ class Asciidoctor::AttributeList
     @scanner.scan BOUNDARY_PATTERNS[quote]
   end
 
+end
 end

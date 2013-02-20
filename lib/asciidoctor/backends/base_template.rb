@@ -1,10 +1,11 @@
+module Asciidoctor
 # An abstract base class that provides methods for definining and rendering the
 # backend templates. Concrete subclasses must implement the template method.
 #
 # NOTE we must use double quotes for attribute values in the HTML/XML output to
 # prevent quote processing. This requirement seems hackish, but AsciiDoc has
 # this same issue.
-class Asciidoctor::BaseTemplate
+class BaseTemplate
 
   attr_reader :view
   attr_reader :eruby
@@ -54,7 +55,7 @@ class Asciidoctor::BaseTemplate
   # returns the text with blank lines removed and HTML line feed entities
   # converted to an endline character.
   def compact(str)
-    str.gsub(Asciidoctor::BLANK_LINES_PATTERN, '').gsub(Asciidoctor::LINE_FEED_ENTITY, "\n")
+    str.gsub(BLANK_LINES_PATTERN, '').gsub(LINE_FEED_ENTITY, "\n")
   end
 
   # Public: Preserve endlines by replacing them with the HTML line feed entity.
@@ -65,7 +66,7 @@ class Asciidoctor::BaseTemplate
   # text  - the String to process
   # node  - the concrete instance of Asciidoctor::AbstractNode being rendered
   def preserve_endlines(str, node)
-    node.renderer.compact ? str.gsub("\n", Asciidoctor::LINE_FEED_ENTITY) : str
+    node.renderer.compact ? str.gsub("\n", LINE_FEED_ENTITY) : str
   end
 
   def template
@@ -95,4 +96,5 @@ class Asciidoctor::BaseTemplate
   def id
     attribute('id', '@id')
   end
+end
 end

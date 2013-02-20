@@ -1,3 +1,4 @@
+module Asciidoctor
 # Public: Methods for parsing Asciidoc documents and rendering them
 # using erb templates.
 #
@@ -15,9 +16,7 @@
 #
 # notitle  - The h1 heading should not be shown
 # noheader - The header block (h1 heading, author, revision info) should not be shown
-class Asciidoctor::Document < Asciidoctor::AbstractBlock
-
-  include Asciidoctor
+class Document < AbstractBlock
 
   Footnote = Struct.new(:index, :id, :text)
   AttributeEntry = Struct.new(:name, :value, :negate) do
@@ -239,7 +238,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
     @callouts.rewind
 
-    Asciidoctor.debug {
+    Debug.debug {
       msg = []
       msg << "Found #{@blocks.size} blocks in this document:"
       @blocks.each {|b|
@@ -513,7 +512,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   end
 
   def splain
-    Asciidoctor.debug {
+    Debug.debug {
       msg = ''
       if @header
         msg = "Header is #{@header}"
@@ -573,4 +572,5 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     %[#{super.to_s} - #{doctitle}]  
   end
 
+end
 end
