@@ -70,14 +70,14 @@ class DocumentTemplate < BaseTemplate
 <% if attr? :toc %><?asciidoc-toc?><% end %>
 <% if attr? :numbered %><?asciidoc-numbered?><% end %>
 <% if doctype == 'book' %>
-<book lang="<%= attr :lang, 'en' %>">
+<book<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
   <bookinfo>
 #{docinfo}
   </bookinfo>
 <%= content %>
 </book>
 <% else %>
-<article lang="<%= attr :lang, 'en' %>">
+<article<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
   <articleinfo>
 #{docinfo}
   </articleinfo>
