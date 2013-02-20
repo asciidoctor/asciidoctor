@@ -120,6 +120,8 @@ class AbstractNode
 
   # Public: Construct a reference or data URI to the target image.
   #
+  # If the target image is a URI reference, then leave it untouched.
+  #
   # The target image is resolved relative to the directory retrieved from the
   # specified attribute key, if provided.
   #
@@ -136,7 +138,9 @@ class AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
-    if @document.safe < SafeMode::SECURE && @document.attr?('data-uri')
+    if target_image.include?(':') && target_image.match(Asciidoctor::REGEXP[:uri_sniff])
+      target_image
+    elsif @document.safe < Asciidoctor::SafeMode::SECURE && @document.attr?('data-uri')
       generate_data_uri(target_image, asset_dir_key)
     elsif asset_dir_key && attr?(asset_dir_key)
       File.join(@document.attr(asset_dir_key), target_image)
