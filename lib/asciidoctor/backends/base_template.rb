@@ -39,11 +39,19 @@ class BaseTemplate
   # node   - The concrete instance of AsciiDoctor::AbstractNode to render
   # locals - A Hash of additional variables. Not currently in use.
   def render(node = Object.new, locals = {})
-    # this is hot code, so we inline both calls rather than capture output to a local variable
-    if node.renderer.compact && (@view == 'document' || @view == 'embedded')
-      compact(template.result(node.get_binding(self)))
+    tmpl = template
+    if tmpl.equal? :content
+      result = node.content
+    #elsif tmpl.is_a?(String)
+    #  result = tmpl
     else
-      template.result(node.get_binding(self))
+      result = tmpl.result(node.get_binding(self))
+    end
+
+    if (@view == 'document' || @view == 'embedded') && node.renderer.compact
+      compact result
+    else
+      result
     end
   end
 

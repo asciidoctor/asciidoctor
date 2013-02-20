@@ -20,5 +20,10 @@ module Helpers
     end
     require name
   end
+
+  # Public: A generic capture output routine to be used in templates
+  #def self.capture_output(*args, &block)
+  #  Proc.new { block.call(*args) }
+  #end
 end
 end

@@ -286,9 +286,9 @@ class Lexer
         terminator = delimited_blk_match.terminator
       end
 
-      # NOTE we're letting ruler have attributes
-      if !options[:text] && block_context.nil? && this_line.match(REGEXP[:ruler])
-        block = Block.new(parent, :ruler)
+      # NOTE we're letting break lines (ruler, page_break, etc) have attributes
+      if !options[:text] && block_context.nil? && (match = this_line.match(REGEXP[:break_line]))
+        block = Block.new(parent, BREAK_LINES[match[0][0..2]])
         reader.skip_blank_lines
 
       elsif !options[:text] && block_context.nil? && (match = this_line.match(REGEXP[:image_blk]))
@@ -512,12 +512,20 @@ class Lexer
 
       ## these switches based on style need to come immediately before the else ##
 
-      elsif attributes[1] == 'source'
-        AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
+      elsif attributes[1] == 'source' || attributes[1] == 'listing'
+        if attributes[1] == 'source'
+          AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
+        end
         reader.unshift_line this_line
         buffer = reader.grab_lines_until(:break_on_blank_lines => true)
         buffer.last.chomp! unless buffer.empty?
         block = Block.new(parent, :listing, buffer)
+
+      elsif attributes[1] == 'literal'
+        reader.unshift_line this_line
+        buffer = reader.grab_lines_until(:break_on_blank_lines => true)
+        buffer.last.chomp! unless buffer.empty?
+        block = Block.new(parent, :literal, buffer)
 
       elsif admonition_style = ADMONITION_STYLES.detect{|s| attributes[1] == s}
         # an admonition preceded by [<TYPE>] and lasts until a blank line

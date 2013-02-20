@@ -2,12 +2,12 @@
 .\"     Title: asciidoctor
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 01/30/2013
+.\"      Date: 02/18/2013
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "01/30/2013" "\ \&" "\ \&"
+.TH "ASCIIDOCTOR" "1" "02/18/2013" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -47,19 +47,22 @@ Base directory containing the document and resources\&. Defaults to the director
 .PP
 \fB\-S, \-\-safe\-mode\fR=\fISAFE_MODE\fR
 .RS 4
-Set safe mode level explicity:
+Set safe mode level:
 \fIunsafe\fR,
 \fIsafe\fR,
-\fIsecure\fR\&. Defaults to
-\fIsecure\fR\&. Disables potentially dangerous macros in source files, such as include::[]\&.
+\fIserver\fR
+or
+\fIsecure\fR\&. Disables potentially dangerous macros in source files, such as include::[]\&. If not set, the safe mode level defaults to
+\fIunsafe\fR
+when Asciidoctor is invoked using this script\&.
 .RE
 .PP
 \fB\-\-safe\fR
 .RS 4
-Set safe mode to
-\fIsafe\fR
-from the default safe mode of
-\fIsecure\fR\&. Enables include macros, but restricts access to ancestor paths of source file\&. Provided for compatibility with the asciidoc command\&.
+Set safe mode level to
+\fIsafe\fR\&. Enables include macros, but restricts access to ancestor paths of source file\&. Provided for compatibility with the asciidoc command\&. If not set, the safe mode level defaults to
+\fIunsafe\fR
+when Asciidoctor is invoked using this script\&.
 .RE
 .SS "Document Settings"
 .PP
@@ -161,7 +164,7 @@ Suppress the document header and footer in the output\&.
 .PP
 \fB\-T, \-\-template\-dir\fR=\fIDIR\fR
 .RS 4
-Directory containing custom render templates that override one or more templates from the the built\-in set\&.
+Directory containing custom render templates that override one or more templates from the the built\-in set\&. If there is a folder in the directory that matches the backend, the templates from that folder will be used\&.
 .RE
 .SS "Processing Information"
 .PP
@@ -198,15 +201,21 @@ Failure (syntax or usage error; configuration error; document processing failure
 .RE
 .SH "BUGS"
 .sp
-See the \fBAsciidoctor\fR issue tracker: <\fBhttps://github\&.com/erebor/asciidoctor/issues?state=open\fR>
+See the \fBAsciidoctor\fR issue tracker: <\fBhttps://github\&.com/asciidoctor/asciidoctor/issues?state=open\fR>
 .SH "AUTHORS"
 .sp
-\fBAsciidoctor\fR was written by Ryan Waldron, Dan Allen and other contributors\&. \fBAsciiDoc\fR was written by Stuart Rackham and has received contributions from many other individuals\&.
+\fBAsciidoctor\fR was written by Ryan Waldron, Dan Allen and other contributors\&.
+.sp
+\fBAsciiDoc\fR was written by Stuart Rackham and has received contributions from many other individuals\&.
 .SH "RESOURCES"
 .sp
-Git source repository on GitHub: <\fBhttps://github\&.com/erebor/asciidoctor\fR>
+Git source repository on GitHub: <\fBhttps://github\&.com/asciidoctor/asciidoctor\fR>
 .sp
-Main web site: <\fBhttp://asciidoctor\&.org\fR>
+Project web site: <\fBhttp://asciidoctor\&.org\fR>
+.sp
+GitHub organization: <\fBhttp://github\&.com/asciidoctor\fR>
+.sp
+Mailinglist / forum: <\fBhttp://discuss\&.asciidoctor\&.org\fR>
 .SH "COPYING"
 .sp
 Copyright (C) Ryan Waldron\&. Free use of this software is granted under the terms of the MIT License\&.

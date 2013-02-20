@@ -92,8 +92,8 @@ module Substituters
   #
   # returns - A String with literal (verbatim) substitutions performed
   def apply_literal_subs(lines)
-    if @document.attr('basebackend') == 'html' && attr('style') == 'source' &&
-      @document.attr('source-highlighter') == 'coderay' && attr?('language')
+    if @document.attributes['basebackend'] == 'html' && attr('style') == 'source' &&
+      @document.attributes['source-highlighter'] == 'coderay' && attr?('language')
       sub_callouts(highlight_source(lines.join))
     else
       apply_subs(lines.join, COMPOSITE_SUBS[:verbatim])
@@ -147,6 +147,7 @@ module Substituters
         subs = []
       end
 
+      # TODO move unescaping closing square bracket to an operation
       @passthroughs << {:text => m[2] || m[4].gsub('\]', ']'), :subs => subs}
       index = @passthroughs.size - 1
       "\x0#{index}\x0"
@@ -296,9 +297,11 @@ module Substituters
     found = {}
     found[:square_bracket] = result.include?('[')
     found[:round_bracket] = result.include?('(')
-    found[:macroish] = (found[:square_bracket] && result.include?(':'))
-    found[:macroish_short_form] = (found[:square_bracket] && result.include?(':['))
-    found[:uri] = result.include?('://')
+    found[:colon] = result.include?(':')
+    found[:macroish] = (found[:square_bracket] && found[:colon])
+    found[:macroish_short_form] = (found[:square_bracket] && found[:colon] && result.include?(':['))
+    found[:uri] = (found[:colon] && result.include?('://'))
+    link_attrs = @document.attributes.has_key?('linkattrs')
 
     if found[:macroish] && result.include?('image:')
       # image:filename.png[Alt Text]
@@ -374,8 +377,21 @@ module Substituters
           target = target[0..-5]
         end
         @document.register(:links, target)
-        text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
-        "#{prefix}#{Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render}"
+
+        attrs = nil
+        #text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
+        if !m[3].to_s.empty?
+          if link_attrs && (m[3].start_with?('"') || m[3].include?(','))
+            attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')))
+            text = attrs[1]
+          else
+            text = sub_attributes(m[3].gsub('\]', ']'))
+          end
+        else
+          text = ''
+        end
+
+        "#{prefix}#{Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target, :attributes => attrs).render}"
       }
     end
 
@@ -390,8 +406,17 @@ module Substituters
         end
         target = m[1]
         @document.register(:links, target)
-        text = sub_attributes(m[2].gsub('\]', ']'))
-        Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target).render
+
+        attrs = nil
+        #text = sub_attributes(m[2].gsub('\]', ']'))
+        if link_attrs && (m[2].start_with?('"') || m[2].include?(','))
+          attrs = parse_attributes(sub_attributes(m[2].gsub('\]', ']')))
+          text = attrs[1]
+        else
+          text = sub_attributes(m[2].gsub('\]', ']'))
+        end
+
+        Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target, :attributes => attrs).render
       }
     end
 
@@ -412,7 +437,7 @@ module Substituters
           type = nil
           target = nil
         else
-          id, text = m[2].split(/ *, */, 2)
+          id, text = m[2].split(REGEXP[:csv_delimiter], 2)
           if !text.nil?
             # hmmmm
             text = restore_passthroughs(text)
@@ -443,8 +468,8 @@ module Substituters
         end
         if !m[1].nil?
           id, reftext = m[1].split(REGEXP[:csv_delimiter], 2)
-          id.sub!(/^("|)(.*)\1$/, '\2')
-          reftext.sub!(/^("|)(.*)\1$/m, '\2') unless reftext.nil?
+          id.sub!(REGEXP[:dbl_quoted], '\2')
+          reftext.sub!(REGEXP[:m_dbl_quoted], '\2') unless reftext.nil?
         else
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
@@ -475,11 +500,11 @@ module Substituters
           next m[0][1..-1]
         end
         id, reftext = m[1].split(REGEXP[:csv_delimiter])
-        id.sub!(/^("|)(.*)\1$/, '\2')
+        id.sub!(REGEXP[:dbl_quoted], '\2')
         if reftext.nil?
           reftext = "[#{id}]"
         else
-          reftext.sub!(/^("|)(.*)\1$/m, '\2')
+          reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
         end
         # NOTE the reftext should also match what's in our references dic
         if !@document.references[:ids].has_key? id
@@ -579,8 +604,8 @@ module Substituters
   def highlight_source(source)
     Helpers.require_library 'coderay'
     ::CodeRay::Duo[attr('language', 'text').to_sym, :html, {
-        :css => @document.attr('coderay-css', 'class').to_sym,
-        :line_numbers => (attr?('linenums') ? @document.attr('coderay-linenums-mode', 'table').to_sym : nil),
+        :css => @document.attributes.fetch('coderay-css', 'class').to_sym,
+        :line_numbers => (attr?('linenums') ? @document.attributes.fetch('coderay-linenums-mode', 'table').to_sym : nil),
         :line_number_anchors => false}].highlight(source).chomp
   end
 end

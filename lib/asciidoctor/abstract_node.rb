@@ -35,20 +35,62 @@ class AbstractNode
     @passthroughs = []
   end
 
+  # Public: Get the value of the specified attribute
+  #
+  # Get the value for the specified attribute. First look in the attributes on
+  # this node and return the value of the attribute if found. Otherwise, if
+  # this node is a child of the Document node, look in the attributes of the
+  # Document node and return the value of the attribute if found. Otherwise,
+  # return the default value, which defaults to nil.
+  #
+  # name    - the name of the attribute to lookup as a String or Symbol
+  # default - the value to return if the attribute is not found (default: nil)
+  #
+  # return the value of the attribute or the default value if the attribute
+  # is not found in the attributes of this node or the document node
   def attr(name, default = nil)
+    name = name.to_s if name.is_a?(Symbol)
     if self == @document
-      default.nil? ? @attributes[name.to_s] : @attributes.fetch(name.to_s, default)
+      default.nil? ? @attributes[name] : @attributes.fetch(name, default)
     else
-      default.nil? ? @attributes.fetch(name.to_s, @document.attr(name)) :
-          @attributes.fetch(name.to_s, @document.attr(name, default))
+      default.nil? ? @attributes.fetch(name, @document.attr(name)) :
+          @attributes.fetch(name, @document.attr(name, default))
     end
   end
 
-  def attr?(name)
-    if self == @document
-      @attributes.has_key? name.to_s
+  # Public: Check if the attribute is defined, optionally performing a
+  # comparison of its value
+  #
+  # Check if the attribute is defined. First look in the attributes on this
+  # node. If not found, and this node is a child of the Document node, look in
+  # the attributes of the Document node. If the attribute is found and a
+  # comparison value is specified, return whether the two values match.
+  # Otherwise, return whether the attribute was found.
+  #
+  # name   - the name of the attribute to lookup as a String or Symbol
+  # expect - the expected value of the attribute (default: nil)
+  #
+  # return a Boolean indicating whether the attribute exists and, if a
+  # comparison value is specified, whether the value of the attribute matches
+  # the comparison value
+  def attr?(name, expect = nil)
+    name = name.to_s if name.is_a?(Symbol)
+    if expect.nil?
+      if @attributes.has_key? name
+        true
+      elsif self != @document
+        @document.attributes.has_key? name
+      else
+        false
+      end
     else
-      @attributes.has_key?(name.to_s) || @document.attr?(name)
+      if @attributes.has_key? name
+        @attributes[name] == expect
+      elsif self != @document && @document.attributes.has_key?(name)
+        @document.attributes[name] == expect
+      else
+        false
+      end
     end
   end
 

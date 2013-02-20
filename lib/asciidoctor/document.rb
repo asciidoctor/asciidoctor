@@ -306,6 +306,14 @@ class Document < AbstractBlock
     end
   end
 
+  def footnotes?
+    not @references[:footnotes].empty?
+  end
+
+  def footnotes
+    @references[:footnotes]
+  end
+
   def nested?
     !@parent_document.nil?
   end
@@ -322,6 +330,10 @@ class Document < AbstractBlock
 
   def doctype
     @attributes['doctype']
+  end
+
+  def backend
+    @attributes['backend']
   end
 
   # The title explicitly defined in the document attributes
@@ -538,11 +550,12 @@ class Document < AbstractBlock
     render_options = {}
 
     # Load up relevant Document @options
-    if @options[:template_dir]
+    if @options.has_key? :template_dir
       render_options[:template_dir] = @options[:template_dir]
     end
     
     render_options[:backend] = @attributes.fetch('backend', 'html5')
+    render_options[:template_engine] = @options[:template_engine]
     render_options[:eruby] = @options.fetch(:eruby, 'erb')
     render_options[:compact] = @options.fetch(:compact, false)
     
