@@ -1,3 +1,4 @@
+module Asciidoctor
 # Public: Methods for managing blocks of Asciidoc content in a section.
 #
 # Examples
@@ -5,7 +6,7 @@
 #   block = Asciidoctor::Block.new(document, :paragraph, ["`This` is a <test>"])
 #   block.content
 #   => ["<em>This</em> is a &lt;test&gt;"]
-class Asciidoctor::Block < Asciidoctor::AbstractBlock
+class Block < AbstractBlock
 
   # Public: Create alias for context to be consistent w/ AsciiDoc
   alias :blockname :context
@@ -32,7 +33,8 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   # rendered and returned as content that can be included in the
   # parent block's template.
   def render
-    Asciidoctor.debug { "Now rendering #{@context} block for #{self}" }
+    Debug.debug { "Now rendering #{@context} block for #{self}" }
+    @document.playback_attributes @attributes
     out = renderer.render("block_#{@context}", self)
     @document.callouts.next_list if @context == :colist
     out
@@ -40,42 +42,42 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
 
   def splain(parent_level = 0)
     parent_level += 1
-    Asciidoctor.puts_indented(parent_level, "Block id: #{id}") unless self.id.nil?
-    Asciidoctor.puts_indented(parent_level, "Block title: #{title}") unless self.title.nil?
-    Asciidoctor.puts_indented(parent_level, "Block caption: #{caption}") unless self.caption.nil?
-    Asciidoctor.puts_indented(parent_level, "Block level: #{level}") unless self.level.nil?
-    Asciidoctor.puts_indented(parent_level, "Block context: #{context}") unless self.context.nil?
+    Debug.puts_indented(parent_level, "Block id: #{id}") unless self.id.nil?
+    Debug.puts_indented(parent_level, "Block title: #{title}") unless self.title.nil?
+    Debug.puts_indented(parent_level, "Block caption: #{caption}") unless self.caption.nil?
+    Debug.puts_indented(parent_level, "Block level: #{level}") unless self.level.nil?
+    Debug.puts_indented(parent_level, "Block context: #{context}") unless self.context.nil?
 
-    Asciidoctor.puts_indented(parent_level, "Blocks: #{@blocks.count}")
+    Debug.puts_indented(parent_level, "Blocks: #{@blocks.count}")
 
     if buffer.is_a? Enumerable
       buffer.each_with_index do |buf, i|
-        Asciidoctor.puts_indented(parent_level, "v" * (60 - parent_level*2))
-        Asciidoctor.puts_indented(parent_level, "Buffer ##{i} is a #{buf.class}")
-        Asciidoctor.puts_indented(parent_level, "Name is #{buf.title rescue 'n/a'}")
+        Debug.puts_indented(parent_level, "v" * (60 - parent_level*2))
+        Debug.puts_indented(parent_level, "Buffer ##{i} is a #{buf.class}")
+        Debug.puts_indented(parent_level, "Name is #{buf.title rescue 'n/a'}")
 
         if buf.respond_to? :splain
           buf.splain(parent_level)
         else
-          Asciidoctor.puts_indented(parent_level, "Buffer: #{buf}")
+          Debug.puts_indented(parent_level, "Buffer: #{buf}")
         end
-        Asciidoctor.puts_indented(parent_level, "^" * (60 - parent_level*2))
+        Debug.puts_indented(parent_level, "^" * (60 - parent_level*2))
       end
     else
       if buffer.respond_to? :splain
         buffer.splain(parent_level)
       else
-        Asciidoctor.puts_indented(parent_level, "Buffer: #{@buffer}")
+        Debug.puts_indented(parent_level, "Buffer: #{@buffer}")
       end
     end
 
     @blocks.each_with_index do |block, i|
-      Asciidoctor.puts_indented(parent_level, "v" * (60 - parent_level*2))
-      Asciidoctor.puts_indented(parent_level, "Block ##{i} is a #{block.class}")
-      Asciidoctor.puts_indented(parent_level, "Name is #{block.title rescue 'n/a'}")
+      Debug.puts_indented(parent_level, "v" * (60 - parent_level*2))
+      Debug.puts_indented(parent_level, "Block ##{i} is a #{block.class}")
+      Debug.puts_indented(parent_level, "Name is #{block.title rescue 'n/a'}")
 
       block.splain(parent_level) if block.respond_to? :splain
-      Asciidoctor.puts_indented(parent_level, "^" * (60 - parent_level*2))
+      Debug.puts_indented(parent_level, "^" * (60 - parent_level*2))
     end
     
     nil
@@ -118,4 +120,5 @@ class Asciidoctor::Block < Asciidoctor::AbstractBlock
   def to_s
     "#{super.to_s} - #@context [blocks:#{(@blocks || []).size}]"
   end
+end
 end

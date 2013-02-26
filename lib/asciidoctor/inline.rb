@@ -1,5 +1,6 @@
+module Asciidoctor
 # Public: Methods for managing inline elements in AsciiDoc block
-class Asciidoctor::Inline < Asciidoctor::AbstractNode
+class Inline < AbstractNode
   # Public: Get the text of this inline element
   attr_reader :text
 
@@ -13,9 +14,14 @@ class Asciidoctor::Inline < Asciidoctor::AbstractNode
     super(parent, context)
 
     @text = text 
-    @id = opts[:id] if opts.has_key?(:id)
-    @type = opts[:type] if opts.has_key?(:type)
-    @target = opts[:target] if opts.has_key?(:target)
+
+    #@id = opts[:id] if opts.has_key?(:id)
+    #@type = opts[:type] if opts.has_key?(:type)
+    #@target = opts[:target] if opts.has_key?(:target)
+
+    @id = opts[:id]
+    @type = opts[:type]
+    @target = opts[:target]
     
     if opts.has_key?(:attributes) && (attributes = opts[:attributes]).is_a?(Hash)
       update_attributes(opts[:attributes]) unless attributes.empty?
@@ -26,4 +32,5 @@ class Asciidoctor::Inline < Asciidoctor::AbstractNode
     renderer.render("inline_#{@context}", self).chomp
   end
 
+end
 end

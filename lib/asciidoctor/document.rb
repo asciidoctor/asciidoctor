@@ -1,3 +1,4 @@
+module Asciidoctor
 # Public: Methods for parsing Asciidoc documents and rendering them
 # using erb templates.
 #
@@ -15,11 +16,19 @@
 #
 # notitle  - The h1 heading should not be shown
 # noheader - The header block (h1 heading, author, revision info) should not be shown
-class Asciidoctor::Document < Asciidoctor::AbstractBlock
-
-  include Asciidoctor
+class Document < AbstractBlock
 
   Footnote = Struct.new(:index, :id, :text)
+  AttributeEntry = Struct.new(:name, :value, :negate) do
+    def initialize(name, value, negate = nil)
+      super(name, value, negate.nil? ? value.nil? : false)
+    end
+
+    def save_to(block_attributes)
+      block_attributes[:attribute_entries] ||= []
+      block_attributes[:attribute_entries] << self
+    end
+  end
 
   # Public A read-only integer value indicating the level of security that
   # should be enforced while processing this document. The value must be
@@ -122,43 +131,66 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['asciidoctor-version'] = VERSION
     @attributes['sectids'] = ''
     @attributes['encoding'] = 'UTF-8'
+    @attributes['notitle'] = '' if !@options[:header_footer]
 
-    attribute_overrides = options[:attributes] || {}
+    # language strings
+    # TODO load these based on language settings
+    @attributes['caution-caption'] = 'Caution'
+    @attributes['important-caption'] = 'Important'
+    @attributes['note-caption'] = 'Note'
+    @attributes['tip-caption'] = 'Tip'
+    @attributes['warning-caption'] = 'Warning'
+    @attributes['appendix-caption'] = 'Appendix'
+    @attributes['example-caption'] = 'Example'
+    @attributes['figure-caption'] = 'Figure'
+    @attributes['table-caption'] = 'Table'
+    @attributes['toc-title'] = 'Table of Contents'
+
+    @attribute_overrides = options[:attributes] || {}
 
     # the only way to set the include-depth attribute is via the document options
     # 10 is the AsciiDoc default, though currently Asciidoctor only supports 1 level
-    attribute_overrides['include-depth'] ||= 10
+    @attribute_overrides['include-depth'] ||= 10
 
     # if the base_dir option is specified, it overrides docdir as the root for relative paths
     # otherwise, the base_dir is the directory of the source file (docdir) or the current
     # directory of the input is a string
     if options[:base_dir].nil?
-      if attribute_overrides['docdir']
-        @base_dir = attribute_overrides['docdir'] = File.expand_path(attribute_overrides['docdir'])
+      if @attribute_overrides['docdir']
+        @base_dir = @attribute_overrides['docdir'] = File.expand_path(@attribute_overrides['docdir'])
       else
         # perhaps issue a warning here?
-        @base_dir = attribute_overrides['docdir'] = Dir.pwd
+        @base_dir = @attribute_overrides['docdir'] = Dir.pwd
       end
     else
-      @base_dir = attribute_overrides['docdir'] = File.expand_path(options[:base_dir])
+      @base_dir = @attribute_overrides['docdir'] = File.expand_path(options[:base_dir])
+    end
+
+    # allow common attributes backend and doctype to be set using options hash
+    unless @options[:backend].nil?
+      @attribute_overrides['backend'] = @options[:backend]
+    end
+
+    unless @options[:doctype].nil?
+      @attribute_overrides['doctype'] = @options[:doctype]
     end
 
     if @safe >= SafeMode::SERVER
       # restrict document from setting source-highlighter and backend
-      attribute_overrides['source-highlighter'] ||= nil
-      attribute_overrides['backend'] ||= DEFAULT_BACKEND
+      @attribute_overrides['source-highlighter'] ||= nil
+      @attribute_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
-      if attribute_overrides.has_key?('docfile') && @parent_document.nil?
-        attribute_overrides['docfile'] = attribute_overrides['docfile'][(attribute_overrides['docdir'].length + 1)..-1]
+      if @attribute_overrides.has_key?('docfile') && @parent_document.nil?
+        @attribute_overrides['docfile'] = @attribute_overrides['docfile'][(@attribute_overrides['docdir'].length + 1)..-1]
       end
-      attribute_overrides['docdir'] = ''
+      @attribute_overrides['docdir'] = ''
       # restrict document from enabling icons
       if @safe >= SafeMode::SECURE
-        attribute_overrides['icons'] ||= nil
+        @attribute_overrides['icons'] ||= nil
       end
     end
     
-    attribute_overrides.delete_if {|key, val|
+    @attribute_overrides.delete_if {|key, val|
       verdict = false
       # a nil or negative key undefines the attribute 
       if val.nil? || key[-1..-1] == '!'
@@ -184,7 +216,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
       # don't need to do the extra processing within our own document
       @reader = Reader.new(data)
     else
-      @reader = Reader.new(data, self, attribute_overrides, &block)
+      @reader = Reader.new(data, self, true, &block)
     end
 
     # dynamic intrinstic attribute values
@@ -202,13 +234,11 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', 'images'), 'icons')
 
     # Now parse the lines in the reader into blocks
-    Lexer.parse(@reader, self) 
-    # or we could make it...
-    #self << *Lexer.parse(@reader, self)
+    Lexer.parse(@reader, self, :header_only => @options.fetch(:parse_header_only, false)) 
 
     @callouts.rewind
 
-    Asciidoctor.debug {
+    Debug.debug {
       msg = []
       msg << "Found #{@blocks.size} blocks in this document:"
       @blocks.each {|b|
@@ -276,17 +306,34 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     end
   end
 
+  def footnotes?
+    not @references[:footnotes].empty?
+  end
+
+  def footnotes
+    @references[:footnotes]
+  end
+
   def nested?
     !@parent_document.nil?
   end
 
   # Make the raw source for the Document available.
   def source
+    @reader.source.join if @reader
+  end
+
+  # Make the raw source lines for the Document available.
+  def source_lines
     @reader.source if @reader
   end
 
   def doctype
     @attributes['doctype']
+  end
+
+  def backend
+    @attributes['backend']
   end
 
   # The title explicitly defined in the document attributes
@@ -295,7 +342,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   end
 
   def title=(title)
-    @header = Section.new self
+    @header ||= Section.new self
     @header.title = title
   end
 
@@ -310,6 +357,20 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     end
   end
   alias :name :doctitle
+
+  # Public: Convenience method to retrieve the document attribute 'author'
+  #
+  # returns the full name of the author as a String
+  def author
+    @attributes['author']
+  end
+
+  # Public: Convenience method to retrieve the document attribute 'revdate'
+  #
+  # returns the date of last revision for the document as a String
+  def revdate
+    @attributes['revdate']
+  end
 
   def notitle
     @attributes.has_key? 'notitle'
@@ -326,6 +387,114 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
 
   def has_header?
     !@header.nil?
+  end
+ 
+  # Internal: Branch the attributes so that the original state can be restored
+  # at a future time.
+  def save_attributes
+    # css-signature cannot be updated after header attributes are processed
+    if @id.nil? && @attributes.has_key?('css-signature')
+      @id = @attributes['css-signature']
+    end
+    @original_attributes = @attributes.dup
+  end
+
+  # Internal: Restore the attributes to the previously saved state
+  def restore_attributes
+    @attributes = @original_attributes
+  end
+
+  # Internal: Delete any attributes stored for playback
+  def clear_playback_attributes(attributes)
+    attributes.delete(:attribute_entries)
+  end
+
+  # Internal: Replay attribute assignments at the block level
+  def playback_attributes(block_attributes)
+    if block_attributes.has_key? :attribute_entries
+      block_attributes[:attribute_entries].each do |entry|
+        if entry.negate
+          @attributes.delete(entry.name)
+        else
+          @attributes[entry.name] = entry.value
+        end
+      end
+    end
+  end
+
+  # Public: Set the specified attribute on the document if the name is not locked
+  #
+  # If the attribute is locked, false is returned. Otherwise, the value is
+  # assigned to the attribute name after first performing attribute
+  # substitutions on the value. If the attribute name is 'backend', then the
+  # value of backend-related attributes are updated.
+  #
+  # name  - the String attribute name
+  # value - the String attribute value
+  #
+  # returns true if the attribute was set, false if it was not set because it's locked
+  def set_attribute(name, value)
+    if attribute_locked?(name)
+      false
+    else
+      @attributes[name] = apply_attribute_value_subs(value)
+      if name == 'backend'
+        update_backend_attributes()
+      end
+      true
+    end
+  end
+
+  # Public: Delete the specified attribute from the document if the name is not locked
+  #
+  # If the attribute is locked, false is returned. Otherwise, the attribute is deleted.
+  #
+  # name  - the String attribute name
+  #
+  # returns true if the attribute was deleted, false if it was not because it's locked
+  def delete_attribute(name)
+    if attribute_locked?(name)
+      false
+    else
+      @attributes.delete(name)
+      true
+    end
+  end
+
+  # Public: Determine if the attribute has been locked by being assigned in document options
+  #
+  # key - The attribute key to check
+  #
+  # Returns true if the attribute is locked, false otherwise
+  def attribute_locked?(name)
+    @attribute_overrides.has_key?(name) || @attribute_overrides.has_key?("#{name}!")
+  end
+
+  # Internal: Apply substitutions to the attribute value
+  #
+  # If the value is an inline passthrough macro (e.g., pass:[text]), then
+  # apply the substitutions defined on the macro to the text. Otherwise,
+  # apply the verbatim substitutions to the value.
+  #
+  # value - The String attribute value on which to perform substitutions
+  #
+  # Returns The String value with substitutions performed.
+  def apply_attribute_value_subs(value)
+    if value.match(REGEXP[:pass_macro_basic])
+      # copy match for Ruby 1.8.7 compat
+      m = $~
+      subs = []
+      if !m[1].empty?
+        subs = resolve_subs(m[1])
+      end
+      if !subs.empty?
+        apply_subs(m[2], subs)
+      else
+        m[2]
+      end
+    else
+      apply_header_subs(value)
+    end
   end
 
   # Public: Update the backend attributes to reflect a change in the selected backend
@@ -355,7 +524,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   end
 
   def splain
-    Asciidoctor.debug {
+    Debug.debug {
       msg = ''
       if @header
         msg = "Header is #{@header}"
@@ -381,11 +550,12 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     render_options = {}
 
     # Load up relevant Document @options
-    if @options[:template_dir]
+    if @options.has_key? :template_dir
       render_options[:template_dir] = @options[:template_dir]
     end
     
     render_options[:backend] = @attributes.fetch('backend', 'html5')
+    render_options[:template_engine] = @options[:template_engine]
     render_options[:eruby] = @options.fetch(:eruby, 'erb')
     render_options[:compact] = @options.fetch(:compact, false)
     
@@ -400,6 +570,7 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
   # or a template is missing, the renderer will fall back to
   # using the appropriate built-in template.
   def render(opts = {})
+    restore_attributes
     r = renderer(opts)
     @options.merge(opts)[:header_footer] ? r.render('document', self).strip : r.render('embedded', self)
   end
@@ -414,4 +585,5 @@ class Asciidoctor::Document < Asciidoctor::AbstractBlock
     %[#{super.to_s} - #{doctitle}]  
   end
 
+end
 end

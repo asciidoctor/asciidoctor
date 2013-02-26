@@ -82,6 +82,7 @@ Gem::Specification.new do |s|
     lib/asciidoctor/debug.rb
     lib/asciidoctor/document.rb
     lib/asciidoctor/errors.rb
+    lib/asciidoctor/helpers.rb
     lib/asciidoctor/inline.rb
     lib/asciidoctor/lexer.rb
     lib/asciidoctor/list_item.rb

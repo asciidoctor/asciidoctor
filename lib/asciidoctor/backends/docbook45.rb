@@ -1,35 +1,40 @@
-class Asciidoctor::BaseTemplate
-  def role
-    attribute('role', :role)
-  end
+module Asciidoctor
+  class BaseTemplate
+    def tag(name, key)
+      type = key.is_a?(Symbol) ? :attr : :var
+      key = key.to_s
+      if type == :attr
+        # example: <% if attr? 'foo' %><bar><%= attr 'foo' %></bar><% end %>
+        %(<% if attr? '#{key}' %><#{name}><%= attr '#{key}' %></#{name}><% end %>)
+      else
+        # example: <% unless foo.to_s.empty? %><bar><%= foo %></bar><% end %>
+        %(<% unless #{key}.to_s.empty? %><#{name}><%= #{key} %></#{name}><% end %>)
+      end
+    end
 
-  def xreflabel
-    attribute('xreflabel', :reftext)
-  end
+    def title_tag(optional = true)
+      if optional
+        %q{<%= title? ? "<title>#{title}</title>" : '' %>}
+      else
+        %q{<title><%= title %></title>}
+      end
+    end
 
-  def title
-    tag('title', 'title')
-  end
+    def common_attrs(id, role, reftext)
+      %(#{id && " id=\"#{id}\""}#{role && " role=\"#{role}\""}#{reftext && " xreflabel=\"#{reftext}\""})
+    end
 
-  def tag(name, key)
-    type = key.is_a?(Symbol) ? :attr : :var
-    key = key.to_s
-    if type == :attr
-      # example: <% if attr? 'foo' %><bar><%= attr 'foo' %></bar><% end %>
-      %(<% if attr? '#{key}' %><#{name}><%= attr '#{key}' %></#{name}><% end %>)
-    else
-      # example: <% unless foo.to_s.empty? %><bar><%= foo %></bar><% end %>
-      %(<% unless #{key}.to_s.empty? %><#{name}><%= #{key} %></#{name}><% end %>)
+    def common_attrs_erb
+      %q{<%= template.common_attrs(@id, (attr 'role'), (attr 'reftext')) %>}
     end
   end
-end
 
-module Asciidoctor::DocBook45
-class DocumentTemplate < ::Asciidoctor::BaseTemplate
+module DocBook45
+class DocumentTemplate < BaseTemplate
   def docinfo
     <<-EOF
     <% if has_header? && !notitle %>
-    #{tag 'title', '@header.name'}
+    #{tag 'title', '@header.title'}
     <% end %>
     <% if attr? :revdate %>
     <date><%= attr :revdate %></date>
@@ -65,14 +70,14 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
 <% if attr? :toc %><?asciidoc-toc?><% end %>
 <% if attr? :numbered %><?asciidoc-numbered?><% end %>
 <% if doctype == 'book' %>
-<book lang="en">
+<book<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
   <bookinfo>
 #{docinfo}
   </bookinfo>
 <%= content %>
 </book>
 <% else %>
-<article lang="en">
+<article<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
   <articleinfo>
 #{docinfo}
   </articleinfo>
@@ -83,19 +88,17 @@ class DocumentTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class EmbeddedTemplate < ::Asciidoctor::BaseTemplate
+class EmbeddedTemplate < BaseTemplate
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= content %>
-  EOS
+    :content
   end
 end
 
-class BlockPreambleTemplate < ::Asciidoctor::BaseTemplate
+class BlockPreambleTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if document.doctype == 'book' %>
-<preface#{id}#{role}#{xreflabel}>
+<%#encoding:UTF-8%><% if @document.doctype == 'book' %>
+<preface#{common_attrs_erb}>
   <title><%= title %></title>
 <%= content %>
 </preface>
@@ -106,46 +109,62 @@ class BlockPreambleTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class SectionTemplate < ::Asciidoctor::BaseTemplate
+class SectionTemplate < BaseTemplate
+  def section(sec)
+    if sec.special
+      tag = sec.level <= 1 ? sec.sectname : 'section'
+    else
+      tag = sec.document.doctype == 'book' && sec.level <= 1 ? 'chapter' : 'section'
+    end
+    %(<#{tag}#{common_attrs(sec.id, (sec.attr 'role'), (sec.attr 'reftext'))}>
+  #{sec.title? ? "<title>#{sec.title}</title>" : nil}
+  #{sec.content}
+</#{tag}>)
+  end
+
   def template
+    # hot piece of code, optimized for speed
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><<%= @special ? @sectname : (document.doctype == 'book' && @level <= 1 ? 'chapter' : 'section') %>#{id}#{role}#{xreflabel}>
-  #{title}
-<%= content %>
-</<%= @special ? @sectname : (document.doctype == 'book' && @level <= 1 ? 'chapter' : 'section') %>>
+<%#encoding:UTF-8%><%= template.section(self) %>
     EOF
   end
 end
 
-class BlockFloatingTitleTemplate < ::Asciidoctor::BaseTemplate
+class BlockFloatingTitleTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><bridgehead#{id}#{role}#{xreflabel} renderas="sect<%= @level %>"><%= title %></bridgehead>
+<%#encoding:UTF-8%><bridgehead#{common_attrs_erb} renderas="sect<%= @level %>"><%= title %></bridgehead>
     EOS
   end
 end
 
 
-class BlockParagraphTemplate < ::Asciidoctor::BaseTemplate
+class BlockParagraphTemplate < BaseTemplate
+
+  def paragraph(id, role, reftext, title, content)
+    if title
+      %(<formalpara#{common_attrs(id, role, reftext)}>
+  <title>#{title}</title>
+  <para>#{content}</para>
+</formalpara>)
+    else
+      %(<simpara#{common_attrs(id, role, reftext)}>#{content}</simpara>)
+    end
+  end
+
   def template
+    # very hot piece of code, optimized for speed
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if !title? %>
-<simpara#{id}#{role}#{xreflabel}><%= content %></simpara>
-<% else %>
-<formalpara#{id}#{role}#{xreflabel}>
-  <title><%= title %></title>
-  <para><%= content %></para>
-</formalpara>
-<% end %>
+<%#encoding:UTF-8%><%= template.paragraph(@id, (attr 'role'), (attr 'reftext'), title? ? title : nil, content) %>
     EOF
   end
 end
 
-class BlockAdmonitionTemplate < ::Asciidoctor::BaseTemplate
+class BlockAdmonitionTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><<%= attr :name %>#{id}#{role}#{xreflabel}>
-  #{title}
+<%#encoding:UTF-8%><<%= attr :name %>#{common_attrs_erb}>
+  #{title_tag}
   <% if blocks? %>
 <%= content %>
   <% else %>
@@ -156,12 +175,12 @@ class BlockAdmonitionTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
+class BlockUlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if (attr :style) == 'bibliography' %>
-<bibliodiv#{id}#{role}#{xreflabel}>
-  #{title}
+<%#encoding:UTF-8%><% if attr? :style, 'bibliography' %>
+<bibliodiv#{common_attrs_erb}>
+  #{title_tag}
   <% content.each do |li| %>
     <bibliomixed>
       <bibliomisc><%= li.text %></bibliomisc>
@@ -172,8 +191,8 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
   <% end %>
 </bibliodiv>
 <% else %>
-<itemizedlist#{id}#{role}#{xreflabel}>
-  #{title}
+<itemizedlist#{common_attrs_erb}>
+  #{title_tag}
   <% content.each do |li| %>
     <listitem>
       <simpara><%= li.text %></simpara>
@@ -188,11 +207,11 @@ class BlockUlistTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
+class BlockOlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><orderedlist#{id}#{role}#{xreflabel}#{attribute('numeration', :style)}>
-  #{title}
+<%#encoding:UTF-8%><orderedlist#{common_attrs_erb}#{attribute('numeration', :style)}>
+  #{title_tag}
   <% content.each do |li| %>
     <listitem>
       <simpara><%= li.text %></simpara>
@@ -206,25 +225,25 @@ class BlockOlistTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockColistTemplate < ::Asciidoctor::BaseTemplate
+class BlockColistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><calloutlist#{id}#{role}#{xreflabel}>
-  #{title}
+<%#encoding:UTF-8%><calloutlist#{common_attrs_erb}>
+  #{title_tag}
   <% content.each do |li| %>
-    <callout arearefs="<%= li.attr :coids %>">
-      <para><%= li.text %></para>
-      <% if li.blocks? %>
+  <callout arearefs="<%= li.attr :coids %>">
+    <para><%= li.text %></para>
+    <% if li.blocks? %>
 <%= li.content %>
-      <% end %>
-    </callout>
+    <% end %>
+  </callout>
   <% end %>
 </calloutlist>
     EOF
   end
 end
 
-class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
+class BlockDlistTemplate < BaseTemplate
   LIST_TAGS = {
     'labeled' => {
       :list => 'variablelist',
@@ -249,8 +268,8 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><% tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled']) %>
-<% if tags[:list] %><<%= tags[:list] %>#{id}#{role}#{xreflabel}><% end %>
-  #{title}
+<% if tags[:list] %><<%= tags[:list] %>#{common_attrs_erb}><% end %>
+  #{title_tag}
   <% content.each do |dt, dd| %>
   <<%= tags[:entry] %>>
     <<%= tags[:term] %>>
@@ -273,28 +292,26 @@ class BlockDlistTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockOpenTemplate < ::Asciidoctor::BaseTemplate
+class BlockOpenTemplate < BaseTemplate
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= content %>
-    EOS
+    :content
   end
 end
 
-class BlockListingTemplate < ::Asciidoctor::BaseTemplate
+class BlockListingTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><% if !title? %>
-<% if (attr :style) == 'source' %>
-<programlisting#{id}#{role}#{xreflabel}#{attribute('language', :language)} linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting>
+<% if attr? :style, 'source' %>
+<programlisting#{common_attrs_erb}#{attribute('language', :language)} linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting>
 <% else %>
-<screen#{id}#{role}#{xreflabel}><%= template.preserve_endlines(content, self) %></screen>
+<screen#{common_attrs_erb}><%= template.preserve_endlines(content, self) %></screen>
 <% end %>
 <% else %>
-<formalpara#{id}#{role}#{xreflabel}>
-  <title><%= title %></title>
+<formalpara#{common_attrs_erb}>
+  #{title_tag false}
   <para>
-    <% if (attr :style) == 'source' %>
+    <% if attr :style, 'source' %>
     <programlisting language="<%= attr :language %>" linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting>
     <% else %>
     <screen><%= template.preserve_endlines(content, self) %></screen>
@@ -306,14 +323,14 @@ class BlockListingTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockLiteralTemplate < ::Asciidoctor::BaseTemplate
+class BlockLiteralTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><% if !title? %>
-<literallayout#{id}#{role}#{xreflabel} class="monospaced"><%= template.preserve_endlines(content, self) %></literallayout>
+<literallayout#{common_attrs_erb} class="monospaced"><%= template.preserve_endlines(content, self) %></literallayout>
 <% else %>
-<formalpara#{id}#{role}#{xreflabel}>
-  <title><%= title %></title>
+<formalpara#{common_attrs_erb}>
+  #{title_tag false}
   <para>
     <literallayout class="monospaced"><%= template.preserve_endlines(content, self) %></literallayout>
   </para>
@@ -323,33 +340,33 @@ class BlockLiteralTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockExampleTemplate < ::Asciidoctor::BaseTemplate
+class BlockExampleTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><example#{id}#{role}#{xreflabel}>
-  #{title}
+<%#encoding:UTF-8%><example#{common_attrs_erb}>
+  #{title_tag}
 <%= content %>
 </example>
     EOF
   end
 end
 
-class BlockSidebarTemplate < ::Asciidoctor::BaseTemplate
+class BlockSidebarTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><sidebar#{id}#{role}#{xreflabel}>
-  #{title}
+<%#encoding:UTF-8%><sidebar#{common_attrs_erb}>
+  #{title_tag}
 <%= content %>
 </sidebar>
     EOF
   end
 end
 
-class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
+class BlockQuoteTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><blockquote#{id}#{role}#{xreflabel}>
-  #{title}
+<%#encoding:UTF-8%><blockquote#{common_attrs_erb}>
+  #{title_tag}
   <% if (attr? :attribution) || (attr? :citetitle) %>
   <attribution>
     <% if attr? :attribution %>
@@ -358,7 +375,7 @@ class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
     #{tag 'citetitle', :citetitle}
   </attribution>
   <% end %>
-<% if !buffer.nil? %>
+<% if !@buffer.nil? %>
 <simpara><%= content %></simpara>
 <% else %>
 <%= content %>
@@ -368,11 +385,11 @@ class BlockQuoteTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockVerseTemplate < ::Asciidoctor::BaseTemplate
+class BlockVerseTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><blockquote#{id}#{role}#{xreflabel}>
-  #{title}
+<%#encoding:UTF-8%><blockquote#{common_attrs_erb}>
+  #{title_tag}
   <% if (attr? :attribution) || (attr? :citetitle) %>
   <attribution>
     <% if attr? :attribution %>
@@ -387,20 +404,18 @@ class BlockVerseTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockPassTemplate < ::Asciidoctor::BaseTemplate
+class BlockPassTemplate < BaseTemplate
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= content %>
-    EOS
+    :content
   end
 end
 
-class BlockTableTemplate < ::Asciidoctor::BaseTemplate
+class BlockTableTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><<%= title? ? 'table' : 'informaltable'%>#{id}#{role}#{xreflabel} frame="<%= attr :frame, 'all'%>"
+<%#encoding:UTF-8%><<%= title? ? 'table' : 'informaltable'%>#{common_attrs_erb} frame="<%= attr :frame, 'all'%>"
     rowsep="<%= ['none', 'cols'].include?(attr :grid) ? 0 : 1 %>" colsep="<%= ['none', 'rows'].include?(attr :grid) ? 0 : 1 %>">
-  #{title}
+  #{title_tag}
   <% if attr? :width %>
   <?dbhtml table-width="<%= attr :width %>"?>
   <?dbfo table-width="<%= attr :width %>"?>
@@ -410,15 +425,15 @@ class BlockTableTemplate < ::Asciidoctor::BaseTemplate
     <% @columns.each do |col| %>
     <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= col.attr((attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
     <% end %>
-    <% [:head, :foot, :body].select {|tsec| !rows[tsec].empty? }.each do |tsec| %>
-    <t<%= tsec %>>
-      <% @rows[tsec].each do |row| %>
+    <% [:head, :foot, :body].select {|tblsec| !rows[tblsec].empty? }.each do |tblsec| %>
+    <t<%= tblsec %>>
+      <% @rows[tblsec].each do |row| %>
       <row>
         <% row.each do |cell| %>
         <entry#{attribute('align', 'cell.attr :halign')}#{attribute('valign', 'cell.attr :valign')}<%
         if cell.colspan %> namest="col_<%= cell.column.attr :colnumber %>" nameend="col_<%= (cell.column.attr :colnumber) + cell.colspan - 1 %>"<%
         end %><% if cell.rowspan %> morerows="<%= cell.rowspan - 1 %>"<% end %>><%
-        if tsec == :head %><%= cell.text %><%
+        if tblsec == :head %><%= cell.text %><%
         else %><%
         case cell.attr(:style)
           when :asciidoc %><%= cell.content %><%
@@ -430,7 +445,7 @@ class BlockTableTemplate < ::Asciidoctor::BaseTemplate
         <% end %>
       </row>
       <% end %>
-    </t<%= tsec %>>
+    </t<%= tblsec %>>
     <% end %>
   </tgroup>
 </<%= title? ? 'table' : 'informaltable'%>>
@@ -438,11 +453,11 @@ class BlockTableTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockImageTemplate < ::Asciidoctor::BaseTemplate
+class BlockImageTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%#encoding:UTF-8%><figure#{id}#{role}#{xreflabel}>
-  #{title}
+<%#encoding:UTF-8%><%#encoding:UTF-8%><figure#{common_attrs_erb}>
+  #{title_tag}
   <mediaobject>
     <imageobject>
       <imagedata fileref="<%= image_uri(attr :target) %>"#{attribute('contentwidth', :width)}#{attribute('contentdepth', :height)}/>
@@ -454,7 +469,7 @@ class BlockImageTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class BlockRulerTemplate < ::Asciidoctor::BaseTemplate
+class BlockRulerTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><simpara><?asciidoc-hr?></simpara>
@@ -462,59 +477,74 @@ class BlockRulerTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class InlineBreakTemplate < ::Asciidoctor::BaseTemplate
+class BlockPageBreakTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%= text %><?asciidoc-br?>
+<%#encoding:UTF-8%><simpara><?asciidoc-pagebreak?></simpara>
     EOF
   end
 end
 
-class InlineQuotedTemplate < ::Asciidoctor::BaseTemplate
+class InlineBreakTemplate < BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOF
+<%#encoding:UTF-8%><%= @text %><?asciidoc-br?>
+    EOF
+  end
+end
+
+class InlineQuotedTemplate < BaseTemplate
   QUOTED_TAGS = {
     :emphasis => ['<emphasis>', '</emphasis>'],
     :strong => ['<emphasis role="strong">', '</emphasis>'],
     :monospaced => ['<literal>', '</literal>'],
     :superscript => ['<superscript>', '</superscript>'],
     :subscript => ['<subscript>', '</subscript>'],
-    :double => [Asciidoctor::INTRINSICS['ldquo'], Asciidoctor::INTRINSICS['rdquo']],
-    :single => [Asciidoctor::INTRINSICS['lsquo'], Asciidoctor::INTRINSICS['rsquo']],
-    :none => ['', '']
+    :double => ['&#8220;', '&#8221;'],
+    :single => ['&#8216;', '&#8217;']
+    #:none => ['', '']
   }
 
+  def quote(text, type, role)
+    start_tag, end_tag = QUOTED_TAGS[type] || ['', '']
+    if role
+      "#{start_tag}<phrase role=\"#{role}\">#{text}</phrase>#{end_tag}"
+    else
+      "#{start_tag}#{text}#{end_tag}"
+    end
+  end
+
   def template
+    # very hot piece of code, optimized for speed
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% tags = template.class::QUOTED_TAGS[@type] %><%= tags.first %><%
-if attr? :role %><phrase#{role}><%
-end %><%= @text %><%
-if attr? :role %></phrase><%
-end %><%= tags.last %>
+<%#encoding:UTF-8%><%= template.quote(@text, @type, attr('role')) %>
     EOF
   end
 end
 
-class InlineAnchorTemplate < ::Asciidoctor::BaseTemplate
+class InlineAnchorTemplate < BaseTemplate
+  def anchor(target, text, type)
+    case type
+    when :ref
+      %(<anchor id="#{target}" xreflabel="#{text}"/>)
+    when :xref
+      text.nil? ? %(<xref linkend="#{target}"/>) : %(<link linkend="#{target}">#{text}</link>)
+    when :link
+      %(<ulink url="#{target}">#{text}</ulink>)
+    when :bibref
+      %(<anchor id="#{target}" xreflabel="[#{target}]"/>[#{target}])
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if @type == :xref
-%><%
-  if @text.nil?
-%><xref linkend="<%= @target %>"/><%
-  else
-%><link linkend="<%= @target %>"><%= @text %></link><%
-  end %><%
-elsif @type == :ref
-%><anchor id="<%= @target %>" xreflabel="<%= @text %>"/><%
-elsif @type == :bibref
-%><anchor id="<%= @target %>" xreflabel="[<%= @target %>]"/>[<%= @target %>]<%
-else
-%><ulink url="<%= @target %>"><%= @text %></ulink><%
-end %>
-    EOF
+    # hot piece of code, optimized for speed
+    @template ||= @eruby.new <<-EOS
+<%#encoding:UTF-8%><%= template.anchor(@target, @text, @type) %>
+    EOS
   end
 end
 
-class InlineImageTemplate < ::Asciidoctor::BaseTemplate
+class InlineImageTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><inlinemediaobject>
@@ -527,11 +557,11 @@ class InlineImageTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class InlineFootnoteTemplate < ::Asciidoctor::BaseTemplate
+class InlineFootnoteTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><%
-if type == :xref
+if @type == :xref
 %><footnoteref linkend="<%= @target %>"/><%
 else
 %><footnote#{id}><simpara><%= @text %></simpara></footnote><%
@@ -540,7 +570,7 @@ end %>
   end
 end
 
-class InlineCalloutTemplate < ::Asciidoctor::BaseTemplate
+class InlineCalloutTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><co#{id}/>
@@ -548,10 +578,10 @@ class InlineCalloutTemplate < ::Asciidoctor::BaseTemplate
   end
 end
 
-class InlineIndextermTemplate < ::Asciidoctor::BaseTemplate
+class InlineIndextermTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><% if type == :visible %><indexterm><primary><%= @text %></primary></indexterm><%= @text %><%
+<%#encoding:UTF-8%><% if @type == :visible %><indexterm><primary><%= @text %></primary></indexterm><%= @text %><%
 else %><% terms = (attr :terms); numterms = terms.size %><%
 if numterms > 2 %><indexterm>
   <primary><%= terms[0] %></primary><secondary><%= terms[1] %></secondary><tertiary><%= terms[2] %></tertiary>
@@ -566,4 +596,6 @@ if numterms > 1 %><indexterm>
     EOS
   end
 end
-end
+
+end # module DocBook45
+end # module Asciidoctor

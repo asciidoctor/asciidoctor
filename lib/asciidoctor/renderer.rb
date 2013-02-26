@@ -1,6 +1,7 @@
+module Asciidoctor
 # Public: Methods for rendering Asciidoc Documents, Sections, and Blocks
 # using eRuby templates.
-class Asciidoctor::Renderer
+class Renderer
   attr_reader :compact
 
   # Public: Initialize an Asciidoctor::Renderer object.
@@ -15,10 +16,10 @@ class Asciidoctor::Renderer
     case backend
     when 'html5', 'docbook45'
       eruby = load_eruby options[:eruby]
-      #Asciidoctor.require_library 'asciidoctor/backends/' + backend
+      #Helpers.require_library 'asciidoctor/backends/' + backend
       require 'asciidoctor/backends/' + backend
       # Load up all the template classes that we know how to render for this backend
-      Asciidoctor::BaseTemplate.template_classes.each do |tc|
+      BaseTemplate.template_classes.each do |tc|
         if tc.to_s.downcase.include?('::' + backend + '::') # optimization
           view_name, view_backend = self.class.extract_view_mapping(tc)
           if view_backend == backend
@@ -27,29 +28,71 @@ class Asciidoctor::Renderer
         end
       end
     else
-      Asciidoctor.debug { "No built-in templates for backend: #{backend}" }
+      Debug.debug { "No built-in templates for backend: #{backend}" }
     end
 
     # If user passed in a template dir, let them override our base templates
     if template_dir = options.delete(:template_dir)
-      Asciidoctor.require_library 'tilt'
+      Helpers.require_library 'tilt'
 
-      Asciidoctor.debug {
+      template_glob = '*'
+      if (engine = options[:template_engine])
+        template_glob = "*.#{engine}"
+        # example: templates/haml
+        if File.directory? File.join(template_dir, engine)
+          template_dir = File.join template_dir, engine
+        end
+      end
+
+      # example: templates/html5 or templates/haml/html5
+      if File.directory? File.join(template_dir, options[:backend])
+        template_dir = File.join template_dir, options[:backend]
+      end
+
+      view_opts = {
+        :erb =>  { :trim => '<>' },
+        :haml => { :attr_wrapper => '"', :ugly => true, :escape_attrs => false },
+        :slim => { :disable_escape => true, :sort_attrs => false, :pretty => false }
+      }
+
+      if backend == 'html5'
+        view_opts[:haml][:format] = view_opts[:slim][:format] = :html5
+      end
+
+      Debug.debug {
         msg = []
         msg << "Views going in are like so:"
         msg << @views.map {|k, v| "#{k}: #{v}"}
         msg << '=' * 60
         msg * "\n"
       }
+
+      slim_loaded = false
+      helpers = nil
       
       # Grab the files in the top level of the directory (we're not traversing)
-      files = Dir.glob(File.join(template_dir, '*')).select{|f| File.stat(f).file?}
-      files.inject(@views) do |view_hash, view|
-        name = File.basename(view).split('.').first
-        view_hash.merge!(name => Tilt.new(view, nil, :trim => '<>', :attr_wrapper => '"'))
+      Dir.glob(File.join(template_dir, template_glob)).
+          select{|f| File.file? f }.each do |template|
+        basename = File.basename(template)
+        if basename == 'helpers.rb'
+          helpers = template
+          next
+        end
+        name_parts = basename.split('.')
+        next if name_parts.size < 2
+        view_name = name_parts.first 
+        ext_name = name_parts.last
+        if ext_name == 'slim' && !slim_loaded
+          # slim doesn't get loaded by Tilt
+          Helpers.require_library 'slim'
+        end
+        next unless Tilt.registered? ext_name
+        @views[view_name] = Tilt.new(template, nil, view_opts[ext_name.to_sym])
       end
 
-      Asciidoctor.debug {
+      require helpers unless helpers.nil?
+
+      Debug.debug {
         msg = []
         msg << "Views going in are like so:"
         msg << @views.map {|k, v| "#{k}: #{v}"}
@@ -72,7 +115,7 @@ class Asciidoctor::Renderer
     if !@views.has_key? view
       raise "Couldn't find a view in @views for #{view}"
     else
-      Asciidoctor.debug { "View for #{view} is #{@views[view]}, object is #{object}" }
+      Debug.debug { "View for #{view} is #{@views[view]}, object is #{object}" }
     end
     
     ret = @views[view].render(object, locals)
@@ -83,8 +126,8 @@ class Asciidoctor::Renderer
       STDERR.puts "Rendering:"
       @render_stack.each do |stack_view, stack_obj|
         obj_info = case stack_obj
-                   when Asciidoctor::Section; "SECTION #{stack_obj.title}"
-                   when Asciidoctor::Block;
+                   when Section; "SECTION #{stack_obj.title}"
+                   when Block;
                      if stack_obj.context == :dlist
                        dt_list = stack_obj.buffer.map{|dt,dd| dt.content.strip}.join(', ')
                        "BLOCK :dlist (#{dt_list})"
@@ -122,7 +165,7 @@ class Asciidoctor::Renderer
       name = 'erb'
     end
 
-    Asciidoctor.require_library name
+    Helpers.require_library name
 
     if name == 'erb'
       ::ERB
@@ -175,4 +218,5 @@ class Asciidoctor::Renderer
         gsub(/([[:lower:]])([[:upper:]])/, '\1_\2').downcase
   end
 
+end
 end

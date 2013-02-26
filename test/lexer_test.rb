@@ -355,4 +355,12 @@ context "Lexer" do
     assert_equal '2013-12-18', metadata['revdate']
   end
 
+  test "attribute entry overrides generated author initials" do
+    blankdoc = Asciidoctor::Document.new
+    reader = Asciidoctor::Reader.new "Stuart Rackham <founder@asciidoc.org>\n:Author Initials: SJR".lines.entries
+    metadata = Asciidoctor::Lexer.parse_header_metadata(reader, blankdoc)
+    assert_equal 'SR', metadata['authorinitials']
+    assert_equal 'SJR', blankdoc.attributes['authorinitials']
+  end
+
 end

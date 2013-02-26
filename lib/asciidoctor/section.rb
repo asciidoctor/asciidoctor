@@ -1,3 +1,4 @@
+module Asciidoctor
 # Public: Methods for managing sections of AsciiDoc content in a document.
 # The section responds as an Array of content blocks by delegating
 # block-related methods to its @blocks Array.
@@ -17,7 +18,7 @@
 #   section << new_block
 #   section.size
 #   => 1
-class Asciidoctor::Section < Asciidoctor::AbstractBlock
+class Section < AbstractBlock
 
   # Public: Get/Set the Integer index of this section within the parent block
   attr_accessor :index
@@ -36,7 +37,7 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
     if level.nil? && !parent.nil?
       @level = parent.level + 1
     end
-    if parent.is_a?(::Asciidoctor::Section) && parent.special
+    if parent.is_a?(Section) && parent.special
       @special = true
     else
       @special = false
@@ -89,7 +90,8 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # Public: Get the rendered String content for this Section and all its child
   # Blocks.
   def render
-    Asciidoctor.debug { "Now rendering section for #{self}" }
+    Debug.debug { "Now rendering section for #{self}" }
+    @document.playback_attributes @attributes
     renderer.render('section', self)
   end
 
@@ -152,7 +154,7 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
   # Returns the section number as a String
   def sectnum(delimiter = '.', append = nil)
     append ||= (append == false ? '' : delimiter)
-    if !@level.nil? && @level > 1 && @parent.is_a?(::Asciidoctor::Section)
+    if !@level.nil? && @level > 1 && @parent.is_a?(Section)
       "#{@parent.sectnum(delimiter)}#{@index + 1}#{append}"
     else
       "#{@index + 1}#{append}"
@@ -170,4 +172,5 @@ class Asciidoctor::Section < Asciidoctor::AbstractBlock
       super.to_s
     end
   end
+end
 end

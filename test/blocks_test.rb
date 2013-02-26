@@ -2,7 +2,7 @@ require 'test_helper'
 require 'pathname'
 
 context "Blocks" do
-  context "Rulers" do
+  context 'Line Breaks' do
     test "ruler" do
       output = render_string("'''")
       assert_xpath '//*[@id="content"]/hr', output, 1
@@ -14,6 +14,13 @@ context "Blocks" do
       assert_xpath '//*[@id="content"]/hr', output, 1
       assert_xpath '//*[@id="content"]/hr/preceding-sibling::*', output, 1
       assert_xpath '//*[@id="content"]/hr/following-sibling::*', output, 1
+    end
+
+    test "page break" do
+      output = render_embedded_string("page 1\n\n<<<\n\npage 2")
+      assert_xpath '/*[@style="page-break-after: always"]', output, 1
+      assert_xpath '/*[@style="page-break-after: always"]/preceding-sibling::div/p[text()="page 1"]', output, 1
+      assert_xpath '/*[@style="page-break-after: always"]/following-sibling::div/p[text()="page 2"]', output, 1
     end
   end
 
@@ -99,6 +106,15 @@ block comment
       assert_equal 1, d.blocks.size
       assert_xpath '//p', d.render, 1
     end
+
+    test 'line starting with three slashes should not be line comment' do
+      input = <<-EOS
+/// not a line comment
+      EOS
+
+      output = render_embedded_string input
+      assert !output.strip.empty?, "Line should be emitted => #{input.rstrip}"
+    end
   end
 
   context "Example Blocks" do
@@ -180,6 +196,72 @@ You just write.
       output = doc.render
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
       assert !doc.attributes.has_key?('example-number')
+    end
+
+    test 'automatic caption can be turned off and on and modified' do
+      input = <<-EOS
+.first example
+====
+an example
+====
+
+:caption:
+
+.second example
+====
+another example
+====
+
+:caption!:
+:example-caption: Exhibit
+
+.third example
+====
+yet another example
+====
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/*[@class="exampleblock"]', output, 3
+      assert_xpath '(/*[@class="exampleblock"])[1]/*[@class="title"][starts-with(text(), "Example ")]', output, 1
+      assert_xpath '(/*[@class="exampleblock"])[2]/*[@class="title"][text()="second example"]', output, 1
+      assert_xpath '(/*[@class="exampleblock"])[3]/*[@class="title"][starts-with(text(), "Exhibit ")]', output, 1
+    end
+  end
+
+  context 'Admonition Blocks' do
+    test 'caption block-level attribute should be used as caption' do
+       input = <<-EOS
+:tip-caption: Pro Tip
+
+[caption="Pro Tip"]
+TIP: Override the caption of an admonition block using an attribute entry
+       EOS
+
+       output = render_embedded_string input
+       assert_xpath '/*[@class="admonitionblock"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
+    end
+
+    test 'can override caption of admonition block using document attribute' do
+       input = <<-EOS
+:tip-caption: Pro Tip
+
+TIP: Override the caption of an admonition block using an attribute entry
+       EOS
+
+       output = render_embedded_string input
+       assert_xpath '/*[@class="admonitionblock"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
+    end
+
+    test 'blank caption document attribute should not blank admonition block caption' do
+       input = <<-EOS
+:caption:
+
+TIP: Override the caption of an admonition block using an attribute entry
+       EOS
+
+       output = render_embedded_string input
+       assert_xpath '/*[@class="admonitionblock"]//*[@class="icon"]/*[@class="title"][text()="Tip"]', output, 1
     end
   end
 
@@ -394,6 +476,30 @@ paragraph
       assert_xpath '//*[@class="paragraph"]/*[@class="title"][text() = "Title"]', output, 1
       assert_xpath '//*[@class="paragraph"]/p[text() = "paragraph"]', output, 1
     end
+
+    test 'block title above document title gets carried over to preamble' do
+      input = <<-EOS
+.Block title
+= Document Title
+
+preamble
+      EOS
+      output = render_string input
+      assert_xpath '//*[@id="preamble"]//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
+    end
+
+    test 'block title above document title gets carried over to first block in first section if no preamble' do
+      input = <<-EOS
+.Block title
+= Document Title
+
+== First Section 
+
+paragraph
+      EOS
+      output = render_string input
+      assert_xpath '//*[@class="sect1"]//*[@class="paragraph"]/*[@class="title"][text() = "Block title"]', output, 1
+    end
   end
 
   context "Images" do
@@ -444,6 +550,17 @@ image::images/tiger.png[Tiger]
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Figure 1. The AsciiDoc Tiger"]', output, 1
       assert_equal 1, doc.attributes['figure-number']
+    end
+
+    test 'should pass through image that is a uri reference' do
+      input = <<-EOS
+:imagesdir: images
+
+image::http://asciidoc.org/images/tiger.png[Tiger]
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//img[@src="http://asciidoc.org/images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'can resolve image relative to imagesdir' do
@@ -593,6 +710,49 @@ image::asciidoctor.png[Asciidoctor]
   end
 
   context 'Source code' do
+    test 'should support fenced code block using backticks' do
+      input = <<-EOS
+```
+puts "Hello, World!"
+```
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.listingblock', output, 1
+      assert_css '.listingblock pre code', output, 1
+      assert_css '.listingblock pre code:not([class])', output, 1
+    end
+
+    test 'should support fenced code block using tildes' do
+      input = <<-EOS
+~~~
+puts "Hello, World!"
+~~~
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.listingblock', output, 1
+      assert_css '.listingblock pre code', output, 1
+      assert_css '.listingblock pre code:not([class])', output, 1
+    end
+
+    test 'should support fenced code blocks with languages' do
+      input = <<-EOS
+```ruby
+puts "Hello, World!"
+```
+
+~~~ javascript
+alert("Hello, World!")
+~~~
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.listingblock', output, 2
+      assert_css '.listingblock pre code.ruby', output, 1
+      assert_css '.listingblock pre code.javascript', output, 1
+    end
+
     test 'should highlight source if source-highlighter attribute is coderay' do
       input = <<-EOS
 :source-highlighter: coderay

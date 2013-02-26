@@ -88,6 +88,22 @@ List
       assert_xpath '(//ul)[2]/preceding-sibling::*[@class = "title"][text() = "Also"]', output, 1
     end
 
+    test "dash elements separated by an attribute entry offset by a blank line should not merge lists" do
+      input = <<-EOS
+== List
+
+- Foo
+- Boo
+
+:foo: bar
+- Blech
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//ul', output, 2
+      assert_xpath '(//ul)[1]/li', output, 2
+      assert_xpath '(//ul)[2]/li', output, 1
+    end
+
     test 'a non-indented wrapped line is folded into text of list item' do
       input = <<-EOS
 List
@@ -102,6 +118,36 @@ wrapped content
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li[1]/*', output, 1
       assert_xpath "//ul/li[1]/p[text() = 'Foo\nwrapped content']", output, 1
+    end
+
+    test 'a non-indented wrapped line that resembles a block title is folded into text of list item' do
+      input = <<-EOS
+== List
+
+- Foo
+.wrapped content
+- Boo
+- Blech
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li[1]/*', output, 1
+      assert_xpath "//ul/li[1]/p[text() = 'Foo\n.wrapped content']", output, 1
+    end
+
+    test 'a non-indented wrapped line that resembles an attribute entry is folded into text of list item' do
+      input = <<-EOS
+== List
+
+- Foo
+:foo: bar
+- Boo
+- Blech
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li[1]/*', output, 1
+      assert_xpath "//ul/li[1]/p[text() = 'Foo\n:foo: bar']", output, 1
     end
 
     test 'an indented wrapped line is unindented and folded into text of list item' do
@@ -355,6 +401,22 @@ List
       assert_xpath '(//ul)[1]/li', output, 2
       assert_xpath '(//ul)[2]/li', output, 1
       assert_xpath '(//ul)[2]/preceding-sibling::*[@class = "title"][text() = "Also"]', output, 1
+    end
+
+    test "asterisk elements separated by an attribute entry offset by a blank line should not merge lists" do
+      input = <<-EOS
+== List
+
+* Foo
+* Boo
+
+:foo: bar
+* Blech
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//ul', output, 2
+      assert_xpath '(//ul)[1]/li', output, 2
+      assert_xpath '(//ul)[2]/li', output, 1
     end
 
     test "list should terminate before next lower section heading" do
@@ -815,6 +877,7 @@ Lists
 
 * Item one, paragraph one
 +
+:foo: bar
 [[beck]]
 .Read the following aloud to yourself
 [source, ruby]
@@ -1294,6 +1357,22 @@ List
       assert_xpath '(//ol)[1]/li', output, 2
       assert_xpath '(//ol)[2]/li', output, 1
       assert_xpath '(//ol)[2]/preceding-sibling::*[@class = "title"][text() = "Also"]', output, 1
+    end
+
+    test "dot elements separated by an attribute entry offset by a blank line should not merge lists" do
+      input = <<-EOS
+== List
+
+. Foo
+. Boo
+
+:foo: bar
+. Blech
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//ol', output, 2
+      assert_xpath '(//ol)[1]/li', output, 2
+      assert_xpath '(//ol)[2]/li', output, 1
     end
   end
 end
