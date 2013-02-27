@@ -163,24 +163,39 @@ class BlockPreambleTemplate < BaseTemplate
 end
 
 class SectionTemplate < BaseTemplate
+  def section(sec)
+    slevel = sec.level
+    htag = "h#{slevel + 1}"
+    id = sec.id && " id=\"#{sec.id}\""
+    if slevel == 0
+      %(<h1#{id}>#{sec.title}</h1>
+#{sec.content})
+    else
+      role = sec.attr?('role') ? " #{sec.attr('role')}" : nil
+      if !sec.special && (sec.attr? 'numbered') && slevel < 4
+        sectnum = "#{sec.sectnum} "
+      else
+        sectnum = nil
+      end
+
+      if slevel == 1
+        content = %(  <div class="sectionbody">
+#{sec.content}
+  </div>)
+      else
+        content = sec.content
+      end
+      %(<div class="sect#{slevel}#{role}">
+  <#{htag}#{id}>#{sectnum}#{sec.attr 'caption'}#{sec.title}</#{htag}>
+#{content}
+</div>)
+    end
+  end
+
   def template
+    # hot piece of code, optimized for speed
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%
-if @level == 0 %>
-<h1#{id}><%= title %></h1>
-<%= content %>
-<% else %>
-<div class="sect<%= @level %>#{role_class}">
-  <h<%= @level + 1 %>#{id}><% if !@special && (attr? :numbered) && @level < 4 %><%= sectnum %> <% end %><%= attr :caption %><%= title %></h<%= @level + 1 %>>
-  <% if @level == 1 %>
-  <div class="sectionbody">
-<%= content %>
-  </div>
-  <% else %>
-<%= content %>
-  <% end %>
-</div>
-<% end %>
+<%#encoding:UTF-8%><%= template.section(self) %>
     EOS
   end
 end
