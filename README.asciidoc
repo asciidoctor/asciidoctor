@@ -69,8 +69,7 @@ Sinatra and GitHub.
 === Command line interface (CLI)
 
 After installing the +asciidoctor+ gem, the +asciidoctor+ commandline
-interface should be available on your PATH after installing the gem. To
-invoke it, simply execute:
+interface should be available on your PATH. To invoke it, simply execute:
 
  asciidoctor <asciidoc_file>
 
