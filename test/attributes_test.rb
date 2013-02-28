@@ -181,6 +181,44 @@ Yo, {myfrog}!
       assert_match(/_cool_title/, result.css('h2').first.attr('id'))
     end
 
+    test 'interpolates attribute defined in header inside attribute entry in header' do
+      input = <<-EOS
+= Title
+Author Name
+:attribute-a: value
+:attribute-b: {attribute-a}
+
+preamble
+      EOS
+      doc = document_from_string(input, :parse_header_only => true)
+      assert_equal 'value', doc.attributes['attribute-b']
+    end
+
+    test 'interpolates author attribute inside attribute entry in header' do
+      input = <<-EOS
+= Title
+Author Name
+:name: {author}
+
+preamble
+      EOS
+      doc = document_from_string(input, :parse_header_only => true)
+      assert_equal 'Author Name', doc.attributes['name']
+    end
+
+    test 'interpolates revinfo attribute inside attribute entry in header' do
+      input = <<-EOS
+= Title
+Author Name
+2013-01-01
+:date: {revdate}
+
+preamble
+      EOS
+      doc = document_from_string(input, :parse_header_only => true)
+      assert_equal '2013-01-01', doc.attributes['date']
+    end
+
     test 'substitutes inside block title' do
       input = <<-EOS
 :gem_name: asciidoctor
