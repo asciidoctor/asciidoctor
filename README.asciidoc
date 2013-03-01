@@ -1,6 +1,6 @@
 Asciidoctor
 ===========
-:asciidoctor: http://asciidoctor.org
+:homepage: http://asciidoctor.org
 :asciidoc: http://asciidoc.org
 :sources: http://github.com/asciidoctor/asciidoctor
 :issues: https://github.com/asciidoctor/asciidoctor/issues
