@@ -1255,55 +1255,73 @@ class Lexer
     metadata = {}
 
     if reader.has_more_lines? && !reader.peek_line.chomp.empty?
+      author_metadata = {}
       author_line = reader.get_line
       if match = author_line.match(REGEXP[:author_info])
-        metadata['firstname'] = fname = match[1].tr('_', ' ')
-        metadata['author'] = fname
-        metadata['authorinitials'] = fname[0, 1]
+        author_metadata['firstname'] = fname = match[1].tr('_', ' ')
+        author_metadata['author'] = fname
+        author_metadata['authorinitials'] = fname[0, 1]
         if !match[2].nil? && !match[3].nil?
-          metadata['middlename'] = mname = match[2].tr('_', ' ')
-          metadata['lastname'] = lname = match[3].tr('_', ' ')
-          metadata['author'] = [fname, mname, lname].join ' '
-          metadata['authorinitials'] = [fname[0, 1], mname[0, 1], lname[0, 1]].join
+          author_metadata['middlename'] = mname = match[2].tr('_', ' ')
+          author_metadata['lastname'] = lname = match[3].tr('_', ' ')
+          author_metadata['author'] = [fname, mname, lname].join ' '
+          author_metadata['authorinitials'] = [fname[0, 1], mname[0, 1], lname[0, 1]].join
         elsif !match[2].nil?
-          metadata['lastname'] = lname = match[2].tr('_', ' ')
-          metadata['author'] = [fname, lname].join ' '
-          metadata['authorinitials'] = [fname[0, 1], lname[0, 1]].join
+          author_metadata['lastname'] = lname = match[2].tr('_', ' ')
+          author_metadata['author'] = [fname, lname].join ' '
+          author_metadata['authorinitials'] = [fname[0, 1], lname[0, 1]].join
         end
-        metadata['email'] = match[4] unless match[4].nil?
+        author_metadata['email'] = match[4] unless match[4].nil?
       else
-        metadata['author'] = metadata['firstname'] = author_line.strip.squeeze(' ')
-        metadata['authorinitials'] = metadata['firstname'][0, 1]
+        author_metadata['author'] = author_metadata['firstname'] = author_line.strip.squeeze(' ')
+        author_metadata['authorinitials'] = author_metadata['firstname'][0, 1]
       end
 
-      # NOTE this will discard away any comment lines, but not skip blank lines
+      # apply header subs and assign to document
+      if !document.nil?
+        author_metadata.map do |key, val|
+          val = document.apply_header_subs(val)
+          document.attributes[key] = val if !document.attributes.has_key?(key)
+          val
+        end
+      end
+
+      metadata = author_metadata.dup
+
+      # NOTE this will discard any comment lines, but not skip blank lines
       process_attribute_entries(reader, document)
+
+      rev_metadata = {}
 
       if reader.has_more_lines? && !reader.peek_line.chomp.empty?
         rev_line = reader.get_line 
         if match = rev_line.match(REGEXP[:revision_info])
-          metadata['revdate'] = match[2].strip
-          metadata['revnumber'] = match[1].rstrip unless match[1].nil?
-          metadata['revremark'] = match[3].rstrip unless match[3].nil?
+          rev_metadata['revdate'] = match[2].strip
+          rev_metadata['revnumber'] = match[1].rstrip unless match[1].nil?
+          rev_metadata['revremark'] = match[3].rstrip unless match[3].nil?
         else
           # throw it back
           reader.unshift_line rev_line
         end
       end
 
-      # NOTE this will discard away any comment lines, but not skip blank lines
-      process_attribute_entries(reader, document)
-
-      reader.skip_blank_lines
-
       # apply header subs and assign to document
       if !document.nil?
-        metadata.map do |key, val|
+        rev_metadata.map do |key, val|
           val = document.apply_header_subs(val)
           document.attributes[key] = val if !document.attributes.has_key?(key)
           val
         end
       end
+
+      rev_metadata.each {|k, v|
+        metadata[k] = v
+      }
+
+      # NOTE this will discard any comment lines, but not skip blank lines
+      process_attribute_entries(reader, document)
+
+      reader.skip_blank_lines
     end
 
     metadata
