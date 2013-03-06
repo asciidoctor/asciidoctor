@@ -381,7 +381,7 @@ more info...
       assert_xpath '/*[@id="preamble"]', result, 1
     end
 
-    test 'wip enable title when no header footer' do
+    test 'enable title when no header footer' do
       result = render_string("= Title\n\npreamble", :header_footer => false, :attributes => {'notitle!' => ''})
       assert_xpath '/html', result, 0
       assert_xpath '/h1', result, 1
