@@ -4,6 +4,8 @@ Asciidoctor
 :asciidoc: http://asciidoc.org
 :sources: http://github.com/asciidoctor/asciidoctor
 :issues: https://github.com/asciidoctor/asciidoctor/issues
+:forum: http://discuss.asciidoctor.org
+:org: http://github.com/asciidoctor
 :contributors: https://github.com/asciidoctor/asciidoctor/graphs/contributors
 :templates: https://github.com/asciidoctor/asciidoctor/blob/master/lib/asciidoctor/backends
 :gitscm-next: https://github.com/github/gitscm-next
@@ -384,6 +386,18 @@ implementation, you will be personally responsible for providing patches
 in a timely fashion. If critical issues for a particular implementation
 exist at the time of a major release, support for that Ruby version may
 be dropped.
+
+== Resources
+
+Project home page:: {homepage}
+
+Source repository:: {sources}
+
+Issue tracker:: {issues}
+
+Mailinglist / forum:: {forum}
+
+GitHub organization:: {org}
 
 == Authors
 
