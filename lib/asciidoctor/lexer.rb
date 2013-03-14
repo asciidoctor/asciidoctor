@@ -189,7 +189,7 @@ class Lexer
         end
         if next_level > current_level || (section.is_a?(Document) && next_level == 0)
           unless expected_next_levels.nil? || expected_next_levels.include?(next_level)
-            puts "asciidoctor: WARNING: line #{reader.lineno + 1}: section title out of sequence: " +
+            puts "asciidoctor: WARNING: #{section.name} line #{reader.lineno + 1}: section title out of sequence: " +
                 "expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, " +
                 "got level #{next_level}"
           end
