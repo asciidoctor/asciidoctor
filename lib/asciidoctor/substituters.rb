@@ -369,12 +369,14 @@ module Substituters
         end
         prefix = (m[1] != 'link:' ? m[1] : '')
         target = m[2]
+        suffix = ''
         # strip the <> around the link
-        if prefix.end_with? '&lt;'
-          prefix = prefix[0..-5]
-        end
-        if target.end_with? '&gt;'
+        if prefix.start_with?('&lt;') && target.end_with?('&gt;')
+          prefix = prefix[4..-1]
           target = target[0..-5]
+        elsif prefix.start_with?('(') && target.end_with?(')')
+          target = target[0..-2]
+          suffix = ')'
         end
         @document.register(:links, target)
 
@@ -391,7 +393,7 @@ module Substituters
           text = ''
         end
 
-        "#{prefix}#{Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target, :attributes => attrs).render}"
+        "#{prefix}#{Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target, :attributes => attrs).render}#{suffix}"
       }
     end
 
