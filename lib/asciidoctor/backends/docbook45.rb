@@ -254,7 +254,8 @@ class BlockDlistTemplate < BaseTemplate
     'qanda' => {
       :list => 'qandaset',
       :entry => 'qandaentry',
-      :term => 'question',
+      :label => 'question',
+      :term => 'simpara',
       :item => 'answer'
     },
     'glossary' => {
@@ -272,9 +273,17 @@ class BlockDlistTemplate < BaseTemplate
   #{title_tag}
   <% content.each do |dt, dd| %>
   <<%= tags[:entry] %>>
+    <% if tags.has_key?(:label) %>
+    <<%= tags[:label] %>>
+      <<%= tags[:term] %>>
+        <%= dt.text %>
+      </<%= tags[:term] %>>
+    </<%= tags[:label] %>>
+    <% else %>
     <<%= tags[:term] %>>
       <%= dt.text %>
     </<%= tags[:term] %>>
+    <% end %>
     <% unless dd.nil? %>
     <<%= tags[:item] %>>
       <% if dd.text? %>
