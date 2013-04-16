@@ -21,6 +21,22 @@ module Helpers
     require name
   end
 
+  # Public: Encode a string for inclusion in a URI
+  #
+  # str - the string to encode
+  #
+  # returns an encoded version of the str
+  def self.encode_uri(str)
+    str.gsub /[^\w\-.!~*';:@=+$,()\[\]]/ do
+      match = $&
+      buf = ''
+      match.each_byte do |c|
+        buf << sprintf('%%%02X', c)
+      end
+      buf
+    end
+  end
+
   # Public: A generic capture output routine to be used in templates
   #def self.capture_output(*args, &block)
   #  Proc.new { block.call(*args) }

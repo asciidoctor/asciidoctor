@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'strscan'
 
 $:.unshift(File.dirname(__FILE__))
@@ -303,7 +302,11 @@ module Asciidoctor
 
     # inline link macro
     # link:path[label]
-    :link_macro       => /\\?link:([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/,
+    :link_macro       => /\\?(?:link|mailto):([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/,
+
+    # inline email address
+    # doc.writer@asciidoc.org
+    :email_inline     => /[\\>:]?\w[\w.%+-]*@[[:alnum:]][[:alnum:].-]*\.[[:alpha:]]{2,4}\b/, 
 
     # ----
     #:listing          => /^\-{4,}$/,

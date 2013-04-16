@@ -298,6 +298,7 @@ module Substituters
     found[:square_bracket] = result.include?('[')
     found[:round_bracket] = result.include?('(')
     found[:colon] = result.include?(':')
+    found[:at] = result.include?('@')
     found[:macroish] = (found[:square_bracket] && found[:colon])
     found[:macroish_short_form] = (found[:square_bracket] && found[:colon] && result.include?(':['))
     found[:uri] = (found[:colon] && result.include?('://'))
@@ -395,7 +396,7 @@ module Substituters
       }
     end
 
-    if found[:macroish] && result.include?('link:')
+    if found[:macroish] && (result.include?('link:') || result.include?('mailto:'))
       # inline link macros, link:target[text]
       result.gsub!(REGEXP[:link_macro]) {
         # alias match for Ruby 1.8.7 compat
@@ -404,19 +405,51 @@ module Substituters
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        target = m[1]
-        @document.register(:links, target)
+        raw_target = m[1]
+        mailto = m[0].start_with?('mailto:')
+        target = mailto ? "mailto:#{raw_target}" : raw_target
 
         attrs = nil
         #text = sub_attributes(m[2].gsub('\]', ']'))
         if link_attrs && (m[2].start_with?('"') || m[2].include?(','))
           attrs = parse_attributes(sub_attributes(m[2].gsub('\]', ']')))
           text = attrs[1]
+          if mailto
+            if attrs.has_key? 2
+              target = "#{target}?subject=#{Helpers.encode_uri(attrs[2])}"
+
+              if attrs.has_key? 3
+                target = "#{target}&amp;body=#{Helpers.encode_uri(attrs[3])}"
+              end
+            end
+          end
         else
           text = sub_attributes(m[2].gsub('\]', ']'))
         end
+        # QUESTION should a mailto be registered as an e-mail address?
+        @document.register(:links, target)
 
-        Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target, :attributes => attrs).render
+        Inline.new(self, :anchor, (!text.empty? ? text : raw_target), :type => :link, :target => target, :attributes => attrs).render
+      }
+    end
+
+    if found[:at]
+      result.gsub!(REGEXP[:email_inline]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        address = m[0]
+        case address[0..0]
+        when '\\'
+          next address[1..-1]
+        when '>', ':'
+          next address
+        end
+
+        target = "mailto:#{address}"
+        # QUESTION should this be registered as an e-mail address?
+        @document.register(:links, target)
+
+        Inline.new(self, :anchor, address, :type => :link, :target => target).render
       }
     end
 
