@@ -1,0 +1,4 @@
+= Document Title
+Doc Writer <doc.writer@asciidoc.org>
+
+Body content.

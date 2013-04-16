@@ -94,6 +94,7 @@ pre code { background-color: #F8F8F8; padding: 0; }
     <script src="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad()</script>
     <% end %>
+<%= docinfo %>
   </head>
   <body#{id} class="<%= doctype %>"<% if attr? 'max-width' %> style="max-width: <%= attr 'max-width' %>;"<% end %>>
     <% unless noheader %>

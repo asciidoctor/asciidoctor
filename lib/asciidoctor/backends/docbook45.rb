@@ -59,6 +59,8 @@ class DocumentTemplate < BaseTemplate
       #{tag 'revremark', :revremark}
     </revhistory>
     <% end %>
+<%= docinfo %>
+    #{tag 'orgname', :orgname}
     <% end %>
     EOF
   end

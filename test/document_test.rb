@@ -94,6 +94,7 @@ preamble
   context 'Render APIs' do
     test 'should render document to string' do
       sample_input_path = fixture_path('sample.asciidoc')
+
       output = Asciidoctor.render_file(sample_input_path, :header_footer => true)
       assert !output.empty?
       assert_xpath '/html', output, 1
@@ -101,6 +102,82 @@ preamble
       assert_xpath '/html/body', output, 1
       assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
       assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+    end
+
+    test 'should include docinfo files for html backend' do
+      sample_input_path = fixture_path('basic.asciidoc')
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo' => ''})
+      assert !output.empty?
+      assert_css 'script[src="modernizr.js"]', output, 1
+      assert_css 'meta[http-equiv="imagetoolbar"]', output, 0
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo1' => ''})
+      assert !output.empty?
+      assert_css 'script[src="modernizr.js"]', output, 0
+      assert_css 'meta[http-equiv="imagetoolbar"]', output, 1
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => ''})
+      assert !output.empty?
+      assert_css 'script[src="modernizr.js"]', output, 1
+      assert_css 'meta[http-equiv="imagetoolbar"]', output, 1
+    end
+
+    test 'should include docinfo files for docbook backend' do
+      sample_input_path = fixture_path('basic.asciidoc')
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo' => ''})
+      assert !output.empty?
+      assert_css 'productname', output, 0
+      assert_css 'copyright', output, 1
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo1' => ''})
+      assert !output.empty?
+      assert_css 'productname', output, 1
+      assert_css 'copyright', output, 0
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => ''})
+      assert !output.empty?
+      assert_css 'productname', output, 1
+      assert_css 'copyright', output, 1
+    end
+
+    test 'should not include docinfo files by default' do
+      sample_input_path = fixture_path('basic.asciidoc')
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER)
+      assert !output.empty?
+      assert_css 'script[src="modernizr.js"]', output, 0
+      assert_css 'meta[http-equiv="imagetoolbar"]', output, 0
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER)
+      assert !output.empty?
+      assert_css 'productname', output, 0
+      assert_css 'copyright', output, 0
+    end
+
+    test 'should not include docinfo files if safe mode is SECURE or greater' do
+      sample_input_path = fixture_path('basic.asciidoc')
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :attributes => {'docinfo2' => ''})
+      assert !output.empty?
+      assert_css 'script[src="modernizr.js"]', output, 0
+      assert_css 'meta[http-equiv="imagetoolbar"]', output, 0
+
+      output = Asciidoctor.render_file(sample_input_path,
+          :header_footer => true, :backend => 'docbook', :attributes => {'docinfo2' => ''})
+      assert !output.empty?
+      assert_css 'productname', output, 0
+      assert_css 'copyright', output, 0
     end
 
     test 'should render document in place' do
