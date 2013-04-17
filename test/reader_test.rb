@@ -190,6 +190,23 @@ include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
       assert_match(/last line of included content/, output)
     end
 
+    test 'include macro supports line selection using quoted attribute value' do
+      input = <<-EOS
+include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :header_footer => false, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_match(/first line/, output)
+      assert_no_match(/second line/, output)
+      assert_match(/third line/, output)
+      assert_match(/fourth line/, output)
+      assert_no_match(/fifth line/, output)
+      assert_match(/sixth line/, output)
+      assert_match(/seventh line/, output)
+      assert_match(/eighth line/, output)
+      assert_match(/last line of included content/, output)
+    end
+
     test 'include macro supports tagged selection' do
       input = <<-EOS
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]

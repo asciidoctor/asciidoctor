@@ -445,7 +445,7 @@ class Reader
         attributes = AttributeList.new(raw_attributes).parse
         if attributes.has_key? 'lines'
           lines = []
-          attributes['lines'].split(';').each do |linedef|
+          attributes['lines'].split(/[,;]/).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..').map(&:to_i)
               if to == -1
@@ -461,7 +461,7 @@ class Reader
           lines = lines.sort.uniq
           #lines.push lines.shift if lines.first == -1
         elsif attributes.has_key? 'tags'
-          tags = attributes['tags'].split(';').uniq
+          tags = attributes['tags'].split(/[,;]/).uniq
         end
       end
       # FIXME this borks line numbers
