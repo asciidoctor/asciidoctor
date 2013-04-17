@@ -77,7 +77,7 @@ class Lexer
     # check if the first line is the document title
     # if so, add a header to the document and parse the header metadata
     if is_next_line_document_title?(reader, block_attributes)
-      document.id, document.title, _, _ = parse_section_title(reader)
+      document.id, document.title, _, _ = parse_section_title(reader, document)
       # QUESTION: should this be encapsulated in document?
       if document.id.nil? && block_attributes.has_key?('id')
         document.id = block_attributes.delete('id')
@@ -183,6 +183,7 @@ class Lexer
 
       next_level = is_next_line_section? reader, attributes
       if next_level
+        next_level += section.document.attr('leveloffset', 0).to_i
         doctype = parent.document.doctype
         if next_level == 0 && doctype != 'book'
           puts "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
@@ -549,7 +550,7 @@ class Lexer
       elsif ['float', 'discrete'].include?(attributes[1]) && is_section_title?(this_line, reader.peek_line)
         attributes['style'] = attributes[1]
         reader.unshift_line this_line
-        float_id, float_title, float_level, _ = parse_section_title reader
+        float_id, float_title, float_level, _ = parse_section_title(reader, document)
         block = Block.new(parent, :floating_title)
         if float_id.nil? || float_id.empty?
           # FIXME remove hack of creating throwaway Section to get at the generate_id method
@@ -1053,7 +1054,7 @@ class Lexer
   # attributes - a Hash of attributes to assign to this section (default: {})
   def self.initialize_section(reader, parent, attributes = {})
     section = Section.new parent
-    section.id, section.title, section.level, _ = parse_section_title(reader)
+    section.id, section.title, section.level, _ = parse_section_title(reader, section.document)
     if section.id.nil? && attributes.has_key?('id')
       section.id = attributes['id']
     else
@@ -1168,13 +1169,14 @@ class Lexer
   # the Reader will be positioned at the line after the section title.
   #
   # reader  - the source reader, positioned at a section title
+  # document- the current document
   #
   # Examples
   #
   #   reader.lines
   #   # => ["Foo\n", "~~~\n"]
   #
-  #   title, level, id, single = parse_section_title(reader)
+  #   title, level, id, single = parse_section_title(reader, document)
   #
   #   title
   #   # => "Foo"
@@ -1188,7 +1190,7 @@ class Lexer
   #   line1
   #   # => "==== Foo\n"
   #
-  #   title, level, id, single = parse_section_title(reader)
+  #   title, level, id, single = parse_section_title(reader, document)
   #
   #   title
   #   # => "Foo"
@@ -1204,7 +1206,7 @@ class Lexer
   #
   #--
   # NOTE for efficiency, we don't reuse methods that check for a section title
-  def self.parse_section_title(reader)
+  def self.parse_section_title(reader, document)
     line1 = reader.get_line
     sect_id = nil
     sect_title = nil
@@ -1231,6 +1233,9 @@ class Lexer
         single_line = false
         reader.get_line
       end
+    end
+    if sect_level >= 0
+      sect_level += document.attr('leveloffset', 0).to_i
     end
     return [sect_id, sect_title, sect_level, single_line]
   end
