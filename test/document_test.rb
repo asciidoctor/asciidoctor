@@ -601,6 +601,19 @@ chapter body
       assert_xpath '/book/simpara[text() = "text"]', result, 1
     end
 
+    test 'docbook45 backend parses out subtitle' do
+      input = <<-EOS
+= Document Title: Subtitle
+:doctype: book
+
+text
+      EOS
+      result = render_string input, :backend => 'docbook45'
+      assert_xpath '/book', result, 1
+      assert_xpath '/book/bookinfo/title[text() = "Document Title"]', result, 1
+      assert_xpath '/book/bookinfo/subtitle[text() = "Subtitle"]', result, 1
+    end
+
     test 'should be able to set backend using :backend option key' do
       doc = Asciidoctor::Document.new([], :backend => 'html5')
       assert_equal 'html5', doc.attributes['backend']
