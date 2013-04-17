@@ -53,10 +53,12 @@ class DocumentTemplate < BaseTemplate
     <% end %>
     <% if (attr? :revnumber) || (attr? :revremark) %>
     <revhistory>
-      #{tag 'revision', :revnumber}
-      #{tag 'date', :revdate}
-      #{tag 'authorinitials', :authorinitials}
-      #{tag 'revremark', :revremark}
+      <revision>
+        #{tag 'revnumber', :revnumber}
+        #{tag 'date', :revdate}
+        #{tag 'authorinitials', :authorinitials}
+        #{tag 'revremark', :revremark}
+      </revision>
     </revhistory>
     <% end %>
     <% end %>
