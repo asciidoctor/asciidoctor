@@ -173,6 +173,20 @@ include::fixtures/include-file.asciidoc[]
       assert_match(/included content/, output)
     end
 
+    test 'include macro supports line selection' do
+      input = <<-EOS
+include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :header_footer => false, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_match(/first line/, output)
+      assert_match(/third line/, output)
+      assert_match(/fourth line/, output)
+      assert_match(/sixth line/, output)
+      assert_match(/seventh line/, output)
+      assert_match(/eighth line/, output)
+    end
+
     test "block is called to handle an include macro" do
       input = <<-EOS
 first line

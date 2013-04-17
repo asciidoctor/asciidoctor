@@ -268,7 +268,7 @@ class Reader
   def preprocess_next_line
     # this return could be happening from a recursive call
     return nil if @eof || (next_line = @lines.first).nil?
-    if next_line.include?('if') && (match = next_line.match(REGEXP[:ifdef_macro]))
+    if next_line.include?('::') && (next_line.include?('if') || next_line.include?('endif')) && (match = next_line.match(REGEXP[:ifdef_macro]))
       if next_line.start_with? '\\'
         @next_line_preprocessed = true
         @unescape_next_line = true
@@ -287,7 +287,7 @@ class Reader
         @unescape_next_line = true
         false
       else
-        preprocess_include(match[1])
+        preprocess_include(match[1], match[2].strip)
       end
     else
       @next_line_preprocessed = true
@@ -422,7 +422,7 @@ class Reader
   #          target slot of the include::[] macro
   #
   # returns a Boolean indicating whether the line under the cursor has changed.
-  def preprocess_include(target)
+  def preprocess_include(target, raw_attributes)
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     if @document.safe >= SafeMode::SECURE
@@ -439,8 +439,49 @@ class Reader
     # FIXME currently we're not checking the upper bound of the include depth
     elsif @document.attributes.fetch('include-depth', 0).to_i > 0
       advance
+      lines = nil
+      if !raw_attributes.empty?
+        attributes = AttributeList.new(raw_attributes).parse
+        if attributes.has_key? 'lines'
+          lines = []
+          attributes['lines'].split(';').each do |linedef|
+            if linedef.include?('..')
+              from, to = linedef.split('..').map(&:to_i)
+              if to == -1
+                lines << from
+                lines << 1.0/0.0
+              else
+                lines.concat Range.new(from, to).to_a
+              end
+            else
+              lines << linedef.to_i
+            end
+          end
+          lines = lines.sort.uniq
+          #lines.push lines.shift if lines.first == -1
+        end
+      end
       # FIXME this borks line numbers
-      @lines.unshift(*File.readlines(@document.normalize_asset_path(target, 'include file')).map {|l| "#{l.rstrip}\n"})
+      include_file = @document.normalize_asset_path(target, 'include file')
+      if lines.nil?
+        @lines.unshift(*File.readlines(include_file).map {|l| "#{l.rstrip}\n"})
+      elsif !lines.empty?
+        selected = []
+        f = File.new(include_file)
+        f.each_line {|l|
+          take = lines.first
+          if take.is_a?(Float) && take.infinite?
+            selected.push("#{l.rstrip}\n")
+          else
+            if f.lineno == take
+              selected.push("#{l.rstrip}\n")
+              lines.shift 
+            end
+            break if lines.empty?
+          end
+        }
+        @lines.unshift(*selected) unless selected.empty?
+      end
       true
     else
       @next_line_preprocessed = true
