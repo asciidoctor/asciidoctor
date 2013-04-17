@@ -446,7 +446,8 @@ module Asciidoctor
     #:eval_expr        => /^(true|false|("|'|)\{\w+(?:\-\w+)*\}\2|("|')[^\3]*\3|\-?\d+(?:\.\d+)*)[[:blank:]]*(==|!=|<=|>=|<|>)[[:blank:]]*(true|false|("|'|)\{\w+(?:\-\w+)*\}\6|("|')[^\7]*\7|\-?\d+(?:\.\d+)*)$/,
 
     # include::chapter1.ad[]
-    :include_macro    => /^\\?include::([^\[]+)\[\]$/,
+    # include::example.txt[lines=1;2;5..10]
+    :include_macro    => /^\\?include::([^\[]+)\[(.*?)\]$/,
 
     # http://domain
     # https://domain
