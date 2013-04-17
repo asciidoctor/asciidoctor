@@ -286,6 +286,42 @@ context 'Substitutions' do
       assert_equal %q{<a href="/home.html">Home</a>}, para.sub_macros(para.buffer.join)
     end
 
+    test 'a mailto macro should be interpreted as a mailto link' do
+      para = block_from_string('mailto:doc.writer@asciidoc.org[]')
+      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>}, para.sub_macros(para.buffer.join)
+    end
+
+    test 'a mailto macro with text should be interpreted as a mailto link' do
+      para = block_from_string('mailto:doc.writer@asciidoc.org[Doc Writer]')
+      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org">Doc Writer</a>}, para.sub_macros(para.buffer.join)
+    end
+
+    test 'a mailto macro with text and subject should be interpreted as a mailto link' do
+      para = block_from_string('mailto:doc.writer@asciidoc.org[Doc Writer, Pull request]', :attributes => {'linkattrs' => ''})
+      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request">Doc Writer</a>}, para.sub_macros(para.buffer.join)
+    end
+
+    test 'a mailto macro with text, subject and body should be interpreted as a mailto link' do
+      para = block_from_string('mailto:doc.writer@asciidoc.org[Doc Writer, Pull request, Please accept my pull request]', :attributes => {'linkattrs' => ''})
+      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request&amp;body=Please%20accept%20my%20pull%20request">Doc Writer</a>}, para.sub_macros(para.buffer.join)
+    end
+
+    test 'should recognize inline email addresses' do
+      para = block_from_string('doc.writer@asciidoc.org')
+      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>}, para.sub_macros(para.buffer.join)
+      para = block_from_string('<doc.writer@asciidoc.org>')
+      assert_equal %q{&lt;<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>&gt;}, para.apply_normal_subs(para.buffer)
+      para = block_from_string('author+website@4fs.no')
+      assert_equal %q{<a href="mailto:author+website@4fs.no">author+website@4fs.no</a>}, para.sub_macros(para.buffer.join)
+      para = block_from_string('john@domain.uk.co')
+      assert_equal %q{<a href="mailto:john@domain.uk.co">john@domain.uk.co</a>}, para.sub_macros(para.buffer.join)
+    end
+
+    test 'should ignore escaped inline email address' do
+      para = block_from_string('\doc.writer@asciidoc.org')
+      assert_equal %q{doc.writer@asciidoc.org}, para.sub_macros(para.buffer.join)
+    end
+
     test 'a single-line raw url should be interpreted as a link' do
       para = block_from_string('http://google.com')
       assert_equal %q{<a href="http://google.com">http://google.com</a>}, para.sub_macros(para.buffer.join)
