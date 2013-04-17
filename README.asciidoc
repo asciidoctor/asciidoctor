@@ -30,7 +30,7 @@ Asciidoctor uses a set of built-in ERB templates to render the document
 to HTML 5 or DocBook 4.5. We've matched the rendered output as close as
 possible to the default output of the native Python processor. You can
 override this behavior by providing {tilt}[Tilt]-compatible templates.
-See the xref:usage[Usage section] for more details.
+See <<usage,Usage>> for more details.
 
 Asciidoctor currently works (read as 'tested') with Ruby 1.8.7, Ruby
 1.9.3, Ruby 2.0.0, JRuby 1.7.2 and Rubinius 1.2.4 (on Linux, Mac and
@@ -225,6 +225,8 @@ Here are the known cases where Asciidoctor differs from AsciiDoc:
 * Asciidoctor is much more lenient about attribute list parsing (double
   quotes are rarely needed, though you may want to keep them for
   compatibility)
+
+* Asciidoctor recognizes +opts+ as an alias for the +options+ attribute.
 
 * Asciidoctor creates xref labels using the text from the linked section
   title when rendering HTML to match how DocBook works
