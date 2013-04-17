@@ -434,7 +434,9 @@ class Lexer
             block.title = float_title
             break
 
-          elsif !style.nil? && style != 'normal'
+          # FIXME create another set for "passthrough" styles
+          # though partintro should likely be a dedicated block
+          elsif !style.nil? && style != 'normal' && style != 'partintro'
             if PARAGRAPH_STYLES.include?(style)
               block_context = style.to_sym
               reader.unshift_line this_line

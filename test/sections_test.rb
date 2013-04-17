@@ -686,6 +686,28 @@ Terms
       assert_xpath '//*[@id="toc"]/ol//li/a[text()="Gotchas"]', output, 1
       assert_xpath '//*[@id="toc"]/ol//li/a[text()="Glossary"]', output, 1
     end
+
+    test 'level 0 special sections in multipart book should be rendered as level 1' do
+      input = <<-EOS
+= Multipart Book
+Doc Writer
+:doctype: book
+
+[preface]
+= Preface
+
+Preface text
+
+[appendix]
+= Appendix
+
+Appendix text
+      EOS
+
+      output = render_string input
+      assert_xpath '//h2[@id = "_preface"]', output, 1
+      assert_xpath '//h2[@id = "_appendix"]', output, 1
+    end
   end
 
   context "heading patterns in blocks" do
@@ -963,7 +985,7 @@ That's all she wrote!
       assert_xpath '/book/part[2]/chapter[1]/title[text() = "Chapter Three"]', output, 1
     end
 
-    test 'subsections in preface and appendix should start at level 2' do
+    test 'wip subsections in preface and appendix should start at level 2' do
       input = <<-EOS
 = Multipart Book
 Doc Writer
