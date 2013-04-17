@@ -63,6 +63,7 @@ class DocumentTemplate < BaseTemplate
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>">
     <meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <% if attr? :description %><meta name="description" content="<%= attr :description %>"><% end %>
     <% if attr? :keywords %><meta name="keywords" content="<%= attr :keywords %>"><% end %>
     <title><%= doctitle %></title>
