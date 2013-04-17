@@ -440,6 +440,7 @@ class Reader
     elsif @document.attributes.fetch('include-depth', 0).to_i > 0
       advance
       lines = nil
+      tags = nil
       if !raw_attributes.empty?
         attributes = AttributeList.new(raw_attributes).parse
         if attributes.has_key? 'lines'
@@ -459,28 +460,55 @@ class Reader
           end
           lines = lines.sort.uniq
           #lines.push lines.shift if lines.first == -1
+        elsif attributes.has_key? 'tags'
+          tags = attributes['tags'].split(';').uniq
         end
       end
       # FIXME this borks line numbers
       include_file = @document.normalize_asset_path(target, 'include file')
-      if lines.nil?
-        @lines.unshift(*File.readlines(include_file).map {|l| "#{l.rstrip}\n"})
-      elsif !lines.empty?
-        selected = []
-        f = File.new(include_file)
-        f.each_line {|l|
-          take = lines.first
-          if take.is_a?(Float) && take.infinite?
-            selected.push("#{l.rstrip}\n")
-          else
-            if f.lineno == take
+      if !lines.nil?
+        if !lines.empty?
+          selected = []
+          f = File.new(include_file)
+          f.each_line do |l|
+            take = lines.first
+            if take.is_a?(Float) && take.infinite?
               selected.push("#{l.rstrip}\n")
-              lines.shift 
+            else
+              if f.lineno == take
+                selected.push("#{l.rstrip}\n")
+                lines.shift 
+              end
+              break if lines.empty?
             end
-            break if lines.empty?
           end
-        }
-        @lines.unshift(*selected) unless selected.empty?
+          @lines.unshift(*selected) unless selected.empty?
+        end
+      elsif !tags.nil?
+        if !tags.empty?
+          selected = []
+          active_tag = nil
+          f = File.new(include_file)
+          f.each_line do |l|
+            if !active_tag.nil?
+              if l.include?("end::#{active_tag}[]")
+                active_tag = nil
+              else
+                selected.push("#{l.rstrip}\n")
+              end
+            else
+              tags.each do |tag|
+                if l.include?("tag::#{tag}[]")
+                  active_tag = tag
+                  break
+                end
+              end
+            end
+          end
+          @lines.unshift(*selected) unless selected.empty?
+        end
+      else
+        @lines.unshift(*File.readlines(include_file).map {|l| "#{l.rstrip}\n"})
       end
       true
     else

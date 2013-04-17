@@ -6,3 +6,17 @@ fifth line of included content
 sixth line of included content
 seventh line of included content
 eighth line of included content
+
+// tag::snippetA[]
+snippetA content
+// end::snippetA[]
+
+non-tagged content
+
+// tag::snippetB[]
+snippetB content
+// end::snippetB[]
+
+more non-tagged content
+
+last line of included content
