@@ -581,6 +581,58 @@ class Document < AbstractBlock
     @blocks.map {|b| b.render }.join
   end
 
+  # Public: Read the docinfo file(s) for inclusion in the
+  # document template
+  #
+  # If the docinfo1 attribute is set, read the docinfo.ext file. If the docinfo
+  # attribute is set, read the doc-name.docinfo.ext file. If the docinfo2
+  # attribute is set, read both files in that order.
+  #
+  # ext - The extension of the docinfo file(s). If not set, the extension
+  #       will be determined based on the basebackend. (default: nil)
+  #
+  # returns The contents of the docinfo file(s)
+  def docinfo(ext = nil)
+    if safe >= SafeMode::SECURE
+      ''
+    else
+      if ext.nil?
+        case @attributes['basebackend']
+        when 'docbook'
+          ext = '.xml'
+        when 'html'
+          ext = '.html'
+        end
+      end
+
+      content = nil
+
+      docinfo = @attributes.has_key?('docinfo')
+      docinfo1 = @attributes.has_key?('docinfo1')
+      docinfo2 = @attributes.has_key?('docinfo2')
+      docinfo_filename = "docinfo#{ext}"
+      if docinfo1 || docinfo2
+        docinfo_path = normalize_asset_path(docinfo_filename, 'shared docinfo file')
+        if File.exist?(docinfo_path)
+          content = File.read(docinfo_path)
+        end
+      end
+
+      if (docinfo || docinfo2) && @attributes.has_key?('docname')
+        docinfo_path = normalize_asset_path("#{@attributes['docname']}-#{docinfo_filename}", 'document-specific docinfo file')
+        if File.exist?(docinfo_path)
+          if content.nil?
+            content = File.read(docinfo_path)
+          else
+            content = [content, File.read(docinfo_path)] * "\n"
+          end
+        end
+      end
+
+      content.nil? ? '' : content
+    end
+  end
+
   def to_s
     %[#{super.to_s} - #{doctitle}]  
   end
