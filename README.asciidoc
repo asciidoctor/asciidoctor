@@ -56,9 +56,14 @@ To install the gem:
 
  gem install asciidoctor
 
-Or if you prefer bundler:
+Or if you prefer bundler, add the asciidoctor gem to your Gemfile,
 
- bundle install asciidoctor
+ source 'https://rubygems.org'
+ gem 'asciidoctor'
+
+then install it using bundler:
+
+ bundle install
 
 If you're running Fedora, you can install the gem using yum:
 
@@ -245,7 +250,10 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
   cells with AsciiDoc content
 
 * AsciiDoc doesn't carry over the doctype attribute passed from the
-  commandline when rendering AsciiDoc content cells, whereas Asciidoctor does
+  commandline when rendering AsciiDoc table cells, whereas Asciidoctor does
+
+* Asciidoctor does not require commas between attributes with quoted
+  values in a block attribute list
 
 * Asciidoctor strips the file extension from the target image when
   generating alt text if no alt text is provided
