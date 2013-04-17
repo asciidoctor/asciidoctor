@@ -644,10 +644,10 @@ class InlineAnchorTemplate < BaseTemplate
       %(<a href="##{target}">#{text}</a>)
     when :ref
       %(<a id="#{target}"></a>)
-    when :bibref
-      %(<a id="#{target}"></a>[#{target}])
     when :link
       %(<a href="#{target}"#{window && " target=\"#{window}\""}>#{text}</a>)
+    when :bibref
+      %(<a id="#{target}"></a>[#{target}])
     end
   end
 
