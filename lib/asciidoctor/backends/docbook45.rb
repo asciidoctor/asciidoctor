@@ -61,6 +61,8 @@ class DocumentTemplate < BaseTemplate
       </revision>
     </revhistory>
     <% end %>
+<%= docinfo %>
+    #{tag 'orgname', :orgname}
     <% end %>
     EOF
   end

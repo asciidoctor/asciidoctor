@@ -100,6 +100,11 @@ Gem::Specification.new do |s|
     test/fixtures/asciidoc.txt
     test/fixtures/asciidoc_index.txt
     test/fixtures/ascshort.txt
+    test/fixtures/basic.asciidoc
+    test/fixtures/basic-docinfo.html
+    test/fixtures/basic-docinfo.xml
+    test/fixtures/docinfo.html
+    test/fixtures/docinfo.xml
     test/fixtures/dot.gif
     test/fixtures/encoding.asciidoc
     test/fixtures/include-file.asciidoc
