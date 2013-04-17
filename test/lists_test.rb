@@ -2055,20 +2055,46 @@ second term:: definition
       assert_xpath '((//tr)[2]/td)[2]/p[normalize-space(text())="definition"]', output, 1
     end
 
-    test 'should render qanda list with proper semantics' do
+    test 'should render qanda list in HTML with proper semantics' do
       input = <<-EOS
 [qanda]
-Question one::
-        Answer one.
-Question two::
-        Answer two.
+Question 1::
+        Answer 1.
+Question 2::
+        Answer 2.
       EOS
       output = render_embedded_string input
       assert_css '.qlist.qanda', output, 1
-      assert_css '.qlist ol', output, 1
-      assert_css '.qlist ol li', output, 2
-      assert_css '.qlist ol li:nth-child(1) p em', output, 1
-      assert_css '.qlist ol li:nth-child(1) p', output, 2
+      assert_css '.qanda > ol', output, 1
+      assert_css '.qanda > ol > li', output, 2
+      (1..2).each do |idx|
+        assert_css ".qanda > ol > li:nth-child(#{idx}) > p", output, 2
+        assert_css ".qanda > ol > li:nth-child(#{idx}) > p:first-child > em", output, 1
+        assert_xpath "/*[@class = 'qlist qanda']/ol/li[#{idx}]/p[1]/em[normalize-space(text()) = 'Question #{idx}']", output, 1
+        assert_css ".qanda > ol > li:nth-child(#{idx}) > p:last-child > *", output, 0
+        assert_xpath "/*[@class = 'qlist qanda']/ol/li[#{idx}]/p[2][normalize-space(text()) = 'Answer #{idx}.']", output, 1
+      end
+    end
+
+    test 'should render qanda list in DocBook with proper semantics' do
+      input = <<-EOS
+[qanda]
+Question 1::
+        Answer 1.
+Question 2::
+        Answer 2.
+      EOS
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_css 'qandaset', output, 1
+      assert_css 'qandaset > qandaentry', output, 2
+      (1..2).each do |idx|
+        assert_css "qandaset > qandaentry:nth-child(#{idx}) > question", output, 1
+        assert_css "qandaset > qandaentry:nth-child(#{idx}) > question > simpara", output, 1
+        assert_xpath "/qandaset/qandaentry[#{idx}]/question/simpara[normalize-space(text()) = 'Question #{idx}']", output, 1
+        assert_css "qandaset > qandaentry:nth-child(#{idx}) > answer", output, 1
+        assert_css "qandaset > qandaentry:nth-child(#{idx}) > answer > simpara", output, 1
+        assert_xpath "/qandaset/qandaentry[#{idx}]/answer/simpara[normalize-space(text()) = 'Answer #{idx}.']", output, 1
+      end
     end
 
     test 'should render bibliography list with proper semantics' do
