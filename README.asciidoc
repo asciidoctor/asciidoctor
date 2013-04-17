@@ -305,11 +305,18 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Asciidoctor allows the document id to be set using [[id]] above the
   document header (adds id attribute to +<body>+ tag)
 
+* Asciidoctor allows the author and revision attributes to be referenced
+  in subsequent attribute entries in header (unlike AsciiDoc)
+
 * Assigning value to the +listing-caption+ attribute will enable
   automatic captions for listings (like examples, tables and figures)
 
 * The +ifeval::[]+ macro is constrained for the strict purpose of
   comparing values of attributes
+
+* The +include::[]+ macro is converted to a link to the target document
+  when SafeMode is SECURE or greater (this makes for a friendly
+  experience on GitHub)
 
 If there's a difference you don't see in this list, check the {issues}[issue
 tracker] to see if it's an outstanding feature, or file an issue to report the

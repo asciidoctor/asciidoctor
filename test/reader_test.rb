@@ -153,13 +153,14 @@ This is a paragraph outside the block.
   end
 
   context 'Include Macro' do
-    test 'include macro is disabled by default' do
+    test 'include macro is disabled by default and becomes a link' do
       input = <<-EOS
 include::include-file.asciidoc[]
       EOS
       para = block_from_string input, :attributes => { 'include-depth' => 0 }
       assert_equal 1, para.buffer.size
-      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+      #assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+      assert_equal 'link:include-file.asciidoc[include-file.asciidoc]', para.buffer.join
     end
 
     test 'include macro is enabled when safe mode is less than SECURE' do
