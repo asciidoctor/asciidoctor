@@ -60,6 +60,13 @@ Or if you prefer bundler:
 
  bundle install asciidoctor
 
+If you're running Fedora, you can install the gem using yum:
+
+ sudo yum install rubygem-asciidoctor
+
+The benefit of installing the gem via yum is that yum will also install
+Ruby if it's not already on your machine.
+
 == Usage
 
 Asciidoctor has both a command line interface (CLI) and an API. The CLI
