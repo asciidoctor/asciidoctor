@@ -363,6 +363,31 @@ more info...
       assert_xpath '//*[@id="header"]/span[@id="revremark"][text() = "See changelog."]', output, 1
     end
 
+    test 'with metadata to DocBook' do
+      input = <<-EOS
+= AsciiDoc
+Stuart Rackham <founder@asciidoc.org>
+v8.6.8, 2012-07-12: See changelog.
+
+== Version 8.6.8
+
+more info...
+      EOS
+      output = render_string input, :backend => 'docbook'
+      assert_xpath '/article/articleinfo', output, 1
+      assert_xpath '/article/articleinfo/title[text() = "AsciiDoc"]', output, 1
+      assert_xpath '/article/articleinfo/date[text() = "2012-07-12"]', output, 1
+      assert_xpath '/article/articleinfo/author/firstname[text() = "Stuart"]', output, 1
+      assert_xpath '/article/articleinfo/author/surname[text() = "Rackham"]', output, 1
+      assert_xpath '/article/articleinfo/author/email[text() = "founder@asciidoc.org"]', output, 1
+      assert_xpath '/article/articleinfo/revhistory', output, 1
+      assert_xpath '/article/articleinfo/revhistory/revision', output, 1
+      assert_xpath '/article/articleinfo/revhistory/revision/revnumber[text() = "8.6.8"]', output, 1
+      assert_xpath '/article/articleinfo/revhistory/revision/date[text() = "2012-07-12"]', output, 1
+      assert_xpath '/article/articleinfo/revhistory/revision/authorinitials[text() = "SR"]', output, 1
+      assert_xpath '/article/articleinfo/revhistory/revision/revremark[text() = "See changelog."]', output, 1
+    end
+
     test 'with header footer' do
       result = render_string("= Title\n\npreamble")
       assert_xpath '/html', result, 1
