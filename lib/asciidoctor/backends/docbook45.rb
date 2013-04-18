@@ -31,10 +31,20 @@ module Asciidoctor
 
 module DocBook45
 class DocumentTemplate < BaseTemplate
+  def title_tags(str)
+    if str.include?(': ')
+      title, _, subtitle = str.rpartition(': ')
+      %(<title>#{title}</title>
+    <subtitle>#{subtitle}</subtitle>)
+    else
+      %(<title>#{str}</title>)
+    end
+  end
+
   def docinfo
     <<-EOF
     <% if has_header? && !notitle %>
-    #{tag 'title', '@header.title'}
+    <%= template.title_tags(@header.title) %>
     <% end %>
     <% if attr? :revdate %>
     <date><%= attr :revdate %></date>
@@ -103,7 +113,7 @@ class BlockPreambleTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><% if @document.doctype == 'book' %>
 <preface#{common_attrs_erb}>
-  <title><%= title %></title>
+  #{title_tag false}
 <%= content %>
 </preface>
 <% else %>
