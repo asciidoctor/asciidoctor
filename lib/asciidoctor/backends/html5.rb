@@ -121,8 +121,7 @@ pre code { background-color: #F8F8F8; padding: 0; }
     <div id="content">
 <%= content %>
     </div>
-    <% if footnotes? %>
-    <div id="footnotes">
+    <% unless !footnotes? || attr?(:nofootnotes) %><div id="footnotes">
       <hr>
       <% footnotes.each do |fn| %>
       <div class="footnote" id="_footnote_<%= fn.index %>">
@@ -148,6 +147,14 @@ class EmbeddedTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><% unless notitle || !has_header? %><h1#{id}><%= header.title %></h1>
 <% end %><%= content %>
+<% unless !footnotes? || attr?(:nofootnotes) %><div id="footnotes">
+  <hr>
+  <% footnotes.each do |fn| %>
+  <div class="footnote" id="_footnote_<%= fn.index %>">
+    <a href="#_footnoteref_<%= fn.index %>"><%= fn.index %></a>. <%= fn.text %>
+  </div>
+  <% end %>
+</div><% end %>
     EOS
   end
 end
