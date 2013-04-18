@@ -465,6 +465,22 @@ more info...
       assert_xpath '/article/articleinfo/revhistory/revision/revremark[text() = "See changelog."]', output, 1
     end
 
+    test 'should create authorgroup in DocBook when multiple authors' do
+      input = <<-EOS
+= Document Title
+Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
+
+content
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_xpath '//articleinfo/author', output, 0
+      assert_xpath '//articleinfo/authorgroup', output, 1
+      assert_xpath '//articleinfo/authorgroup/author', output, 2
+      assert_xpath '//articleinfo/authorgroup/author[1]/firstname[text() = "Doc"]', output, 1
+      assert_xpath '//articleinfo/authorgroup/author[2]/firstname[text() = "Junior"]', output, 1
+    end
+
     test 'with header footer' do
       result = render_string("= Title\n\npreamble")
       assert_xpath '/html', result, 1

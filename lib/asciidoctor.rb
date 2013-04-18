@@ -215,7 +215,7 @@ module Asciidoctor
 
     # The author info line the appears immediately following the document title
     # John Doe <john@anonymous.com>
-    :author_info      => /^\s*(\w[\w\-'.]*)(?: +(\w[\w\-'.]*))?(?: +(\w[\w\-'.]*))?(?: +<([^>]+)>)?$/,
+    :author_info      => /^(\w[\w\-'.]*)(?: +(\w[\w\-'.]*))?(?: +(\w[\w\-'.]*))?(?: +<([^>]+)>)?$/,
 
     # [[[Foo]]] (anywhere inline)
     :biblio_macro     => /\\?\[\[\[([\w:][\w:.-]*?)\]\]\]/,
@@ -242,6 +242,11 @@ module Asciidoctor
     # one, two
     # one , two
     :csv_delimiter    => /[[:space:]]*,[[:space:]]*/,
+
+    # one;two
+    # one; two
+    # one ; two
+    :semicolon_delim  => /[[:space:]]*;[[:space:]]*/,
 
     # 29
     :digits           => /^\d+$/,
