@@ -111,7 +111,7 @@ pre code { background-color: #F8F8F8; padding: 0; }
       <% if attr? :revremark %><br><span id="revremark"><%= attr :revremark %></span><% end %>
       <% end %>
       <% if attr? :toc %>
-      <div id="toc">
+      <div id="toc" class="<%= attr 'toc-class', 'toc' %>">
         <div id="toctitle"><%= attr 'toc-title' %></div>
 <%= template.class.outline(self, (attr :toclevels, 2).to_i) %>
       </div>

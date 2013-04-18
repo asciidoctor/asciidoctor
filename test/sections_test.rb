@@ -801,7 +801,7 @@ While they were waiting...
 That's all she wrote!
       EOS
       output = render_string input
-      assert_xpath '//*[@id="toc"]', output, 1
+      assert_xpath '//*[@id="toc"][@class="toc"]', output, 1
       assert_xpath '//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="toc"]/ol', output, 1
       assert_xpath '//*[@id="toc"]//ol', output, 2
@@ -809,6 +809,25 @@ That's all she wrote!
       assert_xpath '//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
       assert_xpath '//*[@id="toc"]/ol/li/ol/li', output, 1
       assert_xpath '//*[@id="toc"]/ol/li/ol/li/a[@href="#_interlude"][text()="2.1. Interlude"]', output, 1
+    end
+
+    test 'should render table of contents if toc2 attribute is set' do
+      input = <<-EOS
+= Article
+:toc2:
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@id="toc"][@class="toc2"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
     end
   end
 
