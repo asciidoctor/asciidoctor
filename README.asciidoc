@@ -318,11 +318,15 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Asciidoctor properly calculates author initials if attribute reference
   is used in name
 
-* Asciidoctor allows the document id to be set using [[id]] above the
-  document header (adds id attribute to +<body>+ tag)
-
 * Asciidoctor allows the author and revision attributes to be referenced
   in subsequent attribute entries in header (unlike AsciiDoc)
+
+* Asciidoctor allows multiple authors to be defined, separated by
+  semicolon. In DocBook backend, the authors are listed in an
+  +<authorgroup>+ element.
+
+* Asciidoctor allows the document id to be set using [[id]] above the
+  document header (adds id attribute to +<body>+ tag)
 
 * Assigning value to the +listing-caption+ attribute will enable
   automatic captions for listings (like examples, tables and figures)
