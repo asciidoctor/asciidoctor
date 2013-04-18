@@ -396,6 +396,12 @@ class Document < AbstractBlock
     if @id.nil? && @attributes.has_key?('css-signature')
       @id = @attributes['css-signature']
     end
+
+    if @attributes.has_key? 'toc2'
+      @attributes['toc'] = ''
+      @attributes['toc-class'] ||= 'toc2'
+    end
+
     @original_attributes = @attributes.dup
   end
 
