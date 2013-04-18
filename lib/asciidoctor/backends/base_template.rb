@@ -48,7 +48,8 @@ class BaseTemplate
       result = tmpl.result(node.get_binding(self))
     end
 
-    if (@view == 'document' || @view == 'embedded') && node.renderer.compact
+    if (@view == 'document' || @view == 'embedded') &&
+        node.renderer.compact && !node.document.nested?
       compact result
     else
       result
