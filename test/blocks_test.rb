@@ -367,6 +367,23 @@ EOS
       }
     end
 
+    test 'should not compact nested document twice' do
+      input = <<-EOS
+|===
+a|....
+line one
+
+line two
+
+line three
+....
+|===
+      EOS
+
+      output = render_string input, :compact => true
+      assert_xpath %(//pre[text() = "line one\n\nline two\n\nline three"]), output, 1
+    end
+
     test 'should process block with CRLF endlines' do
       input = <<-EOS
 [source]\r
