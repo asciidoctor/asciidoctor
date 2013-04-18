@@ -321,6 +321,115 @@ not in section
     end
   end
 
+  context 'Level offset' do
+    test 'should print error if standalone document is included without level offset' do
+      input = <<-EOS
+= Master Document
+Doc Writer
+
+text in master
+
+// begin simulated include::[]
+= Standalone Document
+:author: Junior Writer
+
+text in standalone
+
+// end simulated include::[]
+      EOS
+
+      output = nil
+      errors = nil
+      redirect_streams do |stdout, stderr|
+        output = render_string input
+        errors = stdout.string
+      end
+
+      assert !errors.empty?
+      assert_match(/section title out of sequence/, errors)
+    end
+
+    test 'should add level offset to section level' do
+      input = <<-EOS
+= Master Document
+Doc Writer
+
+Master document written by {author}.
+
+:leveloffset: 1
+
+// begin simulated include::[]
+= Standalone Document
+:author: Junior Writer
+
+Standalone document written by {author}.
+
+== Section in Standalone
+
+Standalone section text.
+// end simulated include::[]
+
+:leveloffset!:
+
+== Section in Master
+
+Master section text.
+      EOS
+
+      output = nil
+      errors = nil
+      redirect_streams do |stdout, stderr|
+        output = render_string input
+        errors = stdout.string
+      end
+
+      assert errors.empty?
+      assert_match(/Master document written by Doc Writer/, output) 
+      assert_match(/Standalone document written by Junior Writer/, output) 
+      assert_xpath '//*[@class="sect1"]/h2[text() = "Standalone Document"]', output, 1
+      assert_xpath '//*[@class="sect2"]/h3[text() = "Section in Standalone"]', output, 1
+      assert_xpath '//*[@class="sect1"]/h2[text() = "Section in Master"]', output, 1
+    end
+
+    test 'level offset should be added to floating title' do
+      input = <<-EOS
+= Master Document
+Doc Writer
+
+:leveloffset: 1
+
+[float]
+= Floating Title
+      EOS
+
+      output = render_string input
+      assert_xpath '//h2[@class="float"][text() = "Floating Title"]', output, 1
+    end
+
+    test 'should be able to reset level offset' do
+      input = <<-EOS
+= Master Document
+Doc Writer
+
+Master preamble.
+
+:leveloffset: 1
+
+= Standalone Document
+
+Standalone preamble.
+
+:leveloffset!:
+
+== Level 1 Section
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class = "sect1"]/h2[text() = "Standalone Document"]', output, 1
+      assert_xpath '//*[@class = "sect1"]/h2[text() = "Level 1 Section"]', output, 1
+    end
+  end
+
   context 'Section Numbering' do
     test 'should create section number with one entry for level 1' do
       sect1 = Asciidoctor::Section.new(nil)
