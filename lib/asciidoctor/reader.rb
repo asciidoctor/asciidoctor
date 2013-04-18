@@ -343,7 +343,7 @@ class Reader
       return preprocess_next_line.nil? ? nil : true
     end
 
-    skip = nil
+    skip = false
     if !@skipping
       case directive
       when 'ifdef'
@@ -384,17 +384,19 @@ class Reader
 
         skip = !lhs.send(op.to_sym, rhs)
       end
-      @skipping = skip
     end
     advance
     # single line conditional inclusion
     if directive != 'ifeval' && !text.nil?
-      if !@skipping
+      if !@skipping && !skip
         unshift_line "#{text.rstrip}\n"
         return true
       end
     # conditional inclusion block
     else
+      if !@skipping && skip
+        @skipping = true
+      end
       @conditionals_stack << {:target => target, :skip => skip, :skipping => @skipping}
     end
     return preprocess_next_line.nil? ? nil : true
