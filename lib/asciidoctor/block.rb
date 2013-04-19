@@ -94,7 +94,6 @@ class Block < AbstractBlock
   #   block.content
   #   => ["<em>This</em> is what happens when you &lt;meet&gt; a stranger in the &lt;alps&gt;!"]
   def content
-
     case @context
     when :preamble, :open, :example, :sidebar
       @blocks.map {|b| b.render }.join
@@ -108,12 +107,12 @@ class Block < AbstractBlock
       apply_passthrough_subs(@buffer)
     when :quote, :verse, :admonition
       if !@buffer.nil?
-        apply_normal_subs(@buffer)
+        apply_para_subs(@buffer)
       else
         @blocks.map {|b| b.render }.join
       end
     else
-      apply_normal_subs(@buffer)
+      apply_para_subs(@buffer)
     end
   end
 

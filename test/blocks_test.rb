@@ -399,6 +399,19 @@ source line 2\r
       assert_xpath '/*[@class="listingblock"]//pre/code', output, 1
       assert_xpath %(/*[@class="listingblock"]//pre/code[text()="source line 1\nsource line 2"]), output, 1
     end
+
+    test 'literal block should honor explicit subs list' do
+      input = <<-EOS
+[subs="verbatim,quotes"]
+----
+Map<String, String> *attributes*; //<1>
+----
+      EOS
+
+      output = render_embedded_string input
+      assert output.include?('Map&lt;String, String&gt; <strong>attributes</strong>;')
+      assert output.include?('1')
+    end
   end
 
   context "Open Blocks" do
@@ -516,6 +529,32 @@ paragraph
       EOS
       output = render_string input
       assert_xpath '//*[@class="sect1"]//*[@class="paragraph"]/*[@class="title"][text() = "Block title"]', output, 1
+    end
+
+    test 'empty attribute list should not appear in output' do
+      input = <<-EOS
+[]
+--
+Block content
+--
+      EOS
+
+      output = render_embedded_string input
+      assert output.include?('Block content')
+      assert !output.include?('[]')
+    end
+
+    test 'empty block anchor should not appear in output' do
+      input = <<-EOS
+[[]]
+--
+Block content
+--
+      EOS
+
+      output = render_embedded_string input
+      assert output.include?('Block content')
+      assert !output.include?('[[]]')
     end
   end
 
