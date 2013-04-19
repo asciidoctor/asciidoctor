@@ -457,7 +457,9 @@ module Asciidoctor
     # http://domain
     # https://domain
     # data:info
-    :uri_sniff        => /^[[:alpha:]][[:alnum:].+-]*:/i
+    :uri_sniff        => /^[[:alpha:]][[:alnum:].+-]*:/i,
+
+    :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/
   }
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
