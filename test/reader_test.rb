@@ -387,6 +387,22 @@ There was much rejoicing.
       assert_equal "On our quest we go...\nThere is a holy grail!\nThere was much rejoicing.", lines.join.strip
     end
 
+    test 'ifndef with defined attribute does not include text in brackets' do
+      input = <<-EOS
+On our quest we go...
+ifndef::hardships[There is a holy grail!]
+There was no rejoicing.
+      EOS
+       
+      doc = Asciidoctor::Document.new [], :attributes => {'hardships' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      assert_equal "On our quest we go...\nThere was no rejoicing.", lines.join.strip
+    end
+
     test 'include with non-matching nested exclude' do
       input = <<-EOS
 ifdef::grail[]
