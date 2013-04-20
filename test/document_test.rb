@@ -530,6 +530,24 @@ finally a reference to the second footnote footnoteref:[note2].
       text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnote_2"]/text()', output, 1
       assert_equal '. Second footnote.', text.text.strip
     end
+
+    test 'renders footnotes block in embedded document by default' do
+      input = <<-EOS
+Text that has supporting information{empty}footnote:[An example footnote.].
+      EOS
+
+      output = render_string input, :header_footer => false
+      assert_css '#footnotes', output, 1
+    end
+
+    test 'does not render footnotes block in embedded document if nofootnotes attribute is set' do
+      input = <<-EOS
+Text that has supporting information{empty}footnote:[An example footnote.].
+      EOS
+
+      output = render_string input, :header_footer => false, :attributes => {'nofootnotes' => ''}
+      assert_css '#footnotes', output, 0
+    end
   end
 
   context 'Backends and Doctypes' do 
