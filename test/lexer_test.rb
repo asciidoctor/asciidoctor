@@ -184,16 +184,19 @@ context "Lexer" do
 
   test "parse author first" do
     metadata, = parse_header_metadata 'Stuart'
-    assert_equal 3, metadata.size
-    assert_equal 'Stuart', metadata['author']
+    assert_equal 5, metadata.size
+    assert_equal 1, metadata['authorcount']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Stuart', metadata['firstname']
     assert_equal 'S', metadata['authorinitials']
   end
 
   test "parse author first last" do
     metadata, = parse_header_metadata 'Yukihiro Matsumoto'
-    assert_equal 4, metadata.size
+    assert_equal 6, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Yukihiro Matsumoto', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Yukihiro', metadata['firstname']
     assert_equal 'Matsumoto', metadata['lastname']
     assert_equal 'YM', metadata['authorinitials']
@@ -201,8 +204,10 @@ context "Lexer" do
 
   test "parse author first middle last" do
     metadata, = parse_header_metadata 'David Heinemeier Hansson'
-    assert_equal 5, metadata.size
+    assert_equal 7, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'David Heinemeier Hansson', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'David', metadata['firstname']
     assert_equal 'Heinemeier', metadata['middlename']
     assert_equal 'Hansson', metadata['lastname']
@@ -211,8 +216,10 @@ context "Lexer" do
 
   test "parse author first middle last email" do
     metadata, = parse_header_metadata 'David Heinemeier Hansson <rails@ruby-lang.org>'
-    assert_equal 6, metadata.size
+    assert_equal 8, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'David Heinemeier Hansson', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'David', metadata['firstname']
     assert_equal 'Heinemeier', metadata['middlename']
     assert_equal 'Hansson', metadata['lastname']
@@ -222,8 +229,10 @@ context "Lexer" do
 
   test "parse author first email" do
     metadata, = parse_header_metadata 'Stuart <founder@asciidoc.org>'
-    assert_equal 4, metadata.size
+    assert_equal 6, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Stuart', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Stuart', metadata['firstname']
     assert_equal 'founder@asciidoc.org', metadata['email']
     assert_equal 'S', metadata['authorinitials']
@@ -231,8 +240,10 @@ context "Lexer" do
 
   test "parse author first last email" do
     metadata, = parse_header_metadata 'Stuart Rackham <founder@asciidoc.org>'
-    assert_equal 5, metadata.size
+    assert_equal 7, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Stuart Rackham', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Stuart', metadata['firstname']
     assert_equal 'Rackham', metadata['lastname']
     assert_equal 'founder@asciidoc.org', metadata['email']
@@ -241,8 +252,10 @@ context "Lexer" do
 
   test "parse author with hyphen" do
     metadata, = parse_header_metadata 'Tim Berners-Lee <founder@www.org>'
-    assert_equal 5, metadata.size
+    assert_equal 7, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Tim Berners-Lee', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Tim', metadata['firstname']
     assert_equal 'Berners-Lee', metadata['lastname']
     assert_equal 'founder@www.org', metadata['email']
@@ -251,8 +264,10 @@ context "Lexer" do
 
   test "parse author with single quote" do
     metadata, = parse_header_metadata 'Stephen O\'Grady <founder@redmonk.com>'
-    assert_equal 5, metadata.size
+    assert_equal 7, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Stephen O\'Grady', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Stephen', metadata['firstname']
     assert_equal 'O\'Grady', metadata['lastname']
     assert_equal 'founder@redmonk.com', metadata['email']
@@ -261,8 +276,10 @@ context "Lexer" do
 
   test "parse author with dotted initial" do
     metadata, = parse_header_metadata 'Heiko W. Rupp <hwr@example.de>'
-    assert_equal 6, metadata.size
+    assert_equal 8, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Heiko W. Rupp', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Heiko', metadata['firstname']
     assert_equal 'W.', metadata['middlename']
     assert_equal 'Rupp', metadata['lastname']
@@ -272,8 +289,10 @@ context "Lexer" do
 
   test "parse author with underscore" do
     metadata, = parse_header_metadata 'Tim_E Fella'
-    assert_equal 4, metadata.size
+    assert_equal 6, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Tim E Fella', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Tim E', metadata['firstname']
     assert_equal 'Fella', metadata['lastname']
     assert_equal 'TF', metadata['authorinitials']
@@ -281,8 +300,10 @@ context "Lexer" do
 
   test "parse author condenses whitespace" do
     metadata, = parse_header_metadata '   Stuart       Rackham     <founder@asciidoc.org>'
-    assert_equal 5, metadata.size
+    assert_equal 7, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Stuart Rackham', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Stuart', metadata['firstname']
     assert_equal 'Rackham', metadata['lastname']
     assert_equal 'founder@asciidoc.org', metadata['email']
@@ -291,15 +312,26 @@ context "Lexer" do
 
   test "parse invalid author line becomes author" do
     metadata, = parse_header_metadata '   Stuart       Rackham, founder of AsciiDoc   <founder@asciidoc.org>'
-    assert_equal 3, metadata.size
+    assert_equal 5, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Stuart Rackham, founder of AsciiDoc <founder@asciidoc.org>', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
     assert_equal 'Stuart Rackham, founder of AsciiDoc <founder@asciidoc.org>', metadata['firstname']
     assert_equal 'S', metadata['authorinitials']
   end
 
+  test 'parse multiple authors' do
+    metadata, = parse_header_metadata 'Doc Writer <doc.writer@asciidoc.org>; John Smith <john.smith@asciidoc.org>'
+    assert_equal 2, metadata['authorcount']
+    assert_equal 'Doc Writer, John Smith', metadata['authors']
+    assert_equal 'Doc Writer', metadata['author']
+    assert_equal 'Doc Writer', metadata['author_1']
+    assert_equal 'John Smith', metadata['author_2']
+  end
+
   test "parse rev number date remark" do
     metadata, = parse_header_metadata "Ryan Waldron\nv0.0.7, 2013-12-18: The first release you can stand on"
-    assert_equal 7, metadata.size
+    assert_equal 9, metadata.size
     assert_equal '0.0.7', metadata['revnumber']
     assert_equal '2013-12-18', metadata['revdate']
     assert_equal 'The first release you can stand on', metadata['revremark']
@@ -307,20 +339,20 @@ context "Lexer" do
 
   test "parse rev date" do
     metadata, = parse_header_metadata "Ryan Waldron\n2013-12-18"
-    assert_equal 5, metadata.size
+    assert_equal 7, metadata.size
     assert_equal '2013-12-18', metadata['revdate']
   end
 
   # while compliant w/ AsciiDoc, this is just sloppy parsing
   test "treats arbitrary text on rev line as revdate" do
     metadata, = parse_header_metadata "Ryan Waldron\nfoobar\n"
-    assert_equal 5, metadata.size
+    assert_equal 7, metadata.size
     assert_equal 'foobar', metadata['revdate']
   end
 
   test "parse rev date remark" do
     metadata, = parse_header_metadata "Ryan Waldron\n2013-12-18:  The first release you can stand on"
-    assert_equal 6, metadata.size
+    assert_equal 8, metadata.size
     assert_equal '2013-12-18', metadata['revdate']
     assert_equal 'The first release you can stand on', metadata['revremark']
   end
@@ -339,7 +371,8 @@ context "Lexer" do
 
   test "skip line comments before author" do
     metadata, = parse_header_metadata "// Asciidoctor\n// release artist\nRyan Waldron"
-    assert_equal 4, metadata.size
+    assert_equal 6, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']
     assert_equal 'Ryan', metadata['firstname']
     assert_equal 'Waldron', metadata['lastname']
@@ -348,7 +381,8 @@ context "Lexer" do
 
   test "skip block comment before author" do
     metadata, = parse_header_metadata "////\nAsciidoctor\nrelease artist\n////\nRyan Waldron"
-    assert_equal 4, metadata.size
+    assert_equal 6, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']
     assert_equal 'Ryan', metadata['firstname']
     assert_equal 'Waldron', metadata['lastname']
@@ -357,7 +391,8 @@ context "Lexer" do
 
   test "skip block comment before rev" do
     metadata, = parse_header_metadata "Ryan Waldron\n////\nAsciidoctor\nrelease info\n////\nv0.0.7, 2013-12-18"
-    assert_equal 6, metadata.size
+    assert_equal 8, metadata.size
+    assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']
     assert_equal '0.0.7', metadata['revnumber']
     assert_equal '2013-12-18', metadata['revdate']
