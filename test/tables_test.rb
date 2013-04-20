@@ -43,6 +43,21 @@ context 'Tables' do
       assert_xpath '/table/caption/following-sibling::colgroup', output, 1
     end
 
+    test 'renders explicit caption on simple psv table' do
+      input = <<-EOS
+[caption="All the Data. "]
+.Simple psv table
+|=======
+|A |B |C
+|a |b |c
+|1 |2 |3
+|=======
+      EOS
+      output = render_embedded_string input
+      assert_xpath '/table/caption[@class="title"][text()="All the Data. Simple psv table"]', output, 1
+      assert_xpath '/table/caption/following-sibling::colgroup', output, 1
+    end
+
     test 'ignores escaped separators' do
       input = <<-EOS
 |===

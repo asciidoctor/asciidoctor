@@ -255,8 +255,8 @@ context 'Substitutions' do
     end
 
     test 'multi-line superscript chars' do
-      para = block_from_string(%Q{x^(n\n+\n1)^})
-      assert_equal "x<sup>(n\n+\n1)</sup>", para.sub_quotes(para.buffer.join)
+      para = block_from_string(%Q{x^(n\n-\n1)^})
+      assert_equal "x<sup>(n\n-\n1)</sup>", para.sub_quotes(para.buffer.join)
     end
 
     test 'single-line subscript chars' do

@@ -94,6 +94,27 @@ class AbstractNode
     end
   end
 
+  # Public: Assign the value to the specified key in this
+  # block's attributes hash.
+  #
+  # key - The attribute key (or name)
+  # val - The value to assign to the key
+  #
+  # returns a flag indicating whether the assignment was performed
+  def set_attr(key, val, overwrite = nil)
+    if overwrite.nil?
+      @attributes[key] = val
+      true
+    else
+      if overwrite || @attributes.has_key?(key)
+        @attributes[key] = val
+        true
+      else
+        false
+      end
+    end
+  end
+
   # Public: Get the execution context of this object (via Kernel#binding).
   #
   # This method is used to set the 'self' reference as well as local variables
