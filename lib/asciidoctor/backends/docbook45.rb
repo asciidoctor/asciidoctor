@@ -1,11 +1,12 @@
 module Asciidoctor
   class BaseTemplate
-    def tag(name, key)
+    def tag(name, key, dynamic = false)
       type = key.is_a?(Symbol) ? :attr : :var
       key = key.to_s
       if type == :attr
+        key_str = dynamic ? %("#{key}") : "'#{key}'"
         # example: <% if attr? 'foo' %><bar><%= attr 'foo' %></bar><% end %>
-        %(<% if attr? '#{key}' %><#{name}><%= attr '#{key}' %></#{name}><% end %>)
+        %(<% if attr? #{key_str} %><#{name}><%= attr #{key_str} %></#{name}><% end %>)
       else
         # example: <% unless foo.to_s.empty? %><bar><%= foo %></bar><% end %>
         %(<% unless #{key}.to_s.empty? %><#{name}><%= #{key} %></#{name}><% end %>)
@@ -53,6 +54,7 @@ class DocumentTemplate < BaseTemplate
     <% end %>
     <% if has_header? %>
     <% if attr? :author %>
+    <% if attr? :authorcount, 1 %>
     <author>
       #{tag 'firstname', :firstname}
       #{tag 'othername', :middlename}
@@ -60,6 +62,18 @@ class DocumentTemplate < BaseTemplate
       #{tag 'email', :email}
     </author>
     #{tag 'authorinitials', :authorinitials}
+    <% else %>
+    <authorgroup>
+    <% (1..(attr(:authorcount))).each do |idx| %>
+      <author> 
+        #{tag 'firstname', :"firstname_\#{idx}", true}
+        #{tag 'othername', :"middlename_\#{idx}", true}
+        #{tag 'surname', :"lastname_\#{idx}", true}
+        #{tag 'email', :"email_\#{idx}", true}
+      </author> 
+    <% end %>
+    </authorgroup>
+    <% end %>
     <% end %>
     <% if (attr? :revnumber) || (attr? :revremark) %>
     <revhistory>

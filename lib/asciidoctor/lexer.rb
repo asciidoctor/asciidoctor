@@ -1261,31 +1261,60 @@ class Lexer
 
     if reader.has_more_lines? && !reader.peek_line.chomp.empty?
       author_metadata = {}
+      keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
       author_line = reader.get_line
-      if match = author_line.match(REGEXP[:author_info])
-        author_metadata['firstname'] = fname = match[1].tr('_', ' ')
-        author_metadata['author'] = fname
-        author_metadata['authorinitials'] = fname[0, 1]
-        if !match[2].nil? && !match[3].nil?
-          author_metadata['middlename'] = mname = match[2].tr('_', ' ')
-          author_metadata['lastname'] = lname = match[3].tr('_', ' ')
-          author_metadata['author'] = [fname, mname, lname].join ' '
-          author_metadata['authorinitials'] = [fname[0, 1], mname[0, 1], lname[0, 1]].join
-        elsif !match[2].nil?
-          author_metadata['lastname'] = lname = match[2].tr('_', ' ')
-          author_metadata['author'] = [fname, lname].join ' '
-          author_metadata['authorinitials'] = [fname[0, 1], lname[0, 1]].join
+      author_line.split(REGEXP[:semicolon_delim]).each_with_index do |author_entry, idx|
+        author_entry.strip!
+        next if author_entry.empty?
+        map = {}
+        if idx.zero?
+          keys.each do |key|
+            map[key.to_sym] = key
+          end
+        else
+          keys.each do |key|
+            map[key.to_sym] = "#{key}_#{idx + 1}"
+          end
         end
-        author_metadata['email'] = match[4] unless match[4].nil?
-      else
-        author_metadata['author'] = author_metadata['firstname'] = author_line.strip.squeeze(' ')
-        author_metadata['authorinitials'] = author_metadata['firstname'][0, 1]
+
+        if match = author_entry.match(REGEXP[:author_info])
+          author_metadata[map[:firstname]] = fname = match[1].tr('_', ' ')
+          author_metadata[map[:author]] = fname
+          author_metadata[map[:authorinitials]] = fname[0, 1]
+          if !match[2].nil? && !match[3].nil?
+            author_metadata[map[:middlename]] = mname = match[2].tr('_', ' ')
+            author_metadata[map[:lastname]] = lname = match[3].tr('_', ' ')
+            author_metadata[map[:author]] = [fname, mname, lname].join ' '
+            author_metadata[map[:authorinitials]] = [fname[0, 1], mname[0, 1], lname[0, 1]].join
+          elsif !match[2].nil?
+            author_metadata[map[:lastname]] = lname = match[2].tr('_', ' ')
+            author_metadata[map[:author]] = [fname, lname].join ' '
+            author_metadata[map[:authorinitials]] = [fname[0, 1], lname[0, 1]].join
+          end
+          author_metadata[map[:email]] = match[4] unless match[4].nil?
+        else
+          author_metadata[map[:author]] = author_metadata[map[:firstname]] = author_entry.strip.squeeze(' ')
+          author_metadata[map[:authorinitials]] = author_metadata[map[:firstname]][0, 1]
+        end
+
+        author_metadata['authorcount'] = idx + 1
+        # only assign the _1 attributes if there are multiple authors
+        if idx == 1
+          keys.each do |key|
+            author_metadata["#{key}_1"] = author_metadata[key] if author_metadata.has_key? key
+          end
+        end
+        if idx.zero?
+          author_metadata['authors'] = author_metadata[map[:author]]
+        else
+          author_metadata['authors'] = "#{author_metadata['authors']}, #{author_metadata[map[:author]]}"
+        end
       end
 
       # apply header subs and assign to document
       if !document.nil?
         author_metadata.map do |key, val|
-          val = document.apply_header_subs(val)
+          val = val.is_a?(String) ? document.apply_header_subs(val) : val
           document.attributes[key] = val if !document.attributes.has_key?(key)
           val
         end
