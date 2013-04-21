@@ -441,6 +441,13 @@ class Reader
     # FIXME currently we're not checking the upper bound of the include depth
     elsif @document.attributes.fetch('include-depth', 0).to_i > 0
       advance
+      # FIXME this borks line numbers
+      include_file = @document.normalize_asset_path(target, 'include file')
+      if !File.file?(include_file)
+        puts "asciidoctor: WARNING: line #{@lineno}: include file not found: #{include_file}"
+        return true
+      end
+
       lines = nil
       tags = nil
       if !raw_attributes.empty?
@@ -466,8 +473,6 @@ class Reader
           tags = attributes['tags'].split(/[,;]/).uniq
         end
       end
-      # FIXME this borks line numbers
-      include_file = @document.normalize_asset_path(target, 'include file')
       if !lines.nil?
         if !lines.empty?
           selected = []
