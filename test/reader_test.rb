@@ -173,6 +173,19 @@ include::fixtures/include-file.asciidoc[]
       assert_match(/included content/, output)
     end
 
+    test 'missing file referenced by include macro does not crash processor' do
+      input = <<-EOS
+include::fixtures/no-such-file.ad[]
+      EOS
+
+      begin
+        doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+        assert_equal 0, doc.blocks.size
+      rescue => e
+        flunk('include macro should not raise exception on missing file')
+      end
+    end
+
     test 'include macro supports line selection' do
       input = <<-EOS
 include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
