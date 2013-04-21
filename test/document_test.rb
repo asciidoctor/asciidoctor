@@ -434,7 +434,7 @@ more info...
       EOS
       output = render_string input
       assert_xpath '//*[@id="header"]/span[@id="author"][text() = "Stuart Rackham"]', output, 1
-      assert_xpath '//*[@id="header"]/span[@id="email"][contains(text(), "founder@asciidoc.org")]', output, 1
+      assert_xpath '//*[@id="header"]/span[@id="email"]/a[@href="mailto:founder@asciidoc.org"][text() = "founder@asciidoc.org"]', output, 1
       assert_xpath '//*[@id="header"]/span[@id="revnumber"][text() = "version 8.6.8,"]', output, 1
       assert_xpath '//*[@id="header"]/span[@id="revdate"][text() = "2012-07-12"]', output, 1
       assert_xpath '//*[@id="header"]/span[@id="revremark"][text() = "See changelog."]', output, 1

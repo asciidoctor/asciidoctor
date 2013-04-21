@@ -158,7 +158,7 @@ context 'Substitutions' do
     test 'single-line constrained monospaced string' do
       para = block_from_string(%q{`a few <\{monospaced\}> words`})
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
-      assert_equal '<tt>a few &lt;{monospaced}&gt; words</tt>', para.apply_normal_subs(para.buffer)
+      assert_equal '<code>a few &lt;{monospaced}&gt; words</code>', para.apply_normal_subs(para.buffer)
     end
 
     test 'escaped single-line constrained monospaced string' do
@@ -170,7 +170,7 @@ context 'Substitutions' do
     test 'multi-line constrained monospaced string' do
       para = block_from_string(%Q{`a few\n<\{monospaced\}> words`})
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
-      assert_equal "<tt>a few\n&lt;{monospaced}&gt; words</tt>", para.apply_normal_subs(para.buffer)
+      assert_equal "<code>a few\n&lt;{monospaced}&gt; words</code>", para.apply_normal_subs(para.buffer)
     end
 
     test 'single-line unconstrained strong chars' do
@@ -231,17 +231,17 @@ context 'Substitutions' do
 
     test 'single-line unconstrained monospaced chars' do
       para = block_from_string(%q{Git++Hub++})
-      assert_equal 'Git<tt>Hub</tt>', para.sub_quotes(para.buffer.join)
+      assert_equal 'Git<code>Hub</code>', para.sub_quotes(para.buffer.join)
     end
 
     test 'escaped single-line unconstrained monospaced chars' do
       para = block_from_string(%q{Git\++Hub++})
-      assert_equal 'Git+<tt>Hub</tt>+', para.sub_quotes(para.buffer.join)
+      assert_equal 'Git+<code>Hub</code>+', para.sub_quotes(para.buffer.join)
     end
 
     test 'multi-line unconstrained monospaced chars' do
       para = block_from_string(%Q{Git++\nH\nu\nb++})
-      assert_equal "Git<tt>\nH\nu\nb</tt>", para.sub_quotes(para.buffer.join)
+      assert_equal "Git<code>\nH\nu\nb</code>", para.sub_quotes(para.buffer.join)
     end
 
     test 'single-line superscript chars' do

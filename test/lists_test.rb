@@ -472,7 +472,7 @@ List
       assert_xpath '//ul/li', output, 3
       assert_xpath '(//ul/li)[1]//strong', output, 1
       assert_xpath '(//ul/li)[2]//em', output, 1
-      assert_xpath '(//ul/li)[3]//tt', output, 1
+      assert_xpath '(//ul/li)[3]//code', output, 1
     end
 
     test "attribute substitutions" do

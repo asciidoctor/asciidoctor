@@ -227,7 +227,7 @@ preamble
 To use {gem_name}, the first thing to do is to import it in your Ruby source file.
       EOS
       output = render_embedded_string input
-      assert_xpath '//*[@class="title"]/tt[text()="asciidoctor"]', output, 1
+      assert_xpath '//*[@class="title"]/code[text()="asciidoctor"]', output, 1
     end
 
     test 'renders attribute until it is deleted' do
