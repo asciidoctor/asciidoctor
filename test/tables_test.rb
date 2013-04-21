@@ -279,14 +279,14 @@ d|9 2+>|10
       assert_css 'table tr:nth-child(1) > td:nth-child(4).halign-right.valign-top p strong', output, 1
 
       assert_css 'table tr:nth-child(2) > td:nth-child(1).halign-center.valign-top p em', output, 1
-      assert_css 'table tr:nth-child(2) > td:nth-child(2).halign-center.valign-middle[colspan="2"][rowspan="2"] p tt', output, 1
-      assert_css 'table tr:nth-child(2) > td:nth-child(3).halign-left.valign-bottom[rowspan="3"] p tt', output, 1
+      assert_css 'table tr:nth-child(2) > td:nth-child(2).halign-center.valign-middle[colspan="2"][rowspan="2"] p code', output, 1
+      assert_css 'table tr:nth-child(2) > td:nth-child(3).halign-left.valign-bottom[rowspan="3"] p code', output, 1
 
       assert_css 'table tr:nth-child(3) > td:nth-child(1).halign-center.valign-top p em', output, 1
 
       assert_css 'table tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p', output, 1
       assert_css 'table tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p em', output, 0
-      assert_css 'table tr:nth-child(4) > td:nth-child(2).halign-right.valign-top[colspan="2"] p tt', output, 1
+      assert_css 'table tr:nth-child(4) > td:nth-child(2).halign-right.valign-top[colspan="2"] p code', output, 1
     end
 
     test 'supports repeating cells' do
