@@ -219,8 +219,13 @@ Here are the known cases where Asciidoctor differs from AsciiDoc:
 * Asciidoctor strips XML entities from the section title before
   generating the id (makes for cleaner section ids)
 
-* Asciidoctor use +<tt>+ instead of +<span class="monospace">+ around
+* Asciidoctor uses +<code>+ instead of +<span class="monospace">+ around
   inline literal text in the HTML backend
+
+* Asciidoctor does not wrap email next to author name in header in
+  angle brackets
+
+* Asciidoctor allows email field to be a URL and renders it as such
 
 * Asciidoctor is much more lenient about attribute list parsing (double
   quotes are rarely needed, though you may want to keep them for

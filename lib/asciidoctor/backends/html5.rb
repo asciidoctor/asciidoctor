@@ -105,7 +105,7 @@ pre code { background-color: #F8F8F8; padding: 0; }
       <h1><%= @header.title %></h1>
       <% end %>
       <% if attr? :author %><span id="author"><%= attr :author %></span><br>
-      <% if attr? :email %><span id="email" class="monospaced">&lt;<%= attr :email %>&gt;</span><br><% end %><% end %>
+      <% if attr? :email %><span id="email"><%= sub_macros(attr :email) %></span><br><% end %><% end %>
       <% if attr? :revnumber %><span id="revnumber">version <%= attr :revnumber %><%= attr?(:revdate) ? ',' : '' %></span><% end %>
       <% if attr? :revdate %><span id="revdate"><%= attr :revdate %></span><% end %>
       <% if attr? :revremark %><br><span id="revremark"><%= attr :revremark %></span><% end %>
@@ -618,7 +618,7 @@ class InlineQuotedTemplate < BaseTemplate
   QUOTED_TAGS = {
     :emphasis => ['<em>', '</em>'],
     :strong => ['<strong>', '</strong>'],
-    :monospaced => ['<tt>', '</tt>'],
+    :monospaced => ['<code>', '</code>'],
     :superscript => ['<sup>', '</sup>'],
     :subscript => ['<sub>', '</sub>'],
     :double => ['&#8220;', '&#8221;'],
