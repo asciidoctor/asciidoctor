@@ -213,7 +213,7 @@ class AbstractBlock < AbstractNode
     if caption.nil?
       if @document.attr?('caption')
         @caption = @document.attr('caption')
-      else
+      elsif title?
         key ||= @context.to_s
         caption_key = "#{key}-caption"
         if @document.attributes.has_key?(caption_key)
@@ -221,6 +221,8 @@ class AbstractBlock < AbstractNode
           caption_num = @document.counter_increment("#{key}-number", self)
           @caption = @attributes['caption'] = "#{caption_title} #{caption_num}. "
         end
+      else
+        @caption = caption
       end
     else
       @caption = caption

@@ -218,6 +218,14 @@ module Asciidoctor
     # NOTE position the most common blocks towards the front of the pattern
     :any_blk          => %r{^(?:--|(?:-|\.|=|\*|_|\+|/){4,}|[\|!]={3,}|(?:`|~){3,}.*)$},
 
+    # detect a list item of any sort
+    # [[:graph:]] is a non-blank character
+    :any_list         => /^(?:
+                             <?\d+>[[:blank:]]+[[:graph:]]|
+                             [[:blank:]]*(?:(?:-|\*|\.){1,5}|\d+\.|[A-Za-z]\.|[IVXivx]+\))[[:blank:]]+[[:graph:]]|
+                             [[:blank:]]*.*?(?::{2,4}|;;)(?:[[:blank:]]+[[:graph:]]|$)
+                           )/x,
+
     # :foo: bar
     # :Author: Dan
     # :numbered!:
@@ -244,10 +252,10 @@ module Asciidoctor
     # [NOTE, caption="Good to know"]
     # Can be defined by an attribute
     # [{lead}]
-    :blk_attr_list    => /^\[(|[[:blank:]]*[\w\{,].*)\]$/,
+    :blk_attr_list    => /^\[(|[[:blank:]]*[\w\{,"'].*)\]$/,
 
     # block attribute list or block id (bulk query)
-    :attr_line        => /^\[(|[[:blank:]]*[\w\{,].*|\[[^\[\]]*\])\]$/,
+    :attr_line        => /^\[(|[[:blank:]]*[\w\{,"'].*|\[[^\[\]]*\])\]$/,
 
     # attribute reference
     # {foo}
@@ -269,7 +277,7 @@ module Asciidoctor
     :callout_scan     => /\\?<(\d+)>/,
 
     # <1> Foo
-    :colist           => /^<?(\d+)> (.*)/,
+    :colist           => /^<?(\d+)>[[:blank:]]+(.*)/,
 
     # ////
     # comment block
@@ -282,12 +290,15 @@ module Asciidoctor
     # one,two
     # one, two
     # one , two
-    :csv_delimiter    => /[[:space:]]*,[[:space:]]*/,
+    :csv_delimiter    => /[[:blank:]]*,[[:blank:]]*/,
 
     # one;two
     # one; two
     # one ; two
-    :semicolon_delim  => /[[:space:]]*;[[:space:]]*/,
+    :semicolon_delim  => /[[:blank:]]*;[[:blank:]]*/,
+
+    # one,two;three;four
+    :scsv_csv_delim   => /[[:blank:]]*[,;][[:blank:]]*/,
 
     # 29
     :digits           => /^\d+$/,
@@ -300,13 +311,14 @@ module Asciidoctor
     #   That which precedes 'bar' (see also, <<bar>>)
     # The term may be an attribute reference
     # {term_foo}:: {def_foo}
-    :dlist            => /^\s*(.*?)(:{2,4}|;;)(?:[[:blank:]]+(.*))?$/,
+    # REVIEW leading space has already been stripped, so may not need in regex
+    :dlist            => /^[[:blank:]]*(.*?)(:{2,4}|;;)(?:[[:blank:]]+(.*))?$/,
     :dlist_siblings   => {
                            # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-                           '::' => /^\s*((?:.*[^:])?)(::)(?:[[:blank:]]+(.*))?$/,
-                           ':::' => /^\s*((?:.*[^:])?)(:::)(?:[[:blank:]]+(.*))?$/,
-                           '::::' => /^\s*((?:.*[^:])?)(::::)(?:[[:blank:]]+(.*))?$/,
-                           ';;' => /^\s*(.*)(;;)(?:[[:blank:]]+(.*))?$/
+                           '::' => /^[[:blank:]]*((?:.*[^:])?)(::)(?:[[:blank:]]+(.*))?$/,
+                           ':::' => /^[[:blank:]]*((?:.*[^:])?)(:::)(?:[[:blank:]]+(.*))?$/,
+                           '::::' => /^[[:blank:]]*((?:.*[^:])?)(::::)(?:[[:blank:]]+(.*))?$/,
+                           ';;' => /^[[:blank:]]*(.*)(;;)(?:[[:blank:]]+(.*))?$/
                          },
     # ====
     #:example          => /^={4,}$/,
@@ -332,6 +344,9 @@ module Asciidoctor
 
     # whitespace at the beginning of the line
     :leading_blanks   => /^([[:blank:]]*)/,
+
+    # leading parent directory references in path
+    :leading_parent_dirs => /^(?:\.\.\/)*/,
 
     # +   From the Asciidoc User Guide: "A plus character preceded by at
     #     least one space character at the end of a non-blank line forces
@@ -372,7 +387,8 @@ module Asciidoctor
     # A. Foo (upperalpha)
     # i. Foo (lowerroman)
     # I. Foo (upperroman)
-    :olist            => /^\s*(\d+\.|[a-z]\.|[ivx]+\)|\.{1,5}) +(.*)$/i,
+    # REVIEW leading space has already been stripped, so may not need in regex
+    :olist            => /^[[:blank:]]*(\.{1,5}|\d+\.|[A-Za-z]\.|[IVXivx]+\))[[:blank:]]+(.*)$/,
 
     # ''' (ruler)
     # <<< (pagebreak)
@@ -443,8 +459,10 @@ module Asciidoctor
     # .Foo   but not  . Foo or ..Foo
     :blk_title        => /^\.([^\s.].*)$/,
 
+    # matches double quoted text, capturing quote char and text (single-line)
     :dbl_quoted       => /^("|)(.*)\1$/,
 
+    # matches double quoted text, capturing quote char and text (multi-line)
     :m_dbl_quoted     => /^("|)(.*)\1$/m,
 
     # == Foo
@@ -471,7 +489,8 @@ module Asciidoctor
 
     # * Foo (up to 5 consecutive asterisks)
     # - Foo
-    :ulist            => /^ \s* (- | \*{1,5}) \s+ (.*) $/x,
+    # REVIEW leading space has already been stripped, so may not need in regex
+    :ulist            => /^[[:blank:]]*(-|\*{1,5})[[:blank:]]+(.*)$/,
 
     # inline xref macro
     # <<id,reftext>> (special characters have already been escaped, hence the entity references)

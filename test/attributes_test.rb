@@ -219,6 +219,31 @@ preamble
       assert_equal '2013-01-01', doc.attributes['date']
     end
 
+    test 'attribute entries can resolve previously defined attributes' do
+      input = <<-EOS
+= Title
+Author Name
+v1.0, 2010-01-01: First release!
+:a: value
+:a2: {a}
+:revdate2: {revdate}
+
+{a} == {a2}
+
+{revdate} == {revdate2}
+      EOS
+
+      doc = document_from_string input
+      assert_equal '2010-01-01', doc.attr('revdate')
+      assert_equal '2010-01-01', doc.attr('revdate2')
+      assert_equal 'value', doc.attr('a')
+      assert_equal 'value', doc.attr('a2')
+
+      output = doc.render
+      assert output.include?('value == value')
+      assert output.include?('2010-01-01 == 2010-01-01')
+    end
+
     test 'substitutes inside block title' do
       input = <<-EOS
 :gem_name: asciidoctor
@@ -460,6 +485,38 @@ ____
       assert_equal 'quote', qb.attributes['style']
       assert_equal 'author', qb.attributes['attribution']
       assert_equal 'source', qb.attributes['citetitle']
+    end
+
+    test 'first attribute in list may be double quoted' do
+      input = <<-EOS
+["quote", "author", "source", role="famous"]
+____
+A famous quote.
+____
+      EOS
+
+      doc = document_from_string input
+      qb = doc.blocks.first
+      assert_equal 'quote', qb.attributes['style']
+      assert_equal 'author', qb.attributes['attribution']
+      assert_equal 'source', qb.attributes['citetitle']
+      assert_equal 'famous', qb.attributes['role']
+    end
+
+    test 'first attribute in list may be single quoted' do
+      input = <<-EOS
+['quote', 'author', 'source', role='famous']
+____
+A famous quote.
+____
+      EOS
+
+      doc = document_from_string input
+      qb = doc.blocks.first
+      assert_equal 'quote', qb.attributes['style']
+      assert_equal 'author', qb.attributes['attribution']
+      assert_equal 'source', qb.attributes['citetitle']
+      assert_equal 'famous', qb.attributes['role']
     end
 
     test "Attribute substitutions are performed on attribute list before parsing attributes" do

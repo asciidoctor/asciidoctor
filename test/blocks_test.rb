@@ -412,6 +412,39 @@ Map<String, String> *attributes*; //<1>
       assert output.include?('Map&lt;String, String&gt; <strong>attributes</strong>;')
       assert output.include?('1')
     end
+
+    test 'listing block should honor explicit subs list' do
+      input = <<-EOS
+[subs="specialcharacters,quotes"]
+----
+$ *python functional_tests.py*
+Traceback (most recent call last):
+  File "functional_tests.py", line 4, in <module>
+    assert 'Django' in browser.title
+AssertionError
+----
+      EOS
+
+      output = render_embedded_string input
+
+      assert_css '.listingblock pre', output, 1
+      assert_css '.listingblock pre strong', output, 1
+      assert_css '.listingblock pre em', output, 1
+
+      input = <<-EOS
+[subs="specialcharacters,macros"]
+----
+$ pass:quotes[*python functional_tests.py*]
+Traceback (most recent call last):
+  File "functional_tests.py", line 4, in <module>
+    assert pass:quotes['Django'] in browser.title
+AssertionError
+----
+      EOS
+
+      output2 = render_embedded_string input
+      assert_equal output, output2
+    end
   end
 
   context "Open Blocks" do
@@ -559,7 +592,7 @@ Block content
   end
 
   context 'Images' do
-    test 'can render block image with alt text define in macro' do
+    test 'can render block image with alt text defined in macro' do
       input = <<-EOS
 image::images/tiger.png[Tiger]
       EOS
@@ -568,7 +601,7 @@ image::images/tiger.png[Tiger]
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
-    test 'can render block image with alt text defined in above macro' do
+    test 'can render block image with alt text defined in block attribute above macro' do
       input = <<-EOS
 [Tiger]
 image::images/tiger.png[]
@@ -726,7 +759,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
-      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="images/icons/tip.png"][@alt="Tip"]', output, 1
+      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="./images/icons/tip.png"][@alt="Tip"]', output, 1
     end
 
     test 'can resolve icon relative to custom iconsdir' do

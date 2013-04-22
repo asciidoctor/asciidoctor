@@ -389,6 +389,23 @@ preamble
      assert_equal 'Override', doc.first_section.title
     end
 
+    test 'doctitle attribute entry above header overrides header title and doctitle' do
+     input = <<-EOS
+:doctitle: Override
+= Title
+
+preamble
+
+== First Section
+     EOS
+     doc = document_from_string input
+     assert_equal 'Override', doc.doctitle
+     assert_nil doc.title
+     assert doc.has_header?
+     assert_equal 'Override', doc.header.title
+     assert_equal 'Override', doc.first_section.title
+    end
+
     test 'should recognize document title when preceded by blank lines' do
       input = <<-EOS
 :doctype: book
