@@ -166,6 +166,7 @@ class AttributeList
     else
       resolved_value = value
       # example: options="opt1,opt2,opt3"
+      # opts is an alias for options
       if name == 'options' || name == 'opts'
         name = 'options'
         resolved_value.split(CSV_SPLIT_PATTERN).each do |o|

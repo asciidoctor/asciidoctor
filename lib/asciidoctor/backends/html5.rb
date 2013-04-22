@@ -670,13 +670,11 @@ class InlineImageTemplate < BaseTemplate
   def template
     # care is taken here to avoid a space inside the optional <a> tag
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><span class="image#{role_class}">
-  <%
-  if attr? :link %><a class="image" href="<%= attr :link %>"><%
-  end %><img src="<%= image_uri(@target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
-  if attr? :link%></a><% end
-  %>
-</span>
+<%#encoding:UTF-8%><span class="image#{role_class}"><%
+if attr? :link %><a class="image" href="<%= attr :link %>"><%
+end %><img src="<%= image_uri(@target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
+if attr? :link%></a><% end
+%></span>
     EOS
   end
 end

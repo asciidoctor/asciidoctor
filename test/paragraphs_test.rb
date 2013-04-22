@@ -81,6 +81,16 @@ Note that multi-entry terms generate separate index entries.
       assert_xpath '(//indexterm)[7]/*', output, 2
       assert_xpath '(//indexterm)[8]/*', output, 1
     end
+
+    test 'normal paragraph should honor explicit subs list' do
+      input = <<-EOS
+[subs="specialcharacters"]
+*Hey Jude*
+      EOS
+
+      output = render_embedded_string input
+      assert output.include?('*Hey Jude*')
+    end
   end
 
   context "code" do
@@ -178,6 +188,17 @@ You're good to go!
       assert_xpath '//*[@class = "verseblock"]/pre', output, 1
       assert_xpath '//*[@class = "verseblock"]//p', output, 0
       assert_xpath '//*[@class = "verseblock"]//*[@class = "literalblock"]', output, 0
+    end
+
+    test 'quote paragraph should honor explicit subs list' do
+      input = <<-EOS
+[subs="specialcharacters"]
+[quote]
+*Hey Jude*
+      EOS
+
+      output = render_embedded_string input
+      assert output.include?('*Hey Jude*')
     end
   end
 

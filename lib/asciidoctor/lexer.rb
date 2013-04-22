@@ -246,7 +246,7 @@ class Lexer
     # Skip ahead to the block content
     skipped = reader.skip_blank_lines
 
-    # bail if we've reached the end of the section content
+    # bail if we've reached the end of the parent block or document
     return nil unless reader.has_more_lines?
 
     if options[:text] && skipped > 0
@@ -294,7 +294,8 @@ class Lexer
 
       elsif !options[:text] && block_context.nil? && (match = this_line.match(REGEXP[:image_blk]))
         block = Block.new(parent, :image)
-        AttributeList.new(document.sub_attributes(match[2])).parse_into(attributes, ['alt', 'width', 'height'])
+
+        block.parse_attributes(match[2], ['alt', 'width', 'height'], :sub_input => true, :sub_result => false, :into => attributes)
         target = block.sub_attributes(match[1])
         if !target.to_s.empty?
           attributes['target'] = target
@@ -1424,7 +1425,7 @@ class Lexer
         parent.document.register(:ids, [id, reftext])
       end
     elsif match = next_line.match(REGEXP[:blk_attr_list])
-      AttributeList.new(parent.document.sub_attributes(match[1]), parent.document).parse_into(attributes)
+      parent.document.parse_attributes(match[1], [], :sub_input => true, :into => attributes)
     # NOTE title doesn't apply to section, but we need to stash it for the first block
     # TODO should issue an error if this is found above the document title
     elsif !options[:text] && (match = next_line.match(REGEXP[:blk_title]))

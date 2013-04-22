@@ -203,10 +203,10 @@ module Asciidoctor
     # [NOTE, caption="Good to know"]
     # Can be defined by an attribute
     # [{lead}]
-    :blk_attr_list    => /^\[([\w\{].*)\]$/,
+    :blk_attr_list    => /^\[(|[\w\{].*)\]$/,
 
     # block attribute list or block id (bulk query)
-    :attr_line        => /^\[([\w\{].*|\[[^\[\]]+\])\]$/,
+    :attr_line        => /^\[(|[\w\{].*|\[[^\[\]]*\])\]$/,
 
     # attribute reference
     # {foo}
@@ -457,7 +457,9 @@ module Asciidoctor
     # http://domain
     # https://domain
     # data:info
-    :uri_sniff        => /^[[:alpha:]][[:alnum:].+-]*:/i
+    :uri_sniff        => /^[[:alpha:]][[:alnum:].+-]*:/i,
+
+    :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/
   }
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']

@@ -92,7 +92,9 @@ module Substituters
   #
   # returns - A String with literal (verbatim) substitutions performed
   def apply_literal_subs(lines)
-    if @document.attributes['basebackend'] == 'html' && attr('style') == 'source' &&
+    if attr? 'subs'
+      apply_subs(lines.join, resolve_subs(attr 'subs'))
+    elsif @document.attributes['basebackend'] == 'html' && attr('style') == 'source' &&
       @document.attributes['source-highlighter'] == 'coderay' && attr?('language')
       sub_callouts(highlight_source(lines.join))
     else
@@ -109,11 +111,24 @@ module Substituters
     apply_subs(text, [:specialcharacters, :attributes])
   end
 
+  # Public: Apply explicit substitutions, if specified, otherwise normal substitutions.
+  #
+  # lines  - The lines of text to process. Can be a String or a String Array 
+  #
+  # returns - A String with substitutions applied
+  def apply_para_subs(lines)
+    if attr? 'subs'
+      apply_subs(lines.join, resolve_subs(attr 'subs'))
+    else
+      apply_subs(lines.join)
+    end
+  end
+
   # Public: Apply substitutions for passthrough text
   #
   # lines  - A String Array containing the lines of text process
   #
-  # returns - A String Array with passthrough substitutions performed
+  # returns - A String with passthrough substitutions performed
   def apply_passthrough_subs(lines)
     if attr? 'subs'
       subs = resolve_subs(attr('subs'))
@@ -608,11 +623,20 @@ module Substituters
   # posattrs  - The keys for positional attributes
   #
   # returns nil if attrline is nil, an empty Hash if attrline is empty, otherwise a Hash of parsed attributes
-  def parse_attributes(attrline, posattrs = ['role'])
+  def parse_attributes(attrline, posattrs = ['role'], opts = {})
     return nil if attrline.nil?
     return {} if attrline.empty?
+    attrline = @document.sub_attributes(attrline) if opts[:sub_input]
+    block = nil
+    if !opts.has_key?(:sub_result) || opts[:sub_result]
+      block = self
+    end
     
-    AttributeList.new(attrline, self).parse(posattrs)
+    if opts.has_key?(:into)
+      AttributeList.new(attrline, block).parse_into(opts[:into], posattrs)
+    else
+      AttributeList.new(attrline, block).parse(posattrs)
+    end
   end
 
   # Internal: Resolve the list of comma-delimited subs against the possible options.
