@@ -344,8 +344,8 @@ end
 
 class BlockParagraphTemplate < BaseTemplate
   def paragraph(id, role, title, content)
-    %(<div#{id && " id=\"#{id}\""} class=\"paragraph#{role && " #{role}"}\">
-  #{title && "<div class=\"title\">#{title}</div>"}  
+    %(<div#{id && " id=\"#{id}\""} class=\"paragraph#{role && " #{role}"}\">#{title && "
+  <div class=\"title\">#{title}</div>"}  
   <p>#{content}</p>
 </div>)
   end

@@ -558,9 +558,29 @@ Block content
     end
   end
 
-  context "Images" do
-    test "can render block image with alt text" do
+  context 'Images' do
+    test 'can render block image with alt text define in macro' do
       input = <<-EOS
+image::images/tiger.png[Tiger]
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
+    test 'can render block image with alt text defined in above macro' do
+      input = <<-EOS
+[Tiger]
+image::images/tiger.png[]
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
+    test 'alt text in macro overrides alt text above macro' do
+      input = <<-EOS
+[Alt Text]
 image::images/tiger.png[Tiger]
       EOS
 
@@ -606,6 +626,42 @@ image::images/tiger.png[Tiger]
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Figure 1. The AsciiDoc Tiger"]', output, 1
       assert_equal 1, doc.attributes['figure-number']
+    end
+
+    test 'can render block image with explicit caption' do
+      input = <<-EOS
+[caption="Voila! "]
+.The AsciiDoc Tiger
+image::images/tiger.png[Tiger]
+      EOS
+
+      doc = document_from_string input
+      output = doc.render
+      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+      assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Voila! The AsciiDoc Tiger"]', output, 1
+      assert !doc.attributes.has_key?('figure-number')
+    end
+
+    test 'drops line if image target is missing attribute reference' do
+      input = <<-EOS
+image::{bogus}[]
+      EOS
+
+      output = render_embedded_string input
+      assert output.strip.empty?
+    end
+
+    test 'dropped image does not break processing of following section' do
+      input = <<-EOS
+image::{bogus}[]
+
+== Section Title
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'img', output, 0
+      assert_css 'h2', output, 1 
+      assert !output.include?('== Section Title')
     end
 
     test 'should pass through image that is a uri reference' do

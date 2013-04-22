@@ -269,6 +269,18 @@ class Document < AbstractBlock
     (@attributes[name] = @counters[name])
   end
 
+  # Public: Increment the specified counter and store it in the block's attributes
+  #
+  # counter_name - the String name of the counter attribute
+  # block        - the Block on which to save the counter
+  #
+  # returns the next number in the sequence for the specified counter
+  def counter_increment(counter_name, block)
+    val = counter(counter_name)
+    AttributeEntry.new(counter_name, val).save_to(block.attributes)
+    val
+  end
+
   # Internal: Get the next value in the sequence.
   #
   # Handles both integer and character sequences.

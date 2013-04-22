@@ -1,4 +1,5 @@
 require 'strscan'
+require 'set'
 
 $:.unshift(File.dirname(__FILE__))
 #$:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
@@ -112,19 +113,35 @@ module Asciidoctor
     'markdown' => '.md'
   }
 
+  SECTION_LEVELS = {
+    '=' => 0,
+    '-' => 1,
+    '~' => 2,
+    '^' => 3,
+    '+' => 4
+  }
+
+  ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'].to_set
+
+  # NOTE: AsciiDoc doesn't support pass style for paragraph
+  PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'pass', 'quote', 'sidebar', 'source', 'verse'].to_set
+
+  VERBATIM_STYLES = ['literal', 'listing', 'source', 'verse'].to_set
+
   DELIMITED_BLOCKS = {
-    '--'   => :open,
-    '----' => :listing,
-    '....' => :literal,
-    '====' => :example,
-    '****' => :sidebar,
-    '____' => :quote,
-    '++++' => :pass,
-    '|===' => :table,
-    '!===' => :table,
-    '////' => :comment,
-    '```'  => :fenced_code,
-    '~~~'  => :fenced_code
+    # NOTE: AsciiDoc doesn't support pass style for open block
+    '--'   => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition'].to_set],
+    '----' => [:listing, ['literal', 'source'].to_set],
+    '....' => [:literal, ['listing', 'source'].to_set],
+    '====' => [:example, ['admonition'].to_set],
+    '****' => [:sidebar, Set.new],
+    '____' => [:quote, ['verse'].to_set],
+    '++++' => [:pass, Set.new],
+    '|===' => [:table, Set.new],
+    '!===' => [:table, Set.new],
+    '////' => [:comment, Set.new],
+    '```'  => [:fenced_code, Set.new],
+    '~~~'  => [:fenced_code, Set.new]
   }
 
   BREAK_LINES = {
@@ -155,6 +172,27 @@ module Asciidoctor
 
   LINE_FEED_ENTITY = '&#10;' # or &#x0A;
 
+  # Flags to control compliance with the behavior of AsciiDoc
+  COMPLIANCE = {
+    # AsciiDoc terminates paragraphs adjacent to
+    # block content (delimiter or block attribute list)
+    # Compliance value: true
+    # TODO what about literal paragraph?
+    :block_terminates_paragraph => true,
+
+    # AsciiDoc does not treat paragraphs labeled with a
+    # verbatim style (literal, listing, source, verse)
+    # as verbatim; override this behavior
+    # Compliance value: false
+    :strict_verbatim_paragraphs => true,
+
+    # AsciiDoc allows start and end delimiters around
+    # a block to be different lengths
+    # this option requires that they be the same
+    # Compliance value: false
+    :congruent_block_delimiters => true
+  }
+
   # The following pattern, which appears frequently, captures the contents between square brackets,
   # ignoring escaped closing brackets (closing brackets prefixed with a backslash '\' character)
   #
@@ -163,8 +201,11 @@ module Asciidoctor
   # Matches:
   # [enclosed text here] or [enclosed [text\] here]
   REGEXP = {
+    # NOTE: this is a inline admonition note
+    :admonition_inline => /^(#{ADMONITION_STYLES.to_a * '|'}):\s/,
+
     # [[Foo]]
-    :anchor           => /^\[\[([^\[\]]+)\]\]$/,
+    :anchor           => /^\[\[([^\s\[\]]+)\]\]$/,
 
     # Foowhatevs [[Bar]]
     :anchor_embedded  => /^(.*?)\s*\[\[([^\[\]]+)\]\]$/,
@@ -203,10 +244,10 @@ module Asciidoctor
     # [NOTE, caption="Good to know"]
     # Can be defined by an attribute
     # [{lead}]
-    :blk_attr_list    => /^\[(|[\w\{].*)\]$/,
+    :blk_attr_list    => /^\[(|[[:blank:]]*[\w\{,].*)\]$/,
 
     # block attribute list or block id (bulk query)
-    :attr_line        => /^\[(|[\w\{].*|\[[^\[\]]*\])\]$/,
+    :attr_line        => /^\[(|[[:blank:]]*[\w\{,].*|\[[^\[\]]*\])\]$/,
 
     # attribute reference
     # {foo}
@@ -425,7 +466,8 @@ module Asciidoctor
     :section_name      => /^((?=.*\w+.*)[^.].*?)$/,
 
     # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
-    :section_underline => /^([=\-~^\+])+$/,
+    # TODO build from SECTION_LEVELS keys
+    :section_underline => /^(?:=|-|~|\^|\+)+$/,
 
     # * Foo (up to 5 consecutive asterisks)
     # - Foo
@@ -461,8 +503,6 @@ module Asciidoctor
 
     :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/
   }
-
-  ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
 
   INTRINSICS = Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(
     {

@@ -592,32 +592,54 @@ class Reader
   def grab_lines_until(options = {}, &block)
     buffer = []
 
-    finis = false
     advance if options[:skip_first_line]
-    # save options to locals for minor optimization
-    terminator = options[:terminator]
-    terminator.chomp! if terminator
-    break_on_blank_lines = options[:break_on_blank_lines]
-    break_on_list_continuation = options[:break_on_list_continuation]
+    # very hot code
+    # save options to locals for minor optimizations
+    if options.has_key? :terminator
+      terminator = options[:terminator]
+      break_on_blank_lines = false
+      break_on_list_continuation = false
+      chomp_last_line = options[:chomp_last_line] || false
+    else
+      terminator = nil
+      break_on_blank_lines = options[:break_on_blank_lines]
+      break_on_list_continuation = options[:break_on_list_continuation]
+      chomp_last_line = break_on_blank_lines
+    end
     skip_line_comments = options[:skip_line_comments]
     preprocess = options.fetch(:preprocess, true)
+    buffer_empty = true
     while !(this_line = get_line(preprocess)).nil?
-      Debug.debug { "Reader processing line: '#{this_line}'" }
-      finis = true if terminator && this_line.chomp == terminator
-      finis = true if !finis && break_on_blank_lines && this_line.strip.empty?
-      finis = true if !finis && break_on_list_continuation && this_line.chomp == LIST_CONTINUATION
-      finis = true if !finis && block && yield(this_line)
-      if finis
-        buffer << this_line if options[:grab_last_line]
-        unshift_line(this_line) if options[:preserve_last_line]
+      # effectively a no-args lamba, but much faster
+      finish = while true
+        break true if terminator && this_line.chomp == terminator
+        break true if break_on_blank_lines && this_line.strip.empty?
+        if break_on_list_continuation && !buffer_empty && this_line.chomp == LIST_CONTINUATION
+          options[:preserve_last_line] = true
+          break true
+        end
+        break true if block && yield(this_line)
+        break false
+      end
+
+      if finish
+        if options[:grab_last_line]
+          buffer << this_line
+          buffer_empty = false
+        end
+        # QUESTION should we dup this_line when restoring??
+        unshift_line this_line if options[:preserve_last_line]
         break
       end
 
       unless skip_line_comments && this_line.match(REGEXP[:comment])
         buffer << this_line
+        buffer_empty = false
       end
     end
 
+    # should we dup the line before chopping?
+    buffer.last.chomp! if chomp_last_line && !buffer_empty
     buffer
   end
 
