@@ -686,6 +686,28 @@ Terms
       assert_xpath '//*[@id="toc"]/ol//li/a[text()="Gotchas"]', output, 1
       assert_xpath '//*[@id="toc"]/ol//li/a[text()="Glossary"]', output, 1
     end
+
+    test 'level 0 special sections in multipart book should be rendered as level 1' do
+      input = <<-EOS
+= Multipart Book
+Doc Writer
+:doctype: book
+
+[preface]
+= Preface
+
+Preface text
+
+[appendix]
+= Appendix
+
+Appendix text
+      EOS
+
+      output = render_string input
+      assert_xpath '//h2[@id = "_preface"]', output, 1
+      assert_xpath '//h2[@id = "_appendix"]', output, 1
+    end
   end
 
   context "heading patterns in blocks" do
@@ -797,8 +819,7 @@ fin.
   context 'Table of Contents' do
     test 'should render table of contents if toc attribute is set' do
       input = <<-EOS
-Article
-=======
+= Article
 :toc:
 
 == Section One
@@ -848,11 +869,54 @@ They couldn't believe their eyes when...
     end
   end
 
-  context "book doctype" do
-    test "document title with level 0 headings" do
+  context 'article doctype' do
+    test 'should create sections only in docbook backend' do
       input = <<-EOS
-Book
-====
+= Article
+Doc Writer
+
+== Section 1
+
+The adventure.
+
+=== Subsection One
+
+It was a dark and stormy night...
+
+=== Subsection Two
+
+They couldn't believe their eyes when...
+
+== Section 2
+
+The return.
+
+=== Subsection Three
+
+While they were returning...
+
+=== Subsection Four
+
+That's all she wrote!
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_xpath '//part', output, 0
+      assert_xpath '//chapter', output, 0
+      assert_xpath '/article/section', output, 2
+      assert_xpath '/article/section[1]/title[text() = "Section 1"]', output, 1
+      assert_xpath '/article/section[2]/title[text() = "Section 2"]', output, 1
+      assert_xpath '/article/section/section', output, 4
+      assert_xpath '/article/section[1]/section[1]/title[text() = "Subsection One"]', output, 1
+      assert_xpath '/article/section[2]/section[1]/title[text() = "Subsection Three"]', output, 1
+    end
+  end
+
+  context 'book doctype' do
+    test 'document title with level 0 headings' do
+      input = <<-EOS
+= Book
+Doc Writer
 :doctype: book
 
 = Chapter One
@@ -878,6 +942,95 @@ That's all she wrote!
       assert_xpath '//h1[@id="_chapter_one"][text() = "Chapter One"]', output, 1
       assert_xpath '//h1[@id="_chapter_two"][text() = "Chapter Two"]', output, 1
       assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
+    end
+
+    test 'should create parts and chapters in docbook backend' do
+      input = <<-EOS
+= Book
+Doc Writer
+:doctype: book
+
+= Part 1
+
+The adventure.
+
+== Chapter One
+
+It was a dark and stormy night...
+
+== Chapter Two
+
+They couldn't believe their eyes when...
+
+= Part 2
+
+The return.
+
+== Chapter Three
+
+While they were returning...
+
+== Chapter Four
+
+That's all she wrote!
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_xpath '//chapter/chapter', output, 0
+      assert_xpath '/book/part', output, 2
+      assert_xpath '/book/part[1]/title[text() = "Part 1"]', output, 1
+      assert_xpath '/book/part[2]/title[text() = "Part 2"]', output, 1
+      assert_xpath '/book/part/chapter', output, 4
+      assert_xpath '/book/part[1]/chapter[1]/title[text() = "Chapter One"]', output, 1
+      assert_xpath '/book/part[2]/chapter[1]/title[text() = "Chapter Three"]', output, 1
+    end
+
+    test 'wip subsections in preface and appendix should start at level 2' do
+      input = <<-EOS
+= Multipart Book
+Doc Writer
+:doctype: book
+
+[preface]
+= Preface
+
+Preface content
+
+=== Preface subsection
+
+Preface subsection content
+
+= Part 1
+
+.Part intro title
+[partintro]
+Part intro content
+
+[appendix]
+= Appendix
+
+Appendix content
+
+=== Appendix subsection
+
+Appendix subsection content
+      EOS
+
+      output = nil
+      errors = nil
+      redirect_streams do |stdout, stderr|
+        output = render_string input, :backend => 'docbook'
+        errors = stdout.string
+      end
+      assert errors.empty?
+      assert_xpath '/book/preface', output, 1
+      assert_xpath '/book/preface/section', output, 1
+      assert_xpath '/book/part', output, 1
+      assert_xpath '/book/part/partintro', output, 1
+      assert_xpath '/book/part/partintro/title', output, 1
+      assert_xpath '/book/part/partintro/simpara', output, 1
+      assert_xpath '/book/appendix', output, 1
+      assert_xpath '/book/appendix/section', output, 1
     end
   end
 end

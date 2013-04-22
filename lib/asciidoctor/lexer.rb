@@ -166,7 +166,13 @@ class Lexer
       # section title to next block of content
       attributes = attributes.delete_if {|k, v| k != 'title'}
       current_level = section.level
-      expected_next_levels = [current_level + 1]
+      # subsections in preface & appendix in multipart books start at level 2
+      if current_level == 0 && section.special &&
+          section.document.doctype == 'book' && ['preface', 'appendix'].include?(section.sectname)
+        expected_next_levels = [current_level + 2]
+      else
+        expected_next_levels = [current_level + 1]
+      end
     end
 
     reader.skip_blank_lines
@@ -428,7 +434,9 @@ class Lexer
             block.title = float_title
             break
 
-          elsif !style.nil? && style != 'normal'
+          # FIXME create another set for "passthrough" styles
+          # though partintro should likely be a dedicated block
+          elsif !style.nil? && style != 'normal' && style != 'partintro'
             if PARAGRAPH_STYLES.include?(style)
               block_context = style.to_sym
               reader.unshift_line this_line
