@@ -172,7 +172,7 @@ class BlockPreambleTemplate < BaseTemplate
 end
 
 class SectionTemplate < BaseTemplate
-  def section(sec)
+  def result(sec)
     slevel = sec.level
     # QUESTION should this check be done in section?
     if slevel == 0 && sec.special
@@ -207,10 +207,7 @@ class SectionTemplate < BaseTemplate
   end
 
   def template
-    # hot piece of code, optimized for speed
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= template.section(self) %>
-    EOS
+    :invoke_result
   end
 end
 
@@ -355,11 +352,12 @@ class BlockParagraphTemplate < BaseTemplate
 </div>)
   end
 
+  def result(node)
+    paragraph(node.id, node.attr('role'), (node.title? ? node.title : nil), node.content)
+  end
+
   def template
-    # very hot piece of code, optimized for speed
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= template.paragraph(@id, (attr 'role'), title? ? title : nil, content) %>
-    EOS
+    :invoke_result
   end
 end
 
@@ -588,34 +586,47 @@ class BlockImageTemplate < BaseTemplate
 end
 
 class BlockRulerTemplate < BaseTemplate
+  def result(node)
+    '<hr>'
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><hr>
-    EOS
+    :invoke_result
   end
 end
 
 class BlockPageBreakTemplate < BaseTemplate
+  def result(node)
+    '<div style="page-break-after: always;"></div>'
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div style="page-break-after: always"></div>
-    EOS
+    :invoke_result
   end
 end
 
 class InlineBreakTemplate < BaseTemplate
+  def result(node)
+    "#{node.text}<br>"
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= "\#@text<br>" %>
-    EOS
+    :invoke_result
   end
 end
 
 class InlineCalloutTemplate < BaseTemplate
+  def result(node)
+    if node.attr? 'icons'
+      src = node.icon_uri("callouts/#{node.text}")
+      %(<img src="#{src}" alt="#{node.text}">)
+    else
+      "<b>&lt;#{node.text}&gt;</b>"
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><% if attr? :icons %><img src="<%= icon_uri("callouts/\#@text") %>" alt="<%= @text %>"><% else %><b>&lt;<%= @text %>&gt;</b><% end %>
-    EOS
+    :invoke_result
   end
 end
 
@@ -632,7 +643,7 @@ class InlineQuotedTemplate < BaseTemplate
     :single => ['&#8216;', '&#8217;']
   }
 
-  def quote(text, type, role)
+  def quote_text(text, type, role)
     start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
     if role
       "#{start_tag}<span class=\"#{role}\">#{text}</span>#{end_tag}"
@@ -641,11 +652,12 @@ class InlineQuotedTemplate < BaseTemplate
     end
   end
 
+  def result(node)
+    quote_text(node.text, node.type, node.attr('role'))
+  end
+
   def template
-    # very hot piece of code, optimized for speed
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= template.quote(@text, @type, attr('role')) %>
-    EOS
+    :invoke_result
   end
 end
 
@@ -664,11 +676,12 @@ class InlineAnchorTemplate < BaseTemplate
     end
   end
 
+  def result(node)
+    anchor(node.target, node.text, node.type, node.document, (node.type == :link ? node.attr('window') : nil))
+  end
+
   def template
-    # hot piece of code, optimized for speed
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= template.anchor(@target, @text, @type, @document, @type == :link ? attr('window') : nil) %>
-    EOS
+    :invoke_result
   end
 end
 
@@ -699,10 +712,12 @@ end %>
 end
 
 class InlineIndextermTemplate < BaseTemplate
+  def result(node)
+    node.type == :visible ? node.text : ''
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= "\#{@type == :visible ? @text : ''}" %>
-    EOS
+    :invoke_result
   end
 end
 
