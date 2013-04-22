@@ -142,7 +142,7 @@ class SectionTemplate < BaseTemplate
     if sec.special
       tag = sec.level <= 1 ? sec.sectname : 'section'
     else
-      tag = sec.document.doctype == 'book' && sec.level <= 1 ? 'chapter' : 'section'
+      tag = sec.document.doctype == 'book' && sec.level <= 1 ? (sec.level == 0 ? 'part' : 'chapter') : 'section'
     end
     %(<#{tag}#{common_attrs(sec.id, (sec.attr 'role'), (sec.attr 'reftext'))}>
   #{sec.title? ? "<title>#{sec.title}</title>" : nil}
@@ -169,21 +169,35 @@ end
 
 class BlockParagraphTemplate < BaseTemplate
 
-  def paragraph(id, role, reftext, title, content)
-    if title
-      %(<formalpara#{common_attrs(id, role, reftext)}>
+  def paragraph(id, style, role, reftext, title, content)
+    # FIXME temporary hack until I can generalize this feature
+    if style == 'partintro'
+      if title
+        %(<partintro#{common_attrs(id, role, reftext)}>
+  <title>#{title}</title>
+  <simpara>#{content}</simpara>
+</partintro>)
+      else
+        %(<partintro#{common_attrs(id, role, reftext)}>
+  <simpara>#{content}</simpara>
+</partintro>)
+      end
+    else
+      if title
+        %(<formalpara#{common_attrs(id, role, reftext)}>
   <title>#{title}</title>
   <para>#{content}</para>
 </formalpara>)
-    else
-      %(<simpara#{common_attrs(id, role, reftext)}>#{content}</simpara>)
+      else
+        %(<simpara#{common_attrs(id, role, reftext)}>#{content}</simpara>)
+      end
     end
   end
 
   def template
     # very hot piece of code, optimized for speed
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%= template.paragraph(@id, (attr 'role'), (attr 'reftext'), title? ? title : nil, content) %>
+<%#encoding:UTF-8%><%= template.paragraph(@id, (attr 'style'), (attr 'role'), (attr 'reftext'), title? ? title : nil, content) %>
     EOF
   end
 end

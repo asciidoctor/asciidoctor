@@ -174,8 +174,13 @@ end
 class SectionTemplate < BaseTemplate
   def section(sec)
     slevel = sec.level
+    # QUESTION should this check be done in section?
+    if slevel == 0 && sec.special
+      slevel = 1
+    end
     htag = "h#{slevel + 1}"
     id = sec.id && " id=\"#{sec.id}\""
+
     if slevel == 0
       %(<h1#{id}>#{sec.title}</h1>
 #{sec.content})
