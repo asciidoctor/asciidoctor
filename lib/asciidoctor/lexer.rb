@@ -218,7 +218,7 @@ class Lexer
       reader.skip_blank_lines
     end
 
-    # prune the preamble if it has no content
+    # drop the preamble if it has no content
     if preamble && preamble.blocks.empty?
       section.delete_at(0)
     end
@@ -244,6 +244,9 @@ class Lexer
   # parent - The Document, Section or Block to which the next block belongs
   # 
   # Returns a Section or Block object holding the parsed content of the processed lines
+  #--
+  # QUESTION should next_block have an option for whether it should keep looking until
+  # a block is found? right now it bails when it encounters a line to be skipped
   def self.next_block(reader, parent, attributes = {}, options = {})
     # Skip ahead to the block content
     skipped = reader.skip_blank_lines
@@ -306,8 +309,11 @@ class Lexer
 
       if !delimited_block
 
-        # use begin block for flow control (yes, could be done better)
-        begin
+        # this loop only executes once; used for flow control
+        # break once a block is found or at end of loop
+        # returns nil if the line must be dropped
+        # Implementation note - while(true) is twice as fast as loop
+        while true
 
           # process lines verbatim
           if !style.nil? && COMPLIANCE[:strict_verbatim_paragraphs] && VERBATIM_STYLES.include?(style)
@@ -322,9 +328,9 @@ class Lexer
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
             if (match = this_line.match(REGEXP[:break_line]))
               block = Block.new(parent, BREAK_LINES[match[0][0..2]])
-              reader.skip_blank_lines
               break
 
+            # TODO make this a media_blk and handle image, video & audio
             elsif (match = this_line.match(REGEXP[:image_blk]))
               block = Block.new(parent, :image)
               unless style.nil?
@@ -343,8 +349,6 @@ class Lexer
                 break
               else
                 # drop the line if target resolves to nothing
-                block = nil
-                reader.skip_blank_lines
                 return nil
               end
             end
@@ -418,8 +422,8 @@ class Lexer
               block.id = tmp_sect.generate_id
             else
               block.id = float_id
-              document.register(:ids, [float_id, float_title])
             end
+            document.register(:ids, [block.id, float_title]) if block.id
             block.level = float_level
             block.title = float_title
             break
@@ -438,8 +442,11 @@ class Lexer
             else
               puts "asciidoctor: WARNING: line #{reader.lineno}: invalid style for paragraph: #{style}"
               style = nil
+              # continue to process paragraph
             end
           end
+
+          break_at_list = (skipped == 0 && parent_context.to_s.end_with?('list'))
 
           # a literal paragraph is contiguous lines starting at least one space
           if style != 'normal' && this_line.match(REGEXP[:lit_par])
@@ -449,9 +456,11 @@ class Lexer
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true,
                 :preserve_last_line => true) {|line|
-              # labeled list terms can be indented, but a preceding blank line indicates
-              # we are in a list continuation and therefore literals should be strictly literal
-              (skipped == 0 && parent_context == :dlist && line.match(REGEXP[:dlist])) ||
+              # a preceding blank line (skipped > 0) indicates we are in a list continuation
+              # and therefore we should not break at a list item
+              # (this won't stop breaking on item of same level since we've already parsed them out)
+              # QUESTION can we turn this block into a lambda or function call?
+              (break_at_list && line.match(REGEXP[:any_list])) ||
               (COMPLIANCE[:block_terminates_paragraph] && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
             }
 
@@ -470,7 +479,6 @@ class Lexer
               # TODO this feels hacky, better way to distinguish from explicit literal block?
               attributes['options'] << 'listparagraph'
             end
-            break
 
           # a paragraph is contiguous nonblank/noncontinuation lines
           else
@@ -481,9 +489,10 @@ class Lexer
                 :preserve_last_line => true,
                 :skip_line_comments => true) {|line|
               # a preceding blank line (skipped > 0) indicates we are in a list continuation
-              # and therefore we should not break at a definition list term
-              # however, this won't stop breaking on item of same level since we've already parsed them out
-              (skipped == 0 && parent_context == :dlist && line.match(REGEXP[:dlist])) ||
+              # and therefore we should not break at a list item
+              # (this won't stop breaking on item of same level since we've already parsed them out)
+              # QUESTION can we turn this block into a lambda or function call?
+              (break_at_list && line.match(REGEXP[:any_list])) ||
               (COMPLIANCE[:block_terminates_paragraph] && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
             }
 
@@ -491,8 +500,9 @@ class Lexer
             # line comments, which may leave us w/ an empty buffer if those
             # were the only lines found
             if buffer.empty?
+              # call get_line since the reader preserved the last line
               reader.get_line
-              break
+              return nil
             end
 
             catalog_inline_anchors(buffer.join, document)
@@ -512,9 +522,11 @@ class Lexer
 
               block = Block.new(parent, :paragraph, buffer)
             end
-            break
           end
-        end while false
+
+          # forbid loop from executing more than once
+          break
+        end
       end
 
       # either delimited block or styled paragraph
@@ -527,8 +539,7 @@ class Lexer
 
         when :comment
           reader.grab_lines_until(:break_on_blank_lines => true, :chomp_last_line => false)
-          # QUESTION should we skip blank lines here?
-          break
+          return nil
 
         when :example
           block = build_block(block_context, :complex, terminator, parent, reader, attributes, true)
@@ -561,6 +572,9 @@ class Lexer
           AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
           block = build_block(block_context, (block_context == :verse ? :verbatim : :complex), terminator, parent, reader, attributes)
 
+        else
+          # this should only happen if there is a misconfiguration
+          raise "Unsupported block type #{block_context} at line #{reader.lineno}"
         end
       end
     end
@@ -568,7 +582,9 @@ class Lexer
     # when looking for nested content, one or more line comments, comment
     # blocks or trailing attribute lists could leave us without a block,
     # so handle accordingly
+    # REVIEW we may no longer need this check
     if !block.nil?
+      # REVIEW seems like there is a better way to organize this wrap-up
       block.id      ||= attributes['id'] if attributes.has_key?('id')
       block.title     = attributes['title'] unless block.title?
       block.caption ||= attributes['caption'] unless block.is_a?(Section)
@@ -639,6 +655,7 @@ class Lexer
   end
 
   # whether a block supports complex content should be a config setting
+  # NOTE could invoke filter in here, before and after parsing
   def self.build_block(block_context, content_type, terminator, parent, reader, attributes, supports_caption = false)
     if terminator.nil?
       if content_type == :verbatim
@@ -668,6 +685,9 @@ class Lexer
     end
 
     if buffer.nil?
+      # we can look for blocks until there are no more lines (and not worry
+      # about sections) since the reader is confined within the boundaries of a
+      # delimited block
       while block_reader.has_more_lines?
         parsed_block = next_block(block_reader, block)
         block.blocks << parsed_block unless parsed_block.nil?
@@ -763,9 +783,9 @@ class Lexer
       m = $~
       next if m[0].start_with? '\\'
       id, reftext = m[1].split(',')
-      id.sub!(/^("|)(.*)\1$/, '\2')
+      id.sub!(REGEXP[:dbl_quoted], '\2')
       if !reftext.nil?
-        reftext.sub!(/^("|)(.*)\1$/m, '\2')
+        reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
       end
       document.register(:ids, [id, reftext])
     }
@@ -853,6 +873,9 @@ class Lexer
       # only relevant for :dlist
       options = {:text => !has_text}
 
+      # we can look for blocks until there are no more lines (and not worry
+      # about sections) since the reader is confined within the boundaries of a
+      # list
       while list_item_reader.has_more_lines?
         new_block = next_block(list_item_reader, list_block, {}, options)
         list_item.blocks << new_block unless new_block.nil?
@@ -917,7 +940,7 @@ class Lexer
         if continuation == :inactive
           continuation = :active
           has_text = true
-          buffer[buffer.size - 1] = "\n" unless within_nested_list
+          buffer[-1] = "\n" unless within_nested_list
         end
 
         # dealing with adjacent list continuations (which is really a syntax error)
@@ -1079,6 +1102,10 @@ class Lexer
       # generate an id if one was not *embedded* in the heading line
       # or as an anchor above the section
       section.id ||= section.generate_id
+    end
+
+    if section.id
+      section.document.register(:ids, [section.id, section.title])
     end
 
     if attributes[1]
@@ -1249,7 +1276,7 @@ class Lexer
     if sect_level >= 0
       sect_level += document.attr('leveloffset', 0).to_i
     end
-    return [sect_id, sect_title, sect_level, single_line]
+    [sect_id, sect_title, sect_level, single_line]
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).

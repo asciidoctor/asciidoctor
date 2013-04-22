@@ -454,7 +454,7 @@ class Reader
         attributes = AttributeList.new(raw_attributes).parse
         if attributes.has_key? 'lines'
           lines = []
-          attributes['lines'].split(/[,;]/).each do |linedef|
+          attributes['lines'].split(REGEXP[:scsv_csv_delim]).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..').map(&:to_i)
               if to == -1
@@ -470,7 +470,7 @@ class Reader
           lines = lines.sort.uniq
           #lines.push lines.shift if lines.first == -1
         elsif attributes.has_key? 'tags'
-          tags = attributes['tags'].split(/[,;]/).uniq
+          tags = attributes['tags'].split(REGEXP[:scsv_csv_delim]).uniq
         end
       end
       if !lines.nil?
@@ -719,8 +719,7 @@ class Reader
 
     # Process bibliography references, so they're available when text
     # before the reference is being rendered.
-    # FIXME we don't have support for bibliography lists yet, so disable for now
-    # plus, this should be done while we are walking lines above
+    # FIXME reenable whereever it belongs
     #@lines.each do |line|
     #  if biblio = line.match(REGEXP[:biblio])
     #    @document.register(:ids, biblio[1])

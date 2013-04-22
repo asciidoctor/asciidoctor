@@ -625,10 +625,10 @@ if numterms > 2 %><indexterm>
 </indexterm>
 <% end %><%
 if numterms > 1 %><indexterm>
-  <primary><%= terms[numterms - 2] %></primary><secondary><%= terms[numterms - 1] %></secondary>
+  <primary><%= terms[-2] %></primary><secondary><%= terms[-1] %></secondary>
 </indexterm>
 <% end %><indexterm>
-  <primary><%= terms[numterms - 1] %></primary>
+  <primary><%= terms[-1] %></primary>
 </indexterm><% end %>
     EOS
   end

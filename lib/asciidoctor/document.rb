@@ -231,7 +231,7 @@ class Document < AbstractBlock
     @attributes['doctime'] ||= @attributes['localtime']
     @attributes['docdatetime'] ||= @attributes['localdatetime']
     
-    @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', 'images'), 'icons')
+    @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', './images'), 'icons')
 
     # Now parse the lines in the reader into blocks
     Lexer.parse(@reader, self, :header_only => @options.fetch(:parse_header_only, false)) 

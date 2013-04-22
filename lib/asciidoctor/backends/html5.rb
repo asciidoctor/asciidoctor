@@ -245,8 +245,8 @@ if attr? :style, 'qanda' %>
   #{title_div}
   <table>
     <colgroup>
-      <col<% if attr? :labelwidth %> style="width: <%= attr :labelwidth %>%;"<% end %>>
-      <col<% if attr? :itemwidth %> style="width: <%= attr :itemwidth %>%;"<% end %>>
+      <col<% if attr? :labelwidth %> style="width:<%= attr :labelwidth %>%;"<% end %>>
+      <col<% if attr? :itemwidth %> style="width:<%= attr :itemwidth %>%;"<% end %>>
     </colgroup>
     <% content.each do |dt, dd| %>
     <tr>
@@ -255,7 +255,7 @@ if attr? :style, 'qanda' %>
         <br>
       </td>
       <td class="hdlist2"><% unless dd.nil? %><% if dd.text? %>
-        <p style="margin-top: 0"><%= dd.text %></p><% end %><% if dd.blocks? %>
+        <p style="margin-top: 0;"><%= dd.text %></p><% end %><% if dd.blocks? %>
 <%= dd.content %><% end %><% end %>
       </td>
     </tr>
@@ -521,7 +521,7 @@ class BlockTableTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><table#{id} class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%>#{role_class}" style="<%
-if !(attr? 'autowidth-option') %>width: <%= attr :tablepcwidth %>%; <% end %><%
+if !(attr? 'autowidth-option') %>width:<%= attr :tablepcwidth %>%; <% end %><%
 if attr? :float %>float: <%= attr :float %>; <% end %>">
   <% if title? %>
   <caption class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></caption>
@@ -534,7 +534,7 @@ if attr? :float %>float: <%= attr :float %>; <% end %>">
     <% end %>
     <% else %>
     <% @columns.each do |col| %>
-    <col style="width: <%= col.attr :colpcwidth %>%;">
+    <col style="width:<%= col.attr :colpcwidth %>%;">
     <% end %>
     <% end %>
   </colgroup>
@@ -615,6 +615,8 @@ class InlineCalloutTemplate < BaseTemplate
 end
 
 class InlineQuotedTemplate < BaseTemplate
+  NO_TAGS = ['', '']
+
   QUOTED_TAGS = {
     :emphasis => ['<em>', '</em>'],
     :strong => ['<strong>', '</strong>'],
@@ -623,11 +625,10 @@ class InlineQuotedTemplate < BaseTemplate
     :subscript => ['<sub>', '</sub>'],
     :double => ['&#8220;', '&#8221;'],
     :single => ['&#8216;', '&#8217;']
-    #:none => ['', '']
   }
 
   def quote(text, type, role)
-    start_tag, end_tag = QUOTED_TAGS[type] || ['', '']
+    start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
     if role
       "#{start_tag}<span class=\"#{role}\">#{text}</span>#{end_tag}"
     else

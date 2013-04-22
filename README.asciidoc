@@ -209,6 +209,8 @@ Here are the known cases where Asciidoctor differs from AsciiDoc:
 * Asciidoctor's default HTML backend matches AsciiDoc's HTML 5 backend
   (whereas XHTML 1.1 is the default HTML backend in AsciiDoc)
 
+* Asciidoctor adds viewport meta tag to +<head>+ to optimize mobile viewing
+
 * Asciidoctor handles inline anchors more cleanly
 
 ** AsciiDoc adds an +<a>+ tag in the line and that markup gets caught in
@@ -246,6 +248,10 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 +
 
 * In Asciidoctor, a horizontal ruler can have attributes
+
+* Asciidoctor wraps +<col>+ elements in +<colgroup>+ in tables
+
+* Asciidoctor uses +<code>+ around content in monospaced table cells
 
 * Asciidoctor skips over line comments in tables, whereas AsciiDoc doesn't
 
@@ -300,8 +306,9 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Use can set the extension for icons using the +icontype+ attribute
   (AsciiDoc defaults to .png)
 
-* AsciiDoc uses the +<blockquote>+ and +<cite>+ tags in the HTML output
-  for quote blocks, requiring some additional styling to match AsciiDoc
+* AsciiDoc uses the +<blockquote>+ for the content and +<cite>+ tag for
+  attribution title in the HTML output for quote blocks, requiring some
+  additional styling to match AsciiDoc
 +
  blockquote.content { padding: 0; margin; 0 }
  cite { color: navy; }

@@ -16,6 +16,28 @@ List
       assert_xpath '//ul/li', output, 3
     end
 
+    test 'indented dash elements using spaces' do
+      input = <<-EOS
+ - Foo
+ - Boo
+ - Blech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 3
+    end
+
+    test 'indented dash elements using tabs' do
+      input = <<-EOS
+\t-\tFoo
+\t-\tBoo
+\t-\tBlech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 3
+    end
+
     test "dash elements separated by blank lines should merge lists" do
       input = <<-EOS
 List
@@ -150,6 +172,40 @@ wrapped content
       assert_xpath "//ul/li[1]/p[text() = 'Foo\n:foo: bar']", output, 1
     end
 
+    test 'a list item with a nested marker terminates non-indented paragraph for text of list item' do
+      input = <<-EOS
+- Foo
+Bar
+* Foo
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ul ul', output, 1
+      assert !output.include?('* Foo')
+    end
+
+    test 'a list item for a different list terminates non-indented paragraph for text of list item' do
+      input = <<-EOS
+== Example 1
+
+- Foo
+Bar
+. Foo
+
+== Example 2
+
+* Item
+text
+term:: def
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ul ol', output, 1
+      assert !output.include?('* Foo')
+      assert_css 'ul dl', output, 1
+      assert !output.include?('term:: def')
+    end
+
     test 'an indented wrapped line is unindented and folded into text of list item' do
       input = <<-EOS
 List
@@ -184,6 +240,40 @@ second wrapped line
       assert_equal 'list item 1', lines[0].chomp
       assert_equal '  // not line comment', lines[1].chomp
       assert_equal 'second wrapped line', lines[2].chomp
+    end
+
+    test 'a list item with a nested marker terminates indented paragraph for text of list item' do
+      input = <<-EOS
+- Foo
+  Bar
+* Foo
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ul ul', output, 1
+      assert !output.include?('* Foo')
+    end
+
+    test 'a list item for a different list terminates indented paragraph for text of list item' do
+      input = <<-EOS
+== Example 1
+
+- Foo
+  Bar
+. Foo
+
+== Example 2
+
+* Item
+  text
+term:: def
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ul ol', output, 1
+      assert !output.include?('* Foo')
+      assert_css 'ul dl', output, 1
+      assert !output.include?('term:: def')
     end
 
     test "a literal paragraph offset by blank lines in list content is appended as a literal block" do
@@ -331,6 +421,28 @@ List
       assert_xpath '//ul/li', output, 3
     end
 
+    test 'indented asterisk elements using spaces' do
+      input = <<-EOS
+ * Foo
+ * Boo
+ * Blech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 3
+    end
+
+    test 'indented asterisk elements using tabs' do
+      input = <<-EOS
+\t*\tFoo
+\t*\tBoo
+\t*\tBlech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 3
+    end
+
     test "asterisk elements separated by blank lines should merge lists" do
       input = <<-EOS
 List
@@ -454,6 +566,21 @@ item
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 2
       assert_xpath '//h2[@id = "sec"][text() = "Section"]', output, 1
+    end
+
+    test 'should not find section title immediately below last list item' do
+      input = <<-EOS
+* first
+* second
+== Not a section
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ul', output, 1
+      assert_css 'ul > li', output, 2
+      assert_css 'h2', output, 0
+      assert output.include?('== Not a section')
+      assert_xpath %((//li)[2]/p[text() = "second\n== Not a section"]), output, 1
     end
   end
 
@@ -1287,6 +1414,28 @@ List
       assert_xpath '//ol/li', output, 3
     end
 
+    test 'indented dot elements using spaces' do
+      input = <<-EOS
+ . Foo
+ . Boo
+ . Blech
+      EOS
+      output = render_string input
+      assert_xpath '//ol', output, 1
+      assert_xpath '//ol/li', output, 3
+    end
+
+    test 'indented dot elements using tabs' do
+      input = <<-EOS
+\t.\tFoo
+\t.\tBoo
+\t.\tBlech
+      EOS
+      output = render_string input
+      assert_xpath '//ol', output, 1
+      assert_xpath '//ol/li', output, 3
+    end
+
     test "dot elements separated by blank lines should merge lists" do
       input = <<-EOS
 List
@@ -1398,6 +1547,21 @@ term2:: def2
       input = <<-EOS
 term1:: def1
  term2:: def2
+      EOS
+      output = render_string input
+      assert_xpath '//dl', output, 1
+      assert_xpath '//dl/dt', output, 2
+      assert_xpath '//dl/dt/following-sibling::dd', output, 2
+      assert_xpath '(//dl/dt)[1][normalize-space(text()) = "term1"]', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "def1"]', output, 1
+      assert_xpath '(//dl/dt)[2][normalize-space(text()) = "term2"]', output, 1
+      assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
+    end
+
+    test "single-line indented adjacent elements with tabs" do
+      input = <<-EOS
+term1::\tdef1
+\tterm2::\tdef2
       EOS
       output = render_string input
       assert_xpath '//dl', output, 1
@@ -3367,11 +3531,11 @@ puts doc.render # <3>
     output = render_embedded_string input, :attributes => {'icons' => ''}
     assert_css '.listingblock code > img', output, 3
     (1..3).each do |i|
-      assert_xpath %((/div[@class="listingblock"]//code/img)[#{i}][@src="images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
+      assert_xpath %((/div[@class="listingblock"]//code/img)[#{i}][@src="./images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
     end
     assert_css '.colist table td img', output, 3
     (1..3).each do |i|
-      assert_xpath %((/div[@class="colist arabic"]//td/img)[#{i}][@src="images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
+      assert_xpath %((/div[@class="colist arabic"]//td/img)[#{i}][@src="./images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
     end
   end
 end

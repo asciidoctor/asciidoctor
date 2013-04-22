@@ -312,7 +312,7 @@ class AbstractNode
         else
           raise SecurityError, "#{asset_name} has reference to path outside of base directory, disallowed in safe mode: #{asset_path}"
         end
-        relative_asset_path.sub!(/^(?:\.\.\/)*/, '')
+        relative_asset_path.sub!(REGEXP[:leading_parent_dirs], '')
         # just to be absolutely sure ;)
         if relative_asset_path[0..0] == '.'
           raise 'Substitution of parent path references failed for ' + relative_asset_path
