@@ -431,7 +431,7 @@ AssertionError
       assert_css '.listingblock pre strong', output, 1
       assert_css '.listingblock pre em', output, 1
 
-      input = <<-EOS
+      input2 = <<-EOS
 [subs="specialcharacters,macros"]
 ----
 $ pass:quotes[*python functional_tests.py*]
@@ -442,8 +442,10 @@ AssertionError
 ----
       EOS
 
-      output2 = render_embedded_string input
-      assert_equal output, output2
+      output2 = render_embedded_string input2
+      # FIXME JRuby is adding extra trailing endlines in the second document,
+      # so rstrip is necessary
+      assert_equal output.rstrip, output2.rstrip
     end
   end
 
