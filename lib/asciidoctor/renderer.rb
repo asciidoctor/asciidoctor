@@ -100,8 +100,6 @@ class Renderer
         msg * "\n"
       }
     end
-
-    @render_stack = []
   end
 
   # Public: Render an Asciidoc object with a specified view template.
@@ -110,43 +108,13 @@ class Renderer
   # object - the Object to be used as an evaluation scope.
   # locals - the optional Hash of locals to be passed to Tilt (default {}) (also ignored, really)
   def render(view, object, locals = {})
-    @render_stack.push([view, object])
-
     if !@views.has_key? view
       raise "Couldn't find a view in @views for #{view}"
     else
       Debug.debug { "View for #{view} is #{@views[view]}, object is #{object}" }
     end
     
-    ret = @views[view].render(object, locals)
-
-    if @debug
-      prefix = ''
-      STDERR.puts '=' * 80
-      STDERR.puts "Rendering:"
-      @render_stack.each do |stack_view, stack_obj|
-        obj_info = case stack_obj
-                   when Section; "SECTION #{stack_obj.title}"
-                   when Block;
-                     if stack_obj.context == :dlist
-                       dt_list = stack_obj.buffer.map{|dt,dd| dt.content.strip}.join(', ')
-                       "BLOCK :dlist (#{dt_list})"
-                     #else
-                     #  "BLOCK #{stack_obj.context.inspect}"
-                     end
-                   else stack_obj.class
-                   end
-        STDERR.puts "#{prefix}#{stack_view}: #{obj_info}"
-        prefix << '  '
-      end
-      STDERR.puts '-' * 80
-      #STDERR.puts ret.inspect
-      STDERR.puts '=' * 80
-      STDERR.puts
-    end
-
-    @render_stack.pop
-    ret
+    @views[view].render(object, locals)
   end
 
   def views

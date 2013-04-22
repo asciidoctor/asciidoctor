@@ -138,7 +138,7 @@ class BlockPreambleTemplate < BaseTemplate
 end
 
 class SectionTemplate < BaseTemplate
-  def section(sec)
+  def result(sec)
     if sec.special
       tag = sec.level <= 1 ? sec.sectname : 'section'
     else
@@ -151,10 +151,7 @@ class SectionTemplate < BaseTemplate
   end
 
   def template
-    # hot piece of code, optimized for speed
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%= template.section(self) %>
-    EOF
+    :invoke_result
   end
 end
 
@@ -194,11 +191,12 @@ class BlockParagraphTemplate < BaseTemplate
     end
   end
 
+  def result(node)
+    paragraph(node.id, node.attr('style'), node.attr('role'), node.attr('reftext'), (node.title? ? node.title : nil), node.content)
+  end
+
   def template
-    # very hot piece of code, optimized for speed
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%= template.paragraph(@id, (attr 'style'), (attr 'role'), (attr 'reftext'), title? ? title : nil, content) %>
-    EOF
+    :invoke_result
   end
 end
 
@@ -545,6 +543,8 @@ class InlineBreakTemplate < BaseTemplate
 end
 
 class InlineQuotedTemplate < BaseTemplate
+  NO_TAGS = ['', '']
+
   QUOTED_TAGS = {
     :emphasis => ['<emphasis>', '</emphasis>'],
     :strong => ['<emphasis role="strong">', '</emphasis>'],
@@ -553,11 +553,10 @@ class InlineQuotedTemplate < BaseTemplate
     :subscript => ['<subscript>', '</subscript>'],
     :double => ['&#8220;', '&#8221;'],
     :single => ['&#8216;', '&#8217;']
-    #:none => ['', '']
   }
 
-  def quote(text, type, role)
-    start_tag, end_tag = QUOTED_TAGS[type] || ['', '']
+  def quote_text(text, type, role)
+    start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
     if role
       "#{start_tag}<phrase role=\"#{role}\">#{text}</phrase>#{end_tag}"
     else
@@ -565,11 +564,12 @@ class InlineQuotedTemplate < BaseTemplate
     end
   end
 
+  def result(node)
+    quote_text(node.text, node.type, node.attr('role'))
+  end
+
   def template
-    # very hot piece of code, optimized for speed
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%= template.quote(@text, @type, attr('role')) %>
-    EOF
+    :invoke_result
   end
 end
 
@@ -587,11 +587,12 @@ class InlineAnchorTemplate < BaseTemplate
     end
   end
 
+  def result(node)
+    anchor(node.target, node.text, node.type)
+  end
+
   def template
-    # hot piece of code, optimized for speed
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%= template.anchor(@target, @text, @type) %>
-    EOS
+    :invoke_result
   end
 end
 
@@ -622,10 +623,12 @@ end %>
 end
 
 class InlineCalloutTemplate < BaseTemplate
+  def result(node)
+    %(<co id="#{node.id}"/>)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><co#{id}/>
-    EOF
+    :invoke_result
   end
 end
 
