@@ -657,12 +657,26 @@ context 'Substitutions' do
     end
 
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
-    # TODO add two entries to ensure index lookup is working correctly (0 indx could be ambiguous)
     test 'restore inline passthroughs with subs' do
-      para = block_from_string("some \x0" + '0' + "\x0 to study")
+      para = block_from_string("some \x0" + '0' + "\x0 to study in the \x0" + '1' + "\x0 programming language")
       para.passthroughs << {:text => '<code>{code}</code>', :subs => [:specialcharacters]}
+      para.passthroughs << {:text => '{language}', :subs => [:specialcharacters]}
       result = para.restore_passthroughs(para.buffer.join)
-      assert_equal 'some &lt;code&gt;{code}&lt;/code&gt; to study', result
+      assert_equal 'some &lt;code&gt;{code}&lt;/code&gt; to study in the {language} programming language', result
+    end
+
+    test 'complex inline passthrough macro' do
+      text_to_escape = %q{[(] <'basic form'> <'logical operator'> <'basic form'> [)]}
+      para = block_from_string %($$#{text_to_escape}$$) 
+      result = para.extract_passthroughs(para.buffer.join)
+      assert_equal 1, para.passthroughs.size
+      assert_equal text_to_escape, para.passthroughs[0][:text]
+
+      text_to_escape_escaped = %q{[(\] <'basic form'> <'logical operator'> <'basic form'> [)\]}
+      para = block_from_string %(pass:specialcharacters[#{text_to_escape_escaped}])
+      result = para.extract_passthroughs(para.buffer.join)
+      assert_equal 1, para.passthroughs.size
+      assert_equal text_to_escape, para.passthroughs[0][:text]
     end
   end
 

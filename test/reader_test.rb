@@ -181,7 +181,7 @@ include::fixtures/no-such-file.ad[]
       begin
         doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
         assert_equal 0, doc.blocks.size
-      rescue => e
+      rescue
         flunk('include macro should not raise exception on missing file')
       end
     end

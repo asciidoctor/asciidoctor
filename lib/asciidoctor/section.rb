@@ -72,6 +72,7 @@ class Section < AbstractBlock
   def generate_id
     if @document.attr? 'sectids'
       separator = @document.attr('idseparator', '_')
+      # FIXME define constants for these regexps
       base_id = @document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, separator).
           gsub(/\W+/, separator).tr_s(separator, separator).chomp(separator)
       gen_id = base_id
@@ -80,7 +81,6 @@ class Section < AbstractBlock
         gen_id = "#{base_id}#{separator}#{cnt}" 
         cnt += 1
       end 
-      @document.register(:ids, [gen_id, title])
       gen_id
     else
       nil
