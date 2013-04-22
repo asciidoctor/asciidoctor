@@ -257,6 +257,23 @@ not in section
       assert floatingtitle.is_a?(Asciidoctor::Block)
       assert !floatingtitle.is_a?(Asciidoctor::Section)
       assert_equal :floating_title, floatingtitle.context
+      assert_equal '_plain_ol_heading', floatingtitle.id
+      assert doc.references[:ids].has_key?('_plain_ol_heading')
+    end
+
+    test 'can assign explicit id to floating title' do
+      input = <<-EOS
+[[unchained]]
+[float]
+=== Plain Ol' Heading
+
+not in section
+      EOS
+
+      doc = document_from_string input
+      floating_title = doc.blocks.first
+      assert_equal 'unchained', floating_title.id
+      assert doc.references[:ids].has_key?('unchained')
     end
 
     test 'should not include floating title in toc' do

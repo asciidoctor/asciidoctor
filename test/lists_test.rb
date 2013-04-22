@@ -2666,6 +2666,55 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]/p[text()="para"]', output, 1
     end
+
+    test 'attached paragraph does not break on adjacent nested labeled list term' do
+      input = <<-EOS
+term1:: def
++
+more definition
+not a term::: def
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.dlist > dl > dt', output, 1
+      assert_css '.dlist > dl > dd', output, 1
+      assert_css '.dlist > dl > dd > .paragraph', output, 1
+      assert output.include?('not a term::: def')
+    end
+
+    # FIXME pending
+=begin
+    test 'attached paragraph does not break on adjacent sibling labeled list term' do
+      input = <<-EOS
+term1:: def
++
+more definition
+not a term:: def
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.dlist > dl > dt', output, 1
+      assert_css '.dlist > dl > dd', output, 1
+      assert_css '.dlist > dl > dd > .paragraph', output, 1
+      assert output.include?('not a term:: def')
+    end
+=end
+
+    test 'attached styled paragraph does not break on adjacent nested labeled list term' do
+      input = <<-EOS
+term1:: def
++
+[quote]
+more definition
+not a term::: def
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.dlist > dl > dt', output, 1
+      assert_css '.dlist > dl > dd', output, 1
+      assert_css '.dlist > dl > dd > .quoteblock', output, 1
+      assert output.include?('not a term::: def')
+    end
   
     test 'appends line as paragraph if attached by continuation following blank line and line comment when term has no inline definition' do
       input = <<-EOS

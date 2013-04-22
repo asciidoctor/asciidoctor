@@ -84,6 +84,7 @@ class AttributeList
 
   def self.rekey(attributes, pos_attrs)
     pos_attrs.each_with_index do |key, index|
+      next if key.nil?
       pos = index + 1
       unless (val = attributes[pos]).nil?
         attributes[key] = val

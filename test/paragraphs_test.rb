@@ -1,21 +1,53 @@
 require 'test_helper'
 
-context "Paragraphs" do
+context 'Paragraphs' do
   context 'Normal' do
-    test "rendered correctly" do
-      assert_xpath "//p", render_string("Plain text for the win.\n\nYes, plainly."), 2
+    test 'should treat plain text separated by blank lines as paragraphs' do
+      input = <<-EOS
+Plain text for the win!
+
+Yep. Text. Plain and simple.
+      EOS
+      output = render_embedded_string input
+      assert_css 'p', output, 2
+      assert_xpath '(//p)[1][text() = "Plain text for the win!"]', output, 1
+      assert_xpath '(//p)[2][text() = "Yep. Text. Plain and simple."]', output, 1
     end
 
-    test "with title" do
-      rendered = render_string(".Titled\nParagraph.\n\nWinning")
+    test 'should associate block title with paragraph' do
+      input = <<-EOS
+.Titled
+Paragraph.
+
+Winning.
+      EOS
+      output = render_embedded_string input
       
-      assert_xpath "//div[@class='title']", rendered
-      assert_xpath "//p", rendered, 2
+      assert_css 'p', output, 2
+      assert_xpath '(//p)[1]/preceding-sibling::*[@class = "title"]', output, 1
+      assert_xpath '(//p)[1]/preceding-sibling::*[@class = "title"][text() = "Titled"]', output, 1
+      assert_xpath '(//p)[2]/preceding-sibling::*[@class = "title"]', output, 0
     end
 
-    test "no duplicate block before next section" do
-      rendered = render_string("Title\n=====\n\nPreamble.\n\n== First Section\n\nParagraph 1\n\nParagraph 2\n\n\n== Second Section\n\nLast words")
-      assert_xpath '//p[text()="Paragraph 2"]', rendered, 1
+    test 'no duplicate block before next section' do
+      input = <<-EOS
+= Title
+
+Preamble
+
+== First Section
+
+Paragraph 1
+
+Paragraph 2
+
+== Second Section
+
+Last words
+      EOS
+
+      output = render_string input
+      assert_xpath '//p[text() = "Paragraph 2"]', output, 1
     end
 
     test 'does not treat wrapped line as a list item' do
@@ -38,6 +70,62 @@ paragraph
       output = render_embedded_string input 
       assert_css 'p', output, 1
       assert_xpath %(//p[text()="paragraph\n.wrapped line"]), output, 1
+    end
+
+    test 'interprets normal paragraph style as normal paragraph' do
+      input = <<-EOS
+[normal]
+Normal paragraph.
+Nothing special.
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'p', output, 1
+    end
+
+    test 'normal paragraph terminates at block attribute list' do
+      input = <<-EOS
+normal text
+[literal]
+literal text
+      EOS
+      output = render_embedded_string input
+      assert_css '.paragraph:root', output, 1
+      assert_css '.literalblock:root', output, 1
+    end
+
+    test 'normal paragraph terminates at block delimiter' do
+      input = <<-EOS
+normal text
+--
+text in open block
+--
+      EOS
+      output = render_embedded_string input
+      assert_css '.paragraph:root', output, 1
+      assert_css '.openblock:root', output, 1
+    end
+
+    test 'normal paragraph terminates at list continuation' do
+      input = <<-EOS
+normal text
++
+      EOS
+      output = render_embedded_string input
+      assert_css '.paragraph:root', output, 2
+      assert_xpath %((/*[@class="paragraph"])[1]/p[text() = "normal text"]), output, 1
+      assert_xpath %((/*[@class="paragraph"])[2]/p[text() = "+"]), output, 1
+    end
+
+    test 'normal style turns literal paragraph into normal paragraph' do
+      input = <<-EOS
+[normal]
+ normal paragraph,
+ despite the leading indent
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.paragraph:root > p', output, 1
     end
 
     test 'expands index term macros in DocBook backend' do
@@ -93,12 +181,20 @@ Note that multi-entry terms generate separate index entries.
     end
   end
 
-  context "code" do
-    test "single-line literal paragraphs" do
-      assert_xpath "//pre", render_string("    LITERALS\n\n    ARE LITERALLY\n\n    AWESOMMMME.")
+  context 'Literal' do
+    test 'single-line literal paragraphs' do
+      input = <<-EOS
+ LITERALS
+
+ ARE LITERALLY
+
+ AWESOME!
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//pre', output, 3
     end
 
-    test "multi-line literal paragraph" do
+    test 'multi-line literal paragraph' do
       input = <<-EOS
 Install instructions:
 
@@ -107,29 +203,95 @@ Install instructions:
 
 You're good to go!
       EOS
-      output = render_string(input)
-      assert_xpath "//pre", output, 1
-      assert_match(/^gem install asciidoctor/, output, "Indentation should be trimmed from literal block")
+      output = render_embedded_string input
+      assert_xpath '//pre', output, 1
+      # indentation should be trimmed from literal block
+      assert_xpath %(//pre[text() = "yum install ruby rubygems\ngem install asciidoctor"]), output, 1
     end
 
-    test "literal paragraph" do
-      assert_xpath "//*[@class='literalblock']//pre[text()='blah blah blah']", render_string("[literal]\nblah blah blah")
+    test 'literal paragraph' do
+      input = <<-EOS
+[literal]
+this text is literally literal
+      EOS
+      output = render_embedded_string input
+      assert_xpath %(/*[@class="literalblock"]//pre[text()="this text is literally literal"]), output, 1
     end
 
-    test "listing paragraph" do
-      assert_xpath "//*[@class='listingblock']//pre[text()='blah blah blah']", render_string("[listing]\nblah blah blah")
+    test 'should read content below literal style verbatim' do
+      input = <<-EOS
+[literal]
+image::not-an-image-block[]
+      EOS
+      output = render_embedded_string input
+      assert_xpath %(/*[@class="literalblock"]//pre[text()="image::not-an-image-block[]"]), output, 1
+      assert_css 'img', output, 0
     end
 
-    test "source code paragraph" do
-      assert_xpath "//pre[@class='highlight']/code", render_string("[source]\nblah blah blah")
+    test 'listing paragraph' do
+      input = <<-EOS
+[listing]
+this text is a listing
+      EOS
+      output = render_embedded_string input
+      assert_xpath %(/*[@class="listingblock"]//pre[text()="this text is a listing"]), output, 1
     end
 
-    test "source code paragraph with language" do
-      assert_xpath "//pre[@class='highlight']/code[@class='perl']", render_string("[source, perl]\ndie 'zomg perl sucks';")
+    test 'source paragraph' do
+      input = <<-EOS
+[source]
+use the source, luke!
+      EOS
+      output = render_embedded_string input
+      assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[text()="use the source, luke!"]), output, 1
+    end
+
+    test 'source code paragraph with language' do
+      input = <<-EOS
+[source, perl]
+die 'zomg perl sucks';
+      EOS
+      output = render_embedded_string input
+      assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[@class="perl"][text()="die 'zomg perl sucks';"]), output, 1
+    end
+
+    test 'literal paragraph terminates at block attribute list' do
+      input = <<-EOS
+ literal text
+[normal]
+normal text
+      EOS
+      output = render_embedded_string input
+      assert_xpath %(/*[@class="literalblock"]), output, 1
+      assert_xpath %(/*[@class="paragraph"]), output, 1
+    end
+
+    test 'literal paragraph terminates at block delimiter' do
+      input = <<-EOS
+ literal text
+--
+normal text
+--
+      EOS
+      output = render_embedded_string input
+      assert_xpath %(/*[@class="literalblock"]), output, 1
+      assert_xpath %(/*[@class="openblock"]), output, 1
+    end
+
+    test 'literal paragraph terminates at list continuation' do
+      input = <<-EOS
+ literal text
++
+      EOS
+      output = render_embedded_string input
+      assert_xpath %(/*[@class="literalblock"]), output, 1
+      assert_xpath %(/*[@class="literalblock"]//pre[text() = "literal text"]), output, 1
+      assert_xpath %(/*[@class="paragraph"]), output, 1
+      assert_xpath %(/*[@class="paragraph"]/p[text() = "+"]), output, 1
     end
   end
 
-  context "quote" do
+  context 'Quote' do
     test "quote block" do
       output = render_string("____\nFamous quote.\n____")
       assert_xpath '//*[@class = "quoteblock"]', output, 1
@@ -155,6 +317,18 @@ You're good to go!
       assert_xpath '//*[@class = "quoteblock"]', output, 1
       assert_xpath '//*[@class = "quoteblock"]//p', output, 0
       assert_xpath '//*[@class = "quoteblock"]//*[contains(text(), "Famous quote.")]', output, 1
+    end
+
+    test 'quote paragraph terminates at list continuation' do
+      input = <<-EOS
+[quote]
+A famouse quote.
++
+      EOS
+      output = render_embedded_string input
+      assert_css '.quoteblock:root', output, 1
+      assert_css '.paragraph:root', output, 1
+      assert_xpath %(/*[@class="paragraph"]/p[text() = "+"]), output, 1
     end
 
     test "verse paragraph" do

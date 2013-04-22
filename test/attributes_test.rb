@@ -403,10 +403,10 @@ of the attribute named foo in your document.
     
   end
 
-  context "Block attributes" do
-    test "Position attributes assigned to block" do
+  context 'Block attributes' do
+    test 'Positional attributes assigned to block' do
       input = <<-EOS
-[quote, Name, Source]
+[quote, author, source]
 ____
 A famous quote.
 ____
@@ -415,13 +415,13 @@ ____
       qb = doc.blocks.first
       assert_equal 'quote', qb.attributes['style']
       assert_equal 'quote', qb.attr(:style)
-      assert_equal 'Name', qb.attributes['attribution']
-      assert_equal 'Source', qb.attributes['citetitle']
+      assert_equal 'author', qb.attributes['attribution']
+      assert_equal 'source', qb.attributes['citetitle']
     end
 
-    test "Normal substitutions are performed on single-quoted attributes" do
+    test 'Normal substitutions are performed on single-quoted attributes' do
       input = <<-EOS
-[quote, Name, 'http://wikipedia.org[Source]']
+[quote, author, 'http://wikipedia.org[source]']
 ____
 A famous quote.
 ____
@@ -430,8 +430,36 @@ ____
       qb = doc.blocks.first
       assert_equal 'quote', qb.attributes['style']
       assert_equal 'quote', qb.attr(:style)
-      assert_equal 'Name', qb.attributes['attribution']
-      assert_equal '<a href="http://wikipedia.org">Source</a>', qb.attributes['citetitle']
+      assert_equal 'author', qb.attributes['attribution']
+      assert_equal '<a href="http://wikipedia.org">source</a>', qb.attributes['citetitle']
+    end
+
+    test 'attribute list may begin with space' do
+      input = <<-EOS
+[ quote]
+____
+A famous quote.
+____
+      EOS
+
+      doc = document_from_string input
+      qb = doc.blocks.first
+      assert_equal 'quote', qb.attributes['style']
+    end
+
+    test 'attribute list may begin with comma' do
+      input = <<-EOS
+[, author, source]
+____
+A famous quote.
+____
+      EOS
+
+      doc = document_from_string input
+      qb = doc.blocks.first
+      assert_equal 'quote', qb.attributes['style']
+      assert_equal 'author', qb.attributes['attribution']
+      assert_equal 'source', qb.attributes['citetitle']
     end
 
     test "Attribute substitutions are performed on attribute list before parsing attributes" do
