@@ -59,39 +59,30 @@ class DocumentTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><!DOCTYPE html>
-<html lang="<%= attr :lang, 'en' %>">
+<html<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>">
     <meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <% if attr? :description %><meta name="description" content="<%= attr :description %>"><% end %>
-    <% if attr? :keywords %><meta name="keywords" content="<%= attr :keywords %>"><% end %>
-    <title><%= doctitle %></title>
-    <% if attr? :toc %>
-    <style>
-#toc > ol { padding-left: 0; }
-#toc ol { list-style-type: none; }
-    </style>
+    <% if attr? :description %>
+    <meta name="description" content="<%= attr :description %>">
     <% end %>
+    <% if attr? :keywords %>
+    <meta name="keywords" content="<%= attr :keywords %>">
+    <% end %>
+    <title><%= doctitle %></title>
     <% unless attr(:stylesheet, '').empty? %>
     <link rel="stylesheet" href="<%= (attr? :stylesdir) ? File.join((attr :stylesdir), (attr :stylesheet)) : (attr :stylesheet) %>">
     <% end %>
-    <%
-    case attr 'source-highlighter' %><%
-    when 'coderay' %>
+    <% case attr 'source-highlighter' %>
+    <% when 'coderay' %>
+    <% if (attr 'coderay-css', 'class') == 'class' %>
     <style>
-pre.highlight { border: none; background-color: #F8F8F8; }
-pre.highlight code, pre.highlight pre { color: #333; }
-pre.highlight span.line-numbers { display: inline-block; margin-right: 4px; padding: 1px 4px; }
-pre.highlight .line-numbers { background-color: #D5F6F6; color: gray; }
-pre.highlight .line-numbers pre { color: gray; }
-<% if (attr 'coderay-css', 'class') == 'class' %><%= template.class.default_coderay_stylesheet %><% end %>
-    </style><%
-    when 'highlightjs' %>
-    <link rel="stylesheet" href="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/styles/<%= (attr 'highlightjs-theme', 'default') %>.min.css">
-    <style>
-pre code { background-color: #F8F8F8; padding: 0; }
+<%= template.class.default_coderay_stylesheet %>
     </style>
+    <% end %>
+    <% when 'highlightjs' %>
+    <link rel="stylesheet" href="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/styles/<%= (attr 'highlightjs-theme', 'default') %>.min.css">
     <script src="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad()</script>
     <% end %>
