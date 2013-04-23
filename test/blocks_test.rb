@@ -239,7 +239,7 @@ TIP: Override the caption of an admonition block using an attribute entry
        EOS
 
        output = render_embedded_string input
-       assert_xpath '/*[@class="admonitionblock"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
+       assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
     end
 
     test 'can override caption of admonition block using document attribute' do
@@ -250,7 +250,7 @@ TIP: Override the caption of an admonition block using an attribute entry
        EOS
 
        output = render_embedded_string input
-       assert_xpath '/*[@class="admonitionblock"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
+       assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
     end
 
     test 'blank caption document attribute should not blank admonition block caption' do
@@ -261,7 +261,7 @@ TIP: Override the caption of an admonition block using an attribute entry
        EOS
 
        output = render_embedded_string input
-       assert_xpath '/*[@class="admonitionblock"]//*[@class="icon"]/*[@class="title"][text()="Tip"]', output, 1
+       assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Tip"]', output, 1
     end
   end
 
@@ -761,7 +761,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
-      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="./images/icons/tip.png"][@alt="Tip"]', output, 1
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="./images/icons/tip.png"][@alt="Tip"]', output, 1
     end
 
     test 'can resolve icon relative to custom iconsdir' do
@@ -774,7 +774,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
-      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="icons/tip.png"][@alt="Tip"]', output, 1
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="icons/tip.png"][@alt="Tip"]', output, 1
     end
 
     test 'embeds base64-encoded data uri of icon when data-uri attribute is set and safe mode level is less than SECURE' do
@@ -789,7 +789,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
-      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
     test 'does not embed base64-encoded data uri of icon when safe mode level is SECURE or greater' do
@@ -804,7 +804,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :attributes => {'icons' => ''}
-      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="fixtures/tip.gif"][@alt="Tip"]', output, 1
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="fixtures/tip.gif"][@alt="Tip"]', output, 1
     end
 
     test 'cleans reference to ancestor directories before reading icon if safe mode level is at least SAFE' do
@@ -819,7 +819,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
-      assert_xpath '//*[@class="admonitionblock"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
   end
 
