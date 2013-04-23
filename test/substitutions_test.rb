@@ -358,6 +358,11 @@ context 'Substitutions' do
       assert_equal %{<span class="image"><img src="tiger.png" alt="Tiger"></span>}, para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
     end
 
+    test 'a single-line image macro with text containing escaped square bracket should be interpreted as an image with alt text' do
+      para = block_from_string('image:tiger.png[[Another\] Tiger]')
+      assert_equal %{<span class="image"><img src="tiger.png" alt="[Another] Tiger"></span>}, para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
     test 'a single-line image macro with text and dimensions should be interpreted as an image with alt text and dimensions' do
       para = block_from_string('image:tiger.png[Tiger, 200, 100]')
       assert_equal %{<span class="image"><img src="tiger.png" alt="Tiger" width="200" height="100"></span>},
@@ -368,6 +373,19 @@ context 'Substitutions' do
       para = block_from_string('image:tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]')
       assert_equal %{<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger"><img src="tiger.png" alt="Tiger"></a></span>},
           para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
+    test 'a multi-line image macro with text and dimensions should be interpreted as an image with alt text and dimensions' do
+      para = block_from_string(%(image:tiger.png[Another\nAwesome\nTiger, 200,\n100]))
+      assert_equal %{<span class="image"><img src="tiger.png" alt="Another Awesome Tiger" width="200" height="100"></span>},
+          para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
+    test 'a block image macro should not be detected within paragraph text' do
+      para = block_from_string(%(Not an inline image macro image::tiger.png[].))
+      result = para.sub_macros(para.buffer.join)
+      assert !result.include?('<img ')
+      assert result.include?('image::tiger.png[]')
     end
 
     test 'a single-line footnote macro should be registered and rendered as a footnote' do

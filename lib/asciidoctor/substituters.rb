@@ -330,8 +330,8 @@ module Substituters
         end
         target = sub_attributes(m[1])
         @document.register(:images, target)
-        attrs = parse_attributes(m[2], ['alt', 'width', 'height'])
-        if !attrs.has_key?('alt') || attrs['alt'].empty?
+        attrs = parse_attributes(unescape_bracketed_text(m[2]), ['alt', 'width', 'height'])
+        if !attrs['alt']
           attrs['alt'] = File.basename(target, File.extname(target))
         end
         Inline.new(self, :image, nil, :target => target, :attributes => attrs).render
@@ -349,7 +349,7 @@ module Substituters
           next m[0][1..-1]
         end
 
-        terms = (m[1] || m[2]).strip.tr("\n", ' ').gsub('\]', ']').split(REGEXP[:csv_delimiter])
+        terms = unescape_bracketed_text(m[1] || m[2]).split(REGEXP[:csv_delimiter])
         document.register(:indexterms, [*terms])
         Inline.new(self, :indexterm, text, :attributes => {'terms' => terms}).render
       }
@@ -364,7 +364,7 @@ module Substituters
           next m[0][1..-1]
         end
 
-        text = (m[1] || m[2]).strip.tr("\n", ' ').gsub('\]', ']')
+        text = unescape_bracketed_text(m[1] || m[2])
         document.register(:indexterms, [text])
         Inline.new(self, :indexterm, text, :type => :visible).render
       }
@@ -627,8 +627,10 @@ module Substituters
     return nil if attrline.nil?
     return {} if attrline.empty?
     attrline = @document.sub_attributes(attrline) if opts[:sub_input]
+    attrline = unescape_bracketed_text(attrline) if opts[:unescape_input]
     block = nil
-    if !opts.has_key?(:sub_result) || opts[:sub_result]
+    if opts.fetch(:sub_result, true)
+      # substitutions are only performed on attribute values if block is not nil
       block = self
     end
     
@@ -637,6 +639,13 @@ module Substituters
     else
       AttributeList.new(attrline, block).parse(posattrs)
     end
+  end
+
+  # Internal: Strip bounding whitespace, fold endlines and unescaped closing
+  # square brackets from text extracted from brackets
+  def unescape_bracketed_text(text)
+    return '' if text.empty?
+    text.strip.tr("\n", ' ').gsub('\]', ']')
   end
 
   # Internal: Resolve the list of comma-delimited subs against the possible options.

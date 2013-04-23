@@ -181,7 +181,31 @@ class AbstractNode
     end
   end
 
-  # Public: Construct a reference or data URI to the target image.
+  # Public: Construct a URI reference to the target media.
+  #
+  # If the target media is a URI reference, then leave it untouched.
+  #
+  # The target media is resolved relative to the directory retrieved from the
+  # specified attribute key, if provided.
+  #
+  # The return value can be safely used in a media tag (img, audio, video).
+  #
+  # target        - A String reference to the target media
+  # asset_dir_key - The String attribute key used to lookup the directory where
+  #                 the media is located (default: 'imagesdir')
+  #
+  # Returns A String reference for the target media
+  def media_uri(target, asset_dir_key = 'imagesdir')
+    if target.include?(':') && target.match(Asciidoctor::REGEXP[:uri_sniff])
+      target
+    elsif asset_dir_key && attr?(asset_dir_key)
+      File.join(@document.attr(asset_dir_key), target)
+    else
+      target
+    end
+  end
+
+  # Public: Construct a URI reference or data URI to the target image.
   #
   # If the target image is a URI reference, then leave it untouched.
   #
