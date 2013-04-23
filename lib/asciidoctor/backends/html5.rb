@@ -314,7 +314,7 @@ end
 class BlockAdmonitionTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="admonitionblock#{role_class}">
+<%#encoding:UTF-8%><div#{id} class="admonitionblock <%= attr :name %>#{role_class}">
   <table>
     <tr>
       <td class="icon">

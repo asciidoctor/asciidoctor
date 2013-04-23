@@ -215,7 +215,7 @@ context 'Invoker' do
     doc = invoker.document
     assert_equal '', doc.attr('icons')
     output = invoker.read_output
-    assert_xpath '//*[@class="admonitionblock"]//img[@alt="Note"]', output, 1
+    assert_xpath '//*[@class="admonitionblock note"]//img[@alt="Note"]', output, 1
   end
 
   test 'should unset attribute ending in bang' do
