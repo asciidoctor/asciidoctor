@@ -608,6 +608,43 @@ class BlockImageTemplate < BaseTemplate
   end
 end
 
+class BlockAudioTemplate < BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOS
+<%#encoding:UTF-8%><div#{id} class="audioblock#{style_class}#{role_class}">
+  #{title_div :caption => true}
+  <div class="content">
+    <audio src="<%= media_uri(attr :target) %>"<% if
+        attr? 'autoplay-option' %> autoplay<% end %><%
+        unless attr? 'nocontrols-option' %> controls<% end %><%
+        if attr? 'loop-option' %> loop<% end %>>
+      Your browser does not support the audio tag.
+    </audio>
+  </div>
+</div>
+    EOS
+  end
+end
+
+class BlockVideoTemplate < BaseTemplate
+  def template
+    @template ||= @eruby.new <<-EOS
+<%#encoding:UTF-8%><div#{id} class="videoblock#{style_class}#{role_class}">
+  #{title_div :caption => true}
+  <div class="content">
+    <video src="<%= media_uri(attr :target) %>"#{attribute('width', :width)}#{attribute('height', :height)}<%
+        if attr? 'poster' %> poster="<%= media_uri(attr :poster) %>"<% end %><%
+        if attr? 'autoplay-option' %> autoplay<% end %><%
+        unless attr? 'nocontrols-option' %> controls<% end %><%
+        if attr? 'loop-option' %> loop<% end %>>
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div>
+    EOS
+  end
+end
+
 class BlockRulerTemplate < BaseTemplate
   def result(node)
     '<hr>'

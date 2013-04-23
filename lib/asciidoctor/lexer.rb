@@ -274,6 +274,7 @@ class Lexer
     parent_context = parent.is_a?(Block) ? parent.context : nil
     block = nil
     style = nil
+    explicit_style = nil
 
     while reader.has_more_lines? && block.nil?
       # if parsing metadata, read until there is no more to read
@@ -292,6 +293,7 @@ class Lexer
       terminator = nil
       # QUESTION put this inside call to rekey attributes?
       if attributes.has_key? 1
+        explicit_style = attributes['style']
         style = attributes['style'] = attributes[1]
       end
 
@@ -337,26 +339,43 @@ class Lexer
               break
 
             # TODO make this a media_blk and handle image, video & audio
-            elsif (match = this_line.match(REGEXP[:image_blk]))
-              block = Block.new(parent, :image)
-              unless style.nil?
-                attributes['alt'] = style
+            elsif (match = this_line.match(REGEXP[:media_blk_macro]))
+              blk_ctx = match[1].to_sym
+              block = Block.new(parent, blk_ctx)
+              if blk_ctx == :image
+                posattrs = ['alt', 'width', 'height']
+              elsif blk_ctx == :video
+                posattrs = ['poster', 'width', 'height']
+              else
+                posattrs = []
+              end
+
+              unless style.nil? || explicit_style
+                attributes['alt'] = style if blk_ctx == :image
                 attributes.delete('style')
                 style = nil
               end
-              block.parse_attributes(match[2], ['alt', 'width', 'height'], :sub_input => true, :sub_result => false, :into => attributes)
-              target = block.sub_attributes(match[1])
-              if !target.to_s.empty?
-                attributes['target'] = target
-                document.register(:images, target)
-                attributes['alt'] ||= File.basename(target, File.extname(target))
-                block.title = attributes.delete('title') if attributes.has_key?('title')
-                block.assign_caption attributes.delete('caption'), 'figure'
-                break
-              else
+
+              block.parse_attributes(match[3], posattrs,
+                  :unescape_input => (blk_ctx == :image),
+                  :sub_input => true,
+                  :sub_result => false,
+                  :into => attributes)
+              target = block.sub_attributes(match[2])
+              if target.empty?
                 # drop the line if target resolves to nothing
                 return nil
               end
+
+              attributes['target'] = target
+              block.title = attributes.delete('title') if attributes.has_key?('title')
+              if blk_ctx == :image
+                document.register(:images, target)
+                attributes['alt'] ||= File.basename(target, File.extname(target))
+                # QUESTION should video or audio have an auto-numbered caption?
+                block.assign_caption attributes.delete('caption'), 'figure'
+              end
+              break
 
             # NOTE we're letting the toc macro have attributes
             elsif (match = this_line.match(REGEXP[:toc]))
