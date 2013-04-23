@@ -357,6 +357,13 @@ class Lexer
                 # drop the line if target resolves to nothing
                 return nil
               end
+
+            # NOTE we're letting the toc macro have attributes
+            elsif (match = this_line.match(REGEXP[:toc]))
+              block = Block.new(parent, :toc)
+              block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
+              break
+
             end
           end
 

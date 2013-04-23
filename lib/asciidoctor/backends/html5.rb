@@ -101,7 +101,7 @@ class DocumentTemplate < BaseTemplate
       <% if attr? :revdate %><span id="revdate"><%= attr :revdate %></span><% end %>
       <% if attr? :revremark %><br><span id="revremark"><%= attr :revremark %></span><% end %>
       <% end %>
-      <% if attr? :toc %>
+      <% if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
       <div id="toc" class="<%= attr 'toc-class', 'toc' %>">
         <div id="toctitle"><%= attr 'toc-title' %></div>
 <%= template.class.outline(self, (attr :toclevels, 2).to_i) %>
@@ -147,6 +147,38 @@ class EmbeddedTemplate < BaseTemplate
   <% end %>
 </div><% end %>
     EOS
+  end
+end
+
+class BlockTocTemplate < BaseTemplate
+  # id must be unique if this macro is used > once or when built-in one is present
+  def result(node)
+    doc = node.document
+
+    return '' unless doc.attr?('toc')
+
+    if node.id
+      id_attr = %( id="#{node.id}")
+      title_id_attr = ''
+    elsif doc.embedded? || !doc.attr?('toc-placement', 'auto')
+      id_attr = ' id="toc"'
+      title_id_attr = ' id="toctitle"'
+    else
+      id_attr = ''
+      title_id_attr = ''
+    end
+    title = node.title? ? node.title : (doc.attr 'toc-title')
+    levels = node.attr?('levels') ? node.attr('levels').to_i : doc.attr('toclevels', 2).to_i
+    role = node.attr?('role') ? node.attr('role') : doc.attr('toc-class', 'toc')
+
+    %(\n<div#{id_attr} class="#{role}">
+<div#{title_id_attr} class="title">#{title}</div>
+#{DocumentTemplate.outline(doc, levels)}
+</div>)
+  end
+
+  def template
+    :invoke_result
   end
 end
 

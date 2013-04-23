@@ -129,9 +129,11 @@ class Document < AbstractBlock
 
     @attributes['asciidoctor'] = ''
     @attributes['asciidoctor-version'] = VERSION
-    @attributes['sectids'] = ''
     @attributes['encoding'] = 'UTF-8'
-    @attributes['notitle'] = '' if !@options[:header_footer]
+    @attributes['sectids'] = ''
+    @attributes['notitle'] = '' unless @options[:header_footer]
+    @attributes['embedded'] = '' unless @options[:header_footer]
+    @attributes['toc-placement'] = 'auto'
 
     # language strings
     # TODO load these based on language settings
@@ -143,9 +145,11 @@ class Document < AbstractBlock
     @attributes['appendix-caption'] = 'Appendix'
     @attributes['example-caption'] = 'Example'
     @attributes['figure-caption'] = 'Figure'
+    #@attributes['listing-caption'] = 'Listing'
     @attributes['table-caption'] = 'Table'
     @attributes['toc-title'] = 'Table of Contents'
 
+    # attribute overrides are attributes that can only be set from the commandline
     @attribute_overrides = options[:attributes] || {}
 
     # the only way to set the include-depth attribute is via the document options
@@ -328,6 +332,11 @@ class Document < AbstractBlock
 
   def nested?
     !@parent_document.nil?
+  end
+
+  def embedded?
+    # QUESTION should this be !@options[:header_footer] ?
+    @attributes.has_key? 'embedded'
   end
 
   # Make the raw source for the Document available.

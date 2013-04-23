@@ -122,6 +122,16 @@ class EmbeddedTemplate < BaseTemplate
   end
 end
 
+class BlockTocTemplate < BaseTemplate
+  def result(node)
+    ''
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
 class BlockPreambleTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
