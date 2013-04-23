@@ -754,7 +754,7 @@ This should be a tip, not a heading.
 ====
       EOS
       output = render_string input
-      assert_xpath "//*[@class='admonitionblock']//p[text() = 'This should be a tip, not a heading.']", output, 1
+      assert_xpath "//*[@class='admonitionblock tip']//p[text() = 'This should be a tip, not a heading.']", output, 1
     end
 
     test "should not match a heading in a labeled list" do

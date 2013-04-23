@@ -309,7 +309,7 @@ normal text
     test "quote block with section body" do
       output = render_string("____\nFamous quote.\n\nNOTE: That was inspiring.\n____")
       assert_xpath '//*[@class = "quoteblock"]', output, 1
-      assert_xpath '//*[@class = "quoteblock"]//*[@class = "admonitionblock"]', output, 1
+      assert_xpath '//*[@class = "quoteblock"]//*[@class = "admonitionblock note"]', output, 1
     end
 
     test "single-line quote paragraph" do
@@ -379,19 +379,19 @@ A famouse quote.
   context "special" do
     test "note multiline syntax" do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock']", render_string("[#{style}]\nThis is a winner.")
+        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", render_string("[#{style}]\nThis is a winner.")
       end
     end
 
     test "note block syntax" do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock']", render_string("[#{style}]\n====\nThis is a winner.\n====")
+        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", render_string("[#{style}]\n====\nThis is a winner.\n====")
       end
     end
 
     test "note inline syntax" do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock']", render_string("#{style}: This is important, fool!")
+        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", render_string("#{style}: This is important, fool!")
       end
     end
 
