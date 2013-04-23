@@ -163,9 +163,7 @@ class BlockFloatingTitleTemplate < BaseTemplate
   end
 end
 
-
 class BlockParagraphTemplate < BaseTemplate
-
   def paragraph(id, style, role, reftext, title, content)
     # FIXME temporary hack until I can generalize this feature
     if style == 'partintro'
