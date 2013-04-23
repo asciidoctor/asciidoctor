@@ -40,10 +40,11 @@ class BaseTemplate
   # locals - A Hash of additional variables. Not currently in use.
   def render(node = Object.new, locals = {})
     tmpl = template
-    if tmpl.equal? :content
+    case tmpl
+    when :invoke_result
+      return result(node)
+    when :content
       result = node.content
-    #elsif tmpl.is_a?(String)
-    #  result = tmpl
     else
       result = tmpl.result(node.get_binding(self))
     end
