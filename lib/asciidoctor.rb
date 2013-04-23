@@ -487,6 +487,10 @@ module Asciidoctor
     # TODO build from SECTION_LEVELS keys
     :section_underline => /^(?:=|-|~|\^|\+)+$/,
 
+    # toc::[]
+    # toc::[levels=2]
+    :toc              => /^toc::\[(.*?)\]$/,
+
     # * Foo (up to 5 consecutive asterisks)
     # - Foo
     # REVIEW leading space has already been stripped, so may not need in regex
