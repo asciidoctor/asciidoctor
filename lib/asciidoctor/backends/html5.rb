@@ -74,14 +74,14 @@ class DocumentTemplate < BaseTemplate
     <% unless attr(:stylesheet, '').empty? %>
     <link rel="stylesheet" href="<%= (attr? :stylesdir) ? File.join((attr :stylesdir), (attr :stylesheet)) : (attr :stylesheet) %>">
     <% end %>
-    <% case attr 'source-highlighter' %>
-    <% when 'coderay' %>
+    <% case attr 'source-highlighter' %><%
+    when 'coderay' %>
     <% if (attr 'coderay-css', 'class') == 'class' %>
     <style>
 <%= template.class.default_coderay_stylesheet %>
     </style>
-    <% end %>
-    <% when 'highlightjs' %>
+    <% end %><%
+    when 'highlightjs' %>
     <link rel="stylesheet" href="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/styles/<%= (attr 'highlightjs-theme', 'default') %>.min.css">
     <script src="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad()</script>
