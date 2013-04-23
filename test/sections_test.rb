@@ -817,7 +817,7 @@ fin.
   end
 
   context 'Table of Contents' do
-    test 'should render table of contents if toc attribute is set' do
+    test 'should render table of contents in header if toc attribute is set' do
       input = <<-EOS
 = Article
 :toc:
@@ -839,17 +839,17 @@ While they were waiting...
 That's all she wrote!
       EOS
       output = render_string input
-      assert_xpath '//*[@id="toc"][@class="toc"]', output, 1
-      assert_xpath '//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
-      assert_xpath '//*[@id="toc"]/ol', output, 1
-      assert_xpath '//*[@id="toc"]//ol', output, 2
-      assert_xpath '//*[@id="toc"]/ol/li', output, 4
-      assert_xpath '//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
-      assert_xpath '//*[@id="toc"]/ol/li/ol/li', output, 1
-      assert_xpath '//*[@id="toc"]/ol/li/ol/li/a[@href="#_interlude"][text()="2.1. Interlude"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//ol', output, 2
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol/li', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol/li/a[@href="#_interlude"][text()="2.1. Interlude"]', output, 1
     end
 
-    test 'should render table of contents if toc2 attribute is set' do
+    test 'should render table of contents in header if toc2 attribute is set' do
       input = <<-EOS
 = Article
 :toc2:
@@ -864,8 +864,212 @@ They couldn't believe their eyes when...
       EOS
 
       output = render_string input
-      assert_xpath '//*[@id="toc"][@class="toc2"]', output, 1
-      assert_xpath '//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc2"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
+    end
+
+    test 'should use document attributes toc-class, toc-title and toclevels to create toc' do
+      input = <<-EOS
+= Article
+:toc:
+:toc-title: Contents
+:toc-class: toc2
+:toclevels: 1
+
+== Section 1
+
+=== Section 1.1
+
+==== Section 1.1.1
+
+==== Section 1.1.2
+
+=== Section 1.2
+
+== Section 2
+
+Fin.
+      EOS
+      output = render_string input
+      assert_css '#header #toc', output, 1
+      assert_css '#header #toc.toc2', output, 1
+      assert_css '#header #toc li', output, 2
+      assert_css '#header #toc #toctitle', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Contents"]', output, 1
+    end
+
+    test 'should not render table of contents if toc-placement attribute is unset' do
+      input = <<-EOS
+= Article
+:toc-placement!:
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@id="toc"]', output, 0
+    end
+
+    test 'should render table of contents at location of toc macro' do
+      input = <<-EOS
+= Article
+:toc:
+:toc-placement!:
+
+Once upon a time...
+
+toc::[]
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input
+      assert_css '#preamble #toc', output, 1
+      assert_css '#preamble .paragraph + #toc', output, 1
+    end
+
+    test 'should render table of contents at location of toc macro in embedded document' do
+      input = <<-EOS
+= Article
+:toc:
+:toc-placement!:
+
+Once upon a time...
+
+toc::[]
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input, :header_footer => false
+      assert_css '#preamble:root #toc', output, 1
+      assert_css '#preamble:root .paragraph + #toc', output, 1
+    end
+
+    test 'should not assign toc id to more than one toc' do
+      input = <<-EOS
+= Article
+:toc:
+
+Once upon a time...
+
+toc::[]
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input
+
+      assert_css '#toc', output, 1
+      assert_css '#toctitle', output, 1
+      assert_xpath '(//*[@class="toc"])[2][not(@id)]', output, 1
+      assert_xpath '(//*[@class="toc"])[2]/*[@class="title"][not(@id)]', output, 1
+    end
+
+    test 'should use global attributes for toc-title, toc-class and toclevels for toc macro' do
+      input = <<-EOS
+= Article
+:toc:
+:toc-placement!:
+:toc-title: Contents
+:toc-class: contents
+:toclevels: 1
+
+Preamble.
+
+toc::[]
+
+== Section 1
+
+=== Section 1.1
+
+==== Section 1.1.1
+
+==== Section 1.1.2
+
+=== Section 1.2
+
+== Section 2
+
+Fin.
+      EOS
+
+      output = render_string input
+      assert_css '#toc', output, 1
+      assert_css '#toctitle', output, 1
+      assert_css '#preamble #toc', output, 1
+      assert_css '#preamble #toc.contents', output, 1
+      assert_xpath '//*[@id="toc"]/*[@class="title"][text() = "Contents"]', output, 1
+      assert_css '#toc li', output, 2
+      assert_xpath '(//*[@id="toc"]//li)[1]/a[text() = "1. Section 1"]', output, 1
+      assert_xpath '(//*[@id="toc"]//li)[2]/a[text() = "2. Section 2"]', output, 1
+    end
+
+    test 'should honor id, title, role and level attributes on toc macro' do
+      input = <<-EOS
+= Article
+:toc:
+:toc-placement!:
+:toc-title: Ignored
+:toc-class: ignored
+:toclevels: 5
+:tocdepth: 1
+
+Preamble.
+
+[[contents]]
+[role="contents"]
+.Contents
+toc::[levels={tocdepth}]
+
+== Section 1
+
+=== Section 1.1
+
+==== Section 1.1.1
+
+==== Section 1.1.2
+
+=== Section 1.2
+
+== Section 2
+
+Fin.
+      EOS
+
+      output = render_string input
+      assert_css '#toc', output, 0
+      assert_css '#toctitle', output, 0
+      assert_css '#preamble #contents', output, 1
+      assert_css '#preamble #contents.contents', output, 1
+      assert_xpath '//*[@id="contents"]/*[@class="title"][text() = "Contents"]', output, 1
+      assert_css '#contents li', output, 2
+      assert_xpath '(//*[@id="contents"]//li)[1]/a[text() = "1. Section 1"]', output, 1
+      assert_xpath '(//*[@id="contents"]//li)[2]/a[text() = "2. Section 2"]', output, 1
     end
   end
 
@@ -985,7 +1189,7 @@ That's all she wrote!
       assert_xpath '/book/part[2]/chapter[1]/title[text() = "Chapter Three"]', output, 1
     end
 
-    test 'wip subsections in preface and appendix should start at level 2' do
+    test 'subsections in preface and appendix should start at level 2' do
       input = <<-EOS
 = Multipart Book
 Doc Writer

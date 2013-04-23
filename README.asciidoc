@@ -273,8 +273,13 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Asciidoctor reifies the toc in the header of the document instead of
   relying on JavaScript to create it
 
-* Asciidoctor sets css class on toc element, read from the +toc-class+
-  attribute. It defaults to toc attribute name (+toc+ or +toc2+).
+* Asciidoctor sets CSS class on toc element, read from the +toc-class+
+  attribute; defaults to toc attribute name (+toc+ or +toc2+).
+
+* Asciidoctor honors the id, title, role and levels attributes set on
+  the toc macro.
+
+* Asciidoctor does not output two tocs with the same id.
 
 * Asciidoctor is nice about using a section title syntax inside a
   delimited block by simply ignoring it (AsciiDoc issues warnings)
