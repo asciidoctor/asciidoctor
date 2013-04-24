@@ -237,8 +237,24 @@ module Substituters
   def sub_replacements(text)
     result = text.dup
 
-    REPLACEMENTS.each {|pattern, replacement|
-      result.gsub!(pattern, replacement)
+    REPLACEMENTS.each {|pattern, replacement, restore|
+      result.gsub!(pattern) {
+        matched = $&
+        head = $1
+        tail = $2
+        if matched.include?('\\')
+          matched.tr('\\', '')
+        else
+          case restore
+          when :none
+            replacement
+          when :leading
+            "#{head}#{replacement}"
+          when :bounding
+            "#{head}#{replacement}#{tail}" 
+          end
+        end
+      }
     }
     
     result
