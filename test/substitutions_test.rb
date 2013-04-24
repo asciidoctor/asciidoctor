@@ -698,6 +698,44 @@ context 'Substitutions' do
     end
   end
 
+  context 'Replacements' do
+    test 'unescapes XML entities' do
+      para = block_from_string '< &quot; &#34; &#x22; >'
+      assert_equal '&lt; &quot; &#34; &#x22; &gt;', para.apply_normal_subs(para.buffer)
+    end
+
+    test 'replaces arrows' do
+      para = block_from_string '<- -> <= => \<- \-> \<= \=>'
+      assert_equal '&#8592; &#8594; &#8656; &#8658; &lt;- -&gt; &lt;= =&gt;', para.apply_normal_subs(para.buffer.join)
+    end
+
+    test 'replaces dashes' do
+      para = block_from_string %(-- foo foo--bar foo\\--bar foo -- bar foo \\-- bar
+stuff in between
+-- foo
+stuff in between
+foo --
+stuff in between
+foo --)
+      expected = %(&#8201;&#8212;&#8201;foo foo&#8212;bar foo--bar foo&#8201;&#8212;&#8201;bar foo -- bar
+stuff in between&#8201;&#8212;&#8201;foo
+stuff in between
+foo&#8201;&#8212;&#8201;stuff in between
+foo&#8201;&#8212;&#8201;)
+      assert_equal expected, para.sub_replacements(para.buffer.join)
+    end
+
+    test 'replaces marks' do
+      para = block_from_string '(C) (R) (TM) \(C) \(R) \(TM)' 
+      assert_equal '&#169; &#174; &#8482; (C) (R) (TM)', para.sub_replacements(para.buffer.join)
+    end
+
+    test 'replaces punctuation' do
+      para = block_from_string %(John's Hideout... foo\\'bar)
+      assert_equal "John&#8217;s Hideout&#8230; foo'bar", para.sub_replacements(para.buffer.join)
+    end
+  end
+
   context 'Post replacements' do
     test 'line break inserted after line with line break character' do
       para = block_from_string("First line +\nSecond line")

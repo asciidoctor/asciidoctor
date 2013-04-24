@@ -1,3 +1,4 @@
+require 'rubygems' unless RUBY_VERSION >= '1.9'
 require 'strscan'
 require 'set'
 
@@ -569,6 +570,7 @@ module Asciidoctor
   }
 
   SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
+  #SPECIAL_CHARS_PATTERN = /(?:<|>|&(?![[:alpha:]]{2,};|#[[:digit:]]{2,}+;|#x[[:alnum:]]{2,}+;))/
 
   # unconstrained quotes:: can appear anywhere
   # constrained quotes:: must be bordered by non-word characters
@@ -621,33 +623,29 @@ module Asciidoctor
   # order is significant
   REPLACEMENTS = [
     # (C)
-    [/(^|[^\\])\(C\)/, '\1&#169;'], 
+    [/\\?\(C\)/, '&#169;', :none],
     # (R)
-    [/(^|[^\\])\(R\)/, '\1&#174;'],
+    [/\\?\(R\)/, '&#174;', :none],
     # (TM)
-    [/(^|[^\\])\(TM\)/, '\1&#8482;'],
+    [/\\?\(TM\)/, '&#8482;', :none],
     # foo -- bar
-    [/(^|\n| )--( |\n|$)/, '&#8201;&#8212;&#8201;'],
+    [/(^|\n| |\\)--( |\n|$)/, '&#8201;&#8212;&#8201;', :none],
     # foo--bar
-    [/(\w)--(?=\w)/, '\1&#8212;'],
+    [/(\w)\\?--(?=\w)/, '&#8212;', :leading],
     # ellipsis
-    [/(^|[^\\])\.\.\./, '\1&#8230;'],
+    [/\\?\.\.\./, '&#8230;', :leading],
     # single quotes
-    [/(\w)'(\w)/, '\1&#8217;\2'],
-    # escaped single quotes
-    [/(\w)\\'(\w)/, '\1\'\2'],
+    [/(\w)\\?'(\w)/, '&#8217;', :bounding],
     # right arrow ->
-    [/(^|[^\\])-&gt;/, '\1&#8594;'],
+    [/\\?-&gt;/, '&#8594;', :none],
     # right double arrow =>
-    [/(^|[^\\])=&gt;/, '\1&#8658;'],
+    [/\\?=&gt;/, '&#8658;', :none],
     # left arrow <-
-    [/(^|[^\\])&lt;-/, '\1&#8592;'],
+    [/\\?&lt;-/, '&#8592;', :none],
     # right left arrow <=
-    [/(^|[^\\])&lt;=/, '\1&#8656;'],
-    # and so on...
-    
-    # restore entities; TODO needs cleanup
-    [/(^|[^\\])&amp;(#[a-z0-9]+;)/i, '\1&\2']
+    [/\\?&lt;=/, '&#8656;', :none],
+    # restore entities
+    [/\\?(&)amp;((?:[[:alpha:]]+|#[[:digit:]]+|#x[[:alnum:]]+);)/, '', :bounding]
   ]
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document
