@@ -127,13 +127,12 @@ class Document < AbstractBlock
     @safe = @options.fetch(:safe, SafeMode::SECURE).to_i
     @options[:header_footer] = @options.fetch(:header_footer, false)
 
-    @attributes['asciidoctor'] = ''
-    @attributes['asciidoctor-version'] = VERSION
     @attributes['encoding'] = 'UTF-8'
     @attributes['sectids'] = ''
     @attributes['notitle'] = '' unless @options[:header_footer]
-    @attributes['embedded'] = '' unless @options[:header_footer]
     @attributes['toc-placement'] = 'auto'
+    @attributes['stylesheet'] = ''
+    @attributes['linkcss'] = ''
 
     # language strings
     # TODO load these based on language settings
@@ -150,7 +149,15 @@ class Document < AbstractBlock
     @attributes['toc-title'] = 'Table of Contents'
 
     # attribute overrides are attributes that can only be set from the commandline
+    # a direct assignment effectively makes the attribute a constant
+    # assigning a nil value will result in the attribute being unset
     @attribute_overrides = options[:attributes] || {}
+
+    @attribute_overrides['asciidoctor'] = ''
+    @attribute_overrides['asciidoctor-version'] = VERSION
+
+    # sync the embedded attribute w/ the value of options...do not allow override
+    @attribute_overrides['embedded'] = @options[:header_footer] ? nil : ''
 
     # the only way to set the include-depth attribute is via the document options
     # 10 is the AsciiDoc default, though currently Asciidoctor only supports 1 level
@@ -163,8 +170,8 @@ class Document < AbstractBlock
       if @attribute_overrides['docdir']
         @base_dir = @attribute_overrides['docdir'] = File.expand_path(@attribute_overrides['docdir'])
       else
-        # perhaps issue a warning here?
-        @base_dir = @attribute_overrides['docdir'] = Dir.pwd
+        #puts 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
+        @base_dir = @attribute_overrides['docdir'] = File.expand_path(Dir.pwd)
       end
     else
       @base_dir = @attribute_overrides['docdir'] = File.expand_path(options[:base_dir])
@@ -180,7 +187,9 @@ class Document < AbstractBlock
     end
 
     if @safe >= SafeMode::SERVER
-      # restrict document from setting source-highlighter and backend
+      # restrict document from setting linkcss, copycss, source-highlighter and backend
+      @attribute_overrides['copycss'] ||= nil
+      @attribute_overrides['linkcss'] ||= ''
       @attribute_overrides['source-highlighter'] ||= nil
       @attribute_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
@@ -234,7 +243,9 @@ class Document < AbstractBlock
     @attributes['docdate'] ||= @attributes['localdate']
     @attributes['doctime'] ||= @attributes['localtime']
     @attributes['docdatetime'] ||= @attributes['localdatetime']
-    
+
+    # fallback directories
+    @attributes['stylesdir'] ||= '.'
     @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', './images'), 'icons')
 
     # Now parse the lines in the reader into blocks
@@ -639,20 +650,15 @@ class Document < AbstractBlock
       docinfo2 = @attributes.has_key?('docinfo2')
       docinfo_filename = "docinfo#{ext}"
       if docinfo1 || docinfo2
-        docinfo_path = normalize_asset_path(docinfo_filename, 'shared docinfo file')
-        if File.exist?(docinfo_path)
-          content = File.read(docinfo_path)
-        end
+        docinfo_path = normalize_system_path(docinfo_filename)
+        content = read_asset(docinfo_path)
       end
 
       if (docinfo || docinfo2) && @attributes.has_key?('docname')
-        docinfo_path = normalize_asset_path("#{@attributes['docname']}-#{docinfo_filename}", 'document-specific docinfo file')
-        if File.exist?(docinfo_path)
-          if content.nil?
-            content = File.read(docinfo_path)
-          else
-            content = [content, File.read(docinfo_path)] * "\n"
-          end
+        docinfo_path = normalize_system_path("#{@attributes['docname']}-#{docinfo_filename}")
+        content2 = read_asset(docinfo_path)
+        unless content2.nil?
+          content = content.nil? ? content2 : "#{content}\n#{content2}"
         end
       end
 
