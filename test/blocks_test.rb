@@ -603,6 +603,16 @@ image::images/tiger.png[Tiger]
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
+    test 'can render block image with alt text defined in macro containing escaped square bracket' do
+      input = <<-EOS
+image::images/tiger.png[A [Bengal\\] Tiger]
+      EOS
+
+      output = render_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'A [Bengal] Tiger', img.attr('alt').value
+    end
+
     test 'can render block image with alt text defined in block attribute above macro' do
       input = <<-EOS
 [Tiger]
@@ -748,6 +758,116 @@ image::dot.gif[Dot]
       assert_equal '../fixtures', doc.attributes['imagesdir']
       output = doc.render
       assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+  end
+
+  context 'Media' do
+    test 'should detect and render video macro' do
+      input = <<-EOS
+video::cats-vs-dogs.avi[]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
+    end
+
+    test 'should detect and render video macro with positional attributes for poster and dimensions' do
+      input = <<-EOS
+video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
+      assert_css 'video[poster="cats-and-dogs.png"]', output, 1
+      assert_css 'video[width="200"]', output, 1
+      assert_css 'video[height="300"]', output, 1
+    end
+
+    test 'video macro should honor all options' do
+      input = <<-EOS
+video::cats-vs-dogs.avi[options="autoplay,nocontrols,loop"]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_css 'video[autoplay]', output, 1
+      assert_css 'video:not([controls])', output, 1
+      assert_css 'video[loop]', output, 1
+    end
+
+    test 'video macro should use imagesdir attribute to resolve target and poster' do
+      input = <<-EOS
+:imagesdir: assets
+
+video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_css 'video[src="assets/cats-vs-dogs.avi"]', output, 1
+      assert_css 'video[poster="assets/cats-and-dogs.png"]', output, 1
+      assert_css 'video[width="200"]', output, 1
+      assert_css 'video[height="300"]', output, 1
+    end
+
+    test 'video macro should not use imagesdir attribute to resolve target if target is a URL' do
+      input = <<-EOS
+:imagesdir: assets
+
+video::http://example.org/videos/cats-vs-dogs.avi[]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_css 'video[src="http://example.org/videos/cats-vs-dogs.avi"]', output, 1
+    end
+
+    test 'should detect and render audio macro' do
+      input = <<-EOS
+audio::podcast.mp3[]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'audio', output, 1
+      assert_css 'audio[src="podcast.mp3"]', output, 1
+    end
+
+    test 'audio macro should use imagesdir attribute to resolve target' do
+      input = <<-EOS
+:imagesdir: assets
+
+audio::podcast.mp3[]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'audio', output, 1
+      assert_css 'audio[src="assets/podcast.mp3"]', output, 1
+    end
+
+    test 'audio macro should not use imagesdir attribute to resolve target if target is a URL' do
+      input = <<-EOS
+:imagesdir: assets
+
+video::http://example.org/podcast.mp3[]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_css 'video[src="http://example.org/podcast.mp3"]', output, 1
+    end
+
+    test 'audio macro should honor all options' do
+      input = <<-EOS
+audio::podcast.mp3[options="autoplay,nocontrols,loop"]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'audio', output, 1
+      assert_css 'audio[autoplay]', output, 1
+      assert_css 'audio:not([controls])', output, 1
+      assert_css 'audio[loop]', output, 1
     end
   end
 

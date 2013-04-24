@@ -107,4 +107,14 @@ class BaseTemplate
     attribute('id', '@id')
   end
 end
+
+module EmptyTemplate
+  def result(node)
+    ''
+  end
+
+  def template
+    :invoke_result
+  end
+end
 end

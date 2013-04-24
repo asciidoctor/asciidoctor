@@ -526,6 +526,14 @@ class BlockImageTemplate < BaseTemplate
   end
 end
 
+class BlockAudioTemplate < BaseTemplate
+  include EmptyTemplate
+end
+
+class BlockVideoTemplate < BaseTemplate
+  include EmptyTemplate
+end
+
 class BlockRulerTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF

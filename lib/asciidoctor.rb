@@ -326,13 +326,15 @@ module Asciidoctor
     # footnote:[text]
     # footnoteref:[id,text]
     # footnoteref:[id]
-    :footnote_macro   => /\\?(footnote|footnoteref):\[((?:\\\]|[^\]])*?)\]/m,
+    :footnote_macro   => /\\?(footnote|footnoteref):\[((?:\\\]|[^\]])*?)\]/,
 
     # image::filename.png[Caption]
-    :image_blk        => /^image::(\S+?)\[(.*?)\]$/,
+    # video::http://youtube.com/12345[Cats vs Dogs]
+    :media_blk_macro  => /^(image|video|audio)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/,
 
     # image:filename.png[Alt Text]
-    :image_macro      => /\\?image:([^\[]+)(?:\[([^\]]*)\])/,
+    # image:filename.png[More [Alt\] Text] (alt text becomes "More [Alt] Text")
+    :image_macro      => /\\?image:([^:\[]+)\[((?:\\\]|[^\]])*?)\]/,
 
     # indexterm:[Tigers,Big cats]
     # (((Tigers,Big cats)))
