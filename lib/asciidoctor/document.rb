@@ -229,6 +229,12 @@ class Document < AbstractBlock
     @attributes['backend'] ||= DEFAULT_BACKEND
     @attributes['doctype'] ||= DEFAULT_DOCTYPE
     update_backend_attributes
+    # make toc and numbered the default for the docbook backend
+    # FIXME this doesn't take into account the backend being set in the document
+    #if @attributes.has_key?('basebackend-docbook')
+    #  @attributes['toc'] = '' unless @attribute_overrides.has_key?('toc!')
+    #  @attributes['numbered'] = '' unless @attribute_overrides.has_key?('numbered!')
+    #end
 
     if !@parent_document.nil?
       # don't need to do the extra processing within our own document

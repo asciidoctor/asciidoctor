@@ -193,21 +193,64 @@ preamble
     test 'should link to default stylesheet by default' do
       sample_input_path = fixture_path('basic.asciidoc')
       output = Asciidoctor.render_file(sample_input_path, :header_footer => true)
-      assert_css 'link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
 
     test 'should link to default stylesheet by default if linkcss is unset' do
       sample_input_path = fixture_path('basic.asciidoc')
       output = Asciidoctor.render_file(sample_input_path, :header_footer => true, :attributes => {'linkcss!' => ''})
-      assert_css 'link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
 
     test 'should embed default stylesheet if safe mode is less than secure and linkcss is unset' do
       sample_input_path = fixture_path('basic.asciidoc')
       output = Asciidoctor.render_file(sample_input_path, :header_footer => true,
           :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'linkcss!' => ''})
-      assert_css 'style', output, 1
-      stylenode = xmlnodes_at_css 'style', output, 1
+      assert_css 'html:root > head > style', output, 1
+      stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
+      styles = stylenode.first.content
+      assert !styles.nil?
+      assert !styles.strip.empty?
+    end
+
+    test 'should not link to stylesheet if stylesheet is unset' do
+      input = <<-EOS
+= Document Title
+
+text
+      EOS
+
+      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet!' => ''})
+      assert_css 'html:root > head > link[rel="stylesheet"]', output, 0
+    end
+
+    test 'should link to custom stylesheet if specified in stylesheet attribute' do
+      input = <<-EOS
+= Document Title
+
+text
+      EOS
+
+      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet' => './custom.css'})
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./custom.css"]', output, 1
+    end
+
+    test 'should resolve custom stylesheet relative to stylesdir' do
+      input = <<-EOS
+= Document Title
+
+text
+      EOS
+
+      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets'})
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./stylesheets/custom.css"]', output, 1
+    end
+
+    test 'should resolve custom stylesheet to embed relative to stylesdir' do
+      sample_input_path = fixture_path('basic.asciidoc')
+      output = Asciidoctor.render_file(sample_input_path, :header_footer => true, :safe => Asciidoctor::SafeMode::SAFE,
+          :attributes => {'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets', 'linkcss!' => ''})
+      stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
       styles = stylenode.first.content
       assert !styles.nil?
       assert !styles.strip.empty?

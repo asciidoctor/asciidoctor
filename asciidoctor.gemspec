@@ -68,7 +68,7 @@ Gem::Specification.new do |s|
     asciidoctor.gemspec
     bin/asciidoctor
     bin/asciidoctor-safe
-    compact/asciidoc.conf
+    compat/asciidoc.conf
     lib/asciidoctor.rb
     lib/asciidoctor/abstract_block.rb
     lib/asciidoctor/abstract_node.rb
@@ -102,9 +102,9 @@ Gem::Specification.new do |s|
     test/fixtures/asciidoc.txt
     test/fixtures/asciidoc_index.txt
     test/fixtures/ascshort.txt
-    test/fixtures/basic.asciidoc
     test/fixtures/basic-docinfo.html
     test/fixtures/basic-docinfo.xml
+    test/fixtures/basic.asciidoc
     test/fixtures/docinfo.html
     test/fixtures/docinfo.xml
     test/fixtures/dot.gif
@@ -112,6 +112,7 @@ Gem::Specification.new do |s|
     test/fixtures/include-file.asciidoc
     test/fixtures/list_elements.asciidoc
     test/fixtures/sample.asciidoc
+    test/fixtures/stylesheets/custom.css
     test/fixtures/tip.gif
     test/invoker_test.rb
     test/lexer_test.rb

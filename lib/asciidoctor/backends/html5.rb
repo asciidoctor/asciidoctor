@@ -81,7 +81,7 @@ class DocumentTemplate < BaseTemplate
     <% end %>
     <% elsif attr? :stylesheet %>
     <% if attr? 'linkcss' %>
-    <link rel="stylesheet" href="<%= normalize_web_path(attr(:stylesdir, ''), (attr :stylesheet)) %>">
+    <link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), attr(:stylesdir, '')) %>">
     <% else %>
     <style>
 <%= read_asset normalize_system_path(attr(:stylesheet), attr(:stylesdir, '')) %>
