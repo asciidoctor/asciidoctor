@@ -456,6 +456,6 @@ from many other individuals.
 
 == Copyright
 
-Copyright (C) 2012 Ryan Waldron. See {license}[LICENSE] for details.
+Copyright (C) 2012-2013 Ryan Waldron. See {license}[LICENSE] for details.
 
 // vim: tw=72
