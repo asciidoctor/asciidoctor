@@ -6,12 +6,11 @@
 ## http://docs.rubygems.org/read/chapter/20
 Gem::Specification.new do |s|
   s.specification_version = 2 if s.respond_to? :specification_version=
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.rubygems_version = '1.3.5'
+  s.required_rubygems_version = Gem::Requirement.new('>= 0') if s.respond_to? :required_rubygems_version=
+  s.rubygems_version = '1.8.5'
 
-  ## Leave these as is they will be modified for you by the rake gemspec task.
-  ## If your rubyforge_project name is different, then edit it and comment out
-  ## the sub! line in the Rakefile
+  ## This group of properties is updated automatically by the Rake build when
+  ## cutting a new release (see the validate task)
   s.name              = 'asciidoctor'
   s.version           = '0.1.2'
   s.date              = '2013-04-25'
@@ -19,26 +18,29 @@ Gem::Specification.new do |s|
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
-  s.summary     = "Pure Ruby Asciidoc to HTML rendering."
-  s.description = "A pure Ruby processor to turn Asciidoc-formatted documents into HTML (and, eventually, other formats perhaps)."
+  s.summary     = 'Pure Ruby Asciidoc to HTML rendering.'
+  s.description = <<-EOS
+A pure Ruby processor to turn Asciidoc-formatted documents into HTML (and, eventually, other formats perhaps).
+EOS
+  s.license     = 'MIT'
 
   ## List the primary authors. If there are a bunch of authors, it's probably
   ## better to set the email to an email list or something. If you don't have
   ## a custom homepage, consider using your GitHub URL or the like.
   s.authors  = ['Ryan Waldron', 'Dan Allen', 'Jeremy McAnally', 'Jason Porter']
-  s.email    = 'dan.j.allen@gmail.com'
-  s.homepage = 'http://github.com/asciidoctor'
+  s.email    = ['rew@erebor.com', 'dan.j.allen@gmail.com']
+  s.homepage = 'http://asciidoctor.org'
 
   ## This gets added to the $LOAD_PATH so that 'lib/NAME.rb' can be required as
   ## require 'NAME.rb' or'/lib/NAME/file.rb' can be as require 'NAME/file.rb'
   s.require_paths = %w[lib]
 
   ## If your gem includes any executables, list them here.
-  s.executables = ["asciidoctor"]
+  s.executables = ['asciidoctor', 'asciidoctor-safe']
 
   ## Specify any RDoc options here. You'll want to add your README and
   ## LICENSE files to the extra_rdoc_files list.
-  s.rdoc_options = ["--charset=UTF-8"]
+  s.rdoc_options = ['--charset=UTF-8']
   s.extra_rdoc_files = %w[LICENSE]
 
   ## List your runtime dependencies here. Runtime dependencies are those
