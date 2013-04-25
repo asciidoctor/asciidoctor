@@ -68,6 +68,7 @@ Gem::Specification.new do |s|
     asciidoctor.gemspec
     bin/asciidoctor
     bin/asciidoctor-safe
+    compact/asciidoc.conf
     lib/asciidoctor.rb
     lib/asciidoctor/abstract_block.rb
     lib/asciidoctor/abstract_node.rb
