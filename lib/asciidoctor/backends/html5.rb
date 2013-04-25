@@ -71,8 +71,22 @@ class DocumentTemplate < BaseTemplate
     <meta name="keywords" content="<%= attr :keywords %>">
     <% end %>
     <title><%= doctitle %></title>
-    <% unless attr(:stylesheet, '').empty? %>
-    <link rel="stylesheet" href="<%= (attr? :stylesdir) ? File.join((attr :stylesdir), (attr :stylesheet)) : (attr :stylesheet) %>">
+    <% if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet') %>
+    <% if attr? 'linkcss' %>
+    <link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>">
+    <% else %>
+    <style>
+<%= read_asset DEFAULT_STYLESHEET_PATH %>
+    </style>
+    <% end %>
+    <% elsif attr? :stylesheet %>
+    <% if attr? 'linkcss' %>
+    <link rel="stylesheet" href="<%= normalize_web_path(attr(:stylesdir, ''), (attr :stylesheet)) %>">
+    <% else %>
+    <style>
+<%= read_asset normalize_system_path(attr(:stylesheet), attr(:stylesdir, '')) %>
+    </style>
+    <% end %>
     <% end %>
     <% case attr 'source-highlighter' %><%
     when 'coderay' %>
@@ -151,7 +165,6 @@ class EmbeddedTemplate < BaseTemplate
 end
 
 class BlockTocTemplate < BaseTemplate
-  # id must be unique if this macro is used > once or when built-in one is present
   def result(node)
     doc = node.document
 

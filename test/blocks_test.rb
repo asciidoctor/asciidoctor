@@ -709,7 +709,7 @@ image::{bogus}[]
       assert !output.include?('== Section Title')
     end
 
-    test 'should pass through image that is a uri reference' do
+    test 'should pass through image that references uri' do
       input = <<-EOS
 :imagesdir: images
 
@@ -746,17 +746,35 @@ image::dot.gif[Dot]
     end
 
     # this test will cause a warning to be printed to the console (until we have a message facility)
-    test 'cleans reference to ancestor directories before reading image if safe mode level is at least SAFE' do
+    test 'cleans reference to ancestor directories in imagesdir before reading image if safe mode level is at least SAFE' do
       input = <<-EOS
 :data-uri:
-:imagesdir: ../fixtures
+:imagesdir: ../..//fixtures/./../../fixtures
 
 image::dot.gif[Dot]
       EOS
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
-      assert_equal '../fixtures', doc.attributes['imagesdir']
+      assert_equal '../..//fixtures/./../../fixtures', doc.attributes['imagesdir']
       output = doc.render
+      # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
+      # the reference cannot fall outside of the document directory in safe mode
+      assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
+    test 'cleans reference to ancestor directories in target before reading image if safe mode level is at least SAFE' do
+      input = <<-EOS
+:data-uri:
+:imagesdir: ./
+
+image::../..//fixtures/./../../fixtures/dot.gif[Dot]
+      EOS
+
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_equal './', doc.attributes['imagesdir']
+      output = doc.render
+      # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
+      # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
   end

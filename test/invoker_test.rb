@@ -110,7 +110,7 @@ context 'Invoker' do
       assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
       assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
     ensure
-      FileUtils::rm(sample_outpath)
+      FileUtils::rm_f(sample_outpath)
     end
   end
 
@@ -119,12 +119,14 @@ context 'Invoker' do
     sample_outpath = File.join(destination_path, 'sample.html')
     begin
       FileUtils::mkdir_p(destination_path) 
+      # QUESTION should -D be relative to working directory or source directory?
       invoker = invoke_cli %w(-D test/test_output)
+      #invoker = invoke_cli %w(-D ../../test/test_output)
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
     ensure
-      FileUtils::rm(sample_outpath)
+      FileUtils::rm_f(sample_outpath)
       FileUtils::rmdir(destination_path)
     end
   end
@@ -137,7 +139,21 @@ context 'Invoker' do
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
     ensure
-      FileUtils::rm(sample_outpath)
+      FileUtils::rm_f(sample_outpath)
+    end
+  end
+
+  test 'should copy default css to target directory if copycss is specified' do
+    sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample-output.html'))
+    default_stylesheet = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'asciidoctor.css'))
+    begin
+      invoker = invoke_cli %W(-o #{sample_outpath} -a copycss)
+      invoker.document
+      assert File.exist?(sample_outpath)
+      assert File.exist?(default_stylesheet)
+    ensure
+      FileUtils::rm_f(sample_outpath)
+      FileUtils::rm_f(default_stylesheet)
     end
   end
 

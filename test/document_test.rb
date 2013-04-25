@@ -180,6 +180,29 @@ preamble
       assert_css 'copyright', output, 0
     end
 
+    test 'should link to default stylesheet by default' do
+      sample_input_path = fixture_path('basic.asciidoc')
+      output = Asciidoctor.render_file(sample_input_path, :header_footer => true)
+      assert_css 'link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
+    end
+
+    test 'should link to default stylesheet by default if linkcss is unset' do
+      sample_input_path = fixture_path('basic.asciidoc')
+      output = Asciidoctor.render_file(sample_input_path, :header_footer => true, :attributes => {'linkcss!' => ''})
+      assert_css 'link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
+    end
+
+    test 'should embed default stylesheet if safe mode is less than secure and linkcss is unset' do
+      sample_input_path = fixture_path('basic.asciidoc')
+      output = Asciidoctor.render_file(sample_input_path, :header_footer => true,
+          :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'linkcss!' => ''})
+      assert_css 'style', output, 1
+      stylenode = xmlnodes_at_css 'style', output, 1
+      styles = stylenode.first.content
+      assert !styles.nil?
+      assert !styles.strip.empty?
+    end
+
     test 'should render document in place' do
       sample_input_path = fixture_path('sample.asciidoc')
       sample_output_path = fixture_path('sample.html')
@@ -499,7 +522,9 @@ content
     end
 
     test 'with header footer' do
-      result = render_string("= Title\n\npreamble")
+      doc = document_from_string "= Title\n\npreamble"
+      assert !doc.attr?('embedded')
+      result = doc.render
       assert_xpath '/html', result, 1
       assert_xpath '//*[@id="header"]', result, 1
       assert_xpath '//*[@id="header"]/h1', result, 1
@@ -508,7 +533,9 @@ content
     end
 
     test 'no header footer' do
-      result = render_string("= Title\n\npreamble", :header_footer => false)
+      doc = document_from_string "= Title\n\npreamble", :header_footer => false
+      assert doc.attr?('embedded')
+      result = doc.render
       assert_xpath '/html', result, 0
       assert_xpath '/h1', result, 0
       assert_xpath '/*[@id="header"]', result, 0
