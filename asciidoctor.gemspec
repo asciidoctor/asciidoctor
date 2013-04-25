@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'asciidoctor'
-  s.version           = '0.1.1'
-  s.date              = '2013-02-26'
+  s.version           = '0.1.2'
+  s.date              = '2013-04-25'
   s.rubyforge_project = 'asciidoctor'
 
   ## Make sure your summary is short. The description may be as long
@@ -25,8 +25,8 @@ Gem::Specification.new do |s|
   ## List the primary authors. If there are a bunch of authors, it's probably
   ## better to set the email to an email list or something. If you don't have
   ## a custom homepage, consider using your GitHub URL or the like.
-  s.authors  = ["Ryan Waldron", "Dan Allen", "Jeremy McAnally"]
-  s.email    = 'rew@erebor.com'
+  s.authors  = ['Ryan Waldron', 'Dan Allen', 'Jeremy McAnally', 'Jason Porter']
+  s.email    = 'dan.j.allen@gmail.com'
   s.homepage = 'http://github.com/asciidoctor'
 
   ## This gets added to the $LOAD_PATH so that 'lib/NAME.rb' can be required as
