@@ -22,7 +22,7 @@ module Asciidoctor
         self[:eruby] = options[:eruby] || nil
         self[:compact] = options[:compact] || false
         self[:verbose] = options[:verbose] || false
-        self[:base_dir] = options[:base_dir] || nil
+        self[:base_dir] = options[:base_dir]
         self[:destination_dir] = options[:destination_dir] || nil
         self[:trace] = false
       end
@@ -125,8 +125,8 @@ Example: asciidoctor -b html5 source.asciidoc
           if self[:input_file].nil? || self[:input_file].empty?
             $stderr.puts opts_parser
             return 1
-          elsif self[:input_file] != '-' && !File.exist?(self[:input_file])
-            $stderr.puts "asciidoctor: FAILED: input file #{self[:input_file]} missing"
+          elsif self[:input_file] != '-' && !File.readable?(self[:input_file])
+            $stderr.puts "asciidoctor: FAILED: input file #{self[:input_file]} missing or cannot be read"
             return 1
           end
         rescue OptionParser::MissingArgument

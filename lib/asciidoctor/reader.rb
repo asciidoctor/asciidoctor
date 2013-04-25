@@ -442,7 +442,7 @@ class Reader
     elsif @document.attributes.fetch('include-depth', 0).to_i > 0
       advance
       # FIXME this borks line numbers
-      include_file = @document.normalize_asset_path(target, 'include file')
+      include_file = @document.normalize_system_path(target, nil, nil, :target_name => 'include file')
       if !File.file?(include_file)
         puts "asciidoctor: WARNING: line #{@lineno}: include file not found: #{include_file}"
         return true

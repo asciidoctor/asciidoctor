@@ -177,7 +177,7 @@ class AbstractNode
     if attr? 'icon'
       image_uri(attr('icon'), nil)
     else
-      image_uri(name + '.' + @document.attr('icontype', 'png'), 'iconsdir')
+      image_uri("#{name}.#{@document.attr('icontype', 'png')}", 'iconsdir')
     end
   end
 
@@ -199,9 +199,9 @@ class AbstractNode
     if target.include?(':') && target.match(Asciidoctor::REGEXP[:uri_sniff])
       target
     elsif asset_dir_key && attr?(asset_dir_key)
-      File.join(@document.attr(asset_dir_key), target)
+      normalize_web_path(target, @document.attr(asset_dir_key))
     else
-      target
+      normalize_web_path(target)
     end
   end
 
@@ -230,9 +230,9 @@ class AbstractNode
     elsif @document.safe < Asciidoctor::SafeMode::SECURE && @document.attr?('data-uri')
       generate_data_uri(target_image, asset_dir_key)
     elsif asset_dir_key && attr?(asset_dir_key)
-      File.join(@document.attr(asset_dir_key), target_image)
+      normalize_web_path(target_image, @document.attr(asset_dir_key))
     else
-      target_image
+      normalize_web_path(target_image)
     end
   end
 
@@ -253,9 +253,17 @@ class AbstractNode
 
     mimetype = 'image/' + File.extname(target_image)[1..-1]
     if asset_dir_key
-      image_path = File.join(normalize_asset_path(@document.attr(asset_dir_key, '.'), asset_dir_key), target_image)
+      #asset_dir_path = normalize_system_path(@document.attr(asset_dir_key), nil, nil, :target_name => asset_dir_key)
+      #image_path = normalize_system_path(target_image, asset_dir_path, nil, :target_name => 'image')
+      image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, :target_name => 'image')
     else
-      image_path = normalize_asset_path(target_image)
+      image_path = normalize_system_path(target_image)
+    end
+
+    if !File.readable? image_path
+      puts "asciidoctor: WARNING: image to embed not found or not readable: #{image_path}"
+      return "data:#{mimetype}:base64,"
+      #return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     end
 
     bindata = nil
@@ -264,88 +272,79 @@ class AbstractNode
     else
       bindata = File.open(image_path, 'rb') {|file| file.read }
     end
-    'data:' + mimetype + ';base64,' + Base64.encode64(bindata).delete("\n")
+    "data:#{mimetype};base64,#{Base64.encode64(bindata).delete("\n")}"
+  end
+
+  # Public: Read the contents of the file at the specified path.
+  # This method assumes that the path is safe to read. It checks
+  # that the file is readable before attempting to read it.
+  #
+  # path - the String path from which to read the contents
+  #
+  # returns the contents of the file at the specified path, or nil
+  # if the file does not exist.
+  def read_asset(path)
+    if File.readable? path
+      File.read path
+    else
+      nil
+    end
+  end
+
+  # Public: Normalize the web page using the PathResolver.
+  #
+  # See PathResolver::web_path(target, start) for details.
+  #
+  # target - the String target path
+  # start  - the String start (i.e, parent) path (optional, default: nil)
+  #
+  # returns the resolved String path 
+  def normalize_web_path(target, start = nil)
+    PathResolver.new.web_path(target, start)
+  end
+
+  # Public: Resolve and normalize a secure path from the target and start paths
+  # using the PathResolver.
+  #
+  # See PathResolver::system_path(target, start, jail, opts) for details.
+  #
+  # The most important functionality in this method is to prevent resolving a
+  # path outside of the jail (which defaults to the directory of the source
+  # file, stored in the base_dir instance variable on Document) if the document
+  # safe level is set to SafeMode::SAFE or greater (a condition which is true
+  # by default).
+  #
+  # target - the String target path
+  # start  - the String start (i.e., parent) path
+  # jail   - the String jail path to confine the resolved path
+  # opts   - an optional Hash of options to control processing (default: {}):
+  #          * :recover is used to control whether the processor should auto-recover
+  #              when an illegal path is encountered
+  #          * :target_name is used in messages to refer to the path being resolved
+  #
+  # raises a SecurityError if a jail is specified and the resolved path is
+  # outside the jail.
+  #
+  # returns a String path resolved from the start and target paths, with any
+  # parent references resolved and self references removed. If a jail is provided,
+  # this path will be guaranteed to be contained within the jail.
+  def normalize_system_path(target, start = nil, jail = nil, opts = {})
+    if start.nil?
+      start = @document.base_dir
+    end
+    if jail.nil? && @document.safe >= SafeMode::SAFE
+      jail = @document.base_dir
+    end
+    PathResolver.new.system_path(target, start, jail, opts)
   end
 
   # Public: Normalize the asset file or directory to a concrete and rinsed path
   #
-  # The most important functionality in this method is to prevent the asset
-  # reference from resolving to a directory outside of the chroot directory
-  # (which defaults to the directory of the source file, stored in the base_dir
-  # instance variable on Document) if the document safe level is set to
-  # SafeMode::SAFE or greater (a condition which is true by default).
-  #
-  # asset_ref    - the String asset file or directory referenced in the document
-  #                or configuration attribute
-  # asset_name   - the String name of the file or directory being resolved (for use in
-  #                the warning message) (default: 'path')
-  #
-  # Examples
-  #
-  #  # given these fixtures
-  #  document.base_dir
-  #  # => "/path/to/chroot"
-  #  document.safe >= Asciidoctor::SafeMode::SAFE
-  #  # => true
-  #
-  #  # then
-  #  normalize_asset_path('images')
-  #  # => "/path/to/chroot/images"
-  #  normalize_asset_path('/etc/images')
-  #  # => "/path/to/chroot/images"
-  #  normalize_asset_path('../images')
-  #  # => "/path/to/chroot/images"
-  #
-  #  # given these fixtures
-  #  document.base_dir
-  #  # => "/path/to/chroot"
-  #  document.safe >= Asciidoctor::SafeMode::SAFE
-  #  # => false
-  #
-  #  # then
-  #  normalize_asset_path('images')
-  #  # => "/path/to/chroot/images"
-  #  normalize_asset_path('/etc/images')
-  #  # => "/etc/images"
-  #  normalize_asset_path('../images')
-  #  # => "/path/to/images"
-  #
-  # Returns The normalized asset file or directory as a String path
-  #--
-  # TODO this method is missing a coordinate; it should be able to resolve
-  # both the directory reference and the path to an asset in it; callers
-  # of this method are still doing a File.join to finish the task
+  # Delegates to normalize_system_path, with the start path set to the value of
+  # the base_dir instance variable on the Document object.
   def normalize_asset_path(asset_ref, asset_name = 'path', autocorrect = true)
-    # TODO we may use pathname enough to make it a top-level require
-    Helpers.require_library 'pathname'
-
-    input_path = @document.base_dir
-    asset_path = Pathname.new(asset_ref)
-    
-    if asset_path.relative?
-      asset_path = File.expand_path(File.join(input_path, asset_ref))
-    else
-      asset_path = asset_path.cleanpath.to_s
-    end
-
-    if @document.safe >= SafeMode::SAFE
-      relative_asset_path = Pathname.new(asset_path).relative_path_from(Pathname.new(input_path)).to_s
-      if relative_asset_path.start_with?('..')
-        if autocorrect
-          puts "asciidoctor: WARNING: #{asset_name} has illegal reference to ancestor of base directory"
-        else
-          raise SecurityError, "#{asset_name} has reference to path outside of base directory, disallowed in safe mode: #{asset_path}"
-        end
-        relative_asset_path.sub!(REGEXP[:leading_parent_dirs], '')
-        # just to be absolutely sure ;)
-        if relative_asset_path[0..0] == '.'
-          raise 'Substitution of parent path references failed for ' + relative_asset_path
-        end
-        asset_path = File.expand_path(File.join(input_path, relative_asset_path))
-      end
-    end
-
-    asset_path
+    normalize_system_path(asset_ref, @document.base_dir, nil,
+        :target_name => asset_name, :recover => autocorrect)
   end
 
 end
