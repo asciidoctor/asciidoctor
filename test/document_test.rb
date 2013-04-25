@@ -19,6 +19,16 @@ context 'Document' do
       assert_equal Asciidoctor::SafeMode::SECURE, doc.safe
     end
 
+    test 'safe mode attributes are set on document' do
+      doc = Asciidoctor::Document.new
+      assert_equal Asciidoctor::SafeMode::SECURE, doc.attr('safe-mode-level')
+      assert_equal 'secure', doc.attr('safe-mode-name')
+      assert doc.attr?('safe-mode-secure')
+      assert !doc.attr?('safe-mode-unsafe')
+      assert !doc.attr?('safe-mode-safe')
+      assert !doc.attr?('safe-mode-server')
+    end
+
     test 'safe mode level can be set in the constructor' do
       doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SafeMode::SAFE
       assert_equal Asciidoctor::SafeMode::SAFE, doc.safe
