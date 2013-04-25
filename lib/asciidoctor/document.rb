@@ -156,6 +156,11 @@ class Document < AbstractBlock
     @attribute_overrides['asciidoctor'] = ''
     @attribute_overrides['asciidoctor-version'] = VERSION
 
+    safe_mode_name = SafeMode.constants.detect {|l| SafeMode.const_get(l) == @safe}.to_s.downcase
+    @attribute_overrides['safe-mode-name'] = safe_mode_name
+    @attribute_overrides["safe-mode-#{safe_mode_name}"] = ''
+    @attribute_overrides['safe-mode-level'] = @safe
+
     # sync the embedded attribute w/ the value of options...do not allow override
     @attribute_overrides['embedded'] = @options[:header_footer] ? nil : ''
 
