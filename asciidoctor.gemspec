@@ -18,9 +18,9 @@ Gem::Specification.new do |s|
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
-  s.summary     = 'Pure Ruby Asciidoc to HTML rendering.'
+  s.summary     = 'A native Ruby AsciiDoc syntax processor and publishing toolchain'
   s.description = <<-EOS
-A pure Ruby processor to turn Asciidoc-formatted documents into HTML (and, eventually, other formats perhaps).
+An open source text processor and publishing toolchain, written entirely in Ruby, for converting AsciiDoc markup into HTML 5, DocBook 4.5 and other formats. 
 EOS
   s.license     = 'MIT'
 
