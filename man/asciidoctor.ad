@@ -101,7 +101,7 @@ Rendering Control
 
 *-T, --template-dir*='DIR'::
     Directory containing custom render templates that override one or more
-    templates from the the built-in set. If there is a folder in the directory
+    templates from the built-in set. If there is a folder in the directory
     that matches the backend, the templates from that folder will be used.
 
 Processing Information
