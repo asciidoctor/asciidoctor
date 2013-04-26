@@ -194,7 +194,6 @@ class Document < AbstractBlock
     if @safe >= SafeMode::SERVER
       # restrict document from setting linkcss, copycss, source-highlighter and backend
       @attribute_overrides['copycss'] ||= nil
-      @attribute_overrides['linkcss'] ||= ''
       @attribute_overrides['source-highlighter'] ||= nil
       @attribute_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
@@ -202,17 +201,24 @@ class Document < AbstractBlock
         @attribute_overrides['docfile'] = @attribute_overrides['docfile'][(@attribute_overrides['docdir'].length + 1)..-1]
       end
       @attribute_overrides['docdir'] = ''
-      # restrict document from enabling icons
       if @safe >= SafeMode::SECURE
+        # assign linkcss (preventing css embedding) unless disabled from the commandline
+        unless @attribute_overrides.fetch('linkcss', '').nil? || @attribute_overrides.has_key?('linkcss!')
+          @attribute_overrides['linkcss'] = ''
+        end
+        # restrict document from enabling icons
         @attribute_overrides['icons'] ||= nil
       end
     end
     
     @attribute_overrides.delete_if {|key, val|
       verdict = false
-      # a nil or negative key undefines the attribute 
-      if val.nil? || key[-1..-1] == '!'
-        @attributes.delete(key.chomp '!')
+      # a nil value undefines the attribute 
+      if val.nil?
+        @attributes.delete(key)
+      # a negative key undefines the attribute
+      elsif key.end_with? '!'
+        @attributes.delete(key[0..-2])
       # otherwise it's an attribute assignment
       else
         # a value ending in @ indicates this attribute does not override

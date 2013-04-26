@@ -196,9 +196,26 @@ preamble
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
 
+    test 'should link to default stylesheet by default if linkcss is unset in document' do
+      input = <<-EOS
+= Document Title
+:linkcss!:
+
+text
+      EOS
+
+      output = Asciidoctor.render(input, :header_footer => true)
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
+    end
+
     test 'should link to default stylesheet by default if linkcss is unset' do
-      sample_input_path = fixture_path('basic.asciidoc')
-      output = Asciidoctor.render_file(sample_input_path, :header_footer => true, :attributes => {'linkcss!' => ''})
+      input = <<-EOS
+= Document Title
+
+text
+      EOS
+
+      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'linkcss!' => ''})
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
 

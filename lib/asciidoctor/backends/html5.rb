@@ -72,7 +72,7 @@ class DocumentTemplate < BaseTemplate
     <% end %>
     <title><%= doctitle %></title>
     <% if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet') %>
-    <% if attr? 'linkcss' %>
+    <% if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
     <link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>">
     <% else %>
     <style>
