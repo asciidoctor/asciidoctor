@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: [see the "AUTHORS" section]
-.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 02/18/2013
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 04/25/2013
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "02/18/2013" "\ \&" "\ \&"
+.TH "ASCIIDOCTOR" "1" "04/25/2013" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -127,7 +127,7 @@ Compact the output by removing blank lines\&. Not enabled by default\&.
 .PP
 \fB\-D, \-\-destination\-dir\fR=\fIDIR\fR
 .RS 4
-Destination output directory\&. Defaults to the directory containing the source file, or the working directory if the source is read from a stream\&.
+Destination output directory\&. Defaults to the directory containing the source file, or the working directory if the source is read from a stream\&. If specified, the directory is resolved relative to the working directory\&.
 .RE
 .PP
 \fB\-e, \-\-eruby\fR
@@ -154,7 +154,7 @@ extension\&. If the input is read from standard input, then the output file defa
 \fIOUT_FILE\fR
 is
 \fI\-\fR
-then the standard output is also used\&.
+then the standard output is also used\&. If specified, the file is resolved relative to the working directory\&.
 .RE
 .PP
 \fB\-s, \-\-no\-header\-footer\fR
@@ -218,4 +218,4 @@ GitHub organization: <\fBhttp://github\&.com/asciidoctor\fR>
 Mailinglist / forum: <\fBhttp://discuss\&.asciidoctor\&.org\fR>
 .SH "COPYING"
 .sp
-Copyright (C) Ryan Waldron\&. Free use of this software is granted under the terms of the MIT License\&.
+Copyright (C) Ryan Waldron and Dan Allen\&. Free use of this software is granted under the terms of the MIT License\&.

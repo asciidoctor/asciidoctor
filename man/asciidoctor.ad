@@ -80,6 +80,7 @@ Rendering Control
 *-D, --destination-dir*='DIR'::
     Destination output directory. Defaults to the directory containing the
     source file, or the working directory if the source is read from a stream.
+    If specified, the directory is resolved relative to the working directory.
 
 *-e, --eruby*::
     Specifies the eRuby implementation to use for rendering the built-in
@@ -92,7 +93,8 @@ Rendering Control
     Write output to file 'OUT_FILE'. Defaults to the base name of the input
     file suffixed with 'backend' extension. If the input is read from standard
     input, then the output file defaults to stdout. If 'OUT_FILE' is '-' then
-    the standard output is also used.
+    the standard output is also used. If specified, the file is resolved
+    relative to the working directory.
 
 *-s, --no-header-footer*::
     Suppress the document header and footer in the output.
@@ -158,5 +160,5 @@ Mailinglist / forum: <**http://discuss.asciidoctor.org**>
 
 COPYING
 -------
-Copyright \(C) Ryan Waldron. Free use of this software is granted under the
-terms of the MIT License.
+Copyright \(C) Ryan Waldron and Dan Allen. Free use of this software is granted
+under the terms of the MIT License.
