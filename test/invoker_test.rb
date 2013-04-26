@@ -165,15 +165,31 @@ context 'Invoker' do
   end
 
   test 'should not compact output by default' do
-    invoker = invoke_cli_to_buffer(%w(-s -o -), '-') { 'content' }
+    # NOTE we are relying on the fact that the template leaves blank lines
+    # this will always fail when using a template engine which strips blank lines by default
+    invoker = invoke_cli_to_buffer(%w(-o -), '-') { '* content' }
     output = invoker.read_output
     assert_match(/\n[[:blank:]]*\n/, output)
   end
 
   test 'should compact output if specified' do
-    invoker = invoke_cli_to_buffer(%w(-C -s -o -), '-') { 'content' }
+    # NOTE we are relying on the fact that the template leaves blank lines
+    # this will always succeed when using a template engine which strips blank lines by default
+    invoker = invoke_cli_to_buffer(%w(-C -s -o -), '-') { '* content' }
     output = invoker.read_output
     assert_no_match(/\n[[:blank:]]*\n/, output)
+  end
+
+  test 'should output a trailing endline to stdout' do
+    invoker = nil
+    output = nil
+    redirect_streams do |stdout, stderr|
+      invoker = invoke_cli %w(-o -)
+      output = stdout.string
+    end
+    assert !invoker.nil?
+    assert !output.nil?
+    assert output.end_with?("\n")
   end
 
   test 'should set backend to html5 if specified' do

@@ -825,7 +825,9 @@ module Asciidoctor
     if to_file
       start = Time.now if monitor
       if stream_output
-        to_file.write output
+        to_file.write output.rstrip
+        # ensure there's a trailing endline
+        to_file.write "\n"
       else
         File.open(to_file, 'w') {|file| file.write output }
         # these assignments primarily for testing, diagnostics or reporting
