@@ -65,7 +65,7 @@ EOS
   s.files = %w[
     Gemfile
     LICENSE
-    README.asciidoc
+    README.adoc
     Rakefile
     asciidoctor.gemspec
     bin/asciidoctor
