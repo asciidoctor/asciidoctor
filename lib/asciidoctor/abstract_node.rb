@@ -279,14 +279,17 @@ class AbstractNode
   # This method assumes that the path is safe to read. It checks
   # that the file is readable before attempting to read it.
   #
-  # path - the String path from which to read the contents
+  # path            - the String path from which to read the contents
+  # warn_on_failure - a Boolean that controls whether a warning is issued if
+  #                   the file cannot be read
   #
   # returns the contents of the file at the specified path, or nil
   # if the file does not exist.
-  def read_asset(path)
+  def read_asset(path, warn_on_failure = false)
     if File.readable? path
       File.read path
     else
+      puts "asciidoctor: WARNING: file does not exist or cannot be read: #{path}" if warn_on_failure
       nil
     end
   end

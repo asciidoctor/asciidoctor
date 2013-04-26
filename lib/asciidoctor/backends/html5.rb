@@ -84,7 +84,7 @@ class DocumentTemplate < BaseTemplate
     <link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), attr(:stylesdir, '')) %>">
     <% else %>
     <style>
-<%= read_asset normalize_system_path(attr(:stylesheet), attr(:stylesdir, '')) %>
+<%= read_asset normalize_system_path(attr(:stylesheet), attr(:stylesdir, '')), true %>
     </style>
     <% end %>
     <% end %>
