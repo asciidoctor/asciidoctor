@@ -348,6 +348,11 @@ context 'Substitutions' do
       assert_equal %q{http://google.com}, para.sub_macros(para.buffer.join)
     end
 
+    test 'a comma separated list of links should not include commas in links' do
+      para = block_from_string('http://foo.com, http://bar.com, http://example.org')
+      assert_equal %q{<a href="http://foo.com">http://foo.com</a>, <a href="http://bar.com">http://bar.com</a>, <a href="http://example.org">http://example.org</a>}, para.sub_macros(para.buffer.join)
+    end
+
     test 'a single-line image macro should be interpreted as an image' do
       para = block_from_string('image:tiger.png[]')
       assert_equal %{<span class="image"><img src="tiger.png" alt="tiger"></span>}, para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
