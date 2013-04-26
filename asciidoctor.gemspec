@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   ## This group of properties is updated automatically by the Rake build when
   ## cutting a new release (see the validate task)
   s.name              = 'asciidoctor'
-  s.version           = '0.1.2.cr'
+  s.version           = '0.1.2'
   s.date              = '2013-04-25'
   s.rubyforge_project = 'asciidoctor'
 
