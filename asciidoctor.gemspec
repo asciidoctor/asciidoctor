@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   ## name, version, date and rubyforge_project are updated automatically by the
   ## Rake build (see the validate task)
   s.name              = 'asciidoctor'
-  s.version           = '0.1.2'
-  s.date              = '2013-04-25'
+  s.version           = '0.1.3.pre'
+  s.date              = '2013-04-26'
   s.rubyforge_project = 'asciidoctor'
 
   s.summary     = 'A native Ruby AsciiDoc syntax processor and publishing toolchain'
