@@ -82,8 +82,8 @@ Example: asciidoctor -b html5 source.asciidoc
                   'a list of attributes, in the form key or key=value pair, to set on the document',
                   'these attributes take precedence over attributes defined in the source file') do |attribs|
             attribs.each do |attrib|
-              tokens = attrib.split('=')
-              self[:attributes][tokens[0]] = tokens[1] || ''
+              key, val = attrib.split '=', 2
+              self[:attributes][key] = val || ''
             end
           end
           opts.on('-T', '--template-dir DIR', 'directory containing custom render templates the override the built-in set') do |template_dir|

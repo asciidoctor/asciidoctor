@@ -234,6 +234,23 @@ context 'Invoker' do
     assert_xpath '//h2[@id="idsection_a"]', output, 1
   end
 
+  test 'should set attribute with value containing equal sign' do
+    invoker = invoke_cli_to_buffer %w(--trace -a toc -a toc-title=t=o=c -o -)
+    doc = invoker.document
+    assert_equal 't=o=c', doc.attr('toc-title')
+    output = invoker.read_output
+    assert_xpath '//*[@id="toctitle"][text() = "t=o=c"]', output, 1
+  end
+
+  test 'wip should set attribute with quoted value containing a space' do
+	# emulating commandline arguments: --trace -a toc -a note-caption="Note to self:" -o -
+    invoker = invoke_cli_to_buffer %w(--trace -a toc -a note-caption=Note\ to\ self: -o -)
+    doc = invoker.document
+    assert_equal 'Note to self:', doc.attr('note-caption')
+    output = invoker.read_output
+    assert_xpath %(//*[#{contains_class('admonitionblock')}]//*[@class='title'][text() = 'Note to self:']), output, 1
+  end
+
   test 'should not set attribute ending in @ if defined in document' do
     invoker = invoke_cli_to_buffer %w(--trace -a idprefix=id@ -s -o -)
     doc = invoker.document

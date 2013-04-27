@@ -99,6 +99,65 @@ preamble
       assert !doc.attr?('docfile')
       assert_equal doc.base_dir, doc.attr('docdir')
     end
+
+    test 'should accept attributes as array' do
+	  # NOTE there's a tab character before idseparator
+      doc = Asciidoctor.load('text', :attributes => %w(toc numbered   source-highlighter=coderay idprefix	idseparator=-))
+      assert doc.attributes.is_a?(Hash)
+      assert doc.attr?('toc')
+      assert_equal '', doc.attr('toc')
+      assert doc.attr?('numbered')
+      assert_equal '', doc.attr('numbered')
+      assert doc.attr?('source-highlighter')
+      assert_equal 'coderay', doc.attr('source-highlighter')
+      assert doc.attr?('idprefix')
+      assert_equal '', doc.attr('idprefix')
+      assert doc.attr?('idseparator')
+      assert_equal '-', doc.attr('idseparator')
+    end
+
+    test 'should accept attributes as empty array' do
+      doc = Asciidoctor.load('text', :attributes => [])
+      assert doc.attributes.is_a?(Hash)
+    end
+
+    test 'should accept attributes as string' do
+	  # NOTE there's a tab character before idseparator
+      doc = Asciidoctor.load('text', :attributes => 'toc numbered  source-highlighter=coderay idprefix	idseparator=-')
+      assert doc.attributes.is_a?(Hash)
+      assert doc.attr?('toc')
+      assert_equal '', doc.attr('toc')
+      assert doc.attr?('numbered')
+      assert_equal '', doc.attr('numbered')
+      assert doc.attr?('source-highlighter')
+      assert_equal 'coderay', doc.attr('source-highlighter')
+      assert doc.attr?('idprefix')
+      assert_equal '', doc.attr('idprefix')
+      assert doc.attr?('idseparator')
+      assert_equal '-', doc.attr('idseparator')
+    end
+
+    test 'should accept values containing spaces in attributes string' do
+	  # NOTE there's a tab character before self:
+      doc = Asciidoctor.load('text', :attributes => 'idprefix idseparator=-   note-caption=Note\ to\	self: toc')
+      assert doc.attributes.is_a?(Hash)
+      assert doc.attr?('idprefix')
+      assert_equal '', doc.attr('idprefix')
+      assert doc.attr?('idseparator')
+      assert_equal '-', doc.attr('idseparator')
+      assert doc.attr?('note-caption')
+      assert_equal "Note to	self:", doc.attr('note-caption')
+    end
+
+    test 'should accept attributes as empty string' do
+      doc = Asciidoctor.load('text', :attributes => '')
+      assert doc.attributes.is_a?(Hash)
+    end
+
+    test 'should accept attributes as nil' do
+      doc = Asciidoctor.load('text', :attributes => nil)
+      assert doc.attributes.is_a?(Hash)
+    end
   end
 
   context 'Render APIs' do
@@ -112,6 +171,18 @@ preamble
       assert_xpath '/html/body', output, 1
       assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
       assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+    end
+
+    test 'should accept attributes as array' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      output = Asciidoctor.render_file(sample_input_path, :attributes => %w(numbered idprefix idseparator=-))
+      assert_css '#section-a', output, 1
+    end
+
+    test 'should accept attributes as string' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      output = Asciidoctor.render_file(sample_input_path, :attributes => 'numbered idprefix idseparator=-')
+      assert_css '#section-a', output, 1
     end
 
     test 'should include docinfo files for html backend' do
@@ -347,7 +418,7 @@ text
       end
     end
 
-    test 'missing directories should be created if specified' do
+    test 'missing directories should be created if mkdirs is enabled' do
       sample_input_path = fixture_path('sample.asciidoc')
       output_dir = File.join(File.join(File.dirname(sample_input_path), 'test_output'), 'subdir')
       sample_output_path = File.join(output_dir, 'sample.html')
