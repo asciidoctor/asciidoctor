@@ -19,6 +19,30 @@ context 'Document' do
       assert_equal Asciidoctor::SafeMode::SECURE, doc.safe
     end
 
+    test 'safe mode level set using string' do
+      doc = Asciidoctor::Document.new [], :safe => 'server'
+      assert_equal Asciidoctor::SafeMode::SERVER, doc.safe
+
+      doc = Asciidoctor::Document.new [], :safe => 'foo'
+      assert_equal Asciidoctor::SafeMode::SECURE, doc.safe
+    end
+
+    test 'safe mode level set using symbol' do
+      doc = Asciidoctor::Document.new [], :safe => :server
+      assert_equal Asciidoctor::SafeMode::SERVER, doc.safe
+
+      doc = Asciidoctor::Document.new [], :safe => :foo
+      assert_equal Asciidoctor::SafeMode::SECURE, doc.safe
+    end
+
+    test 'safe mode level set using integer' do
+      doc = Asciidoctor::Document.new [], :safe => 10
+      assert_equal Asciidoctor::SafeMode::SERVER, doc.safe
+
+      doc = Asciidoctor::Document.new [], :safe => 100
+      assert_equal 100, doc.safe
+    end
+
     test 'safe mode attributes are set on document' do
       doc = Asciidoctor::Document.new
       assert_equal Asciidoctor::SafeMode::SECURE, doc.attr('safe-mode-level')
