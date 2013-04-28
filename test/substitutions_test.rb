@@ -64,34 +64,55 @@ context 'Substitutions' do
       assert_equal %q{&#8216;Here`s Johnny!&#8217;}, para.sub_quotes(para.buffer.join)
     end
 
-    test 'single-line constrained unquoted string' do
+    test 'single-line constrained marked string' do
       para = block_from_string(%q{#a few words#})
-      assert_equal 'a few words', para.sub_quotes(para.buffer.join)
+      assert_equal '<mark>a few words</mark>', para.sub_quotes(para.buffer.join)
     end
 
-    test 'escaped single-line constrained unquoted string' do
+    test 'escaped single-line constrained marked string' do
       para = block_from_string(%q{\#a few words#})
       assert_equal '#a few words#', para.sub_quotes(para.buffer.join)
     end
 
-    test 'multi-line constrained unquoted string' do
+    test 'multi-line constrained marked string' do
       para = block_from_string(%Q{#a few\nwords#})
-      assert_equal "a few\nwords", para.sub_quotes(para.buffer.join)
+      assert_equal "<mark>a few\nwords</mark>", para.sub_quotes(para.buffer.join)
     end
 
-    test 'single-line unconstrained unquoted string' do
+    test 'single-line unconstrained marked string' do
       para = block_from_string(%q{##--anything goes ##})
-      assert_equal '--anything goes ', para.sub_quotes(para.buffer.join)
+      assert_equal '<mark>--anything goes </mark>', para.sub_quotes(para.buffer.join)
     end
 
-    test 'escaped single-line unconstrained unquoted string' do
+    test 'escaped single-line unconstrained marked string' do
       para = block_from_string(%q{\##--anything goes ##})
-      assert_equal '#--anything goes #', para.sub_quotes(para.buffer.join)
+      assert_equal '<mark>#--anything goes #</mark>', para.sub_quotes(para.buffer.join)
     end
 
-    test 'multi-line unconstrained unquoted string' do
+    test 'multi-line unconstrained marked string' do
       para = block_from_string(%Q{##--anything\ngoes ##})
-      assert_equal "--anything\ngoes ", para.sub_quotes(para.buffer.join)
+      assert_equal "<mark>--anything\ngoes </mark>", para.sub_quotes(para.buffer.join)
+    end
+
+    test 'marked strings with built-in roles' do
+      input = <<-EOS
+#mark element#
+[span]#span element#
+[small]#small element#
+[mark tag]#mark element with class tag#
+[tag]#span element with class tag#
+[small tag]#small element with class tag#
+      EOS
+      para = block_from_string input
+      expected = <<-EOS
+<mark>mark element</mark>
+<span>span element</span>
+<small>small element</small>
+<mark class="tag">mark element with class tag</mark>
+<span class="tag">span element with class tag</span>
+<small class="tag">small element with class tag</small>
+      EOS
+      assert_equal expected.rstrip, para.sub_quotes(para.buffer.join).rstrip
     end
 
     test 'single-line constrained strong string' do

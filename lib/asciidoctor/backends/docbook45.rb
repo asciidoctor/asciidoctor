@@ -573,8 +573,18 @@ class InlineQuotedTemplate < BaseTemplate
 
   def quote_text(text, type, role)
     start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
-    if role
-      "#{start_tag}<phrase role=\"#{role}\">#{text}</phrase>#{end_tag}"
+    if type == :mark
+      if !role
+        %(<emphasis role="marked">#{text}</emphasis>)
+      elsif role == 'span'
+        "<phrase>#{text}</phrase>"
+      elsif role.start_with? 'mark '
+        %(<emphasis role="marked #{role[5..-1]}">#{text}</emphasis>)
+      else
+        %(<phrase role="#{role}">#{text}</phrase>)
+      end
+    elsif role
+      %(#{start_tag}<phrase role="#{role}">#{text}</phrase>#{end_tag})
     else
       "#{start_tag}#{text}#{end_tag}"
     end

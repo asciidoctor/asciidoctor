@@ -718,8 +718,22 @@ class InlineQuotedTemplate < BaseTemplate
 
   def quote_text(text, type, role)
     start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
-    if role
-      "#{start_tag}<span class=\"#{role}\">#{text}</span>#{end_tag}"
+    if type == :mark
+      if !role
+        "<mark>#{text}</mark>"
+      elsif role == 'span'
+        "<span>#{text}</span>"
+      elsif role == 'small'
+        "<small>#{text}</small>"
+      elsif role.start_with? 'mark '
+        %(<mark class="#{role[5..-1]}">#{text}</mark>)
+      elsif role.start_with? 'small '
+        %(<small class="#{role[6..-1]}">#{text}</small>)
+      else
+        %(<span class="#{role}">#{text}</span>)
+      end
+    elsif role
+      %(#{start_tag}<span class="#{role}">#{text}</span>#{end_tag})
     else
       "#{start_tag}#{text}#{end_tag}"
     end
