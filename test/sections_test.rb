@@ -898,9 +898,31 @@ Fin.
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Contents"]', output, 1
     end
 
+    test 'should render table of contents in preamble if toc-placement attribute value is preamble' do
+      input = <<-EOS
+= Article
+:toc:
+:toc-placement: preamble
+
+Once upon a time...
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@id="preamble"]/*[@id="toc"]', output, 1
+    end
+
     test 'should not render table of contents if toc-placement attribute is unset' do
       input = <<-EOS
 = Article
+:toc:
 :toc-placement!:
 
 == Section One
