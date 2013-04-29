@@ -287,7 +287,7 @@ class AbstractNode
   # if the file does not exist.
   def read_asset(path, warn_on_failure = false)
     if File.readable? path
-      File.read path
+      File.read(path).chomp
     else
       puts "asciidoctor: WARNING: file does not exist or cannot be read: #{path}" if warn_on_failure
       nil
