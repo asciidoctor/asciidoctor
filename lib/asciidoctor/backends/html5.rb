@@ -431,12 +431,14 @@ class BlockAdmonitionTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="admonitionblock <%= attr :name %>#{role_class}">
   <table>
     <tr>
-      <td class="icon">
-        <% if attr? :icons %>
-        <img src="<%= icon_uri(attr :name) %>" alt="<%= @caption %>">
-        <% else %>
-        <div class="title"><%= @caption %></div>
-        <% end %>
+      <td class="icon"><%
+        if attr? 'icons', 'font' %>
+        <i class="icon-<%= attr :name %>" title="<%= @caption %>"></i><%
+        elsif attr? 'icons' %>
+        <img src="<%= icon_uri(attr :name) %>" alt="<%= @caption %>"><%
+        else %>
+        <div class="title"><%= @caption %></div><%
+        end %>
       </td>
       <td class="content">
         #{title_div}
@@ -623,7 +625,10 @@ class BlockColistTemplate < BaseTemplate
   <table>
     <% content.each_with_index do |item, i| %>
     <tr>
-      <td><img src="<%= icon_uri("callouts/\#{i + 1}") %>" alt="<%= i + 1 %>"></td>
+      <td><%
+        if attr? :icons, 'font' %><i class="conum"><%= i + 1 %></i><%
+        else %><img src="<%= icon_uri("callouts/\#{i + 1}") %>" alt="<%= i + 1 %>"><%
+        end %></td>
       <td><%= item.text %></td>
     </tr>
     <% end %>
@@ -778,7 +783,9 @@ end
 
 class InlineCalloutTemplate < BaseTemplate
   def result(node)
-    if node.attr? 'icons'
+    if node.attr? 'icons', 'font'
+      %(<i class="conum">#{node.text}</i>)
+    elsif node.attr? 'icons'
       src = node.icon_uri("callouts/#{node.text}")
       %(<img src="#{src}" alt="#{node.text}">)
     else

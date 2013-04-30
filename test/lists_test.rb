@@ -3642,4 +3642,27 @@ puts doc.render # <3>
       assert_xpath %((/div[@class="colist arabic"]//td/img)[#{i}][@src="./images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
     end
   end
+
+  test 'callout list with font-based icons enabled' do
+    input = <<-EOS
+[source]
+----
+require 'asciidoctor' # <1>
+doc = Asciidoctor::Document.new('Hello, World!') # <2>
+puts doc.render # <3>
+----
+<1> Describe the first line
+<2> Describe the second line
+<3> Describe the third line
+    EOS
+    output = render_embedded_string input, :attributes => {'icons' => 'font'}
+    assert_css '.listingblock code > i', output, 3
+    (1..3).each do |i|
+      assert_xpath %((/div[@class="listingblock"]//code/i)[#{i}][@class="conum"][text() = "#{i}"]), output, 1
+    end
+    assert_css '.colist table td i', output, 3
+    (1..3).each do |i|
+      assert_xpath %((/div[@class="colist arabic"]//td/i)[#{i}][@class="conum"][text() = "#{i}"]), output, 1
+    end
+  end
 end
