@@ -328,6 +328,11 @@ module Asciidoctor
     # one\ two\	three
     :escaped_space    => /\\([[:blank:]])/,
 
+    # one+two
+    # one+ two
+    # one + two
+    :plus_delim  => /[[:blank:]]*\+[[:blank:]]*/,
+
     # 29
     :digits           => /^\d+$/,
 
@@ -394,6 +399,9 @@ module Asciidoctor
     # inline link macro
     # link:path[label]
     :link_macro       => /\\?(?:link|mailto):([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/,
+
+    # key:Enter[] or key:[Ctrl+T] or key:[Ctrl+Shift+T]
+    :key_macro        => /\\?(key|kbd):([^\[]*)(?:\[([^\]]*)\])/,
 
     # inline email address
     # doc.writer@asciidoc.org

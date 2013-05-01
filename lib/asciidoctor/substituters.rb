@@ -494,6 +494,17 @@ module Substituters
       }
     end
 
+    if found[:macroish] && (result.include?('key:') || result.include?('kbd:'))
+      result.gsub!(REGEXP[:key_macro]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        string = m[2].empty? ? m[3] : m[2];
+        keys = string.split(REGEXP[:plus_delim])
+
+        Inline.new(self, :key, nil, :attributes => {'keys' => keys}).render
+      }
+    end
+
     if found[:at]
       result.gsub!(REGEXP[:email_inline]) {
         # alias match for Ruby 1.8.7 compat
