@@ -614,6 +614,26 @@ context 'Substitutions' do
       assert_equal ['Big cats', 'Tigers'], terms[0]
       assert_equal ['panthera tigris'], terms[1]
     end
+
+    test 'Menu macro with single menu' do
+      para = block_from_string('File&gt;&gt;&gt;Open')
+      assert_equal %q{<b>File</b> &rarr; <b>Open</b>},para.sub_macros(para.buffer.join)
+    end
+
+    test 'Menu macro with single menu and quotes' do
+      para = block_from_string('"File Menu"&gt;&gt;&gt;"Save As"')
+      assert_equal %q{<b>File Menu</b> &rarr; <b>Save As</b>},para.sub_macros(para.buffer.join)
+    end
+
+    test 'Menu macro with sub-menu' do
+      para = block_from_string('Tools&gt;&gt;&gt;Project&gt;&gt;&gt;Build')
+      assert_equal %q{<b>Tools</b> &rarr; <b>Project</b> &rarr; <b>Build</b>},para.sub_macros(para.buffer.join)
+    end
+
+    test 'Menu macro with sub-menu and quotes' do
+      para = block_from_string('"Tools Menu"&gt;&gt;&gt;"My Project"&gt;&gt;&gt;"Build Now"')
+      assert_equal %q{<b>Tools Menu</b> &rarr; <b>My Project</b> &rarr; <b>Build Now</b>},para.sub_macros(para.buffer.join)
+    end
   end
 
   context 'Passthroughs' do
