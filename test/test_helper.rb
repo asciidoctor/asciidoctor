@@ -82,6 +82,11 @@ class Test::Unit::TestCase
     count == 1 ? results.first : results
   end
 
+  # Generate an xpath attribute matcher that matches a name in the class attribute
+  def contains_class(name)
+    %(contains(concat(' ', normalize-space(@class), ' '), ' #{name} '))
+  end
+
   def assert_css(css, content, count = nil)
     assert_path(:css, css, content, count)
   end
