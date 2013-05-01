@@ -461,8 +461,7 @@ class Lexer
             break
 
           # FIXME create another set for "passthrough" styles
-          # though partintro should likely be a dedicated block
-          elsif !style.nil? && style != 'normal' && style != 'partintro'
+          elsif !style.nil? && style != 'normal'
             if PARAGRAPH_STYLES.include?(style)
               block_context = style.to_sym
               reader.unshift_line this_line
@@ -565,6 +564,10 @@ class Lexer
 
       # either delimited block or styled paragraph
       if block.nil? && !block_context.nil?
+        # abstract and partintro should be handled by open block
+        # FIXME kind of hackish...need to sort out how to generalize this
+        block_context = :open if block_context == :abstract || block_context == :partintro
+
         case block_context
         when :admonition
           attributes['name'] = admonition_name = style.downcase

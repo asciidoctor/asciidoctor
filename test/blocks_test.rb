@@ -1219,4 +1219,167 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
     end
   end
 
+  context 'Abstract and Part Intro' do
+    test 'should make abstract on open block without title a quote block' do
+      input = <<-EOS
+= Article
+
+[abstract]
+--
+This article is about stuff.
+
+And other stuff.
+--
+      EOS
+
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '#preamble .quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph', output, 2
+    end
+
+    test 'should make abstract on open block with title a quote block with title' do
+      input = <<-EOS
+= Article
+
+.My abstract
+[abstract]
+--
+This article is about stuff.
+--
+      EOS
+
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '#preamble .quoteblock', output, 1
+      assert_css '.quoteblock > .title', output, 1
+      assert_css '.quoteblock > .title + blockquote', output, 1
+      assert_css '.quoteblock > .title + blockquote > .paragraph', output, 1
+    end
+
+    test 'should make abstract on open block without title rendered to DocBook' do
+      input = <<-EOS
+= Article
+
+[abstract]
+--
+This article is about stuff.
+
+And other stuff.
+--
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'abstract', output, 1
+      assert_css 'abstract > simpara', output, 2
+    end
+
+    test 'should make abstract on open block with title rendered to DocBook' do
+      input = <<-EOS
+= Article
+
+.My abstract
+[abstract]
+--
+This article is about stuff.
+--
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'abstract', output, 1
+      assert_css 'abstract > title', output, 1
+      assert_css 'abstract > title + simpara', output, 1
+    end
+
+    # TODO partintro shouldn't be recognized if doctype is not book, should be in proper place
+    test 'should accept partintro on open block without title' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+[partintro]
+--
+This is a part intro.
+
+It can have multiple paragraphs.
+--
+      EOS
+
+      output = render_string input
+      assert_css '.openblock', output, 1
+      assert_css '.openblock .title', output, 0
+      assert_css '.openblock .content', output, 1
+      assert_xpath '//h1[@id="_part_1"]/following-sibling::*[@class="openblock"]', output, 1
+      assert_xpath '//*[@class="openblock"]/*[@class="content"]/*[@class="paragraph"]', output, 2
+    end
+
+    test 'should accept partintro on open block with title' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+.Intro title
+[partintro]
+--
+This is a part intro with a title.
+--
+      EOS
+
+      output = render_string input
+      assert_css '.openblock', output, 1
+      assert_css '.openblock .title', output, 1
+      assert_css '.openblock .content', output, 1
+      assert_xpath '//h1[@id="_part_1"]/following-sibling::*[@class="openblock"]', output, 1
+      assert_xpath '//*[@class="openblock"]/*[@class="title"][text() = "Intro title"]', output, 1
+      assert_xpath '//*[@class="openblock"]/*[@class="content"]/*[@class="paragraph"]', output, 1
+    end
+
+    test 'should accept partintro on open block without title rendered to DocBook' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+[partintro]
+--
+This is a part intro.
+
+It can have multiple paragraphs.
+--
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'partintro', output, 1
+      assert_css 'part#_part_1 > partintro', output, 1
+      assert_css 'partintro > simpara', output, 2
+    end
+
+    test 'should accept partintro on open block with title rendered to DocBook' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+.Intro title
+[partintro]
+--
+This is a part intro with a title.
+--
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'partintro', output, 1
+      assert_css 'part#_part_1 > partintro', output, 1
+      assert_css 'partintro > title', output, 1
+      assert_css 'partintro > title + simpara', output, 1
+    end
+  end
+
 end

@@ -12,7 +12,11 @@ class BaseTemplate
   end
 
   def title_div(opts = {})
-    %(<% if title? %><div class="title">#{opts.has_key?(:caption) ? '<%= @caption %>' : ''}<%= title %></div><% end %>)
+    if opts.has_key? :caption
+      %q(<% if title? %><div class="title"><%= @caption %><%= title %></div><% end %>)
+    else
+      %q(<% if title? %><div class="title"><%= title %></div><% end %>)
+    end
   end
 end
 
@@ -184,10 +188,10 @@ class BlockTocTemplate < BaseTemplate
     levels = node.attr?('levels') ? node.attr('levels').to_i : doc.attr('toclevels', 2).to_i
     role = node.attr?('role') ? node.attr('role') : doc.attr('toc-class', 'toc')
 
-    %(\n<div#{id_attr} class="#{role}">
+    %(<div#{id_attr} class="#{role}">
 <div#{title_id_attr} class="title">#{title}</div>
 #{DocumentTemplate.outline(doc, levels)}
-</div>)
+</div>\n)
   end
 
   def template
@@ -250,7 +254,7 @@ class SectionTemplate < BaseTemplate
       %(<div class="sect#{slevel}#{role}">
   <#{htag}#{id}>#{sectnum}#{sec.attr 'caption'}#{sec.title}</#{htag}>
 #{content}
-</div>)
+</div>\n)
     end
   end
 
@@ -397,7 +401,7 @@ class BlockParagraphTemplate < BaseTemplate
     %(<div#{id && " id=\"#{id}\""} class=\"paragraph#{role && " #{role}"}\">#{title && "
   <div class=\"title\">#{title}</div>"}  
   <p>#{content}</p>
-</div>)
+</div>\n)
   end
 
   def result(node)
@@ -438,12 +442,17 @@ end
 class BlockOpenTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="openblock#{role_class}">
+<%#encoding:UTF-8%><% if attr? :style, 'abstract' %><div#{id} class="quoteblock#{role_class}">
+  #{title_div}
+  <blockquote>
+<%= content %>
+  </blockquote>
+</div><% else %><div#{id} class="openblock#{role_class}">
   #{title_div}
   <div class="content">
 <%= content %>
   </div>
-</div>
+</div><% end %>
     EOS
   end
 end
@@ -676,7 +685,7 @@ end
 
 class BlockPageBreakTemplate < BaseTemplate
   def result(node)
-    '<div style="page-break-after: always;"></div>'
+    %(<div style="page-break-after: always;"></div>\n)
   end
 
   def template
@@ -686,7 +695,7 @@ end
 
 class InlineBreakTemplate < BaseTemplate
   def result(node)
-    "#{node.text}<br>"
+    %(#{node.text}<br>\n)
   end
 
   def template
