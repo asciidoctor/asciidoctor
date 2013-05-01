@@ -505,7 +505,7 @@ text
       assert !renderer.nil?
       views = renderer.views
       assert !views.nil?
-      assert_equal 34, views.size
+      assert_equal 35, views.size
       assert views.has_key? 'document'
       assert views['document'].is_a?(Asciidoctor::HTML5::DocumentTemplate)
       assert_equal 'ERB', views['document'].eruby.to_s
@@ -521,7 +521,7 @@ text
       assert !renderer.nil?
       views = renderer.views
       assert !views.nil?
-      assert_equal 34, views.size
+      assert_equal 35, views.size
       assert views.has_key? 'document'
       assert views['document'].is_a?(Asciidoctor::DocBook45::DocumentTemplate)
       assert_equal 'ERB', views['document'].eruby.to_s
