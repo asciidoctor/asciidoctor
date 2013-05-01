@@ -614,11 +614,11 @@ module Asciidoctor
     # _emphasis_
     [:emphasis, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?_(\S|\S.*?\S)_(?=\W|$)/m],
 
-    # ##unquoted##
-    [:none, :unconstrained, /\\?(?:\[([^\]]+?)\])?##(.+?)##/m],
+    # ##unquoted## (or marked)
+    [:mark, :unconstrained, /\\?(?:\[([^\]]+?)\])?##(.+?)##/m],
 
-    # #unquoted#
-    [:none, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?=\W|$)/m],
+    # #unquoted# (or marked)
+    [:mark, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?=\W|$)/m],
 
     # ^superscript^
     [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(.+?)\^/m],
