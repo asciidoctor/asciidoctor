@@ -310,6 +310,12 @@ module Asciidoctor
     # one,two;three;four
     :scsv_csv_delim   => /[[:blank:]]*[,;][[:blank:]]*/,
 
+    # one two  three
+    :space_delim      => /([^\\])[[:blank:]]+/,
+
+    # one two  three
+    :escaped_space    => /\\([[:blank:]])/,
+
     # 29
     :digits           => /^\d+$/,
 
@@ -664,8 +670,9 @@ module Asciidoctor
   # Document object.
   #
   # input   - the AsciiDoc source as a IO, String or Array.
-  # options - a Hash of options to control processing (default: {})
-  #           see Asciidoctor::Document#initialize for details
+  # options - a String, Array or Hash of options to control processing (default: {})
+  #           String and Array values are converted into a Hash.
+  #           See Asciidoctor::Document#initialize for details about options.
   # block   - a callback block for handling include::[] directives
   #
   # returns the Asciidoctor::Document
@@ -674,10 +681,31 @@ module Asciidoctor
       start = Time.now
     end
 
+    attrs = (options[:attributes] ||= {})
+    if attrs.is_a? Hash
+      # all good; placed here as optimization
+    elsif attrs.is_a? Array
+      attrs = options[:attributes] = attrs.inject({}) do |accum, entry|
+        k, v = entry.split '=', 2
+        accum[k] = v || ''
+        accum
+      end
+    elsif attrs.is_a? String
+      # convert non-escaped spaces into null character, so we split on the
+      # correct spaces chars, and restore escaped spaces
+      attrs = attrs.gsub(REGEXP[:space_delim], "\\1\0").gsub(REGEXP[:escaped_space], '\1')
+
+      attrs = options[:attributes] = attrs.split("\0").inject({}) do |accum, entry|
+        k, v = entry.split '=', 2
+        accum[k] = v || ''
+        accum
+      end
+    else
+      raise ArgumentError, 'illegal type for attributes option'
+    end
+
     lines = nil
     if input.is_a?(File)
-      options[:attributes] ||= {}
-      attrs = options[:attributes]
       lines = input.readlines
       input_mtime = input.mtime
       input_path = File.expand_path(input.path)
@@ -721,8 +749,9 @@ module Asciidoctor
   # attributes on the Document.
   #
   # input   - the String AsciiDoc source filename
-  # options - a Hash of options to control processing (default: {})
-  #           see Asciidoctor::Document#initialize for details
+  # options - a String, Array or Hash of options to control processing (default: {})
+  #           String and Array values are converted into a Hash.
+  #           See Asciidoctor::Document#initialize for details about options.
   # block   - a callback block for handling include::[] directives
   #
   # returns the Asciidoctor::Document
@@ -753,8 +782,9 @@ module Asciidoctor
   # default and the rendered output is returned.
   #
   # input   - the String AsciiDoc source filename
-  # options - a Hash of options to control processing (default: {})
-  #           see Asciidoctor::Document#initialize for details
+  # options - a String, Array or Hash of options to control processing (default: {})
+  #           String and Array values are converted into a Hash.
+  #           See Asciidoctor::Document#initialize for details about options.
   # block   - a callback block for handling include::[] directives
   #
   # returns the Document object if the rendered result String is written to a
@@ -860,8 +890,9 @@ module Asciidoctor
   # and render it to the specified backend format
   #
   # input   - the String AsciiDoc source filename
-  # options - a Hash of options to control processing (default: {})
-  #           see Asciidoctor::Document#initialize for details
+  # options - a String, Array or Hash of options to control processing (default: {})
+  #           String and Array values are converted into a Hash.
+  #           See Asciidoctor::Document#initialize for details about options.
   # block   - a callback block for handling include::[] directives
   #
   # returns the Document object if the rendered result String is written to a
