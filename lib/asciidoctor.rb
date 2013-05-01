@@ -307,6 +307,11 @@ module Asciidoctor
     # one ; two
     :semicolon_delim  => /[[:blank:]]*;[[:blank:]]*/,
 
+    # one+two
+    # one+ two
+    # one + two
+    :plus_delim  => /[[:blank:]]*\+[[:blank:]]*/,
+
     # one,two;three;four
     :scsv_csv_delim   => /[[:blank:]]*[,;][[:blank:]]*/,
 
@@ -376,6 +381,9 @@ module Asciidoctor
     # inline link macro
     # link:path[label]
     :link_macro       => /\\?(?:link|mailto):([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/,
+
+    # key:Enter[] or key:[Ctrl+T] or key:[Ctrl+Shift+T]
+    :key_macro        => /\\?(key|kbd):([^\[]*)(?:\[([^\]]*)\])/,
 
     # inline email address
     # doc.writer@asciidoc.org
