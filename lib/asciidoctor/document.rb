@@ -104,13 +104,14 @@ class Document < AbstractBlock
 
     if options[:parent]
       @parent_document = options.delete(:parent)
-      # should we dup here?
+      # should we dup attributes here?
       options[:attributes] = @parent_document.attributes
-      options[:safe] ||= @parent_document.safe
       options[:base_dir] ||= @parent_document.base_dir
+      @safe = @parent_document.safe
       @renderer = @parent_document.renderer
     else
       @parent_document = nil
+      @safe = nil
     end
 
     @header = nil
@@ -124,7 +125,19 @@ class Document < AbstractBlock
     @counters = {}
     @callouts = Callouts.new
     @options = options
-    @safe = @options.fetch(:safe, SafeMode::SECURE).to_i
+    # safely resolve the safe mode from const, int or string
+    if @safe.nil? && !(safe_mode = @options[:safe])
+      @safe = SafeMode::SECURE
+    elsif safe_mode.is_a?(Fixnum)
+      # be permissive in case API user wants to define new levels
+      @safe = safe_mode
+    else
+      begin
+        @safe = SafeMode.const_get(safe_mode.to_s.upcase).to_i
+      rescue
+        @safe = SafeMode::SECURE.to_i
+      end
+    end
     @options[:header_footer] = @options.fetch(:header_footer, false)
 
     @attributes['encoding'] = 'UTF-8'
