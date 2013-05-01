@@ -3,12 +3,12 @@ class BaseTemplate
 
   # create template matter to insert a style class from the role attribute if specified
   def role_class
-    attrvalue(:role)
+    attrvalue('role')
   end
 
   # create template matter to insert a style class from the style attribute if specified
   def style_class(sibling = true)
-    attrvalue(:style, sibling)
+    attrvalue('style', sibling, false)
   end
 
   def title_div(opts = {})
@@ -275,7 +275,7 @@ class BlockDlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><%
-if attr? :style, 'qanda' %>
+if attr? 'style', 'qanda', false %>
 <div#{id} class="qlist#{style_class}#{role_class}">
   #{title_div}
   <ol>
@@ -294,7 +294,7 @@ if attr? :style, 'qanda' %>
   <% end %>
   </ol>
 </div>
-<% elsif attr? :style, 'horizontal' %>
+<% elsif attr? 'style', 'horizontal', false %>
 <div#{id} class="hdlist#{role_class}">
   #{title_div}
   <table>
@@ -321,7 +321,7 @@ if attr? :style, 'qanda' %>
   #{title_div}
   <dl>
     <% content.each do |dt, dd| %>
-    <dt<% if !(attr? :style) %> class="hdlist1"<% end %>>
+    <dt<% if !(attr? 'style', nil, false) %> class="hdlist1"<% end %>>
       <%= dt.text %>
     </dt>
     <% unless dd.nil? %>
@@ -348,7 +348,7 @@ class BlockListingTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="listingblock#{role_class}">
   #{title_div :caption => true}
   <div class="content monospaced">
-    <% if attr? :style, 'source' %>
+    <% if attr? 'style', 'source', false %>
     <pre class="highlight<% if attr? 'source-highlighter', 'coderay' %> CodeRay<% end %>"><code#{attribute('class', :language)}><%= template.preserve_endlines(content, self) %></code></pre>
     <% else %>
     <pre><%= template.preserve_endlines(content, self) %></pre>
@@ -398,8 +398,8 @@ end
 
 class BlockParagraphTemplate < BaseTemplate
   def paragraph(id, role, title, content)
-    %(<div#{id && " id=\"#{id}\""} class=\"paragraph#{role && " #{role}"}\">#{title && "
-  <div class=\"title\">#{title}</div>"}  
+    %(<div#{id && " id=\"#{id}\""} class="paragraph#{role && " #{role}"}">#{title && "
+  <div class=\"title\">#{title}</div>"}
   <p>#{content}</p>
 </div>\n)
   end
@@ -440,20 +440,38 @@ class BlockExampleTemplate < BaseTemplate
 end
 
 class BlockOpenTemplate < BaseTemplate
+  def result(node)
+    open_block(node, node.id, node.attr('style', nil, false), node.attr('role'), node.title? ? node.title : nil, node.content)
+  end
+
+  def open_block(node, id, style, role, title, content)
+    if style == 'abstract'
+      if node.parent == node.document && node.document.attr?('doctype', 'book')
+        puts 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+        ''
+      else
+        %(<div#{id && " id=\"#{id}\""} class="quoteblock abstract#{role && " #{role}"}">#{title &&
+"<div class=\"title\">#{title}</div>"}
+<blockquote>
+#{content}
+</blockquote>
+</div>\n)
+      end
+    elsif style == 'partintro' && (!node.document.attr?('doctype', 'book') || !node.parent.is_a?(Asciidoctor::Section) || node.level != 0)
+      puts 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a book part. Excluding block content.'
+      ''
+    else
+      %(<div#{id && " id=\"#{id}\""} class="openblock#{style != 'open' ? " #{style}" : ''}#{role && " #{role}"}">#{title &&
+"<div class=\"title\">#{title}</div>"}
+<div class="content">
+#{content}
+</div>
+</div>\n)
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><% if attr? :style, 'abstract' %><div#{id} class="quoteblock#{role_class}">
-  #{title_div}
-  <blockquote>
-<%= content %>
-  </blockquote>
-</div><% else %><div#{id} class="openblock#{role_class}">
-  #{title_div}
-  <div class="content">
-<%= content %>
-  </div>
-</div><% end %>
-    EOS
+    :invoke_result
   end
 end
 
@@ -528,7 +546,7 @@ class BlockOlistTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="olist#{style_class}#{role_class}">
   #{title_div}
-  <ol class="<%= attr :style %>"#{attribute('start', :start)}>
+  <ol class="<%= attr 'style', nil, false %>"#{attribute('start', :start)}>
   <% content.each do |item| %>
     <li>
       <p><%= item.text %></p>
@@ -599,7 +617,7 @@ if attr? :float %>float: <%= attr :float %>; <% end %>">
       <% row.each do |cell| %>
       <<%= tsec == :head ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}><%
       if tsec == :head %><%= cell.text %><% else %><%
-      case cell.attr(:style)
+      case cell.attr('style', nil, false)
         when :asciidoc %><div><%= cell.content %></div><%
         when :verse %><div class="verse"><%= template.preserve_endlines(cell.text, self) %></div><%
         when :literal %><div class="literal monospaced"><pre><%= template.preserve_endlines(cell.text, self) %></pre></div><%
@@ -734,7 +752,7 @@ class InlineQuotedTemplate < BaseTemplate
   def quote_text(text, type, role)
     start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
     if role
-      "#{start_tag}<span class=\"#{role}\">#{text}</span>#{end_tag}"
+      %(#{start_tag}<span class="#{role}">#{text}</span>#{end_tag})
     else
       "#{start_tag}#{text}#{end_tag}"
     end

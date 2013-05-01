@@ -333,19 +333,31 @@ class BlockDlistTemplate < BaseTemplate
 end
 
 class BlockOpenTemplate < BaseTemplate
-
   def result(node)
-    case node.attr('style')
+    open_block(node, node.id, node.attr('style', nil, false),
+        node.attr('role'), node.attr('reftext'), node.title? ? node.title : nil)
+  end
+
+  def open_block(node, id, style, role, reftext, title)
+    case style
     when 'abstract'
-      %(<abstract>#{node.title? ? "
-<title>#{node.title}</title>" : nil}
+      if node.parent == node.document && node.document.attr?('doctype', 'book')
+        puts 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+        ''
+      else
+        %(<abstract>#{title && "\n<title>#{node.title}</title>"}
 #{content node}
 </abstract>\n)
+      end
     when 'partintro'
-      %(<partintro#{common_attrs node.id, node.attr('role'), node.attr('reftext')}>#{node.title? ? "
-<title>#{node.title}</title>" : nil}
+      unless node.document.attr?('doctype', 'book') && node.parent.is_a?(Asciidoctor::Section) && node.level == 0
+        puts 'asciidoctor: ERROR: partintro block can only be used when doctype is book and its a child of a part section. Excluding block content.'
+        ''
+      else
+        %(<partintro#{common_attrs id, role, reftext}>#{title && "\n<title>#{title}</title>"}
 #{content node}
 </partintro>\n)
+      end
     else
       node.content
     end

@@ -211,7 +211,7 @@ class Lexer
         end
       else
         # just take one block or else we run the risk of overrunning section boundaries
-        new_block = next_block(reader, section, attributes, :parse_metadata => false)
+        new_block = next_block(reader, (preamble || section), attributes, :parse_metadata => false)
         if !new_block.nil?
           (preamble || section) << new_block
           attributes = {}
@@ -224,8 +224,8 @@ class Lexer
       reader.skip_blank_lines
     end
 
-    # drop the preamble if it has no content
-    if preamble && preamble.blocks.empty?
+    if preamble && !preamble.blocks?
+      # drop the preamble if it has no content
       section.delete_at(0)
     end
 
