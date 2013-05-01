@@ -670,6 +670,23 @@ more info...
       assert_xpath '/article/articleinfo/revhistory/revision/revremark[text() = "See changelog."]', output, 1
     end
 
+    test 'with author defined using attribute entry to DocBook' do
+      input = <<-EOS
+= Document Title
+:author: Doc Writer
+:email: thedoctor@asciidoc.org
+
+content
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_xpath '//articleinfo/author', output, 1
+      assert_xpath '//articleinfo/author/firstname[text() = "Doc"]', output, 1
+      assert_xpath '//articleinfo/author/surname[text() = "Writer"]', output, 1
+      assert_xpath '//articleinfo/author/email[text() = "thedoctor@asciidoc.org"]', output, 1
+      assert_xpath '//articleinfo/authorinitials[text() = "DW"]', output, 1
+    end
+
     test 'should create authorgroup in DocBook when multiple authors' do
       input = <<-EOS
 = Document Title
@@ -684,6 +701,26 @@ content
       assert_xpath '//articleinfo/authorgroup/author', output, 2
       assert_xpath '//articleinfo/authorgroup/author[1]/firstname[text() = "Doc"]', output, 1
       assert_xpath '//articleinfo/authorgroup/author[2]/firstname[text() = "Junior"]', output, 1
+    end
+
+    test 'with authors defined using attribute entry to DocBook' do
+      input = <<-EOS
+= Document Title
+:authors: Doc Writer; Junior Writer
+:email_1: thedoctor@asciidoc.org
+:email_2: junior@asciidoc.org
+
+content
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_xpath '//articleinfo/author', output, 0
+      assert_xpath '//articleinfo/authorgroup', output, 1
+      assert_xpath '//articleinfo/authorgroup/author', output, 2
+      assert_xpath '(//articleinfo/authorgroup/author)[1]/firstname[text() = "Doc"]', output, 1
+      assert_xpath '(//articleinfo/authorgroup/author)[1]/email[text() = "thedoctor@asciidoc.org"]', output, 1
+      assert_xpath '(//articleinfo/authorgroup/author)[2]/firstname[text() = "Junior"]', output, 1
+      assert_xpath '(//articleinfo/authorgroup/author)[2]/email[text() = "junior@asciidoc.org"]', output, 1
     end
 
     test 'with header footer' do
