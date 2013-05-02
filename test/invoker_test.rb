@@ -318,7 +318,7 @@ context 'Invoker' do
       # using open3 to work around a bug in JRuby process_manager.rb,
       # which tries to run a gsub on stdout prematurely breaking the test
       require 'open3'
-      stdin, stdout, stderr = Open3.popen3("#{executable} -o - --trace #{input_path}")
+      _, stdout, stderr = Open3.popen3("#{executable} -o - --trace #{input_path}")
       stderr_lines = stderr.readlines
       puts stderr_lines.join unless stderr_lines.empty?
       assert stderr_lines.empty?, 'Command failed. Expected to receive a rendered document.'
