@@ -1,27 +1,28 @@
+# encoding: UTF-8
 require 'test_helper'
 
 context "Text" do
   test "proper encoding to handle utf8 characters in document using html backend" do
     output = example_document(:encoding).render
-    assert_xpath '//p', output, 2
+    assert_xpath '//p', output, 4
     assert_xpath '//a', output, 1
   end
 
   test "proper encoding to handle utf8 characters in embedded document using html backend" do
     output = example_document(:encoding, :header_footer => false).render
-    assert_xpath '//p', output, 2
+    assert_xpath '//p', output, 4
     assert_xpath '//a', output, 1
   end
 
   test "proper encoding to handle utf8 characters in document using docbook backend" do
     output = example_document(:encoding, :attributes => {'backend' => 'docbook'}).render
-    assert_xpath '//simpara', output, 2
+    assert_xpath '//simpara', output, 4
     assert_xpath '//ulink', output, 1
   end
 
   test "proper encoding to handle utf8 characters in embedded document using docbook backend" do
     output = example_document(:encoding, :header_footer => false, :attributes => {'backend' => 'docbook'}).render
-    assert_xpath '//simpara', output, 2
+    assert_xpath '//simpara', output, 4
     assert_xpath '//ulink', output, 1
   end
 
@@ -31,9 +32,20 @@ context "Text" do
     input << "[verse]\n"
     input.concat(File.readlines(sample_doc_path(:encoding)))
     doc = Asciidoctor::Document.new
-    reader = Asciidoctor::Reader.new input
+    reader = Asciidoctor::Reader.new(input, doc, true)
     block = Asciidoctor::Lexer.next_block(reader, doc)
     assert_xpath '//pre', block.render.gsub(/^\s*\n/, ''), 1
+  end
+
+  test "proper encoding to handle utf8 characters from included file" do
+    input = <<-EOS
+include::fixtures/encoding.asciidoc[tags=romé]
+    EOS
+    doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SafeMode::SAFE, :base_dir => File.expand_path(File.dirname(__FILE__))
+    reader = Asciidoctor::Reader.new(input, doc, true)
+    block = Asciidoctor::Lexer.next_block(reader, doc)
+    output = block.render
+    assert_css '.paragraph', output, 1
   end
 
   test 'escaped text markup' do

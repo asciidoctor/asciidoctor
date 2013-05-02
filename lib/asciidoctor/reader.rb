@@ -437,7 +437,7 @@ class Reader
     elsif @include_block
       advance
       # FIXME this borks line numbers
-      @lines.unshift(*@include_block.call(target).map {|l| "#{l.rstrip}\n"})
+      @lines.unshift(*normalize_include_data(@include_block.call(target)))
     # FIXME currently we're not checking the upper bound of the include depth
     elsif @document.attributes.fetch('include-depth', 0).to_i > 0
       advance
@@ -448,48 +448,47 @@ class Reader
         return true
       end
 
-      lines = nil
+      inc_lines = nil
       tags = nil
       if !raw_attributes.empty?
         attributes = AttributeList.new(raw_attributes).parse
         if attributes.has_key? 'lines'
-          lines = []
+          inc_lines = []
           attributes['lines'].split(REGEXP[:scsv_csv_delim]).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..').map(&:to_i)
               if to == -1
-                lines << from
-                lines << 1.0/0.0
+                inc_lines << from
+                inc_lines << 1.0/0.0
               else
-                lines.concat Range.new(from, to).to_a
+                inc_lines.concat Range.new(from, to).to_a
               end
             else
-              lines << linedef.to_i
+              inc_lines << linedef.to_i
             end
           end
-          lines = lines.sort.uniq
-          #lines.push lines.shift if lines.first == -1
+          inc_lines = inc_lines.sort.uniq
         elsif attributes.has_key? 'tags'
           tags = attributes['tags'].split(REGEXP[:scsv_csv_delim]).uniq
         end
       end
-      if !lines.nil?
-        if !lines.empty?
+      if !inc_lines.nil?
+        if !inc_lines.empty?
           selected = []
           f = File.new(include_file)
           f.each_line do |l|
-            take = lines.first
+            take = inc_lines.first
             if take.is_a?(Float) && take.infinite?
-              selected.push("#{l.rstrip}\n")
+              selected.push l
             else
               if f.lineno == take
-                selected.push("#{l.rstrip}\n")
-                lines.shift 
+                selected.push l
+                inc_lines.shift 
               end
-              break if lines.empty?
+              break if inc_lines.empty?
             end
           end
-          @lines.unshift(*selected) unless selected.empty?
+          @lines.unshift(*normalize_include_data(selected)) unless selected.empty?
         end
       elsif !tags.nil?
         if !tags.empty?
@@ -497,11 +496,12 @@ class Reader
           active_tag = nil
           f = File.new(include_file)
           f.each_line do |l|
+            l.force_encoding(::Encoding::UTF_8) if ::Asciidoctor::FORCE_ENCODING
             if !active_tag.nil?
               if l.include?("end::#{active_tag}[]")
                 active_tag = nil
               else
-                selected.push("#{l.rstrip}\n")
+                selected.push l
               end
             else
               tags.each do |tag|
@@ -512,10 +512,10 @@ class Reader
               end
             end
           end
-          @lines.unshift(*selected) unless selected.empty?
+          @lines.unshift(*normalize_include_data(selected)) unless selected.empty?
         end
       else
-        @lines.unshift(*File.readlines(include_file).map {|l| "#{l.rstrip}\n"})
+        @lines.unshift(*normalize_include_data(File.readlines(include_file)))
       end
       true
     else
@@ -695,6 +695,33 @@ class Reader
     val
   end
 
+  # Private: Normalize raw input read from an include directive
+  #
+  # This method strips whitespace from the end of every line of
+  # the source data and appends a LF (i.e., Unix endline). This
+  # whitespace substitution is very important to how Asciidoctor
+  # works.
+  #
+  # Any leading or trailing blank lines are also removed. (DISABLED)
+  #
+  # data - A String Array of input data to be normalized
+  #
+  # returns the processed lines
+  #-
+  # FIXME this shares too much in common w/ normalize_data; combine
+  # in a shared function
+  def normalize_include_data(data)
+    if ::Asciidoctor::FORCE_ENCODING
+      data.map {|line| "#{line.rstrip}\n".force_encoding(::Encoding::UTF_8) }
+    else
+      data.map {|line| "#{line.rstrip}\n" }
+    end
+
+    #data.shift while !data.first.nil? && data.first.chomp.empty?
+    #data.pop while !data.last.nil? && data.last.chomp.empty?
+    #data
+  end
+
   # Private: Normalize raw input, used for the outermost Reader.
   #
   # This method strips whitespace from the end of every line of
@@ -712,7 +739,12 @@ class Reader
   def normalize_data(data)
     # normalize line ending to LF (purging occurrences of CRLF)
     # this rstrip is *very* important to how Asciidoctor works
-    @lines = data.map {|line| "#{line.rstrip}\n" }
+
+    if ::Asciidoctor::FORCE_ENCODING
+      @lines = data.map {|line| "#{line.rstrip}\n".force_encoding(::Encoding::UTF_8) }
+    else
+      @lines = data.map {|line| "#{line.rstrip}\n" }
+    end
 
     @lines.shift && @lineno += 1 while !@lines.first.nil? && @lines.first.chomp.empty?
     @lines.pop while !@lines.last.nil? && @lines.last.chomp.empty?
