@@ -391,6 +391,10 @@ module Asciidoctor
     # link:path[label]
     :link_macro       => /\\?(?:link|mailto):([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/,
 
+    # File>>>Close or "Events and Tasks">>>New>>>Task
+    # ()?su)(?<!\w)[\\]?((?P<menu>[^"\s]+?)|"(?P<menualt>\w[\w\s]*?)")\+\&gt;((?P<submenu>.+?)\+\&gt;)?((?P<item>[^"\s]+)|"(?P<itemalt>\w[\w\s]*?)")(?!\w)=menu
+    :menu_macro        => /\\?((\\?[^"\s]+?)|"(\\?\w[\w\s]*?)")&gt;&gt;&gt;(((\\?[^"\s]+?)|"(\\?\w[\w\s]*?)")&gt;&gt;&gt;)?((\\?[^"\s]+)|"(\\?\w[\w\s]*?)")(?!\w)/,
+
     # inline email address
     # doc.writer@asciidoc.org
     :email_inline     => /[\\>:]?\w[\w.%+-]*@[[:alnum:]][[:alnum:].-]*\.[[:alpha:]]{2,4}\b/, 

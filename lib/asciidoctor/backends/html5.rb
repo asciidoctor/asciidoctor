@@ -767,6 +767,24 @@ class InlineQuotedTemplate < BaseTemplate
   end
 end
 
+class InlineMenuTemplate < BaseTemplate
+  def menu(menu, submenu, item)
+    if submenu
+      %(<b>#{menu}</b> &rarr; <b>#{submenu}</b> &rarr; <b>#{item}</b>)
+    else
+      %(<b>#{menu}</b> &rarr; <b>#{item}</b>)
+    end
+  end
+
+  def result(node)
+    menu(node.attr('menu'), node.attr('submenu'), node.attr('item'))
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
 class InlineAnchorTemplate < BaseTemplate
   def anchor(target, text, type, document, window = nil)
     case type
