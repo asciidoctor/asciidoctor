@@ -150,6 +150,12 @@ class Test::Unit::TestCase
     [Asciidoctor::Lexer.parse_header_metadata(reader), reader]
   end
 
+  # Expand the character for an entity such as &#8212; so
+  # it can be used to match in an XPath expression
+  def expand_entity(number)
+    [number].pack('U*')
+  end
+
   def invoke_cli_to_buffer(argv = [], filename = 'sample.asciidoc', &block)
     invoke_cli(argv, filename, [StringIO.new, StringIO.new], &block)
   end
