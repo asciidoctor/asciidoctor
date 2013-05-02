@@ -117,6 +117,128 @@ block comment
     end
   end
 
+  context 'Quote and Verse Blocks' do
+    test 'quote block with no attribution' do
+      input = <<-EOS
+____
+A famous quote.
+____
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
+      assert_css '.quoteblock > .attribution', output, 0
+      assert_xpath '//*[@class = "quoteblock"]//p[text() = "A famous quote."]', output, 1
+    end
+
+    test 'quote block with attribution' do
+      input = <<-EOS
+[quote, Famous Person, Famous Book (1999)]
+____
+A famous quote.
+____
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
+      assert_css '.quoteblock > .attribution', output, 1
+      assert_css '.quoteblock > .attribution > cite', output, 1
+      assert_css '.quoteblock > .attribution > cite + br', output, 1
+      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Book (1999)"]', output, 1
+      attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
+      author = attribution.children.last
+      assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
+    end
+
+    test 'quote block with complex content' do
+      input = <<-EOS
+____
+A famous quote.
+
+NOTE: _That_ was inspiring.
+____
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph + .admonitionblock', output, 1
+    end
+
+    test 'single-line verse block without attribution' do
+      input = <<-EOS
+[verse]
+____
+A famous verse.
+____
+      EOS
+      output = render_string input
+      assert_css '.verseblock', output, 1
+      assert_css '.verseblock > pre', output, 1
+      assert_css '.verseblock > .attribution', output, 0
+      assert_css '.verseblock p', output, 0
+      assert_xpath '//*[@class = "verseblock"]/pre[normalize-space(text()) = "A famous verse."]', output, 1
+    end
+
+    test 'single-line verse block with attribution' do
+      input = <<-EOS
+[verse, Famous Poet, Famous Poem]
+____
+A famous verse.
+____
+      EOS
+      output = render_string input
+      assert_css '.verseblock', output, 1
+      assert_css '.verseblock p', output, 0
+      assert_css '.verseblock > pre', output, 1
+      assert_css '.verseblock > .attribution', output, 1
+      assert_css '.verseblock > .attribution > cite', output, 1
+      assert_css '.verseblock > .attribution > cite + br', output, 1
+      assert_xpath '//*[@class = "verseblock"]/*[@class = "attribution"]/cite[text() = "Famous Poem"]', output, 1
+      attribution = xmlnodes_at_xpath '//*[@class = "verseblock"]/*[@class = "attribution"]', output, 1
+      author = attribution.children.last
+      assert_equal "#{expand_entity 8212} Famous Poet", author.text.strip
+    end
+
+    test 'multi-stanza verse block' do
+      input = <<-EOS
+[verse]
+____
+A famous verse.
+
+Stanza two.
+____
+      EOS
+      output = render_string input
+      assert_xpath '//*[@class = "verseblock"]', output, 1
+      assert_xpath '//*[@class = "verseblock"]/pre', output, 1
+      assert_xpath '//*[@class = "verseblock"]//p', output, 0
+      assert_xpath '//*[@class = "verseblock"]/pre[contains(text(), "A famous verse.")]', output, 1
+      assert_xpath '//*[@class = "verseblock"]/pre[contains(text(), "Stanza two.")]', output, 1
+    end
+
+    test 'verse block does not contain block elements' do
+      input = <<-EOS
+[verse]
+____
+A famous verse.
+
+....
+not a literal
+....
+____
+      EOS
+      output = render_string input
+      assert_css '.verseblock', output, 1
+      assert_css '.verseblock > pre', output, 1
+      assert_css '.verseblock p', output, 0
+      assert_css '.verseblock .literalblock', output, 0
+    end
+    
+  end
+
   context "Example Blocks" do
     test "can render example block" do
       input = <<-EOS
