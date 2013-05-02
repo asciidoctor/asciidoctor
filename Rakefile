@@ -47,10 +47,20 @@ task :default => :test
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
+  puts "LANG: #{ENV['LANG']}"
   test.libs << 'lib' << 'test'
   test.pattern = 'test/**/*_test.rb'
   test.warning = true
   test.verbose = true
+end
+
+# Run tests with Encoding::default_external set to US-ASCII
+Rake::TestTask.new(:test_us_ascii) do |test|
+  test.libs << 'lib' << 'test'
+  test.pattern = 'test/**/*_test.rb'
+  test.warning = true
+  test.verbose = true
+  test.ruby_opts << '-EUS-ASCII' if RUBY_VERSION >= '1.9'
 end
 
 desc "Generate RCov test coverage and open in your browser"
