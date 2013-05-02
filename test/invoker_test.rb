@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'test_helper'
 require 'asciidoctor/cli/options'
 require 'asciidoctor/cli/invoker'
@@ -242,7 +243,7 @@ context 'Invoker' do
     assert_xpath '//*[@id="toctitle"][text() = "t=o=c"]', output, 1
   end
 
-  test 'wip should set attribute with quoted value containing a space' do
+  test 'should set attribute with quoted value containing a space' do
 	# emulating commandline arguments: --trace -a toc -a note-caption="Note to self:" -o -
     invoker = invoke_cli_to_buffer %w(--trace -a toc -a note-caption=Note\ to\ self: -o -)
     doc = invoker.document
@@ -306,6 +307,35 @@ context 'Invoker' do
     invoker = invoke_cli_to_buffer %w(--eruby erubis -o /dev/null)
     doc = invoker.document
     assert_equal 'erubis', doc.instance_variable_get('@options')[:eruby]
+  end
+
+  test 'should force default external encoding to UTF-8' do
+    executable = File.expand_path(File.join(File.dirname(__FILE__), '..', 'bin', 'asciidoctor'))
+    input_path = fixture_path 'encoding.asciidoc'
+    old_lang = ENV['LANG']
+    ENV['LANG'] = 'US-ASCII'
+    begin
+      # using open3 to work around a bug in JRuby process_manager.rb,
+      # which tries to run a gsub on stdout prematurely breaking the test
+      require 'open3'
+      #cmd = "#{executable} -o - --trace #{input_path}"
+      cmd = "#{File.join RbConfig::CONFIG['bindir'], 'ruby'} #{executable} -o - --trace #{input_path}"
+      _, stdout, stderr = Open3.popen3 cmd
+      stderr_lines = stderr.readlines
+      puts stderr_lines.join unless stderr_lines.empty?
+      assert stderr_lines.empty?, 'Command failed. Expected to receive a rendered document.'
+      stdout_lines = stdout.readlines
+      assert !stdout_lines.empty?
+      if Asciidoctor::FORCE_ENCODING
+        stdout_lines.each do |l|
+          l.force_encoding Encoding::UTF_8
+        end
+      end
+      stdout_str = stdout_lines.join
+      assert stdout_str.include?('Codierungen sind verrückt auf älteren Versionen von Ruby') 
+    ensure
+      ENV['LANG'] = old_lang
+    end
   end
 
 end
