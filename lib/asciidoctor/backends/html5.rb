@@ -449,18 +449,15 @@ class BlockQuoteTemplate < BaseTemplate
   #{title_div}
   <blockquote>
 <%= content %>
-  </blockquote>
-  <div class="attribution">
-    <% if attr? :citetitle %>
-    <cite><%= attr :citetitle %></cite>
-    <% end %>
-    <% if attr? :attribution %>
-    <% if attr? :citetitle %>
-    <br>
-    <% end %>
-    <%= "&#8212; \#{attr :attribution}" %>
-    <% end %>
-  </div>
+  </blockquote><%
+  if attr?(:attribution) || attr?(:citetitle) %>
+  <div class="attribution"><%
+    if attr? :citetitle %>
+    <cite><%= attr :citetitle %></cite><% end %><%
+    if attr? :attribution %><% if attr? :citetitle %>
+    <br><% end %>
+    <%= "&#8212; \#{attr :attribution}" %><% end %>
+  </div><% end %>
 </div>
     EOS
   end
@@ -471,18 +468,15 @@ class BlockVerseTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="verseblock#{role_class}">
   #{title_div}
-  <pre class="content"><%= template.preserve_endlines(content, self) %></pre>
-  <div class="attribution">
-    <% if attr? :citetitle %>
-    <cite><%= attr :citetitle %></cite>
-    <% end %>
-    <% if attr? :attribution %>
-    <% if attr? :citetitle %>
-    <br>
-    <% end %>
-    <%= "&#8212; \#{attr :attribution}" %>
-    <% end %>
-  </div>
+  <pre class="content"><%= template.preserve_endlines(content, self) %></pre><%
+  if attr?(:attribution) || attr?(:citetitle) %>
+  <div class="attribution"><%
+    if attr? :citetitle %>
+    <cite><%= attr :citetitle %></cite><% end %><%
+    if attr? :attribution %><% if attr? :citetitle %>
+    <br><% end %>
+    <%= "&#8212; \#{attr :attribution}" %><% end %>
+  </div><% end %>
 </div>
     EOS
   end
