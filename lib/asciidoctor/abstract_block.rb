@@ -63,7 +63,7 @@ class AbstractBlock < AbstractNode
   # whether this Block *can* have block content
   # that should be the option 'sectionbody'
   def blocks?
-    !blocks.empty?
+    !@blocks.empty?
   end
 
   # Public: Get the element at i in the array of blocks.

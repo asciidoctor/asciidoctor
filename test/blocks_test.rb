@@ -1219,4 +1219,267 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
     end
   end
 
+  context 'Abstract and Part Intro' do
+    test 'should make abstract on open block without title a quote block for article' do
+      input = <<-EOS
+= Article
+
+[abstract]
+--
+This article is about stuff.
+
+And other stuff.
+--
+      EOS
+
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock.abstract', output, 1
+      assert_css '#preamble .quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph', output, 2
+    end
+
+    test 'should make abstract on open block with title a quote block with title for article' do
+      input = <<-EOS
+= Article
+
+.My abstract
+[abstract]
+--
+This article is about stuff.
+--
+      EOS
+
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock.abstract', output, 1
+      assert_css '#preamble .quoteblock', output, 1
+      assert_css '.quoteblock > .title', output, 1
+      assert_css '.quoteblock > .title + blockquote', output, 1
+      assert_css '.quoteblock > .title + blockquote > .paragraph', output, 1
+    end
+
+    test 'should allow abstract in document with title if doctype is book' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+[abstract]
+Abstract for book with title is valid
+      EOS
+
+      output = render_string input
+      assert_css '.abstract', output, 1
+    end
+
+    test 'should not allow abstract as direct child of document if doctype is book' do
+      input = <<-EOS
+:doctype: book
+
+[abstract]
+Abstract for book without title is invalid.
+      EOS
+
+      output = render_string input
+      assert_css '.abstract', output, 0
+    end
+
+    test 'should make abstract on open block without title rendered to DocBook' do
+      input = <<-EOS
+= Article
+
+[abstract]
+--
+This article is about stuff.
+
+And other stuff.
+--
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'abstract', output, 1
+      assert_css 'abstract > simpara', output, 2
+    end
+
+    test 'should make abstract on open block with title rendered to DocBook' do
+      input = <<-EOS
+= Article
+
+.My abstract
+[abstract]
+--
+This article is about stuff.
+--
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'abstract', output, 1
+      assert_css 'abstract > title', output, 1
+      assert_css 'abstract > title + simpara', output, 1
+    end
+
+    test 'should allow abstract in document with title if doctype is book rendered to DocBook' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+[abstract]
+Abstract for book with title is valid
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'abstract', output, 1
+    end
+
+    test 'should not allow abstract as direct child of document if doctype is book rendered to DocBook' do
+      input = <<-EOS
+:doctype: book
+
+[abstract]
+Abstract for book is invalid.
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'abstract', output, 0
+    end
+
+    # TODO partintro shouldn't be recognized if doctype is not book, should be in proper place
+    test 'should accept partintro on open block without title' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+[partintro]
+--
+This is a part intro.
+
+It can have multiple paragraphs.
+--
+      EOS
+
+      output = render_string input
+      assert_css '.openblock', output, 1
+      assert_css '.openblock.partintro', output, 1
+      assert_css '.openblock .title', output, 0
+      assert_css '.openblock .content', output, 1
+      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class(:openblock)}]), output, 1
+      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="content"]/*[@class="paragraph"]), output, 2
+    end
+
+    test 'should accept partintro on open block with title' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+.Intro title
+[partintro]
+--
+This is a part intro with a title.
+--
+      EOS
+
+      output = render_string input
+      assert_css '.openblock', output, 1
+      assert_css '.openblock.partintro', output, 1
+      assert_css '.openblock .title', output, 1
+      assert_css '.openblock .content', output, 1
+      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class(:openblock)}]), output, 1
+      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="title"][text() = "Intro title"]), output, 1
+      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="content"]/*[@class="paragraph"]), output, 1
+    end
+
+    test 'should exclude partintro if not a child of part' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+[partintro]
+part intro paragraph
+      EOS
+
+      output = render_string input
+      assert_css '.partintro', output, 0
+    end
+
+    test 'should not allow partintro unless doctype is book' do
+      input = <<-EOS
+[partintro]
+part intro paragraph
+      EOS
+
+      output = render_string input
+      assert_css '.partintro', output, 0
+    end
+
+    test 'should accept partintro on open block without title rendered to DocBook' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+[partintro]
+--
+This is a part intro.
+
+It can have multiple paragraphs.
+--
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'partintro', output, 1
+      assert_css 'part#_part_1 > partintro', output, 1
+      assert_css 'partintro > simpara', output, 2
+    end
+
+    test 'should accept partintro on open block with title rendered to DocBook' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+.Intro title
+[partintro]
+--
+This is a part intro with a title.
+--
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'partintro', output, 1
+      assert_css 'part#_part_1 > partintro', output, 1
+      assert_css 'partintro > title', output, 1
+      assert_css 'partintro > title + simpara', output, 1
+    end
+
+    test 'should exclude partintro if not a child of part rendered to DocBook' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+[partintro]
+part intro paragraph
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'partintro', output, 0
+    end
+
+    test 'should not allow partintro unless doctype is book rendered to DocBook' do
+      input = <<-EOS
+[partintro]
+part intro paragraph
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'partintro', output, 0
+    end
+  end
+
 end
