@@ -614,6 +614,26 @@ context 'Substitutions' do
       assert_equal ['Big cats', 'Tigers'], terms[0]
       assert_equal ['panthera tigris'], terms[1]
     end
+
+    test 'Single key macro with empty brackets' do
+      para = block_from_string('key:Enter[]')
+      assert_equal %q{<button>Enter</button>}, para.sub_macros(para.buffer.join)
+    end
+
+    test 'Single key macro within brackets' do
+      para = block_from_string('key:[Enter]')
+      assert_equal %q{<button>Enter</button>}, para.sub_macros(para.buffer.join)
+    end
+
+    test 'Two key macro within brackets' do
+      para = block_from_string('key:[Shift+Enter]')
+      assert_equal %q{<button>Shift</button> + <button>Enter</button>}, para.sub_macros(para.buffer.join)
+    end
+
+    test 'Three key macro within brackets' do
+      para = block_from_string('key:[Ctrl+Shift+Enter]')
+      assert_equal %q{<button>Ctrl</button> + <button>Shift</button> + <button>Enter</button>}, para.sub_macros(para.buffer.join)
+    end
   end
 
   context 'Passthroughs' do

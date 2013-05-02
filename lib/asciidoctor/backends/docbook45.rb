@@ -590,6 +590,27 @@ class InlineQuotedTemplate < BaseTemplate
   end
 end
 
+class InlineKeyTemplate < BaseTemplate
+  def key(keys)
+    case keys.size
+      when 1
+        %(<keycap>#{keys[0]}</keycap>)
+      when 2
+        %(<keycombo><keycap>#{keys[0]}</keycap><keycap>#{keys[1]}</keycap></keycombo>)
+      when 3
+        %(<keycombo><keycap>#{keys[0]}</keycap><keycap>#{keys[1]}</keycap><keycap>#{keys[2]}</keycap></keycombo>)
+    end
+  end
+
+  def result(node)
+    key(node.attr('keys'))
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
 class InlineAnchorTemplate < BaseTemplate
   def anchor(target, text, type)
     case type
