@@ -366,5 +366,90 @@ Content goes here
       result = render_string(input)
       assert_xpath "//*[@class='sidebarblock']//p", result, 1
     end
+
+    context 'Styled Paragraphs' do
+      test 'should wrap text in simpara for styled paragraphs when rendered to DocBook' do
+        input = <<-EOS
+= Book
+:doctype: book
+
+[preface]
+= About this book
+
+[abstract]
+An abstract for the book.
+
+= Part 1
+
+[partintro]
+An intro to this part.
+
+[sidebar]
+Just a side note.
+
+[example]
+As you can see here.
+
+[quote]
+Wise words from a wise person.
+        EOS
+
+        output = render_string input, :backend => 'docbook'
+        assert_css 'abstract > simpara', output, 1
+        assert_css 'partintro > simpara', output, 1
+        assert_css 'sidebar > simpara', output, 1
+        assert_css 'informalexample > simpara', output, 1
+        assert_css 'blockquote > simpara', output, 1
+      end
+
+      test 'wip should wrap text in simpara for styled paragraphs with title when rendered to DocBook' do
+        input = <<-EOS
+= Book
+:doctype: book
+
+[preface]
+= About this book
+
+[abstract]
+.Abstract title
+An abstract for the book.
+
+= Part 1
+
+[partintro]
+.Part intro title
+An intro to this part.
+
+[sidebar]
+.Sidebar title
+Just a side note.
+
+[example]
+.Example title
+As you can see here.
+
+[quote]
+.Quote title
+Wise words from a wise person.
+        EOS
+
+        output = render_string input, :backend => 'docbook'
+        assert_css 'abstract > title', output, 1
+        assert_xpath '//abstract/title[text() = "Abstract title"]', output, 1
+        assert_css 'abstract > title + simpara', output, 1
+        assert_css 'partintro > title', output, 1
+        assert_xpath '//partintro/title[text() = "Part intro title"]', output, 1
+        assert_css 'partintro > title + simpara', output, 1
+        assert_css 'sidebar > title', output, 1
+        assert_xpath '//sidebar/title[text() = "Sidebar title"]', output, 1
+        assert_css 'sidebar > title + simpara', output, 1
+        assert_css 'example > title', output, 1
+        assert_xpath '//example/title[text() = "Example title"]', output, 1
+        assert_css 'example > title + simpara', output, 1
+        assert_css 'blockquote > title', output, 1
+        assert_xpath '//blockquote/title[text() = "Quote title"]', output, 1
+        assert_css 'blockquote > title + simpara', output, 1
+      end
+    end
   end
 end

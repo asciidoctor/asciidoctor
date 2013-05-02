@@ -96,7 +96,7 @@ class Block < AbstractBlock
   #   => ["<em>This</em> is what happens when you &lt;meet&gt; a stranger in the &lt;alps&gt;!"]
   def content
     case @context
-    when :preamble, :open
+    when :preamble
       @blocks.map {|b| b.render }.join
     # lists get iterated in the template (for now)
     # list items recurse into this block when their text and content methods are called
@@ -106,7 +106,7 @@ class Block < AbstractBlock
       apply_literal_subs(@buffer)
     when :pass
       apply_passthrough_subs(@buffer)
-    when :admonition, :example, :sidebar, :quote, :verse
+    when :admonition, :example, :sidebar, :quote, :verse, :open
       if !@buffer.nil?
         apply_para_subs(@buffer)
       else

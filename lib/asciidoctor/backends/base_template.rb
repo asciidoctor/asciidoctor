@@ -96,10 +96,15 @@ class BaseTemplate
   end
 
   # create template matter to insert a style class if the variable has a value
-  def attrvalue(key, sibling = true)
+  def attrvalue(key, sibling = true, inherit = true)
     delimiter = sibling ? ' ' : ''
-    # example: <% if attr? 'foo' %><%= attr 'foo' %><% end %>
-    %(<% if attr? '#{key}' %>#{delimiter}<%= attr '#{key}' %><% end %>)
+    if inherit
+      # example: <% if attr? 'foo' %><%= attr 'foo' %><% end %>
+      %(<% if attr? '#{key}' %>#{delimiter}<%= attr '#{key}' %><% end %>)
+    else
+      # example: <% if attr? 'foo', nil, false %><%= attr 'foo', nil, false %><% end %>
+      %(<% if attr? '#{key}', nil, false %>#{delimiter}<%= attr '#{key}', nil, false %><% end %>)
+    end
   end
 
   # create template matter to insert an id if one is specified for the block

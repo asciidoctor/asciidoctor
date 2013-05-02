@@ -142,13 +142,13 @@ module Asciidoctor
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'].to_set
 
   # NOTE: AsciiDoc doesn't support pass style for paragraph
-  PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'pass', 'quote', 'sidebar', 'source', 'verse'].to_set
+  PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro'].to_set
 
   VERBATIM_STYLES = ['literal', 'listing', 'source', 'verse'].to_set
 
   DELIMITED_BLOCKS = {
     # NOTE: AsciiDoc doesn't support pass style for open block
-    '--'   => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition'].to_set],
+    '--'   => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro'].to_set],
     '----' => [:listing, ['literal', 'source'].to_set],
     '....' => [:literal, ['listing', 'source'].to_set],
     '====' => [:example, ['admonition'].to_set],

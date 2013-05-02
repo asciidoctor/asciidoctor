@@ -15,9 +15,9 @@ module Asciidoctor
 
     def title_tag(optional = true)
       if optional
-        %q{<%= title? ? "<title>#{title}</title>" : '' %>}
+        %(<%= title? ? "\n<title>\#{title}</title>" : nil %>)
       else
-        %q{<title><%= title %></title>}
+        %(\n<title><%= title %></title>)
       end
     end
 
@@ -26,7 +26,15 @@ module Asciidoctor
     end
 
     def common_attrs_erb
-      %q{<%= template.common_attrs(@id, (attr 'role'), (attr 'reftext')) %>}
+      %q(<%= template.common_attrs(@id, (attr 'role'), (attr 'reftext')) %>)
+    end
+
+    def content(node)
+      node.blocks? ? node.content.chomp : "<simpara>#{node.content.chomp}</simpara>"
+    end
+
+    def content_erb
+      %q(<%= blocks? ? content.chomp : "<simpara>#{content.chomp}</simpara>" %>)
     end
   end
 
@@ -102,14 +110,14 @@ class DocumentTemplate < BaseTemplate
   <bookinfo>
 #{docinfo}
   </bookinfo>
-<%= content %>
+<%= content.chomp %>
 </book>
 <% else %>
 <article<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
   <articleinfo>
 #{docinfo}
   </articleinfo>
-<%= content %>
+<%= content.chomp %>
 </article>
 <% end %>
     EOF
@@ -135,14 +143,13 @@ end
 class BlockPreambleTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if @document.doctype == 'book' %>
-<preface#{common_attrs_erb}>
-  #{title_tag false}
-<%= content %>
-</preface>
-<% else %>
-<%= content %>
-<% end %>
+<%#encoding:UTF-8%><%
+if @document.doctype == 'book' %><preface#{common_attrs_erb}>#{title_tag false}
+<%= content.chomp %>
+</preface><%
+else %>
+<%= content.chomp %><%
+end %>
     EOF
   end
 end
@@ -155,9 +162,9 @@ class SectionTemplate < BaseTemplate
       tag = sec.document.doctype == 'book' && sec.level <= 1 ? (sec.level == 0 ? 'part' : 'chapter') : 'section'
     end
     %(<#{tag}#{common_attrs(sec.id, (sec.attr 'role'), (sec.attr 'reftext'))}>
-  #{sec.title? ? "<title>#{sec.title}</title>" : nil}
-  #{sec.content}
-</#{tag}>)
+#{sec.title? ? "<title>#{sec.title}</title>" : nil}
+#{sec.content.chomp}
+</#{tag}>\n)
   end
 
   def template
@@ -175,27 +182,13 @@ end
 
 class BlockParagraphTemplate < BaseTemplate
   def paragraph(id, style, role, reftext, title, content)
-    # FIXME temporary hack until I can generalize this feature
-    if style == 'partintro'
-      if title
-        %(<partintro#{common_attrs(id, role, reftext)}>
-  <title>#{title}</title>
-  <simpara>#{content}</simpara>
-</partintro>)
-      else
-        %(<partintro#{common_attrs(id, role, reftext)}>
-  <simpara>#{content}</simpara>
-</partintro>)
-      end
+    if !title.nil?
+      %(<formalpara#{common_attrs(id, role, reftext)}>
+<title>#{title}</title>
+<para>#{content}</para>
+</formalpara>\n)
     else
-      if title
-        %(<formalpara#{common_attrs(id, role, reftext)}>
-  <title>#{title}</title>
-  <para>#{content}</para>
-</formalpara>)
-      else
-        %(<simpara#{common_attrs(id, role, reftext)}>#{content}</simpara>)
-      end
+      %(<simpara#{common_attrs(id, role, reftext)}>#{content}</simpara>\n)
     end
   end
 
@@ -211,13 +204,8 @@ end
 class BlockAdmonitionTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><<%= attr :name %>#{common_attrs_erb}>
-  #{title_tag}
-  <% if blocks? %>
-<%= content %>
-  <% else %>
-  <simpara><%= content.chomp %></simpara>
-  <% end %>
+<%#encoding:UTF-8%><<%= attr :name %>#{common_attrs_erb}>#{title_tag}
+#{content_erb}
 </<%= attr :name %>>
     EOF
   end
@@ -227,8 +215,7 @@ class BlockUlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><% if attr? :style, 'bibliography' %>
-<bibliodiv#{common_attrs_erb}>
-  #{title_tag}
+<bibliodiv#{common_attrs_erb}>#{title_tag}
   <% content.each do |li| %>
     <bibliomixed>
       <bibliomisc><%= li.text %></bibliomisc>
@@ -239,8 +226,7 @@ class BlockUlistTemplate < BaseTemplate
   <% end %>
 </bibliodiv>
 <% else %>
-<itemizedlist#{common_attrs_erb}>
-  #{title_tag}
+<itemizedlist#{common_attrs_erb}>#{title_tag}
   <% content.each do |li| %>
     <listitem>
       <simpara><%= li.text %></simpara>
@@ -258,8 +244,7 @@ end
 class BlockOlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><orderedlist#{common_attrs_erb}#{attribute('numeration', :style)}>
-  #{title_tag}
+<%#encoding:UTF-8%><orderedlist#{common_attrs_erb}#{attribute('numeration', :style)}>#{title_tag}
   <% content.each do |li| %>
     <listitem>
       <simpara><%= li.text %></simpara>
@@ -276,8 +261,7 @@ end
 class BlockColistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><calloutlist#{common_attrs_erb}>
-  #{title_tag}
+<%#encoding:UTF-8%><calloutlist#{common_attrs_erb}>#{title_tag}
   <% content.each do |li| %>
   <callout arearefs="<%= li.attr :coids %>">
     <para><%= li.text %></para>
@@ -317,8 +301,7 @@ class BlockDlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><% tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled']) %>
-<% if tags[:list] %><<%= tags[:list] %>#{common_attrs_erb}><% end %>
-  #{title_tag}
+<% if tags[:list] %><<%= tags[:list] %>#{common_attrs_erb}><% end %>#{title_tag}
   <% content.each do |dt, dd| %>
   <<%= tags[:entry] %>>
     <% if tags.has_key?(:label) %>
@@ -350,8 +333,38 @@ class BlockDlistTemplate < BaseTemplate
 end
 
 class BlockOpenTemplate < BaseTemplate
+  def result(node)
+    open_block(node, node.id, node.attr('style', nil, false),
+        node.attr('role'), node.attr('reftext'), node.title? ? node.title : nil)
+  end
+
+  def open_block(node, id, style, role, reftext, title)
+    case style
+    when 'abstract'
+      if node.parent == node.document && node.document.attr?('doctype', 'book')
+        puts 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+        ''
+      else
+        %(<abstract>#{title && "\n<title>#{node.title}</title>"}
+#{content node}
+</abstract>\n)
+      end
+    when 'partintro'
+      unless node.document.attr?('doctype', 'book') && node.parent.is_a?(Asciidoctor::Section) && node.level == 0
+        puts 'asciidoctor: ERROR: partintro block can only be used when doctype is book and its a child of a part section. Excluding block content.'
+        ''
+      else
+        %(<partintro#{common_attrs id, role, reftext}>#{title && "\n<title>#{title}</title>"}
+#{content node}
+</partintro>\n)
+      end
+    else
+      node.content
+    end
+  end
+
   def template
-    :content
+    :invoke_result
   end
 end
 
@@ -365,8 +378,7 @@ class BlockListingTemplate < BaseTemplate
 <screen#{common_attrs_erb}><%= template.preserve_endlines(content, self) %></screen>
 <% end %>
 <% else %>
-<formalpara#{common_attrs_erb}>
-  #{title_tag false}
+<formalpara#{common_attrs_erb}>#{title_tag false}
   <para>
     <% if attr :style, 'source' %>
     <programlisting language="<%= attr :language %>" linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting>
@@ -386,8 +398,7 @@ class BlockLiteralTemplate < BaseTemplate
 <%#encoding:UTF-8%><% if !title? %>
 <literallayout#{common_attrs_erb} class="monospaced"><%= template.preserve_endlines(content, self) %></literallayout>
 <% else %>
-<formalpara#{common_attrs_erb}>
-  #{title_tag false}
+<formalpara#{common_attrs_erb}>#{title_tag false}
   <para>
     <literallayout class="monospaced"><%= template.preserve_endlines(content, self) %></literallayout>
   </para>
@@ -400,10 +411,9 @@ end
 class BlockExampleTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><example#{common_attrs_erb}>
-  #{title_tag}
-<%= content %>
-</example>
+<%#encoding:UTF-8%><<%= (tag_name = title? ? 'example' : 'informalexample') %>#{common_attrs_erb}>#{title_tag}
+#{content_erb}
+</<%= tag_name %>>
     EOF
   end
 end
@@ -411,9 +421,8 @@ end
 class BlockSidebarTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><sidebar#{common_attrs_erb}>
-  #{title_tag}
-<%= content %>
+<%#encoding:UTF-8%><sidebar#{common_attrs_erb}>#{title_tag}
+#{content_erb}
 </sidebar>
     EOF
   end
@@ -422,8 +431,7 @@ end
 class BlockQuoteTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><blockquote#{common_attrs_erb}>
-  #{title_tag}
+<%#encoding:UTF-8%><blockquote#{common_attrs_erb}>#{title_tag}
   <% if (attr? :attribution) || (attr? :citetitle) %>
   <attribution>
     <% if attr? :attribution %>
@@ -432,11 +440,7 @@ class BlockQuoteTemplate < BaseTemplate
     #{tag 'citetitle', :citetitle}
   </attribution>
   <% end %>
-<% if !@buffer.nil? %>
-<simpara><%= content %></simpara>
-<% else %>
-<%= content %>
-<% end %>
+#{content_erb}
 </blockquote>
     EOF
   end
@@ -445,8 +449,7 @@ end
 class BlockVerseTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><blockquote#{common_attrs_erb}>
-  #{title_tag}
+<%#encoding:UTF-8%><blockquote#{common_attrs_erb}>#{title_tag}
   <% if (attr? :attribution) || (attr? :citetitle) %>
   <attribution>
     <% if attr? :attribution %>
@@ -470,9 +473,8 @@ end
 class BlockTableTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><<%= title? ? 'table' : 'informaltable'%>#{common_attrs_erb} frame="<%= attr :frame, 'all'%>"
-    rowsep="<%= ['none', 'cols'].include?(attr :grid) ? 0 : 1 %>" colsep="<%= ['none', 'rows'].include?(attr :grid) ? 0 : 1 %>">
-  #{title_tag}
+<%#encoding:UTF-8%><<%= (tag_name = title? ? 'table' : 'informaltable') %>#{common_attrs_erb} frame="<%= attr :frame, 'all'%>"
+    rowsep="<%= ['none', 'cols'].include?(attr :grid) ? 0 : 1 %>" colsep="<%= ['none', 'rows'].include?(attr :grid) ? 0 : 1 %>">#{title_tag}
   <% if attr? :width %>
   <?dbhtml table-width="<%= attr :width %>"?>
   <?dbfo table-width="<%= attr :width %>"?>
@@ -505,7 +507,7 @@ class BlockTableTemplate < BaseTemplate
     </t<%= tblsec %>>
     <% end %>
   </tgroup>
-</<%= title? ? 'table' : 'informaltable'%>>
+</<%= tag_name %>>
     EOS
   end
 end
@@ -513,8 +515,7 @@ end
 class BlockImageTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%#encoding:UTF-8%><figure#{common_attrs_erb}>
-  #{title_tag}
+<%#encoding:UTF-8%><%#encoding:UTF-8%><figure#{common_attrs_erb}>#{title_tag}
   <mediaobject>
     <imageobject>
       <imagedata fileref="<%= image_uri(attr :target) %>"#{attribute('contentwidth', :width)}#{attribute('contentdepth', :height)}/>

@@ -211,7 +211,7 @@ class Lexer
         end
       else
         # just take one block or else we run the risk of overrunning section boundaries
-        new_block = next_block(reader, section, attributes, :parse_metadata => false)
+        new_block = next_block(reader, (preamble || section), attributes, :parse_metadata => false)
         if !new_block.nil?
           (preamble || section) << new_block
           attributes = {}
@@ -224,8 +224,8 @@ class Lexer
       reader.skip_blank_lines
     end
 
-    # drop the preamble if it has no content
-    if preamble && preamble.blocks.empty?
+    if preamble && !preamble.blocks?
+      # drop the preamble if it has no content
       section.delete_at(0)
     end
 
@@ -461,8 +461,7 @@ class Lexer
             break
 
           # FIXME create another set for "passthrough" styles
-          # though partintro should likely be a dedicated block
-          elsif !style.nil? && style != 'normal' && style != 'partintro'
+          elsif !style.nil? && style != 'normal'
             if PARAGRAPH_STYLES.include?(style)
               block_context = style.to_sym
               reader.unshift_line this_line
@@ -565,6 +564,10 @@ class Lexer
 
       # either delimited block or styled paragraph
       if block.nil? && !block_context.nil?
+        # abstract and partintro should be handled by open block
+        # FIXME kind of hackish...need to sort out how to generalize this
+        block_context = :open if block_context == :abstract || block_context == :partintro
+
         case block_context
         when :admonition
           attributes['name'] = admonition_name = style.downcase
