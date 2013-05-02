@@ -173,7 +173,7 @@ class BlockTocTemplate < BaseTemplate
     if node.id
       id_attr = %( id="#{node.id}")
       title_id_attr = ''
-    elsif doc.embedded? || !doc.attr?('toc-placement', 'auto')
+    elsif doc.embedded? || !doc.attr?('toc-placement')
       id_attr = ' id="toc"'
       title_id_attr = ' id="toctitle"'
     else
@@ -196,12 +196,24 @@ class BlockTocTemplate < BaseTemplate
 end
 
 class BlockPreambleTemplate < BaseTemplate
+  def toc(node)
+    if node.attr?('toc') && node.attr?('toc-placement', 'preamble')
+      %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
+  <div id="toctitle">#{node.attr 'toc-title'}</div>
+#{DocumentTemplate.outline(node.document, node.attr('toclevels', 2).to_i)}
+</div>)
+    else
+      ''
+    end
+  end
+
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div id="preamble">
   <div class="sectionbody">
 <%= content %>
   </div>
+<%= template.toc(self) %>
 </div>
     EOS
   end
