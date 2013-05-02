@@ -501,7 +501,7 @@ class Reader
               if l.include?("end::#{active_tag}[]")
                 active_tag = nil
               else
-                selected.push l
+                selected.push "#{l.rstrip}\n"
               end
             else
               tags.each do |tag|
@@ -512,7 +512,8 @@ class Reader
               end
             end
           end
-          @lines.unshift(*normalize_include_data(selected)) unless selected.empty?
+          @lines.unshift(*selected) unless selected.empty?
+          #@lines.unshift(*normalize_include_data(selected)) unless selected.empty?
         end
       else
         @lines.unshift(*normalize_include_data(File.readlines(include_file)))
@@ -712,7 +713,7 @@ class Reader
   # in a shared function
   def normalize_include_data(data)
     if ::Asciidoctor::FORCE_ENCODING
-      data.map {|line| "#{line.rstrip}\n".force_encoding(::Encoding::UTF_8) }
+      data.map {|line| "#{line.rstrip.force_encoding(::Encoding::UTF_8)}\n" }
     else
       data.map {|line| "#{line.rstrip}\n" }
     end
@@ -741,7 +742,7 @@ class Reader
     # this rstrip is *very* important to how Asciidoctor works
 
     if ::Asciidoctor::FORCE_ENCODING
-      @lines = data.map {|line| "#{line.rstrip}\n".force_encoding(::Encoding::UTF_8) }
+      @lines = data.map {|line| "#{line.rstrip.force_encoding(::Encoding::UTF_8)}\n" }
     else
       @lines = data.map {|line| "#{line.rstrip}\n" }
     end
