@@ -15,8 +15,8 @@ Gem::Specification.new do |s|
 An open source text processor and publishing toolchain, written entirely in Ruby, for converting AsciiDoc markup into HTML 5, DocBook 4.5 and other formats. 
 EOS
   s.license     = 'MIT'
-  s.authors  = ['Ryan Waldron', 'Dan Allen', 'Jeremy McAnally', 'Jason Porter']
-  s.email    = ['rew@erebor.com', 'dan.j.allen@gmail.com']
+  s.authors  = ['Dan Allen', 'Ryan Waldron', 'Jeremy McAnally', 'Jason Porter', 'Nick Hengeveld']
+  s.email    = ['dan.j.allen@gmail.com', 'rew@erebor.com']
   s.homepage = 'http://asciidoctor.org'
 
   s.require_paths = %w[lib]
