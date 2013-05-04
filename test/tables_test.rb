@@ -21,8 +21,8 @@ context 'Tables' do
       assert_css 'table td', output, 9
       assert_css 'table > tbody > tr > td.tableblock.halign-left.valign-top > p.tableblock', output, 9
       cells.each_with_index {|row, rowi|
-        assert_css "table tr:nth-child(#{rowi + 1}) > td", output, row.size
-        assert_css "table tr:nth-child(#{rowi + 1}) > td > p", output, row.size
+        assert_css "table > tbody > tr:nth-child(#{rowi + 1}) > td", output, row.size
+        assert_css "table > tbody > tr:nth-child(#{rowi + 1}) > td > p", output, row.size
         row.each_with_index {|cell, celli|
           assert_xpath "(//tr)[#{rowi + 1}]/td[#{celli + 1}]/p[text()='#{cell}']", output, 1
         }
@@ -312,21 +312,21 @@ d|9 2+>|10
       assert_css 'table > tbody > tr:nth-child(3) > td', output, 1
       assert_css 'table > tbody > tr:nth-child(4) > td', output, 2
       
-      assert_css 'table tr:nth-child(1) > td:nth-child(1).halign-left.valign-top p em', output, 1
-      assert_css 'table tr:nth-child(1) > td:nth-child(2).halign-right.valign-top p strong', output, 1
-      assert_css 'table tr:nth-child(1) > td:nth-child(3).halign-center.valign-top p', output, 1
-      assert_css 'table tr:nth-child(1) > td:nth-child(3).halign-center.valign-top p *', output, 0
-      assert_css 'table tr:nth-child(1) > td:nth-child(4).halign-right.valign-top p strong', output, 1
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(1).halign-left.valign-top p em', output, 1
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(2).halign-right.valign-top p strong', output, 1
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(3).halign-center.valign-top p', output, 1
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(3).halign-center.valign-top p *', output, 0
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(4).halign-right.valign-top p strong', output, 1
 
-      assert_css 'table tr:nth-child(2) > td:nth-child(1).halign-center.valign-top p em', output, 1
-      assert_css 'table tr:nth-child(2) > td:nth-child(2).halign-center.valign-middle[colspan="2"][rowspan="2"] p code', output, 1
-      assert_css 'table tr:nth-child(2) > td:nth-child(3).halign-left.valign-bottom[rowspan="3"] p code', output, 1
+      assert_css 'table > tbody > tr:nth-child(2) > td:nth-child(1).halign-center.valign-top p em', output, 1
+      assert_css 'table > tbody > tr:nth-child(2) > td:nth-child(2).halign-center.valign-middle[colspan="2"][rowspan="2"] p code', output, 1
+      assert_css 'table > tbody > tr:nth-child(2) > td:nth-child(3).halign-left.valign-bottom[rowspan="3"] p code', output, 1
 
-      assert_css 'table tr:nth-child(3) > td:nth-child(1).halign-center.valign-top p em', output, 1
+      assert_css 'table > tbody > tr:nth-child(3) > td:nth-child(1).halign-center.valign-top p em', output, 1
 
-      assert_css 'table tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p', output, 1
-      assert_css 'table tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p em', output, 0
-      assert_css 'table tr:nth-child(4) > td:nth-child(2).halign-right.valign-top[colspan="2"] p code', output, 1
+      assert_css 'table > tbody > tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p', output, 1
+      assert_css 'table > tbody > tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p em', output, 0
+      assert_css 'table > tbody > tr:nth-child(4) > td:nth-child(2).halign-right.valign-top[colspan="2"] p code', output, 1
     end
 
     test 'supports repeating cells' do
