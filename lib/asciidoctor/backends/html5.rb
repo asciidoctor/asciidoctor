@@ -38,7 +38,9 @@ class DocumentTemplate < BaseTemplate
       end
       toc_level << "#{indent}<ol>\n" if nested
       sections.each do |section|
-        toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{!section.special && section.level > 0 ? "#{section.sectnum} " : ''}#{section.attr('caption')}#{section.title}</a></li>\n"
+        section_num = !section.special && section.level > 0 ? "#{section.sectnum} " : ''
+        section_class = (node.document.doctype == 'book' && section.level == 0)? "class=\"toc-part\"" : ''
+        toc_level << "#{indent}  <li><a href=\"##{section.id}\"#{section_class}>#{section_num}#{section.attr('caption')}#{section.title}</a></li>\n"
         if section.level < to_depth && (child_toc_level = outline(section, to_depth))
           if section.document.doctype != 'book' || section.level > 0
             toc_level << "#{indent}  <li>\n#{child_toc_level}\n#{indent}  </li>\n"
