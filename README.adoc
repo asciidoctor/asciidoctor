@@ -2,20 +2,20 @@
 :awestruct-layout: base
 :homepage: http://asciidoctor.org
 :asciidoc: http://asciidoc.org
-:sources: http://github.com/asciidoctor/asciidoctor
+:sources: https://github.com/asciidoctor/asciidoctor
 :issues: https://github.com/asciidoctor/asciidoctor/issues
 :forum: http://discuss.asciidoctor.org
-:org: http://github.com/asciidoctor
+:org: https://github.com/asciidoctor
 :contributors: https://github.com/asciidoctor/asciidoctor/graphs/contributors
 :templates: https://github.com/asciidoctor/asciidoctor/blob/master/lib/asciidoctor/backends
 :gitscm-next: https://github.com/github/gitscm-next
 :seed-contribution: https://github.com/github/gitscm-next/commits/master/lib/asciidoc.rb
 :tilt: https://github.com/rtomayko/tilt
-:freesoftware: http://www.fsf.org/licensing/essays/free-sw.html
+:freesoftware: http://www.gnu.org/philosophy/free-sw.html
 :gist: https://gist.github.com
-:fork: http://help.github.com/fork-a-repo/
+:fork: https://help.github.com/articles/fork-a-repo
 :branch: http://learn.github.com/p/branching.html
-:pr: http://help.github.com/send-pull-requests/
+:pr: https://help.github.com/articles/using-pull-requests
 :license: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE
 :idprefix:
 :idseparator: -
@@ -78,7 +78,7 @@ Ruby if it's not already on your machine.
 == Usage
 
 Asciidoctor has both a command line interface (CLI) and an API. The CLI
-is a drop-in replacement for the +asciidoc.py+ command from the python
+is a drop-in replacement for the +asciidoc.py+ command from the Python
 implementation. The API is intended for integration with other software
 projects and is suitable for server-side applications, such as Rails,
 Sinatra and GitHub.
@@ -283,7 +283,7 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Asciidoctor honors the id, title, role and levels attributes set on
   the toc macro.
 
-* Asciidoctor does not output two tocs with the same id.
+* Asciidoctor does not output two TOCs with the same id.
 
 * Asciidoctor is nice about using a section title syntax inside a
   delimited block by simply ignoring it (AsciiDoc issues warnings)
@@ -326,7 +326,7 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Asciidoctor does not support the deprecated index term syntax (`++`
   and `+++`)
 
-* Asciidoctor does not yet ship w/ a stylesheet, must provide your own
+* Asciidoctor does not yet ship with a stylesheet, must provide your own
   using the +stylesheet+ attribute
 
 * Asciidoctor introduces the +hardbreaks+ attribute, which inserts a
@@ -452,9 +452,9 @@ GitHub organization:: {org}
 
 == Authors
 
-*Asciidoctor* was written by http://github.com/mojavelinux[Dan Allen],
-http://github.com/erebor[Ryan Waldron],
-http://github.com/lightguard[Jason Porter], http://github.com/nickh[Nick
+*Asciidoctor* was written by https://github.com/mojavelinux[Dan Allen],
+https://github.com/erebor[Ryan Waldron],
+https://github.com/lightguard[Jason Porter], https://github.com/nickh[Nick
 Hengeveld] and {contributors}[other contributors].
 
 *AsciiDoc* was written by Stuart Rackham and has received contributions
