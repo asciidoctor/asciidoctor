@@ -65,4 +65,10 @@ context 'Options' do
     assert_equal '', options[:attributes]['icons']
   end
 
+  test 'should only split attribute key/value pairs on first equal sign' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-a name=value=value test/fixtures/sample.asciidoc))
+
+    assert_equal 'value=value', options[:attributes]['name']
+  end
+
 end
