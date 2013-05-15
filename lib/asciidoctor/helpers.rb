@@ -37,6 +37,16 @@ module Helpers
     end
   end
 
+  def self.mkdir_p(dir)
+    unless Dir.exists? dir
+      parent_dir = File.dirname(dir)
+      if !Dir.exists?(parent_dir = File.dirname(dir)) && parent_dir != '.'
+        mkdir_p(parent_dir)
+      end
+      Dir.mkdir(dir)
+    end
+  end
+
   # Public: A generic capture output routine to be used in templates
   #def self.capture_output(*args, &block)
   #  Proc.new { block.call(*args) }
