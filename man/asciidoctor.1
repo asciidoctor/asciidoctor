@@ -2,12 +2,12 @@
 .\"     Title: asciidoctor
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 05/03/2013
+.\"      Date: 05/15/2013
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "05/03/2013" "\ \&" "\ \&"
+.TH "ASCIIDOCTOR" "1" "05/15/2013" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -94,14 +94,15 @@ This option may be specified more than once\&.
 Backend output file format:
 \fIdocbook45\fR
 or
-\fIhtml5\fR\&. You can also use the backend alias names
+\fIhtml5\fR
+supported out of the box\&. You can also use the backend alias names
 \fIhtml\fR
 (aliased to
 \fIhtml5\fR) or
 \fIdocbook\fR
 (aliased to
 \fIdocbook45\fR)\&. Defaults to
-\fIhtml5\fR\&.
+\fIhtml5\fR\&. Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during rendering\&.
 .RE
 .PP
 \fB\-d, \-\-doctype\fR=\fIDOCTYPE\fR

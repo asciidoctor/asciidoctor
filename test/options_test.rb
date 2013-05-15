@@ -20,9 +20,9 @@ context 'Options' do
 
   test 'should return error code 1 when option has invalid argument' do
     redirect_streams do |stdout, stderr|
-      exitval = Asciidoctor::Cli::Options.parse!(%w(-b foo input.ad))
+      exitval = Asciidoctor::Cli::Options.parse!(%w(-d chapter input.ad)) # had to change for #320
       assert_equal 1, exitval
-      assert_equal 'asciidoctor: invalid argument: -b foo', stderr.string.chomp
+      assert_equal 'asciidoctor: invalid argument: -d chapter', stderr.string.chomp
     end
   end
 
@@ -69,6 +69,12 @@ context 'Options' do
     options = Asciidoctor::Cli::Options.parse!(%w(-a name=value=value test/fixtures/sample.asciidoc))
 
     assert_equal 'value=value', options[:attributes]['name']
+  end
+
+  test 'should allow any backend to be specified' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-b my_custom_backend test/fixtures/sample.asciidoc))
+
+    assert_equal 'my_custom_backend', options[:attributes]['backend']
   end
 
 end

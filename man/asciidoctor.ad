@@ -62,9 +62,11 @@ attribute if already defined in the source file).
 This option may be specified more than once. 
 
 *-b, --backend*='BACKEND'::
-    Backend output file format: 'docbook45' or 'html5'.  You can also use the
-    backend alias names 'html' (aliased to 'html5') or 'docbook' (aliased to
-    'docbook45'). Defaults to 'html5'.
+    Backend output file format: 'docbook45' or 'html5' supported out of the box.  
+    You can also use the backend alias names 'html' (aliased to 'html5') or 
+    'docbook' (aliased to 'docbook45'). Defaults to 'html5'. Other options can
+    be passed, but if Asciidoctor cannot find the backend, it will fail during
+    rendering.
 
 *-d, --doctype*='DOCTYPE'::
     Document type: 'article' or 'book'. Sets the root element when using the

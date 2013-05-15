@@ -44,7 +44,7 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-v', '--verbose', 'enable verbose mode (default: false)') do |verbose|
             self[:verbose] = true
           end
-          opts.on('-b', '--backend BACKEND', ['html5', 'docbook45'], 'set output format (i.e., backend): [html5, docbook45] (default: html5)') do |backend|
+          opts.on('-b', '--backend BACKEND', 'set output format backend (default: html5)') do |backend|
             self[:attributes]['backend'] = backend
           end
           opts.on('-d', '--doctype DOCTYPE', ['article', 'book'],
