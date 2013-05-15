@@ -1,6 +1,5 @@
-# A sample Guardfile
-# More info at https://github.com/guard/guard#readme
-
+# use `guard start -n f` to disable notifications
+# or set the environment variable GUARD_NOTIFY=false
 notification :libnotify,
   :display_message => true,
   :timeout => 5, # in seconds
@@ -9,7 +8,11 @@ notification :libnotify,
   :urgency => :critical
 
 guard :test do
-  watch(%r{^lib/(.+)\.rb$})     { |m| "test/#{m[1]}_test.rb" }
+  watch(%r{^lib/(.+)\.rb$}) do |m|
+    "test/#{m[1]}_test.rb"
+  end
   watch(%r{^test.+_test\.rb$})
-  watch('test/test_helper.rb')  { "test" }
+  watch('test/test_helper.rb') do
+    "test"
+  end
 end
