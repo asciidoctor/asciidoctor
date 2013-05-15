@@ -451,5 +451,19 @@ Wise words from a wise person.
         assert_css 'blockquote > title + simpara', output, 1
       end
     end
+
+    context 'Inline doctype' do
+      test 'should only format and output text in first paragraph when doctype is inline' do
+        input = "http://asciidoc.org[AsciiDoc] is a _lightweight_ markup language...\n\nignored"
+        output = render_string input, :doctype => 'inline'
+        assert_equal '<a href="http://asciidoc.org">AsciiDoc</a> is a <em>lightweight</em> markup language&#8230;', output
+      end
+
+      test 'should output empty string if first block is not a paragraph' do
+        input = '* bullet'
+        output = render_string input, :doctype => 'inline'
+        assert output.empty?
+      end
+    end
   end
 end

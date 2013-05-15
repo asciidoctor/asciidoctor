@@ -640,7 +640,16 @@ class Document < AbstractBlock
   def render(opts = {})
     restore_attributes
     r = renderer(opts)
-    @options.merge(opts)[:header_footer] ? r.render('document', self).strip : r.render('embedded', self)
+    if doctype == 'inline'
+      # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
+      if @blocks.size > 0 && (block = @blocks.first).context == :paragraph
+        block.content
+      else
+        ''
+      end
+    else
+      @options.merge(opts)[:header_footer] ? r.render('document', self).strip : r.render('embedded', self)
+    end
   end
 
   def content
