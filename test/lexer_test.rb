@@ -71,6 +71,14 @@ context "Lexer" do
     assert_equal expected, attributes
   end
 
+  test "collect unnamed attribute in second position after empty attribute" do
+    attributes = {}
+    line = ', John Smith'
+    expected = {1 => nil, 2 => 'John Smith'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
   test "collect unnamed attributes" do
     attributes = {}
     line = "first, second one, third"
@@ -180,6 +188,79 @@ context "Lexer" do
     expected = {1 => 'source', 2 => 'java', 'style' => 'source', 'language' => 'java'}
     Asciidoctor::AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
     assert_equal expected, attributes
+  end
+
+  test 'parse style attribute with id and role' do
+    attributes = {1 => 'style#id.role'}
+    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    assert_equal 'style', style
+    assert_nil original_style
+    assert_equal 'style', attributes['style']
+    assert_equal 'id', attributes['id']
+    assert_equal 'role', attributes['role']
+    assert_equal 'style#id.role', attributes[1]
+  end
+
+  test 'parse style attribute with style, role and id' do
+    attributes = {1 => 'style.role#id'}
+    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    assert_equal 'style', style
+    assert_nil original_style
+    assert_equal 'style', attributes['style']
+    assert_equal 'id', attributes['id']
+    assert_equal 'role', attributes['role']
+    assert_equal 'style.role#id', attributes[1]
+  end
+
+  test 'parse style attribute with style, id and multiple roles' do
+    attributes = {1 => 'style#id.role1.role2'}
+    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    assert_equal 'style', style
+    assert_nil original_style
+    assert_equal 'style', attributes['style']
+    assert_equal 'id', attributes['id']
+    assert_equal 'role1 role2', attributes['role']
+    assert_equal 'style#id.role1.role2', attributes[1]
+  end
+
+  test 'parse style attribute with style, multiple roles and id' do
+    attributes = {1 => 'style.role1.role2#id'}
+    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    assert_equal 'style', style
+    assert_nil original_style
+    assert_equal 'style', attributes['style']
+    assert_equal 'id', attributes['id']
+    assert_equal 'role1 role2', attributes['role']
+    assert_equal 'style.role1.role2#id', attributes[1]
+  end
+
+  test 'parse style attribute with positional and original style' do
+    attributes = {1 => 'new_style', 'style' => 'original_style'}
+    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    assert_equal 'new_style', style
+    assert_equal 'original_style', original_style
+    assert_equal 'new_style', attributes['style']
+    assert_equal 'new_style', attributes[1]
+  end
+
+  test 'parse style attribute with id and role only' do
+    attributes = {1 => '#id.role'}
+    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    assert_nil style
+    assert_nil original_style
+    assert_equal 'id', attributes['id']
+    assert_equal 'role', attributes['role']
+    assert_equal '#id.role', attributes[1]
+  end
+
+  test 'parse empty style attribute' do
+    attributes = {1 => nil}
+    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    assert_nil style
+    assert_nil original_style
+    assert_nil attributes['id']
+    assert_nil attributes['role']
+    assert_nil attributes[1]
   end
 
   test "parse author first" do

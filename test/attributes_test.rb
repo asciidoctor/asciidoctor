@@ -531,6 +531,28 @@ A paragraph
       assert_equal 'lead', para.attributes['role']
     end
 
+    test 'id and role attributes can be specified on block style using shorthand syntax' do
+      input = <<-EOS
+[normal#first.lead]
+A normal paragraph.
+      EOS
+      doc = document_from_string(input)
+      para = doc.blocks.first
+      assert_equal 'first', para.attributes['id']
+      assert_equal 'lead', para.attributes['role']
+    end
+
+    test 'id and role attributes can be specified on section style using shorthand syntax' do
+      input = <<-EOS
+[dedication#dedication.small]
+== Section
+Content.
+      EOS
+      output = render_embedded_string input
+      assert_xpath '/div[@class="sect1 small"]', output, 1
+      assert_xpath '/div[@class="sect1 small"]/h2[@id="dedication"]', output, 1
+    end
+
     test "Block attributes are additive" do
       input = <<-EOS
 [id='foo']
