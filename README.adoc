@@ -326,8 +326,14 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Asciidoctor does not support the deprecated index term syntax (`++`
   and `+++`)
 
-* Asciidoctor does not yet ship with a stylesheet, must provide your own
-  using the +stylesheet+ attribute
+* Asciidoctor includes a modern default stylesheet based on Foundation.
+
+* Asciidoctor links to, rather than embeds, the default stylesheet into
+  the document by default (e.g., +linkcss+). To include the default
+  stylesheet, you can either use the +copycss+ attribute to tell
+  Asciidoctor to copy it to the output directory, or you can embed it
+  into the document using the +linkcss!+ attribute. You can also provide
+  your own stylesheet using the +stylesheet+ attribute.
 
 * Asciidoctor introduces the +hardbreaks+ attribute, which inserts a
   line break character after each line of wrapped text
