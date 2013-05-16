@@ -34,8 +34,6 @@ EOS
   ## testing
   s.add_development_dependency('coderay')
   s.add_development_dependency('erubis')
-  s.add_development_dependency('htmlentities')
-  s.add_development_dependency('mocha')
   s.add_development_dependency('nokogiri')
   s.add_development_dependency('pending')
   s.add_development_dependency('rake')

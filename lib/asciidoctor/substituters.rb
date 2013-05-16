@@ -295,7 +295,7 @@ module Substituters
           args = m[2].split(':')
           @document.counter(args[1], args[2])
           ''
-        elsif document.attributes.has_key? key
+        elsif @document.attributes.has_key? key
           @document.attributes[key]
         elsif INTRINSICS.has_key? key
           INTRINSICS[key]
