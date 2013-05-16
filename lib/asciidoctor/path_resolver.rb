@@ -76,6 +76,12 @@ module Asciidoctor
 #     resolver.system_path('../../../css', '../../..', '/path/to/docs')
 #     => '/path/to/docs/css'
 #
+#     resolver.system_path('..', 'C:\\data\\docs\\assets', 'C:\\data\\docs')
+#     => 'C:/data/docs'
+#
+#     resolver.system_path('..\\..\\css', 'C:\\data\\docs\\assets', 'C:\\data\\docs')
+#     => 'C:/data/docs/css'
+#
 #     begin
 #       resolver.system_path('../../../css', '../../..', '/path/to/docs', :recover => false)
 #     rescue SecurityError => e
@@ -105,7 +111,7 @@ class PathResolver
   attr_accessor :working_dir
 
   # Public: Construct a new instance of PathResolver, optionally specifying the
-  # path separator (to override the system default) and the working directory
+  # file separator (to override the system default) and the working directory
   # (to override the present working directory). The working directory will be
   # expanded to an absolute path inside the constructor.
   #
@@ -114,7 +120,7 @@ class PathResolver
   # working_dir    - the String working directory (optional, default: Dir.pwd)
   #
   def initialize(file_separator = nil, working_dir = nil)
-    @file_separator = file_separator.nil? ? File::SEPARATOR : file_separator
+    @file_separator = file_separator.nil? ? (File::ALT_SEPARATOR || File::SEPARATOR) : file_separator
     if working_dir.nil?
       @working_dir = File.expand_path(Dir.pwd)
     else
@@ -170,7 +176,7 @@ class PathResolver
   # returns a String path with any parent or self references resolved.
   def expand_path(path)
     path_segments, path_root, _ = partition_path(path)
-    join_path(path_segments, path_root)
+    join_path path_segments, path_root
   end
   
   # Public: Partition the path into path segments and remove any empty segments
@@ -196,20 +202,21 @@ class PathResolver
     [path_segments, root, posix_path]
   end
   
-  # Public: Join the segments using the file separator specified in the
-  # constructor. Use the root, if specified, to construct an absolute path.
-  # Otherwise join the segments as a relative path.
+  # Public: Join the segments using the posix file separator (since Ruby knows
+  # how to work with paths specified this way, regardless of OS). Use the root,
+  # if specified, to construct an absolute path. Otherwise join the segments as
+  # a relative path.
   #
   # segments - a String Array of path segments
   # root     - a String path root (optional, default: nil)
   #
-  # returns a String path formed by joining the segments and prepending
-  # the root, if specified
+  # returns a String path formed by joining the segments using the posix file
+  # separator and prepending the root, if specified
   def join_path(segments, root = nil)
     if root
-      "#{root}#{@file_separator}#{segments * @file_separator}"
+      "#{root}#{SLASH}#{segments * SLASH}"
     else
-      segments * @file_separator
+      segments * SLASH
     end
   end
   
