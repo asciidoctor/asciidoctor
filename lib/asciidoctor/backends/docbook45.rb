@@ -351,7 +351,7 @@ class BlockOpenTemplate < BaseTemplate
       end
     when 'partintro'
       unless node.document.attr?('doctype', 'book') && node.parent.is_a?(Asciidoctor::Section) && node.level == 0
-        puts 'asciidoctor: ERROR: partintro block can only be used when doctype is book and its a child of a part section. Excluding block content.'
+        puts 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a part section. Excluding block content.'
         ''
       else
         %(<partintro#{common_attrs id, role, reftext}>#{title && "\n<title>#{title}</title>"}

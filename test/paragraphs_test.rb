@@ -402,7 +402,7 @@ Wise words from a wise person.
         assert_css 'blockquote > simpara', output, 1
       end
 
-      test 'wip should wrap text in simpara for styled paragraphs with title when rendered to DocBook' do
+      test 'should wrap text in simpara for styled paragraphs with title when rendered to DocBook' do
         input = <<-EOS
 = Book
 :doctype: book

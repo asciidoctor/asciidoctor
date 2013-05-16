@@ -166,9 +166,9 @@ context 'Path Resolver' do
 
     test 'resolves windows paths when file separator is backlash' do
       @resolver.file_separator = '\\'
-      assert_equal 'C:\\data\\docs', @resolver.system_path('..', "C:\\data\\docs\\assets", 'C:\\data\\docs')
-      assert_equal 'C:\\data\\docs', @resolver.system_path('..\\..', "C:\\data\\docs\\assets", 'C:\\data\\docs')
-      assert_equal 'C:\\data\\docs\\css', @resolver.system_path('..\\..\\css', "C:\\data\\docs\\assets", 'C:\\data\\docs')
+      assert_equal 'C:/data/docs', @resolver.system_path('..', "C:\\data\\docs\\assets", 'C:\\data\\docs')
+      assert_equal 'C:/data/docs', @resolver.system_path('..\\..', "C:\\data\\docs\\assets", 'C:\\data\\docs')
+      assert_equal 'C:/data/docs/css', @resolver.system_path('..\\..\\css', "C:\\data\\docs\\assets", 'C:\\data\\docs')
     end
   end
 end

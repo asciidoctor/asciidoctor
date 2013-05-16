@@ -319,7 +319,7 @@ context 'Invoker' do
       # which tries to run a gsub on stdout prematurely breaking the test
       require 'open3'
       #cmd = "#{executable} -o - --trace #{input_path}"
-      cmd = "#{File.join RbConfig::CONFIG['bindir'], 'ruby'} #{executable} -o - --trace #{input_path}"
+      cmd = "#{File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']} #{executable} -o - --trace #{input_path}"
       _, stdout, stderr = Open3.popen3 cmd
       stderr_lines = stderr.readlines
       puts stderr_lines.join unless stderr_lines.empty?
