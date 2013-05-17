@@ -8,3 +8,5 @@ rvm:
 # Travis has something screwy w/ rbx 1.9 right now
 #  - rbx-19mode
 #script: rake test test_us_ascii
+notifications:
+  irc: "irc.freenode.org#asciidoctor"
