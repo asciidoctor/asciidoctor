@@ -823,7 +823,7 @@ module Asciidoctor
     elsif write_in_place
       to_file = File.join(File.dirname(input.path), "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
     elsif !stream_output && write_to_target
-      working_dir = options.has_key?(:base_dir) ? File.expand_path(opts[:base_dir]) : File.expand_path(Dir.pwd)
+      working_dir = options.has_key?(:base_dir) ? File.expand_path(options[:base_dir]) : File.expand_path(Dir.pwd)
       # QUESTION should the jail be the working_dir or doc.base_dir???
       jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
       if to_dir
