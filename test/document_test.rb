@@ -404,6 +404,27 @@ text
       end
     end
 
+    test 'wip should render document to file when base dir is set' do
+      sample_input_path = fixture_path('sample.asciidoc')
+      sample_output_path = fixture_path('result.html')
+      fixture_dir = fixture_path('')
+      begin
+        Asciidoctor.render_file(sample_input_path, :to_file => 'result.html', :base_dir => fixture_dir)
+        assert File.exist?(sample_output_path)
+        output = File.read(sample_output_path)
+        assert !output.empty?
+        assert_xpath '/html', output, 1
+        assert_xpath '/html/head', output, 1
+        assert_xpath '/html/body', output, 1
+        assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
+        assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+      rescue => e
+        flunk e.message
+      ensure
+        FileUtils::rm(sample_output_path, :force => true)
+      end
+    end
+
     test 'in_place option must not be used with to_file option' do
       sample_input_path = fixture_path('sample.asciidoc')
       sample_output_path = fixture_path('result.html')
