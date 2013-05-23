@@ -38,9 +38,9 @@ module Helpers
   end
 
   def self.mkdir_p(dir)
-    unless Dir.exists? dir
+    unless File.directory? dir
       parent_dir = File.dirname(dir)
-      if !Dir.exists?(parent_dir = File.dirname(dir)) && parent_dir != '.'
+      if !File.directory?(parent_dir = File.dirname(dir)) && parent_dir != '.'
         mkdir_p(parent_dir)
       end
       Dir.mkdir(dir)
