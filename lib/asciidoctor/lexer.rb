@@ -1355,69 +1355,27 @@ class Lexer
     process_attribute_entries(reader, document)
 
     metadata = {}
+    implicit_author = nil
+    implicit_authors = nil
 
     if reader.has_more_lines? && !reader.peek_line.chomp.empty?
-      author_metadata = {}
-      keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
-      author_line = reader.get_line
-      author_line.split(REGEXP[:semicolon_delim]).each_with_index do |author_entry, idx|
-        author_entry.strip!
-        next if author_entry.empty?
-        map = {}
-        if idx.zero?
-          keys.each do |key|
-            map[key.to_sym] = key
+      author_metadata = process_authors reader.get_line
+
+      unless author_metadata.empty?
+        # apply header subs and assign to document
+        if !document.nil?
+          author_metadata.map do |key, val|
+            val = val.is_a?(String) ? document.apply_header_subs(val) : val
+            document.attributes[key] = val if !document.attributes.has_key?(key)
+            val
           end
-        else
-          keys.each do |key|
-            map[key.to_sym] = "#{key}_#{idx + 1}"
-          end
+
+          implicit_author = document.attributes['author']
+          implicit_authors = document.attributes['authors']
         end
 
-        if match = author_entry.match(REGEXP[:author_info])
-          author_metadata[map[:firstname]] = fname = match[1].tr('_', ' ')
-          author_metadata[map[:author]] = fname
-          author_metadata[map[:authorinitials]] = fname[0, 1]
-          if !match[2].nil? && !match[3].nil?
-            author_metadata[map[:middlename]] = mname = match[2].tr('_', ' ')
-            author_metadata[map[:lastname]] = lname = match[3].tr('_', ' ')
-            author_metadata[map[:author]] = [fname, mname, lname].join ' '
-            author_metadata[map[:authorinitials]] = [fname[0, 1], mname[0, 1], lname[0, 1]].join
-          elsif !match[2].nil?
-            author_metadata[map[:lastname]] = lname = match[2].tr('_', ' ')
-            author_metadata[map[:author]] = [fname, lname].join ' '
-            author_metadata[map[:authorinitials]] = [fname[0, 1], lname[0, 1]].join
-          end
-          author_metadata[map[:email]] = match[4] unless match[4].nil?
-        else
-          author_metadata[map[:author]] = author_metadata[map[:firstname]] = author_entry.strip.squeeze(' ')
-          author_metadata[map[:authorinitials]] = author_metadata[map[:firstname]][0, 1]
-        end
-
-        author_metadata['authorcount'] = idx + 1
-        # only assign the _1 attributes if there are multiple authors
-        if idx == 1
-          keys.each do |key|
-            author_metadata["#{key}_1"] = author_metadata[key] if author_metadata.has_key? key
-          end
-        end
-        if idx.zero?
-          author_metadata['authors'] = author_metadata[map[:author]]
-        else
-          author_metadata['authors'] = "#{author_metadata['authors']}, #{author_metadata[map[:author]]}"
-        end
+        metadata = author_metadata
       end
-
-      # apply header subs and assign to document
-      if !document.nil?
-        author_metadata.map do |key, val|
-          val = val.is_a?(String) ? document.apply_header_subs(val) : val
-          document.attributes[key] = val if !document.attributes.has_key?(key)
-          val
-        end
-      end
-
-      metadata = author_metadata.dup
 
       # NOTE this will discard any comment lines, but not skip blank lines
       process_attribute_entries(reader, document)
@@ -1436,18 +1394,18 @@ class Lexer
         end
       end
 
-      # apply header subs and assign to document
-      if !document.nil?
-        rev_metadata.map do |key, val|
-          val = document.apply_header_subs(val)
-          document.attributes[key] = val if !document.attributes.has_key?(key)
-          val
+      unless rev_metadata.empty?
+        # apply header subs and assign to document
+        if !document.nil?
+          rev_metadata.map do |key, val|
+            val = document.apply_header_subs(val)
+            document.attributes[key] = val if !document.attributes.has_key?(key)
+            val
+          end
         end
-      end
 
-      rev_metadata.each {|k, v|
-        metadata[k] = v
-      }
+        metadata.update rev_metadata
+      end
 
       # NOTE this will discard any comment lines, but not skip blank lines
       process_attribute_entries(reader, document)
@@ -1455,7 +1413,116 @@ class Lexer
       reader.skip_blank_lines
     end
 
+    if !document.nil?
+      # process author attribute entries that override (or stand in for) the implicit author line
+      author_metadata = nil
+      if document.attributes.has_key?('author') &&
+          (author_line = document.attributes['author']) != implicit_author
+        # do not allow multiple, process as names only
+        author_metadata = process_authors author_line, true, false
+      elsif document.attributes.has_key?('authors') &&
+          (author_line = document.attributes['authors']) != implicit_authors
+        # allow multiple, process as names only
+        author_metadata = process_authors author_line, true
+      else
+        authors = []
+        author_key = "author_#{authors.size + 1}"
+        while document.attributes.has_key? author_key
+          authors << document.attributes[author_key]
+          author_key = "author_#{authors.size + 1}"
+        end
+        if authors.size == 1
+          # do not allow multiple, process as names only
+          author_metadata = process_authors authors.first, true, false
+        elsif authors.size > 1
+          # allow multiple, process as names only
+          author_metadata = process_authors authors.join('; '), true
+        end
+      end
+
+      unless author_metadata.nil?
+        document.attributes.update author_metadata
+
+        # special case
+        if !document.attributes.has_key?('email') && document.attributes.has_key?('email_1')
+          document.attributes['email'] = document.attributes['email_1']
+        end
+      end
+    end
+
     metadata
+  end
+
+  # Internal: Parse the author line into a Hash of author metadata
+  #
+  # author_line  - the String author line
+  # names_only   - a Boolean flag that indicates whether to process line as
+  #                names only or names with emails (default: false)
+  # multiple     - a Boolean flag that indicates whether to process multiple
+  #                semicolon-separated entries in the author line (default: true)
+  #
+  # returns a Hash of author metadata
+  def self.process_authors(author_line, names_only = false, multiple = true)
+    author_metadata = {}
+    keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
+    author_entries = multiple ? author_line.split(REGEXP[:semicolon_delim]) : [author_line]
+    author_entries.each_with_index do |author_entry, idx|
+      author_entry.strip!
+      next if author_entry.empty?
+      key_map = {}
+      if idx.zero?
+        keys.each do |key|
+          key_map[key.to_sym] = key
+        end
+      else
+        keys.each do |key|
+          key_map[key.to_sym] = "#{key}_#{idx + 1}"
+        end
+      end
+
+      segments = nil
+      if names_only
+        segments = author_entry.split(REGEXP[:inline_space], 3)
+      elsif (match = author_entry.match(REGEXP[:author_info]))
+        segments = match.to_a
+        segments.shift
+      end
+
+      unless segments.nil?
+        author_metadata[key_map[:firstname]] = fname = segments[0].tr('_', ' ')
+        author_metadata[key_map[:author]] = fname
+        author_metadata[key_map[:authorinitials]] = fname[0, 1]
+        if !segments[1].nil? && !segments[2].nil?
+          author_metadata[key_map[:middlename]] = mname = segments[1].tr('_', ' ')
+          author_metadata[key_map[:lastname]] = lname = segments[2].tr('_', ' ')
+          author_metadata[key_map[:author]] = [fname, mname, lname].join ' '
+          author_metadata[key_map[:authorinitials]] = [fname[0, 1], mname[0, 1], lname[0, 1]].join
+        elsif !segments[1].nil?
+          author_metadata[key_map[:lastname]] = lname = segments[1].tr('_', ' ')
+          author_metadata[key_map[:author]] = [fname, lname].join ' '
+          author_metadata[key_map[:authorinitials]] = [fname[0, 1], lname[0, 1]].join
+        end
+        author_metadata[key_map[:email]] = segments[3] unless names_only || segments[3].nil?
+      else
+        author_metadata[key_map[:author]] = author_metadata[key_map[:firstname]] = fname = author_entry.strip.squeeze(' ')
+        author_metadata[key_map[:authorinitials]] = fname[0, 1]
+      end
+
+      author_metadata['authorcount'] = idx + 1
+      # only assign the _1 attributes if there are multiple authors
+      if idx == 1
+        keys.each do |key|
+          author_metadata["#{key}_1"] = author_metadata[key] if author_metadata.has_key? key
+        end
+      end
+      if idx.zero?
+        author_metadata['authors'] = author_metadata[key_map[:author]]
+      else
+        author_metadata['authors'] = "#{author_metadata['authors']}, #{author_metadata[key_map[:author]]}"
+      end
+    end
+
+    author_metadata
   end
 
   # Internal: Parse lines of metadata until a line of metadata is not found.

@@ -318,11 +318,14 @@ module Asciidoctor
     # one,two;three;four
     :scsv_csv_delim   => /[[:blank:]]*[,;][[:blank:]]*/,
 
-    # one two  three
+    # one two	three
     :space_delim      => /([^\\])[[:blank:]]+/,
 
-    # one two  three
+    # one\ two\	three
     :escaped_space    => /\\([[:blank:]])/,
+
+    # John Smith
+    :inline_space     => /[[:blank:]]+/,
 
     # 29
     :digits           => /^\d+$/,
