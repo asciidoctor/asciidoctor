@@ -69,10 +69,12 @@ This option may be specified more than once.
     rendering.
 
 *-d, --doctype*='DOCTYPE'::
-    Document type: 'article' or 'book'. Sets the root element when using the
-    'docbook' backend and the style class on the HTML body element when using
-    the 'html' backend. The 'book' document type allows multiple level-0
-    section titles in a single document. Defaults to 'article'.
+    Document type: 'article', 'book' or 'inline'. Sets the root element when
+    using the 'docbook' backend and the style class on the HTML body element
+    when using the 'html' backend. The 'book' document type allows multiple
+    level-0 section titles in a single document. The 'inline' document type
+    allows the content of a single paragraph to be formatted and returned
+    without wrapping it in a containing element. Defaults to 'article'.
 
 Rendering Control
 ~~~~~~~~~~~~~~~~~
@@ -167,4 +169,4 @@ COPYING
 Copyright \(C) 2012-2013 Dan Allen and Ryan Waldron. Free use of this
 software is granted under the terms of the MIT License.
 
-// vim: tw=72
+// vim: tw=80
