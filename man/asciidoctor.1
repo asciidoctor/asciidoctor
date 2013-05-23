@@ -108,15 +108,18 @@ supported out of the box\&. You can also use the backend alias names
 \fB\-d, \-\-doctype\fR=\fIDOCTYPE\fR
 .RS 4
 Document type:
-\fIarticle\fR
+\fIarticle\fR,
+\fIbook\fR
 or
-\fIbook\fR\&. Sets the root element when using the
+\fIinline\fR\&. Sets the root element when using the
 \fIdocbook\fR
 backend and the style class on the HTML body element when using the
 \fIhtml\fR
 backend\&. The
 \fIbook\fR
-document type allows multiple level\-0 section titles in a single document\&. Defaults to
+document type allows multiple level\-0 section titles in a single document\&. The
+\fIinline\fR
+document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element\&. Defaults to
 \fIarticle\fR\&.
 .RE
 .SS "Rendering Control"

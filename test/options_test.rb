@@ -77,4 +77,19 @@ context 'Options' do
     assert_equal 'my_custom_backend', options[:attributes]['backend']
   end
 
+  test 'article doctype assignment' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-d article test/fixtures/sample.asciidoc))
+    assert_equal 'article', options[:attributes]['doctype']
+  end
+
+  test 'book doctype assignment' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-d book test/fixtures/sample.asciidoc))
+    assert_equal 'book', options[:attributes]['doctype']
+  end
+
+  test 'inline doctype assignment' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-d inline test/fixtures/sample.asciidoc))
+    assert_equal 'inline', options[:attributes]['doctype']
+  end
+
 end
