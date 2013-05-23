@@ -62,7 +62,7 @@ class DocumentTemplate < BaseTemplate
     <% end %>
     <% if has_header? %>
     <% if attr? :author %>
-    <% if attr? :authorcount, 1 %>
+    <% if attr(:authorcount).to_i < 2 %>
     <author>
       #{tag 'firstname', :firstname}
       #{tag 'othername', :middlename}
@@ -72,7 +72,7 @@ class DocumentTemplate < BaseTemplate
     #{tag 'authorinitials', :authorinitials}
     <% else %>
     <authorgroup>
-    <% (1..(attr(:authorcount))).each do |idx| %>
+    <% (1..(attr(:authorcount).to_i)).each do |idx| %>
       <author> 
         #{tag 'firstname', :"firstname_\#{idx}", true}
         #{tag 'othername', :"middlename_\#{idx}", true}
