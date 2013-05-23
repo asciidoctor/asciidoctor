@@ -368,6 +368,10 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
   when SafeMode is SECURE or greater (this makes for a friendly
   experience on GitHub)
 
+* Asciidoctor supports up to 6 section levels (to cover all heading levels in
+  HTML) whereas AsciiDoc stops at 5; note the 6 section level is only available
+  using the single-line section title syntax
+
 If there's a difference you don't see in this list, check the {issues}[issue
 tracker] to see if it's an outstanding feature, or file an issue to report the
 difference.
