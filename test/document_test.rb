@@ -566,27 +566,49 @@ preamble
 
     test 'document with title attribute entry overrides doctitle' do
      input = <<-EOS
-= Title
-:title: Document Title
+= Document Title
+:title: Override
 
-preamble
+{doctitle}
 
 == First Section
      EOS
      doc = document_from_string input
-     assert_equal 'Document Title', doc.doctitle
-     assert_equal 'Document Title', doc.title
+     assert_equal 'Override', doc.doctitle
+     assert_equal 'Override', doc.title
      assert doc.has_header?
-     assert_equal 'Title', doc.header.title
-     assert_equal 'Title', doc.first_section.title
+     assert_equal 'Document Title', doc.header.title
+     assert_equal 'Document Title', doc.first_section.title
+     assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.render, 1
+    end
+
+    test 'document with title attribute entry overrides doctitle attribute entry' do
+     input = <<-EOS
+= Document Title
+:snapshot: {doctitle}
+:doctitle: doctitle
+:title: Override
+
+{snapshot}, {doctitle}
+
+== First Section
+     EOS
+     doc = document_from_string input
+     assert_equal 'Override', doc.doctitle
+     assert_equal 'Override', doc.title
+     assert doc.has_header?
+     assert_equal 'doctitle', doc.header.title
+     assert_equal 'doctitle', doc.first_section.title
+     assert_xpath '//*[@id="preamble"]//p[text()="Document Title, doctitle"]', doc.render, 1
     end
 
     test 'document with doctitle attribute entry overrides header title and doctitle' do
      input = <<-EOS
-= Title
+= Document Title
+:snapshot: {doctitle}
 :doctitle: Override
 
-preamble
+{snapshot}, {doctitle}
 
 == First Section
      EOS
@@ -596,14 +618,15 @@ preamble
      assert doc.has_header?
      assert_equal 'Override', doc.header.title
      assert_equal 'Override', doc.first_section.title
+     assert_xpath '//*[@id="preamble"]//p[text()="Document Title, Override"]', doc.render, 1
     end
 
     test 'doctitle attribute entry above header overrides header title and doctitle' do
      input = <<-EOS
 :doctitle: Override
-= Title
+= Document Title
 
-preamble
+{doctitle}
 
 == First Section
      EOS
@@ -613,6 +636,7 @@ preamble
      assert doc.has_header?
      assert_equal 'Override', doc.header.title
      assert_equal 'Override', doc.first_section.title
+     assert_xpath '//*[@id="preamble"]//p[text()="Override"]', doc.render, 1
     end
 
     test 'should recognize document title when preceded by blank lines' do

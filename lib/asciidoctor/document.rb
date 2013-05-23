@@ -454,6 +454,10 @@ class Document < AbstractBlock
   # Internal: Branch the attributes so that the original state can be restored
   # at a future time.
   def save_attributes
+    unless @attributes.has_key?('doctitle') || (val = doctitle).nil?
+      @attributes['doctitle'] = val
+    end
+
     # css-signature cannot be updated after header attributes are processed
     if @id.nil? && @attributes.has_key?('css-signature')
       @id = @attributes['css-signature']
@@ -653,7 +657,8 @@ class Document < AbstractBlock
   end
 
   def content
-    # per AsciiDoc-spec, remove the title after rendering the header
+    # per AsciiDoc-spec, remove the title before rendering the body,
+    # regardless of whether the header is rendered)
     @attributes.delete('title')
     @blocks.map {|b| b.render }.join
   end
