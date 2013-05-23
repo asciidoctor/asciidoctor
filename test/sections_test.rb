@@ -208,6 +208,12 @@ text
     end
   end
 
+  context "level 5" do 
+    test "with single line syntax" do
+      assert_xpath "//h6[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n====== My Title")
+    end
+  end
+
   context 'Floating Title' do
     test 'should create floating title if style is float' do
       input = <<-EOS
