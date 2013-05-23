@@ -505,7 +505,7 @@ module Asciidoctor
     # match[1] is the delimiter, whose length determines the level
     # match[2] is the title itself
     # match[3] is an inline anchor, which becomes the section id
-    :section_title     => /^(={1,5})\s+(\S.*?)(?:\s*\[\[([^\[]+)\]\])?(?:\s+\1)?$/,
+    :section_title     => /^(={1,6})\s+(\S.*?)(?:\s*\[\[([^\[]+)\]\])?(?:\s+\1)?$/,
 
     # does not begin with a dot and has at least one alphanumeric character
     :section_name      => /^((?=.*\w+.*)[^.].*?)$/,
