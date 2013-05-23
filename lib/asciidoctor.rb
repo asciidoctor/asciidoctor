@@ -106,11 +106,9 @@ module Asciidoctor
   # The backend determines the format of the rendered output, default to html5
   DEFAULT_BACKEND = 'html5'
 
-  DEFAULT_STYLESHEET_PATH = File.join(ROOT_PATH, 'stylesheets', 'asciidoctor.css')
-
   DEFAULT_STYLESHEET_KEYS = ['', 'DEFAULT'].to_set
 
-  DEFAULT_STYLESHEET_NAME = File.basename(DEFAULT_STYLESHEET_PATH)
+  DEFAULT_STYLESHEET_NAME = 'asciidoctor.css'
 
   # Pointers to the preferred version for a given backend.
   BACKEND_ALIASES = {
@@ -888,8 +886,10 @@ module Asciidoctor
         outdir = doc.attr('outdir')
         stylesdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir,
             doc.safe >= SafeMode::SAFE ? outdir : nil)
-        FileUtils.mkdir_p stylesdir
-        FileUtils.cp DEFAULT_STYLESHEET_PATH, stylesdir, :preserve => true
+        Helpers.mkdir_p stylesdir
+        File.open(File.join(stylesdir, DEFAULT_STYLESHEET_NAME), 'w') {|f|
+          f.write Asciidoctor::HTML5.default_asciidoctor_stylesheet
+        }
       end
       doc
     else

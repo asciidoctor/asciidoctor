@@ -1,4 +1,19 @@
-/* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
+module Asciidoctor
+module HTML5
+  # Internal: Generate the default stylesheet for CodeRay
+  #
+  # returns the default CodeRay stylesheet as a String
+  def self.default_coderay_stylesheet
+    ::Asciidoctor::Helpers.require_library 'coderay'
+    ::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
+  end
+
+  # Internal: Generate the default stylesheet for Asciidoctor
+  #
+  # returns the default Asciidoctor stylesheet as a String
+  def self.default_asciidoctor_stylesheet
+    <<'DEFAULT_ASCIIDOCTOR_STYLESHEET'
+/* Default Asciidoctor stylesheet | MIT License | http://asciidoctor.org */
 article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary { display: block; }
 audio, canvas, video { display: inline-block; }
 audio:not([controls]) { display: none; height: 0; }
@@ -272,3 +287,7 @@ span.white-background { background-color: #fafafa; }
 span.yellow { color: #bfbf00; }
 span.yellow-background { background-color: #fafa00; }
 .literalblock > .content > pre, .listingblock > .content > pre { -webkit-border-radius: 0; border-radius: 0; }
+DEFAULT_ASCIIDOCTOR_STYLESHEET
+  end
+end
+end

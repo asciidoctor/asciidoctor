@@ -81,7 +81,6 @@ EOS
     lib/asciidoctor/version.rb
     man/asciidoctor.1
     man/asciidoctor.ad
-    stylesheets/asciidoctor.css
     test/attributes_test.rb
     test/blocks_test.rb
     test/document_test.rb
