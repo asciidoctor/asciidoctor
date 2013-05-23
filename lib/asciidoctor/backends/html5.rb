@@ -1,3 +1,5 @@
+require 'asciidoctor/backends/_stylesheets'
+
 module Asciidoctor
 class BaseTemplate
 
@@ -21,6 +23,7 @@ class BaseTemplate
 end
 
 module HTML5
+
 class DocumentTemplate < BaseTemplate
   def self.outline(node, to_depth = 2)
     toc_level = nil
@@ -52,14 +55,6 @@ class DocumentTemplate < BaseTemplate
     toc_level
   end
 
-  # Internal: Generate the default stylesheet for CodeRay
-  #
-  # returns the default CodeRay stylesheet as a String
-  def self.default_coderay_stylesheet
-    Helpers.require_library 'coderay'
-    ::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
-  end
-
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><!DOCTYPE html>
@@ -80,7 +75,7 @@ class DocumentTemplate < BaseTemplate
     <link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>">
     <% else %>
     <style>
-<%= read_asset DEFAULT_STYLESHEET_PATH %>
+<%= ::Asciidoctor::HTML5.default_asciidoctor_stylesheet %>
     </style>
     <% end %>
     <% elsif attr? :stylesheet %>
@@ -96,7 +91,7 @@ class DocumentTemplate < BaseTemplate
     when 'coderay' %>
     <% if (attr 'coderay-css', 'class') == 'class' %>
     <style>
-<%= template.class.default_coderay_stylesheet %>
+<%= ::Asciidoctor::HTML5.default_coderay_stylesheet %>
     </style>
     <% end %><%
     when 'highlightjs' %>
