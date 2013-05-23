@@ -74,10 +74,24 @@ class Lexer
     # that precede first block
     block_attributes = parse_block_metadata_lines(reader, document)
 
+    # yep, document title logic in AsciiDoc is just insanity
+    # definitely an area for spec refinement
+    assigned_doctitle = nil
+    unless (val = document.attributes.fetch('doctitle', '')).empty?
+      document.title = val
+      assigned_doctitle = val
+    end
+
+    section_title = nil
     # check if the first line is the document title
     # if so, add a header to the document and parse the header metadata
     if is_next_line_document_title?(reader, block_attributes)
-      document.id, document.title, _, _ = parse_section_title(reader, document)
+      document.id, doctitle, _, _ = parse_section_title(reader, document)
+      unless assigned_doctitle
+        document.title = doctitle
+        assigned_doctitle = doctitle
+      end
+      document.attributes['doctitle'] = section_title = doctitle
       # QUESTION: should this be encapsulated in document?
       if document.id.nil? && block_attributes.has_key?('id')
         document.id = block_attributes.delete('id')
@@ -85,8 +99,15 @@ class Lexer
       parse_header_metadata(reader, document)
     end
 
-    if document.attributes.has_key? 'doctitle'
-      document.title = document.attributes['doctitle']
+    if !(val = document.attributes.fetch('doctitle', '')).empty? &&
+        val != section_title
+      document.title = val
+      assigned_doctitle = val
+    end
+
+    # restore doctitle attribute to original assignment
+    if assigned_doctitle
+      document.attributes['doctitle'] = assigned_doctitle
     end
  
     document.clear_playback_attributes block_attributes
