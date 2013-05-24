@@ -300,7 +300,33 @@ class BlockDlistTemplate < BaseTemplate
 
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled']) %>
+<%#encoding:UTF-8%><% if attr? :style, 'horizontal'
+%><<%= (tag = title? ? 'table' : 'informaltable') %>#{common_attrs_erb} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">#{title_tag}
+  <tgroup cols="2">
+    <colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
+    <colspec colwidth="<%= attr :labelwidth, 85 %>*"/>
+    <tbody valign="top"><%
+      content.each do |dt, dd| %>
+      <row>
+        <entry>
+          <simpara><%= dt.text %></simpara>
+        </entry><%
+        unless dd.nil? %>
+        <entry><%
+          if dd.text? %>
+          <simpara><%= dd.text %></simpara><%
+          end %><%
+          if dd.blocks? %>
+          <%= dd.content.chomp %><%
+          end %>
+        </entry><%
+        end %>
+      </row><%
+      end %>
+    </tbody>
+  </tgroup>
+</<%= tag %><%
+else %><% tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled']) %>
 <% if tags[:list] %><<%= tags[:list] %>#{common_attrs_erb}><% end %>#{title_tag}
   <% content.each do |dt, dd| %>
   <<%= tags[:entry] %>>
@@ -327,7 +353,8 @@ class BlockDlistTemplate < BaseTemplate
     <% end %>
   </<%= tags[:entry] %>>
   <% end %>
-<% if tags[:list] %></<%= tags[:list] %>><% end %>
+<% if tags[:list] %></<%= tags[:list] %>><% end %><%
+end %>
     EOF
   end
 end
