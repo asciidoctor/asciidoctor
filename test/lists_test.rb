@@ -2219,6 +2219,26 @@ second term:: definition
       assert_xpath '((//tr)[2]/td)[2]/p[normalize-space(text())="definition"]', output, 1
     end
 
+    test 'should render horizontal list in docbook with proper markup' do
+      input = <<-EOS
+.Terms
+[horizontal]
+first term:: definition
++
+more detail
+
+second term:: definition
+      EOS
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '/table', output, 1
+      assert_xpath '/table[@tabstyle="horizontal"]', output, 1
+      assert_xpath '/table[@tabstyle="horizontal"]/title[text()="Terms"]', output, 1
+      assert_xpath '/table//row', output, 2
+      assert_xpath '(/table//row)[1]/entry', output, 2
+      assert_xpath '(/table//row)[2]/entry', output, 2
+      assert_xpath '((/table//row)[1]/entry)[2]/simpara', output, 2
+    end
+
     test 'should render qanda list in HTML with proper semantics' do
       input = <<-EOS
 [qanda]
