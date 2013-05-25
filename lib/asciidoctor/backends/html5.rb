@@ -763,7 +763,7 @@ class InlineQuotedTemplate < BaseTemplate
 end
 
 class InlineAnchorTemplate < BaseTemplate
-  def anchor(target, text, type, document, window = nil)
+  def anchor(target, text, type, document, node)
     case type
     when :xref
       text = document.references[:ids].fetch(target, "[#{target}]") if text.nil?
@@ -771,14 +771,14 @@ class InlineAnchorTemplate < BaseTemplate
     when :ref
       %(<a id="#{target}"></a>)
     when :link
-      %(<a href="#{target}"#{window && " target=\"#{window}\""}>#{text}</a>)
+      %(<a href="#{target}"#{node.attr?('role') ? " class=\"#{node.attr 'role'}\"" : nil}#{node.attr?('window') ? " target=\"#{node.attr 'window'}\"" : nil}>#{text}</a>)
     when :bibref
       %(<a id="#{target}"></a>[#{target}])
     end
   end
 
   def result(node)
-    anchor(node.target, node.text, node.type, node.document, (node.type == :link ? node.attr('window') : nil))
+    anchor(node.target, node.text, node.type, node.document, node)
   end
 
   def template
