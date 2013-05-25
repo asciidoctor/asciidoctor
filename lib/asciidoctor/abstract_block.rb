@@ -9,11 +9,15 @@ class AbstractBlock < AbstractNode
   # Public: Set the String block title.
   attr_writer :title
 
+  # Public: Get/Set the caption for this block
+  attr_accessor :caption
+
   def initialize(parent, context)
     super(parent, context)
     @blocks = []
     @id = nil
     @title = nil
+    @caption = nil
     if context == :document
       @level = 0
     elsif !parent.nil? && !self.is_a?(Section)
@@ -219,7 +223,7 @@ class AbstractBlock < AbstractNode
         if @document.attributes.has_key?(caption_key)
           caption_title = @document.attributes["#{key}-caption"]
           caption_num = @document.counter_increment("#{key}-number", self)
-          @caption = @attributes['caption'] = "#{caption_title} #{caption_num}. "
+          @caption = "#{caption_title} #{caption_num}. "
         end
       else
         @caption = caption
