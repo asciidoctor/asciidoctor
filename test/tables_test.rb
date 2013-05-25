@@ -474,6 +474,26 @@ output file name is used.
       assert_css 'table > tbody > tr > td:nth-child(2) table', output, 1
       assert_css 'table > tbody > tr > td:nth-child(2) table > tbody > tr > td', output, 2
     end
+
+    test 'wip cell background color' do
+      input = <<-EOS
+[cols="1e,1", options="header"]
+|===
+|{set:cellbgcolor:green}green
+|{set:cellbgcolor!}
+plain
+|{set:cellbgcolor:red}red
+|{set:cellbgcolor!}
+plain
+|===
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '(/table/thead/tr/th)[1][@style="background-color:green;"]', output, 1
+      assert_xpath '(/table/thead/tr/th)[2][@style="background-color:green;"]', output, 0
+      assert_xpath '(/table/tbody/tr/td)[1][@style="background-color:red;"]', output, 1
+      assert_xpath '(/table/tbody/tr/td)[2][@style="background-color:green;"]', output, 0
+    end
   end
 
   context 'DSV' do

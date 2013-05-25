@@ -288,13 +288,28 @@ module Substituters
         # escaped attribute
         if !$1.empty? || !$3.empty?
           "{#$2}"
-        elsif m[2].start_with?('counter:')
-          args = m[2].split(':')
-          @document.counter(args[1], args[2])
-        elsif m[2].start_with?('counter2:')
-          args = m[2].split(':')
-          @document.counter(args[1], args[2])
-          ''
+        elsif key.include? ':'
+          key = m[2]
+          if key.start_with?('set:')
+            args = key.split(':')
+            name, value = Lexer::store_attribute(args[1], args[2] || '', @document)
+            if value.nil?
+              reject = true
+              break '{undefined}'
+            end
+            ''
+          elsif key.start_with?('counter:')
+            args = key.split(':')
+            @document.counter(args[1], args[2])
+          elsif key.start_with?('counter2:')
+            args = key.split(':')
+            @document.counter(args[1], args[2])
+            ''
+          else
+            # if we get here, our attr_ref regex is too loose
+            puts "asciidoctor: WARNING: illegal attribute directive: #{key}"
+            ''
+          end
         elsif @document.attributes.has_key? key
           @document.attributes[key]
         elsif INTRINSICS.has_key? key

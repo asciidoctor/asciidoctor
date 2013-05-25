@@ -211,7 +211,7 @@ class Table::Cell < AbstractNode
 
   # Public: Get the text with normal substitutions applied for this cell. Used for cells in the head rows
   def text
-    apply_normal_subs(@text)
+    apply_normal_subs(@text).strip
   end
 
   # Public: Handles the body data (tbody, tfoot), applying styles and partitioning into paragraphs

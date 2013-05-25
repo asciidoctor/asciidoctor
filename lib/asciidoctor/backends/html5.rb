@@ -610,15 +610,17 @@ if attr? :float %>float: <%= attr :float %>; <% end %>">
     <% @rows[tsec].each do |row| %>
     <tr>
       <% row.each do |cell| %>
-      <<%= tsec == :head ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}><%
-      if tsec == :head %><%= cell.text %><% else %><%
+      <<%= tsec == :head ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}<%
+      cell_content = ''
+      if tsec == :head %><% cell_content = cell.text %><% else %><%
       case cell.attr('style', nil, false)
-        when :asciidoc %><div><%= cell.content %></div><%
-        when :verse %><div class="verse"><%= template.preserve_endlines(cell.text, self) %></div><%
-        when :literal %><div class="literal monospaced"><pre><%= template.preserve_endlines(cell.text, self) %></pre></div><%
-        when :header %><% cell.content.each do |text| %><p class="tableblock header"><%= text %></p><% end %><%
-        else %><% cell.content.each do |text| %><p class="tableblock"><%= text %></p><% end %><%
-      end %><% end %></<%= tsec == :head ? 'th' : 'td' %>>
+        when :asciidoc %><% cell_content = %(<div>\#{cell.content}</div>) %><%
+        when :verse %><% cell_content = %(<div class="verse">\#{template.preserve_endlines(cell.text, self)}</div>) %><%
+        when :literal %><% cell_content = %(<div class="literal monospaced"><pre>\#{template.preserve_endlines(cell.text, self)}</pre></div>) %><%
+        when :header %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<p class="tableblock header">\#{text}</p>) %><% end %><%
+        else %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<p class="tableblock">\#{text}</p>) %><% end %><%
+      end %><% end %><%= @document.attr?('cellbgcolor') ? %( style="background-color:\#{@document.attr 'cellbgcolor'};") : nil
+      %>><%= cell_content %></<%= tsec == :head ? 'th' : 'td' %>>
       <% end %>
     </tr>
     <% end %>
