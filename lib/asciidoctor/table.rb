@@ -47,9 +47,6 @@ class Table < AbstractBlock
   # Public: A compiled Regexp to match a blank line
   BLANK_LINE_PATTERN = /\n[[:blank:]]*\n/
 
-  # Public: Get/Set the String caption (unused, necessary for compatibility w/ next_block)
-  attr_accessor :caption
-
   # Public: Get/Set the columns for this table
   attr_accessor :columns
 
@@ -59,8 +56,6 @@ class Table < AbstractBlock
 
   def initialize(parent, attributes)
     super(parent, :table)
-    # QUESTION since caption is on block, should it go to AbstractBlock?
-    @caption = nil
     @rows = Rows.new([], [], [])
     @columns = []
 

@@ -41,7 +41,7 @@ class DocumentTemplate < BaseTemplate
       end
       toc_level << "#{indent}<ol>\n" if nested
       sections.each do |section|
-        toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{!section.special && section.level > 0 ? "#{section.sectnum} " : ''}#{section.attr('caption')}#{section.title}</a></li>\n"
+        toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{!section.special && section.level > 0 ? "#{section.sectnum} " : ''}#{section.caption}#{section.title}</a></li>\n"
         if section.level < to_depth && (child_toc_level = outline(section, to_depth))
           if section.document.doctype != 'book' || section.level > 0
             toc_level << "#{indent}  <li>\n#{child_toc_level}\n#{indent}  </li>\n"
@@ -247,7 +247,7 @@ class SectionTemplate < BaseTemplate
         content = sec.content
       end
       %(<div class="sect#{slevel}#{role}">
-  <#{htag}#{id}>#{sectnum}#{sec.attr 'caption'}#{sec.title}</#{htag}>
+  <#{htag}#{id}>#{sectnum}#{sec.caption}#{sec.title}</#{htag}>
 #{content}
 </div>\n)
     end
@@ -375,9 +375,9 @@ class BlockAdmonitionTemplate < BaseTemplate
     <tr>
       <td class="icon">
         <% if attr? :icons %>
-        <img src="<%= icon_uri(attr :name) %>" alt="<%= attr :caption %>">
+        <img src="<%= icon_uri(attr :name) %>" alt="<%= @caption %>">
         <% else %>
-        <div class="title"><%= attr :caption %></div>
+        <div class="title"><%= @caption %></div>
         <% end %>
       </td>
       <td class="content">

@@ -14,9 +14,6 @@ class Block < AbstractBlock
   # Public: Get/Set the original Array content for this section block.
   attr_accessor :buffer
 
-  # Public: Get/Set the caption for this block
-  attr_accessor :caption
-
   # Public: Initialize an Asciidoctor::Block object.
   #
   # parent  - The parent Asciidoc Object.
@@ -26,7 +23,6 @@ class Block < AbstractBlock
   def initialize(parent, context, buffer = nil)
     super(parent, context)
     @buffer = buffer
-    @caption = nil
   end
 
   # Public: Get the rendered String content for this Block.  If the block
