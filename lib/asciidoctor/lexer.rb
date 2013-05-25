@@ -313,9 +313,8 @@ class Lexer
       block_context = nil
       terminator = nil
       # QUESTION put this inside call to rekey attributes?
-      if attributes.has_key? 1
-        explicit_style = attributes['style']
-        style = attributes['style'] = attributes[1]
+      if attributes[1]
+        style, explicit_style = parse_style_attribute(attributes)
       end
 
       if delimited_blk_match = is_delimited_block?(this_line, true)
@@ -1154,20 +1153,9 @@ class Lexer
   def self.initialize_section(reader, parent, attributes = {})
     section = Section.new parent
     section.id, section.title, section.level, _ = parse_section_title(reader, section.document)
-    if section.id.nil? && attributes.has_key?('id')
-      section.id = attributes['id']
-    else
-      # generate an id if one was not *embedded* in the heading line
-      # or as an anchor above the section
-      section.id ||= section.generate_id
-    end
-
-    if section.id
-      section.document.register(:ids, [section.id, section.title])
-    end
-
+    # parse style, id and role from first positional attribute
     if attributes[1]
-      section.sectname = attributes[1]
+      section.sectname, _ = parse_style_attribute(attributes)
       section.special = true
       document = parent.document
       # FIXME refactor to use assign_caption (also check requirements)
@@ -1180,6 +1168,18 @@ class Lexer
       end
     else
       section.sectname = "sect#{section.level}"
+    end
+
+    if section.id.nil? && (id = attributes['id'])
+      section.id = id
+    else
+      # generate an id if one was not *embedded* in the heading line
+      # or as an anchor above the section
+      section.id ||= section.generate_id
+    end
+
+    if section.id
+      section.document.register(:ids, [section.id, section.title])
     end
     section.update_attributes(attributes)
     reader.skip_blank_lines
@@ -1209,7 +1209,7 @@ class Lexer
   # returns the section level if the Reader is positioned at a section title,
   # false otherwise
   def self.is_next_line_section?(reader, attributes)
-    return false if !attributes[1].nil? && ['float', 'discrete'].include?(attributes[1])
+    return false if !(val = attributes[1]).nil? && ['float', 'discrete'].include?(val)
     return false if !reader.has_more_lines?
     is_section_title?(*reader.peek_lines(2))
   end
@@ -1980,6 +1980,67 @@ class Lexer
     end 
 
     [spec, rest]
+  end
+
+  # Public: Parse the first positional attribute and assign named attributes
+  #
+  # Parse the first positional attribute to extract the style, role and id
+  # parts, assign the values to their cooresponding attribute keys and return
+  # both the original style attribute and the parsed value from the first
+  # positional attribute.
+  #
+  # attributes - The Hash of attributes to process
+  #
+  # Examples
+  #
+  #   puts attributes
+  #   => {1 => "abstract#intro.lead", "style" => "preamble"}
+  #
+  #   parse_style_attribute(attributes)
+  #   => ["abstract", "preamble"]
+  #
+  #   puts attributes
+  #   => {1 => "abstract#intro.lead", "style" => "abstract", "id" => "intro", "role" => "lead"}
+  #
+  # Returns a two-element Array of the parsed style from the
+  # first positional attribute and the original style that was
+  # replaced
+  def self.parse_style_attribute(attributes)
+    original_style = attributes['style']
+    raw_style = attributes[1]
+    if !raw_style || raw_style.include?(' ')
+      attributes['style'] = raw_style
+      [raw_style, original_style]
+    # FIXME this logic could be condensed
+    else
+      hash_index = raw_style.index('#')
+      dot_index = raw_style.index('.') 
+      if !hash_index.nil? && (dot_index.nil? || hash_index < dot_index)
+        parsed_style = attributes['style'] = (hash_index > 0 ? raw_style[0..(hash_index - 1)] : nil)
+        id = raw_style[(hash_index + 1)..-1]
+        if !dot_index.nil?
+          id, roles = id.split('.', 2)
+          attributes['id'] = id
+          attributes['role'] = roles.tr('.', ' ')
+        else
+          attributes['id'] = id
+        end
+      elsif !dot_index.nil? && (hash_index.nil? || dot_index < hash_index)
+        parsed_style = attributes['style'] = (dot_index > 0 ? raw_style[0..(dot_index - 1)] : nil)
+        roles = raw_style[(dot_index + 1)..-1]
+        if !hash_index.nil?
+          roles, id = roles.split('#', 2)
+          attributes['id'] = id
+          attributes['role'] = roles.tr('.', ' ')
+        else
+          attributes['role'] = roles.tr('.', ' ')
+        end
+      else
+        parsed_style = attributes['style'] = raw_style
+      end
+
+      [parsed_style, original_style]
+    end
   end
 
   # Public: Convert a string to a legal attribute name.
