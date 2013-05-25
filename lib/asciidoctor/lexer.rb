@@ -74,6 +74,15 @@ class Lexer
     # that precede first block
     block_attributes = parse_block_metadata_lines(reader, document)
 
+    # special case, block title is not allowed above document title,
+    # carry attributes over to the document body
+    if block_attributes.has_key?('title')
+      document.clear_playback_attributes block_attributes
+      document.save_attributes
+      block_attributes['invalid-header'] = true
+      return block_attributes
+    end
+
     # yep, document title logic in AsciiDoc is just insanity
     # definitely an area for spec refinement
     assigned_doctitle = nil
@@ -164,7 +173,7 @@ class Lexer
     # NOTE we could drop a hint in the attributes to indicate
     # that we are at a section title (so we don't have to check)
     if parent.is_a?(Document) && parent.blocks.empty? &&
-        (parent.has_header? || !is_next_line_section?(reader, attributes))
+        (parent.has_header? || attributes.delete('invalid-header') || !is_next_line_section?(reader, attributes))
 
       if parent.has_header?
         preamble = Block.new(parent, :preamble)
@@ -214,11 +223,10 @@ class Lexer
       if next_level
         next_level += section.document.attr('leveloffset', 0).to_i
         doctype = parent.document.doctype
-        if next_level == 0 && doctype != 'book'
-          puts "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
-        end
         if next_level > current_level || (section.is_a?(Document) && next_level == 0)
-          unless expected_next_levels.nil? || expected_next_levels.include?(next_level)
+          if next_level == 0 && doctype != 'book'
+            puts "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
+          elsif !expected_next_levels.nil? && !expected_next_levels.include?(next_level)
             puts "asciidoctor: WARNING: line #{reader.lineno + 1}: section title out of sequence: " +
                 "expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, " +
                 "got level #{next_level}"
@@ -227,6 +235,9 @@ class Lexer
           new_section, attributes = next_section(reader, section, attributes)
           section << new_section
         else
+          if next_level == 0 && doctype != 'book'
+            puts "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
+          end
           # close this section (and break out of the nesting) to begin a new one
           break
         end
