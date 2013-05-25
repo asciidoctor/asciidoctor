@@ -152,6 +152,20 @@ ____
       assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
     end
 
+    test 'quote block with attribute and id and role shorthand' do
+      input = <<-EOS
+[quote#think.big, Donald Trump]
+____
+As long as your going to be thinking anyway, think big.
+____
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '#think.quoteblock.big', output, 1
+      assert_css '.quoteblock > .attribution', output, 1
+    end
+
     test 'quote block with complex content' do
       input = <<-EOS
 ____
