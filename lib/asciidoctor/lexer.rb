@@ -1138,7 +1138,7 @@ class Lexer
     end
 
     #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join}<BUFFER"
-    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer}<BUFFER"
+    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
 
     buffer
   end
