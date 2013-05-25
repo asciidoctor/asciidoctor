@@ -45,9 +45,6 @@ class AttributeList
   # TODO named attributes cannot contain dash characters
   NAME_PATTERN = /[A-Za-z:_][A-Za-z:_\-\.]*/
 
-  # Public: A regular expression for splitting a comma-separated string
-  CSV_SPLIT_PATTERN = /[ \t]*,[ \t]*/
-
   def initialize(source, block = nil, quotes = ['\'', '"'], delimiter = ',', escape_char = '\\')
     @scanner = ::StringScanner.new source
     @block = block
@@ -170,8 +167,8 @@ class AttributeList
       # opts is an alias for options
       if name == 'options' || name == 'opts'
         name = 'options'
-        resolved_value.split(CSV_SPLIT_PATTERN).each do |o|
-          @attributes[o + '-option'] = ''
+        resolved_value.split(',').each do |o|
+          @attributes[o.strip + '-option'] = ''
         end
       elsif single_quoted_value && !@block.nil?
         resolved_value = @block.apply_normal_subs(value)
