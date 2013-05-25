@@ -333,7 +333,7 @@ module Substituters
     found[:macroish] = (found[:square_bracket] && found[:colon])
     found[:macroish_short_form] = (found[:square_bracket] && found[:colon] && result.include?(':['))
     found[:uri] = (found[:colon] && result.include?('://'))
-    link_attrs = @document.attributes.has_key?('linkattrs')
+    use_link_attrs = @document.attributes.has_key?('use-link-attrs')
 
     if found[:macroish] && result.include?('image:')
       # image:filename.png[Alt Text]
@@ -415,11 +415,17 @@ module Substituters
         attrs = nil
         #text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
         if !m[3].to_s.empty?
-          if link_attrs && (m[3].start_with?('"') || m[3].include?(','))
-            attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')))
+          if use_link_attrs && (m[3].start_with?('"') || m[3].include?(','))
+            attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')), [])
             text = attrs[1]
           else
             text = sub_attributes(m[3].gsub('\]', ']'))
+          end
+
+          if text.end_with? '^'
+            text = text.chop
+            attrs ||= {}
+            attrs['window'] = '_blank' unless attrs.has_key?('window')
           end
         else
           text = ''
@@ -444,8 +450,8 @@ module Substituters
 
         attrs = nil
         #text = sub_attributes(m[2].gsub('\]', ']'))
-        if link_attrs && (m[2].start_with?('"') || m[2].include?(','))
-          attrs = parse_attributes(sub_attributes(m[2].gsub('\]', ']')))
+        if use_link_attrs && (m[2].start_with?('"') || m[2].include?(','))
+          attrs = parse_attributes(sub_attributes(m[2].gsub('\]', ']')), [])
           text = attrs[1]
           if mailto
             if attrs.has_key? 2
@@ -459,6 +465,13 @@ module Substituters
         else
           text = sub_attributes(m[2].gsub('\]', ']'))
         end
+
+        if text.end_with? '^'
+          text = text.chop
+          attrs ||= {}
+          attrs['window'] = '_blank' unless attrs.has_key?('window')
+        end
+
         # QUESTION should a mailto be registered as an e-mail address?
         @document.register(:links, target)
 
