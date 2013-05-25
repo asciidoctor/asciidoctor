@@ -104,7 +104,6 @@ class PathResolver
   DOT_DOT = '..'
   SLASH = '/'
   BACKSLASH = '\\'
-  PARTITION_RE = /\/+/
   WIN_ROOT_RE = /^[[:alpha:]]:(?:\\|\/)/
 
   attr_accessor :file_separator
@@ -192,7 +191,7 @@ class PathResolver
   def partition_path(path, web_path = false)
     posix_path = posixfy path
     is_root = web_path ? is_web_root?(posix_path) : is_root?(posix_path)
-    path_segments = posix_path.split(PARTITION_RE)
+    path_segments = posix_path.tr_s(SLASH, SLASH).split(SLASH)
     # capture relative root
     root = path_segments.first == DOT ? DOT : nil
     path_segments.delete(DOT)

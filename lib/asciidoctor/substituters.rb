@@ -365,7 +365,7 @@ module Substituters
           next m[0][1..-1]
         end
 
-        terms = unescape_bracketed_text(m[1] || m[2]).split(REGEXP[:csv_delimiter])
+        terms = unescape_bracketed_text(m[1] || m[2]).split(',').map(&:strip)
         document.register(:indexterms, [*terms])
         Inline.new(self, :indexterm, text, :attributes => {'terms' => terms}).render
       }
@@ -516,7 +516,7 @@ module Substituters
           type = nil
           target = nil
         else
-          id, text = m[2].split(REGEXP[:csv_delimiter], 2)
+          id, text = m[2].split(',', 2).map(&:strip)
           if !text.nil?
             # hmmmm
             text = restore_passthroughs(text)
@@ -546,7 +546,7 @@ module Substituters
           next m[0][1..-1]
         end
         if !m[1].nil?
-          id, reftext = m[1].split(REGEXP[:csv_delimiter], 2)
+          id, reftext = m[1].split(',', 2).map(&:strip)
           id.sub!(REGEXP[:dbl_quoted], '\2')
           reftext.sub!(REGEXP[:m_dbl_quoted], '\2') unless reftext.nil?
         else
@@ -578,7 +578,7 @@ module Substituters
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        id, reftext = m[1].split(REGEXP[:csv_delimiter])
+        id, reftext = m[1].split(',').map(&:strip)
         id.sub!(REGEXP[:dbl_quoted], '\2')
         if reftext.nil?
           reftext = "[#{id}]"

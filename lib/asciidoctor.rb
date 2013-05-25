@@ -184,7 +184,7 @@ module Asciidoctor
   LINE_BREAK = ' +'
 
   # NOTE allows for empty space in line as it could be left by the template engine
-  BLANK_LINES_PATTERN = /^\s*\n/
+  BLANK_LINE_PATTERN = /^[[:blank:]]*\n/
 
   LINE_FEED_ENTITY = '&#10;' # or &#x0A;
 
@@ -303,27 +303,14 @@ module Asciidoctor
     # // (and then whatever)
     :comment          => %r{^//(?:[^/]|$)},
 
-    # one,two
-    # one, two
-    # one , two
-    :csv_delimiter    => /[[:blank:]]*,[[:blank:]]*/,
-
-    # one;two
-    # one; two
-    # one ; two
-    :semicolon_delim  => /[[:blank:]]*;[[:blank:]]*/,
-
     # one,two;three;four
-    :scsv_csv_delim   => /[[:blank:]]*[,;][[:blank:]]*/,
+    :ssv_or_csv_delim   => /,|;/,
 
     # one two	three
     :space_delim      => /([^\\])[[:blank:]]+/,
 
     # one\ two\	three
     :escaped_space    => /\\([[:blank:]])/,
-
-    # John Smith
-    :inline_space     => /[[:blank:]]+/,
 
     # 29
     :digits           => /^\d+$/,

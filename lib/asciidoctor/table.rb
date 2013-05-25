@@ -44,9 +44,6 @@ class Table < AbstractBlock
     }
   }
 
-  # Public: A compiled Regexp to match a blank line
-  BLANK_LINE_PATTERN = /\n[[:blank:]]*\n/
-
   # Public: Get/Set the columns for this table
   attr_accessor :columns
 
@@ -220,7 +217,7 @@ class Table::Cell < AbstractNode
     if style == :asciidoc
       @inner_document.render
     else
-      text.split(Table::BLANK_LINE_PATTERN).map {|p|
+      text.split(BLANK_LINE_PATTERN).map {|p|
         !style || style == :header ? p : Inline.new(parent, :quoted, p, :type => attr('style')).render
       }
     end
