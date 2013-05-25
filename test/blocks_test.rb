@@ -692,15 +692,25 @@ paragraph
       assert_xpath '//*[@class="paragraph"]/p[text() = "paragraph"]', output, 1
     end
 
-    test 'block title above document title gets carried over to preamble' do
+    test 'block title above document title demotes document title to a section title' do
       input = <<-EOS
 .Block title
-= Document Title
+= Section Title
 
-preamble
+section paragraph
       EOS
-      output = render_string input
-      assert_xpath '//*[@id="preamble"]//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
+      output, errors = nil
+      redirect_streams do |stdout, stderr|
+        output = render_string input
+        errors = stdout.string
+      end
+      assert_xpath '//*[@id="header"]/*', output, 0
+      assert_xpath '//*[@id="preamble"]/*', output, 0
+      assert_xpath '//*[@id="content"]/h1[text()="Section Title"]', output, 1
+      assert_xpath '//*[@class="paragraph"]', output, 1
+      assert_xpath '//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
+      assert !errors.empty?
+      assert_match(/only book doctypes can contain level 0 sections/, errors)
     end
 
     test 'block title above document title gets carried over to first block in first section if no preamble' do

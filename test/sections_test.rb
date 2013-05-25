@@ -361,15 +361,14 @@ text in standalone
 // end simulated include::[]
       EOS
 
-      output = nil
-      errors = nil
+      output, errors = nil
       redirect_streams do |stdout, stderr|
         output = render_string input
         errors = stdout.string
       end
 
       assert !errors.empty?
-      assert_match(/section title out of sequence/, errors)
+      assert_match(/only book doctypes can contain level 0 sections/, errors)
     end
 
     test 'should add level offset to section level' do
