@@ -257,7 +257,9 @@ class AbstractNode
   def generate_data_uri(target_image, asset_dir_key = nil)
     Helpers.require_library 'base64'
 
-    mimetype = 'image/' + File.extname(target_image)[1..-1]
+    ext = File.extname(target_image)[1..-1]
+    mimetype = 'image/' + ext
+    mimetype = "#{mimetype}+xml" if ext == 'svg'
     if asset_dir_key
       #asset_dir_path = normalize_system_path(@document.attr(asset_dir_key), nil, nil, :target_name => asset_dir_key)
       #image_path = normalize_system_path(target_image, asset_dir_path, nil, :target_name => 'image')

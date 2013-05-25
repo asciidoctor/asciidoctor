@@ -372,7 +372,7 @@ class BlockOpenTemplate < BaseTemplate
         puts 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
         ''
       else
-        %(<abstract>#{title && "\n<title>#{node.title}</title>"}
+        %(<abstract>#{title && "\n<title>#{title}</title>"}
 #{content node}
 </abstract>\n)
       end

@@ -197,11 +197,11 @@ class Document < AbstractBlock
 
     # allow common attributes backend and doctype to be set using options hash
     unless @options[:backend].nil?
-      @attribute_overrides['backend'] = @options[:backend]
+      @attribute_overrides['backend'] = @options[:backend].to_s
     end
 
     unless @options[:doctype].nil?
-      @attribute_overrides['doctype'] = @options[:doctype]
+      @attribute_overrides['doctype'] = @options[:doctype].to_s
     end
 
     if @safe >= SafeMode::SERVER
