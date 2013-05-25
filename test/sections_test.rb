@@ -572,7 +572,7 @@ Details
 
       output = block_from_string input
       assert_equal 'appendix', output.sectname
-      assert_equal 'Appendix A: ', output.attr('caption')
+      assert_equal 'Appendix A: ', output.caption
     end
 
     test 'should render appendix title prefixed with caption' do

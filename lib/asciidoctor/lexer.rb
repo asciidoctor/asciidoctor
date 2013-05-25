@@ -644,7 +644,7 @@ class Lexer
       # REVIEW seems like there is a better way to organize this wrap-up
       block.id      ||= attributes['id'] if attributes.has_key?('id')
       block.title     = attributes['title'] unless block.title?
-      block.caption ||= attributes['caption'] unless block.is_a?(Section)
+      block.caption ||= attributes.delete('caption')
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
       if block.id && block.title? && !attributes.has_key?('reftext')
@@ -1163,7 +1163,7 @@ class Lexer
           !attributes.has_key?('caption') &&
           !document.attributes.has_key?('caption')
         number = document.counter('appendix-number', 'A')
-        attributes['caption'] = "#{document.attributes['appendix-caption']} #{number}: "
+        section.caption = "#{document.attributes['appendix-caption']} #{number}: "
         Document::AttributeEntry.new('appendix-number', number).save_to(attributes)
       end
     else
