@@ -428,7 +428,7 @@ module Asciidoctor
     :pass_lit         => /(^|[^`\w])(\\?`([^`\s]|[^`\s].*?\S)`)(?![`\w])/m,
 
     # placeholder for extracted passthrough text
-    :pass_placeholder => /\x0(\d+)\x0/,
+    :pass_placeholder => /\e(\d+)\e/,
 
     # ____
     #:quote            => /^_{4,}$/,
