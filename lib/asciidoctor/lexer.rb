@@ -634,6 +634,12 @@ class Lexer
 
         when :table
           block_reader = Reader.new reader.grab_lines_until(:terminator => terminator, :skip_line_comments => true)
+          case terminator[0..0]
+            when ','
+              attributes['format'] = 'csv'
+            when ':'
+              attributes['format'] = 'dsv'
+          end
           block = next_table(block_reader, parent, attributes)
 
         when :quote, :verse

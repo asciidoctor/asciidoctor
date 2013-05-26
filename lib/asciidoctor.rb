@@ -154,6 +154,8 @@ module Asciidoctor
     '____' => [:quote, ['verse'].to_set],
     '++++' => [:pass, Set.new],
     '|===' => [:table, Set.new],
+    ',===' => [:table, Set.new],
+    ':===' => [:table, Set.new],
     '!===' => [:table, Set.new],
     '////' => [:comment, Set.new],
     '```'  => [:fenced_code, Set.new],
@@ -232,7 +234,7 @@ module Asciidoctor
     # matches any block delimiter:
     #   open, listing, example, literal, comment, quote, sidebar, passthrough, table
     # NOTE position the most common blocks towards the front of the pattern
-    :any_blk          => %r{^(?:--|(?:-|\.|=|\*|_|\+|/){4,}|[\|!]={3,}|(?:`|~){3,}.*)$},
+    :any_blk          => %r{^(?:--|(?:-|\.|=|\*|_|\+|/){4,}|[\|,;!]={3,}|(?:`|~){3,}.*)$},
 
     # detect a list item of any sort
     # [[:graph:]] is a non-blank character
