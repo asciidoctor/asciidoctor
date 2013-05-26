@@ -454,7 +454,7 @@ class Reader
         attributes = AttributeList.new(raw_attributes).parse
         if attributes.has_key? 'lines'
           inc_lines = []
-          attributes['lines'].split(REGEXP[:scsv_csv_delim]).each do |linedef|
+          attributes['lines'].split(REGEXP[:ssv_or_csv_delim]).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..').map(&:to_i)
               if to == -1
@@ -469,7 +469,7 @@ class Reader
           end
           inc_lines = inc_lines.sort.uniq
         elsif attributes.has_key? 'tags'
-          tags = attributes['tags'].split(REGEXP[:scsv_csv_delim]).uniq
+          tags = attributes['tags'].split(REGEXP[:ssv_or_csv_delim]).uniq
         end
       end
       if !inc_lines.nil?

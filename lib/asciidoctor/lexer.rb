@@ -1476,7 +1476,7 @@ class Lexer
   def self.process_authors(author_line, names_only = false, multiple = true)
     author_metadata = {}
     keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
-    author_entries = multiple ? author_line.split(REGEXP[:semicolon_delim]) : [author_line]
+    author_entries = multiple ? author_line.split(';').map(&:strip) : [author_line]
     author_entries.each_with_index do |author_entry, idx|
       author_entry.strip!
       next if author_entry.empty?
@@ -1493,7 +1493,8 @@ class Lexer
 
       segments = nil
       if names_only
-        segments = author_entry.split(REGEXP[:inline_space], 3)
+        # splitting on ' ' will collapse repeating spaces
+        segments = author_entry.split(' ', 3)
       elsif (match = author_entry.match(REGEXP[:author_info]))
         segments = match.to_a
         segments.shift
