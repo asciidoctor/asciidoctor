@@ -332,6 +332,34 @@ of the attribute named foo in your document.
       assert_xpath %(//li[1]/p[text()="docdir: #{docdir}"]), output, 1
       assert_xpath %(//li[2]/p[text()="docfile: #{docfile}"]), output, 1
     end
+
+    test 'assigns attribute defined in attribute reference with set prefix and value' do
+      input = '{set:foo:bar}{foo}' 
+      output = render_embedded_string input 
+      assert_xpath '//p', output, 1
+      assert_xpath '//p[text()="bar"]', output, 1
+    end
+
+    test 'assigns attribute defined in attribute reference with set prefix and no value' do
+      input = "{set:foo}\n{foo}yes"
+      output = render_embedded_string input 
+      assert_xpath '//p', output, 1
+      assert_xpath '//p[normalize-space(text())="yes"]', output, 1
+    end
+
+    test 'assigns attribute defined in attribute reference with set prefix and empty value' do
+      input = "{set:foo:}\n{foo}yes"
+      output = render_embedded_string input 
+      assert_xpath '//p', output, 1
+      assert_xpath '//p[normalize-space(text())="yes"]', output, 1
+    end
+
+    test 'unassigns attribute defined in attribute reference with set prefix' do
+      input = ":foo:\n\n{set:foo!}\n{foo}yes"
+      output = render_embedded_string input
+      assert_xpath '//p', output, 1
+      assert_xpath '//p/child::text()', output, 0
+    end
   end
 
   context "Intrinsic attributes" do

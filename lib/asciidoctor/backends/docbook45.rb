@@ -519,15 +519,16 @@ class BlockTableTemplate < BaseTemplate
         <entry#{attribute('align', 'cell.attr :halign')}#{attribute('valign', 'cell.attr :valign')}<%
         if cell.colspan %> namest="col_<%= cell.column.attr :colnumber %>" nameend="col_<%= (cell.column.attr :colnumber) + cell.colspan - 1 %>"<%
         end %><% if cell.rowspan %> morerows="<%= cell.rowspan - 1 %>"<% end %>><%
-        if tblsec == :head %><%= cell.text %><%
+        cell_content = ''
+        if tblsec == :head %><% cell_content = cell.text %><%
         else %><%
         case cell.attr(:style)
-          when :asciidoc %><%= cell.content %><%
-          when :verse %><literallayout><%= template.preserve_endlines(cell.text, self) %></literallayout><%
-          when :literal %><literallayout class="monospaced"><%= template.preserve_endlines(cell.text, self) %></literallayout><%
-          when :header %><% cell.content.each do |text| %><simpara><emphasis role="strong"><%= text %></emphasis></simpara><% end %><%
-          else %><% cell.content.each do |text| %><simpara><%= text %></simpara><% end %><%
-        %><% end %><% end %></entry>
+          when :asciidoc %><% cell_content = cell.content %><%
+          when :verse %><% cell_content = %(<literallayout>\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
+          when :literal %><% cell_content = %(<literallayout class="monospaced">\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
+          when :header %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content\}<simpara><emphasis role="strong">\#{text}</emphasis></simpara>) %><% end %><%
+          else %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<simpara>\#{text}</simpara>) %><% end %><%
+        %><% end %><% end %><%= @document.attr?('cellbgcolor') ? %(<?dbfo bgcolor="\#{@document.attr 'cellbgcolor'}"?>) : nil %><%= cell_content %></entry>
         <% end %>
       </row>
       <% end %>

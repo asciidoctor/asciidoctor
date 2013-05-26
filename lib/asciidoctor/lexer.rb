@@ -1640,27 +1640,39 @@ class Lexer
         end
       end
 
-      if name.end_with?('!')
-        # a nil value signals the attribute should be deleted (undefined)
-        value = nil
-        name = name.chop
-      end
-
-      name = sanitize_attribute_name(name)
-      accessible = true
-      if !parent.nil?
-        accessible = value.nil? ?
-            parent.document.delete_attribute(name) :
-            parent.document.set_attribute(name, value)
-      end
-
-      if !attributes.nil?
-        Document::AttributeEntry.new(name, value).save_to(attributes) if accessible
-      end
+      store_attribute(name, value, parent.nil? ? nil : parent.document, attributes)
       true
     else
       false
     end
+  end
+
+  # Public: Store the attribute in the document and register attribute entry if accessible
+  #
+  # name  - the String name of the attribute to store
+  # value - the String value of the attribute to store
+  # doc   - the Document being parsed
+  # attrs - the attributes for the current context
+  #
+  # returns a 2-element array containing the attribute name and value
+  def self.store_attribute(name, value, doc = nil, attrs = nil)
+    if name.end_with?('!')
+      # a nil value signals the attribute should be deleted (undefined)
+      value = nil
+      name = name.chop
+    end
+
+    name = sanitize_attribute_name(name)
+    accessible = true
+    unless doc.nil?
+      accessible = value.nil? ? doc.delete_attribute(name) : doc.set_attribute(name, value)
+    end
+
+    unless !accessible || attrs.nil?
+      Document::AttributeEntry.new(name, value).save_to(attrs)
+    end
+
+    [name, value]
   end
 
   # Internal: Resolve the 0-index marker for this list item
