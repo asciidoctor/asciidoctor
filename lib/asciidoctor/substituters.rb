@@ -40,8 +40,9 @@ module Substituters
     multiline = lines.is_a?(Array)
     text = multiline ? lines.join : lines
 
-    passthroughs = subs.include?(:macros)
-    text = extract_passthroughs(text) if passthroughs
+    if (has_passthroughs = subs.include?(:macros))
+      text = extract_passthroughs(text)
+    end
     
     subs.each {|type|
       case type
@@ -63,7 +64,7 @@ module Substituters
         puts "asciidoctor: WARNING: unknown substitution type #{type}"
       end
     }
-    text = restore_passthroughs(text) if passthroughs
+    text = restore_passthroughs(text) if has_passthroughs
 
     multiline ? text.lines.entries : text
   end
@@ -165,7 +166,7 @@ module Substituters
       # TODO move unescaping closing square bracket to an operation
       @passthroughs << {:text => m[2] || m[4].gsub('\]', ']'), :subs => subs}
       index = @passthroughs.size - 1
-      "\x0#{index}\x0"
+      "\e#{index}\e"
     } unless !(result.include?('+++') || result.include?('$$') || result.include?('pass:'))
 
     result.gsub!(REGEXP[:pass_lit]) {
@@ -179,7 +180,7 @@ module Substituters
       
       @passthroughs << {:text => m[3], :subs => [:specialcharacters], :literal => true}
       index = @passthroughs.size - 1
-      "#{m[1]}\x0#{index}\x0"
+      "#{m[1]}\e#{index}\e"
     } unless !result.include?('`')
 
     result
@@ -191,7 +192,7 @@ module Substituters
   #
   # returns The String text with the passthrough text restored
   def restore_passthroughs(text)
-    return text if @passthroughs.nil? || @passthroughs.empty? || !text.include?("\x0")
+    return text if @passthroughs.nil? || @passthroughs.empty? || !text.include?("\e")
     
     text.gsub(REGEXP[:pass_placeholder]) {
       pass = @passthroughs[$1.to_i];
