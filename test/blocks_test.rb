@@ -597,6 +597,58 @@ AssertionError
       # so rstrip is necessary
       assert_equal output.rstrip, output2.rstrip
     end
+
+    test 'listing block without title should generate screen element in docbook' do
+      input = <<-EOS
+----
+listing block
+----
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '/screen[text()="listing block"]', output, 1
+    end
+
+    test 'listing block with title should generate screen element inside formalpara element in docbook' do
+      input = <<-EOS
+.title
+----
+listing block
+----
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '/formalpara', output, 1
+      assert_xpath '/formalpara/title[text()="title"]', output, 1
+      assert_xpath '/formalpara/para/screen[text()="listing block"]', output, 1
+    end
+
+    test 'source block with no title or language should generate screen element in docbook' do
+      input = <<-EOS
+[source]
+----
+listing block
+----
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '/screen[text()="listing block"]', output, 1
+    end
+
+    test 'source block with title and no language should generate screen element inside formalpara element in docbook' do
+      input = <<-EOS
+[source]
+.title
+----
+listing block
+----
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '/formalpara', output, 1
+      assert_xpath '/formalpara/title[text()="title"]', output, 1
+      assert_xpath '/formalpara/para/screen[text()="listing block"]', output, 1
+    end
   end
 
   context "Open Blocks" do
