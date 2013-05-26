@@ -62,7 +62,7 @@ class DocumentTemplate < BaseTemplate
     <% end %>
     <% if has_header? %>
     <% if attr? :author %>
-    <% if attr(:authorcount).to_i < 2 %>
+    <% if (attr :authorcount).to_i < 2 %>
     <author>
       #{tag 'firstname', :firstname}
       #{tag 'othername', :middlename}
@@ -72,7 +72,7 @@ class DocumentTemplate < BaseTemplate
     #{tag 'authorinitials', :authorinitials}
     <% else %>
     <authorgroup>
-    <% (1..(attr(:authorcount).to_i)).each do |idx| %>
+    <% (1..((attr :authorcount).to_i)).each do |idx| %>
       <author> 
         #{tag 'firstname', :"firstname_\#{idx}", true}
         #{tag 'othername', :"middlename_\#{idx}", true}
@@ -193,7 +193,7 @@ class BlockParagraphTemplate < BaseTemplate
   end
 
   def result(node)
-    paragraph(node.id, node.attr('style'), node.attr('role'), node.attr('reftext'), (node.title? ? node.title : nil), node.content)
+    paragraph(node.id, (node.attr 'style', nil, false), (node.attr 'role'), (node.attr 'reftext'), (node.title? ? node.title : nil), node.content)
   end
 
   def template
@@ -299,61 +299,91 @@ class BlockDlistTemplate < BaseTemplate
   }
 
   def template
+    # TODO may want to refactor ListItem content to hold multiple terms
+    # that change would drastically simplify this template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if attr? :style, 'horizontal'
+<%#encoding:UTF-8%><%
+continuing = false;
+last_index = content.length - 1
+if attr? :style, 'horizontal'
 %><<%= (tag = title? ? 'table' : 'informaltable') %>#{common_attrs_erb} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">#{title_tag}
-  <tgroup cols="2">
-    <colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
-    <colspec colwidth="<%= attr :labelwidth, 85 %>*"/>
-    <tbody valign="top"><%
-      content.each do |dt, dd| %>
-      <row>
-        <entry>
-          <simpara><%= dt.text %></simpara>
-        </entry><%
-        unless dd.nil? %>
-        <entry><%
-          if dd.text? %>
-          <simpara><%= dd.text %></simpara><%
-          end %><%
-          if dd.blocks? %>
-          <%= dd.content.chomp %><%
-          end %>
-        </entry><%
-        end %>
-      </row><%
+<tgroup cols="2">
+<colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
+<colspec colwidth="<%= attr :labelwidth, 85 %>*"/>
+<tbody valign="top"><%
+  content.each_with_index do |(dt, dd), index|
+    last = (index == last_index)
+    unless continuing %>
+<row>
+<entry><%
+    end %>
+<simpara><%= dt.text %></simpara><%
+    if !last && dd.nil?
+      continuing = true
+      next
+    else
+      continuing = false
+    end %>
+</entry>
+<entry><%
+    unless dd.nil?
+      if dd.text? %>
+<simpara><%= dd.text %></simpara><%
+      end
+      if dd.blocks? %>
+<%= dd.content.chomp %><%
+      end
+    end %>
+</entry><%
+    if last || !dd.nil? %>
+</row><%
+    end %><%
+  end %>
+</tbody>
+</tgroup>
+</<%= tag %>><%
+else
+  tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled'])
+  if tags[:list]
+%><<%= tags[:list] %>#{common_attrs_erb}>#{title_tag}<%
+  end
+  content.each_with_index do |(dt, dd), index|
+    last = (index == last_index)
+    unless continuing %>
+<<%= tags[:entry] %>><%
+    end
+    if tags.has_key?(:label)
+      unless continuing %>
+<<%= tags[:label] %>><%
       end %>
-    </tbody>
-  </tgroup>
-</<%= tag %><%
-else %><% tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled']) %>
-<% if tags[:list] %><<%= tags[:list] %>#{common_attrs_erb}><% end %>#{title_tag}
-  <% content.each do |dt, dd| %>
-  <<%= tags[:entry] %>>
-    <% if tags.has_key?(:label) %>
-    <<%= tags[:label] %>>
-      <<%= tags[:term] %>>
-        <%= dt.text %>
-      </<%= tags[:term] %>>
-    </<%= tags[:label] %>>
-    <% else %>
-    <<%= tags[:term] %>>
-      <%= dt.text %>
-    </<%= tags[:term] %>>
-    <% end %>
-    <% unless dd.nil? %>
-    <<%= tags[:item] %>>
-      <% if dd.text? %>
-      <simpara><%= dd.text %></simpara>
-      <% end %>
-      <% if dd.blocks? %>
-<%= dd.content %>
-      <% end %>
-    </<%= tags[:item] %>>
-    <% end %>
-  </<%= tags[:entry] %>>
-  <% end %>
-<% if tags[:list] %></<%= tags[:list] %>><% end %><%
+<<%= tags[:term] %>><%= dt.text %></<%= tags[:term] %>><%
+      if last || !dd.nil? %>
+</<%= tags[:label] %>><%
+      end
+    else %>
+<<%= tags[:term] %>><%= dt.text %></<%= tags[:term] %>><%
+    end
+    if !last && dd.nil?
+      continuing = true
+      next
+    else
+      continuing = false
+    end %>
+<<%= tags[:item] %>><%
+    unless dd.nil?
+      if dd.text? %>
+<simpara><%= dd.text %></simpara><%
+      end
+      if dd.blocks? %>
+<%= dd.content %><%
+      end
+    end %>
+</<%= tags[:item] %>>
+</<%= tags[:entry] %>><%
+  end
+  if tags[:list] %>
+</<%= tags[:list] %>><%
+  end
 end %>
     EOF
   end
@@ -361,8 +391,8 @@ end
 
 class BlockOpenTemplate < BaseTemplate
   def result(node)
-    open_block(node, node.id, node.attr('style', nil, false),
-        node.attr('role'), node.attr('reftext'), node.title? ? node.title : nil)
+    open_block(node, node.id, (node.attr 'style', nil, false),
+        (node.attr 'role'), (node.attr 'reftext'), node.title? ? node.title : nil)
   end
 
   def open_block(node, id, style, role, reftext, title)
@@ -462,7 +492,7 @@ class BlockQuoteTemplate < BaseTemplate
   <% if (attr? :attribution) || (attr? :citetitle) %>
   <attribution>
     <% if attr? :attribution %>
-    <%= attr(:attribution) %>
+    <%= (attr :attribution) %>
     <% end %>
     #{tag 'citetitle', :citetitle}
   </attribution>
@@ -480,7 +510,7 @@ class BlockVerseTemplate < BaseTemplate
   <% if (attr? :attribution) || (attr? :citetitle) %>
   <attribution>
     <% if attr? :attribution %>
-    <%= attr(:attribution) %>
+    <%= (attr :attribution) %>
     <% end %>
     #{tag 'citetitle', :citetitle}
   </attribution>
@@ -509,7 +539,7 @@ class BlockTableTemplate < BaseTemplate
   <% end %>
   <tgroup cols="<%= attr :colcount %>">
     <% @columns.each do |col| %>
-    <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= col.attr((attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
+    <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= (col.attr (attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
     <% end %>
     <% [:head, :foot, :body].select {|tblsec| !rows[tblsec].empty? }.each do |tblsec| %>
     <t<%= tblsec %>>
@@ -522,13 +552,13 @@ class BlockTableTemplate < BaseTemplate
         cell_content = ''
         if tblsec == :head %><% cell_content = cell.text %><%
         else %><%
-        case cell.attr(:style)
+        case (cell.attr :style)
           when :asciidoc %><% cell_content = cell.content %><%
           when :verse %><% cell_content = %(<literallayout>\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
           when :literal %><% cell_content = %(<literallayout class="monospaced">\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
           when :header %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content\}<simpara><emphasis role="strong">\#{text}</emphasis></simpara>) %><% end %><%
           else %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<simpara>\#{text}</simpara>) %><% end %><%
-        %><% end %><% end %><%= @document.attr?('cellbgcolor') ? %(<?dbfo bgcolor="\#{@document.attr 'cellbgcolor'}"?>) : nil %><%= cell_content %></entry>
+        %><% end %><% end %><%= (@document.attr? 'cellbgcolor') ? %(<?dbfo bgcolor="\#{@document.attr 'cellbgcolor'}"?>) : nil %><%= cell_content %></entry>
         <% end %>
       </row>
       <% end %>
@@ -610,7 +640,7 @@ class InlineQuotedTemplate < BaseTemplate
   end
 
   def result(node)
-    quote_text(node.text, node.type, node.attr('role'))
+    quote_text(node.text, node.type, (node.attr 'role'))
   end
 
   def template

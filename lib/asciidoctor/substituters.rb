@@ -275,56 +275,55 @@ module Substituters
   def sub_attributes(data)
     return data if data.nil? || data.empty?
 
+    string_data = data.is_a? String
     # normalizes data type to an array (string becomes single-element array)
-    lines = Array(data)
+    lines = string_data ? [data] : data
 
-    result = lines.map {|line|
+    result = []
+    lines.each {|line|
       reject = false
-      subject = line.dup
-      subject.gsub!(REGEXP[:attr_ref]) {
+      line = line.gsub(REGEXP[:attr_ref]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
-        key = m[2].downcase
-        # escaped attribute
-        if !$1.empty? || !$3.empty?
-          "{#$2}"
-        elsif key.include? ':'
-          key = m[2]
-          if key.start_with?('set:')
-            args = key.split(':')
-            name, value = Lexer::store_attribute(args[1], args[2] || '', @document)
+        # escaped attribute, return unescaped
+        if !m[1].nil? || !m[4].nil?
+          "{#{m[2]}}"
+        elsif (directive = m[3])
+          offset = directive.length + 1
+          expr = m[2][offset..-1]
+          case directive
+          when 'set'
+            args = expr.split(':')
+            name, value = Lexer::store_attribute(args[0], args[1] || '', @document)
             if value.nil?
               reject = true
               break '{undefined}'
             end
             ''
-          elsif key.start_with?('counter:')
-            args = key.split(':')
-            @document.counter(args[1], args[2])
-          elsif key.start_with?('counter2:')
-            args = key.split(':')
-            @document.counter(args[1], args[2])
-            ''
+          when 'counter', 'counter2'
+            args = expr.split(':')
+            val = @document.counter(args[0], args[1])
+            directive == 'counter2' ? '' : val
           else
             # if we get here, our attr_ref regex is too loose
-            puts "asciidoctor: WARNING: illegal attribute directive: #{key}"
+            puts "asciidoctor: WARNING: illegal attribute directive: #{m[2]}"
             ''
           end
-        elsif @document.attributes.has_key? key
+        elsif (key = m[2].downcase) && @document.attributes.has_key?(key)
           @document.attributes[key]
         elsif INTRINSICS.has_key? key
           INTRINSICS[key]
         else
-          Debug.debug { "Missing attribute: #{m[2]}, line marked for removal" }
+          Debug.debug { "Missing attribute: #{key}, line marked for removal" }
           reject = true
           break '{undefined}'
         end
-      } if subject.include?('{')
+      } if line.include? '{' 
 
-      !reject ? subject : nil
-    }.compact
+      result << line unless reject
+    }
 
-    data.is_a?(String) ? result.join : result
+    string_data ? result.join : result
   end
 
   # Public: Substitute inline macros (e.g., links, images, etc)

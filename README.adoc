@@ -251,6 +251,9 @@ Here are the known cases where Asciidoctor differs from AsciiDoc:
 NOTE: In general, Asciidoctor handles whitespace much more intelligently
 +
 
+* Asciidoctor does not output an empty +<dd>+ for labeled list items
+  that don't have a definition
+
 * In Asciidoctor, a horizontal ruler can have attributes
 
 * Asciidoctor wraps +<col>+ elements in +<colgroup>+ in tables
