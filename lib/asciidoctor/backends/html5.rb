@@ -226,10 +226,23 @@ class SectionTemplate < BaseTemplate
       slevel = 1
     end
     htag = "h#{slevel + 1}"
-    id = sec.id && " id=\"#{sec.id}\""
+    id = anchor = link_start = link_end = nil
+    if sec.id
+      id = %( id="#{sec.id}")
+      if sec.document.attr? 'sectanchors'
+        if sec.document.attr? 'icons', 'font'
+          anchor = %(<a class="anchor" href="##{sec.id}"><i class="icon-anchor"></i></a>)
+        else
+          anchor = %(<a class="anchor" href="##{sec.id}"></a>)
+        end
+      elsif sec.document.attr? 'sectlinks'
+        link_start = %(<a class="link" href="##{sec.id}">)
+        link_end = '</a>'
+      end
+    end
 
     if slevel == 0
-      %(<h1#{id}>#{sec.title}</h1>
+      %(<h1#{id}>#{anchor}#{link_start}#{sec.title}#{link_end}</h1>
 #{sec.content})
     else
       role = sec.attr?('role') ? " #{sec.attr('role')}" : nil
@@ -247,7 +260,7 @@ class SectionTemplate < BaseTemplate
         content = sec.content
       end
       %(<div class="sect#{slevel}#{role}">
-  <#{htag}#{id}>#{sectnum}#{sec.caption}#{sec.title}</#{htag}>
+  <#{htag}#{id}>#{anchor}#{link_start}#{sectnum}#{sec.caption}#{sec.title}#{link_end}</#{htag}>
 #{content}
 </div>\n)
     end
