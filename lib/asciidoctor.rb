@@ -276,7 +276,7 @@ module Asciidoctor
     # attribute reference
     # {foo}
     # {counter:pcount:1}
-    :attr_ref         => /(\\?)\{((?:set|counter2?):.+?|\w+(?:[\-]\w+)*)(\\?)\}/,
+    :attr_ref         => /(\\)?\{((set|counter2?):.+?|\w+(?:[\-]\w+)*)(\\)?\}/,
 
     # The author info line the appears immediately following the document title
     # John Doe <john@anonymous.com>
