@@ -475,7 +475,7 @@ output file name is used.
       assert_css 'table > tbody > tr > td:nth-child(2) table > tbody > tr > td', output, 2
     end
 
-    test 'wip cell background color' do
+    test 'cell background color' do
       input = <<-EOS
 [cols="1e,1", options="header"]
 |===
@@ -517,6 +517,21 @@ nobody:x:99:99:Nobody:/:/sbin/nologin
       assert_xpath '//tr[4]/td[5]/p/text()', output, 0
       assert_xpath '//tr[3]/td[5]/p[text()="MySQL:Server"]', output, 1
     end
+
+    test 'dsv format shorthand' do
+      input = <<-EOS
+:===
+a:b:c
+1:2:3
+:===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 3
+      assert_css 'table > tbody > tr', output, 2
+      assert_css 'table > tbody > tr:nth-child(1) > td', output, 3
+      assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
+    end
   end
 
   context 'CSV' do
@@ -541,6 +556,21 @@ air, moon roof, loaded",4799.00
       assert_xpath '((//tbody/tr)[1]/td)[4]/p[text()="ac, abs, moon"]', output, 1
       assert_xpath %(((//tbody/tr)[2]/td)[3]/p[text()='Venture "Extended Edition"']), output, 1
       assert_xpath '((//tbody/tr)[4]/td)[4]/p[text()="MUST SELL! air, moon roof, loaded"]', output, 1
+    end
+
+    test 'csv format shorthand' do
+      input = <<-EOS
+,===
+a,b,c
+1,2,3
+,===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 3
+      assert_css 'table > tbody > tr', output, 2
+      assert_css 'table > tbody > tr:nth-child(1) > td', output, 3
+      assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
     end
 
     test 'custom separator' do
