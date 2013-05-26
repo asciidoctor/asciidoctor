@@ -80,10 +80,10 @@ class DocumentTemplate < BaseTemplate
     <% end %>
     <% elsif attr? :stylesheet %>
     <% if attr? 'linkcss' %>
-    <link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), attr(:stylesdir, '')) %>">
+    <link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), (attr :stylesdir, '')) %>">
     <% else %>
     <style>
-<%= read_asset normalize_system_path(attr(:stylesheet), attr(:stylesdir, '')), true %>
+<%= read_asset normalize_system_path((attr :stylesheet), (attr :stylesdir, '')), true %>
     </style>
     <% end %>
     <% end %>
@@ -110,7 +110,7 @@ class DocumentTemplate < BaseTemplate
       <% end %>
       <% if attr? :author %><span id="author"><%= attr :author %></span><br>
       <% if attr? :email %><span id="email"><%= sub_macros(attr :email) %></span><br><% end %><% end %>
-      <% if attr? :revnumber %><span id="revnumber">version <%= attr :revnumber %><%= attr?(:revdate) ? ',' : '' %></span><% end %>
+      <% if attr? :revnumber %><span id="revnumber">version <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><% end %>
       <% if attr? :revdate %><span id="revdate"><%= attr :revdate %></span><% end %>
       <% if attr? :revremark %><br><span id="revremark"><%= attr :revremark %></span><% end %>
       <% end %>
@@ -125,7 +125,7 @@ class DocumentTemplate < BaseTemplate
     <div id="content">
 <%= content %>
     </div>
-    <% unless !footnotes? || attr?(:nofootnotes) %><div id="footnotes">
+    <% unless !footnotes? || (attr? :nofootnotes) %><div id="footnotes">
       <hr>
       <% footnotes.each do |fn| %>
       <div class="footnote" id="_footnote_<%= fn.index %>">
@@ -151,7 +151,7 @@ class EmbeddedTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><% unless notitle || !has_header? %><h1#{id}><%= header.title %></h1>
 <% end %><%= content %>
-<% unless !footnotes? || attr?(:nofootnotes) %><div id="footnotes">
+<% unless !footnotes? || (attr? :nofootnotes) %><div id="footnotes">
   <hr>
   <% footnotes.each do |fn| %>
   <div class="footnote" id="_footnote_<%= fn.index %>">
@@ -167,12 +167,12 @@ class BlockTocTemplate < BaseTemplate
   def result(node)
     doc = node.document
 
-    return '' unless doc.attr?('toc')
+    return '' unless (doc.attr? 'toc')
 
     if node.id
       id_attr = %( id="#{node.id}")
       title_id_attr = ''
-    elsif doc.embedded? || !doc.attr?('toc-placement')
+    elsif doc.embedded? || !(doc.attr? 'toc-placement')
       id_attr = ' id="toc"'
       title_id_attr = ' id="toctitle"'
     else
@@ -180,8 +180,8 @@ class BlockTocTemplate < BaseTemplate
       title_id_attr = ''
     end
     title = node.title? ? node.title : (doc.attr 'toc-title')
-    levels = node.attr?('levels') ? node.attr('levels').to_i : doc.attr('toclevels', 2).to_i
-    role = node.attr?('role') ? node.attr('role') : doc.attr('toc-class', 'toc')
+    levels = (node.attr? 'levels') ? (node.attr 'levels').to_i : (doc.attr 'toclevels', 2).to_i
+    role = (node.attr? 'role') ? (node.attr 'role') : (doc.attr 'toc-class', 'toc')
 
     %(<div#{id_attr} class="#{role}">
 <div#{title_id_attr} class="title">#{title}</div>
@@ -196,10 +196,10 @@ end
 
 class BlockPreambleTemplate < BaseTemplate
   def toc(node)
-    if node.attr?('toc') && node.attr?('toc-placement', 'preamble')
+    if (node.attr? 'toc') && (node.attr? 'toc-placement', 'preamble')
       %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
   <div id="toctitle">#{node.attr 'toc-title'}</div>
-#{DocumentTemplate.outline(node.document, node.attr('toclevels', 2).to_i)}
+#{DocumentTemplate.outline(node.document, (node.attr 'toclevels', 2).to_i)}
 </div>)
     else
       ''
@@ -232,7 +232,7 @@ class SectionTemplate < BaseTemplate
       %(<h1#{id}>#{sec.title}</h1>
 #{sec.content})
     else
-      role = sec.attr?('role') ? " #{sec.attr('role')}" : nil
+      role = (sec.attr? 'role') ? " #{sec.attr 'role'}" : nil
       if !sec.special && (sec.attr? 'numbered') && slevel < 4
         sectnum = "#{sec.sectnum} "
       else
@@ -273,8 +273,10 @@ class BlockDlistTemplate < BaseTemplate
 continuing = false
 last_index = content.length - 1
 if attr? 'style', 'qanda', false
-%><div#{id} class="qlist#{style_class}#{role_class}">
-#{title_div}
+%><div#{id} class="qlist#{style_class}#{role_class}"><%
+if title? %>
+<div class="title"><%= title %></div><%
+end %>
 <ol><%
   content.each_with_index do |(dt, dd), index|
     last = (index == last_index)
@@ -301,8 +303,10 @@ if attr? 'style', 'qanda', false
 </ol>
 </div><%
 elsif attr? 'style', 'horizontal', false
-%><div#{id} class="hdlist#{role_class}">
-#{title_div}
+%><div#{id} class="hdlist#{role_class}"><%
+if title? %>
+<div class="title"><%= title %></div><%
+end %>
 <table>
 <colgroup>
 <col<% if attr? :labelwidth %> style="width:<%= attr :labelwidth %>%;"<% end %>>
@@ -312,7 +316,7 @@ elsif attr? 'style', 'horizontal', false
     last = (index == last_index)
     unless continuing %>
 <tr>
-<td class="hdlist1<%= attr?('strong-option') ? 'strong' : nil %>"><%
+<td class="hdlist1<%= (attr? 'strong-option') ? 'strong' : nil %>"><%
     end %>
 <%= dt.text %>
 <br><%
@@ -338,14 +342,14 @@ elsif attr? 'style', 'horizontal', false
 </table>
 </div><%
 else
-%><div#{id} class="dlist#{style_class}#{role_class}">
-#{title_div}
+%><div#{id} class="dlist#{style_class}#{role_class}"><%
+if title? %>
+<div class="title"><%= title %></div><%
+end %>
 <dl><%
   content.each_with_index do |(dt, dd), index|
     last = (index == last_index) %>
-<dt<% if !(attr? 'style', nil, false) %> class="hdlist1"<% end %>>
-<%= dt.text %>
-</dt><%
+<dt<%= !(attr? 'style', nil, false) ? %( class="hdlist1") : nil %>><%= dt.text %></dt><%
     unless dd.nil? %>
 <dd><%
       if dd.text? %>
@@ -427,7 +431,7 @@ class BlockParagraphTemplate < BaseTemplate
   end
 
   def result(node)
-    paragraph(node.id, node.attr('role'), (node.title? ? node.title : nil), node.content)
+    paragraph(node.id, (node.attr 'role'), (node.title? ? node.title : nil), node.content)
   end
 
   def template
@@ -463,7 +467,7 @@ end
 
 class BlockOpenTemplate < BaseTemplate
   def result(node)
-    open_block(node, node.id, node.attr('style', nil, false), node.attr('role'), node.title? ? node.title : nil, node.content)
+    open_block(node, node.id, (node.attr 'style', nil, false), (node.attr 'role'), node.title? ? node.title : nil, node.content)
   end
 
   def open_block(node, id, style, role, title, content)
@@ -511,7 +515,7 @@ class BlockQuoteTemplate < BaseTemplate
   <blockquote>
 <%= content %>
   </blockquote><%
-  if attr?(:attribution) || attr?(:citetitle) %>
+  if (attr? :attribution) || (attr? :citetitle) %>
   <div class="attribution"><%
     if attr? :citetitle %>
     <cite><%= attr :citetitle %></cite><% end %><%
@@ -530,7 +534,7 @@ class BlockVerseTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="verseblock#{role_class}">
   #{title_div}
   <pre class="content"><%= template.preserve_endlines(content, self) %></pre><%
-  if attr?(:attribution) || attr?(:citetitle) %>
+  if (attr? :attribution) || (attr? :citetitle) %>
   <div class="attribution"><%
     if attr? :citetitle %>
     <cite><%= attr :citetitle %></cite><% end %><%
@@ -640,13 +644,13 @@ if attr? :float %>float: <%= attr :float %>; <% end %>">
       <<%= tsec == :head ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}<%
       cell_content = ''
       if tsec == :head %><% cell_content = cell.text %><% else %><%
-      case cell.attr('style', nil, false)
+      case (cell.attr 'style', nil, false)
         when :asciidoc %><% cell_content = %(<div>\#{cell.content}</div>) %><%
         when :verse %><% cell_content = %(<div class="verse">\#{template.preserve_endlines(cell.text, self)}</div>) %><%
         when :literal %><% cell_content = %(<div class="literal monospaced"><pre>\#{template.preserve_endlines(cell.text, self)}</pre></div>) %><%
         when :header %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<p class="tableblock header">\#{text}</p>) %><% end %><%
         else %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<p class="tableblock">\#{text}</p>) %><% end %><%
-      end %><% end %><%= @document.attr?('cellbgcolor') ? %( style="background-color:\#{@document.attr 'cellbgcolor'};") : nil
+      end %><% end %><%= (@document.attr? 'cellbgcolor') ? %( style="background-color:\#{@document.attr 'cellbgcolor'};") : nil
       %>><%= cell_content %></<%= tsec == :head ? 'th' : 'td' %>>
       <% end %>
     </tr>
@@ -783,7 +787,7 @@ class InlineQuotedTemplate < BaseTemplate
   end
 
   def result(node)
-    quote_text(node.text, node.type, node.attr('role'))
+    quote_text(node.text, node.type, (node.attr 'role'))
   end
 
   def template
@@ -800,7 +804,7 @@ class InlineAnchorTemplate < BaseTemplate
     when :ref
       %(<a id="#{target}"></a>)
     when :link
-      %(<a href="#{target}"#{node.attr?('role') ? " class=\"#{node.attr 'role'}\"" : nil}#{node.attr?('window') ? " target=\"#{node.attr 'window'}\"" : nil}>#{text}</a>)
+      %(<a href="#{target}"#{(node.attr? 'role') ? " class=\"#{node.attr 'role'}\"" : nil}#{(node.attr? 'window') ? " target=\"#{node.attr 'window'}\"" : nil}>#{text}</a>)
     when :bibref
       %(<a id="#{target}"></a>[#{target}])
     end

@@ -62,7 +62,7 @@ class DocumentTemplate < BaseTemplate
     <% end %>
     <% if has_header? %>
     <% if attr? :author %>
-    <% if attr(:authorcount).to_i < 2 %>
+    <% if (attr :authorcount).to_i < 2 %>
     <author>
       #{tag 'firstname', :firstname}
       #{tag 'othername', :middlename}
@@ -72,7 +72,7 @@ class DocumentTemplate < BaseTemplate
     #{tag 'authorinitials', :authorinitials}
     <% else %>
     <authorgroup>
-    <% (1..(attr(:authorcount).to_i)).each do |idx| %>
+    <% (1..((attr :authorcount).to_i)).each do |idx| %>
       <author> 
         #{tag 'firstname', :"firstname_\#{idx}", true}
         #{tag 'othername', :"middlename_\#{idx}", true}
@@ -193,7 +193,7 @@ class BlockParagraphTemplate < BaseTemplate
   end
 
   def result(node)
-    paragraph(node.id, node.attr('style'), node.attr('role'), node.attr('reftext'), (node.title? ? node.title : nil), node.content)
+    paragraph(node.id, (node.attr 'style', nil, false), (node.attr 'role'), (node.attr 'reftext'), (node.title? ? node.title : nil), node.content)
   end
 
   def template
@@ -391,8 +391,8 @@ end
 
 class BlockOpenTemplate < BaseTemplate
   def result(node)
-    open_block(node, node.id, node.attr('style', nil, false),
-        node.attr('role'), node.attr('reftext'), node.title? ? node.title : nil)
+    open_block(node, node.id, (node.attr 'style', nil, false),
+        (node.attr 'role'), (node.attr 'reftext'), node.title? ? node.title : nil)
   end
 
   def open_block(node, id, style, role, reftext, title)
@@ -492,7 +492,7 @@ class BlockQuoteTemplate < BaseTemplate
   <% if (attr? :attribution) || (attr? :citetitle) %>
   <attribution>
     <% if attr? :attribution %>
-    <%= attr(:attribution) %>
+    <%= (attr :attribution) %>
     <% end %>
     #{tag 'citetitle', :citetitle}
   </attribution>
@@ -510,7 +510,7 @@ class BlockVerseTemplate < BaseTemplate
   <% if (attr? :attribution) || (attr? :citetitle) %>
   <attribution>
     <% if attr? :attribution %>
-    <%= attr(:attribution) %>
+    <%= (attr :attribution) %>
     <% end %>
     #{tag 'citetitle', :citetitle}
   </attribution>
@@ -539,7 +539,7 @@ class BlockTableTemplate < BaseTemplate
   <% end %>
   <tgroup cols="<%= attr :colcount %>">
     <% @columns.each do |col| %>
-    <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= col.attr((attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
+    <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= (col.attr (attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
     <% end %>
     <% [:head, :foot, :body].select {|tblsec| !rows[tblsec].empty? }.each do |tblsec| %>
     <t<%= tblsec %>>
@@ -552,13 +552,13 @@ class BlockTableTemplate < BaseTemplate
         cell_content = ''
         if tblsec == :head %><% cell_content = cell.text %><%
         else %><%
-        case cell.attr(:style)
+        case (cell.attr :style)
           when :asciidoc %><% cell_content = cell.content %><%
           when :verse %><% cell_content = %(<literallayout>\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
           when :literal %><% cell_content = %(<literallayout class="monospaced">\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
           when :header %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content\}<simpara><emphasis role="strong">\#{text}</emphasis></simpara>) %><% end %><%
           else %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<simpara>\#{text}</simpara>) %><% end %><%
-        %><% end %><% end %><%= @document.attr?('cellbgcolor') ? %(<?dbfo bgcolor="\#{@document.attr 'cellbgcolor'}"?>) : nil %><%= cell_content %></entry>
+        %><% end %><% end %><%= (@document.attr? 'cellbgcolor') ? %(<?dbfo bgcolor="\#{@document.attr 'cellbgcolor'}"?>) : nil %><%= cell_content %></entry>
         <% end %>
       </row>
       <% end %>
@@ -640,7 +640,7 @@ class InlineQuotedTemplate < BaseTemplate
   end
 
   def result(node)
-    quote_text(node.text, node.type, node.attr('role'))
+    quote_text(node.text, node.type, (node.attr 'role'))
   end
 
   def template
