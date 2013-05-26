@@ -304,14 +304,15 @@ class BlockDlistTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><%
 continuing = false;
-last_index = content.length - 1
+entries = content
+last_index = entries.length - 1
 if attr? :style, 'horizontal'
 %><<%= (tag = title? ? 'table' : 'informaltable') %>#{common_attrs_erb} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">#{title_tag}
 <tgroup cols="2">
 <colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
 <colspec colwidth="<%= attr :labelwidth, 85 %>*"/>
 <tbody valign="top"><%
-  content.each_with_index do |(dt, dd), index|
+  entries.each_with_index do |(dt, dd), index|
     last = (index == last_index)
     unless continuing %>
 <row>
@@ -347,7 +348,7 @@ else
   if tags[:list]
 %><<%= tags[:list] %>#{common_attrs_erb}>#{title_tag}<%
   end
-  content.each_with_index do |(dt, dd), index|
+  entries.each_with_index do |(dt, dd), index|
     last = (index == last_index)
     unless continuing %>
 <<%= tags[:entry] %>><%

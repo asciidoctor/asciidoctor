@@ -404,7 +404,7 @@ text
       end
     end
 
-    test 'wip should render document to file when base dir is set' do
+    test 'should render document to file when base dir is set' do
       sample_input_path = fixture_path('sample.asciidoc')
       sample_output_path = fixture_path('result.html')
       fixture_dir = fixture_path('')

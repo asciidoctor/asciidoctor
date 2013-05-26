@@ -1175,8 +1175,13 @@ class Lexer
       section.sectname, _ = parse_style_attribute(attributes)
       section.special = true
       document = parent.document
+      # HACK needs to be refactored so it's driven by config
+      if section.sectname == 'abstract' && document.doctype == 'book'
+        section.sectname = "sect1"
+        section.special = false
+        section.level = 1
       # FIXME refactor to use assign_caption (also check requirements)
-      if section.sectname == 'appendix' &&
+      elsif section.sectname == 'appendix' &&
           !attributes.has_key?('caption') &&
           !document.attributes.has_key?('caption')
         number = document.counter('appendix-number', 'A')
