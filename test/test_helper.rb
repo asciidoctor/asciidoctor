@@ -99,7 +99,13 @@ class Test::Unit::TestCase
 
     results = xmlnodes_at_path type, path, content
 
-    if (count && results.length != count)
+    if (count == true || count == false)
+      if (count != results)
+        flunk "#{type_name} #{path} yielded #{results} rather than #{count} for:\n#{content}"
+      else
+        assert true
+      end
+    elsif (count && results.length != count)
       flunk "#{type_name} #{path} yielded #{results.length} elements rather than #{count} for:\n#{content}"
     elsif (count.nil? && results.empty?)
       flunk "#{type_name} #{path} not found in:\n#{content}"
