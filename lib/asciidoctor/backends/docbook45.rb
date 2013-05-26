@@ -428,23 +428,24 @@ end
 class BlockListingTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if !title? %>
-<% if attr? :style, 'source' %>
-<programlisting#{common_attrs_erb}#{attribute('language', :language)} linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting>
-<% else %>
-<screen#{common_attrs_erb}><%= template.preserve_endlines(content, self) %></screen>
-<% end %>
-<% else %>
-<formalpara#{common_attrs_erb}>#{title_tag false}
-  <para>
-    <% if attr :style, 'source' %>
-    <programlisting language="<%= attr :language %>" linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting>
-    <% else %>
-    <screen><%= template.preserve_endlines(content, self) %></screen>
-    <% end %>
-  </para>
-</formalpara>
-<% end %>
+<%#encoding:UTF-8%><%
+if !title?
+  if (attr? 'style', 'source') && (attr? 'language')
+%><programlisting#{common_attrs_erb}#{attribute('language', :language)} linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting><%
+  else
+%><screen#{common_attrs_erb}><%= template.preserve_endlines(content, self) %></screen><%
+  end
+else
+%><formalpara#{common_attrs_erb}>#{title_tag false}
+<para><%
+  if (attr? 'style', 'source') && (attr? 'language') %>
+<programlisting language="<%= attr 'language' %>" linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting><%
+  else %>
+<screen><%= template.preserve_endlines(content, self) %></screen><%
+  end %>
+</para>
+</formalpara><%
+end %>
     EOF
   end
 end
