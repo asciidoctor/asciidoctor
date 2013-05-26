@@ -299,61 +299,91 @@ class BlockDlistTemplate < BaseTemplate
   }
 
   def template
+    # TODO may want to refactor ListItem content to hold multiple terms
+    # that change would drastically simplify this template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if attr? :style, 'horizontal'
+<%#encoding:UTF-8%><%
+continuing = false;
+last_index = content.length - 1
+if attr? :style, 'horizontal'
 %><<%= (tag = title? ? 'table' : 'informaltable') %>#{common_attrs_erb} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">#{title_tag}
-  <tgroup cols="2">
-    <colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
-    <colspec colwidth="<%= attr :labelwidth, 85 %>*"/>
-    <tbody valign="top"><%
-      content.each do |dt, dd| %>
-      <row>
-        <entry>
-          <simpara><%= dt.text %></simpara>
-        </entry><%
-        unless dd.nil? %>
-        <entry><%
-          if dd.text? %>
-          <simpara><%= dd.text %></simpara><%
-          end %><%
-          if dd.blocks? %>
-          <%= dd.content.chomp %><%
-          end %>
-        </entry><%
-        end %>
-      </row><%
+<tgroup cols="2">
+<colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
+<colspec colwidth="<%= attr :labelwidth, 85 %>*"/>
+<tbody valign="top"><%
+  content.each_with_index do |(dt, dd), index|
+    last = (index == last_index)
+    unless continuing %>
+<row>
+<entry><%
+    end %>
+<simpara><%= dt.text %></simpara><%
+    if !last && dd.nil?
+      continuing = true
+      next
+    else
+      continuing = false
+    end %>
+</entry>
+<entry><%
+    unless dd.nil?
+      if dd.text? %>
+<simpara><%= dd.text %></simpara><%
+      end
+      if dd.blocks? %>
+<%= dd.content.chomp %><%
+      end
+    end %>
+</entry><%
+    if last || !dd.nil? %>
+</row><%
+    end %><%
+  end %>
+</tbody>
+</tgroup>
+</<%= tag %>><%
+else
+  tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled'])
+  if tags[:list]
+%><<%= tags[:list] %>#{common_attrs_erb}>#{title_tag}<%
+  end
+  content.each_with_index do |(dt, dd), index|
+    last = (index == last_index)
+    unless continuing %>
+<<%= tags[:entry] %>><%
+    end
+    if tags.has_key?(:label)
+      unless continuing %>
+<<%= tags[:label] %>><%
       end %>
-    </tbody>
-  </tgroup>
-</<%= tag %><%
-else %><% tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled']) %>
-<% if tags[:list] %><<%= tags[:list] %>#{common_attrs_erb}><% end %>#{title_tag}
-  <% content.each do |dt, dd| %>
-  <<%= tags[:entry] %>>
-    <% if tags.has_key?(:label) %>
-    <<%= tags[:label] %>>
-      <<%= tags[:term] %>>
-        <%= dt.text %>
-      </<%= tags[:term] %>>
-    </<%= tags[:label] %>>
-    <% else %>
-    <<%= tags[:term] %>>
-      <%= dt.text %>
-    </<%= tags[:term] %>>
-    <% end %>
-    <% unless dd.nil? %>
-    <<%= tags[:item] %>>
-      <% if dd.text? %>
-      <simpara><%= dd.text %></simpara>
-      <% end %>
-      <% if dd.blocks? %>
-<%= dd.content %>
-      <% end %>
-    </<%= tags[:item] %>>
-    <% end %>
-  </<%= tags[:entry] %>>
-  <% end %>
-<% if tags[:list] %></<%= tags[:list] %>><% end %><%
+<<%= tags[:term] %>><%= dt.text %></<%= tags[:term] %>><%
+      if last || !dd.nil? %>
+</<%= tags[:label] %>><%
+      end
+    else %>
+<<%= tags[:term] %>><%= dt.text %></<%= tags[:term] %>><%
+    end
+    if !last && dd.nil?
+      continuing = true
+      next
+    else
+      continuing = false
+    end %>
+<<%= tags[:item] %>><%
+    unless dd.nil?
+      if dd.text? %>
+<simpara><%= dd.text %></simpara><%
+      end
+      if dd.blocks? %>
+<%= dd.content %><%
+      end
+    end %>
+</<%= tags[:item] %>>
+</<%= tags[:entry] %>><%
+  end
+  if tags[:list] %>
+</<%= tags[:list] %>><%
+  end
 end %>
     EOF
   end

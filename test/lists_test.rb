@@ -1681,6 +1681,22 @@ def2
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
+    test 'consecutive terms share same varlistentry in docbook' do
+      input = <<-EOS
+term::
+alt term::
+definition
+
+last::
+      EOS
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '//varlistentry', output, 2
+      assert_xpath '(//varlistentry)[1]/term', output, 2
+      assert_xpath '(//varlistentry)[2]/term', output, 1
+      assert_xpath '(//varlistentry)[2]/listitem', output, 1
+      assert_xpath '(//varlistentry)[2]/listitem[normalize-space(text())=""]', output, 1
+    end
+
     test "multi-line elements with blank line before paragraph content" do
       input = <<-EOS
 term1::
@@ -2192,6 +2208,23 @@ term 2:: def 2
       assert_css '.dlist dt:not([class])', output, 2
     end
 
+    test 'consecutive glossary terms should share same glossentry element in docbook' do
+      input = <<-EOS
+[glossary]
+term::
+alt term::
+definition
+
+last::
+      EOS
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '/glossentry', output, 2
+      assert_xpath '(/glossentry)[1]/glossterm', output, 2
+      assert_xpath '(/glossentry)[2]/glossterm', output, 1
+      assert_xpath '(/glossentry)[2]/glossdef', output, 1
+      assert_xpath '(/glossentry)[2]/glossdef[normalize-space(text())=""]', output, 1
+    end
+
     test 'should render horizontal list with proper markup' do
       input = <<-EOS
 [horizontal]
@@ -2217,6 +2250,39 @@ second term:: definition
       assert_xpath '/*[@class="hdlist"]/table/tr[2]/td', output, 2
       assert_xpath '((//tr)[2]/td)[1][normalize-space(text())="second term"]', output, 1
       assert_xpath '((//tr)[2]/td)[2]/p[normalize-space(text())="definition"]', output, 1
+    end
+
+    test 'consecutive terms in horizontal list should share same cell' do
+      input = <<-EOS
+[horizontal]
+term::
+alt term::
+definition
+
+last::
+      EOS
+      output = render_embedded_string input 
+      assert_xpath '//tr', output, 2
+      assert_xpath '(//tr)[1]/td[@class="hdlist1"]', output, 1
+      assert_xpath '(//tr)[1]/td[@class="hdlist1"]/br', output, 2
+      assert_xpath '(//tr)[2]/td[@class="hdlist2"]', output, 1
+    end
+
+    test 'consecutive terms in horizontal list should share same entry in docbook' do
+      input = <<-EOS
+[horizontal]
+term::
+alt term::
+definition
+
+last::
+      EOS
+      output = render_embedded_string input, :backend => 'docbook' 
+      assert_xpath '//row', output, 2
+      assert_xpath '(//row)[1]/entry', output, 2
+      assert_xpath '((//row)[1]/entry)[1]/simpara', output, 2
+      assert_xpath '(//row)[2]/entry', output, 2
+      assert_xpath '((//row)[2]/entry)[2][normalize-space(text())=""]', output, 1
     end
 
     test 'should render horizontal list in docbook with proper markup' do
@@ -2279,6 +2345,24 @@ Question 2::
         assert_css "qandaset > qandaentry:nth-child(#{idx}) > answer > simpara", output, 1
         assert_xpath "/qandaset/qandaentry[#{idx}]/answer/simpara[normalize-space(text()) = 'Answer #{idx}.']", output, 1
       end
+    end
+
+    test 'consecutive questions should share same question element in docbook' do
+      input = <<-EOS
+[qanda]
+question::
+follow-up question::
+response
+
+last question::
+      EOS
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '//qandaentry', output, 2
+      assert_xpath '(//qandaentry)[1]/question', output, 1
+      assert_xpath '(//qandaentry)[1]/question/simpara', output, 2
+      assert_xpath '(//qandaentry)[2]/question', output, 1
+      assert_xpath '(//qandaentry)[2]/answer', output, 1
+      assert_xpath '(//qandaentry)[2]/answer[normalize-space(text())=""]', output, 1
     end
 
     test 'should render bibliography list with proper semantics' do

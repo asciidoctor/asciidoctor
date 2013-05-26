@@ -270,69 +270,96 @@ class BlockDlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><%
-if attr? 'style', 'qanda', false %>
-<div#{id} class="qlist#{style_class}#{role_class}">
-  #{title_div}
-  <ol>
-  <% content.each do |dt, dd| %>
-    <li>
-      <p><em><%= dt.text %></em></p>
-      <% unless dd.nil? %>
-      <% if dd.text? %>
-      <p><%= dd.text %></p>
-      <% end %>
-      <% if dd.blocks? %>
-<%= dd.content %>
-      <% end %>
-      <% end %>
-    </li>
-  <% end %>
-  </ol>
-</div>
-<% elsif attr? 'style', 'horizontal', false %>
-<div#{id} class="hdlist#{role_class}">
-  #{title_div}
-  <table>
-    <colgroup>
-      <col<% if attr? :labelwidth %> style="width:<%= attr :labelwidth %>%;"<% end %>>
-      <col<% if attr? :itemwidth %> style="width:<%= attr :itemwidth %>%;"<% end %>>
-    </colgroup>
-    <% content.each do |dt, dd| %>
-    <tr>
-      <td class="hdlist1<% if attr? 'strong-option' %> strong<% end %>">
-        <%= dt.text %>
-        <br>
-      </td>
-      <td class="hdlist2"><% unless dd.nil? %><% if dd.text? %>
-        <p style="margin-top: 0;"><%= dd.text %></p><% end %><% if dd.blocks? %>
-<%= dd.content %><% end %><% end %>
-      </td>
-    </tr>
-    <% end %>
-  </table>
-</div>
-<% else %>
-<div#{id} class="dlist#{style_class}#{role_class}">
-  #{title_div}
-  <dl>
-    <% content.each do |dt, dd| %>
-    <dt<% if !(attr? 'style', nil, false) %> class="hdlist1"<% end %>>
-      <%= dt.text %>
-    </dt>
-    <% unless dd.nil? %>
-    <dd>
-      <% if dd.text? %>
-      <p><%= dd.text %></p>
-      <% end %>
-      <% if dd.blocks? %>
-<%= dd.content %>
-      <% end %>
-    </dd>
-    <% end %>
-    <% end %>
-  </dl>
-</div>
-<% end %>
+continuing = false
+last_index = content.length - 1
+if attr? 'style', 'qanda', false
+%><div#{id} class="qlist#{style_class}#{role_class}">
+#{title_div}
+<ol><%
+  content.each_with_index do |(dt, dd), index|
+    last = (index == last_index)
+    unless continuing %>
+<li><%
+    end %>
+<p><em><%= dt.text %></em></p><%
+    if !last && dd.nil?
+      continuing = true
+      next
+    else
+      continuing = false
+    end
+    unless dd.nil?
+      if dd.text? %>
+<p><%= dd.text %></p><%
+      end
+      if dd.blocks? %>
+<%= dd.content %><%
+      end
+    end %>
+</li><%
+  end %>
+</ol>
+</div><%
+elsif attr? 'style', 'horizontal', false
+%><div#{id} class="hdlist#{role_class}">
+#{title_div}
+<table>
+<colgroup>
+<col<% if attr? :labelwidth %> style="width:<%= attr :labelwidth %>%;"<% end %>>
+<col<% if attr? :itemwidth %> style="width:<%= attr :itemwidth %>%;"<% end %>>
+</colgroup><%
+  content.each_with_index do |(dt, dd), index|
+    last = (index == last_index)
+    unless continuing %>
+<tr>
+<td class="hdlist1<%= attr?('strong-option') ? 'strong' : nil %>"><%
+    end %>
+<%= dt.text %>
+<br><%
+    if !last && dd.nil?
+      continuing = true
+      next
+    else
+      continuing = false
+    end %>
+</td>
+<td class="hdlist2"><%
+    unless dd.nil?
+      if dd.text? %>
+<p style="margin-top: 0;"><%= dd.text %></p><%
+      end
+      if dd.blocks? %>
+<%= dd.content %><%
+      end
+    end %>
+</td>
+</tr><%
+  end %>
+</table>
+</div><%
+else
+%><div#{id} class="dlist#{style_class}#{role_class}">
+#{title_div}
+<dl><%
+  content.each_with_index do |(dt, dd), index|
+    last = (index == last_index) %>
+<dt<% if !(attr? 'style', nil, false) %> class="hdlist1"<% end %>>
+<%= dt.text %>
+</dt><%
+    unless dd.nil? %>
+<dd><%
+      if dd.text? %>
+<p><%= dd.text %></p><%
+      end %><%
+      if dd.blocks? %>
+<%= dd.content %><%
+      end %>
+</dd><%
+    end
+  end %>
+</dl>
+</div><%
+end %>
     EOS
   end
 end
