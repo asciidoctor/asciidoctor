@@ -620,7 +620,7 @@ context 'Substitutions' do
     test 'collect inline triple plus passthroughs' do
       para = block_from_string('+++<code>inline code</code>+++')
       result = para.extract_passthroughs(para.buffer.join)
-      assert_equal "\x0" + '0' + "\x0", result
+      assert_equal "\e" + '0' + "\e", result
       assert_equal 1, para.passthroughs.size
       assert_equal '<code>inline code</code>', para.passthroughs.first[:text]
       assert para.passthroughs.first[:subs].empty?
@@ -629,7 +629,7 @@ context 'Substitutions' do
     test 'collect multi-line inline triple plus passthroughs' do
       para = block_from_string("+++<code>inline\ncode</code>+++")
       result = para.extract_passthroughs(para.buffer.join)
-      assert_equal "\x0" + '0' + "\x0", result
+      assert_equal "\e" + '0' + "\e", result
       assert_equal 1, para.passthroughs.size
       assert_equal "<code>inline\ncode</code>", para.passthroughs.first[:text]
       assert para.passthroughs.first[:subs].empty?
@@ -638,7 +638,7 @@ context 'Substitutions' do
     test 'collect inline double dollar passthroughs' do
       para = block_from_string('$$<code>{code}</code>$$')
       result = para.extract_passthroughs(para.buffer.join)
-      assert_equal "\x0" + '0' + "\x0", result
+      assert_equal "\e" + '0' + "\e", result
       assert_equal 1, para.passthroughs.size
       assert_equal '<code>{code}</code>', para.passthroughs.first[:text]
       assert_equal [:specialcharacters], para.passthroughs.first[:subs]
@@ -647,7 +647,7 @@ context 'Substitutions' do
     test 'collect multi-line inline double dollar passthroughs' do
       para = block_from_string("$$<code>\n{code}\n</code>$$")
       result = para.extract_passthroughs(para.buffer.join)
-      assert_equal "\x0" + '0' + "\x0", result
+      assert_equal "\e" + '0' + "\e", result
       assert_equal 1, para.passthroughs.size
       assert_equal "<code>\n{code}\n</code>", para.passthroughs.first[:text]
       assert_equal [:specialcharacters], para.passthroughs.first[:subs]
@@ -656,7 +656,7 @@ context 'Substitutions' do
     test 'collect passthroughs from inline pass macro' do
       para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['code'\\]</code>]})
       result = para.extract_passthroughs(para.buffer.join)
-      assert_equal "\x0" + '0' + "\x0", result
+      assert_equal "\e" + '0' + "\e", result
       assert_equal 1, para.passthroughs.size
       assert_equal %q{<code>['code']</code>}, para.passthroughs.first[:text]
       assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
@@ -665,7 +665,7 @@ context 'Substitutions' do
     test 'collect multi-line passthroughs from inline pass macro' do
       para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['more\ncode'\\]</code>]})
       result = para.extract_passthroughs(para.buffer.join)
-      assert_equal "\x0" + '0' + "\x0", result
+      assert_equal "\e" + '0' + "\e", result
       assert_equal 1, para.passthroughs.size
       assert_equal %Q{<code>['more\ncode']</code>}, para.passthroughs.first[:text]
       assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
@@ -673,7 +673,7 @@ context 'Substitutions' do
 
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs without subs' do
-      para = block_from_string("some \x0" + '0' + "\x0 to study")
+      para = block_from_string("some \e" + '0' + "\e to study")
       para.passthroughs << {:text => '<code>inline code</code>', :subs => []}
       result = para.restore_passthroughs(para.buffer.join)
       assert_equal "some <code>inline code</code> to study", result
@@ -681,7 +681,7 @@ context 'Substitutions' do
 
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs with subs' do
-      para = block_from_string("some \x0" + '0' + "\x0 to study in the \x0" + '1' + "\x0 programming language")
+      para = block_from_string("some \e" + '0' + "\e to study in the \e" + '1' + "\e programming language")
       para.passthroughs << {:text => '<code>{code}</code>', :subs => [:specialcharacters]}
       para.passthroughs << {:text => '{language}', :subs => [:specialcharacters]}
       result = para.restore_passthroughs(para.buffer.join)

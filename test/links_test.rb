@@ -131,6 +131,14 @@ context 'Links' do
     assert_xpath %{//a[@href="#tigers"][text() = "about\ntigers"]}, render_string("Want to learn <<tigers,about\ntigers>>?"), 1
   end
 
+  test 'xref with escaped text' do
+    # when \x0 was used as boundary character for passthrough, it was getting stripped
+    # now using \e as boundary character, which resolves issue
+    input = 'See the <<tigers , `[tigers]`>> section for data about tigers'
+    output = render_embedded_string input
+    assert_xpath %(//a[@href="#tigers"]/code[text()="[tigers]"]), output, 1
+  end
+
   test 'xref using macro syntax' do
     doc = document_from_string 'xref:tigers[]'
     doc.references[:ids]['tigers'] = '[tigers]'
