@@ -294,7 +294,7 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Asciidoctor honors the alternate style name "discrete" for a floating
   title (i.e., +[discrete]+)
 
-* Asciidoctor supports syntax highlighting of listing or literal blocks
+* Asciidoctor supports syntax highlighting of listing, literal or open blocks
   that have the "source" style out of the box
 
 ** Asciidoctor honors the source-highlighter values +coderay+ and
@@ -302,6 +302,9 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 
 ** Asciidoctor does not currently support Pygments for source
    highlighting
+
+** Asciidoctor gracefully falls back to listing block if no source language
+   is specified
 
 * Asciidoctor sets these additional intrinsic attributes
 
