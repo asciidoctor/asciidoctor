@@ -1020,7 +1020,7 @@ Lists
       assert_xpath '//ul/li[1]/p', output, 1
       assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@id="beck"][@class = "listingblock"]', output, 1
       assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@id="beck"]/div[@class="title"][starts-with(text(),"Read")]', output, 1
-      assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@id="beck"]//code[@class="ruby"][starts-with(text(),"5.times")]', output, 1
+      assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@id="beck"]//code[@class="ruby language-ruby"][starts-with(text(),"5.times")]', output, 1
     end
 
     test 'trailing block attribute line attached by continuation should not create block' do

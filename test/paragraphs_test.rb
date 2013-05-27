@@ -252,7 +252,7 @@ use the source, luke!
 die 'zomg perl sucks';
       EOS
       output = render_embedded_string input
-      assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[@class="perl"][text()="die 'zomg perl sucks';"]), output, 1
+      assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[@class="perl language-perl"][text()="die 'zomg perl sucks';"]), output, 1
     end
 
     test 'literal paragraph terminates at block attribute list' do
