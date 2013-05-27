@@ -159,12 +159,18 @@ p a > tt:hover { color: #561309; }
 #toc > ol { margin-left: 0.25em; }
 #toc ol { list-style-type: none; }
 #toctitle { color: #7a2518; }
+@media only screen and (min-width: 80em) { body.toc2 { padding-left: 20em; }
+  body.toc2 #header, body.toc2 #content, body.toc2 #footnotes, body.toc2 #footer { margin-left: 0; }
+  #toc.toc2 { background: white; position: fixed; width: 18.5em; left: 0; top: 0; border-right: 1px solid #ebebeb; border-bottom: 0; z-index: 1000; padding: 1em; height: 100%; overflow: auto; }
+  #toc.toc2 #toctitle { margin-top: 0; }
+  #toc.toc2 > ol { font-size: .95em; }
+  #toc.toc2 ol li ol { margin-left: 0; padding-left: 1em; } }
 #footer { max-width: 100%; background-color: #222222; padding: 1.25em; }
 #footer-text { color: #dddddd; line-height: 1.44; }
 .sect1 { border-bottom: 3px double #ebebeb; padding-bottom: 1.25em; }
 .sect1:last-of-type { border-bottom: 0; }
-#content h1 > a.anchor, h2 > a.anchor, h3 > a.anchor, #toctitle > a.anchor, .sidebarblock > .content > .title > a.anchor, h4 > a.anchor, h5 > a.anchor, h6 > a.anchor { position: absolute; width: 1em; margin-left: -1em; display: inline-block; text-decoration: none; visibility: hidden; text-align: center; }
-#content h1 > a.anchor:before, h2 > a.anchor:before, h3 > a.anchor:before, #toctitle > a.anchor:before, .sidebarblock > .content > .title > a.anchor:before, h4 > a.anchor:before, h5 > a.anchor:before, h6 > a.anchor:before { content: '\00A7'; font-size: .85em; vertical-align: text-bottom; }
+#content h1 > a.anchor, h2 > a.anchor, h3 > a.anchor, #toctitle > a.anchor, .sidebarblock > .content > .title > a.anchor, h4 > a.anchor, h5 > a.anchor, h6 > a.anchor { position: absolute; width: 1em; margin-left: -1em; display: block; text-decoration: none; visibility: hidden; text-align: center; font-weight: normal; }
+#content h1 > a.anchor:before, h2 > a.anchor:before, h3 > a.anchor:before, #toctitle > a.anchor:before, .sidebarblock > .content > .title > a.anchor:before, h4 > a.anchor:before, h5 > a.anchor:before, h6 > a.anchor:before { content: '\00A7'; font-size: .85em; vertical-align: text-top; display: block; }
 #content h1:hover > a.anchor, h2:hover > a.anchor, h3:hover > a.anchor, #toctitle:hover > a.anchor, .sidebarblock > .content > .title:hover > a.anchor, h4:hover > a.anchor, h5:hover > a.anchor, h6:hover > a.anchor { visibility: visible; }
 #content h1 > a.link, h2 > a.link, h3 > a.link, #toctitle > a.link, .sidebarblock > .content > .title > a.link, h4 > a.link, h5 > a.link, h6 > a.link { color: #ba3925; text-decoration: none; }
 #content h1 > a.link:hover, #content h1 > a.link:focus, h2 > a.link:hover, h2 > a.link:focus, h3 > a.link:hover, #toctitle > a.link:hover, .sidebarblock > .content > .title > a.link:hover, h3 > a.link:focus, #toctitle > a.link:focus, .sidebarblock > .content > .title > a.link:focus, h4 > a.link:hover, h4 > a.link:focus, h5 > a.link:hover, h5 > a.link:focus, h6 > a.link:hover, h6 > a.link:focus { color: #a53221; }

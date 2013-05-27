@@ -58,85 +58,98 @@ class DocumentTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><!DOCTYPE html>
-<html<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
+<html<%= !(attr? 'nolang') ? %( lang="\#{attr 'lang', 'en'}") : nil %>>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>">
     <meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <% if attr? :description %>
-    <meta name="description" content="<%= attr :description %>">
-    <% end %>
-    <% if attr? :keywords %>
-    <meta name="keywords" content="<%= attr :keywords %>">
-    <% end %>
-    <title><%= doctitle %></title>
-    <% if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet') %>
-    <% if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-    <link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>">
-    <% else %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><%
+    if attr? :description %>
+    <meta name="description" content="<%= attr :description %>"><%
+    end
+    if attr? :keywords %>
+    <meta name="keywords" content="<%= attr :keywords %>"><%
+    end %>
+    <title><%= doctitle %></title><%
+    if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
+      if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
+    <link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>"><%
+      else %>
     <style>
 <%= ::Asciidoctor::HTML5.default_asciidoctor_stylesheet %>
-    </style>
-    <% end %>
-    <% elsif attr? :stylesheet %>
-    <% if attr? 'linkcss' %>
-    <link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), (attr :stylesdir, '')) %>">
-    <% else %>
+    </style><%
+      end
+    elsif attr? :stylesheet
+      if attr? 'linkcss' %>
+    <link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), (attr :stylesdir, '')) %>"><%
+      else %>
     <style>
 <%= read_asset normalize_system_path((attr :stylesheet), (attr :stylesdir, '')), true %>
-    </style>
-    <% end %>
-    <% end %>
-    <% case attr 'source-highlighter' %><%
-    when 'coderay' %>
-    <% if (attr 'coderay-css', 'class') == 'class' %>
+    </style><%
+      end
+    end
+    case attr 'source-highlighter'
+    when 'coderay'
+      if (attr 'coderay-css', 'class') == 'class' %>
     <style>
 <%= ::Asciidoctor::HTML5.default_coderay_stylesheet %>
-    </style>
-    <% end %><%
+    </style><%
+      end
     when 'highlightjs' %>
     <link rel="stylesheet" href="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/styles/<%= (attr 'highlightjs-theme', 'default') %>.min.css">
     <script src="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad()</script>
-    <% end %>
+    <script>hljs.initHighlightingOnLoad()</script><%
+    end %>
 <%= docinfo %>
   </head>
-  <body#{id} class="<%= doctype %>"<% if attr? 'max-width' %> style="max-width: <%= attr 'max-width' %>;"<% end %>>
-    <% unless noheader %>
-    <div id="header">
-      <% if has_header? %>
-      <% unless notitle %>
-      <h1><%= @header.title %></h1>
-      <% end %>
-      <% if attr? :author %><span id="author"><%= attr :author %></span><br>
-      <% if attr? :email %><span id="email"><%= sub_macros(attr :email) %></span><br><% end %><% end %>
-      <% if attr? :revnumber %><span id="revnumber">version <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><% end %>
-      <% if attr? :revdate %><span id="revdate"><%= attr :revdate %></span><% end %>
-      <% if attr? :revremark %><br><span id="revremark"><%= attr :revremark %></span><% end %>
-      <% end %>
-      <% if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
+  <body#{id} class="<%= doctype %><%= (attr? 'toc') && (attr? 'toc-placement', 'auto') && (attr? 'toc-class') ? %( \#{attr 'toc-class'}) : nil %>"<%= (attr? 'max-width') ? %( style="max-width: \#{attr 'max-width'};") : nil %>><%
+    unless noheader %>
+    <div id="header"><%
+      if has_header?
+        unless notitle %>
+      <h1><%= @header.title %></h1><%
+        end %><%
+        if attr? :author %>
+        <span id="author"><%= attr :author %></span><br><%
+          if attr? :email %>
+        <span id="email"><%= sub_macros(attr :email) %></span><br><%
+          end
+        end
+        if attr? :revnumber %>
+        <span id="revnumber">version <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><%
+        end
+        if attr? :revdate %>
+        <span id="revdate"><%= attr :revdate %></span><%
+        end
+        if attr? :revremark %>
+        <br><span id="revremark"><%= attr :revremark %></span><%
+        end
+      end
+      if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
       <div id="toc" class="<%= attr 'toc-class', 'toc' %>">
         <div id="toctitle"><%= attr 'toc-title' %></div>
 <%= template.class.outline(self, (attr :toclevels, 2).to_i) %>
-      </div>
-      <% end %>
-    </div>
-    <% end %>
+      </div><%
+      end %>
+    </div><%
+    end %>
     <div id="content">
 <%= content %>
-    </div>
-    <% unless !footnotes? || (attr? :nofootnotes) %><div id="footnotes">
-      <hr>
-      <% footnotes.each do |fn| %>
+    </div><%
+    unless !footnotes? || (attr? :nofootnotes) %>
+    <div id="footnotes">
+      <hr><%
+      footnotes.each do |fn| %>
       <div class="footnote" id="_footnote_<%= fn.index %>">
         <a href="#_footnoteref_<%= fn.index %>"><%= fn.index %></a>. <%= fn.text %>
-      </div>
-      <% end %>
-    </div>
-    <% end %>
+      </div><%
+      end %>
+    </div><%
+    end %>
     <div id="footer">
-      <div id="footer-text">
-        <% if attr? :revnumber %>Version <%= attr :revnumber %><br><% end %>
+      <div id="footer-text"><%
+      if attr? :revnumber %>
+        Version <%= attr :revnumber %><br><%
+      end %>
         Last updated <%= attr :docdatetime %>
       </div>
     </div>
