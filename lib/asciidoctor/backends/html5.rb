@@ -284,14 +284,15 @@ class BlockDlistTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><%
 continuing = false
-last_index = content.length - 1
+entries = content
+last_index = entries.length - 1
 if attr? 'style', 'qanda', false
 %><div#{id} class="qlist#{style_class}#{role_class}"><%
 if title? %>
 <div class="title"><%= title %></div><%
 end %>
 <ol><%
-  content.each_with_index do |(dt, dd), index|
+  entries.each_with_index do |(dt, dd), index|
     last = (index == last_index)
     unless continuing %>
 <li><%
@@ -325,7 +326,7 @@ end %>
 <col<% if attr? :labelwidth %> style="width:<%= attr :labelwidth %>%;"<% end %>>
 <col<% if attr? :itemwidth %> style="width:<%= attr :itemwidth %>%;"<% end %>>
 </colgroup><%
-  content.each_with_index do |(dt, dd), index|
+  entries.each_with_index do |(dt, dd), index|
     last = (index == last_index)
     unless continuing %>
 <tr>
@@ -360,7 +361,7 @@ if title? %>
 <div class="title"><%= title %></div><%
 end %>
 <dl><%
-  content.each_with_index do |(dt, dd), index|
+  entries.each_with_index do |(dt, dd), index|
     last = (index == last_index) %>
 <dt<%= !(attr? 'style', nil, false) ? %( class="hdlist1") : nil %>><%= dt.text %></dt><%
     unless dd.nil? %>
