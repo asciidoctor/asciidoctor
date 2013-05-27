@@ -1171,6 +1171,18 @@ You can use icons for admonitions by setting the 'icons' attribute.
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
+
+    test 'can use font-based icons' do
+      input = <<-EOS
+:icons: font
+
+[TIP]
+You can use icons for admonitions by setting the 'icons' attribute.
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="icon-tip"]', output, 1
+    end
   end
 
   context 'Image paths' do

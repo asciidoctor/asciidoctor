@@ -29,28 +29,23 @@ class DocumentTemplate < BaseTemplate
     toc_level = nil
     sections = node.sections
     unless sections.empty?
-      toc_level, indent = ''
-      nested = true
-      unless node.is_a?(Document)
-        if node.document.doctype == 'book'
-          indent = '    ' * node.level unless node.level == 0
-          nested = node.level > 0
-        else
-          indent = '    ' * node.level
-        end
+      if !node.is_a?(Document) && node.document.doctype == 'book'
+        nested = node.level > 0
+      else
+        nested = true
       end
-      toc_level << "#{indent}<ol>\n" if nested
+      toc_level = nested ? %(<ol>\n) : ''
       sections.each do |section|
-        toc_level << "#{indent}  <li><a href=\"##{section.id}\">#{!section.special && section.level > 0 ? "#{section.sectnum} " : ''}#{section.caption}#{section.title}</a></li>\n"
+        toc_level = %(#{toc_level}<li><a href=\"##{section.id}\">#{!section.special && section.level > 0 ? "#{section.sectnum} " : ''}#{section.caption}#{section.title}</a></li>\n)
         if section.level < to_depth && (child_toc_level = outline(section, to_depth))
           if section.document.doctype != 'book' || section.level > 0
-            toc_level << "#{indent}  <li>\n#{child_toc_level}\n#{indent}  </li>\n"
+            toc_level = %(#{toc_level}<li>\n#{child_toc_level}\n</li>\n)
           else
-            toc_level << "#{indent}#{child_toc_level}\n"
+            toc_level = %(#{toc_level}#{child_toc_level}\n)
           end
         end
       end
-      toc_level << "#{indent}</ol>" if nested
+      toc_level = %(#{toc_level}</ol>) if nested
     end
     toc_level
   end
@@ -59,101 +54,108 @@ class DocumentTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><!DOCTYPE html>
 <html<%= !(attr? 'nolang') ? %( lang="\#{attr 'lang', 'en'}") : nil %>>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>">
-    <meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><%
-    if attr? :description %>
-    <meta name="description" content="<%= attr :description %>"><%
-    end
-    if attr? :keywords %>
-    <meta name="keywords" content="<%= attr :keywords %>"><%
-    end %>
-    <title><%= doctitle %></title><%
-    if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
-      if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-    <link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>"><%
-      else %>
-    <style>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>">
+<meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><%
+if attr? :description %>
+<meta name="description" content="<%= attr :description %>"><%
+end
+if attr? :keywords %>
+<meta name="keywords" content="<%= attr :keywords %>"><%
+end %>
+<title><%= doctitle %></title><%
+if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
+  if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
+<link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>"><%
+  else %>
+<style>
 <%= ::Asciidoctor::HTML5.default_asciidoctor_stylesheet %>
-    </style><%
-      end
-    elsif attr? :stylesheet
-      if attr? 'linkcss' %>
-    <link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), (attr :stylesdir, '')) %>"><%
-      else %>
-    <style>
+</style><%
+  end
+elsif attr? :stylesheet
+  if attr? 'linkcss' %>
+<link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), (attr :stylesdir, '')) %>"><%
+  else %>
+<style>
 <%= read_asset normalize_system_path((attr :stylesheet), (attr :stylesdir, '')), true %>
-    </style><%
+</style><%
+  end
+end
+if attr? 'icons', 'font'
+  if !(attr 'iconfont-remote', '').nil? %>
+<link rel="stylesheet" href="<%= attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css' %>/<%= attr 'iconfont-name', 'font-awesome' %>.min.css"><%
+  else %>
+<link rel="stylesheet" href="<%= normalize_web_path(%(\#{attr 'iconfont-name', 'font-awesome'}.css), (attr 'stylesdir', '')) %>"><%
+  end
+end
+case attr 'source-highlighter'
+when 'coderay'
+  if (attr 'coderay-css', 'class') == 'class' %>
+<style>
+<%= ::Asciidoctor::HTML5.default_coderay_stylesheet %>
+</style><%
+  end
+when 'highlightjs' %>
+<link rel="stylesheet" href="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css">
+<script src="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script><%
+end %><%= (docinfo_content = docinfo).empty? ? nil : %(
+\#{docinfo_content}) %>
+</head>
+<body#{id} class="<%= doctype %><%= (attr? 'toc-class') && (attr? 'toc') && (attr? 'toc-placement', 'auto') ? %( \#{attr 'toc-class'}) : nil %>"<%= (attr? 'max-width') ? %( style="max-width: \#{attr 'max-width'};") : nil %>><%
+unless noheader %>
+<div id="header"><%
+  if has_header?
+    unless notitle %>
+<h1><%= @header.title %></h1><%
+    end %><%
+    if attr? :author %>
+<span id="author"><%= attr :author %></span><br><%
+      if attr? :email %>
+<span id="email"><%= sub_macros(attr :email) %></span><br><%
       end
     end
-    case attr 'source-highlighter'
-    when 'coderay'
-      if (attr 'coderay-css', 'class') == 'class' %>
-    <style>
-<%= ::Asciidoctor::HTML5.default_coderay_stylesheet %>
-    </style><%
-      end
-    when 'highlightjs' %>
-    <link rel="stylesheet" href="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/styles/<%= (attr 'highlightjs-theme', 'default') %>.min.css">
-    <script src="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad()</script><%
-    end %>
-<%= docinfo %>
-  </head>
-  <body#{id} class="<%= doctype %><%= (attr? 'toc') && (attr? 'toc-placement', 'auto') && (attr? 'toc-class') ? %( \#{attr 'toc-class'}) : nil %>"<%= (attr? 'max-width') ? %( style="max-width: \#{attr 'max-width'};") : nil %>><%
-    unless noheader %>
-    <div id="header"><%
-      if has_header?
-        unless notitle %>
-      <h1><%= @header.title %></h1><%
-        end %><%
-        if attr? :author %>
-        <span id="author"><%= attr :author %></span><br><%
-          if attr? :email %>
-        <span id="email"><%= sub_macros(attr :email) %></span><br><%
-          end
-        end
-        if attr? :revnumber %>
-        <span id="revnumber">version <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><%
-        end
-        if attr? :revdate %>
-        <span id="revdate"><%= attr :revdate %></span><%
-        end
-        if attr? :revremark %>
-        <br><span id="revremark"><%= attr :revremark %></span><%
-        end
-      end
-      if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
-      <div id="toc" class="<%= attr 'toc-class', 'toc' %>">
-        <div id="toctitle"><%= attr 'toc-title' %></div>
+    if attr? :revnumber %>
+<span id="revnumber">version <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><%
+    end
+    if attr? :revdate %>
+<span id="revdate"><%= attr :revdate %></span><%
+    end
+    if attr? :revremark %>
+<br><span id="revremark"><%= attr :revremark %></span><%
+    end
+  end
+  if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
+<div id="toc" class="<%= attr 'toc-class', 'toc' %>">
+<div id="toctitle"><%= attr 'toc-title' %></div>
 <%= template.class.outline(self, (attr :toclevels, 2).to_i) %>
-      </div><%
-      end %>
-    </div><%
-    end %>
-    <div id="content">
+</div><%
+  end %>
+</div><%
+end %>
+<div id="content">
 <%= content %>
-    </div><%
-    unless !footnotes? || (attr? :nofootnotes) %>
-    <div id="footnotes">
-      <hr><%
-      footnotes.each do |fn| %>
-      <div class="footnote" id="_footnote_<%= fn.index %>">
-        <a href="#_footnoteref_<%= fn.index %>"><%= fn.index %></a>. <%= fn.text %>
-      </div><%
-      end %>
-    </div><%
-    end %>
-    <div id="footer">
-      <div id="footer-text"><%
-      if attr? :revnumber %>
-        Version <%= attr :revnumber %><br><%
-      end %>
-        Last updated <%= attr :docdatetime %>
-      </div>
-    </div>
-  </body>
+</div><%
+unless !footnotes? || (attr? :nofootnotes) %>
+<div id="footnotes">
+<hr><%
+  footnotes.each do |fn| %>
+<div class="footnote" id="_footnote_<%= fn.index %>">
+<a href="#_footnoteref_<%= fn.index %>"><%= fn.index %></a>. <%= fn.text %>
+</div><%
+  end %>
+</div><%
+end %>
+<div id="footer">
+<div id="footer-text"><%
+if attr? :revnumber %>
+Version <%= attr :revnumber %><br><%
+end %>
+Last updated <%= attr :docdatetime %>
+</div>
+</div>
+</body>
 </html>
     EOS
   end
@@ -243,11 +245,11 @@ class SectionTemplate < BaseTemplate
     if sec.id
       id = %( id="#{sec.id}")
       if sec.document.attr? 'sectanchors'
-        if sec.document.attr? 'icons', 'font'
-          anchor = %(<a class="anchor" href="##{sec.id}"><i class="icon-anchor"></i></a>)
-        else
+        #if sec.document.attr? 'icons', 'font'
+        #  anchor = %(<a class="anchor" href="##{sec.id}"><i class="icon-anchor"></i></a>)
+        #else
           anchor = %(<a class="anchor" href="##{sec.id}"></a>)
-        end
+        #end
       elsif sec.document.attr? 'sectlinks'
         link_start = %(<a class="link" href="##{sec.id}">)
         link_end = '</a>'
@@ -431,12 +433,14 @@ class BlockAdmonitionTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="admonitionblock <%= attr :name %>#{role_class}">
   <table>
     <tr>
-      <td class="icon">
-        <% if attr? :icons %>
-        <img src="<%= icon_uri(attr :name) %>" alt="<%= @caption %>">
-        <% else %>
-        <div class="title"><%= @caption %></div>
-        <% end %>
+      <td class="icon"><%
+        if attr? 'icons', 'font' %>
+        <i class="icon-<%= attr :name %>" title="<%= @caption %>"></i><%
+        elsif attr? 'icons' %>
+        <img src="<%= icon_uri(attr :name) %>" alt="<%= @caption %>"><%
+        else %>
+        <div class="title"><%= @caption %></div><%
+        end %>
       </td>
       <td class="content">
         #{title_div}
@@ -618,25 +622,28 @@ class BlockColistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="colist#{style_class}#{role_class}">
-  #{title_div}
-  <% if attr? :icons %>
-  <table>
-    <% content.each_with_index do |item, i| %>
-    <tr>
-      <td><img src="<%= icon_uri("callouts/\#{i + 1}") %>" alt="<%= i + 1 %>"></td>
-      <td><%= item.text %></td>
-    </tr>
-    <% end %>
-  </table>
-  <% else %>
-  <ol>
-  <% content.each do |item| %>
-    <li>
-      <p><%= item.text %></p>
-    </li>
-  <% end %>
-  </ol>
-  <% end %>
+#{title_div}<%
+if attr? :icons %>
+<table><%
+  content.each_with_index do |item, i| %>
+<tr>
+<td><%
+    if attr? :icons, 'font' %><i class="conum"><%= i + 1 %></i><%
+    else %><img src="<%= icon_uri("callouts/\#{i + 1}") %>" alt="<%= i + 1 %>"><%
+    end %></td>
+<td><%= item.text %></td>
+</tr><%
+  end %>
+</table><%
+else %>
+<ol><%
+  content.each do |item| %>
+<li>
+<p><%= item.text %></p>
+</li><%
+  end %>
+</ol><%
+end %>
 </div>
     EOS
   end
@@ -778,7 +785,9 @@ end
 
 class InlineCalloutTemplate < BaseTemplate
   def result(node)
-    if node.attr? 'icons'
+    if node.attr? 'icons', 'font'
+      %(<i class="conum">#{node.text}</i>)
+    elsif node.attr? 'icons'
       src = node.icon_uri("callouts/#{node.text}")
       %(<img src="#{src}" alt="#{node.text}">)
     else
