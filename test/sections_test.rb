@@ -1035,6 +1035,7 @@ They couldn't believe their eyes when...
       EOS
 
       output = render_string input
+      assert_xpath '//body[@class="article toc2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
     end
