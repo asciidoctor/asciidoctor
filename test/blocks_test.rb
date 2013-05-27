@@ -1274,7 +1274,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
       EOS
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
-      assert_xpath '//pre[@class="highlight CodeRay"]/code[@class="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
+      assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
       assert_match(/\.CodeRay \{/, output)
     end
 
@@ -1291,7 +1291,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
       EOS
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
-      assert_xpath '//pre[@class="highlight CodeRay"]/code[@class="ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
+      assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
       assert_no_match(/\.CodeRay \{/, output)
     end
 

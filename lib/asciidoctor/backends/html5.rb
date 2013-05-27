@@ -96,10 +96,14 @@ when 'coderay'
 <%= ::Asciidoctor::HTML5.default_coderay_stylesheet %>
 </style><%
   end
-when 'highlightjs' %>
+when 'highlightjs', 'highlight.js' %>
 <link rel="stylesheet" href="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css">
-<script src="<%= (attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3') %>/highlight.min.js"></script>
+<script src="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script><%
+when 'prettify' %>
+<link rel="stylesheet" href="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/<%= attr 'prettify-theme', 'prettify' %>.min.css">
+<script src="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/prettify.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script><%
 end %><%= (docinfo_content = docinfo).empty? ? nil : %(
 \#{docinfo_content}) %>
 </head>
@@ -401,14 +405,30 @@ class BlockListingTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="listingblock#{role_class}">
-  #{title_div :caption => true}
-  <div class="content monospaced">
-    <% if attr? 'style', 'source', false %>
-    <pre class="highlight<% if attr? 'source-highlighter', 'coderay' %> CodeRay<% end %>"><code#{attribute('class', :language)}><%= template.preserve_endlines(content, self) %></code></pre>
-    <% else %>
-    <pre><%= template.preserve_endlines(content, self) %></pre>
-    <% end %>
-  </div>
+#{title_div :caption => true}
+<div class="content monospaced"><%
+if attr? 'style', 'source', false
+  language = (language = (attr 'language')) ? %(\#{language} language-\#{language}) : nil
+  case attr 'source-highlighter'
+  when 'coderay'
+    pre_class = ' class="CodeRay"'
+    code_class = language ? %( class="\#{language}") : nil
+  when 'highlightjs', 'highlight.js'
+    pre_class = ' class="highlight"'
+    code_class = language ? %( class="\#{language}") : nil
+  when 'prettify'
+    pre_class = %( class="prettyprint\#{(attr? 'linenums') ? ' linenums' : nil})
+    pre_class = language ? %(\#{pre_class} \#{language}") : %(\#{pre_class}")
+    code_class = nil
+  else
+    pre_class = ' class="highlight"'
+    code_class = language ? %( class="\#{language}") : nil
+  end %>
+<pre<%= pre_class %>><code<%= code_class %>><%= template.preserve_endlines(content, self) %></code></pre><%
+else %>
+<pre><%= template.preserve_endlines(content, self) %></pre><%
+end %>
+</div>
 </div>
     EOS
   end
