@@ -86,6 +86,14 @@ context 'Links' do
     assert_xpath '//a[@href="http://google.com"][@target="_blank"]', render_embedded_string('http://google.com[Google^]'), 1
   end
 
+  test 'inline irc link' do
+    assert_xpath '//a[@href="irc://irc.freenode.net"][text()="irc://irc.freenode.net"]', render_embedded_string('irc://irc.freenode.net'), 1
+  end
+
+  test 'inline irc link with text' do
+    assert_xpath '//a[@href="irc://irc.freenode.net"][text()="Freenode IRC"]', render_embedded_string('irc://irc.freenode.net[Freenode IRC]'), 1
+  end
+
   test 'inline ref' do
     doc = document_from_string 'Here you can read about tigers.[[tigers]]'
     output = doc.render
