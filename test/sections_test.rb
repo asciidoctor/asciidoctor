@@ -296,7 +296,7 @@ not in section
 
       output = render_string input
       assert_xpath '//*[@id="toc"]', output, 1
-      assert_xpath %(//*[@id="toc"]//a[contains(text(), " Section ")]), output, 2
+      assert_xpath %(//*[@id="toc"]//a[contains(text(), "Section ")]), output, 2
       assert_xpath %(//*[@id="toc"]//a[text()="Miss Independent"]), output, 0
     end
 
@@ -988,7 +988,7 @@ fin.
   end
 
   context 'Table of Contents' do
-    test 'should render table of contents in header if toc attribute is set' do
+    test 'should render unnumbered table of contents in header if toc attribute is set' do
       input = <<-EOS
 = Article
 :toc:
@@ -1013,17 +1013,93 @@ That's all she wrote!
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol[@type="none"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ol', output, 2
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//ol[@type="none"]', output, 2
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="Section One"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol/li', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol/li/a[@href="#_interlude"][text()="Interlude"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ol)[1]/li)[4]/a[@href="#_section_three"][text()="Section Three"]', output, 1
+    end
+
+    test 'should render numbered table of contents in header if toc and numbered attributes are set' do
+      input = <<-EOS
+= Article
+:toc:
+:numbered:
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+
+=== Interlude
+
+While they were waiting...
+
+== Section Three
+
+That's all she wrote!
+      EOS
+      output = render_string input
+      assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol[@type="none"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//ol', output, 2
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//ol[@type="none"]', output, 2
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li', output, 4
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol/li', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol/li/a[@href="#_interlude"][text()="2.1. Interlude"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ol)[1]/li)[4]/a[@href="#_section_three"][text()="3. Section Three"]', output, 1
+    end
+
+    test 'should render a table of contents that honors numbered setting at position of section in document' do
+      input = <<-EOS
+= Article
+:toc:
+:numbered:
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+
+=== Interlude
+
+While they were waiting...
+
+:numbered!:
+
+== Section Three
+
+That's all she wrote!
+      EOS
+      output = render_string input
+      assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol[@type="none"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//ol', output, 2
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//ol[@type="none"]', output, 2
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ol)[1]/li)[4]/a[@href="#_section_three"][text()="Section Three"]', output, 1
     end
 
     test 'should render table of contents in header if toc2 attribute is set' do
       input = <<-EOS
 = Article
 :toc2:
+:numbered:
 
 == Section One
 
@@ -1219,8 +1295,8 @@ Fin.
       assert_css '#preamble #toc.contents', output, 1
       assert_xpath '//*[@id="toc"]/*[@class="title"][text() = "Contents"]', output, 1
       assert_css '#toc li', output, 2
-      assert_xpath '(//*[@id="toc"]//li)[1]/a[text() = "1. Section 1"]', output, 1
-      assert_xpath '(//*[@id="toc"]//li)[2]/a[text() = "2. Section 2"]', output, 1
+      assert_xpath '(//*[@id="toc"]//li)[1]/a[text() = "Section 1"]', output, 1
+      assert_xpath '(//*[@id="toc"]//li)[2]/a[text() = "Section 2"]', output, 1
     end
 
     test 'should honor id, title, role and level attributes on toc macro' do
@@ -1262,8 +1338,8 @@ Fin.
       assert_css '#preamble #contents.contents', output, 1
       assert_xpath '//*[@id="contents"]/*[@class="title"][text() = "Contents"]', output, 1
       assert_css '#contents li', output, 2
-      assert_xpath '(//*[@id="contents"]//li)[1]/a[text() = "1. Section 1"]', output, 1
-      assert_xpath '(//*[@id="contents"]//li)[2]/a[text() = "2. Section 2"]', output, 1
+      assert_xpath '(//*[@id="contents"]//li)[1]/a[text() = "Section 1"]', output, 1
+      assert_xpath '(//*[@id="contents"]//li)[2]/a[text() = "Section 2"]', output, 1
     end
   end
 
