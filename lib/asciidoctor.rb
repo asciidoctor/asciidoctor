@@ -375,7 +375,7 @@ module Asciidoctor
 
     # inline link and some inline link macro
     # FIXME revisit!
-    :link_inline      => %r{(^|link:|\s|>|&lt;|[\(\)\[\]])(\\?(?:https?|ftp)://[^\s\[<]*[^\s.,\[<])(?:\[((?:\\\]|[^\]])*?)\])?},
+    :link_inline      => %r{(^|link:|\s|>|&lt;|[\(\)\[\]])(\\?(?:https?|ftp|irc)://[^\s\[<]*[^\s.,\[<])(?:\[((?:\\\]|[^\]])*?)\])?},
 
     # inline link macro
     # link:path[label]
