@@ -34,9 +34,18 @@ class DocumentTemplate < BaseTemplate
       else
         nested = true
       end
-      toc_level = nested ? %(<ol>\n) : ''
+      toc_level = nested ? %(<ol type="none">\n) : ''
+      numbered = node.document.attr? 'numbered'
       sections.each do |section|
-        toc_level = %(#{toc_level}<li><a href=\"##{section.id}\">#{!section.special && section.level > 0 ? "#{section.sectnum} " : ''}#{section.caption}#{section.title}</a></li>\n)
+        # need to check playback attributes for change in numbered setting
+        # FIXME encapsulate me
+        if section.attributes.has_key? :attribute_entries
+          if (numbered_override = section.attributes[:attribute_entries].find {|entry| entry.name == 'numbered'})
+            numbered = numbered_override.negate ? false : true
+          end
+        end
+        section_num = numbered && !section.special && section.level < 4 ? %(#{section.sectnum} ) : nil
+        toc_level = %(#{toc_level}<li><a href=\"##{section.id}\">#{section_num}#{section.caption}#{section.title}</a></li>\n)
         if section.level < to_depth && (child_toc_level = outline(section, to_depth))
           if section.document.doctype != 'book' || section.level > 0
             toc_level = %(#{toc_level}<li>\n#{child_toc_level}\n</li>\n)
@@ -265,7 +274,7 @@ class SectionTemplate < BaseTemplate
 #{sec.content})
     else
       role = (sec.attr? 'role') ? " #{sec.attr 'role'}" : nil
-      if !sec.special && (sec.attr? 'numbered') && slevel < 4
+      if !sec.special && (sec.document.attr? 'numbered') && slevel < 4
         sectnum = "#{sec.sectnum} "
       else
         sectnum = nil
