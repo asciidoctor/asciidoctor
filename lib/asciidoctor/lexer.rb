@@ -292,10 +292,11 @@ class Lexer
     # bail if we've reached the end of the parent block or document
     return nil unless reader.has_more_lines?
 
+    text_only = options[:text]
     # check for option to find list item text only
     # if skipped a line, assume a list continuation was
     # used and block content is acceptable
-    if options[:text] && skipped > 0
+    if text_only && skipped > 0
       options.delete(:text)
     end
     
@@ -363,7 +364,7 @@ class Lexer
           end
 
           # process lines normally
-          if !options[:text]
+          if !text_only
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
             if (match = this_line.match(REGEXP[:break_line]))
               block = Block.new(parent, BREAK_LINES[match[0][0..2]])
@@ -565,12 +566,49 @@ class Lexer
 
             catalog_inline_anchors(buffer.join, document)
 
-            if !options[:text] && (admonition_match = buffer.first.match(REGEXP[:admonition_inline]))
+            first_line = buffer.first
+            if !text_only && (admonition_match = first_line.match(REGEXP[:admonition_inline]))
               buffer[0] = admonition_match.post_match.lstrip
               block = Block.new(parent, :admonition, buffer)
               attributes['style'] = admonition_match[1]
               attributes['name'] = admonition_name = admonition_match[1].downcase
               attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
+            elsif !text_only && COMPLIANCE[:markdown_syntax] && first_line.start_with?('> ')
+              buffer.map! {|line|
+                if line.start_with?('> ')
+                  line[2..-1]
+                elsif line.chomp == '>'
+                  line[1..-1]
+                else
+                  line
+                end
+              }
+
+              if buffer.last.start_with?('-- ')
+                attribution, citetitle = buffer.pop[3..-1].split(', ')
+                buffer.pop while buffer.last.chomp.empty?
+                buffer[-1] = buffer.last.chomp
+              else
+                attribution, citetitle = nil
+              end
+              attributes['style'] = 'quote'
+              attributes['attribution'] = attribution unless attribution.nil?
+              attributes['citetitle'] = citetitle unless citetitle.nil?
+              # NOTE will only detect headings that are floating titles (not section titles)
+              # TODO could assume a floating title when inside a block context
+              block = build_block(:quote, :complex, false, parent, Reader.new(buffer), attributes)
+            elsif !text_only && buffer.size > 1 && first_line.start_with?('"') &&
+                buffer.last.start_with?('-- ') && buffer[-2].chomp.end_with?('"')
+              buffer[0] = first_line[1..-1]
+              attribution, citetitle = buffer.pop[3..-1].split(', ')
+              buffer.pop while buffer.last.chomp.empty?
+              buffer[-1] = buffer.last.chomp.chop
+              attributes['style'] = 'quote'
+              attributes['attribution'] = attribution unless attribution.nil?
+              attributes['citetitle'] = citetitle unless citetitle.nil?
+              block = Block.new(parent, :quote, buffer)
+              #block = Block.new(parent, :quote)
+              #block << Block.new(block, :paragraph, buffer)
             else
               # QUESTION is this necessary?
               #if style == 'normal' && [' ', "\t"].include?(buffer.first[0..0])
@@ -685,11 +723,13 @@ class Lexer
         tip = line[0..3]
         tl = 4
 
-        # special case for fenced code blocks
-        tip_alt = tip.chop
-        if tip_alt == '```' || tip_alt == '~~~'
-          tip = tip_alt
-          tl = 3
+        if COMPLIANCE[:markdown_syntax]
+          # special case for fenced code blocks
+          tip_alt = tip.chop
+          if tip_alt == '```' || tip_alt == '~~~'
+            tip = tip_alt
+            tl = 3
+          end
         end
       end
 
@@ -723,6 +763,7 @@ class Lexer
   end
 
   # whether a block supports complex content should be a config setting
+  # if terminator is false, that means the all the lines in the reader should be parsed
   # NOTE could invoke filter in here, before and after parsing
   def self.build_block(block_context, content_type, terminator, parent, reader, attributes, options = {})
     if terminator.nil?
@@ -740,6 +781,9 @@ class Lexer
       end
     elsif content_type != :complex
       buffer = reader.grab_lines_until(:terminator => terminator, :chomp_last_line => true)
+    elsif terminator == false
+      buffer = nil
+      block_reader = reader
     else
       buffer = nil
       block_reader = Reader.new reader.grab_lines_until(:terminator => terminator)
