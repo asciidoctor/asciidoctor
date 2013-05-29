@@ -858,20 +858,15 @@ class InlineQuotedTemplate < BaseTemplate
   end
 end
 
-class InlineKeyTemplate < BaseTemplate
-  def key(keys)
-    case keys.size
-      when 1
-        %(<button>#{keys[0]}</button>)
-      when 2
-        %(<button>#{keys[0]}</button> + <button>#{keys[1]}</button>)
-      when 3
-        %(<button>#{keys[0]}</button> + <button>#{keys[1]}</button> + <button>#{keys[2]}</button>)
-    end
-  end
-
+class InlineKbdTemplate < BaseTemplate
   def result(node)
-    key(node.attr('keys'))
+    keys = node.attr 'keys'
+    if keys.size == 1
+      %(<kbd>#{keys.first}</kbd>)
+    else
+      key_combo = keys.map{|key| %(<kbd>#{key}</kbd>+) }.join.chop
+      %(<kbd class="combo">#{key_combo}</kbd>)
+    end
   end
 
   def template

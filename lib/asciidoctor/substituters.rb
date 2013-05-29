@@ -349,6 +349,37 @@ module Substituters
     found[:macroish_short_form] = (found[:square_bracket] && found[:colon] && result.include?(':['))
     found[:uri] = (found[:colon] && result.include?('://'))
     use_link_attrs = @document.attributes.has_key?('use-link-attrs')
+    experimental = @document.attributes.has_key?('experimental')
+
+    if experimental
+      if found[:macroish_short_form] && result.include?('kbd:')
+        result.gsub!(REGEXP[:kbd_macro]) {
+          captured = $~[0]
+          keys = $~[1]
+          # honor the escape
+          if captured.start_with? '\\'
+            next captured[1..-1]
+          end
+
+          keys = unescape_bracketed_text keys
+          if keys == '+'
+            keys = ['+']
+          else
+            # need to use closure to work around lack of negative lookbehind
+            keys = keys.split(REGEXP[:kbd_delim]).inject([]) {|c, key|
+              if key.end_with?('++')
+                c << key[0..-3].strip
+                c << '+'
+              else
+                c << key.strip
+              end
+              c
+            }
+          end
+          Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).render 
+        }
+      end
+    end
 
     if found[:macroish] && result.include?('image:')
       # image:filename.png[Alt Text]
@@ -491,17 +522,6 @@ module Substituters
         @document.register(:links, target)
 
         Inline.new(self, :anchor, (!text.empty? ? text : raw_target), :type => :link, :target => target, :attributes => attrs).render
-      }
-    end
-
-    if found[:macroish] && (result.include?('key:') || result.include?('kbd:'))
-      result.gsub!(REGEXP[:key_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        string = m[2].empty? ? m[3] : m[2];
-        keys = string.split(REGEXP[:plus_delim])
-
-        Inline.new(self, :key, nil, :attributes => {'keys' => keys}).render
       }
     end
 
