@@ -1261,8 +1261,8 @@ class Lexer
 
   #--
   # = is level 0, == is level 1, etc.
-  def self.single_line_section_level(line)
-    [line.length - 1, 0].max
+  def self.single_line_section_level(marker)
+    marker.length - 1
   end
 
   # Internal: Checks if the next line on the Reader is a section title
@@ -1306,7 +1306,8 @@ class Lexer
   end
 
   def self.is_single_line_section_title?(line1)
-    if !line1.nil? && (match = line1.match(REGEXP[:section_title]))
+    if !line1.nil? && (line1.start_with?('=') || (COMPLIANCE[:markdown_syntax] && line1.start_with?('#'))) &&
+        (match = line1.match(REGEXP[:section_title]))
       single_line_section_level match[1]
     else
       false
@@ -1314,8 +1315,8 @@ class Lexer
   end
 
   def self.is_two_line_section_title?(line1, line2)
-    if !line1.nil? && !line2.nil? && line1.match(REGEXP[:section_name]) &&
-        line2.match(REGEXP[:section_underline]) &&
+    if !line1.nil? && !line2.nil? && SECTION_LEVELS.has_key?(line2[0..0]) &&
+        line2.match(REGEXP[:section_underline]) && line1.match(REGEXP[:section_name]) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line1.chomp.size - line2.chomp.size).abs <= 1
       section_level line2
@@ -1374,14 +1375,15 @@ class Lexer
     sect_level = -1
     single_line = true
 
-    if match = line1.match(REGEXP[:section_title])
+    if (line1.start_with?('=') || (COMPLIANCE[:markdown_syntax] && line1.start_with?('#'))) &&
+        (match = line1.match(REGEXP[:section_title]))
       sect_id = match[3]
       sect_title = match[2]
       sect_level = single_line_section_level match[1]
     else
       line2 = reader.peek_line
-      if !line2.nil? && (name_match = line1.match(REGEXP[:section_name])) &&
-        line2.match(REGEXP[:section_underline]) &&
+      if !line2.nil? && SECTION_LEVELS.has_key?(line2[0..0]) && line2.match(REGEXP[:section_underline]) &&
+        (name_match = line1.match(REGEXP[:section_name])) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line1.chomp.size - line2.chomp.size).abs <= 1
         if anchor_match = name_match[1].match(REGEXP[:anchor_embedded]) 

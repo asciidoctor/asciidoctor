@@ -335,6 +335,8 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Asciidoctor supports markdown-style blockquotes as well as a shorthand
   for a blockquote paragraph.
 
+* Asciidoctor supports markdown-style headings (section titles)
+
 * Asciidoctor does not support the deprecated index term syntax (`++`
   and `+++`)
 

@@ -214,6 +214,44 @@ text
     end
   end
 
+  context 'Markdown-style headings' do
+    test 'single-line document title with leading marker' do
+      input = <<-EOS
+# Document Title
+      EOS
+      output = render_string input
+      assert_xpath "//h1[not(@id)][text() = 'Document Title']", output, 1
+    end
+
+    test 'single-line document title with symmetric markers' do
+      input = <<-EOS
+# Document Title #
+      EOS
+      output = render_string input
+      assert_xpath "//h1[not(@id)][text() = 'Document Title']", output, 1
+    end
+
+    test 'single-line section title with leading marker' do
+      input = <<-EOS
+## Section One
+
+blah blah
+      EOS
+      output = render_string input
+      assert_xpath "//h2[@id='_section_one'][text() = 'Section One']", output, 1
+    end
+
+    test 'single-line section title with symmetric markers' do
+      input = <<-EOS
+## Section One ##
+
+blah blah
+      EOS
+      output = render_string input
+      assert_xpath "//h2[@id='_section_one'][text() = 'Section One']", output, 1
+    end
+  end
+
   context 'Floating Title' do
     test 'should create floating title if style is float' do
       input = <<-EOS
