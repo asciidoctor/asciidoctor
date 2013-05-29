@@ -243,6 +243,19 @@ include::fixtures/include-file.asciidoc[lines=1, tags=snippetA;snippetB]
       assert_no_match(/snippetB content/, output)
     end
 
+    test 'indent of included file can be reset to size of indent attribute' do
+      input = <<-EOS
+[source, xml]
+----
+include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
+----
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :header_footer => false, :attributes => {'docdir' => File.dirname(__FILE__)}
+      result = xmlnodes_at_xpath('//pre', output, 1).text
+      assert_equal "<year>2013</year>\n<holder>Acme, Inc.</holder>", result
+    end
+
     test "block is called to handle an include macro" do
       input = <<-EOS
 first line

@@ -450,6 +450,7 @@ class Reader
 
       inc_lines = nil
       tags = nil
+      attributes = {}
       if !raw_attributes.empty?
         attributes = AttributeList.new(raw_attributes).parse
         if attributes.has_key? 'lines'
@@ -488,7 +489,7 @@ class Reader
               break if inc_lines.empty?
             end
           end
-          @lines.unshift(*normalize_include_data(selected)) unless selected.empty?
+          @lines.unshift(*normalize_include_data(selected, attributes['indent'])) unless selected.empty?
         end
       elsif !tags.nil?
         if !tags.empty?
@@ -512,11 +513,11 @@ class Reader
               end
             end
           end
-          @lines.unshift(*selected) unless selected.empty?
-          #@lines.unshift(*normalize_include_data(selected)) unless selected.empty?
+          #@lines.unshift(*selected) unless selected.empty?
+          @lines.unshift(*normalize_include_data(selected, attributes['indent'])) unless selected.empty?
         end
       else
-        @lines.unshift(*normalize_include_data(File.readlines(include_file)))
+        @lines.unshift(*normalize_include_data(File.readlines(include_file), attributes['indent']))
       end
       true
     else
@@ -711,12 +712,18 @@ class Reader
   #-
   # FIXME this shares too much in common w/ normalize_data; combine
   # in a shared function
-  def normalize_include_data(data)
+  def normalize_include_data(data, indent = nil)
     if ::Asciidoctor::FORCE_ENCODING
-      data.map {|line| "#{line.rstrip.force_encoding(::Encoding::UTF_8)}\n" }
+      result = data.map {|line| "#{line.rstrip.force_encoding(::Encoding::UTF_8)}\n" }
     else
-      data.map {|line| "#{line.rstrip}\n" }
+      result = data.map {|line| "#{line.rstrip}\n" }
     end
+
+    unless indent.nil?
+      Lexer.reset_block_indent! result, indent.to_i
+    end
+
+    result
 
     #data.shift while !data.first.nil? && data.first.chomp.empty?
     #data.pop while !data.last.nil? && data.last.chomp.empty?

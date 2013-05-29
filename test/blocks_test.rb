@@ -550,6 +550,60 @@ source line 2\r
       assert_xpath %(/*[@class="listingblock"]//pre/code[text()="source line 1\nsource line 2"]), output, 1
     end
 
+    test 'should remove block indent if indent attribute is 0' do
+      input = <<-EOS
+[indent="0"]
+----
+    def names
+
+      @names.split ' '
+
+    end
+----
+      EOS
+
+      expected = <<-EOS
+def names
+
+  @names.split ' '
+
+end
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'pre', output, 1
+      assert_css '.listingblock pre', output, 1
+      result = xmlnodes_at_xpath('//pre', output, 1).text
+      assert_equal expected.chomp, result
+    end
+
+    test 'should set block indent to value specified by indent attribute' do
+      input = <<-EOS
+[indent="1"]
+----
+    def names
+
+      @names.split ' '
+
+    end
+----
+      EOS
+
+      expected = <<-EOS
+ def names
+ 
+   @names.split ' '
+ 
+ end
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'pre', output, 1
+      assert_css '.listingblock pre', output, 1
+      result = xmlnodes_at_xpath('//pre', output, 1).text
+      assert_equal expected.chomp, result
+    end
+
     test 'literal block should honor explicit subs list' do
       input = <<-EOS
 [subs="verbatim,quotes"]
