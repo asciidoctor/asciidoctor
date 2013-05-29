@@ -321,13 +321,16 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Use can set the extension for icons using the +icontype+ attribute
   (AsciiDoc defaults to .png)
 
-* AsciiDoc uses the +<blockquote>+ for the content and +<cite>+ tag for
+* Asciidoctor uses the +<blockquote>+ for the content and +<cite>+ tag for
   attribution title in the HTML output for quote blocks, requiring some
   additional styling to match AsciiDoc
 +
  blockquote.content { padding: 0; margin; 0 }
  cite { color: navy; }
 +
+
+* Asciidoctor supports markdown-style blockquotes as well as a shorthand
+  for a blockquote paragraph.
 
 * Asciidoctor does not support the deprecated index term syntax (`++`
   and `+++`)

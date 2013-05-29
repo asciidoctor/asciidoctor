@@ -152,6 +152,7 @@ module Asciidoctor
     '====' => [:example, ['admonition'].to_set],
     '****' => [:sidebar, Set.new],
     '____' => [:quote, ['verse'].to_set],
+    '""'   => [:quote, ['verse'].to_set],
     '++++' => [:pass, Set.new],
     '|===' => [:table, Set.new],
     ',===' => [:table, Set.new],
@@ -208,7 +209,12 @@ module Asciidoctor
     # a block to be different lengths
     # this option requires that they be the same
     # Compliance value: false
-    :congruent_block_delimiters => true
+    :congruent_block_delimiters => true,
+
+    # AsciiDoc will recognize commonly-used Markdown syntax
+    # to the degree it does not interfere with existing
+    # AsciiDoc behavior.
+    :markdown_syntax => true
   }
 
   # The following pattern, which appears frequently, captures the contents between square brackets,
@@ -231,10 +237,11 @@ module Asciidoctor
     # [[ref]] (anywhere inline)
     :anchor_macro     => /\\?\[\[([\w":].*?)\]\]/,
 
-    # matches any block delimiter:
-    #   open, listing, example, literal, comment, quote, sidebar, passthrough, table
-    # NOTE position the most common blocks towards the front of the pattern
-    :any_blk          => %r{^(?:--|(?:-|\.|=|\*|_|\+|/){4,}|[\|,;!]={3,}|(?:`|~){3,}.*)$},
+    # matches any unbounded block delimiter:
+    #   listing, literal, example, sidebar, quote, passthrough, table, fenced code
+    # does not include open block or air quotes
+    # TIP position the most common blocks towards the front of the pattern
+    :any_blk          => %r{^(?:(?:-|\.|=|\*|_|\+|/){4,}|[\|,;!]={3,}|(?:`|~){3,}.*)$},
 
     # detect a list item of any sort
     # [[:graph:]] is a non-blank character
