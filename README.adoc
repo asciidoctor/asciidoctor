@@ -237,6 +237,9 @@ Here are the known cases where Asciidoctor differs from AsciiDoc:
   quotes are rarely needed, though you may want to keep them for
   compatibility)
 
+* Asciidoctor adds the type attribute on ordered lists to provide hint
+  for numbering style when stylesheet is absent (such as in embedded mode)
+
 * Asciidoctor recognizes +opts+ as an alias for the +options+ attribute.
 
 * Asciidoctor creates xref labels using the text from the linked section

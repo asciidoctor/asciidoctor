@@ -181,6 +181,13 @@ module Asciidoctor
     :upperroman => /[IVX]+\)/
   }
 
+  ORDERED_LIST_KEYWORDS = {
+    'loweralpha' => 'a',
+    'lowerroman' => 'i',
+    'upperalpha' => 'A',
+    'upperroman' => 'I'
+  }
+
   LIST_CONTINUATION = '+'
 
   LINE_BREAK = ' +'
