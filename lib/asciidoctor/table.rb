@@ -306,7 +306,7 @@ class Table::ParserContext
   #
   # returns the String after the match
   def skip_matched_delimiter(match, escaped = false)
-    @buffer << (escaped ? match.pre_match.chop : match.pre_match) << @delimiter
+    @buffer = %(#@buffer#{escaped ? match.pre_match.chop : match.pre_match}#@delimiter)
     match.post_match
   end
 
