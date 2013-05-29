@@ -625,11 +625,12 @@ class BlockUlistTemplate < BaseTemplate
 end
 
 class BlockOlistTemplate < BaseTemplate
+
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="olist#{style_class}#{role_class}">
+<%#encoding:UTF-8%><% style = attr 'style', nil, false %><div#{id} class="olist#{style_class}#{role_class}">
   #{title_div}
-  <ol class="<%= attr 'style', nil, false %>"#{attribute('start', :start)}>
+  <ol class="<%= style %>"<%= (type = ::Asciidoctor::ORDERED_LIST_KEYWORDS[style]) ? %( type="\#{type}") : nil %>#{attribute('start', :start)}>
   <% content.each do |item| %>
     <li>
       <p><%= item.text %></p>
