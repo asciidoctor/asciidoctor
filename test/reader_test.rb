@@ -275,6 +275,19 @@ last line
       assert_match(/^:includefile: include-file.asciidoc$/, lines.join)
     end
 
+    test 'attributes are substituted in target of include macro' do
+      input = <<-EOS
+:fixturesdir: fixtures
+:ext: asciidoc
+
+include::{fixturesdir}/include-file.{ext}[]
+      EOS
+
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      output = doc.render
+      assert_match(/included content/, output)
+    end
+
     test 'escaped include macro is left unprocessed' do
       input = <<-EOS
 \\include::include-file.asciidoc[]
