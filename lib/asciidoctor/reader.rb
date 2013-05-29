@@ -425,6 +425,7 @@ class Reader
   #
   # returns a Boolean indicating whether the line under the cursor has changed.
   def preprocess_include(target, raw_attributes)
+    target = @document.sub_attributes target
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     if @document.safe >= SafeMode::SECURE
@@ -676,7 +677,7 @@ class Reader
     end
 
     if val.include? '{'
-      val = @document.sub_attributes(val)
+      val = @document.sub_attributes val
     end
 
     if type != :s
