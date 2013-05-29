@@ -29,12 +29,13 @@ class DocumentTemplate < BaseTemplate
     toc_level = nil
     sections = node.sections
     unless sections.empty?
-      if !node.is_a?(Document) && node.document.doctype == 'book'
-        nested = node.level > 0
-      else
-        nested = true
+      # FIXME the level for special sections should be set correctly in the model
+      # sec_level will only be 0 if we have a book doctype with parts
+      sec_level = sections.first.level
+      if sec_level == 0 && sections.first.special
+        sec_level = 1
       end
-      toc_level = nested ? %(<ol type="none">\n) : ''
+      toc_level = %(<ol type="none" class="sectlevel#{sec_level}">\n)
       numbered = node.document.attr? 'numbered'
       sections.each do |section|
         # need to check playback attributes for change in numbered setting
@@ -44,17 +45,13 @@ class DocumentTemplate < BaseTemplate
             numbered = numbered_override.negate ? false : true
           end
         end
-        section_num = numbered && !section.special && section.level < 4 ? %(#{section.sectnum} ) : nil
+        section_num = numbered && !section.special && section.level > 0 && section.level < 4 ? %(#{section.sectnum} ) : nil
         toc_level = %(#{toc_level}<li><a href=\"##{section.id}\">#{section_num}#{section.caption}#{section.title}</a></li>\n)
         if section.level < to_depth && (child_toc_level = outline(section, to_depth))
-          if section.document.doctype != 'book' || section.level > 0
-            toc_level = %(#{toc_level}<li>\n#{child_toc_level}\n</li>\n)
-          else
-            toc_level = %(#{toc_level}#{child_toc_level}\n)
-          end
+          toc_level = %(#{toc_level}<li>\n#{child_toc_level}\n</li>\n)
         end
       end
-      toc_level = %(#{toc_level}</ol>) if nested
+      toc_level = %(#{toc_level}</ol>)
     end
     toc_level
   end

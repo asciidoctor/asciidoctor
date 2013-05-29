@@ -157,13 +157,16 @@ p a > tt:hover { color: #561309; }
 #header br + span:before { content: "\2013 \0020"; }
 #toc { border-bottom: 3px double #ebebeb; padding-bottom: 1.25em; }
 #toc > ol { margin-left: 0.25em; }
+#toc ol.sectlevel0 > li > a { font-style: italic; }
+#toc ol.sectlevel0 ol.sectlevel1 { margin-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
 #toc ol { list-style-type: none; }
 #toctitle { color: #7a2518; }
 @media only screen and (min-width: 80em) { body.toc2 { padding-left: 20em; }
   #toc.toc2 { position: fixed; width: 20em; left: 0; top: 0; border-right: 1px solid #ebebeb; border-bottom: 0; z-index: 1000; padding: 1em; height: 100%; overflow: auto; }
   #toc.toc2 #toctitle { margin-top: 0; }
   #toc.toc2 > ol { font-size: .95em; }
-  #toc.toc2 ol li ol { margin-left: 0; padding-left: 1em; } }
+  #toc.toc2 ol ol { margin-left: 0; padding-left: 1em; }
+  #toc.toc2 ol.sectlevel0 ol.sectlevel1 { padding-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; } }
 #footer { max-width: 100%; background-color: #222222; padding: 1.25em; }
 #footer-text { color: #dddddd; line-height: 1.44; }
 .sect1 { border-bottom: 3px double #ebebeb; padding-bottom: 1.25em; }
