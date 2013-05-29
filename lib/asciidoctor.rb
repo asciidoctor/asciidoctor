@@ -325,6 +325,10 @@ module Asciidoctor
     # one two	three
     :space_delim      => /([^\\])[[:blank:]]+/,
 
+    # Ctrl + Alt+T
+    # Ctrl,T
+    :kbd_delim        => /(?:\+|,)(?=[[:blank:]]*[^\1])/,
+
     # one\ two\	three
     :escaped_space    => /\\([[:blank:]])/,
 
@@ -355,6 +359,12 @@ module Asciidoctor
     # footnoteref:[id,text]
     # footnoteref:[id]
     :footnote_macro   => /\\?(footnote|footnoteref):\[((?:\\\]|[^\]])*?)\]/,
+
+    # kbd:[F3]
+    # kbd:[Ctrl+Shift+T]
+    # kbd:[Ctrl+\]]
+    # kbd:[Ctrl,T]
+    :kbd_macro        => /\\?kbd:\[((?:\\\]|[^\]])+?)\]/,
 
     # image::filename.png[Caption]
     # video::http://youtube.com/12345[Cats vs Dogs]
