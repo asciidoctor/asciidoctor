@@ -428,7 +428,7 @@ class Reader
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     if @document.safe >= SafeMode::SECURE
-      @lines[0] = "link:#{target}[#{target}]"
+      @lines[0] = "link:#{target}[#{target}]\n"
       @next_line_preprocessed = true
       false
     # assume that if a block is given, the developer wants

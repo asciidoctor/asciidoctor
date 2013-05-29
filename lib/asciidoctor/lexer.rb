@@ -1868,9 +1868,9 @@ class Lexer
           if parser_ctx.format == 'psv'
             next_cell_spec, cell_text = parse_cell_spec(m.pre_match, :end)
             parser_ctx.push_cell_spec next_cell_spec
-            parser_ctx.buffer << cell_text
+            parser_ctx.buffer = %(#{parser_ctx.buffer}#{cell_text})
           else
-            parser_ctx.buffer << m.pre_match
+            parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
           end
 
           line = m.post_match
@@ -1878,10 +1878,10 @@ class Lexer
         else
           # no other delimiters to see here
           # suck up this line into the buffer and move on
-          parser_ctx.buffer << line
+          parser_ctx.buffer = %(#{parser_ctx.buffer}#{line})
           # QUESTION make this an option? (unwrap-option?)
           if parser_ctx.format == 'csv'
-            parser_ctx.buffer.rstrip!.concat(' ')
+            parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} )
           end
           line = ''
           if parser_ctx.format == 'psv' || (parser_ctx.format == 'csv' &&
