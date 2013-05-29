@@ -487,4 +487,95 @@ context "Lexer" do
     assert_equal 'SJR', blankdoc.attributes['authorinitials']
   end
 
+  test 'reset block indent to 0' do
+    input = <<-EOS
+    def names
+
+      @name.split ' '
+
+    end
+    EOS
+
+    expected = <<-EOS
+def names
+
+  @name.split ' '
+
+end
+    EOS
+
+    lines = input.lines.entries
+    Asciidoctor::Lexer.reset_block_indent! lines
+    assert_equal expected, lines.join
+  end
+
+  test 'reset block indent mixed with tabs and spaces to 0' do
+    input = <<-EOS
+    def names
+
+\t  @name.split ' '
+
+    end
+    EOS
+
+    expected = <<-EOS
+def names
+
+  @name.split ' '
+
+end
+    EOS
+
+    lines = input.lines.entries
+    Asciidoctor::Lexer.reset_block_indent! lines
+    assert_equal expected, lines.join
+  end
+
+  test 'reset block indent to non-zero' do
+    input = <<-EOS
+    def names
+
+      @name.split ' '
+
+    end
+    EOS
+
+    expected = <<-EOS
+  def names
+  
+    @name.split ' '
+  
+  end
+    EOS
+
+    lines = input.lines.entries
+    Asciidoctor::Lexer.reset_block_indent! lines, 2
+    assert_equal expected, lines.join
+  end
+
+  test 'preserve block indent' do
+    input = <<-EOS
+    def names
+    
+      @name.split ' '
+    
+    end
+    EOS
+
+    expected = input
+
+    lines = input.lines.entries
+    Asciidoctor::Lexer.reset_block_indent! lines, nil
+    assert_equal expected, lines.join
+  end
+
+  test 'reset block indent hands empty lines gracefully' do
+    input = []
+    expected = input
+
+    lines = input.dup
+    Asciidoctor::Lexer.reset_block_indent! lines
+    assert_equal expected, lines
+  end
+
 end

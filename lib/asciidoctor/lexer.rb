@@ -528,13 +528,7 @@ class Lexer
               (COMPLIANCE[:block_terminates_paragraph] && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
             }
 
-            # trim off the indentation equivalent to the size of the least indented line
-            if !buffer.empty?
-              offset = buffer.map {|line| line.match(REGEXP[:leading_blanks])[1].length }.min
-              if offset > 0
-                buffer = buffer.map {|l| l.sub(/^\s{1,#{offset}}/, '') }
-              end
-            end
+            reset_block_indent! buffer
 
             block = Block.new(parent, :literal, buffer)
             # a literal gets special meaning inside of a definition list
@@ -610,7 +604,7 @@ class Lexer
           return nil
 
         when :example
-          block = build_block(block_context, :complex, terminator, parent, reader, attributes, true)
+          block = build_block(block_context, :complex, terminator, parent, reader, attributes, {:supports_caption => true})
 
         when :listing, :fenced_code, :source
           if block_context == :fenced_code
@@ -621,7 +615,7 @@ class Lexer
           elsif block_context == :source
             AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
           end
-          block = build_block(:listing, :verbatim, terminator, parent, reader, attributes, true)
+          block = build_block(:listing, :verbatim, terminator, parent, reader, attributes, {:supports_caption => true})
 
         when :literal
           block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
@@ -730,7 +724,7 @@ class Lexer
 
   # whether a block supports complex content should be a config setting
   # NOTE could invoke filter in here, before and after parsing
-  def self.build_block(block_context, content_type, terminator, parent, reader, attributes, supports_caption = false)
+  def self.build_block(block_context, content_type, terminator, parent, reader, attributes, options = {})
     if terminator.nil?
       if content_type == :verbatim
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
@@ -751,9 +745,13 @@ class Lexer
       block_reader = Reader.new reader.grab_lines_until(:terminator => terminator)
     end
 
+    if content_type == :verbatim && attributes.has_key?('indent')
+      reset_block_indent! buffer, attributes['indent'].to_i
+    end
+
     block = Block.new(parent, block_context, buffer)
     # should supports_caption be necessary?
-    if supports_caption
+    if options.fetch(:supports_caption, false)
       block.title = attributes.delete('title') if attributes.has_key?('title')
       block.assign_caption attributes.delete('caption')
     end
@@ -2076,6 +2074,82 @@ class Lexer
 
       [parsed_style, original_style]
     end
+  end
+
+  # Remove the indentation (block offset) shared by all the lines, then
+  # indent the lines by the specified amount if specified
+  #
+  # Trim the leading whitespace (indentation) equivalent to the length
+  # of the indent on the least indented line. If the indent argument
+  # is specified, indent the lines by this many spaces (columns).
+  # 
+  # The purpose of this method is to shift a block of text to
+  # align to the left margin, while still preserving the relative
+  # indentation between lines
+  #
+  # lines  - the Array of String lines to process
+  # indent - the integer number of spaces to add to the beginning
+  #          of each line; if this value is nil, the existing
+  #          space is preserved (optional, default: 0)
+  #
+  # Examples
+  #
+  #   source = <<EOS
+  #       def names
+  #         @name.split ' ')
+  #       end
+  #   EOS
+  #
+  #   source.lines.entries
+  #   # => ["    def names\n", "      @names.split ' '\n", "    end\n"]
+  #
+  #   Lexer.reset_block_indent(source.lines.entries)
+  #   # => ["def names\n", "  @names.split ' '\n", "end\n"]
+  #
+  #   puts Lexer.reset_block_indent(source.lines.entries).join
+  #   # => def names
+  #   # =>   @names.split ' '
+  #   # => end
+  #
+  # returns the Array of String lines with block offset removed
+  def self.reset_block_indent!(lines, indent = 0)
+    return if indent.nil? || lines.empty?
+
+    tab_detected = false
+    # TODO make tab size configurable
+    tab_expansion = '    '
+    # strip leading block indent
+    offsets = lines.map do |line|
+      # break if the first char is non-whitespace
+      break [] unless (first_char = line.chomp[0..0]).lstrip.empty?
+      if line.include? "\t"
+        tab_detected = true
+        line = line.gsub("\t", tab_expansion)
+      end
+      if (flush_line = line.lstrip).empty?
+        nil
+      elsif (offset = line.length - flush_line.length) == 0
+        break []
+      else
+        offset
+      end
+    end
+    
+    unless offsets.empty? || (offsets = offsets.compact).empty?
+      if (offset = offsets.min) > 0
+        lines.map! {|line|
+          line = line.gsub("\t", tab_expansion) if tab_detected
+          line[offset..-1] || "\n"
+        }
+      end
+    end
+
+    if indent > 0
+      padding = ' ' * indent
+      lines.map! {|line| %(#{padding}#{line}) }
+    end
+
+    nil
   end
 
   # Public: Convert a string to a legal attribute name.
