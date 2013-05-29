@@ -181,6 +181,116 @@ ____
       assert_css '.quoteblock > blockquote > .paragraph + .admonitionblock', output, 1
     end
 
+    test 'quote block using air quotes with no attribution' do
+      input = <<-EOS
+""
+A famous quote.
+""
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
+      assert_css '.quoteblock > .attribution', output, 0
+      assert_xpath '//*[@class = "quoteblock"]//p[text() = "A famous quote."]', output, 1
+    end
+
+    test 'markdown-style quote block with single paragraph and no attribution' do
+      input = <<-EOS
+> A famous quote.
+> Some more inspiring words.
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
+      assert_css '.quoteblock > .attribution', output, 0
+      assert_xpath %(//*[@class = "quoteblock"]//p[text() = "A famous quote.\nSome more inspiring words."]), output, 1
+    end
+
+    test 'lazy markdown-style quote block with single paragraph and no attribution' do
+      input = <<-EOS
+> A famous quote.
+Some more inspiring words.
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
+      assert_css '.quoteblock > .attribution', output, 0
+      assert_xpath %(//*[@class = "quoteblock"]//p[text() = "A famous quote.\nSome more inspiring words."]), output, 1
+    end
+
+    test 'markdown-style quote block with multiple paragraphs and no attribution' do
+      input = <<-EOS
+> A famous quote.
+>
+> Some more inspiring words.
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph > p', output, 2
+      assert_css '.quoteblock > .attribution', output, 0
+      assert_xpath %((//*[@class = "quoteblock"]//p)[1][text() = "A famous quote."]), output, 1
+      assert_xpath %((//*[@class = "quoteblock"]//p)[2][text() = "Some more inspiring words."]), output, 1
+    end
+
+    test 'markdown-style quote block with multiple blocks and no attribution' do
+      input = <<-EOS
+> A famous quote.
+>
+> NOTE: Some more inspiring words.
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
+      assert_css '.quoteblock > blockquote > .admonitionblock', output, 1
+      assert_css '.quoteblock > .attribution', output, 0
+      assert_xpath %((//*[@class = "quoteblock"]//p)[1][text() = "A famous quote."]), output, 1
+      assert_xpath %((//*[@class = "quoteblock"]//*[@class = "admonitionblock note"]//*[@class="content"])[1][normalize-space(text()) = "Some more inspiring words."]), output, 1
+    end
+
+    test 'markdown-style quote block with single paragraph and attribution' do
+      input = <<-EOS
+> A famous quote.
+> Some more inspiring words.
+> -- Famous Person, Famous Source (1999)
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
+      assert_xpath %(//*[@class = "quoteblock"]//p[text() = "A famous quote.\nSome more inspiring words."]), output, 1
+      assert_css '.quoteblock > .attribution', output, 1
+      assert_css '.quoteblock > .attribution > cite', output, 1
+      assert_css '.quoteblock > .attribution > cite + br', output, 1
+      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source (1999)"]', output, 1
+      attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
+      author = attribution.children.last
+      assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
+    end
+
+    test 'quoted paragraph-style quote block with attribution' do
+      input = <<-EOS
+"A famous quote.
+Some more inspiring words."
+-- Famous Person, Famous Source (1999)
+      EOS
+      output = render_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_xpath %(//*[@class = "quoteblock"]/blockquote[normalize-space(text()) = "A famous quote. Some more inspiring words."]), output, 1
+      assert_css '.quoteblock > .attribution', output, 1
+      assert_css '.quoteblock > .attribution > cite', output, 1
+      assert_css '.quoteblock > .attribution > cite + br', output, 1
+      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source (1999)"]', output, 1
+      attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
+      author = attribution.children.last
+      assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
+    end
+
     test 'single-line verse block without attribution' do
       input = <<-EOS
 [verse]
