@@ -858,6 +858,22 @@ class InlineQuotedTemplate < BaseTemplate
   end
 end
 
+class InlineKbdTemplate < BaseTemplate
+  def result(node)
+    keys = node.attr 'keys'
+    if keys.size == 1
+      %(<kbd>#{keys.first}</kbd>)
+    else
+      key_combo = keys.map{|key| %(<kbd>#{key}</kbd>+) }.join.chop
+      %(<kbd class="combo">#{key_combo}</kbd>)
+    end
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
 class InlineAnchorTemplate < BaseTemplate
   def anchor(target, text, type, document, node)
     case type

@@ -614,6 +614,58 @@ context 'Substitutions' do
       assert_equal ['Big cats', 'Tigers'], terms[0]
       assert_equal ['panthera tigris'], terms[1]
     end
+
+    context 'Keyboard macro' do
+      test 'kbd macro with single key' do
+        para = block_from_string('kbd:[F3]', :attributes => {'experimental' => ''})
+        assert_equal %q{<kbd>F3</kbd>}, para.sub_macros(para.buffer.join)
+      end
+  
+      test 'kbd macro with single key, docbook backend' do
+        para = block_from_string('kbd:[F3]', :backend => 'docbook', :attributes => {'experimental' => ''})
+        assert_equal %q{<keycap>F3</keycap>}, para.sub_macros(para.buffer.join)
+      end
+  
+      test 'kbd macro with key combination' do
+        para = block_from_string('kbd:[Ctrl+Shift+T]', :attributes => {'experimental' => ''})
+        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></kbd>}, para.sub_macros(para.buffer.join)
+      end
+  
+      test 'kbd macro with key combination with spaces' do
+        para = block_from_string('kbd:[Ctrl + Shift + T]', :attributes => {'experimental' => ''})
+        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></kbd>}, para.sub_macros(para.buffer.join)
+      end
+  
+      test 'kbd macro with key combination delimited by commas' do
+        para = block_from_string('kbd:[Ctrl,Shift,T]', :attributes => {'experimental' => ''})
+        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></kbd>}, para.sub_macros(para.buffer.join)
+      end
+  
+      test 'kbd macro with key combination containing a plus key no spaces' do
+        para = block_from_string('kbd:[Ctrl++]', :attributes => {'experimental' => ''})
+        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>+</kbd></kbd>}, para.sub_macros(para.buffer.join)
+      end
+  
+      test 'kbd macro with key combination delimited by commands containing a comma key' do
+        para = block_from_string('kbd:[Ctrl,,]', :attributes => {'experimental' => ''})
+        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>,</kbd></kbd>}, para.sub_macros(para.buffer.join)
+      end
+  
+      test 'kbd macro with key combination containing a plus key with spaces' do
+        para = block_from_string('kbd:[Ctrl + +]', :attributes => {'experimental' => ''})
+        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>+</kbd></kbd>}, para.sub_macros(para.buffer.join)
+      end
+  
+      test 'kbd macro with key combination containing escaped bracket' do
+        para = block_from_string('kbd:[Ctrl + \]]', :attributes => {'experimental' => ''})
+        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>]</kbd></kbd>}, para.sub_macros(para.buffer.join)
+      end
+  
+      test 'kbd macro with key combination, docbook backend' do
+        para = block_from_string('kbd:[Ctrl+Shift+T]', :backend => 'docbook', :attributes => {'experimental' => ''})
+        assert_equal %q{<keycombo><keycap>Ctrl</keycap><keycap>Shift</keycap><keycap>T</keycap></keycombo>}, para.sub_macros(para.buffer.join)
+      end
+    end
   end
 
   context 'Passthroughs' do
