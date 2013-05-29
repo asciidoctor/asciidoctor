@@ -270,7 +270,7 @@ class SectionTemplate < BaseTemplate
     end
 
     if slevel == 0
-      %(<h1#{id}>#{anchor}#{link_start}#{sec.title}#{link_end}</h1>
+      %(<h1#{id} class="sect0">#{anchor}#{link_start}#{sec.title}#{link_end}</h1>
 #{sec.content})
     else
       role = (sec.attr? 'role') ? " #{sec.attr 'role'}" : nil

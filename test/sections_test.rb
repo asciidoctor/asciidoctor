@@ -1387,7 +1387,7 @@ That's all she wrote!
   end
 
   context 'book doctype' do
-    test 'document title with level 0 headings' do
+    test 'wip document title with level 0 headings' do
       input = <<-EOS
 = Book
 Doc Writer
@@ -1411,8 +1411,13 @@ That's all she wrote!
       EOS
 
       output = render_string(input)
-      assert_xpath '//h1', output, 4
-      assert_xpath '//h2', output, 1
+      assert_css 'body.book', output, 1
+      assert_css 'h1', output, 4
+      assert_css '#header h1', output, 1
+      assert_css '#content h1', output, 3
+      assert_css '#content h1.sect0', output, 3
+      assert_css 'h2', output, 1
+      assert_css '#content h2', output, 1
       assert_xpath '//h1[@id="_chapter_one"][text() = "Chapter One"]', output, 1
       assert_xpath '//h1[@id="_chapter_two"][text() = "Chapter Two"]', output, 1
       assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
