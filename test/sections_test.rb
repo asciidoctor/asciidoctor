@@ -1013,11 +1013,14 @@ That's all she wrote!
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol', output, 1
-      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol[@type="none"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol[@type="none"][@class="sectlevel1"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ol', output, 2
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ol[@type="none"]', output, 2
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li', output, 4
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="Section One"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol[@type="none"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol[@class="sectlevel2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol/li', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li/ol/li/a[@href="#_interlude"][text()="Interlude"]', output, 1
       assert_xpath '((//*[@id="header"]//*[@id="toc"]/ol)[1]/li)[4]/a[@href="#_section_three"][text()="Section Three"]', output, 1
@@ -1093,6 +1096,43 @@ That's all she wrote!
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li', output, 4
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ol/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
       assert_xpath '((//*[@id="header"]//*[@id="toc"]/ol)[1]/li)[4]/a[@href="#_section_three"][text()="Section Three"]', output, 1
+    end
+
+    test 'should not number parts in table of contents for book doctype when numbered attribute is set' do
+      input = <<-EOS
+= Book
+:doctype: book
+:toc:
+:numbered:
+
+= Part 1
+
+== First Section of Part 1
+
+blah
+
+== Second Section of Part 1
+
+blah
+
+= Part 2
+
+== First Section of Part 2
+
+blah
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@id="toc"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol', output, 1
+      assert_xpath '//*[@id="toc"]/ol[@type="none"][@class="sectlevel0"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol[@type="none"][@class="sectlevel0"]/li', output, 4
+      assert_xpath '(//*[@id="toc"]/ol[@type="none"][@class="sectlevel0"]/li)[1]/a[text()="Part 1"]', output, 1
+      assert_xpath '(//*[@id="toc"]/ol[@type="none"][@class="sectlevel0"]/li)[3]/a[text()="Part 2"]', output, 1
+      assert_xpath '(//*[@id="toc"]/ol[@type="none"][@class="sectlevel0"]/li)[2]/ol', output, 1
+      assert_xpath '(//*[@id="toc"]/ol[@type="none"][@class="sectlevel0"]/li)[2]/ol[@type="none"][@class="sectlevel1"]', output, 1
+      assert_xpath '(//*[@id="toc"]/ol[@type="none"][@class="sectlevel0"]/li)[2]/ol/li', output, 2
+      assert_xpath '((//*[@id="toc"]/ol[@type="none"][@class="sectlevel0"]/li)[2]/ol/li)[1]/a[text()="1. First Section of Part 1"]', output, 1
     end
 
     test 'should render table of contents in header if toc2 attribute is set' do
@@ -1387,7 +1427,7 @@ That's all she wrote!
   end
 
   context 'book doctype' do
-    test 'wip document title with level 0 headings' do
+    test 'document title with level 0 headings' do
       input = <<-EOS
 = Book
 Doc Writer
