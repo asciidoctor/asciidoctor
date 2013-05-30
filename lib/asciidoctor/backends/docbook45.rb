@@ -666,6 +666,27 @@ class InlineKbdTemplate < BaseTemplate
   end
 end
 
+class InlineMenuTemplate < BaseTemplate
+  def menu(menu, submenus, menuitem)
+    if !submenus.empty?
+      submenu_path = submenus.map{|submenu| %(<guisubmenu>#{submenu}</guisubmenu> ) }.join.chop
+      %(<menuchoice><guimenu>#{menu}</guimenu> #{submenu_path} <guimenuitem>#{menuitem}</guimenuitem></menuchoice>)
+    elsif !menuitem.nil?
+      %(<menuchoice><guimenu>#{menu}</guimenu> <guimenuitem>#{menuitem}</guimenuitem></menuchoice>)
+    else
+      %(<guimenu>#{menu}</guimenu>)
+    end
+  end
+
+  def result(node)
+    menu(node.attr('menu'), node.attr('submenus'), node.attr('menuitem'))
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
 class InlineAnchorTemplate < BaseTemplate
   def anchor(target, text, type)
     case type

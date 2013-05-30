@@ -865,8 +865,29 @@ class InlineKbdTemplate < BaseTemplate
       %(<kbd>#{keys.first}</kbd>)
     else
       key_combo = keys.map{|key| %(<kbd>#{key}</kbd>+) }.join.chop
-      %(<kbd class="combo">#{key_combo}</kbd>)
+      %(<kbd class="keyseq">#{key_combo}</kbd>)
     end
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
+class InlineMenuTemplate < BaseTemplate
+  def menu(menu, submenus, menuitem)
+    if !submenus.empty?
+      submenu_path = submenus.map{|submenu| %(<span class="submenu">#{submenu}</span>&#160;&#9656; ) }.join.chop
+      %(<span class="menuseq"><span class="menu">#{menu}</span>&#160;&#9656; #{submenu_path} <span class="menuitem">#{menuitem}</span></span>)
+    elsif !menuitem.nil?
+      %(<span class="menuseq"><span class="menu">#{menu}</span>&#160;&#9656; <span class="menuitem">#{menuitem}</span></span>)
+    else
+      %(<span class="menu">#{menu}</span>)
+    end
+  end
+
+  def result(node)
+    menu(node.attr('menu'), node.attr('submenus'), node.attr('menuitem'))
   end
 
   def template
