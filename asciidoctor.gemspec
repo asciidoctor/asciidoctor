@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
 
   s.summary     = 'A native Ruby AsciiDoc syntax processor and publishing toolchain'
   s.description = <<-EOS
-An open source text processor and publishing toolchain, written entirely in Ruby, for converting AsciiDoc markup into HTML 5, DocBook 4.5 and other formats. 
+An open source text processor and publishing toolchain written in Ruby for converting AsciiDoc markup into HTML 5, DocBook 4.5 and custom formats.
 EOS
   s.license     = 'MIT'
   s.authors  = ['Dan Allen', 'Ryan Waldron', 'Jeremy McAnally', 'Jason Porter', 'Nick Hengeveld']
