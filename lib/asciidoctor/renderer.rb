@@ -60,14 +60,6 @@ class Renderer
         view_opts[:haml][:format] = view_opts[:slim][:format] = :html5
       end
 
-      Debug.debug {
-        msg = []
-        msg << "Views going in are like so:"
-        msg << @views.map {|k, v| "#{k}: #{v}"}
-        msg << '=' * 60
-        msg * "\n"
-      }
-
       slim_loaded = false
       helpers = nil
       
@@ -92,14 +84,6 @@ class Renderer
       end
 
       require helpers unless helpers.nil?
-
-      Debug.debug {
-        msg = []
-        msg << "Views going in are like so:"
-        msg << @views.map {|k, v| "#{k}: #{v}"}
-        msg << '=' * 60
-        msg * "\n"
-      }
     end
   end
 
@@ -111,8 +95,6 @@ class Renderer
   def render(view, object, locals = {})
     if !@views.has_key? view
       raise "Couldn't find a view in @views for #{view}"
-    else
-      Debug.debug { "View for #{view} is #{@views[view]}, object is #{object}" }
     end
     
     @views[view].render(object, locals)

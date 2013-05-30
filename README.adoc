@@ -297,6 +297,8 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Asciidoctor honors the alternate style name "discrete" for a floating
   title (i.e., +[discrete]+)
 
+* Asciidoctor supports the +pass+ style on open blocks and paragraphs
+
 * Asciidoctor supports syntax highlighting of listing, literal or open blocks
   that have the "source" style out of the box
 
@@ -392,8 +394,8 @@ NOTE: In general, Asciidoctor handles whitespace much more intelligently
 * Admonition block caption can be overridden in Asciidoctor using the
   +caption+ block attribute
 
-* Asciidoctor will parse attributes in link macros if the
-  +use-link-attrs+ attribute is set on the document.
+* Asciidoctor will parse attributes in link macros if the +linkattrs+
+  attribute is set on the document.
 
 If there's a difference you don't see in this list, check the {issues}[issue
 tracker] to see if it's an outstanding feature, or file an issue to report the

@@ -322,6 +322,23 @@ para
       assert_xpath '(//ul/li)[1]/*[@class="literalblock"]/following-sibling::*[@class="paragraph"]/p[text()="para"]', output, 1
     end
 
+    test 'an admonition paragraph attached by a line continuation to a list item with wrapped text should produce admonition' do
+      input = <<-EOS
+- first-line text
+  wrapped text
++
+NOTE: This is a note.
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ul', output, 1
+      assert_css 'ul > li', output, 1
+      assert_css 'ul > li > p', output, 1
+      assert_xpath %(//ul/li/p[text()="first-line text\nwrapped text"]), output, 1
+      assert_css 'ul > li > p + .admonitionblock.note', output, 1
+      assert_xpath '//ul/li/*[@class="admonitionblock note"]//td[@class="content"][normalize-space(text())="This is a note."]', output, 1
+    end
+
     test 'appends line as paragraph if attached by continuation following line comment' do
       input = <<-EOS
 - list item 1
@@ -2237,7 +2254,7 @@ second term:: definition
       output = render_embedded_string input
       assert_css '.hdlist', output, 1
       assert_css '.hdlist table', output, 1
-      assert_css '.hdlist table colgroup col', output, 2
+      assert_css '.hdlist table colgroup', output, 0
       assert_css '.hdlist table tr', output, 2
       assert_xpath '/*[@class="hdlist"]/table/tr[1]/td', output, 2
       assert_xpath '/*[@class="hdlist"]/table/tr[1]/td[@class="hdlist1"]', output, 1
@@ -2250,6 +2267,21 @@ second term:: definition
       assert_xpath '/*[@class="hdlist"]/table/tr[2]/td', output, 2
       assert_xpath '((//tr)[2]/td)[1][normalize-space(text())="second term"]', output, 1
       assert_xpath '((//tr)[2]/td)[2]/p[normalize-space(text())="definition"]', output, 1
+    end
+
+    test 'should set col widths of item and label if specified' do
+      input = <<-EOS
+[horizontal]
+[labelwidth="25", itemwidth="75"]
+term:: def
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_xpath '(//table/colgroup/col)[1][@style="width:25%;"]', output, 1
+      assert_xpath '(//table/colgroup/col)[2][@style="width:75%;"]', output, 1
     end
 
     test 'consecutive terms in horizontal list should share same cell' do

@@ -298,6 +298,7 @@ class Lexer
     # used and block content is acceptable
     if text_only && skipped > 0
       options.delete(:text)
+      text_only = false
     end
     
     parse_metadata = options.fetch(:parse_metadata, true)
