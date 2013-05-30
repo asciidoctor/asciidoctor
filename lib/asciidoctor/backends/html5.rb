@@ -858,6 +858,16 @@ class InlineQuotedTemplate < BaseTemplate
   end
 end
 
+class InlineButtonTemplate < BaseTemplate
+  def result(node)
+    %(<b class="button">#{node.text}</b>)
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
 class InlineKbdTemplate < BaseTemplate
   def result(node)
     keys = node.attr 'keys'

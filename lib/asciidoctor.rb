@@ -364,7 +364,8 @@ module Asciidoctor
     # kbd:[Ctrl+Shift+T]
     # kbd:[Ctrl+\]]
     # kbd:[Ctrl,T]
-    :kbd_macro        => /\\?kbd:\[((?:\\\]|[^\]])+?)\]/,
+    # btn:[Save]
+    :kbd_btn_macro    => /\\?(?:kbd|btn):\[((?:\\\]|[^\]])+?)\]/,
 
     # menu:File[New...]
     # menu:View[Page Style > No Style]

@@ -352,8 +352,8 @@ module Substituters
     experimental = @document.attributes.has_key?('experimental')
 
     if experimental
-      if found[:macroish_short_form] && result.include?('kbd:')
-        result.gsub!(REGEXP[:kbd_macro]) {
+      if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
+        result.gsub!(REGEXP[:kbd_btn_macro]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -361,23 +361,28 @@ module Substituters
             next captured[1..-1]
           end
 
-          keys = unescape_bracketed_text m[1]
+          if captured.start_with?('kbd')
+            keys = unescape_bracketed_text m[1]
 
-          if keys == '+'
-            keys = ['+']
-          else
-            # need to use closure to work around lack of negative lookbehind
-            keys = keys.split(REGEXP[:kbd_delim]).inject([]) {|c, key|
-              if key.end_with?('++')
-                c << key[0..-3].strip
-                c << '+'
-              else
-                c << key.strip
-              end
-              c
-            }
+            if keys == '+'
+              keys = ['+']
+            else
+              # need to use closure to work around lack of negative lookbehind
+              keys = keys.split(REGEXP[:kbd_delim]).inject([]) {|c, key|
+                if key.end_with?('++')
+                  c << key[0..-3].strip
+                  c << '+'
+                else
+                  c << key.strip
+                end
+                c
+              }
+            end
+            Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).render 
+          elsif captured.start_with?('btn')
+            label = unescape_bracketed_text m[1]
+            Inline.new(self, :button, label).render
           end
-          Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).render 
         }
       end
       
