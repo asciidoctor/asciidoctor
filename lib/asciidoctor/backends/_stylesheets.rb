@@ -196,7 +196,7 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-si
 .exampleblock > .content > :last-child { margin-bottom: 0; }
 .exampleblock > .content h1, .exampleblock > .content h2, .exampleblock > .content h3, .exampleblock > .content #toctitle, .sidebarblock.exampleblock > .content > .title, .exampleblock > .content h4, .exampleblock > .content h5, .exampleblock > .content h6 { line-height: 1; margin-bottom: 0.625em; }
 .exampleblock > .content h1.subheader, .exampleblock > .content h2.subheader, .exampleblock > .content h3.subheader, .exampleblock > .content .subheader#toctitle, .sidebarblock.exampleblock > .content > .subheader.title, .exampleblock > .content h4.subheader, .exampleblock > .content h5.subheader, .exampleblock > .content h6.subheader { line-height: 1.4; }
-.exampleblock > .content > :last-child > :last-child, .exampleblock > .content .olist > ol > li:last-child > :last-child, .exampleblock > .content .ulist > ul > li:last-child > :last-child { margin-bottom: 0; }
+.exampleblock > .content > :last-child > :last-child, .exampleblock > .content .olist > ol > li:last-child > :last-child, .exampleblock > .content .ulist > ul > li:last-child > :last-child, .exampleblock > .content .qlist > ol > li:last-child > :last-child { margin-bottom: 0; }
 .exampleblock.result > .content { -webkit-box-shadow: 0 1px 8px #d9d9d9; box-shadow: 0 1px 8px #d9d9d9; }
 .imageblock { margin-bottom: 1.25em; }
 .sidebarblock { border-style: solid; border-width: 1px; border-color: #d9d9d9; margin-bottom: 1.25em; padding: 1.25em; background: #f2f2f2; -webkit-border-radius: 4px; border-radius: 4px; }
@@ -207,6 +207,8 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-si
 .sidebarblock h1.subheader, .sidebarblock h2.subheader, .sidebarblock h3.subheader, .sidebarblock .subheader#toctitle, .sidebarblock > .content > .subheader.title, .sidebarblock h4.subheader, .sidebarblock h5.subheader, .sidebarblock h6.subheader { line-height: 1.4; }
 .sidebarblock > .content > .title { color: #7a2518; margin-top: 0; line-height: 1.6; }
 .sidebarblock > .content > .paragraph:last-child p { margin-bottom: 0; }
+pre { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; overflow-x: auto; line-height: 1.6; }
+.verseblock { margin-bottom: 1.25em; }
 .literalblock, .listingblock { margin-bottom: 1.25em; }
 .literalblock > .content > pre, .listingblock > .content > pre { background: none; color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; border-width: 1px 0; border-style: dotted; border-color: #bfbfbf; -webkit-border-radius: 4px; border-radius: 4px; padding: 0.75em 0.75em 0.5em 0.75em; white-space: pre; overflow-x: auto; line-height: 1.6; }
 .literalblock > .content > pre > code, .literalblock > .content > pre > tt, .listingblock > .content > pre > code, .listingblock > .content > pre > tt { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; padding: 0; background: none; font-weight: normal; }
@@ -222,9 +224,9 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-si
 .listingblock:hover .css:before { content: "css"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
 .listingblock:hover .scss:before { content: "scss"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
 .quoteblock { margin: 0 0 1.25em; padding: 0.5625em 1.25em 0 1.1875em; border-left: 1px solid #dddddd; }
-.quoteblock blockquote { margin: 0 0 1.25em 0; padding: 0; border: 0; }
+.quoteblock blockquote { margin: 0 0 1.25em 0; padding: 0 0 0.5625em 0; border: 0; }
 .quoteblock blockquote > .paragraph:last-child p { margin-bottom: 0; }
-.quoteblock .attribution { padding-bottom: 0.5625em; font-size: inherit; color: #555555; }
+.quoteblock .attribution { margin-top: -.25em; padding-bottom: 0.5625em; font-size: inherit; color: #555555; }
 .quoteblock .attribution br { display: none; }
 .quoteblock .attribution cite { display: block; margin-bottom: 0.625em; }
 table thead th, table tfoot th { font-weight: bold; }
@@ -256,55 +258,55 @@ ol.upperroman { list-style-type: upper-roman; }
 .literalblock + .colist, .listingblock + .colist { margin-top: -0.5em; }
 .colist > table tr > td:first-of-type { padding: 0 .8em; line-height: 1; }
 .colist > table tr > td:last-of-type { padding: 0.25em 0; }
-td.hdlist1 { vertical-align: top; padding-right: .8em; }
+td.hdlist1 { vertical-align: top; padding-right: .8em; font-weight: bold; }
 .qanda > ol > li > p:first-child { color: #00467f; }
 span.footnote, span.footnoteref { vertical-align: super; font-size: 0.875em; }
 span.footnote a, span.footnoteref a { text-decoration: none; }
-#footnotes { padding: 0.75em 0.375em; margin-bottom: 1.25em; border-top: 1px solid #dddddd; }
-#footnotes hr { display: none; }
+#footnotes { padding: 0.75em 0.375em; margin-bottom: 1.25em; #border-top: 1px solid #dddddd; }
+#footnotes hr { width: 20%; min-width: 6.25em; margin: -.25em 0 .75em 0; border-width: 1px 0 0 0; }
 #footnotes .footnote { line-height: 1.3; font-size: 0.875em; margin-left: 1.2em; text-indent: -1.2em; margin-bottom: .2em; }
 #footnotes .footnote a { font-weight: bold; text-decoration: none; }
 #footnotes .footnote:last-of-type { margin-bottom: 0; }
 .gist .file-data > table { border: none; background: #fff; width: 100%; margin-bottom: 0; }
 .gist .file-data > table td.line-data { width: 99%; }
 div.unbreakable { page-break-inside: avoid; }
-span.big { font-size: larger; }
-span.small { font-size: smaller; }
-span.underline { text-decoration: underline; }
-span.overline { text-decoration: overline; }
-span.line-through { text-decoration: line-through; }
-span.aqua { color: #00bfbf; }
-span.aqua-background { background-color: #00fafa; }
-span.black { color: black; }
-span.black-background { background-color: black; }
-span.blue { color: #0000bf; }
-span.blue-background { background-color: #0000fa; }
-span.fuchsia { color: #bf00bf; }
-span.fuchsia-background { background-color: #fa00fa; }
-span.gray { color: #606060; }
-span.gray-background { background-color: #7d7d7d; }
-span.green { color: #006000; }
-span.green-background { background-color: #007d00; }
-span.lime { color: #00bf00; }
-span.lime-background { background-color: #00fa00; }
-span.maroon { color: #600000; }
-span.maroon-background { background-color: #7d0000; }
-span.navy { color: #000060; }
-span.navy-background { background-color: #00007d; }
-span.olive { color: #606000; }
-span.olive-background { background-color: #7d7d00; }
-span.purple { color: #600060; }
-span.purple-background { background-color: #7d007d; }
-span.red { color: #bf0000; }
-span.red-background { background-color: #fa0000; }
-span.silver { color: #909090; }
-span.silver-background { background-color: #bcbcbc; }
-span.teal { color: #006060; }
-span.teal-background { background-color: #007d7d; }
-span.white { color: #bfbfbf; }
-span.white-background { background-color: #fafafa; }
-span.yellow { color: #bfbf00; }
-span.yellow-background { background-color: #fafa00; }
+.big { font-size: larger; }
+.small { font-size: smaller; }
+.underline { text-decoration: underline; }
+.overline { text-decoration: overline; }
+.line-through { text-decoration: line-through; }
+.aqua { color: #00bfbf; }
+.aqua-background { background-color: #00fafa; }
+.black { color: black; }
+.black-background { background-color: black; }
+.blue { color: #0000bf; }
+.blue-background { background-color: #0000fa; }
+.fuchsia { color: #bf00bf; }
+.fuchsia-background { background-color: #fa00fa; }
+.gray { color: #606060; }
+.gray-background { background-color: #7d7d7d; }
+.green { color: #006000; }
+.green-background { background-color: #007d00; }
+.lime { color: #00bf00; }
+.lime-background { background-color: #00fa00; }
+.maroon { color: #600000; }
+.maroon-background { background-color: #7d0000; }
+.navy { color: #000060; }
+.navy-background { background-color: #00007d; }
+.olive { color: #606000; }
+.olive-background { background-color: #7d7d00; }
+.purple { color: #600060; }
+.purple-background { background-color: #7d007d; }
+.red { color: #bf0000; }
+.red-background { background-color: #fa0000; }
+.silver { color: #909090; }
+.silver-background { background-color: #bcbcbc; }
+.teal { color: #006060; }
+.teal-background { background-color: #007d7d; }
+.white { color: #bfbfbf; }
+.white-background { background-color: #fafafa; }
+.yellow { color: #bfbf00; }
+.yellow-background { background-color: #fafa00; }
 .admonitionblock td.icon [class^="icon-"]:before { font-size: 2.5em; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); cursor: default; }
 .admonitionblock td.icon .icon-note:before { content: "\f05a"; color: #005498; color: #003f72; }
 .admonitionblock td.icon .icon-tip:before { content: "\f0eb"; text-shadow: 1px 1px 2px rgba(155, 155, 0, 0.8); color: #111; }
