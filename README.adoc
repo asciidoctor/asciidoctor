@@ -36,7 +36,7 @@ override this behavior by providing {tilt}[Tilt]-compatible templates.
 See the <<usage>> section for more details.
 
 Asciidoctor currently works (read as 'tested') with Ruby 1.8.7, Ruby
-1.9.3, Ruby 2.0.0, JRuby 1.7.2 and Rubinius 1.2.4 (on Linux, Mac and
+1.9.3, Ruby 2.0.0, JRuby 1.7.4 and Rubinius nightly (on Linux, Mac and
 Windows). We expect it will work with other versions of Ruby as well and
 would welcome help in testing it out.
 
@@ -459,8 +459,8 @@ This library aims to support the following Ruby implementations:
 * Ruby 1.8.7
 * Ruby 1.9.3
 * Ruby 2.0.0
-* JRuby 1.7.2
-* Rubinius 1.2.4
+* JRuby 1.7.4
+* Rubinius nightly
 
 If something doesn't work on one of these interpreters, it should be
 considered a bug.
