@@ -288,6 +288,26 @@ include::{fixturesdir}/include-file.{ext}[]
       assert_match(/included content/, output)
     end
 
+    test 'line is dropped if target of include macro resolves to empty' do
+      input = <<-EOS
+include::{foodir}/include-file.asciidoc[]
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert output.strip.empty?
+    end
+
+    test 'line is dropped but not following line if target of include macro resolves to empty' do
+      input = <<-EOS
+include::{foodir}/include-file.asciidoc[]
+yo
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_xpath '//p', output, 1
+      assert_xpath '//p[text()="yo"]', output, 1
+    end
+
     test 'escaped include macro is left unprocessed' do
       input = <<-EOS
 \\include::include-file.asciidoc[]

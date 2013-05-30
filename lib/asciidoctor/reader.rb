@@ -426,9 +426,13 @@ class Reader
   # returns a Boolean indicating whether the line under the cursor has changed.
   def preprocess_include(target, raw_attributes)
     target = @document.sub_attributes target
+    if target.empty?
+      advance
+      @next_line_preprocessed = false
+      false
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
-    if @document.safe >= SafeMode::SECURE
+    elsif @document.safe >= SafeMode::SECURE
       @lines[0] = "link:#{target}[#{target}]\n"
       @next_line_preprocessed = true
       false
