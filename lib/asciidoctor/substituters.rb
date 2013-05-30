@@ -295,7 +295,7 @@ module Substituters
           case directive
           when 'set'
             args = expr.split(':')
-            name, value = Lexer::store_attribute(args[0], args[1] || '', @document)
+            _, value = Lexer::store_attribute(args[0], args[1] || '', @document)
             if value.nil?
               reject = true
               break '{undefined}'
@@ -354,14 +354,15 @@ module Substituters
     if experimental
       if found[:macroish_short_form] && result.include?('kbd:')
         result.gsub!(REGEXP[:kbd_macro]) {
-          captured = $~[0]
-          keys = $~[1]
+          # alias match for Ruby 1.8.7 compat
+          m = $~
           # honor the escape
-          if captured.start_with? '\\'
+          if (captured = m[0]).start_with? '\\'
             next captured[1..-1]
           end
 
-          keys = unescape_bracketed_text keys
+          keys = unescape_bracketed_text m[1]
+
           if keys == '+'
             keys = ['+']
           else
@@ -379,19 +380,52 @@ module Substituters
           Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).render 
         }
       end
+      
+      if found[:macroish] && result.include?('menu:')
+        result.gsub!(REGEXP[:menu_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if (captured = m[0]).start_with? '\\'
+            next captured[1..-1]
+          end
 
-      result.gsub!(REGEXP[:menu_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        #menu = m[2] || m[3]
-        #submenu = m[5]
-        #item = m[7] || m[8]
-        menu = m[2] || m[3]
-        submenu = m[6] || m[7]
-        item = m[9] || m[10]
+          menu = m[1]
+          items = m[2]
 
-        Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenu' => submenu, 'item' => item}).render
-      }
+          if items.nil?
+            submenus = []
+            menuitem = nil
+          else
+            if (delim = items.include?('&gt;') ? '&gt;' : (items.include?(',') ? ',' : nil))
+              submenus = items.split(delim).map(&:strip)
+              menuitem = submenus.pop
+            else
+              submenus = []
+              menuitem = items.rstrip
+            end
+          end
+
+          Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).render
+        }
+      end
+
+      if result.include?('"') && result.include?('&gt;')
+        result.gsub!(REGEXP[:menu_inline_macro]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if (captured = m[0]).start_with? '\\'
+            next captured[1..-1]
+          end
+
+          input = m[1]
+
+          menu, *submenus = input.split('&gt;').map(&:strip)
+          menuitem = submenus.pop 
+          Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).render
+        }
+      end
     end
 
     if found[:macroish] && result.include?('image:')

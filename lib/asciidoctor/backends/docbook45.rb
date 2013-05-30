@@ -667,16 +667,19 @@ class InlineKbdTemplate < BaseTemplate
 end
 
 class InlineMenuTemplate < BaseTemplate
-  def menu(menu, submenu, item)
-    if submenu
-      %(<menuchoice><guimenu>#{menu}</guimenu> <guisubmenu>#{submenu}</guisubmenu> <guimenuitem>#{item}</guimenuitem></menuchoice>)
+  def menu(menu, submenus, menuitem)
+    if !submenus.empty?
+      submenu_path = submenus.map{|submenu| %(<guisubmenu>#{submenu}</guisubmenu> ) }.join.chop
+      %(<menuchoice><guimenu>#{menu}</guimenu> #{submenu_path} <guimenuitem>#{menuitem}</guimenuitem></menuchoice>)
+    elsif !menuitem.nil?
+      %(<menuchoice><guimenu>#{menu}</guimenu> <guimenuitem>#{menuitem}</guimenuitem></menuchoice>)
     else
-      %(<menuchoice><guimenu>#{menu}</guimenu> <guimenuitem>#{item}</guimenuitem></menuchoice>)
+      %(<guimenu>#{menu}</guimenu>)
     end
   end
 
   def result(node)
-    menu(node.attr('menu'), node.attr('submenu'), node.attr('item'))
+    menu(node.attr('menu'), node.attr('submenus'), node.attr('menuitem'))
   end
 
   def template
