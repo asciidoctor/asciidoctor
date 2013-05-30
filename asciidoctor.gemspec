@@ -57,6 +57,7 @@ EOS
     lib/asciidoctor/abstract_block.rb
     lib/asciidoctor/abstract_node.rb
     lib/asciidoctor/attribute_list.rb
+    lib/asciidoctor/backends/_stylesheets.rb
     lib/asciidoctor/backends/base_template.rb
     lib/asciidoctor/backends/docbook45.rb
     lib/asciidoctor/backends/html5.rb
