@@ -648,14 +648,7 @@ class Document < AbstractBlock
     if safe >= SafeMode::SECURE
       ''
     else
-      if ext.nil?
-        case @attributes['basebackend']
-        when 'docbook'
-          ext = '.xml'
-        when 'html'
-          ext = '.html'
-        end
-      end
+      ext = @attributes['outfilesuffix'] if ext.nil?
 
       content = nil
 
