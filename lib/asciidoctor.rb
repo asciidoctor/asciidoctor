@@ -366,6 +366,14 @@ module Asciidoctor
     # kbd:[Ctrl,T]
     :kbd_macro        => /\\?kbd:\[((?:\\\]|[^\]])+?)\]/,
 
+    # menu:File[New...]
+    # menu:View[Page Style > No Style]
+    # menu:View[Page Style, No Style]
+    :menu_macro       => /\\?menu:(\w|\w.*?\S)\[[[:blank:]]*(.+?)?\]/,
+
+    # "File > New..."
+    :menu_inline_macro  => /\\?"([^"[:blank:]][^"]*?[[:blank:]]*&gt;[[:blank:]]*[^"[:blank:]][^"]*)"/,
+
     # image::filename.png[Caption]
     # video::http://youtube.com/12345[Cats vs Dogs]
     :media_blk_macro  => /^(image|video|audio)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/,

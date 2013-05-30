@@ -2167,7 +2167,7 @@ class Lexer
     # strip leading block indent
     offsets = lines.map do |line|
       # break if the first char is non-whitespace
-      break [] unless (first_char = line.chomp[0..0]).lstrip.empty?
+      break [] unless line.chomp[0..0].lstrip.empty?
       if line.include? "\t"
         tab_detected = true
         line = line.gsub("\t", tab_expansion)

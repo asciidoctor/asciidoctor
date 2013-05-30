@@ -628,42 +628,89 @@ context 'Substitutions' do
   
       test 'kbd macro with key combination' do
         para = block_from_string('kbd:[Ctrl+Shift+T]', :attributes => {'experimental' => ''})
-        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></kbd>}, para.sub_macros(para.buffer.join)
+        assert_equal %q{<kbd class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></kbd>}, para.sub_macros(para.buffer.join)
       end
   
       test 'kbd macro with key combination with spaces' do
         para = block_from_string('kbd:[Ctrl + Shift + T]', :attributes => {'experimental' => ''})
-        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></kbd>}, para.sub_macros(para.buffer.join)
+        assert_equal %q{<kbd class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></kbd>}, para.sub_macros(para.buffer.join)
       end
   
       test 'kbd macro with key combination delimited by commas' do
         para = block_from_string('kbd:[Ctrl,Shift,T]', :attributes => {'experimental' => ''})
-        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></kbd>}, para.sub_macros(para.buffer.join)
+        assert_equal %q{<kbd class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></kbd>}, para.sub_macros(para.buffer.join)
       end
   
       test 'kbd macro with key combination containing a plus key no spaces' do
         para = block_from_string('kbd:[Ctrl++]', :attributes => {'experimental' => ''})
-        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>+</kbd></kbd>}, para.sub_macros(para.buffer.join)
+        assert_equal %q{<kbd class="keyseq"><kbd>Ctrl</kbd>+<kbd>+</kbd></kbd>}, para.sub_macros(para.buffer.join)
       end
   
       test 'kbd macro with key combination delimited by commands containing a comma key' do
         para = block_from_string('kbd:[Ctrl,,]', :attributes => {'experimental' => ''})
-        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>,</kbd></kbd>}, para.sub_macros(para.buffer.join)
+        assert_equal %q{<kbd class="keyseq"><kbd>Ctrl</kbd>+<kbd>,</kbd></kbd>}, para.sub_macros(para.buffer.join)
       end
   
       test 'kbd macro with key combination containing a plus key with spaces' do
         para = block_from_string('kbd:[Ctrl + +]', :attributes => {'experimental' => ''})
-        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>+</kbd></kbd>}, para.sub_macros(para.buffer.join)
+        assert_equal %q{<kbd class="keyseq"><kbd>Ctrl</kbd>+<kbd>+</kbd></kbd>}, para.sub_macros(para.buffer.join)
       end
   
       test 'kbd macro with key combination containing escaped bracket' do
         para = block_from_string('kbd:[Ctrl + \]]', :attributes => {'experimental' => ''})
-        assert_equal %q{<kbd class="combo"><kbd>Ctrl</kbd>+<kbd>]</kbd></kbd>}, para.sub_macros(para.buffer.join)
+        assert_equal %q{<kbd class="keyseq"><kbd>Ctrl</kbd>+<kbd>]</kbd></kbd>}, para.sub_macros(para.buffer.join)
       end
   
       test 'kbd macro with key combination, docbook backend' do
         para = block_from_string('kbd:[Ctrl+Shift+T]', :backend => 'docbook', :attributes => {'experimental' => ''})
         assert_equal %q{<keycombo><keycap>Ctrl</keycap><keycap>Shift</keycap><keycap>T</keycap></keycombo>}, para.sub_macros(para.buffer.join)
+      end
+    end
+
+    context 'Menu macro' do
+      test 'should process menu using macro sytnax' do
+        para = block_from_string('menu:File[]', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menu">File</span>},para.sub_macros(para.buffer.join)
+      end
+
+      test 'should process menu for docbook backend' do
+        para = block_from_string('menu:File[]', :backend => 'docbook', :attributes => {'experimental' => ''})
+        assert_equal %q{<guimenu>File</guimenu>},para.sub_macros(para.buffer.join)
+      end
+
+      test 'should process menu with menu item using macro syntax' do
+        para = block_from_string('menu:File[Save As&#8230;]', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menuseq"><span class="menu">File</span>&#160;&#9656; <span class="menuitem">Save As&#8230;</span></span>},para.sub_macros(para.buffer.join)
+      end
+
+      test 'should process menu with menu item for docbook backend' do
+        para = block_from_string('menu:File[Save As&#8230;]', :backend => 'docbook', :attributes => {'experimental' => ''})
+        assert_equal %q{<menuchoice><guimenu>File</guimenu> <guimenuitem>Save As&#8230;</guimenuitem></menuchoice>},para.sub_macros(para.buffer.join)
+      end
+
+      test 'should process menu with menu item in submenu using macro syntax' do
+        para = block_from_string('menu:Tools[Project &gt; Build]', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menuseq"><span class="menu">Tools</span>&#160;&#9656; <span class="submenu">Project</span>&#160;&#9656; <span class="menuitem">Build</span></span>},para.sub_macros(para.buffer.join)
+      end
+
+      test 'should process menu with menu item in submenu for docbook backend' do
+        para = block_from_string('menu:Tools[Project &gt; Build]', :backend => 'docbook', :attributes => {'experimental' => ''})
+        assert_equal %q{<menuchoice><guimenu>Tools</guimenu> <guisubmenu>Project</guisubmenu> <guimenuitem>Build</guimenuitem></menuchoice>},para.sub_macros(para.buffer.join)
+      end
+
+      test 'should process menu with menu item in submenu using macro syntax and comma delimiter' do
+        para = block_from_string('menu:Tools[Project, Build]', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menuseq"><span class="menu">Tools</span>&#160;&#9656; <span class="submenu">Project</span>&#160;&#9656; <span class="menuitem">Build</span></span>},para.sub_macros(para.buffer.join)
+      end
+
+      test 'should process menu with menu item using inline syntax' do
+        para = block_from_string('"File &gt; Save As&#8230;"', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menuseq"><span class="menu">File</span>&#160;&#9656; <span class="menuitem">Save As&#8230;</span></span>},para.sub_macros(para.buffer.join)
+      end
+
+      test 'should process menu with menu item in submenu using inline syntax' do
+        para = block_from_string('"Tools &gt; Project &gt; Build"', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menuseq"><span class="menu">Tools</span>&#160;&#9656; <span class="submenu">Project</span>&#160;&#9656; <span class="menuitem">Build</span></span>},para.sub_macros(para.buffer.join)
       end
     end
   end
