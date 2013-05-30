@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   ## name, version, date and rubyforge_project are updated automatically by the
   ## Rake build (see the validate task)
   s.name              = 'asciidoctor'
-  s.version           = '0.1.3.pre'
-  s.date              = '2013-04-26'
+  s.version           = '0.1.3'
+  s.date              = '2013-05-30'
   s.rubyforge_project = 'asciidoctor'
 
   s.summary     = 'A native Ruby AsciiDoc syntax processor and publishing toolchain'
@@ -46,6 +46,7 @@ EOS
   # = MANIFEST =
   s.files = %w[
     Gemfile
+    Guardfile
     LICENSE
     README.adoc
     Rakefile
