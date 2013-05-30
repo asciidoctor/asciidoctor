@@ -615,6 +615,18 @@ context 'Substitutions' do
       assert_equal ['panthera tigris'], terms[1]
     end
 
+    context 'Button macro' do
+      test 'btn macro' do
+        para = block_from_string('btn:[Save]', :attributes => {'experimental' => ''})
+        assert_equal %q{<b class="button">Save</b>}, para.sub_macros(para.buffer.join)
+      end
+
+      test 'btn macro for docbook backend' do
+        para = block_from_string('btn:[Save]', :backend => 'docbook', :attributes => {'experimental' => ''})
+        assert_equal %q{<guibutton>Save</guibutton>}, para.sub_macros(para.buffer.join)
+      end
+    end
+
     context 'Keyboard macro' do
       test 'kbd macro with single key' do
         para = block_from_string('kbd:[F3]', :attributes => {'experimental' => ''})
