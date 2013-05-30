@@ -373,7 +373,7 @@ module Asciidoctor
     :menu_macro       => /\\?menu:(\w|\w.*?\S)\[[[:blank:]]*(.+?)?\]/,
 
     # "File > New..."
-    :menu_inline_macro  => /\\?"([^"[:blank:]][^"]*?[[:blank:]]*&gt;[[:blank:]]*[^"[:blank:]][^"]*)"/,
+    :menu_inline_macro  => /\\?"(\w[^"]*?[[:blank:]]*&gt;[[:blank:]]*[^"[:blank:]][^"]*)"/,
 
     # image::filename.png[Caption]
     # video::http://youtube.com/12345[Cats vs Dogs]
