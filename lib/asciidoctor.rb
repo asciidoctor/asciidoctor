@@ -5,7 +5,6 @@ require 'strscan'
 require 'set'
 
 $:.unshift(File.dirname(__FILE__))
-#$:.unshift(File.join(File.dirname(__FILE__), '..', 'vendor'))
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
 # using eRuby templates.
@@ -139,13 +138,11 @@ module Asciidoctor
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'].to_set
 
-  # NOTE: AsciiDoc doesn't support pass style for paragraph
   PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro'].to_set
 
   VERBATIM_STYLES = ['literal', 'listing', 'source', 'verse'].to_set
 
   DELIMITED_BLOCKS = {
-    # NOTE: AsciiDoc doesn't support pass style for open block
     '--'   => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro'].to_set],
     '----' => [:listing, ['literal', 'source'].to_set],
     '....' => [:literal, ['listing', 'source'].to_set],
@@ -352,8 +349,6 @@ module Asciidoctor
                            '::::' => /^[[:blank:]]*((?:.*[^:])?)(::::)(?:[[:blank:]]+(.*))?$/,
                            ';;' => /^[[:blank:]]*(.*)(;;)(?:[[:blank:]]+(.*))?$/
                          },
-    # ====
-    #:example          => /^={4,}$/,
 
     # footnote:[text]
     # footnoteref:[id,text]
@@ -418,17 +413,8 @@ module Asciidoctor
     # doc.writer@asciidoc.org
     :email_inline     => /[\\>:]?\w[\w.%+-]*@[[:alnum:]][[:alnum:].-]*\.[[:alpha:]]{2,4}\b/, 
 
-    # ----
-    #:listing          => /^\-{4,}$/,
-
-    # ....
-    #:literal          => /^\.{4,}$/,
-
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
     :lit_par          => /^([[:blank:]]+.*)$/,
-
-    # --
-    #:open_blk         => /^\-\-$/,
 
     # . Foo (up to 5 consecutive dots)
     # 1. Foo (arabic, default)
@@ -442,9 +428,6 @@ module Asciidoctor
     # ''' (ruler)
     # <<< (pagebreak)
     :break_line        => /^('|<){3,}$/,
-
-    # ++++
-    #:pass             => /^\+{4,}$/,
 
     # inline passthrough macros
     # +++text+++
@@ -463,19 +446,10 @@ module Asciidoctor
     # placeholder for extracted passthrough text
     :pass_placeholder => /\e(\d+)\e/,
 
-    # ____
-    #:quote            => /^_{4,}$/,
-
     # The document revision info line the appears immediately following the
     # document title author info line, if present
     # v1.0, 2013-01-01: Ring in the new year release
     :revision_info    => /^(?:\D*(.*?),)?(?:\s*(?!:)(.*?))(?:\s*(?!^):\s*(.*))?$/,
-
-    # '''
-    #:ruler            => /^'{3,}$/,
-
-    # ****
-    #:sidebar_blk      => /^\*{4,}$/,
 
     # \' within a word
     :single_quote_esc => /(\w)\\'(\w)/,
@@ -484,16 +458,6 @@ module Asciidoctor
 
     # used for sanitizing attribute names
     :illegal_attr_name_chars => /[^\w\-]/,
-
-    # |===
-    # |table
-    # |===
-    #:table            => /^\|={3,}$/,
-
-    # !===
-    # !table
-    # !===
-    #:table_nested     => /^!={3,}$/,
 
     # 1*h,2*,^3e
     :table_colspec    => /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+)?([a-z])?$/,
@@ -933,14 +897,6 @@ module Asciidoctor
   def self.render_file(filename, options = {}, &block)
     Asciidoctor.render(File.new(filename), options, &block)
   end
-
-  # NOTE still contemplating this method
-  #def self.parse_document_header(input, options = {})
-  #  document = Document.new [], options
-  #  reader = Reader.new input, document, true
-  #  Lexer.parse_document_header reader, document
-  #  document
-  #end
 
   # modules
   require 'asciidoctor/debug'

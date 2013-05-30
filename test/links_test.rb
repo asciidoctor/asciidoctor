@@ -74,12 +74,12 @@ context 'Links' do
     assert_xpath '//a[@href="http://github.com/asciidoctor"]', render_string('Asciidoctor GitHub organization: <**http://github.com/asciidoctor**>'), 1
   end
 
-  test 'link with quoted text should not be separated into attributes when use-link-attrs is set' do
-    assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing"]', render_embedded_string('http://search.example.com["Google, Yahoo, Bing"]', :attributes => {'use-link-attrs' => ''}), 1
+  test 'link with quoted text should not be separated into attributes when linkattrs is set' do
+    assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing"]', render_embedded_string('http://search.example.com["Google, Yahoo, Bing"]', :attributes => {'linkattrs' => ''}), 1
   end
 
-  test 'role and window attributes on link are processed when use-link-attrs is set' do
-    assert_xpath '//a[@href="http://google.com"][@class="external"][@target="_blank"]', render_embedded_string('http://google.com[Google, role="external", window="_blank"]', :attributes => {'use-link-attrs' => ''}), 1
+  test 'role and window attributes on link are processed when linkattrs is set' do
+    assert_xpath '//a[@href="http://google.com"][@class="external"][@target="_blank"]', render_embedded_string('http://google.com[Google, role="external", window="_blank"]', :attributes => {'linkattrs' => ''}), 1
   end
 
   test 'link text that ends in ^ should set link window to _blank' do

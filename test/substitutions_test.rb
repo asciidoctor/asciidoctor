@@ -9,7 +9,7 @@ context 'Substitutions' do
       para = block_from_string("[blue]'http://asciidoc.org[AsciiDoc]' & [red]*Ruby*\n&#167; Making +++<u>documentation</u>+++ together +\nsince (C) {inception_year}.")
       para.document.attributes['inception_year'] = '2012'
       result = para.apply_normal_subs(para.buffer) 
-      assert_equal %{<em><span class="blue"><a href="http://asciidoc.org">AsciiDoc</a></span></em> &amp; <strong><span class="red">Ruby</span></strong>\n&#167; Making <u>documentation</u> together<br>\nsince &#169; 2012.}, result
+      assert_equal %{<em class="blue"><a href="http://asciidoc.org">AsciiDoc</a></em> &amp; <strong class="red">Ruby</strong>\n&#167; Making <u>documentation</u> together<br>\nsince &#169; 2012.}, result
     end
   end
 
@@ -195,7 +195,7 @@ context 'Substitutions' do
 
     test 'unconstrained strong chars with role' do
       para = block_from_string(%q{Git[blue]**Hub**})
-      assert_equal %q{Git<strong><span class="blue">Hub</span></strong>}, para.sub_quotes(para.buffer.join)
+      assert_equal %q{Git<strong class="blue">Hub</strong>}, para.sub_quotes(para.buffer.join)
     end
 
     # TODO this is not the same result as AsciiDoc, though I don't understand why AsciiDoc gets what it gets
@@ -221,7 +221,7 @@ context 'Substitutions' do
 
     test 'unconstrained emphasis chars with role' do
       para = block_from_string(%q{[gray]__Git__Hub})
-      assert_equal %q{<em><span class="gray">Git</span></em>Hub}, para.sub_quotes(para.buffer.join)
+      assert_equal %q{<em class="gray">Git</em>Hub}, para.sub_quotes(para.buffer.join)
     end
 
     test 'escaped unconstrained emphasis chars with role' do
@@ -297,12 +297,12 @@ context 'Substitutions' do
     end
 
     test 'a mailto macro with text and subject should be interpreted as a mailto link' do
-      para = block_from_string('mailto:doc.writer@asciidoc.org[Doc Writer, Pull request]', :attributes => {'use-link-attrs' => ''})
+      para = block_from_string('mailto:doc.writer@asciidoc.org[Doc Writer, Pull request]', :attributes => {'linkattrs' => ''})
       assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request">Doc Writer</a>}, para.sub_macros(para.buffer.join)
     end
 
     test 'a mailto macro with text, subject and body should be interpreted as a mailto link' do
-      para = block_from_string('mailto:doc.writer@asciidoc.org[Doc Writer, Pull request, Please accept my pull request]', :attributes => {'use-link-attrs' => ''})
+      para = block_from_string('mailto:doc.writer@asciidoc.org[Doc Writer, Pull request, Please accept my pull request]', :attributes => {'linkattrs' => ''})
       assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request&amp;body=Please%20accept%20my%20pull%20request">Doc Writer</a>}, para.sub_macros(para.buffer.join)
     end
 

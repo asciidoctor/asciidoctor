@@ -348,7 +348,7 @@ module Substituters
     found[:macroish] = (found[:square_bracket] && found[:colon])
     found[:macroish_short_form] = (found[:square_bracket] && found[:colon] && result.include?(':['))
     found[:uri] = (found[:colon] && result.include?('://'))
-    use_link_attrs = @document.attributes.has_key?('use-link-attrs')
+    use_link_attrs = @document.attributes.has_key?('linkattrs')
     experimental = @document.attributes.has_key?('experimental')
 
     if experimental
@@ -507,6 +507,9 @@ module Substituters
         elsif prefix.start_with?('(') && target.end_with?(')')
           target = target[0..-2]
           suffix = ')'
+        elsif target.end_with?('):')
+          target = target[0..-3]
+          suffix = '):'
         end
         @document.register(:links, target)
 
