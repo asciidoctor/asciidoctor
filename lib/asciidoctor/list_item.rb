@@ -55,27 +55,6 @@ class ListItem < AbstractBlock
     nil
   end
 
-  def splain(parent_level = 0)
-    parent_level += 1
-    Debug.puts_indented(parent_level, "List Item anchor: #{@anchor}") unless @anchor.nil?
-    Debug.puts_indented(parent_level, "Text: #{@text}") unless @text.nil?
-
-    Debug.puts_indented(parent_level, "Blocks: #{@blocks.count}")
-
-    if @blocks.any?
-      Debug.puts_indented(parent_level, "Blocks content (#{@blocks.count}):")
-      @blocks.each_with_index do |block, i|
-        Debug.puts_indented(parent_level, "v" * (60 - parent_level*2))
-        Debug.puts_indented(parent_level, "Block ##{i} is a #{block.class}")
-        Debug.puts_indented(parent_level, "Name is #{block.title rescue 'n/a'}")
-        Debug.puts_indented(parent_level, "=" * 40)
-        block.splain(parent_level) if block.respond_to? :splain
-        Debug.puts_indented(parent_level, "^" * (60 - parent_level*2))
-      end
-    end
-    nil
-  end
-
   def to_s
     "#{super.to_s} - #@context [text:#@text, blocks:#{(@blocks || []).size}]"
   end

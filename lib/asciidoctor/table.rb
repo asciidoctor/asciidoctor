@@ -59,7 +59,7 @@ class Table < AbstractBlock
     @rows = Rows.new([], [], [])
     @columns = []
 
-    @header_option = attributes.has_key? 'header-option'
+    @has_header_option = attributes.has_key? 'header-option'
 
     # smell like we need a utility method here
     # to resolve an integer width from potential bogus input
@@ -76,9 +76,10 @@ class Table < AbstractBlock
     end
   end
 
-  # Internal: Returns the index of the row being processed
-  def row_index
-    @rows.body.size
+  # Internal: Returns whether the current row being processed is
+  # the header row
+  def header_row?
+    @has_header_option && @rows.body.size == 0
   end
 
   # Internal: Creates the Column objects from the column spec
@@ -130,9 +131,6 @@ class Table < AbstractBlock
   # rendered and returned as content that can be included in the
   # parent block's template.
   def render
-    Debug.debug { "Now attempting to render for table my own bad #{self}" }
-    Debug.debug { "Parent is #{@parent}" }
-    Debug.debug { "Renderer is #{renderer}" }
     @document.playback_attributes @attributes
     renderer.render('block_table', self) 
   end
@@ -153,6 +151,9 @@ class Table::Column < AbstractNode
     attributes['valign'] ||= 'top'
     update_attributes(attributes)
   end
+
+  # Public: An alias to the parent block (which is always a Table)
+  alias :table :parent
 
   # Internal: Calculate and assign the widths (percentage and absolute) for this column
   #
@@ -210,7 +211,7 @@ class Table::Cell < AbstractNode
       update_attributes(attributes)
     end
     # only allow AsciiDoc cells in non-header rows
-    if @attributes['style'] == :asciidoc && (!column.parent.header_option || column.parent.row_index > 0)
+    if @attributes['style'] == :asciidoc && !column.table.header_row?
       # FIXME hide doctitle from nested document; temporary workaround to fix
       # nested document seeing doctitle and assuming it has its own document title
       parent_doctitle = @document.attributes.delete('doctitle')

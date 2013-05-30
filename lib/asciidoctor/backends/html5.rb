@@ -222,8 +222,8 @@ end
 class BlockPreambleTemplate < BaseTemplate
   def toc(node)
     if (node.attr? 'toc') && (node.attr? 'toc-placement', 'preamble')
-      %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
-  <div id="toctitle">#{node.attr 'toc-title'}</div>
+      %(\n<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
+<div id="toctitle">#{node.attr 'toc-title'}</div>
 #{DocumentTemplate.outline(node.document, (node.attr 'toclevels', 2).to_i)}
 </div>)
     else
@@ -234,10 +234,9 @@ class BlockPreambleTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div id="preamble">
-  <div class="sectionbody">
+<div class="sectionbody">
 <%= content %>
-  </div>
-<%= template.toc(self) %>
+</div><%= template.toc(self) %>
 </div>
     EOS
   end
@@ -268,7 +267,7 @@ class SectionTemplate < BaseTemplate
 
     if slevel == 0
       %(<h1#{id} class="sect0">#{anchor}#{link_start}#{sec.title}#{link_end}</h1>
-#{sec.content})
+#{sec.content}\n)
     else
       role = (sec.attr? 'role') ? " #{sec.attr 'role'}" : nil
       if !sec.special && (sec.document.attr? 'numbered') && slevel < 4
@@ -278,14 +277,14 @@ class SectionTemplate < BaseTemplate
       end
 
       if slevel == 1
-        content = %(  <div class="sectionbody">
+        content = %(<div class="sectionbody">
 #{sec.content}
-  </div>)
+</div>)
       else
         content = sec.content
       end
       %(<div class="sect#{slevel}#{role}">
-  <#{htag}#{id}>#{anchor}#{link_start}#{sectnum}#{sec.caption}#{sec.title}#{link_end}</#{htag}>
+<#{htag}#{id}>#{anchor}#{link_start}#{sectnum}#{sec.caption}#{sec.title}#{link_end}</#{htag}>
 #{content}
 </div>\n)
     end
@@ -346,11 +345,13 @@ elsif attr? 'style', 'horizontal', false
 if title? %>
 <div class="title"><%= title %></div><%
 end %>
-<table>
+<table><%
+if (attr? :labelwidth) || (attr? :itemwidth) %>
 <colgroup>
-<col<% if attr? :labelwidth %> style="width:<%= attr :labelwidth %>%;"<% end %>>
-<col<% if attr? :itemwidth %> style="width:<%= attr :itemwidth %>%;"<% end %>>
+<col<% if attr? :labelwidth %> style="width:<%= (attr :labelwidth).chomp('%') %>%;"<% end %>>
+<col<% if attr? :itemwidth %> style="width:<%= (attr :itemwidth).chomp('%') %>%;"<% end %>>
 </colgroup><%
+end %><%
   entries.each_with_index do |(dt, dd), index|
     last = (index == last_index)
     unless continuing %>
@@ -369,7 +370,7 @@ end %>
 <td class="hdlist2"><%
     unless dd.nil?
       if dd.text? %>
-<p style="margin-top: 0;"><%= dd.text %></p><%
+<p><%= dd.text %></p><%
       end
       if dd.blocks? %>
 <%= dd.content %><%
@@ -444,10 +445,10 @@ class BlockLiteralTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="literalblock#{role_class}">
-  #{title_div}
-  <div class="content monospaced">
-    <pre><%= template.preserve_endlines(content, self) %></pre>
-  </div>
+#{title_div}
+<div class="content monospaced">
+<pre><%= template.preserve_endlines(content, self) %></pre>
+</div>
 </div>
     EOS
   end
@@ -457,23 +458,23 @@ class BlockAdmonitionTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="admonitionblock <%= attr :name %>#{role_class}">
-  <table>
-    <tr>
-      <td class="icon"><%
-        if attr? 'icons', 'font' %>
-        <i class="icon-<%= attr :name %>" title="<%= @caption %>"></i><%
-        elsif attr? 'icons' %>
-        <img src="<%= icon_uri(attr :name) %>" alt="<%= @caption %>"><%
-        else %>
-        <div class="title"><%= @caption %></div><%
-        end %>
-      </td>
-      <td class="content">
-        #{title_div}
-        <%= content %>
-      </td>
-    </tr>
-  </table>
+<table>
+<tr>
+<td class="icon"><%
+if attr? 'icons', 'font' %>
+<i class="icon-<%= attr :name %>" title="<%= @caption %>"></i><%
+elsif attr? 'icons' %>
+<img src="<%= icon_uri(attr :name) %>" alt="<%= @caption %>"><%
+else %>
+<div class="title"><%= @caption %></div><%
+end %>
+</td>
+<td class="content">
+#{title_div}
+<%= content %>
+</td>
+</tr>
+</table>
 </div>
     EOS
   end
@@ -482,8 +483,8 @@ end
 class BlockParagraphTemplate < BaseTemplate
   def paragraph(id, role, title, content)
     %(<div#{id && " id=\"#{id}\""} class="paragraph#{role && " #{role}"}">#{title && "
-  <div class=\"title\">#{title}</div>"}
-  <p>#{content}</p>
+<div class=\"title\">#{title}</div>"}
+<p>#{content}</p>
 </div>\n)
   end
 
@@ -500,10 +501,10 @@ class BlockSidebarTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="sidebarblock#{role_class}">
-  <div class="content">
-    #{title_div}
+<div class="content">
+#{title_div}
 <%= content %>
-  </div>
+</div>
 </div>
     EOS
   end
@@ -513,10 +514,10 @@ class BlockExampleTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="exampleblock#{role_class}">
-  #{title_div :caption => true}
-  <div class="content">
+#{title_div :caption => true}
+<div class="content">
 <%= content %>
-  </div>
+</div>
 </div>
     EOS
   end
@@ -568,18 +569,23 @@ class BlockQuoteTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="quoteblock#{role_class}">
-  #{title_div}
-  <blockquote>
+#{title_div}
+<blockquote>
 <%= content %>
-  </blockquote><%
-  if (attr? :attribution) || (attr? :citetitle) %>
-  <div class="attribution"><%
+</blockquote><%
+if (attr? :attribution) || (attr? :citetitle) %>
+<div class="attribution"><%
+  if attr? :citetitle %>
+<cite><%= attr :citetitle %></cite><%
+  end
+  if attr? :attribution
     if attr? :citetitle %>
-    <cite><%= attr :citetitle %></cite><% end %><%
-    if attr? :attribution %><% if attr? :citetitle %>
-    <br><% end %>
-    <%= "&#8212; \#{attr :attribution}" %><% end %>
-  </div><% end %>
+<br><%
+    end %>
+<%= "&#8212; \#{attr :attribution}" %><%
+  end %>
+</div><%
+end %>
 </div>
     EOS
   end
@@ -589,16 +595,21 @@ class BlockVerseTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="verseblock#{role_class}">
-  #{title_div}
-  <pre class="content"><%= template.preserve_endlines(content, self) %></pre><%
-  if (attr? :attribution) || (attr? :citetitle) %>
-  <div class="attribution"><%
+#{title_div}
+<pre class="content"><%= template.preserve_endlines(content, self) %></pre><%
+if (attr? :attribution) || (attr? :citetitle) %>
+<div class="attribution"><%
+  if attr? :citetitle %>
+<cite><%= attr :citetitle %></cite><%
+  end
+  if attr? :attribution
     if attr? :citetitle %>
-    <cite><%= attr :citetitle %></cite><% end %><%
-    if attr? :attribution %><% if attr? :citetitle %>
-    <br><% end %>
-    <%= "&#8212; \#{attr :attribution}" %><% end %>
-  </div><% end %>
+<br><%
+    end %>
+<%= "&#8212; \#{attr :attribution}" %><%
+  end %>
+  </div><%
+end %>
 </div>
     EOS
   end
@@ -608,17 +619,17 @@ class BlockUlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="ulist#{style_class}#{role_class}">
-  #{title_div}
-  <ul>
-  <% content.each do |item| %>
-    <li>
-      <p><%= item.text %></p>
-      <% if item.blocks? %>
-<%= item.content %>
-      <% end %>
-    </li>
-  <% end %>
-  </ul>
+#{title_div}
+<ul><%
+content.each do |item| %>
+<li>
+<p><%= item.text %></p><%
+  if item.blocks? %>
+<%= item.content %><%
+  end %>
+</li><%
+end %>
+</ul>
 </div>
     EOS
   end
@@ -629,17 +640,17 @@ class BlockOlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><% style = attr 'style', nil, false %><div#{id} class="olist#{style_class}#{role_class}">
-  #{title_div}
-  <ol class="<%= style %>"<%= (type = ::Asciidoctor::ORDERED_LIST_KEYWORDS[style]) ? %( type="\#{type}") : nil %>#{attribute('start', :start)}>
-  <% content.each do |item| %>
-    <li>
-      <p><%= item.text %></p>
-      <% if item.blocks? %>
-<%= item.content %>
-      <% end %>
-    </li>
-  <% end %>
-  </ol>
+#{title_div}
+<ol class="<%= style %>"<%= (type = ::Asciidoctor::ORDERED_LIST_KEYWORDS[style]) ? %( type="\#{type}") : nil %>#{attribute('start', :start)}><%
+content.each do |item| %>
+<li>
+<p><%= item.text %></p><%
+  if item.blocks? %>
+<%= item.content %><%
+  end %>
+</li><%
+end %>
+</ol>
 </div>
     EOS
   end
@@ -681,44 +692,56 @@ class BlockTableTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><table#{id} class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%>#{role_class}" style="<%
 if !(attr? 'autowidth-option') %>width:<%= attr :tablepcwidth %>%; <% end %><%
-if attr? :float %>float: <%= attr :float %>; <% end %>">
-  <% if title? %>
-  <caption class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></caption>
-  <% end %>
-  <% if (attr :rowcount) >= 0 %>
-  <colgroup>
-    <% if attr? 'autowidth-option' %>
-    <% @columns.each do %>
-    <col>
-    <% end %>
-    <% else %>
-    <% @columns.each do |col| %>
-    <col style="width:<%= col.attr :colpcwidth %>%;">
-    <% end %>
-    <% end %>
-  </colgroup>
-  <% [:head, :foot, :body].select {|tsec| !@rows[tsec].empty? }.each do |tsec| %>
-  <t<%= tsec %>>
-    <% @rows[tsec].each do |row| %>
-    <tr>
-      <% row.each do |cell| %>
-      <<%= tsec == :head ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}<%
-      cell_content = ''
-      if tsec == :head %><% cell_content = cell.text %><% else %><%
-      case (cell.attr 'style', nil, false)
-        when :asciidoc %><% cell_content = %(<div>\#{cell.content}</div>) %><%
-        when :verse %><% cell_content = %(<div class="verse">\#{template.preserve_endlines(cell.text, self)}</div>) %><%
-        when :literal %><% cell_content = %(<div class="literal monospaced"><pre>\#{template.preserve_endlines(cell.text, self)}</pre></div>) %><%
-        when :header %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<p class="tableblock header">\#{text}</p>) %><% end %><%
-        else %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<p class="tableblock">\#{text}</p>) %><% end %><%
-      end %><% end %><%= (@document.attr? 'cellbgcolor') ? %( style="background-color:\#{@document.attr 'cellbgcolor'};") : nil
-      %>><%= cell_content %></<%= tsec == :head ? 'th' : 'td' %>>
-      <% end %>
-    </tr>
-    <% end %>
-  </t<%= tsec %>>
-  <% end %>
-  <% end %>
+if attr? :float %>float: <%= attr :float %>; <% end %>"><%
+if title? %>
+<caption class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></caption><%
+end
+if (attr :rowcount) >= 0 %>
+<colgroup><%
+  if attr? 'autowidth-option'
+    @columns.each do %>
+<col><%
+    end
+  else
+    @columns.each do |col| %>
+<col style="width:<%= col.attr :colpcwidth %>%;"><%
+    end
+  end %> 
+</colgroup><%
+  [:head, :foot, :body].select {|tsec| !@rows[tsec].empty? }.each do |tsec| %>
+<t<%= tsec %>><%
+    @rows[tsec].each do |row| %>
+<tr><%
+      row.each do |cell| %>
+<<%= tsec == :head ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}<%
+        cell_content = ''
+        if tsec == :head
+          cell_content = cell.text
+        else
+          case (cell.attr 'style', nil, false)
+          when :asciidoc
+            cell_content = %(<div>\#{cell.content}</div>)
+          when :verse
+            cell_content = %(<div class="verse">\#{template.preserve_endlines(cell.text, self)}</div>)
+          when :literal
+            cell_content = %(<div class="literal monospaced"><pre>\#{template.preserve_endlines(cell.text, self)}</pre></div>)
+          when :header
+            cell.content.each do |text|
+              cell_content = %(\#{cell_content}<p class="tableblock header">\#{text}</p>)
+            end
+          else
+            cell.content.each do |text|
+              cell_content = %(\#{cell_content}<p class="tableblock">\#{text}</p>)
+            end
+          end
+        end %><%= (@document.attr? 'cellbgcolor') ? %( style="background-color:\#{@document.attr 'cellbgcolor'};") : nil
+        %>><%= cell_content %></<%= tsec == :head ? 'th' : 'td' %>><%
+      end %>
+</tr><%
+    end %>
+</t<%= tsec %>><%
+  end
+end %>
 </table>
     EOS
   end
@@ -727,17 +750,18 @@ end
 class BlockImageTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="imageblock#{style_class}#{role_class}"<% if (attr? :align) || (attr? :float)
-%> style="<% if attr? :align %>text-align: <%= attr :align %><% if attr? :float %>; <% end %><% end %><% if attr? :float %>float: <%= attr :float %><% end %>"<% end
-%>>
-  <div class="content">
-    <% if attr? :link %>
-    <a class="image" href="<%= attr :link %>"><img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}></a>
-    <% else %>
-    <img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}>
-    <% end %>
-  </div>
-  #{title_div :caption => true}
+<%#encoding:UTF-8%><div#{id} class="imageblock#{style_class}#{role_class}"<%
+if (attr? :align) || (attr? :float) %> style="<%
+  if attr? :align %>text-align: <%= attr :align %><% if attr? :float %>; <% end %><% end %><% if attr? :float %>float: <%= attr :float %><% end %>"<%
+end %>>
+<div class="content"><%
+if attr? :link %>
+<a class="image" href="<%= attr :link %>"><img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}></a><%
+else %>
+<img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}><%
+end %>
+</div>
+#{title_div :caption => true}
 </div>
     EOS
   end
@@ -747,15 +771,15 @@ class BlockAudioTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="audioblock#{style_class}#{role_class}">
-  #{title_div :caption => true}
-  <div class="content">
-    <audio src="<%= media_uri(attr :target) %>"<% if
-        attr? 'autoplay-option' %> autoplay<% end %><%
-        unless attr? 'nocontrols-option' %> controls<% end %><%
-        if attr? 'loop-option' %> loop<% end %>>
-      Your browser does not support the audio tag.
-    </audio>
-  </div>
+#{title_div :caption => true}
+<div class="content">
+<audio src="<%= media_uri(attr :target) %>"<%
+if attr? 'autoplay-option' %> autoplay<% end %><%
+unless attr? 'nocontrols-option' %> controls<% end %><%
+if attr? 'loop-option' %> loop<% end %>>
+Your browser does not support the audio tag.
+</audio>
+</div>
 </div>
     EOS
   end
@@ -765,16 +789,16 @@ class BlockVideoTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="videoblock#{style_class}#{role_class}">
-  #{title_div :caption => true}
-  <div class="content">
-    <video src="<%= media_uri(attr :target) %>"#{attribute('width', :width)}#{attribute('height', :height)}<%
-        if attr? 'poster' %> poster="<%= media_uri(attr :poster) %>"<% end %><%
-        if attr? 'autoplay-option' %> autoplay<% end %><%
-        unless attr? 'nocontrols-option' %> controls<% end %><%
-        if attr? 'loop-option' %> loop<% end %>>
-      Your browser does not support the video tag.
-    </video>
-  </div>
+#{title_div :caption => true}
+<div class="content">
+<video src="<%= media_uri(attr :target) %>"#{attribute('width', :width)}#{attribute('height', :height)}<%
+if attr? 'poster' %> poster="<%= media_uri(attr :poster) %>"<% end %><%
+if attr? 'autoplay-option' %> autoplay<% end %><%
+unless attr? 'nocontrols-option' %> controls<% end %><%
+if attr? 'loop-option' %> loop<% end %>>
+Your browser does not support the video tag.
+</video>
+</div>
 </div>
     EOS
   end
@@ -830,7 +854,7 @@ end
 class InlineQuotedTemplate < BaseTemplate
   NO_TAGS = ['', '']
 
-  QUOTED_TAGS = {
+  QUOTE_TAGS = {
     :emphasis => ['<em>', '</em>'],
     :strong => ['<strong>', '</strong>'],
     :monospaced => ['<code>', '</code>'],
@@ -841,9 +865,13 @@ class InlineQuotedTemplate < BaseTemplate
   }
 
   def quote_text(text, type, role)
-    start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
+    start_tag, end_tag = QUOTE_TAGS[type] || NO_TAGS
     if role
-      %(#{start_tag}<span class="#{role}">#{text}</span>#{end_tag})
+      if start_tag.start_with? '<'
+        %(#{start_tag.chop} class="#{role}">#{text}#{end_tag})
+      else
+        %(#{start_tag}<span class="#{role}">#{text}</span>#{end_tag})
+      end
     else
       "#{start_tag}#{text}#{end_tag}"
     end

@@ -282,15 +282,6 @@ class Document < AbstractBlock
     Lexer.parse(@reader, self, :header_only => @options.fetch(:parse_header_only, false)) 
 
     @callouts.rewind
-
-    Debug.debug {
-      msg = []
-      msg << "Found #{@blocks.size} blocks in this document:"
-      @blocks.each {|b|
-        msg << b
-      }
-      msg * "\n"
-    }
   end
 
   # Public: Get the named counter and take the next number in the sequence.
@@ -593,27 +584,6 @@ class Document < AbstractBlock
     file_type = ext[1..-1]
     @attributes['filetype'] = file_type
     @attributes["filetype-#{file_type}"] = ''
-  end
-
-  def splain
-    Debug.debug {
-      msg = ''
-      if @header
-        msg = "Header is #{@header}"
-      else
-        msg = "No header"
-      end
-
-      msg += "I have #{@blocks.count} blocks"
-      @blocks.each_with_index do |block, i|
-        msg += "v" * 60
-        msg += "Block ##{i} is a #{block.class}"
-        msg += "Name is #{block.title rescue 'n/a'}"
-        block.splain(0) if block.respond_to? :splain
-        msg += "^" * 60
-      end
-    }
-    nil
   end
 
   def renderer(opts = {})

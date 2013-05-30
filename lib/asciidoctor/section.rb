@@ -90,7 +90,6 @@ class Section < AbstractBlock
   # Public: Get the rendered String content for this Section and all its child
   # Blocks.
   def render
-    Debug.debug { "Now rendering section for #{self}" }
     @document.playback_attributes @attributes
     renderer.render('section', self)
   end
