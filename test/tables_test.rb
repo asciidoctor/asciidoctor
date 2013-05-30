@@ -475,6 +475,23 @@ output file name is used.
       assert_css 'table > tbody > tr > td:nth-child(2) table > tbody > tr > td', output, 2
     end
 
+    test 'nested document in AsciiDoc cell should not see doctitle of parent' do
+      input = <<-EOS
+= Document Title
+
+[cols="1a"]
+|===
+|AsciiDoc content
+|===
+      EOS
+
+      output = render_string input
+      assert_css 'table', output, 1
+      assert_css 'table > tbody > tr > td', output, 1
+      assert_css 'table > tbody > tr > td #preamble', output, 0
+      assert_css 'table > tbody > tr > td .paragraph', output, 1
+    end
+
     test 'cell background color' do
       input = <<-EOS
 [cols="1e,1", options="header"]

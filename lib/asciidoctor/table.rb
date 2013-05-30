@@ -51,26 +51,34 @@ class Table < AbstractBlock
   # and body rows)
   attr_accessor :rows
 
+  # Public: Boolean specifies whether this table has a header row
+  attr_reader :header_option
+
   def initialize(parent, attributes)
     super(parent, :table)
     @rows = Rows.new([], [], [])
     @columns = []
 
-    unless @attributes.has_key? 'tablepcwidth'
-      # smell like we need a utility method here
-      # to resolve an integer width from potential bogus input
-      pcwidth = attributes['width']
-      pcwidth_intval = pcwidth.to_i.abs
-      if pcwidth_intval == 0 && pcwidth != "0" || pcwidth_intval > 100
-        pcwidth_intval = 100
-      end
-      @attributes['tablepcwidth'] = pcwidth_intval
+    @header_option = attributes.has_key? 'header-option'
+
+    # smell like we need a utility method here
+    # to resolve an integer width from potential bogus input
+    pcwidth = attributes['width']
+    pcwidth_intval = pcwidth.to_i.abs
+    if pcwidth_intval == 0 && pcwidth != "0" || pcwidth_intval > 100
+      pcwidth_intval = 100
     end
+    @attributes['tablepcwidth'] = pcwidth_intval
 
     if @document.attributes.has_key? 'pagewidth'
       @attributes['tableabswidth'] ||=
           ((@attributes['tablepcwidth'].to_f / 100) * @document.attributes['pagewidth']).round
     end
+  end
+
+  # Internal: Returns the index of the row being processed
+  def row_index
+    @rows.body.size
   end
 
   # Internal: Creates the Column objects from the column spec
@@ -201,8 +209,13 @@ class Table::Cell < AbstractNode
       end
       update_attributes(attributes)
     end
-    if @attributes['style'] == :asciidoc
+    # only allow AsciiDoc cells in non-header rows
+    if @attributes['style'] == :asciidoc && (!column.parent.header_option || column.parent.row_index > 0)
+      # FIXME hide doctitle from nested document; temporary workaround to fix
+      # nested document seeing doctitle and assuming it has its own document title
+      parent_doctitle = @document.attributes.delete('doctitle')
       @inner_document = Document.new(@text, :header_footer => false, :parent => @document)
+      @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
     end
   end
 
