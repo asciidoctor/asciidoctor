@@ -2,12 +2,12 @@
 .\"     Title: asciidoctor
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 05/15/2013
+.\"      Date: 05/30/2013
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "05/15/2013" "\ \&" "\ \&"
+.TH "ASCIIDOCTOR" "1" "05/30/2013" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -71,20 +71,22 @@ when Asciidoctor is invoked using this script\&.
 Define, override or delete a document attribute\&. Command\-line attributes take precedence over attributes defined in the source file\&.
 .sp
 \fIATTRIBUTE\fR
-is formatted as a key\-value pair, in the form
-\fINAME=VALUE\fR\&. Values containing spaces should be enclosed in double\-quote characters\&. Alternate acceptable forms are
+is normally formatted as a key\-value pair, in the form
+\fINAME=VALUE\fR\&. Alternate acceptable forms are
 \fINAME\fR
-(the
+(where the
 \fIVALUE\fR
 defaults to an empty string),
 \fINAME!\fR
-(deletes the
+(unassigns the
 \fINAME\fR
 attribute) and
 \fINAME=VALUE@\fR
-(does not override
+(where
+\fIVALUE\fR
+does not override value of
 \fINAME\fR
-attribute if already defined in the source file)\&.
+attribute if it\(cqs already defined in the source document)\&. Values containing spaces should be enclosed in quotes\&.
 .sp
 This option may be specified more than once\&.
 .RE

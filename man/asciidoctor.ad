@@ -53,11 +53,11 @@ Document Settings
     Define, override or delete a document attribute. Command-line attributes
     take precedence over attributes defined in the source file.
 +
-'ATTRIBUTE' is formatted as a key-value pair, in the form 'NAME=VALUE'. Values
-containing spaces should be enclosed in double-quote characters.  Alternate
-acceptable forms are 'NAME' (the 'VALUE' defaults to an empty string), 'NAME!'
-(deletes the 'NAME' attribute) and 'NAME=VALUE@' (does not override 'NAME'
-attribute if already defined in the source file).
+'ATTRIBUTE' is normally formatted as a key-value pair, in the form 'NAME=VALUE'.
+Alternate acceptable forms are 'NAME' (where the 'VALUE' defaults to an empty
+string), 'NAME!' (unassigns the 'NAME' attribute) and 'NAME=VALUE@' (where
+'VALUE' does not override value of 'NAME' attribute if it's already defined in
+the source document). Values containing spaces should be enclosed in quotes.
 +
 This option may be specified more than once. 
 

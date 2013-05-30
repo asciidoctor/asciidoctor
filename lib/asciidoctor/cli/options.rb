@@ -78,9 +78,10 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-C', '--compact', 'compact the output by removing blank lines (default: false)') do
             self[:compact] = true
           end
-          opts.on('-a', '--attribute key1=value,key2=value2,...', Array,
-                  'a list of attributes, in the form key or key=value pair, to set on the document',
-                  'these attributes take precedence over attributes defined in the source file') do |attribs|
+          opts.on('-a', '--attribute key[=value],key2[=value2],...', Array,
+                  'a list of document attributes to set in the form of key, key! or key=value pair',
+                  'unless @ is appended to the value, these attributes take precedence over attributes',
+                  'defined in the source document') do |attribs|
             attribs.each do |attrib|
               key, val = attrib.split '=', 2
               self[:attributes][key] = val || ''
