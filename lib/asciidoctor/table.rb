@@ -52,7 +52,7 @@ class Table < AbstractBlock
   attr_accessor :rows
 
   # Public: Boolean specifies whether this table has a header row
-  attr_reader :header_option
+  attr_accessor :has_header_option
 
   def initialize(parent, attributes)
     super(parent, :table)
@@ -110,7 +110,7 @@ class Table < AbstractBlock
     # set rowcount before splitting up body rows
     @attributes['rowcount'] = @rows.body.size
 
-    if !rows.body.empty? && attributes.has_key?('header-option')
+    if !rows.body.empty? && @has_header_option
       head = rows.body.shift
       # styles aren't applied to header row
       head.each {|c| c.attributes.delete('style') }

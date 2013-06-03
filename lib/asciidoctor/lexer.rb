@@ -1872,11 +1872,20 @@ class Lexer
       explicit_col_specs = false
     end
 
-    table_reader.skip_blank_lines
+    skipped = table_reader.skip_blank_lines
 
     parser_ctx = Table::ParserContext.new(table, attributes)
+    loop_idx = -1
     while table_reader.has_more_lines?
+      loop_idx += 1
       line = table_reader.get_line
+
+      if skipped == 0 && loop_idx.zero? && !attributes.has_key?('options') &&
+          !(next_line = table_reader.peek_line(false)).nil? && next_line.chomp.empty?
+        table.has_header_option = true
+        attributes['options'] = "header"
+        attributes['header-option'] = ''
+      end
 
       if parser_ctx.format == 'psv'
         if parser_ctx.starts_with_delimiter? line
@@ -1938,7 +1947,7 @@ class Lexer
         end
       end
 
-      table_reader.skip_blank_lines unless parser_ctx.cell_open?
+      skipped = table_reader.skip_blank_lines unless parser_ctx.cell_open?
 
       if !table_reader.has_more_lines?
         parser_ctx.close_cell true
