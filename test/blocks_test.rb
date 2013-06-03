@@ -256,7 +256,7 @@ Some more inspiring words.
       input = <<-EOS
 > A famous quote.
 > Some more inspiring words.
-> -- Famous Person, Famous Source (1999)
+> -- Famous Person, Famous Source, Volume 1 (1999)
       EOS
       output = render_string input
       assert_css '.quoteblock', output, 1
@@ -266,7 +266,7 @@ Some more inspiring words.
       assert_css '.quoteblock > .attribution', output, 1
       assert_css '.quoteblock > .attribution > cite', output, 1
       assert_css '.quoteblock > .attribution > cite + br', output, 1
-      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source (1999)"]', output, 1
+      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source, Volume 1 (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
       author = attribution.children.last
       assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
@@ -276,7 +276,7 @@ Some more inspiring words.
       input = <<-EOS
 "A famous quote.
 Some more inspiring words."
--- Famous Person, Famous Source (1999)
+-- Famous Person, Famous Source, Volume 1 (1999)
       EOS
       output = render_string input
       assert_css '.quoteblock', output, 1
@@ -285,7 +285,7 @@ Some more inspiring words."
       assert_css '.quoteblock > .attribution', output, 1
       assert_css '.quoteblock > .attribution > cite', output, 1
       assert_css '.quoteblock > .attribution > cite + br', output, 1
-      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source (1999)"]', output, 1
+      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source, Volume 1 (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
       author = attribution.children.last
       assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
