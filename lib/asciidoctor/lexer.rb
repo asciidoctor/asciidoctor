@@ -586,7 +586,7 @@ class Lexer
               }
 
               if buffer.last.start_with?('-- ')
-                attribution, citetitle = buffer.pop[3..-1].split(', ')
+                attribution, citetitle = buffer.pop[3..-1].split(', ', 2)
                 buffer.pop while buffer.last.chomp.empty?
                 buffer[-1] = buffer.last.chomp
               else
@@ -601,7 +601,7 @@ class Lexer
             elsif !text_only && buffer.size > 1 && first_line.start_with?('"') &&
                 buffer.last.start_with?('-- ') && buffer[-2].chomp.end_with?('"')
               buffer[0] = first_line[1..-1]
-              attribution, citetitle = buffer.pop[3..-1].split(', ')
+              attribution, citetitle = buffer.pop[3..-1].split(', ', 2)
               buffer.pop while buffer.last.chomp.empty?
               buffer[-1] = buffer.last.chomp.chop
               attributes['style'] = 'quote'
