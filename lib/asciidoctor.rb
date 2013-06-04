@@ -1,3 +1,4 @@
+RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
 if RUBY_VERSION < '1.9'
   require 'rubygems'
 end
@@ -677,7 +678,7 @@ module Asciidoctor
     end
 
     attrs = (options[:attributes] ||= {})
-    if attrs.is_a? Hash
+    if attrs.is_a?(Hash) || (RUBY_ENGINE == 'jruby' && attrs.is_a?(Java::JavaUtil::Map))
       # all good; placed here as optimization
     elsif attrs.is_a? Array
       attrs = options[:attributes] = attrs.inject({}) do |accum, entry|
@@ -695,8 +696,15 @@ module Asciidoctor
         accum[k] = v || ''
         accum
       end
+    elsif attrs.respond_to?('keys') && attrs.respond_to?('[]')
+      # convert it to a Hash as we know it
+      original_attrs = attrs
+      attrs = options[:attributes] = {}
+      original_attrs.keys.each do |key|
+        attrs[key] = original_attrs[key]
+      end
     else
-      raise ArgumentError, 'illegal type for attributes option'
+      raise ArgumentError, "illegal type for attributes option: #{attrs.class.ancestors}"
     end
 
     lines = nil
