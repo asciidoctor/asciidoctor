@@ -25,7 +25,8 @@ class AbstractBlock < AbstractNode
     else
       @level = nil
     end
-    @next_section_index = 0 
+    @next_section_index = 0
+    @next_section_number = 1
   end
 
   # Public: A convenience method that indicates whether the title instance
@@ -243,6 +244,10 @@ class AbstractBlock < AbstractNode
   def assign_index(section)
     section.index = @next_section_index
     @next_section_index += 1
+    if section.numbered
+      section.number = @next_section_number
+      @next_section_number += 1
+    end
   end
 
   # Internal: Reassign the section indexes
@@ -254,6 +259,7 @@ class AbstractBlock < AbstractNode
   # returns nothing
   def reindex_sections
     @next_section_index = 0
+    @next_section_number = 0
     @blocks.each {|block|
       if block.is_a?(Section)
         assign_index(block)

@@ -492,22 +492,19 @@ Standalone preamble.
 
   context 'Section Numbering' do
     test 'should create section number with one entry for level 1' do
-      sect1 = Asciidoctor::Section.new(nil)
-      sect1.level = 1
+      sect1 = Asciidoctor::Section.new
       assert_equal '1.', sect1.sectnum
     end
 
     test 'should create section number with two entries for level 2' do
-      sect1 = Asciidoctor::Section.new(nil)
-      sect1.level = 1
+      sect1 = Asciidoctor::Section.new
       sect1_1 = Asciidoctor::Section.new(sect1)
       sect1 << sect1_1
       assert_equal '1.1.', sect1_1.sectnum
     end
 
     test 'should create section number with three entries for level 3' do
-      sect1 = Asciidoctor::Section.new(nil)
-      sect1.level = 1
+      sect1 = Asciidoctor::Section.new
       sect1_1 = Asciidoctor::Section.new(sect1)
       sect1 << sect1_1
       sect1_1_1 = Asciidoctor::Section.new(sect1_1)
@@ -516,8 +513,7 @@ Standalone preamble.
     end
 
     test 'should create section number for second section in level' do
-      sect1 = Asciidoctor::Section.new(nil)
-      sect1.level = 1
+      sect1 = Asciidoctor::Section.new
       sect1_1 = Asciidoctor::Section.new(sect1)
       sect1 << sect1_1
       sect1_2 = Asciidoctor::Section.new(sect1)
@@ -526,8 +522,7 @@ Standalone preamble.
     end
 
     test 'sectnum should use specified delimiter and append string' do
-      sect1 = Asciidoctor::Section.new(nil)
-      sect1.level = 1
+      sect1 = Asciidoctor::Section.new
       sect1_1 = Asciidoctor::Section.new(sect1)
       sect1 << sect1_1
       sect1_1_1 = Asciidoctor::Section.new(sect1_1)
@@ -595,6 +590,98 @@ paragraph
       assert_equal 1, doc.blocks[1].blocks[0].level
       assert_equal 2, doc.blocks[1].blocks[1].level
       assert_equal 2, doc.blocks[1].blocks[1].blocks[0].level
+    end
+
+    test 'section numbers should not increment when numbered attribute is turned off within document' do
+      input = <<-EOS
+= Document Title
+:numbered:
+
+:numbered!:
+
+== Colophon Section
+
+== Another Colophon Section
+
+== Final Colophon Section
+
+:numbered:
+
+== Section One
+
+=== Section One Subsection
+
+== Section Two
+
+== Section Three
+      EOS
+
+      output = render_string input
+      assert_xpath '//h1[text()="Document Title"]', output, 1
+      assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_final_colophon_section"][text()="Final Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '//h3[@id="_section_one_subsection"][text()="1.1. Section One Subsection"]', output, 1
+      assert_xpath '//h2[@id="_section_two"][text()="2. Section Two"]', output, 1
+      assert_xpath '//h2[@id="_section_three"][text()="3. Section Three"]', output, 1
+    end
+
+    # NOTE AsciiDoc fails this test because it does not properly check for a None value when looking up the numbered attribute
+    test 'section numbers should not increment until numbered attribute is turned back on' do
+      input = <<-EOS
+= Document Title
+:numbered!:
+
+== Colophon Section
+
+== Another Colophon Section
+
+== Final Colophon Section
+
+:numbered:
+
+== Section One
+
+=== Section One Subsection
+
+== Section Two
+
+== Section Three
+      EOS
+
+      output = render_string input
+      assert_xpath '//h1[text()="Document Title"]', output, 1
+      assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_final_colophon_section"][text()="Final Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '//h3[@id="_section_one_subsection"][text()="1.1. Section One Subsection"]', output, 1
+      assert_xpath '//h2[@id="_section_two"][text()="2. Section Two"]', output, 1
+      assert_xpath '//h2[@id="_section_three"][text()="3. Section Three"]', output, 1
+    end
+
+    test 'should not number parts when doctype is book' do
+      input = <<-EOS
+= Document Title
+:doctype: book
+:numbered:
+
+= Part 1
+
+== Part 1: Chapter 1
+
+= Part 2
+
+== Part 2: Chapter 1
+      EOS
+
+      output = render_string input
+      assert_xpath '(//h1)[1][text()="Document Title"]', output, 1
+      assert_xpath '(//h1)[2][text()="Part 1"]', output, 1
+      assert_xpath '(//h1)[3][text()="Part 2"]', output, 1
+      assert_xpath '(//h2)[1][text()="1. Part 1: Chapter 1"]', output, 1
+      assert_xpath '(//h2)[2][text()="1. Part 2: Chapter 1"]', output, 1
     end
   end
 
@@ -703,9 +790,85 @@ text
       assert_xpath '//h5[text()="Level_4"]', output, 1
     end
 
+    test 'should not number sections or subsections in regions where numbered is off' do
+      input = <<-EOS
+:numbered:
+
+== Section One
+
+:numbered!:
+
+[appendix]
+== Attribute Options
+
+Details
+
+[appendix]
+== Migration
+
+Details
+
+=== Gotchas
+
+Details
+
+[glossary]
+== Glossary
+
+Terms
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '(//h2)[1][text()="1. Section One"]', output, 1
+      assert_xpath '(//h2)[2][text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '(//h2)[3][text()="Appendix B: Migration"]', output, 1
+      assert_xpath '(//h3)[1][text()="Gotchas"]', output, 1
+      assert_xpath '(//h2)[4][text()="Glossary"]', output, 1
+    end
+
+    test 'should not number sections or subsections in toc in regions where numbered is off' do
+      input = <<-EOS
+:numbered:
+:toc:
+
+== Section One
+
+:numbered!:
+
+[appendix]
+== Attribute Options
+
+Details
+
+[appendix]
+== Migration
+
+Details
+
+=== Gotchas
+
+Details
+
+[glossary]
+== Glossary
+
+Terms
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="1. Section One"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="Appendix B: Migration"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="Gotchas"]', output, 1
+      assert_xpath '//*[@id="toc"]/ol//li/a[text()="Glossary"]', output, 1
+    end
+
+    # reenable once we have :specialnumbered!: implemented
+=begin
     test 'should not number special sections or subsections' do
       input = <<-EOS
 :numbered:
+:specialnumbered!:
 
 == Section One
 
@@ -740,6 +903,7 @@ Terms
     test 'should not number special sections or subsections in toc' do
       input = <<-EOS
 :numbered:
+:specialnumbered!:
 :toc:
 
 == Section One
@@ -771,6 +935,7 @@ Terms
       assert_xpath '//*[@id="toc"]/ol//li/a[text()="Gotchas"]', output, 1
       assert_xpath '//*[@id="toc"]/ol//li/a[text()="Glossary"]', output, 1
     end
+=end
 
     test 'level 0 special sections in multipart book should be rendered as level 1' do
       input = <<-EOS

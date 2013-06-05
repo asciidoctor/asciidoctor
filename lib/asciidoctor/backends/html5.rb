@@ -36,16 +36,8 @@ class DocumentTemplate < BaseTemplate
         sec_level = 1
       end
       toc_level = %(<ol type="none" class="sectlevel#{sec_level}">\n)
-      numbered = node.document.attr? 'numbered'
       sections.each do |section|
-        # need to check playback attributes for change in numbered setting
-        # FIXME encapsulate me
-        if section.attributes.has_key? :attribute_entries
-          if (numbered_override = section.attributes[:attribute_entries].find {|entry| entry.name == 'numbered'})
-            numbered = numbered_override.negate ? false : true
-          end
-        end
-        section_num = numbered && !section.special && section.level > 0 && section.level < 4 ? %(#{section.sectnum} ) : nil
+        section_num = section.numbered ? %(#{section.sectnum} ) : nil
         toc_level = %(#{toc_level}<li><a href=\"##{section.id}\">#{section_num}#{section.caption}#{section.title}</a></li>\n)
         if section.level < to_depth && (child_toc_level = outline(section, to_depth))
           toc_level = %(#{toc_level}<li>\n#{child_toc_level}\n</li>\n)
@@ -270,7 +262,7 @@ class SectionTemplate < BaseTemplate
 #{sec.content}\n)
     else
       role = (sec.attr? 'role') ? " #{sec.attr 'role'}" : nil
-      if !sec.special && (sec.document.attr? 'numbered') && slevel < 4
+      if sec.numbered
         sectnum = "#{sec.sectnum} "
       else
         sectnum = nil

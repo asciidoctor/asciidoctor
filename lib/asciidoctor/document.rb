@@ -395,7 +395,7 @@ class Document < AbstractBlock
   end
 
   def title=(title)
-    @header ||= Section.new self
+    @header ||= Section.new(self, 0)
     @header.title = title
   end
 
