@@ -182,6 +182,26 @@ preamble
       doc = Asciidoctor.load('text', :attributes => nil)
       assert doc.attributes.is_a?(Hash)
     end
+
+    test 'should accept attributes if hash like' do
+      class Hashish
+        def initialize
+          @table = {'toc' => ''}
+        end
+
+        def keys
+          @table.keys
+        end
+
+        def [](key)
+          @table[key]
+        end
+      end
+
+      doc = Asciidoctor.load('text', :attributes => Hashish.new)
+      assert doc.attributes.is_a?(Hash)
+      assert doc.attributes.has_key?('toc')
+    end
   end
 
   context 'Render APIs' do
