@@ -20,8 +20,12 @@ module Asciidoctor
 #   => 1
 class Section < AbstractBlock
 
-  # Public: Get/Set the Integer index of this section within the parent block
+  # Public: Get/Set the 0-based index order of this section within the parent block
   attr_accessor :index
+
+  # Public: Get/Set the number of this section within the parent block
+  # Only relevant if the attribute numbered is true
+  attr_accessor :number
 
   # Public: Get/Set the section name of this section
   attr_accessor :sectname
@@ -29,20 +33,27 @@ class Section < AbstractBlock
   # Public: Get/Set the flag to indicate whether this is a special section or a child of one
   attr_accessor :special
 
+  # Public: Get the state of the numbered attribute at this section (need to preserve for creating TOC)
+  attr_accessor :numbered
+
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
-  def initialize(parent = nil, level = nil)
+  def initialize(parent = nil, level = nil, numbered = true)
     super(parent, :section)
-    if level.nil? && !parent.nil?
-      @level = parent.level + 1
-    end
-    if parent.is_a?(Section) && parent.special
-      @special = true
+    if level.nil?
+      if !parent.nil?
+        @level = parent.level + 1
+      elsif @level.nil?
+        @level = 1
+      end
     else
-      @special = false
+      @level = level
     end
+    @numbered = numbered && @level > 0 && @level < 4
+    @special = parent.is_a?(Section) && parent.special
     @index = 0
+    @number = 1
   end
 
   # Public: The name of this section, an alias of the section title
@@ -112,8 +123,8 @@ class Section < AbstractBlock
   #
   # The section number is a unique, dot separated String
   # where each entry represents one level of nesting and
-  # the value of each entry is the 1-based index of
-  # the Section amongst its sibling Sections
+  # the value of each entry is the 1-based outline number
+  # of the Section amongst its numbered sibling Sections
   #
   # delimiter - the delimiter to separate the number for each level
   # append    - the String to append at the end of the section number
@@ -154,15 +165,15 @@ class Section < AbstractBlock
   def sectnum(delimiter = '.', append = nil)
     append ||= (append == false ? '' : delimiter)
     if !@level.nil? && @level > 1 && @parent.is_a?(Section)
-      "#{@parent.sectnum(delimiter)}#{@index + 1}#{append}"
+      "#{@parent.sectnum(delimiter)}#{@number}#{append}"
     else
-      "#{@index + 1}#{append}"
+      "#{@number}#{append}"
     end
   end
 
   def to_s
     if @title
-      if @level && @index
+      if @numbered
         %[#{super.to_s} - #{sectnum} #@title [blocks:#{@blocks.size}]]
       else
         %[#{super.to_s} - #@title [blocks:#{@blocks.size}]]
