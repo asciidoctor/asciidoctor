@@ -160,6 +160,8 @@ p a > tt:hover { color: #561309; }
 #header br { display: none; }
 #header br + span { padding-left: 3px; }
 #header br + span:before { content: "\2013 \0020"; }
+#header br + span.author { padding-left: 0; }
+#header br + span.author:before { content: ", "; }
 #toc { border-bottom: 3px double #ebebeb; padding-bottom: 1.25em; }
 #toc > ol { margin-left: 0.25em; }
 #toc ol.sectlevel0 > li > a { font-style: italic; }
