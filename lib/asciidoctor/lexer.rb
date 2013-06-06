@@ -1211,13 +1211,15 @@ class Lexer
   # parent     - the parent Section or Document of this Section
   # attributes - a Hash of attributes to assign to this section (default: {})
   def self.initialize_section(reader, parent, attributes = {})
-    section = Section.new parent
-    section.id, section.title, section.level, _ = parse_section_title(reader, section.document)
+    document = parent.document
+    sect_id, sect_title, sect_level, _ = parse_section_title(reader, document)
+    section = Section.new parent, sect_level, document.attributes.has_key?('numbered')
+    section.id = sect_id
+    section.title = sect_title
     # parse style, id and role from first positional attribute
     if attributes[1]
       section.sectname, _ = parse_style_attribute(attributes)
       section.special = true
-      document = parent.document
       # HACK needs to be refactored so it's driven by config
       if section.sectname == 'abstract' && document.doctype == 'book'
         section.sectname = "sect1"
