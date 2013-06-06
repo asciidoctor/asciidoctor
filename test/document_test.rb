@@ -732,6 +732,27 @@ content
       assert_xpath '//articleinfo/authorinitials[text() = "DW"]', output, 1
     end
 
+    test 'should include multiple authors in HTML output' do
+      input = <<-EOS
+= Document Title
+Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
+
+content
+      EOS
+
+      output = render_string input
+      assert_xpath '//span[@id="author"]', output, 1
+      assert_xpath '//span[@id="author"][text()="Doc Writer"]', output, 1
+      assert_xpath '//span[@id="email"]', output, 1
+      assert_xpath '//span[@id="email"]/a', output, 1
+      assert_xpath '//span[@id="email"]/a[@href="mailto:thedoctor@asciidoc.org"][text()="thedoctor@asciidoc.org"]', output, 1
+      assert_xpath '//span[@id="author2"]', output, 1
+      assert_xpath '//span[@id="author2"][text()="Junior Writer"]', output, 1
+      assert_xpath '//span[@id="email2"]', output, 1
+      assert_xpath '//span[@id="email2"]/a', output, 1
+      assert_xpath '//span[@id="email2"]/a[@href="mailto:junior@asciidoctor.org"][text()="junior@asciidoctor.org"]', output, 1
+    end
+
     test 'should create authorgroup in DocBook when multiple authors' do
       input = <<-EOS
 = Document Title
