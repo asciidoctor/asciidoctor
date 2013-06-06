@@ -442,7 +442,7 @@ class Reader
     elsif @include_block
       advance
       # FIXME this borks line numbers
-      @lines.unshift(*normalize_include_data(@include_block.call(target)))
+      @lines.unshift(*normalize_include_data(@include_block.call(target, @document)))
     # FIXME currently we're not checking the upper bound of the include depth
     elsif @document.attributes.fetch('include-depth', 0).to_i > 0
       advance
