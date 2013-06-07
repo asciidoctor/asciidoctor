@@ -460,6 +460,14 @@ class Document < AbstractBlock
     end
 
     @original_attributes = @attributes.dup
+
+    # unfreeze "flexible" attributes
+    FLEXIBLE_ATTRIBUTES.each do |name|
+      @attribute_overrides.delete(name)
+      # turning a flexible attribute off should be permanent
+      # (we may need more config if that's not always the case)
+      #@attribute_overrides.delete("#{name}!")
+    end
   end
 
   # Internal: Restore the attributes to the previously saved state

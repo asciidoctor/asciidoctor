@@ -627,6 +627,74 @@ paragraph
       assert_xpath '//h2[@id="_section_three"][text()="3. Section Three"]', output, 1
     end
 
+    test 'section numbers can be toggled even if numbered attribute is enable via the API' do
+      input = <<-EOS
+= Document Title
+
+:numbered!:
+
+== Colophon Section
+
+== Another Colophon Section
+
+== Final Colophon Section
+
+:numbered:
+
+== Section One
+
+=== Section One Subsection
+
+== Section Two
+
+== Section Three
+      EOS
+
+      output = render_string input, :attributes => {'numbered' => ''}
+      assert_xpath '//h1[text()="Document Title"]', output, 1
+      assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_final_colophon_section"][text()="Final Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '//h3[@id="_section_one_subsection"][text()="1.1. Section One Subsection"]', output, 1
+      assert_xpath '//h2[@id="_section_two"][text()="2. Section Two"]', output, 1
+      assert_xpath '//h2[@id="_section_three"][text()="3. Section Three"]', output, 1
+    end
+
+    test 'section numbers cannot be toggled even if numbered attribute is disabled via the API' do
+      input = <<-EOS
+= Document Title
+
+:numbered!:
+
+== Colophon Section
+
+== Another Colophon Section
+
+== Final Colophon Section
+
+:numbered:
+
+== Section One
+
+=== Section One Subsection
+
+== Section Two
+
+== Section Three
+      EOS
+
+      output = render_string input, :attributes => {'numbered!' => ''}
+      assert_xpath '//h1[text()="Document Title"]', output, 1
+      assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_final_colophon_section"][text()="Final Colophon Section"]', output, 1
+      assert_xpath '//h2[@id="_section_one"][text()="Section One"]', output, 1
+      assert_xpath '//h3[@id="_section_one_subsection"][text()="Section One Subsection"]', output, 1
+      assert_xpath '//h2[@id="_section_two"][text()="Section Two"]', output, 1
+      assert_xpath '//h2[@id="_section_three"][text()="Section Three"]', output, 1
+    end
+
     # NOTE AsciiDoc fails this test because it does not properly check for a None value when looking up the numbered attribute
     test 'section numbers should not increment until numbered attribute is turned back on' do
       input = <<-EOS
