@@ -191,6 +191,10 @@ module Asciidoctor
 
   LINE_BREAK = ' +'
 
+  # attributes which be changed within the content of the document (but not
+  # header) because it has semantic meaning; ex. numbered
+  FLEXIBLE_ATTRIBUTES = %w(numbered)
+
   # NOTE allows for empty space in line as it could be left by the template engine
   BLANK_LINE_PATTERN = /^[[:blank:]]*\n/
 
