@@ -659,12 +659,14 @@ class Document < AbstractBlock
       if docinfo1 || docinfo2
         docinfo_path = normalize_system_path(docinfo_filename)
         content = read_asset(docinfo_path)
+        content = sub_attributes(content.lines.entries).join unless content.nil?
       end
 
       if (docinfo || docinfo2) && @attributes.has_key?('docname')
         docinfo_path = normalize_system_path("#{@attributes['docname']}-#{docinfo_filename}")
         content2 = read_asset(docinfo_path)
         unless content2.nil?
+          content2 = sub_attributes(content2.lines.entries).join
           content = content.nil? ? content2 : "#{content}\n#{content2}"
         end
       end

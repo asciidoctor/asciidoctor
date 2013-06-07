@@ -264,12 +264,16 @@ preamble
           :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo1' => ''})
       assert !output.empty?
       assert_css 'productname', output, 1
+      assert_css 'edition', output, 1
+      assert_xpath '//edition[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'copyright', output, 0
 
       output = Asciidoctor.render_file(sample_input_path,
           :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => ''})
       assert !output.empty?
       assert_css 'productname', output, 1
+      assert_css 'edition', output, 1
+      assert_xpath '//edition[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'copyright', output, 1
     end
 
