@@ -160,6 +160,8 @@ class Document < AbstractBlock
     #@attributes['listing-caption'] = 'Listing'
     @attributes['table-caption'] = 'Table'
     @attributes['toc-title'] = 'Table of Contents'
+    @attributes['version-label'] = 'Version'
+    @attributes['last-update-label'] = 'Last updated'
 
     # attribute overrides are attributes that can only be set from the commandline
     # a direct assignment effectively makes the attribute a constant

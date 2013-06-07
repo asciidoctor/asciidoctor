@@ -820,6 +820,13 @@ content
       assert_xpath '//*[@id="preamble"]', result, 1
     end
 
+    test 'can disable last updated in footer' do
+      doc = document_from_string "= Document Title\n\npreamble", :attributes => {'last-update-label!' => ''}
+      result = doc.render
+      assert_xpath '//*[@id="footer-text"]', result, 1
+      assert_xpath '//*[@id="footer-text"][normalize-space(text())=""]', result, 1
+    end
+
     test 'no header footer' do
       doc = document_from_string "= Title\n\npreamble", :header_footer => false
       assert doc.attr?('embedded')

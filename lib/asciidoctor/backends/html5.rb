@@ -127,7 +127,7 @@ unless noheader %>
       end
     end
     if attr? :revnumber %>
-<span id="revnumber">version <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><%
+<span id="revnumber"><%= ((attr 'version-label') || '').downcase %> <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><%
     end
     if attr? :revdate %>
 <span id="revdate"><%= attr :revdate %></span><%
@@ -160,9 +160,11 @@ end %>
 <div id="footer">
 <div id="footer-text"><%
 if attr? :revnumber %>
-Version <%= attr :revnumber %><br><%
+<%= %(\#{attr 'version-label'} \#{attr :revnumber}) %><%
+end
+if attr? 'last-update-label' %>
+<%= %(\#{attr 'last-update-label'} \#{attr :docdatetime}) %><%
 end %>
-Last updated <%= attr :docdatetime %>
 </div>
 </div>
 </body>
