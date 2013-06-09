@@ -35,7 +35,6 @@ EOS
   s.add_development_dependency('coderay')
   s.add_development_dependency('erubis')
   s.add_development_dependency('nokogiri')
-  s.add_development_dependency('pending')
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc', '~> 3.12')
   s.add_development_dependency('tilt')
