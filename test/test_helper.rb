@@ -5,7 +5,7 @@ require 'test/unit'
 require "#{File.expand_path(File.dirname(__FILE__))}/../lib/asciidoctor.rb"
 
 require 'nokogiri'
-require 'pending'
+#require 'pending'
 
 ENV['SUPPRESS_DEBUG'] ||= 'true'
 
