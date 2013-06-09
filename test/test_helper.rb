@@ -36,6 +36,7 @@ class Test::Unit::TestCase
 
   def example_document(name, opts = {})
     opts[:header_footer] = true unless opts.has_key?(:header_footer)
+    #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'slim')
     Asciidoctor::Document.new(File.readlines(sample_doc_path(name)), opts)
   end
 
@@ -126,11 +127,13 @@ class Test::Unit::TestCase
 
   def document_from_string(src, opts = {})
     opts[:header_footer] = true unless opts.has_key?(:header_footer)
+    #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'slim')
     Asciidoctor::Document.new(src.lines.entries, opts)
   end
 
   def block_from_string(src, opts = {})
     opts[:header_footer] = false
+    #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'slim')
     doc = Asciidoctor::Document.new(src.lines.entries, opts)
     doc.blocks.first
   end
