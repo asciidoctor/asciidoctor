@@ -1,7 +1,4 @@
 RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
-if RUBY_VERSION < '1.9'
-  require 'rubygems'
-end
 require 'strscan'
 require 'set'
 
