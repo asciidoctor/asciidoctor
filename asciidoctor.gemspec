@@ -34,7 +34,7 @@ EOS
   ## testing
   s.add_development_dependency('coderay')
   s.add_development_dependency('erubis')
-  s.add_development_dependency('nokogiri')
+  s.add_development_dependency('nokogiri', '~> 1.5.10')
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc', '~> 3.12')
   s.add_development_dependency('tilt')
