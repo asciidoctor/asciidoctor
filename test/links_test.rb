@@ -136,7 +136,7 @@ context 'Links' do
   end
 
   test 'xref using angled bracket syntax with multi-line label inline with text' do
-    assert_xpath %{//a[@href="#tigers"][text() = "about\ntigers"]}, render_string("Want to learn <<tigers,about\ntigers>>?"), 1
+    assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, render_string("Want to learn <<tigers,about\ntigers>>?"), 1
   end
 
   test 'xref with escaped text' do
@@ -162,7 +162,7 @@ context 'Links' do
   end
 
   test 'xref using macro syntax with multi-line label inline with text' do
-    assert_xpath %{//a[@href="#tigers"][text() = "about\ntigers"]}, render_string("Want to learn xref:tigers[about\ntigers]?"), 1
+    assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, render_string("Want to learn xref:tigers[about\ntigers]?"), 1
   end
 
   test 'xref using invalid macro syntax does not create link' do

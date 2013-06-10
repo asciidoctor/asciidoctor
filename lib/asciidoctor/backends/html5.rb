@@ -852,28 +852,30 @@ class InlineCalloutTemplate < BaseTemplate
 end
 
 class InlineQuotedTemplate < BaseTemplate
-  NO_TAGS = ['', '']
+  NO_TAGS = [nil, nil, nil]
 
   QUOTE_TAGS = {
-    :emphasis => ['<em>', '</em>'],
-    :strong => ['<strong>', '</strong>'],
-    :monospaced => ['<code>', '</code>'],
-    :superscript => ['<sup>', '</sup>'],
-    :subscript => ['<sub>', '</sub>'],
-    :double => ['&#8220;', '&#8221;'],
-    :single => ['&#8216;', '&#8217;']
+    :emphasis => ['<em>', '</em>', true],
+    :strong => ['<strong>', '</strong>', true],
+    :monospaced => ['<code>', '</code>', true],
+    :superscript => ['<sup>', '</sup>', true],
+    :subscript => ['<sub>', '</sub>', true],
+    :double => ['&#8220;', '&#8221;', false],
+    :single => ['&#8216;', '&#8217;', false]
   }
 
   def quote_text(text, type, role)
-    start_tag, end_tag = QUOTE_TAGS[type] || NO_TAGS
+    open, close, is_tag = QUOTE_TAGS[type] || NO_TAGS
     if role
-      if start_tag.start_with? '<'
-        %(#{start_tag.chop} class="#{role}">#{text}#{end_tag})
+      if is_tag
+        %(#{open.chop} class="#{role}">#{text}#{close})
       else
-        %(#{start_tag}<span class="#{role}">#{text}</span>#{end_tag})
+        %(<span class="#{role}">#{open}#{text}#{close}</span>)
       end
+    elsif open.nil?
+      text
     else
-      "#{start_tag}#{text}#{end_tag}"
+      %(#{open}#{text}#{close})
     end
   end
 

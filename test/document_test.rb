@@ -531,8 +531,8 @@ text
       assert !views.nil?
       assert_equal 36, views.size
       assert views.has_key? 'document'
-      assert views['document'].is_a?(Asciidoctor::HTML5::DocumentTemplate)
-      assert_equal 'ERB', views['document'].eruby.to_s
+      assert Asciidoctor.const_defined?(:HTML5)
+      assert Asciidoctor::HTML5.const_defined?(:DocumentTemplate)
     end
 
     test 'built-in DocBook45 views are registered when backend is docbook45' do
@@ -547,11 +547,24 @@ text
       assert !views.nil?
       assert_equal 36, views.size
       assert views.has_key? 'document'
-      assert views['document'].is_a?(Asciidoctor::DocBook45::DocumentTemplate)
+      assert Asciidoctor.const_defined?(:DocBook45)
+      assert Asciidoctor::DocBook45.const_defined?(:DocumentTemplate)
+    end
+
+    test 'eRuby implementation should default to ERB' do
+      # intentionally use built-in templates for this test
+      doc = Asciidoctor::Document.new [], :header_footer => true
+      renderer = doc.renderer
+      views = renderer.views
+      assert !views.nil?
+      assert views.has_key? 'document'
+      assert views['document'].is_a?(Asciidoctor::HTML5::DocumentTemplate)
       assert_equal 'ERB', views['document'].eruby.to_s
+      assert_equal 'ERB', views['document'].template.class.to_s
     end
   
     test 'can set erubis as eRuby implementation' do
+      # intentionally use built-in templates for this test
       doc = Asciidoctor::Document.new [], :eruby => 'erubis', :header_footer => true
       assert $LOADED_FEATURES.detect {|p| p == 'erubis.rb' || p.end_with?('/erubis.rb') }.nil?
       renderer = doc.renderer
@@ -559,6 +572,7 @@ text
       views = renderer.views
       assert !views.nil?
       assert views.has_key? 'document'
+      assert views['document'].is_a?(Asciidoctor::HTML5::DocumentTemplate)
       assert_equal 'Erubis::FastEruby', views['document'].eruby.to_s
       assert_equal 'Erubis::FastEruby', views['document'].template.class.to_s
     end

@@ -51,7 +51,7 @@ class Renderer
 
       view_opts = {
         :erb =>  { :trim => '<>' },
-        :haml => { :attr_wrapper => '"', :ugly => true, :escape_attrs => false },
+        :haml => { :format => :xhtml, :attr_wrapper => '"', :ugly => true, :escape_attrs => false },
         :slim => { :disable_escape => true, :sort_attrs => false, :pretty => false }
       }
 
