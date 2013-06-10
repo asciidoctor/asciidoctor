@@ -729,6 +729,31 @@ paragraph
       assert_xpath '//h2[@id="_section_three"][text()="3. Section Three"]', output, 1
     end
 
+    test 'table with asciidoc content should not disable numbering of subsequent sections' do
+      input = <<-EOS
+= Document Title
+:numbered:
+
+preamble
+
+== Section One
+
+|===
+a|content
+|===
+
+== Section Two
+
+content
+      EOS
+
+      output = render_string input
+      assert_xpath '//h2[@id="_section_one"]', output, 1
+      assert_xpath '//h2[@id="_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '//h2[@id="_section_two"]', output, 1
+      assert_xpath '//h2[@id="_section_two"][text()="2. Section Two"]', output, 1
+    end
+
     test 'should not number parts when doctype is book' do
       input = <<-EOS
 = Document Title
@@ -1455,27 +1480,6 @@ Fin.
       assert_css '#header #toc li', output, 2
       assert_css '#header #toc #toctitle', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Contents"]', output, 1
-    end
-
-    test 'should render table of contents in preamble if toc-placement attribute value is preamble' do
-      input = <<-EOS
-= Article
-:toc:
-:toc-placement: preamble
-
-Once upon a time...
-
-== Section One
-
-It was a dark and stormy night...
-
-== Section Two
-
-They couldn't believe their eyes when...
-      EOS
-
-      output = render_string input
-      assert_xpath '//*[@id="preamble"]/*[@id="toc"]', output, 1
     end
 
     test 'should not render table of contents if toc-placement attribute is unset' do

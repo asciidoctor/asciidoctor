@@ -104,8 +104,8 @@ class Document < AbstractBlock
 
     if options[:parent]
       @parent_document = options.delete(:parent)
-      # should we dup attributes here?
-      options[:attributes] = @parent_document.attributes
+      # QUESTION should we dup here? should we support setting attribute in parent document from nested document?
+      options[:attributes] = @parent_document.attributes.dup
       options[:base_dir] ||= @parent_document.base_dir
       @safe = @parent_document.safe
       @renderer = @parent_document.renderer
@@ -462,11 +462,13 @@ class Document < AbstractBlock
     @original_attributes = @attributes.dup
 
     # unfreeze "flexible" attributes
-    FLEXIBLE_ATTRIBUTES.each do |name|
-      @attribute_overrides.delete(name)
-      # turning a flexible attribute off should be permanent
-      # (we may need more config if that's not always the case)
-      #@attribute_overrides.delete("#{name}!")
+    unless nested?
+      FLEXIBLE_ATTRIBUTES.each do |name|
+        @attribute_overrides.delete(name)
+        # turning a flexible attribute off should be permanent
+        # (we may need more config if that's not always the case)
+        #@attribute_overrides.delete("#{name}!")
+      end
     end
   end
 
