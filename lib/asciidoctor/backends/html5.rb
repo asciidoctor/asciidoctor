@@ -358,7 +358,7 @@ end %><%
     last = (index == last_index)
     unless continuing %>
 <tr>
-<td class="hdlist1<%= (attr? 'strong-option') ? 'strong' : nil %>"><%
+<td class="hdlist1<%= (option? 'strong') ? 'strong' : nil %>"><%
     end %>
 <%= dt.text %>
 <br><%
@@ -693,14 +693,14 @@ class BlockTableTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><table#{id} class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%>#{role_class}" style="<%
-if !(attr? 'autowidth-option') %>width:<%= attr :tablepcwidth %>%; <% end %><%
+if !(option? 'autowidth') %>width:<%= attr :tablepcwidth %>%; <% end %><%
 if attr? :float %>float: <%= attr :float %>; <% end %>"><%
 if title? %>
 <caption class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></caption><%
 end
 if (attr :rowcount) >= 0 %>
 <colgroup><%
-  if attr? 'autowidth-option'
+  if option? 'autowidth'
     @columns.each do %>
 <col><%
     end
@@ -776,9 +776,9 @@ class BlockAudioTemplate < BaseTemplate
 #{title_div :caption => true}
 <div class="content">
 <audio src="<%= media_uri(attr :target) %>"<%
-if attr? 'autoplay-option' %> autoplay<% end %><%
-unless attr? 'nocontrols-option' %> controls<% end %><%
-if attr? 'loop-option' %> loop<% end %>>
+if option? 'autoplay' %> autoplay<% end %><%
+unless option? 'nocontrols' %> controls<% end %><%
+if option? 'loop' %> loop<% end %>>
 Your browser does not support the audio tag.
 </audio>
 </div>
@@ -795,9 +795,9 @@ class BlockVideoTemplate < BaseTemplate
 <div class="content">
 <video src="<%= media_uri(attr :target) %>"#{attribute('width', :width)}#{attribute('height', :height)}<%
 if attr? 'poster' %> poster="<%= media_uri(attr :poster) %>"<% end %><%
-if attr? 'autoplay-option' %> autoplay<% end %><%
-unless attr? 'nocontrols-option' %> controls<% end %><%
-if attr? 'loop-option' %> loop<% end %>>
+if option? 'autoplay' %> autoplay<% end %><%
+unless option? 'nocontrols' %> controls<% end %><%
+if option? 'loop' %> loop<% end %>>
 Your browser does not support the video tag.
 </video>
 </div>
