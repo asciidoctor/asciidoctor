@@ -254,6 +254,11 @@ context 'Substitutions' do
       assert_equal 'call [method]<code>save()</code> to persist the changes', para.sub_quotes(para.buffer.join)
     end
 
+    test 'escaped role on escaped single-line constrained monospaced chars' do
+      para = block_from_string(%q{call \[method]\+save()+ to persist the changes})
+      assert_equal 'call \[method]+save()+ to persist the changes', para.sub_quotes(para.buffer.join)
+    end
+
     test 'single-line unconstrained monospaced chars' do
       para = block_from_string(%q{Git++Hub++})
       assert_equal 'Git<code>Hub</code>', para.sub_quotes(para.buffer.join)
