@@ -173,6 +173,12 @@ context 'Substitutions' do
       assert_equal '`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.buffer)
     end
 
+    test 'escaped single-line constrained monospaced string with role' do
+      para = block_from_string(%q{[input]\`a few <monospaced> words`})
+      # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+      assert_equal '[input]`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.buffer)
+    end
+
     test 'multi-line constrained monospaced string' do
       para = block_from_string(%Q{`a few\n<\{monospaced\}> words`})
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
