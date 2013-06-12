@@ -174,11 +174,20 @@ module Substituters
       m = $~
 
       # honor the escape
-      if m[2].start_with? '\\'
-        next "#{m[1]}#{m[2][1..-1]}"
+      if m[3].start_with? '\\'
+        if m[2].nil?
+          next "#{m[1]}#{m[3][1..-1]}"
+        else
+          next "#{m[1]}[#{m[2]}]#{m[3][1..-1]}"
+        end
+      end
+
+      attributes = {}
+      unless m[2].nil?
+        attributes = parse_attributes(m[2])
       end
       
-      @passthroughs << {:text => m[3], :subs => [:specialcharacters], :literal => true}
+      @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :literal => true}
       index = @passthroughs.size - 1
       "#{m[1]}\e#{index}\e"
     } unless !result.include?('`')
@@ -197,7 +206,7 @@ module Substituters
     text.gsub(REGEXP[:pass_placeholder]) {
       pass = @passthroughs[$1.to_i];
       text = apply_subs(pass[:text], pass.fetch(:subs, []))
-      pass[:literal] ? Inline.new(self, :quoted, text, :type => :monospaced).render : text
+      pass[:literal] ? Inline.new(self, :quoted, text, :type => :monospaced, :attributes => pass.fetch(:attributes, {})).render : text
     }
   end
 
