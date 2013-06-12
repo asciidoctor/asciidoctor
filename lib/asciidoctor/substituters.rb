@@ -173,23 +173,23 @@ module Substituters
       # alias match for Ruby 1.8.7 compat
       m = $~
 
+      unescaped_attrs = nil
       # honor the escape
       if m[3].start_with? '\\'
-        if m[2].nil?
-          next "#{m[1]}#{m[3][1..-1]}"
-        else
-          next "#{m[1]}[#{m[2]}]#{m[3][1..-1]}"
-        end
+        next m[2].nil? ? "#{m[1]}#{m[3][1..-1]}" : "#{m[1]}[#{m[2]}]#{m[3][1..-1]}"
+      elsif m[1] == '\\' && !m[2].nil?
+        unescaped_attrs = "[#{m[2]}]"
       end
 
-      attributes = {}
-      unless m[2].nil?
+      if unescaped_attrs.nil? && !m[2].nil?
         attributes = parse_attributes(m[2])
+      else
+        attributes = {}
       end
       
       @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :literal => true}
       index = @passthroughs.size - 1
-      "#{m[1]}\e#{index}\e"
+      "#{unescaped_attrs || m[1]}\e#{index}\e"
     } unless !result.include?('`')
 
     result
