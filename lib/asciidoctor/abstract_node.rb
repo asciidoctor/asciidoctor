@@ -121,6 +121,19 @@ class AbstractNode
     end
   end
 
+  # Public: A convenience method to check if the specified option attribute is
+  # enabled on the current node.
+  #
+  # Check if the option is enabled. This method simply checks to see if the
+  # {name}-option attribute is defined on the current node.
+  #
+  # name    - the String or Symbol name of the option
+  #
+  # return a Boolean indicating whether the option has been specified
+  def option?(name)
+    @attributes.has_key? "#{name}-option"
+  end
+
   # Public: Get the execution context of this object (via Kernel#binding).
   #
   # This method is used to set the 'self' reference as well as local variables
