@@ -957,7 +957,26 @@ class Lexer
       has_text = !match[3].to_s.empty?
     else
       # Create list item using first line as the text of the list item
-      list_item = ListItem.new(list_block, match[2])
+      text = match[2]
+      checkbox = false
+      if text.start_with? '['
+        if text.start_with? '[ ] '
+          checkbox = true
+          checked = false
+          text = text[3..-1].lstrip
+        elsif text.start_with?('[*] ') || text.start_with?('[x] ')
+          checkbox = true
+          checked = true
+          text = text[3..-1].lstrip
+        end
+      end
+      list_item = ListItem.new(list_block, text)
+
+      if checkbox
+        list_block.attributes['option-checklist'] = ''
+        list_item.attributes['checkbox'] = ''
+        list_item.attributes['checked'] = '' if checked
+      end
 
       if !sibling_trait
         sibling_trait = resolve_list_marker(list_type, match[1], list_block.buffer.size, true)
