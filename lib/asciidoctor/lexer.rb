@@ -959,7 +959,7 @@ class Lexer
       # Create list item using first line as the text of the list item
       text = match[2]
       checkbox = false
-      if text.start_with? '['
+      if list_type == :ulist && text.start_with?('[')
         if text.start_with? '[ ] '
           checkbox = true
           checked = false
