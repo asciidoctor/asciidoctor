@@ -3698,3 +3698,33 @@ puts doc.render # <3>
     end
   end
 end
+
+context 'Checklists' do
+  test 'should create checklist if at least one item has checkbox syntax' do
+    input = <<-EOS
+- [ ] todo
+- [x] done
+- plain
+    EOS
+
+    output = render_embedded_string input
+    assert_css '.ulist.checklist', output, 1
+    assert_css '.ulist.checklist li input[type="checkbox"][disabled]', output, 2
+    assert_css '.ulist.checklist li input[type="checkbox"][checked]', output, 1
+    assert_xpath '(/*[@class="ulist checklist"]/ul/li)[3]/p[text()="plain"]', output, 1
+  end
+
+  test 'should create checklist with font icons if at least one item has checkbox syntax and icons attribute is font' do
+    input = <<-EOS
+- [ ] todo
+- [x] done
+- plain
+    EOS
+
+    output = render_embedded_string input, :attributes => {'icons' => 'font'}
+    assert_css '.ulist.checklist', output, 1
+    assert_css '.ulist.checklist li i.icon-check', output, 1
+    assert_css '.ulist.checklist li i.icon-check-empty', output, 1
+    assert_xpath '(/*[@class="ulist checklist"]/ul/li)[3]/p[text()="plain"]', output, 1
+  end
+end
