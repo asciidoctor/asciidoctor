@@ -443,7 +443,7 @@ module Asciidoctor
 
     # inline literal passthrough macro
     # `text`
-    :pass_lit         => /(^|[^`\w])(\\?`([^`\s]|[^`\s].*?\S)`)(?![`\w])/m,
+    :pass_lit         => /(^|[^`\w])(?:\[([^\]]+?)\])?(\\?`([^`\s]|[^`\s].*?\S)`)(?![`\w])/m,
 
     # placeholder for extracted passthrough text
     :pass_placeholder => /\e(\d+)\e/,
