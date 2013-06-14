@@ -738,10 +738,21 @@ module Substituters
   #
   # returns The rendered text for the quoted text region
   def transform_quoted_text(match, type, scope)
+    unescaped_attrs = nil
     if match[0].start_with? '\\'
-      match[0][1..-1]
-    elsif scope == :constrained
-      "#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :attributes => parse_attributes(match[2])).render}"
+      if scope == :constrained && !match[2].nil?
+        unescaped_attrs = "[#{match[2]}]"
+      else
+        return match[0][1..-1]
+      end
+    end
+
+    if scope == :constrained
+      if unescaped_attrs.nil?
+        "#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :attributes => parse_attributes(match[2])).render}"
+      else
+        "#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type, :attributes => {}).render}"
+      end
     else
       Inline.new(self, :quoted, match[2], :type => type, :attributes => parse_attributes(match[1])).render
     end

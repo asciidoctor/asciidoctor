@@ -229,6 +229,36 @@ context 'Substitutions' do
       assert_equal %q{[gray]__Git__Hub}, para.sub_quotes(para.buffer.join)
     end
 
+    test 'single-line constrained monospaced chars' do
+      para = block_from_string(%q{call +save()+ to persist the changes})
+      assert_equal 'call <code>save()</code> to persist the changes', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'single-line constrained monospaced chars with role' do
+      para = block_from_string(%q{call [method]+save()+ to persist the changes})
+      assert_equal 'call <code class="method">save()</code> to persist the changes', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped single-line constrained monospaced chars' do
+      para = block_from_string(%q{call \+save()+ to persist the changes})
+      assert_equal 'call +save()+ to persist the changes', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped single-line constrained monospaced chars with role' do
+      para = block_from_string(%q{call [method]\+save()+ to persist the changes})
+      assert_equal 'call [method]+save()+ to persist the changes', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped role on single-line constrained monospaced chars' do
+      para = block_from_string(%q{call \[method]+save()+ to persist the changes})
+      assert_equal 'call [method]<code>save()</code> to persist the changes', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'escaped role on escaped single-line constrained monospaced chars' do
+      para = block_from_string(%q{call \[method]\+save()+ to persist the changes})
+      assert_equal 'call \[method]+save()+ to persist the changes', para.sub_quotes(para.buffer.join)
+    end
+
     test 'single-line unconstrained monospaced chars' do
       para = block_from_string(%q{Git++Hub++})
       assert_equal 'Git<code>Hub</code>', para.sub_quotes(para.buffer.join)
