@@ -147,7 +147,6 @@ A | here| a | there
       input = <<-EOS
 |====
 |first |second |third |fourth
-
 |1 |2 |3
 |4
 |====
@@ -220,6 +219,90 @@ A | here| a | there
       assert_css 'table > tfoot', output, 1
       assert_css 'table > tfoot > tr', output, 1
       assert_css 'table > tfoot > tr > td', output, 2
+      assert_css 'table > tbody', output, 1
+      assert_css 'table > tbody > tr', output, 3
+    end
+
+    test 'table with implicit header row' do
+      input = <<-EOS
+|===
+|Column 1 |Column 2
+
+|Data A1
+|Data B1
+
+|Data A2
+|Data B2
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 1
+      assert_css 'table > thead > tr', output, 1
+      assert_css 'table > thead > tr > th', output, 2
+      assert_css 'table > tbody', output, 1
+      assert_css 'table > tbody > tr', output, 2
+    end
+
+    test 'no implicit header row if second line not blank' do
+      input = <<-EOS
+|===
+|Column 1 |Column 2
+|Data A1
+|Data B1
+
+|Data A2
+|Data B2
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 0
+      assert_css 'table > tbody', output, 1
+      assert_css 'table > tbody > tr', output, 3
+    end
+
+    test 'no implicit header row if first line blank' do
+      input = <<-EOS
+|===
+
+|Column 1 |Column 2
+
+|Data A1
+|Data B1
+
+|Data A2
+|Data B2
+
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 0
+      assert_css 'table > tbody', output, 1
+      assert_css 'table > tbody > tr', output, 3
+    end
+
+    test 'no implicit header row if options is specified' do
+      input = <<-EOS
+[options=""]
+|===
+|Column 1 |Column 2
+
+|Data A1
+|Data B1
+
+|Data A2
+|Data B2
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 0
       assert_css 'table > tbody', output, 1
       assert_css 'table > tbody > tr', output, 3
     end
@@ -457,14 +540,11 @@ output file name is used.
 [cols="1,2a"]
 |===
 |Normal cell
-
 |Cell with nested table
-
 [cols="2,1"]
 !===
 !Nested table cell 1 !Nested table cell 2
 !===
-
 |===
       EOS
       output = render_embedded_string input
