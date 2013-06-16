@@ -72,7 +72,7 @@ if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
 </style><%
   end
 elsif attr? :stylesheet
-  if attr? 'linkcss' %>
+  if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
 <link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), (attr :stylesdir, '')) %>"><%
   else %>
 <style>

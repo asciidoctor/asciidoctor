@@ -875,8 +875,9 @@ module Asciidoctor
       end
 
       # NOTE document cannot control this behavior if safe >= SafeMode::SERVER
-      if !stream_output && doc.attr?('basebackend-html') && doc.attr?('copycss') &&
-          doc.attr?('linkcss') && DEFAULT_STYLESHEET_KEYS.include?(doc.attr('stylesheet'))
+      if !stream_output && doc.safe < SafeMode::SECURE && doc.attr?('basebackend-html') &&
+          doc.attr?('copycss') && doc.attr?('linkcss') &&
+          DEFAULT_STYLESHEET_KEYS.include?(doc.attr('stylesheet'))
         Helpers.require_library 'fileutils'
         outdir = doc.attr('outdir')
         stylesdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir,

@@ -309,10 +309,25 @@ preamble
       assert_css 'copyright', output, 0
     end
 
-    test 'should link to default stylesheet by default' do
+    test 'should link to default stylesheet by default when safe mode is SECURE or greater' do
       sample_input_path = fixture_path('basic.asciidoc')
       output = Asciidoctor.render_file(sample_input_path, :header_footer => true)
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
+    end
+
+    test 'should embed default stylesheet by default if SafeMode is less than SECURE' do
+      input = <<-EOS
+= Document Title
+
+text
+      EOS
+
+      output = Asciidoctor.render(input, :safe => Asciidoctor::SafeMode::SERVER, :header_footer => true)
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
+      stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
+      styles = stylenode.first.content
+      assert !styles.nil?
+      assert !styles.strip.empty?
     end
 
     test 'should link to default stylesheet by default if linkcss is unset in document' do

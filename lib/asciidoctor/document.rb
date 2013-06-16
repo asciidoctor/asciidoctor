@@ -145,7 +145,6 @@ class Document < AbstractBlock
     @attributes['notitle'] = '' unless @options[:header_footer]
     @attributes['toc-placement'] = 'auto'
     @attributes['stylesheet'] = ''
-    @attributes['linkcss'] = ''
 
     # language strings
     # TODO load these based on language settings
@@ -207,7 +206,7 @@ class Document < AbstractBlock
     end
 
     if @safe >= SafeMode::SERVER
-      # restrict document from setting linkcss, copycss, source-highlighter and backend
+      # restrict document from setting copycss, source-highlighter and backend
       @attribute_overrides['copycss'] ||= nil
       @attribute_overrides['source-highlighter'] ||= nil
       @attribute_overrides['backend'] ||= DEFAULT_BACKEND
@@ -217,7 +216,7 @@ class Document < AbstractBlock
       end
       @attribute_overrides['docdir'] = ''
       if @safe >= SafeMode::SECURE
-        # assign linkcss (preventing css embedding) unless disabled from the commandline
+        # assign linkcss (preventing css embedding) unless explicitly disabled from the commandline or API
         unless @attribute_overrides.fetch('linkcss', '').nil? || @attribute_overrides.has_key?('linkcss!')
           @attribute_overrides['linkcss'] = ''
         end
@@ -246,6 +245,12 @@ class Document < AbstractBlock
       end
       verdict
     }
+
+    # special case like this can be removed once
+    # we move to a data table for attribute storage
+    #if @attributes['linkcss'].nil?
+    #  @attributes.delete('linkcss')
+    #end
 
     @attributes['backend'] ||= DEFAULT_BACKEND
     @attributes['doctype'] ||= DEFAULT_DOCTYPE
