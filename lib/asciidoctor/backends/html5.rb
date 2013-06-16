@@ -622,7 +622,7 @@ class BlockUlistTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="ulist<%= (checklist = (attr? 'option-checklist')) ? ' checklist' : nil %>#{style_class}#{role_class}">
 #{title_div}
-<ul<%= checklist ? ' type="none"' : nil %>><%
+<ul<%= checklist ? ' class="checklist"' : nil %>><%
 if checklist
   # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
   marker_checked = (attr? 'icons', 'font') ? '<i class="icon-check"></i> ' : '<input type="checkbox" data-item-complete="1" checked disabled> '

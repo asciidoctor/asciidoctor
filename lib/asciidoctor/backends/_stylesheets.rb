@@ -250,6 +250,7 @@ dl dd { margin-left: 1.125em; }
 dl dd:last-child, dl dd:last-child > :last-child { margin-bottom: 0; }
 .unstyled dl dt { font-weight: normal; font-style: normal; }
 ol > li p, ul > li p, ul dd, ol dd { margin-bottom: 0.625em; }
+ul.unstyled, ol.unnumbered, ul.checklist { list-style-type: none; margin-left: 0.625em; }
 ol.arabic { list-style-type: decimal; }
 ol.loweralpha { list-style-type: lower-alpha; }
 ol.upperalpha { list-style-type: upper-alpha; }
