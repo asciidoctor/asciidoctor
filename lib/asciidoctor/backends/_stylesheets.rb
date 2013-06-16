@@ -212,7 +212,8 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-si
 pre { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; overflow-x: auto; line-height: 1.6; }
 .verseblock { margin-bottom: 1.25em; }
 .literalblock, .listingblock { margin-bottom: 1.25em; }
-.literalblock > .content > pre, .listingblock > .content > pre { background: none; color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; border-width: 1px 0; border-style: dotted; border-color: #bfbfbf; -webkit-border-radius: 4px; border-radius: 4px; padding: 0.75em 0.75em 0.5em 0.75em; white-space: pre; overflow-x: auto; line-height: 1.6; }
+.literalblock > .content > pre, .listingblock > .content > pre { background: none; color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; border-width: 1px 0; border-style: dotted; border-color: #bfbfbf; -webkit-border-radius: 4px; border-radius: 4px; padding: 0.75em 0.75em 0.5em 0.75em; word-wrap: break-word; line-height: 1.6; }
+.literalblock > .content > pre.nowrap, .listingblock > .content > pre.nowrap { overflow-x: auto; white-space: pre; }
 .literalblock > .content > pre > code, .literalblock > .content > pre > tt, .listingblock > .content > pre > code, .listingblock > .content > pre > tt { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; padding: 0; background: none; font-weight: normal; }
 @media only screen { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.8em; } }
 @media only screen and (min-width: 48em) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.9em; } }

@@ -145,6 +145,7 @@ class Document < AbstractBlock
     @attributes['notitle'] = '' unless @options[:header_footer]
     @attributes['toc-placement'] = 'auto'
     @attributes['stylesheet'] = ''
+    @attributes['prewrap'] = ''
 
     # language strings
     # TODO load these based on language settings
