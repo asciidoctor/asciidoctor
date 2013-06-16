@@ -973,7 +973,7 @@ class Lexer
       list_item = ListItem.new(list_block, text)
 
       if checkbox
-        list_block.attributes['option-checklist'] = ''
+        list_block.attributes['checklist-option'] = ''
         list_item.attributes['checkbox'] = ''
         list_item.attributes['checked'] = '' if checked
       end

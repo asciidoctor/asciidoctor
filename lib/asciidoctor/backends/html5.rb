@@ -620,7 +620,7 @@ end
 class BlockUlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="ulist<%= (checklist = (attr? 'option-checklist')) ? ' checklist' : nil %>#{style_class}#{role_class}">
+<%#encoding:UTF-8%><div#{id} class="ulist<%= (checklist = (option? 'checklist')) ? ' checklist' : nil %>#{style_class}#{role_class}">
 #{title_div}
 <ul<%= checklist ? ' class="checklist"' : nil %>><%
 if checklist
