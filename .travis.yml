@@ -9,4 +9,5 @@ rvm:
   - rbx-19mode
 #script: rake test test_us_ascii
 notifications:
+  email: false
   irc: "irc.freenode.org#asciidoctor"
