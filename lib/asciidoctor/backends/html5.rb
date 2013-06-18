@@ -418,24 +418,25 @@ class BlockListingTemplate < BaseTemplate
 <div class="content monospaced"><%
 if attr? 'style', 'source', false
   language = (language = (attr 'language')) ? %(\#{language} language-\#{language}) : nil
+  nowrap = !(@document.attr? 'prewrap') || (option? 'nowrap')
   case attr 'source-highlighter'
   when 'coderay'
-    pre_class = ' class="CodeRay"'
+    pre_class = nowrap ? ' class="CodeRay nowrap"' : ' class="CodeRay"'
     code_class = language ? %( class="\#{language}") : nil
   when 'highlightjs', 'highlight.js'
-    pre_class = ' class="highlight"'
+    pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
     code_class = language ? %( class="\#{language}") : nil
   when 'prettify'
-    pre_class = %( class="prettyprint\#{(attr? 'linenums') ? ' linenums' : nil})
+    pre_class = %( class="prettyprint\#{nowrap ? ' nowrap' : nil}\#{(attr? 'linenums') ? ' linenums' : nil})
     pre_class = language ? %(\#{pre_class} \#{language}") : %(\#{pre_class}")
     code_class = nil
   else
-    pre_class = ' class="highlight"'
+    pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
     code_class = language ? %( class="\#{language}") : nil
   end %>
 <pre<%= pre_class %>><code<%= code_class %>><%= template.preserve_endlines(content, self) %></code></pre><%
 else %>
-<pre><%= template.preserve_endlines(content, self) %></pre><%
+<pre<%= !(@document.attr? 'prewrap') || (option? 'nowrap') ? ' class="nowrap"' : nil %>><%= template.preserve_endlines(content, self) %></pre><%
 end %>
 </div>
 </div>
@@ -449,7 +450,7 @@ class BlockLiteralTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="literalblock#{role_class}">
 #{title_div}
 <div class="content monospaced">
-<pre><%= template.preserve_endlines(content, self) %></pre>
+<pre<%= !(@document.attr? 'prewrap') || (option? 'nowrap') ? ' class="nowrap"' : nil %>><%= template.preserve_endlines(content, self) %></pre>
 </div>
 </div>
     EOS
