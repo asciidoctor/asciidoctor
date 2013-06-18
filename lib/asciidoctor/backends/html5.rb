@@ -35,7 +35,7 @@ class DocumentTemplate < BaseTemplate
       if sec_level == 0 && sections.first.special
         sec_level = 1
       end
-      toc_level = %(<ol type="none" class="sectlevel#{sec_level}">\n)
+      toc_level = %(<ul class="sectlevel#{sec_level}">\n)
       sections.each do |section|
         section_num = section.numbered ? %(#{section.sectnum} ) : nil
         toc_level = %(#{toc_level}<li><a href=\"##{section.id}\">#{section_num}#{section.caption}#{section.title}</a></li>\n)
@@ -43,7 +43,7 @@ class DocumentTemplate < BaseTemplate
           toc_level = %(#{toc_level}<li>\n#{child_toc_level}\n</li>\n)
         end
       end
-      toc_level = %(#{toc_level}</ol>)
+      toc_level = %(#{toc_level}</ul>)
     end
     toc_level
   end
