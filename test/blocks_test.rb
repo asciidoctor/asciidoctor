@@ -714,6 +714,31 @@ end
       assert_equal expected.chomp, result
     end
 
+    test 'literal block should honor nowrap option' do
+      input = <<-EOS
+[options="nowrap"]
+----
+Do not wrap me if I get too long.
+----
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'pre.nowrap', output, 1
+    end
+
+    test 'literal block should set nowrap class if prewrap document attribute is disabled' do
+      input = <<-EOS
+:prewrap!:
+
+----
+Do not wrap me if I get too long.
+----
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'pre.nowrap', output, 1
+    end
+
     test 'literal block should honor explicit subs list' do
       input = <<-EOS
 [subs="verbatim,quotes"]
