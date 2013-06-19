@@ -92,4 +92,9 @@ context 'Options' do
     assert_equal 'inline', options[:attributes]['doctype']
   end
 
+  test 'template engine assignment' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-E haml test/fixtures/sample.asciidoc))
+    assert_equal 'haml', options[:template_engine]
+  end
+
 end
