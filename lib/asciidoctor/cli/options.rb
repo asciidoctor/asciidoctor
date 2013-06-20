@@ -13,6 +13,7 @@ module Asciidoctor
         self[:safe] = options[:safe] || SafeMode::UNSAFE
         self[:header_footer] = options[:header_footer] || true
         self[:template_dir] = options[:template_dir] || nil
+        self[:template_engine] = options[:template_engine] || nil
         if options[:doctype]
           self[:attributes]['doctype'] = options[:doctype]
         end
@@ -89,6 +90,9 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts.on('-T', '--template-dir DIR', 'directory containing custom render templates the override the built-in set') do |template_dir|
             self[:template_dir] = template_dir
+          end
+          opts.on('-E', '--template-engine NAME', 'template engine to use for the custom render templates (loads gem on demand)') do |template_engine|
+            self[:template_engine] = template_engine
           end
           opts.on('-B', '--base-dir DIR', 'base directory containing the document and resources (default: directory of source file)') do |base_dir|
             self[:base_dir] = base_dir

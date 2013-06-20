@@ -2,12 +2,12 @@
 .\"     Title: asciidoctor
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 05/30/2013
+.\"      Date: 06/19/2013
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "05/30/2013" "\ \&" "\ \&"
+.TH "ASCIIDOCTOR" "1" "06/19/2013" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -134,6 +134,11 @@ Compact the output by removing blank lines\&. Not enabled by default\&.
 \fB\-D, \-\-destination\-dir\fR=\fIDIR\fR
 .RS 4
 Destination output directory\&. Defaults to the directory containing the source file, or the working directory if the source is read from a stream\&. If specified, the directory is resolved relative to the working directory\&.
+.RE
+.PP
+\fB\-E, \-\-template\-engine\fR=\fINAME\fR
+.RS 4
+Template engine to use for the custom render templates\&. The gem with the same name as the engine will be loaded automatically\&. This name is also used to build the full path to the custom templates\&.
 .RE
 .PP
 \fB\-e, \-\-eruby\fR

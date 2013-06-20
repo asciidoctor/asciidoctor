@@ -87,6 +87,11 @@ Rendering Control
     source file, or the working directory if the source is read from a stream.
     If specified, the directory is resolved relative to the working directory.
 
+*-E, --template-engine*='NAME'::
+    Template engine to use for the custom render templates. The gem with the
+    same name as the engine will be loaded automatically. This name is also
+    used to build the full path to the custom templates.
+
 *-e, --eruby*::
     Specifies the eRuby implementation to use for rendering the built-in
     templates. Supported values are 'erb' and 'erubis'. Defaults to 'erb'.
