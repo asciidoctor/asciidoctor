@@ -88,7 +88,8 @@ Example: asciidoctor -b html5 source.asciidoc
               self[:attributes][key] = val || ''
             end
           end
-          opts.on('-T', '--template-dir DIR', 'a directory containing custom render templates that override the built-in set') do |template_dir|
+          opts.on('-T', '--template-dir DIR', 'a directory containing custom render templates that override the built-in set (requires tilt gem)',
+                  'may be specified multiple times') do |template_dir|
             if self[:template_dirs].nil?
               self[:template_dirs] = [template_dir]
             elsif self[:template_dirs].is_a? Array
@@ -139,6 +140,13 @@ Example: asciidoctor -b html5 source.asciidoc
           elsif self[:input_file] != '-' && !File.readable?(self[:input_file])
             $stderr.puts "asciidoctor: FAILED: input file #{self[:input_file]} missing or cannot be read"
             return 1
+          elsif !self[:template_dirs].nil?
+            begin
+              require 'tilt'
+            rescue LoadError
+              $stderr.puts 'asciidoctor: FAILED: tilt could not be loaded; to use a custom backend, you must have the tilt gem installed (gem install tilt)'
+              return 1
+            end
           end
         rescue OptionParser::MissingArgument
           $stderr.puts "asciidoctor: option #{$!.message}"
