@@ -24,13 +24,13 @@ context 'Renderer' do
 
   context 'View options' do
     test 'should set Haml format to html5 for html5 backend' do
-      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'haml')
+      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml')
       assert doc.renderer.views['block_paragraph'].is_a? Tilt::HamlTemplate
       assert_equal :html5, doc.renderer.views['block_paragraph'].options[:format]
     end
 
     test 'should set Haml format to xhtml for docbook backend' do
-      doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'haml')
+      doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml')
       assert doc.renderer.views['block_paragraph'].is_a? Tilt::HamlTemplate
       assert_equal :xhtml, doc.renderer.views['block_paragraph'].options[:format]
     end
@@ -38,7 +38,7 @@ context 'Renderer' do
 
   context 'Custom backends' do
     test 'should load Haml templates for default backend' do
-      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'haml')
+      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml')
       assert doc.renderer.views['block_paragraph'].is_a? Tilt::HamlTemplate
       assert doc.renderer.views['block_paragraph'].file.end_with? 'block_paragraph.html.haml'
       assert doc.renderer.views['block_sidebar'].is_a? Tilt::HamlTemplate
@@ -46,7 +46,7 @@ context 'Renderer' do
     end
 
     test 'should load Haml templates for docbook45 backend' do
-      doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'haml')
+      doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml')
       assert doc.renderer.views['block_paragraph'].is_a? Tilt::HamlTemplate
       assert doc.renderer.views['block_paragraph'].file.end_with? 'block_paragraph.xml.haml'
     end
@@ -66,7 +66,7 @@ Sidebar content
 ****
       EOS
 
-      output = render_embedded_string input, :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'haml')
+      output = render_embedded_string input, :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml')
       assert_xpath '/*[@class="sect1"]/*[@class="sectionbody"]/p', output, 1
       assert_xpath '//aside', output, 1
       assert_xpath '/*[@class="sect1"]/*[@class="sectionbody"]/p/following-sibling::aside', output, 1
@@ -75,7 +75,7 @@ Sidebar content
     end
 
     test 'should load Slim templates for default backend' do
-      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'slim')
+      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim')
       assert doc.renderer.views['block_paragraph'].is_a? Slim::Template
       assert doc.renderer.views['block_paragraph'].file.end_with? 'block_paragraph.html.slim'
       assert doc.renderer.views['block_sidebar'].is_a? Slim::Template
@@ -83,7 +83,7 @@ Sidebar content
     end
 
     test 'wip should load Slim templates for docbook45 backend' do
-      doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'slim')
+      doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim')
       assert doc.renderer.views['block_paragraph'].is_a? Slim::Template
       assert doc.renderer.views['block_paragraph'].file.end_with? 'block_paragraph.xml.slim'
     end
@@ -103,7 +103,7 @@ Sidebar content
 ****
       EOS
 
-      output = render_embedded_string input, :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'slim')
+      output = render_embedded_string input, :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim')
       assert_xpath '/*[@class="sect1"]/*[@class="sectionbody"]/p', output, 1
       assert_xpath '//aside', output, 1
       assert_xpath '/*[@class="sect1"]/*[@class="sectionbody"]/p/following-sibling::aside', output, 1

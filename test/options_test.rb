@@ -97,4 +97,14 @@ context 'Options' do
     assert_equal 'haml', options[:template_engine]
   end
 
+  test 'template directory assignment' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-T custom-backend test/fixtures/sample.asciidoc))
+    assert_equal ['custom-backend'], options[:template_dirs]
+  end
+
+  test 'multiple template directory assignments' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-T custom-backend -T custom-backend-hacks test/fixtures/sample.asciidoc))
+    assert_equal ['custom-backend', 'custom-backend-hacks'], options[:template_dirs]
+  end
+
 end
