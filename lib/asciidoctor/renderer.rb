@@ -32,22 +32,8 @@ class Renderer
     end
 
     # If user passed in a template dir, let them override our base templates
-    if template_dir = options.delete(:template_dir)
+    if (template_dirs = options.delete(:template_dirs))
       Helpers.require_library 'tilt'
-
-      template_glob = '*'
-      if (engine = options[:template_engine])
-        template_glob = "*.#{engine}"
-        # example: templates/haml
-        if File.directory? File.join(template_dir, engine)
-          template_dir = File.join template_dir, engine
-        end
-      end
-
-      # example: templates/html5 or templates/haml/html5
-      if File.directory? File.join(template_dir, options[:backend])
-        template_dir = File.join template_dir, options[:backend]
-      end
 
       view_opts = {
         :erb =>  { :trim => '<>' },
@@ -61,29 +47,46 @@ class Renderer
       end
 
       slim_loaded = false
-      helpers = nil
-      
-      # Grab the files in the top level of the directory (we're not traversing)
-      Dir.glob(File.join(template_dir, template_glob)).
-          select{|f| File.file? f }.each do |template|
-        basename = File.basename(template)
-        if basename == 'helpers.rb'
-          helpers = template
-          next
-        end
-        name_parts = basename.split('.')
-        next if name_parts.size < 2
-        view_name = name_parts.first 
-        ext_name = name_parts.last
-        if ext_name == 'slim' && !slim_loaded
-          # slim doesn't get loaded by Tilt
-          Helpers.require_library 'slim'
-        end
-        next unless Tilt.registered? ext_name
-        @views[view_name] = Tilt.new(template, nil, view_opts[ext_name.to_sym])
-      end
 
-      require helpers unless helpers.nil?
+      template_dirs.each do |template_dir|
+        template_glob = '*'
+        if (engine = options[:template_engine])
+          template_glob = "*.#{engine}"
+          # example: templates/haml
+          if File.directory? File.join(template_dir, engine)
+            template_dir = File.join template_dir, engine
+          end
+        end
+
+        # example: templates/html5 or templates/haml/html5
+        if File.directory? File.join(template_dir, backend)
+          template_dir = File.join template_dir, backend
+        end
+
+        helpers = nil
+        
+        # Grab the files in the top level of the directory (we're not traversing)
+        Dir.glob(File.join(template_dir, template_glob)).
+            select{|f| File.file? f }.each do |template|
+          basename = File.basename(template)
+          if basename == 'helpers.rb'
+            helpers = template
+            next
+          end
+          name_parts = basename.split('.')
+          next if name_parts.size < 2
+          view_name = name_parts.first 
+          ext_name = name_parts.last
+          if ext_name == 'slim' && !slim_loaded
+            # slim doesn't get loaded by Tilt
+            Helpers.require_library 'slim'
+          end
+          next unless Tilt.registered? ext_name
+          @views[view_name] = Tilt.new(template, nil, view_opts[ext_name.to_sym])
+        end
+
+        require helpers unless helpers.nil?
+      end
     end
   end
 

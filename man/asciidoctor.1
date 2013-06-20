@@ -2,12 +2,12 @@
 .\"     Title: asciidoctor
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 06/19/2013
+.\"      Date: 06/20/2013
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "06/19/2013" "\ \&" "\ \&"
+.TH "ASCIIDOCTOR" "1" "06/20/2013" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -175,7 +175,11 @@ Suppress the document header and footer in the output\&.
 .PP
 \fB\-T, \-\-template\-dir\fR=\fIDIR\fR
 .RS 4
-Directory containing custom render templates that override one or more templates from the built\-in set\&. If there is a folder in the directory that matches the backend, the templates from that folder will be used\&.
+A directory containing custom render templates that override one or more templates from the built\-in set\&.
+.sp
+If there is a subfolder that matches the engine name (if specified), that folder is appended to the template directory path\&. Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path\&.
+.sp
+This option may be specified more than once\&. Matching templates found in subsequent directories override ones previously discovered\&.
 .RE
 .SS "Processing Information"
 .PP

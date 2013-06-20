@@ -611,7 +611,9 @@ class Document < AbstractBlock
 
     # Load up relevant Document @options
     if @options.has_key? :template_dir
-      render_options[:template_dir] = @options[:template_dir]
+      render_options[:template_dirs] = [@options[:template_dir]]
+    elsif @options.has_key? :template_dirs
+      render_options[:template_dirs] = @options[:template_dirs]
     end
     
     render_options[:backend] = @attributes.fetch('backend', 'html5')

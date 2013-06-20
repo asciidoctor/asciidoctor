@@ -241,10 +241,19 @@ context 'Invoker' do
   end
 
   test 'should locate custom templates based on template dir, template engine and backend' do
-    custom_backend_root = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures'))
+    custom_backend_root = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends'))
     invoker = invoke_cli_to_buffer %W(-E haml -T #{custom_backend_root} -o -)
     doc = invoker.document
     assert doc.renderer.views['block_paragraph'].is_a? Tilt::HamlTemplate
+  end
+
+  test 'should load custom templates from multiple template directories' do
+    custom_backend_1 = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends/haml/html5'))
+    custom_backend_2 = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends/haml/html5-tweaks'))
+    invoker = invoke_cli_to_buffer %W(-T #{custom_backend_1} -T #{custom_backend_2} -o - -s)
+    output = invoker.read_output
+    assert_css '.paragraph', output, 0
+    assert_css '#preamble > .sectionbody > p', output, 1
   end
 
   test 'should set attribute with value' do
