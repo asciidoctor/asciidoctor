@@ -110,9 +110,16 @@ Rendering Control
     Suppress the document header and footer in the output.
 
 *-T, --template-dir*='DIR'::
-    Directory containing custom render templates that override one or more
-    templates from the built-in set. If there is a folder in the directory
-    that matches the backend, the templates from that folder will be used.
+    A directory containing custom render templates that override one or more
+    templates from the built-in set.
++
+If there is a subfolder that matches the engine name (if specified), that folder
+is appended to the template directory path. Similarly, if there is a subfolder
+in the resulting template directory that matches the name of the backend, that
+folder is appended to the template directory path.
++
+This option may be specified more than once. Matching templates found in
+subsequent directories override ones previously discovered.
 
 Processing Information
 ~~~~~~~~~~~~~~~~~~~~~~
