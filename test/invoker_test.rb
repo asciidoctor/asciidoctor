@@ -240,6 +240,13 @@ context 'Invoker' do
     assert_xpath '/html/body[@class="book"]', output, 1
   end
 
+  test 'should locate custom templates based on template dir, template engine and backend' do
+    custom_backend_root = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures'))
+    invoker = invoke_cli_to_buffer %W(-E haml -T #{custom_backend_root} -o -)
+    doc = invoker.document
+    assert doc.renderer.views['block_paragraph'].is_a? Tilt::HamlTemplate
+  end
+
   test 'should set attribute with value' do
     invoker = invoke_cli_to_buffer %w(--trace -a idprefix=id -s -o -)
     doc = invoker.document
