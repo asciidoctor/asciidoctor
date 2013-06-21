@@ -466,8 +466,9 @@ ____
       EOS
       doc = document_from_string(input)
       qb = doc.blocks.first
-      assert_equal 'quote', qb.attributes['style']
-      assert_equal 'quote', qb.attr(:style)
+      assert_equal 'quote', qb.style
+      assert_equal 'author', qb.attr('attribution')
+      assert_equal 'author', qb.attr(:attribution)
       assert_equal 'author', qb.attributes['attribution']
       assert_equal 'source', qb.attributes['citetitle']
     end
@@ -481,8 +482,9 @@ ____
       EOS
       doc = document_from_string(input)
       qb = doc.blocks.first
-      assert_equal 'quote', qb.attributes['style']
-      assert_equal 'quote', qb.attr(:style)
+      assert_equal 'quote', qb.style
+      assert_equal 'author', qb.attr('attribution')
+      assert_equal 'author', qb.attr(:attribution)
       assert_equal 'author', qb.attributes['attribution']
       assert_equal '<a href="http://wikipedia.org">source</a>', qb.attributes['citetitle']
     end
@@ -497,7 +499,7 @@ ____
 
       doc = document_from_string input
       qb = doc.blocks.first
-      assert_equal 'quote', qb.attributes['style']
+      assert_equal 'quote', qb.style
     end
 
     test 'attribute list may begin with comma' do
@@ -510,7 +512,7 @@ ____
 
       doc = document_from_string input
       qb = doc.blocks.first
-      assert_equal 'quote', qb.attributes['style']
+      assert_equal 'quote', qb.style
       assert_equal 'author', qb.attributes['attribution']
       assert_equal 'source', qb.attributes['citetitle']
     end
@@ -525,7 +527,7 @@ ____
 
       doc = document_from_string input
       qb = doc.blocks.first
-      assert_equal 'quote', qb.attributes['style']
+      assert_equal 'quote', qb.style
       assert_equal 'author', qb.attributes['attribution']
       assert_equal 'source', qb.attributes['citetitle']
       assert_equal 'famous', qb.attributes['role']
@@ -541,7 +543,7 @@ ____
 
       doc = document_from_string input
       qb = doc.blocks.first
-      assert_equal 'quote', qb.attributes['style']
+      assert_equal 'quote', qb.style
       assert_equal 'author', qb.attributes['attribution']
       assert_equal 'source', qb.attributes['citetitle']
       assert_equal 'famous', qb.attributes['role']

@@ -695,6 +695,9 @@ class Lexer
       block.id      ||= attributes['id'] if attributes.has_key?('id')
       block.title     = attributes['title'] unless block.title?
       block.caption ||= attributes.delete('caption')
+      # TODO eventualy remove the style attribute from the attributes hash
+      #block.style     = attributes.delete('style')
+      block.style     = attributes['style']
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
       if block.id && block.title? && !attributes.has_key?('reftext')

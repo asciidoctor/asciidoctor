@@ -9,6 +9,9 @@ class AbstractBlock < AbstractNode
   # Public: Set the String block title.
   attr_writer :title
 
+  # Public: Get/Set the String style (block type qualifier) for this block.
+  attr_accessor :style
+
   # Public: Get/Set the caption for this block
   attr_accessor :caption
 
@@ -18,6 +21,7 @@ class AbstractBlock < AbstractNode
     @id = nil
     @title = nil
     @caption = nil
+    @style = nil
     if context == :document
       @level = 0
     elsif !parent.nil? && !self.is_a?(Section)
