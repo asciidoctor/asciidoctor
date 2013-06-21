@@ -111,7 +111,7 @@ Rendering Control
 
 *-T, --template-dir*='DIR'::
     A directory containing custom render templates that override one or more
-    templates from the built-in set.
+    templates from the built-in set. (requires 'tilt' gem)
 +
 If there is a subfolder that matches the engine name (if specified), that folder
 is appended to the template directory path. Similarly, if there is a subfolder

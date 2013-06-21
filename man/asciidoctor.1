@@ -175,7 +175,9 @@ Suppress the document header and footer in the output\&.
 .PP
 \fB\-T, \-\-template\-dir\fR=\fIDIR\fR
 .RS 4
-A directory containing custom render templates that override one or more templates from the built\-in set\&.
+A directory containing custom render templates that override one or more templates from the built\-in set\&. (requires
+\fItilt\fR
+gem)
 .sp
 If there is a subfolder that matches the engine name (if specified), that folder is appended to the template directory path\&. Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path\&.
 .sp
