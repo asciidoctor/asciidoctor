@@ -63,6 +63,20 @@ class AbstractBlock < AbstractNode
     end
   end
 
+  # Public: Convenience method that returns the interpreted title of the Block
+  # with the caption prepended.
+  #
+  # Concatenates the value of this Block's caption instance variable and the
+  # return value of this Block's title method. No space is added between the
+  # two values. If the Block does not have a caption, the interpreted title is
+  # returned.
+  #
+  # Returns the String title prefixed with the caption, or just the title if no
+  # caption is set
+  def captioned_title
+    %(#{@caption}#{title})
+  end
+
   # Public: Determine whether this Block contains block content
   #
   # returns Whether this Block has block content

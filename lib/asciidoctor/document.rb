@@ -247,12 +247,6 @@ class Document < AbstractBlock
       verdict
     }
 
-    # special case like this can be removed once
-    # we move to a data table for attribute storage
-    #if @attributes['linkcss'].nil?
-    #  @attributes.delete('linkcss')
-    #end
-
     @attributes['backend'] ||= DEFAULT_BACKEND
     @attributes['doctype'] ||= DEFAULT_DOCTYPE
     update_backend_attributes
