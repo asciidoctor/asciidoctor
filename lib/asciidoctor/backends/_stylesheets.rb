@@ -18,7 +18,7 @@ article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, 
 audio, canvas, video { display: inline-block; }
 audio:not([controls]) { display: none; height: 0; }
 [hidden] { display: none; }
-html { font-family: sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+html { background: #fff; color: #000; font-family: sans-serif; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
 body { margin: 0; }
 a:focus { outline: thin dotted; }
 a:active, a:hover { outline: 0; }
@@ -53,7 +53,8 @@ textarea { overflow: auto; vertical-align: top; }
 table { border-collapse: collapse; border-spacing: 0; }
 *, *:before, *:after { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 html, body { font-size: 100%; }
-body { background: white; color: #222222; padding: 0; margin: 0; font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; line-height: 1; position: relative; }
+body { background: white; color: #222222; padding: 0; margin: 0; font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; line-height: 1; position: relative; cursor: auto; }
+a:hover { cursor: pointer; }
 a:focus { outline: none; }
 img, object, embed { max-width: 100%; height: auto; }
 object, embed { height: 100%; }
@@ -67,7 +68,7 @@ img { -ms-interpolation-mode: bicubic; }
 .text-justify { text-align: justify !important; }
 .hide { display: none; }
 .antialiased, body { -webkit-font-smoothing: antialiased; }
-img { display: inline-block; }
+img { display: inline-block; vertical-align: middle; }
 textarea { height: auto; min-height: 50px; }
 select { width: 100%; }
 p.lead, .paragraph.lead > p, #preamble > .sectionbody > .paragraph:first-of-type p { font-size: 1.21875em; line-height: 1.6; }
@@ -92,13 +93,14 @@ strong, b { font-weight: bold; line-height: inherit; }
 small { font-size: 60%; line-height: inherit; }
 code, tt { font-family: Consolas, "Liberation Mono", Courier, monospace; font-weight: normal; color: #6d180b; }
 ul, ol, dl { font-size: 1em; line-height: 1.6; margin-bottom: 1.25em; list-style-position: outside; font-family: inherit; }
-ul li ul, ul li ol { margin-left: 1.5em; margin-bottom: 0; font-size: 1em; }
+ul, ol { margin-left: 1.5em; }
+ul li ul, ul li ol { margin-left: 1.25em; margin-bottom: 0; font-size: 1em; }
 ul.square li ul, ul.circle li ul, ul.disc li ul { list-style: inherit; }
 ul.square { list-style-type: square; }
 ul.circle { list-style-type: circle; }
 ul.disc { list-style-type: disc; }
 ul.no-bullet { list-style: none; }
-ol li ul, ol li ol { margin-left: 1.5em; margin-bottom: 0; }
+ol li ul, ol li ol { margin-left: 1.25em; margin-bottom: 0; }
 dl dt { margin-bottom: 0.3125em; font-weight: bold; }
 dl dd { margin-bottom: 1.25em; }
 abbr, acronym { text-transform: uppercase; font-size: 90%; color: #222222; border-bottom: 1px dotted #dddddd; cursor: help; }
@@ -112,8 +114,8 @@ blockquote, blockquote p { line-height: 1.6; color: #6f6f6f; }
 .vcard li { margin: 0; display: block; }
 .vcard .fn { font-weight: bold; font-size: 0.9375em; }
 .vevent .summary { font-weight: bold; }
-.vevent abbr { cursor: default; text-decoration: none; font-weight: bold; border: none; padding: 0 0.0625em; }
-@media only screen and (min-width: 48em) { h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 { line-height: 1.4; }
+.vevent abbr { cursor: auto; text-decoration: none; font-weight: bold; border: none; padding: 0 0.0625em; }
+@media only screen and (min-width: 768px) { h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 { line-height: 1.4; }
   h1 { font-size: 2.75em; }
   h2 { font-size: 2.3125em; }
   h3, #toctitle, .sidebarblock > .content > .title { font-size: 1.6875em; }
@@ -168,11 +170,11 @@ p a > tt:hover { color: #561309; }
 #toc ul.sectlevel0 ul.sectlevel1, #toc ol.sectlevel0 ol.sectlevel1 { margin-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
 #toc ul, #toc ol { list-style-type: none; }
 #toctitle { color: #7a2518; }
-@media only screen and (min-width: 80em) { body.toc2 { padding-left: 20em; }
+@media only screen and (min-width: 1280px) { body.toc2 { padding-left: 20em; }
   #toc.toc2 { position: fixed; width: 20em; left: 0; top: 0; border-right: 1px solid #ebebeb; border-bottom: 0; z-index: 1000; padding: 1em; height: 100%; overflow: auto; }
   #toc.toc2 #toctitle { margin-top: 0; }
   #toc.toc2 > ul, #toc.toc2 > ol { font-size: .95em; }
-  #toc.toc2 ul ul, #toc.toc2 ol ol { margin-left: 0; padding-left: 1em; }
+  #toc.toc2 ul ul, #toc.toc2 ol ol { margin-left: 0; padding-left: 1.25em; }
   #toc.toc2 ul.sectlevel0 ul.sectlevel1, #toc.toc2 ol.sectlevel0 ol.sectlevel1 { padding-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; } }
 #footer { max-width: 100%; background-color: #222222; padding: 1.25em; }
 #footer-text { color: #dddddd; line-height: 1.44; }
@@ -193,18 +195,18 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-si
 .admonitionblock > table td.content { padding-left: 1.125em; padding-right: 1.25em; border-left: 1px solid #dddddd; color: #6f6f6f; }
 .admonitionblock > table td.content > .paragraph:last-child > p { margin-bottom: 0; }
 .exampleblock > .content { border-style: solid; border-width: 1px; border-color: #e6e6e6; margin-bottom: 1.25em; padding: 1.25em; background: white; -webkit-border-radius: 4px; border-radius: 4px; }
-.exampleblock > .content h1, .exampleblock > .content h2, .exampleblock > .content h3, .exampleblock > .content #toctitle, .sidebarblock.exampleblock > .content > .title, .exampleblock > .content h4, .exampleblock > .content h5, .exampleblock > .content h6, .exampleblock > .content p { color: #333333; }
 .exampleblock > .content > :first-child { margin-top: 0; }
 .exampleblock > .content > :last-child { margin-bottom: 0; }
+.exampleblock > .content h1, .exampleblock > .content h2, .exampleblock > .content h3, .exampleblock > .content #toctitle, .sidebarblock.exampleblock > .content > .title, .exampleblock > .content h4, .exampleblock > .content h5, .exampleblock > .content h6, .exampleblock > .content p { color: #333333; }
 .exampleblock > .content h1, .exampleblock > .content h2, .exampleblock > .content h3, .exampleblock > .content #toctitle, .sidebarblock.exampleblock > .content > .title, .exampleblock > .content h4, .exampleblock > .content h5, .exampleblock > .content h6 { line-height: 1; margin-bottom: 0.625em; }
 .exampleblock > .content h1.subheader, .exampleblock > .content h2.subheader, .exampleblock > .content h3.subheader, .exampleblock > .content .subheader#toctitle, .sidebarblock.exampleblock > .content > .subheader.title, .exampleblock > .content h4.subheader, .exampleblock > .content h5.subheader, .exampleblock > .content h6.subheader { line-height: 1.4; }
 .exampleblock > .content > :last-child > :last-child, .exampleblock > .content .olist > ol > li:last-child > :last-child, .exampleblock > .content .ulist > ul > li:last-child > :last-child, .exampleblock > .content .qlist > ol > li:last-child > :last-child { margin-bottom: 0; }
 .exampleblock.result > .content { -webkit-box-shadow: 0 1px 8px #d9d9d9; box-shadow: 0 1px 8px #d9d9d9; }
 .imageblock { margin-bottom: 1.25em; }
 .sidebarblock { border-style: solid; border-width: 1px; border-color: #d9d9d9; margin-bottom: 1.25em; padding: 1.25em; background: #f2f2f2; -webkit-border-radius: 4px; border-radius: 4px; }
-.sidebarblock h1, .sidebarblock h2, .sidebarblock h3, .sidebarblock #toctitle, .sidebarblock > .content > .title, .sidebarblock h4, .sidebarblock h5, .sidebarblock h6, .sidebarblock p { color: #333333; }
 .sidebarblock > :first-child { margin-top: 0; }
 .sidebarblock > :last-child { margin-bottom: 0; }
+.sidebarblock h1, .sidebarblock h2, .sidebarblock h3, .sidebarblock #toctitle, .sidebarblock > .content > .title, .sidebarblock h4, .sidebarblock h5, .sidebarblock h6, .sidebarblock p { color: #333333; }
 .sidebarblock h1, .sidebarblock h2, .sidebarblock h3, .sidebarblock #toctitle, .sidebarblock > .content > .title, .sidebarblock h4, .sidebarblock h5, .sidebarblock h6 { line-height: 1; margin-bottom: 0.625em; }
 .sidebarblock h1.subheader, .sidebarblock h2.subheader, .sidebarblock h3.subheader, .sidebarblock .subheader#toctitle, .sidebarblock > .content > .subheader.title, .sidebarblock h4.subheader, .sidebarblock h5.subheader, .sidebarblock h6.subheader { line-height: 1.4; }
 .sidebarblock > .content > .title { color: #7a2518; margin-top: 0; line-height: 1.6; }
@@ -216,8 +218,8 @@ pre { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospa
 .literalblock > .content > pre.nowrap, .listingblock > .content > pre.nowrap { overflow-x: auto; white-space: pre; }
 .literalblock > .content > pre > code, .literalblock > .content > pre > tt, .listingblock > .content > pre > code, .listingblock > .content > pre > tt { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; padding: 0; background: none; font-weight: normal; }
 @media only screen { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.8em; } }
-@media only screen and (min-width: 48em) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.9em; } }
-@media only screen and (min-width: 80em) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 1em; } }
+@media only screen and (min-width: 768px) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.9em; } }
+@media only screen and (min-width: 1280px) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 1em; } }
 .listingblock:hover .xml:before { content: "xml"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
 .listingblock:hover .html:before { content: "html"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
 .listingblock:hover .ruby:before { content: "ruby"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
@@ -245,8 +247,8 @@ th.tableblock.halign-bottom, td.tableblock.halign-bottom { vertical-align: botto
 th.tableblock.halign-middle, td.tableblock.halign-middle { vertical-align: middle; }
 p.tableblock.header { color: #222222; font-weight: bold; }
 td > div.verse { white-space: pre; }
-ul { margin-left: 1.75em; }
-ol { margin-left: 1.875em; }
+ol { margin-left: 1.75em; }
+ul li ol { margin-left: 1.5em; }
 dl dd { margin-left: 1.125em; }
 dl dd:last-child, dl dd:last-child > :last-child { margin-bottom: 0; }
 .unstyled dl dt { font-weight: normal; font-style: normal; }
