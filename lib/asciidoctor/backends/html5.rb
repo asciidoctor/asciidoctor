@@ -470,28 +470,37 @@ class BlockLiteralTemplate < BaseTemplate
 end
 
 class BlockAdmonitionTemplate < BaseTemplate
-  def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="admonitionblock <%= attr :name %>#{role_class}">
+  def result(node)
+    id = node.id
+    name = node.attr 'name'
+    role = node.role
+    title = node.title? ? node.title : nil
+    if node.attr? 'icons'
+      if node.attr? 'icons', 'font'
+        caption = %(<i class="icon-#{name}" title="#{node.caption}"></i>)
+      else
+        caption = %(<img src="#{node.icon_uri(name)}" alt="#{node.caption}">)
+      end
+    else
+      caption = %(<div class="title">#{node.caption}</div>)
+    end
+    %(<div#{id && " id=\"#{id}\""} class="admonitionblock #{name}#{role && " #{role}"}">
 <table>
 <tr>
-<td class="icon"><%
-if attr? 'icons', 'font' %>
-<i class="icon-<%= attr :name %>" title="<%= @caption %>"></i><%
-elsif attr? 'icons' %>
-<img src="<%= icon_uri(attr :name) %>" alt="<%= @caption %>"><%
-else %>
-<div class="title"><%= @caption %></div><%
-end %>
+<td class="icon">
+#{caption}
 </td>
-<td class="content">
-#{title_div}
-<%= content %>
+<td class="content">#{title ? "
+<div class=\"title\">#{title}</div>" : nil}
+#{node.content}
 </td>
 </tr>
 </table>
-</div>
-    EOS
+</div>\n)
+  end
+
+  def template
+    :invoke_result
   end
 end
 
