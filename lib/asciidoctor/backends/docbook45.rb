@@ -26,7 +26,7 @@ module Asciidoctor
     end
 
     def common_attrs_erb
-      %q(<%= template.common_attrs(@id, (attr 'role'), (attr 'reftext')) %>)
+      %q(<%= template.common_attrs(@id, role, reftext) %>)
     end
 
     def content(node)
@@ -161,7 +161,7 @@ class SectionTemplate < BaseTemplate
     else
       tag = sec.document.doctype == 'book' && sec.level <= 1 ? (sec.level == 0 ? 'part' : 'chapter') : 'section'
     end
-    %(<#{tag}#{common_attrs(sec.id, (sec.attr 'role'), (sec.attr 'reftext'))}>
+    %(<#{tag}#{common_attrs(sec.id, sec.role, sec.reftext)}>
 #{sec.title? ? "<title>#{sec.title}</title>" : nil}
 #{sec.content.chomp}
 </#{tag}>\n)
@@ -193,7 +193,7 @@ class BlockParagraphTemplate < BaseTemplate
   end
 
   def result(node)
-    paragraph(node.id, (node.attr 'style', nil, false), (node.attr 'role'), (node.attr 'reftext'), (node.title? ? node.title : nil), node.content)
+    paragraph(node.id, node.style, node.role, node.reftext, (node.title? ? node.title : nil), node.content)
   end
 
   def template
@@ -214,7 +214,7 @@ end
 class BlockUlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if attr? :style, 'bibliography' %>
+<%#encoding:UTF-8%><% if @style == 'bibliography' %>
 <bibliodiv#{common_attrs_erb}>#{title_tag}
   <% content.each do |li| %>
     <bibliomixed>
@@ -244,7 +244,7 @@ end
 class BlockOlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><orderedlist#{common_attrs_erb}#{attribute('numeration', :style)}>#{title_tag}
+<%#encoding:UTF-8%><orderedlist#{common_attrs_erb}#{attribute('numeration', '@style')}>#{title_tag}
   <% content.each do |li| %>
     <listitem>
       <simpara><%= li.text %></simpara>
@@ -306,7 +306,7 @@ class BlockDlistTemplate < BaseTemplate
 continuing = false;
 entries = content
 last_index = entries.length - 1
-if attr? :style, 'horizontal'
+if @style == 'horizontal'
 %><<%= (tag = title? ? 'table' : 'informaltable') %>#{common_attrs_erb} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">#{title_tag}
 <tgroup cols="2">
 <colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
@@ -344,7 +344,7 @@ if attr? :style, 'horizontal'
 </tgroup>
 </<%= tag %>><%
 else
-  tags = (template.class::LIST_TAGS[attr :style] || template.class::LIST_TAGS['labeled'])
+  tags = (template.class::LIST_TAGS[@style] || template.class::LIST_TAGS['labeled'])
   if tags[:list]
 %><<%= tags[:list] %>#{common_attrs_erb}>#{title_tag}<%
   end
@@ -392,8 +392,7 @@ end
 
 class BlockOpenTemplate < BaseTemplate
   def result(node)
-    open_block(node, node.id, (node.attr 'style', nil, false),
-        (node.attr 'role'), (node.attr 'reftext'), node.title? ? node.title : nil)
+    open_block(node, node.id, node.style, node.role, node.reftext, node.title? ? node.title : nil)
   end
 
   def open_block(node, id, style, role, reftext, title)
@@ -431,7 +430,7 @@ class BlockListingTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><%
 if !title?
-  if (attr? 'style', 'source') && (attr? 'language')
+  if @style == 'source' && (attr? 'language')
 %><programlisting#{common_attrs_erb}#{attribute('language', :language)} linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting><%
   else
 %><screen#{common_attrs_erb}><%= template.preserve_endlines(content, self) %></screen><%
@@ -439,7 +438,7 @@ if !title?
 else
 %><formalpara#{common_attrs_erb}>#{title_tag false}
 <para><%
-  if (attr? 'style', 'source') && (attr? 'language') %>
+  if @style == 'source' && (attr? 'language') %>
 <programlisting language="<%= attr 'language' %>" linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting><%
   else %>
 <screen><%= template.preserve_endlines(content, self) %></screen><%
@@ -554,7 +553,7 @@ class BlockTableTemplate < BaseTemplate
         cell_content = ''
         if tblsec == :head %><% cell_content = cell.text %><%
         else %><%
-        case (cell.attr :style)
+        case cell.style
           when :asciidoc %><% cell_content = cell.content %><%
           when :verse %><% cell_content = %(<literallayout>\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
           when :literal %><% cell_content = %(<literallayout class="monospaced">\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
@@ -642,7 +641,7 @@ class InlineQuotedTemplate < BaseTemplate
   end
 
   def result(node)
-    quote_text(node.text, node.type, (node.attr 'role'))
+    quote_text(node.text, node.type, node.role)
   end
 
   def template

@@ -174,6 +174,26 @@ class AbstractNode
     @document.renderer
   end
 
+  # Public: A convenience method that checks if the role attribute is specified
+  def role?
+    self.attr?('role')
+  end
+
+  # Public: A convenience method that returns the value of the role attribute
+  def role
+    self.attr('role')
+  end
+
+  # Public: A convenience method that checks if the reftext attribute is specified
+  def reftext?
+    self.attr?('reftext')
+  end
+
+  # Public: A convenience method that returns the value of the reftext attribute
+  def reftext
+    self.attr('reftext')
+  end
+
   # Public: Construct a reference or data URI to an icon image for the
   # specified icon name.
   #

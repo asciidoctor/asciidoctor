@@ -95,7 +95,7 @@ module Substituters
   def apply_literal_subs(lines)
     if attr? 'subs'
       apply_subs(lines.join, resolve_subs(attr 'subs'))
-    elsif @document.attributes['basebackend'] == 'html' && attr('style') == 'source' &&
+    elsif @document.attributes['basebackend'] == 'html' && @style == 'source' &&
       @document.attributes['source-highlighter'] == 'coderay' && attr?('language')
       sub_callouts(highlight_source(lines.join))
     else

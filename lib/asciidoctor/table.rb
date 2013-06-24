@@ -113,7 +113,7 @@ class Table < AbstractBlock
     if !rows.body.empty? && @has_header_option
       head = rows.body.shift
       # styles aren't applied to header row
-      head.each {|c| c.attributes.delete('style') }
+      head.each {|c| c.style = nil }
       # QUESTION why does AsciiDoc use an array for head? is it
       # possible to have more than one based on the syntax?
       rows.head = [head]
@@ -143,8 +143,12 @@ Table::Rows = Struct.new(:head, :foot, :body)
 # Public: Methods to manage the columns of an AsciiDoc table. In particular, it
 # keeps track of the column specs
 class Table::Column < AbstractNode
+  # Public: Get/Set the Symbol style for this column.
+  attr_accessor :style
+
   def initialize(table, index, attributes = {})
     super(table, :column)
+    @style = attributes['style']
     attributes['colnumber'] = index + 1
     attributes['width'] ||= 1
     attributes['halign'] ||= 'left'
@@ -177,6 +181,8 @@ end
 
 # Public: Methods for managing the a cell in an AsciiDoc table.
 class Table::Cell < AbstractNode
+  # Public: Get/Set the Symbol style for this cell (default: nil)
+  attr_accessor :style
 
   # Public: An Integer of the number of columns this cell will span (default: nil)
   attr_accessor :colspan
@@ -193,25 +199,24 @@ class Table::Cell < AbstractNode
   def initialize(column, text, attributes = {})
     super(column, :cell)
     @text = text
+    @style = nil
     @colspan = nil
     @rowspan = nil
     # TODO feels hacky
     if !column.nil?
+      @style = column.attributes['style']
       update_attributes(column.attributes)
     end
     if !attributes.nil?
-      if attributes.has_key? 'colspan'
-        @colspan = attributes['colspan']
-        attributes.delete('colspan') 
-      end
-      if attributes.has_key? 'rowspan'
-        @rowspan = attributes['rowspan']
-        attributes.delete('rowspan') 
-      end
+      @colspan = attributes.delete('colspan')
+      @rowspan = attributes.delete('rowspan')
+      # TODO eventualy remove the style attribute from the attributes hash
+      #@style = attributes.delete('style') if attributes.has_key? 'style'
+      @style = attributes['style'] if attributes.has_key? 'style'
       update_attributes(attributes)
     end
     # only allow AsciiDoc cells in non-header rows
-    if @attributes['style'] == :asciidoc && !column.table.header_row?
+    if @style == :asciidoc && !column.table.header_row?
       # FIXME hide doctitle from nested document; temporary workaround to fix
       # nested document seeing doctitle and assuming it has its own document title
       parent_doctitle = @document.attributes.delete('doctitle')
@@ -227,12 +232,11 @@ class Table::Cell < AbstractNode
 
   # Public: Handles the body data (tbody, tfoot), applying styles and partitioning into paragraphs
   def content
-    style = attr('style')
-    if style == :asciidoc
+    if @style == :asciidoc
       @inner_document.render
     else
       text.split(BLANK_LINE_PATTERN).map {|p|
-        !style || style == :header ? p : Inline.new(parent, :quoted, p, :type => attr('style')).render
+        !@style || @style == :header ? p : Inline.new(parent, :quoted, p, :type => @style).render
       }
     end
   end
