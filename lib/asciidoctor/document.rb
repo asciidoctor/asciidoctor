@@ -610,6 +610,7 @@ class Document < AbstractBlock
       render_options[:template_dirs] = @options[:template_dirs]
     end
     
+    render_options[:template_cache] = @options.fetch(:template_cache, true)
     render_options[:backend] = @attributes.fetch('backend', 'html5')
     render_options[:template_engine] = @options[:template_engine]
     render_options[:eruby] = @options.fetch(:eruby, 'erb')
