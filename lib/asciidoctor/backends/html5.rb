@@ -5,12 +5,13 @@ class BaseTemplate
 
   # create template matter to insert a style class from the role attribute if specified
   def role_class
-    attrvalue('role')
+    %(<%= role? ? " \#{role}" : nil %>)
   end
 
   # create template matter to insert a style class from the style attribute if specified
   def style_class(sibling = true)
-    attrvalue('style', sibling, false)
+    delimiter = sibling ? ' ' : ''
+    %(<%= @style && "#{delimiter}\#{@style}" %>)
   end
 
   def title_div(opts = {})
@@ -208,7 +209,7 @@ class BlockTocTemplate < BaseTemplate
     end
     title = node.title? ? node.title : (doc.attr 'toc-title')
     levels = (node.attr? 'levels') ? (node.attr 'levels').to_i : (doc.attr 'toclevels', 2).to_i
-    role = (node.attr? 'role') ? (node.attr 'role') : (doc.attr 'toc-class', 'toc')
+    role = node.role? ? node.role : (doc.attr 'toc-class', 'toc')
 
     %(<div#{id_attr} class="#{role}">
 <div#{title_id_attr} class="title">#{title}</div>
@@ -271,7 +272,7 @@ class SectionTemplate < BaseTemplate
       %(<h1#{id} class="sect0">#{anchor}#{link_start}#{sec.title}#{link_end}</h1>
 #{sec.content}\n)
     else
-      role = (sec.attr? 'role') ? " #{sec.attr 'role'}" : nil
+      role = sec.role? ? " #{sec.role}" : nil
       if sec.numbered
         sectnum = "#{sec.sectnum} "
       else
@@ -312,7 +313,7 @@ class BlockDlistTemplate < BaseTemplate
 continuing = false
 entries = content
 last_index = entries.length - 1
-if attr? 'style', 'qanda', false
+if @style == 'qanda'
 %><div#{id} class="qlist#{style_class}#{role_class}"><%
 if title? %>
 <div class="title"><%= title %></div><%
@@ -342,7 +343,7 @@ end %>
   end %>
 </ol>
 </div><%
-elsif attr? 'style', 'horizontal', false
+elsif @style == 'horizontal'
 %><div#{id} class="hdlist#{role_class}"><%
 if title? %>
 <div class="title"><%= title %></div><%
@@ -391,7 +392,7 @@ end %>
 <dl><%
   entries.each_with_index do |(dt, dd), index|
     last = (index == last_index) %>
-<dt<%= !(attr? 'style', nil, false) ? %( class="hdlist1") : nil %>><%= dt.text %></dt><%
+<dt<%= @style.nil? ? %( class="hdlist1") : nil %>><%= dt.text %></dt><%
     unless dd.nil? %>
 <dd><%
       if dd.text? %>
@@ -416,7 +417,7 @@ class BlockListingTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="listingblock#{role_class}">
 #{title_div :caption => true}
 <div class="content monospaced"><%
-if attr? 'style', 'source', false
+if @style == 'source'
   language = (language = (attr 'language')) ? %(\#{language} language-\#{language}) : nil
   nowrap = !(@document.attr? 'prewrap') || (option? 'nowrap')
   case attr 'source-highlighter'
@@ -492,7 +493,7 @@ class BlockParagraphTemplate < BaseTemplate
   end
 
   def result(node)
-    paragraph(node.id, (node.attr 'role'), (node.title? ? node.title : nil), node.content)
+    paragraph(node.id, node.role, (node.title? ? node.title : nil), node.content)
   end
 
   def template
@@ -528,7 +529,7 @@ end
 
 class BlockOpenTemplate < BaseTemplate
   def result(node)
-    open_block(node, node.id, (node.attr 'style', nil, false), (node.attr 'role'), node.title? ? node.title : nil, node.content)
+    open_block(node, node.id, node.style, node.role, node.title? ? node.title : nil, node.content)
   end
 
   def open_block(node, id, style, role, title, content)
@@ -647,9 +648,9 @@ class BlockOlistTemplate < BaseTemplate
 
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><% style = attr 'style', nil, false %><div#{id} class="olist#{style_class}#{role_class}">
+<%#encoding:UTF-8%><div#{id} class="olist#{style_class}#{role_class}">
 #{title_div}
-<ol class="<%= style %>"<%= (type = ::Asciidoctor::ORDERED_LIST_KEYWORDS[style]) ? %( type="\#{type}") : nil %>#{attribute('start', :start)}><%
+<ol class="<%= @style %>"<%= (type = ::Asciidoctor::ORDERED_LIST_KEYWORDS[@style]) ? %( type="\#{type}") : nil %>#{attribute('start', :start)}><%
 content.each do |item| %>
 <li>
 <p><%= item.text %></p><%
@@ -726,7 +727,7 @@ if (attr :rowcount) >= 0 %>
         if tsec == :head
           cell_content = cell.text
         else
-          case (cell.attr 'style', nil, false)
+          case cell.style
           when :asciidoc
             cell_content = %(<div>\#{cell.content}</div>)
           when :verse
@@ -888,7 +889,7 @@ class InlineQuotedTemplate < BaseTemplate
   end
 
   def result(node)
-    quote_text(node.text, node.type, (node.attr 'role'))
+    quote_text(node.text, node.type, node.role)
   end
 
   def template
@@ -952,7 +953,7 @@ class InlineAnchorTemplate < BaseTemplate
     when :ref
       %(<a id="#{target}"></a>)
     when :link
-      %(<a href="#{target}"#{(node.attr? 'role') ? " class=\"#{node.attr 'role'}\"" : nil}#{(node.attr? 'window') ? " target=\"#{node.attr 'window'}\"" : nil}>#{text}</a>)
+      %(<a href="#{target}"#{node.role? ? " class=\"#{node.role}\"" : nil}#{(node.attr? 'window') ? " target=\"#{node.attr 'window'}\"" : nil}>#{text}</a>)
     when :bibref
       %(<a id="#{target}"></a>[#{target}])
     end
