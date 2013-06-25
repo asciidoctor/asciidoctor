@@ -1501,6 +1501,27 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       assert_match(/hljs.initHighlightingOnLoad/, output)
     end
 
+    test 'should set lang attribute on pre when source-highlighter is html-pipeline' do
+      input = <<-EOS
+[source,ruby]
+----
+filters = [
+  HTML::Pipeline::AsciiDocFilter,
+  HTML::Pipeline::SanitizationFilter,
+  HTML::Pipeline::SyntaxHighlightFilter
+]
+
+puts HTML::Pipeline.new(filters, {}).call(input)[:output]
+----
+      EOS
+
+      output = render_string input, :attributes => {'source-highlighter' => 'html-pipeline'}
+      assert_css 'pre[lang="ruby"]', output, 1
+      assert_css 'pre[lang="ruby"] > code', output, 1
+      assert_css 'pre[class]', output, 0
+      assert_css 'code[class]', output, 0
+    end
+
     test 'document cannot turn on source highlighting if safe mode is at least SERVER' do
       input = <<-EOS
 :source-highlighter: coderay

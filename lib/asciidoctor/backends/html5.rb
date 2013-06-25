@@ -412,49 +412,60 @@ end %>
 end
 
 class BlockListingTemplate < BaseTemplate
+  def result(node)
+    nowrap = (!node.document.attr? 'prewrap') || (node.option? 'nowrap')
+    if node.style == 'source'
+      language = node.attr 'language'
+      language_classes = language ? %(#{language} language-#{language}) : nil
+      case node.attr 'source-highlighter'
+      when 'coderay'
+        pre_class = nowrap ? ' class="CodeRay nowrap"' : ' class="CodeRay"'
+        code_class = language ? %( class="#{language_classes}") : nil
+      when 'highlightjs', 'highlight.js'
+        pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
+        code_class = language ? %( class="#{language_classes}") : nil
+      when 'prettify'
+        pre_class = %( class="prettyprint#{nowrap ? ' nowrap' : nil}#{(node.attr? 'linenums') ? ' linenums' : nil})
+        pre_class = language ? %(#{pre_class} #{language_classes}") : %(#{pre_class}")
+        code_class = nil
+      when 'html-pipeline'
+        pre_class = language ? %( lang="#{language}") : nil
+        code_class = nil
+      else
+        pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
+        code_class = language ? %( class="#{language_classes}") : nil
+      end
+      pre = %(<pre#{pre_class}><code#{code_class}>#{preserve_endlines(node.content, node)}</code></pre>)
+    else
+      pre = %(<pre#{nowrap ? ' class="nowrap"' : nil}>#{preserve_endlines(node.content, node)}</pre>)
+    end
+
+    %(<div#{node.id && " id=\"#{node.id}\""} class="listingblock#{node.role && " #{node.role}"}">#{node.title? ? "
+<div class=\"title\">#{node.captioned_title}</div>" : nil}
+<div class="content monospaced">
+#{pre}
+</div>
+</div>\n)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="listingblock#{role_class}">
-#{title_div :caption => true}
-<div class="content monospaced"><%
-if @style == 'source'
-  language = (language = (attr 'language')) ? %(\#{language} language-\#{language}) : nil
-  nowrap = !(@document.attr? 'prewrap') || (option? 'nowrap')
-  case attr 'source-highlighter'
-  when 'coderay'
-    pre_class = nowrap ? ' class="CodeRay nowrap"' : ' class="CodeRay"'
-    code_class = language ? %( class="\#{language}") : nil
-  when 'highlightjs', 'highlight.js'
-    pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
-    code_class = language ? %( class="\#{language}") : nil
-  when 'prettify'
-    pre_class = %( class="prettyprint\#{nowrap ? ' nowrap' : nil}\#{(attr? 'linenums') ? ' linenums' : nil})
-    pre_class = language ? %(\#{pre_class} \#{language}") : %(\#{pre_class}")
-    code_class = nil
-  else
-    pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
-    code_class = language ? %( class="\#{language}") : nil
-  end %>
-<pre<%= pre_class %>><code<%= code_class %>><%= template.preserve_endlines(content, self) %></code></pre><%
-else %>
-<pre<%= !(@document.attr? 'prewrap') || (option? 'nowrap') ? ' class="nowrap"' : nil %>><%= template.preserve_endlines(content, self) %></pre><%
-end %>
-</div>
-</div>
-    EOS
+    :invoke_result
   end
 end
 
 class BlockLiteralTemplate < BaseTemplate
-  def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="literalblock#{role_class}">
-#{title_div}
+  def result(node)
+    nowrap = (!node.document.attr? 'prewrap') || (node.option? 'nowrap')
+    %(<div#{node.id && " id=\"#{node.id}\""} class="literalblock#{node.role && " #{node.role}"}">#{node.title? ? "
+<div class=\"title\">#{node.title}</div>" : nil}
 <div class="content monospaced">
-<pre<%= !(@document.attr? 'prewrap') || (option? 'nowrap') ? ' class="nowrap"' : nil %>><%= template.preserve_endlines(content, self) %></pre>
+<pre#{nowrap ? ' class="nowrap"' : nil}>#{preserve_endlines(node.content, node)}</pre>
 </div>
-</div>
-    EOS
+</div>\n)
+  end
+
+  def template
+    :invoke_result
   end
 end
 
