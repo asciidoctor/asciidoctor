@@ -2,7 +2,6 @@ require 'asciidoctor/backends/_stylesheets'
 
 module Asciidoctor
 class BaseTemplate
-
   # create template matter to insert a style class from the role attribute if specified
   def role_class
     %(<%= role? ? " \#{role}" : nil %>)
@@ -12,14 +11,6 @@ class BaseTemplate
   def style_class(sibling = true)
     delimiter = sibling ? ' ' : ''
     %(<%= @style && "#{delimiter}\#{@style}" %>)
-  end
-
-  def title_div(opts = {})
-    if opts.has_key? :caption
-      %q(<% if title? %><div class="title"><%= @caption %><%= title %></div><% end %>)
-    else
-      %q(<% if title? %><div class="title"><%= title %></div><% end %>)
-    end
   end
 end
 
@@ -39,7 +30,7 @@ class DocumentTemplate < BaseTemplate
       toc_level = %(<ul class="sectlevel#{sec_level}">\n)
       sections.each do |section|
         section_num = section.numbered ? %(#{section.sectnum} ) : nil
-        toc_level = %(#{toc_level}<li><a href=\"##{section.id}\">#{section_num}#{section.caption}#{section.title}</a></li>\n)
+        toc_level = %(#{toc_level}<li><a href=\"##{section.id}\">#{section_num}#{section.captioned_title}</a></li>\n)
         if section.level < to_depth && (child_toc_level = outline(section, to_depth))
           toc_level = %(#{toc_level}<li>\n#{child_toc_level}\n</li>\n)
         end
@@ -287,7 +278,7 @@ class SectionTemplate < BaseTemplate
         content = sec.content
       end
       %(<div class="sect#{slevel}#{role}">
-<#{htag}#{id}>#{anchor}#{link_start}#{sectnum}#{sec.caption}#{sec.title}#{link_end}</#{htag}>
+<#{htag}#{id}>#{anchor}#{link_start}#{sectnum}#{sec.captioned_title}#{link_end}</#{htag}>
 #{content}
 </div>\n)
     end
@@ -525,8 +516,8 @@ class BlockSidebarTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="sidebarblock#{role_class}">
-<div class="content">
-#{title_div}
+<div class="content"><%= title? ? %(
+<div class="title">\#{title}</div>) : nil %>
 <%= content %>
 </div>
 </div>
@@ -537,8 +528,8 @@ end
 class BlockExampleTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="exampleblock#{role_class}">
-#{title_div :caption => true}
+<%#encoding:UTF-8%><div#{id} class="exampleblock#{role_class}"><%= title? ? %(
+<div class="title">\#{captioned_title}</div>) : nil %>
 <div class="content">
 <%= content %>
 </div>
@@ -592,8 +583,8 @@ end
 class BlockQuoteTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="quoteblock#{role_class}">
-#{title_div}
+<%#encoding:UTF-8%><div#{id} class="quoteblock#{role_class}"><%= title? ? %(
+<div class="title">\#{title}</div>) : nil %>
 <blockquote>
 <%= content %>
 </blockquote><%
@@ -618,8 +609,8 @@ end
 class BlockVerseTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="verseblock#{role_class}">
-#{title_div}
+<%#encoding:UTF-8%><div#{id} class="verseblock#{role_class}"><%= title? ? %(
+<div class="title">\#{title}</div>) : nil %>
 <pre class="content"><%= template.preserve_endlines(content, self) %></pre><%
 if (attr? :attribution) || (attr? :citetitle) %>
 <div class="attribution"><%
@@ -642,8 +633,8 @@ end
 class BlockUlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="ulist<%= (checklist = (option? 'checklist')) ? ' checklist' : nil %>#{style_class}#{role_class}">
-#{title_div}
+<%#encoding:UTF-8%><div#{id} class="ulist<%= (checklist = (option? 'checklist')) ? ' checklist' : nil %>#{style_class}#{role_class}"><%= title? ? %(
+<div class="title">\#{title}</div>) : nil %>
 <ul<%= checklist ? ' class="checklist"' : nil %>><%
 if checklist
   # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
@@ -668,8 +659,8 @@ class BlockOlistTemplate < BaseTemplate
 
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="olist#{style_class}#{role_class}">
-#{title_div}
+<%#encoding:UTF-8%><div#{id} class="olist#{style_class}#{role_class}"><%= title? ? %(
+<div class="title">\#{title}</div>) : nil %>
 <ol class="<%= @style %>"<%= (type = ::Asciidoctor::ORDERED_LIST_KEYWORDS[@style]) ? %( type="\#{type}") : nil %>#{attribute('start', :start)}><%
 content.each do |item| %>
 <li>
@@ -688,8 +679,8 @@ end
 class BlockColistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="colist#{style_class}#{role_class}">
-#{title_div}<%
+<%#encoding:UTF-8%><div#{id} class="colist#{style_class}#{role_class}"><%= title? ? %(
+<div class="title">\#{title}</div>) : nil %><%
 if attr? :icons %>
 <table><%
   content.each_with_index do |item, i| %>
@@ -723,7 +714,7 @@ class BlockTableTemplate < BaseTemplate
 if !(option? 'autowidth') %>width:<%= attr :tablepcwidth %>%; <% end %><%
 if attr? :float %>float: <%= attr :float %>; <% end %>"><%
 if title? %>
-<caption class="title"><% unless @caption.nil? %><%= @caption %><% end %><%= title %></caption><%
+<caption class="title"><%= captioned_title %></caption><%
 end
 if (attr :rowcount) >= 0 %>
 <colgroup><%
@@ -789,8 +780,8 @@ if attr? :link %>
 else %>
 <img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}><%
 end %>
-</div>
-#{title_div :caption => true}
+</div><%= title? ? %(
+<div class="title">\#{captioned_title}</div>) : nil %>
 </div>
     EOS
   end
@@ -799,8 +790,8 @@ end
 class BlockAudioTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="audioblock#{style_class}#{role_class}">
-#{title_div :caption => true}
+<%#encoding:UTF-8%><div#{id} class="audioblock#{style_class}#{role_class}"><%= title? ? %(
+<div class="title">\#{captioned_title}</div>) : nil %>
 <div class="content">
 <audio src="<%= media_uri(attr :target) %>"<%
 if option? 'autoplay' %> autoplay<% end %><%
@@ -817,8 +808,8 @@ end
 class BlockVideoTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="videoblock#{style_class}#{role_class}">
-#{title_div :caption => true}
+<%#encoding:UTF-8%><div#{id} class="videoblock#{style_class}#{role_class}"><%= title? ? %(
+<div class="title">\#{captioned_title}</div>) : nil %>
 <div class="content">
 <video src="<%= media_uri(attr :target) %>"#{attribute('width', :width)}#{attribute('height', :height)}<%
 if attr? 'poster' %> poster="<%= media_uri(attr :poster) %>"<% end %><%
