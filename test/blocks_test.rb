@@ -1361,7 +1361,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
-    test 'can use font-based icons' do
+    test 'should import Font Awesome and use font-based icons when value of icons attribute is font' do
       input = <<-EOS
 :icons: font
 
@@ -1370,6 +1370,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_css 'html > head > link[rel="stylesheet"][href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.0/css/font-awesome.min.css"]', output, 1
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="icon-tip"]', output, 1
     end
   end
