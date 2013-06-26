@@ -256,7 +256,7 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
       assert_equal "<year>2013</year>\n<holder>Acme, Inc.</holder>", result
     end
 
-    test "block is called to handle an include macro" do
+    test "local include handler is called to handle an include macro" do
       input = <<-EOS
 first line
 
@@ -264,15 +264,88 @@ include::include-file.asciidoc[]
 
 last line
       EOS
-      document = Asciidoctor::Document.new [], :safe => Asciidoctor::SafeMode::SAFE
-      reader = Asciidoctor::Reader.new(input.lines.entries, document, true) {|inc, doc|
-        ":includefile: #{inc}\n\nmiddle line".lines.entries
-      }
+
+      class TestIncludeHandler
+        def handles? target
+          true
+        end
+
+        def process document, target, attributes
+          ["include target:: #{target}\n", "\n", "middle line\n"]
+        end
+      end
+
+      document = Asciidoctor::Document.new []
+      reader = Asciidoctor::Reader.new(input.lines.entries, document, true, TestIncludeHandler)
       lines = []
       while reader.has_more_lines?
         lines << reader.get_line
       end
-      assert_match(/^:includefile: include-file.asciidoc$/, lines.join)
+      source = lines.join
+      assert_match(/^include target:: include-file.asciidoc$/, source)
+      assert_match(/^middle line$/, source)
+    end
+
+    test "global include handler is called to handle an include macro" do
+      input = <<-EOS
+first line
+
+include::include-file.asciidoc[]
+
+last line
+      EOS
+
+      class TestIncludeHandler
+        def handles? target
+          true
+        end
+
+        def process document, target, attributes
+          ["include target:: #{target}\n", "\n", "middle line\n"]
+        end
+      end
+
+      Asciidoctor::Extensions.register_include_handler TestIncludeHandler
+      assert_equal TestIncludeHandler, Asciidoctor::Extensions.include_handler
+
+      document = Asciidoctor::Document.new []
+      reader = Asciidoctor::Reader.new(input.lines.entries, document, true)
+      lines = []
+      while reader.has_more_lines?
+        lines << reader.get_line
+      end
+      source = lines.join
+      assert_match(/^include target:: include-file.asciidoc$/, source)
+      assert_match(/^middle line$/, source)
+
+      Asciidoctor::Extensions.unregister_include_handler
+      assert_nil Asciidoctor::Extensions.include_handler
+    end
+
+    test 'should fall back to built-in include macro behavior when not handled by include handler' do
+      input = <<-EOS
+include::fixtures/include-file.asciidoc[]
+      EOS
+
+      class TestIncludeHandler
+        def handles? target
+          target.end_with? '.ad'
+        end
+
+        def process document, target, attributes
+          raise 'TestIncludeHandler should not have been invoked'
+        end
+      end
+
+      Asciidoctor::Extensions.register_include_handler TestIncludeHandler
+      assert_equal TestIncludeHandler, Asciidoctor::Extensions.include_handler
+
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      output = doc.render
+      assert_match(/included content/, output)
+
+      Asciidoctor::Extensions.unregister_include_handler
+      assert_nil Asciidoctor::Extensions.include_handler
     end
 
     test 'attributes are substituted in target of include macro' do

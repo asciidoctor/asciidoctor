@@ -670,10 +670,9 @@ module Asciidoctor
   # options - a String, Array or Hash of options to control processing (default: {})
   #           String and Array values are converted into a Hash.
   #           See Asciidoctor::Document#initialize for details about options.
-  # block   - a callback block for handling include::[] directives
   #
   # returns the Asciidoctor::Document
-  def self.load(input, options = {}, &block)
+  def self.load(input, options = {})
     if (monitor = options.fetch(:monitor, false))
       start = Time.now
     end
@@ -736,7 +735,7 @@ module Asciidoctor
       start = Time.now
     end
 
-    doc = Document.new(lines, options, &block) 
+    doc = Document.new(lines, options) 
     if monitor
       parse_time = Time.now - start
       monitor[:read] = read_time
@@ -756,11 +755,10 @@ module Asciidoctor
   # options - a String, Array or Hash of options to control processing (default: {})
   #           String and Array values are converted into a Hash.
   #           See Asciidoctor::Document#initialize for details about options.
-  # block   - a callback block for handling include::[] directives
   #
   # returns the Asciidoctor::Document
-  def self.load_file(filename, options = {}, &block)
-    Asciidoctor.load(File.new(filename), options, &block)
+  def self.load_file(filename, options = {})
+    Asciidoctor.load(File.new(filename), options)
   end
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and render it
@@ -789,11 +787,10 @@ module Asciidoctor
   # options - a String, Array or Hash of options to control processing (default: {})
   #           String and Array values are converted into a Hash.
   #           See Asciidoctor::Document#initialize for details about options.
-  # block   - a callback block for handling include::[] directives
   #
   # returns the Document object if the rendered result String is written to a
   # file, otherwise the rendered result String
-  def self.render(input, options = {}, &block)
+  def self.render(input, options = {})
     in_place = options.delete(:in_place) || false
     to_file = options.delete(:to_file)
     to_dir = options.delete(:to_dir)
@@ -812,7 +809,7 @@ module Asciidoctor
       options[:header_footer] = true
     end
 
-    doc = Asciidoctor.load(input, options, &block)
+    doc = Asciidoctor.load(input, options)
 
     if to_file == '/dev/null'
       return doc
@@ -900,12 +897,11 @@ module Asciidoctor
   # options - a String, Array or Hash of options to control processing (default: {})
   #           String and Array values are converted into a Hash.
   #           See Asciidoctor::Document#initialize for details about options.
-  # block   - a callback block for handling include::[] directives
   #
   # returns the Document object if the rendered result String is written to a
   # file, otherwise the rendered result String
-  def self.render_file(filename, options = {}, &block)
-    Asciidoctor.render(File.new(filename), options, &block)
+  def self.render_file(filename, options = {})
+    Asciidoctor.render(File.new(filename), options)
   end
 
   # modules
@@ -923,6 +919,7 @@ module Asciidoctor
   require 'asciidoctor/block'
   require 'asciidoctor/callouts'
   require 'asciidoctor/document'
+  require 'asciidoctor/extensions'
   require 'asciidoctor/inline'
   require 'asciidoctor/lexer'
   require 'asciidoctor/list_item'
