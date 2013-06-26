@@ -58,13 +58,13 @@ class Renderer
 
       slim_loaded = false
       path_resolver = PathResolver.new
+      engine = options[:template_engine]
 
-      # TODO skip scanning a folder if we've already done it for same backend/engine
       template_dirs.each do |template_dir|
         # TODO need to think about safe mode restrictions here
         template_dir = path_resolver.system_path template_dir, nil
         template_glob = '*'
-        if (engine = options[:template_engine])
+        if engine
           template_glob = "*.#{engine}"
           # example: templates/haml
           if File.directory? File.join(template_dir, engine)
@@ -77,13 +77,13 @@ class Renderer
           template_dir = File.join template_dir, backend
         end
 
-        helpers = nil
-        
-        if @cache && @cache.cached?(template_dir, template_glob)
-          @views.update(@cache.fetch template_dir, template_glob)
+        # skip scanning folder if we've already done it for same backend/engine
+        if @cache && @cache.cached?(:scan, template_dir, template_glob)
+          @views.update(@cache.fetch :scan, template_dir, template_glob)
           next
         end
 
+        helpers = nil
         scan_result = {}
         # Grab the files in the top level of the directory (we're not traversing)
         Dir.glob(File.join(template_dir, template_glob)).
@@ -104,18 +104,16 @@ class Renderer
           next unless Tilt.registered? ext_name
           opts = view_opts[ext_name.to_sym]
           if @cache
-            @views[view_name] = scan_result[view_name] = @cache.fetch(template, opts) {
+            @views[view_name] = scan_result[view_name] = @cache.fetch(:view, template) {
               Tilt.new(template, nil, opts)
             }
           else
-            @views[view_name] = scan_result[view_name] = Tilt.new template, nil, opts
+            @views[view_name] = Tilt.new template, nil, opts
           end
         end
 
         require helpers unless helpers.nil?
-        if @cache
-          @cache.fetch(template_dir, template_glob) { scan_result }
-        end
+        @cache.store(:scan, template_dir, template_glob, scan_result) if @cache
       end
     end
   end
@@ -225,6 +223,11 @@ class TemplateCache
     else
       @cache[key]
     end
+  end
+
+  # stores an item in the cache under the specified key
+  def store(*key, value)
+    @cache[key] = value
   end
 
   # Clears the cache
