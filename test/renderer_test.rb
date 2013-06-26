@@ -78,18 +78,18 @@ Sidebar content
     test 'should use built-in global cache to cache templates' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml')
       doc.renderer
-      tilt_cache = Asciidoctor::Renderer.class_variable_get(:@@global_cache)
-      assert tilt_cache.is_a? Tilt::Cache
-      cache = tilt_cache.instance_variable_get(:@cache)
+      template_cache = Asciidoctor::Renderer.class_variable_get(:@@global_cache)
+      assert template_cache.is_a? Asciidoctor::TemplateCache
+      cache = template_cache.cache
       assert_not_nil cache
       assert cache.size > 0
     end
 
     test 'should use custom cache to cache templates' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'),
-          :template_cache => Tilt::Cache.new
+          :template_cache => Asciidoctor::TemplateCache.new
       assert_not_nil doc.renderer.cache
-      cache = doc.renderer.cache.instance_variable_get(:@cache)
+      cache = doc.renderer.cache.cache
       assert_not_nil cache
       assert cache.size > 0
       assert cache.values[0].is_a? Tilt::HamlTemplate

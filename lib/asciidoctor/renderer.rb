@@ -40,7 +40,7 @@ class Renderer
 
       if (template_cache = options[:template_cache]) === true
         # FIXME probably want to use our own cache object for more control
-        @cache = (@@global_cache ||= Tilt::Cache.new)
+        @cache = (@@global_cache ||= TemplateCache.new)
       elsif template_cache
         @cache = template_cache
       end
@@ -79,6 +79,12 @@ class Renderer
 
         helpers = nil
         
+        if @cache && @cache.cached?(template_dir, template_glob)
+          @views.update(@cache.fetch template_dir, template_glob)
+          next
+        end
+
+        scan_result = {}
         # Grab the files in the top level of the directory (we're not traversing)
         Dir.glob(File.join(template_dir, template_glob)).
             select{|f| File.file? f }.each do |template|
@@ -96,16 +102,20 @@ class Renderer
             Helpers.require_library 'slim'
           end
           next unless Tilt.registered? ext_name
+          opts = view_opts[ext_name.to_sym]
           if @cache
-            @views[view_name] = @cache.fetch(template, (options = view_opts[ext_name.to_sym])) {
-              Tilt.new(template, nil, options)
+            @views[view_name] = scan_result[view_name] = @cache.fetch(template, opts) {
+              Tilt.new(template, nil, opts)
             }
           else
-            @views[view_name] = Tilt.new template, nil, view_opts[ext_name.to_sym]
+            @views[view_name] = scan_result[view_name] = Tilt.new template, nil, opts
           end
         end
 
         require helpers unless helpers.nil?
+        if @cache
+          @cache.fetch(template_dir, template_glob) { scan_result }
+        end
       end
     end
   end
@@ -192,5 +202,34 @@ class Renderer
         gsub(/([[:lower:]])([[:upper:]])/, '\1_\2').downcase
   end
 
+end
+
+class TemplateCache
+  attr_reader :cache
+
+  def initialize
+    @cache = {}
+  end
+
+  # check if a key is available in the cache
+  def cached? *key
+    @cache.has_key? key
+  end
+
+  # retrieves an item from the cache stored in the cache key
+  # if a block is given, the block is called and the return
+  # value stored in the cache under the specified key
+  def fetch(*key)
+    if block_given?
+      @cache[key] ||= yield
+    else
+      @cache[key]
+    end
+  end
+
+  # Clears the cache
+  def clear
+    @cache = {}
+  end
 end
 end
