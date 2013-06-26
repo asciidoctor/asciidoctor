@@ -109,7 +109,7 @@ Sidebar content
       cache = doc.renderer.cache.cache
       assert_not_nil cache
       assert cache.size > 0
-      assert cache.values[0].is_a? Tilt::HamlTemplate
+      assert cache.values[0].kind_of? Tilt::HamlTemplate
     end
 
     test 'should be able to disable template cache' do
