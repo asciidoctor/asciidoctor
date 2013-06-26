@@ -3,6 +3,9 @@ module Asciidoctor
 # using eRuby templates.
 class Renderer
   attr_reader :compact
+  attr_reader :cache
+
+  @@global_cache = nil
 
   # Public: Initialize an Asciidoctor::Renderer object.
   #
@@ -35,6 +38,13 @@ class Renderer
     if (template_dirs = options.delete(:template_dirs))
       Helpers.require_library 'tilt'
 
+      if (template_cache = options[:template_cache]) === true
+        # FIXME probably want to use our own cache object for more control
+        @cache = (@@global_cache ||= TemplateCache.new)
+      elsif template_cache
+        @cache = template_cache
+      end
+
       view_opts = {
         :erb =>  { :trim => '<>' },
         :haml => { :format => :xhtml, :attr_wrapper => '"', :ugly => true, :escape_attrs => false },
@@ -47,8 +57,12 @@ class Renderer
       end
 
       slim_loaded = false
+      path_resolver = PathResolver.new
 
+      # TODO skip scanning a folder if we've already done it for same backend/engine
       template_dirs.each do |template_dir|
+        # TODO need to think about safe mode restrictions here
+        template_dir = path_resolver.system_path template_dir, nil
         template_glob = '*'
         if (engine = options[:template_engine])
           template_glob = "*.#{engine}"
@@ -65,6 +79,12 @@ class Renderer
 
         helpers = nil
         
+        if @cache && @cache.cached?(template_dir, template_glob)
+          @views.update(@cache.fetch template_dir, template_glob)
+          next
+        end
+
+        scan_result = {}
         # Grab the files in the top level of the directory (we're not traversing)
         Dir.glob(File.join(template_dir, template_glob)).
             select{|f| File.file? f }.each do |template|
@@ -82,10 +102,20 @@ class Renderer
             Helpers.require_library 'slim'
           end
           next unless Tilt.registered? ext_name
-          @views[view_name] = Tilt.new(template, nil, view_opts[ext_name.to_sym])
+          opts = view_opts[ext_name.to_sym]
+          if @cache
+            @views[view_name] = scan_result[view_name] = @cache.fetch(template, opts) {
+              Tilt.new(template, nil, opts)
+            }
+          else
+            @views[view_name] = scan_result[view_name] = Tilt.new template, nil, opts
+          end
         end
 
         require helpers unless helpers.nil?
+        if @cache
+          @cache.fetch(template_dir, template_glob) { scan_result }
+        end
       end
     end
   end
@@ -172,5 +202,34 @@ class Renderer
         gsub(/([[:lower:]])([[:upper:]])/, '\1_\2').downcase
   end
 
+end
+
+class TemplateCache
+  attr_reader :cache
+
+  def initialize
+    @cache = {}
+  end
+
+  # check if a key is available in the cache
+  def cached? *key
+    @cache.has_key? key
+  end
+
+  # retrieves an item from the cache stored in the cache key
+  # if a block is given, the block is called and the return
+  # value stored in the cache under the specified key
+  def fetch(*key)
+    if block_given?
+      @cache[key] ||= yield
+    else
+      @cache[key]
+    end
+  end
+
+  # Clears the cache
+  def clear
+    @cache = {}
+  end
 end
 end

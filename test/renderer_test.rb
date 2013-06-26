@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'tilt'
 
 context 'Renderer' do
 
@@ -74,6 +75,32 @@ Sidebar content
       assert_xpath '//aside/header/following-sibling::p[text()="Sidebar content"]', output, 1
     end
 
+    test 'should use built-in global cache to cache templates' do
+      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml')
+      doc.renderer
+      template_cache = Asciidoctor::Renderer.class_variable_get(:@@global_cache)
+      assert template_cache.is_a? Asciidoctor::TemplateCache
+      cache = template_cache.cache
+      assert_not_nil cache
+      assert cache.size > 0
+    end
+
+    test 'should use custom cache to cache templates' do
+      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'),
+          :template_cache => Asciidoctor::TemplateCache.new
+      assert_not_nil doc.renderer.cache
+      cache = doc.renderer.cache.cache
+      assert_not_nil cache
+      assert cache.size > 0
+      assert cache.values[0].is_a? Tilt::HamlTemplate
+    end
+
+    test 'should be able to disable template cache' do
+      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'),
+          :template_cache => false
+      assert_nil doc.renderer.cache
+    end
+
     test 'should load Slim templates for default backend' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim')
       assert doc.renderer.views['block_paragraph'].is_a? Slim::Template
@@ -82,7 +109,7 @@ Sidebar content
       assert doc.renderer.views['block_sidebar'].file.end_with? 'block_sidebar.html.slim'
     end
 
-    test 'wip should load Slim templates for docbook45 backend' do
+    test 'should load Slim templates for docbook45 backend' do
       doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim')
       assert doc.renderer.views['block_paragraph'].is_a? Slim::Template
       assert doc.renderer.views['block_paragraph'].file.end_with? 'block_paragraph.xml.slim'
