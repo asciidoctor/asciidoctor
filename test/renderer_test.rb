@@ -77,12 +77,12 @@ Sidebar content
 
     test 'should use built-in global cache to cache templates' do
       # clear out any cache, just to be sure
-      Asciidoctor::Renderer.class_variable_set(:@@global_cache, nil)
+      Asciidoctor::Renderer.reset_global_cache
 
       template_dir = File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml')
       doc = Asciidoctor::Document.new [], :template_dir => template_dir
       doc.renderer
-      template_cache = Asciidoctor::Renderer.class_variable_get(:@@global_cache)
+      template_cache = Asciidoctor::Renderer.global_cache
       assert template_cache.is_a? Asciidoctor::TemplateCache
       cache = template_cache.cache
       assert_not_nil cache
@@ -94,12 +94,12 @@ Sidebar content
       view.options[:foo] = 'bar'
       doc = Asciidoctor::Document.new [], :template_dir => template_dir
       doc.renderer
-      template_cache = Asciidoctor::Renderer.class_variable_get(:@@global_cache)
+      template_cache = Asciidoctor::Renderer.global_cache
       view = template_cache.fetch(:view, template_path)
       assert_equal 'bar', view.options[:foo]
 
       # clean up
-      Asciidoctor::Renderer.class_variable_set(:@@global_cache, nil)
+      Asciidoctor::Renderer.reset_global_cache
     end
 
     test 'should use custom cache to cache templates' do

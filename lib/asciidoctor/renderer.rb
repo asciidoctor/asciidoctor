@@ -113,7 +113,7 @@ class Renderer
         end
 
         require helpers unless helpers.nil?
-        @cache.store(:scan, template_dir, template_glob, scan_result) if @cache
+        @cache.store(scan_result, :scan, template_dir, template_glob) if @cache
       end
     end
   end
@@ -154,6 +154,16 @@ class Renderer
     elsif name == 'erubis'
       ::Erubis::FastEruby
     end
+  end
+
+  # TODO better name for this method (and/or field)
+  def self.global_cache
+    @@global_cache
+  end
+
+  # TODO better name for this method (and/or field)
+  def self.reset_global_cache
+    @@global_cache.clear if @@global_cache
   end
 
   # Internal: Extracts the view name and backend from a qualified Ruby class
@@ -226,7 +236,7 @@ class TemplateCache
   end
 
   # stores an item in the cache under the specified key
-  def store(*key, value)
+  def store(value, *key)
     @cache[key] = value
   end
 
