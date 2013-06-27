@@ -428,7 +428,7 @@ class Document < AbstractBlock
   end
 
   def notitle
-    @attributes.has_key? 'notitle'
+    !@attributes.has_key?('showtitle') && @attributes.has_key?('notitle')
   end
 
   def noheader
