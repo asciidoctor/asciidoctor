@@ -871,8 +871,31 @@ content
       assert_xpath '/*[@id="preamble"]', result, 1
     end
 
-    test 'enable title when no header footer' do
-      result = render_string("= Title\n\npreamble", :header_footer => false, :attributes => {'notitle!' => ''})
+    test 'enable title in embedded document by unassigning notitle attribute' do
+      input = <<-EOS
+= Document Title
+
+content
+      EOS
+
+      result = render_string input, :header_footer => false, :attributes => {'notitle!' => ''}
+      assert_xpath '/html', result, 0
+      assert_xpath '/h1', result, 1
+      assert_xpath '/*[@id="header"]', result, 0
+      assert_xpath '/*[@id="footer"]', result, 0
+      assert_xpath '/*[@id="preamble"]', result, 1
+      assert_xpath '(/*)[1]/self::h1', result, 1
+      assert_xpath '(/*)[2]/self::*[@id="preamble"]', result, 1
+    end
+
+    test 'enable title in embedded document by assigning showtitle attribute' do
+      input = <<-EOS
+= Document Title
+
+content
+      EOS
+
+      result = render_string input, :header_footer => false, :attributes => {'showtitle' => ''}
       assert_xpath '/html', result, 0
       assert_xpath '/h1', result, 1
       assert_xpath '/*[@id="header"]', result, 0
