@@ -32,12 +32,13 @@ module Asciidoctor
         begin
           opts = {}
           monitor = {}
-          infile = nil
+          infiles = Array.new
           outfile = nil
+          tofile = nil
           @options.map {|k, v|
             case k
             when :input_file
-              infile = v
+              infiles = v
             when :output_file
               outfile = v
             when :destination_dir
@@ -54,29 +55,43 @@ module Asciidoctor
             end
           }
 
-          if infile == '-'
-            # allow use of block to supply stdin, particularly useful for tests
-            input = block_given? ? yield : STDIN
+          if infiles.size == 1 && infiles.at(0) == '-'
+             # allow use of block to supply stdin, particularly useful for tests
+             input = Array.new
+             input.push(block_given? ? yield : STDIN)
           else
-            input = File.new(infile)
+             input = Array.new
+             infiles.each { |infile|
+               input.push(File.new(infile))
+             }
           end
 
-          if outfile == '-' || (infile == '-' && (outfile.to_s.empty? || outfile != '/dev/null'))
-            opts[:to_file] = (@out || $stdout)
+          if outfile == '-' || (infiles.size == 1 && infiles.at(0) == '-' && (outfile.to_s.empty? || outfile != '/dev/null'))
+            tofile = (@out || $stdout)
           elsif !outfile.nil?
-            opts[:to_file] = outfile
+            tofile = outfile
           else
             opts[:in_place] = true unless opts.has_key? :to_dir
           end
 
-          @document = Asciidoctor.render(input, opts)
+          # init iteration  
+          originalOpts = opts.clone
+          input.each { |element|
+            
+            opts = Marshal.load(Marshal.dump(originalOpts))
+            opts[:to_file] = tofile
 
-          # FIXME this should be :monitor, :profile or :timings rather than :verbose
-          if @options[:verbose]
-            puts "Time to read and parse source: #{'%05.5f' % monitor[:parse]}"
-            puts "Time to render document: #{'%05.5f' % monitor[:render]}"
-            puts "Total time to read, parse and render: #{'%05.5f' % monitor[:load_render]}"
-          end
+            @document = Asciidoctor.render(element, opts)
+
+            # FIXME this should be :monitor, :profile or :timings rather than :verbose
+            if @options[:verbose]
+              puts "File #{element}"
+              puts "Time to read and parse source: #{'%05.5f' % opts[:monitor][:parse]}"
+              puts "Time to render document: #{'%05.5f' % opts[:monitor][:parse]}"
+              puts "Total time to read, parse and render: #{'%05.5f' % opts[:monitor][:parse]}"
+            end
+          }
+          #end iteration
         rescue Exception => e
           raise e if @options[:trace] || SystemExit === e
           err = (@err || $stderr)
