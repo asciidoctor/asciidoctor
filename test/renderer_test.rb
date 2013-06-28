@@ -103,13 +103,17 @@ Sidebar content
     end
 
     test 'should use custom cache to cache templates' do
-      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'),
+      template_dir = File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml')
+      template_path = Asciidoctor::PathResolver.new.system_path(File.join(template_dir, 'html5', 'block_paragraph.html.haml'), nil)
+      doc = Asciidoctor::Document.new [], :template_dir => template_dir,
           :template_cache => Asciidoctor::TemplateCache.new
-      assert_not_nil doc.renderer.cache
-      cache = doc.renderer.cache.cache
+      template_cache = doc.renderer.cache
+      assert_not_nil template_cache
+      cache = template_cache.cache
       assert_not_nil cache
       assert cache.size > 0
-      assert_equal true, cache.values[0].is_a?(Tilt::HamlTemplate)
+      view = template_cache.fetch(:view, template_path)
+      assert view.is_a? Tilt::HamlTemplate
     end
 
     test 'should be able to disable template cache' do

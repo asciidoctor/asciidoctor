@@ -159,8 +159,10 @@ module Asciidoctor
   }
 
   BREAK_LINES = {
-    %q{'''} => :ruler,
-    '<<<'   => :page_break
+    '\'' => :ruler,
+    '-'  => :ruler,
+    '*'  => :ruler,
+    '<'  => :page_break
   }
 
   LIST_CONTEXTS = [:ulist, :olist, :dlist, :colist]
@@ -427,9 +429,11 @@ module Asciidoctor
     # REVIEW leading space has already been stripped, so may not need in regex
     :olist            => /^[[:blank:]]*(\.{1,5}|\d+\.|[A-Za-z]\.|[IVXivx]+\))[[:blank:]]+(.*)$/,
 
-    # ''' (ruler)
+    # ''' or ' ' ' (ruler)
+    # --- or - - - (ruler)
+    # *** or * * * (ruler)
     # <<< (pagebreak)
-    :break_line        => /^('|<){3,}$/,
+    :break_line        => /^(?:'|<){3,}|' *' *'|- *- *-|\* *\* *\*$/,
 
     # inline passthrough macros
     # +++text+++
