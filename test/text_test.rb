@@ -63,9 +63,44 @@ include::fixtures/encoding.asciidoc[tags=romé]
     assert_match(/&#8216;The New Yorker.&#8217;/, rendered)
   end
 
-  test "separator" do
-    # for some reason, the html enclosure breaks the xpath //*[@id='content']//hr
-    assert_xpath "//*[@id='content']//hr", render_string("This is separated.\n\n'''\n\n...from this!"), 1
+  test 'horizontal rule' do
+    input = <<-EOS
+This line is separated by a horizontal rule...
+
+'''
+
+...from this line.
+    EOS
+    output = render_embedded_string input
+    assert_xpath "//hr", output, 1
+    assert_xpath "/*[@class='paragraph']", output, 2
+    assert_xpath "(/*[@class='paragraph'])[1]/following-sibling::hr", output, 1
+    assert_xpath "/hr/following-sibling::*[@class='paragraph']", output, 1
+  end
+
+  test 'markdown horizontal rules' do
+    variants = [
+      '---',
+      '- - -',
+      '***',
+      '* * *',
+      '\' \' \''
+    ]
+
+    variants.each do |variant|
+      input = <<-EOS
+This line is separated by a horizontal rule...
+
+#{variant}
+
+...from this line.
+    EOS
+      output = render_embedded_string input
+      assert_xpath "//hr", output, 1
+      assert_xpath "/*[@class='paragraph']", output, 2
+      assert_xpath "(/*[@class='paragraph'])[1]/following-sibling::hr", output, 1
+      assert_xpath "/hr/following-sibling::*[@class='paragraph']", output, 1
+    end
   end
 
   test "emphasized text" do

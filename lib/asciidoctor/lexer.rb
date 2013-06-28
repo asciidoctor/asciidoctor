@@ -368,7 +368,7 @@ class Lexer
           if !text_only
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
             if (match = this_line.match(REGEXP[:break_line]))
-              block = Block.new(parent, BREAK_LINES[match[0][0..2]])
+              block = Block.new(parent, BREAK_LINES[match[0][0..0]])
               break
 
             # TODO make this a media_blk and handle image, video & audio
