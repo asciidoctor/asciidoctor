@@ -38,9 +38,7 @@ class Test::Unit::TestCase
   end
 
   def example_document(name, opts = {})
-    opts[:header_footer] = true unless opts.has_key?(:header_footer)
-    #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'slim')
-    Asciidoctor::Document.new(File.readlines(sample_doc_path(name)), opts)
+    document_from_string File.read(sample_doc_path(name)), opts
   end
 
   def assert_difference(expression, difference = 1, message = nil, &block)
@@ -129,15 +127,13 @@ class Test::Unit::TestCase
   end
 
   def document_from_string(src, opts = {})
-    opts[:header_footer] = true unless opts.has_key?(:header_footer)
-    #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'slim')
+    assign_default_test_options opts
     Asciidoctor::Document.new(src.lines.entries, opts)
   end
 
   def block_from_string(src, opts = {})
     opts[:header_footer] = false
-    #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'slim')
-    doc = Asciidoctor::Document.new(src.lines.entries, opts)
+    doc = document_from_string src, opts
     doc.blocks.first
   end
 
@@ -153,6 +149,20 @@ class Test::Unit::TestCase
   def parse_header_metadata(source)
     reader = Asciidoctor::Reader.new source.lines.entries
     [Asciidoctor::Lexer.parse_header_metadata(reader), reader]
+  end
+
+  def assign_default_test_options(opts)
+    opts[:header_footer] = true unless opts.has_key?(:header_footer)
+    if opts[:header_footer]
+      # don't embed stylesheet unless test requests the default behavior
+      unless opts.has_key?(:linkcss_default)
+        opts[:attributes] ||= {}
+        opts[:attributes]['linkcss'] = nil
+        opts.delete(:linkcss_default)
+      end
+    end
+    #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'slim')
+    nil
   end
 
   # Expand the character for an entity such as &#8212; so
