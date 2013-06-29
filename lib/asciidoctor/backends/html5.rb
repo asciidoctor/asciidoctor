@@ -110,8 +110,7 @@ unless noheader %>
 <span id="email" class="email"><%= sub_macros(attr :email) %></span><br><%
       end
       if (authorcount = (attr :authorcount).to_i) > 1
-        (2..authorcount).each do |idx| %>
-<span id="author<%= idx %>" class="author"><%= attr "author_\#{idx}" %></span><br><%
+        (2..authorcount).each do |idx| %><span id="author<%= idx %>" class="author"><%= attr "author_\#{idx}" %></span><br><%
           if attr? "email_\#{idx}" %>
 <span id="email<%= idx %>" class="email"><%= sub_macros(attr "email_\#{idx}") %></span><br><%
           end
