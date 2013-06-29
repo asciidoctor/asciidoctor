@@ -2028,7 +2028,8 @@ class Lexer
           end
         end
 
-        # TODO support percentage width
+        # to_i permits us to support percentage width by stripping the %
+        # NOTE this is slightly out of compliance w/ AsciiDoc, but makes way more sense
         spec['width'] = !m[3].nil? ? m[3].to_i : 1
 
         # make this an operation

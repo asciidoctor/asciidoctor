@@ -375,6 +375,20 @@ I am getting in shape!
       assert_xpath '/table/tbody/tr[3]/td[4]/p[2][text()="I am getting in shape!"]', output, 1
     end
 
+    test 'percentages as column widths' do
+      input = <<-EOS
+[width="100%", cols="<.^10%,<90%"]
+|===
+|column A |column B
+|===
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/table/colgroup/col', output, 2
+      assert_xpath '(/table/colgroup/col)[1][@style="width:10%;"]', output, 1
+      assert_xpath '(/table/colgroup/col)[2][@style="width:90%;"]', output, 1
+    end
+
     test 'spans, alignments and styles' do
       input = <<-EOS
 [cols="e,m,^,>s",width="25%"]
