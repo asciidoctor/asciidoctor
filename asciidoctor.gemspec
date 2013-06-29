@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   ## name, version, date and rubyforge_project are updated automatically by the
   ## Rake build (see the validate task)
   s.name              = 'asciidoctor'
-  s.version           = '0.1.3'
-  s.date              = '2013-05-30'
+  s.version           = '0.1.4.pre'
+  s.date              = '2013-06-29'
   s.rubyforge_project = 'asciidoctor'
 
   s.summary     = 'A native Ruby AsciiDoc syntax processor and publishing toolchain'
@@ -92,6 +92,13 @@ EOS
     test/fixtures/basic-docinfo.html
     test/fixtures/basic-docinfo.xml
     test/fixtures/basic.asciidoc
+    test/fixtures/custom-backends/haml/docbook45/block_paragraph.xml.haml
+    test/fixtures/custom-backends/haml/html5-tweaks/block_paragraph.html.haml
+    test/fixtures/custom-backends/haml/html5/block_paragraph.html.haml
+    test/fixtures/custom-backends/haml/html5/block_sidebar.html.haml
+    test/fixtures/custom-backends/slim/docbook45/block_paragraph.xml.slim
+    test/fixtures/custom-backends/slim/html5/block_paragraph.html.slim
+    test/fixtures/custom-backends/slim/html5/block_sidebar.html.slim
     test/fixtures/docinfo.html
     test/fixtures/docinfo.xml
     test/fixtures/dot.gif
