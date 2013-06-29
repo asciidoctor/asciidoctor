@@ -466,7 +466,7 @@ module Asciidoctor
     :illegal_attr_name_chars => /[^\w\-]/,
 
     # 1*h,2*,^3e
-    :table_colspec    => /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+)?([a-z])?$/,
+    :table_colspec    => /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+%?)?([a-z])?$/,
 
     # 2.3+<.>m
     # TODO might want to use step-wise scan rather than this mega-regexp
