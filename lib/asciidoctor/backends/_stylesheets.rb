@@ -28,7 +28,7 @@ b, strong { font-weight: bold; }
 dfn { font-style: italic; }
 hr { -moz-box-sizing: content-box; box-sizing: content-box; height: 0; }
 mark { background: #ff0; color: #000; }
-code, tt, kbd, pre, samp { font-family: monospace, serif; font-size: 1em; }
+code, kbd, pre, samp { font-family: monospace, serif; font-size: 1em; }
 pre { white-space: pre-wrap; }
 q { quotes: "\201C" "\201D" "\2018" "\2019"; }
 small { font-size: 80%; }
@@ -91,7 +91,7 @@ hr { border: solid #dddddd; border-width: 1px 0 0; clear: both; margin: 1.25em 0
 em, i { font-style: italic; line-height: inherit; }
 strong, b { font-weight: bold; line-height: inherit; }
 small { font-size: 60%; line-height: inherit; }
-code, tt { font-family: Consolas, "Liberation Mono", Courier, monospace; font-weight: normal; color: #6d180b; }
+code { font-family: Consolas, "Liberation Mono", Courier, monospace; font-weight: normal; color: #6d180b; }
 ul, ol, dl { font-size: 1em; line-height: 1.6; margin-bottom: 1.25em; list-style-position: outside; font-family: inherit; }
 ul, ol { margin-left: 1.5em; }
 ul li ul, ul li ol { margin-left: 1.25em; margin-bottom: 0; font-size: 1em; }
@@ -143,15 +143,15 @@ table thead tr th, table thead tr td, table tfoot tr th, table tfoot tr td { pad
 table tr th, table tr td { padding: 0.5625em 0.625em; font-size: inherit; color: #222222; }
 table tr.even, table tr.alt, table tr:nth-of-type(even) { background: #f9f9f9; }
 table thead tr th, table tfoot tr th, table tbody tr td, table tr td, table tfoot tr td { display: table-cell; line-height: 1.6; }
-pre > code, pre > tt { color: #222222; }
-tt { font-size: 0.9375em; padding: 1px 3px 0; white-space: nowrap; background-color: #f2f2f2; border: 1px solid #cccccc; -webkit-border-radius: 4px; border-radius: 4px; text-shadow: none; }
+pre > code { color: #222222; }
+code { font-size: 0.9375em; padding: 1px 3px 0; white-space: nowrap; background-color: #f2f2f2; border: 1px solid #cccccc; -webkit-border-radius: 4px; border-radius: 4px; text-shadow: none; }
 kbd.keyseq { color: #555555; }
 kbd:not(.keyseq) { display: inline-block; color: #222222; font-size: 0.75em; line-height: 1.4; background-color: #F7F7F7; border: 1px solid #ccc; -webkit-border-radius: 3px; border-radius: 3px; -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px white inset; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px white inset; margin: -0.15em 0.15em 0 0.15em; padding: 0.2em 0.6em 0.2em 0.5em; vertical-align: middle; white-space: nowrap; }
 kbd kbd:first-child { margin-left: 0; }
 kbd kbd:last-child { margin-right: 0; }
 .menuseq, .menu { color: #090909; }
-p a > tt { text-decoration: underline; }
-p a > tt:hover { color: #561309; }
+p a > code { text-decoration: underline; }
+p a > code:hover { color: #561309; }
 #header, #content, #footnotes, #footer { width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 62.5em; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
 #header:before, #header:after, #content:before, #content:after, #footnotes:before, #footnotes:after, #footer:before, #footer:after { content: " "; display: table; }
 #header:after, #content:after, #footnotes:after, #footer:after { clear: both; }
@@ -215,7 +215,7 @@ pre { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospa
 .literalblock, .listingblock { margin-bottom: 1.25em; }
 .literalblock > .content > pre, .listingblock > .content > pre { background: none; color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; border-width: 1px 0; border-style: dotted; border-color: #bfbfbf; -webkit-border-radius: 4px; border-radius: 4px; padding: 0.75em 0.75em 0.5em 0.75em; word-wrap: break-word; line-height: 1.6; }
 .literalblock > .content > pre.nowrap, .listingblock > .content > pre.nowrap { overflow-x: auto; white-space: pre; }
-.literalblock > .content > pre > code, .literalblock > .content > pre > tt, .listingblock > .content > pre > code, .listingblock > .content > pre > tt { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; padding: 0; background: none; font-weight: normal; }
+.literalblock > .content > pre > code, .listingblock > .content > pre > code { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; padding: 0; background: none; font-weight: normal; }
 @media only screen { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.8em; } }
 @media only screen and (min-width: 768px) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.9em; } }
 @media only screen and (min-width: 1280px) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 1em; } }
@@ -272,8 +272,7 @@ td.hdlist1 { vertical-align: top; padding-right: .8em; font-weight: bold; }
 .imageblock > .title { margin-bottom: 0; }
 .imageblock.thumb, .imageblock.th { border-width: 6px; }
 .imageblock.thumb > .title, .imageblock.th > .title { padding: 0 0.125em; }
-.image.related, .image.rel { margin-top: 0.25em; margin-bottom: 0.25em; }
-.image.left, .image.right { display: inline-block; line-height: 0; }
+.image.left, .image.right { margin-top: 0.25em; margin-bottom: 0.25em; display: inline-block; line-height: 0; }
 .image.left { margin-right: 0.625em; }
 .image.right { margin-left: 0.625em; }
 span.footnote, span.footnoteref { vertical-align: super; font-size: 0.875em; }
