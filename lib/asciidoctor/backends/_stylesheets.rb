@@ -215,7 +215,7 @@ pre { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospa
 .literalblock, .listingblock { margin-bottom: 1.25em; }
 .literalblock > .content > pre, .listingblock > .content > pre { background: none; color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; border-width: 1px 0; border-style: dotted; border-color: #bfbfbf; -webkit-border-radius: 4px; border-radius: 4px; padding: 0.75em 0.75em 0.5em 0.75em; word-wrap: break-word; line-height: 1.6; }
 .literalblock > .content > pre.nowrap, .listingblock > .content > pre.nowrap { overflow-x: auto; white-space: pre; }
-.literalblock > .content > pre > code, .listingblock > .content > pre > code { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; padding: 0; background: none; font-weight: normal; }
+.literalblock > .content > pre > code, .listingblock > .content > pre > code { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; padding: 0; background: none; font-weight: normal; border: none; }
 @media only screen { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.8em; } }
 @media only screen and (min-width: 768px) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.9em; } }
 @media only screen and (min-width: 1280px) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 1em; } }
