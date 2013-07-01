@@ -48,7 +48,8 @@ context 'Options' do
     assert_equal true, options[:verbose]
     assert_equal false, options[:header_footer]
     assert_equal 'book', options[:attributes]['doctype']
-    assert_equal 'test/fixtures/sample.asciidoc', options[:input_file][0]
+    assert_equal 1, options[:input_files].size
+    assert_equal 'test/fixtures/sample.asciidoc', options[:input_files][0]
   end
 
   test 'standard attribute assignment' do
