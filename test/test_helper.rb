@@ -171,6 +171,24 @@ class Test::Unit::TestCase
     [number].pack('U*')
   end
 
+  def invoke_cli_with_filenames(argv = [], filenames = [], &block)
+    
+    filepaths = Array.new
+
+    filenames.each { |filename|
+      if filenames.nil?|| ::Pathname.new(filename).absolute?
+        filepaths.push(filename)
+      else
+        filepaths.push(File.join(File.dirname(__FILE__), 'fixtures', filename))
+      end
+    }
+
+    invoker = Asciidoctor::Cli::Invoker.new(argv + filepaths)
+
+    invoker.invoke!(&block)
+    invoker
+  end
+
   def invoke_cli_to_buffer(argv = [], filename = 'sample.asciidoc', &block)
     invoke_cli(argv, filename, [StringIO.new, StringIO.new], &block)
   end
