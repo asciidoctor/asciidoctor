@@ -3,11 +3,11 @@ module Asciidoctor
     # Public Invocation class for starting Asciidoctor via CLI
     class Invoker
       attr_reader :options
-      attr_reader :document
+      attr_reader :documents
       attr_reader :code
 
       def initialize(*options)
-        @document = nil
+        @documents = []
         @out = nil
         @err = nil
         @code = 0
@@ -31,13 +31,13 @@ module Asciidoctor
 
         begin
           opts = {}
-          monitor = {}
-          infiles = Array.new
+          profile = false
+          infiles = []
           outfile = nil
           tofile = nil
           @options.map {|k, v|
             case k
-            when :input_file
+            when :input_files
               infiles = v
             when :output_file
               outfile = v
@@ -47,7 +47,7 @@ module Asciidoctor
             when :attributes
               opts[:attributes] = v.dup
             when :verbose
-              opts[:monitor] = monitor if v
+              profile = true if v
             when :trace
               # currently, nothing
             else
@@ -55,43 +55,40 @@ module Asciidoctor
             end
           }
 
-          if infiles.size == 1 && infiles.at(0) == '-'
-             # allow use of block to supply stdin, particularly useful for tests
-             input = Array.new
-             input.push(block_given? ? yield : STDIN)
+          if infiles.size == 1 && infiles.first == '-'
+             # allows use of block to supply stdin, particularly useful for tests
+             inputs = [block_given? ? yield : STDIN]
           else
-             input = Array.new
-             infiles.each { |infile|
-               input.push(File.new(infile))
-             }
+             inputs = infiles.map {|infile| File.new infile}
           end
 
-          if outfile == '-' || (infiles.size == 1 && infiles.at(0) == '-' && (outfile.to_s.empty? || outfile != '/dev/null'))
+          if outfile == '-' || (infiles.size == 1 && infiles.first == '-' && (outfile.to_s.empty? || outfile != '/dev/null'))
             tofile = (@out || $stdout)
           elsif !outfile.nil?
             tofile = outfile
           else
+            tofile = nil
             opts[:in_place] = true unless opts.has_key? :to_dir
           end
 
-          # init iteration  
-          originalOpts = opts.clone
-          input.each { |element|
+          original_opts = opts
+          inputs.each do |input|
             
-            opts = Marshal.load(Marshal.dump(originalOpts))
-            opts[:to_file] = tofile
+            opts = Helpers.clone_options(original_opts) if inputs.size > 1
+            opts[:to_file] = tofile unless tofile.nil?
+            opts[:monitor] = {} if profile
 
-            @document = Asciidoctor.render(element, opts)
+            @documents ||= []
+            @documents.push Asciidoctor.render(input, opts)
 
-            # FIXME this should be :monitor, :profile or :timings rather than :verbose
-            if @options[:verbose]
-              puts "File #{element}"
-              puts "Time to read and parse source: #{'%05.5f' % opts[:monitor][:parse]}"
-              puts "Time to render document: #{'%05.5f' % opts[:monitor][:parse]}"
-              puts "Total time to read, parse and render: #{'%05.5f' % opts[:monitor][:parse]}"
+            if profile
+              monitor = opts[:monitor]
+              puts "Input file: #{input.respond_to?(:path) ? input.path : '-'}"
+              puts "  Time to read and parse source: #{'%05.5f' % monitor[:parse]}"
+              puts "  Time to render document: #{'%05.5f' % monitor[:parse]}"
+              puts "  Total time to read, parse and render: #{'%05.5f' % monitor[:parse]}"
             end
-          }
-          #end iteration
+          end
         rescue Exception => e
           raise e if @options[:trace] || SystemExit === e
           err = (@err || $stderr)
@@ -100,6 +97,10 @@ module Asciidoctor
           err.puts '  Use --trace for backtrace'
           @code = 1
         end
+      end
+
+      def document
+        @documents.size > 0 ? @documents.first : nil
       end
 
       def redirect_streams(out, err = nil)
