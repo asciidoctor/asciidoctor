@@ -36,9 +36,9 @@ context 'Options' do
 
   test 'should emit warning when unparsed options remain' do
     redirect_streams do |stdout, stderr|
-      options = Asciidoctor::Cli::Options.parse!(%w(-b docbook extra junk test/fixtures/sample.asciidoc))
+      options = Asciidoctor::Cli::Options.parse!(%w(-b docbook - -))
       assert options.is_a? Hash
-      assert_equal 'asciidoctor: WARNING: extra arguments detected (unparsed arguments: \'extra\', \'junk\')', stderr.string.chomp
+      assert_match(/asciidoctor: WARNING: extra arguments .*/, stderr.string.chomp)
     end
   end
 
@@ -48,7 +48,8 @@ context 'Options' do
     assert_equal true, options[:verbose]
     assert_equal false, options[:header_footer]
     assert_equal 'book', options[:attributes]['doctype']
-    assert_equal 'test/fixtures/sample.asciidoc', options[:input_file]
+    assert_equal 1, options[:input_files].size
+    assert_equal 'test/fixtures/sample.asciidoc', options[:input_files][0]
   end
 
   test 'standard attribute assignment' do

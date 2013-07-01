@@ -88,10 +88,10 @@ context 'Invoker' do
     end
   end
 
-  test 'should warn if extra arguments are detected' do
+  test 'should treat extra arguments as files' do
     redirect_streams do |stdout, stderr|
       invoker = invoke_cli %w(-o /dev/null extra arguments sample.asciidoc), nil
-      assert_match(/extra arguments detected/, stderr.string)
+      assert_match(/input file .* missing/, stderr.string)
       assert_equal 1, invoker.code
     end
   end
@@ -170,6 +170,29 @@ context 'Invoker' do
       FileUtils::rm_f(sample_outpath)
     end
   end
+
+  test 'should render all passed files' do
+    basic_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'basic.html'))
+    sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.html'))
+    begin
+      invoke_cli_with_filenames %w(), %w(basic.asciidoc sample.asciidoc)
+      assert File.exist?(basic_outpath)
+      assert File.exist?(sample_outpath)
+    ensure
+      FileUtils::rm_f(basic_outpath)
+      FileUtils::rm_f(sample_outpath)
+    end
+  end
+
+  test 'should render all files that matches a glob expression' do
+    basic_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'basic.html'))
+    begin
+      invoke_cli_to_buffer %w(), "ba*.asciidoc"
+      assert File.exist?(basic_outpath)
+    ensure
+      FileUtils::rm_f(basic_outpath)
+    end
+  end 
 
   test 'should suppress header footer if specified' do
     invoker = invoke_cli_to_buffer %w(-s -o -)
@@ -273,7 +296,7 @@ context 'Invoker' do
   end
 
   test 'should set attribute with quoted value containing a space' do
-	# emulating commandline arguments: --trace -a toc -a note-caption="Note to self:" -o -
+    # emulating commandline arguments: --trace -a toc -a note-caption="Note to self:" -o -
     invoker = invoke_cli_to_buffer %w(--trace -a toc -a note-caption=Note\ to\ self: -o -)
     doc = invoker.document
     assert_equal 'Note to self:', doc.attr('note-caption')

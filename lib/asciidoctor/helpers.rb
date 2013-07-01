@@ -47,6 +47,16 @@ module Helpers
     end
   end
 
+  # Public: Create a copy of options such that no references are shared
+  # returns A deep clone of the options Hash
+  def self.clone_options(opts)
+    clone = opts.dup
+    if opts.has_key? :attributes
+      clone[:attributes] = opts[:attributes].dup
+    end
+    clone
+  end
+
   # Public: A generic capture output routine to be used in templates
   #def self.capture_output(*args, &block)
   #  Proc.new { block.call(*args) }

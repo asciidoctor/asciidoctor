@@ -8,7 +8,7 @@ module Asciidoctor
 
       def initialize(options = {})
         self[:attributes] = options[:attributes] || {}
-        self[:input_file] = options[:input_file] || nil
+        self[:input_files] = options[:input_files] || nil
         self[:output_file] = options[:output_file] || nil
         self[:safe] = options[:safe] || SafeMode::UNSAFE
         self[:header_footer] = options[:header_footer] || true
@@ -35,8 +35,8 @@ module Asciidoctor
       def parse!(args)
         opts_parser = OptionParser.new do |opts|
           opts.banner = <<-EOS
-Usage: asciidoctor [OPTION]... [FILE]
-Translate the AsciiDoc source FILE into the backend output format (e.g., HTML 5, DocBook 4.5, etc.)
+Usage: asciidoctor [OPTION]... FILE...
+Translate the AsciiDoc source FILE or FILE(s) into the backend output format (e.g., HTML 5, DocBook 4.5, etc.)
 By default, the output is written to a file with the basename of the source file and the appropriate extension.
 Example: asciidoctor -b html5 source.asciidoc
 
@@ -124,23 +124,45 @@ Example: asciidoctor -b html5 source.asciidoc
         end
 
         begin
-          # shave off the file to process so that options errors appear correctly
-          if args.last && (args.last == '-' || !args.last.start_with?('-'))
-            self[:input_file] = args.pop
-          end
-          opts_parser.parse!(args)
-          if args.size > 0
-            # warn, but don't panic; we may have enough to proceed, so we won't force a failure
-            $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '})"
-          end
-
-          if self[:input_file].nil? || self[:input_file].empty?
+          infiles = []
+          opts_parser.parse! args
+          
+          if args.empty?
             $stderr.puts opts_parser
             return 1
-          elsif self[:input_file] != '-' && !File.readable?(self[:input_file])
-            $stderr.puts "asciidoctor: FAILED: input file #{self[:input_file]} missing or cannot be read"
-            return 1
-          elsif !self[:template_dirs].nil?
+          end
+
+          # shave off the file to process so that options errors appear correctly
+          if args.size == 1 && args.first == '-'
+            infiles.push args.pop
+          elsif
+            args.each do |file|
+              if (file == '-' || file.start_with?('-'))
+                # warn, but don't panic; we may have enough to proceed, so we won't force a failure
+                $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '}) or incorrect usage of stdin"
+              else
+                matches = Dir.glob file
+
+                if matches.empty?
+                  $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
+                  return 1
+                end
+
+                infiles.concat matches
+              end
+            end
+          end
+
+          infiles.each do |file|
+            unless file == '-' || File.readable?(file)
+              $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
+              return 1
+            end
+          end
+
+          self[:input_files] = infiles
+
+          if !self[:template_dirs].nil?
             begin
               require 'tilt'
             rescue LoadError
@@ -148,6 +170,7 @@ Example: asciidoctor -b html5 source.asciidoc
               return 1
             end
           end
+
         rescue OptionParser::MissingArgument
           $stderr.puts "asciidoctor: option #{$!.message}"
           $stdout.puts opts_parser
