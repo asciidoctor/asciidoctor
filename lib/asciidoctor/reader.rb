@@ -25,7 +25,7 @@ class Reader
   #
   #   data   = File.readlines(filename)
   #   reader = Asciidoctor::Reader.new data
-  def initialize(data = nil, document = nil, preprocess = false, &block)
+  def initialize(data = nil, document = nil, preprocess = false, include_handler = nil)
     data = [] if data.nil?
     # TODO use Struct to track file/lineno info; track as file changes; offset for sub-readers
     @lineno = 0
@@ -35,9 +35,17 @@ class Reader
     elsif !data.empty?
       # NOTE we assume document is not nil!
       @document = document
-      @preprocess_source = true
-      @include_block = block_given? ? block : nil
       normalize_data(data.is_a?(String) ? data.lines.entries : data)
+      @preprocess_source = true
+      if include_handler.nil?
+        include_handler = Asciidoctor::Extensions.include_handler
+      end
+
+      if !include_handler.nil?
+        @include_handler = include_handler.instance_method(:initialize).arity == 1 ? include_handler.new(document) : include_handler.new
+      else
+        @include_handler = nil
+      end
     else
       @lines = []
       @preprocess_source = false
@@ -430,19 +438,22 @@ class Reader
       advance
       @next_line_preprocessed = false
       false
+    # assume that if a block is given, the developer wants
+    # to handle when and how to process the include, even
+    # if the include-depth attribute is 0
+    elsif @include_handler && @include_handler.handles?(target)
+      advance
+      # QUESTION should we pre-parse attributes??
+      attributes = AttributeList.new(raw_attributes).parse
+      # FIXME this borks line numbers
+      # FIXME nil check
+      @lines.unshift(*normalize_include_data(@include_handler.process(@document, target, attributes)))
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif @document.safe >= SafeMode::SECURE
       @lines[0] = "link:#{target}[#{target}]\n"
       @next_line_preprocessed = true
       false
-    # assume that if a block is given, the developer wants
-    # to handle when and how to process the include, even
-    # if the include-depth attribute is 0
-    elsif @include_block
-      advance
-      # FIXME this borks line numbers
-      @lines.unshift(*normalize_include_data(@include_block.call(target, @document)))
     # FIXME currently we're not checking the upper bound of the include depth
     elsif @document.attributes.fetch('include-depth', 0).to_i > 0
       advance
