@@ -6,17 +6,17 @@ asciidoctor(1)
 
 NAME
 ----
-asciidoctor - converts an AsciiDoc source file to HTML, DocBook and other formats
+asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
 
 SYNOPSIS
 --------
-*asciidoctor* ['OPTION']... 'FILE'
+*asciidoctor* ['OPTION']... 'FILE'...
 
 
 DESCRIPTION
 -----------
-The asciidoctor(1) command converts the AsciiDoc source file 'FILE' to HTML 5,
+The asciidoctor(1) command converts the AsciiDoc source file(s) 'FILE' to HTML 5,
 DocBook 4.5 and other output formats.
 
 If 'FILE' is '-' then the AsciiDoc source is read from standard input.
