@@ -141,6 +141,7 @@ Example: asciidoctor -b html5 source.asciidoc
                 # warn, but don't panic; we may have enough to proceed, so we won't force a failure
                 $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '}) or incorrect usage of stdin"
               else
+                # TODO this glob may not be necessary as the shell should have already performed expansion
                 matches = Dir.glob file
 
                 if matches.empty?
