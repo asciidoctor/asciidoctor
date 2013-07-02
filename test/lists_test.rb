@@ -460,6 +460,20 @@ List
       assert_xpath '//ul/li', output, 3
     end
 
+    test 'should represent block style as style class' do
+      ['disc', 'square', 'circle'].each do |style|
+        input = <<-EOS
+[#{style}]
+* a
+* b
+* c
+        EOS
+        output = render_embedded_string input
+        assert_css ".ulist.#{style}", output, 1
+        assert_css ".ulist.#{style} ul.#{style}", output, 1
+      end
+    end
+
     test "asterisk elements separated by blank lines should merge lists" do
       input = <<-EOS
 List
@@ -1451,6 +1465,58 @@ List
       output = render_string input
       assert_xpath '//ol', output, 1
       assert_xpath '//ol/li', output, 3
+    end
+
+    test 'should represent explicit role attribute as style class' do
+      input = <<-EOS
+[role="dry"]
+. Once
+. Again
+. Refactor!
+      EOS
+
+      output = render_embedded_string input 
+      assert_css '.olist.arabic.dry', output, 1
+      assert_css '.olist ol.arabic', output, 1
+    end
+
+    test 'should represent custom numbering and explicit role attribute as style classes' do
+      input = <<-EOS
+[loweralpha, role="dry"]
+. Once
+. Again
+. Refactor!
+      EOS
+
+      output = render_embedded_string input 
+      assert_css '.olist.loweralpha.dry', output, 1
+      assert_css '.olist ol.loweralpha', output, 1
+    end
+
+    test 'should represent implicit role attribute as style class' do
+      input = <<-EOS
+[.dry]
+. Once
+. Again
+. Refactor!
+      EOS
+
+      output = render_embedded_string input 
+      assert_css '.olist.arabic.dry', output, 1
+      assert_css '.olist ol.arabic', output, 1
+    end
+
+    test 'should represent custom numbering and implicit role attribute as style classes' do
+      input = <<-EOS
+[loweralpha.dry]
+. Once
+. Again
+. Refactor!
+      EOS
+
+      output = render_embedded_string input 
+      assert_css '.olist.loweralpha.dry', output, 1
+      assert_css '.olist ol.loweralpha', output, 1
     end
 
     test "dot elements separated by blank lines should merge lists" do

@@ -253,10 +253,12 @@ dl dd:last-child, dl dd:last-child > :last-child { margin-bottom: 0; }
 ol > li p, ul > li p, ul dd, ol dd, .olist .olist, .ulist .olist, .olist .ulist { margin-bottom: 0.625em; }
 ul.unstyled, ol.unnumbered, ul.checklist { list-style-type: none; margin-left: 0.625em; }
 ol.arabic { list-style-type: decimal; }
+ol.decimal { list-style-type: decimal-leading-zero; }
 ol.loweralpha { list-style-type: lower-alpha; }
 ol.upperalpha { list-style-type: upper-alpha; }
 ol.lowerroman { list-style-type: lower-roman; }
 ol.upperroman { list-style-type: upper-roman; }
+ol.lowergreek { list-style-type: lower-greek; }
 .hdlist > table, .colist > table { border: 0; background: none; }
 .hdlist > table > tbody > tr, .colist > table > tbody > tr { background: none; }
 .literalblock + .colist, .listingblock + .colist { margin-top: -0.5em; }

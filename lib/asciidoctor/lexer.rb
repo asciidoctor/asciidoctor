@@ -457,10 +457,10 @@ class Lexer
             reader.unshift_line this_line
             block = next_outline_list(reader, :olist, parent)
             # QUESTION move this logic to next_outline_list?
-            if !(attributes.has_key? 'style') && !(block.attributes.has_key? 'style')
+            if !attributes['style'] && !block.attributes['style']
               marker = block.buffer.first.marker
               if marker.start_with? '.'
-                # first one makes more sense, but second on is AsciiDoc-compliant
+                # first one makes more sense, but second one is AsciiDoc-compliant
                 #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES.first).to_s
                 attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || ORDERED_LIST_STYLES.first).to_s
               else
@@ -2152,6 +2152,12 @@ class Lexer
       else
         parsed_style = attributes['style'] = raw_style
       end
+
+      # don't leave an empty style
+      #if parsed_style.to_s.empty?
+      #  parsed_style = nil
+      #  attributes.delete('style')
+      #end
 
       [parsed_style, original_style]
     end

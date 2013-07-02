@@ -634,7 +634,7 @@ class BlockUlistTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="ulist<%= (checklist = (option? 'checklist')) ? ' checklist' : nil %>#{style_class}#{role_class}"><%= title? ? %(
 <div class="title">\#{title}</div>) : nil %>
-<ul<%= checklist ? ' class="checklist"' : nil %>><%
+<ul<%= checklist ? ' class="checklist"' : (!@style.nil? ? %( class="\#{@style}") : nil) %>><%
 if checklist
   # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
   marker_checked = (@document.attr? 'icons', 'font') ? '<i class="icon-check"></i> ' : '<input type="checkbox" data-item-complete="1" checked disabled> '
@@ -660,7 +660,7 @@ class BlockOlistTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="olist#{style_class}#{role_class}"><%= title? ? %(
 <div class="title">\#{title}</div>) : nil %>
-<ol class="<%= @style %>"<%= (type = ::Asciidoctor::ORDERED_LIST_KEYWORDS[@style]) ? %( type="\#{type}") : nil %>#{attribute('start', :start)}><%
+<ol class="<%= @style %>"<%= (keyword = list_marker_keyword) ? %( type="\#{keyword}") : nil %>#{attribute('start', :start)}><%
 content.each do |item| %>
 <li>
 <p><%= item.text %></p><%
