@@ -549,6 +549,49 @@ ____
       assert_equal 'famous', qb.attributes['role']
     end
 
+    test 'role? returns true if role is assigned' do
+      input = <<-EOS
+[role="lead"]
+A paragraph
+      EOS
+
+      doc = document_from_string input
+      p = doc.blocks.first
+      assert p.role?
+    end
+
+    test 'role? can check for precense of role name' do
+      input = <<-EOS
+[role="lead"]
+A paragraph
+      EOS
+
+      doc = document_from_string input
+      p = doc.blocks.first
+      assert p.role?('lead')
+    end
+
+    test 'roles returns array of role names' do
+      input = <<-EOS
+[role="story lead"]
+A paragraph
+      EOS
+
+      doc = document_from_string input
+      p = doc.blocks.first
+      assert_equal ['story', 'lead'], p.roles
+    end
+
+    test 'roles returns empty array if role attribute is not set' do
+      input = <<-EOS
+A paragraph
+      EOS
+
+      doc = document_from_string input
+      p = doc.blocks.first
+      assert_equal [], p.roles
+    end
+
     test "Attribute substitutions are performed on attribute list before parsing attributes" do
       input = <<-EOS
 :lead: role="lead"
