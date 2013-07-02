@@ -169,14 +169,16 @@ module Asciidoctor
 
   NESTABLE_LIST_CONTEXTS = [:ulist, :olist, :dlist]
 
-  ORDERED_LIST_STYLES = [:arabic, :loweralpha, :lowerroman, :upperalpha, :upperroman]
+  # TODO validate use of explicit style name above ordered list (this list is for selecting an implicit style)
+  ORDERED_LIST_STYLES = [:arabic, :loweralpha, :lowerroman, :upperalpha, :upperroman] #, :lowergreek]
 
   ORDERED_LIST_MARKER_PATTERNS = {
     :arabic => /\d+[.>]/,
     :loweralpha => /[a-z]\./,
-    :upperalpha => /[A-Z]\./,
     :lowerroman => /[ivx]+\)/,
+    :upperalpha => /[A-Z]\./,
     :upperroman => /[IVX]+\)/
+    #:lowergreek => /[a-z]\]/
   }
 
   ORDERED_LIST_KEYWORDS = {
@@ -184,6 +186,9 @@ module Asciidoctor
     'lowerroman' => 'i',
     'upperalpha' => 'A',
     'upperroman' => 'I'
+    #'lowergreek' => 'a'
+    #'arabic'     => '1'
+    #'decimal'    => '1'
   }
 
   LIST_CONTINUATION = '+'
