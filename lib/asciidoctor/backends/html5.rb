@@ -465,8 +465,8 @@ class BlockAdmonitionTemplate < BaseTemplate
     name = node.attr 'name'
     role = node.role
     title = node.title? ? node.title : nil
-    if node.attr? 'icons'
-      if node.attr? 'icons', 'font'
+    if node.document.attr? 'icons'
+      if node.document.attr? 'icons', 'font'
         caption = %(<i class="icon-#{name}" title="#{node.caption}"></i>)
       else
         caption = %(<img src="#{node.icon_uri(name)}" alt="#{node.caption}">)
@@ -637,8 +637,8 @@ class BlockUlistTemplate < BaseTemplate
 <ul<%= checklist ? ' class="checklist"' : nil %>><%
 if checklist
   # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
-  marker_checked = (attr? 'icons', 'font') ? '<i class="icon-check"></i> ' : '<input type="checkbox" data-item-complete="1" checked disabled> '
-  marker_unchecked = (attr? 'icons', 'font') ? '<i class="icon-check-empty"></i> ' : '<input type="checkbox" data-item-complete="0" disabled> '
+  marker_checked = (@document.attr? 'icons', 'font') ? '<i class="icon-check"></i> ' : '<input type="checkbox" data-item-complete="1" checked disabled> '
+  marker_unchecked = (@document.attr? 'icons', 'font') ? '<i class="icon-check-empty"></i> ' : '<input type="checkbox" data-item-complete="0" disabled> '
 end
 content.each do |item| %>
 <li>
@@ -680,12 +680,12 @@ class BlockColistTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><div#{id} class="colist#{style_class}#{role_class}"><%= title? ? %(
 <div class="title">\#{title}</div>) : nil %><%
-if attr? :icons %>
+if @document.attr? 'icons' %>
 <table><%
   content.each_with_index do |item, i| %>
 <tr>
 <td><%
-    if attr? :icons, 'font' %><i class="conum"><%= i + 1 %></i><%
+    if @document.attr? 'icons', 'font' %><i class="conum"><%= i + 1 %></i><%
     else %><img src="<%= icon_uri("callouts/\#{i + 1}") %>" alt="<%= i + 1 %>"><%
     end %></td>
 <td><%= item.text %></td>
@@ -855,9 +855,9 @@ end
 
 class InlineCalloutTemplate < BaseTemplate
   def result(node)
-    if node.attr? 'icons', 'font'
+    if node.document.attr? 'icons', 'font'
       %(<i class="conum">#{node.text}</i>)
-    elsif node.attr? 'icons'
+    elsif node.document.attr? 'icons'
       src = node.icon_uri("callouts/#{node.text}")
       %(<img src="#{src}" alt="#{node.text}">)
     else
