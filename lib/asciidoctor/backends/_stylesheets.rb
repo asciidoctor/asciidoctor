@@ -4,7 +4,7 @@ module HTML5
   #
   # returns the default CodeRay stylesheet as a String
   def self.default_coderay_stylesheet
-    ::Asciidoctor::Helpers.require_library 'coderay'
+    ::Asciidoctor::Helpers.require_library 'coderay', true
     ::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
   end
 
