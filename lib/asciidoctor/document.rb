@@ -183,6 +183,11 @@ class Document < AbstractBlock
     # 10 is the AsciiDoc default, though currently Asciidoctor only supports 1 level
     @attribute_overrides['include-depth'] ||= 10
 
+    # the only way to enable uri reads is via the document options, disabled by default
+    unless !@attribute_overrides['allow-uri-read'].nil? || @attribute_overrides.has_key?('allow-uri-read!')
+      @attribute_overrides['allow-uri-read'] = nil
+    end
+
     # if the base_dir option is specified, it overrides docdir as the root for relative paths
     # otherwise, the base_dir is the directory of the source file (docdir) or the current
     # directory of the input is a string

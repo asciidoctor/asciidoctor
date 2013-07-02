@@ -448,6 +448,12 @@ class Reader
     elsif @document.attributes.fetch('include-depth', 0).to_i > 0
       advance
       if target.include?(':') && target.match(REGEXP[:uri_sniff])
+        unless @document.attributes.has_key? 'allow-uri-read'
+          @lines[0] = "link:#{target}[#{target}]\n"
+          @next_line_preprocessed = true
+          return false
+        end
+
         target_type = :uri
         include_file = target
         if @document.attributes.has_key? 'cache-uri'

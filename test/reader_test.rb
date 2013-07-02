@@ -193,7 +193,7 @@ include::https://raw.github.com/asciidoctor/asciidoctor/master/LICENSE[]
 ....
       EOS
 
-      output = render_embedded_string input, :safe => :safe
+      output = render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
       assert_match(/MIT/, output)
     end
 
@@ -205,7 +205,7 @@ include::http://localhost:0[]
       EOS
 
       begin
-        output = render_embedded_string input, :safe => :safe
+        output = render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
         assert_css 'pre', output, 1
         assert_css 'pre *', output, 0
       rescue
