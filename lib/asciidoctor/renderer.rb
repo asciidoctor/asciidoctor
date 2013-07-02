@@ -36,7 +36,7 @@ class Renderer
 
     # If user passed in a template dir, let them override our base templates
     if (template_dirs = options.delete(:template_dirs))
-      Helpers.require_library 'tilt'
+      Helpers.require_library 'tilt', true
 
       if (template_cache = options[:template_cache]) === true
         # FIXME probably want to use our own cache object for more control
@@ -99,7 +99,7 @@ class Renderer
           ext_name = name_parts.last
           if ext_name == 'slim' && !slim_loaded
             # slim doesn't get loaded by Tilt
-            Helpers.require_library 'slim'
+            Helpers.require_library 'slim', true
           end
           next unless Tilt.registered? ext_name
           opts = view_opts[ext_name.to_sym]
@@ -147,11 +147,11 @@ class Renderer
       name = 'erb'
     end
 
-    Helpers.require_library name
-
     if name == 'erb'
+      Helpers.require_library 'erb'
       ::ERB
     elsif name == 'erubis'
+      Helpers.require_library 'erubis', true
       ::Erubis::FastEruby
     end
   end

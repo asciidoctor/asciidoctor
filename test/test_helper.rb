@@ -155,10 +155,11 @@ class Test::Unit::TestCase
     opts[:header_footer] = true unless opts.has_key?(:header_footer)
     if opts[:header_footer]
       # don't embed stylesheet unless test requests the default behavior
-      unless opts.has_key?(:linkcss_default)
-        opts[:attributes] ||= {}
-        opts[:attributes]['linkcss'] = nil
+      if opts.has_key? :linkcss_default
         opts.delete(:linkcss_default)
+      else
+        opts[:attributes] ||= {}
+        opts[:attributes]['linkcss'] = ''
       end
     end
     #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'slim')

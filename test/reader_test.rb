@@ -182,7 +182,34 @@ include::fixtures/no-such-file.ad[]
         doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
         assert_equal 0, doc.blocks.size
       rescue
-        flunk('include macro should not raise exception on missing file')
+        flunk 'include macro should not raise exception on missing file'
+      end
+    end
+
+    test 'include macro can retrieve data from uri' do
+      input = <<-EOS
+....
+include::https://raw.github.com/asciidoctor/asciidoctor/master/LICENSE[]
+....
+      EOS
+
+      output = render_embedded_string input, :safe => :safe
+      assert_match(/MIT/, output)
+    end
+
+    test 'inaccessible uri referenced by include macro does not crash processor' do
+      input = <<-EOS
+....
+include::http://localhost:0[]
+....
+      EOS
+
+      begin
+        output = render_embedded_string input, :safe => :safe
+        assert_css 'pre', output, 1
+        assert_css 'pre *', output, 0
+      rescue
+        flunk 'include macro should not raise exception on inaccessible uri'
       end
     end
 
