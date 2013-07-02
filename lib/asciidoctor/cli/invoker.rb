@@ -85,8 +85,8 @@ module Asciidoctor
               monitor = opts[:monitor]
               puts "Input file: #{input.respond_to?(:path) ? input.path : '-'}"
               puts "  Time to read and parse source: #{'%05.5f' % monitor[:parse]}"
-              puts "  Time to render document: #{'%05.5f' % monitor[:parse]}"
-              puts "  Total time to read, parse and render: #{'%05.5f' % monitor[:parse]}"
+              puts "  Time to render document: #{'%05.5f' % monitor[:render]}"
+              puts "  Total time to read, parse and render: #{'%05.5f' % monitor[:load_render]}"
             end
           end
         rescue Exception => e

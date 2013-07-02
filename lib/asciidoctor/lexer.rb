@@ -404,7 +404,7 @@ class Lexer
               block.title = attributes.delete('title') if attributes.has_key?('title')
               if blk_ctx == :image
                 document.register(:images, target)
-                attributes['alt'] ||= File.basename(target, File.extname(target))
+                attributes['alt'] ||= File.basename(target, File.extname(target)).tr('_-', ' ')
                 # QUESTION should video or audio have an auto-numbered caption?
                 block.assign_caption attributes.delete('caption'), 'figure'
               end
