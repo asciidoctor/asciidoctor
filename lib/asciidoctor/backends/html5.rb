@@ -685,7 +685,7 @@ if @document.attr? 'icons' %>
   content.each_with_index do |item, i| %>
 <tr>
 <td><%
-    if @document.attr? 'icons', 'font' %><i class="conum"><%= i + 1 %></i><%
+    if @document.attr? 'icons', 'font' %><%= %(<i class="conum" data-value="\#{i + 1}"></i><b>\#{i + 1}</b>) %><%
     else %><img src="<%= icon_uri("callouts/\#{i + 1}") %>" alt="<%= i + 1 %>"><%
     end %></td>
 <td><%= item.text %></td>
@@ -856,12 +856,12 @@ end
 class InlineCalloutTemplate < BaseTemplate
   def result(node)
     if node.document.attr? 'icons', 'font'
-      %(<i class="conum">#{node.text}</i>)
+      %(<i class="conum" data-value="#{node.text}"></i><b>(#{node.text})</b>)
     elsif node.document.attr? 'icons'
       src = node.icon_uri("callouts/#{node.text}")
       %(<img src="#{src}" alt="#{node.text}">)
     else
-      "<b>&lt;#{node.text}&gt;</b>"
+      "<b>(#{node.text})</b>"
     end
   end
 

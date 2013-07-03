@@ -716,10 +716,10 @@ module Substituters
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
-      if m[0].start_with? '\\'
-        next "&lt;#{m[1]}&gt;"
+      if m[1] == '\\'
+        next "&lt;#{m[2]}&gt;"
       end
-      Inline.new(self, :callout, m[1], :id => document.callouts.read_next_id).render
+      Inline.new(self, :callout, m[2], :id => document.callouts.read_next_id).render
     }
   end
 
