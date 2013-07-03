@@ -424,6 +424,8 @@ class Reader
   #          target slot of the include::[] macro
   #
   # returns a Boolean indicating whether the line under the cursor has changed.
+  # -
+  # FIXME includes bork line numbers
   def preprocess_include(target, raw_attributes)
     target = @document.sub_attributes target
     if target.empty?
@@ -441,16 +443,33 @@ class Reader
     # if the include-depth attribute is 0
     elsif @include_block
       advance
-      # FIXME this borks line numbers
       @lines.unshift(*normalize_include_data(@include_block.call(target, @document)))
     # FIXME currently we're not checking the upper bound of the include depth
     elsif @document.attributes.fetch('include-depth', 0).to_i > 0
       advance
-      # FIXME this borks line numbers
-      include_file = @document.normalize_system_path(target, nil, nil, :target_name => 'include file')
-      if !File.file?(include_file)
-        puts "asciidoctor: WARNING: line #{@lineno}: include file not found: #{include_file}"
-        return true
+      if target.include?(':') && target.match(REGEXP[:uri_sniff])
+        unless @document.attributes.has_key? 'allow-uri-read'
+          @lines[0] = "link:#{target}[#{target}]\n"
+          @next_line_preprocessed = true
+          return false
+        end
+
+        target_type = :uri
+        include_file = target
+        if @document.attributes.has_key? 'cache-uri'
+          # NOTE caching requires the open-uri-cached gem to be installed
+          Helpers.require_library 'open-uri/cached', 'open-uri-cached'
+        else
+          Helpers.require_library 'open-uri'
+        end
+        # FIXME should stop processing include if required library cannot be loaded; check for -1 return value?
+      else
+        target_type = :file
+        include_file = @document.normalize_system_path(target, nil, nil, :target_name => 'include file')
+        if !File.file?(include_file)
+          puts "asciidoctor: WARNING: line #{@lineno}: include file not found: #{include_file}"
+          return true
+        end
       end
 
       inc_lines = nil
@@ -481,18 +500,24 @@ class Reader
       if !inc_lines.nil?
         if !inc_lines.empty?
           selected = []
-          f = File.new(include_file)
-          f.each_line do |l|
-            take = inc_lines.first
-            if take.is_a?(Float) && take.infinite?
-              selected.push l
-            else
-              if f.lineno == take
-                selected.push l
-                inc_lines.shift 
+          begin
+            open(include_file) do |f|
+              f.each_line do |l|
+                take = inc_lines.first
+                if take.is_a?(Float) && take.infinite?
+                  selected.push l
+                else
+                  if f.lineno == take
+                    selected.push l
+                    inc_lines.shift 
+                  end
+                  break if inc_lines.empty?
+                end
               end
-              break if inc_lines.empty?
             end
+          rescue
+            puts "asciidoctor: WARNING: line #{@lineno}: include #{target_type} not readable: #{include_file}"
+            return true
           end
           @lines.unshift(*normalize_include_data(selected, attributes['indent'])) unless selected.empty?
         end
@@ -500,29 +525,40 @@ class Reader
         if !tags.empty?
           selected = []
           active_tag = nil
-          f = File.new(include_file)
-          f.each_line do |l|
-            l.force_encoding(::Encoding::UTF_8) if ::Asciidoctor::FORCE_ENCODING
-            if !active_tag.nil?
-              if l.include?("end::#{active_tag}[]")
-                active_tag = nil
-              else
-                selected.push "#{l.rstrip}\n"
-              end
-            else
-              tags.each do |tag|
-                if l.include?("tag::#{tag}[]")
-                  active_tag = tag
-                  break
+          begin
+            open(include_file) do |f|
+              f.each_line do |l|
+                l.force_encoding(::Encoding::UTF_8) if ::Asciidoctor::FORCE_ENCODING
+                if !active_tag.nil?
+                  if l.include?("end::#{active_tag}[]")
+                    active_tag = nil
+                  else
+                    selected.push "#{l.rstrip}\n"
+                  end
+                else
+                  tags.each do |tag|
+                    if l.include?("tag::#{tag}[]")
+                      active_tag = tag
+                      break
+                    end
+                  end
                 end
               end
             end
+          rescue
+            puts "asciidoctor: WARNING: line #{@lineno}: include #{target_type} not readable: #{include_file}"
+            return true
           end
           #@lines.unshift(*selected) unless selected.empty?
           @lines.unshift(*normalize_include_data(selected, attributes['indent'])) unless selected.empty?
         end
       else
-        @lines.unshift(*normalize_include_data(File.readlines(include_file), attributes['indent']))
+        begin
+          @lines.unshift(*normalize_include_data(open(include_file) {|f| f.readlines }, attributes['indent']))
+        rescue
+          puts "asciidoctor: WARNING: line #{@lineno}: include #{target_type} not readable: #{include_file}"
+          return true
+        end
       end
       true
     else

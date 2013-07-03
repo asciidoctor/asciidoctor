@@ -820,7 +820,7 @@ module Substituters
   # returns the highlighted source code, if a source highlighter is defined
   # on the document, otherwise the unprocessed text
   def highlight_source(source)
-    Helpers.require_library 'coderay'
+    Helpers.require_library 'coderay', true
     ::CodeRay::Duo[attr('language', 'text').to_sym, :html, {
         :css => @document.attributes.fetch('coderay-css', 'class').to_sym,
         :line_numbers => (attr?('linenums') ? @document.attributes.fetch('coderay-linenums-mode', 'table').to_sym : nil),
