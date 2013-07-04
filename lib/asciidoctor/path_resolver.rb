@@ -339,9 +339,14 @@ class PathResolver
   def web_path(target, start = nil)
     target = posixfy(target)
     start = posixfy(start)
+    uri_prefix = nil
 
     unless is_web_root?(target) || start.empty?
       target = "#{start}#{SLASH}#{target}"
+      if target.include?(':') && target.match(Asciidoctor::REGEXP[:uri_sniff])
+        uri_prefix = $~[0]
+        target = target[uri_prefix.length..-1]
+      end
     end
 
     target_segments, target_root, _ = partition_path(target, true)
@@ -360,7 +365,11 @@ class PathResolver
       accum
     end
 
-    join_path resolved_segments, target_root
+    if uri_prefix.nil?
+      join_path resolved_segments, target_root
+    else
+      "#{uri_prefix}#{join_path resolved_segments, target_root}"
+    end
   end
 end
 end

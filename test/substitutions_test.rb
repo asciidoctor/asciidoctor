@@ -440,6 +440,30 @@ context 'Substitutions' do
           para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
     end
 
+    test 'an inline image macro with a url target should be interpreted as an image' do
+      para = block_from_string %(Beware of the image:http://example.com/images/tiger.png[tiger].)
+      assert_equal %{Beware of the <span class="image"><img src="http://example.com/images/tiger.png" alt="tiger"></span>.},
+          para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
+    test 'should prepend value of imagesdir attribute to inline image target if target is relative path' do
+      para = block_from_string %(Beware of the image:tiger.png[tiger].), :attributes => {'imagesdir' => './images'}
+      assert_equal %{Beware of the <span class="image"><img src="./images/tiger.png" alt="tiger"></span>.},
+          para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
+    test 'should not prepend value of imagesdir attribute to inline image target if target is absolute path' do
+      para = block_from_string %(Beware of the image:/tiger.png[tiger].), :attributes => {'imagesdir' => './images'}
+      assert_equal %{Beware of the <span class="image"><img src="/tiger.png" alt="tiger"></span>.},
+          para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
+    test 'should not prepend value of imagesdir attribute to inline image target if target is url' do
+      para = block_from_string %(Beware of the image:http://example.com/images/tiger.png[tiger].), :attributes => {'imagesdir' => './images'}
+      assert_equal %{Beware of the <span class="image"><img src="http://example.com/images/tiger.png" alt="tiger"></span>.},
+          para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
     test 'a block image macro should not be detected within paragraph text' do
       para = block_from_string(%(Not an inline image macro image::tiger.png[].))
       result = para.sub_macros(para.buffer.join)

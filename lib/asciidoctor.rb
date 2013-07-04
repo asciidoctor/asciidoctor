@@ -384,8 +384,9 @@ module Asciidoctor
     :media_blk_macro  => /^(image|video|audio)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/,
 
     # image:filename.png[Alt Text]
+    # image:http://example.com/images/filename.png[Alt Text]
     # image:filename.png[More [Alt\] Text] (alt text becomes "More [Alt] Text")
-    :image_macro      => /\\?image:([^:\[]+)\[((?:\\\]|[^\]])*?)\]/,
+    :image_macro      => /\\?image:([^:\[][^\[]*)\[((?:\\\]|[^\]])*?)\]/,
 
     # indexterm:[Tigers,Big cats]
     # (((Tigers,Big cats)))
@@ -546,7 +547,7 @@ module Asciidoctor
     # http://domain
     # https://domain
     # data:info
-    :uri_sniff        => %r{\A[[:alpha:]][[:alnum:].+-]*:},
+    :uri_sniff        => %r{\A[[:alpha:]][[:alnum:].+-]*:/*},
 
     :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/
   }
