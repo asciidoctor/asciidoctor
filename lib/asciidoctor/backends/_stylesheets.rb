@@ -331,8 +331,9 @@ div.unbreakable { page-break-inside: avoid; }
 .admonitionblock td.icon .icon-important:before { content: "\f06a"; color: #bf0000; }
 .conum { display: inline-block; color: white !important; background-color: #222222; -webkit-border-radius: 100px; border-radius: 100px; text-align: center; width: 20px; height: 20px; font-size: 12px; font-weight: bold; line-height: 20px; font-family: Arial, sans-serif; font-style: normal; position: relative; top: -2px; letter-spacing: -1px; }
 .conum * { color: white !important; }
-.conum:empty { display: none; }
-pre .comment .conum { left: -20px; }
+.conum + b { display: none; }
+.conum:after { content: attr(data-value); }
+.conum:not([data-value]):empty { display: none; }
 .literalblock > .content > pre, .listingblock > .content > pre { -webkit-border-radius: 0; border-radius: 0; }
 DEFAULT_ASCIIDOCTOR_STYLESHEET
   end
