@@ -42,6 +42,10 @@ context 'Path Resolver' do
       assert_equal './assets/images', @resolver.web_path('./images', './assets')
     end
 
+    test 'target with relative path appended to url start path' do
+      assert_equal 'http://www.example.com/assets/images', @resolver.web_path('images', 'http://www.example.com/assets')
+    end
+
     test 'normalize target' do
       assert_equal '../images', @resolver.web_path('../images/../images')
     end
