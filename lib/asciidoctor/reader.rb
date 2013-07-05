@@ -32,6 +32,14 @@ class Reader
     if !preprocess
       @lines = data.is_a?(String) ? data.lines.entries : data.dup
       @preprocess_source = false
+      # document is not nil in the case of nested AsciiDoc document (in table cell)
+      unless document.nil?
+        @document = document
+        # preprocess first line, since we may not have hit it yet
+        # FIXME include handler (block) should be available to the peek_line call
+        peek_line true
+        @document = nil
+      end
     elsif !data.empty?
       # NOTE we assume document is not nil!
       @document = document
@@ -64,10 +72,10 @@ class Reader
   # the next line is preprocessed before checking whether there are more lines. 
   #
   # Returns true if @lines is empty, or false otherwise.
-  def has_more_lines?
+  def has_more_lines?(preprocess = nil)
     if @eof || (@eof = @lines.empty?)
       false
-    elsif @preprocess_source && !@next_line_preprocessed
+    elsif (preprocess.nil? && @preprocess_source || preprocess) && !@next_line_preprocessed
       preprocess_next_line.nil? ? false : !@lines.empty?
     else
       true
@@ -231,7 +239,7 @@ class Reader
     if !preprocess
       # QUESTION do we need to dup?
       @eof || (@eof = @lines.empty?) ? nil : @lines.first.dup
-    elsif has_more_lines?
+    elsif has_more_lines? true
       # QUESTION do we need to dup?
       @lines.first.dup
     else
