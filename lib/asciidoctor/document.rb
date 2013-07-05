@@ -125,17 +125,19 @@ class Document < AbstractBlock
     @counters = {}
     @callouts = Callouts.new
     @options = options
-    # safely resolve the safe mode from const, int or string
-    if @safe.nil? && !(safe_mode = @options[:safe])
-      @safe = SafeMode::SECURE
-    elsif safe_mode.is_a?(Fixnum)
-      # be permissive in case API user wants to define new levels
-      @safe = safe_mode
-    else
-      begin
-        @safe = SafeMode.const_get(safe_mode.to_s.upcase).to_i
-      rescue
-        @safe = SafeMode::SECURE.to_i
+    if @parent_document.nil?
+      # safely resolve the safe mode from const, int or string
+      if @safe.nil? && !(safe_mode = @options[:safe])
+        @safe = SafeMode::SECURE
+      elsif safe_mode.is_a?(Fixnum)
+        # be permissive in case API user wants to define new levels
+        @safe = safe_mode
+      else
+        begin
+          @safe = SafeMode.const_get(safe_mode.to_s.upcase).to_i
+        rescue
+          @safe = SafeMode::SECURE.to_i
+        end
       end
     end
     @options[:header_footer] = @options.fetch(:header_footer, false)
@@ -264,7 +266,7 @@ class Document < AbstractBlock
 
     if !@parent_document.nil?
       # don't need to do the extra processing within our own document
-      @reader = Reader.new(data)
+      @reader = Reader.new(data, self)
     else
       @reader = Reader.new(data, self, true, &block)
     end
