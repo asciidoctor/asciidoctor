@@ -549,6 +549,17 @@ output file name is used.
       assert_css 'table > tbody > tr:nth-child(2) > td:nth-child(3) div.dlist', output, 1
     end
 
+    test 'preprocessor directive on first line of AsciiDoc cell should be processed' do
+      input = <<-EOS
+|===
+a|include::fixtures/include-file.asciidoc[]
+|===
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE, :base_dir => File.dirname(__FILE__)
+      assert_match(/included content/, output)
+    end
+
     test 'nested table' do
       input = <<-EOS
 [cols="1,2a"]
