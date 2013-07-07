@@ -618,15 +618,31 @@ A paragraph
       assert_equal 'lead', para.attributes['role']
     end
 
-    test 'id and role attributes can be specified on block style using shorthand syntax' do
+    test 'id, role and options attributes can be specified on block style using shorthand syntax' do
       input = <<-EOS
-[normal#first.lead]
+[normal#first.lead%step]
 A normal paragraph.
       EOS
       doc = document_from_string(input)
       para = doc.blocks.first
       assert_equal 'first', para.attributes['id']
       assert_equal 'lead', para.attributes['role']
+      assert_equal 'step', para.attributes['options']
+      assert para.attributes.has_key?('step-option')
+    end
+
+    test 'multiple roles and options can be specified in block style using shorthand syntax' do
+      input = <<-EOS
+[.role1%option1.role2%option2]
+Text
+      EOS
+
+      doc = document_from_string input
+      para = doc.blocks.first
+      assert_equal 'role1 role2', para.attributes['role']
+      assert_equal 'option1,option2', para.attributes['options']
+      assert para.attributes.has_key?('option1-option')
+      assert para.attributes.has_key?('option2-option')
     end
 
     test 'id and role attributes can be specified on section style using shorthand syntax' do

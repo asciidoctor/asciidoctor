@@ -14,6 +14,7 @@ class Renderer
 
     @views = {}
     @compact = options[:compact]
+    @cache = nil
 
     backend = options[:backend]
     case backend
