@@ -560,7 +560,7 @@ A paragraph
       assert p.role?
     end
 
-    test 'role? can check for precense of role name' do
+    test 'role? can check for exact role name match' do
       input = <<-EOS
 [role="lead"]
 A paragraph
@@ -569,6 +569,20 @@ A paragraph
       doc = document_from_string input
       p = doc.blocks.first
       assert p.role?('lead')
+      p2 = doc.blocks.last
+      assert !p2.role?('final')
+    end
+
+    test 'has_role? can check for precense of role name' do
+      input = <<-EOS
+[role="lead abstract"]
+A paragraph
+      EOS
+
+      doc = document_from_string input
+      p = doc.blocks.first
+      assert !p.role?('lead')
+      assert p.has_role?('lead')
     end
 
     test 'roles returns array of role names' do

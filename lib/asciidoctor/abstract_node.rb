@@ -175,13 +175,19 @@ class AbstractNode
   end
 
   # Public: A convenience method that checks if the role attribute is specified
-  def role?(expect_include = nil)
-    expect_include.nil? ? self.attr?('role') : roles.include?(expect_include)
+  def role?(expect = nil)
+    self.attr?('role', expect)
   end
 
   # Public: A convenience method that returns the value of the role attribute
   def role
     self.attr('role')
+  end
+
+  # Public: A convenience method that checks if the specified role is present
+  # in the list of roles on this node
+  def has_role?(name)
+    roles.include?(name)
   end
 
   # Public: A convenience method that returns the role names as an Array
