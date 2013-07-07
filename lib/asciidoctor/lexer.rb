@@ -327,7 +327,7 @@ class Lexer
       terminator = nil
       # QUESTION put this inside call to rekey attributes?
       if attributes[1]
-        style, explicit_style = parse_style_attribute(attributes)
+        style, explicit_style = parse_style_attribute(attributes, reader)
       end
 
       if delimited_blk_match = is_delimited_block?(this_line, true)
@@ -1240,7 +1240,7 @@ class Lexer
     section.title = sect_title
     # parse style, id and role from first positional attribute
     if attributes[1]
-      section.sectname, _ = parse_style_attribute(attributes)
+      section.sectname, _ = parse_style_attribute(attributes, reader)
       section.special = true
       # HACK needs to be refactored so it's driven by config
       if section.sectname == 'abstract' && document.doctype == 'book'
@@ -2103,61 +2103,100 @@ class Lexer
   # both the original style attribute and the parsed value from the first
   # positional attribute.
   #
-  # attributes - The Hash of attributes to process
+  # attributes - The Hash of attributes to process and update
   #
   # Examples
   #
   #   puts attributes
-  #   => {1 => "abstract#intro.lead", "style" => "preamble"}
+  #   => {1 => "abstract#intro.lead%fragment", "style" => "preamble"}
   #
   #   parse_style_attribute(attributes)
   #   => ["abstract", "preamble"]
   #
   #   puts attributes
-  #   => {1 => "abstract#intro.lead", "style" => "abstract", "id" => "intro", "role" => "lead"}
+  #   => {1 => "abstract#intro.lead", "style" => "abstract", "id" => "intro",
+  #         "role" => "lead", "options" => "fragment", "option-fragment" => ''}
   #
   # Returns a two-element Array of the parsed style from the
   # first positional attribute and the original style that was
   # replaced
-  def self.parse_style_attribute(attributes)
+  def self.parse_style_attribute(attributes, reader = nil)
     original_style = attributes['style']
     raw_style = attributes[1]
+    # NOTE the check for empty string is a hack to skip processing alt text on block macro
     if !raw_style || raw_style.include?(' ')
       attributes['style'] = raw_style
       [raw_style, original_style]
-    # FIXME this logic could be condensed
     else
-      hash_index = raw_style.index('#')
-      dot_index = raw_style.index('.') 
-      if !hash_index.nil? && (dot_index.nil? || hash_index < dot_index)
-        parsed_style = attributes['style'] = (hash_index > 0 ? raw_style[0..(hash_index - 1)] : nil)
-        id = raw_style[(hash_index + 1)..-1]
-        if !dot_index.nil?
-          id, roles = id.split('.', 2)
-          attributes['id'] = id
-          attributes['role'] = roles.tr('.', ' ')
+      type = :style
+      collector = []
+      parsed = {}
+      # QUESTION should this be a private method? (though, it's never called if shorthand isn't used)
+      save_current = lambda {
+        if collector.empty?
+          if type != :style
+            puts "asciidoctor: WARNING:#{reader.nil? ? nil : " line #{reader.lineno}:"} invalid empty #{type} detected in style attribute"
+          end
         else
-          attributes['id'] = id
+          case type
+          when :role, :option
+            parsed[type] ||= []
+            parsed[type].push collector.join
+          when :id
+            if parsed.has_key? :id
+              puts "asciidoctor: WARNING:#{reader.nil? ? nil : " line #{reader.lineno}:"} multiple ids detected in style attribute"
+            end
+            parsed[type] = collector.join
+          else
+            parsed[type] = collector.join
+          end
+          collector = []
         end
-      elsif !dot_index.nil? && (hash_index.nil? || dot_index < hash_index)
-        parsed_style = attributes['style'] = (dot_index > 0 ? raw_style[0..(dot_index - 1)] : nil)
-        roles = raw_style[(dot_index + 1)..-1]
-        if !hash_index.nil?
-          roles, id = roles.split('#', 2)
-          attributes['id'] = id
-          attributes['role'] = roles.tr('.', ' ')
-        else
-          attributes['role'] = roles.tr('.', ' ')
-        end
-      else
-        parsed_style = attributes['style'] = raw_style
-      end
+      }
 
-      # don't leave an empty style
-      #if parsed_style.to_s.empty?
-      #  parsed_style = nil
-      #  attributes.delete('style')
-      #end
+      raw_style.split('').each do |c|
+        if c == '.' || c == '#' || c == '%'
+          save_current.call
+          case c
+          when '.'
+            type = :role
+          when '#'
+            type = :id
+          when '%'
+            type = :option
+          end
+        else
+          collector.push c
+        end
+      end
+      
+      # small optimization if no shorthand is found
+      if type == :style
+        parsed_style = attributes['style'] = raw_style
+      else
+        save_current.call
+
+        if parsed.has_key? :style
+          parsed_style = attributes['style'] = parsed[:style]
+        else
+          parsed_style = nil
+        end
+
+        if parsed.has_key? :id
+          attributes['id'] = parsed[:id]
+        end
+
+        if parsed.has_key? :role
+          attributes['role'] = parsed[:role] * ' '
+        end
+
+        if parsed.has_key? :option
+          (options = parsed[:option]).each do |option|
+            attributes["#{option}-option"] = ''
+          end
+          attributes['options'] = options * ','
+        end
+      end
 
       [parsed_style, original_style]
     end

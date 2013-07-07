@@ -26,9 +26,15 @@ class Reader
   #   data   = File.readlines(filename)
   #   reader = Asciidoctor::Reader.new data
   def initialize(data = nil, document = nil, preprocess = false, &block)
-    data = [] if data.nil?
     # TODO use Struct to track file/lineno info; track as file changes; offset for sub-readers
+    data = [] if data.nil?
     @lineno = 0
+    @next_line_preprocessed = false
+    @unescape_next_line = false
+    @conditionals_stack = []
+    @skipping = false
+    @eof = false
+
     if !preprocess
       @lines = data.is_a?(String) ? data.lines.entries : data.dup
       @preprocess_source = false
@@ -37,6 +43,7 @@ class Reader
         @document = document
         # preprocess first line, since we may not have hit it yet
         # FIXME include handler (block) should be available to the peek_line call
+        @include_block = nil
         peek_line true
         @document = nil
       end
@@ -52,13 +59,6 @@ class Reader
     end
 
     @source = @lines.dup
-
-    @next_line_preprocessed = false
-    @unescape_next_line = false
-
-    @conditionals_stack = []
-    @skipping = false
-    @eof = false
   end
 
   # Public: Get a copy of the remaining Array of String lines parsed from the source

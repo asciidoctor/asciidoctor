@@ -168,7 +168,7 @@ class AttributeList
       if name == 'options' || name == 'opts'
         name = 'options'
         resolved_value.split(',').each do |o|
-          @attributes[o.strip + '-option'] = ''
+          @attributes["#{o.strip}-option"] = ''
         end
       elsif single_quoted_value && !@block.nil?
         resolved_value = @block.apply_normal_subs(value)
