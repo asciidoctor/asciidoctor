@@ -118,6 +118,36 @@ class Lexer
     if assigned_doctitle
       document.attributes['doctitle'] = assigned_doctitle
     end
+
+    # parse title and consume name section of manpage document
+    if document.doctype == 'manpage'
+      if (m = document.attributes['doctitle'].match(REGEXP[:mantitle_manvolnum]))
+        document.attributes['mantitle'] = document.sub_attributes(m[1].rstrip.downcase)
+        document.attributes['manvolnum'] = m[2].strip
+      else
+        puts "asciidoctor: ERROR: line #{reader.lineno}: malformed manpage title"
+      end
+
+      reader.skip_blank_lines
+
+      if is_next_line_section?(reader, {})
+        name_section = initialize_section(reader, document, {})
+        if name_section.level == 1
+          name_section_buffer = reader.grab_lines_until(:break_on_blank_lines => true).join.tr_s("\n ", ' ')
+          if (m = name_section_buffer.match(REGEXP[:manname_manpurpose]))
+            document.attributes['manname'] = m[1] 
+            document.attributes['manpurpose'] = m[2] 
+            # TODO parse multiple man names
+          else
+            puts "asciidoctor: ERROR: line #{reader.lineno}: malformed name section body"
+          end
+        else
+          puts "asciidoctor: ERROR: line #{reader.lineno}: name section title must be at level 1"
+        end
+      else
+        puts "asciidoctor: ERROR: line #{reader.lineno}: name section expected"
+      end
+    end
  
     document.clear_playback_attributes block_attributes
     document.save_attributes
@@ -1255,6 +1285,9 @@ class Lexer
         section.caption = "#{document.attributes['appendix-caption']} #{number}: "
         Document::AttributeEntry.new('appendix-number', number).save_to(attributes)
       end
+    elsif sect_title.downcase == 'synopsis' && document.doctype == 'manpage'
+      section.special = true
+      section.sectname = 'synopsis'
     else
       section.sectname = "sect#{section.level}"
     end

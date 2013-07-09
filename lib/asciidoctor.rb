@@ -549,7 +549,11 @@ module Asciidoctor
     # data:info
     :uri_sniff        => %r{\A[[:alpha:]][[:alnum:].+-]*:/*},
 
-    :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/
+    :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/,
+
+    :mantitle_manvolnum => /^(.*)\((.*)\)$/,
+
+    :manname_manpurpose => /^(.*?)[[:blank:]]+-[[:blank:]]+(.*)$/
   }
 
   INTRINSICS = Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(

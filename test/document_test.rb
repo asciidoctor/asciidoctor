@@ -1102,5 +1102,73 @@ preamble
       assert_equal '', doc.attr('toc')
       assert_equal 'Dan Allen', doc.attr('author')
     end
+
+    test 'should parse mantitle and manvolnum from document title for manpage doctype' do
+      input = <<-EOS
+= asciidoctor ( 1 )
+:doctype: manpage
+
+== NAME
+
+asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      EOS
+
+       doc = document_from_string input
+       assert_equal 'asciidoctor', doc.attr('mantitle')
+       assert_equal '1', doc.attr('manvolnum')
+    end
+
+    test 'should perform attribute substitution on mantitle in manpage doctype' do
+      input = <<-EOS
+= {app}(1)
+:doctype: manpage
+:app: asciidoctor
+
+== NAME
+
+asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      EOS
+
+       doc = document_from_string input
+       assert_equal 'asciidoctor', doc.attr('mantitle')
+    end
+
+    test 'should consume name section as manname and manpurpose for manpage doctype' do
+      input = <<-EOS
+= asciidoctor(1)
+:doctype: manpage
+
+== NAME
+
+asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      EOS
+
+       doc = document_from_string input
+       assert_equal 'asciidoctor', doc.attr('manname')
+       assert_equal 'converts AsciiDoc source files to HTML, DocBook and other formats', doc.attr('manpurpose')
+       assert_equal 0, doc.blocks.size
+    end
+
+    test 'should mark synopsis as special section in manpage doctype' do
+      input = <<-EOS
+= asciidoctor(1)
+:doctype: manpage
+
+== NAME
+
+asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+
+== SYNOPSIS
+
+*asciidoctor* ['OPTION']... 'FILE'..
+      EOS
+
+       doc = document_from_string input
+       synopsis_section = doc.blocks.first 
+       assert_not_nil synopsis_section
+       assert_equal :section, synopsis_section.context
+       assert synopsis_section.special
+       assert_equal 'synopsis', synopsis_section.sectname
+    end
   end
 end
