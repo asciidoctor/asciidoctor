@@ -1,32 +1,31 @@
-asciidoctor(1)
-==============
+= asciidoctor(1)
+Dan Allen; Ryan Waldron
 :doctype: manpage
+:man manual: Asciidoctor Manual
+:man source: Asciidoctor 0.1.3
 :awestruct-layout: base
 
+== NAME
 
-NAME
-----
 asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
 
-SYNOPSIS
---------
+== SYNOPSIS
+
 *asciidoctor* ['OPTION']... 'FILE'...
 
 
-DESCRIPTION
------------
+== DESCRIPTION
+
 The asciidoctor(1) command converts the AsciiDoc source file(s) 'FILE' to HTML 5,
 DocBook 4.5 and other output formats.
 
 If 'FILE' is '-' then the AsciiDoc source is read from standard input.
 
 
-OPTIONS
--------
+== OPTIONS
 
-Security Settings
-~~~~~~~~~~~~~~~~~
+=== Security Settings
 
 *-B, --base-dir*='DIR'::
     Base directory containing the document and resources. Defaults to the
@@ -46,8 +45,7 @@ Security Settings
     asciidoc command. If not set, the safe mode level defaults to 'unsafe' when
     Asciidoctor is invoked using this script.
 
-Document Settings
-~~~~~~~~~~~~~~~~~
+=== Document Settings
 
 *-a, --attribute*='ATTRIBUTE'::
     Define, override or delete a document attribute. Command-line attributes
@@ -76,8 +74,7 @@ This option may be specified more than once.
     allows the content of a single paragraph to be formatted and returned
     without wrapping it in a containing element. Defaults to 'article'.
 
-Rendering Control
-~~~~~~~~~~~~~~~~~
+=== Rendering Control
 
 *-C, --compact*::
     Compact the output by removing blank lines. Not enabled by default.
@@ -121,8 +118,7 @@ folder is appended to the template directory path.
 This option may be specified more than once. Matching templates found in
 subsequent directories override ones previously discovered.
 
-Processing Information
-~~~~~~~~~~~~~~~~~~~~~~
+=== Processing Information
 
 *--trace*::
     Include backtrace information on errors. Not enabled by default.
@@ -131,8 +127,7 @@ Processing Information
     Verbosely print processing information and configuration file checks to
     stderr.
 
-Program Information
-~~~~~~~~~~~~~~~~~~~
+=== Program Information
 
 *-h, --help*::
     Show the help message.
@@ -141,8 +136,8 @@ Program Information
     Print program version number.
 
 
-EXIT STATUS
------------
+== EXIT STATUS
+
 *0*::
     Success
 
@@ -151,13 +146,13 @@ EXIT STATUS
     failure; unexpected error).
 
 
-BUGS
-----
+== BUGS
+
 See the *Asciidoctor* issue tracker: <**https://github.com/asciidoctor/asciidoctor/issues?state=open**>
 
 
-AUTHORS
--------
+== AUTHORS
+
 *Asciidoctor* was written by Dan Allen, Ryan Waldron, Jason Porter, Nick
 Hengeveld and other contributors.
 
@@ -165,8 +160,8 @@ Hengeveld and other contributors.
 many other individuals.
 
 
-RESOURCES
----------
+== RESOURCES
+
 Git source repository on GitHub: <**https://github.com/asciidoctor/asciidoctor**>
 
 Project web site: <**http://asciidoctor.org**>
@@ -176,8 +171,8 @@ GitHub organization: <**http://github.com/asciidoctor**>
 Mailinglist / forum: <**http://discuss.asciidoctor.org**>
 
 
-COPYING
--------
+== COPYING
+
 Copyright \(C) 2012-2013 Dan Allen and Ryan Waldron. Free use of this
 software is granted under the terms of the MIT License.
 
