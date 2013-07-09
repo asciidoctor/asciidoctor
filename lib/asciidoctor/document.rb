@@ -466,6 +466,17 @@ class Document < AbstractBlock
     if @attributes.has_key? 'toc2'
       @attributes['toc'] = ''
       @attributes['toc-class'] ||= 'toc2'
+      case (@attributes['toc-position'] || @attributes['toc2'])
+      when 'left', '<', '&lt;'
+        @attributes['toc-position'] = 'left'
+      when 'right', '>', '&gt;'
+        @attributes['toc-position'] = 'right'
+      when 'top', '^'
+        @attributes['toc-position'] = 'top'
+      when 'bottom', 'v'
+        @attributes['toc-position'] = 'bottom'
+      end
+      @attributes['toc-position'] ||= 'left'
     end
 
     @original_attributes = @attributes.dup
