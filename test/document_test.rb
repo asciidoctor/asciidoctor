@@ -1149,6 +1149,21 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
        assert_equal 0, doc.blocks.size
     end
 
+    test 'should set docname and outfilesuffix from manname and manvolnum for manpage backend and doctype' do
+      input = <<-EOS
+= asciidoctor(1)
+:doctype: manpage
+
+== NAME
+
+asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      EOS
+
+       doc = document_from_string input, :backend => 'manpage'
+       assert_equal 'asciidoctor', doc.attributes['docname']
+       assert_equal '.1', doc.attributes['outfilesuffix']
+    end
+
     test 'should mark synopsis as special section in manpage doctype' do
       input = <<-EOS
 = asciidoctor(1)

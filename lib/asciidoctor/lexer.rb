@@ -138,6 +138,11 @@ class Lexer
             document.attributes['manname'] = m[1] 
             document.attributes['manpurpose'] = m[2] 
             # TODO parse multiple man names
+
+            if document.backend == 'manpage'
+              document.attributes['docname'] = document.attributes['manname']
+              document.attributes['outfilesuffix'] = ".#{document.attributes['manvolnum']}"
+            end
           else
             puts "asciidoctor: ERROR: line #{reader.lineno}: malformed name section body"
           end
