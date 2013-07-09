@@ -81,10 +81,14 @@ if attr? 'icons', 'font'
 end
 case attr 'source-highlighter'
 when 'coderay'
-  if (attr 'coderay-css', 'class') == 'class' %>
+  if (attr 'coderay-css', 'class') == 'class'
+    if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
+<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-coderay.css', (attr :stylesdir, '')) %>"><%
+    else %>
 <style>
 <%= ::Asciidoctor::HTML5.default_coderay_stylesheet %>
 </style><%
+    end
   end
 when 'highlightjs', 'highlight.js' %>
 <link rel="stylesheet" href="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css">

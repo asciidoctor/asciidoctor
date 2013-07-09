@@ -1463,9 +1463,25 @@ require 'coderay'
 html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
       EOS
-      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
       assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
       assert_match(/\.CodeRay \{/, output)
+    end
+
+    test 'should link to CodeRay stylesheet if source-highlighter is coderay and linkcss is set' do
+      input = <<-EOS
+:source-highlighter: coderay
+
+[source, ruby]
+----
+require 'coderay'
+
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
+----
+      EOS
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'linkcss' => ''}
+      assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
+      assert_css 'link[rel="stylesheet"][href="./asciidoctor-coderay.css"]', output, 1
     end
 
     test 'should highlight source inline if source-highlighter attribute is coderay and coderay-css is style' do
@@ -1480,7 +1496,7 @@ require 'coderay'
 html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
       EOS
-      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
       assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
       assert_no_match(/\.CodeRay \{/, output)
     end

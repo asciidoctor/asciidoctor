@@ -146,15 +146,18 @@ context 'Invoker' do
 
   test 'should copy default css to target directory if linkcss and copycss are specified' do
     sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample-output.html'))
-    default_stylesheet = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'asciidoctor.css'))
+    asciidoctor_stylesheet = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'asciidoctor.css'))
+    coderay_stylesheet = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'asciidoctor-coderay.css'))
     begin
-      invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a copycss)
+      invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a copycss -a source-highlighter=coderay)
       invoker.document
       assert File.exist?(sample_outpath)
-      assert File.exist?(default_stylesheet)
+      assert File.exist?(asciidoctor_stylesheet)
+      assert File.exist?(coderay_stylesheet)
     ensure
       FileUtils::rm_f(sample_outpath)
-      FileUtils::rm_f(default_stylesheet)
+      FileUtils::rm_f(asciidoctor_stylesheet)
+      FileUtils::rm_f(coderay_stylesheet)
     end
   end
 
