@@ -1170,5 +1170,28 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
        assert synopsis_section.special
        assert_equal 'synopsis', synopsis_section.sectname
     end
+
+    test 'should output special header block in HTML for manpage doctype' do
+      input = <<-EOS
+= asciidoctor(1)
+:doctype: manpage
+
+== NAME
+
+asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+
+== SYNOPSIS
+
+*asciidoctor* ['OPTION']... 'FILE'..
+      EOS
+
+      output = render_string input
+      assert_css 'body.manpage', output, 1
+      assert_xpath '//body/*[@id="header"]/h1[text()="asciidoctor(1) Manual Page"]', output, 1
+      assert_xpath '//body/*[@id="header"]/h1/following-sibling::h2[text()="NAME"]', output, 1
+      assert_xpath '//h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]', output, 1
+      assert_xpath '//h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]/p[text()="asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats"]', output, 1
+      assert_xpath '//*[@id="content"]/*[@class="sect1"]/h2[text()="SYNOPSIS"]', output, 1
+    end
   end
 end

@@ -100,38 +100,52 @@ end %><%= (docinfo_content = docinfo).empty? ? nil : %(
 <body#{id} class="<%= doctype %><%= (attr? 'toc-class') && (attr? 'toc') && (attr? 'toc-placement', 'auto') ? %( \#{attr 'toc-class'}) : nil %>"<%= (attr? 'max-width') ? %( style="max-width: \#{attr 'max-width'};") : nil %>><%
 unless noheader %>
 <div id="header"><%
-  if has_header?
-    unless notitle %>
-<h1><%= @header.title %></h1><%
-    end %><%
-    if attr? :author %>
-<span id="author" class="author"><%= attr :author %></span><br><%
-      if attr? :email %>
-<span id="email" class="email"><%= sub_macros(attr :email) %></span><br><%
-      end
-      if (authorcount = (attr :authorcount).to_i) > 1
-        (2..authorcount).each do |idx| %><span id="author<%= idx %>" class="author"><%= attr "author_\#{idx}" %></span><br><%
-          if attr? "email_\#{idx}" %>
-<span id="email<%= idx %>" class="email"><%= sub_macros(attr "email_\#{idx}") %></span><br><%
-          end
-        end
-      end
-    end
-    if attr? :revnumber %>
-<span id="revnumber"><%= ((attr 'version-label') || '').downcase %> <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><%
-    end
-    if attr? :revdate %>
-<span id="revdate"><%= attr :revdate %></span><%
-    end
-    if attr? :revremark %>
-<br><span id="revremark"><%= attr :revremark %></span><%
-    end
-  end
-  if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
+  if doctype == 'manpage' %>
+<h1><%= doctitle %> Manual Page</h1><%
+    if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
 <div id="toc" class="<%= attr 'toc-class', 'toc' %>">
 <div id="toctitle"><%= attr 'toc-title' %></div>
 <%= template.class.outline(self, (attr :toclevels, 2).to_i) %>
 </div><%
+    end %>
+<h2><%= attr 'manname-title' %></h2>
+<div class="sectionbody">
+<p><%= %(\#{attr 'manname'} - \#{attr 'manpurpose'}) %></p>
+</div><%
+  else
+    if has_header?
+      unless notitle %>
+<h1><%= @header.title %></h1><%
+      end %><%
+      if attr? :author %>
+<span id="author" class="author"><%= attr :author %></span><br><%
+        if attr? :email %>
+<span id="email" class="email"><%= sub_macros(attr :email) %></span><br><%
+        end
+        if (authorcount = (attr :authorcount).to_i) > 1
+          (2..authorcount).each do |idx| %><span id="author<%= idx %>" class="author"><%= attr "author_\#{idx}" %></span><br><%
+            if attr? "email_\#{idx}" %>
+<span id="email<%= idx %>" class="email"><%= sub_macros(attr "email_\#{idx}") %></span><br><%
+            end
+          end
+        end
+      end
+      if attr? :revnumber %>
+<span id="revnumber"><%= ((attr 'version-label') || '').downcase %> <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><%
+      end
+      if attr? :revdate %>
+<span id="revdate"><%= attr :revdate %></span><%
+      end
+      if attr? :revremark %>
+<br><span id="revremark"><%= attr :revremark %></span><%
+      end
+    end
+    if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
+<div id="toc" class="<%= attr 'toc-class', 'toc' %>">
+<div id="toctitle"><%= attr 'toc-title' %></div>
+<%= template.class.outline(self, (attr :toclevels, 2).to_i) %>
+</div><%
+    end
   end %>
 </div><%
 end %>
