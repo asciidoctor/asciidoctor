@@ -174,7 +174,9 @@ p a > code:hover { color: #561309; }
   #toc.toc2 #toctitle { margin-top: 0; }
   #toc.toc2 > ul, #toc.toc2 > ol { font-size: .95em; }
   #toc.toc2 ul ul, #toc.toc2 ol ol { margin-left: 0; padding-left: 1.25em; }
-  #toc.toc2 ul.sectlevel0 ul.sectlevel1, #toc.toc2 ol.sectlevel0 ol.sectlevel1 { padding-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; } }
+  #toc.toc2 ul.sectlevel0 ul.sectlevel1, #toc.toc2 ol.sectlevel0 ol.sectlevel1 { padding-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
+  body.toc2.toc-right { padding-left: 0; padding-right: 20em; }
+  body.toc2.toc-right #toc.toc2 { border-right: 0; border-left: 1px solid #ebebeb; left: auto; right: 0; } }
 #footer { max-width: 100%; background-color: #222222; padding: 1.25em; }
 #footer-text { color: #dddddd; line-height: 1.44; }
 .sect1 { border-bottom: 3px double #ebebeb; padding-bottom: 1.25em; }
