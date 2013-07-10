@@ -162,6 +162,7 @@ class Document < AbstractBlock
     #@attributes['listing-caption'] = 'Listing'
     @attributes['table-caption'] = 'Table'
     @attributes['toc-title'] = 'Table of Contents'
+    @attributes['manname-title'] = 'NAME'
     @attributes['version-label'] = 'Version'
     @attributes['last-update-label'] = 'Last updated'
 
