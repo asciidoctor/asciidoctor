@@ -167,7 +167,7 @@ Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
 
       output = render_embedded_string input
       assert_match(/Line 1/, output)
-      assert_not_match(/Line 2/, output)
+      assert_no_match(/Line 2/, output)
     end
 
     test 'should not drop line with reference to undefined attribute if ignore-undefined attribute is set' do
@@ -194,7 +194,7 @@ Line 2: {set:a!}This line should not appear in the output.
 
       output = render_embedded_string input
       assert_match(/Line 1/, output)
-      assert_not_match(/Line 2/, output)
+      assert_no_match(/Line 2/, output)
     end
 
     test 'should not drop line with attribute unassignment if ignore-undefined attribute is set' do
@@ -209,7 +209,7 @@ Line 2: {set:a!}This line should not appear in the output.
       output = render_embedded_string input
       assert_match(/Line 1/, output)
       assert_match(/Line 2/, output)
-      assert_not_match(/\{set:a!\}/, output)
+      assert_no_match(/\{set:a!\}/, output)
     end
 
     test "substitutes inside unordered list items" do
