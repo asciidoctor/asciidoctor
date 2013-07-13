@@ -62,12 +62,14 @@ module Asciidoctor
              inputs = infiles.map {|infile| File.new infile}
           end
 
-          if outfile == '-' || (infiles.size == 1 && infiles.first == '-' && (outfile.to_s.empty? || outfile != '/dev/null'))
+          # NOTE: if infile is stdin, default to outfile as stout
+          if outfile == '-' || (infiles.size == 1 && infiles.first == '-' && outfile.to_s.empty?)
             tofile = (@out || $stdout)
           elsif !outfile.nil?
             tofile = outfile
           else
             tofile = nil
+            # automatically calculate outfile based on infile
             opts[:in_place] = true unless opts.has_key? :to_dir
           end
 
