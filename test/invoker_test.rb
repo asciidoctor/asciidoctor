@@ -58,6 +58,25 @@ context 'Invoker' do
     assert_xpath '/*[@class="paragraph"]/p[text()="content"]', output, 1
   end
 
+  test 'should accept document from stdin and write to output file' do
+    sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample-output.html'))
+    begin
+      invoker = invoke_cli(%W(-s -o #{sample_outpath}), '-') { 'content' }
+      doc = invoker.document
+      assert !doc.attr?('docname')
+      assert !doc.attr?('docfile')
+      assert_equal Dir.pwd, doc.attr('docdir')
+      assert_equal doc.attr('docdate'), doc.attr('localdate')
+      assert_equal doc.attr('doctime'), doc.attr('localtime')
+      assert_equal doc.attr('docdatetime'), doc.attr('localdatetime')
+      assert doc.attr?('outfile')
+      assert_equal sample_outpath, doc.attr('outfile')
+      assert File.exist?(sample_outpath)
+    ensure
+      FileUtils::rm_f(sample_outpath)
+    end
+  end
+
   test 'should allow docdir to be specified when input is a string' do
     expected_docdir = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures'))
     invoker = invoke_cli_to_buffer(%w(-s --base-dir test/fixtures -o /dev/null), '-') { 'content' }
