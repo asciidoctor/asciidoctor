@@ -899,5 +899,45 @@ endlines\r
       assert_equal 'foo', @reader.sanitize_attribute_name("foo")
       assert_equal 'foo3-bar', @reader.sanitize_attribute_name("Foo 3^ # - Bar[")
     end
+
+    test 'should not skip front matter by default' do
+      input = <<-EOS
+---
+layout: post
+title: Document Title
+author: username
+tags: [ first, second ]
+---
+= Document Title
+Author Name
+
+preamble
+      EOS
+
+      doc = Asciidoctor::Document.new
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      assert_equal '---', reader.peek_line.rstrip
+    end
+
+    test 'should skip front matter if specified by skip-front-matter attribute' do
+      front_matter = %(layout: post
+title: Document Title
+author: username
+tags: [ first, second ])
+      input = <<-EOS
+---
+#{front_matter}
+---
+= Document Title
+Author Name
+
+preamble
+      EOS
+
+      doc = Asciidoctor::Document.new nil, :attributes => {'skip-front-matter' => ''}
+      reader = Asciidoctor::Reader.new(input.lines.entries, doc, true)
+      assert_equal '= Document Title', reader.peek_line.rstrip
+      assert_equal front_matter, doc.attributes['front-matter']
+    end
   end
 end
