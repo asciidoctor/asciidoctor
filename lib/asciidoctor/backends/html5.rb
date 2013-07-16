@@ -54,7 +54,7 @@ end
 if attr? :keywords %>
 <meta name="keywords" content="<%= attr :keywords %>"><%
 end %>
-<title><%= doctitle %></title><%
+<title><%= doctitle(:sanitize => true) || 'Untitled' %></title><%
 if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
   if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
 <link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>"><%
