@@ -1468,6 +1468,24 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       assert_match(/\.CodeRay \{/, output)
     end
 
+    test 'should replace callout marks if source-highlighter attribute is coderay' do
+      input = <<-EOS
+:source-highlighter: coderay
+
+[source, ruby]
+----
+require 'coderay' # <1>
+
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table) # <2>
+----
+<1> Load library
+<2> Highlight source
+      EOS
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
+      assert_match(/ <b>\(1\)<\/b>$/, output)
+      assert_match(/ <b>\(2\)<\/b><\/code>/, output)
+    end
+
     test 'should link to CodeRay stylesheet if source-highlighter is coderay and linkcss is set' do
       input = <<-EOS
 :source-highlighter: coderay
