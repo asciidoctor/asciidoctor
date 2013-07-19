@@ -306,8 +306,11 @@ module Substituters
             args = expr.split(':')
             _, value = Lexer::store_attribute(args[0], args[1] || '', @document)
             if value.nil?
-              reject = true
-              break '{undefined}'
+              reject = !(@document.attributes.has_key? 'ignore-undefined')
+              if reject
+                Debug.debug { "Undefining attribute: #{key}, line marked for removal" }
+                break ''
+              end
             end
             ''
           when 'counter', 'counter2'
@@ -324,9 +327,13 @@ module Substituters
         elsif INTRINSICS.has_key? key
           INTRINSICS[key]
         else
-          Debug.debug { "Missing attribute: #{key}, line marked for removal" }
-          reject = true
-          break '{undefined}'
+          reject = !(@document.attributes.has_key? 'ignore-undefined')
+          if reject
+            Debug.debug { "Missing attribute: #{key}, line marked for removal" }
+            break ''
+          else
+            "{#{key}}"
+          end
         end
       } if line.include? '{' 
 
