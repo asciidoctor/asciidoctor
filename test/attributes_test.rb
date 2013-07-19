@@ -159,14 +159,58 @@ Yo, {myfrog}!
       assert_xpath '//a[@href="http://google.com"][text() = "Google"]', output, 1
     end
 
-    # See above - AsciiDoc says we're supposed to delete lines with bad
-    # attribute refs in them. AsciiDoc is strange.
-    #
-    # test "Unknowns" do
-    #   html = render_string("Look, a {gobbledygook}")
-    #   result = Nokogiri::HTML(html)
-    #   assert_equal("Look, a {gobbledygook}", result.css("p").first.content.strip)
-    # end
+    test 'should drop line with reference to undefined attribute' do
+      input = <<-EOS
+Line 1: This line should appear in the output.
+Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
+      EOS
+
+      output = render_embedded_string input
+      assert_match(/Line 1/, output)
+      assert_no_match(/Line 2/, output)
+    end
+
+    test 'should not drop line with reference to undefined attribute if ignore-undefined attribute is set' do
+      input = <<-EOS
+:ignore-undefined:
+
+Line 1: This line should appear in the output.
+Line 2: A {bogus-attribute}! This time, this line should appear in the output.
+      EOS
+
+      output = render_embedded_string input
+      assert_match(/Line 1/, output)
+      assert_match(/Line 2/, output)
+      assert_match(/\{bogus-attribute\}/, output)
+    end
+
+    test 'should drop line with attribute unassignment' do
+      input = <<-EOS
+:a:
+
+Line 1: This line should appear in the output.
+Line 2: {set:a!}This line should not appear in the output.
+      EOS
+
+      output = render_embedded_string input
+      assert_match(/Line 1/, output)
+      assert_no_match(/Line 2/, output)
+    end
+
+    test 'should not drop line with attribute unassignment if ignore-undefined attribute is set' do
+      input = <<-EOS
+:ignore-undefined:
+:a:
+
+Line 1: This line should appear in the output.
+Line 2: {set:a!}This line should not appear in the output.
+      EOS
+
+      output = render_embedded_string input
+      assert_match(/Line 1/, output)
+      assert_match(/Line 2/, output)
+      assert_no_match(/\{set:a!\}/, output)
+    end
 
     test "substitutes inside unordered list items" do
       html = render_string(":foo: bar\n* snort at the {foo}\n* yawn")
