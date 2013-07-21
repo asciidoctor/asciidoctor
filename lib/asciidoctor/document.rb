@@ -104,8 +104,8 @@ class Document < AbstractBlock
 
     if options[:parent]
       @parent_document = options.delete(:parent)
-      # QUESTION should we dup here? should we support setting attribute in parent document from nested document?
-      options[:attributes] = @parent_document.attributes.dup
+      # QUESTION should we support setting attribute in parent document from nested document?
+      options[:attributes] = @parent_document.attributes
       options[:base_dir] ||= @parent_document.base_dir
       @safe = @parent_document.safe
       @renderer = @parent_document.renderer
@@ -166,10 +166,21 @@ class Document < AbstractBlock
     @attributes['version-label'] = 'Version'
     @attributes['last-update-label'] = 'Last updated'
 
+    # copy attributes map and normalize keys
     # attribute overrides are attributes that can only be set from the commandline
     # a direct assignment effectively makes the attribute a constant
-    # assigning a nil value will result in the attribute being unset
-    @attribute_overrides = options[:attributes] || {}
+    # a nil value or name with leading or trailing ! will result in the attribute being unassigned
+    @attribute_overrides = (options[:attributes] || {}).inject({}) do |collector,(key,value)|
+      if key.start_with?('!')
+        key = key[1..-1]
+        value = nil
+      elsif key.end_with?('!')
+        key = key[0..-2]
+        value = nil
+      end
+      collector[key] = value
+      collector
+    end
 
     @attribute_overrides['asciidoctor'] = ''
     @attribute_overrides['asciidoctor-version'] = VERSION
@@ -187,7 +198,7 @@ class Document < AbstractBlock
     @attribute_overrides['include-depth'] ||= 10
 
     # the only way to enable uri reads is via the document options, disabled by default
-    unless !@attribute_overrides['allow-uri-read'].nil? || @attribute_overrides.has_key?('allow-uri-read!')
+    unless !@attribute_overrides['allow-uri-read'].nil?
       @attribute_overrides['allow-uri-read'] = nil
     end
 
@@ -226,7 +237,8 @@ class Document < AbstractBlock
       @attribute_overrides['docdir'] = ''
       if @safe >= SafeMode::SECURE
         # assign linkcss (preventing css embedding) unless explicitly disabled from the commandline or API
-        unless @attribute_overrides.fetch('linkcss', '').nil? || @attribute_overrides.has_key?('linkcss!')
+        # effectively the same has "has key 'linkcss' and value == nil"
+        unless @attribute_overrides.fetch('linkcss', '').nil?
           @attribute_overrides['linkcss'] = ''
         end
         # restrict document from enabling icons
@@ -239,9 +251,14 @@ class Document < AbstractBlock
       # a nil value undefines the attribute 
       if val.nil?
         @attributes.delete(key)
-      # a negative key undefines the attribute
-      elsif key.end_with? '!'
-        @attributes.delete(key[0..-2])
+      # a negative key (trailing !) undefines the attribute
+      # NOTE already normalize above as key with nil value
+      #elsif key.end_with? '!'
+      #  @attributes.delete(key[0..-2])
+      # a negative key (leading !) undefines the attribute
+      # NOTE already normalize above as key with nil value
+      #elsif key.start_with? '!'
+      #  @attributes.delete(key[1..-1])
       # otherwise it's an attribute assignment
       else
         # a value ending in @ indicates this attribute does not override
@@ -485,10 +502,11 @@ class Document < AbstractBlock
     # unfreeze "flexible" attributes
     unless nested?
       FLEXIBLE_ATTRIBUTES.each do |name|
-        @attribute_overrides.delete(name)
         # turning a flexible attribute off should be permanent
         # (we may need more config if that's not always the case)
-        #@attribute_overrides.delete("#{name}!")
+        if @attribute_overrides.has_key?(name) && !@attribute_overrides[name].nil?
+          @attribute_overrides.delete(name)
+        end
       end
     end
   end
@@ -561,7 +579,7 @@ class Document < AbstractBlock
   #
   # Returns true if the attribute is locked, false otherwise
   def attribute_locked?(name)
-    @attribute_overrides.has_key?(name) || @attribute_overrides.has_key?("#{name}!")
+    @attribute_overrides.has_key?(name)
   end
 
   # Internal: Apply substitutions to the attribute value

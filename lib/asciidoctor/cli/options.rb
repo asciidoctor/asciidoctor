@@ -85,6 +85,10 @@ Example: asciidoctor -b html5 source.asciidoc
                   'defined in the source document') do |attribs|
             attribs.each do |attrib|
               key, val = attrib.split '=', 2
+              # move leading ! to end for internal processing
+              #if val.nil? && key.start_with?('!')
+              #  key = "#{key[1..-1]}!"
+              #end
               self[:attributes][key] = val || ''
             end
           end

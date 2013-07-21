@@ -22,8 +22,28 @@ context 'Attributes' do
       assert_equal 'This is the first Ruby implementation of AsciiDoc.', doc.attributes['description']
     end
 
-    test 'deletes an attribute' do
+    test 'should delete an attribute that ends with !' do
       doc = document_from_string(":frog: Tanglefoot\n:frog!:")
+      assert_equal nil, doc.attributes['frog']
+    end
+
+    test 'should delete an attribute that ends with ! set via API' do
+      doc = document_from_string(":frog: Tanglefoot", :attributes => {'frog!' => ''})
+      assert_equal nil, doc.attributes['frog']
+    end
+
+    test 'should delete an attribute that begins with !' do
+      doc = document_from_string(":frog: Tanglefoot\n:!frog:")
+      assert_equal nil, doc.attributes['frog']
+    end
+
+    test 'should delete an attribute that begins with ! set via API' do
+      doc = document_from_string(":frog: Tanglefoot", :attributes => {'!frog' => ''})
+      assert_equal nil, doc.attributes['frog']
+    end
+
+    test 'should delete an attribute set via API to nil value' do
+      doc = document_from_string(":frog: Tanglefoot", :attributes => {'frog' => nil})
       assert_equal nil, doc.attributes['frog']
     end
 

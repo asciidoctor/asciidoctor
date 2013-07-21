@@ -1778,6 +1778,10 @@ class Lexer
       # a nil value signals the attribute should be deleted (undefined)
       value = nil
       name = name.chop
+    elsif name.start_with?('!')
+      # a nil value signals the attribute should be deleted (undefined)
+      value = nil
+      name = name[1..-1]
     end
 
     name = sanitize_attribute_name(name)
