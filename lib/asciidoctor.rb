@@ -267,20 +267,11 @@ module Asciidoctor
     # :foo: bar
     # :Author: Dan
     # :numbered!:
-    :attr_entry       => /^:(\w.*?):(?:[[:blank:]]+(.*))?$/,
-
-    # {name?value}
-    :attr_conditional => /^\s*\{([^\?]+)\?\s*([^\}]+)\s*\}/,
-
-    # +   Attribute values treat lines ending with ' +' as a continuation,
-    #     not a line-break as elsewhere in the document, where this is
-    #     a forced line break. This should be the same regexp as :line_break,
-    #     below, but it gets its own entry because readability ftw, even
-    #     though repeating regexps ftl.
-    :attr_continue    => /^[[:blank:]]*(.*)[[:blank:]]\+[[:blank:]]*$/,
-
-    # :foo!:
-    :attr_delete      => /^:([^:]+)!:$/,
+    # :long-entry: Attribute value lines ending in ' +'
+    #              are joined together as a single value,
+    #              collapsing the line breaks and indentation to
+    #              a single space.
+    :attr_entry       => /^:(!?\w.*?):(?:[[:blank:]]+(.*))?$/,
 
     # An attribute list above a block element
     #
@@ -298,6 +289,8 @@ module Asciidoctor
     # attribute reference
     # {foo}
     # {counter:pcount:1}
+    # {set:foo:bar}
+    # {set:name!}
     :attr_ref         => /(\\)?\{((set|counter2?):.+?|\w+(?:[\-]\w+)*)(\\)?\}/,
 
     # The author info line the appears immediately following the document title
