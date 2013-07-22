@@ -163,6 +163,7 @@ class Document < AbstractBlock
     @attributes['table-caption'] = 'Table'
     @attributes['toc-title'] = 'Table of Contents'
     @attributes['manname-title'] = 'NAME'
+    @attributes['untitled-label'] = 'Untitled'
     @attributes['version-label'] = 'Version'
     @attributes['last-update-label'] = 'Last updated'
 
@@ -427,13 +428,19 @@ class Document < AbstractBlock
   end
 
   # We need to be able to return some semblance of a title
-  def doctitle
-    if !(title = @attributes.fetch('title', '')).empty?
-      title
+  def doctitle(opts = {})
+    if !(val = @attributes.fetch('title', '')).empty?
+      val = title
     elsif !(sect = first_section).nil? && sect.title?
-      sect.title
+      val = sect.title
     else
-      nil
+      return nil
+    end
+    
+    if opts[:sanitize] && val.include?('<')
+      val.gsub(/<[^>]+>/, '').tr_s(' ', ' ').strip
+    else
+      val
     end
   end
   alias :name :doctitle
