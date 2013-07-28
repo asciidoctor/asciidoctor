@@ -371,7 +371,7 @@ span.footnote a, span.footnoteref a { text-decoration: none; }
 #footnotes { padding: 0.75em 0.375em; margin-bottom: 1.25em; #border-top: 1px solid #dddddd; }
 #footnotes hr { width: 20%; min-width: 6.25em; margin: -.25em 0 .75em 0; border-width: 1px 0 0 0; }
 #footnotes .footnote { line-height: 1.3; font-size: 0.875em; margin-left: 1.2em; text-indent: -1.2em; margin-bottom: .2em; }
-#footnotes .footnote a { font-weight: bold; text-decoration: none; }
+#footnotes .footnote a:first-of-type { font-weight: bold; text-decoration: none; }
 #footnotes .footnote:last-of-type { margin-bottom: 0; }
 .gist .file-data > table { border: none; background: #fff; width: 100%; margin-bottom: 0; }
 .gist .file-data > table td.line-data { width: 99%; }
