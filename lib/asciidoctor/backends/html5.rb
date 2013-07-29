@@ -901,23 +901,26 @@ class InlineQuotedTemplate < BaseTemplate
     :single => ['&#8216;', '&#8217;', false]
   }
 
-  def quote_text(text, type, role)
+  def quote_text(text, type, id, role)
     open, close, is_tag = QUOTE_TAGS[type] || NO_TAGS
+    anchor = id.nil? ? nil : %(<a id="#{id}"></a>)
     if role
       if is_tag
-        %(#{open.chop} class="#{role}">#{text}#{close})
+        quoted_text = %(#{open.chop} class="#{role}">#{text}#{close})
       else
-        %(<span class="#{role}">#{open}#{text}#{close}</span>)
+        quoted_text = %(<span class="#{role}">#{open}#{text}#{close}</span>)
       end
     elsif open.nil?
-      text
+      quoted_text = text
     else
-      %(#{open}#{text}#{close})
+      quoted_text = %(#{open}#{text}#{close})
     end
+
+    anchor.nil? ? quoted_text : %(#{anchor}#{quoted_text})
   end
 
   def result(node)
-    quote_text(node.text, node.type, node.role)
+    quote_text(node.text, node.type, node.id, node.role)
   end
 
   def template

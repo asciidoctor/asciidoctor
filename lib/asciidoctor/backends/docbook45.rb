@@ -619,7 +619,7 @@ class InlineBreakTemplate < BaseTemplate
 end
 
 class InlineQuotedTemplate < BaseTemplate
-  NO_TAGS = ['', '']
+  NO_TAGS = [nil, nil]
 
   QUOTED_TAGS = {
     :emphasis => ['<emphasis>', '</emphasis>'],
@@ -631,17 +631,22 @@ class InlineQuotedTemplate < BaseTemplate
     :single => ['&#8216;', '&#8217;']
   }
 
-  def quote_text(text, type, role)
+  def quote_text(text, type, id, role)
     start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
+    anchor = id.nil? ? nil : %(<anchor id="#{id}" xreflabel="#{text}"/>)
     if role
-      "#{start_tag}<phrase role=\"#{role}\">#{text}</phrase>#{end_tag}"
+      quoted_text = "#{start_tag}<phrase role=\"#{role}\">#{text}</phrase>#{end_tag}"
+    elsif start_tag.nil?
+      quoted_text = text
     else
-      "#{start_tag}#{text}#{end_tag}"
+      quoted_text = "#{start_tag}#{text}#{end_tag}"
     end
+
+    anchor.nil? ? quoted_text : %(#{anchor}#{quoted_text})
   end
 
   def result(node)
-    quote_text(node.text, node.type, node.role)
+    quote_text(node.text, node.type, node.id, node.role)
   end
 
   def template

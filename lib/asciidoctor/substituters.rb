@@ -765,12 +765,61 @@ module Substituters
 
     if scope == :constrained
       if unescaped_attrs.nil?
-        "#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :attributes => parse_attributes(match[2])).render}"
+        attributes = parse_quoted_text_attributes(match[2])
+        id = attributes.nil? ? nil : attributes.delete('id')
+        "#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :id => id, :attributes => attributes).render}"
       else
         "#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type, :attributes => {}).render}"
       end
     else
-      Inline.new(self, :quoted, match[2], :type => type, :attributes => parse_attributes(match[1])).render
+      attributes = parse_quoted_text_attributes(match[1])
+      id = attributes.nil? ? nil : attributes.delete('id')
+      Inline.new(self, :quoted, match[2], :type => type, :id => id, :attributes => attributes).render
+    end
+  end
+
+  # Internal: Parse the attributes that are defined on quoted text
+  #
+  # str       - A String of unprocessed attributes (space-separated roles or the id/role shorthand syntax)
+  #
+  # returns nil if str is nil, an empty Hash if str is empty, otherwise a Hash of attributes (role and id only)
+  def parse_quoted_text_attributes(str)
+    return nil if str.nil?
+    return {} if str.empty?
+    str = sub_attributes(str) if str.include?('{')
+    str = str.strip
+    # for compliance, only consider first positional attribute
+    str, rest = str.split(',', 2) if str.include?(',')
+
+    if str.empty?
+      {}
+    elsif str.start_with?('.') || str.start_with?('#')
+      segments = str.split('#', 2)
+      
+      if segments.length > 1
+        id, *more_roles = segments[1].split('.')
+      else
+        id = nil
+        more_roles = []
+      end
+    
+      roles = segments[0].empty? ? [] : segments[0].split('.')
+      if roles.length > 1
+        roles.shift
+      end
+      
+      if more_roles.length > 0
+        roles.concat more_roles
+      end
+
+      attrs = {}
+      attrs['id'] = id unless id.nil?
+      attrs['role'] = roles.empty? ? nil : (roles * ' ')
+      attrs
+    else
+      attrs = {}
+      attrs['role'] = str
+      attrs
     end
   end
 
