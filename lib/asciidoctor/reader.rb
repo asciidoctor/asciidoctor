@@ -156,6 +156,39 @@ class Reader
   end
   alias :skip_comment_lines :consume_comments
 
+  # Ignore front-matter, commonly used in static site generators
+  def skip_front_matter(data, increment_linenos = true)
+    #if data.nil?
+    #  data = @lines
+    #  increment_linenos = true
+    #else
+    #  increment_linenos = false
+    #end
+
+    front_matter = nil
+    if data.size > 0 && data.first.chomp == '---'
+      original_data = data.dup
+      front_matter = []
+      data.shift
+      @lineno += 1 if increment_linenos
+      while !data.empty? && data.first.chomp != '---'
+        front_matter.push data.shift
+        @lineno += 1 if increment_linenos
+      end
+
+      if data.empty?
+        data.unshift(*original_data)
+        @lineno = 0 if increment_linenos
+        front_matter = nil
+      else
+        data.shift
+        @lineno += 1 if increment_linenos
+      end
+    end
+
+    front_matter
+  end
+
   # Public: Consume consecutive lines containing line comments.
   #
   # Returns the Array of lines that were consumed
@@ -768,15 +801,17 @@ class Reader
       result = data.map {|line| "#{line.rstrip}\n" }
     end
 
+    # QUESTION: how should this be activated? (defering for now)
+    # QUESTION: should we save the front matter read from an include file somewhere?
+    #if !@document.nil? && @document.attributes.has_key?('skip-front-matter')
+    #  skip_front_matter result
+    #end
+
     unless indent.nil?
       Lexer.reset_block_indent! result, indent.to_i
     end
 
     result
-
-    #data.shift while !data.first.nil? && data.first.chomp.empty?
-    #data.pop while !data.last.nil? && data.last.chomp.empty?
-    #data
   end
 
   # Private: Normalize raw input, used for the outermost Reader.
@@ -801,6 +836,13 @@ class Reader
       @lines = data.map {|line| "#{line.rstrip.force_encoding(::Encoding::UTF_8)}\n" }
     else
       @lines = data.map {|line| "#{line.rstrip}\n" }
+    end
+
+    # QUESTION should this work for AsciiDoc table cell content? If so, it won't hit here
+    if !@document.nil? && @document.attributes.has_key?('skip-front-matter')
+      if (front_matter = skip_front_matter(@lines))
+        @document.attributes['front-matter'] = front_matter.join.chomp
+      end
     end
 
     @lines.shift && @lineno += 1 while !@lines.first.nil? && @lines.first.chomp.empty?
