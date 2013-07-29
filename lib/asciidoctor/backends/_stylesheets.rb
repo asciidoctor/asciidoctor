@@ -160,7 +160,7 @@ img { display: inline-block; vertical-align: middle; }
 textarea { height: auto; min-height: 50px; }
 select { width: 100%; }
 p.lead, .paragraph.lead > p, #preamble > .sectionbody > .paragraph:first-of-type p { font-size: 1.21875em; line-height: 1.6; }
-.subheader, .admonitionblock td.content > .title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .literalblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, .sidebarblock > .title, .tableblock > .title, .verseblock > .title, .ulist > .title, .olist > .title, .dlist > .title, .qlist > .title, .tableblock > caption { line-height: 1.4; color: #7a2518; font-weight: 300; margin-top: 0.2em; margin-bottom: 0.5em; }
+.subheader, .admonitionblock td.content > .title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .literalblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, .sidebarblock > .title, .tableblock > .title, .verseblock > .title, .ulist > .title, .olist > .title, .dlist > .title, .qlist > .title, .hdlist > .title, .tableblock > caption { line-height: 1.4; color: #7a2518; font-weight: 300; margin-top: 0.2em; margin-bottom: 0.5em; }
 div, dl, dt, dd, ul, ol, li, h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6, pre, form, p, blockquote, th, td { margin: 0; padding: 0; direction: ltr; }
 a { color: #005498; text-decoration: underline; line-height: inherit; }
 a:hover, a:focus { color: #00467f; }
@@ -267,14 +267,14 @@ p a > code:hover { color: #561309; }
   body.toc2.toc-right #toc.toc2 { border-right: 0; border-left: 1px solid #ebebeb; left: auto; right: 0; } }
 #footer { max-width: 100%; background-color: #222222; padding: 1.25em; }
 #footer-text { color: #dddddd; line-height: 1.44; }
-.sect1 { border-bottom: 3px double #ebebeb; padding-bottom: 1.25em; }
-.sect1:last-of-type { border-bottom: 0; }
+.sect1 { padding-bottom: 1.25em; }
+.sect1 + .sect1 { border-top: 3px double #ebebeb; }
 #content h1 > a.anchor, h2 > a.anchor, h3 > a.anchor, #toctitle > a.anchor, .sidebarblock > .content > .title > a.anchor, h4 > a.anchor, h5 > a.anchor, h6 > a.anchor { position: absolute; width: 1em; margin-left: -1em; display: block; text-decoration: none; visibility: hidden; text-align: center; font-weight: normal; }
 #content h1 > a.anchor:before, h2 > a.anchor:before, h3 > a.anchor:before, #toctitle > a.anchor:before, .sidebarblock > .content > .title > a.anchor:before, h4 > a.anchor:before, h5 > a.anchor:before, h6 > a.anchor:before { content: '\00A7'; font-size: .85em; vertical-align: text-top; display: block; margin-top: 0.05em; }
 #content h1:hover > a.anchor, #content h1 > a.anchor:hover, h2:hover > a.anchor, h2 > a.anchor:hover, h3:hover > a.anchor, #toctitle:hover > a.anchor, .sidebarblock > .content > .title:hover > a.anchor, h3 > a.anchor:hover, #toctitle > a.anchor:hover, .sidebarblock > .content > .title > a.anchor:hover, h4:hover > a.anchor, h4 > a.anchor:hover, h5:hover > a.anchor, h5 > a.anchor:hover, h6:hover > a.anchor, h6 > a.anchor:hover { visibility: visible; }
 #content h1 > a.link, h2 > a.link, h3 > a.link, #toctitle > a.link, .sidebarblock > .content > .title > a.link, h4 > a.link, h5 > a.link, h6 > a.link { color: #ba3925; text-decoration: none; }
 #content h1 > a.link:hover, h2 > a.link:hover, h3 > a.link:hover, #toctitle > a.link:hover, .sidebarblock > .content > .title > a.link:hover, h4 > a.link:hover, h5 > a.link:hover, h6 > a.link:hover { color: #a53221; }
-.admonitionblock td.content > .title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .literalblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, .sidebarblock > .title, .tableblock > .title, .verseblock > .title, .ulist > .title, .olist > .title, .dlist > .title, .qlist > .title { text-align: left; font-weight: bold; }
+.admonitionblock td.content > .title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .literalblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, .sidebarblock > .title, .tableblock > .title, .verseblock > .title, .ulist > .title, .olist > .title, .dlist > .title, .qlist > .title, .hdlist > .title { text-align: left; font-weight: bold; }
 .tableblock > caption { text-align: left; font-weight: bold; white-space: nowrap; overflow: visible; max-width: 0; }
 table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-size: inherit; }
 .admonitionblock > table { border: 0; background: none; width: 100%; }
@@ -368,11 +368,12 @@ td.hdlist1 { vertical-align: top; padding-right: .8em; font-weight: bold; }
 .image.right { margin-left: 0.625em; }
 span.footnote, span.footnoteref { vertical-align: super; font-size: 0.875em; }
 span.footnote a, span.footnoteref a { text-decoration: none; }
-#footnotes { padding: 0.75em 0.375em; margin-bottom: 1.25em; #border-top: 1px solid #dddddd; }
+#footnotes { padding: 0.75em 0.375em; margin-bottom: 1.25em; }
 #footnotes hr { width: 20%; min-width: 6.25em; margin: -.25em 0 .75em 0; border-width: 1px 0 0 0; }
 #footnotes .footnote { line-height: 1.3; font-size: 0.875em; margin-left: 1.2em; text-indent: -1.2em; margin-bottom: .2em; }
 #footnotes .footnote a:first-of-type { font-weight: bold; text-decoration: none; }
 #footnotes .footnote:last-of-type { margin-bottom: 0; }
+#content #footnotes { margin-top: -0.625em; }
 .gist .file-data > table { border: none; background: #fff; width: 100%; margin-bottom: 0; }
 .gist .file-data > table td.line-data { width: 99%; }
 div.unbreakable { page-break-inside: avoid; }
