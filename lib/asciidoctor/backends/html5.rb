@@ -43,7 +43,7 @@ class DocumentTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><!DOCTYPE html>
-<html<%= !(attr? 'nolang') ? %( lang="\#{attr 'lang', 'en'}") : nil %>>
+<html<%= (attr? 'nolang') ? nil : %( lang="\#{attr 'lang', 'en'}") %>>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>">
 <meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>">
@@ -169,7 +169,7 @@ end %>
 <div id="footer">
 <div id="footer-text"><%
 if attr? :revnumber %>
-<%= %(\#{attr 'version-label'} \#{attr :revnumber}) %><%
+<%= %(\#{attr 'version-label'} \#{attr :revnumber}) %><br><%
 end
 if attr? 'last-update-label' %>
 <%= %(\#{attr 'last-update-label'} \#{attr :docdatetime}) %><%
