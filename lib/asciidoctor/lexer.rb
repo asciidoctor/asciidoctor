@@ -1381,7 +1381,7 @@ class Lexer
     if !line1.nil? && !line2.nil? && SECTION_LEVELS.has_key?(line2[0..0]) &&
         line2.match(REGEXP[:section_underline]) && line1.match(REGEXP[:section_name]) &&
         # chomp so that a (non-visible) endline does not impact calculation
-        (line1.chomp.size - line2.chomp.size).abs <= 1
+        (line_length(line1) - line_length(line2)).abs <= 1
       section_level line2
     else
       false
@@ -1448,7 +1448,7 @@ class Lexer
       if !line2.nil? && SECTION_LEVELS.has_key?(line2[0..0]) && line2.match(REGEXP[:section_underline]) &&
         (name_match = line1.match(REGEXP[:section_name])) &&
         # chomp so that a (non-visible) endline does not impact calculation
-        (line1.chomp.size - line2.chomp.size).abs <= 1
+        (line_length(line1) - line_length(line2)).abs <= 1
         if anchor_match = name_match[1].match(REGEXP[:anchor_embedded]) 
           sect_id = anchor_match[2]
           sect_title = anchor_match[1]
@@ -1464,6 +1464,15 @@ class Lexer
       sect_level += document.attr('leveloffset', 0).to_i
     end
     [sect_id, sect_title, sect_level, single_line]
+  end
+
+  # Public: Calculate the number of unicode characters in the line, excluding the endline
+  #
+  # line - the String to calculate
+  #
+  # returns the number of unicode characters in the line
+  def self.line_length(line)
+    FORCE_UNICODE_LINE_LENGTH ? line.chomp.scan(/./u).length : line.chomp.length
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).

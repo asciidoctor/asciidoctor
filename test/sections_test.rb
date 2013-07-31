@@ -97,6 +97,20 @@ text
       assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
     end
 
+    test 'document title with multiline syntax and unicode characters' do
+      input = <<-EOS
+AsciiDoc Writer’s Guide
+=======================
+Author Name
+
+preamble
+      EOS
+
+      result = render_string input
+      assert_xpath '//h1', result, 1
+      assert_xpath '//h1[text()="AsciiDoc Writer’s Guide"]', result, 1
+    end
+
     test "not enough chars for a multiline document title" do
       title = "My Title"
       chars = "=" * (title.length - 2)
