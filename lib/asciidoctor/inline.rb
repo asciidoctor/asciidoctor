@@ -15,10 +15,6 @@ class Inline < AbstractNode
 
     @text = text 
 
-    #@id = opts[:id] if opts.has_key?(:id)
-    #@type = opts[:type] if opts.has_key?(:type)
-    #@target = opts[:target] if opts.has_key?(:target)
-
     @id = opts[:id]
     @type = opts[:type]
     @target = opts[:target]
