@@ -327,6 +327,31 @@ context 'Substitutions' do
       para = block_from_string(%Q{project~ view\non\nGitHub~})
       assert_equal "project<sub> view\non\nGitHub</sub>", para.sub_quotes(para.buffer.join)
     end
+
+    test 'quoted text with role shorthand' do
+      para = block_from_string(%q{[.white.red-background]#alert#})
+      assert_equal '<span class="white red-background">alert</span>', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'quoted text with id shorthand' do
+      para = block_from_string(%q{[#bond]#007#})
+      assert_equal '<a id="bond"></a>007', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'quoted text with id and role shorthand' do
+      para = block_from_string(%q{[#bond.white.red-background]#007#})
+      assert_equal '<a id="bond"></a><span class="white red-background">007</span>', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'quoted text with id and role shorthand using docbook backend' do
+      para = block_from_string(%q{[#bond.white.red-background]#007#}, :backend => 'docbook')
+      assert_equal '<anchor id="bond" xreflabel="007"/><phrase role="white red-background">007</phrase>', para.sub_quotes(para.buffer.join)
+    end
+
+    test 'should ignore attributes after comma' do
+      para = block_from_string(%q{[red, foobar]#alert#})
+      assert_equal '<span class="red">alert</span>', para.sub_quotes(para.buffer.join)
+    end
   end
 
   context 'Macros' do
