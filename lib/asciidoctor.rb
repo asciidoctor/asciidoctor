@@ -342,14 +342,15 @@ module Asciidoctor
     #   That which precedes 'bar' (see also, <<bar>>)
     # The term may be an attribute reference
     # {term_foo}:: {def_foo}
-    # REVIEW leading space has already been stripped, so may not need in regex
-    :dlist            => /^[[:blank:]]*(.*?)(:{2,4}|;;)(?:[[:blank:]]+(.*))?$/,
+    # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
+    # QUESTION should we check for line comment in regex or when scanning the lines?
+    :dlist            => /^(?!\/\/)[[:blank:]]*(.*?)(:{2,4}|;;)(?:[[:blank:]]+(.*))?$/,
     :dlist_siblings   => {
                            # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-                           '::' => /^[[:blank:]]*((?:.*[^:])?)(::)(?:[[:blank:]]+(.*))?$/,
-                           ':::' => /^[[:blank:]]*((?:.*[^:])?)(:::)(?:[[:blank:]]+(.*))?$/,
-                           '::::' => /^[[:blank:]]*((?:.*[^:])?)(::::)(?:[[:blank:]]+(.*))?$/,
-                           ';;' => /^[[:blank:]]*(.*)(;;)(?:[[:blank:]]+(.*))?$/
+                           '::' => /^(?!\/\/)[[:blank:]]*((?:.*[^:])?)(::)(?:[[:blank:]]+(.*))?$/,
+                           ':::' => /^(?!\/\/)[[:blank:]]*((?:.*[^:])?)(:::)(?:[[:blank:]]+(.*))?$/,
+                           '::::' => /^(?!\/\/)[[:blank:]]*((?:.*[^:])?)(::::)(?:[[:blank:]]+(.*))?$/,
+                           ';;' => /^(?!\/\/)[[:blank:]]*(.*)(;;)(?:[[:blank:]]+(.*))?$/
                          },
 
     # footnote:[text]

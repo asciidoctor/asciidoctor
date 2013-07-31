@@ -2089,6 +2089,23 @@ A new paragraph.
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '(//*[@class="dlist"]/following-sibling::*[@class="paragraph"])[1]/p[text() = "A new paragraph."]', output, 1
     end
+
+    test 'should not match comment line that looks like labeled list term' do
+      input = <<-EOS
+* item
+
+//::
+== Section
+
+section text
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/*[@class="ulist"]', output, 1
+      assert_xpath '/*[@class="sect1"]', output, 1
+      assert_xpath '/*[@class="sect1"]/h2[text()="Section"]', output, 1
+      assert_xpath '/*[@class="ulist"]/following-sibling::*[@class="sect1"]', output, 1
+    end
   end
 
   context "Nested lists" do
