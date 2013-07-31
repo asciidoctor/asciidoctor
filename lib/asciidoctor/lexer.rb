@@ -1472,11 +1472,7 @@ class Lexer
   #
   # returns the number of unicode characters in the line
   def self.line_length(line)
-    if FORCE_UNICODE_LINE_LENGTH
-      line.chomp.scan(/./u).length
-    else
-      line.chomp.length
-    end
+    FORCE_UNICODE_LINE_LENGTH ? line.chomp.scan(/./u).length : line.chomp.length
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).
