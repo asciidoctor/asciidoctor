@@ -817,9 +817,7 @@ module Substituters
       attrs['role'] = roles.empty? ? nil : (roles * ' ')
       attrs
     else
-      attrs = {}
-      attrs['role'] = str
-      attrs
+      {'role' => str}
     end
   end
 
