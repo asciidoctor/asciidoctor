@@ -496,6 +496,21 @@ context 'Substitutions' do
       assert result.include?('image::tiger.png[]')
     end
 
+    test 'an icon macro should be interpreted as an icon' do
+      para = block_from_string('icon:github[]')
+      assert_equal %{<span class="image"><img src="./images/icons/github.png" alt="github"></span>}, para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
+    test 'an icon macro should be interpreted as a font-based icon when icons=font' do
+      para = block_from_string 'icon:github[]', :attributes => {'icons' => 'font'}
+      assert_equal %{<i class="icon-github"></i>}, para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
+    test 'an icon macro with a size should be interpreted as a font-based icon with a size when icons=font' do
+      para = block_from_string 'icon:github[4x]', :attributes => {'icons' => 'font'}
+      assert_equal %{<i class="icon-github icon-4x"></i>}, para.sub_macros(para.buffer.join).gsub(/>\s+</, '><')
+    end
+
     test 'a single-line footnote macro should be registered and rendered as a footnote' do
       para = block_from_string('Sentence text footnote:[An example footnote.].')
       assert_equal %(Sentence text <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>.), para.sub_macros(para.buffer.join)

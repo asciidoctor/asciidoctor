@@ -383,7 +383,8 @@ module Asciidoctor
     # image:filename.png[Alt Text]
     # image:http://example.com/images/filename.png[Alt Text]
     # image:filename.png[More [Alt\] Text] (alt text becomes "More [Alt] Text")
-    :image_macro      => /\\?image:([^:\[][^\[]*)\[((?:\\\]|[^\]])*?)\]/,
+    # icon:github[large]
+    :image_macro      => /\\?(?:image|icon):([^:\[][^\[]*)\[((?:\\\]|[^\]])*?)\]/,
 
     # indexterm:[Tigers,Big cats]
     # (((Tigers,Big cats)))
