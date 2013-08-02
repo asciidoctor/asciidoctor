@@ -480,7 +480,7 @@ module Substituters
         end
 
         terms = unescape_bracketed_text(m[1] || m[2]).split(',').map(&:strip)
-        document.register(:indexterms, [*terms])
+        @document.register(:indexterms, [*terms])
         Inline.new(self, :indexterm, text, :attributes => {'terms' => terms}).render
       }
     
@@ -495,7 +495,7 @@ module Substituters
         end
 
         text = unescape_bracketed_text(m[1] || m[2])
-        document.register(:indexterms, [text])
+        @document.register(:indexterms, [text])
         Inline.new(self, :indexterm, text, :type => :visible).render
       }
     end
@@ -726,7 +726,7 @@ module Substituters
       if m[1] == '\\'
         next "&lt;#{m[2]}&gt;"
       end
-      Inline.new(self, :callout, m[2], :id => document.callouts.read_next_id).render
+      Inline.new(self, :callout, m[2], :id => @document.callouts.read_next_id).render
     }
   end
 
