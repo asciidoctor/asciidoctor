@@ -1130,8 +1130,21 @@ image::images/tiger.png[Tiger]
       assert !doc.attributes.has_key?('figure-number')
     end
 
-    test 'drops line if image target is missing attribute reference' do
+    test 'keeps line unprocessed if image target is missing attribute reference and attribute-missing is skip' do
       input = <<-EOS
+:attribute-missing: skip
+
+image::{bogus}[]
+      EOS
+
+      output = render_embedded_string input
+      assert output.include?('image::{bogus}[]')
+    end
+
+    test 'drops line if image target is missing attribute reference and attribute-missing is drop' do
+      input = <<-EOS
+:attribute-missing: drop
+
 image::{bogus}[]
       EOS
 
@@ -1139,8 +1152,21 @@ image::{bogus}[]
       assert output.strip.empty?
     end
 
-    test 'dropped image does not break processing of following section' do
+    test 'drops line if image target is missing attribute reference and attribute-missing is drop-line' do
       input = <<-EOS
+:attribute-missing: drop-line
+
+image::{bogus}[]
+      EOS
+
+      output = render_embedded_string input
+      assert output.strip.empty?
+    end
+
+    test 'dropped image does not break processing of following section and attribute-missing is drop-line' do
+      input = <<-EOS
+:attribute-missing: drop-line
+
 image::{bogus}[]
 
 == Section Title
