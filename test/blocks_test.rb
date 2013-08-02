@@ -1088,8 +1088,10 @@ image::images/tiger.png[Tiger]
       assert !doc.attributes.has_key?('figure-number')
     end
 
-    test 'drops line if image target is missing attribute reference' do
+    test 'drops line if image target is missing attribute reference and ignore-undefined attribute is unset' do
       input = <<-EOS
+:ignore-undefined!:
+
 image::{bogus}[]
       EOS
 
@@ -1097,8 +1099,10 @@ image::{bogus}[]
       assert output.strip.empty?
     end
 
-    test 'dropped image does not break processing of following section' do
+    test 'dropped image does not break processing of following section and ignore-undefined attribute is unset' do
       input = <<-EOS
+:ignore-undefined!:
+
 image::{bogus}[]
 
 == Section Title

@@ -63,12 +63,12 @@ context 'Attributes' do
     end
 
     test "assigns attribute to empty string if substitution fails to resolve attribute" do
-      doc = document_from_string(":release: Asciidoctor {version}")
+      doc = document_from_string ":release: Asciidoctor {version}", :attributes => { 'ignore-undefined!' => '' }
       assert_equal '', doc.attributes['release']
     end
 
     test "assigns multi-line attribute to empty string if substitution fails to resolve attribute" do
-      doc = document_from_string(":release: Asciidoctor +\n          {version}")
+      doc = document_from_string ":release: Asciidoctor +\n          {version}", :attributes => { 'ignore-undefined!' => '' }
       assert_equal '', doc.attributes['release']
     end
 
@@ -166,8 +166,15 @@ Yo, {myfrog}!
       assert_xpath '(//p)[1][text()="Yo, Tanglefoot!"]', output, 1
     end
 
-    test "ignores lines with bad attributes" do
-      html = render_string("This is\nblah blah {foobarbaz}\nall there is.")
+    test "ignores lines with bad attributes if ignore-undefined attribute is unset" do
+      input = <<-EOS
+:ignore-undefined!:
+
+This is
+blah blah {foobarbaz}
+all there is.
+      EOS
+      html = render_embedded_string input
       result = Nokogiri::HTML(html)
       assert_no_match(/blah blah/m, result.css("p").first.content.strip)
     end
@@ -179,8 +186,10 @@ Yo, {myfrog}!
       assert_xpath '//a[@href="http://google.com"][text() = "Google"]', output, 1
     end
 
-    test 'should drop line with reference to undefined attribute' do
+    test 'should drop line with reference to undefined attribute if ignore-undefined attribute is unset' do
       input = <<-EOS
+:ignore-undefined!:
+
 Line 1: This line should appear in the output.
 Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
       EOS
@@ -192,8 +201,6 @@ Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
 
     test 'should not drop line with reference to undefined attribute if ignore-undefined attribute is set' do
       input = <<-EOS
-:ignore-undefined:
-
 Line 1: This line should appear in the output.
 Line 2: A {bogus-attribute}! This time, this line should appear in the output.
       EOS
@@ -204,8 +211,9 @@ Line 2: A {bogus-attribute}! This time, this line should appear in the output.
       assert_match(/\{bogus-attribute\}/, output)
     end
 
-    test 'should drop line with attribute unassignment' do
+    test 'should drop line with attribute unassignment if attribute ignore-undefined is unset' do
       input = <<-EOS
+:ignore-undefined!:
 :a:
 
 Line 1: This line should appear in the output.
@@ -219,7 +227,6 @@ Line 2: {set:a!}This line should not appear in the output.
 
     test 'should not drop line with attribute unassignment if ignore-undefined attribute is set' do
       input = <<-EOS
-:ignore-undefined:
 :a:
 
 Line 1: This line should appear in the output.
@@ -419,7 +426,13 @@ of the attribute named foo in your document.
     end
 
     test 'unassigns attribute defined in attribute reference with set prefix' do
-      input = ":foo:\n\n{set:foo!}\n{foo}yes"
+      input = <<-EOS
+:ignore-undefined!:
+:foo:
+
+{set:foo!}
+{foo}yes
+      EOS
       output = render_embedded_string input
       assert_xpath '//p', output, 1
       assert_xpath '//p/child::text()', output, 0
