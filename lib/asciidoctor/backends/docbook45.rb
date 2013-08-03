@@ -540,7 +540,7 @@ class BlockTableTemplate < BaseTemplate
   <% end %>
   <tgroup cols="<%= attr :colcount %>">
     <% @columns.each do |col| %>
-    <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= (col.attr (attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
+    <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= col.attr((attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
     <% end %>
     <% [:head, :foot, :body].select {|tblsec| !rows[tblsec].empty? }.each do |tblsec| %>
     <t<%= tblsec %>>
