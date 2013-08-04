@@ -330,9 +330,9 @@ table.tableblock td .paragraph:last-child p, table.tableblock td > p:last-child 
 th.tableblock.halign-left, td.tableblock.halign-left { text-align: left; }
 th.tableblock.halign-right, td.tableblock.halign-right { text-align: right; }
 th.tableblock.halign-center, td.tableblock.halign-center { text-align: center; }
-th.tableblock.halign-top, td.tableblock.halign-top { vertical-align: top; }
-th.tableblock.halign-bottom, td.tableblock.halign-bottom { vertical-align: bottom; }
-th.tableblock.halign-middle, td.tableblock.halign-middle { vertical-align: middle; }
+th.tableblock.valign-top, td.tableblock.valign-top { vertical-align: top; }
+th.tableblock.valign-bottom, td.tableblock.valign-bottom { vertical-align: bottom; }
+th.tableblock.valign-middle, td.tableblock.valign-middle { vertical-align: middle; }
 p.tableblock.header { color: #222222; font-weight: bold; }
 td > div.verse { white-space: pre; }
 ol { margin-left: 1.75em; }
@@ -366,6 +366,7 @@ td.hdlist1 { vertical-align: top; padding-right: .8em; font-weight: bold; }
 .image.left, .image.right { margin-top: 0.25em; margin-bottom: 0.25em; display: inline-block; line-height: 0; }
 .image.left { margin-right: 0.625em; }
 .image.right { margin-left: 0.625em; }
+a.image { text-decoration: none; }
 span.footnote, span.footnoteref { vertical-align: super; font-size: 0.875em; }
 span.footnote a, span.footnoteref a { text-decoration: none; }
 #footnotes { padding: 0.75em 0.375em; margin-bottom: 1.25em; }
