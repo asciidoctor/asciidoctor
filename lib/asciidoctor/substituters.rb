@@ -97,7 +97,8 @@ module Substituters
       apply_subs(lines.join, resolve_subs(attr 'subs'))
     elsif @document.attributes['basebackend'] == 'html' && @style == 'source' &&
       @document.attributes['source-highlighter'] == 'coderay' && attr?('language')
-      sub_callouts(highlight_source(lines.join))
+      #sub_callouts(highlight_source(lines.join))
+      highlight_source(lines.join, true)
     else
       apply_subs(lines.join, COMPOSITE_SUBS[:verbatim])
     end
@@ -869,16 +870,54 @@ module Substituters
   # Public: Highlight the source code if a source highlighter is defined
   # on the document, otherwise return the text unprocessed
   #
+  # Callout marks are stripped from the source prior to passing it to the
+  # highlighter, then later restored in rendered form, so they are not
+  # incorrectly processed by the source highlighter.
+  #
   # source - the source code String to highlight
+  # sub_callouts - a Boolean flag indicating whether callout marks should be substituted
   #
   # returns the highlighted source code, if a source highlighter is defined
   # on the document, otherwise the unprocessed text
-  def highlight_source(source)
+  def highlight_source(source, sub_callouts)
     Helpers.require_library 'coderay', true
-    ::CodeRay::Duo[attr('language', 'text').to_sym, :html, {
+    callout_marks = {}
+    lineno = 0
+    if sub_callouts
+      # extract callout marks, indexed by line number
+      source = source.split("\n").map {|line|
+        lineno = lineno + 1
+        line.sub(REGEXP[:callout_scan]) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[1] == '\\'
+            "<#{m[2]}>"
+          else
+            callout_marks[lineno] = m[2]
+            nil
+          end
+        }
+      } * "\n"
+    end
+
+    result = ::CodeRay::Duo[attr('language', 'text').to_sym, :html, {
         :css => @document.attributes.fetch('coderay-css', 'class').to_sym,
         :line_numbers => (attr?('linenums') ? @document.attributes.fetch('coderay-linenums-mode', 'table').to_sym : nil),
         :line_number_anchors => false}].highlight(source).chomp
+    if !sub_callouts || callout_marks.empty?
+      result
+    else
+      lineno = 0
+      result.split("\n").map {|line|
+        lineno = lineno + 1
+        if (conum = callout_marks.delete(lineno))
+          %(#{line}#{Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).render})
+        else
+          line
+        end
+      } * "\n"
+    end
   end
 end
 end

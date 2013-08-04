@@ -308,7 +308,7 @@ module Asciidoctor
     # special characters will already be replaced, hence their use in the regex
     :callout_render   => /(?:\/\/ ?|# ?)?(\\)?&lt;(\d+)&gt;$/,
     # ...but not while scanning
-    :callout_scan     => /\\?<(\d+)>$/,
+    :callout_scan     => /(?:\/\/ ?|# ?)?(\\)?<(\d+)>$/,
 
     # <1> Foo
     :colist           => /^<?(\d+)>[[:blank:]]+(.*)/,
