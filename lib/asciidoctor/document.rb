@@ -171,6 +171,7 @@ class Document < AbstractBlock
     # attribute overrides are attributes that can only be set from the commandline
     # a direct assignment effectively makes the attribute a constant
     # a nil value or name with leading or trailing ! will result in the attribute being unassigned
+    # FIXME normalizing keys isn't required if document is nested
     @attribute_overrides = (options[:attributes] || {}).inject({}) do |collector,(key,value)|
       if key.start_with?('!')
         key = key[1..-1]
@@ -179,7 +180,7 @@ class Document < AbstractBlock
         key = key[0..-2]
         value = nil
       end
-      collector[key] = value
+      collector[key.downcase] = value
       collector
     end
 
