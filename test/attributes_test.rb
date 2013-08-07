@@ -144,8 +144,16 @@ endif::holygrail[]
     end
 
     test 'attribute lookup is not case sensitive' do
-      result = render_embedded_string(":He-Man: The most powerful man in the universe\n\n{He-Man}")
-      assert_xpath '//p[text()="The most powerful man in the universe"]', result, 1
+      input = <<-EOS
+:He-Man: The most powerful man in the universe
+
+He-Man: {He-Man}
+
+She-Ra: {She-Ra}
+      EOS
+      result = render_embedded_string input, :attributes => {'She-Ra' => 'The Princess of Power'}
+      assert_xpath '//p[text()="He-Man: The most powerful man in the universe"]', result, 1
+      assert_xpath '//p[text()="She-Ra: The Princess of Power"]', result, 1
     end
 
     test "render properly with single character name" do
@@ -154,7 +162,7 @@ endif::holygrail[]
       assert_equal 'R is for Ruby!', result.css("p").first.content.strip
     end
 
-    test "convert multi-word names and render" do
+    test "collapses spaces in attribute names" do
       input = <<-EOS
 Main Header
 ===========
