@@ -685,7 +685,30 @@ module Substituters
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
         end
-        Inline.new(self, :anchor, reftext, :type => :xref, :target => id).render
+
+        if id.include? '#'
+          path, fragment = id.split('#')
+        else
+          path = nil
+          fragment = id
+        end
+
+        # handles form: id
+        if path.nil?
+          target = "##{fragment}"
+        # handles forms: doc# and doc#id
+        else
+          path = Helpers.rootname(path)
+          # the referenced path is this document, or its contents has been included in this document
+          if @document.attr?('docname', path) || @document.references[:includes].include?(path)
+            path = nil
+            target = "##{fragment}"
+          else
+            path = "#{path}#{@document.attr 'outfilesuffix', '.html'}"
+            target = fragment.nil? ? path : "#{path}##{fragment}"
+          end
+        end
+        Inline.new(self, :anchor, reftext, :type => :xref, :target => target, :attributes => {'path' => path, 'fragment' => fragment}).render
       }
     end
 

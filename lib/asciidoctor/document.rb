@@ -135,7 +135,8 @@ class Document < AbstractBlock
       :footnotes => [],
       :links => [],
       :images => [],
-      :indexterms => []
+      :indexterms => [],
+      :includes => Set.new,
     }
     @counters = {}
     @callouts = Callouts.new
