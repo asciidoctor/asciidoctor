@@ -74,7 +74,7 @@ elsif attr? :stylesheet
 end
 if attr? 'icons', 'font'
   if !(attr 'iconfont-remote', '').nil? %>
-<link rel="stylesheet" href="<%= attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css' %>/<%= attr 'iconfont-name', 'font-awesome' %>.min.css"><%
+<link rel="stylesheet" href="<%= attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css' %>"><%
   else %>
 <link rel="stylesheet" href="<%= normalize_web_path(%(\#{attr 'iconfont-name', 'font-awesome'}.css), (attr 'stylesdir', '')) %>"><%
   end
