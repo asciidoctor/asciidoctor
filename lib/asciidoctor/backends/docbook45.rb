@@ -22,7 +22,7 @@ module Asciidoctor
     end
 
     def common_attrs(id, role, reftext)
-      %(#{id && " id=\"#{id}\""}#{role && " role=\"#{role}\""}#{reftext && " xreflabel=\"#{reftext}\""})
+      %(#{id && " #{@backend == 'docbook5' ? 'xml:id' : 'id'}=\"#{id}\""}#{role && " role=\"#{role}\""}#{reftext && " xreflabel=\"#{reftext}\""})
     end
 
     def common_attrs_erb
@@ -44,7 +44,7 @@ class DocumentTemplate < BaseTemplate
     if str.include?(': ')
       title, _, subtitle = str.rpartition(': ')
       %(<title>#{title}</title>
-    <subtitle>#{subtitle}</subtitle>)
+<subtitle>#{subtitle}</subtitle>)
     else
       %(<title>#{str}</title>)
     end
@@ -52,75 +52,81 @@ class DocumentTemplate < BaseTemplate
 
   def docinfo
     <<-EOF
-    <% if has_header? && !notitle %>
-    <%= template.title_tags(@header.title) %>
-    <% end %>
-    <% if attr? :revdate %>
-    <date><%= attr :revdate %></date>
-    <% else %>
-    <date><%= attr :docdate %></date>
-    <% end %>
-    <% if has_header? %>
-    <% if attr? :author %>
-    <% if (attr :authorcount).to_i < 2 %>
-    <author>
-      #{tag 'firstname', :firstname}
-      #{tag 'othername', :middlename}
-      #{tag 'surname', :lastname}
-      #{tag 'email', :email}
-    </author>
-    #{tag 'authorinitials', :authorinitials}
-    <% else %>
-    <authorgroup>
-    <% (1..((attr :authorcount).to_i)).each do |idx| %>
-      <author> 
-        #{tag 'firstname', :"firstname_\#{idx}", true}
-        #{tag 'othername', :"middlename_\#{idx}", true}
-        #{tag 'surname', :"lastname_\#{idx}", true}
-        #{tag 'email', :"email_\#{idx}", true}
-      </author> 
-    <% end %>
-    </authorgroup>
-    <% end %>
-    <% end %>
-    <% if (attr? :revnumber) || (attr? :revremark) %>
-    <revhistory>
-      <revision>
-        #{tag 'revnumber', :revnumber}
-        #{tag 'date', :revdate}
-        #{tag 'authorinitials', :authorinitials}
-        #{tag 'revremark', :revremark}
-      </revision>
-    </revhistory>
-    <% end %>
+<% if has_header? && !notitle
+  %><%= template.title_tags(@header.title) %><%
+end
+if attr? :revdate %>
+<date><%= attr :revdate %></date><%
+else %>
+<date><%= attr :docdate %></date><%
+end
+if has_header?
+  if attr? :author
+    if (attr :authorcount).to_i < 2 %>
+#{author}
+#{tag 'authorinitials', :authorinitials}<%
+    else %>
+<authorgroup><%
+      (1..((attr :authorcount).to_i)).each do |idx| %>
+#{author true}<%
+      end %>
+</authorgroup><%
+    end
+  end
+  if (attr? :revnumber) || (attr? :revremark) %>
+<revhistory>
+<revision>
+#{tag 'revnumber', :revnumber}
+#{tag 'date', :revdate}
+#{tag 'authorinitials', :authorinitials}
+#{tag 'revremark', :revremark}
+</revision>
+</revhistory><%
+  end %>
 <%= docinfo %>
-    #{tag 'orgname', :orgname}
-    <% end %>
+#{tag 'orgname', :orgname}<%
+end %>
+    EOF
+  end
+
+  def author indexed = false
+    <<-EOF
+<author>
+#{tag 'firstname', indexed ? :"firstname_\#{idx}" : :firstname, indexed}
+#{tag 'othername', indexed ? :"middlename_\#{idx}" : :middlename, indexed}
+#{tag 'surname', indexed ? :"lastname_\#{idx}" : :lastname, indexed}
+#{tag 'email', indexed ? :"email_\#{idx}" : :email, indexed}
+</author>
     EOF
   end
 
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE <%= doctype %> PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<% if attr? :toc %><?asciidoc-toc?><% end %>
-<% if attr? :numbered %><?asciidoc-numbered?><% end %>
-<% if doctype == 'book' %>
+<!DOCTYPE <%= doctype %> PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"><%
+if attr? :toc %>
+<?asciidoc-toc?><%
+end
+if attr? :numbered %>
+<?asciidoc-numbered?><%
+end
+if doctype == 'book' %>
 <book<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
-  <bookinfo>
+<bookinfo>
 #{docinfo}
-  </bookinfo>
-<%= content %>
-</book>
-<% else %>
-<article<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
-  <articleinfo>
-#{docinfo}
-  </articleinfo>
+</bookinfo>
 <%= content %><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
 \#{docinfo_content}) %>
-</article>
-<% end %>
+</book><%
+else %>
+<article<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
+<articleinfo>
+#{docinfo}
+</articleinfo>
+<%= content %><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
+\#{docinfo_content}) %>
+</article><%
+end %>
     EOF
   end
 end
@@ -611,7 +617,7 @@ class InlineQuotedTemplate < BaseTemplate
 
   def quote_text(text, type, id, role)
     start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
-    anchor = id.nil? ? nil : %(<anchor id="#{id}" xreflabel="#{text}"/>)
+    anchor = id.nil? ? nil : %(<anchor#{common_attrs id, nil, text}/>)
     if role
       quoted_text = "#{start_tag}<phrase role=\"#{role}\">#{text}</phrase>#{end_tag}"
     elsif start_tag.nil?
@@ -683,13 +689,13 @@ class InlineAnchorTemplate < BaseTemplate
   def anchor(target, text, type)
     case type
     when :ref
-      %(<anchor id="#{target}" xreflabel="#{text}"/>)
+      %(<anchor#{common_attrs target, nil, text}/>)
     when :xref
       text.nil? ? %(<xref linkend="#{target}"/>) : %(<link linkend="#{target}">#{text}</link>)
     when :link
       %(<ulink url="#{target}">#{text}</ulink>)
     when :bibref
-      %(<anchor id="#{target}" xreflabel="[#{target}]"/>[#{target}])
+      %(<anchor#{common_attrs target, nil, "[#{target}]"}/>[#{target}])
     end
   end
 
@@ -722,7 +728,7 @@ class InlineFootnoteTemplate < BaseTemplate
 if @type == :xref
 %><footnoteref linkend="<%= @target %>"/><%
 else
-%><footnote#{id}><simpara><%= @text %></simpara></footnote><%
+%><footnote<%= template.common_attrs(@id, nil, nil) %>><simpara><%= @text %></simpara></footnote><%
 end %>
     EOS
   end
@@ -730,7 +736,7 @@ end
 
 class InlineCalloutTemplate < BaseTemplate
   def result(node)
-    %(<co id="#{node.id}"/>)
+    %(<co#{common_attrs node.id, nil, nil}/>)
   end
 
   def template

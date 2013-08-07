@@ -18,7 +18,7 @@ class Renderer
 
     backend = options[:backend]
     case backend
-    when 'html5', 'docbook45'
+    when 'html5', 'docbook45', 'docbook5'
       eruby = load_eruby options[:eruby]
       #Helpers.require_library 'asciidoctor/backends/' + backend
       require 'asciidoctor/backends/' + backend
@@ -27,7 +27,7 @@ class Renderer
         if tc.to_s.downcase.include?('::' + backend + '::') # optimization
           view_name, view_backend = self.class.extract_view_mapping(tc)
           if view_backend == backend
-            @views[view_name] = tc.new(view_name, eruby)
+            @views[view_name] = tc.new(view_name, backend, eruby)
           end
         end
       end
