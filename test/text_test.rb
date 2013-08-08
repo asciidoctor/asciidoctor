@@ -16,8 +16,8 @@ context "Text" do
 
   test "proper encoding to handle utf8 characters in document using docbook backend" do
     output = example_document(:encoding, :attributes => {'backend' => 'docbook'}).render
-    assert_xpath '//simpara', output, 4
-    assert_xpath '//ulink', output, 1
+    assert_xpath '//xmlns:simpara', output, 4
+    assert_xpath '//xmlns:ulink', output, 1
   end
 
   test "proper encoding to handle utf8 characters in embedded document using docbook backend" do

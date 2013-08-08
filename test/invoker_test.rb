@@ -266,7 +266,7 @@ context 'Invoker' do
     assert_equal 'docbook45', doc.attr('backend')
     assert_equal '.xml', doc.attr('outfilesuffix')
     output = invoker.read_output
-    assert_xpath '/article', output, 1
+    assert_xpath '/xmlns:article', output, 1
   end
 
   test 'should set doctype to article if specified' do

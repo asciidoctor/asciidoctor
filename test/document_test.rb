@@ -507,7 +507,7 @@ text
       assert !output.empty?
       assert_css 'productname', output, 1
       assert_css 'edition', output, 1
-      assert_xpath '//edition[text()="1.0"]', output, 1 # verifies substitutions are performed
+      assert_xpath '//xmlns:edition[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'copyright', output, 0
 
       output = Asciidoctor.render_file(sample_input_path,
@@ -515,7 +515,7 @@ text
       assert !output.empty?
       assert_css 'productname', output, 1
       assert_css 'edition', output, 1
-      assert_xpath '//edition[text()="1.0"]', output, 1 # verifies substitutions are performed
+      assert_xpath '//xmlns:edition[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'copyright', output, 1
     end
 
@@ -548,7 +548,7 @@ text
           :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo' => ''})
       assert !output.empty?
       assert_css 'article > revhistory', output, 1
-      assert_xpath '/article/revhistory/revision/revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
+      assert_xpath '/xmlns:article/xmlns:revhistory/xmlns:revision/xmlns:revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'glossary#_glossary', output, 0
 
       output = Asciidoctor.render_file(sample_input_path,
@@ -561,7 +561,7 @@ text
           :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => ''})
       assert !output.empty?
       assert_css 'article > revhistory', output, 1
-      assert_xpath '/article/revhistory/revision/revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
+      assert_xpath '/xmlns:article/xmlns:revhistory/xmlns:revision/xmlns:revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'glossary#_glossary', output, 1
     end
 
@@ -1167,18 +1167,22 @@ preamble
 
 section body
       EOS
-      result = render_string(input, :attributes => {'backend' => 'docbook5'})
-      assert_xpath '/article', result, 1
-      doc = xmlnodes_at_xpath('/article', result, 1).first
-      assert_xpath '/article[@xmlns="http://docbook.org/ns/docbook"]', result, 1
-      assert_equal 'http://www.w3.org/1999/xlink', doc['xmlns:xlink']
-      assert_xpath '/article[@version="5.0"]', result, 1
-      assert_xpath '/article/info/title[text() = "Title"]', result, 1
-      assert_xpath '/article/simpara[text() = "preamble"]', result, 1
-      assert_xpath '/article/section', result, 1
-      section = xmlnodes_at_xpath('/article/section', result, 1).first
-      assert_not_nil section.attribute('xml:id')
-      assert_equal '_first_section', section.attribute('xml:id').value
+      result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5'})
+      assert_xpath '/xmlns:article', result, 1
+      doc = xmlnodes_at_xpath('/xmlns:article', result, 1).first
+      assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
+      assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xlink']
+      assert_xpath '/xmlns:article[@version="5.0"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:info/xmlns:title[text() = "Title"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:simpara[text() = "preamble"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:section', result, 1
+      section = xmlnodes_at_xpath('/xmlns:article/xmlns:section', result, 1).first
+      # nokogiri can't make up its mind
+      id_attr = section.attribute('id') || section.attribute('xml:id')
+      assert_not_nil id_attr
+      assert_not_nil id_attr.namespace
+      assert_equal 'xml', id_attr.namespace.prefix
+      assert_equal '_first_section', id_attr.value
     end
 
     test 'docbook5 backend doctype book' do
@@ -1188,22 +1192,26 @@ Author Name
 
 preamble
 
-== First Section
+== First Chapter
 
-section body
+chapter body
       EOS
-      result = render_string(input, :attributes => {'backend' => 'docbook5', 'doctype' => 'book'})
-      assert_xpath '/book', result, 1
-      doc = xmlnodes_at_xpath('/book', result, 1).first
-      assert_xpath '/book[@xmlns="http://docbook.org/ns/docbook"]', result, 1
-      assert_equal 'http://www.w3.org/1999/xlink', doc['xmlns:xlink']
-      assert_xpath '/book[@version="5.0"]', result, 1
-      assert_xpath '/book/info/title[text() = "Title"]', result, 1
-      assert_xpath '/book/preface/simpara[text() = "preamble"]', result, 1
-      assert_xpath '/book/chapter', result, 1
-      chapter = xmlnodes_at_xpath('/book/chapter', result, 1).first
-      assert_not_nil chapter.attribute('xml:id')
-      assert_equal '_first_section', chapter.attribute('xml:id').value
+      result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'book'})
+      assert_xpath '/xmlns:book', result, 1
+      doc = xmlnodes_at_xpath('/xmlns:book', result, 1).first
+      assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
+      assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xlink']
+      assert_xpath '/xmlns:book[@version="5.0"]', result, 1
+      assert_xpath '/xmlns:book/xmlns:info/xmlns:title[text() = "Title"]', result, 1
+      assert_xpath '/xmlns:book/xmlns:preface/xmlns:simpara[text() = "preamble"]', result, 1
+      assert_xpath '/xmlns:book/xmlns:chapter', result, 1
+      chapter = xmlnodes_at_xpath('/xmlns:book/xmlns:chapter', result, 1).first
+      # nokogiri can't make up its mind
+      id_attr = chapter.attribute('id') || chapter.attribute('xml:id')
+      assert_not_nil id_attr
+      assert_not_nil id_attr.namespace
+      assert_equal 'xml', id_attr.namespace.prefix
+      assert_equal '_first_chapter', id_attr.value
     end
 
     test 'should be able to set backend using :backend option key' do
