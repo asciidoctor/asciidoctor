@@ -450,7 +450,7 @@ module Substituters
       end
     end
 
-    if found[:macroish] && result.include?('image:')
+    if found[:macroish] && (result.include?('image:') || result.include?('icon:'))
       # image:filename.png[Alt Text]
       result.gsub!(REGEXP[:image_macro]) {
         # alias match for Ruby 1.8.7 compat
@@ -459,13 +459,24 @@ module Substituters
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
+
+        raw_attrs = unescape_bracketed_text m[2]
+        if m[0].start_with? 'icon:'
+          type = 'icon'
+          posattrs = ['size']
+        else
+          type = 'image'
+          posattrs = ['alt', 'width', 'height']
+        end
         target = sub_attributes(m[1])
-        @document.register(:images, target)
-        attrs = parse_attributes(unescape_bracketed_text(m[2]), ['alt', 'width', 'height'])
+        unless type == 'icon'
+          @document.register(:images, target)
+        end
+        attrs = parse_attributes(raw_attrs, posattrs)
         if !attrs['alt']
           attrs['alt'] = File.basename(target, File.extname(target))
         end
-        Inline.new(self, :image, nil, :target => target, :attributes => attrs).render
+        Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).render
       }
     end
 
