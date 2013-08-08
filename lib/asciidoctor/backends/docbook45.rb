@@ -117,7 +117,8 @@ class DocumentTemplate < BaseTemplate
   <articleinfo>
 #{docinfo}
   </articleinfo>
-<%= content.chomp %>
+<%= content.chomp %><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
+\#{docinfo_content}) %>
 </article>
 <% end %>
     EOF
