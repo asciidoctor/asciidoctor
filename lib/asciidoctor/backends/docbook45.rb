@@ -729,7 +729,7 @@ class InlineImageTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><inlinemediaobject>
   <imageobject>
-    <imagedata fileref="<%= image_uri(@target) %>"#{attribute('width', :width)}#{attribute('depth', :height)}/>
+    <imagedata fileref="<%= @type == 'icon' ? icon_uri(@target) : image_uri(@target) %>"#{attribute('width', :width)}#{attribute('depth', :height)}/>
   </imageobject>
   <textobject><phrase><%= attr :alt %></phrase></textobject>
 </inlinemediaobject>

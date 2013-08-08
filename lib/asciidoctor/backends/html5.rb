@@ -74,7 +74,7 @@ elsif attr? :stylesheet
 end
 if attr? 'icons', 'font'
   if !(attr 'iconfont-remote', '').nil? %>
-<link rel="stylesheet" href="<%= attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css' %>/<%= attr 'iconfont-name', 'font-awesome' %>.min.css"><%
+<link rel="stylesheet" href="<%= attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css' %>"><%
   else %>
 <link rel="stylesheet" href="<%= normalize_web_path(%(\#{attr 'iconfont-name', 'font-awesome'}.css), (attr 'stylesdir', '')) %>"><%
   end
@@ -1000,15 +1000,52 @@ class InlineAnchorTemplate < BaseTemplate
 end
 
 class InlineImageTemplate < BaseTemplate
+  def image(target, type, node)
+    if type == 'icon' && (node.document.attr? 'icons', 'font') 
+      style_class = "icon-#{target}"
+      if node.attr? 'size'
+        style_class = "#{style_class} icon-#{node.attr 'size'}"
+      end
+      if node.attr? 'rotate'
+        style_class = "#{style_class} icon-rotate-#{node.attr 'rotate'}"
+      end
+      if node.attr? 'flip'
+        style_class = "#{style_class} icon-flip-#{node.attr 'flip'}"
+      end
+      img = %(<i class="#{style_class}"></i>)
+      span = false
+    else
+      if type == 'icon'
+        resolved_target = node.icon_uri target
+      else
+        resolved_target = node.image_uri target
+      end
+
+      attrs = ['alt', 'width', 'height', 'title'].map {|name|
+        if node.attr? name
+          %( #{name}="#{node.attr name}")
+        else
+          nil
+        end
+      }.join
+
+      img = %(<img src="#{resolved_target}"#{attrs}>)
+      span = true
+    end
+
+    if node.attr? 'link'
+      img = %(<a class="image" href="#{node.attr 'link'}"#{(node.attr? 'window') ? " target=\"#{node.attr 'window'}\"" : nil}>#{img}</a>)
+    end
+
+    span ? %(<span class="image#{node.role? ? " #{node.role}" : nil}">#{img}</span>) : img
+  end
+
+  def result(node)
+    image(node.target, node.type, node)
+  end
+
   def template
-    # care is taken here to avoid a space inside the optional <a> tag
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><span class="image#{role_class}"><%
-if attr? :link %><a class="image" href="<%= attr :link %>"><%
-end %><img src="<%= image_uri(@target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}#{attribute('title', :title)}><%
-if attr? :link%></a><% end
-%></span>
-    EOS
+    :invoke_result
   end
 end
 
