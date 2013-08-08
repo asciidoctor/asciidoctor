@@ -124,6 +124,7 @@ class Document < AbstractBlock
     }
     @counters = {}
     @callouts = Callouts.new
+    @attributes_modified = Set.new
     @options = options
     if @parent_document.nil?
       # safely resolve the safe mode from const, int or string
@@ -480,6 +481,13 @@ class Document < AbstractBlock
   # Internal: Branch the attributes so that the original state can be restored
   # at a future time.
   def save_attributes
+    # enable toc and numbered by default in DocBook backend
+    # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility
+    if @attributes['basebackend'] == 'docbook'
+      @attributes['toc'] = '' unless attribute_locked?('toc') || @attributes_modified.include?('toc')
+      @attributes['numbered'] = '' unless attribute_locked?('numbered') || @attributes_modified.include?('numbered')
+    end
+
     unless @attributes.has_key?('doctitle') || (val = doctitle).nil?
       @attributes['doctitle'] = val
     end
@@ -558,6 +566,7 @@ class Document < AbstractBlock
       false
     else
       @attributes[name] = apply_attribute_value_subs(value)
+      @attributes_modified << name
       if name == 'backend'
         update_backend_attributes()
       end
@@ -577,6 +586,7 @@ class Document < AbstractBlock
       false
     else
       @attributes.delete(name)
+      @attributes_modified << name
       true
     end
   end

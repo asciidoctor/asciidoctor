@@ -66,6 +66,23 @@ context 'Document' do
       rescue
       end
     end
+
+    test 'toc and numbered should be enabled by default for DocBook backend' do
+      doc = Asciidoctor::Document.new [], :backend => 'docbook'
+      assert doc.attr?('toc')
+      assert doc.attr?('numbered')
+    end
+
+    test 'should be able to disable toc and numbered in document header for DocBook backend' do
+      input = <<-EOS
+= Document Title
+:toc!:
+:numbered!:
+      EOS
+      doc = document_from_string input, :backend => 'docbook'
+      assert !doc.attr?('toc')
+      assert !doc.attr?('numbered')
+    end
   end
 
   context 'Load APIs' do
