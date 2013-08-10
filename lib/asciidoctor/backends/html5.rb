@@ -90,6 +90,17 @@ when 'coderay'
 </style><%
     end
   end
+when 'pygments'
+  unless attr? 'pygments-css', 'style'
+    if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
+<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-pygments.css', (attr :stylesdir, '')) %>"><%
+    else
+      Helpers.require_library 'pygments', 'pygments.rb' %>
+<style>
+<%= Pygments.css '.highlight', :classprefix => 'tok-', :style => (attr 'pygments-style', 'pastie') %>
+</style><%
+    end
+  end
 when 'highlightjs', 'highlight.js' %>
 <link rel="stylesheet" href="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css">
 <script src="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/highlight.min.js"></script>
