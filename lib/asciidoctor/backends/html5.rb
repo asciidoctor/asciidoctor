@@ -329,26 +329,17 @@ class BlockDlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
 <%#encoding:UTF-8%><%
-continuing = false
-entries = content
-last_index = entries.length - 1
-if @style == 'qanda'
+case @style
+when 'qanda'
 %><div#{id} class="qlist#{style_class}#{role_class}"><%
-if title? %>
+  if title? %>
 <div class="title"><%= title %></div><%
-end %>
+  end %>
 <ol><%
-  entries.each_with_index do |(dt, dd), index|
-    last = (index == last_index)
-    unless continuing %>
+  content.each do |terms, dd| %>
 <li><%
-    end %>
+    terms.each do |dt| %>
 <p><em><%= dt.text %></em></p><%
-    if !last && dd.nil?
-      continuing = true
-      next
-    else
-      continuing = false
     end
     unless dd.nil?
       if dd.text? %>
@@ -362,31 +353,26 @@ end %>
   end %>
 </ol>
 </div><%
-elsif @style == 'horizontal'
+when 'horizontal'
 %><div#{id} class="hdlist#{role_class}"><%
-if title? %>
+  if title? %>
 <div class="title"><%= title %></div><%
-end %>
+  end %>
 <table><%
-if (attr? :labelwidth) || (attr? :itemwidth) %>
+  if (attr? :labelwidth) || (attr? :itemwidth) %>
 <colgroup>
 <col<% if attr? :labelwidth %> style="width:<%= (attr :labelwidth).chomp('%') %>%;"<% end %>>
 <col<% if attr? :itemwidth %> style="width:<%= (attr :itemwidth).chomp('%') %>%;"<% end %>>
 </colgroup><%
-end %><%
-  entries.each_with_index do |(dt, dd), index|
-    last = (index == last_index)
-    unless continuing %>
+  end %><%
+  content.each do |terms, dd| %>
 <tr>
 <td class="hdlist1<%= (option? 'strong') ? 'strong' : nil %>"><%
-    end %>
-<%= dt.text %>
+    terms.each do |dt| %>
+<%= dt.text %><%
+      if dt != terms.last %>
 <br><%
-    if !last && dd.nil?
-      continuing = true
-      next
-    else
-      continuing = false
+      end
     end %>
 </td>
 <td class="hdlist2"><%
@@ -405,13 +391,14 @@ end %><%
 </div><%
 else
 %><div#{id} class="dlist#{style_class}#{role_class}"><%
-if title? %>
+  if title? %>
 <div class="title"><%= title %></div><%
-end %>
+  end %>
 <dl><%
-  entries.each_with_index do |(dt, dd), index|
-    last = (index == last_index) %>
+  content.each do |terms, dd|
+    terms.each do |dt| %>
 <dt<%= @style.nil? ? %( class="hdlist1") : nil %>><%= dt.text %></dt><%
+    end
     unless dd.nil? %>
 <dd><%
       if dd.text? %>

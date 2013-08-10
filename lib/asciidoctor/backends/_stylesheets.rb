@@ -356,10 +356,11 @@ ol.upperroman { list-style-type: upper-roman; }
 ol.lowergreek { list-style-type: lower-greek; }
 .hdlist > table, .colist > table { border: 0; background: none; }
 .hdlist > table > tbody > tr, .colist > table > tbody > tr { background: none; }
+td.hdlist1 { padding-right: .8em; font-weight: bold; }
+td.hdlist1, td.hdlist2 { vertical-align: top; }
 .literalblock + .colist, .listingblock + .colist { margin-top: -0.5em; }
 .colist > table tr > td:first-of-type { padding: 0 .8em; line-height: 1; }
 .colist > table tr > td:last-of-type { padding: 0.25em 0; }
-td.hdlist1 { vertical-align: top; padding-right: .8em; font-weight: bold; }
 .qanda > ol > li > p:first-child { color: #00467f; }
 .thumb, .th { line-height: 0; display: inline-block; border: solid 4px white; -webkit-box-shadow: 0 0 0 1px #dddddd; box-shadow: 0 0 0 1px #dddddd; }
 .imageblock { margin-bottom: 1.25em; }
