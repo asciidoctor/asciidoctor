@@ -115,6 +115,48 @@ block comment
       output = render_embedded_string input
       assert !output.strip.empty?, "Line should be emitted => #{input.rstrip}"
     end
+
+    test 'comment style on open block should only skip block' do
+      input = <<-EOS
+[comment]
+--
+skip
+
+this block
+--
+
+not this text
+      EOS
+      result = render_embedded_string input
+      assert_xpath '//p', result, 1
+      assert_xpath '//p[text()="not this text"]', result, 1
+    end
+
+    test 'comment style on paragraph should only skip paragraph' do
+      input = <<-EOS
+[comment]
+skip
+this paragraph
+
+not this text
+      EOS
+      result = render_embedded_string input
+      assert_xpath '//p', result, 1
+      assert_xpath '//p[text()="not this text"]', result, 1
+    end
+
+    test 'comment style on paragraph should not cause adjacent block to be skipped' do
+      input = <<-EOS
+[comment]
+skip
+this paragraph
+[example]
+not this text
+      EOS
+      result = render_embedded_string input
+      assert_xpath '/*[@class="exampleblock"]', result, 1
+      assert_xpath '/*[@class="exampleblock"]//*[normalize-space(text())="not this text"]', result, 1
+    end
   end
 
   context 'Quote and Verse Blocks' do

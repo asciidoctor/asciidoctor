@@ -674,7 +674,7 @@ class Lexer
           block = build_block(block_context, :complex, terminator, parent, reader, attributes)
 
         when :comment
-          reader.grab_lines_until(:break_on_blank_lines => true, :chomp_last_line => false)
+          build_block(block_context, :skip, terminator, parent, reader, attributes)
           return nil
 
         when :example
@@ -805,6 +805,13 @@ class Lexer
   # if terminator is false, that means the all the lines in the reader should be parsed
   # NOTE could invoke filter in here, before and after parsing
   def self.build_block(block_context, content_type, terminator, parent, reader, attributes, options = {})
+    if content_type == :skip
+      skip = true
+      content_type = :simple
+    else
+      skip = false
+    end
+
     if terminator.nil?
       if content_type == :verbatim
         buffer = reader.grab_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
@@ -826,6 +833,11 @@ class Lexer
     else
       buffer = nil
       block_reader = Reader.new reader.grab_lines_until(:terminator => terminator)
+    end
+
+    if skip
+      attributes.clear
+      return buffer
     end
 
     if content_type == :verbatim && attributes.has_key?('indent')
