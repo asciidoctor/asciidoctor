@@ -125,16 +125,6 @@ class Table < AbstractBlock
     
     nil
   end
-
-  # Public: Get the rendered String content for this Block.  If the block
-  # has child blocks, the content method should cause them to be
-  # rendered and returned as content that can be included in the
-  # parent block's template.
-  def render
-    @document.playback_attributes @attributes
-    renderer.render('block_table', self) 
-  end
-
 end
 
 # Public: A struct that encapsulates the collection of rows (head, foot, body) for a table

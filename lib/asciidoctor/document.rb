@@ -700,7 +700,7 @@ class Document < AbstractBlock
     # per AsciiDoc-spec, remove the title before rendering the body,
     # regardless of whether the header is rendered)
     @attributes.delete('title')
-    @blocks.map {|b| b.render }.join
+    super
   end
 
   # Public: Read the docinfo file(s) for inclusion in the

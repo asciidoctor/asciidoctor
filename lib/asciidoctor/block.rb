@@ -25,19 +25,8 @@ class Block < AbstractBlock
     @buffer = buffer
   end
 
-  # Public: Get the rendered String content for this Block.  If the block
-  # has child blocks, the content method should cause them to be
-  # rendered and returned as content that can be included in the
-  # parent block's template.
-  def render
-    @document.playback_attributes @attributes
-    out = renderer.render("block_#{@context}", self)
-    @document.callouts.next_list if @context == :colist
-    out
-  end
-
-  # Public: Get an HTML-ified version of the source buffer, with special
-  # Asciidoc characters and entities converted to their HTML equivalents.
+  # Public: Get an rendered version of the block content, performing
+  # any substitutions on the content.
   #
   # Examples
   #
@@ -48,24 +37,22 @@ class Block < AbstractBlock
   #   => ["<em>This</em> is what happens when you &lt;meet&gt; a stranger in the &lt;alps&gt;!"]
   def content
     case @context
+    when :paragraph
+      apply_para_subs(@buffer)
     when :preamble
       @blocks.map {|b| b.render }.join
-    # lists get iterated in the template (for now)
-    # list items recurse into this block when their text and content methods are called
-    when :ulist, :olist, :dlist, :colist
-      @buffer
     when :listing, :literal
       apply_literal_subs(@buffer)
     when :pass
       apply_passthrough_subs(@buffer)
-    when :admonition, :example, :sidebar, :quote, :verse, :open
-      if !@buffer.nil?
+    else
+      if @blocks.size > 0
+        @blocks.map {|b| b.render }.join
+      elsif !@buffer.nil?
         apply_para_subs(@buffer)
       else
-        @blocks.map {|b| b.render }.join
+        nil
       end
-    else
-      apply_para_subs(@buffer)
     end
   end
 

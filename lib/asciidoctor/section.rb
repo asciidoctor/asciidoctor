@@ -41,6 +41,7 @@ class Section < AbstractBlock
   # parent - The parent Asciidoc Object.
   def initialize(parent = nil, level = nil, numbered = true)
     super(parent, :section)
+    @template_name = 'section'
     if level.nil?
       if !parent.nil?
         @level = parent.level + 1
@@ -106,27 +107,6 @@ class Section < AbstractBlock
     else
       nil
     end
-  end
-
-  # Public: Get the rendered String content for this Section and all its child
-  # Blocks.
-  def render
-    @document.playback_attributes @attributes
-    renderer.render('section', self)
-  end
-
-  # Public: Get the String section content by aggregating rendered section blocks.
-  #
-  # Examples
-  #
-  #   section = Section.new
-  #   section << 'foo'
-  #   section << 'bar'
-  #   section << 'baz'
-  #   section.content
-  #   "<div class=\"paragraph\"><p>foo</p></div>\n<div class=\"paragraph\"><p>bar</p></div>\n<div class=\"paragraph\"><p>baz</p></div>"
-  def content
-    @blocks.map {|b| b.render }.join
   end
 
   # Public: Get the section number for the current Section

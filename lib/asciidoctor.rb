@@ -957,7 +957,7 @@ module Asciidoctor
   require 'asciidoctor/document'
   require 'asciidoctor/inline'
   require 'asciidoctor/lexer'
-  require 'asciidoctor/list_item'
+  require 'asciidoctor/list'
   require 'asciidoctor/path_resolver'
   require 'asciidoctor/reader'
   require 'asciidoctor/renderer'

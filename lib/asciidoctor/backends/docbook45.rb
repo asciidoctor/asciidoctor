@@ -216,7 +216,7 @@ class BlockUlistTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><% if @style == 'bibliography' %>
 <bibliodiv#{common_attrs_erb}>#{title_tag}
-  <% content.each do |li| %>
+  <% items.each do |li| %>
     <bibliomixed>
       <bibliomisc><%= li.text %></bibliomisc>
       <% if li.blocks? %>
@@ -227,7 +227,7 @@ class BlockUlistTemplate < BaseTemplate
 </bibliodiv>
 <% else %>
 <itemizedlist#{common_attrs_erb}>#{title_tag}
-  <% content.each do |li| %>
+  <% items.each do |li| %>
     <listitem>
       <simpara><%= li.text %></simpara>
       <% if li.blocks? %>
@@ -245,7 +245,7 @@ class BlockOlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><orderedlist#{common_attrs_erb}#{attribute('numeration', '@style')}>#{title_tag}
-  <% content.each do |li| %>
+  <% items.each do |li| %>
     <listitem>
       <simpara><%= li.text %></simpara>
       <% if li.blocks? %>
@@ -262,7 +262,7 @@ class BlockColistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><calloutlist#{common_attrs_erb}>#{title_tag}
-  <% content.each do |li| %>
+  <% items.each do |li| %>
   <callout arearefs="<%= li.attr :coids %>">
     <para><%= li.text %></para>
     <% if li.blocks? %>
@@ -309,7 +309,7 @@ if @style == 'horizontal'
 <colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
 <colspec colwidth="<%= attr :labelwidth, 85 %>*"/>
 <tbody valign="top"><%
-  content.each do |terms, dd| %>
+  items.each do |terms, dd| %>
 <row>
 <entry><%
     terms.each do |dt| %>
@@ -336,7 +336,7 @@ else
   if tags[:list]
 %><<%= tags[:list] %>#{common_attrs_erb}>#{title_tag}<%
   end
-  content.each do |terms, dd| %>
+  items.each do |terms, dd| %>
 <<%= tags[:entry] %>><%
     if tags.has_key? :label %>
 <<%= tags[:label] %>><%

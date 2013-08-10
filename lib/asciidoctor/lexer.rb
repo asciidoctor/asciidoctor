@@ -340,7 +340,8 @@ class Lexer
     #parse_sections = options.fetch(:parse_sections, false)
 
     document = parent.document
-    parent_context = parent.is_a?(Block) ? parent.context : nil
+    #parent_context = parent.is_a?(Block) ? parent.context : nil
+    in_list = parent.is_a?(List)
     block = nil
     style = nil
     explicit_style = nil
@@ -456,10 +457,8 @@ class Lexer
 
           # haven't found anything yet, continue
           if (match = this_line.match(REGEXP[:colist]))
-            block = Block.new(parent, :colist)
+            block = List.new(parent, :colist)
             attributes['style'] = 'arabic'
-            items = []
-            block.buffer = items
             reader.unshift_line this_line
             expected_index = 1
             begin
@@ -470,12 +469,12 @@ class Lexer
               list_item = next_list_item(reader, block, match)
               expected_index += 1
               if !list_item.nil?
-                items << list_item
-                coids = document.callouts.callout_ids(items.size)
+                block << list_item
+                coids = document.callouts.callout_ids(block.size)
                 if !coids.empty?
                   list_item.attributes['coids'] = coids
                 else
-                  puts "asciidoctor: WARNING: line #{reader.lineno}: no callouts refer to list item #{items.size}"
+                  puts "asciidoctor: WARNING: line #{reader.lineno}: no callouts refer to list item #{block.size}"
                 end
               end
             end while reader.has_more_lines? && match = reader.peek_line.match(REGEXP[:colist])
@@ -493,7 +492,7 @@ class Lexer
             block = next_outline_list(reader, :olist, parent)
             # QUESTION move this logic to next_outline_list?
             if !attributes['style'] && !block.attributes['style']
-              marker = block.buffer.first.marker
+              marker = block.first.marker
               if marker.start_with? '.'
                 # first one makes more sense, but second one is AsciiDoc-compliant
                 #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES.first).to_s
@@ -547,7 +546,7 @@ class Lexer
             end
           end
 
-          break_at_list = (skipped == 0 && parent_context.to_s.end_with?('list'))
+          break_at_list = (skipped == 0 && in_list)
 
           # a literal paragraph is contiguous lines starting at least one space
           if style != 'normal' && this_line.match(REGEXP[:lit_par])
@@ -569,7 +568,7 @@ class Lexer
 
             block = Block.new(parent, :literal, buffer)
             # a literal gets special meaning inside of a definition list
-            if LIST_CONTEXTS.include?(parent_context)
+            if in_list
               attributes['options'] ||= []
               # TODO this feels hacky, better way to distinguish from explicit literal block?
               attributes['options'] << 'listparagraph'
@@ -871,9 +870,7 @@ class Lexer
   #
   # Returns the Block encapsulating the parsed outline (unordered or ordered) list
   def self.next_outline_list(reader, list_type, parent)
-    list_block = Block.new(parent, list_type)
-    items = []
-    list_block.buffer = items
+    list_block = List.new(parent, list_type)
     if parent.context == list_type
       list_block.level = parent.level + 1
     else
@@ -882,28 +879,27 @@ class Lexer
     Debug.debug { "Created #{list_type} block: #{list_block}" }
 
     while reader.has_more_lines? && (match = reader.peek_line.match(REGEXP[list_type]))
-
       marker = resolve_list_marker(list_type, match[1])
 
       # if we are moving to the next item, and the marker is different
       # determine if we are moving up or down in nesting
-      if items.size > 0 && marker != items.first.marker
+      if list_block.size > 0 && marker != list_block.first.marker
         # assume list is nested by default, but then check to see if we are
         # popping out of a nested list by matching an ancestor's list marker
         this_item_level = list_block.level + 1
-        p = parent
-        while p.context == list_type
-          if marker == p.buffer.first.marker
-            this_item_level = p.level
+        ancestor = parent
+        while ancestor.context == list_type
+          if marker == ancestor.first.marker
+            this_item_level = ancestor.level
             break
           end
-          p = p.parent
+          ancestor = ancestor.parent
         end
       else
         this_item_level = list_block.level
       end
 
-      if items.size == 0 || this_item_level == list_block.level
+      if list_block.size == 0 || this_item_level == list_block.level
         list_item = next_list_item(reader, list_block, match)
       elsif this_item_level < list_block.level
         # leave this block
@@ -911,10 +907,10 @@ class Lexer
       elsif this_item_level > list_block.level
         # If this next list level is down one from the
         # current Block's, append it to content of the current list item
-        items.last.blocks << next_block(reader, list_block)
+        list_block.last << next_block(reader, list_block)
       end
 
-      items << list_item unless list_item.nil?
+      list_block << list_item unless list_item.nil?
       list_item = nil
 
       reader.skip_blank_lines
@@ -967,9 +963,7 @@ class Lexer
   #
   # Returns the Block encapsulating the parsed labeled list
   def self.next_labeled_list(reader, match, parent)
-    pairs = []
-    block = Block.new(parent, :dlist)
-    block.buffer = pairs
+    block = List.new(parent, :dlist)
     previous_pair = nil
     # allows us to capture until we find a labeled item
     # that uses the same delimiter (::, :::, :::: or ;;)
@@ -982,8 +976,7 @@ class Lexer
         previous_pair[0] << term
         previous_pair << item
       else
-        pairs << [[term], item]
-        previous_pair = pairs.last
+        block << (previous_pair = [[term], item])
       end
     end while reader.has_more_lines? && match = reader.peek_line.match(sibling_pattern)
 
@@ -1038,7 +1031,7 @@ class Lexer
       end
 
       if !sibling_trait
-        sibling_trait = resolve_list_marker(list_type, match[1], list_block.buffer.size, true)
+        sibling_trait = resolve_list_marker(list_type, match[1], list_block.size, true)
       end
       list_item.marker = sibling_trait
       has_text = true

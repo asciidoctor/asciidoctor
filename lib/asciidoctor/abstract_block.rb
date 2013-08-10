@@ -1,5 +1,8 @@
 module Asciidoctor
 class AbstractBlock < AbstractNode
+  # Public: Get the String name of the render template
+  attr_reader :template_name
+
   # Public: Get the Array of Asciidoctor::AbstractBlock sub-blocks for this block
   attr_reader :blocks
 
@@ -17,6 +20,7 @@ class AbstractBlock < AbstractNode
 
   def initialize(parent, context)
     super(parent, context)
+    @template_name = "block_#{context}"
     @blocks = []
     @id = nil
     @title = nil
@@ -31,6 +35,19 @@ class AbstractBlock < AbstractNode
     end
     @next_section_index = 0
     @next_section_number = 1
+  end
+
+  # Public: Get the rendered String content for this Block.  If the block
+  # has child blocks, the content method should cause them to be
+  # rendered and returned as content that can be included in the
+  # parent block's template.
+  def render
+    @document.playback_attributes @attributes
+    renderer.render(@template_name, self)
+  end
+
+  def content
+    @blocks.map {|b| b.render }.join
   end
 
   # Public: A convenience method that indicates whether the title instance
@@ -101,6 +118,16 @@ class AbstractBlock < AbstractNode
   #   => "bar"
   def [](i)
     @blocks[i]
+  end
+
+  # Public: Get the first element in the array of blocks.
+  def first
+    @blocks.first
+  end
+
+  # Public: Get the last element in the array of blocks.
+  def last
+    @blocks.last
   end
 
   # Public: Append a content block to this block's list of blocks.

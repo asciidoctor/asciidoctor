@@ -1,4 +1,21 @@
 module Asciidoctor
+# Public: Methods for managing AsciiDoc lists (ordered, unordered and labeled lists)
+class List < AbstractBlock
+  # Public: Create alias for blocks
+  alias :items :blocks
+  alias :items? :blocks?
+
+  def initialize(parent, context)
+    super(parent, context)
+  end
+
+  def render
+    result = super
+    @document.callouts.next_list if @context == :colist
+    result
+  end
+end
+
 # Public: Methods for managing items for AsciiDoc olists, ulist, and dlists.
 class ListItem < AbstractBlock
 
@@ -24,10 +41,6 @@ class ListItem < AbstractBlock
     Block.new(self, nil, [@text]).content
   end
 
-  def content
-    blocks? ? blocks.map {|b| b.render }.join : nil
-  end
-
   # Public: Fold the first paragraph block into the text
   #
   # Here are the rules for when a folding occurs:
@@ -40,10 +53,10 @@ class ListItem < AbstractBlock
   #
   # Returns nothing
   def fold_first(continuation_connects_first_block = false, content_adjacent = false)
-    if !blocks.empty? && blocks.first.is_a?(Block) &&
-        ((blocks.first.context == :paragraph && !continuation_connects_first_block) ||
-        ((content_adjacent || !continuation_connects_first_block) && blocks.first.context == :literal &&
-            blocks.first.attr('options', []).include?('listparagraph')))
+    if !(first_block = @blocks.first).nil? && first_block.is_a?(Block) &&
+        ((first_block.context == :paragraph && !continuation_connects_first_block) ||
+        ((content_adjacent || !continuation_connects_first_block) && first_block.context == :literal &&
+            first_block.attr('options', []).include?('listparagraph')))
 
       block = blocks.shift
       unless @text.to_s.empty?

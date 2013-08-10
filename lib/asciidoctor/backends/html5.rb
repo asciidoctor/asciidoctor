@@ -336,7 +336,7 @@ when 'qanda'
 <div class="title"><%= title %></div><%
   end %>
 <ol><%
-  content.each do |terms, dd| %>
+  items.each do |terms, dd| %>
 <li><%
     terms.each do |dt| %>
 <p><em><%= dt.text %></em></p><%
@@ -365,7 +365,7 @@ when 'horizontal'
 <col<% if attr? :itemwidth %> style="width:<%= (attr :itemwidth).chomp('%') %>%;"<% end %>>
 </colgroup><%
   end %><%
-  content.each do |terms, dd| %>
+  items.each do |terms, dd| %>
 <tr>
 <td class="hdlist1<%= (option? 'strong') ? 'strong' : nil %>"><%
     terms.each do |dt| %>
@@ -395,7 +395,7 @@ else
 <div class="title"><%= title %></div><%
   end %>
 <dl><%
-  content.each do |terms, dd|
+  items.each do |terms, dd|
     terms.each do |dt| %>
 <dt<%= @style.nil? ? %( class="hdlist1") : nil %>><%= dt.text %></dt><%
     end
@@ -656,7 +656,7 @@ if checklist
   marker_checked = (@document.attr? 'icons', 'font') ? '<i class="icon-check"></i> ' : '<input type="checkbox" data-item-complete="1" checked disabled> '
   marker_unchecked = (@document.attr? 'icons', 'font') ? '<i class="icon-check-empty"></i> ' : '<input type="checkbox" data-item-complete="0" disabled> '
 end
-content.each do |item| %>
+items.each do |item| %>
 <li>
 <p><% if checklist && (item.attr? 'checkbox') %><%= (item.attr? 'checked') ? marker_checked : marker_unchecked %><% end %><%= item.text %></p><%
   if item.blocks? %>
@@ -677,7 +677,7 @@ class BlockOlistTemplate < BaseTemplate
 <%#encoding:UTF-8%><div#{id} class="olist#{style_class}#{role_class}"><%= title? ? %(
 <div class="title">\#{title}</div>) : nil %>
 <ol class="<%= @style %>"<%= (keyword = list_marker_keyword) ? %( type="\#{keyword}") : nil %>#{attribute('start', :start)}><%
-content.each do |item| %>
+items.each do |item| %>
 <li>
 <p><%= item.text %></p><%
   if item.blocks? %>
@@ -698,7 +698,7 @@ class BlockColistTemplate < BaseTemplate
 <div class="title">\#{title}</div>) : nil %><%
 if @document.attr? 'icons' %>
 <table><%
-  content.each_with_index do |item, i| %>
+  items.each_with_index do |item, i| %>
 <tr>
 <td><%
     if @document.attr? 'icons', 'font' %><%= %(<i class="conum" data-value="\#{i + 1}"></i><b>\#{i + 1}</b>) %><%
@@ -710,7 +710,7 @@ if @document.attr? 'icons' %>
 </table><%
 else %>
 <ol><%
-  content.each do |item| %>
+  items.each do |item| %>
 <li>
 <p><%= item.text %></p>
 </li><%
