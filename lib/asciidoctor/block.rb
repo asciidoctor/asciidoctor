@@ -70,7 +70,7 @@ class Block < AbstractBlock
   end
 
   def to_s
-    "#{super.to_s} - #@context [blocks:#{(@blocks || []).size}]"
+    "#@context [blocks:#{(@blocks || []).size}]"
   end
 end
 end

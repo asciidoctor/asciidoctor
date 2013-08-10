@@ -303,27 +303,17 @@ class BlockDlistTemplate < BaseTemplate
     # that change would drastically simplify this template
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><%
-continuing = false;
-entries = content
-last_index = entries.length - 1
 if @style == 'horizontal'
 %><<%= (tag = title? ? 'table' : 'informaltable') %>#{common_attrs_erb} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">#{title_tag}
 <tgroup cols="2">
 <colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
 <colspec colwidth="<%= attr :labelwidth, 85 %>*"/>
 <tbody valign="top"><%
-  entries.each_with_index do |(dt, dd), index|
-    last = (index == last_index)
-    unless continuing %>
+  content.each do |terms, dd| %>
 <row>
 <entry><%
-    end %>
+    terms.each do |dt| %>
 <simpara><%= dt.text %></simpara><%
-    if !last && dd.nil?
-      continuing = true
-      next
-    else
-      continuing = false
     end %>
 </entry>
 <entry><%
@@ -335,10 +325,8 @@ if @style == 'horizontal'
 <%= dd.content.chomp %><%
       end
     end %>
-</entry><%
-    if last || !dd.nil? %>
+</entry>
 </row><%
-    end %><%
   end %>
 </tbody>
 </tgroup>
@@ -348,27 +336,16 @@ else
   if tags[:list]
 %><<%= tags[:list] %>#{common_attrs_erb}>#{title_tag}<%
   end
-  entries.each_with_index do |(dt, dd), index|
-    last = (index == last_index)
-    unless continuing %>
+  content.each do |terms, dd| %>
 <<%= tags[:entry] %>><%
-    end
-    if tags.has_key?(:label)
-      unless continuing %>
+    if tags.has_key? :label %>
 <<%= tags[:label] %>><%
-      end %>
-<<%= tags[:term] %>><%= dt.text %></<%= tags[:term] %>><%
-      if last || !dd.nil? %>
-</<%= tags[:label] %>><%
-      end
-    else %>
+    end
+    terms.each do |dt| %>
 <<%= tags[:term] %>><%= dt.text %></<%= tags[:term] %>><%
     end
-    if !last && dd.nil?
-      continuing = true
-      next
-    else
-      continuing = false
+    if tags.has_key? :label %>
+</<%= tags[:label] %>><%
     end %>
 <<%= tags[:item] %>><%
     unless dd.nil?
