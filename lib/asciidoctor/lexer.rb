@@ -970,12 +970,21 @@ class Lexer
     pairs = []
     block = Block.new(parent, :dlist)
     block.buffer = pairs
+    previous_pair = nil
     # allows us to capture until we find a labeled item
     # that uses the same delimiter (::, :::, :::: or ;;)
     sibling_pattern = REGEXP[:dlist_siblings][match[2]]
 
     begin
-      pairs << next_list_item(reader, block, match, sibling_pattern)
+      term, item = next_list_item(reader, block, match, sibling_pattern)
+      if !previous_pair.nil? && previous_pair.last.nil?
+        previous_pair.pop
+        previous_pair[0] << term
+        previous_pair << item
+      else
+        pairs << [[term], item]
+        previous_pair = pairs.last
+      end
     end while reader.has_more_lines? && match = reader.peek_line.match(sibling_pattern)
 
     block

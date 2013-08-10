@@ -2379,7 +2379,9 @@ last::
       output = render_embedded_string input 
       assert_xpath '//tr', output, 2
       assert_xpath '(//tr)[1]/td[@class="hdlist1"]', output, 1
-      assert_xpath '(//tr)[1]/td[@class="hdlist1"]/br', output, 2
+      # NOTE I'm trimming the trailing <br> in Asciidoctor
+      #assert_xpath '(//tr)[1]/td[@class="hdlist1"]/br', output, 2
+      assert_xpath '(//tr)[1]/td[@class="hdlist1"]/br', output, 1
       assert_xpath '(//tr)[2]/td[@class="hdlist2"]', output, 1
     end
 
