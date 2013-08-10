@@ -1,6 +1,7 @@
 module Asciidoctor
 # Public: Methods for managing AsciiDoc lists (ordered, unordered and labeled lists)
 class List < AbstractBlock
+
   # Public: Create alias for blocks
   alias :items :blocks
   alias :items? :blocks?
@@ -14,6 +15,7 @@ class List < AbstractBlock
     @document.callouts.next_list if @context == :colist
     result
   end
+
 end
 
 # Public: Methods for managing items for AsciiDoc olists, ulist, and dlists.
@@ -71,5 +73,6 @@ class ListItem < AbstractBlock
   def to_s
     "#@context [text:#@text, blocks:#{(@blocks || []).size}]"
   end
+
 end
 end

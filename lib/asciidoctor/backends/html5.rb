@@ -253,14 +253,16 @@ class BlockPreambleTemplate < BaseTemplate
     end
   end
 
-  def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div id="preamble">
+  def result(node)
+    %(<div id="preamble">
 <div class="sectionbody">
-<%= content %>
-</div><%= template.toc(self) %>
-</div>
-    EOS
+#{node.content}
+</div>#{toc(node)}
+</div>\n)
+  end
+
+  def template
+    :invoke_result
   end
 end
 
@@ -318,10 +320,15 @@ class SectionTemplate < BaseTemplate
 end
 
 class BlockFloatingTitleTemplate < BaseTemplate
+  def result(node)
+    tag_name = "h#{node.level + 1}"
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    style_classes = [node.style, node.role].compact
+    %(<#{tag_name}#{id_attribute} class="#{style_classes * ' '}">#{node.title}</#{tag_name}>\n)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><h<%= @level + 1 %>#{id} class="#{style_class false}#{role_class}"><%= title %></h<%= @level + 1 %>>
-    EOS
+    :invoke_result
   end
 end
 
@@ -511,15 +518,14 @@ class BlockAdmonitionTemplate < BaseTemplate
 end
 
 class BlockParagraphTemplate < BaseTemplate
-  def paragraph(id, role, title, content)
-    %(<div#{id && " id=\"#{id}\""} class="paragraph#{role && " #{role}"}">#{title && "
-<div class=\"title\">#{title}</div>"}
-<p>#{content}</p>
-</div>\n)
-  end
-
   def result(node)
-    paragraph(node.id, node.role, (node.title? ? node.title : nil), node.content)
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    style_classes = node.role? ? %(paragraph #{node.role}) : 'paragraph'
+    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
+
+    %(<div#{id_attribute} class="#{style_classes}">#{title_element}
+<p>#{node.content}</p>
+</div>\n)
   end
 
   def template
@@ -528,28 +534,38 @@ class BlockParagraphTemplate < BaseTemplate
 end
 
 class BlockSidebarTemplate < BaseTemplate
+  def result(node)
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    style_classes = node.role? ? %(sidebarblock #{node.role}) : 'sidebarblock'
+    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
+
+    %(<div#{id_attribute} class="#{style_classes}">
+<div class="content">#{title_element}
+#{node.content}
+</div>
+</div>\n)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="sidebarblock#{role_class}">
-<div class="content"><%= title? ? %(
-<div class="title">\#{title}</div>) : nil %>
-<%= content %>
-</div>
-</div>
-    EOS
+    :invoke_result
   end
 end
 
 class BlockExampleTemplate < BaseTemplate
-  def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="exampleblock#{role_class}"><%= title? ? %(
-<div class="title">\#{captioned_title}</div>) : nil %>
+  def result(node)
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    style_classes = node.role? ? %(exampleblock #{node.role}) : 'exampleblock'
+    title_element = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : nil
+
+    %(<div#{id_attribute} class="#{style_classes}">#{title_element}
 <div class="content">
-<%= content %>
+#{node.content}
 </div>
-</div>
-    EOS
+</div>\n)
+  end
+
+  def template
+    :invoke_result
   end
 end
 
@@ -646,48 +662,79 @@ end %>
 end
 
 class BlockUlistTemplate < BaseTemplate
-  def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="ulist<%= (checklist = (option? 'checklist')) ? ' checklist' : nil %>#{style_class}#{role_class}"><%= title? ? %(
-<div class="title">\#{title}</div>) : nil %>
-<ul<%= checklist ? ' class="checklist"' : (!@style.nil? ? %( class="\#{@style}") : nil) %>><%
-if checklist
-  # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
-  marker_checked = (@document.attr? 'icons', 'font') ? '<i class="icon-check"></i> ' : '<input type="checkbox" data-item-complete="1" checked disabled> '
-  marker_unchecked = (@document.attr? 'icons', 'font') ? '<i class="icon-check-empty"></i> ' : '<input type="checkbox" data-item-complete="0" disabled> '
-end
-items.each do |item| %>
-<li>
-<p><% if checklist && (item.attr? 'checkbox') %><%= (item.attr? 'checked') ? marker_checked : marker_unchecked %><% end %><%= item.text %></p><%
-  if item.blocks? %>
-<%= item.content %><%
-  end %>
-</li><%
-end %>
+  def result(node)
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    div_style_classes = ['ulist', node.style, node.role].compact
+    marker_checked = nil
+    marker_unchecked = nil
+    if (checklist = (node.option? 'checklist'))
+      div_style_classes.insert(1, 'checklist')
+      ul_class_attribute = ' class="checklist"'
+      if node.document.attr? 'icons', 'font'
+        marker_checked = '<i class="icon-check"></i> '
+        marker_unchecked = '<i class="icon-check-empty"></i> '
+      else
+        # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
+        marker_checked = '<input type="checkbox" data-item-complete="1" checked disabled> '
+        marker_unchecked = '<input type="checkbox" data-item-complete="0" disabled> '
+      end
+    elsif !node.style.nil?
+      ul_class_attribute = %( class="#{node.style}")
+    else
+      ul_class_attribute = nil
+    end
+    div_class_attribute = %( class="#{div_style_classes * ' '}")
+    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
+    item_elements = []
+    node.items.each do |item|
+      item_content = item.blocks? ? %(\n#{item.content}) : nil
+      if checklist && (item.attr? 'checkbox')
+        marker = (item.attr? 'checked') ? marker_checked : marker_unchecked
+      else
+        marker = nil
+      end
+      item_elements << %(<li>
+<p>#{marker}#{item.text}</p>#{item_content}
+</li>\n)
+    end
+
+    %(<div#{id_attribute}#{div_class_attribute}>#{title_element}
+<ul#{ul_class_attribute}>
+#{item_elements.join}
 </ul>
-</div>
-    EOS
+</div>\n)
+  end
+
+  def template
+    :invoke_result
   end
 end
 
 class BlockOlistTemplate < BaseTemplate
+  def result(node)
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    div_style_classes = ['olist', node.style, node.role].compact
+    div_class_attribute = %( class="#{div_style_classes * ' '}")
+    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
+    type_attribute = (keyword = node.list_marker_keyword) ? %( type="#{keyword}") : nil
+    start_attribute = (node.attr? 'start') ? %( start="#{node.attr 'start'}") : nil
+    item_elements = []
+    node.items.each do |item|
+      item_content = item.blocks? ? %(\n#{item.content}) : nil
+      item_elements << %(<li>
+<p>#{item.text}</p>#{item_content}
+</li>\n)
+    end
+
+    %(<div#{id_attribute}#{div_class_attribute}>#{title_element}
+<ol class="#{node.style}"#{type_attribute}#{start_attribute}>
+#{item_elements.join}
+</ol>
+</div>\n)
+  end
 
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="olist#{style_class}#{role_class}"><%= title? ? %(
-<div class="title">\#{title}</div>) : nil %>
-<ol class="<%= @style %>"<%= (keyword = list_marker_keyword) ? %( type="\#{keyword}") : nil %>#{attribute('start', :start)}><%
-items.each do |item| %>
-<li>
-<p><%= item.text %></p><%
-  if item.blocks? %>
-<%= item.content %><%
-  end %>
-</li><%
-end %>
-</ol>
-</div>
-    EOS
+    :invoke_result
   end
 end
 

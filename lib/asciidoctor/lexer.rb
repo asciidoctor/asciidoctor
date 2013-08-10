@@ -293,7 +293,7 @@ class Lexer
 
     if preamble && !preamble.blocks?
       # drop the preamble if it has no content
-      section.delete_at(0)
+      section.blocks.delete_at(0)
     end
 
     # The attributes returned here are orphaned attributes that fall at the end
@@ -469,12 +469,12 @@ class Lexer
               list_item = next_list_item(reader, block, match)
               expected_index += 1
               if !list_item.nil?
-                block << list_item
-                coids = document.callouts.callout_ids(block.size)
+                block.items << list_item
+                coids = document.callouts.callout_ids(block.items.size)
                 if !coids.empty?
                   list_item.attributes['coids'] = coids
                 else
-                  puts "asciidoctor: WARNING: line #{reader.lineno}: no callouts refer to list item #{block.size}"
+                  puts "asciidoctor: WARNING: line #{reader.lineno}: no callouts refer to list item #{block.items.size}"
                 end
               end
             end while reader.has_more_lines? && match = reader.peek_line.match(REGEXP[:colist])
@@ -492,7 +492,7 @@ class Lexer
             block = next_outline_list(reader, :olist, parent)
             # QUESTION move this logic to next_outline_list?
             if !attributes['style'] && !block.attributes['style']
-              marker = block.first.marker
+              marker = block.items.first.marker
               if marker.start_with? '.'
                 # first one makes more sense, but second one is AsciiDoc-compliant
                 #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES.first).to_s
@@ -876,20 +876,20 @@ class Lexer
     else
       list_block.level = 1
     end
-    Debug.debug { "Created #{list_type} block: #{list_block}" }
+    #Debug.debug { "Created #{list_type} block: #{list_block}" }
 
     while reader.has_more_lines? && (match = reader.peek_line.match(REGEXP[list_type]))
       marker = resolve_list_marker(list_type, match[1])
 
       # if we are moving to the next item, and the marker is different
       # determine if we are moving up or down in nesting
-      if list_block.size > 0 && marker != list_block.first.marker
+      if list_block.items? && marker != list_block.items.first.marker
         # assume list is nested by default, but then check to see if we are
         # popping out of a nested list by matching an ancestor's list marker
         this_item_level = list_block.level + 1
         ancestor = parent
         while ancestor.context == list_type
-          if marker == ancestor.first.marker
+          if marker == ancestor.items.first.marker
             this_item_level = ancestor.level
             break
           end
@@ -899,7 +899,7 @@ class Lexer
         this_item_level = list_block.level
       end
 
-      if list_block.size == 0 || this_item_level == list_block.level
+      if !list_block.items? || this_item_level == list_block.level
         list_item = next_list_item(reader, list_block, match)
       elsif this_item_level < list_block.level
         # leave this block
@@ -907,10 +907,10 @@ class Lexer
       elsif this_item_level > list_block.level
         # If this next list level is down one from the
         # current Block's, append it to content of the current list item
-        list_block.last << next_block(reader, list_block)
+        list_block.items.last << next_block(reader, list_block)
       end
 
-      list_block << list_item unless list_item.nil?
+      list_block.items << list_item unless list_item.nil?
       list_item = nil
 
       reader.skip_blank_lines
@@ -976,7 +976,7 @@ class Lexer
         previous_pair[0] << term
         previous_pair << item
       else
-        block << (previous_pair = [[term], item])
+        block.items << (previous_pair = [[term], item])
       end
     end while reader.has_more_lines? && match = reader.peek_line.match(sibling_pattern)
 
@@ -1031,7 +1031,7 @@ class Lexer
       end
 
       if !sibling_trait
-        sibling_trait = resolve_list_marker(list_type, match[1], list_block.size, true)
+        sibling_trait = resolve_list_marker(list_type, match[1], list_block.items.size, true)
       end
       list_item.marker = sibling_trait
       has_text = true

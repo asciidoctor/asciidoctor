@@ -168,7 +168,7 @@ module Asciidoctor
     '<'  => :page_break
   }
 
-  LIST_CONTEXTS = [:ulist, :olist, :dlist, :colist]
+  #LIST_CONTEXTS = [:ulist, :olist, :dlist, :colist]
 
   NESTABLE_LIST_CONTEXTS = [:ulist, :olist, :dlist]
 
