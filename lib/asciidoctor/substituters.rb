@@ -95,10 +95,11 @@ module Substituters
   def apply_literal_subs(lines)
     if attr? 'subs'
       apply_subs(lines.join, resolve_subs(attr 'subs'))
-    elsif @document.attributes['basebackend'] == 'html' && @style == 'source' &&
-      @document.attributes['source-highlighter'] == 'coderay' && attr?('language')
+    elsif @style == 'source' && @document.attributes['basebackend'] == 'html' &&
+      (highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
+      highlighter == 'pygments' && attr?('language')
       #sub_callouts(highlight_source(lines.join))
-      highlight_source(lines.join, true)
+      highlight_source(lines.join, highlighter, true)
     else
       apply_subs(lines.join, COMPOSITE_SUBS[:verbatim])
     end
@@ -890,8 +891,8 @@ module Substituters
   #
   # returns the highlighted source code, if a source highlighter is defined
   # on the document, otherwise the unprocessed text
-  def highlight_source(source, sub_callouts)
-    Helpers.require_library 'coderay', true
+  def highlight_source(source, highlighter, sub_callouts)
+    Helpers.require_library highlighter, true
     callout_marks = {}
     lineno = 0
     if sub_callouts
@@ -912,10 +913,24 @@ module Substituters
       } * "\n"
     end
 
-    result = ::CodeRay::Duo[attr('language', 'text').to_sym, :html, {
-        :css => @document.attributes.fetch('coderay-css', 'class').to_sym,
-        :line_numbers => (attr?('linenums') ? @document.attributes.fetch('coderay-linenums-mode', 'table').to_sym : nil),
-        :line_number_anchors => false}].highlight(source).chomp
+    case highlighter
+      when 'coderay'
+        result = ::CodeRay::Duo[attr('language', 'text').to_sym, :html, {
+            :css => @document.attributes.fetch('coderay-css', 'class').to_sym,
+            :line_numbers => (attr?('linenums') ? @document.attributes.fetch('coderay-linenums-mode', 'table').to_sym : nil),
+            :line_number_anchors => false}].highlight(source).chomp
+      when 'pygments'
+        lexer = ::Pygments::Lexer[attr('language')]
+        if lexer
+          opts = {:nobackground => true, :classprefix => 'tok-'}
+          opts[:noclasses] = true if @document.attr?('pygments-css', 'style')
+          opts[:linenos] = true if attr? 'linenums'
+          result = lexer.highlight(source, :options => opts).sub(/<div class="highlight">(.*)<\/div>/m, '\1')
+        else
+          result = source
+        end
+    end
+
     if !sub_callouts || callout_marks.empty?
       result
     else

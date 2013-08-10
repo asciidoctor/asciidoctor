@@ -890,8 +890,9 @@ module Asciidoctor
       if !stream_output && doc.safe < SafeMode::SECURE && doc.attr?('basebackend-html') &&
           doc.attr?('copycss') && doc.attr?('linkcss')
         copy_asciidoctor_stylesheet = DEFAULT_STYLESHEET_KEYS.include?(doc.attr 'stylesheet')
-        copy_coderay_stylesheet = (doc.attr? 'source-highlighter', 'coderay') && (doc.attr 'coderay-css', 'class') == 'class'
-        if copy_asciidoctor_stylesheet || copy_coderay_stylesheet
+        copy_coderay_stylesheet = (doc.attr? 'source-highlighter', 'coderay') && !(doc.attr? 'coderay-css', 'style')
+        copy_pygments_stylesheet = (doc.attr? 'source-highlighter', 'pygments') && !(doc.attr? 'pygments-css', 'style')
+        if copy_asciidoctor_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet
           Helpers.require_library 'fileutils'
           outdir = doc.attr('outdir')
           stylesdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir,
@@ -906,6 +907,12 @@ module Asciidoctor
           if copy_coderay_stylesheet
             File.open(File.join(stylesdir, 'asciidoctor-coderay.css'), 'w') {|f|
               f.write Asciidoctor::HTML5.default_coderay_stylesheet
+            }
+          end
+
+          if copy_pygments_stylesheet
+            File.open(File.join(stylesdir, 'asciidoctor-pygments.css'), 'w') {|f|
+              f.write Pygments.css '.highlight', :classprefix => 'tok-', :style => (doc.attr 'pygments-style', 'pastie')
             }
           end
         end

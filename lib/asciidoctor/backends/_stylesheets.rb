@@ -8,7 +8,7 @@ module HTML5
     #::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
     <<'DEFAULT_CODERAY_STYLESHEET'
 /* Foundation stylesheet for CodeRay (to match GitHub theme) | MIT License | http://foundation.zurb.com */
-table.CodeRay { border-collapse: collapse; width: 100%; padding: 2px; margin-bottom: 0; border: 0; background: transparent; }
+table.CodeRay { border-collapse: collapse; padding: 2px; margin-bottom: 0; border: 0; background: transparent; }
 table.CodeRay td { padding: 0 .5em; vertical-align: top; }
 table.CodeRay td.line-numbers { text-align: right; color: #999; border-right: 1px solid #e5e5e5; padding-left: 0; }
 span.line-numbers { border-right: 1px solid #E5E5E5; color: #999; display: inline-block; margin-right: 0.5em; padding-right: 0.5em; }
@@ -316,6 +316,11 @@ pre { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospa
 .listingblock:hover .javascript:before { content: "javascript"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
 .listingblock:hover .css:before { content: "css"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
 .listingblock:hover .scss:before { content: "scss"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
+table.highlighttable { border: 0; margin-bottom: 0; }
+table.highlighttable td.code, table.highlighttable td.linenos { vertical-align: top; padding-top: 0; padding-bottom: 0; }
+table.highlighttable td.code { padding-left: 1em; padding-right: 0; }
+table.highlighttable td.linenos { color: #999; padding-left: 0; padding-right: .75em; border-right: 1px solid #dddddd; }
+table.highlighttable td.code > pre { margin-bottom: -1.6em; }
 .quoteblock { margin: 0 0 1.25em; padding: 0.5625em 1.25em 0 1.1875em; border-left: 1px solid #dddddd; }
 .quoteblock blockquote { margin: 0 0 1.25em 0; padding: 0 0 0.5625em 0; border: 0; }
 .quoteblock blockquote > .paragraph:last-child p { margin-bottom: 0; }
