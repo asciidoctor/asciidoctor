@@ -18,6 +18,11 @@ context 'Sections' do
       assert_equal '_section_one', sec.id
     end
 
+    test 'synthetic id removes entities' do
+      sec = block_from_string('== Ben & Jerry &#34;Ice Cream Brothers&#34;')
+      assert_equal '_ben_jerry_ice_cream_brothers', sec.id
+    end
+
     test 'synthetic id prefix can be customized' do
       sec = block_from_string(":idprefix: id_\n\n== Section One")
       assert_equal 'id_section_one', sec.id
@@ -26,6 +31,11 @@ context 'Sections' do
     test 'synthetic id prefix can be set to blank' do
       sec = block_from_string(":idprefix:\n\n== Section One")
       assert_equal 'section_one', sec.id
+    end
+
+    test 'synthetic id prefix is stripped from beginning of id if set to blank' do
+      sec = block_from_string(":idprefix:\n\n== & More")
+      assert_equal 'more', sec.id
     end
 
     test 'synthetic id separator can be customized' do
