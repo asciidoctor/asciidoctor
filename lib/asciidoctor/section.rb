@@ -80,16 +80,26 @@ class Section < AbstractBlock
   #   another_section.title = "Foo"
   #   another_section.generate_id
   #   => "_foo_1"
+  #
+  #   yet_another_section = Section.new(parent)
+  #   yet_another_section.title = "Ben & Jerry"
+  #   yet_another_section.generate_id
+  #   => "_ben_jerry"
   def generate_id
     if @document.attr? 'sectids'
       separator = @document.attr('idseparator', '_')
-      # FIXME define constants for these regexps
-      base_id = @document.attr('idprefix', '_') + title.downcase.gsub(/&#[0-9]+;/, separator).
-          gsub(/\W+/, separator).tr_s(separator, separator).chomp(separator)
+      idprefix = @document.attr('idprefix', '_')
+      base_id = idprefix + title.downcase.gsub(REGEXP[:illegal_sectid_chars], separator).
+          tr_s(separator, separator).chomp(separator)
+      # ensure id doesn't begin with idprefix if requested it doesn't
+      if idprefix.empty? && base_id.start_with?(separator)
+        base_id = base_id[1..-1]
+        base_id = base_id[1..-1] while base_id.start_with?(separator)
+      end
       gen_id = base_id
       cnt = 2
-      while @document.references[:ids].has_key? gen_id 
-        gen_id = "#{base_id}#{separator}#{cnt}" 
+      while @document.references[:ids].has_key? gen_id
+        gen_id = "#{base_id}#{separator}#{cnt}"
         cnt += 1
       end 
       gen_id

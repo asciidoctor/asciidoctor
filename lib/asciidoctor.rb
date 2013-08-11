@@ -356,6 +356,8 @@ module Asciidoctor
                            ';;' => /^(?!\/\/)[[:blank:]]*(.*)(;;)(?:[[:blank:]]+(.*))?$/
                          },
 
+    :illegal_sectid_chars => /&(?:[[:alpha:]]+|#[[:digit:]]+|#x[[:alnum:]]+);|\W+?/,
+
     # footnote:[text]
     # footnoteref:[id,text]
     # footnoteref:[id]
