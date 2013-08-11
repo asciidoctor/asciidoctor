@@ -925,8 +925,8 @@ This is a passthrough block.
 
       block = block_from_string input
       assert !block.nil?
-      assert_equal 1, block.buffer.size
-      assert_equal 'This is a passthrough block.', block.buffer.first
+      assert_equal 1, block.lines.size
+      assert_equal 'This is a passthrough block.', block.source
     end
 
     test 'performs passthrough subs on a passthrough block' do

@@ -261,6 +261,23 @@ class Reader
     end
   end
 
+  # Public: Return whether the next line is empty. Does not consume the line returned.
+  #
+  # preprocess - A Boolean flag indicating whether to evaluate preprocessing
+  #              directives (macros) before reading line (default: true)
+  #
+  # Returns a Boolean indicating whether the next line of the source data is empty.
+  # Returns true if there is no more data.
+  def next_line_empty?(preprocess = true)
+    if !preprocess
+      @eof || (@eof = @lines.empty?) ? true : @lines.first.chomp.empty?
+    elsif has_more_lines? true
+      @lines.first.chomp.empty?
+    else
+      true
+    end
+  end
+
   # Public: Get the next line of source data. Does not consume the line returned.
   #
   # preprocess - A Boolean flag indicating whether to evaluate preprocessing

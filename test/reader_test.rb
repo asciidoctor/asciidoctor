@@ -158,9 +158,9 @@ This is a paragraph outside the block.
 include::include-file.asciidoc[]
       EOS
       para = block_from_string input, :attributes => { 'include-depth' => 0 }
-      assert_equal 1, para.buffer.size
-      #assert_equal 'include::include-file.asciidoc[]', para.buffer.join
-      assert_equal 'link:include-file.asciidoc[include-file.asciidoc]', para.buffer.join
+      assert_equal 1, para.lines.size
+      #assert_equal 'include::include-file.asciidoc[]', para.source
+      assert_equal 'link:include-file.asciidoc[include-file.asciidoc]', para.source
     end
 
     test 'include macro is enabled when safe mode is less than SECURE' do
@@ -340,8 +340,8 @@ yo
 \\include::include-file.asciidoc[]
       EOS
       para = block_from_string input
-      assert_equal 1, para.buffer.size
-      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+      assert_equal 1, para.lines.size
+      assert_equal 'include::include-file.asciidoc[]', para.source
     end
 
     test 'include macro not at start of line is ignored' do
@@ -349,10 +349,10 @@ yo
  include::include-file.asciidoc[]
       EOS
       para = block_from_string input
-      assert_equal 1, para.buffer.size
+      assert_equal 1, para.lines.size
       # NOTE the space gets stripped because the line is treated as an inline literal
       assert_equal :literal, para.context
-      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+      assert_equal 'include::include-file.asciidoc[]', para.source
     end
 
     test 'include macro is disabled when include-depth attribute is 0' do
@@ -360,8 +360,8 @@ yo
 include::include-file.asciidoc[]
       EOS
       para = block_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'include-depth' => 0 }
-      assert_equal 1, para.buffer.size
-      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+      assert_equal 1, para.lines.size
+      assert_equal 'include::include-file.asciidoc[]', para.source
     end
 
     test 'include-depth cannot be set by document' do
@@ -371,8 +371,8 @@ include::include-file.asciidoc[]
 include::include-file.asciidoc[]
       EOS
       para = block_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'include-depth' => 0 }
-      assert_equal 1, para.buffer.size
-      assert_equal 'include::include-file.asciidoc[]', para.buffer.join
+      assert_equal 1, para.lines.size
+      assert_equal 'include::include-file.asciidoc[]', para.source
     end
   end
 

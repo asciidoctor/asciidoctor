@@ -121,6 +121,12 @@ class AbstractNode
     end
   end
 
+  # TODO document me
+  def set_option(name)
+    @attributes['options'] ||= []
+    @attributes['options'] << name
+  end
+
   # Public: A convenience method to check if the specified option attribute is
   # enabled on the current node.
   #

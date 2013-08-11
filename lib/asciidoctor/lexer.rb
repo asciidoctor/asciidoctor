@@ -101,7 +101,7 @@ class Lexer
         assigned_doctitle = doctitle
       end
       document.attributes['doctitle'] = section_title = doctitle
-      # QUESTION: should this be encapsulated in document?
+      # QUESTION: should the id assignment on Document be encapsulated in the Document class?
       if document.id.nil? && block_attributes.has_key?('id')
         document.id = block_attributes.delete('id')
       end
@@ -356,7 +356,7 @@ class Lexer
       #  break
       end
 
-      # QUESTION introduce parsing context object?
+      # QUESTION should we introduce a parsing context object?
       this_line = reader.get_line
       delimited_block = false
       block_context = nil
@@ -404,13 +404,13 @@ class Lexer
           if !text_only
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
             if (match = this_line.match(REGEXP[:break_line]))
-              block = Block.new(parent, BREAK_LINES[match[0][0..0]])
+              block = Block.new(parent, BREAK_LINES[match[0][0..0]], :simple)
               break
 
             # TODO make this a media_blk and handle image, video & audio
             elsif (match = this_line.match(REGEXP[:media_blk_macro]))
               blk_ctx = match[1].to_sym
-              block = Block.new(parent, blk_ctx)
+              block = Block.new(parent, blk_ctx, :simple)
               if blk_ctx == :image
                 posattrs = ['alt', 'width', 'height']
               elsif blk_ctx == :video
@@ -448,7 +448,7 @@ class Lexer
 
             # NOTE we're letting the toc macro have attributes
             elsif (match = this_line.match(REGEXP[:toc]))
-              block = Block.new(parent, :toc)
+              block = Block.new(parent, :toc, :simple)
               block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
               break
 
@@ -513,7 +513,7 @@ class Lexer
             reader.unshift_line this_line
             float_id, float_title, float_level, _ = parse_section_title(reader, document)
             float_id ||= attributes['id'] if attributes.has_key?('id')
-            block = Block.new(parent, :floating_title)
+            block = Block.new(parent, :floating_title, :simple)
             if float_id.nil? || float_id.empty?
               # FIXME remove hack of creating throwaway Section to get at the generate_id method
               tmp_sect = Section.new(parent)
@@ -552,7 +552,7 @@ class Lexer
           if style != 'normal' && this_line.match(REGEXP[:lit_par])
             # So we need to actually include this one in the grab_lines group
             reader.unshift_line this_line
-            buffer = reader.grab_lines_until(
+            lines = reader.grab_lines_until(
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true,
                 :preserve_last_line => true) {|line|
@@ -564,20 +564,17 @@ class Lexer
               (COMPLIANCE[:block_terminates_paragraph] && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
             }
 
-            reset_block_indent! buffer
+            reset_block_indent! lines
 
-            block = Block.new(parent, :literal, buffer)
+            block = Block.new(parent, :literal, :verbatim, attributes, lines)
             # a literal gets special meaning inside of a definition list
-            if in_list
-              attributes['options'] ||= []
-              # TODO this feels hacky, better way to distinguish from explicit literal block?
-              attributes['options'] << 'listparagraph'
-            end
+            # TODO this feels hacky, better way to distinguish from explicit literal block?
+            block.set_option('listparagraph') if in_list
 
           # a paragraph is contiguous nonblank/noncontinuation lines
           else
             reader.unshift_line this_line
-            buffer = reader.grab_lines_until(
+            lines = reader.grab_lines_until(
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true,
                 :preserve_last_line => true,
@@ -593,23 +590,23 @@ class Lexer
             # NOTE we need this logic because we've asked the reader to skip
             # line comments, which may leave us w/ an empty buffer if those
             # were the only lines found
-            if buffer.empty?
+            if lines.empty?
               # call get_line since the reader preserved the last line
               reader.get_line
               return nil
             end
 
-            catalog_inline_anchors(buffer.join, document)
+            catalog_inline_anchors(lines.join, document)
 
-            first_line = buffer.first
+            first_line = lines.first
             if !text_only && (admonition_match = first_line.match(REGEXP[:admonition_inline]))
-              buffer[0] = admonition_match.post_match.lstrip
-              block = Block.new(parent, :admonition, buffer)
+              lines[0] = admonition_match.post_match.lstrip
               attributes['style'] = admonition_match[1]
               attributes['name'] = admonition_name = admonition_match[1].downcase
               attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
+              block = Block.new(parent, :admonition, :simple, attributes, lines)
             elsif !text_only && COMPLIANCE[:markdown_syntax] && first_line.start_with?('> ')
-              buffer.map! {|line|
+              lines.map! {|line|
                 if line.start_with?('> ')
                   line[2..-1]
                 elsif line.chomp == '>'
@@ -619,10 +616,10 @@ class Lexer
                 end
               }
 
-              if buffer.last.start_with?('-- ')
-                attribution, citetitle = buffer.pop[3..-1].split(', ', 2)
-                buffer.pop while buffer.last.chomp.empty?
-                buffer[-1] = buffer.last.chomp
+              if lines.last.start_with?('-- ')
+                attribution, citetitle = lines.pop[3..-1].split(', ', 2)
+                lines.pop while lines.last.chomp.empty?
+                lines[-1] = lines.last.chomp
               else
                 attribution, citetitle = nil
               end
@@ -631,27 +628,27 @@ class Lexer
               attributes['citetitle'] = citetitle unless citetitle.nil?
               # NOTE will only detect headings that are floating titles (not section titles)
               # TODO could assume a floating title when inside a block context
-              block = build_block(:quote, :complex, false, parent, Reader.new(buffer), attributes)
-            elsif !text_only && buffer.size > 1 && first_line.start_with?('"') &&
-                buffer.last.start_with?('-- ') && buffer[-2].chomp.end_with?('"')
-              buffer[0] = first_line[1..-1]
-              attribution, citetitle = buffer.pop[3..-1].split(', ', 2)
-              buffer.pop while buffer.last.chomp.empty?
-              buffer[-1] = buffer.last.chomp.chop
+              block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
+            elsif !text_only && lines.size > 1 && first_line.start_with?('"') &&
+                lines.last.start_with?('-- ') && lines[-2].chomp.end_with?('"')
+              lines[0] = first_line[1..-1]
+              attribution, citetitle = lines.pop[3..-1].split(', ', 2)
+              lines.pop while lines.last.chomp.empty?
+              lines[-1] = lines.last.chomp.chop
               attributes['style'] = 'quote'
               attributes['attribution'] = attribution unless attribution.nil?
               attributes['citetitle'] = citetitle unless citetitle.nil?
-              block = Block.new(parent, :quote, buffer)
-              #block = Block.new(parent, :quote)
-              #block << Block.new(block, :paragraph, buffer)
+              block = Block.new(parent, :quote, :simple, attributes, lines)
+              #block = Block.new(parent, :quote, :compound, attributes)
+              #block << Block.new(block, :paragraph, :simple, {}, lines)
             else
-              # QUESTION is this necessary?
-              #if style == 'normal' && [' ', "\t"].include?(buffer.first[0..0])
+              # QUESTION is stripping whitespace from start of paragraph lines necessary? (currently disabled)
+              #if style == 'normal' && [' ', "\t"].include?(lines.first[0..0])
               #  # QUESTION should we only trim leading blanks?
-              #  buffer.map! &:lstrip
+              #  lines.map! &:lstrip
               #end
 
-              block = Block.new(parent, :paragraph, buffer)
+              block = Block.new(parent, :paragraph, :simple, attributes, lines)
             end
           end
 
@@ -670,14 +667,14 @@ class Lexer
         when :admonition
           attributes['name'] = admonition_name = style.downcase
           attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
-          block = build_block(block_context, :complex, terminator, parent, reader, attributes)
+          block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :comment
           build_block(block_context, :skip, terminator, parent, reader, attributes)
           return nil
 
         when :example
-          block = build_block(block_context, :complex, terminator, parent, reader, attributes, {:supports_caption => true})
+          block = build_block(block_context, :compound, terminator, parent, reader, attributes, {:supports_caption => true})
 
         when :listing, :fenced_code, :source
           if block_context == :fenced_code
@@ -694,10 +691,10 @@ class Lexer
           block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
         
         when :pass
-          block = build_block(block_context, :simple, terminator, parent, reader, attributes)
+          block = build_block(block_context, :raw, terminator, parent, reader, attributes)
 
         when :open, :sidebar
-          block = build_block(block_context, :complex, terminator, parent, reader, attributes)
+          block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :table
           block_reader = Reader.new reader.grab_lines_until(:terminator => terminator, :skip_line_comments => true)
@@ -711,7 +708,7 @@ class Lexer
 
         when :quote, :verse
           AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
-          block = build_block(block_context, (block_context == :verse ? :verbatim : :complex), terminator, parent, reader, attributes)
+          block = build_block(block_context, (block_context == :verse ? :verbatim : :compound), terminator, parent, reader, attributes)
 
         else
           # this should only happen if there is a misconfiguration
@@ -739,8 +736,9 @@ class Lexer
       end
       block.update_attributes(attributes)
 
+      # FIXME callout capabilities should be a setting on the block
       if block.context == :listing || block.context == :literal
-        catalog_callouts(block.buffer.join, document)
+        catalog_callouts(block.source, document)
       end
     end
 
@@ -803,54 +801,55 @@ class Lexer
   # whether a block supports complex content should be a config setting
   # if terminator is false, that means the all the lines in the reader should be parsed
   # NOTE could invoke filter in here, before and after parsing
-  def self.build_block(block_context, content_type, terminator, parent, reader, attributes, options = {})
-    if content_type == :skip
-      skip = true
-      content_type = :simple
+  def self.build_block(block_context, content_model, terminator, parent, reader, attributes, options = {})
+    if content_model == :skip || content_model == :raw
+      parse_as_content_model = :simple
     else
-      skip = false
+      parse_as_content_model = content_model
     end
 
     if terminator.nil?
-      if content_type == :verbatim
-        buffer = reader.grab_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
+      if parse_as_content_model == :verbatim
+        lines = reader.grab_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
       else
-        buffer = reader.grab_lines_until(
+        content_model = :simple if content_model == :compound
+        lines = reader.grab_lines_until(
             :break_on_blank_lines => true,
             :break_on_list_continuation => true,
             :preserve_last_line => true,
             :skip_line_comments => true) {|line|
           COMPLIANCE[:block_terminates_paragraph] && (is_delimited_block?(line) || line.match(REGEXP[:attr_line]))
         }
-        # QUESTION check for empty buffer?
+        # QUESTION check for empty lines after grabbing lines for simple content model?
       end
-    elsif content_type != :complex
-      buffer = reader.grab_lines_until(:terminator => terminator, :chomp_last_line => true)
+    elsif parse_as_content_model != :compound
+      lines = reader.grab_lines_until(:terminator => terminator, :chomp_last_line => true)
+    # terminator is false when reader has already been prepared
     elsif terminator == false
-      buffer = nil
+      lines = nil
       block_reader = reader
     else
-      buffer = nil
+      lines = nil
       block_reader = Reader.new reader.grab_lines_until(:terminator => terminator)
     end
 
-    if skip
+    if content_model == :skip
       attributes.clear
-      return buffer
+      return lines
     end
 
-    if content_type == :verbatim && attributes.has_key?('indent')
-      reset_block_indent! buffer, attributes['indent'].to_i
+    if content_model == :verbatim && attributes.has_key?('indent')
+      reset_block_indent! lines, attributes['indent'].to_i
     end
 
-    block = Block.new(parent, block_context, buffer)
+    block = Block.new(parent, block_context, content_model, attributes, lines)
     # should supports_caption be necessary?
     if options.fetch(:supports_caption, false)
       block.title = attributes.delete('title') if attributes.has_key?('title')
       block.assign_caption attributes.delete('caption')
     end
 
-    if buffer.nil?
+    if content_model == :compound
       # we can look for blocks until there are no more lines (and not worry
       # about sections) since the reader is confined within the boundaries of a
       # delimited block
@@ -1510,7 +1509,7 @@ class Lexer
     implicit_author = nil
     implicit_authors = nil
 
-    if reader.has_more_lines? && !reader.peek_line.chomp.empty?
+    if reader.has_more_lines? && !reader.next_line_empty?
       author_metadata = process_authors reader.get_line
 
       unless author_metadata.empty?
@@ -1534,7 +1533,7 @@ class Lexer
 
       rev_metadata = {}
 
-      if reader.has_more_lines? && !reader.peek_line.chomp.empty?
+      if reader.has_more_lines? && !reader.next_line_empty?
         rev_line = reader.get_line 
         if match = rev_line.match(REGEXP[:revision_info])
           rev_metadata['revdate'] = match[2].strip
@@ -1987,8 +1986,7 @@ class Lexer
           if !next_cell_spec.nil?
             parser_ctx.close_open_cell next_cell_spec
           else
-            # QUESTION do we not advance to next line? if so, when
-            # will we if we came into this block?
+            # QUESTION do we not advance to next line? if so, when will we if we came into this block?
           end
         end
       end
@@ -2022,7 +2020,7 @@ class Lexer
           # no other delimiters to see here
           # suck up this line into the buffer and move on
           parser_ctx.buffer = %(#{parser_ctx.buffer}#{line})
-          # QUESTION make this an option? (unwrap-option?)
+          # QUESTION make stripping endlines in csv data an option? (unwrap-option?)
           if parser_ctx.format == 'csv'
             parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} )
           end

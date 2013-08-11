@@ -39,8 +39,7 @@ class ListItem < AbstractBlock
   end
 
   def text
-    # this will allow the text to be processed
-    Block.new(self, nil, [@text]).content
+    apply_subs @text
   end
 
   # Public: Fold the first paragraph block into the text
@@ -62,10 +61,10 @@ class ListItem < AbstractBlock
 
       block = blocks.shift
       unless @text.to_s.empty?
-        block.buffer.unshift("#@text\n")
+        block.lines.unshift("#@text\n")
       end
 
-      @text = block.buffer.join
+      @text = block.source
     end
     nil
   end
