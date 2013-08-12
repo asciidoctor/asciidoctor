@@ -710,14 +710,21 @@ class Document < AbstractBlock
   # attribute is set, read the doc-name.docinfo.ext file. If the docinfo2
   # attribute is set, read both files in that order.
   #
+  # pos - The Symbol position of the docinfo, either :header or :footer. (default: :header)
   # ext - The extension of the docinfo file(s). If not set, the extension
   #       will be determined based on the basebackend. (default: nil)
   #
   # returns The contents of the docinfo file(s)
-  def docinfo(ext = nil)
+  def docinfo(pos = :header, ext = nil)
     if safe >= SafeMode::SECURE
       ''
     else
+      case pos
+      when :footer
+        qualifier = '-footer'
+      else
+        qualifier = nil
+      end
       ext = @attributes['outfilesuffix'] if ext.nil?
 
       content = nil
@@ -725,7 +732,7 @@ class Document < AbstractBlock
       docinfo = @attributes.has_key?('docinfo')
       docinfo1 = @attributes.has_key?('docinfo1')
       docinfo2 = @attributes.has_key?('docinfo2')
-      docinfo_filename = "docinfo#{ext}"
+      docinfo_filename = "docinfo#{qualifier}#{ext}"
       if docinfo1 || docinfo2
         docinfo_path = normalize_system_path(docinfo_filename)
         content = read_asset(docinfo_path)

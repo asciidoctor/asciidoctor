@@ -185,7 +185,8 @@ end
 if attr? 'last-update-label' %>
 <%= %(\#{attr 'last-update-label'} \#{attr :docdatetime}) %><%
 end %>
-</div>
+</div><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
+\#{docinfo_content}) %>
 </div>
 </body>
 </html>
