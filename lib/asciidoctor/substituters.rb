@@ -802,7 +802,7 @@ module Substituters
     str = sub_attributes(str) if str.include?('{')
     str = str.strip
     # for compliance, only consider first positional attribute
-    str, rest = str.split(',', 2) if str.include?(',')
+    str, _ = str.split(',', 2) if str.include?(',')
 
     if str.empty?
       {}
