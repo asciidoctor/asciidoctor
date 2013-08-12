@@ -312,7 +312,7 @@ if @style == 'horizontal'
   items.each do |terms, dd| %>
 <row>
 <entry><%
-    terms.each do |dt| %>
+    [*terms].each do |dt| %>
 <simpara><%= dt.text %></simpara><%
     end %>
 </entry>
@@ -341,7 +341,7 @@ else
     if tags.has_key? :label %>
 <<%= tags[:label] %>><%
     end
-    terms.each do |dt| %>
+    [*terms].each do |dt| %>
 <<%= tags[:term] %>><%= dt.text %></<%= tags[:term] %>><%
     end
     if tags.has_key? :label %>

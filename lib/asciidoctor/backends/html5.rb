@@ -363,7 +363,7 @@ when 'qanda'
 <ol><%
   items.each do |terms, dd| %>
 <li><%
-    terms.each do |dt| %>
+    [*terms].each do |dt| %>
 <p><em><%= dt.text %></em></p><%
     end
     unless dd.nil?
@@ -393,9 +393,10 @@ when 'horizontal'
   items.each do |terms, dd| %>
 <tr>
 <td class="hdlist1<%= (option? 'strong') ? 'strong' : nil %>"><%
-    terms.each do |dt| %>
+    last_term = [*terms].last
+    [*terms].each do |dt| %>
 <%= dt.text %><%
-      if dt != terms.last %>
+      if dt != last_term %>
 <br><%
       end
     end %>
@@ -421,7 +422,7 @@ else
   end %>
 <dl><%
   items.each do |terms, dd|
-    terms.each do |dt| %>
+    [*terms].each do |dt| %>
 <dt<%= @style.nil? ? %( class="hdlist1") : nil %>><%= dt.text %></dt><%
     end
     unless dd.nil? %>
