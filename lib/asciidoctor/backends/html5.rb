@@ -695,12 +695,12 @@ class BlockUlistTemplate < BaseTemplate
       end
       item_elements << %(<li>
 <p>#{marker}#{item.text}</p>#{item_content}
-</li>\n)
+</li>)
     end
 
     %(<div#{id_attribute}#{div_class_attribute}>#{title_element}
 <ul#{ul_class_attribute}>
-#{item_elements.join}
+#{item_elements * "\n"}
 </ul>
 </div>\n)
   end
@@ -723,12 +723,12 @@ class BlockOlistTemplate < BaseTemplate
       item_content = item.blocks? ? %(\n#{item.content}) : nil
       item_elements << %(<li>
 <p>#{item.text}</p>#{item_content}
-</li>\n)
+</li>)
     end
 
     %(<div#{id_attribute}#{div_class_attribute}>#{title_element}
 <ol class="#{node.style}"#{type_attribute}#{start_attribute}>
-#{item_elements.join}
+#{item_elements * "\n"}
 </ol>
 </div>\n)
   end
@@ -739,33 +739,48 @@ class BlockOlistTemplate < BaseTemplate
 end
 
 class BlockColistTemplate < BaseTemplate
+  def result(node)
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    style_classes = ['colist', node.style, node.role].compact
+    class_attribute = %( class="#{style_classes * ' '}")
+    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
+    item_elements = []
+
+    if node.document.attr? 'icons'
+      font_icons = node.document.attr? 'icons', 'font'
+      node.items.each_with_index do |item, i|
+        num = i + 1
+        num_element = font_icons ?
+            %(<i class="conum" data-value="#{num}"></i><b>#{num}</b>) :
+            %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}">)
+        item_elements << %(<tr>
+<td>#{num_element}</td>
+<td>#{item.text}</td>
+</tr>)
+      end
+
+      %(<div#{id_attribute}#{class_attribute}>#{title_element}
+<table>
+#{item_elements * "\n"}
+</table>
+</div>)
+    else
+      node.items.each do |item|
+        item_elements << %(<li>
+<p>#{item.text}</p>
+</li>)
+      end
+
+      %(<div#{id_attribute}#{class_attribute}>#{title_element}
+<ol>
+#{item_elements * "\n"}
+</ol>
+</div>\n)
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="colist#{style_class}#{role_class}"><%= title? ? %(
-<div class="title">\#{title}</div>) : nil %><%
-if @document.attr? 'icons' %>
-<table><%
-  items.each_with_index do |item, i| %>
-<tr>
-<td><%
-    if @document.attr? 'icons', 'font' %><%= %(<i class="conum" data-value="\#{i + 1}"></i><b>\#{i + 1}</b>) %><%
-    else %><img src="<%= icon_uri("callouts/\#{i + 1}") %>" alt="<%= i + 1 %>"><%
-    end %></td>
-<td><%= item.text %></td>
-</tr><%
-  end %>
-</table><%
-else %>
-<ol><%
-  items.each do |item| %>
-<li>
-<p><%= item.text %></p>
-</li><%
-  end %>
-</ol><%
-end %>
-</div>
-    EOS
+    :invoke_result
   end
 end
 
@@ -830,22 +845,41 @@ end %>
 end
 
 class BlockImageTemplate < BaseTemplate
+  def image(target, alt, title, link, node)
+    align = (node.attr? 'align') ? (node.attr 'align') : nil
+    float = (node.attr? 'float') ? (node.attr 'float') : nil 
+    if align || float
+      styles = [align ? %(text-align: #{align}) : nil, float ? %(float: #{float}) : nil].compact
+      style_attribute = %( style="#{styles * ';'}")
+    else
+      style_attribute = nil
+    end
+
+    width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
+    height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
+
+    img_element = %(<img src="#{node.image_uri target}" alt="#{alt}"#{width_attribute}#{height_attribute}>)
+    if link
+      img_element = %(<a class="image" href="#{link}">#{img_element}</a>)
+    end
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    classes = ['imageblock', node.style, node.role].compact
+    class_attribute = %( class="#{classes * ' '}")
+    title_element = title ? %(\n<div class="title">#{title}</div>) : nil
+
+    %(<div#{id_attribute}#{class_attribute}#{style_attribute}>
+<div class="content">
+#{img_element}
+</div>#{title_element}
+</div>\n)
+  end
+
+  def result(node)
+    image(node.attr('target'), node.attr('alt'), node.title? ? node.captioned_title : nil, node.attr('link'), node)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><div#{id} class="imageblock#{style_class}#{role_class}"<%
-if (attr? :align) || (attr? :float) %> style="<%
-  if attr? :align %>text-align: <%= attr :align %><% if attr? :float %>; <% end %><% end %><% if attr? :float %>float: <%= attr :float %><% end %>"<%
-end %>>
-<div class="content"><%
-if attr? :link %>
-<a class="image" href="<%= attr :link %>"><img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}></a><%
-else %>
-<img src="<%= image_uri(attr :target) %>" alt="<%= attr :alt %>"#{attribute('width', :width)}#{attribute('height', :height)}><%
-end %>
-</div><%= title? ? %(
-<div class="title">\#{captioned_title}</div>) : nil %>
-</div>
-    EOS
+    :invoke_result
   end
 end
 
@@ -1095,15 +1129,18 @@ class InlineImageTemplate < BaseTemplate
 end
 
 class InlineFootnoteTemplate < BaseTemplate
+  def result(node)
+    index = node.attr :index
+    if node.type == :xref
+      %(<span class="footnoteref">[<a class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
+    else
+      id_attribute = node.id ? %( id="_footnote_#{node.id}") : nil
+      %(<span class="footnote"#{id_attribute}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%
-if @type == :xref
-%><span class="footnoteref">[<a class="footnote" href="#_footnote_<%= attr :index %>" title="View footnote."><%= attr :index %></a>]</span><%
-else
-%><span class="footnote"<% if @id %> id="_footnote_<%= @id %>"<% end %>>[<a id="_footnoteref_<%= attr :index %>" class="footnote" href="#_footnote_<%= attr :index %>" title="View footnote."><%= attr :index %></a>]</span><%
-end %>
-    EOS
+    :invoke_result
   end
 end
 
