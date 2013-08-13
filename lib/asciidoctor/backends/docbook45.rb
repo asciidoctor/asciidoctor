@@ -111,7 +111,7 @@ if attr? :numbered %>
 <?asciidoc-numbered?><%
 end
 if doctype == 'book' %>
-<book xmlns="http://docbook.org/ns/docbook"<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
+<book<% unless attr? :noxmlns %> xmlns="http://docbook.org/ns/docbook"<% end %><% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
 <bookinfo>
 #{docinfo}
 </bookinfo>
@@ -119,7 +119,7 @@ if doctype == 'book' %>
 \#{docinfo_content}) %>
 </book><%
 else %>
-<article xmlns="http://docbook.org/ns/docbook"<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
+<article<% unless attr? :noxmlns %> xmlns="http://docbook.org/ns/docbook"<% end %><% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
 <articleinfo>
 #{docinfo}
 </articleinfo>

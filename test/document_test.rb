@@ -1117,6 +1117,11 @@ section body
       assert_xpath '/article/simpara[text() = "text"]', result, 1
     end
 
+    test 'docbook45 backend doctype article no xmlns' do
+      result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'article', 'noxmlns' => ''})
+      assert_no_match(RE_XMLNS_ATTRIBUTE, result)
+    end
+
     test 'docbook45 backend doctype book' do
       input = <<-EOS
 = Title
@@ -1141,6 +1146,11 @@ chapter body
       assert_xpath '/book', result, 1
       assert_xpath '/book/bookinfo/date', result, 1
       assert_xpath '/book/simpara[text() = "text"]', result, 1
+    end
+
+    test 'docbook45 backend doctype book no xmlns' do
+      result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'book', 'noxmlns' => ''})
+      assert_no_match(RE_XMLNS_ATTRIBUTE, result)
     end
 
     test 'docbook45 backend parses out subtitle' do
