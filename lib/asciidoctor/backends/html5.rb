@@ -1,24 +1,11 @@
 require 'asciidoctor/backends/_stylesheets'
 
 module Asciidoctor
-class BaseTemplate
-  # create template matter to insert a style class from the role attribute if specified
-  def role_class
-    %(<%= role? ? " \#{role}" : nil %>)
-  end
-
-  # create template matter to insert a style class from the style attribute if specified
-  def style_class(sibling = true)
-    delimiter = sibling ? ' ' : ''
-    %(<%= @style && "#{delimiter}\#{@style}" %>)
-  end
-end
-
 module HTML5
 
 class DocumentTemplate < BaseTemplate
   def self.outline(node, to_depth = 2)
-    toc_level_lines = []
+    toc_level_buffer = []
     sections = node.sections
     unless sections.empty?
       # FIXME the level for special sections should be set correctly in the model
@@ -27,19 +14,19 @@ class DocumentTemplate < BaseTemplate
       if sec_level == 0 && sections.first.special
         sec_level = 1
       end
-      toc_level_lines << %(<ul class="sectlevel#{sec_level}">)
+      toc_level_buffer << %(<ul class="sectlevel#{sec_level}">)
       sections.each do |section|
         section_num = section.numbered ? %(#{section.sectnum} ) : nil
-        toc_level_lines << %(<li><a href=\"##{section.id}\">#{section_num}#{section.captioned_title}</a></li>)
+        toc_level_buffer << %(<li><a href=\"##{section.id}\">#{section_num}#{section.captioned_title}</a></li>)
         if section.level < to_depth && (child_toc_level = outline(section, to_depth)) != ''
-          toc_level_lines << '<li>'
-          toc_level_lines << child_toc_level
-          toc_level_lines << '</li>'
+          toc_level_buffer << '<li>'
+          toc_level_buffer << child_toc_level
+          toc_level_buffer << '</li>'
         end
       end
-      toc_level_lines << '</ul>'
+      toc_level_buffer << '</ul>'
     end
-    toc_level_lines * EOL
+    toc_level_buffer * EOL
   end
 
   def template
@@ -198,32 +185,26 @@ end
 
 class EmbeddedTemplate < BaseTemplate
   def result(node)
+    result_buffer = []
     if !node.notitle && node.has_header?
       id_attr = node.id ? %( id="#{node.id}") : nil
-      h1_element = %(<h1#{id_attr}>#{node.header.title}</h1>\n)
-    else
-      h1_element = nil
+      result_buffer << %(<h1#{id_attr}>#{node.header.title}</h1>)
     end
 
-    content = node.content
+    result_buffer << node.content
 
     if node.footnotes? && !(node.attr? 'nofootnotes')
-      item_elements = []
-      node.footnotes.each do |fn|
-        item_elements << %(<div class="footnote" id="_footnote_#{fn.index}">
-<a href="#_footnoteref_#{fn.index}">#{fn.index}</a> #{fn.text}
+      result_buffer << '<div id="footnotes">'
+      node.footnotes.each do |footnote|
+        result_buffer << %(<div class="footnote" id="_footnote_#{footnote.index}">
+<a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a> #{footnote.text}
 </div>)
       end
 
-      footnotes = %(\n<div id="footnotes">
-<hr>
-#{item_elements * EOL}
-</div>)
-    else
-      footnotes = nil
+      result_buffer << '</div>'
     end
 
-    %(#{h1_element}#{content}#{footnotes})
+    result_buffer * EOL
   end
 
   def template
@@ -355,7 +336,7 @@ end
 
 class BlockDlistTemplate < BaseTemplate
   def result(node)
-    list_lines = []
+    result_buffer = []
     id_attribute = node.id ? %( id="#{node.id}") : nil
 
     case node.style
@@ -369,71 +350,71 @@ class BlockDlistTemplate < BaseTemplate
 
     class_attribute = %( class="#{classes * ' '}")
 
-    list_lines << %(<div#{id_attribute}#{class_attribute}>)
-    list_lines << %(<div class="title">#{node.title}</div>) if node.title?
+    result_buffer << %(<div#{id_attribute}#{class_attribute}>)
+    result_buffer << %(<div class="title">#{node.title}</div>) if node.title?
     case node.style
     when 'qanda'
-      list_lines << '<ol>'
+      result_buffer << '<ol>'
       node.items.each do |terms, dd|
-        list_lines << '<li>'
+        result_buffer << '<li>'
         [*terms].each do |dt|
-          list_lines << %(<p><em>#{dt.text}</em></p>)
+          result_buffer << %(<p><em>#{dt.text}</em></p>)
         end
         unless dd.nil?
-          list_lines << %(<p>#{dd.text}</p>) if dd.text?
-          list_lines << dd.content if dd.blocks?
+          result_buffer << %(<p>#{dd.text}</p>) if dd.text?
+          result_buffer << dd.content if dd.blocks?
         end
-        list_lines << '</li>'
+        result_buffer << '</li>'
       end
-      list_lines << '</ol>'
+      result_buffer << '</ol>'
     when 'horizontal'
-      list_lines << '<table>'
+      result_buffer << '<table>'
       if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
-        list_lines << '<colgroup>'
+        result_buffer << '<colgroup>'
         col_style_attribute = (node.attr? 'labelwidth') ? %( style="width:#{(node.attr 'labelwidth').chomp '%'}%;") : nil
-        list_lines << %(<col#{col_style_attribute}>)
+        result_buffer << %(<col#{col_style_attribute}>)
         col_style_attribute = (node.attr? 'itemwidth') ? %( style="width:#{(node.attr 'itemwidth').chomp '%'}%;") : nil
-        list_lines << %(<col#{col_style_attribute}>)
-        list_lines << '</colgroup>'
+        result_buffer << %(<col#{col_style_attribute}>)
+        result_buffer << '</colgroup>'
       end
       node.items.each do |terms, dd|
-        list_lines << '<tr>'
-        list_lines << %(<td class="hdlist1#{(node.option? 'strong') ? ' strong' : nil}">)
+        result_buffer << '<tr>'
+        result_buffer << %(<td class="hdlist1#{(node.option? 'strong') ? ' strong' : nil}">)
         terms_array = [*terms]
         last_term = terms_array.last
         terms_array.each do |dt|
-          list_lines << dt.text
-          list_lines << '<br>' if dt != last_term
+          result_buffer << dt.text
+          result_buffer << '<br>' if dt != last_term
         end
-        list_lines << '</td>'
-        list_lines << '<td class="hdlist2">'
+        result_buffer << '</td>'
+        result_buffer << '<td class="hdlist2">'
         unless dd.nil?
-          list_lines << %(<p>#{dd.text}</p>) if dd.text?
-          list_lines << dd.content if dd.blocks?
+          result_buffer << %(<p>#{dd.text}</p>) if dd.text?
+          result_buffer << dd.content if dd.blocks?
         end
-        list_lines << '</td>'
-        list_lines << '</tr>'
+        result_buffer << '</td>'
+        result_buffer << '</tr>'
       end
-      list_lines << '</table>'
+      result_buffer << '</table>'
     else
-      list_lines << '<dl>'
+      result_buffer << '<dl>'
       dt_style_attribute = node.style.nil? ? ' class="hdlist1"' : nil
       node.items.each do |terms, dd|
         [*terms].each do |dt|
-          list_lines << %(<dt#{dt_style_attribute}>#{dt.text}</dt>)
+          result_buffer << %(<dt#{dt_style_attribute}>#{dt.text}</dt>)
         end
         unless dd.nil?
-          list_lines << '<dd>'
-          list_lines << %(<p>#{dd.text}</p>) if dd.text?
-          list_lines << dd.content if dd.blocks?
-          list_lines << '</dd>'
+          result_buffer << '<dd>'
+          result_buffer << %(<p>#{dd.text}</p>) if dd.text?
+          result_buffer << dd.content if dd.blocks?
+          result_buffer << '</dd>'
         end
       end
-      list_lines << '</dl>'
+      result_buffer << '</dl>'
     end
 
-    list_lines << '</div>'
-    list_lines * EOL
+    result_buffer << '</div>'
+    result_buffer * EOL
   end
 
   def template
@@ -537,11 +518,10 @@ end
 class BlockParagraphTemplate < BaseTemplate
   def result(node)
     id_attribute = node.id ? %( id="#{node.id}") : nil
-    classes = node.role? ? %(paragraph #{node.role}) : 'paragraph'
-    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
+    title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
 
-    %(<div#{id_attribute} class="#{classes}">#{title_element}
-<p>#{node.content}</p>
+    %(<div#{id_attribute} class="#{!node.role? ? 'paragraph' : ['paragraph', node.role] * ' '}">
+#{title_element}<p>#{node.content}</p>
 </div>)
   end
 
@@ -553,12 +533,11 @@ end
 class BlockSidebarTemplate < BaseTemplate
   def result(node)
     id_attribute = node.id ? %( id="#{node.id}") : nil
-    classes = node.role? ? %(sidebarblock #{node.role}) : 'sidebarblock'
-    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
+    title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
 
-    %(<div#{id_attribute} class="#{classes}">
-<div class="content">#{title_element}
-#{node.content}
+    %(<div#{id_attribute} class="#{!node.role? ? 'sidebarblock' : ['sidebarblock', node.role] * ' '}">
+<div class="content">
+#{title_element}#{node.content}
 </div>
 </div>)
   end
@@ -571,11 +550,10 @@ end
 class BlockExampleTemplate < BaseTemplate
   def result(node)
     id_attribute = node.id ? %( id="#{node.id}") : nil
-    classes = node.role? ? %(exampleblock #{node.role}) : 'exampleblock'
-    title_element = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : nil
+    title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
 
-    %(<div#{id_attribute} class="#{classes}">#{title_element}
-<div class="content">
+    %(<div#{id_attribute} class="#{!node.role? ? 'exampleblock' : ['exampleblock', node.role] * ' '}">
+#{title_element}<div class="content">
 #{node.content}
 </div>
 </div>)
@@ -684,12 +662,13 @@ end
 
 class BlockUlistTemplate < BaseTemplate
   def result(node)
+    result_buffer = []
     id_attribute = node.id ? %( id="#{node.id}") : nil
-    div_style_classes = ['ulist', node.style, node.role].compact
+    div_classes = ['ulist', node.style, node.role].compact
     marker_checked = nil
     marker_unchecked = nil
     if (checklist = (node.option? 'checklist'))
-      div_style_classes.insert(1, 'checklist')
+      div_classes.insert(1, 'checklist')
       ul_class_attribute = ' class="checklist"'
       if node.document.attr? 'icons', 'font'
         marker_checked = '<i class="icon-check"></i> '
@@ -704,26 +683,27 @@ class BlockUlistTemplate < BaseTemplate
     else
       ul_class_attribute = nil
     end
-    div_class_attribute = %( class="#{div_style_classes * ' '}")
-    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
-    item_elements = []
+    div_class_attribute = %( class="#{div_classes * ' '}")
+    result_buffer << %(<div#{id_attribute}#{div_class_attribute}>)
+    result_buffer << %(<div class="title">#{node.title}</div>) if node.title?
+    result_buffer << %(<ul#{ul_class_attribute}>)
+
     node.items.each do |item|
-      item_content = item.blocks? ? %(\n#{item.content}) : nil
       if checklist && (item.attr? 'checkbox')
         marker = (item.attr? 'checked') ? marker_checked : marker_unchecked
       else
         marker = nil
       end
-      item_elements << %(<li>
-<p>#{marker}#{item.text}</p>#{item_content}
-</li>)
+      result_buffer << '<li>'
+      result_buffer << %(<p>#{marker}#{item.text}</p>)
+      result_buffer << item.content if item.blocks?
+      result_buffer << '</li>'
     end
 
-    %(<div#{id_attribute}#{div_class_attribute}>#{title_element}
-<ul#{ul_class_attribute}>
-#{item_elements * EOL}
-</ul>
-</div>)
+    result_buffer << '</ul>'
+    result_buffer << '</div>'
+
+    result_buffer * EOL
   end
 
   def template
@@ -733,25 +713,29 @@ end
 
 class BlockOlistTemplate < BaseTemplate
   def result(node)
+    result_buffer = []
     id_attribute = node.id ? %( id="#{node.id}") : nil
-    div_style_classes = ['olist', node.style, node.role].compact
-    div_class_attribute = %( class="#{div_style_classes * ' '}")
-    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
+    classes = ['olist', node.style, node.role].compact
+    class_attribute = %( class="#{classes * ' '}")
+
+    result_buffer << %(<div#{id_attribute}#{class_attribute}>)
+    result_buffer << %(<div class="title">#{node.title}</div>) if node.title?
+
     type_attribute = (keyword = node.list_marker_keyword) ? %( type="#{keyword}") : nil
     start_attribute = (node.attr? 'start') ? %( start="#{node.attr 'start'}") : nil
-    item_elements = []
+    result_buffer << %(<ol class="#{node.style}"#{type_attribute}#{start_attribute}>)
+
     node.items.each do |item|
-      item_content = item.blocks? ? %(\n#{item.content}) : nil
-      item_elements << %(<li>
-<p>#{item.text}</p>#{item_content}
-</li>)
+      result_buffer << '<li>'
+      result_buffer << %(<p>#{item.text}</p>)
+      result_buffer << item.content if item.blocks?
+      result_buffer << '</li>'
     end
 
-    %(<div#{id_attribute}#{div_class_attribute}>#{title_element}
-<ol class="#{node.style}"#{type_attribute}#{start_attribute}>
-#{item_elements * EOL}
-</ol>
-</div>)
+    result_buffer << '</ol>'
+    result_buffer << '</div>'
+
+    result_buffer * EOL
   end
 
   def template
@@ -761,43 +745,42 @@ end
 
 class BlockColistTemplate < BaseTemplate
   def result(node)
+    result_buffer = []
     id_attribute = node.id ? %( id="#{node.id}") : nil
     classes = ['colist', node.style, node.role].compact
     class_attribute = %( class="#{classes * ' '}")
-    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
-    item_elements = []
+
+    result_buffer << %(<div#{id_attribute}#{class_attribute}>)
+    result_buffer << %(<div class="title">#{node.title}</div>) if node.title?
 
     if node.document.attr? 'icons'
+      result_buffer << '<table>'
+
       font_icons = node.document.attr? 'icons', 'font'
       node.items.each_with_index do |item, i|
         num = i + 1
         num_element = font_icons ?
             %(<i class="conum" data-value="#{num}"></i><b>#{num}</b>) :
             %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}">)
-        item_elements << %(<tr>
+        result_buffer << %(<tr>
 <td>#{num_element}</td>
 <td>#{item.text}</td>
 </tr>)
       end
 
-      %(<div#{id_attribute}#{class_attribute}>#{title_element}
-<table>
-#{item_elements * EOL}
-</table>
-</div>)
+      result_buffer << '</table>'
     else
+      result_buffer << '<ol>'
       node.items.each do |item|
-        item_elements << %(<li>
+        result_buffer << %(<li>
 <p>#{item.text}</p>
 </li>)
       end
-
-      %(<div#{id_attribute}#{class_attribute}>#{title_element}
-<ol>
-#{item_elements * EOL}
-</ol>
-</div>)
+      result_buffer << '</ol>'
     end
+
+    result_buffer << '</div>'
+    result_buffer * EOL
   end
 
   def template
@@ -808,7 +791,7 @@ end
 class BlockTableTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><table#{id} class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%>#{role_class}" style="<%
+<%#encoding:UTF-8%><table#{id} class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%><%= role? ? " \#{role}" : nil %>" style="<%
 if !(option? 'autowidth') %>width:<%= attr :tablepcwidth %>%; <% end %><%
 if attr? :float %>float: <%= attr :float %>; <% end %>"><%
 if title? %>
