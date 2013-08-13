@@ -18,7 +18,7 @@ module HTML5
 
 class DocumentTemplate < BaseTemplate
   def self.outline(node, to_depth = 2)
-    toc_level = nil
+    toc_level_lines = []
     sections = node.sections
     unless sections.empty?
       # FIXME the level for special sections should be set correctly in the model
@@ -27,17 +27,19 @@ class DocumentTemplate < BaseTemplate
       if sec_level == 0 && sections.first.special
         sec_level = 1
       end
-      toc_level = %(<ul class="sectlevel#{sec_level}">\n)
+      toc_level_lines << %(<ul class="sectlevel#{sec_level}">)
       sections.each do |section|
         section_num = section.numbered ? %(#{section.sectnum} ) : nil
-        toc_level = %(#{toc_level}<li><a href=\"##{section.id}\">#{section_num}#{section.captioned_title}</a></li>\n)
-        if section.level < to_depth && (child_toc_level = outline(section, to_depth))
-          toc_level = %(#{toc_level}<li>\n#{child_toc_level}\n</li>\n)
+        toc_level_lines << %(<li><a href=\"##{section.id}\">#{section_num}#{section.captioned_title}</a></li>)
+        if section.level < to_depth && (child_toc_level = outline(section, to_depth)) != ''
+          toc_level_lines << '<li>'
+          toc_level_lines << child_toc_level
+          toc_level_lines << '</li>'
         end
       end
-      toc_level = %(#{toc_level}</ul>)
+      toc_level_lines << '</ul>'
     end
-    toc_level
+    toc_level_lines * EOL
   end
 
   def template
@@ -60,7 +62,7 @@ if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
 <link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>"><%
   else %>
 <style>
-<%= ::Asciidoctor::HTML5.default_asciidoctor_stylesheet %>
+<%= HTML5.default_asciidoctor_stylesheet %>
 </style><%
   end
 elsif attr? :stylesheet
@@ -86,7 +88,7 @@ when 'coderay'
 <link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-coderay.css', (attr :stylesdir, '')) %>"><%
     else %>
 <style>
-<%= ::Asciidoctor::HTML5.default_coderay_stylesheet %>
+<%= HTML5.default_coderay_stylesheet %>
 </style><%
     end
   end
@@ -215,7 +217,7 @@ class EmbeddedTemplate < BaseTemplate
 
       footnotes = %(\n<div id="footnotes">
 <hr>
-#{item_elements * "\n"}
+#{item_elements * EOL}
 </div>)
     else
       footnotes = nil
@@ -277,7 +279,7 @@ class BlockPreambleTemplate < BaseTemplate
 <div class="sectionbody">
 #{node.content}
 </div>#{toc node}
-</div>\n)
+</div>)
   end
 
   def template
@@ -310,7 +312,7 @@ class SectionTemplate < BaseTemplate
 
     if slevel == 0
       %(<h1#{id} class="sect0">#{anchor}#{link_start}#{sec.title}#{link_end}</h1>
-#{sec.content}\n)
+#{sec.content})
     else
       role = sec.role? ? " #{sec.role}" : nil
       if sec.numbered
@@ -329,7 +331,7 @@ class SectionTemplate < BaseTemplate
       %(<div class="sect#{slevel}#{role}">
 <#{htag}#{id}>#{anchor}#{link_start}#{sectnum}#{sec.captioned_title}#{link_end}</#{htag}>
 #{content}
-</div>\n)
+</div>)
     end
   end
 
@@ -343,7 +345,7 @@ class BlockFloatingTitleTemplate < BaseTemplate
     tag_name = "h#{node.level + 1}"
     id_attribute = node.id ? %( id="#{node.id}") : nil
     classes = [node.style, node.role].compact
-    %(<#{tag_name}#{id_attribute} class="#{classes * ' '}">#{node.title}</#{tag_name}>\n)
+    %(<#{tag_name}#{id_attribute} class="#{classes * ' '}">#{node.title}</#{tag_name}>)
   end
 
   def template
@@ -352,95 +354,90 @@ class BlockFloatingTitleTemplate < BaseTemplate
 end
 
 class BlockDlistTemplate < BaseTemplate
+  def result(node)
+    list_lines = []
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+
+    case node.style
+    when 'qanda'
+      classes = ['qlist', node.style, node.role].compact
+    when 'horizontal'
+      classes = ['hdlist', node.role].compact
+    else
+      classes = ['dlist', node.style, node.role].compact
+    end
+
+    class_attribute = %( class="#{classes * ' '}")
+
+    list_lines << %(<div#{id_attribute}#{class_attribute}>)
+    list_lines << %(<div class="title">#{node.title}</div>) if node.title?
+    case node.style
+    when 'qanda'
+      list_lines << '<ol>'
+      node.items.each do |terms, dd|
+        list_lines << '<li>'
+        [*terms].each do |dt|
+          list_lines << %(<p><em>#{dt.text}</em></p>)
+        end
+        unless dd.nil?
+          list_lines << %(<p>#{dd.text}</p>) if dd.text?
+          list_lines << dd.content if dd.blocks?
+        end
+        list_lines << '</li>'
+      end
+      list_lines << '</ol>'
+    when 'horizontal'
+      list_lines << '<table>'
+      if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
+        list_lines << '<colgroup>'
+        col_style_attribute = (node.attr? 'labelwidth') ? %( style="width:#{(node.attr 'labelwidth').chomp '%'}%;") : nil
+        list_lines << %(<col#{col_style_attribute}>)
+        col_style_attribute = (node.attr? 'itemwidth') ? %( style="width:#{(node.attr 'itemwidth').chomp '%'}%;") : nil
+        list_lines << %(<col#{col_style_attribute}>)
+        list_lines << '</colgroup>'
+      end
+      node.items.each do |terms, dd|
+        list_lines << '<tr>'
+        list_lines << %(<td class="hdlist1#{(node.option? 'strong') ? ' strong' : nil}">)
+        terms_array = [*terms]
+        last_term = terms_array.last
+        terms_array.each do |dt|
+          list_lines << dt.text
+          list_lines << '<br>' if dt != last_term
+        end
+        list_lines << '</td>'
+        list_lines << '<td class="hdlist2">'
+        unless dd.nil?
+          list_lines << %(<p>#{dd.text}</p>) if dd.text?
+          list_lines << dd.content if dd.blocks?
+        end
+        list_lines << '</td>'
+        list_lines << '</tr>'
+      end
+      list_lines << '</table>'
+    else
+      list_lines << '<dl>'
+      dt_style_attribute = node.style.nil? ? ' class="hdlist1"' : nil
+      node.items.each do |terms, dd|
+        [*terms].each do |dt|
+          list_lines << %(<dt#{dt_style_attribute}>#{dt.text}</dt>)
+        end
+        unless dd.nil?
+          list_lines << '<dd>'
+          list_lines << %(<p>#{dd.text}</p>) if dd.text?
+          list_lines << dd.content if dd.blocks?
+          list_lines << '</dd>'
+        end
+      end
+      list_lines << '</dl>'
+    end
+
+    list_lines << '</div>'
+    list_lines * EOL
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%
-case @style
-when 'qanda'
-%><div#{id} class="qlist#{style_class}#{role_class}"><%
-  if title? %>
-<div class="title"><%= title %></div><%
-  end %>
-<ol><%
-  items.each do |terms, dd| %>
-<li><%
-    [*terms].each do |dt| %>
-<p><em><%= dt.text %></em></p><%
-    end
-    unless dd.nil?
-      if dd.text? %>
-<p><%= dd.text %></p><%
-      end
-      if dd.blocks? %>
-<%= dd.content %><%
-      end
-    end %>
-</li><%
-  end %>
-</ol>
-</div><%
-when 'horizontal'
-%><div#{id} class="hdlist#{role_class}"><%
-  if title? %>
-<div class="title"><%= title %></div><%
-  end %>
-<table><%
-  if (attr? :labelwidth) || (attr? :itemwidth) %>
-<colgroup>
-<col<% if attr? :labelwidth %> style="width:<%= (attr :labelwidth).chomp('%') %>%;"<% end %>>
-<col<% if attr? :itemwidth %> style="width:<%= (attr :itemwidth).chomp('%') %>%;"<% end %>>
-</colgroup><%
-  end %><%
-  items.each do |terms, dd| %>
-<tr>
-<td class="hdlist1<%= (option? 'strong') ? 'strong' : nil %>"><%
-    last_term = [*terms].last
-    [*terms].each do |dt| %>
-<%= dt.text %><%
-      if dt != last_term %>
-<br><%
-      end
-    end %>
-</td>
-<td class="hdlist2"><%
-    unless dd.nil?
-      if dd.text? %>
-<p><%= dd.text %></p><%
-      end
-      if dd.blocks? %>
-<%= dd.content %><%
-      end
-    end %>
-</td>
-</tr><%
-  end %>
-</table>
-</div><%
-else
-%><div#{id} class="dlist#{style_class}#{role_class}"><%
-  if title? %>
-<div class="title"><%= title %></div><%
-  end %>
-<dl><%
-  items.each do |terms, dd|
-    [*terms].each do |dt| %>
-<dt<%= @style.nil? ? %( class="hdlist1") : nil %>><%= dt.text %></dt><%
-    end
-    unless dd.nil? %>
-<dd><%
-      if dd.text? %>
-<p><%= dd.text %></p><%
-      end %><%
-      if dd.blocks? %>
-<%= dd.content %><%
-      end %>
-</dd><%
-    end
-  end %>
-</dl>
-</div><%
-end %>
-    EOS
+    :invoke_result
   end
 end
 
@@ -478,7 +475,7 @@ class BlockListingTemplate < BaseTemplate
 <div class="content monospaced">
 #{pre}
 </div>
-</div>\n)
+</div>)
   end
 
   def template
@@ -494,7 +491,7 @@ class BlockLiteralTemplate < BaseTemplate
 <div class="content monospaced">
 <pre#{nowrap ? ' class="nowrap"' : nil}>#{preserve_endlines(node.content, node)}</pre>
 </div>
-</div>\n)
+</div>)
   end
 
   def template
@@ -529,7 +526,7 @@ class BlockAdmonitionTemplate < BaseTemplate
 </td>
 </tr>
 </table>
-</div>\n)
+</div>)
   end
 
   def template
@@ -545,7 +542,7 @@ class BlockParagraphTemplate < BaseTemplate
 
     %(<div#{id_attribute} class="#{classes}">#{title_element}
 <p>#{node.content}</p>
-</div>\n)
+</div>)
   end
 
   def template
@@ -563,7 +560,7 @@ class BlockSidebarTemplate < BaseTemplate
 <div class="content">#{title_element}
 #{node.content}
 </div>
-</div>\n)
+</div>)
   end
 
   def template
@@ -581,7 +578,7 @@ class BlockExampleTemplate < BaseTemplate
 <div class="content">
 #{node.content}
 </div>
-</div>\n)
+</div>)
   end
 
   def template
@@ -605,9 +602,9 @@ class BlockOpenTemplate < BaseTemplate
 <blockquote>
 #{content}
 </blockquote>
-</div>\n)
+</div>)
       end
-    elsif style == 'partintro' && (!node.document.attr?('doctype', 'book') || !node.parent.is_a?(Asciidoctor::Section) || node.level != 0)
+    elsif style == 'partintro' && (node.level != 0 || node.parent.context != :section || !node.document.attr?('doctype', 'book'))
       puts 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a book part. Excluding block content.'
       ''
     else
@@ -616,7 +613,7 @@ class BlockOpenTemplate < BaseTemplate
 <div class="content">
 #{content}
 </div>
-</div>\n)
+</div>)
     end
   end
 
@@ -724,9 +721,9 @@ class BlockUlistTemplate < BaseTemplate
 
     %(<div#{id_attribute}#{div_class_attribute}>#{title_element}
 <ul#{ul_class_attribute}>
-#{item_elements * "\n"}
+#{item_elements * EOL}
 </ul>
-</div>\n)
+</div>)
   end
 
   def template
@@ -752,9 +749,9 @@ class BlockOlistTemplate < BaseTemplate
 
     %(<div#{id_attribute}#{div_class_attribute}>#{title_element}
 <ol class="#{node.style}"#{type_attribute}#{start_attribute}>
-#{item_elements * "\n"}
+#{item_elements * EOL}
 </ol>
-</div>\n)
+</div>)
   end
 
   def template
@@ -785,7 +782,7 @@ class BlockColistTemplate < BaseTemplate
 
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <table>
-#{item_elements * "\n"}
+#{item_elements * EOL}
 </table>
 </div>)
     else
@@ -797,9 +794,9 @@ class BlockColistTemplate < BaseTemplate
 
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <ol>
-#{item_elements * "\n"}
+#{item_elements * EOL}
 </ol>
-</div>\n)
+</div>)
     end
   end
 
@@ -895,7 +892,7 @@ class BlockImageTemplate < BaseTemplate
 <div class="content">
 #{img_element}
 </div>#{title_element}
-</div>\n)
+</div>)
   end
 
   def result(node)
@@ -919,7 +916,7 @@ class BlockAudioTemplate < BaseTemplate
 Your browser does not support the audio tag.
 </audio>
 </div>
-</div>\n)
+</div>)
   end
 
   def template
@@ -942,7 +939,7 @@ class BlockVideoTemplate < BaseTemplate
 Your browser does not support the video tag.
 </video>
 </div>
-</div>\n)
+</div>)
   end
 
   def template
@@ -962,7 +959,7 @@ end
 
 class BlockPageBreakTemplate < BaseTemplate
   def result(node)
-    %(<div style="page-break-after: always;"></div>\n)
+    %(<div style="page-break-after: always;"></div>)
   end
 
   def template

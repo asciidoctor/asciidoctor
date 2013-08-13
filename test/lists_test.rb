@@ -2367,6 +2367,17 @@ term:: def
       assert_xpath '(//table/colgroup/col)[2][@style="width:75%;"]', output, 1
     end
 
+    test 'should add strong class to label if strong option is set' do
+      input = <<-EOS
+[horizontal, options="strong"]
+term:: def
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.hdlist', output, 1
+      assert_css '.hdlist td.hdlist1.strong', output, 1
+    end
+
     test 'consecutive terms in horizontal list should share same cell' do
       input = <<-EOS
 [horizontal]

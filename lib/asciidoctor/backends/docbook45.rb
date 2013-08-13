@@ -30,11 +30,11 @@ module Asciidoctor
     end
 
     def content(node)
-      node.blocks? ? node.content.chomp : "<simpara>#{node.content.chomp}</simpara>"
+      node.blocks? ? node.content : "<simpara>#{node.content}</simpara>"
     end
 
     def content_erb
-      %q(<%= blocks? ? content.chomp : "<simpara>#{content.chomp}</simpara>" %>)
+      %q(<%= blocks? ? content : "<simpara>#{content}</simpara>" %>)
     end
   end
 
@@ -110,14 +110,14 @@ class DocumentTemplate < BaseTemplate
   <bookinfo>
 #{docinfo}
   </bookinfo>
-<%= content.chomp %>
+<%= content %>
 </book>
 <% else %>
 <article<% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
   <articleinfo>
 #{docinfo}
   </articleinfo>
-<%= content.chomp %><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
+<%= content %><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
 \#{docinfo_content}) %>
 </article>
 <% end %>
@@ -146,10 +146,10 @@ class BlockPreambleTemplate < BaseTemplate
     @template ||= @eruby.new <<-EOF
 <%#encoding:UTF-8%><%
 if @document.doctype == 'book' %><preface#{common_attrs_erb}>#{title_tag false}
-<%= content.chomp %>
+<%= content %>
 </preface><%
 else %>
-<%= content.chomp %><%
+<%= content %><%
 end %>
     EOF
   end
@@ -164,8 +164,8 @@ class SectionTemplate < BaseTemplate
     end
     %(<#{tag}#{common_attrs(sec.id, sec.role, sec.reftext)}>
 #{sec.title? ? "<title>#{sec.title}</title>" : nil}
-#{sec.content.chomp}
-</#{tag}>\n)
+#{sec.content}
+</#{tag}>)
   end
 
   def template
@@ -187,9 +187,9 @@ class BlockParagraphTemplate < BaseTemplate
       %(<formalpara#{common_attrs(id, role, reftext)}>
 <title>#{title}</title>
 <para>#{content}</para>
-</formalpara>\n)
+</formalpara>)
     else
-      %(<simpara#{common_attrs(id, role, reftext)}>#{content}</simpara>\n)
+      %(<simpara#{common_attrs(id, role, reftext)}>#{content}</simpara>)
     end
   end
 
@@ -323,7 +323,7 @@ if @style == 'horizontal'
 <simpara><%= dd.text %></simpara><%
       end
       if dd.blocks? %>
-<%= dd.content.chomp %><%
+<%= dd.content %><%
       end
     end %>
 </entry>
@@ -382,7 +382,7 @@ class BlockOpenTemplate < BaseTemplate
       else
         %(<abstract>#{title && "\n<title>#{title}</title>"}
 #{content node}
-</abstract>\n)
+</abstract>)
       end
     when 'partintro'
       unless node.document.attr?('doctype', 'book') && node.parent.is_a?(Asciidoctor::Section) && node.level == 0
@@ -391,7 +391,7 @@ class BlockOpenTemplate < BaseTemplate
       else
         %(<partintro#{common_attrs id, role, reftext}>#{title && "\n<title>#{title}</title>"}
 #{content node}
-</partintro>\n)
+</partintro>)
       end
     else
       node.content

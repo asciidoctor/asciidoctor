@@ -46,8 +46,11 @@ class AbstractBlock < AbstractNode
     renderer.render(@template_name, self)
   end
 
+  # Public: Get an rendered version of the block content, rendering the
+  # children appropriate to content model that this block supports.
+  #
   def content
-    @blocks.map {|b| b.render }.join
+    @blocks.map {|b| b.render } * EOL
   end
 
   # Public: A convenience method that indicates whether the title instance

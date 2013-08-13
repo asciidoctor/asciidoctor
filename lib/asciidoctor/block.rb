@@ -28,7 +28,7 @@ class Block < AbstractBlock
     @content_model = content_model
     @attributes = attributes.nil? ? {} : attributes
     # QUESTION should we store lines for blocks with compound content models?
-    if lines.nil? && content_model != :compound
+    if content_model != :compound && lines.nil?
       @lines = []
     else
       @lines = lines
@@ -50,7 +50,7 @@ class Block < AbstractBlock
     when :simple
       apply_para_subs(@lines)
     when :compound
-      @blocks.map {|b| b.render }.join
+      super
     when :verbatim
       apply_literal_subs(@lines)
     when :raw

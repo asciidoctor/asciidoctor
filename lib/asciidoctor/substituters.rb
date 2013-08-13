@@ -753,7 +753,7 @@ module Substituters
       lines = text.lines.entries
       return text if lines.size == 1
       last = lines.pop
-      "#{lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).render } * "\n"}\n#{last}"
+      lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).render }.push(last) * EOL
     else
       text.gsub(REGEXP[:line_break]) { Inline.new(self, :break, $1, :type => :line).render }
     end
@@ -862,7 +862,7 @@ module Substituters
   # square brackets from text extracted from brackets
   def unescape_bracketed_text(text)
     return '' if text.empty?
-    text.strip.tr("\n", ' ').gsub('\]', ']')
+    text.strip.tr(EOL, ' ').gsub('\]', ']')
   end
 
   # Internal: Resolve the list of comma-delimited subs against the possible options.
@@ -897,7 +897,7 @@ module Substituters
     lineno = 0
     if sub_callouts
       # extract callout marks, indexed by line number
-      source = source.split("\n").map {|line|
+      source = source.split(EOL).map {|line|
         lineno = lineno + 1
         line.sub(REGEXP[:callout_scan]) {
           # alias match for Ruby 1.8.7 compat
@@ -910,7 +910,7 @@ module Substituters
             nil
           end
         }
-      } * "\n"
+      } * EOL
     end
 
     case highlighter
@@ -935,14 +935,14 @@ module Substituters
       result
     else
       lineno = 0
-      result.split("\n").map {|line|
+      result.split(EOL).map {|line|
         lineno = lineno + 1
         if (conum = callout_marks.delete(lineno))
           %(#{line}#{Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).render})
         else
           line
         end
-      } * "\n"
+      } * EOL
     end
   end
 end
