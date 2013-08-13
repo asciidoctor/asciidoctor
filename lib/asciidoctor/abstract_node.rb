@@ -319,7 +319,7 @@ class AbstractNode
     end
 
     if !File.readable? image_path
-      puts "asciidoctor: WARNING: image to embed not found or not readable: #{image_path}"
+      warn "asciidoctor: WARNING: image to embed not found or not readable: #{image_path}"
       return "data:#{mimetype}:base64,"
       #return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     end
@@ -347,7 +347,7 @@ class AbstractNode
     if File.readable? path
       File.read(path).chomp
     else
-      puts "asciidoctor: WARNING: file does not exist or cannot be read: #{path}" if warn_on_failure
+      warn "asciidoctor: WARNING: file does not exist or cannot be read: #{path}" if warn_on_failure
       nil
     end
   end

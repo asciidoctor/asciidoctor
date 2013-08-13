@@ -410,7 +410,7 @@ class Table::ParserContext
     if format == 'psv'
       cell_spec = take_cell_spec
       if cell_spec.nil?
-        puts 'asciidoctor: ERROR: table missing leading separator, recovering automatically'
+        warn 'asciidoctor: ERROR: table missing leading separator, recovering automatically'
         cell_spec = {}
         repeat = 1
       else
