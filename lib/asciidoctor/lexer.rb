@@ -120,39 +120,7 @@ class Lexer
     end
 
     # parse title and consume name section of manpage document
-    if document.doctype == 'manpage'
-      if (m = document.attributes['doctitle'].match(REGEXP[:mantitle_manvolnum]))
-        document.attributes['mantitle'] = document.sub_attributes(m[1].rstrip.downcase)
-        document.attributes['manvolnum'] = m[2].strip
-      else
-        puts "asciidoctor: ERROR: line #{reader.lineno}: malformed manpage title"
-      end
-
-      reader.skip_blank_lines
-
-      if is_next_line_section?(reader, {})
-        name_section = initialize_section(reader, document, {})
-        if name_section.level == 1
-          name_section_buffer = reader.grab_lines_until(:break_on_blank_lines => true).join.tr_s("\n ", ' ')
-          if (m = name_section_buffer.match(REGEXP[:manname_manpurpose]))
-            document.attributes['manname'] = m[1] 
-            document.attributes['manpurpose'] = m[2] 
-            # TODO parse multiple man names
-
-            if document.backend == 'manpage'
-              document.attributes['docname'] = document.attributes['manname']
-              document.attributes['outfilesuffix'] = ".#{document.attributes['manvolnum']}"
-            end
-          else
-            puts "asciidoctor: ERROR: line #{reader.lineno}: malformed name section body"
-          end
-        else
-          puts "asciidoctor: ERROR: line #{reader.lineno}: name section title must be at level 1"
-        end
-      else
-        puts "asciidoctor: ERROR: line #{reader.lineno}: name section expected"
-      end
-    end
+    parse_manpage_header(reader, document) if document.doctype == 'manpage'
  
     document.clear_playback_attributes block_attributes
     document.save_attributes
@@ -160,6 +128,43 @@ class Lexer
     # NOTE these are the block-level attributes (not document attributes) that
     # precede the first line of content (document title, first section or first block)
     block_attributes
+  end
+
+  # Public: Parses the manpage header of the AsciiDoc source read from the Reader
+  #
+  # returns Nothing
+  def self.parse_manpage_header(reader, document)
+    if (m = document.attributes['doctitle'].match(REGEXP[:mantitle_manvolnum]))
+      document.attributes['mantitle'] = document.sub_attributes(m[1].rstrip.downcase)
+      document.attributes['manvolnum'] = m[2].strip
+    else
+      puts "asciidoctor: ERROR: line #{reader.lineno}: malformed manpage title"
+    end
+
+    reader.skip_blank_lines
+
+    if is_next_line_section?(reader, {})
+      name_section = initialize_section(reader, document, {})
+      if name_section.level == 1
+        name_section_buffer = reader.grab_lines_until(:break_on_blank_lines => true).join.tr_s("\n ", ' ')
+        if (m = name_section_buffer.match(REGEXP[:manname_manpurpose]))
+          document.attributes['manname'] = m[1] 
+          document.attributes['manpurpose'] = m[2] 
+          # TODO parse multiple man names
+
+          if document.backend == 'manpage'
+            document.attributes['docname'] = document.attributes['manname']
+            document.attributes['outfilesuffix'] = ".#{document.attributes['manvolnum']}"
+          end
+        else
+          puts "asciidoctor: ERROR: line #{reader.lineno}: malformed name section body"
+        end
+      else
+        puts "asciidoctor: ERROR: line #{reader.lineno}: name section title must be at level 1"
+      end
+    else
+      puts "asciidoctor: ERROR: line #{reader.lineno}: name section expected"
+    end
   end
 
   # Public: Return the next section from the Reader.
