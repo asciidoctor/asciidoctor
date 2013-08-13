@@ -8,16 +8,22 @@ module Asciidoctor
 class BaseTemplate
 
   attr_reader :view
+  attr_reader :backend
   attr_reader :eruby
 
-  def initialize(view, eruby)
+  def initialize(view, backend, eruby)
     @view = view
+    @backend = backend
     @eruby = eruby
   end
 
   def self.inherited(klass)
-    @template_classes ||= []
-    @template_classes << klass
+    if self == BaseTemplate
+      @template_classes ||= []
+      @template_classes << klass
+    else
+      self.superclass.inherited(klass)
+    end
   end
 
   def self.template_classes
@@ -93,23 +99,6 @@ class BaseTemplate
       # example: <% if foo %> bar="<%= foo %>"<% end %>
       %(<% if #{key} %> #{name}="<%= #{key} %>"<% end %>)
     end
-  end
-
-  # create template matter to insert a style class if the variable has a value
-  def attrvalue(key, sibling = true, inherit = true)
-    delimiter = sibling ? ' ' : ''
-    if inherit
-      # example: <% if attr? 'foo' %><%= attr 'foo' %><% end %>
-      %(<% if attr? '#{key}' %>#{delimiter}<%= attr '#{key}' %><% end %>)
-    else
-      # example: <% if attr? 'foo', nil, false %><%= attr 'foo', nil, false %><% end %>
-      %(<% if attr? '#{key}', nil, false %>#{delimiter}<%= attr '#{key}', nil, false %><% end %>)
-    end
-  end
-
-  # create template matter to insert an id if one is specified for the block
-  def id
-    attribute('id', '@id')
   end
 end
 
