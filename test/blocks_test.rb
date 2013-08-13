@@ -985,7 +985,7 @@ section paragraph
       output, errors = nil
       redirect_streams do |stdout, stderr|
         output = render_string input
-        errors = stdout.string
+        errors = stderr.string
       end
       assert_xpath '//*[@id="header"]/*', output, 0
       assert_xpath '//*[@id="preamble"]/*', output, 0

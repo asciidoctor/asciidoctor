@@ -22,12 +22,10 @@ module Helpers
       require name
     rescue LoadError => e
       if gem_name
-        puts "asciidoctor: FAILED: required gem '#{gem_name === true ? name : gem_name}' is not installed"
+        fail "asciidoctor: FAILED: required gem '#{gem_name === true ? name : gem_name}' is not installed. Processing aborted."
       else
-        puts "asciidoctor: FAILED: #{e}"
+        fail "asciidoctor: FAILED: #{e.chomp '.'}. Processing aborted."
       end
-      # QUESTION: raise abort error or use exit code return value?
-      raise 'Processing aborted'
     end
   end
 

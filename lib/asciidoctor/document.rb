@@ -212,7 +212,7 @@ class Document < AbstractBlock
       if @attribute_overrides['docdir']
         @base_dir = @attribute_overrides['docdir'] = File.expand_path(@attribute_overrides['docdir'])
       else
-        #puts 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
+        #warn 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
         @base_dir = @attribute_overrides['docdir'] = File.expand_path(Dir.pwd)
       end
     else

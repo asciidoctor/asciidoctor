@@ -312,7 +312,7 @@ class PathResolver
           elsif !recover
             raise SecurityError, "#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode)"
           elsif !warned
-            puts "asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering"
+            warn "asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering"
             warned = true
           end
         else
