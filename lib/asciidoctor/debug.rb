@@ -3,7 +3,7 @@ module Debug
   @show_debug = nil
   
   def self.debug
-    puts yield if self.show_debug_output?
+    warn yield if self.show_debug_output?
   end
   
   def self.set_debug(value)

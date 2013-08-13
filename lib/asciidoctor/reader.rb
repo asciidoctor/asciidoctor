@@ -392,10 +392,10 @@ class Reader
           @conditionals_stack.pop
           @skipping = @conditionals_stack.empty? ? false : @conditionals_stack.last[:skipping]
         else
-          puts "asciidoctor: ERROR: line #{@lineno + 1}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]"
+          warn "asciidoctor: ERROR: line #{@lineno + 1}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]"
         end
       else
-        puts "asciidoctor: ERROR: line #{@lineno + 1}: unmatched macro: endif::#{target}[]"
+        warn "asciidoctor: ERROR: line #{@lineno + 1}: unmatched macro: endif::#{target}[]"
       end
       advance
       return preprocess_next_line.nil? ? nil : true
@@ -525,7 +525,7 @@ class Reader
         target_type = :file
         include_file = @document.normalize_system_path(target, nil, nil, :target_name => 'include file')
         if !File.file?(include_file)
-          puts "asciidoctor: WARNING: line #{@lineno}: include file not found: #{include_file}"
+          warn "asciidoctor: WARNING: line #{@lineno}: include file not found: #{include_file}"
           return true
         end
       end
@@ -574,7 +574,7 @@ class Reader
               end
             end
           rescue
-            puts "asciidoctor: WARNING: line #{@lineno}: include #{target_type} not readable: #{include_file}"
+            warn "asciidoctor: WARNING: line #{@lineno}: include #{target_type} not readable: #{include_file}"
             return true
           end
           @lines.unshift(*normalize_include_data(selected, attributes['indent'])) unless selected.empty?
@@ -604,7 +604,7 @@ class Reader
               end
             end
           rescue
-            puts "asciidoctor: WARNING: line #{@lineno}: include #{target_type} not readable: #{include_file}"
+            warn "asciidoctor: WARNING: line #{@lineno}: include #{target_type} not readable: #{include_file}"
             return true
           end
           #@lines.unshift(*selected) unless selected.empty?
@@ -614,7 +614,7 @@ class Reader
         begin
           @lines.unshift(*normalize_include_data(open(include_file) {|f| f.readlines }, attributes['indent']))
         rescue
-          puts "asciidoctor: WARNING: line #{@lineno}: include #{target_type} not readable: #{include_file}"
+          warn "asciidoctor: WARNING: line #{@lineno}: include #{target_type} not readable: #{include_file}"
           return true
         end
       end

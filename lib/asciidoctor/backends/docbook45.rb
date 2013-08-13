@@ -383,7 +383,7 @@ class BlockOpenTemplate < BaseTemplate
     case style
     when 'abstract'
       if node.parent == node.document && node.document.attr?('doctype', 'book')
-        puts 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+        warn 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
         ''
       else
         %(<abstract>#{title && "\n<title>#{title}</title>"}
@@ -392,7 +392,7 @@ class BlockOpenTemplate < BaseTemplate
       end
     when 'partintro'
       unless node.document.attr?('doctype', 'book') && node.parent.is_a?(Asciidoctor::Section) && node.level == 0
-        puts 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a part section. Excluding block content.'
+        warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a part section. Excluding block content.'
         ''
       else
         %(<partintro#{common_attrs id, role, reftext}>#{title && "\n<title>#{title}</title>"}

@@ -61,7 +61,7 @@ module Substituters
       when :post_replacements
         text = sub_post_replacements(text)
       else
-        puts "asciidoctor: WARNING: unknown substitution type #{type}"
+        warn "asciidoctor: WARNING: unknown substitution type #{type}"
       end
     }
     text = restore_passthroughs(text) if has_passthroughs
@@ -321,7 +321,7 @@ module Substituters
             directive == 'counter2' ? '' : val
           else
             # if we get here, our attr_ref regex is too loose
-            puts "asciidoctor: WARNING: illegal attribute directive: #{m[2]}"
+            warn "asciidoctor: WARNING: illegal attribute directive: #{m[2]}"
             ''
           end
         elsif (key = m[2].downcase) && @document.attributes.has_key?(key)
@@ -874,7 +874,7 @@ module Substituters
     candidates = subs.split(',').map {|sub| sub.strip.to_sym}
     resolved = candidates & SUB_OPTIONS 
     if (invalid = candidates - resolved).size > 0
-      puts "asciidoctor: WARNING: invalid passthrough macro substitution operation#{invalid.size > 1 ? 's' : ''}: #{invalid * ', '}"
+      warn "asciidoctor: WARNING: invalid passthrough macro substitution operation#{invalid.size > 1 ? 's' : ''}: #{invalid * ', '}"
     end 
     resolved
   end

@@ -138,7 +138,7 @@ class Lexer
       document.attributes['mantitle'] = document.sub_attributes(m[1].rstrip.downcase)
       document.attributes['manvolnum'] = m[2].strip
     else
-      puts "asciidoctor: ERROR: line #{reader.lineno}: malformed manpage title"
+      warn "asciidoctor: ERROR: line #{reader.lineno}: malformed manpage title"
     end
 
     reader.skip_blank_lines
@@ -157,13 +157,13 @@ class Lexer
             document.attributes['outfilesuffix'] = ".#{document.attributes['manvolnum']}"
           end
         else
-          puts "asciidoctor: ERROR: line #{reader.lineno}: malformed name section body"
+          warn "asciidoctor: ERROR: line #{reader.lineno}: malformed name section body"
         end
       else
-        puts "asciidoctor: ERROR: line #{reader.lineno}: name section title must be at level 1"
+        warn "asciidoctor: ERROR: line #{reader.lineno}: name section title must be at level 1"
       end
     else
-      puts "asciidoctor: ERROR: line #{reader.lineno}: name section expected"
+      warn "asciidoctor: ERROR: line #{reader.lineno}: name section expected"
     end
   end
 
@@ -265,9 +265,9 @@ class Lexer
         doctype = parent.document.doctype
         if next_level > current_level || (section.is_a?(Document) && next_level == 0)
           if next_level == 0 && doctype != 'book'
-            puts "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
+            warn "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
           elsif !expected_next_levels.nil? && !expected_next_levels.include?(next_level)
-            puts "asciidoctor: WARNING: line #{reader.lineno + 1}: section title out of sequence: " +
+            warn "asciidoctor: WARNING: line #{reader.lineno + 1}: section title out of sequence: " +
                 "expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, " +
                 "got level #{next_level}"
           end
@@ -276,7 +276,7 @@ class Lexer
           section << new_section
         else
           if next_level == 0 && doctype != 'book'
-            puts "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
+            warn "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
           end
           # close this section (and break out of the nesting) to begin a new one
           break
@@ -383,7 +383,7 @@ class Lexer
           elsif delimited_blk_match.masq.include?('admonition') && ADMONITION_STYLES.include?(style)
             block_context = :admonition
           else
-            puts "asciidoctor: WARNING: line #{reader.lineno}: invalid style for #{block_context} block: #{style}"
+            warn "asciidoctor: WARNING: line #{reader.lineno}: invalid style for #{block_context} block: #{style}"
             style = block_context.to_s
           end
         end
@@ -469,7 +469,7 @@ class Lexer
             begin
               # might want to move this check to a validate method
               if match[1].to_i != expected_index
-                puts "asciidoctor: WARNING: line #{reader.lineno + 1}: callout list item index: expected #{expected_index} got #{match[1]}"
+                warn "asciidoctor: WARNING: line #{reader.lineno + 1}: callout list item index: expected #{expected_index} got #{match[1]}"
               end
               list_item = next_list_item(reader, block, match)
               expected_index += 1
@@ -479,7 +479,7 @@ class Lexer
                 if !coids.empty?
                   list_item.attributes['coids'] = coids
                 else
-                  puts "asciidoctor: WARNING: line #{reader.lineno}: no callouts refer to list item #{block.items.size}"
+                  warn "asciidoctor: WARNING: line #{reader.lineno}: no callouts refer to list item #{block.items.size}"
                 end
               end
             end while reader.has_more_lines? && match = reader.peek_line.match(REGEXP[:colist])
@@ -545,7 +545,7 @@ class Lexer
               # advance to block parsing =>
               break
             else
-              puts "asciidoctor: WARNING: line #{reader.lineno}: invalid style for paragraph: #{style}"
+              warn "asciidoctor: WARNING: line #{reader.lineno}: invalid style for paragraph: #{style}"
               style = nil
               # continue to process paragraph
             end
@@ -1271,8 +1271,8 @@ class Lexer
       buffer.pop
     end
 
-    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join}<BUFFER"
-    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
+    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join}<BUFFER"
+    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
 
     buffer
   end
@@ -1911,7 +1911,7 @@ class Lexer
 
     if validate && expected != actual
       # FIXME I need a reader reference or line number to report line number
-      puts "asciidoctor: WARNING: list item index: expected #{expected}, got #{actual}"
+      warn "asciidoctor: WARNING: list item index: expected #{expected}, got #{actual}"
     end
 
     marker
@@ -2203,7 +2203,7 @@ class Lexer
       save_current = lambda {
         if collector.empty?
           if type != :style
-            puts "asciidoctor: WARNING:#{reader.nil? ? nil : " line #{reader.lineno}:"} invalid empty #{type} detected in style attribute"
+            warn "asciidoctor: WARNING:#{reader.nil? ? nil : " line #{reader.lineno}:"} invalid empty #{type} detected in style attribute"
           end
         else
           case type
@@ -2212,7 +2212,7 @@ class Lexer
             parsed[type].push collector.join
           when :id
             if parsed.has_key? :id
-              puts "asciidoctor: WARNING:#{reader.nil? ? nil : " line #{reader.lineno}:"} multiple ids detected in style attribute"
+              warn "asciidoctor: WARNING:#{reader.nil? ? nil : " line #{reader.lineno}:"} multiple ids detected in style attribute"
             end
             parsed[type] = collector.join
           else
