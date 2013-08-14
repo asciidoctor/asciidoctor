@@ -216,7 +216,7 @@ class Lexer
         (parent.has_header? || attributes.delete('invalid-header') || !is_next_line_section?(reader, attributes))
 
       if parent.has_header?
-        preamble = Block.new(parent, :preamble)
+        preamble = Block.new(parent, :preamble, :content_model => :compound)
         parent << preamble
       end
       section = parent
@@ -409,13 +409,13 @@ class Lexer
           if !text_only
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
             if (match = this_line.match(REGEXP[:break_line]))
-              block = Block.new(parent, BREAK_LINES[match[0][0..0]], :simple)
+              block = Block.new(parent, BREAK_LINES[match[0][0..0]], :content_model => :empty)
               break
 
             # TODO make this a media_blk and handle image, video & audio
             elsif (match = this_line.match(REGEXP[:media_blk_macro]))
               blk_ctx = match[1].to_sym
-              block = Block.new(parent, blk_ctx, :simple)
+              block = Block.new(parent, blk_ctx, :content_model => :empty)
               if blk_ctx == :image
                 posattrs = ['alt', 'width', 'height']
               elsif blk_ctx == :video
@@ -453,7 +453,7 @@ class Lexer
 
             # NOTE we're letting the toc macro have attributes
             elsif (match = this_line.match(REGEXP[:toc]))
-              block = Block.new(parent, :toc, :simple)
+              block = Block.new(parent, :toc, :content_model => :empty)
               block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
               break
 
@@ -474,7 +474,7 @@ class Lexer
               list_item = next_list_item(reader, block, match)
               expected_index += 1
               if !list_item.nil?
-                block.items << list_item
+                block << list_item
                 coids = document.callouts.callout_ids(block.items.size)
                 if !coids.empty?
                   list_item.attributes['coids'] = coids
@@ -518,7 +518,7 @@ class Lexer
             reader.unshift_line this_line
             float_id, float_title, float_level, _ = parse_section_title(reader, document)
             float_id ||= attributes['id'] if attributes.has_key?('id')
-            block = Block.new(parent, :floating_title, :simple)
+            block = Block.new(parent, :floating_title, :content_model => :empty)
             if float_id.nil? || float_id.empty?
               # FIXME remove hack of creating throwaway Section to get at the generate_id method
               tmp_sect = Section.new(parent)
@@ -571,7 +571,7 @@ class Lexer
 
             reset_block_indent! lines
 
-            block = Block.new(parent, :literal, :verbatim, attributes, lines)
+            block = Block.new(parent, :literal, :content_model => :verbatim, :source => lines, :attributes => attributes)
             # a literal gets special meaning inside of a definition list
             # TODO this feels hacky, better way to distinguish from explicit literal block?
             block.set_option('listparagraph') if in_list
@@ -609,7 +609,7 @@ class Lexer
               attributes['style'] = admonition_match[1]
               attributes['name'] = admonition_name = admonition_match[1].downcase
               attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
-              block = Block.new(parent, :admonition, :simple, attributes, lines)
+              block = Block.new(parent, :admonition, :source => lines, :attributes => attributes)
             elsif !text_only && COMPLIANCE[:markdown_syntax] && first_line.start_with?('> ')
               lines.map! {|line|
                 if line.start_with?('> ')
@@ -643,9 +643,9 @@ class Lexer
               attributes['style'] = 'quote'
               attributes['attribution'] = attribution unless attribution.nil?
               attributes['citetitle'] = citetitle unless citetitle.nil?
-              block = Block.new(parent, :quote, :simple, attributes, lines)
-              #block = Block.new(parent, :quote, :compound, attributes)
-              #block << Block.new(block, :paragraph, :simple, {}, lines)
+              block = Block.new(parent, :quote, :source => lines, :attributes => attributes)
+              #block = Block.new(parent, :quote, :content_model => :compound, :attributes => attributes)
+              #block << Block.new(block, :paragraph, :source => lines)
             else
               # QUESTION is stripping whitespace from start of paragraph lines necessary? (currently disabled)
               #if style == 'normal' && [' ', "\t"].include?(lines.first[0..0])
@@ -653,7 +653,7 @@ class Lexer
               #  lines.map! &:lstrip
               #end
 
-              block = Block.new(parent, :paragraph, :simple, attributes, lines)
+              block = Block.new(parent, :paragraph, :source => lines, :attributes => attributes)
             end
           end
 
@@ -847,7 +847,7 @@ class Lexer
       reset_block_indent! lines, attributes['indent'].to_i
     end
 
-    block = Block.new(parent, block_context, content_model, attributes, lines)
+    block = Block.new(parent, block_context, :content_model => content_model, :attributes => attributes, :source => lines)
     # should supports_caption be necessary?
     if options.fetch(:supports_caption, false)
       block.title = attributes.delete('title') if attributes.has_key?('title')
@@ -860,7 +860,7 @@ class Lexer
       # delimited block
       while block_reader.has_more_lines?
         parsed_block = next_block(block_reader, block)
-        block.blocks << parsed_block unless parsed_block.nil?
+        block << parsed_block unless parsed_block.nil?
       end
     end
     block
@@ -914,7 +914,7 @@ class Lexer
         list_block.items.last << next_block(reader, list_block)
       end
 
-      list_block.items << list_item unless list_item.nil?
+      list_block << list_item unless list_item.nil?
       list_item = nil
 
       reader.skip_blank_lines
@@ -967,24 +967,25 @@ class Lexer
   #
   # Returns the Block encapsulating the parsed labeled list
   def self.next_labeled_list(reader, match, parent)
-    block = List.new(parent, :dlist)
+    list_block = List.new(parent, :dlist)
     previous_pair = nil
     # allows us to capture until we find a labeled item
     # that uses the same delimiter (::, :::, :::: or ;;)
     sibling_pattern = REGEXP[:dlist_siblings][match[2]]
 
     begin
-      term, item = next_list_item(reader, block, match, sibling_pattern)
+      term, item = next_list_item(reader, list_block, match, sibling_pattern)
       if !previous_pair.nil? && previous_pair.last.nil?
         previous_pair.pop
         previous_pair[0] << term
         previous_pair << item
       else
-        block.items << (previous_pair = [[term], item])
+        # FIXME this misses the automatic parent assignment
+        list_block.items << (previous_pair = [[term], item])
       end
     end while reader.has_more_lines? && match = reader.peek_line.match(sibling_pattern)
 
-    block
+    list_block
   end
 
   # Internal: Parse and construct the next ListItem for the current bulleted
@@ -1070,7 +1071,7 @@ class Lexer
       # list
       while list_item_reader.has_more_lines?
         new_block = next_block(list_item_reader, list_block, {}, options)
-        list_item.blocks << new_block unless new_block.nil?
+        list_item << new_block unless new_block.nil?
       end
 
       list_item.fold_first(continuation_connects_first_block, content_adjacent)

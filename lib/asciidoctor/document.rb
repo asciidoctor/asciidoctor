@@ -477,6 +477,20 @@ class Document < AbstractBlock
   def has_header?
     !@header.nil?
   end
+
+  # Public: Append a content Block to this Document.
+  #
+  # If the child block is a Section, assign an index to it.
+  #
+  # block - The child Block to append to this parent Block
+  #
+  # Returns nothing.
+  def <<(block)
+    super
+    if block.context == :section
+      assign_index(block) 
+    end
+  end
  
   # Internal: Branch the attributes so that the original state can be restored
   # at a future time.
@@ -633,7 +647,7 @@ class Document < AbstractBlock
     if BACKEND_ALIASES.has_key? backend
       backend = @attributes['backend'] = BACKEND_ALIASES[backend]
     end
-    basebackend = backend.sub(/[[:digit:]]+$/, '')
+    basebackend = backend.sub(REGEXP[:trailing_digit], '')
     page_width = DEFAULT_PAGE_WIDTHS[basebackend]
     if page_width
       @attributes['pagewidth'] = page_width
@@ -686,7 +700,7 @@ class Document < AbstractBlock
     r = renderer(opts)
     if doctype == 'inline'
       # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
-      if @blocks.size > 0 && (block = @blocks.first).context == :paragraph
+      if !(block = @blocks.first).nil? && block.content_model != :compound
         block.content
       else
         ''

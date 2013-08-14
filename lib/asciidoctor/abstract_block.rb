@@ -1,5 +1,8 @@
 module Asciidoctor
 class AbstractBlock < AbstractNode
+  # Public: The types of content that this block can accomodate
+  attr_accessor :content_model
+
   # Public: Get the String name of the render template
   attr_reader :template_name
 
@@ -20,6 +23,7 @@ class AbstractBlock < AbstractNode
 
   def initialize(parent, context)
     super(parent, context)
+    @content_model = :compound
     @template_name = "block_#{context}"
     @blocks = []
     @id = nil
@@ -115,18 +119,19 @@ class AbstractBlock < AbstractNode
   #
   # Examples
   #
-  #   block = Block.new(parent, :preamble)
+  #   block = Block.new(parent, :preamble, :content_model => :compound)
   #
-  #   block << Block.new(block, :paragraph, 'p1')
-  #   block << Block.new(block, :paragraph, 'p2')
-  #   block.blocks
-  #   # => ["p1", "p2"]
+  #   block << Block.new(block, :paragraph, :source => 'p1')
+  #   block << Block.new(block, :paragraph, :source => 'p2')
+  #   block.blocks?
+  #   # => true
+  #   block.blocks.size
+  #   # => 2
   #
   # Returns nothing.
   def <<(block)
-    if block.is_a?(Section)
-      assign_index(block)
-    end
+    # parent assignment pending refactor
+    #block.parent = self
     @blocks << block
   end
 
@@ -137,9 +142,13 @@ class AbstractBlock < AbstractNode
   # Examples
   # 
   #   section = Section.new(parent)
-  #   section << Block.new(section, :paragraph, 'paragraph 1')
+  #   section << Block.new(section, :paragraph, :source => 'paragraph 1')
   #   section << Section.new(parent)
-  #   section << Block.new(section, :paragraph, 'paragraph 2')
+  #   section << Block.new(section, :paragraph, :source => 'paragraph 2')
+  #   section.blocks?
+  #   # => true
+  #   section.blocks.size
+  #   # => 3
   #   section.sections.size
   #   # => 1
   #

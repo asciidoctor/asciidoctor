@@ -22,17 +22,28 @@ class AbstractNode
   attr_reader :attributes
 
   def initialize(parent, context)
-    @parent = (context != :document ? parent : nil)
-
-    if !parent.nil?
-      @document = parent.is_a?(Document) ? parent : parent.document
+    # document is a special case, should refer to itself
+    if context == :document
+      @parent = nil
+      @document = parent
     else
-      @document = nil
+      @parent = parent
+      @document = (parent.nil? ? nil : parent.document)
     end
-    
     @context = context
     @attributes = {}
     @passthroughs = []
+  end
+
+  # Public: Associate this Block with a new parent Block
+  #
+  # parent - The Block to set as the parent of this Block
+  #
+  # Returns nothing
+  def parent=(parent)
+    @parent = parent
+    @document = parent.document
+    nil
   end
 
   # Public: Get the value of the specified attribute

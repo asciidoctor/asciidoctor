@@ -161,6 +161,20 @@ class Section < AbstractBlock
     end
   end
 
+  # Public: Append a content block to this block's list of blocks.
+  #
+  # If the child block is a Section, assign an index to it.
+  #
+  # block - The child Block to append to this parent Block
+  #
+  # Returns nothing.
+  def <<(block)
+    super
+    if block.context == :section
+      assign_index(block) 
+    end
+  end
+
   def to_s
     if @title
       if @numbered

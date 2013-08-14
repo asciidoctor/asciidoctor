@@ -484,6 +484,10 @@ module Asciidoctor
       :end => /[[:blank:]]+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
     },
 
+    # docbook45
+    # html5
+    :trailing_digit   => /[[:digit:]]+$/,
+
     # .Foo   but not  . Foo or ..Foo
     :blk_title        => /^\.([^\s.].*)$/,
 

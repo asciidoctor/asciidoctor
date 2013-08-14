@@ -571,7 +571,7 @@ class BlockOpenTemplate < BaseTemplate
 
   def open_block(node, id, style, role, title, content)
     if style == 'abstract'
-      if node.parent == node.document && node.document.attr?('doctype', 'book')
+      if node.parent == node.document && node.document.doctype == 'book'
         warn 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
         ''
       else
@@ -582,7 +582,7 @@ class BlockOpenTemplate < BaseTemplate
 </blockquote>
 </div>)
       end
-    elsif style == 'partintro' && (node.level != 0 || node.parent.context != :section || !node.document.attr?('doctype', 'book'))
+    elsif style == 'partintro' && (node.level != 0 || node.parent.context != :section || node.document.doctype != 'book')
       warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a book part. Excluding block content.'
       ''
     else
