@@ -494,6 +494,12 @@ class Reader
     @lines.dup
   end
 
+  # Public: Get a copy of the remaining lines managed by this Reader joined as a String
+  def string
+    @lines.join
+  end
+
+  # Public: Get the source lines for this Reader joined as a String
   def source
     @source_lines.join
   end
@@ -560,6 +566,14 @@ class PreprocessorReader < Reader
     end
 
     result
+  end
+
+  # FIXME need to deal with cursor info
+  def invoke_preprocessors preprocessors
+    preprocessors.each do |processor|
+      #@lines = processor.process self, @lines
+      @lines = processor.process @lines
+    end
   end
 
   def process_line line

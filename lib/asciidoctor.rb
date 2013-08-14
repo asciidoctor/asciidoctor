@@ -376,6 +376,9 @@ module Asciidoctor
     # footnoteref:[id]
     :footnote_macro   => /\\?(footnote|footnoteref):\[((?:\\\]|[^\]])*?)\]/,
 
+    # gist::123456[]
+    :generic_blk_macro => /^(\w[\w\-]*)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/,
+
     # kbd:[F3]
     # kbd:[Ctrl+Shift+T]
     # kbd:[Ctrl+\]]
