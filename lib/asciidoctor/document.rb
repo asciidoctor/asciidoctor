@@ -100,18 +100,33 @@ class Document < AbstractBlock
   #   puts doc.render
   def initialize(data = [], options = {}, &block)
     super(self, :document)
-    @renderer = nil
 
     if options[:parent]
       @parent_document = options.delete(:parent)
-      # QUESTION should we support setting attribute in parent document from nested document?
-      options[:attributes] = @parent_document.attributes
       options[:base_dir] ||= @parent_document.base_dir
+      # QUESTION should we support setting attribute in parent document from nested document?
+      @attribute_overrides = @parent_document.attributes
       @safe = @parent_document.safe
       @renderer = @parent_document.renderer
     else
       @parent_document = nil
+      # copy attributes map and normalize keys
+      # attribute overrides are attributes that can only be set from the commandline
+      # a direct assignment effectively makes the attribute a constant
+      # a nil value or name with leading or trailing ! will result in the attribute being unassigned
+      @attribute_overrides = (options[:attributes] || {}).inject({}) do |collector,(key,value)|
+        if key.start_with?('!')
+          key = key[1..-1]
+          value = nil
+        elsif key.end_with?('!')
+          key = key[0..-2]
+          value = nil
+        end
+        collector[key.downcase] = value
+        collector
+      end
       @safe = nil
+      @renderer = nil
     end
 
     @header = nil
@@ -126,7 +141,7 @@ class Document < AbstractBlock
     @callouts = Callouts.new
     @attributes_modified = Set.new
     @options = options
-    if @parent_document.nil?
+    unless @parent_document
       # safely resolve the safe mode from const, int or string
       if @safe.nil? && !(safe_mode = @options[:safe])
         @safe = SafeMode::SECURE
@@ -168,23 +183,6 @@ class Document < AbstractBlock
     @attributes['version-label'] = 'Version'
     @attributes['last-update-label'] = 'Last updated'
 
-    # copy attributes map and normalize keys
-    # attribute overrides are attributes that can only be set from the commandline
-    # a direct assignment effectively makes the attribute a constant
-    # a nil value or name with leading or trailing ! will result in the attribute being unassigned
-    # FIXME normalizing keys isn't required if document is nested
-    @attribute_overrides = (options[:attributes] || {}).inject({}) do |collector,(key,value)|
-      if key.start_with?('!')
-        key = key[1..-1]
-        value = nil
-      elsif key.end_with?('!')
-        key = key[0..-2]
-        value = nil
-      end
-      collector[key.downcase] = value
-      collector
-    end
-
     @attribute_overrides['asciidoctor'] = ''
     @attribute_overrides['asciidoctor-version'] = VERSION
 
@@ -208,7 +206,7 @@ class Document < AbstractBlock
     # if the base_dir option is specified, it overrides docdir as the root for relative paths
     # otherwise, the base_dir is the directory of the source file (docdir) or the current
     # directory of the input is a string
-    if options[:base_dir].nil?
+    if @options[:base_dir].nil?
       if @attribute_overrides['docdir']
         @base_dir = @attribute_overrides['docdir'] = File.expand_path(@attribute_overrides['docdir'])
       else
@@ -216,7 +214,7 @@ class Document < AbstractBlock
         @base_dir = @attribute_overrides['docdir'] = File.expand_path(Dir.pwd)
       end
     else
-      @base_dir = @attribute_overrides['docdir'] = File.expand_path(options[:base_dir])
+      @base_dir = @attribute_overrides['docdir'] = File.expand_path(@options[:base_dir])
     end
 
     # allow common attributes backend and doctype to be set using options hash
@@ -234,7 +232,7 @@ class Document < AbstractBlock
       @attribute_overrides['source-highlighter'] ||= nil
       @attribute_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
-      if @attribute_overrides.has_key?('docfile') && @parent_document.nil?
+      if !@parent_document && @attribute_overrides.has_key?('docfile')
         @attribute_overrides['docfile'] = @attribute_overrides['docfile'][(@attribute_overrides['docdir'].length + 1)..-1]
       end
       @attribute_overrides['docdir'] = ''
@@ -275,38 +273,35 @@ class Document < AbstractBlock
       verdict
     }
 
-    @attributes['backend'] ||= DEFAULT_BACKEND
-    @attributes['doctype'] ||= DEFAULT_DOCTYPE
-    update_backend_attributes
-    # make toc and numbered the default for the docbook backend
-    # FIXME this doesn't take into account the backend being set in the document
-    #if @attributes.has_key?('basebackend-docbook')
-    #  @attributes['toc'] = '' unless @attribute_overrides.has_key?('toc!')
-    #  @attributes['numbered'] = '' unless @attribute_overrides.has_key?('numbered!')
-    #end
+    unless @parent_document
+      # setup default backend and doctype
+      @attributes['backend'] ||= DEFAULT_BACKEND
+      @attributes['doctype'] ||= DEFAULT_DOCTYPE
+      update_backend_attributes
 
-    if !@parent_document.nil?
+      # dynamic intrinstic attribute values
+      now = Time.new
+      @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
+      @attributes['localtime'] ||= now.strftime('%H:%M:%S %Z')
+      @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']] * ' '
+      
+      # docdate, doctime and docdatetime should default to
+      # localdate, localtime and localdatetime if not otherwise set
+      @attributes['docdate'] ||= @attributes['localdate']
+      @attributes['doctime'] ||= @attributes['localtime']
+      @attributes['docdatetime'] ||= @attributes['localdatetime']
+
+      # fallback directories
+      @attributes['stylesdir'] ||= '.'
+      @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', './images'), 'icons')
+    end
+
+    if @parent_document
       # don't need to do the extra processing within our own document
       @reader = Reader.new(data, self)
     else
       @reader = Reader.new(data, self, true, &block)
     end
-
-    # dynamic intrinstic attribute values
-    now = Time.new
-    @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
-    @attributes['localtime'] ||= now.strftime('%H:%M:%S %Z')
-    @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']] * ' '
-    
-    # docdate, doctime and docdatetime should default to
-    # localdate, localtime and localdatetime if not otherwise set
-    @attributes['docdate'] ||= @attributes['localdate']
-    @attributes['doctime'] ||= @attributes['localtime']
-    @attributes['docdatetime'] ||= @attributes['localdatetime']
-
-    # fallback directories
-    @attributes['stylesdir'] ||= '.'
-    @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', './images'), 'icons')
 
     # Now parse the lines in the reader into blocks
     Lexer.parse(@reader, self, :header_only => @options.fetch(:parse_header_only, false)) 
@@ -393,7 +388,7 @@ class Document < AbstractBlock
   end
 
   def nested?
-    !@parent_document.nil?
+    @parent_document ? true : false
   end
 
   def embedded?
@@ -475,7 +470,7 @@ class Document < AbstractBlock
   end
 
   def has_header?
-    !@header.nil?
+    @header ? true : false
   end
 
   # Public: Append a content Block to this Document.
@@ -488,7 +483,7 @@ class Document < AbstractBlock
   def <<(block)
     super
     if block.context == :section
-      assign_index(block) 
+      assign_index block
     end
   end
  
@@ -507,7 +502,7 @@ class Document < AbstractBlock
     end
 
     # css-signature cannot be updated after header attributes are processed
-    if @id.nil? && @attributes.has_key?('css-signature')
+    if !@id && @attributes.has_key?('css-signature')
       @id = @attributes['css-signature']
     end
 
@@ -762,7 +757,8 @@ class Document < AbstractBlock
         end
       end
 
-      content.nil? ? '' : content
+      # to_s forces nil to empty string
+      content.to_s
     end
   end
 

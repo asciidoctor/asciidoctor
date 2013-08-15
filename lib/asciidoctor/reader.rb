@@ -52,7 +52,7 @@ class Reader
       @document = document
       @preprocess_source = true
       @include_block = block_given? ? block : nil
-      normalize_data(data.is_a?(String) ? data.lines.entries : data)
+      normalize_data(data.is_a?(String) ? data.lines : data)
     else
       @lines = []
       @preprocess_source = false
@@ -864,15 +864,6 @@ class Reader
 
     @lines.shift && @lineno += 1 while !@lines.first.nil? && @lines.first.chomp.empty?
     @lines.pop while !@lines.last.nil? && @lines.last.chomp.empty?
-
-    # Process bibliography references, so they're available when text
-    # before the reference is being rendered.
-    # FIXME reenable whereever it belongs
-    #@lines.each do |line|
-    #  if biblio = line.match(REGEXP[:biblio])
-    #    @document.register(:ids, biblio[1])
-    #  end
-    #end
     nil
   end
 end

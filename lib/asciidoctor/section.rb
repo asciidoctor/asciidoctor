@@ -171,7 +171,7 @@ class Section < AbstractBlock
   def <<(block)
     super
     if block.context == :section
-      assign_index(block) 
+      assign_index block
     end
   end
 

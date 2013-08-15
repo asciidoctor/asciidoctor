@@ -200,7 +200,7 @@ include::https://raw.github.com/asciidoctor/asciidoctor/master/LICENSE[]
     test 'inaccessible uri referenced by include macro does not crash processor' do
       input = <<-EOS
 ....
-include::http://localhost:0[]
+include::http://127.0.0.1:0[]
 ....
       EOS
 

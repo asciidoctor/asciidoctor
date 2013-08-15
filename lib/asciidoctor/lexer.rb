@@ -437,6 +437,7 @@ class Lexer
                   :into => attributes)
               target = block.sub_attributes(match[2])
               if target.empty?
+                # FIXME shouldn't this consult ignore-missing setting before dropping?
                 # drop the line if target resolves to nothing
                 return nil
               end
@@ -827,8 +828,10 @@ class Lexer
         }
         # QUESTION check for empty lines after grabbing lines for simple content model?
       end
+      block_reader = nil
     elsif parse_as_content_model != :compound
       lines = reader.grab_lines_until(:terminator => terminator, :chomp_last_line => true)
+      block_reader = nil
     # terminator is false when reader has already been prepared
     elsif terminator == false
       lines = nil
