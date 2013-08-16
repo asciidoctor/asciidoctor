@@ -4,6 +4,9 @@ require 'asciidoctor/extensions'
 class SamplePreprocessor < Asciidoctor::Extensions::Preprocessor
 end
 
+class SampleIncludeProcessor < Asciidoctor::Extensions::IncludeProcessor
+end
+
 class SampleTreeprocessor < Asciidoctor::Extensions::Treeprocessor
 end
 
@@ -27,6 +30,21 @@ class ScrubHeaderPreprocessor < Asciidoctor::Extensions::Preprocessor
     end
     #lines
     reader
+  end
+end
+
+class BoilerplateTextIncludeProcessor < Asciidoctor::Extensions::IncludeProcessor
+  def handles? target
+    target.end_with? '.txt'
+  end
+
+  def process target, attributes
+    case target
+    when 'lorem-ipsum.txt'
+      ["Lorem ipsum dolor sit amet...\n"]
+    else
+      nil
+    end
   end
 end
 
@@ -184,6 +202,15 @@ context 'Extensions' do
       assert processors.first.is_a? SamplePreprocessor
     end
 
+    test 'should instantiate include processors' do
+      registry = Asciidoctor::Extensions::Registry.new
+      registry.include_processor SampleIncludeProcessor
+      assert registry.include_processors?
+      processors = registry.load_include_processors Asciidoctor::Document.new
+      assert_equal 1, processors.size
+      assert processors.first.is_a? SampleIncludeProcessor
+    end
+
     test 'should instantiate treeprocessors' do
       registry = Asciidoctor::Extensions::Registry.new
       registry.treeprocessor SampleTreeprocessor
@@ -254,6 +281,29 @@ sample content
         doc = document_from_string input
         assert doc.has_header?
         assert_equal 'Document Title', doc.doctitle
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should invoke include processor to process include macro' do
+      input = <<-EOS
+before
+
+include::lorem-ipsum.txt[]
+
+after
+      EOS
+
+      begin
+        Asciidoctor::Extensions.register do |document|
+          include_processor BoilerplateTextIncludeProcessor
+        end
+
+        result = render_string input, :safe => :server
+        assert result.include?('before')
+        assert result.include?('Lorem ipsum')
+        assert result.include?('after')
       ensure
         Asciidoctor::Extensions.unregister_all
       end
