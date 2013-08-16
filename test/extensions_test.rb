@@ -38,10 +38,11 @@ class BoilerplateTextIncludeProcessor < Asciidoctor::Extensions::IncludeProcesso
     target.end_with? '.txt'
   end
 
-  def process target, attributes
+  def process reader, target, attributes
     case target
     when 'lorem-ipsum.txt'
-      ["Lorem ipsum dolor sit amet...\n"]
+      content = ["Lorem ipsum dolor sit amet...\n"]
+      reader.push_include content, target, target, 1, attributes
     else
       nil
     end
@@ -301,6 +302,7 @@ after
         end
 
         result = render_string input, :safe => :server
+        assert_css '.paragraph > p', result, 3
         assert result.include?('before')
         assert result.include?('Lorem ipsum')
         assert result.include?('after')

@@ -612,8 +612,9 @@ last line
             true
           end
 
-          def process target, attributes
-            ["include target:: #{target}\n", "\n", "middle line\n"]
+          def process reader, target, attributes
+            content = ["include target:: #{target}\n", "\n", "middle line\n"]
+            reader.push_include content, target, target, 1, attributes
           end
         }
 
@@ -621,7 +622,15 @@ last line
         document = empty_document :base_dir => DIRNAME
         reader = Asciidoctor::PreprocessorReader.new document, input
         reader.instance_variable_set '@include_processors', [include_processor.new(document)]
-        lines = reader.get_lines
+        lines = []
+        lines << reader.read_line
+        lines << reader.read_line
+        lines << reader.read_line
+        assert_equal "include target:: include-file.asciidoc\n", lines.last
+        assert_equal 'include-file.asciidoc: line 2', reader.line_info
+        while reader.has_more_lines?
+          lines << reader.read_line
+        end
         source = lines.join
         assert_match(/^include target:: include-file.asciidoc$/, source)
         assert_match(/^middle line$/, source)
@@ -640,7 +649,7 @@ include::fixtures/include-file.asciidoc[]
             false
           end
   
-          def process target, attributes
+          def process reader, target, attributes
             raise 'TestIncludeHandler should not have been invoked'
           end
         }
@@ -648,7 +657,7 @@ include::fixtures/include-file.asciidoc[]
         document = empty_safe_document :base_dir => DIRNAME
         reader = Asciidoctor::PreprocessorReader.new document, input
         reader.instance_variable_set '@include_processors', [include_processor.new(document)]
-        lines = reader.get_lines
+        lines = reader.read_lines
         source = lines.join
         assert_match(/included content/, source)
       end

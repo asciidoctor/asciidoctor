@@ -1,5 +1,4 @@
 module Asciidoctor
-
 # Public: Methods for retrieving lines from AsciiDoc source files
 class Reader
   class Cursor
@@ -1112,5 +1111,4 @@ class PreprocessorReader < Reader
     %(#{self.class.name} [path: #{@path}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|include| include.to_s}.join ', '}]])
   end
 end
-
 end
