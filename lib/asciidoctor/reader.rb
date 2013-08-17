@@ -244,6 +244,22 @@ class Reader
     end
   end
 
+  # Public: Get the remaining lines of source data by calling
+  # Reader#get_line until all lines are consumed.
+  #
+  # preprocess - A Boolean flag indicating whether to evaluate preprocessing
+  #              directives (macros) before reading line (default: true)
+  #
+  # Returns the lines read as a String Array
+  def get_lines(preprocess = true)
+    lines = nil
+    while has_more_lines? preprocess
+      (lines ||= []) << get_line(preprocess)
+    end
+    @eof = true
+    lines
+  end
+
   # Public: Advance to the next line by discarding the line at the front of the stack
   #
   # Removes the line at the front of the stack without any processing.
@@ -258,6 +274,15 @@ class Reader
       @lineno += 1
       @lines.shift
       true
+    end
+  end
+
+  # Public: Advance to the end of the reader, consuming all remaining lines
+  #
+  # Returns nothing.
+  def terminate
+    while !@eof
+      advance
     end
   end
 

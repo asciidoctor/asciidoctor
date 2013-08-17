@@ -42,6 +42,36 @@ class ReaderTest < Test::Unit::TestCase
       assert_equal "bar", reader.get_line
       assert_equal "foo", reader.get_line
     end
+
+    test 'get lines consumes all remaining lines' do
+      input = <<-EOS
+line 1
+line 2
+line 3
+      EOS
+      input_lines = input.lines.entries
+      reader = Asciidoctor::Reader.new input_lines
+      assert_equal input_lines, reader.lines
+      assert_equal 'line 1', reader.get_line.chomp
+      assert_equal input_lines[1..-1], reader.get_lines
+      assert !reader.has_more_lines?
+      assert_equal 3, reader.lineno
+    end
+
+    test 'terminate should consume remaining lines' do
+      input = <<-EOS
+line 1
+line 2
+line 3
+      EOS
+      input_lines = input.lines.entries
+      reader = Asciidoctor::Reader.new input_lines
+      assert_equal input_lines, reader.lines
+      assert_equal 'line 1', reader.get_line.chomp
+      reader.terminate
+      assert !reader.has_more_lines?
+      assert_equal 3, reader.lineno
+    end
   end
 
   context "Grab lines" do
