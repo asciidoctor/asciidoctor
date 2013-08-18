@@ -365,7 +365,7 @@ td.hdlist1, td.hdlist2 { vertical-align: top; }
 .literalblock + .colist, .listingblock + .colist { margin-top: -0.5em; }
 .colist > table tr > td:first-of-type { padding: 0 .8em; line-height: 1; }
 .colist > table tr > td:last-of-type { padding: 0.25em 0; }
-.qanda > ol > li > p:first-child { color: #00467f; }
+.qanda > ol > li > p > em:only-child { color: #00467f; }
 .thumb, .th { line-height: 0; display: inline-block; border: solid 4px white; -webkit-box-shadow: 0 0 0 1px #dddddd; box-shadow: 0 0 0 1px #dddddd; }
 .imageblock { margin-bottom: 1.25em; }
 .imageblock.left, .imageblock[style*="float: left"] { margin: 0.25em 0.625em 1.25em 0; }
