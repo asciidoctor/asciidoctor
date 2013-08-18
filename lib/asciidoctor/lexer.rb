@@ -435,11 +435,15 @@ class Lexer
                   :sub_input => true,
                   :sub_result => false,
                   :into => attributes)
-              target = block.sub_attributes(match[2])
+              target = block.sub_attributes(match[2], :attribute_missing => 'drop-line')
               if target.empty?
-                # FIXME shouldn't this consult ignore-missing setting before dropping?
-                # drop the line if target resolves to nothing
-                return nil
+                if document.attributes.fetch('attribute-missing', COMPLIANCE[:attribute_missing]) == 'skip'
+                  # retain as unparsed
+                  return Block.new(parent, :paragraph, :source => [this_line.chomp])
+                else
+                  # drop the line if target resolves to nothing
+                  return nil
+                end
               end
 
               attributes['target'] = target

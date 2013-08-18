@@ -284,7 +284,7 @@ module Substituters
   #--
   # NOTE it's necessary to perform this substitution line-by-line
   # so that a missing key doesn't wipe out the whole block of data
-  def sub_attributes(data)
+  def sub_attributes(data, opts = {})
     return data if data.nil? || data.empty?
 
     string_data = data.is_a? String
@@ -308,8 +308,8 @@ module Substituters
             args = expr.split(':')
             _, value = Lexer::store_attribute(args[0], args[1] || '', @document)
             if value.nil?
-              reject = !(@document.attributes.has_key? 'ignore-undefined')
-              if reject
+              # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
+              if @document.attributes.fetch('attribute-undefined', COMPLIANCE[:attribute_undefined]) == 'drop-line'
                 Debug.debug { "Undefining attribute: #{key}, line marked for removal" }
                 break ''
               end
@@ -329,12 +329,14 @@ module Substituters
         elsif INTRINSICS.has_key? key
           INTRINSICS[key]
         else
-          reject = !(@document.attributes.has_key? 'ignore-undefined')
-          if reject
+          case (opts[:attribute_missing] || @document.attributes.fetch('attribute-missing', COMPLIANCE[:attribute_missing]))
+          when 'skip'
+            "{#{key}}"
+          when 'drop-line'
             Debug.debug { "Missing attribute: #{key}, line marked for removal" }
             break ''
-          else
-            "{#{key}}"
+          else # 'drop'
+            ''
           end
         end
       } if line.include? '{' 
