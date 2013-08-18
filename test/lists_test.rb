@@ -3828,3 +3828,20 @@ context 'Checklists' do
     assert_xpath '(/*[@class="ulist checklist"]/ul/li)[3]/p[text()="plain"]', output, 1
   end
 end
+
+context 'Lists model' do
+  test 'content should return items in list' do
+    input = <<-EOS
+* one
+* two
+* three
+    EOS
+
+    doc = document_from_string input
+    list = doc.blocks.first
+    assert list.is_a? Asciidoctor::List
+    items = list.items
+    assert_equal 3, items.size
+    assert_equal list.items, list.content
+  end
+end

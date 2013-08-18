@@ -52,7 +52,6 @@ class AbstractBlock < AbstractNode
 
   # Public: Get an rendered version of the block content, rendering the
   # children appropriate to content model that this block supports.
-  #
   def content
     @blocks.map {|b| b.render } * EOL
   end

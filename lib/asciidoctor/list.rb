@@ -10,6 +10,11 @@ class List < AbstractBlock
     super(parent, context)
   end
 
+  # Public: Get the items in this list as an Array
+  def content
+    @blocks
+  end
+
   def render
     result = super
     @document.callouts.next_list if @context == :colist
