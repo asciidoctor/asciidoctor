@@ -7,6 +7,12 @@ context "Lexer" do
     assert Asciidoctor::Lexer.is_section_title?('=== AsciiDoc Home Page')
   end
 
+  test 'sanitize attribute name' do
+    assert_equal 'foobar', Asciidoctor::Lexer.sanitize_attribute_name("Foo Bar")
+    assert_equal 'foo', Asciidoctor::Lexer.sanitize_attribute_name("foo")
+    assert_equal 'foo3-bar', Asciidoctor::Lexer.sanitize_attribute_name("Foo 3^ # - Bar[")
+  end
+
   test "collect unnamed attribute" do
     attributes = {}
     line = 'quote'

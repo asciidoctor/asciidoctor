@@ -25,9 +25,12 @@ class Document < AbstractBlock
     end
 
     def save_to(block_attributes)
-      block_attributes[:attribute_entries] ||= []
-      block_attributes[:attribute_entries] << self
+      (block_attributes[:attribute_entries] ||= []) << self
     end
+
+    #def save_to_next_block(document)
+    #  (document.attributes[:pending_attribute_entries] ||= []) << self
+    #end
   end
 
   # Public A read-only integer value indicating the level of security that
@@ -198,7 +201,7 @@ class Document < AbstractBlock
     @attribute_overrides['embedded'] = @options[:header_footer] ? nil : ''
 
     # the only way to set the include-depth attribute is via the document options
-    # 10 is the AsciiDoc default, though currently Asciidoctor only supports 1 level
+    # 10 is the AsciiDoc default
     @attribute_overrides['include-depth'] ||= 10
 
     # the only way to enable uri reads is via the document options, disabled by default
@@ -282,6 +285,9 @@ class Document < AbstractBlock
       @attributes['doctype'] ||= DEFAULT_DOCTYPE
       update_backend_attributes
 
+      @attributes['indir'] = @attributes['docdir']
+      @attributes['infile'] = @attributes['docfile']
+
       # dynamic intrinstic attribute values
       now = Time.new
       @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
@@ -301,9 +307,11 @@ class Document < AbstractBlock
 
     if @parent_document
       # don't need to do the extra processing within our own document
-      @reader = Reader.new(data, self)
+      # FIXME how are line numbers being tracked in this case?!?!
+      @reader = Reader.new data
     else
-      @reader = Reader.new(data, self, true, &block)
+      # TODO review the docfile logic here
+      @reader = PreprocessorReader.new self, data, ((@attributes.has_key? 'docfile') ? File.basename(@attributes['docfile']) : nil)
     end
 
     # Now parse the lines in the reader into blocks
@@ -401,12 +409,12 @@ class Document < AbstractBlock
 
   # Make the raw source for the Document available.
   def source
-    @reader.source.join if @reader
+    @reader.source if @reader
   end
 
   # Make the raw source lines for the Document available.
   def source_lines
-    @reader.source if @reader
+    @reader.source_lines if @reader
   end
 
   def doctype

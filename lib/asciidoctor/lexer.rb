@@ -138,7 +138,7 @@ class Lexer
       document.attributes['mantitle'] = document.sub_attributes(m[1].rstrip.downcase)
       document.attributes['manvolnum'] = m[2].strip
     else
-      warn "asciidoctor: ERROR: line #{reader.lineno}: malformed manpage title"
+      warn "asciidoctor: ERROR: #{reader.prev_line_info}: malformed manpage title"
     end
 
     reader.skip_blank_lines
@@ -146,7 +146,7 @@ class Lexer
     if is_next_line_section?(reader, {})
       name_section = initialize_section(reader, document, {})
       if name_section.level == 1
-        name_section_buffer = reader.grab_lines_until(:break_on_blank_lines => true).join.tr_s("\n ", ' ')
+        name_section_buffer = reader.take_lines_until(:break_on_blank_lines => true).join.tr_s("\n ", ' ')
         if (m = name_section_buffer.match(REGEXP[:manname_manpurpose]))
           document.attributes['manname'] = m[1] 
           document.attributes['manpurpose'] = m[2] 
@@ -157,13 +157,13 @@ class Lexer
             document.attributes['outfilesuffix'] = ".#{document.attributes['manvolnum']}"
           end
         else
-          warn "asciidoctor: ERROR: line #{reader.lineno}: malformed name section body"
+          warn "asciidoctor: ERROR: #{reader.prev_line_info}: malformed name section body"
         end
       else
-        warn "asciidoctor: ERROR: line #{reader.lineno}: name section title must be at level 1"
+        warn "asciidoctor: ERROR: #{reader.prev_line_info}: name section title must be at level 1"
       end
     else
-      warn "asciidoctor: ERROR: line #{reader.lineno}: name section expected"
+      warn "asciidoctor: ERROR: #{reader.prev_line_info}: name section expected"
     end
   end
 
@@ -265,9 +265,9 @@ class Lexer
         doctype = parent.document.doctype
         if next_level > current_level || (section.is_a?(Document) && next_level == 0)
           if next_level == 0 && doctype != 'book'
-            warn "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
+            warn "asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections"
           elsif !expected_next_levels.nil? && !expected_next_levels.include?(next_level)
-            warn "asciidoctor: WARNING: line #{reader.lineno + 1}: section title out of sequence: " +
+            warn "asciidoctor: WARNING: #{reader.line_info}: section title out of sequence: " +
                 "expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, " +
                 "got level #{next_level}"
           end
@@ -276,7 +276,7 @@ class Lexer
           section << new_section
         else
           if next_level == 0 && doctype != 'book'
-            warn "asciidoctor: ERROR: line #{reader.lineno + 1}: only book doctypes can contain level 0 sections"
+            warn "asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections"
           end
           # close this section (and break out of the nesting) to begin a new one
           break
@@ -362,7 +362,7 @@ class Lexer
       end
 
       # QUESTION should we introduce a parsing context object?
-      this_line = reader.get_line
+      this_line = reader.read_line
       delimited_block = false
       block_context = nil
       terminator = nil
@@ -383,7 +383,7 @@ class Lexer
           elsif delimited_blk_match.masq.include?('admonition') && ADMONITION_STYLES.include?(style)
             block_context = :admonition
           else
-            warn "asciidoctor: WARNING: line #{reader.lineno}: invalid style for #{block_context} block: #{style}"
+            warn "asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for #{block_context} block: #{style}"
             style = block_context.to_s
           end
         end
@@ -474,7 +474,7 @@ class Lexer
             begin
               # might want to move this check to a validate method
               if match[1].to_i != expected_index
-                warn "asciidoctor: WARNING: line #{reader.lineno + 1}: callout list item index: expected #{expected_index} got #{match[1]}"
+                warn "asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: callout list item index: expected #{expected_index} got #{match[1]}"
               end
               list_item = next_list_item(reader, block, match)
               expected_index += 1
@@ -484,7 +484,7 @@ class Lexer
                 if !coids.empty?
                   list_item.attributes['coids'] = coids
                 else
-                  warn "asciidoctor: WARNING: line #{reader.lineno}: no callouts refer to list item #{block.items.size}"
+                  warn "asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: no callouts refer to list item #{block.items.size}"
                 end
               end
             end while reader.has_more_lines? && match = reader.peek_line.match(REGEXP[:colist])
@@ -550,7 +550,7 @@ class Lexer
               # advance to block parsing =>
               break
             else
-              warn "asciidoctor: WARNING: line #{reader.lineno}: invalid style for paragraph: #{style}"
+              warn "asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for paragraph: #{style}"
               style = nil
               # continue to process paragraph
             end
@@ -560,9 +560,9 @@ class Lexer
 
           # a literal paragraph is contiguous lines starting at least one space
           if style != 'normal' && this_line.match(REGEXP[:lit_par])
-            # So we need to actually include this one in the grab_lines group
+            # So we need to actually include this one in the take_lines group
             reader.unshift_line this_line
-            lines = reader.grab_lines_until(
+            lines = reader.take_lines_until(
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true,
                 :preserve_last_line => true) {|line|
@@ -584,7 +584,7 @@ class Lexer
           # a paragraph is contiguous nonblank/noncontinuation lines
           else
             reader.unshift_line this_line
-            lines = reader.grab_lines_until(
+            lines = reader.take_lines_until(
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true,
                 :preserve_last_line => true,
@@ -602,7 +602,7 @@ class Lexer
             # were the only lines found
             if lines.empty?
               # call get_line since the reader preserved the last line
-              reader.get_line
+              reader.read_line
               return nil
             end
 
@@ -638,6 +638,7 @@ class Lexer
               attributes['citetitle'] = citetitle unless citetitle.nil?
               # NOTE will only detect headings that are floating titles (not section titles)
               # TODO could assume a floating title when inside a block context
+              # FIXME Reader needs to be created w/ line info
               block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
             elsif !text_only && lines.size > 1 && first_line.start_with?('"') &&
                 lines.last.start_with?('-- ') && lines[-2].chomp.end_with?('"')
@@ -707,7 +708,10 @@ class Lexer
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :table
-          block_reader = Reader.new reader.grab_lines_until(:terminator => terminator, :skip_line_comments => true)
+          file = reader.file
+          path = reader.path
+          lineno = reader.lineno
+          block_reader = Reader.new reader.take_lines_until(:terminator => terminator, :skip_line_comments => true), file, path, lineno
           case terminator[0..0]
             when ','
               attributes['format'] = 'csv'
@@ -722,7 +726,7 @@ class Lexer
 
         else
           # this should only happen if there is a misconfiguration
-          raise "Unsupported block type #{block_context} at line #{reader.lineno}"
+          raise "Unsupported block type #{block_context} at #{reader.line_info}"
         end
       end
     end
@@ -745,6 +749,12 @@ class Lexer
         document.register(:ids, [block.id, block.title])
       end
       block.update_attributes(attributes)
+
+      #if document.attributes.has_key? :pending_attribute_entries
+      #  document.attributes.delete(:pending_attribute_entries).each do |entry|
+      #    entry.save_to block.attributes
+      #  end
+      #end
 
       # FIXME callout capabilities should be a setting on the block
       if block.context == :listing || block.context == :literal
@@ -820,10 +830,10 @@ class Lexer
 
     if terminator.nil?
       if parse_as_content_model == :verbatim
-        lines = reader.grab_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
+        lines = reader.take_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
       else
         content_model = :simple if content_model == :compound
-        lines = reader.grab_lines_until(
+        lines = reader.take_lines_until(
             :break_on_blank_lines => true,
             :break_on_list_continuation => true,
             :preserve_last_line => true,
@@ -834,7 +844,7 @@ class Lexer
       end
       block_reader = nil
     elsif parse_as_content_model != :compound
-      lines = reader.grab_lines_until(:terminator => terminator, :chomp_last_line => true)
+      lines = reader.take_lines_until(:terminator => terminator, :chomp_last_line => true)
       block_reader = nil
     # terminator is false when reader has already been prepared
     elsif terminator == false
@@ -842,7 +852,10 @@ class Lexer
       block_reader = reader
     else
       lines = nil
-      block_reader = Reader.new reader.grab_lines_until(:terminator => terminator)
+      file = reader.file
+      path = reader.path
+      lineno = reader.lineno
+      block_reader = Reader.new reader.take_lines_until(:terminator => terminator), file, path, lineno
     end
 
     if content_model == :skip
@@ -1050,15 +1063,18 @@ class Lexer
     end
 
     # first skip the line with the marker / term
-    reader.get_line
-    list_item_reader = Reader.new grab_lines_for_list_item(reader, list_type, sibling_trait, has_text)
+    reader.read_line
+    file = reader.file
+    path = reader.path
+    lineno = reader.lineno
+    list_item_reader = Reader.new take_lines_for_list_item(reader, list_type, sibling_trait, has_text), file, path, lineno
     if list_item_reader.has_more_lines?
       comment_lines = list_item_reader.consume_line_comments
       subsequent_line = list_item_reader.peek_line
       list_item_reader.unshift(*comment_lines) unless comment_lines.empty? 
 
       if !subsequent_line.nil?
-        continuation_connects_first_block = (subsequent_line == "\n")
+        continuation_connects_first_block = (subsequent_line == ::Asciidoctor::EOL)
         # if there's no continuation connecting the first block, then
         # treat the lines as paragraph text (activated when has_text = false)
         if !continuation_connects_first_block && list_type != :dlist
@@ -1108,7 +1124,7 @@ class Lexer
   # has_text        - Whether the list item has text defined inline (always true except for labeled lists)
   #
   # Returns an Array of lines belonging to the current list item.
-  def self.grab_lines_for_list_item(reader, list_type, sibling_trait = nil, has_text = true)
+  def self.take_lines_for_list_item(reader, list_type, sibling_trait = nil, has_text = true)
     buffer = []
 
     # three states for continuation: :inactive, :active & :frozen
@@ -1126,7 +1142,7 @@ class Lexer
     detached_continuation = nil
 
     while reader.has_more_lines?
-      this_line = reader.get_line
+      this_line = reader.read_line
 
       # if we've arrived at a sibling item in this list, we've captured
       # the complete list item and can begin processing it
@@ -1161,7 +1177,7 @@ class Lexer
           buffer << this_line
           # grab all the lines in the block, leaving the delimiters in place
           # we're being more strict here about the terminator, but I think that's a good thing
-          buffer.concat reader.grab_lines_until(:terminator => match.terminator, :grab_last_line => true)
+          buffer.concat reader.take_lines_until(:terminator => match.terminator, :take_last_line => true)
           continuation = :inactive
         else
           break
@@ -1178,7 +1194,7 @@ class Lexer
           # list item will throw off the exit from it
           if this_line.match(REGEXP[:lit_par])
             reader.unshift_line this_line
-            buffer.concat reader.grab_lines_until(
+            buffer.concat reader.take_lines_until(
                 :preserve_last_line => true,
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true) {|line|
@@ -1205,7 +1221,7 @@ class Lexer
           # advance to the next line of content
           if this_line.chomp.empty?
             reader.skip_blank_lines
-            this_line = reader.get_line 
+            this_line = reader.read_line 
             # if we hit eof or a sibling, stop reading
             break if this_line.nil? || is_sibling_list_item?(this_line, list_type, sibling_trait)
           end
@@ -1221,7 +1237,7 @@ class Lexer
               # slurp up any literal paragraph offset by blank lines
               if this_line.match(REGEXP[:lit_par])
                 reader.unshift_line this_line
-                buffer.concat reader.grab_lines_until(
+                buffer.concat reader.take_lines_until(
                     :preserve_last_line => true,
                     :break_on_blank_lines => true,
                     :break_on_list_continuation => true) {|line|
@@ -1279,8 +1295,8 @@ class Lexer
       buffer.pop
     end
 
-    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join}<BUFFER"
-    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
+    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join}<BUFFER"
+    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
 
     buffer
   end
@@ -1458,7 +1474,7 @@ class Lexer
   #--
   # NOTE for efficiency, we don't reuse methods that check for a section title
   def self.parse_section_title(reader, document)
-    line1 = reader.get_line
+    line1 = reader.read_line
     sect_id = nil
     sect_title = nil
     sect_level = -1
@@ -1483,7 +1499,7 @@ class Lexer
         end
         sect_level = section_level line2
         single_line = false
-        reader.get_line
+        reader.read_line
       end
     end
     if sect_level >= 0
@@ -1523,7 +1539,7 @@ class Lexer
     implicit_authors = nil
 
     if reader.has_more_lines? && !reader.next_line_empty?
-      author_metadata = process_authors reader.get_line
+      author_metadata = process_authors reader.read_line
 
       unless author_metadata.empty?
         # apply header subs and assign to document
@@ -1547,7 +1563,7 @@ class Lexer
       rev_metadata = {}
 
       if reader.has_more_lines? && !reader.next_line_empty?
-        rev_line = reader.get_line 
+        rev_line = reader.read_line 
         if match = rev_line.match(REGEXP[:revision_info])
           rev_metadata['revdate'] = match[2].strip
           rev_metadata['revnumber'] = match[1].rstrip unless match[1].nil?
@@ -1737,7 +1753,7 @@ class Lexer
     next_line = reader.peek_line
     if (commentish = next_line.start_with?('//')) && (match = next_line.match(REGEXP[:comment_blk]))
       terminator = match[0]
-      reader.grab_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :preprocess => false)
+      reader.take_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :preprocess => false)
     elsif commentish && next_line.match(REGEXP[:comment])
       # do nothing, we'll skip it
     elsif !options[:text] && (match = next_line.match(REGEXP[:attr_entry]))
@@ -1918,7 +1934,7 @@ class Lexer
     end
 
     if validate && expected != actual
-      # FIXME I need a reader reference or line number to report line number
+      # FIXME I need a reader reference or line number to report line number!!
       warn "asciidoctor: WARNING: list item index: expected #{expected}, got #{actual}"
     end
 
@@ -1979,7 +1995,7 @@ class Lexer
     loop_idx = -1
     while table_reader.has_more_lines?
       loop_idx += 1
-      line = table_reader.get_line
+      line = table_reader.read_line
 
       if skipped == 0 && loop_idx.zero? && !attributes.has_key?('options') &&
           !(next_line = table_reader.peek_line(false)).nil? && next_line.chomp.empty?
@@ -2211,7 +2227,7 @@ class Lexer
       save_current = lambda {
         if collector.empty?
           if type != :style
-            warn "asciidoctor: WARNING:#{reader.nil? ? nil : " line #{reader.lineno}:"} invalid empty #{type} detected in style attribute"
+            warn "asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} invalid empty #{type} detected in style attribute"
           end
         else
           case type
@@ -2220,7 +2236,7 @@ class Lexer
             parsed[type].push collector.join
           when :id
             if parsed.has_key? :id
-              warn "asciidoctor: WARNING:#{reader.nil? ? nil : " line #{reader.lineno}:"} multiple ids detected in style attribute"
+              warn "asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} multiple ids detected in style attribute"
             end
             parsed[type] = collector.join
           else

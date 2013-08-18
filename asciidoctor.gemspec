@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   ## Rake build (see the validate task)
   s.name              = 'asciidoctor'
   s.version           = '0.1.4.preview.4'
-  s.date              = '2013-08-12'
+  s.date              = '2013-08-21'
   s.rubyforge_project = 'asciidoctor'
 
   s.summary     = 'A native Ruby AsciiDoc syntax processor and publishing toolchain'
@@ -63,6 +63,7 @@ EOS
     lib/asciidoctor/backends/_stylesheets.rb
     lib/asciidoctor/backends/base_template.rb
     lib/asciidoctor/backends/docbook45.rb
+    lib/asciidoctor/backends/docbook5.rb
     lib/asciidoctor/backends/html5.rb
     lib/asciidoctor/block.rb
     lib/asciidoctor/callouts.rb
