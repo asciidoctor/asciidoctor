@@ -686,12 +686,17 @@ class InlineMenuTemplate < BaseTemplate
 end
 
 class InlineAnchorTemplate < BaseTemplate
-  def anchor(target, text, type)
+  def anchor(target, text, type, node)
     case type
     when :ref
       %(<anchor#{common_attrs target, nil, text}/>)
     when :xref
-      text.nil? ? %(<xref linkend="#{target}"/>) : %(<link linkend="#{target}">#{text}</link>)
+      if node.attr? 'path', nil
+        linkend = (node.attr 'fragment') || target
+        text.nil? ? %(<xref linkend="#{linkend}"/>) : %(<link linkend="#{linkend}">#{text}</link>)
+      else
+        %(<ulink url="#{target}">#{text || path}</ulink>)
+      end
     when :link
       %(<ulink url="#{target}">#{text}</ulink>)
     when :bibref
@@ -700,7 +705,7 @@ class InlineAnchorTemplate < BaseTemplate
   end
 
   def result(node)
-    anchor(node.target, node.text, node.type)
+    anchor(node.target, node.text, node.type, node)
   end
 
   def template

@@ -131,6 +131,38 @@ context 'Links' do
     assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string('<<tigers,"About Tigers">>'), 1
   end
 
+  test 'xref using angled bracket syntax with path sans extension' do
+    doc = document_from_string '<<tigers#>>', :header_footer => false
+    assert_xpath '//a[@href="tigers.html"][text() = "[tigers]"]', doc.render, 1
+  end
+
+  test 'xref using angled bracket syntax with path and extension' do
+    doc = document_from_string '<<tigers.adoc#>>', :header_footer => false
+    assert_xpath '//a[@href="tigers.html"][text() = "[tigers]"]', doc.render, 1
+  end
+
+  test 'xref using angled bracket syntax with path and fragment' do
+    doc = document_from_string '<<tigers#about>>', :header_footer => false
+    assert_xpath '//a[@href="tigers.html#about"][text() = "[tigers#about]"]', doc.render, 1
+  end
+
+  test 'xref using angled bracket syntax with path, fragment and text' do
+    doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
+    assert_xpath '//a[@href="tigers.html#about"][text() = "About Tigers"]', doc.render, 1
+  end
+
+  test 'xref using angled bracket syntax with path which has been included in this document' do
+    doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
+    doc.references[:includes] << 'tigers'
+    assert_xpath '//a[@href="#about"][text() = "About Tigers"]', doc.render, 1
+  end
+
+  test 'xref using angled bracket syntax with nested path which has been included in this document' do
+    doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
+    doc.references[:includes] << 'part1/tigers'
+    assert_xpath '//a[@href="#about"][text() = "About Tigers"]', doc.render, 1
+  end
+
   test 'xref using angled bracket syntax inline with text' do
     assert_xpath '//a[@href="#tigers"][text() = "about tigers"]', render_string('Want to learn <<tigers,about tigers>>?'), 1
   end

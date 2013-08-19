@@ -1068,8 +1068,11 @@ class InlineAnchorTemplate < BaseTemplate
   def anchor(target, text, type, document, node)
     case type
     when :xref
-      text = document.references[:ids].fetch(target, "[#{target}]") if text.nil?
-      %(<a href="##{target}">#{text}</a>)
+      refid = (node.attr 'refid') || target
+      if text.nil?
+        text = document.references[:ids].fetch(refid, "[#{refid}]") if text.nil?
+      end
+      %(<a href="#{target}">#{text}</a>)
     when :ref
       %(<a id="#{target}"></a>)
     when :link
