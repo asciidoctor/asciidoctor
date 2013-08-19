@@ -230,6 +230,16 @@ module Asciidoctor
     # Compliance value: false
     :congruent_block_delimiters => true,
 
+    # AsciiDoc drops lines that contain references to missing attributes.
+    # This behavior is not intuitive to most writers
+    # Compliance value: 'drop-line'
+    :attribute_missing => 'skip',
+
+    # AsciiDoc drops lines that contain an attribute unassignemnt.
+    # This behavior may need to be tuned depending on the circumstances.
+    # Compliance value: 'drop-line'
+    :attribute_undefined => 'drop-line',
+
     # AsciiDoc will recognize commonly-used Markdown syntax
     # to the degree it does not interfere with existing
     # AsciiDoc behavior.

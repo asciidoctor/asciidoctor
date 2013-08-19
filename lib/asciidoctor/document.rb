@@ -164,6 +164,8 @@ class Document < AbstractBlock
     @attributes['toc-placement'] = 'auto'
     @attributes['stylesheet'] = ''
     @attributes['prewrap'] = ''
+    @attributes['attribute-undefined'] = COMPLIANCE[:attribute_undefined]
+    @attributes['attribute-missing'] = COMPLIANCE[:attribute_missing]
 
     # language strings
     # TODO load these based on language settings
