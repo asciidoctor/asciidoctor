@@ -1068,18 +1068,10 @@ class InlineAnchorTemplate < BaseTemplate
   def anchor(target, text, type, document, node)
     case type
     when :xref
-      if node.attr? 'fragment'
-        lookup_id = (fragment = (node.attr 'fragment')) || target
-        if (fallback_text = (node.attr 'path'))
-          fallback_text = "#{fallback_text}##{fragment}" if fragment
-        else
-          fallback_text = "[#{lookup_id}]"
-        end
-      else
-        lookup_id = target
-        fallback_text = "[#{lookup_id}]"
+      refid = (node.attr 'refid') || target
+      if text.nil?
+        text = document.references[:ids].fetch(refid, "[#{refid}]") if text.nil?
       end
-      text = document.references[:ids].fetch(lookup_id, fallback_text) if text.nil?
       %(<a href="#{target}">#{text}</a>)
     when :ref
       %(<a id="#{target}"></a>)
