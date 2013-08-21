@@ -17,12 +17,6 @@ class Reader
     if file.nil?
       @file = @dir = nil
       @path = path
-    #elsif file.is_a? Reader
-    #  @file = file.file
-    #  @dir = File.dirname @file
-    #  @dir = nil if @dir == '.' # right?
-    #  @path = file.path
-    #  lineno = file.lineno
     else
       @file = file
       @dir = File.dirname @file
@@ -103,11 +97,11 @@ class Reader
   # direct  - A Boolean flag to bypasses the check for more lines and immediately
   #           returns the first element of the internal @lines Array. (default: false)
   #
-  # Returns a String dup of the next line of the source data if data is present.
+  # Returns a the next line of the source data if data is present.
   # Returns nil if there is no more data.
   def peek_line direct = false
     if @look_ahead > 0
-      @unescape_next_line ? @lines.first[1..-1].dup : @lines.first.dup
+      @unescape_next_line ? @lines.first[1..-1] : @lines.first
     elsif @eof || @lines.empty?
       @eof = true
       @look_ahead = 0
@@ -119,7 +113,7 @@ class Reader
       if (line = process_line @lines.first).nil?
         peek_line
       else
-        line.dup
+        line
       end
     end
   end
@@ -926,13 +920,6 @@ class PreprocessorReader < Reader
 
   # Private: Ignore front-matter, commonly used in static site generators
   def skip_front_matter! data, increment_linenos = true
-    #if data.nil?
-    #  data = @lines
-    #  increment_linenos = true
-    #else
-    #  increment_linenos = false
-    #end
-
     front_matter = nil
     if data.size > 0 && data.first.chomp == '---'
       original_data = data.dup
