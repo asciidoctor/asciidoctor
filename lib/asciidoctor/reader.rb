@@ -795,7 +795,6 @@ class PreprocessorReader < Reader
         end
       else
         target_type = :file
-        @document.references[:includes] << Helpers.rootname(target)
         # include file is resolved relative to current include context
         include_file = @document.normalize_system_path(target, @dir, nil, :target_name => 'include file')
         path = include_file[(@document.base_dir.length + 1)..-1]
@@ -919,8 +918,7 @@ class PreprocessorReader < Reader
   end
 
   def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
-    # FIXME change this to File.basename(File.rootname(file)) or File.baserootname(file)
-    @includes << File.join(File.dirname(file), File.basename(file, File.extname(file)))
+    @includes << Helpers.rootname(path)
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth]
     @file = file
     @dir = File.dirname file
