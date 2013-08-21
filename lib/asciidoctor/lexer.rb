@@ -146,7 +146,7 @@ class Lexer
     if is_next_line_section?(reader, {})
       name_section = initialize_section(reader, document, {})
       if name_section.level == 1
-        name_section_buffer = reader.take_lines_until(:break_on_blank_lines => true).join.tr_s("\n ", ' ')
+        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join.tr_s("\n ", ' ')
         if (m = name_section_buffer.match(REGEXP[:manname_manpurpose]))
           document.attributes['manname'] = m[1] 
           document.attributes['manpurpose'] = m[2] 
@@ -560,9 +560,9 @@ class Lexer
 
           # a literal paragraph is contiguous lines starting at least one space
           if style != 'normal' && this_line.match(REGEXP[:lit_par])
-            # So we need to actually include this one in the take_lines group
+            # So we need to actually include this one in the read_lines group
             reader.unshift_line this_line
-            lines = reader.take_lines_until(
+            lines = reader.read_lines_until(
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true,
                 :preserve_last_line => true) {|line|
@@ -584,7 +584,7 @@ class Lexer
           # a paragraph is contiguous nonblank/noncontinuation lines
           else
             reader.unshift_line this_line
-            lines = reader.take_lines_until(
+            lines = reader.read_lines_until(
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true,
                 :preserve_last_line => true,
@@ -708,10 +708,8 @@ class Lexer
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :table
-          file = reader.file
-          path = reader.path
-          lineno = reader.lineno
-          block_reader = Reader.new reader.take_lines_until(:terminator => terminator, :skip_line_comments => true), file, path, lineno
+          cursor = reader.cursor
+          block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), cursor
           case terminator[0..0]
             when ','
               attributes['format'] = 'csv'
@@ -830,10 +828,10 @@ class Lexer
 
     if terminator.nil?
       if parse_as_content_model == :verbatim
-        lines = reader.take_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
+        lines = reader.read_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
       else
         content_model = :simple if content_model == :compound
-        lines = reader.take_lines_until(
+        lines = reader.read_lines_until(
             :break_on_blank_lines => true,
             :break_on_list_continuation => true,
             :preserve_last_line => true,
@@ -844,7 +842,7 @@ class Lexer
       end
       block_reader = nil
     elsif parse_as_content_model != :compound
-      lines = reader.take_lines_until(:terminator => terminator, :chomp_last_line => true)
+      lines = reader.read_lines_until(:terminator => terminator, :chomp_last_line => true)
       block_reader = nil
     # terminator is false when reader has already been prepared
     elsif terminator == false
@@ -852,10 +850,8 @@ class Lexer
       block_reader = reader
     else
       lines = nil
-      file = reader.file
-      path = reader.path
-      lineno = reader.lineno
-      block_reader = Reader.new reader.take_lines_until(:terminator => terminator), file, path, lineno
+      cursor = reader.cursor
+      block_reader = Reader.new reader.read_lines_until(:terminator => terminator), cursor
     end
 
     if content_model == :skip
@@ -1063,11 +1059,9 @@ class Lexer
     end
 
     # first skip the line with the marker / term
-    reader.read_line
-    file = reader.file
-    path = reader.path
-    lineno = reader.lineno
-    list_item_reader = Reader.new take_lines_for_list_item(reader, list_type, sibling_trait, has_text), file, path, lineno
+    reader.advance
+    cursor = reader.cursor
+    list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), cursor
     if list_item_reader.has_more_lines?
       comment_lines = list_item_reader.consume_line_comments
       subsequent_line = list_item_reader.peek_line
@@ -1124,7 +1118,7 @@ class Lexer
   # has_text        - Whether the list item has text defined inline (always true except for labeled lists)
   #
   # Returns an Array of lines belonging to the current list item.
-  def self.take_lines_for_list_item(reader, list_type, sibling_trait = nil, has_text = true)
+  def self.read_lines_for_list_item(reader, list_type, sibling_trait = nil, has_text = true)
     buffer = []
 
     # three states for continuation: :inactive, :active & :frozen
@@ -1177,7 +1171,7 @@ class Lexer
           buffer << this_line
           # grab all the lines in the block, leaving the delimiters in place
           # we're being more strict here about the terminator, but I think that's a good thing
-          buffer.concat reader.take_lines_until(:terminator => match.terminator, :take_last_line => true)
+          buffer.concat reader.read_lines_until(:terminator => match.terminator, :read_last_line => true)
           continuation = :inactive
         else
           break
@@ -1194,7 +1188,7 @@ class Lexer
           # list item will throw off the exit from it
           if this_line.match(REGEXP[:lit_par])
             reader.unshift_line this_line
-            buffer.concat reader.take_lines_until(
+            buffer.concat reader.read_lines_until(
                 :preserve_last_line => true,
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true) {|line|
@@ -1237,7 +1231,7 @@ class Lexer
               # slurp up any literal paragraph offset by blank lines
               if this_line.match(REGEXP[:lit_par])
                 reader.unshift_line this_line
-                buffer.concat reader.take_lines_until(
+                buffer.concat reader.read_lines_until(
                     :preserve_last_line => true,
                     :break_on_blank_lines => true,
                     :break_on_list_continuation => true) {|line|
@@ -1753,7 +1747,7 @@ class Lexer
     next_line = reader.peek_line
     if (commentish = next_line.start_with?('//')) && (match = next_line.match(REGEXP[:comment_blk]))
       terminator = match[0]
-      reader.take_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :preprocess => false)
+      reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :preprocess => false)
     elsif commentish && next_line.match(REGEXP[:comment])
       # do nothing, we'll skip it
     elsif !options[:text] && (match = next_line.match(REGEXP[:attr_entry]))

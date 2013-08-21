@@ -308,10 +308,10 @@ class Document < AbstractBlock
     if @parent_document
       # don't need to do the extra processing within our own document
       # FIXME how are line numbers being tracked in this case?!?!
-      @reader = Reader.new data
+      @reader = Reader.new data, Asciidoctor::Reader::Cursor.new(@attributes['docfile'], @base_dir)
     else
-      # TODO review the docfile logic here
-      @reader = PreprocessorReader.new self, data, ((@attributes.has_key? 'docfile') ? File.basename(@attributes['docfile']) : nil)
+      # REVIEW review the docfile logic here
+      @reader = PreprocessorReader.new self, data, Asciidoctor::Reader::Cursor.new(@attributes['docfile'], @base_dir)
     end
 
     # Now parse the lines in the reader into blocks

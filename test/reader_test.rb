@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class ReaderTest < Test::Unit::TestCase
-  DIRNAME = File.dirname __FILE__
+  DIRNAME = File.expand_path(File.dirname(__FILE__))
 
   SAMPLE_DATA = <<-EOS.each_line.to_a
 first line
@@ -215,7 +215,7 @@ This is another paragraph.
         EOS
 
         reader = Asciidoctor::Reader.new lines
-        result = reader.take_lines_until
+        result = reader.read_lines_until
         assert_equal 3, result.size
         assert_equal lines, result
         assert !reader.has_more_lines?
@@ -230,7 +230,7 @@ This is another paragraph.
         EOS
 
         reader = Asciidoctor::Reader.new lines
-        result = reader.take_lines_until :break_on_blank_lines => true
+        result = reader.read_lines_until :break_on_blank_lines => true
         assert_equal 1, result.size
         assert_equal lines.first.chomp, result.first
         assert_equal lines.last, reader.peek_line
@@ -244,7 +244,7 @@ This is another paragraph.
         EOS
 
         reader = Asciidoctor::Reader.new lines
-        result = reader.take_lines_until :break_on_blank_lines => true, :preserve_last_line => true
+        result = reader.read_lines_until :break_on_blank_lines => true, :preserve_last_line => true
         assert_equal 1, result.size
         assert_equal lines.first.chomp, result.first
         assert reader.next_line_empty?
@@ -263,7 +263,7 @@ This is a paragraph outside the block.
 
         reader = Asciidoctor::Reader.new lines
         reader.read_line
-        result = reader.take_lines_until {|line| line.chomp == '--' }
+        result = reader.read_lines_until {|line| line.chomp == '--' }
         assert_equal 3, result.size
         assert_equal lines[1, 3], result
         assert reader.next_line_empty?
@@ -282,7 +282,7 @@ This is a paragraph outside the block.
 
         reader = Asciidoctor::Reader.new lines
         reader.read_line
-        result = reader.take_lines_until(:take_last_line => true) {|line| line.chomp == '--' }
+        result = reader.read_lines_until(:read_last_line => true) {|line| line.chomp == '--' }
         assert_equal 4, result.size
         assert_equal lines[1, 4], result
         assert reader.next_line_empty?
@@ -301,7 +301,7 @@ This is a paragraph outside the block.
 
         reader = Asciidoctor::Reader.new lines
         reader.read_line
-        result = reader.take_lines_until(:take_last_line => true, :preserve_last_line => true) {|line| line.chomp == '--' }
+        result = reader.read_lines_until(:read_last_line => true, :preserve_last_line => true) {|line| line.chomp == '--' }
         assert_equal 4, result.size
         assert_equal lines[1, 4], result
         assert_equal "--\n", reader.peek_line
@@ -700,7 +700,7 @@ include::fixtures/parent-include.adoc[depth=1]
         pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
 
         doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, input, pseudo_docfile
+        reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile)
 
         lines = reader.readlines
         assert lines.include?("include::child-include.adoc[]\n")
