@@ -46,12 +46,12 @@ third line
 
       test 'read_line should return nil with empty data' do
         assert_nil Asciidoctor::Reader.new.read_line
-        assert_nil Asciidoctor::Reader.new.get_line
+        #assert_nil Asciidoctor::Reader.new.get_line
       end
 
       test 'read_lines should return empty Array with empty data' do
         assert_equal [], Asciidoctor::Reader.new.read_lines
-        assert_equal [], Asciidoctor::Reader.new.get_lines
+        #assert_equal [], Asciidoctor::Reader.new.get_lines
       end
     end
 
@@ -148,7 +148,7 @@ third line
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         reader.unshift "line zero\n"
         assert_equal "line zero\n", reader.peek_line
-        assert_equal "line zero\n", reader.get_line
+        assert_equal "line zero\n", reader.read_line
         assert_equal 1, reader.lineno
       end
 

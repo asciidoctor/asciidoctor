@@ -1071,7 +1071,7 @@ class Lexer
     if list_item_reader.has_more_lines?
       comment_lines = list_item_reader.consume_line_comments
       subsequent_line = list_item_reader.peek_line
-      list_item_reader.unshift(*comment_lines) unless comment_lines.empty? 
+      list_item_reader.unshift_lines comment_lines unless comment_lines.empty? 
 
       if !subsequent_line.nil?
         continuation_connects_first_block = (subsequent_line == ::Asciidoctor::EOL)

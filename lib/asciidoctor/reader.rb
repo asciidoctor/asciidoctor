@@ -1,7 +1,6 @@
 module Asciidoctor
 # Public: Methods for retrieving lines from AsciiDoc source files
 class Reader
-  attr_reader :lines
   attr_reader :file
   attr_reader :dir
   attr_reader :path
@@ -148,7 +147,6 @@ class Reader
       nil
     end
   end
-  alias :get_line :read_line
 
   # Public: Get the remaining lines of source data.
   #
@@ -166,7 +164,6 @@ class Reader
     lines
   end
   alias :readlines :read_lines
-  alias :get_lines :read_lines
 
   # Public: Get the remaining lines of source data joined as a String.
   #
@@ -398,7 +395,6 @@ class Reader
     @process_lines = true if reset_process_lines
     result
   end
-  alias :grab_lines_until :take_lines_until
 
   # Protected: Shift the line off the stack and increment the lineno
   def shift

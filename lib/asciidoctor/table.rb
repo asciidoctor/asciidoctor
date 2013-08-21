@@ -219,7 +219,7 @@ class Table::Cell < AbstractNode
         processed_lines = PreprocessorReader.new(@document, unprocessed_lines).readlines
         if processed_lines != unprocessed_lines
           inner_document_lines.shift
-          inner_document_lines.unshift *processed_lines
+          inner_document_lines.unshift(*processed_lines)
         end
       end
       @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document)
