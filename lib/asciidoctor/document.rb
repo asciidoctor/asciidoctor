@@ -285,8 +285,8 @@ class Document < AbstractBlock
       @attributes['doctype'] ||= DEFAULT_DOCTYPE
       update_backend_attributes
 
-      @attributes['indir'] = @attributes['docdir']
-      @attributes['infile'] = @attributes['docfile']
+      #@attributes['indir'] = @attributes['docdir']
+      #@attributes['infile'] = @attributes['docfile']
 
       # dynamic intrinstic attribute values
       now = Time.new

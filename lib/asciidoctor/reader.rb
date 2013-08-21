@@ -29,7 +29,8 @@ class Reader
   # Public: Initialize the Reader object
   def initialize data = nil, cursor = nil
     if cursor.nil?
-      @file = @dir = @path = nil
+      @file = @dir
+      @path = '<stdin>'
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     elsif cursor.is_a? String
       @file = cursor
@@ -39,7 +40,7 @@ class Reader
     else
       @file = cursor.file
       @dir = cursor.dir
-      @path = cursor.path
+      @path = cursor.path || '<stdin>'
       unless @file.nil?
         if @dir.nil?
           # REVIEW might to look at this assignment closer
@@ -47,7 +48,7 @@ class Reader
           @dir = nil if @dir == '.' # right?
         end
 
-        if @path.nil?
+        if cursor.path.nil?
           @path = File.basename @file
         end
       end
@@ -795,14 +796,15 @@ class PreprocessorReader < Reader
         end
       else
         target_type = :file
-        # include file is resolved relative to current include context
+        # include file is resolved relative to dir of current include, or base_dir if within original docfile
         include_file = @document.normalize_system_path(target, @dir, nil, :target_name => 'include file')
-        path = include_file[(@document.base_dir.length + 1)..-1]
         if !File.file?(include_file)
           warn "asciidoctor: WARNING: #{line_info}: include file not found: #{include_file}"
           advance
           return true
         end
+        #path = @document.relative_path include_file
+        path = PathResolver.new.relative_path include_file, @document.base_dir
       end
 
       inc_lines = nil
