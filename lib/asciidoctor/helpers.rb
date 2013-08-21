@@ -45,6 +45,23 @@ module Helpers
     end
   end
 
+  # Public: Removes the file extension from filename and returns the result
+  #
+  # Examples
+  #
+  #   Helpers.rootname('part1/chapter1.adoc')
+  #   # => "part1/chapter1"
+  #
+  # Returns The String filename with its file extension removed
+  def self.rootname(filename)
+    ext = File.extname(filename)
+    if ext.empty?
+      filename
+    else
+      filename[0...-ext.length]
+    end
+  end
+
   def self.mkdir_p(dir)
     unless File.directory? dir
       parent_dir = File.dirname(dir)

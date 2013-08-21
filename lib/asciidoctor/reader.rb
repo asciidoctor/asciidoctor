@@ -548,6 +548,7 @@ class Reader
         # FIXME should stop processing include if required library cannot be loaded; check for -1 return value?
       else
         target_type = :file
+        @document.references[:includes] << Helpers.rootname(target)
         include_file = @document.normalize_system_path(target, nil, nil, :target_name => 'include file')
         if !File.file?(include_file)
           warn "asciidoctor: WARNING: line #{@lineno}: include file not found: #{include_file}"
