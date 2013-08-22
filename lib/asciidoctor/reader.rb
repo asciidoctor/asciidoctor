@@ -26,6 +26,9 @@ class Reader
   # Public: Get the document source as a String Array of lines.
   attr_reader :source_lines
 
+  # Public: Control whether lines are processed using Reader#process_line on first visit (default: true)
+  attr_accessor :process_lines
+
   # Public: Initialize the Reader object
   def initialize data = nil, cursor = nil
     if cursor.nil?
@@ -267,59 +270,7 @@ class Reader
     nil
   end
 
-  # Public: Consume consecutive lines containing line comments.
-  #
-  # Examples
-  #   @lines
-  #   => ["// foo\n", "bar\n"]
-  #
-  #   comment_lines = consume_comments
-  #   => ["// foo\n"]
-  #
-  #   @lines
-  #   => ["bar\n"]
-  #
-  # Returns the Array of lines that were consumed
-  def consume_comments opts = {}
-    return [] if eof?
-
-    comment_lines = []
-    include_blank_lines = opts[:include_blank_lines]
-    while (next_line = peek_line)
-      if include_blank_lines && next_line.chomp.empty?
-        comment_lines << read_line
-      elsif (commentish = next_line.start_with?('//')) && (match = next_line.match(REGEXP[:comment_blk]))
-        comment_lines << read_line
-        comment_lines.push(*(read_lines_until(:terminator => match[0], :read_last_line => true, :raw => true)))
-      elsif commentish && next_line.match(REGEXP[:comment])
-        comment_lines << read_line
-      else
-        break
-      end
-    end
-
-    comment_lines
-  end
-  alias :skip_comment_lines :consume_comments
-
-  def consume_line_comments
-    return [] if eof?
-
-    comment_lines = []
-    # optimized code for shortest execution path
-    while (next_line = peek_line)
-      if next_line.match(REGEXP[:comment])
-        comment_lines << read_line
-      else
-        break
-      end
-    end
-
-    comment_lines
-  end
-  alias :skip_lines_comments :consume_comments
-
-  # Private: Strip off leading blank lines in the Array of lines.
+  # Public: Strip off leading blank lines in the Array of lines.
   #
   # Examples
   #
@@ -348,6 +299,57 @@ class Reader
     end
 
     num_skipped
+  end
+
+  # Public: Skip consecutive lines containing line comments and return them.
+  #
+  # Examples
+  #   @lines
+  #   => ["// foo\n", "bar\n"]
+  #
+  #   comment_lines = skip_comment_lines
+  #   => ["// foo\n"]
+  #
+  #   @lines
+  #   => ["bar\n"]
+  #
+  # Returns the Array of lines that were skipped
+  def skip_comment_lines opts = {}
+    return [] if eof?
+
+    comment_lines = []
+    include_blank_lines = opts[:include_blank_lines]
+    while (next_line = peek_line)
+      if include_blank_lines && next_line.chomp.empty?
+        comment_lines << read_line
+      elsif (commentish = next_line.start_with?('//')) && (match = next_line.match(REGEXP[:comment_blk]))
+        comment_lines << read_line
+        comment_lines.push(*(read_lines_until(:terminator => match[0], :read_last_line => true, :skip_processing => true)))
+      elsif commentish && next_line.match(REGEXP[:comment])
+        comment_lines << read_line
+      else
+        break
+      end
+    end
+
+    comment_lines
+  end
+
+  # Public: Skip consecutive lines that are line comments and return them.
+  def skip_line_comments
+    return [] if eof?
+
+    comment_lines = []
+    # optimized code for shortest execution path
+    while (next_line = peek_line)
+      if next_line.match(REGEXP[:comment])
+        comment_lines << read_line
+      else
+        break
+      end
+    end
+
+    comment_lines
   end
 
   # Public: Advance to the end of the reader, consuming all remaining lines
@@ -398,11 +400,11 @@ class Reader
   def read_lines_until options = {}
     result = []
     advance if options[:skip_first_line]
-    if @process_lines && options[:raw]
+    if @process_lines && options[:skip_processing]
       @process_lines = false
-      reset_process_lines = true
+      restore_process_lines = true
     else
-      reset_process_lines = false
+      restore_process_lines = false
     end
 
     has_block = block_given?
@@ -416,14 +418,14 @@ class Reader
       chomp_last_line = break_on_blank_lines
     end
     skip_line_comments = options[:skip_line_comments]
-    taken = false
+    line_read = false
     
     while (line = read_line)
       finish = while true
         break true if terminator && line.chomp == terminator
         # QUESTION: can we get away with line.chomp.empty? here?
         break true if break_on_blank_lines && line.chomp.empty?
-        if break_on_list_continuation && taken && line.chomp == LIST_CONTINUATION
+        if break_on_list_continuation && line_read && line.chomp == LIST_CONTINUATION
           options[:preserve_last_line] = true
           break true
         end
@@ -434,7 +436,7 @@ class Reader
       if finish
         if options[:read_last_line]
           result << line
-          taken = true
+          line_read = true
         end
         restore_line line if options[:preserve_last_line]
         break
@@ -442,15 +444,15 @@ class Reader
 
       unless skip_line_comments && line.match(REGEXP[:comment])
         result << line
-        taken = true
+        line_read = true
       end
     end
 
-    if chomp_last_line && taken
-      result[-1] = result.last.chomp
+    if chomp_last_line && line_read
+      result << result.pop.chomp
     end
 
-    @process_lines = true if reset_process_lines
+    @process_lines = true if restore_process_lines
     result
   end
 

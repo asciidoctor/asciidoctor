@@ -206,8 +206,8 @@ third line
       end
     end
 
-    context 'Take lines' do
-      test 'Take lines until end' do
+    context 'Read lines until' do
+      test 'Read lines until until end' do
         lines = <<-EOS.each_line.to_a
 This is one paragraph.
 
@@ -222,7 +222,7 @@ This is another paragraph.
         assert reader.eof?
       end
 
-      test 'Take lines until blank line' do
+      test 'Read lines until until blank line' do
         lines = <<-EOS.each_line.to_a
 This is one paragraph.
 
@@ -236,7 +236,7 @@ This is another paragraph.
         assert_equal lines.last, reader.peek_line
       end
 
-      test 'Take lines until blank line preserving last line' do
+      test 'Read lines until until blank line preserving last line' do
         lines = <<-EOS.each_line.to_a
 This is one paragraph.
 
@@ -250,7 +250,7 @@ This is another paragraph.
         assert reader.next_line_empty?
       end
 
-      test 'Take lines until condition is true' do
+      test 'Read lines until until condition is true' do
         lines = <<-EOS.each_line.to_a
 --
 This is one paragraph inside the block.
@@ -269,7 +269,7 @@ This is a paragraph outside the block.
         assert reader.next_line_empty?
       end
 
-      test 'Take lines until condition is true, taking last line' do
+      test 'Read lines until until condition is true, taking last line' do
         lines = <<-EOS.each_line.to_a
 --
 This is one paragraph inside the block.
@@ -288,7 +288,7 @@ This is a paragraph outside the block.
         assert reader.next_line_empty?
       end
 
-      test 'Take lines until condition is true, taking and preserving last line' do
+      test 'Read lines until until condition is true, taking and preserving last line' do
         lines = <<-EOS.each_line.to_a
 --
 This is one paragraph inside the block.
@@ -704,6 +704,33 @@ include::fixtures/parent-include.adoc[depth=1]
 
         lines = reader.readlines
         assert lines.include?("include::child-include.adoc[]\n")
+      end
+
+      test 'read_lines_until should not process lines if process option is false' do
+        lines = <<-EOS.each_line.to_a
+////
+include::fixtures/no-such-file.asciidoc[]
+////
+        EOS
+
+        doc = empty_safe_document :base_dir => DIRNAME
+        reader = Asciidoctor::PreprocessorReader.new doc, lines
+        reader.read_line
+        result = reader.read_lines_until(:terminator => '////', :skip_processing => true)
+        assert_equal lines[1..1], result
+      end
+
+      test 'skip_comment_lines should not process lines read' do
+        lines = <<-EOS.each_line.to_a
+////
+include::fixtures/no-such-file.asciidoc[]
+////
+        EOS
+
+        doc = empty_safe_document :base_dir => DIRNAME
+        reader = Asciidoctor::PreprocessorReader.new doc, lines
+        result = reader.skip_comment_lines
+        assert_equal lines, result
       end
     end
 

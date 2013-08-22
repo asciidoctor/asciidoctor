@@ -821,8 +821,10 @@ class Lexer
   # NOTE could invoke filter in here, before and after parsing
   def self.build_block(block_context, content_model, terminator, parent, reader, attributes, options = {})
     if content_model == :skip || content_model == :raw
+      skip_processing = content_model == :skip
       parse_as_content_model = :simple
     else
+      skip_processing = false
       parse_as_content_model = content_model
     end
 
@@ -835,14 +837,15 @@ class Lexer
             :break_on_blank_lines => true,
             :break_on_list_continuation => true,
             :preserve_last_line => true,
-            :skip_line_comments => true) {|line|
+            :skip_line_comments => true,
+            :skip_processing => skip_processing) {|line|
           COMPLIANCE[:block_terminates_paragraph] && (is_delimited_block?(line) || line.match(REGEXP[:attr_line]))
         }
         # QUESTION check for empty lines after grabbing lines for simple content model?
       end
       block_reader = nil
     elsif parse_as_content_model != :compound
-      lines = reader.read_lines_until(:terminator => terminator, :chomp_last_line => true)
+      lines = reader.read_lines_until(:terminator => terminator, :chomp_last_line => true, :skip_processing => skip_processing)
       block_reader = nil
     # terminator is false when reader has already been prepared
     elsif terminator == false
@@ -851,7 +854,7 @@ class Lexer
     else
       lines = nil
       cursor = reader.cursor
-      block_reader = Reader.new reader.read_lines_until(:terminator => terminator), cursor
+      block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing), cursor
     end
 
     if content_model == :skip
@@ -1063,7 +1066,7 @@ class Lexer
     cursor = reader.cursor
     list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), cursor
     if list_item_reader.has_more_lines?
-      comment_lines = list_item_reader.consume_line_comments
+      comment_lines = list_item_reader.skip_line_comments
       subsequent_line = list_item_reader.peek_line
       list_item_reader.unshift_lines comment_lines unless comment_lines.empty? 
 
@@ -1747,7 +1750,7 @@ class Lexer
     next_line = reader.peek_line
     if (commentish = next_line.start_with?('//')) && (match = next_line.match(REGEXP[:comment_blk]))
       terminator = match[0]
-      reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :preprocess => false)
+      reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :skip_processing => true)
     elsif commentish && next_line.match(REGEXP[:comment])
       # do nothing, we'll skip it
     elsif !options[:text] && (match = next_line.match(REGEXP[:attr_entry]))
@@ -1755,7 +1758,7 @@ class Lexer
     elsif match = next_line.match(REGEXP[:anchor])
       id, reftext = match[1].split(',')
       attributes['id'] = id
-      # AsciiDoc always use [id] as the reftext in HTML output,
+      # AsciiDoc always uses [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
       #parent.document.register(:ids, id)
       if reftext
