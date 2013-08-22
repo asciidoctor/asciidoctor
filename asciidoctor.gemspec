@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   ## Rake build (see the validate task)
   s.name              = 'asciidoctor'
   s.version           = '0.1.4.preview.4'
-  s.date              = '2013-08-12'
+  s.date              = '2013-08-21'
   s.rubyforge_project = 'asciidoctor'
 
   s.summary     = 'A native Ruby AsciiDoc syntax processor and publishing toolchain'
@@ -63,6 +63,7 @@ EOS
     lib/asciidoctor/backends/_stylesheets.rb
     lib/asciidoctor/backends/base_template.rb
     lib/asciidoctor/backends/docbook45.rb
+    lib/asciidoctor/backends/docbook5.rb
     lib/asciidoctor/backends/html5.rb
     lib/asciidoctor/block.rb
     lib/asciidoctor/callouts.rb
@@ -94,6 +95,7 @@ EOS
     test/fixtures/basic-docinfo.html
     test/fixtures/basic-docinfo.xml
     test/fixtures/basic.asciidoc
+    test/fixtures/child-include.adoc
     test/fixtures/custom-backends/haml/docbook45/block_paragraph.xml.haml
     test/fixtures/custom-backends/haml/html5-tweaks/block_paragraph.html.haml
     test/fixtures/custom-backends/haml/html5/block_paragraph.html.haml
@@ -109,6 +111,7 @@ EOS
     test/fixtures/encoding.asciidoc
     test/fixtures/include-file.asciidoc
     test/fixtures/list_elements.asciidoc
+    test/fixtures/parent-include.adoc
     test/fixtures/sample.asciidoc
     test/fixtures/stylesheets/custom.css
     test/fixtures/tip.gif

@@ -1390,4 +1390,28 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       assert_xpath '//*[@id="content"]/*[@class="sect1"]/h2[text()="SYNOPSIS"]', output, 1
     end
   end
+
+  context 'Secure Asset Path' do
+    test 'allows us to specify a path relative to the current dir' do
+      doc = Asciidoctor::Document.new
+      legit_path = Dir.pwd + '/foo'
+      assert_equal legit_path, doc.normalize_asset_path(legit_path)
+    end
+
+    test 'keeps naughty absolute paths from getting outside' do
+      naughty_path = "#{disk_root}etc/passwd"
+      doc = Asciidoctor::Document.new
+      secure_path = doc.normalize_asset_path(naughty_path)
+      assert naughty_path != secure_path
+      assert_match(/^#{doc.base_dir}/, secure_path)
+    end
+
+    test 'keeps naughty relative paths from getting outside' do
+      naughty_path = 'safe/ok/../../../../../etc/passwd'
+      doc = Asciidoctor::Document.new
+      secure_path = doc.normalize_asset_path(naughty_path)
+      assert naughty_path != secure_path
+      assert_match(/^#{doc.base_dir}/, secure_path)
+    end
+  end
 end

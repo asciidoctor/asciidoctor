@@ -210,7 +210,19 @@ class Table::Cell < AbstractNode
       # FIXME hide doctitle from nested document; temporary workaround to fix
       # nested document seeing doctitle and assuming it has its own document title
       parent_doctitle = @document.attributes.delete('doctitle')
-      @inner_document = Document.new(@text, :header_footer => false, :parent => @document)
+      # NOTE we need to process the first line of content as it may not have been processed
+      # the included content cannot expect to match conditional terminators in the remaining
+      # lines of table cell content, it must be self-contained logic
+      inner_document_lines = @text.each_line.to_a
+      unless inner_document_lines.empty? || !inner_document_lines.first.include?('::')
+        unprocessed_lines = inner_document_lines[0..0]
+        processed_lines = PreprocessorReader.new(@document, unprocessed_lines).readlines
+        if processed_lines != unprocessed_lines
+          inner_document_lines.shift
+          inner_document_lines.unshift(*processed_lines)
+        end
+      end
+      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document)
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
     end
   end
@@ -410,6 +422,7 @@ class Table::ParserContext
     if format == 'psv'
       cell_spec = take_cell_spec
       if cell_spec.nil?
+        # FIXME need a reader reference to report line info
         warn 'asciidoctor: ERROR: table missing leading separator, recovering automatically'
         cell_spec = {}
         repeat = 1

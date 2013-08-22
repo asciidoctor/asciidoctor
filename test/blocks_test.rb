@@ -116,6 +116,67 @@ block comment
       assert !output.strip.empty?, "Line should be emitted => #{input.rstrip}"
     end
 
+    test 'preprocessor directives should not be processed within comment block within block metadata' do
+      input = <<-EOS
+.sample title
+////
+ifdef::asciidoctor[////]
+////
+line should be rendered
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//p[text() = "line should be rendered"]', output, 1
+    end
+
+    test 'preprocessor directives should not be processed within comment block' do
+      input = <<-EOS
+dummy line
+
+////
+ifdef::asciidoctor[////]
+////
+
+line should be rendered
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//p[text() = "line should be rendered"]', output, 1
+    end
+
+    # WARNING if first line of content is a directive, it will get interpretted before we know it's a comment block
+    # it happens when looking for a title...not sure what we can do about it
+    test 'preprocessor directives should not be processed within comment open block' do
+      input = <<-EOS
+[comment]
+--
+first line of comment
+ifdef::asciidoctor[--]
+line should not be rendered
+--
+
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//p', output, 0
+    end
+
+    # WARNING if either of first two lines of content is a directive, it will get interpretted before we know it's a comment block
+    # it happens when looking for a title...not sure what we can do about it
+    test 'preprocessor directives should not be processed within comment paragraph' do
+      input = <<-EOS
+[comment]
+first line of content
+second line of content
+ifdef::asciidoctor[////]
+
+this line should be rendered
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//p[text() = "this line should be rendered"]', output, 1
+    end
+
     test 'comment style on open block should only skip block' do
       input = <<-EOS
 [comment]
@@ -825,7 +886,7 @@ AssertionError
 
       output2 = render_embedded_string input2
       # FIXME JRuby is adding extra trailing endlines in the second document,
-      # so rstrip is necessary
+      # for now, rstrip is necessary
       assert_equal output.rstrip, output2.rstrip
     end
 

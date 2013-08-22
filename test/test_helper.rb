@@ -22,6 +22,15 @@ class Test::Unit::TestCase
     "#{windows? ? File.expand_path(__FILE__).split('/').first : nil}/"
   end
 
+  def empty_document options = {}
+    Asciidoctor::Document.new [], options
+  end
+
+  def empty_safe_document options = {}
+    options[:safe] = :safe
+    Asciidoctor::Document.new [], options
+  end
+
   def sample_doc_path(name)
     name = name.to_s
     unless name.include?('.')
