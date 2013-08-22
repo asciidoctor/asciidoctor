@@ -245,19 +245,19 @@ module Extensions
   # lines and normalizes them. The normalize process strips trailing whitespace
   # from each line and leaves behind a line-feed character (i.e., "\n").
   #
-  # Asciidoctor passes a reference to the resulting lines Array to the process
-  # method of an instance of each registered Preprocessor. The Preprocessor
-  # modifies the Array as necessary and either returns a reference to the same
-  # Array or a reference to a new one.
+  # Asciidoctor passes a reference to the Reader and a copy of the lines Array
+  # to the process method of an instance of each registered Preprocessor. The
+  # Preprocessor modifies the Array as necessary and either returns a reference
+  # to the same Reader or a reference to a new one.
   #
   # Preprocessors must extend Asciidoctor::Extensions::Preprocessor.
   class Preprocessor < Processor
-    # Public: Accepts an Array of lines, modifies it as needed, then returns
-    # the Array or a reference to a new one.
+    # Public: Accepts the Reader and an Array of lines, modifies them as
+    # needed, then returns the Reader or a reference to a new one.
     #
     # Each subclass of Preprocessor should override this method.
-    def process lines
-      lines
+    def process reader, lines
+      reader
     end
   end
 

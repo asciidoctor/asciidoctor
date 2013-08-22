@@ -20,11 +20,13 @@ class SampleInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
 end
 
 class ScrubHeaderPreprocessor < Asciidoctor::Extensions::Preprocessor
-  def process lines
+  def process reader, lines
     while !lines.empty? && !lines.first.start_with?('=')
       lines.shift
+      reader.advance
     end
-    lines
+    #lines
+    reader
   end
 end
 

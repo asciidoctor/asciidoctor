@@ -77,10 +77,7 @@ class Lexer
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
     if block_attributes.has_key?('title')
-      document.clear_playback_attributes block_attributes
-      document.save_attributes
-      block_attributes['invalid-header'] = true
-      return block_attributes
+      return document.finalize_header block_attributes, false
     end
 
     # yep, document title logic in AsciiDoc is just insanity
@@ -122,12 +119,9 @@ class Lexer
     # parse title and consume name section of manpage document
     parse_manpage_header(reader, document) if document.doctype == 'manpage'
  
-    document.clear_playback_attributes block_attributes
-    document.save_attributes
- 
-    # NOTE these are the block-level attributes (not document attributes) that
+    # NOTE block_attributes are the block-level attributes (not document attributes) that
     # precede the first line of content (document title, first section or first block)
-    block_attributes
+    document.finalize_header block_attributes
   end
 
   # Public: Parses the manpage header of the AsciiDoc source read from the Reader

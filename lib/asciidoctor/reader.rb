@@ -65,7 +65,7 @@ class Reader
     @unescape_next_line = false
   end
 
-  # Protected: Prepare the lines from the provided data
+  # Internal: Prepare the lines from the provided data
   #
   # This method strips whitespace from the end of every line of
   # the source data and appends a LF (i.e., Unix endline). This
@@ -84,7 +84,7 @@ class Reader
     data.is_a?(String) ? data.each_line.to_a : data.dup
   end
 
-  # Protected: Processes a previously unvisited line
+  # Internal: Processes a previously unvisited line
   #
   # By default, this method marks the line as processed
   # by incrementing the look_ahead counter and returns
@@ -456,14 +456,14 @@ class Reader
     result
   end
 
-  # Protected: Shift the line off the stack and increment the lineno
+  # Internal: Shift the line off the stack and increment the lineno
   def shift
     @lineno += 1
     @look_ahead -= 1 unless @look_ahead == 0
     @lines.shift
   end
 
-  # Protected: Restore the line to the stack and decrement the lineno
+  # Internal: Restore the line to the stack and decrement the lineno
   def unshift line
     @lineno -= 1
     @look_ahead += 1
@@ -566,14 +566,6 @@ class PreprocessorReader < Reader
     end
 
     result
-  end
-
-  # FIXME need to deal with cursor info
-  def invoke_preprocessors preprocessors
-    preprocessors.each do |processor|
-      #@lines = processor.process self, @lines
-      @lines = processor.process @lines
-    end
   end
 
   def process_line line

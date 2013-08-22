@@ -314,9 +314,10 @@ class Document < AbstractBlock
       @extensions = initialize_extensions ? Extensions::Registry.new(self) : nil
       @reader = PreprocessorReader.new self, data, Asciidoctor::Reader::Cursor.new(@attributes['docfile'], @base_dir)
 
-      # TODO needs review
       if @extensions && @extensions.preprocessors?
-        @reader.invoke_preprocessors @extensions.load_preprocessors(self)
+        @extensions.load_preprocessors(self).each do |processor|
+          @reader = processor.process(@reader, @reader.lines) || @reader
+        end
       end
     else
       # don't need to do the extra processing within our own document
@@ -516,6 +517,18 @@ class Document < AbstractBlock
     if block.context == :section
       assign_index block
     end
+  end
+
+  # Internal: called after the header has been parsed and before the content
+  # will be parsed.
+  #--
+  # QUESTION should we invoke the Treeprocessors here, passing in a phase?
+  # QUESTION is finalize_header the right name?
+  def finalize_header unrooted_attributes, header_valid = true
+    clear_playback_attributes unrooted_attributes
+    save_attributes
+    unrooted_attributes['invalid-header'] = true unless header_valid
+    unrooted_attributes
   end
  
   # Internal: Branch the attributes so that the original state can be restored
@@ -724,6 +737,14 @@ class Document < AbstractBlock
   def render(opts = {})
     restore_attributes
     r = renderer(opts)
+
+    # QUESTION should we add Preserializeprocessors? is it the right name?
+    #if !@parent_document && @extensions && @extensions.preserializeprocessors?
+    #  @extensions.load_preserializeprocessors(self).each do |processor|
+    #    processor.process r
+    #  end
+    #end
+
     if doctype == 'inline'
       # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
       if !(block = @blocks.first).nil? && block.content_model != :compound
