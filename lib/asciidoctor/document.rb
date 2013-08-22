@@ -87,6 +87,9 @@ class Document < AbstractBlock
   # Public: A reference to the parent document of this nested document.
   attr_reader :parent_document
 
+  # Public: The extensions registry
+  attr_reader :extensions
+
   # Public: Initialize an Asciidoc object.
   #
   # data    - The Array of Strings holding the Asciidoc source document. (default: [])
@@ -111,6 +114,8 @@ class Document < AbstractBlock
       @attribute_overrides = @parent_document.attributes
       @safe = @parent_document.safe
       @renderer = @parent_document.renderer
+      initialize_extensions = false
+      @extensions = @parent_document.extensions
     else
       @parent_document = nil
       # copy attributes map and normalize keys
@@ -130,6 +135,8 @@ class Document < AbstractBlock
       end
       @safe = nil
       @renderer = nil
+      initialize_extensions = Asciidoctor.const_defined?('Extensions')
+      @extensions = nil # initialize furthur down
     end
 
     @header = nil
@@ -279,7 +286,7 @@ class Document < AbstractBlock
       verdict
     }
 
-    unless @parent_document
+    if !@parent_document
       # setup default backend and doctype
       @attributes['backend'] ||= DEFAULT_BACKEND
       @attributes['doctype'] ||= DEFAULT_DOCTYPE
@@ -303,21 +310,31 @@ class Document < AbstractBlock
       # fallback directories
       @attributes['stylesdir'] ||= '.'
       @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', './images'), 'icons')
-    end
 
-    if @parent_document
+      @extensions = initialize_extensions ? Extensions::Registry.new(self) : nil
+      @reader = PreprocessorReader.new self, data, Asciidoctor::Reader::Cursor.new(@attributes['docfile'], @base_dir)
+
+      if @extensions && @extensions.preprocessors?
+        @extensions.load_preprocessors(self).each do |processor|
+          @reader = processor.process(@reader, @reader.lines) || @reader
+        end
+      end
+    else
       # don't need to do the extra processing within our own document
       # FIXME how are line numbers being tracked in this case?!?!
       @reader = Reader.new data, Asciidoctor::Reader::Cursor.new(@attributes['docfile'], @base_dir)
-    else
-      # REVIEW review the docfile logic here
-      @reader = PreprocessorReader.new self, data, Asciidoctor::Reader::Cursor.new(@attributes['docfile'], @base_dir)
     end
 
     # Now parse the lines in the reader into blocks
     Lexer.parse(@reader, self, :header_only => @options.fetch(:parse_header_only, false)) 
 
     @callouts.rewind
+
+    if !@parent_document && @extensions && @extensions.treeprocessors?
+      @extensions.load_treeprocessors(self).each do |processor|
+        processor.process
+      end
+    end
   end
 
   # Public: Get the named counter and take the next number in the sequence.
@@ -405,6 +422,10 @@ class Document < AbstractBlock
   def embedded?
     # QUESTION should this be !@options[:header_footer] ?
     @attributes.has_key? 'embedded'
+  end
+
+  def extensions?
+    @extensions ? true : false
   end
 
   # Make the raw source for the Document available.
@@ -496,6 +517,18 @@ class Document < AbstractBlock
     if block.context == :section
       assign_index block
     end
+  end
+
+  # Internal: called after the header has been parsed and before the content
+  # will be parsed.
+  #--
+  # QUESTION should we invoke the Treeprocessors here, passing in a phase?
+  # QUESTION is finalize_header the right name?
+  def finalize_header unrooted_attributes, header_valid = true
+    clear_playback_attributes unrooted_attributes
+    save_attributes
+    unrooted_attributes['invalid-header'] = true unless header_valid
+    unrooted_attributes
   end
  
   # Internal: Branch the attributes so that the original state can be restored
@@ -704,16 +737,35 @@ class Document < AbstractBlock
   def render(opts = {})
     restore_attributes
     r = renderer(opts)
+
+    # QUESTION should we add Preserializeprocessors? is it the right name?
+    #if !@parent_document && @extensions && @extensions.preserializeprocessors?
+    #  @extensions.load_preserializeprocessors(self).each do |processor|
+    #    processor.process r
+    #  end
+    #end
+
     if doctype == 'inline'
       # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
       if !(block = @blocks.first).nil? && block.content_model != :compound
-        block.content
+        output = block.content
       else
-        ''
+        output = ''
       end
     else
-      @options.merge(opts)[:header_footer] ? r.render('document', self).strip : r.render('embedded', self)
+      output = @options.merge(opts)[:header_footer] ? r.render('document', self).strip : r.render('embedded', self)
     end
+
+    if !@parent_document && @extensions
+      if @extensions.postprocessors?
+        @extensions.load_postprocessors(self).each do |processor|
+          output = processor.process output
+        end
+      end
+      @extensions.reset
+    end
+
+    output
   end
 
   def content

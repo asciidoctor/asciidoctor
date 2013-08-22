@@ -453,6 +453,30 @@ module Substituters
       end
     end
 
+    # FIXME this location is somewhat arbitrary, probably need to be able to control ordering
+    # TODO this handling needs some cleanup
+    if (extensions = @document.extensions) && extensions.inline_macros? && found[:macroish]
+      extensions.load_inline_macro_processors(@document).each do |processor|
+        result.gsub!(processor.regexp) {
+          # alias match for Ruby 1.8.7 compat
+          m = $~
+          # honor the escape
+          if m[0].start_with? '\\'
+            next m[0][1..-1]
+          end
+
+          target = m[1]
+          if processor.options[:short_form]
+            attributes = {}
+          else
+            posattrs = processor.options.fetch(:pos_attrs, [])
+            attributes = parse_attributes(m[2], posattrs, :sub_input => true, :unescape_input => true) 
+          end
+          processor.process self, target, attributes
+        }
+      end
+    end
+
     if found[:macroish] && (result.include?('image:') || result.include?('icon:'))
       # image:filename.png[Alt Text]
       result.gsub!(REGEXP[:image_macro]) {

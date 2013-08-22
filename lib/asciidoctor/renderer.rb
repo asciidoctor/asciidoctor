@@ -143,6 +143,11 @@ class Renderer
     readonly_views
   end
 
+  def register_view(view_name, tilt_template)
+    # TODO need to figure out how to cache this
+    @views[view_name] = tilt_template
+  end
+
   # Internal: Load the eRuby implementation
   #
   # name - the String name of the eRuby implementation (default: 'erb')

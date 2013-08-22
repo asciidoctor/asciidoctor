@@ -47,18 +47,20 @@ module Helpers
 
   # Public: Removes the file extension from filename and returns the result
   #
+  # file_name - The String file name to process
+  #
   # Examples
   #
   #   Helpers.rootname('part1/chapter1.adoc')
   #   # => "part1/chapter1"
   #
-  # Returns The String filename with its file extension removed
-  def self.rootname(filename)
-    ext = File.extname(filename)
+  # Returns the String filename with the file extension removed
+  def self.rootname(file_name)
+    ext = File.extname(file_name)
     if ext.empty?
-      filename
+      file_name
     else
-      filename[0...-ext.length]
+      file_name[0...-ext.length]
     end
   end
 
@@ -81,10 +83,5 @@ module Helpers
     end
     clone
   end
-
-  # Public: A generic capture output routine to be used in templates
-  #def self.capture_output(*args, &block)
-  #  Proc.new { block.call(*args) }
-  #end
 end
 end

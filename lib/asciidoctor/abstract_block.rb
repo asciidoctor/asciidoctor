@@ -3,8 +3,8 @@ class AbstractBlock < AbstractNode
   # Public: The types of content that this block can accomodate
   attr_accessor :content_model
 
-  # Public: Get the String name of the render template
-  attr_reader :template_name
+  # Public: Get/Set the String name of the render template
+  attr_accessor :template_name
 
   # Public: Get the Array of Asciidoctor::AbstractBlock sub-blocks for this block
   attr_reader :blocks
@@ -102,12 +102,7 @@ class AbstractBlock < AbstractNode
 
   # Public: Determine whether this Block contains block content
   #
-  # returns Whether this Block has block content
-  #
-  #--
-  # TODO we still need another method that answers
-  # whether this Block *can* have block content
-  # that should be the option 'sectionbody'
+  # Returns A Boolean indicating whether this Block has block content
   def blocks?
     !@blocks.empty?
   end
