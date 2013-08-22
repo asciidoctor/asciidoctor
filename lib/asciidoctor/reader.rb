@@ -29,7 +29,7 @@ class Reader
   # Public: Initialize the Reader object
   def initialize data = nil, cursor = nil
     if cursor.nil?
-      @file = @dir
+      @file = @dir = nil
       @path = '<stdin>'
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     elsif cursor.is_a? String
@@ -128,7 +128,7 @@ class Reader
   # direct  - A Boolean flag to bypasses the check for more lines and immediately
   #           returns the first element of the internal @lines Array. (default: false)
   #
-  # Returns a the next line of the source data if data is present.
+  # Returns the next line of the source data as a String if there are lines remaining.
   # Returns nil if there is no more data.
   def peek_line direct = false
     if direct || @look_ahead > 0
@@ -568,8 +568,8 @@ class PreprocessorReader < Reader
       return ''
     end
 
-    found_colon = line.include?('::')
-    if found_colon && line.include?('if') && (match = line.match(REGEXP[:ifdef_macro]))
+    macroish = line.include?('::') && line.include?('[')
+    if macroish && line.include?('if') && (match = line.match(REGEXP[:ifdef_macro]))
       # if escaped, mark as processed and return line unescaped
       if line.start_with? '\\'
         @unescape_next_line = true
@@ -591,7 +591,7 @@ class PreprocessorReader < Reader
     elsif @skipping
       advance
       nil 
-    elsif found_colon && line.include?('include::') && (match = line.match(REGEXP[:include_macro]))
+    elsif macroish && line.include?('include::') && (match = line.match(REGEXP[:include_macro]))
       # if escaped, mark as processed and return line unescaped
       if line.start_with? '\\'
         @unescape_next_line = true
@@ -610,18 +610,28 @@ class PreprocessorReader < Reader
         end
       end
     else
-      super
+      # optimization to inline super
+      #super
+      @look_ahead += 1
+      line
     end
   end
 
+  # Public: Override the Reader#peek_line method to pop the include
+  # stack if the last line has been reached and there's at least
+  # one include on the stack.
+  #
+  # Returns the next line of the source data as a String if there are lines remaining
+  # in the current include context or a parent include context.
+  # Returns nil if there are no more lines remaining and the include stack is empty.
   def peek_line direct = false
     if (line = super)
       line
-    elsif !@include_stack.empty?
+    elsif @include_stack.empty?
+      nil
+    else
       pop_include
       peek_line direct
-    else
-      nil
     end
   end
 

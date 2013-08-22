@@ -708,7 +708,8 @@ include::fixtures/parent-include.adoc[depth=1]
     end
 
     context 'Conditional Inclusions' do
-      test 'preprocess_line returns nil if cursor advanced' do
+      #test 'process_line returns next line of content' do
+      test 'process_line returns nil if cursor advanced' do
         input = <<-EOS
 ifdef::asciidoctor[]
 Asciidoctor!
@@ -716,6 +717,7 @@ endif::asciidoctor[]
         EOS
   
         reader = Asciidoctor::PreprocessorReader.new empty_document, input
+        #assert_equal "Asciidoctor!\n", reader.process_line(reader.lines.first)
         assert_nil reader.process_line(reader.lines.first)
       end
 
