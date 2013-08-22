@@ -27,22 +27,22 @@ context "Text" do
   end
 
   # NOTE this test ensures we have the encoding line on block templates too
-  test "proper encoding to handle utf8 characters in arbitrary block" do
+  test 'proper encoding to handle utf8 characters in arbitrary block' do
     input = []
     input << "[verse]\n"
     input.concat(File.readlines(sample_doc_path(:encoding)))
-    doc = Asciidoctor::Document.new
-    reader = Asciidoctor::Reader.new(input, doc, true)
+    doc = empty_document
+    reader = Asciidoctor::PreprocessorReader.new doc, input
     block = Asciidoctor::Lexer.next_block(reader, doc)
     assert_xpath '//pre', block.render.gsub(/^\s*\n/, ''), 1
   end
 
-  test "proper encoding to handle utf8 characters from included file" do
+  test 'proper encoding to handle utf8 characters from included file' do
     input = <<-EOS
 include::fixtures/encoding.asciidoc[tags=romé]
     EOS
-    doc = Asciidoctor::Document.new [], :safe => Asciidoctor::SafeMode::SAFE, :base_dir => File.expand_path(File.dirname(__FILE__))
-    reader = Asciidoctor::Reader.new(input, doc, true)
+    doc = empty_safe_document :base_dir => File.expand_path(File.dirname(__FILE__))
+    reader = Asciidoctor::PreprocessorReader.new doc, input
     block = Asciidoctor::Lexer.next_block(reader, doc)
     output = block.render
     assert_css '.paragraph', output, 1

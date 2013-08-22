@@ -1089,7 +1089,7 @@ Lists
       assert_xpath '//ul/li[1]/*', output, 1
     end
 
-    test "consecutive blocks in list continuation attach to list item" do
+    test 'consecutive blocks in list continuation attach to list item' do
       input = <<-EOS
 Lists
 =====
@@ -1106,7 +1106,7 @@ ____
 +
 * Item two
       EOS
-      output = render_string input
+      output = render_embedded_string input
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 2
       assert_xpath '//ul/li[1]/p', output, 1

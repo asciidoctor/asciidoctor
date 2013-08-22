@@ -371,5 +371,22 @@ class PathResolver
       "#{uri_prefix}#{join_path resolved_segments, target_root}"
     end
   end
+
+  # Public: Calculate the relative path to this absolute filename from the specified base directory
+  #
+  # If either the filename or the base_directory are not absolute paths, no work is done.
+  #
+  # filename       - An absolute file name as a String
+  # base_directory - An absolute base directory as a String
+  #
+  # Return the relative path String of the filename calculated from the base directory
+  def relative_path(filename, base_directory)
+    if (is_root? filename) && (is_root? base_directory)
+      offset = base_directory.chomp(@file_separator).length + 1
+      filename[offset..-1]
+    else
+      filename
+    end
+  end
 end
 end

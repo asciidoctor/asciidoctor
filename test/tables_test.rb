@@ -556,7 +556,7 @@ a|include::fixtures/include-file.asciidoc[]
 |===
       EOS
 
-      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE, :base_dir => File.dirname(__FILE__)
+      output = render_embedded_string input, :safe => :safe, :base_dir => File.dirname(__FILE__)
       assert_match(/included content/, output)
     end
 

@@ -1,0 +1,5 @@
+first line of child
+
+include::grandchild-include.adoc[]
+
+last line of child

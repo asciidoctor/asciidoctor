@@ -419,6 +419,11 @@ class AbstractNode
         :target_name => asset_name, :recover => autocorrect)
   end
 
+  # Public: Calculate the relative path to this absolute filename from the Document#base_dir
+  def relative_path(filename)
+    PathResolver.new.relative_path filename, @document.base_dir
+  end
+
   # Public: Retrieve the list marker keyword for the specified list type.
   #
   # For use in the HTML type attribute.
