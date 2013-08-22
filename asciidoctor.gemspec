@@ -71,6 +71,7 @@ EOS
     lib/asciidoctor/cli/options.rb
     lib/asciidoctor/debug.rb
     lib/asciidoctor/document.rb
+    lib/asciidoctor/extensions.rb
     lib/asciidoctor/helpers.rb
     lib/asciidoctor/inline.rb
     lib/asciidoctor/lexer.rb
@@ -87,6 +88,7 @@ EOS
     test/attributes_test.rb
     test/blocks_test.rb
     test/document_test.rb
+    test/extensions_test.rb
     test/fixtures/asciidoc.txt
     test/fixtures/asciidoc_index.txt
     test/fixtures/ascshort.txt

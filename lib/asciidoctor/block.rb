@@ -82,8 +82,8 @@ class Block < AbstractBlock
   end
 
   def to_s
-    content_summary = @content_model == :compound ? %(# blocks = #{@blocks.size}) : %(# lines = #{@lines.size})
-    %(Block[context: #@context, @content_model: #@content_model, #{content_summary}])
+    content_summary = @content_model == :compound ? %(# of blocks = #{@blocks.size}) : %(# of lines = #{@lines.size})
+    %(Block[@context: :#@context, @content_model: :#@content_model, #{content_summary}])
   end
 end
 end

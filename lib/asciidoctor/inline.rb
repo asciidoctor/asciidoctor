@@ -1,6 +1,9 @@
 module Asciidoctor
 # Public: Methods for managing inline elements in AsciiDoc block
 class Inline < AbstractNode
+  # Public: Get/Set the String name of the render template
+  attr_accessor :template_name
+
   # Public: Get the text of this inline element
   attr_reader :text
 
@@ -12,6 +15,7 @@ class Inline < AbstractNode
 
   def initialize(parent, context, text = nil, opts = {})
     super(parent, context)
+    @template_name = "inline_#{context}"
 
     @text = text 
 
@@ -25,7 +29,7 @@ class Inline < AbstractNode
   end
 
   def render
-    renderer.render("inline_#{@context}", self).chomp
+    renderer.render(@template_name, self).chomp
   end
 
 end

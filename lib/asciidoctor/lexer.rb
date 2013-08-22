@@ -77,10 +77,7 @@ class Lexer
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
     if block_attributes.has_key?('title')
-      document.clear_playback_attributes block_attributes
-      document.save_attributes
-      block_attributes['invalid-header'] = true
-      return block_attributes
+      return document.finalize_header block_attributes, false
     end
 
     # yep, document title logic in AsciiDoc is just insanity
@@ -122,12 +119,9 @@ class Lexer
     # parse title and consume name section of manpage document
     parse_manpage_header(reader, document) if document.doctype == 'manpage'
  
-    document.clear_playback_attributes block_attributes
-    document.save_attributes
- 
-    # NOTE these are the block-level attributes (not document attributes) that
+    # NOTE block_attributes are the block-level attributes (not document attributes) that
     # precede the first line of content (document title, first section or first block)
-    block_attributes
+    document.finalize_header block_attributes
   end
 
   # Public: Parses the manpage header of the AsciiDoc source read from the Reader
@@ -345,6 +339,12 @@ class Lexer
     #parse_sections = options.fetch(:parse_sections, false)
 
     document = parent.document
+    if (extensions = document.extensions)
+      block_extensions = extensions.blocks?
+      macro_extensions = extensions.block_macros?
+    else
+      block_extensions = macro_extensions = false
+    end
     #parent_context = parent.is_a?(Block) ? parent.context : nil
     in_list = parent.is_a?(List)
     block = nil
@@ -365,6 +365,7 @@ class Lexer
       this_line = reader.read_line
       delimited_block = false
       block_context = nil
+      cloaked_context = nil
       terminator = nil
       # QUESTION put this inside call to rekey attributes?
       if attributes[1]
@@ -373,7 +374,7 @@ class Lexer
 
       if delimited_blk_match = is_delimited_block?(this_line, true)
         delimited_block = true
-        block_context = delimited_blk_match.context
+        block_context = cloaked_context = delimited_blk_match.context
         terminator = delimited_blk_match.terminator
         if !style
           style = attributes['style'] = block_context.to_s
@@ -382,6 +383,8 @@ class Lexer
             block_context = style.to_sym
           elsif delimited_blk_match.masq.include?('admonition') && ADMONITION_STYLES.include?(style)
             block_context = :admonition
+          elsif block_extensions && extensions.processor_registered_for_block?(style, block_context)
+            block_context = style.to_sym
           else
             warn "asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for #{block_context} block: #{style}"
             style = block_context.to_s
@@ -412,7 +415,6 @@ class Lexer
               block = Block.new(parent, BREAK_LINES[match[0][0..0]], :content_model => :empty)
               break
 
-            # TODO make this a media_blk and handle image, video & audio
             elsif (match = this_line.match(REGEXP[:media_blk_macro]))
               blk_ctx = match[1].to_sym
               block = Block.new(parent, blk_ctx, :content_model => :empty)
@@ -462,6 +464,22 @@ class Lexer
               block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
               break
 
+            elsif macro_extensions && (match = this_line.match(REGEXP[:generic_blk_macro])) &&
+                extensions.processor_registered_for_block_macro?(match[1])
+              name = match[1]
+              target = match[2]
+              raw_attributes = match[3]
+              processor = extensions.load_block_macro_processor name, document
+              unless raw_attributes.empty?
+                document.parse_attributes(raw_attributes, processor.options.fetch(:pos_attrs, []),
+                    :sub_input => true, :sub_result => false, :into => attributes)
+              end
+              if !(default_attrs = processor.options.fetch(:default_attrs, {})).empty?
+                default_attrs.each {|k, v| attributes[k] ||= v }
+              end
+              block = processor.process parent, target, attributes
+              return nil if block.nil?
+              break
             end
           end
 
@@ -538,14 +556,23 @@ class Lexer
             break
 
           # FIXME create another set for "passthrough" styles
+          # FIXME make this more DRY!
           elsif !style.nil? && style != 'normal'
             if PARAGRAPH_STYLES.include?(style)
               block_context = style.to_sym
+              cloaked_context = :paragraph
               reader.unshift_line this_line
               # advance to block parsing =>
               break
             elsif ADMONITION_STYLES.include?(style)
               block_context = :admonition
+              cloaked_context = :paragraph
+              reader.unshift_line this_line
+              # advance to block parsing =>
+              break
+            elsif block_extensions && extensions.processor_registered_for_block?(style, :paragraph)
+              block_context = style.to_sym
+              cloaked_context = :paragraph
               reader.unshift_line this_line
               # advance to block parsing =>
               break
@@ -723,8 +750,23 @@ class Lexer
           block = build_block(block_context, (block_context == :verse ? :verbatim : :compound), terminator, parent, reader, attributes)
 
         else
-          # this should only happen if there is a misconfiguration
-          raise "Unsupported block type #{block_context} at #{reader.line_info}"
+          if block_extensions && extensions.processor_registered_for_block?(block_context, cloaked_context)
+            processor = extensions.load_block_processor block_context, document
+            
+            if (content_model = processor.options[:content_model]) != :skip
+              if !(pos_attrs = processor.options.fetch(:pos_attrs, [])).empty?
+                AttributeList.rekey(attributes, [nil].concat(pos_attrs))
+              end
+              if !(default_attrs = processor.options.fetch(:default_attrs, {})).empty?
+                default_attrs.each {|k, v| attributes[k] ||= v }
+              end
+            end
+            block = build_block(block_context, content_model, terminator, parent, reader, attributes, :processor => processor)
+            return nil if block.nil?
+          else
+            # this should only happen if there's a misconfiguration
+            raise "Unsupported block type #{block_context} at #{reader.line_info}"
+          end
         end
       end
     end
@@ -732,7 +774,7 @@ class Lexer
     # when looking for nested content, one or more line comments, comment
     # blocks or trailing attribute lists could leave us without a block,
     # so handle accordingly
-    # REVIEW we may no longer need this check
+    # REVIEW we may no longer need this nil check
     if !block.nil?
       # REVIEW seems like there is a better way to organize this wrap-up
       block.id      ||= attributes['id'] if attributes.has_key?('id')
@@ -866,7 +908,14 @@ class Lexer
       reset_block_indent! lines, attributes['indent'].to_i
     end
 
-    block = Block.new(parent, block_context, :content_model => content_model, :attributes => attributes, :source => lines)
+    if (processor = options[:processor])
+      attributes.delete('style')
+      processor.options[:content_model] = content_model
+      block = processor.process(parent, block_reader || Reader.new(lines), attributes)
+    else
+      block = Block.new(parent, block_context, :content_model => content_model, :attributes => attributes, :source => lines)
+    end
+
     # should supports_caption be necessary?
     if options.fetch(:supports_caption, false)
       block.title = attributes.delete('title') if attributes.has_key?('title')
@@ -877,12 +926,26 @@ class Lexer
       # we can look for blocks until there are no more lines (and not worry
       # about sections) since the reader is confined within the boundaries of a
       # delimited block
-      while block_reader.has_more_lines?
-        parsed_block = next_block(block_reader, block)
-        block << parsed_block unless parsed_block.nil?
-      end
+      parse_blocks block_reader, block
     end
     block
+  end
+
+  # Public: Parse blocks from this reader until there are no more lines.
+  #
+  # This method calls Lexer#next_block until there are no more lines in the
+  # Reader. It does not consider sections because it's assumed the Reader only
+  # has lines which are within a delimited block region.
+  #
+  # reader - The Reader containing the lines to process
+  # parent - The parent Block to which to attach the parsed blocks
+  #
+  # Returns nothing.
+  def self.parse_blocks(reader, parent)
+    while reader.has_more_lines?
+      block = Lexer.next_block(reader, parent)
+      parent << block unless block.nil?
+    end
   end
 
   # Internal: Parse and construct an outline list Block from the current position of the Reader
