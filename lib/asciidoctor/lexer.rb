@@ -410,9 +410,11 @@ class Lexer
 
           # process lines normally
           if !text_only
+            first_char = this_line[0..0]
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
-            if (match = this_line.match(REGEXP[:break_line]))
-              block = Block.new(parent, BREAK_LINES[match[0][0..0]], :content_model => :empty)
+            if BREAK_LINES.has_key?(first_char) && this_line.length > 2 &&
+                (match = this_line.match(COMPLIANCE[:markdown_syntax] ? REGEXP[:break_line_plus] : REGEXP[:break_line]))
+              block = Block.new(parent, BREAK_LINES[first_char], :content_model => :empty)
               break
 
             elsif (match = this_line.match(REGEXP[:media_blk_macro]))
@@ -1471,7 +1473,8 @@ class Lexer
   end
 
   def self.is_single_line_section_title?(line1)
-    if !line1.nil? && (line1.start_with?('=') || (COMPLIANCE[:markdown_syntax] && line1.start_with?('#'))) &&
+    first_char = line1.nil? ? nil : line1[0..0]
+    if (first_char == '=' || (COMPLIANCE[:markdown_syntax] && first_char == '#')) &&
         (match = line1.match(REGEXP[:section_title]))
       single_line_section_level match[1]
     else
@@ -1540,7 +1543,8 @@ class Lexer
     sect_level = -1
     single_line = true
 
-    if (line1.start_with?('=') || (COMPLIANCE[:markdown_syntax] && line1.start_with?('#'))) &&
+    first_char = line1[0..0]
+    if (first_char == '=' || (COMPLIANCE[:markdown_syntax] && first_char == '#')) &&
         (match = line1.match(REGEXP[:section_title]))
       sect_id = match[3]
       sect_title = match[2]
@@ -2058,7 +2062,7 @@ class Lexer
       line = table_reader.read_line
 
       if skipped == 0 && loop_idx.zero? && !attributes.has_key?('options') &&
-          !(next_line = table_reader.peek_line(false)).nil? && next_line.chomp.empty?
+          !(next_line = table_reader.peek_line).nil? && next_line == ::Asciidoctor::EOL
         table.has_header_option = true
         attributes['options'] = "header"
         attributes['header-option'] = ''

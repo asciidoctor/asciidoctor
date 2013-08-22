@@ -33,7 +33,7 @@ class Block < AbstractBlock
     if raw_source.nil?
       @lines = []
     elsif raw_source.class == String
-      # TODO make line normalization a utility method since it's used multiple times in code base!!
+      # FIXME make line normalization a utility method since it's used multiple times in code base!!
       if ::Asciidoctor::FORCE_ENCODING
         @lines = raw_source.lines.map {|line| "#{line.rstrip.force_encoding(::Encoding::UTF_8)}\n" }
       else

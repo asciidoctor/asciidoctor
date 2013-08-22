@@ -64,11 +64,10 @@ class AbstractNode
   def attr(name, default = nil, inherit = true)
     name = name.to_s if name.is_a?(Symbol)
     inherit = false if self == @document
-    if !inherit
-      default.nil? ? @attributes[name] : @attributes.fetch(name, default)
+    if inherit
+      @attributes[name] || @document.attributes[name] || default
     else
-      default.nil? ? @attributes.fetch(name, @document.attr(name)) :
-          @attributes.fetch(name, @document.attr(name, default))
+      @attributes[name] || default
     end
   end
 
@@ -93,21 +92,11 @@ class AbstractNode
     name = name.to_s if name.is_a?(Symbol)
     inherit = false if self == @document
     if expect.nil?
-      if @attributes.has_key? name
-        true
-      elsif inherit
-        @document.attributes.has_key? name
-      else
-        false
-      end
+      @attributes.has_key?(name) || (inherit && @document.attributes.has_key?(name))
+    elsif inherit
+      expect == (@attributes[name] || @document.attributes[name])
     else
-      if @attributes.has_key? name
-        @attributes[name] == expect
-      elsif inherit && @document.attributes.has_key?(name)
-        @document.attributes[name] == expect
-      else
-        false
-      end
+      expect == @attributes[name]
     end
   end
 
@@ -193,33 +182,45 @@ class AbstractNode
 
   # Public: A convenience method that checks if the role attribute is specified
   def role?(expect = nil)
-    self.attr?('role', expect)
+    if expect.nil?
+      @attributes.has_key?('role') || @document.attributes.has_key?('role')
+    else
+      expect == (@attributes['role'] || @document.attributes['role'])
+    end
   end
 
   # Public: A convenience method that returns the value of the role attribute
   def role
-    self.attr('role')
+    @attributes['role'] || @document.attributes['role']
   end
 
   # Public: A convenience method that checks if the specified role is present
   # in the list of roles on this node
   def has_role?(name)
-    roles.include?(name)
+    if (val = (@attributes['role'] || @document.attributes['role']))
+      val.split(' ').include?(name)
+    else
+      false
+    end
   end
 
   # Public: A convenience method that returns the role names as an Array
   def roles
-    self.attr('role').to_s.split(' ')
+    if (val = (@attributes['role'] || @document.attributes['role']))
+      val.split(' ')
+    else
+      []
+    end
   end
 
   # Public: A convenience method that checks if the reftext attribute is specified
   def reftext?
-    self.attr?('reftext')
+    @attributes.has_key?('reftext') || @document.attributes.has_key?('reftext')
   end
 
   # Public: A convenience method that returns the value of the reftext attribute
   def reftext
-    self.attr('reftext')
+    @attributes['reftext'] || @document.attributes['reftext']
   end
 
   # Public: Construct a reference or data URI to an icon image for the
