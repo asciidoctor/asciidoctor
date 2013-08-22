@@ -88,8 +88,8 @@ module Asciidoctor
               err = (@err || $stderr)
               err.puts "Input file: #{input.respond_to?(:path) ? input.path : '-'}"
               err.puts "  Time to read and parse source: #{'%05.5f' % monitor[:parse]}"
-              err.puts "  Time to render document: #{'%05.5f' % monitor[:render]}"
-              err.puts "  Total time to read, parse and render: #{'%05.5f' % monitor[:load_render]}"
+              err.puts "  Time to render document: #{monitor.has_key?(:render) ? '%05.5f' % monitor[:render] : 'n/a'}"
+              err.puts "  Total time to read, parse and render: #{'%05.5f' % (monitor[:load_render] || monitor[:parse])}"
             end
           end
         rescue Exception => e
