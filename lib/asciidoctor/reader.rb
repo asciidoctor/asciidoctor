@@ -1,5 +1,4 @@
 module Asciidoctor
-
 # Public: Methods for retrieving lines from AsciiDoc source files
 class Reader
   class Cursor
@@ -773,8 +772,6 @@ class PreprocessorReader < Reader
   #          target slot of the include::[] macro
   #
   # returns a Boolean indicating whether the line under the cursor has changed.
-  # -
-  # TODO extensions need to be able to communicate line numbers
   def preprocess_include target, raw_attributes
     target = @document.sub_attributes target, :attribute_missing => 'drop-line'
     if target.empty?
@@ -784,6 +781,14 @@ class PreprocessorReader < Reader
         advance
         true
       end
+    # assume that if an include processor is given, the developer wants
+    # to handle when and how to process the include
+    elsif include_processors? &&
+        (processor = @include_processors.find {|candidate| candidate.handles? target })
+      advance
+      # QUESTION should we use @document.parse_attribues?
+      processor.process self, target, AttributeList.new(raw_attributes).parse
+      true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif @document.safe >= SafeMode::SECURE
@@ -795,7 +800,6 @@ class PreprocessorReader < Reader
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
       warn %(asciidoctor: WARNING: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
       false
-    # FIXME Insert IncludeProcessor logic here once merged
     elsif abs_maxdepth > 0
       if target.include?(':') && target.match(REGEXP[:uri_sniff])
         unless @document.attributes.has_key? 'allow-uri-read'
@@ -977,6 +981,14 @@ class PreprocessorReader < Reader
     @include_stack.size 
   end
 
+  def exceeded_max_depth?
+    if (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
+      @maxdepth[:rel]
+    else
+      false
+    end
+  end
+
   # TODO Document this override
   # also, we now have the field in the super class, so perhaps
   # just implement the logic there?
@@ -1081,9 +1093,22 @@ class PreprocessorReader < Reader
     val
   end
 
+  def include_processors?
+    if @include_processors.nil?
+      if @document.extensions? && @document.extensions.include_processors?
+        @include_processors = @document.extensions.load_include_processors(@document)
+        true
+      else
+        @include_processors = false
+        false
+      end
+    else
+      @include_processors != false
+    end
+  end
+
   def to_s
     %(#{self.class.name} [path: #{@path}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|include| include.to_s}.join ', '}]])
   end
 end
-
 end

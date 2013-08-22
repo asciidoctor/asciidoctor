@@ -96,15 +96,13 @@ class Document < AbstractBlock
   # options - A Hash of options to control processing, such as setting the safe mode (:safe),
   #           suppressing the header/footer (:header_footer) and attribute overrides (:attributes)
   #           (default: {})
-  # block   - A block that can be used to retrieve external Asciidoc
-  #           data to include in this document.
   #
   # Examples
   #
   #   data = File.readlines(filename)
   #   doc  = Asciidoctor::Document.new(data)
   #   puts doc.render
-  def initialize(data = [], options = {}, &block)
+  def initialize(data = [], options = {})
     super(self, :document)
 
     if options[:parent]

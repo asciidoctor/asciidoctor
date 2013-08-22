@@ -51,6 +51,7 @@ module Extensions
     attr_accessor :preprocessors
     attr_accessor :treeprocessors
     attr_accessor :postprocessors
+    attr_accessor :include_processors
     attr_accessor :blocks
     attr_accessor :block_macros
     attr_accessor :inline_macros
@@ -59,6 +60,8 @@ module Extensions
       @preprocessors = []
       @treeprocessors = []
       @postprocessors = []
+      @include_processors = []
+      @include_processor_cache = {}
       @block_delimiters = {}
       @blocks = {}
       @block_processor_cache = {}
@@ -134,6 +137,30 @@ module Extensions
       @postprocessors.map do |processor|
         processor.new(*args)
       end
+    end
+
+    def include_processor processor, position = :<<
+      if position == :<< || @include_processors.empty?
+        @include_processors.push processor
+      elsif position == :>>
+        @include_processors.unshift processor
+      else
+        @include_processors.push processor
+      end
+    end
+
+    def include_processors?
+      !@include_processors.empty?
+    end
+
+    def load_include_processors *args
+      @include_processors.map do |processor|
+        processor.new(*args)
+      end
+      # QUESTION do we need/want the cache?
+      #@include_processors.map do |processor|
+      #  @include_processor_cache[processor] ||= processor.new(*args)
+      #end
     end
 
     # TODO allow contexts to be specified here, perhaps as [:upper, [:paragraph, :sidebar]]
@@ -294,6 +321,21 @@ module Extensions
   # Postprocessors must extend Asciidoctor::Extensions::Postprocessor.
   class Postprocessor < Processor
     def process output
+      output
+    end
+  end
+
+  # Public: IncludeProcessors are used to process include::[] macros in the
+  # source document.
+  #
+  # When Asciidoctor discovers an include::[] macro in the source document, it
+  # iterates through the IncludeProcessors and delegates the work of reading
+  # the content to the first processor that identifies itself as capable of
+  # handling that target.
+  #
+  # IncludeProcessors must extend Asciidoctor::Extensions::IncludeProcessor.
+  class IncludeProcessor < Processor
+    def process target, attributes
       output
     end
   end
