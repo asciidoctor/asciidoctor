@@ -434,6 +434,7 @@ include::fixtures/parent-include.adoc[]
         fixtures_dir = File.join DIRNAME, 'fixtures'
         parent_include_docfile = File.join fixtures_dir, 'parent-include.adoc'
         child_include_docfile = File.join fixtures_dir, 'child-include.adoc'
+        grandchild_include_docfile = File.join fixtures_dir, 'grandchild-include.adoc'
 
         doc = empty_safe_document :base_dir => DIRNAME
         reader = Asciidoctor::PreprocessorReader.new doc, input, pseudo_docfile
@@ -457,6 +458,19 @@ include::fixtures/parent-include.adoc[]
         assert_equal child_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/child-include.adoc', reader.path
+
+        reader.skip_blank_lines
+
+        assert_equal "first line of grandchild\n", reader.read_line
+
+        assert_equal 'fixtures/grandchild-include.adoc: line 1', reader.prev_line_info
+        assert_equal grandchild_include_docfile, reader.file
+        assert_equal fixtures_dir, reader.dir
+        assert_equal 'fixtures/grandchild-include.adoc', reader.path
+
+        reader.skip_blank_lines
+
+        assert_equal "last line of grandchild\n", reader.read_line
 
         reader.skip_blank_lines
 
@@ -704,6 +718,21 @@ include::fixtures/parent-include.adoc[depth=1]
 
         lines = reader.readlines
         assert lines.include?("include::child-include.adoc[]\n")
+      end
+
+      test 'include macro should be disabled if max include depth set in nested context has been exceeded' do
+        input = <<-EOS
+include::fixtures/parent-include-restricted.adoc[depth=3]
+        EOS
+
+        pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
+
+        doc = empty_safe_document :base_dir => DIRNAME
+        reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile)
+
+        lines = reader.readlines
+        assert lines.include?("first line of child\n")
+        assert lines.include?("include::grandchild-include.adoc[]\n")
       end
 
       test 'read_lines_until should not process lines if process option is false' do

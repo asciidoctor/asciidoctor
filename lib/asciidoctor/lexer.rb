@@ -1153,7 +1153,7 @@ class Lexer
         if continuation == :inactive
           continuation = :active
           has_text = true
-          buffer[-1] = "\n" unless within_nested_list
+          buffer[-1] = ::Asciidoctor::EOL unless within_nested_list
         end
 
         # dealing with adjacent list continuations (which is really a syntax error)
@@ -2327,6 +2327,8 @@ class Lexer
   #   # => end
   #
   # returns the Array of String lines with block offset removed
+  #--
+  # FIXME refactor gsub matchers into compiled regex
   def self.reset_block_indent!(lines, indent = 0)
     return if indent.nil? || lines.empty?
 

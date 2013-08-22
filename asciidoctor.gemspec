@@ -95,6 +95,7 @@ EOS
     test/fixtures/basic-docinfo.html
     test/fixtures/basic-docinfo.xml
     test/fixtures/basic.asciidoc
+    test/fixtures/child-include.adoc
     test/fixtures/custom-backends/haml/docbook45/block_paragraph.xml.haml
     test/fixtures/custom-backends/haml/html5-tweaks/block_paragraph.html.haml
     test/fixtures/custom-backends/haml/html5/block_paragraph.html.haml
@@ -110,6 +111,7 @@ EOS
     test/fixtures/encoding.asciidoc
     test/fixtures/include-file.asciidoc
     test/fixtures/list_elements.asciidoc
+    test/fixtures/parent-include.adoc
     test/fixtures/sample.asciidoc
     test/fixtures/stylesheets/custom.css
     test/fixtures/tip.gif
