@@ -595,8 +595,7 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
         assert_equal "<year>2013</year>\n<holder>Acme, Inc.</holder>", result
       end
   
-=begin
-      test 'block is called to handle an include macro' do
+      test 'include processor is called to process include directive' do
         input = <<-EOS
 first line
 
@@ -604,17 +603,64 @@ include::include-file.asciidoc[]
 
 last line
         EOS
-        document = Asciidoctor::Document.new [], :safe => Asciidoctor::SafeMode::SAFE
-        reader = Asciidoctor::Reader.new(input.lines.entries, document, true) {|inc, doc|
-          ":includefile: #{inc}\n\nmiddle line".lines.entries
+
+        include_processor = Class.new {
+          def initialize document
+          end
+
+          def handles? target
+            true
+          end
+
+          def process reader, target, attributes
+            content = ["include target:: #{target}\n", "\n", "middle line\n"]
+            reader.push_include content, target, target, 1, attributes
+          end
         }
+
+        # Safe Mode is not required
+        document = empty_document :base_dir => DIRNAME
+        reader = Asciidoctor::PreprocessorReader.new document, input
+        reader.instance_variable_set '@include_processors', [include_processor.new(document)]
         lines = []
+        lines << reader.read_line
+        lines << reader.read_line
+        lines << reader.read_line
+        assert_equal "include target:: include-file.asciidoc\n", lines.last
+        assert_equal 'include-file.asciidoc: line 2', reader.line_info
         while reader.has_more_lines?
-          lines << reader.get_line
+          lines << reader.read_line
         end
-        assert_match(/^:includefile: include-file.asciidoc$/, lines.join)
+        source = lines.join
+        assert_match(/^include target:: include-file.asciidoc$/, source)
+        assert_match(/^middle line$/, source)
       end
-=end
+
+      test 'should fall back to built-in include macro behavior when not handled by include processor' do
+        input = <<-EOS
+include::fixtures/include-file.asciidoc[]
+        EOS
+  
+        include_processor = Class.new {
+          def initialize document
+          end
+  
+          def handles? target
+            false
+          end
+  
+          def process reader, target, attributes
+            raise 'TestIncludeHandler should not have been invoked'
+          end
+        }
+  
+        document = empty_safe_document :base_dir => DIRNAME
+        reader = Asciidoctor::PreprocessorReader.new document, input
+        reader.instance_variable_set '@include_processors', [include_processor.new(document)]
+        lines = reader.read_lines
+        source = lines.join
+        assert_match(/included content/, source)
+      end
   
       test 'attributes are substituted in target of include macro' do
         input = <<-EOS
