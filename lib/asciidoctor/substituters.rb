@@ -102,8 +102,8 @@ module Substituters
     if (subs = attr('subs', nil, false))
       apply_subs(lines.join, resolve_subs(subs))
     elsif @style == 'source' && @document.attributes['basebackend'] == 'html' &&
-      (highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
-      highlighter == 'pygments' && attr?('language')
+      ((highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
+      highlighter == 'pygments') && attr?('language')
       #sub_callouts(highlight_source(lines.join))
       highlight_source(lines.join, highlighter, true)
     else
@@ -795,9 +795,9 @@ module Substituters
       m = $~
       # honor the escape
       if m[1] == '\\'
-        next "&lt;#{m[2]}&gt;"
+        next "&lt;#{m[3]}&gt;"
       end
-      Inline.new(self, :callout, m[2], :id => @document.callouts.read_next_id).render
+      Inline.new(self, :callout, m[3], :id => @document.callouts.read_next_id).render
     }
   end
 
@@ -961,10 +961,11 @@ module Substituters
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
+          # FIXME this does not put back the optional leading comment chars
           if m[1] == '\\'
-            "<#{m[2]}>"
+            "<#{m[3]}>"
           else
-            callout_marks[lineno] = m[2]
+            callout_marks[lineno] = m[3]
             nil
           end
         }

@@ -1748,7 +1748,7 @@ term2::
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test 'wip multi-line element with paragraph starting with multiple dashes should not be seen as list' do
+    test 'multi-line element with paragraph starting with multiple dashes should not be seen as list' do
       input = <<-EOS
 term1::
   def1
@@ -3744,6 +3744,72 @@ require 'asciidoctor' # \\<1>
     EOS
     output = render_string input, :attributes => {'backend' => 'docbook45'}
     assert_xpath '//co', output, 0
+  end
+
+  test 'should not recognize callouts in middle of line' do
+    input = <<-EOS
+[source, ruby]
+----
+puts "The syntax <1> at the end of the line makes a code callout"
+----
+    EOS
+    output = render_embedded_string input
+    assert_xpath '//b', output, 0
+  end
+
+  test 'should allow XML comment-style callouts' do
+    input = <<-EOS
+[source, xml]
+----
+<section>
+  <title>Section Title</title> <!--1-->
+  <simpara>Just a paragraph</simpara> <!--2-->
+</section>
+----
+<1> The title is required
+<2> The content isn't
+    EOS
+    output = render_embedded_string input
+    assert_xpath '//b', output, 2
+    assert_xpath '//b[text()="(1)"]', output, 1
+    assert_xpath '//b[text()="(2)"]', output, 1
+  end
+
+  test 'should not allow callouts with half an XML comment' do
+    input = <<-EOS
+----
+First line <1-->
+Second line <2-->
+----
+    EOS
+    output = render_embedded_string input
+    assert_xpath '//b', output, 0
+  end
+
+  test 'should remove leading line comment chars' do
+    input = <<-EOS
+----
+puts 'Hello, world!' # <1>
+----
+<1> Ruby
+
+----
+println 'Hello, world!' // <1>
+----
+<1> Groovy
+
+----
+(def hello (fn [] "Hello, world!")) ;; <1>
+(hello)
+----
+<1> Clojure
+    EOS
+    output = render_embedded_string input
+    assert_xpath '//b', output, 3
+    nodes = xmlnodes_at_css 'pre', output 
+    assert_equal "puts 'Hello, world!' (1)", nodes[0].text
+    assert_equal "println 'Hello, world!' (1)", nodes[1].text
+    assert_equal %((def hello (fn [] "Hello, world!")) (1)\n(hello)), nodes[2].text
   end
 
   test 'literal block with callouts' do
