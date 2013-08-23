@@ -186,7 +186,7 @@ class Table::Cell < AbstractNode
   # Public: The internal Asciidoctor::Document for a cell that has the asciidoc style
   attr_reader :inner_document
 
-  def initialize(column, text, attributes = {})
+  def initialize(column, text, attributes = {}, cursor = nil)
     super(column, :cell)
     @text = text
     @style = nil
@@ -222,7 +222,7 @@ class Table::Cell < AbstractNode
           inner_document_lines.unshift(*processed_lines)
         end
       end
-      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document)
+      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => cursor)
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
     end
   end
@@ -278,8 +278,11 @@ class Table::ParserContext
   # Public: The cell delimiter compiled Regexp for this table.
   attr_reader :delimiter_re
 
-  def initialize(table, attributes = {})
+  def initialize(reader, table, attributes = {})
+    @reader = reader
     @table = table
+    # TODO if reader.cursor becomes a reference, this would require .dup
+    @last_cursor = reader.cursor
     if attributes.has_key? 'format'
       @format = attributes['format']
       if !Table::DATA_FORMATS.include? @format
@@ -422,8 +425,7 @@ class Table::ParserContext
     if format == 'psv'
       cell_spec = take_cell_spec
       if cell_spec.nil?
-        # FIXME need a reader reference to report line info
-        warn 'asciidoctor: ERROR: table missing leading separator, recovering automatically'
+        warn "asciidoctor: ERROR: #{@last_cursor.line_info}: table missing leading separator, recovering automatically"
         cell_spec = {}
         repeat = 1
       else
@@ -457,7 +459,8 @@ class Table::ParserContext
         column = @table.columns[@current_row.size]
       end
 
-      cell = Table::Cell.new(column, cell_text, cell_spec)
+      cell = Table::Cell.new(column, cell_text, cell_spec, @last_cursor)
+      @last_cursor = @reader.cursor
       unless cell.rowspan.nil? || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))
       end

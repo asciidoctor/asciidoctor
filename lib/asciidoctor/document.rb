@@ -319,8 +319,8 @@ class Document < AbstractBlock
       end
     else
       # don't need to do the extra processing within our own document
-      # FIXME how are line numbers being tracked in this case?!?!
-      @reader = Reader.new data, Asciidoctor::Reader::Cursor.new(@attributes['docfile'], @base_dir)
+      # FIXME line info isn't reported correctly within include files in nested document
+      @reader = Reader.new data, options[:cursor]
     end
 
     # Now parse the lines in the reader into blocks

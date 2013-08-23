@@ -494,6 +494,7 @@ class Lexer
             begin
               # might want to move this check to a validate method
               if match[1].to_i != expected_index
+                # FIXME this lineno - 2 hack means we need a proper look-behind cursor
                 warn "asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: callout list item index: expected #{expected_index} got #{match[1]}"
               end
               list_item = next_list_item(reader, block, match)
@@ -504,6 +505,7 @@ class Lexer
                 if !coids.empty?
                   list_item.attributes['coids'] = coids
                 else
+                  # FIXME this lineno - 2 hack means we need a proper look-behind cursor
                   warn "asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: no callouts refer to list item #{block.items.size}"
                 end
               end
@@ -1120,7 +1122,7 @@ class Lexer
       end
 
       if !sibling_trait
-        sibling_trait = resolve_list_marker(list_type, match[1], list_block.items.size, true)
+        sibling_trait = resolve_list_marker(list_type, match[1], list_block.items.size, true, reader)
       end
       list_item.marker = sibling_trait
       has_text = true
@@ -1928,9 +1930,9 @@ class Lexer
   # validate   - Whether to validate the value of the marker
   #
   # Returns the String 0-index marker for this list item
-  def self.resolve_list_marker(list_type, marker, ordinal = 0, validate = false)
+  def self.resolve_list_marker(list_type, marker, ordinal = 0, validate = false, reader = nil)
     if list_type == :olist && !marker.start_with?('.')
-      resolve_ordered_list_marker(marker, ordinal, validate)
+      resolve_ordered_list_marker(marker, ordinal, validate, reader)
     elsif list_type == :colist
       '<1>'
     else
@@ -1959,7 +1961,7 @@ class Lexer
   #  # => 'A.'
   #
   # Returns the String of the first marker in this number series 
-  def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false)
+  def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
     number_style = ORDERED_LIST_STYLES.detect {|s| marker.match(ORDERED_LIST_MARKER_PATTERNS[s]) }
     expected = actual = nil
     case number_style
@@ -1998,8 +2000,7 @@ class Lexer
     end
 
     if validate && expected != actual
-      # FIXME I need a reader reference or line number to report line number!!
-      warn "asciidoctor: WARNING: list item index: expected #{expected}, got #{actual}"
+      warn "asciidoctor: WARNING: #{reader.line_info}: list item index: expected #{expected}, got #{actual}"
     end
 
     marker
@@ -2055,7 +2056,7 @@ class Lexer
 
     skipped = table_reader.skip_blank_lines
 
-    parser_ctx = Table::ParserContext.new(table, attributes)
+    parser_ctx = Table::ParserContext.new(table_reader, table, attributes)
     loop_idx = -1
     while table_reader.has_more_lines?
       loop_idx += 1
@@ -2064,7 +2065,7 @@ class Lexer
       if skipped == 0 && loop_idx.zero? && !attributes.has_key?('options') &&
           !(next_line = table_reader.peek_line).nil? && next_line == ::Asciidoctor::EOL
         table.has_header_option = true
-        attributes['options'] = "header"
+        attributes['options'] = 'header'
         attributes['header-option'] = ''
       end
 

@@ -17,9 +17,9 @@ module Substituters
 
   # Public: Apply the specified substitutions to the lines of text
   #
-  # lines   - The lines of text to process. Can be a String or a String Array 
+  # lines   - The lines of text to process. Can be a String or a String Array
   # subs    - The substitutions to perform. Can be a Symbol or a Symbol Array (default: COMPOSITE_SUBS[:normal])
-  # 
+  #
   # returns Either a String or String Array, whichever matches the type of the first argument
   def apply_subs(lines, subs = COMPOSITE_SUBS[:normal])
     if subs.nil?
@@ -34,7 +34,7 @@ module Substituters
       effective_subs = []
       subs.each do |key|
         if COMPOSITE_SUBS.has_key? key
-          effective_subs.push *COMPOSITE_SUBS[key]   
+          effective_subs.push(*COMPOSITE_SUBS[key])
         else
           effective_subs << key
         end
@@ -49,7 +49,7 @@ module Substituters
     if (has_passthroughs = subs.include?(:macros))
       text = extract_passthroughs(text)
     end
-    
+
     subs.each {|type|
       case type
       when :specialcharacters
@@ -77,7 +77,7 @@ module Substituters
 
   # Public: Apply normal substitutions.
   #
-  # lines  - The lines of text to process. Can be a String or a String Array 
+  # lines  - The lines of text to process. Can be a String or a String Array
   #
   # returns - A String with normal substitutions performed
   def apply_normal_subs(lines)
@@ -122,7 +122,7 @@ module Substituters
 
   # Public: Apply explicit substitutions, if specified, otherwise normal substitutions.
   #
-  # lines  - The lines of text to process. Can be a String or a String Array 
+  # lines  - The lines of text to process. Can be a String or a String Array
   #
   # returns - A String with substitutions applied
   def apply_para_subs(lines)
@@ -194,7 +194,7 @@ module Substituters
       else
         attributes = {}
       end
-      
+
       @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :literal => true}
       index = @passthroughs.size - 1
       "#{unescaped_attrs || m[1]}\e#{index}\e"
@@ -210,7 +210,7 @@ module Substituters
   # returns The String text with the passthrough text restored
   def restore_passthroughs(text)
     return text if @passthroughs.nil? || @passthroughs.empty? || !text.include?("\e")
-    
+
     text.gsub(REGEXP[:pass_placeholder]) {
       pass = @passthroughs[$1.to_i];
       text = apply_subs(pass[:text], pass.fetch(:subs, []))
@@ -243,7 +243,7 @@ module Substituters
     QUOTE_SUBS.each {|type, scope, pattern|
       result.gsub!(pattern) { transform_quoted_text($~, type, scope) }
     }
-    
+
     result
   end
 
@@ -269,12 +269,12 @@ module Substituters
           when :leading
             "#{head}#{replacement}"
           when :bounding
-            "#{head}#{replacement}#{tail}" 
+            "#{head}#{replacement}#{tail}"
           end
         end
       }
     }
-    
+
     result
   end
 
@@ -345,7 +345,7 @@ module Substituters
             ''
           end
         end
-      } if line.include? '{' 
+      } if line.include? '{'
 
       result << line unless reject
     }
@@ -404,14 +404,14 @@ module Substituters
                 c
               }
             end
-            Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).render 
+            Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).render
           elsif captured.start_with?('btn')
             label = unescape_bracketed_text m[1]
             Inline.new(self, :button, label).render
           end
         }
       end
-      
+
       if found[:macroish] && result.include?('menu:')
         result.gsub!(REGEXP[:menu_macro]) {
           # alias match for Ruby 1.8.7 compat
@@ -453,7 +453,7 @@ module Substituters
           input = m[1]
 
           menu, *submenus = input.split('&gt;').map(&:strip)
-          menuitem = submenus.pop 
+          menuitem = submenus.pop
           Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).render
         }
       end
@@ -476,7 +476,7 @@ module Substituters
             attributes = {}
           else
             posattrs = processor.options.fetch(:pos_attrs, [])
-            attributes = parse_attributes(m[2], posattrs, :sub_input => true, :unescape_input => true) 
+            attributes = parse_attributes(m[2], posattrs, :sub_input => true, :unescape_input => true)
           end
           processor.process self, target, attributes
         }
@@ -528,7 +528,7 @@ module Substituters
         @document.register(:indexterms, [*terms])
         Inline.new(self, :indexterm, text, :attributes => {'terms' => terms}).render
       }
-    
+
       # indexterm2:[Tigers]
       # ((Tigers))
       result.gsub!(REGEXP[:indexterm2_macro]) {
@@ -866,19 +866,19 @@ module Substituters
       {}
     elsif str.start_with?('.') || str.start_with?('#')
       segments = str.split('#', 2)
-      
+
       if segments.length > 1
         id, *more_roles = segments[1].split('.')
       else
         id = nil
         more_roles = []
       end
-    
+
       roles = segments[0].empty? ? [] : segments[0].split('.')
       if roles.length > 1
         roles.shift
       end
-      
+
       if more_roles.length > 0
         roles.concat more_roles
       end
@@ -908,7 +908,7 @@ module Substituters
       # substitutions are only performed on attribute values if block is not nil
       block = self
     end
-    
+
     if opts.has_key?(:into)
       AttributeList.new(attrline, block).parse_into(opts[:into], posattrs)
     else
@@ -930,10 +930,10 @@ module Substituters
   # returns An Array of Symbols representing the substitution operation
   def resolve_subs(subs)
     candidates = subs.split(',').map {|sub| sub.strip.to_sym}
-    resolved = candidates & SUB_OPTIONS 
+    resolved = candidates & SUB_OPTIONS
     if (invalid = candidates - resolved).size > 0
       warn "asciidoctor: WARNING: invalid passthrough macro substitution operation#{invalid.size > 1 ? 's' : ''}: #{invalid * ', '}"
-    end 
+    end
     resolved
   end
 

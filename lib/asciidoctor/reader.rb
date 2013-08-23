@@ -13,6 +13,10 @@ class Reader
       @path = path
       @lineno = lineno
     end
+
+    def line_info
+      %(#{path}: line #{lineno})
+    end
   end
 
   attr_reader :file
@@ -537,6 +541,7 @@ class PreprocessorReader < Reader
     @includes = (document.references[:includes] ||= [])
     @skipping = false
     @conditional_stack = []
+    @include_processors = nil
   end
 
   def prepare_lines data, opts = {}
