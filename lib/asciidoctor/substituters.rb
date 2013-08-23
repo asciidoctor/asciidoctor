@@ -23,19 +23,25 @@ module Substituters
   # returns Either a String or String Array, whichever matches the type of the first argument
   def apply_subs(lines, subs = COMPOSITE_SUBS[:normal])
     if subs.nil?
-      subs = []
+      return lines
     elsif subs.is_a? Symbol
       subs = [subs]
     end
 
-    if !subs.empty?
-      # QUESTION is this most efficient operation?
-      subs = subs.map {|key|
-        COMPOSITE_SUBS.has_key?(key) ? COMPOSITE_SUBS[key] : key
-      }.flatten
-    end
+    if subs.empty?
+      return lines
+    else
+      effective_subs = []
+      subs.each do |key|
+        if COMPOSITE_SUBS.has_key? key
+          effective_subs.push *COMPOSITE_SUBS[key]   
+        else
+          effective_subs << key
+        end
+      end
 
-    return lines if subs.empty?
+      subs = effective_subs
+    end
 
     multiline = lines.is_a?(Array)
     text = multiline ? lines.join : lines
@@ -93,8 +99,8 @@ module Substituters
   #
   # returns - A String with literal (verbatim) substitutions performed
   def apply_literal_subs(lines)
-    if attr? 'subs'
-      apply_subs(lines.join, resolve_subs(attr 'subs'))
+    if (subs = attr('subs', nil, false))
+      apply_subs(lines.join, resolve_subs(subs))
     elsif @style == 'source' && @document.attributes['basebackend'] == 'html' &&
       (highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
       highlighter == 'pygments' && attr?('language')
@@ -120,8 +126,8 @@ module Substituters
   #
   # returns - A String with substitutions applied
   def apply_para_subs(lines)
-    if attr? 'subs'
-      apply_subs(lines.join, resolve_subs(attr 'subs'))
+    if (subs = attr('subs', nil, false))
+      apply_subs(lines.join, resolve_subs(subs))
     else
       apply_subs(lines.join)
     end
@@ -133,8 +139,8 @@ module Substituters
   #
   # returns - A String with passthrough substitutions performed
   def apply_passthrough_subs(lines)
-    if attr? 'subs'
-      subs = resolve_subs(attr('subs'))
+    if (subs = attr('subs', nil, false))
+      subs = resolve_subs(subs)
     else
       subs = [:attributes, :macros]
     end
@@ -801,7 +807,7 @@ module Substituters
   #
   # returns The String with the post replacements rendered using the backend templates
   def sub_post_replacements(text)
-    if @document.attr? 'hardbreaks'
+    if @document.attributes['hardbreaks']
       lines = text.lines.entries
       return text if lines.size == 1
       last = lines.pop
@@ -975,7 +981,7 @@ module Substituters
         lexer = ::Pygments::Lexer[attr('language')]
         if lexer
           opts = {:nobackground => true, :classprefix => 'tok-'}
-          opts[:noclasses] = true if @document.attr?('pygments-css', 'style')
+          opts[:noclasses] = true if @document.attributes.fetch('pygments-css', 'style')
           opts[:linenos] = true if attr? 'linenums'
           result = lexer.highlight(source, :options => opts).sub(/<div class="highlight">(.*)<\/div>/m, '\1')
         else

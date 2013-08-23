@@ -276,7 +276,7 @@ class Document < AbstractBlock
         # a value ending in @ indicates this attribute does not override
         # an attribute with the same key in the document souce
         if val.is_a?(String) && val.end_with?('@')
-          val.chop!
+          val = val.chop
           verdict = true
         end
         @attributes[key] = val
