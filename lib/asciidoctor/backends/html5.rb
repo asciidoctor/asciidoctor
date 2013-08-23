@@ -916,13 +916,22 @@ class BlockVideoTemplate < BaseTemplate
     width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
     poster_attribute = (node.attr? 'poster') ? %( poster="#{node.media_uri(node.attr 'poster')}") : nil
-    %(<div#{id_attribute}#{class_attribute}>#{title_element}
-<div class="content">
-<video src="#{node.media_uri(node.attr 'target')}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? ' autoplay' : nil}#{(node.option? 'nocontrols') ? nil : ' controls'}#{(node.option? 'loop') ? ' loop' : nil}>
-Your browser does not support the video tag.
-</video>
-</div>
-</div>)
+    service_attribute = (node.attr? 'service') ? %(#{node.attr 'service'}) : nil
+    if service_attribute == 'vimeo'
+      %(<div#{id_attribute}#{class_attribute}>#{title_element}
+  <div class="content">
+  <iframe src="http://player.vimeo.com/video/#{node.attr 'target'}" #{width_attribute} #{height_attribute} frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+  </div>
+  </div>)
+    else 
+      %(<div#{id_attribute}#{class_attribute}>#{title_element}
+  <div class="content">
+  <video src="#{node.media_uri(node.attr 'target')}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? ' autoplay' : nil}#{(node.option? 'nocontrols') ? nil : ' controls'}#{(node.option? 'loop') ? ' loop' : nil}>
+  Your browser does not support the video tag.
+  </video>
+  </div>
+  </div>)
+    end
   end
 
   def template
