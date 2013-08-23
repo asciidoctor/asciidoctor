@@ -145,7 +145,7 @@ line should be rendered
     end
 
     # WARNING if first line of content is a directive, it will get interpretted before we know it's a comment block
-    # it happens when looking for a title...not sure what we can do about it
+    # it happens because we always look a line ahead...not sure what we can do about it
     test 'preprocessor directives should not be processed within comment open block' do
       input = <<-EOS
 [comment]
@@ -161,13 +161,12 @@ line should not be rendered
       assert_xpath '//p', output, 0
     end
 
-    # WARNING if either of first two lines of content is a directive, it will get interpretted before we know it's a comment block
-    # it happens when looking for a title...not sure what we can do about it
+    # WARNING if first line of content is a directive, it will get interpretted before we know it's a comment block
+    # it happens because we always look a line ahead...not sure what we can do about it
     test 'preprocessor directives should not be processed within comment paragraph' do
       input = <<-EOS
 [comment]
 first line of content
-second line of content
 ifdef::asciidoctor[////]
 
 this line should be rendered

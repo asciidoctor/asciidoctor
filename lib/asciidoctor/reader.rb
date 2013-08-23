@@ -163,21 +163,26 @@ class Reader
   # be processed and marked as such so that subsequent reads will not need to process
   # the lines again.
   #
-  # num  - The Integer number of lines to peek.
+  # num    - The Integer number of lines to peek.
+  # direct - A Boolean indicating whether processing should be disabled when reading lines
   #
   # Returns A String Array of the next multiple lines of source data, or an empty Array
   # if there are no more lines in this Reader.
-  def peek_lines num = 1
+  def peek_lines num = 1, direct = true
+    old_look_ahead = @look_ahead
     result = []
     (1..num).each do
-      if has_more_lines?
-        result << read_line
+      if (line = read_line direct)
+        result << line
       else
         break
       end
     end
 
-    restore_lines result unless result.empty?
+    unless result.empty?
+      result.reverse_each {|line| unshift line }
+      @look_ahead = old_look_ahead if direct
+    end
 
     result
   end
@@ -810,7 +815,7 @@ class PreprocessorReader < Reader
       #unshift "link:#{output_target}[]#{::Asciidoctor::EOL}"
       true
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
-      warn %(asciidoctor: WARNING: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
+      warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
       false
     elsif abs_maxdepth > 0
       if target.include?(':') && target.match(REGEXP[:uri_sniff])
