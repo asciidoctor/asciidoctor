@@ -87,20 +87,19 @@ class Section < AbstractBlock
   #   yet_another_section.generate_id
   #   => "_ben_jerry"
   def generate_id
-    if @document.attr? 'sectids'
-      separator = @document.attr('idseparator', '_')
-      idprefix = @document.attr('idprefix', '_')
-      base_id = idprefix + title.downcase.gsub(REGEXP[:illegal_sectid_chars], separator).
-          tr_s(separator, separator).chomp(separator)
+    if @document.attributes.has_key? 'sectids'
+      sep = @document.attributes['idseparator'] || '_'
+      pre = @document.attributes['idprefix'] || '_'
+      base_id = %(#{pre}#{title.downcase.gsub(REGEXP[:illegal_sectid_chars], sep).tr_s(sep, sep).chomp(sep)})
       # ensure id doesn't begin with idprefix if requested it doesn't
-      if idprefix.empty? && base_id.start_with?(separator)
+      if pre.empty? && base_id.start_with?(sep)
         base_id = base_id[1..-1]
-        base_id = base_id[1..-1] while base_id.start_with?(separator)
+        base_id = base_id[1..-1] while base_id.start_with?(sep)
       end
       gen_id = base_id
       cnt = 2
       while @document.references[:ids].has_key? gen_id
-        gen_id = "#{base_id}#{separator}#{cnt}"
+        gen_id = "#{base_id}#{sep}#{cnt}"
         cnt += 1
       end 
       gen_id
