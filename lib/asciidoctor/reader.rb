@@ -407,7 +407,7 @@ class Reader
     end
 
     has_block = block_given?
-    if (terminator = (options.fetch :terminator, nil))
+    if (terminator = options[:terminator])
       break_on_blank_lines = false
       break_on_list_continuation = false
       chomp_last_line = options.fetch :chomp_last_line, false
@@ -418,6 +418,7 @@ class Reader
     end
     skip_line_comments = options[:skip_line_comments]
     line_read = false
+    line_restored = false
     
     while (line = read_line)
       finish = while true
@@ -437,11 +438,14 @@ class Reader
           result << line
           line_read = true
         end
-        restore_line line if options[:preserve_last_line]
+        if options[:preserve_last_line]
+          restore_line line
+          line_restored = true
+        end
         break
       end
 
-      unless skip_line_comments && line.match(REGEXP[:comment])
+      unless skip_line_comments && line.start_with?('//') && line.match(REGEXP[:comment])
         result << line
         line_read = true
       end
@@ -451,7 +455,10 @@ class Reader
       result << result.pop.chomp
     end
 
-    @process_lines = true if restore_process_lines
+    if restore_process_lines
+      @process_lines = true
+      @look_ahead -= 1 if line_restored && terminator.nil?
+    end
     result
   end
 
@@ -942,12 +949,14 @@ class PreprocessorReader < Reader
   end
 
   def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
+    @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
     @includes << Helpers.rootname(path)
-    @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth]
     @file = file
     @dir = File.dirname file
     @path = path
     @lineno = lineno
+    # NOTE only process lines in AsciiDoc files
+    @process_lines = ASCIIDOC_EXTENSIONS[File.extname(@file)]
     if attributes.has_key? 'depth'
       depth = attributes['depth'].to_i
       depth = 1 if depth <= 0
@@ -968,7 +977,7 @@ class PreprocessorReader < Reader
 
   def pop_include
     if @include_stack.size > 0
-      @lines, @file, @dir, @path, @lineno, @maxdepth = @include_stack.pop
+      @lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines = @include_stack.pop
       # FIXME kind of a hack
       #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
       #Document::AttributeEntry.new('indir', File.dirname(@file)).save_to_next_block @document
@@ -1108,7 +1117,7 @@ class PreprocessorReader < Reader
   end
 
   def to_s
-    %(#{self.class.name} [path: #{@path}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|include| include.to_s}.join ', '}]])
+    %(#{self.class.name} [path: #{@path}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s}.join ', '}]])
   end
 end
 end
