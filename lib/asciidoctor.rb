@@ -326,11 +326,12 @@ module Asciidoctor
     :biblio_macro     => /\\?\[\[\[([\w:][\w:.-]*?)\]\]\]/,
 
     # callout reference inside literal text
-    # <1> (optionally prefixed by // or # line comment character)
-    # special characters will already be replaced, hence their use in the regex
-    :callout_render   => /(?:\/\/ ?|# ?)?(\\)?&lt;(\d+)&gt;$/,
+    # <1> (optionally prefixed by //, # or ;; line comment chars) or <!--1--> (for XML-based languages)
+    # special characters are already be replaced at this point during render
+    :callout_render     => /(?:(?:\/\/|#|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;$/,
     # ...but not while scanning
-    :callout_scan     => /(?:\/\/ ?|# ?)?(\\)?<(\d+)>$/,
+    :callout_quick_scan => /(\\)?<!?(--|)(\d+)\2>$/,
+    :callout_scan       => /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>$/,
 
     # <1> Foo
     :colist           => /^<?(\d+)>[[:blank:]]+(.*)/,

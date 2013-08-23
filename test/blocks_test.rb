@@ -1597,7 +1597,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       assert_match(/\.CodeRay \{/, output)
     end
 
-    test 'should replace callout marks if source-highlighter attribute is coderay' do
+    test 'wip should replace callout marks if source-highlighter attribute is coderay' do
       input = <<-EOS
 :source-highlighter: coderay
 
