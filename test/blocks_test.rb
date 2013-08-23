@@ -1371,6 +1371,24 @@ video::http://example.org/videos/cats-vs-dogs.avi[]
       assert_css 'video', output, 1
       assert_css 'video[src="http://example.org/videos/cats-vs-dogs.avi"]', output, 1
     end
+    
+    test 'video macro should output custom HTML with iFrame for vimeo service' do
+      input = <<-EOS
+:imagesdir: assets
+
+video::67480300[service="vimeo", width="400", height="300"]
+      EOS
+      # expected output: 
+      # <iframe src="http://player.vimeo.com/video/VIDEO_ID" width="WIDTH" height="HEIGHT" 
+      #         frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+      output = render_embedded_string input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="http://player.vimeo.com/video/67480300"]', output, 1
+      assert_css 'iframe[width="400"]', output, 1
+      assert_css 'iframe[height="300"]', output, 1
+      
+    end
 
     test 'should detect and render audio macro' do
       input = <<-EOS
