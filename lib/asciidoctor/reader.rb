@@ -868,6 +868,8 @@ class PreprocessorReader < Reader
             end
           end
           inc_lines = inc_lines.sort.uniq
+        elsif attributes.has_key? 'tag'
+          tags = [attributes['tag']]
         elsif attributes.has_key? 'tags'
           tags = attributes['tags'].split(REGEXP[:ssv_or_csv_delim]).uniq
         end

@@ -561,6 +561,18 @@ include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
   
       test 'include macro supports tagged selection' do
         input = <<-EOS
+include::fixtures/include-file.asciidoc[tag=snippetA]
+        EOS
+  
+        output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        assert_match(/snippetA content/, output)
+        assert_no_match(/snippetB content/, output)
+        assert_no_match(/non-tagged content/, output)
+        assert_no_match(/included content/, output)
+      end
+  
+      test 'include macro supports multiple tagged selection' do
+        input = <<-EOS
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         EOS
   
