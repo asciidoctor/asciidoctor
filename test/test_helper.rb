@@ -190,11 +190,19 @@ class Test::Unit::TestCase
     nil
   end
 
-  # Expand the character for an entity such as &#8212; so
-  # it can be used to match in an XPath expression
+  # Expand the character for an entity such as &#8212; into a glyph
+  # so it can be used to match in an XPath expression
+  #
+  # Examples
+  #
+  #   expand_entity 60
+  #   # => "<"
+  #
+  # Returns the String entity expanded to its equivalent UTF-8 glyph
   def expand_entity(number)
     [number].pack('U*')
   end
+  alias :entity :expand_entity
 
   def invoke_cli_with_filenames(argv = [], filenames = [], &block)
     
