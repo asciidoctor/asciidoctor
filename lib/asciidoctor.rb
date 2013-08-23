@@ -87,6 +87,27 @@ module Asciidoctor
 
   end
 
+  # Flags to control compliance with the behavior of AsciiDoc
+  module Compliance
+    # AsciiDoc supports both single-line and underlined
+    # section titles.
+    # This option disables the underlined variant.
+    # Compliance value: true
+    @underline_style_section_titles = true
+    class << self
+      attr_accessor :underline_style_section_titles
+    end
+
+    # Asciidoctor will recognize commonly-used Markdown syntax
+    # to the degree it does not interfere with existing
+    # AsciiDoc syntax and behavior.
+    # Compliance value: false
+    @markdown_syntax = true
+    class << self
+      attr_accessor :markdown_syntax
+    end
+  end
+
   # The root path of the Asciidoctor gem
   ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
@@ -248,11 +269,6 @@ module Asciidoctor
     # This behavior may need to be tuned depending on the circumstances.
     # Compliance value: 'drop-line'
     :attribute_undefined => 'drop-line',
-
-    # AsciiDoc will recognize commonly-used Markdown syntax
-    # to the degree it does not interfere with existing
-    # AsciiDoc behavior.
-    :markdown_syntax => true
   }
 
   # The following pattern, which appears frequently, captures the contents between square brackets,

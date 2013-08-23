@@ -413,7 +413,7 @@ class Lexer
             first_char = this_line[0..0]
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
             if BREAK_LINES.has_key?(first_char) && this_line.length > 2 &&
-                (match = this_line.match(COMPLIANCE[:markdown_syntax] ? REGEXP[:break_line_plus] : REGEXP[:break_line]))
+                (match = this_line.match(Compliance.markdown_syntax ? REGEXP[:break_line_plus] : REGEXP[:break_line]))
               block = Block.new(parent, BREAK_LINES[first_char], :content_model => :empty)
               break
 
@@ -541,7 +541,8 @@ class Lexer
             block = next_labeled_list(reader, match, parent)
             break
 
-          elsif (style == 'float' || style == 'discrete') && is_section_title?(this_line, reader.peek_line)
+          elsif (style == 'float' || style == 'discrete') &&
+              is_section_title?(this_line, (Compliance.underline_style_section_titles ? reader.peek_line(true) : nil))
             reader.unshift_line this_line
             float_id, float_title, float_level, _ = parse_section_title(reader, document)
             float_id ||= attributes['id'] if attributes.has_key?('id')
@@ -646,7 +647,7 @@ class Lexer
               attributes['name'] = admonition_name = admonition_match[1].downcase
               attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
               block = Block.new(parent, :admonition, :source => lines, :attributes => attributes)
-            elsif !text_only && COMPLIANCE[:markdown_syntax] && first_line.start_with?('> ')
+            elsif !text_only && Compliance.markdown_syntax && first_line.start_with?('> ')
               lines.map! {|line|
                 if line.start_with?('> ')
                   line[2..-1]
@@ -823,7 +824,7 @@ class Lexer
         tip = line[0..3]
         tl = 4
 
-        if COMPLIANCE[:markdown_syntax]
+        if Compliance.markdown_syntax
           # special case for fenced code blocks
           tip_alt = tip.chop
           if tip_alt == '```' || tip_alt == '~~~'
@@ -1444,7 +1445,7 @@ class Lexer
   def self.is_next_line_section?(reader, attributes)
     return false if !(val = attributes[1]).nil? && ['float', 'discrete'].include?(val)
     return false if !reader.has_more_lines?
-    is_section_title?(*reader.peek_lines(2))
+    Compliance.underline_style_section_titles ? is_section_title?(*reader.peek_lines(2)) : is_section_title?(reader.peek_line)
   end
 
   # Internal: Convenience API for checking if the next line on the Reader is the document title
@@ -1467,7 +1468,7 @@ class Lexer
   def self.is_section_title?(line1, line2 = nil)
     if (level = is_single_line_section_title?(line1))
       level
-    elsif (level = is_two_line_section_title?(line1, line2))
+    elsif line2 && (level = is_two_line_section_title?(line1, line2))
       level
     else
       false
@@ -1476,7 +1477,7 @@ class Lexer
 
   def self.is_single_line_section_title?(line1)
     first_char = line1.nil? ? nil : line1[0..0]
-    if (first_char == '=' || (COMPLIANCE[:markdown_syntax] && first_char == '#')) &&
+    if (first_char == '=' || (Compliance.markdown_syntax && first_char == '#')) &&
         (match = line1.match(REGEXP[:section_title]))
       single_line_section_level match[1]
     else
@@ -1546,13 +1547,13 @@ class Lexer
     single_line = true
 
     first_char = line1[0..0]
-    if (first_char == '=' || (COMPLIANCE[:markdown_syntax] && first_char == '#')) &&
+    if (first_char == '=' || (Compliance.markdown_syntax && first_char == '#')) &&
         (match = line1.match(REGEXP[:section_title]))
       sect_id = match[3]
       sect_title = match[2]
       sect_level = single_line_section_level match[1]
-    else
-      line2 = reader.peek_line
+    elsif Compliance.underline_style_section_titles
+      line2 = reader.peek_line true
       if !line2.nil? && SECTION_LEVELS.has_key?(line2[0..0]) && line2.match(REGEXP[:section_underline]) &&
         (name_match = line1.match(REGEXP[:section_name])) &&
         # chomp so that a (non-visible) endline does not impact calculation
