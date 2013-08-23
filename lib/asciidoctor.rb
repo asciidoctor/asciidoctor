@@ -276,7 +276,7 @@ module Asciidoctor
     # [[:graph:]] is a non-blank character
     :any_list         => /^(?:
                              <?\d+>[[:blank:]]+[[:graph:]]|
-                             [[:blank:]]*(?:(?:-|\*|\.){1,5}|\d+\.|[A-Za-z]\.|[IVXivx]+\))[[:blank:]]+[[:graph:]]|
+                             [[:blank:]]*(?:-|(?:\*|\.){1,5}|\d+\.|[A-Za-z]\.|[IVXivx]+\))[[:blank:]]+[[:graph:]]|
                              [[:blank:]]*.*?(?::{2,4}|;;)(?:[[:blank:]]+[[:graph:]]|$)
                            )/x,
 
