@@ -633,8 +633,8 @@ class Lexer
             # line comments, which may leave us w/ an empty buffer if those
             # were the only lines found
             if lines.empty?
-              # call get_line since the reader preserved the last line
-              reader.read_line
+              # call advance since the reader preserved the last line
+              reader.advance
               return nil
             end
 
@@ -685,11 +685,17 @@ class Lexer
               #block = Block.new(parent, :quote, :content_model => :compound, :attributes => attributes)
               #block << Block.new(block, :paragraph, :source => lines)
             else
-              # QUESTION is stripping whitespace from start of paragraph lines necessary? (currently disabled)
-              #if style == 'normal' && [' ', "\t"].include?(lines.first[0..0])
-              #  # QUESTION should we only trim leading blanks?
-              #  lines.map! &:lstrip
-              #end
+              # if [normal] is used over an indented paragraph, unindent it
+              if style == 'normal' && ((first_char = lines.first[0..0]) == ' ' || first_char == "\t")
+                first_line = lines.first
+                first_line_shifted = first_line.lstrip
+                indent = line_length(first_line) - line_length(first_line_shifted)
+                lines[0] = first_line_shifted
+                # QUESTION should we fix the rest of the lines, since in XML output it's insignificant?
+                lines.size.times do |i|
+                  lines[i] = lines[i].lstrip if i > 0
+                end
+              end
 
               block = Block.new(parent, :paragraph, :source => lines, :attributes => attributes)
             end
@@ -1566,7 +1572,7 @@ class Lexer
         end
         sect_level = section_level line2
         single_line = false
-        reader.read_line
+        reader.advance
       end
     end
     if sect_level >= 0

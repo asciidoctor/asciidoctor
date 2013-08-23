@@ -83,6 +83,18 @@ Nothing special.
       assert_css 'p', output, 1
     end
 
+    test 'removes indentation from literal paragraph marked as normal' do
+      input = <<-EOS
+[normal]
+  Normal paragraph.
+  Nothing special.
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'p', output, 1
+      assert_xpath %(//p[text()="Normal paragraph.\nNothing special."]), output, 1
+    end
+
     test 'normal paragraph terminates at block attribute list' do
       input = <<-EOS
 normal text
