@@ -953,6 +953,11 @@ context 'Substitutions' do
       assert_equal 1, para.passthroughs.size
       assert_equal text_to_escape, para.passthroughs[0][:text]
     end
+
+    test 'inline pass macro with a composite sub' do
+      para = block_from_string %(pass:verbatim[<{backend}>])
+      assert_equal '&lt;{backend}&gt;', para.content
+    end
   end
 
   context 'Replacements' do
