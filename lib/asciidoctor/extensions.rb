@@ -27,18 +27,24 @@ module Extensions
     def register extension = nil, &block
       if block_given?
         registered << block
-      elsif !extension.nil?
-        if extension.is_a? Class
-          registered << extension
-        else
-          registered << class_for_name(extension)
-        end
+      elsif extension
+        registered << resolve_class(extension)
       end 
+    end
+
+    def resolve_class(object)
+      object.is_a?(Class) ? object : class_for_name(object.to_s)
     end
 
     def class_for_name(qualified_name)
       qualified_name.split('::').inject(Object) do |module_, name|
-        module_.const_get(name)
+        if name.empty?
+          module_
+        elsif module_.const_defined? name
+          module_.const_get(name)
+        else
+          raise "Could not resolve class for name: #{qualified_name}"
+        end
       end
     end
 
@@ -80,6 +86,7 @@ module Extensions
     end 
 
     def preprocessor processor, position = :<<
+      processor = resolve_processor_class processor
       if position == :<< || @preprocessors.empty?
         @preprocessors.push processor
       elsif position == :>>
@@ -100,6 +107,7 @@ module Extensions
     end
 
     def treeprocessor processor, position = :<<
+      processor = resolve_processor_class processor
       if position == :<< || @treeprocessors.empty?
         @treeprocessors.push processor
       elsif position == :>>
@@ -120,6 +128,7 @@ module Extensions
     end
 
     def postprocessor processor, position = :<<
+      processor = resolve_processor_class processor
       if position == :<< || @postprocessors.empty?
         @postprocessors.push processor
       elsif position == :>>
@@ -140,6 +149,7 @@ module Extensions
     end
 
     def include_processor processor, position = :<<
+      processor = resolve_processor_class processor
       if position == :<< || @include_processors.empty?
         @include_processors.push processor
       elsif position == :>>
@@ -165,6 +175,7 @@ module Extensions
 
     # TODO allow contexts to be specified here, perhaps as [:upper, [:paragraph, :sidebar]]
     def block name, processor, delimiter = nil, &block
+      processor = resolve_processor_class processor
       @blocks[name] = processor
       if block_given?
         @block_delimiters[block] = name
@@ -210,6 +221,7 @@ module Extensions
     end
 
     def block_macro name, processor
+      processor = resolve_processor_class processor
       @block_macros[name.to_s] = processor
     end
 
@@ -227,6 +239,7 @@ module Extensions
 
     # TODO probably need ordering control before/after other inline macros
     def inline_macro name, processor
+      processor = resolve_processor_class processor
       @inline_macros[name.to_s] = processor
     end
 
@@ -250,6 +263,10 @@ module Extensions
 
     def register document, &block
       instance_exec document, &block
+    end
+
+    def resolve_processor_class object
+      ::Asciidoctor::Extensions.resolve_class object
     end
 
     def reset

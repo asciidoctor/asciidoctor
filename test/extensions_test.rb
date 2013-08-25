@@ -145,8 +145,41 @@ context 'Extensions' do
       end
     end
 
-    test 'should get class for name' do
+    test 'should get class for top-level class name' do
+      clazz = Asciidoctor::Extensions.class_for_name('Asciidoctor')
+      assert_not_nil clazz
+      assert_equal Asciidoctor, clazz
+    end
+
+    test 'should get class for class name in module' do
       clazz = Asciidoctor::Extensions.class_for_name('Asciidoctor::Extensions')
+      assert_not_nil clazz
+      assert_equal Asciidoctor::Extensions, clazz
+    end
+
+    test 'should get class for class name resolved from root' do
+      clazz = Asciidoctor::Extensions.class_for_name('::Asciidoctor::Extensions')
+      assert_not_nil clazz
+      assert_equal Asciidoctor::Extensions, clazz
+    end
+
+    test 'should raise exception if cannot find class for name' do
+      begin
+      clazz = Asciidoctor::Extensions.class_for_name('InvalidModule::InvalidClass')
+      flunk 'Expecting RuntimeError to be raised'
+      rescue RuntimeError => e
+        assert_equal 'Could not resolve class for name: InvalidModule::InvalidClass', e.message
+      end
+    end
+
+    test 'should resolve class if class is given' do
+      clazz = Asciidoctor::Extensions.resolve_class(Asciidoctor::Extensions)
+      assert_not_nil clazz
+      assert_equal Asciidoctor::Extensions, clazz
+    end
+
+    test 'should resolve class if class from string' do
+      clazz = Asciidoctor::Extensions.resolve_class('Asciidoctor::Extensions')
       assert_not_nil clazz
       assert_equal Asciidoctor::Extensions, clazz
     end
@@ -261,6 +294,15 @@ context 'Extensions' do
       assert registry.processor_registered_for_inline_macro? 'sample'
       processor = registry.load_inline_macro_processor 'sample', Asciidoctor::Document.new
       assert processor.is_a? SampleInlineMacro
+    end
+
+    test 'should allow processors to be registered by a string name' do
+      registry = Asciidoctor::Extensions::Registry.new
+      registry.preprocessor 'SamplePreprocessor'
+      assert registry.preprocessors?
+      processors = registry.load_preprocessors Asciidoctor::Document.new
+      assert_equal 1, processors.size
+      assert processors.first.is_a? SamplePreprocessor
     end
   end
 
