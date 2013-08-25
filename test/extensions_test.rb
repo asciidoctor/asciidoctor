@@ -165,7 +165,7 @@ context 'Extensions' do
 
     test 'should raise exception if cannot find class for name' do
       begin
-      clazz = Asciidoctor::Extensions.class_for_name('InvalidModule::InvalidClass')
+      Asciidoctor::Extensions.class_for_name('InvalidModule::InvalidClass')
       flunk 'Expecting RuntimeError to be raised'
       rescue RuntimeError => e
         assert_equal 'Could not resolve class for name: InvalidModule::InvalidClass', e.message

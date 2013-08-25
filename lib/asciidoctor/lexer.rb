@@ -693,7 +693,7 @@ class Lexer
                 lines[0] = first_line_shifted
                 # QUESTION should we fix the rest of the lines, since in XML output it's insignificant?
                 lines.size.times do |i|
-                  lines[i] = lines[i].lstrip if i > 0
+                  lines[i] = lines[i][indent..-1] if i > 0
                 end
               end
 
