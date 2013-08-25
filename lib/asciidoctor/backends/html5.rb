@@ -915,22 +915,38 @@ class BlockVideoTemplate < BaseTemplate
     title_element = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : nil
     width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
-    poster_attribute = (node.attr? 'poster') ? %( poster="#{node.media_uri(node.attr 'poster')}") : nil
-    service_attribute = (node.attr? 'service') ? %(#{node.attr 'service'}) : nil
-    if service_attribute == 'vimeo'
+    case node.attr 'poster'
+    when 'vimeo'
+      start_anchor = (node.attr? 'start') ? "#at=#{node.attr 'start'}" : nil
+      delimiter = '?'
+      autoplay_param = (node.option? 'autoplay') ? "#{delimiter}autoplay=1" : nil
+      delimiter = '&amp;' if autoplay_param
+      loop_param = (node.option? 'loop') ? "#{delimiter}loop=1" : nil
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
-  <div class="content">
-  <iframe src="http://player.vimeo.com/video/#{node.attr 'target'}" #{width_attribute} #{height_attribute} frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-  </div>
-  </div>)
+<div class="content">
+<iframe#{width_attribute}#{height_attribute} src="//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+</div>
+</div>)
+    when 'youtube'
+      start_param = (node.attr? 'start') ? "&amp;start=#{node.attr 'start'}" : nil
+      end_param = (node.attr? 'end') ? "&amp;end=#{node.attr 'end'}" : nil
+      autoplay_param = (node.option? 'autoplay') ? '&amp;autoplay=1' : nil
+      loop_param = (node.option? 'loop') ? '&amp;loop=1' : nil
+      controls_param = (node.option? 'nocontrols') ? '&amp;controls=0' : nil
+      %(<div#{id_attribute}#{class_attribute}>#{title_element}
+<div class="content">
+<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{node.attr 'target'}?rel=0#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : ' allowfullscreen'}></iframe>
+</div>
+</div>)
     else 
+      poster_attribute = (node.attr? 'poster') ? %( poster="#{node.media_uri(node.attr 'poster')}") : nil
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
-  <div class="content">
-  <video src="#{node.media_uri(node.attr 'target')}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? ' autoplay' : nil}#{(node.option? 'nocontrols') ? nil : ' controls'}#{(node.option? 'loop') ? ' loop' : nil}>
-  Your browser does not support the video tag.
-  </video>
-  </div>
-  </div>)
+<div class="content">
+<video src="#{node.media_uri(node.attr 'target')}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? ' autoplay' : nil}#{(node.option? 'nocontrols') ? nil : ' controls'}#{(node.option? 'loop') ? ' loop' : nil}>
+Your browser does not support the video tag.
+</video>
+</div>
+</div>)
     end
   end
 
