@@ -1383,6 +1383,18 @@ video::67480300[vimeo, 400, 300, start=60, options=autoplay]
       assert_css 'iframe[height="300"]', output, 1
     end
 
+    test 'video macro should output custom HTML with iframe for youtube service' do
+      input = <<-EOS
+video::rPQoq7ThGAU[youtube, 640, 360, start=60, options=autoplay]
+      EOS
+      output = render_embedded_string input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="//www.youtube.com/embed/rPQoq7ThGAU?rel=0&start=60&autoplay=1"]', output, 1
+      assert_css 'iframe[width="640"]', output, 1
+      assert_css 'iframe[height="360"]', output, 1
+    end
+
     test 'should detect and render audio macro' do
       input = <<-EOS
 audio::podcast.mp3[]
