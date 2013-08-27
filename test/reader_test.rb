@@ -744,22 +744,22 @@ yo
         assert_equal 'include::include-file.asciidoc[]', para.source
       end
   
-      test 'include macro is disabled when include-depth attribute is 0' do
+      test 'include macro is disabled when max-include-depth attribute is 0' do
         input = <<-EOS
 include::include-file.asciidoc[]
         EOS
-        para = block_from_string input, :safe => :safe, :attributes => { 'include-depth' => 0 }
+        para = block_from_string input, :safe => :safe, :attributes => { 'max-include-depth' => 0 }
         assert_equal 1, para.lines.size
         assert_equal 'include::include-file.asciidoc[]', para.source
       end
   
-      test 'include-depth cannot be set by document' do
+      test 'max-include-depth cannot be set by document' do
         input = <<-EOS
-:include-depth: 1
+:max-include-depth: 1
  
 include::include-file.asciidoc[]
         EOS
-        para = block_from_string input, :safe => :safe, :attributes => { 'include-depth' => 0 }
+        para = block_from_string input, :safe => :safe, :attributes => { 'max-include-depth' => 0 }
         assert_equal 1, para.lines.size
         assert_equal 'include::include-file.asciidoc[]', para.source
       end
