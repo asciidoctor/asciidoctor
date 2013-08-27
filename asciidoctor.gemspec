@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   ## Rake build (see the validate task)
   s.name              = 'asciidoctor'
   s.version           = '0.1.4.rc.1'
-  s.date              = '2013-08-25'
+  s.date              = '2013-08-27'
   s.rubyforge_project = 'asciidoctor'
 
   s.summary     = 'A native Ruby AsciiDoc syntax processor and publishing toolchain'
@@ -24,7 +24,7 @@ EOS
 
   s.has_rdoc = true
   s.rdoc_options = ['--charset=UTF-8']
-  s.extra_rdoc_files = %w[LICENSE]
+  s.extra_rdoc_files = %w[LICENSE CHANGELOG.adoc]
 
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
@@ -47,6 +47,7 @@ EOS
   ## DO NOT REMOVE THE = MANIFEST = DELIMITERS!
   # = MANIFEST =
   s.files = %w[
+    CHANGELOG.adoc
     Gemfile
     Guardfile
     LICENSE

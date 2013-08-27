@@ -1,0 +1,351 @@
+# Asciidoctor Changelog
+
+http://asciidoctor.org[Asciidoctor] is an open source text processor and publishing toolchain for converting http://asciidoctor.org[AsciiDoc] markup into HTML, DocBook and custom formats.
+
+This document provides a high-level view of the changes introduced in Asciidoctor by release.
+For a detailed view of what has changed, refer to the https://github.com/asciidoctor/asciidoctor/commits/master[commit history] on GitHub.
+
+## 0.1.4 (in development)
+
+Performance::
+
+  * 15% increase in speed compared to 0.1.3
+
+Enhancements::
+
+  * update xref to support interdocument references (#417)
+  * added extension API for document processing (#79)
+  * added include directive processor extension (#100)
+  * added id and role shorthand for formatted (quoted) text (#517)
+  * added shorthand syntax for specifying block options (#481)
+  * add support for checklists in unordered list (#200)
+  * recognize implicit table header row (#387)
+  * allow role to be specified on text enclosed in backticks (#419)
+  * XML comment-style callouts (#582)
+  * make callout bullets non-selectable (#478)
+  * pre-wrap literal blocks, add nowrap option (#303)
+  * skip (retain) missing attribute references by default (#523)
+  * added attribute-missing attribute to control how a missing attribute is handled (#495)
+  * added attribute-undefined attribute to control how an undefined attribute is handled (#495)
+  * add inline icon macro (#529)
+  * add DocBook 5 backend (#411)
+  * add docinfo option for footer (#486)
+  * add pygments as source highlighter option (#538)
+  * permit !name syntax for undefining attribute (#498)
+  * ignore front matter often required by static site generators (#502)
+  * sanitize contents of HTML title element in html5 backend (#504)
+  * support toc position for toc2 (#467)
+  * cli accepts multiple files as input (@lordofthejars) (#227)
+  * add Markdown-style horizontal rules (w/ restriction) (#455)
+  * asciidoctor package now available in Debian Sid and Ubuntu Saucy (@avtobiff) (#216)
+
+Compliance::
+
+  * embed CSS by default, copycss when linkcss is set (#428)
+  * refactor reader to track include stack (#572)
+  * make include directive resolve relative to current file (#572)
+  * track include stack to enforce maximum depth (#581)
+  * multiple terms per labeled list item (#532)
+  * fix greedy comment blocks and paragraphs (#546)
+  * enable toc & numbered by default in DocBook backend (#540)
+  * ignore comment lines when matching labeled list item (#524)
+  * correctly parse footnotes that contain a URL (#506)
+  * parse mangpage metadata and output manpage-specific HTML (#488, #489)
+  * preprocessor directives on first line of AsciiDoc table cell are recognized (#453)
+  * uri can be used in inline image (#470)
+  * include macro can retrieve data from uri if allow-uri-read attribute is set (#445)
+  * support escaping the attributes that precede formatted (quoted) text (#421)
+  * improvements to list processing (#472, #469, #364)
+  * support percentage column widths (#465)
+  * update AsciiDoc compatibility file to support linkattrs feature (#441)
+  * add level 5 section to AsciiDoc compatibility file (#388)
+  * substitute attributes in docinfo files (#403)
+  * numbering should not increment on unnumbered sections (#393)
+
+Bug Fixes::
+
+  * lowercase attribute names passed to API (#508)
+  * numbered can still be toggled even when enabled in API (#393)
+  * allow JRuby Map as attributes (#396)
+  * handle callout marks properly when using CodeRay (#534)
+  * correctly calculate line length in Ruby 1.8 (#167)
+  * write to specified outfile even when input is stdin (#500)
+  * only split quote attribution on first comma in Markdown blockquotes (#389)
+
+Improvements::
+
+  * upgrade font awesome to 3.2.1 (#451)
+  * rename include-depth attribute to max-include-depth, set 64 as default value (#591)
+  * output multiple authors in HTML backend (#399)
+  * allow multiple template directories to be specified (#437)
+  * add option to cli to specify template engine (#406)
+  * add support for external video hosting services in video macro (@xcoulon) (#587)
+  * link to CodeRay stylesheet if linkcss is set (#381)
+  * strip leading separator(s) on section id if idprefix is blank (#551)
+  * customize styling of toc placed inside body content (#507)
+  * properly style floating images (inline & block) (#460)
+  * use ul list for TOC in HTML5 backend (#431)
+  * added role? method to check for role, option? method to check for option and roles method (#423, 474)
+  * honor showtitle attribute as alternate to notitle! (#457)
+  * strip leading indent from literal paragraph blocks assigned the style normal
+  * document that the tilt gem is required to use custom backends (#433)
+  * add basic template cache (#438)
+  * print warning/error messages using warn (#556)
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?milestone=7&state=closed[issues resolved]
+::
+https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.4[git tag]
+::
+https://github.com/asciidoctor/asciidoctor/compare/v0.1.3...v0.1.4[full diff]
+
+## 0.1.3 (2013-05-30) - @mojavelinux
+
+Performance::
+
+  * 10% increase in speed compared to 0.1.2
+
+Enhancements::
+
+  * added support for inline rendering by setting doctype to inline (#328)
+  * added support for using font-based icons (#115)
+  * honor haml/slim/jade-style shorthand for id and role attributes (#313)
+  * support markdown-style headings as section titles (#373)
+  * add section level 5 (maps to <h6> in html5 backend) (#334)
+  * added btn inline macro (#259)
+  * added menu inline macro (#173)
+  * added an inline menu macro to identify a menu selection (@bleathem) (#173)
+  * added an inline key macro to identify a key or key combination (@bleathem) (#172)
+  * support alternative quote forms (#196)
+  * added indent attribute to verbatim blocks (#365)
+  * added prettify source-highlighter (#202)
+  * link section titles (#122)
+  * introduce shorthand syntax for table format (#350)
+  * parse attributes in link when use-link-attrs attribute is set (#214)
+  * support preamble toc-placement (#295)
+  * exclude attribute div if quote has no attribution (#309)
+  * support attributes passed to API as string or string array (#289)
+  * allow safe mode to be set using string, symbol or int in API (#290)
+  * make level 0 section titles more prominent in TOC (#369)
+
+Compliance::
+
+  * ~ 99.5% compliance with AsciiDoc
+  * drop line if target of include macro is blank (#376)
+  * resolve attribute references in target of include macro (#367)
+  * add irc scheme to link detection (#314)
+  * toc should honor numbered attribute (#341)
+  * add toc2 layout to default stylesheet (#285)
+  * consecutive terms in labeled list share same entry (#315)
+  * support set:name:value attribute syntax (#228)
+  * block title not allowed above document title (#175)
+  * assign caption even if no title (#321)
+  * horizontal dlist layout in docbook backend (#298)
+  * set doctitle attribute (#337)
+  * allow any backend to be specified in cli (@lightguard) (#320)
+  * support for abstract and partintro (#297)
+
+Bug Fixes::
+
+  * fix file path resolution on Windows (#330)
+  * fix bad variable name that was causing crash, add test for it (#335)
+  * set proper encoding on input data (#308)
+  * don't leak doctitle into nested document (#382)
+  * handle author(s) defined using attributes (#301)
+
+Improvements::
+
+  * added tests for all special sections (#80)
+  * add test for attributes defined as string or string array (@lightguard) (#291)
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+
+http://asciidoctor.org/news/2013/05/31/asciidoctor-0-1-3-released[release notes]
+::
+https://github.com/asciidoctor/asciidoctor/issues?milestone=4&state=closed[issues resolved]
+::
+https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.3[git tag]
+::
+https://github.com/asciidoctor/asciidoctor/compare/v0.1.2...v0.1.3[full diff]
+
+## 0.1.2 (2013-04-25) - @mojavelinux
+
+Performance::
+
+  * 28% increase in speed compared to 0.1.1, 32% increase compared to 0.1.0
+
+Enhancements::
+
+  * new website at http://asciidoctor.org
+  * add a default stylesheet (#76)
+  * add viewport meta tag for mobile browsers (#238)
+  * set attributes based on safe mode (#244)
+  * add admonition name as style class (#265)
+  * remove hardcoded CSS, no one likes hardcoded CSS (#165)
+  * support multiple authors in document header (#223)
+  * include footnotes block in embedded document (#206)
+  * allow comma delimiter in include attribute values (#226)
+  * support including tagged lines (#226)
+  * add line selection to include macro (#226)
+  * Asciidoctor#render APIs return Document when document is written to file
+
+Compliance::
+
+  * added AsciiDoc configuration file for compatibility with Asciidoctor (#257)
+  * restore alpha-based xml entities (#211)
+  * implement video and audio macros (#155)
+  * implement block toc macro (#269)
+  * correctly handle multi-part books (#222)
+  * complete masquerade functionality for blocks & paragraphs (#187)
+  * support explicit subs on blocks (#220)
+  * use code element instead of tt (#260)
+  * honor toc2 attribute (#221)
+  * implement leveloffset feature (#212)
+  * include docinfo files in header when safe mode < SERVER (#116)
+  * support email links and mailto macros (#213)
+  * question must be wrapped in simpara (#231)
+  * allow round bracket in link (#218)
+
+Bug Fixes::
+
+  * trailing comma shouldn't be included in link (#280)
+  * warn if file in include macro doesn't exist (#262)
+  * negative case for inline ifndef should only affect current line (#241)
+  * don't compact nested documents (#217)
+  * nest revision info inside revision element (#236)
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+
+http://asciidoctor.org/news/2013/04/25/asciidoctor-0-1-2-released[release notes]
+::
+https://github.com/asciidoctor/asciidoctor/issues?milestone=3&state=closed[issues resolved]
+::
+https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.2[git tag]
+::
+https://github.com/asciidoctor/asciidoctor/compare/v0.1.1...v0.1.2[full diff]
+
+## 0.1.1 (2013-02-26) - @erebor
+
+Performance::
+
+  * 15% increase in speed compared to 0.1.0
+
+Enhancements::
+
+  * migrated repository to asciidoctor organization on GitHub (#77)
+  * include document title when header/footer disabled and notitle attribute is unset (#103)
+  * honor GitHub-flavored Markdown fenced code blocks (#118)
+  * add :doctype and :backend keys to options hash in API (#163)
+  * added :to_dir option to the Asciidoctor#render API
+  * added option :header_only to stop parsing after reading the header
+  * preliminary line number tracking
+  * auto-select backend sub-folder containing custom templates
+  * rubygem-asciidoctor package now available in Fedora (#92)
+
+Compliance::
+
+  * refactor reader, process attribute entries and conditional blocks while parsing (#143)
+  * support limited value comparison functionality of ifeval (#83)
+  * added support for multiple attributes in ifdef and ifndef macros
+  * don't attempt to embed image with uri reference when data-uri is set (#157)
+  * accomodate trailing dot in author name (#156)
+  * don't hardcode language attribute in html backend (#185)
+  * remove language from DocBook root node (#188)
+  * fix revinfo line swallowing attribute entry
+  * auto-generate caption for listing blocks if listing-caption attribute is set
+  * support nested includes
+  * support literal and listing paragraphs
+  * support em dash shorthand at the end of a line
+  * added ftp support to link macro
+  * added support for the page break macro
+
+Bug Fixes::
+
+  * pass through image with uri reference when data-uri is set (#157)
+  * print message for failed arg (#152)
+  * normalize whitespace at the end of lines (improved)
+  * properly load custom templates and required libraries
+
+Improvements::
+
+  * parse document header in distinct parsing step
+  * moved hardcoded english captions to attributes
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?milestone=1&state=closed[issues resolved]
+::
+https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.1[git tag]
+::
+https://github.com/asciidoctor/asciidoctor/compare/v0.1.0...v0.1.1[full diff]
+
+## 0.1.0 (2013-02-04) - @erebor
+
+Enhancements::
+
+  * add Asciidoctor API (Asciidoctor#load and Asciidoctor#render methods) (#34)
+  * added SERVER safe mode level (minimum recommended security for serverside usage) (#93)
+  * added the asciidoctor commandline interface (cli)
+  * added asciidoctor-safe command, enables safe mode by default
+  * added man page for the asciidoctor command
+  * use blockquote tag for quote block content (#124)
+  * add hardbreaks option to preserve line breaks in paragraph text (#119)
+  * :header_footer option defaults to false when using the API, unless rendering to file
+  * added idseparator attribute to customized separator used in generated section ids
+  * do not number special sections (differs from AsciiDoc)
+
+Compliance::
+
+  * use callout icons if icons are enabled, unless safe mode is SECURE
+  * add support for name=value@ attribute syntax passed via cli (#97)
+  * attr refs no longer case sensitive (#109)
+  * fixed several cases of incorrect list handling
+  * don't allow links to consume endlines or surrounding angled brackets
+  * recognize single quote in author name
+  * support horizontal labeled list style
+  * added support for the 'd' cell style
+  * added support for bibliography anchors
+  * added support for special sections (e.g., appendix)
+  * added support for index term macros
+  * added support for footnote and footnoteref macros
+  * added auto-generated numbered captions for figures, tables and examples
+  * added counter macros
+  * added support for floating (discrete) section titles
+
+Bug Fixes::
+
+  * fixed UTF-8 encoding issue by adding magic encoding line to ERB templates (#144)
+  * resolved Windows compatibility issues
+  * clean CRLF from end of lines (#125)
+  * enabled warnings when running tests, fixed warnings (#69)
+
+Improvements::
+
+  * renamed iconstype attribute to icontype
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?milestone=12&state=closed[issues resolved]
+::
+https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.0[git tag]
+::
+https://github.com/asciidoctor/asciidoctor/compare/v0.0.9...v0.1.0[full diff]
+
+## Older releases (pre-0.0.1)
+
+For information about older releases, refer to the https://github.com/asciidoctor/asciidoctor/tags[commit history] on GitHub.
