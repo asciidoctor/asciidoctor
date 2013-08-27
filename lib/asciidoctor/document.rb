@@ -205,9 +205,9 @@ class Document < AbstractBlock
     # sync the embedded attribute w/ the value of options...do not allow override
     @attribute_overrides['embedded'] = @options[:header_footer] ? nil : ''
 
-    # the only way to set the include-depth attribute is via the document options
-    # 10 is the AsciiDoc default
-    @attribute_overrides['include-depth'] ||= 10
+    # the only way to set the max-include-depth attribute is via the document options
+    # 64 is the AsciiDoc default
+    @attribute_overrides['max-include-depth'] ||= 64
 
     # the only way to enable uri reads is via the document options, disabled by default
     unless !@attribute_overrides['allow-uri-read'].nil?
