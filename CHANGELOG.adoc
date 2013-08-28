@@ -5,7 +5,7 @@ http://asciidoctor.org[Asciidoctor] is an open source text processor and publish
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the https://github.com/asciidoctor/asciidoctor/commits/master[commit history] on GitHub.
 
-## 0.1.4 (in development)
+## 0.1.4 (under development)
 
 Performance::
 
@@ -138,8 +138,9 @@ Enhancements::
   * added support for inline rendering by setting doctype to inline (#328)
   * added support for using font-based icons (#115)
   * honor haml/slim/jade-style shorthand for id and role attributes (#313)
-  * support markdown-style headings as section titles (#373)
-  * added section level 5 (maps to <h6> in html5 backend) (#334)
+  * support Markdown-style headings as section titles (#373)
+  * support Markdown-style quote blocks
+  * added section level 5 (maps to h6 element in the html5 backend) (#334)
   * added btn inline macro (#259)
   * added menu inline menu to identify a menu selection (@bleathem) (#173)
   * added kbd inline macro to identify a key or key combination (@bleathem) (#172)
@@ -337,7 +338,7 @@ Compliance::
   * don't allow links to consume endlines or surrounding angled brackets
   * recognize single quote in author name
   * support horizontal labeled list style
-  * added support for the 'd' cell style
+  * added support for the d cell style
   * added support for bibliography anchors
   * added support for special sections (e.g., appendix)
   * added support for index term inline macros
