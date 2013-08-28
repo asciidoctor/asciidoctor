@@ -795,7 +795,7 @@ module Substituters
       m = $~
       # honor the escape
       if m[1] == '\\'
-        next "&lt;#{m[3]}&gt;"
+        next m[0].sub('\\', '')
       end
       Inline.new(self, :callout, m[3], :id => @document.callouts.read_next_id).render
     }
@@ -957,15 +957,14 @@ module Substituters
       # extract callout marks, indexed by line number
       source = source.split(EOL).map {|line|
         lineno = lineno + 1
-        line.sub(REGEXP[:callout_scan]) {
+        line.gsub(REGEXP[:callout_scan]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
-          # FIXME this does not put back the optional leading comment chars
           if m[1] == '\\'
-            "<#{m[3]}>"
+            m[0].sub('\\', '')
           else
-            callout_marks[lineno] = m[3]
+            (callout_marks[lineno] ||= []) << m[3]
             nil
           end
         }
@@ -996,8 +995,13 @@ module Substituters
       lineno = 0
       result.split(EOL).map {|line|
         lineno = lineno + 1
-        if (conum = callout_marks.delete(lineno))
-          %(#{line}#{Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).render})
+        if (conums = callout_marks.delete(lineno))
+          if conums.size == 1
+            %(#{line}#{Inline.new(self, :callout, conums.first, :id => @document.callouts.read_next_id).render })
+          else
+            conums_markup = conums.map {|conum| Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).render } * ' '
+            %(#{line}#{conums_markup})
+          end
         else
           line
         end
