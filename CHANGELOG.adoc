@@ -85,7 +85,7 @@ Improvements::
   * improved the built-in CodeRay theme to match Asciidoctor styles
   * link to CodeRay stylesheet if linkcss is set (#381)
   * added content_model to AbstractBlock, rename buffer to lines
-  * use Untitled as document title in rendere output if document has no title
+  * use Untitled as document title in rendered output if document has no title
   * rename include-depth attribute to max-include-depth, set 64 as default value (#591)
   * the tag attribute can be used on the include directive to identify a single tagged region
   * output multiple authors in HTML backend (#399)
