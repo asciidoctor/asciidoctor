@@ -392,7 +392,7 @@ Improvements::
   * added tests for all special sections (#80)
   * added test for attributes defined as string or string array (@lightguard) (#291)
 
-See the {changelog}[CHANGELOG.adoc] file for changes in older releases as well as the upcoming release.
+See the {changelog}[CHANGELOG.adoc] file for a list of changes in older releases as well as for the upcoming release.
 
 == Contributing
 
