@@ -730,6 +730,19 @@ Text
       assert para.attributes.has_key?('option2-option')
     end
 
+    test 'option can be specified in first position of block style using shorthand syntax' do
+      input = <<-EOS
+[%interactive]
+- [x] checked
+      EOS
+
+      doc = document_from_string input
+      list = doc.blocks.first
+      assert_equal 'interactive', list.attributes['options']
+      assert list.attributes.has_key?('interactive-option')
+      assert list.attributes[1] == '%interactive'
+    end
+
     test 'id and role attributes can be specified on section style using shorthand syntax' do
       input = <<-EOS
 [dedication#dedication.small]

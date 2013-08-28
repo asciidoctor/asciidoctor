@@ -219,29 +219,32 @@ end
 class BlockUlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if @style == 'bibliography' %>
-<bibliodiv#{common_attrs_erb}>#{title_tag}
-  <% items.each do |li| %>
-    <bibliomixed>
-      <bibliomisc><%= li.text %></bibliomisc>
-      <% if li.blocks? %>
-<%= li.content %>
-      <% end %>
-    </bibliomixed>
-  <% end %>
-</bibliodiv>
-<% else %>
-<itemizedlist#{common_attrs_erb}>#{title_tag}
-  <% items.each do |li| %>
-    <listitem>
-      <simpara><%= li.text %></simpara>
-      <% if li.blocks? %>
-<%= li.content %>
-      <% end %>
-    </listitem>
-  <% end %>
-</itemizedlist>
-<% end %>
+<%#encoding:UTF-8%><%
+if @style == 'bibliography'
+%><bibliodiv#{common_attrs_erb}>#{title_tag}<%
+  items.each do |li| %>
+<bibliomixed>
+<bibliomisc><%= li.text %></bibliomisc><%
+    if li.blocks? %>
+<%= li.content %><%
+    end %>
+</bibliomixed><%
+  end %>
+</bibliodiv><%
+else
+checklist = (option? 'checklist')
+mark = checklist ? 'none' : @style
+%><itemizedlist#{common_attrs_erb}<%= mark ? %( mark="\#{mark}") : nil %>>#{title_tag}<%
+  items.each do |li| %>
+<listitem>
+<simpara><%= checklist && (li.attr? 'checkbox') ? ((li.attr? 'checked') ? '&#9745; ' : '&#9744; ') : nil %><%= li.text %></simpara><%
+    if li.blocks? %>
+<%= li.content %><%
+    end %>
+</listitem><%
+  end %>
+</itemizedlist><%
+end %>
     EOF
   end
 end
@@ -249,15 +252,15 @@ end
 class BlockOlistTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><orderedlist#{common_attrs_erb}#{attribute('numeration', '@style')}>#{title_tag}
-  <% items.each do |li| %>
-    <listitem>
-      <simpara><%= li.text %></simpara>
-      <% if li.blocks? %>
-<%= li.content %>
-      <% end %>
-    </listitem>
-  <% end %>
+<%#encoding:UTF-8%><orderedlist#{common_attrs_erb}#{attribute('numeration', '@style')}>#{title_tag}<%
+  items.each do |li| %>
+<listitem>
+<simpara><%= li.text %></simpara><%
+    if li.blocks? %>
+<%= li.content %><%
+    end %>
+</listitem><%
+end %>
 </orderedlist>
     EOF
   end

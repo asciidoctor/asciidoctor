@@ -2289,7 +2289,7 @@ class Lexer
   def self.parse_style_attribute(attributes, reader = nil)
     original_style = attributes['style']
     raw_style = attributes[1]
-    # NOTE the check for empty string is a hack to skip processing alt text on block macro
+    # NOTE spaces are not allowed in shorthand, so if we find one, this ain't shorthand
     if !raw_style || raw_style.include?(' ')
       attributes['style'] = raw_style
       [raw_style, original_style]

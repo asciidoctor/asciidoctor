@@ -670,13 +670,18 @@ class BlockUlistTemplate < BaseTemplate
     if (checklist = (node.option? 'checklist'))
       div_classes.insert(1, 'checklist')
       ul_class_attribute = ' class="checklist"'
-      if node.document.attr? 'icons', 'font'
-        marker_checked = '<i class="icon-check"></i> '
-        marker_unchecked = '<i class="icon-check-empty"></i> '
+      if node.option? 'interactive'
+        marker_checked = %(<input type="checkbox" data-item-complete="1" checked> )
+        marker_unchecked = %(<input type="checkbox" data-item-complete="0"> )
       else
-        # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
-        marker_checked = '<input type="checkbox" data-item-complete="1" checked disabled> '
-        marker_unchecked = '<input type="checkbox" data-item-complete="0" disabled> '
+        if node.document.attr? 'icons', 'font'
+          marker_checked = '<i class="icon-check"></i> '
+          marker_unchecked = '<i class="icon-check-empty"></i> '
+        else
+          # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
+          marker_checked = %(<input type="checkbox" data-item-complete="1" checked disabled> )
+          marker_unchecked = %(<input type="checkbox" data-item-complete="0" disabled> )
+        end
       end
     elsif !node.style.nil?
       ul_class_attribute = %( class="#{node.style}")
