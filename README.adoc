@@ -4,19 +4,19 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Ryan Waldron <https://
 :homepage: http://asciidoctor.org
 :asciidoc: http://asciidoc.org
 :gem: http://rubygems.org/gems/asciidoctor
-:toolchain: http://asciidoctor.org/docs/install-toolchain/
-:install-mac: http://asciidoctor.org/docs/install-asciidoctor-macosx/
+:toolchain: http://asciidoctor.org/docs/install-toolchain
+:install-mac: http://asciidoctor.org/docs/install-asciidoctor-macosx
 :render: http://asciidoctor.org/docs/render-documents
 :factory: http://asciidoctor.org/docs/produce-custom-themes-using-asciidoctor-stylesheet-factory
 :java: http://asciidoctor.org/docs/install-and-use-asciidoctor-java-integration
-:man: http://asciidoctor.org/man/asciidoctor 
+:man: http://asciidoctor.org/man/asciidoctor
 :sources: https://github.com/asciidoctor/asciidoctor
 :tests: https://github.com/asciidoctor/asciidoctor/tree/master/test
 :issues: https://github.com/asciidoctor/asciidoctor/issues
 :forum: http://discuss.asciidoctor.org
 :irc: irc://irc.freenode.org/#asciidoctor
-:news: http://asciidoctor.org/news/
-:docs: http://asciidoctor.org/docs/
+:news: http://asciidoctor.org/news
+:docs: http://asciidoctor.org/docs
 :org: https://github.com/asciidoctor
 :contributors: https://github.com/asciidoctor/asciidoctor/graphs/contributors
 :templates: https://github.com/asciidoctor/asciidoctor/blob/master/lib/asciidoctor/backends
@@ -28,6 +28,7 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Ryan Waldron <https://
 :fork: https://help.github.com/articles/fork-a-repo
 :branch: http://learn.github.com/p/branching.html
 :pr: https://help.github.com/articles/using-pull-requests
+:changelog: https://github.com/asciidoctor/asciidoctor/blob/master/CHANGELOG.adoc
 :license: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE
 :idprefix:
 :idseparator: -
@@ -43,7 +44,7 @@ There are also Fedora, Debian and Ubuntu packages available for installing Ascii
 Asciidoctor is released under the MIT license.
 
 ifndef::awestruct[]
-image::https://travis-ci.org/asciidoctor/asciidoctor.png?branch=master[Build Status, link="https://travis-ci.org/asciidoctor/asciidoctor"]
+*Project health:* image:https://travis-ci.org/asciidoctor/asciidoctor.png?branch=master[Build Status, link="https://travis-ci.org/asciidoctor/asciidoctor"]
 endif::awestruct[]
 
 == AsciiDoc Processing
@@ -336,7 +337,62 @@ New contributors are always welcome!
 
 == Changelog
 
-// Embed version's changelog here
+=== v0.1.3 (2013-05-30) - @mojavelinux
+
+Enhancements::
+
+  * added support for inline rendering by setting doctype to inline (#328)
+  * added support for using font-based icons (#115)
+  * honor haml/slim/jade-style shorthand for id and role attributes (#313)
+  * support Markdown-style headings as section titles (#373)
+  * support Markdown-style quote blocks
+  * added section level 5 (maps to h6 element in the html5 backend) (#334)
+  * added btn inline macro (#259)
+  * added menu inline menu to identify a menu selection (@bleathem) (#173)
+  * added kbd inline macro to identify a key or key combination (@bleathem) (#172)
+  * support alternative quote forms (#196)
+  * added indent attribute to verbatim blocks (#365)
+  * added prettify source-highlighter (#202)
+  * link section titles (#122)
+  * introduce shorthand syntax for table format (#350)
+  * parse attributes in link when use-link-attrs attribute is set (#214)
+  * support preamble toc-placement (#295)
+  * exclude attribute div if quote has no attribution (#309)
+  * support attributes passed to API as string or string array (#289)
+  * allow safe mode to be set using string, symbol or int in API (#290)
+  * make level 0 section titles more prominent in TOC (#369)
+
+Compliance::
+
+  * ~ 99.5% compliance with AsciiDoc
+  * drop line if target of include directive is blank (#376)
+  * resolve attribute references in target of include directive (#367)
+  * added irc scheme to link detection (#314)
+  * toc should honor numbered attribute (#341)
+  * added toc2 layout to default stylesheet (#285)
+  * consecutive terms in labeled list share same entry (#315)
+  * support set:name:value attribute syntax (#228)
+  * block title not allowed above document title (#175)
+  * assign caption even if no title (#321)
+  * horizontal dlist layout in docbook backend (#298)
+  * set doctitle attribute (#337)
+  * allow any backend to be specified in cli (@lightguard) (#320)
+  * support for abstract and partintro (#297)
+
+Bug Fixes::
+
+  * fixed file path resolution on Windows (#330)
+  * fixed bad variable name that was causing crash, add test for it (#335)
+  * set proper encoding on input data (#308)
+  * don't leak doctitle into nested document (#382)
+  * handle author(s) defined using attributes (#301)
+
+Improvements::
+
+  * added tests for all special sections (#80)
+  * added test for attributes defined as string or string array (@lightguard) (#291)
+
+See the {changelog}[CHANGELOG.adoc] file for changes in older releases as well as the upcoming release.
 
 == Contributing
 
@@ -360,7 +416,7 @@ Here are some ways *you* can contribute:
 
 === Submitting an Issue
 
-We use the {issues}[GitHub issue tracker] associated with this project to track bugs and features. 
+We use the {issues}[issue tracker on GitHub] associated with this project to track bugs and features. 
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. 
 When submitting a bug report, please include a {gist}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
 
