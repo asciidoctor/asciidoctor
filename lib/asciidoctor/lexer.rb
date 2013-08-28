@@ -1026,8 +1026,8 @@ class Lexer
     text.scan(REGEXP[:callout_quick_scan]) {
       # alias match for Ruby 1.8.7 compat
       m = $~
-      next if m[1] == '\\'
-      document.callouts.register(m[3])
+      next if m[0][0..0] == '\\'
+      document.callouts.register(m[2])
     }
   end
 

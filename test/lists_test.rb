@@ -3757,6 +3757,28 @@ puts "The syntax <1> at the end of the line makes a code callout"
     assert_xpath '//b', output, 0
   end
 
+  test 'should allow multiple callouts on the same line' do
+    input = <<-EOS
+[source, ruby]
+----
+require 'asciidoctor' <1>
+doc = Asciidoctor.load('Hello, World!') # <2> <3>
+puts doc.render <4><5>
+exit 0
+----
+<1> Require library
+<2> Load document from String
+<3> Uses default backend and doctype
+<4> Renders document to String
+<5> Prints output to stdout
+    EOS
+    output = render_embedded_string input
+    assert_xpath '//code/b', output, 5
+    assert_match(/ <b>\(1\)<\/b>$/, output)
+    assert_match(/ <b>\(2\)<\/b> <b>\(3\)<\/b>$/, output)
+    assert_match(/ <b>\(4\)<\/b><b>\(5\)<\/b>$/, output)
+  end
+
   test 'should allow XML comment-style callouts' do
     input = <<-EOS
 [source, xml]

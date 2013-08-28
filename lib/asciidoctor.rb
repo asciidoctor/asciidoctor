@@ -340,12 +340,14 @@ module Asciidoctor
     :biblio_macro     => /\\?\[\[\[([\w:][\w:.-]*?)\]\]\]/,
 
     # callout reference inside literal text
-    # <1> (optionally prefixed by //, # or ;; line comment chars) or <!--1--> (for XML-based languages)
+    # <1> (optionally prefixed by //, # or ;; line comment chars)
+    # <1> <2> (multiple callouts on one line)
+    # <!--1--> (for XML-based languages)
     # special characters are already be replaced at this point during render
-    :callout_render     => /(?:(?:\/\/|#|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;$/,
+    :callout_render     => /(?:(?:\/\/|#|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=$| ?\\?&lt;!?\2\d+\2&gt;$)/,
     # ...but not while scanning
-    :callout_quick_scan => /(\\)?<!?(--|)(\d+)\2>$/,
-    :callout_scan       => /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>$/,
+    :callout_quick_scan => /\\?<!?(--|)(\d+)\1>(?=$| ?\\?<!?\1\d+\1>$)/,
+    :callout_scan       => /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=$| ?\\?<!?\2\d+\2>$)/,
 
     # <1> Foo
     :colist           => /^<?(\d+)>[[:blank:]]+(.*)/,
