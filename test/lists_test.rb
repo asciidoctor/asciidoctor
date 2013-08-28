@@ -3934,6 +3934,22 @@ context 'Checklists' do
     assert_css '.ulist.checklist li i.icon-check-empty', output, 1
     assert_xpath '(/*[@class="ulist checklist"]/ul/li)[3]/p[text()="plain"]', output, 1
   end
+
+  test 'should create interactive checklist if interactive option is set even with icons attribute is font' do
+    input = <<-EOS
+:icons: font
+
+[options="interactive"]
+- [ ] todo
+- [x] done
+    EOS
+
+    output = render_embedded_string input
+    assert_css '.ulist.checklist', output, 1
+    assert_css '.ulist.checklist li input[type="checkbox"]', output, 2
+    assert_css '.ulist.checklist li input[type="checkbox"][disabled]', output, 0
+    assert_css '.ulist.checklist li input[type="checkbox"][checked]', output, 1
+  end
 end
 
 context 'Lists model' do

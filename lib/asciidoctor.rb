@@ -320,10 +320,10 @@ module Asciidoctor
     # [NOTE, caption="Good to know"]
     # Can be defined by an attribute
     # [{lead}]
-    :blk_attr_list    => /^\[(|[[:blank:]]*[\w\{,.#"'].*)\]$/,
+    :blk_attr_list    => /^\[(|[[:blank:]]*[\w\{,.#"'%].*)\]$/,
 
     # block attribute list or block id (bulk query)
-    :attr_line        => /^\[(|[[:blank:]]*[\w\{,.#"'].*|\[[^\[\]]*\])\]$/,
+    :attr_line        => /^\[(|[[:blank:]]*[\w\{,.#"'%].*|\[[^\[\]]*\])\]$/,
 
     # attribute reference
     # {foo}

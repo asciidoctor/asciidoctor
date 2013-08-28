@@ -425,6 +425,7 @@ div.unbreakable { page-break-inside: avoid; }
 .white-background { background-color: #fafafa; }
 .yellow { color: #bfbf00; }
 .yellow-background { background-color: #fafa00; }
+[class^="icon-"], [class*=" icon-"] { cursor: default; }
 .admonitionblock td.icon [class^="icon-"]:before { font-size: 2.5em; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); cursor: default; }
 .admonitionblock td.icon .icon-note:before { content: "\f05a"; color: #005498; color: #003f72; }
 .admonitionblock td.icon .icon-tip:before { content: "\f0eb"; text-shadow: 1px 1px 2px rgba(155, 155, 0, 0.8); color: #111; }
