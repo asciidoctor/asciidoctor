@@ -10,20 +10,18 @@ $:.unshift(File.dirname(__FILE__))
 # Asciidoc documents comprise a header followed by zero or more sections.
 # Sections are composed of blocks of content.  For example:
 #
-#   Doc Title
-#   =========
+#   = Doc Title
 #
-#   SECTION 1
-#   ---------
+#   == Section 1
 #
 #   This is a paragraph block in the first section.
 #
-#   SECTION 2
+#   == Section 2
 #
 #   This section has a paragraph block and an olist block.
 #
-#   1. Item 1
-#   2. Item 2
+#   . Item 1
+#   . Item 2
 #
 # Examples:
 #
