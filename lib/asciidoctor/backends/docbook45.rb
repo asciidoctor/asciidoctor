@@ -52,9 +52,7 @@ class DocumentTemplate < BaseTemplate
 
   def docinfo
     <<-EOF
-<% if has_header? && !notitle
-  %><%= template.title_tags(@header.title) %><%
-end
+<% unless notitle %><%= has_header? ? template.title_tags(@header.title) : %(<title>\#{attr 'untitled-label'}</title>) %><% end
 if attr? :revdate %>
 <date><%= attr :revdate %></date><%
 else %>
