@@ -93,7 +93,7 @@ Improvements::
   * added option to cli to specify template engine (#406)
   * added support for external video hosting services in video block macro (@xcoulon) (#587)
   * strip leading separator(s) on section id if idprefix is blank (#551)
-  * customize styling of toc placed inside body content (#507)
+  * customized styling of toc placed inside body content (#507)
   * properly style floating images (inline & block) (#460)
   * use ul list for TOC in HTML5 backend (#431)
   * support multiple terms per labeled list item in model (#532)
