@@ -237,7 +237,7 @@ mark = checklist ? 'none' : @style
 %><itemizedlist#{common_attrs_erb}<%= mark ? %( mark="\#{mark}") : nil %>>#{title_tag}<%
   items.each do |li| %>
 <listitem>
-<simpara><%= checklist && (li.attr? 'checkbox') ? ((li.attr? 'checked') ? '&#9745; ' : '&#9744; ') : nil %><%= li.text %></simpara><%
+<simpara><%= checklist && (li.attr? 'checkbox') ? ((li.attr? 'checked') ? '&#x25A0; ' : '&#x25A1; ') : nil %><%= li.text %></simpara><%
     if li.blocks? %>
 <%= li.content %><%
     end %>
