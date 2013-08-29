@@ -196,6 +196,7 @@ module Asciidoctor
     '\'' => :ruler,
     '-'  => :ruler,
     '*'  => :ruler,
+    '_'  => :ruler,
     '<'  => :page_break
   }
 
@@ -485,7 +486,7 @@ module Asciidoctor
     # --- or - - - (ruler)
     # *** or * * * (ruler)
     # <<< (pagebreak)
-    :break_line_plus   => /^(?:'|<){3,}|' *' *'|- *- *-|\* *\* *\*$/,
+    :break_line_plus   => /^(?:'|<){3,}$|^ {0,3}([-\*_])( *)\1\2\1$/,
 
     # inline passthrough macros
     # +++text+++
