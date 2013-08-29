@@ -409,10 +409,10 @@ class Lexer
           end
 
           # process lines normally
-          if !text_only
-            first_char = this_line[0..0]
+          unless text_only
+            first_char = Compliance.markdown_syntax ? this_line.lstrip[0..0] : this_line[0..0]
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
-            if BREAK_LINES.has_key?(first_char) && this_line.length > 2 &&
+            if BREAK_LINES.has_key?(first_char) && this_line.length > 3 &&
                 (match = this_line.match(Compliance.markdown_syntax ? REGEXP[:break_line_plus] : REGEXP[:break_line]))
               block = Block.new(parent, BREAK_LINES[first_char], :content_model => :empty)
               break
@@ -461,7 +461,7 @@ class Lexer
               break
 
             # NOTE we're letting the toc macro have attributes
-            elsif (match = this_line.match(REGEXP[:toc]))
+            elsif first_char == 't' && (match = this_line.match(REGEXP[:toc]))
               block = Block.new(parent, :toc, :content_model => :empty)
               block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
               break

@@ -84,22 +84,87 @@ This line is separated by a horizontal rule...
       '- - -',
       '***',
       '* * *',
-      '\' \' \''
+      '___',
+      '_ _ _'
+    ]
+
+    offsets = [
+      '',
+      ' ',
+      '  ',
+      '   '
     ]
 
     variants.each do |variant|
-      input = <<-EOS
+      offsets.each do |offset|
+        input = <<-EOS
 This line is separated by a horizontal rule...
 
-#{variant}
+#{offset}#{variant}
 
 ...from this line.
-    EOS
-      output = render_embedded_string input
-      assert_xpath "//hr", output, 1
-      assert_xpath "/*[@class='paragraph']", output, 2
-      assert_xpath "(/*[@class='paragraph'])[1]/following-sibling::hr", output, 1
-      assert_xpath "/hr/following-sibling::*[@class='paragraph']", output, 1
+        EOS
+        output = render_embedded_string input
+        assert_xpath "//hr", output, 1
+        assert_xpath "/*[@class='paragraph']", output, 2
+        assert_xpath "(/*[@class='paragraph'])[1]/following-sibling::hr", output, 1
+        assert_xpath "/hr/following-sibling::*[@class='paragraph']", output, 1
+      end
+    end
+  end
+
+  test 'markdown horizontal rules negative case' do
+
+    bad_variants = [
+      '- - - -',
+      '* * * *',
+      '_ _ _ _'
+    ]
+
+    good_offsets = [
+      '',
+      ' ',
+      '  ',
+      '   '
+    ]
+
+    bad_variants.each do |variant|
+      good_offsets.each do |offset|
+        input = <<-EOS
+This line is separated something that is not a horizontal rule...
+
+#{offset}#{variant}
+
+...from this line.
+        EOS
+        output = render_embedded_string input
+        assert_xpath '//hr', output, 0
+      end
+    end
+
+    good_variants = [
+      '- - -',
+      '* * *',
+      '_ _ _'
+    ]
+
+    bad_offsets = [
+      "\t",
+      '    '
+    ]
+
+    good_variants.each do |variant|
+      bad_offsets.each do |offset|
+        input = <<-EOS
+This line is separated something that is not a horizontal rule...
+
+#{offset}#{variant}
+
+...from this line.
+        EOS
+        output = render_embedded_string input
+        assert_xpath '//hr', output, 0
+      end
     end
   end
 
