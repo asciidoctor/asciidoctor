@@ -971,12 +971,14 @@ module Substituters
       } * EOL
     end
 
+    linenums_mode = nil
+
     case highlighter
       when 'coderay'
         result = ::CodeRay::Duo[attr('language', 'text').to_sym, :html, {
             :css => @document.attributes.fetch('coderay-css', 'class').to_sym,
-            :line_numbers => (attr?('linenums') ? @document.attributes.fetch('coderay-linenums-mode', 'table').to_sym : nil),
-            :line_number_anchors => false}].highlight(source).chomp
+            :line_numbers => (linenums_mode = (attr?('linenums') ? @document.attributes.fetch('coderay-linenums-mode', 'table').to_sym : nil)),
+            :line_number_anchors => false}].highlight(source)
       when 'pygments'
         lexer = ::Pygments::Lexer[attr('language')]
         if lexer
@@ -1004,14 +1006,26 @@ module Substituters
       result
     else
       lineno = 0
+      reached_code = linenums_mode != :table
       result.split(EOL).map {|line|
+        unless reached_code
+          unless line.include?('<td class="code">')
+            next line
+          end
+          reached_code = true
+        end
         lineno = lineno + 1
         if (conums = callout_marks.delete(lineno))
+          tail = nil
+          if (pos = line.index '</pre>')
+            tail = line[pos..-1]
+            line = line[0...pos]
+          end
           if conums.size == 1
-            %(#{line}#{Inline.new(self, :callout, conums.first, :id => @document.callouts.read_next_id).render })
+            %(#{line}#{Inline.new(self, :callout, conums.first, :id => @document.callouts.read_next_id).render }#{tail})
           else
             conums_markup = conums.map {|conum| Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).render } * ' '
-            %(#{line}#{conums_markup})
+            %(#{line}#{conums_markup}#{tail})
           end
         else
           line

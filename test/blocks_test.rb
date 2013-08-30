@@ -1639,11 +1639,38 @@ exit 0 # <5><6>
 <5> Exit program
 <6> Reports success
       EOS
-      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
-      assert_match(/ <b>\(1\)<\/b>$/, output)
-      assert_match(/ <b>\(2\)<\/b>$/, output)
-      assert_match(/ <b>\(3\)<\/b> <b>\(4\)<\/b>$/, output)
-      assert_match(/ <b>\(5\)<\/b> <b>\(6\)<\/b><\/code>/, output)
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_match(/<span class="content">coderay<\/span>.* <b>\(1\)<\/b>$/, output)
+      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b>\(2\)<\/b>$/, output)
+      assert_match(/puts html * <b>\(3\)<\/b> <b>\(4\)<\/b>$/, output)
+      assert_match(/exit.* <b>\(5\)<\/b> <b>\(6\)<\/b><\/code>/, output)
+    end
+
+    test 'should restore callout marks to correct lines if source highlighter is coderay and table line numbering is enabled' do
+      input = <<-EOS
+:source-highlighter: coderay
+:coderay-linenums-mode: table
+
+[source, ruby, numbered]
+----
+require 'coderay' # <1>
+
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table) # <2>
+puts html # <3> <4>
+exit 0 # <5><6>
+----
+<1> Load library
+<2> Highlight source
+<3> Print to stdout
+<4> Redirect to a file to capture output
+<5> Exit program
+<6> Reports success
+      EOS
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_match(/<span class="content">coderay<\/span>.* <b>\(1\)<\/b>$/, output)
+      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b>\(2\)<\/b>$/, output)
+      assert_match(/puts html * <b>\(3\)<\/b> <b>\(4\)<\/b>$/, output)
+      assert_match(/exit.* <b>\(5\)<\/b> <b>\(6\)<\/b><\/pre>/, output)
     end
 
     test 'should link to CodeRay stylesheet if source-highlighter is coderay and linkcss is set' do
