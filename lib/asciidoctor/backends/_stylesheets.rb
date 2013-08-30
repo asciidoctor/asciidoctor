@@ -320,11 +320,12 @@ pre { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospa
 .listingblock:hover .javascript:before { content: "javascript"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
 .listingblock:hover .css:before { content: "css"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
 .listingblock:hover .scss:before { content: "scss"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
-table.highlighttable { border: 0; margin-bottom: 0; }
-table.highlighttable td.code, table.highlighttable td.linenos { vertical-align: top; padding-top: 0; padding-bottom: 0; }
-table.highlighttable td.code { padding-left: 1em; padding-right: 0; }
-table.highlighttable td.linenos { color: #999; padding-left: 0; padding-right: .75em; border-right: 1px solid #dddddd; }
-table.highlighttable td.code > pre { margin-bottom: -1.6em; }
+table.pyhltable { border: 0; margin-bottom: 0; }
+table.pyhltable td { vertical-align: top; padding-top: 0; padding-bottom: 0; }
+table.pyhltable td.code { padding-left: .75em; padding-right: 0; }
+.highlight.pygments .lineno, table.pyhltable td:not(.code) { color: #999; padding-left: 0; padding-right: .5em; border-right: 1px solid #dddddd; }
+.highlight.pygments .lineno { display: inline-block; margin-right: .25em; }
+table.pyhltable .linenodiv { background-color: transparent !important; padding-right: 0 !important; }
 .quoteblock { margin: 0 0 1.25em; padding: 0.5625em 1.25em 0 1.1875em; border-left: 1px solid #dddddd; }
 .quoteblock blockquote { margin: 0 0 1.25em 0; padding: 0 0 0.5625em 0; border: 0; }
 .quoteblock blockquote > .paragraph:last-child p { margin-bottom: 0; }
