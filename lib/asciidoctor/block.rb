@@ -78,7 +78,7 @@ class Block < AbstractBlock
   # Returns the a String containing the lines joined together or nil if there
   # are no lines
   def source
-    @lines.nil? ? nil : @lines.join
+    @lines.join
   end
 
   def to_s

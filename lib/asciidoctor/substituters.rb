@@ -104,10 +104,9 @@ module Substituters
     elsif @style == 'source' && @document.attributes['basebackend'] == 'html' &&
       ((highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
       highlighter == 'pygments') && attr?('language')
-      #sub_callouts(highlight_source(lines.join))
-      highlight_source(lines.join, highlighter, true)
+      highlight_source lines.join, highlighter, attr?('callouts', nil, false)
     else
-      apply_subs(lines.join, COMPOSITE_SUBS[:verbatim])
+      apply_subs lines.join, COMPOSITE_SUBS[:verbatim]
     end
   end
 
@@ -790,6 +789,8 @@ module Substituters
   #
   # returns The String with the callout references rendered using the backend templates
   def sub_callouts(text)
+    # FIXME need a cleaner way of marking a block as having callouts
+    return text unless attr? 'callouts', nil, false
     text.gsub(REGEXP[:callout_render]) {
       # alias match for Ruby 1.8.7 compat
       m = $~

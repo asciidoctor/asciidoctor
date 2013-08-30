@@ -808,8 +808,9 @@ class Lexer
       #end
 
       # FIXME callout capabilities should be a setting on the block
-      if block.context == :listing || block.context == :literal
-        catalog_callouts(block.source, document)
+      # FIXME we can disable this scan if subs does not include "callouts"
+      if block.context == :listing || (block.context == :literal && !block.option?('listparagraph'))
+        catalog_callouts(block, document)
       end
     end
 
@@ -1022,14 +1023,17 @@ class Lexer
   # document - The current document on which the callouts are stored
   #
   # Returns nothing
-  def self.catalog_callouts(text, document)
-    if text.include? '<'
+  def self.catalog_callouts(block, document)
+    if (text = block.source).include? '<'
+      found = false
       text.scan(REGEXP[:callout_quick_scan]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         next if m[0][0..0] == '\\'
         document.callouts.register(m[2])
+        found = true
       }
+      block.attributes['callouts'] = '' if found
     end
   end
 
@@ -2281,7 +2285,7 @@ class Lexer
   #
   #   puts attributes
   #   => {1 => "abstract#intro.lead", "style" => "abstract", "id" => "intro",
-  #         "role" => "lead", "options" => "fragment", "option-fragment" => ''}
+  #         "role" => "lead", "options" => ["fragment"], "fragment-option" => ''}
   #
   # Returns a two-element Array of the parsed style from the
   # first positional attribute and the original style that was
