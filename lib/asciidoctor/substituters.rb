@@ -980,10 +980,21 @@ module Substituters
       when 'pygments'
         lexer = ::Pygments::Lexer[attr('language')]
         if lexer
-          opts = {:nobackground => true, :classprefix => 'tok-'}
-          opts[:noclasses] = true if @document.attributes.fetch('pygments-css', 'style')
-          opts[:linenos] = true if attr? 'linenums'
-          result = lexer.highlight(source, :options => opts).sub(/<div class="highlight">(.*)<\/div>/m, '\1')
+          opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
+          opts[:noclasses] = true unless @document.attributes.fetch('pygments-css', 'class') == 'class'
+          if attr? 'linenums'
+            opts[:linenos] = (linenums_mode = @document.attributes.fetch('pygments-linenums-mode', 'table').to_sym).to_s
+          end
+
+          # FIXME stick these regexs into constants
+          if linenums_mode == :table
+            result = lexer.highlight(source, :options => opts).
+                sub(/<div class="pyhl">(.*)<\/div>/m, '\1').
+                gsub(/<pre[^>]*>(.*?)<\/pre>\s*/m, '\1')
+          else
+            result = lexer.highlight(source, :options => opts).
+                sub(/<div class="pyhl"><pre[^>]*>(.*?)<\/pre><\/div>/m, '\1')
+          end
         else
           result = source
         end

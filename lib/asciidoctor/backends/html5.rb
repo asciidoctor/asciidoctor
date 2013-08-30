@@ -80,7 +80,7 @@ when 'coderay'
     end
   end
 when 'pygments'
-  unless attr? 'pygments-css', 'style'
+  if (attr 'pygments-css', 'class') == 'class'
     if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
 <link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-pygments.css', (attr :stylesdir, '')) %>"><%
     else
@@ -431,6 +431,9 @@ class BlockListingTemplate < BaseTemplate
       case node.attr 'source-highlighter'
       when 'coderay'
         pre_class = nowrap ? ' class="CodeRay nowrap"' : ' class="CodeRay"'
+        code_class = language ? %( class="#{language_classes}") : nil
+      when 'pygments'
+        pre_class = nowrap ? ' class="pygments highlight nowrap"' : ' class="pygments highlight"'
         code_class = language ? %( class="#{language_classes}") : nil
       when 'highlightjs', 'highlight.js'
         pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
