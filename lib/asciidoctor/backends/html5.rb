@@ -1137,8 +1137,8 @@ class InlineImageTemplate < BaseTemplate
       if node.attr? 'flip'
         style_class = "#{style_class} icon-flip-#{node.attr 'flip'}"
       end
-      img = %(<i class="#{style_class}"></i>)
-      span = false
+      title_attribute = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : nil
+      img = %(<i class="#{style_class}"#{title_attribute}></i>)
     else
       if type == 'icon'
         resolved_target = node.icon_uri target
@@ -1155,14 +1155,13 @@ class InlineImageTemplate < BaseTemplate
       }.join
 
       img = %(<img src="#{resolved_target}"#{attrs}>)
-      span = true
     end
 
     if node.attr? 'link'
       img = %(<a class="image" href="#{node.attr 'link'}"#{(node.attr? 'window') ? " target=\"#{node.attr 'window'}\"" : nil}>#{img}</a>)
     end
 
-    span ? %(<span class="image#{node.role? ? " #{node.role}" : nil}">#{img}</span>) : img
+    %(<span class="#{type}#{node.role? ? " #{node.role}" : nil}">#{img}</span>)
   end
 
   def result(node)
