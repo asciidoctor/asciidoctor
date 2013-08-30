@@ -953,7 +953,9 @@ module Substituters
     Helpers.require_library highlighter, true
     callout_marks = {}
     lineno = 0
+    callout_on_last = false
     if sub_callouts
+      last = -1
       # extract callout marks, indexed by line number
       source = source.split(EOL).map {|line|
         lineno = lineno + 1
@@ -965,10 +967,12 @@ module Substituters
             m[0].sub('\\', '')
           else
             (callout_marks[lineno] ||= []) << m[3]
+            last = lineno
             nil
           end
         }
       } * EOL
+      callout_on_last = (last == lineno)
     end
 
     linenums_mode = nil
@@ -1017,7 +1021,7 @@ module Substituters
         lineno = lineno + 1
         if (conums = callout_marks.delete(lineno))
           tail = nil
-          if (pos = line.index '</pre>')
+          if callout_on_last && callout_marks.empty? && (pos = line.index '</pre>')
             tail = line[pos..-1]
             line = line[0...pos]
           end
