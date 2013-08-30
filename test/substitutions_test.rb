@@ -496,9 +496,19 @@ context 'Substitutions' do
       assert result.include?('image::tiger.png[]')
     end
 
-    test 'an icon macro should be interpreted as an icon' do
-      para = block_from_string('icon:github[]')
+    test 'an icon macro should be interpreted as an icon if icons are enabled' do
+      para = block_from_string 'icon:github[]', :attributes => {'icons' => ''}
       assert_equal %{<span class="icon"><img src="./images/icons/github.png" alt="github"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'an icon macro should be interpreted as alt text if icons are disabled' do
+      para = block_from_string 'icon:github[]'
+      assert_equal %{<span class="icon">[github]</span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'an icon macro should render alt text if icons are disabled and alt is given' do
+      para = block_from_string 'icon:github[alt="GitHub"]'
+      assert_equal %{<span class="icon">[GitHub]</span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'an icon macro should be interpreted as a font-based icon when icons=font' do

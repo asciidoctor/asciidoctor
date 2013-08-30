@@ -1139,6 +1139,8 @@ class InlineImageTemplate < BaseTemplate
       end
       title_attribute = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : nil
       img = %(<i class="#{style_class}"#{title_attribute}></i>)
+    elsif type == 'icon' && !(node.document.attr? 'icons')
+      img = "[#{node.attr 'alt'}]"
     else
       if type == 'icon'
         resolved_target = node.icon_uri target
