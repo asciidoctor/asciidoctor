@@ -192,6 +192,8 @@ module Asciidoctor
     '~~~'  => [:fenced_code, Set.new]
   }
 
+  DELIMITED_BLOCK_LEADERS = DELIMITED_BLOCKS.keys.map {|key| key[0..1] }.to_set
+
   BREAK_LINES = {
     '\'' => :ruler,
     '-'  => :ruler,
@@ -362,7 +364,7 @@ module Asciidoctor
     :comment          => %r{^//(?:[^/]|$)},
 
     # one,two;three;four
-    :ssv_or_csv_delim   => /,|;/,
+    :ssv_or_csv_delim => /,|;/,
 
     # one two	three
     :space_delim      => /([^\\])[[:blank:]]+/,
