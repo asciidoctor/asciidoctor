@@ -800,6 +800,7 @@ class Lexer
         document.register(:ids, [block.id, block.title])
       end
       block.update_attributes(attributes)
+      block.lock_in_subs
 
       #if document.attributes.has_key? :pending_attribute_entries
       #  document.attributes.delete(:pending_attribute_entries).each do |entry|
@@ -807,9 +808,11 @@ class Lexer
       #  end
       #end
 
-      # FIXME callout capabilities should be a setting on the block
-      if block.context == :listing || block.context == :literal
-        catalog_callouts(block.source, document)
+      if block.sub? :callouts
+        if !(catalog_callouts block.source, document)
+          # No need to look for callouts if they aren't there
+          block.remove_sub :callouts
+        end
       end
     end
 
@@ -1021,16 +1024,19 @@ class Lexer
   # text     - The String of text in which to look for callouts
   # document - The current document on which the callouts are stored
   #
-  # Returns nothing
+  # Returns A Boolean indicating whether callouts were found
   def self.catalog_callouts(text, document)
+    found = false
     if text.include? '<'
       text.scan(REGEXP[:callout_quick_scan]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         next if m[0][0..0] == '\\'
         document.callouts.register(m[2])
+        found = true
       }
     end
+    found
   end
 
   # Internal: Catalog any inline anchors found in the text, but don't process them
@@ -2281,7 +2287,7 @@ class Lexer
   #
   #   puts attributes
   #   => {1 => "abstract#intro.lead", "style" => "abstract", "id" => "intro",
-  #         "role" => "lead", "options" => "fragment", "option-fragment" => ''}
+  #         "role" => "lead", "options" => ["fragment"], "fragment-option" => ''}
   #
   # Returns a two-element Array of the parsed style from the
   # first positional attribute and the original style that was

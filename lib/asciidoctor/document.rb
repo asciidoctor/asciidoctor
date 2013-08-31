@@ -444,6 +444,10 @@ class Document < AbstractBlock
     @attributes['backend']
   end
 
+  def basebackend? base
+    @attributes['basebackend'] == base
+  end
+
   # The title explicitly defined in the document attributes
   def title
     @attributes['title']
@@ -664,12 +668,9 @@ class Document < AbstractBlock
     if value.match(REGEXP[:pass_macro_basic])
       # copy match for Ruby 1.8.7 compat
       m = $~
-      subs = []
       if !m[1].empty?
-        subs = resolve_subs(m[1])
-      end
-      if !subs.empty?
-        apply_subs(m[2], subs)
+        subs = resolve_pass_subs m[1]
+        subs.empty? ? m[2] : apply_subs(m[2], subs)
       else
         m[2]
       end

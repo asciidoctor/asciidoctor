@@ -123,8 +123,12 @@ class AbstractNode
 
   # TODO document me
   def set_option(name)
-    @attributes['options'] ||= []
-    @attributes['options'] << name
+    if @attributes.has_key? 'options'
+      @attributes['options'] = "#{@attributes['options']},#{name}"
+    else
+      @attributes['options'] = name
+    end
+    @attributes["#{name}-option"] = ''
   end
 
   # Public: A convenience method to check if the specified option attribute is
