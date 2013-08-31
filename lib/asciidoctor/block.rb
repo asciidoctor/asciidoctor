@@ -59,14 +59,10 @@ class Block < AbstractBlock
   #   => "<em>This</em> is what happens when you &lt;meet&gt; a stranger in the &lt;alps&gt;!"
   def content
     case @content_model
-    when :simple
-      apply_para_subs @lines
     when :compound
       super
-    when :verbatim
-      apply_literal_subs @lines
-    when :raw
-      apply_passthrough_subs @lines
+    when :simple, :verbatim, :raw
+      apply_subs @lines.join, @subs
     else
       warn "Unknown content model '#@content_model' for block: #{to_s}" unless @content_model == :empty
       nil

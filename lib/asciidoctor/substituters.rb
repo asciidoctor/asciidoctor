@@ -4,53 +4,68 @@ module Asciidoctor
 # the necessary substitutions.
 module Substituters
 
-  COMPOSITE_SUBS = {
-    :none => [],
-    :normal => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements],
-    :verbatim => [:specialcharacters, :callouts]
+  SUBS = {
+    :basic    => [:specialcharacters],
+    :normal   => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements],
+    :verbatim => [:specialcharacters, :callouts],
+    :title    => [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements],
+    :header   => [:specialcharacters, :attributes],
+    :pass     => [:attributes, :macros]
   }
 
-  SUB_OPTIONS = COMPOSITE_SUBS.keys + COMPOSITE_SUBS[:normal]
+  COMPOSITE_SUBS = {
+    :none => [],
+    :normal => SUBS[:normal],
+    :verbatim => SUBS[:verbatim]
+  }
+
+  SUB_OPTIONS = {
+    :block  => COMPOSITE_SUBS.keys + SUBS[:normal] + [:callouts],
+    :inline => COMPOSITE_SUBS.keys + SUBS[:normal]
+  }
 
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs
 
   # Public: Apply the specified substitutions to the lines of text
   #
-  # lines   - The lines of text to process. Can be a String or a String Array
-  # subs    - The substitutions to perform. Can be a Symbol or a Symbol Array (default: COMPOSITE_SUBS[:normal])
+  # source  - The String or String Array of text to process
+  # subs    - The substitutions to perform. Can be a Symbol or a Symbol Array (default: :normal)
+  # expand -  A Boolean to control whether sub aliases are expanded (default: true)
   #
   # returns Either a String or String Array, whichever matches the type of the first argument
-  def apply_subs(lines, subs = COMPOSITE_SUBS[:normal])
-    if subs.nil?
-      return lines
-    elsif subs.is_a? Symbol
-      subs = [subs]
-    end
-
-    if subs.empty?
-      return lines
-    else
-      effective_subs = []
-      subs.each do |key|
-        if COMPOSITE_SUBS.has_key? key
-          effective_subs.push(*COMPOSITE_SUBS[key])
-        else
-          effective_subs << key
+  def apply_subs source, subs = :normal, expand = false
+    if subs == :normal
+      subs = SUBS[:normal]
+    elsif subs.nil?
+      return source
+    elsif expand
+      if subs.is_a? Symbol
+        subs = COMPOSITE_SUBS[subs] || [subs]
+      else
+        effective_subs = []
+        subs.each do |key|
+          if COMPOSITE_SUBS.has_key? key
+            effective_subs.push(*COMPOSITE_SUBS[key])
+          else
+            effective_subs << key
+          end
         end
-      end
 
-      subs = effective_subs
+        subs = effective_subs
+      end
     end
 
-    multiline = lines.is_a?(Array)
-    text = multiline ? lines.join : lines
+    return source if subs.empty?
+
+    multiline = source.is_a?(Array)
+    text = multiline ? source.join : source
 
     if (has_passthroughs = subs.include?(:macros))
       text = extract_passthroughs(text)
     end
 
-    subs.each {|type|
+    subs.each do |type|
       case type
       when :specialcharacters
         text = sub_specialcharacters(text)
@@ -62,14 +77,16 @@ module Substituters
         text = sub_replacements(text)
       when :macros
         text = sub_macros(text)
+      when :highlight
+        text = highlight_source(text, subs.include?(:callouts))
       when :callouts
-        text = sub_callouts(text)
+        text = sub_callouts(text) unless subs.include?(:highlight)
       when :post_replacements
         text = sub_post_replacements(text)
       else
         warn "asciidoctor: WARNING: unknown substitution type #{type}"
       end
-    }
+    end
     text = restore_passthroughs(text) if has_passthroughs
 
     multiline ? text.lines.entries : text
@@ -81,7 +98,7 @@ module Substituters
   #
   # returns - A String with normal substitutions performed
   def apply_normal_subs(lines)
-    apply_subs(lines.is_a?(Array) ? lines.join : lines)
+    apply_subs lines.is_a?(Array) ? lines.join : lines
   end
 
   # Public: Apply substitutions for titles.
@@ -90,7 +107,30 @@ module Substituters
   #
   # returns - A String with title substitutions performed
   def apply_title_subs(title)
-    apply_subs(title, [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements])
+    apply_subs title, SUBS[:title]
+  end
+
+  # Public: Apply substitutions for header metadata and attribute assignments
+  #
+  # text    - String containing the text process
+  #
+  # returns - A String with header substitutions performed
+  def apply_header_subs(text)
+    apply_subs text, SUBS[:header]
+  end
+
+=begin
+  # Public: Apply explicit substitutions, if specified, otherwise normal substitutions.
+  #
+  # lines  - The lines of text to process. Can be a String or a String Array
+  #
+  # returns - A String with substitutions applied
+  def apply_para_subs(lines)
+    if (subs = attr('subs', nil, false))
+      apply_subs lines.join, resolve_subs(subs)
+    else
+      apply_subs lines.join
+    end
   end
 
   # Public: Apply substitutions for titles
@@ -100,35 +140,13 @@ module Substituters
   # returns - A String with literal (verbatim) substitutions performed
   def apply_literal_subs(lines)
     if (subs = attr('subs', nil, false))
-      apply_subs(lines.join, resolve_subs(subs))
+      apply_subs lines.join, resolve_subs(subs)
     elsif @style == 'source' && @document.attributes['basebackend'] == 'html' &&
       ((highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
       highlighter == 'pygments') && attr?('language')
-      highlight_source lines.join, highlighter, attr?('callouts', nil, false)
+      highlight_source lines.join, highlighter, callouts
     else
-      apply_subs lines.join, COMPOSITE_SUBS[:verbatim]
-    end
-  end
-
-  # Public: Apply substitutions for header metadata and attribute assignments
-  #
-  # text    - String containing the text process
-  #
-  # returns - A String with header substitutions performed
-  def apply_header_subs(text)
-    apply_subs(text, [:specialcharacters, :attributes])
-  end
-
-  # Public: Apply explicit substitutions, if specified, otherwise normal substitutions.
-  #
-  # lines  - The lines of text to process. Can be a String or a String Array
-  #
-  # returns - A String with substitutions applied
-  def apply_para_subs(lines)
-    if (subs = attr('subs', nil, false))
-      apply_subs(lines.join, resolve_subs(subs))
-    else
-      apply_subs(lines.join)
+      apply_subs lines.join, SUBS[:verbatim]
     end
   end
 
@@ -141,10 +159,11 @@ module Substituters
     if (subs = attr('subs', nil, false))
       subs = resolve_subs(subs)
     else
-      subs = [:attributes, :macros]
+      subs = SUBS[:pass]
     end
-    apply_subs(lines.join, subs)
+    apply_subs lines.join, subs
   end
+=end
 
   # Internal: Extract the passthrough text from the document for reinsertion after processing.
   #
@@ -164,10 +183,10 @@ module Substituters
 
       if m[1] == '$$'
         subs = [:specialcharacters]
-      elsif !m[3].nil? && !m[3].empty?
-        subs = resolve_subs(m[3])
-      else
+      elsif m[3].nil? || m[3].empty?
         subs = []
+      else
+        subs = resolve_pass_subs m[3]
       end
 
       # TODO move unescaping closing square bracket to an operation
@@ -789,8 +808,6 @@ module Substituters
   #
   # returns The String with the callout references rendered using the backend templates
   def sub_callouts(text)
-    # FIXME need a cleaner way of marking a block as having callouts
-    return text unless attr? 'callouts', nil, false
     text.gsub(REGEXP[:callout_render]) {
       # alias match for Ruby 1.8.7 compat
       m = $~
@@ -929,13 +946,34 @@ module Substituters
   # subs - A comma-delimited String of substitution aliases
   #
   # returns An Array of Symbols representing the substitution operation
-  def resolve_subs(subs)
-    candidates = subs.split(',').map {|sub| sub.strip.to_sym}
-    resolved = candidates & SUB_OPTIONS
+  def resolve_subs subs, type = :block, subject = nil
+    return [] if subs.nil? || subs.empty?
+    candidates = []
+    subs.split(',').each do |val|
+      key = val.strip.to_sym
+      # special case to disable callouts for inline subs
+      if key == :verbatim && type == :inline
+        candidates << :specialcharacters
+      elsif COMPOSITE_SUBS.has_key? key
+        candidates.push(*COMPOSITE_SUBS[key])
+      else
+        candidates << key
+      end
+    end
+    # weed out invalid options and remove duplicates (first wins)
+    resolved = candidates & SUB_OPTIONS[type]
     if (invalid = candidates - resolved).size > 0
-      warn "asciidoctor: WARNING: invalid passthrough macro substitution operation#{invalid.size > 1 ? 's' : ''}: #{invalid * ', '}"
+      warn "asciidoctor: WARNING: invalid substitution type#{invalid.size > 1 ? 's' : ''}#{subject ? ' for ' : nil}#{subject}: #{invalid * ', '}"
     end
     resolved
+  end
+
+  def resolve_block_subs subs, subject
+    resolve_subs subs, :block, subject
+  end
+
+  def resolve_pass_subs subs
+    resolve_subs subs, :inline, 'passthrough macro'
   end
 
   # Public: Highlight the source code if a source highlighter is defined
@@ -950,7 +988,8 @@ module Substituters
   #
   # returns the highlighted source code, if a source highlighter is defined
   # on the document, otherwise the unprocessed text
-  def highlight_source(source, highlighter, sub_callouts)
+  def highlight_source(source, sub_callouts, highlighter = nil)
+    highlighter ||= @document.attributes['source-highlighter']
     Helpers.require_library highlighter, true
     callout_marks = {}
     lineno = 0

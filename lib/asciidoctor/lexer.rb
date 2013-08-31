@@ -800,6 +800,7 @@ class Lexer
         document.register(:ids, [block.id, block.title])
       end
       block.update_attributes(attributes)
+      block.lock_in_subs
 
       #if document.attributes.has_key? :pending_attribute_entries
       #  document.attributes.delete(:pending_attribute_entries).each do |entry|
@@ -807,10 +808,11 @@ class Lexer
       #  end
       #end
 
-      # FIXME callout capabilities should be a setting on the block
-      # FIXME we can disable this scan if subs does not include "callouts"
-      if block.context == :listing || (block.context == :literal && !block.option?('listparagraph'))
-        catalog_callouts(block, document)
+      if block.sub? :callouts
+        if !(catalog_callouts block.source, document)
+          # No need to look for callouts if they aren't there
+          block.remove_sub :callouts
+        end
       end
     end
 
@@ -1022,10 +1024,10 @@ class Lexer
   # text     - The String of text in which to look for callouts
   # document - The current document on which the callouts are stored
   #
-  # Returns nothing
-  def self.catalog_callouts(block, document)
-    if (text = block.source).include? '<'
-      found = false
+  # Returns A Boolean indicating whether callouts were found
+  def self.catalog_callouts(text, document)
+    found = false
+    if text.include? '<'
       text.scan(REGEXP[:callout_quick_scan]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -1033,8 +1035,8 @@ class Lexer
         document.callouts.register(m[2])
         found = true
       }
-      block.attributes['callouts'] = '' if found
     end
+    found
   end
 
   # Internal: Catalog any inline anchors found in the text, but don't process them

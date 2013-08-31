@@ -1016,26 +1016,65 @@ foo&#8201;&#8212;&#8201;)
   context 'Post replacements' do
     test 'line break inserted after line with line break character' do
       para = block_from_string("First line +\nSecond line")
-      result = para.apply_subs(para.lines, :post_replacements)
+      result = para.apply_subs(para.lines, :post_replacements, true)
       assert_equal "First line<br>\n", result.first
     end
 
     test 'line break inserted after line wrap with hardbreaks enabled' do
       para = block_from_string("First line\nSecond line", :attributes => {'hardbreaks' => ''})
-      result = para.apply_subs(para.lines, :post_replacements)
+      result = para.apply_subs(para.lines, :post_replacements, true)
       assert_equal "First line<br>\n", result.first
     end
 
     test 'line break character stripped from end of line with hardbreaks enabled' do
       para = block_from_string("First line +\nSecond line", :attributes => {'hardbreaks' => ''})
-      result = para.apply_subs(para.lines, :post_replacements)
+      result = para.apply_subs(para.lines, :post_replacements, true)
       assert_equal "First line<br>\n", result.first
     end
 
     test 'line break not inserted for single line with hardbreaks enabled' do
       para = block_from_string("First line", :attributes => {'hardbreaks' => ''})
-      result = para.apply_subs(para.lines, :post_replacements)
+      result = para.apply_subs(para.lines, :post_replacements, true)
       assert_equal "First line", result.first
+    end
+  end
+
+  context 'Resolve subs' do
+    test 'should resolve subs for block' do
+      block = Asciidoctor::Block.new(empty_document, :paragraph)
+      block.attributes['subs'] = 'quotes,normal'
+      block.lock_in_subs
+      assert_equal [:quotes, :specialcharacters, :attributes, :replacements, :macros, :post_replacements], block.subs
+    end
+
+    test 'should resolve specialcharacters sub as highlight for source block when source highlighter is coderay' do
+      doc = empty_document :attributes => {'source-highlighter' => 'coderay'}
+      block = Asciidoctor::Block.new(doc, :listing, :content_model => :verbatim)
+      block.style = 'source'
+      block.attributes['subs'] = 'specialcharacters'
+      block.attributes['language'] = 'ruby'
+      block.lock_in_subs
+      assert_equal [:highlight], block.subs
+    end
+
+    test 'should resolve specialcharacters sub as highlight for source block when source highlighter is pygments' do
+      doc = empty_document :attributes => {'source-highlighter' => 'pygments'}
+      block = Asciidoctor::Block.new(doc, :listing, :content_model => :verbatim)
+      block.style = 'source'
+      block.attributes['subs'] = 'specialcharacters'
+      block.attributes['language'] = 'ruby'
+      block.lock_in_subs
+      assert_equal [:highlight], block.subs
+    end
+
+    test 'should not resolve specialcharacters sub as highlight for source block when source highlighter is not set' do
+      doc = empty_document
+      block = Asciidoctor::Block.new(doc, :listing, :content_model => :verbatim)
+      block.style = 'source'
+      block.attributes['subs'] = 'specialcharacters'
+      block.attributes['language'] = 'ruby'
+      block.lock_in_subs
+      assert_equal [:specialcharacters], block.subs
     end
   end
 end
