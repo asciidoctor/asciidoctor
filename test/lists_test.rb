@@ -3808,6 +3808,32 @@ Second line <2-->
     assert_xpath '//b', output, 0
   end
 
+  test 'should not recognize callouts in an indented labeled list paragraph' do
+    input = <<-EOS
+foo::
+  bar <1>
+
+<1> Not pointing to a callout
+    EOS
+    output = render_embedded_string input
+    assert_xpath '//dl//b', output, 0
+    assert_xpath '//dl/dd/p[text()="bar <1>"]', output, 1
+    assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
+  end
+
+  test 'should not recognize callouts in an indented outline list paragraph' do
+    input = <<-EOS
+* foo
+  bar <1>
+
+<1> Not pointing to a callout
+    EOS
+    output = render_embedded_string input
+    assert_xpath '//ul//b', output, 0
+    assert_xpath %(//ul/li/p[text()="foo\nbar <1>"]), output, 1
+    assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
+  end
+
   test 'should remove leading line comment chars' do
     input = <<-EOS
 ----

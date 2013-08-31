@@ -462,7 +462,31 @@ ____
       assert_css '.verseblock p', output, 0
       assert_css '.verseblock .literalblock', output, 0
     end
-    
+
+    test 'verse should only have specialcharacters subs' do
+      input = <<-EOS
+[verse]
+____
+A famous verse
+____
+      EOS
+
+      verse = block_from_string input
+      assert_equal [:specialcharacters], verse.subs
+    end
+
+    test 'should not recognize callouts in a verse' do
+      input = <<-EOS
+[verse]
+____
+La la la <1>
+____
+<1> Not pointing to a callout
+      EOS
+     
+      output = render_embedded_string input
+      assert_xpath '//pre[text()="La la la <1>"]', output, 1
+    end
   end
 
   context "Example Blocks" do
@@ -849,9 +873,24 @@ Map<String, String> *attributes*; //<1>
 ----
       EOS
 
-      output = render_embedded_string input
+      block = block_from_string input
+      assert_equal [:specialcharacters,:callouts,:quotes], block.subs
+      output = block.render
       assert output.include?('Map&lt;String, String&gt; <strong>attributes</strong>;')
-      assert output.include?('1')
+      assert_xpath '//pre/b[text()="(1)"]', output, 1
+    end
+
+    test 'should be able to disable callouts for literal block' do
+      input = <<-EOS
+[subs="specialcharacters"]
+----
+No callout here <1>
+----
+      EOS
+      block = block_from_string input
+      assert_equal [:specialcharacters], block.subs
+      output = block.render
+      assert_xpath '//pre/b[text()="(1)"]', output, 0
     end
 
     test 'listing block should honor explicit subs list' do

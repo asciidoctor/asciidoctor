@@ -1103,6 +1103,7 @@ class InlineAnchorTemplate < BaseTemplate
     when :xref
       refid = (node.attr 'refid') || target
       if text.nil?
+        # FIXME this seems like it should be prepared already
         text = document.references[:ids].fetch(refid, "[#{refid}]") if text.nil?
       end
       %(<a href="#{target}">#{text}</a>)

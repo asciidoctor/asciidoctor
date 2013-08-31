@@ -62,7 +62,7 @@ class ListItem < AbstractBlock
     if !(first_block = @blocks.first).nil? && first_block.is_a?(Block) &&
         ((first_block.context == :paragraph && !continuation_connects_first_block) ||
         ((content_adjacent || !continuation_connects_first_block) && first_block.context == :literal &&
-            first_block.attr('options', [], false).include?('listparagraph')))
+            first_block.option?('listparagraph')))
 
       block = blocks.shift
       unless @text.to_s.empty?

@@ -3,6 +3,9 @@ class AbstractBlock < AbstractNode
   # Public: The types of content that this block can accomodate
   attr_accessor :content_model
 
+  # Public: Substitutions to be applied to content in this block
+  attr_reader :subs
+
   # Public: Get/Set the String name of the render template
   attr_accessor :template_name
 
@@ -24,6 +27,7 @@ class AbstractBlock < AbstractNode
   def initialize(parent, context)
     super(parent, context)
     @content_model = :compound
+    @subs = []
     @template_name = "block_#{context}"
     @blocks = []
     @id = nil
@@ -54,6 +58,17 @@ class AbstractBlock < AbstractNode
   # children appropriate to content model that this block supports.
   def content
     @blocks.map {|b| b.render } * EOL
+  end
+
+  # Public: A convenience method that checks whether the specified
+  # substitution is enabled for this block.
+  #
+  # name - The Symbol substitution name
+  #
+  # Returns A Boolean indicating whether the specified substitution is
+  # enabled for this block
+  def sub? name
+    @subs.include? name
   end
 
   # Public: A convenience method that indicates whether the title instance
@@ -152,6 +167,55 @@ class AbstractBlock < AbstractNode
       collector << block if block.is_a?(Section)
       collector
     }
+  end
+
+  # Internal: Lock-in the substitutions for this block
+  #
+  # Looks for an attribute named "subs". If present, resolves the
+  # substitutions and assigns it to the subs property on this block.
+  # Otherwise, assigns a set of default substitutions based on the
+  # content model of the block.
+  #
+  # Returns nothing
+  def lock_in_subs
+    default_subs = []
+    case @content_model
+    when :simple
+      default_subs = SUBS[:normal]
+    when :verbatim
+      if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
+        default_subs = SUBS[:verbatim]
+      else
+        default_subs = SUBS[:basic]
+      end
+    when :raw
+      default_subs = SUBS[:pass]
+    else
+      return
+    end
+
+    if (custom_subs = @attributes['subs'])
+      @subs = resolve_block_subs custom_subs, @context
+    else
+      @subs = default_subs.dup
+    end
+
+    # QUESION delegate this logic to method?
+    if @context == :listing && @style == 'source' && (@document.basebackend? 'html') &&
+      ((highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
+      highlighter == 'pygments') && (attr? 'language')
+      @subs = @subs.map {|sub| sub == :specialcharacters ? :highlight : sub }
+    end
+  end
+
+  # Public: Remove a substitution from this block
+  #
+  # sub  - The Symbol substitution name
+  #
+  # Returns nothing
+  def remove_sub sub
+    @subs.delete sub
+    nil
   end
 
   # Public: Generate a caption and assign it to this block if one
