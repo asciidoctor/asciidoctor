@@ -728,9 +728,12 @@ class Lexer
         when :listing, :fenced_code, :source
           if block_context == :fenced_code
             style = attributes['style'] = 'source'
-            lang = this_line[3..-1].strip
-            attributes['language'] = lang unless lang.empty?
-            terminator = terminator[0..2] if terminator.length > 3
+            language, linenums = this_line[3...-1].split(',', 2)
+            if language && !(language = language.strip).empty?
+              attributes['language'] = language
+              attributes['linenums'] = '' if linenums && !linenums.strip.empty?
+            end
+            terminator = terminator[0..2]
           elsif block_context == :source
             AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
           end
@@ -822,48 +825,68 @@ class Lexer
   # Public: Determines whether this line is the start of any of the delimited blocks
   #
   # returns the match data if this line is the first line of a delimited block or nil if not
-  def self.is_delimited_block?(line, return_match_data = false)
-    line_len = line.length
-    # optimized for best performance
-    if line_len > 2
-      if line_len == 3
-        tip = line.chop
-        tl = 2
+  def self.is_delimited_block? line, return_match_data = false
+    # highly optimized for best performance
+    line_len = line.length - 1
+    return nil unless line_len > 1 && DELIMITED_BLOCK_LEADERS.include?(line[0..1])
+    line = line.chomp
+    # counts endline character in line length
+    if line_len == 2
+      tip = line
+      tl = 2
+    elsif line_len < 3
+      return nil
+    else
+      if line_len < 5
+        tip = line
+        tl = line_len
       else
         tip = line[0..3]
         tl = 4
-
-        if Compliance.markdown_syntax
-          # special case for fenced code blocks
-          tip_alt = tip.chop
-          if tip_alt == '```' || tip_alt == '~~~'
-            tip = tip_alt
-            tl = 3
-          end
-        end
       end
 
-      if DELIMITED_BLOCKS.has_key? tip
-        # if tip is the full line
-        if tl == line_len - 1
-          #return_match_data ? BlockMatchData.new(DELIMITED_BLOCKS[tip], tip, tip) : true
-          if return_match_data
-            context, masq = *DELIMITED_BLOCKS[tip]
-            BlockMatchData.new(context, masq, tip, tip)
-          else
-            true
+      # special case for fenced code blocks
+      if Compliance.markdown_syntax
+        tip_alt = tip.chop if tl == 4
+        if tip_alt == '```'
+          if tip.end_with? '`'
+            return nil
           end
-        elsif match = line.match(REGEXP[:any_blk])
-          #return_match_data ? BlockMatchData.new(DELIMITED_BLOCKS[tip], tip, match[0]) : true
-          if return_match_data
-            context, masq = *DELIMITED_BLOCKS[tip]
-            BlockMatchData.new(context, masq, tip, match[0])
-          else
-            true
+          tip = tip_alt
+          tl = 3
+        elsif tip_alt == '~~~'
+          if tip.end_with? '~'
+            return nil
           end
-        else
-          nil
+          tip = tip_alt
+          tl = 3
         end
+      end
+    end
+
+    if DELIMITED_BLOCKS.has_key? tip
+      # tip is the full line when delimiter is minimum length
+      if tl == 3 || tl == line_len
+        if return_match_data
+          context, masq = *DELIMITED_BLOCKS[tip]
+          BlockMatchData.new(context, masq, tip, tip)
+        else
+          true
+        end
+      elsif %(#{tip}#{tip[-1..-1] * (line_len - tl)}) == line
+        if return_match_data
+          context, masq = *DELIMITED_BLOCKS[tip]
+          BlockMatchData.new(context, masq, tip, line)
+        else
+          true
+        end
+      #elsif match = line.match(REGEXP[:any_blk])
+      #  if return_match_data
+      #    context, masq = *DELIMITED_BLOCKS[tip]
+      #    BlockMatchData.new(context, masq, tip, match[0])
+      #  else
+      #    true
+      #  end
       else
         nil
       end
