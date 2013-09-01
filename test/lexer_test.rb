@@ -271,6 +271,16 @@ context "Lexer" do
     assert_nil attributes[1]
   end
 
+  test 'parse style attribute with option should preserve existing options' do
+    attributes = {1 => '%header', 'options' => 'footer', 'footer-option' => ''}
+    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    assert_nil style
+    assert_nil original_style
+    assert_equal 'header,footer', attributes['options']
+    assert_equal '', attributes['header-option']
+    assert_equal '', attributes['footer-option']
+  end
+
   test "parse author first" do
     metadata, = parse_header_metadata 'Stuart'
     assert_equal 5, metadata.size
