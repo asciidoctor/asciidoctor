@@ -1154,6 +1154,7 @@ class Lexer
       list_item = ListItem.new(list_block, text)
 
       if checkbox
+        # FIXME checklist never makes it into the options attribute
         list_block.attributes['checklist-option'] = ''
         list_item.attributes['checkbox'] = ''
         list_item.attributes['checked'] = '' if checked
@@ -2103,8 +2104,7 @@ class Lexer
       if skipped == 0 && loop_idx.zero? && !attributes.has_key?('options') &&
           !(next_line = table_reader.peek_line).nil? && next_line == ::Asciidoctor::EOL
         table.has_header_option = true
-        attributes['options'] = 'header'
-        attributes['header-option'] = ''
+        table.set_option 'header'
       end
 
       if parser_ctx.format == 'psv'
@@ -2389,7 +2389,11 @@ class Lexer
           (options = parsed[:option]).each do |option|
             attributes["#{option}-option"] = ''
           end
-          attributes['options'] = options * ','
+          if (existing_opts = attributes['options'])
+            attributes['options'] = (options + existing_opts.split(',')) * ',' 
+          else
+            attributes['options'] = options * ','
+          end
         end
       end
 
