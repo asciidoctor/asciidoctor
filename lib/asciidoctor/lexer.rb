@@ -1054,8 +1054,10 @@ class Lexer
       text.scan(REGEXP[:callout_quick_scan]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
-        next if m[0][0..0] == '\\'
-        document.callouts.register(m[2])
+        if m[0][0..0] != '\\'
+          document.callouts.register(m[2])
+        end
+        # we have to mark as found even if it's escaped so it can be unescaped
         found = true
       }
     end
