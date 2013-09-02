@@ -456,7 +456,7 @@ class BlockListingTemplate < BaseTemplate
 
     %(<div#{node.id && " id=\"#{node.id}\""} class="listingblock#{node.role && " #{node.role}"}">#{node.title? ? "
 <div class=\"title\">#{node.captioned_title}</div>" : nil}
-<div class="content monospaced">
+<div class="content">
 #{pre}
 </div>
 </div>)
@@ -472,7 +472,7 @@ class BlockLiteralTemplate < BaseTemplate
     nowrap = (!node.document.attr? 'prewrap') || (node.option? 'nowrap')
     %(<div#{node.id && " id=\"#{node.id}\""} class="literalblock#{node.role && " #{node.role}"}">#{node.title? ? "
 <div class=\"title\">#{node.title}</div>" : nil}
-<div class="content monospaced">
+<div class="content">
 <pre#{nowrap ? ' class="nowrap"' : nil}>#{preserve_endlines(node.content, node)}</pre>
 </div>
 </div>)
@@ -833,7 +833,7 @@ if (attr :rowcount) >= 0 %>
           when :verse
             cell_content = %(<div class="verse">\#{template.preserve_endlines(cell.text, self)}</div>)
           when :literal
-            cell_content = %(<div class="literal monospaced"><pre>\#{template.preserve_endlines(cell.text, self)}</pre></div>)
+            cell_content = %(<div class="literal"><pre>\#{template.preserve_endlines(cell.text, self)}</pre></div>)
           when :header
             cell.content.each do |text|
               cell_content = %(\#{cell_content}<p class="tableblock header">\#{text}</p>)
