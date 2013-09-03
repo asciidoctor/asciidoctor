@@ -76,12 +76,18 @@ class InlineButtonTemplate < DocBook45::InlineButtonTemplate; end
 class InlineKbdTemplate < DocBook45::InlineKbdTemplate; end
 class InlineMenuTemplate < DocBook45::InlineMenuTemplate; end
 class InlineAnchorTemplate < DocBook45::InlineAnchorTemplate
-  def anchor(target, text, type)
+  def anchor(target, text, type, node)
     case type
     when :ref
       %(<anchor#{common_attrs target, nil, text}/>)
     when :xref
-      text.nil? ? %(<xref linkend="#{target}"/>) : %(<link linkend="#{target}">#{text}</link>)
+      if node.attr? 'path', nil
+        linkend = (node.attr 'fragment') || target
+        text.nil? ? %(<xref linkend="#{linkend}"/>) : %(<link linkend="#{linkend}">#{text}</link>)
+      else
+        text = text || (node.attr 'path')
+        %(<link xlink:href="#{target}">#{text}</link>)
+      end
     when :link
       %(<link xlink:href="#{target}">#{text}</link>)
     when :bibref

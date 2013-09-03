@@ -696,7 +696,8 @@ class InlineAnchorTemplate < BaseTemplate
         linkend = (node.attr 'fragment') || target
         text.nil? ? %(<xref linkend="#{linkend}"/>) : %(<link linkend="#{linkend}">#{text}</link>)
       else
-        %(<ulink url="#{target}">#{text || path}</ulink>)
+        text = text || (node.attr 'path')
+        %(<ulink url="#{target}">#{text}</ulink>)
       end
     when :link
       %(<ulink url="#{target}">#{text}</ulink>)
