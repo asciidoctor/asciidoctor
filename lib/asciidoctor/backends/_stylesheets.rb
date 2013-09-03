@@ -320,14 +320,19 @@ pre { color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospa
 @media only screen { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.8em; } }
 @media only screen and (min-width: 768px) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 0.9em; } }
 @media only screen and (min-width: 1280px) { .literalblock > .content > pre, .listingblock > .content > pre { font-size: 1em; } }
-.listingblock:hover .xml:before { content: "xml"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
-.listingblock:hover .html:before { content: "html"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
-.listingblock:hover .ruby:before { content: "ruby"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
-.listingblock:hover .asciidoc:before { content: "asciidoc"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
-.listingblock:hover .java:before { content: "java"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
-.listingblock:hover .javascript:before { content: "javascript"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
-.listingblock:hover .css:before { content: "css"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
-.listingblock:hover .scss:before { content: "scss"; text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
+.listingblock:hover code[class*=" language-"]:before { text-transform: uppercase; float: right; font-size: 0.9em; color: #999; }
+.listingblock:hover code.asciidoc:before { content: "asciidoc"; }
+.listingblock:hover code.clojure:before { content: "clojure"; }
+.listingblock:hover code.css:before { content: "css"; }
+.listingblock:hover code.groovy:before { content: "groovy"; }
+.listingblock:hover code.html:before { content: "html"; }
+.listingblock:hover code.java:before { content: "java"; }
+.listingblock:hover code.javascript:before { content: "javascript"; }
+.listingblock:hover code.python:before { content: "python"; }
+.listingblock:hover code.ruby:before { content: "ruby"; }
+.listingblock:hover code.scss:before { content: "scss"; }
+.listingblock:hover code.xml:before { content: "xml"; }
+.listingblock:hover code.yaml:before { content: "yaml"; }
 table.pyhltable { border: 0; margin-bottom: 0; }
 table.pyhltable td { vertical-align: top; padding-top: 0; padding-bottom: 0; }
 table.pyhltable td.code { padding-left: .75em; padding-right: 0; }
