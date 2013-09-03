@@ -96,6 +96,14 @@ span.line-numbers { border-right: 1px solid #E5E5E5; color: #999; display: inlin
 DEFAULT_CODERAY_STYLESHEET
   end
 
+  # Internal: Generate the default stylesheet for Pygments
+  #
+  # returns the default Pygments stylesheet as a String
+  def self.pygments_stylesheet(style = nil)
+    ::Asciidoctor::Helpers.require_library 'pygments', 'pygments.rb'
+    ::Pygments.css '.highlight', :classprefix => 'tok-', :style => (style || 'pastie')
+  end
+
   # Internal: Generate the default stylesheet for Asciidoctor
   #
   # returns the default Asciidoctor stylesheet as a String

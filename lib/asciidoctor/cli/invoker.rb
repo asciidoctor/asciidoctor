@@ -67,10 +67,12 @@ module Asciidoctor
             tofile = (@out || $stdout)
           elsif !outfile.nil?
             tofile = outfile
+            opts[:mkdirs] = true
           else
             tofile = nil
             # automatically calculate outfile based on infile
             opts[:in_place] = true unless opts.has_key? :to_dir
+            opts[:mkdirs] = true
           end
 
           original_opts = opts

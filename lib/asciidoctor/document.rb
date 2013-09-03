@@ -172,6 +172,7 @@ class Document < AbstractBlock
     @attributes['notitle'] = '' unless @options[:header_footer]
     @attributes['toc-placement'] = 'auto'
     @attributes['stylesheet'] = ''
+    @attributes['copycss'] = '' if @options[:header_footer]
     @attributes['prewrap'] = ''
     @attributes['attribute-undefined'] = COMPLIANCE[:attribute_undefined]
     @attributes['attribute-missing'] = COMPLIANCE[:attribute_missing]

@@ -83,10 +83,9 @@ when 'pygments'
   if (attr 'pygments-css', 'class') == 'class'
     if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
 <link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-pygments.css', (attr :stylesdir, '')) %>"><%
-    else
-      Helpers.require_library 'pygments', 'pygments.rb' %>
+    else %>
 <style>
-<%= Pygments.css '.highlight', :classprefix => 'tok-', :style => (attr 'pygments-style', 'pastie') %>
+<%= HTML5.pygments_stylesheet(attr 'pygments-style') %>
 </style><%
     end
   end

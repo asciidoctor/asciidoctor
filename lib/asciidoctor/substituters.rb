@@ -813,6 +813,7 @@ module Substituters
       m = $~
       # honor the escape
       if m[1] == '\\'
+        # we have to do a sub since we aren't sure it's the first char
         next m[0].sub('\\', '')
       end
       Inline.new(self, :callout, m[3], :id => @document.callouts.read_next_id).render
@@ -990,7 +991,7 @@ module Substituters
   # on the document, otherwise the unprocessed text
   def highlight_source(source, sub_callouts, highlighter = nil)
     highlighter ||= @document.attributes['source-highlighter']
-    Helpers.require_library highlighter, true
+    Helpers.require_library highlighter, (highlighter == 'pygments' ? 'pygments.rb' : highlighter)
     callout_marks = {}
     lineno = 0
     callout_on_last = false
