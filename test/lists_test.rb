@@ -3762,21 +3762,22 @@ puts "The syntax <1> at the end of the line makes a code callout"
 [source, ruby]
 ----
 require 'asciidoctor' <1>
-doc = Asciidoctor.load('Hello, World!') # <2> <3>
-puts doc.render <4><5>
+doc = Asciidoctor.load('Hello, World!') # <2> <3> <4>
+puts doc.render <5><6>
 exit 0
 ----
 <1> Require library
 <2> Load document from String
 <3> Uses default backend and doctype
-<4> Renders document to String
-<5> Prints output to stdout
+<4> One more for good luck
+<5> Renders document to String
+<6> Prints output to stdout
     EOS
     output = render_embedded_string input
-    assert_xpath '//code/b', output, 5
+    assert_xpath '//code/b', output, 6
     assert_match(/ <b>\(1\)<\/b>$/, output)
-    assert_match(/ <b>\(2\)<\/b> <b>\(3\)<\/b>$/, output)
-    assert_match(/ <b>\(4\)<\/b><b>\(5\)<\/b>$/, output)
+    assert_match(/ <b>\(2\)<\/b> <b>\(3\)<\/b> <b>\(4\)<\/b>$/, output)
+    assert_match(/ <b>\(5\)<\/b><b>\(6\)<\/b>$/, output)
   end
 
   test 'should allow XML comment-style callouts' do
