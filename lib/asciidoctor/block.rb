@@ -29,6 +29,7 @@ class Block < AbstractBlock
     super(parent, context)
     @content_model = opts.fetch(:content_model, nil) || :simple
     @attributes = opts.fetch(:attributes, nil) || {}
+    @subs = opts[:subs] if opts.has_key? :subs
     raw_source = opts.fetch(:source, nil) || nil
     if raw_source.nil?
       @lines = []
