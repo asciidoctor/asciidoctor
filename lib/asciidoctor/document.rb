@@ -109,7 +109,8 @@ class Document < AbstractBlock
       @parent_document = options.delete(:parent)
       options[:base_dir] ||= @parent_document.base_dir
       # QUESTION should we support setting attribute in parent document from nested document?
-      @attribute_overrides = @parent_document.attributes
+      # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
+      @attribute_overrides = @parent_document.attributes.dup
       @safe = @parent_document.safe
       @renderer = @parent_document.renderer
       initialize_extensions = false
