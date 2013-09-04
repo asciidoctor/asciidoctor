@@ -366,7 +366,7 @@ dl dd:last-child, dl dd:last-child > :last-child { margin-bottom: 0; }
 ol > li p, ul > li p, ul dd, ol dd, .olist .olist, .ulist .olist, .olist .ulist { margin-bottom: 0.625em; }
 ul.unstyled, ol.unnumbered, ul.checklist { list-style-type: none; margin-left: 0.625em; }
 ul.checklist li > p:first-child > i[class^="icon-check"]:first-child, ul.checklist li > p:first-child > input[type="checkbox"]:first-child { margin-right: 0.25em; }
-ul.checklist li > p:first-child > input[type="checkbox"]:first-child { position: relative; top: 2px; }
+ul.checklist li > p:first-child > input[type="checkbox"]:first-child { position: relative; top: 1px; }
 ul.none { list-style-type: none; }
 ol.arabic { list-style-type: decimal; }
 ol.decimal { list-style-type: decimal-leading-zero; }
@@ -441,7 +441,7 @@ div.unbreakable { page-break-inside: avoid; }
 .white-background { background-color: #fafafa; }
 .yellow { color: #bfbf00; }
 .yellow-background { background-color: #fafa00; }
-[class^="icon-"], [class*=" icon-"] { cursor: default; }
+span.icon > [class^="icon-"], span.icon > [class*=" icon-"] { cursor: default; }
 .admonitionblock td.icon [class^="icon-"]:before { font-size: 2.5em; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); cursor: default; }
 .admonitionblock td.icon .icon-note:before { content: "\f05a"; color: #005498; color: #003f72; }
 .admonitionblock td.icon .icon-tip:before { content: "\f0eb"; text-shadow: 1px 1px 2px rgba(155, 155, 0, 0.8); color: #111; }
