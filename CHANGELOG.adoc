@@ -21,7 +21,7 @@ Enhancements::
   * added support for checklists in unordered list (#200)
   * added DocBook 5 backend (#411)
   * added docinfo option for footer (#486)
-  * added pygments as source highlighter option (#538)
+  * added Pygments as source highlighter option (pygments) (#538)
   * added icon inline macro (#529)
   * recognize implicit table header row (#387)
   * uri can be used in inline image (#470)
@@ -37,12 +37,14 @@ Enhancements::
   * sanitize contents of HTML title element in html5 backend (#504)
   * support toc position for toc2 (#467)
   * cli accepts multiple files as input (@lordofthejars) (#227)
-  * added Markdown-style horizontal rules (w/ restriction) (#455)
+  * added Markdown-style horizontal rules and pass Markdown tests (#455)
+  * added float clearing classes (.clearfix, .float-group) (#602)
+  * don't disable syntax highlighting when explicit subs is used on listing block
   * asciidoctor package now available in Debian Sid and Ubuntu Saucy (@avtobiff) (#216)
 
 Compliance::
 
-  * embed CSS by default, copycss when linkcss is set (#428)
+  * embed CSS by default, copy stylesheet when linkcss is set unless copycss! is set (#428)
   * refactor reader to track include stack (#572)
   * made include directive resolve relative to current file (#572)
   * track include stack to enforce maximum depth (#581)
@@ -67,23 +69,28 @@ Compliance::
   * added new XML-based callouts to AsciiDoc compatibility file
   * added absolute and uri image target matching to AsciiDoc compatibility file
   * removed linkcss in AsciiDoc compatibility file
+  * fixed fenced code entry in compatibility file
 
 Bug Fixes::
 
   * lowercase attribute names passed to API (#508)
   * numbered can still be toggled even when enabled in API (#393)
   * allow JRuby Map as attributes (#396)
-  * handle callout marks properly when using CodeRay (#534)
+  * don't attempt to highlight callouts when using CodeRay and Pygments (#534)
   * correctly calculate line length in Ruby 1.8 (#167)
   * write to specified outfile even when input is stdin (#500)
   * only split quote attribution on first comma in Markdown blockquotes (#389)
   * don't attempt to print render times when doc is not rendered
+  * don't recognize line with four backticks as a fenced code block (#611)
 
 Improvements::
 
   * upgraded Font Awesome to 3.2.1 (#451)
   * improved the built-in CodeRay theme to match Asciidoctor styles
   * link to CodeRay stylesheet if linkcss is set (#381)
+  * style the video block (title & margin) (#590)
+  * added Groovy, Clojure, Python and YAML to floating language hint 
+  * only process callouts for blocks in which callouts are found
   * added content_model to AbstractBlock, rename buffer to lines
   * use Untitled as document title in rendered output if document has no title
   * rename include-depth attribute to max-include-depth, set 64 as default value (#591)
@@ -113,6 +120,8 @@ Improvements::
   * removed dependency on pending library, lock Nokogiri version to 1.5.10
   * removed require rubygems line in asciidoctor.rb, add to cli if RUBY_VERSION < 1.9
   * added tests for custom backends
+  * added test that shorthand doesn't clobber explicit options (#481)
+  * removed unnecessary monospace class from literal and listing blocks
 
 Distribution Packages::
 
