@@ -365,6 +365,8 @@ dl dd:last-child, dl dd:last-child > :last-child { margin-bottom: 0; }
 .unstyled dl dt { font-weight: normal; font-style: normal; }
 ol > li p, ul > li p, ul dd, ol dd, .olist .olist, .ulist .olist, .olist .ulist { margin-bottom: 0.625em; }
 ul.unstyled, ol.unnumbered, ul.checklist { list-style-type: none; margin-left: 0.625em; }
+ul.checklist li > p:first-child > i[class^="icon-check"]:first-child, ul.checklist li > p:first-child > input[type="checkbox"]:first-child { margin-right: 0.25em; }
+ul.checklist li > p:first-child > input[type="checkbox"]:first-child { position: relative; top: 2px; }
 ul.none { list-style-type: none; }
 ol.arabic { list-style-type: decimal; }
 ol.decimal { list-style-type: decimal-leading-zero; }
