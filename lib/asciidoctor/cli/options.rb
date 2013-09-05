@@ -48,8 +48,8 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-b', '--backend BACKEND', 'set output format backend (default: html5)') do |backend|
             self[:attributes]['backend'] = backend
           end
-          opts.on('-d', '--doctype DOCTYPE', ['article', 'book', 'inline'],
-                  'document type to use when rendering output: [article, book, inline] (default: article)') do |doc_type|
+          opts.on('-d', '--doctype DOCTYPE', ['article', 'book', 'manpage', 'inline'],
+                  'document type to use when rendering output: [article, book, manpage, inline] (default: article)') do |doc_type|
             self[:attributes]['doctype'] = doc_type
           end
           opts.on('-o', '--out-file FILE', 'output file (default: based on input file path); use - to output to STDOUT') do |output_file|

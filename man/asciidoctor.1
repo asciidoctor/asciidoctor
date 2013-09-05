@@ -1,25 +1,23 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen
-.\" Generator: Asciidoctor 0.1.4.preview.3
-.\"      Date: 2013-07-07
+.\" Generator: Asciidoctor 0.1.4
+.\"      Date: 2013-09-05
 .\"    Manual: Asciidoctor Manual
-.\"    Source: Asciidoctor 0.1.3
+.\"    Source: Asciidoctor 0.1.4
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2013-07-07" "Asciidoctor 0.1.3" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2013-09-05" "Asciidoctor 0\&.1\&.4" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .nh
 .ad l
-.SH "NAME"
-asciidoctor \- converts AsciiDoc source files to HTML, DocBook and other formats
 .SH "SYNOPSIS"
 .sp
 \fBasciidoctor\fR [\fIOPTION\fR]\&... \fIFILE\fR\&...
 .SH "DESCRIPTION"
 .sp
-The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fR to HTML 5, DocBook 4\&.5 and other output formats\&.
+The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fR to HTML 5, DocBook 4\&.5, DocBook 5\&.0 and other custom output formats\&.
 .sp
 If \fIFILE\fR is \fI\-\fR then the AsciiDoc source is read from standard input\&.
 .SH "OPTIONS"
@@ -52,12 +50,12 @@ This option may be specified more than once\&.
 .PP
 \fB\-b, \-\-backend\fR=\fIBACKEND\fR
 .RS 4
-Backend output file format: \fIdocbook45\fR or \fIhtml5\fR supported out of the box\&. You can also use the backend alias names \fIhtml\fR (aliased to \fIhtml5\fR) or \fIdocbook\fR (aliased to \fIdocbook45\fR)\&. Defaults to \fIhtml5\fR\&. Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during rendering\&.
+Backend output file format: \fIhtml5\fR, \fIdocbook45\fR and \fIdocbook5\fR supported out of the box\&. You can also use the backend alias names \fIhtml\fR (aliased to \fIhtml5\fR) or \fIdocbook\fR (aliased to \fIdocbook45\fR)\&. Defaults to \fIhtml5\fR\&. Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during rendering\&.
 .RE
 .PP
 \fB\-d, \-\-doctype\fR=\fIDOCTYPE\fR
 .RS 4
-Document type: \fIarticle\fR, \fIbook\fR or \fIinline\fR\&. Sets the root element when using the \fIdocbook\fR backend and the style class on the HTML body element when using the \fIhtml\fR backend\&. The \fIbook\fR document type allows multiple level\-0 section titles in a single document\&. The \fIinline\fR document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element\&. Defaults to \fIarticle\fR\&.
+Document type: \fIarticle\fR, \fIbook\fR, \fImanpage\fR or \fIinline\fR\&. Sets the root element when using the \fIdocbook\fR backend and the style class on the HTML body element when using the \fIhtml\fR backend\&. The \fIbook\fR document type allows multiple level\-0 section titles in a single document\&. The \fImanpage\fR document type enables parsing of metadata necessary to produce a manpage\&. The \fIinline\fR document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element\&. Defaults to \fIarticle\fR\&.
 .RE
 .SS "Rendering Control"
 .PP
