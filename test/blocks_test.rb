@@ -1658,7 +1658,7 @@ alert("Hello, World!")
       assert_css '.listingblock pre code.javascript', output, 1
     end
 
-    test 'wip should support fenced code blocks with languages and numbering' do
+    test 'should support fenced code blocks with languages and numbering' do
       input = <<-EOS
 ```ruby,numbered
 puts "Hello, World!"
