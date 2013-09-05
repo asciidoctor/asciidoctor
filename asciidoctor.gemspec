@@ -10,9 +10,9 @@ Gem::Specification.new do |s|
   s.date              = '2013-09-05'
   s.rubyforge_project = 'asciidoctor'
 
-  s.summary     = 'A native Ruby AsciiDoc syntax processor and publishing toolchain'
+  s.summary     = 'An implementation of the AsciiDoc text processor and publishing toolchain in Ruby'
   s.description = <<-EOS
-An open source text processor and publishing toolchain written in Ruby for converting AsciiDoc markup into HTML 5, DocBook 4.5, DocBook 5 and custom formats.
+A fast, open source text processor and publishing toolchain, written in Ruby, for transforming AsciiDoc markup into HTML 5, DocBook 4.5, DocBook 5.0 and custom outupt formats.
 EOS
   s.license     = 'MIT'
   s.authors  = ['Dan Allen', 'Ryan Waldron', 'Jeremy McAnally', 'Jason Porter', 'Nick Hengeveld']
