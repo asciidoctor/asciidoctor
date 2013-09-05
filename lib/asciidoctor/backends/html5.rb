@@ -1164,7 +1164,15 @@ class InlineImageTemplate < BaseTemplate
       img = %(<a class="image" href="#{node.attr 'link'}"#{(node.attr? 'window') ? " target=\"#{node.attr 'window'}\"" : nil}>#{img}</a>)
     end
 
-    %(<span class="#{type}#{node.role? ? " #{node.role}" : nil}">#{img}</span>)
+    if node.role?
+      style_classes = %(#{type} #{node.role})
+    else
+      style_classes = type
+    end
+
+    style_attr = (node.attr? 'float') ? %( style="float: #{node.attr 'float'}") : nil
+
+    %(<span class="#{style_classes}"#{style_attr}>#{img}</span>)
   end
 
   def result(node)
