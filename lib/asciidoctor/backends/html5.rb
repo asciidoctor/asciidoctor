@@ -194,6 +194,7 @@ class EmbeddedTemplate < BaseTemplate
 
     if node.footnotes? && !(node.attr? 'nofootnotes')
       result_buffer << '<div id="footnotes">'
+      result_buffer << '<hr>'
       node.footnotes.each do |footnote|
         result_buffer << %(<div class="footnote" id="_footnote_#{footnote.index}">
 <a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a> #{footnote.text}
