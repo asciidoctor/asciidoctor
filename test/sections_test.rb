@@ -1491,11 +1491,54 @@ They couldn't believe their eyes when...
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
     end
 
-    test 'should set toc position if toc-position attribute is set' do
+    test 'should set toc position if toc and toc-position attributes are set' do
+      input = <<-EOS
+= Article
+:toc:
+:toc-position: right
+:numbered:
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input
+      assert_xpath '//body[@class="article toc2 toc-right"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc2"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
+    end
+
+    test 'should set toc position if toc2 and toc-position attribute are set' do
       input = <<-EOS
 = Article
 :toc2:
 :toc-position: right
+:numbered:
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input
+      assert_xpath '//body[@class="article toc2 toc-right"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc2"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
+    end
+
+    test 'should set toc position if toc attribute is set to direction' do
+      input = <<-EOS
+= Article
+:toc: right
 :numbered:
 
 == Section One
