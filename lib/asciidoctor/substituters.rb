@@ -249,6 +249,7 @@ module Substituters
 
     text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
   end
+  alias :sub_specialchars :sub_specialcharacters
 
   # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc)
   #
