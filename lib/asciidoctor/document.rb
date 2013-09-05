@@ -554,10 +554,17 @@ class Document < AbstractBlock
       @id = @attributes['css-signature']
     end
 
-    if @attributes.has_key? 'toc2'
+    toc_val = @attributes['toc']
+    toc2_val = @attributes['toc2']
+    toc_position_val = @attributes['toc-position']
+
+    if (!toc_val.nil? && (toc_val != '' || toc_position_val.to_s != '')) || !toc2_val.nil?
+      default_toc_position = 'left'
+      default_toc_class = 'toc2'
+      position = [toc_position_val, toc2_val, toc_val].find {|pos| pos.to_s != ''}
+      position = default_toc_position if !position && !toc2_val.nil?
       @attributes['toc'] = ''
-      @attributes['toc-class'] ||= 'toc2'
-      case (@attributes['toc-position'] || @attributes['toc2'])
+      case position
       when 'left', '<', '&lt;'
         @attributes['toc-position'] = 'left'
       when 'right', '>', '&gt;'
@@ -566,8 +573,13 @@ class Document < AbstractBlock
         @attributes['toc-position'] = 'top'
       when 'bottom', 'v'
         @attributes['toc-position'] = 'bottom'
+      when 'center'
+        @attributes.delete('toc2')
+        default_toc_class = nil
+        default_toc_position = 'center'
       end
-      @attributes['toc-position'] ||= 'left'
+      @attributes['toc-class'] ||= default_toc_class if default_toc_class
+      @attributes['toc-position'] ||= default_toc_position if default_toc_position
     end
 
     @original_attributes = @attributes.dup
