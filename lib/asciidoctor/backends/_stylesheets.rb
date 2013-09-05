@@ -369,6 +369,9 @@ ul.unstyled, ol.unnumbered, ul.checklist, ul.none { list-style-type: none; }
 ul.unstyled, ol.unnumbered, ul.checklist { margin-left: 0.625em; }
 ul.checklist li > p:first-child > i[class^="icon-check"]:first-child, ul.checklist li > p:first-child > input[type="checkbox"]:first-child { margin-right: 0.25em; }
 ul.checklist li > p:first-child > input[type="checkbox"]:first-child { position: relative; top: 1px; }
+ul.inline { margin: 0 auto 0.625em auto; margin-left: -1.375em; margin-right: 0; padding: 0; list-style: none; overflow: hidden; }
+ul.inline > li { list-style: none; float: left; margin-left: 1.375em; display: block; }
+ul.inline > li > * { display: block; }
 .unstyled dl dt { font-weight: normal; font-style: normal; }
 ol.arabic { list-style-type: decimal; }
 ol.decimal { list-style-type: decimal-leading-zero; }
