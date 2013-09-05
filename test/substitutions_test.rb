@@ -471,6 +471,12 @@ context 'Substitutions' do
           para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'wip an inline image macro with a float attribute should be interpreted as a floating image' do
+      para = block_from_string %(image:http://example.com/images/tiger.png[tiger, float="right"] Beware of the tigers!)
+      assert_equal %{<span class="image" style="float: right"><img src="http://example.com/images/tiger.png" alt="tiger"></span> Beware of the tigers!},
+          para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'should prepend value of imagesdir attribute to inline image target if target is relative path' do
       para = block_from_string %(Beware of the image:tiger.png[tiger].), :attributes => {'imagesdir' => './images'}
       assert_equal %{Beware of the <span class="image"><img src="./images/tiger.png" alt="tiger"></span>.},

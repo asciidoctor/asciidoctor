@@ -25,6 +25,7 @@ Enhancements::
   * added icon inline macro (#529)
   * recognize implicit table header row (#387)
   * uri can be used in inline image (#470)
+  * add float attribute to inline image (#616)
   * allow role to be specified on text enclosed in backticks (#419)
   * added XML comment-style callouts for use in XML listings (#582)
   * made callout bullets non-selectable in HTML output (#478)
@@ -68,6 +69,7 @@ Compliance::
   * added level-5 heading to AsciiDoc compatibility file (#388)
   * added new XML-based callouts to AsciiDoc compatibility file
   * added absolute and uri image target matching to AsciiDoc compatibility file
+  * added float attribute on inline image macro to AsciiDoc compatibility file
   * removed linkcss in AsciiDoc compatibility file
   * fixed fenced code entry in compatibility file
 
