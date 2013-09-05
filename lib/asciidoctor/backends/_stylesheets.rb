@@ -248,7 +248,6 @@ kbd:not(.keyseq) { display: inline-block; color: #222222; font-size: 0.75em; lin
 kbd kbd:first-child { margin-left: 0; }
 kbd kbd:last-child { margin-right: 0; }
 .menuseq, .menu { color: #090909; }
-p a > code { text-decoration: underline; }
 p a > code:hover { color: #561309; }
 #header, #content, #footnotes, #footer { width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 62.5em; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
 #header:before, #header:after, #content:before, #content:after, #footnotes:before, #footnotes:after, #footer:before, #footer:after { content: " "; display: table; }
@@ -299,7 +298,7 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-si
 .admonitionblock > table td.icon img { max-width: none; }
 .admonitionblock > table td.icon .title { font-weight: bold; text-transform: uppercase; }
 .admonitionblock > table td.content { padding-left: 1.125em; padding-right: 1.25em; border-left: 1px solid #dddddd; color: #6f6f6f; }
-.admonitionblock > table td.content > .paragraph:last-child > p { margin-bottom: 0; }
+.admonitionblock > table td.content > :last-child > :last-child { margin-bottom: 0; }
 .exampleblock > .content { border-style: solid; border-width: 1px; border-color: #e6e6e6; margin-bottom: 1.25em; padding: 1.25em; background: white; -webkit-border-radius: 4px; border-radius: 4px; }
 .exampleblock > .content > :first-child { margin-top: 0; }
 .exampleblock > .content > :last-child { margin-bottom: 0; }
