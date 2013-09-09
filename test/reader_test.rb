@@ -502,12 +502,12 @@ include::fixtures/no-such-file.ad[]
       test 'include macro can retrieve data from uri' do
         input = <<-EOS
 ....
-include::https://raw.github.com/asciidoctor/asciidoctor/master/LICENSE[]
+include::http://asciidoctor.org/humans.txt[]
 ....
         EOS
   
         output = render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
-        assert_match(/MIT/, output)
+        assert_match(/Asciidoctor/, output)
       end
   
       test 'inaccessible uri referenced by include macro does not crash processor' do
