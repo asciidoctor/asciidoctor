@@ -299,7 +299,7 @@ class Document < AbstractBlock
       now = Time.new
       @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
       @attributes['localtime'] ||= now.strftime('%H:%M:%S %Z')
-      @attributes['localdatetime'] ||= [@attributes['localdate'], @attributes['localtime']] * ' '
+      @attributes['localdatetime'] ||= %(#{@attributes['localdate']} #{@attributes['localtime']})
       
       # docdate, doctime and docdatetime should default to
       # localdate, localtime and localdatetime if not otherwise set

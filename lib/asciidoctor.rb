@@ -783,9 +783,9 @@ module Asciidoctor
       attrs['docfile'] = input_path
       attrs['docdir'] = File.dirname(input_path)
       attrs['docname'] = File.basename(input_path, File.extname(input_path))
-      attrs['docdate'] = input_mtime.strftime('%Y-%m-%d')
-      attrs['doctime'] = input_mtime.strftime('%H:%M:%S %Z')
-      attrs['docdatetime'] = [attrs['docdate'], attrs['doctime']] * ' '
+      attrs['docdate'] = docdate = input_mtime.strftime('%Y-%m-%d')
+      attrs['doctime'] = doctime = input_mtime.strftime('%H:%M:%S %Z')
+      attrs['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to?(:readlines)
       input.rewind rescue nil
       lines = input.readlines
