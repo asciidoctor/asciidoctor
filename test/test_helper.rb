@@ -4,6 +4,17 @@ end
 require 'fileutils'
 require 'pathname'
 require 'test/unit'
+if RUBY_ENGINE == 'rbx'
+  # TODO we'll need to think about a way in the future to load these
+  # dependencies in a thread-safe manner within Asciidoctor itself
+  # something like a "preload" libraries option
+  require 'erb'
+  require 'coderay'
+  require 'open-uri'
+  require 'haml'
+  require 'slim'
+  require 'base64'
+end
 
 require "#{File.expand_path(File.dirname(__FILE__))}/../lib/asciidoctor.rb"
 

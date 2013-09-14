@@ -396,8 +396,8 @@ context 'Invoker' do
       cmd = "#{File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']} #{executable} -o - --trace #{input_path}"
       _, stdout, stderr = Open3.popen3 cmd
       stderr_lines = stderr.readlines
-      puts stderr_lines.join unless stderr_lines.empty?
-      assert stderr_lines.empty?, 'Command failed. Expected to receive a rendered document.'
+      # warnings may be issued, so don't assert on stderr
+      #assert stderr_lines.empty?, 'Command failed. Expected to receive a rendered document.'
       stdout_lines = stdout.readlines
       assert !stdout_lines.empty?
       if Asciidoctor::FORCE_ENCODING
