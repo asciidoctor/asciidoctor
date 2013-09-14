@@ -394,8 +394,8 @@ context 'Invoker' do
       require 'open3'
       #cmd = "#{executable} -o - --trace #{input_path}"
       cmd = "#{File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']} #{executable} -o - --trace #{input_path}"
-      _, stdout, stderr = Open3.popen3 cmd
-      stderr_lines = stderr.readlines
+      _, stdout, _ = Open3.popen3 cmd
+      #stderr_lines = stderr.readlines
       # warnings may be issued, so don't assert on stderr
       #assert stderr_lines.empty?, 'Command failed. Expected to receive a rendered document.'
       stdout_lines = stdout.readlines

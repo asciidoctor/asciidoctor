@@ -4,6 +4,11 @@ end
 require 'fileutils'
 require 'pathname'
 require 'test/unit'
+
+require "#{File.expand_path(File.dirname(__FILE__))}/../lib/asciidoctor.rb"
+
+require 'nokogiri'
+
 if RUBY_ENGINE == 'rbx'
   # TODO we'll need to think about a way in the future to load these
   # dependencies in a thread-safe manner within Asciidoctor itself
@@ -15,10 +20,6 @@ if RUBY_ENGINE == 'rbx'
   require 'slim'
   require 'base64'
 end
-
-require "#{File.expand_path(File.dirname(__FILE__))}/../lib/asciidoctor.rb"
-
-require 'nokogiri'
 
 ENV['SUPPRESS_DEBUG'] ||= 'true'
 
