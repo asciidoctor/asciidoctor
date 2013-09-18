@@ -10,21 +10,21 @@ Gem::Specification.new do |s|
   s.date              = '2013-09-05'
   s.rubyforge_project = 'asciidoctor'
 
-  s.summary     = 'An implementation of the AsciiDoc text processor and publishing toolchain in Ruby'
-  s.description = <<-EOS
+  s.summary           = 'An implementation of the AsciiDoc text processor and publishing toolchain in Ruby'
+  s.description       = <<-EOS
 A fast, open source text processor and publishing toolchain, written in Ruby, for transforming AsciiDoc markup into HTML 5, DocBook 4.5, DocBook 5.0 and custom output formats.
 EOS
-  s.license     = 'MIT'
-  s.authors  = ['Dan Allen', 'Ryan Waldron', 'Jeremy McAnally', 'Jason Porter', 'Nick Hengeveld']
-  s.email    = ['dan.j.allen@gmail.com', 'rew@erebor.com']
-  s.homepage = 'http://asciidoctor.org'
+  s.license           = 'MIT'
+  s.authors           = ['Dan Allen', 'Sarah White', 'Ryan Waldron', 'Jason Porter', 'Nick Hengeveld', 'Jeremy McAnally']
+  s.email             = ['dan.j.allen@gmail.com']
+  s.homepage          = 'http://asciidoctor.org'
 
-  s.require_paths = %w[lib]
-  s.executables = ['asciidoctor', 'asciidoctor-safe']
+  s.require_paths     = %w[lib]
+  s.executables       = ['asciidoctor', 'asciidoctor-safe']
 
-  s.has_rdoc = true
-  s.rdoc_options = ['--charset=UTF-8']
-  s.extra_rdoc_files = %w[LICENSE CHANGELOG.adoc]
+  s.has_rdoc          = true
+  s.rdoc_options      = ['--charset=UTF-8']
+  s.extra_rdoc_files  = %w[LICENSE CHANGELOG.adoc]
 
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
