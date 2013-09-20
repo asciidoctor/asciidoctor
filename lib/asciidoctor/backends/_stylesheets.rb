@@ -331,6 +331,7 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-si
 .listingblock:hover code.javascript:before { content: "javascript"; }
 .listingblock:hover code.python:before { content: "python"; }
 .listingblock:hover code.ruby:before { content: "ruby"; }
+.listingblock:hover code.sass:before { content: "sass"; }
 .listingblock:hover code.scss:before { content: "scss"; }
 .listingblock:hover code.xml:before { content: "xml"; }
 .listingblock:hover code.yaml:before { content: "yaml"; }
