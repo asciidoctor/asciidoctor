@@ -48,6 +48,8 @@ task :default => :test
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   puts "LANG: #{ENV['LANG']}"
+  # rather than hardcoding gc settings in test task,
+  # could use https://gist.github.com/benders/788695
   ENV['RUBY_GC_MALLOC_LIMIT'] = '90000000'
   ENV['RUBY_FREE_MIN'] = '200000'
   test.libs << 'lib' << 'test'
