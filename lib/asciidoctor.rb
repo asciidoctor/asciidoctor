@@ -109,6 +109,9 @@ module Asciidoctor
   # The root path of the Asciidoctor gem
   ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
+  # The user's home directory, as best we can determine it
+  USER_HOME = RUBY_VERSION >= '1.9' ? Dir.home : ENV['HOME']
+
   # Flag to indicate whether encoding of external strings needs to be forced to UTF-8
   # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
   # Address failures performing string operations that are reported as "invalid byte sequence in US-ASCII" 
