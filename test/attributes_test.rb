@@ -72,6 +72,34 @@ context 'Attributes' do
       assert_equal '', doc.attributes['release']
     end
 
+    test 'resolves user-home attribute if safe mode is less than SERVER' do
+      input = <<-EOS
+:imagesdir: {user-home}/etc/images
+
+{imagesdir}
+EOS
+      output = render_embedded_string input, :doctype => :inline, :safe => :safe
+      if RUBY_VERSION >= '1.9'
+        assert_equal %(#{Dir.home}/etc/images), output
+      else
+        assert_equal %(#{ENV['HOME']}/etc/images), output
+      end
+    end
+
+    test 'user-home attribute resolves to . if safe mode is SERVER or greater' do
+      input = <<-EOS
+:imagesdir: {user-home}/etc/images
+
+{imagesdir}
+EOS
+      output = render_embedded_string input, :doctype => :inline, :safe => :server
+      if RUBY_VERSION >= '1.9'
+        assert_equal %(./etc/images), output
+      else
+        assert_equal %(./etc/images), output
+      end
+    end
+
     test "apply custom substitutions to text in passthrough macro and assign to attribute" do
       doc = document_from_string(":xml-busters: pass:[<>&]")
       assert_equal '<>&', doc.attributes['xml-busters']

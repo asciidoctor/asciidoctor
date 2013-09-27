@@ -216,6 +216,8 @@ class Document < AbstractBlock
       @attribute_overrides['allow-uri-read'] = nil
     end
 
+    @attribute_overrides['user-home'] = USER_HOME
+
     # if the base_dir option is specified, it overrides docdir as the root for relative paths
     # otherwise, the base_dir is the directory of the source file (docdir) or the current
     # directory of the input is a string
@@ -249,6 +251,7 @@ class Document < AbstractBlock
         @attribute_overrides['docfile'] = @attribute_overrides['docfile'][(@attribute_overrides['docdir'].length + 1)..-1]
       end
       @attribute_overrides['docdir'] = ''
+      @attribute_overrides['user-home'] = '.'
       if @safe >= SafeMode::SECURE
         # assign linkcss (preventing css embedding) unless explicitly disabled from the commandline or API
         # effectively the same has "has key 'linkcss' and value == nil"
