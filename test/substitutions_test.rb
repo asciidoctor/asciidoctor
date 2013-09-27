@@ -352,6 +352,20 @@ context 'Substitutions' do
       para = block_from_string(%q{[red, foobar]#alert#})
       assert_equal '<span class="red">alert</span>', para.sub_quotes(para.source)
     end
+
+    test 'should assign role attribute when shorthand style contains a role' do
+      para = block_from_string 'blah'
+      result = para.parse_quoted_text_attributes '.red#idref'
+      expect = {'id' => 'idref', 'role' => 'red'}
+      assert_equal expect, result
+    end
+
+    test 'should not assign role attribute if shorthand style has no roles' do
+      para = block_from_string 'blah'
+      result = para.parse_quoted_text_attributes '#idref'
+      expect = {'id' => 'idref'}
+      assert_equal expect, result
+    end
   end
 
   context 'Macros' do
