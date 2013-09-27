@@ -616,7 +616,7 @@ module Asciidoctor
     {
     'startsb'    => '[',
     'endsb'      => ']',
-    'brvbar'     => '|',
+    'vbar'       => '|',
     'caret'      => '^',
     'asterisk'   => '*',
     'tilde'      => '~',
@@ -639,6 +639,7 @@ module Asciidoctor
     'ldquo'      => '&#8220;',
     'rdquo'      => '&#8221;',
     'wj'         => '&#8288;',
+    'brvbar'     => '&#166;',
     'amp'        => '&',
     'lt'         => '<',
     'gt'         => '>'

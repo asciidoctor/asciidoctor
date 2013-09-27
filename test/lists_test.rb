@@ -639,7 +639,7 @@ List
 ====
 :foo: bar
 
-- side a {brvbar} side b
+- side a {vbar} side b
 - Take me to a {foo}.
       EOS
       output = render_string input
