@@ -905,7 +905,7 @@ module Substituters
 
       attrs = {}
       attrs['id'] = id unless id.nil?
-      attrs['role'] = roles.empty? ? nil : (roles * ' ')
+      attrs['role'] = roles * ' ' unless roles.empty?
       attrs
     else
       {'role' => str}
