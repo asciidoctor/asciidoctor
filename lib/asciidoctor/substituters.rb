@@ -543,7 +543,12 @@ module Substituters
           next m[0][1..-1]
         end
 
-        terms = unescape_bracketed_text(m[1] || m[2]).split(',').map(&:strip)
+        if m[1]
+          terms = split_simple_csv normalize_string(m[1], true)
+        else
+          terms = split_simple_csv normalize_string(m[2])
+        end
+
         @document.register(:indexterms, [*terms])
         Inline.new(self, :indexterm, text, :attributes => {'terms' => terms}).render
       }
@@ -558,7 +563,12 @@ module Substituters
           next m[0][1..-1]
         end
 
-        text = unescape_bracketed_text(m[1] || m[2])
+        if m[1]
+          text = normalize_string m[1], true
+        else
+          text = normalize_string m[2]
+        end
+
         @document.register(:indexterms, [text])
         Inline.new(self, :indexterm, text, :type => :visible).render
       }
@@ -941,6 +951,56 @@ module Substituters
   def unescape_bracketed_text(text)
     return '' if text.empty?
     text.strip.tr(EOL, ' ').gsub('\]', ']')
+  end
+
+  # Internal: Strip bounding whitespace and fold endlines
+  def normalize_string str, unescape_brackets = false
+    if str.empty?
+      ''
+    elsif unescape_brackets
+      unescape_brackets str.strip.tr(EOL, ' ')
+    else
+      str.strip.tr(EOL, ' ')
+    end
+  end
+
+  # Internal: Unescape closing square brackets.
+  # Intended for text extracted from square brackets.
+  def unescape_brackets str
+    str.empty? ? '' : str.gsub('\]', ']')
+  end
+
+  # Internal: Split text formatted as CSV with support
+  # for double-quoted values (in which commas are ignored)
+  def split_simple_csv str
+    if str.empty?
+      values = []
+    elsif str.include? '"'
+      values = []
+      current = []
+      quote_open = false
+      str.split('').each do |c|
+        case c
+        when ','
+          if quote_open
+            current.push c
+          else
+            values << current.join.strip
+            current = []
+          end
+        when '"'
+          quote_open = !quote_open
+        else
+          current.push c
+        end
+      end
+  
+      values << current.join.strip
+    else
+      values = str.split(',').map(&:strip)
+    end
+  
+    values
   end
 
   # Internal: Resolve the list of comma-delimited subs against the possible options.

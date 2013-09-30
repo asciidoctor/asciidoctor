@@ -689,6 +689,31 @@ context 'Substitutions' do
       end
     end
 
+    test 'should not split index terms on commas inside of quoted terms' do
+      inputs = []
+      inputs.push <<-EOS
+Tigers are big, scary cats.
+indexterm:[Tigers, "[Big\\],
+scary cats"]
+EOS
+      inputs.push <<-EOS
+Tigers are big, scary cats.
+(((Tigers, "[Big],
+scary cats")))
+EOS
+
+      inputs.each do |input|
+        para = block_from_string input
+        output = para.sub_macros(para.source)
+        assert_equal input.lines.first, output
+        assert_equal 1, para.document.references[:indexterms].size
+        terms = para.document.references[:indexterms].first
+        assert_equal 2, terms.size
+        assert_equal 'Tigers', terms.first
+        assert_equal '[Big], scary cats', terms.last
+      end
+    end
+
     test 'normal substitutions are performed on an index term macro' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macros = ['indexterm:[*Tigers*]', '(((*Tigers*)))']
