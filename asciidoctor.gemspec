@@ -18,7 +18,7 @@ EOS
 
   s.files             = `git ls-files -z -- */* {CHANGELOG,LICENSE,README,Rakefile}*`.split "\0"
   s.executables       = s.files.grep(/^bin\//) { |f| File.basename f }
-  s.test_files        = s.files.grep /^test\/.*_test\.rb$/
+  s.test_files        = s.files.grep(/^test\/.*_test\.rb$/)
   s.require_paths     = %w[lib]
 
   s.has_rdoc          = true
