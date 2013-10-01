@@ -51,7 +51,8 @@ class Section < AbstractBlock
     else
       @level = level
     end
-    @numbered = numbered && @level > 0 && @level < 4
+    #@numbered = numbered && @level > 0 && @level < 4
+    @numbered = numbered && @level > 0
     @special = parent.is_a?(Section) && parent.special
     @index = 0
     @number = 1

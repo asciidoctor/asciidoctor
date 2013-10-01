@@ -888,7 +888,7 @@ Details
       assert_xpath '(//h2)[2][text()="Appendix B: Migration"]', output, 1
     end
 
-    test 'should not number level 4 section' do
+    test 'should not number level 4 section by default' do
       input = <<-EOS
 :numbered:
 
@@ -903,6 +903,32 @@ Details
 text
       EOS
       output = render_embedded_string input
+      assert_xpath '//h5', output, 1
+      assert_xpath '//h5[text()="Level_4"]', output, 1
+    end
+
+    test 'should only number levels up to value defined by sectnumlevels attribute' do
+      input = <<-EOS
+:numbered:
+:sectnumlevels: 2
+
+== Level_1
+
+=== Level_2
+
+==== Level_3
+
+===== Level_4
+
+text
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//h2', output, 1
+      assert_xpath '//h2[text()="1. Level_1"]', output, 1
+      assert_xpath '//h3', output, 1
+      assert_xpath '//h3[text()="1.1. Level_2"]', output, 1
+      assert_xpath '//h4', output, 1
+      assert_xpath '//h4[text()="Level_3"]', output, 1
       assert_xpath '//h5', output, 1
       assert_xpath '//h5[text()="Level_4"]', output, 1
     end
@@ -978,6 +1004,26 @@ Terms
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix B: Migration"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Gotchas"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Glossary"]', output, 1
+    end
+
+    test 'should only number sections in toc up to value defined by sectnumlevels attribute' do
+      input = <<-EOS
+:numbered:
+:toc:
+:sectnumlevels: 2
+:toclevels: 3
+
+== Level 1
+
+=== Level 2
+
+==== Level 3
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@id="toc"]//a[@href="#_level_1"][text()="1. Level 1"]', output, 1
+      assert_xpath '//*[@id="toc"]//a[@href="#_level_2"][text()="1.1. Level 2"]', output, 1
+      assert_xpath '//*[@id="toc"]//a[@href="#_level_3"][text()="Level 3"]', output, 1
     end
 
     # reenable once we have :specialnumbered!: implemented
