@@ -192,6 +192,20 @@ Note that multi-entry terms generate separate index entries.
       output = render_embedded_string input
       assert output.include?('*Hey Jude*')
     end
+
+    test 'should add a hardbreak at end of each line when hardbreaks option is set' do
+      input = <<-EOS
+[%hardbreaks]
+read
+my
+lips
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'br', output, 2
+      assert_xpath '//p', output, 1
+      assert output.include?("<p>read<br>\nmy<br>\nlips</p>")
+    end
   end
 
   context 'Literal' do

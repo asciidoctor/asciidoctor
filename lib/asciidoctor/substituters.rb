@@ -760,13 +760,13 @@ module Substituters
         else
           path = Helpers.rootname(path)
           # the referenced path is this document, or its contents has been included in this document
-          if @document.attr?('docname', path) || @document.references[:includes].include?(path)
+          if @document.attributes['docname'] == path || @document.references[:includes].include?(path)
             refid = fragment
             path = nil
             target = "##{fragment}"
           else
             refid = fragment.nil? ? path : "#{path}##{fragment}"
-            path = "#{path}#{@document.attr 'outfilesuffix', '.html'}"
+            path = "#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'}"
             target = fragment.nil? ? path : "#{path}##{fragment}"
           end
         end
@@ -837,11 +837,11 @@ module Substituters
   #
   # returns The String with the post replacements rendered using the backend templates
   def sub_post_replacements(text)
-    if @document.attributes['hardbreaks']
+    if (@document.attributes.has_key? 'hardbreaks') || (@attributes.has_key?('hardbreaks-option'))
       lines = text.lines.entries
       return text if lines.size == 1
       last = lines.pop
-      lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).render }.push(last) * EOL
+      lines.map {|line| Inline.new(self, :break, line.chomp.chomp(LINE_BREAK), :type => :line).render }.push(last) * EOL
     else
       text.gsub(REGEXP[:line_break]) { Inline.new(self, :break, $1, :type => :line).render }
     end
