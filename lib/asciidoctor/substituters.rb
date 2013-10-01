@@ -16,7 +16,19 @@ module Substituters
   COMPOSITE_SUBS = {
     :none => [],
     :normal => SUBS[:normal],
-    :verbatim => SUBS[:verbatim]
+    :verbatim => SUBS[:verbatim],
+    :specialchars => :specialcharacters
+  }
+
+  SUB_SYMBOLS = {
+    :a => :attributes,
+    :m => :macros,
+    :n => :normal,
+    :p => :post_replacements,
+    :q => :quotes,
+    :r => :replacements,
+    :c => :specialcharacters,
+    :v => :verbatim
   }
 
   SUB_OPTIONS = {
@@ -1014,10 +1026,17 @@ module Substituters
     subs.split(',').each do |val|
       key = val.strip.to_sym
       # special case to disable callouts for inline subs
-      if key == :verbatim && type == :inline
+      if type == :inline && (key == :verbatim || key == :v)
         candidates << :specialcharacters
       elsif COMPOSITE_SUBS.has_key? key
         candidates.push(*COMPOSITE_SUBS[key])
+      elsif type == :inline && key.to_s.length == 1 && (SUB_SYMBOLS.has_key? key)
+        resolved_key = SUB_SYMBOLS[key]
+        if COMPOSITE_SUBS.has_key? resolved_key
+          candidates.push(*COMPOSITE_SUBS[resolved_key])
+        else
+          candidates << resolved_key
+        end
       else
         candidates << key
       end

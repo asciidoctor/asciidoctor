@@ -983,6 +983,15 @@ EOS
       assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
     end
 
+    test 'resolves sub shorthands on inline pass macro' do
+      para = block_from_string 'pass:q,a[*<{backend}>*]'
+      result = para.extract_passthroughs para.source
+      assert_equal 1, para.passthroughs.size
+      assert_equal [:quotes, :attributes], para.passthroughs.first[:subs]
+      result = para.restore_passthroughs result
+      assert_equal '<strong><html5></strong>', result
+    end
+
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs without subs' do
       para = block_from_string("some \e" + '0' + "\e to study")
