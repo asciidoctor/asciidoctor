@@ -401,7 +401,7 @@ module Asciidoctor
                            ';;' => /^(?!\/\/)[ \t]*(.*)(;;)(?:[ \t]+(.*))?$/
                          },
 
-    :illegal_sectid_chars => /&(?:[a-zA-Z]+|#[[:digit:]]+|#x[a-zA-Z0-9]+);|\W+?/,
+    :illegal_sectid_chars => /&(?:[a-zA-Z]+|#\d+|#x[a-zA-Z0-9]+);|\W+?/,
 
     # footnote:[text]
     # footnoteref:[id,text]
@@ -535,7 +535,7 @@ module Asciidoctor
 
     # docbook45
     # html5
-    :trailing_digit   => /[[:digit:]]+$/,
+    :trailing_digit   => /\d+$/,
 
     # .Foo   but not  . Foo or ..Foo
     :blk_title        => /^\.([^\s.].*)$/,
@@ -653,7 +653,7 @@ module Asciidoctor
   }
 
   SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
-  #SPECIAL_CHARS_PATTERN = /(?:<|>|&(?![a-zA-Z]{2,};|#[[:digit:]]{2,}+;|#x[a-zA-Z0-9]{2,}+;))/
+  #SPECIAL_CHARS_PATTERN = /(?:<|>|&(?![a-zA-Z]{2,};|#\d{2,}+;|#x[a-zA-Z0-9]{2,}+;))/
 
   # unconstrained quotes:: can appear anywhere
   # constrained quotes:: must be bordered by non-word characters
@@ -728,7 +728,7 @@ module Asciidoctor
     # right left arrow <=
     [/\\?&lt;=/, '&#8656;', :none],
     # restore entities
-    [/\\?(&)amp;((?:[a-zA-Z]+|#[[:digit:]]+|#x[a-zA-Z0-9]+);)/, '', :bounding]
+    [/\\?(&)amp;((?:[a-zA-Z]+|#\d+|#x[a-zA-Z0-9]+);)/, '', :bounding]
   ]
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document
