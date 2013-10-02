@@ -401,7 +401,7 @@ module Asciidoctor
                            ';;' => /^(?!\/\/)[ \t]*(.*)(;;)(?:[ \t]+(.*))?$/
                          },
 
-    :illegal_sectid_chars => /&(?:[[:alpha:]]+|#[[:digit:]]+|#x[[:alnum:]]+);|\W+?/,
+    :illegal_sectid_chars => /&(?:[[:alpha:]]+|#[[:digit:]]+|#x[a-zA-Z0-9]+);|\W+?/,
 
     # footnote:[text]
     # footnoteref:[id,text]
@@ -469,7 +469,7 @@ module Asciidoctor
 
     # inline email address
     # doc.writer@asciidoc.org
-    :email_inline     => /[\\>:]?\w[\w.%+-]*@[[:alnum:]][[:alnum:].-]*\.[[:alpha:]]{2,4}\b/, 
+    :email_inline     => /[\\>:]?\w[\w.%+-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[[:alpha:]]{2,4}\b/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
     :lit_par          => /^([ \t]+.*)$/,
@@ -603,7 +603,7 @@ module Asciidoctor
     # http://domain
     # https://domain
     # data:info
-    :uri_sniff        => %r{\A[[:alpha:]][[:alnum:].+-]*:/*},
+    :uri_sniff        => %r{\A[[:alpha:]][a-zA-Z0-9.+-]*:/*},
 
     :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/,
 
@@ -653,7 +653,7 @@ module Asciidoctor
   }
 
   SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
-  #SPECIAL_CHARS_PATTERN = /(?:<|>|&(?![[:alpha:]]{2,};|#[[:digit:]]{2,}+;|#x[[:alnum:]]{2,}+;))/
+  #SPECIAL_CHARS_PATTERN = /(?:<|>|&(?![[:alpha:]]{2,};|#[[:digit:]]{2,}+;|#x[a-zA-Z0-9]{2,}+;))/
 
   # unconstrained quotes:: can appear anywhere
   # constrained quotes:: must be bordered by non-word characters
@@ -728,7 +728,7 @@ module Asciidoctor
     # right left arrow <=
     [/\\?&lt;=/, '&#8656;', :none],
     # restore entities
-    [/\\?(&)amp;((?:[[:alpha:]]+|#[[:digit:]]+|#x[[:alnum:]]+);)/, '', :bounding]
+    [/\\?(&)amp;((?:[[:alpha:]]+|#[[:digit:]]+|#x[a-zA-Z0-9]+);)/, '', :bounding]
   ]
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document
