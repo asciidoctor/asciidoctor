@@ -104,7 +104,7 @@ class PathResolver
   DOT_DOT = '..'
   SLASH = '/'
   BACKSLASH = '\\'
-  WIN_ROOT_RE = /^[[:alpha:]]:(?:\\|\/)/
+  WIN_ROOT_RE = /^[a-zA-Z]:(?:\\|\/)/
 
   attr_accessor :file_separator
   attr_accessor :working_dir
