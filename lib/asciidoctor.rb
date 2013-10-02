@@ -240,7 +240,7 @@ module Asciidoctor
   FLEXIBLE_ATTRIBUTES = %w(numbered)
 
   # NOTE allows for empty space in line as it could be left by the template engine
-  BLANK_LINE_PATTERN = /^[[:blank:]]*\n/
+  BLANK_LINE_PATTERN = /^[ \t]*\n/
 
   LINE_FEED_ENTITY = '&#10;' # or &#x0A;
 
@@ -304,9 +304,9 @@ module Asciidoctor
     # detect a list item of any sort
     # [[:graph:]] is a non-blank character
     :any_list         => /^(?:
-                             <?\d+>[[:blank:]]+[[:graph:]]|
-                             [[:blank:]]*(?:-|(?:\*|\.){1,5}|\d+\.|[A-Za-z]\.|[IVXivx]+\))[[:blank:]]+[[:graph:]]|
-                             [[:blank:]]*.*?(?::{2,4}|;;)(?:[[:blank:]]+[[:graph:]]|$)
+                             <?\d+>[ \t]+[[:graph:]]|
+                             [ \t]*(?:-|(?:\*|\.){1,5}|\d+\.|[A-Za-z]\.|[IVXivx]+\))[ \t]+[[:graph:]]|
+                             [ \t]*.*?(?::{2,4}|;;)(?:[ \t]+[[:graph:]]|$)
                            )/x,
 
     # :foo: bar
@@ -316,7 +316,7 @@ module Asciidoctor
     #              are joined together as a single value,
     #              collapsing the line breaks and indentation to
     #              a single space.
-    :attr_entry       => /^:(!?\w.*?):(?:[[:blank:]]+(.*))?$/,
+    :attr_entry       => /^:(!?\w.*?):(?:[ \t]+(.*))?$/,
 
     # An attribute list above a block element
     #
@@ -326,10 +326,10 @@ module Asciidoctor
     # [NOTE, caption="Good to know"]
     # Can be defined by an attribute
     # [{lead}]
-    :blk_attr_list    => /^\[(|[[:blank:]]*[\w\{,.#"'%].*)\]$/,
+    :blk_attr_list    => /^\[(|[ \t]*[\w\{,.#"'%].*)\]$/,
 
     # block attribute list or block id (bulk query)
-    :attr_line        => /^\[(|[[:blank:]]*[\w\{,.#"'%].*|\[[^\[\]]*\])\]$/,
+    :attr_line        => /^\[(|[ \t]*[\w\{,.#"'%].*|\[[^\[\]]*\])\]$/,
 
     # attribute reference
     # {foo}
@@ -356,7 +356,7 @@ module Asciidoctor
     :callout_scan       => /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*$)/,
 
     # <1> Foo
-    :colist           => /^<?(\d+)>[[:blank:]]+(.*)/,
+    :colist           => /^<?(\d+)>[ \t]+(.*)/,
 
     # ////
     # comment block
@@ -370,14 +370,14 @@ module Asciidoctor
     :ssv_or_csv_delim => /,|;/,
 
     # one two	three
-    :space_delim      => /([^\\])[[:blank:]]+/,
+    :space_delim      => /([^\\])[ \t]+/,
 
     # Ctrl + Alt+T
     # Ctrl,T
-    :kbd_delim        => /(?:\+|,)(?=[[:blank:]]*[^\1])/,
+    :kbd_delim        => /(?:\+|,)(?=[ \t]*[^\1])/,
 
     # one\ two\	three
-    :escaped_space    => /\\([[:blank:]])/,
+    :escaped_space    => /\\([ \t])/,
 
     # 29
     :digits           => /^\d+$/,
@@ -392,13 +392,13 @@ module Asciidoctor
     # {term_foo}:: {def_foo}
     # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
     # QUESTION should we check for line comment in regex or when scanning the lines?
-    :dlist            => /^(?!\/\/)[[:blank:]]*(.*?)(:{2,4}|;;)(?:[[:blank:]]+(.*))?$/,
+    :dlist            => /^(?!\/\/)[ \t]*(.*?)(:{2,4}|;;)(?:[ \t]+(.*))?$/,
     :dlist_siblings   => {
                            # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-                           '::' => /^(?!\/\/)[[:blank:]]*((?:.*[^:])?)(::)(?:[[:blank:]]+(.*))?$/,
-                           ':::' => /^(?!\/\/)[[:blank:]]*((?:.*[^:])?)(:::)(?:[[:blank:]]+(.*))?$/,
-                           '::::' => /^(?!\/\/)[[:blank:]]*((?:.*[^:])?)(::::)(?:[[:blank:]]+(.*))?$/,
-                           ';;' => /^(?!\/\/)[[:blank:]]*(.*)(;;)(?:[[:blank:]]+(.*))?$/
+                           '::' => /^(?!\/\/)[ \t]*((?:.*[^:])?)(::)(?:[ \t]+(.*))?$/,
+                           ':::' => /^(?!\/\/)[ \t]*((?:.*[^:])?)(:::)(?:[ \t]+(.*))?$/,
+                           '::::' => /^(?!\/\/)[ \t]*((?:.*[^:])?)(::::)(?:[ \t]+(.*))?$/,
+                           ';;' => /^(?!\/\/)[ \t]*(.*)(;;)(?:[ \t]+(.*))?$/
                          },
 
     :illegal_sectid_chars => /&(?:[[:alpha:]]+|#[[:digit:]]+|#x[[:alnum:]]+);|\W+?/,
@@ -421,10 +421,10 @@ module Asciidoctor
     # menu:File[New...]
     # menu:View[Page Style > No Style]
     # menu:View[Page Style, No Style]
-    :menu_macro       => /\\?menu:(\w|\w.*?\S)\[[[:blank:]]*(.+?)?\]/,
+    :menu_macro       => /\\?menu:(\w|\w.*?\S)\[[ \t]*(.+?)?\]/,
 
     # "File > New..."
-    :menu_inline_macro  => /\\?"(\w[^"]*?[[:blank:]]*&gt;[[:blank:]]*[^"[:blank:]][^"]*)"/,
+    :menu_inline_macro  => /\\?"(\w[^"]*?[ \t]*&gt;[ \t]*[^" \t][^"]*)"/,
 
     # image::filename.png[Caption]
     # video::http://youtube.com/12345[Cats vs Dogs]
@@ -445,7 +445,7 @@ module Asciidoctor
     :indexterm2_macro  => /\\?(?:indexterm2:(?:\[((?:\\\]|[^\]])*?)\])|\(\((.*?)\)\)(?!\)))/m,
 
     # whitespace at the beginning of the line
-    :leading_blanks   => /^([[:blank:]]*)/,
+    :leading_blanks   => /^([ \t]*)/,
 
     # leading parent directory references in path
     :leading_parent_dirs => /^(?:\.\.\/)*/,
@@ -457,7 +457,7 @@ module Asciidoctor
     # +      (would not match because there's no space before +)
     #  +     (would match and capture '')
     # Foo +  (would and capture 'Foo')
-    :line_break       => /^(.*)[[:blank:]]\+$/,
+    :line_break       => /^(.*)[ \t]\+$/,
 
     # inline link and some inline link macro
     # FIXME revisit!
@@ -472,7 +472,7 @@ module Asciidoctor
     :email_inline     => /[\\>:]?\w[\w.%+-]*@[[:alnum:]][[:alnum:].-]*\.[[:alpha:]]{2,4}\b/, 
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
-    :lit_par          => /^([[:blank:]]+.*)$/,
+    :lit_par          => /^([ \t]+.*)$/,
 
     # . Foo (up to 5 consecutive dots)
     # 1. Foo (arabic, default)
@@ -481,7 +481,7 @@ module Asciidoctor
     # i. Foo (lowerroman)
     # I. Foo (upperroman)
     # REVIEW leading space has already been stripped, so may not need in regex
-    :olist            => /^[[:blank:]]*(\.{1,5}|\d+\.|[A-Za-z]\.|[IVXivx]+\))[[:blank:]]+(.*)$/,
+    :olist            => /^[ \t]*(\.{1,5}|\d+\.|[A-Za-z]\.|[IVXivx]+\))[ \t]+(.*)$/,
 
     # ''' (ruler)
     # <<< (pagebreak)
@@ -529,8 +529,8 @@ module Asciidoctor
     # 2.3+<.>m
     # TODO might want to use step-wise scan rather than this mega-regexp
     :table_cellspec => {
-      :start => /^[[:blank:]]*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?\|/,
-      :end => /[[:blank:]]+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
+      :start => /^[ \t]*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?\|/,
+      :end => /[ \t]+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
     },
 
     # docbook45
@@ -575,7 +575,7 @@ module Asciidoctor
     # * Foo (up to 5 consecutive asterisks)
     # - Foo
     # REVIEW leading space has already been stripped, so may not need in regex
-    :ulist            => /^[[:blank:]]*(-|\*{1,5})[[:blank:]]+(.*)$/,
+    :ulist            => /^[ \t]*(-|\*{1,5})[ \t]+(.*)$/,
 
     # inline xref macro
     # <<id,reftext>> (special characters have already been escaped, hence the entity references)
@@ -592,9 +592,9 @@ module Asciidoctor
     :ifdef_macro      => /^[\\]?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,\+])\S+?)?)\[(.+)?\]$/,
 
     # "{asciidoctor-version}" >= "0.1.0"
-    :eval_expr        => /^(\S.*?)[[:blank:]]*(==|!=|<=|>=|<|>)[[:blank:]]*(\S.*)$/,
+    :eval_expr        => /^(\S.*?)[ \t]*(==|!=|<=|>=|<|>)[ \t]*(\S.*)$/,
     # ...or if we want to be more strict up front about what's on each side
-    #:eval_expr        => /^(true|false|("|'|)\{\w+(?:\-\w+)*\}\2|("|')[^\3]*\3|\-?\d+(?:\.\d+)*)[[:blank:]]*(==|!=|<=|>=|<|>)[[:blank:]]*(true|false|("|'|)\{\w+(?:\-\w+)*\}\6|("|')[^\7]*\7|\-?\d+(?:\.\d+)*)$/,
+    #:eval_expr        => /^(true|false|("|'|)\{\w+(?:\-\w+)*\}\2|("|')[^\3]*\3|\-?\d+(?:\.\d+)*)[ \t]*(==|!=|<=|>=|<|>)[ \t]*(true|false|("|'|)\{\w+(?:\-\w+)*\}\6|("|')[^\7]*\7|\-?\d+(?:\.\d+)*)$/,
 
     # include::chapter1.ad[]
     # include::example.txt[lines=1;2;5..10]
@@ -609,7 +609,7 @@ module Asciidoctor
 
     :mantitle_manvolnum => /^(.*)\((.*)\)$/,
 
-    :manname_manpurpose => /^(.*?)[[:blank:]]+-[[:blank:]]+(.*)$/
+    :manname_manpurpose => /^(.*?)[ \t]+-[ \t]+(.*)$/
   }
 
   INTRINSICS = Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(

@@ -686,7 +686,7 @@ EOS
         assert_equal 5, lines.size
         expected = "line one\n\nline two\n\nline three".lines.entries
         assert_equal expected, lines
-        blank_lines = output.scan(/\n[[:blank:]]*\n/).size
+        blank_lines = output.scan(/\n[ \t]*\n/).size
         if compact
           assert_equal 2, blank_lines
         else
@@ -715,7 +715,7 @@ EOS
         assert_equal 5, lines.size
         expected = "line one\n\nline two\n\nline three".lines.entries
         assert_equal expected, lines
-        blank_lines = output.scan(/\n[[:blank:]]*\n/).size
+        blank_lines = output.scan(/\n[ \t]*\n/).size
         if compact
           assert_equal 2, blank_lines
         else
@@ -744,7 +744,7 @@ EOS
         assert_equal 5, lines.size
         expected = "line one\n\nline two\n\nline three".lines.entries
         assert_equal expected, lines
-        blank_lines = output.scan(/\n[[:blank:]]*\n/).size
+        blank_lines = output.scan(/\n[ \t]*\n/).size
         if compact
           assert_equal 2, blank_lines
         else
