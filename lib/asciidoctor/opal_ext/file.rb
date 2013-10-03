@@ -1,12 +1,3 @@
-class Array
-  def to_set
-    `#{self}`
-  end
-end
-
-class Set < Array
-end
-
 class File
   SEPARATOR = '/'
 
@@ -30,11 +21,5 @@ class File
     return '' if path.to_s.empty?
     last_dot_idx = path[1..-1].rindex('.')
     last_dot_idx.nil? ? "" : path[(last_dot_idx + 1)..-1]
-  end
-end
-
-class Dir
-  def self.pwd
-    '.'
   end
 end
