@@ -1,4 +1,5 @@
 RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
+OPAL = (RUBY_ENGINE == 'opal')
 require 'strscan'
 require 'set'
 
