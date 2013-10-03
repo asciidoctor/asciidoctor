@@ -1,5 +1,6 @@
 RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
-OPAL = (RUBY_ENGINE == 'opal')
+RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
+RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
 require 'strscan'
 require 'set'
 
@@ -750,7 +751,7 @@ module Asciidoctor
     end
 
     attrs = (options[:attributes] ||= {})
-    if attrs.is_a?(Hash) || (RUBY_ENGINE == 'jruby' && attrs.is_a?(Java::JavaUtil::Map))
+    if attrs.is_a?(Hash) || (RUBY_ENGINE_JRUBY && attrs.is_a?(Java::JavaUtil::Map))
       # all good; placed here as optimization
     elsif attrs.is_a? Array
       attrs = options[:attributes] = attrs.inject({}) do |accum, entry|
