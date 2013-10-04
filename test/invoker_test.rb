@@ -228,7 +228,7 @@ context 'Invoker' do
     # this will always fail when using a template engine which strips blank lines by default
     invoker = invoke_cli_to_buffer(%w(-o -), '-') { '* content' }
     output = invoker.read_output
-    assert_match(/\n[[:blank:]]*\n/, output)
+    assert_match(/\n[ \t]*\n/, output)
   end
 
   test 'should compact output if specified' do
@@ -236,7 +236,7 @@ context 'Invoker' do
     # this will always succeed when using a template engine which strips blank lines by default
     invoker = invoke_cli_to_buffer(%w(-C -s -o -), '-') { '* content' }
     output = invoker.read_output
-    assert_no_match(/\n[[:blank:]]*\n/, output)
+    assert_no_match(/\n[ \t]*\n/, output)
   end
 
   test 'should output a trailing endline to stdout' do
