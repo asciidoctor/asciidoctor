@@ -315,11 +315,7 @@ module Asciidoctor
     :any_blk          => %r{^(?:(?:-|\.|=|\*|_|\+|/){4,}|[\|,;!]={3,}|(?:`|~){3,}.*)$},
 
     # detect a list item of any sort
-    :any_list         => /^(?:
-                             <?\d+>#{CC_BLANK}+#{CC_GRAPH}|
-                             #{CC_BLANK}*(?:-|(?:\*|\.){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CC_BLANK}+#{CC_GRAPH}|
-                             #{CC_BLANK}*.*?(?::{2,4}|;;)(?:#{CC_BLANK}+#{CC_GRAPH}|$)
-                           )/x,
+    :any_list         => /^(?:<?\d+>#{CC_BLANK}+#{CC_GRAPH}|#{CC_BLANK}*(?:-|(?:\*|\.){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CC_BLANK}+#{CC_GRAPH}|#{CC_BLANK}*.*?(?::{2,4}|;;)(?:#{CC_BLANK}+#{CC_GRAPH}|$))/,
 
     # :foo: bar
     # :Author: Dan
