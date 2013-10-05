@@ -1,5 +1,6 @@
 class File
   SEPARATOR = '/'
+  ALT_SEPARATOR = nil
 
   def self.expand_path(path)
     path
