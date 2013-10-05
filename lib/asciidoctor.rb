@@ -244,7 +244,7 @@ module Asciidoctor
   FLEXIBLE_ATTRIBUTES = %w(numbered)
 
   # Regular expression character classes (dependent on regexp engine)
-  if RUBY_ENGINE == 'opal'
+  if RUBY_ENGINE_OPAL
     CC_ALPHA = '[a-zA-Z]'
     CC_ALNUM = '[a-zA-Z0-9]'
     CC_BLANK = '[ \t]'
