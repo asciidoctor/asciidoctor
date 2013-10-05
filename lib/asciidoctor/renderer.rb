@@ -4,7 +4,7 @@ module Asciidoctor
 class Renderer
   RE_ASCIIDOCTOR_NAMESPACE = /^Asciidoctor::/
   RE_TEMPLATE_CLASS_SUFFIX = /Template$/
-  RE_CAMELCASE_BOUNDARY_1 = /([[:upper:]]+)([[:upper:]][[:alpha:]])/
+  RE_CAMELCASE_BOUNDARY_1 = /([[:upper:]]+)([[:upper:]][a-zA-Z])/
   RE_CAMELCASE_BOUNDARY_2 = /([[:lower:]])([[:upper:]])/
 
   attr_reader :compact
