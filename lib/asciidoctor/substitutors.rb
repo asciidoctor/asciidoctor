@@ -708,9 +708,9 @@ module Substitutors
           next m[0][1..-1]
         end
         if m[1] == 'footnote'
-          # hmmmm
-          text = unescape_bracketed_text restore_passthroughs(m[2])
           id = nil
+          # REVIEW it's a dirty job, but somebody's gotta do it
+          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string m[2], true)))
           index = @document.counter('footnote-number')
           @document.register(:footnotes, Document::Footnote.new(index, id, text))
           type = nil
@@ -719,8 +719,8 @@ module Substitutors
           id, text = m[2].split(',', 2)
           id = id.strip
           if !text.nil?
-            # hmmmm
-            text = unescape_bracketed_text restore_passthroughs(text)
+            # REVIEW it's a dirty job, but somebody's gotta do it
+            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)))
             index = @document.counter('footnote-number')
             @document.register(:footnotes, Document::Footnote.new(index, id, text))
             type = :ref
@@ -738,8 +738,60 @@ module Substitutors
       }
     end
 
-    if found[:macroish] || result.include?('&lt;&lt;')
-      result = result.gsub(REGEXP[:xref_macro]) {
+    sub_inline_xrefs(sub_inline_anchors(result, found), found)
+  end
+
+  # Internal: Substitute normal and bibliographic anchors
+  def sub_inline_anchors(text, found = nil)
+    if (found.nil? || found[:square_bracket]) && text.include?('[[[')
+      text = text.gsub(REGEXP[:biblio_macro]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        # honor the escape
+        if m[0].start_with? '\\'
+          next m[0][1..-1]
+        end
+        id = reftext = m[1]
+        Inline.new(self, :anchor, reftext, :type => :bibref, :target => id).render
+      }
+    end
+
+    if (found.nil? || found[:square_bracket]) && text.include?('[[')
+      text = text.gsub(REGEXP[:anchor_macro]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        # honor the escape
+        if m[0].start_with? '\\'
+          next m[0][1..-1]
+        end
+        id = m[1]
+        reftext = m[2].nil? ? "[#{id}]" : m[2]
+        # enable if we want to allow double quoted values
+        #id = id.sub(REGEXP[:dbl_quoted], '\2')
+        #if reftext.nil?
+        #  reftext = "[#{id}]"
+        #else
+        #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
+        #end
+        if @document.references[:ids].has_key? id
+          # reftext may not match since inline substitutions have been applied
+          #if reftext != @document.references[:ids][id]
+          #  Debug.debug { "Mismatched reference for anchor #{id}" }
+          #end
+        else
+          Debug.debug { "Missing reference for anchor #{id}" }
+        end
+        Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
+      }
+    end
+
+    text
+  end
+
+  # Internal: Substitute cross reference links
+  def sub_inline_xrefs(text, found = nil)
+    if (found.nil? || found[:macroish]) || text.include?('&lt;&lt;')
+      text = text.gsub(REGEXP[:xref_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -784,49 +836,7 @@ module Substitutors
       }
     end
 
-    if found[:square_bracket] && result.include?('[[[')
-      result = result.gsub(REGEXP[:biblio_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
-        id = reftext = m[1]
-        Inline.new(self, :anchor, reftext, :type => :bibref, :target => id).render
-      }
-    end
-
-    if found[:square_bracket] && result.include?('[[')
-      result = result.gsub(REGEXP[:anchor_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
-        id = m[1]
-        reftext = m[2].nil? ? "[#{id}]" : m[2]
-        # enable if we want to allow double quoted values
-        #id = id.sub(REGEXP[:dbl_quoted], '\2')
-        #if reftext.nil?
-        #  reftext = "[#{id}]"
-        #else
-        #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
-        #end
-        if @document.references[:ids].has_key? id
-          # reftext may not match since inline substitutions have been applied
-          #if reftext != @document.references[:ids][id]
-          #  Debug.debug { "Mismatched reference for anchor #{id}" }
-          #end
-        else
-          Debug.debug { "Missing reference for anchor #{id}" }
-        end
-        Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
-      }
-    end
-
-    result
+    text
   end
 
   # Public: Substitute callout references

@@ -449,7 +449,7 @@ module Asciidoctor
     # footnote:[text]
     # footnoteref:[id,text]
     # footnoteref:[id]
-    :footnote_macro   => /\\?(footnote|footnoteref):\[((?:\\\]|[^\]])*?)\]/,
+    :footnote_macro   => /\\?(footnote(?:ref)?):\[(.*?[^\\])\]/m,
 
     # gist::123456[]
     :generic_blk_macro => /^(\w[\w\-]*)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/,

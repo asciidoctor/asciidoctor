@@ -579,7 +579,19 @@ context 'Substitutions' do
       assert_equal %(Sentence text<span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>.), para.sub_macros(para.source)
     end
 
-    test 'a footnote macro may contain a macro' do
+    test 'a footnote macro may contain an escaped backslash' do
+      para = block_from_string("footnote:[\\]]\nfootnote:[a \\] b]\nfootnote:[a \\]\\] b]")
+      para.sub_macros(para.source)
+      assert_equal 3, para.document.references[:footnotes].size
+      footnote1 = para.document.references[:footnotes][0]
+      assert_equal ']', footnote1.text
+      footnote2 = para.document.references[:footnotes][1]
+      assert_equal 'a ] b', footnote2.text
+      footnote3 = para.document.references[:footnotes][2]
+      assert_equal 'a ]] b', footnote3.text
+    end
+
+    test 'a footnote macro may contain a link macro' do
       para = block_from_string('Share your code. footnote:[http://github.com[GitHub]]')
       assert_equal %(Share your code. <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>), para.sub_macros(para.source)
       assert_equal 1, para.document.references[:footnotes].size
@@ -603,6 +615,31 @@ context 'Substitutions' do
       assert_equal 1, para.document.references[:footnotes].size
       fn1 = para.document.references[:footnotes].first
       assert_equal '<a href="https://github.com/jline/jline2">https://github.com/jline/jline2</a>', fn1.text
+    end
+
+    test 'a footnote macro may contain an xref macro' do
+      # specialcharacters escaping is simulated
+      para = block_from_string('text footnote:[&lt;&lt;_install,Install&gt;&gt;]')
+      assert_equal %(text <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>), para.sub_macros(para.source)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote1 = para.document.references[:footnotes][0]
+      assert_equal '<a href="#_install">Install</a>', footnote1.text
+    end
+
+    test 'a footnote macro may contain an anchor macro' do
+      para = block_from_string('text footnote:[a [[b\]\] \[[c\]\] d]')
+      assert_equal %(text <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>), para.sub_macros(para.source)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote1 = para.document.references[:footnotes][0]
+      assert_equal 'a <a id="b"></a> [[c]] d', footnote1.text
+    end
+
+    test 'a footnote macro may contain a bibliographic anchor macro' do
+      para = block_from_string('text footnote:[a [[[b\]\]\] c]')
+      assert_equal %(text <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>), para.sub_macros(para.source)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote1 = para.document.references[:footnotes][0]
+      assert_equal 'a <a id="b"></a>[b] c', footnote1.text
     end
 
     test 'should increment index of subsequent footnote macros' do
