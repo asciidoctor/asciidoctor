@@ -700,17 +700,18 @@ module Substituters
         end
         if m[1] == 'footnote'
           # hmmmm
-          text = restore_passthroughs(m[2])
+          text = unescape_bracketed_text restore_passthroughs(m[2])
           id = nil
           index = @document.counter('footnote-number')
           @document.register(:footnotes, Document::Footnote.new(index, id, text))
           type = nil
           target = nil
         else
-          id, text = m[2].split(',', 2).map(&:strip)
+          id, text = m[2].split(',', 2)
+          id = id.strip
           if !text.nil?
             # hmmmm
-            text = restore_passthroughs(text)
+            text = unescape_bracketed_text restore_passthroughs(text)
             index = @document.counter('footnote-number')
             @document.register(:footnotes, Document::Footnote.new(index, id, text))
             type = :ref
