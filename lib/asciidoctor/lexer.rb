@@ -23,7 +23,7 @@ module Asciidoctor
 #   # => Asciidoctor::Block
 class Lexer
 
-  BlockMatchData = Struct.new(:context, :masq, :tip, :terminator)
+  BlockMatchData = Struct.new :context, :masq, :tip, :terminator
 
   # Public: Make sure the Lexer object doesn't get initialized.
   #

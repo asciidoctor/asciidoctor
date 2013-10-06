@@ -110,17 +110,17 @@ class Table < AbstractBlock
     # set rowcount before splitting up body rows
     @attributes['rowcount'] = @rows.body.size
 
-    if !rows.body.empty? && @has_header_option
-      head = rows.body.shift
+    if !@rows.body.empty? && @has_header_option
+      head = @rows.body.shift
       # styles aren't applied to header row
       head.each {|c| c.style = nil }
       # QUESTION why does AsciiDoc use an array for head? is it
       # possible to have more than one based on the syntax?
-      rows.head = [head]
+      @rows.head = [head]
     end
 
-    if !rows.body.empty? && attributes.has_key?('footer-option')
-      rows.foot = [rows.body.pop]
+    if !@rows.body.empty? && attributes.has_key?('footer-option')
+      @rows.foot = [@rows.body.pop]
     end
     
     nil
@@ -128,7 +128,7 @@ class Table < AbstractBlock
 end
 
 # Public: A struct that encapsulates the collection of rows (head, foot, body) for a table
-Table::Rows = Struct.new(:head, :foot, :body)
+Table::Rows = Struct.new :head, :foot, :body
 
 # Public: Methods to manage the columns of an AsciiDoc table. In particular, it
 # keeps track of the column specs

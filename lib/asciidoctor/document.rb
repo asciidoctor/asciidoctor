@@ -18,19 +18,20 @@ module Asciidoctor
 # noheader - The header block (h1 heading, author, revision info) should not be shown
 class Document < AbstractBlock
 
-  Footnote = Struct.new(:index, :id, :text)
-  AttributeEntry = Struct.new(:name, :value, :negate) do
-    def initialize(name, value, negate = nil)
-      super(name, value, negate.nil? ? value.nil? : false)
+  Footnote = Struct.new :index, :id, :text
+
+  class AttributeEntry
+    attr_reader :name, :value, :negate
+
+    def initialize name, value, negate = nil
+      @name = name
+      @value = value
+      @negate = negate.nil? ? value.nil? : negate
     end
 
-    def save_to(block_attributes)
+    def save_to block_attributes
       (block_attributes[:attribute_entries] ||= []) << self
     end
-
-    #def save_to_next_block(document)
-    #  (document.attributes[:pending_attribute_entries] ||= []) << self
-    #end
   end
 
   # Public A read-only integer value indicating the level of security that
