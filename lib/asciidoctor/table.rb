@@ -496,8 +496,8 @@ class Table::ParserContext
   # returns nothing
   def activate_rowspan(rowspan, colspan)
     1.upto(rowspan - 1).each {|i|
-      @active_rowspans[i] ||= 0
-      @active_rowspans[i] += colspan 
+      # longhand assignment used for Opal compatibility
+      @active_rowspans[i] = (@active_rowspans[i] || 0) + colspan
     }
     nil
   end
