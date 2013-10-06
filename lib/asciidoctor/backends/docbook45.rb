@@ -392,7 +392,7 @@ class BlockOpenTemplate < BaseTemplate
 </abstract>)
       end
     when 'partintro'
-      unless node.document.attr?('doctype', 'book') && node.parent.is_a?(Asciidoctor::Section) && node.level == 0
+      unless node.level == 0 && node.parent.context == :section && node.document.doctype == 'book'
         warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a part section. Excluding block content.'
         ''
       else
