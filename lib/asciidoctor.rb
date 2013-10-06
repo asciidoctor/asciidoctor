@@ -247,11 +247,13 @@ module Asciidoctor
   if RUBY_ENGINE_OPAL
     CC_ALPHA = '[a-zA-Z]'
     CC_ALNUM = '[a-zA-Z0-9]'
+    CC_ALNUM_BARE = 'a-zA-Z0-9'
     CC_BLANK = '[ \t]'
     CC_GRAPH = '[\x21-\x7E]' # non-blank character
   else
     CC_ALPHA = '[[:alpha:]]'
     CC_ALNUM = '[[:alnum:]]'
+    CC_ALNUM_BARE = '[:alnum:]'
     CC_BLANK = '[[:blank:]]'
     CC_GRAPH = '[[:graph:]]' # non-blank character
   end
@@ -479,7 +481,7 @@ module Asciidoctor
 
     # inline email address
     # doc.writer@asciidoc.org
-    :email_inline     => /[\\>:]?\w[\w.%+-]*@#{CC_ALNUM}[#{CC_ALNUM}.-]*\.#{CC_ALPHA}{2,4}\b/,
+    :email_inline     => /[\\>:]?\w[\w.%+-]*@#{CC_ALNUM}[#{CC_ALNUM_BARE}.-]*\.#{CC_ALPHA}{2,4}\b/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
     :lit_par          => /^(#{CC_BLANK}+.*)$/,
@@ -613,7 +615,7 @@ module Asciidoctor
     # http://domain
     # https://domain
     # data:info
-    :uri_sniff        => %r{\A#{CC_ALPHA}[#{CC_ALNUM}.+-]*:/*},
+    :uri_sniff        => %r{\A#{CC_ALPHA}[#{CC_ALNUM_BARE}.+-]*:/*},
 
     :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/,
 
