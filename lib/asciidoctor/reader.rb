@@ -429,8 +429,9 @@ class Reader
     line_read = false
     line_restored = false
     
-    while (line = read_line)
-      finish = while true
+    complete = false
+    while !complete && (line = read_line)
+      complete = while true
         break true if terminator && line.chomp == terminator
         # QUESTION: can we get away with line.chomp.empty? here?
         break true if break_on_blank_lines && line.chomp.empty?
@@ -442,7 +443,7 @@ class Reader
         break false
       end
 
-      if finish
+      if complete
         if options[:read_last_line]
           result << line
           line_read = true
@@ -451,12 +452,11 @@ class Reader
           restore_line line
           line_restored = true
         end
-        break
-      end
-
-      unless skip_line_comments && line.start_with?('//') && line.match(REGEXP[:comment])
-        result << line
-        line_read = true
+      else
+        unless skip_line_comments && line.start_with?('//') && line.match(REGEXP[:comment])
+          result << line
+          line_read = true
+        end
       end
     end
 
