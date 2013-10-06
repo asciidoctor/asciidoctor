@@ -1649,12 +1649,12 @@ class Lexer
       author_metadata = process_authors reader.read_line
 
       unless author_metadata.empty?
-        # apply header subs and assign to document
         if !document.nil?
-          author_metadata.map do |key, val|
-            val = val.is_a?(String) ? document.apply_header_subs(val) : val
-            document.attributes[key] = val if !document.attributes.has_key?(key)
-            val
+          # apply header subs and assign to document
+          author_metadata.each do |key, val|
+            unless document.attributes.has_key? key
+              document.attributes[key] = ((val.is_a? String) ? document.apply_header_subs(val) : val)
+            end
           end
 
           implicit_author = document.attributes['author']
@@ -1682,12 +1682,12 @@ class Lexer
       end
 
       unless rev_metadata.empty?
-        # apply header subs and assign to document
         if !document.nil?
-          rev_metadata.map do |key, val|
-            val = document.apply_header_subs(val)
-            document.attributes[key] = val if !document.attributes.has_key?(key)
-            val
+          # apply header subs and assign to document
+          rev_metadata.each do |key, val|
+            unless document.attributes.has_key? key
+              document.attributes[key] = document.apply_header_subs(val)
+            end
           end
         end
 
