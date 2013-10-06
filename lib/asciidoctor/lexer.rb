@@ -1,5 +1,4 @@
 module Asciidoctor
-
 # Public: Methods to parse lines of AsciiDoc into an object hierarchy
 # representing the structure of the document. All methods are class methods and
 # should be invoked from the Lexer class. The main entry point is ::next_block.
@@ -24,16 +23,7 @@ module Asciidoctor
 #   # => Asciidoctor::Block
 class Lexer
 
-  class BlockMatchData
-    attr_reader :context, :masq, :tip, :terminator
-
-    def initialize(context, masq, tip, terminator)
-      @context = context
-      @masq = masq
-      @tip = tip
-      @terminator = terminator
-    end
-  end
+  BlockMatchData = Struct.new :context, :masq, :tip, :terminator
 
   # Public: Make sure the Lexer object doesn't get initialized.
   #

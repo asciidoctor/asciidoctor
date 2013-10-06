@@ -18,28 +18,19 @@ module Asciidoctor
 # noheader - The header block (h1 heading, author, revision info) should not be shown
 class Document < AbstractBlock
 
-  class Footnote
-    attr_reader :index, :id, :text
-
-    def initialize(index, id, text)
-      @index = index
-      @id = id
-      @text = text
-    end
-  end
+  Footnote = Struct.new :index, :id, :text
 
   class AttributeEntry
     attr_reader :name, :value, :negate
 
-    def initialize(name, value, negate = nil)
+    def initialize name, value, negate = nil
       @name = name
       @value = value
-      @negate = negate.nil? ? value.nil? : false
+      @negate = negate.nil? ? value.nil? : negate
     end
 
-    def save_to(block_attributes)
-      block_attributes[:attribute_entries] ||= []
-      block_attributes[:attribute_entries] << self
+    def save_to block_attributes
+      (block_attributes[:attribute_entries] ||= []) << self
     end
   end
 
