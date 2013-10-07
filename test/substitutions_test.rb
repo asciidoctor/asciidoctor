@@ -556,14 +556,22 @@ context 'Substitutions' do
       assert_equal 'An example footnote.', footnote.text
     end
 
-    test 'a multi-line footnote macro should be registered and rendered as a footnote' do
+    test 'a multi-line footnote macro should be registered and rendered as a footnote without endline' do
       para = block_from_string("Sentence text footnote:[An example footnote\nwith wrapped text.].")
       assert_equal %(Sentence text <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>.), para.sub_macros(para.source)
       assert_equal 1, para.document.references[:footnotes].size
       footnote = para.document.references[:footnotes].first
       assert_equal 1, footnote.index
       assert footnote.id.nil?
-      assert_equal "An example footnote\nwith wrapped text.", footnote.text
+      assert_equal "An example footnote with wrapped text.", footnote.text
+    end
+
+    test 'an escaped closing square bracket in a footnote should be unescaped when rendered' do
+      para = block_from_string('footnote:[a \] b].')
+      assert_equal %(<span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>.), para.sub_macros(para.source)
+      assert_equal 1, para.document.references[:footnotes].size
+      footnote = para.document.references[:footnotes].first
+      assert_equal "a ] b", footnote.text
     end
 
     test 'a footnote macro can be directly adjacent to preceding word' do
@@ -621,14 +629,14 @@ context 'Substitutions' do
       assert_equal 'An example footnote.', footnote.text
     end
 
-    test 'a footnoteref macro with id and multi-line text should be registered and rendered as a footnote' do
+    test 'a footnoteref macro with id and multi-line text should be registered and rendered as a footnote without endlines' do
       para = block_from_string("Sentence text footnoteref:[ex1, An example footnote\nwith wrapped text.].")
       assert_equal %(Sentence text <span class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>.), para.sub_macros(para.source)
       assert_equal 1, para.document.references[:footnotes].size
       footnote = para.document.references[:footnotes].first
       assert_equal 1, footnote.index
       assert_equal 'ex1', footnote.id
-      assert_equal "An example footnote\nwith wrapped text.", footnote.text
+      assert_equal "An example footnote with wrapped text.", footnote.text
     end
 
     test 'a footnoteref macro with id should refer to footnoteref with same id' do
