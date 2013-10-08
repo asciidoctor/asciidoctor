@@ -186,11 +186,21 @@ Note that multi-entry terms generate separate index entries.
     test 'normal paragraph should honor explicit subs list' do
       input = <<-EOS
 [subs="specialcharacters"]
-*Hey Jude*
+*<Hey Jude>*
       EOS
 
       output = render_embedded_string input
-      assert output.include?('*Hey Jude*')
+      assert output.include?('*&lt;Hey Jude&gt;*')
+    end
+
+    test 'normal paragraph should honor specialchars shorthand' do
+      input = <<-EOS
+[subs="specialchars"]
+*<Hey Jude>*
+      EOS
+
+      output = render_embedded_string input
+      assert output.include?('*&lt;Hey Jude&gt;*')
     end
 
     test 'should add a hardbreak at end of each line when hardbreaks option is set' do
