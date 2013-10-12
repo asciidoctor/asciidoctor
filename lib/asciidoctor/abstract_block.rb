@@ -269,8 +269,13 @@ class AbstractBlock < AbstractNode
     section.index = @next_section_index
     @next_section_index += 1
     if section.numbered
-      section.number = @next_section_number
-      @next_section_number += 1
+      # chapters in a book doctype should be sequential even when divided into parts
+      if section.level == 1 && @document.doctype == 'book'
+        section.number = @document.counter('chapter-number', 1)
+      else
+        section.number = @next_section_number
+        @next_section_number += 1
+      end
     end
   end
 

@@ -786,19 +786,53 @@ content
 
 = Part 1
 
-== Part 1: Chapter 1
+== Chapter 1
 
 = Part 2
 
-== Part 2: Chapter 1
+== Chapter 2
       EOS
 
       output = render_string input
       assert_xpath '(//h1)[1][text()="Document Title"]', output, 1
       assert_xpath '(//h1)[2][text()="Part 1"]', output, 1
       assert_xpath '(//h1)[3][text()="Part 2"]', output, 1
-      assert_xpath '(//h2)[1][text()="1. Part 1: Chapter 1"]', output, 1
-      assert_xpath '(//h2)[2][text()="1. Part 2: Chapter 1"]', output, 1
+      assert_xpath '(//h2)[1][text()="1. Chapter 1"]', output, 1
+      assert_xpath '(//h2)[2][text()="2. Chapter 2"]', output, 1
+    end
+
+    test 'should number chapters sequentially even when divided into parts' do
+      input = <<-EOS
+= Document Title
+:doctype: book
+:numbered:
+
+== Chapter 1
+
+content
+
+= Part 1
+
+== Chapter 2
+
+content
+
+= Part 2
+
+== Chapter 3
+
+content
+
+== Chapter 4
+
+content
+      EOS
+
+      result = render_string input
+      (1..4).each do |num|
+        assert_xpath %(//h2[@id="_chapter_#{num}"]), result, 1
+        assert_xpath %(//h2[@id="_chapter_#{num}"][text()="#{num}. Chapter #{num}"]), result, 1
+      end
     end
   end
 
