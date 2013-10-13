@@ -17,7 +17,7 @@ class DocumentTemplate < BaseTemplate
       end
       toc_level_buffer << %(<ul class="sectlevel#{sec_level}">)
       sections.each do |section|
-        section_num = (section.numbered && section.level <= sectnumlevels) ? %(#{section.sectnum} ) : nil
+        section_num = (section.numbered && section.caption.nil? && section.level <= sectnumlevels) ? %(#{section.sectnum} ) : nil
         toc_level_buffer << %(<li><a href=\"##{section.id}\">#{section_num}#{section.captioned_title}</a></li>)
         if section.level < to_depth && (child_toc_level = outline(section, to_depth, sectnumlevels)) != ''
           toc_level_buffer << '<li>'
@@ -297,10 +297,9 @@ class SectionTemplate < BaseTemplate
 #{sec.content})
     else
       role = sec.role? ? " #{sec.role}" : nil
-      if sec.numbered && slevel <= (sec.document.attr 'sectnumlevels', 3).to_i
+      sectnum = nil
+      if sec.numbered && sec.caption.nil? && slevel <= (sec.document.attr 'sectnumlevels', 3).to_i
         sectnum = "#{sec.sectnum} "
-      else
-        sectnum = nil
       end
 
       if slevel == 1

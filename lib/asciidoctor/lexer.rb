@@ -1429,13 +1429,6 @@ class Lexer
         section.sectname = "sect1"
         section.special = false
         section.level = 1
-      # FIXME refactor to use assign_caption (also check requirements)
-      elsif section.sectname == 'appendix' &&
-          !attributes.has_key?('caption') &&
-          !document.attributes.has_key?('caption')
-        number = document.counter('appendix-number', 'A')
-        section.caption = "#{document.attributes['appendix-caption']} #{number}: "
-        Document::AttributeEntry.new('appendix-number', number).save_to(attributes)
       end
     elsif sect_title.downcase == 'synopsis' && document.doctype == 'manpage'
       section.special = true
