@@ -206,7 +206,7 @@ class Lexer
     # check if we are at the start of processing the document
     # NOTE we could drop a hint in the attributes to indicate
     # that we are at a section title (so we don't have to check)
-    if parent.is_a?(Document) && parent.blocks.empty? &&
+    if parent.context == :document && parent.blocks.empty? &&
         (parent.has_header? || attributes.delete('invalid-header') || !is_next_line_section?(reader, attributes))
 
       if parent.has_header?
@@ -257,7 +257,7 @@ class Lexer
       if next_level
         next_level += section.document.attr('leveloffset', 0).to_i
         doctype = parent.document.doctype
-        if next_level > current_level || (section.is_a?(Document) && next_level == 0)
+        if next_level > current_level || (section.context == :document && next_level == 0)
           if next_level == 0 && doctype != 'book'
             warn "asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections"
           elsif !expected_next_levels.nil? && !expected_next_levels.include?(next_level)
@@ -2057,7 +2057,7 @@ class Lexer
   # Returns a Boolean indicating whether this line is a sibling list item given
   # the criteria provided
   def self.is_sibling_list_item?(line, list_type, sibling_trait)
-    if sibling_trait.is_a?(Regexp)
+    if sibling_trait.is_a? Regexp
       matcher = sibling_trait
       expected_marker = false
     else

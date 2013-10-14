@@ -36,7 +36,7 @@ class AbstractBlock < AbstractNode
     @style = nil
     if context == :document
       @level = 0
-    elsif !parent.nil? && !self.is_a?(Section)
+    elsif !parent.nil? && @context != :section
       @level = parent.level
     else
       @level = nil
@@ -164,7 +164,7 @@ class AbstractBlock < AbstractNode
   # returns an Array of Section objects
   def sections
     @blocks.inject([]) {|collector, block|
-      collector << block if block.is_a?(Section)
+      collector << block if block.context == :section
       collector
     }
   end
@@ -290,7 +290,7 @@ class AbstractBlock < AbstractNode
     @next_section_index = 0
     @next_section_number = 0
     @blocks.each {|block|
-      if block.is_a?(Section)
+      if block.context == :section
         assign_index(block)
         block.reindex_sections
       end

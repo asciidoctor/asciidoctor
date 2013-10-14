@@ -9,7 +9,7 @@ context 'Document' do
       assert_equal 'AsciiDoc Home Page', doc.name
       assert_equal 14, doc.blocks.size
       assert_equal :preamble, doc.blocks[0].context
-      assert doc.blocks[1].is_a? ::Asciidoctor::Section
+      assert doc.blocks[1].context == :section
     end
   end
 

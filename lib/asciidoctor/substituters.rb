@@ -70,7 +70,7 @@ module Substituters
 
     return source if subs.empty?
 
-    multiline = source.is_a?(Array)
+    multiline = source.is_a? Array
     text = multiline ? source.join : source
 
     if (has_passthroughs = subs.include?(:macros))

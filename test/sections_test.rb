@@ -323,7 +323,7 @@ not in section
       doc = document_from_string input
       floatingtitle = doc.blocks.first
       assert floatingtitle.is_a?(Asciidoctor::Block)
-      assert !floatingtitle.is_a?(Asciidoctor::Section)
+      assert floatingtitle.context != :section
       assert_equal :floating_title, floatingtitle.context
       assert_equal '_plain_ol_heading', floatingtitle.id
       assert doc.references[:ids].has_key?('_plain_ol_heading')
