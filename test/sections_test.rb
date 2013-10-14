@@ -86,8 +86,8 @@ text
 
     test 'should use specified id and reftext when registering section reference' do
       input = <<-EOS
-[[install,Install]]
-== Install Procedure
+[[install,Install Procedure]]
+== Install
 
 content
       EOS
@@ -95,21 +95,21 @@ content
       doc = document_from_string input
       reftext = doc.references[:ids]['install']
       assert_not_nil reftext
-      assert_equal 'Install', reftext
+      assert_equal 'Install Procedure', reftext
     end
 
     test 'should use specified reftext when registering section reference' do
       input = <<-EOS
-[reftext="Install"]
-== Install Procedure
+[reftext="Install Procedure"]
+== Install
 
 content
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['_install_procedure']
+      reftext = doc.references[:ids]['_install']
       assert_not_nil reftext
-      assert_equal 'Install', reftext
+      assert_equal 'Install Procedure', reftext
     end
   end
 
@@ -435,9 +435,9 @@ not in section
 
     test 'should use specified id and reftext when registering discrete section reference' do
       input = <<-EOS
-[[install,Install]]
+[[install,Install Procedure]]
 [discrete]
-== Install Procedure
+== Install
 
 content
       EOS
@@ -445,22 +445,22 @@ content
       doc = document_from_string input
       reftext = doc.references[:ids]['install']
       assert_not_nil reftext
-      assert_equal 'Install', reftext
+      assert_equal 'Install Procedure', reftext
     end
 
     test 'should use specified reftext when registering discrete section reference' do
       input = <<-EOS
-[reftext="Install"]
+[reftext="Install Procedure"]
 [discrete]
-== Install Procedure
+== Install
 
 content
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['_install_procedure']
+      reftext = doc.references[:ids]['_install']
       assert_not_nil reftext
-      assert_equal 'Install', reftext
+      assert_equal 'Install Procedure', reftext
     end
   end
 

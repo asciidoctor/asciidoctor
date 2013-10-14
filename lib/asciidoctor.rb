@@ -303,8 +303,9 @@ module Asciidoctor
     # NOTE: this is a inline admonition note
     :admonition_inline => /^(#{ADMONITION_STYLES.to_a * '|'}):\s/,
 
-    # [[Foo]]
-    :anchor           => /^\[\[([^\s\[\]]+)\]\]$/,
+    # [[idname]]
+    # [[idname,Reference Text]]
+    :anchor           => /^\[\[(#{CC_ALPHA}[\w:.-]*(?:,#{CC_BLANK}*\S.*)?)\]\]$/,
 
     # Foowhatevs [[Bar]]
     :anchor_embedded  => /^(.*?)\s*\[\[([^\[\]]+)\]\]$/,
