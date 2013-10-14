@@ -303,14 +303,19 @@ module Asciidoctor
     # NOTE: this is a inline admonition note
     :admonition_inline => /^(#{ADMONITION_STYLES.to_a * '|'}):\s/,
 
-    # [[Foo]]
-    :anchor           => /^\[\[([^\s\[\]]+)\]\]$/,
+    # [[idname]]
+    # [[idname,Reference Text]]
+    :anchor           => /^\[\[(|#{CC_ALPHA}[\w:.-]*(?:,#{CC_BLANK}*\S.*)?)\]\]$/,
 
-    # Foowhatevs [[Bar]]
-    :anchor_embedded  => /^(.*?)\s*\[\[([^\[\]]+)\]\]$/,
+    # Section Title [[idname]]
+    # Section Title [[idname,Reference Text]]
+    # Section Title [["idname","Reference Text"]]
+    :anchor_embedded  => /^(.*?)#{CC_BLANK}+(\\)?\[\[("?)(#{CC_ALPHA}[\w:.-]*)\3(?:,#{CC_BLANK}*("?)(\S.*?)\5)?\]\]$/,
 
-    # [[ref]] (anywhere inline)
-    :anchor_macro     => /\\?\[\[([\w":].*?)\]\]/,
+    # [[idname]] (anywhere inline)
+    # [[idname,Reference Text]] (anywhere inline)
+    # [["idname","Reference Text"]] (anywhere inline)
+    :anchor_macro     => /\\?\[\[(("?)#{CC_ALPHA}[\w:.-]*\2(?:,#{CC_BLANK}*\S.*?)?)\]\]/,
 
     # matches any unbounded block delimiter:
     #   listing, literal, example, sidebar, quote, passthrough, table, fenced code
@@ -340,8 +345,8 @@ module Asciidoctor
     # [{lead}]
     :blk_attr_list    => /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*)\]$/,
 
-    # block attribute list or block id (bulk query)
-    :attr_line        => /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*|\[[^\[\]]*\])\]$/,
+    # block attribute list or block anchor (bulk query)
+    :attr_line        => /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*|\[(?:|#{CC_ALPHA}[\w:.-]*(?:,#{CC_BLANK}*\S.*)?)\])\]$/,
 
     # attribute reference
     # {foo}
@@ -571,8 +576,9 @@ module Asciidoctor
     # match[1] is the delimiter, whose length determines the level
     # match[2] is the title itself
     # match[3] is an inline anchor, which becomes the section id
-    :section_title     => /^((?:=|#){1,6})\s+(\S.*?)(?:\s*\[\[([^\[]+)\]\])?(?:\s+\1)?$/,
+    :section_title     => /^((?:=|#){1,6})#{CC_BLANK}+(\S.*?)(?:#{CC_BLANK}+\1)?$/,
 
+    # restricted section name for two-line section title
     # does not begin with a dot and has at least one alphanumeric character
     :section_name      => /^((?=.*\w+.*)[^.].*?)$/,
 
