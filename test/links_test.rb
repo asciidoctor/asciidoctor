@@ -241,4 +241,8 @@ context 'Links' do
     assert_equal({'tigers' => "Tigers roam here"}, doc.references[:ids])
   end
 
+  test 'anchor with quoted label containing a comma creates reference' do
+    doc = document_from_string %([["tigers","Tigers, scary tigers, roam here"]]Tigers roam here.)
+    assert_equal({'tigers' => "Tigers, scary tigers, roam here"}, doc.references[:ids])
+  end
 end
