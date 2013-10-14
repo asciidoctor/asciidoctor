@@ -555,7 +555,10 @@ class Lexer
             else
               block.id = float_id
             end
-            document.register(:ids, [block.id, float_title]) if block.id
+            if block.id
+              # TODO sub reftext
+              document.register(:ids, [block.id, (attributes['reftext'] || float_title)])
+            end
             block.level = float_level
             block.title = float_title
             break
@@ -799,8 +802,9 @@ class Lexer
       block.style     = attributes['style']
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
-      if block.id && block.title? && !attributes.has_key?('reftext')
-        document.register(:ids, [block.id, block.title])
+      # TODO sub reftext
+      if block.id && (reftext = attributes['reftext'] || (block.title? ? block.title : nil))
+        document.register(:ids, [block.id, reftext])
       end
       block.update_attributes(attributes)
       block.lock_in_subs
@@ -1453,7 +1457,8 @@ class Lexer
     end
 
     if section.id
-      section.document.register(:ids, [section.id, section.title])
+      # TODO sub reftext
+      section.document.register(:ids, [section.id, (attributes['reftext'] || section.title)])
     end
     section.update_attributes(attributes)
     reader.skip_blank_lines
@@ -1870,11 +1875,8 @@ class Lexer
       attributes['id'] = id
       # AsciiDoc always uses [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
-      #parent.document.register(:ids, id)
-      if reftext
-        attributes['reftext'] = reftext
-        parent.document.register(:ids, [id, reftext])
-      end
+      # registration is deferred until the block or section is processed
+      attributes['reftext'] = reftext if reftext
     elsif match = next_line.match(REGEXP[:blk_attr_list])
       parent.document.parse_attributes(match[1], [], :sub_input => true, :into => attributes)
     # NOTE title doesn't apply to section, but we need to stash it for the first block

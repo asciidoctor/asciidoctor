@@ -83,6 +83,34 @@ text
       assert_equal '_some_section', doc.blocks[0].id
       assert_equal '_some_section_2', doc.blocks[1].id
     end
+
+    test 'should use specified id and reftext when registering section reference' do
+      input = <<-EOS
+[[install,Install]]
+== Install Procedure
+
+content
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['install']
+      assert_not_nil reftext
+      assert_equal 'Install', reftext
+    end
+
+    test 'should use specified reftext when registering section reference' do
+      input = <<-EOS
+[reftext="Install"]
+== Install Procedure
+
+content
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['_install_procedure']
+      assert_not_nil reftext
+      assert_equal 'Install', reftext
+    end
   end
 
   context "document title (level 0)" do
@@ -403,6 +431,36 @@ not in section
       assert_xpath '/h2', output, 1
       assert_xpath '/h2[@id="_plain_ol_heading"]', output, 1
       assert_xpath '/h2[@class="float isolated"]', output, 1
+    end
+
+    test 'should use specified id and reftext when registering discrete section reference' do
+      input = <<-EOS
+[[install,Install]]
+[discrete]
+== Install Procedure
+
+content
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['install']
+      assert_not_nil reftext
+      assert_equal 'Install', reftext
+    end
+
+    test 'should use specified reftext when registering discrete section reference' do
+      input = <<-EOS
+[reftext="Install"]
+[discrete]
+== Install Procedure
+
+content
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['_install_procedure']
+      assert_not_nil reftext
+      assert_equal 'Install', reftext
     end
   end
 

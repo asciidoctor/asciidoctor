@@ -2087,4 +2087,36 @@ part intro paragraph
     end
   end
 
+  context 'References' do
+    test 'should use specified id and reftext when registering block reference' do
+      input = <<-EOS
+[[debian,Debian]]
+.Installation on Debian
+----
+$ apt-get install asciidoctor
+----
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['debian']
+      assert_not_nil reftext
+      assert_equal 'Debian', reftext
+    end
+
+    test 'should use specified reftext when registering block reference' do
+      input = <<-EOS
+[[debian]]
+[reftext="Debian"]
+.Installation on Debian
+----
+$ apt-get install asciidoctor
+----
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['debian']
+      assert_not_nil reftext
+      assert_equal 'Debian', reftext
+    end
+  end
 end
