@@ -2088,9 +2088,24 @@ part intro paragraph
   end
 
   context 'References' do
+    test 'should not recognize block anchor with illegal id characters' do
+      input = <<-EOS
+[[illegal$id,Reference Text]]
+----
+content
+----
+      EOS
+
+      doc = document_from_string input
+      block = doc.blocks.first
+      assert_nil block.id
+      assert_nil (block.attr 'reftext')
+      assert !doc.references[:ids].has_key?('illegal$id')
+    end
+
     test 'should use specified id and reftext when registering block reference' do
       input = <<-EOS
-[[debian,Debian]]
+[[debian,Debian Install]]
 .Installation on Debian
 ----
 $ apt-get install asciidoctor
@@ -2100,13 +2115,28 @@ $ apt-get install asciidoctor
       doc = document_from_string input
       reftext = doc.references[:ids]['debian']
       assert_not_nil reftext
-      assert_equal 'Debian', reftext
+      assert_equal 'Debian Install', reftext
+    end
+
+    test 'should allow square brackets in block reference text' do
+      input = <<-EOS
+[[debian,[Debian] Install]]
+.Installation on Debian
+----
+$ apt-get install asciidoctor
+----
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['debian']
+      assert_not_nil reftext
+      assert_equal '[Debian] Install', reftext
     end
 
     test 'should use specified reftext when registering block reference' do
       input = <<-EOS
 [[debian]]
-[reftext="Debian"]
+[reftext="Debian Install"]
 .Installation on Debian
 ----
 $ apt-get install asciidoctor
@@ -2116,7 +2146,7 @@ $ apt-get install asciidoctor
       doc = document_from_string input
       reftext = doc.references[:ids]['debian']
       assert_not_nil reftext
-      assert_equal 'Debian', reftext
+      assert_equal 'Debian Install', reftext
     end
   end
 end
