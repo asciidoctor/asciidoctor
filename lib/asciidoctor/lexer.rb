@@ -1594,20 +1594,31 @@ class Lexer
     first_char = line1[0..0]
     if (first_char == '=' || (Compliance.markdown_syntax && first_char == '#')) &&
         (match = line1.match(REGEXP[:section_title]))
-      sect_id = match[3]
-      sect_title = match[2]
       sect_level = single_line_section_level match[1]
+      sect_title = match[2]
+      sect_id = nil
+      if (sect_title.end_with? ']]') && (anchor_match = (sect_title.match REGEXP[:anchor_embedded]))
+        if anchor_match[2].nil?
+          sect_title = anchor_match[1]
+          sect_id = anchor_match[4]
+          # FIXME honor reftext
+          #reftext = anchor_match[6]
+        end
+      end
     elsif Compliance.underline_style_section_titles
       line2 = reader.peek_line true
       if !line2.nil? && SECTION_LEVELS.has_key?(line2[0..0]) && line2.match(REGEXP[:section_underline]) &&
         (name_match = line1.match(REGEXP[:section_name])) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
-        if anchor_match = name_match[1].match(REGEXP[:anchor_embedded]) 
-          sect_id = anchor_match[2]
-          sect_title = anchor_match[1]
-        else
-          sect_title = name_match[1]
+        sect_title = name_match[1]
+        if (sect_title.end_with? ']]') && (anchor_match = (sect_title.match REGEXP[:anchor_embedded]))
+          if anchor_match[2].nil?
+            sect_title = anchor_match[1]
+            sect_id = anchor_match[4]
+            # FIXME honor reftext
+            #reftext = anchor_match[6]
+          end
         end
         sect_level = section_level line2
         single_line = false
@@ -1871,12 +1882,14 @@ class Lexer
     elsif !options[:text] && (match = next_line.match(REGEXP[:attr_entry]))
       process_attribute_entry(reader, parent, attributes, match)
     elsif match = next_line.match(REGEXP[:anchor])
-      id, reftext = match[1].split(',')
-      attributes['id'] = id
-      # AsciiDoc always uses [id] as the reftext in HTML output,
-      # but I'd like to do better in Asciidoctor
-      # registration is deferred until the block or section is processed
-      attributes['reftext'] = reftext if reftext
+      unless (text = match[1]).empty?
+        id, reftext = text.split(',')
+        attributes['id'] = id
+        # AsciiDoc always uses [id] as the reftext in HTML output,
+        # but I'd like to do better in Asciidoctor
+        # registration is deferred until the block or section is processed
+        attributes['reftext'] = reftext if reftext
+      end
     elsif match = next_line.match(REGEXP[:blk_attr_list])
       parent.document.parse_attributes(match[1], [], :sub_input => true, :into => attributes)
     # NOTE title doesn't apply to section, but we need to stash it for the first block

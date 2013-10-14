@@ -64,6 +64,24 @@ context 'Sections' do
       assert_equal 'Section One', sec.title
     end
 
+    test 'explicit id can be defined using an inline anchor with reftext' do
+      sec = block_from_string("== Section One [[one,Section Uno]] ==")
+      assert_equal 'one', sec.id
+      assert_equal 'Section One', sec.title
+    end
+
+    test 'id and reftext in inline anchor can be quoted' do
+      sec = block_from_string(%(== Section One [["one","Section Uno"]] ==))
+      assert_equal 'one', sec.id
+      assert_equal 'Section One', sec.title
+    end
+
+    test 'should unescape but not process inline anchor' do
+      sec = block_from_string(%(== Section One \\[[one]] ==))
+      assert_not_equal 'one', sec.id
+      assert_equal 'Section One [[one]]', sec.title
+    end
+
     test 'title substitutions are applied before generating id' do
       sec = block_from_string("== Section{sp}One\n")
       assert_equal '_section_one', sec.id

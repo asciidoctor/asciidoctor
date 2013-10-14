@@ -2101,7 +2101,6 @@ content
       assert_nil block.id
       assert_nil (block.attr 'reftext')
       assert !doc.references[:ids].has_key?('illegal$id')
-      puts doc.render
     end
 
     test 'should use specified id and reftext when registering block reference' do
