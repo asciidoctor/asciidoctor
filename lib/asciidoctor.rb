@@ -245,15 +245,13 @@ module Asciidoctor
 
   # Regular expression character classes (dependent on regexp engine)
   if RUBY_ENGINE_OPAL
-    CC_ALPHA = '[a-zA-Z]'
-    CC_ALNUM = '[a-zA-Z0-9]'
-    CC_ALNUM_BARE = 'a-zA-Z0-9'
+    CC_ALPHA = 'a-zA-Z'
+    CC_ALNUM = 'a-zA-Z0-9'
     CC_BLANK = '[ \t]'
     CC_GRAPH = '[\x21-\x7E]' # non-blank character
   else
-    CC_ALPHA = '[[:alpha:]]'
-    CC_ALNUM = '[[:alnum:]]'
-    CC_ALNUM_BARE = '[:alnum:]'
+    CC_ALPHA = '[:alpha:]'
+    CC_ALNUM = '[:alnum:]'
     CC_BLANK = '[[:blank:]]'
     CC_GRAPH = '[[:graph:]]' # non-blank character
   end
@@ -305,17 +303,15 @@ module Asciidoctor
 
     # [[idname]]
     # [[idname,Reference Text]]
-    :anchor           => /^\[\[(|#{CC_ALPHA}[\w:.-]*(?:,#{CC_BLANK}*\S.*)?)\]\]$/,
+    :anchor           => /^\[\[(?:|([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*))?)\]\]$/,
 
     # Section Title [[idname]]
     # Section Title [[idname,Reference Text]]
-    # Section Title [["idname","Reference Text"]]
-    :anchor_embedded  => /^(.*?)#{CC_BLANK}+(\\)?\[\[("?)(#{CC_ALPHA}[\w:.-]*)\3(?:,#{CC_BLANK}*("?)(\S.*?)\5)?\]\]$/,
+    :anchor_embedded  => /^(.*?)#{CC_BLANK}+(\\)?\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]$/,
 
     # [[idname]] (anywhere inline)
     # [[idname,Reference Text]] (anywhere inline)
-    # [["idname","Reference Text"]] (anywhere inline)
-    :anchor_macro     => /\\?\[\[(("?)#{CC_ALPHA}[\w:.-]*\2(?:,#{CC_BLANK}*\S.*?)?)\]\]/,
+    :anchor_macro     => /\\?\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]/,
 
     # matches any unbounded block delimiter:
     #   listing, literal, example, sidebar, quote, passthrough, table, fenced code
@@ -346,7 +342,7 @@ module Asciidoctor
     :blk_attr_list    => /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*)\]$/,
 
     # block attribute list or block anchor (bulk query)
-    :attr_line        => /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*|\[(?:|#{CC_ALPHA}[\w:.-]*(?:,#{CC_BLANK}*\S.*)?)\])\]$/,
+    :attr_line        => /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*|\[(?:|[#{CC_ALPHA}:_][\w:.-]*(?:,#{CC_BLANK}*\S.*)?)\])\]$/,
 
     # attribute reference
     # {foo}
@@ -486,7 +482,7 @@ module Asciidoctor
 
     # inline email address
     # doc.writer@asciidoc.org
-    :email_inline     => /[\\>:]?\w[\w.%+-]*@#{CC_ALNUM}[#{CC_ALNUM_BARE}.-]*\.#{CC_ALPHA}{2,4}\b/,
+    :email_inline     => /[\\>:]?\w[\w.%+-]*@[#{CC_ALNUM}][#{CC_ALNUM}.-]*\.[#{CC_ALPHA}]{2,4}\b/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
     :lit_par          => /^(#{CC_BLANK}+.*)$/,
@@ -621,7 +617,7 @@ module Asciidoctor
     # http://domain
     # https://domain
     # data:info
-    :uri_sniff        => %r{\A#{CC_ALPHA}[#{CC_ALNUM_BARE}.+-]*:/*},
+    :uri_sniff        => %r{\A[#{CC_ALPHA}][#{CC_ALNUM}.+-]*:/*},
 
     :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/,
 

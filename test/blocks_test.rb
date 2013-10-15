@@ -2133,6 +2133,21 @@ $ apt-get install asciidoctor
       assert_equal '[Debian] Install', reftext
     end
 
+    test 'should allow comma in block reference text' do
+      input = <<-EOS
+[[debian, Debian, Ubuntu]]
+.Installation on Debian
+----
+$ apt-get install asciidoctor
+----
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['debian']
+      assert_not_nil reftext
+      assert_equal 'Debian, Ubuntu', reftext
+    end
+
     test 'should use specified reftext when registering block reference' do
       input = <<-EOS
 [[debian]]
