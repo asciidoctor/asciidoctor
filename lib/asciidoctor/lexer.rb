@@ -92,7 +92,7 @@ class Lexer
     # check if the first line is the document title
     # if so, add a header to the document and parse the header metadata
     if is_next_line_document_title?(reader, block_attributes)
-      document.id, doctitle, _, _ = parse_section_title(reader, document)
+      document.id, _, doctitle, _, _ = parse_section_title(reader, document)
       unless assigned_doctitle
         document.title = doctitle
         assigned_doctitle = doctitle
@@ -544,7 +544,8 @@ class Lexer
           elsif (style == 'float' || style == 'discrete') &&
               is_section_title?(this_line, (Compliance.underline_style_section_titles ? reader.peek_line(true) : nil))
             reader.unshift_line this_line
-            float_id, float_title, float_level, _ = parse_section_title(reader, document)
+            float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
+            attributes['reftext'] = float_reftext if float_reftext
             float_id ||= attributes['id'] if attributes.has_key?('id')
             block = Block.new(parent, :floating_title, :content_model => :empty)
             if float_id.nil? || float_id.empty?
@@ -554,10 +555,6 @@ class Lexer
               block.id = tmp_sect.generate_id
             else
               block.id = float_id
-            end
-            if block.id
-              # TODO sub reftext
-              document.register(:ids, [block.id, (attributes['reftext'] || float_title)])
             end
             block.level = float_level
             block.title = float_title
@@ -802,9 +799,9 @@ class Lexer
       block.style     = attributes['style']
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
-      # TODO sub reftext
-      if block.id && (reftext = attributes['reftext'] || (block.title? ? block.title : nil))
-        document.register(:ids, [block.id, reftext])
+      if block.id
+        # TODO sub reftext
+        document.register(:ids, [block.id, (attributes['reftext'] || (block.title? ? block.title : nil))])
       end
       block.update_attributes(attributes)
       block.lock_in_subs
@@ -1079,11 +1076,13 @@ class Lexer
       # alias match for Ruby 1.8.7 compat
       m = $~
       next if m[0].start_with? '\\'
-      id, reftext = m[1].split(',')
-      id.sub!(REGEXP[:dbl_quoted], '\2')
-      if !reftext.nil?
-        reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
-      end
+      id = m[1]
+      reftext = m[2]
+      # enable if we want to allow double quoted values
+      #id.sub!(REGEXP[:dbl_quoted], '\2')
+      #if !reftext.nil?
+      #  reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
+      #end
       document.register(:ids, [id, reftext])
     }
     nil
@@ -1420,7 +1419,8 @@ class Lexer
   # attributes - a Hash of attributes to assign to this section (default: {})
   def self.initialize_section(reader, parent, attributes = {})
     document = parent.document
-    sect_id, sect_title, sect_level, _ = parse_section_title(reader, document)
+    sect_id, sect_reftext, sect_title, sect_level, _ = parse_section_title(reader, document)
+    attributes['reftext'] = sect_reftext if sect_reftext
     section = Section.new parent, sect_level, document.attributes.has_key?('numbered')
     section.id = sect_id
     section.title = sect_title
@@ -1554,7 +1554,7 @@ class Lexer
   #   reader.lines
   #   # => ["Foo\n", "~~~\n"]
   #
-  #   title, level, id, single = parse_section_title(reader, document)
+  #   id, reftext, title, level, single = parse_section_title(reader, document)
   #
   #   title
   #   # => "Foo"
@@ -1568,7 +1568,7 @@ class Lexer
   #   line1
   #   # => "==== Foo\n"
   #
-  #   title, level, id, single = parse_section_title(reader, document)
+  #   id, reftext, title, level, single = parse_section_title(reader, document)
   #
   #   title
   #   # => "Foo"
@@ -1579,8 +1579,8 @@ class Lexer
   #   single
   #   # => true
   #
-  # returns an Array of [String, Integer, String, Boolean], representing the
-  # id, title, level and line count of the Section, or nil.
+  # returns an Array of [String, String, Integer, String, Boolean], representing the
+  # id, reftext, title, level and line count of the Section, or nil.
   #
   #--
   # NOTE for efficiency, we don't reuse methods that check for a section title
@@ -1589,6 +1589,7 @@ class Lexer
     sect_id = nil
     sect_title = nil
     sect_level = -1
+    sect_reftext = nil
     single_line = true
 
     first_char = line1[0..0]
@@ -1596,13 +1597,11 @@ class Lexer
         (match = line1.match(REGEXP[:section_title]))
       sect_level = single_line_section_level match[1]
       sect_title = match[2]
-      sect_id = nil
       if (sect_title.end_with? ']]') && (anchor_match = (sect_title.match REGEXP[:anchor_embedded]))
         if anchor_match[2].nil?
           sect_title = anchor_match[1]
-          sect_id = anchor_match[4]
-          # FIXME honor reftext
-          #reftext = anchor_match[6]
+          sect_id = anchor_match[3]
+          sect_reftext = anchor_match[4]
         end
       end
     elsif Compliance.underline_style_section_titles
@@ -1615,9 +1614,8 @@ class Lexer
         if (sect_title.end_with? ']]') && (anchor_match = (sect_title.match REGEXP[:anchor_embedded]))
           if anchor_match[2].nil?
             sect_title = anchor_match[1]
-            sect_id = anchor_match[4]
-            # FIXME honor reftext
-            #reftext = anchor_match[6]
+            sect_id = anchor_match[3]
+            sect_reftext = anchor_match[4]
           end
         end
         sect_level = section_level line2
@@ -1628,7 +1626,7 @@ class Lexer
     if sect_level >= 0
       sect_level += document.attr('leveloffset', 0).to_i
     end
-    [sect_id, sect_title, sect_level, single_line]
+    [sect_id, sect_reftext, sect_title, sect_level, single_line]
   end
 
   # Public: Calculate the number of unicode characters in the line, excluding the endline
@@ -1882,13 +1880,12 @@ class Lexer
     elsif !options[:text] && (match = next_line.match(REGEXP[:attr_entry]))
       process_attribute_entry(reader, parent, attributes, match)
     elsif match = next_line.match(REGEXP[:anchor])
-      unless (text = match[1]).empty?
-        id, reftext = text.split(',')
-        attributes['id'] = id
+      unless match[1] == ''
+        attributes['id'] = match[1]
         # AsciiDoc always uses [id] as the reftext in HTML output,
         # but I'd like to do better in Asciidoctor
         # registration is deferred until the block or section is processed
-        attributes['reftext'] = reftext if reftext
+        attributes['reftext'] = match[2] unless match[2].nil?
       end
     elsif match = next_line.match(REGEXP[:blk_attr_list])
       parent.document.parse_attributes(match[1], [], :sub_input => true, :into => attributes)

@@ -808,15 +808,21 @@ module Substituters
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        id, reftext = m[1].split(',').map(&:strip)
-        id.sub!(REGEXP[:dbl_quoted], '\2')
-        if reftext.nil?
-          reftext = "[#{id}]"
+        id = m[1]
+        reftext = m[2].nil? ? "[#{id}]" : m[2]
+        # enable if we want to allow double quoted values
+        #id.sub!(REGEXP[:dbl_quoted], '\2')
+        #if reftext.nil?
+        #  reftext = "[#{id}]"
+        #else
+        #  reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
+        #end
+        if @document.references[:ids].has_key? id
+          # reftext may not match since inline substitutions have been applied
+          #if reftext != @document.references[:ids][id]
+          #  Debug.debug { "Mismatched reference for anchor #{id}" }
+          #end
         else
-          reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
-        end
-        # NOTE the reftext should also match what's in our references dic
-        if !@document.references[:ids].has_key? id
           Debug.debug { "Missing reference for anchor #{id}" }
         end
         Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
