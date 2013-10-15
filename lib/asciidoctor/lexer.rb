@@ -1076,11 +1076,13 @@ class Lexer
       # alias match for Ruby 1.8.7 compat
       m = $~
       next if m[0].start_with? '\\'
-      id, reftext = m[1].split(',', 2)
-      id.sub!(REGEXP[:dbl_quoted], '\2')
-      if !reftext.nil?
-        reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
-      end
+      id = m[1]
+      reftext = m[2]
+      # enable if we want to allow double quoted values
+      #id.sub!(REGEXP[:dbl_quoted], '\2')
+      #if !reftext.nil?
+      #  reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
+      #end
       document.register(:ids, [id, reftext])
     }
     nil
@@ -1598,8 +1600,8 @@ class Lexer
       if (sect_title.end_with? ']]') && (anchor_match = (sect_title.match REGEXP[:anchor_embedded]))
         if anchor_match[2].nil?
           sect_title = anchor_match[1]
-          sect_id = anchor_match[4]
-          sect_reftext = anchor_match[6]
+          sect_id = anchor_match[3]
+          sect_reftext = anchor_match[4]
         end
       end
     elsif Compliance.underline_style_section_titles
@@ -1612,8 +1614,8 @@ class Lexer
         if (sect_title.end_with? ']]') && (anchor_match = (sect_title.match REGEXP[:anchor_embedded]))
           if anchor_match[2].nil?
             sect_title = anchor_match[1]
-            sect_id = anchor_match[4]
-            sect_reftext = anchor_match[6]
+            sect_id = anchor_match[3]
+            sect_reftext = anchor_match[4]
           end
         end
         sect_level = section_level line2
@@ -1878,13 +1880,12 @@ class Lexer
     elsif !options[:text] && (match = next_line.match(REGEXP[:attr_entry]))
       process_attribute_entry(reader, parent, attributes, match)
     elsif match = next_line.match(REGEXP[:anchor])
-      unless (text = match[1]).empty?
-        id, reftext = text.split(',', 2)
-        attributes['id'] = id
+      unless match[1] == ''
+        attributes['id'] = match[1]
         # AsciiDoc always uses [id] as the reftext in HTML output,
         # but I'd like to do better in Asciidoctor
         # registration is deferred until the block or section is processed
-        attributes['reftext'] = reftext if reftext
+        attributes['reftext'] = match[2] unless match[2].nil?
       end
     elsif match = next_line.match(REGEXP[:blk_attr_list])
       parent.document.parse_attributes(match[1], [], :sub_input => true, :into => attributes)

@@ -2135,7 +2135,7 @@ $ apt-get install asciidoctor
 
     test 'should allow comma in block reference text' do
       input = <<-EOS
-[[debian,Debian, Ubuntu]]
+[[debian, Debian, Ubuntu]]
 .Installation on Debian
 ----
 $ apt-get install asciidoctor

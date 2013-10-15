@@ -71,15 +71,15 @@ context 'Sections' do
       assert_equal 'Section Uno', (sec.attr 'reftext')
     end
 
-    test 'id and reftext in embedded anchor can be quoted' do
+    test 'id and reftext in embedded anchor cannot be quoted' do
       sec = block_from_string(%(== Section One [["one","Section Uno"]] ==))
-      assert_equal 'one', sec.id
-      assert_equal 'Section One', sec.title
-      assert_equal 'Section Uno', (sec.attr 'reftext')
+      assert_not_equal 'one', sec.id
+      assert_equal 'Section One [["one","Section Uno"]]', sec.title
+      assert_nil (sec.attr 'reftext')
     end
 
     test 'reftext in embedded anchor may contain comma' do
-      sec = block_from_string(%(== Section One [["one","Section,Uno"]] ==))
+      sec = block_from_string(%(== Section One [[one, Section,Uno]] ==))
       assert_equal 'one', sec.id
       assert_equal 'Section One', sec.title
       assert_equal 'Section,Uno', (sec.attr 'reftext')
