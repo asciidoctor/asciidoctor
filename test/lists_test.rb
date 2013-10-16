@@ -1399,6 +1399,71 @@ bullet 1 paragraph
       assert_xpath '(((//ul)[1]/li)[1]/div[@class="ulist"]/ul/li/div[@class="ulist"]/ul/li/*)[2]/self::div[@class="openblock"]', output, 1
     end
 
+    test 'indented outline list item with different marker offset by a blank line should be recognized as a nested list' do
+      input = <<-EOS
+* item 1
+
+  . item 1.1
++
+attached paragraph
+
+  . item 1.2
++
+attached paragraph
+
+* item 2
+      EOS
+
+      output = render_embedded_string input
+
+      assert_css 'ul', output, 1
+      assert_css 'ol', output, 1
+      assert_css 'ul ol', output, 1
+      assert_css 'ul > li', output, 2
+      assert_xpath '((//ul/li)[1]/*)', output, 2
+      assert_xpath '((//ul/li)[1]/*)[1]/self::p', output, 1
+      assert_xpath '((//ul/li)[1]/*)[2]/self::div/ol', output, 1
+      assert_xpath '((//ul/li)[1]/*)[2]/self::div/ol/li', output, 2
+      (1..2).each do |idx|
+        assert_xpath "(((//ul/li)[1]/*)[2]/self::div/ol/li)[#{idx}]/*", output, 2
+        assert_xpath "((((//ul/li)[1]/*)[2]/self::div/ol/li)[#{idx}]/*)[1]/self::p", output, 1
+        assert_xpath "((((//ul/li)[1]/*)[2]/self::div/ol/li)[#{idx}]/*)[2]/self::div[@class=\"paragraph\"]", output, 1
+      end
+    end
+
+    test 'indented labeled list item inside outline list item offset by a blank line should be recognized as a nested list' do
+      input = <<-EOS
+* item 1
+
+  term a:: definition a
++
+attached paragraph
+
+  term b:: definition b
++
+attached paragraph
+
+* item 2
+      EOS
+
+      output = render_embedded_string input
+
+      assert_css 'ul', output, 1
+      assert_css 'dl', output, 1
+      assert_css 'ul dl', output, 1
+      assert_css 'ul > li', output, 2
+      assert_xpath '((//ul/li)[1]/*)', output, 2
+      assert_xpath '((//ul/li)[1]/*)[1]/self::p', output, 1
+      assert_xpath '((//ul/li)[1]/*)[2]/self::div/dl', output, 1
+      assert_xpath '((//ul/li)[1]/*)[2]/self::div/dl/dt', output, 2
+      assert_xpath '((//ul/li)[1]/*)[2]/self::div/dl/dd', output, 2
+      (1..2).each do |idx|
+        assert_xpath "(((//ul/li)[1]/*)[2]/self::div/dl/dd)[#{idx}]/*", output, 2
+        assert_xpath "((((//ul/li)[1]/*)[2]/self::div/dl/dd)[#{idx}]/*)[1]/self::p", output, 1
+        assert_xpath "((((//ul/li)[1]/*)[2]/self::div/dl/dd)[#{idx}]/*)[2]/self::div[@class=\"paragraph\"]", output, 1
+      end
+    end
+
     # NOTE this is not consistent w/ AsciiDoc output, but this is some screwy input anyway
 =begin
     test "consecutive list continuation lines are folded" do

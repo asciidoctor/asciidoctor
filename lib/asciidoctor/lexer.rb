@@ -1188,7 +1188,7 @@ class Lexer
         if !continuation_connects_first_block && list_type != :dlist
           has_text = false
         end
-        content_adjacent = !subsequent_line.chomp.empty?
+        content_adjacent = !continuation_connects_first_block && !subsequent_line.chomp.empty?
       else
         continuation_connects_first_block = false
         content_adjacent = false
@@ -1342,8 +1342,19 @@ class Lexer
             # for all other lists, has_text is always true
             # in this block, we have to see whether we stay in the list
             if has_text
+              # TODO any way to combine this with the check after skipping blank lines?
+              if is_sibling_list_item?(this_line, list_type, sibling_trait)
+                break
+              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
+                buffer << this_line
+                within_nested_list = true
+                if nested_list_type == :dlist && $~[3].to_s.empty?
+                  # get greedy again
+                  has_text = false
+                end
               # slurp up any literal paragraph offset by blank lines
-              if this_line.match(REGEXP[:lit_par])
+              # NOTE we have to check for indented list items first
+              elsif this_line.match(REGEXP[:lit_par])
                 reader.unshift_line this_line
                 buffer.concat reader.read_lines_until(
                     :preserve_last_line => true,
@@ -1353,16 +1364,6 @@ class Lexer
                   # so we need to make sure we don't slurp up a legitimate sibling
                   list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
                 }
-              # TODO any way to combine this with the check after skipping blank lines?
-              elsif is_sibling_list_item?(this_line, list_type, sibling_trait)
-                break
-              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
-                buffer << this_line
-                within_nested_list = true
-                if nested_list_type == :dlist && $~[3].to_s.empty?
-                  # get greedy again
-                  has_text = false
-                end
               else
                 break
               end

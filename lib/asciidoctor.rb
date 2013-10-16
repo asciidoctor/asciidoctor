@@ -493,7 +493,7 @@ module Asciidoctor
     # A. Foo (upperalpha)
     # i. Foo (lowerroman)
     # I. Foo (upperroman)
-    # REVIEW leading space has already been stripped, so may not need in regex
+    # NOTE leading space match is not always necessary, but is used for list reader
     :olist            => /^#{CC_BLANK}*(\.{1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CC_BLANK}+(.*)$/,
 
     # ''' (ruler)
@@ -588,7 +588,7 @@ module Asciidoctor
 
     # * Foo (up to 5 consecutive asterisks)
     # - Foo
-    # REVIEW leading space has already been stripped, so may not need in regex
+    # NOTE leading space match is not always necessary, but is used for list reader
     :ulist            => /^#{CC_BLANK}*(-|\*{1,5})#{CC_BLANK}+(.*)$/,
 
     # inline xref macro
