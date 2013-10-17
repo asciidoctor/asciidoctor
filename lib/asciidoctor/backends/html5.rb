@@ -372,9 +372,9 @@ class BlockDlistTemplate < BaseTemplate
       if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
         result_buffer << '<colgroup>'
         col_style_attribute = (node.attr? 'labelwidth') ? %( style="width:#{(node.attr 'labelwidth').chomp '%'}%;") : nil
-        result_buffer << %(<col#{col_style_attribute}>)
+        result_buffer << %(<col#{col_style_attribute}/>)
         col_style_attribute = (node.attr? 'itemwidth') ? %( style="width:#{(node.attr 'itemwidth').chomp '%'}%;") : nil
-        result_buffer << %(<col#{col_style_attribute}>)
+        result_buffer << %(<col#{col_style_attribute}/>)
         result_buffer << '</colgroup>'
       end
       node.items.each do |terms, dd|
@@ -493,7 +493,7 @@ class BlockAdmonitionTemplate < BaseTemplate
       if node.document.attr? 'icons', 'font'
         caption = %(<i class="icon-#{name}" title="#{node.caption}"></i>)
       else
-        caption = %(<img src="#{node.icon_uri(name)}" alt="#{node.caption}">)
+        caption = %(<img src="#{node.icon_uri(name)}" alt="#{node.caption}"/>)
       end
     else
       caption = %(<div class="title">#{node.caption}</div>)
@@ -674,16 +674,16 @@ class BlockUlistTemplate < BaseTemplate
       div_classes.insert(1, 'checklist')
       ul_class_attribute = ' class="checklist"'
       if node.option? 'interactive'
-        marker_checked = '<input type="checkbox" data-item-complete="1" checked> '
-        marker_unchecked = '<input type="checkbox" data-item-complete="0"> '
+        marker_checked = '<input type="checkbox" data-item-complete="1" checked/> '
+        marker_unchecked = '<input type="checkbox" data-item-complete="0"/> '
       else
         if node.document.attr? 'icons', 'font'
           marker_checked = '<i class="icon-check"></i> '
           marker_unchecked = '<i class="icon-check-empty"></i> '
         else
           # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
-          marker_checked = '<input type="checkbox" data-item-complete="1" checked disabled> '
-          marker_unchecked = '<input type="checkbox" data-item-complete="0" disabled> '
+          marker_checked = '<input type="checkbox" data-item-complete="1" checked disabled/> '
+          marker_unchecked = '<input type="checkbox" data-item-complete="0" disabled/> '
         end
       end
     elsif !node.style.nil?
@@ -769,7 +769,7 @@ class BlockColistTemplate < BaseTemplate
         num = i + 1
         num_element = font_icons ?
             %(<i class="conum" data-value="#{num}"></i><b>#{num}</b>) :
-            %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}">)
+            %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}"/>)
         result_buffer << %(<tr>
 <td>#{num_element}</td>
 <td>#{item.text}</td>
@@ -813,7 +813,7 @@ if (attr :rowcount) >= 0 %>
     end
   else
     @columns.each do |col| %>
-<col style="width:<%= col.attr :colpcwidth %>%;"><%
+<col style="width:<%= col.attr :colpcwidth %>%;"/><%
     end
   end %> 
 </colgroup><%
@@ -870,7 +870,7 @@ class BlockImageTemplate < BaseTemplate
     width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
 
-    img_element = %(<img src="#{node.image_uri target}" alt="#{alt}"#{width_attribute}#{height_attribute}>)
+    img_element = %(<img src="#{node.image_uri target}" alt="#{alt}"#{width_attribute}#{height_attribute}/>)
     if link
       img_element = %(<a class="image" href="#{link}">#{img_element}</a>)
     end
@@ -999,7 +999,7 @@ class InlineCalloutTemplate < BaseTemplate
       %(<i class="conum" data-value="#{node.text}"></i><b>(#{node.text})</b>)
     elsif node.document.attr? 'icons'
       src = node.icon_uri("callouts/#{node.text}")
-      %(<img src="#{src}" alt="#{node.text}">)
+      %(<img src="#{src}" alt="#{node.text}"/>)
     else
       "<b>(#{node.text})</b>"
     end
@@ -1157,7 +1157,7 @@ class InlineImageTemplate < BaseTemplate
         end
       }.join
 
-      img = %(<img src="#{resolved_target}"#{attrs}>)
+      img = %(<img src="#{resolved_target}"#{attrs}/>)
     end
 
     if node.attr? 'link'
