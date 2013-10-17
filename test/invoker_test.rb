@@ -225,7 +225,7 @@ context 'Invoker' do
     ensure
       FileUtils::rm_f(sample_outpath)
       FileUtils::rm_f(custom_stylesheet)
-      FileUtils::rmdir(stylesdir)
+      FileUtils::rmdir(stylesdir) if File.directory? stylesdir
       FileUtils::rmdir(destdir)
     end
   end
