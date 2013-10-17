@@ -267,7 +267,7 @@ text
       assert !styles.strip.empty?
     end
 
-    test 'should link to default stylesheet by default if linkcss is unset in document' do
+    test 'should link to default stylesheet by default even if linkcss is unset in document' do
       input = <<-EOS
 = Document Title
 :linkcss!:
