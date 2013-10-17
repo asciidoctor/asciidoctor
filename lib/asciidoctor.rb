@@ -960,32 +960,43 @@ module Asciidoctor
       if !stream_output && doc.safe < SafeMode::SECURE && (doc.attr? 'basebackend-html') &&
           (doc.attr? 'linkcss') && (doc.attr? 'copycss')
         copy_asciidoctor_stylesheet = DEFAULT_STYLESHEET_KEYS.include?(stylesheet = (doc.attr 'stylesheet'))
-        #copy_user_stylesheet = !copy_asciidoctor_stylesheet && (doc.attr? 'copycss')
+        copy_user_stylesheet = !copy_asciidoctor_stylesheet && !stylesheet.to_s.empty?
         copy_coderay_stylesheet = (doc.attr? 'source-highlighter', 'coderay') && (doc.attr 'coderay-css', 'class') == 'class'
         copy_pygments_stylesheet = (doc.attr? 'source-highlighter', 'pygments') && (doc.attr 'pygments-css', 'class') == 'class'
-        if copy_asciidoctor_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet
+        if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet
           Helpers.require_library 'fileutils'
           outdir = doc.attr('outdir')
-          stylesdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir,
+          stylesoutdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir,
               doc.safe >= SafeMode::SAFE ? outdir : nil)
-          Helpers.mkdir_p stylesdir if mkdirs
+          Helpers.mkdir_p stylesoutdir if mkdirs
           if copy_asciidoctor_stylesheet
-            File.open(File.join(stylesdir, DEFAULT_STYLESHEET_NAME), 'w') {|f|
+            File.open(File.join(stylesoutdir, DEFAULT_STYLESHEET_NAME), 'w') {|f|
               f.write Asciidoctor::HTML5.default_asciidoctor_stylesheet
             }
           end
 
-          #if copy_user_stylesheet
-          #end
+          if copy_user_stylesheet
+            if (stylesheet_src = (doc.attr 'copycss')).empty?
+              stylesheet_src = doc.normalize_system_path stylesheet
+            else
+              stylesheet_src = doc.normalize_system_path stylesheet_src
+            end
+            stylesheet_dst = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
+            unless stylesheet_src == stylesheet_dst || (stylesheet_content = doc.read_asset stylesheet_src).nil?
+              File.open(stylesheet_dst, 'w') {|f|
+                f.write stylesheet_content
+              }
+            end
+          end
 
           if copy_coderay_stylesheet
-            File.open(File.join(stylesdir, 'asciidoctor-coderay.css'), 'w') {|f|
+            File.open(File.join(stylesoutdir, 'asciidoctor-coderay.css'), 'w') {|f|
               f.write Asciidoctor::HTML5.default_coderay_stylesheet
             }
           end
 
           if copy_pygments_stylesheet
-            File.open(File.join(stylesdir, 'asciidoctor-pygments.css'), 'w') {|f|
+            File.open(File.join(stylesoutdir, 'asciidoctor-pygments.css'), 'w') {|f|
               f.write Asciidoctor::HTML5.pygments_stylesheet(doc.attr 'pygments-style')
             }
           end
