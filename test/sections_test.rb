@@ -989,6 +989,49 @@ Details
       assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
     end
 
+    test 'should prefix appendix title by label and letter only when numbered is enabled' do
+      input = <<-EOS
+:numbered:
+
+[appendix]
+== Attribute Options
+
+Details
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
+    end
+
+    test 'should use custom appendix caption if specified' do
+      input = <<-EOS
+:appendix-caption: App
+
+[appendix]
+== Attribute Options
+
+Details
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//h2[text()="App A: Attribute Options"]', output, 1
+    end
+
+    test 'should only assign letter to appendix when numbered is enabled and appendix caption is empty' do
+      input = <<-EOS
+:numbered:
+:appendix-caption:
+
+[appendix]
+== Attribute Options
+
+Details
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//h2[text()="A. Attribute Options"]', output, 1
+    end
+
     test 'should increment appendix number for each appendix section' do
       input = <<-EOS
 [appendix]
@@ -1005,6 +1048,49 @@ Details
       output = render_embedded_string input
       assert_xpath '(//h2)[1][text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '(//h2)[2][text()="Appendix B: Migration"]', output, 1
+    end
+
+    test 'should continue numbering after appendix' do
+      input = <<-EOS
+:numbered:
+
+== First Section
+
+content
+
+[appendix]
+== Attribute Options
+
+content
+
+== Migration
+
+content
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '(//h2)[1][text()="1. First Section"]', output, 1
+      assert_xpath '(//h2)[2][text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '(//h2)[3][text()="2. Migration"]', output, 1
+    end
+
+    test 'should number appendix subsections using appendix letter' do
+      input = <<-EOS
+:numbered:
+
+[appendix]
+== Attribute Options
+
+Details
+
+=== Optional Attributes
+
+Details
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '(//h2)[1][text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '(//h3)[1][text()="A.1. Optional Attributes"]', output, 1
     end
 
     test 'should not number level 4 section by default' do

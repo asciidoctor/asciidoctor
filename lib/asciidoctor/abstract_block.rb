@@ -268,9 +268,18 @@ class AbstractBlock < AbstractNode
   def assign_index(section)
     section.index = @next_section_index
     @next_section_index += 1
-    if section.numbered
+
+    if section.sectname == 'appendix'
+      appendix_number = @document.counter 'appendix-number', 'A'
+      section.number = appendix_number if section.numbered
+      if (caption = @document.attr 'appendix-caption', '') != ''
+        section.caption = %(#{caption} #{appendix_number}: )
+      else
+        section.caption = %(#{appendix_number}. )
+      end
+    elsif section.numbered
       # chapters in a book doctype should be sequential even when divided into parts
-      if section.level == 1 && @document.doctype == 'book'
+      if (section.level == 1 || (section.level == 0 && section.special)) && @document.doctype == 'book'
         section.number = @document.counter('chapter-number', 1)
       else
         section.number = @next_section_number
