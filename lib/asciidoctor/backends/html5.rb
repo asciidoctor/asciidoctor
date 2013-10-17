@@ -372,9 +372,9 @@ class BlockDlistTemplate < BaseTemplate
       if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
         result_buffer << '<colgroup>'
         col_style_attribute = (node.attr? 'labelwidth') ? %( style="width:#{(node.attr 'labelwidth').chomp '%'}%;") : nil
-        result_buffer << %(<col#{col_style_attribute}>)
+        result_buffer << %(<col#{col_style_attribute}/>)
         col_style_attribute = (node.attr? 'itemwidth') ? %( style="width:#{(node.attr 'itemwidth').chomp '%'}%;") : nil
-        result_buffer << %(<col#{col_style_attribute}>)
+        result_buffer << %(<col#{col_style_attribute}/>)
         result_buffer << '</colgroup>'
       end
       node.items.each do |terms, dd|
@@ -813,7 +813,7 @@ if (attr :rowcount) >= 0 %>
     end
   else
     @columns.each do |col| %>
-<col style="width:<%= col.attr :colpcwidth %>%;"><%
+<col style="width:<%= col.attr :colpcwidth %>%;"/><%
     end
   end %> 
 </colgroup><%
