@@ -701,6 +701,12 @@ class Document < AbstractBlock
   # Public: Update the backend attributes to reflect a change in the selected backend
   def update_backend_attributes()
     backend = @attributes['backend']
+    if backend.start_with? 'xhtml'
+      @attributes['htmlsyntax'] = 'xml'
+      backend = @attributes['backend'] = backend[1..-1]
+    elsif backend.start_with? 'html'
+      @attributes['htmlsyntax'] = 'html'
+    end
     if BACKEND_ALIASES.has_key? backend
       backend = @attributes['backend'] = BACKEND_ALIASES[backend]
     end
@@ -738,6 +744,7 @@ class Document < AbstractBlock
     
     render_options[:template_cache] = @options.fetch(:template_cache, true)
     render_options[:backend] = @attributes.fetch('backend', 'html5')
+    render_options[:htmlsyntax] = @attributes['htmlsyntax']
     render_options[:template_engine] = @options[:template_engine]
     render_options[:eruby] = @options.fetch(:eruby, 'erb')
     render_options[:compact] = @options.fetch(:compact, false)

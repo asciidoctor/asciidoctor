@@ -57,8 +57,8 @@ class Renderer
         :slim => { :disable_escape => true, :sort_attrs => false, :pretty => false }
       }
 
-      # workaround until we have a proper way to configure
-      if {'html5' => true, 'dzslides' => true, 'deckjs' => true, 'revealjs' => true}.has_key? backend
+      # workaround until we have a proper way to configure view options
+      if options[:htmlsyntax] == 'html'
         view_opts[:haml][:format] = view_opts[:slim][:format] = :html5
       end
 

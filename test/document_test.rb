@@ -1091,6 +1091,97 @@ Text that has supporting information{empty}footnote:[An example footnote.].
       assert_xpath '/html//*[@id="preamble"]//p[text() = "preamble"]', result, 1
     end
 
+    test 'xhtml5 backend should map to html5 and set htmlsyntax to xml' do
+      input = <<-EOS
+content
+      EOS
+      doc = document_from_string input, :backend => :xhtml5
+      assert_equal 'html5', doc.backend
+      assert_equal 'xml', (doc.attr 'htmlsyntax')
+    end
+
+    test 'xhtml backend should map to html5 and set htmlsyntax to xml' do
+      input = <<-EOS
+content
+      EOS
+      doc = document_from_string input, :backend => :xhtml
+      assert_equal 'html5', doc.backend
+      assert_equal 'xml', (doc.attr 'htmlsyntax')
+    end
+
+    test 'should close all short tags when htmlsyntax is xml' do
+      input = <<-EOS
+= Document Title
+Author Name
+v1.0, 2001-01-01
+:icons:
+
+image:tiger.png[]
+
+image::tiger.png[]
+
+* [x] one
+* [ ] two
+
+|===
+|A |B
+|===
+
+[horizontal, labelwidth="25%", itemwidth="75%"]
+term:: definition
+
+NOTE: note
+
+[quote,Author,Source]
+____
+Quote me.
+____
+
+[verse,Author,Source]
+____
+A tall tale.
+____
+
+[options="autoplay,loop"]
+video::screencast.ogg[]
+
+video::12345[vimeo]
+
+[options="autoplay,loop"]
+audio::podcast.ogg[]
+
+one +
+two
+
+'''
+      EOS
+      result = render_string input, :safe => :safe, :backend => :xhtml
+      begin
+        doc = Nokogiri::XML::Document.parse(result) {|config|
+          config.options = Nokogiri::XML::ParseOptions::STRICT | Nokogiri::XML::ParseOptions::NONET
+        }
+      rescue => e
+        flunk "xhtml5 backend did not generate well-formed XML: #{e.message}\n#{result}"
+      end
+      #assert_no_match(/<meta [^>]+[^\/]>/, result)
+      #assert_no_match(/<link [^>]+[^\/]>/, result)
+      #assert_no_match(/<img [^>]+[^\/]>/, result)
+      #assert_no_match(/<input [^>]+[^\/]>/, result)
+      #assert_match(/<input [^>]+checked="checked"/, result)
+      #assert_match(/<input [^>]+disabled="disabled"/, result)
+      #assert_no_match(/<col [^>]+[^\/]>/, result)
+      #assert_no_match(/<[bh]r>/, result)
+      #assert_match(/video [^>]+loop="loop"/, result)
+      #assert_match(/video [^>]+autoplay="autoplay"/, result)
+      #assert_match(/video [^>]+controls="controls"/, result)
+      #assert_match(/audio [^>]+loop="loop"/, result)
+      #assert_match(/audio [^>]+autoplay="autoplay"/, result)
+      #assert_match(/audio [^>]+controls="controls"/, result)
+      #assert_match(/iframe [^>]+webkitallowfullscreen="webkitallowfullscreen"/i, result)
+      #assert_match(/iframe [^>]+mozallowfullscreen="mozallowfullscreen"/i, result)
+      #assert_match(/iframe [^>]+allowfullscreen="allowfullscreen"/i, result)
+    end
+
     test 'docbook45 backend doctype article' do
       input = <<-EOS
 = Title

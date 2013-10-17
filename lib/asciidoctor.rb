@@ -139,7 +139,7 @@ module Asciidoctor
 
   # Pointers to the preferred version for a given backend.
   BACKEND_ALIASES = {
-    'html' => 'html5',
+    'html'    => 'html5',
     'docbook' => 'docbook45'
   }
 
