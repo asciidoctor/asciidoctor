@@ -227,6 +227,11 @@ class AbstractNode
     @attributes['reftext'] || @document.attributes['reftext']
   end
 
+  # Public: Returns a forward slash if the attribute htmlsyntax has the value "xml".
+  def short_tag_slash
+    @document.attributes['htmlsyntax'] == 'xml' ? '/' : nil
+  end
+
   # Public: Construct a reference or data URI to an icon image for the
   # specified icon name.
   #

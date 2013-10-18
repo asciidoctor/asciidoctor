@@ -32,22 +32,22 @@ class DocumentTemplate < BaseTemplate
 
   def template
     @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><!DOCTYPE html>
+<%#encoding:UTF-8%><% short_tag_slash_local = short_tag_slash %><!DOCTYPE html>
 <html<%= (attr? 'nolang') ? nil : %( lang="\#{attr 'lang', 'en'}") %>>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>">
-<meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><%
+<meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>"<%= short_tag_slash_local %>>
+<meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>"<%= short_tag_slash_local %>>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"<%= short_tag_slash_local %>><%
 if attr? :description %>
-<meta name="description" content="<%= attr :description %>"><%
+<meta name="description" content="<%= attr :description %>"<%= short_tag_slash_local %>><%
 end
 if attr? :keywords %>
-<meta name="keywords" content="<%= attr :keywords %>"><%
+<meta name="keywords" content="<%= attr :keywords %>"<%= short_tag_slash_local %>><%
 end %>
 <title><%= doctitle(:sanitize => true) || (attr 'untitled-label') %></title><%
 if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
   if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>"><%
+<link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>"<%= short_tag_slash_local %>><%
   else %>
 <style>
 <%= HTML5.default_asciidoctor_stylesheet %>
@@ -55,7 +55,7 @@ if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
   end
 elsif attr? :stylesheet
   if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), (attr :stylesdir, '')) %>"><%
+<link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), (attr :stylesdir, '')) %>"<%= short_tag_slash_local %>><%
   else %>
 <style>
 <%= read_asset normalize_system_path((attr :stylesheet), (attr :stylesdir, '')), true %>
@@ -64,16 +64,16 @@ elsif attr? :stylesheet
 end
 if attr? 'icons', 'font'
   if !(attr 'iconfont-remote', '').nil? %>
-<link rel="stylesheet" href="<%= attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css' %>"><%
+<link rel="stylesheet" href="<%= attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css' %>"<%= short_tag_slash_local %>><%
   else %>
-<link rel="stylesheet" href="<%= normalize_web_path(%(\#{attr 'iconfont-name', 'font-awesome'}.css), (attr 'stylesdir', '')) %>"><%
+<link rel="stylesheet" href="<%= normalize_web_path(%(\#{attr 'iconfont-name', 'font-awesome'}.css), (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
   end
 end
 case attr 'source-highlighter'
 when 'coderay'
   if (attr 'coderay-css', 'class') == 'class'
     if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-coderay.css', (attr :stylesdir, '')) %>"><%
+<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-coderay.css', (attr :stylesdir, '')) %>"<%= short_tag_slash_local %>><%
     else %>
 <style>
 <%= HTML5.default_coderay_stylesheet %>
@@ -83,7 +83,7 @@ when 'coderay'
 when 'pygments'
   if (attr 'pygments-css', 'class') == 'class'
     if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-pygments.css', (attr :stylesdir, '')) %>"><%
+<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-pygments.css', (attr :stylesdir, '')) %>"<%= short_tag_slash_local %>><%
     else %>
 <style>
 <%= HTML5.pygments_stylesheet(attr 'pygments-style') %>
@@ -91,11 +91,11 @@ when 'pygments'
     end
   end
 when 'highlightjs', 'highlight.js' %>
-<link rel="stylesheet" href="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css">
+<link rel="stylesheet" href="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css"<%= short_tag_slash_local %>>
 <script src="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script><%
 when 'prettify' %>
-<link rel="stylesheet" href="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/<%= attr 'prettify-theme', 'prettify' %>.min.css">
+<link rel="stylesheet" href="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/<%= attr 'prettify-theme', 'prettify' %>.min.css"<%= short_tag_slash_local %>>
 <script src="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/prettify.min.js"></script>
 <script>document.addEventListener('DOMContentLoaded', prettyPrint)</script><%
 end %><%= (docinfo_content = docinfo).empty? ? nil : %(
@@ -122,14 +122,14 @@ unless noheader %>
 <h1><%= @header.title %></h1><%
       end %><%
       if attr? :author %>
-<span id="author" class="author"><%= attr :author %></span><br><%
+<span id="author" class="author"><%= attr :author %></span><br<%= short_tag_slash_local %>><%
         if attr? :email %>
-<span id="email" class="email"><%= sub_macros(attr :email) %></span><br><%
+<span id="email" class="email"><%= sub_macros(attr :email) %></span><br<%= short_tag_slash_local %>><%
         end
         if (authorcount = (attr :authorcount).to_i) > 1
-          (2..authorcount).each do |idx| %><span id="author<%= idx %>" class="author"><%= attr "author_\#{idx}" %></span><br><%
+          (2..authorcount).each do |idx| %><span id="author<%= idx %>" class="author"><%= attr "author_\#{idx}" %></span><br<%= short_tag_slash_local %>><%
             if attr? "email_\#{idx}" %>
-<span id="email<%= idx %>" class="email"><%= sub_macros(attr "email_\#{idx}") %></span><br><%
+<span id="email<%= idx %>" class="email"><%= sub_macros(attr "email_\#{idx}") %></span><br<%= short_tag_slash_local %>><%
             end
           end
         end
@@ -141,7 +141,7 @@ unless noheader %>
 <span id="revdate"><%= attr :revdate %></span><%
       end
       if attr? :revremark %>
-<br><span id="revremark"><%= attr :revremark %></span><%
+<br<%= short_tag_slash_local %>><span id="revremark"><%= attr :revremark %></span><%
       end
     end
     if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
@@ -158,7 +158,7 @@ end %>
 </div><%
 unless !footnotes? || (attr? :nofootnotes) %>
 <div id="footnotes">
-<hr><%
+<hr<%= short_tag_slash_local %>><%
   footnotes.each do |fn| %>
 <div class="footnote" id="_footnote_<%= fn.index %>">
 <a href="#_footnoteref_<%= fn.index %>"><%= fn.index %></a>. <%= fn.text %>
@@ -169,7 +169,7 @@ end %>
 <div id="footer">
 <div id="footer-text"><%
 if attr? :revnumber %>
-<%= %(\#{attr 'version-label'} \#{attr :revnumber}) %><br><%
+<%= %(\#{attr 'version-label'} \#{attr :revnumber}) %><br<%= short_tag_slash_local %>><%
 end
 if attr? 'last-update-label' %>
 <%= %(\#{attr 'last-update-label'} \#{attr :docdatetime}) %><%
@@ -195,7 +195,7 @@ class EmbeddedTemplate < BaseTemplate
 
     if node.footnotes? && !(node.attr? 'nofootnotes')
       result_buffer << '<div id="footnotes">'
-      result_buffer << '<hr>'
+      result_buffer << %(<hr#{node.short_tag_slash}>)
       node.footnotes.each do |footnote|
         result_buffer << %(<div class="footnote" id="_footnote_#{footnote.index}">
 <a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a> #{footnote.text}
@@ -368,13 +368,14 @@ class BlockDlistTemplate < BaseTemplate
       end
       result_buffer << '</ol>'
     when 'horizontal'
+      short_tag_slash_local = node.short_tag_slash
       result_buffer << '<table>'
       if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
         result_buffer << '<colgroup>'
         col_style_attribute = (node.attr? 'labelwidth') ? %( style="width:#{(node.attr 'labelwidth').chomp '%'}%;") : nil
-        result_buffer << %(<col#{col_style_attribute}>)
+        result_buffer << %(<col#{col_style_attribute}#{short_tag_slash_local}>)
         col_style_attribute = (node.attr? 'itemwidth') ? %( style="width:#{(node.attr 'itemwidth').chomp '%'}%;") : nil
-        result_buffer << %(<col#{col_style_attribute}>)
+        result_buffer << %(<col#{col_style_attribute}#{short_tag_slash_local}>)
         result_buffer << '</colgroup>'
       end
       node.items.each do |terms, dd|
@@ -384,7 +385,7 @@ class BlockDlistTemplate < BaseTemplate
         last_term = terms_array.last
         terms_array.each do |dt|
           result_buffer << dt.text
-          result_buffer << '<br>' if dt != last_term
+          result_buffer << %(<br#{short_tag_slash_local}>) if dt != last_term
         end
         result_buffer << '</td>'
         result_buffer << '<td class="hdlist2">'
@@ -493,7 +494,7 @@ class BlockAdmonitionTemplate < BaseTemplate
       if node.document.attr? 'icons', 'font'
         caption = %(<i class="icon-#{name}" title="#{node.caption}"></i>)
       else
-        caption = %(<img src="#{node.icon_uri(name)}" alt="#{node.caption}">)
+        caption = %(<img src="#{node.icon_uri(name)}" alt="#{node.caption}"#{node.short_tag_slash}>)
       end
     else
       caption = %(<div class="title">#{node.caption}</div>)
@@ -619,7 +620,7 @@ class BlockQuoteTemplate < BaseTemplate
     citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
     if attribution || citetitle
       cite_element = citetitle ? %(<cite>#{citetitle}</cite>) : nil
-      attribution_text = attribution ? %(#{citetitle ? "<br>\n" : nil}&#8212; #{attribution}) : nil
+      attribution_text = attribution ? %(#{citetitle ? "<br#{node.short_tag_slash}>\n" : nil}&#8212; #{attribution}) : nil
       attribution_element = %(\n<div class="attribution">\n#{cite_element}#{attribution_text}\n</div>)
     else
       attribution_element = nil
@@ -647,7 +648,7 @@ class BlockVerseTemplate < BaseTemplate
     citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
     if attribution || citetitle
       cite_element = citetitle ? %(<cite>#{citetitle}</cite>) : nil
-      attribution_text = attribution ? %(#{citetitle ? "<br>\n" : nil}&#8212; #{attribution}) : nil
+      attribution_text = attribution ? %(#{citetitle ? "<br#{node.short_tag_slash}>\n" : nil}&#8212; #{attribution}) : nil
       attribution_element = %(\n<div class="attribution">\n#{cite_element}#{attribution_text}\n</div>)
     else
       attribution_element = nil
@@ -674,16 +675,26 @@ class BlockUlistTemplate < BaseTemplate
       div_classes.insert(1, 'checklist')
       ul_class_attribute = ' class="checklist"'
       if node.option? 'interactive'
-        marker_checked = '<input type="checkbox" data-item-complete="1" checked> '
-        marker_unchecked = '<input type="checkbox" data-item-complete="0"> '
+        if node.document.attr? 'htmlsyntax', 'xml'
+          marker_checked = '<input type="checkbox" data-item-complete="1" checked="checked"/> '
+          marker_unchecked = '<input type="checkbox" data-item-complete="0"/> '
+        else
+          marker_checked = '<input type="checkbox" data-item-complete="1" checked> '
+          marker_unchecked = '<input type="checkbox" data-item-complete="0"> '
+        end
       else
         if node.document.attr? 'icons', 'font'
           marker_checked = '<i class="icon-check"></i> '
           marker_unchecked = '<i class="icon-check-empty"></i> '
         else
           # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
-          marker_checked = '<input type="checkbox" data-item-complete="1" checked disabled> '
-          marker_unchecked = '<input type="checkbox" data-item-complete="0" disabled> '
+          if node.document.attr? 'htmlsyntax', 'xml'
+            marker_checked = '<input type="checkbox" data-item-complete="1" checked="checked" disabled="disabled"/> '
+            marker_unchecked = '<input type="checkbox" data-item-complete="0" disabled="disabled"/> '
+          else
+            marker_checked = '<input type="checkbox" data-item-complete="1" checked disabled> '
+            marker_unchecked = '<input type="checkbox" data-item-complete="0" disabled> '
+          end
         end
       end
     elsif !node.style.nil?
@@ -769,7 +780,7 @@ class BlockColistTemplate < BaseTemplate
         num = i + 1
         num_element = font_icons ?
             %(<i class="conum" data-value="#{num}"></i><b>#{num}</b>) :
-            %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}">)
+            %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}"#{node.short_tag_slash}>)
         result_buffer << %(<tr>
 <td>#{num_element}</td>
 <td>#{item.text}</td>
@@ -805,15 +816,16 @@ if attr? :float %>float: <%= attr :float %>; <% end %>"><%
 if title? %>
 <caption class="title"><%= captioned_title %></caption><%
 end
-if (attr :rowcount) >= 0 %>
+if (attr :rowcount) >= 0
+  short_tag_slash_local = short_tag_slash %>
 <colgroup><%
   if option? 'autowidth'
     @columns.each do %>
-<col><%
+<col<%= short_tag_slash_local %>><%
     end
   else
     @columns.each do |col| %>
-<col style="width:<%= col.attr :colpcwidth %>%;"><%
+<col style="width:<%= col.attr :colpcwidth %>%;"<%= short_tag_slash_local %>><%
     end
   end %> 
 </colgroup><%
@@ -870,7 +882,7 @@ class BlockImageTemplate < BaseTemplate
     width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
 
-    img_element = %(<img src="#{node.image_uri target}" alt="#{alt}"#{width_attribute}#{height_attribute}>)
+    img_element = %(<img src="#{node.image_uri target}" alt="#{alt}"#{width_attribute}#{height_attribute}#{node.short_tag_slash}>)
     if link
       img_element = %(<a class="image" href="#{link}">#{img_element}</a>)
     end
@@ -897,17 +909,22 @@ end
 
 class BlockAudioTemplate < BaseTemplate
   def result(node)
+    xml = node.document.attr? 'htmlsyntax', 'xml'
     id_attribute = node.id ? %( id="#{node.id}") : nil
     classes = ['audioblock', node.style, node.role].compact
     class_attribute = %( class="#{classes * ' '}")
     title_element = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : nil
     %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<audio src="#{node.media_uri(node.attr 'target')}"#{(node.option? 'autoplay') ? ' autoplay' : nil}#{(node.option? 'nocontrols') ? nil : ' controls'}#{(node.option? 'loop') ? ' loop' : nil}>
+<audio src="#{node.media_uri(node.attr 'target')}"#{(node.option? 'autoplay') ? (boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (boolean_attribute 'loop', xml) : nil}>
 Your browser does not support the audio tag.
 </audio>
 </div>
 </div>)
+  end
+
+  def boolean_attribute name, xml
+    xml ? %( #{name}="#{name}") : %( #{name})
   end
 
   def template
@@ -917,6 +934,7 @@ end
 
 class BlockVideoTemplate < BaseTemplate
   def result(node)
+    xml = node.document.attr? 'htmlsyntax', 'xml'
     id_attribute = node.id ? %( id="#{node.id}") : nil
     classes = ['videoblock', node.style, node.role].compact
     class_attribute = %( class="#{classes * ' '}")
@@ -932,7 +950,7 @@ class BlockVideoTemplate < BaseTemplate
       loop_param = (node.option? 'loop') ? "#{delimiter}loop=1" : nil
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+<iframe#{width_attribute}#{height_attribute} src="//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{boolean_attribute 'webkitAllowFullScreen', xml}#{boolean_attribute 'mozallowfullscreen', xml}#{boolean_attribute 'allowFullScreen', xml}></iframe>
 </div>
 </div>)
     when 'youtube'
@@ -943,19 +961,23 @@ class BlockVideoTemplate < BaseTemplate
       controls_param = (node.option? 'nocontrols') ? '&amp;controls=0' : nil
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{node.attr 'target'}?rel=0#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : ' allowfullscreen'}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{node.attr 'target'}?rel=0#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
     else 
       poster_attribute = (node.attr? 'poster') ? %( poster="#{node.media_uri(node.attr 'poster')}") : nil
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri(node.attr 'target')}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? ' autoplay' : nil}#{(node.option? 'nocontrols') ? nil : ' controls'}#{(node.option? 'loop') ? ' loop' : nil}>
+<video src="#{node.media_uri(node.attr 'target')}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (boolean_attribute 'loop', xml) : nil}>
 Your browser does not support the video tag.
 </video>
 </div>
 </div>)
     end
+  end
+
+  def boolean_attribute name, xml
+    xml ? %( #{name}="#{name}") : %( #{name})
   end
 
   def template
@@ -965,7 +987,7 @@ end
 
 class BlockRulerTemplate < BaseTemplate
   def result(node)
-    '<hr>'
+    (node.document.attr? 'htmlsyntax', 'xml') ? '<hr/>' : '<hr>'
   end
 
   def template
@@ -985,7 +1007,7 @@ end
 
 class InlineBreakTemplate < BaseTemplate
   def result(node)
-    %(#{node.text}<br>\n)
+    (node.document.attr? 'htmlsyntax', 'xml') ? %(#{node.text}<br/>\n) : %(#{node.text}<br>\n)
   end
 
   def template
@@ -999,7 +1021,7 @@ class InlineCalloutTemplate < BaseTemplate
       %(<i class="conum" data-value="#{node.text}"></i><b>(#{node.text})</b>)
     elsif node.document.attr? 'icons'
       src = node.icon_uri("callouts/#{node.text}")
-      %(<img src="#{src}" alt="#{node.text}">)
+      %(<img src="#{src}" alt="#{node.text}"#{node.short_tag_slash}>)
     else
       "<b>(#{node.text})</b>"
     end
@@ -1157,7 +1179,7 @@ class InlineImageTemplate < BaseTemplate
         end
       }.join
 
-      img = %(<img src="#{resolved_target}"#{attrs}>)
+      img = %(<img src="#{resolved_target}"#{attrs}#{node.short_tag_slash}>)
     end
 
     if node.attr? 'link'
