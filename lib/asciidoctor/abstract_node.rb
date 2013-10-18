@@ -54,20 +54,20 @@ class AbstractNode
   # Document node and return the value of the attribute if found. Otherwise,
   # return the default value, which defaults to nil.
   #
-  # name    - the String or Symbol name of the attribute to lookup
-  # default - the Object value to return if the attribute is not found (default: nil)
-  # inherit - a Boolean indicating whether to check for the attribute on the
-  #           AsciiDoctor::Document if not found on this node (default: false)
+  # name          - the String or Symbol name of the attribute to lookup
+  # default_value - the Object value to return if the attribute is not found (default: nil)
+  # inherit       - a Boolean indicating whether to check for the attribute on the
+  #                 AsciiDoctor::Document if not found on this node (default: false)
   #
   # return the value of the attribute or the default value if the attribute
   # is not found in the attributes of this node or the document node
-  def attr(name, default = nil, inherit = true)
+  def attr(name, default_value = nil, inherit = true)
     name = name.to_s if name.is_a?(Symbol)
     inherit = false if self == @document
     if inherit
-      @attributes[name] || @document.attributes[name] || default
+      @attributes[name] || @document.attributes[name] || default_value
     else
-      @attributes[name] || default
+      @attributes[name] || default_value
     end
   end
 
