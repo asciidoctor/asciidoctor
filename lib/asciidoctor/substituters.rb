@@ -1165,5 +1165,44 @@ module Substituters
       } * EOL
     end
   end
+
+  # Internal: Lock-in the substitutions for this block
+  #
+  # Looks for an attribute named "subs". If present, resolves the
+  # substitutions and assigns it to the subs property on this block.
+  # Otherwise, assigns a set of default substitutions based on the
+  # content model of the block.
+  #
+  # Returns nothing
+  def lock_in_subs
+    default_subs = []
+    case @content_model
+      when :simple
+        default_subs = SUBS[:normal]
+      when :verbatim
+        if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
+          default_subs = SUBS[:verbatim]
+        else
+          default_subs = SUBS[:basic]
+        end
+      when :raw
+        default_subs = SUBS[:pass]
+      else
+        return
+    end
+
+    if (custom_subs = @attributes['subs'])
+      @subs = resolve_block_subs custom_subs, @context
+    else
+      @subs = default_subs.dup
+    end
+
+    # QUESION delegate this logic to method?
+    if @context == :listing && @style == 'source' && (@document.basebackend? 'html') &&
+        ((highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
+            highlighter == 'pygments') && (attr? 'language')
+      @subs = @subs.map {|sub| sub == :specialcharacters ? :highlight : sub }
+    end
+  end
 end
 end
