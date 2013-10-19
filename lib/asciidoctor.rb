@@ -1117,4 +1117,9 @@ module Asciidoctor
   require 'asciidoctor/renderer'
   require 'asciidoctor/section'
   require 'asciidoctor/table'
+
+  # backends
+  if RUBY_ENGINE_OPAL
+    require 'asciidoctor/backends/html5-erb'
+  end
 end
