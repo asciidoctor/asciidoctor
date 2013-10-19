@@ -731,8 +731,10 @@ module Asciidoctor
     [/(\w)\\?--(?=\w)/, '&#8212;', :leading],
     # ellipsis
     [/\\?\.\.\./, '&#8230;', :leading],
-    # single quotes
-    [/(\w)\\?'(\w)/, '&#8217;', :bounding],
+    # apostrophe or a closing single quote (planned)
+    [/([#{CC_ALPHA}])\\?'(?!')/, '&#8217;', :leading],
+    # an opening single quote (planned)
+    #[/\B\\?'(?=[#{CC_ALPHA])/, '&#8216;', :none],
     # right arrow ->
     [/\\?-&gt;/, '&#8594;', :none],
     # right double arrow =>

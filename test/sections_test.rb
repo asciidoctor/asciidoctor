@@ -335,15 +335,15 @@ blah blah
     test 'should create floating title if style is float' do
       input = <<-EOS
 [float]
-= Plain Ol' Heading
+= Independent Heading!
 
 not in section
       EOS
 
       output = render_embedded_string input
-      assert_xpath '/h1[@id="_plain_ol_heading"]', output, 1
+      assert_xpath '/h1[@id="_independent_heading"]', output, 1
       assert_xpath '/h1[@class="float"]', output, 1
-      assert_xpath %(/h1[@class="float"][text()="Plain Ol' Heading"]), output, 1
+      assert_xpath %(/h1[@class="float"][text()="Independent Heading!"]), output, 1
       assert_xpath '/h1/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p', output, 1
       assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
@@ -352,16 +352,16 @@ not in section
     test 'should create floating title if style is discrete' do
       input = <<-EOS
 [discrete]
-=== Plain Ol' Heading
+=== Independent Heading!
 
 not in section
       EOS
 
       output = render_embedded_string input
       assert_xpath '/h3', output, 1
-      assert_xpath '/h3[@id="_plain_ol_heading"]', output, 1
+      assert_xpath '/h3[@id="_independent_heading"]', output, 1
       assert_xpath '/h3[@class="discrete"]', output, 1
-      assert_xpath %(/h3[@class="discrete"][text()="Plain Ol' Heading"]), output, 1
+      assert_xpath %(/h3[@class="discrete"][text()="Independent Heading!"]), output, 1
       assert_xpath '/h3/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '/h3/following-sibling::*[@class="paragraph"]/p', output, 1
       assert_xpath '/h3/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
@@ -370,7 +370,7 @@ not in section
     test 'floating title should be a block with context floating_title' do
       input = <<-EOS
 [float]
-=== Plain Ol' Heading
+=== Independent Heading!
 
 not in section
       EOS
@@ -380,15 +380,15 @@ not in section
       assert floatingtitle.is_a?(Asciidoctor::Block)
       assert floatingtitle.context != :section
       assert_equal :floating_title, floatingtitle.context
-      assert_equal '_plain_ol_heading', floatingtitle.id
-      assert doc.references[:ids].has_key?('_plain_ol_heading')
+      assert_equal '_independent_heading', floatingtitle.id
+      assert doc.references[:ids].has_key?('_independent_heading')
     end
 
     test 'can assign explicit id to floating title' do
       input = <<-EOS
 [[unchained]]
 [float]
-=== Plain Ol' Heading
+=== Independent Heading!
 
 not in section
       EOS
@@ -420,14 +420,14 @@ not in section
     test 'should not set id on floating title if sectids attribute is unset' do
       input = <<-EOS
 [float]
-=== Plain Ol' Heading
+=== Independent Heading!
 
 not in section
       EOS
 
       output = render_embedded_string input, :attributes => {'sectids' => nil}
       assert_xpath '/h3', output, 1
-      assert_xpath '/h3[@id="_plain_ol_heading"]', output, 0
+      assert_xpath '/h3[@id="_independent_heading"]', output, 0
       assert_xpath '/h3[@class="float"]', output, 1
     end
 
@@ -435,7 +435,7 @@ not in section
       input = <<-EOS
 [[free]]
 [float]
-== Plain Ol' Heading
+== Independent Heading!
 
 not in section
       EOS
@@ -449,14 +449,14 @@ not in section
     test 'should add role to class attribute on floating title' do
       input = <<-EOS
 [float, role="isolated"]
-== Plain Ol' Heading
+== Independent Heading!
 
 not in section
       EOS
 
       output = render_embedded_string input
       assert_xpath '/h2', output, 1
-      assert_xpath '/h2[@id="_plain_ol_heading"]', output, 1
+      assert_xpath '/h2[@id="_independent_heading"]', output, 1
       assert_xpath '/h2[@class="float isolated"]', output, 1
     end
 
