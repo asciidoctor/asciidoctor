@@ -676,13 +676,14 @@ class Document < AbstractBlock
 
   # Internal: Apply substitutions to the attribute value
   #
-  # If the value is an inline passthrough macro (e.g., pass:[text]), then
-  # apply the substitutions defined on the macro to the text. Otherwise,
-  # apply the verbatim substitutions to the value.
+  # If the value is an inline passthrough macro (e.g., pass:<subs>[value]),
+  # apply the substitutions defined in <subs> to the value, or leave the value
+  # unmodified if no substitutions are specified.  If the value is not an
+  # inline passthrough macro, apply header substitutions to the value.
   #
   # value - The String attribute value on which to perform substitutions
   #
-  # Returns The String value with substitutions performed.
+  # Returns The String value with substitutions performed
   def apply_attribute_value_subs(value)
     if value.match(REGEXP[:pass_macro_basic])
       # copy match for Ruby 1.8.7 compat
