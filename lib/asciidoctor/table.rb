@@ -347,7 +347,7 @@ class Table::ParserContext
   # returns true if the buffer starts with a double quote (and not an escaped double quote),
   # false otherwise
   def buffer_quoted?
-    @buffer.lstrip!
+    @buffer = @buffer.lstrip
     @buffer.start_with?('"') && !@buffer.start_with?('""')
   end
 

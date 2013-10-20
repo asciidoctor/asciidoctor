@@ -242,7 +242,7 @@ module Substituters
     return text if @passthroughs.nil? || @passthroughs.empty? || !text.include?(PASS_PLACEHOLDER[:start])
 
     text.gsub(PASS_PLACEHOLDER[:match]) {
-      pass = @passthroughs[$1.to_i]
+      pass = @passthroughs[$~[1].to_i]
       text = apply_subs(pass[:text], pass.fetch(:subs, []))
       pass[:literal] ? Inline.new(self, :quoted, text, :type => :monospaced, :attributes => pass.fetch(:attributes, {})).render : text
     }
@@ -289,8 +289,8 @@ module Substituters
     REPLACEMENTS.each {|pattern, replacement, restore|
       result.gsub!(pattern) {
         matched = $&
-        head = $1
-        tail = $2
+        head = $~[1]
+        tail = $~[2]
         if matched.include?('\\')
           matched.tr('\\', '')
         else
@@ -862,7 +862,7 @@ module Substituters
       last = lines.pop
       lines.map {|line| Inline.new(self, :break, line.chomp.chomp(LINE_BREAK), :type => :line).render }.push(last) * EOL
     else
-      text.gsub(REGEXP[:line_break]) { Inline.new(self, :break, $1, :type => :line).render }
+      text.gsub(REGEXP[:line_break]) { Inline.new(self, :break, $~[1], :type => :line).render }
     end
   end
 
