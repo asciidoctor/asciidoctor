@@ -185,7 +185,7 @@ module Substituters
   def extract_passthroughs(text)
     result = text.dup
 
-    result.gsub!(REGEXP[:pass_macro]) {
+    result = result.gsub(REGEXP[:pass_macro]) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
@@ -207,7 +207,7 @@ module Substituters
       "#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
     } unless !(result.include?('+++') || result.include?('$$') || result.include?('pass:'))
 
-    result.gsub!(REGEXP[:pass_lit]) {
+    result = result.gsub(REGEXP[:pass_lit]) {
       # alias match for Ruby 1.8.7 compat
       m = $~
 
@@ -272,7 +272,7 @@ module Substituters
     result = text.dup
 
     QUOTE_SUBS.each {|type, scope, pattern|
-      result.gsub!(pattern) { transform_quoted_text($~, type, scope) }
+      result = result.gsub(pattern) { transform_quoted_text($~, type, scope) }
     }
 
     result
@@ -287,7 +287,7 @@ module Substituters
     result = text.dup
 
     REPLACEMENTS.each {|pattern, replacement, restore|
-      result.gsub!(pattern) {
+      result = result.gsub(pattern) {
         matched = $&
         head = $1
         tail = $2
@@ -410,7 +410,7 @@ module Substituters
 
     if experimental
       if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
-        result.gsub!(REGEXP[:kbd_btn_macro]) {
+        result = result.gsub(REGEXP[:kbd_btn_macro]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -444,7 +444,7 @@ module Substituters
       end
 
       if found[:macroish] && result.include?('menu:')
-        result.gsub!(REGEXP[:menu_macro]) {
+        result = result.gsub(REGEXP[:menu_macro]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -473,7 +473,7 @@ module Substituters
       end
 
       if result.include?('"') && result.include?('&gt;')
-        result.gsub!(REGEXP[:menu_inline_macro]) {
+        result = result.gsub(REGEXP[:menu_inline_macro]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -494,7 +494,7 @@ module Substituters
     # TODO this handling needs some cleanup
     if (extensions = @document.extensions) && extensions.inline_macros? && found[:macroish]
       extensions.load_inline_macro_processors(@document).each do |processor|
-        result.gsub!(processor.regexp) {
+        result = result.gsub(processor.regexp) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -516,7 +516,7 @@ module Substituters
 
     if found[:macroish] && (result.include?('image:') || result.include?('icon:'))
       # image:filename.png[Alt Text]
-      result.gsub!(REGEXP[:image_macro]) {
+      result = result.gsub(REGEXP[:image_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -547,7 +547,7 @@ module Substituters
     if found[:macroish_short_form] || found[:round_bracket]
       # indexterm:[Tigers,Big cats]
       # (((Tigers,Big cats)))
-      result.gsub!(REGEXP[:indexterm_macro]) {
+      result = result.gsub(REGEXP[:indexterm_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -567,7 +567,7 @@ module Substituters
 
       # indexterm2:[Tigers]
       # ((Tigers))
-      result.gsub!(REGEXP[:indexterm2_macro]) {
+      result = result.gsub(REGEXP[:indexterm2_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -588,7 +588,7 @@ module Substituters
 
     if found[:uri]
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
-      result.gsub!(REGEXP[:link_inline]) {
+      result = result.gsub(REGEXP[:link_inline]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -640,7 +640,7 @@ module Substituters
 
     if found[:macroish] && (result.include?('link:') || result.include?('mailto:'))
       # inline link macros, link:target[text]
-      result.gsub!(REGEXP[:link_macro]) {
+      result = result.gsub(REGEXP[:link_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -683,7 +683,7 @@ module Substituters
     end
 
     if found[:at]
-      result.gsub!(REGEXP[:email_inline]) {
+      result = result.gsub(REGEXP[:email_inline]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         address = m[0]
@@ -703,7 +703,7 @@ module Substituters
     end
 
     if found[:macroish_short_form] && result.include?('footnote')
-      result.gsub!(REGEXP[:footnote_macro]) {
+      result = result.gsub(REGEXP[:footnote_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -742,7 +742,7 @@ module Substituters
     end
 
     if found[:macroish] || result.include?('&lt;&lt;')
-      result.gsub!(REGEXP[:xref_macro]) {
+      result = result.gsub(REGEXP[:xref_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -751,8 +751,8 @@ module Substituters
         end
         if !m[1].nil?
           id, reftext = m[1].split(',', 2).map(&:strip)
-          id.sub!(REGEXP[:dbl_quoted], '\2')
-          reftext.sub!(REGEXP[:m_dbl_quoted], '\2') unless reftext.nil?
+          id = id.sub(REGEXP[:dbl_quoted], '\2')
+          reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2') unless reftext.nil?
         else
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
@@ -788,7 +788,7 @@ module Substituters
     end
 
     if found[:square_bracket] && result.include?('[[[')
-      result.gsub!(REGEXP[:biblio_macro]) {
+      result = result.gsub(REGEXP[:biblio_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -801,7 +801,7 @@ module Substituters
     end
 
     if found[:square_bracket] && result.include?('[[')
-      result.gsub!(REGEXP[:anchor_macro]) {
+      result = result.gsub(REGEXP[:anchor_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -811,11 +811,11 @@ module Substituters
         id = m[1]
         reftext = m[2].nil? ? "[#{id}]" : m[2]
         # enable if we want to allow double quoted values
-        #id.sub!(REGEXP[:dbl_quoted], '\2')
+        #id = id.sub(REGEXP[:dbl_quoted], '\2')
         #if reftext.nil?
         #  reftext = "[#{id}]"
         #else
-        #  reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
+        #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
         #end
         if @document.references[:ids].has_key? id
           # reftext may not match since inline substitutions have been applied
