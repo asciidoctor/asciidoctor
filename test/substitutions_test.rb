@@ -1070,8 +1070,33 @@ foo&#8201;&#8212;&#8201;)
     end
 
     test 'replaces punctuation' do
-      para = block_from_string %(John's Hideout... foo\\'bar)
-      assert_equal "John&#8217;s Hideout&#8230; foo'bar", para.sub_replacements(para.source)
+      para = block_from_string %(John's Hideout is the Whites' place... foo\\'bar)
+      assert_equal "John&#8217;s Hideout is the Whites&#8217; place&#8230; foo'bar", para.sub_replacements(para.source)
+    end
+
+    test 'should replace typographic apostrophe with smart apostrophe at the end of a word' do
+      given = [
+        %(the whites' place),
+        %(the whites'.),
+        %(the whites'--where the wild things are),
+        %(the whites'\nhave),
+        %(consecutive single quotes '' are not modified),
+        %(he is 6' tall),
+        %(the whites\\' place)
+      ]
+      expected = [
+        %(the whites&#8217; place),
+        %(the whites&#8217;.),
+        %(the whites&#8217;--where the wild things are),
+        %(the whites&#8217;\nhave),
+        %(consecutive single quotes '' are not modified),
+        %(he is 6' tall),
+        %(the whites' place)
+      ]
+      given.size.times {|i|
+        para = block_from_string given[i]
+        assert_equal expected[i], para.sub_replacements(para.source)
+      }
     end
   end
 
