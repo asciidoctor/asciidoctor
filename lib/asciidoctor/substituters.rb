@@ -204,7 +204,7 @@ module Substituters
       # TODO move unescaping closing square bracket to an operation
       @passthroughs << {:text => m[2] || m[4].gsub('\]', ']'), :subs => subs}
       index = @passthroughs.size - 1
-      "\e#{index}\e"
+      "#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
     } unless !(result.include?('+++') || result.include?('$$') || result.include?('pass:'))
 
     result.gsub!(REGEXP[:pass_lit]) {
@@ -227,7 +227,7 @@ module Substituters
 
       @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :literal => true}
       index = @passthroughs.size - 1
-      "#{unescaped_attrs || m[1]}\e#{index}\e"
+      "#{unescaped_attrs || m[1]}#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
     } unless !result.include?('`')
 
     result
@@ -239,10 +239,10 @@ module Substituters
   #
   # returns The String text with the passthrough text restored
   def restore_passthroughs(text)
-    return text if @passthroughs.nil? || @passthroughs.empty? || !text.include?("\e")
+    return text if @passthroughs.nil? || @passthroughs.empty? || !text.include?(PASS_PLACEHOLDER[:start])
 
-    text.gsub(REGEXP[:pass_placeholder]) {
-      pass = @passthroughs[$1.to_i];
+    text.gsub(PASS_PLACEHOLDER[:match]) {
+      pass = @passthroughs[$1.to_i]
       text = apply_subs(pass[:text], pass.fetch(:subs, []))
       pass[:literal] ? Inline.new(self, :quoted, text, :type => :monospaced, :attributes => pass.fetch(:attributes, {})).render : text
     }
@@ -1132,6 +1132,11 @@ module Substituters
         else
           result = source
         end
+    end
+
+    # fix passthrough placeholders that got caught up in syntax highlighting
+    unless @passthroughs.empty?
+      result.gsub! PASS_PLACEHOLDER[:match_syn], "#{PASS_PLACEHOLDER[:start]}\\1#{PASS_PLACEHOLDER[:end]}"
     end
 
     if !sub_callouts || callout_marks.empty?
