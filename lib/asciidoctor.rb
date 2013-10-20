@@ -290,6 +290,19 @@ module Asciidoctor
     :attribute_undefined => 'drop-line',
   }
 
+  # Delimiters and matchers for the passthrough placeholder
+  # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
+  PASS_PLACEHOLDER = {
+    # SPA, start of guarded protected area
+    :start  => "\u0096",
+    # EPA, end of guarded protected area
+    :end    => "\u0097",
+    # match placeholder record
+    :match  => /\u0096(\d+)\u0097/,
+    # fix placeholder record after syntax highlighting
+    :match_syn => /<span[^>]*>\u0096<\/span>[^\d]*(\d+)[^\d]*<span[^>]*>\u0097<\/span>/
+  }
+
   # The following pattern, which appears frequently, captures the contents between square brackets,
   # ignoring escaped closing brackets (closing brackets prefixed with a backslash '\' character)
   #
@@ -519,9 +532,6 @@ module Asciidoctor
     # inline literal passthrough macro
     # `text`
     :pass_lit         => /(^|[^`\w])(?:\[([^\]]+?)\])?(\\?`([^`\s]|[^`\s].*?\S)`)(?![`\w])/m,
-
-    # placeholder for extracted passthrough text
-    :pass_placeholder => /\e(\d+)\e/,
 
     # The document revision info line the appears immediately following the
     # document title author info line, if present
