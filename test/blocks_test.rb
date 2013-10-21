@@ -2120,7 +2120,7 @@ content
       doc = document_from_string input
       block = doc.blocks.first
       assert_nil block.id
-      assert_nil (block.attr 'reftext')
+      assert_nil(block.attr 'reftext')
       assert !doc.references[:ids].has_key?('illegal$id')
     end
 

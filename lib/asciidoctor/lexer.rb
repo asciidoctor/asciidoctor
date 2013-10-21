@@ -1760,9 +1760,8 @@ class Lexer
   def self.process_authors(author_line, names_only = false, multiple = true)
     author_metadata = {}
     keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
-    author_entries = multiple ? author_line.split(';').map(&:strip) : [author_line]
+    author_entries = multiple ? ((author_line.split ';').map &:strip) : [author_line]
     author_entries.each_with_index do |author_entry, idx|
-      author_entry.strip!
       next if author_entry.empty?
       key_map = {}
       if idx.zero?
@@ -1909,7 +1908,7 @@ class Lexer
       name = match[1]
       value = match[2].nil? ? '' : match[2]
       if value.end_with? LINE_BREAK
-        value.chop!.rstrip!
+        value = value.chop.rstrip
         while reader.advance
           next_line = reader.peek_line.strip
           break if next_line.empty?

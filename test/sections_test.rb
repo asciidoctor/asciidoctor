@@ -75,7 +75,7 @@ context 'Sections' do
       sec = block_from_string(%(== Section One [["one","Section Uno"]] ==))
       assert_not_equal 'one', sec.id
       assert_equal 'Section One [["one","Section Uno"]]', sec.title
-      assert_nil (sec.attr 'reftext')
+      assert_nil(sec.attr 'reftext')
     end
 
     test 'reftext in embedded anchor may contain comma' do

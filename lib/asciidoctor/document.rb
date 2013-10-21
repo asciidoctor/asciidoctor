@@ -136,7 +136,7 @@ class Document < AbstractBlock
       @safe = nil
       @renderer = nil
       initialize_extensions = Asciidoctor.const_defined?(:Extensions) &&
-          Asciidoctor.const_get(:Extensions) == Asciidoctor::Extensions
+          Asciidoctor.const_get(:Extensions) == ::Asciidoctor::Extensions
       @extensions = nil # initialize furthur down
     end
 

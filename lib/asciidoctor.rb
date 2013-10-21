@@ -483,7 +483,7 @@ module Asciidoctor
     # +      (would not match because there's no space before +)
     #  +     (would match and capture '')
     # Foo +  (would and capture 'Foo')
-    :line_break       => /^(.*)#{CC_BLANK}\+$/,
+    :line_break       => /^(.*)#{CC_BLANK}\+(?=\n|$)/,
 
     # inline link and some inline link macro
     # FIXME revisit!
@@ -771,7 +771,7 @@ module Asciidoctor
   # returns the Asciidoctor::Document
   def self.load(input, options = {})
     if (monitor = options.fetch(:monitor, false))
-      start = Time.now
+      start = Time.now.to_f
     end
 
     attrs = (options[:attributes] ||= {})
@@ -828,13 +828,13 @@ module Asciidoctor
     end
 
     if monitor
-      read_time = Time.now - start
-      start = Time.now
+      read_time = Time.now.to_f - start
+      start = Time.now.to_f
     end
 
     doc = Document.new(lines, options) 
     if monitor
-      parse_time = Time.now - start
+      parse_time = Time.now.to_f - start
       monitor[:read] = read_time
       monitor[:parse] = parse_time
       monitor[:load] = read_time + parse_time
@@ -941,17 +941,17 @@ module Asciidoctor
       end
     end
 
-    start = Time.now if monitor
+    start = Time.now.to_f if monitor
     output = doc.render
 
     if monitor
-      render_time = Time.now - start
+      render_time = Time.now.to_f - start
       monitor[:render] = render_time
       monitor[:load_render] = monitor[:load] + render_time
     end
 
     if to_file
-      start = Time.now if monitor
+      start = Time.now.to_f if monitor
       if stream_output
         to_file.write output.rstrip
         # ensure there's a trailing endline
@@ -963,7 +963,7 @@ module Asciidoctor
         doc.attributes['outdir'] = File.dirname(outfile)
       end
       if monitor
-        write_time = Time.now - start
+        write_time = Time.now.to_f - start
         monitor[:write] = write_time
         monitor[:total] = monitor[:load_render] + write_time
       end
