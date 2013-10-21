@@ -1157,7 +1157,7 @@ two
       EOS
       result = render_string input, :safe => :safe, :backend => :xhtml
       begin
-        doc = Nokogiri::XML::Document.parse(result) {|config|
+        Nokogiri::XML::Document.parse(result) {|config|
           config.options = Nokogiri::XML::ParseOptions::STRICT | Nokogiri::XML::ParseOptions::NONET
         }
       rescue => e
