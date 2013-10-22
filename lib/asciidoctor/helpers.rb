@@ -34,12 +34,7 @@ module Helpers
   # returns an encoded version of the str
   def self.encode_uri(str)
     str.gsub(REGEXP[:uri_encode_chars]) do
-      match = $&
-      buf = ''
-      match.each_byte do |c|
-        buf << sprintf('%%%02X', c)
-      end
-      buf
+      $&.each_byte.map {|c| sprintf '%%%02X', c}.join
     end
   end
 

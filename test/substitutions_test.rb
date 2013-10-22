@@ -1164,4 +1164,19 @@ foo&#8201;&#8212;&#8201;)
       assert_equal [:specialcharacters], block.subs
     end
   end
+
+  # TODO move to helpers_test.rb
+  context 'Helpers' do
+    test 'should URI encode non-word characters generally' do
+      given = ' /%&?\\'
+      expect = '%20%2F%25%26%3F%5C'
+      assert_equal expect, (Asciidoctor::Helpers.encode_uri given)
+    end
+
+    test 'should not URI select non-word characters' do
+      given = '-.!~*\';:@=+$,()[]'
+      expect = given
+      assert_equal expect, (Asciidoctor::Helpers.encode_uri given)
+    end
+  end
 end
