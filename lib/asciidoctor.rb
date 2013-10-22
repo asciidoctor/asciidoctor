@@ -698,7 +698,7 @@ module Asciidoctor
 
   # unconstrained quotes:: can appear anywhere
   # constrained quotes:: must be bordered by non-word characters
-  # NOTE these substituions are processed in the order they appear here and
+  # NOTE these substitutions are processed in the order they appear here and
   # the order in which they are replaced is important
   QUOTE_SUBS = [
 
@@ -1055,7 +1055,7 @@ module Asciidoctor
 
   # modules
   require 'asciidoctor/helpers'
-  require 'asciidoctor/substituters'
+  require 'asciidoctor/substitutors'
 
   # abstract classes
   require 'asciidoctor/abstract_node'

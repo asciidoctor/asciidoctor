@@ -4,7 +4,7 @@ module Asciidoctor
 # all content segments in an AsciiDoc document.
 class AbstractNode
 
-  include Substituters
+  include Substitutors
 
   # Public: Get the element which is the parent of this node
   attr_reader :parent

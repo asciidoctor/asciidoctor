@@ -622,7 +622,7 @@ class PreprocessorReader < Reader
         @look_ahead += 1
         line[1..-1]
       else
-        # QUESTION should we strip whitespace from raw attributes in Substituters#parse_attributes? (check perf)
+        # QUESTION should we strip whitespace from raw attributes in Substitutors#parse_attributes? (check perf)
         if preprocess_include match[1], match[2].strip
           # peek again since the content has changed
           nil
