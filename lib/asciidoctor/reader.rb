@@ -831,7 +831,8 @@ class PreprocessorReader < Reader
           # processing will be automatically aborted if these libraries can't be opened
           Helpers.require_library 'open-uri/cached', 'open-uri-cached'
         else
-          Helpers.require_library 'open-uri'
+          # autoload open-uri
+          ::OpenURI
         end
       else
         target_type = :file

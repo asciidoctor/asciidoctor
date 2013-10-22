@@ -4,7 +4,8 @@ module HTML5
   #
   # returns the default CodeRay stylesheet as a String
   def self.default_coderay_stylesheet
-    #::Asciidoctor::Helpers.require_library 'coderay', true
+    # use the following two lines to load a built-in theme instead
+    #::Asciidoctor::Helpers.require_library 'coderay'
     #::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
     <<'DEFAULT_CODERAY_STYLESHEET'
 /* Foundation stylesheet for CodeRay (to match GitHub theme) | MIT License | http://foundation.zurb.com */
