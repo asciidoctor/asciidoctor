@@ -1,30 +1,28 @@
 module Asciidoctor
 module Helpers
-  # Internal: Prior to invoking Kernel#require, issues a warning urging a
-  # manual require if running in a threaded environment.
+  # Internal: Require the specified library using Kernel#require.
+  #
+  # Attempts to load the library specified in the first argument using the
+  # Kernel#require. Rescues the LoadError if the library is not available and
+  # passes a message to Kernel#fail to communicate to the user that processing
+  # is being aborted. If a gem_name is specified, the failure message
+  # communicates that a required gem is not installed.
   #
   # name  - the String name of the library to require.
+  # gem   - a Boolean that indicates whether this library is provided by a RubyGem,
+  #         or the String name of the RubyGem if it differs from the library name
+  #         (default: true)
   #
-  # returns false if the library is detected on the load path or the return
-  # value of delegating to Kernel#require
-  def self.require_library(name, gem_name = nil)
-    if Thread.list.size > 1
-      main_script = "#{name}.rb"
-      main_script_path_segment = "/#{name}.rb"
-      if !$LOADED_FEATURES.detect {|p| p == main_script || p.end_with?(main_script_path_segment) }.nil?
-        return false
-      else
-        warn "WARN: asciidoctor is autoloading '#{name}' in threaded environment. " +
-           "The use of an explicit require '#{name}' statement is recommended."
-      end
-    end
+  # returns the return value of Kernel#require if the library is available,
+  # otherwise Kernel#fail is called with an appropriate message.
+  def self.require_library(name, gem = true)
     begin
       require name
     rescue LoadError => e
-      if gem_name
-        fail "asciidoctor: FAILED: required gem '#{gem_name === true ? name : gem_name}' is not installed. Processing aborted."
+      if gem
+        fail "asciidoctor: FAILED: required gem '#{gem === true ? name : gem}' is not installed. Processing aborted."
       else
-        fail "asciidoctor: FAILED: #{e.chomp '.'}. Processing aborted."
+        fail "asciidoctor: FAILED: #{e.message.chomp '.'}. Processing aborted."
       end
     end
   end

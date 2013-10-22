@@ -1,16 +1,17 @@
 RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
 RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
 RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
-require 'strscan'
 require 'set'
+#require 'strscan'
+
+# ideally we should use require_relative instead of modifying the LOAD_PATH
+$:.unshift(File.dirname __FILE__)
 
 if RUBY_ENGINE_OPAL
   require 'asciidoctor/opal_ext/dir'
   require 'asciidoctor/opal_ext/error'
   require 'asciidoctor/opal_ext/file'
 end
-
-$:.unshift(File.dirname(__FILE__))
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
 # using eRuby templates.
@@ -51,6 +52,13 @@ $:.unshift(File.dirname(__FILE__))
 #     file.puts html
 #   end
 module Asciidoctor
+
+  ::Object.autoload :Base64,        'base64'
+  ::Object.autoload :ERB,           'erb'
+  ::Object.autoload :FileUtils,     'fileutils'
+  ::Object.autoload :OpenURI,       'open-uri'
+  #::Object.autoload :Set,           'set'
+  ::Object.autoload :StringScanner, 'strscan'
 
   module SafeMode
 
@@ -114,17 +122,20 @@ module Asciidoctor
     end
   end
 
-  # The root path of the Asciidoctor gem
-  ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+  # The absolute lib path of the Asciidoctor RubyGem
+  LIB_PATH = ::File.expand_path(::File.dirname __FILE__)
+
+  # The absolute root path of the Asciidoctor RubyGem
+  ROOT_PATH = ::File.dirname LIB_PATH
 
   # The user's home directory, as best we can determine it
-  USER_HOME = RUBY_VERSION >= '1.9' ? Dir.home : ENV['HOME']
+  USER_HOME = RUBY_VERSION >= '1.9' ? ::Dir.home : ENV['HOME']
 
   # Flag to indicate whether encoding of external strings needs to be forced to UTF-8
   # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
   # Address failures performing string operations that are reported as "invalid byte sequence in US-ASCII" 
   # Ruby 1.8 doesn't seem to experience this problem (perhaps because it isn't validating the encodings)
-  FORCE_ENCODING = !RUBY_ENGINE_OPAL && RUBY_VERSION > '1.9' && Encoding.default_external != Encoding::UTF_8
+  FORCE_ENCODING = !RUBY_ENGINE_OPAL && RUBY_VERSION > '1.9' && ::Encoding.default_external != ::Encoding::UTF_8
 
   # Flag to indicate that line length should be calculated using a unicode mode hint
   FORCE_UNICODE_LINE_LENGTH = RUBY_VERSION < '1.9'
@@ -190,17 +201,17 @@ module Asciidoctor
     '----' => [:listing, ['literal', 'source'].to_set],
     '....' => [:literal, ['listing', 'source'].to_set],
     '====' => [:example, ['admonition'].to_set],
-    '****' => [:sidebar, Set.new],
+    '****' => [:sidebar, ::Set.new],
     '____' => [:quote, ['verse'].to_set],
     '""'   => [:quote, ['verse'].to_set],
-    '++++' => [:pass, Set.new],
-    '|===' => [:table, Set.new],
-    ',===' => [:table, Set.new],
-    ':===' => [:table, Set.new],
-    '!===' => [:table, Set.new],
-    '////' => [:comment, Set.new],
-    '```'  => [:fenced_code, Set.new],
-    '~~~'  => [:fenced_code, Set.new]
+    '++++' => [:pass, ::Set.new],
+    '|===' => [:table, ::Set.new],
+    ',===' => [:table, ::Set.new],
+    ':===' => [:table, ::Set.new],
+    '!===' => [:table, ::Set.new],
+    '////' => [:comment, ::Set.new],
+    '```'  => [:fenced_code, ::Set.new],
+    '~~~'  => [:fenced_code, ::Set.new]
   }
 
   DELIMITED_BLOCK_LEADERS = DELIMITED_BLOCKS.keys.map {|key| key[0..1] }.to_set
@@ -642,7 +653,7 @@ module Asciidoctor
     :manname_manpurpose => /^(.*?)#{CC_BLANK}+-#{CC_BLANK}+(.*)$/
   }
 
-  INTRINSICS = Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(
+  INTRINSICS = ::Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(
     {
     'startsb'    => '[',
     'endsb'      => ']',
@@ -777,19 +788,19 @@ module Asciidoctor
   # returns the Asciidoctor::Document
   def self.load(input, options = {})
     if (monitor = options.fetch(:monitor, false))
-      start = Time.now.to_f
+      start = ::Time.now.to_f
     end
 
     attrs = (options[:attributes] ||= {})
-    if attrs.is_a?(Hash) || (RUBY_ENGINE_JRUBY && attrs.is_a?(Java::JavaUtil::Map))
+    if attrs.is_a?(::Hash) || (RUBY_ENGINE_JRUBY && attrs.is_a?(::Java::JavaUtil::Map))
       # all good; placed here as optimization
-    elsif attrs.is_a? Array
+    elsif attrs.is_a? ::Array
       attrs = options[:attributes] = attrs.inject({}) do |accum, entry|
         k, v = entry.split '=', 2
         accum[k] = v || ''
         accum
       end
-    elsif attrs.is_a? String
+    elsif attrs.is_a? ::String
       # convert non-escaped spaces into null character, so we split on the
       # correct spaces chars, and restore escaped spaces
       attrs = attrs.gsub(REGEXP[:space_delim], "\\1\0").gsub(REGEXP[:escaped_space], '\1')
@@ -807,40 +818,40 @@ module Asciidoctor
         attrs[key] = original_attrs[key]
       end
     else
-      raise ArgumentError, "illegal type for attributes option: #{attrs.class.ancestors}"
+      raise ::ArgumentError, "illegal type for attributes option: #{attrs.class.ancestors}"
     end
 
     lines = nil
-    if input.is_a? File
+    if input.is_a? ::File
       lines = input.readlines
       input_mtime = input.mtime
-      input_path = File.expand_path(input.path)
+      input_path = ::File.expand_path(input.path)
       # hold off on setting infile and indir until we get a better sense of their purpose
       attrs['docfile'] = input_path
-      attrs['docdir'] = File.dirname(input_path)
-      attrs['docname'] = File.basename(input_path, File.extname(input_path))
+      attrs['docdir'] = ::File.dirname(input_path)
+      attrs['docname'] = ::File.basename(input_path, ::File.extname(input_path))
       attrs['docdate'] = docdate = input_mtime.strftime('%Y-%m-%d')
       attrs['doctime'] = doctime = input_mtime.strftime('%H:%M:%S %Z')
       attrs['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to?(:readlines)
       input.rewind rescue nil
       lines = input.readlines
-    elsif input.is_a?(String)
+    elsif input.is_a?(::String)
       lines = input.lines.entries
-    elsif input.is_a?(Array)
+    elsif input.is_a?(::Array)
       lines = input.dup
     else
-      raise "Unsupported input type: #{input.class}"
+      raise ::ArgumentError, "Unsupported input type: #{input.class}"
     end
 
     if monitor
-      read_time = Time.now.to_f - start
-      start = Time.now.to_f
+      read_time = ::Time.now.to_f - start
+      start = ::Time.now.to_f
     end
 
     doc = Document.new(lines, options) 
     if monitor
-      parse_time = Time.now.to_f - start
+      parse_time = ::Time.now.to_f - start
       monitor[:read] = read_time
       monitor[:parse] = parse_time
       monitor[:load] = read_time + parse_time
@@ -861,7 +872,7 @@ module Asciidoctor
   #
   # returns the Asciidoctor::Document
   def self.load_file(filename, options = {})
-    Asciidoctor.load(File.new(filename), options)
+    ::Asciidoctor.load(::File.new(filename), options)
   end
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and render it
@@ -900,26 +911,26 @@ module Asciidoctor
     mkdirs = options.delete(:mkdirs) || false
     monitor = options.fetch(:monitor, false)
 
-    write_in_place = in_place && input.is_a?(File)
+    write_in_place = in_place && input.is_a?(::File)
     write_to_target = to_file || to_dir
     stream_output = !to_file.nil? && to_file.respond_to?(:write)
 
     if write_in_place && write_to_target
-      raise ArgumentError, 'the option :in_place cannot be used with either the :to_dir or :to_file option'
+      raise ::ArgumentError, 'the option :in_place cannot be used with either the :to_dir or :to_file option'
     end
 
     if !options.has_key?(:header_footer) && (write_in_place || write_to_target)
       options[:header_footer] = true
     end
 
-    doc = Asciidoctor.load(input, options)
+    doc = ::Asciidoctor.load(input, options)
 
     if to_file == '/dev/null'
       return doc
     elsif write_in_place
-      to_file = File.join(File.dirname(input.path), "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
+      to_file = ::File.join(::File.dirname(input.path), "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
     elsif !stream_output && write_to_target
-      working_dir = options.has_key?(:base_dir) ? File.expand_path(options[:base_dir]) : File.expand_path(Dir.pwd)
+      working_dir = options.has_key?(:base_dir) ? ::File.expand_path(options[:base_dir]) : ::File.expand_path(::Dir.pwd)
       # QUESTION should the jail be the working_dir or doc.base_dir???
       jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
       if to_dir
@@ -927,49 +938,48 @@ module Asciidoctor
         if to_file
           to_file = doc.normalize_system_path(to_file, to_dir, nil, :target_name => 'to_dir', :recover => false)
           # reestablish to_dir as the final target directory (in the case to_file had directory segments)
-          to_dir = File.dirname(to_file)
+          to_dir = ::File.dirname(to_file)
         else
-          to_file = File.join(to_dir, "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
+          to_file = ::File.join(to_dir, "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
         end
       elsif to_file
         to_file = doc.normalize_system_path(to_file, working_dir, jail, :target_name => 'to_dir', :recover => false)
         # establish to_dir as the final target directory (in the case to_file had directory segments)
-        to_dir = File.dirname(to_file)
+        to_dir = ::File.dirname(to_file)
       end
 
-      if !File.directory? to_dir
+      if !::File.directory? to_dir
         if mkdirs
-          Helpers.require_library 'fileutils'
-          FileUtils.mkdir_p to_dir
+          ::FileUtils.mkdir_p to_dir
         else
-          raise IOError, "target directory does not exist: #{to_dir}"
+          raise ::IOError, "target directory does not exist: #{to_dir}"
         end
       end
     end
 
-    start = Time.now.to_f if monitor
+    start = ::Time.now.to_f if monitor
     output = doc.render
 
     if monitor
-      render_time = Time.now.to_f - start
+      render_time = ::Time.now.to_f - start
       monitor[:render] = render_time
       monitor[:load_render] = monitor[:load] + render_time
     end
 
     if to_file
-      start = Time.now.to_f if monitor
+      start = ::Time.now.to_f if monitor
       if stream_output
         to_file.write output.rstrip
         # ensure there's a trailing endline
         to_file.write EOL
       else
-        File.open(to_file, 'w') {|file| file.write output }
+        ::File.open(to_file, 'w') {|file| file.write output }
         # these assignments primarily for testing, diagnostics or reporting
-        doc.attributes['outfile'] = outfile = File.expand_path(to_file)
-        doc.attributes['outdir'] = File.dirname(outfile)
+        doc.attributes['outfile'] = outfile = ::File.expand_path(to_file)
+        doc.attributes['outdir'] = ::File.dirname(outfile)
       end
       if monitor
-        write_time = Time.now.to_f - start
+        write_time = ::Time.now.to_f - start
         monitor[:write] = write_time
         monitor[:total] = monitor[:load_render] + write_time
       end
@@ -982,14 +992,13 @@ module Asciidoctor
         copy_coderay_stylesheet = (doc.attr? 'source-highlighter', 'coderay') && (doc.attr 'coderay-css', 'class') == 'class'
         copy_pygments_stylesheet = (doc.attr? 'source-highlighter', 'pygments') && (doc.attr 'pygments-css', 'class') == 'class'
         if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet
-          Helpers.require_library 'fileutils'
           outdir = doc.attr('outdir')
           stylesoutdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir,
               doc.safe >= SafeMode::SAFE ? outdir : nil)
           Helpers.mkdir_p stylesoutdir if mkdirs
           if copy_asciidoctor_stylesheet
-            File.open(File.join(stylesoutdir, DEFAULT_STYLESHEET_NAME), 'w') {|f|
-              f.write Asciidoctor::HTML5.default_asciidoctor_stylesheet
+            ::File.open(::File.join(stylesoutdir, DEFAULT_STYLESHEET_NAME), 'w') {|f|
+              f.write HTML5.default_asciidoctor_stylesheet
             }
           end
 
@@ -1001,21 +1010,21 @@ module Asciidoctor
             end
             stylesheet_dst = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
             unless stylesheet_src == stylesheet_dst || (stylesheet_content = doc.read_asset stylesheet_src).nil?
-              File.open(stylesheet_dst, 'w') {|f|
+              ::File.open(stylesheet_dst, 'w') {|f|
                 f.write stylesheet_content
               }
             end
           end
 
           if copy_coderay_stylesheet
-            File.open(File.join(stylesoutdir, 'asciidoctor-coderay.css'), 'w') {|f|
-              f.write Asciidoctor::HTML5.default_coderay_stylesheet
+            ::File.open(::File.join(stylesoutdir, 'asciidoctor-coderay.css'), 'w') {|f|
+              f.write HTML5.default_coderay_stylesheet
             }
           end
 
           if copy_pygments_stylesheet
-            File.open(File.join(stylesoutdir, 'asciidoctor-pygments.css'), 'w') {|f|
-              f.write Asciidoctor::HTML5.pygments_stylesheet(doc.attr 'pygments-style')
+            ::File.open(::File.join(stylesoutdir, 'asciidoctor-pygments.css'), 'w') {|f|
+              f.write HTML5.pygments_stylesheet(doc.attr 'pygments-style')
             }
           end
         end
@@ -1037,13 +1046,16 @@ module Asciidoctor
   # returns the Document object if the rendered result String is written to a
   # file, otherwise the rendered result String
   def self.render_file(filename, options = {})
-    Asciidoctor.render(File.new(filename), options)
+    ::Asciidoctor.render(::File.new(filename), options)
   end
 
+  # autoload
+  autoload :Debug,   'asciidoctor/debug'
+  autoload :VERSION, 'asciidoctor/version'
+
   # modules
-  require 'asciidoctor/debug'
-  require 'asciidoctor/substituters'
   require 'asciidoctor/helpers'
+  require 'asciidoctor/substituters'
 
   # abstract classes
   require 'asciidoctor/abstract_node'
@@ -1051,7 +1063,6 @@ module Asciidoctor
 
   # concrete classes
   require 'asciidoctor/attribute_list'
-  require 'asciidoctor/backends/base_template'
   require 'asciidoctor/block'
   require 'asciidoctor/callouts'
   require 'asciidoctor/document'
@@ -1063,7 +1074,4 @@ module Asciidoctor
   require 'asciidoctor/renderer'
   require 'asciidoctor/section'
   require 'asciidoctor/table'
-
-  # info
-  require 'asciidoctor/version'
 end
