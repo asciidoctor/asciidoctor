@@ -4,6 +4,12 @@ RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
 require 'strscan'
 require 'set'
 
+if RUBY_ENGINE_OPAL
+  require 'asciidoctor/opal_ext/dir'
+  require 'asciidoctor/opal_ext/error'
+  require 'asciidoctor/opal_ext/file'
+end
+
 $:.unshift(File.dirname(__FILE__))
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
