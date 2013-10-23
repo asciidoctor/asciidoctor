@@ -507,6 +507,71 @@ If your tests fail, return to step 5.
 . Add, commit, and push your changes.
 . {pr}[Submit a pull request].
 
+=== Writing and Executing Tests
+
+Tests live inside the test directory and are named <topic>_test.rb.
+For instance, tests for the different types of blocks can be found in the file test/blocks_test.rb.
+
+Within a test file, individual test cases are organized inside of contexts.
+A context is type of logical container that groups related tests together.
+
+Each test case follows the same structure:
+
+ test 'description of test' do
+   # test logic
+ end
+
+At the moment, the tests are quite primitive.
+Here's how a typical test operates:
+
+. Defines sample AsciiDoc source
+. Renders the document to HTML or DocBook
+. Uses XPath and CSS expressions to verify expected output
+
+Here's how we might test the open block syntax:
+
+ test 'should render content bounded by two consecutive hyphens as an open block' do
+   input = <<-EOS
+ --
+ This is an open block.
+ --
+   EOS
+   result = render_embedded_string input
+   assert_css '.openblock', result, 1
+   assert_css '.openblock p', result, 1
+   assert_xpath '/div[@class="openblock"]//p[text()="This is an open block."]', result, 1
+ end
+
+As you can see, several helpers are used to facilitate the test scenario.
+The +render_embedded_string+ invokes Asciidoctor's render method with the header and footer option disabled.
+This method is ideal for unit-level tests.
+If you need to test the whole document, use +render_string+ instead.
+The +assert_css+ and +assert_xpath+ assertion methods take a CSS or XPath selector, respectively, the rendered result and the number of expected matches.
+You can also use built-in assertions in Ruby's test library.
+
+To run all the tests, simply execute +rake+:
+
+ $> rake
+
+If you want to run a single test file, you can use +testrb+:
+
+ $> testrb test/blocks_test.rb
+
+To test a single test case, first add the string "wip" to the beginning of the description.
+For example:
+
+ test 'wip should render ...' do
+   ...
+ end
+
+Then, run +testrb+ again, but this time pass a selector argument so it finds matching tests:
+
+ $> testrb test/blocks_test.rb -n /wip/
+
+Once you are done with your test, make sure to remove "wip" from the description and run all the tests again using +rake+.
+
+We plan on switching to a more elegant testing framework in the future, such as RSpec or Cucumber, in order to make the tests more clear and robust.
+
 === Supporting Additional Ruby Versions
 
 If you would like this library to support another Ruby version, you may volunteer to be a maintainer. 
