@@ -70,8 +70,9 @@ Asciidoctor requires one of the following implementations of Ruby:
 * Ruby 1.8.7
 * Ruby 1.9.3
 * Ruby 2.0.0
-* JRuby 1.7.4
-* Rubinius 2.0 - _testing suspended until a release is available_
+* JRuby 1.7.5 (Ruby 1.8 and 1.9 modes)
+* Rubinius 2.0 (Ruby 1.8 and 1.9 modes)
+* Opal (JavaScript)
 
 We expect Asciidoctor to work with other versions of Ruby as well.
 We welcome your help testing those versions if you are interested in seeing them supported.
