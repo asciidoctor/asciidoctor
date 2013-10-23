@@ -109,6 +109,14 @@ class Document < AbstractBlock
     if options[:parent]
       @parent_document = options.delete(:parent)
       options[:base_dir] ||= @parent_document.base_dir
+      @references = @parent_document.references.inject({}) do |collector,(key,ref)|
+        if key == :footnotes
+          collector[:footnotes] = []
+        else
+          collector[key] = ref
+        end
+        collector
+      end
       # QUESTION should we support setting attribute in parent document from nested document?
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
       @attribute_overrides = @parent_document.attributes.dup
@@ -118,6 +126,14 @@ class Document < AbstractBlock
       @extensions = @parent_document.extensions
     else
       @parent_document = nil
+      @references = {
+        :ids => {},
+        :footnotes => [],
+        :links => [],
+        :images => [],
+        :indexterms => [],
+        :includes => Set.new,
+      }
       # copy attributes map and normalize keys
       # attribute overrides are attributes that can only be set from the commandline
       # a direct assignment effectively makes the attribute a constant
@@ -141,14 +157,6 @@ class Document < AbstractBlock
     end
 
     @header = nil
-    @references = {
-      :ids => {},
-      :footnotes => [],
-      :links => [],
-      :images => [],
-      :indexterms => [],
-      :includes => Set.new,
-    }
     @counters = {}
     @callouts = Callouts.new
     @attributes_modified = Set.new

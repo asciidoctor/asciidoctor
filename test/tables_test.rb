@@ -560,6 +560,35 @@ a|include::fixtures/include-file.asciidoc[]
       assert_match(/included content/, output)
     end
 
+    test 'cross reference link in AsciiDoc-style table cell should resolve to reference in main document' do
+      input = <<-EOS
+== Some
+
+|===
+a|See <<_more>>
+|===
+
+== More
+
+content
+      EOS
+
+      result = render_string input
+      assert_xpath '//a[@href="#_more"]', result, 1
+      assert_xpath '//a[@href="#_more"][text()="More"]', result, 1
+    end
+
+    test 'footnotes should not be shared between AsciiDoc-style table cell and main document' do
+      input = <<-EOS
+|===
+a|AsciiDoc footnote:[A lightweight markup language.]
+|===
+      EOS
+
+      result = render_string input
+      assert_css '#_footnote_1', result, 1
+    end
+
     test 'nested table' do
       input = <<-EOS
 [cols="1,2a"]
