@@ -138,7 +138,8 @@ class Document < AbstractBlock
       # attribute overrides are attributes that can only be set from the commandline
       # a direct assignment effectively makes the attribute a constant
       # a nil value or name with leading or trailing ! will result in the attribute being unassigned
-      @attribute_overrides = (options[:attributes] || {}).inject({}) do |collector,(key,value)|
+      @attribute_overrides = (options[:attributes] || {}).inject({}) do |collector,hash|
+        key, value = hash
         if key.start_with?('!')
           key = key[1..-1]
           value = nil
