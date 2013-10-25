@@ -761,7 +761,7 @@ module Asciidoctor
     # apostrophe or a closing single quote (planned)
     [/([#{CC_ALPHA}])\\?'(?!')/, '&#8217;', :leading],
     # an opening single quote (planned)
-    #[/\B\\?'(?=[#{CC_ALPHA])/, '&#8216;', :none],
+    #[/\B\\?'(?=[#{CC_ALPHA}])/, '&#8216;', :none],
     # right arrow ->
     [/\\?-&gt;/, '&#8594;', :none],
     # right double arrow =>

@@ -4,7 +4,7 @@ module Asciidoctor
 # the necessary substitutions.
 module Substitutors
 
-  FEATURE_GSUB_REPLACEMENT_HASH = (RUBY_VERSION >= '1.9')
+  #FEATURE_GSUB_REPLACEMENT_HASH = (RUBY_VERSION >= '1.9')
 
   SUBS = {
     :basic    => [:specialcharacters],
@@ -133,59 +133,12 @@ module Substitutors
     apply_subs text, SUBS[:header]
   end
 
-=begin
-  # Public: Apply explicit substitutions, if specified, otherwise normal substitutions.
-  #
-  # lines  - The lines of text to process. Can be a String or a String Array
-  #
-  # returns - A String with substitutions applied
-  def apply_para_subs(lines)
-    if (subs = attr('subs', nil, false))
-      apply_subs lines.join, resolve_subs(subs)
-    else
-      apply_subs lines.join
-    end
-  end
-
-  # Public: Apply substitutions for titles
-  #
-  # lines  - A String Array containing the lines of text process
-  #
-  # returns - A String with literal (verbatim) substitutions performed
-  def apply_literal_subs(lines)
-    if (subs = attr('subs', nil, false))
-      apply_subs lines.join, resolve_subs(subs)
-    elsif @style == 'source' && @document.attributes['basebackend'] == 'html' &&
-      ((highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
-      highlighter == 'pygments') && attr?('language')
-      highlight_source lines.join, highlighter, callouts
-    else
-      apply_subs lines.join, SUBS[:verbatim]
-    end
-  end
-
-  # Public: Apply substitutions for passthrough text
-  #
-  # lines  - A String Array containing the lines of text process
-  #
-  # returns - A String with passthrough substitutions performed
-  def apply_passthrough_subs(lines)
-    if (subs = attr('subs', nil, false))
-      subs = resolve_subs(subs)
-    else
-      subs = SUBS[:pass]
-    end
-    apply_subs lines.join, subs
-  end
-=end
-
   # Internal: Extract the passthrough text from the document for reinsertion after processing.
   #
   # text - The String from which to extract passthrough fragements
   #
   # returns - The text with the passthrough region substituted with placeholders
   def extract_passthroughs(text)
-
     text = text.gsub(REGEXP[:pass_macro]) {
       # alias match for Ruby 1.8.7 compat
       m = $~
@@ -257,10 +210,11 @@ module Substitutors
   #
   # returns The String text with special characters replaced
   def sub_specialcharacters(text)
-    FEATURE_GSUB_REPLACEMENT_HASH ?
-      # replacement Hash only available in Ruby >= 1.9
-      text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS) :
-      text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
+    text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
+    #FEATURE_GSUB_REPLACEMENT_HASH ?
+    #  # replacement Hash only available in Ruby >= 1.9
+    #  text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS) :
+    #  text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
   end
   alias :sub_specialchars :sub_specialcharacters
 
