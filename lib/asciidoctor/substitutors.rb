@@ -224,11 +224,12 @@ module Substitutors
   #
   # returns The String text with quoted text rendered using the backend templates
   def sub_quotes(text)
+    result = text.dup
     QUOTE_SUBS.each {|type, scope, pattern|
-      text = text.gsub(pattern) { transform_quoted_text($~, type, scope) }
+      result.gsub!(pattern) { transform_quoted_text($~, type, scope) }
     }
 
-    text
+    result
   end
 
   # Public: Substitute replacement characters (e.g., copyright, trademark, etc)
@@ -237,11 +238,11 @@ module Substitutors
   #
   # returns The String text with the replacement characters substituted
   def sub_replacements(text)
+    result = text.dup
     REPLACEMENTS.each {|pattern, replacement, restore|
-      text = text.gsub(pattern) {
+      result.gsub!(pattern) {
+        m = $~
         matched = $&
-        head = $~[1]
-        tail = $~[2]
         if matched.include?('\\')
           matched.tr('\\', '')
         else
@@ -249,15 +250,15 @@ module Substitutors
           when :none
             replacement
           when :leading
-            "#{head}#{replacement}"
+            "#{m[1]}#{replacement}"
           when :bounding
-            "#{head}#{replacement}#{tail}"
+            "#{m[1]}#{replacement}#{m[2]}"
           end
         end
       }
     }
 
-    text
+    result
   end
 
   # Public: Substitute attribute references
@@ -339,25 +340,23 @@ module Substitutors
   #
   # Replace inline macros, which may span multiple lines, in the provided text
   #
-  # text - The String text to process
+  # source - The String text to process
   #
   # returns The String with the inline macros rendered using the backend templates
-  def sub_macros(text)
-    return text if text.nil? || text.empty?
-
-    result = text
+  def sub_macros(source)
+    return source if source.nil? || source.empty?
 
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
-    found[:square_bracket] = result.include?('[')
-    found[:round_bracket] = result.include?('(')
-    found[:colon] = result.include?(':')
-    found[:at] = result.include?('@')
+    found[:square_bracket] = source.include?('[')
+    found[:round_bracket] = source.include?('(')
+    found[:colon] = source.include?(':')
     found[:macroish] = (found[:square_bracket] && found[:colon])
-    found[:macroish_short_form] = (found[:square_bracket] && found[:colon] && result.include?(':['))
-    found[:uri] = (found[:colon] && result.include?('://'))
+    found[:macroish_short_form] = (found[:square_bracket] && found[:colon] && source.include?(':['))
     use_link_attrs = @document.attributes.has_key?('linkattrs')
     experimental = @document.attributes.has_key?('experimental')
+
+    result = source.dup
 
     if experimental
       if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
@@ -537,7 +536,7 @@ module Substitutors
       }
     end
 
-    if found[:uri]
+    if result.include? '://'
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
       result = result.gsub(REGEXP[:link_inline]) {
         # alias match for Ruby 1.8.7 compat
@@ -589,7 +588,7 @@ module Substitutors
       }
     end
 
-    if found[:macroish] && (result.include?('link:') || result.include?('mailto:'))
+    if found[:macroish] && (result.include? 'link:') || (result.include? 'mailto:')
       # inline link macros, link:target[text]
       result = result.gsub(REGEXP[:link_macro]) {
         # alias match for Ruby 1.8.7 compat
@@ -633,7 +632,7 @@ module Substitutors
       }
     end
 
-    if found[:at]
+    if result.include? '@'
       result = result.gsub(REGEXP[:email_inline]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
