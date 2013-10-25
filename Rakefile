@@ -38,6 +38,13 @@ end
 =end
 
 begin
+  require 'cucumber/rake/task'
+  Cucumber::Rake::Task.new(:features) do |t|
+  end
+rescue LoadError
+end
+
+begin
   require 'rdoc/task'
   RDoc::Task.new do |rdoc|
     rdoc.rdoc_dir = 'rdoc'

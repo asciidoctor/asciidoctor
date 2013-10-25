@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+# Look in asciidoctor.gemspec for runtime and development dependencies
 gemspec
 
 # enable this group to use Guard for continuous testing
