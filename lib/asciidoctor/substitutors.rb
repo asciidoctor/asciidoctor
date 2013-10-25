@@ -4,6 +4,8 @@ module Asciidoctor
 # the necessary substitutions.
 module Substitutors
 
+  FEATURE_GSUB_REPLACEMENT_HASH = (RUBY_VERSION >= '1.9')
+
   SUBS = {
     :basic    => [:specialcharacters],
     :normal   => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements],
@@ -183,9 +185,8 @@ module Substitutors
   #
   # returns - The text with the passthrough region substituted with placeholders
   def extract_passthroughs(text)
-    result = text.dup
 
-    result.gsub!(REGEXP[:pass_macro]) {
+    text = text.gsub(REGEXP[:pass_macro]) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
@@ -205,9 +206,9 @@ module Substitutors
       @passthroughs << {:text => m[2] || m[4].gsub('\]', ']'), :subs => subs}
       index = @passthroughs.size - 1
       "#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
-    } unless !(result.include?('+++') || result.include?('$$') || result.include?('pass:'))
+    } if text.include?('+++') || text.include?('$$') || text.include?('pass:')
 
-    result.gsub!(REGEXP[:pass_lit]) {
+    text = text.gsub(REGEXP[:pass_lit]) {
       # alias match for Ruby 1.8.7 compat
       m = $~
 
@@ -228,9 +229,9 @@ module Substitutors
       @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :literal => true}
       index = @passthroughs.size - 1
       "#{unescaped_attrs || m[1]}#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
-    } unless !result.include?('`')
+    } if text.include?('`')
 
-    result
+    text
   end
 
   # Internal: Restore the passthrough text by reinserting into the placeholder positions
@@ -243,8 +244,8 @@ module Substitutors
 
     text.gsub(PASS_PLACEHOLDER[:match]) {
       pass = @passthroughs[$~[1].to_i]
-      text = apply_subs(pass[:text], pass.fetch(:subs, []))
-      pass[:literal] ? Inline.new(self, :quoted, text, :type => :monospaced, :attributes => pass.fetch(:attributes, {})).render : text
+      subbed_text = apply_subs(pass[:text], pass.fetch(:subs, []))
+      pass[:literal] ? Inline.new(self, :quoted, subbed_text, :type => :monospaced, :attributes => pass.fetch(:attributes, {})).render : subbed_text
     }
   end
 
@@ -256,10 +257,10 @@ module Substitutors
   #
   # returns The String text with special characters replaced
   def sub_specialcharacters(text)
-    # this syntax only available in Ruby 1.9
-    #text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS)
-
-    text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
+    FEATURE_GSUB_REPLACEMENT_HASH ?
+      # replacement Hash only available in Ruby >= 1.9
+      text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS) :
+      text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
   end
   alias :sub_specialchars :sub_specialcharacters
 
@@ -269,13 +270,11 @@ module Substitutors
   #
   # returns The String text with quoted text rendered using the backend templates
   def sub_quotes(text)
-    result = text.dup
-
     QUOTE_SUBS.each {|type, scope, pattern|
-      result.gsub!(pattern) { transform_quoted_text($~, type, scope) }
+      text = text.gsub(pattern) { transform_quoted_text($~, type, scope) }
     }
 
-    result
+    text
   end
 
   # Public: Substitute replacement characters (e.g., copyright, trademark, etc)
@@ -284,10 +283,8 @@ module Substitutors
   #
   # returns The String text with the replacement characters substituted
   def sub_replacements(text)
-    result = text.dup
-
     REPLACEMENTS.each {|pattern, replacement, restore|
-      result.gsub!(pattern) {
+      text = text.gsub(pattern) {
         matched = $&
         head = $~[1]
         tail = $~[2]
@@ -306,7 +303,7 @@ module Substitutors
       }
     }
 
-    result
+    text
   end
 
   # Public: Substitute attribute references
@@ -394,7 +391,7 @@ module Substitutors
   def sub_macros(text)
     return text if text.nil? || text.empty?
 
-    result = text.dup
+    result = text
 
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
@@ -410,7 +407,7 @@ module Substitutors
 
     if experimental
       if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
-        result.gsub!(REGEXP[:kbd_btn_macro]) {
+        result = result.gsub(REGEXP[:kbd_btn_macro]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -444,7 +441,7 @@ module Substitutors
       end
 
       if found[:macroish] && result.include?('menu:')
-        result.gsub!(REGEXP[:menu_macro]) {
+        result = result.gsub(REGEXP[:menu_macro]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -473,7 +470,7 @@ module Substitutors
       end
 
       if result.include?('"') && result.include?('&gt;')
-        result.gsub!(REGEXP[:menu_inline_macro]) {
+        result = result.gsub(REGEXP[:menu_inline_macro]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -494,7 +491,7 @@ module Substitutors
     # TODO this handling needs some cleanup
     if (extensions = @document.extensions) && extensions.inline_macros? && found[:macroish]
       extensions.load_inline_macro_processors(@document).each do |processor|
-        result.gsub!(processor.regexp) {
+        result = result.gsub(processor.regexp) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -516,7 +513,7 @@ module Substitutors
 
     if found[:macroish] && (result.include?('image:') || result.include?('icon:'))
       # image:filename.png[Alt Text]
-      result.gsub!(REGEXP[:image_macro]) {
+      result = result.gsub(REGEXP[:image_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -547,7 +544,7 @@ module Substitutors
     if found[:macroish_short_form] || found[:round_bracket]
       # indexterm:[Tigers,Big cats]
       # (((Tigers,Big cats)))
-      result.gsub!(REGEXP[:indexterm_macro]) {
+      result = result.gsub(REGEXP[:indexterm_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -562,12 +559,12 @@ module Substitutors
         end
 
         @document.register(:indexterms, [*terms])
-        Inline.new(self, :indexterm, text, :attributes => {'terms' => terms}).render
+        Inline.new(self, :indexterm, nil, :attributes => {'terms' => terms}).render
       }
 
       # indexterm2:[Tigers]
       # ((Tigers))
-      result.gsub!(REGEXP[:indexterm2_macro]) {
+      result = result.gsub(REGEXP[:indexterm2_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -588,7 +585,7 @@ module Substitutors
 
     if found[:uri]
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
-      result.gsub!(REGEXP[:link_inline]) {
+      result = result.gsub(REGEXP[:link_inline]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -640,7 +637,7 @@ module Substitutors
 
     if found[:macroish] && (result.include?('link:') || result.include?('mailto:'))
       # inline link macros, link:target[text]
-      result.gsub!(REGEXP[:link_macro]) {
+      result = result.gsub(REGEXP[:link_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -683,7 +680,7 @@ module Substitutors
     end
 
     if found[:at]
-      result.gsub!(REGEXP[:email_inline]) {
+      result = result.gsub(REGEXP[:email_inline]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         address = m[0]
@@ -703,7 +700,7 @@ module Substitutors
     end
 
     if found[:macroish_short_form] && result.include?('footnote')
-      result.gsub!(REGEXP[:footnote_macro]) {
+      result = result.gsub(REGEXP[:footnote_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -742,7 +739,7 @@ module Substitutors
     end
 
     if found[:macroish] || result.include?('&lt;&lt;')
-      result.gsub!(REGEXP[:xref_macro]) {
+      result = result.gsub(REGEXP[:xref_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -751,8 +748,8 @@ module Substitutors
         end
         if !m[1].nil?
           id, reftext = m[1].split(',', 2).map(&:strip)
-          id.sub!(REGEXP[:dbl_quoted], '\2')
-          reftext.sub!(REGEXP[:m_dbl_quoted], '\2') unless reftext.nil?
+          id = id.sub(REGEXP[:dbl_quoted], '\2')
+          reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2') unless reftext.nil?
         else
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
@@ -788,7 +785,7 @@ module Substitutors
     end
 
     if found[:square_bracket] && result.include?('[[[')
-      result.gsub!(REGEXP[:biblio_macro]) {
+      result = result.gsub(REGEXP[:biblio_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -801,7 +798,7 @@ module Substitutors
     end
 
     if found[:square_bracket] && result.include?('[[')
-      result.gsub!(REGEXP[:anchor_macro]) {
+      result = result.gsub(REGEXP[:anchor_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -811,11 +808,11 @@ module Substitutors
         id = m[1]
         reftext = m[2].nil? ? "[#{id}]" : m[2]
         # enable if we want to allow double quoted values
-        #id.sub!(REGEXP[:dbl_quoted], '\2')
+        #id = id.sub(REGEXP[:dbl_quoted], '\2')
         #if reftext.nil?
         #  reftext = "[#{id}]"
         #else
-        #  reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
+        #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
         #end
         if @document.references[:ids].has_key? id
           # reftext may not match since inline substitutions have been applied
@@ -856,7 +853,7 @@ module Substitutors
   #
   # returns The String with the post replacements rendered using the backend templates
   def sub_post_replacements(text)
-    if (@document.attributes.has_key? 'hardbreaks') || (@attributes.has_key?('hardbreaks-option'))
+    if (@document.attributes.has_key? 'hardbreaks') || (@attributes.has_key? 'hardbreaks-option')
       lines = text.lines.entries
       return text if lines.size == 1
       last = lines.pop
@@ -1136,7 +1133,7 @@ module Substitutors
 
     # fix passthrough placeholders that got caught up in syntax highlighting
     unless @passthroughs.empty?
-      result.gsub! PASS_PLACEHOLDER[:match_syn], "#{PASS_PLACEHOLDER[:start]}\\1#{PASS_PLACEHOLDER[:end]}"
+      result = result.gsub PASS_PLACEHOLDER[:match_syn], "#{PASS_PLACEHOLDER[:start]}\\1#{PASS_PLACEHOLDER[:end]}"
     end
 
     if !sub_callouts || callout_marks.empty?
