@@ -1079,9 +1079,9 @@ class Lexer
       id = m[1]
       reftext = m[2]
       # enable if we want to allow double quoted values
-      #id.sub!(REGEXP[:dbl_quoted], '\2')
+      #id = id.sub(REGEXP[:dbl_quoted], '\2')
       #if !reftext.nil?
-      #  reftext.sub!(REGEXP[:m_dbl_quoted], '\2')
+      #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
       #end
       document.register(:ids, [id, reftext])
     }
