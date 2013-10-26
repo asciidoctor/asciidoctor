@@ -40,4 +40,8 @@ EOS
   s.add_development_dependency 'tilt', '~> 1.4.1'
   s.add_development_dependency 'yard', '~> 0.8.7'
   s.add_development_dependency 'yard-tomdoc', '~> 0.7.0'
+  if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
+    s.add_development_dependency 'rubysl-test-unit', '~> 2.0.1'
+    s.add_development_dependency 'racc', '~> 1.4.10'
+  end
 end
