@@ -3,6 +3,21 @@ module Asciidoctor
 # It supports all three of AsciiDoc's table formats: psv, dsv and csv.
 class Table < AbstractBlock
 
+  # Public: A data object that encapsulates the collection of rows (head, foot, body) for a table
+  class Rows
+    attr_accessor :head, :foot, :body
+
+    def initialize(head = [], foot = [], body = [])
+      @head = head
+      @foot = foot
+      @body = body
+    end
+
+    def [](name)
+      self.send(name)
+    end
+  end
+
   # Public: A String key that specifies the default table format in AsciiDoc (psv)
   DEFAULT_DATA_FORMAT = 'psv'
 
@@ -56,7 +71,7 @@ class Table < AbstractBlock
 
   def initialize(parent, attributes)
     super(parent, :table)
-    @rows = Rows.new([], [], [])
+    @rows = Rows.new
     @columns = []
 
     @has_header_option = attributes.has_key? 'header-option'
@@ -126,9 +141,6 @@ class Table < AbstractBlock
     nil
   end
 end
-
-# Public: A struct that encapsulates the collection of rows (head, foot, body) for a table
-Table::Rows = Struct.new :head, :foot, :body
 
 # Public: Methods to manage the columns of an AsciiDoc table. In particular, it
 # keeps track of the column specs
