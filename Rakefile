@@ -44,14 +44,43 @@ begin
 rescue LoadError
 end
 
+=begin
 begin
   require 'rdoc/task'
   RDoc::Task.new do |rdoc|
     rdoc.rdoc_dir = 'rdoc'
     rdoc.title = "Asciidoctor #{Asciidoctor::VERSION}"
     rdoc.markup = 'tomdoc' if rdoc.respond_to?(:markup)
-    #rdoc.rdoc_files.include('CHANGELOG', 'LICENSE', 'README.adoc', 'lib/**/*.rb')
     rdoc.rdoc_files.include('LICENSE', 'lib/**/*.rb')
+  end
+rescue LoadError
+end
+=end
+
+begin
+  require 'yard'
+  require 'yard-tomdoc'
+  require './lib/asciidoctor'
+  # register .adoc extension for AsciiDoc markup helper
+  YARD::Templates::Helpers::MarkupHelper::MARKUP_EXTENSIONS[:asciidoc] = %w(adoc)
+  YARD::Rake::YardocTask.new do |yard|
+    yard.files = %w(
+        lib/**/*.rb
+        -
+        CHANGELOG.adoc
+        LICENSE
+    )
+    # --no-highlight enabled to prevent verbatim blocks in AsciiDoc that begin with $ from being dropped
+    # need to patch htmlify method to not attempt to syntax highlight blocks (or fix what's wrong)
+    yard.options = %w(
+        --exclude backends
+        --exclude opal_ext
+        --hide-api private
+        --no-highlight
+        -o rdoc
+        --plugin tomdoc
+        --title Asciidoctor\ API\ Documentation
+    )
   end
 rescue LoadError
 end
@@ -71,5 +100,5 @@ end
 
 desc 'Open an irb session preloaded with this library'
 task :console do
-  sh "bundle console", :verbose => false
+  sh 'bundle console', :verbose => false
 end

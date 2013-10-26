@@ -135,7 +135,7 @@ class AbstractNode
   # enabled on the current node.
   #
   # Check if the option is enabled. This method simply checks to see if the
-  # {name}-option attribute is defined on the current node.
+  # %name%-option attribute is defined on the current node.
   #
   # name    - the String or Symbol name of the option
   #

@@ -263,7 +263,7 @@ module Substitutors
 
   # Public: Substitute attribute references
   #
-  # Attribute references are in the format {name}.
+  # Attribute references are in the format +{name}+.
   #
   # If an attribute referenced in the line is missing, the line is dropped.
   #
