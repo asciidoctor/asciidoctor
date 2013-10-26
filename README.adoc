@@ -180,6 +180,9 @@ If the Asciidoctor gem installed successfully, the +asciidoctor+ command line in
 To invoke it, execute:
 
  $ asciidoctor --version
+
+In the console, you should see:
+
  Asciidoctor 0.1.4 [http://asciidoctor.org]
 
 In addition to the CLI, Asciidoctor provides a Ruby API

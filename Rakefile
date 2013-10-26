@@ -61,6 +61,18 @@ begin
   require 'yard'
   require 'yard-tomdoc'
   require './lib/asciidoctor'
+  require './lib/asciidoctor/extensions'
+
+  # Prevent YARD from breaking command statements in literal paragraphs
+  class CommandBlockPostprocessor < Asciidoctor::Extensions::Postprocessor
+    def process output
+      output.gsub(/<pre>\$ (.+?)<\/pre>/m, '<pre class="command code"><span class="const">$</span> \1</pre>')
+    end
+  end
+  Asciidoctor::Extensions.register do |doc|
+    postprocessor CommandBlockPostprocessor
+  end
+
   # register .adoc extension for AsciiDoc markup helper
   YARD::Templates::Helpers::MarkupHelper::MARKUP_EXTENSIONS[:asciidoc] = %w(adoc)
   YARD::Rake::YardocTask.new do |yard|
@@ -76,7 +88,6 @@ begin
         --exclude backends
         --exclude opal_ext
         --hide-api private
-        --no-highlight
         -o rdoc
         --plugin tomdoc
         --title Asciidoctor\ API\ Documentation
