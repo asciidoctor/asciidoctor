@@ -834,7 +834,7 @@ if (attr :rowcount) >= 0
     @rows[tsec].each do |row| %>
 <tr><%
       row.each do |cell| %>
-<<%= tsec == :head ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}<%
+<<%= tsec == :head || cell.style == :header ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}<%
         cell_content = ''
         if tsec == :head
           cell_content = cell.text
@@ -846,17 +846,13 @@ if (attr :rowcount) >= 0
             cell_content = %(<div class="verse">\#{template.preserve_endlines(cell.text, self)}</div>)
           when :literal
             cell_content = %(<div class="literal"><pre>\#{template.preserve_endlines(cell.text, self)}</pre></div>)
-          when :header
-            cell.content.each do |text|
-              cell_content = %(\#{cell_content}<p class="tableblock header">\#{text}</p>)
-            end
           else
             cell.content.each do |text|
               cell_content = %(\#{cell_content}<p class="tableblock">\#{text}</p>)
             end
           end
         end %><%= (@document.attr? 'cellbgcolor') ? %( style="background-color:\#{@document.attr 'cellbgcolor'};") : nil
-        %>><%= cell_content %></<%= tsec == :head ? 'th' : 'td' %>><%
+        %>><%= cell_content %></<%= tsec == :head || cell.style == :header ? 'th' : 'td' %>><%
       end %>
 </tr><%
     end %>
