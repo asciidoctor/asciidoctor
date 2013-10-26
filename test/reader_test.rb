@@ -500,14 +500,20 @@ include::fixtures/no-such-file.ad[]
       end
   
       test 'include macro can retrieve data from uri' do
+        # disable use of asciidoctor.org due to bug in Rubinius reading zlib compressed response
+        #url = 'http://asciidoctor.org/humans.txt'
+        #match = /Asciidoctor/
+        url = 'http://echo.jsontest.com/name/asciidoctor'
+        expect = /\{"name": "asciidoctor"\}/
+
         input = <<-EOS
 ....
-include::http://asciidoctor.org/humans.txt[]
+include::#{url}[]
 ....
         EOS
   
         output = render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
-        assert_match(/Asciidoctor/, output)
+        assert_match(expect, output)
       end
   
       test 'inaccessible uri referenced by include macro does not crash processor' do
