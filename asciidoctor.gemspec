@@ -35,8 +35,9 @@ EOS
   s.add_development_dependency 'haml', '~> 4.0.0'
   s.add_development_dependency 'nokogiri', '~> 1.5.10'
   s.add_development_dependency 'rake', '~> 10.0.0'
-  s.add_development_dependency 'rdoc', '~> 4.0.0'
   s.add_development_dependency 'rspec-expectations', '~> 2.14.0'
   s.add_development_dependency 'slim', '~> 2.0.0'
   s.add_development_dependency 'tilt', '~> 1.4.1'
+  s.add_development_dependency 'yard', '~> 0.8.7'
+  s.add_development_dependency 'yard-tomdoc', '~> 0.7.0'
 end
