@@ -235,7 +235,7 @@ blockquote, blockquote p { line-height: 1.6; color: #6f6f6f; }
   .hide-for-print { display: none !important; }
   .show-for-print { display: inherit !important; } }
 table { background: white; margin-bottom: 1.25em; border: solid 1px #dddddd; }
-table thead, table tfoot, table tr th { background: whitesmoke; font-weight: bold; }
+table thead, table tfoot { background: whitesmoke; font-weight: bold; }
 table thead tr th, table thead tr td, table tfoot tr th, table tfoot tr td { padding: 0.5em 0.625em 0.625em; font-size: inherit; color: #222222; text-align: left; }
 table tr th, table tr td { padding: 0.5625em 0.625em; font-size: inherit; color: #222222; }
 table tr.even, table tr.alt, table tr:nth-of-type(even) { background: #f9f9f9; }
@@ -362,14 +362,15 @@ table thead th, table tfoot th { font-weight: bold; }
 table.tableblock.grid-all { border-collapse: separate; border-spacing: 1px; -webkit-border-radius: 4px; border-radius: 4px; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; }
 table.tableblock.frame-topbot, table.tableblock.frame-none { border-left: 0; border-right: 0; }
 table.tableblock.frame-sides, table.tableblock.frame-none { border-top: 0; border-bottom: 0; }
-table.tableblock td .paragraph:last-child p, table.tableblock td > p:last-child { margin-bottom: 0; }
+table.tableblock td .paragraph:last-child p > p:last-child, table.tableblock th > p:last-child, table.tableblock td > p:last-child { margin-bottom: 0; }
 th.tableblock.halign-left, td.tableblock.halign-left { text-align: left; }
 th.tableblock.halign-right, td.tableblock.halign-right { text-align: right; }
 th.tableblock.halign-center, td.tableblock.halign-center { text-align: center; }
 th.tableblock.valign-top, td.tableblock.valign-top { vertical-align: top; }
 th.tableblock.valign-bottom, td.tableblock.valign-bottom { vertical-align: bottom; }
 th.tableblock.valign-middle, td.tableblock.valign-middle { vertical-align: middle; }
-p.tableblock.header { color: #222222; font-weight: bold; }
+tbody tr th { display: table-cell; line-height: 1.6; background: whitesmoke; }
+tbody tr th, tbody tr th p, tfoot tr th, tfoot tr th p { color: #222222; font-weight: bold; }
 td > div.verse { white-space: pre; }
 ol { margin-left: 1.75em; }
 ul li ol { margin-left: 1.5em; }
