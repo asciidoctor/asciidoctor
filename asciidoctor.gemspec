@@ -16,7 +16,11 @@ EOS
   s.homepage          = 'http://asciidoctor.org'
   s.license           = 'MIT'
 
+  begin
   s.files             = `git ls-files -z -- */* {CHANGELOG,LICENSE,README,Rakefile}*`.split "\0"
+  rescue
+  s.files             = Dir['**/*']
+  end
   s.executables       = s.files.grep(/^bin\//) { |f| File.basename f }
   s.test_files        = s.files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
   s.require_paths     = %w[lib]
