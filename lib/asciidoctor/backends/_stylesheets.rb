@@ -235,7 +235,7 @@ blockquote, blockquote p { line-height: 1.6; color: #6f6f6f; }
   .hide-for-print { display: none !important; }
   .show-for-print { display: inherit !important; } }
 table { background: white; margin-bottom: 1.25em; border: solid 1px #dddddd; }
-table thead, table tfoot { background: whitesmoke; font-weight: bold; }
+table thead, table tfoot, table tr th { background: whitesmoke; font-weight: bold; }
 table thead tr th, table thead tr td, table tfoot tr th, table tfoot tr td { padding: 0.5em 0.625em 0.625em; font-size: inherit; color: #222222; text-align: left; }
 table tr th, table tr td { padding: 0.5625em 0.625em; font-size: inherit; color: #222222; }
 table tr.even, table tr.alt, table tr:nth-of-type(even) { background: #f9f9f9; }

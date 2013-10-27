@@ -321,14 +321,40 @@ A | here| a | there
       assert_css 'table > thead > tr > th', output, 3
       assert_css 'table > thead > tr > th > *', output, 0
 
-      assert_css 'table > tfoot > tr > td', output, 3
-      assert_css 'table > tfoot > tr > td > p.header', output, 1
+      assert_css 'table > tfoot > tr > th', output, 1
+      assert_css 'table > tfoot > tr > td', output, 2
       assert_css 'table > tfoot > tr > td > p > strong', output, 1
       assert_css 'table > tfoot > tr > td > p > em', output, 1
 
-      assert_css 'table > tbody > tr > td', output, 3
-      assert_css 'table > tbody > tr > td > p.header', output, 1
+      assert_css 'table > tbody > tr > th', output, 1
+      assert_css 'table > tbody > tr > td', output, 2
+      assert_css 'table > tbody > tr > td > p.header', output, 0
       assert_css 'table > tbody > tr > td > p > strong', output, 1
+      assert_css 'table > tbody > tr > td > p > em > a', output, 1
+    end
+
+    test 'vertical table headers use th element instead of header class' do
+      input = <<-EOS
+[cols="1h,1s,1e"]
+|====
+
+|Name |Occupation| Website
+
+|Octocat |Social coding| http://github.com
+
+|Name |Occupation| Website
+
+|====
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+
+      assert_css 'table > tbody > tr > th', output, 3
+      assert_css 'table > tbody > tr > td', output, 6
+      assert_css 'table > tbody > tr > td.header', output, 0
+      assert_css 'table > tbody > tr > td > p.header', output, 0
+      assert_css 'table > tbody > tr > td > p > strong', output, 3
+      assert_css 'table > tbody > tr > td > p > em', output, 3
       assert_css 'table > tbody > tr > td > p > em > a', output, 1
     end
 
