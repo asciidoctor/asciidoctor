@@ -59,7 +59,7 @@ module Asciidoctor
              # allows use of block to supply stdin, particularly useful for tests
              inputs = [block_given? ? yield : STDIN]
           else
-             inputs = infiles.map {|infile| File.new infile}
+             inputs = infiles.map {|infile| File.new infile, 'r'}
           end
 
           # NOTE: if infile is stdin, default to outfile as stout
