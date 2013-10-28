@@ -135,7 +135,7 @@ module Asciidoctor
   # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
   # Address failures performing string operations that are reported as "invalid byte sequence in US-ASCII" 
   # Ruby 1.8 doesn't seem to experience this problem (perhaps because it isn't validating the encodings)
-  FORCE_ENCODING = !RUBY_ENGINE_OPAL && RUBY_VERSION > '1.9' && ::Encoding.default_external != ::Encoding::UTF_8
+  FORCE_ENCODING = !RUBY_ENGINE_OPAL && RUBY_VERSION >= '1.9' && ::Encoding.default_external != ::Encoding::UTF_8
 
   # Flag to indicate that line length should be calculated using a unicode mode hint
   FORCE_UNICODE_LINE_LENGTH = RUBY_VERSION < '1.9'
