@@ -12,7 +12,8 @@ module Substitutors
     :verbatim => [:specialcharacters, :callouts],
     :title    => [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements],
     :header   => [:specialcharacters, :attributes],
-    :pass     => [:attributes, :macros]
+    # by default, AsciiDoc performs :attributes and :macros on a pass block
+    :pass     => []
   }
 
   COMPOSITE_SUBS = {
