@@ -405,6 +405,26 @@ preamble
       end
     end
 
+    context 'Include Stack' do
+      test 'PreprocessorReader#push_include method should return nil' do
+        doc = empty_document
+        reader = Asciidoctor::PreprocessorReader.new doc, ''
+        append_lines = %w(one two three)
+        result = reader.push_include append_lines, '<stdin>', '<stdin>'
+        assert_nil result
+      end
+
+      test 'PreprocessorReader#push_include method should put lines on top of stack' do
+        doc = empty_document
+        lines = %(a b c)
+        reader = Asciidoctor::PreprocessorReader.new doc, lines
+        append_lines = %w(one two three)
+        reader.push_include append_lines, '<stdin>', '<stdin>'
+        assert_equal 1, reader.include_stack.size
+        assert_equal 'one', reader.read_line.rstrip
+      end
+    end
+
     context 'Include Macro' do
       test 'include macro is disabled by default and becomes a link' do
         input = <<-EOS
