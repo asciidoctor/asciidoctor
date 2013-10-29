@@ -1028,17 +1028,35 @@ This is a passthrough block.
       assert_equal 'This is a passthrough block.', block.source
     end
 
-    test 'performs passthrough subs on a passthrough block' do
+    test 'does not perform subs on a passthrough block by default' do
       input = <<-EOS
 :type: passthrough
 
 ++++
 This is a '{type}' block.
 http://asciidoc.org
+image:tiger.png[]
 ++++
       EOS
 
-      expected = %(This is a 'passthrough' block.\n<a href="http://asciidoc.org">http://asciidoc.org</a>)
+      expected = %(This is a '{type}' block.\nhttp://asciidoc.org\nimage:tiger.png[])
+      output = render_embedded_string input
+      assert_equal expected, output.strip
+    end
+
+    test 'does not perform subs on a passthrough block with pass style by default' do
+      input = <<-EOS
+:type: passthrough
+
+[pass]
+++++
+This is a '{type}' block.
+http://asciidoc.org
+image:tiger.png[]
+++++
+      EOS
+
+      expected = %(This is a '{type}' block.\nhttp://asciidoc.org\nimage:tiger.png[])
       output = render_embedded_string input
       assert_equal expected, output.strip
     end
@@ -1047,14 +1065,14 @@ http://asciidoc.org
       input = <<-EOS
 :type: passthrough
 
-[subs="attributes, quotes"]
+[subs="attributes,quotes,macros"]
 ++++
 This is a '{type}' block.
 http://asciidoc.org
 ++++
       EOS
 
-      expected = %(This is a <em>passthrough</em> block.\nhttp://asciidoc.org)
+      expected = %(This is a <em>passthrough</em> block.\n<a href="http://asciidoc.org">http://asciidoc.org</a>)
       output = render_embedded_string input
       assert_equal expected, output.strip
     end
