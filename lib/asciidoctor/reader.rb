@@ -986,6 +986,7 @@ class PreprocessorReader < Reader
       @eof = false
       @look_ahead = 0
     end
+    nil
   end
 
   def pop_include
@@ -997,6 +998,7 @@ class PreprocessorReader < Reader
       @eof = @lines.empty?
       @look_ahead = 0
     end
+    nil
   end
 
   def include_depth
