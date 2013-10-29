@@ -122,6 +122,9 @@ subsequent directories override ones previously discovered.
 
 === Processing Information
 
+*-q, --quiet*::
+    Silence warnings.
+
 *--trace*::
     Include backtrace information on errors. Not enabled by default.
 
