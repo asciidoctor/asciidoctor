@@ -870,9 +870,9 @@ class PreprocessorReader < Reader
           end
           inc_lines = inc_lines.sort.uniq
         elsif attributes.has_key? 'tag'
-          tags = [attributes['tag']]
+          tags = [attributes['tag']].to_set
         elsif attributes.has_key? 'tags'
-          tags = attributes['tags'].split(REGEXP[:ssv_or_csv_delim]).uniq
+          tags = attributes['tags'].split(REGEXP[:ssv_or_csv_delim]).uniq.to_set
         end
       end
       if !inc_lines.nil?
@@ -913,6 +913,7 @@ class PreprocessorReader < Reader
           inc_line_offset = 0
           inc_lineno = 0
           active_tag = nil
+          tags_found = Set.new
           begin
             open(include_file) do |f|
               f.each_line do |l|
@@ -930,6 +931,7 @@ class PreprocessorReader < Reader
                   tags.each do |tag|
                     if l.include?("tag::#{tag}[]")
                       active_tag = tag
+                      tags_found << tag
                       break
                     end
                   end
@@ -940,6 +942,9 @@ class PreprocessorReader < Reader
             warn "asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file}"
             advance
             return true
+          end
+          unless (missing_tags = tags - tags_found).empty?
+            warn "asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags.to_a * ','}' not found in include #{target_type}: #{include_file}"
           end
           advance
           # FIXME not accounting for skipped lines in reader line numbering

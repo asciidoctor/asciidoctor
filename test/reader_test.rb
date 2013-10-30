@@ -425,8 +425,8 @@ preamble
       end
     end
 
-    context 'Include Macro' do
-      test 'include macro is disabled by default and becomes a link' do
+    context 'Include Directive' do
+      test 'include directive is disabled by default and becomes a link' do
         input = <<-EOS
 include::include-file.asciidoc[]
         EOS
@@ -435,7 +435,7 @@ include::include-file.asciidoc[]
         assert_equal 'link:include-file.asciidoc[]', reader.read_line.chomp
       end
   
-      test 'include macro is enabled when safe mode is less than SECURE' do
+      test 'include directive is enabled when safe mode is less than SECURE' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[]
         EOS
@@ -445,7 +445,7 @@ include::fixtures/include-file.asciidoc[]
         assert_match(/included content/, output)
       end
 
-      test 'include macro should resolve file relative to current include' do
+      test 'include directive should resolve file relative to current include' do
         input = <<-EOS
 include::fixtures/parent-include.adoc[]
         EOS
@@ -506,7 +506,7 @@ include::fixtures/parent-include.adoc[]
         assert_equal 'fixtures/parent-include.adoc', reader.path
       end
   
-      test 'missing file referenced by include macro does not crash processor' do
+      test 'missing file referenced by include directive does not crash processor' do
         input = <<-EOS
 include::fixtures/no-such-file.ad[]
         EOS
@@ -515,11 +515,11 @@ include::fixtures/no-such-file.ad[]
           doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
           assert_equal 0, doc.blocks.size
         rescue
-          flunk 'include macro should not raise exception on missing file'
+          flunk 'include directive should not raise exception on missing file'
         end
       end
   
-      test 'include macro can retrieve data from uri' do
+      test 'include directive can retrieve data from uri' do
         # disable use of asciidoctor.org due to bug in Rubinius reading zlib compressed response
         #url = 'http://asciidoctor.org/humans.txt'
         #match = /Asciidoctor/
@@ -536,7 +536,7 @@ include::#{url}[]
         assert_match(expect, output)
       end
   
-      test 'inaccessible uri referenced by include macro does not crash processor' do
+      test 'inaccessible uri referenced by include directive does not crash processor' do
         input = <<-EOS
 ....
 include::http://127.0.0.1:0[]
@@ -547,11 +547,11 @@ include::http://127.0.0.1:0[]
           output = render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
           assert_css 'pre:empty', output, 1
         rescue
-          flunk 'include macro should not raise exception on inaccessible uri'
+          flunk 'include directive should not raise exception on inaccessible uri'
         end
       end
   
-      test 'include macro supports line selection' do
+      test 'include directive supports line selection' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         EOS
@@ -568,7 +568,7 @@ include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         assert_match(/last line of included content/, output)
       end
   
-      test 'include macro supports line selection using quoted attribute value' do
+      test 'include directive supports line selection using quoted attribute value' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         EOS
@@ -585,7 +585,7 @@ include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         assert_match(/last line of included content/, output)
       end
   
-      test 'include macro supports tagged selection' do
+      test 'include directive supports tagged selection' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tag=snippetA]
         EOS
@@ -597,7 +597,7 @@ include::fixtures/include-file.asciidoc[tag=snippetA]
         assert_no_match(/included content/, output)
       end
   
-      test 'include macro supports multiple tagged selection' do
+      test 'include directive supports multiple tagged selection' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         EOS
@@ -608,8 +608,25 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         assert_no_match(/non-tagged content/, output)
         assert_no_match(/included content/, output)
       end
+
+      test 'should warn if tag is not found in include file' do
+        input = <<-EOS
+include::fixtures/include-file.asciidoc[tag=snippetZ]
+        EOS
   
-      test 'lines attribute takes precedence over tags attribute in include macro' do
+        old_stderr = $stderr
+        $stderr = StringIO.new
+        begin
+          render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+          warning = $stderr.tap(&:rewind).read
+          assert_not_nil warning
+          assert_match(/WARNING.*snippetZ/, warning)
+        ensure
+          $stderr = old_stderr
+        end
+      end
+  
+      test 'lines attribute takes precedence over tags attribute in include directive' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines=1, tags=snippetA;snippetB]
         EOS
@@ -674,7 +691,7 @@ last line
         assert_match(/^middle line$/, source)
       end
 
-      test 'should fall back to built-in include macro behavior when not handled by include processor' do
+      test 'should fall back to built-in include directive behavior when not handled by include processor' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[]
         EOS
@@ -700,7 +717,7 @@ include::fixtures/include-file.asciidoc[]
         assert_match(/included content/, source)
       end
   
-      test 'attributes are substituted in target of include macro' do
+      test 'attributes are substituted in target of include directive' do
         input = <<-EOS
 :fixturesdir: fixtures
 :ext: asciidoc
@@ -713,7 +730,7 @@ include::{fixturesdir}/include-file.{ext}[]
         assert_match(/included content/, output)
       end
   
-      test 'line is skipped by default if target of include macro resolves to empty' do
+      test 'line is skipped by default if target of include directive resolves to empty' do
         input = <<-EOS
 include::{foodir}/include-file.asciidoc[]
         EOS
@@ -723,7 +740,7 @@ include::{foodir}/include-file.asciidoc[]
         assert_equal "include::{foodir}/include-file.asciidoc[]\n", reader.read_line
       end
 
-      test 'line is dropped if target of include macro resolves to empty and attribute-missing attribute is not skip' do
+      test 'line is dropped if target of include directive resolves to empty and attribute-missing attribute is not skip' do
         input = <<-EOS
 include::{foodir}/include-file.asciidoc[]
         EOS
@@ -744,7 +761,7 @@ yo
         assert_equal "yo\n", reader.read_line
       end
   
-      test 'escaped include macro is left unprocessed' do
+      test 'escaped include directive is left unprocessed' do
         input = <<-EOS
 \\include::fixtures/include-file.asciidoc[]
 \\escape preserved here
@@ -759,7 +776,7 @@ yo
         assert_equal '\\escape preserved here', reader.read_line.chomp
       end
   
-      test 'include macro not at start of line is ignored' do
+      test 'include directive not at start of line is ignored' do
         input = <<-EOS
  include::include-file.asciidoc[]
         EOS
@@ -770,7 +787,7 @@ yo
         assert_equal 'include::include-file.asciidoc[]', para.source
       end
   
-      test 'include macro is disabled when max-include-depth attribute is 0' do
+      test 'include directive is disabled when max-include-depth attribute is 0' do
         input = <<-EOS
 include::include-file.asciidoc[]
         EOS
@@ -790,7 +807,7 @@ include::include-file.asciidoc[]
         assert_equal 'include::include-file.asciidoc[]', para.source
       end
 
-      test 'include macro should be disabled if max include depth has been exceeded' do
+      test 'include directive should be disabled if max include depth has been exceeded' do
         input = <<-EOS
 include::fixtures/parent-include.adoc[depth=1]
         EOS
@@ -804,7 +821,7 @@ include::fixtures/parent-include.adoc[depth=1]
         assert lines.include?("include::child-include.adoc[]\n")
       end
 
-      test 'include macro should be disabled if max include depth set in nested context has been exceeded' do
+      test 'include directive should be disabled if max include depth set in nested context has been exceeded' do
         input = <<-EOS
 include::fixtures/parent-include-restricted.adoc[depth=3]
         EOS
