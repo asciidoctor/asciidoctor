@@ -719,7 +719,8 @@ module Substitutors
       }
     end
 
-    if (found.nil? || found[:square_bracket]) && text.include?('[[')
+    if ((found.nil? || found[:square_bracket]) && text.include?('[[')) ||
+        ((found.nil? || found[:macroish]) && text.include?('anchor:'))
       text = text.gsub(REGEXP[:anchor_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -727,8 +728,9 @@ module Substitutors
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        id = m[1]
-        reftext = m[2].nil? ? "[#{id}]" : m[2]
+        id = m[1] || m[3]
+        reftext = m[2] || m[4]
+        reftext = "[#{id}]" if reftext.nil?
         # enable if we want to allow double quoted values
         #id = id.sub(REGEXP[:dbl_quoted], '\2')
         #if reftext.nil?

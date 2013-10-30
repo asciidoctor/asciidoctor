@@ -1,3 +1,4 @@
+$cnt = 0
 module Asciidoctor
 # Public: Methods to parse lines of AsciiDoc into an object hierarchy
 # representing the structure of the document. All methods are class methods and
@@ -1072,19 +1073,21 @@ class Lexer
   #
   # Returns nothing
   def self.catalog_inline_anchors(text, document)
-    text.scan(REGEXP[:anchor_macro]) {
-      # alias match for Ruby 1.8.7 compat
-      m = $~
-      next if m[0].start_with? '\\'
-      id = m[1]
-      reftext = m[2]
-      # enable if we want to allow double quoted values
-      #id = id.sub(REGEXP[:dbl_quoted], '\2')
-      #if !reftext.nil?
-      #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
-      #end
-      document.register(:ids, [id, reftext])
-    }
+    if text.include? '['
+      text.scan(REGEXP[:anchor_macro]) {
+        # alias match for Ruby 1.8.7 compat
+        m = $~
+        next if m[0].start_with? '\\'
+        id = m[1] || m[3]
+        reftext = m[2] || m[4]
+        # enable if we want to allow double quoted values
+        #id = id.sub(REGEXP[:dbl_quoted], '\2')
+        #if !reftext.nil?
+        #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
+        #end
+        document.register(:ids, [id, reftext])
+      }
+    end
     nil
   end
 
