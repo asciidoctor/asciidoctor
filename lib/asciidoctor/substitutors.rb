@@ -498,6 +498,8 @@ module Substitutors
     if found[:macroish_short_form] || found[:round_bracket]
       # indexterm:[Tigers,Big cats]
       # (((Tigers,Big cats)))
+      # indexterm2:[Tigers]
+      # ((Tigers))
       result = result.gsub(REGEXP[:indexterm_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -506,34 +508,41 @@ module Substitutors
           next m[0][1..-1]
         end
 
-        if m[1]
-          terms = split_simple_csv normalize_string(m[1], true)
+        num_brackets = 0
+        text_in_brackets = nil
+        if (macro_name = m[1]).nil?
+          text_in_brackets = m[3]
+          if (text_in_brackets.start_with? '(') && (text_in_brackets.end_with? ')')
+            text_in_brackets = text_in_brackets[1...-1]
+            num_brackets = 3
+          else
+            num_brackets = 2
+          end
+        end
+
+        # non-visible
+        if macro_name == 'indexterm' || num_brackets == 3
+          if macro_name.nil?
+            # (((Tigers,Big cats)))
+            terms = split_simple_csv normalize_string(text_in_brackets)
+          else
+            # indexterm:[Tigers,Big cats]
+            terms = split_simple_csv normalize_string(m[2], true)
+          end
+          @document.register(:indexterms, [*terms])
+          Inline.new(self, :indexterm, nil, :attributes => {'terms' => terms}).render
+        # visible
         else
-          terms = split_simple_csv normalize_string(m[2])
+          if macro_name.nil?
+            # ((Tigers))
+            text = normalize_string text_in_brackets
+          else
+            # indexterm2:[Tigers]
+            text = normalize_string m[2], true
+          end
+          @document.register(:indexterms, [text])
+          Inline.new(self, :indexterm, text, :type => :visible).render
         end
-
-        @document.register(:indexterms, [*terms])
-        Inline.new(self, :indexterm, nil, :attributes => {'terms' => terms}).render
-      }
-
-      # indexterm2:[Tigers]
-      # ((Tigers))
-      result = result.gsub(REGEXP[:indexterm2_macro]) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
-        end
-
-        if m[1]
-          text = normalize_string m[1], true
-        else
-          text = normalize_string m[2]
-        end
-
-        @document.register(:indexterms, [text])
-        Inline.new(self, :indexterm, text, :type => :visible).render
       }
     end
 

@@ -481,11 +481,9 @@ module Asciidoctor
 
     # indexterm:[Tigers,Big cats]
     # (((Tigers,Big cats)))
-    :indexterm_macro  => /\\?(?:indexterm:(?:\[((?:\\\]|[^\]])*?)\])|\(\(\((.*?)\)\)\)(?!\)))/m,
-
     # indexterm2:[Tigers]
     # ((Tigers))
-    :indexterm2_macro  => /\\?(?:indexterm2:(?:\[((?:\\\]|[^\]])*?)\])|\(\((.*?)\)\)(?!\)))/m,
+    :indexterm_macro   => /\\?(?:(indexterm2?):\[(.*?[^\\])\]|\(\((.+?)\)\)(?!\)))/m,
 
     # whitespace at the beginning of the line
     :leading_blanks   => /^(#{CC_BLANK}*)/,

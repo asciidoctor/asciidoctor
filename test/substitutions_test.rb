@@ -852,8 +852,8 @@ EOS
       assert_equal "The panthera tigris is the largest cat species.\n", output
       terms = para.document.references[:indexterms]
       assert_equal 2, terms.size
-      assert_equal ['Big cats', 'Tigers'], terms[0]
-      assert_equal ['panthera tigris'], terms[1]
+      assert_equal ['panthera tigris'], terms[0]
+      assert_equal ['Big cats', 'Tigers'], terms[1]
     end
 
     context 'Button macro' do
