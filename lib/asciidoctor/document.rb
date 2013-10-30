@@ -185,8 +185,8 @@ class Document < AbstractBlock
     @attributes['stylesheet'] = ''
     @attributes['copycss'] = '' if @options[:header_footer]
     @attributes['prewrap'] = ''
-    @attributes['attribute-undefined'] = COMPLIANCE[:attribute_undefined]
-    @attributes['attribute-missing'] = COMPLIANCE[:attribute_missing]
+    @attributes['attribute-undefined'] = Compliance.attribute_undefined
+    @attributes['attribute-missing'] = Compliance.attribute_missing
 
     # language strings
     # TODO load these based on language settings

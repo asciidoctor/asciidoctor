@@ -792,7 +792,7 @@ class PreprocessorReader < Reader
   def preprocess_include target, raw_attributes
     target = @document.sub_attributes target, :attribute_missing => 'drop-line'
     if target.empty?
-      if @document.attributes.fetch('attribute-missing', COMPLIANCE[:attribute_missing]) == 'skip'
+      if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
         false
       else
         advance

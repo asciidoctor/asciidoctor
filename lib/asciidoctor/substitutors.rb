@@ -299,7 +299,7 @@ module Substitutors
             _, value = Lexer::store_attribute(args[0], args[1] || '', @document)
             if value.nil?
               # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
-              if @document.attributes.fetch('attribute-undefined', COMPLIANCE[:attribute_undefined]) == 'drop-line'
+              if @document.attributes.fetch('attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
                 Debug.debug { "Undefining attribute: #{key}, line marked for removal" }
                 break ''
               end
@@ -319,7 +319,7 @@ module Substitutors
         elsif INTRINSICS.has_key? key
           INTRINSICS[key]
         else
-          case (opts[:attribute_missing] || @document.attributes.fetch('attribute-missing', COMPLIANCE[:attribute_missing]))
+          case (opts[:attribute_missing] || @document.attributes.fetch('attribute-missing', Compliance.attribute_missing))
           when 'skip'
             "{#{key}}"
           when 'drop-line'

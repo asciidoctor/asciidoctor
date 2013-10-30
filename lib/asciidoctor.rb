@@ -103,6 +103,35 @@ module Asciidoctor
 
   # Flags to control compliance with the behavior of AsciiDoc
   module Compliance
+    # AsciiDoc terminates paragraphs adjacent to
+    # block content (delimiter or block attribute list)
+    # This option allows this behavior to be modified
+    # TODO what about literal paragraph?
+    # Compliance value: true
+    @block_terminates_paragraph = true
+    class << self
+      attr_accessor :block_terminates_paragraph
+    end
+
+    # AsciiDoc does not treat paragraphs labeled with a verbatim style
+    # (literal, listing, source, verse) as verbatim
+    # This options allows this behavior to be modified
+    # Compliance value: false
+    @strict_verbatim_paragraphs = true
+    class << self
+      attr_accessor :strict_verbatim_paragraphs
+    end
+
+    # NOT CURRENTLY USED
+    # AsciiDoc allows start and end delimiters around
+    # a block to be different lengths
+    # Enabling this option requires matching lengths
+    # Compliance value: false
+    #@congruent_block_delimiters = true
+    #class << self
+    #  attr_accessor :congruent_block_delimiters
+    #end
+
     # AsciiDoc supports both single-line and underlined
     # section titles.
     # This option disables the underlined variant.
@@ -110,6 +139,22 @@ module Asciidoctor
     @underline_style_section_titles = true
     class << self
       attr_accessor :underline_style_section_titles
+    end
+
+    # AsciiDoc drops lines that contain references to missing attributes.
+    # This behavior is not intuitive to most writers
+    # Compliance value: 'drop-line'
+    @attribute_missing = 'skip'
+    class << self
+      attr_accessor :attribute_missing
+    end
+
+    # AsciiDoc drops lines that contain an attribute unassignemnt.
+    # This behavior may need to be tuned depending on the circumstances.
+    # Compliance value: 'drop-line'
+    @attribute_undefined = 'drop-line'
+    class << self
+      attr_accessor :attribute_undefined
     end
 
     # Asciidoctor will recognize commonly-used Markdown syntax
@@ -275,37 +320,6 @@ module Asciidoctor
 
   # NOTE allows for empty space in line as it could be left by the template engine
   BLANK_LINE_PATTERN = /^#{CC_BLANK}*\n/
-
-  # Flags to control compliance with the behavior of AsciiDoc
-  COMPLIANCE = {
-    # AsciiDoc terminates paragraphs adjacent to
-    # block content (delimiter or block attribute list)
-    # Compliance value: true
-    # TODO what about literal paragraph?
-    :block_terminates_paragraph => true,
-
-    # AsciiDoc does not treat paragraphs labeled with a
-    # verbatim style (literal, listing, source, verse)
-    # as verbatim; override this behavior
-    # Compliance value: false
-    :strict_verbatim_paragraphs => true,
-
-    # AsciiDoc allows start and end delimiters around
-    # a block to be different lengths
-    # this option requires that they be the same
-    # Compliance value: false
-    :congruent_block_delimiters => true,
-
-    # AsciiDoc drops lines that contain references to missing attributes.
-    # This behavior is not intuitive to most writers
-    # Compliance value: 'drop-line'
-    :attribute_missing => 'skip',
-
-    # AsciiDoc drops lines that contain an attribute unassignemnt.
-    # This behavior may need to be tuned depending on the circumstances.
-    # Compliance value: 'drop-line'
-    :attribute_undefined => 'drop-line',
-  }
 
   # Delimiters and matchers for the passthrough placeholder
   # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
