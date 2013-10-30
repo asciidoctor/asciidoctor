@@ -402,7 +402,7 @@ class Lexer
         while true
 
           # process lines verbatim
-          if !style.nil? && COMPLIANCE[:strict_verbatim_paragraphs] && VERBATIM_STYLES.include?(style)
+          if !style.nil? && Compliance.strict_verbatim_paragraphs && VERBATIM_STYLES.include?(style)
             block_context = style.to_sym
             reader.unshift_line this_line
             # advance to block parsing =>
@@ -442,7 +442,7 @@ class Lexer
                   :into => attributes)
               target = block.sub_attributes(match[2], :attribute_missing => 'drop-line')
               if target.empty?
-                if document.attributes.fetch('attribute-missing', COMPLIANCE[:attribute_missing]) == 'skip'
+                if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
                   # retain as unparsed
                   return Block.new(parent, :paragraph, :source => [this_line.chomp])
                 else
@@ -604,7 +604,7 @@ class Lexer
               # (this won't stop breaking on item of same level since we've already parsed them out)
               # QUESTION can we turn this block into a lambda or function call?
               (break_at_list && line.match(REGEXP[:any_list])) ||
-              (COMPLIANCE[:block_terminates_paragraph] && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
+              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
             }
 
             reset_block_indent! lines
@@ -627,7 +627,7 @@ class Lexer
               # (this won't stop breaking on item of same level since we've already parsed them out)
               # QUESTION can we turn this block into a lambda or function call?
               (break_at_list && line.match(REGEXP[:any_list])) ||
-              (COMPLIANCE[:block_terminates_paragraph] && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
+              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
             }
 
             # NOTE we need this logic because we've asked the reader to skip
@@ -920,7 +920,7 @@ class Lexer
             :preserve_last_line => true,
             :skip_line_comments => true,
             :skip_processing => skip_processing) {|line|
-          COMPLIANCE[:block_terminates_paragraph] && (is_delimited_block?(line) || line.match(REGEXP[:attr_line]))
+          Compliance.block_terminates_paragraph && (is_delimited_block?(line) || line.match(REGEXP[:attr_line]))
         }
         # QUESTION check for empty lines after grabbing lines for simple content model?
       end
