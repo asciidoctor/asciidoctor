@@ -339,9 +339,12 @@ module Asciidoctor
     # Section Title [[idname,Reference Text]]
     :anchor_embedded  => /^(.*?)#{CC_BLANK}+(\\)?\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]$/,
 
-    # [[idname]] (anywhere inline)
-    # [[idname,Reference Text]] (anywhere inline)
-    :anchor_macro     => /\\?\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]/,
+    # Anywhere inline:
+    # [[idname]]
+    # [[idname,Reference Text]]
+    # anchor:idname[]
+    # anchor:idname[Reference Text]
+    :anchor_macro     => /\\?(?:\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]|anchor:(\S+)\[(.*?[^\\])?\])/,
 
     # matches any unbounded block delimiter:
     #   listing, literal, example, sidebar, quote, passthrough, table, fenced code

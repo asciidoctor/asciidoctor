@@ -95,26 +95,35 @@ context 'Links' do
   end
 
   test 'inline ref' do
-    doc = document_from_string 'Here you can read about tigers.[[tigers]]'
-    output = doc.render
-    assert_equal '[tigers]', doc.references[:ids]['tigers']
-    assert_xpath '//a[@id = "tigers"]', output, 1
-    assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
+    variations = %w([[tigers]] anchor:tigers[])
+    variations.each do |anchor|
+      doc = document_from_string %(Here you can read about tigers.#{anchor})
+      output = doc.render
+      assert_equal '[tigers]', doc.references[:ids]['tigers']
+      assert_xpath '//a[@id = "tigers"]', output, 1
+      assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
+    end
   end
 
   test 'inline ref with reftext' do
-    doc = document_from_string 'Here you can read about tigers.[[tigers,Tigers]]'
-    output = doc.render
-    assert_equal 'Tigers', doc.references[:ids]['tigers']
-    assert_xpath '//a[@id = "tigers"]', output, 1
-    assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
+    variations = %w([[tigers,Tigers]] anchor:tigers[Tigers])
+    variations.each do |anchor|
+      doc = document_from_string %(Here you can read about tigers.#{anchor})
+      output = doc.render
+      assert_equal 'Tigers', doc.references[:ids]['tigers']
+      assert_xpath '//a[@id = "tigers"]', output, 1
+      assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
+    end
   end
 
   test 'escaped inline ref' do
-    doc = document_from_string 'Here you can read about tigers.\[[tigers]]'
-    output = doc.render
-    assert !doc.references[:ids].has_key?('tigers')
-    assert_xpath '//a[@id = "tigers"]', output, 0
+    variations = %w([[tigers]] anchor:tigers[])
+    variations.each do |anchor|
+      doc = document_from_string %(Here you can read about tigers.\\#{anchor})
+      output = doc.render
+      assert !doc.references[:ids].has_key?('tigers')
+      assert_xpath '//a[@id = "tigers"]', output, 0
+    end
   end
 
   test 'xref using angled bracket syntax' do
