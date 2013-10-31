@@ -1072,6 +1072,98 @@ EOS
       para = block_from_string %(pass:verbatim[<{backend}>])
       assert_equal '&lt;{backend}&gt;', para.content
     end
+
+    context 'Math macros' do
+      test 'should passthrough text in asciimath macro and surround with AsciiMath delimiters' do
+        input = 'asciimath:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
+        para = block_from_string input
+        assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
+      end
+
+      test 'should not recognize asciimath macro with no content' do
+        input = 'asciimath:[]'
+        para = block_from_string input
+        assert_equal 'asciimath:[]', para.content
+      end
+
+      test 'should perform specialcharacters subs on asciimath macro content in html backend by default' do
+        input = 'asciimath:[a < b]'
+        para = block_from_string input
+        assert_equal '\$a &lt; b\$', para.content
+      end
+
+      test 'should not perform specialcharacters subs on asciimath macro content in docbook backend by default' do
+        input = 'asciimath:[a < b]'
+        para = block_from_string input, :backend => :docbook
+        assert_equal 'a < b', para.content
+      end
+
+      test 'should honor explicit subslist on asciimath macro' do
+        input = 'asciimath:attributes[{expr}]'
+        para = block_from_string input, :attributes => {'expr' => 'x != 0'}
+        assert_equal '\$x != 0\$', para.content
+      end
+
+      test 'should passthrough text in latexmath macro and surround with LaTeX math delimiters' do
+        input = 'latexmath:[C = \alpha + \beta Y^{\gamma} + \epsilon]'
+        para = block_from_string input
+        assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
+      end
+
+      test 'should not recognize latexmath macro with no content' do
+        input = 'latexmath:[]'
+        para = block_from_string input
+        assert_equal 'latexmath:[]', para.content
+      end
+
+      test 'should perform specialcharacters subs on latexmath macro in html backend by default' do
+        input = 'latexmath:[a < b]'
+        para = block_from_string input
+        assert_equal '\(a &lt; b\)', para.content
+      end
+
+      test 'should not perform specialcharacters subs on latexmath macro content in docbook backend by default' do
+        input = 'latexmath:[a < b]'
+        para = block_from_string input, :backend => :docbook
+        assert para.content.include?('<alt><![CDATA[a < b]]></alt>')
+      end
+
+      test 'should honor explicit subslist on latexmath macro' do
+        input = 'latexmath:attributes[{expr}]'
+        para = block_from_string input, :attributes => {'expr' => '\sqrt{4} = 2'}
+        assert_equal '\(\sqrt{4} = 2\)', para.content
+      end
+
+      test 'should passthrough math macro inside another passthrough' do
+        input = 'the text `asciimath:[x = y]` should be passed through as `literal` text'
+        para = block_from_string input 
+        assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
+      end
+
+      test 'should not recognize math macro with no content' do
+        input = 'math:[]'
+        para = block_from_string input
+        assert_equal 'math:[]', para.content
+      end
+
+      test 'should passthrough text in math macro and surround with AsciiMath delimiters if math attribute != latexmath' do
+        [
+          {},
+          {'math' => ''},
+          {'math' => 'asciimath'}
+        ].each do |attributes|
+          input = 'math:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
+          para = block_from_string input, :attributes => attributes
+          assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
+        end
+      end
+
+      test 'should passthrough text in math macro and surround with LaTeX math delimiters if math attribute = latexmath' do
+        input = 'math:[C = \alpha + \beta Y^{\gamma} + \epsilon]'
+        para = block_from_string input, :attributes => {'math' => 'latexmath'}
+        assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
+      end
+    end
   end
 
   context 'Replacements' do

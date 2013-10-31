@@ -513,6 +513,33 @@ class BlockPassTemplate < BaseTemplate
   end
 end
 
+class BlockMathTemplate < BaseTemplate
+  def result node
+    equation = node.content.strip
+    if node.style == 'latexmath'
+      equation_data = %(<alt><![CDATA[#{equation}]]></alt>
+<mediaobject><textobject><phrase></phrase></textobject></mediaobject>)
+    else # asciimath
+      # DocBook backends can't handle AsciiMath, so output raw expression in text object
+      equation_data = %(<mediaobject><textobject><phrase><![CDATA[#{equation}]]></phrase></textobject></mediaobject>)
+    end
+    if node.title?
+      %(<equation#{common_attrs node.id, node.role, node.reftext}>
+<title>#{node.title}</title>
+#{equation_data}
+</equation>)
+    else
+      %(<informalequation#{common_attrs node.id, node.role, node.reftext}>
+#{equation_data}
+</informalequation>)
+    end
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
 class BlockTableTemplate < BaseTemplate
   def template
     @template ||= @eruby.new <<-EOS
@@ -617,17 +644,24 @@ class InlineQuotedTemplate < BaseTemplate
   }
 
   def quote_text(text, type, id, role)
-    start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
-    anchor = id.nil? ? nil : %(<anchor#{common_attrs id, nil, text}/>)
-    if role
-      quoted_text = "#{start_tag}<phrase role=\"#{role}\">#{text}</phrase>#{end_tag}"
-    elsif start_tag.nil?
-      quoted_text = text
+    if type == :latexmath
+      %(<inlineequation>
+<alt><![CDATA[#{text}]]></alt>
+<inlinemediaobject><textobject><phrase><![CDATA[#{text}]]></phrase></textobject></inlinemediaobject>
+</inlineequation>)
     else
-      quoted_text = "#{start_tag}#{text}#{end_tag}"
-    end
+      start_tag, end_tag = QUOTED_TAGS[type] || NO_TAGS
+      anchor = id.nil? ? nil : %(<anchor#{common_attrs id, nil, text}/>)
+      if role
+        quoted_text = "#{start_tag}<phrase role=\"#{role}\">#{text}</phrase>#{end_tag}"
+      elsif start_tag.nil?
+        quoted_text = text
+      else
+        quoted_text = "#{start_tag}#{text}#{end_tag}"
+      end
 
-    anchor.nil? ? quoted_text : %(#{anchor}#{quoted_text})
+      anchor.nil? ? quoted_text : %(#{anchor}#{quoted_text})
+    end
   end
 
   def result(node)

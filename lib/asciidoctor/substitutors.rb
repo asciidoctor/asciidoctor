@@ -148,19 +148,22 @@ module Substitutors
         next m[0][1..-1]
       end
 
-      if m[1] == '$$'
-        subs = [:specialcharacters]
-      elsif m[3].nil? || m[3].empty?
-        subs = []
+      if !(text = m[4]).nil?
+        text = unescape_brackets text
+        if !(subslist = m[3].to_s).empty?
+          subs = resolve_pass_subs subslist
+        else
+          subs = []
+        end
       else
-        subs = resolve_pass_subs m[3]
+        text = m[2]
+        subs = (m[1] == '$$' ? [:specialcharacters] : [])
       end
 
-      # TODO move unescaping closing square bracket to an operation
-      @passthroughs << {:text => m[2] || m[4].gsub('\]', ']'), :subs => subs}
+      @passthroughs << {:text => text, :subs => subs}
       index = @passthroughs.size - 1
       "#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
-    } if text.include?('+++') || text.include?('$$') || text.include?('pass:')
+    } if (text.include? '+++') || (text.include? '$$') || (text.include? 'pass:')
 
     text = text.gsub(REGEXP[:pass_lit]) {
       # alias match for Ruby 1.8.7 compat
@@ -180,10 +183,33 @@ module Substitutors
         attributes = {}
       end
 
-      @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :literal => true}
+      @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :type => :monospaced}
       index = @passthroughs.size - 1
       "#{unescaped_attrs || m[1]}#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
-    } if text.include?('`')
+    } if (text.include? '`')
+
+    # NOTE we need to do the math in a subsequent step to allow it to be escaped by the former
+    text = text.gsub(REGEXP[:inline_math_macro]) {
+      # alias match for Ruby 1.8.7 compat
+      m = $~
+      # honor the escape
+      if m[0].start_with? '\\'
+        next m[0][1..-1]
+      end
+
+      type = m[1].to_sym
+      type = ((default_type = document.attributes['math'].to_s) == '' ? 'asciimath' : default_type).to_sym if type == :math
+      text = unescape_brackets m[3]
+      if !(subslist = m[2].to_s).empty?
+        subs = resolve_pass_subs subslist
+      else
+        subs = (@document.basebackend? 'html') ? [:specialcharacters] : []
+      end
+
+      @passthroughs << {:text => text, :subs => subs, :type => type}
+      index = @passthroughs.size - 1
+      "#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
+    } if (text.include? 'math:')
 
     text
   end
@@ -199,7 +225,7 @@ module Substitutors
     text.gsub(PASS_PLACEHOLDER[:match]) {
       pass = @passthroughs[$~[1].to_i]
       subbed_text = apply_subs(pass[:text], pass.fetch(:subs, []))
-      pass[:literal] ? Inline.new(self, :quoted, subbed_text, :type => :monospaced, :attributes => pass.fetch(:attributes, {})).render : subbed_text
+      pass[:type] ? Inline.new(self, :quoted, subbed_text, :type => pass[:type], :attributes => pass.fetch(:attributes, {})).render : subbed_text
     }
   end
 

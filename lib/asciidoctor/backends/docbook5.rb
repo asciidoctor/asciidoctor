@@ -64,6 +64,7 @@ class BlockSidebarTemplate < DocBook45::BlockSidebarTemplate; end
 class BlockQuoteTemplate < DocBook45::BlockQuoteTemplate; end
 class BlockVerseTemplate < DocBook45::BlockVerseTemplate; end
 class BlockPassTemplate < DocBook45::BlockPassTemplate; end
+class BlockMathTemplate < DocBook45::BlockMathTemplate; end
 class BlockTableTemplate < DocBook45::BlockTableTemplate; end
 class BlockImageTemplate < DocBook45::BlockImageTemplate; end
 class BlockAudioTemplate < DocBook45::BlockAudioTemplate; end
