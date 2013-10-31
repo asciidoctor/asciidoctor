@@ -598,6 +598,13 @@ text
     end
   end
 
+  context 'MathJax' do
+    test 'should add MathJax script to HTML head if mathjax attribute is set' do
+      output = render_string '', :attributes => {'mathjax' => ''}
+      assert_match('<script type="text/x-mathjax-config">', output)
+    end
+  end
+
   context 'Renderer' do
     test 'built-in HTML5 views are registered by default' do
       doc = document_from_string ''
@@ -609,7 +616,7 @@ text
       assert !renderer.nil?
       views = renderer.views
       assert !views.nil?
-      assert_equal 36, views.size
+      assert_equal 37, views.size
       assert views.has_key? 'document'
       assert Asciidoctor.const_defined?(:HTML5)
       assert Asciidoctor::HTML5.const_defined?(:DocumentTemplate)
@@ -625,7 +632,7 @@ text
       assert !renderer.nil?
       views = renderer.views
       assert !views.nil?
-      assert_equal 36, views.size
+      assert_equal 37, views.size
       assert views.has_key? 'document'
       assert Asciidoctor.const_defined?(:DocBook45)
       assert Asciidoctor::DocBook45.const_defined?(:DocumentTemplate)
@@ -641,7 +648,7 @@ text
       assert !renderer.nil?
       views = renderer.views
       assert !views.nil?
-      assert_equal 36, views.size
+      assert_equal 37, views.size
       assert views.has_key? 'document'
       assert Asciidoctor.const_defined?(:DocBook5)
       assert Asciidoctor::DocBook5.const_defined?(:DocumentTemplate)

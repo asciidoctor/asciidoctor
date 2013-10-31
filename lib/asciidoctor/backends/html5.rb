@@ -31,34 +31,34 @@ class DocumentTemplate < BaseTemplate
   end
 
   def template
-    @template ||= @eruby.new <<-EOS
+    @template ||= @eruby.new <<-'EOS'
 <%#encoding:UTF-8%><% short_tag_slash_local = short_tag_slash %><!DOCTYPE html>
-<html<%= (attr? 'nolang') ? nil : %( lang="\#{attr 'lang', 'en'}") %>>
+<html<%= (attr? 'nolang') ? nil : %( lang="#{attr 'lang', 'en'}") %>>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=<%= attr :encoding %>"<%= short_tag_slash_local %>>
+<meta http-equiv="Content-Type" content="text/html; charset=<%= attr 'encoding' %>"<%= short_tag_slash_local %>>
 <meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>"<%= short_tag_slash_local %>>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"<%= short_tag_slash_local %>><%
-if attr? :description %>
-<meta name="description" content="<%= attr :description %>"<%= short_tag_slash_local %>><%
+if attr? 'description' %>
+<meta name="description" content="<%= attr 'description' %>"<%= short_tag_slash_local %>><%
 end
-if attr? :keywords %>
-<meta name="keywords" content="<%= attr :keywords %>"<%= short_tag_slash_local %>><%
+if attr? 'keywords' %>
+<meta name="keywords" content="<%= attr 'keywords' %>"<%= short_tag_slash_local %>><%
 end %>
 <title><%= doctitle(:sanitize => true) || (attr 'untitled-label') %></title><%
 if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
   if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr :stylesdir, '')) %>"<%= short_tag_slash_local %>><%
+<link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
   else %>
 <style>
 <%= HTML5.default_asciidoctor_stylesheet %>
 </style><%
   end
-elsif attr? :stylesheet
+elsif attr? 'stylesheet'
   if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path((attr :stylesheet), (attr :stylesdir, '')) %>"<%= short_tag_slash_local %>><%
+<link rel="stylesheet" href="<%= normalize_web_path((attr 'stylesheet'), (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
   else %>
 <style>
-<%= read_asset normalize_system_path((attr :stylesheet), (attr :stylesdir, '')), true %>
+<%= read_asset normalize_system_path((attr 'stylesheet'), (attr 'stylesdir', '')), true %>
 </style><%
   end
 end
@@ -66,14 +66,14 @@ if attr? 'icons', 'font'
   if !(attr 'iconfont-remote', '').nil? %>
 <link rel="stylesheet" href="<%= attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css' %>"<%= short_tag_slash_local %>><%
   else %>
-<link rel="stylesheet" href="<%= normalize_web_path(%(\#{attr 'iconfont-name', 'font-awesome'}.css), (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
+<link rel="stylesheet" href="<%= normalize_web_path(%(#{attr 'iconfont-name', 'font-awesome'}.css), (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
   end
 end
 case attr 'source-highlighter'
 when 'coderay'
   if (attr 'coderay-css', 'class') == 'class'
     if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-coderay.css', (attr :stylesdir, '')) %>"<%= short_tag_slash_local %>><%
+<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-coderay.css', (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
     else %>
 <style>
 <%= HTML5.default_coderay_stylesheet %>
@@ -83,7 +83,7 @@ when 'coderay'
 when 'pygments'
   if (attr 'pygments-css', 'class') == 'class'
     if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-pygments.css', (attr :stylesdir, '')) %>"<%= short_tag_slash_local %>><%
+<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-pygments.css', (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
     else %>
 <style>
 <%= HTML5.pygments_stylesheet(attr 'pygments-style') %>
@@ -91,63 +91,88 @@ when 'pygments'
     end
   end
 when 'highlightjs', 'highlight.js' %>
-<link rel="stylesheet" href="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css"<%= short_tag_slash_local %>>
-<script src="<%= attr :highlightjsdir, 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/highlight.min.js"></script>
+<link rel="stylesheet" href="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css"<%= short_tag_slash_local %>>
+<script src="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script><%
 when 'prettify' %>
 <link rel="stylesheet" href="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/<%= attr 'prettify-theme', 'prettify' %>.min.css"<%= short_tag_slash_local %>>
 <script src="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/prettify.min.js"></script>
 <script>document.addEventListener('DOMContentLoaded', prettyPrint)</script><%
-end %><%= (docinfo_content = docinfo).empty? ? nil : %(
-\#{docinfo_content}) %>
+end
+if attr? 'mathjax' %>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['\\(','\\)']],
+    displayMath: [['\\[','\\]']],
+    ignoreClass: 'nomath|nolatexmath'
+  },
+  asciimath2jax: {
+    delimiters: [['`','`']],
+    ignoreClass: 'nomath|noasciimath'
+  }
+});
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+<script type="text/javascript">
+function execute_on_dom_ready(fn) {
+  /in/.test(document.readyState) ? setTimeout('execute_on_dom_ready(' + fn + ')', 10) : fn();
+}
+execute_on_dom_ready(function() {
+  MathJax.Hub.Typeset();
+});
+</script><%
+end
+%><%= (docinfo_content = docinfo).empty? ? nil : %(
+#{docinfo_content}) %>
 </head>
-<body<%= @id ? %( id="\#{@id}") : nil %> class="<%= doctype %><%= (attr? 'toc-class') && (attr? 'toc') && (attr? 'toc-placement', 'auto') ? %( \#{attr 'toc-class'} toc-\#{attr 'toc-position', 'left'}) : nil %>"<%= (attr? 'max-width') ? %( style="max-width: \#{attr 'max-width'};") : nil %>><%
+<body<%= @id ? %( id="#{@id}") : nil %> class="<%= doctype %><%= (attr? 'toc-class') && (attr? 'toc') && (attr? 'toc-placement', 'auto') ? %( #{attr 'toc-class'} toc-#{attr 'toc-position', 'left'}) : nil %>"<%= (attr? 'max-width') ? %( style="max-width: #{attr 'max-width'};") : nil %>><%
 unless noheader %>
 <div id="header"><%
   if doctype == 'manpage' %>
 <h1><%= doctitle %> Manual Page</h1><%
-    if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
+    if (attr? 'toc') && (attr? 'toc-placement', 'auto') %>
 <div id="toc" class="<%= attr 'toc-class', 'toc' %>">
 <div id="toctitle"><%= attr 'toc-title' %></div>
-<%= template.class.outline(self, (attr :toclevels, 2).to_i) %>
+<%= template.class.outline(self, (attr 'toclevels', 2).to_i) %>
 </div><%
     end %>
 <h2><%= attr 'manname-title' %></h2>
 <div class="sectionbody">
-<p><%= %(\#{attr 'manname'} - \#{attr 'manpurpose'}) %></p>
+<p><%= %(#{attr 'manname'} - #{attr 'manpurpose'}) %></p>
 </div><%
   else
     if has_header?
       unless notitle %>
 <h1><%= @header.title %></h1><%
       end %><%
-      if attr? :author %>
-<span id="author" class="author"><%= attr :author %></span><br<%= short_tag_slash_local %>><%
-        if attr? :email %>
-<span id="email" class="email"><%= sub_macros(attr :email) %></span><br<%= short_tag_slash_local %>><%
+      if attr? 'author' %>
+<span id="author" class="author"><%= attr 'author' %></span><br<%= short_tag_slash_local %>><%
+        if attr? 'email' %>
+<span id="email" class="email"><%= sub_macros(attr 'email') %></span><br<%= short_tag_slash_local %>><%
         end
-        if (authorcount = (attr :authorcount).to_i) > 1
-          (2..authorcount).each do |idx| %><span id="author<%= idx %>" class="author"><%= attr "author_\#{idx}" %></span><br<%= short_tag_slash_local %>><%
-            if attr? "email_\#{idx}" %>
-<span id="email<%= idx %>" class="email"><%= sub_macros(attr "email_\#{idx}") %></span><br<%= short_tag_slash_local %>><%
+        if (authorcount = (attr 'authorcount').to_i) > 1
+          (2..authorcount).each do |idx| %><span id="author<%= idx %>" class="author"><%= attr "author_#{idx}" %></span><br<%= short_tag_slash_local %>><%
+            if attr? "email_#{idx}" %>
+<span id="email<%= idx %>" class="email"><%= sub_macros(attr "email_#{idx}") %></span><br<%= short_tag_slash_local %>><%
             end
           end
         end
       end
-      if attr? :revnumber %>
-<span id="revnumber"><%= ((attr 'version-label') || '').downcase %> <%= attr :revnumber %><%= (attr? :revdate) ? ',' : '' %></span><%
+      if attr? 'revnumber' %>
+<span id="revnumber"><%= ((attr 'version-label') || '').downcase %> <%= attr 'revnumber' %><%= (attr? 'revdate') ? ',' : '' %></span><%
       end
-      if attr? :revdate %>
-<span id="revdate"><%= attr :revdate %></span><%
+      if attr? 'revdate' %>
+<span id="revdate"><%= attr 'revdate' %></span><%
       end
-      if attr? :revremark %>
-<br<%= short_tag_slash_local %>><span id="revremark"><%= attr :revremark %></span><%
+      if attr? 'revremark' %>
+<br<%= short_tag_slash_local %>><span id="revremark"><%= attr 'revremark' %></span><%
       end
     end
-    if (attr? :toc) && (attr? 'toc-placement', 'auto') %>
+    if (attr? 'toc') && (attr? 'toc-placement', 'auto') %>
 <div id="toc" class="<%= attr 'toc-class', 'toc' %>">
 <div id="toctitle"><%= attr 'toc-title' %></div>
-<%= template.class.outline(self, (attr :toclevels, 2).to_i) %>
+<%= template.class.outline(self, (attr 'toclevels', 2).to_i) %>
 </div><%
     end
   end %>
@@ -156,7 +181,7 @@ end %>
 <div id="content">
 <%= content %>
 </div><%
-unless !footnotes? || (attr? :nofootnotes) %>
+unless !footnotes? || (attr? 'nofootnotes') %>
 <div id="footnotes">
 <hr<%= short_tag_slash_local %>><%
   footnotes.each do |fn| %>
@@ -168,14 +193,14 @@ unless !footnotes? || (attr? :nofootnotes) %>
 end %>
 <div id="footer">
 <div id="footer-text"><%
-if attr? :revnumber %>
-<%= %(\#{attr 'version-label'} \#{attr :revnumber}) %><br<%= short_tag_slash_local %>><%
+if attr? 'revnumber' %>
+<%= %(#{attr 'version-label'} #{attr 'revnumber'}) %><br<%= short_tag_slash_local %>><%
 end
 if attr? 'last-update-label' %>
-<%= %(\#{attr 'last-update-label'} \#{attr :docdatetime}) %><%
+<%= %(#{attr 'last-update-label'} #{attr 'docdatetime'}) %><%
 end %>
 </div><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
-\#{docinfo_content}) %>
+#{docinfo_content}) %>
 </div>
 </body>
 </html>
@@ -610,6 +635,37 @@ class BlockPassTemplate < BaseTemplate
   end
 end
 
+class BlockMathTemplate < BaseTemplate
+  DELIMITERS = {
+    :asciimath => ['`', '`'],
+    :latexmath => ['\\[', '\\]']
+  }
+
+  def result node
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
+    open, close = DELIMITERS[node.style.to_sym]
+    equation = node.content.strip
+    if (node.subs.nil? || node.subs.empty?) && !(node.attr? 'subs')
+      equation = node.sub_specialcharacters(equation)
+    end
+
+    unless (equation.start_with? open) && (equation.end_with? close)
+      equation = %(#{open}#{equation}#{close})
+    end
+    
+    %(<div#{id_attribute} class="#{node.role? ? ['mathblock', node.role] * ' ' : 'mathblock'}">
+#{title_element}<div class="content">
+#{equation}
+</div>
+</div>)
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
 class BlockQuoteTemplate < BaseTemplate
   def result(node)
     id_attribute = node.id ? %( id="#{node.id}") : nil
@@ -1038,7 +1094,9 @@ class InlineQuotedTemplate < BaseTemplate
     :superscript => ['<sup>', '</sup>', true],
     :subscript => ['<sub>', '</sub>', true],
     :double => ['&#8220;', '&#8221;', false],
-    :single => ['&#8216;', '&#8217;', false]
+    :single => ['&#8216;', '&#8217;', false],
+    :asciimath => ['`', '`', false],
+    :latexmath => ['\\(', '\\)', false]
   }
 
   def quote_text(text, type, id, role)

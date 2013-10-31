@@ -1078,6 +1078,135 @@ http://asciidoc.org
     end
   end
 
+  context 'Math blocks' do
+    test 'should add LaTeX math delimiters around latexmath block content' do
+      input = <<-'EOS'
+[latexmath]
+++++
+\sqrt{3x-1}+(1+x)^2 < y
+++++
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.mathblock', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+      assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
+    end
+
+    test 'should not add LaTeX math delimiters around latexmath block content if already present' do
+      input = <<-'EOS'
+[latexmath]
+++++
+\[\sqrt{3x-1}+(1+x)^2 < y\]
+++++
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.mathblock', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+      assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
+    end
+
+    test 'should render latexmath block in alt of equation in DocBook backend' do
+      input = <<-'EOS'
+[latexmath]
+++++
+\sqrt{3x-1}+(1+x)^2 < y
+++++
+      EOS
+
+      expect = <<-'EOS'
+<informalequation>
+<alt><![CDATA[\sqrt{3x-1}+(1+x)^2 < y]]></alt>
+<mediaobject><textobject><phrase></phrase></textobject></mediaobject>
+</informalequation>
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_equal expect.strip, output.strip
+    end
+
+    test 'should add AsciiMath delimiters around asciimath block content' do
+      input = <<-'EOS'
+[asciimath]
+++++
+sqrt(3x-1)+(1+x)^2 < y
+++++
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.mathblock', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+      assert_equal '`sqrt(3x-1)+(1+x)^2 &lt; y`', nodes.first.to_s.strip
+    end
+
+    test 'should not add AsciiMath delimiters around asciimath block content if already present' do
+      input = <<-'EOS'
+[asciimath]
+++++
+`sqrt(3x-1)+(1+x)^2 < y`
+++++
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.mathblock', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+      assert_equal '`sqrt(3x-1)+(1+x)^2 &lt; y`', nodes.first.to_s.strip
+    end
+
+    test 'should render asciimath block in textobject of equation in DocBook backend' do
+      input = <<-'EOS'
+[asciimath]
+++++
+x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
+++++
+      EOS
+
+      expect = <<-'EOS'
+<informalequation>
+<mediaobject><textobject><phrase><![CDATA[x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)]]></phrase></textobject></mediaobject>
+</informalequation>
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_equal expect.strip, output.strip
+    end
+
+    test 'should output title for latexmath block if defined' do
+      input = <<-'EOS'
+.The Lorenz Equations
+[latexmath]
+++++
+\begin{aligned}
+\dot{x} & = \sigma(y-x) \\
+\dot{y} & = \rho x - y - xz \\
+\dot{z} & = -\beta z + xy
+\end{aligned}
+++++
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.mathblock', output, 1
+      assert_css '.mathblock .title', output, 1
+      assert_xpath '//*[@class="title"][text()="The Lorenz Equations"]', output, 1
+    end
+
+    test 'should output title for asciimath block if defined' do
+      input = <<-'EOS'
+.Simple fraction
+[asciimath]
+++++
+a//b
+++++
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.mathblock', output, 1
+      assert_css '.mathblock .title', output, 1
+      assert_xpath '//*[@class="title"][text()="Simple fraction"]', output, 1
+    end
+  end
+
   context 'Metadata' do
     test 'block title above section gets carried over to first block in section' do
       input = <<-EOS

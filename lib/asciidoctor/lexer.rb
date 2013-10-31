@@ -746,6 +746,9 @@ class Lexer
         when :pass
           block = build_block(block_context, :raw, terminator, parent, reader, attributes)
 
+        when :latexmath, :asciimath
+          block = build_block(:math, :raw, terminator, parent, reader, attributes)
+
         when :open, :sidebar
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 

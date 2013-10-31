@@ -249,7 +249,7 @@ module Asciidoctor
     '****' => [:sidebar, ::Set.new],
     '____' => [:quote, ['verse'].to_set],
     '""'   => [:quote, ['verse'].to_set],
-    '++++' => [:pass, ::Set.new],
+    '++++' => [:pass, ['latexmath', 'asciimath'].to_set],
     '|===' => [:table, ::Set.new],
     ',===' => [:table, ::Set.new],
     ':===' => [:table, ::Set.new],
@@ -555,7 +555,11 @@ module Asciidoctor
     # +++text+++
     # $$text$$
     # pass:quotes[text]
-    :pass_macro       => /\\?(?:(\+{3}|\${2})(.*?)\1|pass:([a-z,]*)\[((?:\\\]|[^\]])*?)\])/m,
+    :pass_macro       => /\\?(?:(\+{3}|\${2})(.*?)\1|pass:([a-z,]*)\[(.*?[^\\])\])/m,
+
+    # asciimath:[x != 0]
+    # latexmath:[\sqrt{4} = 2]
+    :inline_math_macro => /\\?((?:latex|ascii)math):([a-z,]*)\[(.*?[^\\])\]/m,
 
     # passthrough macro allowed in value of attribute assignment
     # pass:[text]
