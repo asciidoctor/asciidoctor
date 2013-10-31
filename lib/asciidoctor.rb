@@ -302,12 +302,12 @@ module Asciidoctor
   LINE_FEED_ENTITY = '&#10;' # or &#x0A;
 
   BLOCK_MATH_DELIMITERS = {
-    :asciimath => ['`', '`'],
+    :asciimath => ['\\$', '\\$'],
     :latexmath => ['\\[', '\\]'],
   }
 
   INLINE_MATH_DELIMITERS = {
-    :asciimath => ['`', '`'],
+    :asciimath => ['\\$', '\\$'],
     :latexmath => ['\\(', '\\)'],
   }
 

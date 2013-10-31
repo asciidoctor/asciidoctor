@@ -1137,21 +1137,21 @@ sqrt(3x-1)+(1+x)^2 < y
       output = render_embedded_string input
       assert_css '.mathblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
-      assert_equal '`sqrt(3x-1)+(1+x)^2 &lt; y`', nodes.first.to_s.strip
+      assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
     end
 
     test 'should not add AsciiMath delimiters around asciimath block content if already present' do
       input = <<-'EOS'
 [asciimath]
 ++++
-`sqrt(3x-1)+(1+x)^2 < y`
+\$sqrt(3x-1)+(1+x)^2 < y\$
 ++++
       EOS
 
       output = render_embedded_string input
       assert_css '.mathblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
-      assert_equal '`sqrt(3x-1)+(1+x)^2 &lt; y`', nodes.first.to_s.strip
+      assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
     end
 
     test 'should render asciimath block in textobject of equation in DocBook backend' do
@@ -1222,7 +1222,7 @@ sqrt(3x-1)+(1+x)^2 < y
         output = render_embedded_string input, :attributes => attributes
         assert_css '.mathblock', output, 1
         nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
-        assert_equal '`sqrt(3x-1)+(1+x)^2 &lt; y`', nodes.first.to_s.strip
+        assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
       end
     end
 

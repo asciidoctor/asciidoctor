@@ -1077,7 +1077,7 @@ EOS
       test 'should passthrough text in asciimath macro and surround with AsciiMath delimiters' do
         input = 'asciimath:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
         para = block_from_string input
-        assert_equal '`x/x={(1,if x!=0),(text{undefined},if x=0):}`', para.content
+        assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
       end
 
       test 'should not recognize asciimath macro with no content' do
@@ -1089,7 +1089,7 @@ EOS
       test 'should perform specialcharacters subs on asciimath macro content in html backend by default' do
         input = 'asciimath:[a < b]'
         para = block_from_string input
-        assert_equal '`a &lt; b`', para.content
+        assert_equal '\$a &lt; b\$', para.content
       end
 
       test 'should not perform specialcharacters subs on asciimath macro content in docbook backend by default' do
@@ -1101,7 +1101,7 @@ EOS
       test 'should honor explicit subslist on asciimath macro' do
         input = 'asciimath:attributes[{expr}]'
         para = block_from_string input, :attributes => {'expr' => 'x != 0'}
-        assert_equal '`x != 0`', para.content
+        assert_equal '\$x != 0\$', para.content
       end
 
       test 'should passthrough text in latexmath macro and surround with LaTeX math delimiters' do
@@ -1154,7 +1154,7 @@ EOS
         ].each do |attributes|
           input = 'math:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
           para = block_from_string input, :attributes => attributes
-          assert_equal '`x/x={(1,if x!=0),(text{undefined},if x=0):}`', para.content
+          assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
         end
       end
 
