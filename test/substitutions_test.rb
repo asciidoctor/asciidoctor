@@ -1110,7 +1110,7 @@ EOS
         assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
       end
 
-      test 'should not recognize asciimath macro with no content' do
+      test 'should not recognize latexmath macro with no content' do
         input = 'latexmath:[]'
         para = block_from_string input
         assert_equal 'latexmath:[]', para.content
@@ -1138,6 +1138,30 @@ EOS
         input = 'the text `asciimath:[x = y]` should be passed through as `literal` text'
         para = block_from_string input 
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
+      end
+
+      test 'should not recognize math macro with no content' do
+        input = 'math:[]'
+        para = block_from_string input
+        assert_equal 'math:[]', para.content
+      end
+
+      test 'should passthrough text in math macro and surround with AsciiMath delimiters if math attribute != latexmath' do
+        [
+          {},
+          {'math' => ''},
+          {'math' => 'asciimath'}
+        ].each do |attributes|
+          input = 'math:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
+          para = block_from_string input, :attributes => attributes
+          assert_equal '`x/x={(1,if x!=0),(text{undefined},if x=0):}`', para.content
+        end
+      end
+
+      test 'should passthrough text in math macro and surround with LaTeX math delimiters if math attribute = latexmath' do
+        input = 'math:[C = \alpha + \beta Y^{\gamma} + \epsilon]'
+        para = block_from_string input, :attributes => {'math' => 'latexmath'}
+        assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
       end
     end
   end

@@ -99,29 +99,22 @@ when 'prettify' %>
 <script src="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/prettify.min.js"></script>
 <script>document.addEventListener('DOMContentLoaded', prettyPrint)</script><%
 end
-if attr? 'mathjax' %>
+if attr? 'math' %>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {
-    inlineMath: [['\\(','\\)']],
-    displayMath: [['\\[','\\]']],
-    ignoreClass: 'nomath|nolatexmath'
+    inlineMath: [<%= INLINE_MATH_DELIMITERS[:latexmath] %>],
+    displayMath: [<%= BLOCK_MATH_DELIMITERS[:latexmath] %>],
+    ignoreClass: "nomath|nolatexmath"
   },
   asciimath2jax: {
-    delimiters: [['`','`']],
-    ignoreClass: 'nomath|noasciimath'
+    delimiters: [<%= BLOCK_MATH_DELIMITERS[:asciimath] %>],
+    ignoreClass: "nomath|noasciimath"
   }
 });
 </script>
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
-<script type="text/javascript">
-function execute_on_dom_ready(fn) {
-  /in/.test(document.readyState) ? setTimeout('execute_on_dom_ready(' + fn + ')', 10) : fn();
-}
-execute_on_dom_ready(function() {
-  MathJax.Hub.Typeset();
-});
-</script><%
+<script>document.addEventListener('DOMContentLoaded', MathJax.Hub.TypeSet)</script><%
 end
 %><%= (docinfo_content = docinfo).empty? ? nil : %(
 #{docinfo_content}) %>
@@ -636,15 +629,10 @@ class BlockPassTemplate < BaseTemplate
 end
 
 class BlockMathTemplate < BaseTemplate
-  DELIMITERS = {
-    :asciimath => ['`', '`'],
-    :latexmath => ['\\[', '\\]']
-  }
-
   def result node
     id_attribute = node.id ? %( id="#{node.id}") : nil
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-    open, close = DELIMITERS[node.style.to_sym]
+    open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
     equation = node.content.strip
     if (node.subs.nil? || node.subs.empty?) && !(node.attr? 'subs')
       equation = node.sub_specialcharacters(equation)
@@ -1095,8 +1083,8 @@ class InlineQuotedTemplate < BaseTemplate
     :subscript => ['<sub>', '</sub>', true],
     :double => ['&#8220;', '&#8221;', false],
     :single => ['&#8216;', '&#8217;', false],
-    :asciimath => ['`', '`', false],
-    :latexmath => ['\\(', '\\)', false]
+    :asciimath => INLINE_MATH_DELIMITERS[:asciimath] + [false],
+    :latexmath => INLINE_MATH_DELIMITERS[:latexmath] + [false]
   }
 
   def quote_text(text, type, id, role)

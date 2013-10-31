@@ -198,6 +198,7 @@ module Substitutors
       end
 
       type = m[1].to_sym
+      type = ((default_type = document.attributes['math'].to_s) == '' ? 'asciimath' : default_type).to_sym if type == :math
       text = unescape_brackets m[3]
       if !(subslist = m[2].to_s).empty?
         subs = resolve_pass_subs subslist
@@ -209,7 +210,6 @@ module Substitutors
       index = @passthroughs.size - 1
       "#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
     } if (text.include? 'math:')
-    #} if @document && (@document.attr? 'mathjax') && (text.include? 'math:')
 
     text
   end

@@ -249,7 +249,7 @@ module Asciidoctor
     '****' => [:sidebar, ::Set.new],
     '____' => [:quote, ['verse'].to_set],
     '""'   => [:quote, ['verse'].to_set],
-    '++++' => [:pass, ['latexmath', 'asciimath'].to_set],
+    '++++' => [:pass, ['math', 'latexmath', 'asciimath'].to_set],
     '|===' => [:table, ::Set.new],
     ',===' => [:table, ::Set.new],
     ':===' => [:table, ::Set.new],
@@ -300,6 +300,16 @@ module Asciidoctor
   LINE_BREAK = ' +'
 
   LINE_FEED_ENTITY = '&#10;' # or &#x0A;
+
+  BLOCK_MATH_DELIMITERS = {
+    :asciimath => ['`', '`'],
+    :latexmath => ['\\[', '\\]'],
+  }
+
+  INLINE_MATH_DELIMITERS = {
+    :asciimath => ['`', '`'],
+    :latexmath => ['\\(', '\\)'],
+  }
 
   # attributes which be changed within the content of the document (but not
   # header) because it has semantic meaning; ex. numbered
@@ -557,9 +567,10 @@ module Asciidoctor
     # pass:quotes[text]
     :pass_macro       => /\\?(?:(\+{3}|\${2})(.*?)\1|pass:([a-z,]*)\[(.*?[^\\])\])/m,
 
+    # math:[x != 0]
     # asciimath:[x != 0]
     # latexmath:[\sqrt{4} = 2]
-    :inline_math_macro => /\\?((?:latex|ascii)math):([a-z,]*)\[(.*?[^\\])\]/m,
+    :inline_math_macro => /\\?((?:latex|ascii)?math):([a-z,]*)\[(.*?[^\\])\]/m,
 
     # passthrough macro allowed in value of attribute assignment
     # pass:[text]

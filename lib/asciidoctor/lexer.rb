@@ -746,7 +746,10 @@ class Lexer
         when :pass
           block = build_block(block_context, :raw, terminator, parent, reader, attributes)
 
-        when :latexmath, :asciimath
+        when :math, :latexmath, :asciimath
+          if block_context == :math
+            attributes['style'] = (default_math_syntax = document.attributes['math'].to_s) == '' ? 'asciimath' : default_math_syntax
+          end
           block = build_block(:math, :raw, terminator, parent, reader, attributes)
 
         when :open, :sidebar

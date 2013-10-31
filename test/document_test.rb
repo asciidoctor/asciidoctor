@@ -599,8 +599,8 @@ text
   end
 
   context 'MathJax' do
-    test 'should add MathJax script to HTML head if mathjax attribute is set' do
-      output = render_string '', :attributes => {'mathjax' => ''}
+    test 'should add MathJax script to HTML head if math attribute is set' do
+      output = render_string '', :attributes => {'math' => ''}
       assert_match('<script type="text/x-mathjax-config">', output)
     end
   end
