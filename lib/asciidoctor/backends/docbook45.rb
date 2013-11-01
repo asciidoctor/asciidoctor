@@ -589,7 +589,7 @@ class BlockImageTemplate < BaseTemplate
 <%#encoding:UTF-8%><%#encoding:UTF-8%><figure#{common_attrs_erb}>#{title_tag}
   <mediaobject>
     <imageobject>
-      <imagedata fileref="<%= image_uri(attr :target) %>"#{attribute('contentwidth', :width)}#{attribute('contentdepth', :height)}/>
+      <imagedata fileref="<%= image_uri(attr :target) %>"#{attribute('contentwidth', :width)}#{attribute('contentdepth', :height)}#{attribute('scale', :scale)}<%= (attr? :scaledwidth) ? %( width="\#{attr :scaledwidth}" scalefit="1") : nil %>#{attribute('align', :align)}/>
     </imageobject>
     <textobject><phrase><%= attr :alt %></phrase></textobject>
   </mediaobject>
