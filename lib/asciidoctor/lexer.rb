@@ -454,6 +454,12 @@ class Lexer
               attributes['target'] = target
               block.title = attributes.delete('title') if attributes.has_key?('title')
               if blk_ctx == :image
+                if attributes.has_key? 'scaledwidth'
+                  # append % to scaledwidth if ends in number (no units present)
+                  if (48..57).include?((attributes['scaledwidth'][-1] || 0).ord)
+                    attributes['scaledwidth'] = %(#{attributes['scaledwidth']}%)
+                  end
+                end
                 document.register(:images, target)
                 attributes['alt'] ||= File.basename(target, File.extname(target)).tr('_-', ' ')
                 # QUESTION should video or audio have an auto-numbered caption?

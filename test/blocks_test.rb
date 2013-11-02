@@ -1441,6 +1441,17 @@ image::images/sunset.jpg[Sunset, scaledwidth="25%"]
       assert_xpath '//imagedata[@scalefit="1"]', output, 1
     end
 
+    test 'adds % to scaled width if no units given in DocBook backend ' do
+      input = <<-EOS
+image::images/sunset.jpg[Sunset, scaledwidth="25"]
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_xpath '//imagedata', output, 1
+      assert_xpath '//imagedata[@width="25%"]', output, 1
+      assert_xpath '//imagedata[@scalefit="1"]', output, 1
+    end
+
     test 'keeps line unprocessed if image target is missing attribute reference and attribute-missing is skip' do
       input = <<-EOS
 :attribute-missing: skip
