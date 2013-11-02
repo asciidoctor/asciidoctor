@@ -1410,6 +1410,48 @@ image::images/tiger.png[Tiger]
       assert !doc.attributes.has_key?('figure-number')
     end
 
+    test 'can align image in DocBook backend' do
+      input = <<-EOS
+image::images/sunset.jpg[Sunset, align="right"]
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_xpath '//imagedata', output, 1
+      assert_xpath '//imagedata[@align="right"]', output, 1
+    end
+
+    test 'can scale image in DocBook backend' do
+      input = <<-EOS
+image::images/sunset.jpg[Sunset, scale="200"]
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_xpath '//imagedata', output, 1
+      assert_xpath '//imagedata[@scale="200"]', output, 1
+    end
+
+    test 'can scale image width in DocBook backend' do
+      input = <<-EOS
+image::images/sunset.jpg[Sunset, scaledwidth="25%"]
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_xpath '//imagedata', output, 1
+      assert_xpath '//imagedata[@width="25%"]', output, 1
+      assert_xpath '//imagedata[@scalefit="1"]', output, 1
+    end
+
+    test 'adds % to scaled width if no units given in DocBook backend ' do
+      input = <<-EOS
+image::images/sunset.jpg[Sunset, scaledwidth="25"]
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_xpath '//imagedata', output, 1
+      assert_xpath '//imagedata[@width="25%"]', output, 1
+      assert_xpath '//imagedata[@scalefit="1"]', output, 1
+    end
+
     test 'keeps line unprocessed if image target is missing attribute reference and attribute-missing is skip' do
       input = <<-EOS
 :attribute-missing: skip
