@@ -225,7 +225,7 @@ class Table::Cell < AbstractNode
       # NOTE we need to process the first line of content as it may not have been processed
       # the included content cannot expect to match conditional terminators in the remaining
       # lines of table cell content, it must be self-contained logic
-      inner_document_lines = @text.each_line.to_a
+      inner_document_lines = @text.split(LINE_SPLIT)
       unless inner_document_lines.empty? || !inner_document_lines.first.include?('::')
         unprocessed_lines = inner_document_lines[0..0]
         processed_lines = PreprocessorReader.new(@document, unprocessed_lines).readlines

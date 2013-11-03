@@ -532,6 +532,25 @@ I wouldn't have it any other way.
       assert_equal 26, literal.text.lines.entries.size
     end
 
+    test 'basic asciidoc cell' do
+      input = <<-EOS
+|===
+a|--
+NOTE: content
+
+content
+--
+|===
+      EOS
+
+      result = render_embedded_string input
+      assert_css 'table.tableblock', result, 1
+      assert_css 'table.tableblock td.tableblock', result, 1
+      assert_css 'table.tableblock td.tableblock .openblock', result, 1
+      assert_css 'table.tableblock td.tableblock .openblock .admonitionblock', result, 1
+      assert_css 'table.tableblock td.tableblock .openblock .paragraph', result, 1
+    end
+
     test 'asciidoc content' do
       input = <<-EOS
 [cols="1e,1,5a",frame="topbot",options="header"]

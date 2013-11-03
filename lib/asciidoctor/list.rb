@@ -66,7 +66,7 @@ class ListItem < AbstractBlock
 
       block = blocks.shift
       unless @text.to_s.empty?
-        block.lines.unshift("#@text\n")
+        block.lines.unshift @text
       end
 
       @text = block.source

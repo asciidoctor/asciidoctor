@@ -33,7 +33,7 @@ class Reader
   attr_accessor :process_lines
 
   # Public: Initialize the Reader object
-  def initialize data = nil, cursor = nil
+  def initialize data = nil, cursor = nil, opts = {:normalize => false}
     if cursor.nil?
       @file = @dir = nil
       @path = '<stdin>'
@@ -60,7 +60,7 @@ class Reader
       end
       @lineno = cursor.lineno || 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     end
-    @lines = data.nil? ? [] : (prepare_lines data)
+    @lines = data.nil? ? [] : (prepare_lines data, opts)
     @source_lines = @lines.dup
     @eof = @lines.empty?
     @look_ahead = 0
@@ -77,14 +77,32 @@ class Reader
   #
   # Any leading or trailing blank lines are also removed.
   #
-  # The normalized lines are assigned to the @lines instance variable.
-  #
   # data - A String Array of input data to be normalized
   # opts - A Hash of options to control what cleansing is done
   #
   # Returns The String lines extracted from the data
   def prepare_lines data, opts = {}
-    data.is_a?(String) ? data.each_line.to_a : data.dup
+    if data.is_a? ::String
+      if opts[:normalize]
+        if FORCE_ENCODING
+          data.each_line.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
+        else
+          data.each_line.map {|line| line.rstrip }
+        end
+      else
+        data.each_line.to_a
+      end
+    else
+      if opts[:normalize]
+        if FORCE_ENCODING
+          data.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
+        else
+          data.map {|line| line.rstrip }
+        end
+      else
+        data.dup
+      end
+    end
   end
 
   # Internal: Processes a previously unvisited line
@@ -118,7 +136,7 @@ class Reader
   #
   # Returns True if the there are no more lines or if the next line is empty
   def next_line_empty?
-    (line = peek_line).nil? || line.chomp.empty?
+    (line = peek_line).nil? || line.empty?
   end
 
   # Public: Peek at the next line of source data. Processes the line, if not
@@ -225,7 +243,7 @@ class Reader
   #
   # Returns the lines read joined as a String
   def read
-    read_lines.join
+    read_lines * EOL
   end
 
   # Public: Advance to the next line by discarding the line at the front of the stack
@@ -283,13 +301,13 @@ class Reader
   # Examples
   #
   #   @lines
-  #   => ["\n", "\t\n", "Foo\n", "Bar\n", "\n"]
+  #   => ["", "", "Foo", "Bar", ""]
   #
   #   skip_blank_lines
   #   => 2
   #
   #   @lines
-  #   => ["Foo\n", "Bar\n"]
+  #   => ["Foo", "Bar", ""]
   #
   # Returns an Integer of the number of lines skipped
   def skip_blank_lines
@@ -298,7 +316,7 @@ class Reader
     num_skipped = 0
     # optimized code for shortest execution path
     while (next_line = peek_line)
-      if next_line.chomp.empty?
+      if next_line.empty?
         advance
         num_skipped += 1
       else
@@ -313,13 +331,13 @@ class Reader
   #
   # Examples
   #   @lines
-  #   => ["// foo\n", "bar\n"]
+  #   => ["// foo", "bar"]
   #
   #   comment_lines = skip_comment_lines
-  #   => ["// foo\n"]
+  #   => ["// foo"]
   #
   #   @lines
-  #   => ["bar\n"]
+  #   => ["bar"]
   #
   # Returns the Array of lines that were skipped
   def skip_comment_lines opts = {}
@@ -328,7 +346,7 @@ class Reader
     comment_lines = []
     include_blank_lines = opts[:include_blank_lines]
     while (next_line = peek_line)
-      if include_blank_lines && next_line.chomp.empty?
+      if include_blank_lines && next_line.empty?
         comment_lines << read_line
       elsif (commentish = next_line.start_with?('//')) && (match = next_line.match(REGEXP[:comment_blk]))
         comment_lines << read_line
@@ -399,12 +417,16 @@ class Reader
   #
   # Examples
   #
-  #   reader = Reader.new ["First paragraph\n", "Second paragraph\n",
-  #                        "Open block\n", "\n", "Can have blank lines\n",
-  #                        "--\n", "\n", "In a different segment\n"]
+  #   data = [
+  #     "First line\n",
+  #     "Second line\n",
+  #     "\n",
+  #     "Third line\n",
+  #   ]
+  #   reader = Reader.new data, nil, :normalize => true
   #
   #   reader.read_lines_until
-  #   => ["First paragraph\n", "Second paragraph\n", "Open block\n"]
+  #   => ["First line", "Second line"]
   def read_lines_until options = {}
     result = []
     advance if options[:skip_first_line]
@@ -419,11 +441,9 @@ class Reader
     if (terminator = options[:terminator])
       break_on_blank_lines = false
       break_on_list_continuation = false
-      chomp_last_line = options.fetch :chomp_last_line, false
     else
       break_on_blank_lines = options[:break_on_blank_lines]
       break_on_list_continuation = options[:break_on_list_continuation]
-      chomp_last_line = break_on_blank_lines
     end
     skip_line_comments = options[:skip_line_comments]
     line_read = false
@@ -432,10 +452,10 @@ class Reader
     complete = false
     while !complete && (line = read_line)
       complete = while true
-        break true if terminator && line.chomp == terminator
-        # QUESTION: can we get away with line.chomp.empty? here?
-        break true if break_on_blank_lines && line.chomp.empty?
-        if break_on_list_continuation && line_read && line.chomp == LIST_CONTINUATION
+        break true if terminator && line == terminator
+        # QUESTION: can we get away with line.empty? here?
+        break true if break_on_blank_lines && line.empty?
+        if break_on_list_continuation && line_read && line == LIST_CONTINUATION
           options[:preserve_last_line] = true
           break true
         end
@@ -458,10 +478,6 @@ class Reader
           line_read = true
         end
       end
-    end
-
-    if chomp_last_line && line_read
-      result << result.pop.chomp
     end
 
     if restore_process_lines
@@ -511,12 +527,12 @@ class Reader
 
   # Public: Get a copy of the remaining lines managed by this Reader joined as a String
   def string
-    @lines.join
+    @lines * EOL
   end
 
   # Public: Get the source lines for this Reader joined as a String
   def source
-    @source_lines.join
+    @source_lines * EOL
   end
 
   # Public: Get a summary of this Reader.
@@ -537,7 +553,7 @@ class PreprocessorReader < Reader
   # Public: Initialize the PreprocessorReader object
   def initialize document, data = nil, cursor = nil
     @document = document
-    super data, cursor
+    super data, cursor, :normalize => true
     include_depth_default = document.attributes.fetch('max-include-depth', 64).to_i
     include_depth_default = 0 if include_depth_default < 0
     # track both absolute depth for comparing to size of include stack and relative depth for reporting
@@ -550,31 +566,18 @@ class PreprocessorReader < Reader
   end
 
   def prepare_lines data, opts = {}
-    if data.is_a?(String)
-      if ::Asciidoctor::FORCE_ENCODING
-        result = data.each_line.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}#{::Asciidoctor::EOL}" }
-      else
-        result = data.each_line.map {|line| "#{line.rstrip}#{::Asciidoctor::EOL}" }
-      end
-    else
-      if ::Asciidoctor::FORCE_ENCODING
-        result = data.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}#{::Asciidoctor::EOL}" }
-      else
-        result = data.map {|line| "#{line.rstrip}#{::Asciidoctor::EOL}" }
-      end
-    end
+    result = super
 
     # QUESTION should this work for AsciiDoc table cell content? Currently it does not.
     unless @document.nil? || !(@document.attributes.has_key? 'skip-front-matter')
       if (front_matter = skip_front_matter! result)
-        @document.attributes['front-matter'] = front_matter.join.chomp
+        @document.attributes['front-matter'] = front_matter * EOL
       end
     end
 
-    # QUESTION should we chomp last line? (with or without the condense flag?)
-    if opts.fetch(:condense, true)
-      result.shift && @lineno += 1 while !(first = result.first).nil? && first == ::Asciidoctor::EOL
-      result.pop while !(last = result.last).nil? && last == ::Asciidoctor::EOL
+    if opts.fetch :condense, true
+      result.shift && @lineno += 1 while !(first = result.first).nil? && first.empty?
+      result.pop while !(last = result.last).nil? && last.empty?
     end
 
     if (indent = opts.fetch(:indent, nil))
@@ -587,7 +590,7 @@ class PreprocessorReader < Reader
   def process_line line
     return line unless @process_lines
 
-    if line.chomp.empty?
+    if line.empty?
       @look_ahead += 1
       return ''
     end
@@ -759,7 +762,7 @@ class PreprocessorReader < Reader
         # FIXME slight hack to skip past conditional line
         # but keep our synthetic line marked as processed
         conditional_line = peek_line true
-        replace_line "#{text.rstrip}#{::Asciidoctor::EOL}"
+        replace_line text.rstrip
         unshift conditional_line
         return true
       end
@@ -809,10 +812,10 @@ class PreprocessorReader < Reader
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif @document.safe >= SafeMode::SECURE
-      replace_line "link:#{target}[]#{::Asciidoctor::EOL}"
+      replace_line "link:#{target}[]"
       # TODO make creating the output target a helper method
       #output_target = %(#{File.join(File.dirname(target), File.basename(target, File.extname(target)))}#{@document.attributes['outfilesuffix']})
-      #unshift "link:#{output_target}[]#{::Asciidoctor::EOL}"
+      #unshift "link:#{output_target}[]"
       true
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
       warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
@@ -820,7 +823,7 @@ class PreprocessorReader < Reader
     elsif abs_maxdepth > 0
       if target.include?(':') && target.match(REGEXP[:uri_sniff])
         unless @document.attributes.has_key? 'allow-uri-read'
-          replace_line "link:#{target}[]#{::Asciidoctor::EOL}"
+          replace_line "link:#{target}[]"
           return true
         end
 
@@ -919,7 +922,7 @@ class PreprocessorReader < Reader
               f.each_line do |l|
                 inc_lineno += 1
                 # must force encoding here since we're performing String operations on line
-                l.force_encoding(::Encoding::UTF_8) if ::Asciidoctor::FORCE_ENCODING
+                l.force_encoding(::Encoding::UTF_8) if FORCE_ENCODING
                 if !active_tag.nil?
                   if l.include?("end::#{active_tag}[]")
                     active_tag = nil
@@ -981,7 +984,7 @@ class PreprocessorReader < Reader
       @maxdepth = {:abs => (@include_stack.size - 1) + depth, :rel => depth}
     end
     # effectively fill the buffer
-    @lines = prepare_lines data, :condense => false, :indent => attributes['indent']
+    @lines = prepare_lines data, :normalize => true, :condense => false, :indent => attributes['indent']
     # FIXME kind of a hack
     #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
     #Document::AttributeEntry.new('indir', File.dirname(@file)).save_to_next_block @document
@@ -1033,12 +1036,12 @@ class PreprocessorReader < Reader
   # Private: Ignore front-matter, commonly used in static site generators
   def skip_front_matter! data, increment_linenos = true
     front_matter = nil
-    if data.size > 0 && data.first.chomp == '---'
+    if data.size > 0 && data.first == '---'
       original_data = data.dup
       front_matter = []
       data.shift
       @lineno += 1 if increment_linenos
-      while !data.empty? && data.first.chomp != '---'
+      while !data.empty? && data.first != '---'
         front_matter.push data.shift
         @lineno += 1 if increment_linenos
       end
