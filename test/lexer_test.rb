@@ -429,7 +429,11 @@ context "Lexer" do
   end
 
   test "parse rev number date remark" do
-    metadata, = parse_header_metadata "Ryan Waldron\nv0.0.7, 2013-12-18: The first release you can stand on"
+    input = <<-EOS
+Ryan Waldron
+v0.0.7, 2013-12-18: The first release you can stand on
+    EOS
+    metadata, = parse_header_metadata input
     assert_equal 9, metadata.size
     assert_equal '0.0.7', metadata['revnumber']
     assert_equal '2013-12-18', metadata['revdate']
@@ -437,39 +441,64 @@ context "Lexer" do
   end
 
   test "parse rev date" do
-    metadata, = parse_header_metadata "Ryan Waldron\n2013-12-18"
+    input = <<-EOS
+Ryan Waldron
+2013-12-18
+    EOS
+    metadata, = parse_header_metadata input
     assert_equal 7, metadata.size
     assert_equal '2013-12-18', metadata['revdate']
   end
 
   # while compliant w/ AsciiDoc, this is just sloppy parsing
   test "treats arbitrary text on rev line as revdate" do
-    metadata, = parse_header_metadata "Ryan Waldron\nfoobar\n"
+    input = <<-EOS
+Ryan Waldron
+foobar
+    EOS
+    metadata, = parse_header_metadata input
     assert_equal 7, metadata.size
     assert_equal 'foobar', metadata['revdate']
   end
 
   test "parse rev date remark" do
-    metadata, = parse_header_metadata "Ryan Waldron\n2013-12-18:  The first release you can stand on"
+    input = <<-EOS
+Ryan Waldron
+2013-12-18:  The first release you can stand on
+    EOS
+    metadata, = parse_header_metadata input
     assert_equal 8, metadata.size
     assert_equal '2013-12-18', metadata['revdate']
     assert_equal 'The first release you can stand on', metadata['revremark']
   end
 
   test "should not mistake attribute entry as rev remark" do
-    metadata, = parse_header_metadata "Joe Cool\n:layout: post\n"
-    assert_not_equal 'layout: post', metadata['revremark']
+    input = <<-EOS
+Joe Cool
+:page-layout: post
+    EOS
+    metadata, = parse_header_metadata input
+    assert_not_equal 'page-layout: post', metadata['revremark']
     assert !metadata.has_key?('revdate')
   end
 
   test "parse rev remark only" do
-    metadata, = parse_header_metadata "Joe Cool\n :Must start line with space\n"
-    assert_equal 'Must start line with space', metadata['revremark']
+    input = <<-EOS
+Joe Cool
+ :Must start revremark-only line with space
+    EOS
+    metadata, = parse_header_metadata input
+    assert_equal 'Must start revremark-only line with space', metadata['revremark']
     assert_equal '', metadata['revdate']
   end
 
   test "skip line comments before author" do
-    metadata, = parse_header_metadata "// Asciidoctor\n// release artist\nRyan Waldron"
+    input = <<-EOS
+// Asciidoctor
+// release artist
+Ryan Waldron
+    EOS
+    metadata, = parse_header_metadata input
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']
@@ -479,7 +508,14 @@ context "Lexer" do
   end
 
   test "skip block comment before author" do
-    metadata, = parse_header_metadata "////\nAsciidoctor\nrelease artist\n////\nRyan Waldron"
+    input = <<-EOS
+////
+Asciidoctor
+release artist
+////
+Ryan Waldron
+    EOS
+    metadata, = parse_header_metadata input
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']
@@ -489,7 +525,15 @@ context "Lexer" do
   end
 
   test "skip block comment before rev" do
-    metadata, = parse_header_metadata "Ryan Waldron\n////\nAsciidoctor\nrelease info\n////\nv0.0.7, 2013-12-18"
+    input = <<-EOS
+Ryan Waldron
+////
+Asciidoctor
+release info
+////
+v0.0.7, 2013-12-18
+    EOS
+    metadata, = parse_header_metadata input
     assert_equal 8, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']
@@ -506,7 +550,7 @@ context "Lexer" do
   end
 
   test 'reset block indent to 0' do
-    input = <<-EOS
+    input = <<-EOS.chomp
     def names
 
       @name.split ' '
@@ -514,7 +558,7 @@ context "Lexer" do
     end
     EOS
 
-    expected = <<-EOS
+    expected = <<-EOS.chomp
 def names
 
   @name.split ' '
@@ -522,13 +566,13 @@ def names
 end
     EOS
 
-    lines = input.lines.entries
+    lines = input.split("\n")
     Asciidoctor::Lexer.reset_block_indent! lines
-    assert_equal expected, lines.join
+    assert_equal expected, (lines * "\n")
   end
 
   test 'reset block indent mixed with tabs and spaces to 0' do
-    input = <<-EOS
+    input = <<-EOS.chomp
     def names
 
 \t  @name.split ' '
@@ -536,7 +580,7 @@ end
     end
     EOS
 
-    expected = <<-EOS
+    expected = <<-EOS.chomp
 def names
 
   @name.split ' '
@@ -544,13 +588,13 @@ def names
 end
     EOS
 
-    lines = input.lines.entries
+    lines = input.split("\n")
     Asciidoctor::Lexer.reset_block_indent! lines
-    assert_equal expected, lines.join
+    assert_equal expected, (lines * "\n")
   end
 
   test 'reset block indent to non-zero' do
-    input = <<-EOS
+    input = <<-EOS.chomp
     def names
 
       @name.split ' '
@@ -558,7 +602,7 @@ end
     end
     EOS
 
-    expected = <<-EOS
+    expected = <<-EOS.chomp
   def names
   
     @name.split ' '
@@ -566,9 +610,9 @@ end
   end
     EOS
 
-    lines = input.lines.entries
+    lines = input.split("\n")
     Asciidoctor::Lexer.reset_block_indent! lines, 2
-    assert_equal expected, lines.join
+    assert_equal expected, (lines * "\n")
   end
 
   test 'preserve block indent' do

@@ -141,7 +141,7 @@ class Lexer
     if is_next_line_section?(reader, {})
       name_section = initialize_section(reader, document, {})
       if name_section.level == 1
-        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join.tr_s("\n ", ' ')
+        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join(' ').tr_s(' ', ' ')
         if (m = name_section_buffer.match(REGEXP[:manname_manpurpose]))
           document.attributes['manname'] = m[1] 
           document.attributes['manpurpose'] = m[2] 
@@ -185,9 +185,9 @@ class Lexer
   # Examples
   #
   #   source
-  #   # => "Greetings\n---------\nThis is my doc.\n\nSalutations\n-----------\nIt is awesome."
+  #   # => "= Greetings\n\nThis is my doc.\n\n== Salutations\n\nIt is awesome."
   #
-  #   reader = Reader.new source.lines.entries
+  #   reader = Reader.new source, nil, :normalize => true
   #   # create empty document to parent the section
   #   # and hold attributes extracted from header
   #   doc = Document.new
@@ -347,7 +347,7 @@ class Lexer
       block_extensions = macro_extensions = false
     end
     #parent_context = parent.is_a?(Block) ? parent.context : nil
-    in_list = parent.is_a?(List)
+    in_list = (parent.is_a? List)
     block = nil
     style = nil
     explicit_style = nil
@@ -413,7 +413,7 @@ class Lexer
           unless text_only
             first_char = Compliance.markdown_syntax ? this_line.lstrip[0..0] : this_line[0..0]
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
-            if BREAK_LINES.has_key?(first_char) && this_line.length > 3 &&
+            if (BREAK_LINES.has_key? first_char) && this_line.length >= 3 &&
                 (match = this_line.match(Compliance.markdown_syntax ? REGEXP[:break_line_plus] : REGEXP[:break_line]))
               block = Block.new(parent, BREAK_LINES[first_char], :content_model => :empty)
               break
@@ -444,7 +444,7 @@ class Lexer
               if target.empty?
                 if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
                   # retain as unparsed
-                  return Block.new(parent, :paragraph, :source => [this_line.chomp])
+                  return Block.new(parent, :paragraph, :source => [this_line])
                 else
                   # drop the line if target resolves to nothing
                   return nil
@@ -645,7 +645,7 @@ class Lexer
               return nil
             end
 
-            catalog_inline_anchors(lines.join, document)
+            catalog_inline_anchors(lines.join(EOL), document)
 
             first_line = lines.first
             if !text_only && (admonition_match = first_line.match(REGEXP[:admonition_inline]))
@@ -656,19 +656,18 @@ class Lexer
               block = Block.new(parent, :admonition, :source => lines, :attributes => attributes)
             elsif !text_only && Compliance.markdown_syntax && first_line.start_with?('> ')
               lines.map! {|line|
-                if line.start_with?('> ')
-                  line[2..-1]
-                elsif line.chomp == '>'
+                if line == '>'
                   line[1..-1]
+                elsif line.start_with? '> '
+                  line[2..-1]
                 else
                   line
                 end
               }
 
-              if lines.last.start_with?('-- ')
+              if lines.last.start_with? '-- '
                 attribution, citetitle = lines.pop[3..-1].split(', ', 2)
-                lines.pop while lines.last.chomp.empty?
-                lines[-1] = lines.last.chomp
+                lines.pop while lines.last.empty?
               else
                 attribution, citetitle = nil
               end
@@ -680,11 +679,12 @@ class Lexer
               # FIXME Reader needs to be created w/ line info
               block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
             elsif !text_only && lines.size > 1 && first_line.start_with?('"') &&
-                lines.last.start_with?('-- ') && lines[-2].chomp.end_with?('"')
+                lines.last.start_with?('-- ') && lines[-2].end_with?('"')
               lines[0] = first_line[1..-1]
               attribution, citetitle = lines.pop[3..-1].split(', ', 2)
-              lines.pop while lines.last.chomp.empty?
-              lines[-1] = lines.last.chomp.chop
+              lines.pop while lines.last.empty?
+              # strip trailing quote
+              lines[-1] = lines.last.chop
               attributes['style'] = 'quote'
               attributes['attribution'] = attribution unless attribution.nil?
               attributes['citetitle'] = citetitle unless citetitle.nil?
@@ -735,7 +735,7 @@ class Lexer
         when :listing, :fenced_code, :source
           if block_context == :fenced_code
             style = attributes['style'] = 'source'
-            language, linenums = this_line[3...-1].split(',', 2)
+            language, linenums = this_line[3..-1].split(',', 2)
             if language && !(language = language.strip).empty?
               attributes['language'] = language
               attributes['linenums'] = '' if linenums && !linenums.strip.empty?
@@ -841,17 +841,14 @@ class Lexer
   # returns the match data if this line is the first line of a delimited block or nil if not
   def self.is_delimited_block? line, return_match_data = false
     # highly optimized for best performance
-    line_len = line.length - 1
-    return nil unless line_len > 1 && DELIMITED_BLOCK_LEADERS.include?(line[0..1])
-    line = line.chomp
-    # counts endline character in line length
+    return nil unless (line_len = line.length) > 1 && (DELIMITED_BLOCK_LEADERS.include? line[0..1])
+    # catches open block
     if line_len == 2
       tip = line
       tl = 2
-    elsif line_len < 3
-      return nil
     else
-      if line_len < 5
+      # catches all other delimited blocks, including fenced code
+      if line_len <= 4
         tip = line
         tl = line_len
       else
@@ -860,27 +857,34 @@ class Lexer
       end
 
       # special case for fenced code blocks
+      # REVIEW review this logic
+      fenced_code = false
       if Compliance.markdown_syntax
-        tip_alt = tip.chop if tl == 4
-        if tip_alt == '```'
-          if tip.end_with? '`'
+        tip_3 = (tl == 4 ? tip.chop : tip)
+        if tip_3 == '```'
+          if tl == 4 && (tip.end_with? '`')
             return nil
           end
-          tip = tip_alt
+          tip = tip_3
           tl = 3
-        elsif tip_alt == '~~~'
-          if tip.end_with? '~'
+          fenced_code = true
+        elsif tip_3 == '~~~'
+          if tl == 4 && (tip.end_with? '~')
             return nil
           end
-          tip = tip_alt
+          tip = tip_3
           tl = 3
+          fenced_code = true
         end
       end
+
+      # short circuit if not a fenced code block
+      return nil if tl == 3 && !fenced_code
     end
 
     if DELIMITED_BLOCKS.has_key? tip
       # tip is the full line when delimiter is minimum length
-      if tl == 3 || tl == line_len
+      if tl < 4 || tl == line_len
         if return_match_data
           context, masq = *DELIMITED_BLOCKS[tip]
           BlockMatchData.new(context, masq, tip, tip)
@@ -938,7 +942,7 @@ class Lexer
       end
       block_reader = nil
     elsif parse_as_content_model != :compound
-      lines = reader.read_lines_until(:terminator => terminator, :chomp_last_line => true, :skip_processing => skip_processing)
+      lines = reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing)
       block_reader = nil
     # terminator is false when reader has already been prepared
     elsif terminator == false
@@ -1197,13 +1201,13 @@ class Lexer
       list_item_reader.unshift_lines comment_lines unless comment_lines.empty? 
 
       if !subsequent_line.nil?
-        continuation_connects_first_block = (subsequent_line == ::Asciidoctor::EOL)
+        continuation_connects_first_block = subsequent_line.empty?
         # if there's no continuation connecting the first block, then
         # treat the lines as paragraph text (activated when has_text = false)
         if !continuation_connects_first_block && list_type != :dlist
           has_text = false
         end
-        content_adjacent = !continuation_connects_first_block && !subsequent_line.chomp.empty?
+        content_adjacent = !continuation_connects_first_block && !subsequent_line.empty?
       else
         continuation_connects_first_block = false
         content_adjacent = false
@@ -1273,17 +1277,17 @@ class Lexer
       # the termination of the list
       break if is_sibling_list_item?(this_line, list_type, sibling_trait)
 
-      prev_line = buffer.empty? ? nil : buffer.last.chomp
+      prev_line = buffer.empty? ? nil : buffer.last
 
       if prev_line == LIST_CONTINUATION
         if continuation == :inactive
           continuation = :active
           has_text = true
-          buffer[-1] = ::Asciidoctor::EOL unless within_nested_list
+          buffer[-1] = '' unless within_nested_list
         end
 
         # dealing with adjacent list continuations (which is really a syntax error)
-        if this_line.chomp == LIST_CONTINUATION
+        if this_line == LIST_CONTINUATION
           if continuation != :frozen
             continuation = :frozen
             buffer << this_line
@@ -1310,7 +1314,7 @@ class Lexer
       elsif list_type == :dlist && continuation != :active && this_line.match(REGEXP[:attr_line])
         break
       else
-        if continuation == :active && !this_line.chomp.empty?
+        if continuation == :active && !this_line.empty?
           # literal paragraphs have special considerations (and this is one of 
           # two entry points into one)
           # if we don't process it as a whole, then a line in it that looks like a
@@ -1340,16 +1344,16 @@ class Lexer
             buffer << this_line
             continuation = :inactive
           end
-        elsif !prev_line.nil? && prev_line.chomp.empty?
+        elsif !prev_line.nil? && prev_line.empty?
           # advance to the next line of content
-          if this_line.chomp.empty?
+          if this_line.empty?
             reader.skip_blank_lines
             this_line = reader.read_line 
             # if we hit eof or a sibling, stop reading
             break if this_line.nil? || is_sibling_list_item?(this_line, list_type, sibling_trait)
           end
 
-          if this_line.chomp == LIST_CONTINUATION
+          if this_line == LIST_CONTINUATION
             detached_continuation = buffer.size
             buffer << this_line
           else
@@ -1390,7 +1394,7 @@ class Lexer
             end
           end
         else
-          has_text = true if !this_line.chomp.empty?
+          has_text = true if !this_line.empty?
           if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
             within_nested_list = true
             if nested_list_type == :dlist && $~[3].to_s.empty?
@@ -1411,16 +1415,14 @@ class Lexer
     end
 
     # strip trailing blank lines to prevent empty blocks
-    buffer.pop while !buffer.empty? && buffer.last.chomp.empty?
+    buffer.pop while !buffer.empty? && buffer.last.empty?
 
     # We do need to replace the optional trailing continuation
     # a blank line would have served the same purpose in the document
-    if !buffer.empty? && buffer.last.chomp == LIST_CONTINUATION
-      buffer.pop
-    end
+    buffer.pop if !buffer.empty? && buffer.last == LIST_CONTINUATION
 
-    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join}<BUFFER"
-    #puts "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
+    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer * EOL}<BUFFER"
+    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
 
     buffer
   end
@@ -1561,7 +1563,7 @@ class Lexer
   # Examples
   #
   #   reader.lines
-  #   # => ["Foo\n", "~~~\n"]
+  #   # => ["Foo", "~~~"]
   #
   #   id, reftext, title, level, single = parse_section_title(reader, document)
   #
@@ -1575,7 +1577,7 @@ class Lexer
   #   # => false
   #
   #   line1
-  #   # => "==== Foo\n"
+  #   # => "==== Foo"
   #
   #   id, reftext, title, level, single = parse_section_title(reader, document)
   #
@@ -1644,7 +1646,7 @@ class Lexer
   #
   # returns the number of unicode characters in the line
   def self.line_length(line)
-    FORCE_UNICODE_LINE_LENGTH ? line.chomp.scan(/./u).length : line.chomp.length
+    FORCE_UNICODE_LINE_LENGTH ? line.scan(/./u).length : line.length
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).
@@ -1657,7 +1659,8 @@ class Lexer
   #
   # Examples
   #
-  #  parse_header_metadata(Reader.new ["Author Name <author@example.org>\n", "v1.0, 2012-12-21: Coincide w/ end of world.\n"])
+  #  data = ["Author Name <author@example.org>\n", "v1.0, 2012-12-21: Coincide w/ end of world.\n"]
+  #  parse_header_metadata(Reader.new data, nil, :normalize => true)
   #  # => {'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
   #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.'}
   def self.parse_header_metadata(reader, document = nil)
@@ -2124,7 +2127,7 @@ class Lexer
       line = table_reader.read_line
 
       if skipped == 0 && loop_idx.zero? && !attributes.has_key?('options') &&
-          !(next_line = table_reader.peek_line).nil? && next_line == ::Asciidoctor::EOL
+          !(next_line = table_reader.peek_line).nil? && next_line.empty?
         table.has_header_option = true
         table.set_option 'header'
       end
@@ -2145,7 +2148,9 @@ class Lexer
         end
       end
 
-      while !line.empty?
+      seen = false
+      while !seen || !line.empty?
+        seen = true
         if m = parser_ctx.match_delimiter(line)
           if parser_ctx.format == 'csv'
             if parser_ctx.buffer_has_unclosed_quotes?(m.pre_match)
@@ -2173,7 +2178,7 @@ class Lexer
         else
           # no other delimiters to see here
           # suck up this line into the buffer and move on
-          parser_ctx.buffer = %(#{parser_ctx.buffer}#{line})
+          parser_ctx.buffer = %(#{parser_ctx.buffer}#{line}#{EOL})
           # QUESTION make stripping endlines in csv data an option? (unwrap-option?)
           if parser_ctx.format == 'csv'
             parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} )
@@ -2281,7 +2286,7 @@ class Lexer
 
     if m = line.match(REGEXP[:table_cellspec][pos]) 
       spec = {}
-      return [spec, line] if m[0].chomp.empty?
+      return [spec, line] if m[0].empty?
       rest = (pos == :start ? m.post_match : m.pre_match)
       if m[1]
         colspec, rowspec = m[1].split '.'
@@ -2371,7 +2376,7 @@ class Lexer
         end
       }
 
-      raw_style.split('').each do |c|
+      raw_style.each_char do |c|
         if c == '.' || c == '#' || c == '%'
           save_current.call
           case c
@@ -2447,13 +2452,13 @@ class Lexer
   #       end
   #   EOS
   #
-  #   source.lines.entries
-  #   # => ["    def names\n", "      @names.split ' '\n", "    end\n"]
+  #   source.split("\n")
+  #   # => ["    def names", "      @names.split ' '", "    end"]
   #
-  #   Lexer.reset_block_indent(source.lines.entries)
-  #   # => ["def names\n", "  @names.split ' '\n", "end\n"]
+  #   Lexer.reset_block_indent(source.split "\n")
+  #   # => ["def names", "  @names.split ' '", "end"]
   #
-  #   puts Lexer.reset_block_indent(source.lines.entries).join
+  #   puts Lexer.reset_block_indent(source.split "\n") * "\n"
   #   # => def names
   #   # =>   @names.split ' '
   #   # => end
@@ -2470,7 +2475,7 @@ class Lexer
     # strip leading block indent
     offsets = lines.map do |line|
       # break if the first char is non-whitespace
-      break [] unless line.chomp[0..0].lstrip.empty?
+      break [] unless line[0..0].lstrip.empty?
       if line.include? "\t"
         tab_detected = true
         line = line.gsub("\t", tab_expansion)
@@ -2488,7 +2493,7 @@ class Lexer
       if (offset = offsets.min) > 0
         lines.map! {|line|
           line = line.gsub("\t", tab_expansion) if tab_detected
-          line[offset..-1] || "\n"
+          line[offset..-1].to_s
         }
       end
     end

@@ -33,15 +33,12 @@ class Block < AbstractBlock
     raw_source = opts.fetch(:source, nil) || nil
     if raw_source.nil?
       @lines = []
-    elsif raw_source.class == String
+    elsif raw_source.class == ::String
       # FIXME make line normalization a utility method since it's used multiple times in code base!!
-      if ::Asciidoctor::FORCE_ENCODING
-        @lines = raw_source.lines.map {|line| "#{line.rstrip.force_encoding(::Encoding::UTF_8)}\n" }
+      if FORCE_ENCODING
+        @lines = raw_source.each_line.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
       else
-        @lines = raw_source.lines.map {|line| "#{line.rstrip}\n" }
-      end
-      if (last = @lines.pop)
-        @lines.push last.chomp
+        @lines = raw_source.each_line.map {|line| line.rstrip }
       end
     else
       @lines = raw_source.dup
@@ -63,7 +60,7 @@ class Block < AbstractBlock
     when :compound
       super
     when :simple, :verbatim, :raw
-      apply_subs @lines.join, @subs
+      apply_subs @lines.join(EOL), @subs
     else
       warn "Unknown content model '#@content_model' for block: #{to_s}" unless @content_model == :empty
       nil
@@ -75,7 +72,7 @@ class Block < AbstractBlock
   # Returns the a String containing the lines joined together or nil if there
   # are no lines
   def source
-    @lines.join
+    @lines * EOL
   end
 
   def to_s

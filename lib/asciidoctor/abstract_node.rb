@@ -365,6 +365,7 @@ class AbstractNode
   # if the file does not exist.
   def read_asset(path, warn_on_failure = false)
     if File.readable? path
+      # QUESTION should we use strip or rstrip instead of chomp here?
       File.read(path).chomp
     else
       warn "asciidoctor: WARNING: file does not exist or cannot be read: #{path}" if warn_on_failure

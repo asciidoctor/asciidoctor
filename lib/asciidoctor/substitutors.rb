@@ -73,38 +73,38 @@ module Substitutors
 
     return source if subs.empty?
 
-    multiline = source.is_a? Array
-    text = multiline ? source.join : source
+    multiline = source.is_a? ::Array
+    text = multiline ? (source * EOL) : source
 
-    if (has_passthroughs = subs.include?(:macros))
-      text = extract_passthroughs(text)
+    if (has_passthroughs = subs.include? :macros)
+      text = extract_passthroughs text
     end
 
     subs.each do |type|
       case type
       when :specialcharacters
-        text = sub_specialcharacters(text)
+        text = sub_specialcharacters text
       when :quotes
-        text = sub_quotes(text)
+        text = sub_quotes text
       when :attributes
-        text = sub_attributes(text.lines.entries).join
+        text = sub_attributes(text.split LINE_SPLIT) * EOL
       when :replacements
-        text = sub_replacements(text)
+        text = sub_replacements text
       when :macros
-        text = sub_macros(text)
+        text = sub_macros text
       when :highlight
-        text = highlight_source(text, subs.include?(:callouts))
+        text = highlight_source text, (subs.include? :callouts)
       when :callouts
-        text = sub_callouts(text) unless subs.include?(:highlight)
+        text = sub_callouts text unless subs.include? :highlight
       when :post_replacements
-        text = sub_post_replacements(text)
+        text = sub_post_replacements text
       else
         warn "asciidoctor: WARNING: unknown substitution type #{type}"
       end
     end
-    text = restore_passthroughs(text) if has_passthroughs
+    text = restore_passthroughs text if has_passthroughs
 
-    multiline ? text.lines.entries : text
+    multiline ? (text.split LINE_SPLIT) : text
   end
 
   # Public: Apply normal substitutions.
@@ -113,7 +113,7 @@ module Substitutors
   #
   # returns - A String with normal substitutions performed
   def apply_normal_subs(lines)
-    apply_subs lines.is_a?(Array) ? lines.join : lines
+    apply_subs lines.is_a?(::Array) ? (lines * EOL) : lines
   end
 
   # Public: Apply substitutions for titles.
@@ -310,6 +310,7 @@ module Substitutors
     result = []
     lines.each {|line|
       reject = false
+      reject_if_empty = false
       line = line.gsub(REGEXP[:attr_ref]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -327,18 +328,25 @@ module Substitutors
               # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
               if @document.attributes.fetch('attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
                 Debug.debug { "Undefining attribute: #{key}, line marked for removal" }
+                reject = true
                 break ''
               end
             end
+            reject_if_empty = true
             ''
           when 'counter', 'counter2'
             args = expr.split(':')
             val = @document.counter(args[0], args[1])
-            directive == 'counter2' ? '' : val
+            if directive == 'counter2'
+              reject_if_empty = true
+              ''
+            else
+              val
+            end
           else
             # if we get here, our attr_ref regex is too loose
             warn "asciidoctor: WARNING: illegal attribute directive: #{m[2]}"
-            ''
+            m[0]
           end
         elsif (key = m[2].downcase) && @document.attributes.has_key?(key)
           @document.attributes[key]
@@ -347,20 +355,22 @@ module Substitutors
         else
           case (opts[:attribute_missing] || @document.attributes.fetch('attribute-missing', Compliance.attribute_missing))
           when 'skip'
-            "{#{key}}"
+            m[0]
           when 'drop-line'
             Debug.debug { "Missing attribute: #{key}, line marked for removal" }
+            reject = true
             break ''
           else # 'drop'
+            reject_if_empty = true
             ''
           end
         end
       } if line.include? '{'
 
-      result << line unless reject
+      result << line unless reject || (reject_if_empty && line.empty?)
     }
 
-    string_data ? result.join : result
+    string_data ? (result * EOL) : result
   end
 
   # Public: Substitute inline macros (e.g., links, images, etc)
@@ -855,10 +865,10 @@ module Substitutors
   # returns The String with the post replacements rendered using the backend templates
   def sub_post_replacements(text)
     if (@document.attributes.has_key? 'hardbreaks') || (@attributes.has_key? 'hardbreaks-option')
-      lines = text.lines.entries
+      lines = (text.split LINE_SPLIT)
       return text if lines.size == 1
       last = lines.pop
-      lines.map {|line| Inline.new(self, :break, line.chomp.chomp(LINE_BREAK), :type => :line).render }.push(last) * EOL
+      lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).render }.push(last) * EOL
     else
       text.gsub(REGEXP[:line_break]) { Inline.new(self, :break, $~[1], :type => :line).render }
     end
@@ -996,7 +1006,7 @@ module Substitutors
       values = []
       current = []
       quote_open = false
-      str.split('').each do |c|
+      str.each_char do |c|
         case c
         when ','
           if quote_open
@@ -1083,7 +1093,7 @@ module Substitutors
     if sub_callouts
       last = -1
       # extract callout marks, indexed by line number
-      source = source.split(EOL).map {|line|
+      source = source.split(LINE_SPLIT).map {|line|
         lineno = lineno + 1
         line.gsub(REGEXP[:callout_scan]) {
           # alias match for Ruby 1.8.7 compat
@@ -1142,7 +1152,7 @@ module Substitutors
     else
       lineno = 0
       reached_code = linenums_mode != :table
-      result.split(EOL).map {|line|
+      result.split(LINE_SPLIT).map {|line|
         unless reached_code
           unless line.include?('<td class="code">')
             next line

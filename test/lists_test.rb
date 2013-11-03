@@ -1028,7 +1028,7 @@ Item one, literal block
       assert_xpath '(//ul/li[1]/p/following-sibling::*)[1][@class = "literalblock"]', output, 1
     end
 
-    test "adjacent list continuation line attaches following block with block attributes" do
+    test 'adjacent list continuation line attaches following block with block attributes' do
       input = <<-EOS
 Lists
 =====

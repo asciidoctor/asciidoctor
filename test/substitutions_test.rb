@@ -1233,25 +1233,25 @@ foo&#8201;&#8212;&#8201;)
     test 'line break inserted after line with line break character' do
       para = block_from_string("First line +\nSecond line")
       result = para.apply_subs(para.lines, :post_replacements, true)
-      assert_equal "First line<br>\n", result.first
+      assert_equal 'First line<br>', result.first
     end
 
     test 'line break inserted after line wrap with hardbreaks enabled' do
       para = block_from_string("First line\nSecond line", :attributes => {'hardbreaks' => ''})
       result = para.apply_subs(para.lines, :post_replacements, true)
-      assert_equal "First line<br>\n", result.first
+      assert_equal 'First line<br>', result.first
     end
 
     test 'line break character stripped from end of line with hardbreaks enabled' do
       para = block_from_string("First line +\nSecond line", :attributes => {'hardbreaks' => ''})
       result = para.apply_subs(para.lines, :post_replacements, true)
-      assert_equal "First line<br>\n", result.first
+      assert_equal 'First line<br>', result.first
     end
 
     test 'line break not inserted for single line with hardbreaks enabled' do
-      para = block_from_string("First line", :attributes => {'hardbreaks' => ''})
+      para = block_from_string('First line', :attributes => {'hardbreaks' => ''})
       result = para.apply_subs(para.lines, :post_replacements, true)
-      assert_equal "First line", result.first
+      assert_equal 'First line', result.first
     end
   end
 
