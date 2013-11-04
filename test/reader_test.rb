@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'test_helper'
 
 class ReaderTest < Test::Unit::TestCase
@@ -647,7 +648,7 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
   
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         result = xmlnodes_at_xpath('//pre', output, 1).text
-        assert_equal "<year>2013</year>\n<holder>Acme, Inc.</holder>", result
+        assert_equal "<year>2013</year>\n<holder>Acme™, Inc.</holder>", result
       end
   
       test 'include processor is called to process include directive' do

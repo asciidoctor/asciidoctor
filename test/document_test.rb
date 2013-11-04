@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'test_helper'
 
 context 'Document' do
@@ -506,6 +507,7 @@ text
           :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo1' => ''})
       assert !output.empty?
       assert_css 'productname', output, 1
+      assert_xpath '//xmlns:productname[text()="Asciidoctor™"]', output, 1
       assert_css 'edition', output, 1
       assert_xpath '//xmlns:edition[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'copyright', output, 0
@@ -514,6 +516,7 @@ text
           :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => ''})
       assert !output.empty?
       assert_css 'productname', output, 1
+      assert_xpath '//xmlns:productname[text()="Asciidoctor™"]', output, 1
       assert_css 'edition', output, 1
       assert_xpath '//xmlns:edition[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'copyright', output, 1
@@ -563,6 +566,37 @@ text
       assert_css 'article > revhistory', output, 1
       assert_xpath '/xmlns:article/xmlns:revhistory/xmlns:revision/xmlns:revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'glossary#_glossary', output, 1
+    end
+
+    # WARNING this test manipulates runtime settings; should probably be run in forked process
+    test 'should force encoding of docinfo files to UTF-8' do
+      sample_input_path = fixture_path('basic.asciidoc')
+
+      if RUBY_VERSION >= '1.9'
+        default_external_old = Encoding.default_external
+        force_encoding_old = Asciidoctor::FORCE_ENCODING
+        verbose_old = $VERBOSE
+      end
+      begin
+        if RUBY_VERSION >= '1.9'
+          $VERBOSE = nil # disable warnings since we have to modify constants
+          Encoding.default_external = 'US-ASCII'
+          Asciidoctor::FORCE_ENCODING = true
+        end
+        output = Asciidoctor.render_file(sample_input_path,
+            :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => ''})
+        assert !output.empty?
+        assert_css 'productname', output, 1
+        assert_css 'edition', output, 1
+        assert_xpath '//xmlns:edition[text()="1.0"]', output, 1 # verifies substitutions are performed
+        assert_css 'copyright', output, 1
+      ensure
+        if RUBY_VERSION >= '1.9'
+          Encoding.default_external = default_external_old
+          Asciidoctor::FORCE_ENCODING = force_encoding_old
+          $VERBOSE = verbose_old
+        end
+      end
     end
 
     test 'should not include docinfo files by default' do
