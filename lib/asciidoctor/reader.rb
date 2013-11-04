@@ -884,7 +884,7 @@ class PreprocessorReader < Reader
           inc_line_offset = 0
           inc_lineno = 0
           begin
-            open(include_file) do |f|
+            open(include_file, 'r') do |f|
               f.each_line do |l|
                 inc_lineno += 1
                 take = inc_lines.first
@@ -918,7 +918,7 @@ class PreprocessorReader < Reader
           active_tag = nil
           tags_found = Set.new
           begin
-            open(include_file) do |f|
+            open(include_file, 'r') do |f|
               f.each_line do |l|
                 inc_lineno += 1
                 # must force encoding here since we're performing String operations on line
@@ -956,7 +956,7 @@ class PreprocessorReader < Reader
       else
         begin
           advance
-          push_include open(include_file) {|f| f.read }, include_file, path, 1, attributes
+          push_include open(include_file, 'r') {|f| f.read }, include_file, path, 1, attributes
         rescue
           warn "asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file}"
           advance
