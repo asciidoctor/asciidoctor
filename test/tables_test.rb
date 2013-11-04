@@ -14,8 +14,8 @@ context 'Tables' do
       cells = [%w(A B C), %w(a b c), %w(1 2 3)]
       output = render_embedded_string input
       assert_css 'table', output, 1
-      assert_css 'table.tableblock.frame-all.grid-all[style*="width:100%"]', output, 1
-      assert_css 'table > colgroup > col[style*="width:33%"]', output, 3
+      assert_css 'table.tableblock.frame-all.grid-all[style*="width: 100%"]', output, 1
+      assert_css 'table > colgroup > col[style*="width: 33%"]', output, 3
       assert_css 'table tr', output, 3
       assert_css 'table > tbody > tr', output, 3
       assert_css 'table td', output, 9
@@ -382,13 +382,13 @@ I am getting in shape!
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
-      assert_css 'table[style*="width:80%"]', output, 1
+      assert_css 'table[style*="width: 80%"]', output, 1
       assert_xpath '/table/caption[@class="title"][text()="Table 1. Horizontal and vertical source data"]', output, 1
       assert_css 'table > colgroup > col', output, 4
-      assert_css 'table > colgroup > col:nth-child(1)[@style*="width:17%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(2)[@style*="width:11%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(3)[@style*="width:11%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(4)[@style*="width:58%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(1)[@style*="width: 17%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(2)[@style*="width: 11%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(3)[@style*="width: 11%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(4)[@style*="width: 58%"]', output, 1
       assert_css 'table > thead', output, 1
       assert_css 'table > thead > tr', output, 1
       assert_css 'table > thead > tr > th', output, 4
@@ -411,8 +411,8 @@ I am getting in shape!
 
       output = render_embedded_string input
       assert_xpath '/table/colgroup/col', output, 2
-      assert_xpath '(/table/colgroup/col)[1][@style="width:10%;"]', output, 1
-      assert_xpath '(/table/colgroup/col)[2][@style="width:90%;"]', output, 1
+      assert_xpath '(/table/colgroup/col)[1][@style="width: 10%;"]', output, 1
+      assert_xpath '(/table/colgroup/col)[2][@style="width: 90%;"]', output, 1
     end
 
     test 'spans, alignments and styles' do
@@ -427,7 +427,7 @@ d|9 2+>|10
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width:25%"]', output, 4
+      assert_css 'table > colgroup > col[style*="width: 25%"]', output, 4
       assert_css 'table > tbody > tr', output, 4
       assert_css 'table > tbody > tr > td', output, 10
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 4
@@ -685,10 +685,10 @@ plain
       EOS
 
       output = render_embedded_string input
-      assert_xpath '(/table/thead/tr/th)[1][@style="background-color:green;"]', output, 1
-      assert_xpath '(/table/thead/tr/th)[2][@style="background-color:green;"]', output, 0
-      assert_xpath '(/table/tbody/tr/td)[1][@style="background-color:red;"]', output, 1
-      assert_xpath '(/table/tbody/tr/td)[2][@style="background-color:green;"]', output, 0
+      assert_xpath '(/table/thead/tr/th)[1][@style="background-color: green;"]', output, 1
+      assert_xpath '(/table/thead/tr/th)[2][@style="background-color: green;"]', output, 0
+      assert_xpath '(/table/tbody/tr/td)[1][@style="background-color: red;"]', output, 1
+      assert_xpath '(/table/tbody/tr/td)[2][@style="background-color: green;"]', output, 0
     end
   end
 
@@ -708,7 +708,7 @@ nobody:x:99:99:Nobody:/:/sbin/nologin
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width:14%"]', output, 7
+      assert_css 'table > colgroup > col[style*="width: 14%"]', output, 7
       assert_css 'table > tbody > tr', output, 6
       assert_xpath '//tr[4]/td[5]/p/text()', output, 0
       assert_xpath '//tr[3]/td[5]/p[text()="MySQL:Server"]', output, 1
@@ -746,7 +746,7 @@ air, moon roof, loaded",4799.00
       EOS
       output = render_embedded_string input 
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width:20%"]', output, 5
+      assert_css 'table > colgroup > col[style*="width: 20%"]', output, 5
       assert_css 'table > thead > tr', output, 1
       assert_css 'table > tbody > tr', output, 4
       assert_xpath '((//tbody/tr)[1]/td)[4]/p[text()="ac, abs, moon"]', output, 1
