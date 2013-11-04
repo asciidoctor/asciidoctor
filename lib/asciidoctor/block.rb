@@ -59,8 +59,19 @@ class Block < AbstractBlock
     case @content_model
     when :compound
       super
-    when :simple, :verbatim, :raw
+    when :simple
       apply_subs @lines.join(EOL), @subs
+    when :verbatim, :raw
+      #((apply_subs @lines.join(EOL), @subs).sub REGEXP[:strip_line_wise], '\1')
+
+      result = apply_subs @lines, @subs
+      if result.size < 2
+        result.first || ''
+      else
+        result.shift while !(first = result.first).nil? && first.rstrip.empty?
+        result.pop while !(last = result.last).nil? && last.rstrip.empty?
+        result.join EOL
+      end
     else
       warn "Unknown content model '#@content_model' for block: #{to_s}" unless @content_model == :empty
       nil
