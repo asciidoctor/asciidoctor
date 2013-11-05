@@ -355,6 +355,8 @@ module Asciidoctor
   # Matches:
   # [enclosed text here] or [enclosed [text\] here]
   REGEXP = {
+    #:strip_line_wise => /\A(?:\s*\n)?(.*?)\s*\z/m,
+
     # NOTE: this is a inline admonition note
     :admonition_inline => /^(#{ADMONITION_STYLES.to_a * '|'}):#{CC_BLANK}/,
 

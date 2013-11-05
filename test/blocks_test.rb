@@ -753,6 +753,28 @@ EOS
       }
     end
 
+    test 'should strip leading and trailing blank lines when rendering verbatim block' do
+      input = <<-EOS
+[subs="attributes"]
+....
+
+
+  first line
+
+last line
+
+{empty}
+
+....
+      EOS
+
+      doc = document_from_string input, :header_footer => false
+      block = doc.blocks.first
+      assert_equal ['', '', '  first line', '', 'last line', '', '{empty}', ''], block.lines
+      result = doc.render
+      assert_xpath %(//pre[text()="  first line\n\nlast line"]), result, 1
+    end
+
     test 'should not compact nested document twice' do
       input = <<-EOS
 |===
@@ -1075,6 +1097,34 @@ http://asciidoc.org
       expected = %(This is a <em>passthrough</em> block.\n<a href="http://asciidoc.org">http://asciidoc.org</a>)
       output = render_embedded_string input
       assert_equal expected, output.strip
+    end
+
+    test 'should strip leading and trailing blank lines when rendering raw block' do
+      input = <<-EOS
+++++
+line above
+++++
+
+++++
+
+
+  first line
+
+last line
+
+
+++++
+
+++++
+line below
+++++
+      EOS
+
+      doc = document_from_string input, :header_footer => false
+      block = doc.blocks[1]
+      assert_equal ['', '', '  first line', '', 'last line', '', ''], block.lines
+      result = doc.render
+      assert_equal "line above\n  first line\n\nlast line\nline below", result, 1
     end
   end
 
