@@ -842,8 +842,11 @@ class Document < AbstractBlock
       if docinfo1 || docinfo2
         docinfo_path = normalize_system_path(docinfo_filename)
         content = read_asset(docinfo_path)
-        # FIXME normalize these lines!
-        content = sub_attributes(content.split LINE_SPLIT) * EOL unless content.nil?
+        unless content.nil?
+          # FIXME normalize these lines!
+          content.force_encoding ::Encoding::UTF_8 if FORCE_ENCODING
+          content = sub_attributes(content.split LINE_SPLIT) * EOL
+        end
       end
 
       if (docinfo || docinfo2) && @attributes.has_key?('docname')
@@ -851,6 +854,7 @@ class Document < AbstractBlock
         content2 = read_asset(docinfo_path)
         unless content2.nil?
           # FIXME normalize these lines!
+          content2.force_encoding ::Encoding::UTF_8 if FORCE_ENCODING
           content2 = sub_attributes(content2.split LINE_SPLIT) * EOL
           content = content.nil? ? content2 : "#{content}#{EOL}#{content2}"
         end
