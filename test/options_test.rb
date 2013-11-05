@@ -45,7 +45,7 @@ context 'Options' do
   test 'basic argument assignment' do
     options = Asciidoctor::Cli::Options.parse!(%w(-v -s -d book test/fixtures/sample.asciidoc))
 
-    assert_equal true, options[:verbose]
+    assert_equal 2, options[:verbose]
     assert_equal false, options[:header_footer]
     assert_equal 'book', options[:attributes]['doctype']
     assert_equal 1, options[:input_files].size
@@ -106,6 +106,26 @@ context 'Options' do
   test 'multiple template directory assignments' do
     options = Asciidoctor::Cli::Options.parse!(%w(-T custom-backend -T custom-backend-hacks test/fixtures/sample.asciidoc))
     assert_equal ['custom-backend', 'custom-backend-hacks'], options[:template_dirs]
+  end
+
+  test 'should set verbose to 2 when -v flag is specified' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-v test/fixtures/sample.asciidoc))
+    assert_equal 2, options[:verbose]
+  end
+
+  test 'should set verbose to 0 when -q flag is specified' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-q test/fixtures/sample.asciidoc))
+    assert_equal 0, options[:verbose]
+  end
+
+  test 'should set verbose to 2 when -v flag is specified after -q flag' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-q -v test/fixtures/sample.asciidoc))
+    assert_equal 2, options[:verbose]
+  end
+
+  test 'should set verbose to 0 when -q flag is specified after -v flag' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-v -q test/fixtures/sample.asciidoc))
+    assert_equal 0, options[:verbose]
   end
 
 end

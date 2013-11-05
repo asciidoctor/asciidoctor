@@ -22,7 +22,7 @@ module Asciidoctor
         end
         self[:eruby] = options[:eruby] || nil
         self[:compact] = options[:compact] || false
-        self[:verbose] = options[:verbose] || false
+        self[:verbose] = options[:verbose] || 1
         self[:base_dir] = options[:base_dir]
         self[:destination_dir] = options[:destination_dir] || nil
         self[:trace] = false
@@ -42,9 +42,6 @@ Example: asciidoctor -b html5 source.asciidoc
 
           EOS
 
-          opts.on('-v', '--verbose', 'enable verbose mode (default: false)') do |verbose|
-            self[:verbose] = true
-          end
           opts.on('-b', '--backend BACKEND', 'set output format backend (default: html5)') do |backend|
             self[:attributes]['backend'] = backend
           end
@@ -111,8 +108,14 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-D', '--destination-dir DIR', 'destination output directory (default: directory of source file)') do |dest_dir|
             self[:destination_dir] = dest_dir
           end
+          opts.on('-q', '--quiet', 'suppress warnings (default: false)') do |verbose|
+            self[:verbose] = 0
+          end
           opts.on('--trace', 'include backtrace information on errors (default: false)') do |trace|
             self[:trace] = true
+          end
+          opts.on('-v', '--verbose', 'enable verbose mode (default: false)') do |verbose|
+            self[:verbose] = 2
           end
 
           opts.on_tail('-h', '--help', 'show this message') do

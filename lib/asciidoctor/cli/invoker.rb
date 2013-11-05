@@ -29,6 +29,17 @@ module Asciidoctor
       def invoke!
         return if @options.nil?
 
+        old_verbose = $VERBOSE
+
+        case @options[:verbose]
+        when 0
+          $VERBOSE = nil
+        when 1
+          $VERBOSE = false
+        when 2
+          $VERBOSE = true
+        end
+
         begin
           opts = {}
           profile = false
@@ -47,7 +58,7 @@ module Asciidoctor
             when :attributes
               opts[:attributes] = v.dup
             when :verbose
-              profile = true if v
+              profile = true if v == 2
             when :trace
               # currently, nothing
             else
@@ -101,6 +112,8 @@ module Asciidoctor
           err.puts e.message
           err.puts '  Use --trace for backtrace'
           @code = 1
+        ensure
+          $VERBOSE = old_verbose
         end
       end
 

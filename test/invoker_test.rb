@@ -92,6 +92,32 @@ context 'Invoker' do
     end
   end
 
+  test 'should print warnings to stderr by default' do
+    input = <<-EOS
+2. second
+3. third
+    EOS
+    warnings = nil
+    redirect_streams do |stdout, stderr|
+      invoke_cli_to_buffer(%w(-o /dev/null), '-') { input }
+      warnings = stderr.string
+    end
+    assert_match(/WARNING/, warnings)
+  end
+
+  test 'should silence warnings if -q flag is specified' do
+    input = <<-EOS
+2. second
+3. third
+    EOS
+    warnings = nil
+    redirect_streams do |stdout, stderr|
+      invoke_cli_to_buffer(%w(-q -o /dev/null), '-') { input }
+      warnings = stderr.string
+    end
+    assert_equal '', warnings
+  end
+
   test 'should report usage if no input file given' do
     redirect_streams do |stdout, stderr|
       invoke_cli [], nil
