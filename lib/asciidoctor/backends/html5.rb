@@ -852,59 +852,80 @@ class BlockColistTemplate < BaseTemplate
 end
 
 class BlockTableTemplate < BaseTemplate
-  def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><table<%= @id ? %( id="\#{@id}") : nil %> class="tableblock frame-<%= attr :frame, 'all' %> grid-<%= attr :grid, 'all'%><%= role? ? " \#{role}" : nil %>" style="<%
-if !(option? 'autowidth') %>width:<%= attr :tablepcwidth %>%; <% end %><%
-if attr? :float %>float: <%= attr :float %>; <% end %>"><%
-if title? %>
-<caption class="title"><%= captioned_title %></caption><%
-end
-if (attr :rowcount) >= 0
-  short_tag_slash_local = short_tag_slash %>
-<colgroup><%
-  if option? 'autowidth'
-    @columns.each do %>
-<col<%= short_tag_slash_local %>><%
+  def result(node)
+    result_buffer = [] 
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    classes = ['tableblock', %(frame-#{node.attr 'frame', 'all'}), %(grid-#{node.attr 'grid', 'all'})]
+    if (role_class = node.role)
+      classes << role_class
     end
-  else
-    @columns.each do |col| %>
-<col style="width:<%= col.attr :colpcwidth %>%;"<%= short_tag_slash_local %>><%
+    class_attribute = %( class="#{classes * ' '}")
+    styles = [(node.option? 'autowidth') ? nil : %(width: #{node.attr 'tablepcwidth'}%;), (node.attr? 'float') ? %(float: #{node.attr 'float'};) : nil].compact
+    if styles.size > 0
+      style_attribute = %( style="#{styles * ' '}")
+    else
+      style_attribute = nil
     end
-  end %> 
-</colgroup><%
-  [:head, :foot, :body].select {|tsec| !@rows[tsec].empty? }.each do |tsec| %>
-<t<%= tsec %>><%
-    @rows[tsec].each do |row| %>
-<tr><%
-      row.each do |cell| %>
-<<%= tsec == :head || cell.style == :header ? 'th' : 'td' %> class="tableblock halign-<%= cell.attr :halign %> valign-<%= cell.attr :valign %>"#{attribute('colspan', 'cell.colspan')}#{attribute('rowspan', 'cell.rowspan')}<%
-        cell_content = ''
-        if tsec == :head
-          cell_content = cell.text
-        else
-          case cell.style
-          when :asciidoc
-            cell_content = %(<div>\#{cell.content}</div>)
-          when :verse
-            cell_content = %(<div class="verse">\#{template.preserve_endlines(cell.text, self)}</div>)
-          when :literal
-            cell_content = %(<div class="literal"><pre>\#{template.preserve_endlines(cell.text, self)}</pre></div>)
-          else
-            cell.content.each do |text|
-              cell_content = %(\#{cell_content}<p class="tableblock">\#{text}</p>)
+
+    result_buffer << %(<table#{id_attribute}#{class_attribute}#{style_attribute}>)
+    if node.title?
+      result_buffer << %(<caption class="title">#{node.captioned_title}</caption>)
+    end
+    if (node.attr 'rowcount') > 0
+      result_buffer << '<colgroup>'
+      if node.option? 'autowidth'
+        tag = %(<col#{node.short_tag_slash}>)
+        node.columns.size.times do
+          result_buffer << tag
+        end
+      else
+        short_tag_slash_local = node.short_tag_slash
+        node.columns.each do |col|
+          result_buffer << %(<col style="width: #{col.attr 'colpcwidth'}%;"#{short_tag_slash_local}>)
+        end
+      end
+      result_buffer << '</colgroup>'
+      [:head, :foot, :body].select {|tsec| !node.rows[tsec].empty? }.each do |tsec|
+        result_buffer << %(<t#{tsec}>)
+        node.rows[tsec].each do |row|
+          result_buffer << '<tr>'
+          row.each do |cell|
+            if tsec == :head
+              cell_content = cell.text
+            else
+              case cell.style
+              when :asciidoc
+                cell_content = %(<div>#{cell.content}</div>)
+              when :verse
+                cell_content = %(<div class="verse">#{preserve_endlines cell.text, node}</div>)
+              when :literal
+                cell_content = %(<div class="literal"><pre>#{preserve_endlines cell.text, node}</pre></div>)
+              else
+                cell_content = ''
+                cell.content.each do |text|
+                  cell_content = %(#{cell_content}<p class="tableblock">#{text}</p>)
+                end
+              end
             end
+
+            cell_tag_name = (tsec == :head || cell.style == :header ? 'th' : 'td')
+            cell_class_attribute = %( class="tableblock halign-#{cell.attr 'halign'} valign-#{cell.attr 'valign'}")
+            cell_colspan_attribute = cell.colspan ? %( colspan="#{cell.colspan}") : nil
+            cell_rowspan_attribute = cell.rowspan ? %( rowspan="#{cell.rowspan}") : nil
+            cell_style_attribute = (node.document.attr? 'cellbgcolor') ? %( style="background-color: #{node.document.attr 'cellbgcolor'};") : nil
+            result_buffer << %(<#{cell_tag_name}#{cell_class_attribute}#{cell_colspan_attribute}#{cell_rowspan_attribute}#{cell_style_attribute}>#{cell_content}</#{cell_tag_name}>)
           end
-        end %><%= (@document.attr? 'cellbgcolor') ? %( style="background-color:\#{@document.attr 'cellbgcolor'};") : nil
-        %>><%= cell_content %></<%= tsec == :head || cell.style == :header ? 'th' : 'td' %>><%
-      end %>
-</tr><%
-    end %>
-</t<%= tsec %>><%
+          result_buffer << '</tr>'
+        end
+        result_buffer << %(</t#{tsec}>)
+      end
+    end
+    result_buffer << %(</table>)
+    result_buffer * EOL
   end
-end %>
-</table>
-    EOS
+
+  def template
+    :invoke_result
   end
 end
 
