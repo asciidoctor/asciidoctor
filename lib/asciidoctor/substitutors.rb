@@ -1035,28 +1035,76 @@ module Substitutors
   # subs - A comma-delimited String of substitution aliases
   #
   # returns An Array of Symbols representing the substitution operation
-  def resolve_subs subs, type = :block, subject = nil
+  def resolve_subs subs, type = :block, defaults = nil, subject = nil
     return [] if subs.nil? || subs.empty?
     candidates = []
+    # only allow modification if defaults is given
+    modification_group = defaults.nil? ? false : nil
     subs.split(',').each do |val|
-      key = val.strip.to_sym
+      key = val.strip
+      # QUESTION can we encapsulate this logic?
+      if modification_group != false
+        if (first = key[0..0]) == '+'
+          operation = :append
+          key = key[1..-1]
+        elsif first == '-'
+          operation = :remove
+          key = key[1..-1]
+        elsif key.end_with? '+'
+          operation = :prepend
+          key = key[0...-1]
+        else
+          if modification_group
+            warn "asciidoctor: WARNING: invalid entry in substitution modification group#{subject ? ' for ' : nil}#{subject}: #{key}"
+            next
+          else
+            operation = nil
+          end
+        end
+        # first time through
+        if modification_group.nil?
+          if operation
+            candidates = defaults.dup
+            modification_group = true
+          else
+            modification_group = false
+          end
+        end
+      end
+      key = key.to_sym
       # special case to disable callouts for inline subs
       if type == :inline && (key == :verbatim || key == :v)
-        candidates << :specialcharacters
+        resolved_keys = [:specialcharacters]
       elsif COMPOSITE_SUBS.has_key? key
-        candidates.push(*COMPOSITE_SUBS[key])
+        resolved_keys = COMPOSITE_SUBS[key]
       elsif type == :inline && key.to_s.length == 1 && (SUB_SYMBOLS.has_key? key)
         resolved_key = SUB_SYMBOLS[key]
         if COMPOSITE_SUBS.has_key? resolved_key
-          candidates.push(*COMPOSITE_SUBS[resolved_key])
+          resolved_keys = COMPOSITE_SUBS[resolved_key]
         else
-          candidates << resolved_key
+          resolved_keys = [resolved_key]
         end
       else
-        candidates << key
+        resolved_keys = [key]
+      end
+
+      if modification_group
+        case operation
+        when :append
+          candidates.push *resolved_keys
+        when :prepend
+          candidates.unshift *resolved_keys
+        when :remove
+          candidates -= resolved_keys
+        else
+          # ignore, invalid entry, shouldn't get here
+        end
+      else
+        candidates.push *resolved_keys
       end
     end
     # weed out invalid options and remove duplicates (first wins)
+    # TODO may be use a set instead?
     resolved = candidates & SUB_OPTIONS[type]
     if (invalid = candidates - resolved).size > 0
       warn "asciidoctor: WARNING: invalid substitution type#{invalid.size > 1 ? 's' : ''}#{subject ? ' for ' : nil}#{subject}: #{invalid * ', '}"
@@ -1064,12 +1112,12 @@ module Substitutors
     resolved
   end
 
-  def resolve_block_subs subs, subject
-    resolve_subs subs, :block, subject
+  def resolve_block_subs subs, defaults, subject
+    resolve_subs subs, :block, defaults, subject
   end
 
   def resolve_pass_subs subs
-    resolve_subs subs, :inline, 'passthrough macro'
+    resolve_subs subs, :inline, nil, 'passthrough macro'
   end
 
   # Public: Highlight the source code if a source highlighter is defined
@@ -1205,7 +1253,7 @@ module Substitutors
     end
 
     if (custom_subs = @attributes['subs'])
-      @subs = resolve_block_subs custom_subs, @context
+      @subs = resolve_block_subs custom_subs, default_subs, @context
     else
       @subs = default_subs.dup
     end
