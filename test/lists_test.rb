@@ -944,7 +944,8 @@ List
 literal
 ....
       EOS
-      output = render_embedded_string input
+      # use render_string so we can match all ulists easier
+      output = render_string input
       assert_xpath '//*[@class="ulist"]/ul', output, 2
       assert_xpath '(//*[@class="ulist"])[1]/following-sibling::*[@class="literalblock"]', output, 1
       assert_xpath '(//*[@class="ulist"])[1]/following-sibling::*[@class="literalblock"]/*[@class="title"]', output, 1

@@ -141,6 +141,14 @@ module Asciidoctor
       attr_accessor :underline_style_section_titles
     end
 
+    # Asciidoctor will unwrap the content in a preamble
+    # if the document has a title and no sections.
+    # Compliance value: false
+    @unwrap_standalone_preamble = true
+    class << self
+      attr_accessor :unwrap_standalone_preamble
+    end
+
     # AsciiDoc drops lines that contain references to missing attributes.
     # This behavior is not intuitive to most writers
     # Compliance value: 'drop-line'

@@ -2129,6 +2129,10 @@ This article is about stuff.
 
 And other stuff.
 --
+
+== Section One
+
+content
       EOS
 
       output = render_string input
@@ -2148,6 +2152,10 @@ And other stuff.
 --
 This article is about stuff.
 --
+
+== Section One
+
+content
       EOS
 
       output = render_string input

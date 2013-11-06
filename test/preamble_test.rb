@@ -42,18 +42,17 @@ Section paragraph 1.
     assert_xpath '//*[@id="preamble"]/following-sibling::*//p', result, 1
   end
 
-  test 'title and preamble only' do
+  test 'should not wrap content in preamble if document has title but no sections' do
     input = <<-EOS
 Title
 =====
 
-Preamble paragraph 1.
+paragraph
     EOS
     result = render_string(input)
     assert_xpath '//p', result, 1
-    assert_xpath '//*[@id="preamble"]', result, 1
-    assert_xpath '//*[@id="preamble"]//p', result, 1
-    assert_xpath '//*[@id="preamble"]/following-sibling::*', result, 0
+    assert_xpath '//*[@id="content"]/*[@class="paragraph"]/p', result, 1
+    assert_xpath '//*[@id="content"]/*[@class="paragraph"]/following-sibling::*', result, 0
   end
 
   test 'title and section without preamble' do

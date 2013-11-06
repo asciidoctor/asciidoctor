@@ -997,14 +997,14 @@ content
     end
 
     test 'with header footer' do
-      doc = document_from_string "= Title\n\npreamble"
+      doc = document_from_string "= Title\n\nparagraph"
       assert !doc.attr?('embedded')
       result = doc.render
       assert_xpath '/html', result, 1
       assert_xpath '//*[@id="header"]', result, 1
       assert_xpath '//*[@id="header"]/h1', result, 1
       assert_xpath '//*[@id="footer"]', result, 1
-      assert_xpath '//*[@id="preamble"]', result, 1
+      assert_xpath '//*[@id="content"]', result, 1
     end
 
     test 'can disable last updated in footer' do
@@ -1015,14 +1015,14 @@ content
     end
 
     test 'no header footer' do
-      doc = document_from_string "= Title\n\npreamble", :header_footer => false
+      doc = document_from_string "= Document Title\n\ncontent", :header_footer => false
       assert doc.attr?('embedded')
       result = doc.render
       assert_xpath '/html', result, 0
       assert_xpath '/h1', result, 0
       assert_xpath '/*[@id="header"]', result, 0
       assert_xpath '/*[@id="footer"]', result, 0
-      assert_xpath '/*[@id="preamble"]', result, 1
+      assert_xpath '/*[@class="paragraph"]', result, 1
     end
 
     test 'enable title in embedded document by unassigning notitle attribute' do
@@ -1037,9 +1037,9 @@ content
       assert_xpath '/h1', result, 1
       assert_xpath '/*[@id="header"]', result, 0
       assert_xpath '/*[@id="footer"]', result, 0
-      assert_xpath '/*[@id="preamble"]', result, 1
+      assert_xpath '/*[@class="paragraph"]', result, 1
       assert_xpath '(/*)[1]/self::h1', result, 1
-      assert_xpath '(/*)[2]/self::*[@id="preamble"]', result, 1
+      assert_xpath '(/*)[2]/self::*[@class="paragraph"]', result, 1
     end
 
     test 'enable title in embedded document by assigning showtitle attribute' do
@@ -1054,9 +1054,9 @@ content
       assert_xpath '/h1', result, 1
       assert_xpath '/*[@id="header"]', result, 0
       assert_xpath '/*[@id="footer"]', result, 0
-      assert_xpath '/*[@id="preamble"]', result, 1
+      assert_xpath '/*[@class="paragraph"]', result, 1
       assert_xpath '(/*)[1]/self::h1', result, 1
-      assert_xpath '(/*)[2]/self::*[@id="preamble"]', result, 1
+      assert_xpath '(/*)[2]/self::*[@class="paragraph"]', result, 1
     end
 
     test 'parse header only' do
@@ -1117,19 +1117,19 @@ Text that has supporting information{empty}footnote:[An example footnote.].
 
   context 'Backends and Doctypes' do 
     test 'html5 backend doctype article' do
-      result = render_string("= Title\n\npreamble", :attributes => {'backend' => 'html5'})
+      result = render_string("= Title\n\nparagraph", :attributes => {'backend' => 'html5'})
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="article"]', result, 1
       assert_xpath '/html//*[@id="header"]/h1[text() = "Title"]', result, 1
-      assert_xpath '/html//*[@id="preamble"]//p[text() = "preamble"]', result, 1
+      assert_xpath '/html//*[@id="content"]//p[text() = "paragraph"]', result, 1
     end
 
     test 'html5 backend doctype book' do
-      result = render_string("= Title\n\npreamble", :attributes => {'backend' => 'html5', 'doctype' => 'book'})
+      result = render_string("= Title\n\nparagraph", :attributes => {'backend' => 'html5', 'doctype' => 'book'})
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="book"]', result, 1
       assert_xpath '/html//*[@id="header"]/h1[text() = "Title"]', result, 1
-      assert_xpath '/html//*[@id="preamble"]//p[text() = "preamble"]', result, 1
+      assert_xpath '/html//*[@id="content"]//p[text() = "paragraph"]', result, 1
     end
 
     test 'xhtml5 backend should map to html5 and set htmlsyntax to xml' do
