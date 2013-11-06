@@ -86,10 +86,13 @@ context 'Invoker' do
   end
 
   test 'should display version and exit' do
+    expected = %(Asciidoctor #{Asciidoctor::VERSION} [http://asciidoctor.org]\nRuntime Environment (#{RUBY_DESCRIPTION}))
+    actual = nil
     redirect_streams do |stdout, stderr|
       invoke_cli %w(--version)
-      assert_equal "Asciidoctor #{Asciidoctor::VERSION} [http://asciidoctor.org]", stdout.string.chomp
+      actual = stdout.string.rstrip
     end
+    assert_equal expected, actual
   end
 
   test 'should print warnings to stderr by default' do
