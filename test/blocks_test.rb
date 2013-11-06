@@ -2381,6 +2381,66 @@ part intro paragraph
     end
   end
 
+  context 'Substitutions' do
+    test 'should be able to append subs to default block substitution list' do
+      input = <<-EOS
+:application: Asciidoctor
+
+[subs="+attributes,+macros"]
+....
+{application}
+....
+      EOS
+
+      doc = document_from_string input
+      block = doc.blocks.first
+      assert_equal [:specialcharacters, :attributes, :macros], block.subs
+    end
+
+    test 'should be able to prepend subs to default block substitution list' do
+      input = <<-EOS
+:application: Asciidoctor
+
+[subs="attributes+"]
+....
+{application}
+....
+      EOS
+
+      doc = document_from_string input
+      block = doc.blocks.first
+      assert_equal [:attributes, :specialcharacters], block.subs
+    end
+
+    test 'should be able to remove subs to default block substitution list' do
+      input = <<-EOS
+[subs="-quotes,-replacements"]
+content
+      EOS
+
+      doc = document_from_string input
+      block = doc.blocks.first
+      assert_equal [:specialcharacters, :attributes, :macros, :post_replacements], block.subs
+    end
+
+    test 'should be able to prepend, append and remove subs from default block substitution list' do
+      input = <<-EOS
+:application: asciidoctor
+
+[subs="attributes+,-verbatim,+specialcharacters,+macros"]
+....
+http://{application}.org[{gt}{gt}] <1>
+....
+      EOS
+
+      doc = document_from_string input, :header_footer => false
+      block = doc.blocks.first
+      assert_equal [:attributes, :specialcharacters, :macros], block.subs
+      result = doc.render
+      assert result.include?('<pre><a href="http://asciidoctor.org">&gt;&gt;</a> &lt;1&gt;</pre>')
+    end
+  end
+
   context 'References' do
     test 'should not recognize block anchor with illegal id characters' do
       input = <<-EOS
