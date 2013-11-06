@@ -55,16 +55,17 @@ class Lexer
       end
       # NOTE we could try to avoid creating a preamble in the first place, though
       # that would require reworking assumptions in next_section since the preamble
-      # is treated as an untitled section
-      if Compliance.unwrap_standalone_preamble &&
-          document.blocks.size == 1 && (first_block = document.blocks.first).context == :preamble &&
-          first_block.blocks? && (document.doctype != 'book' || first_block.blocks.first.style != 'abstract')
-        preamble = document.blocks.shift
-        while (child_block = preamble.blocks.shift)
-          child_block.parent = document
-          document << child_block
-        end
-      end
+      # is treated like an untitled section
+      # NOTE logic relocated to end of next_section
+      #if Compliance.unwrap_standalone_preamble &&
+      #    document.blocks.size == 1 && (first_block = document.blocks.first).context == :preamble &&
+      #    first_block.blocks? && (document.doctype != 'book' || first_block.blocks.first.style != 'abstract')
+      #  preamble = document.blocks.shift
+      #  while (child_block = preamble.blocks.shift)
+      #    child_block.parent = document
+      #    document << child_block
+      #  end
+      #end
     end
 
     document
@@ -303,9 +304,25 @@ class Lexer
       reader.skip_blank_lines
     end
 
-    if preamble && !preamble.blocks?
+    # NOTE we could try to avoid creating a preamble in the first place, though
+    # that would require reworking assumptions in next_section since the preamble
+    # is treated like an untitled section
+    if preamble # implies parent == document
+      document = parent
+      if preamble.blocks?
+        # unwrap standalone preamble (i.e., no sections), if permissible
+        if Compliance.unwrap_standalone_preamble && document.blocks.size == 1 &&
+            (document.doctype != 'book' || preamble.blocks.first.style != 'abstract')
+          document.blocks.shift
+          while (child_block = preamble.blocks.shift)
+            child_block.parent = document
+            document << child_block
+          end
+        end
       # drop the preamble if it has no content
-      section.blocks.delete_at(0)
+      else
+        document.blocks.shift
+      end
     end
 
     # The attributes returned here are orphaned attributes that fall at the end
