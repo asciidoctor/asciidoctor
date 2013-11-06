@@ -20,7 +20,7 @@ module Substitutors
     :none => [],
     :normal => SUBS[:normal],
     :verbatim => SUBS[:verbatim],
-    :specialchars => :specialcharacters
+    :specialchars => [:specialcharacters]
   }
 
   SUB_SYMBOLS = {
@@ -61,7 +61,7 @@ module Substitutors
         effective_subs = []
         subs.each do |key|
           if COMPOSITE_SUBS.has_key? key
-            effective_subs.push(*COMPOSITE_SUBS[key])
+            effective_subs += COMPOSITE_SUBS[key]
           else
             effective_subs << key
           end
@@ -1091,16 +1091,16 @@ module Substitutors
       if modification_group
         case operation
         when :append
-          candidates.push *resolved_keys
+          candidates += resolved_keys
         when :prepend
-          candidates.unshift *resolved_keys
+          candidates = resolved_keys + candidates
         when :remove
           candidates -= resolved_keys
         else
           # ignore, invalid entry, shouldn't get here
         end
       else
-        candidates.push *resolved_keys
+        candidates += resolved_keys
       end
     end
     # weed out invalid options and remove duplicates (first wins)
