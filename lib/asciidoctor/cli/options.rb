@@ -123,8 +123,9 @@ Example: asciidoctor -b html5 source.asciidoc
             return 0
           end
 
-          opts.on_tail('-V', '--version', 'display the version') do
+          opts.on_tail('-V', '--version', 'display the version and runtime environment') do
             $stdout.puts "Asciidoctor #{Asciidoctor::VERSION} [http://asciidoctor.org]"
+            $stdout.puts "Runtime Environment (#{RUBY_DESCRIPTION})"
             return 0
           end
           
