@@ -421,6 +421,8 @@ An abstract for the book.
 [partintro]
 An intro to this part.
 
+== Chapter 1
+
 [sidebar]
 Just a side note.
 
@@ -456,6 +458,8 @@ An abstract for the book.
 [partintro]
 .Part intro title
 An intro to this part.
+
+== Chapter 1
 
 [sidebar]
 .Sidebar title

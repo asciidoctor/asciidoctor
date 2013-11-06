@@ -214,6 +214,7 @@ class Lexer
   # returns a two-element Array containing the Section and Hash of orphaned attributes
   def self.next_section(reader, parent, attributes = {})
     preamble = false
+    part = false
 
     # FIXME if attributes[1] is a verbatim style, then don't check for section
 
@@ -223,6 +224,7 @@ class Lexer
     if parent.context == :document && parent.blocks.empty? &&
         (parent.has_header? || attributes.delete('invalid-header') || !is_next_line_section?(reader, attributes))
 
+      doctype = parent.doctype
       if parent.has_header?
         preamble = Block.new(parent, :preamble, :content_model => :compound)
         parent << preamble
@@ -233,21 +235,26 @@ class Lexer
       if parent.attributes.has_key? 'fragment'
         expected_next_levels = nil
       # small tweak to allow subsequent level-0 sections for book doctype
-      elsif parent.doctype == 'book'
+      elsif doctype == 'book'
         expected_next_levels = [0, 1]
       else
         expected_next_levels = [1]
       end
     else
+      doctype = parent.document.doctype
       section = initialize_section(reader, parent, attributes)
       # clear attributes, except for title which carries over
       # section title to next block of content
       attributes = attributes.delete_if {|k, v| k != 'title'}
       current_level = section.level
-      # subsections in preface & appendix in multipart books start at level 2
-      if current_level == 0 && section.special &&
-          section.document.doctype == 'book' && ['preface', 'appendix'].include?(section.sectname)
-        expected_next_levels = [current_level + 2]
+      if current_level == 0 && doctype == 'book'
+        part = !section.special
+        # subsections in preface & appendix in multipart books start at level 2
+        if section.special && (['preface', 'appendix'].include? section.sectname)
+          expected_next_levels = [current_level + 2]
+        else
+          expected_next_levels = [current_level + 1]
+        end
       else
         expected_next_levels = [current_level + 1]
       end
@@ -264,13 +271,13 @@ class Lexer
     #
     # We have to parse all the metadata lines before continuing with the loop,
     # otherwise subsequent metadata lines get interpreted as block content
+    new_section = nil
     while reader.has_more_lines?
       parse_block_metadata_lines(reader, section, attributes)
 
       next_level = is_next_line_section? reader, attributes
       if next_level
         next_level += section.document.attr('leveloffset', 0).to_i
-        doctype = parent.document.doctype
         if next_level > current_level || (section.context == :document && next_level == 0)
           if next_level == 0 && doctype != 'book'
             warn "asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections"
@@ -291,8 +298,12 @@ class Lexer
         end
       else
         # just take one block or else we run the risk of overrunning section boundaries
+        prev_line_info = reader.line_info
         new_block = next_block(reader, (preamble || section), attributes, :parse_metadata => false)
         if !new_block.nil?
+          if part && new_block.style != 'partintro'
+            warn "asciidoctor: ERROR: #{prev_line_info}: invalid part, intro content must be a partintro paragraph or block"
+          end
           (preamble || section) << new_block
           attributes = {}
         else
@@ -304,15 +315,19 @@ class Lexer
       reader.skip_blank_lines
     end
 
+    if part
+      if new_section.nil?
+        warn "asciidoctor: ERROR: #{reader.line_info}: invalid part, must have at least one section (e.g., chapter, appendix, etc.)"
+      end
     # NOTE we could try to avoid creating a preamble in the first place, though
     # that would require reworking assumptions in next_section since the preamble
     # is treated like an untitled section
-    if preamble # implies parent == document
+    elsif preamble # implies parent == document
       document = parent
       if preamble.blocks?
         # unwrap standalone preamble (i.e., no sections), if permissible
         if Compliance.unwrap_standalone_preamble && document.blocks.size == 1 &&
-            (document.doctype != 'book' || preamble.blocks.first.style != 'abstract')
+            (doctype != 'book' || preamble.blocks.first.style != 'abstract')
           document.blocks.shift
           while (child_block = preamble.blocks.shift)
             child_block.parent = document
