@@ -2188,8 +2188,15 @@ Abstract for book with title is valid
 Abstract for book without title is invalid.
       EOS
 
-      output = render_string input
+      warnings = nil
+      output = nil
+      redirect_streams do |stdout, stderr|
+        output = render_string input
+        warnings = stderr.string
+      end
       assert_css '.abstract', output, 0
+      assert_not_nil warnings
+      assert_match(/WARNING:.*abstract block/, warnings)
     end
 
     test 'should make abstract on open block without title rendered to DocBook' do
@@ -2247,8 +2254,15 @@ Abstract for book with title is valid
 Abstract for book is invalid.
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = nil
+      warnings = nil
+      redirect_streams do |stdout, stderr|
+        output = render_string input, :backend => 'docbook'
+        warnings = stderr.string
+      end
       assert_css 'abstract', output, 0
+      assert_not_nil warnings
+      assert_match(/WARNING:.*abstract block/, warnings)
     end
 
     # TODO partintro shouldn't be recognized if doctype is not book, should be in proper place
@@ -2265,6 +2279,10 @@ This is a part intro.
 
 It can have multiple paragraphs.
 --
+
+== Chapter 1
+
+content
       EOS
 
       output = render_string input
@@ -2288,6 +2306,10 @@ It can have multiple paragraphs.
 --
 This is a part intro with a title.
 --
+
+== Chapter 1
+
+content
       EOS
 
       output = render_string input
@@ -2336,6 +2358,10 @@ This is a part intro.
 
 It can have multiple paragraphs.
 --
+
+== Chapter 1
+
+content
       EOS
 
       output = render_string input, :backend => 'docbook'
@@ -2356,6 +2382,10 @@ It can have multiple paragraphs.
 --
 This is a part intro with a title.
 --
+
+== Chapter 1
+
+content
       EOS
 
       output = render_string input, :backend => 'docbook'

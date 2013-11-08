@@ -4,8 +4,7 @@ context 'Preamble' do
 
   test 'title and single paragraph preamble before section' do
     input = <<-EOS
-Title
-=====
+= Title
 
 Preamble paragraph 1.
 
@@ -23,8 +22,7 @@ Section paragraph 1.
 
   test 'title and multi-paragraph preamble before section' do
     input = <<-EOS
-Title
-=====
+= Title
 
 Preamble paragraph 1.
 
@@ -44,8 +42,7 @@ Section paragraph 1.
 
   test 'should not wrap content in preamble if document has title but no sections' do
     input = <<-EOS
-Title
-=====
+= Title
 
 paragraph
     EOS
@@ -57,8 +54,7 @@ paragraph
 
   test 'title and section without preamble' do
     input = <<-EOS
-Title
-=====
+= Title
 
 == First Section
 
@@ -86,19 +82,28 @@ Section paragraph 1.
 
   test 'preamble in book doctype' do
       input = <<-EOS
-Book
-====
+= Book
 :doctype: book
 
 Back then...
 
 = Chapter One
 
+[partintro]
 It was a dark and stormy night...
+
+== Scene One
+
+Someone's gonna get axed.
 
 = Chapter Two
 
+[partintro]
 They couldn't believe their eyes when...
+
+== Scene One
+
+The axe came swinging.
       EOS
 
       d = document_from_string(input)

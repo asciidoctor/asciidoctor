@@ -873,9 +873,13 @@ content
 
 == Chapter 1
 
+content
+
 = Part 2
 
 == Chapter 2
+
+content
       EOS
 
       output = render_string input
@@ -1368,6 +1372,7 @@ blah blah
 
 = Part 2
 
+[partintro]
 blah blah
 
 == Chapter 3
@@ -2065,10 +2070,16 @@ Doc Writer
 
 = Chapter One
 
+[partintro]
 It was a dark and stormy night...
+
+== Scene One
+
+Someone's gonna get axed.
 
 = Chapter Two
 
+[partintro]
 They couldn't believe their eyes when...
 
 == Interlude
@@ -2076,6 +2087,8 @@ They couldn't believe their eyes when...
 While they were waiting...
 
 = Chapter Three
+
+== Scene One
 
 That's all she wrote!
       EOS
@@ -2086,11 +2099,94 @@ That's all she wrote!
       assert_css '#header h1', output, 1
       assert_css '#content h1', output, 3
       assert_css '#content h1.sect0', output, 3
-      assert_css 'h2', output, 1
-      assert_css '#content h2', output, 1
+      assert_css 'h2', output, 3
+      assert_css '#content h2', output, 3
       assert_xpath '//h1[@id="_chapter_one"][text() = "Chapter One"]', output, 1
       assert_xpath '//h1[@id="_chapter_two"][text() = "Chapter Two"]', output, 1
       assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
+    end
+
+    test 'should add partintro style to child paragraph of part' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+part intro
+
+== Chapter 1
+      EOS
+
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_equal 'partintro', partintro.style
+    end
+
+    test 'should add partintro style to child open block of part' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+--
+part intro
+--
+
+== Chapter 1
+      EOS
+
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_equal 'partintro', partintro.style
+    end
+
+    test 'should wrap child paragraphs of part in partintro open block' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+part intro
+
+more part intro
+
+== Chapter 1
+      EOS
+
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_equal 'partintro', partintro.style
+      assert_equal 2, partintro.blocks.size
+      assert_equal :paragraph, partintro.blocks[0].context
+      assert_equal :paragraph, partintro.blocks[1].context
+    end
+
+    test 'should warn if part has no sections' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+[partintro]
+intro
+      EOS
+
+      doc = nil
+      warnings = nil
+      redirect_streams do |stdout, stderr|
+        doc = document_from_string input
+        warnings = stderr.string
+      end
+
+      assert_not_nil warnings
+      assert_match(/ERROR:.*section/, warnings)
     end
 
     test 'should create parts and chapters in docbook backend' do
@@ -2101,6 +2197,7 @@ Doc Writer
 
 = Part 1
 
+[partintro]
 The adventure.
 
 == Chapter One
@@ -2113,6 +2210,7 @@ They couldn't believe their eyes when...
 
 = Part 2
 
+[partintro]
 The return.
 
 == Chapter Three
