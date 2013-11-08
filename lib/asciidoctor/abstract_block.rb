@@ -45,6 +45,15 @@ class AbstractBlock < AbstractNode
     @next_section_number = 1
   end
 
+  # Public: Update the context of this block.
+  #
+  # This method changes the context of this block. It also
+  # updates the template name accordingly.
+  def context=(context)
+    @context = context
+    @template_name = "block_#{context}"
+  end
+
   # Public: Get the rendered String content for this Block.  If the block
   # has child blocks, the content method should cause them to be
   # rendered and returned as content that can be included in the

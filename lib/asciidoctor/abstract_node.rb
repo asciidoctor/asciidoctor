@@ -15,7 +15,7 @@ class AbstractNode
   # Public: Get the Symbol context for this node
   attr_reader :context
 
-  # Public: Get the id of this node
+  # Public: Get or set the id of this node
   attr_accessor :id
 
   # Public: Get the Hash of attributes for this node

@@ -2106,30 +2106,25 @@ That's all she wrote!
       assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
     end
 
-    test 'should warn if part has child paragraph without partintro style' do
+    test 'should add partintro style to child paragraph of part' do
       input = <<-EOS
 = Book
 :doctype: book
 
 = Part 1
 
-illegal content!
+part intro
 
 == Chapter 1
       EOS
 
-      doc = nil
-      warnings = nil
-      redirect_streams do |stdout, stderr|
-        doc = document_from_string input
-        warnings = stderr.string
-      end
-
-      assert_not_nil warnings
-      assert_match(/ERROR:.*partintro/, warnings)
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_equal 'partintro', partintro.style
     end
 
-    test 'should warn if part has child open block without partintro style' do
+    test 'should add partintro style to child open block of part' do
       input = <<-EOS
 = Book
 :doctype: book
@@ -2137,21 +2132,39 @@ illegal content!
 = Part 1
 
 --
-illegal content!
+part intro
 --
 
 == Chapter 1
       EOS
 
-      doc = nil
-      warnings = nil
-      redirect_streams do |stdout, stderr|
-        doc = document_from_string input
-        warnings = stderr.string
-      end
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_equal 'partintro', partintro.style
+    end
 
-      assert_not_nil warnings
-      assert_match(/ERROR:.*partintro/, warnings)
+    test 'should wrap child paragraphs of part in partintro open block' do
+      input = <<-EOS
+= Book
+:doctype: book
+
+= Part 1
+
+part intro
+
+more part intro
+
+== Chapter 1
+      EOS
+
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_equal 'partintro', partintro.style
+      assert_equal 2, partintro.blocks.size
+      assert_equal :paragraph, partintro.blocks[0].context
+      assert_equal :paragraph, partintro.blocks[1].context
     end
 
     test 'should warn if part has no sections' do

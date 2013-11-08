@@ -215,6 +215,7 @@ class Lexer
   def self.next_section(reader, parent, attributes = {})
     preamble = false
     part = false
+    intro = false
 
     # FIXME if attributes[1] is a verbatim style, then don't check for section
 
@@ -226,7 +227,7 @@ class Lexer
 
       doctype = parent.doctype
       if parent.has_header?
-        preamble = Block.new(parent, :preamble, :content_model => :compound)
+        preamble = intro = Block.new(parent, :preamble, :content_model => :compound)
         parent << preamble
       end
       section = parent
@@ -271,7 +272,6 @@ class Lexer
     #
     # We have to parse all the metadata lines before continuing with the loop,
     # otherwise subsequent metadata lines get interpreted as block content
-    new_section = nil
     while reader.has_more_lines?
       parse_block_metadata_lines(reader, section, attributes)
 
@@ -298,13 +298,50 @@ class Lexer
         end
       else
         # just take one block or else we run the risk of overrunning section boundaries
-        prev_line_info = reader.line_info
-        new_block = next_block(reader, (preamble || section), attributes, :parse_metadata => false)
+        block_line_info = reader.line_info
+        new_block = next_block(reader, (intro || section), attributes, :parse_metadata => false)
         if !new_block.nil?
-          if part && new_block.style != 'partintro'
-            warn "asciidoctor: ERROR: #{prev_line_info}: invalid part, intro content must be a partintro paragraph or block"
+          # REVIEW this may be doing too much
+          if part
+            if !section.blocks?
+              # if this block wasn't marked as [partintro], emulate behavior as if it had
+              if new_block.style != 'partintro'
+                # emulate [partintro] paragraph
+                if new_block.context == :paragraph
+                  new_block.context = :open
+                  new_block.style = 'partintro'
+                # emulate [partintro] open block
+                else
+                  intro = Block.new section, :open, :content_model => :compound
+                  intro.style = 'partintro'
+                  new_block.parent = intro
+                  section << intro
+                end
+              end
+            elsif section.blocks.size == 1
+              first_block = section.blocks.first
+              # open the [partintro] open block for appending
+              if !intro && first_block.content_model == :compound
+                #new_block.parent = (intro = first_block)
+                warn "asciidoctor: ERROR: #{block_line_info}: illegal block content outside of partintro block"
+              # rebuild [partintro] paragraph as an open block
+              elsif first_block.content_model != :compound
+                intro = Block.new section, :open, :content_model => :compound
+                intro.style = 'partintro'
+                section.blocks.shift 
+                if first_block.style == 'partintro'
+                  first_block.context = :paragraph
+                  first_block.style = nil
+                end
+                first_block.parent = intro
+                intro << first_block
+                new_block.parent = intro
+                section << intro
+              end
+            end
           end
-          (preamble || section) << new_block
+
+          (intro || section) << new_block
           attributes = {}
         else
           # don't clear attributes if we don't find a block because they may
@@ -316,7 +353,7 @@ class Lexer
     end
 
     if part
-      if new_section.nil?
+      unless section.blocks? && section.blocks.last.context == :section
         warn "asciidoctor: ERROR: #{reader.line_info}: invalid part, must have at least one section (e.g., chapter, appendix, etc.)"
       end
     # NOTE we could try to avoid creating a preamble in the first place, though
