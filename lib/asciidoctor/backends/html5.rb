@@ -1026,7 +1026,7 @@ class BlockVideoTemplate < BaseTemplate
 </div>
 </div>)
     else 
-      poster_attribute = (node.attr? 'poster') ? %( poster="#{node.media_uri(node.attr 'poster')}") : nil
+      poster_attribute = %(#{poster = node.attr 'poster'}).empty? ? nil : %( poster="#{node.media_uri poster}")
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
 <video src="#{node.media_uri(node.attr 'target')}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (boolean_attribute 'loop', xml) : nil}>
