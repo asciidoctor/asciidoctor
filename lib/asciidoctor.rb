@@ -2,7 +2,7 @@ RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
 RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
 RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
 require 'set'
-#require 'strscan'
+require 'strscan'
 
 # ideally we should use require_relative instead of modifying the LOAD_PATH
 $:.unshift(File.dirname __FILE__)
