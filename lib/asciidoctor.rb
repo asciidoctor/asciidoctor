@@ -53,12 +53,14 @@ end
 #   end
 module Asciidoctor
 
-  ::Object.autoload :Base64,        'base64'
-  ::Object.autoload :ERB,           'erb'
-  ::Object.autoload :FileUtils,     'fileutils'
-  ::Object.autoload :OpenURI,       'open-uri'
-  #::Object.autoload :Set,           'set'
-  ::Object.autoload :StringScanner, 'strscan'
+  unless RUBY_ENGINE_OPAL
+    ::Object.autoload :Base64,        'base64'.chomp
+    ::Object.autoload :ERB,           'erb'.chomp
+    ::Object.autoload :FileUtils,     'fileutils'.chomp
+    ::Object.autoload :OpenURI,       'open-uri'.chomp
+    #::Object.autoload :Set,           'set'.chomp
+    ::Object.autoload :StringScanner, 'strscan'.chomp
+  end
 
   module SafeMode
 
@@ -1093,8 +1095,10 @@ module Asciidoctor
   end
 
   # autoload
-  autoload :Debug,   'asciidoctor/debug'
-  autoload :VERSION, 'asciidoctor/version'
+  unless RUBY_ENGINE_OPAL
+    autoload :Debug,   'asciidoctor/debug'
+    autoload :VERSION, 'asciidoctor/version'
+  end
 
   # modules
   require 'asciidoctor/helpers'
