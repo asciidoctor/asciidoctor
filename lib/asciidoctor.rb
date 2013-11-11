@@ -2,12 +2,12 @@ RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
 RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
 RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
 require 'set'
-require 'strscan'
 
 # ideally we should use require_relative instead of modifying the LOAD_PATH
 $:.unshift(File.dirname __FILE__)
 
 if RUBY_ENGINE_OPAL
+  require 'strscan'
   require 'asciidoctor/opal_ext/dir'
   require 'asciidoctor/opal_ext/error'
   require 'asciidoctor/opal_ext/file'
@@ -54,6 +54,7 @@ end
 module Asciidoctor
 
   unless RUBY_ENGINE_OPAL
+    # .chomp keeps Opal from trying to load the library
     ::Object.autoload :Base64,        'base64'.chomp
     ::Object.autoload :ERB,           'erb'.chomp
     ::Object.autoload :FileUtils,     'fileutils'.chomp
