@@ -22,6 +22,12 @@ class Renderer
     @cache = nil
 
     backend = options[:backend]
+    if RUBY_ENGINE_OPAL
+      ::Template.instance_variable_get('@_cache').each do |path, tmpl|
+        @views[(File.basename path)] = tmpl
+      end
+      return
+    end
     case backend
     when 'html5', 'docbook45', 'docbook5'
       eruby = load_eruby options[:eruby]
