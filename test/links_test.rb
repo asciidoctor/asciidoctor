@@ -6,6 +6,14 @@ context 'Links' do
     assert_xpath "//a[@href='http://asciidoc.org'][text() = 'http://asciidoc.org']", render_string("The AsciiDoc project is located at http://asciidoc.org.")
   end
 
+  test 'qualified http url inline with hide-uri-scheme set' do
+    assert_xpath "//a[@href='http://asciidoc.org'][text() = 'asciidoc.org']", render_string("The AsciiDoc project is located at http://asciidoc.org.", :attributes => {'hide-uri-scheme' => ''})
+  end
+
+  test 'qualified file url inline with hide-uri-scheme set' do
+    assert_xpath "//a[@href='file:///etc/app.conf'][text() = '/etc/app.conf']", render_string('Edit the configuration file link:file:///etc/app.conf[]', :attributes => {'hide-uri-scheme' => ''})
+  end
+
   test 'qualified url with label' do
     assert_xpath "//a[@href='http://asciidoc.org'][text() = 'AsciiDoc']", render_string("We're parsing http://asciidoc.org[AsciiDoc] markup")
   end

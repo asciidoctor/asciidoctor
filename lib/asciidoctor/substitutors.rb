@@ -630,7 +630,15 @@ module Substitutors
           text = ''
         end
 
-        "#{prefix}#{Inline.new(self, :anchor, (!text.empty? ? text : target), :type => :link, :target => target, :attributes => attrs).render}#{suffix}"
+        if text.empty?
+          if @document.attr? 'hide-uri-scheme'
+            text = target.sub REGEXP[:uri_sniff], ''
+          else
+            text = target
+          end
+        end
+
+        "#{prefix}#{Inline.new(self, :anchor, text, :type => :link, :target => target, :attributes => attrs).render}#{suffix}"
       }
     end
 
@@ -674,7 +682,15 @@ module Substitutors
         # QUESTION should a mailto be registered as an e-mail address?
         @document.register(:links, target)
 
-        Inline.new(self, :anchor, (!text.empty? ? text : raw_target), :type => :link, :target => target, :attributes => attrs).render
+        if text.empty?
+          if @document.attr? 'hide-uri-scheme'
+            text = raw_target.sub REGEXP[:uri_sniff], ''
+          else
+            text = raw_target
+          end
+        end
+
+        Inline.new(self, :anchor, text, :type => :link, :target => target, :attributes => attrs).render
       }
     end
 
