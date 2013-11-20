@@ -446,6 +446,40 @@ include::fixtures/include-file.asciidoc[]
         assert_match(/included content/, output)
       end
 
+      test 'include directive should resolve file with spaces in name' do
+        input = <<-EOS
+include::fixtures/include file.asciidoc[]
+        EOS
+  
+        include_file = File.join DIRNAME, 'fixtures', 'include-file.asciidoc'
+        include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.asciidoc'
+        begin
+          FileUtils.cp include_file, include_file_with_sp
+          doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+          output = doc.render
+          assert_match(/included content/, output)
+        ensure
+          FileUtils.rm include_file_with_sp
+        end
+      end
+
+      test 'include directive should resolve file with {sp} in name' do
+        input = <<-EOS
+include::fixtures/include{sp}file.asciidoc[]
+        EOS
+  
+        include_file = File.join DIRNAME, 'fixtures', 'include-file.asciidoc'
+        include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.asciidoc'
+        begin
+          FileUtils.cp include_file, include_file_with_sp
+          doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+          output = doc.render
+          assert_match(/included content/, output)
+        ensure
+          FileUtils.rm include_file_with_sp
+        end
+      end
+
       test 'include directive should resolve file relative to current include' do
         input = <<-EOS
 include::fixtures/parent-include.adoc[]
