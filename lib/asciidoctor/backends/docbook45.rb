@@ -71,7 +71,7 @@ if has_header?
 </authorgroup><%
     end
   end
-  if (attr? :revnumber) || (attr? :revremark) %>
+  if (attr? :revdate) && ((attr? :revnumber) || (attr? :revremark)) %>
 <revhistory>
 <revision>
 #{tag 'revnumber', :revnumber}
