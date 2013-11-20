@@ -463,7 +463,7 @@ ____
       assert_css '.verseblock .literalblock', output, 0
     end
 
-    test 'verse should only have specialcharacters subs' do
+    test 'verse should have normal subs' do
       input = <<-EOS
 [verse]
 ____
@@ -472,7 +472,7 @@ ____
       EOS
 
       verse = block_from_string input
-      assert_equal [:specialcharacters], verse.subs
+      assert_equal Asciidoctor::Substitutors::SUBS[:normal], verse.subs
     end
 
     test 'should not recognize callouts in a verse' do
@@ -486,6 +486,18 @@ ____
      
       output = render_embedded_string input
       assert_xpath '//pre[text()="La la la <1>"]', output, 1
+    end
+
+    test 'should perform normal subs on a verse block' do
+      input = <<-EOS
+[verse]
+____
+'GET /groups/link:#group-id[\{group-id\}]'
+____
+      EOS
+
+      output = render_embedded_string input
+      assert output.include?('<pre class="content"><em>GET /groups/<a href="#group-id">{group-id}</a></em></pre>')
     end
   end
 
