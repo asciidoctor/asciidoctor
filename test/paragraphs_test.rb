@@ -360,6 +360,16 @@ A famouse quote.
       assert_xpath '//*[@class = "verseblock"]/pre[normalize-space(text()) = "Famous verse."]', output, 1
     end
 
+    test 'should perform normal subs on a verse paragraph' do
+      input = <<-EOS
+[verse]
+'GET /groups/link:#group-id[\{group-id\}]'
+      EOS
+
+      output = render_embedded_string input
+      assert output.include?('<pre class="content"><em>GET /groups/<a href="#group-id">{group-id}</a></em></pre>')
+    end
+
     test 'quote paragraph should honor explicit subs list' do
       input = <<-EOS
 [subs="specialcharacters"]

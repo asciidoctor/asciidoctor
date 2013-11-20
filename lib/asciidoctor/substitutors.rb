@@ -1259,6 +1259,8 @@ module Substitutors
       when :verbatim
         if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
           default_subs = SUBS[:verbatim]
+        elsif @context == :verse
+          default_subs = SUBS[:normal]
         else
           default_subs = SUBS[:basic]
         end
