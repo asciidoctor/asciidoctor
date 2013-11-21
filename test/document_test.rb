@@ -879,6 +879,53 @@ more info...
       assert_xpath '//*[@id="header"]/span[@id="revremark"][text() = "See changelog."]', output, 1
     end
 
+    test 'should include revision history if revdate and revnumber is set' do
+      input = <<-EOS
+= Document Title
+Author Name
+:revdate: 2011-11-11
+:revnumber: 1.0
+
+content
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'revhistory', output, 1
+      assert_css 'revhistory > revision', output, 1
+      assert_css 'revhistory > revision > date', output, 1
+      assert_css 'revhistory > revision > revnumber', output, 1
+    end
+
+    test 'should include revision history if revdate and revremark is set' do
+      input = <<-EOS
+= Document Title
+Author Name
+:revdate: 2011-11-11
+:revremark: features!
+
+content
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'revhistory', output, 1
+      assert_css 'revhistory > revision', output, 1
+      assert_css 'revhistory > revision > date', output, 1
+      assert_css 'revhistory > revision > revremark', output, 1
+    end
+
+    test 'should not include revision history if revdate is not set' do
+      input = <<-EOS
+= Document Title
+Author Name
+:revnumber: 1.0
+
+content
+      EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_css 'revhistory', output, 0
+    end
+
     test 'with metadata to DocBook45' do
       input = <<-EOS
 = AsciiDoc
