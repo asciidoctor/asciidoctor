@@ -91,8 +91,9 @@ when 'pygments'
     end
   end
 when 'highlightjs', 'highlight.js' %>
-<link rel="stylesheet" href="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css"<%= short_tag_slash_local %>>
-<script src="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3' %>/highlight.min.js"></script>
+<link rel="stylesheet" href="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4' %>/styles/<%= attr 'highlightjs-theme', 'default' %>.min.css"<%= short_tag_slash_local %>>
+<script src="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4' %>/highlight.min.js"></script>
+<script src="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4' %>/lang/common.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script><%
 when 'prettify' %>
 <link rel="stylesheet" href="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/<%= attr 'prettify-theme', 'prettify' %>.min.css"<%= short_tag_slash_local %>>
