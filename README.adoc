@@ -286,7 +286,7 @@ It will fallback to its default templates for everything else.
    :template_dir => 'templates'
 
 The Document and Section templates should begin with +document.+ and +section.+, respectively.
-The file extension is used by Tilt to determine which view framework it will use to use to render the template.
+The file extension is used by Tilt to determine which view framework it will use to render the template.
 For instance, if you want to write the template in ERB, you'd name these two templates +document.html.erb+ and +section.html.erb+.
 To use Haml, you'd name them +document.html.haml+ and +section.html.haml+.
 
