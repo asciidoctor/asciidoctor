@@ -194,10 +194,12 @@ class SectionTemplate < BaseTemplate
 end
 
 class BlockFloatingTitleTemplate < BaseTemplate
+  def result node
+    %(<bridgehead#{common_attrs node.id, node.role, node.reftext} renderas="sect#{node.level}">#{node.title}</bridgehead>)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><bridgehead#{common_attrs_erb} renderas="sect<%= @level %>"><%= title %></bridgehead>
-    EOS
+    :invoke_result
   end
 end
 
