@@ -434,27 +434,29 @@ class BlockOpenTemplate < BaseTemplate
 end
 
 class BlockListingTemplate < BaseTemplate
-  def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%
-if !title?
-  if @style == 'source' && (attr? 'language')
-%><programlisting#{common_attrs_erb}#{attribute('language', :language)} linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting><%
-  else
-%><screen#{common_attrs_erb}><%= template.preserve_endlines(content, self) %></screen><%
-  end
-else
-%><formalpara#{common_attrs_erb}>#{title_tag false}
-<para><%
-  if @style == 'source' && (attr? 'language') %>
-<programlisting language="<%= attr 'language' %>" linenumbering="<%= (attr? :linenums) ? 'numbered' : 'unnumbered' %>"><%= template.preserve_endlines(content, self) %></programlisting><%
-  else %>
-<screen><%= template.preserve_endlines(content, self) %></screen><%
-  end %>
+  def result node
+    informal = !node.title?
+    listing_attributes = (common_attrs node.id, node.role, node.reftext)
+    if node.style == 'source' && (node.attr? 'language')
+      numbering = (node.attr? 'linenums') ? 'numbered' : 'unnumbered'
+      listing_content = %(<programlisting#{informal ? listing_attributes : nil} language="#{node.attr 'language'}" linenumbering="#{numbering}">#{preserve_endlines node.content, node}</programlisting>)
+    else
+      listing_content = %(<screen#{informal ? listing_attributes : nil}>#{preserve_endlines node.content, node}</screen>)
+    end
+    if informal
+      listing_content
+    else
+      %(<formalpara#{listing_attributes}>
+<title>#{node.title}</title>
+<para>
+#{listing_content}
 </para>
-</formalpara><%
-end %>
-    EOF
+</formalpara>)
+    end
+  end
+
+  def template
+    :invoke_result
   end
 end
 
