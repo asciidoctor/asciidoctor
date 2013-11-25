@@ -222,9 +222,9 @@ end
 
 class BlockAdmonitionTemplate < BaseTemplate
   def result node
-    %(<#{name = node.attr 'name'}#{common_attrs node.id, node.role, node.reftext}>
+    %(<#{tag_name = node.attr 'name'}#{common_attrs node.id, node.role, node.reftext}>
 #{title_element node}#{node.content}
-</#{name}>)
+</#{tag_name}>)
   end
 
   def template
@@ -478,12 +478,21 @@ class BlockLiteralTemplate < BaseTemplate
 end
 
 class BlockExampleTemplate < BaseTemplate
+  def result node
+    if node.title?
+      %(<example#{common_attrs node.id, node.role, node.reftext}>
+<title>#{node.title}</title>
+#{node.content}
+</example>)
+    else
+      %(<informalexample#{common_attrs node.id, node.role, node.reftext}>
+#{node.content}
+</informalexample>)
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><<%= (tag_name = title? ? 'example' : 'informalexample') %>#{common_attrs_erb}>#{title_tag}
-#{content_erb}
-</<%= tag_name %>>
-    EOF
+    :invoke_result
   end
 end
 
