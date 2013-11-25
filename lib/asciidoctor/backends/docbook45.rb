@@ -497,12 +497,14 @@ class BlockExampleTemplate < BaseTemplate
 end
 
 class BlockSidebarTemplate < BaseTemplate
+  def result node
+    %(<sidebar#{common_attrs node.id, node.role, node.reftext}>
+#{title_element node}#{node.content}
+</sidebar>)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><sidebar#{common_attrs_erb}>#{title_tag}
-#{content_erb}
-</sidebar>
-    EOF
+    :invoke_result
   end
 end
 
