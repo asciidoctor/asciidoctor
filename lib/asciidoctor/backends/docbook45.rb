@@ -13,6 +13,10 @@ module Asciidoctor
       end
     end
 
+    def title_element node, optional = true
+      !optional || node.title? ? %(<title>#{node.title}</title>\n) : nil
+    end
+
     def title_tag(optional = true)
       if optional
         %(<%= title? ? "\n<title>\#{title}</title>" : nil %>)
@@ -21,8 +25,18 @@ module Asciidoctor
       end
     end
 
-    def common_attrs(id, role, reftext)
-      %(#{id && " #{@backend == 'docbook5' ? 'xml:id' : 'id'}=\"#{id}\""}#{role && " role=\"#{role}\""}#{reftext && " xreflabel=\"#{reftext}\""})
+    def common_attrs id, role, reftext
+      res = ''
+      if id
+        res = (@backend == 'docbook5' ? %( xml:id="#{id}") : %( id="#{id}"))
+      end
+      if role
+        res = %(#{res} role="#{role}")
+      end
+      if reftext
+        res = %(#{res} xreflabel="#{reftext}")
+      end
+      res
     end
 
     def common_attrs_erb
@@ -146,16 +160,18 @@ class BlockTocTemplate < BaseTemplate
 end
 
 class BlockPreambleTemplate < BaseTemplate
+  def result node
+    if node.document.doctype == 'book'
+      %(<preface#{common_attrs node.id, node.role, node.reftext}>
+#{title_element node, false}#{node.content}
+</preface>)
+    else
+      node.content
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%
-if @document.doctype == 'book' %><preface#{common_attrs_erb}>#{title_tag false}
-<%= content %>
-</preface><%
-else %>
-<%= content %><%
-end %>
-    EOF
+    :invoke_result
   end
 end
 
