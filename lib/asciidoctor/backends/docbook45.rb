@@ -223,7 +223,7 @@ end
 class BlockAdmonitionTemplate < BaseTemplate
   def result node
     %(<#{tag_name = node.attr 'name'}#{common_attrs node.id, node.role, node.reftext}>
-#{title_element node}#{node.content}
+#{title_element node}#{content node}
 </#{tag_name}>)
   end
 
@@ -482,11 +482,11 @@ class BlockExampleTemplate < BaseTemplate
     if node.title?
       %(<example#{common_attrs node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
-#{node.content}
+#{content node}
 </example>)
     else
       %(<informalexample#{common_attrs node.id, node.role, node.reftext}>
-#{node.content}
+#{content node}
 </informalexample>)
     end
   end
@@ -499,7 +499,7 @@ end
 class BlockSidebarTemplate < BaseTemplate
   def result node
     %(<sidebar#{common_attrs node.id, node.role, node.reftext}>
-#{title_element node}#{node.content}
+#{title_element node}#{content node}
 </sidebar>)
   end
 
@@ -644,26 +644,32 @@ class BlockVideoTemplate < BaseTemplate
 end
 
 class BlockRulerTemplate < BaseTemplate
+  def result node
+    %(<simpara><?asciidoc-hr?></simpara>)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><simpara><?asciidoc-hr?></simpara>
-    EOF
+    :invoke_result
   end
 end
 
 class BlockPageBreakTemplate < BaseTemplate
+  def result node
+    %(<simpara><?asciidoc-pagebreak?></simpara>)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><simpara><?asciidoc-pagebreak?></simpara>
-    EOF
+    :invoke_result
   end
 end
 
 class InlineBreakTemplate < BaseTemplate
+  def result node
+    %(#{@text}<?asciidoc-br?>)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%= @text %><?asciidoc-br?>
-    EOF
+    :invoke_result
   end
 end
 
