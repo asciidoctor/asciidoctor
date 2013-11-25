@@ -459,18 +459,21 @@ end %>
 end
 
 class BlockLiteralTemplate < BaseTemplate
+  def result node
+    if node.title?
+      %(<formalpara#{common_attrs node.id, node.role, node.reftext}>
+<title>#{node.title}</title>
+<para>
+<literallayout class="monospaced">#{preserve_endlines node.content, node}</literallayout>
+</para>
+</formalpara>)
+    else
+      %(<literallayout#{common_attrs node.id, node.role, node.reftext} class="monospaced">#{preserve_endlines node.content, node}</literallayout>)
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><% if !title? %>
-<literallayout#{common_attrs_erb} class="monospaced"><%= template.preserve_endlines(content, self) %></literallayout>
-<% else %>
-<formalpara#{common_attrs_erb}>#{title_tag false}
-  <para>
-    <literallayout class="monospaced"><%= template.preserve_endlines(content, self) %></literallayout>
-  </para>
-</formalpara>
-<% end %>
-    EOF
+    :invoke_result
   end
 end
 
