@@ -204,19 +204,15 @@ class BlockFloatingTitleTemplate < BaseTemplate
 end
 
 class BlockParagraphTemplate < BaseTemplate
-  def paragraph(id, style, role, reftext, title, content)
-    if !title.nil?
-      %(<formalpara#{common_attrs(id, role, reftext)}>
-<title>#{title}</title>
-<para>#{content}</para>
+  def result(node)
+    if node.title?
+      %(<formalpara#{common_attrs node.id, node.role, node.reftext}>
+<title>#{node.title}</title>
+<para>#{node.content}</para>
 </formalpara>)
     else
-      %(<simpara#{common_attrs(id, role, reftext)}>#{content}</simpara>)
+      %(<simpara#{common_attrs node.id, node.role, node.reftext}>#{node.content}</simpara>)
     end
-  end
-
-  def result(node)
-    paragraph(node.id, node.style, node.role, node.reftext, (node.title? ? node.title : nil), node.content)
   end
 
   def template
@@ -225,12 +221,14 @@ class BlockParagraphTemplate < BaseTemplate
 end
 
 class BlockAdmonitionTemplate < BaseTemplate
+  def result node
+    %(<#{name = node.attr 'name'}#{common_attrs node.id, node.role, node.reftext}>
+#{title_element node}#{node.content}
+</#{name}>)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><<%= attr :name %>#{common_attrs_erb}>#{title_tag}
-#{content_erb}
-</<%= attr :name %>>
-    EOF
+    :invoke_result
   end
 end
 
