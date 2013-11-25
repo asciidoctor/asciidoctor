@@ -266,19 +266,23 @@ end %>
 end
 
 class BlockOlistTemplate < BaseTemplate
+  def result node
+    result_buffer = []
+    num_attribute = node.style ? %( numeration="#{node.style}") : nil
+    result_buffer << %(<orderedlist#{common_attrs node.id, node.role, node.reftext}#{num_attribute}>)
+    result_buffer << %(<title>#{node.title}</title>) if node.title?
+    node.items.each do |item|
+      result_buffer << '<listitem>'
+      result_buffer << %(<simpara>#{item.text}</simpara>)
+      result_buffer << item.content if item.blocks?
+      result_buffer << '</listitem>'
+    end
+    result_buffer << %(</orderedlist>)
+    result_buffer * EOL
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><orderedlist#{common_attrs_erb}#{attribute('numeration', '@style')}>#{title_tag}<%
-  items.each do |li| %>
-<listitem>
-<simpara><%= li.text %></simpara><%
-    if li.blocks? %>
-<%= li.content %><%
-    end %>
-</listitem><%
-end %>
-</orderedlist>
-    EOF
+    :invoke_result
   end
 end
 
