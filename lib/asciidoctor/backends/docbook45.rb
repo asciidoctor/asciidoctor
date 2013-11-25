@@ -511,38 +511,52 @@ class BlockSidebarTemplate < BaseTemplate
 end
 
 class BlockQuoteTemplate < BaseTemplate
+  def result node
+    result_buffer = []
+    result_buffer << %(<blockquote#{common_attrs node.id, node.role, node.reftext}>)
+    result_buffer << %(<title>#{node.title}</title>) if node.title?
+    if (node.attr? 'attribution') || (node.attr? 'citetitle')
+      result_buffer << '<attribution>'
+      if node.attr? 'attribution'
+        result_buffer << (node.attr 'attribution')
+      end
+      if node.attr? 'citetitle'
+        result_buffer << %(<citetitle>#{node.attr 'citetitle'}</citetitle>)
+      end
+      result_buffer << '</attribution>'
+    end
+    result_buffer << (content node)
+    result_buffer << '</blockquote>'
+    result_buffer * EOL
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><blockquote#{common_attrs_erb}>#{title_tag}
-  <% if (attr? :attribution) || (attr? :citetitle) %>
-  <attribution>
-    <% if attr? :attribution %>
-    <%= (attr :attribution) %>
-    <% end %>
-    #{tag 'citetitle', :citetitle}
-  </attribution>
-  <% end %>
-#{content_erb}
-</blockquote>
-    EOF
+    :invoke_result
   end
 end
 
 class BlockVerseTemplate < BaseTemplate
+  def result node
+    result_buffer = []
+    result_buffer << %(<blockquote#{common_attrs node.id, node.role, node.reftext}>)
+    result_buffer << %(<title>#{node.title}</title>) if node.title?
+    if (node.attr? 'attribution') || (node.attr? 'citetitle')
+      result_buffer << '<attribution>'
+      if node.attr? 'attribution'
+        result_buffer << (node.attr 'attribution')
+      end
+      if node.attr? 'citetitle'
+        result_buffer << %(<citetitle>#{node.attr 'citetitle'}</citetitle>)
+      end
+      result_buffer << '</attribution>'
+    end
+    result_buffer << %(<literallayout>#{node.content}</literallayout>)
+    result_buffer << '</blockquote>'
+    result_buffer * EOL
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><blockquote#{common_attrs_erb}>#{title_tag}
-  <% if (attr? :attribution) || (attr? :citetitle) %>
-  <attribution>
-    <% if attr? :attribution %>
-    <%= (attr :attribution) %>
-    <% end %>
-    #{tag 'citetitle', :citetitle}
-  </attribution>
-  <% end %>
-  <literallayout><%= content %></literallayout>
-</blockquote>
-    EOF
+    :invoke_result
   end
 end
 
