@@ -287,19 +287,22 @@ class BlockOlistTemplate < BaseTemplate
 end
 
 class BlockColistTemplate < BaseTemplate
+  def result node
+    result_buffer = []
+    result_buffer << %(<calloutlist#{common_attrs node.id, node.role, node.reftext}>)
+    result_buffer << %(<title>#{node.title}</title>) if node.title?
+    node.items.each do |item|
+      result_buffer << %(<callout arearefs="#{item.attr 'coids'}">)
+      result_buffer << %(<para>#{item.text}</para>)
+      result_buffer << item.content if item.blocks?
+      result_buffer << '</callout>'
+    end
+    result_buffer << %(</calloutlist>)
+    result_buffer * EOL
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><calloutlist#{common_attrs_erb}>#{title_tag}
-  <% items.each do |li| %>
-  <callout arearefs="<%= li.attr :coids %>">
-    <para><%= li.text %></para>
-    <% if li.blocks? %>
-<%= li.content %>
-    <% end %>
-  </callout>
-  <% end %>
-</calloutlist>
-    EOF
+    :invoke_result
   end
 end
 
