@@ -1,10 +1,8 @@
 RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
 RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
 RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
-require 'set'
 
-# ideally we should use require_relative instead of modifying the LOAD_PATH
-$:.unshift(File.dirname __FILE__)
+require 'set'
 
 if RUBY_ENGINE_OPAL
   require 'strscan'
@@ -12,6 +10,9 @@ if RUBY_ENGINE_OPAL
   require 'asciidoctor/opal_ext/error'
   require 'asciidoctor/opal_ext/file'
 end
+
+# ideally we should use require_relative instead of modifying the LOAD_PATH
+$:.unshift(File.dirname __FILE__)
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
 # using eRuby templates.
