@@ -315,7 +315,7 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # escaped attribute, return unescaped
-        if !m[1].nil? || !m[4].nil?
+        if m[1] == '\\' || m[4] == '\\'
           "{#{m[2]}}"
         elsif (directive = m[3])
           offset = directive.length + 1
