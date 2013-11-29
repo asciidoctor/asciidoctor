@@ -317,7 +317,7 @@ module Substitutors
         # escaped attribute, return unescaped
         if m[1] == '\\' || m[4] == '\\'
           "{#{m[2]}}"
-        elsif (directive = m[3])
+        elsif !(directive = m[3]).to_s.empty?
           offset = directive.length + 1
           expr = m[2][offset..-1]
           case directive
@@ -348,7 +348,7 @@ module Substitutors
             warn "asciidoctor: WARNING: illegal attribute directive: #{m[2]}"
             m[0]
           end
-        elsif (key = m[2].downcase) && @document.attributes.has_key?(key)
+        elsif (key = m[2].downcase) && (@document.attributes.has_key? key)
           @document.attributes[key]
         elsif INTRINSICS.has_key? key
           INTRINSICS[key]
@@ -815,13 +815,13 @@ module Substitutors
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        if !m[1].nil?
-          id, reftext = m[1].split(',', 2).map(&:strip)
-          id = id.sub(REGEXP[:dbl_quoted], '\2')
-          reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2') unless reftext.nil?
-        else
+        if m[1].nil? || (RUBY_ENGINE_OPAL && m[1].to_s == '')
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
+        else
+          id, reftext = m[1].split(',', 2).map(&:strip)
+          id = id.sub(REGEXP[:dbl_quoted], RUBY_ENGINE_OPAL ? '$2' : '\2')
+          reftext = reftext.sub(REGEXP[:m_dbl_quoted], RUBY_ENGINE_OPAL ? '$2' : '\2') unless reftext.nil?
         end
 
         if id.include? '#'
