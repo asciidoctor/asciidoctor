@@ -184,7 +184,8 @@ unless !footnotes? || (attr? 'nofootnotes') %>
 </div><%
   end %>
 </div><%
-end %>
+end %><%
+unless nofooter %>
 <div id="footer">
 <div id="footer-text"><%
 if attr? 'revnumber' %>
@@ -195,7 +196,8 @@ if attr? 'last-update-label' %>
 end %>
 </div><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
 #{docinfo_content}) %>
-</div>
+</div><% 
+end %>
 </body>
 </html>
     EOS
