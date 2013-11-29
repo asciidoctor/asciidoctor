@@ -691,7 +691,7 @@ module Asciidoctor
     # http://domain
     # https://domain
     # data:info
-    :uri_sniff        => %r{\A[#{CC_ALPHA}][#{CC_ALNUM}.+-]*:/{0,2}},
+    :uri_sniff        => %r{^[#{CC_ALPHA}][#{CC_ALNUM}.+-]*:/{0,2}},
 
     :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/,
 
