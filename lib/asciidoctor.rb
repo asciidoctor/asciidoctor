@@ -336,11 +336,13 @@ module Asciidoctor
     CC_ALNUM = 'a-zA-Z0-9'
     CC_BLANK = '[ \t]'
     CC_GRAPH = '[\x21-\x7E]' # non-blank character
+    CC_EOL   = '(?=\n|$)'
   else
     CC_ALPHA = '[:alpha:]'
     CC_ALNUM = '[:alnum:]'
     CC_BLANK = '[[:blank:]]'
     CC_GRAPH = '[[:graph:]]' # non-blank character
+    CC_EOL   = '$'
   end
 
   # NOTE allows for empty space in line as it could be left by the template engine
@@ -437,10 +439,10 @@ module Asciidoctor
     # <1> <2> (multiple callouts on one line)
     # <!--1--> (for XML-based languages)
     # special characters are already be replaced at this point during render
-    :callout_render     => /(?:(?:\/\/|#|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*$)/,
+    :callout_render     => /(?:(?:\/\/|#|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL})/,
     # ...but not while scanning
-    :callout_quick_scan => /\\?<!?(--|)(\d+)\1>(?=(?: ?\\?<!?\1\d+\1>)*$)/,
-    :callout_scan       => /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*$)/,
+    :callout_quick_scan => /\\?<!?(--|)(\d+)\1>(?=(?: ?\\?<!?\1\d+\1>)*#{CC_EOL})/,
+    :callout_scan       => /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*#{CC_EOL})/,
 
     # <1> Foo
     :colist           => /^<?(\d+)>#{CC_BLANK}+(.*)/,
@@ -542,7 +544,7 @@ module Asciidoctor
     # +      (would not match because there's no space before +)
     #  +     (would match and capture '')
     # Foo +  (would and capture 'Foo')
-    :line_break       => /^(.*)#{CC_BLANK}\+(?=\n|$)/,
+    :line_break       => /^(.*)#{CC_BLANK}\+#{CC_EOL}/,
 
     # inline link and some inline link macro
     # FIXME revisit!
