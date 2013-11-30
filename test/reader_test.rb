@@ -346,6 +346,33 @@ This is a paragraph outside the block.
         assert_equal SAMPLE_DATA, reader.lines
       end
 
+      test 'should strip BOM from beginning of data' do
+        doc = Asciidoctor::Document.new
+        input = <<-EOS
+= Title =
+
+Some source text.
+      EOS
+        data = input.split "\n"
+        expected = data.dup
+        data[0] = "\u{feff}#{data[0]}"
+        reader = Asciidoctor::PreprocessorReader.new doc, data
+        assert_equal expected, reader.lines
+      end
+
+      test 'should not strip U+FEFF from middle of data' do
+        doc = Asciidoctor::Document.new
+        input = <<-EOS
+= Title =
+
+Some source text.
+      EOS
+        data = input.split "\n"
+        data[1] = "\u{feff}#{data[1]}"
+        reader = Asciidoctor::PreprocessorReader.new doc, data
+        assert_equal data, reader.lines
+      end
+
       test 'should clean CRLF from end of lines' do
         input = <<-EOS
 source\r
