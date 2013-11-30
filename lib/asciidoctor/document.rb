@@ -16,6 +16,7 @@ module Asciidoctor
 #
 # notitle  - The h1 heading should not be shown
 # noheader - The header block (h1 heading, author, revision info) should not be shown
+# nofooter - the footer block should not be shown
 class Document < AbstractBlock
 
   Footnote = Struct.new :index, :id, :text
@@ -511,6 +512,10 @@ class Document < AbstractBlock
 
   def noheader
     @attributes.has_key? 'noheader'
+  end
+
+  def nofooter
+    @attributes.has_key? 'nofooter'
   end
 
   # QUESTION move to AbstractBlock?
