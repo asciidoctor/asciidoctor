@@ -466,11 +466,7 @@ context 'Invoker' do
       #assert stderr_lines.empty?, 'Command failed. Expected to receive a rendered document.'
       stdout_lines = stdout.readlines
       assert !stdout_lines.empty?
-      if Asciidoctor::FORCE_ENCODING
-        stdout_lines.each do |l|
-          l.force_encoding Encoding::UTF_8
-        end
-      end
+      stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
       stdout_str = stdout_lines.join
       assert stdout_str.include?('Codierungen sind verrückt auf älteren Versionen von Ruby') 
     ensure

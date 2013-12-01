@@ -27,6 +27,93 @@ module Helpers
     end
   end
 
+  # Public: Normalize the data to prepare for parsing
+  #
+  # Delegates to Helpers#normalize_lines_from_string if data is a String.
+  # Delegates to Helpers#normalize_lines_array if data is a String Array.
+  #
+  # returns a String Array of normalized lines
+  def self.normalize_lines data
+    data.class == ::String ? (normalize_lines_from_string data) : (normalize_lines_array data)
+  end
+
+  # Public: Normalize the array of lines to prepare them for parsing
+  #
+  # Force encodes the data to UTF-8 and removes trailing whitespace from each line.
+  #
+  # If a BOM is present at the beginning of the data, a best attempt
+  # is made to encode from the specified encoding to UTF-8.
+  #
+  # data - a String Array of lines to normalize
+  #
+  # returns a String Array of normalized lines
+  def self.normalize_lines_array data
+    unless data.size > 0
+      return []
+    end
+ 
+    if COERCE_ENCODING
+      utf8 = ::Encoding::UTF_8
+      # NOTE if data encoding is UTF-*, we only need 0..1
+      leading_bytes = (first_line = data.first) ? first_line[0..2].bytes.to_a : nil
+      if (leading_2_bytes = leading_bytes[0..1]) == BOM_BYTES_UTF_16LE
+        # Ruby messes up trailing whitespace on UTF-16LE, so take a different route
+        return ((data.join.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8).lines.map {|line| line.rstrip }
+      elsif leading_2_bytes == BOM_BYTES_UTF_16BE
+        data[0] = (first_line.force_encoding ::Encoding::UTF_16BE)[1..-1]
+        return data.map {|line| "#{((line.force_encoding ::Encoding::UTF_16BE).encode utf8).rstrip}" }
+      elsif leading_bytes[0..2] == BOM_BYTES_UTF_8
+        data[0] = (first_line.force_encoding utf8)[1..-1]
+      end
+
+      data.map {|line| line.encoding == utf8 ? line.rstrip : (line.force_encoding utf8).rstrip }
+    else
+      # Ruby 1.8 has no built-in re-encoding, so no point in removing the UTF-16 BOMs
+      if (first_line = data.first) && first_line[0..2].bytes.to_a == BOM_BYTES_UTF_8
+        data[0] = first_line[3..-1]
+      end
+      data.map {|line| line.rstrip }
+    end
+  end
+
+  # Public: Normalize the String and split into lines to prepare them for parsing
+  #
+  # Force encodes the data to UTF-8 and removes trailing whitespace from each line.
+  # Converts the data to a String Array.
+  #
+  # If a BOM is present at the beginning of the data, a best attempt
+  # is made to encode from the specified encoding to UTF-8.
+  #
+  # data - a String of lines to normalize
+  #
+  # returns a String Array of normalized lines
+  def self.normalize_lines_from_string data 
+    if data.nil? || data == ''
+      return []
+    end
+
+    if COERCE_ENCODING
+      utf8 = ::Encoding::UTF_8
+      # NOTE if data encoding is UTF-*, we only need 0..1
+      leading_bytes = data[0..2].bytes.to_a
+      if (leading_2_bytes = leading_bytes[0..1]) == BOM_BYTES_UTF_16LE
+        data = (data.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8
+      elsif leading_2_bytes == BOM_BYTES_UTF_16BE
+        data = (data.force_encoding ::Encoding::UTF_16BE)[1..-1].encode utf8
+      elsif leading_bytes[0..2] == BOM_BYTES_UTF_8
+        data = data.encoding == utf8 ? data[1..-1] : (data.force_encoding utf8)[1..-1]
+      else
+        data = data.force_encoding utf8 unless data.encoding == utf8
+      end
+    else
+      # Ruby 1.8 has no built-in re-encoding, so no point in removing the UTF-16 BOMs
+      if data[0..2].bytes.to_a == BOM_BYTES_UTF_8
+        data = data[3..-1]
+      end
+    end
+    data.each_line.map {|line| line.rstrip }
+  end
+
   # Public: Encode a string for inclusion in a URI
   #
   # str - the string to encode

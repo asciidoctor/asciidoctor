@@ -34,12 +34,7 @@ class Block < AbstractBlock
     if raw_source.nil?
       @lines = []
     elsif raw_source.class == ::String
-      # FIXME make line normalization a utility method since it's used multiple times in code base!!
-      if FORCE_ENCODING
-        @lines = raw_source.each_line.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
-      else
-        @lines = raw_source.each_line.map {|line| line.rstrip }
-      end
+      @lines = Helpers.normalize_lines_from_string raw_source
     else
       @lines = raw_source.dup
     end

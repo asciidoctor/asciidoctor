@@ -21,6 +21,51 @@ third line
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         assert_equal SAMPLE_DATA, reader.lines
       end
+
+      test 'should remove UTF-8 BOM from first line of String data' do
+        data = "\xef\xbb\xbf#{SAMPLE_DATA.join ::Asciidoctor::EOL}"
+        reader = Asciidoctor::Reader.new data, nil, :normalize => true
+        assert_equal 'f', reader.lines.first[0..0]
+        assert_equal SAMPLE_DATA, reader.lines
+      end
+
+      test 'should remove UTF-8 BOM from first line of Array data' do
+        data = SAMPLE_DATA.dup
+        data[0] = "\xef\xbb\xbf#{data.first}"
+        reader = Asciidoctor::Reader.new data, nil, :normalize => true
+        assert_equal 'f', reader.lines.first[0..0]
+        assert_equal SAMPLE_DATA, reader.lines
+      end
+
+      if Asciidoctor::COERCE_ENCODING
+        test 'should encode UTF-16LE string to UTF-8 when BOM is found' do
+          data = "\uFEFF#{SAMPLE_DATA.join ::Asciidoctor::EOL}".encode('UTF-16LE').force_encoding('UTF-8')
+          reader = Asciidoctor::Reader.new data, nil, :normalize => true
+          assert_equal 'f', reader.lines.first[0..0]
+          assert_equal SAMPLE_DATA, reader.lines
+        end
+
+        test 'should encode UTF-16LE string array to UTF-8 when BOM is found' do
+          data = "\uFEFF#{SAMPLE_DATA.join ::Asciidoctor::EOL}".encode('UTF-16LE').force_encoding('UTF-8').lines.to_a
+          reader = Asciidoctor::Reader.new data, nil, :normalize => true
+          assert_equal 'f', reader.lines.first[0..0]
+          assert_equal SAMPLE_DATA, reader.lines
+        end
+
+        test 'should encode UTF-16BE string to UTF-8 when BOM is found' do
+          data = "\uFEFF#{SAMPLE_DATA.join ::Asciidoctor::EOL}".encode('UTF-16BE').force_encoding('UTF-8')
+          reader = Asciidoctor::Reader.new data, nil, :normalize => true
+          assert_equal 'f', reader.lines.first[0..0]
+          assert_equal SAMPLE_DATA, reader.lines
+        end
+
+        test 'should encode UTF-16BE string array to UTF-8 when BOM is found' do
+          data = "\uFEFF#{SAMPLE_DATA.join ::Asciidoctor::EOL}".encode('UTF-16BE').force_encoding('UTF-8').lines.to_a
+          reader = Asciidoctor::Reader.new data, nil, :normalize => true
+          assert_equal 'f', reader.lines.first[0..0]
+          assert_equal SAMPLE_DATA, reader.lines
+        end
+      end
     end
 
     context 'With empty data' do
@@ -355,7 +400,7 @@ endlines\r
       EOS
 
         doc = Asciidoctor::Document.new
-        [input, input.lines, input.split(::Asciidoctor::LINE_SPLIT), input.split(::Asciidoctor::LINE_SPLIT).join(::Asciidoctor::EOL)].each do |lines|
+        [input, input.lines.to_a, input.split(::Asciidoctor::LINE_SPLIT), input.split(::Asciidoctor::LINE_SPLIT).join(::Asciidoctor::EOL)].each do |lines|
           reader = Asciidoctor::PreprocessorReader.new doc, lines
           reader.lines.each do |line|
             assert !line.end_with?("\r"), "CRLF not properly cleaned for source lines: #{lines.inspect}"

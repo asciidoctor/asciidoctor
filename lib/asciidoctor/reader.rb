@@ -84,21 +84,13 @@ class Reader
   def prepare_lines data, opts = {}
     if data.is_a? ::String
       if opts[:normalize]
-        if FORCE_ENCODING
-          data.each_line.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
-        else
-          data.each_line.map {|line| line.rstrip }
-        end
+        Helpers.normalize_lines_from_string data
       else
         data.each_line.to_a
       end
     else
       if opts[:normalize]
-        if FORCE_ENCODING
-          data.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
-        else
-          data.map {|line| line.rstrip }
-        end
+        Helpers.normalize_lines_array data
       else
         data.dup
       end
