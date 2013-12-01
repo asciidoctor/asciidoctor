@@ -21,7 +21,8 @@ EOS
   rescue
   s.files             = Dir['**/*']
   end
-  s.executables       = s.files.grep(/^bin\//) { |f| File.basename f }
+  #s.executables       = s.files.grep(/^bin\//) { |f| File.basename f }
+  s.executables       = ['asciidoctor', 'asciidoctor-safe']
   s.test_files        = s.files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
   s.require_paths     = %w[lib]
 
