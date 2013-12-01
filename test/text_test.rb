@@ -247,4 +247,10 @@ This line is separated something that is not a horizontal rule...
       assert_xpath "//code", rendered_chars
     end
   end
+
+  test 'should format Asian characters as words' do
+    assert_xpath '//strong', (render_embedded_string 'bold *要* bold')
+    assert_xpath '//strong', (render_embedded_string 'bold *素* bold')
+    assert_xpath '//strong', (render_embedded_string 'bold *要素* bold')
+  end
 end
