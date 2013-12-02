@@ -73,7 +73,8 @@ class Reader
   # This method strips whitespace from the end of every line of
   # the source data and appends a LF (i.e., Unix endline). This
   # whitespace substitution is very important to how Asciidoctor
-  # works.
+  # works.  It also calls strip_bom to remove a leading BOM, if
+  # present.
   #
   # Any leading or trailing blank lines are also removed.
   #
@@ -85,9 +86,9 @@ class Reader
     if data.is_a? ::String
       if opts[:normalize]
         if FORCE_ENCODING
-          data.each_line.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
+          strip_bom data.each_line.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
         else
-          data.each_line.map {|line| line.rstrip }
+          strip_bom data.each_line.map {|line| line.rstrip }
         end
       else
         data.each_line.to_a
@@ -95,14 +96,28 @@ class Reader
     else
       if opts[:normalize]
         if FORCE_ENCODING
-          data.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
+          strip_bom data.map {|line| "#{line.rstrip.force_encoding ::Encoding::UTF_8}" }
         else
-          data.map {|line| line.rstrip }
+          strip_bom data.map {|line| line.rstrip }
         end
       else
         data.dup
       end
     end
+  end
+
+  # Internal: Strip a byte order mark from the beginning of the data
+  #
+  # This method strips a leading BOM from the data.  It does not remove any
+  # U+FEFF characters that may be present elsewhere in the data, since those
+  # are not considered BOMs.
+  #
+  # data - A String Array of input data to be normalized
+  #
+  # Returns The String lines without any BOM.
+  def strip_bom data
+    data[0].sub!(/^\u{feff}/, "") if !data.empty?
+    data
   end
 
   # Internal: Processes a previously unvisited line
