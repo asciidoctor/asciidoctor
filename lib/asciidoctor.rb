@@ -644,6 +644,10 @@ module Asciidoctor
     # matches double quoted text, capturing quote char and text (multi-line)
     :m_dbl_quoted     => /^("|)(.*)\1$/m,
 
+    # [float]
+    # = Heading
+    :section_float_style => /^(?:float|discrete)\b/,
+
     # == Foo
     # ^ yields a level 2 title
     #
