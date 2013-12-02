@@ -367,6 +367,40 @@ not in section
       assert_xpath '/h3/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
     end
 
+    test 'should create floating title if style is float with shorthand role and id' do
+      input = <<-EOS
+[float.independent#first]
+= Independent Heading!
+
+not in section
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/h1[@id="first"]', output, 1
+      assert_xpath '/h1[@class="float independent"]', output, 1
+      assert_xpath %(/h1[@class="float independent"][text()="Independent Heading!"]), output, 1
+      assert_xpath '/h1/following-sibling::*[@class="paragraph"]', output, 1
+      assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p', output, 1
+      assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
+    end
+
+    test 'should create floating title if style is discrete with shorthand role and id' do
+      input = <<-EOS
+[discrete.independent#first]
+= Independent Heading!
+
+not in section
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/h1[@id="first"]', output, 1
+      assert_xpath '/h1[@class="discrete independent"]', output, 1
+      assert_xpath %(/h1[@class="discrete independent"][text()="Independent Heading!"]), output, 1
+      assert_xpath '/h1/following-sibling::*[@class="paragraph"]', output, 1
+      assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p', output, 1
+      assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
+    end
+
     test 'floating title should be a block with context floating_title' do
       input = <<-EOS
 [float]

@@ -1579,7 +1579,9 @@ class Lexer
   # returns the section level if the Reader is positioned at a section title,
   # false otherwise
   def self.is_next_line_section?(reader, attributes)
-    return false if !(val = attributes[1]).nil? && ['float', 'discrete'].include?(val)
+    if !(val = attributes[1]).nil? && ((ord_0 = val[0].ord) == 100 || ord_0 == 102) && (val.match REGEXP[:section_float_style])
+      return false
+    end
     return false if !reader.has_more_lines?
     Compliance.underline_style_section_titles ? is_section_title?(*reader.peek_lines(2)) : is_section_title?(reader.peek_line)
   end
