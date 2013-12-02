@@ -50,6 +50,11 @@ context 'Links' do
     assert_xpath '//a[@href="http://asciidoc.org"][text()="AsciiDoc"]', render_string(')http://asciidoc.org[AsciiDoc] project page.'), 1
   end
 
+  test 'qualified url following smart apostrophe' do
+    output = render_embedded_string("l&#8217;http://www.irit.fr[IRIT]") 
+    assert_match(/l&#8217;<a href=/, output)
+  end
+
   test 'qualified url using invalid link macro should not create link' do
     assert_xpath '//a', render_string('link:http://asciidoc.org is the project page for AsciiDoc.'), 0
   end
