@@ -22,7 +22,7 @@ class Renderer
     @cache = nil
 
     backend = options[:backend]
-    if RUBY_ENGINE_OPAL
+    if ::RUBY_ENGINE_OPAL
       ::Template.instance_variable_get('@_cache').each do |path, tmpl|
         @views[(File.basename path)] = tmpl
       end

@@ -251,10 +251,18 @@ module Substitutors
   #
   # returns The String text with quoted text rendered using the backend templates
   def sub_quotes(text)
-    result = text.dup
-    QUOTE_SUBS.each {|type, scope, pattern|
-      result.gsub!(pattern) { transform_quoted_text($~, type, scope) }
-    }
+    if ::RUBY_ENGINE_OPAL
+      result = text
+      QUOTE_SUBS.each {|type, scope, pattern|
+        result = result.gsub(pattern) { transform_quoted_text $~, type, scope }
+      }
+    else
+      # Use gsub! as optimization
+      result = text.dup
+      QUOTE_SUBS.each {|type, scope, pattern|
+        result.gsub!(pattern) { transform_quoted_text $~, type, scope }
+      }
+    end
 
     result
   end
@@ -265,27 +273,42 @@ module Substitutors
   #
   # returns The String text with the replacement characters substituted
   def sub_replacements(text)
-    result = text.dup
-    REPLACEMENTS.each {|pattern, replacement, restore|
-      result.gsub!(pattern) {
-        m = $~
-        matched = $&
-        if matched.include?('\\')
-          matched.tr('\\', '')
-        else
-          case restore
-          when :none
-            replacement
-          when :leading
-            "#{m[1]}#{replacement}"
-          when :bounding
-            "#{m[1]}#{replacement}#{m[2]}"
-          end
-        end
+    if ::RUBY_ENGINE_OPAL
+      result = text
+      REPLACEMENTS.each {|pattern, replacement, restore|
+        result = result.gsub(pattern) {
+          do_replacement $~, replacement, restore
+        }
       }
-    }
+    else
+      # Use gsub! as optimization
+      result = text.dup
+      REPLACEMENTS.each {|pattern, replacement, restore|
+        result.gsub!(pattern) {
+          do_replacement $~, replacement, restore
+        }
+      }
+    end
 
     result
+  end
+
+  # Internal: Substitute replacement text for matched location
+  #
+  # returns The String text with the replacement characters substituted
+  def do_replacement m, replacement, restore
+    if (matched = m[0]).include? '\\'
+      matched.tr '\\', ''
+    else
+      case restore
+      when :none
+        replacement
+      when :leading
+        "#{m[1]}#{replacement}"
+      when :bounding
+        "#{m[1]}#{replacement}#{m[2]}"
+      end
+    end
   end
 
   # Public: Substitute attribute references
@@ -815,13 +838,13 @@ module Substitutors
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        if m[1].nil? || (RUBY_ENGINE_OPAL && m[1].to_s == '')
+        if m[1].nil? || (::RUBY_ENGINE_OPAL && m[1].to_s == '')
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
         else
           id, reftext = m[1].split(',', 2).map(&:strip)
-          id = id.sub(REGEXP[:dbl_quoted], RUBY_ENGINE_OPAL ? '$2' : '\2')
-          reftext = reftext.sub(REGEXP[:m_dbl_quoted], RUBY_ENGINE_OPAL ? '$2' : '\2') unless reftext.nil?
+          id = id.sub(REGEXP[:dbl_quoted], ::RUBY_ENGINE_OPAL ? '$2' : '\2')
+          reftext = reftext.sub(REGEXP[:m_dbl_quoted], ::RUBY_ENGINE_OPAL ? '$2' : '\2') unless reftext.nil?
         end
 
         if id.include? '#'
