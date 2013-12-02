@@ -54,7 +54,7 @@ $:.unshift(File.dirname __FILE__)
 #   end
 module Asciidoctor
 
-  unless RUBY_ENGINE_OPAL
+  unless ::RUBY_ENGINE_OPAL
     # .chomp keeps Opal from trying to load the library
     ::Object.autoload :Base64,        'base64'.chomp
     ::Object.autoload :ERB,           'erb'.chomp
@@ -186,13 +186,13 @@ module Asciidoctor
   ROOT_PATH = ::File.dirname LIB_PATH
 
   # The user's home directory, as best we can determine it
-  USER_HOME = RUBY_VERSION >= '1.9' ? ::Dir.home : ENV['HOME']
+  USER_HOME = ::RUBY_VERSION >= '1.9' ? ::Dir.home : ENV['HOME']
 
   # Flag to indicate whether encoding can be coerced to UTF-8
   # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
   # Addresses failures performing string operations that are reported as "invalid byte sequence in US-ASCII" 
   # Ruby 1.8 doesn't seem to experience this problem (perhaps because it isn't validating the encodings)
-  COERCE_ENCODING = !RUBY_ENGINE_OPAL && RUBY_VERSION >= '1.9'
+  COERCE_ENCODING = !::RUBY_ENGINE_OPAL && ::RUBY_VERSION >= '1.9'
 
   # Flag to indicate whether encoding of external strings needs to be forced to UTF-8
   FORCE_ENCODING = COERCE_ENCODING && ::Encoding.default_external != ::Encoding::UTF_8
@@ -204,7 +204,7 @@ module Asciidoctor
   BOM_BYTES_UTF_16BE = "\xfe\xff".bytes.to_a
 
   # Flag to indicate that line length should be calculated using a unicode mode hint
-  FORCE_UNICODE_LINE_LENGTH = RUBY_VERSION < '1.9'
+  FORCE_UNICODE_LINE_LENGTH = ::RUBY_VERSION < '1.9'
 
   # The endline character to use when rendering output
   EOL = "\n"
@@ -340,7 +340,7 @@ module Asciidoctor
   FLEXIBLE_ATTRIBUTES = %w(numbered)
 
   # Regular expression character classes (dependent on regexp engine)
-  if RUBY_ENGINE_OPAL
+  if ::RUBY_ENGINE_OPAL
     CC_ALPHA = 'a-zA-Z'
     CC_ALNUM = 'a-zA-Z0-9'
     CC_BLANK = '[ \t]'
@@ -361,9 +361,9 @@ module Asciidoctor
   # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
   PASS_PLACEHOLDER = {
     # SPA, start of guarded protected area
-    :start  => RUBY_ENGINE_OPAL ? 150.chr : "\u0096",
+    :start  => ::RUBY_ENGINE_OPAL ? 150.chr : "\u0096",
     # EPA, end of guarded protected area
-    :end    => RUBY_ENGINE_OPAL ? 151.chr : "\u0097",
+    :end    => ::RUBY_ENGINE_OPAL ? 151.chr : "\u0097",
     # match placeholder record
     :match  => /\u0096(\d+)\u0097/,
     # fix placeholder record after syntax highlighting
@@ -850,7 +850,7 @@ module Asciidoctor
     end
 
     attrs = (options[:attributes] ||= {})
-    if attrs.is_a?(::Hash) || (RUBY_ENGINE_JRUBY && attrs.is_a?(::Java::JavaUtil::Map))
+    if attrs.is_a?(::Hash) || (::RUBY_ENGINE_JRUBY && attrs.is_a?(::Java::JavaUtil::Map))
       # all good; placed here as optimization
     elsif attrs.is_a? ::Array
       attrs = options[:attributes] = attrs.inject({}) do |accum, entry|
@@ -1108,7 +1108,7 @@ module Asciidoctor
   end
 
   # autoload
-  unless RUBY_ENGINE_OPAL
+  unless ::RUBY_ENGINE_OPAL
     autoload :Debug,   'asciidoctor/debug'
     autoload :VERSION, 'asciidoctor/version'
   end
@@ -1136,7 +1136,7 @@ module Asciidoctor
   require 'asciidoctor/table'
 
   # backends
-  if RUBY_ENGINE_OPAL
+  if ::RUBY_ENGINE_OPAL
     require 'asciidoctor/backends/html5-erb'
   end
 end
