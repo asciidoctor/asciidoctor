@@ -188,11 +188,20 @@ module Asciidoctor
   # The user's home directory, as best we can determine it
   USER_HOME = RUBY_VERSION >= '1.9' ? ::Dir.home : ENV['HOME']
 
-  # Flag to indicate whether encoding of external strings needs to be forced to UTF-8
+  # Flag to indicate whether encoding can be coerced to UTF-8
   # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
-  # Address failures performing string operations that are reported as "invalid byte sequence in US-ASCII" 
+  # Addresses failures performing string operations that are reported as "invalid byte sequence in US-ASCII" 
   # Ruby 1.8 doesn't seem to experience this problem (perhaps because it isn't validating the encodings)
-  FORCE_ENCODING = !RUBY_ENGINE_OPAL && RUBY_VERSION >= '1.9' && ::Encoding.default_external != ::Encoding::UTF_8
+  COERCE_ENCODING = !RUBY_ENGINE_OPAL && RUBY_VERSION >= '1.9'
+
+  # Flag to indicate whether encoding of external strings needs to be forced to UTF-8
+  FORCE_ENCODING = COERCE_ENCODING && ::Encoding.default_external != ::Encoding::UTF_8
+
+  # Byte arrays for UTF-* Byte Order Marks
+  # hex escape sequence used for Ruby 1.8 compatibility
+  BOM_BYTES_UTF_8 = "\xef\xbb\xbf".bytes.to_a
+  BOM_BYTES_UTF_16LE = "\xff\xfe".bytes.to_a
+  BOM_BYTES_UTF_16BE = "\xfe\xff".bytes.to_a
 
   # Flag to indicate that line length should be calculated using a unicode mode hint
   FORCE_UNICODE_LINE_LENGTH = RUBY_VERSION < '1.9'
