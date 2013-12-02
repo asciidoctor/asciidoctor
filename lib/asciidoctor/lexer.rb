@@ -1897,7 +1897,7 @@ class Lexer
         end
         author_metadata[key_map[:email]] = segments[3] unless names_only || segments[3].nil?
       else
-        author_metadata[key_map[:author]] = author_metadata[key_map[:firstname]] = fname = author_entry.strip.squeeze(' ')
+        author_metadata[key_map[:author]] = author_metadata[key_map[:firstname]] = fname = author_entry.strip.tr_s(' ', ' ')
         author_metadata[key_map[:authorinitials]] = fname[0, 1]
       end
 
