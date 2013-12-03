@@ -146,7 +146,8 @@ unless noheader %>
 <span id="email" class="email"><%= sub_macros(attr 'email') %></span><br<%= short_tag_slash_local %>><%
         end
         if (authorcount = (attr 'authorcount').to_i) > 1
-          (2..authorcount).each do |idx| %><span id="author<%= idx %>" class="author"><%= attr "author_#{idx}" %></span><br<%= short_tag_slash_local %>><%
+          (2..authorcount).each do |idx| %>
+<span id="author<%= idx %>" class="author"><%= attr "author_#{idx}" %></span><br<%= short_tag_slash_local %>><%
             if attr? "email_#{idx}" %>
 <span id="email<%= idx %>" class="email"><%= sub_macros(attr "email_#{idx}") %></span><br<%= short_tag_slash_local %>><%
             end
