@@ -20,6 +20,7 @@ class Renderer
     @views = {}
     @compact = options[:compact]
     @cache = nil
+    @chomp_result = false
 
     backend = options[:backend]
     if ::RUBY_ENGINE_OPAL
@@ -50,6 +51,11 @@ class Renderer
     if (template_dirs = options.delete(:template_dirs))
       Helpers.require_library 'tilt'
 
+      # chomp result when using custom templates since template engines
+      # tend to add a trailing newline character
+      # this setting should really be applied per template
+      @chomp_result = true
+
       if (template_cache = options[:template_cache]) === true
         # FIXME probably want to use our own cache object for more control
         @cache = (@@global_cache ||= TemplateCache.new)
@@ -58,7 +64,7 @@ class Renderer
       end
 
       view_opts = {
-        :erb =>  { :trim => '<>' },
+        :erb =>  { :trim => '<' },
         :haml => { :format => :xhtml, :attr_wrapper => '"', :ugly => true, :escape_attrs => false },
         :slim => { :disable_escape => true, :sort_attrs => false, :pretty => false }
       }
@@ -140,7 +146,11 @@ class Renderer
       raise "Couldn't find a view in @views for #{view}"
     end
     
-    @views[view].render(object, locals)
+    if @chomp_result
+      @views[view].render(object, locals).chomp
+    else
+      @views[view].render(object, locals)
+    end
   end
 
   def views
