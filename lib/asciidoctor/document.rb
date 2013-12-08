@@ -738,7 +738,7 @@ class Document < AbstractBlock
     @attributes["#{backend}-#{@attributes['doctype']}"] = ''
     @attributes["#{basebackend}-#{@attributes['doctype']}"] = ''
     ext = DEFAULT_EXTENSIONS[basebackend] || '.html'
-    @attributes['outfilesuffix'] = ext
+    @attributes['outfilesuffix'] = ext unless (attribute_locked? 'outfilesuffix')
     file_type = ext[1..-1]
     @attributes['filetype'] = file_type
     @attributes["filetype-#{file_type}"] = ''

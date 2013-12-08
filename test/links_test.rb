@@ -173,6 +173,12 @@ context 'Links' do
     assert_xpath '//a[@href="tigers.html#about"][text() = "About Tigers"]', doc.render, 1
   end
 
+  test 'xref using angled bracket syntax with path and custom relfilesuffix and outfilesuffix' do
+    attributes = {'relfileprefix' => '../', 'outfilesuffix' => '/'}
+    doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false, :attributes => attributes
+    assert_xpath '//a[@href="../tigers/#about"][text() = "About Tigers"]', doc.render, 1
+  end
+
   test 'xref using angled bracket syntax with path which has been included in this document' do
     doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
     doc.references[:includes] << 'tigers'
