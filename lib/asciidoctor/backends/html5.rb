@@ -38,11 +38,10 @@ class DocumentTemplate < BaseTemplate
 <meta http-equiv="Content-Type" content="text/html; charset=<%= attr 'encoding' %>"<%= short_tag_slash_local %>>
 <meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>"<%= short_tag_slash_local %>>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"<%= short_tag_slash_local %>><%
-if attr? 'description' %>
-<meta name="description" content="<%= attr 'description' %>"<%= short_tag_slash_local %>><%
-end
-if attr? 'keywords' %>
-<meta name="keywords" content="<%= attr 'keywords' %>"<%= short_tag_slash_local %>><%
+['description', 'keywords', 'author', 'copyright'].each do |key|
+  if attr? key %>
+<meta name="<%= key %>" content="<%= attr key %>"<%= short_tag_slash_local %>><%
+  end
 end %>
 <title><%= doctitle(:sanitize => true) || (attr 'untitled-label') %></title><%
 if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')

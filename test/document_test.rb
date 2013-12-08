@@ -866,12 +866,17 @@ content
 = AsciiDoc
 Stuart Rackham <founder@asciidoc.org>
 v8.6.8, 2012-07-12: See changelog.
+:description: AsciiDoc user guide
+:keywords: asciidoc,documentation
 
 == Version 8.6.8
 
 more info...
       EOS
       output = render_string input
+      assert_xpath '//meta[@name="author"][@content="Stuart Rackham"]', output, 1
+      assert_xpath '//meta[@name="description"][@content="AsciiDoc user guide"]', output, 1
+      assert_xpath '//meta[@name="keywords"][@content="asciidoc,documentation"]', output, 1
       assert_xpath '//*[@id="header"]/span[@id="author"][text() = "Stuart Rackham"]', output, 1
       assert_xpath '//*[@id="header"]/span[@id="email"]/a[@href="mailto:founder@asciidoc.org"][text() = "founder@asciidoc.org"]', output, 1
       assert_xpath '//*[@id="header"]/span[@id="revnumber"][text() = "version 8.6.8,"]', output, 1
