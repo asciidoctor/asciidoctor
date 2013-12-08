@@ -868,7 +868,7 @@ module Substitutors
             target = "##{fragment}"
           else
             refid = fragment.nil? ? path : "#{path}##{fragment}"
-            path = "#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'}"
+            path = "#{@document.attributes['relfileprefix']}#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'}"
             target = fragment.nil? ? path : "#{path}##{fragment}"
           end
         end
