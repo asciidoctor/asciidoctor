@@ -361,9 +361,9 @@ module Asciidoctor
   # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
   PASS_PLACEHOLDER = {
     # SPA, start of guarded protected area
-    :start  => ::RUBY_ENGINE_OPAL ? 150.chr : "\u0096",
+    :start  => "\u0096",
     # EPA, end of guarded protected area
-    :end    => ::RUBY_ENGINE_OPAL ? 151.chr : "\u0097",
+    :end    => "\u0097",
     # match placeholder record
     :match  => /\u0096(\d+)\u0097/,
     # fix placeholder record after syntax highlighting
