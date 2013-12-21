@@ -469,6 +469,16 @@ preamble
         assert_equal 1, reader.include_stack.size
         assert_equal 'one', reader.read_line.rstrip
       end
+
+      test 'PreprocessorReader#push_include method should gracefully handle file and path' do
+        doc = empty_document
+        lines = %(a b c)
+        reader = Asciidoctor::PreprocessorReader.new doc, lines
+        append_lines = %w(one two three)
+        assert_nothing_raised do
+          reader.push_include append_lines
+        end
+      end
     end
 
     context 'Include Directive' do

@@ -961,7 +961,7 @@ class PreprocessorReader < Reader
     end
   end
 
-  def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
+  def push_include data, file = '', path = '', lineno = 1, attributes = {}
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
     @includes << Helpers.rootname(path)
     @file = file
