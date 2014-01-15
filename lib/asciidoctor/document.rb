@@ -121,6 +121,7 @@ class Document < AbstractBlock
       # QUESTION should we support setting attribute in parent document from nested document?
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
       @attribute_overrides = @parent_document.attributes.dup
+      @attribute_overrides.delete 'doctype'
       @safe = @parent_document.safe
       @renderer = @parent_document.renderer
       initialize_extensions = false
