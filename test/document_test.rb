@@ -283,6 +283,39 @@ preamble
       assert_equal fixture_path('chapter-a.adoc'), section_1.file
       assert_equal 1, section_1.lineno
     end
+
+    test 'find_by should return Array of blocks that match criteria' do
+      input = <<-EOS
+= Document Title
+
+preamble
+
+== Section A
+
+paragraph
+
+--
+Exhibit A::
++
+[#tiger.animal]
+image::tiger.png[Tiger]
+--
+
+image::cat.png[Cat]
+
+== Section B
+
+paragraph
+      EOS
+
+      doc = Asciidoctor.load input
+      result = doc.find_by :context => :image
+      assert_equal 2, result.size
+      assert_equal :image, result[0].context
+      assert_equal 'tiger.png', result[0].attr('target')
+      assert_equal :image, result[1].context
+      assert_equal 'cat.png', result[1].attr('target')
+    end
   end
 
   context 'Convert APIs' do

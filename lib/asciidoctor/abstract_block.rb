@@ -79,6 +79,16 @@ class AbstractBlock < AbstractNode
     @blocks.map {|b| b.convert } * EOL
   end
 
+  # Public: Get the source file where this block started
+  def file
+    @source_location ? @source_location.file : nil
+  end
+
+  # Public: Get the source line number where this block started
+  def lineno
+    @source_location ? @source_location.lineno : nil
+  end
+
   # Public: A convenience method that checks whether the specified
   # substitution is enabled for this block.
   #
@@ -185,15 +195,95 @@ class AbstractBlock < AbstractNode
     @blocks.select {|block| block.context == :section }
   end
 
-  # Public: Get the source file where this block started
-  def file
-    @source_location ? @source_location.file : nil
+# stage the Enumerable mixin until we're sure we've got it right
+=begin
+  include ::Enumerable
+
+  # Public: Yield the block on this block node and all its descendant
+  # block node children to satisfy the Enumerable contract.
+  #
+  # Returns nothing
+  def each &block
+    # yucky, dlist is a special case
+    if @context == :dlist
+      @blocks.flatten.each &block
+    else
+      #yield self.header if @context == :document && header?
+      @blocks.each &block
+    end
   end
 
-  # Public: Get the source line number where this block started
-  def lineno
-    @source_location ? @source_location.lineno : nil
+  #--
+  # TODO is there a way to make this lazy?
+  def each_recursive &block
+    block = lambda {|node| node } unless block_given?
+    results = []
+    self.each do |node|
+      results << block.call(node)
+      results.concat(node.each_recursive(&block)) if ::Enumerable === node
+    end
+    block_given? ? results : results.to_enum
   end
+=end
+
+  # Public: Query for all descendant block nodes in the document tree that
+  # match the specified Symbol filter_context and, optionally, the style and/or
+  # role specified in the options Hash. If a block is provided, it's used as an
+  # additional filter. If no filters are specified, all block nodes in the tree
+  # are returned.
+  #
+  # Examples
+  #
+  #   doc.find_by context: :section 
+  #   #=> Asciidoctor::Section@14459860 { level: 0, title: "Hello, AsciiDoc!", blocks: 0 }
+  #   #=> Asciidoctor::Section@14505460 { level: 1, title: "First Section", blocks: 1 }
+  #
+  #   doc.find_by(context: :section) {|section| section.level == 1 }
+  #   #=> Asciidoctor::Section@14505460 { level: 1, title: "First Section", blocks: 1 }
+  #
+  #   doc.find_by context: :listing, style: 'source'
+  #   #=> Asciidoctor::Block@13136720 { context: :listing, content_model: :verbatim, style: "source", lines: 1 }
+  #
+  # Returns An Array of block nodes that match the given selector or nil if no matches are found
+  #--
+  # TODO support jQuery-style selector (e.g., image.thumb)
+  def find_by selector = {}, &block
+    result = []
+
+    if ((any_context = !(context_selector = selector[:context])) || context_selector == @context) &&
+        (!(style_selector = selector[:style]) || style_selector == @style) &&
+        (!(role_selector = selector[:role]) || has_role?(role_selector)) &&
+        (!(id_selector = selector[:id]) || id_selector == @id)
+      if id_selector
+        return [(block_given? && yield(self) ? self : self)]
+      else
+        result << (block_given? && yield(self) ? self : self)
+      end
+    end
+
+    # process document header as a section if present
+    if @context == :document && (any_context || context_selector == :section) && header?
+      result.concat(@header.find_by(selector, &block) || [])
+    end
+
+    # yuck, dlist is a special case
+    unless context_selector == :document # optimization
+      if @context == :dlist
+        if any_context || context_selector != :section # optimization
+          @blocks.flatten.each do |li|
+            result.concat(li.find_by(selector, &block) || [])
+          end
+        end
+      elsif
+        @blocks.each do |b|
+          next if (context_selector == :section && b.context != :section) # optimization
+          result.concat(b.find_by(selector, &block) || [])
+        end
+      end
+    end
+    result.empty? ? nil : result
+  end
+  alias :query :find_by
 
   # Public: Remove a substitution from this block
   #
