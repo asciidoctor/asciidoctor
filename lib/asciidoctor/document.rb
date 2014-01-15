@@ -526,6 +526,7 @@ class Document < AbstractBlock
   def has_header?
     @header ? true : false
   end
+  alias :header? :has_header?
 
   # Public: Append a content Block to this Document.
   #
@@ -616,6 +617,7 @@ class Document < AbstractBlock
 
   # Internal: Restore the attributes to the previously saved state
   def restore_attributes
+    # QUESTION shouldn't this be a dup in case we render again?
     @attributes = @original_attributes
   end
 
@@ -655,7 +657,7 @@ class Document < AbstractBlock
       @attributes[name] = apply_attribute_value_subs(value)
       @attributes_modified << name
       if name == 'backend'
-        update_backend_attributes()
+        update_backend_attributes
       end
       true
     end
@@ -713,7 +715,7 @@ class Document < AbstractBlock
   end
 
   # Public: Update the backend attributes to reflect a change in the selected backend
-  def update_backend_attributes()
+  def update_backend_attributes
     backend = @attributes['backend']
     if backend.start_with? 'xhtml'
       @attributes['htmlsyntax'] = 'xml'
