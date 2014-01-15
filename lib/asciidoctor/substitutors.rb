@@ -4,7 +4,13 @@ module Asciidoctor
 # the necessary substitutions.
 module Substitutors
 
-  #FEATURE_GSUB_REPLACEMENT_HASH = (RUBY_VERSION >= '1.9')
+  SPECIAL_CHARS = {
+    '&' => '&amp;',
+    '<' => '&lt;',
+    '>' => '&gt;'
+  }
+
+  SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
 
   SUBS = {
     :basic    => [:specialcharacters],
@@ -237,11 +243,9 @@ module Substitutors
   #
   # returns The String text with special characters replaced
   def sub_specialcharacters(text)
-    text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
-    #FEATURE_GSUB_REPLACEMENT_HASH ?
-    #  # replacement Hash only available in Ruby >= 1.9
-    #  text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS) :
-    #  text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
+    ::RUBY_MIN_VERSION_1_9 ?
+      text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS) :
+      text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
   end
   alias :sub_specialchars :sub_specialcharacters
 
@@ -1216,6 +1220,7 @@ module Substitutors
           end
 
           # FIXME stick these regexs into constants
+          # FIXME could use "nowrap" option here, which gives raw highlighting (what's inside <pre> tag)
           if linenums_mode == :table
             result = lexer.highlight(source, :options => opts).
                 sub(/<div class="pyhl">(.*)<\/div>/m, '\1').

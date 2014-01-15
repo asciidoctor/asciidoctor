@@ -102,18 +102,19 @@ class Table < AbstractBlock
   # returns nothing
   def create_columns(col_specs)
     total_width = 0
-    @columns = col_specs.inject([]) {|collector, col_spec|
+    cols = []
+    col_specs.each do |col_spec|
       total_width += col_spec['width']
-      collector << Column.new(self, collector.size, col_spec)
-      collector
-    }
-
-    if !@columns.empty?
-      @attributes['colcount'] = @columns.size
-      even_width = (100.0 / @columns.size).floor
-      @columns.each {|c| c.assign_width(total_width, even_width) }
+      cols << Column.new(self, cols.size, col_spec)
     end
 
+    if !cols.empty?
+      @attributes['colcount'] = cols.size
+      even_width = (100.0 / cols.size).floor
+      cols.each {|c| c.assign_width(total_width, even_width) }
+    end
+
+    @columns = cols
     nil
   end
 
