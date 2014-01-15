@@ -21,6 +21,10 @@ class List < AbstractBlock
     result
   end
 
+  def to_s
+    %(#{self.class}@#{object_id} { context: #{@context.inspect}, style: #{@style.inspect}, items: #{items.size} })
+  end
+
 end
 
 # Public: Methods for managing items for AsciiDoc olists, ulist, and dlists.
@@ -75,7 +79,7 @@ class ListItem < AbstractBlock
   end
 
   def to_s
-    "#@context [text:#@text, blocks:#{(@blocks || []).size}]"
+    %(#{self.class}@#{object_id} { list_context: #{parent.context.inspect}, text: #{@text.inspect}, blocks: #{(@blocks || []).size} })
   end
 
 end

@@ -17,6 +17,8 @@ class Reader
     def line_info
       %(#{path}: line #{lineno})
     end
+
+    alias :to_s :line_info
   end
 
   attr_reader :file

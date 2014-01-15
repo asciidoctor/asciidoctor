@@ -176,14 +176,11 @@ class Section < AbstractBlock
   end
 
   def to_s
-    if @title
-      if @numbered
-        %[#{super.to_s} - #{sectnum} #@title [blocks:#{@blocks.size}]]
-      else
-        %[#{super.to_s} - #@title [blocks:#{@blocks.size}]]
-      end
+    if @title != nil
+      qualified_title = @numbered ? %(#{sectnum} #{@title}) : @title
+      %(#{self.class}@#{object_id} { level: #{@level}, title: #{qualified_title.inspect}, blocks: #{@blocks.size} })
     else
-      super.to_s
+      super
     end
   end
 end

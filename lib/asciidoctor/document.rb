@@ -871,7 +871,7 @@ class Document < AbstractBlock
   end
 
   def to_s
-    %[#{super.to_s} - #{doctitle}]  
+    %(#{self.class}@#{object_id} { doctype: #{doctype.inspect}, doctitle: #{(@header != nil ? @header.title : nil).inspect}, blocks: #{@blocks.size} })
   end
 
 end
