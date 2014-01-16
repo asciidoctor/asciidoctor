@@ -140,7 +140,8 @@ class Document < AbstractBlock
       # attribute overrides are attributes that can only be set from the commandline
       # a direct assignment effectively makes the attribute a constant
       # a nil value or name with leading or trailing ! will result in the attribute being unassigned
-      @attribute_overrides = (options[:attributes] || {}).inject({}) do |collector,(key,value)|
+      overrides = {}
+      (options[:attributes] || {}).each do |key, value|
         if key.start_with?('!')
           key = key[1..-1]
           value = nil
@@ -148,9 +149,9 @@ class Document < AbstractBlock
           key = key[0..-2]
           value = nil
         end
-        collector[key.downcase] = value
-        collector
+        overrides[key.downcase] = value
       end
+      @attribute_overrides = overrides
       @safe = nil
       @renderer = nil
       initialize_extensions = Asciidoctor.const_defined?(:Extensions) &&

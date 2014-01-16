@@ -60,10 +60,7 @@ class Callouts
   #
   # Returns A space-separated String of callout ids associated with the specified list item
   def callout_ids(li_ordinal)
-    current_list.inject([]) {|collector, element|
-      collector << element[:id] if element[:ordinal] == li_ordinal
-      collector
-    } * ' '
+    current_list.map {|element| element[:ordinal] == li_ordinal ? %(#{element[:id]} ) : nil }.join.chop
   end
 
   # Public: The current list for which callouts are being collected

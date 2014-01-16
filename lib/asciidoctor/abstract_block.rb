@@ -172,10 +172,7 @@ class AbstractBlock < AbstractNode
   #
   # returns an Array of Section objects
   def sections
-    @blocks.inject([]) {|collector, block|
-      collector << block if block.context == :section
-      collector
-    }
+    @blocks.select {|block| block.context == :section }
   end
 
   # Public: Remove a substitution from this block

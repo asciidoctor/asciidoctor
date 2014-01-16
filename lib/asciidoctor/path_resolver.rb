@@ -350,19 +350,19 @@ class PathResolver
     end
 
     target_segments, target_root, _ = partition_path(target, true)
-    resolved_segments = target_segments.inject([]) do |accum, segment|
+    resolved_segments = []
+    target_segments.each do |segment|
       if segment == DOT_DOT
-        if accum.empty?
-          accum.push segment unless target_root && target_root != DOT
-        elsif accum[-1] == DOT_DOT
-          accum.push segment
+        if resolved_segments.empty?
+          resolved_segments << segment unless target_root && target_root != DOT
+        elsif resolved_segments.last == DOT_DOT
+          resolved_segments << segment
         else
-          accum.pop
+          resolved_segments.pop
         end
       else
-        accum.push segment
+        resolved_segments << segment
       end
-      accum
     end
 
     if uri_prefix.nil?
