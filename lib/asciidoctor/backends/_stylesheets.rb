@@ -276,7 +276,7 @@ p a > code:hover { color: #561309; }
 #toc ul { list-style-type: none; }
 #toctitle { color: #7a2518; }
 @media only screen and (min-width: 768px) { body.toc2 { padding-left: 15em; padding-right: 0; }
-  #toc.toc2 { position: fixed; width: 15em; left: 0; top: 0; border-right: 1px solid #ebebeb; border-bottom: 0; z-index: 1000; padding: 1em; height: 100%; overflow: auto; }
+  #toc.toc2 { position: fixed; width: 15em; left: 0; top: 0; border-right: 1px solid #ebebeb; border-bottom: 0; z-index: 1000; padding: 1em; height: 100%; overflow: auto; background: white;}
   #toc.toc2 #toctitle { margin-top: 0; font-size: 1.2em; }
   #toc.toc2 > ul { font-size: .90em; }
   #toc.toc2 ul ul { margin-left: 0; padding-left: 1em; }
