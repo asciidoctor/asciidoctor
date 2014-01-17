@@ -65,7 +65,7 @@ class Block < AbstractBlock
       else
         result.shift while !(first = result.first).nil? && first.rstrip.empty?
         result.pop while !(last = result.last).nil? && last.rstrip.empty?
-        result.join EOL
+        result * EOL
       end
     else
       warn "Unknown content model '#@content_model' for block: #{to_s}" unless @content_model == :empty
