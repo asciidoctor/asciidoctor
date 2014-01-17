@@ -261,8 +261,8 @@ module Substitutors
         result = result.gsub(pattern) { transform_quoted_text $~, type, scope }
       }
     else
-      # Use gsub! as optimization
-      result = text.dup
+      # NOTE using gsub! as optimization
+      result = %(#{text})
       QUOTE_SUBS.each {|type, scope, pattern|
         result.gsub!(pattern) { transform_quoted_text $~, type, scope }
       }
@@ -285,8 +285,8 @@ module Substitutors
         }
       }
     else
-      # Use gsub! as optimization
-      result = text.dup
+      # NOTE Using gsub! as optimization
+      result = %(#{text})
       REPLACEMENTS.each {|pattern, replacement, restore|
         result.gsub!(pattern) {
           do_replacement $~, replacement, restore
@@ -420,7 +420,7 @@ module Substitutors
     use_link_attrs = @document.attributes.has_key?('linkattrs')
     experimental = @document.attributes.has_key?('experimental')
 
-    result = source.dup
+    result = %(#{source})
 
     if experimental
       if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
