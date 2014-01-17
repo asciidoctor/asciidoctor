@@ -1213,23 +1213,25 @@ module Substitutors
             :line_numbers => (linenums_mode = (attr?('linenums') ? @document.attributes.fetch('coderay-linenums-mode', 'table').to_sym : nil)),
             :line_number_anchors => false}].highlight(source)
       when 'pygments'
-        lexer = ::Pygments::Lexer[attr('language')]
-        if lexer
+        if (lexer = ::Pygments::Lexer[attr('language')])
           opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
           opts[:noclasses] = true unless @document.attributes.fetch('pygments-css', 'class') == 'class'
           if attr? 'linenums'
-            opts[:linenos] = (linenums_mode = @document.attributes.fetch('pygments-linenums-mode', 'table').to_sym).to_s
-          end
-
-          # FIXME stick these regexs into constants
-          # FIXME could use "nowrap" option here, which gives raw highlighting (what's inside <pre> tag)
-          if linenums_mode == :table
-            result = lexer.highlight(source, :options => opts).
-                sub(/<div class="pyhl">(.*)<\/div>/m, '\1').
-                gsub(/<pre[^>]*>(.*?)<\/pre>\s*/m, '\1')
+            # TODO we could add the line numbers in ourselves instead of having to strip out the junk
+            # FIXME move these regular expressions into constants
+            if (opts[:linenos] = @document.attributes.fetch('pygments-linenums-mode', 'table')) == 'table'
+              # NOTE these subs clean out HTML that messes up our styles
+              result = lexer.highlight(source, :options => opts).
+                  sub(/<div class="pyhl">(.*)<\/div>/m, '\1').
+                  gsub(/<pre[^>]*>(.*?)<\/pre>\s*/m, '\1')
+            else
+              result = lexer.highlight(source, :options => opts).
+                  sub(/<div class="pyhl"><pre[^>]*>(.*?)<\/pre><\/div>/m, '\1')
+            end
           else
-            result = lexer.highlight(source, :options => opts).
-                sub(/<div class="pyhl"><pre[^>]*>(.*?)<\/pre><\/div>/m, '\1')
+            # nowrap gives us just the highlighted source; won't work when we need linenums though
+            opts[:nowrap] = true
+            result = lexer.highlight(source, :options => opts)
           end
         else
           result = source
