@@ -726,11 +726,13 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         address = m[0]
-        case address[0..0]
-        when '\\'
-          next address[1..-1]
-        when '>', ':'
-          next address
+        if (lead = m[1])
+          case lead
+          when '\\'
+            next address[1..-1]
+          else
+            next address
+          end
         end
 
         target = "mailto:#{address}"

@@ -566,7 +566,7 @@ module Asciidoctor
 
     # inline email address
     # doc.writer@asciidoc.org
-    :email_inline     => /[\\>:]?\w[\w.%+-]*@[#{CC_ALNUM}][#{CC_ALNUM}.-]*\.[#{CC_ALPHA}]{2,4}\b/,
+    :email_inline     => /([\\>:\/])?\w[\w.%+-]*@[#{CC_ALNUM}][#{CC_ALNUM}.-]*\.[#{CC_ALPHA}]{2,4}\b/,
 
     # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
     :lit_par          => /^(#{CC_BLANK}+.*)$/,

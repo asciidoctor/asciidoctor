@@ -63,6 +63,14 @@ context 'Links' do
     assert_xpath '//a', render_string('\http://asciidoc.org is the project page for AsciiDoc.'), 0
   end
 
+  test 'url in link macro with at (@) sign should not create mailto link' do
+    assert_xpath '//a[@href="http://xircles.codehaus.org/lists/dev@geb.codehaus.org"][text()="subscribe"]', render_string('http://xircles.codehaus.org/lists/dev@geb.codehaus.org[subscribe]')
+  end
+
+  test 'implicit url with at (@) sign should not create mailto link' do
+    assert_xpath '//a[@href="http://xircles.codehaus.org/lists/dev@geb.codehaus.org"][text()="http://xircles.codehaus.org/lists/dev@geb.codehaus.org"]', render_string('http://xircles.codehaus.org/lists/dev@geb.codehaus.org')
+  end
+
   test 'escaped inline qualified url using macro syntax should not create link' do
     assert_xpath '//a', render_string('\http://asciidoc.org[AsciiDoc] is the key to good docs.'), 0
   end
