@@ -841,7 +841,7 @@ module Asciidoctor
   #
   # returns the Asciidoctor::Document
   def self.load(input, options = {})
-    if (monitor = options.fetch(:monitor, false))
+    if (monitor = options[:monitor])
       start = ::Time.now.to_f
     end
 
@@ -864,7 +864,7 @@ module Asciidoctor
         accum[k] = v || ''
         accum
       end
-    elsif attrs.respond_to?('keys') && attrs.respond_to?('[]')
+    elsif attrs.respond_to?(:keys) && attrs.respond_to?(:[])
       # convert it to a Hash as we know it
       original_attrs = attrs
       attrs = options[:attributes] = {}
@@ -963,7 +963,7 @@ module Asciidoctor
     to_file = options.delete(:to_file)
     to_dir = options.delete(:to_dir)
     mkdirs = options.delete(:mkdirs) || false
-    monitor = options.fetch(:monitor, false)
+    monitor = options[:monitor]
 
     write_in_place = in_place && input.is_a?(::File)
     write_to_target = to_file || to_dir

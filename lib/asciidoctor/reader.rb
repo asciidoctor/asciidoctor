@@ -138,7 +138,7 @@ class Reader
   #
   # This method will probe the reader for more lines. If there is a next line
   # that has not previously been visited, the line is passed to the
-  # Reader#preprocess_line method to be initialized. This call gives
+  # Reader#process_line method to be initialized. This call gives
   # sub-classess the opportunity to do preprocessing. If the return value of
   # the Reader#process_line is nil, the data is assumed to be changed and
   # Reader#peek_line is invoked again to perform further processing.
