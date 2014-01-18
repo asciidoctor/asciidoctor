@@ -154,8 +154,7 @@ class Document < AbstractBlock
       @attribute_overrides = overrides
       @safe = nil
       @renderer = nil
-      initialize_extensions = Asciidoctor.const_defined?(:Extensions) &&
-          Asciidoctor.const_get(:Extensions) == ::Asciidoctor::Extensions
+      initialize_extensions = defined?(::Asciidoctor::Extensions)
       @extensions = nil # initialize furthur down
     end
 
