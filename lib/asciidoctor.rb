@@ -210,6 +210,12 @@ module Asciidoctor
   # The endline character to use when rendering output
   EOL = "\n"
 
+  # String for matching tab character
+  TAB = "\t"
+
+  # Regexp for replacing tab character
+  TAB_PATTERN = /\t/
+
   # The pattern to use for splitting lines
   LINE_SPLIT = /\n/
 

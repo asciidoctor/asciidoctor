@@ -112,7 +112,7 @@ class Lexer
       end
       document.attributes['doctitle'] = section_title = doctitle
       # QUESTION: should the id assignment on Document be encapsulated in the Document class?
-      if document.id.nil? && block_attributes.has_key?('id')
+      if document.id.nil?
         document.id = block_attributes.delete('id')
       end
       parse_header_metadata(reader, document)
@@ -145,7 +145,7 @@ class Lexer
       document.attributes['mantitle'] = document.sub_attributes(m[1].rstrip.downcase)
       document.attributes['manvolnum'] = m[2].strip
     else
-      warn "asciidoctor: ERROR: #{reader.prev_line_info}: malformed manpage title"
+      warn %(asciidoctor: ERROR: #{reader.prev_line_info}: malformed manpage title)
     end
 
     reader.skip_blank_lines
@@ -161,16 +161,16 @@ class Lexer
 
           if document.backend == 'manpage'
             document.attributes['docname'] = document.attributes['manname']
-            document.attributes['outfilesuffix'] = ".#{document.attributes['manvolnum']}"
+            document.attributes['outfilesuffix'] = %(.#{document.attributes['manvolnum']})
           end
         else
-          warn "asciidoctor: ERROR: #{reader.prev_line_info}: malformed name section body"
+          warn %(asciidoctor: ERROR: #{reader.prev_line_info}: malformed name section body)
         end
       else
-        warn "asciidoctor: ERROR: #{reader.prev_line_info}: name section title must be at level 1"
+        warn %(asciidoctor: ERROR: #{reader.prev_line_info}: name section title must be at level 1)
       end
     else
-      warn "asciidoctor: ERROR: #{reader.prev_line_info}: name section expected"
+      warn %(asciidoctor: ERROR: #{reader.prev_line_info}: name section expected)
     end
   end
 
@@ -279,18 +279,18 @@ class Lexer
         next_level += section.document.attr('leveloffset', 0).to_i
         if next_level > current_level || (section.context == :document && next_level == 0)
           if next_level == 0 && doctype != 'book'
-            warn "asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections"
+            warn %(asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections)
           elsif !expected_next_levels.nil? && !expected_next_levels.include?(next_level)
-            warn "asciidoctor: WARNING: #{reader.line_info}: section title out of sequence: " +
-                "expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, " +
-                "got level #{next_level}"
+            warn %(asciidoctor: WARNING: #{reader.line_info}: section title out of sequence: ) +
+                %(expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, ) +
+                %(got level #{next_level})
           end
           # the attributes returned are those that are orphaned
           new_section, attributes = next_section(reader, section, attributes)
           section << new_section
         else
           if next_level == 0 && doctype != 'book'
-            warn "asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections"
+            warn %(asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections)
           end
           # close this section (and break out of the nesting) to begin a new one
           break
@@ -299,7 +299,7 @@ class Lexer
         # just take one block or else we run the risk of overrunning section boundaries
         block_line_info = reader.line_info
         new_block = next_block(reader, (intro || section), attributes, :parse_metadata => false)
-        if !new_block.nil?
+        unless new_block.nil?
           # REVIEW this may be doing too much
           if part
             if !section.blocks?
@@ -322,7 +322,7 @@ class Lexer
               # open the [partintro] open block for appending
               if !intro && first_block.content_model == :compound
                 #new_block.parent = (intro = first_block)
-                warn "asciidoctor: ERROR: #{block_line_info}: illegal block content outside of partintro block"
+                warn %(asciidoctor: ERROR: #{block_line_info}: illegal block content outside of partintro block)
               # rebuild [partintro] paragraph as an open block
               elsif first_block.content_model != :compound
                 intro = Block.new section, :open, :content_model => :compound
@@ -342,9 +342,9 @@ class Lexer
 
           (intro || section) << new_block
           attributes = {}
-        else
-          # don't clear attributes if we don't find a block because they may
-          # be trailing attributes that didn't get associated with a block
+        #else
+        #  # don't clear attributes if we don't find a block because they may
+        #  # be trailing attributes that didn't get associated with a block
         end
       end
 
@@ -353,7 +353,7 @@ class Lexer
 
     if part
       unless section.blocks? && section.blocks.last.context == :section
-        warn "asciidoctor: ERROR: #{reader.line_info}: invalid part, must have at least one section (e.g., chapter, appendix, etc.)"
+        warn %(asciidoctor: ERROR: #{reader.line_info}: invalid part, must have at least one section (e.g., chapter, appendix, etc.))
       end
     # NOTE we could try to avoid creating a preamble in the first place, though
     # that would require reworking assumptions in next_section since the preamble
@@ -467,7 +467,7 @@ class Lexer
           elsif block_extensions && extensions.processor_registered_for_block?(style, block_context)
             block_context = style.to_sym
           else
-            warn "asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for #{block_context} block: #{style}"
+            warn %(asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for #{block_context} block: #{style})
             style = block_context.to_s
           end
         end
@@ -582,7 +582,7 @@ class Lexer
               # might want to move this check to a validate method
               if match[1].to_i != expected_index
                 # FIXME this lineno - 2 hack means we need a proper look-behind cursor
-                warn "asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: callout list item index: expected #{expected_index} got #{match[1]}"
+                warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: callout list item index: expected #{expected_index} got #{match[1]})
               end
               list_item = next_list_item(reader, block, match)
               expected_index += 1
@@ -593,7 +593,7 @@ class Lexer
                   list_item.attributes['coids'] = coids
                 else
                   # FIXME this lineno - 2 hack means we need a proper look-behind cursor
-                  warn "asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: no callouts refer to list item #{block.items.size}"
+                  warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: no callouts refer to list item #{block.items.size})
                 end
               end
             end while reader.has_more_lines? && match = reader.peek_line.match(REGEXP[:colist])
@@ -649,7 +649,7 @@ class Lexer
 
           # FIXME create another set for "passthrough" styles
           # FIXME make this more DRY!
-          elsif !style.nil? && style != 'normal'
+          elsif style && style != 'normal'
             if PARAGRAPH_STYLES.include?(style)
               block_context = style.to_sym
               cloaked_context = :paragraph
@@ -669,7 +669,7 @@ class Lexer
               # advance to block parsing =>
               break
             else
-              warn "asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for paragraph: #{style}"
+              warn %(asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for paragraph: #{style})
               style = nil
               # continue to process paragraph
             end
@@ -732,7 +732,7 @@ class Lexer
               lines[0] = admonition_match.post_match.lstrip
               attributes['style'] = admonition_match[1]
               attributes['name'] = admonition_name = admonition_match[1].downcase
-              attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
+              attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
               block = Block.new(parent, :admonition, :source => lines, :attributes => attributes)
             elsif !text_only && Compliance.markdown_syntax && first_line.start_with?('> ')
               lines.map! {|line|
@@ -773,7 +773,7 @@ class Lexer
               #block << Block.new(block, :paragraph, :source => lines)
             else
               # if [normal] is used over an indented paragraph, unindent it
-              if style == 'normal' && ((first_char = lines.first[0..0]) == ' ' || first_char == "\t")
+              if style == 'normal' && ((first_char = lines.first[0..0]) == ' ' || first_char == TAB)
                 first_line = lines.first
                 first_line_shifted = first_line.lstrip
                 indent = line_length(first_line) - line_length(first_line_shifted)
@@ -802,7 +802,7 @@ class Lexer
         case block_context
         when :admonition
           attributes['name'] = admonition_name = style.downcase
-          attributes['caption'] ||= document.attributes["#{admonition_name}-caption"]
+          attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :comment
@@ -872,7 +872,7 @@ class Lexer
             return nil if block.nil?
           else
             # this should only happen if there's a misconfiguration
-            raise "Unsupported block type #{block_context} at #{reader.line_info}"
+            raise %(Unsupported block type #{block_context} at #{reader.line_info})
           end
         end
       end
@@ -882,9 +882,8 @@ class Lexer
     # blocks or trailing attribute lists could leave us without a block,
     # so handle accordingly
     # REVIEW we may no longer need this nil check
-    if !block.nil?
+    unless block.nil?
       # REVIEW seems like there is a better way to organize this wrap-up
-      block.id      ||= attributes['id'] if attributes.has_key?('id')
       block.title     = attributes['title'] unless block.title?
       block.caption ||= attributes.delete('caption')
       # TODO eventualy remove the style attribute from the attributes hash
@@ -892,9 +891,9 @@ class Lexer
       block.style     = attributes['style']
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
-      if block.id
+      if (block_id = (block.id ||= attributes['id']))
         # TODO sub reftext
-        document.register(:ids, [block.id, (attributes['reftext'] || (block.title? ? block.title : nil))])
+        document.register(:ids, [block_id, (attributes['reftext'] || (block.title? ? block.title : nil))])
       end
       block.update_attributes(attributes)
       block.lock_in_subs
@@ -1528,7 +1527,7 @@ class Lexer
       section.special = true
       # HACK needs to be refactored so it's driven by config
       if section.sectname == 'abstract' && document.doctype == 'book'
-        section.sectname = "sect1"
+        section.sectname = 'sect1'
         section.special = false
         section.level = 1
       end
@@ -1536,7 +1535,7 @@ class Lexer
       section.special = true
       section.sectname = 'synopsis'
     else
-      section.sectname = "sect#{section.level}"
+      section.sectname = %(sect#{section.level})
     end
 
     if section.id.nil? && (id = attributes['id'])
@@ -1821,10 +1820,10 @@ class Lexer
         author_metadata = process_authors author_line, true
       else
         authors = []
-        author_key = "author_#{authors.size + 1}"
+        author_key = %(author_#{authors.size + 1})
         while document.attributes.has_key? author_key
           authors << document.attributes[author_key]
-          author_key = "author_#{authors.size + 1}"
+          author_key = %(author_#{authors.size + 1})
         end
         if authors.size == 1
           # do not allow multiple, process as names only
@@ -1870,7 +1869,7 @@ class Lexer
         end
       else
         keys.each do |key|
-          key_map[key.to_sym] = "#{key}_#{idx + 1}"
+          key_map[key.to_sym] = %(#{key}_#{idx + 1})
         end
       end
 
@@ -1907,13 +1906,13 @@ class Lexer
       # only assign the _1 attributes if there are multiple authors
       if idx == 1
         keys.each do |key|
-          author_metadata["#{key}_1"] = author_metadata[key] if author_metadata.has_key? key
+          author_metadata[%(#{key}_1)] = author_metadata[key] if author_metadata.has_key? key
         end
       end
       if idx.zero?
         author_metadata['authors'] = author_metadata[key_map[:author]]
       else
-        author_metadata['authors'] = "#{author_metadata['authors']}, #{author_metadata[key_map[:author]]}"
+        author_metadata['authors'] = %(#{author_metadata['authors']}, #{author_metadata[key_map[:author]]})
       end
     end
 
@@ -2006,16 +2005,16 @@ class Lexer
     match ||= reader.has_more_lines? ? reader.peek_line.match(REGEXP[:attr_entry]) : nil
     if match
       name = match[1]
-      value = match[2].nil? ? '' : match[2]
+      value = match[2] || ''
       if value.end_with? LINE_BREAK
         value = value.chop.rstrip
         while reader.advance
           next_line = reader.peek_line.strip
           break if next_line.empty?
           if next_line.end_with? LINE_BREAK
-            value = "#{value} #{next_line.chop.rstrip}"
+            value = %(#{value} #{next_line.chop.rstrip})
           else
-            value = "#{value} #{next_line}"
+            value = %(#{value} #{next_line})
             break
           end
         end
@@ -2146,7 +2145,7 @@ class Lexer
     end
 
     if validate && expected != actual
-      warn "asciidoctor: WARNING: #{reader.line_info}: list item index: expected #{expected}, got #{actual}"
+      warn %(asciidoctor: WARNING: #{reader.line_info}: list item index: expected #{expected}, got #{actual})
     end
 
     marker
@@ -2439,7 +2438,7 @@ class Lexer
       save_current = lambda {
         if collector.empty?
           if type != :style
-            warn "asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} invalid empty #{type} detected in style attribute"
+            warn %(asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} invalid empty #{type} detected in style attribute)
           end
         else
           case type
@@ -2448,7 +2447,7 @@ class Lexer
             parsed[type].push collector.join
           when :id
             if parsed.has_key? :id
-              warn "asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} multiple ids detected in style attribute"
+              warn %(asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} multiple ids detected in style attribute)
             end
             parsed[type] = collector.join
           else
@@ -2496,7 +2495,7 @@ class Lexer
 
         if parsed.has_key? :option
           (options = parsed[:option]).each do |option|
-            attributes["#{option}-option"] = ''
+            attributes[%(#{option}-option)] = ''
           end
           if (existing_opts = attributes['options'])
             attributes['options'] = (options + existing_opts.split(',')) * ',' 
@@ -2558,9 +2557,9 @@ class Lexer
     offsets = lines.map do |line|
       # break if the first char is non-whitespace
       break [] unless line[0..0].lstrip.empty?
-      if line.include? "\t"
+      if line.include? TAB
         tab_detected = true
-        line = line.gsub("\t", tab_expansion)
+        line = line.gsub(TAB_PATTERN, tab_expansion)
       end
       if (flush_line = line.lstrip).empty?
         nil
@@ -2574,7 +2573,7 @@ class Lexer
     unless offsets.empty? || (offsets = offsets.compact).empty?
       if (offset = offsets.min) > 0
         lines.map! {|line|
-          line = line.gsub("\t", tab_expansion) if tab_detected
+          line = line.gsub(TAB_PATTERN, tab_expansion) if tab_detected
           line[offset..-1].to_s
         }
       end
