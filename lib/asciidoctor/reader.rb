@@ -183,7 +183,7 @@ class Reader
   def peek_lines num = 1, direct = true
     old_look_ahead = @look_ahead
     result = []
-    (1..num).each do
+    num.times do
       if (line = read_line direct)
         result << line
       else
