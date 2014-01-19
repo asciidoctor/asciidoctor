@@ -1,28 +1,8 @@
 module Asciidoctor
+  # FIXME move these into a base DocBook template or other helper class
   class BaseTemplate
-    def tag(name, key, dynamic = false)
-      type = key.is_a?(Symbol) ? :attr : :var
-      key = key.to_s
-      if type == :attr
-        key_str = dynamic ? %("#{key}") : "'#{key}'"
-        # example: <% if attr? 'foo' %><bar><%= attr 'foo' %></bar><% end %>
-        %(<% if attr? #{key_str} %><#{name}><%= attr #{key_str} %></#{name}><% end %>)
-      else
-        # example: <% unless foo.to_s.empty? %><bar><%= foo %></bar><% end %>
-        %(<% unless #{key}.to_s.empty? %><#{name}><%= #{key} %></#{name}><% end %>)
-      end
-    end
-
     def title_element node, optional = true
       !optional || node.title? ? %(<title>#{node.title}</title>\n) : nil
-    end
-
-    def title_tag(optional = true)
-      if optional
-        %(<%= title? ? "\n<title>\#{title}</title>" : nil %>)
-      else
-        %(\n<title><%= title %></title>)
-      end
     end
 
     def common_attrs id, role = nil, reftext = nil
@@ -39,107 +19,105 @@ module Asciidoctor
       res
     end
 
-    def common_attrs_erb
-      %q(<%= template.common_attrs(@id, role, reftext) %>)
-    end
-
+    # QUESTION should we remove this method?
     def content(node)
       node.blocks? ? node.content : "<simpara>#{node.content}</simpara>"
-    end
-
-    def content_erb
-      %q(<%= blocks? ? content : "<simpara>#{content}</simpara>" %>)
     end
   end
 
 module DocBook45
 class DocumentTemplate < BaseTemplate
-  def title_tags(str)
-    if str.include?(': ')
-      title, _, subtitle = str.rpartition(': ')
+  def result doc
+    result_buffer = []
+    root_tag_name = doc.doctype
+    result_buffer << '<?xml version="1.0" encoding="UTF-8"?>'
+    result_buffer << %(<!DOCTYPE #{root_tag_name} PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">)
+    result_buffer << '<?asciidoc-toc?>' if doc.attr? 'toc'
+    result_buffer << '<?asciidoc-numbered?>' if doc.attr? 'numbered'
+    lang_attribute = (doc.attr? 'nolang') ? nil : %( lang="#{doc.attr 'lang', 'en'}")
+    result_buffer << %(<#{root_tag_name}#{namespace_attributes doc}#{lang_attribute}>)
+    result_buffer << (docinfo_header doc, root_tag_name)
+    result_buffer << doc.content if doc.blocks?
+    unless (user_docinfo_footer = doc.docinfo :footer).empty?
+      result_buffer << user_docinfo_footer
+    end
+    result_buffer << %(</#{root_tag_name}>)
+
+    result_buffer * EOL
+  end
+
+  def namespace_attributes doc
+    (doc.attr? 'noxmlns') ? nil : ' xmlns="http://docbook.org/ns/docbook"'
+  end
+
+  def docinfo_header doc, info_tag_prefix = ''
+    result_buffer = []
+    result_buffer << %(<#{info_tag_prefix}info>)
+    result_buffer << (doc.header? ? (title_tags doc.header.title) : %(<title>#{doc.attr 'untitled-label'}</title>)) unless doc.notitle
+    result_buffer << %(<date>#{(doc.attr? 'revdate') ? (doc.attr 'revdate') : (doc.attr 'docdate')}</date>)
+    if doc.has_header?
+      if doc.attr? 'author'
+        if (authorcount = (doc.attr 'authorcount').to_i) < 2
+          result_buffer << (author doc)
+          result_buffer << %(<authorinitials>#{doc.attr 'authorinitials'}</authorinitials>) if doc.attr? 'authorinitials'
+        else
+          result_buffer << '<authorgroup>'
+          authorcount.times do |index|
+            result_buffer << (author doc, index + 1)
+          end
+          result_buffer << '</authorgroup>'
+        end
+      end
+      if (doc.attr? 'revdate') && ((doc.attr? 'revnumber') || (doc.attr? 'revremark'))
+        result_buffer << %(<revhistory>
+<revision>)
+        result_buffer << %(<revnumber>#{doc.attr 'revnumber'}</revnumber>) if doc.attr? 'revnumber'
+        result_buffer << %(<date>#{doc.attr 'revdate'}</date>) if doc.attr? 'revdate'
+        result_buffer << %(<authorinitials>#{doc.attr 'authorinitials'}</authorinitials>) if doc.attr? 'authorinitials'
+        result_buffer << %(<revremark>#{doc.attr 'revremark'}</revremark>) if doc.attr? 'revremark'
+        result_buffer << %(</revision>
+</revhistory>)
+      end
+      unless (user_docinfo_header = doc.docinfo :header).empty?
+        result_buffer << user_docinfo_header
+      end
+      result_buffer << %(<orgname>#{doc.attr 'orgname'}</orgname>) if doc.attr? 'orgname'
+    end
+    result_buffer << %(</#{info_tag_prefix}info>)
+
+    result_buffer * EOL
+  end
+
+  # FIXME this splitting should handled in the AST!
+  def title_tags title
+    if title.include? ': '
+      title, _, subtitle = title.rpartition ': '
       %(<title>#{title}</title>
 <subtitle>#{subtitle}</subtitle>)
     else
-      %(<title>#{str}</title>)
+      %(<title>#{title}</title>)
     end
   end
 
-  def docinfo
-    <<-EOF
-<% unless notitle %><%= has_header? ? template.title_tags(@header.title) : %(<title>\#{attr 'untitled-label'}</title>) %><% end
-if attr? :revdate %>
-<date><%= attr :revdate %></date><%
-else %>
-<date><%= attr :docdate %></date><%
-end
-if has_header?
-  if attr? :author
-    if (attr :authorcount).to_i < 2 %>
-#{author}
-#{tag 'authorinitials', :authorinitials}<%
-    else %>
-<authorgroup><%
-      (1..((attr :authorcount).to_i)).each do |idx| %>
-#{author true}<%
-      end %>
-</authorgroup><%
-    end
-  end
-  if (attr? :revdate) && ((attr? :revnumber) || (attr? :revremark)) %>
-<revhistory>
-<revision>
-#{tag 'revnumber', :revnumber}
-#{tag 'date', :revdate}
-#{tag 'authorinitials', :authorinitials}
-#{tag 'revremark', :revremark}
-</revision>
-</revhistory><%
-  end %>
-<%= docinfo %>
-#{tag 'orgname', :orgname}<%
-end %>
-    EOF
-  end
+  def author doc, index = nil
+    firstname_key = index ? %(firstname_#{index}) : 'firstname'
+    middlename_key = index ? %(middlename_#{index}) : 'middlename'
+    lastname_key = index ? %(lastname_#{index}) : 'lastname'
+    email_key = index ? %(email_#{index}) : 'email'
 
-  def author indexed = false
-    <<-EOF
-<author>
-#{tag 'firstname', indexed ? :"firstname_\#{idx}" : :firstname, indexed}
-#{tag 'othername', indexed ? :"middlename_\#{idx}" : :middlename, indexed}
-#{tag 'surname', indexed ? :"lastname_\#{idx}" : :lastname, indexed}
-#{tag 'email', indexed ? :"email_\#{idx}" : :email, indexed}
-</author>
-    EOF
+    result_buffer = []
+    result_buffer << '<author>'
+    result_buffer << %(<firstname>#{doc.attr firstname_key}</firstname>) if doc.attr? firstname_key
+    result_buffer << %(<othername>#{doc.attr middlename_key}</othername>) if doc.attr? middlename_key
+    result_buffer << %(<surname>#{doc.attr lastname_key}</surname>) if doc.attr? lastname_key
+    result_buffer << %(<email>#{doc.attr email_key}</email>) if doc.attr? email_key
+    result_buffer << '</author>'
+
+    result_buffer * EOL
   end
 
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE <%= doctype %> PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"><%
-if attr? :toc %>
-<?asciidoc-toc?><%
-end
-if attr? :numbered %>
-<?asciidoc-numbered?><%
-end
-if doctype == 'book' %>
-<book<% unless attr? :noxmlns %> xmlns="http://docbook.org/ns/docbook"<% end %><% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
-<bookinfo>
-#{docinfo}
-</bookinfo>
-<%= content %><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
-\#{docinfo_content}) %>
-</book><%
-else %>
-<article<% unless attr? :noxmlns %> xmlns="http://docbook.org/ns/docbook"<% end %><% unless attr? :nolang %> lang="<%= attr :lang, 'en' %>"<% end %>>
-<articleinfo>
-#{docinfo}
-</articleinfo>
-<%= content %><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
-\#{docinfo_content}) %>
-</article><%
-end %>
-    EOF
+    :invoke_result
   end
 end
 
@@ -172,14 +150,14 @@ end
 class SectionTemplate < BaseTemplate
   def result sec
     if sec.special
-      tag = sec.level <= 1 ? sec.sectname : 'section'
+      tag_name = sec.level <= 1 ? sec.sectname : 'section'
     else
-      tag = sec.document.doctype == 'book' && sec.level <= 1 ? (sec.level == 0 ? 'part' : 'chapter') : 'section'
+      tag_name = sec.document.doctype == 'book' && sec.level <= 1 ? (sec.level == 0 ? 'part' : 'chapter') : 'section'
     end
-    %(<#{tag}#{common_attrs sec.id, sec.role, sec.reftext}>
+    %(<#{tag_name}#{common_attrs sec.id, sec.role, sec.reftext}>
 <title>#{sec.title}</title>
 #{sec.content}
-</#{tag}>)
+</#{tag_name}>)
   end
 
   def template

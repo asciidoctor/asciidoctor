@@ -5,44 +5,31 @@ module Asciidoctor
 
 module DocBook5
 class DocumentTemplate < DocBook45::DocumentTemplate
-  def author indexed = false
-    <<-EOF
-<author>
-<personname>
-#{tag 'firstname', indexed ? :"firstname_\#{idx}" : :firstname, indexed}
-#{tag 'othername', indexed ? :"middlename_\#{idx}" : :middlename, indexed}
-#{tag 'surname', indexed ? :"lastname_\#{idx}" : :lastname, indexed}
-</personname>
-#{tag 'email', indexed ? :"email_\#{idx}" : :email, indexed}
-</author>
-    EOF
+  def namespace_attributes doc
+    ' xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"'
   end
 
-  def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><?xml version="1.0" encoding="UTF-8"?><%
-if attr? :toc %>
-<?asciidoc-toc?><%
-end
-if attr? :numbered %>
-<?asciidoc-numbered?><%
-end
-if doctype == 'book' %>
-<book xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"<% unless attr? :nolang %> xml:lang="<%= attr :lang, 'en' %>"<% end %>>
-<info>
-#{docinfo}
-</info>
-<%= content.chomp %>
-</book><%
-else %>
-<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"<% unless attr? :nolang %> xml:lang="<%= attr :lang, 'en' %>"<% end %>>
-<info>
-#{docinfo}
-</info>
-<%= content.chomp %>
-</article><%
-end %>
-    EOF
+  def docinfo_header doc, info_tag_prefix
+    super doc
+  end
+
+  def author doc, index = nil
+    firstname_key = index ? %(firstname_#{index}) : 'firstname'
+    middlename_key = index ? %(middlename_#{index}) : 'middlename'
+    lastname_key = index ? %(lastname_#{index}) : 'lastname'
+    email_key = index ? %(email_#{index}) : 'email'
+
+    result_buffer = []
+    result_buffer << '<author>'
+    result_buffer << '<personname>'
+    result_buffer << %(<firstname>#{doc.attr firstname_key}</firstname>) if doc.attr? firstname_key
+    result_buffer << %(<othername>#{doc.attr middlename_key}</othername>) if doc.attr? middlename_key
+    result_buffer << %(<surname>#{doc.attr lastname_key}</surname>) if doc.attr? lastname_key
+    result_buffer << '</personname>'
+    result_buffer << %(<email>#{doc.attr email_key}</email>) if doc.attr? email_key
+    result_buffer << '</author>'
+
+    result_buffer * EOL
   end
 end
 class EmbeddedTemplate < DocBook45::EmbeddedTemplate; end

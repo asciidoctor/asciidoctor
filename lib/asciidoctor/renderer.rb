@@ -31,10 +31,6 @@ class Renderer
     end
     case backend
     when 'html5', 'docbook45', 'docbook5'
-      eruby = nil
-      unless backend == 'html5'
-        eruby = load_eruby(options[:eruby])
-      end
       require 'asciidoctor/backends/base_template'
       require "asciidoctor/backends/#{backend}"
       # Load up all the template classes that we know how to render for this backend
@@ -42,7 +38,7 @@ class Renderer
         if tc.to_s.downcase.include?('::' + backend + '::') # optimization
           view_name, view_backend = self.class.extract_view_mapping(tc)
           if view_backend == backend
-            @views[view_name] = tc.new(view_name, backend, eruby)
+            @views[view_name] = tc.new(view_name, backend)
           end
         end
       end
@@ -53,7 +49,6 @@ class Renderer
     # If user passed in a template dir, let them override our base templates
     if (template_dirs = options.delete(:template_dirs))
       Helpers.require_library 'tilt'
-      load_eruby options[:eruby] if backend == 'html5'
 
       # chomp result when using custom templates since template engines
       # tend to add a trailing newline character
@@ -78,7 +73,7 @@ class Renderer
         view_opts[:haml][:format] = view_opts[:slim][:format] = :html5
       end
 
-      slim_loaded = false
+      eruby = nil
       path_resolver = PathResolver.new
       engine = options[:template_engine]
 
@@ -119,9 +114,11 @@ class Renderer
           next if name_parts.size < 2
           view_name = name_parts.first 
           ext_name = name_parts.last
-          if ext_name == 'slim' && !slim_loaded
-            # slim doesn't get loaded by Tilt
-            Helpers.require_library 'slim'
+          if ext_name == 'slim'
+            # slim doesn't get loaded by Tilt, so we have to load it explicitly
+            Helpers.require_library 'slim' unless defined? ::Slim
+          elsif ext_name == 'erb'
+            eruby = load_eruby options[:eruby] unless eruby
           end
           next unless Tilt.registered? ext_name
           opts = view_opts[ext_name.to_sym]

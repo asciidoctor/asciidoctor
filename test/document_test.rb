@@ -688,6 +688,9 @@ text
       assert Asciidoctor::DocBook5.const_defined?(:DocumentTemplate)
     end
 
+# NOTE The eruby tests are no longer relevant as we no longer use ERB internally
+# These should be rewritten to test the selection of ERB for use with the template renderer
+=begin
     test 'eRuby implementation should default to ERB' do
       # intentionally use built-in templates for this test
       doc = Asciidoctor::Document.new [], :backend => 'docbook', :header_footer => true
@@ -713,6 +716,7 @@ text
       assert_equal 'Erubis::FastEruby', views['document'].eruby.to_s
       assert_equal 'Erubis::FastEruby', views['document'].template.class.to_s
     end
+=end
   end
 
   context 'Structure' do

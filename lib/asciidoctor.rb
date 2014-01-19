@@ -58,7 +58,6 @@ module Asciidoctor
   unless ::RUBY_ENGINE_OPAL
     # .chomp keeps Opal from trying to load the library
     ::Object.autoload :Base64,        'base64'.chomp
-    ::Object.autoload :ERB,           'erb'.chomp
     ::Object.autoload :FileUtils,     'fileutils'.chomp
     ::Object.autoload :OpenURI,       'open-uri'.chomp
     #::Object.autoload :Set,           'set'.chomp

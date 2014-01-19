@@ -9,12 +9,10 @@ class BaseTemplate
 
   attr_reader :view
   attr_reader :backend
-  attr_reader :eruby
 
-  def initialize(view, backend, eruby = 'erb')
+  def initialize(view, backend)
     @view = view
     @backend = backend
-    @eruby = eruby
   end
 
   def self.inherited(klass)
@@ -89,18 +87,6 @@ class BaseTemplate
 
   def template
     raise "You chilluns need to make your own template"
-  end
-
-  # create template matter to insert an attribute if the variable has a value
-  def attribute(name, key)
-    type = key.is_a?(Symbol) ? :attr : :var
-    if type == :attr
-      # example: <% if attr? 'foo' %> bar="<%= attr 'foo' %>"<% end %>
-      %(<% if attr? '#{key}' %> #{name}="<%= attr '#{key}' %>"<% end %>)
-    else
-      # example: <% if foo %> bar="<%= foo %>"<% end %>
-      %(<% if #{key} %> #{name}="<%= #{key} %>"<% end %>)
-    end
   end
 end
 

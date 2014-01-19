@@ -4,6 +4,7 @@ module Asciidoctor
 module HTML5
 
 class DocumentTemplate < BaseTemplate
+  # FIXME make this outline generic
   def self.outline(node, to_depth = 2, sectnumlevels = nil)
     sectnumlevels = (node.document.attr 'sectnumlevels', 3).to_i if sectnumlevels.nil?
     toc_level_buffer = []
