@@ -467,6 +467,12 @@ context 'Substitutions' do
           para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'a single-line image macro with text and dimensions should be interpreted as an image with alt text and dimensions in docbook' do
+      para = block_from_string 'image:tiger.png[Tiger, 200, 100]', :backend => 'docbook'
+      assert_equal %{<inlinemediaobject><imageobject><imagedata fileref="tiger.png" contentwidth="200" contentdepth="100"/></imageobject><textobject><phrase>Tiger</phrase></textobject></inlinemediaobject>},
+          para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'a single-line image macro with text and link should be interpreted as a linked image with alt text' do
       para = block_from_string('image:tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]')
       assert_equal %{<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger"><img src="tiger.png" alt="Tiger"></a></span>},

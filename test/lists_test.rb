@@ -2452,6 +2452,21 @@ term:: def
       assert_xpath '(//table/colgroup/col)[2][@style="width:75%;"]', output, 1
     end
 
+    test 'should set col widths of item and label in docbook if specified' do
+      input = <<-EOS
+[horizontal]
+[labelwidth="25", itemwidth="75"]
+term:: def
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_css 'informaltable', output, 1
+      assert_css 'informaltable > tgroup', output, 1
+      assert_css 'informaltable > tgroup > colspec', output, 2
+      assert_xpath '(/informaltable/tgroup/colspec)[1][@colwidth="25*"]', output, 1
+      assert_xpath '(/informaltable/tgroup/colspec)[2][@colwidth="75*"]', output, 1
+    end
+
     test 'should add strong class to label if strong option is set' do
       input = <<-EOS
 [horizontal, options="strong"]

@@ -25,7 +25,7 @@ module Asciidoctor
       end
     end
 
-    def common_attrs id, role, reftext
+    def common_attrs id, role = nil, reftext = nil
       res = ''
       if id
         res = (@backend == 'docbook5' ? %( xml:id="#{id}") : %( id="#{id}"))
@@ -150,13 +150,7 @@ class EmbeddedTemplate < BaseTemplate
 end
 
 class BlockTocTemplate < BaseTemplate
-  def result(node)
-    ''
-  end
-
-  def template
-    :invoke_result
-  end
+  include EmptyTemplate
 end
 
 class BlockPreambleTemplate < BaseTemplate
@@ -176,14 +170,14 @@ class BlockPreambleTemplate < BaseTemplate
 end
 
 class SectionTemplate < BaseTemplate
-  def result(sec)
+  def result sec
     if sec.special
       tag = sec.level <= 1 ? sec.sectname : 'section'
     else
       tag = sec.document.doctype == 'book' && sec.level <= 1 ? (sec.level == 0 ? 'part' : 'chapter') : 'section'
     end
-    %(<#{tag}#{common_attrs(sec.id, sec.role, sec.reftext)}>
-#{sec.title? ? "<title>#{sec.title}</title>" : nil}
+    %(<#{tag}#{common_attrs sec.id, sec.role, sec.reftext}>
+<title>#{sec.title}</title>
 #{sec.content}
 </#{tag}>)
   end
@@ -204,7 +198,7 @@ class BlockFloatingTitleTemplate < BaseTemplate
 end
 
 class BlockParagraphTemplate < BaseTemplate
-  def result(node)
+  def result node
     if node.title?
       %(<formalpara#{common_attrs node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
@@ -233,35 +227,42 @@ class BlockAdmonitionTemplate < BaseTemplate
 end
 
 class BlockUlistTemplate < BaseTemplate
+  def result node
+    result_buffer = []
+    if node.style == 'bibliography'
+      result_buffer << %(<bibliodiv#{common_attrs node.id, node.role, node.reftext}>)
+      result_buffer << %(<title>#{node.title}</title>) if node.title?
+      node.items.each do |item|
+        result_buffer << '<bibliomixed>'
+        result_buffer << %(<bibliomisc>#{item.text}</bibliomisc>)
+        result_buffer << item.content if item.blocks?
+        result_buffer << '</bibliomixed>'
+      end
+      result_buffer << '</bibliodiv>'
+    else
+      mark_type = (checklist = node.option? 'checklist') ? 'none' : node.style
+      mark_attribute = mark_type ? %( mark="#{mark_type}") : nil
+      result_buffer << %(<itemizedlist#{common_attrs node.id, node.role, node.reftext}#{mark_attribute}>)
+      result_buffer << %(<title>#{node.title}</title>) if node.title?
+      node.items.each do |item|
+        text_marker = if checklist && (item.attr? 'checkbox')
+          (item.attr? 'checked') ? '&#x25A0; ' : '&#x25A1; '
+        else
+          nil
+        end
+        result_buffer << '<listitem>'
+        result_buffer << %(<simpara>#{text_marker}#{item.text}</simpara>)
+        result_buffer << item.content if item.blocks?
+        result_buffer << '</listitem>'
+      end
+      result_buffer << '</itemizedlist>'
+    end
+
+    result_buffer * EOL
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%
-if @style == 'bibliography'
-%><bibliodiv#{common_attrs_erb}>#{title_tag}<%
-  items.each do |li| %>
-<bibliomixed>
-<bibliomisc><%= li.text %></bibliomisc><%
-    if li.blocks? %>
-<%= li.content %><%
-    end %>
-</bibliomixed><%
-  end %>
-</bibliodiv><%
-else
-checklist = (option? 'checklist')
-mark = checklist ? 'none' : @style
-%><itemizedlist#{common_attrs_erb}<%= mark ? %( mark="\#{mark}") : nil %>>#{title_tag}<%
-  items.each do |li| %>
-<listitem>
-<simpara><%= checklist && (li.attr? 'checkbox') ? ((li.attr? 'checked') ? '&#x25A0; ' : '&#x25A1; ') : nil %><%= li.text %></simpara><%
-    if li.blocks? %>
-<%= li.content %><%
-    end %>
-</listitem><%
-  end %>
-</itemizedlist><%
-end %>
-    EOF
+    :invoke_result
   end
 end
 
@@ -329,77 +330,77 @@ class BlockDlistTemplate < BaseTemplate
     }
   }
 
-  def template
-    # TODO may want to refactor ListItem content to hold multiple terms
-    # that change would drastically simplify this template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%
-if @style == 'horizontal'
-%><<%= (tag = title? ? 'table' : 'informaltable') %>#{common_attrs_erb} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">#{title_tag}
-<tgroup cols="2">
-<colspec colwidth="<%= attr :labelwidth, 15 %>*"/>
-<colspec colwidth="<%= attr :labelwidth, 85 %>*"/>
-<tbody valign="top"><%
-  items.each do |terms, dd| %>
-<row>
-<entry><%
-    [*terms].each do |dt| %>
-<simpara><%= dt.text %></simpara><%
-    end %>
-</entry>
-<entry><%
-    unless dd.nil?
-      if dd.text? %>
-<simpara><%= dd.text %></simpara><%
+  LIST_TAGS_DEFAULT = LIST_TAGS['labeled']
+
+  def result node
+    result_buffer = []
+    if node.style == 'horizontal'
+      result_buffer << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attrs node.id, node.role, node.reftext} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">
+#{title_element node}<tgroup cols="2">
+<colspec colwidth="#{node.attr 'labelwidth', 15}*"/>
+<colspec colwidth="#{node.attr 'itemwidth', 85}*"/>
+<tbody valign="top">)
+      node.items.each do |terms, dd|
+        result_buffer << %(<row>
+<entry>)
+        [*terms].each do |dt|
+          result_buffer << %(<simpara>#{dt.text}</simpara>) 
+        end
+        result_buffer << %(</entry>
+<entry>)
+        unless dd.nil?
+          result_buffer << %(<simpara>#{dd.text}</simpara>) if dd.text?
+          result_buffer << dd.content if dd.blocks?
+        end
+        result_buffer << %(</entry>
+</row>)
       end
-      if dd.blocks? %>
-<%= dd.content %><%
-      end
-    end %>
-</entry>
-</row><%
-  end %>
-</tbody>
+      result_buffer << %(</tbody>
 </tgroup>
-</<%= tag %>><%
-else
-  tags = (template.class::LIST_TAGS[@style] || template.class::LIST_TAGS['labeled'])
-  if tags[:list]
-%><<%= tags[:list] %>#{common_attrs_erb}>#{title_tag}<%
-  end
-  items.each do |terms, dd| %>
-<<%= tags[:entry] %>><%
-    if tags.has_key? :label %>
-<<%= tags[:label] %>><%
-    end
-    [*terms].each do |dt| %>
-<<%= tags[:term] %>><%= dt.text %></<%= tags[:term] %>><%
-    end
-    if tags.has_key? :label %>
-</<%= tags[:label] %>><%
-    end %>
-<<%= tags[:item] %>><%
-    unless dd.nil?
-      if dd.text? %>
-<simpara><%= dd.text %></simpara><%
+</#{tag_name}>)
+    else
+      tags = LIST_TAGS[node.style] || LIST_TAGS_DEFAULT
+      list_tag = tags[:list]
+      entry_tag = tags[:entry]
+      label_tag = tags[:label]
+      term_tag = tags[:term]
+      item_tag = tags[:item]
+      if list_tag
+        result_buffer << %(<#{list_tag}#{common_attrs node.id, node.role, node.reftext}>)
+        result_buffer << %(<title>#{node.title}</title>) if node.title?
       end
-      if dd.blocks? %>
-<%= dd.content %><%
+
+      node.items.each do |terms, dd|
+        result_buffer << %(<#{entry_tag}>)
+        result_buffer << %(<#{label_tag}>) if label_tag
+
+        [*terms].each do |dt|
+          result_buffer << %(<#{term_tag}>#{dt.text}</#{term_tag}>) 
+        end
+
+        result_buffer << %(</#{label_tag}>) if label_tag
+        result_buffer << %(<#{item_tag}>)
+        unless dd.nil?
+          result_buffer << %(<simpara>#{dd.text}</simpara>) if dd.text?
+          result_buffer << dd.content if dd.blocks?
+        end
+        result_buffer << %(</#{item_tag}>)
+        result_buffer << %(</#{entry_tag}>)
       end
-    end %>
-</<%= tags[:item] %>>
-</<%= tags[:entry] %>><%
+
+      result_buffer << %(</#{list_tag}>) if list_tag
+    end
+
+    result_buffer * EOL
   end
-  if tags[:list] %>
-</<%= tags[:list] %>><%
-  end
-end %>
-    EOF
+
+  def template
+    :invoke_result
   end
 end
 
 class BlockOpenTemplate < BaseTemplate
-  def result(node)
+  def result node
     open_block(node, node.id, node.style, node.role, node.reftext, node.title? ? node.title : nil)
   end
 
@@ -594,60 +595,87 @@ class BlockMathTemplate < BaseTemplate
 end
 
 class BlockTableTemplate < BaseTemplate
+  TABLE_PI_NAMES = ['dbhtml', 'dbfo', 'dblatex']
+  TABLE_SECTIONS = [:head, :foot, :body]
+
+  def result node
+    result_buffer = []
+    pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : nil
+    result_buffer << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attrs node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{node.attr 'frame', 'all'}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}">)
+    result_buffer << %(<title>#{node.title}</title>) if tag_name == 'table'
+    if (width = (node.attr? 'width') ? (node.attr 'width') : nil)
+      TABLE_PI_NAMES.each do |pi_name|
+        result_buffer << %(<?#{pi_name} table-width="#{width}"?>)
+      end
+    end
+    result_buffer << %(<tgroup cols="#{node.attr 'colcount'}">)
+    node.columns.each do |col|
+      result_buffer << %(<colspec colname="col_#{col.attr 'colnumber'}" colwidth="#{col.attr(width ? 'colabswidth' : 'colpcwidth')}*"/>)
+    end
+    TABLE_SECTIONS.select {|tblsec| !node.rows[tblsec].empty? }.each do |tblsec|
+      result_buffer << %(<t#{tblsec}>)
+      node.rows[tblsec].each do |row|
+        result_buffer << '<row>'
+        row.each do |cell|
+          halign_attribute = (cell.attr? 'halign') ? %( align="#{cell.attr 'halign'}") : nil
+          valign_attribute = (cell.attr? 'valign') ? %( valign="#{cell.attr 'valign'}") : nil
+          colspan_attribute = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{colnum + cell.colspan - 1}") : nil
+          rowspan_attribute = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : nil
+          entry_start = %(<entry#{halign_attribute}#{valign_attribute}#{colspan_attribute}#{rowspan_attribute}>)
+          cell_content = if tblsec == :head
+            %(<simpara>#{cell.text}</simpara>)
+          else
+            case cell.style
+            when :asciidoc
+              cell.content
+            when :verse
+              %(<literallayout>#{preserve_endlines cell.text, node}</literallayout>)
+            when :literal
+              %(<literallayout class="monospaced">#{preserve_endlines cell.text, node}</literallayout>)
+            when :header
+              cell.content.map {|text| %(<simpara><emphasis role="strong">#{text}</emphasis></simpara>) }.join
+            else
+              cell.content.map {|text| %(<simpara>#{text}</simpara>) }.join
+            end
+          end
+          entry_end = (node.document.attr? 'cellbgcolor') ? %(<?dbfo bgcolor="#{node.document.attr 'cellbgcolor'}"?></entry>) : '</entry>'
+          result_buffer << %(#{entry_start}#{cell_content}#{entry_end})
+        end
+        result_buffer << '</row>'
+      end
+      result_buffer << %(</t#{tblsec}>)
+    end
+    result_buffer << '</tgroup>'
+    result_buffer << %(</#{tag_name}>)
+
+    result_buffer * EOL
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><<%= (tag_name = title? ? 'table' : 'informaltable') %>#{common_attrs_erb} frame="<%= attr :frame, 'all'%>"
-    rowsep="<%= ['none', 'cols'].include?(attr :grid) ? 0 : 1 %>" colsep="<%= ['none', 'rows'].include?(attr :grid) ? 0 : 1 %>">#{title_tag}
-  <% if attr? :width %>
-  <?dbhtml table-width="<%= attr :width %>"?>
-  <?dbfo table-width="<%= attr :width %>"?>
-  <?dblatex table-width="<%= attr :width %>"?>
-  <% end %>
-  <tgroup cols="<%= attr :colcount %>">
-    <% @columns.each do |col| %>
-    <colspec colname="col_<%= col.attr :colnumber %>" colwidth="<%= col.attr((attr? :width) ? :colabswidth : :colpcwidth) %>*"/>
-    <% end %>
-    <% [:head, :foot, :body].select {|tblsec| !rows[tblsec].empty? }.each do |tblsec| %>
-    <t<%= tblsec %>>
-      <% @rows[tblsec].each do |row| %>
-      <row>
-        <% row.each do |cell| %>
-        <entry#{attribute('align', 'cell.attr :halign')}#{attribute('valign', 'cell.attr :valign')}<%
-        if cell.colspan %> namest="col_<%= cell.column.attr :colnumber %>" nameend="col_<%= (cell.column.attr :colnumber) + cell.colspan - 1 %>"<%
-        end %><% if cell.rowspan %> morerows="<%= cell.rowspan - 1 %>"<% end %>><%
-        cell_content = ''
-        if tblsec == :head %><% cell_content = cell.text %><%
-        else %><%
-        case cell.style
-          when :asciidoc %><% cell_content = cell.content %><%
-          when :verse %><% cell_content = %(<literallayout>\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
-          when :literal %><% cell_content = %(<literallayout class="monospaced">\#{template.preserve_endlines(cell.text, self)}</literallayout>) %><%
-          when :header %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content\}<simpara><emphasis role="strong">\#{text}</emphasis></simpara>) %><% end %><%
-          else %><% cell.content.each do |text| %><% cell_content = %(\#{cell_content}<simpara>\#{text}</simpara>) %><% end %><%
-        %><% end %><% end %><%= (@document.attr? 'cellbgcolor') ? %(<?dbfo bgcolor="\#{@document.attr 'cellbgcolor'}"?>) : nil %><%= cell_content %></entry>
-        <% end %>
-      </row>
-      <% end %>
-    </t<%= tblsec %>>
-    <% end %>
-  </tgroup>
-</<%= tag_name %>>
-    EOS
+    :invoke_result
   end
 end
 
 class BlockImageTemplate < BaseTemplate
+  def result node
+    width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : nil
+    depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : nil
+    swidth_attribute = (node.attr? 'scaledwidth') ? %( width="#{node.attr 'scaledwidth'}" scalefit="1") : nil
+    scale_attribute = (node.attr? 'scale') ? %( scale="#{node.attr 'scale'}") : nil
+    align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : nil
+
+    %(<figure#{common_attrs node.id, node.role, node.reftext}>
+#{title_element node}<mediaobject>
+<imageobject>
+<imagedata fileref="#{node.image_uri(node.attr 'target')}"#{width_attribute}#{depth_attribute}#{swidth_attribute}#{scale_attribute}#{align_attribute}/>
+</imageobject>
+<textobject><phrase>#{node.attr 'alt'}</phrase></textobject>
+</mediaobject>
+</figure>)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><%#encoding:UTF-8%><figure#{common_attrs_erb}>#{title_tag}
-  <mediaobject>
-    <imageobject>
-      <imagedata fileref="<%= image_uri(attr :target) %>"#{attribute('contentwidth', :width)}#{attribute('contentdepth', :height)}#{attribute('scale', :scale)}<%= (attr? :scaledwidth) ? %( width="\#{attr :scaledwidth}" scalefit="1") : nil %>#{attribute('align', :align)}/>
-    </imageobject>
-    <textobject><phrase><%= attr :alt %></phrase></textobject>
-  </mediaobject>
-</figure>
-    EOF
+    :invoke_result
   end
 end
 
@@ -716,14 +744,14 @@ class InlineQuotedTemplate < BaseTemplate
       elsif start_tag.nil?
         quoted_text = text
       else
-        quoted_text = "#{start_tag}#{text}#{end_tag}"
+        quoted_text = %(#{start_tag}#{text}#{end_tag})
       end
 
       anchor.nil? ? quoted_text : %(#{anchor}#{quoted_text})
     end
   end
 
-  def result(node)
+  def result node
     quote_text(node.text, node.type, node.id, node.role)
   end
 
@@ -733,7 +761,7 @@ class InlineQuotedTemplate < BaseTemplate
 end
 
 class InlineButtonTemplate < BaseTemplate
-  def result(node)
+  def result node
     %(<guibutton>#{node.text}</guibutton>)
   end
 
@@ -743,7 +771,7 @@ class InlineButtonTemplate < BaseTemplate
 end
 
 class InlineKbdTemplate < BaseTemplate
-  def result(node)
+  def result node
     keys = node.attr 'keys'
     if keys.size == 1
       %(<keycap>#{keys.first}</keycap>)
@@ -770,7 +798,7 @@ class InlineMenuTemplate < BaseTemplate
     end
   end
 
-  def result(node)
+  def result node
     menu(node.attr('menu'), node.attr('submenus'), node.attr('menuitem'))
   end
 
@@ -799,7 +827,7 @@ class InlineAnchorTemplate < BaseTemplate
     end
   end
 
-  def result(node)
+  def result node
     anchor(node.target, node.text, node.type, node)
   end
 
@@ -809,33 +837,38 @@ class InlineAnchorTemplate < BaseTemplate
 end
 
 class InlineImageTemplate < BaseTemplate
+  def result node
+    width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : nil
+    depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : nil
+    %(<inlinemediaobject>
+<imageobject>
+<imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{width_attribute}#{depth_attribute}/>
+</imageobject>
+<textobject><phrase>#{node.attr 'alt'}</phrase></textobject>
+</inlinemediaobject>)
+  end
+
   def template
-    @template ||= @eruby.new <<-EOF
-<%#encoding:UTF-8%><inlinemediaobject>
-  <imageobject>
-    <imagedata fileref="<%= @type == 'icon' ? icon_uri(@target) : image_uri(@target) %>"#{attribute('width', :width)}#{attribute('depth', :height)}/>
-  </imageobject>
-  <textobject><phrase><%= attr :alt %></phrase></textobject>
-</inlinemediaobject>
-    EOF
+    :invoke_result
   end
 end
 
 class InlineFootnoteTemplate < BaseTemplate
+  def result node
+    if node.type == :xref
+      %(<footnoteref linkend="#{node.target}"/>)
+    else
+      %(<footnote#{common_attrs node.id}><simpara>#{node.text}</simpara></footnote>)
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><%
-if @type == :xref
-%><footnoteref linkend="<%= @target %>"/><%
-else
-%><footnote<%= template.common_attrs(@id, nil, nil) %>><simpara><%= @text %></simpara></footnote><%
-end %>
-    EOS
+    :invoke_result
   end
 end
 
 class InlineCalloutTemplate < BaseTemplate
-  def result(node)
+  def result node
     %(<co#{common_attrs node.id, nil, nil}/>)
   end
 
@@ -845,21 +878,31 @@ class InlineCalloutTemplate < BaseTemplate
 end
 
 class InlineIndextermTemplate < BaseTemplate
+  def result node
+    if node.type == :visible
+      %(<indexterm><primary>#{node.text}</primary></indexterm>#{node.text})
+    else
+      terms = node.attr 'terms'
+      result_buffer = []
+      if (numterms = terms.size) > 2
+        result_buffer << %(<indexterm>
+<primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary><tertiary>#{terms[2]}</tertiary>
+</indexterm>)
+      end
+      if numterms > 1
+        result_buffer << %(<indexterm>
+<primary>#{terms[-2]}</primary><secondary>#{terms[-1]}</secondary>
+</indexterm>)
+      end
+      result_buffer << %(<indexterm>
+<primary>#{terms[-1]}</primary>
+</indexterm>)
+      result_buffer * EOL
+    end
+  end
+
   def template
-    @template ||= @eruby.new <<-EOS
-<%#encoding:UTF-8%><% if @type == :visible %><indexterm><primary><%= @text %></primary></indexterm><%= @text %><%
-else %><% terms = (attr :terms); numterms = terms.size %><%
-if numterms > 2 %><indexterm>
-  <primary><%= terms[0] %></primary><secondary><%= terms[1] %></secondary><tertiary><%= terms[2] %></tertiary>
-</indexterm>
-<% end %><%
-if numterms > 1 %><indexterm>
-  <primary><%= terms[-2] %></primary><secondary><%= terms[-1] %></secondary>
-</indexterm>
-<% end %><indexterm>
-  <primary><%= terms[-1] %></primary>
-</indexterm><% end %>
-    EOS
+    :invoke_result
   end
 end
 

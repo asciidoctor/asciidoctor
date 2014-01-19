@@ -105,7 +105,7 @@ class BaseTemplate
 end
 
 module EmptyTemplate
-  def result(node)
+  def result node
     ''
   end
 

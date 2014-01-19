@@ -223,6 +223,39 @@ A | here| a | there
       assert_css 'table > tbody > tr', output, 3
     end
 
+    test 'table with header and footer docbook' do
+      input = <<-EOS
+.Table with header, body and footer
+[frame="topbot",options="header,footer"]
+|===
+|Item       |Quantity
+|Item 1     |1        
+|Item 2     |2        
+|Item 3     |3        
+|Total      |6        
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_css 'table', output, 1
+      assert_css 'table[frame="topbot"]', output, 1
+      assert_css 'table > title', output, 1
+      assert_css 'table > tgroup', output, 1
+      assert_css 'table > tgroup[cols="2"]', output, 1
+      assert_css 'table > tgroup[cols="2"] > colspec', output, 2
+      assert_css 'table > tgroup[cols="2"] > colspec[colwidth="50*"]', output, 2
+      assert_css 'table > tgroup > thead', output, 1
+      assert_css 'table > tgroup > thead > row', output, 1
+      assert_css 'table > tgroup > thead > row > entry', output, 2
+      assert_css 'table > tgroup > thead > row > entry > simpara', output, 2
+      assert_css 'table > tgroup > tfoot', output, 1
+      assert_css 'table > tgroup > tfoot > row', output, 1
+      assert_css 'table > tgroup > tfoot > row > entry', output, 2
+      assert_css 'table > tgroup > tfoot > row > entry > simpara', output, 2
+      assert_css 'table > tgroup > tbody', output, 1
+      assert_css 'table > tgroup > tbody > row', output, 3
+      assert_css 'table > tgroup > tbody > row', output, 3
+    end
+
     test 'table with implicit header row' do
       input = <<-EOS
 |===
