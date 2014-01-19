@@ -36,21 +36,14 @@ class DocumentTemplate < BaseTemplate
     br = %(<br#{short_tag_slash_local}>)
     linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
     result_buffer << '<!DOCTYPE html>'
-    if node.attr? 'nolang'
-      result_buffer << '<html>'
-    else
-      result_buffer << %(<html lang="#{node.attr 'lang', 'en'}">)
-    end
-
+    result_buffer << ((node.attr? 'nolang') ? '<html>' : %(<html lang="#{node.attr 'lang', 'en'}">))
     result_buffer << %(<head>
 <meta http-equiv="Content-Type" content="text/html; charset=#{node.attr 'encoding'}"#{short_tag_slash_local}>
 <meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{short_tag_slash_local}>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"#{short_tag_slash_local}>)
 
     ['description', 'keywords', 'author', 'copyright'].each do |key|
-      if node.attr? key
-        result_buffer << %(<meta name="#{key}" content="#{node.attr key}"#{short_tag_slash_local}>)
-      end
+      result_buffer << %(<meta name="#{key}" content="#{node.attr key}"#{short_tag_slash_local}>) if node.attr? key
     end
 
     result_buffer << %(<title>#{node.doctitle(:sanitize => true) || node.attr('untitled-label')}</title>) 
@@ -209,9 +202,9 @@ MathJax.Hub.Config({
     if node.footnotes? && !(node.attr? 'nofootnotes')
       result_buffer << %(<div id="footnotes">
 <hr#{short_tag_slash_local}>)
-      node.footnotes.each do |fn|
-        result_buffer << %(<div class="footnote" id="_footnote_#{fn.index}">
-<a href="#_footnoteref_#{fn.index}">#{fn.index}</a>. #{fn.text}
+      node.footnotes.each do |footnote|
+        result_buffer << %(<div class="footnote" id="_footnote_#{footnote.index}">
+<a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a>. #{footnote.text}
 </div>)
       end
       result_buffer << '</div>'
