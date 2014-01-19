@@ -30,177 +30,216 @@ class DocumentTemplate < BaseTemplate
     toc_level_buffer * EOL
   end
 
-  def template
-    @template ||= @eruby.new <<-'EOS'
-<%#encoding:UTF-8%><% short_tag_slash_local = short_tag_slash %><!DOCTYPE html>
-<html<%= (attr? 'nolang') ? nil : %( lang="#{attr 'lang', 'en'}") %>>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=<%= attr 'encoding' %>"<%= short_tag_slash_local %>>
-<meta name="generator" content="Asciidoctor <%= attr 'asciidoctor-version' %>"<%= short_tag_slash_local %>>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"<%= short_tag_slash_local %>><%
-['description', 'keywords', 'author', 'copyright'].each do |key|
-  if attr? key %>
-<meta name="<%= key %>" content="<%= attr key %>"<%= short_tag_slash_local %>><%
-  end
-end %>
-<title><%= doctitle(:sanitize => true) || (attr 'untitled-label') %></title><%
-if DEFAULT_STYLESHEET_KEYS.include?(attr 'stylesheet')
-  if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path(DEFAULT_STYLESHEET_NAME, (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
-  else %>
-<style>
-<%= HTML5.default_asciidoctor_stylesheet %>
-</style><%
-  end
-elsif attr? 'stylesheet'
-  if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path((attr 'stylesheet'), (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
-  else %>
-<style>
-<%= read_asset normalize_system_path((attr 'stylesheet'), (attr 'stylesdir', '')), true %>
-</style><%
-  end
-end
-if attr? 'icons', 'font'
-  if !(attr 'iconfont-remote', '').nil? %>
-<link rel="stylesheet" href="<%= attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css' %>"<%= short_tag_slash_local %>><%
-  else %>
-<link rel="stylesheet" href="<%= normalize_web_path(%(#{attr 'iconfont-name', 'font-awesome'}.css), (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
-  end
-end
-case attr 'source-highlighter'
-when 'coderay'
-  if (attr 'coderay-css', 'class') == 'class'
-    if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-coderay.css', (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
-    else %>
-<style>
-<%= HTML5.default_coderay_stylesheet %>
-</style><%
+  def result node
+    result_buffer = []
+    short_tag_slash_local = node.short_tag_slash
+    br = %(<br#{short_tag_slash_local}>)
+    linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
+    result_buffer << '<!DOCTYPE html>'
+    if node.attr? 'nolang'
+      result_buffer << '<html>'
+    else
+      result_buffer << %(<html lang="#{node.attr 'lang', 'en'}">)
     end
-  end
-when 'pygments'
-  if (attr 'pygments-css', 'class') == 'class'
-    if @safe >= SafeMode::SECURE || (attr? 'linkcss') %>
-<link rel="stylesheet" href="<%= normalize_web_path('asciidoctor-pygments.css', (attr 'stylesdir', '')) %>"<%= short_tag_slash_local %>><%
-    else %>
-<style>
-<%= HTML5.pygments_stylesheet(attr 'pygments-style') %>
-</style><%
+
+    result_buffer << %(<head>
+<meta http-equiv="Content-Type" content="text/html; charset=#{node.attr 'encoding'}"#{short_tag_slash_local}>
+<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{short_tag_slash_local}>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"#{short_tag_slash_local}>)
+
+    ['description', 'keywords', 'author', 'copyright'].each do |key|
+      if node.attr? key
+        result_buffer << %(<meta name="#{key}" content="#{node.attr key}"#{short_tag_slash_local}>)
+      end
     end
-  end
-when 'highlightjs', 'highlight.js' %>
-<link rel="stylesheet" href="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4' %>/styles/<%= attr 'highlightjs-theme', 'googlecode' %>.min.css"<%= short_tag_slash_local %>>
-<script src="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4' %>/highlight.min.js"></script>
-<script src="<%= attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4' %>/lang/common.min.js"></script>
-<script>hljs.initHighlightingOnLoad()</script><%
-when 'prettify' %>
-<link rel="stylesheet" href="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/<%= attr 'prettify-theme', 'prettify' %>.min.css"<%= short_tag_slash_local %>>
-<script src="<%= attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298' %>/prettify.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script><%
-end
-if attr? 'math' %>
-<script type="text/x-mathjax-config">
+
+    result_buffer << %(<title>#{node.doctitle(:sanitize => true) || node.attr('untitled-label')}</title>) 
+    if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
+      if linkcss
+        result_buffer << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', '')}"#{short_tag_slash_local}>)
+      else
+        result_buffer << %(<style>
+#{HTML5.default_asciidoctor_stylesheet}
+</style>)
+      end
+    elsif node.attr? 'stylesheet'
+      if linkcss
+        result_buffer << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{short_tag_slash_local}>)
+      else
+        result_buffer << %(<style>
+#{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), true}
+</style>)
+      end
+    end
+
+    if node.attr? 'icons', 'font'
+      if !(node.attr 'iconfont-remote', '').nil?
+        result_buffer << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css'}"#{short_tag_slash_local}>)
+      else
+        iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
+        result_buffer << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', '')}"#{short_tag_slash_local}>)
+      end
+    end
+
+    case node.attr 'source-highlighter'
+    when 'coderay'
+      if (node.attr 'coderay-css', 'class') == 'class'
+        if linkcss
+          result_buffer << %(<link rel="stylesheet" href="#{node.normalize_web_path 'asciidoctor-coderay.css', (node.attr 'stylesdir', '')}"#{short_tag_slash_local}>)
+        else
+          result_buffer << %(<style>
+#{HTML5.default_coderay_stylesheet}
+</style>)
+        end
+      end
+    when 'pygments'
+      if (node.attr 'pygments-css', 'class') == 'class'
+        if linkcss
+          result_buffer << %(<link rel="stylesheet" href="#{node.normalize_web_path 'asciidoctor-pygments.css', (node.attr 'stylesdir', '')}"#{short_tag_slash_local}>)
+        else
+          result_buffer << %(<style>
+#{HTML5.pygments_stylesheet(node.attr 'pygments-style')}
+</style>)
+        end
+      end
+    when 'highlightjs', 'highlight.js'
+      result_buffer << %(<link rel="stylesheet" href="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/styles/#{node.attr 'highlightjs-theme', 'googlecode'}.min.css"#{short_tag_slash_local}>
+<script src="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/highlight.min.js"></script>
+<script src="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/lang/common.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>)
+    when 'prettify'
+      result_buffer << %(<link rel="stylesheet" href="#{node.attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{short_tag_slash_local}>
+<script src="#{node.attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/prettify.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>)
+    end
+
+    if node.attr? 'math'
+      result_buffer << %(<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {
-    inlineMath: [<%= INLINE_MATH_DELIMITERS[:latexmath] %>],
-    displayMath: [<%= BLOCK_MATH_DELIMITERS[:latexmath] %>],
+    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath]}],
+    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath]}],
     ignoreClass: "nomath|nolatexmath"
   },
   asciimath2jax: {
-    delimiters: [<%= BLOCK_MATH_DELIMITERS[:asciimath] %>],
+    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath]}],
     ignoreClass: "nomath|noasciimath"
   }
 });
 </script>
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
-<script>document.addEventListener('DOMContentLoaded', MathJax.Hub.TypeSet)</script><%
-end
-%><%= (docinfo_content = docinfo).empty? ? nil : %(
-#{docinfo_content}) %>
-</head>
-<body<%= @id ? %( id="#{@id}") : nil %> class="<%= doctype %><%= (attr? 'toc-class') && (attr? 'toc') && (attr? 'toc-placement', 'auto') ? %( #{attr 'toc-class'} toc-#{attr 'toc-position', 'left'}) : nil %>"<%= (attr? 'max-width') ? %( style="max-width: #{attr 'max-width'};") : nil %>><%
-unless noheader %>
-<div id="header"><%
-  if doctype == 'manpage' %>
-<h1><%= doctitle %> Manual Page</h1><%
-    if (attr? 'toc') && (attr? 'toc-placement', 'auto') %>
-<div id="toc" class="<%= attr 'toc-class', 'toc' %>">
-<div id="toctitle"><%= attr 'toc-title' %></div>
-<%= template.class.outline(self, (attr 'toclevels', 2).to_i) %>
-</div><%
-    end %>
-<h2><%= attr 'manname-title' %></h2>
-<div class="sectionbody">
-<p><%= %(#{attr 'manname'} - #{attr 'manpurpose'}) %></p>
-</div><%
-  else
-    if has_header?
-      unless notitle %>
-<h1><%= @header.title %></h1><%
-      end %><%
-      if attr? 'author' %>
-<span id="author" class="author"><%= attr 'author' %></span><br<%= short_tag_slash_local %>><%
-        if attr? 'email' %>
-<span id="email" class="email"><%= sub_macros(attr 'email') %></span><br<%= short_tag_slash_local %>><%
+<script>document.addEventListener('DOMContentLoaded', MathJax.Hub.TypeSet)</script>)
+    end
+
+    unless (docinfo_content = node.docinfo).empty?
+      result_buffer << docinfo_content
+    end
+
+    result_buffer << '</head>'
+    body_attrs = []
+    if node.id
+      body_attrs << %(id="#{node.id}")
+    end
+    if (node.attr? 'toc-class') && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
+      body_attrs << %(class="#{node.doctype} #{node.attr 'toc-class'} toc-#{node.attr 'toc-position', 'left'}")
+    else
+      body_attrs << %(class="#{node.doctype}")
+    end
+    if node.attr? 'max-width'
+      body_attrs << %(style="max-width: #{node.attr 'max-width'};")
+    end
+    result_buffer << %(<body #{body_attrs * ' '}>)
+
+    unless node.noheader
+      result_buffer << '<div id="header">'
+      if node.doctype == 'manpage'
+        result_buffer << %(<h1>#{node.doctitle} Manual Page</h1>)
+        if (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
+          result_buffer << %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
+<div id="toctitle">#{node.attr 'toc-title'}</div>
+#{DocumentTemplate.outline node, (node.attr 'toclevels', 2).to_i}
+</div>)
         end
-        if (authorcount = (attr 'authorcount').to_i) > 1
-          (2..authorcount).each do |idx| %>
-<span id="author<%= idx %>" class="author"><%= attr "author_#{idx}" %></span><br<%= short_tag_slash_local %>><%
-            if attr? "email_#{idx}" %>
-<span id="email<%= idx %>" class="email"><%= sub_macros(attr "email_#{idx}") %></span><br<%= short_tag_slash_local %>><%
+        result_buffer << %(<h2>#{node.attr 'manname-title'}</h2>
+<div class="sectionbody">
+<p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
+</div>)
+      else
+        if node.has_header?
+          result_buffer << %(<h1>#{node.header.title}</h1>) unless node.notitle
+          if node.attr? 'author'
+            result_buffer << %(<span id="author" class="author">#{node.attr 'author'}</span>#{br})
+            if node.attr? 'email'
+              result_buffer << %(<span id="email" class="email">#{node.sub_macros(node.attr 'email')}</span>#{br})
+            end
+            if (authorcount = (node.attr 'authorcount').to_i) > 1
+              (2..authorcount).each do |idx|
+                result_buffer << %(<span id="author#{idx}" class="author">#{node.attr "author_#{idx}"}</span>#{br})
+                if node.attr? %(email_#{idx})
+                  result_buffer << %(<span id="email#{idx}" class="email">#{node.sub_macros(node.attr "email_#{idx}")}</span>#{br})
+                end
+              end
             end
           end
+          if node.attr? 'revnumber'
+            result_buffer << %(<span id="revnumber">#{((node.attr 'version-label') || '').downcase} #{node.attr 'revnumber'}#{(node.attr? 'revdate') ? ',' : ''}</span>)
+          end
+          if node.attr? 'revdate'
+            result_buffer << %(<span id="revdate">#{node.attr 'revdate'}</span>)
+          end
+          if node.attr? 'revremark'
+            result_buffer << %(#{br}<span id="revremark">#{node.attr 'revremark'}</span>)
+          end
+        end
+
+        if (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
+          result_buffer << %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
+<div id="toctitle">#{node.attr 'toc-title'}</div>
+#{DocumentTemplate.outline node, (node.attr 'toclevels', 2).to_i}
+</div>)
         end
       end
-      if attr? 'revnumber' %>
-<span id="revnumber"><%= ((attr 'version-label') || '').downcase %> <%= attr 'revnumber' %><%= (attr? 'revdate') ? ',' : '' %></span><%
-      end
-      if attr? 'revdate' %>
-<span id="revdate"><%= attr 'revdate' %></span><%
-      end
-      if attr? 'revremark' %>
-<br<%= short_tag_slash_local %>><span id="revremark"><%= attr 'revremark' %></span><%
-      end
+      result_buffer << '</div>'
     end
-    if (attr? 'toc') && (attr? 'toc-placement', 'auto') %>
-<div id="toc" class="<%= attr 'toc-class', 'toc' %>">
-<div id="toctitle"><%= attr 'toc-title' %></div>
-<%= template.class.outline(self, (attr 'toclevels', 2).to_i) %>
-</div><%
+
+    result_buffer << %(<div id="content">
+#{node.content}
+</div>)
+
+    if node.footnotes? && !(node.attr? 'nofootnotes')
+      result_buffer << %(<div id="footnotes">
+<hr#{short_tag_slash_local}>)
+      node.footnotes.each do |fn|
+        result_buffer << %(<div class="footnote" id="_footnote_#{fn.index}">
+<a href="#_footnoteref_#{fn.index}">#{fn.index}</a>. #{fn.text}
+</div>)
+      end
+      result_buffer << '</div>'
     end
-  end %>
-</div><%
-end %>
-<div id="content">
-<%= content %>
-</div><%
-unless !footnotes? || (attr? 'nofootnotes') %>
-<div id="footnotes">
-<hr<%= short_tag_slash_local %>><%
-  footnotes.each do |fn| %>
-<div class="footnote" id="_footnote_<%= fn.index %>">
-<a href="#_footnoteref_<%= fn.index %>"><%= fn.index %></a>. <%= fn.text %>
-</div><%
-  end %>
-</div><%
-end %><%
-unless nofooter %>
-<div id="footer">
-<div id="footer-text"><%
-if attr? 'revnumber' %>
-<%= %(#{attr 'version-label'} #{attr 'revnumber'}) %><br<%= short_tag_slash_local %>><%
-end
-if attr? 'last-update-label' %>
-<%= %(#{attr 'last-update-label'} #{attr 'docdatetime'}) %><%
-end %>
-</div><%= (docinfo_content = docinfo :footer).empty? ? nil : %(
-#{docinfo_content}) %>
-</div><% 
-end %>
-</body>
-</html>
-    EOS
+    unless node.nofooter
+      result_buffer << '<div id="footer">'
+      result_buffer << '<div id="footer-text">'
+      if node.attr? 'revnumber'
+        result_buffer << %(#{node.attr 'version-label'} #{node.attr 'revnumber'}#{br})
+      end
+      if node.attr? 'last-update-label'
+        result_buffer << %(#{node.attr 'last-update-label'} #{node.attr 'docdatetime'})
+      end
+      result_buffer << '</div>'
+      unless (docinfo_content = node.docinfo :footer).empty?
+        result_buffer << docinfo_content
+      end
+      result_buffer << '</div>'
+    end
+
+    result_buffer << '</body>'
+    result_buffer << '</html>'
+    result_buffer * EOL
+  end
+
+  def template
+    # FIXME remove need for this special case!!
+    :invoke_result_document
   end
 end
 
@@ -230,7 +269,7 @@ class EmbeddedTemplate < BaseTemplate
   end
 
   def template
-    :invoke_result
+    :invoke_result_document
   end
 end
 

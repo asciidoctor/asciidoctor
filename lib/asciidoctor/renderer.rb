@@ -31,7 +31,10 @@ class Renderer
     end
     case backend
     when 'html5', 'docbook45', 'docbook5'
-      eruby = load_eruby options[:eruby]
+      eruby = nil
+      unless backend == 'html5'
+        eruby = load_eruby(options[:eruby])
+      end
       require 'asciidoctor/backends/base_template'
       require "asciidoctor/backends/#{backend}"
       # Load up all the template classes that we know how to render for this backend
@@ -50,6 +53,7 @@ class Renderer
     # If user passed in a template dir, let them override our base templates
     if (template_dirs = options.delete(:template_dirs))
       Helpers.require_library 'tilt'
+      load_eruby options[:eruby] if backend == 'html5'
 
       # chomp result when using custom templates since template engines
       # tend to add a trailing newline character

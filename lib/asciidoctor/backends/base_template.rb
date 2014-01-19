@@ -11,7 +11,7 @@ class BaseTemplate
   attr_reader :backend
   attr_reader :eruby
 
-  def initialize(view, backend, eruby)
+  def initialize(view, backend, eruby = 'erb')
     @view = view
     @backend = backend
     @eruby = eruby
@@ -49,17 +49,19 @@ class BaseTemplate
     case tmpl
     when :invoke_result
       return result(node)
+    when :invoke_result_document
+      output = result(node)
     when :content
-      result = node.content
+      output = node.content
     else
-      result = tmpl.result(node.get_binding(self))
+      output = tmpl.result(node.get_binding(self))
     end
 
     if (@view == 'document' || @view == 'embedded') &&
         node.renderer.compact && !node.document.nested?
-      compact result
+      compact output
     else
-      result
+      output
     end
   end
 

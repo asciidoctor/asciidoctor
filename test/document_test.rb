@@ -690,26 +690,26 @@ text
 
     test 'eRuby implementation should default to ERB' do
       # intentionally use built-in templates for this test
-      doc = Asciidoctor::Document.new [], :header_footer => true
+      doc = Asciidoctor::Document.new [], :backend => 'docbook', :header_footer => true
       renderer = doc.renderer
       views = renderer.views
       assert !views.nil?
       assert views.has_key? 'document'
-      assert views['document'].is_a?(Asciidoctor::HTML5::DocumentTemplate)
+      assert views['document'].is_a?(Asciidoctor::DocBook45::DocumentTemplate)
       assert_equal 'ERB', views['document'].eruby.to_s
       assert_equal 'ERB', views['document'].template.class.to_s
     end
   
     test 'can set erubis as eRuby implementation' do
       # intentionally use built-in templates for this test
-      doc = Asciidoctor::Document.new [], :eruby => 'erubis', :header_footer => true
+      doc = Asciidoctor::Document.new [], :backend => 'docbook', :eruby => 'erubis', :header_footer => true
       assert $LOADED_FEATURES.detect {|p| p == 'erubis.rb' || p.end_with?('/erubis.rb') }.nil?
       renderer = doc.renderer
       assert $LOADED_FEATURES.detect {|p| p == 'erubis.rb' || p.end_with?('/erubis.rb') }
       views = renderer.views
       assert !views.nil?
       assert views.has_key? 'document'
-      assert views['document'].is_a?(Asciidoctor::HTML5::DocumentTemplate)
+      assert views['document'].is_a?(Asciidoctor::DocBook45::DocumentTemplate)
       assert_equal 'Erubis::FastEruby', views['document'].eruby.to_s
       assert_equal 'Erubis::FastEruby', views['document'].template.class.to_s
     end

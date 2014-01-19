@@ -689,8 +689,8 @@ line two
 line three
 ....
 EOS
-      [true, false].each {|compact|
-        output = render_string input, :compact => compact
+      [[true, true], [true, false], [false, true], [false, false]].each {|compact, header_footer|
+        output = render_string input, :header_footer => header_footer, :compact => compact
         assert_xpath '//pre', output, 1
         assert_xpath '//pre/text()', output, 1
         text = xmlnodes_at_xpath('//pre/text()', output, 1).text
@@ -718,8 +718,8 @@ line two
 line three
 ----
 EOS
-      [true, false].each {|compact|
-        output = render_string input, :compact => compact
+      [[true, true], [true, false], [false, true], [false, false]].each {|(compact,header_footer)|
+        output = render_string input, header_footer => header_footer, :compact => compact
         assert_xpath '//pre/code', output, 1
         assert_xpath '//pre/code/text()', output, 1
         text = xmlnodes_at_xpath('//pre/code/text()', output, 1).text
@@ -738,6 +738,7 @@ EOS
 
     test "should preserve endlines in verse block" do
       input = <<-EOS
+--
 [verse]
 ____
 line one
@@ -746,9 +747,10 @@ line two
 
 line three
 ____
+--
 EOS
-      [true, false].each {|compact|
-        output = render_string input, :compact => compact
+      [[true, true], [true, false], [false, true], [false, false]].each {|compact, header_footer|
+        output = render_string input, :header_footer => header_footer, :compact => compact
         assert_xpath '//*[@class="verseblock"]/pre', output, 1
         assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
         text = xmlnodes_at_xpath('//*[@class="verseblock"]/pre/text()', output, 1).text
