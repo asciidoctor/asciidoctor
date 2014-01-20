@@ -36,33 +36,33 @@ class Reader
 
   # Public: Initialize the Reader object
   def initialize data = nil, cursor = nil, opts = {:normalize => false}
-    if cursor.nil?
+    if !cursor
       @file = @dir = nil
       @path = '<stdin>'
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
-    elsif cursor.is_a? String
+    elsif cursor.is_a? ::String
       @file = cursor
-      @dir = File.dirname @file
-      @path = File.basename @file
+      @dir = ::File.dirname @file
+      @path = ::File.basename @file
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     else
       @file = cursor.file
       @dir = cursor.dir
       @path = cursor.path || '<stdin>'
-      unless @file.nil?
-        if @dir.nil?
+      if @file
+        unless @dir
           # REVIEW might to look at this assignment closer
-          @dir = File.dirname @file
+          @dir = ::File.dirname @file
           @dir = nil if @dir == '.' # right?
         end
 
-        if cursor.path.nil?
-          @path = File.basename @file
+        unless cursor.path
+          @path = ::File.basename @file
         end
       end
       @lineno = cursor.lineno || 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     end
-    @lines = data.nil? ? [] : (prepare_lines data, opts)
+    @lines = data ? (prepare_lines data, opts) : []
     @source_lines = @lines.dup
     @eof = @lines.empty?
     @look_ahead = 0
@@ -130,7 +130,7 @@ class Reader
   #
   # Returns True if the there are no more lines or if the next line is empty
   def next_line_empty?
-    (line = peek_line).nil? || line.empty?
+    peek_line.nothing?
   end
 
   # Public: Peek at the next line of source data. Processes the line, if not
@@ -159,7 +159,7 @@ class Reader
       # FIXME the problem with this approach is that we aren't
       # retaining the modified line (hence the @unescape_next_line tweak)
       # perhaps we need a stack of proxy lines
-      if (line = process_line @lines.first).nil?
+      if !(line = process_line @lines[0])
         peek_line
       else
         line
@@ -476,7 +476,7 @@ class Reader
 
     if restore_process_lines
       @process_lines = true
-      @look_ahead -= 1 if line_restored && terminator.nil?
+      @look_ahead -= 1 if line_restored && !terminator
     end
     result
   end
@@ -563,15 +563,15 @@ class PreprocessorReader < Reader
     result = super
 
     # QUESTION should this work for AsciiDoc table cell content? Currently it does not.
-    unless @document.nil? || !(@document.attributes.has_key? 'skip-front-matter')
+    if @document && (@document.attributes.has_key? 'skip-front-matter')
       if (front_matter = skip_front_matter! result)
         @document.attributes['front-matter'] = front_matter * EOL
       end
     end
 
     if opts.fetch :condense, true
-      result.shift && @lineno += 1 while !(first = result.first).nil? && first.empty?
-      result.pop while !(last = result.last).nil? && last.empty?
+      result.shift && @lineno += 1 while (first = result[0]) && first.empty?
+      result.pop while (last = result[-1]) && last.empty?
     end
 
     if (indent = opts.fetch(:indent, nil))
@@ -589,50 +589,58 @@ class PreprocessorReader < Reader
       return ''
     end
 
-    macroish = line.include?('::') && line.include?('[')
-    if macroish && line.include?('if') && (match = line.match(REGEXP[:ifdef_macro]))
-      # if escaped, mark as processed and return line unescaped
-      if line.start_with? '\\'
-        @unescape_next_line = true
-        @look_ahead += 1
-        line[1..-1]
-      else
-        if preprocess_conditional_inclusion(*match.captures)
-          # move the pointer past the conditional line
-          advance
-          # treat next line as uncharted territory
-          nil
-        else
-          # the line was not a valid conditional line
-          # mark it as visited and return it
+    # NOTE highly optimized
+    if line.end_with?(']') && !line.start_with?('[') && line.include?('::')
+      if line.include?('if') && (match = line.match(REGEXP[:ifdef_macro]))
+        # if escaped, mark as processed and return line unescaped
+        if line.start_with?('\\')
+          @unescape_next_line = true
           @look_ahead += 1
-          line
+          line[1..-1]
+        else
+          if preprocess_conditional_inclusion(*match.captures)
+            # move the pointer past the conditional line
+            advance
+            # treat next line as uncharted territory
+            nil
+          else
+            # the line was not a valid conditional line
+            # mark it as visited and return it
+            @look_ahead += 1
+            line
+          end
         end
+      elsif @skipping
+        advance
+        nil
+      elsif ((escaped = line.start_with?('\\include::')) || line.start_with?('include::')) && (match = line.match(REGEXP[:include_macro]))
+        # if escaped, mark as processed and return line unescaped
+        if escaped
+          @unescape_next_line = true
+          @look_ahead += 1
+          line[1..-1]
+        else
+          # QUESTION should we strip whitespace from raw attributes in Substitutors#parse_attributes? (check perf)
+          if preprocess_include match[1], match[2].strip
+            # peek again since the content has changed
+            nil
+          else
+            # the line was not a valid include line and is unchanged
+            # mark it as visited and return it
+            @look_ahead += 1
+            line
+          end
+        end
+      else
+        # NOTE optimization to inline super
+        @look_ahead += 1
+        line
       end
     elsif @skipping
       advance
-      nil 
-    elsif macroish && line.include?('include::') && (match = line.match(REGEXP[:include_macro]))
-      # if escaped, mark as processed and return line unescaped
-      if line.start_with? '\\'
-        @unescape_next_line = true
-        @look_ahead += 1
-        line[1..-1]
-      else
-        # QUESTION should we strip whitespace from raw attributes in Substitutors#parse_attributes? (check perf)
-        if preprocess_include match[1], match[2].strip
-          # peek again since the content has changed
-          nil
-        else
-          # the line was not a valid include line and is unchanged
-          # mark it as visited and return it
-          @look_ahead += 1
-          line
-        end
-      end
+      nil
     else
-      # optimization to inline super
-      #super
+      # NOTE optimization to inline super
       @look_ahead += 1
       line
     end
@@ -682,7 +690,7 @@ class PreprocessorReader < Reader
     # don't honor match if it doesn't meet this criteria
     # QUESTION should we warn for these bogus declarations?
     if ((directive == 'ifdef' || directive == 'ifndef') && target.empty?) ||
-        (directive == 'endif' && !text.nil?)
+        (directive == 'endif' && text)
       return false
     end
 
@@ -747,7 +755,7 @@ class PreprocessorReader < Reader
     end
 
     # conditional inclusion block
-    if directive == 'ifeval' || text.nil?
+    if directive == 'ifeval' || !text
       @skipping = true if skip
       @conditional_stack << {:target => target, :skip => skip, :skipping => @skipping}
     # single line conditional inclusion
@@ -806,9 +814,9 @@ class PreprocessorReader < Reader
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif @document.safe >= SafeMode::SECURE
-      replace_line "link:#{target}[]"
+      replace_line %(link:#{target}[])
       # TODO make creating the output target a helper method
-      #output_target = %(#{File.join(File.dirname(target), File.basename(target, File.extname(target)))}#{@document.attributes['outfilesuffix']})
+      #output_target = %(#{::File.join(::File.dirname(target), ::File.basename(target, ::File.extname(target)))}#{@document.attributes['outfilesuffix']})
       #unshift "link:#{output_target}[]"
       true
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
@@ -835,7 +843,7 @@ class PreprocessorReader < Reader
         target_type = :file
         # include file is resolved relative to dir of current include, or base_dir if within original docfile
         include_file = @document.normalize_system_path(target, @dir, nil, :target_name => 'include file')
-        if !File.file?(include_file)
+        if !::File.file?(include_file)
           warn "asciidoctor: WARNING: #{line_info}: include file not found: #{include_file}"
           advance
           return true
@@ -967,11 +975,11 @@ class PreprocessorReader < Reader
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
     @includes << Helpers.rootname(path)
     @file = file
-    @dir = File.dirname file
+    @dir = ::File.dirname file
     @path = path
     @lineno = lineno
     # NOTE only process lines in AsciiDoc files
-    @process_lines = ASCIIDOC_EXTENSIONS[File.extname(@file)]
+    @process_lines = ASCIIDOC_EXTENSIONS[::File.extname(@file)]
     if attributes.has_key? 'depth'
       depth = attributes['depth'].to_i
       depth = 1 if depth <= 0
@@ -981,7 +989,7 @@ class PreprocessorReader < Reader
     @lines = prepare_lines data, :normalize => true, :condense => false, :indent => attributes['indent']
     # FIXME kind of a hack
     #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
-    #Document::AttributeEntry.new('indir', File.dirname(@file)).save_to_next_block @document
+    #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
     if @lines.empty?
       pop_include
     else
@@ -996,7 +1004,7 @@ class PreprocessorReader < Reader
       @lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines = @include_stack.pop
       # FIXME kind of a hack
       #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
-      #Document::AttributeEntry.new('indir', File.dirname(@file)).save_to_next_block @document
+      #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
       @eof = @lines.empty?
       @look_ahead = 0
     end
@@ -1120,7 +1128,7 @@ class PreprocessorReader < Reader
   end
 
   def include_processors?
-    if @include_processors.nil?
+    if !@include_processors
       if @document.extensions? && @document.extensions.include_processors?
         @include_processors = @document.extensions.load_include_processors(@document)
         true

@@ -698,7 +698,7 @@ module Asciidoctor
     # endif::theme[]
     # endif::basebackend-html[]
     # endif::[]
-    :ifdef_macro      => /^[\\]?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,\+])\S+?)?)\[(.+)?\]$/,
+    :ifdef_macro      => /^\\?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,\+])\S+?)?)\[(.+)?\]$/,
 
     # "{asciidoctor-version}" >= "0.1.0"
     :eval_expr        => /^(\S.*?)#{CC_BLANK}*(==|!=|<=|>=|<|>)#{CC_BLANK}*(\S.*)$/,
@@ -1113,6 +1113,9 @@ module Asciidoctor
     autoload :Debug,   'asciidoctor/debug'
     autoload :VERSION, 'asciidoctor/version'
   end
+
+  # core extensions
+  require 'asciidoctor/core_ext'
 
   # modules
   require 'asciidoctor/helpers'

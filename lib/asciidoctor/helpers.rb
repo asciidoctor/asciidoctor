@@ -48,9 +48,7 @@ module Helpers
   #
   # returns a String Array of normalized lines
   def self.normalize_lines_array data
-    unless data.size > 0
-      return []
-    end
+    return [] if data.empty?
  
     if COERCE_ENCODING
       utf8 = ::Encoding::UTF_8
@@ -88,9 +86,7 @@ module Helpers
   #
   # returns a String Array of normalized lines
   def self.normalize_lines_from_string data 
-    if data.nil? || data == ''
-      return []
-    end
+    return [] if data.nothing?
 
     if COERCE_ENCODING
       utf8 = ::Encoding::UTF_8
@@ -136,12 +132,7 @@ module Helpers
   #
   # Returns the String filename with the file extension removed
   def self.rootname(file_name)
-    ext = File.extname(file_name)
-    if ext.empty?
-      file_name
-    else
-      file_name[0...-ext.length]
-    end
+    (ext = File.extname(file_name)).empty? ? file_name : file_name[0...-ext.length]
   end
 
   def self.mkdir_p(dir)

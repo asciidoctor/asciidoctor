@@ -57,8 +57,8 @@ class Lexer
       # is treated like an untitled section
       # NOTE logic relocated to end of next_section
       #if Compliance.unwrap_standalone_preamble &&
-      #    document.blocks.size == 1 && (first_block = document.blocks.first).context == :preamble &&
-      #    first_block.blocks? && (document.doctype != 'book' || first_block.blocks.first.style != 'abstract')
+      #    document.blocks.size == 1 && (first_block = document.blocks[0]).context == :preamble &&
+      #    first_block.blocks? && (document.doctype != 'book' || first_block.blocks[0].style != 'abstract')
       #  preamble = document.blocks.shift
       #  while (child_block = preamble.blocks.shift)
       #    child_block.parent = document
@@ -96,7 +96,7 @@ class Lexer
     # yep, document title logic in AsciiDoc is just insanity
     # definitely an area for spec refinement
     assigned_doctitle = nil
-    unless (val = document.attributes.fetch('doctitle', '')).empty?
+    unless (val = document.attributes['doctitle']).nothing?
       document.title = val
       assigned_doctitle = val
     end
@@ -118,7 +118,7 @@ class Lexer
       parse_header_metadata(reader, document)
     end
 
-    if !(val = document.attributes.fetch('doctitle', '')).empty? &&
+    if !(val = document.attributes['doctitle']).nothing? &&
         val != section_title
       document.title = val
       assigned_doctitle = val
@@ -318,7 +318,7 @@ class Lexer
                 end
               end
             elsif section.blocks.size == 1
-              first_block = section.blocks.first
+              first_block = section.blocks[0]
               # open the [partintro] open block for appending
               if !intro && first_block.content_model == :compound
                 #new_block.parent = (intro = first_block)
@@ -363,7 +363,7 @@ class Lexer
       if preamble.blocks?
         # unwrap standalone preamble (i.e., no sections), if permissible
         if Compliance.unwrap_standalone_preamble && document.blocks.size == 1 &&
-            (doctype != 'book' || preamble.blocks.first.style != 'abstract')
+            (doctype != 'book' || preamble.blocks[0].style != 'abstract')
           document.blocks.shift
           while (child_block = preamble.blocks.shift)
             child_block.parent = document
@@ -491,14 +491,14 @@ class Lexer
 
           # process lines normally
           unless text_only
-            first_char = Compliance.markdown_syntax ? this_line.lstrip[0..0] : this_line[0..0]
+            first_char = Compliance.markdown_syntax ? this_line.lstrip.chr : this_line.chr
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
             if (BREAK_LINES.has_key? first_char) && this_line.length >= 3 &&
                 (match = this_line.match(Compliance.markdown_syntax ? REGEXP[:break_line_plus] : REGEXP[:break_line]))
               block = Block.new(parent, BREAK_LINES[first_char], :content_model => :empty)
               break
 
-            elsif (match = this_line.match(REGEXP[:media_blk_macro]))
+            elsif this_line.end_with?(']') && (match = this_line.match(REGEXP[:media_blk_macro]))
               blk_ctx = match[1].to_sym
               block = Block.new(parent, blk_ctx, :content_model => :empty)
               if blk_ctx == :image
@@ -611,14 +611,14 @@ class Lexer
             block = next_outline_list(reader, :olist, parent)
             # QUESTION move this logic to next_outline_list?
             if !attributes['style'] && !block.attributes['style']
-              marker = block.items.first.marker
+              marker = block.items[0].marker
               if marker.start_with? '.'
                 # first one makes more sense, but second one is AsciiDoc-compliant
-                #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES.first).to_s
-                attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || ORDERED_LIST_STYLES.first).to_s
+                #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES[0]).to_s
+                attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || ORDERED_LIST_STYLES[0]).to_s
               else
                 style = ORDERED_LIST_STYLES.detect{|s| marker.match(ORDERED_LIST_MARKER_PATTERNS[s]) }
-                attributes['style'] = (style || ORDERED_LIST_STYLES.first).to_s
+                attributes['style'] = (style || ORDERED_LIST_STYLES[0]).to_s
               end
             end
             break
@@ -635,7 +635,7 @@ class Lexer
             attributes['reftext'] = float_reftext if float_reftext
             float_id ||= attributes['id'] if attributes.has_key?('id')
             block = Block.new(parent, :floating_title, :content_model => :empty)
-            if float_id.nil? || float_id.empty?
+            if float_id.nothing?
               # FIXME remove hack of creating throwaway Section to get at the generate_id method
               tmp_sect = Section.new(parent)
               tmp_sect.title = float_title
@@ -727,7 +727,7 @@ class Lexer
 
             catalog_inline_anchors(lines.join(EOL), document)
 
-            first_line = lines.first
+            first_line = lines[0]
             if !text_only && (admonition_match = first_line.match(REGEXP[:admonition_inline]))
               lines[0] = admonition_match.post_match.lstrip
               attributes['style'] = admonition_match[1]
@@ -773,8 +773,8 @@ class Lexer
               #block << Block.new(block, :paragraph, :source => lines)
             else
               # if [normal] is used over an indented paragraph, unindent it
-              if style == 'normal' && ((first_char = lines.first[0..0]) == ' ' || first_char == TAB)
-                first_line = lines.first
+              if style == 'normal' && ((first_char = lines[0].chr) == ' ' || first_char == TAB)
+                first_line = lines[0]
                 first_line_shifted = first_line.lstrip
                 indent = line_length(first_line) - line_length(first_line_shifted)
                 lines[0] = first_line_shifted
@@ -834,7 +834,7 @@ class Lexer
 
         when :math, :latexmath, :asciimath
           if block_context == :math
-            attributes['style'] = (default_math_syntax = document.attributes['math'].to_s) == '' ? 'asciimath' : default_math_syntax
+            attributes['style'] = (default_math_syntax = document.attributes['math']).nothing? ? 'asciimath' : default_math_syntax
           end
           block = build_block(:math, :raw, terminator, parent, reader, attributes)
 
@@ -844,7 +844,7 @@ class Lexer
         when :table
           cursor = reader.cursor
           block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), cursor
-          case terminator[0..0]
+          case terminator.chr
             when ','
               attributes['format'] = 'csv'
             when ':'
@@ -1103,13 +1103,13 @@ class Lexer
 
       # if we are moving to the next item, and the marker is different
       # determine if we are moving up or down in nesting
-      if list_block.items? && marker != list_block.items.first.marker
+      if list_block.items? && marker != list_block.items[0].marker
         # assume list is nested by default, but then check to see if we are
         # popping out of a nested list by matching an ancestor's list marker
         this_item_level = list_block.level + 1
         ancestor = parent
         while ancestor.context == list_type
-          if marker == ancestor.items.first.marker
+          if marker == ancestor.items[0].marker
             this_item_level = ancestor.level
             break
           end
@@ -1151,7 +1151,7 @@ class Lexer
       text.scan(REGEXP[:callout_quick_scan]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
-        if m[0][0..0] != '\\'
+        if m[0].chr != '\\'
           document.callouts.register(m[2])
         end
         # we have to mark as found even if it's escaped so it can be unescaped
@@ -1238,7 +1238,7 @@ class Lexer
     if list_type == :dlist
       list_term = ListItem.new(list_block, match[1])
       list_item = ListItem.new(list_block, match[3])
-      has_text = !match[3].to_s.empty?
+      has_text = !match[3].nothing?
     else
       # Create list item using first line as the text of the list item
       text = match[2]
@@ -1415,7 +1415,7 @@ class Lexer
           else
             if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
               within_nested_list = true
-              if nested_list_type == :dlist && $~[3].to_s.empty?
+              if nested_list_type == :dlist && $~[3].nothing?
                 # get greedy again
                 has_text = false
               end
@@ -1446,7 +1446,7 @@ class Lexer
               elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
                 buffer << this_line
                 within_nested_list = true
-                if nested_list_type == :dlist && $~[3].to_s.empty?
+                if nested_list_type == :dlist && $~[3].nothing?
                   # get greedy again
                   has_text = false
                 end
@@ -1476,7 +1476,7 @@ class Lexer
           has_text = true if !this_line.empty?
           if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
             within_nested_list = true
-            if nested_list_type == :dlist && $~[3].to_s.empty?
+            if nested_list_type == :dlist && $~[3].nothing?
               # get greedy again
               has_text = false
             end
@@ -1561,7 +1561,7 @@ class Lexer
   #
   # line - the String line from under the section title.
   def self.section_level(line)
-    SECTION_LEVELS[line[0..0]]
+    SECTION_LEVELS[line.chr]
   end
 
   #--
@@ -1613,7 +1613,7 @@ class Lexer
   end
 
   def self.is_single_line_section_title?(line1)
-    first_char = line1.nil? ? nil : line1[0..0]
+    first_char = line1 ? line1.chr : nil
     if (first_char == '=' || (Compliance.markdown_syntax && first_char == '#')) &&
         (match = line1.match(REGEXP[:section_title]))
       single_line_section_level match[1]
@@ -1623,7 +1623,7 @@ class Lexer
   end
 
   def self.is_two_line_section_title?(line1, line2)
-    if !line1.nil? && !line2.nil? && SECTION_LEVELS.has_key?(line2[0..0]) &&
+    if line1 && line2 && SECTION_LEVELS.has_key?(line2.chr) &&
         line2.match(REGEXP[:section_underline]) && line1.match(REGEXP[:section_name]) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
@@ -1684,7 +1684,7 @@ class Lexer
     sect_reftext = nil
     single_line = true
 
-    first_char = line1[0..0]
+    first_char = line1.chr
     if (first_char == '=' || (Compliance.markdown_syntax && first_char == '#')) &&
         (match = line1.match(REGEXP[:section_title]))
       sect_level = single_line_section_level match[1]
@@ -1697,8 +1697,8 @@ class Lexer
         end
       end
     elsif Compliance.underline_style_section_titles
-      line2 = reader.peek_line true
-      if !line2.nil? && SECTION_LEVELS.has_key?(line2[0..0]) && line2.match(REGEXP[:section_underline]) &&
+      
+      if (line2 = reader.peek_line true) && SECTION_LEVELS.has_key?(line2.chr) && line2.match(REGEXP[:section_underline]) &&
         (name_match = line1.match(REGEXP[:section_name])) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
@@ -1827,7 +1827,7 @@ class Lexer
         end
         if authors.size == 1
           # do not allow multiple, process as names only
-          author_metadata = process_authors authors.first, true, false
+          author_metadata = process_authors authors[0], true, false
         elsif authors.size > 1
           # allow multiple, process as names only
           author_metadata = process_authors authors.join('; '), true
@@ -1969,17 +1969,17 @@ class Lexer
       reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :skip_processing => true)
     elsif commentish && next_line.match(REGEXP[:comment])
       # do nothing, we'll skip it
-    elsif !options[:text] && (match = next_line.match(REGEXP[:attr_entry]))
+    elsif !options[:text] && next_line.start_with?(':') && (match = next_line.match(REGEXP[:attr_entry]))
       process_attribute_entry(reader, parent, attributes, match)
-    elsif match = next_line.match(REGEXP[:anchor])
-      unless match[1] == ''
+    elsif (in_square_brackets = next_line.start_with?('[') && next_line.end_with?(']')) && (match = next_line.match(REGEXP[:anchor]))
+      unless match[1].nothing?
         attributes['id'] = match[1]
         # AsciiDoc always uses [id] as the reftext in HTML output,
         # but I'd like to do better in Asciidoctor
         # registration is deferred until the block or section is processed
         attributes['reftext'] = match[2] unless match[2].nil?
       end
-    elsif match = next_line.match(REGEXP[:blk_attr_list])
+    elsif in_square_brackets && (match = next_line.match(REGEXP[:blk_attr_list]))
       parent.document.parse_attributes(match[1], [], :sub_input => true, :into => attributes)
     # NOTE title doesn't apply to section, but we need to stash it for the first block
     # TODO should issue an error if this is found above the document title
@@ -2323,10 +2323,10 @@ class Lexer
         if m[2]
           # make this an operation
           colspec, rowspec = m[2].split '.'
-          if !colspec.to_s.empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
+          if !colspec.nothing? && Table::ALIGNMENTS[:h].has_key?(colspec)
             spec['halign'] = Table::ALIGNMENTS[:h][colspec]
           end
-          if !rowspec.to_s.empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
+          if !rowspec.nothing? && Table::ALIGNMENTS[:v].has_key?(rowspec)
             spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
           end
         end
@@ -2371,8 +2371,8 @@ class Lexer
       rest = (pos == :start ? m.post_match : m.pre_match)
       if m[1]
         colspec, rowspec = m[1].split '.'
-        colspec = colspec.to_s.empty? ? 1 : colspec.to_i
-        rowspec = rowspec.to_s.empty? ? 1 : rowspec.to_i
+        colspec = colspec.nothing? ? 1 : colspec.to_i
+        rowspec = rowspec.nothing? ? 1 : rowspec.to_i
         if m[2] == '+'
           spec['colspan'] = colspec unless colspec == 1
           spec['rowspan'] = rowspec unless rowspec == 1
@@ -2383,10 +2383,10 @@ class Lexer
       
       if m[3]
         colspec, rowspec = m[3].split '.'
-        if !colspec.to_s.empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
+        if !colspec.nothing? && Table::ALIGNMENTS[:h].has_key?(colspec)
           spec['halign'] = Table::ALIGNMENTS[:h][colspec]
         end
-        if !rowspec.to_s.empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
+        if !rowspec.nothing? && Table::ALIGNMENTS[:v].has_key?(rowspec)
           spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
         end
       end
@@ -2556,7 +2556,7 @@ class Lexer
     # strip leading block indent
     offsets = lines.map do |line|
       # break if the first char is non-whitespace
-      break [] unless line[0..0].lstrip.empty?
+      break [] unless line.chr.lstrip.empty?
       if line.include? TAB
         tab_detected = true
         line = line.gsub(TAB_PATTERN, tab_expansion)

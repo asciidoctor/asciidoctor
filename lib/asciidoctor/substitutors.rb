@@ -58,7 +58,7 @@ module Substitutors
   def apply_subs source, subs = :normal, expand = false
     if subs == :normal
       subs = SUBS[:normal]
-    elsif subs.nil?
+    elsif !subs
       return source
     elsif expand
       if subs.is_a? Symbol
@@ -154,12 +154,12 @@ module Substitutors
         next m[0][1..-1]
       end
 
-      if !(text = m[4]).nil?
-        text = unescape_brackets text
-        if !(subslist = m[3].to_s).empty?
-          subs = resolve_pass_subs subslist
-        else
+      if m[4]
+        text = unescape_brackets m[4]
+        if m[3].nothing?
           subs = []
+        else
+          subs = resolve_pass_subs m[3]
         end
       else
         text = m[2]
@@ -168,7 +168,7 @@ module Substitutors
 
       @passthroughs << {:text => text, :subs => subs}
       index = @passthroughs.size - 1
-      "#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
+      %(#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]})
     } if (text.include? '+++') || (text.include? '$$') || (text.include? 'pass:')
 
     text = text.gsub(REGEXP[:pass_lit]) {
@@ -178,12 +178,12 @@ module Substitutors
       unescaped_attrs = nil
       # honor the escape
       if m[3].start_with? '\\'
-        next m[2].nil? ? "#{m[1]}#{m[3][1..-1]}" : "#{m[1]}[#{m[2]}]#{m[3][1..-1]}"
-      elsif m[1] == '\\' && !m[2].nil?
+        next m[2] ? %(#{m[1]}[#{m[2]}]#{m[3][1..-1]}) : %(#{m[1]}#{m[3][1..-1]})
+      elsif m[1] == '\\' && m[2]
         unescaped_attrs = "[#{m[2]}]"
       end
 
-      if unescaped_attrs.nil? && !m[2].nil?
+      if !unescaped_attrs && m[2]
         attributes = parse_attributes(m[2])
       else
         attributes = {}
@@ -191,7 +191,7 @@ module Substitutors
 
       @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :type => :monospaced}
       index = @passthroughs.size - 1
-      "#{unescaped_attrs || m[1]}#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
+      %(#{unescaped_attrs || m[1]}#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]})
     } if (text.include? '`')
 
     # NOTE we need to do the math in a subsequent step to allow it to be escaped by the former
@@ -204,12 +204,12 @@ module Substitutors
       end
 
       type = m[1].to_sym
-      type = ((default_type = document.attributes['math'].to_s) == '' ? 'asciimath' : default_type).to_sym if type == :math
+      type = ((default_type = document.attributes['math']).nothing? ? 'asciimath' : default_type).to_sym if type == :math
       text = unescape_brackets m[3]
-      if !(subslist = m[2].to_s).empty?
-        subs = resolve_pass_subs subslist
-      else
+      if m[2].nothing?
         subs = (@document.basebackend? 'html') ? [:specialcharacters] : []
+      else
+        subs = resolve_pass_subs m[2]
       end
 
       @passthroughs << {:text => text, :subs => subs, :type => type}
@@ -226,7 +226,7 @@ module Substitutors
   #
   # returns The String text with the passthrough text restored
   def restore_passthroughs(text)
-    return text if @passthroughs.nil? || @passthroughs.empty? || !text.include?(PASS_PLACEHOLDER[:start])
+    return text if @passthroughs.nothing? || !text.include?(PASS_PLACEHOLDER[:start])
 
     text.gsub(PASS_PLACEHOLDER[:match]) {
       pass = @passthroughs[$~[1].to_i]
@@ -328,7 +328,7 @@ module Substitutors
   # NOTE it's necessary to perform this substitution line-by-line
   # so that a missing key doesn't wipe out the whole block of data
   def sub_attributes(data, opts = {})
-    return data if data.nil? || data.empty?
+    return data if data.nothing?
 
     string_data = data.is_a? String
     # normalizes data type to an array (string becomes single-element array)
@@ -344,14 +344,14 @@ module Substitutors
         # escaped attribute, return unescaped
         if m[1] == '\\' || m[4] == '\\'
           "{#{m[2]}}"
-        elsif !(directive = m[3]).to_s.empty?
-          offset = directive.length + 1
+        elsif !m[3].nothing?
+          offset = (directive = m[3]).length + 1
           expr = m[2][offset..-1]
           case directive
           when 'set'
             args = expr.split(':')
             _, value = Lexer::store_attribute(args[0], args[1] || '', @document)
-            if value.nil?
+            unless value
               # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
               if @document.attributes.fetch('attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
                 Debug.debug { "Undefining attribute: #{key}, line marked for removal" }
@@ -372,7 +372,7 @@ module Substitutors
             end
           else
             # if we get here, our attr_ref regex is too loose
-            warn "asciidoctor: WARNING: illegal attribute directive: #{m[2]}"
+            warn "asciidoctor: WARNING: illegal attribute directive: #{m[3]}"
             m[0]
           end
         elsif (key = m[2].downcase) && (@document.attributes.has_key? key)
@@ -408,7 +408,7 @@ module Substitutors
   #
   # returns The String with the inline macros rendered using the backend templates
   def sub_macros(source)
-    return source if source.nil? || source.empty?
+    return source if source.nothing?
 
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
@@ -469,7 +469,7 @@ module Substitutors
           menu = m[1]
           items = m[2]
 
-          if items.nil?
+          if !items
             submenus = []
             menuitem = nil
           else
@@ -573,7 +573,7 @@ module Substitutors
 
         num_brackets = 0
         text_in_brackets = nil
-        if (macro_name = m[1]).nil?
+        unless (macro_name = m[1])
           text_in_brackets = m[3]
           if (text_in_brackets.start_with? '(') && (text_in_brackets.end_with? ')')
             text_in_brackets = text_in_brackets[1...-1]
@@ -585,7 +585,7 @@ module Substitutors
 
         # non-visible
         if macro_name == 'indexterm' || num_brackets == 3
-          if macro_name.nil?
+          if !macro_name
             # (((Tigers,Big cats)))
             terms = split_simple_csv normalize_string(text_in_brackets)
           else
@@ -596,7 +596,7 @@ module Substitutors
           Inline.new(self, :indexterm, nil, :attributes => {'terms' => terms}).render
         # visible
         else
-          if macro_name.nil?
+          if !macro_name
             # ((Tigers))
             text = normalize_string text_in_brackets
           else
@@ -616,10 +616,10 @@ module Substitutors
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
-          next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
+          next %(#{m[1]}#{m[2][1..-1]}#{m[3]})
         # not a valid macro syntax w/o trailing square brackets
         # we probably shouldn't even get here...our regex is doing too much
-        elsif m[1] == 'link:' && m[3].nil?
+        elsif m[1] == 'link:' && !m[3]
           next m[0]
         end
         prefix = (m[1] != 'link:' ? m[1] : '')
@@ -639,8 +639,8 @@ module Substitutors
         @document.register(:links, target)
 
         attrs = nil
-        #text = !m[3].nil? ? sub_attributes(m[3].gsub('\]', ']')) : ''
-        if !m[3].to_s.empty?
+        #text = m[3] ? sub_attributes(m[3].gsub('\]', ']')) : ''
+        if !m[3].nothing?
           if use_link_attrs && (m[3].start_with?('"') || m[3].include?(','))
             attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')), [])
             text = attrs[1]
@@ -762,7 +762,7 @@ module Substitutors
         else
           id, text = m[2].split(',', 2)
           id = id.strip
-          if !text.nil?
+          if text
             # REVIEW it's a dirty job, but somebody's gotta do it
             text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)))
             index = @document.counter('footnote-number')
@@ -787,7 +787,7 @@ module Substitutors
 
   # Internal: Substitute normal and bibliographic anchors
   def sub_inline_anchors(text, found = nil)
-    if (found.nil? || found[:square_bracket]) && text.include?('[[[')
+    if (!found || found[:square_bracket]) && text.include?('[[[')
       text = text.gsub(REGEXP[:biblio_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -800,8 +800,8 @@ module Substitutors
       }
     end
 
-    if ((found.nil? || found[:square_bracket]) && text.include?('[[')) ||
-        ((found.nil? || found[:macroish]) && text.include?('anchor:'))
+    if ((!found || found[:square_bracket]) && text.include?('[[')) ||
+        ((!found || found[:macroish]) && text.include?('anchor:'))
       text = text.gsub(REGEXP[:anchor_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -811,13 +811,13 @@ module Substitutors
         end
         id = m[1] || m[3]
         reftext = m[2] || m[4]
-        reftext = "[#{id}]" if reftext.nil?
+        reftext = %([#{id}]) if !reftext
         # enable if we want to allow double quoted values
         #id = id.sub(REGEXP[:dbl_quoted], '\2')
-        #if reftext.nil?
-        #  reftext = "[#{id}]"
-        #else
+        #if reftext
         #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
+        #else
+        #  reftext = "[#{id}]"
         #end
         if @document.references[:ids].has_key? id
           # reftext may not match since inline substitutions have been applied
@@ -836,7 +836,7 @@ module Substitutors
 
   # Internal: Substitute cross reference links
   def sub_inline_xrefs(text, found = nil)
-    if (found.nil? || found[:macroish]) || text.include?('&lt;&lt;')
+    if (!found || found[:macroish]) || text.include?('&lt;&lt;')
       text = text.gsub(REGEXP[:xref_macro]) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -844,13 +844,13 @@ module Substitutors
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        if m[1].nil? || (::RUBY_ENGINE_OPAL && m[1].to_s == '')
+        if !m[1] || (::RUBY_ENGINE_OPAL && m[1].to_s == '')
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
         else
           id, reftext = m[1].split(',', 2).map(&:strip)
           id = id.sub(REGEXP[:dbl_quoted], ::RUBY_ENGINE_OPAL ? '$2' : '\2')
-          reftext = reftext.sub(REGEXP[:m_dbl_quoted], ::RUBY_ENGINE_OPAL ? '$2' : '\2') unless reftext.nil?
+          reftext = reftext.sub(REGEXP[:m_dbl_quoted], ::RUBY_ENGINE_OPAL ? '$2' : '\2') if reftext
         end
 
         if id.include? '#'
@@ -861,7 +861,7 @@ module Substitutors
         end
 
         # handles form: id
-        if path.nil?
+        if !path
           refid = fragment
           target = "##{fragment}"
         # handles forms: doc#, doc.adoc#, doc#id and doc.adoc#id
@@ -873,9 +873,9 @@ module Substitutors
             path = nil
             target = "##{fragment}"
           else
-            refid = fragment.nil? ? path : "#{path}##{fragment}"
+            refid = fragment ? %(#{path}##{fragment}) : path
             path = "#{@document.attributes['relfileprefix']}#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'}"
-            target = fragment.nil? ? path : "#{path}##{fragment}"
+            target = fragment ? %(#{path}##{fragment}) : path
           end
         end
         Inline.new(self, :anchor, reftext, :type => :xref, :target => target, :attributes => {'path' => path, 'fragment' => fragment, 'refid' => refid}).render
@@ -929,24 +929,24 @@ module Substitutors
   def transform_quoted_text(match, type, scope)
     unescaped_attrs = nil
     if match[0].start_with? '\\'
-      if scope == :constrained && !match[2].nil?
-        unescaped_attrs = "[#{match[2]}]"
+      if scope == :constrained && match[2]
+        unescaped_attrs = %([#{match[2]}])
       else
         return match[0][1..-1]
       end
     end
 
     if scope == :constrained
-      if unescaped_attrs.nil?
+      if !unescaped_attrs
         attributes = parse_quoted_text_attributes(match[2])
-        id = attributes.nil? ? nil : attributes.delete('id')
+        id = attributes ? attributes.delete('id') : nil
         "#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :id => id, :attributes => attributes).render}"
       else
         "#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type, :attributes => {}).render}"
       end
     else
       attributes = parse_quoted_text_attributes(match[1])
-      id = attributes.nil? ? nil : attributes.delete('id')
+      id = attributes ? attributes.delete('id') : nil
       Inline.new(self, :quoted, match[2], :type => type, :id => id, :attributes => attributes).render
     end
   end
@@ -957,7 +957,7 @@ module Substitutors
   #
   # returns nil if str is nil, an empty Hash if str is empty, otherwise a Hash of attributes (role and id only)
   def parse_quoted_text_attributes(str)
-    return nil if str.nil?
+    return nil unless str
     return {} if str.empty?
     str = sub_attributes(str) if str.include?('{')
     str = str.strip
@@ -986,7 +986,7 @@ module Substitutors
       end
 
       attrs = {}
-      attrs['id'] = id unless id.nil?
+      attrs['id'] = id if id
       attrs['role'] = roles * ' ' unless roles.empty?
       attrs
     else
@@ -1001,7 +1001,7 @@ module Substitutors
   #
   # returns nil if attrline is nil, an empty Hash if attrline is empty, otherwise a Hash of parsed attributes
   def parse_attributes(attrline, posattrs = ['role'], opts = {})
-    return nil if attrline.nil?
+    return nil unless attrline
     return {} if attrline.empty?
     attrline = @document.sub_attributes(attrline) if opts[:sub_input]
     attrline = unescape_bracketed_text(attrline) if opts[:unescape_input]
@@ -1081,7 +1081,7 @@ module Substitutors
   #
   # returns An Array of Symbols representing the substitution operation
   def resolve_subs subs, type = :block, defaults = nil, subject = nil
-    return [] if subs.nil? || subs.empty?
+    return [] if subs.nothing?
     candidates = []
     # only allow modification if defaults is given
     modification_group = defaults.nil? ? false : nil
@@ -1089,7 +1089,7 @@ module Substitutors
       key = val.strip
       # QUESTION can we encapsulate this logic?
       if modification_group != false
-        if (first = key[0..0]) == '+'
+        if (first = key.chr) == '+'
           operation = :append
           key = key[1..-1]
         elsif first == '-'
@@ -1122,6 +1122,7 @@ module Substitutors
         resolved_keys = [:specialcharacters]
       elsif COMPOSITE_SUBS.has_key? key
         resolved_keys = COMPOSITE_SUBS[key]
+      # NOTE Symbol doesn't have .length or .size in Ruby 1.8
       elsif type == :inline && key.to_s.length == 1 && (SUB_SYMBOLS.has_key? key)
         resolved_key = SUB_SYMBOLS[key]
         if COMPOSITE_SUBS.has_key? resolved_key
@@ -1263,7 +1264,7 @@ module Substitutors
             line = line[0...pos]
           end
           if conums.size == 1
-            %(#{line}#{Inline.new(self, :callout, conums.first, :id => @document.callouts.read_next_id).render }#{tail})
+            %(#{line}#{Inline.new(self, :callout, conums[0], :id => @document.callouts.read_next_id).render }#{tail})
           else
             conums_markup = conums.map {|conum| Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).render } * ' '
             %(#{line}#{conums_markup}#{tail})
