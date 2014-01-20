@@ -25,7 +25,7 @@ class Renderer
     backend = options[:backend]
     if ::RUBY_ENGINE_OPAL
       ::Template.instance_variable_get('@_cache').each do |path, tmpl|
-        @views[(File.basename path)] = tmpl
+        @views[(::File.basename path)] = tmpl
       end
       return
     end
@@ -55,7 +55,7 @@ class Renderer
       # this setting should really be applied per template
       @chomp_result = true
 
-      if (template_cache = options[:template_cache]) === true
+      if (template_cache = options[:template_cache]) == true
         # FIXME probably want to use our own cache object for more control
         @cache = (@@global_cache ||= TemplateCache.new)
       elsif template_cache
@@ -103,9 +103,9 @@ class Renderer
         helpers = nil
         scan_result = {}
         # Grab the files in the top level of the directory (we're not traversing)
-        Dir.glob(File.join(template_dir, template_glob)).
-            select{|f| File.file? f }.each do |template|
-          basename = File.basename(template)
+        ::Dir.glob(::File.join(template_dir, template_glob)).
+            select{|f| ::File.file? f }.each do |template|
+          basename = ::File.basename(template)
           if basename == 'helpers.rb'
             helpers = template
             next
@@ -120,14 +120,14 @@ class Renderer
           elsif ext_name == 'erb'
             eruby = load_eruby options[:eruby] unless eruby
           end
-          next unless Tilt.registered? ext_name
+          next unless ::Tilt.registered? ext_name
           opts = view_opts[ext_name.to_sym]
           if @cache
             @views[view_name] = scan_result[view_name] = @cache.fetch(:view, template) {
-              Tilt.new(template, nil, opts)
+              ::Tilt.new(template, nil, opts)
             }
           else
-            @views[view_name] = Tilt.new template, nil, opts
+            @views[view_name] = ::Tilt.new template, nil, opts
           end
         end
 

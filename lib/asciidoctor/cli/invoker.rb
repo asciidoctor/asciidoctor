@@ -14,12 +14,12 @@ module Asciidoctor
         options = options.flatten
         if !options.empty? && options.first.is_a?(Cli::Options)
           @options = options.first
-        elsif options.first.is_a? Hash
+        elsif options.first.is_a? ::Hash
           @options = Cli::Options.new(options)
         else
           @options = Cli::Options.parse!(options)
           # hmmm
-          if @options.is_a?(Integer)
+          if @options.is_a?(::Integer)
             @code = @options
             @options = nil
           end
@@ -53,7 +53,7 @@ module Asciidoctor
             when :output_file
               outfile = v
             when :destination_dir
-              #opts[:to_dir] = File.expand_path(v) unless v.nil?
+              #opts[:to_dir] = ::File.expand_path(v) unless v.nil?
               opts[:to_dir] = v unless v.nil?
             when :attributes
               opts[:attributes] = v.dup
@@ -70,7 +70,7 @@ module Asciidoctor
              # allows use of block to supply stdin, particularly useful for tests
              inputs = [block_given? ? yield : STDIN]
           else
-             inputs = infiles.map {|infile| File.new infile, 'r'}
+             inputs = infiles.map {|infile| ::File.new infile, 'r'}
           end
 
           # NOTE: if infile is stdin, default to outfile as stout
@@ -94,7 +94,7 @@ module Asciidoctor
             opts[:monitor] = {} if profile
 
             @documents ||= []
-            @documents.push Asciidoctor.render(input, opts)
+            @documents.push ::Asciidoctor.render(input, opts)
 
             if profile
               monitor = opts[:monitor]
@@ -105,10 +105,10 @@ module Asciidoctor
               err.puts "  Total time to read, parse and render: #{'%05.5f' % (monitor[:load_render] || monitor[:parse])}"
             end
           end
-        rescue Exception => e
-          raise e if @options[:trace] || SystemExit === e
+        rescue ::Exception => e
+          raise e if @options[:trace] || ::SystemExit === e
           err = (@err || $stderr)
-          err.print "#{e.class}: " if e.class != RuntimeError
+          err.print "#{e.class}: " if e.class != ::RuntimeError
           err.puts e.message
           err.puts '  Use --trace for backtrace'
           @code = 1

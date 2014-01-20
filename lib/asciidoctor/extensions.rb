@@ -33,11 +33,11 @@ module Extensions
     end
 
     def resolve_class(object)
-      object.is_a?(Class) ? object : class_for_name(object.to_s)
+      object.is_a?(::Class) ? object : class_for_name(object.to_s)
     end
 
     def class_for_name(qualified_name)
-      qualified_name.split('::').inject(Object) do |module_, name|
+      qualified_name.split('::').inject(::Object) do |module_, name|
         if name.empty?
           module_
         elsif module_.const_defined? name
@@ -77,7 +77,7 @@ module Extensions
       @inline_macro_processor_cache = {}
 
       Extensions.registered.each do |extension|
-        if extension.is_a? Proc
+        if extension.is_a? ::Proc
           register document, &extension
         else
           extension.activate self, document
@@ -179,7 +179,7 @@ module Extensions
       @blocks[name] = processor
       if block_given?
         @block_delimiters[block] = name
-      elsif delimiter && delimiter.is_a?(Regexp)
+      elsif delimiter && delimiter.is_a?(::Regexp)
         @block_delimiters[delimiter] = name
       end
     end
@@ -195,12 +195,12 @@ module Extensions
     # NOTE block delimiters not yet implemented
     def at_block_delimiter? line
       @block_delimiters.each do |delimiter, name|
-        if delimiter.is_a? Proc
+        if delimiter.is_a? ::Proc
           if delimiter.call(line)
             return name
           end
         else
-          if line.match(delimiter)
+          if delimiter =~ line
             return name
           end
         end

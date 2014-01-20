@@ -246,7 +246,7 @@ A | here| a | there
       assert_css 'table > tgroup > thead', output, 1
       assert_css 'table > tgroup > thead > row', output, 1
       assert_css 'table > tgroup > thead > row > entry', output, 2
-      assert_css 'table > tgroup > thead > row > entry > simpara', output, 2
+      assert_css 'table > tgroup > thead > row > entry > simpara', output, 0
       assert_css 'table > tgroup > tfoot', output, 1
       assert_css 'table > tgroup > tfoot > row', output, 1
       assert_css 'table > tgroup > tfoot > row > entry', output, 2

@@ -61,7 +61,7 @@ module Substitutors
     elsif !subs
       return source
     elsif expand
-      if subs.is_a? Symbol
+      if subs.is_a? ::Symbol
         subs = COMPOSITE_SUBS[subs] || [subs]
       else
         effective_subs = []
@@ -146,7 +146,7 @@ module Substitutors
   #
   # returns - The text with the passthrough region substituted with placeholders
   def extract_passthroughs(text)
-    text = text.gsub(REGEXP[:pass_macro]) {
+    text = text.gsub(PassInlineMacroRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
@@ -156,7 +156,7 @@ module Substitutors
 
       if m[4]
         text = unescape_brackets m[4]
-        if m[3].nothing?
+        if m[3].nil_or_empty?
           subs = []
         else
           subs = resolve_pass_subs m[3]
@@ -171,7 +171,7 @@ module Substitutors
       %(#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]})
     } if (text.include? '+++') || (text.include? '$$') || (text.include? 'pass:')
 
-    text = text.gsub(REGEXP[:pass_lit]) {
+    text = text.gsub(PassInlineLiteralRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
 
@@ -195,7 +195,7 @@ module Substitutors
     } if (text.include? '`')
 
     # NOTE we need to do the math in a subsequent step to allow it to be escaped by the former
-    text = text.gsub(REGEXP[:inline_math_macro]) {
+    text = text.gsub(MathInlineMacroRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
@@ -204,9 +204,9 @@ module Substitutors
       end
 
       type = m[1].to_sym
-      type = ((default_type = document.attributes['math']).nothing? ? 'asciimath' : default_type).to_sym if type == :math
+      type = ((default_type = document.attributes['math']).nil_or_empty? ? 'asciimath' : default_type).to_sym if type == :math
       text = unescape_brackets m[3]
-      if m[2].nothing?
+      if m[2].nil_or_empty?
         subs = (@document.basebackend? 'html') ? [:specialcharacters] : []
       else
         subs = resolve_pass_subs m[2]
@@ -226,7 +226,7 @@ module Substitutors
   #
   # returns The String text with the passthrough text restored
   def restore_passthroughs(text)
-    return text if @passthroughs.nothing? || !text.include?(PASS_PLACEHOLDER[:start])
+    return text if @passthroughs.nil_or_empty? || !text.include?(PASS_PLACEHOLDER[:start])
 
     text.gsub(PASS_PLACEHOLDER[:match]) {
       pass = @passthroughs[$~[1].to_i]
@@ -328,9 +328,9 @@ module Substitutors
   # NOTE it's necessary to perform this substitution line-by-line
   # so that a missing key doesn't wipe out the whole block of data
   def sub_attributes(data, opts = {})
-    return data if data.nothing?
+    return data if data.nil_or_empty?
 
-    string_data = data.is_a? String
+    string_data = data.is_a? ::String
     # normalizes data type to an array (string becomes single-element array)
     lines = string_data ? [data] : data
 
@@ -338,13 +338,13 @@ module Substitutors
     lines.each {|line|
       reject = false
       reject_if_empty = false
-      line = line.gsub(REGEXP[:attr_ref]) {
+      line = line.gsub(AttributeReferenceRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # escaped attribute, return unescaped
         if m[1] == '\\' || m[4] == '\\'
           "{#{m[2]}}"
-        elsif !m[3].nothing?
+        elsif !m[3].nil_or_empty?
           offset = (directive = m[3]).length + 1
           expr = m[2][offset..-1]
           case directive
@@ -371,14 +371,14 @@ module Substitutors
               val
             end
           else
-            # if we get here, our attr_ref regex is too loose
+            # if we get here, our AttributeReference regex is too loose
             warn "asciidoctor: WARNING: illegal attribute directive: #{m[3]}"
             m[0]
           end
         elsif (key = m[2].downcase) && (@document.attributes.has_key? key)
           @document.attributes[key]
-        elsif INTRINSICS.has_key? key
-          INTRINSICS[key]
+        elsif INTRINSIC_ATTRIBUTES.has_key? key
+          INTRINSIC_ATTRIBUTES[key]
         else
           case (opts[:attribute_missing] || @document.attributes.fetch('attribute-missing', Compliance.attribute_missing))
           when 'skip'
@@ -408,7 +408,7 @@ module Substitutors
   #
   # returns The String with the inline macros rendered using the backend templates
   def sub_macros(source)
-    return source if source.nothing?
+    return source if source.nil_or_empty?
 
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
@@ -424,7 +424,7 @@ module Substitutors
 
     if experimental
       if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
-        result = result.gsub(REGEXP[:kbd_btn_macro]) {
+        result = result.gsub(KbdBtnInlineMacroRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -439,7 +439,7 @@ module Substitutors
               keys = ['+']
             else
               # need to use closure to work around lack of negative lookbehind
-              keys = keys.split(REGEXP[:kbd_delim]).inject([]) {|c, key|
+              keys = keys.split(KbdDelimiterRx).inject([]) {|c, key|
                 if key.end_with?('++')
                   c << key[0..-3].strip
                   c << '+'
@@ -458,7 +458,7 @@ module Substitutors
       end
 
       if found[:macroish] && result.include?('menu:')
-        result = result.gsub(REGEXP[:menu_macro]) {
+        result = result.gsub(MenuInlineMacroRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -487,7 +487,7 @@ module Substitutors
       end
 
       if result.include?('"') && result.include?('&gt;')
-        result = result.gsub(REGEXP[:menu_inline_macro]) {
+        result = result.gsub(MenuInlineRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -530,7 +530,7 @@ module Substitutors
 
     if found[:macroish] && (result.include?('image:') || result.include?('icon:'))
       # image:filename.png[Alt Text]
-      result = result.gsub(REGEXP[:image_macro]) {
+      result = result.gsub(ImageInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -563,7 +563,7 @@ module Substitutors
       # (((Tigers,Big cats)))
       # indexterm2:[Tigers]
       # ((Tigers))
-      result = result.gsub(REGEXP[:indexterm_macro]) {
+      result = result.gsub(IndextermInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -611,7 +611,7 @@ module Substitutors
 
     if result.include? '://'
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
-      result = result.gsub(REGEXP[:link_inline]) {
+      result = result.gsub(LinkInlineRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -640,7 +640,7 @@ module Substitutors
 
         attrs = nil
         #text = m[3] ? sub_attributes(m[3].gsub('\]', ']')) : ''
-        if !m[3].nothing?
+        if !m[3].nil_or_empty?
           if use_link_attrs && (m[3].start_with?('"') || m[3].include?(','))
             attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')), [])
             text = attrs[1]
@@ -659,7 +659,7 @@ module Substitutors
 
         if text.empty?
           if @document.attr? 'hide-uri-scheme'
-            text = target.sub REGEXP[:uri_sniff], ''
+            text = target.sub UriSniffRx, ''
           else
             text = target
           end
@@ -671,7 +671,7 @@ module Substitutors
 
     if found[:macroish] && (result.include? 'link:') || (result.include? 'mailto:')
       # inline link macros, link:target[text]
-      result = result.gsub(REGEXP[:link_macro]) {
+      result = result.gsub(LinkInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -711,7 +711,7 @@ module Substitutors
 
         if text.empty?
           if @document.attr? 'hide-uri-scheme'
-            text = raw_target.sub REGEXP[:uri_sniff], ''
+            text = raw_target.sub UriSniffRx, ''
           else
             text = raw_target
           end
@@ -722,7 +722,7 @@ module Substitutors
     end
 
     if result.include? '@'
-      result = result.gsub(REGEXP[:email_inline]) {
+      result = result.gsub(EmailInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         address = m[0]
@@ -744,7 +744,7 @@ module Substitutors
     end
 
     if found[:macroish_short_form] && result.include?('footnote')
-      result = result.gsub(REGEXP[:footnote_macro]) {
+      result = result.gsub(FootnoteInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -788,7 +788,7 @@ module Substitutors
   # Internal: Substitute normal and bibliographic anchors
   def sub_inline_anchors(text, found = nil)
     if (!found || found[:square_bracket]) && text.include?('[[[')
-      text = text.gsub(REGEXP[:biblio_macro]) {
+      text = text.gsub(InlineBiblioAnchorRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -802,7 +802,7 @@ module Substitutors
 
     if ((!found || found[:square_bracket]) && text.include?('[[')) ||
         ((!found || found[:macroish]) && text.include?('anchor:'))
-      text = text.gsub(REGEXP[:anchor_macro]) {
+      text = text.gsub(InlineAnchorRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -813,9 +813,9 @@ module Substitutors
         reftext = m[2] || m[4]
         reftext = %([#{id}]) if !reftext
         # enable if we want to allow double quoted values
-        #id = id.sub(REGEXP[:dbl_quoted], '\2')
+        #id = id.sub(DoubleQuotedRx, '\2')
         #if reftext
-        #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
+        #  reftext = reftext.sub(DoubleQuotedMultiRx, '\2')
         #else
         #  reftext = "[#{id}]"
         #end
@@ -837,7 +837,7 @@ module Substitutors
   # Internal: Substitute cross reference links
   def sub_inline_xrefs(text, found = nil)
     if (!found || found[:macroish]) || text.include?('&lt;&lt;')
-      text = text.gsub(REGEXP[:xref_macro]) {
+      text = text.gsub(XrefInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -849,8 +849,8 @@ module Substitutors
           reftext = !m[3].empty? ? m[3] : nil
         else
           id, reftext = m[1].split(',', 2).map(&:strip)
-          id = id.sub(REGEXP[:dbl_quoted], ::RUBY_ENGINE_OPAL ? '$2' : '\2')
-          reftext = reftext.sub(REGEXP[:m_dbl_quoted], ::RUBY_ENGINE_OPAL ? '$2' : '\2') if reftext
+          id = id.sub(DoubleQuotedRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2')
+          reftext = reftext.sub(DoubleQuotedMultiRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2') if reftext
         end
 
         if id.include? '#'
@@ -891,7 +891,7 @@ module Substitutors
   #
   # returns The String with the callout references rendered using the backend templates
   def sub_callouts(text)
-    text.gsub(REGEXP[:callout_render]) {
+    text.gsub(CalloutRenderRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
@@ -915,7 +915,7 @@ module Substitutors
       last = lines.pop
       lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).render }.push(last) * EOL
     else
-      text.gsub(REGEXP[:line_break]) { Inline.new(self, :break, $~[1], :type => :line).render }
+      text.gsub(LineBreakRx) { Inline.new(self, :break, $~[1], :type => :line).render }
     end
   end
 
@@ -1081,7 +1081,7 @@ module Substitutors
   #
   # returns An Array of Symbols representing the substitution operation
   def resolve_subs subs, type = :block, defaults = nil, subject = nil
-    return [] if subs.nothing?
+    return [] if subs.nil_or_empty?
     candidates = []
     # only allow modification if defaults is given
     modification_group = defaults.nil? ? false : nil
@@ -1189,7 +1189,7 @@ module Substitutors
       # extract callout marks, indexed by line number
       source = source.split(LINE_SPLIT).map {|line|
         lineno = lineno + 1
-        line.gsub(REGEXP[:callout_scan]) {
+        line.gsub(CalloutScanRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape

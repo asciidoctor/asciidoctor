@@ -62,7 +62,7 @@ class AbstractNode
   # return the value of the attribute or the default value if the attribute
   # is not found in the attributes of this node or the document node
   def attr(name, default_value = nil, inherit = true)
-    name = name.to_s if name.is_a?(Symbol)
+    name = name.to_s if name.is_a?(::Symbol)
     inherit = false if self == @document
     if inherit
       @attributes[name] || @document.attributes[name] || default_value
@@ -89,7 +89,7 @@ class AbstractNode
   # comparison value is specified, whether the value of the attribute matches
   # the comparison value
   def attr?(name, expect = nil, inherit = true)
-    name = name.to_s if name.is_a?(Symbol)
+    name = name.to_s if name.is_a?(::Symbol)
     inherit = false if self == @document
     if expect.nil?
       @attributes.has_key?(name) || (inherit && @document.attributes.has_key?(name))
@@ -273,7 +273,7 @@ class AbstractNode
   #
   # Returns A String reference for the target media
   def media_uri(target, asset_dir_key = 'imagesdir')
-    if target.include?(':') && target.match(Asciidoctor::REGEXP[:uri_sniff])
+    if target.include?(':') && UriSniffRx =~ target
       target
     elsif asset_dir_key && attr?(asset_dir_key)
       normalize_web_path(target, @document.attr(asset_dir_key))
@@ -302,9 +302,9 @@ class AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
-    if target_image.include?(':') && target_image.match(Asciidoctor::REGEXP[:uri_sniff])
+    if target_image.include?(':') && UriSniffRx =~ target_image
       target_image
-    elsif @document.safe < Asciidoctor::SafeMode::SECURE && @document.attr?('data-uri')
+    elsif @document.safe < SafeMode::SECURE && @document.attr?('data-uri')
       generate_data_uri(target_image, asset_dir_key)
     elsif asset_dir_key && attr?(asset_dir_key)
       normalize_web_path(target_image, @document.attr(asset_dir_key))

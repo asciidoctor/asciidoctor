@@ -599,9 +599,10 @@ class BlockTableTemplate < BaseTemplate
           valign_attribute = (cell.attr? 'valign') ? %( valign="#{cell.attr 'valign'}") : nil
           colspan_attribute = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{colnum + cell.colspan - 1}") : nil
           rowspan_attribute = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : nil
+          # NOTE <entry> may not have whitespace (e.g., line breaks) as a direct descendant according to DocBook rules
           entry_start = %(<entry#{halign_attribute}#{valign_attribute}#{colspan_attribute}#{rowspan_attribute}>)
           cell_content = if tblsec == :head
-            %(<simpara>#{cell.text}</simpara>)
+            cell.text
           else
             case cell.style
             when :asciidoc

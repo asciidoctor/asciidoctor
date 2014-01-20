@@ -478,7 +478,7 @@ of the attribute named foo in your document.
   context "Intrinsic attributes" do
 
     test "substitute intrinsics" do
-      Asciidoctor::INTRINSICS.each_pair do |key, value|
+      Asciidoctor::INTRINSIC_ATTRIBUTES.each_pair do |key, value|
         html = render_string("Look, a {#{key}} is here")
         # can't use Nokogiri because it interprets the HTML entities and we can't match them
         assert_match(/Look, a #{Regexp.escape(value)} is here/, html)

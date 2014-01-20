@@ -4,7 +4,7 @@ module Asciidoctor
   module Cli
 
     # Public: List of options that can be specified on the command line
-    class Options < Hash
+    class Options < ::Hash
 
       def initialize(options = {})
         self[:attributes] = options[:attributes] || {}
@@ -33,7 +33,7 @@ module Asciidoctor
       end
 
       def parse!(args)
-        opts_parser = OptionParser.new do |opts|
+        opts_parser = ::OptionParser.new do |opts|
           opts.banner = <<-EOS
 Usage: asciidoctor [OPTION]... FILE...
 Translate the AsciiDoc source FILE or FILE(s) into the backend output format (e.g., HTML 5, DocBook 4.5, etc.)
@@ -76,7 +76,7 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-C', '--compact', 'compact the output by removing blank lines (default: false)') do
             self[:compact] = true
           end
-          opts.on('-a', '--attribute key[=value],key2[=value2],...', Array,
+          opts.on('-a', '--attribute key[=value],key2[=value2],...', ::Array,
                   'a list of document attributes to set in the form of key, key! or key=value pair',
                   'unless @ is appended to the value, these attributes take precedence over attributes',
                   'defined in the source document') do |attribs|
@@ -93,7 +93,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   'may be specified multiple times') do |template_dir|
             if self[:template_dirs].nil?
               self[:template_dirs] = [template_dir]
-            elsif self[:template_dirs].is_a? Array
+            elsif self[:template_dirs].is_a? ::Array
               self[:template_dirs].push template_dir
             else
               self[:template_dirs] = [self[:template_dirs], template_dir]
@@ -124,7 +124,7 @@ Example: asciidoctor -b html5 source.asciidoc
           end
 
           opts.on_tail('-V', '--version', 'display the version and runtime environment') do
-            $stdout.puts "Asciidoctor #{Asciidoctor::VERSION} [http://asciidoctor.org]"
+            $stdout.puts "Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org]"
             $stdout.puts "Runtime Environment (#{RUBY_DESCRIPTION})"
             return 0
           end
@@ -150,7 +150,7 @@ Example: asciidoctor -b html5 source.asciidoc
                 $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '}) or incorrect usage of stdin"
               else
                 # TODO this glob may not be necessary as the shell should have already performed expansion
-                matches = Dir.glob file
+                matches = ::Dir.glob file
 
                 if matches.empty?
                   $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
@@ -163,7 +163,7 @@ Example: asciidoctor -b html5 source.asciidoc
           end
 
           infiles.each do |file|
-            unless file == '-' || File.readable?(file)
+            unless file == '-' || ::File.readable?(file)
               $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
               return 1
             end
@@ -174,17 +174,17 @@ Example: asciidoctor -b html5 source.asciidoc
           if !self[:template_dirs].nil?
             begin
               require 'tilt'
-            rescue LoadError
+            rescue ::LoadError
               $stderr.puts 'asciidoctor: FAILED: tilt could not be loaded; to use a custom backend, you must have the tilt gem installed (gem install tilt)'
               return 1
             end
           end
 
-        rescue OptionParser::MissingArgument
+        rescue ::OptionParser::MissingArgument
           $stderr.puts "asciidoctor: option #{$!.message}"
           $stdout.puts opts_parser
           return 1
-        rescue OptionParser::InvalidOption, OptionParser::InvalidArgument
+        rescue ::OptionParser::InvalidOption, ::OptionParser::InvalidArgument
           $stderr.puts "asciidoctor: #{$!.message}"
           $stdout.puts opts_parser
           return 1

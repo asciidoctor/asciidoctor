@@ -104,7 +104,7 @@ class PathResolver
   DOT_DOT = '..'
   SLASH = '/'
   BACKSLASH = '\\'
-  WIN_ROOT_RE = /^[a-zA-Z]:(?:\\|\/)/
+  WindowsRootRx = /^[a-zA-Z]:(?:\\|\/)/
 
   attr_accessor :file_separator
   attr_accessor :working_dir
@@ -119,11 +119,11 @@ class PathResolver
   # working_dir    - the String working directory (optional, default: Dir.pwd)
   #
   def initialize(file_separator = nil, working_dir = nil)
-    @file_separator = file_separator.nil? ? (File::ALT_SEPARATOR || File::SEPARATOR) : file_separator
+    @file_separator = file_separator.nil? ? (::File::ALT_SEPARATOR || ::File::SEPARATOR) : file_separator
     if working_dir.nil?
-      @working_dir = File.expand_path(Dir.pwd)
+      @working_dir = ::File.expand_path(::Dir.pwd)
     else
-      @working_dir = is_root?(working_dir) ? working_dir : File.expand_path(working_dir) 
+      @working_dir = is_root?(working_dir) ? working_dir : ::File.expand_path(working_dir) 
     end
   end
 
@@ -134,7 +134,7 @@ class PathResolver
   #
   # returns a Boolean indicating whether the path is an absolute root path
   def is_root?(path)
-    if @file_separator == BACKSLASH && path.match(WIN_ROOT_RE)
+    if @file_separator == BACKSLASH && WindowsRootRx =~ path
       true
     elsif path.start_with? SLASH
       true
@@ -241,7 +241,7 @@ class PathResolver
     recover = opts.fetch(:recover, true)
     unless jail.nil?
       unless is_root? jail
-        raise SecurityError, "Jail is not an absolute path: #{jail}"
+        raise ::SecurityError, "Jail is not an absolute path: #{jail}"
       end
       jail = posixfy jail
     end
@@ -287,7 +287,7 @@ class PathResolver
       start_segments = jail_segments.dup
     elsif !jail.nil?
       if !start.start_with?(jail)
-        raise SecurityError, "#{opts[:target_name] || 'Start path'} #{start} is outside of jail: #{jail} (disallowed in safe mode)"
+        raise ::SecurityError, "#{opts[:target_name] || 'Start path'} #{start} is outside of jail: #{jail} (disallowed in safe mode)"
       end
 
       start_segments, start_root, _ = partition_path(start)
@@ -295,7 +295,7 @@ class PathResolver
   
       # Already checked for this condition
       #if start_root != jail_root
-      #  raise SecurityError, "Jail root #{jail_root} does not match root of #{opts[:target_name] || 'start path'}: #{start_root}"
+      #  raise ::SecurityError, "Jail root #{jail_root} does not match root of #{opts[:target_name] || 'start path'}: #{start_root}"
       #end
     else
       start_segments, start_root, _ = partition_path(start)
@@ -310,7 +310,7 @@ class PathResolver
           if resolved_segments.length > jail_segments.length
             resolved_segments.pop
           elsif !recover
-            raise SecurityError, "#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode)"
+            raise ::SecurityError, "#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode)"
           elsif !warned
             warn "asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering"
             warned = true
@@ -343,7 +343,7 @@ class PathResolver
 
     unless is_web_root?(target) || start.empty?
       target = "#{start}#{SLASH}#{target}"
-      if target.include?(':') && target.match(Asciidoctor::REGEXP[:uri_sniff])
+      if target.include?(':') && UriSniffRx =~ target
         uri_prefix = $~[0]
         target = target[uri_prefix.length..-1]
       end

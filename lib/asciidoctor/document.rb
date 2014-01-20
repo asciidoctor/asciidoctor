@@ -134,7 +134,7 @@ class Document < AbstractBlock
         :links => [],
         :images => [],
         :indexterms => [],
-        :includes => Set.new,
+        :includes => ::Set.new,
       }
       # copy attributes map and normalize keys
       # attribute overrides are attributes that can only be set from the commandline
@@ -161,13 +161,13 @@ class Document < AbstractBlock
     @header = nil
     @counters = {}
     @callouts = Callouts.new
-    @attributes_modified = Set.new
+    @attributes_modified = ::Set.new
     @options = options
     unless @parent_document
       # safely resolve the safe mode from const, int or string
       if @safe.nil? && !(safe_mode = @options[:safe])
         @safe = SafeMode::SECURE
-      elsif safe_mode.is_a?(Fixnum)
+      elsif safe_mode.is_a?(::Fixnum)
         # be permissive in case API user wants to define new levels
         @safe = safe_mode
       else
@@ -235,13 +235,13 @@ class Document < AbstractBlock
     # directory of the input is a string
     if @options[:base_dir].nil?
       if @attribute_overrides['docdir']
-        @base_dir = @attribute_overrides['docdir'] = File.expand_path(@attribute_overrides['docdir'])
+        @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(@attribute_overrides['docdir'])
       else
         #warn 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
-        @base_dir = @attribute_overrides['docdir'] = File.expand_path(Dir.pwd)
+        @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(::Dir.pwd)
       end
     else
-      @base_dir = @attribute_overrides['docdir'] = File.expand_path(@options[:base_dir])
+      @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(@options[:base_dir])
     end
 
     # allow common attributes backend and doctype to be set using options hash
@@ -292,7 +292,7 @@ class Document < AbstractBlock
       else
         # a value ending in @ indicates this attribute does not override
         # an attribute with the same key in the document souce
-        if val.is_a?(String) && val.end_with?('@')
+        if val.is_a?(::String) && val.end_with?('@')
           val = val.chop
           verdict = true
         end
@@ -327,7 +327,7 @@ class Document < AbstractBlock
       @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', './images'), 'icons')
 
       @extensions = initialize_extensions ? Extensions::Registry.new(self) : nil
-      @reader = PreprocessorReader.new self, data, Asciidoctor::Reader::Cursor.new(@attributes['docfile'], @base_dir)
+      @reader = PreprocessorReader.new self, data, Reader::Cursor.new(@attributes['docfile'], @base_dir)
 
       if @extensions && @extensions.preprocessors?
         @extensions.load_preprocessors(self).each do |processor|
@@ -393,7 +393,7 @@ class Document < AbstractBlock
   #
   # returns the next value in the sequence according to the current value's type
   def nextval(current)
-    if current.is_a?(Integer)
+    if current.is_a?(::Integer)
       current + 1
     else
       intval = current.to_i
@@ -408,7 +408,7 @@ class Document < AbstractBlock
   def register(type, value)
     case type
     when :ids
-      if value.is_a?(Array)
+      if value.is_a?(::Array)
         @references[:ids][value[0]] = (value[1] || '[' + value[0] + ']')
       else
         @references[:ids][value] = '[' + value + ']'
@@ -701,17 +701,15 @@ class Document < AbstractBlock
   #
   # Returns The String value with substitutions performed
   def apply_attribute_value_subs(value)
-    if value.match(REGEXP[:pass_macro_basic])
-      # copy match for Ruby 1.8.7 compat
-      m = $~
+    if (m = AttributeEntryPassMacroRx.match(value))
       if !m[1].empty?
         subs = resolve_pass_subs m[1]
-        subs.empty? ? m[2] : apply_subs(m[2], subs)
+        subs.empty? ? m[2] : (apply_subs m[2], subs)
       else
         m[2]
       end
     else
-      apply_header_subs(value)
+      apply_header_subs value
     end
   end
 
@@ -727,7 +725,7 @@ class Document < AbstractBlock
     if BACKEND_ALIASES.has_key? backend
       backend = @attributes['backend'] = BACKEND_ALIASES[backend]
     end
-    basebackend = backend.sub(REGEXP[:trailing_digit], '')
+    basebackend = backend.sub(TrailingDigitsRx, '')
     page_width = DEFAULT_PAGE_WIDTHS[basebackend]
     if page_width
       @attributes['pagewidth'] = page_width

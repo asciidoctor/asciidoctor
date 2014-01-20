@@ -18,9 +18,9 @@ module Helpers
   def self.require_library(name, gem = true)
     begin
       require name
-    rescue LoadError => e
+    rescue ::LoadError => e
       if gem
-        fail "asciidoctor: FAILED: required gem '#{gem === true ? name : gem}' is not installed. Processing aborted."
+        fail "asciidoctor: FAILED: required gem '#{gem == true ? name : gem}' is not installed. Processing aborted."
       else
         fail "asciidoctor: FAILED: #{e.message.chomp '.'}. Processing aborted."
       end
@@ -86,7 +86,7 @@ module Helpers
   #
   # returns a String Array of normalized lines
   def self.normalize_lines_from_string data 
-    return [] if data.nothing?
+    return [] if data.nil_or_empty?
 
     if COERCE_ENCODING
       utf8 = ::Encoding::UTF_8
@@ -110,13 +110,16 @@ module Helpers
     data.each_line.map {|line| line.rstrip }
   end
 
+  # Matches the characters in a URI to encode
+  REGEXP_ENCODE_URI_CHARS = /[^\w\-.!~*';:@=+$,()\[\]]/
+
   # Public: Encode a string for inclusion in a URI
   #
   # str - the string to encode
   #
   # returns an encoded version of the str
   def self.encode_uri(str)
-    str.gsub(REGEXP[:uri_encode_chars]) do
+    str.gsub(REGEXP_ENCODE_URI_CHARS) do
       $&.each_byte.map {|c| sprintf '%%%02X', c}.join
     end
   end
@@ -132,16 +135,16 @@ module Helpers
   #
   # Returns the String filename with the file extension removed
   def self.rootname(file_name)
-    (ext = File.extname(file_name)).empty? ? file_name : file_name[0...-ext.length]
+    (ext = ::File.extname(file_name)).empty? ? file_name : file_name[0...-ext.length]
   end
 
   def self.mkdir_p(dir)
-    unless File.directory? dir
-      parent_dir = File.dirname(dir)
-      if !File.directory?(parent_dir = File.dirname(dir)) && parent_dir != '.'
+    unless ::File.directory? dir
+      parent_dir = ::File.dirname(dir)
+      if !::File.directory?(parent_dir = ::File.dirname(dir)) && parent_dir != '.'
         mkdir_p(parent_dir)
       end
-      Dir.mkdir(dir)
+      ::Dir.mkdir(dir)
     end
   end
 

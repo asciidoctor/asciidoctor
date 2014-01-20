@@ -22,13 +22,14 @@ class Inline < AbstractNode
     @id = opts[:id]
     @type = opts[:type]
     @target = opts[:target]
-    
-    if opts.has_key?(:attributes) && (attributes = opts[:attributes]).is_a?(Hash)
-      update_attributes(opts[:attributes]) unless attributes.empty?
+
+    unless (more_attributes = opts[:attributes]).nil_or_empty?
+      update_attributes more_attributes
     end
   end
 
   def render
+    # QUESTION can we do away with this chomp?
     renderer.render(@template_name, self).chomp
   end
 

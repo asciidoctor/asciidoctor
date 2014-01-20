@@ -575,10 +575,11 @@ end
 
 class BlockParagraphTemplate < BaseTemplate
   def result(node)
-    id_attribute = node.id ? %( id="#{node.id}") : nil
+    id_attr = node.id ? %( id="#{node.id}") : nil
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
+    role_val = (role = node.role) ? %( #{role}) : nil
 
-    %(<div#{id_attribute} class="#{!node.role? ? 'paragraph' : ['paragraph', node.role] * ' '}">
+    %(<div#{id_attr} class="paragraph#{role_val}">
 #{title_element}<p>#{node.content}</p>
 </div>)
   end

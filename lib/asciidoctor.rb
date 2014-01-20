@@ -13,7 +13,7 @@ if RUBY_ENGINE_OPAL
 end
 
 # ideally we should use require_relative instead of modifying the LOAD_PATH
-$:.unshift(File.dirname __FILE__)
+$:.unshift(File.dirname(__FILE__))
 
 # Public: Methods for parsing Asciidoc input files and rendering documents
 # using eRuby templates.
@@ -180,7 +180,7 @@ module Asciidoctor
   end
 
   # The absolute lib path of the Asciidoctor RubyGem
-  LIB_PATH = ::File.expand_path(::File.dirname __FILE__)
+  LIB_PATH = ::File.expand_path(::File.dirname(__FILE__))
 
   # The absolute root path of the Asciidoctor RubyGem
   ROOT_PATH = ::File.dirname LIB_PATH
@@ -291,7 +291,7 @@ module Asciidoctor
 
   DELIMITED_BLOCK_LEADERS = DELIMITED_BLOCKS.keys.map {|key| key[0..1] }.to_set
 
-  BREAK_LINES = {
+  LAYOUT_BREAK_LINES = {
     '\'' => :ruler,
     '-'  => :ruler,
     '*'  => :ruler,
@@ -306,15 +306,6 @@ module Asciidoctor
   # TODO validate use of explicit style name above ordered list (this list is for selecting an implicit style)
   ORDERED_LIST_STYLES = [:arabic, :loweralpha, :lowerroman, :upperalpha, :upperroman] #, :lowergreek]
 
-  ORDERED_LIST_MARKER_PATTERNS = {
-    :arabic => /\d+[.>]/,
-    :loweralpha => /[a-z]\./,
-    :lowerroman => /[ivx]+\)/,
-    :upperalpha => /[A-Z]\./,
-    :upperroman => /[IVX]+\)/
-    #:lowergreek => /[a-z]\]/
-  }
-
   ORDERED_LIST_KEYWORDS = {
     'loweralpha' => 'a',
     'lowerroman' => 'i',
@@ -327,6 +318,8 @@ module Asciidoctor
 
   LIST_CONTINUATION = '+'
 
+  # FIXME technical a preceding TAB is allowed too
+  # alternatively, we can enforce everywhere it must be a space
   LINE_BREAK = ' +'
 
   LINE_FEED_ENTITY = '&#10;' # or &#x0A;
@@ -345,24 +338,6 @@ module Asciidoctor
   # header) because it has semantic meaning; ex. numbered
   FLEXIBLE_ATTRIBUTES = %w(numbered)
 
-  # Regular expression character classes (dependent on regexp engine)
-  if ::RUBY_ENGINE_OPAL
-    CC_ALPHA = 'a-zA-Z'
-    CC_ALNUM = 'a-zA-Z0-9'
-    CC_BLANK = '[ \t]'
-    CC_GRAPH = '[\x21-\x7E]' # non-blank character
-    CC_EOL   = '(?=\n|$)'
-  else
-    CC_ALPHA = '[:alpha:]'
-    CC_ALNUM = '[:alnum:]'
-    CC_BLANK = '[[:blank:]]'
-    CC_GRAPH = '[[:graph:]]' # non-blank character
-    CC_EOL   = '$'
-  end
-
-  # NOTE allows for empty space in line as it could be left by the template engine
-  BLANK_LINE_PATTERN = /^#{CC_BLANK}*\n/
-
   # Delimiters and matchers for the passthrough placeholder
   # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
   PASS_PLACEHOLDER = {
@@ -376,353 +351,708 @@ module Asciidoctor
     :match_syn => /<span[^>]*>\u0096<\/span>[^\d]*(\d+)[^\d]*<span[^>]*>\u0097<\/span>/
   }
 
-  # The following pattern, which appears frequently, captures the contents between square brackets,
-  # ignoring escaped closing brackets (closing brackets prefixed with a backslash '\' character)
+  # A collection of regular expressions used by the parser.
   #
-  # Pattern:
-  # (?:\[((?:\\\]|[^\]])*?)\])
-  # Matches:
-  # [enclosed text here] or [enclosed [text\] here]
-  REGEXP = {
-    #:strip_line_wise => /\A(?:\s*\n)?(.*?)\s*\z/m,
+  # NOTE: The following pattern, which appears frequently, captures the
+  # contents between square brackets, ignoring escaped closing brackets
+  # (closing brackets prefixed with a backslash '\' character)
+  #
+  #   Pattern: (?:\[((?:\\\]|[^\]])*?)\])
+  #   Matches: [enclosed text here] or [enclosed [text\] here]
+  #
+  #(pseudo)module Rx
 
-    # NOTE: this is a inline admonition note
-    :admonition_inline => /^(#{ADMONITION_STYLES.to_a * '|'}):#{CC_BLANK}/,
+    ## Regular expression character classes (to ensure regexp compatibility between Ruby and JavaScript)
 
-    # [[idname]]
-    # [[idname,Reference Text]]
-    :anchor           => /^\[\[(?:|([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*))?)\]\]$/,
+    if ::RUBY_ENGINE_OPAL
+      CC_ALPHA = 'a-zA-Z'
+      CC_ALNUM = 'a-zA-Z0-9'
+      CC_BLANK = '[ \t]'
+      CC_GRAPH = '[\x21-\x7E]' # non-blank character
+      CC_EOL   = '(?=\n|$)'
+    else
+      CC_ALPHA = '[:alpha:]'
+      CC_ALNUM = '[:alnum:]'
+      CC_BLANK = '[[:blank:]]'
+      CC_GRAPH = '[[:graph:]]' # non-blank character
+      CC_EOL   = '$'
+    end
 
-    # Section Title [[idname]]
-    # Section Title [[idname,Reference Text]]
-    :anchor_embedded  => /^(.*?)#{CC_BLANK}+(\\)?\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]$/,
+    ## Document header
 
-    # Anywhere inline:
-    # [[idname]]
-    # [[idname,Reference Text]]
-    # anchor:idname[]
-    # anchor:idname[Reference Text]
-    :anchor_macro     => /\\?(?:\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]|anchor:(\S+)\[(.*?[^\\])?\])/,
-
-    # matches any unbounded block delimiter:
-    #   listing, literal, example, sidebar, quote, passthrough, table, fenced code
-    # does not include open block or air quotes
-    # TIP position the most common blocks towards the front of the pattern
-    :any_blk          => %r{^(?:(?:-|\.|=|\*|_|\+|/){4,}|[\|,;!]={3,}|(?:`|~){3,}.*)$},
-
-    # detect a list item of any sort
-    :any_list         => /^(?:<?\d+>#{CC_BLANK}+#{CC_GRAPH}|#{CC_BLANK}*(?:-|(?:\*|\.){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CC_BLANK}+#{CC_GRAPH}|#{CC_BLANK}*.*?(?::{2,4}|;;)(?:#{CC_BLANK}+#{CC_GRAPH}|$))/,
-
-    # :foo: bar
-    # :Author: Dan
-    # :numbered!:
-    # :long-entry: Attribute value lines ending in ' +'
-    #              are joined together as a single value,
-    #              collapsing the line breaks and indentation to
-    #              a single space.
-    :attr_entry       => /^:(!?\w.*?):(?:#{CC_BLANK}+(.*))?$/,
-
-    # An attribute list above a block element
+    # Matches the author info line immediately following the document title.
     #
-    # Can be strictly positional:
-    # [quote, Adam Smith, Wealth of Nations]
-    # Or can have name/value pairs
-    # [NOTE, caption="Good to know"]
-    # Can be defined by an attribute
-    # [{lead}]
-    :blk_attr_list    => /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*)\]$/,
-
-    # block attribute list or block anchor (bulk query)
-    :attr_line        => /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*|\[(?:|[#{CC_ALPHA}:_][\w:.-]*(?:,#{CC_BLANK}*\S.*)?)\])\]$/,
-
-    # attribute reference
-    # {foo}
-    # {counter:pcount:1}
-    # {set:foo:bar}
-    # {set:name!}
-    :attr_ref         => /(\\)?\{((set|counter2?):.+?|\w+(?:[\-]\w+)*)(\\)?\}/,
-
-    # The author info line the appears immediately following the document title
-    # John Doe <john@anonymous.com>
-    :author_info      => /^(\w[\w\-'.]*)(?: +(\w[\w\-'.]*))?(?: +(\w[\w\-'.]*))?(?: +<([^>]+)>)?$/,
-
-    # [[[Foo]]] (anywhere inline)
-    :biblio_macro     => /\\?\[\[\[([\w:][\w:.-]*?)\]\]\]/,
-
-    # callout reference inside literal text
-    # <1> (optionally prefixed by //, # or ;; line comment chars)
-    # <1> <2> (multiple callouts on one line)
-    # <!--1--> (for XML-based languages)
-    # special characters are already be replaced at this point during render
-    :callout_render     => /(?:(?:\/\/|#|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL})/,
-    # ...but not while scanning
-    :callout_quick_scan => /\\?<!?(--|)(\d+)\1>(?=(?: ?\\?<!?\1\d+\1>)*#{CC_EOL})/,
-    :callout_scan       => /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*#{CC_EOL})/,
-
-    # <1> Foo
-    :colist           => /^<?(\d+)>#{CC_BLANK}+(.*)/,
-
-    # ////
-    # comment block
-    # ////
-    :comment_blk      => %r{^/{4,}$},
-
-    # // (and then whatever)
-    :comment          => %r{^//(?:[^/]|$)},
-
-    # one,two;three;four
-    :ssv_or_csv_delim => /,|;/,
-
-    # one two	three
-    :space_delim      => /([^\\])#{CC_BLANK}+/,
-
-    # Ctrl + Alt+T
-    # Ctrl,T
-    :kbd_delim        => /(?:\+|,)(?=#{CC_BLANK}*[^\1])/,
-
-    # one\ two\	three
-    :escaped_space    => /\\(#{CC_BLANK})/,
-
-    # 29
-    :digits           => /^\d+$/,
-
-    # foo::  ||  foo::: || foo:::: || foo;;
-    # Should be followed by a definition, on the same line...
-    # foo:: That which precedes 'bar' (see also, <<bar>>)
-    # ...or on a separate line
-    # foo::
-    #   That which precedes 'bar' (see also, <<bar>>)
-    # The term may be an attribute reference
-    # {term_foo}:: {def_foo}
-    # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
-    # QUESTION should we check for line comment in regex or when scanning the lines?
-    :dlist            => /^(?!\/\/)#{CC_BLANK}*(.*?)(:{2,4}|;;)(?:#{CC_BLANK}+(.*))?$/,
-    :dlist_siblings   => {
-                           # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-                           '::' => /^(?!\/\/)#{CC_BLANK}*((?:.*[^:])?)(::)(?:#{CC_BLANK}+(.*))?$/,
-                           ':::' => /^(?!\/\/)#{CC_BLANK}*((?:.*[^:])?)(:::)(?:#{CC_BLANK}+(.*))?$/,
-                           '::::' => /^(?!\/\/)#{CC_BLANK}*((?:.*[^:])?)(::::)(?:#{CC_BLANK}+(.*))?$/,
-                           ';;' => /^(?!\/\/)#{CC_BLANK}*(.*)(;;)(?:#{CC_BLANK}+(.*))?$/
-                         },
-
-    :illegal_sectid_chars => /&(?:[a-zA-Z]{2,}|#\d{2,4}|#x[a-fA-F0-9]{2,4});|\W+?/,
-
-    # footnote:[text]
-    # footnoteref:[id,text]
-    # footnoteref:[id]
-    :footnote_macro   => /\\?(footnote(?:ref)?):\[(.*?[^\\])\]/m,
-
-    # gist::123456[]
-    :generic_blk_macro => /^(\w[\w\-]*)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/,
-
-    # kbd:[F3]
-    # kbd:[Ctrl+Shift+T]
-    # kbd:[Ctrl+\]]
-    # kbd:[Ctrl,T]
-    # btn:[Save]
-    :kbd_btn_macro    => /\\?(?:kbd|btn):\[((?:\\\]|[^\]])+?)\]/,
-
-    # menu:File[New...]
-    # menu:View[Page Style > No Style]
-    # menu:View[Page Style, No Style]
-    :menu_macro       => /\\?menu:(\w|\w.*?\S)\[#{CC_BLANK}*(.+?)?\]/,
-
-    # "File > New..."
-    :menu_inline_macro  => /\\?"(\w[^"]*?#{CC_BLANK}*&gt;#{CC_BLANK}*[^" \t][^"]*)"/,
-
-    # image::filename.png[Caption]
-    # video::http://youtube.com/12345[Cats vs Dogs]
-    :media_blk_macro  => /^(image|video|audio)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/,
-
-    # image:filename.png[Alt Text]
-    # image:http://example.com/images/filename.png[Alt Text]
-    # image:filename.png[More [Alt\] Text] (alt text becomes "More [Alt] Text")
-    # icon:github[large]
-    :image_macro      => /\\?(?:image|icon):([^:\[][^\[]*)\[((?:\\\]|[^\]])*?)\]/,
-
-    # indexterm:[Tigers,Big cats]
-    # (((Tigers,Big cats)))
-    # indexterm2:[Tigers]
-    # ((Tigers))
-    :indexterm_macro   => /\\?(?:(indexterm2?):\[(.*?[^\\])\]|\(\((.+?)\)\)(?!\)))/m,
-
-    # whitespace at the beginning of the line
-    :leading_blanks   => /^(#{CC_BLANK}*)/,
-
-    # leading parent directory references in path
-    :leading_parent_dirs => /^(?:\.\.\/)*/,
-
-    # +   From the Asciidoc User Guide: "A plus character preceded by at
-    #     least one space character at the end of a non-blank line forces
-    #     a line break. It generates a line break (br) tag for HTML outputs.
+    # Examples
     #
-    # +      (would not match because there's no space before +)
-    #  +     (would match and capture '')
-    # Foo +  (would and capture 'Foo')
-    :line_break       => /^(.*)#{CC_BLANK}\+#{CC_EOL}/,
-
-    # inline link and some inline link macro
-    # FIXME revisit!
-    :link_inline      => %r{(^|link:|&lt;|[\s>\(\)\[\];])(\\?(?:https?|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[((?:\\\]|[^\]])*?)\])?},
-
-    # inline link macro
-    # link:path[label]
-    :link_macro       => /\\?(?:link|mailto):([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/,
-
-    # inline email address
-    # doc.writer@asciidoc.org
-    :email_inline     => /([\\>:\/])?\w[\w.%+-]*@[#{CC_ALNUM}][#{CC_ALNUM}.-]*\.[#{CC_ALPHA}]{2,4}\b/,
-
-    # <TAB>Foo  or one-or-more-spaces-or-tabs then whatever
-    :lit_par          => /^(#{CC_BLANK}+.*)$/,
-
-    # . Foo (up to 5 consecutive dots)
-    # 1. Foo (arabic, default)
-    # a. Foo (loweralpha)
-    # A. Foo (upperalpha)
-    # i. Foo (lowerroman)
-    # I. Foo (upperroman)
-    # NOTE leading space match is not always necessary, but is used for list reader
-    :olist            => /^#{CC_BLANK}*(\.{1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CC_BLANK}+(.*)$/,
-
-    # ''' (ruler)
-    # <<< (pagebreak)
-    :break_line        => /^('|<){3,}$/,
-
-    # ''' or ' ' ' (ruler)
-    # --- or - - - (ruler)
-    # *** or * * * (ruler)
-    # <<< (pagebreak)
-    :break_line_plus   => /^(?:'|<){3,}$|^ {0,3}([-\*_])( *)\1\2\1$/,
-
-    # inline passthrough macros
-    # +++text+++
-    # $$text$$
-    # pass:quotes[text]
-    :pass_macro       => /\\?(?:(\+{3}|\${2})(.*?)\1|pass:([a-z,]*)\[(.*?[^\\])\])/m,
-
-    # math:[x != 0]
-    # asciimath:[x != 0]
-    # latexmath:[\sqrt{4} = 2]
-    :inline_math_macro => /\\?((?:latex|ascii)?math):([a-z,]*)\[(.*?[^\\])\]/m,
-
-    # passthrough macro allowed in value of attribute assignment
-    # pass:[text]
-    :pass_macro_basic => /^pass:([a-z,]*)\[(.*)\]$/,
-
-    # inline literal passthrough macro
-    # `text`
-    :pass_lit         => /(^|[^`\w])(?:\[([^\]]+?)\])?(\\?`([^`\s]|[^`\s].*?\S)`)(?![`\w])/m,
-
-    # The document revision info line the appears immediately following the
-    # document title author info line, if present
-    # v1.0, 2013-01-01: Ring in the new year release
-    :revision_info    => /^(?:\D*(.*?),)?(?:\s*(?!:)(.*?))(?:\s*(?!^):\s*(.*))?$/,
-
-    # \' within a word
-    :single_quote_esc => /(\w)\\'(\w)/,
-    # an alternative if our backend generated single-quoted html/xml attributes
-    #:single_quote_esc => /(\w|=)\\'(\w)/,
-
-    # used for sanitizing attribute names
-    :illegal_attr_name_chars => /[^\w\-]/,
-
-    # 1*h,2*,^3e
-    :table_colspec    => /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+%?)?([a-z])?$/,
-
-    # 2.3+<.>m
-    # TODO might want to use step-wise scan rather than this mega-regexp
-    :table_cellspec => {
-      :start => /^#{CC_BLANK}*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?\|/,
-      :end => /#{CC_BLANK}+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
-    },
-
-    # docbook45
-    # html5
-    :trailing_digit   => /\d+$/,
-
-    # .Foo   but not  . Foo or ..Foo
-    :blk_title        => /^\.([^\s.].*)$/,
-
-    # matches double quoted text, capturing quote char and text (single-line)
-    :dbl_quoted       => /^("|)(.*)\1$/,
-
-    # matches double quoted text, capturing quote char and text (multi-line)
-    :m_dbl_quoted     => /^("|)(.*)\1$/m,
-
-    # [float]
-    # = Heading
-    :section_float_style => /^(?:float|discrete)\b/,
-
-    # == Foo
-    # ^ yields a level 2 title
+    #   Doc Writer <doc@example.com>
     #
-    # == Foo ==
-    # ^ also yields a level 2 title
+    AuthorInfoLineRx = /^(\w[\w\-'.]*)(?: +(\w[\w\-'.]*))?(?: +(\w[\w\-'.]*))?(?: +<([^>]+)>)?$/
+
+    # Matches the revision info line, which appears immediately following
+    # the author info line beneath the document title.
     #
-    # both equivalent to this two-line version:
-    # Foo
-    # ~~~
+    # Examples
+    #
+    #   v1.0, 2013-01-01: Ring in the new year release
+    #
+    RevisionInfoLineRx = /^(?:\D*(.*?),)?(?:\s*(?!:)(.*?))(?:\s*(?!^):\s*(.*))?$/
+
+    # Matches the title and volnum in the manpage doctype.
+    #
+    # Examples
+    #
+    #   = asciidoctor ( 1 ) 
+    #
+    ManpageTitleVolnumRx = /^(.*)\((.*)\)$/
+
+    # Matches the name and purpose in the manpage doctype.
+    #
+    # Examples
+    #
+    #   asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+    #
+    ManpageNamePurposeRx = /^(.*?)#{CC_BLANK}+-#{CC_BLANK}+(.*)$/
+
+    ## Preprocessor directives
+
+    # Matches a conditional preprocessor directive (e.g., ifdef, ifndef, ifeval and endif).
+    #
+    # Examples
+    #
+    #   ifdef::basebackend-html[]
+    #   ifndef::theme[]
+    #   ifeval::["{asciidoctor-version}" >= "0.1.0"]
+    #   ifdef::asciidoctor[Asciidoctor!]
+    #   endif::theme[]
+    #   endif::basebackend-html[]
+    #   endif::[]
+    #
+    ConditionalDirectiveRx = /^\\?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,\+])\S+?)?)\[(.+)?\]$/
+
+    # Matches a restricted (read as safe) eval expression.
+    #
+    # Examples
+    #
+    #   "{asciidoctor-version}" >= "0.1.0"
+    #
+    EvalExpressionRx = /^(\S.*?)#{CC_BLANK}*(==|!=|<=|>=|<|>)#{CC_BLANK}*(\S.*)$/
+    # ...or if we want to be more strict up front about what's on each side
+    # EvalExpressionRx = /^(true|false|("|'|)\{\w+(?:\-\w+)*\}\2|("|')[^\3]*\3|\-?\d+(?:\.\d+)*)#{CC_BLANK}*(==|!=|<=|>=|<|>)#{CC_BLANK}*(true|false|("|'|)\{\w+(?:\-\w+)*\}\6|("|')[^\7]*\7|\-?\d+(?:\.\d+)*)$/
+
+    # Matches an include preprocessor directive.
+    #
+    # Examples
+    #
+    #   include::chapter1.ad[]
+    #   include::example.txt[lines=1;2;5..10]
+    #
+    IncludeDirectiveRx = /^\\?include::([^\[]+)\[(.*?)\]$/
+
+    ## Attribute entries and references
+
+    # Matches a document attribute entry.
+    #
+    # Examples
+    #
+    #   :foo: bar
+    #   :First Name: Dan
+    #   :numbered!:
+    #   :!toc:
+    #   :long-entry: Attribute value lines ending in ' +'
+    #                are joined together as a single value,
+    #                collapsing the line breaks and indentation to
+    #                a single space.
+    #
+    AttributeEntryRx = /^:(!?\w.*?):(?:#{CC_BLANK}+(.*))?$/
+
+    # Matches invalid characters in an attribute name.
+    InvalidAttributeNameCharsRx = /[^\w\-]/
+
+    # Matches the pass inline macro allowed in value of attribute assignment.
+    #
+    # Examples
+    #
+    #   pass:[text]
+    #
+    AttributeEntryPassMacroRx = /^pass:([a-z,]*)\[(.*)\]$/
+
+    # Matches an inline attribute reference.
+    #
+    # Examples
+    #
+    #   {foo}
+    #   {counter:pcount:1}
+    #   {set:foo:bar}
+    #   {set:name!}
+    #
+    AttributeReferenceRx = /(\\)?\{((set|counter2?):.+?|\w+(?:[\-]\w+)*)(\\)?\}/
+
+    ## Paragraphs and delimited blocks
+
+    # Matches an anchor (i.e., id + optional reference text) on a line above a block.
+    #
+    # Examples
+    #
+    #   [[idname]]
+    #   [[idname,Reference Text]]
+    #
+    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*))?)\]\]$/
+
+    # Matches an attribute list above a block element.
+    #
+    # Examples
+    #
+    #   # strictly positional
+    #   [quote, Adam Smith, Wealth of Nations]
+    #
+    #   # name/value pairs
+    #   [NOTE, caption="Good to know"]
+    #
+    #   # as attribute reference
+    #   [{lead}]
+    #
+    BlockAttributeListRx = /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*)\]$/
+
+    # A combined pattern that matches either a block anchor or a block attribute list.
+    #
+    # TODO this one gets hit a lot, should be optimized as much as possible
+    BlockAttributeLineRx = /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*|\[(?:|[#{CC_ALPHA}:_][\w:.-]*(?:,#{CC_BLANK}*\S.*)?)\])\]$/
+
+    # Matches a title above a block.
+    #
+    # Examples
+    #
+    #   .Title goes here
+    #
+    BlockTitleRx = /^\.([^\s.].*)$/
+
+    # Matches an admonition label at the start of a paragraph.
+    #
+    # Examples
+    #
+    #   NOTE: Just a little note.
+    #   TIP: Don't forget!
+    #
+    AdmonitionParagraphRx = /^(#{ADMONITION_STYLES.to_a * '|'}):#{CC_BLANK}/
+
+    # Matches a literal paragraph, which is a line of text preceded by at least one space.
+    #
+    # Examples
+    #
+    #   <SPACE>Foo
+    #   <TAB>Foo
+    LiteralParagraphRx = /^(#{CC_BLANK}+.*)$/
+
+    # Matches a comment block.
+    #
+    # Examples
+    #
+    #   ////
+    #   This is a block comment.
+    #   It can span one or more lines.
+    #   ////
+    CommentBlockRx = %r{^/{4,}$}
+
+    # Matches a comment line.
+    #
+    # Examples
+    #
+    #   // an then whatever
+    #
+    CommentLineRx = %r{^//(?:[^/]|$)}
+
+    ## Section titles
+
+    # Matches a single-line (Atx-style) section title.
+    #
+    # Examples
+    #
+    #   == Foo
+    #   # ^ a level 1 (h2) section title
+    #
+    #   == Foo ==
+    #   # ^ also a level 1 (h2) section title
     #
     # match[1] is the delimiter, whose length determines the level
     # match[2] is the title itself
     # match[3] is an inline anchor, which becomes the section id
-    :section_title     => /^((?:=|#){1,6})#{CC_BLANK}+(\S.*?)(?:#{CC_BLANK}+\1)?$/,
+    AtxSectionRx = /^((?:=|#){1,6})#{CC_BLANK}+(\S.*?)(?:#{CC_BLANK}+\1)?$/
 
-    # restricted section name for two-line section title
-    # does not begin with a dot and has at least one alphanumeric character
-    :section_name      => /^((?=.*\w+.*)[^.].*?)$/,
+    # Matches the restricted section name for a two-line (Setext-style) section title.
+    # The name cannot begin with a dot and has at least one alphanumeric character.
+    SetextSectionTitleRx = /^((?=.*\w+.*)[^.].*?)$/
 
-    # ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
-    # TODO build from SECTION_LEVELS keys
-    :section_underline => /^(?:=|-|~|\^|\+)+$/,
+    # Matches the underline in a two-line (Setext-style) section title.
+    #
+    # Examples
+    #
+    #   ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
+    #
+    SetextSectionLineRx = /^(?:=|-|~|\^|\+)+$/
 
-    # toc::[]
-    # toc::[levels=2]
-    :toc              => /^toc::\[(.*?)\]$/,
+    # Matches an anchor (i.e., id + optional reference text) inside a section title.
+    #
+    # Examples
+    #
+    #   Section Title [[idname]]
+    #   Section Title [[idname,Reference Text]]
+    #
+    InlineSectionAnchorRx = /^(.*?)#{CC_BLANK}+(\\)?\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]$/
 
-    # * Foo (up to 5 consecutive asterisks)
-    # - Foo
+    # Matches invalid characters in a section id.
+    InvalidSectionIdCharsRx = /&(?:[a-zA-Z]{2,}|#\d{2,4}|#x[a-fA-F0-9]{2,4});|\W+?/
+
+    # Matches the block style used to designate a section title as a floating title.
+    #
+    # Examples
+    #
+    #   [float]
+    #   = Floating Title
+    #
+    FloatingTitleStyleRx = /^(?:float|discrete)\b/
+
+    ## Lists
+
+    # Detects the start of any list item.
+    AnyListRx = /^(?:<?\d+>#{CC_BLANK}+#{CC_GRAPH}|#{CC_BLANK}*(?:-|(?:\*|\.){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CC_BLANK}+#{CC_GRAPH}|#{CC_BLANK}*.*?(?::{2,4}|;;)(?:#{CC_BLANK}+#{CC_GRAPH}|$))/
+
+    # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
+    #
+    # Examples
+    #
+    #   * Foo
+    #   - Foo
+    #
+    UnorderedListRx = /^#{CC_BLANK}*(-|\*{1,5})#{CC_BLANK}+(.*)$/
+
+    # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
+    #
+    # Examples
+    #
+    #   . Foo
+    #   .. Foo
+    #   1. Foo (arabic, default)
+    #   a. Foo (loweralpha)
+    #   A. Foo (upperalpha)
+    #   i. Foo (lowerroman)
+    #   I. Foo (upperroman)
+    #
     # NOTE leading space match is not always necessary, but is used for list reader
-    :ulist            => /^#{CC_BLANK}*(-|\*{1,5})#{CC_BLANK}+(.*)$/,
+    OrderedListRx = /^#{CC_BLANK}*(\.{1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CC_BLANK}+(.*)$/
 
-    # inline xref macro
-    # <<id,reftext>> (special characters have already been escaped, hence the entity references)
-    # xref:id[reftext]
-    :xref_macro       => /\\?(?:&lt;&lt;([\w":].*?)&gt;&gt;|xref:([\w":].*?)\[(.*?)\])/m,
+    # Matches the ordinals for each type of ordered list.
+    OrderedListMarkerRxMap = {
+      :arabic => /\d+[.>]/,
+      :loweralpha => /[a-z]\./,
+      :lowerroman => /[ivx]+\)/,
+      :upperalpha => /[A-Z]\./,
+      :upperroman => /[IVX]+\)/
+      #:lowergreek => /[a-z]\]/
+    }
 
-    # ifdef::basebackend-html[]
-    # ifndef::theme[]
-    # ifeval::["{asciidoctor-version}" >= "0.1.0"]
-    # ifdef::asciidoctor[Asciidoctor!]
-    # endif::theme[]
-    # endif::basebackend-html[]
-    # endif::[]
-    :ifdef_macro      => /^\\?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,\+])\S+?)?)\[(.+)?\]$/,
+    # Matches a definition list item.
+    #
+    # Examples
+    #
+    #   foo::
+    #   foo:::
+    #   foo::::
+    #   foo;;
+    #
+    #   # should be followed by a definition, on the same line...
+    #
+    #   foo:: That which precedes 'bar' (see also, <<bar>>)
+    #
+    #   # ...or on a separate line
+    #
+    #   foo::
+    #     That which precedes 'bar' (see also, <<bar>>)
+    #
+    #   # the term may be an attribute reference
+    #
+    #   {foo_term}:: {foo_def}
+    #
+    # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
+    # QUESTION should we check for line comment in regex or when scanning the lines?
+    # 
+    DefinitionListRx = /^(?!\/\/)#{CC_BLANK}*(.*?)(:{2,4}|;;)(?:#{CC_BLANK}+(.*))?$/
 
-    # "{asciidoctor-version}" >= "0.1.0"
-    :eval_expr        => /^(\S.*?)#{CC_BLANK}*(==|!=|<=|>=|<|>)#{CC_BLANK}*(\S.*)$/,
-    # ...or if we want to be more strict up front about what's on each side
-    #:eval_expr        => /^(true|false|("|'|)\{\w+(?:\-\w+)*\}\2|("|')[^\3]*\3|\-?\d+(?:\.\d+)*)#{CC_BLANK}*(==|!=|<=|>=|<|>)#{CC_BLANK}*(true|false|("|'|)\{\w+(?:\-\w+)*\}\6|("|')[^\7]*\7|\-?\d+(?:\.\d+)*)$/,
+    # Matches a sibling definition list item (which does not include the keyed type).
+    DefinitionListSiblingRx = {
+      # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
+      '::' => /^(?!\/\/)#{CC_BLANK}*((?:.*[^:])?)(::)(?:#{CC_BLANK}+(.*))?$/,
+      ':::' => /^(?!\/\/)#{CC_BLANK}*((?:.*[^:])?)(:::)(?:#{CC_BLANK}+(.*))?$/,
+      '::::' => /^(?!\/\/)#{CC_BLANK}*((?:.*[^:])?)(::::)(?:#{CC_BLANK}+(.*))?$/,
+      ';;' => /^(?!\/\/)#{CC_BLANK}*(.*)(;;)(?:#{CC_BLANK}+(.*))?$/
+    }
 
-    # include::chapter1.ad[]
-    # include::example.txt[lines=1;2;5..10]
-    :include_macro    => /^\\?include::([^\[]+)\[(.*?)\]$/,
+    # Matches a callout list item.
+    #
+    # Examples
+    #
+    #   <1> Foo
+    #
+    CalloutListRx = /^<?(\d+)>#{CC_BLANK}+(.*)/
 
-    # http://domain
-    # https://domain
-    # data:info
-    :uri_sniff        => %r{^[#{CC_ALPHA}][#{CC_ALNUM}.+-]*:/{0,2}},
+    # Matches a callout reference inside literal text.
+    # 
+    # Examples
+    #   <1> (optionally prefixed by //, # or ;; line comment chars)
+    #   <1> <2> (multiple callouts on one line)
+    #   <!--1--> (for XML-based languages)
+    #
+    # NOTE special characters are already be replaced at this point during render
+    CalloutRenderRx = /(?:(?:\/\/|#|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL})/
+    # NOTE (con't) ...but not while scanning
+    CalloutQuickScanRx = /\\?<!?(--|)(\d+)\1>(?=(?: ?\\?<!?\1\d+\1>)*#{CC_EOL})/
+    CalloutScanRx = /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*#{CC_EOL})/
 
-    :uri_encode_chars => /[^\w\-.!~*';:@=+$,()\[\]]/,
+    # A Hash of regexps for lists used for dynamic access.
+    ListRxMap = {
+      :ulist => UnorderedListRx,
+      :olist => OrderedListRx,
+      :dlist => DefinitionListRx,
+      :colist => CalloutListRx
+    }
 
-    :mantitle_manvolnum => /^(.*)\((.*)\)$/,
+    ## Tables
 
-    :manname_manpurpose => /^(.*?)#{CC_BLANK}+-#{CC_BLANK}+(.*)$/
-  }
+    # Parses the column spec (i.e., colspec) for a table.
+    #
+    # Examples
+    #
+    #   1*h,2*,^3e
+    #
+    ColumnSpecRx = /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+%?)?([a-z])?$/
 
-  INTRINSICS = ::Hash.new{|h,k| STDERR.puts "Missing intrinsic: #{k.inspect}"; "{#{k}}"}.merge(
-    {
+    # Parses the start and end of a cell spec (i.e., cellspec) for a table.
+    #
+    # Examples
+    #
+    #   2.3+<.>m
+    #
+    # FIXME use step-wise scan (or treetop) rather than this mega-regexp
+    CellSpecStartRx = /^#{CC_BLANK}*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?\|/
+    CellSpecEndRx = /#{CC_BLANK}+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
+
+    # Block macros
+
+    # Matches the general block macro pattern.
+    #
+    # Examples
+    # 
+    #   gist::123456[]
+    #
+    GenericBlockMacroRx = /^(\w[\w\-]*)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/
+
+    # Matches an image, video or audio block macro.
+    #
+    # Examples
+    #
+    #   image::filename.png[Caption]
+    #   video::http://youtube.com/12345[Cats vs Dogs]
+    #
+    MediaBlockMacroRx = /^(image|video|audio)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/
+
+    # Matches the TOC block macro.
+    #
+    # Examples
+    #
+    #   toc::[]
+    #   toc::[levels=2]
+    #
+    TocBlockMacroRx = /^toc::\[(.*?)\]$/
+
+    ## Inline macros
+
+    # Matches an anchor (i.e., id + optional reference text) in the flow of text.
+    #
+    # Examples
+    #
+    #   [[idname]]
+    #   [[idname,Reference Text]]
+    #   anchor:idname[]
+    #   anchor:idname[Reference Text]
+    #
+    InlineAnchorRx = /\\?(?:\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]|anchor:(\S+)\[(.*?[^\\])?\])/
+
+    # Matches a bibliography anchor anywhere inline.
+    #
+    # Examples
+    #
+    #   [[[Foo]]]
+    #
+    InlineBiblioAnchorRx = /\\?\[\[\[([\w:][\w:.-]*?)\]\]\]/
+
+    # Matches an inline e-mail address.
+    #
+    #   doc.writer@example.com
+    #
+    EmailInlineMacroRx = /([\\>:\/])?\w[\w.%+-]*@[#{CC_ALNUM}][#{CC_ALNUM}.-]*\.[#{CC_ALPHA}]{2,4}\b/
+
+    # Matches an inline footnote macro, which is allowed to span multiple lines.
+    #
+    # Examples
+    #   footnote:[text]
+    #   footnoteref:[id,text]
+    #   footnoteref:[id]
+    #
+    FootnoteInlineMacroRx = /\\?(footnote(?:ref)?):\[(.*?[^\\])\]/m
+
+    # Matches an image or icon inline macro.
+    #
+    # Examples
+    #
+    #   image:filename.png[Alt Text]
+    #   image:http://example.com/images/filename.png[Alt Text]
+    #   image:filename.png[More [Alt\] Text] (alt text becomes "More [Alt] Text")
+    #   icon:github[large]
+    #
+    ImageInlineMacroRx = /\\?(?:image|icon):([^:\[][^\[]*)\[((?:\\\]|[^\]])*?)\]/
+
+    # Matches an indexterm inline macro, which may span multiple lines.
+    #
+    # Examples
+    #
+    #   indexterm:[Tigers,Big cats]
+    #   (((Tigers,Big cats)))
+    #   indexterm2:[Tigers]
+    #   ((Tigers))
+    #
+    IndextermInlineMacroRx = /\\?(?:(indexterm2?):\[(.*?[^\\])\]|\(\((.+?)\)\)(?!\)))/m
+
+    # Matches either the kbd or btn inline macro.
+    #
+    # Examples
+    #
+    #   kbd:[F3]
+    #   kbd:[Ctrl+Shift+T]
+    #   kbd:[Ctrl+\]]
+    #   kbd:[Ctrl,T]
+    #   btn:[Save]
+    #
+    KbdBtnInlineMacroRx = /\\?(?:kbd|btn):\[((?:\\\]|[^\]])+?)\]/
+
+    # Matches the delimiter used for kbd value.
+    #
+    # Examples
+    #
+    #   Ctrl + Alt+T
+    #   Ctrl,T
+    #
+    KbdDelimiterRx = /(?:\+|,)(?=#{CC_BLANK}*[^\1])/
+
+    # Matches an implicit link and some of the link inline macro.
+    #
+    # Examples
+    # 
+    #   http://github.com
+    #   http://github.com[GitHub]
+    #
+    # FIXME revisit!
+    LinkInlineRx = %r{(^|link:|&lt;|[\s>\(\)\[\];])(\\?(?:https?|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[((?:\\\]|[^\]])*?)\])?}
+
+    # Match a link or e-mail inline macro.
+    #
+    # Examples
+    #
+    #   link:path[label]
+    #   mailto:doc.writer@example.com[]
+    #
+    LinkInlineMacroRx = /\\?(?:link|mailto):([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/
+
+    # Matches a math inline macro, which may span multiple lines.
+    #
+    # Examples
+    #
+    #   math:[x != 0]
+    #   asciimath:[x != 0]
+    #   latexmath:[\sqrt{4} = 2]
+    #
+    MathInlineMacroRx = /\\?((?:latex|ascii)?math):([a-z,]*)\[(.*?[^\\])\]/m
+
+    # Matches a menu inline macro.
+    #
+    # Examples
+    #
+    #   menu:File[New...]
+    #   menu:View[Page Style > No Style]
+    #   menu:View[Page Style, No Style]
+    #
+    MenuInlineMacroRx = /\\?menu:(\w|\w.*?\S)\[#{CC_BLANK}*(.+?)?\]/
+
+    # Matches an implicit menu inline macro.
+    #
+    # Examples
+    #
+    #   "File > New..."
+    #
+    MenuInlineRx = /\\?"(\w[^"]*?#{CC_BLANK}*&gt;#{CC_BLANK}*[^" \t][^"]*)"/
+
+    # Matches a passthrough literal value, which may span multiple lines.
+    #
+    # Examples
+    #
+    #   `text`
+    #
+    PassInlineLiteralRx = /(^|[^`\w])(?:\[([^\]]+?)\])?(\\?`([^`\s]|[^`\s].*?\S)`)(?![`\w])/m
+
+    # Matches several variants of the passthrough inline macro, which may span multiple lines.
+    #
+    # Examples
+    #
+    #   +++text+++
+    #   $$text$$
+    #   pass:quotes[text]
+    #
+    PassInlineMacroRx = /\\?(?:(\+{3}|\${2})(.*?)\1|pass:([a-z,]*)\[(.*?[^\\])\])/m
+
+    # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
+    #
+    # Examples
+    #
+    #   <<id,reftext>>
+    #   xref:id[reftext]
+    #
+    # NOTE special characters have already been escaped, hence the entity references
+    XrefInlineMacroRx = /\\?(?:&lt;&lt;([\w":].*?)&gt;&gt;|xref:([\w":].*?)\[(.*?)\])/m
+
+    ## Layout
+
+    # Matches a trailing + preceded by at least one space character,
+    # which forces a hard line break (<br> tag in HTML outputs).
+    #
+    # Examples
+    #
+    #    +
+    #   Foo +
+    #
+    LineBreakRx = /^(.*)#{CC_BLANK}\+#{CC_EOL}/
+
+    # Matches an AsciiDoc horizontal rule or AsciiDoc page break.
+    #
+    # Examples
+    #
+    #   ''' (horizontal rule)
+    #   <<< (page break)
+    #
+    LayoutBreakLineRx = /^('|<){3,}$/
+
+    # Matches an AsciiDoc or Markdown horizontal rule or AsciiDoc page break.
+    #
+    # Examples
+    #
+    #   ''' or ' ' ' (horizontal rule)
+    #   --- or - - - (horizontal rule)
+    #   *** or * * * (horizontal rule)
+    #   <<< (page break)
+    #
+    LayoutBreakLinePlusRx = /^(?:'|<){3,}$|^ {0,3}([-\*_])( *)\1\2\1$/
+
+    ## General
+
+    # Matches a blank line.
+    #
+    # NOTE allows for empty space in line as it could be left by the template engine
+    BlankLineRx = /^#{CC_BLANK}*\n/
+
+    # Matches a comma or semi-colon delimiter.
+    #
+    # Examples
+    #
+    #   one,two
+    #   three;four
+    #
+    DataDelimiterRx = /,|;/ 
+
+    # Matches one or more consecutive digits on a single line.
+    #
+    # Examples
+    #
+    #   29
+    #
+    DigitsRx = /^\d+$/
+
+    # Matches a single-line of text enclosed in double quotes, capturing the quote char and text.
+    #
+    # Examples
+    #
+    #   "Who goes there?"
+    #
+    DoubleQuotedRx = /^("|)(.*)\1$/
+
+    # Matches multiple lines of text enclosed in double quotes, capturing the quote char and text.
+    #
+    # Examples
+    #
+    #   "I am a run-on sentence and I like
+    #   to take up multiple lines and I
+    #   still want to be matched."
+    #
+    DoubleQuotedMultiRx = /^("|)(.*)\1$/m
+
+    # Matches one or more consecutive digits at the end of a line.
+    #
+    # Examples
+    #
+    #   docbook45
+    #   html5
+    #
+    TrailingDigitsRx = /\d+$/
+
+    # Matches a space escaped by a backslash.
+    #
+    # Examples
+    # 
+    #   one\ two\ three
+    #
+    EscapedSpaceRx = /\\(#{CC_BLANK})/
+
+    # Matches a space delimiter that's not escaped.
+    #
+    # Examples
+    #
+    #   one two	three	four
+    #
+    SpaceDelimiterRx = /([^\\])#{CC_BLANK}+/
+
+    # Detects strings that resemble URIs.
+    #
+    # Examples
+    #   http://domain
+    #   https://domain
+    #   data:info
+    #
+    UriSniffRx = %r{^[#{CC_ALPHA}][#{CC_ALNUM}.+-]*:/{0,2}}
+
+    # Unused
+
+    # Detects any fenced block delimiter, including:
+    #   listing, literal, example, sidebar, quote, passthrough, table and fenced code
+    # Does not match open blocks or air quotes
+    # TIP position the most common blocks towards the front of the pattern
+    #BlockDelimiterRx = %r{^(?:(?:-|\.|=|\*|_|\+|/){4,}|[\|,;!]={3,}|(?:`|~){3,}.*)$}
+
+    # Matches an escaped single quote within a word
+    #
+    # Examples
+    #
+    #   Here\'s Johnny!
+    #
+    #EscapedSingleQuoteRx = /(\w)\\'(\w)/
+    # an alternative if our backend generates single-quoted html/xml attributes
+    #EscapedSingleQuoteRx = /(\w|=)\\'(\w)/
+
+    # Matches whitespace at the beginning of the line
+    #LeadingSpacesRx = /^(#{CC_BLANK}*)/
+
+    # Matches parent directory references at the beginning of a path
+    #LeadingParentDirsRx = /^(?:\.\.\/)*/
+
+    #StripLineWise = /\A(?:\s*\n)?(.*?)\s*\z/m
+  #end
+
+  INTRINSIC_ATTRIBUTES = {
     'startsb'    => '[',
     'endsb'      => ']',
     'vbar'       => '|',
@@ -752,8 +1082,7 @@ module Asciidoctor
     'amp'        => '&',
     'lt'         => '<',
     'gt'         => '>'
-    }
-  )
+  }
 
   # unconstrained quotes:: can appear anywhere
   # constrained quotes:: must be bordered by non-word characters
@@ -862,7 +1191,7 @@ module Asciidoctor
     elsif attrs.is_a? ::String
       # convert non-escaped spaces into null character, so we split on the
       # correct spaces chars, and restore escaped spaces
-      attrs = attrs.gsub(REGEXP[:space_delim], "\\1\0").gsub(REGEXP[:escaped_space], '\1')
+      attrs = attrs.gsub(SpaceDelimiterRx, "\\1\0").gsub(EscapedSpaceRx, '\1')
 
       attrs = options[:attributes] = attrs.split("\0").inject({}) do |accum, entry|
         k, v = entry.split '=', 2

@@ -250,7 +250,7 @@ class Table::Cell < AbstractNode
     if @style == :asciidoc
       @inner_document.render
     else
-      text.split(BLANK_LINE_PATTERN).map {|p|
+      text.split(BlankLineRx).map {|p|
         !@style || @style == :header ? p : Inline.new(parent, :quoted, p, :type => @style).render
       }
     end
@@ -332,9 +332,9 @@ class Table::ParserContext
   # Public: Checks whether the line provided contains the cell delimiter
   # used by this table.
   #
-  # returns MatchData if the line contains the delimiter, false otherwise
+  # returns Regexp MatchData if the line contains the delimiter, false otherwise
   def match_delimiter(line)
-    line.match @delimiter_re
+    @delimiter_re.match(line)
   end
 
   # Public: Skip beyond the matched delimiter because it was a false positive
@@ -351,7 +351,7 @@ class Table::ParserContext
   # returns true if the buffer has unclosed quotes, false if it doesn't or it 
   # isn't quoted data
   def buffer_has_unclosed_quotes?(append = nil)
-    record = "#@buffer#{append}".strip
+    record = %(#@buffer#{append}).strip
     record.start_with?('"') && !record.start_with?('""') && !record.end_with?('"')
   end
 

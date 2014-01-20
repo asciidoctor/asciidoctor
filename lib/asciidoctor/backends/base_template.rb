@@ -71,7 +71,7 @@ class BaseTemplate
   # returns the text with blank lines removed and HTML line feed entities
   # converted to an endline character.
   def compact(str)
-    str.gsub(BLANK_LINE_PATTERN, '').gsub(LINE_FEED_ENTITY, EOL)
+    str.gsub(BlankLineRx, '').gsub(LINE_FEED_ENTITY, EOL)
   end
 
   # Public: Preserve endlines by replacing them with the HTML line feed entity.

@@ -96,7 +96,7 @@ class Lexer
     # yep, document title logic in AsciiDoc is just insanity
     # definitely an area for spec refinement
     assigned_doctitle = nil
-    unless (val = document.attributes['doctitle']).nothing?
+    unless (val = document.attributes['doctitle']).nil_or_empty?
       document.title = val
       assigned_doctitle = val
     end
@@ -118,7 +118,7 @@ class Lexer
       parse_header_metadata(reader, document)
     end
 
-    if !(val = document.attributes['doctitle']).nothing? &&
+    if !(val = document.attributes['doctitle']).nil_or_empty? &&
         val != section_title
       document.title = val
       assigned_doctitle = val
@@ -141,7 +141,7 @@ class Lexer
   #
   # returns Nothing
   def self.parse_manpage_header(reader, document)
-    if (m = document.attributes['doctitle'].match(REGEXP[:mantitle_manvolnum]))
+    if (m = ManpageTitleVolnumRx.match(document.attributes['doctitle']))
       document.attributes['mantitle'] = document.sub_attributes(m[1].rstrip.downcase)
       document.attributes['manvolnum'] = m[2].strip
     else
@@ -154,7 +154,7 @@ class Lexer
       name_section = initialize_section(reader, document, {})
       if name_section.level == 1
         name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join(' ').tr_s(' ', ' ')
-        if (m = name_section_buffer.match(REGEXP[:manname_manpurpose]))
+        if (m = ManpageNamePurposeRx.match(name_section_buffer))
           document.attributes['manname'] = m[1] 
           document.attributes['manpurpose'] = m[2] 
           # TODO parse multiple man names
@@ -493,12 +493,12 @@ class Lexer
           unless text_only
             first_char = Compliance.markdown_syntax ? this_line.lstrip.chr : this_line.chr
             # NOTE we're letting break lines (ruler, page_break, etc) have attributes
-            if (BREAK_LINES.has_key? first_char) && this_line.length >= 3 &&
-                (match = this_line.match(Compliance.markdown_syntax ? REGEXP[:break_line_plus] : REGEXP[:break_line]))
-              block = Block.new(parent, BREAK_LINES[first_char], :content_model => :empty)
+            if (LAYOUT_BREAK_LINES.has_key? first_char) && this_line.length >= 3 &&
+                (Compliance.markdown_syntax ? LayoutBreakLinePlusRx : LayoutBreakLineRx) =~ this_line
+              block = Block.new(parent, LAYOUT_BREAK_LINES[first_char], :content_model => :empty)
               break
 
-            elsif this_line.end_with?(']') && (match = this_line.match(REGEXP[:media_blk_macro]))
+            elsif this_line.end_with?(']') && (match = MediaBlockMacroRx.match(this_line))
               blk_ctx = match[1].to_sym
               block = Block.new(parent, blk_ctx, :content_model => :empty)
               if blk_ctx == :image
@@ -541,19 +541,19 @@ class Lexer
                   end
                 end
                 document.register(:images, target)
-                attributes['alt'] ||= File.basename(target, File.extname(target)).tr('_-', ' ')
+                attributes['alt'] ||= ::File.basename(target, ::File.extname(target)).tr('_-', ' ')
                 # QUESTION should video or audio have an auto-numbered caption?
                 block.assign_caption attributes.delete('caption'), 'figure'
               end
               break
 
             # NOTE we're letting the toc macro have attributes
-            elsif first_char == 't' && (match = this_line.match(REGEXP[:toc]))
+            elsif first_char == 't' && (match = TocBlockMacroRx.match(this_line))
               block = Block.new(parent, :toc, :content_model => :empty)
               block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
               break
 
-            elsif macro_extensions && (match = this_line.match(REGEXP[:generic_blk_macro])) &&
+            elsif macro_extensions && (match = GenericBlockMacroRx.match(this_line)) &&
                 extensions.processor_registered_for_block_macro?(match[1])
               name = match[1]
               target = match[2]
@@ -573,7 +573,7 @@ class Lexer
           end
 
           # haven't found anything yet, continue
-          if (match = this_line.match(REGEXP[:colist]))
+          if (match = CalloutListRx.match(this_line))
             block = List.new(parent, :colist)
             attributes['style'] = 'arabic'
             reader.unshift_line this_line
@@ -596,17 +596,17 @@ class Lexer
                   warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: no callouts refer to list item #{block.items.size})
                 end
               end
-            end while reader.has_more_lines? && match = reader.peek_line.match(REGEXP[:colist])
+            end while reader.has_more_lines? && (match = CalloutListRx.match(reader.peek_line))
 
             document.callouts.next_list
             break
 
-          elsif (match = this_line.match(REGEXP[:ulist]))
+          elsif UnorderedListRx =~ this_line
             reader.unshift_line this_line
             block = next_outline_list(reader, :ulist, parent)
             break
 
-          elsif (match = this_line.match(REGEXP[:olist]))
+          elsif (match = OrderedListRx.match(this_line))
             reader.unshift_line this_line
             block = next_outline_list(reader, :olist, parent)
             # QUESTION move this logic to next_outline_list?
@@ -617,13 +617,13 @@ class Lexer
                 #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES[0]).to_s
                 attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || ORDERED_LIST_STYLES[0]).to_s
               else
-                style = ORDERED_LIST_STYLES.detect{|s| marker.match(ORDERED_LIST_MARKER_PATTERNS[s]) }
+                style = ORDERED_LIST_STYLES.detect{|s| OrderedListMarkerRxMap[s] =~ marker }
                 attributes['style'] = (style || ORDERED_LIST_STYLES[0]).to_s
               end
             end
             break
 
-          elsif (match = this_line.match(REGEXP[:dlist]))
+          elsif (match = DefinitionListRx.match(this_line))
             reader.unshift_line this_line
             block = next_labeled_list(reader, match, parent)
             break
@@ -635,7 +635,7 @@ class Lexer
             attributes['reftext'] = float_reftext if float_reftext
             float_id ||= attributes['id'] if attributes.has_key?('id')
             block = Block.new(parent, :floating_title, :content_model => :empty)
-            if float_id.nothing?
+            if float_id.nil_or_empty?
               # FIXME remove hack of creating throwaway Section to get at the generate_id method
               tmp_sect = Section.new(parent)
               tmp_sect.title = float_title
@@ -678,7 +678,7 @@ class Lexer
           break_at_list = (skipped == 0 && in_list)
 
           # a literal paragraph is contiguous lines starting at least one space
-          if style != 'normal' && this_line.match(REGEXP[:lit_par])
+          if style != 'normal' && LiteralParagraphRx =~ this_line
             # So we need to actually include this one in the read_lines group
             reader.unshift_line this_line
             lines = reader.read_lines_until(
@@ -689,8 +689,8 @@ class Lexer
               # and therefore we should not break at a list item
               # (this won't stop breaking on item of same level since we've already parsed them out)
               # QUESTION can we turn this block into a lambda or function call?
-              (break_at_list && line.match(REGEXP[:any_list])) ||
-              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
+              (break_at_list && AnyListRx =~ line) ||
+              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
             }
 
             reset_block_indent! lines
@@ -712,8 +712,8 @@ class Lexer
               # and therefore we should not break at a list item
               # (this won't stop breaking on item of same level since we've already parsed them out)
               # QUESTION can we turn this block into a lambda or function call?
-              (break_at_list && line.match(REGEXP[:any_list])) ||
-              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || line.match(REGEXP[:attr_line])))
+              (break_at_list && AnyListRx =~ line) ||
+              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
             }
 
             # NOTE we need this logic because we've asked the reader to skip
@@ -728,7 +728,7 @@ class Lexer
             catalog_inline_anchors(lines.join(EOL), document)
 
             first_line = lines[0]
-            if !text_only && (admonition_match = first_line.match(REGEXP[:admonition_inline]))
+            if !text_only && (admonition_match = AdmonitionParagraphRx.match(first_line))
               lines[0] = admonition_match.post_match.lstrip
               attributes['style'] = admonition_match[1]
               attributes['name'] = admonition_name = admonition_match[1].downcase
@@ -834,7 +834,7 @@ class Lexer
 
         when :math, :latexmath, :asciimath
           if block_context == :math
-            attributes['style'] = (default_math_syntax = document.attributes['math']).nothing? ? 'asciimath' : default_math_syntax
+            attributes['style'] = (default_math_syntax = document.attributes['math']).nil_or_empty? ? 'asciimath' : default_math_syntax
           end
           block = build_block(:math, :raw, terminator, parent, reader, attributes)
 
@@ -941,14 +941,14 @@ class Lexer
       if Compliance.markdown_syntax
         tip_3 = (tl == 4 ? tip.chop : tip)
         if tip_3 == '```'
-          if tl == 4 && (tip.end_with? '`')
+          if tl == 4 && tip.end_with?('`')
             return nil
           end
           tip = tip_3
           tl = 3
           fenced_code = true
         elsif tip_3 == '~~~'
-          if tl == 4 && (tip.end_with? '~')
+          if tl == 4 && tip.end_with?('~')
             return nil
           end
           tip = tip_3
@@ -977,7 +977,8 @@ class Lexer
         else
           true
         end
-      #elsif match = line.match(REGEXP[:any_blk])
+      # only enable if/when we decide to support non-congruent block delimiters
+      #elsif (match = BlockDelimiterRx.match(line))
       #  if return_match_data
       #    context, masq = *DELIMITED_BLOCKS[tip]
       #    BlockMatchData.new(context, masq, tip, match[0])
@@ -1015,7 +1016,7 @@ class Lexer
             :preserve_last_line => true,
             :skip_line_comments => true,
             :skip_processing => skip_processing) {|line|
-          Compliance.block_terminates_paragraph && (is_delimited_block?(line) || line.match(REGEXP[:attr_line]))
+          Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line)
         }
         # QUESTION check for empty lines after grabbing lines for simple content model?
       end
@@ -1098,7 +1099,7 @@ class Lexer
     end
     #Debug.debug { "Created #{list_type} block: #{list_block}" }
 
-    while reader.has_more_lines? && (match = reader.peek_line.match(REGEXP[list_type]))
+    while reader.has_more_lines? && (match = ListRxMap[list_type].match(reader.peek_line))
       marker = resolve_list_marker(list_type, match[1])
 
       # if we are moving to the next item, and the marker is different
@@ -1148,7 +1149,7 @@ class Lexer
   def self.catalog_callouts(text, document)
     found = false
     if text.include? '<'
-      text.scan(REGEXP[:callout_quick_scan]) {
+      text.scan(CalloutQuickScanRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         if m[0].chr != '\\'
@@ -1169,16 +1170,16 @@ class Lexer
   # Returns nothing
   def self.catalog_inline_anchors(text, document)
     if text.include? '['
-      text.scan(REGEXP[:anchor_macro]) {
+      text.scan(InlineAnchorRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         next if m[0].start_with? '\\'
         id = m[1] || m[3]
         reftext = m[2] || m[4]
         # enable if we want to allow double quoted values
-        #id = id.sub(REGEXP[:dbl_quoted], '\2')
+        #id = id.sub(DoubleQuotedRx, '\2')
         #if !reftext.nil?
-        #  reftext = reftext.sub(REGEXP[:m_dbl_quoted], '\2')
+        #  reftext = reftext.sub(DoubleQuotedMultiRx, '\2')
         #end
         document.register(:ids, [id, reftext])
       }
@@ -1198,7 +1199,7 @@ class Lexer
     previous_pair = nil
     # allows us to capture until we find a labeled item
     # that uses the same delimiter (::, :::, :::: or ;;)
-    sibling_pattern = REGEXP[:dlist_siblings][match[2]]
+    sibling_pattern = DefinitionListSiblingRx[match[2]]
 
     begin
       term, item = next_list_item(reader, list_block, match, sibling_pattern)
@@ -1210,7 +1211,7 @@ class Lexer
         # FIXME this misses the automatic parent assignment
         list_block.items << (previous_pair = [[term], item])
       end
-    end while reader.has_more_lines? && match = reader.peek_line.match(sibling_pattern)
+    end while reader.has_more_lines? && (match = sibling_pattern.match(reader.peek_line))
 
     list_block
   end
@@ -1238,7 +1239,7 @@ class Lexer
     if list_type == :dlist
       list_term = ListItem.new(list_block, match[1])
       list_item = ListItem.new(list_block, match[3])
-      has_text = !match[3].nothing?
+      has_text = !match[3].nil_or_empty?
     else
       # Create list item using first line as the text of the list item
       text = match[2]
@@ -1378,7 +1379,7 @@ class Lexer
 
       # a delimited block immediately breaks the list unless preceded
       # by a list continuation (they are harsh like that ;0)
-      if match = is_delimited_block?(this_line, true)
+      if (match = is_delimited_block?(this_line, true))
         if continuation == :active
           buffer << this_line
           # grab all the lines in the block, leaving the delimiters in place
@@ -1388,9 +1389,9 @@ class Lexer
         else
           break
         end
-      # technically attr_line only breaks if ensuing line is not a list item
-      # which really means attr_line only breaks if it's acting as a block delimiter
-      elsif list_type == :dlist && continuation != :active && this_line.match(REGEXP[:attr_line])
+      # technically BlockAttributeLineRx only breaks if ensuing line is not a list item
+      # which really means BlockAttributeLineRx only breaks if it's acting as a block delimiter
+      elsif list_type == :dlist && continuation != :active && BlockAttributeLineRx =~ this_line
         break
       else
         if continuation == :active && !this_line.empty?
@@ -1398,7 +1399,7 @@ class Lexer
           # two entry points into one)
           # if we don't process it as a whole, then a line in it that looks like a
           # list item will throw off the exit from it
-          if this_line.match(REGEXP[:lit_par])
+          if LiteralParagraphRx =~ this_line
             reader.unshift_line this_line
             buffer.concat reader.read_lines_until(
                 :preserve_last_line => true,
@@ -1410,12 +1411,12 @@ class Lexer
             }
             continuation = :inactive
           # let block metadata play out until we find the block
-          elsif this_line.match(REGEXP[:blk_title]) || this_line.match(REGEXP[:attr_line]) || this_line.match(REGEXP[:attr_entry])
+          elsif BlockTitleRx =~ this_line || BlockAttributeLineRx =~ this_line || AttributeEntryRx =~ this_line
             buffer << this_line
           else
-            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
+            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| ListRxMap[ctx] =~ this_line }
               within_nested_list = true
-              if nested_list_type == :dlist && $~[3].nothing?
+              if nested_list_type == :dlist && $~[3].nil_or_empty?
                 # get greedy again
                 has_text = false
               end
@@ -1443,16 +1444,16 @@ class Lexer
               # TODO any way to combine this with the check after skipping blank lines?
               if is_sibling_list_item?(this_line, list_type, sibling_trait)
                 break
-              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| this_line.match(REGEXP[ctx]) }
+              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| ListRxMap[ctx] =~ this_line }
                 buffer << this_line
                 within_nested_list = true
-                if nested_list_type == :dlist && $~[3].nothing?
+                if nested_list_type == :dlist && $~[3].nil_or_empty?
                   # get greedy again
                   has_text = false
                 end
               # slurp up any literal paragraph offset by blank lines
               # NOTE we have to check for indented list items first
-              elsif this_line.match(REGEXP[:lit_par])
+              elsif LiteralParagraphRx =~ this_line
                 reader.unshift_line this_line
                 buffer.concat reader.read_lines_until(
                     :preserve_last_line => true,
@@ -1474,9 +1475,9 @@ class Lexer
           end
         else
           has_text = true if !this_line.empty?
-          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| this_line.match(REGEXP[ctx]) }
+          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| ListRxMap[ctx] =~ this_line }
             within_nested_list = true
-            if nested_list_type == :dlist && $~[3].nothing?
+            if nested_list_type == :dlist && $~[3].nil_or_empty?
               # get greedy again
               has_text = false
             end
@@ -1578,7 +1579,7 @@ class Lexer
   # returns the section level if the Reader is positioned at a section title,
   # false otherwise
   def self.is_next_line_section?(reader, attributes)
-    if !(val = attributes[1]).nil? && ((ord_0 = val[0].ord) == 100 || ord_0 == 102) && (val.match REGEXP[:section_float_style])
+    if !(val = attributes[1]).nil? && ((ord_0 = val[0].ord) == 100 || ord_0 == 102) && val =~ FloatingTitleStyleRx
       return false
     end
     return false if !reader.has_more_lines?
@@ -1615,7 +1616,7 @@ class Lexer
   def self.is_single_line_section_title?(line1)
     first_char = line1 ? line1.chr : nil
     if (first_char == '=' || (Compliance.markdown_syntax && first_char == '#')) &&
-        (match = line1.match(REGEXP[:section_title]))
+        (match = AtxSectionRx.match(line1))
       single_line_section_level match[1]
     else
       false
@@ -1624,7 +1625,7 @@ class Lexer
 
   def self.is_two_line_section_title?(line1, line2)
     if line1 && line2 && SECTION_LEVELS.has_key?(line2.chr) &&
-        line2.match(REGEXP[:section_underline]) && line1.match(REGEXP[:section_name]) &&
+        line2 =~ SetextSectionLineRx && line1 =~ SetextSectionTitleRx &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
       section_level line2
@@ -1686,10 +1687,10 @@ class Lexer
 
     first_char = line1.chr
     if (first_char == '=' || (Compliance.markdown_syntax && first_char == '#')) &&
-        (match = line1.match(REGEXP[:section_title]))
+        (match = AtxSectionRx.match(line1))
       sect_level = single_line_section_level match[1]
       sect_title = match[2]
-      if (sect_title.end_with? ']]') && (anchor_match = (sect_title.match REGEXP[:anchor_embedded]))
+      if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
         if anchor_match[2].nil?
           sect_title = anchor_match[1]
           sect_id = anchor_match[3]
@@ -1698,12 +1699,12 @@ class Lexer
       end
     elsif Compliance.underline_style_section_titles
       
-      if (line2 = reader.peek_line true) && SECTION_LEVELS.has_key?(line2.chr) && line2.match(REGEXP[:section_underline]) &&
-        (name_match = line1.match(REGEXP[:section_name])) &&
+      if (line2 = reader.peek_line(true)) && SECTION_LEVELS.has_key?(line2.chr) && line2 =~ SetextSectionLineRx &&
+        (name_match = SetextSectionTitleRx.match(line1)) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
         sect_title = name_match[1]
-        if (sect_title.end_with? ']]') && (anchor_match = (sect_title.match REGEXP[:anchor_embedded]))
+        if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
           if anchor_match[2].nil?
             sect_title = anchor_match[1]
             sect_id = anchor_match[3]
@@ -1760,7 +1761,7 @@ class Lexer
           # apply header subs and assign to document
           author_metadata.each do |key, val|
             unless document.attributes.has_key? key
-              document.attributes[key] = ((val.is_a? String) ? document.apply_header_subs(val) : val)
+              document.attributes[key] = ((val.is_a? ::String) ? document.apply_header_subs(val) : val)
             end
           end
 
@@ -1778,7 +1779,7 @@ class Lexer
 
       if reader.has_more_lines? && !reader.next_line_empty?
         rev_line = reader.read_line 
-        if match = rev_line.match(REGEXP[:revision_info])
+        if (match = RevisionInfoLineRx.match(rev_line))
           rev_metadata['revdate'] = match[2].strip
           rev_metadata['revnumber'] = match[1].rstrip unless match[1].nil?
           rev_metadata['revremark'] = match[3].rstrip unless match[3].nil?
@@ -1877,7 +1878,7 @@ class Lexer
       if names_only
         # splitting on ' ' will collapse repeating spaces
         segments = author_entry.split(' ', 3)
-      elsif (match = author_entry.match(REGEXP[:author_info]))
+      elsif (match = AuthorInfoLineRx.match(author_entry))
         segments = match.to_a
         segments.shift
       end
@@ -1964,26 +1965,26 @@ class Lexer
   def self.parse_block_metadata_line(reader, parent, attributes, options = {})
     return false if !reader.has_more_lines?
     next_line = reader.peek_line
-    if (commentish = next_line.start_with?('//')) && (match = next_line.match(REGEXP[:comment_blk]))
+    if (commentish = next_line.start_with?('//')) && (match = CommentBlockRx.match(next_line))
       terminator = match[0]
       reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :skip_processing => true)
-    elsif commentish && next_line.match(REGEXP[:comment])
+    elsif commentish && CommentLineRx =~ next_line
       # do nothing, we'll skip it
-    elsif !options[:text] && next_line.start_with?(':') && (match = next_line.match(REGEXP[:attr_entry]))
+    elsif !options[:text] && next_line.start_with?(':') && (match = AttributeEntryRx.match(next_line))
       process_attribute_entry(reader, parent, attributes, match)
-    elsif (in_square_brackets = next_line.start_with?('[') && next_line.end_with?(']')) && (match = next_line.match(REGEXP[:anchor]))
-      unless match[1].nothing?
+    elsif (in_square_brackets = next_line.start_with?('[') && next_line.end_with?(']')) && (match = BlockAnchorRx.match(next_line))
+      unless match[1].nil_or_empty?
         attributes['id'] = match[1]
         # AsciiDoc always uses [id] as the reftext in HTML output,
         # but I'd like to do better in Asciidoctor
         # registration is deferred until the block or section is processed
         attributes['reftext'] = match[2] unless match[2].nil?
       end
-    elsif in_square_brackets && (match = next_line.match(REGEXP[:blk_attr_list]))
+    elsif in_square_brackets && (match = BlockAttributeListRx.match(next_line))
       parent.document.parse_attributes(match[1], [], :sub_input => true, :into => attributes)
     # NOTE title doesn't apply to section, but we need to stash it for the first block
     # TODO should issue an error if this is found above the document title
-    elsif !options[:text] && (match = next_line.match(REGEXP[:blk_title]))
+    elsif !options[:text] && (match = BlockTitleRx.match(next_line))
       attributes['title'] = match[1]
     else
       return false
@@ -2002,7 +2003,7 @@ class Lexer
   end
 
   def self.process_attribute_entry(reader, parent, attributes = nil, match = nil)
-    match ||= reader.has_more_lines? ? reader.peek_line.match(REGEXP[:attr_entry]) : nil
+    match ||= (reader.has_more_lines? ? AttributeEntryRx.match(reader.peek_line) : nil)
     if match
       name = match[1]
       value = match[2] || ''
@@ -2107,7 +2108,7 @@ class Lexer
   #
   # Returns the String of the first marker in this number series 
   def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
-    number_style = ORDERED_LIST_STYLES.detect {|s| marker.match(ORDERED_LIST_MARKER_PATTERNS[s]) }
+    number_style = ORDERED_LIST_STYLES.detect {|s| OrderedListMarkerRxMap[s] =~ marker }
     expected = actual = nil
     case number_style
       when :arabic
@@ -2161,15 +2162,15 @@ class Lexer
   # Returns a Boolean indicating whether this line is a sibling list item given
   # the criteria provided
   def self.is_sibling_list_item?(line, list_type, sibling_trait)
-    if sibling_trait.is_a? Regexp
+    if sibling_trait.is_a? ::Regexp
       matcher = sibling_trait
       expected_marker = false
     else
-      matcher = REGEXP[list_type]
+      matcher = ListRxMap[list_type]
       expected_marker = sibling_trait
     end
 
-    if m = line.match(matcher)
+    if (m = matcher.match(line))
       if expected_marker
         expected_marker == resolve_list_marker(list_type, m[1])
       else
@@ -2232,7 +2233,7 @@ class Lexer
       seen = false
       while !seen || !line.empty?
         seen = true
-        if m = parser_ctx.match_delimiter(line)
+        if (m = parser_ctx.match_delimiter(line))
           if parser_ctx.format == 'csv'
             if parser_ctx.buffer_has_unclosed_quotes?(m.pre_match)
               # throw it back, it's too small
@@ -2306,27 +2307,24 @@ class Lexer
   # returns a Hash of attributes that specify how to format
   # and layout the cells in the table.
   def self.parse_col_specs(records)
-    specs = []
-
-    # check for deprecated syntax
-    if m = records.match(REGEXP[:digits])
-      1.upto(m[0].to_i) {
-        specs << {'width' => 1}
-      }
-      return specs
+    # check for deprecated syntax: single number, equal column spread
+    # REVIEW could use records == records.to_i.to_s instead of regexp
+    if DigitsRx =~ records
+      return ::Array.new(records.to_i) { { 'width' => 1 } }
     end
 
+    specs = []
     records.split(',').each {|record|
       # TODO might want to use scan rather than this mega-regexp
-      if m = record.match(REGEXP[:table_colspec])
+      if (m = ColumnSpecRx.match(record))
         spec = {}
         if m[2]
           # make this an operation
           colspec, rowspec = m[2].split '.'
-          if !colspec.nothing? && Table::ALIGNMENTS[:h].has_key?(colspec)
+          if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
             spec['halign'] = Table::ALIGNMENTS[:h][colspec]
           end
-          if !rowspec.nothing? && Table::ALIGNMENTS[:v].has_key?(rowspec)
+          if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
             spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
           end
         end
@@ -2365,14 +2363,14 @@ class Lexer
     spec = (pos == :end ? {} : nil)
     rest = line
 
-    if m = line.match(REGEXP[:table_cellspec][pos]) 
+    if (m = (pos == :start ? CellSpecStartRx : CellSpecEndRx).match(line))
       spec = {}
       return [spec, line] if m[0].empty?
       rest = (pos == :start ? m.post_match : m.pre_match)
       if m[1]
         colspec, rowspec = m[1].split '.'
-        colspec = colspec.nothing? ? 1 : colspec.to_i
-        rowspec = rowspec.nothing? ? 1 : rowspec.to_i
+        colspec = colspec.nil_or_empty? ? 1 : colspec.to_i
+        rowspec = rowspec.nil_or_empty? ? 1 : rowspec.to_i
         if m[2] == '+'
           spec['colspan'] = colspec unless colspec == 1
           spec['rowspan'] = rowspec unless rowspec == 1
@@ -2383,10 +2381,10 @@ class Lexer
       
       if m[3]
         colspec, rowspec = m[3].split '.'
-        if !colspec.nothing? && Table::ALIGNMENTS[:h].has_key?(colspec)
+        if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
           spec['halign'] = Table::ALIGNMENTS[:h][colspec]
         end
-        if !rowspec.nothing? && Table::ALIGNMENTS[:v].has_key?(rowspec)
+        if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
           spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
         end
       end
@@ -2604,7 +2602,7 @@ class Lexer
   #   sanitize_attribute_name('Foo 3 #-Billy')
   #   => 'foo3-billy'
   def self.sanitize_attribute_name(name)
-    name.gsub(REGEXP[:illegal_attr_name_chars], '').downcase
+    name.gsub(InvalidAttributeNameCharsRx, '').downcase
   end
 
   # Internal: Converts a Roman numeral to an integer value.

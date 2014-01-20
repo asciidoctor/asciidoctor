@@ -57,7 +57,7 @@ class Block < AbstractBlock
     when :simple
       apply_subs @lines.join(EOL), @subs
     when :verbatim, :raw
-      #((apply_subs @lines.join(EOL), @subs).sub REGEXP[:strip_line_wise], '\1')
+      #((apply_subs @lines.join(EOL), @subs).sub StripLineWiseRx, '\1')
 
       result = apply_subs @lines, @subs
       if result.size < 2

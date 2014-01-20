@@ -91,7 +91,7 @@ class Section < AbstractBlock
     if @document.attributes.has_key? 'sectids'
       sep = @document.attributes['idseparator'] || '_'
       pre = @document.attributes['idprefix'] || '_'
-      base_id = %(#{pre}#{title.downcase.gsub(REGEXP[:illegal_sectid_chars], sep).tr_s(sep, sep).chomp(sep)})
+      base_id = %(#{pre}#{title.downcase.gsub(InvalidSectionIdCharsRx, sep).tr_s(sep, sep).chomp(sep)})
       # ensure id doesn't begin with idprefix if requested it doesn't
       if pre.empty? && base_id.start_with?(sep)
         base_id = base_id[1..-1]

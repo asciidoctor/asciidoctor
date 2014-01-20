@@ -130,7 +130,7 @@ class Reader
   #
   # Returns True if the there are no more lines or if the next line is empty
   def next_line_empty?
-    peek_line.nothing?
+    peek_line.nil_or_empty?
   end
 
   # Public: Peek at the next line of source data. Processes the line, if not
@@ -225,7 +225,7 @@ class Reader
   def read_lines
     lines = []
     while has_more_lines?
-      lines << read_line
+      lines << shift
     end
     lines
   end
@@ -247,7 +247,7 @@ class Reader
   #
   # returns a Boolean indicating whether there was a line to discard.
   def advance direct = true
-    !(read_line direct).nil?
+    !!read_line(direct)
   end
 
   # Public: Push the String line onto the beginning of the Array of source data.
@@ -341,12 +341,12 @@ class Reader
     include_blank_lines = opts[:include_blank_lines]
     while (next_line = peek_line)
       if include_blank_lines && next_line.empty?
-        comment_lines << read_line
-      elsif (commentish = next_line.start_with?('//')) && (match = next_line.match(REGEXP[:comment_blk]))
-        comment_lines << read_line
+        comment_lines << shift
+      elsif (commentish = next_line.start_with?('//')) && (match = CommentBlockRx.match(next_line))
+        comment_lines << shift
         comment_lines.push(*(read_lines_until(:terminator => match[0], :read_last_line => true, :skip_processing => true)))
-      elsif commentish && next_line.match(REGEXP[:comment])
-        comment_lines << read_line
+      elsif commentish && CommentLineRx =~ next_line
+        comment_lines << shift
       else
         break
       end
@@ -362,8 +362,8 @@ class Reader
     comment_lines = []
     # optimized code for shortest execution path
     while (next_line = peek_line)
-      if next_line.match(REGEXP[:comment])
-        comment_lines << read_line
+      if CommentLineRx =~ next_line
+        comment_lines << shift
       else
         break
       end
@@ -467,7 +467,7 @@ class Reader
           line_restored = true
         end
       else
-        unless skip_line_comments && line.start_with?('//') && line.match(REGEXP[:comment])
+        unless skip_line_comments && line.start_with?('//') && CommentLineRx =~ line
           result << line
           line_read = true
         end
@@ -482,6 +482,11 @@ class Reader
   end
 
   # Internal: Shift the line off the stack and increment the lineno
+  #
+  # This method can be used directly when you've already called peek_line
+  # and determined that you do, in fact, want to pluck that line off the stack.
+  #
+  # Returns The String line at the top of the stack
   def shift
     @lineno += 1
     @look_ahead -= 1 unless @look_ahead == 0
@@ -591,7 +596,7 @@ class PreprocessorReader < Reader
 
     # NOTE highly optimized
     if line.end_with?(']') && !line.start_with?('[') && line.include?('::')
-      if line.include?('if') && (match = line.match(REGEXP[:ifdef_macro]))
+      if line.include?('if') && (match = ConditionalDirectiveRx.match(line))
         # if escaped, mark as processed and return line unescaped
         if line.start_with?('\\')
           @unescape_next_line = true
@@ -613,7 +618,7 @@ class PreprocessorReader < Reader
       elsif @skipping
         advance
         nil
-      elsif ((escaped = line.start_with?('\\include::')) || line.start_with?('include::')) && (match = line.match(REGEXP[:include_macro]))
+      elsif ((escaped = line.start_with?('\\include::')) || line.start_with?('include::')) && (match = IncludeDirectiveRx.match(line))
         # if escaped, mark as processed and return line unescaped
         if escaped
           @unescape_next_line = true
@@ -741,7 +746,7 @@ class PreprocessorReader < Reader
       when 'ifeval'
         # the text in brackets must match an expression
         # don't honor match if it doesn't meet this criteria
-        if !target.empty? || !(expr_match = text.strip.match(REGEXP[:eval_expr]))
+        if !target.empty? || !(expr_match = EvalExpressionRx.match(text.strip))
           return false
         end
 
@@ -823,9 +828,9 @@ class PreprocessorReader < Reader
       warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
       false
     elsif abs_maxdepth > 0
-      if target.include?(':') && target.match(REGEXP[:uri_sniff])
+      if target.include?(':') && UriSniffRx =~ target
         unless @document.attributes.has_key? 'allow-uri-read'
-          replace_line "link:#{target}[]"
+          replace_line %(link:#{target}[])
           return true
         end
 
@@ -860,14 +865,14 @@ class PreprocessorReader < Reader
         attributes = AttributeList.new(raw_attributes).parse
         if attributes.has_key? 'lines'
           inc_lines = []
-          attributes['lines'].split(REGEXP[:ssv_or_csv_delim]).each do |linedef|
+          attributes['lines'].split(DataDelimiterRx).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..').map(&:to_i)
               if to == -1
                 inc_lines << from
                 inc_lines << 1.0/0.0
               else
-                inc_lines.concat Range.new(from, to).to_a
+                inc_lines.concat ::Range.new(from, to).to_a
               end
             else
               inc_lines << linedef.to_i
@@ -877,7 +882,7 @@ class PreprocessorReader < Reader
         elsif attributes.has_key? 'tag'
           tags = [attributes['tag']].to_set
         elsif attributes.has_key? 'tags'
-          tags = attributes['tags'].split(REGEXP[:ssv_or_csv_delim]).uniq.to_set
+          tags = attributes['tags'].split(DataDelimiterRx).uniq.to_set
         end
       end
       if !inc_lines.nil?
@@ -890,7 +895,7 @@ class PreprocessorReader < Reader
               f.each_line do |l|
                 inc_lineno += 1
                 take = inc_lines.first
-                if take.is_a?(Float) && take.infinite?
+                if take.is_a?(::Float) && take.infinite?
                   selected.push l
                   inc_line_offset = inc_lineno if inc_line_offset == 0
                 else
@@ -918,7 +923,7 @@ class PreprocessorReader < Reader
           inc_line_offset = 0
           inc_lineno = 0
           active_tag = nil
-          tags_found = Set.new
+          tags_found = ::Set.new
           begin
             open(include_file, 'r') do |f|
               f.each_line do |l|
