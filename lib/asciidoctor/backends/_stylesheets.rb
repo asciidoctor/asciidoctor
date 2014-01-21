@@ -254,8 +254,9 @@ kbd:not(.keyseq) { display: inline-block; color: #222222; font-size: 0.75em; lin
 kbd kbd:first-child { margin-left: 0; }
 kbd kbd:last-child { margin-right: 0; }
 .menuseq, .menu { color: #090909; }
-b.button:before { content: '[ '; }
-b.button:after { content: ' ]'; }
+b.button:before, b.button:after { position: relative; top: -1px; font-weight: normal; }
+b.button:before { content: "["; padding: 0 3px 0 2px; }
+b.button:after { content: "]"; padding: 0 2px 0 3px; }
 p a > code:hover { color: #561309; }
 #header, #content, #footnotes, #footer { width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 62.5em; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
 #header:before, #header:after, #content:before, #content:after, #footnotes:before, #footnotes:after, #footer:before, #footer:after { content: " "; display: table; }
