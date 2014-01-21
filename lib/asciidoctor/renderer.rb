@@ -176,7 +176,7 @@ class Renderer
     end
 
     if name == 'erb'
-      # autoload erb and return constant
+      Helpers.require_library 'erb'
       ::ERB
     elsif name == 'erubis'
       Helpers.require_library 'erubis'

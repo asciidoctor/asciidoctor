@@ -426,9 +426,9 @@ class BlockDlistTemplate < BaseTemplate
       result_buffer << '<table>'
       if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
         result_buffer << '<colgroup>'
-        col_style_attribute = (node.attr? 'labelwidth') ? %( style="width:#{(node.attr 'labelwidth').chomp '%'}%;") : nil
+        col_style_attribute = (node.attr? 'labelwidth') ? %( style="width: #{(node.attr 'labelwidth').chomp '%'}%;") : nil
         result_buffer << %(<col#{col_style_attribute}#{short_tag_slash_local}>)
-        col_style_attribute = (node.attr? 'itemwidth') ? %( style="width:#{(node.attr 'itemwidth').chomp '%'}%;") : nil
+        col_style_attribute = (node.attr? 'itemwidth') ? %( style="width: #{(node.attr 'itemwidth').chomp '%'}%;") : nil
         result_buffer << %(<col#{col_style_attribute}#{short_tag_slash_local}>)
         result_buffer << '</colgroup>'
       end

@@ -927,7 +927,9 @@ module Asciidoctor
     #    +
     #   Foo +
     #
-    LineBreakRx = /^(.*)#{CC_BLANK}\+#{CC_EOL}/
+    # NOTE: JavaScript only treats ^ and $ as line boundaries in multiline regexp
+    #LineBreakRx = /^(.*)[[:blank:]]\+$/
+    LineBreakRx = ::RUBY_ENGINE_OPAL ? %x(/^(.*?)[ \\t]\\+$/m) : %r{^(.*)[[:blank:]]\+$}
 
     # Matches an AsciiDoc horizontal rule or AsciiDoc page break.
     #

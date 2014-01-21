@@ -2448,8 +2448,8 @@ term:: def
       assert_css 'table', output, 1
       assert_css 'table > colgroup', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_xpath '(//table/colgroup/col)[1][@style="width:25%;"]', output, 1
-      assert_xpath '(//table/colgroup/col)[2][@style="width:75%;"]', output, 1
+      assert_xpath '(//table/colgroup/col)[1][@style="width: 25%;"]', output, 1
+      assert_xpath '(//table/colgroup/col)[2][@style="width: 75%;"]', output, 1
     end
 
     test 'should set col widths of item and label in docbook if specified' do
@@ -2540,6 +2540,8 @@ Question 1::
         Answer 1.
 Question 2::
         Answer 2.
++
+NOTE: A note about Answer 2.
       EOS
       output = render_embedded_string input
       assert_css '.qlist.qanda', output, 1
@@ -2552,6 +2554,7 @@ Question 2::
         assert_css ".qanda > ol > li:nth-child(#{idx}) > p:last-child > *", output, 0
         assert_xpath "/*[@class = 'qlist qanda']/ol/li[#{idx}]/p[2][normalize-space(text()) = 'Answer #{idx}.']", output, 1
       end
+      assert_xpath "/*[@class = 'qlist qanda']/ol/li[2]/p[2]/following-sibling::div[@class='admonitionblock note']", output, 1
     end
 
     test 'should render qanda list in DocBook with proper semantics' do
@@ -2561,6 +2564,8 @@ Question 1::
         Answer 1.
 Question 2::
         Answer 2.
++
+NOTE: A note about Answer 2.
       EOS
       output = render_embedded_string input, :backend => 'docbook'
       assert_css 'qandaset', output, 1
@@ -2573,6 +2578,7 @@ Question 2::
         assert_css "qandaset > qandaentry:nth-child(#{idx}) > answer > simpara", output, 1
         assert_xpath "/qandaset/qandaentry[#{idx}]/answer/simpara[normalize-space(text()) = 'Answer #{idx}.']", output, 1
       end
+      assert_xpath "/qandaset/qandaentry[2]/answer/simpara/following-sibling::note", output, 1
     end
 
     test 'consecutive questions should share same question element in docbook' do

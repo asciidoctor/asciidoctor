@@ -12,6 +12,8 @@ module Substitutors
 
   SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
 
+  USE_GSUB_RESULT_HASH = ::RUBY_MIN_VERSION_1_9 && !::RUBY_ENGINE_OPAL
+
   SUBS = {
     :basic    => [:specialcharacters],
     :normal   => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements],
@@ -243,7 +245,7 @@ module Substitutors
   #
   # returns The String text with special characters replaced
   def sub_specialcharacters(text)
-    ::RUBY_MIN_VERSION_1_9 ?
+    USE_GSUB_RESULT_HASH ?
       text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS) :
       text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
   end
@@ -616,7 +618,8 @@ module Substitutors
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
-          next %(#{m[1]}#{m[2][1..-1]}#{m[3]})
+          # NOTE Opal doesn't like %() as an enclosure around this string
+          next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
         # not a valid macro syntax w/o trailing square brackets
         # we probably shouldn't even get here...our regex is doing too much
         elsif m[1] == 'link:' && !m[3]
