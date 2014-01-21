@@ -206,6 +206,9 @@ module Asciidoctor
   # Flag to indicate that line length should be calculated using a unicode mode hint
   FORCE_UNICODE_LINE_LENGTH = !::RUBY_MIN_VERSION_1_9
 
+  # Flag to indicate whether gsub can use a Hash to map matches to replacements
+  SUPPORTS_GSUB_RESULT_HASH = ::RUBY_MIN_VERSION_1_9 && !::RUBY_ENGINE_OPAL
+
   # The endline character to use when rendering output
   EOL = "\n"
 

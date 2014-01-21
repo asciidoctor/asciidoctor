@@ -12,8 +12,6 @@ module Substitutors
 
   SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
 
-  USE_GSUB_RESULT_HASH = ::RUBY_MIN_VERSION_1_9 && !::RUBY_ENGINE_OPAL
-
   SUBS = {
     :basic    => [:specialcharacters],
     :normal   => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements],
@@ -245,7 +243,7 @@ module Substitutors
   #
   # returns The String text with special characters replaced
   def sub_specialcharacters(text)
-    USE_GSUB_RESULT_HASH ?
+    SUPPORTS_GSUB_RESULT_HASH ?
       text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS) :
       text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
   end
