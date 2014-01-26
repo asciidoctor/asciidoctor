@@ -381,11 +381,9 @@ A | here| a | there
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
-
       assert_css 'table > tbody > tr > th', output, 3
       assert_css 'table > tbody > tr > td', output, 6
-      assert_css 'table > tbody > tr > td.header', output, 0
-      assert_css 'table > tbody > tr > td > p.header', output, 0
+      assert_css 'table > tbody > tr .header', output, 0
       assert_css 'table > tbody > tr > td > p > strong', output, 3
       assert_css 'table > tbody > tr > td > p > em', output, 3
       assert_css 'table > tbody > tr > td > p > em > a', output, 1
