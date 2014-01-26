@@ -359,15 +359,15 @@ class Document < AbstractBlock
   #
   # returns the next number in the sequence for the specified counter
   def counter(name, seed = nil)
-    if !@counters.has_key? name
+    if (attr_is_seed = !(attr_val = @attributes[name]).nil_or_empty?) && @counters.has_key?(name)
+      @counters[name] = nextval(attr_val)
+    else
       if seed.nil?
-        seed = nextval(@attributes.has_key?(name) ? @attributes[name] : 0)
+        seed = nextval(attr_is_seed ? attr_val : 0)
       elsif seed.to_i.to_s == seed
         seed = seed.to_i
       end
       @counters[name] = seed
-    else
-      @counters[name] = nextval(@counters[name])
     end
 
     (@attributes[name] = @counters[name])

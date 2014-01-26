@@ -17,3 +17,7 @@ end
 class Hash
   alias :nil_or_empty? :empty? unless respond_to? :nil_or_empty?
 end
+
+class Numeric
+  alias :nil_or_empty? :nil? unless respond_to? :nil_or_empty?
+end
