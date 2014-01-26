@@ -189,7 +189,10 @@ class Test::Unit::TestCase
         opts[:attributes]['linkcss'] = ''
       end
     end
-    #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'erb') unless opts.has_key? :template_dir
+    if (template_dir = ENV['TEMPLATE_DIR'])
+      opts[:template_dir] = template_dir unless opts.has_key? :template_dir
+      #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'erb') unless opts.has_key? :template_dir
+    end
     nil
   end
 
