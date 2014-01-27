@@ -567,6 +567,38 @@ of the attribute named foo in your document.
       assert_xpath '//p[text()="A"]', output, 2
     end
     
+    test 'counter uses 0 as seed value if seed attribute is nil' do
+      input = <<-EOS
+:mycounter:
+
+{counter:mycounter}
+
+{mycounter}
+      EOS
+
+      doc = document_from_string input
+      output = doc.render :header_footer => false
+      assert_equal 1, doc.attributes['mycounter']
+      assert_xpath '//p[text()="1"]', output, 2
+    end
+
+    test 'counter value can be reset by attribute entry' do
+      input = <<-EOS
+:mycounter:
+
+before: {counter:mycounter} {counter:mycounter} {counter:mycounter}
+
+:mycounter!:
+
+after: {counter:mycounter}
+      EOS
+
+      doc = document_from_string input
+      output = doc.render :header_footer => false
+      assert_equal 1, doc.attributes['mycounter']
+      assert_xpath '//p[text()="before: 1 2 3"]', output, 1
+      assert_xpath '//p[text()="after: 1"]', output, 1
+    end
   end
 
   context 'Block attributes' do
