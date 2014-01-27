@@ -280,7 +280,23 @@ context 'Invoker' do
     ensure
       FileUtils::rm_f(basic_outpath)
     end
-  end 
+  end
+
+  test 'should render all files that matches an absolute path glob expression' do
+    basic_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'basic.html'))
+    glob = File.join(File.dirname(__FILE__), 'fixtures', 'ba*.asciidoc')
+    # test Windows using backslash-style pathname
+    if ::File::ALT_SEPARATOR == '\\'
+      glob = glob.tr '/', '\\'
+    end
+
+    begin
+      invoke_cli_to_buffer %w(), glob
+      assert File.exist?(basic_outpath)
+    ensure
+      FileUtils::rm_f(basic_outpath)
+    end
+  end
 
   test 'should suppress header footer if specified' do
     invoker = invoke_cli_to_buffer %w(-s -o -)
