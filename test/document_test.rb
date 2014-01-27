@@ -409,7 +409,7 @@ text
         begin
           Asciidoctor.render_file(sample_input_path, :to_file => sample_output_path, :in_place => true)
         ensure
-          FileUtils::rm(sample_output_path) if File.exists? sample_output_path
+          FileUtils::rm(sample_output_path) if File.exist? sample_output_path
         end
       end
     end
@@ -421,7 +421,7 @@ text
         begin
           Asciidoctor.render_file(sample_input_path, :to_dir => '', :in_place => true)
         ensure
-          FileUtils::rm(sample_output_path) if File.exists? sample_output_path
+          FileUtils::rm(sample_output_path) if File.exist? sample_output_path
         end
       end
     end
@@ -429,13 +429,13 @@ text
     test 'output should be relative to to_dir option' do
       sample_input_path = fixture_path('sample.asciidoc')
       output_dir = File.join(File.dirname(sample_input_path), 'test_output')
-      Dir.mkdir output_dir if !File.exists? output_dir
+      Dir.mkdir output_dir if !File.exist? output_dir
       sample_output_path = File.join(output_dir, 'sample.html')
       begin
         Asciidoctor.render_file(sample_input_path, :to_dir => output_dir)
-        assert File.exists? sample_output_path
+        assert File.exist? sample_output_path
       ensure
-        FileUtils::rm(sample_output_path) if File.exists? sample_output_path
+        FileUtils::rm(sample_output_path) if File.exist? sample_output_path
         FileUtils::rmdir output_dir
       end
     end
@@ -446,9 +446,9 @@ text
       sample_output_path = File.join(output_dir, 'sample.html')
       begin
         Asciidoctor.render_file(sample_input_path, :to_dir => output_dir, :mkdirs => true)
-        assert File.exists? sample_output_path
+        assert File.exist? sample_output_path
       ensure
-        FileUtils::rm(sample_output_path) if File.exists? sample_output_path
+        FileUtils::rm(sample_output_path) if File.exist? sample_output_path
         FileUtils::rmdir output_dir
         FileUtils::rmdir File.dirname(output_dir)
       end
@@ -459,13 +459,13 @@ text
       base_dir = File.dirname(sample_input_path)
       sample_rel_output_path = File.join('test_output', 'result.html')
       output_dir = File.dirname(File.join(base_dir, sample_rel_output_path))
-      Dir.mkdir output_dir if !File.exists? output_dir
+      Dir.mkdir output_dir if !File.exist? output_dir
       sample_output_path = File.join(base_dir, sample_rel_output_path)
       begin
         Asciidoctor.render_file(sample_input_path, :to_dir => base_dir, :to_file => sample_rel_output_path)
-        assert File.exists? sample_output_path
+        assert File.exist? sample_output_path
       ensure
-        FileUtils::rm(sample_output_path) if File.exists? sample_output_path
+        FileUtils::rm(sample_output_path) if File.exist? sample_output_path
         FileUtils::rmdir output_dir
       end
     end
