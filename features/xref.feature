@@ -19,10 +19,9 @@ Feature: Cross References
   When it is rendered using the html backend
   Then the output should match the HTML structure
     """
-    table.tableblock.frame-all.grid-all style='width:100%; '
+    table.tableblock.frame-all.grid-all style='width: 100%;'
       colgroup
-        col style='width:100%;'
-        '
+        col style='width: 100%;'
       tbody
         tr
           td.tableblock.halign-left.valign-top
