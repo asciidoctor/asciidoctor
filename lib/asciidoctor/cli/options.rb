@@ -145,16 +145,21 @@ Example: asciidoctor -b html5 source.asciidoc
             infiles.push args.pop
           elsif
             args.each do |file|
-              if (file == '-' || file.start_with?('-'))
+              if file == '-' || (file.start_with? '-')
                 # warn, but don't panic; we may have enough to proceed, so we won't force a failure
                 $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '}) or incorrect usage of stdin"
               else
-                # TODO this glob may not be necessary as the shell should have already performed expansion
-                matches = ::Dir.glob file
-
-                if matches.empty?
-                  $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
-                  return 1
+                if ::File.readable? file
+                  matches = [file]
+                else
+                  # Tilt backslashes in Windows paths the Ruby-friendly way
+                  if ::File::ALT_SEPARATOR == '\\' && (file.include? '\\')
+                    file = file.tr '\\', '/'
+                  end
+                  if (matches = ::Dir.glob file).empty?
+                    $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
+                    return 1
+                  end
                 end
 
                 infiles.concat matches
