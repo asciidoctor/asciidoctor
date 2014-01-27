@@ -10,6 +10,10 @@ context 'Links' do
     assert_xpath "//a[@href='http://asciidoc.org'][text() = 'asciidoc.org']", render_string("The AsciiDoc project is located at http://asciidoc.org.", :attributes => {'hide-uri-scheme' => ''})
   end
 
+  test 'qualified file url inline with label' do
+    assert_xpath "//a[@href='file:///home/user/bookmarks.html'][text() = 'My Bookmarks']", render_embedded_string('file:///home/user/bookmarks.html[My Bookmarks]')
+  end
+
   test 'qualified file url inline with hide-uri-scheme set' do
     assert_xpath "//a[@href='file:///etc/app.conf'][text() = '/etc/app.conf']", render_string('Edit the configuration file link:file:///etc/app.conf[]', :attributes => {'hide-uri-scheme' => ''})
   end
