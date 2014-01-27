@@ -104,6 +104,7 @@ class PathResolver
   DOT_DOT = '..'
   SLASH = '/'
   BACKSLASH = '\\'
+  DOUBLE_SLASH = '//'
   WindowsRootRx = /^[a-zA-Z]:(?:\\|\/)/
 
   attr_accessor :file_separator
@@ -134,9 +135,10 @@ class PathResolver
   #
   # returns a Boolean indicating whether the path is an absolute root path
   def is_root?(path)
-    if @file_separator == BACKSLASH && WindowsRootRx =~ path
+    # includes Unix absolute paths and UNC paths
+    if path.start_with?(SLASH)
       true
-    elsif path.start_with? SLASH
+    elsif @file_separator == BACKSLASH && WindowsRootRx =~ path
       true
     else
       false
@@ -191,12 +193,20 @@ class PathResolver
   def partition_path(path, web_path = false)
     posix_path = posixfy path
     is_root = web_path ? is_web_root?(posix_path) : is_root?(posix_path)
+    is_double_root = is_root && posix_path.start_with?(DOUBLE_SLASH)
     path_segments = posix_path.tr_s(SLASH, SLASH).split(SLASH)
-    # capture relative root
-    root = path_segments.first == DOT ? DOT : nil
+    # capture absolute root
+    root = if is_root
+      is_double_root ? %(/#{path_segments.shift}) : path_segments.shift
+    # capture explicit relative root
+    elsif path_segments.first == DOT
+      DOT
+    # normal relative path
+    else
+      nil
+    end
+    # strip out all dot entries
     path_segments.delete(DOT)
-    # capture absolute root, preserving relative root if set
-    root = is_root ? path_segments.shift : root
   
     [path_segments, root, posix_path]
   end
