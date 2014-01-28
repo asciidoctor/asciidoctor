@@ -102,8 +102,10 @@ module Asciidoctor
 class PathResolver
   DOT = '.'
   DOT_DOT = '..'
+  DOT_SLASH = './'
   SLASH = '/'
   BACKSLASH = '\\'
+  DOUBLE_SLASH = '//'
   WindowsRootRx = /^[a-zA-Z]:(?:\\|\/)/
 
   attr_accessor :file_separator
@@ -118,13 +120,15 @@ class PathResolver
   #                  (optional, default: File::FILE_SEPARATOR)
   # working_dir    - the String working directory (optional, default: Dir.pwd)
   #
-  def initialize(file_separator = nil, working_dir = nil)
-    @file_separator = file_separator.nil? ? (::File::ALT_SEPARATOR || ::File::SEPARATOR) : file_separator
-    if working_dir.nil?
-      @working_dir = ::File.expand_path(::Dir.pwd)
+  def initialize file_separator = nil, working_dir = nil
+    @file_separator = file_separator ? file_separator : (::File::ALT_SEPARATOR || ::File::SEPARATOR)
+    if working_dir
+      @working_dir = (is_root? working_dir) ? working_dir : (::File.expand_path working_dir)
     else
-      @working_dir = is_root?(working_dir) ? working_dir : ::File.expand_path(working_dir) 
+      @working_dir = ::File.expand_path ::Dir.pwd
     end
+    @_partition_path_sys = {}
+    @_partition_path_web = {}
   end
 
   # Public: Check if the specified path is an absolute root path
@@ -133,14 +137,25 @@ class PathResolver
   # path - the String path to check
   #
   # returns a Boolean indicating whether the path is an absolute root path
-  def is_root?(path)
-    if @file_separator == BACKSLASH && WindowsRootRx =~ path
+  def is_root? path
+    # Unix absolute paths and UNC paths start with slash
+    if path.start_with? SLASH
       true
-    elsif path.start_with? SLASH
+    # Windows roots can begin with drive letter
+    elsif @file_separator == BACKSLASH && WindowsRootRx =~ path
       true
     else
       false
     end
+  end
+
+  # Public: Determine if the path is a UNC (root) path
+  #
+  # path - the String path to check
+  #
+  # returns a Boolean indicating whether the path is a UNC path
+  def is_unc? path
+    path.start_with? DOUBLE_SLASH
   end
 
   # Public: Determine if the path is an absolute (root) web path
@@ -148,7 +163,7 @@ class PathResolver
   # path - the String path to check
   #
   # returns a Boolean indicating whether the path is an absolute (root) web path
-  def is_web_root?(path)
+  def is_web_root? path
     path.start_with? SLASH
   end
   
@@ -157,9 +172,14 @@ class PathResolver
   # path - the String path to normalize
   #
   # returns a String path with any backslashes replaced with forward slashes
-  def posixfy(path)
-    return '' if path.to_s.empty?
-    path.include?(BACKSLASH) ? path.tr(BACKSLASH, SLASH) : path
+  def posixfy path
+    if path.nil_or_empty?
+      ''
+    elsif path.include? BACKSLASH
+      path.tr BACKSLASH, SLASH
+    else
+      path
+    end
   end
 
   # Public: Expand the path by resolving any parent references (..)
@@ -173,32 +193,76 @@ class PathResolver
   # path - the String path to expand
   #
   # returns a String path with any parent or self references resolved.
-  def expand_path(path)
-    path_segments, path_root, _ = partition_path(path)
+  def expand_path path
+    path_segments, path_root, _ = partition_path path
     join_path path_segments, path_root
   end
   
   # Public: Partition the path into path segments and remove any empty segments
-  # or segments that are self references (.). The path is split on either posix
-  # or windows file separators.
+  # or segments that are self references (.). The path is converted to a posix
+  # path before being partitioned.
   #
   # path     - the String path to partition
   # web_path - a Boolean indicating whether the path should be handled
   #            as a web path (optional, default: false)
   #
-  # returns a 3-item Array containing the Array of String path segments, the
-  # path root, if the path is absolute, and the posix version of the path.
-  def partition_path(path, web_path = false)
+  # Returns a 3-item Array containing the Array of String path segments, the
+  # path root (e.g., '/', './', 'c:/') if the path is absolute and the posix
+  # version of the path.
+  #--
+  # QUESTION is it worth it to normalize slashes? it doubles the time elapsed 
+  def partition_path path, web_path = false
+    if (result = web_path ? @_partition_path_web[path] : @_partition_path_sys[path])
+      return result
+    end
+
     posix_path = posixfy path
-    is_root = web_path ? is_web_root?(posix_path) : is_root?(posix_path)
-    path_segments = posix_path.tr_s(SLASH, SLASH).split(SLASH)
-    # capture relative root
-    root = path_segments.first == DOT ? DOT : nil
-    path_segments.delete(DOT)
-    # capture absolute root, preserving relative root if set
-    root = is_root ? path_segments.shift : root
-  
-    [path_segments, root, posix_path]
+
+    root = if web_path
+      # ex. /sample/path
+      if is_web_root? posix_path
+        SLASH
+      # ex. ./sample/path
+      elsif posix_path.start_with? DOT_SLASH
+        DOT_SLASH
+      # ex. sample/path
+      else
+        nil
+      end
+    else
+      if is_root? posix_path
+        # ex. //sample/path
+        if is_unc? posix_path
+          DOUBLE_SLASH
+        # ex. /sample/path
+        elsif posix_path.start_with? SLASH
+          SLASH
+        # ex. c:/sample/path
+        else
+          posix_path[0..(posix_path.index SLASH)]
+        end
+      # ex. ./sample/path
+      elsif posix_path.start_with? DOT_SLASH
+        DOT_SLASH
+      # ex. sample/path
+      else
+        nil
+      end
+    end
+
+    path_segments = posix_path.split SLASH
+    # shift twice for a UNC path
+    if root == DOUBLE_SLASH
+      path_segments = path_segments[2..-1]
+    # shift once for any other root
+    elsif root
+      path_segments.shift
+    end
+    # strip out all dot entries
+    path_segments.delete DOT
+    # QUESTION should we chomp trailing /? (we pay a small fraction)
+    #posix_path = posix_path.chomp '/'
+    (web_path ? @_partition_path_web : @_partition_path_sys)[path] = [path_segments, root, posix_path]
   end
   
   # Public: Join the segments using the posix file separator (since Ruby knows
@@ -211,9 +275,9 @@ class PathResolver
   #
   # returns a String path formed by joining the segments using the posix file
   # separator and prepending the root, if specified
-  def join_path(segments, root = nil)
+  def join_path segments, root = nil
     if root
-      "#{root}#{SLASH}#{segments * SLASH}"
+      %(#{root}#{segments * SLASH})
     else
       segments * SLASH
     end
@@ -237,68 +301,68 @@ class PathResolver
   # returns a String path that joins the target path with the start path with
   # any parent references resolved and self references removed and enforces
   # that the resolved path be contained within the jail, if provided
-  def system_path(target, start, jail = nil, opts = {})
-    recover = opts.fetch(:recover, true)
-    unless jail.nil?
+  def system_path target, start, jail = nil, opts = {}
+    recover = opts.fetch :recover, true
+    if jail
       unless is_root? jail
-        raise ::SecurityError, "Jail is not an absolute path: #{jail}"
+        raise ::SecurityError, %(Jail is not an absolute path: #{jail})
       end
       jail = posixfy jail
     end
 
-    if target.to_s.empty?
+    if target.nil_or_empty?
       target_segments = []
     else
-      target_segments, target_root, _ = partition_path(target)
+      target_segments, target_root, _ = partition_path target 
     end
 
     if target_segments.empty?
-      if start.to_s.empty?
-        return jail.nil? ? @working_dir : jail
+      if start.nil_or_empty?
+        return jail ? jail : @working_dir
       elsif is_root? start
-        if jail.nil?
+        unless jail
           return expand_path start
         end
       else
-        return system_path(start, jail, jail)
+        return system_path start, jail, jail 
       end
     end
   
-    if target_root && target_root != DOT
+    if target_root && target_root != DOT_SLASH
       resolved_target = join_path target_segments, target_root
       # if target is absolute and a sub-directory of jail, or
       # a jail is not in place, let it slide
-      if jail.nil? || resolved_target.start_with?(jail)
+      if !jail || (resolved_target.start_with? jail)
         return resolved_target
       end
     end
   
-    if start.to_s.empty?
-      start = jail.nil? ? @working_dir : jail
+    if start.nil_or_empty?
+      start = jail ? jail : @working_dir
     elsif is_root? start
       start = posixfy start
     else
-      start = system_path(start, jail, jail)
+      start = system_path start, jail, jail
     end
   
     # both jail and start have been posixfied at this point
     if jail == start
-      jail_segments, jail_root, _ = partition_path(jail)
+      jail_segments, jail_root, _ = partition_path jail
       start_segments = jail_segments.dup
-    elsif !jail.nil?
-      if !start.start_with?(jail)
-        raise ::SecurityError, "#{opts[:target_name] || 'Start path'} #{start} is outside of jail: #{jail} (disallowed in safe mode)"
+    elsif jail
+      unless start.start_with? jail
+        raise ::SecurityError, %(#{opts[:target_name] || 'Start path'} #{start} is outside of jail: #{jail} (disallowed in safe mode))
       end
 
-      start_segments, start_root, _ = partition_path(start)
-      jail_segments, jail_root, _ = partition_path(jail)
+      start_segments, start_root, _ = partition_path start 
+      jail_segments, jail_root, _ = partition_path jail
   
       # Already checked for this condition
       #if start_root != jail_root
-      #  raise ::SecurityError, "Jail root #{jail_root} does not match root of #{opts[:target_name] || 'start path'}: #{start_root}"
+      #  raise ::SecurityError, %(Jail root #{jail_root} does not match root of #{opts[:target_name] || 'start path'}: #{start_root})
       #end
     else
-      start_segments, start_root, _ = partition_path(start)
+      start_segments, start_root, _ = partition_path start
       jail_root = start_root
     end
   
@@ -306,13 +370,13 @@ class PathResolver
     warned = false
     target_segments.each do |segment|
       if segment == DOT_DOT
-        if !jail.nil?
+        if jail
           if resolved_segments.length > jail_segments.length
             resolved_segments.pop
           elsif !recover
-            raise ::SecurityError, "#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode)"
+            raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode))
           elsif !warned
-            warn "asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering"
+            warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering)
             warned = true
           end
         else
@@ -336,25 +400,25 @@ class PathResolver
   # returns a String path that joins the target path with the
   # start path with any parent references resolved and self
   # references removed
-  def web_path(target, start = nil)
-    target = posixfy(target)
-    start = posixfy(start)
+  def web_path target, start = nil
+    target = posixfy target
+    start = posixfy start
     uri_prefix = nil
 
-    unless is_web_root?(target) || start.empty?
-      target = "#{start}#{SLASH}#{target}"
-      if target.include?(':') && UriSniffRx =~ target
-        uri_prefix = $~[0]
+    unless start.nil_or_empty? || (is_web_root? target)
+      target = %(#{start}#{SLASH}#{target})
+      if (target.include? ':') && UriSniffRx =~ target
+        uri_prefix = $&
         target = target[uri_prefix.length..-1]
       end
     end
 
-    target_segments, target_root, _ = partition_path(target, true)
+    target_segments, target_root, _ = partition_path target, true
     resolved_segments = []
     target_segments.each do |segment|
       if segment == DOT_DOT
         if resolved_segments.empty?
-          resolved_segments << segment unless target_root && target_root != DOT
+          resolved_segments << segment unless target_root && target_root != DOT_SLASH
         elsif resolved_segments.last == DOT_DOT
           resolved_segments << segment
         else
@@ -365,10 +429,10 @@ class PathResolver
       end
     end
 
-    if uri_prefix.nil?
-      join_path resolved_segments, target_root
+    if uri_prefix
+      %(#{uri_prefix}#{join_path resolved_segments, target_root})
     else
-      "#{uri_prefix}#{join_path resolved_segments, target_root}"
+      join_path resolved_segments, target_root
     end
   end
 
@@ -380,7 +444,7 @@ class PathResolver
   # base_directory - An absolute base directory as a String
   #
   # Return the relative path String of the filename calculated from the base directory
-  def relative_path(filename, base_directory)
+  def relative_path filename, base_directory
     if (is_root? filename) && (is_root? base_directory)
       offset = base_directory.chomp(@file_separator).length + 1
       filename[offset..-1]
