@@ -1098,7 +1098,7 @@ module Substitutors
           key = key[1..-1]
         elsif key.end_with? '+'
           operation = :prepend
-          key = key[0...-1]
+          key = key.chop
         else
           if modification_group
             warn "asciidoctor: WARNING: invalid entry in substitution modification group#{subject ? ' for ' : nil}#{subject}: #{key}"

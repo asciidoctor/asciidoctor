@@ -27,8 +27,11 @@ class AbstractNode
       @parent = nil
       @document = parent
     else
-      @parent = parent
-      @document = (parent.nil? ? nil : parent.document)
+      if (@parent = parent)
+        @document = parent.document
+      else
+        @document = nil
+      end
     end
     @context = context
     @attributes = {}
@@ -141,7 +144,7 @@ class AbstractNode
   #
   # return a Boolean indicating whether the option has been specified
   def option?(name)
-    @attributes.has_key? "#{name}-option"
+    @attributes.has_key? %(#{name}-option)
   end
 
   # Public: Get the execution context of this object (via Kernel#binding).
@@ -254,7 +257,7 @@ class AbstractNode
     if attr? 'icon'
       image_uri(attr('icon'), nil)
     else
-      image_uri("#{name}.#{@document.attr('icontype', 'png')}", 'iconsdir')
+      image_uri(%(#{name}.#{@document.attr('icontype', 'png')}), 'iconsdir')
     end
   end
 

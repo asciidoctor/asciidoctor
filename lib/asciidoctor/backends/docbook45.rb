@@ -753,7 +753,7 @@ class InlineKbdTemplate < BaseTemplate
   def result node
     keys = node.attr 'keys'
     if keys.size == 1
-      %(<keycap>#{keys.first}</keycap>)
+      %(<keycap>#{keys[0]}</keycap>)
     else
       key_combo = keys.map{|key| %(<keycap>#{key}</keycap>) }.join
       %(<keycombo>#{key_combo}</keycombo>)

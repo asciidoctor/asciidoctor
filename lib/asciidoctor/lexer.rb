@@ -352,7 +352,7 @@ class Lexer
     end
 
     if part
-      unless section.blocks? && section.blocks.last.context == :section
+      unless section.blocks? && section.blocks[-1].context == :section
         warn %(asciidoctor: ERROR: #{reader.line_info}: invalid part, must have at least one section (e.g., chapter, appendix, etc.))
       end
     # NOTE we could try to avoid creating a preamble in the first place, though
@@ -745,9 +745,9 @@ class Lexer
                 end
               }
 
-              if lines.last.start_with? '-- '
+              if lines[-1].start_with? '-- '
                 attribution, citetitle = lines.pop[3..-1].split(', ', 2)
-                lines.pop while lines.last.empty?
+                lines.pop while lines[-1].empty?
               else
                 attribution, citetitle = nil
               end
@@ -759,12 +759,12 @@ class Lexer
               # FIXME Reader needs to be created w/ line info
               block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
             elsif !text_only && lines.size > 1 && first_line.start_with?('"') &&
-                lines.last.start_with?('-- ') && lines[-2].end_with?('"')
+                lines[-1].start_with?('-- ') && lines[-2].end_with?('"')
               lines[0] = first_line[1..-1]
               attribution, citetitle = lines.pop[3..-1].split(', ', 2)
-              lines.pop while lines.last.empty?
+              lines.pop while lines[-1].empty?
               # strip trailing quote
-              lines[-1] = lines.last.chop
+              lines[-1] = lines[-1].chop
               attributes['style'] = 'quote'
               attributes['attribution'] = attribution unless attribution.nil?
               attributes['citetitle'] = citetitle unless citetitle.nil?
@@ -1128,7 +1128,7 @@ class Lexer
       elsif this_item_level > list_block.level
         # If this next list level is down one from the
         # current Block's, append it to content of the current list item
-        list_block.items.last << next_block(reader, list_block)
+        list_block.items[-1] << next_block(reader, list_block)
       end
 
       list_block << list_item unless list_item.nil?
@@ -1203,7 +1203,7 @@ class Lexer
 
     begin
       term, item = next_list_item(reader, list_block, match, sibling_pattern)
-      if !previous_pair.nil? && previous_pair.last.nil?
+      if previous_pair && !previous_pair[-1]
         previous_pair.pop
         previous_pair[0] << term
         previous_pair << item
@@ -1357,7 +1357,7 @@ class Lexer
       # the termination of the list
       break if is_sibling_list_item?(this_line, list_type, sibling_trait)
 
-      prev_line = buffer.empty? ? nil : buffer.last
+      prev_line = buffer.empty? ? nil : buffer[-1]
 
       if prev_line == LIST_CONTINUATION
         if continuation == :inactive
@@ -1495,11 +1495,11 @@ class Lexer
     end
 
     # strip trailing blank lines to prevent empty blocks
-    buffer.pop while !buffer.empty? && buffer.last.empty?
+    buffer.pop while !buffer.empty? && buffer[-1].empty?
 
     # We do need to replace the optional trailing continuation
     # a blank line would have served the same purpose in the document
-    buffer.pop if !buffer.empty? && buffer.last == LIST_CONTINUATION
+    buffer.pop if !buffer.empty? && buffer[-1] == LIST_CONTINUATION
 
     #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer * EOL}<BUFFER"
     #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"

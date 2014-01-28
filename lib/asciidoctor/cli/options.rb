@@ -141,7 +141,7 @@ Example: asciidoctor -b html5 source.asciidoc
           end
 
           # shave off the file to process so that options errors appear correctly
-          if args.size == 1 && args.first == '-'
+          if args.size == 1 && args[0] == '-'
             infiles.push args.pop
           elsif
             args.each do |file|

@@ -15,7 +15,7 @@ class Inline < AbstractNode
 
   def initialize(parent, context, text = nil, opts = {})
     super(parent, context)
-    @template_name = "inline_#{context}"
+    @template_name = %(inline_#{context})
 
     @text = text 
 
@@ -29,8 +29,7 @@ class Inline < AbstractNode
   end
 
   def render
-    # QUESTION can we do away with this chomp?
-    renderer.render(@template_name, self).chomp
+    renderer.render(@template_name, self)
   end
 
 end

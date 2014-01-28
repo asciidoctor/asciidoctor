@@ -19,8 +19,8 @@ class File
   end
 
   def self.extname(path)
-    return '' if path.to_s.empty?
+    return '' if path.nil_or_empty?
     last_dot_idx = path[1..-1].rindex('.')
-    last_dot_idx.nil? ? "" : path[(last_dot_idx + 1)..-1]
+    last_dot_idx.nil? ? '' : path[(last_dot_idx + 1)..-1]
   end
 end

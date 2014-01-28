@@ -43,7 +43,7 @@ class Section < AbstractBlock
     super(parent, :section)
     @template_name = 'section'
     if level.nil?
-      if !parent.nil?
+      if parent
         @level = parent.level + 1
       elsif @level.nil?
         @level = 1
@@ -53,7 +53,7 @@ class Section < AbstractBlock
     end
     #@numbered = numbered && @level > 0 && @level < 4
     @numbered = numbered && @level > 0
-    @special = !parent.nil? && parent.context == :section && parent.special
+    @special = parent && parent.context == :section && parent.special
     @index = 0
     @number = 1
   end
@@ -154,7 +154,7 @@ class Section < AbstractBlock
   # Returns the section number as a String
   def sectnum(delimiter = '.', append = nil)
     append ||= (append == false ? '' : delimiter)
-    if !@level.nil? && @level > 1 && !@parent.nil? && @parent.context == :section
+    if @level && @level > 1 && @parent && @parent.context == :section
       "#{@parent.sectnum(delimiter)}#{@number}#{append}"
     else
       "#{@number}#{append}"

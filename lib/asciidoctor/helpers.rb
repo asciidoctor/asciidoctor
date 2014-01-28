@@ -50,10 +50,10 @@ module Helpers
   def self.normalize_lines_array data
     return [] if data.empty?
  
+    # NOTE if data encoding is UTF-*, we only need 0..1
+    leading_bytes = (first_line = data[0])[0..2].bytes.to_a
     if COERCE_ENCODING
       utf8 = ::Encoding::UTF_8
-      # NOTE if data encoding is UTF-*, we only need 0..1
-      leading_bytes = (first_line = data.first) ? first_line[0..2].bytes.to_a : nil
       if (leading_2_bytes = leading_bytes[0..1]) == BOM_BYTES_UTF_16LE
         # Ruby messes up trailing whitespace on UTF-16LE, so take a different route
         return ((data.join.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8).lines.map {|line| line.rstrip }
@@ -67,7 +67,7 @@ module Helpers
       data.map {|line| line.encoding == utf8 ? line.rstrip : (line.force_encoding utf8).rstrip }
     else
       # Ruby 1.8 has no built-in re-encoding, so no point in removing the UTF-16 BOMs
-      if (first_line = data.first) && first_line[0..2].bytes.to_a == BOM_BYTES_UTF_8
+      if leading_bytes == BOM_BYTES_UTF_8
         data[0] = first_line[3..-1]
       end
       data.map {|line| line.rstrip }

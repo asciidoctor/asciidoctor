@@ -1030,6 +1030,9 @@ module Asciidoctor
     #
     UriSniffRx = %r{^[#{CC_ALPHA}][#{CC_ALNUM}.+-]*:/{0,2}}
 
+    # Detects XML tags
+    XmlSanitizeRx = /<[^>]+>/
+
     # Unused
 
     # Detects any fenced block delimiter, including:
@@ -1381,7 +1384,7 @@ module Asciidoctor
       if !stream_output && doc.safe < SafeMode::SECURE && (doc.attr? 'basebackend-html') &&
           (doc.attr? 'linkcss') && (doc.attr? 'copycss')
         copy_asciidoctor_stylesheet = DEFAULT_STYLESHEET_KEYS.include?(stylesheet = (doc.attr 'stylesheet'))
-        copy_user_stylesheet = !copy_asciidoctor_stylesheet && !stylesheet.to_s.empty?
+        copy_user_stylesheet = !copy_asciidoctor_stylesheet && !stylesheet.nil_or_empty?
         copy_coderay_stylesheet = (doc.attr? 'source-highlighter', 'coderay') && (doc.attr 'coderay-css', 'class') == 'class'
         copy_pygments_stylesheet = (doc.attr? 'source-highlighter', 'pygments') && (doc.attr 'pygments-css', 'class') == 'class'
         if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet

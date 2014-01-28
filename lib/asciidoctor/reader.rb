@@ -150,7 +150,7 @@ class Reader
   # Returns nil if there is no more data.
   def peek_line direct = false
     if direct || @look_ahead > 0
-      @unescape_next_line ? @lines.first[1..-1] : @lines.first
+      @unescape_next_line ? @lines[0][1..-1] : @lines[0]
     elsif @eof || @lines.empty?
       @eof = true
       @look_ahead = 0
@@ -431,7 +431,6 @@ class Reader
       restore_process_lines = false
     end
 
-    has_block = block_given?
     if (terminator = options[:terminator])
       break_on_blank_lines = false
       break_on_list_continuation = false
@@ -453,7 +452,7 @@ class Reader
           options[:preserve_last_line] = true
           break true
         end
-        break true if has_block && (yield line)
+        break true if block_given? && (yield line)
         break false
       end
 
@@ -702,10 +701,10 @@ class PreprocessorReader < Reader
     if directive == 'endif'
       stack_size = @conditional_stack.size
       if stack_size > 0
-        pair = @conditional_stack.last
+        pair = @conditional_stack[-1]
         if target.empty? || target == pair[:target]
           @conditional_stack.pop
-          @skipping = @conditional_stack.empty? ? false : @conditional_stack.last[:skipping]
+          @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
         else
           warn "asciidoctor: ERROR: #{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]"
         end
@@ -894,7 +893,7 @@ class PreprocessorReader < Reader
             open(include_file, 'r') do |f|
               f.each_line do |l|
                 inc_lineno += 1
-                take = inc_lines.first
+                take = inc_lines[0]
                 if take.is_a?(::Float) && take.infinite?
                   selected.push l
                   inc_line_offset = inc_lineno if inc_line_offset == 0
@@ -984,7 +983,7 @@ class PreprocessorReader < Reader
     @path = path
     @lineno = lineno
     # NOTE only process lines in AsciiDoc files
-    @process_lines = ASCIIDOC_EXTENSIONS[::File.extname(@file)]
+    @process_lines = ASCIIDOC_EXTENSIONS[::File.extname(file)]
     if attributes.has_key? 'depth'
       depth = attributes['depth'].to_i
       depth = 1 if depth <= 0
@@ -994,7 +993,7 @@ class PreprocessorReader < Reader
     @lines = prepare_lines data, :normalize => true, :condense => false, :indent => attributes['indent']
     # FIXME kind of a hack
     #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
-    #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
+    #Document::AttributeEntry.new('indir', @dir).save_to_next_block @document
     if @lines.empty?
       pop_include
     else
@@ -1043,12 +1042,12 @@ class PreprocessorReader < Reader
   # Private: Ignore front-matter, commonly used in static site generators
   def skip_front_matter! data, increment_linenos = true
     front_matter = nil
-    if data.size > 0 && data.first == '---'
+    if data[0] == '---'
       original_data = data.dup
       front_matter = []
       data.shift
       @lineno += 1 if increment_linenos
-      while !data.empty? && data.first != '---'
+      while !data.empty? && data[0] != '---'
         front_matter.push data.shift
         @lineno += 1 if increment_linenos
       end

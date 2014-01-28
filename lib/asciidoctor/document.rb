@@ -146,7 +146,7 @@ class Document < AbstractBlock
           key = key[1..-1]
           value = nil
         elsif key.end_with?('!')
-          key = key[0..-2]
+          key = key.chop
           value = nil
         end
         overrides[key.downcase] = value
@@ -178,7 +178,7 @@ class Document < AbstractBlock
         end
       end
     end
-    @options[:header_footer] = @options.fetch(:header_footer, false)
+    @options[:header_footer] ||= false
 
     @attributes['encoding'] = 'UTF-8'
     @attributes['sectids'] = ''
@@ -431,7 +431,7 @@ class Document < AbstractBlock
   end
 
   def nested?
-    @parent_document ? true : false
+    !!@parent_document
   end
 
   def embedded?
@@ -440,7 +440,7 @@ class Document < AbstractBlock
   end
 
   def extensions?
-    @extensions ? true : false
+    !!@extensions
   end
 
   # Make the raw source for the Document available.
@@ -454,11 +454,11 @@ class Document < AbstractBlock
   end
 
   def doctype
-    @attributes['doctype']
+    @_doctype ||= @attributes['doctype']
   end
 
   def backend
-    @attributes['backend']
+    @_backend ||= @attributes['backend']
   end
 
   def basebackend? base
@@ -479,14 +479,14 @@ class Document < AbstractBlock
   def doctitle(opts = {})
     if !(val = @attributes.fetch('title', '')).empty?
       val = title
-    elsif !(sect = first_section).nil? && sect.title?
+    elsif (sect = first_section) && sect.title?
       val = sect.title
     else
       return nil
     end
     
     if opts[:sanitize] && val.include?('<')
-      val.gsub(/<[^>]+>/, '').tr_s(' ', ' ').strip
+      val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
     else
       val
     end
@@ -565,7 +565,7 @@ class Document < AbstractBlock
       @attributes['numbered'] = '' unless attribute_locked?('numbered') || @attributes_modified.include?('numbered')
     end
 
-    unless @attributes.has_key?('doctitle') || (val = doctitle).nil?
+    unless @attributes.has_key?('doctitle') || !(val = doctitle)
       @attributes['doctitle'] = val
     end
 
@@ -629,8 +629,8 @@ class Document < AbstractBlock
 
   # Internal: Replay attribute assignments at the block level
   def playback_attributes(block_attributes)
-    if block_attributes.has_key? :attribute_entries
-      block_attributes[:attribute_entries].each do |entry|
+    if (entries = block_attributes[:attribute_entries])
+      entries.each do |entry|
         if entry.negate
           @attributes.delete(entry.name)
         else
@@ -743,6 +743,8 @@ class Document < AbstractBlock
     file_type = ext[1..-1]
     @attributes['filetype'] = file_type
     @attributes["filetype-#{file_type}"] = ''
+    @_doctype = nil
+    @_backend = nil
   end
 
   def renderer(opts = {})
@@ -787,7 +789,7 @@ class Document < AbstractBlock
 
     if doctype == 'inline'
       # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
-      if !(block = @blocks.first).nil? && block.content_model != :compound
+      if (block = @blocks[0]) && block.content_model != :compound
         output = block.content
       else
         output = ''

@@ -12,9 +12,10 @@ module Asciidoctor
         @err = nil
         @code = 0
         options = options.flatten
-        if !options.empty? && options.first.is_a?(Cli::Options)
-          @options = options.first
-        elsif options.first.is_a? ::Hash
+        first_option = options[0]
+        if (first_option = options[0]) && first_option.is_a?(Cli::Options)
+          @options = options[0]
+        elsif first_option && first_option.is_a?(::Hash)
           @options = Cli::Options.new(options)
         else
           @options = Cli::Options.parse!(options)
@@ -66,7 +67,7 @@ module Asciidoctor
             end
           }
 
-          if infiles.size == 1 && infiles.first == '-'
+          if infiles.size == 1 && infiles[0] == '-'
              # allows use of block to supply stdin, particularly useful for tests
              inputs = [block_given? ? yield : STDIN]
           else
@@ -74,9 +75,9 @@ module Asciidoctor
           end
 
           # NOTE: if infile is stdin, default to outfile as stout
-          if outfile == '-' || (infiles.size == 1 && infiles.first == '-' && outfile.to_s.empty?)
+          if outfile == '-' || (!outfile && infiles.size == 1 && infiles[0] == '-')
             tofile = (@out || $stdout)
-          elsif !outfile.nil?
+          elsif outfile
             tofile = outfile
             opts[:mkdirs] = true
           else
@@ -118,7 +119,7 @@ module Asciidoctor
       end
 
       def document
-        @documents.size > 0 ? @documents.first : nil
+        @documents[0]
       end
 
       def redirect_streams(out, err = nil)

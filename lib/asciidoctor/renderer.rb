@@ -112,8 +112,8 @@ class Renderer
           end
           name_parts = basename.split('.')
           next if name_parts.size < 2
-          view_name = name_parts.first 
-          ext_name = name_parts.last
+          view_name = name_parts[0]
+          ext_name = name_parts[-1]
           if ext_name == 'slim'
             # slim doesn't get loaded by Tilt, so we have to load it explicitly
             Helpers.require_library 'slim' unless defined? ::Slim
@@ -143,15 +143,11 @@ class Renderer
   # object - the Object to be used as an evaluation scope.
   # locals - the optional Hash of locals to be passed to Tilt (default {}) (also ignored, really)
   def render(view, object, locals = {})
-    if !@views.has_key? view
+    unless (view_impl = @views[view])
       raise "Couldn't find a view in @views for #{view}"
     end
     
-    if @chomp_result
-      @views[view].render(object, locals).chomp
-    else
-      @views[view].render(object, locals)
-    end
+    @chomp_result ? view_impl.render(object, locals).chomp : view_impl.render(object, locals)
   end
 
   def views

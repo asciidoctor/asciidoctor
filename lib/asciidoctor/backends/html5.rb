@@ -12,8 +12,8 @@ class DocumentTemplate < BaseTemplate
     unless sections.empty?
       # FIXME the level for special sections should be set correctly in the model
       # sec_level will only be 0 if we have a book doctype with parts
-      sec_level = sections.first.level
-      if sec_level == 0 && sections.first.special
+      sec_level = (first_section = sections[0]).level
+      if sec_level == 0 && first_section.special
         sec_level = 1
       end
       toc_level_buffer << %(<ul class="sectlevel#{sec_level}">)
@@ -436,7 +436,7 @@ class BlockDlistTemplate < BaseTemplate
         result_buffer << '<tr>'
         result_buffer << %(<td class="hdlist1#{(node.option? 'strong') ? ' strong' : nil}">)
         terms_array = [*terms]
-        last_term = terms_array.last
+        last_term = terms_array[-1]
         terms_array.each do |dt|
           result_buffer << dt.text
           result_buffer << %(<br#{short_tag_slash_local}>) if dt != last_term
@@ -1105,7 +1105,7 @@ end
 
 class InlineBreakTemplate < BaseTemplate
   def result(node)
-    (node.document.attr? 'htmlsyntax', 'xml') ? %(#{node.text}<br/>\n) : %(#{node.text}<br>\n)
+    (node.document.attr? 'htmlsyntax', 'xml') ? %(#{node.text}<br/>) : %(#{node.text}<br>)
   end
 
   def template
@@ -1186,7 +1186,7 @@ class InlineKbdTemplate < BaseTemplate
   def result(node)
     keys = node.attr 'keys'
     if keys.size == 1
-      %(<kbd>#{keys.first}</kbd>)
+      %(<kbd>#{keys[0]}</kbd>)
     else
       key_combo = keys.map{|key| %(<kbd>#{key}</kbd>+) }.join.chop
       %(<kbd class="keyseq">#{key_combo}</kbd>)

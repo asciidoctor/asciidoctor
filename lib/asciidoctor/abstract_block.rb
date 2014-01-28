@@ -25,10 +25,10 @@ class AbstractBlock < AbstractNode
   attr_accessor :caption
 
   def initialize(parent, context)
-    super(parent, context)
+    super
     @content_model = :compound
     @subs = []
-    @template_name = "block_#{context}"
+    @template_name = %(block_#{context})
     @blocks = []
     @id = nil
     @title = nil
@@ -36,7 +36,7 @@ class AbstractBlock < AbstractNode
     @style = nil
     @level = if context == :document
       0
-    elsif !parent.nil? && @context != :section
+    elsif parent && context != :section
       parent.level
     end
     @next_section_index = 0
@@ -49,7 +49,7 @@ class AbstractBlock < AbstractNode
   # updates the template name accordingly.
   def context=(context)
     @context = context
-    @template_name = "block_#{context}"
+    @template_name = %(block_#{context})
   end
 
   # Public: Get the rendered String content for this Block.  If the block
@@ -81,7 +81,7 @@ class AbstractBlock < AbstractNode
   # Public: A convenience method that indicates whether the title instance
   # variable is blank (nil or empty)
   def title?
-    !@title.to_s.empty?
+    !@title.nil_or_empty?
   end
 
   # Public: Get the String title of this Block with title substitions applied

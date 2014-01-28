@@ -27,13 +27,13 @@ class Block < AbstractBlock
   # QUESTION should we store source_data as lines for blocks that have compound content models?
   def initialize(parent, context, opts = {})
     super(parent, context)
-    @content_model = opts.fetch(:content_model, nil) || :simple
-    @attributes = opts.fetch(:attributes, nil) || {}
-    @subs = opts[:subs] if opts.has_key? :subs
+    @content_model = opts[:content_model] || :simple
+    @attributes = opts[:attributes] || {}
+    @subs = opts[:subs] || []
     raw_source = opts.fetch(:source, nil) || nil
-    if raw_source.nil?
+    if !(raw_source = opts[:source])
       @lines = []
-    elsif raw_source.class == ::String
+    elsif raw_source.is_a? ::String
       @lines = Helpers.normalize_lines_from_string raw_source
     else
       @lines = raw_source.dup
@@ -55,20 +55,20 @@ class Block < AbstractBlock
     when :compound
       super
     when :simple
-      apply_subs @lines.join(EOL), @subs
+      apply_subs(@lines * EOL, @subs)
     when :verbatim, :raw
       #((apply_subs @lines.join(EOL), @subs).sub StripLineWiseRx, '\1')
 
       result = apply_subs @lines, @subs
       if result.size < 2
-        result.first || ''
+        result[0]
       else
-        result.shift while !(first = result.first).nil? && first.rstrip.empty?
-        result.pop while !(last = result.last).nil? && last.rstrip.empty?
+        result.shift while (first = result[0]) && first.rstrip.empty?
+        result.pop while (last = result[-1]) && last.rstrip.empty?
         result * EOL
       end
     else
-      warn "Unknown content model '#@content_model' for block: #{to_s}" unless @content_model == :empty
+      warn %(Unknown content model '#{@content_model}' for block: #{to_s}) unless @content_model == :empty
       nil
     end
   end

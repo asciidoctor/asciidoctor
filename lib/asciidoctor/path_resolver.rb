@@ -419,7 +419,7 @@ class PathResolver
       if segment == DOT_DOT
         if resolved_segments.empty?
           resolved_segments << segment unless target_root && target_root != DOT_SLASH
-        elsif resolved_segments.last == DOT_DOT
+        elsif resolved_segments[-1] == DOT_DOT
           resolved_segments << segment
         else
           resolved_segments.pop
