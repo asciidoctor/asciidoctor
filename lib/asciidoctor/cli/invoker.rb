@@ -12,10 +12,9 @@ module Asciidoctor
         @err = nil
         @code = 0
         options = options.flatten
-        first_option = options[0]
-        if (first_option = options[0]) && first_option.is_a?(Cli::Options)
-          @options = options[0]
-        elsif first_option && first_option.is_a?(::Hash)
+        if (first_option = options[0]).is_a?(Cli::Options)
+          @options = first_option
+        elsif first_option.is_a?(::Hash)
           @options = Cli::Options.new(options)
         else
           @options = Cli::Options.parse!(options)
