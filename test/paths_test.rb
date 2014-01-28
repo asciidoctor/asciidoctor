@@ -18,6 +18,12 @@ context 'Path Resolver' do
       assert_equal 'images', @resolver.web_path('images', nil)
     end
 
+    test 'target with hidden relative path' do
+      assert_equal '.images', @resolver.web_path('.images')
+      assert_equal '.images', @resolver.web_path('.images', '')
+      assert_equal '.images', @resolver.web_path('.images', nil)
+    end
+
     test 'target with path relative to current directory' do
       assert_equal './images', @resolver.web_path('./images')
       assert_equal './images', @resolver.web_path('./images', '')
@@ -158,6 +164,12 @@ context 'Path Resolver' do
       pwd = File.expand_path(Dir.pwd)
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', '')
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', nil)
+    end
+
+    test 'resolves relative hidden target relative to current directory if start is empty' do
+      pwd = File.expand_path(Dir.pwd)
+      assert_equal "#{pwd}/.images/tiger.png", @resolver.system_path('.images/tiger.png', '')
+      assert_equal "#{pwd}/.images/tiger.png", @resolver.system_path('.images/tiger.png', nil)
     end
 
     test 'resolves and normalizes start with target is empty' do
