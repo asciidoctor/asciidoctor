@@ -45,6 +45,12 @@ module Substitutors
     :inline => COMPOSITE_SUBS.keys + SUBS[:normal]
   }
 
+  # dereference these constants closer and out of map as performance optimization
+  PASS_START = PASS_PLACEHOLDER[:start]
+  PASS_END = PASS_PLACEHOLDER[:end]
+  PASS_MATCH = PASS_PLACEHOLDER[:match]
+  PASS_MATCH_HI = PASS_PLACEHOLDER[:match_hi]
+
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs
 
@@ -56,10 +62,10 @@ module Substitutors
   #
   # returns Either a String or String Array, whichever matches the type of the first argument
   def apply_subs source, subs = :normal, expand = false
-    if subs == :normal
-      subs = SUBS[:normal]
-    elsif !subs
+    if !subs
       return source
+    elsif subs == :normal
+      subs = SUBS[:normal]
     elsif expand
       if subs.is_a? ::Symbol
         subs = COMPOSITE_SUBS[subs] || [subs]
@@ -93,7 +99,7 @@ module Substitutors
       when :quotes
         text = sub_quotes text
       when :attributes
-        text = sub_attributes(text.split LINE_SPLIT) * EOL
+        text = sub_attributes(text.split EOL) * EOL
       when :replacements
         text = sub_replacements text
       when :macros
@@ -105,12 +111,12 @@ module Substitutors
       when :post_replacements
         text = sub_post_replacements text
       else
-        warn "asciidoctor: WARNING: unknown substitution type #{type}"
+        warn %(asciidoctor: WARNING: unknown substitution type #{type})
       end
     end
     text = restore_passthroughs text if has_passthroughs
 
-    multiline ? (text.split LINE_SPLIT) : text
+    multiline ? (text.split EOL) : text
   end
 
   # Public: Apply normal substitutions.
@@ -168,8 +174,8 @@ module Substitutors
 
       @passthroughs << {:text => text, :subs => subs}
       index = @passthroughs.size - 1
-      %(#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]})
-    } if (text.include? '+++') || (text.include? '$$') || (text.include? 'pass:')
+      %(#{PASS_START}#{index}#{PASS_END})
+    } if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
     text = text.gsub(PassInlineLiteralRx) {
       # alias match for Ruby 1.8.7 compat
@@ -178,7 +184,8 @@ module Substitutors
       unescaped_attrs = nil
       # honor the escape
       if m[3].start_with? '\\'
-        next m[2] ? %(#{m[1]}[#{m[2]}]#{m[3][1..-1]}) : %(#{m[1]}#{m[3][1..-1]})
+        # NOTE Opal may not like %() as an enclosure around this string
+        next m[2] ? "#{m[1]}[#{m[2]}]#{m[3][1..-1]}" : "#{m[1]}#{m[3][1..-1]}"
       elsif m[1] == '\\' && m[2]
         unescaped_attrs = "[#{m[2]}]"
       end
@@ -186,12 +193,12 @@ module Substitutors
       if !unescaped_attrs && m[2]
         attributes = parse_attributes(m[2])
       else
-        attributes = {}
+        attributes = nil
       end
 
       @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :type => :monospaced}
       index = @passthroughs.size - 1
-      %(#{unescaped_attrs || m[1]}#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]})
+      %(#{unescaped_attrs || m[1]}#{PASS_START}#{index}#{PASS_END})
     } if (text.include? '`')
 
     # NOTE we need to do the math in a subsequent step to allow it to be escaped by the former
@@ -214,7 +221,7 @@ module Substitutors
 
       @passthroughs << {:text => text, :subs => subs, :type => type}
       index = @passthroughs.size - 1
-      "#{PASS_PLACEHOLDER[:start]}#{index}#{PASS_PLACEHOLDER[:end]}"
+      "#{PASS_START}#{index}#{PASS_END}"
     } if (text.include? 'math:')
 
     text
@@ -226,12 +233,16 @@ module Substitutors
   #
   # returns The String text with the passthrough text restored
   def restore_passthroughs(text)
-    return text if @passthroughs.nil_or_empty? || !text.include?(PASS_PLACEHOLDER[:start])
+    return text if @passthroughs.nil_or_empty? || !text.include?(PASS_START)
 
-    text.gsub(PASS_PLACEHOLDER[:match]) {
+    text.gsub(PASS_MATCH) {
       pass = @passthroughs[$~[1].to_i]
-      subbed_text = apply_subs(pass[:text], pass.fetch(:subs, []))
-      pass[:type] ? Inline.new(self, :quoted, subbed_text, :type => pass[:type], :attributes => pass.fetch(:attributes, {})).render : subbed_text
+      subbed_text = (subs = pass[:subs]) ? (apply_subs pass[:text], subs) : pass[:text]
+      if (type = pass[:type])
+        Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).render
+      else
+        subbed_text
+      end
     }
   end
 
@@ -261,8 +272,9 @@ module Substitutors
         result = result.gsub(pattern) { transform_quoted_text $~, type, scope }
       }
     else
-      # NOTE using gsub! as optimization
+      # NOTE interpolation is faster than String#dup
       result = %(#{text})
+      # NOTE using gsub! as optimization
       QUOTE_SUBS.each {|type, scope, pattern|
         result.gsub!(pattern) { transform_quoted_text $~, type, scope }
       }
@@ -285,8 +297,9 @@ module Substitutors
         }
       }
     else
-      # NOTE Using gsub! as optimization
+      # NOTE interpolation is faster than String#dup
       result = %(#{text})
+      # NOTE Using gsub! as optimization
       REPLACEMENTS.each {|pattern, replacement, restore|
         result.gsub!(pattern) {
           do_replacement $~, replacement, restore
@@ -308,9 +321,9 @@ module Substitutors
       when :none
         replacement
       when :leading
-        "#{m[1]}#{replacement}"
+        %(#{m[1]}#{replacement})
       when :bounding
-        "#{m[1]}#{replacement}#{m[2]}"
+        %(#{m[1]}#{replacement}#{m[2]})
       end
     end
   end
@@ -343,7 +356,7 @@ module Substitutors
         m = $~
         # escaped attribute, return unescaped
         if m[1] == '\\' || m[4] == '\\'
-          "{#{m[2]}}"
+          %({#{m[2]}})
         elsif !m[3].nil_or_empty?
           offset = (directive = m[3]).length + 1
           expr = m[2][offset..-1]
@@ -414,12 +427,13 @@ module Substitutors
     found = {}
     found[:square_bracket] = source.include?('[')
     found[:round_bracket] = source.include?('(')
-    found[:colon] = source.include?(':')
-    found[:macroish] = (found[:square_bracket] && found[:colon])
-    found[:macroish_short_form] = (found[:square_bracket] && found[:colon] && source.include?(':['))
+    found[:colon] = found_colon = source.include?(':')
+    found[:macroish] = (found[:square_bracket] && found_colon)
+    found[:macroish_short_form] = (found[:square_bracket] && found_colon && source.include?(':['))
     use_link_attrs = @document.attributes.has_key?('linkattrs')
     experimental = @document.attributes.has_key?('experimental')
 
+    # NOTE interpolation is faster than String#dup
     result = %(#{source})
 
     if experimental
@@ -474,7 +488,7 @@ module Substitutors
             menuitem = nil
           else
             if (delim = items.include?('&gt;') ? '&gt;' : (items.include?(',') ? ',' : nil))
-              submenus = items.split(delim).map(&:strip)
+              submenus = items.split(delim).map {|it| it.strip }
               menuitem = submenus.pop
             else
               submenus = []
@@ -497,7 +511,7 @@ module Substitutors
 
           input = m[1]
 
-          menu, *submenus = input.split('&gt;').map(&:strip)
+          menu, *submenus = input.split('&gt;').map {|it| it.strip }
           menuitem = submenus.pop
           Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).render
         }
@@ -551,9 +565,7 @@ module Substitutors
           @document.register(:images, target)
         end
         attrs = parse_attributes(raw_attrs, posattrs)
-        if !attrs['alt']
-          attrs['alt'] = File.basename(target, File.extname(target))
-        end
+        attrs['alt'] ||= File.basename(target, File.extname(target))
         Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).render
       }
     end
@@ -609,7 +621,7 @@ module Substitutors
       }
     end
 
-    if result.include? '://'
+    if found_colon && (result.include? '://')
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
       result = result.gsub(LinkInlineRx) {
         # alias match for Ruby 1.8.7 compat
@@ -736,7 +748,7 @@ module Substitutors
           end
         end
 
-        target = "mailto:#{address}"
+        target = %(mailto:#{address})
         # QUESTION should this be registered as an e-mail address?
         @document.register(:links, target)
 
@@ -849,7 +861,7 @@ module Substitutors
           id = m[2]
           reftext = !m[3].empty? ? m[3] : nil
         else
-          id, reftext = m[1].split(',', 2).map(&:strip)
+          id, reftext = m[1].split(',', 2).map {|it| it.strip }
           id = id.sub(DoubleQuotedRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2')
           reftext = reftext.sub(DoubleQuotedMultiRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2') if reftext
         end
@@ -911,12 +923,14 @@ module Substitutors
   # returns The String with the post replacements rendered using the backend templates
   def sub_post_replacements(text)
     if (@document.attributes.has_key? 'hardbreaks') || (@attributes.has_key? 'hardbreaks-option')
-      lines = (text.split LINE_SPLIT)
+      lines = (text.split EOL)
       return text if lines.size == 1
       last = lines.pop
       lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).render }.push(last) * EOL
-    else
+    elsif text.include? '+'
       text.gsub(LineBreakRx) { Inline.new(self, :break, $~[1], :type => :line).render }
+    else
+      text
     end
   end
 
@@ -941,9 +955,9 @@ module Substitutors
       if !unescaped_attrs
         attributes = parse_quoted_text_attributes(match[2])
         id = attributes ? attributes.delete('id') : nil
-        "#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :id => id, :attributes => attributes).render}"
+        %(#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :id => id, :attributes => attributes).render})
       else
-        "#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type, :attributes => {}).render}"
+        %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type).render})
       end
     else
       attributes = parse_quoted_text_attributes(match[1])
@@ -1012,8 +1026,8 @@ module Substitutors
       block = self
     end
 
-    if opts.has_key?(:into)
-      AttributeList.new(attrline, block).parse_into(opts[:into], posattrs)
+    if (into = opts[:into])
+      AttributeList.new(attrline, block).parse_into(into, posattrs)
     else
       AttributeList.new(attrline, block).parse(posattrs)
     end
@@ -1023,6 +1037,7 @@ module Substitutors
   # square brackets from text extracted from brackets
   def unescape_bracketed_text(text)
     return '' if text.empty?
+    # FIXME make \] a regex
     text.strip.tr(EOL, ' ').gsub('\]', ']')
   end
 
@@ -1040,6 +1055,7 @@ module Substitutors
   # Internal: Unescape closing square brackets.
   # Intended for text extracted from square brackets.
   def unescape_brackets str
+    # FIXME make \] a regex
     str.empty? ? '' : str.gsub('\]', ']')
   end
 
@@ -1070,7 +1086,7 @@ module Substitutors
   
       values << current.join.strip
     else
-      values = str.split(',').map(&:strip)
+      values = str.split(',').map {|it| it.strip }
     end
   
     values
@@ -1085,7 +1101,7 @@ module Substitutors
     return [] if subs.nil_or_empty?
     candidates = []
     # only allow modification if defaults is given
-    modification_group = defaults.nil? ? false : nil
+    modification_group = defaults ? nil : false
     subs.split(',').each do |val|
       key = val.strip
       # QUESTION can we encapsulate this logic?
@@ -1101,7 +1117,7 @@ module Substitutors
           key = key.chop
         else
           if modification_group
-            warn "asciidoctor: WARNING: invalid entry in substitution modification group#{subject ? ' for ' : nil}#{subject}: #{key}"
+            warn %(asciidoctor: WARNING: invalid entry in substitution modification group#{subject ? ' for ' : nil}#{subject}: #{key})
             next
           else
             operation = nil
@@ -1124,10 +1140,10 @@ module Substitutors
       elsif COMPOSITE_SUBS.has_key? key
         resolved_keys = COMPOSITE_SUBS[key]
       # NOTE Symbol doesn't have .length or .size in Ruby 1.8
-      elsif type == :inline && key.to_s.length == 1 && (SUB_SYMBOLS.has_key? key)
+      elsif type == :inline && key.length == 1 && (SUB_SYMBOLS.has_key? key)
         resolved_key = SUB_SYMBOLS[key]
-        if COMPOSITE_SUBS.has_key? resolved_key
-          resolved_keys = COMPOSITE_SUBS[resolved_key]
+        if (candidate = COMPOSITE_SUBS[resolved_key])
+          resolved_keys = candidate
         else
           resolved_keys = [resolved_key]
         end
@@ -1153,7 +1169,8 @@ module Substitutors
     # weed out invalid options and remove duplicates (first wins)
     # TODO may be use a set instead?
     resolved = candidates & SUB_OPTIONS[type]
-    if (invalid = candidates - resolved).size > 0
+    unless (candidates - resolved).empty?
+      invalid = candidates - resolved
       warn "asciidoctor: WARNING: invalid substitution type#{invalid.size > 1 ? 's' : ''}#{subject ? ' for ' : nil}#{subject}: #{invalid * ', '}"
     end
     resolved
@@ -1188,7 +1205,7 @@ module Substitutors
     if sub_callouts
       last = -1
       # extract callout marks, indexed by line number
-      source = source.split(LINE_SPLIT).map {|line|
+      source = source.split(EOL).map {|line|
         lineno = lineno + 1
         line.gsub(CalloutScanRx) {
           # alias match for Ruby 1.8.7 compat
@@ -1242,7 +1259,7 @@ module Substitutors
 
     # fix passthrough placeholders that got caught up in syntax highlighting
     unless @passthroughs.empty?
-      result = result.gsub PASS_PLACEHOLDER[:match_syn], "#{PASS_PLACEHOLDER[:start]}\\1#{PASS_PLACEHOLDER[:end]}"
+      result = result.gsub PASS_MATCH_HI, "#{PASS_START}\\1#{PASS_END}"
     end
 
     if !sub_callouts || callout_marks.empty?
@@ -1250,7 +1267,7 @@ module Substitutors
     else
       lineno = 0
       reached_code = linenums_mode != :table
-      result.split(LINE_SPLIT).map {|line|
+      result.split(EOL).map {|line|
         unless reached_code
           unless line.include?('<td class="code">')
             next line
@@ -1288,20 +1305,20 @@ module Substitutors
   def lock_in_subs
     default_subs = []
     case @content_model
-      when :simple
+    when :simple
+      default_subs = SUBS[:normal]
+    when :verbatim
+      if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
+        default_subs = SUBS[:verbatim]
+      elsif @context == :verse
         default_subs = SUBS[:normal]
-      when :verbatim
-        if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
-          default_subs = SUBS[:verbatim]
-        elsif @context == :verse
-          default_subs = SUBS[:normal]
-        else
-          default_subs = SUBS[:basic]
-        end
-      when :raw
-        default_subs = SUBS[:pass]
       else
-        return
+        default_subs = SUBS[:basic]
+      end
+    when :raw
+      default_subs = SUBS[:pass]
+    else
+      return
     end
 
     if (custom_subs = @attributes['subs'])

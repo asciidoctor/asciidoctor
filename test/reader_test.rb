@@ -4,7 +4,7 @@ require 'test_helper'
 class ReaderTest < Test::Unit::TestCase
   DIRNAME = File.expand_path(File.dirname(__FILE__))
 
-  SAMPLE_DATA = <<-EOS.chomp.split(::Asciidoctor::LINE_SPLIT)
+  SAMPLE_DATA = <<-EOS.chomp.split(::Asciidoctor::EOL)
 first line
 second line
 third line
@@ -283,7 +283,7 @@ This is another paragraph.
       end
 
       test 'Read lines until until blank line preserving last line' do
-        lines = <<-EOS.chomp.split(::Asciidoctor::LINE_SPLIT)
+        lines = <<-EOS.chomp.split(::Asciidoctor::EOL)
 This is one paragraph.
 
 This is another paragraph.
@@ -297,7 +297,7 @@ This is another paragraph.
       end
 
       test 'Read lines until until condition is true' do
-        lines = <<-EOS.chomp.split(::Asciidoctor::LINE_SPLIT)
+        lines = <<-EOS.chomp.split(::Asciidoctor::EOL)
 --
 This is one paragraph inside the block.
 
@@ -316,7 +316,7 @@ This is a paragraph outside the block.
       end
 
       test 'Read lines until until condition is true, taking last line' do
-        lines = <<-EOS.chomp.split(::Asciidoctor::LINE_SPLIT)
+        lines = <<-EOS.chomp.split(::Asciidoctor::EOL)
 --
 This is one paragraph inside the block.
 
@@ -335,7 +335,7 @@ This is a paragraph outside the block.
       end
 
       test 'Read lines until until condition is true, taking and preserving last line' do
-        lines = <<-EOS.chomp.split(::Asciidoctor::LINE_SPLIT)
+        lines = <<-EOS.chomp.split(::Asciidoctor::EOL)
 --
 This is one paragraph inside the block.
 
@@ -400,7 +400,7 @@ endlines\r
       EOS
 
         doc = Asciidoctor::Document.new
-        [input, input.lines.to_a, input.split(::Asciidoctor::LINE_SPLIT), input.split(::Asciidoctor::LINE_SPLIT).join(::Asciidoctor::EOL)].each do |lines|
+        [input, input.lines.to_a, input.split(::Asciidoctor::EOL), input.split(::Asciidoctor::EOL).join(::Asciidoctor::EOL)].each do |lines|
           reader = Asciidoctor::PreprocessorReader.new doc, lines
           reader.lines.each do |line|
             assert !line.end_with?("\r"), "CRLF not properly cleaned for source lines: #{lines.inspect}"

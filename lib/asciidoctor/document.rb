@@ -853,7 +853,7 @@ class Document < AbstractBlock
         unless content.nil?
           # FIXME normalize these lines!
           content.force_encoding ::Encoding::UTF_8 if FORCE_ENCODING
-          content = sub_attributes(content.split LINE_SPLIT) * EOL
+          content = sub_attributes(content.split EOL) * EOL
         end
       end
 
@@ -863,7 +863,7 @@ class Document < AbstractBlock
         unless content2.nil?
           # FIXME normalize these lines!
           content2.force_encoding ::Encoding::UTF_8 if FORCE_ENCODING
-          content2 = sub_attributes(content2.split LINE_SPLIT) * EOL
+          content2 = sub_attributes(content2.split EOL) * EOL
           content = content.nil? ? content2 : "#{content}#{EOL}#{content2}"
         end
       end
