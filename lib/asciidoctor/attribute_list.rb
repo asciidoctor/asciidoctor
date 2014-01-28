@@ -10,7 +10,7 @@ module Asciidoctor
 #    attrlist = Asciidoctor::AttributeList.new('astyle')
 #
 #    attrlist.parse
-#    => {0 => 'astyle'} 
+#    => {0 => 'astyle'}
 #
 #    attrlist.rekey(['style'])
 #    => {'style' => 'astyle'}
@@ -18,55 +18,60 @@ module Asciidoctor
 #    attrlist = Asciidoctor::AttributeList.new('quote, Famous Person, Famous Book (2001)')
 #
 #    attrlist.parse(['style', 'attribution', 'citetitle'])
-#    => {'style' => 'quote', 'attribution' => 'Famous Person', 'citetitle' => 'Famous Book (2001)'} 
+#    => {'style' => 'quote', 'attribution' => 'Famous Person', 'citetitle' => 'Famous Book (2001)'}
 #
 class AttributeList
 
   # Public: Regular expressions for detecting the boundary of a value
-  BOUNDARY_PATTERNS = {
+  BoundaryRxs = {
     '"' => /.*?[^\\](?=")/,
     '\'' => /.*?[^\\](?=')/,
     ',' => /.*?(?=[ \t]*(,|$))/
   }
 
   # Public: Regular expressions for unescaping quoted characters
-  UNESCAPE_PATTERNS = {
+  EscapedQuoteRxs = {
     '\\"' => /\\"/,
-    '\\\'' => /\\'/ 
-  }
-
-  # Public: Regular expressions for skipping blanks and delimiters
-  SKIP_PATTERNS = {
-    :blank => /[ \t]+/,
-    ',' => /[ \t]*(,|$)/
+    '\\\'' => /\\'/
   }
 
   # Public: A regular expression for an attribute name
   # TODO named attributes cannot contain dash characters
-  NAME_PATTERN = /[A-Za-z:_][A-Za-z:_\-\.]*/
+  NameRx = /[A-Za-z:_][A-Za-z:_\-.]*/
 
-  def initialize(source, block = nil, quotes = ['\'', '"'], delimiter = ',', escape_char = '\\')
+  BlankRx = /[ \t]+/
+
+  # Public: Regular expressions for skipping blanks and delimiters
+  SkipRxs = {
+    :blank => BlankRx,
+    ',' => /[ \t]*(,|$)/
+  }
+
+  def initialize source, block = nil, quotes = ['\'', '"'], delimiter = ',', escape_char = '\\'
     @scanner = ::StringScanner.new source
     @block = block
     @quotes = quotes
     @escape_char = escape_char
     @delimiter = delimiter
+    @delimiter_skip_pattern = SkipRxs[delimiter]
+    @delimiter_boundary_pattern = BoundaryRxs[delimiter]
     @attributes = nil
   end
 
-  def parse_into(attributes, posattrs = [])
-    attributes.update(parse(posattrs))
+  def parse_into attributes, posattrs = []
+    attributes.update(parse posattrs)
   end
 
-  def parse(posattrs = [])
-    return @attributes unless @attributes.nil?
+  def parse posattrs = []
+    # return if already parsed
+    return @attributes if @attributes
 
     @attributes = {}
-    # not sure if I want this assignment or not
+    # QUESTION do we want to store the attribute list as the zero-index attribute?
     #attributes[0] = @scanner.string
     index = 0
 
-    while parse_attribute(index, posattrs)
+    while parse_attribute index, posattrs
       break if @scanner.eos?
       skip_delimiter
       index += 1
@@ -75,30 +80,28 @@ class AttributeList
     @attributes
   end
 
-  def rekey(posattrs)
-    AttributeList.rekey(@attributes, posattrs)
+  def rekey posattrs
+    AttributeList.rekey @attributes, posattrs
   end
 
-  def self.rekey(attributes, pos_attrs)
+  def self.rekey attributes, pos_attrs
     pos_attrs.each_with_index do |key, index|
-      next if key.nil?
+      next unless key
       pos = index + 1
-      unless (val = attributes[pos]).nil?
+      if (val = attributes[pos])
+        # QUESTION should we delete the positional key?
         attributes[key] = val
-        #QUESTION should we delete the positional key?
-        #attributes.delete pos
       end
     end
 
     attributes
   end
 
-  def parse_attribute(index = 0, pos_attrs = [])
+  def parse_attribute index = 0, pos_attrs = []
     single_quoted_value = false
     skip_blank
-    first = @scanner.peek(1)
     # example: "quote" || 'quote'
-    if @quotes.include? first
+    if @quotes.include?(first = @scanner.peek(1))
       value = nil
       name = parse_attribute_value @scanner.get_byte
       if first == '\''
@@ -110,23 +113,18 @@ class AttributeList
       skipped = 0
       c = nil
       if @scanner.eos?
-        if name.nil?
-          return false
-        end
+        return false unless name
       else
         skipped = skip_blank || 0
         c = @scanner.get_byte
       end
 
       # example: quote
-      if c.nil? || c == @delimiter
+      if !c || c == @delimiter
         value = nil
       # example: Sherlock Holmes || =foo=
-      elsif c != '=' || name.nil?
-        remainder = scan_to_delimiter
-        name = '' if name.nil?
-        name += ' ' * skipped + c
-        name += remainder unless remainder.nil?
+      elsif c != '=' || !name
+        name = %(#{name}#{' ' * skipped}#{c}#{scan_to_delimiter})
         value = nil
       else
         skip_blank
@@ -143,76 +141,73 @@ class AttributeList
               single_quoted_value = true
             end
           # example: foo=bar (all spaces ignored)
-          elsif !c.nil?
-            value = c + scan_to_delimiter
+          elsif c
+            value = %(#{c}#{scan_to_delimiter})
           end
         end
       end
     end
 
-    if value.nil?
-      resolved_name = single_quoted_value && !@block.nil? ? @block.apply_normal_subs(name) : name
-      if !(pos_name = pos_attrs[index]).nil?
-        @attributes[pos_name] = resolved_name
-      else
-        #@attributes[index + 1] = resolved_name
-      end
-      # not sure if we want to always assign the positional key
-      @attributes[index + 1] = resolved_name
-      # not sure if I want this assignment or not
-      #@attributes[resolved_name] = nil
-    else
+    if value
       resolved_value = value
       # example: options="opt1,opt2,opt3"
       # opts is an alias for options
       if name == 'options' || name == 'opts'
         name = 'options'
-        resolved_value.split(',').each do |o|
-          @attributes["#{o.strip}-option"] = ''
-        end
-      elsif single_quoted_value && !@block.nil?
-        resolved_value = @block.apply_normal_subs(value)
+        resolved_value.split(',').each {|o| @attributes[%(#{o.strip}-option)] = '' }
+      elsif single_quoted_value && @block
+        resolved_value = @block.apply_normal_subs value
       end
       @attributes[name] = resolved_value
+    else
+      resolved_name = single_quoted_value && @block ? (@block.apply_normal_subs name) : name
+      if (pos_name = pos_attrs[index])
+        @attributes[pos_name] = resolved_name
+      end
+      # QUESTION should we always assign the positional key?
+      @attributes[index + 1] = resolved_name
+      # QUESTION should we assign the resolved name as an attribute?
+      #@attributes[resolved_name] = nil
     end
 
     true
   end
 
-  def parse_attribute_value(quote)
+  def parse_attribute_value quote
     # empty quoted value
     if @scanner.peek(1) == quote
-      @scanner.get_byte 
+      @scanner.get_byte
       return ''
     end
 
-    value = scan_to_quote quote
-    if value.nil?
-      quote + scan_to_delimiter
-    else
+    if (value = scan_to_quote quote)
       @scanner.get_byte
-      value.gsub(UNESCAPE_PATTERNS[@escape_char + quote], quote)
+      value.gsub EscapedQuoteRxs[%(#{@escape_char}#{quote})], quote
+    else
+      %(#{quote}#{scan_to_delimiter})
     end
   end
 
   def skip_blank
-    @scanner.skip SKIP_PATTERNS[:blank]
+    @scanner.skip BlankRx
   end
 
   def skip_delimiter
-    @scanner.skip SKIP_PATTERNS[@delimiter]
+    @scanner.skip @delimiter_skip_pattern
+    #@scanner.skip SkipRxs[@delimiter]
   end
 
   def scan_name
-    @scanner.scan NAME_PATTERN
+    @scanner.scan NameRx
   end
 
   def scan_to_delimiter
-    @scanner.scan BOUNDARY_PATTERNS[@delimiter]
+    @scanner.scan @delimiter_boundary_pattern
+    #@scanner.scan BoundaryRxs[@delimiter]
   end
 
-  def scan_to_quote(quote)
-    @scanner.scan BOUNDARY_PATTERNS[quote]
+  def scan_to_quote quote
+    @scanner.scan BoundaryRxs[quote]
   end
 
 end
