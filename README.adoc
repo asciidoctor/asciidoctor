@@ -1,6 +1,6 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Ryan Waldron <https://github.com/erebor[@erebor]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>
-:awestruct-layout: base
+:page-layout: base
 :homepage: http://asciidoctor.org
 :asciidoc: http://asciidoc.org
 :gem: http://rubygems.org/gems/asciidoctor
@@ -32,20 +32,16 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Ryan Waldron <https://
 :license: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE
 :idprefix:
 :idseparator: -
-ifndef::safe-mode-name[]
-
-[float]
-= Asciidoctor
-endif::[]
+:language: ruby
 
 {homepage}[Asciidoctor] is an open source text processor and publishing toolchain for transforming {asciidoc}[AsciiDoc] markup into HTML 5, DocBook 4.5 and 5.0 and other custom formats.
 Asciidoctor is written entirely in Ruby, packaged as a RubyGem and published to {gem}[RubyGems.org].
 There are also Fedora, Debian and Ubuntu packages available for installing Asciidoctor.
 Asciidoctor is released under the MIT license.
 
-ifndef::awestruct[]
+ifdef::env-github[]
 *Project health:* image:https://travis-ci.org/asciidoctor/asciidoctor.png?branch=master[Build Status, link="https://travis-ci.org/asciidoctor/asciidoctor"]
-endif::awestruct[]
+endif::env-github[]
 
 == AsciiDoc Processing
 
@@ -61,7 +57,7 @@ We continue to work hard to ensure Asciidoctor continues to serve as a drop-in r
 
 == Operating Systems
 
-Asciidoctor works on Linux, Mac and Windows.
+Asciidoctor works on Linux, OSX (Mac) and Windows.
 
 == Dependency and Configuration Requirements
 
@@ -109,8 +105,9 @@ To install Asciidoctor using bundler:
 . Open your system Gemfile
 . Add the +asciidoctor+ gem to your Gemfile using the following text
 
- source 'https://rubygems.org'
- gem 'asciidoctor'
+[source]
+source 'https://rubygems.org'
+gem 'asciidoctor'
 
 . Save the Gemfile
 . Open a terminal
@@ -152,13 +149,12 @@ If you have an earlier version of Asciidoctor installed, you can update it using
  $ gem update asciidoctor
 
 [TIP]
-====
+--
 If you accidentally use +gem install+ instead of +gem update+ then you will have both versions installed.
 If you wish to remove the older version use the +gem+ command:
 
  $ gem cleanup asciidoctor
-
-====
+--
 
 On Fedora, you can update it using:
 
@@ -198,13 +194,13 @@ See the {java}[Asciidoctor Java integration project] for more information.
 Asciidoctor's CLI is a drop-in replacement for the +asciidoc.py+ command from the Python implementation.
 To invoke Asciidoctor from the CLI, execute:
 
- asciidoctor <asciidoc_file>
+ $ asciidoctor [asciidoc-file]
 
 This will use the built-in defaults for options and create a new file in the same directory as the input file, with the same base name, but with the +.html+ extension.
 
 There are many other options available and full help is provided via:
 
- asciidoctor --help
+ $ asciidoctor --help
 
 or in the {man}[man page].
 
@@ -220,19 +216,23 @@ Additional documentation:
 
 To use Asciidoctor in your application, you first need to require the gem:
 
- require 'asciidoctor'
+[source]
+require 'asciidoctor'
 
 With that in place, you can start processing AsciiDoc documents.
 
 .Loading a document
 To parse a file into an +Asciidoctor::Document+ object:
 
- doc = Asciidoctor.load_file 'sample.adoc'
+[source]
+doc = Asciidoctor.load_file 'sample.adoc'
 
 You can get information about the document:
 
- puts doc.doctitle
- puts doc.attributes
+[source]
+require 'pp'
+puts doc.doctitle
+puts doc.attributes
 
 More than likely, you will want to render the document.
 
@@ -240,13 +240,15 @@ More than likely, you will want to render the document.
 --
 To render a file containing AsciiDoc markup to HTML 5, use:
 
- Asciidoctor.render_file 'sample.adoc', :in_place => true
+[source]
+Asciidoctor.render_file 'sample.adoc', :in_place => true
 
 The command will output to the file +sample.html+ in the same directory.
 
-You can render the file to DocBook 4.5 by setting the +:backend+ option to +'docbook'+:
+You can render the file to DocBook 4.5 by setting the +:backend+ option to +:docbook+:
 
- Asciidoctor.render_file 'sample.adoc', :in_place => true, :backend => 'docbook'
+[source]
+Asciidoctor.render_file 'sample.adoc', :in_place => true, :backend => :docbook
 
 The command will output to the file +sample.xml+ in the same directory.
 (If you're on Linux, you can view the file using yelp).
@@ -256,22 +258,26 @@ The command will output to the file +sample.xml+ in the same directory.
 --
 To render an AsciiDoc-formatted string:
 
- puts Asciidoctor.render '*This* is Asciidoctor.'
+[source]
+puts Asciidoctor.render '*This* is http://asciidoc.org[AsciiDoc]!'
 
 When rendering a string, the header and footer are excluded by default to make Asciidoctor consistent with other lightweight markup engines like Markdown.
 If you want the header and footer, just enable it using the +:header_footer+ option:
 
- puts Asciidoctor.render '*This* is Asciidoctor.', :header_footer => true
+[source]
+puts Asciidoctor.render '*This* is http://asciidoc.org[AsciiDoc]!', :header_footer => true
 
 Now you'll get a full HTML 5 file.
 If you only want the inline markup to be processed, set the +:doctype+ option to +'inline'+:
 
- puts Asciidoctor.render '*This* is Asciidoctor.', :doctype => 'inline'
+[source]
+puts Asciidoctor.render '*This* is http://asciidoc.org[AsciiDoc]!', :doctype => :inline
 
 As before, you can also produce DocBook 4.5:
 
- puts Asciidoctor.render '*This* is Asciidoctor.', :header_footer => true,
-   :backend => 'docbook'
+[source]
+puts Asciidoctor.render '*This* is http://asciidoc.org[AsciiDoc]!.', :header_footer => true,
+   :backend => :docbook
 
 If you don't like the output you see, you can change it.
 Any of it!
@@ -283,7 +289,8 @@ Asciidoctor allows you to override the {templates}[built-in templates] used to r
 If you provide a directory of {tilt}[Tilt]-compatible templates, named in such a way that Asciidoctor can figure out which template goes with which element, Asciidoctor will use the templates in this directory instead of its built-in templates for any elements for which it finds a matching template.
 It will fallback to its default templates for everything else.
 
- puts Asciidoctor.render '*This* is Asciidoctor.', :header_footer => true,
+[source]
+puts Asciidoctor.render '*This* is http://asciidoc.org[AsciiDoc]!', :header_footer => true,
    :template_dir => 'templates'
 
 The Document and Section templates should begin with +document.+ and +section.+, respectively.
@@ -524,9 +531,10 @@ A context is type of logical container that groups related tests together.
 
 Each test case follows the same structure:
 
- test 'description of test' do
-   # test logic
- end
+[source]
+test 'description of test' do
+  # test logic
+end
 
 At the moment, the tests are quite primitive.
 Here's how a typical test operates:
@@ -537,17 +545,18 @@ Here's how a typical test operates:
 
 Here's how we might test the open block syntax:
 
- test 'should render content bounded by two consecutive hyphens as an open block' do
-   input = <<-EOS
- --
- This is an open block.
- --
-   EOS
-   result = render_embedded_string input
-   assert_css '.openblock', result, 1
-   assert_css '.openblock p', result, 1
-   assert_xpath '/div[@class="openblock"]//p[text()="This is an open block."]', result, 1
- end
+[source]
+test 'should render content bounded by two consecutive hyphens as an open block' do
+  input = <<-EOS
+--
+This is an open block.
+--
+  EOS
+  result = render_embedded_string input
+  assert_css '.openblock', result, 1
+  assert_css '.openblock p', result, 1
+  assert_xpath '/div[@class="openblock"]//p[text()="This is an open block."]', result, 1
+end
 
 As you can see, several helpers are used to facilitate the test scenario.
 The +render_embedded_string+ invokes Asciidoctor's render method with the header and footer option disabled.
@@ -567,9 +576,10 @@ If you want to run a single test file, you can use +testrb+:
 To test a single test case, first add the string "wip" to the beginning of the description.
 For example:
 
- test 'wip should render ...' do
-   ...
- end
+[source]
+test 'wip should render ...' do
+  ...
+end
 
 Then, run +testrb+ again, but this time pass a selector argument so it finds matching tests:
 
