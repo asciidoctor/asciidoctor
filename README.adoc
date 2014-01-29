@@ -221,7 +221,8 @@ require 'asciidoctor'
 
 With that in place, you can start processing AsciiDoc documents.
 
-.Loading a document
+==== Loading a document
+
 To parse a file into an +Asciidoctor::Document+ object:
 
 [source]
@@ -236,8 +237,8 @@ puts doc.attributes
 
 More than likely, you will want to render the document.
 
-.Rendering files
---
+==== Rendering files
+
 To render a file containing AsciiDoc markup to HTML 5, use:
 
 [source]
@@ -252,10 +253,9 @@ Asciidoctor.render_file 'sample.adoc', :in_place => true, :backend => :docbook
 
 The command will output to the file +sample.xml+ in the same directory.
 (If you're on Linux, you can view the file using yelp).
---
 
-.Rendering strings
---
+==== Rendering strings
+
 To render an AsciiDoc-formatted string:
 
 [source]
@@ -281,10 +281,9 @@ puts Asciidoctor.render '*This* is http://asciidoc.org[AsciiDoc]!.', :header_foo
 
 If you don't like the output you see, you can change it.
 Any of it!
---
 
-.Custom templates
---
+==== Using custom templates
+
 Asciidoctor allows you to override the {templates}[built-in templates] used to render almost any individual AsciiDoc element.
 If you provide a directory of {tilt}[Tilt]-compatible templates, named in such a way that Asciidoctor can figure out which template goes with which element, Asciidoctor will use the templates in this directory instead of its built-in templates for any elements for which it finds a matching template.
 It will fallback to its default templates for everything else.
@@ -302,7 +301,6 @@ Templates for block elements, like a Paragraph or Sidebar, would begin with +blo
 For instance, to override the default Paragraph template with an ERB template, put a file named +block_paragraph.html.erb+ in the template directory you pass to the +Document+ constructor using the +:template_dir+ option.
 
 For more usage examples, see the (massive) {tests}[test suite].
---
 
 == Copyright and Licensing
 
