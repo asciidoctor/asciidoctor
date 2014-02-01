@@ -149,14 +149,17 @@ class AttributeList
     end
 
     if value
-      resolved_value = value
       # example: options="opt1,opt2,opt3"
       # opts is an alias for options
-      if name == 'options' || name == 'opts'
+      resolved_value = case name
+      when 'options', 'opts'
         name = 'options'
-        resolved_value.split(',').each {|o| @attributes[%(#{o.strip}-option)] = '' }
-      elsif single_quoted_value && @block
-        resolved_value = @block.apply_normal_subs value
+        value.split(',').each {|o| @attributes[%(#{o.strip}-option)] = '' }
+        value
+      when 'title'
+        value
+      else
+        single_quoted_value && @block ? (@block.apply_normal_subs value) : value
       end
       @attributes[name] = resolved_value
     else

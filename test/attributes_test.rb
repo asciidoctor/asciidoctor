@@ -602,7 +602,7 @@ after: {counter:mycounter}
   end
 
   context 'Block attributes' do
-    test 'Positional attributes assigned to block' do
+    test 'positional attributes assigned to block' do
       input = <<-EOS
 [quote, author, source]
 ____
@@ -618,7 +618,7 @@ ____
       assert_equal 'source', qb.attributes['citetitle']
     end
 
-    test 'Normal substitutions are performed on single-quoted attributes' do
+    test 'normal substitutions are performed on single-quoted positional attribute' do
       input = <<-EOS
 [quote, author, 'http://wikipedia.org[source]']
 ____
@@ -632,6 +632,31 @@ ____
       assert_equal 'author', qb.attr(:attribution)
       assert_equal 'author', qb.attributes['attribution']
       assert_equal '<a href="http://wikipedia.org">source</a>', qb.attributes['citetitle']
+    end
+
+    test 'normal substitutions are performed on single-quoted named attribute' do
+      input = <<-EOS
+[quote, author, citetitle='http://wikipedia.org[source]']
+____
+A famous quote.
+____
+      EOS
+      doc = document_from_string(input)
+      qb = doc.blocks.first
+      assert_equal 'quote', qb.style
+      assert_equal 'author', qb.attr('attribution')
+      assert_equal 'author', qb.attr(:attribution)
+      assert_equal 'author', qb.attributes['attribution']
+      assert_equal '<a href="http://wikipedia.org">source</a>', qb.attributes['citetitle']
+    end
+
+    test 'normal substitutions are performed once on single-quoted named title attribute' do
+      input = <<-EOS
+[title='*title*']
+content
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//*[@class="title"]/strong[text()="title"]', output, 1
     end
 
     test 'attribute list may begin with space' do
