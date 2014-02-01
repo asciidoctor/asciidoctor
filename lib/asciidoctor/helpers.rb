@@ -15,15 +15,13 @@ module Helpers
   #
   # returns the return value of Kernel#require if the library is available,
   # otherwise Kernel#fail is called with an appropriate message.
-  def self.require_library(name, gem = true)
-    begin
-      require name
-    rescue ::LoadError => e
-      if gem
-        fail "asciidoctor: FAILED: required gem '#{gem == true ? name : gem}' is not installed. Processing aborted."
-      else
-        fail "asciidoctor: FAILED: #{e.message.chomp '.'}. Processing aborted."
-      end
+  def self.require_library name, gem = true
+    require name
+  rescue ::LoadError => e
+    if gem
+      fail %(asciidoctor: FAILED: required gem '#{gem == true ? name : gem}' is not installed. Processing aborted.)
+    else
+      fail %(asciidoctor: FAILED: #{e.message.chomp '.'}. Processing aborted.)
     end
   end
 
