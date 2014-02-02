@@ -65,11 +65,11 @@ begin
 
   # Prevent YARD from breaking command statements in literal paragraphs
   class CommandBlockPostprocessor < Asciidoctor::Extensions::Postprocessor
-    def process output
+    def process document, output
       output.gsub(/<pre>\$ (.+?)<\/pre>/m, '<pre class="command code"><span class="const">$</span> \1</pre>')
     end
   end
-  Asciidoctor::Extensions.register do |doc|
+  Asciidoctor::Extensions.register do
     postprocessor CommandBlockPostprocessor
   end
 

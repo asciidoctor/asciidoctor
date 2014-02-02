@@ -154,7 +154,7 @@ class Document < AbstractBlock
       @attribute_overrides = overrides
       @safe = nil
       @renderer = nil
-      initialize_extensions = defined?(::Asciidoctor::Extensions)
+      initialize_extensions = defined? ::Asciidoctor::Extensions
       @extensions = nil # initialize furthur down
     end
 
@@ -165,7 +165,7 @@ class Document < AbstractBlock
     @options = options
     unless @parent_document
       # safely resolve the safe mode from const, int or string
-      if @safe.nil? && !(safe_mode = @options[:safe])
+      if !@safe && !(safe_mode = options[:safe])
         @safe = SafeMode::SECURE
       elsif safe_mode.is_a?(::Fixnum)
         # be permissive in case API user wants to define new levels
@@ -178,14 +178,14 @@ class Document < AbstractBlock
         end
       end
     end
-    @options[:header_footer] ||= false
+    options[:header_footer] ||= false
 
     @attributes['encoding'] = 'UTF-8'
     @attributes['sectids'] = ''
-    @attributes['notitle'] = '' unless @options[:header_footer]
+    @attributes['notitle'] = '' unless options[:header_footer]
     @attributes['toc-placement'] = 'auto'
     @attributes['stylesheet'] = ''
-    @attributes['copycss'] = '' if @options[:header_footer]
+    @attributes['copycss'] = '' if options[:header_footer]
     @attributes['prewrap'] = ''
     @attributes['attribute-undefined'] = Compliance.attribute_undefined
     @attributes['attribute-missing'] = Compliance.attribute_missing
@@ -217,7 +217,7 @@ class Document < AbstractBlock
     @attribute_overrides['safe-mode-level'] = @safe
 
     # sync the embedded attribute w/ the value of options...do not allow override
-    @attribute_overrides['embedded'] = @options[:header_footer] ? nil : ''
+    @attribute_overrides['embedded'] = options[:header_footer] ? nil : ''
 
     # the only way to set the max-include-depth attribute is via the document options
     # 64 is the AsciiDoc default
@@ -233,7 +233,7 @@ class Document < AbstractBlock
     # if the base_dir option is specified, it overrides docdir as the root for relative paths
     # otherwise, the base_dir is the directory of the source file (docdir) or the current
     # directory of the input is a string
-    if @options[:base_dir].nil?
+    if !options[:base_dir]
       if @attribute_overrides['docdir']
         @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(@attribute_overrides['docdir'])
       else
@@ -241,16 +241,16 @@ class Document < AbstractBlock
         @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(::Dir.pwd)
       end
     else
-      @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(@options[:base_dir])
+      @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(options[:base_dir])
     end
 
     # allow common attributes backend and doctype to be set using options hash
-    unless @options[:backend].nil?
-      @attribute_overrides['backend'] = @options[:backend].to_s
+    if (value = options[:backend])
+      @attribute_overrides['backend'] = %(#{value})
     end
 
-    unless @options[:doctype].nil?
-      @attribute_overrides['doctype'] = @options[:doctype].to_s
+    if (value = options[:doctype])
+      @attribute_overrides['doctype'] = %(#{value})
     end
 
     if @safe >= SafeMode::SERVER
@@ -326,12 +326,23 @@ class Document < AbstractBlock
       @attributes['stylesdir'] ||= '.'
       @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', './images'), 'icons')
 
-      @extensions = initialize_extensions ? Extensions::Registry.new(self) : nil
+      @extensions = if initialize_extensions
+        registry = if (ext_registry = options[:extensions_registry])
+          if (ext_registry.is_a? Extensions::Registry) ||
+              (::RUBY_ENGINE_JRUBY && (ext_registry.is_a? ::AsciidoctorJ::Extensions::ExtensionRegistry))
+            ext_registry
+          end
+        elsif (ext_block = options[:extensions]) && (ext_block.is_a? ::Proc)
+          Extensions.build_registry(&ext_block)
+        end
+        (registry ||= Extensions::Registry.new).activate self
+      end
+
       @reader = PreprocessorReader.new self, data, Reader::Cursor.new(@attributes['docfile'], @base_dir)
 
       if @extensions && @extensions.preprocessors?
-        @extensions.load_preprocessors(self).each do |processor|
-          @reader = processor.process(@reader, @reader.lines) || @reader
+        @extensions.preprocessors.each do |ext|
+          @reader = ext.process_method[@reader, @reader.lines] || @reader
         end
       end
     else
@@ -341,13 +352,13 @@ class Document < AbstractBlock
     end
 
     # Now parse the lines in the reader into blocks
-    Lexer.parse(@reader, self, :header_only => @options.fetch(:parse_header_only, false)) 
+    Lexer.parse @reader, self, :header_only => !!options[:parse_header_only]
 
     @callouts.rewind
 
-    if !@parent_document && @extensions && @extensions.treeprocessors?
-      @extensions.load_treeprocessors(self).each do |processor|
-        processor.process
+    if @extensions && !@parent_document && @extensions.treeprocessors?
+      @extensions.treeprocessors.each do |ext|
+        ext.process_method[self]
       end
     end
   end
@@ -482,7 +493,7 @@ class Document < AbstractBlock
     elsif (sect = first_section) && sect.title?
       val = sect.title
     else
-      return nil
+      return
     end
     
     if opts[:sanitize] && val.include?('<')
@@ -780,10 +791,10 @@ class Document < AbstractBlock
     restore_attributes
     r = renderer(opts)
 
-    # QUESTION should we add Preserializeprocessors? is it the right name?
-    #if !@parent_document && @extensions && @extensions.preserializeprocessors?
-    #  @extensions.load_preserializeprocessors(self).each do |processor|
-    #    processor.process r
+    # QUESTION should we add Prerenderprocessors? is it the right name?
+    #if @extensions && !@parent_document && @extensions.prerenderprocessors?
+    #  @extensions.prerenderprocessors.each do |ext|
+    #    ext.process_method[self, r]
     #  end
     #end
 
@@ -798,13 +809,13 @@ class Document < AbstractBlock
       output = @options.merge(opts)[:header_footer] ? r.render('document', self).strip : r.render('embedded', self)
     end
 
-    if !@parent_document && @extensions
+    if @extensions && !@parent_document
       if @extensions.postprocessors?
-        @extensions.load_postprocessors(self).each do |processor|
-          output = processor.process output
+        @extensions.postprocessors.each do |ext|
+          output = ext.process_method[self, output]
         end
       end
-      @extensions.reset
+      #@extensions.reset
     end
 
     output

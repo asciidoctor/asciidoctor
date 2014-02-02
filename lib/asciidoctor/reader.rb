@@ -88,7 +88,7 @@ class Reader
       if opts[:normalize]
         Helpers.normalize_lines_from_string data
       else
-        data.each_line.to_a
+        data.split EOL
       end
     else
       if opts[:normalize]
@@ -560,7 +560,7 @@ class PreprocessorReader < Reader
     @includes = (document.references[:includes] ||= [])
     @skipping = false
     @conditional_stack = []
-    @include_processors = nil
+    @include_processor_extensions = nil
   end
 
   def prepare_lines data, opts = {}
@@ -810,10 +810,10 @@ class PreprocessorReader < Reader
     # assume that if an include processor is given, the developer wants
     # to handle when and how to process the include
     elsif include_processors? &&
-        (processor = @include_processors.find {|candidate| candidate.handles? target })
+        (extension = @include_processor_extensions.find {|candidate| candidate.instance.handles? target })
       advance
       # QUESTION should we use @document.parse_attribues?
-      processor.process self, target, AttributeList.new(raw_attributes).parse
+      extension.process_method[self, target, AttributeList.new(raw_attributes).parse]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
@@ -1136,16 +1136,16 @@ class PreprocessorReader < Reader
   end
 
   def include_processors?
-    if !@include_processors
+    if !@include_processor_extensions
       if @document.extensions? && @document.extensions.include_processors?
-        @include_processors = @document.extensions.load_include_processors(@document)
+        @include_processor_extensions = @document.extensions.include_processors
         true
       else
-        @include_processors = false
+        @include_processor_extensions = false
         false
       end
     else
-      @include_processors != false
+      @include_processor_extensions != false
     end
   end
 

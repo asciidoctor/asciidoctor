@@ -385,7 +385,7 @@ class AbstractNode
   #
   # returns the resolved String path 
   def normalize_web_path(target, start = nil)
-    PathResolver.new.web_path(target, start)
+    (@path_resolver ||= PathResolver.new).web_path(target, start)
   end
 
   # Public: Resolve and normalize a secure path from the target and start paths
@@ -420,7 +420,7 @@ class AbstractNode
     if jail.nil? && @document.safe >= SafeMode::SAFE
       jail = @document.base_dir
     end
-    PathResolver.new.system_path(target, start, jail, opts)
+    (@path_resolver ||= PathResolver.new).system_path(target, start, jail, opts)
   end
 
   # Public: Normalize the asset file or directory to a concrete and rinsed path
@@ -434,7 +434,7 @@ class AbstractNode
 
   # Public: Calculate the relative path to this absolute filename from the Document#base_dir
   def relative_path(filename)
-    PathResolver.new.relative_path filename, @document.base_dir
+    (@path_resolver ||= PathResolver.new).relative_path filename, @document.base_dir
   end
 
   # Public: Retrieve the list marker keyword for the specified list type.
