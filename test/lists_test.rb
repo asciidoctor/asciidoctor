@@ -1,4 +1,8 @@
-require 'test_helper'
+# encoding: UTF-8
+unless defined? ASCIIDOCTOR_PROJECT_DIR
+  $: << File.dirname(__FILE__); $:.uniq!
+  require 'test_helper'
+end
 
 context "Bulleted lists (:ulist)" do
   context "Simple lists" do

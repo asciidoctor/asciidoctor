@@ -1,5 +1,8 @@
 # encoding: UTF-8
-require 'test_helper'
+unless defined? ASCIIDOCTOR_PROJECT_DIR
+  $: << File.dirname(__FILE__); $:.uniq!
+  require 'test_helper'
+end
 
 class ReaderTest < Test::Unit::TestCase
   DIRNAME = File.expand_path(File.dirname(__FILE__))

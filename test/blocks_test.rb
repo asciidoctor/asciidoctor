@@ -1,5 +1,8 @@
-require 'test_helper'
-require 'pathname'
+# encoding: UTF-8
+unless defined? ASCIIDOCTOR_PROJECT_DIR
+  $: << File.dirname(__FILE__); $:.uniq!
+  require 'test_helper'
+end
 
 context "Blocks" do
   context 'Line Breaks' do

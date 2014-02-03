@@ -1,10 +1,12 @@
+ASCIIDOCTOR_PROJECT_DIR = File.dirname File.dirname(__FILE__)
+Dir.chdir ASCIIDOCTOR_PROJECT_DIR
+$:.unshift File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib')
+
 if RUBY_VERSION < '1.9'
   require 'rubygems'
 end
 
-require "#{File.dirname __FILE__}/../lib/asciidoctor"
-# or
-#require 'asciidoctor'
+require 'asciidoctor'
 
 require 'test/unit'
 require 'nokogiri'

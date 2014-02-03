@@ -1,4 +1,8 @@
-require 'test_helper'
+# encoding: UTF-8
+unless defined? ASCIIDOCTOR_PROJECT_DIR
+  $: << File.dirname(__FILE__); $:.uniq!
+  require 'test_helper'
+end
 
 context 'Path Resolver' do
   context 'Web Paths' do

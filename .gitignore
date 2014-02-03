@@ -1,6 +1,7 @@
 pkg/
 /Gemfile.lock
 /.bundle
+/*.gem
 /.idea/
 /.yardoc/
 /rdoc/

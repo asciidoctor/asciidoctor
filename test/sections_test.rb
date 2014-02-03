@@ -1,5 +1,8 @@
 # encoding: UTF-8
-require 'test_helper'
+unless defined? ASCIIDOCTOR_PROJECT_DIR
+  $: << File.dirname(__FILE__); $:.uniq!
+  require 'test_helper'
+end
 
 context 'Sections' do
   context 'Ids' do

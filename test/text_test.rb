@@ -1,5 +1,8 @@
 # encoding: UTF-8
-require 'test_helper'
+unless defined? ASCIIDOCTOR_PROJECT_DIR
+  $: << File.dirname(__FILE__); $:.uniq!
+  require 'test_helper'
+end
 
 context "Text" do
   test "proper encoding to handle utf8 characters in document using html backend" do
