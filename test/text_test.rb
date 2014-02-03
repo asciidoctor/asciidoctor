@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require 'test_helper'
+require "#{File.dirname __FILE__}/test_helper"
 
 context "Text" do
   test "proper encoding to handle utf8 characters in document using html backend" do
