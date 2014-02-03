@@ -3,3 +3,4 @@ pkg/
 /.bundle
 /.yardoc/
 /rdoc/
+*.gem

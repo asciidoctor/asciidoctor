@@ -1,4 +1,5 @@
-require 'test_helper'
+#require 'test_helper'
+require "#{File.dirname __FILE__}/test_helper"
 
 context 'Attributes' do
   context 'Assignment' do

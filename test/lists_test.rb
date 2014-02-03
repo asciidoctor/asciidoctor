@@ -1,4 +1,4 @@
-require 'test_helper'
+require "#{File.dirname __FILE__}/test_helper"
 
 context "Bulleted lists (:ulist)" do
   context "Simple lists" do

@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require 'test_helper'
+require "#{File.dirname __FILE__}/test_helper"
 
 class ReaderTest < Test::Unit::TestCase
   DIRNAME = File.expand_path(File.dirname(__FILE__))

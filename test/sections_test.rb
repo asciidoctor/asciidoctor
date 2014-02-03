@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require 'test_helper'
+require "#{File.dirname __FILE__}/test_helper"
 
 context 'Sections' do
   context 'Ids' do
