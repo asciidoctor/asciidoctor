@@ -212,6 +212,9 @@ module Asciidoctor
   # The endline character to use when rendering output
   EOL = "\n"
 
+  # The null character to use for splitting attribute values
+  NULL = ::RUBY_ENGINE_OPAL ? 0.chr : "\0"
+
   # String for matching tab character
   TAB = "\t"
 
@@ -337,19 +340,6 @@ module Asciidoctor
   # attributes which be changed within the content of the document (but not
   # header) because it has semantic meaning; ex. numbered
   FLEXIBLE_ATTRIBUTES = %w(numbered)
-
-  # Delimiters and matchers for the passthrough placeholder
-  # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
-  PASS_PLACEHOLDER = {
-    # SPA, start of guarded protected area
-    :start  => ::RUBY_ENGINE_OPAL ? 150.chr : "\u0096",
-    # EPA, end of guarded protected area
-    :end    => ::RUBY_ENGINE_OPAL ? 151.chr : "\u0097",
-    # match placeholder record
-    :match  => /\u0096(\d+)\u0097/,
-    # fix placeholder record after syntax highlighting
-    :match_hi => /<span[^>]*>\u0096<\/span>[^\d]*(\d+)[^\d]*<span[^>]*>\u0097<\/span>/
-  }
 
   # A collection of regular expressions used by the parser.
   #
@@ -1196,9 +1186,10 @@ module Asciidoctor
     elsif attrs.is_a? ::String
       # convert non-escaped spaces into null character, so we split on the
       # correct spaces chars, and restore escaped spaces
-      attrs = attrs.gsub(SpaceDelimiterRx, "\\1\0").gsub(EscapedSpaceRx, '\1')
+      capture_1 = ::RUBY_ENGINE_OPAL ? '$' : '\1'
+      attrs = attrs.gsub(SpaceDelimiterRx, %(#{capture_1}#{NULL})).gsub(EscapedSpaceRx, capture_1)
 
-      attrs = options[:attributes] = attrs.split("\0").inject({}) do |accum, entry|
+      attrs = options[:attributes] = attrs.split(NULL).inject({}) do |accum, entry|
         k, v = entry.split '=', 2
         accum[k] = v || ''
         accum

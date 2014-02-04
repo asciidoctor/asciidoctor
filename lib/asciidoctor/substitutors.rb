@@ -45,11 +45,21 @@ module Substitutors
     :inline => COMPOSITE_SUBS.keys + SUBS[:normal]
   }
 
-  # dereference these constants closer and out of map as performance optimization
-  PASS_START = PASS_PLACEHOLDER[:start]
-  PASS_END = PASS_PLACEHOLDER[:end]
-  PASS_MATCH = PASS_PLACEHOLDER[:match]
-  PASS_MATCH_HI = PASS_PLACEHOLDER[:match_hi]
+  # Delimiters and matchers for the passthrough placeholder
+  # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
+  # Opal hasn't yet defined the constant ::RUBY_ENGINE_OPAL at this point
+
+  # SPA, start of guarded protected area (\u0096)
+  PASS_START = ::RUBY_ENGINE == 'opal' ? 150.chr : "\u0096"
+
+  # EPA, end of guarded protected area (\u0097)
+  PASS_END = ::RUBY_ENGINE == 'opal' ? 151.chr : "\u0097"
+
+  # match placeholder record
+  PASS_MATCH = /\u0096(\d+)\u0097/
+
+  # fix placeholder record after syntax highlighting
+  PASS_MATCH_HI = /<span[^>]*>\u0096<\/span>[^\d]*(\d+)[^\d]*<span[^>]*>\u0097<\/span>/
 
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs
