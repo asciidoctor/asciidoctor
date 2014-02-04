@@ -2049,7 +2049,7 @@ public class Printer {
       assert_match(/\.<em>out<\/em>\./, output, 1)
       assert_match(/\*asterisks\*/, output, 1)
       assert_match(/<strong>bold<\/strong>/, output, 1)
-      assert !output.include?(Asciidoctor::PASS_PLACEHOLDER[:start])
+      assert !output.include?(Asciidoctor::Substitutors::PASS_START)
     end
 
     test 'should link to CodeRay stylesheet if source-highlighter is coderay and linkcss is set' do

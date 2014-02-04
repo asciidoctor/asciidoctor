@@ -983,7 +983,7 @@ EOS
     test 'collect inline triple plus passthroughs' do
       para = block_from_string('+++<code>inline code</code>+++')
       result = para.extract_passthroughs(para.source)
-      assert_equal Asciidoctor::PASS_PLACEHOLDER[:start] + '0' + Asciidoctor::PASS_PLACEHOLDER[:end], result
+      assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
       assert_equal '<code>inline code</code>', para.passthroughs.first[:text]
       assert para.passthroughs.first[:subs].empty?
@@ -992,7 +992,7 @@ EOS
     test 'collect multi-line inline triple plus passthroughs' do
       para = block_from_string("+++<code>inline\ncode</code>+++")
       result = para.extract_passthroughs(para.source)
-      assert_equal Asciidoctor::PASS_PLACEHOLDER[:start] + '0' + Asciidoctor::PASS_PLACEHOLDER[:end], result
+      assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
       assert_equal "<code>inline\ncode</code>", para.passthroughs.first[:text]
       assert para.passthroughs.first[:subs].empty?
@@ -1001,7 +1001,7 @@ EOS
     test 'collect inline double dollar passthroughs' do
       para = block_from_string('$$<code>{code}</code>$$')
       result = para.extract_passthroughs(para.source)
-      assert_equal Asciidoctor::PASS_PLACEHOLDER[:start] + '0' + Asciidoctor::PASS_PLACEHOLDER[:end], result
+      assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
       assert_equal '<code>{code}</code>', para.passthroughs.first[:text]
       assert_equal [:specialcharacters], para.passthroughs.first[:subs]
@@ -1010,7 +1010,7 @@ EOS
     test 'collect multi-line inline double dollar passthroughs' do
       para = block_from_string("$$<code>\n{code}\n</code>$$")
       result = para.extract_passthroughs(para.source)
-      assert_equal Asciidoctor::PASS_PLACEHOLDER[:start] + '0' + Asciidoctor::PASS_PLACEHOLDER[:end], result
+      assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
       assert_equal "<code>\n{code}\n</code>", para.passthroughs.first[:text]
       assert_equal [:specialcharacters], para.passthroughs.first[:subs]
@@ -1019,7 +1019,7 @@ EOS
     test 'collect passthroughs from inline pass macro' do
       para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['code'\\]</code>]})
       result = para.extract_passthroughs(para.source)
-      assert_equal Asciidoctor::PASS_PLACEHOLDER[:start] + '0' + Asciidoctor::PASS_PLACEHOLDER[:end], result
+      assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
       assert_equal %q{<code>['code']</code>}, para.passthroughs.first[:text]
       assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
@@ -1028,7 +1028,7 @@ EOS
     test 'collect multi-line passthroughs from inline pass macro' do
       para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['more\ncode'\\]</code>]})
       result = para.extract_passthroughs(para.source)
-      assert_equal Asciidoctor::PASS_PLACEHOLDER[:start] + '0' + Asciidoctor::PASS_PLACEHOLDER[:end], result
+      assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
       assert_equal %Q{<code>['more\ncode']</code>}, para.passthroughs.first[:text]
       assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
@@ -1045,7 +1045,7 @@ EOS
 
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs without subs' do
-      para = block_from_string("some #{Asciidoctor::PASS_PLACEHOLDER[:start]}" + '0' + "#{Asciidoctor::PASS_PLACEHOLDER[:end]} to study")
+      para = block_from_string("some #{Asciidoctor::Substitutors::PASS_START}" + '0' + "#{Asciidoctor::Substitutors::PASS_END} to study")
       para.passthroughs << {:text => '<code>inline code</code>', :subs => []}
       result = para.restore_passthroughs(para.source)
       assert_equal "some <code>inline code</code> to study", result
@@ -1053,7 +1053,7 @@ EOS
 
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs with subs' do
-      para = block_from_string("some #{Asciidoctor::PASS_PLACEHOLDER[:start]}" + '0' + "#{Asciidoctor::PASS_PLACEHOLDER[:end]} to study in the #{Asciidoctor::PASS_PLACEHOLDER[:start]}" + '1' + "#{Asciidoctor::PASS_PLACEHOLDER[:end]} programming language")
+      para = block_from_string("some #{Asciidoctor::Substitutors::PASS_START}" + '0' + "#{Asciidoctor::Substitutors::PASS_END} to study in the #{Asciidoctor::Substitutors::PASS_START}" + '1' + "#{Asciidoctor::Substitutors::PASS_END} programming language")
       para.passthroughs << {:text => '<code>{code}</code>', :subs => [:specialcharacters]}
       para.passthroughs << {:text => '{language}', :subs => [:specialcharacters]}
       result = para.restore_passthroughs(para.source)
