@@ -69,6 +69,7 @@ class BlockTableTemplate < DocBook45::BlockTableTemplate; end
 class BlockImageTemplate < DocBook45::BlockImageTemplate; end
 class BlockAudioTemplate < DocBook45::BlockAudioTemplate; end
 class BlockVideoTemplate < DocBook45::BlockVideoTemplate; end
+class BlockEmbedTemplate < DocBook45::BlockEmbedTemplate; end
 class BlockRulerTemplate < DocBook45::BlockRulerTemplate; end
 class BlockPageBreakTemplate < DocBook45::BlockPageBreakTemplate; end
 class InlineBreakTemplate < DocBook45::InlineBreakTemplate; end

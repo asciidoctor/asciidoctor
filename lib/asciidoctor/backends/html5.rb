@@ -1047,6 +1047,34 @@ Your browser does not support the video tag.
   end
 end
 
+class BlockEmbedTemplate < BaseTemplate
+  def embed(target, title, node)
+    width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
+    height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
+
+    embed_element = %(<embed src="#{node.image_uri target}" #{width_attribute}#{height_attribute}#{node.short_tag_slash}>)
+
+    id_attribute = node.id ? %( id="#{node.id}") : nil
+    classes = ['embedblock', node.style, node.role].compact
+    class_attribute = %( class="#{classes * ' '}")
+    title_element = title ? %(\n<div class="title">#{title}</div>) : nil
+
+    %(<div#{id_attribute}#{class_attribute}>
+<div class="content">
+#{embed_element}
+</div>#{title_element}
+</div>)
+  end
+
+  def result(node)
+    embed(node.attr('target'), node.title? ? node.captioned_title : nil, node)
+  end
+
+  def template
+    :invoke_result
+  end
+end
+
 class BlockRulerTemplate < BaseTemplate
   def result(node)
     (node.document.attr? 'htmlsyntax', 'xml') ? '<hr/>' : '<hr>'

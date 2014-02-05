@@ -505,6 +505,8 @@ class Lexer
                 posattrs = ['alt', 'width', 'height']
               elsif blk_ctx == :video
                 posattrs = ['poster', 'width', 'height']
+              elsif blk_ctx == :embed
+                posattrs = ['type', 'width', 'height']
               else
                 posattrs = []
               end

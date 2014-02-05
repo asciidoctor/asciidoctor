@@ -659,6 +659,10 @@ class BlockVideoTemplate < BaseTemplate
   include EmptyTemplate
 end
 
+class BlockEmbedTemplate < BaseTemplate
+  include EmptyTemplate
+end
+
 class BlockRulerTemplate < BaseTemplate
   def result node
     %(<simpara><?asciidoc-hr?></simpara>)

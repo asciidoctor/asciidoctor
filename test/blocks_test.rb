@@ -1766,6 +1766,18 @@ audio::podcast.mp3[options="autoplay,nocontrols,loop"]
     end
   end
 
+  context 'Embed' do
+    test 'should detect and render embed macro' do
+      input = <<-EOS
+embed::bookmark.swf[]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'embed', output, 1
+      assert_css 'embed[src="bookmark.swf"]', output, 1
+    end
+  end
+
   context 'Admonition icons' do
     test 'can resolve icon relative to default iconsdir' do
       input = <<-EOS

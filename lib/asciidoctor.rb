@@ -514,7 +514,7 @@ module Asciidoctor
 
     # image::filename.png[Caption]
     # video::http://youtube.com/12345[Cats vs Dogs]
-    :media_blk_macro  => /^(image|video|audio)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/,
+    :media_blk_macro  => /^(image|video|audio|embed)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/,
 
     # image:filename.png[Alt Text]
     # image:http://example.com/images/filename.png[Alt Text]
