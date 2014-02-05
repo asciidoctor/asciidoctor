@@ -1670,6 +1670,36 @@ video::cats-vs-dogs.avi[options="autoplay,nocontrols,loop"]
       assert_css 'video[loop]', output, 1
     end
 
+    test 'video macro should add time range anchor with start time if start attribute is set' do
+      input = <<-EOS
+video::cats-vs-dogs.avi[start="30"]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_xpath '//video[@src="cats-vs-dogs.avi#t=30"]', output, 1
+    end
+
+    test 'video macro should add time range anchor with end time if end attribute is set' do
+      input = <<-EOS
+video::cats-vs-dogs.avi[end="30"]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_xpath '//video[@src="cats-vs-dogs.avi#t=,30"]', output, 1
+    end
+
+    test 'video macro should add time range anchor with start and end time if start and end attributes are set' do
+      input = <<-EOS
+video::cats-vs-dogs.avi[start="30",end="60"]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_xpath '//video[@src="cats-vs-dogs.avi#t=30,60"]', output, 1
+    end
+
     test 'video macro should use imagesdir attribute to resolve target and poster' do
       input = <<-EOS
 :imagesdir: assets

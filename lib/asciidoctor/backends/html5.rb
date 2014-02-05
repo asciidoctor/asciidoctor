@@ -1064,9 +1064,10 @@ class BlockVideoTemplate < BaseTemplate
 </div>)
     else 
       poster_attribute = %(#{poster = node.attr 'poster'}).empty? ? nil : %( poster="#{node.media_uri poster}")
+      time_anchor = ((node.attr? 'start') || (node.attr? 'end')) ? %(#t=#{node.attr 'start'}#{(node.attr? 'end') ? ',' : nil}#{node.attr 'end'}) : nil
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri(node.attr 'target')}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (boolean_attribute 'loop', xml) : nil}>
+<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (boolean_attribute 'loop', xml) : nil}>
 Your browser does not support the video tag.
 </video>
 </div>
