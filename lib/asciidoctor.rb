@@ -321,7 +321,7 @@ module Asciidoctor
 
   LIST_CONTINUATION = '+'
 
-  # FIXME technical a preceding TAB is allowed too
+  # FIXME technically a preceding TAB is allowed too
   # alternatively, we can enforce everywhere it must be a space
   LINE_BREAK = ' +'
 
