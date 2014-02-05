@@ -1107,7 +1107,7 @@ module Asciidoctor
     [:monospaced, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?=\W|$)/m],
 
     # __emphasis__
-    [:emphasis, :unconstrained, /\\?(?:\[([^\]]+?)\])?\_\_(.+?)\_\_/m],
+    [:emphasis, :unconstrained, /\\?(?:\[([^\]]+?)\])?__(.+?)__/m],
 
     # _emphasis_
     [:emphasis, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?_(\S|\S.*?\S)_(?=\W|$)/m],
@@ -1122,7 +1122,7 @@ module Asciidoctor
     [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(.+?)\^/m],
 
     # ~subscript~
-    [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\~(.+?)\~/m]
+    [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?~(.+?)~/m]
   ]
 
   # NOTE in Ruby 1.8.7, [^\\] does not match start of line,
