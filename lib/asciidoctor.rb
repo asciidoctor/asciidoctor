@@ -1186,7 +1186,7 @@ module Asciidoctor
     elsif attrs.is_a? ::String
       # convert non-escaped spaces into null character, so we split on the
       # correct spaces chars, and restore escaped spaces
-      capture_1 = ::RUBY_ENGINE_OPAL ? '$' : '\1'
+      capture_1 = ::RUBY_ENGINE_OPAL ? '$1' : '\1'
       attrs = attrs.gsub(SpaceDelimiterRx, %(#{capture_1}#{NULL})).gsub(EscapedSpaceRx, capture_1)
 
       attrs = options[:attributes] = attrs.split(NULL).inject({}) do |accum, entry|
