@@ -768,14 +768,8 @@ class BlockUlistTemplate < BaseTemplate
           marker_checked = '<i class="icon-check"></i> '
           marker_unchecked = '<i class="icon-check-empty"></i> '
         else
-          # could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
-          if node.document.attr? 'htmlsyntax', 'xml'
-            marker_checked = '<input type="checkbox" data-item-complete="1" checked="checked" disabled="disabled"/> '
-            marker_unchecked = '<input type="checkbox" data-item-complete="0" disabled="disabled"/> '
-          else
-            marker_checked = '<input type="checkbox" data-item-complete="1" checked disabled> '
-            marker_unchecked = '<input type="checkbox" data-item-complete="0" disabled> '
-          end
+          marker_checked = '&#10003; '
+          marker_unchecked = '&#10065; '
         end
       end
     elsif !node.style.nil?

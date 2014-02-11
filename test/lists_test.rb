@@ -4034,8 +4034,8 @@ context 'Checklists' do
 
     output = render_embedded_string input
     assert_css '.ulist.checklist', output, 1
-    assert_css '.ulist.checklist li input[type="checkbox"][disabled]', output, 2
-    assert_css '.ulist.checklist li input[type="checkbox"][checked]', output, 1
+    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[1]/p[text()="#{expand_entity 10065} todo"]), output, 1
+    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[2]/p[text()="#{expand_entity 10003} done"]), output, 1
     assert_xpath '(/*[@class="ulist checklist"]/ul/li)[3]/p[text()="plain"]', output, 1
   end
 
