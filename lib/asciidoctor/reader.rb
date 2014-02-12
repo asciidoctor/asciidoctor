@@ -827,7 +827,7 @@ class PreprocessorReader < Reader
       warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
       false
     elsif abs_maxdepth > 0
-      if RUBY_ENGINE_OPAL
+      if ::RUBY_ENGINE_OPAL
         # NOTE resolves uri relative to currently loaded document
         target_type = :uri
         include_file = path = target
@@ -843,7 +843,7 @@ class PreprocessorReader < Reader
           # caching requires the open-uri-cached gem to be installed
           # processing will be automatically aborted if these libraries can't be opened
           Helpers.require_library 'open-uri/cached', 'open-uri-cached'
-        elsif !RUBY_ENGINE_OPAL
+        elsif !::RUBY_ENGINE_OPAL
           # autoload open-uri
           ::OpenURI
         end
