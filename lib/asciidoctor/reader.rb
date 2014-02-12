@@ -827,7 +827,11 @@ class PreprocessorReader < Reader
       warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
       false
     elsif abs_maxdepth > 0
-      if target.include?(':') && UriSniffRx =~ target
+      if RUBY_ENGINE_OPAL
+        # NOTE resolves uri relative to currently loaded document
+        target_type = :uri
+        include_file = path = target
+      elsif target.include?(':') && UriSniffRx =~ target
         unless @document.attributes.has_key? 'allow-uri-read'
           replace_line %(link:#{target}[])
           return true
@@ -839,7 +843,7 @@ class PreprocessorReader < Reader
           # caching requires the open-uri-cached gem to be installed
           # processing will be automatically aborted if these libraries can't be opened
           Helpers.require_library 'open-uri/cached', 'open-uri-cached'
-        else
+        elsif !RUBY_ENGINE_OPAL
           # autoload open-uri
           ::OpenURI
         end
@@ -952,8 +956,8 @@ class PreprocessorReader < Reader
             advance
             return true
           end
-          unless (missing_tags = tags - tags_found).empty?
-            warn "asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags.to_a * ','}' not found in include #{target_type}: #{include_file}"
+          unless (missing_tags = tags.to_a - tags_found.to_a).empty?
+            warn "asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{include_file}"
           end
           advance
           # FIXME not accounting for skipped lines in reader line numbering
