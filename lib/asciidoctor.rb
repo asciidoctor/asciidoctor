@@ -186,7 +186,7 @@ module Asciidoctor
   ROOT_PATH = ::File.dirname LIB_PATH
 
   # The user's home directory, as best we can determine it
-  USER_HOME = ::RUBY_MIN_VERSION_1_9 ? ::Dir.home : ::ENV['HOME']
+  USER_HOME = ::Dir.home rescue ::ENV['HOME'] || ::Dir.pwd
 
   # Flag to indicate whether encoding can be coerced to UTF-8
   # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
