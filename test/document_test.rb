@@ -948,7 +948,7 @@ v8.6.8, 2012-07-12: See changelog.
 
 more info...
       EOS
-      output = render_string input, :backend => 'docbook'
+      output = render_string input, :backend => 'docbook45'
       assert_xpath '/article/articleinfo', output, 1
       assert_xpath '/article/articleinfo/title[text() = "AsciiDoc"]', output, 1
       assert_xpath '/article/articleinfo/date[text() = "2012-07-12"]', output, 1
@@ -981,7 +981,7 @@ more info...
       assert_xpath '/article/info/author/email[text() = "founder@asciidoc.org"]', output, 1
     end
 
-    test 'with author defined using attribute entry to DocBook' do
+    test 'with author defined using attribute entry to DocBook 4.5' do
       input = <<-EOS
 = Document Title
 :author: Doc Writer
@@ -990,7 +990,7 @@ more info...
 content
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = render_string input, :backend => 'docbook45'
       assert_xpath '//articleinfo/author', output, 1
       assert_xpath '//articleinfo/author/firstname[text() = "Doc"]', output, 1
       assert_xpath '//articleinfo/author/surname[text() = "Writer"]', output, 1
@@ -1027,7 +1027,7 @@ Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
 content
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = render_string input, :backend => 'docbook45'
       assert_xpath '//articleinfo/author', output, 0
       assert_xpath '//articleinfo/authorgroup', output, 1
       assert_xpath '//articleinfo/authorgroup/author', output, 2
@@ -1045,7 +1045,7 @@ content
 content
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = render_string input, :backend => 'docbook45'
       assert_xpath '//articleinfo/author', output, 0
       assert_xpath '//articleinfo/authorgroup', output, 1
       assert_xpath '//articleinfo/authorgroup/author', output, 2

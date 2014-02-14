@@ -235,7 +235,7 @@ module Asciidoctor
   # Pointers to the preferred version for a given backend.
   BACKEND_ALIASES = {
     'html'    => 'html5',
-    'docbook' => 'docbook45'
+    'docbook' => 'docbook5'
   }
 
   # Default page widths for calculating absolute widths

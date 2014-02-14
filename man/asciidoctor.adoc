@@ -62,7 +62,7 @@ This option may be specified more than once.
 *-b, --backend*='BACKEND'::
     Backend output file format: 'html5', 'docbook45' and 'docbook5' supported
     out of the box. You can also use the backend alias names 'html' (aliased to
-    'html5') or 'docbook' (aliased to 'docbook45'). Defaults to 'html5'. Other
+    'html5') or 'docbook' (aliased to 'docbook5'). Defaults to 'html5'. Other
     options can be passed, but if Asciidoctor cannot find the backend, it will
     fail during rendering.
 
