@@ -1448,7 +1448,7 @@ Colophon content
 = Index Title
       EOS
 
-      output = render_embedded_string input, :backend => 'docbook'
+      output = render_embedded_string input, :backend => 'docbook45'
       assert_xpath '/chapter[@id="abstract_title"]', output, 1
       assert_xpath '/chapter[@id="abstract_title"]/title[text()="Abstract Title"]', output, 1
       assert_xpath '/chapter/following-sibling::dedication[@id="dedication_title"]', output, 1
@@ -1488,7 +1488,7 @@ Colophon content
 Abstract content
       EOS
 
-      output = render_embedded_string input, :backend => 'docbook'
+      output = render_embedded_string input, :backend => 'docbook45'
       assert_xpath '/abstract[@id="abstract_title"]', output, 1
       assert_xpath '/abstract[@id="abstract_title"]/title[text()="Abstract Title"]', output, 1
     end
