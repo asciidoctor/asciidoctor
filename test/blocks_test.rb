@@ -2411,7 +2411,7 @@ It can have multiple paragraphs.
 content
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = render_string input, :backend => 'docbook45'
       assert_css 'partintro', output, 1
       assert_css 'part#_part_1 > partintro', output, 1
       assert_css 'partintro > simpara', output, 2
@@ -2435,7 +2435,7 @@ This is a part intro with a title.
 content
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = render_string input, :backend => 'docbook45'
       assert_css 'partintro', output, 1
       assert_css 'part#_part_1 > partintro', output, 1
       assert_css 'partintro > title', output, 1
