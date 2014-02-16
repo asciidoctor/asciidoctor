@@ -579,7 +579,7 @@ class PreprocessorReader < Reader
     end
 
     if (indent = opts.fetch(:indent, nil))
-      Lexer.reset_block_indent! result, indent.to_i
+      Parser.reset_block_indent! result, indent.to_i
     end
 
     result

@@ -352,7 +352,7 @@ class Document < AbstractBlock
     end
 
     # Now parse the lines in the reader into blocks
-    Lexer.parse @reader, self, :header_only => !!options[:parse_header_only]
+    Parser.parse @reader, self, :header_only => !!options[:parse_header_only]
 
     @callouts.rewind
 

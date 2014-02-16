@@ -110,7 +110,7 @@ Example: asciidoctor -b html5 source.asciidoc
             self[:destination_dir] = dest_dir
           end
           opts.on('-r', '--require LIBRARY', ::Array,
-              'require the specified library before executing the processor (calls Kernel::require)',
+              'require the specified library before executing the processor (calls Kernel.require)',
               'may be specified more than once') do |paths|
             self[:requires] = paths
           end

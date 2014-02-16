@@ -76,7 +76,7 @@ context 'Invoker' do
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
     ensure
-      FileUtils::rm_f(sample_outpath)
+      FileUtils.rm_f(sample_outpath)
     end
   end
 
@@ -162,7 +162,7 @@ context 'Invoker' do
       assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
       assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
     ensure
-      FileUtils::rm_f(sample_outpath)
+      FileUtils.rm_f(sample_outpath)
     end
   end
 
@@ -170,7 +170,7 @@ context 'Invoker' do
     destination_path = File.expand_path(File.join(File.dirname(__FILE__), 'test_output'))
     sample_outpath = File.join(destination_path, 'sample.html')
     begin
-      FileUtils::mkdir_p(destination_path) 
+      FileUtils.mkdir_p(destination_path) 
       # QUESTION should -D be relative to working directory or source directory?
       invoker = invoke_cli %w(-D test/test_output)
       #invoker = invoke_cli %w(-D ../../test/test_output)
@@ -178,8 +178,8 @@ context 'Invoker' do
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
     ensure
-      FileUtils::rm_f(sample_outpath)
-      FileUtils::rmdir(destination_path)
+      FileUtils.rm_f(sample_outpath)
+      FileUtils.rmdir(destination_path)
     end
   end
 
@@ -191,7 +191,7 @@ context 'Invoker' do
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
     ensure
-      FileUtils::rm_f(sample_outpath)
+      FileUtils.rm_f(sample_outpath)
     end
   end
 
@@ -206,9 +206,9 @@ context 'Invoker' do
       assert File.exist?(asciidoctor_stylesheet)
       assert File.exist?(coderay_stylesheet)
     ensure
-      FileUtils::rm_f(sample_outpath)
-      FileUtils::rm_f(asciidoctor_stylesheet)
-      FileUtils::rm_f(coderay_stylesheet)
+      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f(asciidoctor_stylesheet)
+      FileUtils.rm_f(coderay_stylesheet)
     end
   end
 
@@ -221,8 +221,8 @@ context 'Invoker' do
       assert File.exist?(sample_outpath)
       assert !File.exist?(default_stylesheet)
     ensure
-      FileUtils::rm_f(sample_outpath)
-      FileUtils::rm_f(default_stylesheet)
+      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f(default_stylesheet)
     end
   end
 
@@ -237,10 +237,10 @@ context 'Invoker' do
       assert File.exist?(sample_outpath)
       assert File.exist?(custom_stylesheet)
     ensure
-      FileUtils::rm_f(sample_outpath)
-      FileUtils::rm_f(custom_stylesheet)
-      FileUtils::rmdir(stylesdir)
-      FileUtils::rmdir(destdir)
+      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f(custom_stylesheet)
+      FileUtils.rmdir(stylesdir)
+      FileUtils.rmdir(destdir)
     end
   end
 
@@ -255,10 +255,10 @@ context 'Invoker' do
       assert File.exist?(sample_outpath)
       assert !File.exist?(custom_stylesheet)
     ensure
-      FileUtils::rm_f(sample_outpath)
-      FileUtils::rm_f(custom_stylesheet)
-      FileUtils::rmdir(stylesdir) if File.directory? stylesdir
-      FileUtils::rmdir(destdir)
+      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f(custom_stylesheet)
+      FileUtils.rmdir(stylesdir) if File.directory? stylesdir
+      FileUtils.rmdir(destdir)
     end
   end
 
@@ -270,8 +270,8 @@ context 'Invoker' do
       assert File.exist?(basic_outpath)
       assert File.exist?(sample_outpath)
     ensure
-      FileUtils::rm_f(basic_outpath)
-      FileUtils::rm_f(sample_outpath)
+      FileUtils.rm_f(basic_outpath)
+      FileUtils.rm_f(sample_outpath)
     end
   end
 
@@ -281,7 +281,7 @@ context 'Invoker' do
       invoke_cli_to_buffer %w(), "ba*.asciidoc"
       assert File.exist?(basic_outpath)
     ensure
-      FileUtils::rm_f(basic_outpath)
+      FileUtils.rm_f(basic_outpath)
     end
   end
 
@@ -297,7 +297,7 @@ context 'Invoker' do
       invoke_cli_to_buffer %w(), glob
       assert File.exist?(basic_outpath)
     ensure
-      FileUtils::rm_f(basic_outpath)
+      FileUtils.rm_f(basic_outpath)
     end
   end
 

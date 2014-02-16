@@ -362,7 +362,7 @@ text
         assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
         assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
       ensure
-        FileUtils::rm(sample_output_path)
+        FileUtils.rm(sample_output_path)
       end
     end
 
@@ -380,7 +380,7 @@ text
         assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
         assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
       ensure
-        FileUtils::rm(sample_output_path)
+        FileUtils.rm(sample_output_path)
       end
     end
 
@@ -401,7 +401,7 @@ text
       rescue => e
         flunk e.message
       ensure
-        FileUtils::rm(sample_output_path, :force => true)
+        FileUtils.rm(sample_output_path, :force => true)
       end
     end
 
@@ -412,7 +412,7 @@ text
         begin
           Asciidoctor.render_file(sample_input_path, :to_file => sample_output_path, :in_place => true)
         ensure
-          FileUtils::rm(sample_output_path) if File.exist? sample_output_path
+          FileUtils.rm(sample_output_path) if File.exist? sample_output_path
         end
       end
     end
@@ -424,7 +424,7 @@ text
         begin
           Asciidoctor.render_file(sample_input_path, :to_dir => '', :in_place => true)
         ensure
-          FileUtils::rm(sample_output_path) if File.exist? sample_output_path
+          FileUtils.rm(sample_output_path) if File.exist? sample_output_path
         end
       end
     end
@@ -438,8 +438,8 @@ text
         Asciidoctor.render_file(sample_input_path, :to_dir => output_dir)
         assert File.exist? sample_output_path
       ensure
-        FileUtils::rm(sample_output_path) if File.exist? sample_output_path
-        FileUtils::rmdir output_dir
+        FileUtils.rm(sample_output_path) if File.exist? sample_output_path
+        FileUtils.rmdir output_dir
       end
     end
 
@@ -451,9 +451,9 @@ text
         Asciidoctor.render_file(sample_input_path, :to_dir => output_dir, :mkdirs => true)
         assert File.exist? sample_output_path
       ensure
-        FileUtils::rm(sample_output_path) if File.exist? sample_output_path
-        FileUtils::rmdir output_dir
-        FileUtils::rmdir File.dirname(output_dir)
+        FileUtils.rm(sample_output_path) if File.exist? sample_output_path
+        FileUtils.rmdir output_dir
+        FileUtils.rmdir File.dirname(output_dir)
       end
     end
 
@@ -468,8 +468,8 @@ text
         Asciidoctor.render_file(sample_input_path, :to_dir => base_dir, :to_file => sample_rel_output_path)
         assert File.exist? sample_output_path
       ensure
-        FileUtils::rm(sample_output_path) if File.exist? sample_output_path
-        FileUtils::rmdir output_dir
+        FileUtils.rm(sample_output_path) if File.exist? sample_output_path
+        FileUtils.rmdir output_dir
       end
     end
   end
