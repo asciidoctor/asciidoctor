@@ -465,12 +465,26 @@ preamble
 
       test 'PreprocessorReader#push_include method should put lines on top of stack' do
         doc = empty_document
-        lines = %(a b c)
+        lines = %w(a b c)
         reader = Asciidoctor::PreprocessorReader.new doc, lines
         append_lines = %w(one two three)
-        reader.push_include append_lines, '<stdin>', '<stdin>'
+        reader.push_include append_lines, '', '<stdin>'
         assert_equal 1, reader.include_stack.size
         assert_equal 'one', reader.read_line.rstrip
+      end
+
+      test 'PreprocessorReader#push_include method should gracefully handle file and path' do
+        doc = empty_document
+        lines = %w(a b c)
+        reader = Asciidoctor::PreprocessorReader.new doc, lines
+        append_lines = %w(one two three)
+        assert_nothing_raised do
+          reader.push_include append_lines
+        end
+        assert_equal 1, reader.include_stack.size
+        assert_equal 'one', reader.read_line.rstrip
+        assert_nil reader.file
+        assert_equal '<stdin>', reader.path
       end
     end
 

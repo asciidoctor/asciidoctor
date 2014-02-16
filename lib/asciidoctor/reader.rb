@@ -979,15 +979,36 @@ class PreprocessorReader < Reader
     end
   end
 
+  # Public: Push source onto the front of the reader and switch the context
+  # based on the file, document-relative path and line information given.
+  #
+  # This method is typically used in an IncludeProcessor to add source
+  # read from the target specified.
+  #
+  # Examples
+  #
+  #    path = 'partial.adoc'
+  #    file = File.expand_path path
+  #    data = IO.read file
+  #    reader.push_include data, file, path
+  #
+  # Returns nothing
   def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
-    @includes << Helpers.rootname(path)
-    @file = file
-    @dir = ::File.dirname file
-    @path = path
+    @includes << Helpers.rootname(path) if path
+    if file
+      @file = file
+      @dir = File.dirname file
+      # only process lines in AsciiDoc files
+      @process_lines = ASCIIDOC_EXTENSIONS[::File.extname(file)]
+    else
+      @file = nil
+      @dir = '.' # right?
+      # we don't know what file type we have, so assume AsciiDoc
+      @process_lines = true
+    end
+    @path = path || '<stdin>'
     @lineno = lineno
-    # NOTE only process lines in AsciiDoc files
-    @process_lines = ASCIIDOC_EXTENSIONS[::File.extname(file)]
     if attributes.has_key? 'depth'
       depth = attributes['depth'].to_i
       depth = 1 if depth <= 0
