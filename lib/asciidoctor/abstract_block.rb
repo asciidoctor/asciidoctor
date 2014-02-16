@@ -28,6 +28,7 @@ class AbstractBlock < AbstractNode
     super
     @content_model = :compound
     @subs = []
+    @default_subs = nil
     @template_name = %(block_#{context})
     @blocks = []
     @id = nil
@@ -200,26 +201,21 @@ class AbstractBlock < AbstractNode
   #
   # returns nothing
   def assign_caption(caption = nil, key = nil)
-    unless title? || @caption.nil?
-      return nil
-    end
+    return unless title? || !@caption
 
-    if caption.nil?
-      if @document.attributes.has_key? 'caption'
-        @caption = @document.attributes['caption']
+    if caption
+      @caption = caption
+    else
+      if (value = @document.attributes['caption'])
+        @caption = value
       elsif title?
         key ||= @context.to_s
         caption_key = "#{key}-caption"
-        if @document.attributes.has_key? caption_key
-          caption_title = @document.attributes["#{key}-caption"]
+        if (caption_title = @document.attributes[caption_key])
           caption_num = @document.counter_increment("#{key}-number", self)
           @caption = "#{caption_title} #{caption_num}. "
         end
-      else
-        @caption = caption
       end
-    else
-      @caption = caption
     end
     nil
   end

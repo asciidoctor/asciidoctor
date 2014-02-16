@@ -531,8 +531,8 @@ module Substitutors
     # FIXME this location is somewhat arbitrary, probably need to be able to control ordering
     # TODO this handling needs some cleanup
     if (extensions = @document.extensions) && extensions.inline_macros? && found[:macroish]
-      extensions.load_inline_macro_processors(@document).each do |processor|
-        result = result.gsub(processor.regexp) {
+      extensions.inline_macros.each do |extension|
+        result = result.gsub(extension.config[:regexp]) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -541,13 +541,16 @@ module Substitutors
           end
 
           target = m[1]
-          if processor.options[:short_form]
-            attributes = {}
+          attributes = if extension.config[:format] == :short
+            {}
           else
-            posattrs = processor.options.fetch(:pos_attrs, [])
-            attributes = parse_attributes(m[2], posattrs, :sub_input => true, :unescape_input => true)
+            if extension.config[:content_model] == :attributes
+              parse_attributes m[2], (extension.config[:pos_attrs] || []), :sub_input => true, :unescape_input => true
+            else
+              { 'text' => (unescape_bracketed_text m[2]) }
+            end
           end
-          processor.process self, target, attributes
+          extension.process_method[self, target, attributes]
         }
       end
     end
@@ -982,7 +985,7 @@ module Substitutors
   #
   # returns nil if str is nil, an empty Hash if str is empty, otherwise a Hash of attributes (role and id only)
   def parse_quoted_text_attributes(str)
-    return nil unless str
+    return unless str
     return {} if str.empty?
     str = sub_attributes(str) if str.include?('{')
     str = str.strip
@@ -1026,7 +1029,7 @@ module Substitutors
   #
   # returns nil if attrline is nil, an empty Hash if attrline is empty, otherwise a Hash of parsed attributes
   def parse_attributes(attrline, posattrs = ['role'], opts = {})
-    return nil unless attrline
+    return unless attrline
     return {} if attrline.empty?
     attrline = @document.sub_attributes(attrline) if opts[:sub_input]
     attrline = unescape_bracketed_text(attrline) if opts[:unescape_input]
@@ -1313,22 +1316,25 @@ module Substitutors
   #
   # Returns nothing
   def lock_in_subs
-    default_subs = []
-    case @content_model
-    when :simple
-      default_subs = SUBS[:normal]
-    when :verbatim
-      if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
-        default_subs = SUBS[:verbatim]
-      elsif @context == :verse
-        default_subs = SUBS[:normal]
-      else
-        default_subs = SUBS[:basic]
-      end
-    when :raw
-      default_subs = SUBS[:pass]
+    default_subs = if @default_subs
+      @default_subs
     else
-      return
+      case @content_model
+      when :simple
+        SUBS[:normal]
+      when :verbatim
+        if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
+          SUBS[:verbatim]
+        elsif @context == :verse
+          SUBS[:normal]
+        else
+          SUBS[:basic]
+        end
+      when :raw
+        SUBS[:pass]
+      else
+        return
+      end
     end
 
     if (custom_subs = @attributes['subs'])

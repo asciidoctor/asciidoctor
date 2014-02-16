@@ -732,48 +732,6 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
         result = xmlnodes_at_xpath('//pre', output, 1).text
         assert_equal "<year>2013</year>\n<holder>Acme™, Inc.</holder>", result
       end
-  
-      test 'include processor is called to process include directive' do
-        input = <<-EOS
-first line
-
-include::include-file.asciidoc[]
-
-last line
-        EOS
-
-        include_processor = Class.new {
-          def initialize document
-          end
-
-          def handles? target
-            true
-          end
-
-          def process reader, target, attributes
-            # demonstrate that push_include normalizes endlines
-            content = ["include target:: #{target}\n", "\n", "middle line\n"]
-            reader.push_include content, target, target, 1, attributes
-          end
-        }
-
-        # Safe Mode is not required
-        document = empty_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new document, input
-        reader.instance_variable_set '@include_processors', [include_processor.new(document)]
-        lines = []
-        lines << reader.read_line
-        lines << reader.read_line
-        lines << reader.read_line
-        assert_equal 'include target:: include-file.asciidoc', lines.last
-        assert_equal 'include-file.asciidoc: line 2', reader.line_info
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        source = lines * ::Asciidoctor::EOL
-        assert_match(/^include target:: include-file.asciidoc$/, source)
-        assert_match(/^middle line$/, source)
-      end
 
       test 'should fall back to built-in include directive behavior when not handled by include processor' do
         input = <<-EOS

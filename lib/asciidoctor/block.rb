@@ -8,6 +8,20 @@ module Asciidoctor
 #   => "<em>This</em> is a &lt;test&gt;"
 class Block < AbstractBlock
 
+  DEFAULT_CONTENT_MODEL = ::Hash.new(:simple).merge({
+    # TODO should probably fill in all known blocks
+    :audio      => :empty,
+    :image      => :empty,
+    :listing    => :verbatim,
+    :literal    => :verbatim,
+    :math       => :raw,
+    :open       => :compound,
+    :page_break => :empty,
+    :pass       => :raw,
+    :ruler      => :empty,
+    :video      => :empty
+  })
+
   # Public: Create alias for context to be consistent w/ AsciiDoc
   alias :blockname :context
 
@@ -27,10 +41,19 @@ class Block < AbstractBlock
   # QUESTION should we store source_data as lines for blocks that have compound content models?
   def initialize(parent, context, opts = {})
     super(parent, context)
-    @content_model = opts[:content_model] || :simple
+    @content_model = opts[:content_model] || DEFAULT_CONTENT_MODEL[context]
     @attributes = opts[:attributes] || {}
-    @subs = opts[:subs] || []
-    raw_source = opts.fetch(:source, nil) || nil
+    if opts.has_key? :subs
+      # FIXME this is a bit funky
+      # we have to be defensive to avoid lock_in_subs wiping out the override
+      if !(subs = opts[:subs]) || (subs.is_a? ::Array)
+        @subs = subs || []
+        @default_subs = @subs.dup
+        @attributes.delete('subs')
+      else
+        @attributes['subs'] = %(#{subs})
+      end
+    end
     if !(raw_source = opts[:source])
       @lines = []
     elsif raw_source.is_a? ::String

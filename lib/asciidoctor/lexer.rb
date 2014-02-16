@@ -50,7 +50,7 @@ class Lexer
     unless options[:header_only]
       while reader.has_more_lines?
         new_section, block_attributes = next_section(reader, document, block_attributes)
-        document << new_section unless new_section.nil?
+        document << new_section if new_section
       end
       # NOTE we could try to avoid creating a preamble in the first place, though
       # that would require reworking assumptions in next_section since the preamble
@@ -112,7 +112,7 @@ class Lexer
       end
       document.attributes['doctitle'] = section_title = doctitle
       # QUESTION: should the id assignment on Document be encapsulated in the Document class?
-      if document.id.nil?
+      unless document.id
         document.id = block_attributes.delete('id')
       end
       parse_header_metadata(reader, document)
@@ -280,7 +280,7 @@ class Lexer
         if next_level > current_level || (section.context == :document && next_level == 0)
           if next_level == 0 && doctype != 'book'
             warn %(asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections)
-          elsif !expected_next_levels.nil? && !expected_next_levels.include?(next_level)
+          elsif expected_next_levels && !expected_next_levels.include?(next_level)
             warn %(asciidoctor: WARNING: #{reader.line_info}: section title out of sequence: ) +
                 %(expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, ) +
                 %(got level #{next_level})
@@ -298,8 +298,7 @@ class Lexer
       else
         # just take one block or else we run the risk of overrunning section boundaries
         block_line_info = reader.line_info
-        new_block = next_block(reader, (intro || section), attributes, :parse_metadata => false)
-        unless new_block.nil?
+        if (new_block = next_block reader, (intro || section), attributes, :parse_metadata => false)
           # REVIEW this may be doing too much
           if part
             if !section.blocks?
@@ -405,13 +404,12 @@ class Lexer
     skipped = reader.skip_blank_lines
 
     # bail if we've reached the end of the parent block or document
-    return nil unless reader.has_more_lines?
+    return unless reader.has_more_lines?
 
-    text_only = options[:text]
     # check for option to find list item text only
     # if skipped a line, assume a list continuation was
     # used and block content is acceptable
-    if text_only && skipped > 0
+    if (text_only = options[:text]) && skipped > 0
       options.delete(:text)
       text_only = false
     end
@@ -422,9 +420,9 @@ class Lexer
     document = parent.document
     if (extensions = document.extensions)
       block_extensions = extensions.blocks?
-      macro_extensions = extensions.block_macros?
+      block_macro_extensions = extensions.block_macros?
     else
-      block_extensions = macro_extensions = false
+      block_extensions = block_macro_extensions = false
     end
     #parent_context = parent.is_a?(Block) ? parent.context : nil
     in_list = (parent.is_a? List)
@@ -432,12 +430,12 @@ class Lexer
     style = nil
     explicit_style = nil
 
-    while reader.has_more_lines? && block.nil?
+    while !block && reader.has_more_lines?
       # if parsing metadata, read until there is no more to read
       if parse_metadata && parse_block_metadata_line(reader, document, attributes, options)
         reader.advance
         next
-      #elsif parse_sections && parent_context.nil? && is_next_line_section?(reader, attributes)
+      #elsif parse_sections && !parent_context && is_next_line_section?(reader, attributes)
       #  block, attributes = next_section(reader, parent, attributes)
       #  break
       end
@@ -453,7 +451,7 @@ class Lexer
         style, explicit_style = parse_style_attribute(attributes, reader)
       end
 
-      if delimited_blk_match = is_delimited_block?(this_line, true)
+      if (delimited_blk_match = is_delimited_block? this_line, true)
         delimited_block = true
         block_context = cloaked_context = delimited_blk_match.context
         terminator = delimited_blk_match.terminator
@@ -464,7 +462,7 @@ class Lexer
             block_context = style.to_sym
           elsif delimited_blk_match.masq.include?('admonition') && ADMONITION_STYLES.include?(style)
             block_context = :admonition
-          elsif block_extensions && extensions.processor_registered_for_block?(style, block_context)
+          elsif block_extensions && extensions.registered_for_block?(style, block_context)
             block_context = style.to_sym
           else
             warn %(asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for #{block_context} block: #{style})
@@ -473,7 +471,7 @@ class Lexer
         end
       end
 
-      if !delimited_block
+      unless delimited_block
 
         # this loop only executes once; used for flow control
         # break once a block is found or at end of loop
@@ -482,7 +480,7 @@ class Lexer
         while true
 
           # process lines verbatim
-          if !style.nil? && Compliance.strict_verbatim_paragraphs && VERBATIM_STYLES.include?(style)
+          if style && Compliance.strict_verbatim_paragraphs && VERBATIM_STYLES.include?(style)
             block_context = style.to_sym
             reader.unshift_line this_line
             # advance to block parsing =>
@@ -509,7 +507,7 @@ class Lexer
                 posattrs = []
               end
 
-              unless style.nil? || explicit_style
+              unless !style || explicit_style
                 attributes['alt'] = style if blk_ctx == :image
                 attributes.delete('style')
                 style = nil
@@ -522,29 +520,31 @@ class Lexer
                   :into => attributes)
               target = block.sub_attributes(match[2], :attribute_missing => 'drop-line')
               if target.empty?
+                # retain as unparsed if attribute-missing is skip
                 if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
-                  # retain as unparsed
-                  return Block.new(parent, :paragraph, :source => [this_line])
+                  return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
+                # otherwise, drop the line
                 else
-                  # drop the line if target resolves to nothing
-                  return nil
+                  attributes.clear
+                  return
                 end
               end
 
               attributes['target'] = target
-              block.title = attributes.delete('title') if attributes.has_key?('title')
-              if blk_ctx == :image
-                if attributes.has_key? 'scaledwidth'
-                  # append % to scaledwidth if ends in number (no units present)
-                  if (48..57).include?((attributes['scaledwidth'][-1] || 0).ord)
-                    attributes['scaledwidth'] = %(#{attributes['scaledwidth']}%)
-                  end
-                end
-                document.register(:images, target)
-                attributes['alt'] ||= ::File.basename(target, ::File.extname(target)).tr('_-', ' ')
-                # QUESTION should video or audio have an auto-numbered caption?
-                block.assign_caption attributes.delete('caption'), 'figure'
-              end
+              # now done down below
+              #block.title = attributes.delete('title') if attributes.has_key?('title')
+              #if blk_ctx == :image
+              #  if attributes.has_key? 'scaledwidth'
+              #    # append % to scaledwidth if ends in number (no units present)
+              #    if (48..57).include?((attributes['scaledwidth'][-1] || 0).ord)
+              #      attributes['scaledwidth'] = %(#{attributes['scaledwidth']}%)
+              #    end
+              #  end
+              #  document.register(:images, target)
+              #  attributes['alt'] ||= ::File.basename(target, ::File.extname(target)).tr('_-', ' ')
+              #  # QUESTION should video or audio have an auto-numbered caption?
+              #  block.assign_caption attributes.delete('caption'), 'figure'
+              #end
               break
 
             # NOTE we're letting the toc macro have attributes
@@ -553,21 +553,27 @@ class Lexer
               block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
               break
 
-            elsif macro_extensions && (match = GenericBlockMacroRx.match(this_line)) &&
-                extensions.processor_registered_for_block_macro?(match[1])
-              name = match[1]
+            elsif block_macro_extensions && (match = GenericBlockMacroRx.match(this_line)) &&
+                (extension = extensions.registered_for_block_macro?(match[1]))
               target = match[2]
               raw_attributes = match[3]
-              processor = extensions.load_block_macro_processor name, document
-              unless raw_attributes.empty?
-                document.parse_attributes(raw_attributes, processor.options.fetch(:pos_attrs, []),
-                    :sub_input => true, :sub_result => false, :into => attributes)
+              if extension.config[:content_model] == :attributes
+                unless raw_attributes.empty?
+                  document.parse_attributes(raw_attributes, (extension.config[:pos_attrs] || []),
+                      :sub_input => true, :sub_result => false, :into => attributes)
+                end
+              else
+                attributes['text'] = raw_attributes
               end
-              if !(default_attrs = processor.options.fetch(:default_attrs, {})).empty?
+              if (default_attrs = extension.config[:default_attrs])
                 default_attrs.each {|k, v| attributes[k] ||= v }
               end
-              block = processor.process parent, target, attributes
-              return nil if block.nil?
+              if (block = extension.process_method[parent, target, attributes.dup])
+                attributes.replace block.attributes
+              else
+                attributes.clear
+                return
+              end
               break
             end
           end
@@ -586,7 +592,7 @@ class Lexer
               end
               list_item = next_list_item(reader, block, match)
               expected_index += 1
-              if !list_item.nil?
+              if list_item
                 block << list_item
                 coids = document.callouts.callout_ids(block.items.size)
                 if !coids.empty?
@@ -662,7 +668,7 @@ class Lexer
               reader.unshift_line this_line
               # advance to block parsing =>
               break
-            elsif block_extensions && extensions.processor_registered_for_block?(style, :paragraph)
+            elsif block_extensions && extensions.registered_for_block?(style, :paragraph)
               block_context = style.to_sym
               cloaked_context = :paragraph
               reader.unshift_line this_line
@@ -722,7 +728,7 @@ class Lexer
             if lines.empty?
               # call advance since the reader preserved the last line
               reader.advance
-              return nil
+              return
             end
 
             catalog_inline_anchors(lines.join(EOL), document)
@@ -733,7 +739,7 @@ class Lexer
               attributes['style'] = admonition_match[1]
               attributes['name'] = admonition_name = admonition_match[1].downcase
               attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
-              block = Block.new(parent, :admonition, :source => lines, :attributes => attributes)
+              block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
             elsif !text_only && Compliance.markdown_syntax && first_line.start_with?('> ')
               lines.map! {|line|
                 if line == '>'
@@ -752,8 +758,8 @@ class Lexer
                 attribution, citetitle = nil
               end
               attributes['style'] = 'quote'
-              attributes['attribution'] = attribution unless attribution.nil?
-              attributes['citetitle'] = citetitle unless citetitle.nil?
+              attributes['attribution'] = attribution if attribution
+              attributes['citetitle'] = citetitle if citetitle
               # NOTE will only detect headings that are floating titles (not section titles)
               # TODO could assume a floating title when inside a block context
               # FIXME Reader needs to be created w/ line info
@@ -766,11 +772,9 @@ class Lexer
               # strip trailing quote
               lines[-1] = lines[-1].chop
               attributes['style'] = 'quote'
-              attributes['attribution'] = attribution unless attribution.nil?
-              attributes['citetitle'] = citetitle unless citetitle.nil?
-              block = Block.new(parent, :quote, :source => lines, :attributes => attributes)
-              #block = Block.new(parent, :quote, :content_model => :compound, :attributes => attributes)
-              #block << Block.new(block, :paragraph, :source => lines)
+              attributes['attribution'] = attribution if attribution
+              attributes['citetitle'] = citetitle if citetitle
+              block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
             else
               # if [normal] is used over an indented paragraph, unindent it
               if style == 'normal' && ((first_char = lines[0].chr) == ' ' || first_char == TAB)
@@ -784,7 +788,7 @@ class Lexer
                 end
               end
 
-              block = Block.new(parent, :paragraph, :source => lines, :attributes => attributes)
+              block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
             end
           end
 
@@ -794,7 +798,7 @@ class Lexer
       end
 
       # either delimited block or styled paragraph
-      if block.nil? && !block_context.nil?
+      if !block && block_context
         # abstract and partintro should be handled by open block
         # FIXME kind of hackish...need to sort out how to generalize this
         block_context = :open if block_context == :abstract || block_context == :partintro
@@ -807,10 +811,10 @@ class Lexer
 
         when :comment
           build_block(block_context, :skip, terminator, parent, reader, attributes)
-          return nil
+          return
 
         when :example
-          block = build_block(block_context, :compound, terminator, parent, reader, attributes, {:supports_caption => true})
+          block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :listing, :fenced_code, :source
           if block_context == :fenced_code
@@ -824,7 +828,7 @@ class Lexer
           elsif block_context == :source
             AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
           end
-          block = build_block(:listing, :verbatim, terminator, parent, reader, attributes, {:supports_caption => true})
+          block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
 
         when :literal
           block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
@@ -857,19 +861,21 @@ class Lexer
           block = build_block(block_context, (block_context == :verse ? :verbatim : :compound), terminator, parent, reader, attributes)
 
         else
-          if block_extensions && extensions.processor_registered_for_block?(block_context, cloaked_context)
-            processor = extensions.load_block_processor block_context, document
-            
-            if (content_model = processor.options[:content_model]) != :skip
-              if !(pos_attrs = processor.options.fetch(:pos_attrs, [])).empty?
+          if block_extensions && (extension = extensions.registered_for_block?(block_context, cloaked_context))
+            # TODO pass cloaked_context to extension somehow (perhaps a new instance for each cloaked_context?)
+            if (content_model = extension.config[:content_model]) != :skip
+              if !(pos_attrs = extension.config[:pos_attrs] || []).empty?
                 AttributeList.rekey(attributes, [nil].concat(pos_attrs))
               end
-              if !(default_attrs = processor.options.fetch(:default_attrs, {})).empty?
+              if (default_attrs = extension.config[:default_attrs])
                 default_attrs.each {|k, v| attributes[k] ||= v }
               end
             end
-            block = build_block(block_context, content_model, terminator, parent, reader, attributes, :processor => processor)
-            return nil if block.nil?
+            block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
+            unless block && content_model != :skip
+              attributes.clear
+              return
+            end
           else
             # this should only happen if there's a misconfiguration
             raise %(Unsupported block type #{block_context} at #{reader.line_info})
@@ -882,10 +888,25 @@ class Lexer
     # blocks or trailing attribute lists could leave us without a block,
     # so handle accordingly
     # REVIEW we may no longer need this nil check
-    unless block.nil?
+    # FIXME we've got to clean this up, it's horrible!
+    if block
       # REVIEW seems like there is a better way to organize this wrap-up
       block.title     = attributes['title'] unless block.title?
-      block.caption ||= attributes.delete('caption')
+      # FIXME HACK don't hardcode logic for alt, caption and scaledwidth on images down here
+      if block.context == :image
+        resolved_target = attributes['target']
+        block.document.register(:images, resolved_target)
+        attributes['alt'] ||= ::File.basename(resolved_target, ::File.extname(resolved_target)).tr('_-', ' ')
+        block.assign_caption attributes.delete('caption'), 'figure'
+        if (scaledwidth = attributes['scaledwidth'])
+          # append % to scaledwidth if ends in number (no units present)
+          if (48..57).include?((scaledwidth[-1] || 0).ord)
+            attributes['scaledwidth'] = %(#{scaledwidth}%)
+          end
+        end
+      else
+        block.caption ||= attributes.delete('caption')
+      end
       # TODO eventualy remove the style attribute from the attributes hash
       #block.style     = attributes.delete('style')
       block.style     = attributes['style']
@@ -895,7 +916,8 @@ class Lexer
         # TODO sub reftext
         document.register(:ids, [block_id, (attributes['reftext'] || (block.title? ? block.title : nil))])
       end
-      block.update_attributes(attributes)
+      # FIXME remove the need for this update!
+      block.attributes.update(attributes) unless attributes.empty?
       block.lock_in_subs
 
       #if document.attributes.has_key? :pending_attribute_entries
@@ -920,7 +942,7 @@ class Lexer
   # returns the match data if this line is the first line of a delimited block or nil if not
   def self.is_delimited_block? line, return_match_data = false
     # highly optimized for best performance
-    return nil unless (line_len = line.length) > 1 && (DELIMITED_BLOCK_LEADERS.include? line[0..1])
+    return unless (line_len = line.length) > 1 && (DELIMITED_BLOCK_LEADERS.include? line[0..1])
     # catches open block
     if line_len == 2
       tip = line
@@ -942,14 +964,14 @@ class Lexer
         tip_3 = (tl == 4 ? tip.chop : tip)
         if tip_3 == '```'
           if tl == 4 && tip.end_with?('`')
-            return nil
+            return
           end
           tip = tip_3
           tl = 3
           fenced_code = true
         elsif tip_3 == '~~~'
           if tl == 4 && tip.end_with?('~')
-            return nil
+            return
           end
           tip = tip_3
           tl = 3
@@ -958,7 +980,7 @@ class Lexer
       end
 
       # short circuit if not a fenced code block
-      return nil if tl == 3 && !fenced_code
+      return if tl == 3 && !fenced_code
     end
 
     if DELIMITED_BLOCKS.has_key? tip
@@ -1036,24 +1058,37 @@ class Lexer
 
     if content_model == :skip
       attributes.clear
+      # FIXME we shouldn't be mixing return types
       return lines
     end
 
-    if content_model == :verbatim && attributes.has_key?('indent')
-      reset_block_indent! lines, attributes['indent'].to_i
+    if content_model == :verbatim && (indent = attributes['indent'])
+      reset_block_indent! lines, indent.to_i
     end
 
-    if (processor = options[:processor])
+    if (extension = options[:extension])
+      # QUESTION do we want to delete the style?
       attributes.delete('style')
-      processor.options[:content_model] = content_model
-      block = processor.process(parent, block_reader || Reader.new(lines), attributes)
+      if (block = extension.process_method[parent, block_reader || (Reader.new lines), attributes.dup])
+        attributes.replace block.attributes
+        # FIXME if the content model is set to compound, but we only have simple in this context, then
+        # forcefully set the content_model to simple to prevent parsing blocks from children
+        # TODO document this behavior!!
+        if block.content_model == :compound && !(lines = block.lines).nil_or_empty?
+          content_model = :compound
+          block_reader = Reader.new lines
+        end
+      else
+        # FIXME need a test to verify this returns nil at the right time
+        return
+      end
     else
-      block = Block.new(parent, block_context, :content_model => content_model, :attributes => attributes, :source => lines)
+      block = Block.new(parent, block_context, :content_model => content_model, :source => lines, :attributes => attributes)
     end
 
-    # should supports_caption be necessary?
-    if options.fetch(:supports_caption, false)
-      block.title = attributes.delete('title') if attributes.has_key?('title')
+    # QUESTION should we have an explicit map or can we rely on check for *-caption attribute?
+    if (attributes.has_key? 'title') && (block.document.attr? %(#{block.context}-caption))
+      block.title = attributes.delete 'title'
       block.assign_caption attributes.delete('caption')
     end
 
@@ -1079,7 +1114,7 @@ class Lexer
   def self.parse_blocks(reader, parent)
     while reader.has_more_lines?
       block = Lexer.next_block(reader, parent)
-      parent << block unless block.nil?
+      parent << block if block
     end
   end
 
@@ -1131,7 +1166,7 @@ class Lexer
         list_block.items[-1] << next_block(reader, list_block)
       end
 
-      list_block << list_item unless list_item.nil?
+      list_block << list_item if list_item
       list_item = nil
 
       reader.skip_blank_lines
@@ -1178,7 +1213,7 @@ class Lexer
         reftext = m[2] || m[4]
         # enable if we want to allow double quoted values
         #id = id.sub(DoubleQuotedRx, '\2')
-        #if !reftext.nil?
+        #if reftext
         #  reftext = reftext.sub(DoubleQuotedMultiRx, '\2')
         #end
         document.register(:ids, [id, reftext])
@@ -1301,7 +1336,7 @@ class Lexer
       # list
       while list_item_reader.has_more_lines?
         new_block = next_block(list_item_reader, list_block, {}, options)
-        list_item << new_block unless new_block.nil?
+        list_item << new_block if new_block
       end
 
       list_item.fold_first(continuation_connects_first_block, content_adjacent)
@@ -1488,7 +1523,7 @@ class Lexer
       this_line = nil
     end
 
-    reader.unshift_line this_line if !this_line.nil?
+    reader.unshift_line this_line if this_line
 
     if detached_continuation
       buffer.delete_at detached_continuation
@@ -1539,7 +1574,7 @@ class Lexer
       section.sectname = %(sect#{section.level})
     end
 
-    if section.id.nil? && (id = attributes['id'])
+    if !section.id && (id = attributes['id'])
       section.id = id
     else
       # generate an id if one was not *embedded* in the heading line
@@ -1757,7 +1792,7 @@ class Lexer
       author_metadata = process_authors reader.read_line
 
       unless author_metadata.empty?
-        if !document.nil?
+        if document
           # apply header subs and assign to document
           author_metadata.each do |key, val|
             unless document.attributes.has_key? key
@@ -1790,7 +1825,7 @@ class Lexer
       end
 
       unless rev_metadata.empty?
-        if !document.nil?
+        if document
           # apply header subs and assign to document
           rev_metadata.each do |key, val|
             unless document.attributes.has_key? key
@@ -1808,7 +1843,7 @@ class Lexer
       reader.skip_blank_lines
     end
 
-    if !document.nil?
+    if document
       # process author attribute entries that override (or stand in for) the implicit author line
       author_metadata = nil
       if document.attributes.has_key?('author') &&
@@ -1835,7 +1870,7 @@ class Lexer
         end
       end
 
-      unless author_metadata.nil?
+      if author_metadata
         document.attributes.update author_metadata
 
         # special case
@@ -2021,7 +2056,7 @@ class Lexer
         end
       end
 
-      store_attribute(name, value, parent.nil? ? nil : parent.document, attributes)
+      store_attribute(name, value, (parent ? parent.document : nil), attributes)
       true
     else
       false
@@ -2049,7 +2084,7 @@ class Lexer
 
     name = sanitize_attribute_name(name)
     accessible = true
-    unless doc.nil?
+    if doc
       accessible = value.nil? ? doc.delete_attribute(name) : doc.set_attribute(name, value)
     end
 
@@ -2190,8 +2225,10 @@ class Lexer
   # returns an instance of Asciidoctor::Table parsed from the provided reader
   def self.next_table(table_reader, parent, attributes)
     table = Table.new(parent, attributes)
-    table.title = attributes.delete('title') if attributes.has_key?('title')
-    table.assign_caption attributes.delete('caption')
+    if (attributes.has_key? 'title')
+      table.title = attributes.delete 'title'
+      table.assign_caption attributes.delete('caption')
+    end
 
     if attributes.has_key? 'cols'
       table.create_columns(parse_col_specs(attributes['cols']))
@@ -2546,7 +2583,7 @@ class Lexer
   #--
   # FIXME refactor gsub matchers into compiled regex
   def self.reset_block_indent!(lines, indent = 0)
-    return if indent.nil? || lines.empty?
+    return if !indent || lines.empty?
 
     tab_detected = false
     # TODO make tab size configurable

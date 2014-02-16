@@ -23,6 +23,7 @@ module Asciidoctor
         self[:eruby] = options[:eruby] || nil
         self[:compact] = options[:compact] || false
         self[:verbose] = options[:verbose] || 1
+        self[:requires] = options[:requires] || nil
         self[:base_dir] = options[:base_dir]
         self[:destination_dir] = options[:destination_dir] || nil
         self[:trace] = false
@@ -108,6 +109,11 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-D', '--destination-dir DIR', 'destination output directory (default: directory of source file)') do |dest_dir|
             self[:destination_dir] = dest_dir
           end
+          opts.on('-r', '--require LIBRARY', ::Array,
+              'require the specified library before executing the processor (calls Kernel::require)',
+              'may be specified more than once') do |paths|
+            self[:requires] = paths
+          end
           opts.on('-q', '--quiet', 'suppress warnings (default: false)') do |verbose|
             self[:verbose] = 0
           end
@@ -176,7 +182,7 @@ Example: asciidoctor -b html5 source.asciidoc
 
           self[:input_files] = infiles
 
-          if !self[:template_dirs].nil?
+          if self[:template_dirs]
             begin
               require 'tilt'
             rescue ::LoadError
@@ -185,12 +191,27 @@ Example: asciidoctor -b html5 source.asciidoc
             end
           end
 
+          if (requires = self[:requires])
+            requires.each do |path|
+              begin
+                require path
+              rescue ::LoadError => e
+                raise e if self[:trace]
+                $stderr.puts %(asciidoctor: FAILED: '#{path}' could not be loaded)
+                $stderr.puts '  Use --trace for backtrace'
+                return 1
+              rescue ::SystemExit
+                # not permitted here
+              end
+            end
+          end
+
         rescue ::OptionParser::MissingArgument
-          $stderr.puts "asciidoctor: option #{$!.message}"
+          $stderr.puts %(asciidoctor: option #{$!.message})
           $stdout.puts opts_parser
           return 1
         rescue ::OptionParser::InvalidOption, ::OptionParser::InvalidArgument
-          $stderr.puts "asciidoctor: #{$!.message}"
+          $stderr.puts %(asciidoctor: #{$!.message})
           $stdout.puts opts_parser
           return 1
         end

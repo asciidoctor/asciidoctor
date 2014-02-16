@@ -733,7 +733,9 @@ module Asciidoctor
     # 
     #   gist::123456[]
     #
-    GenericBlockMacroRx = /^(\w[\w\-]*)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/
+    #--
+    # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
+    GenericBlockMacroRx = /^(\w[\w\-]*)::(\S*?)\[((?:\\\]|[^\]])*?)\]$/
 
     # Matches an image, video or audio block macro.
     #

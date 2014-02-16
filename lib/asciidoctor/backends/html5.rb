@@ -634,8 +634,8 @@ class BlockOpenTemplate < BaseTemplate
         warn 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
         ''
       else
-        %(<div#{id && " id=\"#{id}\""} class="quoteblock abstract#{role && " #{role}"}">#{title &&
-"<div class=\"title\">#{title}</div>"}
+        %(<div#{id && " id=\"#{id}\""} class="quoteblock abstract#{role && " #{role}"}">#{title && "
+<div class=\"title\">#{title}</div>"}
 <blockquote>
 #{content}
 </blockquote>
@@ -645,8 +645,8 @@ class BlockOpenTemplate < BaseTemplate
       warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a book part. Excluding block content.'
       ''
     else
-      %(<div#{id && " id=\"#{id}\""} class="openblock#{style != 'open' ? " #{style}" : ''}#{role && " #{role}"}">#{title &&
-"<div class=\"title\">#{title}</div>"}
+      %(<div#{id && " id=\"#{id}\""} class="openblock#{style && style != 'open' ? " #{style}" : ''}#{role && " #{role}"}">#{title && "
+<div class=\"title\">#{title}</div>"}
 <div class="content">
 #{content}
 </div>
