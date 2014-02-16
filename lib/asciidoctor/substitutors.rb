@@ -373,7 +373,7 @@ module Substitutors
           case directive
           when 'set'
             args = expr.split(':')
-            _, value = Lexer::store_attribute(args[0], args[1] || '', @document)
+            _, value = Parser.store_attribute(args[0], args[1] || '', @document)
             unless value
               # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
               if @document.attributes.fetch('attribute-undefined', Compliance.attribute_undefined) == 'drop-line'

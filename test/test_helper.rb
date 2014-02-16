@@ -177,7 +177,7 @@ class Test::Unit::TestCase
 
   def parse_header_metadata(source)
     reader = Asciidoctor::Reader.new source.split ::Asciidoctor::EOL
-    [::Asciidoctor::Lexer.parse_header_metadata(reader), reader]
+    [::Asciidoctor::Parser.parse_header_metadata(reader), reader]
   end
 
   def assign_default_test_options(opts)

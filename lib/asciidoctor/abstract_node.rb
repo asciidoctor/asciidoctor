@@ -378,7 +378,7 @@ class AbstractNode
 
   # Public: Normalize the web page using the PathResolver.
   #
-  # See PathResolver::web_path(target, start) for details.
+  # See {PathResolver.web_path} for details.
   #
   # target - the String target path
   # start  - the String start (i.e, parent) path (optional, default: nil)
@@ -391,7 +391,7 @@ class AbstractNode
   # Public: Resolve and normalize a secure path from the target and start paths
   # using the PathResolver.
   #
-  # See PathResolver::system_path(target, start, jail, opts) for details.
+  # See {PathResolver.system_path} for details.
   #
   # The most important functionality in this method is to prevent resolving a
   # path outside of the jail (which defaults to the directory of the source

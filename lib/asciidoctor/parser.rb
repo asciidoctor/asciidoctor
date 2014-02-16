@@ -1,11 +1,11 @@
 module Asciidoctor
 # Public: Methods to parse lines of AsciiDoc into an object hierarchy
 # representing the structure of the document. All methods are class methods and
-# should be invoked from the Lexer class. The main entry point is ::next_block.
-# No Lexer instances shall be discovered running around. (Any attempt to
-# instantiate a Lexer will be futile).
+# should be invoked from the Parser class. The main entry point is ::next_block.
+# No Parser instances shall be discovered running around. (Any attempt to
+# instantiate a Parser will be futile).
 #
-# The object hierarchy created by the Lexer consists of zero or more Section
+# The object hierarchy created by the Parser consists of zero or more Section
 # and Block objects. Section objects may be nested and a Section object
 # contains zero or more Block objects. Block objects may be nested, but may
 # only contain other Block objects. Block objects which represent lists may
@@ -14,18 +14,18 @@ module Asciidoctor
 # Examples
 #
 #   # Create a Reader for the AsciiDoc lines and retrieve the next block from it.
-#   # Lexer::next_block requires a parent, so we begin by instantiating an empty Document.
+#   # Parser.next_block requires a parent, so we begin by instantiating an empty Document.
 #
 #   doc = Document.new
 #   reader = Reader.new lines
-#   block = Lexer.next_block(reader, doc)
+#   block = Parser.next_block(reader, doc)
 #   block.class
 #   # => Asciidoctor::Block
-class Lexer
+class Parser
 
   BlockMatchData = Struct.new :context, :masq, :tip, :terminator
 
-  # Public: Make sure the Lexer object doesn't get initialized.
+  # Public: Make sure the Parser object doesn't get initialized.
   #
   # Raises RuntimeError if this constructor is invoked.
   def initialize
@@ -34,7 +34,7 @@ class Lexer
 
   # Public: Parses AsciiDoc source read from the Reader into the Document
   #
-  # This method is the main entry-point into the Lexer when parsing a full document.
+  # This method is the main entry-point into the Parser when parsing a full document.
   # It first looks for and, if found, processes the document title. It then
   # proceeds to iterate through the lines in the Reader, parsing the document
   # into nested Sections and Blocks.
@@ -204,10 +204,10 @@ class Lexer
   #   # and hold attributes extracted from header
   #   doc = Document.new
   #
-  #   Lexer.next_section(reader, doc).first.title
+  #   Parser.next_section(reader, doc).first.title
   #   # => "Greetings"
   #
-  #   Lexer.next_section(reader, doc).first.title
+  #   Parser.next_section(reader, doc).first.title
   #   # => "Salutations"
   #
   # returns a two-element Array containing the Section and Hash of orphaned attributes
@@ -1103,7 +1103,7 @@ class Lexer
 
   # Public: Parse blocks from this reader until there are no more lines.
   #
-  # This method calls Lexer#next_block until there are no more lines in the
+  # This method calls Parser#next_block until there are no more lines in the
   # Reader. It does not consider sections because it's assumed the Reader only
   # has lines which are within a delimited block region.
   #
@@ -1113,7 +1113,7 @@ class Lexer
   # Returns nothing.
   def self.parse_blocks(reader, parent)
     while reader.has_more_lines?
-      block = Lexer.next_block(reader, parent)
+      block = Parser.next_block(reader, parent)
       parent << block if block
     end
   end
@@ -2138,7 +2138,7 @@ class Lexer
   # Examples
   #
   #  marker = 'B.'
-  #  Lexer::resolve_ordered_list_marker(marker, 1, true)
+  #  Parser.resolve_ordered_list_marker(marker, 1, true)
   #  # => 'A.'
   #
   # Returns the String of the first marker in this number series 
@@ -2571,10 +2571,10 @@ class Lexer
   #   source.split("\n")
   #   # => ["    def names", "      @names.split ' '", "    end"]
   #
-  #   Lexer.reset_block_indent(source.split "\n")
+  #   Parser.reset_block_indent(source.split "\n")
   #   # => ["def names", "  @names.split ' '", "end"]
   #
-  #   puts Lexer.reset_block_indent(source.split "\n") * "\n"
+  #   puts Parser.reset_block_indent(source.split "\n") * "\n"
   #   # => def names
   #   # =>   @names.split ' '
   #   # => end

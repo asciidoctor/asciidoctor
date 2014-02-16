@@ -4,17 +4,17 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
   require 'test_helper'
 end
 
-context "Lexer" do
+context "Parser" do
 
   test "is_section_title?" do
-    assert Asciidoctor::Lexer.is_section_title?('AsciiDoc Home Page', '==================')
-    assert Asciidoctor::Lexer.is_section_title?('=== AsciiDoc Home Page')
+    assert Asciidoctor::Parser.is_section_title?('AsciiDoc Home Page', '==================')
+    assert Asciidoctor::Parser.is_section_title?('=== AsciiDoc Home Page')
   end
 
   test 'sanitize attribute name' do
-    assert_equal 'foobar', Asciidoctor::Lexer.sanitize_attribute_name("Foo Bar")
-    assert_equal 'foo', Asciidoctor::Lexer.sanitize_attribute_name("foo")
-    assert_equal 'foo3-bar', Asciidoctor::Lexer.sanitize_attribute_name("Foo 3^ # - Bar[")
+    assert_equal 'foobar', Asciidoctor::Parser.sanitize_attribute_name("Foo Bar")
+    assert_equal 'foo', Asciidoctor::Parser.sanitize_attribute_name("foo")
+    assert_equal 'foo3-bar', Asciidoctor::Parser.sanitize_attribute_name("Foo 3^ # - Bar[")
   end
 
   test "collect unnamed attribute" do
@@ -202,7 +202,7 @@ context "Lexer" do
 
   test 'parse style attribute with id and role' do
     attributes = {1 => 'style#id.role'}
-    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
     assert_nil original_style
     assert_equal 'style', attributes['style']
@@ -213,7 +213,7 @@ context "Lexer" do
 
   test 'parse style attribute with style, role, id and option' do
     attributes = {1 => 'style.role#id%fragment'}
-    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
     assert_nil original_style
     assert_equal 'style', attributes['style']
@@ -226,7 +226,7 @@ context "Lexer" do
 
   test 'parse style attribute with style, id and multiple roles' do
     attributes = {1 => 'style#id.role1.role2'}
-    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
     assert_nil original_style
     assert_equal 'style', attributes['style']
@@ -237,7 +237,7 @@ context "Lexer" do
 
   test 'parse style attribute with style, multiple roles and id' do
     attributes = {1 => 'style.role1.role2#id'}
-    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
     assert_nil original_style
     assert_equal 'style', attributes['style']
@@ -248,7 +248,7 @@ context "Lexer" do
 
   test 'parse style attribute with positional and original style' do
     attributes = {1 => 'new_style', 'style' => 'original_style'}
-    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'new_style', style
     assert_equal 'original_style', original_style
     assert_equal 'new_style', attributes['style']
@@ -257,7 +257,7 @@ context "Lexer" do
 
   test 'parse style attribute with id and role only' do
     attributes = {1 => '#id.role'}
-    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
     assert_nil original_style
     assert_equal 'id', attributes['id']
@@ -267,7 +267,7 @@ context "Lexer" do
 
   test 'parse empty style attribute' do
     attributes = {1 => nil}
-    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
     assert_nil original_style
     assert_nil attributes['id']
@@ -277,7 +277,7 @@ context "Lexer" do
 
   test 'parse style attribute with option should preserve existing options' do
     attributes = {1 => '%header', 'options' => 'footer', 'footer-option' => ''}
-    style, original_style = Asciidoctor::Lexer.parse_style_attribute(attributes)
+    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
     assert_nil original_style
     assert_equal 'header,footer', attributes['options']
@@ -548,7 +548,7 @@ v0.0.7, 2013-12-18
   test "attribute entry overrides generated author initials" do
     blankdoc = Asciidoctor::Document.new
     reader = Asciidoctor::Reader.new "Stuart Rackham <founder@asciidoc.org>\n:Author Initials: SJR".lines.entries
-    metadata = Asciidoctor::Lexer.parse_header_metadata(reader, blankdoc)
+    metadata = Asciidoctor::Parser.parse_header_metadata(reader, blankdoc)
     assert_equal 'SR', metadata['authorinitials']
     assert_equal 'SJR', blankdoc.attributes['authorinitials']
   end
@@ -571,7 +571,7 @@ end
     EOS
 
     lines = input.split("\n")
-    Asciidoctor::Lexer.reset_block_indent! lines
+    Asciidoctor::Parser.reset_block_indent! lines
     assert_equal expected, (lines * "\n")
   end
 
@@ -593,7 +593,7 @@ end
     EOS
 
     lines = input.split("\n")
-    Asciidoctor::Lexer.reset_block_indent! lines
+    Asciidoctor::Parser.reset_block_indent! lines
     assert_equal expected, (lines * "\n")
   end
 
@@ -615,7 +615,7 @@ end
     EOS
 
     lines = input.split("\n")
-    Asciidoctor::Lexer.reset_block_indent! lines, 2
+    Asciidoctor::Parser.reset_block_indent! lines, 2
     assert_equal expected, (lines * "\n")
   end
 
@@ -631,7 +631,7 @@ end
     expected = input
 
     lines = input.lines.entries
-    Asciidoctor::Lexer.reset_block_indent! lines, nil
+    Asciidoctor::Parser.reset_block_indent! lines, nil
     assert_equal expected, lines.join
   end
 
@@ -640,7 +640,7 @@ end
     expected = input
 
     lines = input.dup
-    Asciidoctor::Lexer.reset_block_indent! lines
+    Asciidoctor::Parser.reset_block_indent! lines
     assert_equal expected, lines
   end
 

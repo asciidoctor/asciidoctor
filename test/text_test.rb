@@ -36,7 +36,7 @@ context "Text" do
     input.concat(File.readlines(sample_doc_path(:encoding)))
     doc = empty_document
     reader = Asciidoctor::PreprocessorReader.new doc, input
-    block = Asciidoctor::Lexer.next_block(reader, doc)
+    block = Asciidoctor::Parser.next_block(reader, doc)
     assert_xpath '//pre', block.render.gsub(/^\s*\n/, ''), 1
   end
 
@@ -46,7 +46,7 @@ include::fixtures/encoding.asciidoc[tags=romé]
     EOS
     doc = empty_safe_document :base_dir => File.expand_path(File.dirname(__FILE__))
     reader = Asciidoctor::PreprocessorReader.new doc, input
-    block = Asciidoctor::Lexer.next_block(reader, doc)
+    block = Asciidoctor::Parser.next_block(reader, doc)
     output = block.render
     assert_css '.paragraph', output, 1
   end

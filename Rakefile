@@ -22,7 +22,7 @@ rescue LoadError
 end
 
 =begin
-# Run tests with Encoding::default_external set to US-ASCII
+# Run tests with Encoding.default_external set to US-ASCII
 begin
   Rake::TestTask.new(:test_us_ascii) do |test|
     prepare_test_env

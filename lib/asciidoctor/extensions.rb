@@ -109,7 +109,7 @@ module Extensions
     def parse_content parent, content, attributes = {}
       reader = (content.is_a? Reader) ? reader : (Reader.new content)
       while reader.has_more_lines?
-        block = Lexer.next_block(reader, parent, attributes)
+        block = Parser.next_block(reader, parent, attributes)
         parent << block if block
       end
       nil
