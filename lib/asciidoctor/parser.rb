@@ -222,10 +222,10 @@ class Parser
     # NOTE we could drop a hint in the attributes to indicate
     # that we are at a section title (so we don't have to check)
     if parent.context == :document && parent.blocks.empty? &&
-        (parent.has_header? || attributes.delete('invalid-header') || !is_next_line_section?(reader, attributes))
+        ((has_header = parent.has_header?) || attributes.delete('invalid-header') || !is_next_line_section?(reader, attributes))
 
       doctype = parent.doctype
-      if parent.has_header?
+      if has_header
         preamble = intro = Block.new(parent, :preamble, :content_model => :compound)
         parent << preamble
       end
@@ -245,7 +245,7 @@ class Parser
       section = initialize_section(reader, parent, attributes)
       # clear attributes, except for title which carries over
       # section title to next block of content
-      attributes = attributes.delete_if {|k, v| k != 'title'}
+      attributes = (title = attributes['title']) ? { 'title' => title } : {}
       current_level = section.level
       if current_level == 0 && doctype == 'book'
         part = !section.special
@@ -274,8 +274,7 @@ class Parser
     while reader.has_more_lines?
       parse_block_metadata_lines(reader, section, attributes)
 
-      next_level = is_next_line_section? reader, attributes
-      if next_level
+      if (next_level = is_next_line_section? reader, attributes)
         next_level += section.document.attr('leveloffset', 0).to_i
         if next_level > current_level || (section.context == :document && next_level == 0)
           if next_level == 0 && doctype != 'book'
@@ -1269,9 +1268,7 @@ class Parser
   # Returns the next ListItem or ListItem pair (depending on the list type)
   # for the parent list Block.
   def self.next_list_item(reader, list_block, match, sibling_trait = nil)
-    list_type = list_block.context
-
-    if list_type == :dlist
+    if (list_type = list_block.context) == :dlist
       list_term = ListItem.new(list_block, match[1])
       list_item = ListItem.new(list_block, match[3])
       has_text = !match[3].nil_or_empty?
@@ -1299,9 +1296,7 @@ class Parser
         list_item.attributes['checked'] = '' if checked
       end
 
-      if !sibling_trait
-        sibling_trait = resolve_list_marker(list_type, match[1], list_block.items.size, true, reader)
-      end
+      sibling_trait ||= resolve_list_marker(list_type, match[1], list_block.items.size, true, reader)
       list_item.marker = sibling_trait
       has_text = true
     end

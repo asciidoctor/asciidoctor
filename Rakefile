@@ -4,7 +4,11 @@ def prepare_test_env
   # rather than hardcoding gc settings in test task,
   # could use https://gist.github.com/benders/788695
   ENV['RUBY_GC_MALLOC_LIMIT'] = '90000000'
-  ENV['RUBY_FREE_MIN'] = '200000'
+  if RUBY_VERSION >= '2.1'
+    ENV['RUBY_GC_HEAP_FREE_SLOTS'] = '600000'
+  else
+    ENV['RUBY_FREE_MIN'] = '600000'
+  end
 end
 
 begin
