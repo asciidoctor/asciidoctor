@@ -1303,12 +1303,17 @@ end
 
 class InlineFootnoteTemplate < BaseTemplate
   def result(node)
-    index = node.attr :index
-    if node.type == :xref
-      %(<span class="footnoteref">[<a class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
+    if (index = node.attr :index)
+      if node.type == :xref
+        %(<span class="footnoteref">[<a class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
+      else
+        id_attribute = node.id ? %( id="_footnote_#{node.id}") : nil
+        %(<span class="footnote"#{id_attribute}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
+      end
     else
-      id_attribute = node.id ? %( id="_footnote_#{node.id}") : nil
-      %(<span class="footnote"#{id_attribute}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
+      if node.type == :xref
+        %(<span class="footnoteref red" title="Unresolved footnote reference.">[#{node.text}]</span>)
+      end
     end
   end
 
