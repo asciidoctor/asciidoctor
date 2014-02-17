@@ -264,7 +264,7 @@ module Extensions
   #
   # BlockProcessor implementations must extend BlockProcessor.
   class BlockProcessor < Processor
-    attr :name
+    attr_accessor :name
 
     def initialize name = nil, config = {}
       super config
@@ -326,7 +326,7 @@ module Extensions
   BlockProcessor::DSL = BlockProcessorDsl
 
   class MacroProcessor < Processor
-    attr :name
+    attr_accessor :name
 
     def initialize name = nil, config = {}
       super config
@@ -1063,13 +1063,13 @@ module Extensions
         else
           processor.instance_exec(&block)
         end
-        processor.freeze
-        unless (name = processor.name)
+        unless (name = as_symbol processor.name)
           raise ::ArgumentError.new %(No name specified for #{kind_name} extension at #{block.source_location})
         end
         unless processor.process_block_given?
           raise ::NoMethodError.new %(No block specified to process #{kind_name} extension at #{block.source_location})
         end
+        processor.freeze
         kind_store[name] = ProcessorExtension.new kind, processor
       else
         processor, name, config = resolve_args args, 3
@@ -1079,19 +1079,19 @@ module Extensions
             raise ::ArgumentError.new %(Class specified for #{kind_name} extension does not inherit from #{kind_class}: #{processor})
           end
           processor_instance = processor.new as_symbol(name), config
-          processor.freeze
-          unless (name = processor_instance.name)
+          unless (name = as_symbol processor_instance.name)
             raise ::ArgumentError.new %(No name specified for #{kind_name} extension: #{processor})
           end
+          processor.freeze
           kind_store[name] = ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
         elsif (processor.is_a? kind_class) || (kind_java_class && (processor.is_a? kind_java_class))
-          name = as_symbol(name || processor.name)
           processor.update_config config
-          processor.freeze
-          unless (name = processor.name)
+          # TODO need a test for this override!
+          unless (name = name ? (processor.name = as_symbol name) : (as_symbol processor.name))
             raise ::ArgumentError.new %(No name specified for #{kind_name} extension: #{processor})
           end
+          processor.freeze
           kind_store[name] = ProcessorExtension.new kind, processor
         else
           raise ::ArgumentError.new %(Invalid arguments specified for registering #{kind_name} extension: #{args})
