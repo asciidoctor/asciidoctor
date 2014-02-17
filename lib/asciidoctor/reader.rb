@@ -798,11 +798,11 @@ class PreprocessorReader < Reader
   #          target slot of the include::[] macro
   #
   # returns a Boolean indicating whether the line under the cursor has changed.
-  def preprocess_include target, raw_attributes
-    target = @document.sub_attributes target, :attribute_missing => 'drop-line'
-    if target.empty?
+  def preprocess_include raw_target, raw_attributes
+    if (target = @document.sub_attributes raw_target, :attribute_missing => 'drop-line').empty?
       if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
-        false
+        replace_line %(Unresolved directive in #{@path} - include::#{raw_target}[#{raw_attributes}])
+        true
       else
         advance
         true
@@ -812,16 +812,14 @@ class PreprocessorReader < Reader
     elsif include_processors? &&
         (extension = @include_processor_extensions.find {|candidate| candidate.instance.handles? target })
       advance
-      # QUESTION should we use @document.parse_attribues?
+      # FIXME parse attributes if requested by extension
       extension.process_method[self, target, AttributeList.new(raw_attributes).parse]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif @document.safe >= SafeMode::SECURE
+      # FIXME we don't want to use a link macro if we are in a verbatim context
       replace_line %(link:#{target}[])
-      # TODO make creating the output target a helper method
-      #output_target = %(#{::File.join(::File.dirname(target), ::File.basename(target, ::File.extname(target)))}#{@document.attributes['outfilesuffix']})
-      #unshift "link:#{output_target}[]"
       true
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
       warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
@@ -829,8 +827,9 @@ class PreprocessorReader < Reader
     elsif abs_maxdepth > 0
       if ::RUBY_ENGINE_OPAL
         # NOTE resolves uri relative to currently loaded document
-        target_type = :uri
-        include_file = path = target
+        # NOTE we defer checking if file exists and catch the 404 error if it does not
+        target_type = :file
+        include_file = path = (@include_stack.empty? ? target : (File.join @dir, target))
       elsif target.include?(':') && UriSniffRx =~ target
         unless @document.attributes.has_key? 'allow-uri-read'
           replace_line %(link:#{target}[])
@@ -851,9 +850,9 @@ class PreprocessorReader < Reader
         target_type = :file
         # include file is resolved relative to dir of current include, or base_dir if within original docfile
         include_file = @document.normalize_system_path(target, @dir, nil, :target_name => 'include file')
-        if !::File.file?(include_file)
+        unless ::File.file? include_file
           warn "asciidoctor: WARNING: #{line_info}: include file not found: #{include_file}"
-          advance
+          replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
         #path = @document.relative_path include_file
@@ -912,8 +911,8 @@ class PreprocessorReader < Reader
               end
             end
           rescue
-            warn "asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file}"
-            advance
+            warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
+            replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
             return true
           end
           advance
@@ -952,8 +951,8 @@ class PreprocessorReader < Reader
               end
             end
           rescue
-            warn "asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file}"
-            advance
+            warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
+            replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
             return true
           end
           unless (missing_tags = tags.to_a - tags_found.to_a).empty?
@@ -968,8 +967,8 @@ class PreprocessorReader < Reader
           advance
           push_include open(include_file, 'r') {|f| f.read }, include_file, path, 1, attributes
         rescue
-          warn "asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file}"
-          advance
+          warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
+          replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
       end

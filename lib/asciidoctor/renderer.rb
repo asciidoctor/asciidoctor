@@ -24,6 +24,7 @@ class Renderer
 
     backend = options[:backend]
     if ::RUBY_ENGINE_OPAL
+      @chomp_result = true
       ::Template.instance_variable_get('@_cache').each do |path, tmpl|
         @views[(::File.basename path)] = tmpl
       end

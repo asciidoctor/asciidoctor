@@ -77,11 +77,11 @@ class File
   end
 
   def self.basename(path)
-    path[((path.rindex(File::SEPARATOR) || -1) + 1)..-1]
+    (offset = path.rindex SEPARATOR) ? path[(offset + 1)..-1] : path
   end
 
   def self.dirname(path)
-    path[0..((path.rindex(SEPARATOR) || 0) - 1)]
+    (offset = path.rindex SEPARATOR) ? path[0..(offset - 1)] : '.'
   end
 
   def self.extname(path)
@@ -90,6 +90,7 @@ class File
     last_dot_idx.nil? ? '' : path[(last_dot_idx + 1)..-1]
   end
 
+  # TODO use XMLHttpRequest HEAD request unless in local file mode
   def self.file?(path)
     true
   end
@@ -97,16 +98,27 @@ class File
   def self.read(path)
     %x{
       var data = ''
+      var status = -1;
       try {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', path, false);
         xhr.addEventListener('load', function() {
-          data = xhr.responseText;
+          status = this.status;
+          // status is 0 for local file mode (i.e., file://)
+          if (status == 0 || status == 200) {
+            data = this.responseText;
+          }
         });
         xhr.overrideMimeType('text/plain');
-        xhr.send(null);
+        xhr.send();
       }
-      catch (xhrError) {}
+      catch (e) {
+        status = 0;
+      }
+      // assume that no data in local file mode means it doesn't exist
+      if (status == 404 || (status == 0 && data == '')) {
+        throw #{IOError.new `'No such file or directory: ' + path`};
+      }
     }
     `data`
   end

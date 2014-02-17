@@ -610,7 +610,8 @@ include::fixtures/no-such-file.ad[]
   
         begin
           doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
-          assert_equal 0, doc.blocks.size
+          assert_equal 1, doc.blocks.size
+          assert_equal ['Unresolved directive in <stdin> - include::fixtures/no-such-file.ad[]'], doc.blocks[0].lines
         rescue
           flunk 'include directive should not raise exception on missing file'
         end
@@ -642,7 +643,7 @@ include::http://127.0.0.1:0[]
   
         begin
           output = render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
-          assert_css 'pre:empty', output, 1
+          assert_match(/Unresolved directive/, output)
         rescue
           flunk 'include directive should not raise exception on inaccessible uri'
         end
@@ -793,7 +794,7 @@ include::{foodir}/include-file.asciidoc[]
   
         doc = empty_safe_document :base_dir => DIRNAME
         reader = Asciidoctor::PreprocessorReader.new doc, input
-        assert_equal 'include::{foodir}/include-file.asciidoc[]', reader.read_line
+        assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.asciidoc[]', reader.read_line
       end
 
       test 'line is dropped if target of include directive resolves to empty and attribute-missing attribute is not skip' do
