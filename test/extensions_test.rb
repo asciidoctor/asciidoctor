@@ -6,7 +6,7 @@ end
 require 'asciidoctor/extensions'
 
 class SamplePreprocessor < Asciidoctor::Extensions::Preprocessor
-  def process reader, raw_lines
+  def process doc, reader
     nil
   end
 end
@@ -30,7 +30,8 @@ class SampleInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
 end
 
 class ScrubHeaderPreprocessor < Asciidoctor::Extensions::Preprocessor
-  def process reader, lines
+  def process doc, reader
+    lines = reader.lines
     while !lines.empty? && !lines.first.start_with?('=')
       lines.shift
       reader.advance

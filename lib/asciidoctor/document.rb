@@ -342,7 +342,7 @@ class Document < AbstractBlock
 
       if @extensions && @extensions.preprocessors?
         @extensions.preprocessors.each do |ext|
-          @reader = ext.process_method[@reader, @reader.lines] || @reader
+          @reader = ext.process_method[self, @reader] || @reader
         end
       end
     else

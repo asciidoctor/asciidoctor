@@ -175,7 +175,7 @@ module Extensions
   #
   # Preprocessor implementations must extend the Preprocessor class.
   class Preprocessor < Processor
-    def process reader, lines
+    def process document, reader
       raise ::NotImplementedError
     end
   end
