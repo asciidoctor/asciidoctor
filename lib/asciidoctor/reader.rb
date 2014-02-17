@@ -994,7 +994,6 @@ class PreprocessorReader < Reader
   # Returns nothing
   def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
-    @includes << Helpers.rootname(path) if path
     if file
       @file = file
       @dir = File.dirname file
@@ -1006,13 +1005,22 @@ class PreprocessorReader < Reader
       # we don't know what file type we have, so assume AsciiDoc
       @process_lines = true
     end
-    @path = path || '<stdin>'
+
+    @path = if path
+      @includes << Helpers.rootname(path)
+      path
+    else
+      '<stdin>'
+    end
+
     @lineno = lineno
+
     if attributes.has_key? 'depth'
       depth = attributes['depth'].to_i
       depth = 1 if depth <= 0
       @maxdepth = {:abs => (@include_stack.size - 1) + depth, :rel => depth}
     end
+
     # effectively fill the buffer
     @lines = prepare_lines data, :normalize => true, :condense => false, :indent => attributes['indent']
     # FIXME kind of a hack
