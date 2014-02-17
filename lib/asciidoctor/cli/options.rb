@@ -23,6 +23,7 @@ module Asciidoctor
         self[:eruby] = options[:eruby] || nil
         self[:compact] = options[:compact] || false
         self[:verbose] = options[:verbose] || 1
+        self[:load_paths] = options[:load_paths] || nil
         self[:requires] = options[:requires] || nil
         self[:base_dir] = options[:base_dir]
         self[:destination_dir] = options[:destination_dir] || nil
@@ -109,10 +110,13 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-D', '--destination-dir DIR', 'destination output directory (default: directory of source file)') do |dest_dir|
             self[:destination_dir] = dest_dir
           end
-          opts.on('-r', '--require LIBRARY', ::Array,
-              'require the specified library before executing the processor (calls Kernel.require)',
-              'may be specified more than once') do |paths|
-            self[:requires] = paths
+          opts.on('-IDIRECTORY', '--load-path LIBRARY', 'add a directory to the $LOAD_PATH',
+              'may be specified more than once') do |path|
+            (self[:load_paths] ||= []) << path
+          end
+          opts.on('-rLIBRARY', '--require LIBRARY', 'require the specified library before executing the processor (using require)',
+              'may be specified more than once') do |path|
+            (self[:requires] ||= []) << path
           end
           opts.on('-q', '--quiet', 'suppress warnings (default: false)') do |verbose|
             self[:verbose] = 0
@@ -188,6 +192,12 @@ Example: asciidoctor -b html5 source.asciidoc
             rescue ::LoadError
               $stderr.puts 'asciidoctor: FAILED: tilt could not be loaded; to use a custom backend, you must have the tilt gem installed (gem install tilt)'
               return 1
+            end
+          end
+
+          if (load_paths = self[:load_paths])
+            load_paths.reverse_each do |path|
+              $:.unshift File.expand_path(path)
             end
           end
 

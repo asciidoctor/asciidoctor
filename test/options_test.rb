@@ -112,6 +112,31 @@ context 'Options' do
     assert_equal ['custom-backend', 'custom-backend-hacks'], options[:template_dirs]
   end
 
+  test '-r option requires specified libraries' do
+    options = Asciidoctor::Cli::Options.new
+    redirect_streams do |stdout, stderr|
+      exitval = options.parse! %w(-r foobar -r foobaz test/fixtures/sample.asciidoc)
+      assert_match(%(asciidoctor: FAILED: 'foobar' could not be loaded), stderr.string)
+      assert_equal 1, exitval
+      assert_equal ['foobar', 'foobaz'], options[:requires]
+    end
+  end
+
+  test '-I option appends directories to $LOAD_PATH' do
+    options = Asciidoctor::Cli::Options.new
+    old_load_path = $LOAD_PATH.dup
+    begin
+      exitval = options.parse! %w(-I foobar -I foobaz test/fixtures/sample.asciidoc)
+      assert_not_equal 1, exitval
+      assert_equal old_load_path.size + 2, $LOAD_PATH.size
+      assert_equal File.expand_path('foobar'), $LOAD_PATH[0]
+      assert_equal File.expand_path('foobaz'), $LOAD_PATH[1]
+      assert_equal ['foobar', 'foobaz'], options[:load_paths]
+    ensure
+      ($LOAD_PATH.size - old_load_path.size).times { $LOAD_PATH.shift }
+    end
+  end
+
   test 'should set verbose to 2 when -v flag is specified' do
     options = Asciidoctor::Cli::Options.parse!(%w(-v test/fixtures/sample.asciidoc))
     assert_equal 2, options[:verbose]
