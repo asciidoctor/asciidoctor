@@ -796,11 +796,15 @@ module Substitutors
             type = :ref
             target = nil
           else
-            footnote = @document.references[:footnotes].find {|fn| fn.id == id }
+            if (footnote = @document.references[:footnotes].find {|fn| fn.id == id })
+              index = footnote.index
+              text = footnote.text
+            else
+              index = nil
+              text = id
+            end
             target = id
             id = nil
-            index = footnote.index
-            text = footnote.text
             type = :xref
           end
         end
