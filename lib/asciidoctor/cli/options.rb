@@ -1,5 +1,3 @@
-require 'optparse'
-
 module Asciidoctor
   module Cli
 

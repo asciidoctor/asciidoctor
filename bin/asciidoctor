@@ -1,14 +1,13 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require 'rubygems' if RUBY_VERSION < '1.9'
 
-if RUBY_VERSION < '1.9'
-  require 'rubygems'
-end
-require 'asciidoctor'
+require File.join File.dirname(__FILE__), '../lib/asciidoctor'
+require 'optparse'
 require 'asciidoctor/cli/options'
 require 'asciidoctor/cli/invoker'
 
-invoker = Asciidoctor::Cli::Invoker.new(ARGV)
+invoker = Asciidoctor::Cli::Invoker.new ARGV
+GC.start
 invoker.invoke!
 exit invoker.code
