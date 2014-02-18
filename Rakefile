@@ -3,11 +3,15 @@ require File.expand_path '../lib/asciidoctor/version', __FILE__
 def prepare_test_env
   # rather than hardcoding gc settings in test task,
   # could use https://gist.github.com/benders/788695
-  ENV['RUBY_GC_MALLOC_LIMIT'] = '90000000'
+  ENV['RUBY_GC_MALLOC_LIMIT'] = 128_000_000.to_s
+  ENV['RUBY_GC_OLDMALLOC_LIMIT'] = 128_000_000.to_s
   if RUBY_VERSION >= '2.1'
-    ENV['RUBY_GC_HEAP_FREE_SLOTS'] = '600000'
+    ENV['RUBY_GC_HEAP_INIT_SLOTS'] = 750_000.to_s
+    ENV['RUBY_GC_HEAP_FREE_SLOTS'] = 750_000.to_s
+    ENV['RUBY_GC_HEAP_GROWTH_MAX_SLOTS'] = 250_000.to_s
+    ENV['RUBY_GC_HEAP_GROWTH_FACTOR'] = 1.25.to_s
   else
-    ENV['RUBY_FREE_MIN'] = '600000'
+    ENV['RUBY_FREE_MIN'] = 750_000.to_s
   end
 end
 
@@ -20,6 +24,9 @@ begin
     test.pattern = 'test/**/*_test.rb'
     test.verbose = true
     test.warning = true
+    if RUBY_VERSION >= '2'
+      test.options = '--tty=no'
+    end
   end
   task :default => :test
 rescue LoadError
