@@ -354,12 +354,15 @@ module Asciidoctor
 
     ## Regular expression character classes (to ensure regexp compatibility between Ruby and JavaScript)
 
+    # character classes for JavaScript Regexp engine
+    # NOTE use of double quotes are intentional to work around Opal issue
     if ::RUBY_ENGINE_OPAL
       CC_ALPHA = 'a-zA-Z'
       CC_ALNUM = 'a-zA-Z0-9'
-      CC_BLANK = '[ \t]'
-      CC_GRAPH = '[\x21-\x7E]' # non-blank character
-      CC_EOL   = '(?=\n|$)'
+      CC_BLANK = "[ \\t]"
+      CC_GRAPH = '[\x21-\x7E]' # non-blank character; broken in Opal!
+      CC_EOL   = "(?=\\n|$)"
+    # character classes for Ruby Regexp engine
     else
       CC_ALPHA = '[:alpha:]'
       CC_ALNUM = '[:alnum:]'
