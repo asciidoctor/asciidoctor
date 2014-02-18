@@ -3,9 +3,7 @@
 require 'rubygems' if RUBY_VERSION < '1.9'
 
 require File.join File.dirname(__FILE__), '../lib/asciidoctor'
-require 'optparse'
-require 'asciidoctor/cli/options'
-require 'asciidoctor/cli/invoker'
+require 'asciidoctor/cli'
 
 invoker = Asciidoctor::Cli::Invoker.new ARGV
 GC.start
