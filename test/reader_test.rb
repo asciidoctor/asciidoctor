@@ -618,35 +618,39 @@ include::fixtures/no-such-file.ad[]
       end
   
       test 'include directive can retrieve data from uri' do
-        # disable use of asciidoctor.org due to bug in Rubinius reading zlib compressed response
-        #url = 'http://asciidoctor.org/humans.txt'
-        #match = /Asciidoctor/
-        url = 'http://echo.jsontest.com/name/asciidoctor'
-        expect = /\{"name": "asciidoctor"\}/
-
+        #url = 'http://echo.jsontest.com/name/asciidoctor'
+        url = %(http://#{Socket.gethostname}:9876/name/asciidoctor)
         input = <<-EOS
 ....
 include::#{url}[]
 ....
         EOS
-  
-        output = render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        expect = /\{"name": "asciidoctor"\}/
+        output = using_test_webserver do
+          render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        end
+
+        assert_not_nil output
         assert_match(expect, output)
       end
   
       test 'inaccessible uri referenced by include directive does not crash processor' do
+        url = %(http://#{Socket.gethostname}:9876/no_such_file)
         input = <<-EOS
 ....
-include::http://127.0.0.1:0[]
+include::#{url}[]
 ....
         EOS
-  
-        begin
-          output = render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
-          assert_match(/Unresolved directive/, output)
+
+        output = begin
+          using_test_webserver do
+            render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+          end
         rescue
           flunk 'include directive should not raise exception on inaccessible uri'
         end
+        assert_not_nil output
+        assert_match(/Unresolved directive/, output)
       end
   
       test 'include directive supports line selection' do

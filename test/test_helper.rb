@@ -8,6 +8,7 @@ end
 require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
 
 require 'test/unit'
+require 'socket'
 require 'nokogiri'
 
 autoload :FileUtils, 'fileutils'
@@ -259,6 +260,53 @@ class Test::Unit::TestCase
     ensure
       $stdout = old_stdout
       $stderr = old_stderr
+    end
+  end
+
+  def using_test_webserver host = Socket.gethostname, port = 9876
+    server = TCPServer.new host, port
+    base_dir = File.expand_path File.dirname __FILE__
+    t = Thread.new do
+      while (session = server.accept)
+        request = session.gets
+        resource = nil
+        if (m = /GET (\S+) HTTP\/1\.1$/.match(request.chomp))
+          resource = (resource = m[1]) == '' ? '.' : resource
+        else
+          session.print %(HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\n\r\n)
+          session.print %(405 - Method not allowed\n)
+          session.close
+          break
+        end
+      
+        if resource == '/name/asciidoctor'
+          session.print %(HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n)
+          session.print %({"name": "asciidoctor"}\n)
+        elsif File.file?(resource_file = (File.join base_dir, resource))
+          session.print %(HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n)
+          File.open resource_file, 'rb' do |fd|
+            until fd.eof? do
+              buffer = fd.read 256
+              session.write buffer
+            end
+          end
+        else
+          session.print %(HTTP/1.1 404 File Not Found\r\nContent-Type: text/plain\r\n\r\n)
+          session.print %(404 - Resource not found.\n)
+        end
+        session.close
+      end
+    end
+    begin
+      yield
+    ensure
+      begin
+        server.shutdown
+      # "Errno::ENOTCONN: Socket is not connected' is reported on some platforms; call #close instead of #shutdown
+      rescue Errno::ENOTCONN
+        server.close
+      end
+      t.exit
     end
   end
 end
