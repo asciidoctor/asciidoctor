@@ -6,12 +6,12 @@ def prepare_test_env
   ENV['RUBY_GC_MALLOC_LIMIT'] = 128_000_000.to_s
   ENV['RUBY_GC_OLDMALLOC_LIMIT'] = 128_000_000.to_s
   if RUBY_VERSION >= '2.1'
-    ENV['RUBY_GC_HEAP_INIT_SLOTS'] = 750_000.to_s
-    ENV['RUBY_GC_HEAP_FREE_SLOTS'] = 750_000.to_s
+    ENV['RUBY_GC_HEAP_INIT_SLOTS'] = 800_000.to_s
+    ENV['RUBY_GC_HEAP_FREE_SLOTS'] = 800_000.to_s
     ENV['RUBY_GC_HEAP_GROWTH_MAX_SLOTS'] = 250_000.to_s
     ENV['RUBY_GC_HEAP_GROWTH_FACTOR'] = 1.25.to_s
   else
-    ENV['RUBY_FREE_MIN'] = 750_000.to_s
+    ENV['RUBY_FREE_MIN'] = 800_000.to_s
   end
 end
 
