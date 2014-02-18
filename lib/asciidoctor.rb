@@ -844,7 +844,7 @@ module Asciidoctor
     #   http://github.com
     #   http://github.com[GitHub]
     #
-    # FIXME revisit!
+    # FIXME revisit! the main issue is we need different rules for implicit vs explicit
     LinkInlineRx = %r{(^|link:|&lt;|[\s>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[((?:\\\]|[^\]])*?)\])?}
 
     # Match a link or e-mail inline macro.
@@ -1021,6 +1021,16 @@ module Asciidoctor
     #   data:info
     #
     UriSniffRx = %r{^[#{CC_ALPHA}][#{CC_ALNUM}.+-]*:/{0,2}}
+
+    # Detects the end of an implicit URI in the text
+    #
+    # Examples
+    #
+    #   (http://google.com)
+    #   &gt;http://google.com&lt;
+    #   (See http://google.com):
+    #
+    UriTerminator = /[);:]$/
 
     # Detects XML tags
     XmlSanitizeRx = /<[^>]+>/

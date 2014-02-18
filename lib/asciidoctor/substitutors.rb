@@ -651,16 +651,35 @@ module Substitutors
         prefix = (m[1] != 'link:' ? m[1] : '')
         target = m[2]
         suffix = ''
-        # strip the <> around the link
-        if prefix.start_with?('&lt;') && target.end_with?('&gt;')
-          prefix = prefix[4..-1]
-          target = target[0..-5]
-        elsif prefix.start_with?('(') && target.end_with?(')')
-          target = target[0..-2]
-          suffix = ')'
-        elsif target.end_with?('):')
-          target = target[0..-3]
-          suffix = '):'
+        unless m[3] || target !~ UriTerminator
+          case $~[0]
+          when ')'
+            # strip the trailing )
+            target = target[0..-2]
+            suffix = ')'
+          when ';'
+            # strip the <> around the link
+            if prefix.start_with?('&lt;') && target.end_with?('&gt;')
+              prefix = prefix[4..-1]
+              target = target[0..-5]
+            # strip the ); from the end of the link
+            elsif target.end_with?(');')
+              target = target[0..-3]
+              suffix = ');'
+            else
+              target = target[0..-2]
+              suffix = ';'
+            end
+          when ':'
+            # strip the ): from the end of the link
+            if target.end_with?('):')
+              target = target[0..-3]
+              suffix = '):'
+            else
+              target = target[0..-2]
+              suffix = ':'
+            end
+          end
         end
         @document.register(:links, target)
 
