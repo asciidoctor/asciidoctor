@@ -723,6 +723,17 @@ ____
       assert_equal 'famous', qb.attributes['role']
     end
 
+    test 'attribute with value None without quotes is ignored' do
+      input = <<-EOS
+[id=None]
+paragraph
+      EOS
+
+      doc = document_from_string input
+      para = doc.blocks.first
+      assert !para.attributes.has_key?('id')
+    end
+
     test 'role? returns true if role is assigned' do
       input = <<-EOS
 [role="lead"]

@@ -31,8 +31,8 @@ class AttributeList
 
   # Public: Regular expressions for unescaping quoted characters
   EscapedQuoteRxs = {
-    '\\"' => /\\"/,
-    '\\\'' => /\\'/
+    '"' => /\\"/,
+    '\'' => /\\'/
   }
 
   # Public: A regular expression for an attribute name
@@ -47,11 +47,9 @@ class AttributeList
     ',' => /[ \t]*(,|$)/
   }
 
-  def initialize source, block = nil, quotes = ['\'', '"'], delimiter = ',', escape_char = '\\'
+  def initialize source, block = nil, delimiter = ','
     @scanner = ::StringScanner.new source
     @block = block
-    @quotes = quotes
-    @escape_char = escape_char
     @delimiter = delimiter
     @delimiter_skip_pattern = SkipRxs[delimiter]
     @delimiter_boundary_pattern = BoundaryRxs[delimiter]
@@ -100,13 +98,15 @@ class AttributeList
   def parse_attribute index = 0, pos_attrs = []
     single_quoted_value = false
     skip_blank
-    # example: "quote" || 'quote'
-    if @quotes.include?(first = @scanner.peek(1))
-      value = nil
+    # example: "quote"
+    if (first = @scanner.peek(1)) == '"'
       name = parse_attribute_value @scanner.get_byte
-      if first == '\''
-        single_quoted_value = true
-      end
+      value = nil
+    # example: 'quote'
+    elsif first == '\''
+      name = parse_attribute_value @scanner.get_byte
+      value = nil
+      single_quoted_value = true
     else
       name = scan_name
 
@@ -128,21 +128,21 @@ class AttributeList
         value = nil
       else
         skip_blank
-        # example: foo=,
-        if @scanner.peek(1) == @delimiter
-          value = nil
-        else
-          c = @scanner.get_byte
-
-          # example: foo="bar" || foo='bar' || foo="ba\"zaar" || foo='ba\'zaar' || foo='ba"zaar' (all spaces ignored)
-          if @quotes.include? c
+        if @scanner.peek(1)
+          # example: foo="bar" || foo="ba\"zaar"
+          if (c = @scanner.get_byte) == '"'
             value = parse_attribute_value c
-            if c == '\''
-              single_quoted_value = true
-            end
+          # example: foo='bar' || foo='ba\'zaar' || foo='ba"zaar'
+          elsif c == '\''
+            value = parse_attribute_value c
+            single_quoted_value = true
+          # example: foo=,
+          elsif c == @delimiter
+            value = nil
           # example: foo=bar (all spaces ignored)
-          elsif c
+          else
             value = %(#{c}#{scan_to_delimiter})
+            return true if value == 'None'
           end
         end
       end
@@ -185,7 +185,7 @@ class AttributeList
 
     if (value = scan_to_quote quote)
       @scanner.get_byte
-      value.gsub EscapedQuoteRxs[%(#{@escape_char}#{quote})], quote
+      value.gsub EscapedQuoteRxs[quote], quote
     else
       %(#{quote}#{scan_to_delimiter})
     end
@@ -197,7 +197,6 @@ class AttributeList
 
   def skip_delimiter
     @scanner.skip @delimiter_skip_pattern
-    #@scanner.skip SkipRxs[@delimiter]
   end
 
   def scan_name
@@ -206,7 +205,6 @@ class AttributeList
 
   def scan_to_delimiter
     @scanner.scan @delimiter_boundary_pattern
-    #@scanner.scan BoundaryRxs[@delimiter]
   end
 
   def scan_to_quote quote
