@@ -584,7 +584,7 @@ module Asciidoctor
     InlineSectionAnchorRx = /^(.*?)#{CC_BLANK}+(\\)?\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]$/
 
     # Matches invalid characters in a section id.
-    InvalidSectionIdCharsRx = /&(?:[a-zA-Z]{2,}|#\d{2,4}|#x[a-fA-F0-9]{2,4});|\W+?/
+    InvalidSectionIdCharsRx = /&(?:[a-zA-Z]{2,}|#\d{2,5}|#x[a-fA-F0-9]{2,4});|\W+?/
 
     # Matches the block style used to designate a section title as a floating title.
     #
