@@ -233,7 +233,7 @@ class BlockUlistTemplate < BaseTemplate
       result_buffer << %(<title>#{node.title}</title>) if node.title?
       node.items.each do |item|
         text_marker = if checklist && (item.attr? 'checkbox')
-          (item.attr? 'checked') ? '&#x25A0; ' : '&#x25A1; '
+          (item.attr? 'checked') ? '&#10003; ' : '&#10063; '
         else
           nil
         end

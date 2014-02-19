@@ -769,7 +769,7 @@ class BlockUlistTemplate < BaseTemplate
           marker_unchecked = '<i class="icon-check-empty"></i> '
         else
           marker_checked = '&#10003; '
-          marker_unchecked = '&#10065; '
+          marker_unchecked = '&#10063; '
         end
       end
     elsif !node.style.nil?
@@ -783,13 +783,12 @@ class BlockUlistTemplate < BaseTemplate
     result_buffer << %(<ul#{ul_class_attribute}>)
 
     node.items.each do |item|
-      if checklist && (item.attr? 'checkbox')
-        marker = (item.attr? 'checked') ? marker_checked : marker_unchecked
-      else
-        marker = nil
-      end
       result_buffer << '<li>'
-      result_buffer << %(<p>#{marker}#{item.text}</p>)
+      if checklist && (item.attr? 'checkbox')
+        result_buffer << %(<p>#{(item.attr? 'checked') ? marker_checked : marker_unchecked}#{item.text}</p>)
+      else
+        result_buffer << %(<p>#{item.text}</p>)
+      end
       result_buffer << item.content if item.blocks?
       result_buffer << '</li>'
     end
