@@ -107,76 +107,67 @@ module Asciidoctor
 
   # Flags to control compliance with the behavior of AsciiDoc
   module Compliance
+    @keys = [].to_set
+    class << self
+      attr :keys
+    end
+
+    # Defines a new compliance key and assigns an initial value.
+    def self.define key, value
+      if key == :keys || (self.respond_to? key)
+        raise ::ArgumentError, %(Illegal key name: #{key})
+      end
+      instance_variable_set %(@#{key}), value
+      class << self; self; end.send :attr_accessor, key
+      @keys << key
+    end
+
     # AsciiDoc terminates paragraphs adjacent to
     # block content (delimiter or block attribute list)
     # This option allows this behavior to be modified
     # TODO what about literal paragraph?
     # Compliance value: true
-    @block_terminates_paragraph = true
-    class << self
-      attr_accessor :block_terminates_paragraph
-    end
+    define :block_terminates_paragraph, true
 
     # AsciiDoc does not treat paragraphs labeled with a verbatim style
     # (literal, listing, source, verse) as verbatim
     # This options allows this behavior to be modified
     # Compliance value: false
-    @strict_verbatim_paragraphs = true
-    class << self
-      attr_accessor :strict_verbatim_paragraphs
-    end
+    define :strict_verbatim_paragraphs, true
 
     # NOT CURRENTLY USED
     # AsciiDoc allows start and end delimiters around
     # a block to be different lengths
     # Enabling this option requires matching lengths
     # Compliance value: false
-    #@congruent_block_delimiters = true
-    #class << self
-    #  attr_accessor :congruent_block_delimiters
-    #end
+    #define :congruent_block_delimiters, true
 
     # AsciiDoc supports both single-line and underlined
     # section titles.
     # This option disables the underlined variant.
     # Compliance value: true
-    @underline_style_section_titles = true
-    class << self
-      attr_accessor :underline_style_section_titles
-    end
+    define :underline_style_section_titles, true
 
     # Asciidoctor will unwrap the content in a preamble
     # if the document has a title and no sections.
     # Compliance value: false
-    @unwrap_standalone_preamble = true
-    class << self
-      attr_accessor :unwrap_standalone_preamble
-    end
+    define :unwrap_standalone_preamble, true
 
     # AsciiDoc drops lines that contain references to missing attributes.
     # This behavior is not intuitive to most writers
     # Compliance value: 'drop-line'
-    @attribute_missing = 'skip'
-    class << self
-      attr_accessor :attribute_missing
-    end
+    define :attribute_missing, 'skip'
 
     # AsciiDoc drops lines that contain an attribute unassignemnt.
     # This behavior may need to be tuned depending on the circumstances.
     # Compliance value: 'drop-line'
-    @attribute_undefined = 'drop-line'
-    class << self
-      attr_accessor :attribute_undefined
-    end
+    define :attribute_undefined, 'drop-line'
 
     # Asciidoctor will recognize commonly-used Markdown syntax
     # to the degree it does not interfere with existing
     # AsciiDoc syntax and behavior.
     # Compliance value: false
-    @markdown_syntax = true
-    class << self
-      attr_accessor :markdown_syntax
-    end
+    define :markdown_syntax, true
   end
 
   # The absolute lib path of the Asciidoctor RubyGem
