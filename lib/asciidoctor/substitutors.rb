@@ -1339,14 +1339,14 @@ module Substitutors
   #
   # Returns nothing
   def lock_in_subs
-    default_subs = if @default_subs
-      @default_subs
+    if @default_subs
+      default_subs = @default_subs
     else
       case @content_model
       when :simple
-        SUBS[:normal]
+        default_subs = SUBS[:normal]
       when :verbatim
-        if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
+        default_subs = if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
           SUBS[:verbatim]
         elsif @context == :verse
           SUBS[:normal]
@@ -1354,7 +1354,7 @@ module Substitutors
           SUBS[:basic]
         end
       when :raw
-        SUBS[:pass]
+        default_subs = SUBS[:pass]
       else
         return
       end
