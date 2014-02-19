@@ -1160,7 +1160,7 @@ module Asciidoctor
     # right left arrow <=
     [/\\?&lt;=/, '&#8656;', :none],
     # restore entities
-    [/\\?(&)amp;((?:[a-zA-Z]+|#\d{2,4}|#x[a-fA-F0-9]{2,4});)/, '', :bounding]
+    [/\\?(&)amp;((?:[a-zA-Z]+|#\d{2,5}|#x[a-fA-F0-9]{2,4});)/, '', :bounding]
   ]
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document

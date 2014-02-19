@@ -1215,6 +1215,12 @@ foo&#8201;&#8212;&#8201;)
       assert_equal '&#169; &#174; &#8482; (C) (R) (TM)', para.sub_replacements(para.source)
     end
 
+    test 'preserves entity references' do
+      input = '&amp; &#169; &#10004; &#x2022;'
+      result = render_embedded_string input, :doctype => :inline
+      assert_equal input, result
+    end
+
     test 'replaces punctuation' do
       para = block_from_string %(John's Hideout is the Whites' place... foo\\'bar)
       assert_equal "John&#8217;s Hideout is the Whites&#8217; place&#8230; foo'bar", para.sub_replacements(para.source)
