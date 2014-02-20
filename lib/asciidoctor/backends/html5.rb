@@ -6,28 +6,24 @@ module HTML5
 class DocumentTemplate < BaseTemplate
   # FIXME make this outline generic
   def self.outline(node, to_depth = 2, sectnumlevels = nil)
-    sectnumlevels = (node.document.attr 'sectnumlevels', 3).to_i if sectnumlevels.nil?
+    return if (sections = node.sections).empty?
+    sectnumlevels = (node.document.attr 'sectnumlevels', 3).to_i unless sectnumlevels
     toc_level_buffer = []
-    sections = node.sections
-    unless sections.empty?
-      # FIXME the level for special sections should be set correctly in the model
-      # sec_level will only be 0 if we have a book doctype with parts
-      sec_level = (first_section = sections[0]).level
-      if sec_level == 0 && first_section.special
-        sec_level = 1
+    # FIXME the level for special sections should be set correctly in the model
+    # slevel will only be 0 if we have a book doctype with parts
+    slevel = (first_section = sections[0]).level
+    slevel = 1 if slevel == 0 && first_section.special
+    toc_level_buffer << %(<ul class="sectlevel#{slevel}">)
+    sections.each do |section|
+      section_num = (section.numbered && !section.caption && section.level <= sectnumlevels) ? %(#{section.sectnum} ) : nil
+      toc_level_buffer << %(<li><a href="##{section.id}">#{section_num}#{section.captioned_title}</a></li>)
+      if section.level < to_depth && (child_toc_level = outline(section, to_depth, sectnumlevels))
+        toc_level_buffer << '<li>'
+        toc_level_buffer << child_toc_level
+        toc_level_buffer << '</li>'
       end
-      toc_level_buffer << %(<ul class="sectlevel#{sec_level}">)
-      sections.each do |section|
-        section_num = (section.numbered && section.caption.nil? && section.level <= sectnumlevels) ? %(#{section.sectnum} ) : nil
-        toc_level_buffer << %(<li><a href=\"##{section.id}\">#{section_num}#{section.captioned_title}</a></li>)
-        if section.level < to_depth && (child_toc_level = outline(section, to_depth, sectnumlevels)) != ''
-          toc_level_buffer << '<li>'
-          toc_level_buffer << child_toc_level
-          toc_level_buffer << '</li>'
-        end
-      end
-      toc_level_buffer << '</ul>'
     end
+    toc_level_buffer << '</ul>'
     toc_level_buffer * EOL
   end
 
@@ -248,8 +244,8 @@ class EmbeddedTemplate < BaseTemplate
     result_buffer << node.content
 
     if node.footnotes? && !(node.attr? 'nofootnotes')
-      result_buffer << '<div id="footnotes">'
-      result_buffer << %(<hr#{node.short_tag_slash}>)
+      result_buffer << %(<div id="footnotes">
+<hr#{node.short_tag_slash}>)
       node.footnotes.each do |footnote|
         result_buffer << %(<div class="footnote" id="_footnote_#{footnote.index}">
 <a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a> #{footnote.text}
@@ -330,10 +326,10 @@ class SectionTemplate < BaseTemplate
     if slevel == 0 && sec.special
       slevel = 1
     end
-    htag = "h#{slevel + 1}"
-    id = anchor = link_start = link_end = nil
+    htag = %(h#{slevel + 1})
+    id_attr = anchor = link_start = link_end = nil
     if sec.id
-      id = %( id="#{sec.id}")
+      id_attr = %( id="#{sec.id}")
       if sec.document.attr? 'sectanchors'
         #if sec.document.attr? 'icons', 'font'
         #  anchor = %(<a class="anchor" href="##{sec.id}"><i class="icon-anchor"></i></a>)
@@ -347,25 +343,18 @@ class SectionTemplate < BaseTemplate
     end
 
     if slevel == 0
-      %(<h1#{id} class="sect0">#{anchor}#{link_start}#{sec.title}#{link_end}</h1>
+      %(<h1#{id_attr} class="sect0">#{anchor}#{link_start}#{sec.title}#{link_end}</h1>
 #{sec.content})
     else
-      role = sec.role? ? " #{sec.role}" : nil
+      class_attr = (role = sec.role) ? %( class="sect#{slevel} #{role}") : %( class="sect#{slevel}")
       sectnum = nil
-      if sec.numbered && sec.caption.nil? && slevel <= (sec.document.attr 'sectnumlevels', 3).to_i
-        sectnum = "#{sec.sectnum} "
+      if sec.numbered && !sec.caption && slevel <= (sec.document.attr 'sectnumlevels', 3).to_i
+        sectnum = %(#{sec.sectnum} )
       end
 
-      if slevel == 1
-        content = %(<div class="sectionbody">
-#{sec.content}
-</div>)
-      else
-        content = sec.content
-      end
-      %(<div class="sect#{slevel}#{role}">
-<#{htag}#{id}>#{anchor}#{link_start}#{sectnum}#{sec.captioned_title}#{link_end}</#{htag}>
-#{content}
+      %(<div#{class_attr}>
+<#{htag}#{id_attr}>#{anchor}#{link_start}#{sectnum}#{sec.captioned_title}#{link_end}</#{htag}>
+#{slevel == 1 ? %[<div class="sectionbody">#{sec.content}</div>] : sec.content}
 </div>)
     end
   end
@@ -377,7 +366,7 @@ end
 
 class BlockFloatingTitleTemplate < BaseTemplate
   def result(node)
-    tag_name = "h#{node.level + 1}"
+    tag_name = %(h#{node.level + 1})
     id_attribute = node.id ? %( id="#{node.id}") : nil
     classes = [node.style, node.role].compact
     %(<#{tag_name}#{id_attribute} class="#{classes * ' '}">#{node.title}</#{tag_name}>)
@@ -540,28 +529,26 @@ end
 
 class BlockAdmonitionTemplate < BaseTemplate
   def result(node)
-    id = node.id
+    id_attr = node.id ? %( id="#{node.id}") : nil
+    title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
     name = node.attr 'name'
-    role = node.role
-    title = node.title? ? node.title : nil
-    if node.document.attr? 'icons'
+    caption = if node.document.attr? 'icons'
       if node.document.attr? 'icons', 'font'
-        caption = %(<i class="icon-#{name}" title="#{node.caption}"></i>)
+        %(<i class="icon-#{name}" title="#{node.caption}"></i>)
       else
-        caption = %(<img src="#{node.icon_uri(name)}" alt="#{node.caption}"#{node.short_tag_slash}>)
+        %(<img src="#{node.icon_uri name}" alt="#{node.caption}"#{node.short_tag_slash}>)
       end
     else
-      caption = %(<div class="title">#{node.caption}</div>)
+      %(<div class="title">#{node.caption}</div>)
     end
-    %(<div#{id && " id=\"#{id}\""} class="admonitionblock #{name}#{role && " #{role}"}">
+    %(<div#{id_attr} class="admonitionblock #{name}#{(role = node.role) && " #{role}"}">
 <table>
 <tr>
 <td class="icon">
 #{caption}
 </td>
-<td class="content">#{title ? "
-<div class=\"title\">#{title}</div>" : nil}
-#{node.content}
+<td class="content">
+#{title_element}#{node.content}
 </td>
 </tr>
 </table>
@@ -577,9 +564,8 @@ class BlockParagraphTemplate < BaseTemplate
   def result(node)
     id_attr = node.id ? %( id="#{node.id}") : nil
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-    role_val = (role = node.role) ? %( #{role}) : nil
-
-    %(<div#{id_attr} class="paragraph#{role_val}">
+    class_attr = (role = node.role) ? %( class="paragraph #{role}") : ' class="paragraph"'
+    %(<div#{id_attr}#{class_attr}>
 #{title_element}<p>#{node.content}</p>
 </div>)
   end
@@ -1125,40 +1111,32 @@ class InlineCalloutTemplate < BaseTemplate
 end
 
 class InlineQuotedTemplate < BaseTemplate
-  NO_TAGS = [nil, nil, nil]
-
   QUOTE_TAGS = {
-    :emphasis => ['<em>', '</em>', true],
-    :strong => ['<strong>', '</strong>', true],
-    :monospaced => ['<code>', '</code>', true],
-    :superscript => ['<sup>', '</sup>', true],
-    :subscript => ['<sub>', '</sub>', true],
-    :double => ['&#8220;', '&#8221;', false],
-    :single => ['&#8216;', '&#8217;', false],
-    :asciimath => INLINE_MATH_DELIMITERS[:asciimath] + [false],
-    :latexmath => INLINE_MATH_DELIMITERS[:latexmath] + [false]
+    :emphasis    => ['<em>',     '</em>',     true],
+    :strong      => ['<strong>', '</strong>', true],
+    :monospaced  => ['<code>',   '</code>',   true],
+    :superscript => ['<sup>',    '</sup>',    true],
+    :subscript   => ['<sub>',    '</sub>',    true],
+    :double      => ['&#8220;',  '&#8221;',   false],
+    :single      => ['&#8216;',  '&#8217;',   false],
+    :asciimath   => INLINE_MATH_DELIMITERS[:asciimath] + [false],
+    :latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
   }
+  QUOTE_TAGS.default = [nil, nil, nil]
 
-  def quote_text(text, type, id, role)
-    open, close, is_tag = QUOTE_TAGS[type] || NO_TAGS
-    anchor = id.nil? ? nil : %(<a id="#{id}"></a>)
-    if role
+  def result node
+    open, close, is_tag = QUOTE_TAGS[node.type]
+    quoted_text = if (role = node.role)
       if is_tag
-        quoted_text = %(#{open.chop} class="#{role}">#{text}#{close})
+        %(#{open.chop} class="#{role}">#{node.text}#{close})
       else
-        quoted_text = %(<span class="#{role}">#{open}#{text}#{close}</span>)
+        %(<span class="#{role}">#{open}#{node.text}#{close}</span>)
       end
-    elsif open.nil?
-      quoted_text = text
     else
-      quoted_text = %(#{open}#{text}#{close})
+      %(#{open}#{node.text}#{close})
     end
 
-    anchor.nil? ? quoted_text : %(#{anchor}#{quoted_text})
-  end
-
-  def result(node)
-    quote_text(node.text, node.type, node.id, node.role)
+    node.id ? %(<a id="#{node.id}"></a>#{quoted_text}) : quoted_text
   end
 
   def template
@@ -1218,10 +1196,8 @@ class InlineAnchorTemplate < BaseTemplate
     case type
     when :xref
       refid = (node.attr 'refid') || target
-      if text.nil?
-        # FIXME this seems like it should be prepared already
-        text = document.references[:ids].fetch(refid, "[#{refid}]") if text.nil?
-      end
+      # FIXME this seems like it should be prepared already
+      text ||= (document.references[:ids][refid] || %([#{refid}]))
       %(<a href="#{target}">#{text}</a>)
     when :ref
       %(<a id="#{target}"></a>)
@@ -1302,7 +1278,7 @@ end
 
 class InlineFootnoteTemplate < BaseTemplate
   def result(node)
-    if (index = node.attr :index)
+    if (index = node.attr 'index')
       if node.type == :xref
         %(<span class="footnoteref">[<a class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
       else
