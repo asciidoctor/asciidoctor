@@ -286,7 +286,7 @@ class BlockTocTemplate < BaseTemplate
     %(<div#{id_attr} class="#{role}">
 <div#{title_id_attr} class="title">#{title}</div>
 #{DocumentTemplate.outline(doc, levels)}
-</div>\n)
+</div>)
   end
 
   def template
@@ -468,7 +468,7 @@ end
 
 class BlockListingTemplate < BaseTemplate
   def result(node)
-    nowrap = (!node.document.attr? 'prewrap') || (node.option? 'nowrap')
+    nowrap = !(node.document.attr? 'prewrap') || (node.option? 'nowrap')
     if node.style == 'source'
       language = node.attr 'language'
       language_classes = language ? %(#{language} language-#{language}) : nil
@@ -513,7 +513,7 @@ end
 
 class BlockLiteralTemplate < BaseTemplate
   def result(node)
-    nowrap = (!node.document.attr? 'prewrap') || (node.option? 'nowrap')
+    nowrap = !(node.document.attr? 'prewrap') || (node.option? 'nowrap')
     %(<div#{node.id && " id=\"#{node.id}\""} class="literalblock#{node.role && " #{node.role}"}">#{node.title? ? "
 <div class=\"title\">#{node.title}</div>" : nil}
 <div class="content">
@@ -1075,7 +1075,7 @@ end
 
 class BlockPageBreakTemplate < BaseTemplate
   def result(node)
-    %(<div style="page-break-after: always;"></div>)
+    '<div style="page-break-after: always;"></div>'
   end
 
   def template
