@@ -308,13 +308,15 @@ context 'Invoker' do
     assert_xpath '/*[@id="preamble"]', output, 1
   end
 
-  test 'should not compact output by default' do
-    # NOTE we are relying on the fact that the template leaves blank lines
-    # this will always fail when using a template engine which strips blank lines by default
-    invoker = invoke_cli_to_buffer(%w(-o -), '-') { '* content' }
-    output = invoker.read_output
-    assert_match(/\n[ \t]*\n/, output)
-  end
+  # no longer relevant
+  #test 'should not compact output by default' do
+  #  # NOTE we are relying on the fact that the template leaves blank lines
+  #  # this will always fail when using a template engine which strips blank lines by default
+  #  invoker = invoke_cli_to_buffer(%w(-o -), '-') { '* content' }
+  #  output = invoker.read_output
+  #  puts output
+  #  assert_match(/\n[ \t]*\n/, output)
+  #end
 
   test 'should compact output if specified' do
     # NOTE we are relying on the fact that the template leaves blank lines

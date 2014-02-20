@@ -7,7 +7,7 @@ module HTML5
     # use the following two lines to load a built-in theme instead
     #::Asciidoctor::Helpers.require_library 'coderay'
     #::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
-    <<'DEFAULT_CODERAY_STYLESHEET'
+    <<'DEFAULT_CODERAY_STYLESHEET'.chomp
 /* Foundation stylesheet for CodeRay (to match GitHub theme) | MIT License | http://foundation.zurb.com */
 table.CodeRay { border-collapse: collapse; padding: 2px; margin-bottom: 0; border: 0; background: transparent; }
 table.CodeRay td { padding: 0 .5em; vertical-align: top; }
@@ -109,7 +109,7 @@ DEFAULT_CODERAY_STYLESHEET
   #
   # returns the default Asciidoctor stylesheet as a String
   def self.default_asciidoctor_stylesheet
-    <<'DEFAULT_ASCIIDOCTOR_STYLESHEET'
+    <<'DEFAULT_ASCIIDOCTOR_STYLESHEET'.chomp
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
 article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary { display: block; }
 audio, canvas, video { display: inline-block; }

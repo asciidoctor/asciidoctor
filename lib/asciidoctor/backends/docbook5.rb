@@ -677,7 +677,7 @@ end
 
 class BlockRulerTemplate < BaseTemplate
   def result node
-    %(<simpara><?asciidoc-hr?></simpara>)
+    '<simpara><?asciidoc-hr?></simpara>'
   end
 
   def template
@@ -687,7 +687,7 @@ end
 
 class BlockPageBreakTemplate < BaseTemplate
   def result node
-    %(<simpara><?asciidoc-pagebreak?></simpara>)
+    '<simpara><?asciidoc-pagebreak?></simpara>'
   end
 
   def template
@@ -697,7 +697,7 @@ end
 
 class InlineBreakTemplate < BaseTemplate
   def result node
-    %(#{@text}<?asciidoc-br?>)
+    %(#{node.text}<?asciidoc-br?>)
   end
 
   def template
