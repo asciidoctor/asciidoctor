@@ -12,8 +12,8 @@ Feature: Open Blocks
     A paragraph in an open block.
     --
     """
-  When it is rendered using the html backend
-  Then the output should match the HTML source
+  When it is converted to html
+  Then the result should match the HTML source
     """
     <div class="openblock">
     <div class="content">
@@ -32,8 +32,8 @@ Feature: Open Blocks
     A paragraph in an open block.
     --
     """
-  When it is rendered using the docbook backend
-  Then the output should match the XML source
+  When it is converted to docbook
+  Then the result should match the XML source
     """
     <simpara>A paragraph in an open block.</simpara>
     """
@@ -46,8 +46,8 @@ Feature: Open Blocks
     A paragraph in an open block.
     --
     """
-  When it is rendered using the html backend
-  Then the output should match the HTML structure
+  When it is converted to html
+  Then the result should match the HTML structure
     """
     .openblock
       .content
@@ -63,8 +63,8 @@ Feature: Open Blocks
     A paragraph in an open block.
     --
     """
-  When it is rendered using the docbook backend
-  Then the output should match the XML structure
+  When it is converted to docbook
+  Then the result should match the XML structure
     """
     simpara A paragraph in an open block.
     """
@@ -79,8 +79,8 @@ Feature: Open Blocks
     * three
     --
     """
-  When it is rendered using the html backend
-  Then the output should match the HTML structure
+  When it is converted to html
+  Then the result should match the HTML structure
     """
     .openblock
       .content

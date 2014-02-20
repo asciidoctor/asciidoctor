@@ -41,7 +41,6 @@ class Section < AbstractBlock
   # parent - The parent Asciidoc Object.
   def initialize(parent = nil, level = nil, numbered = true)
     super(parent, :section)
-    @template_name = 'section'
     if level.nil?
       if parent
         @level = parent.level + 1

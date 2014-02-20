@@ -198,7 +198,7 @@ context 'Invoker' do
   test 'should copy default stylesheet to target directory if linkcss is specified' do
     sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample-output.html'))
     asciidoctor_stylesheet = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'asciidoctor.css'))
-    coderay_stylesheet = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'asciidoctor-coderay.css'))
+    coderay_stylesheet = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'coderay-asciidoctor.css'))
     begin
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a source-highlighter=coderay)
       invoker.document
@@ -308,24 +308,6 @@ context 'Invoker' do
     assert_xpath '/*[@id="preamble"]', output, 1
   end
 
-  # no longer relevant
-  #test 'should not compact output by default' do
-  #  # NOTE we are relying on the fact that the template leaves blank lines
-  #  # this will always fail when using a template engine which strips blank lines by default
-  #  invoker = invoke_cli_to_buffer(%w(-o -), '-') { '* content' }
-  #  output = invoker.read_output
-  #  puts output
-  #  assert_match(/\n[ \t]*\n/, output)
-  #end
-
-  test 'should compact output if specified' do
-    # NOTE we are relying on the fact that the template leaves blank lines
-    # this will always succeed when using a template engine which strips blank lines by default
-    invoker = invoke_cli_to_buffer(%w(-C -s -o -), '-') { '* content' }
-    output = invoker.read_output
-    assert_no_match(/\n[ \t]*\n/, output)
-  end
-
   test 'should output a trailing endline to stdout' do
     invoker = nil
     output = nil
@@ -376,7 +358,10 @@ context 'Invoker' do
     custom_backend_root = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends'))
     invoker = invoke_cli_to_buffer %W(-E haml -T #{custom_backend_root} -o -)
     doc = invoker.document
-    assert doc.renderer.views['block_paragraph'].is_a? Tilt::HamlTemplate
+    assert doc.converter.is_a? Asciidoctor::Converter::CompositeConverter
+    selected = doc.converter.find_converter 'paragraph'
+    assert selected.is_a? Asciidoctor::Converter::TemplateConverter
+    assert selected.templates['paragraph'].is_a? Tilt::HamlTemplate
   end
 
   test 'should load custom templates from multiple template directories' do

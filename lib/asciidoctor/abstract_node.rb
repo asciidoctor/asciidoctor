@@ -15,7 +15,10 @@ class AbstractNode
   # Public: Get the Symbol context for this node
   attr_reader :context
 
-  # Public: Get or set the id of this node
+  # Public: Get the String name of this node
+  attr_reader :node_name
+
+  # Public: Get/Set the id of this node
   attr_accessor :id
 
   # Public: Get the Hash of attributes for this node
@@ -34,6 +37,7 @@ class AbstractNode
       end
     end
     @context = context
+    @node_name = context.to_s
     @attributes = {}
     @passthroughs = []
   end
@@ -47,6 +51,20 @@ class AbstractNode
     @parent = parent
     @document = parent.document
     nil
+  end
+
+  # Public: Returns whether this {AbstractNode} is an instance of {Inline}
+  #
+  # Returns [Boolean]
+  def inline?
+    raise ::NotImplementedError
+  end
+
+  # Public: Returns whether this {AbstractNode} is an instance of {Block}
+  #
+  # Returns [Boolean]
+  def block?
+    raise ::NotImplementedError
   end
 
   # Public: Get the value of the specified attribute
@@ -181,10 +199,10 @@ class AbstractNode
     nil
   end
 
-  # Public: Get the Asciidoctor::Renderer instance being used for the
-  # Asciidoctor::Document to which this node belongs
-  def renderer
-    @document.renderer
+  # Public: Get the Asciidoctor::Converter instance being used to convert the
+  # current Asciidoctor::Document.
+  def converter
+    @document.converter
   end
 
   # Public: A convenience method that checks if the role attribute is specified
@@ -228,11 +246,6 @@ class AbstractNode
   # Public: A convenience method that returns the value of the reftext attribute
   def reftext
     @attributes['reftext'] || @document.attributes['reftext']
-  end
-
-  # Public: Returns a forward slash if the attribute htmlsyntax has the value "xml".
-  def short_tag_slash
-    @document.attributes['htmlsyntax'] == 'xml' ? '/' : nil
   end
 
   # Public: Construct a reference or data URI to an icon image for the
@@ -353,7 +366,7 @@ class AbstractNode
     else
       bindata = File.open(image_path, 'rb') {|file| file.read }
     end
-    "data:#{mimetype};base64,#{Base64.encode64(bindata).delete("\n")}"
+    "data:#{mimetype};base64,#{Base64.encode64(bindata).delete EOL}"
   end
 
   # Public: Read the contents of the file at the specified path.
@@ -378,7 +391,7 @@ class AbstractNode
 
   # Public: Normalize the web page using the PathResolver.
   #
-  # See {PathResolver.web_path} for details.
+  # See {PathResolver#web_path} for details.
   #
   # target - the String target path
   # start  - the String start (i.e, parent) path (optional, default: nil)
@@ -391,7 +404,7 @@ class AbstractNode
   # Public: Resolve and normalize a secure path from the target and start paths
   # using the PathResolver.
   #
-  # See {PathResolver.system_path} for details.
+  # See {PathResolver#system_path} for details.
   #
   # The most important functionality in this method is to prevent resolving a
   # path outside of the jail (which defaults to the directory of the source

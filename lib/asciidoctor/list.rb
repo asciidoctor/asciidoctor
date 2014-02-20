@@ -15,7 +15,7 @@ class List < AbstractBlock
     @blocks
   end
 
-  def render
+  def convert
     if @context == :colist
       result = super
       @document.callouts.next_list
@@ -24,6 +24,9 @@ class List < AbstractBlock
       super
     end
   end
+
+  # Alias render to convert to maintain backwards compatibility
+  alias :render :convert
 
   def to_s
     %(#{self.class}@#{object_id} { context: #{@context.inspect}, style: #{@style.inspect}, items: #{items.size} })
