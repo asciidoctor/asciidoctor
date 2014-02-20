@@ -530,7 +530,7 @@ module Substitutors
 
     # FIXME this location is somewhat arbitrary, probably need to be able to control ordering
     # TODO this handling needs some cleanup
-    if (extensions = @document.extensions) && extensions.inline_macros? && found[:macroish]
+    if (extensions = @document.extensions) && extensions.inline_macros? # && found[:macroish]
       extensions.inline_macros.each do |extension|
         result = result.gsub(extension.config[:regexp]) {
           # alias match for Ruby 1.8.7 compat
