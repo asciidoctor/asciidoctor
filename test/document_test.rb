@@ -1229,6 +1229,8 @@ image::tiger.png[]
 * [x] one
 * [ ] two
 
+Read &sect;2.
+
 |===
 |A |B
 |===

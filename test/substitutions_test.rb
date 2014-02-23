@@ -1189,6 +1189,16 @@ EOS
       assert_equal '&lt; &quot; &#34; &#x22; &gt;', para.apply_normal_subs(para.lines)
     end
 
+    test 'replaces non-builtin XML entities with numeric entities' do
+      para = block_from_string '&sect; &gt;'
+      assert_equal '&#167; &gt;', para.apply_normal_subs(para.lines)
+    end
+
+    test 'replaces builtin XML entities properly' do
+      para = block_from_string '&gt; &lt; &apos; &quot; &amp;'
+      assert_equal '&gt; &lt; &#39; &quot; &amp;', para.apply_normal_subs(para.lines)
+    end
+
     test 'replaces arrows' do
       para = block_from_string '<- -> <= => \<- \-> \<= \=>'
       assert_equal '&#8592; &#8594; &#8656; &#8658; &lt;- -&gt; &lt;= =&gt;', para.apply_normal_subs(para.source)
