@@ -134,12 +134,10 @@ class Test::Unit::TestCase
 
   def xmldoc_from_string(content)
     doctype_match = content.match(/\s*<!DOCTYPE (.*)/)
-    if !doctype_match
-      if content.match(RE_XMLNS_ATTRIBUTE)
-        doc = Nokogiri::XML::Document.parse(content)
-      else
-        doc = Nokogiri::HTML::DocumentFragment.parse(content)
-      end
+    if content.match(RE_XMLNS_ATTRIBUTE)
+      doc = Nokogiri::XML::Document.parse(content)
+    elsif !doctype_match
+      doc = Nokogiri::HTML::DocumentFragment.parse(content)
     elsif doctype_match[1].start_with? 'html'
       doc = Nokogiri::HTML::Document.parse(content)
     else

@@ -1296,6 +1296,15 @@ two
       #assert_match(/iframe [^>]+allowfullscreen="allowfullscreen"/i, result)
     end
 
+    test 'xhtml backend should emit elements in proper namespace' do
+      input = <<-EOS
+content
+      EOS
+      result = render_string input, :safe => :safe, :backend => :xhtml, :keep_namespaces => true
+      doc = xmldoc_from_string(result)
+      assert_xpath '//*[not(namespace-uri() = "http://www.w3.org/1999/xhtml")]', result, 0
+    end
+
     test 'docbook45 backend doctype article' do
       input = <<-EOS
 = Title
