@@ -137,10 +137,10 @@ table thead tr th, table tfoot tr th, table tbody tr td, table tr td, table tfoo
 .clearfix:after, .float-group:after { clear: both; }
 *:not(pre) > code { font-size: 0.9375em; padding: 1px 3px 0; white-space: nowrap; background-color: #f2f2f2; border: 1px solid #cccccc; -webkit-border-radius: 4px; border-radius: 4px; text-shadow: none; }
 pre, pre > code { line-height: 1.4; color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; font-weight: normal; }
-kbd.keyseq { color: #555555; }
+.keyseq { color: #555555; }
 kbd:not(.keyseq) { display: inline-block; color: #222222; font-size: 0.75em; line-height: 1.4; background-color: #F7F7F7; border: 1px solid #ccc; -webkit-border-radius: 3px; border-radius: 3px; -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px white inset; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px white inset; margin: -0.15em 0.15em 0 0.15em; padding: 0.2em 0.6em 0.2em 0.5em; vertical-align: middle; white-space: nowrap; }
-kbd kbd:first-child { margin-left: 0; }
-kbd kbd:last-child { margin-right: 0; }
+.keyseq kbd:first-child { margin-left: 0; }
+.keyseq kbd:last-child { margin-right: 0; }
 .menuseq, .menu { color: #090909; }
 b.button:before, b.button:after { position: relative; top: -1px; font-weight: normal; }
 b.button:before { content: "["; padding: 0 3px 0 2px; }
