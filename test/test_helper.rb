@@ -149,7 +149,7 @@ class Test::Unit::TestCase
 
   def document_from_string(src, opts = {})
     assign_default_test_options opts
-    Asciidoctor::Document.new(src.lines.entries, opts)
+    Asciidoctor::Document.new src.lines.entries, opts
   end
 
   def block_from_string(src, opts = {})
@@ -181,7 +181,8 @@ class Test::Unit::TestCase
   end
 
   def assign_default_test_options(opts)
-    opts[:header_footer] = true unless opts.has_key?(:header_footer)
+    opts[:header_footer] = true unless opts.key? :header_footer
+    opts[:parse] = true unless opts.key? :parse
     if opts[:header_footer]
       # don't embed stylesheet unless test requests the default behavior
       if opts.has_key? :linkcss_default

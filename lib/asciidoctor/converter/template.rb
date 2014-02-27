@@ -248,15 +248,17 @@ module Asciidoctor
           name = name[6..-1]
         end
         ext_name = path_segments[-1]
+        template_class = ::Tilt
+        extra_engine_options = {}
         if ext_name == 'slim'
           # slim doesn't get loaded by Tilt, so we have to load it explicitly
           Helpers.require_library 'slim' unless defined? ::Slim
         elsif ext_name == 'erb'
-          eruby_loaded = load_eruby @eruby unless eruby_loaded
+          template_class, extra_engine_options = (eruby_loaded ||= load_eruby @eruby)
         end
         next unless ::Tilt.registered? ext_name
         unless template_cache && (template = template_cache[file])
-          template = ::Tilt.new file, 1, @engine_options[ext_name.to_sym]
+          template = template_class.new file, 1, (@engine_options[ext_name.to_sym] || {}).merge(extra_engine_options)
         end
         result[name] = template
       end
@@ -270,14 +272,15 @@ module Asciidoctor
     #
     # name - the String name of the eRuby implementation
     #
-    # Returns the eRuby implementation [Class]
+    # Returns an [Array] containing the Tilt template Class for the eRuby implementation
+    # and a Hash of additional options to pass to the initializer
     def load_eruby name
       if !name || name == 'erb'
         require 'erb' unless defined? ::ERB
-        ::ERB
+        [::Tilt::ERBTemplate, {}]
       elsif name == 'erubis'
-        Helpers.require_library 'erubis' unless defined? ::Erubis
-        ::Erubis::FastEruby
+        Helpers.require_library 'erubis' unless defined? ::Erubis::FastEruby
+        [::Tilt::ErubisTemplate, { :engine_class => ::Erubis::FastEruby }]
       else
         raise ::ArgumentError, %(Unknown ERB implementation: #{name})
       end

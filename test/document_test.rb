@@ -21,36 +21,36 @@ context 'Document' do
 
   context 'Default settings' do
     test 'safe mode level set to SECURE by default' do
-      doc = Asciidoctor::Document.new
+      doc = empty_document
       assert_equal Asciidoctor::SafeMode::SECURE, doc.safe
     end
 
     test 'safe mode level set using string' do
-      doc = Asciidoctor::Document.new [], :safe => 'server'
+      doc = empty_document :safe => 'server'
       assert_equal Asciidoctor::SafeMode::SERVER, doc.safe
 
-      doc = Asciidoctor::Document.new [], :safe => 'foo'
+      doc = empty_document :safe => 'foo'
       assert_equal Asciidoctor::SafeMode::SECURE, doc.safe
     end
 
     test 'safe mode level set using symbol' do
-      doc = Asciidoctor::Document.new [], :safe => :server
+      doc = empty_document :safe => :server
       assert_equal Asciidoctor::SafeMode::SERVER, doc.safe
 
-      doc = Asciidoctor::Document.new [], :safe => :foo
+      doc = empty_document :safe => :foo
       assert_equal Asciidoctor::SafeMode::SECURE, doc.safe
     end
 
     test 'safe mode level set using integer' do
-      doc = Asciidoctor::Document.new [], :safe => 10
+      doc = empty_document :safe => 10
       assert_equal Asciidoctor::SafeMode::SERVER, doc.safe
 
-      doc = Asciidoctor::Document.new [], :safe => 100
+      doc = empty_document :safe => 100
       assert_equal 100, doc.safe
     end
 
     test 'safe mode attributes are set on document' do
-      doc = Asciidoctor::Document.new
+      doc = empty_document
       assert_equal Asciidoctor::SafeMode::SECURE, doc.attr('safe-mode-level')
       assert_equal 'secure', doc.attr('safe-mode-name')
       assert doc.attr?('safe-mode-secure')
@@ -65,7 +65,7 @@ context 'Document' do
     end
 
     test 'safe model level cannot be modified' do
-      doc = Asciidoctor::Document.new
+      doc = empty_document
       begin
         doc.safe = Asciidoctor::SafeMode::UNSAFE
         flunk 'safe mode property of Asciidoctor::Document should not be writable!' 
@@ -74,7 +74,7 @@ context 'Document' do
     end
 
     test 'toc and numbered should be enabled by default for DocBook backend' do
-      doc = Asciidoctor::Document.new [], :backend => 'docbook'
+      doc = empty_document :backend => 'docbook', :parse => true
       assert doc.attr?('toc')
       assert doc.attr?('numbered')
     end
@@ -726,36 +726,6 @@ text
         assert converter.respond_to? element
       end
     end
-
-# NOTE The eruby tests are no longer relevant as we no longer use ERB internally
-# These should be rewritten to test the selection of ERB for use with the template converter
-=begin
-    test 'eRuby implementation should default to ERB' do
-      # intentionally use built-in templates for this test
-      doc = Asciidoctor::Document.new [], :backend => 'docbook', :header_footer => true
-      converter = doc.converter
-      views = converter.views
-      assert !views.nil?
-      assert views.has_key? 'document'
-      assert views['document'].is_a?(Asciidoctor::DocBook45::DocumentTemplate)
-      assert_equal 'ERB', views['document'].eruby.to_s
-      assert_equal 'ERB', views['document'].template.class.to_s
-    end
-  
-    test 'can set erubis as eRuby implementation' do
-      # intentionally use built-in templates for this test
-      doc = Asciidoctor::Document.new [], :backend => 'docbook', :eruby => 'erubis', :header_footer => true
-      assert $LOADED_FEATURES.detect {|p| p == 'erubis.rb' || p.end_with?('/erubis.rb') }.nil?
-      converter = doc.converter
-      assert $LOADED_FEATURES.detect {|p| p == 'erubis.rb' || p.end_with?('/erubis.rb') }
-      views = converter.views
-      assert !views.nil?
-      assert views.has_key? 'document'
-      assert views['document'].is_a?(Asciidoctor::DocBook45::DocumentTemplate)
-      assert_equal 'Erubis::FastEruby', views['document'].eruby.to_s
-      assert_equal 'Erubis::FastEruby', views['document'].template.class.to_s
-    end
-=end
   end
 
   context 'Structure' do
@@ -1452,22 +1422,22 @@ chapter body
     end
 
     test 'should be able to set backend using :backend option key' do
-      doc = Asciidoctor::Document.new([], :backend => 'html5')
+      doc = empty_document :backend => 'html5'
       assert_equal 'html5', doc.attributes['backend']
     end
 
     test ':backend option should override backend attribute' do
-      doc = Asciidoctor::Document.new([], :backend => 'html5', :attributes => {'backend' => 'docbook45'})
+      doc = empty_document :backend => 'html5', :attributes => {'backend' => 'docbook45'}
       assert_equal 'html5', doc.attributes['backend']
     end
 
     test 'should be able to set doctype using :doctype option key' do
-      doc = Asciidoctor::Document.new([], :doctype => 'book')
+      doc = empty_document :doctype => 'book'
       assert_equal 'book', doc.attributes['doctype']
     end
 
     test ':doctype option should override doctype attribute' do
-      doc = Asciidoctor::Document.new([], :doctype => 'book', :attributes => {'doctype' => 'article'})
+      doc = empty_document :doctype => 'book', :attributes => {'doctype' => 'article'}
       assert_equal 'book', doc.attributes['doctype']
     end
 
@@ -1620,14 +1590,14 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
   context 'Secure Asset Path' do
     test 'allows us to specify a path relative to the current dir' do
-      doc = Asciidoctor::Document.new
+      doc = empty_document
       legit_path = Dir.pwd + '/foo'
       assert_equal legit_path, doc.normalize_asset_path(legit_path)
     end
 
     test 'keeps naughty absolute paths from getting outside' do
       naughty_path = "#{disk_root}etc/passwd"
-      doc = Asciidoctor::Document.new
+      doc = empty_document
       secure_path = doc.normalize_asset_path(naughty_path)
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)
@@ -1635,7 +1605,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
     test 'keeps naughty relative paths from getting outside' do
       naughty_path = 'safe/ok/../../../../../etc/passwd'
-      doc = Asciidoctor::Document.new
+      doc = empty_document
       secure_path = doc.normalize_asset_path(naughty_path)
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)

@@ -177,6 +177,34 @@ Sidebar content
       end
     end
 
+    test 'should load ERB templates using ERBTemplate if eruby is not set' do
+      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'erb'), :template_cache => false
+      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      ['paragraph'].each do |node_name|
+        selected = doc.converter.find_converter node_name
+        assert selected.is_a? Asciidoctor::Converter::TemplateConverter
+        template = selected.templates[node_name]
+        assert template.is_a? Tilt::ERBTemplate
+        assert !(template.is_a? Tilt::ErubisTemplate)
+        assert template.instance_variable_get('@engine').is_a? ::ERB
+        assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
+      end
+    end
+
+    test 'should load ERB templates using ErubisTemplate if eruby is set to erubis' do
+      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'erb'), :template_cache => false, :eruby => 'erubis'
+      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      ['paragraph'].each do |node_name|
+        selected = doc.converter.find_converter node_name
+        assert selected.is_a? Asciidoctor::Converter::TemplateConverter
+        template = selected.templates[node_name]
+        assert template.is_a? Tilt::ERBTemplate
+        assert template.is_a? Tilt::ErubisTemplate
+        assert template.instance_variable_get('@engine').is_a? ::Erubis::FastEruby
+        assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
+      end
+    end
+
     test 'should load Slim templates for default backend' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false
       assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
