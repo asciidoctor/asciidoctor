@@ -18,7 +18,7 @@ module Asciidoctor
     }
     QUOTE_TAGS.default = [nil, nil, nil]
 
-    def initialize opts = {}
+    def initialize backend, opts = {}
       @short_tag_slash = ((@htmlsyntax = opts[:htmlsyntax]) == 'xml' ? '/' : nil)
       @stylesheets = Stylesheets.instance
     end

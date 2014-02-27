@@ -165,7 +165,11 @@ module Asciidoctor
       # Returns the [Converter] object
       def create backend, opts = {}
         if (converter = resolve backend)
-          return (converter.is_a? ::Class) ? (converter.new backend, opts) : converter
+          if converter.is_a? ::Class
+            return converter.new backend, opts
+          else
+            return converter
+          end
         end
     
         base_converter = case backend
@@ -173,17 +177,17 @@ module Asciidoctor
           unless defined? ::Asciidoctor::Converter::Html5Converter
             require 'asciidoctor/converter/html5'.to_s
           end
-          Html5Converter.new opts
+          Html5Converter.new backend, opts
         when 'docbook5'
           unless defined? ::Asciidoctor::Converter::DocBook5Converter
             require 'asciidoctor/converter/docbook5'.to_s
           end
-          DocBook5Converter.new opts
+          DocBook5Converter.new backend, opts
         when 'docbook45'
           unless defined? ::Asciidoctor::Converter::DocBook45Converter
             require 'asciidoctor/converter/docbook45'.to_s
           end
-          DocBook45Converter.new opts
+          DocBook45Converter.new backend, opts
         end
 
         return base_converter unless opts.key? :template_dirs

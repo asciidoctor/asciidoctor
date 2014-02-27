@@ -11,7 +11,7 @@ module Asciidoctor
 
   # An abstract base class for built-in {Converter} classes.
   class Converter::BuiltIn
-    def initialize opts = {}
+    def initialize backend, opts = {}
     end
 
     # Public: Converts the specified {AbstractNode} using the specified transform.

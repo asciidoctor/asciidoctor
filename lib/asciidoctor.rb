@@ -232,8 +232,9 @@ module Asciidoctor
   DEFAULT_EXTENSIONS = {
     'html' => '.html',
     'docbook' => '.xml',
-    'asciidoc' => '.ad',
-    'markdown' => '.md'
+    'pdf' => '.pdf',
+    'epub' => '.epub',
+    'asciidoc' => '.adoc'
   }
 
   # Set of file extensions recognized as AsciiDoc documents (stored as a truth hash)
@@ -242,6 +243,7 @@ module Asciidoctor
     '.adoc' => true,
     '.ad' => true,
     '.asc' => true,
+    # TODO .txt should be deprecated
     '.txt' => true
   }
 
