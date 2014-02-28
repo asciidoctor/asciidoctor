@@ -36,8 +36,8 @@ class Callouts
   # Public: Get the next callout index in the document
   #
   # Reads the next callout index in the document and advances the pointer.
-  # This method is used during rendering to retrieve the unique id of the
-  # callout that was generated during lexing.
+  # This method is used during conversion to retrieve the unique id of the
+  # callout that was generated during parsing.
   #
   # Returns The unique String id of the next callout in the document
   def read_next_id
@@ -86,7 +86,7 @@ class Callouts
   end
 
   # Public: Rewind the list index pointer, intended to be used when switching
-  # from the parsing to rendering phase.
+  # from the parsing to conversion phase.
   #
   # Returns nothing
   def rewind

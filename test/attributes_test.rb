@@ -149,12 +149,97 @@ endif::holygrail[]
       assert_equal nil, doc.attributes['cash']
     end
 
+    test 'backend and doctype attributes are set by default in default configuration' do
+      input = <<-EOS
+= Document Title
+Author Name
+
+content
+      EOS
+
+      doc = document_from_string input
+      expect = {
+        'backend' => 'html5',
+        'backend-html5' => '',
+        'backend-html5-doctype-article' => '',
+        'outfilesuffix' => '.html',
+        'basebackend' => 'html',
+        'basebackend-html' => '',
+        'basebackend-html-doctype-article' => '',
+        'doctype' => 'article',
+        'doctype-article' => '',
+        'filetype' => 'html',
+        'filetype-html' => ''
+      }
+      expect.each do |key, val|
+        assert doc.attributes.key? key
+        assert_equal val, doc.attributes[key]
+      end
+    end
+
+    test 'backend and doctype attributes are set by default in custom configuration' do
+      input = <<-EOS
+= Document Title
+Author Name
+
+content
+      EOS
+
+      doc = document_from_string input, :doctype => 'book', :backend => 'docbook'
+      expect = {
+        'backend' => 'docbook5',
+        'backend-docbook5' => '',
+        'backend-docbook5-doctype-book' => '',
+        'outfilesuffix' => '.xml',
+        'basebackend' => 'docbook',
+        'basebackend-docbook' => '',
+        'basebackend-docbook-doctype-book' => '',
+        'doctype' => 'book',
+        'doctype-book' => '',
+        'filetype' => 'xml',
+        'filetype-xml' => ''
+      }
+      expect.each do |key, val|
+        assert doc.attributes.key? key
+        assert_equal val, doc.attributes[key]
+      end
+    end
+
     test 'backend attributes are updated if backend attribute is defined in document and safe mode is less than SERVER' do
-      doc = document_from_string(':backend: docbook45', :safe => Asciidoctor::SafeMode::SAFE)
-      assert_equal 'docbook45', doc.attributes['backend']
-      assert doc.attributes.has_key? 'backend-docbook45'
-      assert_equal 'docbook', doc.attributes['basebackend']
-      assert doc.attributes.has_key? 'basebackend-docbook'
+      input = <<-EOS
+= Document Title
+Author Name
+:backend: docbook
+:doctype: book
+
+content
+      EOS
+
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE
+      expect = {
+        'backend' => 'docbook5',
+        'backend-docbook5' => '',
+        'backend-docbook5-doctype-book' => '',
+        'outfilesuffix' => '.xml',
+        'basebackend' => 'docbook',
+        'basebackend-docbook' => '',
+        'basebackend-docbook-doctype-book' => '',
+        'doctype' => 'book',
+        'doctype-book' => '',
+        'filetype' => 'xml',
+        'filetype-xml' => ''
+      }
+      expect.each do |key, val|
+        assert doc.attributes.key?(key)
+        assert_equal val, doc.attributes[key]
+      end
+
+      assert !doc.attributes.key?('backend-html5')
+      assert !doc.attributes.key?('backend-html5-doctype-article')
+      assert !doc.attributes.key?('basebackend-html')
+      assert !doc.attributes.key?('basebackend-html-doctype-article')
+      assert !doc.attributes.key?('doctype-article')
+      assert !doc.attributes.key?('filetype-html')
     end
 
     test 'backend attributes defined in document options overrides backend attribute in document' do

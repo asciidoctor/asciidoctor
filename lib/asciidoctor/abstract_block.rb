@@ -6,9 +6,6 @@ class AbstractBlock < AbstractNode
   # Public: Substitutions to be applied to content in this block
   attr_reader :subs
 
-  # Public: Get/Set the String name of the render template
-  attr_accessor :template_name
-
   # Public: Get the Array of Asciidoctor::AbstractBlock sub-blocks for this block
   attr_reader :blocks
 
@@ -29,7 +26,6 @@ class AbstractBlock < AbstractNode
     @content_model = :compound
     @subs = []
     @default_subs = nil
-    @template_name = %(block_#{context})
     @blocks = []
     @id = nil
     @title = nil
@@ -44,28 +40,39 @@ class AbstractBlock < AbstractNode
     @next_section_number = 1
   end
 
+  def block?
+    true
+  end
+
+  def inline?
+    false
+  end
+
   # Public: Update the context of this block.
   #
   # This method changes the context of this block. It also
-  # updates the template name accordingly.
+  # updates the node name accordingly.
   def context=(context)
     @context = context
-    @template_name = %(block_#{context})
+    @node_name = context.to_s
   end
 
-  # Public: Get the rendered String content for this Block.  If the block
+  # Public: Get the converted String content for this Block.  If the block
   # has child blocks, the content method should cause them to be
-  # rendered and returned as content that can be included in the
+  # converted and returned as content that can be included in the
   # parent block's template.
-  def render
+  def convert
     @document.playback_attributes @attributes
-    renderer.render(@template_name, self)
+    converter.convert self
   end
 
-  # Public: Get an rendered version of the block content, rendering the
+  # Alias render to convert to maintain backwards compatibility
+  alias :render :convert
+
+  # Public: Get the converted result of the child blocks by converting the
   # children appropriate to content model that this block supports.
   def content
-    @blocks.map {|b| b.render } * EOL
+    @blocks.map {|b| b.convert } * EOL
   end
 
   # Public: A convenience method that checks whether the specified

@@ -250,11 +250,11 @@ class Table::Cell < AbstractNode
   # Public: Handles the body data (tbody, tfoot), applying styles and partitioning into paragraphs
   def content
     if @style == :asciidoc
-      @inner_document.render
+      @inner_document.convert
     else
-      text.split(BlankLineRx).map {|p|
-        !@style || @style == :header ? p : Inline.new(parent, :quoted, p, :type => @style).render
-      }
+      text.split(BlankLineRx).map do |p|
+        !@style || @style == :header ? p : Inline.new(parent, :quoted, p, :type => @style).convert
+      end
     end
   end
 

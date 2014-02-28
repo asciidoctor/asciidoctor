@@ -1,5 +1,5 @@
 module Asciidoctor
-# Extensions provide a way to participate in the parsing and rendering
+# Extensions provide a way to participate in the parsing and converting
 # phases of the AsciiDoc processor or extend the AsciiDoc syntax.
 #
 # The various extensions participate in AsciiDoc processing as follows:
@@ -11,9 +11,9 @@ module Asciidoctor
 #    Custom blocks and block macros are processed by associated {BlockProcessor}s
 #    and {BlockMacroProcessor}s, respectively.
 # 3. {Treeprocessor}s are run on the abstract syntax tree.
-# 4. Rendering of the document begins, at which point inline markup is processed
-#    and rendered. Custom inline macros are processed by associated {InlineMacroProcessor}s.
-# 5. {Postprocessor}s modify or replace the rendered document.
+# 4. Conversion of the document begins, at which point inline markup is processed
+#    and converted. Custom inline macros are processed by associated {InlineMacroProcessor}s.
+# 5. {Postprocessor}s modify or replace the converted document.
 # 6. The output is written to the output stream.
 #
 # Extensions may be registered globally using the {Extensions.register} method
@@ -198,14 +198,14 @@ module Extensions
   end
   Treeprocessor::DSL = ProcessorDsl
 
-  # Public: Postprocessors are run after the document is rendered, but before
+  # Public: Postprocessors are run after the document is converted, but before
   # it is written to the output stream.
   #
-  # Asciidoctor passes a reference to the rendered String to the {Processor#process}
+  # Asciidoctor passes a reference to the converted String to the {Processor#process}
   # method of each registered Postprocessor. The Preprocessor modifies the
   # String as necessary and returns the String replacement.
   #
-  # The markup format in the String is determined by the backend used to render
+  # The markup format in the String is determined by the backend used to convert
   # the Document. The backend and be looked up using the backend method on the
   # Document object, as well as various backend-related document attributes.
   #
@@ -617,7 +617,7 @@ module Extensions
     end
 
     # Public: Registers a {Postprocessor} with the extension registry to process
-    # the output after rendering is complete.
+    # the output after conversion is complete.
     #
     # The Postprocessor may be one of four types:
     #

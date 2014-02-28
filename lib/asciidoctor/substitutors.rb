@@ -19,6 +19,7 @@ module Substitutors
     :title    => [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements],
     :header   => [:specialcharacters, :attributes],
     # by default, AsciiDoc performs :attributes and :macros on a pass block
+    # TODO make this a compliance setting
     :pass     => []
   }
 
@@ -95,8 +96,7 @@ module Substitutors
 
     return source if subs.empty?
 
-    multiline = source.is_a? ::Array
-    text = multiline ? (source * EOL) : source
+    text = (multiline = source.is_a? ::Array) ? (source * EOL) : source
 
     if (has_passthroughs = subs.include? :macros)
       text = extract_passthroughs text
@@ -249,7 +249,7 @@ module Substitutors
       pass = @passthroughs[$~[1].to_i]
       subbed_text = (subs = pass[:subs]) ? (apply_subs pass[:text], subs) : pass[:text]
       if (type = pass[:type])
-        Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).render
+        Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).convert
       else
         subbed_text
       end
@@ -274,19 +274,19 @@ module Substitutors
   #
   # text - The String text to process
   #
-  # returns The String text with quoted text rendered using the backend templates
+  # returns The converted String text
   def sub_quotes(text)
     if ::RUBY_ENGINE_OPAL
       result = text
       QUOTE_SUBS.each {|type, scope, pattern|
-        result = result.gsub(pattern) { transform_quoted_text $~, type, scope }
+        result = result.gsub(pattern) { convert_quoted_text $~, type, scope }
       }
     else
       # NOTE interpolation is faster than String#dup
       result = %(#{text})
       # NOTE using gsub! as optimization
       QUOTE_SUBS.each {|type, scope, pattern|
-        result.gsub!(pattern) { transform_quoted_text $~, type, scope }
+        result.gsub!(pattern) { convert_quoted_text $~, type, scope }
       }
     end
 
@@ -429,7 +429,7 @@ module Substitutors
   #
   # source - The String text to process
   #
-  # returns The String with the inline macros rendered using the backend templates
+  # returns The converted String text
   def sub_macros(source)
     return source if source.nil_or_empty?
 
@@ -473,10 +473,10 @@ module Substitutors
                 c
               }
             end
-            Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).render
+            Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).convert
           elsif captured.start_with?('btn')
             label = unescape_bracketed_text m[1]
-            Inline.new(self, :button, label).render
+            Inline.new(self, :button, label).convert
           end
         }
       end
@@ -506,7 +506,7 @@ module Substitutors
             end
           end
 
-          Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).render
+          Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).convert
         }
       end
 
@@ -523,7 +523,7 @@ module Substitutors
 
           menu, *submenus = input.split('&gt;').map {|it| it.strip }
           menuitem = submenus.pop
-          Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).render
+          Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).convert
         }
       end
     end
@@ -579,7 +579,7 @@ module Substitutors
         end
         attrs = parse_attributes(raw_attrs, posattrs)
         attrs['alt'] ||= File.basename(target, File.extname(target))
-        Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).render
+        Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
       }
     end
 
@@ -618,7 +618,7 @@ module Substitutors
             terms = split_simple_csv normalize_string(m[2], true)
           end
           @document.register(:indexterms, [*terms])
-          Inline.new(self, :indexterm, nil, :attributes => {'terms' => terms}).render
+          Inline.new(self, :indexterm, nil, :attributes => {'terms' => terms}).convert
         # visible
         else
           if !macro_name
@@ -629,7 +629,7 @@ module Substitutors
             text = normalize_string m[2], true
           end
           @document.register(:indexterms, [text])
-          Inline.new(self, :indexterm, text, :type => :visible).render
+          Inline.new(self, :indexterm, text, :type => :visible).convert
         end
       }
     end
@@ -710,7 +710,7 @@ module Substitutors
           end
         end
 
-        "#{prefix}#{Inline.new(self, :anchor, text, :type => :link, :target => target, :attributes => attrs).render}#{suffix}"
+        "#{prefix}#{Inline.new(self, :anchor, text, :type => :link, :target => target, :attributes => attrs).convert}#{suffix}"
       }
     end
 
@@ -762,7 +762,7 @@ module Substitutors
           end
         end
 
-        Inline.new(self, :anchor, text, :type => :link, :target => target, :attributes => attrs).render
+        Inline.new(self, :anchor, text, :type => :link, :target => target, :attributes => attrs).convert
       }
     end
 
@@ -784,7 +784,7 @@ module Substitutors
         # QUESTION should this be registered as an e-mail address?
         @document.register(:links, target)
 
-        Inline.new(self, :anchor, address, :type => :link, :target => target).render
+        Inline.new(self, :anchor, address, :type => :link, :target => target).convert
       }
     end
 
@@ -827,7 +827,7 @@ module Substitutors
             type = :xref
           end
         end
-        Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).render
+        Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).convert
       }
     end
 
@@ -845,7 +845,7 @@ module Substitutors
           next m[0][1..-1]
         end
         id = reftext = m[1]
-        Inline.new(self, :anchor, reftext, :type => :bibref, :target => id).render
+        Inline.new(self, :anchor, reftext, :type => :bibref, :target => id).convert
       }
     end
 
@@ -876,7 +876,7 @@ module Substitutors
         else
           Debug.debug { "Missing reference for anchor #{id}" }
         end
-        Inline.new(self, :anchor, reftext, :type => :ref, :target => id).render
+        Inline.new(self, :anchor, reftext, :type => :ref, :target => id).convert
       }
     end
 
@@ -927,7 +927,7 @@ module Substitutors
             target = fragment ? %(#{path}##{fragment}) : path
           end
         end
-        Inline.new(self, :anchor, reftext, :type => :xref, :target => target, :attributes => {'path' => path, 'fragment' => fragment, 'refid' => refid}).render
+        Inline.new(self, :anchor, reftext, :type => :xref, :target => target, :attributes => {'path' => path, 'fragment' => fragment, 'refid' => refid}).convert
       }
     end
 
@@ -938,9 +938,9 @@ module Substitutors
   #
   # text - The String text to process
   #
-  # returns The String with the callout references rendered using the backend templates
+  # Returns the converted String text
   def sub_callouts(text)
-    text.gsub(CalloutRenderRx) {
+    text.gsub(CalloutConvertRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
@@ -948,7 +948,7 @@ module Substitutors
         # we have to do a sub since we aren't sure it's the first char
         next m[0].sub('\\', '')
       end
-      Inline.new(self, :callout, m[3], :id => @document.callouts.read_next_id).render
+      Inline.new(self, :callout, m[3], :id => @document.callouts.read_next_id).convert
     }
   end
 
@@ -956,49 +956,49 @@ module Substitutors
   #
   # text - The String text to process
   #
-  # returns The String with the post replacements rendered using the backend templates
+  # Returns the converted String text
   def sub_post_replacements(text)
     if (@document.attributes.has_key? 'hardbreaks') || (@attributes.has_key? 'hardbreaks-option')
       lines = (text.split EOL)
       return text if lines.size == 1
       last = lines.pop
-      lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).render }.push(last) * EOL
+      lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).convert }.push(last) * EOL
     elsif text.include? '+'
-      text.gsub(LineBreakRx) { Inline.new(self, :break, $~[1], :type => :line).render }
+      text.gsub(LineBreakRx) { Inline.new(self, :break, $~[1], :type => :line).convert }
     else
       text
     end
   end
 
-  # Internal: Transform (render) a quoted text region
+  # Internal: Convert a quoted text region
   #
   # match  - The MatchData for the quoted text region
   # type   - The quoting type (single, double, strong, emphasis, monospaced, etc)
   # scope  - The scope of the quoting (constrained or unconstrained)
   #
-  # returns The rendered text for the quoted text region
-  def transform_quoted_text(match, type, scope)
+  # Returns The converted String text for the quoted text region
+  def convert_quoted_text(match, type, scope)
     unescaped_attrs = nil
     if match[0].start_with? '\\'
-      if scope == :constrained && match[2]
-        unescaped_attrs = %([#{match[2]}])
+      if scope == :constrained && (attrs = match[2])
+        unescaped_attrs = %([#{attrs}])
       else
         return match[0][1..-1]
       end
     end
 
     if scope == :constrained
-      if !unescaped_attrs
+      if unescaped_attrs
+        %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type).convert})
+      else
         attributes = parse_quoted_text_attributes(match[2])
         id = attributes ? attributes.delete('id') : nil
-        %(#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :id => id, :attributes => attributes).render})
-      else
-        %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type).render})
+        %(#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :id => id, :attributes => attributes).convert})
       end
     else
       attributes = parse_quoted_text_attributes(match[1])
       id = attributes ? attributes.delete('id') : nil
-      Inline.new(self, :quoted, match[2], :type => type, :id => id, :attributes => attributes).render
+      Inline.new(self, :quoted, match[2], :type => type, :id => id, :attributes => attributes).convert
     end
   end
 
@@ -1224,7 +1224,7 @@ module Substitutors
   # on the document, otherwise return the text unprocessed
   #
   # Callout marks are stripped from the source prior to passing it to the
-  # highlighter, then later restored in rendered form, so they are not
+  # highlighter, then later restored in converted form, so they are not
   # incorrectly processed by the source highlighter.
   #
   # source - the source code String to highlight
@@ -1318,9 +1318,9 @@ module Substitutors
             line = line[0...pos]
           end
           if conums.size == 1
-            %(#{line}#{Inline.new(self, :callout, conums[0], :id => @document.callouts.read_next_id).render }#{tail})
+            %(#{line}#{Inline.new(self, :callout, conums[0], :id => @document.callouts.read_next_id).convert }#{tail})
           else
-            conums_markup = conums.map {|conum| Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).render } * ' '
+            conums_markup = conums.map {|conum| Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).convert } * ' '
             %(#{line}#{conums_markup}#{tail})
           end
         else

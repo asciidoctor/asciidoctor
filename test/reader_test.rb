@@ -312,7 +312,7 @@ This is a paragraph outside the block.
 
         reader = Asciidoctor::Reader.new lines
         reader.read_line
-        result = reader.read_lines_until {|line| line.chomp == '--' }
+        result = reader.read_lines_until {|line| line == '--' }
         assert_equal 3, result.size
         assert_equal lines[1, 3], result
         assert reader.next_line_empty?
@@ -361,14 +361,13 @@ This is a paragraph outside the block.
   context 'PreprocessorReader' do
     context 'Type hierarchy' do
       test 'PreprocessorReader should extend from Reader' do
-        doc = Asciidoctor::Document.new
-        reader = Asciidoctor::PreprocessorReader.new doc
+        reader = empty_document.reader
         assert reader.is_a?(Asciidoctor::Reader)
       end
 
       test 'PreprocessorReader should invoke or emulate Reader initializer' do
-        doc = Asciidoctor::Document.new
-        reader = Asciidoctor::PreprocessorReader.new doc, SAMPLE_DATA
+        doc = Asciidoctor::Document.new SAMPLE_DATA
+        reader = doc.reader
         assert_equal SAMPLE_DATA, reader.lines
         assert_equal 1, reader.lineno
       end
@@ -376,21 +375,21 @@ This is a paragraph outside the block.
 
     context 'Prepare lines' do
       test 'should prepare and normalize lines from Array data' do
-        doc = Asciidoctor::Document.new
         data = SAMPLE_DATA.map {|line| line.chomp}
         data.unshift ''
         data.push ''
-        reader = Asciidoctor::PreprocessorReader.new doc, data
+        doc = Asciidoctor::Document.new data
+        reader = doc.reader
         assert_equal SAMPLE_DATA, reader.lines
       end
 
       test 'should prepare and normalize lines from String data' do
-        doc = Asciidoctor::Document.new
         data = SAMPLE_DATA.map {|line| line.chomp}
         data.unshift ' '
         data.push ' '
         data_as_string = data * ::Asciidoctor::EOL
-        reader = Asciidoctor::PreprocessorReader.new doc, data_as_string
+        doc = Asciidoctor::Document.new data_as_string
+        reader = doc.reader
         assert_equal SAMPLE_DATA, reader.lines
       end
 
@@ -402,9 +401,9 @@ CRLF\r
 endlines\r
       EOS
 
-        doc = Asciidoctor::Document.new
         [input, input.lines.to_a, input.split(::Asciidoctor::EOL), input.split(::Asciidoctor::EOL).join(::Asciidoctor::EOL)].each do |lines|
-          reader = Asciidoctor::PreprocessorReader.new doc, lines
+          doc = Asciidoctor::Document.new lines
+          reader = doc.reader
           reader.lines.each do |line|
             assert !line.end_with?("\r"), "CRLF not properly cleaned for source lines: #{lines.inspect}"
             assert !line.end_with?("\r\n"), "CRLF not properly cleaned for source lines: #{lines.inspect}"
@@ -427,9 +426,10 @@ Author Name
 preamble
         EOS
 
-        doc = Asciidoctor::Document.new
-        reader = Asciidoctor::PreprocessorReader.new doc, input
-        assert_equal '---', reader.peek_line.chomp
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert !doc.attributes.key?('front-matter')
+        assert_equal '---', reader.peek_line
     end
 
     test 'should skip front matter if specified by skip-front-matter attribute' do
@@ -447,26 +447,25 @@ Author Name
 preamble
         EOS
 
-        doc = Asciidoctor::Document.new [], :attributes => {'skip-front-matter' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
-        assert_equal '= Document Title', reader.peek_line.chomp
+        doc = Asciidoctor::Document.new input, :attributes => {'skip-front-matter' => ''}
+        reader = doc.reader
+        assert_equal '= Document Title', reader.peek_line
         assert_equal front_matter, doc.attributes['front-matter']
       end
     end
 
     context 'Include Stack' do
       test 'PreprocessorReader#push_include method should return nil' do
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, ''
+        reader = empty_document.reader
         append_lines = %w(one two three)
         result = reader.push_include append_lines, '<stdin>', '<stdin>'
         assert_nil result
       end
 
       test 'PreprocessorReader#push_include method should put lines on top of stack' do
-        doc = empty_document
         lines = %w(a b c)
-        reader = Asciidoctor::PreprocessorReader.new doc, lines
+        doc = Asciidoctor::Document.new lines
+        reader = doc.reader
         append_lines = %w(one two three)
         reader.push_include append_lines, '', '<stdin>'
         assert_equal 1, reader.include_stack.size
@@ -474,9 +473,9 @@ preamble
       end
 
       test 'PreprocessorReader#push_include method should gracefully handle file and path' do
-        doc = empty_document
         lines = %w(a b c)
-        reader = Asciidoctor::PreprocessorReader.new doc, lines
+        doc = Asciidoctor::Document.new lines
+        reader = doc.reader
         append_lines = %w(one two three)
         assert_nothing_raised do
           reader.push_include append_lines
@@ -493,9 +492,9 @@ preamble
         input = <<-EOS
 include::include-file.asciidoc[]
         EOS
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
-        assert_equal 'link:include-file.asciidoc[]', reader.read_line.chomp
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 'link:include-file.asciidoc[]', reader.read_line
       end
   
       test 'include directive is enabled when safe mode is less than SECURE' do
@@ -831,10 +830,10 @@ yo
         reader = Asciidoctor::PreprocessorReader.new doc, input
         # we should be able to peek it multiple times and still have the backslash preserved
         # this is the test for @unescape_next_line
-        assert_equal 'include::fixtures/include-file.asciidoc[]', reader.peek_line.chomp
-        assert_equal 'include::fixtures/include-file.asciidoc[]', reader.peek_line.chomp
-        assert_equal 'include::fixtures/include-file.asciidoc[]', reader.read_line.chomp
-        assert_equal '\\escape preserved here', reader.read_line.chomp
+        assert_equal 'include::fixtures/include-file.asciidoc[]', reader.peek_line
+        assert_equal 'include::fixtures/include-file.asciidoc[]', reader.peek_line
+        assert_equal 'include::fixtures/include-file.asciidoc[]', reader.read_line
+        assert_equal '\\escape preserved here', reader.read_line
       end
   
       test 'include directive not at start of line is ignored' do
@@ -933,7 +932,8 @@ Asciidoctor!
 endif::asciidoctor[]
         EOS
   
-        reader = Asciidoctor::PreprocessorReader.new empty_document, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         assert_nil reader.process_line(reader.lines.first)
       end
 
@@ -944,7 +944,8 @@ Asciidoctor!
 endif::asciidoctor[]
         EOS
   
-        reader = Asciidoctor::PreprocessorReader.new empty_document, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         assert_equal 1, reader.lineno
         assert_equal 'Asciidoctor!', reader.peek_line
         assert_equal 2, reader.lineno
@@ -958,7 +959,8 @@ Asciidoctor!
 endif::asciidoctor[]
         EOS
   
-        reader = Asciidoctor::PreprocessorReader.new empty_document, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         assert_not_nil reader.process_line(reader.lines.first)
       end
 
@@ -970,7 +972,8 @@ Asciidoctor!
 endif::asciidoctor[]
         EOS
   
-        reader = Asciidoctor::PreprocessorReader.new empty_document, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         assert_equal 1, reader.lineno
         assert_equal 'content', reader.peek_line
         assert_equal 1, reader.lineno
@@ -983,7 +986,8 @@ swallowed content
 endif::foobar[]
         EOS
   
-        reader = Asciidoctor::PreprocessorReader.new empty_document, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         assert_equal 1, reader.lineno
         assert_nil reader.peek_line
         assert_equal 4, reader.lineno
@@ -996,8 +1000,8 @@ There is a holy grail!
 endif::holygrail[]
         EOS
          
-        doc = empty_document :attributes => {'holygrail' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'holygrail' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1012,8 +1016,8 @@ ifdef::holygrail[There is a holy grail!]
 There was much rejoicing.
         EOS
          
-        doc = empty_document :attributes => {'holygrail' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'holygrail' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1028,8 +1032,8 @@ ifndef::hardships[There is a holy grail!]
 There was no rejoicing.
         EOS
          
-        doc = empty_document :attributes => {'hardships' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'hardships' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1048,8 +1052,8 @@ grail
 endif::grail[]
         EOS
          
-        doc = empty_document :attributes => {'grail' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1066,8 +1070,8 @@ endif::grail[]
 endif::grail[]
         EOS
          
-        doc = empty_document :attributes => {'grail' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1086,8 +1090,8 @@ grail
 endif::grail[]
         EOS
          
-        doc = empty_document :attributes => {'grail' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1108,8 +1112,8 @@ endif::swallow[]
 gone
         EOS
          
-        doc = empty_document :attributes => {'grail' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1130,8 +1134,8 @@ endif::[]
 gone
         EOS
          
-        doc = empty_document :attributes => {'grail' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1146,8 +1150,8 @@ Our quest is complete!
 endif::holygrail,swallow[]
         EOS
   
-        doc = empty_document :attributes => {'swallow' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1162,8 +1166,8 @@ Our quest is complete!
 endif::holygrail,swallow[]
         EOS
   
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1178,8 +1182,8 @@ Our quest is complete!
 endif::holygrail+swallow[]
         EOS
   
-        doc = empty_document :attributes => {'holygrail' => '', 'swallow' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'holygrail' => '', 'swallow' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1194,8 +1198,8 @@ Our quest is complete!
 endif::holygrail+swallow[]
         EOS
   
-        doc = empty_document :attributes => {'holygrail' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'holygrail' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1210,8 +1214,8 @@ Our quest continues to find the holy grail!
 endif::holygrail[]
         EOS
   
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1226,8 +1230,8 @@ Our quest is complete!
 endif::holygrail,swallow[]
         EOS
   
-        doc = empty_document :attributes => {'swallow' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1242,8 +1246,8 @@ Our quest is complete!
 endif::holygrail,swallow[]
         EOS
   
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1258,8 +1262,8 @@ Our quest is complete!
 endif::holygrail+swallow[]
         EOS
   
-        doc = empty_document :attributes => {'swallow' => ''}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1274,8 +1278,8 @@ Our quest is complete!
 endif::holygrail+swallow[]
         EOS
   
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1290,8 +1294,8 @@ content
 \\endif::holygrail[]
         EOS
   
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1306,8 +1310,8 @@ Asciidoctor it is!
 endif::[]
         EOS
   
-        doc = empty_document :attributes => {'gem' => 'asciidoctor'}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'gem' => 'asciidoctor' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1322,8 +1326,8 @@ Asciidoctor it is!
 endif::[]
         EOS
   
-        doc = empty_document :attributes => {'gem' => 'asciidoctor'}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'gem' => 'asciidoctor' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1338,8 +1342,8 @@ Asciidoctor it is!
 endif::[]
         EOS
   
-        doc = empty_document :attributes => {'gem' => 'tilt'}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'gem' => 'tilt' }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1354,8 +1358,8 @@ That version will do!
 endif::[]
         EOS
   
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1370,8 +1374,8 @@ Of course it's the same!
 endif::[]
         EOS
   
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1386,8 +1390,8 @@ That version will do!
 endif::[]
         EOS
   
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1402,8 +1406,8 @@ One ring to rule them all!
 endif::[]
         EOS
   
-        doc = empty_document :attributes => {'rings' => 1}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input, :attributes => { 'rings' => 1 }
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line
@@ -1417,8 +1421,8 @@ ifdef::[]
 content
         EOS
   
-        doc = empty_document
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
         lines = []
         while reader.has_more_lines?
           lines << reader.read_line

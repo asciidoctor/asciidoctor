@@ -16,8 +16,8 @@ Feature: Cross References
     
     Instructions go here.
     """
-  When it is rendered using the html backend
-  Then the output should match the HTML structure
+  When it is converted to html
+  Then the result should match the HTML structure
     """
     table.tableblock.frame-all.grid-all style='width: 100%;'
       colgroup

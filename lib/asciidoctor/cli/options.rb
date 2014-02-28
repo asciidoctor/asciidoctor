@@ -19,7 +19,6 @@ module Asciidoctor
           self[:attributes]['backend'] = options[:backend]
         end
         self[:eruby] = options[:eruby] || nil
-        self[:compact] = options[:compact] || false
         self[:verbose] = options[:verbose] || 1
         self[:load_paths] = options[:load_paths] || nil
         self[:requires] = options[:requires] || nil
@@ -46,7 +45,7 @@ Example: asciidoctor -b html5 source.asciidoc
             self[:attributes]['backend'] = backend
           end
           opts.on('-d', '--doctype DOCTYPE', ['article', 'book', 'manpage', 'inline'],
-                  'document type to use when rendering output: [article, book, manpage, inline] (default: article)') do |doc_type|
+                  'document type to use when converting document: [article, book, manpage, inline] (default: article)') do |doc_type|
             self[:attributes]['doctype'] = doc_type
           end
           opts.on('-o', '--out-file FILE', 'output file (default: based on input file path); use - to output to STDOUT') do |output_file|
@@ -70,11 +69,10 @@ Example: asciidoctor -b html5 source.asciidoc
             self[:attributes]['numbered'] = ''
           end
           opts.on('-e', '--eruby ERUBY', ['erb', 'erubis'],
-                  'specify eRuby implementation to render built-in templates: [erb, erubis] (default: erb)') do |eruby|
+                  'specify eRuby implementation to use when rendering custom ERB templates: [erb, erubis] (default: erb)') do |eruby|
             self[:eruby] = eruby
           end
-          opts.on('-C', '--compact', 'compact the output by removing blank lines (default: false)') do
-            self[:compact] = true
+          opts.on('-C', '--compact', 'compact the output by removing blank lines. (No longer in use)') do
           end
           opts.on('-a', '--attribute key[=value],key2[=value2],...', ::Array,
                   'a list of document attributes to set in the form of key, key! or key=value pair',
@@ -89,7 +87,7 @@ Example: asciidoctor -b html5 source.asciidoc
               self[:attributes][key] = val || ''
             end
           end
-          opts.on('-T', '--template-dir DIR', 'a directory containing custom render templates that override the built-in set (requires tilt gem)',
+          opts.on('-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
                   'may be specified multiple times') do |template_dir|
             if self[:template_dirs].nil?
               self[:template_dirs] = [template_dir]
@@ -99,7 +97,7 @@ Example: asciidoctor -b html5 source.asciidoc
               self[:template_dirs] = [self[:template_dirs], template_dir]
             end
           end
-          opts.on('-E', '--template-engine NAME', 'template engine to use for the custom render templates (loads gem on demand)') do |template_engine|
+          opts.on('-E', '--template-engine NAME', 'template engine to use for the custom converter templates (loads gem on demand)') do |template_engine|
             self[:template_engine] = template_engine
           end
           opts.on('-B', '--base-dir DIR', 'base directory containing the document and resources (default: directory of source file)') do |base_dir|
@@ -186,7 +184,7 @@ Example: asciidoctor -b html5 source.asciidoc
 
           if self[:template_dirs]
             begin
-              require 'tilt'
+              require 'tilt' unless defined? ::Tilt
             rescue ::LoadError
               $stderr.puts 'asciidoctor: FAILED: tilt could not be loaded; to use a custom backend, you must have the tilt gem installed (gem install tilt)'
               return 1

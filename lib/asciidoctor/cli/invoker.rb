@@ -42,7 +42,7 @@ module Asciidoctor
 
         begin
           opts = {}
-          profile = false
+          show_timings = false
           infiles = []
           outfile = nil
           tofile = nil
@@ -58,7 +58,7 @@ module Asciidoctor
             when :attributes
               opts[:attributes] = v.dup
             when :verbose
-              profile = true if v == 2
+              show_timings = true if v == 2
             when :trace
               # currently, nothing
             else
@@ -88,22 +88,11 @@ module Asciidoctor
 
           original_opts = opts
           inputs.each do |input|
-            
             opts = Helpers.clone_options(original_opts) if inputs.size > 1
             opts[:to_file] = tofile unless tofile.nil?
-            opts[:monitor] = {} if profile
-
-            @documents ||= []
-            @documents.push ::Asciidoctor.render(input, opts)
-
-            if profile
-              monitor = opts[:monitor]
-              err = (@err || $stderr)
-              err.puts "Input file: #{input.respond_to?(:path) ? input.path : '-'}"
-              err.puts "  Time to read and parse source: #{'%05.5f' % monitor[:parse]}"
-              err.puts "  Time to render document: #{monitor.has_key?(:render) ? '%05.5f' % monitor[:render] : 'n/a'}"
-              err.puts "  Total time to read, parse and render: #{'%05.5f' % (monitor[:load_render] || monitor[:parse])}"
-            end
+            timings = opts[:timings] = Timings.new if show_timings
+            @documents << (::Asciidoctor.convert input, opts)
+            timings.print_report((@err || $stderr), ((input.respond_to? :path) ? input.path : '-')) if show_timings
           end
         rescue ::Exception => e
           raise e if @options[:trace] || ::SystemExit === e

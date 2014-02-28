@@ -636,7 +636,7 @@ output file name is used.
       assert !body_cell_1_3.inner_document.nil?
       assert body_cell_1_3.inner_document.nested?
       assert_equal doc, body_cell_1_3.inner_document.parent_document
-      assert_equal doc.renderer, body_cell_1_3.inner_document.renderer
+      assert_equal doc.converter, body_cell_1_3.inner_document.converter
       output = doc.render
 
       assert_css 'table > tbody > tr', output, 2

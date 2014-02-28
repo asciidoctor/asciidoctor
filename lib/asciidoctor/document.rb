@@ -1,6 +1,5 @@
 module Asciidoctor
-# Public: Methods for parsing Asciidoc documents and rendering them
-# using erb templates.
+# Public: Methods for parsing and converting AsciiDoc documents.
 #
 # There are several strategies for getting the title of the document:
 #
@@ -19,7 +18,7 @@ module Asciidoctor
 # nofooter - the footer block should not be shown
 class Document < AbstractBlock
 
-  Footnote = Struct.new :index, :id, :text
+  Footnote = ::Struct.new :index, :id, :text
 
   class AttributeEntry
     attr_reader :name, :value, :negate
@@ -47,7 +46,7 @@ class Document < AbstractBlock
   # of the source file and disables any macro other than the include macro.
   #
   # A value of 10 (SERVER) disallows the document from setting attributes that
-  # would affect the rendering of the document, in addition to all the security
+  # would affect the conversion of the document, in addition to all the security
   # features of SafeMode::SAFE. For instance, this value disallows changing the
   # backend or the source-highlighter using an attribute defined in the source
   # document. This is the most fundamental level of security for server-side
@@ -82,50 +81,56 @@ class Document < AbstractBlock
   # Public: The section level 0 block
   attr_reader :header
 
-  # Public: Base directory for rendering this document. Defaults to directory of the source file.
+  # Public: Base directory for converting this document. Defaults to directory of the source file.
   # If the source is a string, defaults to the current directory.
   attr_reader :base_dir
 
   # Public: A reference to the parent document of this nested document.
   attr_reader :parent_document
 
+  # Public: The Reader associated with this document
+  attr_reader :reader
+
+  # Public: The Converter associated with this document
+  attr_reader :converter
+
   # Public: The extensions registry
   attr_reader :extensions
 
-  # Public: Initialize an Asciidoc object.
+  # Public: Initialize a {Document} object.
   #
-  # data    - The Array of Strings holding the Asciidoc source document. (default: [])
-  # options - A Hash of options to control processing, such as setting the safe mode (:safe),
-  #           suppressing the header/footer (:header_footer) and attribute overrides (:attributes)
-  #           (default: {})
+  # data    - The AsciiDoc source data as a String or String Array. (default: nil)
+  # options - A Hash of options to control processing (e.g., safe mode value (:safe), backend (:backend),
+  #           header/footer toggle (:header_footer), custom attributes (:attributes)). (default: {})
   #
   # Examples
   #
-  #   data = File.readlines(filename)
-  #   doc  = Asciidoctor::Document.new(data)
-  #   puts doc.render
-  def initialize(data = [], options = {})
-    super(self, :document)
+  #   data = File.read filename
+  #   doc = Asciidoctor::Document.new data
+  #   puts doc.convert
+  def initialize data = nil, options = {}
+    super self, :document
 
-    if options[:parent]
-      @parent_document = options.delete(:parent)
-      options[:base_dir] ||= @parent_document.base_dir
-      @references = @parent_document.references.inject({}) do |collector,(key,ref)|
+    if (parent_doc = options.delete :parent)
+      @parent_document = parent_doc
+      options[:base_dir] ||= parent_doc.base_dir
+      @references = parent_doc.references.inject({}) do |accum, (key,ref)|
         if key == :footnotes
-          collector[:footnotes] = []
+          accum[:footnotes] = []
         else
-          collector[key] = ref
+          accum[key] = ref
         end
-        collector
+        accum
       end
       # QUESTION should we support setting attribute in parent document from nested document?
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
-      @attribute_overrides = @parent_document.attributes.dup
-      @attribute_overrides.delete 'doctype'
-      @safe = @parent_document.safe
-      @renderer = @parent_document.renderer
+      attr_overrides = parent_doc.attributes.dup
+      attr_overrides.delete 'doctype'
+      @attribute_overrides = attr_overrides
+      @safe = parent_doc.safe
+      @converter = parent_doc.converter
       initialize_extensions = false
-      @extensions = @parent_document.extensions
+      @extensions = parent_doc.extensions
     else
       @parent_document = nil
       @references = {
@@ -140,191 +145,192 @@ class Document < AbstractBlock
       # attribute overrides are attributes that can only be set from the commandline
       # a direct assignment effectively makes the attribute a constant
       # a nil value or name with leading or trailing ! will result in the attribute being unassigned
-      overrides = {}
+      attr_overrides = {}
       (options[:attributes] || {}).each do |key, value|
-        if key.start_with?('!')
+        if key.start_with? '!'
           key = key[1..-1]
           value = nil
-        elsif key.end_with?('!')
+        elsif key.end_with? '!'
           key = key.chop
           value = nil
         end
-        overrides[key.downcase] = value
+        attr_overrides[key.downcase] = value
       end
-      @attribute_overrides = overrides
+      @attribute_overrides = attr_overrides
       @safe = nil
-      @renderer = nil
+      @converter = nil
       initialize_extensions = defined? ::Asciidoctor::Extensions
       @extensions = nil # initialize furthur down
     end
 
+    @parsed = false
     @header = nil
     @counters = {}
     @callouts = Callouts.new
     @attributes_modified = ::Set.new
     @options = options
-    unless @parent_document
+    unless parent_doc
       # safely resolve the safe mode from const, int or string
-      if !@safe && !(safe_mode = options[:safe])
+      if !(safe_mode = options[:safe])
         @safe = SafeMode::SECURE
-      elsif safe_mode.is_a?(::Fixnum)
+      elsif safe_mode.is_a? ::Fixnum
         # be permissive in case API user wants to define new levels
         @safe = safe_mode
       else
-        begin
-          @safe = SafeMode.const_get(safe_mode.to_s.upcase).to_i
-        rescue
-          @safe = SafeMode::SECURE.to_i
-        end
+        @safe = SafeMode.const_get(safe_mode.to_s.upcase).to_i rescue SafeMode::SECURE.to_i
       end
     end
-    options[:header_footer] ||= false
+    header_footer = (options[:header_footer] ||= false)
 
-    @attributes['encoding'] = 'UTF-8'
-    @attributes['sectids'] = ''
-    @attributes['notitle'] = '' unless options[:header_footer]
-    @attributes['toc-placement'] = 'auto'
-    @attributes['stylesheet'] = ''
-    @attributes['copycss'] = '' if options[:header_footer]
-    @attributes['prewrap'] = ''
-    @attributes['attribute-undefined'] = Compliance.attribute_undefined
-    @attributes['attribute-missing'] = Compliance.attribute_missing
+    attrs = @attributes
+    attrs['encoding'] = 'UTF-8'
+    attrs['sectids'] = ''
+    attrs['notitle'] = '' unless header_footer
+    attrs['toc-placement'] = 'auto'
+    attrs['stylesheet'] = ''
+    attrs['copycss'] = '' if header_footer
+    attrs['prewrap'] = ''
+    attrs['attribute-undefined'] = Compliance.attribute_undefined
+    attrs['attribute-missing'] = Compliance.attribute_missing
 
     # language strings
     # TODO load these based on language settings
-    @attributes['caution-caption'] = 'Caution'
-    @attributes['important-caption'] = 'Important'
-    @attributes['note-caption'] = 'Note'
-    @attributes['tip-caption'] = 'Tip'
-    @attributes['warning-caption'] = 'Warning'
-    @attributes['appendix-caption'] = 'Appendix'
-    @attributes['example-caption'] = 'Example'
-    @attributes['figure-caption'] = 'Figure'
-    #@attributes['listing-caption'] = 'Listing'
-    @attributes['table-caption'] = 'Table'
-    @attributes['toc-title'] = 'Table of Contents'
-    @attributes['manname-title'] = 'NAME'
-    @attributes['untitled-label'] = 'Untitled'
-    @attributes['version-label'] = 'Version'
-    @attributes['last-update-label'] = 'Last updated'
+    attrs['caution-caption'] = 'Caution'
+    attrs['important-caption'] = 'Important'
+    attrs['note-caption'] = 'Note'
+    attrs['tip-caption'] = 'Tip'
+    attrs['warning-caption'] = 'Warning'
+    attrs['appendix-caption'] = 'Appendix'
+    attrs['example-caption'] = 'Example'
+    attrs['figure-caption'] = 'Figure'
+    #attrs['listing-caption'] = 'Listing'
+    attrs['table-caption'] = 'Table'
+    attrs['toc-title'] = 'Table of Contents'
+    attrs['manname-title'] = 'NAME'
+    attrs['untitled-label'] = 'Untitled'
+    attrs['version-label'] = 'Version'
+    attrs['last-update-label'] = 'Last updated'
 
-    @attribute_overrides['asciidoctor'] = ''
-    @attribute_overrides['asciidoctor-version'] = VERSION
+    attr_overrides['asciidoctor'] = ''
+    attr_overrides['asciidoctor-version'] = VERSION
 
-    safe_mode_name = SafeMode.constants.detect {|l| SafeMode.const_get(l) == @safe}.to_s.downcase
-    @attribute_overrides['safe-mode-name'] = safe_mode_name
-    @attribute_overrides["safe-mode-#{safe_mode_name}"] = ''
-    @attribute_overrides['safe-mode-level'] = @safe
+    safe_mode_name = SafeMode.constants.detect {|l| SafeMode.const_get(l) == @safe }.to_s.downcase
+    attr_overrides['safe-mode-name'] = safe_mode_name
+    attr_overrides["safe-mode-#{safe_mode_name}"] = ''
+    attr_overrides['safe-mode-level'] = @safe
 
     # sync the embedded attribute w/ the value of options...do not allow override
-    @attribute_overrides['embedded'] = options[:header_footer] ? nil : ''
+    attr_overrides['embedded'] = header_footer ? nil : ''
 
     # the only way to set the max-include-depth attribute is via the document options
     # 64 is the AsciiDoc default
-    @attribute_overrides['max-include-depth'] ||= 64
+    attr_overrides['max-include-depth'] ||= 64
 
     # the only way to enable uri reads is via the document options, disabled by default
-    unless !@attribute_overrides['allow-uri-read'].nil?
-      @attribute_overrides['allow-uri-read'] = nil
+    unless !attr_overrides['allow-uri-read'].nil?
+      attr_overrides['allow-uri-read'] = nil
     end
 
-    @attribute_overrides['user-home'] = USER_HOME
+    attr_overrides['user-home'] = USER_HOME
 
     # if the base_dir option is specified, it overrides docdir as the root for relative paths
     # otherwise, the base_dir is the directory of the source file (docdir) or the current
     # directory of the input is a string
-    if !options[:base_dir]
-      if @attribute_overrides['docdir']
-        @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(@attribute_overrides['docdir'])
+    if options[:base_dir]
+      @base_dir = attr_overrides['docdir'] = ::File.expand_path(options[:base_dir])
+    else
+      if attr_overrides['docdir']
+        @base_dir = attr_overrides['docdir'] = ::File.expand_path(attr_overrides['docdir'])
       else
         #warn 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
-        @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(::Dir.pwd)
+        @base_dir = attr_overrides['docdir'] = ::File.expand_path(::Dir.pwd)
       end
-    else
-      @base_dir = @attribute_overrides['docdir'] = ::File.expand_path(options[:base_dir])
     end
 
-    # allow common attributes backend and doctype to be set using options hash
-    if (value = options[:backend])
-      @attribute_overrides['backend'] = %(#{value})
+    # allow common attributes backend and doctype to be set using options hash, coerce values to string
+    if (backend_val = options[:backend])
+      attr_overrides['backend'] = %(#{backend_val})
     end
 
-    if (value = options[:doctype])
-      @attribute_overrides['doctype'] = %(#{value})
+    if (doctype_val = options[:doctype])
+      attr_overrides['doctype'] = %(#{doctype_val})
     end
 
     if @safe >= SafeMode::SERVER
       # restrict document from setting copycss, source-highlighter and backend
-      @attribute_overrides['copycss'] ||= nil
-      @attribute_overrides['source-highlighter'] ||= nil
-      @attribute_overrides['backend'] ||= DEFAULT_BACKEND
+      attr_overrides['copycss'] ||= nil
+      attr_overrides['source-highlighter'] ||= nil
+      attr_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
-      if !@parent_document && @attribute_overrides.has_key?('docfile')
-        @attribute_overrides['docfile'] = @attribute_overrides['docfile'][(@attribute_overrides['docdir'].length + 1)..-1]
+      if !parent_doc && attr_overrides.key?('docfile')
+        attr_overrides['docfile'] = attr_overrides['docfile'][(attr_overrides['docdir'].length + 1)..-1]
       end
-      @attribute_overrides['docdir'] = ''
-      @attribute_overrides['user-home'] = '.'
+      attr_overrides['docdir'] = ''
+      attr_overrides['user-home'] = '.'
       if @safe >= SafeMode::SECURE
         # assign linkcss (preventing css embedding) unless explicitly disabled from the commandline or API
         # effectively the same has "has key 'linkcss' and value == nil"
-        unless @attribute_overrides.fetch('linkcss', '').nil?
-          @attribute_overrides['linkcss'] = ''
+        unless attr_overrides.fetch('linkcss', '').nil?
+          attr_overrides['linkcss'] = ''
         end
         # restrict document from enabling icons
-        @attribute_overrides['icons'] ||= nil
+        attr_overrides['icons'] ||= nil
       end
     end
     
-    @attribute_overrides.delete_if {|key, val|
+    attr_overrides.delete_if do |key, val|
       verdict = false
       # a nil value undefines the attribute 
       if val.nil?
-        @attributes.delete(key)
-      # a negative key (trailing !) undefines the attribute
-      # NOTE already normalize above as key with nil value
-      #elsif key.end_with? '!'
-      #  @attributes.delete(key[0..-2])
-      # a negative key (leading !) undefines the attribute
-      # NOTE already normalize above as key with nil value
-      #elsif key.start_with? '!'
-      #  @attributes.delete(key[1..-1])
-      # otherwise it's an attribute assignment
+        attrs.delete(key)
       else
         # a value ending in @ indicates this attribute does not override
         # an attribute with the same key in the document souce
-        if val.is_a?(::String) && val.end_with?('@')
+        if (val.is_a? ::String) && (val.end_with? '@')
           val = val.chop
           verdict = true
         end
-        @attributes[key] = val
+        attrs[key] = val
       end
       verdict
-    }
+    end
 
-    if !@parent_document
+    if parent_doc
+      # don't need to do the extra processing within our own document
+      # FIXME line info isn't reported correctly within include files in nested document
+      @reader = Reader.new data, options[:cursor]
+
+      # Now parse the lines in the reader into blocks
+      # Eagerly parse (for now) since a subdocument is not a publicly accessible object
+      Parser.parse @reader, self
+
+      # should we call rewind in some sort of post-parse function?
+      @callouts.rewind
+      @parsed = true
+    else
       # setup default backend and doctype
-      @attributes['backend'] ||= DEFAULT_BACKEND
-      @attributes['doctype'] ||= DEFAULT_DOCTYPE
-      update_backend_attributes
+      attrs['backend'] ||= DEFAULT_BACKEND
+      attrs['doctype'] ||= DEFAULT_DOCTYPE
+      update_backend_attributes attrs['backend'], true
 
-      #@attributes['indir'] = @attributes['docdir']
-      #@attributes['infile'] = @attributes['docfile']
+      #attrs['indir'] = attrs['docdir']
+      #attrs['infile'] = attrs['docfile']
 
       # dynamic intrinstic attribute values
-      now = Time.new
-      @attributes['localdate'] ||= now.strftime('%Y-%m-%d')
-      @attributes['localtime'] ||= now.strftime('%H:%M:%S %Z')
-      @attributes['localdatetime'] ||= %(#{@attributes['localdate']} #{@attributes['localtime']})
+      now = ::Time.now
+      localdate = (attrs['localdate'] ||= now.strftime('%Y-%m-%d'))
+      localtime = (attrs['localtime'] ||= now.strftime('%H:%M:%S %Z'))
+      attrs['localdatetime'] ||= %(#{localdate} #{localtime})
       
       # docdate, doctime and docdatetime should default to
       # localdate, localtime and localdatetime if not otherwise set
-      @attributes['docdate'] ||= @attributes['localdate']
-      @attributes['doctime'] ||= @attributes['localtime']
-      @attributes['docdatetime'] ||= @attributes['localdatetime']
+      attrs['docdate'] ||= localdate
+      attrs['doctime'] ||= localtime
+      attrs['docdatetime'] ||= %(#{localdate} #{localtime})
 
       # fallback directories
-      @attributes['stylesdir'] ||= '.'
-      @attributes['iconsdir'] ||= File.join(@attributes.fetch('imagesdir', './images'), 'icons')
+      attrs['stylesdir'] ||= '.'
+      attrs['iconsdir'] ||= ::File.join(attrs.fetch('imagesdir', './images'), 'icons')
 
       @extensions = if initialize_extensions
         registry = if (ext_registry = options[:extensions_registry])
@@ -332,35 +338,54 @@ class Document < AbstractBlock
               (::RUBY_ENGINE_JRUBY && (ext_registry.is_a? ::AsciidoctorJ::Extensions::ExtensionRegistry))
             ext_registry
           end
-        elsif (ext_block = options[:extensions]) && (ext_block.is_a? ::Proc)
+        elsif (ext_block = options[:extensions]).is_a? ::Proc
           Extensions.build_registry(&ext_block)
         end
         (registry ||= Extensions::Registry.new).activate self
       end
 
-      @reader = PreprocessorReader.new self, data, Reader::Cursor.new(@attributes['docfile'], @base_dir)
+      @reader = PreprocessorReader.new self, data, Reader::Cursor.new(attrs['docfile'], @base_dir)
+      parse if data && options[:parse]
+    end
+  end
 
-      if @extensions && @extensions.preprocessors?
-        @extensions.preprocessors.each do |ext|
+  # Public: Parse the AsciiDoc source stored in the {Reader} into an abstract syntax tree.
+  #
+  # If the data parameter is not nil, create a new {PreprocessorReader} and assigned it to the reader
+  # property of this object. Otherwise, continue with the reader that was created in {#initialize}. 
+  # Pass the reader to {Parser.parse} to parse the source data into an abstract syntax tree.
+  #
+  # If parsing has already been performed, this method returns without performing any processing.
+  #
+  # data - The optional replacement AsciiDoc source data as a String or String Array. (default: nil)
+  #
+  # Returns this [Document]
+  def parse data = nil
+    unless @parsed
+      # create reader if data is provided (used when data is not known at the time the Document object is created)
+      @reader = PreprocessorReader.new self, data, Reader::Cursor.new(@attributes['docfile'], @base_dir) if data
+
+      if (exts = @parent_document ? nil : @extensions) && exts.preprocessors?
+        exts.preprocessors.each do |ext|
           @reader = ext.process_method[self, @reader] || @reader
         end
       end
-    else
-      # don't need to do the extra processing within our own document
-      # FIXME line info isn't reported correctly within include files in nested document
-      @reader = Reader.new data, options[:cursor]
-    end
 
-    # Now parse the lines in the reader into blocks
-    Parser.parse @reader, self, :header_only => !!options[:parse_header_only]
+      # Now parse the lines in the reader into blocks
+      Parser.parse @reader, self, :header_only => !!@options[:parse_header_only]
 
-    @callouts.rewind
+      # should we call rewind in some sort of post-parse function?
+      @callouts.rewind
 
-    if @extensions && !@parent_document && @extensions.treeprocessors?
-      @extensions.treeprocessors.each do |ext|
-        ext.process_method[self]
+      if exts && exts.treeprocessors?
+        exts.treeprocessors.each do |ext|
+          ext.process_method[self]
+        end
       end
+
+      @parsed = true
     end
+    self
   end
 
   # Public: Get the named counter and take the next number in the sequence.
@@ -370,7 +395,7 @@ class Document < AbstractBlock
   #
   # returns the next number in the sequence for the specified counter
   def counter(name, seed = nil)
-    if (attr_is_seed = !(attr_val = @attributes[name]).nil_or_empty?) && @counters.has_key?(name)
+    if (attr_is_seed = !(attr_val = @attributes[name]).nil_or_empty?) && @counters.key?(name)
       @counters[name] = nextval(attr_val)
     else
       if seed.nil?
@@ -434,7 +459,7 @@ class Document < AbstractBlock
   end
 
   def footnotes?
-    not @references[:footnotes].empty?
+    !@references[:footnotes].empty?
   end
 
   def footnotes
@@ -447,7 +472,7 @@ class Document < AbstractBlock
 
   def embedded?
     # QUESTION should this be !@options[:header_footer] ?
-    @attributes.has_key? 'embedded'
+    @attributes.key? 'embedded'
   end
 
   def extensions?
@@ -465,11 +490,11 @@ class Document < AbstractBlock
   end
 
   def doctype
-    @_doctype ||= @attributes['doctype']
+    @doctype ||= @attributes['doctype']
   end
 
   def backend
-    @_backend ||= @attributes['backend']
+    @backend ||= @attributes['backend']
   end
 
   def basebackend? base
@@ -519,15 +544,15 @@ class Document < AbstractBlock
   end
 
   def notitle
-    !@attributes.has_key?('showtitle') && @attributes.has_key?('notitle')
+    !@attributes.key?('showtitle') && @attributes.key?('notitle')
   end
 
   def noheader
-    @attributes.has_key? 'noheader'
+    @attributes.key? 'noheader'
   end
 
   def nofooter
-    @attributes.has_key? 'nofooter'
+    @attributes.key? 'nofooter'
   end
 
   # QUESTION move to AbstractBlock?
@@ -576,24 +601,22 @@ class Document < AbstractBlock
       @attributes['numbered'] = '' unless attribute_locked?('numbered') || @attributes_modified.include?('numbered')
     end
 
-    unless @attributes.has_key?('doctitle') || !(val = doctitle)
+    unless @attributes.key?('doctitle') || !(val = doctitle)
       @attributes['doctitle'] = val
     end
 
     # css-signature cannot be updated after header attributes are processed
-    if !@id && @attributes.has_key?('css-signature')
-      @id = @attributes['css-signature']
-    end
+    @id = @attributes['css-signature'] unless @id
 
     toc_val = @attributes['toc']
     toc2_val = @attributes['toc2']
     toc_position_val = @attributes['toc-position']
 
-    if (!toc_val.nil? && (toc_val != '' || toc_position_val.to_s != '')) || !toc2_val.nil?
+    if (toc_val && (toc_val != '' || !toc_position_val.nil_or_empty?)) || toc2_val
       default_toc_position = 'left'
       default_toc_class = 'toc2'
-      position = [toc_position_val, toc2_val, toc_val].find {|pos| pos.to_s != ''}
-      position = default_toc_position if !position && !toc2_val.nil?
+      position = [toc_position_val, toc2_val, toc_val].find {|pos| !pos.nil_or_empty? }
+      position = default_toc_position if !position && toc2_val
       @attributes['toc'] = ''
       case position
       when 'left', '<', '&lt;'
@@ -604,10 +627,15 @@ class Document < AbstractBlock
         @attributes['toc-position'] = 'top'
       when 'bottom', 'v'
         @attributes['toc-position'] = 'bottom'
-      when 'center'
-        @attributes.delete('toc2')
+      when 'preamble'
+        @attributes.delete 'toc2'
+        @attributes['toc-placement'] = 'preamble'
         default_toc_class = nil
-        default_toc_position = 'center'
+        default_toc_position = nil
+      when 'default'
+        @attributes.delete 'toc2'
+        default_toc_class = nil
+        default_toc_position = 'default'
       end
       @attributes['toc-class'] ||= default_toc_class if default_toc_class
       @attributes['toc-position'] ||= default_toc_position if default_toc_position
@@ -620,7 +648,7 @@ class Document < AbstractBlock
       FLEXIBLE_ATTRIBUTES.each do |name|
         # turning a flexible attribute off should be permanent
         # (we may need more config if that's not always the case)
-        if @attribute_overrides.has_key?(name) && !@attribute_overrides[name].nil?
+        if @attribute_overrides.key?(name) && !@attribute_overrides[name].nil?
           @attribute_overrides.delete(name)
         end
       end
@@ -629,7 +657,7 @@ class Document < AbstractBlock
 
   # Internal: Restore the attributes to the previously saved state
   def restore_attributes
-    # QUESTION shouldn't this be a dup in case we render again?
+    # QUESTION shouldn't this be a dup in case we convert again?
     @attributes = @original_attributes
   end
 
@@ -640,8 +668,8 @@ class Document < AbstractBlock
 
   # Internal: Replay attribute assignments at the block level
   def playback_attributes(block_attributes)
-    if (entries = block_attributes[:attribute_entries])
-      entries.each do |entry|
+    if block_attributes.key? :attribute_entries
+      block_attributes[:attribute_entries].each do |entry|
         if entry.negate
           @attributes.delete(entry.name)
         else
@@ -666,11 +694,15 @@ class Document < AbstractBlock
     if attribute_locked?(name)
       false
     else
-      @attributes[name] = apply_attribute_value_subs(value)
-      @attributes_modified << name
-      if name == 'backend'
-        update_backend_attributes
+      case name
+      when 'backend'
+        update_backend_attributes apply_attribute_value_subs(value)
+      when 'doctype'
+        update_doctype_attributes apply_attribute_value_subs(value)
+      else
+        @attributes[name] = apply_attribute_value_subs(value)
       end
+      @attributes_modified << name
       true
     end
   end
@@ -698,7 +730,7 @@ class Document < AbstractBlock
   #
   # Returns true if the attribute is locked, false otherwise
   def attribute_locked?(name)
-    @attribute_overrides.has_key?(name)
+    @attribute_overrides.key?(name)
   end
 
   # Internal: Apply substitutions to the attribute value
@@ -725,78 +757,128 @@ class Document < AbstractBlock
   end
 
   # Public: Update the backend attributes to reflect a change in the selected backend
-  def update_backend_attributes
-    backend = @attributes['backend']
-    if backend.start_with? 'xhtml'
-      @attributes['htmlsyntax'] = 'xml'
-      backend = @attributes['backend'] = backend[1..-1]
-    elsif backend.start_with? 'html'
-      @attributes['htmlsyntax'] = 'html'
+  #
+  # This method also handles updating the related doctype attributes if the
+  # doctype attribute is assigned at the time this method is called.
+  def update_backend_attributes new_backend, force = false
+    if force || (new_backend && new_backend != @attributes['backend'])
+      attrs = @attributes
+      current_backend = attrs['backend']
+      current_basebackend = attrs['basebackend']
+      current_doctype = attrs['doctype']
+      if new_backend.start_with? 'xhtml'
+        attrs['htmlsyntax'] = 'xml'
+        new_backend = new_backend[1..-1]
+      elsif new_backend.start_with? 'html'
+        attrs['htmlsyntax'] = 'html'
+      end
+      if (resolved_name = BACKEND_ALIASES[new_backend])
+        new_backend = resolved_name
+      end
+      if current_backend
+        attrs.delete %(backend-#{current_backend})
+        if current_doctype
+          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
+        end
+      end
+      if current_doctype
+        attrs[%(doctype-#{current_doctype})] = ''
+        attrs[%(backend-#{new_backend}-doctype-#{current_doctype})] = ''
+      end
+      attrs['backend'] = new_backend
+      attrs[%(backend-#{new_backend})] = ''
+      # (re)initialize converter
+      if (@converter = create_converter).is_a? Converter::BackendInfo
+        new_basebackend = @converter.basebackend
+        attrs['outfilesuffix'] = @converter.outfilesuffix
+        new_filetype = @converter.filetype
+      else
+        new_basebackend = new_backend.sub TrailingDigitsRx, ''
+        # QUESTION should we be forcing the basebackend to html if unknown?
+        new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend] || '.html'
+        new_filetype = new_outfilesuffix[1..-1]
+        attrs['outfilesuffix'] = new_outfilesuffix unless attribute_locked? 'outfilesuffix'
+      end
+      if (current_filetype = attrs['filetype'])
+        attrs.delete %(filetype-#{current_filetype})
+      end
+      attrs['filetype'] = new_filetype
+      attrs[%(filetype-#{new_filetype})] = ''
+      if (page_width = DEFAULT_PAGE_WIDTHS[new_basebackend])
+        attrs['pagewidth'] = page_width
+      else
+        attrs.delete 'pagewidth'
+      end
+      if new_basebackend != current_basebackend
+        if current_basebackend
+          attrs.delete %(basebackend-#{current_basebackend})
+          if current_doctype
+            attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
+          end
+        end
+        attrs['basebackend'] = new_basebackend
+        attrs[%(basebackend-#{new_basebackend})] = ''
+        attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = '' if current_doctype
+      end
+      # clear cached backend value
+      @backend = nil
     end
-    if BACKEND_ALIASES.has_key? backend
-      backend = @attributes['backend'] = BACKEND_ALIASES[backend]
+  end
+
+  def update_doctype_attributes new_doctype
+    if new_doctype && new_doctype != @attributes['doctype']
+      attrs = @attributes
+      current_doctype = attrs['doctype']
+      current_backend = attrs['backend']
+      current_basebackend = attrs['basebackend']
+      if current_doctype
+        attrs.delete %(doctype-#{current_doctype})
+        attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype}) if current_backend
+        attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype}) if current_basebackend
+      end
+      attrs['doctype'] = new_doctype
+      attrs[%(doctype-#{new_doctype})] = ''
+      attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
+      attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
+      # clear cached doctype value
+      @doctype = nil
     end
-    basebackend = backend.sub(TrailingDigitsRx, '')
-    page_width = DEFAULT_PAGE_WIDTHS[basebackend]
-    if page_width
-      @attributes['pagewidth'] = page_width
+  end
+
+  def create_converter
+    converter_opts = {}
+    converter_opts[:htmlsyntax] = @attributes['htmlsyntax']
+    template_dirs = if (template_dir = @options[:template_dir])
+      converter_opts[:template_dirs] = [template_dir]
+    elsif (template_dirs = @options[:template_dirs])
+      converter_opts[:template_dirs] = template_dirs
+    end
+    if template_dirs
+      converter_opts[:template_cache] = @options.fetch :template_cache, true
+      converter_opts[:template_engine] = @options[:template_engine]
+      converter_opts[:template_engine_options] = @options[:template_engine_options]
+      converter_opts[:eruby] = @options[:eruby]
+    end
+    converter_factory = if (converter = @options[:converter])
+      Converter::Factory.new ::Hash[backend, converter]
     else
-      @attributes.delete('pagewidth')
+      Converter::Factory.default false
     end
-    @attributes["backend-#{backend}"] = ''
-    @attributes['basebackend'] = basebackend
-    @attributes["basebackend-#{basebackend}"] = ''
-    # REVIEW cases for the next two assignments
-    @attributes["#{backend}-#{@attributes['doctype']}"] = ''
-    @attributes["#{basebackend}-#{@attributes['doctype']}"] = ''
-    ext = DEFAULT_EXTENSIONS[basebackend] || '.html'
-    @attributes['outfilesuffix'] = ext unless (attribute_locked? 'outfilesuffix')
-    file_type = ext[1..-1]
-    @attributes['filetype'] = file_type
-    @attributes["filetype-#{file_type}"] = ''
-    @_doctype = nil
-    @_backend = nil
+    # QUESTION should we honor the convert_opts?
+    # QUESTION should we pass through all options and attributes too?
+    #converter_opts.update opts
+    converter_factory.create backend, converter_opts
   end
 
-  def renderer(opts = {})
-    return @renderer if @renderer
-    
-    render_options = {}
-
-    # Load up relevant Document @options
-    if @options.has_key? :template_dir
-      render_options[:template_dirs] = [@options[:template_dir]]
-    elsif @options.has_key? :template_dirs
-      render_options[:template_dirs] = @options[:template_dirs]
-    end
-    
-    render_options[:template_cache] = @options.fetch(:template_cache, true)
-    render_options[:backend] = @attributes.fetch('backend', 'html5')
-    render_options[:htmlsyntax] = @attributes['htmlsyntax']
-    render_options[:template_engine] = @options[:template_engine]
-    render_options[:eruby] = @options.fetch(:eruby, 'erb')
-    render_options[:compact] = @options.fetch(:compact, false)
-    
-    # Override Document @option settings with options passed in
-    render_options.merge! opts
-
-    @renderer = Renderer.new(render_options)
-  end
-
-  # Public: Render the Asciidoc document using the templates
-  # loaded by Renderer. If a :template_dir is not specified,
-  # or a template is missing, the renderer will fall back to
+  # Public: Convert the AsciiDoc document using the templates
+  # loaded by the Converter. If a :template_dir is not specified,
+  # or a template is missing, the converter will fall back to
   # using the appropriate built-in template.
-  def render(opts = {})
+  def convert opts = {}
+    parse unless @parsed
     restore_attributes
-    r = renderer(opts)
 
-    # QUESTION should we add Prerenderprocessors? is it the right name?
-    #if @extensions && !@parent_document && @extensions.prerenderprocessors?
-    #  @extensions.prerenderprocessors.each do |ext|
-    #    ext.process_method[self, r]
-    #  end
-    #end
+    # QUESTION should we add processors that execute before conversion begins?
 
     if doctype == 'inline'
       # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
@@ -806,24 +888,64 @@ class Document < AbstractBlock
         output = ''
       end
     else
-      output = @options.merge(opts)[:header_footer] ? r.render('document', self).strip : r.render('embedded', self)
+      transform = ((opts.key? :header_footer) ? opts[:header_footer] : @options[:header_footer]) ? 'document' : 'embedded'
+      output = @converter.convert self, transform
     end
 
-    if @extensions && !@parent_document
-      if @extensions.postprocessors?
-        @extensions.postprocessors.each do |ext|
+    unless @parent_document
+      if (exts = @extensions) && exts.postprocessors?
+        exts.postprocessors.each do |ext|
           output = ext.process_method[self, output]
         end
       end
-      #@extensions.reset
     end
 
     output
   end
 
+  # Alias render to convert to maintain backwards compatibility
+  alias :render :convert
+
+  # Public: Write the output to the specified file
+  #
+  # If the converter responds to :write, delegate the work of writing the file
+  # to that method. Otherwise, write the output the specified file.
+  def write output, target
+    if @converter.is_a? Writer
+      @converter.write output, target
+    else
+      if target.respond_to? :write
+        target.write output.chomp
+        # ensure there's a trailing endline
+        target.write EOL
+      else
+        ::File.open(target, 'w') {|f| f.write output }
+      end
+      nil
+    end
+  end
+
+=begin
+  def convert_to target, opts = {}
+    start = ::Time.now.to_f if (monitor = opts[:monitor])
+    output = (r = converter opts).convert
+    monitor[:convert] = ::Time.now.to_f - start if monitor
+
+    unless target.respond_to? :write
+      @attributes['outfile'] = target = ::File.expand_path target
+      @attributes['outdir'] = ::File.dirname target
+    end
+
+    start = ::Time.now.to_f if monitor
+    r.write output, target
+    monitor[:write] = ::Time.now.to_f - start if monitor 
+
+    output
+  end
+=end
+
   def content
-    # per AsciiDoc-spec, remove the title before rendering the body,
-    # regardless of whether the header is rendered)
+    # NOTE per AsciiDoc-spec, remove the title before converting the body
     @attributes.delete('title')
     super
   end
@@ -854,9 +976,9 @@ class Document < AbstractBlock
 
       content = nil
 
-      docinfo = @attributes.has_key?('docinfo')
-      docinfo1 = @attributes.has_key?('docinfo1')
-      docinfo2 = @attributes.has_key?('docinfo2')
+      docinfo = @attributes.key?('docinfo')
+      docinfo1 = @attributes.key?('docinfo1')
+      docinfo2 = @attributes.key?('docinfo2')
       docinfo_filename = "docinfo#{qualifier}#{ext}"
       if docinfo1 || docinfo2
         docinfo_path = normalize_system_path(docinfo_filename)
@@ -868,7 +990,7 @@ class Document < AbstractBlock
         end
       end
 
-      if (docinfo || docinfo2) && @attributes.has_key?('docname')
+      if (docinfo || docinfo2) && @attributes.key?('docname')
         docinfo_path = normalize_system_path("#{@attributes['docname']}-#{docinfo_filename}")
         content2 = read_asset(docinfo_path)
         unless content2.nil?

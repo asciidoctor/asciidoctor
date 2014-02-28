@@ -489,7 +489,7 @@ class Parser
           # process lines normally
           unless text_only
             first_char = Compliance.markdown_syntax ? this_line.lstrip.chr : this_line.chr
-            # NOTE we're letting break lines (ruler, page_break, etc) have attributes
+            # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
             if (LAYOUT_BREAK_LINES.has_key? first_char) && this_line.length >= 3 &&
                 (Compliance.markdown_syntax ? LayoutBreakLinePlusRx : LayoutBreakLineRx) =~ this_line
               block = Block.new(parent, LAYOUT_BREAK_LINES[first_char], :content_model => :empty)

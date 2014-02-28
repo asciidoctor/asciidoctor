@@ -10,16 +10,16 @@ class Block < AbstractBlock
 
   DEFAULT_CONTENT_MODEL = ::Hash.new(:simple).merge({
     # TODO should probably fill in all known blocks
-    :audio      => :empty,
-    :image      => :empty,
-    :listing    => :verbatim,
-    :literal    => :verbatim,
-    :math       => :raw,
-    :open       => :compound,
+    :audio => :empty,
+    :image => :empty,
+    :listing => :verbatim,
+    :literal => :verbatim,
+    :math => :raw,
+    :open => :compound,
     :page_break => :empty,
-    :pass       => :raw,
-    :ruler      => :empty,
-    :video      => :empty
+    :pass => :raw,
+    :thematic_break => :empty,
+    :video => :empty
   })
 
   # Public: Create alias for context to be consistent w/ AsciiDoc
@@ -42,7 +42,12 @@ class Block < AbstractBlock
   def initialize(parent, context, opts = {})
     super(parent, context)
     @content_model = opts[:content_model] || DEFAULT_CONTENT_MODEL[context]
-    @attributes = opts[:attributes] || {}
+    if (attrs = opts[:attributes]).nil_or_empty?
+      @attributes = {}
+    else
+      # QUESTION are we correct in duplicating the attributes (seems to be just as fast)
+      @attributes = attrs.dup
+    end
     if opts.has_key? :subs
       # FIXME this is a bit funky
       # we have to be defensive to avoid lock_in_subs wiping out the override
@@ -63,8 +68,8 @@ class Block < AbstractBlock
     end
   end
 
-  # Public: Get an rendered version of the block content, performing
-  # any substitutions on the content.
+  # Public: Get the converted result of the child blocks by converting the
+  # children appropriate to content model that this block supports.
   #
   # Examples
   #
@@ -82,6 +87,8 @@ class Block < AbstractBlock
     when :verbatim, :raw
       #((apply_subs @lines.join(EOL), @subs).sub StripLineWiseRx, '\1')
 
+      # QUESTION could we use strip here instead of popping empty lines?
+      # maybe apply_subs can know how to strip whitespace?
       result = apply_subs @lines, @subs
       if result.size < 2
         result[0]

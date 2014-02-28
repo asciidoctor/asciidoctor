@@ -1849,6 +1849,27 @@ They couldn't believe their eyes when...
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
     end
 
+    test 'should set toc placement to preamble if toc attribute is set to preamble' do
+      input = <<-EOS
+= Article
+:toc: preamble
+
+Yada yada
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input
+      assert_css '#preamble #toc', output, 1
+      assert_css '#preamble .sectionbody + #toc', output, 1
+    end
+
     test 'should use document attributes toc-class, toc-title and toclevels to create toc' do
       input = <<-EOS
 = Article

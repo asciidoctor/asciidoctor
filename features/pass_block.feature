@@ -16,8 +16,8 @@ Feature: Open Blocks
     image:tiger.png[]
     ++++
     """
-  When it is rendered using the html backend
-  Then the output should match the HTML source
+  When it is converted to html
+  Then the result should match the HTML source
     """
     <p>{name}</p>
 
@@ -36,8 +36,8 @@ Feature: Open Blocks
     image:tiger.png[]
     ++++
     """
-  When it is rendered using the docbook backend
-  Then the output should match the XML source
+  When it is converted to docbook
+  Then the result should match the XML source
     """
     <simpara>{name}</simpara>
 
@@ -57,8 +57,8 @@ Feature: Open Blocks
     image:tiger.png[]
     ++++
     """
-  When it is rendered using the html backend
-  Then the output should match the HTML source
+  When it is converted to html
+  Then the result should match the HTML source
     """
     <p>value</p>
 

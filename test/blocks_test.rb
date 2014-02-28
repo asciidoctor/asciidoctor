@@ -692,8 +692,8 @@ line two
 line three
 ....
 EOS
-      [[true, true], [true, false], [false, true], [false, false]].each {|compact, header_footer|
-        output = render_string input, :header_footer => header_footer, :compact => compact
+      [true, false].each {|header_footer|
+        output = render_string input, :header_footer => header_footer
         assert_xpath '//pre', output, 1
         assert_xpath '//pre/text()', output, 1
         text = xmlnodes_at_xpath('//pre/text()', output, 1).text
@@ -702,11 +702,7 @@ EOS
         expected = "line one\n\nline two\n\nline three".lines.entries
         assert_equal expected, lines
         blank_lines = output.scan(/\n[ \t]*\n/).size
-        if compact
-          assert_equal 2, blank_lines
-        else
-          assert blank_lines >= 2
-        end
+        assert blank_lines >= 2
       }
     end
 
@@ -721,8 +717,8 @@ line two
 line three
 ----
 EOS
-      [[true, true], [true, false], [false, true], [false, false]].each {|(compact,header_footer)|
-        output = render_string input, header_footer => header_footer, :compact => compact
+      [true, false].each {|header_footer|
+        output = render_string input, header_footer => header_footer
         assert_xpath '//pre/code', output, 1
         assert_xpath '//pre/code/text()', output, 1
         text = xmlnodes_at_xpath('//pre/code/text()', output, 1).text
@@ -731,11 +727,7 @@ EOS
         expected = "line one\n\nline two\n\nline three".lines.entries
         assert_equal expected, lines
         blank_lines = output.scan(/\n[ \t]*\n/).size
-        if compact
-          assert_equal 2, blank_lines
-        else
-          assert blank_lines >= 2
-        end
+        assert blank_lines >= 2
       }
     end
 
@@ -752,8 +744,8 @@ line three
 ____
 --
 EOS
-      [[true, true], [true, false], [false, true], [false, false]].each {|compact, header_footer|
-        output = render_string input, :header_footer => header_footer, :compact => compact
+      [true, false].each {|header_footer|
+        output = render_string input, :header_footer => header_footer
         assert_xpath '//*[@class="verseblock"]/pre', output, 1
         assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
         text = xmlnodes_at_xpath('//*[@class="verseblock"]/pre/text()', output, 1).text
@@ -762,11 +754,7 @@ EOS
         expected = "line one\n\nline two\n\nline three".lines.entries
         assert_equal expected, lines
         blank_lines = output.scan(/\n[ \t]*\n/).size
-        if compact
-          assert_equal 2, blank_lines
-        else
-          assert blank_lines >= 2
-        end
+        assert blank_lines >= 2
       }
     end
 
@@ -790,23 +778,6 @@ last line
       assert_equal ['', '', '  first line', '', 'last line', '', '{empty}', ''], block.lines
       result = doc.render
       assert_xpath %(//pre[text()="  first line\n\nlast line"]), result, 1
-    end
-
-    test 'should not compact nested document twice' do
-      input = <<-EOS
-|===
-a|....
-line one
-
-line two
-
-line three
-....
-|===
-      EOS
-
-      output = render_string input, :compact => true
-      assert_xpath %(//pre[text() = "line one\n\nline two\n\nline three"]), output, 1
     end
 
     test 'should process block with CRLF endlines' do
@@ -2098,7 +2069,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       EOS
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'linkcss' => ''}
       assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
-      assert_css 'link[rel="stylesheet"][href="./asciidoctor-coderay.css"]', output, 1
+      assert_css 'link[rel="stylesheet"][href="./coderay-asciidoctor.css"]', output, 1
     end
 
     test 'should highlight source inline if source-highlighter attribute is coderay and coderay-css is style' do
