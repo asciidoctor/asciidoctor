@@ -200,7 +200,7 @@ module Asciidoctor
         end
         template_converter = TemplateConverter.new backend, opts[:template_dirs], opts
         # QUESTION should we omit the composite converter if built_in_converter is nil?
-        CompositeConverter.new template_converter, base_converter
+        CompositeConverter.new backend, template_converter, base_converter
       end
     end
   end

@@ -15,6 +15,10 @@ module Asciidoctor
   #   class TextConverter
   #     include Asciidoctor::Converter
   #     register_for 'text'
+  #     def initialize backend, opts
+  #       super
+  #       outfilesuffix '.txt'
+  #     end
   #     def convert node, transform = nil
   #       case (transform ||= node.node_name)
   #       when 'document'
@@ -63,6 +67,54 @@ module Asciidoctor
       end
     end
 
+    module BackendInfo
+      def backend_info
+        @backend_info ||= setup_backend_info
+      end
+
+      def setup_backend_info
+        raise ::ArgumentError, %(Cannot determine backend for converter: #{self.class}) unless @backend
+        base = @backend.sub TrailingDigitsRx, ''
+        if (ext = DEFAULT_EXTENSIONS[base])
+          type = ext[1..-1]
+        else
+          # QUESTION should we be forcing the basebackend to html if unknown?
+          base = 'html'
+          ext = '.html'
+          type = 'html'
+        end
+        {
+          'basebackend' => base,
+          'outfilesuffix' => ext,
+          'filetype' => type,
+        }
+      end
+
+      def filetype value = nil
+        if value
+          backend_info['filetype'] = value
+        else
+          backend_info['filetype']
+        end
+      end
+
+      def basebackend value = nil
+        if value
+          backend_info['basebackend'] = value
+        else
+          backend_info['basebackend']
+        end
+      end
+
+      def outfilesuffix value = nil
+        if value
+          backend_info['outfilesuffix'] = value
+        else
+          backend_info['outfilesuffix']
+        end
+      end
+    end
+
     class << self
       # Mixes the {Config Converter::Config} module into any class that includes the {Converter} module.
       #
@@ -75,7 +127,8 @@ module Asciidoctor
     end
   
     include Config
-  
+    include BackendInfo
+
     # Public: Creates a new instance of Converter
     #
     # backend - The String backend format to which this converter converts.
@@ -84,8 +137,19 @@ module Asciidoctor
     # Returns a new instance of [Converter]
     def initialize backend, opts = {}
       @backend = backend
+      setup_backend_info
     end
-  
+
+=begin
+    # Public: Invoked when this converter is added to the chain of converters in a {CompositeConverter}.
+    #
+    # owner - The CompositeConverter instance
+    #
+    # Returns nothing
+    def composed owner
+    end
+=end
+
     # Public: Converts an {AbstractNode} using the specified transform. If a
     # transform is not specified, implementations typically derive one from the
     # {AbstractNode#node_name} property.

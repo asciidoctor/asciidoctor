@@ -3,11 +3,15 @@ module Asciidoctor
   # objects passed to the constructor. Selects the first {Converter} that
   # identifies itself as the handler for a given transform.
   class Converter::CompositeConverter < Converter::Base
+
     # Get the Array of Converter objects in the chain
     attr_reader :converters
 
-    def initialize *converters
-      @converters = converters.flatten.compact
+    def initialize backend, *converters
+      @backend = backend
+      (@converters = converters.flatten.compact).each do |converter|
+        converter.composed self if converter.respond_to? :composed
+      end
       @converter_map = {}
     end
 

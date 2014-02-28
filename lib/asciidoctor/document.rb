@@ -775,23 +775,39 @@ class Document < AbstractBlock
       if (resolved_name = BACKEND_ALIASES[new_backend])
         new_backend = resolved_name
       end
-      new_basebackend = new_backend.sub TrailingDigitsRx, ''
-      if (page_width = DEFAULT_PAGE_WIDTHS[new_basebackend])
-        attrs['pagewidth'] = page_width
-      else
-        attrs.delete 'pagewidth'
-      end
       if current_backend
         attrs.delete %(backend-#{current_backend})
         if current_doctype
           attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
         end
       end
-      attrs['backend'] = new_backend
-      attrs[%(backend-#{new_backend})] = ''
       if current_doctype
         attrs[%(doctype-#{current_doctype})] = ''
         attrs[%(backend-#{new_backend}-doctype-#{current_doctype})] = ''
+      end
+      attrs['backend'] = new_backend
+      attrs[%(backend-#{new_backend})] = ''
+      # (re)initialize converter
+      if (@converter = create_converter).is_a? Converter::BackendInfo
+        new_basebackend = @converter.basebackend
+        attrs['outfilesuffix'] = @converter.outfilesuffix
+        new_filetype = @converter.filetype
+      else
+        new_basebackend = new_backend.sub TrailingDigitsRx, ''
+        # QUESTION should we be forcing the basebackend to html if unknown?
+        new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend] || '.html'
+        new_filetype = new_outfilesuffix[1..-1]
+        attrs['outfilesuffix'] = new_outfilesuffix unless attribute_locked? 'outfilesuffix'
+      end
+      if (current_filetype = attrs['filetype'])
+        attrs.delete %(filetype-#{current_filetype})
+      end
+      attrs['filetype'] = new_filetype
+      attrs[%(filetype-#{new_filetype})] = ''
+      if (page_width = DEFAULT_PAGE_WIDTHS[new_basebackend])
+        attrs['pagewidth'] = page_width
+      else
+        attrs.delete 'pagewidth'
       end
       if new_basebackend != current_basebackend
         if current_basebackend
@@ -804,17 +820,8 @@ class Document < AbstractBlock
         attrs[%(basebackend-#{new_basebackend})] = ''
         attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = '' if current_doctype
       end
-      ext = DEFAULT_EXTENSIONS[new_basebackend] || '.html'
-      new_file_type = ext[1..-1]
-      current_file_type = attrs['filetype']
-      attrs['outfilesuffix'] = ext unless attribute_locked? 'outfilesuffix'
-      attrs.delete %(filetype-#{current_file_type}) if current_file_type
-      attrs['filetype'] = new_file_type
-      attrs[%(filetype-#{new_file_type})] = ''
-      # clear cached value
+      # clear cached backend value
       @backend = nil
-      # (re)initialize converter
-      @converter = create_converter
     end
   end
 
@@ -833,7 +840,7 @@ class Document < AbstractBlock
       attrs[%(doctype-#{new_doctype})] = ''
       attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
       attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
-      # clear cached value
+      # clear cached doctype value
       @doctype = nil
     end
   end

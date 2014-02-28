@@ -78,6 +78,13 @@ module Asciidoctor
       #create_handlers
     end
 
+=begin
+    # Public: Called when this converter is added to a composite converter.
+    def composed parent
+      # TODO set the backend info determined during the scan
+    end
+=end
+
     # Internal: Scans the template directories specified in the constructor for Tilt-supported
     # templates, loads the templates and stores the in a Hash that is accessible via the
     # {TemplateConverter#templates} method.
