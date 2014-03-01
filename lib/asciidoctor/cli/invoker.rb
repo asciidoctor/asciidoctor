@@ -17,11 +17,11 @@ module Asciidoctor
         elsif first_option.is_a?(::Hash)
           @options = Cli::Options.new(options)
         else
-          @options = Cli::Options.parse!(options)
-          # FIXME what the heck is this for?
-          if @options.is_a? ::Integer
-            @code = @options
+          if (result = Cli::Options.parse! options).is_a? ::Integer
+            @code = result
             @options = nil
+          else
+            @options = result
           end
         end
       end
@@ -72,7 +72,7 @@ module Asciidoctor
           inputs = infiles.map {|infile| ::File.new infile, 'r'}
         end
 
-        # NOTE: if infile is stdin, default to outfile as stout
+        # NOTE if infile is stdin, default to outfile as stout
         if outfile == '-' || (!outfile && infiles.size == 1 && infiles[0] == '-')
           tofile = (@out || $stdout)
         elsif outfile
@@ -85,13 +85,16 @@ module Asciidoctor
           opts[:mkdirs] = true
         end
 
-        original_opts = opts
         inputs.each do |input|
-          opts = Helpers.clone_options(original_opts) if inputs.size > 1
-          opts[:to_file] = tofile if tofile
-          timings = opts[:timings] = Timings.new if show_timings
-          @documents << (::Asciidoctor.convert input, opts)
-          timings.print_report((@err || $stderr), ((input.respond_to? :path) ? input.path : '-')) if show_timings
+          # NOTE processor will dup options and attributes internally
+          input_opts = tofile ? opts.merge(:to_file => tofile) : opts
+          if show_timings
+            timings = Timings.new
+            @documents << ::Asciidoctor.convert(input, input_opts.merge(:timings => timings))
+            timings.print_report((@err || $stderr), ((input.respond_to? :path) ? input.path : '-'))
+          else
+            @documents << ::Asciidoctor.convert(input, input_opts)
+          end
         end
       rescue ::Exception => e
         if ::SignalException === e

@@ -278,7 +278,7 @@ context 'Invoker' do
     basic_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'basic.html'))
     sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.html'))
     begin
-      invoke_cli_with_filenames %w(), %w(basic.asciidoc sample.asciidoc)
+      invoke_cli_with_filenames [], %w(basic.asciidoc sample.asciidoc)
       assert File.exist?(basic_outpath)
       assert File.exist?(sample_outpath)
     ensure
@@ -287,10 +287,25 @@ context 'Invoker' do
     end
   end
 
+  test 'options should not be modified when processing multiple files' do
+    destination_path = File.expand_path(File.join(File.dirname(__FILE__), 'test_output'))
+    basic_outpath = File.join(destination_path, 'basic.htm')
+    sample_outpath = File.join(destination_path, 'sample.htm')
+    begin
+      invoke_cli_with_filenames %w(-D test/test_output -a outfilesuffix=.htm), %w(basic.asciidoc sample.asciidoc)
+      assert File.exist?(basic_outpath)
+      assert File.exist?(sample_outpath)
+    ensure
+      FileUtils.rm_f(basic_outpath)
+      FileUtils.rm_f(sample_outpath)
+      FileUtils.rmdir(destination_path)
+    end
+  end
+
   test 'should render all files that matches a glob expression' do
     basic_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'basic.html'))
     begin
-      invoke_cli_to_buffer %w(), "ba*.asciidoc"
+      invoke_cli_to_buffer [], "ba*.asciidoc"
       assert File.exist?(basic_outpath)
     ensure
       FileUtils.rm_f(basic_outpath)
@@ -306,7 +321,7 @@ context 'Invoker' do
     end
 
     begin
-      invoke_cli_to_buffer %w(), glob
+      invoke_cli_to_buffer [], glob
       assert File.exist?(basic_outpath)
     ensure
       FileUtils.rm_f(basic_outpath)
