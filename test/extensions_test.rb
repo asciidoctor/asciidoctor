@@ -32,10 +32,12 @@ end
 class ScrubHeaderPreprocessor < Asciidoctor::Extensions::Preprocessor
   def process doc, reader
     lines = reader.lines
+    skipped = []
     while !lines.empty? && !lines.first.start_with?('=')
-      lines.shift
+      skipped << lines.shift
       reader.advance
     end
+    doc.set_attr 'skipped', (skipped * "\n")
     reader
   end
 end
@@ -368,6 +370,8 @@ sample content
         end
 
         doc = document_from_string input
+        assert doc.attr? 'skipped'
+        assert_equal 'junk line', (doc.attr 'skipped').strip
         assert doc.has_header?
         assert_equal 'Document Title', doc.doctitle
       ensure
