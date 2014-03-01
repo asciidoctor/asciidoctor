@@ -1024,6 +1024,18 @@ There was much rejoicing.
         end
         assert_equal "On our quest we go...\nThere is a holy grail!\nThere was much rejoicing.", (lines * ::Asciidoctor::EOL)
       end
+
+      test 'ifdef attribute name is not case sensitive' do
+        input = <<-EOS
+ifdef::showScript[]
+The script is shown!
+endif::showScript[]
+        EOS
+
+        doc = Asciidoctor::Document.new input, :attributes => { 'showscript' => '' }
+        result = doc.reader.read
+        assert_equal 'The script is shown!', result
+      end
   
       test 'ifndef with defined attribute does not include text in brackets' do
         input = <<-EOS
