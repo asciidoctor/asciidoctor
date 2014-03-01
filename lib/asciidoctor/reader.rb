@@ -698,6 +698,9 @@ class PreprocessorReader < Reader
       return false
     end
 
+    # attributes are case insensitive
+    target = target.downcase
+
     if directive == 'endif'
       stack_size = @conditional_stack.size
       if stack_size > 0
