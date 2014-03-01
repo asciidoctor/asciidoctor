@@ -95,14 +95,7 @@ begin
     )
     # --no-highlight enabled to prevent verbatim blocks in AsciiDoc that begin with $ from being dropped
     # need to patch htmlify method to not attempt to syntax highlight blocks (or fix what's wrong)
-    yard.options = %w(
-        --exclude backends
-        --exclude opal_ext
-        --hide-api private
-        -o rdoc
-        --plugin tomdoc
-        --title Asciidoctor\ API\ Documentation
-    )
+    yard.options = IO.readlines '.yardopts'
   end
 rescue LoadError
 end
