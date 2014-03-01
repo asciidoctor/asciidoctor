@@ -10,9 +10,9 @@ context 'Invoker' do
   test 'should parse source and render as html5 article by default' do
     invoker = nil
     output = nil
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |out, err|
       invoker = invoke_cli %w(-o -)
-      output = stdout.string
+      output = out.string
     end
     assert !invoker.nil?
     doc = invoker.document
@@ -103,9 +103,9 @@ context 'Invoker' do
   test 'should display version and exit' do
     expected = %(Asciidoctor #{Asciidoctor::VERSION} [http://asciidoctor.org]\nRuntime Environment (#{RUBY_DESCRIPTION}))
     actual = nil
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |out, err|
       invoke_cli %w(--version)
-      actual = stdout.string.rstrip
+      actual = out.string.rstrip
     end
     assert_equal expected, actual
   end
@@ -116,9 +116,9 @@ context 'Invoker' do
 3. third
     EOS
     warnings = nil
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |out, err|
       invoke_cli_to_buffer(%w(-o /dev/null), '-') { input }
-      warnings = stderr.string
+      warnings = err.string
     end
     assert_match(/WARNING/, warnings)
   end
@@ -129,32 +129,32 @@ context 'Invoker' do
 3. third
     EOS
     warnings = nil
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |out, err|
       invoke_cli_to_buffer(%w(-q -o /dev/null), '-') { input }
-      warnings = stderr.string
+      warnings = err.string
     end
     assert_equal '', warnings
   end
 
   test 'should report usage if no input file given' do
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |out, err|
       invoke_cli [], nil
-      assert_match(/Usage:/, stderr.string)
+      assert_match(/Usage:/, err.string)
     end
   end
 
   test 'should report error if input file does not exist' do
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |out, err|
       invoker = invoke_cli [], 'missing_file.asciidoc'
-      assert_match(/input file .* missing/, stderr.string)
+      assert_match(/input file .* missing/, err.string)
       assert_equal 1, invoker.code
     end
   end
 
   test 'should treat extra arguments as files' do
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |out, err|
       invoker = invoke_cli %w(-o /dev/null extra arguments sample.asciidoc), nil
-      assert_match(/input file .* missing/, stderr.string)
+      assert_match(/input file .* missing/, err.string)
       assert_equal 1, invoker.code
     end
   end
@@ -323,9 +323,9 @@ context 'Invoker' do
   test 'should output a trailing endline to stdout' do
     invoker = nil
     output = nil
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |out, err|
       invoker = invoke_cli %w(-o -)
-      output = stdout.string
+      output = out.string
     end
     assert !invoker.nil?
     assert !output.nil?
@@ -478,11 +478,11 @@ context 'Invoker' do
       require 'open3'
       #cmd = "#{executable} -o - --trace #{input_path}"
       cmd = "#{File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']} #{executable} -o - --trace #{input_path}"
-      _, stdout, _ = Open3.popen3 cmd
+      _, out, _ = Open3.popen3 cmd
       #stderr_lines = stderr.readlines
       # warnings may be issued, so don't assert on stderr
       #assert stderr_lines.empty?, 'Command failed. Expected to receive a rendered document.'
-      stdout_lines = stdout.readlines
+      stdout_lines = out.readlines
       assert !stdout_lines.empty?
       stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
       stdout_str = stdout_lines.join

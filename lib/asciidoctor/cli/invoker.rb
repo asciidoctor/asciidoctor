@@ -18,8 +18,8 @@ module Asciidoctor
           @options = Cli::Options.new(options)
         else
           @options = Cli::Options.parse!(options)
-          # hmmm
-          if @options.is_a?(::Integer)
+          # FIXME what the heck is this for?
+          if @options.is_a? ::Integer
             @code = @options
             @options = nil
           end
@@ -27,10 +27,10 @@ module Asciidoctor
       end
 
       def invoke!
-        return if @options.nil?
+        old_verbose = -1
+        return unless @options
 
         old_verbose = $VERBOSE
-
         case @options[:verbose]
         when 0
           $VERBOSE = nil
@@ -40,70 +40,78 @@ module Asciidoctor
           $VERBOSE = true
         end
 
-        begin
-          opts = {}
-          show_timings = false
-          infiles = []
-          outfile = nil
-          tofile = nil
-          @options.map {|k, v|
-            case k
-            when :input_files
-              infiles = v
-            when :output_file
-              outfile = v
-            when :destination_dir
-              #opts[:to_dir] = ::File.expand_path(v) unless v.nil?
-              opts[:to_dir] = v unless v.nil?
-            when :attributes
-              opts[:attributes] = v.dup
-            when :verbose
-              show_timings = true if v == 2
-            when :trace
-              # currently, nothing
-            else
-              opts[k] = v unless v.nil?
-            end
-          }
-
-          if infiles.size == 1 && infiles[0] == '-'
-            # allows use of block to supply stdin, particularly useful for tests
-            inputs = [block_given? ? yield : STDIN]
+        opts = {}
+        show_timings = false
+        infiles = []
+        outfile = nil
+        tofile = nil
+        @options.map do |key, val|
+          case key
+          when :input_files
+            infiles = val
+          when :output_file
+            outfile = val
+          when :destination_dir
+            opts[:to_dir] = val if val
+          when :attributes
+            # NOTE processor will dup attributes internally
+            opts[:attributes] = val
+          when :verbose
+            show_timings = true if val == 2
+          when :trace
+            # currently, nothing
           else
-            inputs = infiles.map {|infile| ::File.new infile, 'r'}
+            opts[key] = val unless val.nil?
           end
-
-          # NOTE: if infile is stdin, default to outfile as stout
-          if outfile == '-' || (!outfile && infiles.size == 1 && infiles[0] == '-')
-            tofile = (@out || $stdout)
-          elsif outfile
-            tofile = outfile
-            opts[:mkdirs] = true
-          else
-            tofile = nil
-            # automatically calculate outfile based on infile
-            opts[:in_place] = true unless opts.has_key? :to_dir
-            opts[:mkdirs] = true
-          end
-
-          original_opts = opts
-          inputs.each do |input|
-            opts = Helpers.clone_options(original_opts) if inputs.size > 1
-            opts[:to_file] = tofile unless tofile.nil?
-            timings = opts[:timings] = Timings.new if show_timings
-            @documents << (::Asciidoctor.convert input, opts)
-            timings.print_report((@err || $stderr), ((input.respond_to? :path) ? input.path : '-')) if show_timings
-          end
-        rescue ::Exception => e
-          raise e if @options[:trace] || ::SystemExit === e
-          err = (@err || $stderr)
-          err.print "#{e.class}: " if e.class != ::RuntimeError
-          err.puts e.message
-          err.puts '  Use --trace for backtrace'
-          @code = 1
-        ensure
-          $VERBOSE = old_verbose
         end
+
+        if infiles.size == 1 && infiles[0] == '-'
+          # allows use of block to supply stdin, particularly useful for tests
+          inputs = [block_given? ? yield : STDIN]
+        else
+          inputs = infiles.map {|infile| ::File.new infile, 'r'}
+        end
+
+        # NOTE: if infile is stdin, default to outfile as stout
+        if outfile == '-' || (!outfile && infiles.size == 1 && infiles[0] == '-')
+          tofile = (@out || $stdout)
+        elsif outfile
+          tofile = outfile
+          opts[:mkdirs] = true
+        else
+          tofile = nil
+          # automatically calculate outfile based on infile
+          opts[:in_place] = true unless opts.has_key? :to_dir
+          opts[:mkdirs] = true
+        end
+
+        original_opts = opts
+        inputs.each do |input|
+          opts = Helpers.clone_options(original_opts) if inputs.size > 1
+          opts[:to_file] = tofile if tofile
+          timings = opts[:timings] = Timings.new if show_timings
+          @documents << (::Asciidoctor.convert input, opts)
+          timings.print_report((@err || $stderr), ((input.respond_to? :path) ? input.path : '-')) if show_timings
+        end
+      rescue ::Exception => e
+        if ::SignalException === e
+          @code = e.signo
+          # add extra endline if Ctrl+C is used
+          (@err || $stderr).puts if ::Interrupt === e
+        else
+          @code = (e.respond_to? :status) ? e.status : 1
+          if @options[:trace]
+            raise e
+          else
+            err = (@err || $stderr)
+            err.print %(#{e.class}: ) if ::RuntimeError === e
+            err.puts e.message
+            err.puts '  Use --trace for backtrace'
+          end
+        end
+        nil
+      ensure
+        $VERBOSE = old_verbose unless old_verbose == -1
       end
 
       def document
@@ -116,11 +124,11 @@ module Asciidoctor
       end
 
       def read_output
-        !@out.nil? ? @out.string : ''
+        @out ? @out.string : ''
       end
 
       def read_error
-        !@err.nil? ? @err.string : ''
+        @err ? @err.string : ''
       end
 
       def reset_streams

@@ -137,93 +137,95 @@ Example: asciidoctor -b html5 source.asciidoc
           
         end
 
-        begin
-          infiles = []
-          opts_parser.parse! args
-          
-          if args.empty?
-            $stderr.puts opts_parser
-            return 1
-          end
-
-          # shave off the file to process so that options errors appear correctly
-          if args.size == 1 && args[0] == '-'
-            infiles.push args.pop
-          elsif
-            args.each do |file|
-              if file == '-' || (file.start_with? '-')
-                # warn, but don't panic; we may have enough to proceed, so we won't force a failure
-                $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '}) or incorrect usage of stdin"
-              else
-                if ::File.readable? file
-                  matches = [file]
-                else
-                  # Tilt backslashes in Windows paths the Ruby-friendly way
-                  if ::File::ALT_SEPARATOR == '\\' && (file.include? '\\')
-                    file = file.tr '\\', '/'
-                  end
-                  if (matches = ::Dir.glob file).empty?
-                    $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
-                    return 1
-                  end
-                end
-
-                infiles.concat matches
-              end
-            end
-          end
-
-          infiles.each do |file|
-            unless file == '-' || ::File.readable?(file)
-              $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
-              return 1
-            end
-          end
-
-          self[:input_files] = infiles
-
-          if self[:template_dirs]
-            begin
-              require 'tilt' unless defined? ::Tilt
-            rescue ::LoadError
-              $stderr.puts 'asciidoctor: FAILED: tilt could not be loaded; to use a custom backend, you must have the tilt gem installed (gem install tilt)'
-              return 1
-            end
-          end
-
-          if (load_paths = self[:load_paths])
-            load_paths.reverse_each do |path|
-              $:.unshift File.expand_path(path)
-            end
-          end
-
-          if (requires = self[:requires])
-            requires.each do |path|
-              begin
-                require path
-              rescue ::LoadError => e
-                raise e if self[:trace]
-                $stderr.puts %(asciidoctor: FAILED: '#{path}' could not be loaded)
-                $stderr.puts '  Use --trace for backtrace'
-                return 1
-              rescue ::SystemExit
-                # not permitted here
-              end
-            end
-          end
-
-        rescue ::OptionParser::MissingArgument
-          $stderr.puts %(asciidoctor: option #{$!.message})
-          $stdout.puts opts_parser
-          return 1
-        rescue ::OptionParser::InvalidOption, ::OptionParser::InvalidArgument
-          $stderr.puts %(asciidoctor: #{$!.message})
-          $stdout.puts opts_parser
+        infiles = []
+        opts_parser.parse! args
+        
+        if args.empty?
+          $stderr.puts opts_parser
           return 1
         end
-        self
-      end # parse()
 
+        # shave off the file to process so that options errors appear correctly
+        if args.size == 1 && args[0] == '-'
+          infiles.push args.pop
+        elsif
+          args.each do |file|
+            if file == '-' || (file.start_with? '-')
+              # warn, but don't panic; we may have enough to proceed, so we won't force a failure
+              $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '}) or incorrect usage of stdin"
+            else
+              if ::File.readable? file
+                matches = [file]
+              else
+                # Tilt backslashes in Windows paths the Ruby-friendly way
+                if ::File::ALT_SEPARATOR == '\\' && (file.include? '\\')
+                  file = file.tr '\\', '/'
+                end
+                if (matches = ::Dir.glob file).empty?
+                  $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
+                  return 1
+                end
+              end
+
+              infiles.concat matches
+            end
+          end
+        end
+
+        infiles.each do |file|
+          unless file == '-' || (::File.readable? file)
+            $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
+            return 1
+          end
+        end
+
+        self[:input_files] = infiles
+
+        if self[:template_dirs]
+          begin
+            require 'tilt' unless defined? ::Tilt
+          rescue ::LoadError
+            raise $! if self[:trace]
+            $stderr.puts 'asciidoctor: FAILED: \'tilt\' could not be loaded'
+            $stderr.puts '  You must have the tilt gem installed (gem install tilt) to use custom backend templates'
+            $stderr.puts '  Use --trace for backtrace'
+            return 1
+          rescue ::SystemExit
+            # not permitted here
+          end
+        end
+
+        if (load_paths = self[:load_paths])
+          load_paths.reverse_each do |path|
+            $:.unshift File.expand_path(path)
+          end
+        end
+
+        if (requires = self[:requires])
+          requires.each do |path|
+            begin
+              require path
+            rescue ::LoadError
+              raise $! if self[:trace]
+              $stderr.puts %(asciidoctor: FAILED: '#{path}' could not be loaded)
+              $stderr.puts '  Use --trace for backtrace'
+              return 1
+            rescue ::SystemExit
+              # not permitted here
+            end
+          end
+        end
+
+        self
+      rescue ::OptionParser::MissingArgument
+        $stderr.puts %(asciidoctor: option #{$!.message})
+        $stdout.puts opts_parser
+        return 1
+      rescue ::OptionParser::InvalidOption, ::OptionParser::InvalidArgument
+        $stderr.puts %(asciidoctor: #{$!.message})
+        $stdout.puts opts_parser
+        return 1
+      end
     end
   end
 end

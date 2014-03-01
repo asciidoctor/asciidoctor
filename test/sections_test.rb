@@ -546,9 +546,9 @@ text in standalone
       EOS
 
       output, errors = nil
-      redirect_streams do |stdout, stderr|
+      redirect_streams do |out, err|
         output = render_string input
-        errors = stderr.string
+        errors = err.string
       end
 
       assert !errors.empty?
@@ -584,9 +584,9 @@ Master section text.
 
       output = nil
       errors = nil
-      redirect_streams do |stdout, stderr|
+      redirect_streams do |out, err|
         output = render_string input
-        errors = stdout.string
+        errors = out.string
       end
 
       assert errors.empty?
@@ -2238,12 +2238,13 @@ intro
 
       doc = nil
       warnings = nil
-      redirect_streams do |stdout, stderr|
+      redirect_streams do |out, err|
         doc = document_from_string input
-        warnings = stderr.string
+        warnings = err.string
       end
 
       assert_not_nil warnings
+      assert !warnings.empty?
       assert_match(/ERROR:.*section/, warnings)
     end
 
@@ -2323,9 +2324,9 @@ Appendix subsection content
 
       output = nil
       errors = nil
-      redirect_streams do |stdout, stderr|
+      redirect_streams do |out, err|
         output = render_string input, :backend => 'docbook'
-        errors = stdout.string
+        errors = out.string
       end
       assert errors.empty?
       assert_xpath '/book/preface', output, 1
