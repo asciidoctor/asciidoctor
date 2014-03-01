@@ -61,6 +61,18 @@ context 'Invoker' do
     assert_xpath '/*[@class="paragraph"]/p[text()="content"]', output, 1
   end
 
+  test 'should not fail to rewind input if reading document from stdin' do
+    io = STDIN.dup
+    class << io
+      def readlines
+        ['paragraph']
+      end
+    end
+    invoker = invoke_cli_to_buffer(%w(-s), '-') { io }
+    assert_equal 0, invoker.code
+    assert_equal 1, invoker.document.blocks.size
+  end
+
   test 'should accept document from stdin and write to output file' do
     sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample-output.html'))
     begin

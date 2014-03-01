@@ -1223,7 +1223,9 @@ module Asciidoctor
       attributes['doctime'] = doctime = input_mtime.strftime('%H:%M:%S %Z')
       attributes['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to? :readlines
-      input.rewind if input.respond_to? :rewind
+      # NOTE tty, pipes & sockets can't be rewound, but can't be sniffed easily either
+      # just fail the rewind operation silently to handle all cases
+      input.rewind rescue nil
       lines = input.readlines
     elsif input.is_a? ::String
       lines = input.lines.entries
