@@ -121,20 +121,21 @@ class AbstractNode
     end
   end
 
-  # Public: Assign the value to the specified key in this
-  # block's attributes hash.
+  # Public: Assign the value to the attribute name for the current node.
   #
-  # key - The attribute key (or name)
-  # val - The value to assign to the key
+  # name      - The String attribute name
+  # value     - The Object value to assign to the attribute name
+  # overwrite - A Boolean indicating whether to assign the attribute
+  #             if currently present in the attributes Hash
   #
-  # returns a flag indicating whether the assignment was performed
-  def set_attr(key, val, overwrite = nil)
+  # Returns a [Boolean] indicating whether the assignment was performed
+  def set_attr name, value, overwrite = nil
     if overwrite.nil?
-      @attributes[key] = val
+      @attributes[name] = value
       true
     else
-      if overwrite || @attributes.has_key?(key)
-        @attributes[key] = val
+      if overwrite || !(@attributes.key? name)
+        @attributes[name] = value
         true
       else
         false
@@ -178,7 +179,7 @@ class AbstractNode
   # template -  The BaseTemplate instance in which this binding will be active.
   #             Bound to the local variable of the same name, template.
   #
-  # returns the execution context for this object so it can be be transferred to
+  # Returns the execution context for this object so it can be be transferred to
   # the backend template and binds the method arguments as local variables in
   # that same environment.
   def get_binding template
@@ -193,7 +194,7 @@ class AbstractNode
   #
   # attributes - A Hash of attributes to assign to this node.
   #
-  # returns nothing
+  # Returns nothing
   def update_attributes(attributes)
     @attributes.update(attributes)
     nil
@@ -377,7 +378,7 @@ class AbstractNode
   # warn_on_failure - a Boolean that controls whether a warning is issued if
   #                   the file cannot be read
   #
-  # returns the contents of the file at the specified path, or nil
+  # Returns the [String] content of the file at the specified path, or nil
   # if the file does not exist.
   def read_asset(path, warn_on_failure = false)
     if File.readable? path
@@ -396,7 +397,7 @@ class AbstractNode
   # target - the String target path
   # start  - the String start (i.e, parent) path (optional, default: nil)
   #
-  # returns the resolved String path 
+  # Returns the resolved [String] path 
   def normalize_web_path(target, start = nil)
     (@path_resolver ||= PathResolver.new).web_path(target, start)
   end
@@ -423,7 +424,7 @@ class AbstractNode
   # raises a SecurityError if a jail is specified and the resolved path is
   # outside the jail.
   #
-  # returns a String path resolved from the start and target paths, with any
+  # Returns the [String] path resolved from the start and target paths, with any
   # parent references resolved and self references removed. If a jail is provided,
   # this path will be guaranteed to be contained within the jail.
   def normalize_system_path(target, start = nil, jail = nil, opts = {})
@@ -456,7 +457,7 @@ class AbstractNode
   #
   # list_type - the type of list; default to the @style if not specified
   #
-  # returns the single-character String keyword that represents the marker for the specified list type
+  # Returns the single-character [String] keyword that represents the marker for the specified list type
   def list_marker_keyword(list_type = nil)
     ORDERED_LIST_KEYWORDS[list_type || @style]
   end

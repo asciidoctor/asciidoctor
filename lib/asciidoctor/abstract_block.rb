@@ -176,7 +176,7 @@ class AbstractBlock < AbstractNode
   #   section.sections.size
   #   # => 1
   #
-  # returns an Array of Section objects
+  # Returns an [Array] of Section objects
   def sections
     @blocks.select {|block| block.context == :section }
   end
@@ -206,7 +206,7 @@ class AbstractBlock < AbstractNode
   #               If not provided, the name of the context for this block
   #               is used. (default: nil).
   #
-  # returns nothing
+  # Returns nothing
   def assign_caption(caption = nil, key = nil)
     return unless title? || !@caption
 
@@ -232,7 +232,7 @@ class AbstractBlock < AbstractNode
   # Assign the next index of this section within the parent
   # Block (in document order)
   #
-  # returns nothing
+  # Returns nothing
   def assign_index(section)
     section.index = @next_section_index
     @next_section_index += 1
@@ -262,7 +262,7 @@ class AbstractBlock < AbstractNode
   # and reassign the section 0-based index value to each Section
   # as it appears in document order.
   # 
-  # returns nothing
+  # Returns nothing
   def reindex_sections
     @next_section_index = 0
     @next_section_number = 0
