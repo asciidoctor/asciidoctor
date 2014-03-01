@@ -166,26 +166,6 @@ class AbstractNode
     @attributes.has_key? %(#{name}-option)
   end
 
-  # Public: Get the execution context of this object (via Kernel#binding).
-  #
-  # This method is used to set the 'self' reference as well as local variables
-  # that map to this method's arguments during the evaluation of a backend
-  # template.
-  #
-  # Each object in Ruby has a binding context that can be used to set the 'self'
-  # reference in an evaluation context. Any arguments passed to this
-  # method are also available in the execution environment.
-  #
-  # template -  The BaseTemplate instance in which this binding will be active.
-  #             Bound to the local variable of the same name, template.
-  #
-  # Returns the execution context for this object so it can be be transferred to
-  # the backend template and binds the method arguments as local variables in
-  # that same environment.
-  def get_binding template
-    binding
-  end
-
   # Public: Update the attributes of this node with the new values in
   # the attributes argument.
   #
