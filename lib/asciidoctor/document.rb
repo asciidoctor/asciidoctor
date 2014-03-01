@@ -845,6 +845,7 @@ class Document < AbstractBlock
     end
   end
 
+  # TODO document me
   def create_converter
     converter_opts = {}
     converter_opts[:htmlsyntax] = @attributes['htmlsyntax']

@@ -1214,7 +1214,8 @@ module Asciidoctor
     if input.is_a? ::File
       lines = input.readlines
       input_mtime = input.mtime
-      input_path = ::File.expand_path input.path
+      input = ::File.new ::File.expand_path input.path
+      input_path = input.path
       # hold off on setting infile and indir until we get a better sense of their purpose
       attributes['docfile'] = input_path
       attributes['docdir'] = ::File.dirname input_path
@@ -1293,21 +1294,29 @@ module Asciidoctor
   # file, otherwise the converted String
   def convert input, options = {}
     options = options.dup
-    in_place = options.delete(:in_place) || false
     to_file = options.delete(:to_file)
     to_dir = options.delete(:to_dir)
     mkdirs = options.delete(:mkdirs) || false
     timings = options[:timings]
 
-    write_in_place = in_place && input.is_a?(::File)
-    write_to_target = to_file || to_dir
-    stream_output = to_file && to_file.respond_to?(:write)
-
-    if write_in_place && write_to_target
-      raise ::ArgumentError, 'the option :in_place cannot be used with either the :to_dir or :to_file option'
+    case to_file
+    when true, nil
+      write_to_same_dir = !to_dir && (input.is_a? ::File)
+      stream_output = false
+      write_to_target = to_dir
+      to_file = nil
+    when false
+      write_to_same_dir = false
+      stream_output = false
+      write_to_target = false
+      to_file = nil
+    else
+      write_to_same_dir = false
+      stream_output = to_file.respond_to? :write
+      write_to_target = stream_output ? false : to_file
     end
 
-    if !options.has_key?(:header_footer) && (write_in_place || write_to_target)
+    if !options.key?(:header_footer) && (write_to_same_dir || write_to_target)
       options[:header_footer] = true
     end
 
@@ -1315,57 +1324,56 @@ module Asciidoctor
 
     if to_file == '/dev/null'
       return doc
-    elsif write_in_place
-      to_file = ::File.join(::File.dirname(input.path), "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
-    elsif !stream_output && write_to_target
+    elsif write_to_same_dir
+      infile = ::File.expand_path input.path
+      outfile = ::File.join ::File.dirname(infile), %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
+      if outfile == infile
+        raise ::IOError, 'Input file and output file are the same!'
+      end
+      outdir = ::File.dirname outfile
+    elsif write_to_target
       working_dir = options.has_key?(:base_dir) ? ::File.expand_path(options[:base_dir]) : ::File.expand_path(::Dir.pwd)
       # QUESTION should the jail be the working_dir or doc.base_dir???
       jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
       if to_dir
-        to_dir = doc.normalize_system_path(to_dir, working_dir, jail, :target_name => 'to_dir', :recover => false)
+        outdir = doc.normalize_system_path(to_dir, working_dir, jail, :target_name => 'to_dir', :recover => false)
         if to_file
-          to_file = doc.normalize_system_path(to_file, to_dir, nil, :target_name => 'to_dir', :recover => false)
-          # reestablish to_dir as the final target directory (in the case to_file had directory segments)
-          to_dir = ::File.dirname(to_file)
+          outfile = doc.normalize_system_path(to_file, outdir, nil, :target_name => 'to_dir', :recover => false)
+          # reestablish outdir as the final target directory (in the case to_file had directory segments)
+          outdir = ::File.dirname outfile
         else
-          to_file = ::File.join(to_dir, "#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']}")
+          outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
         end
       elsif to_file
-        to_file = doc.normalize_system_path(to_file, working_dir, jail, :target_name => 'to_dir', :recover => false)
-        # establish to_dir as the final target directory (in the case to_file had directory segments)
-        to_dir = ::File.dirname(to_file)
+        outfile = doc.normalize_system_path(to_file, working_dir, jail, :target_name => 'to_dir', :recover => false)
+        # establish outdir as the final target directory (in the case to_file had directory segments)
+        outdir = ::File.dirname outfile
       end
 
-      if !::File.directory? to_dir
+      unless ::File.directory? outdir
         if mkdirs
-          ::FileUtils.mkdir_p to_dir
+          ::FileUtils.mkdir_p outdir
         else
-          raise ::IOError, "target directory does not exist: #{to_dir}"
+          # NOTE we intentionally refer to the directory as it was passed to the API
+          raise ::IOError, %(target directory does not exist: #{to_dir})
         end
       end
+    else
+      outfile = to_file
+      outdir = nil
     end
-
-    # concept::
-    #if to_file
-    #  doc.convert_to to_file, :timings => timings
-    #  # write stylesheets
-    #  doc
-    #else
-    #  doc.convert, :timings => timings
-    #end
 
     timings.start :convert if timings
     output = doc.convert
     timings.record :convert if timings
 
-    if to_file
+    if outfile
       timings.start :write if timings
       unless stream_output
-        to_file = ::File.expand_path to_file
-        doc.attributes['outfile'] = ::File.expand_path to_file
-        doc.attributes['outdir'] = ::File.dirname to_file
+        doc.attributes['outfile'] = outfile
+        doc.attributes['outdir'] = outdir
       end
-      doc.write output, to_file
+      doc.write output, outfile
       timings.record :write if timings
 
       # NOTE document cannot control this behavior if safe >= SafeMode::SERVER

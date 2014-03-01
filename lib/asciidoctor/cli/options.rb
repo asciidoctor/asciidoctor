@@ -162,7 +162,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   file = file.tr '\\', '/'
                 end
                 if (matches = ::Dir.glob file).empty?
-                  $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
+                  $stderr.puts %(asciidoctor: FAILED: input file #{file} missing or cannot be read)
                   return 1
                 end
               end
@@ -174,12 +174,14 @@ Example: asciidoctor -b html5 source.asciidoc
 
         infiles.each do |file|
           unless file == '-' || (::File.readable? file)
-            $stderr.puts "asciidoctor: FAILED: input file #{file} missing or cannot be read"
+            $stderr.puts %(asciidoctor: FAILED: input file #{file} missing or cannot be read)
             return 1
           end
         end
 
         self[:input_files] = infiles
+
+        self.delete(:attributes) if self[:attributes].empty?
 
         if self[:template_dirs]
           begin

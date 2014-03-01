@@ -79,15 +79,14 @@ module Asciidoctor
           tofile = outfile
           opts[:mkdirs] = true
         else
+          # automatically calculate outfile based on infile unless to_dir is set
           tofile = nil
-          # automatically calculate outfile based on infile
-          opts[:in_place] = true unless opts.has_key? :to_dir
           opts[:mkdirs] = true
         end
 
         inputs.each do |input|
           # NOTE processor will dup options and attributes internally
-          input_opts = tofile ? opts.merge(:to_file => tofile) : opts
+          input_opts = tofile.nil? ? opts : opts.merge(:to_file => tofile)
           if show_timings
             timings = Timings.new
             @documents << ::Asciidoctor.convert(input, input_opts.merge(:timings => timings))
