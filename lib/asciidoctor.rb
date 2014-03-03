@@ -1151,7 +1151,7 @@ module Asciidoctor
     [/\\?=&gt;/, '&#8658;', :none],
     # left arrow <-
     [/\\?&lt;-/, '&#8592;', :none],
-    # right left arrow <=
+    # left double arrow <=
     [/\\?&lt;=/, '&#8656;', :none],
     # restore entities
     [/\\?(&)amp;((?:[a-zA-Z]+|#\d{2,5}|#x[a-fA-F0-9]{2,4});)/, '', :bounding]
