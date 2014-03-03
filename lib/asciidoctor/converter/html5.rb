@@ -20,38 +20,38 @@ module Asciidoctor
 
     def initialize backend, opts = {}
       @xml_mode = opts[:htmlsyntax] == 'xml'
-      @short_tag_slash = @xml_mode ? '/' : nil
+      @void_element_slash = @xml_mode ? '/' : nil
       @stylesheets = Stylesheets.instance
     end
 
     def document node
       result = []
-      short_tag_slash_local = @short_tag_slash
-      br = %(<br#{short_tag_slash_local}>)
+      slash = @void_element_slash
+      br = %(<br#{slash}>)
       linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
       result << '<!DOCTYPE html>'
       lang_attribute = (node.attr? 'nolang') ? nil : %( lang="#{node.attr 'lang', 'en'}")
       result << %(<html#{@xml_mode ? ' xmlns="http://www.w3.org/1999/xhtml"' : nil}#{lang_attribute}>)
       result << %(<head>
-<meta charset="#{node.attr 'encoding', 'UTF-8'}"#{short_tag_slash_local}>
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"#{short_tag_slash_local}><![endif]-->
-<meta name="viewport" content="width=device-width, initial-scale=1.0"#{short_tag_slash_local}>
-<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{short_tag_slash_local}>)
+<meta charset="#{node.attr 'encoding', 'UTF-8'}"#{slash}>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"#{slash}><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>
+<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>)
 
       ['description', 'keywords', 'author', 'copyright'].each do |key|
-        result << %(<meta name="#{key}" content="#{node.attr key}"#{short_tag_slash_local}>) if node.attr? key
+        result << %(<meta name="#{key}" content="#{node.attr key}"#{slash}>) if node.attr? key
       end
 
       result << %(<title>#{node.doctitle(:sanitize => true) || node.attr('untitled-label')}</title>) 
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
         if linkcss
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', '')}"#{short_tag_slash_local}>)
+          result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', '')}"#{slash}>)
         else
           result << @stylesheets.embed_primary_stylesheet
         end
       elsif node.attr? 'stylesheet'
         if linkcss
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{short_tag_slash_local}>)
+          result << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{slash}>)
         else
           result << %(<style>
 #{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), true}
@@ -61,10 +61,10 @@ module Asciidoctor
 
       if node.attr? 'icons', 'font'
         if !(node.attr 'iconfont-remote', '').nil?
-          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css'}"#{short_tag_slash_local}>)
+          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css'}"#{slash}>)
         else
           iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', '')}"#{short_tag_slash_local}>)
+          result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', '')}"#{slash}>)
         end
       end
 
@@ -72,7 +72,7 @@ module Asciidoctor
       when 'coderay'
         if (node.attr 'coderay-css', 'class') == 'class'
           if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.coderay_stylesheet_name, (node.attr 'stylesdir', '')}"#{short_tag_slash_local}>)
+            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.coderay_stylesheet_name, (node.attr 'stylesdir', '')}"#{slash}>)
           else
             result << @stylesheets.embed_coderay_stylesheet
           end
@@ -81,18 +81,18 @@ module Asciidoctor
         if (node.attr 'pygments-css', 'class') == 'class'
           pygments_style = (doc.attr 'pygments-style', 'pastie')
           if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', '')}"#{short_tag_slash_local}>)
+            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', '')}"#{slash}>)
           else
             result << (@stylesheets.instance.embed_pygments_stylesheet pygments_style)
           end
         end
       when 'highlightjs', 'highlight.js'
-        result << %(<link rel="stylesheet" href="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/styles/#{node.attr 'highlightjs-theme', 'googlecode'}.min.css"#{short_tag_slash_local}>
+        result << %(<link rel="stylesheet" href="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/styles/#{node.attr 'highlightjs-theme', 'googlecode'}.min.css"#{slash}>
 <script src="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/highlight.min.js"></script>
 <script src="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/lang/common.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>)
       when 'prettify'
-        result << %(<link rel="stylesheet" href="#{node.attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{short_tag_slash_local}>
+        result << %(<link rel="stylesheet" href="#{node.attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>
 <script src="#{node.attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/prettify.min.js"></script>
 <script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>)
       end
@@ -192,7 +192,7 @@ MathJax.Hub.Config({
 
       if node.footnotes? && !(node.attr? 'nofootnotes')
         result << %(<div id="footnotes">
-<hr#{short_tag_slash_local}>)
+<hr#{slash}>)
         node.footnotes.each do |footnote|
           result << %(<div class="footnote" id="_footnote_#{footnote.index}">
 <a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a>. #{footnote.text}
@@ -232,7 +232,7 @@ MathJax.Hub.Config({
 
       if node.footnotes? && !(node.attr? 'nofootnotes')
         result << %(<div id="footnotes">
-<hr#{@short_tag_slash}>)
+<hr#{@void_element_slash}>)
         node.footnotes.each do |footnote|
           result << %(<div class="footnote" id="_footnote_#{footnote.index}">
 <a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a> #{footnote.text}
@@ -311,7 +311,7 @@ MathJax.Hub.Config({
         if node.document.attr? 'icons', 'font'
           %(<i class="icon-#{name}" title="#{node.caption}"></i>)
         else
-          %(<img src="#{node.icon_uri name}" alt="#{node.caption}"#{@short_tag_slash}>)
+          %(<img src="#{node.icon_uri name}" alt="#{node.caption}"#{@void_element_slash}>)
         end
       else
         %(<div class="title">#{node.caption}</div>)
@@ -363,7 +363,7 @@ Your browser does not support the audio tag.
           num_element = if font_icons
             %(<i class="conum" data-value="#{num}"></i><b>#{num}</b>)
           else
-            %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}"#{@short_tag_slash}>)
+            %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}"#{@void_element_slash}>)
           end
           result << %(<tr>
 <td>#{num_element}</td>
@@ -419,14 +419,14 @@ Your browser does not support the audio tag.
         end
         result << '</ol>'
       when 'horizontal'
-        short_tag_slash_local = @short_tag_slash
+        slash = @void_element_slash
         result << '<table>'
         if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
           result << '<colgroup>'
           col_style_attribute = (node.attr? 'labelwidth') ? %( style="width: #{(node.attr 'labelwidth').chomp '%'}%;") : nil
-          result << %(<col#{col_style_attribute}#{short_tag_slash_local}>)
+          result << %(<col#{col_style_attribute}#{slash}>)
           col_style_attribute = (node.attr? 'itemwidth') ? %( style="width: #{(node.attr 'itemwidth').chomp '%'}%;") : nil
-          result << %(<col#{col_style_attribute}#{short_tag_slash_local}>)
+          result << %(<col#{col_style_attribute}#{slash}>)
           result << '</colgroup>'
         end
         node.items.each do |terms, dd|
@@ -436,7 +436,7 @@ Your browser does not support the audio tag.
           last_term = terms_array[-1]
           terms_array.each do |dt|
             result << dt.text
-            result << %(<br#{short_tag_slash_local}>) if dt != last_term
+            result << %(<br#{slash}>) if dt != last_term
           end
           result << '</td>'
           result << '<td class="hdlist2">'
@@ -498,7 +498,7 @@ Your browser does not support the audio tag.
       width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
       height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
 
-      img_element = %(<img src="#{node.image_uri node.attr('target')}" alt="#{node.attr 'alt'}"#{width_attribute}#{height_attribute}#{@short_tag_slash}>)
+      img_element = %(<img src="#{node.image_uri node.attr('target')}" alt="#{node.attr 'alt'}"#{width_attribute}#{height_attribute}#{@void_element_slash}>)
       if (link = node.attr 'link')
         img_element = %(<a class="image" href="#{link}">#{img_element}</a>)
       end
@@ -694,7 +694,7 @@ Your browser does not support the audio tag.
       citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
       if attribution || citetitle
         cite_element = citetitle ? %(<cite>#{citetitle}</cite>) : nil
-        attribution_text = attribution ? %(#{citetitle ? "<br#{@short_tag_slash}>\n" : nil}&#8212; #{attribution}) : nil
+        attribution_text = attribution ? %(#{citetitle ? "<br#{@void_element_slash}>\n" : nil}&#8212; #{attribution}) : nil
         attribution_element = %(\n<div class="attribution">\n#{cite_element}#{attribution_text}\n</div>)
       else
         attribution_element = nil
@@ -708,7 +708,7 @@ Your browser does not support the audio tag.
     end
 
     def thematic_break node
-      %(<hr#{@short_tag_slash}>)
+      %(<hr#{@void_element_slash}>)
     end
 
     def sidebar node
@@ -735,16 +735,16 @@ Your browser does not support the audio tag.
       result << %(<table#{id_attribute}#{class_attribute}#{style_attribute}>)
       result << %(<caption class="title">#{node.captioned_title}</caption>) if node.title?
       if (node.attr 'rowcount') > 0
-        short_tag_slash_local = @short_tag_slash
+        slash = @void_element_slash
         result << '<colgroup>'
         if node.option? 'autowidth'
-          tag = %(<col#{short_tag_slash_local}>)
+          tag = %(<col#{slash}>)
           node.columns.size.times do
             result << tag
           end
         else
           node.columns.each do |col|
-            result << %(<col style="width: #{col.attr 'colpcwidth'}%;"#{short_tag_slash_local}>)
+            result << %(<col style="width: #{col.attr 'colpcwidth'}%;"#{slash}>)
           end
         end
         result << '</colgroup>'
@@ -869,7 +869,7 @@ Your browser does not support the audio tag.
       citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
       if attribution || citetitle
         cite_element = citetitle ? %(<cite>#{citetitle}</cite>) : nil
-        attribution_text = attribution ? %(#{citetitle ? "<br#{@short_tag_slash}>\n" : nil}&#8212; #{attribution}) : nil
+        attribution_text = attribution ? %(#{citetitle ? "<br#{@void_element_slash}>\n" : nil}&#8212; #{attribution}) : nil
         attribution_element = %(\n<div class="attribution">\n#{cite_element}#{attribution_text}\n</div>)
       else
         attribution_element = nil
@@ -946,7 +946,7 @@ Your browser does not support the video tag.
     end
 
     def inline_break node
-      %(#{node.text}<br#{@short_tag_slash}>)
+      %(#{node.text}<br#{@void_element_slash}>)
     end
 
     def inline_button node
@@ -958,7 +958,7 @@ Your browser does not support the video tag.
         %(<i class="conum" data-value="#{node.text}"></i><b>(#{node.text})</b>)
       elsif node.document.attr? 'icons'
         src = node.icon_uri("callouts/#{node.text}")
-        %(<img src="#{src}" alt="#{node.text}"#{@short_tag_slash}>)
+        %(<img src="#{src}" alt="#{node.text}"#{@void_element_slash}>)
       else
         %(<b>(#{node.text})</b>)
       end
@@ -1000,7 +1000,7 @@ Your browser does not support the video tag.
           (node.attr? name) ? %( #{name}="#{node.attr name}") : nil
         }.join
 
-        img = %(<img src="#{resolved_target}"#{attrs}#{@short_tag_slash}>)
+        img = %(<img src="#{resolved_target}"#{attrs}#{@void_element_slash}>)
       end
 
       if node.attr? 'link'
