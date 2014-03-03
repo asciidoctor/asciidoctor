@@ -7,15 +7,13 @@ class Table < AbstractBlock
   class Rows
     attr_accessor :head, :foot, :body
 
-    def initialize(head = [], foot = [], body = [])
+    def initialize head = [], foot = [], body = []
       @head = head
       @foot = foot
       @body = body
     end
 
-    def [](name)
-      self.send(name)
-    end
+    alias :[] :send
   end
 
   # Public: A String key that specifies the default table format in AsciiDoc (psv)
