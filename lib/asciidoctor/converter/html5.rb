@@ -19,22 +19,24 @@ module Asciidoctor
     QUOTE_TAGS.default = [nil, nil, nil]
 
     def initialize backend, opts = {}
-      @short_tag_slash = ((@htmlsyntax = opts[:htmlsyntax]) == 'xml' ? '/' : nil)
+      @xml_mode = opts[:htmlsyntax] == 'xml'
+      @short_tag_slash = @xml_mode ? '/' : nil
       @stylesheets = Stylesheets.instance
     end
 
     def document node
-      xml = node.document.attr? 'htmlsyntax', 'xml'
       result = []
       short_tag_slash_local = @short_tag_slash
       br = %(<br#{short_tag_slash_local}>)
       linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
       result << '<!DOCTYPE html>'
-      result << ((node.attr? 'nolang') ? '<html' : %(<html lang="#{node.attr 'lang', 'en'}")) + (xml ? %( xmlns="http://www.w3.org/1999/xhtml">) : ">")
+      lang_attribute = (node.attr? 'nolang') ? nil : %( lang="#{node.attr 'lang', 'en'}")
+      result << %(<html#{@xml_mode ? ' xmlns="http://www.w3.org/1999/xhtml"' : nil}#{lang_attribute}>)
       result << %(<head>
-<meta http-equiv="Content-Type" content="text/html; charset=#{node.attr 'encoding'}"#{short_tag_slash_local}>
-<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{short_tag_slash_local}>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"#{short_tag_slash_local}>)
+<meta charset="#{node.attr 'encoding', 'UTF-8'}"#{short_tag_slash_local}>
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"#{short_tag_slash_local}><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"#{short_tag_slash_local}>
+<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{short_tag_slash_local}>)
 
       ['description', 'keywords', 'author', 'copyright'].each do |key|
         result << %(<meta name="#{key}" content="#{node.attr key}"#{short_tag_slash_local}>) if node.attr? key

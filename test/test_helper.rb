@@ -17,6 +17,7 @@ autoload :Pathname,  'pathname'
 ENV['SUPPRESS_DEBUG'] ||= 'true'
 
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
+RE_DOCTYPE = /\s*<!DOCTYPE (.*)/
 
 class Test::Unit::TestCase
   def windows?
@@ -133,10 +134,9 @@ class Test::Unit::TestCase
   end
 
   def xmldoc_from_string(content)
-    doctype_match = content.match(/\s*<!DOCTYPE (.*)/)
     if content.match(RE_XMLNS_ATTRIBUTE)
       doc = Nokogiri::XML::Document.parse(content)
-    elsif !doctype_match
+    elsif !(doctype_match = content.match(RE_DOCTYPE))
       doc = Nokogiri::HTML::DocumentFragment.parse(content)
     elsif doctype_match[1].start_with? 'html'
       doc = Nokogiri::HTML::Document.parse(content)
