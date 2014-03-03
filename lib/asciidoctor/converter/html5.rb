@@ -24,12 +24,13 @@ module Asciidoctor
     end
 
     def document node
+      xml = node.document.attr? 'htmlsyntax', 'xml'
       result = []
       short_tag_slash_local = @short_tag_slash
       br = %(<br#{short_tag_slash_local}>)
       linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
       result << '<!DOCTYPE html>'
-      result << ((node.attr? 'nolang') ? '<html>' : %(<html lang="#{node.attr 'lang', 'en'}">))
+      result << ((node.attr? 'nolang') ? '<html' : %(<html lang="#{node.attr 'lang', 'en'}")) + (xml ? %( xmlns="http://www.w3.org/1999/xhtml">) : ">")
       result << %(<head>
 <meta http-equiv="Content-Type" content="text/html; charset=#{node.attr 'encoding'}"#{short_tag_slash_local}>
 <meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{short_tag_slash_local}>
