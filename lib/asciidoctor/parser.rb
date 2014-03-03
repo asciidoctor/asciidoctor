@@ -926,7 +926,7 @@ class Parser
       #end
 
       if block.sub? :callouts
-        if !(catalog_callouts block.source, document)
+        unless (catalog_callouts block.source, document)
           # No need to look for callouts if they aren't there
           block.remove_sub :callouts
         end
@@ -1612,7 +1612,7 @@ class Parser
     if !(val = attributes[1]).nil? && ((ord_0 = val[0].ord) == 100 || ord_0 == 102) && val =~ FloatingTitleStyleRx
       return false
     end
-    return false if !reader.has_more_lines?
+    return false unless reader.has_more_lines?
     Compliance.underline_style_section_titles ? is_section_title?(*reader.peek_lines(2)) : is_section_title?(reader.peek_line)
   end
 
@@ -1993,7 +1993,7 @@ class Parser
   #
   # returns true if the line contains metadata, otherwise false
   def self.parse_block_metadata_line(reader, parent, attributes, options = {})
-    return false if !reader.has_more_lines?
+    return false unless reader.has_more_lines?
     next_line = reader.peek_line
     if (commentish = next_line.start_with?('//')) && (match = CommentBlockRx.match(next_line))
       terminator = match[0]
