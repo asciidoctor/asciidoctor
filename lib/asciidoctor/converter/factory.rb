@@ -44,7 +44,7 @@ module Asciidoctor
         def default initialize_singleton = true
           return @__default__ || new unless initialize_singleton
           @__default__ ||= begin
-            require 'thread_safe' unless defined? ::ThreadSafe
+            require 'thread_safe'.to_s unless defined? ::ThreadSafe
             new ::ThreadSafe::Cache.new
           rescue ::LoadError
             warn 'asciidoctor: WARNING: gem \'thread_safe\' is not installed. This gem recommended when registering custom converters.'

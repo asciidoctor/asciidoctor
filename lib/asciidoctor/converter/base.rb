@@ -1,4 +1,6 @@
 module Asciidoctor
+  module Converter; end if RUBY_ENGINE_OPAL
+
   # An abstract base class for defining converters that can be used to convert
   # {AbstractNode} objects in a parsed AsciiDoc document to a backend format
   # such as HTML or DocBook.
