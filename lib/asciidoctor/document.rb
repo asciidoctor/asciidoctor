@@ -319,9 +319,9 @@ class Document < AbstractBlock
       # dynamic intrinstic attribute values
       now = ::Time.now
       localdate = (attrs['localdate'] ||= now.strftime('%Y-%m-%d'))
-      localtime = (attrs['localtime'] ||= now.strftime('%H:%M:%S %Z'))
+      localtime = (attrs['localtime'] ||= (now.strftime '%H:%M:%S %Z' rescue now.strftime '%H:%M:%S'))
       attrs['localdatetime'] ||= %(#{localdate} #{localtime})
-      
+
       # docdate, doctime and docdatetime should default to
       # localdate, localtime and localdatetime if not otherwise set
       attrs['docdate'] ||= localdate
