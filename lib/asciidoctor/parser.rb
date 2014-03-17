@@ -1554,13 +1554,19 @@ class Parser
     section.title = sect_title
     # parse style, id and role from first positional attribute
     if attributes[1]
-      section.sectname, _ = parse_style_attribute(attributes, reader)
-      section.special = true
-      # HACK needs to be refactored so it's driven by config
-      if section.sectname == 'abstract' && document.doctype == 'book'
-        section.sectname = 'sect1'
-        section.special = false
-        section.level = 1
+      style, _ = parse_style_attribute attributes, reader
+      # handle case where only id and/or role are given (e.g., #idname.rolename)
+      if style
+        section.sectname = style
+        section.special = true
+        # HACK needs to be refactored so it's driven by config
+        if section.sectname == 'abstract' && document.doctype == 'book'
+          section.sectname = 'sect1'
+          section.special = false
+          section.level = 1
+        end
+      else
+        section.sectname = %(sect#{section.level})
       end
     elsif sect_title.downcase == 'synopsis' && document.doctype == 'manpage'
       section.special = true

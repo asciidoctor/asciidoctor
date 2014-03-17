@@ -952,6 +952,24 @@ Content.
       assert_xpath '/div[@class="sect1 small"]/h2[@id="dedication"]', output, 1
     end
 
+    test 'id attribute specified using shorthand syntax should not create a special section' do
+      input = <<-EOS
+[#idname]
+== Section
+
+content
+      EOS
+
+      doc = document_from_string input, :backend => 'docbook45'
+      section = doc.blocks[0]
+      assert_not_nil section
+      assert_equal :section, section.context
+      assert !section.special
+      output = doc.convert
+      assert_css 'section', output, 1
+      assert_css 'section#idname', output, 1
+    end
+
     test "Block attributes are additive" do
       input = <<-EOS
 [id='foo']
