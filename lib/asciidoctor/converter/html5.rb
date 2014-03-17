@@ -530,9 +530,8 @@ Your browser does not support the audio tag.
           pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
           code_class = language ? %( class="#{language_classes}") : nil
         when 'prettify'
-          pre_class = %( class="prettyprint#{nowrap ? ' nowrap' : nil}#{(node.attr? 'linenums') ? ' linenums' : nil})
-          pre_class = language ? %(#{pre_class} #{language_classes}") : %(#{pre_class}")
-          code_class = nil
+          pre_class = %( class="prettyprint#{nowrap ? ' nowrap' : nil}#{(node.attr? 'linenums') ? ' linenums' : nil}")
+          code_class = language ? %( class="#{language_classes}") : nil
         when 'html-pipeline'
           pre_class = language ? %( lang="#{language}") : nil
           code_class = nil
