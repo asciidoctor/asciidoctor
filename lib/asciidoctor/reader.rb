@@ -1181,7 +1181,7 @@ class PreprocessorReader < Reader
   end
 
   def to_s
-    %(#{self.class.name} [path: #{@path}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s}.join ', '}]])
+    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s}.join ', '}]}>)
   end
 end
 end

@@ -1008,7 +1008,7 @@ class Document < AbstractBlock
   end
 
   def to_s
-    %(#{self.class}@#{object_id} { doctype: #{doctype.inspect}, doctitle: #{(@header != nil ? @header.title : nil).inspect}, blocks: #{@blocks.size} })
+    %(#<#{self.class}@#{object_id} {doctype: #{doctype.inspect}, doctitle: #{(@header != nil ? @header.title : nil).inspect}, blocks: #{@blocks.size}}>)
   end
 
 end

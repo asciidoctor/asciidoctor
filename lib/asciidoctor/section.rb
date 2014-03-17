@@ -177,7 +177,7 @@ class Section < AbstractBlock
   def to_s
     if @title != nil
       qualified_title = @numbered ? %(#{sectnum} #{@title}) : @title
-      %(#{self.class}@#{object_id} { level: #{@level}, title: #{qualified_title.inspect}, blocks: #{@blocks.size} })
+      %(#<#{self.class}@#{object_id} {level: #{@level}, title: #{qualified_title.inspect}, blocks: #{@blocks.size}}>)
     else
       super
     end

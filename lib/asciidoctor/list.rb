@@ -29,7 +29,7 @@ class List < AbstractBlock
   alias :render :convert
 
   def to_s
-    %(#{self.class}@#{object_id} { context: #{@context.inspect}, style: #{@style.inspect}, items: #{items.size} })
+    %(#<#{self.class}@#{object_id} {context: #{@context.inspect}, style: #{@style.inspect}, items: #{items.size}}>)
   end
 
 end
@@ -83,7 +83,7 @@ class ListItem < AbstractBlock
   end
 
   def to_s
-    %(#{self.class}@#{object_id} { list_context: #{parent.context.inspect}, text: #{@text.inspect}, blocks: #{(@blocks || []).size} })
+    %(#<#{self.class}@#{object_id} {list_context: #{parent.context.inspect}, text: #{@text.inspect}, blocks: #{(@blocks || []).size}}>)
   end
 
 end
