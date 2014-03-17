@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.summary           = 'An implementation of the AsciiDoc text processor and publishing toolchain in Ruby'
   s.description       = <<-EOS
 A fast, open source text processor and publishing toolchain, written in Ruby, for transforming AsciiDoc markup into HTML 5, DocBook 4.5, DocBook 5.0 and custom output formats.
-EOS
+  EOS
 
   s.authors           = ['Dan Allen', 'Sarah White', 'Ryan Waldron', 'Jason Porter', 'Nick Hengeveld', 'Jeremy McAnally']
   s.email             = ['dan.j.allen@gmail.com']
@@ -24,12 +24,12 @@ EOS
   #s.executables       = s.files.grep(/^bin\//) { |f| File.basename f }
   s.executables       = ['asciidoctor', 'asciidoctor-safe']
   s.test_files        = s.files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
-  s.require_paths     = %w[lib]
+  s.require_paths     = %w(lib)
 
   s.has_rdoc          = true
   s.rdoc_options      = ['--charset=UTF-8']
-  #s.extra_rdoc_files  = %w[CHANGELOG.adoc LICENSE README.adoc]
-  s.extra_rdoc_files  = %w[LICENSE]
+  #s.extra_rdoc_files  = %w(CHANGELOG.adoc LICENSE README.adoc)
+  s.extra_rdoc_files  = %w(LICENSE)
 
   # erubis is needed for testing use of alternative eRuby impls
   # tilt, slim and haml are needed for testing custom templates
