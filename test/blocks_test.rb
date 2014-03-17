@@ -2106,6 +2106,19 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       assert_match(/hljs.initHighlightingOnLoad/, output)
     end
 
+    test 'should add language classes to child code element when source-highlighter is prettify' do
+      input = <<-EOS
+[source,ruby]
+----
+puts "foo"
+----
+      EOS
+
+      output = render_embedded_string input, :attributes => {'source-highlighter' => 'prettify'}
+      assert_css 'pre[class="prettyprint"]', output, 1
+      assert_css 'pre > code[class="ruby language-ruby"]', output, 1
+    end
+
     test 'should set lang attribute on pre when source-highlighter is html-pipeline' do
       input = <<-EOS
 [source,ruby]
