@@ -38,9 +38,11 @@ module Asciidoctor
 <meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>
 <meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>)
 
-      ['description', 'keywords', 'author', 'copyright'].each do |key|
-        result << %(<meta name="#{key}" content="#{node.attr key}"#{slash}>) if node.attr? key
-      end
+      result << %(<meta name="application-name" content="#{node.attr 'app-name'}"#{slash}>) if node.attr? 'app-name'
+      result << %(<meta name="description" content="#{node.attr 'description'}"#{slash}>) if node.attr? 'description'
+      result << %(<meta name="keywords" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
+      result << %(<meta name="author" content="#{node.attr 'authors'}"#{slash}>) if node.attr? 'authors'
+      result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
 
       result << %(<title>#{node.doctitle(:sanitize => true) || node.attr('untitled-label')}</title>) 
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
