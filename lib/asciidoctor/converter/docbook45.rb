@@ -4,6 +4,22 @@ module Asciidoctor
   # A built-in {Converter} implementation that generates DocBook 4.5 output
   # consistent with the docbook45 backend from AsciiDoc Python.
   class Converter::DocBook45Converter < Converter::DocBook5Converter
+    def olist node
+      result = []
+      num_attribute = node.style ? %( numeration="#{node.style}") : nil
+      start_attribute = (node.attr? 'start') ? %( override="#{node.attr 'start'}") : nil
+      result << %(<orderedlist#{common_attributes node.id, node.role, node.reftext}#{num_attribute}>)
+      result << %(<title>#{node.title}</title>) if node.title?
+      node.items.each_with_index do |item, idx|
+        result << (idx == 0 ? %(<listitem#{start_attribute}>) : '<listitem>')
+        result << %(<simpara>#{item.text}</simpara>)
+        result << item.content if item.blocks?
+        result << '</listitem>'
+      end
+      result << %(</orderedlist>)
+      result * EOL
+    end
+
     def inline_anchor node
       target = node.target
       case node.type
