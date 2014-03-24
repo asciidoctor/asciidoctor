@@ -1676,6 +1676,36 @@ List
       assert_xpath '(//ol)[1]/li', output, 2
       assert_xpath '(//ol)[2]/li', output, 1
     end
+
+    test 'should use start number in docbook4.5 backend' do
+      input = <<-EOS
+== List
+
+[start=7]
+. item 7
+. item 8
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook45'
+      assert_xpath '//orderedlist', output, 1
+      assert_xpath '(//orderedlist)/listitem', output, 2
+      assert_xpath '(//orderedlist/listitem)[1][@override = "7"]', output, 1
+    end
+
+    test 'should use start number in docbook5 backend' do
+      input = <<-EOS
+== List
+
+[start=7]
+. item 7
+. item 8
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook5'
+      assert_xpath '//orderedlist', output, 1
+      assert_xpath '(//orderedlist)/listitem', output, 2
+      assert_xpath '(//orderedlist)[@startingnumber = "7"]', output, 1
+    end
   end
 end
 
