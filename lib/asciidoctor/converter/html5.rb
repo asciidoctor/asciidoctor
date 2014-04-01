@@ -81,7 +81,7 @@ module Asciidoctor
         end
       when 'pygments'
         if (node.attr 'pygments-css', 'class') == 'class'
-          pygments_style = (doc.attr 'pygments-style', 'pastie')
+          pygments_style = (node.attr 'pygments-style', 'pastie')
           if linkcss
             result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', '')}"#{slash}>)
           else
