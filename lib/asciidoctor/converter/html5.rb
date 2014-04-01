@@ -85,7 +85,7 @@ module Asciidoctor
           if linkcss
             result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', '')}"#{slash}>)
           else
-            result << (@stylesheets.instance.embed_pygments_stylesheet pygments_style)
+            result << (@stylesheets.embed_pygments_stylesheet pygments_style)
           end
         end
       when 'highlightjs', 'highlight.js'
