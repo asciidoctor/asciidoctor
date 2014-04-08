@@ -482,7 +482,7 @@ Joe Cool
 :page-layout: post
     EOS
     metadata, = parse_header_metadata input
-    assert_not_equal 'page-layout: post', metadata['revremark']
+    refute_equal 'page-layout: post', metadata['revremark']
     assert !metadata.has_key?('revdate')
   end
 

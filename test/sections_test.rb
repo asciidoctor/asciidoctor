@@ -76,7 +76,7 @@ context 'Sections' do
 
     test 'id and reftext in embedded anchor cannot be quoted' do
       sec = block_from_string(%(== Section One [["one","Section Uno"]] ==))
-      assert_not_equal 'one', sec.id
+      refute_equal 'one', sec.id
       assert_equal 'Section One [["one","Section Uno"]]', sec.title
       assert_nil(sec.attr 'reftext')
     end
@@ -90,7 +90,7 @@ context 'Sections' do
 
     test 'should unescape but not process inline anchor' do
       sec = block_from_string(%(== Section One \\[[one]] ==))
-      assert_not_equal 'one', sec.id
+      refute_equal 'one', sec.id
       assert_equal 'Section One [[one]]', sec.title
     end
 
@@ -124,7 +124,7 @@ content
 
       doc = document_from_string input
       reftext = doc.references[:ids]['install']
-      assert_not_nil reftext
+      refute_nil reftext
       assert_equal 'Install Procedure', reftext
     end
 
@@ -138,7 +138,7 @@ content
 
       doc = document_from_string input
       reftext = doc.references[:ids]['_install']
-      assert_not_nil reftext
+      refute_nil reftext
       assert_equal 'Install Procedure', reftext
     end
   end
@@ -508,7 +508,7 @@ content
 
       doc = document_from_string input
       reftext = doc.references[:ids]['install']
-      assert_not_nil reftext
+      refute_nil reftext
       assert_equal 'Install Procedure', reftext
     end
 
@@ -523,7 +523,7 @@ content
 
       doc = document_from_string input
       reftext = doc.references[:ids]['_install']
-      assert_not_nil reftext
+      refute_nil reftext
       assert_equal 'Install Procedure', reftext
     end
   end
@@ -2243,7 +2243,7 @@ intro
         warnings = err.string
       end
 
-      assert_not_nil warnings
+      refute_nil warnings
       assert !warnings.empty?
       assert_match(/ERROR:.*section/, warnings)
     end

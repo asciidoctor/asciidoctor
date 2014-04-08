@@ -200,7 +200,7 @@ This line is separated something that is not a horizontal rule...
   end
 
   test "unquoted text" do
-    assert_no_match(/#/, render_string("An #unquoted# word"))
+    refute_match(/#/, render_string("An #unquoted# word"))
   end
 
   test "backtick-escaped text followed by single-quoted text" do

@@ -37,7 +37,7 @@ first paragraph
 second paragraph
       EOS
       output = render_embedded_string input
-      assert_no_match(/line comment/, output)
+      refute_match(/line comment/, output)
       assert_xpath '//p', output, 2
     end
 
@@ -48,7 +48,7 @@ first line
 second line
       EOS
       output = render_embedded_string input
-      assert_no_match(/line comment/, output)
+      refute_match(/line comment/, output)
       assert_xpath '//p', output, 1
       assert_xpath "//p[1][text()='first line\nsecond line']", output, 1
     end
@@ -64,7 +64,7 @@ block comment
 second paragraph
       EOS
       output = render_embedded_string input
-      assert_no_match(/block comment/, output)
+      refute_match(/block comment/, output)
       assert_xpath '//p', output, 2
     end
 
@@ -77,7 +77,7 @@ block comment
 second paragraph
       EOS
       output = render_embedded_string input
-      assert_no_match(/block comment/, output)
+      refute_match(/block comment/, output)
       assert_xpath '//p', output, 2
     end
 
@@ -92,7 +92,7 @@ block comment
 
       EOS
       output = render_embedded_string input
-      assert_no_match(/block comment/, output)
+      refute_match(/block comment/, output)
     end
 
     test "trailing endlines after block comment at end of document does not create paragraph" do
@@ -596,7 +596,7 @@ Just write.
       doc = document_from_string input
       assert_equal 'Look!', doc.blocks.first.caption
       output = doc.render
-      assert_no_match(/Look/, output)
+      refute_match(/Look/, output)
     end
 
     test 'automatic caption can be turned off and on and modified' do
@@ -790,7 +790,7 @@ source line 2\r
       EOS
 
       output = render_embedded_string input
-      assert_no_match(/\[source\]/, output)
+      refute_match(/\[source\]/, output)
       assert_xpath '/*[@class="listingblock"]//pre', output, 1
       assert_xpath '/*[@class="listingblock"]//pre/code', output, 1
       assert_xpath %(/*[@class="listingblock"]//pre/code[text()="source line 1\nsource line 2"]), output, 1
@@ -2086,7 +2086,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       EOS
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
       assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
-      assert_no_match(/\.CodeRay \{/, output)
+      refute_match(/\.CodeRay \{/, output)
     end
 
     test 'should include remote highlight.js assets if source-highlighter attribute is highlightjs' do
@@ -2226,7 +2226,7 @@ Abstract for book without title is invalid.
         warnings = stderr.string
       end
       assert_css '.abstract', output, 0
-      assert_not_nil warnings
+      refute_nil warnings
       assert_match(/WARNING:.*abstract block/, warnings)
     end
 
@@ -2292,7 +2292,7 @@ Abstract for book is invalid.
         warnings = stderr.string
       end
       assert_css 'abstract', output, 0
-      assert_not_nil warnings
+      refute_nil warnings
       assert_match(/WARNING:.*abstract block/, warnings)
     end
 
@@ -2537,7 +2537,7 @@ $ apt-get install asciidoctor
 
       doc = document_from_string input
       reftext = doc.references[:ids]['debian']
-      assert_not_nil reftext
+      refute_nil reftext
       assert_equal 'Debian Install', reftext
     end
 
@@ -2552,7 +2552,7 @@ $ apt-get install asciidoctor
 
       doc = document_from_string input
       reftext = doc.references[:ids]['debian']
-      assert_not_nil reftext
+      refute_nil reftext
       assert_equal '[Debian] Install', reftext
     end
 
@@ -2567,7 +2567,7 @@ $ apt-get install asciidoctor
 
       doc = document_from_string input
       reftext = doc.references[:ids]['debian']
-      assert_not_nil reftext
+      refute_nil reftext
       assert_equal 'Debian, Ubuntu', reftext
     end
 
@@ -2583,7 +2583,7 @@ $ apt-get install asciidoctor
 
       doc = document_from_string input
       reftext = doc.references[:ids]['debian']
-      assert_not_nil reftext
+      refute_nil reftext
       assert_equal 'Debian Install', reftext
     end
   end

@@ -489,7 +489,7 @@ text
     test 'should raise exception if an attempt is made to overwrite input file' do
       sample_input_path = fixture_path('sample.asciidoc')
 
-      assert_raise IOError do
+      assert_raises IOError do
         Asciidoctor.convert_file sample_input_path, :attributes => { 'outfilesuffix' => '.asciidoc' }
       end
     end
@@ -1277,14 +1277,14 @@ two
       rescue => e
         flunk "xhtml5 backend did not generate well-formed XML: #{e.message}\n#{result}"
       end
-      #assert_no_match(/<meta [^>]+[^\/]>/, result)
-      #assert_no_match(/<link [^>]+[^\/]>/, result)
-      #assert_no_match(/<img [^>]+[^\/]>/, result)
-      #assert_no_match(/<input [^>]+[^\/]>/, result)
+      #refute_match(/<meta [^>]+[^\/]>/, result)
+      #refute_match(/<link [^>]+[^\/]>/, result)
+      #refute_match(/<img [^>]+[^\/]>/, result)
+      #refute_match(/<input [^>]+[^\/]>/, result)
       #assert_match(/<input [^>]+checked="checked"/, result)
       #assert_match(/<input [^>]+disabled="disabled"/, result)
-      #assert_no_match(/<col [^>]+[^\/]>/, result)
-      #assert_no_match(/<[bh]r>/, result)
+      #refute_match(/<col [^>]+[^\/]>/, result)
+      #refute_match(/<[bh]r>/, result)
       #assert_match(/video [^>]+loop="loop"/, result)
       #assert_match(/video [^>]+autoplay="autoplay"/, result)
       #assert_match(/video [^>]+controls="controls"/, result)
@@ -1333,7 +1333,7 @@ section body
 
     test 'docbook45 backend doctype article no xmlns' do
       result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'article', 'noxmlns' => ''})
-      assert_no_match(RE_XMLNS_ATTRIBUTE, result)
+      refute_match(RE_XMLNS_ATTRIBUTE, result)
     end
 
     test 'docbook45 backend doctype book' do
@@ -1364,7 +1364,7 @@ chapter body
 
     test 'docbook45 backend doctype book no xmlns' do
       result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'book', 'noxmlns' => ''})
-      assert_no_match(RE_XMLNS_ATTRIBUTE, result)
+      refute_match(RE_XMLNS_ATTRIBUTE, result)
     end
 
     test 'docbook45 backend parses out subtitle' do
@@ -1403,8 +1403,8 @@ section body
       section = xmlnodes_at_xpath('/xmlns:article/xmlns:section', result, 1).first
       # nokogiri can't make up its mind
       id_attr = section.attribute('id') || section.attribute('xml:id')
-      assert_not_nil id_attr
-      assert_not_nil id_attr.namespace
+      refute_nil id_attr
+      refute_nil id_attr.namespace
       assert_equal 'xml', id_attr.namespace.prefix
       assert_equal '_first_section', id_attr.value
     end
@@ -1432,8 +1432,8 @@ chapter body
       chapter = xmlnodes_at_xpath('/xmlns:book/xmlns:chapter', result, 1).first
       # nokogiri can't make up its mind
       id_attr = chapter.attribute('id') || chapter.attribute('xml:id')
-      assert_not_nil id_attr
-      assert_not_nil id_attr.namespace
+      refute_nil id_attr
+      refute_nil id_attr.namespace
       assert_equal 'xml', id_attr.namespace.prefix
       assert_equal '_first_chapter', id_attr.value
     end
@@ -1575,7 +1575,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
        doc = document_from_string input
        synopsis_section = doc.blocks.first 
-       assert_not_nil synopsis_section
+       refute_nil synopsis_section
        assert_equal :section, synopsis_section.context
        assert synopsis_section.special
        assert_equal 'synopsis', synopsis_section.sectname

@@ -127,7 +127,7 @@ context 'Options' do
     old_load_path = $LOAD_PATH.dup
     begin
       exitval = options.parse! %w(-I foobar -I foobaz test/fixtures/sample.asciidoc)
-      assert_not_equal 1, exitval
+      refute_equal 1, exitval
       assert_equal old_load_path.size + 2, $LOAD_PATH.size
       assert_equal File.expand_path('foobar'), $LOAD_PATH[0]
       assert_equal File.expand_path('foobaz'), $LOAD_PATH[1]

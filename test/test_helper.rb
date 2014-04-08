@@ -7,7 +7,7 @@ end
 
 require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
 
-require 'test/unit'
+require 'minitest/autorun'
 require 'socket'
 require 'nokogiri'
 
@@ -19,7 +19,14 @@ ENV['SUPPRESS_DEBUG'] ||= 'true'
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
 RE_DOCTYPE = /\s*<!DOCTYPE (.*)/
 
-class Test::Unit::TestCase
+if Minitest.const_defined?('Test')
+  # We're on Minitest 5+. Nothing to do here.
+else
+  # Minitest 4 doesn't have Minitest::Test yet.
+  Minitest::Test = MiniTest::Unit::TestCase
+end
+
+class Minitest::Test
   def windows?
     RbConfig::CONFIG['host_os'] =~ /win|ming/
   end
@@ -316,22 +323,12 @@ end
 #
 ###
 
-# Test::Unit loads a default test if the suite is empty, whose purpose is to
-# fail. Since having empty contexts is a common practice, we decided to
-# overwrite TestSuite#empty? in order to allow them. Having a failure when no
-# tests have been defined seems counter-intuitive.
-class Test::Unit::TestSuite
-  def empty?
-    false
-  end
-end
-
 # Contest adds +teardown+, +test+ and +context+ as class methods, and the
 # instance methods +setup+ and +teardown+ now iterate on the corresponding
 # blocks. Note that all setup and teardown blocks must be defined with the
 # block syntax. Adding setup or teardown instance methods defeats the purpose
 # of this library.
-class Test::Unit::TestCase
+class Minitest::Test
   def self.setup(&block)
     define_method :setup do
       super(&block)
@@ -384,5 +381,5 @@ private
 end
 
 def context(*name, &block)
-  Test::Unit::TestCase.context(name, &block)
+  Minitest::Test.context(name, &block)
 end
