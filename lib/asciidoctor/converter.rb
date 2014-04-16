@@ -82,11 +82,13 @@ module Asciidoctor
           base = 'html'
           ext = '.html'
           type = 'html'
+          syntax = 'html'
         end
         {
           'basebackend' => base,
           'outfilesuffix' => ext,
           'filetype' => type,
+          'htmlsyntax' => syntax
         }
       end
 
@@ -111,6 +113,14 @@ module Asciidoctor
           backend_info['outfilesuffix'] = value
         else
           backend_info['outfilesuffix']
+        end
+      end
+
+      def htmlsyntax value = nil
+        if value
+          backend_info['htmlsyntax'] = value
+        else
+          backend_info['htmlsyntax']
         end
       end
     end
