@@ -784,7 +784,7 @@ Your browser does not support the audio tag.
           result << %(</t#{tsec}>)
         end
       end
-      result << %(</table>)
+      result << '</table>'
       result * EOL
     end
 
@@ -840,8 +840,7 @@ Your browser does not support the audio tag.
       else
         ul_class_attribute = node.style ? %( class="#{node.style}") : nil
       end
-      div_class_attribute = %( class="#{div_classes * ' '}")
-      result << %(<div#{id_attribute}#{div_class_attribute}>)
+      result << %(<div#{id_attribute} class="#{div_classes * ' '}">)
       result << %(<div class="title">#{node.title}</div>) if node.title?
       result << %(<ul#{ul_class_attribute}>)
 
