@@ -1,17 +1,34 @@
 '\" t
 .\"     Title: asciidoctor
-.\"    Author: Dan Allen
-.\" Generator: Asciidoctor 0.1.4
-.\"      Date: 2013-09-05
+.\"    Author: Dan Allen; Ryan Waldron
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 04/10/2014
 .\"    Manual: Asciidoctor Manual
 .\"    Source: Asciidoctor 0.1.4
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2013-09-05" "Asciidoctor 0\&.1\&.4" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "04/10/2014" "Asciidoctor 0\&.1\&.4" "Asciidoctor Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
 .nh
+.\" disable justification (adjust text to left margin only)
 .ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+asciidoctor \- converts AsciiDoc source files to HTML, DocBook and other formats
 .SH "SYNOPSIS"
 .sp
 \fBasciidoctor\fR [\fIOPTION\fR]\&... \fIFILE\fR\&...
@@ -30,12 +47,22 @@ Base directory containing the document and resources\&. Defaults to the director
 .PP
 \fB\-S, \-\-safe\-mode\fR=\fISAFE_MODE\fR
 .RS 4
-Set safe mode level: \fIunsafe\fR, \fIsafe\fR, \fIserver\fR or \fIsecure\fR\&. Disables potentially dangerous macros in source files, such as include::[]\&. If not set, the safe mode level defaults to \fIunsafe\fR when Asciidoctor is invoked using this script\&.
+Set safe mode level:
+\fIunsafe\fR,
+\fIsafe\fR,
+\fIserver\fR
+or
+\fIsecure\fR\&. Disables potentially dangerous macros in source files, such as include::[]\&. If not set, the safe mode level defaults to
+\fIunsafe\fR
+when Asciidoctor is invoked using this script\&.
 .RE
 .PP
 \fB\-\-safe\fR
 .RS 4
-Set safe mode level to \fIsafe\fR\&. Enables include macros, but restricts access to ancestor paths of source file\&. Provided for compatibility with the asciidoc command\&. If not set, the safe mode level defaults to \fIunsafe\fR when Asciidoctor is invoked using this script\&.
+Set safe mode level to
+\fIsafe\fR\&. Enables include macros, but restricts access to ancestor paths of source file\&. Provided for compatibility with the asciidoc command\&. If not set, the safe mode level defaults to
+\fIunsafe\fR
+when Asciidoctor is invoked using this script\&.
 .RE
 .SS "Document Settings"
 .PP
@@ -43,25 +70,69 @@ Set safe mode level to \fIsafe\fR\&. Enables include macros, but restricts acces
 .RS 4
 Define, override or delete a document attribute\&. Command\-line attributes take precedence over attributes defined in the source file\&.
 .sp
-\fIATTRIBUTE\fR is normally formatted as a key\-value pair, in the form \fINAME=VALUE\fR\&. Alternate acceptable forms are \fINAME\fR (where the \fIVALUE\fR defaults to an empty string), \fINAME!\fR (unassigns the \fINAME\fR attribute) and \fINAME=VALUE@\fR (where \fIVALUE\fR does not override value of \fINAME\fR attribute if it\(cqs already defined in the source document)\&. Values containing spaces should be enclosed in quotes\&.
+\fIATTRIBUTE\fR
+is normally formatted as a key\-value pair, in the form
+\fINAME=VALUE\fR\&. Alternate acceptable forms are
+\fINAME\fR
+(where the
+\fIVALUE\fR
+defaults to an empty string),
+\fINAME!\fR
+(unassigns the
+\fINAME\fR
+attribute) and
+\fINAME=VALUE@\fR
+(where
+\fIVALUE\fR
+does not override value of
+\fINAME\fR
+attribute if it\(cqs already defined in the source document)\&. Values containing spaces should be enclosed in quotes\&.
 .sp
 This option may be specified more than once\&.
 .RE
 .PP
 \fB\-b, \-\-backend\fR=\fIBACKEND\fR
 .RS 4
-Backend output file format: \fIhtml5\fR, \fIdocbook45\fR and \fIdocbook5\fR supported out of the box\&. You can also use the backend alias names \fIhtml\fR (aliased to \fIhtml5\fR) or \fIdocbook\fR (aliased to \fIdocbook5\fR)\&. Defaults to \fIhtml5\fR\&. Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during rendering\&.
+Backend output file format:
+\fIhtml5\fR,
+\fIdocbook45\fR
+and
+\fIdocbook5\fR
+supported out of the box\&. You can also use the backend alias names
+\fIhtml\fR
+(aliased to
+\fIhtml5\fR) or
+\fIdocbook\fR
+(aliased to
+\fIdocbook5\fR)\&. Defaults to
+\fIhtml5\fR\&. Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during rendering\&.
 .RE
 .PP
 \fB\-d, \-\-doctype\fR=\fIDOCTYPE\fR
 .RS 4
-Document type: \fIarticle\fR, \fIbook\fR, \fImanpage\fR or \fIinline\fR\&. Sets the root element when using the \fIdocbook\fR backend and the style class on the HTML body element when using the \fIhtml\fR backend\&. The \fIbook\fR document type allows multiple level\-0 section titles in a single document\&. The \fImanpage\fR document type enables parsing of metadata necessary to produce a manpage\&. The \fIinline\fR document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element\&. Defaults to \fIarticle\fR\&.
+Document type:
+\fIarticle\fR,
+\fIbook\fR,
+\fImanpage\fR
+or
+\fIinline\fR\&. Sets the root element when using the
+\fIdocbook\fR
+backend and the style class on the HTML body element when using the
+\fIhtml\fR
+backend\&. The
+\fIbook\fR
+document type allows multiple level\-0 section titles in a single document\&. The
+\fImanpage\fR
+document type enables parsing of metadata necessary to produce a manpage\&. The
+\fIinline\fR
+document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element\&. Defaults to
+\fIarticle\fR\&.
 .RE
 .SS "Rendering Control"
 .PP
 \fB\-C, \-\-compact\fR
 .RS 4
-Compact the output by removing blank lines\&. Not enabled by default\&.
+Compact the output by removing blank lines\&. (No longer in use)\&.
 .RE
 .PP
 \fB\-D, \-\-destination\-dir\fR=\fIDIR\fR
@@ -71,22 +142,34 @@ Destination output directory\&. Defaults to the directory containing the source 
 .PP
 \fB\-E, \-\-template\-engine\fR=\fINAME\fR
 .RS 4
-Template engine to use for the custom render templates\&. The gem with the same name as the engine will be loaded automatically\&. This name is also used to build the full path to the custom templates\&.
+Template engine to use for the custom render templates\&. The gem with the same name as the engine will be loaded automatically\&. This name is also used to build the full path to the custom templates\&. If a template engine is not specified, it will be auto\-detected based on the file extension of the custom templates found\&.
 .RE
 .PP
 \fB\-e, \-\-eruby\fR
 .RS 4
-Specifies the eRuby implementation to use for rendering the built\-in templates\&. Supported values are \fIerb\fR and \fIerubis\fR\&. Defaults to \fIerb\fR\&.
+Specifies the eRuby implementation to use for rendering the custom ERB templates\&. Supported values are
+\fIerb\fR
+and
+\fIerubis\fR\&. Defaults to
+\fIerb\fR\&.
 .RE
 .PP
 \fB\-n, \-\-section\-numbers\fR
 .RS 4
-Auto\-number section titles\&. Synonym for \fB\-\-attribute numbered\fR\&.
+Auto\-number section titles\&. Synonym for
+\fB\-\-attribute numbered\fR\&.
 .RE
 .PP
 \fB\-o, \-\-out\-file\fR=\fIOUT_FILE\fR
 .RS 4
-Write output to file \fIOUT_FILE\fR\&. Defaults to the base name of the input file suffixed with \fIbackend\fR extension\&. If the input is read from standard input, then the output file defaults to stdout\&. If \fIOUT_FILE\fR is \fI\-\fR then the standard output is also used\&. If specified, the file is resolved relative to the working directory\&.
+Write output to file
+\fIOUT_FILE\fR\&. Defaults to the base name of the input file suffixed with
+\fIbackend\fR
+extension\&. If the input is read from standard input, then the output file defaults to stdout\&. If
+\fIOUT_FILE\fR
+is
+\fI\-\fR
+then the standard output is also used\&. If specified, the file is resolved relative to the working directory\&.
 .RE
 .PP
 \fB\-s, \-\-no\-header\-footer\fR
@@ -96,7 +179,9 @@ Suppress the document header and footer in the output\&.
 .PP
 \fB\-T, \-\-template\-dir\fR=\fIDIR\fR
 .RS 4
-A directory containing custom render templates that override one or more templates from the built\-in set\&. (requires \fItilt\fR gem)
+A directory containing custom render templates that override one or more templates from the built\-in set\&. (requires
+\fItilt\fR
+gem)
 .sp
 If there is a subfolder that matches the engine name (if specified), that folder is appended to the template directory path\&. Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path\&.
 .sp
@@ -159,10 +244,10 @@ GitHub organization: <\fBhttp://github\&.com/asciidoctor\fR>
 Mailinglist / forum: <\fBhttp://discuss\&.asciidoctor\&.org\fR>
 .SH "COPYING"
 .sp
-Copyright (C) 2012\-2013 Dan Allen and Ryan Waldron\&. Free use of this software is granted under the terms of the MIT License\&.
+Copyright (C) 2012\-2014 Dan Allen and Ryan Waldron\&. Free use of this software is granted under the terms of the MIT License\&.
 .SH "AUTHOR"
 .PP
-\fBDan Allen\fR
+\fBDan Allen; Ryan Waldron\fR
 .RS 4
 Author.
 .RE
