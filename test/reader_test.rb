@@ -4,7 +4,7 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
   require 'test_helper'
 end
 
-class ReaderTest < Test::Unit::TestCase
+class ReaderTest < Minitest::Test
   DIRNAME = File.expand_path(File.dirname(__FILE__))
 
   SAMPLE_DATA = <<-EOS.chomp.split(::Asciidoctor::EOL)
@@ -477,9 +477,7 @@ preamble
         doc = Asciidoctor::Document.new lines
         reader = doc.reader
         append_lines = %w(one two three)
-        assert_nothing_raised do
-          reader.push_include append_lines
-        end
+        reader.push_include append_lines
         assert_equal 1, reader.include_stack.size
         assert_equal 'one', reader.read_line.rstrip
         assert_nil reader.file
@@ -629,7 +627,7 @@ include::#{url}[]
           render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
         end
 
-        assert_not_nil output
+        refute_nil output
         assert_match(expect, output)
       end
   
@@ -648,7 +646,7 @@ include::#{url}[]
         rescue
           flunk 'include directive should not raise exception on inaccessible uri'
         end
-        assert_not_nil output
+        refute_nil output
         assert_match(/Unresolved directive/, output)
       end
   
@@ -659,10 +657,10 @@ include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
   
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/first line/, output)
-        assert_no_match(/second line/, output)
+        refute_match(/second line/, output)
         assert_match(/third line/, output)
         assert_match(/fourth line/, output)
-        assert_no_match(/fifth line/, output)
+        refute_match(/fifth line/, output)
         assert_match(/sixth line/, output)
         assert_match(/seventh line/, output)
         assert_match(/eighth line/, output)
@@ -676,10 +674,10 @@ include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
   
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/first line/, output)
-        assert_no_match(/second line/, output)
+        refute_match(/second line/, output)
         assert_match(/third line/, output)
         assert_match(/fourth line/, output)
-        assert_no_match(/fifth line/, output)
+        refute_match(/fifth line/, output)
         assert_match(/sixth line/, output)
         assert_match(/seventh line/, output)
         assert_match(/eighth line/, output)
@@ -693,9 +691,9 @@ include::fixtures/include-file.asciidoc[tag=snippetA]
   
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/snippetA content/, output)
-        assert_no_match(/snippetB content/, output)
-        assert_no_match(/non-tagged content/, output)
-        assert_no_match(/included content/, output)
+        refute_match(/snippetB content/, output)
+        refute_match(/non-tagged content/, output)
+        refute_match(/included content/, output)
       end
   
       test 'include directive supports multiple tagged selection' do
@@ -706,8 +704,8 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/snippetA content/, output)
         assert_match(/snippetB content/, output)
-        assert_no_match(/non-tagged content/, output)
-        assert_no_match(/included content/, output)
+        refute_match(/non-tagged content/, output)
+        refute_match(/included content/, output)
       end
 
       test 'should warn if tag is not found in include file' do
@@ -720,7 +718,7 @@ include::fixtures/include-file.asciidoc[tag=snippetZ]
         begin
           render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
           warning = $stderr.tap(&:rewind).read
-          assert_not_nil warning
+          refute_nil warning
           assert_match(/WARNING.*snippetZ/, warning)
         ensure
           $stderr = old_stderr
@@ -734,8 +732,8 @@ include::fixtures/include-file.asciidoc[lines=1, tags=snippetA;snippetB]
   
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/first line of included content/, output)
-        assert_no_match(/snippetA content/, output)
-        assert_no_match(/snippetB content/, output)
+        refute_match(/snippetA content/, output)
+        refute_match(/snippetB content/, output)
       end
   
       test 'indent of included file can be reset to size of indent attribute' do
@@ -961,7 +959,7 @@ endif::asciidoctor[]
   
         doc = Asciidoctor::Document.new input
         reader = doc.reader
-        assert_not_nil reader.process_line(reader.lines.first)
+        refute_nil reader.process_line(reader.lines.first)
       end
 
       test 'peek_line does not advance cursor when on a regular content line' do

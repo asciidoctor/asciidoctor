@@ -24,9 +24,6 @@ begin
     test.pattern = 'test/**/*_test.rb'
     test.verbose = true
     test.warning = true
-    if RUBY_VERSION >= '2'
-      test.options = '--tty=no'
-    end
   end
   task :default => :test
 rescue LoadError

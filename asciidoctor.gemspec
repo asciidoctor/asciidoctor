@@ -46,8 +46,8 @@ A fast, open source text processor and publishing toolchain, written in Ruby, fo
   s.add_development_dependency 'tilt', '~> 2.0.0'
   s.add_development_dependency 'yard', '~> 0.8.7'
   s.add_development_dependency 'yard-tomdoc', '~> 0.7.0'
+  s.add_development_dependency 'minitest', '> 0'
   if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
-    s.add_development_dependency 'rubysl-test-unit', '~> 2.0.1'
     s.add_development_dependency 'racc', '~> 1.4.10'
   end
 end
