@@ -1627,5 +1627,16 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)
     end
+
+    test 'should raise an exception when a converter cannot be resolved' do
+      input = <<-EOS
+= Document Title
+text
+      EOS
+      exception = assert_raise ArgumentError do
+        Asciidoctor.render(input, :backend => "unknownBackend")
+      end
+      assert_equal "Converter unknownBackend cannot be resolved", exception.message
+    end
   end
 end
