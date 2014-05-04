@@ -507,4 +507,19 @@ context 'Invoker' do
     end
   end
 
+  test 'should print timings when -t flag is specified' do
+    input = <<-EOS
+    Sample *AsciiDoc*
+    EOS
+    invoker = nil
+    error = nil
+    redirect_streams do |out, err|
+      invoker = invoke_cli(%w(-t -o /dev/null), '-') { input }
+      error = err.string
+    end
+    assert !invoker.nil?
+    assert !error.nil?
+    assert_match(/Total time/, error)
+  end
+
 end

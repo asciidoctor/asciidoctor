@@ -157,4 +157,14 @@ context 'Options' do
     assert_equal 0, options[:verbose]
   end
 
+  test 'should enable timings when -t flag is specified' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-t test/fixtures/sample.asciidoc))
+    assert_equal true, options[:timings]
+  end
+
+  test 'timings option is disable by default' do
+    options = Asciidoctor::Cli::Options.parse!(%w(test/fixtures/sample.asciidoc))
+    assert_equal false, options[:timings]
+  end
+
 end
