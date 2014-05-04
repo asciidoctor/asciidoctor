@@ -25,6 +25,7 @@ module Asciidoctor
         self[:base_dir] = options[:base_dir]
         self[:destination_dir] = options[:destination_dir] || nil
         self[:trace] = false
+        self[:timings] = false
       end
 
       def self.parse!(args)
@@ -122,6 +123,9 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts.on('-v', '--verbose', 'enable verbose mode (default: false)') do |verbose|
             self[:verbose] = 2
+          end
+          opts.on('-t', '--timings', 'enable timings mode (default: false)') do |timing|
+            self[:timings] = true
           end
 
           opts.on_tail('-h', '--help', 'show this message') do

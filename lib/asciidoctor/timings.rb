@@ -18,7 +18,7 @@ module Asciidoctor
     end
 
     def convert
-      @log[:convert]
+      @log[:convert] || 0
     end
 
     def read_parse_convert

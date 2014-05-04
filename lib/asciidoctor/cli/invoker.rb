@@ -41,7 +41,6 @@ module Asciidoctor
         end
 
         opts = {}
-        show_timings = false
         infiles = []
         outfile = nil
         tofile = nil
@@ -56,8 +55,6 @@ module Asciidoctor
           when :attributes
             # NOTE processor will dup attributes internally
             opts[:attributes] = val
-          when :verbose
-            show_timings = true if val == 2
           when :trace
             # currently, nothing
           else
@@ -87,7 +84,7 @@ module Asciidoctor
         inputs.each do |input|
           # NOTE processor will dup options and attributes internally
           input_opts = tofile.nil? ? opts : opts.merge(:to_file => tofile)
-          if show_timings
+          if @options[:timings]
             timings = Timings.new
             @documents << ::Asciidoctor.convert(input, input_opts.merge(:timings => timings))
             timings.print_report((@err || $stderr), ((input.respond_to? :path) ? input.path : '-'))
