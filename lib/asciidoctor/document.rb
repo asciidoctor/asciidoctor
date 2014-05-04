@@ -890,7 +890,11 @@ class Document < AbstractBlock
       end
     else
       transform = ((opts.key? :header_footer) ? opts[:header_footer] : @options[:header_footer]) ? 'document' : 'embedded'
-      output = @converter.convert self, transform
+      if @converter.nil?
+        raise ::ArgumentError, %(Converter #{backend} cannot be resolved)
+      else
+        output = @converter.convert self, transform
+      end
     end
 
     unless @parent_document
