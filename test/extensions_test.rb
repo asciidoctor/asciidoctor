@@ -115,7 +115,7 @@ context 'Extensions' do
     test 'should register extension group class' do
       begin
         Asciidoctor::Extensions.register :sample, SampleExtensionGroup
-        assert_not_nil Asciidoctor::Extensions.groups
+        refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
         assert_equal SampleExtensionGroup, Asciidoctor::Extensions.groups[:sample]
       ensure
@@ -126,7 +126,7 @@ context 'Extensions' do
     test 'should self register extension group class' do
       begin
         SampleExtensionGroup.register :sample
-        assert_not_nil Asciidoctor::Extensions.groups
+        refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
         assert_equal SampleExtensionGroup, Asciidoctor::Extensions.groups[:sample]
       ensure
@@ -137,7 +137,7 @@ context 'Extensions' do
     test 'should register extension group from class name' do
       begin
         Asciidoctor::Extensions.register :sample, 'SampleExtensionGroup'
-        assert_not_nil Asciidoctor::Extensions.groups
+        refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
         assert_equal SampleExtensionGroup, Asciidoctor::Extensions.groups[:sample]
       ensure
@@ -148,7 +148,7 @@ context 'Extensions' do
     test 'should register extension group from instance' do
       begin
         Asciidoctor::Extensions.register :sample, SampleExtensionGroup.new
-        assert_not_nil Asciidoctor::Extensions.groups
+        refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
         assert Asciidoctor::Extensions.groups[:sample].is_a? SampleExtensionGroup
       ensure
@@ -160,7 +160,7 @@ context 'Extensions' do
       begin
         Asciidoctor::Extensions.register(:sample) do
         end
-        assert_not_nil Asciidoctor::Extensions.groups
+        refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
         assert Asciidoctor::Extensions.groups[:sample].is_a? Proc
       ensure
@@ -170,19 +170,19 @@ context 'Extensions' do
 
     test 'should get class for top-level class name' do
       clazz = Asciidoctor::Extensions.class_for_name('Asciidoctor')
-      assert_not_nil clazz
+      refute_nil clazz
       assert_equal Asciidoctor, clazz
     end
 
     test 'should get class for class name in module' do
       clazz = Asciidoctor::Extensions.class_for_name('Asciidoctor::Extensions')
-      assert_not_nil clazz
+      refute_nil clazz
       assert_equal Asciidoctor::Extensions, clazz
     end
 
     test 'should get class for class name resolved from root' do
       clazz = Asciidoctor::Extensions.class_for_name('::Asciidoctor::Extensions')
-      assert_not_nil clazz
+      refute_nil clazz
       assert_equal Asciidoctor::Extensions, clazz
     end
 
@@ -197,13 +197,13 @@ context 'Extensions' do
 
     test 'should resolve class if class is given' do
       clazz = Asciidoctor::Extensions.resolve_class(Asciidoctor::Extensions)
-      assert_not_nil clazz
+      refute_nil clazz
       assert_equal Asciidoctor::Extensions, clazz
     end
 
     test 'should resolve class if class from string' do
       clazz = Asciidoctor::Extensions.resolve_class('Asciidoctor::Extensions')
-      assert_not_nil clazz
+      refute_nil clazz
       assert_equal Asciidoctor::Extensions, clazz
     end
   end
@@ -469,7 +469,7 @@ content
         end
 
         output = render_string input
-        assert_no_match(/<div class="ulist">/, output)
+        refute_match(/<div class="ulist">/, output)
       ensure
         Asciidoctor::Extensions.unregister_all
       end

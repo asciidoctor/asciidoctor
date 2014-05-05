@@ -698,9 +698,7 @@ context 'Substitutions' do
 
     test 'an unresolved footnoteref should not crash the processor' do
       para = block_from_string('Sentence text footnoteref:[ex1].')
-      assert_nothing_raised do
-        para.sub_macros para.source
-      end
+      para.sub_macros para.source
     end
 
     test 'a single-line index term macro with a primary term should be registered as an index reference' do

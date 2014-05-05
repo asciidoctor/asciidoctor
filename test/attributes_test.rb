@@ -314,7 +314,7 @@ all there is.
       EOS
       html = render_embedded_string input
       result = Nokogiri::HTML(html)
-      assert_no_match(/blah blah/m, result.css("p").first.content.strip)
+      refute_match(/blah blah/m, result.css("p").first.content.strip)
     end
 
     test "attribute value gets interpretted when rendering" do
@@ -334,7 +334,7 @@ Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
 
       output = render_embedded_string input
       assert_match(/Line 1/, output)
-      assert_no_match(/Line 2/, output)
+      refute_match(/Line 2/, output)
     end
 
     test 'should not drop line with reference to missing attribute by default' do
@@ -359,7 +359,7 @@ Line 2: {set:a!}This line should not appear in the output.
 
       output = render_embedded_string input
       assert_match(/Line 1/, output)
-      assert_no_match(/Line 2/, output)
+      refute_match(/Line 2/, output)
     end
 
     test 'should not drop line with attribute unassignment if attribute-undefined is drop' do
@@ -374,7 +374,7 @@ Line 2: {set:a!}This line should not appear in the output.
       output = render_embedded_string input
       assert_match(/Line 1/, output)
       assert_match(/Line 2/, output)
-      assert_no_match(/\{set:a!\}/, output)
+      refute_match(/\{set:a!\}/, output)
     end
 
     test "substitutes inside unordered list items" do
@@ -962,7 +962,7 @@ content
 
       doc = document_from_string input, :backend => 'docbook45'
       section = doc.blocks[0]
-      assert_not_nil section
+      refute_nil section
       assert_equal :section, section.context
       assert !section.special
       output = doc.convert
