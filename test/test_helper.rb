@@ -19,7 +19,7 @@ ENV['SUPPRESS_DEBUG'] ||= 'true'
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
 RE_DOCTYPE = /\s*<!DOCTYPE (.*)/
 
-if Minitest.const_defined?('Test')
+if defined? Minitest::Test
   # We're on Minitest 5+. Nothing to do here.
 else
   # Minitest 4 doesn't have Minitest::Test yet.
@@ -319,7 +319,8 @@ end
 
 ###
 # 
-# Context goodness provided by @citrusbyte's contest
+# Context goodness provided by @citrusbyte's contest.
+# See https://github.com/citrusbyte/contest
 #
 ###
 
