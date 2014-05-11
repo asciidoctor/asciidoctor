@@ -170,16 +170,16 @@ module Substitutors
         next m[0][1..-1]
       end
 
-      if m[4]
+      if m[4].nil_or_empty?
+        text = m[2]
+        subs = (m[1] == '$$' ? [:specialcharacters] : [])
+      else
         text = unescape_brackets m[4]
         if m[3].nil_or_empty?
           subs = []
         else
           subs = resolve_pass_subs m[3]
         end
-      else
-        text = m[2]
-        subs = (m[1] == '$$' ? [:specialcharacters] : [])
       end
 
       @passthroughs << {:text => text, :subs => subs}
@@ -190,6 +190,10 @@ module Substitutors
     text = text.gsub(PassInlineLiteralRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
+      # fix nil results in Opal
+      if ::RUBY_ENGINE_OPAL
+        m[2] = nil if m[2] == ''
+      end
 
       unescaped_attrs = nil
       # honor the escape
@@ -591,9 +595,15 @@ module Substitutors
       result = result.gsub(IndextermInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
+
         # honor the escape
         if m[0].start_with? '\\'
           next m[0][1..-1]
+        end
+
+        # fix nil results in Opal
+        if ::RUBY_ENGINE_OPAL
+          m[1] = nil if m[1] == ''
         end
 
         num_brackets = 0
@@ -643,9 +653,14 @@ module Substitutors
         if m[2].start_with? '\\'
           # NOTE Opal doesn't like %() as an enclosure around this string
           next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
+        end
+        # fix nil results in Opal
+        if ::RUBY_ENGINE_OPAL
+          m[3] = nil if m[3] == ''
+        end
         # not a valid macro syntax w/o trailing square brackets
         # we probably shouldn't even get here...our regex is doing too much
-        elsif m[1] == 'link:' && !m[3]
+        if m[1] == 'link:' && !m[3]
           next m[0]
         end
         prefix = (m[1] != 'link:' ? m[1] : '')
@@ -685,7 +700,9 @@ module Substitutors
 
         attrs = nil
         #text = m[3] ? sub_attributes(m[3].gsub('\]', ']')) : ''
-        if !m[3].nil_or_empty?
+        if m[3].nil_or_empty?
+          text = ''
+        else
           if use_link_attrs && (m[3].start_with?('"') || m[3].include?(','))
             attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')), [])
             text = attrs[1]
@@ -698,8 +715,6 @@ module Substitutors
             attrs ||= {}
             attrs['window'] = '_blank' unless attrs.has_key?('window')
           end
-        else
-          text = ''
         end
 
         if text.empty?
@@ -854,6 +869,11 @@ module Substitutors
       text = text.gsub(InlineAnchorRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
+        # fix nil results in Opal
+        if ::RUBY_ENGINE_OPAL
+          m[1] = nil if m[1] == ''
+          m[2] = nil if m[2] == ''
+        end
         # honor the escape
         if m[0].start_with? '\\'
           next m[0][1..-1]
@@ -893,13 +913,17 @@ module Substitutors
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        if !m[1] || (::RUBY_ENGINE_OPAL && m[1].to_s == '')
-          id = m[2]
-          reftext = !m[3].empty? ? m[3] : nil
-        else
+        # fix nil results in Opal
+        if ::RUBY_ENGINE_OPAL
+          m[1] = nil if m[1] == ''
+        end
+        if m[1]
           id, reftext = m[1].split(',', 2).map {|it| it.strip }
           id = id.sub(DoubleQuotedRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2')
           reftext = reftext.sub(DoubleQuotedMultiRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2') if reftext
+        else
+          id = m[2]
+          reftext = m[3] unless m[3].nil_or_empty?
         end
 
         if id.include? '#'
@@ -980,7 +1004,7 @@ module Substitutors
   def convert_quoted_text(match, type, scope)
     unescaped_attrs = nil
     if match[0].start_with? '\\'
-      if scope == :constrained && (attrs = match[2])
+      if scope == :constrained && !(attrs = match[2]).nil_or_empty?
         unescaped_attrs = %([#{attrs}])
       else
         return match[0][1..-1]
