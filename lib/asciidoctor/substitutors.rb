@@ -869,18 +869,18 @@ module Substitutors
       text = text.gsub(InlineAnchorRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
-        # fix nil results in Opal
-        if ::RUBY_ENGINE_OPAL
-          m[1] = nil if m[1] == ''
-          m[2] = nil if m[2] == ''
-        end
         # honor the escape
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
+        # fix nil results in Opal
+        if ::RUBY_ENGINE_OPAL
+          m[1] = nil if m[1] == ''
+          m[2] = nil if m[2] == ''
+          m[4] = nil if m[4] == ''
+        end
         id = m[1] || m[3]
-        reftext = m[2] || m[4]
-        reftext = %([#{id}]) if !reftext
+        reftext = m[2] || m[4] || %([#{id}])
         # enable if we want to allow double quoted values
         #id = id.sub(DoubleQuotedRx, '\2')
         #if reftext
