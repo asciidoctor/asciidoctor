@@ -6,7 +6,9 @@ RUBY_MIN_VERSION_1_9 = (RUBY_VERSION >= '1.9')
 require 'set'
 
 if RUBY_ENGINE_OPAL
+  require 'encoding' # needed for String.bytes method
   require 'strscan'
+  require 'asciidoctor/opal_ext/comparable'
   require 'asciidoctor/opal_ext/dir'
   require 'asciidoctor/opal_ext/error'
   require 'asciidoctor/opal_ext/file'
@@ -997,6 +999,12 @@ module Asciidoctor
     #   one two	three	four
     #
     SpaceDelimiterRx = /([^\\])#{CC_BLANK}+/
+
+    # Matches any character with multibyte support explicitly enabled (length of multibyte char = 1)
+    #
+    # NOTE It's necessary to hide the use of the language modifier (u) from JavaScript
+    #
+    UnicodeCharScanRx = FORCE_UNICODE_LINE_LENGTH ? (Regexp.new '.', false, 'u') : nil
 
     # Detects strings that resemble URIs.
     #

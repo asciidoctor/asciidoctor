@@ -1764,7 +1764,7 @@ class Parser
   #
   # returns the number of unicode characters in the line
   def self.line_length(line)
-    FORCE_UNICODE_LINE_LENGTH ? line.scan(/./u).length : line.length
+    FORCE_UNICODE_LINE_LENGTH ? line.scan(UnicodeCharScanRx).length : line.length
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).

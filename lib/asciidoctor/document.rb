@@ -656,6 +656,8 @@ class Document < AbstractBlock
   end
 
   # Internal: Restore the attributes to the previously saved state
+  #--
+  # QUESTION should we restore attributes after parse?
   def restore_attributes
     # QUESTION shouldn't this be a dup in case we convert again?
     @attributes = @original_attributes

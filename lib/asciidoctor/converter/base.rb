@@ -1,5 +1,5 @@
 module Asciidoctor
-  module Converter; end if RUBY_ENGINE_OPAL
+  module Converter; end # required for Opal
 
   # An abstract base class for defining converters that can be used to convert
   # {AbstractNode} objects in a parsed AsciiDoc document to a backend format
