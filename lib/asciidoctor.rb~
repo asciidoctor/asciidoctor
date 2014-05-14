@@ -6,9 +6,7 @@ RUBY_MIN_VERSION_1_9 = (RUBY_VERSION >= '1.9')
 require 'set'
 
 if RUBY_ENGINE_OPAL
-  require 'encoding' # needed for String.bytes method
   require 'strscan'
-  require 'asciidoctor/opal_ext/comparable'
   require 'asciidoctor/opal_ext/dir'
   require 'asciidoctor/opal_ext/error'
   require 'asciidoctor/opal_ext/file'
@@ -1000,12 +998,6 @@ module Asciidoctor
     #
     SpaceDelimiterRx = /([^\\])#{CC_BLANK}+/
 
-    # Matches any character with multibyte support explicitly enabled (length of multibyte char = 1)
-    #
-    # NOTE It's necessary to hide the use of the language modifier (u) from JavaScript
-    #
-    UnicodeCharScanRx = FORCE_UNICODE_LINE_LENGTH ? (Regexp.new '.', false, 'u') : nil
-
     # Detects strings that resemble URIs.
     #
     # Examples
@@ -1180,8 +1172,7 @@ module Asciidoctor
   #
   # Returns the Document
   def load input, options = {}
-    # In AsciiDoctor.js, dup sets the map to undefined, which causes errors
-  	#options = options.dup
+    options = options.dup
     if (timings = options[:timings])
       timings.start :read
     end
@@ -1302,8 +1293,7 @@ module Asciidoctor
   # Returns the Document object if the converted String is written to a
   # file, otherwise the converted String
   def convert input, options = {}
-    # In AsciiDoctor.js, dup sets the map to undefined, which causes errors
-  	#options = options.dup
+    options = options.dup
     to_file = options.delete(:to_file)
     to_dir = options.delete(:to_dir)
     mkdirs = options.delete(:mkdirs) || false
@@ -1485,9 +1475,3 @@ require 'asciidoctor/reader'
 require 'asciidoctor/section'
 require 'asciidoctor/stylesheets'
 require 'asciidoctor/table'
-
-if ::RUBY_ENGINE_OPAL
-	require 'asciidoctor/converter/html5'
-	require 'asciidoctor/converter/docbook45'
-	require 'asciidoctor/converter/docbook5'
-end
