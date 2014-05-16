@@ -231,8 +231,12 @@ preamble
       assert_xpath "//h2[@id='_my_title'][text() = 'My Title ===']", render_string("== My Title ===")
     end
 
-    test "with non-word character" do
+    test "with XML entity" do
       assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where#{[8217].pack('U*')}s the love?\"]", render_string("== Where's the love?")
+    end
+    
+    test "with non-word character" do
+      assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where’s the love?\"]", render_string("== Where’s the love?")
     end
 
     test "with sequential non-word characters" do
@@ -256,8 +260,37 @@ preamble
 == Asciidoctor in 中文
       EOS
       output = render_string input
-      assert_xpath '//h2[@id="_asciidoctor_in"][text()="Asciidoctor in 中文"]', output
+      if ::RUBY_MIN_VERSION_1_9
+        assert_xpath '//h2[@id="_asciidoctor_in_中文"][text()="Asciidoctor in 中文"]', output
+      else
+        assert_xpath '//h2[@id="_asciidoctor_in"][text()="Asciidoctor in 中文"]', output
+      end
     end
+
+    test 'with only multibyte characters' do
+      input = <<-EOS
+== 视图
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//h2[@id="_视图"][text()="视图"]', output
+    end if ::RUBY_MIN_VERSION_1_9
+
+    test 'multiline syntax with only multibyte characters' do
+      input = <<-EOS
+视图
+--
+
+content
+
+连接器
+---
+
+content
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//h2[@id="_视图"][text()="视图"]', output
+      assert_xpath '//h2[@id="_连接器"][text()="连接器"]', output
+    end if ::RUBY_MIN_VERSION_1_9
   end
 
   context "level 2" do 

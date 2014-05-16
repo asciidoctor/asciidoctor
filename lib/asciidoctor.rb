@@ -2,6 +2,7 @@ RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
 RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
 RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
 RUBY_MIN_VERSION_1_9 = (RUBY_VERSION >= '1.9')
+RUBY_MIN_VERSION_2 = (RUBY_VERSION >= '2')
 
 require 'set'
 
@@ -50,6 +51,9 @@ $:.unshift File.dirname __FILE__
 #   Asciidoctor.convert_file 'sample.adoc', :template_dir => 'path/to/templates'
 #
 module Asciidoctor
+
+  # alias the RUBY_ENGINE constant inside the Asciidoctor namespace
+  RUBY_ENGINE = ::RUBY_ENGINE
 
   module SafeMode
 
@@ -334,22 +338,46 @@ module Asciidoctor
   #(pseudo)module Rx
 
     ## Regular expression character classes (to ensure regexp compatibility between Ruby and JavaScript)
+    ## CC stands for "character class", CG stands for "character class group"
 
-    # character classes for JavaScript Regexp engine
-    # NOTE use of double quotes are intentional to work around Opal issue
+    # NOTE \w matches only the ASCII word characters, whereas [[:word:]] or \p{Word} matches any character in the Unicode word category.
+
+    # character classes for the Regexp engine(s) in JavaScript
     if RUBY_ENGINE == 'opal'
       CC_ALPHA = 'a-zA-Z'
+      CG_ALPHA = '[a-zA-Z]'
       CC_ALNUM = 'a-zA-Z0-9'
-      CC_BLANK = "[ \\t]"
-      CC_GRAPH = '[\x21-\x7E]' # non-blank character; broken in Opal!
-      CC_EOL   = "(?=\\n|$)"
-    # character classes for Ruby Regexp engine
+      CG_ALNUM = '[a-zA-Z0-9]'
+      CG_BLANK = '[ \\t]'
+      CC_EOL   = '(?=\\n|$)'
+      CG_GRAPH = '[\\x21-\\x7E]' # non-blank character
+      CC_WORD  = 'a-zA-Z0-9_'
+      CG_WORD  = '[a-zA-Z0-9_]'
+    # character classes for the Regexp engine in Ruby >= 2 (Ruby 1.9 supports \p{} but has problems w/ encoding)
+    elsif ::RUBY_MIN_VERSION_2
+      CC_ALPHA = CG_ALPHA = '\p{Alpha}'
+      CC_ALNUM = CG_ALNUM = '\p{Alnum}'
+      CG_BLANK = '\p{Blank}'
+      CC_EOL   = '$'
+      CG_GRAPH = '\p{Graph}'
+      CC_WORD  = CG_WORD = '\p{Word}'
+    # character classes for the Regexp engine in Ruby < 2
     else
       CC_ALPHA = '[:alpha:]'
+      CG_ALPHA = '[[:alpha:]]'
       CC_ALNUM = '[:alnum:]'
-      CC_BLANK = '[[:blank:]]'
-      CC_GRAPH = '[[:graph:]]' # non-blank character
+      CG_ALNUM = '[[:alnum:]]'
+      CG_BLANK = '[[:blank:]]'
       CC_EOL   = '$'
+      CG_GRAPH = '[[:graph:]]' # non-blank character
+      if ::RUBY_MIN_VERSION_1_9
+        CC_WORD = '[:word:]'
+        CG_WORD = '[[:word:]]'
+      else
+        # NOTE Ruby 1.8 cannot match word characters beyond the ASCII range; if you need this feature, upgrade!
+        CC_WORD = '[:alnum:]_'
+        CG_WORD = '[[:alnum:]_]'
+      end
     end
 
     ## Document header
@@ -359,8 +387,9 @@ module Asciidoctor
     # Examples
     #
     #   Doc Writer <doc@example.com>
+    #   Mary_Sue Brontë
     #
-    AuthorInfoLineRx = /^(\w[\w\-'.]*)(?: +(\w[\w\-'.]*))?(?: +(\w[\w\-'.]*))?(?: +<([^>]+)>)?$/
+    AuthorInfoLineRx = /^(#{CG_WORD}[#{CC_WORD}\-'.]*)(?: +(#{CG_WORD}[#{CC_WORD}\-'.]*))?(?: +(#{CG_WORD}[#{CC_WORD}\-'.]*))?(?: +<([^>]+)>)?$/
 
     # Matches the revision info line, which appears immediately following
     # the author info line beneath the document title.
@@ -385,7 +414,7 @@ module Asciidoctor
     #
     #   asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     #
-    ManpageNamePurposeRx = /^(.*?)#{CC_BLANK}+-#{CC_BLANK}+(.*)$/
+    ManpageNamePurposeRx = /^(.*?)#{CG_BLANK}+-#{CG_BLANK}+(.*)$/
 
     ## Preprocessor directives
 
@@ -409,9 +438,7 @@ module Asciidoctor
     #
     #   "{asciidoctor-version}" >= "0.1.0"
     #
-    EvalExpressionRx = /^(\S.*?)#{CC_BLANK}*(==|!=|<=|>=|<|>)#{CC_BLANK}*(\S.*)$/
-    # ...or if we want to be more strict up front about what's on each side
-    # EvalExpressionRx = /^(true|false|("|'|)\{\w+(?:\-\w+)*\}\2|("|')[^\3]*\3|\-?\d+(?:\.\d+)*)#{CC_BLANK}*(==|!=|<=|>=|<|>)#{CC_BLANK}*(true|false|("|'|)\{\w+(?:\-\w+)*\}\6|("|')[^\7]*\7|\-?\d+(?:\.\d+)*)$/
+    EvalExpressionRx = /^(\S.*?)#{CG_BLANK}*(==|!=|<=|>=|<|>)#{CG_BLANK}*(\S.*)$/
 
     # Matches an include preprocessor directive.
     #
@@ -437,7 +464,7 @@ module Asciidoctor
     #                collapsing the line breaks and indentation to
     #                a single space.
     #
-    AttributeEntryRx = /^:(!?\w.*?):(?:#{CC_BLANK}+(.*))?$/
+    AttributeEntryRx = /^:(!?\w.*?):(?:#{CG_BLANK}+(.*))?$/
 
     # Matches invalid characters in an attribute name.
     InvalidAttributeNameCharsRx = /[^\w\-]/
@@ -470,7 +497,7 @@ module Asciidoctor
     #   [[idname]]
     #   [[idname,Reference Text]]
     #
-    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*))?)\]\]$/
+    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(\S.*))?)\]\]$/
 
     # Matches an attribute list above a block element.
     #
@@ -485,12 +512,12 @@ module Asciidoctor
     #   # as attribute reference
     #   [{lead}]
     #
-    BlockAttributeListRx = /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*)\]$/
+    BlockAttributeListRx = /^\[(|#{CG_BLANK}*[#{CC_WORD}\{,.#"'%].*)\]$/
 
     # A combined pattern that matches either a block anchor or a block attribute list.
     #
     # TODO this one gets hit a lot, should be optimized as much as possible
-    BlockAttributeLineRx = /^\[(|#{CC_BLANK}*[\w\{,.#"'%].*|\[(?:|[#{CC_ALPHA}:_][\w:.-]*(?:,#{CC_BLANK}*\S.*)?)\])\]$/
+    BlockAttributeLineRx = /^\[(|#{CG_BLANK}*[#{CC_WORD}\{,.#"'%].*|\[(?:|[#{CC_ALPHA}:_][#{CC_WORD}:.-]*(?:,#{CG_BLANK}*\S.*)?)\])\]$/
 
     # Matches a title above a block.
     #
@@ -507,7 +534,7 @@ module Asciidoctor
     #   NOTE: Just a little note.
     #   TIP: Don't forget!
     #
-    AdmonitionParagraphRx = /^(#{ADMONITION_STYLES.to_a * '|'}):#{CC_BLANK}/
+    AdmonitionParagraphRx = /^(#{ADMONITION_STYLES.to_a * '|'}):#{CG_BLANK}/
 
     # Matches a literal paragraph, which is a line of text preceded by at least one space.
     #
@@ -515,7 +542,7 @@ module Asciidoctor
     #
     #   <SPACE>Foo
     #   <TAB>Foo
-    LiteralParagraphRx = /^(#{CC_BLANK}+.*)$/
+    LiteralParagraphRx = /^(#{CG_BLANK}+.*)$/
 
     # Matches a comment block.
     #
@@ -550,11 +577,11 @@ module Asciidoctor
     # match[1] is the delimiter, whose length determines the level
     # match[2] is the title itself
     # match[3] is an inline anchor, which becomes the section id
-    AtxSectionRx = /^((?:=|#){1,6})#{CC_BLANK}+(\S.*?)(?:#{CC_BLANK}+\1)?$/
+    AtxSectionRx = /^((?:=|#){1,6})#{CG_BLANK}+(\S.*?)(?:#{CG_BLANK}+\1)?$/
 
     # Matches the restricted section name for a two-line (Setext-style) section title.
     # The name cannot begin with a dot and has at least one alphanumeric character.
-    SetextSectionTitleRx = /^((?=.*\w+.*)[^.].*?)$/
+    SetextSectionTitleRx = /^((?=.*#{CG_WORD}+.*)[^.].*?)$/
 
     # Matches the underline in a two-line (Setext-style) section title.
     #
@@ -571,10 +598,10 @@ module Asciidoctor
     #   Section Title [[idname]]
     #   Section Title [[idname,Reference Text]]
     #
-    InlineSectionAnchorRx = /^(.*?)#{CC_BLANK}+(\\)?\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]$/
+    InlineSectionAnchorRx = /^(.*?)#{CG_BLANK}+(\\)?\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(\S.*?))?\]\]$/
 
     # Matches invalid characters in a section id.
-    InvalidSectionIdCharsRx = /&(?:[a-zA-Z]{2,}|#\d{2,5}|#x[a-fA-F0-9]{2,4});|\W+?/
+    InvalidSectionIdCharsRx = /&(?:[a-zA-Z]{2,}|#\d{2,5}|#x[a-fA-F0-9]{2,4});|[^#{CC_WORD}]+?/
 
     # Matches the block style used to designate a section title as a floating title.
     #
@@ -588,7 +615,7 @@ module Asciidoctor
     ## Lists
 
     # Detects the start of any list item.
-    AnyListRx = /^(?:<?\d+>#{CC_BLANK}+#{CC_GRAPH}|#{CC_BLANK}*(?:-|(?:\*|\.){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CC_BLANK}+#{CC_GRAPH}|#{CC_BLANK}*.*?(?::{2,4}|;;)(?:#{CC_BLANK}+#{CC_GRAPH}|$))/
+    AnyListRx = /^(?:<?\d+>#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*(?:-|(?:\*|\.){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*.*?(?::{2,4}|;;)(?:#{CG_BLANK}+#{CG_GRAPH}|$))/
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -597,7 +624,7 @@ module Asciidoctor
     #   * Foo
     #   - Foo
     #
-    UnorderedListRx = /^#{CC_BLANK}*(-|\*{1,5})#{CC_BLANK}+(.*)$/
+    UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5})#{CG_BLANK}+(.*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
     #
@@ -612,7 +639,7 @@ module Asciidoctor
     #   I. Foo (upperroman)
     #
     # NOTE leading space match is not always necessary, but is used for list reader
-    OrderedListRx = /^#{CC_BLANK}*(\.{1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CC_BLANK}+(.*)$/
+    OrderedListRx = /^#{CG_BLANK}*(\.{1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}+(.*)$/
 
     # Matches the ordinals for each type of ordered list.
     OrderedListMarkerRxMap = {
@@ -649,15 +676,15 @@ module Asciidoctor
     # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
     # QUESTION should we check for line comment in regex or when scanning the lines?
     # 
-    DefinitionListRx = /^(?!\/\/)#{CC_BLANK}*(.*?)(:{2,4}|;;)(?:#{CC_BLANK}+(.*))?$/
+    DefinitionListRx = /^(?!\/\/)#{CG_BLANK}*(.*?)(:{2,4}|;;)(?:#{CG_BLANK}+(.*))?$/
 
     # Matches a sibling definition list item (which does not include the keyed type).
     DefinitionListSiblingRx = {
       # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-      '::' => /^(?!\/\/)#{CC_BLANK}*((?:.*[^:])?)(::)(?:#{CC_BLANK}+(.*))?$/,
-      ':::' => /^(?!\/\/)#{CC_BLANK}*((?:.*[^:])?)(:::)(?:#{CC_BLANK}+(.*))?$/,
-      '::::' => /^(?!\/\/)#{CC_BLANK}*((?:.*[^:])?)(::::)(?:#{CC_BLANK}+(.*))?$/,
-      ';;' => /^(?!\/\/)#{CC_BLANK}*(.*)(;;)(?:#{CC_BLANK}+(.*))?$/
+      '::' => /^(?!\/\/)#{CG_BLANK}*((?:.*[^:])?)(::)(?:#{CG_BLANK}+(.*))?$/,
+      ':::' => /^(?!\/\/)#{CG_BLANK}*((?:.*[^:])?)(:::)(?:#{CG_BLANK}+(.*))?$/,
+      '::::' => /^(?!\/\/)#{CG_BLANK}*((?:.*[^:])?)(::::)(?:#{CG_BLANK}+(.*))?$/,
+      ';;' => /^(?!\/\/)#{CG_BLANK}*(.*)(;;)(?:#{CG_BLANK}+(.*))?$/
     }
 
     # Matches a callout list item.
@@ -666,7 +693,7 @@ module Asciidoctor
     #
     #   <1> Foo
     #
-    CalloutListRx = /^<?(\d+)>#{CC_BLANK}+(.*)/
+    CalloutListRx = /^<?(\d+)>#{CG_BLANK}+(.*)/
 
     # Matches a callout reference inside literal text.
     # 
@@ -706,8 +733,8 @@ module Asciidoctor
     #   2.3+<.>m
     #
     # FIXME use step-wise scan (or treetop) rather than this mega-regexp
-    CellSpecStartRx = /^#{CC_BLANK}*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?\|/
-    CellSpecEndRx = /#{CC_BLANK}+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
+    CellSpecStartRx = /^#{CG_BLANK}*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?\|/
+    CellSpecEndRx = /#{CG_BLANK}+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
 
     # Block macros
 
@@ -719,7 +746,7 @@ module Asciidoctor
     #
     #--
     # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
-    GenericBlockMacroRx = /^(\w[\w\-]*)::(\S*?)\[((?:\\\]|[^\]])*?)\]$/
+    GenericBlockMacroRx = /^(#{CG_WORD}+)::(\S*?)\[((?:\\\]|[^\]])*?)\]$/
 
     # Matches an image, video or audio block macro.
     #
@@ -750,7 +777,7 @@ module Asciidoctor
     #   anchor:idname[]
     #   anchor:idname[Reference Text]
     #
-    InlineAnchorRx = /\\?(?:\[\[([#{CC_ALPHA}:_][\w:.-]*)(?:,#{CC_BLANK}*(\S.*?))?\]\]|anchor:(\S+)\[(.*?[^\\])?\])/
+    InlineAnchorRx = /\\?(?:\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(\S.*?))?\]\]|anchor:(\S+)\[(.*?[^\\])?\])/
 
     # Matches a bibliography anchor anywhere inline.
     #
@@ -758,13 +785,13 @@ module Asciidoctor
     #
     #   [[[Foo]]]
     #
-    InlineBiblioAnchorRx = /\\?\[\[\[([\w:][\w:.-]*?)\]\]\]/
+    InlineBiblioAnchorRx = /\\?\[\[\[([#{CC_WORD}:][#{CC_WORD}:.-]*?)\]\]\]/
 
     # Matches an inline e-mail address.
     #
     #   doc.writer@example.com
     #
-    EmailInlineMacroRx = /([\\>:\/])?\w[\w.%+-]*@[#{CC_ALNUM}][#{CC_ALNUM}.-]*\.[#{CC_ALPHA}]{2,4}\b/
+    EmailInlineMacroRx = /([\\>:\/])?#{CG_WORD}[#{CC_WORD}.%+-]*@#{CG_ALNUM}[#{CC_ALNUM}.-]*\.#{CG_ALPHA}{2,4}\b/
 
     # Matches an inline footnote macro, which is allowed to span multiple lines.
     #
@@ -816,7 +843,7 @@ module Asciidoctor
     #   Ctrl + Alt+T
     #   Ctrl,T
     #
-    KbdDelimiterRx = /(?:\+|,)(?=#{CC_BLANK}*[^\1])/
+    KbdDelimiterRx = /(?:\+|,)(?=#{CG_BLANK}*[^\1])/
 
     # Matches an implicit link and some of the link inline macro.
     #
@@ -855,7 +882,7 @@ module Asciidoctor
     #   menu:View[Page Style > No Style]
     #   menu:View[Page Style, No Style]
     #
-    MenuInlineMacroRx = /\\?menu:(\w|\w.*?\S)\[#{CC_BLANK}*(.+?)?\]/
+    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|#{CG_WORD}.*?\S)\[#{CG_BLANK}*(.+?)?\]/
 
     # Matches an implicit menu inline macro.
     #
@@ -863,7 +890,7 @@ module Asciidoctor
     #
     #   "File > New..."
     #
-    MenuInlineRx = /\\?"(\w[^"]*?#{CC_BLANK}*&gt;#{CC_BLANK}*[^" \t][^"]*)"/
+    MenuInlineRx = /\\?"(#{CG_WORD}[^"]*?#{CG_BLANK}*&gt;#{CG_BLANK}*[^" \t][^"]*)"/
 
     # Matches a passthrough literal value, which may span multiple lines.
     #
@@ -871,7 +898,7 @@ module Asciidoctor
     #
     #   `text`
     #
-    PassInlineLiteralRx = /(^|[^`\w])(?:\[([^\]]+?)\])?(\\?`([^`\s]|[^`\s].*?\S)`)(?![`\w])/m
+    PassInlineLiteralRx = /(^|[^`#{CC_WORD}])(?:\[([^\]]+?)\])?(\\?`([^`\s]|[^`\s].*?\S)`)(?![`#{CC_WORD}])/m
 
     # Matches several variants of the passthrough inline macro, which may span multiple lines.
     #
@@ -891,7 +918,7 @@ module Asciidoctor
     #   xref:id[reftext]
     #
     # NOTE special characters have already been escaped, hence the entity references
-    XrefInlineMacroRx = /\\?(?:&lt;&lt;([\w":].*?)&gt;&gt;|xref:([\w":].*?)\[(.*?)\])/m
+    XrefInlineMacroRx = /\\?(?:&lt;&lt;([#{CC_WORD}":].*?)&gt;&gt;|xref:([#{CC_WORD}":].*?)\[(.*?)\])/m
 
     ## Layout
 
@@ -904,8 +931,11 @@ module Asciidoctor
     #   Foo +
     #
     # NOTE: JavaScript only treats ^ and $ as line boundaries in multiline regexp
-    #LineBreakRx = /^(.*)[[:blank:]]\+$/
-    LineBreakRx = ::RUBY_ENGINE_OPAL ? %x(/^(.*?)[ \\t]\\+$/m) : %r{^(.*)[[:blank:]]\+$}
+    LineBreakRx = if RUBY_ENGINE == 'opal'
+      /^(.*)[ \t]\+$/m
+    else
+      /^(.*)[[:blank:]]\+$/
+    end
 
     # Matches an AsciiDoc horizontal rule or AsciiDoc page break.
     #
@@ -932,7 +962,7 @@ module Asciidoctor
     # Matches a blank line.
     #
     # NOTE allows for empty space in line as it could be left by the template engine
-    BlankLineRx = /^#{CC_BLANK}*\n/
+    BlankLineRx = /^#{CG_BLANK}*\n/
 
     # Matches a comma or semi-colon delimiter.
     #
@@ -984,7 +1014,7 @@ module Asciidoctor
     # 
     #   one\ two\ three
     #
-    EscapedSpaceRx = /\\(#{CC_BLANK})/
+    EscapedSpaceRx = /\\(#{CG_BLANK})/
 
     # Matches a space delimiter that's not escaped.
     #
@@ -992,13 +1022,15 @@ module Asciidoctor
     #
     #   one two	three	four
     #
-    SpaceDelimiterRx = /([^\\])#{CC_BLANK}+/
+    SpaceDelimiterRx = /([^\\])#{CG_BLANK}+/
 
     # Matches any character with multibyte support explicitly enabled (length of multibyte char = 1)
     #
-    # NOTE It's necessary to hide the use of the language modifier (u) from JavaScript
+    # NOTE If necessary to hide use of the language modifier (u) from JavaScript, use (Regexp.new '.', false, 'u')
     #
-    UnicodeCharScanRx = FORCE_UNICODE_LINE_LENGTH ? (Regexp.new '.', false, 'u') : nil
+    UnicodeCharScanRx = unless RUBY_ENGINE == 'opal'
+      FORCE_UNICODE_LINE_LENGTH ? /./u : nil
+    end
 
     # Detects strings that resemble URIs.
     #
@@ -1007,7 +1039,7 @@ module Asciidoctor
     #   https://domain
     #   data:info
     #
-    UriSniffRx = %r{^[#{CC_ALPHA}][#{CC_ALNUM}.+-]*:/{0,2}}
+    UriSniffRx = %r{^#{CG_ALPHA}[#{CC_ALNUM}.+-]*:/{0,2}}
 
     # Detects the end of an implicit URI in the text
     #
@@ -1036,12 +1068,12 @@ module Asciidoctor
     #
     #   Here\'s Johnny!
     #
-    #EscapedSingleQuoteRx = /(\w)\\'(\w)/
+    #EscapedSingleQuoteRx = /(#{CG_WORD})\\'(#{CG_WORD})/
     # an alternative if our backend generates single-quoted html/xml attributes
-    #EscapedSingleQuoteRx = /(\w|=)\\'(\w)/
+    #EscapedSingleQuoteRx = /(#{CG_WORD}|=)\\'(#{CG_WORD})/
 
     # Matches whitespace at the beginning of the line
-    #LeadingSpacesRx = /^(#{CC_BLANK}*)/
+    #LeadingSpacesRx = /^(#{CG_BLANK}*)/
 
     # Matches parent directory references at the beginning of a path
     #LeadingParentDirsRx = /^(?:\.\.\/)*/
@@ -1091,34 +1123,34 @@ module Asciidoctor
     [:strong, :unconstrained, /\\?(?:\[([^\]]+?)\])?\*\*(.+?)\*\*/m],
 
     # *strong*
-    [:strong, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?\*(\S|\S.*?\S)\*(?=\W|$)/m],
+    [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\*(\S|\S.*?\S)\*(?!#{CG_WORD})/m],
 
     # ``double-quoted''
-    [:double, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?``(\S|\S.*?\S)''(?=\W|$)/m],
+    [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?``(\S|\S.*?\S)''(?!#{CG_WORD})/m],
 
     # 'emphasis'
-    [:emphasis, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?=\W|$)/m],
+    [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m],
 
     # `single-quoted'
-    [:single, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?=\W|$)/m],
+    [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?!#{CG_WORD})/m],
 
     # ++monospaced++
     [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m],
 
     # +monospaced+
-    [:monospaced, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?=\W|$)/m],
+    [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?!#{CG_WORD})/m],
 
     # __emphasis__
     [:emphasis, :unconstrained, /\\?(?:\[([^\]]+?)\])?__(.+?)__/m],
 
     # _emphasis_
-    [:emphasis, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?_(\S|\S.*?\S)_(?=\W|$)/m],
+    [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?_(\S|\S.*?\S)_(?!#{CG_WORD})/m],
 
     # ##unquoted##
     [:none, :unconstrained, /\\?(?:\[([^\]]+?)\])?##(.+?)##/m],
 
     # #unquoted#
-    [:none, :constrained, /(^|[^\w;:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?=\W|$)/m],
+    [:none, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?!#{CG_WORD})/m],
 
     # ^superscript^
     [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(.+?)\^/m],
@@ -1140,13 +1172,13 @@ module Asciidoctor
     # foo -- bar
     [/(^|\n| |\\)--( |\n|$)/, '&#8201;&#8212;&#8201;', :none],
     # foo--bar
-    [/(\w)\\?--(?=\w)/, '&#8212;', :leading],
+    [/(#{CG_WORD})\\?--(?=#{CG_WORD})/, '&#8212;', :leading],
     # ellipsis
     [/\\?\.\.\./, '&#8230;', :leading],
     # apostrophe or a closing single quote (planned)
-    [/([#{CC_ALPHA}])\\?'(?!')/, '&#8217;', :leading],
+    [/(#{CG_ALPHA})\\?'(?!')/, '&#8217;', :leading],
     # an opening single quote (planned)
-    #[/\B\\?'(?=[#{CC_ALPHA}])/, '&#8216;', :none],
+    #[/\B\\?'(?=#{CG_ALPHA})/, '&#8216;', :none],
     # right arrow ->
     [/\\?-&gt;/, '&#8594;', :none],
     # right double arrow =>
