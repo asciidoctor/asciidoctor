@@ -118,6 +118,11 @@ context 'Substitutions' do
       assert_equal '<strong>bl*ck</strong>-eye', para.sub_quotes(para.source)
     end
 
+    test 'constrained strong string containing an asterisk and multibyte word chars' do
+      para = block_from_string(%q{*黑*眼圈*})
+      assert_equal '<strong>黑*眼圈</strong>', para.sub_quotes(para.source)
+    end if ::RUBY_MIN_VERSION_1_9
+
     test 'single-line constrained quote variation emphasized string' do
       para = block_from_string(%q{'a few emphasized words'})
       assert_equal '<em>a few emphasized words</em>', para.sub_quotes(para.source)
@@ -985,6 +990,16 @@ EOS
         para = block_from_string('<span class="xmltag">&lt;node&gt;</span><span class="classname">r</span>', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="xmltag">&lt;node&gt;</span><span class="classname">r</span>}, para.sub_macros(para.source)
       end
+
+      test 'should process menu macro with items containing multibyte characters' do
+        para = block_from_string('menu:视图[放大, 重置]', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menuseq"><span class="menu">视图</span>&#160;&#9656; <span class="submenu">放大</span>&#160;&#9656; <span class="menuitem">重置</span></span>}, para.sub_macros(para.source)
+      end if ::RUBY_MIN_VERSION_1_9
+
+      test 'should process inline menu with items containing multibyte characters' do
+        para = block_from_string('"视图 &gt; 放大 &gt; 重置"', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menuseq"><span class="menu">视图</span>&#160;&#9656; <span class="submenu">放大</span>&#160;&#9656; <span class="menuitem">重置</span></span>}, para.sub_macros(para.source)
+      end if ::RUBY_MIN_VERSION_1_9
     end
   end
 
@@ -1193,20 +1208,26 @@ EOS
     end
 
     test 'replaces dashes' do
-      para = block_from_string %(-- foo foo--bar foo\\--bar foo -- bar foo \\-- bar
+      para = block_from_string %(-- foo foo--bar foo\\--bar foo -- bar foo \\-- bar 
 stuff in between
 -- foo
 stuff in between
 foo --
 stuff in between
 foo --)
-      expected = %(&#8201;&#8212;&#8201;foo foo&#8212;bar foo--bar foo&#8201;&#8212;&#8201;bar foo -- bar
+      expected = '&#8201;&#8212;&#8201;foo foo&#8212;bar foo--bar foo&#8201;&#8212;&#8201;bar foo -- bar
 stuff in between&#8201;&#8212;&#8201;foo
 stuff in between
 foo&#8201;&#8212;&#8201;stuff in between
-foo&#8201;&#8212;&#8201;)
+foo&#8201;&#8212;&#8201;'
       assert_equal expected, para.sub_replacements(para.source)
     end
+
+    test 'replaces dashes between multibyte word characters' do
+      para = block_from_string %(富--巴)
+      expected = '富&#8212;巴'
+      assert_equal expected, para.sub_replacements(para.source)
+    end if ::RUBY_MIN_VERSION_1_9
 
     test 'replaces marks' do
       para = block_from_string '(C) (R) (TM) \(C) \(R) \(TM)' 

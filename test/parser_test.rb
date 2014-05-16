@@ -286,7 +286,7 @@ context "Parser" do
   end
 
   test "parse author first" do
-    metadata, = parse_header_metadata 'Stuart'
+    metadata, _ = parse_header_metadata 'Stuart'
     assert_equal 5, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal metadata['author'], metadata['authors']
@@ -295,7 +295,7 @@ context "Parser" do
   end
 
   test "parse author first last" do
-    metadata, = parse_header_metadata 'Yukihiro Matsumoto'
+    metadata, _ = parse_header_metadata 'Yukihiro Matsumoto'
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Yukihiro Matsumoto', metadata['author']
@@ -306,7 +306,7 @@ context "Parser" do
   end
 
   test "parse author first middle last" do
-    metadata, = parse_header_metadata 'David Heinemeier Hansson'
+    metadata, _ = parse_header_metadata 'David Heinemeier Hansson'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'David Heinemeier Hansson', metadata['author']
@@ -318,7 +318,7 @@ context "Parser" do
   end
 
   test "parse author first middle last email" do
-    metadata, = parse_header_metadata 'David Heinemeier Hansson <rails@ruby-lang.org>'
+    metadata, _ = parse_header_metadata 'David Heinemeier Hansson <rails@ruby-lang.org>'
     assert_equal 8, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'David Heinemeier Hansson', metadata['author']
@@ -331,7 +331,7 @@ context "Parser" do
   end
 
   test "parse author first email" do
-    metadata, = parse_header_metadata 'Stuart <founder@asciidoc.org>'
+    metadata, _ = parse_header_metadata 'Stuart <founder@asciidoc.org>'
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Stuart', metadata['author']
@@ -342,7 +342,7 @@ context "Parser" do
   end
 
   test "parse author first last email" do
-    metadata, = parse_header_metadata 'Stuart Rackham <founder@asciidoc.org>'
+    metadata, _ = parse_header_metadata 'Stuart Rackham <founder@asciidoc.org>'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Stuart Rackham', metadata['author']
@@ -354,7 +354,7 @@ context "Parser" do
   end
 
   test "parse author with hyphen" do
-    metadata, = parse_header_metadata 'Tim Berners-Lee <founder@www.org>'
+    metadata, _ = parse_header_metadata 'Tim Berners-Lee <founder@www.org>'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Tim Berners-Lee', metadata['author']
@@ -366,7 +366,7 @@ context "Parser" do
   end
 
   test "parse author with single quote" do
-    metadata, = parse_header_metadata 'Stephen O\'Grady <founder@redmonk.com>'
+    metadata, _ = parse_header_metadata 'Stephen O\'Grady <founder@redmonk.com>'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Stephen O\'Grady', metadata['author']
@@ -378,7 +378,7 @@ context "Parser" do
   end
 
   test "parse author with dotted initial" do
-    metadata, = parse_header_metadata 'Heiko W. Rupp <hwr@example.de>'
+    metadata, _ = parse_header_metadata 'Heiko W. Rupp <hwr@example.de>'
     assert_equal 8, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Heiko W. Rupp', metadata['author']
@@ -391,7 +391,7 @@ context "Parser" do
   end
 
   test "parse author with underscore" do
-    metadata, = parse_header_metadata 'Tim_E Fella'
+    metadata, _ = parse_header_metadata 'Tim_E Fella'
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Tim E Fella', metadata['author']
@@ -401,8 +401,31 @@ context "Parser" do
     assert_equal 'TF', metadata['authorinitials']
   end
 
+  test 'parse author name with letters outside basic latin' do
+    metadata, _ = parse_header_metadata 'Stéphane Brontë'
+    assert_equal 6, metadata.size
+    assert_equal 1, metadata['authorcount']
+    assert_equal 'Stéphane Brontë', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
+    assert_equal 'Stéphane', metadata['firstname']
+    assert_equal 'Brontë', metadata['lastname']
+    assert_equal 'SB', metadata['authorinitials']
+  end if ::RUBY_MIN_VERSION_1_9
+
+  test 'parse ideographic author names' do
+    metadata, _ = parse_header_metadata '李 四 <si.li@example.com>'
+    assert_equal 7, metadata.size
+    assert_equal 1, metadata['authorcount']
+    assert_equal '李 四', metadata['author']
+    assert_equal metadata['author'], metadata['authors']
+    assert_equal '李', metadata['firstname']
+    assert_equal '四', metadata['lastname']
+    assert_equal 'si.li@example.com', metadata['email']
+    assert_equal '李四', metadata['authorinitials']
+  end if ::RUBY_MIN_VERSION_1_9
+
   test "parse author condenses whitespace" do
-    metadata, = parse_header_metadata '   Stuart       Rackham     <founder@asciidoc.org>'
+    metadata, _ = parse_header_metadata '   Stuart       Rackham     <founder@asciidoc.org>'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Stuart Rackham', metadata['author']
@@ -414,7 +437,7 @@ context "Parser" do
   end
 
   test "parse invalid author line becomes author" do
-    metadata, = parse_header_metadata '   Stuart       Rackham, founder of AsciiDoc   <founder@asciidoc.org>'
+    metadata, _ = parse_header_metadata '   Stuart       Rackham, founder of AsciiDoc   <founder@asciidoc.org>'
     assert_equal 5, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Stuart Rackham, founder of AsciiDoc <founder@asciidoc.org>', metadata['author']
@@ -424,7 +447,7 @@ context "Parser" do
   end
 
   test 'parse multiple authors' do
-    metadata, = parse_header_metadata 'Doc Writer <doc.writer@asciidoc.org>; John Smith <john.smith@asciidoc.org>'
+    metadata, _ = parse_header_metadata 'Doc Writer <doc.writer@asciidoc.org>; John Smith <john.smith@asciidoc.org>'
     assert_equal 2, metadata['authorcount']
     assert_equal 'Doc Writer, John Smith', metadata['authors']
     assert_equal 'Doc Writer', metadata['author']
@@ -437,7 +460,7 @@ context "Parser" do
 Ryan Waldron
 v0.0.7, 2013-12-18: The first release you can stand on
     EOS
-    metadata, = parse_header_metadata input
+    metadata, _ = parse_header_metadata input
     assert_equal 9, metadata.size
     assert_equal '0.0.7', metadata['revnumber']
     assert_equal '2013-12-18', metadata['revdate']
@@ -449,7 +472,7 @@ v0.0.7, 2013-12-18: The first release you can stand on
 Ryan Waldron
 2013-12-18
     EOS
-    metadata, = parse_header_metadata input
+    metadata, _ = parse_header_metadata input
     assert_equal 7, metadata.size
     assert_equal '2013-12-18', metadata['revdate']
   end
@@ -460,7 +483,7 @@ Ryan Waldron
 Ryan Waldron
 foobar
     EOS
-    metadata, = parse_header_metadata input
+    metadata, _ = parse_header_metadata input
     assert_equal 7, metadata.size
     assert_equal 'foobar', metadata['revdate']
   end
@@ -470,7 +493,7 @@ foobar
 Ryan Waldron
 2013-12-18:  The first release you can stand on
     EOS
-    metadata, = parse_header_metadata input
+    metadata, _ = parse_header_metadata input
     assert_equal 8, metadata.size
     assert_equal '2013-12-18', metadata['revdate']
     assert_equal 'The first release you can stand on', metadata['revremark']
@@ -481,7 +504,7 @@ Ryan Waldron
 Joe Cool
 :page-layout: post
     EOS
-    metadata, = parse_header_metadata input
+    metadata, _ = parse_header_metadata input
     refute_equal 'page-layout: post', metadata['revremark']
     assert !metadata.has_key?('revdate')
   end
@@ -491,7 +514,7 @@ Joe Cool
 Joe Cool
  :Must start revremark-only line with space
     EOS
-    metadata, = parse_header_metadata input
+    metadata, _ = parse_header_metadata input
     assert_equal 'Must start revremark-only line with space', metadata['revremark']
     assert_equal '', metadata['revdate']
   end
@@ -502,7 +525,7 @@ Joe Cool
 // release artist
 Ryan Waldron
     EOS
-    metadata, = parse_header_metadata input
+    metadata, _ = parse_header_metadata input
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']
@@ -519,7 +542,7 @@ release artist
 ////
 Ryan Waldron
     EOS
-    metadata, = parse_header_metadata input
+    metadata, _ = parse_header_metadata input
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']
@@ -537,7 +560,7 @@ release info
 ////
 v0.0.7, 2013-12-18
     EOS
-    metadata, = parse_header_metadata input
+    metadata, _ = parse_header_metadata input
     assert_equal 8, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']

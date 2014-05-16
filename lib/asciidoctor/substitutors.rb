@@ -189,7 +189,7 @@ module Substitutors
     text = text.gsub(PassInlineLiteralRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
-      # fix nil results in Opal
+      # fix non-matching group results in Opal under Firefox
       if ::RUBY_ENGINE_OPAL
         m[2] = nil if m[2] == ''
       end
@@ -197,8 +197,7 @@ module Substitutors
       unescaped_attrs = nil
       # honor the escape
       if m[3].start_with? '\\'
-        # NOTE Opal may not like %() as an enclosure around this string
-        next m[2] ? "#{m[1]}[#{m[2]}]#{m[3][1..-1]}" : "#{m[1]}#{m[3][1..-1]}"
+        next m[2] ? %(#{m[1]}[#{m[2]}]#{m[3][1..-1]}) : %(#{m[1]}#{m[3][1..-1]})
       elsif m[1] == '\\' && m[2]
         unescaped_attrs = "[#{m[2]}]"
       end
@@ -600,7 +599,7 @@ module Substitutors
           next m[0][1..-1]
         end
 
-        # fix nil results in Opal
+        # fix non-matching group results in Opal under Firefox
         if ::RUBY_ENGINE_OPAL
           m[1] = nil if m[1] == ''
         end
@@ -653,7 +652,7 @@ module Substitutors
           # NOTE Opal doesn't like %() as an enclosure around this string
           next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
         end
-        # fix nil results in Opal
+        # fix non-matching group results in Opal under Firefox
         if ::RUBY_ENGINE_OPAL
           m[3] = nil if m[3] == ''
         end
@@ -873,7 +872,7 @@ module Substitutors
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        # fix nil results in Opal
+        # fix non-matching group results in Opal under Firefox
         if ::RUBY_ENGINE_OPAL
           m[1] = nil if m[1] == ''
           m[2] = nil if m[2] == ''
@@ -913,18 +912,18 @@ module Substitutors
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        # fix nil results in Opal
+        # fix non-matching group results in Opal under Firefox
         if ::RUBY_ENGINE_OPAL
           m[1] = nil if m[1] == ''
         end
         if m[1]
           id, reftext = m[1].split(',', 2).map {|it| it.strip }
-          id = id.sub(DoubleQuotedRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2')
+          id = id.sub(DoubleQuotedRx, '\2')
           # NOTE In Opal, reftext is set to empty string if comma is missing
           reftext = if reftext.nil_or_empty?
             nil
           else
-            reftext.sub(DoubleQuotedMultiRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2')
+            reftext.sub(DoubleQuotedMultiRx, '\2')
           end
         else
           id = m[2]
