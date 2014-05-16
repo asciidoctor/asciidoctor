@@ -1301,7 +1301,6 @@ two
 content
       EOS
       result = render_string input, :safe => :safe, :backend => :xhtml, :keep_namespaces => true
-      doc = xmldoc_from_string(result)
       assert_xpath '//*[not(namespace-uri() = "http://www.w3.org/1999/xhtml")]', result, 0
     end
 

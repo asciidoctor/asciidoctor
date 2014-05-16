@@ -48,13 +48,12 @@ module Substitutors
 
   # Delimiters and matchers for the passthrough placeholder
   # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
-  # Opal hasn't yet defined the constant ::RUBY_ENGINE_OPAL at this point
 
   # SPA, start of guarded protected area (\u0096)
-  PASS_START = ::RUBY_ENGINE == 'opal' ? 150.chr : "\u0096"
+  PASS_START = "\u0096"
 
   # EPA, end of guarded protected area (\u0097)
-  PASS_END = ::RUBY_ENGINE == 'opal' ? 151.chr : "\u0097"
+  PASS_END = "\u0097"
 
   # match placeholder record
   PASS_MATCH = /\u0096(\d+)\u0097/
@@ -822,14 +821,8 @@ module Substitutors
         else
           id, text = m[2].split(',', 2)
           id = id.strip
-          if text
-            # REVIEW it's a dirty job, but somebody's gotta do it
-            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)))
-            index = @document.counter('footnote-number')
-            @document.register(:footnotes, Document::Footnote.new(index, id, text))
-            type = :ref
-            target = nil
-          else
+          # NOTE In Opal, text is set to empty string if comma is missing
+          if text.nil_or_empty?
             if (footnote = @document.references[:footnotes].find {|fn| fn.id == id })
               index = footnote.index
               text = footnote.text
@@ -840,6 +833,13 @@ module Substitutors
             target = id
             id = nil
             type = :xref
+          else
+            # REVIEW it's a dirty job, but somebody's gotta do it
+            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)))
+            index = @document.counter('footnote-number')
+            @document.register(:footnotes, Document::Footnote.new(index, id, text))
+            type = :ref
+            target = nil
           end
         end
         Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).convert
@@ -920,7 +920,12 @@ module Substitutors
         if m[1]
           id, reftext = m[1].split(',', 2).map {|it| it.strip }
           id = id.sub(DoubleQuotedRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2')
-          reftext = reftext.sub(DoubleQuotedMultiRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2') if reftext
+          # NOTE In Opal, reftext is set to empty string if comma is missing
+          reftext = if reftext.nil_or_empty?
+            nil
+          else
+            reftext.sub(DoubleQuotedMultiRx, ::RUBY_ENGINE_OPAL ? '$2' : '\2')
+          end
         else
           id = m[2]
           reftext = m[3] unless m[3].nil_or_empty?

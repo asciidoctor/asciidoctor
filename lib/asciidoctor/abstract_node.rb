@@ -323,7 +323,7 @@ class AbstractNode
   #
   # Returns A String data URI containing the content of the target image
   def generate_data_uri(target_image, asset_dir_key = nil)
-    ext = File.extname(target_image)[1..-1]
+    ext = ::File.extname(target_image)[1..-1]
     mimetype = 'image/' + ext
     mimetype = "#{mimetype}+xml" if ext == 'svg'
     if asset_dir_key
@@ -334,7 +334,7 @@ class AbstractNode
       image_path = normalize_system_path(target_image)
     end
 
-    if !File.readable? image_path
+    unless ::File.readable? image_path
       warn "asciidoctor: WARNING: image to embed not found or not readable: #{image_path}"
       return "data:#{mimetype}:base64,"
       # uncomment to return 1 pixel white dot instead
@@ -342,12 +342,12 @@ class AbstractNode
     end
 
     bindata = nil
-    if IO.respond_to? :binread
-      bindata = IO.binread(image_path)
+    if ::IO.respond_to? :binread
+      bindata = ::IO.binread(image_path)
     else
-      bindata = File.open(image_path, 'rb') {|file| file.read }
+      bindata = ::File.open(image_path, 'rb') {|file| file.read }
     end
-    "data:#{mimetype};base64,#{Base64.encode64(bindata).delete EOL}"
+    "data:#{mimetype};base64,#{::Base64.encode64(bindata).delete EOL}"
   end
 
   # Public: Read the contents of the file at the specified path.
@@ -361,9 +361,9 @@ class AbstractNode
   # Returns the [String] content of the file at the specified path, or nil
   # if the file does not exist.
   def read_asset(path, warn_on_failure = false)
-    if File.readable? path
+    if ::File.readable? path
       # QUESTION should we use strip or rstrip instead of chomp here?
-      File.read(path).chomp
+      ::File.read(path).chomp
     else
       warn "asciidoctor: WARNING: file does not exist or cannot be read: #{path}" if warn_on_failure
       nil

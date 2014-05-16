@@ -5,13 +5,16 @@ RUBY_MIN_VERSION_1_9 = (RUBY_VERSION >= '1.9')
 
 require 'set'
 
-if RUBY_ENGINE_OPAL
+# NOTE "RUBY_ENGINE == 'opal'" conditional blocks are filtered by the Opal preprocessor
+if RUBY_ENGINE == 'opal'
   require 'encoding' # needed for String.bytes method
   require 'strscan'
-  require 'asciidoctor/opal_ext/comparable'
-  require 'asciidoctor/opal_ext/dir'
-  require 'asciidoctor/opal_ext/error'
-  require 'asciidoctor/opal_ext/file'
+  require 'asciidoctor/opal_ext'
+else
+  autoload :Base64, 'base64'
+  autoload :FileUtils, 'fileutils'
+  autoload :OpenURI, 'open-uri'
+  autoload :StringScanner, 'strscan'
 end
 
 # ideally we should use require_relative instead of modifying the LOAD_PATH
@@ -47,15 +50,6 @@ $:.unshift File.dirname __FILE__
 #   Asciidoctor.convert_file 'sample.adoc', :template_dir => 'path/to/templates'
 #
 module Asciidoctor
-
-  unless ::RUBY_ENGINE_OPAL
-    # .chomp keeps Opal from trying to load the library
-    ::Object.autoload :Base64,        'base64'.chomp
-    ::Object.autoload :FileUtils,     'fileutils'.chomp
-    ::Object.autoload :OpenURI,       'open-uri'.chomp
-    #::Object.autoload :Set,           'set'.chomp
-    ::Object.autoload :StringScanner, 'strscan'.chomp
-  end
 
   module SafeMode
 
@@ -200,7 +194,7 @@ module Asciidoctor
   EOL = "\n"
 
   # The null character to use for splitting attribute values
-  NULL = ::RUBY_ENGINE_OPAL ? 0.chr : "\0"
+  NULL = "\0"
 
   # String for matching tab character
   TAB = "\t"
@@ -343,7 +337,7 @@ module Asciidoctor
 
     # character classes for JavaScript Regexp engine
     # NOTE use of double quotes are intentional to work around Opal issue
-    if ::RUBY_ENGINE_OPAL
+    if RUBY_ENGINE == 'opal'
       CC_ALPHA = 'a-zA-Z'
       CC_ALNUM = 'a-zA-Z0-9'
       CC_BLANK = "[ \\t]"
@@ -1449,8 +1443,11 @@ module Asciidoctor
 
   end
 
-  # autoload
-  unless ::RUBY_ENGINE_OPAL
+  if RUBY_ENGINE == 'opal'
+    require 'asciidoctor/debug'
+    require 'asciidoctor/version'
+    require 'asciidoctor/timings'
+  else
     autoload :Debug,   'asciidoctor/debug'
     autoload :VERSION, 'asciidoctor/version'
     autoload :Timings, 'asciidoctor/timings'
