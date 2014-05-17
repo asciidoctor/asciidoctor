@@ -831,8 +831,13 @@ class PreprocessorReader < Reader
       if ::RUBY_ENGINE_OPAL
         # NOTE resolves uri relative to currently loaded document
         # NOTE we defer checking if file exists and catch the 404 error if it does not
+        # TODO only use this logic if env-browser is set
         target_type = :file
-        include_file = path = (@include_stack.empty? ? target : (File.join @dir, target))
+        include_file = path = if @include_stack.empty?
+          ::Dir.pwd == @document.base_dir ? target : (::File.join @dir, target)
+        else
+          ::File.join @dir, target
+        end
       elsif target.include?(':') && UriSniffRx =~ target
         unless @document.attributes.has_key? 'allow-uri-read'
           replace_line %(link:#{target}[])
