@@ -551,6 +551,11 @@ context 'Substitutions' do
       assert_equal %{<span class="fa"><i class="fa-github"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'an icon name should be backward compatible' do
+      para = block_from_string 'icon:beaker[]', :attributes => {'icons' => 'font'}
+      assert_equal %{<span class="fa"><i class="fa-flask"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'an icon macro with a size should be interpreted as a font-based icon with a size when icons=font' do
       para = block_from_string 'icon:github[4x]', :attributes => {'icons' => 'font'}
       assert_equal %{<span class="fa"><i class="fa-github fa-4x"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
