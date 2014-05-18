@@ -548,17 +548,17 @@ context 'Substitutions' do
 
     test 'an icon macro should be interpreted as a font-based icon when icons=font' do
       para = block_from_string 'icon:github[]', :attributes => {'icons' => 'font'}
-      assert_equal %{<span class="icon"><i class="icon-github"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+      assert_equal %{<span class="icon"><i class="fa fa-github"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'an icon macro with a size should be interpreted as a font-based icon with a size when icons=font' do
       para = block_from_string 'icon:github[4x]', :attributes => {'icons' => 'font'}
-      assert_equal %{<span class="icon"><i class="icon-github icon-4x"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+      assert_equal %{<span class="icon"><i class="fa fa-github fa-4x"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'an icon macro with a role and title should be interpreted as a font-based icon with a class and title when icons=font' do
       para = block_from_string 'icon:heart[role="red", title="Heart me"]', :attributes => {'icons' => 'font'}
-      assert_equal %{<span class="icon red"><i class="icon-heart" title="Heart me"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+      assert_equal %{<span class="icon red"><i class="fa fa-heart" title="Heart me"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'a single-line footnote macro should be registered and rendered as a footnote' do

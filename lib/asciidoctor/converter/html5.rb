@@ -63,7 +63,7 @@ module Asciidoctor
 
       if node.attr? 'icons', 'font'
         if node.attr? 'iconfont-remote'
-          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css'}"#{slash}>)
+          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', 'http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'}"#{slash}>)
         else
           iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
           result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', '')}"#{slash}>)
@@ -282,7 +282,7 @@ MathJax.Hub.Config({
           anchor = %(<a class="anchor" href="##{node.id}"></a>)
           # possible idea - anchor icons GitHub-style
           #if node.document.attr? 'icons', 'font'
-          #  anchor = %(<a class="anchor" href="##{node.id}"><i class="icon-anchor"></i></a>)
+          #  anchor = %(<a class="anchor" href="##{node.id}"><i class="fa fa-anchor"></i></a>)
           #else
         elsif node.document.attr? 'sectlinks'
           link_start = %(<a class="link" href="##{node.id}">)
@@ -311,7 +311,7 @@ MathJax.Hub.Config({
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
       caption = if node.document.attr? 'icons'
         if node.document.attr? 'icons', 'font'
-          %(<i class="icon-#{name}" title="#{node.caption}"></i>)
+          %(<i class="fa fa-#{name}" title="#{node.caption}"></i>)
         else
           %(<img src="#{node.icon_uri name}" alt="#{node.caption}"#{@void_element_slash}>)
         end
@@ -830,8 +830,8 @@ Your browser does not support the audio tag.
           end
         else
           if node.document.attr? 'icons', 'font'
-            marker_checked = '<i class="icon-check"></i> '
-            marker_unchecked = '<i class="icon-check-empty"></i> '
+            marker_checked = '<i class="fa fa-check-square-o"></i> '
+            marker_unchecked = '<i class="fa fa-square-o"></i> '
           else
             marker_checked = '&#10003; '
             marker_unchecked = '&#10063; '
@@ -979,16 +979,16 @@ Your browser does not support the video tag.
     end
 
     def inline_image node
-      if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font') 
-        style_class = "icon-#{node.target}"
+      if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
+        style_class = %(fa fa-#{node.target})
         if node.attr? 'size'
-          style_class = %(#{style_class} icon-#{node.attr 'size'})
+          style_class = %(#{style_class} fa-#{node.attr 'size'})
         end
         if node.attr? 'rotate'
-          style_class = %(#{style_class} icon-rotate-#{node.attr 'rotate'})
+          style_class = %(#{style_class} fa-rotate-#{node.attr 'rotate'})
         end
         if node.attr? 'flip'
-          style_class = %(#{style_class} icon-flip-#{node.attr 'flip'})
+          style_class = %(#{style_class} fa-flip-#{node.attr 'flip'})
         end
         title_attribute = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : nil
         img = %(<i class="#{style_class}"#{title_attribute}></i>)

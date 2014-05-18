@@ -4078,8 +4078,8 @@ context 'Checklists' do
 
     output = render_embedded_string input, :attributes => {'icons' => 'font'}
     assert_css '.ulist.checklist', output, 1
-    assert_css '.ulist.checklist li i.icon-check', output, 1
-    assert_css '.ulist.checklist li i.icon-check-empty', output, 1
+    assert_css '.ulist.checklist li i.fa-check-square-o', output, 1
+    assert_css '.ulist.checklist li i.fa-square-o', output, 1
     assert_xpath '(/*[@class="ulist checklist"]/ul/li)[3]/p[text()="plain"]', output, 1
   end
 
