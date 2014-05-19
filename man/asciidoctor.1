@@ -1,20 +1,20 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen
-.\" Generator: Asciidoctor 0.1.4
-.\"      Date: 2013-09-05
+.\" Generator: Asciidoctor 1.5.0.dev
+.\"      Date: 2014-05-19
 .\"    Manual: Asciidoctor Manual
-.\"    Source: Asciidoctor 0.1.4
+.\"    Source: Asciidoctor 1.5.0.dev
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2013-09-05" "Asciidoctor 0\&.1\&.4" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2014-05-19" "Asciidoctor 1\&.5\&.0\&.dev" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .nh
 .ad l
 .SH "SYNOPSIS"
 .sp
-\fBasciidoctor\fR [\fIOPTION\fR]\&... \fIFILE\fR\&...
+\fBasciidoctor\fR [\fIOPTION\fR]... \fIFILE\fR...
 .SH "DESCRIPTION"
 .sp
 The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fR to HTML 5, DocBook 4\&.5, DocBook 5\&.0 and other custom output formats\&.
@@ -61,7 +61,7 @@ Document type: \fIarticle\fR, \fIbook\fR, \fImanpage\fR or \fIinline\fR\&. Sets 
 .PP
 \fB\-C, \-\-compact\fR
 .RS 4
-Compact the output by removing blank lines\&. Not enabled by default\&.
+Compact the output by removing blank lines\&. (No longer in use)\&.
 .RE
 .PP
 \fB\-D, \-\-destination\-dir\fR=\fIDIR\fR
@@ -71,12 +71,12 @@ Destination output directory\&. Defaults to the directory containing the source 
 .PP
 \fB\-E, \-\-template\-engine\fR=\fINAME\fR
 .RS 4
-Template engine to use for the custom render templates\&. The gem with the same name as the engine will be loaded automatically\&. This name is also used to build the full path to the custom templates\&.
+Template engine to use for the custom render templates\&. The gem with the same name as the engine will be loaded automatically\&. This name is also used to build the full path to the custom templates\&. If a template engine is not specified, it will be auto\-detected based on the file extension of the custom templates found\&.
 .RE
 .PP
 \fB\-e, \-\-eruby\fR
 .RS 4
-Specifies the eRuby implementation to use for rendering the built\-in templates\&. Supported values are \fIerb\fR and \fIerubis\fR\&. Defaults to \fIerb\fR\&.
+Specifies the eRuby implementation to use for rendering the custom ERB templates\&. Supported values are \fIerb\fR and \fIerubis\fR\&. Defaults to \fIerb\fR\&.
 .RE
 .PP
 \fB\-n, \-\-section\-numbers\fR
@@ -117,6 +117,11 @@ Include backtrace information on errors\&. Not enabled by default\&.
 \fB\-v, \-\-verbose\fR
 .RS 4
 Verbosely print processing information and configuration file checks to stderr\&.
+.RE
+.PP
+\fB\-t, \-\-timings\fR
+.RS 4
+Display timings information (time to read, parse and convert)
 .RE
 .SS "Program Information"
 .PP
@@ -159,10 +164,8 @@ GitHub organization: <\fBhttp://github\&.com/asciidoctor\fR>
 Mailinglist / forum: <\fBhttp://discuss\&.asciidoctor\&.org\fR>
 .SH "COPYING"
 .sp
-Copyright (C) 2012\-2013 Dan Allen and Ryan Waldron\&. Free use of this software is granted under the terms of the MIT License\&.
+Copyright (C) 2012\-2014 Dan Allen and Ryan Waldron\&. Free use of this software is granted under the terms of the MIT License\&.
 .SH "AUTHOR"
 .PP
 \fBDan Allen\fR
-.RS 4
-Author.
 .RE

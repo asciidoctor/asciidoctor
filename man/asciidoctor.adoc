@@ -2,7 +2,7 @@
 Dan Allen; Ryan Waldron
 :doctype: manpage
 :man manual: Asciidoctor Manual
-:man source: Asciidoctor 0.1.4
+:man source: Asciidoctor 1.5.0.dev
 :awestruct-layout: base
 
 == NAME
