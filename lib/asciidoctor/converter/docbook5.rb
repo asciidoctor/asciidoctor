@@ -95,7 +95,7 @@ module Asciidoctor
           result << %(<row>
 <entry>)
           [*terms].each do |dt|
-            result << %(<simpara>#{dt.text}</simpara>) 
+            result << %(<simpara>#{dt.text}</simpara>)
           end
           result << %(</entry>
 <entry>)
@@ -126,7 +126,7 @@ module Asciidoctor
           result << %(<#{label_tag}>) if label_tag
 
           [*terms].each do |dt|
-            result << %(<#{term_tag}>#{dt.text}</#{term_tag}>) 
+            result << %(<#{term_tag}>#{dt.text}</#{term_tag}>)
           end
 
           result << %(</#{label_tag}>) if label_tag
@@ -239,7 +239,8 @@ module Asciidoctor
     def olist node
       result = []
       num_attribute = node.style ? %( numeration="#{node.style}") : nil
-      result << %(<orderedlist#{common_attributes node.id, node.role, node.reftext}#{num_attribute}>)
+      start_attribute = (node.attr? 'start') ? %( startingnumber="#{node.attr 'start'}") : nil
+      result << %(<orderedlist#{common_attributes node.id, node.role, node.reftext}#{num_attribute}#{start_attribute}>)
       result << %(<title>#{node.title}</title>) if node.title?
       node.items.each do |item|
         result << '<listitem>'
