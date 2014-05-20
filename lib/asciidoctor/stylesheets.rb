@@ -40,6 +40,10 @@ class Stylesheets
     'coderay-asciidoctor.css'
   end
 
+  def fontawesome_compat_stylesheet_name
+    'asciidoctor-font-awesome-compat.css'
+  end
+
   # Public: Read the contents of the default CodeRay stylesheet
   #
   # returns the [String] CodeRay stylesheet data
@@ -50,9 +54,22 @@ class Stylesheets
     @coderay_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DATA_PATH, 'coderay-asciidoctor.css')).chomp
   end
 
+  # Public: Read the contents of the default FontAwesome compatibility stylesheet
+  #
+  # returns the [String] FontAwesome compatibility stylesheet data
+  def fontawesome_compat_stylesheet_data
+    @fontawesome_compat_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DATA_PATH, 'asciidoctor-font-awesome-compat.css')).chomp
+  end
+
   def embed_coderay_stylesheet
     %(<style>
 #{coderay_stylesheet_data}
+</style>)
+  end
+
+  def embed_fontawesome_compat_stylesheet
+    %(<style>
+#{fontawesome_compat_stylesheet_data}
 </style>)
   end
 

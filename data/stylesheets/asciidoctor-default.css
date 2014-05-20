@@ -276,7 +276,7 @@ dl dd:last-child, dl dd:last-child > :last-child { margin-bottom: 0; }
 ol > li p, ul > li p, ul dd, ol dd, .olist .olist, .ulist .ulist, .ulist .olist, .olist .ulist { margin-bottom: 0.625em; }
 ul.unstyled, ol.unnumbered, ul.checklist, ul.none { list-style-type: none; }
 ul.unstyled, ol.unnumbered, ul.checklist { margin-left: 0.625em; }
-ul.checklist li > p:first-child > i[class^="fa-fa-check-square-o"]:first-child, ul.checklist li > p:first-child > input[type="checkbox"]:first-child { margin-right: 0.25em; }
+ul.checklist li > p:first-child > i.fa-check-square-o:first-child, ul.checklist li > p:first-child > input[type="checkbox"]:first-child { margin-right: 0.25em; }
 ul.checklist li > p:first-child > input[type="checkbox"]:first-child { position: relative; top: 1px; }
 ul.inline { margin: 0 auto 0.625em auto; margin-left: -1.375em; margin-right: 0; padding: 0; list-style: none; overflow: hidden; }
 ul.inline > li { list-style: none; float: left; margin-left: 1.375em; display: block; }
