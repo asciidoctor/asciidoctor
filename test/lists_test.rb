@@ -4116,3 +4116,52 @@ context 'Lists model' do
     assert_equal list.items, list.content
   end
 end
+context 'Iconslists' do
+  test 'should create icons bullets item if marker option is set' do
+    input = <<-EOS
+:icons: font
+
+[marker="icon:flag[]"]
+* one
+* two
+* three
+    EOS
+
+    output = render_embedded_string input
+    assert_css '.ulist', output, 1
+    assert_css '.ulist li', output, 3
+    assert_css '.ulist li span i.icon-flag', output, 3
+  end
+
+  test 'should create large icons bullets item if marker option is set' do
+    input = <<-EOS
+:icons: font
+
+[marker="icon:flag[large]"]
+* one
+* two
+* three
+    EOS
+
+    output = render_embedded_string input
+    assert_css '.ulist', output, 1
+    assert_css '.ulist li', output, 3
+    assert_css '.ulist li span i.icon-flag.icon-large', output, 3
+  end
+
+  test 'should create images bullets item if marker option is set' do
+    input = <<-EOS
+:icons: font
+
+[marker="image:lyon.png[Lyon]"]
+* one
+* two
+* three
+    EOS
+
+    output = render_embedded_string input
+    assert_css '.ulist', output, 1
+    assert_css '.ulist li', output, 3
+    assert_css '.ulist li span.image img', output, 3
+  end
+end

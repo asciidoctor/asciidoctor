@@ -817,6 +817,15 @@ Your browser does not support the audio tag.
       div_classes = ['ulist', node.style, node.role].compact
       marker_checked = nil
       marker_unchecked = nil
+      marker_image = nil
+
+      if node.attr? 'marker'
+        marker = node.attributes['marker']
+        # TODO Attributes is not set on node.document ?
+        node.document.set_attr('icons', 'font')
+        # TODO If icon add icon-li class
+        marker_image = node.sub_macros(marker)
+      end
       if (checklist = node.option? 'checklist')
         div_classes.insert 1, 'checklist'
         ul_class_attribute = ' class="checklist"'
@@ -837,6 +846,10 @@ Your browser does not support the audio tag.
             marker_unchecked = '&#10063; '
           end
         end
+      elsif marker_image
+        if node.document.attr? 'icons', 'font'
+          ul_class_attribute = ' class="icons-ul"'
+        end
       else
         ul_class_attribute = node.style ? %( class="#{node.style}") : nil
       end
@@ -848,6 +861,8 @@ Your browser does not support the audio tag.
         result << '<li>'
         if checklist && (item.attr? 'checkbox')
           result << %(<p>#{(item.attr? 'checked') ? marker_checked : marker_unchecked}#{item.text}</p>)
+        elsif marker_image
+          result << %(#{marker_image} #{item.text})
         else
           result << %(<p>#{item.text}</p>)
         end
