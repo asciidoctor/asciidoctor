@@ -1661,13 +1661,13 @@ That's all she wrote!
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul[@class="sectlevel1"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ul', output, 2
-      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 4
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="Section One"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul[@class="sectlevel2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li/a[@href="#_interlude"][text()="Interlude"]', output, 1
-      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[4]/a[@href="#_section_three"][text()="Section Three"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="Section Three"]', output, 1
     end
 
     test 'should render numbered table of contents in header if toc and numbered attributes are set' do
@@ -1697,11 +1697,11 @@ That's all she wrote!
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ul', output, 2
-      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 4
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li/a[@href="#_interlude"][text()="2.1. Interlude"]', output, 1
-      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[4]/a[@href="#_section_three"][text()="3. Section Three"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="3. Section Three"]', output, 1
     end
 
     test 'should render a table of contents that honors numbered setting at position of section in document' do
@@ -1733,9 +1733,9 @@ That's all she wrote!
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ul', output, 2
-      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 4
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
-      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[4]/a[@href="#_section_three"][text()="Section Three"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="Section Three"]', output, 1
     end
 
     test 'should not number parts in table of contents for book doctype when numbered attribute is set' do
@@ -1766,13 +1766,13 @@ blah
       assert_xpath '//*[@id="toc"]', output, 1
       assert_xpath '//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="toc"]/ul[@class="sectlevel0"]', output, 1
-      assert_xpath '//*[@id="toc"]/ul[@class="sectlevel0"]/li', output, 4
+      assert_xpath '//*[@id="toc"]/ul[@class="sectlevel0"]/li', output, 2
       assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/a[text()="Part 1"]', output, 1
-      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[3]/a[text()="Part 2"]', output, 1
-      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/ul', output, 1
-      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/ul[@class="sectlevel1"]', output, 1
-      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/ul/li', output, 2
-      assert_xpath '((//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/ul/li)[1]/a[text()="1. First Section of Part 1"]', output, 1
+      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/a[text()="Part 2"]', output, 1
+      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/ul', output, 1
+      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/ul[@class="sectlevel1"]', output, 1
+      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/ul/li', output, 2
+      assert_xpath '((//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/ul/li)[1]/a[text()="1. First Section of Part 1"]', output, 1
     end
 
     test 'should render table of contents in header if toc2 attribute is set' do
@@ -2106,6 +2106,40 @@ Fin.
       assert_css '#contents li', output, 2
       assert_xpath '(//*[@id="contents"]//li)[1]/a[text() = "Section 1"]', output, 1
       assert_xpath '(//*[@id="contents"]//li)[2]/a[text() = "Section 2"]', output, 1
+    end
+
+    test 'child toc levels should not have additional bullet at parent level in html' do
+      input = <<-EOS
+= Article
+:toc:
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+
+=== Interlude
+
+While they were waiting...
+
+== Section Three
+
+That's all she wrote!
+      EOS
+      output = render_string input
+      assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//ul', output, 2
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[2]/a[@href="#_section_two"][text()="Section Two"]', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[2]/ul/li', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li/a[@href="#_interlude"][text()="Interlude"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="Section Three"]', output, 1
     end
   end
 
