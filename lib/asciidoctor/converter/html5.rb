@@ -259,10 +259,12 @@ MathJax.Hub.Config({
       result << %(<ul class="sectlevel#{slevel}">)
       sections.each do |section|
         section_num = (section.numbered && !section.caption && section.level <= sectnumlevels) ? %(#{section.sectnum} ) : nil
-        result << %(<li><a href="##{section.id}">#{section_num}#{section.captioned_title}</a></li>)
-        if section.level < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :secnumlevels => sectnumlevels)
-          result << '<li>'
+        has_child_toc = section.level < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :secnumlevels => sectnumlevels)
+        result << %(<li><a href="##{section.id}">#{section_num}#{section.captioned_title}</a>)
+        if has_child_toc
           result << child_toc_level
+          result << '</li>'
+        else
           result << '</li>'
         end
       end
