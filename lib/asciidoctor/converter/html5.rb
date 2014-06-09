@@ -63,7 +63,7 @@ module Asciidoctor
 
       if node.attr? 'icons', 'font'
         if !(node.attr 'iconfont-remote', '').nil?
-          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css'}"#{slash}>)
+          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css'}"#{slash}>)
         else
           iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
           result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', '')}"#{slash}>)
@@ -89,13 +89,13 @@ module Asciidoctor
           end
         end
       when 'highlightjs', 'highlight.js'
-        result << %(<link rel="stylesheet" href="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/styles/#{node.attr 'highlightjs-theme', 'googlecode'}.min.css"#{slash}>
-<script src="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/highlight.min.js"></script>
-<script src="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/lang/common.min.js"></script>
+        result << %(<link rel="stylesheet" href="#{node.attr 'highlightjsdir', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/styles/#{node.attr 'highlightjs-theme', 'googlecode'}.min.css"#{slash}>
+<script src="#{node.attr 'highlightjsdir', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/highlight.min.js"></script>
+<script src="#{node.attr 'highlightjsdir', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/lang/common.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>)
       when 'prettify'
-        result << %(<link rel="stylesheet" href="#{node.attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>
-<script src="#{node.attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/prettify.min.js"></script>
+        result << %(<link rel="stylesheet" href="#{node.attr 'prettifydir', 'https://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>
+<script src="#{node.attr 'prettifydir', 'https://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/prettify.min.js"></script>
 <script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>)
       end
 
