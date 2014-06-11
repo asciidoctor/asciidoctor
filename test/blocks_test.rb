@@ -1852,8 +1852,9 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
-      assert_css 'html > head > link[rel="stylesheet"][href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css"]', output, 1
-      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="icon-tip"]', output, 1
+      assert_css 'html > head > link[rel="stylesheet"][href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"]', output, 1
+      assert_css 'html > head > link[rel="stylesheet"][href="./asciidoctor-font-awesome-compat.css"]', output, 1
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa fa-tip"]', output, 1
     end
   end
 
