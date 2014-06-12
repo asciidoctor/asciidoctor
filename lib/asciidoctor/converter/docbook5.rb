@@ -597,7 +597,7 @@ module Asciidoctor
     end
 
     def doctype_declaration root_tag_name
-      ''
+      nil
     end
 
     def document_info_element doc, info_tag_prefix, use_info_tag_prefix = false
