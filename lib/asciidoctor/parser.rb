@@ -896,6 +896,7 @@ class Parser
         resolved_target = attributes['target']
         block.document.register(:images, resolved_target)
         attributes['alt'] ||= ::File.basename(resolved_target, ::File.extname(resolved_target)).tr('_-', ' ')
+        attributes['alt'] = block.sub_specialcharacters attributes['alt']
         block.assign_caption attributes.delete('caption'), 'figure'
         if (scaledwidth = attributes['scaledwidth'])
           # append % to scaledwidth if ends in number (no units present)

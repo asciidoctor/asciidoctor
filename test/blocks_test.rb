@@ -1394,6 +1394,24 @@ image::images/tiger.png[Tiger]
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
+    test 'alt text is escaped in HTML backend' do
+      input = <<-EOS
+image::images/open.png[File > Open]
+      EOS
+
+      output = render_embedded_string input
+      assert_match(/File &gt; Open/, output)
+    end
+
+    test 'alt text is escaped in DocBook backend' do
+      input = <<-EOS
+image::images/open.png[File > Open]
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_match(/File &gt; Open/, output)
+    end
+
     test "can render block image with auto-generated alt text" do
       input = <<-EOS
 image::images/tiger.png[]
