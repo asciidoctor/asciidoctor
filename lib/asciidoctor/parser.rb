@@ -223,9 +223,8 @@ class Parser
     # that we are at a section title (so we don't have to check)
     if parent.context == :document && parent.blocks.empty? &&
         ((has_header = parent.has_header?) || attributes.delete('invalid-header') || !is_next_line_section?(reader, attributes))
-
       doctype = parent.doctype
-      if has_header
+      if has_header || (doctype == 'book' && attributes[1] != 'abstract')
         preamble = intro = Block.new(parent, :preamble, :content_model => :compound)
         parent << preamble
       end
@@ -360,8 +359,7 @@ class Parser
       document = parent
       if preamble.blocks?
         # unwrap standalone preamble (i.e., no sections), if permissible
-        if Compliance.unwrap_standalone_preamble && document.blocks.size == 1 &&
-            (doctype != 'book' || preamble.blocks[0].style != 'abstract')
+        if Compliance.unwrap_standalone_preamble && document.blocks.size == 1 && doctype != 'book'
           document.blocks.shift
           while (child_block = preamble.blocks.shift)
             child_block.parent = document

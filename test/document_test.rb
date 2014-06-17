@@ -1358,7 +1358,8 @@ chapter body
       result = render_string('text', :attributes => {'backend' => 'docbook45', 'doctype' => 'book'})
       assert_xpath '/book', result, 1
       assert_xpath '/book/bookinfo/date', result, 1
-      assert_xpath '/book/simpara[text() = "text"]', result, 1
+      # NOTE simpara cannot be a direct child of book, so content must be treated as a preface
+      assert_xpath '/book/preface/simpara[text() = "text"]', result, 1
     end
 
     test 'docbook45 backend doctype book no xmlns' do
