@@ -2020,10 +2020,10 @@ exit 0 # <5><6>
 <6> Reports success
       EOS
       output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE
-      assert_match(/<span class="content">coderay<\/span>.* <b>\(1\)<\/b>$/, output)
-      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b>\(2\)<\/b>$/, output)
-      assert_match(/puts html * <b>\(3\)<\/b> <b>\(4\)<\/b>$/, output)
-      assert_match(/exit.* <b>\(5\)<\/b> <b>\(6\)<\/b><\/code>/, output)
+      assert_match(/<span class="content">coderay<\/span>.* <b class="conum">\(1\)<\/b>$/, output)
+      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b class="conum">\(2\)<\/b>$/, output)
+      assert_match(/puts html * <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
+      assert_match(/exit.* <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b><\/code>/, output)
     end
 
     test 'should restore callout marks to correct lines if source highlighter is coderay and table line numbering is enabled' do
@@ -2047,10 +2047,10 @@ exit 0 # <5><6>
 <6> Reports success
       EOS
       output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE
-      assert_match(/<span class="content">coderay<\/span>.* <b>\(1\)<\/b>$/, output)
-      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b>\(2\)<\/b>$/, output)
-      assert_match(/puts html * <b>\(3\)<\/b> <b>\(4\)<\/b>$/, output)
-      assert_match(/exit.* <b>\(5\)<\/b> <b>\(6\)<\/b><\/pre>/, output)
+      assert_match(/<span class="content">coderay<\/span>.* <b class="conum">\(1\)<\/b>$/, output)
+      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b class="conum">\(2\)<\/b>$/, output)
+      assert_match(/puts html * <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
+      assert_match(/exit.* <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b><\/pre>/, output)
     end
 
     test 'should preserve passthrough placeholders when highlighting source using coderay' do

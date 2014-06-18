@@ -3896,9 +3896,9 @@ exit 0
     EOS
     output = render_embedded_string input
     assert_xpath '//code/b', output, 6
-    assert_match(/ <b>\(1\)<\/b>$/, output)
-    assert_match(/ <b>\(2\)<\/b> <b>\(3\)<\/b> <b>\(4\)<\/b>$/, output)
-    assert_match(/ <b>\(5\)<\/b><b>\(6\)<\/b>$/, output)
+    assert_match(/ <b class="conum">\(1\)<\/b>$/, output)
+    assert_match(/ <b class="conum">\(2\)<\/b> <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
+    assert_match(/ <b class="conum">\(5\)<\/b><b class="conum">\(6\)<\/b>$/, output)
   end
 
   test 'should allow XML comment-style callouts' do
