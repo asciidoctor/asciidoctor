@@ -155,7 +155,7 @@ class Parser
       if name_section.level == 1
         name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join(' ').tr_s(' ', ' ')
         if (m = ManpageNamePurposeRx.match(name_section_buffer))
-          document.attributes['manname'] = m[1] 
+          document.attributes['manname'] = document.sub_attributes m[1]
           document.attributes['manpurpose'] = m[2] 
           # TODO parse multiple man names
 
