@@ -883,6 +883,9 @@ class Document < AbstractBlock
     restore_attributes
 
     # QUESTION should we add processors that execute before conversion begins?
+    unless @converter
+      fail %(asciidoctor: FAILED: missing converter for backend '#{backend}'. Processing aborted.)
+    end
 
     if doctype == 'inline'
       # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
