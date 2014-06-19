@@ -1331,7 +1331,7 @@ section body
     end
 
     test 'docbook45 backend doctype article no xmlns' do
-      result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'article', 'noxmlns' => ''})
+      result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'article'})
       refute_match(RE_XMLNS_ATTRIBUTE, result)
     end
 
@@ -1363,7 +1363,7 @@ chapter body
     end
 
     test 'docbook45 backend doctype book no xmlns' do
-      result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'book', 'noxmlns' => ''})
+      result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'book'})
       refute_match(RE_XMLNS_ATTRIBUTE, result)
     end
 

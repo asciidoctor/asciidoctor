@@ -73,7 +73,11 @@ module Asciidoctor
     end
 
     def document_ns_attributes doc
-      (doc.attr? 'noxmlns') ? nil : ' xmlns="http://docbook.org/ns/docbook"'
+      if (ns = doc.attr 'xmlns')
+        ns.empty? ? ' xmlns="http://docbook.org/ns/docbook"' : %( xmlns="#{ns}")
+      else
+        nil
+      end
     end
   end
 end

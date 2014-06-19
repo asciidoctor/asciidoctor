@@ -357,7 +357,7 @@ context 'Invoker' do
   end
 
   test 'should set backend to docbook45 if specified' do
-    invoker = invoke_cli_to_buffer %w(-b docbook45 -o -)
+    invoker = invoke_cli_to_buffer %w(-b docbook45 -a xmlns -o -)
     doc = invoker.document
     assert_equal 'docbook45', doc.attr('backend')
     assert_equal '.xml', doc.attr('outfilesuffix')

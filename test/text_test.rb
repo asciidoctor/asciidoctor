@@ -18,7 +18,7 @@ context "Text" do
   end
 
   test "proper encoding to handle utf8 characters in document using docbook45 backend" do
-    output = example_document(:encoding, :attributes => {'backend' => 'docbook45'}).render
+    output = example_document(:encoding, :attributes => {'backend' => 'docbook45', 'xmlns' => ''}).render
     assert_xpath '//xmlns:simpara', output, 4
     assert_xpath '//xmlns:ulink', output, 1
   end
