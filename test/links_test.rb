@@ -135,6 +135,10 @@ context 'Links' do
     assert_xpath '//a[@href="http://google.com"][@id="link-1"]', render_embedded_string('http://google.com[Google, id="link-1"]', :attributes => {'linkattrs' => ''}), 1
   end
 
+  test 'title attribute on link are processed when linkattrs is set' do
+    assert_xpath '//a[@href="http://google.com"][@title="title-1"]', render_embedded_string('http://google.com[Google, title="title-1"]', :attributes => {'linkattrs' => ''}), 1
+  end
+
   test 'inline irc link' do
     assert_xpath '//a[@href="irc://irc.freenode.net"][text()="irc://irc.freenode.net"]', render_embedded_string('irc://irc.freenode.net'), 1
   end
