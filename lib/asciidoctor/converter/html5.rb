@@ -62,7 +62,7 @@ module Asciidoctor
       end
 
       if node.attr? 'icons', 'font'
-        if !(node.attr 'iconfont-remote', '').nil?
+        if node.attr? 'iconfont-remote'
           result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', 'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css'}"#{slash}>)
         else
           iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)

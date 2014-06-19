@@ -192,6 +192,7 @@ class Document < AbstractBlock
     attrs['prewrap'] = ''
     attrs['attribute-undefined'] = Compliance.attribute_undefined
     attrs['attribute-missing'] = Compliance.attribute_missing
+    attrs['iconfont-remote'] = ''
 
     # language strings
     # TODO load these based on language settings
