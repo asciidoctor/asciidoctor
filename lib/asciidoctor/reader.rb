@@ -816,7 +816,7 @@ class PreprocessorReader < Reader
         (extension = @include_processor_extensions.find {|candidate| candidate.instance.handles? target })
       advance
       # FIXME parse attributes if requested by extension
-      extension.process_method[self, target, AttributeList.new(raw_attributes).parse]
+      extension.process_method[@document, self, target, AttributeList.new(raw_attributes).parse]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document

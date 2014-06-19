@@ -232,7 +232,7 @@ module Extensions
   #--
   # TODO add file extension or regexp to shortcut handles?
   class IncludeProcessor < Processor
-    def process reader, target, attributes
+    def process document, reader, target, attributes
       raise ::NotImplementedError
     end
 
