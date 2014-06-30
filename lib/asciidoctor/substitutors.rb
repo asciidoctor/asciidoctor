@@ -1290,35 +1290,35 @@ module Substitutors
     linenums_mode = nil
 
     case highlighter
-      when 'coderay'
-        result = ::CodeRay::Duo[attr('language', :text).to_sym, :html, {
-            :css => (@document.attributes['coderay-css'] || :class).to_sym,
-            :line_numbers => (linenums_mode = ((attr? 'linenums') ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)),
-            :line_number_anchors => false}].highlight source
-      when 'pygments'
-        lexer = ::Pygments::Lexer[attr('language')] || ::Pygments::Lexer['text']
-          opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
-          unless (@document.attributes['pygments-css'] || 'class') == 'class'
-            opts[:noclasses] = true
-            opts[:style] = (@document.attributes['pygments-style'] || Stylesheets::DEFAULT_PYGMENTS_STYLE)
-          end
-          if attr? 'linenums'
-            # TODO we could add the line numbers in ourselves instead of having to strip out the junk
-            # FIXME move these regular expressions into constants
-            if (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
-              # NOTE these subs clean out HTML that messes up our styles
-              result = lexer.highlight(source, :options => opts).
-                  sub(/<div class="pyhl">(.*)<\/div>/m, '\1').
-                  gsub(/<pre[^>]*>(.*?)<\/pre>\s*/m, '\1')
-            else
-              result = lexer.highlight(source, :options => opts).
-                  sub(/<div class="pyhl"><pre[^>]*>(.*?)<\/pre><\/div>/m, '\1')
-            end
-          else
-            # nowrap gives us just the highlighted source; won't work when we need linenums though
-            opts[:nowrap] = true
-            result = lexer.highlight(source, :options => opts)
-          end
+    when 'coderay'
+      result = ::CodeRay::Duo[attr('language', :text).to_sym, :html, {
+          :css => (@document.attributes['coderay-css'] || :class).to_sym,
+          :line_numbers => (linenums_mode = ((attr? 'linenums') ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)),
+          :line_number_anchors => false}].highlight source
+    when 'pygments'
+      lexer = ::Pygments::Lexer[attr('language')] || ::Pygments::Lexer['text']
+      opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
+      unless (@document.attributes['pygments-css'] || 'class') == 'class'
+        opts[:noclasses] = true
+        opts[:style] = (@document.attributes['pygments-style'] || Stylesheets::DEFAULT_PYGMENTS_STYLE)
+      end
+      if attr? 'linenums'
+        # TODO we could add the line numbers in ourselves instead of having to strip out the junk
+        # FIXME move these regular expressions into constants
+        if (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
+          # NOTE these subs clean out HTML that messes up our styles
+          result = lexer.highlight(source, :options => opts).
+              sub(/<div class="pyhl">(.*)<\/div>/m, '\1').
+              gsub(/<pre[^>]*>(.*?)<\/pre>\s*/m, '\1')
+        else
+          result = lexer.highlight(source, :options => opts).
+              sub(/<div class="pyhl"><pre[^>]*>(.*?)<\/pre><\/div>/m, '\1')
+        end
+      else
+        # nowrap gives us just the highlighted source; won't work when we need linenums though
+        opts[:nowrap] = true
+        result = lexer.highlight(source, :options => opts)
+      end
     end
 
     # fix passthrough placeholders that got caught up in syntax highlighting
