@@ -1296,7 +1296,7 @@ module Substitutors
             :line_numbers => (linenums_mode = ((attr? 'linenums') ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)),
             :line_number_anchors => false}].highlight source
       when 'pygments'
-        if (lexer = ::Pygments::Lexer[attr('language')])
+        lexer = ::Pygments::Lexer[attr('language')] || ::Pygments::Lexer['text']
           opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
           unless (@document.attributes['pygments-css'] || 'class') == 'class'
             opts[:noclasses] = true
@@ -1319,9 +1319,6 @@ module Substitutors
             opts[:nowrap] = true
             result = lexer.highlight(source, :options => opts)
           end
-        else
-          result = source
-        end
     end
 
     # fix passthrough placeholders that got caught up in syntax highlighting
