@@ -92,7 +92,7 @@ begin
     )
     # --no-highlight enabled to prevent verbatim blocks in AsciiDoc that begin with $ from being dropped
     # need to patch htmlify method to not attempt to syntax highlight blocks (or fix what's wrong)
-    yard.options = IO.readlines '.yardopts'
+    yard.options = (IO.readlines '.yardopts').map {|l| l.chomp.delete('"').split ' ', 2 }.flatten
   end
 rescue LoadError
 end
