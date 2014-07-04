@@ -774,6 +774,29 @@ include::fixtures/include-file.asciidoc[]
         source = lines * ::Asciidoctor::EOL
         assert_match(/included content/, source)
       end
+
+      test 'leveloffset attribute entries should be added to content if leveloffset attribute is specified' do
+        input = <<-EOS
+include::fixtures/master.adoc[]
+        EOS
+
+        expected = <<-EOS.chomp.split(::Asciidoctor::EOL)
+= Master Document
+
+preamble
+
+:leveloffset: +1
+
+= Chapter A
+
+content
+
+:leveloffset!:
+        EOS
+
+        document = Asciidoctor.load input, :safe => :safe, :base_dir => DIRNAME, :parse => false
+        assert_equal expected, document.reader.read_lines
+      end
   
       test 'attributes are substituted in target of include directive' do
         input = <<-EOS
