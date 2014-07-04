@@ -667,6 +667,31 @@ Standalone preamble.
       assert_xpath '//*[@class = "sect1"]/h2[text() = "Standalone Document"]', output, 1
       assert_xpath '//*[@class = "sect1"]/h2[text() = "Level 1 Section"]', output, 1
     end
+
+    test 'should add relative offset value to current leveloffset' do
+      input = <<-EOS
+= Master Document
+Doc Writer
+
+Master preamble.
+
+:leveloffset: 1
+
+= Chapter 1
+
+content
+
+:leveloffset: +1
+
+= Standalone Section
+
+content
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@class = "sect1"]/h2[text() = "Chapter 1"]', output, 1
+      assert_xpath '//*[@class = "sect2"]/h3[text() = "Standalone Section"]', output, 1
+    end
   end
 
   context 'Section Numbering' do

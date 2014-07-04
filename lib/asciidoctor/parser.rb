@@ -2072,6 +2072,7 @@ class Parser
   #
   # returns a 2-element array containing the attribute name and value
   def self.store_attribute(name, value, doc = nil, attrs = nil)
+    # TODO move processing of attribute value to utility method
     if name.end_with?('!')
       # a nil value signals the attribute should be deleted (undefined)
       value = nil
@@ -2085,10 +2086,19 @@ class Parser
     name = sanitize_attribute_name(name)
     accessible = true
     if doc
+      # support relative leveloffset values
+      if name == 'leveloffset' && value
+        case value[0..0]
+        when '+'
+          value = ((doc.attr 'leveloffset', 0).to_i + (value[1..-1] || 0).to_i).to_s
+        when '-'
+          value = ((doc.attr 'leveloffset', 0).to_i - (value[1..-1] || 0).to_i).to_s
+        end
+      end
       accessible = value.nil? ? doc.delete_attribute(name) : doc.set_attribute(name, value)
     end
 
-    unless !accessible || attrs.nil?
+    if accessible && attrs
       Document::AttributeEntry.new(name, value).save_to(attrs)
     end
 

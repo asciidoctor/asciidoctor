@@ -1031,6 +1031,19 @@ class PreprocessorReader < Reader
 
     # effectively fill the buffer
     @lines = prepare_lines data, :normalize => true, :condense => false, :indent => attributes['indent']
+
+    # FIXME we eventually want to handle leveloffset without affecting the lines
+    if attributes.has_key? 'leveloffset'
+      @lines.unshift ''
+      @lines.unshift %(:leveloffset: #{attributes['leveloffset']})
+      @lines.push ''
+      if (old_leveloffset = @document.attr 'leveloffset')
+        @lines.push %(:leveloffset: #{old_leveloffset})
+      else
+        @lines.push ':leveloffset!:'
+      end
+    end
+
     # FIXME kind of a hack
     #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
     #Document::AttributeEntry.new('indir', @dir).save_to_next_block @document
