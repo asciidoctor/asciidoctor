@@ -1709,7 +1709,7 @@ List
   end
 end
 
-context "Labeled lists (:dlist)" do
+context "Description lists (:dlist)" do
   context "Simple lists" do
     test "single-line adjacent elements" do
       input = <<-EOS
@@ -2655,7 +2655,7 @@ last question::
   end
 end
 
-context 'Labeled lists redux' do
+context 'Description lists redux' do
 
   context 'Label without text on same line' do
 
@@ -2875,6 +2875,23 @@ NOTE: def1
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="NOTE: def1"]', output, 1
+    end
+
+    test 'folds text that looks like section title offset by blank line' do
+      input = <<-EOS
+== Lists
+
+term1::
+
+== Another Section
+      EOS
+  
+      output = render_embedded_string input
+      puts output
+      assert_xpath '//*[@class="dlist"]/dl', output, 1
+      assert_xpath '//*[@class="dlist"]//dd', output, 1
+      assert_xpath '//*[@class="dlist"]//dd/p[text()="== Another Section"]', output, 1
+      assert_xpath '//h2', output, 1
     end
   
     test 'folds text of first literal line offset by blank line appends subsequent literals offset by blank line as blocks' do
