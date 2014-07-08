@@ -269,7 +269,11 @@ class Minitest::Test
     end
   end
 
-  def using_test_webserver host = Socket.ip_address_list[0].ip_address, port = 9876
+  def resolve_localhost
+    RUBY_VERSION < '1.9' ? Socket.gethostname : Socket.ip_address_list[0].ip_address 
+  end
+
+  def using_test_webserver host = resolve_localhost, port = 9876
     server = TCPServer.new host, port
     base_dir = File.expand_path File.dirname __FILE__
     t = Thread.new do
