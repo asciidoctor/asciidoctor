@@ -270,7 +270,7 @@ class Minitest::Test
   end
 
   def resolve_localhost
-    RUBY_VERSION < '1.9' ? Socket.gethostname : Socket.ip_address_list[0].ip_address 
+    RUBY_VERSION < '1.9' ? Socket.gethostname : Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
   end
 
   def using_test_webserver host = resolve_localhost, port = 9876
