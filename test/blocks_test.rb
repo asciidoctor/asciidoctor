@@ -1870,8 +1870,42 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
-      assert_css 'html > head > link[rel="stylesheet"][href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"]', output, 1
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css"]', output, 1
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa fa-tip"]', output, 1
+    end
+
+    test 'should use http uri scheme for assets when asset-uri-scheme is http' do
+      input = <<-EOS
+:asset-uri-scheme: http
+:icons: font
+:source-highlighter: highlightjs
+
+TIP: You can control the URI scheme used for assets with the asset-uri-scheme attribute
+
+[source,ruby]
+puts "AsciiDoc, FTW!"
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_css 'html > head > link[rel="stylesheet"][href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css"]', output, 1
+      assert_css 'html > head > script[src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"]', output, 1
+    end
+
+    test 'should use no uri scheme for assets when asset-uri-scheme is blank' do
+      input = <<-EOS
+:asset-uri-scheme:
+:icons: font
+:source-highlighter: highlightjs
+
+TIP: You can control the URI scheme used for assets with the asset-uri-scheme attribute
+
+[source,ruby]
+puts "AsciiDoc, FTW!"
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_css 'html > head > link[rel="stylesheet"][href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css"]', output, 1
+      assert_css 'html > head > script[src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"]', output, 1
     end
   end
 
