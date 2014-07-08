@@ -1420,6 +1420,7 @@ class Parser
         end
       # technically BlockAttributeLineRx only breaks if ensuing line is not a list item
       # which really means BlockAttributeLineRx only breaks if it's acting as a block delimiter
+      # FIXME to be AsciiDoc compliant, we shouldn't break if style in attribute line is "literal" (i.e., [literal])
       elsif list_type == :dlist && continuation != :active && BlockAttributeLineRx =~ this_line
         break
       else
