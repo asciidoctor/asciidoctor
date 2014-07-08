@@ -28,6 +28,9 @@ module Asciidoctor
       result = []
       slash = @void_element_slash
       br = %(<br#{slash}>)
+      asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')
+      asset_uri_scheme = %(#{asset_uri_scheme}:) unless asset_uri_scheme == ''
+      cdn_base = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
       linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
       result << '<!DOCTYPE html>'
       lang_attribute = (node.attr? 'nolang') ? nil : %( lang="#{node.attr 'lang', 'en'}")
@@ -63,7 +66,7 @@ module Asciidoctor
 
       if node.attr? 'icons', 'font'
         if node.attr? 'iconfont-remote'
-          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', 'http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'}"#{slash}>)
+          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base}/font-awesome/4.1.0/css/font-awesome.min.css]}"#{slash}>)
         else
           iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
           result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', '')}"#{slash}>)
@@ -89,13 +92,14 @@ module Asciidoctor
           end
         end
       when 'highlightjs', 'highlight.js'
-        result << %(<link rel="stylesheet" href="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/styles/#{node.attr 'highlightjs-theme', 'googlecode'}.min.css"#{slash}>
-<script src="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/highlight.min.js"></script>
-<script src="#{node.attr 'highlightjsdir', 'http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4'}/lang/common.min.js"></script>
+        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/8.0)
+        result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'googlecode'}.min.css"#{slash}>
+<script src="#{highlightjs_path}/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>)
       when 'prettify'
-        result << %(<link rel="stylesheet" href="#{node.attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>
-<script src="#{node.attr 'prettifydir', 'http://cdnjs.cloudflare.com/ajax/libs/prettify/r298'}/prettify.min.js"></script>
+        prettify_path = node.attr 'prettifydir', %(#{cdn_base}/prettify/r298)
+        result << %(<link rel="stylesheet" href="#{prettify_path}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>
+<script src="#{prettify_path}/prettify.min.js"></script>
 <script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>)
       end
 
@@ -113,7 +117,7 @@ MathJax.Hub.Config({
   }
 });
 </script>
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+<script type="text/javascript" src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
 <script>document.addEventListener('DOMContentLoaded', MathJax.Hub.TypeSet)</script>)
       end
 
