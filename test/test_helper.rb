@@ -269,7 +269,7 @@ class Minitest::Test
     end
   end
 
-  def using_test_webserver host = Socket.gethostname, port = 9876
+  def using_test_webserver host = Socket.ip_address_list[0].ip_address, port = 9876
     server = TCPServer.new host, port
     base_dir = File.expand_path File.dirname __FILE__
     t = Thread.new do

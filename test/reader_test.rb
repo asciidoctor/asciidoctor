@@ -616,7 +616,7 @@ include::fixtures/no-such-file.ad[]
   
       test 'include directive can retrieve data from uri' do
         #url = 'http://echo.jsontest.com/name/asciidoctor'
-        url = %(http://#{Socket.gethostname}:9876/name/asciidoctor)
+        url = %(http://#{Socket.ip_address_list[0].ip_address}:9876/name/asciidoctor)
         input = <<-EOS
 ....
 include::#{url}[]
@@ -632,7 +632,7 @@ include::#{url}[]
       end
   
       test 'inaccessible uri referenced by include directive does not crash processor' do
-        url = %(http://#{Socket.gethostname}:9876/no_such_file)
+        url = %(http://#{Socket.ip_address_list[0].ip_address}:9876/no_such_file)
         input = <<-EOS
 ....
 include::#{url}[]
