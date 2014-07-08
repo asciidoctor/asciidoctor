@@ -696,17 +696,28 @@ module Substitutors
         end
         @document.register(:links, target)
 
+        link_opts = { :type => :link, :target => target }
         attrs = nil
         #text = m[3] ? sub_attributes(m[3].gsub('\]', ']')) : ''
         if m[3].nil_or_empty?
           text = ''
         else
-          if use_link_attrs && (m[3].start_with?('"') || m[3].include?(','))
+          text = if use_link_attrs && (m[3].start_with?('"') || m[3].include?(','))
             attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')), [])
-            text = attrs[1]
+            link_opts[:id] = (attrs.delete 'id') if attrs.has_key? 'id'
+            attrs[1] || ''
           else
-            text = sub_attributes(m[3].gsub('\]', ']'))
+            sub_attributes(m[3].gsub('\]', ']'))
           end
+
+          # TODO enable in Asciidoctor 1.5.1
+          # support pipe-separated text and title
+          #unless attrs && (attrs.has_key? 'title')
+          #  if text.include? '|'
+          #    attrs ||= {}
+          #    text, attrs['title'] = text.split '|', 2
+          #  end
+          #end
 
           if text.end_with? '^'
             text = text.chop
@@ -716,14 +727,15 @@ module Substitutors
         end
 
         if text.empty?
-          if @document.attr? 'hide-uri-scheme'
-            text = target.sub UriSniffRx, ''
+          text = if @document.attr? 'hide-uri-scheme'
+            target.sub UriSniffRx, ''
           else
-            text = target
+            target
           end
         end
 
-        "#{prefix}#{Inline.new(self, :anchor, text, :type => :link, :target => target, :attributes => attrs).convert}#{suffix}"
+        link_opts[:attributes] = attrs if attrs
+        %(#{prefix}#{Inline.new(self, :anchor, text, link_opts).convert}#{suffix})
       }
     end
 
@@ -740,32 +752,43 @@ module Substitutors
         mailto = m[0].start_with?('mailto:')
         target = mailto ? "mailto:#{raw_target}" : raw_target
 
+        link_opts = { :type => :link, :target => target }
         attrs = nil
         #text = sub_attributes(m[2].gsub('\]', ']'))
-        if use_link_attrs && (m[2].start_with?('"') || m[2].include?(','))
+        text = if use_link_attrs && (m[2].start_with?('"') || m[2].include?(','))
           attrs = parse_attributes(sub_attributes(m[2].gsub('\]', ']')), [])
-          text = attrs[1]
+          link_opts[:id] = (attrs.delete 'id') if attrs.has_key? 'id'
           if mailto
             if attrs.has_key? 2
-              target = "#{target}?subject=#{Helpers.encode_uri(attrs[2])}"
+              target = link_opts[:target] = "#{target}?subject=#{Helpers.encode_uri(attrs[2])}"
 
               if attrs.has_key? 3
-                target = "#{target}&amp;body=#{Helpers.encode_uri(attrs[3])}"
+                target = link_opts[:target] = "#{target}&amp;body=#{Helpers.encode_uri(attrs[3])}"
               end
             end
           end
+          attrs[1]
         else
-          text = sub_attributes(m[2].gsub('\]', ']'))
+          sub_attributes(m[2].gsub('\]', ']'))
         end
+
+        # QUESTION should a mailto be registered as an e-mail address?
+        @document.register(:links, target)
+
+        # TODO enable in Asciidoctor 1.5.1
+        # support pipe-separated text and title
+        #unless attrs && (attrs.has_key? 'title')
+        #  if text.include? '|'
+        #    attrs ||= {}
+        #    text, attrs['title'] = text.split '|', 2
+        #  end
+        #end
 
         if text.end_with? '^'
           text = text.chop
           attrs ||= {}
           attrs['window'] = '_blank' unless attrs.has_key?('window')
         end
-
-        # QUESTION should a mailto be registered as an e-mail address?
-        @document.register(:links, target)
 
         if text.empty?
           if @document.attr? 'hide-uri-scheme'
@@ -775,7 +798,8 @@ module Substitutors
           end
         end
 
-        Inline.new(self, :anchor, text, :type => :link, :target => target, :attributes => attrs).convert
+        link_opts[:attributes] = attrs if attrs
+        Inline.new(self, :anchor, text, link_opts).convert
       }
     end
 

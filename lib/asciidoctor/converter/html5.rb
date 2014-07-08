@@ -939,11 +939,14 @@ Your browser does not support the video tag.
       when :ref
         %(<a id="#{target}"></a>)
       when :link
-        class_attr = (role = node.role) ? %( class="#{role}") : nil
-        id_attr = (node.attr? 'id') ? %( id="#{node.attr 'id'}") : nil
-        window_attr = (node.attr? 'window') ? %( target="#{node.attr 'window'}") : nil
-        title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : nil
-        %(<a href="#{target}"#{id_attr}#{class_attr}#{window_attr}#{title_attr}>#{node.text}</a>)
+        attrs = []
+        attrs << %( id="#{node.id}") if node.id
+        if (role = node.role)
+          attrs << %( class="#{role}")
+        end
+        attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
+        attrs << %( target="#{node.attr 'window'}") if node.attr? 'window'
+        %(<a href="#{target}"#{attrs.join}>#{node.text}</a>)
       when :bibref
         %(<a id="#{target}"></a>[#{target}])
       else
