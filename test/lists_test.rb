@@ -2887,7 +2887,6 @@ term1::
       EOS
   
       output = render_embedded_string input
-      puts output
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="== Another Section"]', output, 1
