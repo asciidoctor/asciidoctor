@@ -188,6 +188,7 @@ class Document < AbstractBlock
     attrs['notitle'] = '' unless header_footer
     attrs['toc-placement'] = 'auto'
     attrs['stylesheet'] = ''
+    attrs['webfonts'] = ''
     attrs['copycss'] = '' if header_footer
     attrs['prewrap'] = ''
     attrs['attribute-undefined'] = Compliance.attribute_undefined

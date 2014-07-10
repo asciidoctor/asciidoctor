@@ -1,8 +1,8 @@
 /* Foundation stylesheet for CodeRay (to match GitHub theme) | MIT License | http://foundation.zurb.com */
 table.CodeRay { border-collapse: collapse; padding: 2px; margin-bottom: 0; border: 0; background: transparent; }
-table.CodeRay td { padding: 0 .5em; vertical-align: top; }
+table.CodeRay td { padding: 0 0.5em; vertical-align: top; }
 table.CodeRay td.line-numbers { text-align: right; color: #999; border-right: 1px solid #e5e5e5; padding-left: 0; }
-span.line-numbers { border-right: 1px solid #E5E5E5; color: #999; display: inline-block; margin-right: 0.5em; padding-right: 0.5em; }
+span.line-numbers { border-right: 1px solid #e5e5e5; color: #999; display: inline-block; margin-right: 0.5em; padding-right: 0.5em; }
 .CodeRay td.line-numbers strong, .CodeRay span.line-numbers strong { font-weight: normal; }
 .CodeRay .debug { color: white !important; background: blue !important; }
 .CodeRay .annotation { color: #007; }

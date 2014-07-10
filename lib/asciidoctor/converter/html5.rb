@@ -29,7 +29,7 @@ module Asciidoctor
       slash = @void_element_slash
       br = %(<br#{slash}>)
       asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')
-      asset_uri_scheme = %(#{asset_uri_scheme}:) unless asset_uri_scheme == ''
+      asset_uri_scheme = %(#{asset_uri_scheme}:) unless asset_uri_scheme.empty?
       cdn_base = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
       linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
       result << '<!DOCTYPE html>'
@@ -49,6 +49,9 @@ module Asciidoctor
 
       result << %(<title>#{node.doctitle(:sanitize => true) || node.attr('untitled-label')}</title>) 
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
+        if (webfonts = node.attr 'webfonts')
+          result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic|Noto+Serif:400,400italic,700,700italic|Droid+Sans+Mono:400' : webfonts}"#{slash}>)
+        end
         if linkcss
           result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', '')}"#{slash}>)
         else
@@ -316,7 +319,7 @@ MathJax.Hub.Config({
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
       caption = if node.document.attr? 'icons'
         if node.document.attr? 'icons', 'font'
-          %(<i class="fa fa-#{name}" title="#{node.caption}"></i>)
+          %(<i class="fa icon-#{name}" title="#{node.caption}"></i>)
         else
           %(<img src="#{node.icon_uri name}" alt="#{node.caption}"#{@void_element_slash}>)
         end
