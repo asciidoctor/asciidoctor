@@ -1,0 +1,107 @@
+= Contributing
+:issues: https://github.com/asciidoctor/asciidoctor/issues
+:fork: https://help.github.com/articles/fork-a-repo
+:gist: https://gist.github.com
+:branch: http://learn.github.com/p/branching.html
+:pr: https://help.github.com/articles/using-pull-requests
+
+=== Submitting an Issue
+
+We use the {issues}[issue tracker on GitHub] associated with this project to track bugs and features.
+Before submitting a bug report or feature request, check to make sure it hasn't already been submitted.
+When submitting a bug report, please include a {gist}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
+
+Most importantly, since Asciidoctor is a text processor, reproducing most bugs requires that we have some snippet of text on which Asciidoctor exhibits the bad behavior.
+
+An ideal bug report would include a pull request with failing specs.
+
+=== Submitting a Pull Request
+
+. {fork}[Fork the repository].
+. Run +bundle install+ to install dependencies.
+. {branch}[Create a topic branch].
+. Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
+. Run +bundle exec rake+ to run the tests.
+If your tests pass, return to step 3.
+. Implement your feature or bug fix.
+. Run +bundle exec rake+ to run the tests.
+If your tests fail, return to step 5.
+. Add documentation for your feature or bug fix.
+. If your changes are not 100% documented, go back to step 7.
+. Add, commit, and push your changes.
+. {pr}[Submit a pull request].
+
+=== Writing and Executing Tests
+
+Tests live inside the test directory and are named <topic>_test.rb.
+For instance, tests for the different types of blocks can be found in the file test/blocks_test.rb.
+
+Within a test file, individual test cases are organized inside of contexts.
+A context is type of logical container that groups related tests together.
+
+Each test case follows the same structure:
+
+[source]
+test 'description of test' do
+  # test logic
+end
+
+At the moment, the tests are quite primitive.
+Here's how a typical test operates:
+
+. Defines sample AsciiDoc source
+. Renders the document to HTML or DocBook
+. Uses XPath and CSS expressions to verify expected output
+
+Here's how we might test the open block syntax:
+
+[source]
+test 'should render content bounded by two consecutive hyphens as an open block' do
+  input = <<-EOS
+--
+This is an open block.
+--
+  EOS
+  result = render_embedded_string input
+  assert_css '.openblock', result, 1
+  assert_css '.openblock p', result, 1
+  assert_xpath '/div[@class="openblock"]//p[text()="This is an open block."]', result, 1
+end
+
+As you can see, several helpers are used to facilitate the test scenario.
+The +render_embedded_string+ invokes Asciidoctor's render method with the header and footer option disabled.
+This method is ideal for unit-level tests.
+If you need to test the whole document, use +render_string+ instead.
+The +assert_css+ and +assert_xpath+ assertion methods take a CSS or XPath selector, respectively, the rendered result and the number of expected matches.
+You can also use built-in assertions in Ruby's test library.
+
+To run all the tests, simply execute +rake+:
+
+ $ rake
+
+If you want to run a single test file, you can use +ruby+:
+
+ $ ruby test/blocks_test.rb
+
+To test a single test case, first add the string "wip" to the beginning of the description.
+For example:
+
+[source]
+test 'wip should render ...' do
+  ...
+end
+
+Then, run +ruby+ again, but this time pass a selector argument so it finds matching tests:
+
+ $ ruby test/blocks_test.rb -n /wip/
+
+Once you are done with your test, make sure to remove "wip" from the description and run all the tests again using +rake+.
+
+We plan on switching to a more elegant testing framework in the future, such as RSpec or Cucumber, in order to make the tests more clear and robust.
+
+=== Supporting Additional Ruby Versions
+
+If you would like this library to support another Ruby version, you may volunteer to be a maintainer.
+Being a maintainer entails making sure all tests run and pass on that implementation.
+When something breaks on your implementation, you will be expected to provide patches in a timely fashion.
+If critical issues for a particular implementation exist at the time of a major release, support for that Ruby version may be dropped.

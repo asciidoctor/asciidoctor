@@ -24,11 +24,8 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Ryan Waldron <https://
 :seed-contribution: https://github.com/github/gitscm-next/commits/master/lib/asciidoc.rb
 :tilt: https://github.com/rtomayko/tilt
 :freesoftware: http://www.gnu.org/philosophy/free-sw.html
-:gist: https://gist.github.com
-:fork: https://help.github.com/articles/fork-a-repo
-:branch: http://learn.github.com/p/branching.html
-:pr: https://help.github.com/articles/using-pull-requests
 :changelog: https://github.com/asciidoctor/asciidoctor/blob/master/CHANGELOG.adoc
+:contributing: https://github.com/asciidoctor/asciidoctor/blob/master/CONTRIBUTING.adoc
 :license: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE
 :idprefix:
 :idseparator: -
@@ -55,24 +52,18 @@ NOTE: With few exceptions, Asciidoctor is compliant with the original AsciiDoc p
 Asciidoctor has well over 1,000 tests to ensure compatibility with the AsciiDoc syntax.
 We continue to work hard to ensure Asciidoctor continues to serve as a drop-in replacement for AsciiDoc.
 
-== Operating Systems
+== Requirements
 
-Asciidoctor works on Linux, OSX (Mac) and Windows.
+Asciidoctor works on Linux, OSX (Mac) and Windows and requires one of the following implementations of Ruby:
 
-== Dependency and Configuration Requirements
-
-Asciidoctor requires one of the following implementations of Ruby:
-
-* Ruby 1.8.7
-* Ruby 1.9.3
-* Ruby 2.0
-* Ruby 2.1
+* Ruby 1.8.7 or higher
 * JRuby 1.7 (Ruby 1.8 and 1.9 modes)
 * Rubinius 2.1.1
 * Opal (JavaScript)
 
 We expect Asciidoctor to work with other versions of Ruby as well.
 We welcome your help testing those versions if you are interested in seeing them supported.
+See {contributing}[Contributing]
 
 // QUESTION What is considered configuration information?
 
@@ -88,19 +79,15 @@ The latest source code is located in the {sources}[Asciidoctor git repository] o
 == Installation
 
 Asciidoctor can be installed via the +gem+ command, bundler, or popular Linux package managers.
+The benefit of installing the gem via Linux package managers is that they will also install Ruby and RubyGems if not already on your machine.
 
 === gem install
 
-To install Asciidoctor using the +gem+ command:
-
-. Open a terminal
-. Type the +gem+ command
+. Open a terminal and type the +gem+ command
 
  $ gem install asciidoctor
 
 === bundle install (Bundler)
-
-To install Asciidoctor using bundler:
 
 . Open your system Gemfile
 . Add the +asciidoctor+ gem to your Gemfile using the following text
@@ -110,32 +97,21 @@ source 'https://rubygems.org'
 gem 'asciidoctor'
 
 . Save the Gemfile
-. Open a terminal
-. Install the gem with bundler
+. Open a terminal and install the +gem+ with bundler
 
  $ bundle install
 
-=== yum install (Fedora)
+=== yum install (Fedora 17 or greater)
 
-To install Asciidoctor on Fedora 17 or greater:
-
-. Open a terminal
-. Type the +yum+ command
+. Open a terminal and type the +yum+ command
 
  $ sudo yum install rubygem-asciidoctor
 
-The benefit of installing the gem via +yum+ is that the package manager will also install Ruby and RubyGems if not already on your machine.
+=== apt-get install (Debian Sid or Ubuntu Saucy or greater)
 
-=== apt-get install (Debian, Ubuntu)
-
-To install Asciidoctor on Debian Sid or Ubuntu Saucy or greater:
-
-. Open a terminal
-. Type the +apt-get+ command
+. Open a terminal and type the +apt-get+ command
 
  $ sudo apt-get install asciidoctor
-
-The benefit of installing the gem via +apt-get+ is that the package manager will also install Ruby and RubyGems if not already on your machine.
 
 === Other installation options
 
@@ -302,26 +278,30 @@ For instance, to override the default Paragraph template with an ERB template, p
 
 For more usage examples, see the (massive) {tests}[test suite].
 
-== Copyright and Licensing
 
-Copyright (C) 2012-2014 Dan Allen and Ryan Waldron.
-Free use of this software is granted under the terms of the MIT License.
+== Contributing
 
-See the {license}[LICENSE] file for details.
+In the spirit of {freesoftware}[free software], _everyone_ is encouraged to help improve this project.
 
-== Authors
+Here are some ways *you* can contribute:
 
-*Asciidoctor* was written by https://github.com/mojavelinux[Dan Allen], https://github.com/erebor[Ryan Waldron], https://github.com/lightguard[Jason Porter], https://github.com/nickh[Nick Hengeveld] and {contributors}[other contributors].
+* by using alpha, beta, and prerelease versions
+* by reporting bugs
+* by suggesting new features
+* by writing or editing documentation
+* by writing specifications
+* by writing code -- _No patch is too small._
+** fix typos
+** add comments
+** clean up inconsistent whitespace
+** write tests!
+* by refactoring code
+* by fixing {issues}[issues]
+* by reviewing patches
 
-The initial code from which Asciidoctor emerged was written by http://github.com/nickh[Nick Hengeveld] to process the git man pages for the {gitscm-next}[Git project site].
-Refer to the commit history of {seed-contribution}[asciidoc.rb] to view the initial contributions.
+See {contributing}[Contributing]
 
-*AsciiDoc* was written by Stuart Rackham and has received contributions from many other individuals.
-
-// TODO fill in this section and enable
-//== Thanks, acknowledgements, and credits
-
-== Contact and Help
+== Getting Help
 
 The Asciidoctor project is developed to help you sucessfully write and publish your content.
 But we can't do that without your feedback!
@@ -345,6 +325,25 @@ Asciidoctor organization (GitHub):: {org}
 If you discover errors or ommisions in the source code, documentation, or website content, please don't hesitate to submit an issue or open a pull request with a fix.
 The <<contributing>> section provides information on how to create, style, and submit issues, feature requests, code, and documentation to the Asciidoctor Project.
 New contributors are always welcome!
+
+== Copyright and Licensing
+
+Copyright (C) 2012-2014 Dan Allen and Ryan Waldron.
+Free use of this software is granted under the terms of the MIT License.
+
+See the {license}[LICENSE] file for details.
+
+== Authors
+
+*Asciidoctor* was written by https://github.com/mojavelinux[Dan Allen], https://github.com/erebor[Ryan Waldron], https://github.com/lightguard[Jason Porter], https://github.com/nickh[Nick Hengeveld] and {contributors}[other contributors].
+
+The initial code from which Asciidoctor emerged was written by http://github.com/nickh[Nick Hengeveld] to process the git man pages for the {gitscm-next}[Git project site].
+Refer to the commit history of {seed-contribution}[asciidoc.rb] to view the initial contributions.
+
+*AsciiDoc* was written by Stuart Rackham and has received contributions from many other individuals.
+
+// TODO fill in this section and enable
+//== Thanks, acknowledgements, and credits
 
 == Changelog
 
@@ -472,124 +471,3 @@ Improvements::
   * removed unnecessary monospace class from literal and listing blocks
 
 See the {changelog}[CHANGELOG.adoc] file for a list of changes in older releases as well as for the upcoming release.
-
-== Contributing
-
-In the spirit of {freesoftware}[free software], _everyone_ is encouraged to help improve this project.
-
-Here are some ways *you* can contribute:
-
-* by using alpha, beta, and prerelease versions
-* by reporting bugs
-* by suggesting new features
-* by writing or editing documentation
-* by writing specifications
-* by writing code -- _No patch is too small._
-** fix typos
-** add comments
-** clean up inconsistent whitespace
-** write tests!
-* by refactoring code
-* by fixing {issues}[issues]
-* by reviewing patches
-
-=== Submitting an Issue
-
-We use the {issues}[issue tracker on GitHub] associated with this project to track bugs and features.
-Before submitting a bug report or feature request, check to make sure it hasn't already been submitted.
-When submitting a bug report, please include a {gist}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
-
-Most importantly, since Asciidoctor is a text processor, reproducing most bugs requires that we have some snippet of text on which Asciidoctor exhibits the bad behavior.
-
-An ideal bug report would include a pull request with failing specs.
-
-=== Submitting a Pull Request
-
-. {fork}[Fork the repository].
-. Run +bundle install+ to install dependencies.
-. {branch}[Create a topic branch].
-. Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
-. Run +bundle exec rake+ to run the tests.
-If your tests pass, return to step 3.
-. Implement your feature or bug fix.
-. Run +bundle exec rake+ to run the tests.
-If your tests fail, return to step 5.
-. Add documentation for your feature or bug fix.
-. If your changes are not 100% documented, go back to step 7.
-. Add, commit, and push your changes.
-. {pr}[Submit a pull request].
-
-=== Writing and Executing Tests
-
-Tests live inside the test directory and are named <topic>_test.rb.
-For instance, tests for the different types of blocks can be found in the file test/blocks_test.rb.
-
-Within a test file, individual test cases are organized inside of contexts.
-A context is type of logical container that groups related tests together.
-
-Each test case follows the same structure:
-
-[source]
-test 'description of test' do
-  # test logic
-end
-
-At the moment, the tests are quite primitive.
-Here's how a typical test operates:
-
-. Defines sample AsciiDoc source
-. Renders the document to HTML or DocBook
-. Uses XPath and CSS expressions to verify expected output
-
-Here's how we might test the open block syntax:
-
-[source]
-test 'should render content bounded by two consecutive hyphens as an open block' do
-  input = <<-EOS
---
-This is an open block.
---
-  EOS
-  result = render_embedded_string input
-  assert_css '.openblock', result, 1
-  assert_css '.openblock p', result, 1
-  assert_xpath '/div[@class="openblock"]//p[text()="This is an open block."]', result, 1
-end
-
-As you can see, several helpers are used to facilitate the test scenario.
-The +render_embedded_string+ invokes Asciidoctor's render method with the header and footer option disabled.
-This method is ideal for unit-level tests.
-If you need to test the whole document, use +render_string+ instead.
-The +assert_css+ and +assert_xpath+ assertion methods take a CSS or XPath selector, respectively, the rendered result and the number of expected matches.
-You can also use built-in assertions in Ruby's test library.
-
-To run all the tests, simply execute +rake+:
-
- $ rake
-
-If you want to run a single test file, you can use +ruby+:
-
- $ ruby test/blocks_test.rb
-
-To test a single test case, first add the string "wip" to the beginning of the description.
-For example:
-
-[source]
-test 'wip should render ...' do
-  ...
-end
-
-Then, run +ruby+ again, but this time pass a selector argument so it finds matching tests:
-
- $ ruby test/blocks_test.rb -n /wip/
-
-Once you are done with your test, make sure to remove "wip" from the description and run all the tests again using +rake+.
-
-We plan on switching to a more elegant testing framework in the future, such as RSpec or Cucumber, in order to make the tests more clear and robust.
-
-=== Supporting Additional Ruby Versions
-
-If you would like this library to support another Ruby version, you may volunteer to be a maintainer.
-Being a maintainer entails making sure all tests run and pass on that implementation.
-When something breaks on your implementation, you will be expected to provide patches in a timely fashion.
-If critical issues for a particular implementation exist at the time of a major release, support for that Ruby version may be dropped.
