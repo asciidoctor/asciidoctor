@@ -734,12 +734,20 @@ Your browser does not support the audio tag.
       result = [] 
       id_attribute = node.id ? %( id="#{node.id}") : nil
       classes = ['tableblock', %(frame-#{node.attr 'frame', 'all'}), %(grid-#{node.attr 'grid', 'all'})]
-      if (role_class = node.role)
-        classes << role_class
+      styles = []
+      unless node.option? 'autowidth'
+        if (tablepcwidth = node.attr 'tablepcwidth') == 100
+          classes << 'spread'
+        else
+          styles << %(width: #{tablepcwidth}%;)
+        end
+      end
+      if (role = node.role)
+        classes << role
       end
       class_attribute = %( class="#{classes * ' '}")
-      styles = [(node.option? 'autowidth') ? nil : %(width: #{node.attr 'tablepcwidth'}%;), (node.attr? 'float') ? %(float: #{node.attr 'float'};) : nil].compact
-      style_attribute = styles.size > 0 ? %( style="#{styles * ' '}") : nil
+      styles << %(float: #{node.attr 'float'};) if node.attr? 'float'
+      style_attribute = styles.empty? ? nil : %( style="#{styles * ' '}")
 
       result << %(<table#{id_attribute}#{class_attribute}#{style_attribute}>)
       result << %(<caption class="title">#{node.captioned_title}</caption>) if node.title?
