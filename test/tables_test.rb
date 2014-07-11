@@ -18,7 +18,7 @@ context 'Tables' do
       cells = [%w(A B C), %w(a b c), %w(1 2 3)]
       output = render_embedded_string input
       assert_css 'table', output, 1
-      assert_css 'table.tableblock.frame-all.grid-all[style*="width: 100%"]', output, 1
+      assert_css 'table.tableblock.frame-all.grid-all.spread', output, 1
       assert_css 'table > colgroup > col[style*="width: 33%"]', output, 3
       assert_css 'table tr', output, 3
       assert_css 'table > tbody > tr', output, 3
@@ -438,7 +438,7 @@ I am getting in shape!
 
     test 'percentages as column widths' do
       input = <<-EOS
-[width="100%", cols="<.^10%,<90%"]
+[cols="<.^10%,<90%"]
 |===
 |column A |column B
 |===
