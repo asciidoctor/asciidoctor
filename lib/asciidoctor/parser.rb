@@ -2268,7 +2268,7 @@ class Parser
           # push an empty cell spec if boundary at start of line
           parser_ctx.close_open_cell
         else
-          next_cell_spec, line = parse_cell_spec(line, :start)
+          next_cell_spec, line = parse_cell_spec(line, :start, parser_ctx.delimiter)
           # if the cell spec is not null, then we're at a cell boundary
           if !next_cell_spec.nil?
             parser_ctx.close_open_cell next_cell_spec
@@ -2400,47 +2400,65 @@ class Parser
   #
   # The cell specs dictate the cell's alignments, styles or filters,
   # colspan, rowspan and/or repeating content.
+  #
+  # The default spec when pos == :end is {} since we already know we're at a
+  # delimiter. When pos == :start, we *may* be at a delimiter, nil indicates
+  # we're not.
   # 
   # returns the Hash of attributes that indicate how to layout
   # and style this cell in the table.
-  def self.parse_cell_spec(line, pos = :start)
-    # the default for the end pos it {} since we
-    # know we're at a delimiter; when the pos
-    # is start, we *may* be at a delimiter and
-    # nil indicates we're not
-    spec = (pos == :end ? {} : nil)
-    rest = line
+  def self.parse_cell_spec(line, pos = :start, delimiter = nil)
+    m = nil
+    rest = ''
 
-    if (m = (pos == :start ? CellSpecStartRx : CellSpecEndRx).match(line))
-      spec = {}
-      return [spec, line] if m[0].empty?
-      rest = (pos == :start ? m.post_match : m.pre_match)
-      if m[1]
-        colspec, rowspec = m[1].split '.'
-        colspec = colspec.nil_or_empty? ? 1 : colspec.to_i
-        rowspec = rowspec.nil_or_empty? ? 1 : rowspec.to_i
-        if m[2] == '+'
-          spec['colspan'] = colspec unless colspec == 1
-          spec['rowspan'] = rowspec unless rowspec == 1
-        elsif m[2] == '*'
-          spec['repeatcol'] = colspec unless colspec == 1
+    case pos
+    when :start
+      if line.include? delimiter
+        spec_part, rest = line.split delimiter, 2
+        if (m = CellSpecStartRx.match spec_part)
+          return [{}, rest] if m[0].empty?
+        else
+          return [nil, line]
         end
+      else
+        return [nil, line]
       end
-      
-      if m[3]
-        colspec, rowspec = m[3].split '.'
-        if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
-          spec['halign'] = Table::ALIGNMENTS[:h][colspec]
-        end
-        if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
-          spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
-        end
+    when :end
+      if (m = CellSpecEndRx.match line)
+        # NOTE return the line stripped of trailing whitespace if no cellspec is found in this case
+        return [{}, line.rstrip] if m[0].lstrip.empty?
+        rest = m.pre_match
+      else
+        return [{}, line]
       end
+    end
 
-      if m[4] && Table::TEXT_STYLES.has_key?(m[4])
-        spec['style'] = Table::TEXT_STYLES[m[4]]
+    spec = {}
+    if m[1]
+      colspec, rowspec = m[1].split '.'
+      colspec = colspec.nil_or_empty? ? 1 : colspec.to_i
+      rowspec = rowspec.nil_or_empty? ? 1 : rowspec.to_i
+      if m[2] == '+'
+        spec['colspan'] = colspec unless colspec == 1
+        spec['rowspan'] = rowspec unless rowspec == 1
+      elsif m[2] == '*'
+        spec['repeatcol'] = colspec unless colspec == 1
       end
-    end 
+    end
+    
+    if m[3]
+      colspec, rowspec = m[3].split '.'
+      if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
+        spec['halign'] = Table::ALIGNMENTS[:h][colspec]
+      end
+      if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
+        spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
+      end
+    end
+
+    if m[4] && Table::TEXT_STYLES.has_key?(m[4])
+      spec['style'] = Table::TEXT_STYLES[m[4]]
+    end
 
     [spec, rest]
   end

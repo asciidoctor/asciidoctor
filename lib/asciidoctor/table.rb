@@ -304,10 +304,10 @@ class Table::ParserContext
       @format = Table::DEFAULT_DATA_FORMAT
     end
 
-    if @format == 'psv' && !attributes.has_key?('separator') && table.document.nested?
-      @delimiter = '!'
+    @delimiter = if @format == 'psv' && !(attributes.has_key? 'separator') && table.document.nested?
+      '!'
     else
-      @delimiter = attributes['separator'] || Table::DEFAULT_DELIMITERS[@format]
+      attributes['separator'] || Table::DEFAULT_DELIMITERS[@format]
     end
     @delimiter_re = /#{Regexp.escape @delimiter}/
     @col_count = table.columns.empty? ? -1 : table.columns.size
