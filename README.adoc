@@ -79,7 +79,7 @@ The latest source code is located in the {sources}[Asciidoctor git repository] o
 == Installation
 
 Asciidoctor can be installed via the +gem+ command, bundler, or popular Linux package managers.
-The benefit of installing the gem via Linux package managers is that they will also install Ruby and RubyGems if not already on your machine.
+The benefit of installing the gem via Linux package managers is that they will also install Ruby and RubyGems if they are not already on your machine.
 
 === gem install
 
