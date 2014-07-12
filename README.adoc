@@ -42,11 +42,15 @@ endif::env-github[]
 
 == AsciiDoc Processing
 
+// QUESTION Remove this section with an image ?
+
 Asciidoctor reads and parses AsciiDoc markup (from a file or string) and feeds the parsed result to a set of built-in templates to render the document as HTML 5, DocBook 4.5 or DocBook 5.0.
 Asciidoctor is a drop-in replacement for the original AsciiDoc processor.
 We've matched the output to that produced by the AsciiDoc Python processor as faithfully as possible.
 You can override the built-in templates, or produce a custom format, by pointing the processor at a set of template files written in a language supported by {tilt}[Tilt].
 See the <<usage>> section for more details.
+
+// QUESTION Can we capture the number of tests and assertions in Travis CI and display the result below the "build status" ?
 
 NOTE: With few exceptions, Asciidoctor is compliant with the original AsciiDoc processor.
 Asciidoctor has well over 1,000 tests to ensure compatibility with the AsciiDoc syntax.
@@ -120,9 +124,13 @@ gem 'asciidoctor'
 
 == Upgrading
 
+// QUESTION Merge this section with "Installation" ? "Installing and upgrading"
+
 If you have an earlier version of Asciidoctor installed, you can update it using the +gem+ command:
 
  $ gem update asciidoctor
+
+// QUESTION Move this tip somewhere else to reduce the length of the README ? "See Troubleshooting" ?
 
 [TIP]
 --
@@ -142,6 +150,8 @@ Refer to the http://docs.fedoraproject.org[Fedora docs] if you are unsure.
 On Debian or Ubuntu, you can update it using:
 
  $ sudo apt-get upgrade asciidoctor
+
+// QUESTION Maybe we can move this note with the explanation on why using linux packages is better than gem ?
 
 NOTE: The Fedora, Debian and Ubuntu packages will not be available right away after a release of the RubyGem.
 It may take several weeks before the packages become available for a new release.
@@ -166,6 +176,8 @@ The Java API calls through to the Ruby API using an embedded JRuby runtime.
 See the {java}[Asciidoctor Java integration project] for more information.
 
 === Command line interface (CLI)
+
+// QUESTION Remove that part with "Once the Asciidoctor gem installed, you can invoke Asciidoctor from the CLI:"
 
 Asciidoctor's CLI is a drop-in replacement for the +asciidoc.py+ command from the Python implementation.
 To invoke Asciidoctor from the CLI, execute:
@@ -267,6 +279,8 @@ It will fallback to its default templates for everything else.
 [source]
 puts Asciidoctor.render '*This* is http://asciidoc.org[AsciiDoc]!', :header_footer => true,
    :template_dir => 'templates'
+
+// QUESTION Keep it short and add a "For more information..." ?
 
 The Document and Section templates should begin with +document.+ and +section.+, respectively.
 The file extension is used by Tilt to determine which view framework it will use to render the template.
