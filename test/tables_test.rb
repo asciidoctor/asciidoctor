@@ -834,5 +834,25 @@ a;b;c
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 3
       assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
     end
+
+    test 'custom separator on AsciiDoc table cell' do
+      input = <<-EOS
+[cols=2,separator=!]
+|===
+!Pipe output to vim
+a!
+----
+asciidoctor -o - -s test.adoc | view -
+----
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > tbody > tr', output, 1
+      assert_css 'table > tbody > tr:nth-child(1) > td', output, 2
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(1) p', output, 1
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(2) .listingblock', output, 1
+    end
   end
 end

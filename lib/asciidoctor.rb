@@ -733,7 +733,7 @@ module Asciidoctor
     #   2.3+<.>m
     #
     # FIXME use step-wise scan (or treetop) rather than this mega-regexp
-    CellSpecStartRx = /^#{CG_BLANK}*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?\|/
+    CellSpecStartRx = /^#{CG_BLANK}*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
     CellSpecEndRx = /#{CG_BLANK}+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
 
     # Block macros
