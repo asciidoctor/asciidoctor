@@ -69,6 +69,14 @@ class Document < AbstractBlock
   # this level is not currently implemented (and therefore not enforced)!
   attr_reader :safe
 
+  # Public: Get the AsciiDoc compatibility mode (:default or :legacy)
+  #
+  # :legacy mode activates the following syntax changes:
+  # 
+  #   * single quotes as constrained emphasis formatting marks
+  #
+  attr_reader :compat_mode
+
   # Public: Get the Hash of document references
   attr_reader :references
 
@@ -126,8 +134,10 @@ class Document < AbstractBlock
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
       attr_overrides = parent_doc.attributes.dup
       attr_overrides.delete 'doctype'
+      attr_overrides.delete 'compat-mode'
       @attribute_overrides = attr_overrides
       @safe = parent_doc.safe
+      @compat_mode = parent_doc.compat_mode
       @converter = parent_doc.converter
       initialize_extensions = false
       @extensions = parent_doc.extensions
@@ -193,6 +203,7 @@ class Document < AbstractBlock
     attrs['prewrap'] = ''
     attrs['attribute-undefined'] = Compliance.attribute_undefined
     attrs['attribute-missing'] = Compliance.attribute_missing
+    attrs['compat-mode'] = 'default'
     attrs['iconfont-remote'] = ''
 
     # language strings
@@ -297,7 +308,17 @@ class Document < AbstractBlock
       verdict
     end
 
+    if (attrs['compat-mode'] == 'legacy')
+      @compat_mode = :legacy
+    else
+      attrs['compat-mode'] = 'default'
+      @compat_mode = :default
+    end
+
     if parent_doc
+      # setup default doctype (backend is fixed)
+      attrs['doctype'] ||= DEFAULT_DOCTYPE
+
       # don't need to do the extra processing within our own document
       # FIXME line info isn't reported correctly within include files in nested document
       @reader = Reader.new data, options[:cursor]
@@ -642,6 +663,8 @@ class Document < AbstractBlock
       @attributes['toc-class'] ||= default_toc_class if default_toc_class
       @attributes['toc-position'] ||= default_toc_position if default_toc_position
     end
+
+    @compat_mode = (@attributes['compat-mode'] == 'legacy' ? :legacy : :default)
 
     @original_attributes = @attributes.dup
 

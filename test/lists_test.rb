@@ -626,7 +626,7 @@ List
 ====
 
 - I am *strong*.
-- I am 'stressed'.
+- I am _stressed_.
 - I am `flexible`.
       EOS
       output = render_string input
@@ -2795,7 +2795,7 @@ term1::
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath %(//*[@class="dlist"]//dd/p/em[text()="'"]), output, 1
+      assert_xpath %(//*[@class="dlist"]//dd/p[text()="'''"]), output, 1
     end
   
     test 'folds text that looks like ruler offset by blank line and line comment' do
@@ -2811,7 +2811,7 @@ term1::
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath %(//*[@class="dlist"]//dd/p/em[text()="'"]), output, 1
+      assert_xpath %(//*[@class="dlist"]//dd/p[text()="'''"]), output, 1
     end
   
     test 'folds text that looks like ruler and the line following it offset by blank line' do
@@ -2827,8 +2827,7 @@ continued
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
-      assert_xpath %(//*[@class="dlist"]//dd/p/em[text()="'"]), output, 1
-      assert_xpath %(//*[@class="dlist"]//dd/p[normalize-space(text())="continued"]), output, 1
+      assert_xpath %(//*[@class="dlist"]//dd/p[normalize-space(text())="''' continued"]), output, 1
     end
   
     test 'folds text that looks like title offset by blank line' do

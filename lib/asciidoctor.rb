@@ -1117,8 +1117,8 @@ module Asciidoctor
   # constrained quotes:: must be bordered by non-word characters
   # NOTE these substitutions are processed in the order they appear here and
   # the order in which they are replaced is important
-  QUOTE_SUBS = [
-
+  QUOTE_SUBS = { :default =>
+  [
     # **strong**
     [:strong, :unconstrained, /\\?(?:\[([^\]]+?)\])?\*\*(.+?)\*\*/m],
 
@@ -1127,9 +1127,6 @@ module Asciidoctor
 
     # ``double-quoted''
     [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?``(\S|\S.*?\S)''(?!#{CG_WORD})/m],
-
-    # 'emphasis'
-    [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m],
 
     # `single-quoted'
     [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?!#{CG_WORD})/m],
@@ -1157,7 +1154,10 @@ module Asciidoctor
 
     # ~subscript~
     [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?~(\S*?)~/m]
-  ]
+  ]}
+
+  QUOTE_SUBS[:legacy] = QUOTE_SUBS[:default].dup.
+    insert(3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m])
 
   # NOTE in Ruby 1.8.7, [^\\] does not match start of line,
   # so we need to match it explicitly
@@ -1175,10 +1175,10 @@ module Asciidoctor
     [/(#{CG_WORD})\\?--(?=#{CG_WORD})/, '&#8212;', :leading],
     # ellipsis
     [/\\?\.\.\./, '&#8230;', :leading],
-    # apostrophe or a closing single quote (planned)
-    [/(#{CG_ALPHA})\\?'(?!')/, '&#8217;', :leading],
-    # an opening single quote (planned)
-    #[/\B\\?'(?=#{CG_ALPHA})/, '&#8216;', :none],
+    # right single quote
+    [/\\?`'/, '&#8217;', :none],
+    # apostrophe (inside a word)
+    [/(#{CG_ALNUM})\\?'(?=#{CG_ALPHA})/, '&#8217;', :leading],
     # right arrow ->
     [/\\?-&gt;/, '&#8594;', :none],
     # right double arrow =>

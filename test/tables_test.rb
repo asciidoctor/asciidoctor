@@ -601,6 +601,20 @@ content
       assert_css 'table.tableblock .paragraph', result, 0
     end
 
+    test 'compat-mode can be set in asciidoc table cell' do
+      input = <<-EOS
+|===
+a|
+:compat-mode: legacy
+
+'italic'
+|===
+      EOS
+
+      result = render_embedded_string input
+      assert_css 'table.tableblock td em', result, 1
+    end
+
     test 'asciidoc content' do
       input = <<-EOS
 [cols="1e,1,5a",frame="topbot",options="header"]

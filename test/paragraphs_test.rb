@@ -367,7 +367,7 @@ A famouse quote.
     test 'should perform normal subs on a verse paragraph' do
       input = <<-EOS
 [verse]
-'GET /groups/link:#group-id[\{group-id\}]'
+_GET /groups/link:#group-id[\{group-id\}]_
       EOS
 
       output = render_embedded_string input

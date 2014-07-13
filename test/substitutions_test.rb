@@ -10,7 +10,7 @@ end
 context 'Substitutions' do
   context 'Dispatcher' do
     test 'apply normal substitutions' do
-      para = block_from_string("[blue]'http://asciidoc.org[AsciiDoc]' & [red]*Ruby*\n&#167; Making +++<u>documentation</u>+++ together +\nsince (C) {inception_year}.")
+      para = block_from_string("[blue]_http://asciidoc.org[AsciiDoc]_ & [red]*Ruby*\n&#167; Making +++<u>documentation</u>+++ together +\nsince (C) {inception_year}.")
       para.document.attributes['inception_year'] = '2012'
       result = para.apply_normal_subs(para.lines) 
       assert_equal %{<em class="blue"><a href="http://asciidoc.org">AsciiDoc</a></em> &amp; <strong class="red">Ruby</strong>\n&#167; Making <u>documentation</u> together<br>\nsince &#169; 2012.}, result
@@ -124,29 +124,41 @@ context 'Substitutions' do
     end if ::RUBY_MIN_VERSION_1_9
 
     test 'single-line constrained quote variation emphasized string' do
-      para = block_from_string(%q{'a few emphasized words'})
+      para = block_from_string(%q{_a few emphasized words_})
       assert_equal '<em>a few emphasized words</em>', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line constrained quote variation emphasized string' do
+      para = block_from_string(%q{\_a few emphasized words_})
+      assert_equal %q(_a few emphasized words_), para.sub_quotes(para.source)
+    end
+
+    test 'escaped single quoted string' do
       para = block_from_string(%q{\'a few emphasized words'})
-      assert_equal %q('a few emphasized words'), para.sub_quotes(para.source)
+      # NOTE the \' is replaced with ' by the :replacements substitution, later in the substitution pipeline
+      assert_equal %q(\'a few emphasized words'), para.sub_quotes(para.source)
     end
 
     test 'multi-line constrained emphasized quote variation string' do
-      para = block_from_string(%Q{'a few\nemphasized words'})
+      para = block_from_string(%Q{_a few\nemphasized words_})
       assert_equal "<em>a few\nemphasized words</em>", para.sub_quotes(para.source)
     end
 
     test 'single-quoted string containing an emphasized phrase' do
-      para = block_from_string(%q{`I told him, 'Just go for it!''})
+      para = block_from_string(%q{`I told him, 'Just go for it!''}, :attributes => {'compat-mode' => 'legacy'})
       assert_equal '&#8216;I told him, <em>Just go for it!</em>&#8217;', para.sub_quotes(para.source)
+
+      # NOTE yes, the result seems odd, but we are verifying the correct odd behavior ;)
+      para = block_from_string(%q{`I told him, 'Just go for it!''})
+      assert_equal %q(&#8216;I told him, 'Just go for it!&#8217;'), para.sub_quotes(para.source)
     end
 
     test 'escaped single-quotes inside emphasized words are restored' do
+      para = block_from_string(%q{'Here\'s Johnny!'}, :attributes => {'compat-mode' => 'legacy'})
+      assert_equal %q(<em>Here's Johnny!</em>), para.apply_subs(para.source)
+
       para = block_from_string(%q{'Here\'s Johnny!'})
-      # NOTE the \' is replaced with ' by the :replacements substitution, later in the substitution pipeline
-      assert_equal %q{<em>Here\'s Johnny!</em>}, para.sub_quotes(para.source)
+      assert_equal %q('Here's Johnny!'), para.apply_subs(para.source)
     end
 
     test 'single-line constrained emphasized underline variation string' do
@@ -1251,28 +1263,34 @@ foo&#8201;&#8212;&#8201;'
     end
 
     test 'replaces punctuation' do
-      para = block_from_string %(John's Hideout is the Whites' place... foo\\'bar)
+      para = block_from_string %(John's Hideout is the Whites`' place... foo\\'bar)
       assert_equal "John&#8217;s Hideout is the Whites&#8217; place&#8230; foo'bar", para.sub_replacements(para.source)
     end
 
-    test 'should replace typographic apostrophe with smart apostrophe at the end of a word' do
+    test 'should replace right single quote marks' do
       given = [
-        %(the whites' place),
-        %(the whites'.),
-        %(the whites'--where the wild things are),
-        %(the whites'\nhave),
+        %(`'Twas the night),
+        %(a `'57 Chevy!),
+        %(the whites`' place),
+        %(the whites`'.),
+        %(the whites`'--where the wild things are),
+        %(the whites`'\nhave),
+        %(It's Mary`'s little lamb.),
         %(consecutive single quotes '' are not modified),
         %(he is 6' tall),
-        %(the whites\\' place)
+        %(\\`')
       ]
       expected = [
+        %(&#8217;Twas the night),
+        %(a &#8217;57 Chevy!),
         %(the whites&#8217; place),
         %(the whites&#8217;.),
         %(the whites&#8217;--where the wild things are),
         %(the whites&#8217;\nhave),
+        %(It&#8217;s Mary&#8217;s little lamb.),
         %(consecutive single quotes '' are not modified),
         %(he is 6' tall),
-        %(the whites' place)
+        %(`')
       ]
       given.size.times {|i|
         para = block_from_string given[i]
