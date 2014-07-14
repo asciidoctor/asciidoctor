@@ -1153,10 +1153,10 @@ module Asciidoctor
     [:none, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?!#{CG_WORD})/m],
 
     # ^superscript^
-    [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(.+?)\^/m],
+    [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(\S*?)\^/m],
 
     # ~subscript~
-    [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?~(.+?)~/m]
+    [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?~(\S*?)~/m]
   ]
 
   # NOTE in Ruby 1.8.7, [^\\] does not match start of line,
