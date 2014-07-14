@@ -14,7 +14,7 @@ class Block < AbstractBlock
     :image => :empty,
     :listing => :verbatim,
     :literal => :verbatim,
-    :math => :raw,
+    :stem => :raw,
     :open => :compound,
     :page_break => :empty,
     :pass => :raw,
