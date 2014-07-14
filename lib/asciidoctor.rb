@@ -906,13 +906,18 @@ module Asciidoctor
     #
     MenuInlineRx = /\\?"(#{CG_WORD}[^"]*?#{CG_BLANK}*&gt;#{CG_BLANK}*[^" \t][^"]*)"/
 
-    # Matches a passthrough literal value, which may span multiple lines.
+    # Matches an inline passthrough value, which may span multiple lines.
     #
     # Examples
     #
-    #   `text`
+    #   +text+
+    #   `text` (legacy)
     #
-    PassInlineLiteralRx = /(^|[^`#{CC_WORD}])(?:\[([^\]]+?)\])?(\\?`([^`\s]|[^`\s].*?\S)`)(?![`#{CC_WORD}])/m
+    # NOTE we always capture the attributes so we know when to use legacy behavior
+    PassInlineRx = {
+      :default => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+?)\])?(\\?(\+|`)(\S|\S.*?\S)\4)(?!#{CC_WORD})/m],
+      :legacy  => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+?)\])?(\\?(`)([^`\s]|[^`\s].*?\S)\4)(?![`#{CC_WORD}])/m]
+    }
 
     # Matches several variants of the passthrough inline macro, which may span multiple lines.
     #
@@ -922,7 +927,7 @@ module Asciidoctor
     #   $$text$$
     #   pass:quotes[text]
     #
-    PassInlineMacroRx = /\\?(?:(\+{3}|\${2})(.*?)\1|pass:([a-z,]*)\[(.*?[^\\])\])/m
+    PassInlineMacroRx = /(?:(?:(\\?)\[([^\]]+?)\])?(\\{0,2})(\+{2,3}|\${2})(.*?)\4|(\\?)pass:([a-z,]*)\[(.*?[^\\])\])/m
 
     # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
     #
@@ -1131,25 +1136,24 @@ module Asciidoctor
   # constrained quotes:: must be bordered by non-word characters
   # NOTE these substitutions are processed in the order they appear here and
   # the order in which they are replaced is important
-  QUOTE_SUBS = { :default =>
-  [
+  default_quote_subs = [
     # **strong**
     [:strong, :unconstrained, /\\?(?:\[([^\]]+?)\])?\*\*(.+?)\*\*/m],
 
     # *strong*
     [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\*(\S|\S.*?\S)\*(?!#{CG_WORD})/m],
 
+    # ``monospaced``
+    [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?``(.+?)``/m],
+
+    # `monospaced`
+    [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)`(?!#{CG_WORD})/m],
+
     # ``double-quoted''
     [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?``(\S|\S.*?\S)''(?!#{CG_WORD})/m],
 
     # `single-quoted'
     [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?!#{CG_WORD})/m],
-
-    # ++monospaced++
-    [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m],
-
-    # +monospaced+
-    [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?!#{CG_WORD})/m],
 
     # __emphasis__
     [:emphasis, :unconstrained, /\\?(?:\[([^\]]+?)\])?__(.+?)__/m],
@@ -1168,10 +1172,25 @@ module Asciidoctor
 
     # ~subscript~
     [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?~(\S*?)~/m]
-  ]}
+  ]
 
-  QUOTE_SUBS[:legacy] = QUOTE_SUBS[:default].dup.
-    insert(3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m])
+  legacy_quote_subs = default_quote_subs.dup
+  # remove +monospaced+ and +monospaced+ to reposition
+  legacy_quote_subs.delete_at 3
+  legacy_quote_subs.delete_at 2
+  # 'emphasis'
+  legacy_quote_subs.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m]
+  # ++monospaced++
+  legacy_quote_subs.insert 5, [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m]
+  # +monospaced+
+  legacy_quote_subs.insert 6, [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?!#{CG_WORD})/m]
+
+  QUOTE_SUBS = {
+    :default => default_quote_subs,
+    :legacy  => legacy_quote_subs,
+  }
+  default_quote_subs = nil
+  legacy_quote_subs = nil
 
   # NOTE in Ruby 1.8.7, [^\\] does not match start of line,
   # so we need to match it explicitly

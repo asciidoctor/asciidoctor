@@ -5,7 +5,7 @@ Feature: Text Formatting
   I want to be able to markup inline text with formatting characters
 
 
-  Scenario: Render text that contains superscript and subscript characters
+  Scenario: Convert text that contains superscript and subscript characters
   Given the AsciiDoc source
     """
     _v_~rocket~ is the value
@@ -23,5 +23,33 @@ Feature: Text Formatting
     log<sub>4</sub>x<sup>n</sup> is the expression
     M<sup>me</sup> White is the address
     the 10<sup>th</sup> point has coordinate (x<sub>10</sub>, y<sub>10</sub>)</p>
+    </div>
+    """
+
+
+  Scenario: Convert text that has ex-inline literal formatting
+  Given the AsciiDoc source
+    """
+    Use [x-]`{asciidoctor-version}` to print the version of Asciidoctor.
+    """
+  When it is converted to html
+  Then the result should match the HTML source
+    """
+    <div class="paragraph">
+    <p>Use <code>{asciidoctor-version}</code> to print the version of Asciidoctor.</p>
+    </div>
+    """
+
+
+  Scenario: Convert text that has ex-inline monospaced formatting
+  Given the AsciiDoc source
+    """
+    The document is assumed to be encoded as [x-]+{encoding}+.
+    """
+  When it is converted to html
+  Then the result should match the HTML source
+    """
+    <div class="paragraph">
+    <p>The document is assumed to be encoded as <code>UTF-8</code>.</p>
     </div>
     """

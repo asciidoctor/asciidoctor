@@ -415,7 +415,7 @@ last line
       # Safe Mode is not required here
       document = empty_document :base_dir => File.expand_path(File.dirname(__FILE__))
       document.extensions.include_processor do
-        process do |document, reader, target, attributes|
+        process do |doc, reader, target, attributes|
           # demonstrate that push_include normalizes endlines
           content = ["include target:: #{target}\n", "\n", "middle line\n"]
           reader.push_include content, target, target, 1, attributes

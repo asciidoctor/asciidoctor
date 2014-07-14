@@ -164,57 +164,132 @@ module Substitutors
   #
   # returns - The text with the passthrough region substituted with placeholders
   def extract_passthroughs(text)
+    compat_mode = @document.compat_mode
     text = text.gsub(PassInlineMacroRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
-      # honor the escape
-      if m[0].start_with? '\\'
-        next m[0][1..-1]
-      end
+      preceding = nil
 
-      if m[4].nil_or_empty?
-        text = m[2]
-        subs = (m[1] == '$$' ? [:specialcharacters] : [])
-      else
-        text = unescape_brackets m[4]
-        if m[3].nil_or_empty?
-          subs = []
+      if (boundary = m[4]).nil_or_empty? # pass:[]
+        if m[6] == '\\'
+          # NOTE we don't look for nested pass:[] macros
+          next m[0][1..-1]
+        end
+
+        @passthroughs << {:text => (unescape_brackets m[8]), :subs => (m[7].nil_or_empty? ? [] : (resolve_pass_subs m[7]))}
+      else # $$, ++ or +++
+        # skip ++ in legacy mode, handled as normal quoted text
+        if compat_mode == :legacy && boundary == '++'
+          next m[2].nil_or_empty? ?
+              %(#{m[1]}#{m[3]}++#{extract_passthroughs m[5]}++) :
+              %(#{m[1]}[#{m[2]}]#{m[3]}++#{extract_passthroughs m[5]}++)
+        end
+
+        attributes = m[2]
+
+        # fix non-matching group results in Opal under Firefox
+        if ::RUBY_ENGINE_OPAL
+          attributes = nil if attributes == ''
+        end
+
+        escape_count = m[3].size
+        content = m[5]
+        old_behavior = false
+
+        if attributes
+          if escape_count > 0
+            # NOTE we don't look for nested unconstrained pass macros
+            next %(#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
+          elsif m[1] == '\\'
+            preceding = %([#{attributes}])
+            attributes = nil
+          else
+            if boundary == '++' && (attributes.end_with? 'x-')
+              old_behavior = true
+              attributes = attributes[0...-2]
+            end
+            attributes = parse_attributes attributes
+          end
+        elsif escape_count > 0
+          # NOTE we don't look for nested unconstrained pass macros
+          next %(#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
+        end
+        subs = (boundary == '+++' ? [] : [:specialcharacters])
+
+        if attributes
+          if old_behavior
+            @passthroughs << {:text => content, :subs => SUBS[:normal], :type => :monospaced, :attributes => attributes}
+          else
+            @passthroughs << {:text => content, :subs => subs, :type => :unquoted, :attributes => attributes}
+          end
         else
-          subs = resolve_pass_subs m[3]
+          @passthroughs << {:text => content, :subs => subs}
         end
       end
 
-      @passthroughs << {:text => text, :subs => subs}
-      index = @passthroughs.size - 1
-      %(#{PASS_START}#{index}#{PASS_END})
+      %(#{preceding}#{PASS_START}#{@passthroughs.size - 1}#{PASS_END})
     } if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
-    text = text.gsub(PassInlineLiteralRx) {
+    pass_inline_char1, pass_inline_char2, pass_inline_rx = PassInlineRx[compat_mode]
+    text = text.gsub(pass_inline_rx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
+      preceding = m[1]
+      attributes = m[2]
+      escape_mark = (m[3].start_with? '\\') ? '\\' : nil
+      format_mark = m[4]
+      content = m[5]
+
       # fix non-matching group results in Opal under Firefox
       if ::RUBY_ENGINE_OPAL
-        m[2] = nil if m[2] == ''
+        attributes = nil if attributes == ''
       end
 
-      unescaped_attrs = nil
-      # honor the escape
-      if m[3].start_with? '\\'
-        next m[2] ? %(#{m[1]}[#{m[2]}]#{m[3][1..-1]}) : %(#{m[1]}#{m[3][1..-1]})
-      elsif m[1] == '\\' && m[2]
-        unescaped_attrs = "[#{m[2]}]"
-      end
-
-      if !unescaped_attrs && m[2]
-        attributes = parse_attributes(m[2])
+      if compat_mode == :default
+        if (old_behavior = (attributes && (attributes.end_with? 'x-')))
+          attributes = attributes[0...-2]
+        end
       else
-        attributes = nil
+        old_behavior = true
       end
 
-      @passthroughs << {:text => m[4], :subs => [:specialcharacters], :attributes => attributes, :type => :monospaced}
-      index = @passthroughs.size - 1
-      %(#{unescaped_attrs || m[1]}#{PASS_START}#{index}#{PASS_END})
-    } if (text.include? '`')
+      if attributes
+        if format_mark == '`' && !old_behavior
+          next %(#{preceding}[#{attributes}]#{escape_mark}`#{extract_passthroughs content}`)
+        end
+
+        if escape_mark
+          # honor the escape of the formatting mark
+          next "#{preceding}[#{attributes}]#{m[3][1..-1]}"
+        elsif preceding == '\\'
+          # honor the escape of the attributes
+          preceding = %([#{attributes}])
+          attributes = nil
+        else
+          attributes = parse_attributes attributes
+        end
+      elsif format_mark == '`' && !old_behavior
+        next %(#{preceding}#{escape_mark}`#{extract_passthroughs content}`)
+      elsif escape_mark
+        # honor the escape of the formatting mark
+        next "#{preceding}#{m[3][1..-1]}"
+      end
+
+      if compat_mode == :legacy
+        @passthroughs << {:text => content, :subs => [:specialcharacters], :attributes => attributes, :type => :monospaced}
+      elsif attributes
+        if old_behavior
+          subs = (format_mark == '`' ? [:specialcharacters] : SUBS[:normal])
+          @passthroughs << {:text => content, :subs => subs, :attributes => attributes, :type => :monospaced}
+        else
+          @passthroughs << {:text => content, :subs => [:specialcharacters], :attributes => attributes, :type => :unquoted}
+        end
+      else
+        @passthroughs << {:text => content, :subs => [:specialcharacters]}
+      end
+
+      %(#{preceding}#{PASS_START}#{@passthroughs.size - 1}#{PASS_END})
+    } if (text.include? pass_inline_char1) || (pass_inline_char2 && (text.include? pass_inline_char2))
 
     # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
     text = text.gsub(StemInlineMacroRx) {
@@ -228,16 +303,15 @@ module Substitutors
       if (type = m[1].to_sym) == :stem
         type = ((default_stem_type = document.attributes['stem']).nil_or_empty? ? 'asciimath' : default_stem_type).to_sym
       end
-      text = unescape_brackets m[3]
+      content = unescape_brackets m[3]
       if m[2].nil_or_empty?
         subs = (@document.basebackend? 'html') ? [:specialcharacters] : []
       else
         subs = resolve_pass_subs m[2]
       end
 
-      @passthroughs << {:text => text, :subs => subs, :type => type}
-      index = @passthroughs.size - 1
-      "#{PASS_START}#{index}#{PASS_END}"
+      @passthroughs << {:text => content, :subs => subs, :type => type}
+      %(#{PASS_START}#{@passthroughs.size - 1}#{PASS_END})
     } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
     text
@@ -659,7 +733,7 @@ module Substitutors
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
-          # NOTE Opal doesn't like %() as an enclosure around this string
+          # NOTE Opal doesn't like %() as an enclosure around this string because of range
           next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
         end
         # fix non-matching group results in Opal under Firefox
@@ -1371,7 +1445,7 @@ module Substitutors
 
     # fix passthrough placeholders that got caught up in syntax highlighting
     unless @passthroughs.empty?
-      result = result.gsub PASS_MATCH_HI, "#{PASS_START}\\1#{PASS_END}"
+      result = result.gsub PASS_MATCH_HI, %(#{PASS_START}\\1#{PASS_END})
     end
 
     if !sub_callouts || callout_marks.empty?

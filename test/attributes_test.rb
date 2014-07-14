@@ -480,6 +480,15 @@ v1.0, 2010-01-01: First release!
 .Require the +{gem_name}+ gem
 To use {gem_name}, the first thing to do is to import it in your Ruby source file.
       EOS
+      output = render_embedded_string input, :attributes => {'compat-mode' => 'legacy'}
+      assert_xpath '//*[@class="title"]/code[text()="asciidoctor"]', output, 1
+
+      input = <<-EOS
+:gem_name: asciidoctor
+
+.Require the `{gem_name}` gem
+To use {gem_name}, the first thing to do is to import it in your Ruby source file.
+      EOS
       output = render_embedded_string input
       assert_xpath '//*[@class="title"]/code[text()="asciidoctor"]', output, 1
     end
