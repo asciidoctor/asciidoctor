@@ -317,9 +317,14 @@ context 'Substitutions' do
       assert_equal 'x^2^ = x * x', para.sub_quotes(para.source)
     end
 
-    test 'multi-line superscript chars' do
+    test 'does not match superscript across whitespace' do
       para = block_from_string(%Q{x^(n\n-\n1)^})
-      assert_equal "x<sup>(n\n-\n1)</sup>", para.sub_quotes(para.source)
+      assert_equal para.source, para.sub_quotes(para.source)
+    end
+
+    test 'does not confuse superscript and links with blank window shorthand' do
+      para = block_from_string(%Q{http://localhost[Text^] on the 21^st^ and 22^nd^})
+      assert_equal '<a href="http://localhost" target="_blank">Text</a> on the 21<sup>st</sup> and 22<sup>nd</sup>', para.content
     end
 
     test 'single-line subscript chars' do
@@ -332,9 +337,14 @@ context 'Substitutions' do
       assert_equal 'H~2~O', para.sub_quotes(para.source)
     end
 
-    test 'multi-line subscript chars' do
+    test 'does not match subscript across whitespace' do
       para = block_from_string(%Q{project~ view\non\nGitHub~})
-      assert_equal "project<sub> view\non\nGitHub</sub>", para.sub_quotes(para.source)
+      assert_equal para.source, para.sub_quotes(para.source)
+    end
+
+    test 'does not match subscript across distinct URLs' do
+      para = block_from_string(%Q{http://www.abc.com/~def[DEF] and http://www.abc.com/~ghi[GHI]})
+      assert_equal para.source, para.sub_quotes(para.source)
     end
 
     test 'quoted text with role shorthand' do
