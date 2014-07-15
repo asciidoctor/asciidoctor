@@ -19,7 +19,7 @@ Feature: Cross References
   When it is converted to html
   Then the result should match the HTML structure
     """
-    table.tableblock.frame-all.grid-all style='width: 100%;'
+    table.tableblock.frame-all.grid-all.spread
       colgroup
         col style='width: 100%;'
       tbody
@@ -34,3 +34,83 @@ Feature: Cross References
       .sectionbody
         .paragraph: p Instructions go here.
     """
+
+
+    Scenario: Create a cross reference using the target section title
+    Given the AsciiDoc source
+      """
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to <<Section One>>
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_section_one Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          'refer to
+          a href='#_section_one' Section One
+      """
+
+
+    Scenario: Create a cross reference using the target reftext
+    Given the AsciiDoc source
+      """
+      [reftext="the first section"]
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to <<the first section>>
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_section_one Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          'refer to
+          a href='#_section_one' the first section
+      """
+
+
+    Scenario: Create a cross reference using the formatted target title
+    Given the AsciiDoc source
+      """
+      == Section *One*
+
+      content
+
+      == Section Two
+
+      refer to <<Section *One*>>
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_section_strong_one_strong
+          'Section
+          strong One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          'refer to
+          a href='#_section_strong_one_strong'
+            'Section
+            strong One
+      """

@@ -962,23 +962,29 @@ module Substitutors
           fragment = id
         end
 
-        # handles form: id
-        if !path
-          refid = fragment
-          target = "##{fragment}"
         # handles forms: doc#, doc.adoc#, doc#id and doc.adoc#id
-        else
+        if path
           path = Helpers.rootname(path)
           # the referenced path is this document, or its contents has been included in this document
           if @document.attributes['docname'] == path || @document.references[:includes].include?(path)
             refid = fragment
             path = nil
-            target = "##{fragment}"
+            target = %(##{fragment})
           else
             refid = fragment ? %(#{path}##{fragment}) : path
             path = "#{@document.attributes['relfileprefix']}#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'}"
             target = fragment ? %(#{path}##{fragment}) : path
           end
+        # handles form: id or Section Title
+        else
+          # resolve fragment as reftext if cannot be resolved as refid and looks like reftext
+          if !(@document.references[:ids].has_key? fragment) &&
+              ((fragment.include? ' ') || fragment.downcase != fragment) &&
+              (resolved_id = RUBY_MIN_VERSION_1_9 ? (@document.references[:ids].key fragment) : (@document.references[:ids].index fragment))
+            fragment = resolved_id
+          end
+          refid = fragment
+          target = %(##{fragment})
         end
         Inline.new(self, :anchor, reftext, :type => :xref, :target => target, :attributes => {'path' => path, 'fragment' => fragment, 'refid' => refid}).convert
       }

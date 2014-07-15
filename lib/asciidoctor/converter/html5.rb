@@ -945,7 +945,7 @@ Your browser does not support the video tag.
       case node.type
       when :xref
         refid = (node.attr 'refid') || target
-        # FIXME seems like text should be prepared already
+        # NOTE we lookup text in converter because DocBook doesn't need this logic
         text = node.text || (node.document.references[:ids][refid] || %([#{refid}]))
         %(<a href="#{target}">#{text}</a>)
       when :ref
