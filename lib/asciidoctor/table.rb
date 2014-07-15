@@ -461,11 +461,15 @@ class Table::ParserContext
       end
     end
 
-    1.upto(repeat) {|i|
+    1.upto(repeat) do |i|
       # make column resolving an operation
       if @col_count == -1
-        @table.columns << Table::Column.new(@table, @current_row.size + i - 1)
-        column = @table.columns[-1]
+        @table.columns << (column = Table::Column.new(@table, @current_row.size + i - 1))
+        if cell_spec && (cell_spec.has_key? 'colspan') && (extra_cols = cell_spec['colspan'].to_i - 1) > 0
+          extra_cols.times do |j|
+            @table.columns << Table::Column.new(@table, @current_row.size + i + j - 1)
+          end
+        end
       else
         # QUESTION is this right for cells that span columns?
         column = @table.columns[@current_row.size]
@@ -481,7 +485,7 @@ class Table::ParserContext
       # don't close the row if we're on the first line and the column count has not been set explicitly
       # TODO perhaps the col_count/linenum logic should be in end_of_row? (or a should_end_row? method)
       close_row if end_of_row? && (@col_count != -1 || @linenum > 0 || (eol && i == repeat))
-    }
+    end
     @open_cell = false
     nil
   end
