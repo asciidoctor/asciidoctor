@@ -487,6 +487,22 @@ d|9 2+>|10
       assert_css 'table > tbody > tr:nth-child(4) > td:nth-child(2).halign-right.valign-top[colspan="2"] p code', output, 1
     end
 
+    test 'sets up columns correctly if first row has cell that spans columns' do
+      input = <<-EOS
+|===
+2+^|AAA |CCC
+|AAA |BBB |CCC
+|AAA |BBB |CCC
+|===
+      EOS
+      output = render_embedded_string input 
+      assert_css 'table > tbody > tr:nth-child(1) > td', output, 2
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(1)[colspan="2"]', output, 1
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(2):not([colspan])', output, 1
+      assert_css 'table > tbody > tr:nth-child(2) > td:not([colspan])', output, 3
+      assert_css 'table > tbody > tr:nth-child(3) > td:not([colspan])', output, 3
+    end
+
     test 'supports repeating cells' do
       input = <<-EOS
 |===
