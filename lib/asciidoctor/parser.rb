@@ -2491,10 +2491,7 @@ class Parser
     original_style = attributes['style']
     raw_style = attributes[1]
     # NOTE spaces are not allowed in shorthand, so if we find one, this ain't shorthand
-    if !raw_style || raw_style.include?(' ')
-      attributes['style'] = raw_style
-      [raw_style, original_style]
-    else
+    if raw_style && !raw_style.include?(' ') && Compliance.shorthand_property_syntax
       type = :style
       collector = []
       parsed = {}
@@ -2570,6 +2567,9 @@ class Parser
       end
 
       [parsed_style, original_style]
+    else
+      attributes['style'] = raw_style
+      [raw_style, original_style]
     end
   end
 
