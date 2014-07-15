@@ -359,7 +359,7 @@ b.conum * { color: inherit !important; }
 .conum:not([data-value]):empty { display: none; }
 .literalblock > .content > pre, .listingblock > .content > pre { -webkit-border-radius: 0; border-radius: 0; }
 .print-only { display: none !important; }
-@media print { @page { margin: 0.5cm; }
+@media print { @page { margin: 1.25cm 0.75cm; }
   * { -webkit-box-shadow: none !important; box-shadow: none !important; text-shadow: none !important; }
   a, a:visited { color: inherit !important; text-decoration: underline !important; }
   a[href^="http:"]:after, a[href^="https:"]:after { content: " (" attr(href) ")"; }
@@ -376,6 +376,14 @@ b.conum * { color: inherit !important; }
   #toc { border-bottom: 1px solid #d8d8d8 !important; padding-bottom: 0 !important; }
   .sect1 { padding-bottom: 0 !important; }
   .sect1 + .sect1 { border: none !important; }
+  body.book #header { text-align: center; }
+  body.book #header > h1 { border: none !important; margin: 2.5em 0 1em 0; padding: 0; }
+  body.book #header span { line-height: 1.6; }
+  body.book #header br { display: block; }
+  body.book #header br + span { padding-left: 0; }
+  body.book #header br + span:before { content: none !important; }
+  body.book #toc { border: none !important; text-align: left !important; padding: 0 !important; }
+  body.book #toc, body.book #preamble, body.book h1.sect0, body.book .sect1 > h2 { page-break-before: always; }
   .literalblock pre, .literalblock pre[class], .listingblock pre, .listingblock pre[class] { border: none !important; background: #f5f5f5 !important; padding: 0.75em !important; }
   .listingblock pre.highlight { padding: 0 !important; }
   .listingblock pre.highlight > code { background: #f5f5f5 !important; padding: 0.75em !important; }
