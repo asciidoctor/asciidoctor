@@ -235,9 +235,17 @@ table.pyhltable .linenodiv { background-color: transparent !important; padding-r
 table.tableblock { max-width: 100%; }
 table.tableblock td .paragraph:last-child p > p:last-child, table.tableblock th > p:last-child, table.tableblock td > p:last-child { margin-bottom: 0; }
 table.spread { width: 100%; }
-table.grid-all { border-collapse: separate; border-spacing: 1px; -webkit-border-radius: 4px; border-radius: 4px; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; }
-table.frame-topbot, table.frame-none { border-left: 0; border-right: 0; }
-table.frame-sides, table.frame-none { border-top: 0; border-bottom: 0; }
+table.tableblock, th.tableblock, td.tableblock { border: 0 solid #dddddd; }
+table.grid-all th.tableblock, table.grid-all td.tableblock { border-width: 0 1px 1px 0; }
+table.grid-all tfoot > tr > th.tableblock, table.grid-all tfoot > tr > td.tableblock { border-width: 1px 1px 0 0; }
+table.grid-cols th.tableblock, table.grid-cols td.tableblock { border-width: 0 1px 0 0; }
+table.grid-all * > tr > .tableblock:last-child, table.grid-cols * > tr > .tableblock:last-child { border-right-width: 0; }
+table.grid-rows th.tableblock, table.grid-rows td.tableblock { border-width: 0 0 1px 0; }
+table.grid-all tbody > tr:last-child > th.tableblock, table.grid-all tbody > tr:last-child > td.tableblock, table.grid-all thead:last-child > tr > th.tableblock, table.grid-rows tbody > tr:last-child > th.tableblock, table.grid-rows tbody > tr:last-child > td.tableblock, table.grid-rows thead:last-child > tr > th.tableblock { border-bottom-width: 0; }
+table.grid-rows tfoot > tr > th.tableblock, table.grid-rows tfoot > tr > td.tableblock { border-width: 1px 0 0 0; }
+table.frame-all { border-width: 1px; }
+table.frame-sides { border-width: 0 1px; }
+table.frame-topbot { border-width: 1px 0; }
 th.halign-left, td.halign-left { text-align: left; }
 th.halign-right, td.halign-right { text-align: right; }
 th.halign-center, td.halign-center { text-align: center; }
