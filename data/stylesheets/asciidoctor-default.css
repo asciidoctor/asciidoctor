@@ -133,7 +133,7 @@ p a > code:hover { color: #561309; }
 #header br + span:before { content: "\2013 \0020"; }
 #header br + span.author { padding-left: 0; }
 #header br + span.author:before { content: ", "; }
-#toc { border-bottom: 3px double #e5e5e5; padding-bottom: 1.25em; }
+#toc { border-bottom: 3px double #e5e5e5; padding-top: 1em; padding-bottom: 1.25em; }
 #toc > ul { margin-left: 0.25em; }
 #toc ul.sectlevel0 > li > a { font-style: italic; }
 #toc ul.sectlevel0 ul.sectlevel1 { margin-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
@@ -141,7 +141,6 @@ p a > code:hover { color: #561309; }
 #toc a { text-decoration: none; }
 #toc a:active { text-decoration: underline; }
 #toctitle { color: #7a2518; }
-#header #toc { padding-top: 1.25em; }
 @media only screen and (min-width: 768px) { body.toc2 { padding-left: 15em; padding-right: 0; }
   #toc.toc2 { background-color: #fafaf9; position: fixed; width: 15em; left: 0; top: 0; border-right: 1px solid #e5e5e5; border-bottom: 0; z-index: 1000; padding: 1.25em 1em; height: 100%; overflow: auto; }
   #toc.toc2 #toctitle { margin-top: 0; font-size: 1.2em; }
