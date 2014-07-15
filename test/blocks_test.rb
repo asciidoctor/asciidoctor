@@ -495,7 +495,7 @@ ____
       input = <<-EOS
 [verse]
 ____
-'GET /groups/link:#group-id[\{group-id\}]'
+_GET /groups/link:#group-id[\{group-id\}]_
 ____
       EOS
 
@@ -919,7 +919,7 @@ AssertionError
 
       assert_css '.listingblock pre', output, 1
       assert_css '.listingblock pre strong', output, 1
-      assert_css '.listingblock pre em', output, 1
+      assert_css '.listingblock pre em', output, 0
 
       input2 = <<-EOS
 [subs="specialcharacters,macros"]
@@ -1077,7 +1077,7 @@ image:tiger.png[]
 
 [subs="attributes,quotes,macros"]
 ++++
-This is a '{type}' block.
+This is a _{type}_ block.
 http://asciidoc.org
 ++++
       EOS

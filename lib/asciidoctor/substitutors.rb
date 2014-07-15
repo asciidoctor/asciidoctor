@@ -280,14 +280,14 @@ module Substitutors
   def sub_quotes(text)
     if ::RUBY_ENGINE_OPAL
       result = text
-      QUOTE_SUBS.each {|type, scope, pattern|
+      QUOTE_SUBS[@document.compat_mode].each {|type, scope, pattern|
         result = result.gsub(pattern) { convert_quoted_text $~, type, scope }
       }
     else
       # NOTE interpolation is faster than String#dup
       result = %(#{text})
-      # NOTE using gsub! as optimization
-      QUOTE_SUBS.each {|type, scope, pattern|
+      # NOTE using gsub! here as an MRI Ruby optimization
+      QUOTE_SUBS[@document.compat_mode].each {|type, scope, pattern|
         result.gsub!(pattern) { convert_quoted_text $~, type, scope }
       }
     end

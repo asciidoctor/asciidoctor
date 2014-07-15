@@ -171,32 +171,43 @@ This line is separated something that is not a horizontal rule...
     end
   end
 
-  test "emphasized text" do
-    assert_xpath "//em", render_string("An 'emphatic' no")
+  test "emphasized text using underscore characters" do
+    assert_xpath "//em", render_string("An _emphatic_ no")
   end
 
-  test "emphasized text with single quote" do
-    assert_xpath "//em[text()=\"Johnny#{[8217].pack('U*')}s\"]", render_string("It's 'Johnny's' phone")
+  test 'emphasized text with single quote using apostrophe characters' do
+    rsquo = [8217].pack 'U*'
+    assert_xpath %(//em[text()="Johnny#{rsquo}s"]), render_string(%q(It's 'Johnny's' phone), :attributes => {'compat-mode' => 'legacy'})
+    assert_xpath %(//p[text()="It#{rsquo}s 'Johnny#{rsquo}s' phone"]), render_string(%q(It's 'Johnny's' phone))
   end
 
-  test "emphasized text with escaped single quote" do
-    assert_xpath "//em[text()=\"Johnny's\"]", render_string("It's 'Johnny\\'s' phone")
+  test 'emphasized text with escaped single quote using apostrophe characters' do
+    assert_xpath %(//em[text()="Johnny's"]), render_string(%q(It's 'Johnny\\'s' phone), :attributes => {'compat-mode' => 'legacy'})
+    assert_xpath %(//p[text()="It's 'Johnny's' phone"]), render_string(%q(It\\'s 'Johnny\\'s' phone))
   end
 
   test "escaped single quote is restored as single quote" do
     assert_xpath "//p[contains(text(), \"Let's do it!\")]", render_string("Let\\'s do it!")
   end
 
+  test 'unescape escaped single quote emphasis in legacy mode only' do
+    assert_xpath %(//p[text()="A 'single quoted string' example"]), render_embedded_string(%(A \\'single quoted string' example), :attributes => {'compat-mode' => 'legacy'})
+    assert_xpath %(//p[text()="'single quoted string'"]), render_embedded_string(%(\\'single quoted string'), :attributes => {'compat-mode' => 'legacy'})
+
+    assert_xpath %(//p[text()="A \\'single quoted string' example"]), render_embedded_string(%(A \\'single quoted string' example))
+    assert_xpath %(//p[text()="\\'single quoted string'"]), render_embedded_string(%(\\'single quoted string'))
+  end
+
   test "emphasized text at end of line" do
-    assert_xpath "//em", render_string("This library is 'awesome'")
+    assert_xpath "//em", render_string("This library is _awesome_")
   end
 
   test "emphasized text at beginning of line" do
-    assert_xpath "//em", render_string("'drop' it")
+    assert_xpath "//em", render_string("_drop_ it")
   end
 
   test "emphasized text across line" do
-    assert_xpath "//em", render_string("'check it'")
+    assert_xpath "//em", render_string("_check it_")
   end
 
   test "unquoted text" do
