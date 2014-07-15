@@ -1126,7 +1126,7 @@ line below
       EOS
 
       output = render_embedded_string input
-      assert_css '.mathblock', output, 1
+      assert_css '.stemblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
       assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
     end
@@ -1140,7 +1140,7 @@ line below
       EOS
 
       output = render_embedded_string input
-      assert_css '.mathblock', output, 1
+      assert_css '.stemblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
       assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
     end
@@ -1173,7 +1173,7 @@ sqrt(3x-1)+(1+x)^2 < y
       EOS
 
       output = render_embedded_string input
-      assert_css '.mathblock', output, 1
+      assert_css '.stemblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
       assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
     end
@@ -1187,7 +1187,7 @@ sqrt(3x-1)+(1+x)^2 < y
       EOS
 
       output = render_embedded_string input
-      assert_css '.mathblock', output, 1
+      assert_css '.stemblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
       assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
     end
@@ -1224,8 +1224,8 @@ x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
       EOS
 
       output = render_embedded_string input
-      assert_css '.mathblock', output, 1
-      assert_css '.mathblock .title', output, 1
+      assert_css '.stemblock', output, 1
+      assert_css '.stemblock .title', output, 1
       assert_xpath '//*[@class="title"][text()="The Lorenz Equations"]', output, 1
     end
 
@@ -1239,14 +1239,14 @@ a//b
       EOS
 
       output = render_embedded_string input
-      assert_css '.mathblock', output, 1
-      assert_css '.mathblock .title', output, 1
+      assert_css '.stemblock', output, 1
+      assert_css '.stemblock .title', output, 1
       assert_xpath '//*[@class="title"][text()="Simple fraction"]', output, 1
     end
 
-    test 'should add AsciiMath delimiters around math block content if math attribute != latexmath' do
+    test 'should add AsciiMath delimiters around stem block content if stem attribute != latexmath' do
       input = <<-'EOS'
-[math]
+[stem]
 ++++
 sqrt(3x-1)+(1+x)^2 < y
 ++++
@@ -1254,26 +1254,26 @@ sqrt(3x-1)+(1+x)^2 < y
 
       [
         {},
-        {'math' => ''},
-        {'math' => 'asciimath'}
+        {'stem' => ''},
+        {'stem' => 'asciimath'}
       ].each do |attributes|
         output = render_embedded_string input, :attributes => attributes
-        assert_css '.mathblock', output, 1
+        assert_css '.stemblock', output, 1
         nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
         assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
       end
     end
 
-    test 'should add LaTeX math delimiters around math block content if math attribute is latexmath' do
+    test 'should add LaTeX math delimiters around stem block content if stem attribute is latexmath' do
       input = <<-'EOS'
-[math]
+[stem]
 ++++
 \sqrt{3x-1}+(1+x)^2 < y
 ++++
       EOS
 
-      output = render_embedded_string input, :attributes => {'math' => 'latexmath'}
-      assert_css '.mathblock', output, 1
+      output = render_embedded_string input, :attributes => {'stem' => 'latexmath'}
+      assert_css '.stemblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
       assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
     end

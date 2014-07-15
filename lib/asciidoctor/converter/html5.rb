@@ -106,17 +106,17 @@ module Asciidoctor
 <script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>)
       end
 
-      if node.attr? 'math'
+      if node.attr? 'stem'
         result << %(<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {
     inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath]}],
     displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath]}],
-    ignoreClass: "nomath|nolatexmath"
+    ignoreClass: "nostem|nostem|nolatexmath"
   },
   asciimath2jax: {
     delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath]}],
-    ignoreClass: "nomath|noasciimath"
+    ignoreClass: "nostem|nostem|noasciimath"
   }
 });
 </script>
@@ -576,7 +576,7 @@ Your browser does not support the audio tag.
 </div>)
     end
 
-    def math node
+    def stem node
       id_attribute = node.id ? %( id="#{node.id}") : nil
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
       open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
@@ -590,7 +590,7 @@ Your browser does not support the audio tag.
         equation = %(#{open}#{equation}#{close})
       end
       
-      %(<div#{id_attribute} class="#{(role = node.role) ? ['mathblock', role] * ' ' : 'mathblock'}">
+      %(<div#{id_attribute} class="#{(role = node.role) ? ['stemblock', role] * ' ' : 'stemblock'}">
 #{title_element}<div class="content">
 #{equation}
 </div>

@@ -213,8 +213,8 @@ module Substitutors
       %(#{unescaped_attrs || m[1]}#{PASS_START}#{index}#{PASS_END})
     } if (text.include? '`')
 
-    # NOTE we need to do the math in a subsequent step to allow it to be escaped by the former
-    text = text.gsub(MathInlineMacroRx) {
+    # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
+    text = text.gsub(StemInlineMacroRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
@@ -222,8 +222,9 @@ module Substitutors
         next m[0][1..-1]
       end
 
-      type = m[1].to_sym
-      type = ((default_type = document.attributes['math']).nil_or_empty? ? 'asciimath' : default_type).to_sym if type == :math
+      if (type = m[1].to_sym) == :stem
+        type = ((default_stem_type = document.attributes['stem']).nil_or_empty? ? 'asciimath' : default_stem_type).to_sym
+      end
       text = unescape_brackets m[3]
       if m[2].nil_or_empty?
         subs = (@document.basebackend? 'html') ? [:specialcharacters] : []
@@ -234,7 +235,7 @@ module Substitutors
       @passthroughs << {:text => text, :subs => subs, :type => type}
       index = @passthroughs.size - 1
       "#{PASS_START}#{index}#{PASS_END}"
-    } if (text.include? 'math:')
+    } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
     text
   end

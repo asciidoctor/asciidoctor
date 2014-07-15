@@ -269,7 +269,7 @@ module Asciidoctor
     '****' => [:sidebar, ::Set.new],
     '____' => [:quote, ['verse'].to_set],
     '""'   => [:quote, ['verse'].to_set],
-    '++++' => [:pass, ['math', 'latexmath', 'asciimath'].to_set],
+    '++++' => [:pass, ['stem', 'latexmath', 'asciimath'].to_set],
     '|===' => [:table, ::Set.new],
     ',===' => [:table, ::Set.new],
     ':===' => [:table, ::Set.new],
@@ -864,15 +864,15 @@ module Asciidoctor
     #
     LinkInlineMacroRx = /\\?(?:link|mailto):([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/
 
-    # Matches a math inline macro, which may span multiple lines.
+    # Matches a stem (and alternatives, asciimath and latexmath) inline macro, which may span multiple lines.
     #
     # Examples
     #
-    #   math:[x != 0]
+    #   stem:[x != 0]
     #   asciimath:[x != 0]
     #   latexmath:[\sqrt{4} = 2]
     #
-    MathInlineMacroRx = /\\?((?:latex|ascii)?math):([a-z,]*)\[(.*?[^\\])\]/m
+    StemInlineMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z,]*)\[(.*?[^\\])\]/m
 
     # Matches a menu inline macro.
     #

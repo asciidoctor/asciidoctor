@@ -213,7 +213,7 @@ module Asciidoctor
       end
     end
 
-    def math node
+    def stem node
       # QUESTION should the content be stripped already?
       equation = node.content.strip
       if node.style == 'latexmath'

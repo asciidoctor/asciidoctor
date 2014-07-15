@@ -1186,33 +1186,33 @@ EOS
         assert_equal '\(\sqrt{4} = 2\)', para.content
       end
 
-      test 'should passthrough math macro inside another passthrough' do
+      test 'should passthrough asciimath macro inside another passthrough' do
         input = 'the text `asciimath:[x = y]` should be passed through as `literal` text'
         para = block_from_string input 
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
       end
 
-      test 'should not recognize math macro with no content' do
-        input = 'math:[]'
+      test 'should not recognize stem macro with no content' do
+        input = 'stem:[]'
         para = block_from_string input
-        assert_equal 'math:[]', para.content
+        assert_equal input, para.content
       end
 
-      test 'should passthrough text in math macro and surround with AsciiMath delimiters if math attribute != latexmath' do
+      test 'should passthrough text in stem macro and surround with AsciiMath delimiters if stem attribute != latexmath' do
         [
           {},
-          {'math' => ''},
-          {'math' => 'asciimath'}
+          {'stem' => ''},
+          {'stem' => 'asciimath'}
         ].each do |attributes|
-          input = 'math:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
+          input = 'stem:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
           para = block_from_string input, :attributes => attributes
           assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
         end
       end
 
-      test 'should passthrough text in math macro and surround with LaTeX math delimiters if math attribute = latexmath' do
-        input = 'math:[C = \alpha + \beta Y^{\gamma} + \epsilon]'
-        para = block_from_string input, :attributes => {'math' => 'latexmath'}
+      test 'should passthrough text in stem macro and surround with LaTeX math delimiters if stem attribute = latexmath' do
+        input = 'stem:[C = \alpha + \beta Y^{\gamma} + \epsilon]'
+        para = block_from_string input, :attributes => {'stem' => 'latexmath'}
         assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
       end
     end
