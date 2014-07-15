@@ -154,6 +154,10 @@ module Asciidoctor
     # Compliance value: 'drop-line'
     define :attribute_undefined, 'drop-line'
 
+    # Asciidoctor will allow the id, role and options to be set
+    # on blocks using a shorthand syntax (e.g., #idname.rolename%optionname)
+    define :shorthand_property_syntax, true
+
     # Asciidoctor will recognize commonly-used Markdown syntax
     # to the degree it does not interfere with existing
     # AsciiDoc syntax and behavior.
