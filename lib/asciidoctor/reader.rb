@@ -42,8 +42,7 @@ class Reader
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     elsif cursor.is_a? ::String
       @file = cursor
-      @dir = ::File.dirname @file
-      @path = ::File.basename @file
+      @dir, @path = ::File.split @file
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     else
       @file = cursor.file
