@@ -1360,8 +1360,8 @@ Block content
 image::images/tiger.png[Tiger]
       EOS
 
-      output = render_string input
-      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'can render block image with alt text defined in macro containing escaped square bracket' do
@@ -1380,8 +1380,8 @@ image::images/tiger.png[A [Bengal\\] Tiger]
 image::images/tiger.png[]
       EOS
 
-      output = render_string input
-      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'alt text in macro overrides alt text above macro' do
@@ -1390,8 +1390,8 @@ image::images/tiger.png[]
 image::images/tiger.png[Tiger]
       EOS
 
-      output = render_string input
-      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'alt text is escaped in HTML backend' do
@@ -1417,8 +1417,8 @@ image::images/open.png[File > Open]
 image::images/tiger.png[]
       EOS
 
-      output = render_string input
-      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="tiger"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="tiger"]', output, 1
     end
 
     test "can render block image with alt text and height and width" do
@@ -1426,8 +1426,8 @@ image::images/tiger.png[]
 image::images/tiger.png[Tiger, 200, 300]
       EOS
 
-      output = render_string input
-      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"][@width="200"][@height="300"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"][@width="200"][@height="300"]', output, 1
     end
 
     test "can render block image with link" do
@@ -1435,8 +1435,8 @@ image::images/tiger.png[Tiger, 200, 300]
 image::images/tiger.png[Tiger, link='http://en.wikipedia.org/wiki/Tiger']
       EOS
 
-      output = render_string input
-      assert_xpath '//*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test "can render block image with caption" do
@@ -1563,8 +1563,8 @@ image::{bogus}[]
 image::http://asciidoc.org/images/tiger.png[Tiger]
       EOS
 
-      output = render_string input
-      assert_xpath '//*[@class="imageblock"]//img[@src="http://asciidoc.org/images/tiger.png"][@alt="Tiger"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//img[@src="http://asciidoc.org/images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'can resolve image relative to imagesdir' do
@@ -1574,8 +1574,8 @@ image::http://asciidoc.org/images/tiger.png[Tiger]
 image::tiger.png[Tiger]
       EOS
 
-      output = render_string input
-      assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'embeds base64-encoded data uri for image when data-uri attribute is set' do
@@ -1589,7 +1589,66 @@ image::dot.gif[Dot]
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal 'fixtures', doc.attributes['imagesdir']
       output = doc.render
-      assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
+    test 'embeds base64-encoded data uri for remote image when data-uri attribute is set' do
+      input = <<-EOS
+:data-uri:
+
+image::http://#{resolve_localhost}:9876/fixtures/dot.gif[Dot]
+      EOS
+
+      output = using_test_webserver do
+        render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+      end
+      
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
+    test 'embeds base64-encoded data uri for remote image when imagesdir is a URI and data-uri attribute is set' do
+      input = <<-EOS
+:data-uri:
+:imagesdir: http://#{resolve_localhost}:9876/fixtures
+
+image::dot.gif[Dot]
+      EOS
+
+      output = using_test_webserver do
+        render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+      end
+      
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
+    test 'uses remote image uri when data-uri attribute is set and image cannot be retrieved' do
+      image_uri = "http://#{resolve_localhost}:9876/fixtures/missing-image.gif"
+      input = <<-EOS
+:data-uri:
+
+image::#{image_uri}[Missing image]
+      EOS
+
+      output = using_test_webserver do
+        render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+      end
+      
+      assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Missing image"]), output, 1
+    end
+
+    test 'uses remote image uri when data-uri attribute is set and allow-uri-read is not set' do
+      image_uri = "http://#{resolve_localhost}:9876/fixtures/dot.gif"
+      input = <<-EOS
+:data-uri:
+
+image::#{image_uri}[Dot]
+      EOS
+
+      output = using_test_webserver do
+        render_embedded_string input, :safe => :safe
+      end
+      
+      assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Dot"]), output, 1
     end
 
     # this test will cause a warning to be printed to the console (until we have a message facility)
@@ -1606,7 +1665,7 @@ image::dot.gif[Dot]
       output = doc.render
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
-      assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
     test 'cleans reference to ancestor directories in target before reading image if safe mode level is at least SAFE' do
@@ -1622,7 +1681,7 @@ image::../..//fixtures/./../../fixtures/dot.gif[Dot]
       output = doc.render
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
-      assert_xpath '//*[@class="imageblock"]//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
   end
 

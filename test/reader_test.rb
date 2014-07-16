@@ -236,22 +236,22 @@ third line
 
     context 'Line context' do
       test 'to_s should return file name and line number of current line' do
-        reader = Asciidoctor::Reader.new SAMPLE_DATA, 'sample.ad'
+        reader = Asciidoctor::Reader.new SAMPLE_DATA, 'sample.adoc'
         reader.read_line
-        assert_equal 'sample.ad: line 2', reader.to_s
+        assert_equal 'sample.adoc: line 2', reader.to_s
       end
 
       test 'line_info should return file name and line number of current line' do
-        reader = Asciidoctor::Reader.new SAMPLE_DATA, 'sample.ad'
+        reader = Asciidoctor::Reader.new SAMPLE_DATA, 'sample.adoc'
         reader.read_line
-        assert_equal 'sample.ad: line 2', reader.line_info
-        assert_equal 'sample.ad: line 2', reader.next_line_info
+        assert_equal 'sample.adoc: line 2', reader.line_info
+        assert_equal 'sample.adoc: line 2', reader.next_line_info
       end
 
       test 'prev_line_info should return file name and line number of previous line read' do
-        reader = Asciidoctor::Reader.new SAMPLE_DATA, 'sample.ad'
+        reader = Asciidoctor::Reader.new SAMPLE_DATA, 'sample.adoc'
         reader.read_line
-        assert_equal 'sample.ad: line 1', reader.prev_line_info
+        assert_equal 'sample.adoc: line 1', reader.prev_line_info
       end
     end
 
@@ -602,13 +602,13 @@ include::fixtures/parent-include.adoc[]
   
       test 'missing file referenced by include directive does not crash processor' do
         input = <<-EOS
-include::fixtures/no-such-file.ad[]
+include::fixtures/no-such-file.adoc[]
         EOS
   
         begin
           doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
           assert_equal 1, doc.blocks.size
-          assert_equal ['Unresolved directive in <stdin> - include::fixtures/no-such-file.ad[]'], doc.blocks[0].lines
+          assert_equal ['Unresolved directive in <stdin> - include::fixtures/no-such-file.adoc[]'], doc.blocks[0].lines
         rescue
           flunk 'include directive should not raise exception on missing file'
         end
@@ -920,7 +920,7 @@ include::fixtures/parent-include-restricted.adoc[depth=3]
       test 'read_lines_until should not process lines if process option is false' do
         lines = <<-EOS.each_line.to_a
 ////
-include::fixtures/no-such-file.asciidoc[]
+include::fixtures/no-such-file.adoc[]
 ////
         EOS
 
@@ -934,7 +934,7 @@ include::fixtures/no-such-file.asciidoc[]
       test 'skip_comment_lines should not process lines read' do
         lines = <<-EOS.each_line.to_a
 ////
-include::fixtures/no-such-file.asciidoc[]
+include::fixtures/no-such-file.adoc[]
 ////
         EOS
 

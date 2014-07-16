@@ -270,12 +270,10 @@ class AbstractNode
   #
   # Returns A String reference for the target media
   def media_uri(target, asset_dir_key = 'imagesdir')
-    if target.include?(':') && UriSniffRx =~ target
+    if is_uri? target
       target
-    elsif asset_dir_key && attr?(asset_dir_key)
-      normalize_web_path(target, @document.attr(asset_dir_key))
     else
-      normalize_web_path(target)
+      normalize_web_path target, (asset_dir_key ? @document.attr(asset_dir_key) : nil)
     end
   end
 
@@ -299,14 +297,22 @@ class AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
-    if target_image.include?(':') && UriSniffRx =~ target_image
+    if (doc = @document).safe < SafeMode::SECURE && doc.attr?('data-uri')
+      if is_uri?(target_image) ||
+          (asset_dir_key && (images_base = doc.attr(asset_dir_key)) &&
+          is_uri?(images_base) && (target_image = normalize_web_path target_image, images_base))
+        if doc.attr? 'allow-uri-read'
+          generate_data_uri_from_uri target_image, doc.attr?('cache-uri')
+        else
+          target_image
+        end
+      else
+        generate_data_uri target_image, asset_dir_key
+      end
+    elsif is_uri? target_image
       target_image
-    elsif @document.safe < SafeMode::SECURE && @document.attr?('data-uri')
-      generate_data_uri(target_image, asset_dir_key)
-    elsif asset_dir_key && attr?(asset_dir_key)
-      normalize_web_path(target_image, @document.attr(asset_dir_key))
     else
-      normalize_web_path(target_image)
+      normalize_web_path target_image, (asset_dir_key ? doc.attr(asset_dir_key) : nil)
     end
   end
 
@@ -324,19 +330,16 @@ class AbstractNode
   # Returns A String data URI containing the content of the target image
   def generate_data_uri(target_image, asset_dir_key = nil)
     ext = ::File.extname(target_image)[1..-1]
-    mimetype = 'image/' + ext
-    mimetype = "#{mimetype}+xml" if ext == 'svg'
+    mimetype = (ext == 'svg' ? 'image/svg+xml' : %(image/#{ext}))
     if asset_dir_key
-      #asset_dir_path = normalize_system_path(@document.attr(asset_dir_key), nil, nil, :target_name => asset_dir_key)
-      #image_path = normalize_system_path(target_image, asset_dir_path, nil, :target_name => 'image')
       image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, :target_name => 'image')
     else
       image_path = normalize_system_path(target_image)
     end
 
     unless ::File.readable? image_path
-      warn "asciidoctor: WARNING: image to embed not found or not readable: #{image_path}"
-      return "data:#{mimetype}:base64,"
+      warn %(asciidoctor: WARNING: image to embed not found or not readable: #{image_path})
+      return %(data:#{mimetype}:base64,)
       # uncomment to return 1 pixel white dot instead
       #return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     end
@@ -347,7 +350,47 @@ class AbstractNode
     else
       bindata = ::File.open(image_path, 'rb') {|file| file.read }
     end
-    "data:#{mimetype};base64,#{::Base64.encode64(bindata).delete EOL}"
+    %(data:#{mimetype};base64,#{::Base64.encode64(bindata).delete EOL})
+  end
+ 
+  # Public: Read the image data from the specified URI and generate a data URI
+  #
+  # The image data is read from the URI and converted to Base64. A data URI is
+  # constructed from the content_type header and Base64 data and returned,
+  # which can then be used in an image tag.
+  #
+  # image_uri  - The URI from which to read the image data. Can be http://, https:// or ftp://
+  # cache_uri  - A Boolean to control caching. When true, the open-uri-cached library
+  #              is used to cache the image for subsequent reads. (default: false)
+  #
+  # Returns A data URI string built from Base64 encoded data read from the URI
+  # and the mime type specified in the Content Type header.
+  def generate_data_uri_from_uri image_uri, cache_uri = false
+    Helpers.require_library 'base64'
+    if cache_uri
+      # caching requires the open-uri-cached gem to be installed
+      # processing will be automatically aborted if these libraries can't be opened
+      Helpers.require_library 'open-uri/cached', 'open-uri-cached'
+    elsif !::RUBY_ENGINE_OPAL
+      # autoload open-uri
+      ::OpenURI
+    end
+
+    begin
+      mimetype = nil
+      bindata = open(image_uri, 'rb') {|file|
+        mimetype = file.content_type 
+        file.read
+      }
+      %(data:#{mimetype};base64,#{Base64.encode64(bindata).delete EOL})
+    rescue
+      warn %(asciidoctor: WARNING: could not retrieve image data from URI: #{image_uri})
+      image_uri
+      # uncomment to return empty data (however, mimetype needs to be resolved)
+      #%(data:#{mimetype}:base64,)
+      # uncomment to return 1 pixel white dot instead
+      #'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+    end
   end
 
   # Public: Read the contents of the file at the specified path.
@@ -429,6 +472,12 @@ class AbstractNode
   # Public: Calculate the relative path to this absolute filename from the Document#base_dir
   def relative_path(filename)
     (@path_resolver ||= PathResolver.new).relative_path filename, @document.base_dir
+  end
+
+  # Public: Check whether the specified String is a URI by
+  # matching it against the Asciidoctor::UriSniffRx regex.
+  def is_uri? str
+    str.include?(':') && UriSniffRx =~ str
   end
 
   # Public: Retrieve the list marker keyword for the specified list type.
