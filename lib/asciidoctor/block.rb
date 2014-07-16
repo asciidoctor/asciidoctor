@@ -40,14 +40,8 @@ class Block < AbstractBlock
   #--
   # QUESTION should we store source_data as lines for blocks that have compound content models?
   def initialize(parent, context, opts = {})
-    super(parent, context)
+    super
     @content_model = opts[:content_model] || DEFAULT_CONTENT_MODEL[context]
-    if (attrs = opts[:attributes]).nil_or_empty?
-      @attributes = {}
-    else
-      # QUESTION are we correct in duplicating the attributes (seems to be just as fast)
-      @attributes = attrs.dup
-    end
     if opts.has_key? :subs
       # FIXME this is a bit funky
       # we have to be defensive to avoid lock_in_subs wiping out the override

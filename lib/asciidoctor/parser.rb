@@ -105,11 +105,13 @@ class Parser
     # check if the first line is the document title
     # if so, add a header to the document and parse the header metadata
     if is_next_line_document_title?(reader, block_attributes)
+      source_location = reader.cursor if document.sourcemap
       document.id, _, doctitle, _, _ = parse_section_title(reader, document)
       unless assigned_doctitle
         document.title = doctitle
         assigned_doctitle = doctitle
       end
+      document.header.source_location = source_location if source_location
       document.attributes['doctitle'] = section_title = doctitle
       # QUESTION: should the id assignment on Document be encapsulated in the Document class?
       unless document.id
@@ -426,6 +428,8 @@ class Parser
     block = nil
     style = nil
     explicit_style = nil
+    sourcemap = document.sourcemap
+    source_location = nil
 
     while !block && reader.has_more_lines?
       # if parsing metadata, read until there is no more to read
@@ -438,6 +442,7 @@ class Parser
       end
 
       # QUESTION should we introduce a parsing context object?
+      source_location = reader.cursor if sourcemap
       this_line = reader.read_line
       delimited_block = false
       block_context = nil
@@ -894,6 +899,7 @@ class Parser
     # REVIEW we may no longer need this nil check
     # FIXME we've got to clean this up, it's horrible!
     if block
+      block.source_location = source_location if source_location
       # REVIEW seems like there is a better way to organize this wrap-up
       block.title     = attributes['title'] unless block.title?
       # FIXME HACK don't hardcode logic for alt, caption and scaledwidth on images down here
@@ -1547,9 +1553,11 @@ class Parser
   # attributes - a Hash of attributes to assign to this section (default: {})
   def self.initialize_section(reader, parent, attributes = {})
     document = parent.document
+    source_location = reader.cursor if document.sourcemap
     sect_id, sect_reftext, sect_title, sect_level, _ = parse_section_title(reader, document)
     attributes['reftext'] = sect_reftext if sect_reftext
     section = Section.new parent, sect_level, document.attributes.has_key?('numbered')
+    section.source_location = source_location if source_location
     section.id = sect_id
     section.title = sect_title
     # parse style, id and role from first positional attribute

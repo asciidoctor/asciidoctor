@@ -77,6 +77,9 @@ class Document < AbstractBlock
   #
   attr_reader :compat_mode
 
+  # Public: Get the Boolean flag that indicates whether source map information is tracked by the parser
+  attr_reader :sourcemap
+
   # Public: Get the Hash of document references
   attr_reader :references
 
@@ -86,23 +89,25 @@ class Document < AbstractBlock
   # Public: Get the Hash of callouts
   attr_reader :callouts
 
-  # Public: The section level 0 block
+  # Public: Get the level-0 Section
   attr_reader :header
 
-  # Public: Base directory for converting this document. Defaults to directory of the source file.
+  # Public: Get the String base directory for converting this document.
+  #
+  # Defaults to directory of the source file.
   # If the source is a string, defaults to the current directory.
   attr_reader :base_dir
 
-  # Public: A reference to the parent document of this nested document.
+  # Public: Get a reference to the parent Document of this nested document.
   attr_reader :parent_document
 
-  # Public: The Reader associated with this document
+  # Public: Get the Reader associated with this document
   attr_reader :reader
 
-  # Public: The Converter associated with this document
+  # Public: Get the Converter associated with this document
   attr_reader :converter
 
-  # Public: The extensions registry
+  # Public: Get the extensions registry
   attr_reader :extensions
 
   # Public: Initialize a {Document} object.
@@ -138,6 +143,7 @@ class Document < AbstractBlock
       @attribute_overrides = attr_overrides
       @safe = parent_doc.safe
       @compat_mode = parent_doc.compat_mode
+      @sourcemap = parent_doc.sourcemap
       @converter = parent_doc.converter
       initialize_extensions = false
       @extensions = parent_doc.extensions
@@ -167,7 +173,16 @@ class Document < AbstractBlock
         attr_overrides[key.downcase] = value
       end
       @attribute_overrides = attr_overrides
-      @safe = nil
+      # safely resolve the safe mode from const, int or string
+      @safe = if !(safe_mode = options[:safe])
+        SafeMode::SECURE
+      elsif safe_mode.is_a? ::Fixnum
+        # be permissive in case API user wants to define new levels
+        safe_mode
+      else
+        SafeMode.const_get(safe_mode.to_s.upcase).to_i rescue SafeMode::SECURE.to_i
+      end
+      @sourcemap = options.key?(:sourcemap) && options[:sourcemap] == true
       @converter = nil
       initialize_extensions = defined? ::Asciidoctor::Extensions
       @extensions = nil # initialize furthur down
@@ -179,17 +194,6 @@ class Document < AbstractBlock
     @callouts = Callouts.new
     @attributes_modified = ::Set.new
     @options = options
-    unless parent_doc
-      # safely resolve the safe mode from const, int or string
-      if !(safe_mode = options[:safe])
-        @safe = SafeMode::SECURE
-      elsif safe_mode.is_a? ::Fixnum
-        # be permissive in case API user wants to define new levels
-        @safe = safe_mode
-      else
-        @safe = SafeMode.const_get(safe_mode.to_s.upcase).to_i rescue SafeMode::SECURE.to_i
-      end
-    end
     header_footer = (options[:header_footer] ||= false)
 
     attrs = @attributes

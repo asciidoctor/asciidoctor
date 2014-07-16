@@ -39,8 +39,8 @@ class Section < AbstractBlock
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
-  def initialize(parent = nil, level = nil, numbered = true)
-    super(parent, :section)
+  def initialize(parent = nil, level = nil, numbered = true, opts = {})
+    super(parent, :section, opts)
     if level.nil?
       if parent
         @level = parent.level + 1
@@ -50,7 +50,6 @@ class Section < AbstractBlock
     else
       @level = level
     end
-    #@numbered = numbered && @level > 0 && @level < 4
     @numbered = numbered && @level > 0
     @special = parent && parent.context == :section && parent.special
     @index = 0
