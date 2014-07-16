@@ -4,6 +4,17 @@ module Asciidoctor
   # A built-in {Converter} implementation that generates DocBook 4.5 output
   # consistent with the docbook45 backend from AsciiDoc Python.
   class Converter::DocBook45Converter < Converter::DocBook5Converter
+    def admonition node
+      # address a bug in the DocBook 4.5 DTD
+      if node.parent.context == :example
+        %(<para>
+#{super}
+</para>)
+      else
+        super
+      end
+    end
+
     def olist node
       result = []
       num_attribute = node.style ? %( numeration="#{node.style}") : nil
