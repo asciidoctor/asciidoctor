@@ -820,10 +820,17 @@ class Parser
             if language && !(language = language.strip).empty?
               attributes['language'] = language
               attributes['linenums'] = '' if linenums && !linenums.strip.empty?
+            elsif (default_language = document.attributes['source-language'])
+              attributes['language'] = default_language
             end
             terminator = terminator[0..2]
           elsif block_context == :source
             AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
+            unless attributes.has_key? 'language'
+              if (default_language = document.attributes['source-language'])
+                attributes['language'] = default_language
+              end
+            end
           end
           block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
 
@@ -962,13 +969,6 @@ class Parser
         tip_3 = (tl == 4 ? tip.chop : tip)
         if tip_3 == '```'
           if tl == 4 && tip.end_with?('`')
-            return
-          end
-          tip = tip_3
-          tl = 3
-          fenced_code = true
-        elsif tip_3 == '~~~'
-          if tl == 4 && tip.end_with?('~')
             return
           end
           tip = tip_3
