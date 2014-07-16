@@ -169,14 +169,23 @@ module Asciidoctor
       scale_attribute = (node.attr? 'scale') ? %( scale="#{node.attr 'scale'}") : nil
       align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : nil
 
-      %(<figure#{common_attributes node.id, node.role, node.reftext}>
-#{title_tag node}<mediaobject>
+      mediaobject = %(<mediaobject>
 <imageobject>
 <imagedata fileref="#{node.image_uri(node.attr 'target')}"#{width_attribute}#{depth_attribute}#{swidth_attribute}#{scale_attribute}#{align_attribute}/>
 </imageobject>
 <textobject><phrase>#{node.attr 'alt'}</phrase></textobject>
-</mediaobject>
+</mediaobject>)
+
+      if node.title?
+        %(<figure#{common_attributes node.id, node.role, node.reftext}>
+<title>#{node.title}</title>
+#{mediaobject}
 </figure>)
+      else
+        %(<informalfigure#{common_attributes node.id, node.role, node.reftext}>
+#{mediaobject}
+</informalfigure>)
+      end
     end
 
     def listing node
