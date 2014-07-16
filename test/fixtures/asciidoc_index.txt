@@ -169,7 +169,7 @@ link:asciimathml.html[ASCIIMathML] or link:latexmathml.html[LaTeXMathML]
 notation.
 
 The link:latex-filter.html[AsciiDoc LaTeX filter] translates LaTeX
-source to a PNG image that is automatically inserted into the AsciiDoc
+source to an image that is automatically inserted into the AsciiDoc
 output documents.
 
 AsciiDoc also has 'latexmath' macros for DocBook outputs -- they are
@@ -180,8 +180,8 @@ AsciiDoc documents processed by `dblatex(1)`.
 Editor Support
 --------------
 - An AsciiDoc syntax highlighter for the Vim text editor is included in the
-  AsciiDoc distribution (see 'Appendix F' of the 'AsciiDoc User Guide' for
-  details).
+  AsciiDoc distribution (see the 'Vim Syntax Highlighter' appendix in
+  the 'AsciiDoc User Guide' for details).
 +
 .Syntax highlighter screenshot
 image::images/highlighter.png[height=400,caption="",link="images/highlighter.png"]
@@ -194,15 +194,9 @@ image::images/highlighter.png[height=400,caption="",link="images/highlighter.png
   (used by http://projects.gnome.org/gedit/[gedit] and a number of
   other applications). The project is hosted here:
   https://launchpad.net/asciidoc-gtk-highlight
-- Florian Kaufman has written 'adoc-mode.el' -- a major-mode for
-  editing AsciiDoc files in Emacs, you can find it
-  http://code.google.com/p/sensorflo-emacs/[here].
-- The http://xpt.sourceforge.net/[*Nix Power Tools project] has
-  released an http://xpt.sourceforge.net/tools/doc-mode/[AsciiDoc
-  syntax highlighter for Emacs].
-- Terrence Brannon has written
-  http://github.com/metaperl/asciidoc-el[AsciiDoc functions for
-  Emacs].
+- AsciiDoc resources for the Emacs editor can be found on the
+  http://www.emacswiki.org/emacs/AsciiDoc[AsciiDoc  page] at the
+  http://www.emacswiki.org/emacs/EmacsWiki[Emacs Wiki].
 - Christian Zuckschwerdt has written a
   https://github.com/zuckschwerdt/asciidoc.tmbundle[TextMate bundle]
   for AsciiDoc.
@@ -255,7 +249,7 @@ and I'll add them to the list.
 - David Hajage has written an AsciiDoc package for the
   http://www.r-project.org/[R Project] (R is a free software
   environment for statistical computing).  'ascii' is available on
-  'CRAN' (just run `install.package("ascii")` from R).  Briefly,
+  'CRAN' (just run `install.packages("ascii")` from R).  Briefly,
   'ascii' replaces R results in AsciiDoc document with AsciiDoc
   markup.  More information and examples here:
   http://eusebe.github.com/ascii/.
@@ -319,6 +313,26 @@ and I'll add them to the list.
 - The guys from O'Reilly Media have posted an
   https://github.com/oreillymedia/docbook2asciidoc[XSL Stylesheet to
 github] that converts DocBook to AsciiDoc.
+- Lex Trotman has written
+  https://github.com/elextr/flexndex[flexndex], an index generator
+  tool that be used with AsciiDoc.
+- Michael Haberler has created a
+  https://code.google.com/p/asciidoc-diag-filter/[blockdiag filter for
+  Asciidoc] which embeds http://blockdiag.com/[blockdiag] images in
+  AsciiDoc documents.
+- Dan Allen has written a
+  https://github.com/mojavelinux/asciidoc-bootstrap-docs-backend[Bootstrap
+  backend] for AsciiDoc.
+- Steven Boscarine has written
+  https://github.com/StevenBoscarine/JavaAsciidocWrapper[Maven wrapper for AsciiDoc].
+- Christian Goltz has written
+  https://github.com/christiangoltz/shaape[Shaape], an Ascii art to
+  image converter for AsciiDoc.
+- Eduardo Santana has written an
+  https://github.com/edusantana/asciidoc-highlight[Asciidoc Highlight
+  for Notepad++].
+- http://www.geany.org/[Geany] 1.23 adds document structure support
+  for AsciiDoc.
 
 Please let me know if any of these links need updating.
 
