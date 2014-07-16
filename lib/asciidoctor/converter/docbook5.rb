@@ -344,6 +344,7 @@ module Asciidoctor
     TABLE_SECTIONS = [:head, :foot, :body]
 
     def table node
+      has_body = false
       result = []
       pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : nil
       result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{node.attr 'frame', 'all'}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}">)
@@ -358,6 +359,7 @@ module Asciidoctor
         result << %(<colspec colname="col_#{col.attr 'colnumber'}" colwidth="#{col.attr(width ? 'colabswidth' : 'colpcwidth')}*"/>)
       end
       TABLE_SECTIONS.select {|tblsec| !node.rows[tblsec].empty? }.each do |tblsec|
+        has_body = true if tblsec == :body
         result << %(<t#{tblsec}>)
         node.rows[tblsec].each do |row|
           result << '<row>'
@@ -394,6 +396,7 @@ module Asciidoctor
       result << '</tgroup>'
       result << %(</#{tag_name}>)
 
+      warn 'asciidoctor: WARNING: tables must have at least one body row' unless has_body
       result * EOL
     end
 
