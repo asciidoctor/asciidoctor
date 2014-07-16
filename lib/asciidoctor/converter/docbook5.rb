@@ -541,15 +541,15 @@ module Asciidoctor
     end
 
     QUOTED_TAGS = {
-      :emphasis    => ['<emphasis>',               '</emphasis>'],
-      :strong      => ['<emphasis role="strong">', '</emphasis>'],
-      :monospaced  => ['<literal>',                '</literal>'],
-      :superscript => ['<superscript>',            '</superscript>'],
-      :subscript   => ['<subscript>',              '</subscript>'],
-      :double      => ['&#8220;',                  '&#8221;'],
-      :single      => ['&#8216;',                  '&#8217;']
+      :emphasis    => ['<emphasis>',               '</emphasis>',    true],
+      :strong      => ['<emphasis role="strong">', '</emphasis>',    true],
+      :monospaced  => ['<literal>',                '</literal>',     false],
+      :superscript => ['<superscript>',            '</superscript>', false],
+      :subscript   => ['<subscript>',              '</subscript>',   false],
+      :double      => ['&#8220;',                  '&#8221;',        true],
+      :single      => ['&#8216;',                  '&#8217;',        true]
     }
-    QUOTED_TAGS.default = [nil, nil]
+    QUOTED_TAGS.default = [nil, nil, true]
 
     def inline_quoted node
       if (type = node.type) == :latexmath
@@ -558,10 +558,14 @@ module Asciidoctor
 <inlinemediaobject><textobject><phrase><![CDATA[#{node.text}]]></phrase></textobject></inlinemediaobject>
 </inlineequation>)
       else
-        open, close = QUOTED_TAGS[type]
+        open, close, supports_phrase = QUOTED_TAGS[type]
         text = node.text
         quoted_text = if (role = node.role)
-          %(#{open}<phrase role="#{role}">#{text}</phrase>#{close})
+          if supports_phrase
+            %(#{open}<phrase role="#{role}">#{text}</phrase>#{close})
+          else
+            %(#{open.chop} role="#{role}">#{text}#{close})
+          end
         else
           %(#{open}#{text}#{close})
         end
