@@ -21,7 +21,10 @@ class AbstractBlock < AbstractNode
   # Public: Get/Set the caption for this block
   attr_accessor :caption
 
-  def initialize(parent, context)
+  # Public: Gets/Sets the location in the AsciiDoc source where this block begins
+  attr_accessor :source_location
+
+  def initialize(parent, context, opts = {})
     super
     @content_model = :compound
     @subs = []
@@ -38,6 +41,7 @@ class AbstractBlock < AbstractNode
     end
     @next_section_index = 0
     @next_section_number = 1
+    @source_location = nil
   end
 
   def block?
@@ -179,6 +183,16 @@ class AbstractBlock < AbstractNode
   # Returns an [Array] of Section objects
   def sections
     @blocks.select {|block| block.context == :section }
+  end
+
+  # Public: Get the source file where this block started
+  def file
+    @source_location ? @source_location.file : nil
+  end
+
+  # Public: Get the source line number where this block started
+  def lineno
+    @source_location ? @source_location.lineno : nil
   end
 
   # Public: Remove a substitution from this block

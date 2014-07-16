@@ -24,7 +24,7 @@ class AbstractNode
   # Public: Get the Hash of attributes for this node
   attr_reader :attributes
 
-  def initialize(parent, context)
+  def initialize(parent, context, opts = {})
     # document is a special case, should refer to itself
     if context == :document
       @parent = nil
@@ -38,7 +38,8 @@ class AbstractNode
     end
     @context = context
     @node_name = context.to_s
-    @attributes = {}
+    # QUESTION are we correct in duplicating the attributes (seems to be just as fast)
+    @attributes = opts.key?(:attributes) ? (opts[:attributes] || {}).dup : {}
     @passthroughs = []
   end
 

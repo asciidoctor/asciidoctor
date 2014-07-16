@@ -253,6 +253,36 @@ preamble
         flunk %(attributes argument should not be modified)
       end
     end
+
+    test 'should track file and line information with blocks if sourcemap option is set' do
+      doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), :sourcemap => true
+
+      section_1 = doc.sections[0]
+      assert_equal 'Section A', section_1.title
+      refute_nil section_1.source_location
+      assert_equal 'sample.asciidoc', section_1.file
+      assert_equal 10, section_1.lineno
+
+      section_2 = doc.sections[1]
+      assert_equal 'Section B', section_2.title
+      refute_nil section_2.source_location
+      assert_equal 'sample.asciidoc', section_2.file
+      assert_equal 18, section_2.lineno
+
+      last_block = section_2.blocks[-1] 
+      assert_equal :ulist, last_block.context
+      refute_nil last_block.source_location
+      assert_equal 'sample.asciidoc', last_block.file
+      assert_equal 23, last_block.lineno
+
+      doc = Asciidoctor.load_file fixture_path('master.adoc'), :sourcemap => true, :safe => :safe
+
+      section_1 = doc.sections[0]
+      assert_equal 'Chapter A', section_1.title
+      refute_nil section_1.source_location
+      assert_equal fixture_path('chapter-a.adoc'), section_1.file
+      assert_equal 1, section_1.lineno
+    end
   end
 
   context 'Convert APIs' do
