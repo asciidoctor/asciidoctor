@@ -145,6 +145,7 @@ class Document < AbstractBlock
       @parent_document = nil
       @references = {
         :ids => {},
+        :reftexts => {},
         :footnotes => [],
         :links => [],
         :images => [],
@@ -467,8 +468,19 @@ class Document < AbstractBlock
   def register(type, value)
     case type
     when :ids
-      if value.is_a?(::Array)
-        @references[:ids][value[0]] = (value[1] || '[' + value[0] + ']')
+      if value.is_a? ::Array
+        id = value[0]
+        if (reftext = value[1])
+          if value[2]
+            @references[:ids][id] = value[2]
+          else
+            @references[:ids][id] = reftext
+          end
+          # NOTE this ignores duplicate reftexts
+          @references[:reftexts][reftext] ||= id
+        else
+          @references[:ids][id] = %([#{id}])
+        end
       else
         @references[:ids][value] = '[' + value + ']'
       end

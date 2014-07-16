@@ -915,14 +915,14 @@ class Parser
       # TODO eventualy remove the style attribute from the attributes hash
       #block.style     = attributes.delete('style')
       block.style     = attributes['style']
+      # FIXME remove the need for this update!
+      block.attributes.update(attributes) unless attributes.empty?
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
       if (block_id = (block.id ||= attributes['id']))
         # TODO sub reftext
-        document.register(:ids, [block_id, (attributes['reftext'] || (block.title? ? block.title : nil))])
+        document.register(:ids, block.resolve_reftext.insert(0, block_id))
       end
-      # FIXME remove the need for this update!
-      block.attributes.update(attributes) unless attributes.empty?
       block.lock_in_subs
 
       #if document.attributes.has_key? :pending_attribute_entries

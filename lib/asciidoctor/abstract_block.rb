@@ -191,6 +191,28 @@ class AbstractBlock < AbstractNode
     nil
   end
 
+  # Public: Calculates the reference text for this block.
+  #
+  # Use the value of the reftext attribute, if present.
+  # Otherwise, use the title if specified, prefixed with the caption.
+  # If neither the reftext attribute nor title are present, return nil.
+  #
+  # Returns a String Array containing the reference text and, if present, the formal reference text, for this block.
+  #--
+  # TODO sub reftext
+  # FIXME admonition blocks abuse the caption field
+  def resolve_reftext
+    if (reftext = @attributes['reftext'])
+      [reftext]
+    elsif @title.nil_or_empty?
+      []
+    elsif @caption && @context != :admonition && (@document.attr? 'xrefstyle', 'formal')
+      [(reftext = title), %(#{@caption.rstrip.chomp '.'}, &#8220;#{reftext}&#8221;)]
+    else
+      [title]
+    end
+  end
+
   # Public: Generate a caption and assign it to this block if one
   # is not already assigned.
   #
