@@ -184,7 +184,7 @@ module Asciidoctor
       listing_attributes = (common_attributes node.id, node.role, node.reftext)
       if node.style == 'source' && (node.attr? 'language')
         numbering = (node.attr? 'linenums') ? 'numbered' : 'unnumbered'
-        listing_content = %(<programlisting#{informal ? listing_attributes : nil} language="#{node.attr 'language'}" linenumbering="#{numbering}">#{node.content}</programlisting>)
+        listing_content = %(<programlisting#{informal ? listing_attributes : nil} language="#{node.attr 'language', nil, false}" linenumbering="#{numbering}">#{node.content}</programlisting>)
       else
         listing_content = %(<screen#{informal ? listing_attributes : nil}>#{node.content}</screen>)
       end

@@ -279,8 +279,7 @@ module Asciidoctor
     ':===' => [:table, ::Set.new],
     '!===' => [:table, ::Set.new],
     '////' => [:comment, ::Set.new],
-    '```'  => [:fenced_code, ::Set.new],
-    '~~~'  => [:fenced_code, ::Set.new]
+    '```'  => [:fenced_code, ::Set.new]
   }
 
   DELIMITED_BLOCK_LEADERS = DELIMITED_BLOCKS.keys.map {|key| key[0..1] }.to_set

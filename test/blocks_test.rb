@@ -1955,19 +1955,6 @@ puts "Hello, World!"
       assert_css '.listingblock pre code', output, 1
       assert_css '.listingblock pre code:not([class])', output, 1
     end
-
-    test 'should support fenced code block using tildes' do
-      input = <<-EOS
-~~~
-puts "Hello, World!"
-~~~
-      EOS
-
-      output = render_embedded_string input
-      assert_css '.listingblock', output, 1
-      assert_css '.listingblock pre code', output, 1
-      assert_css '.listingblock pre code:not([class])', output, 1
-    end
  
     test 'should not recognize fenced code blocks with more than three delimiters' do
       input = <<-EOS
@@ -1990,9 +1977,9 @@ alert("Hello, World!")
 puts "Hello, World!"
 ```
 
-~~~ javascript
+``` javascript
 alert("Hello, World!")
-~~~
+```
       EOS
 
       output = render_embedded_string input
@@ -2007,9 +1994,9 @@ alert("Hello, World!")
 puts "Hello, World!"
 ```
 
-~~~ javascript, numbered
+``` javascript, numbered
 alert("Hello, World!")
-~~~
+```
       EOS
 
       output = render_embedded_string input
@@ -2032,6 +2019,40 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
       assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
       assert_match(/\.CodeRay \{/, output)
+    end
+
+    test 'should read source language from source-language document attribute if not specified on source block' do
+      input = <<-EOS
+:source-highlighter: coderay
+:source-language: ruby
+
+[source]
+----
+require 'coderay'
+
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
+----
+      EOS
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
+      assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
+    end
+
+    test 'should rename document attribute named language to source-language when compat-mode is legacy' do
+      input = <<-EOS
+:language: ruby
+
+{source-language}
+      EOS
+
+      assert_equal 'ruby', render_string(input, :doctype => :inline, :attributes => {'compat-mode' => 'legacy'})
+
+      input = <<-EOS
+:language: ruby
+
+{source-language}
+      EOS
+
+      assert_equal '{source-language}', render_string(input, :doctype => :inline)
     end
 
     test 'should replace callout marks but not highlight them if source-highlighter attribute is coderay' do

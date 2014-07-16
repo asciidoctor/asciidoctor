@@ -1322,12 +1322,12 @@ module Substitutors
 
     case highlighter
     when 'coderay'
-      result = ::CodeRay::Duo[attr('language', :text).to_sym, :html, {
+      result = ::CodeRay::Duo[attr('language', :text, false).to_sym, :html, {
           :css => (@document.attributes['coderay-css'] || :class).to_sym,
           :line_numbers => (linenums_mode = ((attr? 'linenums') ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)),
           :line_number_anchors => false}].highlight source
     when 'pygments'
-      lexer = ::Pygments::Lexer[attr('language')] || ::Pygments::Lexer['text']
+      lexer = ::Pygments::Lexer[attr('language', nil, false)] || ::Pygments::Lexer['text']
       opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
       unless (@document.attributes['pygments-css'] || 'class') == 'class'
         opts[:noclasses] = true

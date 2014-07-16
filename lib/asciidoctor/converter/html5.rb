@@ -527,9 +527,9 @@ Your browser does not support the audio tag.
     def listing node
       nowrap = !(node.document.attr? 'prewrap') || (node.option? 'nowrap')
       if node.style == 'source'
-        language = node.attr 'language'
+        language = node.attr 'language', nil, false
         language_classes = language ? %(#{language} language-#{language}) : nil
-        case node.attr 'source-highlighter'
+        case node.document.attr 'source-highlighter'
         when 'coderay'
           pre_class = nowrap ? ' class="CodeRay nowrap"' : ' class="CodeRay"'
           code_class = language ? %( class="#{language_classes}") : nil

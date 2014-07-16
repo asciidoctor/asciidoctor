@@ -664,7 +664,12 @@ class Document < AbstractBlock
       @attributes['toc-position'] ||= default_toc_position if default_toc_position
     end
 
-    @compat_mode = (@attributes['compat-mode'] == 'legacy' ? :legacy : :default)
+    @compat_mode = if @attributes['compat-mode'] == 'legacy'
+      @attributes['source-language'] = @attributes['language'] if @attributes.has_key? 'language'
+      :legacy
+    else
+      :default
+    end
 
     @original_attributes = @attributes.dup
 
