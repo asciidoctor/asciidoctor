@@ -580,13 +580,8 @@ Your browser does not support the audio tag.
       id_attribute = node.id ? %( id="#{node.id}") : nil
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
       open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
-      # QUESTION should the content be stripped already?
-      equation = node.content.strip
-      if node.subs.nil_or_empty? && !(node.attr? 'subs')
-        equation = node.sub_specialcharacters equation
-      end
 
-      unless (equation.start_with? open) && (equation.end_with? close)
+      unless ((equation = node.content).start_with? open) && (equation.end_with? close)
         equation = %(#{open}#{equation}#{close})
       end
       

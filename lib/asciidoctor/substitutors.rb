@@ -46,6 +46,8 @@ module Substitutors
     :inline => COMPOSITE_SUBS.keys + SUBS[:normal]
   }
 
+  SUB_HIGHLIGHT = ['coderay', 'pygments']
+
   # Delimiters and matchers for the passthrough placeholder
   # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
 
@@ -1405,15 +1407,19 @@ module Substitutors
       when :simple
         default_subs = SUBS[:normal]
       when :verbatim
-        default_subs = if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
-          SUBS[:verbatim]
+        if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
+          default_subs = SUBS[:verbatim]
         elsif @context == :verse
-          SUBS[:normal]
+          default_subs = SUBS[:normal]
         else
-          SUBS[:basic]
+          default_subs = SUBS[:basic]
         end
       when :raw
-        default_subs = SUBS[:pass]
+        if @context == :stem
+          default_subs = SUBS[:basic]
+        else
+          default_subs = SUBS[:pass]
+        end
       else
         return
       end
@@ -1425,10 +1431,9 @@ module Substitutors
       @subs = default_subs.dup
     end
 
-    # QUESION delegate this logic to method?
-    if @context == :listing && @style == 'source' && (@document.basebackend? 'html') &&
-        ((highlighter = @document.attributes['source-highlighter']) == 'coderay' ||
-            highlighter == 'pygments') && (attr? 'language')
+    # QUESION delegate this logic to a method?
+    if @context == :listing && @style == 'source' && @attributes['language'] &&
+        @document.basebackend?('html') && SUB_HIGHLIGHT.include?(@document.attributes['source-highlighter'])
       @subs = @subs.map {|sub| sub == :specialcharacters ? :highlight : sub }
     end
   end

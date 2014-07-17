@@ -223,8 +223,11 @@ module Asciidoctor
     end
 
     def stem node
-      # QUESTION should the content be stripped already?
-      equation = node.content.strip
+      if (idx = node.subs.index :specialcharacters)
+        node.subs.delete :specialcharacters
+      end
+      equation = node.content
+      node.subs.insert idx, :specialcharacters if idx
       if node.style == 'latexmath'
         equation_data = %(<alt><![CDATA[#{equation}]]></alt>
 <mediaobject><textobject><phrase></phrase></textobject></mediaobject>)
