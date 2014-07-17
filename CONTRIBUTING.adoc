@@ -1,15 +1,17 @@
 = Contributing
-:issues: https://github.com/asciidoctor/asciidoctor/issues
-:fork: https://help.github.com/articles/fork-a-repo
-:gist: https://gist.github.com
-:branch: http://learn.github.com/p/branching.html
-:pr: https://help.github.com/articles/using-pull-requests
+:repo-uri: https://github.com/asciidoctor/asciidoctor
+:base-help-uri: https://help.github.com/articles
+:issues-uri: {repo-uri}/issues
+:fork-help-uri: {base-help-uri}/fork-a-repo
+:branch-help-uri: {fork-help-uri}#create-branches
+:pr-help-uri: {base-help-uri}/using-pull-requests
+:gist-uri: https://gist.github.com
 
 === Submitting an Issue
 
-We use the {issues}[issue tracker on GitHub] associated with this project to track bugs and features.
+We use the {issues-uri}[issue tracker on GitHub] associated with this project to track bugs and features.
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted.
-When submitting a bug report, please include a {gist}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
+When submitting a bug report, please include a {gist-uri}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
 
 Most importantly, since Asciidoctor is a text processor, reproducing most bugs requires that we have some snippet of text on which Asciidoctor exhibits the bad behavior.
 
@@ -17,9 +19,9 @@ An ideal bug report would include a pull request with failing specs.
 
 === Submitting a Pull Request
 
-. {fork}[Fork the repository].
+. {fork-help-uri}[Fork the repository].
 . Run +bundle install+ to install dependencies.
-. {branch}[Create a topic branch].
+. {branch-help-uri}[Create a topic branch].
 . Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
 . Run +bundle exec rake+ to run the tests.
 If your tests pass, return to step 3.
@@ -29,7 +31,7 @@ If your tests fail, return to step 5.
 . Add documentation for your feature or bug fix.
 . If your changes are not 100% documented, go back to step 7.
 . Add, commit, and push your changes.
-. {pr}[Submit a pull request].
+. {pr-help-uri}[Submit a pull request].
 
 === Writing and Executing Tests
 
