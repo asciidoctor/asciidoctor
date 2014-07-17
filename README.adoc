@@ -18,8 +18,10 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Ryan Waldron <https://
 :templates: {sources}/blob/master/lib/asciidoctor/backends
 :tests: {sources}/tree/master/test
 :issues: {sources}/issues
-:changelog: {sources}/blob/master/CHANGELOG.adoc
-:contributing: {sources}/blob/master/CONTRIBUTING.adoc
+:sources-master-uri: {sources}/blob/master
+:main-img-uri: {sources-master-uri}/main.png
+:changelog: {sources-master-uri}/CHANGELOG.adoc
+:contributing: {sources-master-uri}/CONTRIBUTING.adoc
 :license: {sources}/blob/master/LICENSE
 :forum: http://discuss.asciidoctor.org
 :irc: irc://irc.freenode.org/#asciidoctor
@@ -42,17 +44,12 @@ ifdef::env-github[]
 *Project health:* image:https://travis-ci.org/asciidoctor/asciidoctor.png?branch=master[Build Status, link="https://travis-ci.org/asciidoctor/asciidoctor"]
 endif::env-github[]
 
-== AsciiDoc Processing
+image::{main-img-uri}[]
 
-// QUESTION Remove this section with an image ?
+== AsciiDoc Processing
 
 Asciidoctor reads and parses AsciiDoc markup (from a file or string) and feeds the parsed result to a set of built-in templates to convert the document as HTML 5, DocBook 4.5 or DocBook 5.0.
 Asciidoctor is a drop-in replacement for the original AsciiDoc processor.
-We've matched the output to that produced by the AsciiDoc Python processor as faithfully as possible.
-You can override the built-in templates, or produce a custom format, by pointing the processor at a set of template files written in a language supported by {tilt}[Tilt].
-See the <<usage>> section for more details.
-
-// QUESTION Can we capture the number of tests and assertions in Travis CI and display the result below the "build status" ?
 
 NOTE: With few exceptions, Asciidoctor is compliant with the original AsciiDoc processor.
 Asciidoctor has well over 1,000 tests to ensure compatibility with the AsciiDoc syntax.
@@ -130,13 +127,9 @@ gem 'asciidoctor'
 
 === Upgrading
 
-// QUESTION Merge this section with "Installation" ? "Installing and upgrading"
-
 If you have an earlier version of Asciidoctor installed, you can update it using the +gem+ command:
 
  $ gem update asciidoctor
-
-// QUESTION Move this tip somewhere else to reduce the length of the README ? "See Troubleshooting" ?
 
 [TIP]
 --
