@@ -311,9 +311,12 @@ module Asciidoctor
 
   LIST_CONTINUATION = '+'
 
-  # FIXME technically a preceding TAB is allowed too
-  # alternatively, we can enforce everywhere it must be a space
+  # NOTE AsciiDoc Python recognizes both a preceding TAB and a space
   LINE_BREAK = ' +'
+
+  LINE_CONTINUATION = ' \\'
+
+  LINE_CONTINUATION_LEGACY = ' +'
 
   BLOCK_MATH_DELIMITERS = {
     :asciimath => ['\\$', '\\$'],
