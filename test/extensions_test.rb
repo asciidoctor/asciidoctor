@@ -87,8 +87,8 @@ class SnippetMacro < Asciidoctor::Extensions::BlockMacroProcessor
 end
 
 class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
-  match_name :degrees
-  map_attributes ['units']
+  named :degrees
+  name_attributes 'units'
   def process parent, target, attributes
     units = attributes['units'] || (parent.document.attr 'temperature-unit', 'C')
     c = target.to_f

@@ -257,9 +257,10 @@ module Extensions
   #
   # Recognized options:
   #
+  # * :named - The name of the block (required: true)
   # * :contexts - The blocks contexts on which this style can be used (default: [:paragraph, :open]
   # * :content_model - The structure of the content supported in this block (default: :compound)
-  # * :pos_attrs - A list of attribute names used to map positional attributes (default: nil)
+  # * :positional_attributes - A list of attribute names used to map positional attributes (default: nil)
   # * ...
   #
   # BlockProcessor implementations must extend BlockProcessor.
@@ -312,11 +313,12 @@ module Extensions
     end
     alias :parse_content_as :content_model
 
-    def pos_attrs *value
+    def positional_attributes *value
       option :pos_attrs, value.flatten
     end
-    alias :map_attributes :pos_attrs
-    alias :name_positional_attributes :pos_attrs
+    alias :pos_attrs :positional_attributes
+    alias :name_attributes :positional_attributes
+    alias :name_positional_attributes :positional_attributes
 
     def default_attrs value
       option :default_attrs, value
@@ -358,11 +360,12 @@ module Extensions
     end
     alias :parse_content_as :content_model
 
-    def pos_attrs *value
+    def positional_attributes *value
       option :pos_attrs, value.flatten
     end
-    alias :map_attributes :pos_attrs
-    alias :name_positional_attributes :pos_attrs
+    alias :pos_attrs :positional_attributes
+    alias :name_attributes :positional_attributes
+    alias :name_positional_attributes :positional_attributes
 
     def default_attrs value
       option :default_attrs, value
