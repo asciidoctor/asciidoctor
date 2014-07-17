@@ -4074,6 +4074,8 @@ context 'Checklists' do
     input = <<-EOS
 - [ ] todo
 - [x] done
+- [] another todo
+- [*] another done
 - plain
     EOS
 
@@ -4081,7 +4083,9 @@ context 'Checklists' do
     assert_css '.ulist.checklist', output, 1
     assert_xpath %((/*[@class="ulist checklist"]/ul/li)[1]/p[text()="#{expand_entity 10063} todo"]), output, 1
     assert_xpath %((/*[@class="ulist checklist"]/ul/li)[2]/p[text()="#{expand_entity 10003} done"]), output, 1
-    assert_xpath '(/*[@class="ulist checklist"]/ul/li)[3]/p[text()="plain"]', output, 1
+    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[3]/p[text()="#{expand_entity 10063} another todo"]), output, 1
+    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[4]/p[text()="#{expand_entity 10003} another done"]), output, 1
+    assert_xpath '(/*[@class="ulist checklist"]/ul/li)[5]/p[text()="plain"]', output, 1
   end
 
   test 'should create checklist with font icons if at least one item has checkbox syntax and icons attribute is font' do
