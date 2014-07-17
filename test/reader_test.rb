@@ -708,6 +708,22 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         refute_match(/included content/, output)
       end
 
+      test 'include directive does not select tagged lines inside tagged selection' do
+        input = <<-EOS
+++++
+include::fixtures/include-file.asciidoc[tags=snippet]
+++++
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        expect = %(snippetA content
+
+non-tagged content
+
+snippetB content)
+        assert_equal expect, output
+      end
+
       test 'should warn if tag is not found in include file' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tag=snippetZ]
