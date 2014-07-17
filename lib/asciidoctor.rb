@@ -455,6 +455,14 @@ module Asciidoctor
     #
     IncludeDirectiveRx = /^\\?include::([^\[]+)\[(.*?)\]$/
 
+    # Matches a tag directive in an include file.
+    #
+    # Examples
+    #
+    #   tag::try-catch[]
+    #   end::try-catch[]
+    TagDirectiveRx = /(?:tag|end)::\S+\[\]/
+
     ## Attribute entries and references
 
     # Matches a document attribute entry.

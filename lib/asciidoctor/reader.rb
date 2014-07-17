@@ -943,7 +943,7 @@ class PreprocessorReader < Reader
                   if l.include?("end::#{active_tag}[]")
                     active_tag = nil
                   else
-                    selected.push l
+                    selected.push l unless TagDirectiveRx =~ l
                     inc_line_offset = inc_lineno if inc_line_offset == 0
                   end
                 else
