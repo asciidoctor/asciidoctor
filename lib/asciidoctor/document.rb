@@ -826,7 +826,7 @@ class Document < AbstractBlock
       # (re)initialize converter
       if (@converter = create_converter).is_a? Converter::BackendInfo
         new_basebackend = @converter.basebackend
-        attrs['outfilesuffix'] = @converter.outfilesuffix
+        attrs['outfilesuffix'] = @converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
         new_filetype = @converter.filetype
       else
         new_basebackend = new_backend.sub TrailingDigitsRx, ''
