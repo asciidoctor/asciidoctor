@@ -101,6 +101,7 @@ module Substitutors
 
     if (has_passthroughs = subs.include? :macros)
       text = extract_passthroughs text
+      has_passthroughs = false if @passthroughs.nil_or_empty?
     end
 
     subs.each do |type|
@@ -244,20 +245,26 @@ module Substitutors
 
   # Internal: Restore the passthrough text by reinserting into the placeholder positions
   #
-  # text - The String text into which to restore the passthrough text
+  # text  - The String text into which to restore the passthrough text
+  # check - A Boolean indicating whether to check whether substitution is necessary (default: true)
   #
   # returns The String text with the passthrough text restored
-  def restore_passthroughs(text)
-    return text if @passthroughs.nil_or_empty? || !text.include?(PASS_START)
+  def restore_passthroughs(text, check = true)
+    return text if check && @passthroughs.nil_or_empty? || !text.include?(PASS_START)
 
     text.gsub(PASS_MATCH) {
       pass = @passthroughs[$~[1].to_i]
       subbed_text = (subs = pass[:subs]) ? (apply_subs pass[:text], subs) : pass[:text]
       if (type = pass[:type])
-        Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).convert
-      else
-        subbed_text
+        subbed_text = Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).convert
       end
+      subbed_text
+      # TODO enable the following code to restore passthroughs recursively
+      #if subbed_text.include? PASS_START
+      #  restore_passthroughs subbed_text, false
+      #else
+      #  subbed_text
+      #end
     }
   end
 
