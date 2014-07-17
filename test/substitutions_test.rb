@@ -18,7 +18,7 @@ context 'Substitutions' do
   end
 
   context 'Quotes' do
-    BACKSLASH = "\u005c"
+    BACKSLASH = '\\'
 
     test 'single-line double-quoted string' do
       para = block_from_string(%q{``a few quoted words''})
