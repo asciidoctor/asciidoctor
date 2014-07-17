@@ -2050,17 +2050,18 @@ class Parser
     match ||= (reader.has_more_lines? ? AttributeEntryRx.match(reader.peek_line) : nil)
     if match
       name = match[1]
-      value = match[2] || ''
-      if value.end_with? LINE_BREAK
-        value = value.chop.rstrip
-        while reader.advance
-          next_line = reader.peek_line.strip
-          break if next_line.empty?
-          if next_line.end_with? LINE_BREAK
-            value = %(#{value} #{next_line.chop.rstrip})
-          else
-            value = %(#{value} #{next_line})
-            break
+      unless (value = match[2] || '').empty?
+        if value.end_with?(line_continuation = LINE_CONTINUATION) ||
+            value.end_with?(line_continuation = LINE_CONTINUATION_LEGACY)
+          value = value.chop.rstrip
+          while reader.advance
+            break if (next_line = reader.peek_line.strip).empty?
+            if (keep_open = next_line.end_with? line_continuation)
+              next_line = next_line.chop.rstrip
+            end
+            separator = (value.end_with? LINE_BREAK) ? EOL : ' '
+            value = %(#{value}#{separator}#{next_line})
+            break unless keep_open
           end
         end
       end

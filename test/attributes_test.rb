@@ -16,7 +16,7 @@ context 'Attributes' do
       assert_equal nil, doc.attributes['foo']
     end
 
-    test 'creates an attribute by fusing a multi-line value' do
+    test 'creates an attribute by fusing a legacy multi-line value' do
       str = <<-EOS
 :description: This is the first      +
               Ruby implementation of +
@@ -24,6 +24,26 @@ context 'Attributes' do
       EOS
       doc = document_from_string(str)
       assert_equal 'This is the first Ruby implementation of AsciiDoc.', doc.attributes['description']
+    end
+
+    test 'creates an attribute by fusing a multi-line value' do
+      str = <<-EOS
+:description: This is the first \\
+              Ruby implementation of \\
+              AsciiDoc.
+      EOS
+      doc = document_from_string(str)
+      assert_equal 'This is the first Ruby implementation of AsciiDoc.', doc.attributes['description']
+    end
+
+    test 'honors line break characters in multi-line values' do
+      str = <<-EOS
+:signature: Linus Torvalds + \\
+Linux Hacker + \\
+linus.torvalds@example.com
+      EOS
+      doc = document_from_string(str)
+      assert_equal %(Linus Torvalds +\nLinux Hacker +\nlinus.torvalds@example.com), doc.attributes['signature']
     end
 
     test 'should delete an attribute that ends with !' do
