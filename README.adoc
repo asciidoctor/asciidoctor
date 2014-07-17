@@ -1,37 +1,39 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Ryan Waldron <https://github.com/erebor[@erebor]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>
 :page-layout: base
-:homepage: http://asciidoctor.org
-:asciidoc: http://asciidoc.org
-:gem: http://rubygems.org/gems/asciidoctor
-:toolchain: http://asciidoctor.org/docs/install-toolchain
-:install-mac: http://asciidoctor.org/docs/install-asciidoctor-macosx
-:render: http://asciidoctor.org/docs/render-documents
-:factory: http://asciidoctor.org/docs/produce-custom-themes-using-asciidoctor-stylesheet-factory
-:java: http://asciidoctor.org/docs/install-and-use-asciidoctor-java-integration
-:man: http://asciidoctor.org/man/asciidoctor
-:sources: https://github.com/asciidoctor/asciidoctor
-:tests: https://github.com/asciidoctor/asciidoctor/tree/master/test
-:issues: https://github.com/asciidoctor/asciidoctor/issues
+:homepage-uri: http://asciidoctor.org
+:docs-uri: {homepage-uri}/docs
+:toolchain: {docs-uri}/install-toolchain
+:install-mac: {docs-uri}/install-asciidoctor-macosx
+:render: {docs-uri}/render-documents
+:factory: {docs-uri}/produce-custom-themes-using-asciidoctor-stylesheet-factory
+:java: {docs-uri}/install-and-use-asciidoctor-java-integration
+:user-manual-uri: {docs-uri}/user-manual
+:man: {homepage-uri}/man/asciidoctor
+:news: {homepage-uri}/news
+:docs: {homepage-uri}/docs
+:org: https://github.com/asciidoctor
+:sources: {org}/asciidoctor
+:contributors: {sources}/graphs/contributors
+:templates: {sources}/blob/master/lib/asciidoctor/backends
+:tests: {sources}/tree/master/test
+:issues: {sources}/issues
+:changelog: {sources}/blob/master/CHANGELOG.adoc
+:contributing: {sources}/blob/master/CONTRIBUTING.adoc
+:license: {sources}/blob/master/LICENSE
 :forum: http://discuss.asciidoctor.org
 :irc: irc://irc.freenode.org/#asciidoctor
-:news: http://asciidoctor.org/news
-:docs: http://asciidoctor.org/docs
-:org: https://github.com/asciidoctor
-:contributors: https://github.com/asciidoctor/asciidoctor/graphs/contributors
-:templates: https://github.com/asciidoctor/asciidoctor/blob/master/lib/asciidoctor/backends
+:asciidoc: http://asciidoc.org
+:gem: http://rubygems.org/gems/asciidoctor
 :gitscm-next: https://github.com/github/gitscm-next
 :seed-contribution: https://github.com/github/gitscm-next/commits/master/lib/asciidoc.rb
 :tilt: https://github.com/rtomayko/tilt
 :freesoftware: http://www.gnu.org/philosophy/free-sw.html
-:changelog: https://github.com/asciidoctor/asciidoctor/blob/master/CHANGELOG.adoc
-:contributing: https://github.com/asciidoctor/asciidoctor/blob/master/CONTRIBUTING.adoc
-:license: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE
 :idprefix:
 :idseparator: -
 :language: ruby
 
-{homepage}[Asciidoctor] is an open source text processor and publishing toolchain for transforming {asciidoc}[AsciiDoc] markup into HTML 5, DocBook 4.5 and 5.0 and other custom formats.
+{homepage-uri}[Asciidoctor] is an open source text processor and publishing toolchain for transforming {asciidoc}[AsciiDoc] markup into HTML 5, DocBook 4.5 and 5.0 and other custom formats.
 Asciidoctor is written entirely in Ruby, packaged as a RubyGem and published to {gem}[RubyGems.org].
 There are also Fedora, Debian and Ubuntu packages available for installing Asciidoctor.
 Asciidoctor is released under the MIT license.
@@ -44,7 +46,7 @@ endif::env-github[]
 
 // QUESTION Remove this section with an image ?
 
-Asciidoctor reads and parses AsciiDoc markup (from a file or string) and feeds the parsed result to a set of built-in templates to render the document as HTML 5, DocBook 4.5 or DocBook 5.0.
+Asciidoctor reads and parses AsciiDoc markup (from a file or string) and feeds the parsed result to a set of built-in templates to convert the document as HTML 5, DocBook 4.5 or DocBook 5.0.
 Asciidoctor is a drop-in replacement for the original AsciiDoc processor.
 We've matched the output to that produced by the AsciiDoc Python processor as faithfully as possible.
 You can override the built-in templates, or produce a custom format, by pointing the processor at a set of template files written in a language supported by {tilt}[Tilt].
@@ -60,14 +62,14 @@ We continue to work hard to ensure Asciidoctor continues to serve as a drop-in r
 
 Asciidoctor works on Linux, OSX (Mac) and Windows and requires one of the following implementations of Ruby:
 
-* Ruby 1.8.7 or higher
+* Ruby 1.8.7 - 2.1.2
 * JRuby 1.7 (Ruby 1.8 and 1.9 modes)
 * Rubinius 2.1.1
 * Opal (JavaScript)
 
 We expect Asciidoctor to work with other versions of Ruby as well.
 We welcome your help testing those versions if you are interested in seeing them supported.
-See {contributing}[Contributing]
+See {contributing}[Contributing].
 
 // QUESTION What is considered configuration information?
 
@@ -83,7 +85,11 @@ The latest source code is located in the {sources}[Asciidoctor git repository] o
 == Installation
 
 Asciidoctor can be installed via the +gem+ command, bundler, or popular Linux package managers.
-The benefit of installing the gem via Linux package managers is that they will also install Ruby and RubyGems if they are not already on your machine.
+
+NOTE: The benefit of installing the gem via Linux package managers is that they will also install Ruby and RubyGems if they are not already on your machine.
+The downside is that Linux package will not be available right away after a release of the RubyGem.
+It may take several weeks before the packages become available for a new release.
+If you need the latest version immediately, use the +gem install+ option.
 
 === gem install
 
@@ -122,7 +128,7 @@ gem 'asciidoctor'
 * {toolchain}[Installing the Asciidoctor toolchain]
 * {install-mac}[Installing Asciidoctor on Mac OS X]
 
-== Upgrading
+=== Upgrading
 
 // QUESTION Merge this section with "Installation" ? "Installing and upgrading"
 
@@ -151,12 +157,6 @@ On Debian or Ubuntu, you can update it using:
 
  $ sudo apt-get upgrade asciidoctor
 
-// QUESTION Maybe we can move this note with the explanation on why using linux packages is better than gem ?
-
-NOTE: The Fedora, Debian and Ubuntu packages will not be available right away after a release of the RubyGem.
-It may take several weeks before the packages become available for a new release.
-If you need the latest version immediately, use the +gem install+ option.
-
 == Usage
 
 If the Asciidoctor gem installed successfully, the +asciidoctor+ command line interface (CLI) will be available on your PATH.
@@ -168,7 +168,7 @@ In the console, you should see:
 
  Asciidoctor 0.1.4 [http://asciidoctor.org]
 
-In addition to the CLI, Asciidoctor provides a Ruby API
+In addition to the CLI, Asciidoctor provides a Ruby API.
 The API is intended for integration with other software projects and is suitable for server-side applications, such as Rails, Sinatra and GitHub.
 
 TIP: Asciidoctor also has a Java API that mirrors the Ruby API.
@@ -177,14 +177,10 @@ See the {java}[Asciidoctor Java integration project] for more information.
 
 === Command line interface (CLI)
 
-// QUESTION Remove that part with "Once the Asciidoctor gem installed, you can invoke Asciidoctor from the CLI:"
-
-Asciidoctor's CLI is a drop-in replacement for the +asciidoc.py+ command from the Python implementation.
-To invoke Asciidoctor from the CLI, execute:
+The following command will use the built-in defaults for options and create a new file in the same directory as the input file, with the same base name, but with the +.html+ extension:
 
  $ asciidoctor [asciidoc-file]
 
-This will use the built-in defaults for options and create a new file in the same directory as the input file, with the same base name, but with the +.html+ extension.
 
 There are many other options available and full help is provided via:
 
@@ -197,7 +193,7 @@ This mode is very similar to the safe mode of +asciidoc.py+.
 
 Additional documentation:
 
-* {render}[How do I render a document?]
+* {render}[How do I convert a document?]
 * {factory}[How do I use the Asciidoctor stylesheet factory to produce custom themes?]
 
 === Ruby API
@@ -223,18 +219,18 @@ require 'pp'
 puts doc.doctitle
 puts doc.attributes
 
-More than likely, you will want to render the document.
+More than likely, you will want to convert the document.
 
-==== Rendering files
+==== Converting files
 
-To render a file containing AsciiDoc markup to HTML 5, use:
+To convert a file containing AsciiDoc markup to HTML 5, use:
 
 [source]
 Asciidoctor.render_file 'sample.adoc', :in_place => true
 
 The command will output to the file +sample.html+ in the same directory.
 
-You can render the file to DocBook 4.5 by setting the +:backend+ option to +:docbook+:
+You can convert the file to DocBook 4.5 by setting the +:backend+ option to +:docbook+:
 
 [source]
 Asciidoctor.render_file 'sample.adoc', :in_place => true, :backend => :docbook
@@ -242,14 +238,14 @@ Asciidoctor.render_file 'sample.adoc', :in_place => true, :backend => :docbook
 The command will output to the file +sample.xml+ in the same directory.
 (If you're on Linux, you can view the file using yelp).
 
-==== Rendering strings
+==== Converting strings
 
-To render an AsciiDoc-formatted string:
+To convert an AsciiDoc-formatted string:
 
 [source]
 puts Asciidoctor.render '*This* is http://asciidoc.org[AsciiDoc]!'
 
-When rendering a string, the header and footer are excluded by default to make Asciidoctor consistent with other lightweight markup engines like Markdown.
+When converting a string, the header and footer are excluded by default to make Asciidoctor consistent with other lightweight markup engines like Markdown.
 If you want the header and footer, just enable it using the +:header_footer+ option:
 
 [source]
@@ -272,30 +268,20 @@ Any of it!
 
 ==== Using custom templates
 
-Asciidoctor allows you to override the {templates}[built-in templates] used to render almost any individual AsciiDoc element.
-If you provide a directory of {tilt}[Tilt]-compatible templates, named in such a way that Asciidoctor can figure out which template goes with which element, Asciidoctor will use the templates in this directory instead of its built-in templates for any elements for which it finds a matching template.
-It will fallback to its default templates for everything else.
+Let's assume you want to customize the HTML that is generated for a paragraph. First, create the file +templates/paragraph.html.slim+ with the following content:
 
-[source]
-puts Asciidoctor.render '*This* is http://asciidoc.org[AsciiDoc]!', :header_footer => true,
-   :template_dir => 'templates'
+[source, slim]
+p id=@id class=role =content
 
-// QUESTION Keep it short and add a "For more information..." ?
+Then, pass the template_dir option to the API to have Asciidoctor use this template for converting paragraph blocks in place of the built-in converter for paragraphs.
 
-The Document and Section templates should begin with +document.+ and +section.+, respectively.
-The file extension is used by Tilt to determine which view framework it will use to render the template.
-For instance, if you want to write the template in ERB, you'd name these two templates +document.html.erb+ and +section.html.erb+.
-To use Haml, you'd name them +document.html.haml+ and +section.html.haml+.
-
-Templates for block elements, like a Paragraph or Sidebar, would begin with +block_<style>.+.
-For instance, to override the default Paragraph template with an ERB template, put a file named +block_paragraph.html.erb+ in the template directory you pass to the +Document+ constructor using the +:template_dir+ option.
-
-For more usage examples, see the (massive) {tests}[test suite].
-
+For more information, see the {user-manual-uri}[user manual].
 
 == Contributing
 
 In the spirit of {freesoftware}[free software], _everyone_ is encouraged to help improve this project.
+If you discover errors or ommisions in the source code, documentation, or website content, please don't hesitate to submit an issue or open a pull request with a fix.
+New contributors are always welcome!
 
 Here are some ways *you* can contribute:
 
@@ -313,7 +299,7 @@ Here are some ways *you* can contribute:
 * by fixing {issues}[issues]
 * by reviewing patches
 
-See {contributing}[Contributing]
+The {contributing}[Contributing] guide provides information on how to create, style, and submit issues, feature requests, code, and documentation to the Asciidoctor Project.
 
 == Getting Help
 
@@ -326,7 +312,7 @@ Chat:: {irc}[#asciidoctor] on FreeNode IRC
 
 Further information and documentation about Asciidoctor can be found on the project's website.
 
-Home:: {homepage}
+Home:: {homepage-uri}
 News:: {news}
 Docs:: {docs}
 
@@ -336,9 +322,6 @@ Source repository (git):: {sources}
 Issue tracker (GitHub):: {issues}
 Asciidoctor organization (GitHub):: {org}
 
-If you discover errors or ommisions in the source code, documentation, or website content, please don't hesitate to submit an issue or open a pull request with a fix.
-The <<contributing>> section provides information on how to create, style, and submit issues, feature requests, code, and documentation to the Asciidoctor Project.
-New contributors are always welcome!
 
 == Copyright and Licensing
 
