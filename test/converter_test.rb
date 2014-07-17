@@ -76,6 +76,26 @@ context 'Converter' do
       end
     end
 
+    test 'should set outfilesuffix according to backend info' do
+      doc = Asciidoctor.load 'content'
+      doc.render
+      assert_equal '.html', doc.attributes['outfilesuffix']
+
+      doc = Asciidoctor.load 'content', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'), :template_cache => false
+      doc.render
+      assert_equal '.html', doc.attributes['outfilesuffix']
+    end
+
+    test 'should not override outfilesuffix attribute if locked' do
+      doc = Asciidoctor.load 'content', :attributes => {'outfilesuffix' => '.foo'}
+      doc.render
+      assert_equal '.foo', doc.attributes['outfilesuffix']
+
+      doc = Asciidoctor.load 'content', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'), :template_cache => false, :attributes => {'outfilesuffix' => '.foo'}
+      doc.render
+      assert_equal '.foo', doc.attributes['outfilesuffix']
+    end
+
     test 'should load Haml templates for docbook45 backend' do
       doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'), :template_cache => false
       assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
