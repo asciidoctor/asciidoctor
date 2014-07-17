@@ -18,14 +18,19 @@ context 'Substitutions' do
   end
 
   context 'Quotes' do
+    BACKSLASH = "\u005c"
+
     test 'single-line double-quoted string' do
       para = block_from_string(%q{``a few quoted words''})
       assert_equal '&#8220;a few quoted words&#8221;', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line double-quoted string' do
-      para = block_from_string(%q{\``a few quoted words''})
+      para = block_from_string(%(#{BACKSLASH}``a few quoted words''))
       assert_equal %q(&#8216;`a few quoted words&#8217;'), para.sub_quotes(para.source)
+
+      para = block_from_string(%(#{BACKSLASH}#{BACKSLASH}``a few quoted words''))
+      assert_equal %q(``a few quoted words''), para.sub_quotes(para.source)
     end
 
     test 'multi-line double-quoted string' do
@@ -49,7 +54,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line single-quoted string' do
-      para = block_from_string(%q{\`a few quoted words'})
+      para = block_from_string(%(#{BACKSLASH}`a few quoted words'))
       assert_equal %(`a few quoted words'), para.sub_quotes(para.source)
     end
 
@@ -74,7 +79,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line constrained unquoted string' do
-      para = block_from_string(%q{\#a few words#})
+      para = block_from_string(%(#{BACKSLASH}#a few words#))
       assert_equal '#a few words#', para.sub_quotes(para.source)
     end
 
@@ -89,7 +94,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line unconstrained unquoted string' do
-      para = block_from_string(%q{\##--anything goes ##})
+      para = block_from_string(%(#{BACKSLASH}##--anything goes ##))
       assert_equal '#--anything goes #', para.sub_quotes(para.source)
     end
 
@@ -104,7 +109,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line constrained strong string' do
-      para = block_from_string(%q{\*a few strong words*})
+      para = block_from_string(%(#{BACKSLASH}*a few strong words*))
       assert_equal '*a few strong words*', para.sub_quotes(para.source)
     end
 
@@ -129,14 +134,14 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line constrained quote variation emphasized string' do
-      para = block_from_string(%q{\_a few emphasized words_})
+      para = block_from_string(%(#{BACKSLASH}_a few emphasized words_))
       assert_equal %q(_a few emphasized words_), para.sub_quotes(para.source)
     end
 
     test 'escaped single quoted string' do
-      para = block_from_string(%q{\'a few emphasized words'})
+      para = block_from_string(%(#{BACKSLASH}'a few emphasized words'))
       # NOTE the \' is replaced with ' by the :replacements substitution, later in the substitution pipeline
-      assert_equal %q(\'a few emphasized words'), para.sub_quotes(para.source)
+      assert_equal %(#{BACKSLASH}'a few emphasized words'), para.sub_quotes(para.source)
     end
 
     test 'multi-line constrained emphasized quote variation string' do
@@ -154,11 +159,11 @@ context 'Substitutions' do
     end
 
     test 'escaped single-quotes inside emphasized words are restored' do
-      para = block_from_string(%q{'Here\'s Johnny!'}, :attributes => {'compat-mode' => 'legacy'})
-      assert_equal %q(<em>Here's Johnny!</em>), para.apply_subs(para.source)
+      para = block_from_string(%('Here#{BACKSLASH}'s Johnny!'), :attributes => {'compat-mode' => 'legacy'})
+      assert_equal %q(<em>Here's Johnny!</em>), para.apply_normal_subs(para.lines)
 
-      para = block_from_string(%q{'Here\'s Johnny!'})
-      assert_equal %q('Here's Johnny!'), para.apply_subs(para.source)
+      para = block_from_string(%('Here#{BACKSLASH}'s Johnny!'))
+      assert_equal %q('Here's Johnny!'), para.apply_normal_subs(para.lines)
     end
 
     test 'single-line constrained emphasized underline variation string' do
@@ -167,7 +172,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line constrained emphasized underline variation string' do
-      para = block_from_string(%q{\_a few emphasized words_})
+      para = block_from_string(%(#{BACKSLASH}_a few emphasized words_))
       assert_equal '_a few emphasized words_', para.sub_quotes(para.source)
     end
 
@@ -177,43 +182,43 @@ context 'Substitutions' do
     end
 
     test 'single-line constrained monospaced string' do
-      para = block_from_string(%q{`a few <\{monospaced\}> words`})
+      para = block_from_string(%(`a few <{monospaced}> words`))
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal '<code>a few &lt;{monospaced}&gt; words</code>', para.apply_normal_subs(para.lines)
     end
 
     test 'single-line constrained monospaced string with role' do
-      para = block_from_string(%q{[input]`a few <\{monospaced\}> words`})
+      para = block_from_string(%([input]`a few <{monospaced}> words`))
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal '<code class="input">a few &lt;{monospaced}&gt; words</code>', para.apply_normal_subs(para.lines)
     end
 
     test 'escaped single-line constrained monospaced string' do
-      para = block_from_string(%q{\`a few <monospaced> words`})
+      para = block_from_string(%(#{BACKSLASH}`a few <monospaced> words`))
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal '`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
     end
 
     test 'escaped single-line constrained monospaced string with role' do
-      para = block_from_string(%q{[input]\`a few <monospaced> words`})
+      para = block_from_string(%([input]#{BACKSLASH}`a few <monospaced> words`))
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal '[input]`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
     end
 
     test 'escaped role on single-line constrained monospaced string' do
-      para = block_from_string(%q{\[input]`a few <monospaced> words`})
+      para = block_from_string(%(#{BACKSLASH}[input]`a few <monospaced> words`))
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal '[input]<code>a few &lt;monospaced&gt; words</code>', para.apply_normal_subs(para.lines)
     end
 
     test 'escaped role on escaped single-line constrained monospaced string' do
-      para = block_from_string(%q{\[input]\`a few <monospaced> words`})
+      para = block_from_string(%(#{BACKSLASH}[input]#{BACKSLASH}`a few <monospaced> words`))
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
-      assert_equal '\[input]`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
+      assert_equal %(#{BACKSLASH}[input]`a few &lt;monospaced&gt; words`), para.apply_normal_subs(para.lines)
     end
 
     test 'multi-line constrained monospaced string' do
-      para = block_from_string(%Q{`a few\n<\{monospaced\}> words`})
+      para = block_from_string(%(`a few\n<{monospaced}> words`))
       # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal "<code>a few\n&lt;{monospaced}&gt; words</code>", para.apply_normal_subs(para.lines)
     end
@@ -224,7 +229,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line unconstrained strong chars' do
-      para = block_from_string(%q{\**Git**Hub})
+      para = block_from_string(%(#{BACKSLASH}**Git**Hub))
       assert_equal '<strong>*Git</strong>*Hub', para.sub_quotes(para.source)
     end
 
@@ -245,7 +250,7 @@ context 'Substitutions' do
 
     # TODO this is not the same result as AsciiDoc, though I don't understand why AsciiDoc gets what it gets
     test 'escaped unconstrained strong chars with role' do
-      para = block_from_string(%q{Git\[blue]**Hub**})
+      para = block_from_string(%(Git#{BACKSLASH}[blue]**Hub**))
       assert_equal %q{Git[blue]<strong>*Hub</strong>*}, para.sub_quotes(para.source)
     end
 
@@ -255,8 +260,13 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line unconstrained emphasized chars' do
-      para = block_from_string(%q{\__Git__Hub})
+      para = block_from_string(%(#{BACKSLASH}__Git__Hub))
       assert_equal '__Git__Hub', para.sub_quotes(para.source)
+    end
+
+    test 'escaped single-line unconstrained emphasized chars around word' do
+      para = block_from_string(%(#{BACKSLASH}#{BACKSLASH}__GitHub__))
+      assert_equal '__GitHub__', para.sub_quotes(para.source)
     end
 
     test 'multi-line unconstrained emphasized chars' do
@@ -270,7 +280,7 @@ context 'Substitutions' do
     end
 
     test 'escaped unconstrained emphasis chars with role' do
-      para = block_from_string(%q{\[gray]__Git__Hub})
+      para = block_from_string(%(#{BACKSLASH}[gray]__Git__Hub))
       assert_equal %q{[gray]__Git__Hub}, para.sub_quotes(para.source)
     end
 
@@ -285,23 +295,23 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line constrained monospaced chars' do
-      para = block_from_string(%q{call \+save()+ to persist the changes})
+      para = block_from_string(%(call #{BACKSLASH}+save()+ to persist the changes))
       assert_equal 'call +save()+ to persist the changes', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line constrained monospaced chars with role' do
-      para = block_from_string(%q{call [method]\+save()+ to persist the changes})
+      para = block_from_string(%(call [method]#{BACKSLASH}+save()+ to persist the changes))
       assert_equal 'call [method]+save()+ to persist the changes', para.sub_quotes(para.source)
     end
 
     test 'escaped role on single-line constrained monospaced chars' do
-      para = block_from_string(%q{call \[method]+save()+ to persist the changes})
+      para = block_from_string(%(call #{BACKSLASH}[method]+save()+ to persist the changes))
       assert_equal 'call [method]<code>save()</code> to persist the changes', para.sub_quotes(para.source)
     end
 
     test 'escaped role on escaped single-line constrained monospaced chars' do
-      para = block_from_string(%q{call \[method]\+save()+ to persist the changes})
-      assert_equal 'call \[method]+save()+ to persist the changes', para.sub_quotes(para.source)
+      para = block_from_string(%(call #{BACKSLASH}[method]#{BACKSLASH}+save()+ to persist the changes))
+      assert_equal %(call #{BACKSLASH}[method]+save()+ to persist the changes), para.sub_quotes(para.source)
     end
 
     test 'single-line unconstrained monospaced chars' do
@@ -310,7 +320,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line unconstrained monospaced chars' do
-      para = block_from_string(%q{Git\++Hub++})
+      para = block_from_string(%(Git#{BACKSLASH}++Hub++))
       assert_equal 'Git+<code>Hub</code>+', para.sub_quotes(para.source)
     end
 
@@ -320,12 +330,12 @@ context 'Substitutions' do
     end
 
     test 'single-line superscript chars' do
-      para = block_from_string(%q{x^2^ = x * x, e = mc^2^, there's a 1^st^ time for everything})
-      assert_equal 'x<sup>2</sup> = x * x, e = mc<sup>2</sup>, there\'s a 1<sup>st</sup> time for everything', para.sub_quotes(para.source)
+      para = block_from_string(%(x^2^ = x * x, e = mc^2^, there's a 1^st^ time for everything))
+      assert_equal %(x<sup>2</sup> = x * x, e = mc<sup>2</sup>, there\'s a 1<sup>st</sup> time for everything), para.sub_quotes(para.source)
     end
 
     test 'escaped single-line superscript chars' do
-      para = block_from_string(%q{x\^2^ = x * x})
+      para = block_from_string(%(x#{BACKSLASH}^2^ = x * x))
       assert_equal 'x^2^ = x * x', para.sub_quotes(para.source)
     end
 
@@ -345,7 +355,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line subscript chars' do
-      para = block_from_string(%q{H\~2~O})
+      para = block_from_string(%(H#{BACKSLASH}~2~O))
       assert_equal 'H~2~O', para.sub_quotes(para.source)
     end
 
@@ -442,7 +452,7 @@ context 'Substitutions' do
     end
 
     test 'should ignore escaped inline email address' do
-      para = block_from_string('\doc.writer@asciidoc.org')
+      para = block_from_string(%(#{BACKSLASH}doc.writer@asciidoc.org))
       assert_equal %q{doc.writer@asciidoc.org}, para.sub_macros(para.source)
     end
 
@@ -468,7 +478,7 @@ context 'Substitutions' do
     end
 
     test 'a single-line escaped raw url should not be interpreted as a link' do
-      para = block_from_string('\http://google.com')
+      para = block_from_string(%(#{BACKSLASH}http://google.com))
       assert_equal %q{http://google.com}, para.sub_macros(para.source)
     end
 
@@ -488,7 +498,7 @@ context 'Substitutions' do
     end
 
     test 'a single-line image macro with text containing escaped square bracket should be interpreted as an image with alt text' do
-      para = block_from_string('image:tiger.png[[Another\] Tiger]')
+      para = block_from_string(%(image:tiger.png[[Another#{BACKSLASH}] Tiger]))
       assert_equal %{<span class="image"><img src="tiger.png" alt="[Another] Tiger"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
@@ -604,7 +614,7 @@ context 'Substitutions' do
     end
 
     test 'an escaped closing square bracket in a footnote should be unescaped when rendered' do
-      para = block_from_string('footnote:[a \] b].')
+      para = block_from_string(%(footnote:[a #{BACKSLASH}] b].))
       assert_equal %(<span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>.), para.sub_macros(para.source)
       assert_equal 1, para.document.references[:footnotes].size
       footnote = para.document.references[:footnotes].first
