@@ -124,6 +124,7 @@ p a > code:hover { color: #561309; }
 #header, #content, #footnotes, #footer { width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 62.5em; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
 #header:before, #header:after, #content:before, #content:after, #footnotes:before, #footnotes:after, #footer:before, #footer:after { content: " "; display: table; }
 #header:after, #content:after, #footnotes:after, #footer:after { clear: both; }
+#content:before { content: none; }
 #header { margin-bottom: 2.5em; }
 #header > h1 { color: black; font-weight: 300; border-bottom: 1px solid #d8d8d8; margin-bottom: -28px; padding-bottom: 32px; }
 #header span { color: #6e6e6e; }
@@ -169,7 +170,7 @@ p a > code:hover { color: #561309; }
 #content h1 > a.link, h2 > a.link, h3 > a.link, #toctitle > a.link, .sidebarblock > .content > .title > a.link, h4 > a.link, h5 > a.link, h6 > a.link { color: #ba3925; text-decoration: none; }
 #content h1 > a.link:hover, h2 > a.link:hover, h3 > a.link:hover, #toctitle > a.link:hover, .sidebarblock > .content > .title > a.link:hover, h4 > a.link:hover, h5 > a.link:hover, h6 > a.link:hover { color: #a53221; }
 .audioblock, .imageblock, .literalblock, .listingblock, .stemblock, .verseblock, .videoblock { margin-bottom: 1.25em; }
-.admonitionblock td.content > .title, .audioblock > .title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .literalblock > .title, .stemblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, table.tableblock > .title, .verseblock > .title, .videoblock > .title, .dlist > .title, .olist > .title, .ulist > .title, .qlist > .title, .hdlist > .title { text-align: left; font-family: "Noto Serif", "DejaVu Serif", "Serif", serif; font-weight: normal; font-style: italic; }
+.admonitionblock td.content > .title, .audioblock > .title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .literalblock > .title, .stemblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, table.tableblock > .title, .verseblock > .title, .videoblock > .title, .dlist > .title, .olist > .title, .ulist > .title, .qlist > .title, .hdlist > .title { text-rendering: optimizeLegibility; text-align: left; font-family: "Noto Serif", "DejaVu Serif", "Serif", serif; font-weight: normal; font-style: italic; }
 table.tableblock > caption.title { white-space: nowrap; overflow: visible; max-width: 0; }
 table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-size: inherit; }
 .admonitionblock > table { border: 0; background: none; width: 100%; }
