@@ -73,34 +73,39 @@ context 'Substitutions' do
       assert_equal %q{&#8216;Here`s Johnny!&#8217;}, para.sub_quotes(para.source)
     end
 
-    test 'single-line constrained unquoted string' do
+    test 'single-line constrained marked string' do
       para = block_from_string(%q{#a few words#})
-      assert_equal 'a few words', para.sub_quotes(para.source)
+      assert_equal '<mark>a few words</mark>', para.sub_quotes(para.source)
     end
 
-    test 'escaped single-line constrained unquoted string' do
+    test 'escaped single-line constrained marked string' do
       para = block_from_string(%(#{BACKSLASH}#a few words#))
       assert_equal '#a few words#', para.sub_quotes(para.source)
     end
 
-    test 'multi-line constrained unquoted string' do
+    test 'multi-line constrained marked string' do
       para = block_from_string(%Q{#a few\nwords#})
-      assert_equal "a few\nwords", para.sub_quotes(para.source)
+      assert_equal "<mark>a few\nwords</mark>", para.sub_quotes(para.source)
     end
 
-    test 'single-line unconstrained unquoted string' do
+    test 'single-line unconstrained marked string' do
       para = block_from_string(%q{##--anything goes ##})
-      assert_equal '--anything goes ', para.sub_quotes(para.source)
+      assert_equal '<mark>--anything goes </mark>', para.sub_quotes(para.source)
     end
 
-    test 'escaped single-line unconstrained unquoted string' do
-      para = block_from_string(%(#{BACKSLASH}##--anything goes ##))
-      assert_equal '#--anything goes #', para.sub_quotes(para.source)
+    test 'escaped single-line unconstrained marked string' do
+      para = block_from_string(%(#{BACKSLASH}#{BACKSLASH}##--anything goes ##))
+      assert_equal '##--anything goes ##', para.sub_quotes(para.source)
     end
 
-    test 'multi-line unconstrained unquoted string' do
+    test 'multi-line unconstrained marked string' do
       para = block_from_string(%Q{##--anything\ngoes ##})
-      assert_equal "--anything\ngoes ", para.sub_quotes(para.source)
+      assert_equal "<mark>--anything\ngoes </mark>", para.sub_quotes(para.source)
+    end
+
+    test 'single-line constrained marked string with role' do
+      para = block_from_string(%q{[statement]#a few words#})
+      assert_equal '<span class="statement">a few words</span>', para.sub_quotes(para.source)
     end
 
     test 'single-line constrained strong string' do

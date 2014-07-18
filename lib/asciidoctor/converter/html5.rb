@@ -10,6 +10,7 @@ module Asciidoctor
       :subscript   => ['<sub>',    '</sub>',    true],
       :double      => ['&#8220;',  '&#8221;',   false],
       :single      => ['&#8216;',  '&#8217;',   false],
+      :mark        => ['<mark>',   '</mark>',   true],
       :asciimath   => ['\\$',      '\\$',       false],
       :latexmath   => ['\\(',      '\\)',       false]
       # Opal can't resolve these constants when referenced here
@@ -1057,10 +1058,14 @@ Your browser does not support the video tag.
 
     def inline_quoted node
       open, close, is_tag = QUOTE_TAGS[node.type]
-      quoted_text = if (role = node.role)
-        is_tag ? %(#{open.chop} class="#{role}">#{node.text}#{close}) : %(<span class="#{role}">#{open}#{node.text}#{close}</span>)
+      if (role = node.role)
+        if is_tag
+          quoted_text = %(#{open.chop} class="#{role}">#{node.text}#{close})
+        else
+          quoted_text = %(<span class="#{role}">#{open}#{node.text}#{close}</span>)
+        end
       else
-        %(#{open}#{node.text}#{close})
+        quoted_text = %(#{open}#{node.text}#{close})
       end
 
       node.id ? %(<a id="#{node.id}"></a>#{quoted_text}) : quoted_text
