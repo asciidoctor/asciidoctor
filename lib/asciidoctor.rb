@@ -1157,11 +1157,11 @@ module Asciidoctor
     # _emphasis_
     [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?_(\S|\S.*?\S)_(?!#{CG_WORD})/m],
 
-    # ##unquoted##
-    [:none, :unconstrained, /\\?(?:\[([^\]]+?)\])?##(.+?)##/m],
+    # ##mark## (referred to in AsciiDoc Python as unquoted)
+    [:mark, :unconstrained, /\\?(?:\[([^\]]+?)\])?##(.+?)##/m],
 
-    # #unquoted#
-    [:none, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?!#{CG_WORD})/m],
+    # #mark# (referred to in AsciiDoc Python as unquoted)
+    [:mark, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?!#{CG_WORD})/m],
 
     # ^superscript^
     [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(\S*?)\^/m],

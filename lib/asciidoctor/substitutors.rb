@@ -1059,13 +1059,21 @@ module Substitutors
       if unescaped_attrs
         %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type).convert})
       else
-        attributes = parse_quoted_text_attributes(match[2])
-        id = attributes ? attributes.delete('id') : nil
+        if (attributes = parse_quoted_text_attributes(match[2]))
+          id = attributes.delete 'id'
+          type = :unquoted if type == :mark
+        else
+          id = nil
+        end
         %(#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :id => id, :attributes => attributes).convert})
       end
     else
-      attributes = parse_quoted_text_attributes(match[1])
-      id = attributes ? attributes.delete('id') : nil
+      if (attributes = parse_quoted_text_attributes(match[1]))
+        id = attributes.delete 'id'
+        type = :unquoted if type == :mark
+      else
+        id = nil
+      end
       Inline.new(self, :quoted, match[2], :type => type, :id => id, :attributes => attributes).convert
     end
   end
