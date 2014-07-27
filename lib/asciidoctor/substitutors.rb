@@ -101,7 +101,7 @@ module Substitutors
 
     if (has_passthroughs = subs.include? :macros)
       text = extract_passthroughs text
-      has_passthroughs = false if @passthroughs.nil_or_empty?
+      has_passthroughs = false if @passthroughs.empty?
     end
 
     subs.each do |type|
@@ -176,7 +176,7 @@ module Substitutors
           next m[0][1..-1]
         end
 
-        @passthroughs << {:text => (unescape_brackets m[8]), :subs => (m[7].nil_or_empty? ? [] : (resolve_pass_subs m[7]))}
+        @passthroughs[pass_key = @passthroughs.size] = {:text => (unescape_brackets m[8]), :subs => (m[7].nil_or_empty? ? [] : (resolve_pass_subs m[7]))}
       else # $$, ++ or +++
         # skip ++ in legacy mode, handled as normal quoted text
         if compat_mode == :legacy && boundary == '++'
@@ -216,18 +216,19 @@ module Substitutors
         end
         subs = (boundary == '+++' ? [] : [:specialcharacters])
 
+        pass_key = @passthroughs.size
         if attributes
           if old_behavior
-            @passthroughs << {:text => content, :subs => SUBS[:normal], :type => :monospaced, :attributes => attributes}
+            @passthroughs[pass_key] = {:text => content, :subs => SUBS[:normal], :type => :monospaced, :attributes => attributes}
           else
-            @passthroughs << {:text => content, :subs => subs, :type => :unquoted, :attributes => attributes}
+            @passthroughs[pass_key] = {:text => content, :subs => subs, :type => :unquoted, :attributes => attributes}
           end
         else
-          @passthroughs << {:text => content, :subs => subs}
+          @passthroughs[pass_key] = {:text => content, :subs => subs}
         end
       end
 
-      %(#{preceding}#{PASS_START}#{@passthroughs.size - 1}#{PASS_END})
+      %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
     } if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
     pass_inline_char1, pass_inline_char2, pass_inline_rx = PassInlineRx[compat_mode]
@@ -275,20 +276,21 @@ module Substitutors
         next "#{preceding}#{m[3][1..-1]}"
       end
 
+      pass_key = @passthroughs.size
       if compat_mode == :legacy
-        @passthroughs << {:text => content, :subs => [:specialcharacters], :attributes => attributes, :type => :monospaced}
+        @passthroughs[pass_key] = {:text => content, :subs => [:specialcharacters], :attributes => attributes, :type => :monospaced}
       elsif attributes
         if old_behavior
           subs = (format_mark == '`' ? [:specialcharacters] : SUBS[:normal])
-          @passthroughs << {:text => content, :subs => subs, :attributes => attributes, :type => :monospaced}
+          @passthroughs[pass_key] = {:text => content, :subs => subs, :attributes => attributes, :type => :monospaced}
         else
-          @passthroughs << {:text => content, :subs => [:specialcharacters], :attributes => attributes, :type => :unquoted}
+          @passthroughs[pass_key] = {:text => content, :subs => [:specialcharacters], :attributes => attributes, :type => :unquoted}
         end
       else
-        @passthroughs << {:text => content, :subs => [:specialcharacters]}
+        @passthroughs[pass_key] = {:text => content, :subs => [:specialcharacters]}
       end
 
-      %(#{preceding}#{PASS_START}#{@passthroughs.size - 1}#{PASS_END})
+      %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
     } if (text.include? pass_inline_char1) || (pass_inline_char2 && (text.include? pass_inline_char2))
 
     # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
@@ -310,8 +312,8 @@ module Substitutors
         subs = resolve_pass_subs m[2]
       end
 
-      @passthroughs << {:text => content, :subs => subs, :type => type}
-      %(#{PASS_START}#{@passthroughs.size - 1}#{PASS_END})
+      @passthroughs[pass_key = @passthroughs.size] = {:text => content, :subs => subs, :type => type}
+      %(#{PASS_START}#{pass_key}#{PASS_END})
     } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
     text
@@ -323,22 +325,18 @@ module Substitutors
   # check - A Boolean indicating whether to check whether substitution is necessary (default: true)
   #
   # returns The String text with the passthrough text restored
-  def restore_passthroughs(text, check = true)
-    return text if check && @passthroughs.nil_or_empty? || !text.include?(PASS_START)
+  def restore_passthroughs text, check = true
+    if check && (@passthroughs.empty? || !text.include?(PASS_START))
+      return text
+    end
 
     text.gsub(PASS_MATCH) {
-      pass = @passthroughs[$~[1].to_i]
-      subbed_text = (subs = pass[:subs]) ? (apply_subs pass[:text], subs) : pass[:text]
+      pass = @passthroughs.delete $~[1].to_i
+      subbed_text = (subs = pass[:subs]) ? apply_subs(pass[:text], subs) : pass[:text]
       if (type = pass[:type])
         subbed_text = Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).convert
       end
-      subbed_text
-      # TODO enable the following code to restore passthroughs recursively
-      #if subbed_text.include? PASS_START
-      #  restore_passthroughs subbed_text, false
-      #else
-      #  subbed_text
-      #end
+      (@passthroughs.empty? || !subbed_text.include?(PASS_START)) ? subbed_text : restore_passthroughs(subbed_text, false)
     }
   end
 

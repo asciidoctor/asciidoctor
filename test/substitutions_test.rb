@@ -1085,8 +1085,8 @@ EOS
       result = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
-      assert_equal '<code>inline code</code>', para.passthroughs.first[:text]
-      assert para.passthroughs.first[:subs].empty?
+      assert_equal '<code>inline code</code>', para.passthroughs[0][:text]
+      assert para.passthroughs[0][:subs].empty?
     end
 
     test 'collect multi-line inline triple plus passthroughs' do
@@ -1094,8 +1094,8 @@ EOS
       result = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
-      assert_equal "<code>inline\ncode</code>", para.passthroughs.first[:text]
-      assert para.passthroughs.first[:subs].empty?
+      assert_equal "<code>inline\ncode</code>", para.passthroughs[0][:text]
+      assert para.passthroughs[0][:subs].empty?
     end
 
     test 'collect inline double dollar passthroughs' do
@@ -1103,8 +1103,8 @@ EOS
       result = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
-      assert_equal '<code>{code}</code>', para.passthroughs.first[:text]
-      assert_equal [:specialcharacters], para.passthroughs.first[:subs]
+      assert_equal '<code>{code}</code>', para.passthroughs[0][:text]
+      assert_equal [:specialcharacters], para.passthroughs[0][:subs]
     end
 
     test 'collect inline double plus passthroughs' do
@@ -1112,8 +1112,8 @@ EOS
       result = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
-      assert_equal '<code>{code}</code>', para.passthroughs.first[:text]
-      assert_equal [:specialcharacters], para.passthroughs.first[:subs]
+      assert_equal '<code>{code}</code>', para.passthroughs[0][:text]
+      assert_equal [:specialcharacters], para.passthroughs[0][:subs]
     end
 
     test 'collect multi-line inline double dollar passthroughs' do
@@ -1121,8 +1121,8 @@ EOS
       result = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
-      assert_equal "<code>\n{code}\n</code>", para.passthroughs.first[:text]
-      assert_equal [:specialcharacters], para.passthroughs.first[:subs]
+      assert_equal "<code>\n{code}\n</code>", para.passthroughs[0][:text]
+      assert_equal [:specialcharacters], para.passthroughs[0][:subs]
     end
 
     test 'collect multi-line inline double plus passthroughs' do
@@ -1130,8 +1130,8 @@ EOS
       result = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
-      assert_equal "<code>\n{code}\n</code>", para.passthroughs.first[:text]
-      assert_equal [:specialcharacters], para.passthroughs.first[:subs]
+      assert_equal "<code>\n{code}\n</code>", para.passthroughs[0][:text]
+      assert_equal [:specialcharacters], para.passthroughs[0][:subs]
     end
 
     test 'collect passthroughs from inline pass macro' do
@@ -1139,8 +1139,8 @@ EOS
       result = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
-      assert_equal %q{<code>['code']</code>}, para.passthroughs.first[:text]
-      assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
+      assert_equal %q{<code>['code']</code>}, para.passthroughs[0][:text]
+      assert_equal [:specialcharacters, :quotes], para.passthroughs[0][:subs]
     end
 
     test 'collect multi-line passthroughs from inline pass macro' do
@@ -1148,15 +1148,15 @@ EOS
       result = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
-      assert_equal %Q{<code>['more\ncode']</code>}, para.passthroughs.first[:text]
-      assert_equal [:specialcharacters, :quotes], para.passthroughs.first[:subs]
+      assert_equal %Q{<code>['more\ncode']</code>}, para.passthroughs[0][:text]
+      assert_equal [:specialcharacters, :quotes], para.passthroughs[0][:subs]
     end
 
     test 'resolves sub shorthands on inline pass macro' do
       para = block_from_string 'pass:q,a[*<{backend}>*]'
       result = para.extract_passthroughs para.source
       assert_equal 1, para.passthroughs.size
-      assert_equal [:quotes, :attributes], para.passthroughs.first[:subs]
+      assert_equal [:quotes, :attributes], para.passthroughs[0][:subs]
       result = para.restore_passthroughs result
       assert_equal '<strong><html5></strong>', result
     end
@@ -1164,7 +1164,7 @@ EOS
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs without subs' do
       para = block_from_string("some #{Asciidoctor::Substitutors::PASS_START}" + '0' + "#{Asciidoctor::Substitutors::PASS_END} to study")
-      para.passthroughs << {:text => '<code>inline code</code>', :subs => []}
+      para.passthroughs[0] = {:text => '<code>inline code</code>', :subs => []}
       result = para.restore_passthroughs(para.source)
       assert_equal "some <code>inline code</code> to study", result
     end
@@ -1172,10 +1172,15 @@ EOS
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs with subs' do
       para = block_from_string("some #{Asciidoctor::Substitutors::PASS_START}" + '0' + "#{Asciidoctor::Substitutors::PASS_END} to study in the #{Asciidoctor::Substitutors::PASS_START}" + '1' + "#{Asciidoctor::Substitutors::PASS_END} programming language")
-      para.passthroughs << {:text => '<code>{code}</code>', :subs => [:specialcharacters]}
-      para.passthroughs << {:text => '{language}', :subs => [:specialcharacters]}
+      para.passthroughs[0] = {:text => '<code>{code}</code>', :subs => [:specialcharacters]}
+      para.passthroughs[1] = {:text => '{language}', :subs => [:specialcharacters]}
       result = para.restore_passthroughs(para.source)
       assert_equal 'some &lt;code&gt;{code}&lt;/code&gt; to study in the {language} programming language', result
+    end
+
+    test 'restore nested passthroughs' do
+      result = render_embedded_string %q(+I'm in pass:q[`mono`].+), :doctype => :inline
+      assert_equal %q(I'm in <code>mono</code>.), result
     end
 
     test 'should honor role on double plus passthrough' do
