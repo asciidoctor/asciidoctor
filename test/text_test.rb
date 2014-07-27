@@ -214,48 +214,69 @@ This line is separated something that is not a horizontal rule...
     refute_match(/#/, render_string("An #unquoted# word"))
   end
 
-  test "backtick-escaped text followed by single-quoted text" do
+  test "backtick text followed by single-quoted text" do
     assert_match(/<code>foo<\/code>/, render_string(%Q(run `foo` 'dog')))
+  end
+
+  test 'plus characters inside single plus passthrough' do
+    assert_xpath '//p[text()="+"]', render_embedded_string('+++')
+    assert_xpath '//p[text()="+="]', render_embedded_string('++=+')
+  end
+
+  test 'plus passthrough escapes entity reference' do
+    assert_match(/&amp;#44;/, render_embedded_string('+&#44;+'))
+    assert_match(/one&amp;#44;two/, render_embedded_string('one++&#44;++two'))
   end
 
   context "basic styling" do
     setup do
-      @rendered = render_string("A *BOLD* word.  An _italic_ word.  A +mono+ word.  ^superscript!^ and some ~subscript~.")
+      @rendered = render_string("A *BOLD* word.  An _italic_ word.  A `mono` word.  ^superscript!^ and some ~subscript~.")
     end
 
     test "strong" do
-      assert_xpath "//strong", @rendered
+      assert_xpath "//strong", @rendered, 1
     end
 
     test "italic" do
-      assert_xpath "//em", @rendered
+      assert_xpath "//em", @rendered, 1
     end
 
     test "monospaced" do
-      assert_xpath "//code", @rendered
+      assert_xpath "//code", @rendered, 1
     end
 
     test "superscript" do
-      assert_xpath "//sup", @rendered
+      assert_xpath "//sup", @rendered, 1
     end
 
     test "subscript" do
-      assert_xpath "//sub", @rendered
+      assert_xpath "//sub", @rendered, 1
     end
 
-    test "backticks" do
-      assert_xpath "//code", render_string("This is `totally cool`.")
+    test "passthrough" do
+      assert_xpath "//code", render_string("This is +passed through+."), 0
+      assert_xpath "//code", render_string("This is +passed through and monospaced+.", :attributes => {'compat-mode' => 'legacy'}), 1
     end
 
     test "nested styles" do
-      rendered = render_string("Winning *big _time_* in the +city *boyeeee*+.")
+      rendered = render_string("Winning *big _time_* in the +city *boyeeee*+.", :attributes => {'compat-mode' => 'legacy'})
+
+      assert_xpath "//strong/em", rendered
+      assert_xpath "//code/strong", rendered
+
+      rendered = render_string("Winning *big _time_* in the `city *boyeeee*`.")
 
       assert_xpath "//strong/em", rendered
       assert_xpath "//code/strong", rendered
     end
 
     test "unconstrained quotes" do
-      rendered_chars = render_string("**B**__I__++M++")
+      rendered_chars = render_string("**B**__I__++M++", :attributes => {'compat-mode' => 'legacy'})
+      assert_xpath "//strong", rendered_chars
+      assert_xpath "//em", rendered_chars
+      assert_xpath "//code", rendered_chars
+
+      rendered_chars = render_string("**B**__I__``M``")
       assert_xpath "//strong", rendered_chars
       assert_xpath "//em", rendered_chars
       assert_xpath "//code", rendered_chars

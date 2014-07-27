@@ -183,6 +183,7 @@ class Document < AbstractBlock
         SafeMode.const_get(safe_mode.to_s.upcase).to_i rescue SafeMode::SECURE.to_i
       end
       @sourcemap = options.key?(:sourcemap) && options[:sourcemap] == true
+      @compat_mode = :default
       @converter = nil
       initialize_extensions = defined? ::Asciidoctor::Extensions
       @extensions = nil # initialize furthur down
