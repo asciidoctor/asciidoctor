@@ -24,7 +24,7 @@ class AbstractNode
   # Public: Get the Hash of attributes for this node
   attr_reader :attributes
 
-  def initialize(parent, context, opts = {})
+  def initialize parent, context, opts = {}
     # document is a special case, should refer to itself
     if context == :document
       @parent = nil

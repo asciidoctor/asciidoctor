@@ -67,8 +67,8 @@ class Table < AbstractBlock
   # Public: Boolean specifies whether this table has a header row
   attr_accessor :has_header_option
 
-  def initialize(parent, attributes)
-    super(parent, :table)
+  def initialize parent, attributes
+    super parent, :table
     @rows = Rows.new
     @columns = []
 
@@ -149,8 +149,8 @@ class Table::Column < AbstractNode
   # Public: Get/Set the Symbol style for this column.
   attr_accessor :style
 
-  def initialize(table, index, attributes = {})
-    super(table, :column)
+  def initialize table, index, attributes = {}
+    super table, :column
     @style = attributes['style']
     attributes['colnumber'] = index + 1
     attributes['width'] ||= 1
@@ -199,8 +199,8 @@ class Table::Cell < AbstractNode
   # Public: The internal Asciidoctor::Document for a cell that has the asciidoc style
   attr_reader :inner_document
 
-  def initialize(column, text, attributes = {}, cursor = nil)
-    super(column, :cell)
+  def initialize column, text, attributes = {}, cursor = nil
+    super column, :cell
     @text = text
     @style = nil
     @colspan = nil

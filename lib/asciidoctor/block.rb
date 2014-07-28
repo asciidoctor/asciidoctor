@@ -39,7 +39,7 @@ class Block < AbstractBlock
   #                 * :source a String or Array of raw source for this Block. (default: nil)
   #--
   # QUESTION should we store source_data as lines for blocks that have compound content models?
-  def initialize(parent, context, opts = {})
+  def initialize parent, context, opts = {}
     super
     @content_model = opts[:content_model] || DEFAULT_CONTENT_MODEL[context]
     if opts.has_key? :subs
