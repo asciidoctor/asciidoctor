@@ -340,7 +340,8 @@ class AbstractNode
 
     unless ::File.readable? image_path
       warn %(asciidoctor: WARNING: image to embed not found or not readable: #{image_path})
-      return %(data:#{mimetype}:base64,)
+      # must enclose string following return in " for Opal
+      return "data:#{mimetype}:base64,"
       # uncomment to return 1 pixel white dot instead
       #return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     end

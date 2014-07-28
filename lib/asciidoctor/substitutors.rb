@@ -199,7 +199,8 @@ module Substitutors
         if attributes
           if escape_count > 0
             # NOTE we don't look for nested unconstrained pass macros
-            next %(#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
+            # must enclose string following next in " for Opal
+            next "#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})"
           elsif m[1] == '\\'
             preceding = %([#{attributes}])
             attributes = nil
@@ -212,7 +213,8 @@ module Substitutors
           end
         elsif escape_count > 0
           # NOTE we don't look for nested unconstrained pass macros
-          next %(#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
+          # must enclose string following next in " for Opal
+          next "#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary}"
         end
         subs = (boundary == '+++' ? [] : [:specialcharacters])
 
@@ -256,11 +258,12 @@ module Substitutors
 
       if attributes
         if format_mark == '`' && !old_behavior
-          next %(#{preceding}[#{attributes}]#{escape_mark}`#{extract_passthroughs content}`)
+          # must enclose string following next in " for Opal
+          next "#{preceding}[#{attributes}]#{escape_mark}`#{extract_passthroughs content}`"
         end
 
         if escape_mark
-          # honor the escape of the formatting mark
+          # honor the escape of the formatting mark (must enclose string following next in " for Opal)
           next "#{preceding}[#{attributes}]#{m[3][1..-1]}"
         elsif preceding == '\\'
           # honor the escape of the attributes
@@ -270,9 +273,10 @@ module Substitutors
           attributes = parse_attributes attributes
         end
       elsif format_mark == '`' && !old_behavior
-        next %(#{preceding}#{escape_mark}`#{extract_passthroughs content}`)
+        # must enclose string following next in " for Opal
+        next "#{preceding}#{escape_mark}`#{extract_passthroughs content}`"
       elsif escape_mark
-        # honor the escape of the formatting mark
+        # honor the escape of the formatting mark (must enclose string following next in " for Opal)
         next "#{preceding}#{m[3][1..-1]}"
       end
 
@@ -731,7 +735,7 @@ module Substitutors
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
-          # NOTE Opal doesn't like %() as an enclosure around this string because of range
+          # must enclose string following next in " for Opal
           next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
         end
         # fix non-matching group results in Opal under Firefox
