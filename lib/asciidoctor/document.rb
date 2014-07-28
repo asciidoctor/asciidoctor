@@ -373,7 +373,6 @@ class Document < AbstractBlock
       end
 
       @reader = PreprocessorReader.new self, data, Reader::Cursor.new(attrs['docfile'], @base_dir)
-      parse if data && options[:parse]
     end
   end
 
@@ -389,31 +388,36 @@ class Document < AbstractBlock
   #
   # Returns this [Document]
   def parse data = nil
-    unless @parsed
+    if @parsed
+      self
+    else
+      doc = self
       # create reader if data is provided (used when data is not known at the time the Document object is created)
-      @reader = PreprocessorReader.new self, data, Reader::Cursor.new(@attributes['docfile'], @base_dir) if data
+      @reader = PreprocessorReader.new doc, data, Reader::Cursor.new(@attributes['docfile'], @base_dir) if data
 
       if (exts = @parent_document ? nil : @extensions) && exts.preprocessors?
         exts.preprocessors.each do |ext|
-          @reader = ext.process_method[self, @reader] || @reader
+          @reader = ext.process_method[doc, @reader] || @reader
         end
       end
 
       # Now parse the lines in the reader into blocks
-      Parser.parse @reader, self, :header_only => !!@options[:parse_header_only]
+      Parser.parse @reader, doc, :header_only => !!@options[:parse_header_only]
 
       # should we call rewind in some sort of post-parse function?
       @callouts.rewind
 
       if exts && exts.treeprocessors?
         exts.treeprocessors.each do |ext|
-          ext.process_method[self]
+          if (result = ext.process_method[doc]) && Document === result && result != doc
+            doc = result
+          end
         end
       end
 
       @parsed = true
+      doc
     end
-    self
   end
 
   # Public: Get the named counter and take the next number in the sequence.

@@ -62,6 +62,17 @@ class ReplaceAuthorTreeprocessor < Asciidoctor::Extensions::Treeprocessor
   def process document
     document.attributes['firstname'] = 'Ghost'
     document.attributes['author'] = 'Ghost Writer'
+    document
+  end
+end
+
+class ReplaceTreeTreeprocessor < Asciidoctor::Extensions::Treeprocessor
+  def process document
+    if document.doctitle == 'Original Document'
+      Asciidoctor.load %(== Replacement Document\nReplacement Author\n\ncontent)
+    else
+      document
+    end
   end
 end
 
@@ -451,6 +462,26 @@ content
 
         doc = document_from_string input
         assert_equal 'Ghost Writer', doc.author
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should allow treeprocessor to replace tree' do
+      input = <<-EOS
+= Original Document
+Doc Writer
+
+content
+      EOS
+
+      begin
+        Asciidoctor::Extensions.register do
+          treeprocessor ReplaceTreeTreeprocessor
+        end
+
+        doc = document_from_string input
+        assert_equal 'Replacement Document', doc.doctitle
       ensure
         Asciidoctor::Extensions.unregister_all
       end
