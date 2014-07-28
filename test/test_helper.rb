@@ -36,7 +36,11 @@ class Minitest::Test
   end
 
   def empty_document options = {}
-    Asciidoctor::Document.new [], options
+    if options[:parse]
+      (Asciidoctor::Document.new [], options).parse
+    else
+      Asciidoctor::Document.new [], options
+    end
   end
 
   def empty_safe_document options = {}
@@ -154,7 +158,11 @@ class Minitest::Test
 
   def document_from_string(src, opts = {})
     assign_default_test_options opts
-    Asciidoctor::Document.new src.lines.entries, opts
+    if opts[:parse]
+      (Asciidoctor::Document.new src.lines.entries, opts).parse
+    else
+      Asciidoctor::Document.new src.lines.entries, opts
+    end
   end
 
   def block_from_string(src, opts = {})

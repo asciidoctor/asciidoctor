@@ -1308,8 +1308,7 @@ module Asciidoctor
       timings.start :parse
     end
 
-    options[:parse] = true unless options.key? :parse
-    doc = Document.new lines, options
+    doc = (options[:parse] == false ? (Document.new lines, options) : (Document.new lines,options).parse)
     timings.record :parse if timings
     doc
   end
