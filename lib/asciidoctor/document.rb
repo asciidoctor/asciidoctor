@@ -34,6 +34,38 @@ class Document < AbstractBlock
     end
   end
 
+  # Public Parsed and stores a partitioned title (i.e., title & subtitle).
+  class Title
+    attr_reader :main
+    attr_reader :subtitle
+    attr_reader :combined
+
+    def initialize val, opts = {}
+      # TODO separate sanitization by type (:sgml for HTML/XML, :plain_text for non-SGML, false for none)
+      if (@sanitized = !!opts[:sanitize]) && val.include?('<')
+        val = val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
+      end
+      if (@combined = val).include? ': '
+        @main, _, @subtitle = val.rpartition ': '
+      else
+        @main = val
+        @subtitle = nil
+      end
+    end
+
+    def sanitized?
+      @sanitized
+    end
+
+    def subtitle?
+      !!@subtitle
+    end
+
+    def to_s
+      @combined
+    end
+  end
+
   # Public A read-only integer value indicating the level of security that
   # should be enforced while processing this document. The value must be
   # set in the Document constructor using the :safe option.
@@ -553,7 +585,9 @@ class Document < AbstractBlock
       return
     end
     
-    if opts[:sanitize] && val.include?('<')
+    if opts[:partition]
+      Title.new val, opts
+    elsif opts[:sanitize] && val.include?('<')
       val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
     else
       val

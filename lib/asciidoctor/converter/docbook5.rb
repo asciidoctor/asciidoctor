@@ -624,7 +624,7 @@ module Asciidoctor
       info_tag_prefix = '' unless use_info_tag_prefix
       result = []
       result << %(<#{info_tag_prefix}info>)
-      result << (doc.header? ? (document_title_tags doc.header.title) : %(<title>#{doc.attr 'untitled-label'}</title>)) unless doc.notitle
+      result << (doc.header? ? document_title_tags(doc.doctitle :partition => true, :sanitize => :sgml) : %(<title>#{doc.attr 'untitled-label'}</title>)) unless doc.notitle
       result << %(<date>#{(doc.attr? 'revdate') ? (doc.attr 'revdate') : (doc.attr 'docdate')}</date>)
       if doc.has_header?
         if doc.attr? 'author'
@@ -663,12 +663,10 @@ module Asciidoctor
       ' xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"'
     end
 
-    # FIXME this splitting should handled in the AST!
     def document_title_tags title
-      if title.include? ': '
-        title, _, subtitle = title.rpartition ': '
-        %(<title>#{title}</title>
-<subtitle>#{subtitle}</subtitle>)
+      if title.subtitle?
+        %(<title>#{title.main}</title>
+<subtitle>#{title.subtitle}</subtitle>)
       else
         %(<title>#{title}</title>)
       end
