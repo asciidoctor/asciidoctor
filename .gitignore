@@ -3,5 +3,7 @@ pkg/
 /.bundle
 /*.gem
 /.idea/
+/.ruby-gemset
+/.ruby-version
 /.yardoc/
 /rdoc/
