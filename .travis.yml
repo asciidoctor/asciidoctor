@@ -6,8 +6,7 @@ rvm:
   - 1.8.7
   - jruby-18mode
   - jruby-19mode
-  # Rubinius broken with "OpenURI is not a module, but a Autoload"
-  #- rbx-2.1.1
+  - rbx-2
 #script: rake test test_us_ascii
 notifications:
   email: false
