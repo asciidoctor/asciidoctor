@@ -43,6 +43,7 @@ module Asciidoctor
         # Returns the default [Factory] singleton instance
         def default initialize_singleton = true
           return @__default__ || new unless initialize_singleton
+          # FIXME this assignment is not thread_safe, may need to use a ::Threadsafe helper here
           @__default__ ||= begin
             require 'thread_safe'.to_s unless defined? ::ThreadSafe
             new ::ThreadSafe::Cache.new
