@@ -26,11 +26,17 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line double-quoted string' do
-      para = block_from_string(%(#{BACKSLASH}``a few quoted words''))
+      para = block_from_string %(#{BACKSLASH}``a few quoted words''), :attributes => {'compat-mode' => 'legacy'}
       assert_equal %q(&#8216;`a few quoted words&#8217;'), para.sub_quotes(para.source)
 
-      para = block_from_string(%(#{BACKSLASH}#{BACKSLASH}``a few quoted words''))
+      para = block_from_string %(#{BACKSLASH * 2}``a few quoted words''), :attributes => {'compat-mode' => 'legacy'}
       assert_equal %q(``a few quoted words''), para.sub_quotes(para.source)
+
+      para = block_from_string(%(#{BACKSLASH}``a few quoted words''))
+      assert_equal %q(``a few quoted words''), para.sub_quotes(para.source)
+
+      para = block_from_string(%(#{BACKSLASH * 2}``a few quoted words''))
+      assert_equal %(#{BACKSLASH}``a few quoted words''), para.sub_quotes(para.source)
     end
 
     test 'multi-line double-quoted string' do
@@ -358,8 +364,11 @@ context 'Substitutions' do
       para = block_from_string(%(Git#{BACKSLASH}++Hub++), :attributes => {'compat-mode' => 'legacy'})
       assert_equal 'Git+<code>Hub</code>+', para.sub_quotes(para.source)
 
+      para = block_from_string(%(Git#{BACKSLASH * 2}++Hub++), :attributes => {'compat-mode' => 'legacy'})
+      assert_equal 'Git++Hub++', para.sub_quotes(para.source)
+
       para = block_from_string(%(Git#{BACKSLASH}``Hub``))
-      assert_equal 'Git`<code>Hub</code>`', para.sub_quotes(para.source)
+      assert_equal 'Git``Hub``', para.sub_quotes(para.source)
     end
 
     test 'multi-line unconstrained monospaced chars' do

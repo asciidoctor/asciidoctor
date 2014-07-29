@@ -66,6 +66,13 @@ include::fixtures/encoding.asciidoc[tags=romé]
     assert_match(/&#8216;The New Yorker.&#8217;/, rendered)
   end
 
+  test 'multiple double-quoted text on a single line' do
+    assert_equal '&#8220;Our business is constantly changing&#8221; or &#8220;We need faster time to market.&#8221;',
+        render_embedded_string(%q(``Our business is constantly changing'' or ``We need faster time to market.''), :doctype => :inline, :attributes => {'compat-mode' => 'legacy'})
+    assert_equal '&#8220;Our business is constantly changing&#8221; or &#8220;We need faster time to market.&#8221;',
+        render_embedded_string(%q(``Our business is constantly changing'' or ``We need faster time to market.''), :doctype => :inline)
+  end
+
   test 'horizontal rule' do
     input = <<-EOS
 This line is separated by a horizontal rule...
@@ -215,7 +222,11 @@ This line is separated something that is not a horizontal rule...
   end
 
   test "backtick text followed by single-quoted text" do
-    assert_match(/<code>foo<\/code>/, render_string(%Q(run `foo` 'dog')))
+    backslash = '\\'
+    assert_equal %q(run <code>foo</code> <em>dog</em>), render_embedded_string(%q(run `foo` 'dog'), :doctype => :inline, :attributes => {'compat-mode' => 'legacy'})
+    assert_equal %q(run &#8216;foo` 'dog&#8217;), render_embedded_string(%q(run `foo` 'dog'), :doctype => :inline)
+    assert_equal %q(run <code>foo</code> 'dog'), render_embedded_string(%(run #{backslash}`foo` 'dog'), :doctype => :inline)
+    assert_equal %q(run `foo` 'dog'), render_embedded_string(%(run #{backslash * 2}`foo` 'dog'), :doctype => :inline)
   end
 
   test 'plus characters inside single plus passthrough' do

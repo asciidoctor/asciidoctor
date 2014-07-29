@@ -1143,17 +1143,17 @@ module Asciidoctor
     # *strong*
     [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\*(\S|\S.*?\S)\*(?!#{CG_WORD})/m],
 
-    # ``monospaced``
-    [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?``(.+?)``/m],
-
-    # `monospaced`
-    [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)`(?!#{CG_WORD})/m],
-
     # ``double-quoted''
     [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?``(\S|\S.*?\S)''(?!#{CG_WORD})/m],
 
     # `single-quoted'
-    [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?!#{CG_WORD})/m],
+    [:single, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+?)\])?`([^`\s]|[^`\s].*?\S)'(?!#{CG_WORD})/m],
+
+    # ``monospaced``
+    [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?``(.+?)``/m],
+
+    # `monospaced`
+    [:monospaced, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+?)\])?`([^`\s]|[^`\s].*?\S)`(?![#{CC_WORD}`])/m],
 
     # __emphasis__
     [:emphasis, :unconstrained, /\\?(?:\[([^\]]+?)\])?__(.+?)__/m],
@@ -1175,15 +1175,14 @@ module Asciidoctor
   ]
 
   legacy_quote_subs = default_quote_subs.dup
-  # remove +monospaced+ and +monospaced+ to reposition
-  legacy_quote_subs.delete_at 3
-  legacy_quote_subs.delete_at 2
+  # `quoted' (legacy)
+  legacy_quote_subs[3] = [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?!#{CG_WORD})/m]
   # 'emphasis'
   legacy_quote_subs.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m]
   # ++monospaced++
-  legacy_quote_subs.insert 5, [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m]
+  legacy_quote_subs[5] = [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m]
   # +monospaced+
-  legacy_quote_subs.insert 6, [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?!#{CG_WORD})/m]
+  legacy_quote_subs[6] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?!#{CG_WORD})/m]
 
   QUOTE_SUBS = {
     :default => default_quote_subs,
