@@ -219,6 +219,13 @@ module Asciidoctor
       nil
     end
   end
+
+  module VoidWriter
+    include Writer
+    # Public: Does not write output
+    def write output, target
+    end
+  end
 end
 
 require 'asciidoctor/converter/base'

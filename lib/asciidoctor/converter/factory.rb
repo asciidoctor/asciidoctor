@@ -79,6 +79,23 @@ module Asciidoctor
           default.resolve backend
         end
 
+        # Public: Lookup the converter for the specified backend in the global
+        # factory and instantiate it, forwarding the Hash of options to the
+        # constructor of the converter class.
+        #
+        # If the custom converter is not found, an attempt will be made to find
+        # and instantiate a built-in converter.
+        #
+        #
+        # backend - The String backend name
+        # opts - A Hash of options to pass to the converter
+        #
+        # Returns an instance of [Converter] for converting the specified backend or
+        # nil if no match is found.
+        def create backend, opts = {}
+          default.create backend, opts
+        end
+
         # Public: Retrieve the global Hash of custom Converter classes keyed by backend.
         #
         # Returns the the global [Hash] of custom Converter classes
