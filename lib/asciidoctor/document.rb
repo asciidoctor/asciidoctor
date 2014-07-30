@@ -34,6 +34,38 @@ class Document < AbstractBlock
     end
   end
 
+  # Public Parsed and stores a partitioned title (i.e., title & subtitle).
+  class Title
+    attr_reader :main
+    attr_reader :subtitle
+    attr_reader :combined
+
+    def initialize val, opts = {}
+      # TODO separate sanitization by type (:cdata for HTML/XML, :plain for non-SGML, false for none)
+      if (@sanitized = opts[:sanitize]) && val.include?('<')
+        val = val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
+      end
+      if (@combined = val).include? ': '
+        @main, _, @subtitle = val.rpartition ': '
+      else
+        @main = val
+        @subtitle = nil
+      end
+    end
+
+    def sanitized?
+      @sanitized
+    end
+
+    def subtitle?
+      !!@subtitle
+    end
+
+    def to_s
+      @combined
+    end
+  end
+
   # Public A read-only integer value indicating the level of security that
   # should be enforced while processing this document. The value must be
   # set in the Document constructor using the :safe option.
@@ -543,17 +575,37 @@ class Document < AbstractBlock
     @header.title = title
   end
 
-  # We need to be able to return some semblance of a title
-  def doctitle(opts = {})
-    if !(val = @attributes.fetch('title', '')).empty?
+  # Public: Resolves the primary title for the document
+  #
+  # Searches the locations to find the first non-empty
+  # value:
+  #
+  #  * document-level attribute named title
+  #  * header title (known as the document title)
+  #  * title of the first section
+  #  * document-level attribute named untitled-label (if :use_fallback option is set)
+  #
+  # If no value can be resolved, nil is returned.
+  #
+  # If the :partition attribute is specified, the value is parsed into an Document::Title object.
+  # If the :sanitize attribute is specified, XML elements are removed from the value.
+  #
+  # Returns the resolved title as a [Title] if the :partition option is passed or a [String] if not
+  # or nil if no value can be resolved.
+  def doctitle opts = {}
+    if !(val = @attributes['title'].nil_or_empty?)
       val = title
     elsif (sect = first_section) && sect.title?
       val = sect.title
+    elsif opts[:use_fallback] && (val = @attributes['untitled-label'])
+      # use val set in condition
     else
       return
     end
     
-    if opts[:sanitize] && val.include?('<')
+    if opts[:partition]
+      Title.new val, opts
+    elsif opts[:sanitize] && val.include?('<')
       val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
     else
       val

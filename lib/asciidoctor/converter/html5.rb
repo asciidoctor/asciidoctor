@@ -48,7 +48,7 @@ module Asciidoctor
       result << %(<meta name="author" content="#{node.attr 'authors'}"#{slash}>) if node.attr? 'authors'
       result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
 
-      result << %(<title>#{node.doctitle(:sanitize => true) || node.attr('untitled-label')}</title>) 
+      result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>) 
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
         if (webfonts = node.attr 'webfonts')
           result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic|Noto+Serif:400,400italic,700,700italic|Droid+Sans+Mono:400' : webfonts}"#{slash}>)
