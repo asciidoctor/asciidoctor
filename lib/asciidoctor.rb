@@ -455,13 +455,18 @@ module Asciidoctor
     #
     IncludeDirectiveRx = /^\\?include::([^\[]+)\[(.*?)\]$/
 
-    # Matches a tag directive in an include file.
+    # Matches a trailing tag directive in an include file.
     #
     # Examples
     #
-    #   tag::try-catch[]
-    #   end::try-catch[]
-    TagDirectiveRx = /(?:tag|end)::\S+\[\]/
+    #   // tag::try-catch[]
+    #   try {
+    #     someMethod();
+    #   catch (Exception e) {
+    #     log(e);
+    #   }
+    #   // end::try-catch[]
+    TagDirectiveRx = /\b(?:tag|end)::\S+\[\]$/
 
     ## Attribute entries and references
 

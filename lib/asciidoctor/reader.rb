@@ -939,16 +939,17 @@ class PreprocessorReader < Reader
                 inc_lineno += 1
                 # must force encoding here since we're performing String operations on line
                 l.force_encoding(::Encoding::UTF_8) if FORCE_ENCODING
-                if !active_tag.nil?
-                  if l.include?("end::#{active_tag}[]")
+                l = l.rstrip
+                if active_tag
+                  if l.end_with?(%(end::#{active_tag}[])) && TagDirectiveRx =~ l
                     active_tag = nil
                   else
-                    selected.push l unless TagDirectiveRx =~ l
+                    selected.push l unless l.end_with?('[]') && TagDirectiveRx =~ l
                     inc_line_offset = inc_lineno if inc_line_offset == 0
                   end
                 else
                   tags.each do |tag|
-                    if l.include?("tag::#{tag}[]")
+                    if l.end_with?(%(tag::#{tag}[])) && TagDirectiveRx =~ l
                       active_tag = tag
                       tags_found << tag
                       break
