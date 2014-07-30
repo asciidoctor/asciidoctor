@@ -41,8 +41,8 @@ class Document < AbstractBlock
     attr_reader :combined
 
     def initialize val, opts = {}
-      # TODO separate sanitization by type (:sgml for HTML/XML, :plain_text for non-SGML, false for none)
-      if (@sanitized = !!opts[:sanitize]) && val.include?('<')
+      # TODO separate sanitization by type (:cdata for HTML/XML, :plain for non-SGML, false for none)
+      if (@sanitized = opts[:sanitize]) && val.include?('<')
         val = val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
       end
       if (@combined = val).include? ': '
@@ -575,12 +575,30 @@ class Document < AbstractBlock
     @header.title = title
   end
 
-  # We need to be able to return some semblance of a title
-  def doctitle(opts = {})
-    if !(val = @attributes.fetch('title', '')).empty?
+  # Public: Resolves the primary title for the document
+  #
+  # Searches the locations to find the first non-empty
+  # value:
+  #
+  #  * document-level attribute named title
+  #  * header title (known as the document title)
+  #  * title of the first section
+  #  * document-level attribute named untitled-label (if :use_fallback option is set)
+  #
+  # If no value can be resolved, nil is returned.
+  #
+  # If the :partition attribute is specified, the value is parsed into an Document::Title object.
+  # If the :sanitize attribute is specified, XML elements are removed from the value.
+  #
+  # Returns the resolved title as a [Title] if the :partition option is passed or a [String] if not
+  # or nil if no value can be resolved.
+  def doctitle opts = {}
+    if !(val = @attributes['title'].nil_or_empty?)
       val = title
     elsif (sect = first_section) && sect.title?
       val = sect.title
+    elsif opts[:use_fallback] && (val = @attributes['untitled-label'])
+      # use val set in condition
     else
       return
     end

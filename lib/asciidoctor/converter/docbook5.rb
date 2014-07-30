@@ -624,7 +624,7 @@ module Asciidoctor
       info_tag_prefix = '' unless use_info_tag_prefix
       result = []
       result << %(<#{info_tag_prefix}info>)
-      result << (doc.header? ? document_title_tags(doc.doctitle :partition => true, :sanitize => :sgml) : %(<title>#{doc.attr 'untitled-label'}</title>)) unless doc.notitle
+      result << document_title_tags(doc.doctitle :partition => true, :use_fallback => true) unless doc.notitle
       result << %(<date>#{(doc.attr? 'revdate') ? (doc.attr 'revdate') : (doc.attr 'docdate')}</date>)
       if doc.has_header?
         if doc.attr? 'author'
