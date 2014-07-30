@@ -2652,6 +2652,25 @@ last question::
       text = xmlnodes_at_xpath '(//a)[1]/following-sibling::text()', output, 1
       assert text.text.start_with?('[taoup] ')
     end
+
+    test 'should render bibliography list with proper semantics to DocBook' do
+      input = <<-EOS
+[bibliography]
+- [[[taoup]]] Eric Steven Raymond. 'The Art of Unix
+  Programming'. Addison-Wesley. ISBN 0-13-142901-9.
+- [[[walsh-muellner]]] Norman Walsh & Leonard Muellner.
+  'DocBook - The Definitive Guide'. O'Reilly & Associates. 1999.
+  ISBN 1-56592-580-7.
+      EOS
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_css 'bibliodiv', output, 1
+      assert_css 'bibliodiv > bibliomixed', output, 2
+      assert_css 'bibliodiv > bibliomixed > bibliomisc', output, 2
+      assert_css 'bibliodiv > bibliomixed:nth-child(1) > bibliomisc > anchor', output, 1
+      assert_css 'bibliodiv > bibliomixed:nth-child(1) > bibliomisc > anchor[xreflabel="[taoup]"]', output, 1
+      assert_css 'bibliodiv > bibliomixed:nth-child(2) > bibliomisc > anchor', output, 1
+      assert_css 'bibliodiv > bibliomixed:nth-child(2) > bibliomisc > anchor[xreflabel="[walsh-muellner]"]', output, 1
+    end
   end
 end
 
