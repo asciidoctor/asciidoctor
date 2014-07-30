@@ -474,7 +474,7 @@ module Asciidoctor
       when :link
         %(<link xlink:href="#{node.target}">#{node.text}</link>)
       when :bibref
-        %(<anchor#{common_attributes target, nil, "[#{node.target}]"}/>[#{node.target}])
+        %(<anchor#{common_attributes node.target, nil, "[#{node.target}]"}/>[#{node.target}])
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
       end
