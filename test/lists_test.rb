@@ -4093,7 +4093,7 @@ context 'Checklists' do
     input = <<-EOS
 - [ ] todo
 - [x] done
-- [] another todo
+- [ ] another todo
 - [*] another done
 - plain
     EOS

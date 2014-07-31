@@ -1282,7 +1282,7 @@ class Parser
       text = match[2]
       checkbox = false
       if list_type == :ulist && text.start_with?('[')
-        if text.start_with?('[ ] ') || text.start_with?('[] ')
+        if text.start_with?('[ ] ')
           checkbox = true
           checked = false
           text = text[3..-1].lstrip
