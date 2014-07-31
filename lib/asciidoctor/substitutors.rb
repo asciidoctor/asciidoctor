@@ -1296,48 +1296,30 @@ module Substitutors
   # returns An Array of Symbols representing the substitution operation
   def resolve_subs subs, type = :block, defaults = nil, subject = nil
     return [] if subs.nil_or_empty?
-    candidates = []
-    # only allow modification if defaults is given
-    modification_group = defaults ? nil : false
+    candidates = nil
+    modifiers_present = SubModifierSniffRx =~ subs
     subs.split(',').each do |val|
       key = val.strip
-      # QUESTION can we encapsulate this logic?
-      if modification_group != false
+      modifier_operation = nil
+      if modifiers_present
         if (first = key.chr) == '+'
-          operation = :append
+          modifier_operation = :append
           key = key[1..-1]
         elsif first == '-'
-          operation = :remove
+          modifier_operation = :remove
           key = key[1..-1]
         elsif key.end_with? '+'
-          operation = :prepend
+          modifier_operation = :prepend
           key = key.chop
-        else
-          if modification_group
-            warn %(asciidoctor: WARNING: invalid entry in substitution modification group#{subject ? ' for ' : nil}#{subject}: #{key})
-            next
-          else
-            operation = nil
-          end
-        end
-        # first time through
-        if modification_group.nil?
-          if operation
-            candidates = defaults.dup
-            modification_group = true
-          else
-            modification_group = false
-          end
         end
       end
       key = key.to_sym
       # special case to disable callouts for inline subs
       if type == :inline && (key == :verbatim || key == :v)
         resolved_keys = [:specialcharacters]
-      elsif COMPOSITE_SUBS.has_key? key
+      elsif COMPOSITE_SUBS.key? key
         resolved_keys = COMPOSITE_SUBS[key]
-      # NOTE Symbol doesn't have .length or .size in Ruby 1.8
-      elsif type == :inline && key.length == 1 && (SUB_SYMBOLS.has_key? key)
+      elsif type == :inline && key.length == 1 && (SUB_SYMBOLS.key? key)
         resolved_key = SUB_SYMBOLS[key]
         if (candidate = COMPOSITE_SUBS[resolved_key])
           resolved_keys = candidate
@@ -1348,18 +1330,18 @@ module Substitutors
         resolved_keys = [key]
       end
 
-      if modification_group
-        case operation
+      if modifier_operation
+        candidates ||= (defaults ? defaults.dup : [])
+        case modifier_operation
         when :append
           candidates += resolved_keys
         when :prepend
           candidates = resolved_keys + candidates
         when :remove
           candidates -= resolved_keys
-        else
-          # ignore, invalid entry, shouldn't get here
         end
       else
+        candidates ||= []
         candidates += resolved_keys
       end
     end
@@ -1368,7 +1350,7 @@ module Substitutors
     resolved = candidates & SUB_OPTIONS[type]
     unless (candidates - resolved).empty?
       invalid = candidates - resolved
-      warn "asciidoctor: WARNING: invalid substitution type#{invalid.size > 1 ? 's' : ''}#{subject ? ' for ' : nil}#{subject}: #{invalid * ', '}"
+      warn %(asciidoctor: WARNING: invalid substitution type#{invalid.size > 1 ? 's' : ''}#{subject ? ' for ' : nil}#{subject}: #{invalid * ', '})
     end
     resolved
   end

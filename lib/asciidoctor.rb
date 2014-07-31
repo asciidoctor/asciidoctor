@@ -1053,6 +1053,10 @@ module Asciidoctor
     #
     SpaceDelimiterRx = /([^\\])#{CG_BLANK}+/
 
+    # Matches a + or - modifier in a subs list
+    #
+    SubModifierSniffRx = /[+-]/
+
     # Matches any character with multibyte support explicitly enabled (length of multibyte char = 1)
     #
     # NOTE If necessary to hide use of the language modifier (u) from JavaScript, use (Regexp.new '.', false, 'u')

@@ -2640,6 +2640,19 @@ http://{application}.org[{gt}{gt}] <1>
       result = doc.render
       assert result.include?('<pre><a href="http://asciidoctor.org">&gt;&gt;</a> &lt;1&gt;</pre>')
     end
+
+    test 'should be able to set subs then modify them' do
+      input = <<-EOS
+[subs="verbatim,-callouts"]
+_hey now_ <1>
+      EOS
+
+      doc = document_from_string input, :header_footer => false
+      block = doc.blocks.first
+      assert_equal [:specialcharacters], block.subs
+      result = doc.render
+      assert result.include?('_hey now_ &lt;1&gt;')
+    end
   end
 
   context 'References' do
