@@ -438,15 +438,19 @@ module Substitutors
   #--
   # NOTE it's necessary to perform this substitution line-by-line
   # so that a missing key doesn't wipe out the whole block of data
-  def sub_attributes(data, opts = {})
+  # when attribute-undefined and/or attribute-missing is drop-line
+  def sub_attributes data, opts = {}
     return data if data.nil_or_empty?
 
-    string_data = data.is_a? ::String
     # normalizes data type to an array (string becomes single-element array)
-    lines = string_data ? [data] : data
+    if (string_data = String === data)
+      data = [data]
+    end
 
+    doc_attrs = @document.attributes
+    attribute_missing = nil
     result = []
-    lines.each {|line|
+    data.each do |line|
       reject = false
       reject_if_empty = false
       line = line.gsub(AttributeReferenceRx) {
@@ -464,8 +468,7 @@ module Substitutors
             _, value = Parser.store_attribute(args[0], args[1] || '', @document)
             unless value
               # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
-              if @document.attributes.fetch('attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
-                Debug.debug { "Undefining attribute: #{key}, line marked for removal" }
+              if doc_attrs.fetch('attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
                 reject = true
                 break ''
               end
@@ -483,21 +486,23 @@ module Substitutors
             end
           else
             # if we get here, our AttributeReference regex is too loose
-            warn "asciidoctor: WARNING: illegal attribute directive: #{m[3]}"
+            warn %(asciidoctor: WARNING: illegal attribute directive: #{m[3]})
             m[0]
           end
-        elsif (key = m[2].downcase) && (@document.attributes.has_key? key)
-          @document.attributes[key]
-        elsif INTRINSIC_ATTRIBUTES.has_key? key
+        elsif doc_attrs.key?(key = m[2].downcase)
+          doc_attrs[key]
+        elsif INTRINSIC_ATTRIBUTES.key? key
           INTRINSIC_ATTRIBUTES[key]
         else
-          case (opts[:attribute_missing] || @document.attributes.fetch('attribute-missing', Compliance.attribute_missing))
+          case (attribute_missing ||= (opts[:attribute_missing] || doc_attrs.fetch('attribute-missing', Compliance.attribute_missing)))
           when 'skip'
             m[0]
           when 'drop-line'
-            Debug.debug { "Missing attribute: #{key}, line marked for removal" }
+            warn %(asciidoctor: WARNING: dropping line containing reference to missing attribute: #{key})
             reject = true
             break ''
+          when 'warn'
+            warn %(asciidoctor: WARNING: skipping reference to missing attribute: #{key})
           else # 'drop'
             reject_if_empty = true
             ''
@@ -506,7 +511,7 @@ module Substitutors
       } if line.include? '{'
 
       result << line unless reject || (reject_if_empty && line.empty?)
-    }
+    end
 
     string_data ? (result * EOL) : result
   end
