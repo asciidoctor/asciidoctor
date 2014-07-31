@@ -209,13 +209,18 @@ class Document < AbstractBlock
       end
       @attribute_overrides = attr_overrides
       # safely resolve the safe mode from const, int or string
-      @safe = if !(safe_mode = options[:safe])
-        SafeMode::SECURE
-      elsif safe_mode.is_a? ::Fixnum
+      if !(safe_mode = options[:safe])
+        @safe = SafeMode::SECURE
+      elsif ::Fixnum === safe_mode
         # be permissive in case API user wants to define new levels
-        safe_mode
+        @safe = safe_mode
       else
-        SafeMode.const_get(safe_mode.to_s.upcase).to_i rescue SafeMode::SECURE.to_i
+        # NOTE: not using infix rescue for performance reasons, see https://github.com/jruby/jruby/issues/1816
+        begin
+          @safe = SafeMode.const_get(safe_mode.to_s.upcase)
+        rescue
+          @safe = SafeMode::SECURE
+        end
       end
       @sourcemap = options[:sourcemap]
       @compat_mode = false
@@ -376,7 +381,13 @@ class Document < AbstractBlock
       # dynamic intrinstic attribute values
       now = ::Time.now
       localdate = (attrs['localdate'] ||= now.strftime('%Y-%m-%d'))
-      localtime = (attrs['localtime'] ||= (now.strftime '%H:%M:%S %Z' rescue now.strftime '%H:%M:%S'))
+      unless (localtime = attrs['localtime'])
+        begin
+          localtime = attrs['localtime'] = now.strftime '%H:%M:%S %Z'
+        rescue
+          localtime = attrs['localtime'] = now.strftime '%H:%M:%S'
+        end
+      end
       attrs['localdatetime'] ||= %(#{localdate} #{localtime})
 
       # docdate, doctime and docdatetime should default to

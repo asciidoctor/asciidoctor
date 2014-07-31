@@ -175,7 +175,12 @@ module Asciidoctor
   DATA_PATH = ::File.join ROOT_PATH, 'data'
 
   # The user's home directory, as best we can determine it
-  USER_HOME = ::Dir.home rescue ::ENV['HOME'] || ::Dir.pwd
+  # NOTE not using infix rescue for performance reasons, see: https://github.com/jruby/jruby/issues/1816
+  begin
+    USER_HOME = ::Dir.home
+  rescue
+    USER_HOME = ::ENV['HOME'] || ::Dir.pwd
+  end
 
   # Flag to indicate whether encoding can be coerced to UTF-8
   # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
@@ -1299,7 +1304,10 @@ module Asciidoctor
     elsif input.respond_to? :readlines
       # NOTE tty, pipes & sockets can't be rewound, but can't be sniffed easily either
       # just fail the rewind operation silently to handle all cases
-      input.rewind rescue nil
+      begin
+        input.rewind
+      rescue
+      end
       lines = input.readlines
     elsif input.is_a? ::String
       lines = input.lines.entries
