@@ -735,6 +735,45 @@ content
       assert_equal '1:1:1', sect1_1_1.sectnum(':', false)
     end
 
+    test 'should render section numbers when sectnums attribute is set' do
+      input = <<-EOS
+= Title
+:sectnums:
+
+== Section_1 
+
+text
+
+=== Section_1_1
+
+text
+
+==== Section_1_1_1
+
+text
+
+== Section_2
+
+text
+
+=== Section_2_1
+
+text
+
+=== Section_2_2
+
+text
+      EOS
+    
+      output = render_string input
+      assert_xpath '//h2[@id="_section_1"][starts-with(text(), "1. ")]', output, 1
+      assert_xpath '//h3[@id="_section_1_1"][starts-with(text(), "1.1. ")]', output, 1
+      assert_xpath '//h4[@id="_section_1_1_1"][starts-with(text(), "1.1.1. ")]', output, 1
+      assert_xpath '//h2[@id="_section_2"][starts-with(text(), "2. ")]', output, 1
+      assert_xpath '//h3[@id="_section_2_1"][starts-with(text(), "2.1. ")]', output, 1
+      assert_xpath '//h3[@id="_section_2_2"][starts-with(text(), "2.2. ")]', output, 1
+    end
+
     test 'should render section numbers when numbered attribute is set' do
       input = <<-EOS
 = Title

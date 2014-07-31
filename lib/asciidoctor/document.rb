@@ -285,6 +285,9 @@ class Document < AbstractBlock
 
     attr_overrides['user-home'] = USER_HOME
 
+    # legacy support for numbered attribute
+    attr_overrides['sectnums'] = attr_overrides.delete 'numbered' if attr_overrides.key? 'numbered'
+
     # if the base_dir option is specified, it overrides docdir as the root for relative paths
     # otherwise, the base_dir is the directory of the source file (docdir) or the current
     # directory of the input is a string
@@ -675,11 +678,11 @@ class Document < AbstractBlock
   # Internal: Branch the attributes so that the original state can be restored
   # at a future time.
   def save_attributes
-    # enable toc and numbered by default in DocBook backend
+    # enable toc and sectnums (i.e., numbered) by default in DocBook backend
     # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility
     if @attributes['basebackend'] == 'docbook'
       @attributes['toc'] = '' unless attribute_locked?('toc') || @attributes_modified.include?('toc')
-      @attributes['numbered'] = '' unless attribute_locked?('numbered') || @attributes_modified.include?('numbered')
+      @attributes['sectnums'] = '' unless attribute_locked?('sectnums') || @attributes_modified.include?('sectnums')
     end
 
     unless @attributes.key?('doctitle') || !(val = doctitle)
@@ -736,7 +739,7 @@ class Document < AbstractBlock
       FLEXIBLE_ATTRIBUTES.each do |name|
         # turning a flexible attribute off should be permanent
         # (we may need more config if that's not always the case)
-        if @attribute_overrides.key?(name) && !@attribute_overrides[name].nil?
+        if @attribute_overrides.key?(name) && @attribute_overrides[name]
           @attribute_overrides.delete(name)
         end
       end

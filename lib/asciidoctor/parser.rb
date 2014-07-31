@@ -1556,7 +1556,7 @@ class Parser
     source_location = reader.cursor if document.sourcemap
     sect_id, sect_reftext, sect_title, sect_level, _ = parse_section_title(reader, document)
     attributes['reftext'] = sect_reftext if sect_reftext
-    section = Section.new parent, sect_level, document.attributes.has_key?('numbered')
+    section = Section.new parent, sect_level, document.attributes.has_key?('sectnums')
     section.source_location = source_location if source_location
     section.id = sect_id
     section.title = sect_title
@@ -2096,16 +2096,21 @@ class Parser
     name = sanitize_attribute_name(name)
     accessible = true
     if doc
+      # alias numbered attribute to sectnums
+      if name == 'numbered'
+        name = 'sectnums'
       # support relative leveloffset values
-      if name == 'leveloffset' && value
-        case value[0..0]
-        when '+'
-          value = ((doc.attr 'leveloffset', 0).to_i + (value[1..-1] || 0).to_i).to_s
-        when '-'
-          value = ((doc.attr 'leveloffset', 0).to_i - (value[1..-1] || 0).to_i).to_s
+      elsif name == 'leveloffset'
+        if value
+          case value[0..0]
+          when '+'
+            value = ((doc.attr 'leveloffset', 0).to_i + (value[1..-1] || 0).to_i).to_s
+          when '-'
+            value = ((doc.attr 'leveloffset', 0).to_i - (value[1..-1] || 0).to_i).to_s
+          end
         end
       end
-      accessible = value.nil? ? doc.delete_attribute(name) : doc.set_attribute(name, value)
+      accessible = value ? doc.set_attribute(name, value) : doc.delete_attribute(name)
     end
 
     if accessible && attrs
