@@ -178,8 +178,8 @@ module Substitutors
 
         @passthroughs[pass_key = @passthroughs.size] = {:text => (unescape_brackets m[8]), :subs => (m[7].nil_or_empty? ? [] : (resolve_pass_subs m[7]))}
       else # $$, ++ or +++
-        # skip ++ in legacy mode, handled as normal quoted text
-        if compat_mode == :legacy && boundary == '++'
+        # skip ++ in compat mode, handled as normal quoted text
+        if compat_mode && boundary == '++'
           next m[2].nil_or_empty? ?
               %(#{m[1]}#{m[3]}++#{extract_passthroughs m[5]}++) :
               %(#{m[1]}[#{m[2]}]#{m[3]}++#{extract_passthroughs m[5]}++)
@@ -248,12 +248,12 @@ module Substitutors
         attributes = nil if attributes == ''
       end
 
-      if compat_mode == :default
+      if compat_mode
+        old_behavior = true
+      else
         if (old_behavior = (attributes && (attributes.end_with? 'x-')))
           attributes = attributes[0...-2]
         end
-      else
-        old_behavior = true
       end
 
       if attributes
@@ -281,7 +281,7 @@ module Substitutors
       end
 
       pass_key = @passthroughs.size
-      if compat_mode == :legacy
+      if compat_mode
         @passthroughs[pass_key] = {:text => content, :subs => [:specialcharacters], :attributes => attributes, :type => :monospaced}
       elsif attributes
         if old_behavior

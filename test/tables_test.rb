@@ -617,11 +617,11 @@ content
       assert_css 'table.tableblock .paragraph', result, 0
     end
 
-    test 'compat-mode can be set in asciidoc table cell' do
+    test 'compat mode can be activated in asciidoc table cell' do
       input = <<-EOS
 |===
 a|
-:compat-mode: legacy
+:compat-mode:
 
 'italic'
 |===

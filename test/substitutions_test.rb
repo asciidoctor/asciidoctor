@@ -21,61 +21,88 @@ context 'Substitutions' do
     BACKSLASH = '\\'
 
     test 'single-line double-quoted string' do
-      para = block_from_string(%q{``a few quoted words''})
+      para = block_from_string(%q{``a few quoted words''}, :attributes => {'compat-mode' => ''})
+      assert_equal '&#8220;a few quoted words&#8221;', para.sub_quotes(para.source)
+
+      para = block_from_string(%q{"`a few quoted words`"})
       assert_equal '&#8220;a few quoted words&#8221;', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line double-quoted string' do
-      para = block_from_string %(#{BACKSLASH}``a few quoted words''), :attributes => {'compat-mode' => 'legacy'}
+      para = block_from_string %(#{BACKSLASH}``a few quoted words''), :attributes => {'compat-mode' => ''}
       assert_equal %q(&#8216;`a few quoted words&#8217;'), para.sub_quotes(para.source)
 
-      para = block_from_string %(#{BACKSLASH * 2}``a few quoted words''), :attributes => {'compat-mode' => 'legacy'}
+      para = block_from_string %(#{BACKSLASH * 2}``a few quoted words''), :attributes => {'compat-mode' => ''}
       assert_equal %q(``a few quoted words''), para.sub_quotes(para.source)
 
-      para = block_from_string(%(#{BACKSLASH}``a few quoted words''))
-      assert_equal %q(``a few quoted words''), para.sub_quotes(para.source)
+      para = block_from_string(%(#{BACKSLASH}"`a few quoted words`"))
+      assert_equal %q("`a few quoted words`"), para.sub_quotes(para.source)
 
-      para = block_from_string(%(#{BACKSLASH * 2}``a few quoted words''))
-      assert_equal %(#{BACKSLASH}``a few quoted words''), para.sub_quotes(para.source)
+      para = block_from_string(%(#{BACKSLASH * 2}"`a few quoted words`"))
+      assert_equal %(#{BACKSLASH}"`a few quoted words`"), para.sub_quotes(para.source)
     end
 
     test 'multi-line double-quoted string' do
-      para = block_from_string(%Q{``a few\nquoted words''})
+      para = block_from_string(%Q{``a few\nquoted words''}, :attributes => {'compat-mode' => ''})
+      assert_equal "&#8220;a few\nquoted words&#8221;", para.sub_quotes(para.source)
+
+      para = block_from_string(%Q{"`a few\nquoted words`"})
       assert_equal "&#8220;a few\nquoted words&#8221;", para.sub_quotes(para.source)
     end
 
     test 'double-quoted string with inline single quote' do
-      para = block_from_string(%q{``Here's Johnny!''})
+      para = block_from_string(%q{``Here's Johnny!''}, :attributes => {'compat-mode' => ''})
+      assert_equal %q{&#8220;Here's Johnny!&#8221;}, para.sub_quotes(para.source)
+
+      para = block_from_string(%q{"`Here's Johnny!`"})
       assert_equal %q{&#8220;Here's Johnny!&#8221;}, para.sub_quotes(para.source)
     end
 
     test 'double-quoted string with inline backquote' do
-      para = block_from_string(%q{``Here`s Johnny!''})
+      para = block_from_string(%q{``Here`s Johnny!''}, :attributes => {'compat-mode' => ''})
+      assert_equal %q{&#8220;Here`s Johnny!&#8221;}, para.sub_quotes(para.source)
+
+      para = block_from_string(%q{"`Here`s Johnny!`"})
       assert_equal %q{&#8220;Here`s Johnny!&#8221;}, para.sub_quotes(para.source)
     end
 
     test 'single-line single-quoted string' do
-      para = block_from_string(%q{`a few quoted words'})
+      para = block_from_string(%q{`a few quoted words'}, :attributes => {'compat-mode' => ''})
+      assert_equal '&#8216;a few quoted words&#8217;', para.sub_quotes(para.source)
+
+      para = block_from_string(%q{'`a few quoted words`'})
       assert_equal '&#8216;a few quoted words&#8217;', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line single-quoted string' do
-      para = block_from_string(%(#{BACKSLASH}`a few quoted words'))
+      para = block_from_string(%(#{BACKSLASH}`a few quoted words'), :attributes => {'compat-mode' => ''})
       assert_equal %(`a few quoted words'), para.sub_quotes(para.source)
+
+      para = block_from_string(%(#{BACKSLASH}'`a few quoted words`'))
+      assert_equal %('`a few quoted words`'), para.sub_quotes(para.source)
     end
 
     test 'multi-line single-quoted string' do
-      para = block_from_string(%Q{`a few\nquoted words'})
+      para = block_from_string(%Q{`a few\nquoted words'}, :attributes => {'compat-mode' => ''})
+      assert_equal "&#8216;a few\nquoted words&#8217;", para.sub_quotes(para.source)
+
+      para = block_from_string(%Q{'`a few\nquoted words`'})
       assert_equal "&#8216;a few\nquoted words&#8217;", para.sub_quotes(para.source)
     end
 
     test 'single-quoted string with inline single quote' do
-      para = block_from_string(%q{`That isn't what I did.'})
+      para = block_from_string(%q{`That isn't what I did.'}, :attributes => {'compat-mode' => ''})
+      assert_equal %q{&#8216;That isn't what I did.&#8217;}, para.sub_quotes(para.source)
+
+      para = block_from_string(%q{'`That isn't what I did.`'})
       assert_equal %q{&#8216;That isn't what I did.&#8217;}, para.sub_quotes(para.source)
     end
 
     test 'single-quoted string with inline backquote' do
-      para = block_from_string(%q{`Here`s Johnny!'})
+      para = block_from_string(%q{`Here`s Johnny!'}, :attributes => {'compat-mode' => ''})
+      assert_equal %q{&#8216;Here`s Johnny!&#8217;}, para.sub_quotes(para.source)
+
+      para = block_from_string(%q{'`Here`s Johnny!`'})
       assert_equal %q{&#8216;Here`s Johnny!&#8217;}, para.sub_quotes(para.source)
     end
 
@@ -161,16 +188,15 @@ context 'Substitutions' do
     end
 
     test 'single-quoted string containing an emphasized phrase' do
-      para = block_from_string(%q{`I told him, 'Just go for it!''}, :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%q{`I told him, 'Just go for it!''}, :attributes => {'compat-mode' => ''})
       assert_equal '&#8216;I told him, <em>Just go for it!</em>&#8217;', para.sub_quotes(para.source)
 
-      # NOTE yes, the result seems odd, but we are verifying the correct odd behavior ;)
-      para = block_from_string(%q{`I told him, 'Just go for it!''})
-      assert_equal %q(&#8216;I told him, 'Just go for it!&#8217;'), para.sub_quotes(para.source)
+      para = block_from_string(%q{'`I told him, 'Just go for it!'`'})
+      assert_equal %q(&#8216;I told him, 'Just go for it!'&#8217;), para.sub_quotes(para.source)
     end
 
     test 'escaped single-quotes inside emphasized words are restored' do
-      para = block_from_string(%('Here#{BACKSLASH}'s Johnny!'), :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%('Here#{BACKSLASH}'s Johnny!'), :attributes => {'compat-mode' => ''})
       assert_equal %q(<em>Here's Johnny!</em>), para.apply_normal_subs(para.lines)
 
       para = block_from_string(%('Here#{BACKSLASH}'s Johnny!'))
@@ -296,7 +322,7 @@ context 'Substitutions' do
     end
 
     test 'single-line constrained monospaced chars' do
-      para = block_from_string(%q{call +save()+ to persist the changes}, :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%q{call +save()+ to persist the changes}, :attributes => {'compat-mode' => ''})
       assert_equal 'call <code>save()</code> to persist the changes', para.sub_quotes(para.source)
 
       para = block_from_string(%q{call [x-]+save()+ to persist the changes})
@@ -307,7 +333,7 @@ context 'Substitutions' do
     end
 
     test 'single-line constrained monospaced chars with role' do
-      para = block_from_string(%q{call [method]+save()+ to persist the changes}, :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%q{call [method]+save()+ to persist the changes}, :attributes => {'compat-mode' => ''})
       assert_equal 'call <code class="method">save()</code> to persist the changes', para.sub_quotes(para.source)
 
       para = block_from_string(%q{call [method x-]+save()+ to persist the changes})
@@ -318,7 +344,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line constrained monospaced chars' do
-      para = block_from_string(%(call #{BACKSLASH}+save()+ to persist the changes), :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%(call #{BACKSLASH}+save()+ to persist the changes), :attributes => {'compat-mode' => ''})
       assert_equal 'call +save()+ to persist the changes', para.sub_quotes(para.source)
 
       para = block_from_string(%(call #{BACKSLASH}`save()` to persist the changes))
@@ -326,7 +352,7 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line constrained monospaced chars with role' do
-      para = block_from_string(%(call [method]#{BACKSLASH}+save()+ to persist the changes), :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%(call [method]#{BACKSLASH}+save()+ to persist the changes), :attributes => {'compat-mode' => ''})
       assert_equal 'call [method]+save()+ to persist the changes', para.sub_quotes(para.source)
 
       para = block_from_string(%(call [method]#{BACKSLASH}`save()` to persist the changes))
@@ -334,7 +360,7 @@ context 'Substitutions' do
     end
 
     test 'escaped role on single-line constrained monospaced chars' do
-      para = block_from_string(%(call #{BACKSLASH}[method]+save()+ to persist the changes), :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%(call #{BACKSLASH}[method]+save()+ to persist the changes), :attributes => {'compat-mode' => ''})
       assert_equal 'call [method]<code>save()</code> to persist the changes', para.sub_quotes(para.source)
 
       para = block_from_string(%(call #{BACKSLASH}[method]`save()` to persist the changes))
@@ -342,7 +368,7 @@ context 'Substitutions' do
     end
 
     test 'escaped role on escaped single-line constrained monospaced chars' do
-      para = block_from_string(%(call #{BACKSLASH}[method]#{BACKSLASH}+save()+ to persist the changes), :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%(call #{BACKSLASH}[method]#{BACKSLASH}+save()+ to persist the changes), :attributes => {'compat-mode' => ''})
       assert_equal %(call #{BACKSLASH}[method]+save()+ to persist the changes), para.sub_quotes(para.source)
 
       para = block_from_string(%(call #{BACKSLASH}[method]#{BACKSLASH}`save()` to persist the changes))
@@ -350,7 +376,7 @@ context 'Substitutions' do
     end
 
     test 'single-line unconstrained monospaced chars' do
-      para = block_from_string(%q{Git++Hub++}, :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%q{Git++Hub++}, :attributes => {'compat-mode' => ''})
       assert_equal 'Git<code>Hub</code>', para.sub_quotes(para.source)
 
       para = block_from_string(%q{Git[x-]++Hub++})
@@ -361,10 +387,10 @@ context 'Substitutions' do
     end
 
     test 'escaped single-line unconstrained monospaced chars' do
-      para = block_from_string(%(Git#{BACKSLASH}++Hub++), :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%(Git#{BACKSLASH}++Hub++), :attributes => {'compat-mode' => ''})
       assert_equal 'Git+<code>Hub</code>+', para.sub_quotes(para.source)
 
-      para = block_from_string(%(Git#{BACKSLASH * 2}++Hub++), :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%(Git#{BACKSLASH * 2}++Hub++), :attributes => {'compat-mode' => ''})
       assert_equal 'Git++Hub++', para.sub_quotes(para.source)
 
       para = block_from_string(%(Git#{BACKSLASH}``Hub``))
@@ -372,7 +398,7 @@ context 'Substitutions' do
     end
 
     test 'multi-line unconstrained monospaced chars' do
-      para = block_from_string(%Q{Git++\nH\nu\nb++}, :attributes => {'compat-mode' => 'legacy'})
+      para = block_from_string(%Q{Git++\nH\nu\nb++}, :attributes => {'compat-mode' => ''})
       assert_equal "Git<code>\nH\nu\nb</code>", para.sub_quotes(para.source)
 
       para = block_from_string(%Q{Git[x-]++\nH\nu\nb++})
@@ -1279,7 +1305,7 @@ EOS
 
       test 'should passthrough math macro inside another passthrough' do
         input = 'the text `asciimath:[x = y]` should be passed through as +literal+ text'
-        para = block_from_string input, :attributes => {'compat-mode' => 'legacy'}
+        para = block_from_string input, :attributes => {'compat-mode' => ''}
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
 
         input = 'the text [x-]`asciimath:[x = y]` should be passed through as `literal` text'
