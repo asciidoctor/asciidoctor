@@ -2096,14 +2096,14 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
     end
 
-    test 'should rename document attribute named language to source-language when compat-mode is legacy' do
+    test 'should rename document attribute named language to source-language when compat-mode is enabled' do
       input = <<-EOS
 :language: ruby
 
 {source-language}
       EOS
 
-      assert_equal 'ruby', render_string(input, :doctype => :inline, :attributes => {'compat-mode' => 'legacy'})
+      assert_equal 'ruby', render_string(input, :doctype => :inline, :attributes => {'compat-mode' => ''})
 
       input = <<-EOS
 :language: ruby

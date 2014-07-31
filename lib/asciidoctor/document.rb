@@ -101,11 +101,14 @@ class Document < AbstractBlock
   # this level is not currently implemented (and therefore not enforced)!
   attr_reader :safe
 
-  # Public: Get the AsciiDoc compatibility mode (:default or :legacy)
+  # Public: Get the Boolean AsciiDoc compatibility mode
   #
-  # :legacy mode activates the following syntax changes:
+  # enabling this attribute activates the following syntax changes:
   # 
   #   * single quotes as constrained emphasis formatting marks
+  #   * single backticks parsed as inline literal, formatted as monospace
+  #   * single plus parsed as constrained, monospaced inline formatting
+  #   * double plus parsed as constrained, monospaced inline formatting
   #
   attr_reader :compat_mode
 
@@ -215,7 +218,7 @@ class Document < AbstractBlock
         SafeMode.const_get(safe_mode.to_s.upcase).to_i rescue SafeMode::SECURE.to_i
       end
       @sourcemap = options[:sourcemap]
-      @compat_mode = :default
+      @compat_mode = false
       @converter = nil
       initialize_extensions = defined? ::Asciidoctor::Extensions
       @extensions = nil # initialize furthur down
@@ -240,7 +243,6 @@ class Document < AbstractBlock
     attrs['prewrap'] = ''
     attrs['attribute-undefined'] = Compliance.attribute_undefined
     attrs['attribute-missing'] = Compliance.attribute_missing
-    attrs['compat-mode'] = 'default'
     attrs['iconfont-remote'] = ''
 
     # language strings
@@ -345,12 +347,7 @@ class Document < AbstractBlock
       verdict
     end
 
-    if (attrs['compat-mode'] == 'legacy')
-      @compat_mode = :legacy
-    else
-      attrs['compat-mode'] = 'default'
-      @compat_mode = :default
-    end
+    @compat_mode = true if attrs.key? 'compat-mode'
 
     if parent_doc
       # setup default doctype (backend is fixed)
@@ -725,11 +722,11 @@ class Document < AbstractBlock
       @attributes['toc-position'] ||= default_toc_position if default_toc_position
     end
 
-    @compat_mode = if @attributes['compat-mode'] == 'legacy'
+    if @attributes.key? 'compat-mode'
       @attributes['source-language'] = @attributes['language'] if @attributes.has_key? 'language'
-      :legacy
+      @compat_mode = true
     else
-      :default
+      @compat_mode = false
     end
 
     @original_attributes = @attributes.dup

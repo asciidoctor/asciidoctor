@@ -916,12 +916,12 @@ module Asciidoctor
     # Examples
     #
     #   +text+
-    #   `text` (legacy)
+    #   `text` (compat)
     #
-    # NOTE we always capture the attributes so we know when to use legacy behavior
+    # NOTE we always capture the attributes so we know when to use compatible (i.e., legacy) behavior
     PassInlineRx = {
-      :default => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+?)\])?(\\?(\+|`)(\S|\S.*?\S)\4)(?!#{CC_WORD})/m],
-      :legacy  => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+?)\])?(\\?(`)([^`\s]|[^`\s].*?\S)\4)(?![`#{CC_WORD}])/m]
+      false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+?)\])?(\\?(\+|`)(\S|\S.*?\S)\4)(?!#{CC_WORD})/m],
+      true  => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+?)\])?(\\?(`)([^`\s]|[^`\s].*?\S)\4)(?![`#{CC_WORD}])/m]
     }
 
     # Matches several variants of the passthrough inline macro, which may span multiple lines.
@@ -1141,24 +1141,24 @@ module Asciidoctor
   # constrained quotes:: must be bordered by non-word characters
   # NOTE these substitutions are processed in the order they appear here and
   # the order in which they are replaced is important
-  default_quote_subs = [
+  quote_subs = [
     # **strong**
     [:strong, :unconstrained, /\\?(?:\[([^\]]+?)\])?\*\*(.+?)\*\*/m],
 
     # *strong*
     [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\*(\S|\S.*?\S)\*(?!#{CG_WORD})/m],
 
-    # ``double-quoted''
-    [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?``(\S|\S.*?\S)''(?!#{CG_WORD})/m],
+    # "`double-quoted`"
+    [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?"`(\S|\S.*?\S)`"(?!#{CG_WORD})/m],
 
-    # `single-quoted'
-    [:single, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+?)\])?`([^`\s]|[^`\s].*?\S)'(?!#{CG_WORD})/m],
+    # '`single-quoted`'
+    [:single, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+?)\])?'`(\S|\S.*?\S)`'(?!#{CG_WORD})/m],
 
     # ``monospaced``
     [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?``(.+?)``/m],
 
     # `monospaced`
-    [:monospaced, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+?)\])?`([^`\s]|[^`\s].*?\S)`(?![#{CC_WORD}`])/m],
+    [:monospaced, :constrained, /(^|[^#{CC_WORD};:"'`}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)`(?![#{CC_WORD}"'`])/m],
 
     # __emphasis__
     [:emphasis, :unconstrained, /\\?(?:\[([^\]]+?)\])?__(.+?)__/m],
@@ -1179,22 +1179,24 @@ module Asciidoctor
     [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?~(\S*?)~/m]
   ]
 
-  legacy_quote_subs = default_quote_subs.dup
-  # `quoted' (legacy)
-  legacy_quote_subs[3] = [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?!#{CG_WORD})/m]
-  # 'emphasis'
-  legacy_quote_subs.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m]
+  compat_quote_subs = quote_subs.dup
+  # ``quoted''
+  compat_quote_subs[2] = [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?``(\S|\S.*?\S)''(?!#{CG_WORD})/m]
+  # `quoted'
+  compat_quote_subs[3] = [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?!#{CG_WORD})/m]
   # ++monospaced++
-  legacy_quote_subs[5] = [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m]
+  compat_quote_subs[4] = [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m]
   # +monospaced+
-  legacy_quote_subs[6] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?!#{CG_WORD})/m]
+  compat_quote_subs[5] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?!#{CG_WORD})/m]
+  # 'emphasis'
+  compat_quote_subs.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m]
 
   QUOTE_SUBS = {
-    :default => default_quote_subs,
-    :legacy  => legacy_quote_subs,
+    false => quote_subs,
+    true  => compat_quote_subs
   }
-  default_quote_subs = nil
-  legacy_quote_subs = nil
+  quote_subs = nil
+  compat_quote_subs = nil
 
   # NOTE in Ruby 1.8.7, [^\\] does not match start of line,
   # so we need to match it explicitly
