@@ -452,14 +452,18 @@ class AbstractNode
   # Returns the [String] path resolved from the start and target paths, with any
   # parent references resolved and self references removed. If a jail is provided,
   # this path will be guaranteed to be contained within the jail.
-  def normalize_system_path(target, start = nil, jail = nil, opts = {})
-    if start.nil?
-      start = @document.base_dir
+  def normalize_system_path target, start = nil, jail = nil, opts = {}
+    if (doc = @document).safe < SafeMode::SAFE
+      if start
+        start = ::File.join doc.base_dir, start unless (@path_resolver ||= PathResolver.new).is_root? start
+      else
+        start = doc.base_dir
+      end
+    else
+      start = doc.base_dir unless start
+      jail = doc.base_dir unless jail
     end
-    if jail.nil? && @document.safe >= SafeMode::SAFE
-      jail = @document.base_dir
-    end
-    (@path_resolver ||= PathResolver.new).system_path(target, start, jail, opts)
+    (@path_resolver ||= PathResolver.new).system_path target, start, jail, opts
   end
 
   # Public: Normalize the asset file or directory to a concrete and rinsed path

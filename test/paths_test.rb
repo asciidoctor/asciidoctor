@@ -200,6 +200,21 @@ context 'Path Resolver' do
       assert_equal "#{JAIL}/part1/chapter1/section1.adoc", filename
       assert_equal 'part1/chapter1/section1.adoc', @resolver.relative_path(filename, JAIL)
     end
+
+    test 'should resolve relative path relative to base dir in unsafe mode' do
+      base_dir = fixture_path 'base'
+      doc = empty_document :base_dir => base_dir, :safe => Asciidoctor::SafeMode::UNSAFE
+      expected = ::File.join base_dir, 'images', 'tiger.png'
+      actual = doc.normalize_system_path 'tiger.png', 'images'
+      assert_equal expected, actual
+    end
+
+    test 'should resolve absolute path as absolute in unsafe mode' do
+      base_dir = fixture_path 'base'
+      doc = empty_document :base_dir => base_dir, :safe => Asciidoctor::SafeMode::UNSAFE
+      actual = doc.normalize_system_path 'tiger.png', '/etc/images'
+      assert_equal '/etc/images/tiger.png', actual
+    end
   end
 
   context 'Helpers' do
