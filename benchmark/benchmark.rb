@@ -69,7 +69,7 @@ when 'name'
 when 'userguide'
   require '../lib/asciidoctor.rb'
   Asciidoctor::Compliance.markdown_syntax = false
-  Asciidoctor::Compliance.shorthand_property_syntax = false
+  Asciidoctor::Compliance.shorthand_property_syntax = false if Asciidoctor::VERSION > '0.1.4'
   sample_file = ENV['BENCH_TEST_FILE'] || 'sample-data/userguide.adoc'
   backend = ENV['BENCH_BACKEND'] || 'html5'
   fetch_userguide if sample_file == 'sample-data/userguide.adoc' && !(File.exist? sample_file)
@@ -87,7 +87,7 @@ when 'userguide-loop'
   require '../lib/asciidoctor.rb'
   GC.start
   Asciidoctor::Compliance.markdown_syntax = false
-  Asciidoctor::Compliance.shorthand_property_syntax = false
+  Asciidoctor::Compliance.shorthand_property_syntax = false if Asciidoctor::VERSION > '0.1.4'
   sample_file = ENV['BENCH_TEST_FILE'] || 'sample-data/userguide.adoc'
   backend = ENV['BENCH_BACKEND'] || 'html5'
   fetch_userguide if sample_file == 'sample-data/userguide.adoc' && !(File.exist? sample_file)
