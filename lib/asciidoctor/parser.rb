@@ -2102,7 +2102,7 @@ class Parser
       # support relative leveloffset values
       elsif name == 'leveloffset'
         if value
-          case value[0..0]
+          case value.chr
           when '+'
             value = ((doc.attr 'leveloffset', 0).to_i + (value[1..-1] || 0).to_i).to_s
           when '-'
