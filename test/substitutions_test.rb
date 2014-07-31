@@ -1340,6 +1340,12 @@ EOS
         para = block_from_string input, :attributes => {'stem' => 'latexmath'}
         assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
       end
+
+      test 'should find and replace placeholder duplicated by substitution' do
+        input = %q(+first passthrough+ followed by link:$$http://example.com/__u_no_format_me__$$[] with passthrough)
+        result = render_embedded_string input, :doctype => :inline
+        assert_equal 'first passthrough followed by <a href="http://example.com/__u_no_format_me__">http://example.com/__u_no_format_me__</a> with passthrough', result
+      end
     end
   end
 

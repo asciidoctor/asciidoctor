@@ -335,13 +335,17 @@ module Substitutors
     end
 
     text.gsub(PASS_MATCH) {
-      pass = @passthroughs.delete $~[1].to_i
+      # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
+      pass = @passthroughs[$~[1].to_i]
       subbed_text = (subs = pass[:subs]) ? apply_subs(pass[:text], subs) : pass[:text]
       if (type = pass[:type])
         subbed_text = Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).convert
       end
-      (@passthroughs.empty? || !subbed_text.include?(PASS_START)) ? subbed_text : restore_passthroughs(subbed_text, false)
+      subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text, false) : subbed_text
     }
+  ensure
+    # free memory...we don't need these anymore
+    @passthroughs.clear
   end
 
   # Public: Substitute special characters (i.e., encode XML)
