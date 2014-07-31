@@ -73,21 +73,30 @@ context 'Document' do
       end
     end
 
-    test 'toc and numbered should be enabled by default for DocBook backend' do
+    test 'toc and sectnums should be enabled by default for DocBook backend' do
       doc = empty_document :backend => 'docbook', :parse => true
       assert doc.attr?('toc')
-      assert doc.attr?('numbered')
+      assert doc.attr?('sectnums')
     end
 
-    test 'should be able to disable toc and numbered in document header for DocBook backend' do
+    test 'should be able to disable toc and sectnums in document header for DocBook backend' do
       input = <<-EOS
 = Document Title
 :toc!:
-:numbered!:
+:sectnums!:
       EOS
       doc = document_from_string input, :backend => 'docbook'
       assert !doc.attr?('toc')
-      assert !doc.attr?('numbered')
+      assert !doc.attr?('sectnums')
+    end
+
+    test 'should be able to disable section numbering using numbered attribute in document header for DocBook backend' do
+      input = <<-EOS
+= Document Title
+:numbered!:
+      EOS
+      doc = document_from_string input, :backend => 'docbook'
+      assert !doc.attr?('sectnums')
     end
   end
 
@@ -149,12 +158,12 @@ preamble
 
     test 'should accept attributes as array' do
 	  # NOTE there's a tab character before idseparator
-      doc = Asciidoctor.load('text', :attributes => %w(toc numbered   source-highlighter=coderay idprefix	idseparator=-))
+      doc = Asciidoctor.load('text', :attributes => %w(toc sectnums   source-highlighter=coderay idprefix	idseparator=-))
       assert doc.attributes.is_a?(Hash)
       assert doc.attr?('toc')
       assert_equal '', doc.attr('toc')
-      assert doc.attr?('numbered')
-      assert_equal '', doc.attr('numbered')
+      assert doc.attr?('sectnums')
+      assert_equal '', doc.attr('sectnums')
       assert doc.attr?('source-highlighter')
       assert_equal 'coderay', doc.attr('source-highlighter')
       assert doc.attr?('idprefix')
@@ -170,12 +179,12 @@ preamble
 
     test 'should accept attributes as string' do
 	  # NOTE there's a tab character before idseparator
-      doc = Asciidoctor.load('text', :attributes => 'toc numbered  source-highlighter=coderay idprefix	idseparator=-')
+      doc = Asciidoctor.load('text', :attributes => 'toc sectnums  source-highlighter=coderay idprefix	idseparator=-')
       assert doc.attributes.is_a?(Hash)
       assert doc.attr?('toc')
       assert_equal '', doc.attr('toc')
-      assert doc.attr?('numbered')
-      assert_equal '', doc.attr('numbered')
+      assert doc.attr?('sectnums')
+      assert_equal '', doc.attr('sectnums')
       assert doc.attr?('source-highlighter')
       assert_equal 'coderay', doc.attr('source-highlighter')
       assert doc.attr?('idprefix')
@@ -333,13 +342,13 @@ paragraph
 
     test 'should accept attributes as array' do
       sample_input_path = fixture_path('sample.asciidoc')
-      output = Asciidoctor.convert_file sample_input_path, :attributes => %w(numbered idprefix idseparator=-), :to_file => false
+      output = Asciidoctor.convert_file sample_input_path, :attributes => %w(sectnums idprefix idseparator=-), :to_file => false
       assert_css '#section-a', output, 1
     end
 
     test 'should accept attributes as string' do
       sample_input_path = fixture_path('sample.asciidoc')
-      output = Asciidoctor.convert_file sample_input_path, :attributes => 'numbered idprefix idseparator=-', :to_file => false
+      output = Asciidoctor.convert_file sample_input_path, :attributes => 'sectnums idprefix idseparator=-', :to_file => false
       assert_css '#section-a', output, 1
     end
 

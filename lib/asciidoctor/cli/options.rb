@@ -67,7 +67,7 @@ Example: asciidoctor -b html5 source.asciidoc
             self[:header_footer] = false
           end
           opts.on('-n', '--section-numbers', 'auto-number section titles in the HTML backend; disabled by default') do
-            self[:attributes]['numbered'] = ''
+            self[:attributes]['sectnums'] = ''
           end
           opts.on('-e', '--eruby ERUBY', ['erb', 'erubis'],
                   'specify eRuby implementation to use when rendering custom ERB templates: [erb, erubis] (default: erb)') do |eruby|

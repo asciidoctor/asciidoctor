@@ -334,8 +334,8 @@ module Asciidoctor
   }
 
   # attributes which be changed within the content of the document (but not
-  # header) because it has semantic meaning; ex. numbered
-  FLEXIBLE_ATTRIBUTES = %w(numbered)
+  # header) because it has semantic meaning; ex. sectnums
+  FLEXIBLE_ATTRIBUTES = %w(sectnums)
 
   # A collection of regular expressions used by the parser.
   #
@@ -481,7 +481,7 @@ module Asciidoctor
     #
     #   :foo: bar
     #   :First Name: Dan
-    #   :numbered!:
+    #   :sectnums!:
     #   :!toc:
     #   :long-entry: Attribute value lines ending in ' +'
     #                are joined together as a single value,
