@@ -386,9 +386,9 @@ class Document < AbstractBlock
       localdate = (attrs['localdate'] ||= now.strftime('%Y-%m-%d'))
       unless (localtime = attrs['localtime'])
         begin
-          localtime = attrs['localtime'] = now.strftime '%H:%M:%S %Z'
+          localtime = attrs['localtime'] = now.strftime('%H:%M:%S %Z')
         rescue
-          localtime = attrs['localtime'] = now.strftime '%H:%M:%S'
+          localtime = attrs['localtime'] = now.strftime('%H:%M:%S')
         end
       end
       attrs['localdatetime'] ||= %(#{localdate} #{localtime})
