@@ -1860,10 +1860,10 @@ They couldn't believe their eyes when...
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
     end
 
-    test 'should set toc position if toc2 attribute is set to position' do
+    test 'should set toc position if toc attribute is set to position' do
       input = <<-EOS
 = Article
-:toc2: >
+:toc: >
 :numbered:
 
 == Section One
@@ -2020,7 +2020,7 @@ They couldn't believe their eyes when...
       input = <<-EOS
 = Article
 :toc:
-:toc-placement!:
+:toc-placement: macro
 
 Once upon a time...
 
@@ -2044,7 +2044,7 @@ They couldn't believe their eyes when...
       input = <<-EOS
 = Article
 :toc:
-:toc-placement!:
+:toc-placement: macro
 
 Once upon a time...
 
@@ -2064,7 +2064,7 @@ They couldn't believe their eyes when...
       assert_css '#preamble:root .paragraph + #toc', output, 1
     end
 
-    test 'should not assign toc id to more than one toc' do
+    test 'should not activate toc macro if toc-placement is not set' do
       input = <<-EOS
 = Article
 :toc:
@@ -2086,15 +2086,41 @@ They couldn't believe their eyes when...
 
       assert_css '#toc', output, 1
       assert_css '#toctitle', output, 1
-      assert_xpath '(//*[@class="toc"])[2][not(@id)]', output, 1
-      assert_xpath '(//*[@class="toc"])[2]/*[@class="title"][not(@id)]', output, 1
+      assert_css '.toc', output, 1
+      assert_css '#content .toc', output, 0
+    end
+
+    test 'should only output toc at toc macro if toc is macro' do
+      input = <<-EOS
+= Article
+:toc: macro
+
+Once upon a time...
+
+toc::[]
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input
+
+      assert_css '#toc', output, 1
+      assert_css '#toctitle', output, 1
+      assert_css '.toc', output, 1
+      assert_css '#content .toc', output, 1
     end
 
     test 'should use global attributes for toc-title, toc-class and toclevels for toc macro' do
       input = <<-EOS
 = Article
 :toc:
-:toc-placement!:
+:toc-placement: macro
 :toc-title: Contents
 :toc-class: contents
 :toclevels: 1
@@ -2133,7 +2159,7 @@ Fin.
       input = <<-EOS
 = Article
 :toc:
-:toc-placement!:
+:toc-placement: macro
 :toc-title: Ignored
 :toc-class: ignored
 :toclevels: 5

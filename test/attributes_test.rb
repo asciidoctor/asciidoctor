@@ -283,6 +283,37 @@ content
       node.set_attr 'foo', 'baz'
       assert_equal 'baz', (node.attr 'foo')
     end
+
+    test 'verify toc attribute matrix' do
+      expected_data = <<-EOS
+#attributes                               |toc|toc-position|toc-placement|toc-class
+toc                                       |   |nil         |auto         |nil
+toc=header                                |   |nil         |auto         |nil
+toc=beeboo                                |   |nil         |auto         |nil
+toc=left                                  |   |left        |auto         |toc2
+toc2                                      |   |left        |auto         |toc2
+toc=right                                 |   |right       |auto         |toc2
+toc=preamble                              |   |content     |preamble     |nil
+toc=macro                                 |   |content     |macro        |nil
+toc toc-placement=macro toc-position=left |   |content     |macro        |nil
+toc toc-placement!                        |   |content     |macro        |nil
+      EOS
+
+      expected = expected_data.strip.lines.map {|l|
+        next if l.start_with? '#'
+        l.split('|').map {|e| (e = e.strip) == 'nil' ? nil : e }
+      }.compact
+
+      expected.each do |expect|
+        raw_attrs, toc, toc_position, toc_placement, toc_class = expect
+        attrs = Hash[*(raw_attrs.split ' ').map {|e| e.include?('=') ? e.split('=') : [e, ''] }.flatten]
+        doc = document_from_string '', :attributes => attrs
+        toc ? (assert doc.attr?('toc', toc)) : (assert !doc.attr?('toc')) 
+        toc_position ? (assert doc.attr?('toc-position', toc_position)) : (assert !doc.attr?('toc-position')) 
+        toc_placement ? (assert doc.attr?('toc-placement', toc_placement)) : (assert !doc.attr?('toc-placement')) 
+        toc_class ? (assert doc.attr?('toc-class', toc_class)) : (assert !doc.attr?('toc-class')) 
+      end
+    end
   end
 
   context 'Interpolation' do
