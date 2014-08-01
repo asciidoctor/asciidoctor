@@ -703,16 +703,26 @@ class Document < AbstractBlock
     # css-signature cannot be updated after header attributes are processed
     @id = @attributes['css-signature'] unless @id
 
-    toc_val = @attributes['toc']
-    toc2_val = @attributes['toc2']
-    toc_position_val = @attributes['toc-position']
+    toc_position_val = if (toc_val = (@attributes.delete('toc2') ? 'left' : @attributes['toc']))
+      # toc-placement allows us to separate position from using fitted slot vs macro
+      (toc_placement = @attributes.fetch('toc-placement', 'macro')) && toc_placement != 'auto' ? toc_placement : @attributes['toc-position']
+    else
+      nil
+    end
 
-    if (toc_val && (toc_val != '' || !toc_position_val.nil_or_empty?)) || toc2_val
+    if toc_val && (!toc_val.empty? || !toc_position_val.nil_or_empty?)
       default_toc_position = 'left'
+      # TODO rename toc2 to aside-toc
       default_toc_class = 'toc2'
-      position = [toc_position_val, toc2_val, toc_val].find {|pos| !pos.nil_or_empty? }
-      position = default_toc_position if !position && toc2_val
+      if !toc_position_val.nil_or_empty?
+        position = toc_position_val
+      elsif !toc_val.empty?
+        position = toc_val
+      else
+        position = default_toc_position
+      end
       @attributes['toc'] = ''
+      @attributes['toc-placement'] = 'auto'
       case position
       when 'left', '<', '&lt;'
         @attributes['toc-position'] = 'left'
@@ -722,18 +732,15 @@ class Document < AbstractBlock
         @attributes['toc-position'] = 'top'
       when 'bottom', 'v'
         @attributes['toc-position'] = 'bottom'
-      when 'preamble'
-        @attributes.delete 'toc2'
-        @attributes['toc-placement'] = 'preamble'
+      when 'preamble', 'macro'
+        @attributes['toc-position'] = 'content'
+        @attributes['toc-placement'] = position
         default_toc_class = nil
-        default_toc_position = nil
-      when 'default'
-        @attributes.delete 'toc2'
+      else
+        @attributes.delete 'toc-position'
         default_toc_class = nil
-        default_toc_position = 'default'
       end
       @attributes['toc-class'] ||= default_toc_class if default_toc_class
-      @attributes['toc-position'] ||= default_toc_position if default_toc_position
     end
 
     if @attributes.key? 'compat-mode'

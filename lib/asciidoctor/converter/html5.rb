@@ -135,7 +135,7 @@ MathJax.Hub.Config({
         body_attrs << %(id="#{node.id}")
       end
       if (node.attr? 'toc-class') && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
-        body_attrs << %(class="#{node.doctype} #{node.attr 'toc-class'} toc-#{node.attr 'toc-position', 'left'}")
+        body_attrs << %(class="#{node.doctype} #{node.attr 'toc-class'} toc-#{node.attr 'toc-position', 'header'}")
       else
         body_attrs << %(class="#{node.doctype}")
       end
@@ -801,17 +801,14 @@ Your browser does not support the audio tag.
     end
 
     def toc node
-      return '<!-- toc disabled -->' unless (doc = node.document).attr? 'toc'
+      return '<!-- toc disabled -->' unless (doc = node.document).attr?('toc-placement', 'macro') && doc.attr?('toc')
 
       if node.id
         id_attr = %( id="#{node.id}")
-        title_id_attr = ''
-      elsif doc.embedded? || !(doc.attr? 'toc-placement')
+        title_id_attr = %( id="#{node.id}title")
+      else
         id_attr = ' id="toc"'
         title_id_attr = ' id="toctitle"'
-      else
-        id_attr = nil
-        title_id_attr = nil
       end
       title = node.title? ? node.title : (doc.attr 'toc-title')
       levels = (node.attr? 'levels') ? (node.attr 'levels').to_i : nil
