@@ -106,11 +106,13 @@ class Parser
     # if so, add a header to the document and parse the header metadata
     if is_next_line_document_title?(reader, block_attributes)
       source_location = reader.cursor if document.sourcemap
-      document.id, _, doctitle, _, _ = parse_section_title(reader, document)
+      document.id, _, doctitle, _, single_line = parse_section_title(reader, document)
       unless assigned_doctitle
         document.title = doctitle
         assigned_doctitle = doctitle
       end
+      # default to compat-mode if document uses atx-style doctitle
+      document.set_attribute 'compat-mode', '' unless single_line
       document.header.source_location = source_location if source_location
       document.attributes['doctitle'] = section_title = doctitle
       # QUESTION: should the id assignment on Document be encapsulated in the Document class?
@@ -1742,7 +1744,6 @@ class Parser
         end
       end
     elsif Compliance.underline_style_section_titles
-      
       if (line2 = reader.peek_line(true)) && SECTION_LEVELS.has_key?(line2.chr) && line2 =~ SetextSectionLineRx &&
         (name_match = SetextSectionTitleRx.match(line1)) &&
         # chomp so that a (non-visible) endline does not impact calculation

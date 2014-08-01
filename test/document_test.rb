@@ -16,6 +16,10 @@ context 'Document' do
       assert_equal 14, doc.blocks.size
       assert_equal :preamble, doc.blocks[0].context
       assert doc.blocks[1].context == :section
+
+      # verify compat-mode is set when atx-style doctitle is used
+      result = doc.blocks[0].convert
+      assert_xpath %q(//em[text()="Stuart Rackham"]), result, 1
     end
   end
 
