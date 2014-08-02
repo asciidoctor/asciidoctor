@@ -133,9 +133,9 @@ Example: asciidoctor -b html5 source.asciidoc
             return 0
           end
 
-          opts.on_tail('-V', '--version', 'display the version and runtime environment') do
-            $stdout.puts "Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org]"
-            $stdout.puts "Runtime Environment (#{RUBY_DESCRIPTION})"
+          opts.on_tail('-V', '--version', 'display the version and runtime environment (or -v if no other flags or arguments)') do
+            $stdout.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
+            $stdout.puts %(Runtime Environment (#{RUBY_DESCRIPTION}))
             return 0
           end
           
@@ -145,8 +145,14 @@ Example: asciidoctor -b html5 source.asciidoc
         opts_parser.parse! args
         
         if args.empty?
-          $stderr.puts opts_parser
-          return 1
+          if self[:verbose] == 2
+            $stdout.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
+            $stdout.puts %(Runtime Environment (#{RUBY_DESCRIPTION}))
+            return 0
+          else
+            $stderr.puts opts_parser
+            return 1
+          end
         end
 
         # shave off the file to process so that options errors appear correctly

@@ -102,12 +102,14 @@ context 'Invoker' do
 
   test 'should display version and exit' do
     expected = %(Asciidoctor #{Asciidoctor::VERSION} [http://asciidoctor.org]\nRuntime Environment (#{RUBY_DESCRIPTION}))
-    actual = nil
-    redirect_streams do |out, err|
-      invoke_cli %w(--version)
-      actual = out.string.rstrip
+    ['--version', '-V'].each do |switch|
+      actual = nil
+      redirect_streams do |out, err|
+        invoke_cli [switch]
+        actual = out.string.rstrip
+      end
+      assert_equal expected, actual, %(Expected to print version when using #{switch} switch)
     end
-    assert_equal expected, actual
   end
 
   test 'should print warnings to stderr by default' do
