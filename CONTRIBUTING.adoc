@@ -1,4 +1,10 @@
 = Contributing
+// [settings]
+:idprefix:
+:idseparator: -
+:source-language: ruby
+:language: {source-language}
+// [URIs]
 :repo-uri: https://github.com/asciidoctor/asciidoctor
 :base-help-uri: https://help.github.com/articles
 :issues-uri: {repo-uri}/issues
