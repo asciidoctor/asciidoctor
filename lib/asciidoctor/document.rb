@@ -691,21 +691,21 @@ class Document < AbstractBlock
   def save_attributes
     # enable toc and sectnums (i.e., numbered) by default in DocBook backend
     # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility
-    if @attributes['basebackend'] == 'docbook'
-      @attributes['toc'] = '' unless attribute_locked?('toc') || @attributes_modified.include?('toc')
-      @attributes['sectnums'] = '' unless attribute_locked?('sectnums') || @attributes_modified.include?('sectnums')
+    if (attrs = @attributes)['basebackend'] == 'docbook'
+      attrs['toc'] = '' unless attribute_locked?('toc') || @attributes_modified.include?('toc')
+      attrs['sectnums'] = '' unless attribute_locked?('sectnums') || @attributes_modified.include?('sectnums')
     end
 
-    unless @attributes.key?('doctitle') || !(val = doctitle)
-      @attributes['doctitle'] = val
+    unless attrs.key?('doctitle') || !(val = doctitle)
+      attrs['doctitle'] = val
     end
 
     # css-signature cannot be updated after header attributes are processed
-    @id = @attributes['css-signature'] unless @id
+    @id = attrs['css-signature'] unless @id
 
-    toc_position_val = if (toc_val = (@attributes.delete('toc2') ? 'left' : @attributes['toc']))
+    toc_position_val = if (toc_val = (attrs.delete('toc2') ? 'left' : attrs['toc']))
       # toc-placement allows us to separate position from using fitted slot vs macro
-      (toc_placement = @attributes.fetch('toc-placement', 'macro')) && toc_placement != 'auto' ? toc_placement : @attributes['toc-position']
+      (toc_placement = attrs.fetch('toc-placement', 'macro')) && toc_placement != 'auto' ? toc_placement : attrs['toc-position']
     else
       nil
     end
@@ -721,36 +721,36 @@ class Document < AbstractBlock
       else
         position = default_toc_position
       end
-      @attributes['toc'] = ''
-      @attributes['toc-placement'] = 'auto'
+      attrs['toc'] = ''
+      attrs['toc-placement'] = 'auto'
       case position
       when 'left', '<', '&lt;'
-        @attributes['toc-position'] = 'left'
+        attrs['toc-position'] = 'left'
       when 'right', '>', '&gt;'
-        @attributes['toc-position'] = 'right'
+        attrs['toc-position'] = 'right'
       when 'top', '^'
-        @attributes['toc-position'] = 'top'
+        attrs['toc-position'] = 'top'
       when 'bottom', 'v'
-        @attributes['toc-position'] = 'bottom'
+        attrs['toc-position'] = 'bottom'
       when 'preamble', 'macro'
-        @attributes['toc-position'] = 'content'
-        @attributes['toc-placement'] = position
+        attrs['toc-position'] = 'content'
+        attrs['toc-placement'] = position
         default_toc_class = nil
       else
-        @attributes.delete 'toc-position'
+        attrs.delete 'toc-position'
         default_toc_class = nil
       end
-      @attributes['toc-class'] ||= default_toc_class if default_toc_class
+      attrs['toc-class'] ||= default_toc_class if default_toc_class
     end
 
-    if @attributes.key? 'compat-mode'
-      @attributes['source-language'] = @attributes['language'] if @attributes.has_key? 'language'
+    if attrs.key? 'compat-mode'
+      attrs['source-language'] = attrs['language'] if attrs.has_key? 'language'
       @compat_mode = true
     else
       @compat_mode = false
     end
 
-    @original_attributes = @attributes.dup
+    @original_attributes = attrs.dup
 
     # unfreeze "flexible" attributes
     unless nested?
