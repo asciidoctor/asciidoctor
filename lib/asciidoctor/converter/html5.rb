@@ -915,9 +915,10 @@ Your browser does not support the audio tag.
         autoplay_param = (node.option? 'autoplay') ? '&amp;autoplay=1' : nil
         loop_param = (node.option? 'loop') ? '&amp;loop=1' : nil
         controls_param = (node.option? 'nocontrols') ? '&amp;controls=0' : nil
+        list_param = (node.attr? 'list') ? "&amp;list=#{node.attr 'list'}" : nil
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{node.attr 'target'}?rel=0#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{node.attr 'target'}?rel=0#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}#{list_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
       else 
