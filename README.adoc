@@ -3,6 +3,7 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://g
 // [settings]
 :page-layout: base
 :idprefix:
+ifdef::env-github[:idprefix: user-content-]
 :idseparator: -
 :source-language: ruby
 :language: {source-language}
@@ -45,15 +46,15 @@ endif::[]
 // [Images]
 :screenshot-img: screenshot.png
 
-{project-uri}[Asciidoctor] is a _fast_ text processor and publishing toolchain for converting {what-is-asciidoc-uri}[AsciiDoc] content to HTML 5, DocBook 5 (or 4.5) and other output formats.
+{project-uri}[Asciidoctor] is a _fast_ text processor and publishing toolchain for converting {what-is-asciidoc-uri}[AsciiDoc] content to HTML5, DocBook 5 (or 4.5) and other formats.
 Asciidoctor is written in {ruby-uri}[Ruby], packaged as a RubyGem and published to {rubygem-uri}[RubyGems.org].
-It's also packaged in several Linux distributions, including Fedora, Debian and Ubuntu.
+The gem is also packaged in several Linux distributions, including Fedora, Debian and Ubuntu.
 Asciidoctor is open source, {repo-uri}[hosted on GitHub] and released under the MIT license.
 
 TIP: You can run Asciidoctor on the JVM using JRuby.
 You can also use the Asciidoctor APIs from Java and other JVM languages using {asciidoctorj-uri}[AsciidoctorJ].
 Asciidoctor can also be used in JavaScript.
-We use http://opalrb.org[Opal] to transcompiled the code from Ruby to JavaScript to make {asciidoctorjs-uri}[Asciidoctor.js], which can be used whereever JavaScript runs, such as in a web browser or on Node.js.
+http://opalrb.org[Opal] is used to transcompile the code from Ruby to JavaScript to make {asciidoctorjs-uri}[Asciidoctor.js], which can be used whereever JavaScript runs, such as in a web browser or on Node.js.
 
 ifdef::env-github[]
 *Project health:* image:https://travis-ci.org/asciidoctor/asciidoctor.png?branch=master[Build Status, link="https://travis-ci.org/asciidoctor/asciidoctor"]
@@ -61,18 +62,21 @@ endif::env-github[]
 
 == The Big Picture
 
+Asciidoctor reads content written in plain text, as shown in the panel on the left in the image below, and converts it to HTML5, as shown rendered in the right panel.
+Asciidoctor adds a default stylesheet to the HTML5 document, as shown, to provide a pleasant out-of-the-box experience.
+
 image::{screenshot-img}[Preview of AsciiDoc source and corresponding rendered HTML]
 
 == AsciiDoc Processing
 
-Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the parse tree into a set of built-in templates to produce HTML 5, DocBook 5 or DocBook 4.5.
-You have the option of using your own {tilt-uri}[Tilt]-supported templates to customize the generated output or to convert AsciiDoc to additional formats.
+Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the parse tree into a set of built-in templates to produce HTML5, DocBook 5 (or 4.5).
+You have the option of writing your own converter or providing {tilt-uri}[Tilt]-supported templates to customize the generated output or to convert the AsciiDoc to alternative formats.
 
 NOTE: Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor.
 The project has {tests-uri}[> 1,500 tests] to ensure compatibility with the AsciiDoc syntax.
 
 In addition to the standard AsciiDoc syntax, Asciidoctor recognizes additional markup and formatting options, such as font-based icons (e.g., [x-]`icon:fire[]`) and UI elements (e.g., [x-]`button:[Save]`).
-Asciidoctor also offers a modern, responsive theme based on {foundation-uri}[Foundation] to style the HTML output.
+Asciidoctor also offers a modern, responsive theme based on {foundation-uri}[Foundation] to style the HTML5 output.
 
 == Requirements
 
@@ -84,30 +88,40 @@ Asciidoctor works on Linux, OSX (Mac) and Windows and requires one of the follow
 * Opal (JavaScript)
 
 We welcome your help testing Asciidoctor on other platforms as well.
-Refer to {contribute-uri}[Contributing] to learn how to get involved.
+Refer to <<{idprefix}contributing,Contributing>> to learn how to get involved.
 
 == Installation
 
-Asciidoctor can be installed using the `gem install` command, Bundler or package managers for popular Linux distributions.
+Asciidoctor can be installed using (a) the `gem install` command, (b) Bundler or (c) package managers for popular Linux distributions.
 
 TIP: The benefit of using a Linux package manager to install the gem is that it handles installing Ruby and RubyGems if they're not already installed on your machine.
 The drawback is that package may not be available immediately after the release of the RubyGem.
 If you need the latest version, you can always fallback to using the `gem` command.
 
-=== gem install
+=== (a) gem install
 
 Open a terminal and type: (without the leading `$`)
 
  $ gem install asciidoctor
 
-[NOTE]
-====
 If you want to install a pre-release version (e.g., a release candidate), use:
 
  $ gem install asciidoctor --pre
+
+.Upgrading your installation
+[TIP]
+====
+If you have an earlier version of Asciidoctor installed, you can update it using:
+
+ $ gem upgrade asciidoctor
+
+If you install a new version of the gem using `gem install` instead of gem update, you'll have multiple versions installed.
+If that's the case, use the following gem command to remove the old versions:
+
+ $ gem cleanup asciidoctor
 ====
 
-=== Bundler
+=== (b) Bundler
 
 . Create a Gemfile in the root folder of your project (or the current directory)
 . Add the `asciidoctor` gem to your Gemfile as follows:
@@ -116,6 +130,8 @@ If you want to install a pre-release version (e.g., a release candidate), use:
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
+# or set the version explicitly
+# gem 'asciidoctor', '1.5.0'
 ----
 
 . Save the Gemfile
@@ -123,47 +139,39 @@ gem 'asciidoctor'
 
  $ bundle
 
-=== Yum (Fedora 18 or greater)
+To upgrade the gem, set the new version in the Gemfile and run `bundle` again.
+Using `bundle update` is not recommended as it will also update other gems, which may not be the desired result.
 
-Open a terminal and type:
+=== (c) Linux package managers
+
+==== Yum (Fedora 18 or greater)
+
+To install the gem on Fedora 18 or greater using yum, open a terminal and type:
 
  $ sudo yum install -y rubygem-asciidoctor
 
-=== apt-get (Debian Sid, Ubuntu Saucy or greater)
+To upgrade the gem, use:
 
-Open a terminal and type:
+ $ sudo yum update -y rubygem-asciidoctor
+
+TIP: Your Fedora system may be configured to automatically update packages, in which case no action is required by you to update the gem.
+
+==== apt-get (Debian Sid, Ubuntu Saucy or greater)
+
+To install the gem on Debian or Ubuntu, open a terminal and type:
 
  $ sudo apt-get install -y asciidoctor
+
+To upgrade the gem, use:
+
+ $ sudo apt-get upgrade -y asciidoctor
+
+TIP: Your Debian or Ubuntu system may be configured to automatically update packages, in which case no action is required by you to update the gem.
 
 === Other installation options
 
 * {install-doc-uri}[Installing the Asciidoctor toolchain]
 * {install-osx-doc-uri}[Installing Asciidoctor on Mac OS X]
-
-=== Upgrading
-
-If you have an earlier version of Asciidoctor installed, you can update it using:
-
- $ gem update asciidoctor
-
-[TIP]
---
-If you install a new version of the gem using `gem install` instead of `gem update`, then you'll have multiple versions installed.
-If you wish to remove older versions, use the following `gem` command:
-
- $ gem cleanup asciidoctor
---
-
-On Fedora, you can update it using:
-
- $ sudo yum update -y rubygem-asciidoctor
-
-TIP: Your Fedora system may be configured to automatically update packages, in which case no further action is required by you.
-Refer to the https://docs.fedoraproject.org[Fedora docs] if you are unsure.
-
-On Debian or Ubuntu, you can update it using:
-
- $ sudo apt-get upgrade -y asciidoctor
 
 == Usage
 
@@ -174,7 +182,7 @@ To verify it's installed correctly, run the following in your terminal:
 
 You should see information about the Asciidoctor version and your Ruby environment printed in the terminal.
 
-  Asciidoctor 1.5.0.dev [http://asciidoctor.org]
+  Asciidoctor 1.5.0 [http://asciidoctor.org]
   Runtime Environment (ruby 2.1.2p95 (2014-05-08 revision 45877) [x86_64-linux])
 
 Asciidoctor also provides an API.
@@ -182,7 +190,7 @@ The API is intended for integration with other Ruby software, such as Rails, Sin
 
 === Command line interface (CLI)
 
-You use the `asciidoctor` command to run Asciidoctor from the command line.
+You'll use the `asciidoctor` command to run Asciidoctor from the command line.
 
 The following command converts README.adoc to HTML and saves the result to the file README.html in the same directory.
 The name of the generated HTML file is derived from the source file by changing its file extension to `.html`.
@@ -214,17 +222,17 @@ require 'asciidoctor'
 You can then convert an AsciiDoc source file to an HTML file using:
 
 [source]
-Asciidoctor.convert_file 'README.adoc', :to_file => true, safe: :safe
+Asciidoctor.convert_file 'README.adoc', to_file: true, safe: 'safe'
 
 WARNING: When using Asciidoctor via the API, the default safe mode is `:secure`.
 In secure mode, several core features are disabled, including the `include` directive.
-If you want to enable these features, you'll need to explicitly set the safe mode to `:server` (recommended) or `:safe`.
+If you want to enable these features, you'll need to explicitly set the safe mode to `server` (recommended) or `safe`.
 
 You can also convert an AsciiDoc string to embeddable HTML (for inserting in an HTML page) using:
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].', safe: :safe
+content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].', safe: 'safe'
 Asciidoctor.convert content
 ----
 
@@ -232,7 +240,7 @@ If you want the full HTML document, enable the `header_footer` option as follows
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].', safe: :safe
+content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].', safe: 'safe'
 html_document = Asciidoctor.convert content, header_footer: true
 ----
 
@@ -241,7 +249,7 @@ If you need access to the parsed document, you can split the conversion into dis
 [source]
 ----
 content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
-document = Asciidoctor.load content, header_footer: true, safe: :safe
+document = Asciidoctor.load content, header_footer: true, safe: 'safe'
 puts document.doctitle
 html = document.convert
 ----
