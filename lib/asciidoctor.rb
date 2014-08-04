@@ -1197,6 +1197,10 @@ module Asciidoctor
   compat_quote_subs[4] = [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m]
   # +monospaced+
   compat_quote_subs[5] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?!#{CG_WORD})/m]
+  # #unquoted#
+  #compat_quote_subs[8] = [:unquoted, *compat_quote_subs[8][1..-1]]
+  # ##unquoted##
+  #compat_quote_subs[9] = [:unquoted, *compat_quote_subs[9][1..-1]]
   # 'emphasis'
   compat_quote_subs.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m]
 
