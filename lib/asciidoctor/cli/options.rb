@@ -109,11 +109,11 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts.on('-IDIRECTORY', '--load-path LIBRARY', 'add a directory to the $LOAD_PATH',
               'may be specified more than once') do |path|
-            (self[:load_paths] ||= []) << path
+            (self[:load_paths] ||= []).concat(path.split ::File::PATH_SEPARATOR)
           end
           opts.on('-rLIBRARY', '--require LIBRARY', 'require the specified library before executing the processor (using require)',
               'may be specified more than once') do |path|
-            (self[:requires] ||= []) << path
+            (self[:requires] ||= []).concat(path.split ',')
           end
           opts.on('-q', '--quiet', 'suppress warnings (default: false)') do |verbose|
             self[:verbose] = 0
@@ -208,13 +208,13 @@ Example: asciidoctor -b html5 source.asciidoc
         end
 
         if (load_paths = self[:load_paths])
-          load_paths.reverse_each do |path|
+          (self[:load_paths] = load_paths.uniq).reverse_each do |path|
             $:.unshift File.expand_path(path)
           end
         end
 
         if (requires = self[:requires])
-          requires.each do |path|
+          (self[:requires] = requires.uniq).each do |path|
             begin
               require path
             rescue ::LoadError
