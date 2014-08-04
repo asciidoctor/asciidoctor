@@ -507,7 +507,9 @@ module Substitutors
             break ''
           when 'warn'
             warn %(asciidoctor: WARNING: skipping reference to missing attribute: #{key})
+            m[0]
           else # 'drop'
+            # QUESTION should we warn in this case?
             reject_if_empty = true
             ''
           end
