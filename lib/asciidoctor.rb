@@ -6,7 +6,7 @@ RUBY_MIN_VERSION_2 = (RUBY_VERSION >= '2')
 
 require 'set'
 
-# NOTE "RUBY_ENGINE == 'opal'" conditional blocks are filtered by the Opal preprocessor
+# NOTE RUBY_ENGINE == 'opal' conditional blocks are filtered by the Opal preprocessor
 if RUBY_ENGINE == 'opal'
   require 'encoding' # needed for String.bytes method
   require 'strscan'
@@ -362,12 +362,14 @@ module Asciidoctor
       CG_BLANK = '[ \\t]'
       CC_EOL   = '(?=\\n|$)'
       CG_GRAPH = '[\\x21-\\x7E]' # non-blank character
+      CC_ALL   = '[\s\S]' # any character, including newlines (alternatively, [^])
       CC_WORD  = 'a-zA-Z0-9_'
       CG_WORD  = '[a-zA-Z0-9_]'
     # character classes for the Regexp engine in Ruby >= 2 (Ruby 1.9 supports \p{} but has problems w/ encoding)
     elsif ::RUBY_MIN_VERSION_2
       CC_ALPHA = CG_ALPHA = '\p{Alpha}'
       CC_ALNUM = CG_ALNUM = '\p{Alnum}'
+      CC_ALL   = '.'
       CG_BLANK = '\p{Blank}'
       CC_EOL   = '$'
       CG_GRAPH = '\p{Graph}'
@@ -376,6 +378,7 @@ module Asciidoctor
     else
       CC_ALPHA = '[:alpha:]'
       CG_ALPHA = '[[:alpha:]]'
+      CC_ALL   = '.'
       CC_ALNUM = '[:alnum:]'
       CG_ALNUM = '[[:alnum:]]'
       CG_BLANK = '[[:blank:]]'
@@ -824,7 +827,7 @@ module Asciidoctor
     #   footnoteref:[id,text]
     #   footnoteref:[id]
     #
-    FootnoteInlineMacroRx = /\\?(footnote(?:ref)?):\[(.*?[^\\])\]/m
+    FootnoteInlineMacroRx = /\\?(footnote(?:ref)?):\[(#{CC_ALL}*?[^\\])\]/m
 
     # Matches an image or icon inline macro.
     #
@@ -846,7 +849,7 @@ module Asciidoctor
     #   indexterm2:[Tigers]
     #   ((Tigers))
     #
-    IndextermInlineMacroRx = /\\?(?:(indexterm2?):\[(.*?[^\\])\]|\(\((.+?)\)\)(?!\)))/m
+    IndextermInlineMacroRx = /\\?(?:(indexterm2?):\[(#{CC_ALL}*?[^\\])\]|\(\((#{CC_ALL}+?)\)\)(?!\)))/m
 
     # Matches either the kbd or btn inline macro.
     #
@@ -896,7 +899,7 @@ module Asciidoctor
     #   asciimath:[x != 0]
     #   latexmath:[\sqrt{4} = 2]
     #
-    StemInlineMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z,]*)\[(.*?[^\\])\]/m
+    StemInlineMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z,]*)\[(#{CC_ALL}*?[^\\])\]/m
 
     # Matches a menu inline macro.
     #
@@ -925,8 +928,8 @@ module Asciidoctor
     #
     # NOTE we always capture the attributes so we know when to use compatible (i.e., legacy) behavior
     PassInlineRx = {
-      false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+?)\])?(\\?(\+|`)(\S|\S.*?\S)\4)(?!#{CC_WORD})/m],
-      true  => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+?)\])?(\\?(`)([^`\s]|[^`\s].*?\S)\4)(?![`#{CC_WORD}])/m]
+      false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+?)\])?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CC_WORD})/m],
+      true  => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+?)\])?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m]
     }
 
     # Matches several variants of the passthrough inline macro, which may span multiple lines.
@@ -937,7 +940,7 @@ module Asciidoctor
     #   $$text$$
     #   pass:quotes[text]
     #
-    PassInlineMacroRx = /(?:(?:(\\?)\[([^\]]+?)\])?(\\{0,2})(\+{2,3}|\${2})(.*?)\4|(\\?)pass:([a-z,]*)\[(.*?[^\\])\])/m
+    PassInlineMacroRx = /(?:(?:(\\?)\[([^\]]+?)\])?(\\{0,2})(\+{2,3}|\${2})(#{CC_ALL}*?)\4|(\\?)pass:([a-z,]*)\[(#{CC_ALL}*?[^\\])\])/m
 
     # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
     #
@@ -947,7 +950,7 @@ module Asciidoctor
     #   xref:id[reftext]
     #
     # NOTE special characters have already been escaped, hence the entity references
-    XrefInlineMacroRx = /\\?(?:&lt;&lt;([#{CC_WORD}":].*?)&gt;&gt;|xref:([#{CC_WORD}":].*?)\[(.*?)\])/m
+    XrefInlineMacroRx = /\\?(?:&lt;&lt;([#{CC_WORD}":]#{CC_ALL}*?)&gt;&gt;|xref:([#{CC_WORD}":]#{CC_ALL}*?)\[(#{CC_ALL}*?)\])/m
 
     ## Layout
 
@@ -959,11 +962,11 @@ module Asciidoctor
     #    +
     #   Foo +
     #
-    # NOTE: JavaScript only treats ^ and $ as line boundaries in multiline regexp
-    LineBreakRx = if RUBY_ENGINE == 'opal'
-      /^(.*)[ \t]\+$/m
+    if RUBY_ENGINE == 'opal'
+      # NOTE JavaScript only treats ^ and $ as line boundaries in multiline regexp; . won't match newlines
+      LineBreakRx = /^(.*)[ \t]\+$/m
     else
-      /^(.*)[[:blank:]]\+$/
+      LineBreakRx = /^(.*)[[:blank:]]\+$/
     end
 
     # Matches an AsciiDoc horizontal rule or AsciiDoc page break.
@@ -1026,7 +1029,7 @@ module Asciidoctor
     #   to take up multiple lines and I
     #   still want to be matched."
     #
-    DoubleQuotedMultiRx = /^("|)(.*)\1$/m
+    DoubleQuotedMultiRx = /^("|)(#{CC_ALL}*)\1$/m
 
     # Matches one or more consecutive digits at the end of a line.
     #
@@ -1111,7 +1114,7 @@ module Asciidoctor
     # Matches parent directory references at the beginning of a path
     #LeadingParentDirsRx = /^(?:\.\.\/)*/
 
-    #StripLineWise = /\A(?:\s*\n)?(.*?)\s*\z/m
+    #StripLineWise = /\A(?:\s*\n)?(#{CC_ALL}*?)\s*\z/m
   #end
 
   INTRINSIC_ATTRIBUTES = {
@@ -1152,34 +1155,34 @@ module Asciidoctor
   # the order in which they are replaced is important
   quote_subs = [
     # **strong**
-    [:strong, :unconstrained, /\\?(?:\[([^\]]+?)\])?\*\*(.+?)\*\*/m],
+    [:strong, :unconstrained, /\\?(?:\[([^\]]+?)\])?\*\*(#{CC_ALL}+?)\*\*/m],
 
     # *strong*
-    [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\*(\S|\S.*?\S)\*(?!#{CG_WORD})/m],
+    [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\*(\S|\S#{CC_ALL}*?\S)\*(?!#{CG_WORD})/m],
 
     # "`double-quoted`"
-    [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?"`(\S|\S.*?\S)`"(?!#{CG_WORD})/m],
+    [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?"`(\S|\S#{CC_ALL}*?\S)`"(?!#{CG_WORD})/m],
 
     # '`single-quoted`'
-    [:single, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+?)\])?'`(\S|\S.*?\S)`'(?!#{CG_WORD})/m],
+    [:single, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+?)\])?'`(\S|\S#{CC_ALL}*?\S)`'(?!#{CG_WORD})/m],
 
     # ``monospaced``
-    [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?``(.+?)``/m],
+    [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?``(#{CC_ALL}+?)``/m],
 
     # `monospaced`
-    [:monospaced, :constrained, /(^|[^#{CC_WORD};:"'`}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)`(?![#{CC_WORD}"'`])/m],
+    [:monospaced, :constrained, /(^|[^#{CC_WORD};:"'`}])(?:\[([^\]]+?)\])?`(\S|\S#{CC_ALL}*?\S)`(?![#{CC_WORD}"'`])/m],
 
     # __emphasis__
-    [:emphasis, :unconstrained, /\\?(?:\[([^\]]+?)\])?__(.+?)__/m],
+    [:emphasis, :unconstrained, /\\?(?:\[([^\]]+?)\])?__(#{CC_ALL}+?)__/m],
 
     # _emphasis_
-    [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?_(\S|\S.*?\S)_(?!#{CG_WORD})/m],
+    [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?_(\S|\S#{CC_ALL}*?\S)_(?!#{CG_WORD})/m],
 
     # ##mark## (referred to in AsciiDoc Python as unquoted)
-    [:mark, :unconstrained, /\\?(?:\[([^\]]+?)\])?##(.+?)##/m],
+    [:mark, :unconstrained, /\\?(?:\[([^\]]+?)\])?##(#{CC_ALL}+?)##/m],
 
     # #mark# (referred to in AsciiDoc Python as unquoted)
-    [:mark, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?!#{CG_WORD})/m],
+    [:mark, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?#(\S|\S#{CC_ALL}*?\S)#(?!#{CG_WORD})/m],
 
     # ^superscript^
     [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(\S+?)\^/],
@@ -1190,19 +1193,19 @@ module Asciidoctor
 
   compat_quote_subs = quote_subs.dup
   # ``quoted''
-  compat_quote_subs[2] = [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?``(\S|\S.*?\S)''(?!#{CG_WORD})/m]
+  compat_quote_subs[2] = [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?``(\S|\S#{CC_ALL}*?\S)''(?!#{CG_WORD})/m]
   # `quoted'
-  compat_quote_subs[3] = [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S.*?\S)'(?!#{CG_WORD})/m]
+  compat_quote_subs[3] = [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?`(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
   # ++monospaced++
-  compat_quote_subs[4] = [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(.+?)\+\+/m]
+  compat_quote_subs[4] = [:monospaced, :unconstrained, /\\?(?:\[([^\]]+?)\])?\+\+(#{CC_ALL}+?)\+\+/m]
   # +monospaced+
-  compat_quote_subs[5] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S.*?\S)\+(?!#{CG_WORD})/m]
+  compat_quote_subs[5] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?\+(\S|\S#{CC_ALL}*?\S)\+(?!#{CG_WORD})/m]
   # #unquoted#
   #compat_quote_subs[8] = [:unquoted, *compat_quote_subs[8][1..-1]]
   # ##unquoted##
   #compat_quote_subs[9] = [:unquoted, *compat_quote_subs[9][1..-1]]
   # 'emphasis'
-  compat_quote_subs.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S.*?\S)'(?!#{CG_WORD})/m]
+  compat_quote_subs.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?'(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
 
   QUOTE_SUBS = {
     false => quote_subs,
