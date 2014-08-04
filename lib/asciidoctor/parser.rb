@@ -849,7 +849,13 @@ class Parser
 
         when :stem, :latexmath, :asciimath
           if block_context == :stem
-            attributes['style'] = (default_stem_syntax = document.attributes['stem']).nil_or_empty? ? 'asciimath' : default_stem_syntax
+            attributes['style'] = if (explicit_stem_syntax = attributes[2])
+              explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
+            elsif (default_stem_syntax = document.attributes['stem']).nil_or_empty?
+              'asciimath'
+            else
+              default_stem_syntax
+            end
           end
           block = build_block(:stem, :raw, terminator, parent, reader, attributes)
 
