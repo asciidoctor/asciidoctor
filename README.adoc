@@ -52,7 +52,7 @@ The gem is also packaged in several Linux distributions, including Fedora, Debia
 Asciidoctor is open source, {repo-uri}[hosted on GitHub] and released under the MIT license.
 
 TIP: You can run Asciidoctor on the JVM using JRuby.
-You can also use the Asciidoctor APIs from Java and other JVM languages using {asciidoctorj-uri}[AsciidoctorJ].
+You can also use {asciidoctorj-uri}[AsciidoctorJ] to invoke Asciidoctor's APIs from Java and other JVM languages.
 Asciidoctor can also be used in JavaScript.
 http://opalrb.org[Opal] is used to transcompile the code from Ruby to JavaScript to make {asciidoctorjs-uri}[Asciidoctor.js], which can be used whereever JavaScript runs, such as in a web browser or on Node.js.
 
@@ -70,10 +70,10 @@ image::{screenshot-img}[Preview of AsciiDoc source and corresponding rendered HT
 == AsciiDoc Processing
 
 Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the parse tree into a set of built-in templates to produce HTML5, DocBook 5 (or 4.5).
-You have the option of writing your own converter or providing {tilt-uri}[Tilt]-supported templates to customize the generated output or to convert the AsciiDoc to alternative formats.
+You have the option of writing your own converter or providing {tilt-uri}[Tilt]-supported templates to customize the generated output or produce alternative formats.
 
-NOTE: Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor.
-The project has {tests-uri}[> 1,500 tests] to ensure compatibility with the AsciiDoc syntax.
+NOTE: Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor (`asciidoc.py`).
+The Asciidoctor test suite has {tests-uri}[> 1,500 tests] to ensure compatibility with the AsciiDoc syntax.
 
 In addition to the standard AsciiDoc syntax, Asciidoctor recognizes additional markup and formatting options, such as font-based icons (e.g., [x-]`icon:fire[]`) and UI elements (e.g., [x-]`button:[Save]`).
 Asciidoctor also offers a modern, responsive theme based on {foundation-uri}[Foundation] to style the HTML5 output.
@@ -87,15 +87,15 @@ Asciidoctor works on Linux, OSX (Mac) and Windows and requires one of the follow
 * Rubinius 2.2.x
 * Opal (JavaScript)
 
-We welcome your help testing Asciidoctor on other platforms as well.
+We welcome your help testing Asciidoctor on these and other platforms.
 Refer to <<{idprefix}contributing,Contributing>> to learn how to get involved.
 
 == Installation
 
 Asciidoctor can be installed using (a) the `gem install` command, (b) Bundler or (c) package managers for popular Linux distributions.
 
-TIP: The benefit of using a Linux package manager to install the gem is that it handles installing Ruby and RubyGems if they're not already installed on your machine.
-The drawback is that package may not be available immediately after the release of the RubyGem.
+TIP: The benefit of using a Linux package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
+The drawback is that package may not be available immediately after the release of the gem.
 If you need the latest version, you can always fallback to using the `gem` command.
 
 === (a) gem install
@@ -190,7 +190,7 @@ The API is intended for integration with other Ruby software, such as Rails, Sin
 
 === Command line interface (CLI)
 
-You'll use the `asciidoctor` command to run Asciidoctor from the command line.
+The `asciidoctor` command allows you to invoke Asciidoctor from the command line (i.e., a terminal).
 
 The following command converts README.adoc to HTML and saves the result to the file README.html in the same directory.
 The name of the generated HTML file is derived from the source file by changing its file extension to `.html`.
@@ -285,7 +285,7 @@ The {contribute-uri}[Contributing] guide provides information on how to create, 
 
 == Getting Help
 
-The Asciidoctor project is developed to help you sucessfully write and publish your content.
+The Asciidoctor project is developed to help you easily write and publish your content.
 But we can't do that without your feedback!
 We encourage you to ask questions and discuss any aspects of the project on the discussion list, Twitter or IRC.
 
