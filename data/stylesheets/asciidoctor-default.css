@@ -126,8 +126,8 @@ p a > code:hover { color: #250b08; }
 #header:after, #content:after, #footnotes:after, #footer:after { clear: both; }
 #content:before { content: none; }
 #header { margin-bottom: 1.875em; }
-#header > h1 { color: #212020; font-weight: 300; border-bottom: 1px solid #d8d8d8; margin-bottom: -28px; padding-bottom: 28px; }
-#header > span { color: #6e6e6e; float: left; line-height: 1.4; }
+#header > h1 { color: #212020; font-weight: 300; border-bottom: 1px solid #d8d8d8; margin-bottom: -0.65em; padding-bottom: 0.7em; }
+#header > span { color: #6e6e6e; float: left; line-height: 1.5; }
 #header #revnumber { text-transform: capitalize; }
 #header > br { display: none; float: left; }
 #header > br + span:before { content: "\2005\2013\2005"; }
