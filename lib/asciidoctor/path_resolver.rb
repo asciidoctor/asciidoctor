@@ -117,7 +117,7 @@ class PathResolver
   # expanded to an absolute path inside the constructor.
   #
   # file_separator - the String file separator to use for path operations
-  #                  (optional, default: File::FILE_SEPARATOR)
+  #                  (optional, default: File::SEPARATOR)
   # working_dir    - the String working directory (optional, default: Dir.pwd)
   #
   def initialize file_separator = nil, working_dir = nil
