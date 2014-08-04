@@ -423,6 +423,11 @@ context 'Substitutions' do
       assert_equal para.source, para.sub_quotes(para.source)
     end
 
+    test 'does not match adjacent superscript chars' do
+      para = block_from_string 'a ^^ b'
+      assert_equal 'a ^^ b', para.sub_quotes(para.source)
+    end
+
     test 'does not confuse superscript and links with blank window shorthand' do
       para = block_from_string(%Q{http://localhost[Text^] on the 21^st^ and 22^nd^})
       assert_equal '<a href="http://localhost" target="_blank">Text</a> on the 21<sup>st</sup> and 22<sup>nd</sup>', para.content
@@ -441,6 +446,11 @@ context 'Substitutions' do
     test 'does not match subscript across whitespace' do
       para = block_from_string(%Q{project~ view\non\nGitHub~})
       assert_equal para.source, para.sub_quotes(para.source)
+    end
+
+    test 'does not match adjacent subscript chars' do
+      para = block_from_string 'a ~~ b'
+      assert_equal 'a ~~ b', para.sub_quotes(para.source)
     end
 
     test 'does not match subscript across distinct URLs' do

@@ -1182,10 +1182,10 @@ module Asciidoctor
     [:mark, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?#(\S|\S.*?\S)#(?!#{CG_WORD})/m],
 
     # ^superscript^
-    [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(\S*?)\^/m],
+    [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(\S+?)\^/],
 
     # ~subscript~
-    [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?~(\S*?)~/m]
+    [:subscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?~(\S+?)~/]
   ]
 
   compat_quote_subs = quote_subs.dup
