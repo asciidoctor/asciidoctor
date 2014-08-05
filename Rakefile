@@ -59,7 +59,7 @@ begin
     rdoc.rdoc_dir = 'rdoc'
     rdoc.title = "Asciidoctor #{Asciidoctor::VERSION}"
     rdoc.markup = 'tomdoc' if rdoc.respond_to?(:markup)
-    rdoc.rdoc_files.include('LICENSE', 'lib/**/*.rb')
+    rdoc.rdoc_files.include('LICENSE.adoc', 'lib/**/*.rb')
   end
 rescue LoadError
 end
@@ -88,7 +88,7 @@ begin
         lib/**/*.rb
         -
         CHANGELOG.adoc
-        LICENSE
+        LICENSE.adoc
     )
     # --no-highlight enabled to prevent verbatim blocks in AsciiDoc that begin with $ from being dropped
     # need to patch htmlify method to not attempt to syntax highlight blocks (or fix what's wrong)

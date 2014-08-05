@@ -28,8 +28,8 @@ A fast, open source text processor and publishing toolchain, written in Ruby, fo
 
   s.has_rdoc          = true
   s.rdoc_options      = ['--charset=UTF-8']
-  #s.extra_rdoc_files  = %w(CHANGELOG.adoc LICENSE README.adoc)
-  s.extra_rdoc_files  = %w(LICENSE)
+  #s.extra_rdoc_files  = %w(CHANGELOG.adoc LICENSE.adoc README.adoc)
+  s.extra_rdoc_files  = %w(LICENSE.adoc)
 
   # erubis is needed for testing use of alternative eRuby impls
   # tilt, slim and haml are needed for testing custom templates
