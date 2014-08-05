@@ -225,12 +225,13 @@ table.pyhltable td.code { padding-left: .75em; padding-right: 0; }
 .highlight.pygments .lineno, table.pyhltable td:not(.code) { color: #999; padding-left: 0; padding-right: .5em; border-right: 1px solid #d8d8d8; }
 .highlight.pygments .lineno { display: inline-block; margin-right: .25em; }
 table.pyhltable .linenodiv { background-color: transparent !important; padding-right: 0 !important; }
+.quoteblock .attribution, .verseblock .attribution { margin-top: 0.25em; font-size: inherit; color: #454545; line-height: 1.6; }
+.quoteblock .attribution br, .verseblock .attribution br { display: none; }
+.quoteblock .attribution cite, .verseblock .attribution cite { display: block; }
 .quoteblock { margin: 0 0 1.25em 0; padding: 0.5625em 1.25em 0 1.1875em; border-left: 3px solid #487c58; }
 .quoteblock blockquote { margin: 0 0 1.25em 0; padding: 0 0 0.625em 0; border: 0; }
 .quoteblock blockquote > .paragraph:last-child p { margin-bottom: 0; }
-.quoteblock .attribution { margin-top: -0.625em; padding-bottom: 0.625em; font-size: inherit; color: #454545; line-height: 1.6; }
-.quoteblock .attribution br { display: none; }
-.quoteblock .attribution cite { display: block; }
+.quoteblock .attribution { margin-top: -0.625em; padding-bottom: 0.625em; }
 table.tableblock { max-width: 100%; }
 table.tableblock td .paragraph:last-child p > p:last-child, table.tableblock th > p:last-child, table.tableblock td > p:last-child { margin-bottom: 0; }
 table.spread { width: 100%; }
