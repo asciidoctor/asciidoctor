@@ -161,28 +161,34 @@ MathJax.Hub.Config({
         else
           if node.has_header?
             result << %(<h1>#{node.header.title}</h1>) unless node.notitle
+            details = []
             if node.attr? 'author'
-              result << %(<span id="author" class="author">#{node.attr 'author'}</span>#{br})
+              details << %(<span id="author" class="author">#{node.attr 'author'}</span>#{br})
               if node.attr? 'email'
-                result << %(<span id="email" class="email">#{node.sub_macros(node.attr 'email')}</span>#{br})
+                details << %(<span id="email" class="email">#{node.sub_macros(node.attr 'email')}</span>#{br})
               end
               if (authorcount = (node.attr 'authorcount').to_i) > 1
                 (2..authorcount).each do |idx|
-                  result << %(<span id="author#{idx}" class="author">#{node.attr "author_#{idx}"}</span>#{br})
+                  details << %(<span id="author#{idx}" class="author">#{node.attr "author_#{idx}"}</span>#{br})
                   if node.attr? %(email_#{idx})
-                    result << %(<span id="email#{idx}" class="email">#{node.sub_macros(node.attr "email_#{idx}")}</span>#{br})
+                    details << %(<span id="email#{idx}" class="email">#{node.sub_macros(node.attr "email_#{idx}")}</span>#{br})
                   end
                 end
               end
             end
             if node.attr? 'revnumber'
-              result << %(<span id="revnumber">#{((node.attr 'version-label') || '').downcase} #{node.attr 'revnumber'}#{(node.attr? 'revdate') ? ',' : ''}</span>)
+              details << %(<span id="revnumber">#{((node.attr 'version-label') || '').downcase} #{node.attr 'revnumber'}#{(node.attr? 'revdate') ? ',' : ''}</span>)
             end
             if node.attr? 'revdate'
-              result << %(<span id="revdate">#{node.attr 'revdate'}</span>)
+              details << %(<span id="revdate">#{node.attr 'revdate'}</span>)
             end
             if node.attr? 'revremark'
-              result << %(#{br}<span id="revremark">#{node.attr 'revremark'}</span>)
+              details << %(#{br}<span id="revremark">#{node.attr 'revremark'}</span>)
+            end
+            unless details.empty?
+              result << '<div class="details">'
+              result.concat details
+              result << '</div>'
             end
           end
 

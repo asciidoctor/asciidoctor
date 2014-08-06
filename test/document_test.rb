@@ -992,11 +992,11 @@ more info...
       assert_xpath '//meta[@name="description"][@content="AsciiDoc user guide"]', output, 1
       assert_xpath '//meta[@name="keywords"][@content="asciidoc,documentation"]', output, 1
       assert_xpath '//meta[@name="copyright"][@content="Stuart Rackham"]', output, 1
-      assert_xpath '//*[@id="header"]/span[@id="author"][text() = "Stuart Rackham"]', output, 1
-      assert_xpath '//*[@id="header"]/span[@id="email"]/a[@href="mailto:founder@asciidoc.org"][text() = "founder@asciidoc.org"]', output, 1
-      assert_xpath '//*[@id="header"]/span[@id="revnumber"][text() = "version 8.6.8,"]', output, 1
-      assert_xpath '//*[@id="header"]/span[@id="revdate"][text() = "2012-07-12"]', output, 1
-      assert_xpath '//*[@id="header"]/span[@id="revremark"][text() = "See changelog."]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="author"][text() = "Stuart Rackham"]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="email"]/a[@href="mailto:founder@asciidoc.org"][text() = "founder@asciidoc.org"]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revnumber"][text() = "version 8.6.8,"]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revdate"][text() = "2012-07-12"]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revremark"][text() = "See changelog."]', output, 1
     end
 
     test 'should include revision history if revdate and revnumber is set' do
