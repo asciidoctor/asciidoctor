@@ -128,7 +128,7 @@ A | here| a | there
       EOS
       output = render_embedded_string input
       assert_xpath '//tbody/tr/td[1]/p[text()="Cool new show"]', output, 1
-      assert_xpath %(//tbody/tr/td[2]/p[text()='Coming soon#{[8230].pack('U*')}']), output, 1
+      assert_xpath %(//tbody/tr/td[2]/p[text()='Coming soon#{expand_entity 8230}#{expand_entity 8203}']), output, 1
     end
 
     test 'table and col width not assigned when autowidth option is specified' do

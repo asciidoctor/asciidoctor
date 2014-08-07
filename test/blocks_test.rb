@@ -2077,7 +2077,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       EOS
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
       assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
-      assert_match(/\.CodeRay \{/, output)
+      assert_match(/\.CodeRay *\{/, output)
     end
 
     test 'should read source language from source-language document attribute if not specified on source block' do

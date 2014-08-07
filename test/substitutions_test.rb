@@ -1390,7 +1390,7 @@ stuff in between
 foo --
 stuff in between
 foo --)
-      expected = '&#8201;&#8212;&#8201;foo foo&#8212;bar foo--bar foo&#8201;&#8212;&#8201;bar foo -- bar
+      expected = '&#8201;&#8212;&#8201;foo foo&#8212;&#8203;bar foo--bar foo&#8201;&#8212;&#8201;bar foo -- bar
 stuff in between&#8201;&#8212;&#8201;foo
 stuff in between
 foo&#8201;&#8212;&#8201;stuff in between
@@ -1400,7 +1400,7 @@ foo&#8201;&#8212;&#8201;'
 
     test 'replaces dashes between multibyte word characters' do
       para = block_from_string %(富--巴)
-      expected = '富&#8212;巴'
+      expected = '富&#8212;&#8203;巴'
       assert_equal expected, para.sub_replacements(para.source)
     end if ::RUBY_MIN_VERSION_1_9
 
@@ -1417,7 +1417,7 @@ foo&#8201;&#8212;&#8201;'
 
     test 'replaces punctuation' do
       para = block_from_string %(John's Hideout is the Whites`' place... foo\\'bar)
-      assert_equal "John&#8217;s Hideout is the Whites&#8217; place&#8230; foo'bar", para.sub_replacements(para.source)
+      assert_equal "John&#8217;s Hideout is the Whites&#8217; place&#8230;&#8203; foo'bar", para.sub_replacements(para.source)
     end
 
     test 'should replace right single quote marks' do

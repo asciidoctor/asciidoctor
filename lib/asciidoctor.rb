@@ -1225,11 +1225,12 @@ module Asciidoctor
     # (TM)
     [/\\?\(TM\)/, '&#8482;', :none],
     # foo -- bar
+    # FIXME this drops the endline if it appears at end of line
     [/(^|\n| |\\)--( |\n|$)/, '&#8201;&#8212;&#8201;', :none],
     # foo--bar
-    [/(#{CG_WORD})\\?--(?=#{CG_WORD})/, '&#8212;', :leading],
+    [/(#{CG_WORD})\\?--(?=#{CG_WORD})/, '&#8212;&#8203;', :leading],
     # ellipsis
-    [/\\?\.\.\./, '&#8230;', :leading],
+    [/\\?\.\.\./, '&#8230;&#8203;', :leading],
     # right single quote
     [/\\?`'/, '&#8217;', :none],
     # apostrophe (inside a word)
