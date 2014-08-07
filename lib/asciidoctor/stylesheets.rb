@@ -6,7 +6,7 @@ module Asciidoctor
 class Stylesheets
   DEFAULT_STYLESHEET_NAME = 'asciidoctor.css'
   #DEFAULT_CODERAY_STYLE = 'asciidoctor'
-  DEFAULT_PYGMENTS_STYLE = 'pastie'
+  DEFAULT_PYGMENTS_STYLE = 'default'
   STYLESHEETS_DATA_PATH = ::File.join DATA_PATH, 'stylesheets'
 
   @__instance__ = new
