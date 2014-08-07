@@ -1235,9 +1235,9 @@ EOS
       assert_equal 'some &lt;code&gt;{code}&lt;/code&gt; to study in the {language} programming language', result
     end
 
-    test 'restore nested passthroughs' do
-      result = render_embedded_string %q(+I'm in pass:q[`mono`].+), :doctype => :inline
-      assert_equal %q(I'm in <code>mono</code>.), result
+    test 'should restore nested passthroughs' do
+      result = render_embedded_string %q(+Sometimes you feel pass:q[`mono`].+ Sometimes you +$$don't$$+.), :doctype => :inline
+      assert_equal %q(Sometimes you feel <code>mono</code>. Sometimes you don't.), result
     end
 
     test 'should honor role on double plus passthrough' do

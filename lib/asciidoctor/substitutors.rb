@@ -326,11 +326,11 @@ module Substitutors
   # Internal: Restore the passthrough text by reinserting into the placeholder positions
   #
   # text  - The String text into which to restore the passthrough text
-  # check - A Boolean indicating whether to check whether substitution is necessary (default: true)
+  # outer - A Boolean indicating whether we are in the outer call (default: true)
   #
   # returns The String text with the passthrough text restored
-  def restore_passthroughs text, check = true
-    if check && (@passthroughs.empty? || !text.include?(PASS_START))
+  def restore_passthroughs text, outer = true
+    if outer && (@passthroughs.empty? || !text.include?(PASS_START))
       return text
     end
 
@@ -344,8 +344,8 @@ module Substitutors
       subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text, false) : subbed_text
     }
   ensure
-    # free memory...we don't need these anymore
-    @passthroughs.clear
+    # free memory if in outer call...we don't need these anymore
+    @passthroughs.clear if outer
   end
 
   # Public: Substitute special characters (i.e., encode XML)
