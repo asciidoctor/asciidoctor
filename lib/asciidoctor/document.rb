@@ -781,10 +781,13 @@ class Document < AbstractBlock
   def playback_attributes(block_attributes)
     if block_attributes.key? :attribute_entries
       block_attributes[:attribute_entries].each do |entry|
+        name = entry.name
         if entry.negate
-          @attributes.delete(entry.name)
+          @attributes.delete name
+          @compat_mode = false if name == 'compat-mode'
         else
-          @attributes[entry.name] = entry.value
+          @attributes[name] = entry.value
+          @compat_mode = true if name == 'compat-mode'
         end
       end
     end

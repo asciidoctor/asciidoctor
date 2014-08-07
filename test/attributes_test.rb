@@ -539,6 +539,30 @@ Belly up to the {foo}.
       assert_xpath '//p[text()="Belly up to the bar."]', output, 0
     end
 
+    test 'should allow compat-mode to be set and unset in middle of document' do
+      input = <<-EOS
+:foo: bar
+
+[[paragraph-a]]
+`{foo}`
+
+:compat-mode!:
+
+[[paragraph-b]]
+`{foo}`
+
+:compat-mode:
+
+[[paragraph-c]]
+`{foo}`
+      EOS
+
+      result = render_embedded_string input, :attributes => {'compat-mode' => '@'}
+      assert_xpath '/*[@id="paragraph-a"]//code[text()="{foo}"]', result, 1
+      assert_xpath '/*[@id="paragraph-b"]//code[text()="bar"]', result, 1
+      assert_xpath '/*[@id="paragraph-c"]//code[text()="{foo}"]', result, 1
+    end
+
     test 'does not disturb attribute-looking things escaped with backslash' do
       html = render_string(":foo: bar\nThis is a \\{foo} day.")
       result = Nokogiri::HTML(html)
