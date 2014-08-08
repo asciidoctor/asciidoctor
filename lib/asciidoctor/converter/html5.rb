@@ -113,16 +113,15 @@ MathJax.Hub.Config({
   tex2jax: {
     inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath]}],
     displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath]}],
-    ignoreClass: "nostem|nostem|nolatexmath"
+    ignoreClass: "nostem|nolatexmath"
   },
   asciimath2jax: {
     delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath]}],
-    ignoreClass: "nostem|nostem|noasciimath"
+    ignoreClass: "nostem|noasciimath"
   }
 });
 </script>
-<script type="text/javascript" src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
-<script>document.addEventListener('DOMContentLoaded', MathJax.Hub.TypeSet)</script>)
+<script type="text/javascript" src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
       end
 
       unless (docinfo_content = node.docinfo).empty?
