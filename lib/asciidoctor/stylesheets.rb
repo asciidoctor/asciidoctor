@@ -70,7 +70,7 @@ class Stylesheets
   # returns the [String] Pygments stylesheet data
   def pygments_stylesheet_data style = nil
     style ||= DEFAULT_PYGMENTS_STYLE
-    (@pygments_stylesheet_data ||= load_pygments)[style] ||= ::Pygments.css '.listingblock pre.highlight', :classprefix => 'tok-', :style => style
+    (@pygments_stylesheet_data ||= load_pygments)[style] ||= ::Pygments.css '.listingblock .pygments', :classprefix => 'tok-', :style => style
   end
 
   def embed_pygments_stylesheet style = nil
