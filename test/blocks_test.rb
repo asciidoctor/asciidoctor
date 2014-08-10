@@ -250,10 +250,10 @@ ____
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
       assert_css '.quoteblock > .attribution', output, 1
       assert_css '.quoteblock > .attribution > cite', output, 1
-      assert_css '.quoteblock > .attribution > cite + br', output, 1
+      assert_css '.quoteblock > .attribution > br + cite', output, 1
       assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Book (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
-      author = attribution.children.last
+      author = attribution.children.first
       assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
     end
 
@@ -370,10 +370,10 @@ Some more inspiring words.
       assert_xpath %(//*[@class = "quoteblock"]//p[text() = "A famous quote.\nSome more inspiring words."]), output, 1
       assert_css '.quoteblock > .attribution', output, 1
       assert_css '.quoteblock > .attribution > cite', output, 1
-      assert_css '.quoteblock > .attribution > cite + br', output, 1
+      assert_css '.quoteblock > .attribution > br + cite', output, 1
       assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source, Volume 1 (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
-      author = attribution.children.last
+      author = attribution.children.first
       assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
     end
 
@@ -389,10 +389,10 @@ Some more inspiring words."
       assert_xpath %(//*[@class = "quoteblock"]/blockquote[normalize-space(text()) = "A famous quote. Some more inspiring words."]), output, 1
       assert_css '.quoteblock > .attribution', output, 1
       assert_css '.quoteblock > .attribution > cite', output, 1
-      assert_css '.quoteblock > .attribution > cite + br', output, 1
+      assert_css '.quoteblock > .attribution > br + cite', output, 1
       assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source, Volume 1 (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
-      author = attribution.children.last
+      author = attribution.children.first
       assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
     end
 
@@ -424,10 +424,10 @@ ____
       assert_css '.verseblock > pre', output, 1
       assert_css '.verseblock > .attribution', output, 1
       assert_css '.verseblock > .attribution > cite', output, 1
-      assert_css '.verseblock > .attribution > cite + br', output, 1
+      assert_css '.verseblock > .attribution > br + cite', output, 1
       assert_xpath '//*[@class = "verseblock"]/*[@class = "attribution"]/cite[text() = "Famous Poem"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "verseblock"]/*[@class = "attribution"]', output, 1
-      author = attribution.children.last
+      author = attribution.children.first
       assert_equal "#{expand_entity 8212} Famous Poet", author.text.strip
     end
 

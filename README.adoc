@@ -394,6 +394,7 @@ Improvements::
   * make Reader#push_include work with default file, path and dir (@bk2204) (#743)
   * honor custom outfilesuffix and introduce relfileprefix (#801)
   * add author and copyright to meta in HTML5 backend (#838)
+  * output attribution in front of citetitle for quote and verse blocks
   * recognize float style with shorthand syntax outside block (#818)
   * honor background color in syntax highlighting themes (#813)
   * print runtime environment in version output, support -v as version flag (#785)

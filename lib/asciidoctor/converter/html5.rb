@@ -704,8 +704,8 @@ Your browser does not support the audio tag.
       citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
       if attribution || citetitle
         cite_element = citetitle ? %(<cite>#{citetitle}</cite>) : nil
-        attribution_text = attribution ? %(#{citetitle ? "<br#{@void_element_slash}>\n" : nil}&#8212; #{attribution}) : nil
-        attribution_element = %(\n<div class="attribution">\n#{cite_element}#{attribution_text}\n</div>)
+        attribution_text = attribution ? %(&#8212; #{attribution}#{citetitle ? "<br#{@void_element_slash}>\n" : nil}) : nil
+        attribution_element = %(\n<div class="attribution">\n#{attribution_text}#{cite_element}\n</div>)
       else
         attribution_element = nil
       end
@@ -883,8 +883,8 @@ Your browser does not support the audio tag.
       citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
       if attribution || citetitle
         cite_element = citetitle ? %(<cite>#{citetitle}</cite>) : nil
-        attribution_text = attribution ? %(#{citetitle ? "<br#{@void_element_slash}>\n" : nil}&#8212; #{attribution}) : nil
-        attribution_element = %(\n<div class="attribution">\n#{cite_element}#{attribution_text}\n</div>)
+        attribution_text = attribution ? %(&#8212; #{attribution}#{citetitle ? "<br#{@void_element_slash}>\n" : nil}) : nil
+        attribution_element = %(\n<div class="attribution">\n#{attribution_text}#{cite_element}\n</div>)
       else
         attribution_element = nil
       end
