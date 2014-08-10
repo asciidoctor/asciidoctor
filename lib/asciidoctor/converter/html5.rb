@@ -537,16 +537,16 @@ Your browser does not support the audio tag.
         language_classes = language ? %(#{language} language-#{language}) : nil
         case node.document.attr 'source-highlighter'
         when 'coderay'
-          pre_class = nowrap ? ' class="CodeRay nowrap"' : ' class="CodeRay"'
+          pre_class = nowrap ? ' class="CodeRay highlight nowrap"' : ' class="CodeRay highlight"'
           code_class = language ? %( class="#{language_classes}") : nil
         when 'pygments'
           pre_class = nowrap ? ' class="pygments highlight nowrap"' : ' class="pygments highlight"'
           code_class = language ? %( class="#{language_classes}") : nil
         when 'highlightjs', 'highlight.js'
-          pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
+          pre_class = nowrap ? ' class="highlightjs highlight nowrap"' : ' class="highlightjs highlight"'
           code_class = language ? %( class="#{language_classes}") : nil
         when 'prettify'
-          pre_class = %( class="prettyprint#{nowrap ? ' nowrap' : nil}#{(node.attr? 'linenums') ? ' linenums' : nil}")
+          pre_class = %( class="prettyprint highlight#{nowrap ? ' nowrap' : nil}#{(node.attr? 'linenums') ? ' linenums' : nil}")
           code_class = language ? %( class="#{language_classes}") : nil
         when 'html-pipeline'
           pre_class = language ? %( lang="#{language}") : nil

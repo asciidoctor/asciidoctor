@@ -2076,7 +2076,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
       EOS
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
-      assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
+      assert_xpath '//pre[@class="CodeRay highlight"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
       assert_match(/\.CodeRay *\{/, output)
     end
 
@@ -2093,7 +2093,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
       EOS
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
-      assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
+      assert_xpath '//pre[@class="CodeRay highlight"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
     end
 
     test 'should rename document attribute named language to source-language when compat-mode is enabled' do
@@ -2200,7 +2200,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
       EOS
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'linkcss' => ''}
-      assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
+      assert_xpath '//pre[@class="CodeRay highlight"]/code[@class="ruby language-ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
       assert_css 'link[rel="stylesheet"][href="./coderay-asciidoctor.css"]', output, 1
     end
 
@@ -2217,7 +2217,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
       EOS
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
-      assert_xpath '//pre[@class="CodeRay"]/code[@class="ruby language-ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
+      assert_xpath '//pre[@class="CodeRay highlight"]/code[@class="ruby language-ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
       refute_match(/\.CodeRay \{/, output)
     end
 
@@ -2247,7 +2247,7 @@ puts "foo"
       EOS
 
       output = render_embedded_string input, :attributes => {'source-highlighter' => 'prettify'}
-      assert_css 'pre[class="prettyprint"]', output, 1
+      assert_css 'pre[class="prettyprint highlight"]', output, 1
       assert_css 'pre > code[class="ruby language-ruby"]', output, 1
     end
 
