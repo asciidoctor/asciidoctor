@@ -121,7 +121,7 @@ MathJax.Hub.Config({
   }
 });
 </script>
-<script type="text/javascript" src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+<script src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
       end
 
       unless (docinfo_content = node.docinfo).empty?
