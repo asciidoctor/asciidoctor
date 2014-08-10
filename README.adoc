@@ -235,16 +235,16 @@ You can also convert an AsciiDoc string to embeddable HTML (for inserting in an 
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].', safe: 'safe'
-Asciidoctor.convert content
+content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+Asciidoctor.convert content, safe: 'safe'
 ----
 
 If you want the full HTML document, enable the `header_footer` option as follows:
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].', safe: 'safe'
-html_document = Asciidoctor.convert content, header_footer: true
+content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+html = Asciidoctor.convert content, header_footer: true, safe: 'safe'
 ----
 
 If you need access to the parsed document, you can split the conversion into discrete steps:
