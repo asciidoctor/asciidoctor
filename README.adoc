@@ -324,7 +324,7 @@ The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and
 
 == Changelog
 
-== 1.5.0 (pending) - @mojavelinux
+=== 1.5.0 (pending) - @mojavelinux
 
 Performance::
 
