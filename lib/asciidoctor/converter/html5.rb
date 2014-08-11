@@ -533,29 +533,30 @@ Your browser does not support the audio tag.
     def listing node
       nowrap = !(node.document.attr? 'prewrap') || (node.option? 'nowrap')
       if node.style == 'source'
-        language = node.attr 'language', nil, false
-        language_classes = language ? %(#{language} language-#{language}) : nil
+        if (language = node.attr 'language', nil, false)
+          code_attrs = %( data-lang="#{language}")
+        else
+          code_attrs = nil
+        end
         case node.document.attr 'source-highlighter'
         when 'coderay'
-          pre_class = nowrap ? ' class="CodeRay highlight nowrap"' : ' class="CodeRay highlight"'
-          code_class = language ? %( class="#{language_classes}") : nil
+          pre_class = %( class="CodeRay highlight#{nowrap ? ' nowrap' : nil}")
         when 'pygments'
-          pre_class = nowrap ? ' class="pygments highlight nowrap"' : ' class="pygments highlight"'
-          code_class = language ? %( class="#{language_classes}") : nil
+          pre_class = %( class="pygments highlight#{nowrap ? ' nowrap' : nil}")
         when 'highlightjs', 'highlight.js'
-          pre_class = nowrap ? ' class="highlightjs highlight nowrap"' : ' class="highlightjs highlight"'
-          code_class = language ? %( class="#{language_classes}") : nil
+          pre_class = %( class="highlightjs highlight#{nowrap ? ' nowrap' : nil}")
+          code_attrs = %( class="language-#{language}"#{code_attrs}) if language
         when 'prettify'
           pre_class = %( class="prettyprint highlight#{nowrap ? ' nowrap' : nil}#{(node.attr? 'linenums') ? ' linenums' : nil}")
-          code_class = language ? %( class="#{language_classes}") : nil
+          code_attrs = %( class="language-#{language}"#{code_attrs}) if language
         when 'html-pipeline'
           pre_class = language ? %( lang="#{language}") : nil
-          code_class = nil
+          code_attrs = nil
         else
-          pre_class = nowrap ? ' class="highlight nowrap"' : ' class="highlight"'
-          code_class = language ? %( class="#{language_classes}") : nil
+          pre_class = %( class="highlight#{nowrap ? ' nowrap' : nil}")
+          code_attrs = %( class="language-#{language}"#{code_attrs}) if language
         end
-        pre_start = %(<pre#{pre_class}><code#{code_class}>)
+        pre_start = %(<pre#{pre_class}><code#{code_attrs}>)
         pre_end = '</code></pre>'
       else
         pre_start = %(<pre#{nowrap ? ' class="nowrap"' : nil}>)
