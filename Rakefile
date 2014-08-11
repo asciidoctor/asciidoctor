@@ -52,6 +52,11 @@ begin
 rescue LoadError
 end
 
+namespace :test do
+  desc 'Run unit and feature tests'
+  task :all => [:test,:features]
+end
+
 =begin
 begin
   require 'rdoc/task'

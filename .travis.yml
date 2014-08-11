@@ -7,7 +7,7 @@ rvm:
   - jruby-18mode
   - jruby-19mode
   - rbx-2
-#script: rake test test_us_ascii
+script: rake test:all
 notifications:
   email: false
   irc: "irc.freenode.org#asciidoctor"
