@@ -204,11 +204,11 @@ table.tableblock #preamble>.sectionbody>.paragraph:first-of-type p{font-size:inh
 .listingblock:hover code[data-lang]:before{content:attr(data-lang);position:absolute;font-size:.75em;top:.5rem;right:.5rem;line-height:1;text-transform:uppercase;color:#999}
 .listingblock.terminal pre .command:before{content:attr(data-prompt);padding-right:.5em;color:#999}
 .listingblock.terminal pre .command:not([data-prompt]):before{content:"$"}
-table.pyhltable{border:none;margin-bottom:0;background:transparent}
+table.pyhltable{border-collapse:separate;border:none;margin-bottom:0;background:transparent}
 table.pyhltable td{vertical-align:top;padding-top:0;padding-bottom:0}
 table.pyhltable td.code{padding-left:.75em;padding-right:0}
-.pygments.highlight .lineno,table.pyhltable td:not(.code){color:#999;padding-left:0;padding-right:.5em;border-right:1px solid #ddddd8}
-.pygments.highlight .lineno{display:inline-block;margin-right:.25em}
+pre.pygments .lineno,table.pyhltable td:not(.code){color:#999;padding-left:0;padding-right:.5em;border-right:1px solid #ddddd8}
+pre.pygments .lineno{display:inline-block;margin-right:.25em}
 table.pyhltable .linenodiv{background-color:transparent!important;padding-right:0!important}
 .quoteblock{margin:0 1em 1.25em 1.5em;display:table}
 .quoteblock>.title{margin-left:-1.5em;margin-bottom:.75em}
