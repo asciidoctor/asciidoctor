@@ -230,46 +230,67 @@ context 'Substitutions' do
       assert_equal "<em>a few\nemphasized words</em>", para.sub_quotes(para.source)
     end
 
+    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
     test 'single-line constrained monospaced string' do
-      para = block_from_string(%(`a few <{monospaced}> words`))
-      # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+      para = block_from_string(%(`a few <{monospaced}> words`), :attributes => {'monospaced' => 'monospaced', 'compat-mode' => ''})
       assert_equal '<code>a few &lt;{monospaced}&gt; words</code>', para.apply_normal_subs(para.lines)
+
+      para = block_from_string(%(`a few <{monospaced}> words`), :attributes => {'monospaced' => 'monospaced'})
+      assert_equal '<code>a few &lt;monospaced&gt; words</code>', para.apply_normal_subs(para.lines)
     end
 
+    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
     test 'single-line constrained monospaced string with role' do
-      para = block_from_string(%([input]`a few <{monospaced}> words`))
-      # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+      para = block_from_string(%([input]`a few <{monospaced}> words`), :attributes => {'monospaced' => 'monospaced', 'compat-mode' => ''})
       assert_equal '<code class="input">a few &lt;{monospaced}&gt; words</code>', para.apply_normal_subs(para.lines)
+
+      para = block_from_string(%([input]`a few <{monospaced}> words`), :attributes => {'monospaced' => 'monospaced'})
+      assert_equal '<code class="input">a few &lt;monospaced&gt; words</code>', para.apply_normal_subs(para.lines)
     end
 
+    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
     test 'escaped single-line constrained monospaced string' do
+      para = block_from_string(%(#{BACKSLASH}`a few <monospaced> words`), :attributes => {'compat-mode' => ''})
+      assert_equal '`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
+
       para = block_from_string(%(#{BACKSLASH}`a few <monospaced> words`))
-      # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal '`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
     end
 
+    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
     test 'escaped single-line constrained monospaced string with role' do
+      para = block_from_string(%([input]#{BACKSLASH}`a few <monospaced> words`), :attributes => {'compat-mode' => ''})
+      assert_equal '[input]`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
+
       para = block_from_string(%([input]#{BACKSLASH}`a few <monospaced> words`))
-      # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal '[input]`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
     end
 
+    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
     test 'escaped role on single-line constrained monospaced string' do
+      para = block_from_string(%(#{BACKSLASH}[input]`a few <monospaced> words`), :attributes => {'compat-mode' => ''})
+      assert_equal '[input]<code>a few &lt;monospaced&gt; words</code>', para.apply_normal_subs(para.lines)
+
       para = block_from_string(%(#{BACKSLASH}[input]`a few <monospaced> words`))
-      # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal '[input]<code>a few &lt;monospaced&gt; words</code>', para.apply_normal_subs(para.lines)
     end
 
+    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
     test 'escaped role on escaped single-line constrained monospaced string' do
+      para = block_from_string(%(#{BACKSLASH}[input]#{BACKSLASH}`a few <monospaced> words`), :attributes => {'compat-mode' => ''})
+      assert_equal %(#{BACKSLASH}[input]`a few &lt;monospaced&gt; words`), para.apply_normal_subs(para.lines)
+
       para = block_from_string(%(#{BACKSLASH}[input]#{BACKSLASH}`a few <monospaced> words`))
-      # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
       assert_equal %(#{BACKSLASH}[input]`a few &lt;monospaced&gt; words`), para.apply_normal_subs(para.lines)
     end
 
+    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
     test 'multi-line constrained monospaced string' do
-      para = block_from_string(%(`a few\n<{monospaced}> words`))
-      # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+      para = block_from_string(%(`a few\n<{monospaced}> words`), :attributes => {'monospaced' => 'monospaced', 'compat-mode' => ''})
       assert_equal "<code>a few\n&lt;{monospaced}&gt; words</code>", para.apply_normal_subs(para.lines)
+
+      para = block_from_string(%(`a few\n<{monospaced}> words`), :attributes => {'monospaced' => 'monospaced'})
+      assert_equal "<code>a few\n&lt;monospaced&gt; words</code>", para.apply_normal_subs(para.lines)
     end
 
     test 'single-line unconstrained strong chars' do
