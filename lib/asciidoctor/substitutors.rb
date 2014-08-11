@@ -799,12 +799,12 @@ module Substitutors
         if m[3].nil_or_empty?
           text = ''
         else
-          text = if use_link_attrs && (m[3].start_with?('"') || m[3].include?(','))
+          if use_link_attrs && (m[3].start_with?('"') || (m[3].include?(',') && m[3].include?('=')))
             attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')), [])
             link_opts[:id] = (attrs.delete 'id') if attrs.has_key? 'id'
-            attrs[1] || ''
+            text = attrs[1] || ''
           else
-            sub_attributes(m[3].gsub('\]', ']'))
+            text = sub_attributes(m[3].gsub('\]', ']'))
           end
 
           # TODO enable in Asciidoctor 1.5.1

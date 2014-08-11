@@ -120,7 +120,11 @@ context 'Links' do
   end
 
   test 'link with quoted text should not be separated into attributes when linkattrs is set' do
-    assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing"]', render_embedded_string('http://search.example.com["Google, Yahoo, Bing"]', :attributes => {'linkattrs' => ''}), 1
+    assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing = Search Engines"]', render_embedded_string('http://search.example.com["Google, Yahoo, Bing = Search Engines"]', :attributes => {'linkattrs' => ''}), 1
+  end
+
+  test 'link with comma in text but no equal sign should not be separated into attributes when linkattrs is set' do
+    assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing"]', render_embedded_string('http://search.example.com[Google, Yahoo, Bing]', :attributes => {'linkattrs' => ''}), 1
   end
 
   test 'role and window attributes on link are processed when linkattrs is set' do
