@@ -66,6 +66,14 @@ context 'Substitutions' do
       assert_equal %q{&#8220;Here`s Johnny!&#8221;}, para.sub_quotes(para.source)
     end
 
+    test 'double-quoted string around monospaced text' do
+      para = block_from_string(%q("``E=mc^2^` is the solution!`"))
+      assert_equal %q(&#8220;`E=mc<sup>2</sup>` is the solution!&#8221;), para.apply_subs(para.source);
+
+      para = block_from_string(%q("```E=mc^2^`` is the solution!`"))
+      assert_equal %q(&#8220;<code>E=mc<sup>2</sup></code> is the solution!&#8221;), para.apply_subs(para.source);
+    end
+
     test 'single-line single-quoted string' do
       para = block_from_string(%q{`a few quoted words'}, :attributes => {'compat-mode' => ''})
       assert_equal '&#8216;a few quoted words&#8217;', para.sub_quotes(para.source)
