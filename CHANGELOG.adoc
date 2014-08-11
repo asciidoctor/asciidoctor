@@ -1,15 +1,17 @@
 = Asciidoctor Changelog
+:uri-asciidoctor: https://github.com/asciidoctor/asciidoctor
+:uri-asciidoc: http://asciidoctor.org/docs/what-is-asciidoc
 :star: icon:star[role=red]
 ifndef::icons[]
 :star: &#9733;
 endif::[]
 
-http://asciidoctor.org[Asciidoctor] is an open source text processor and publishing toolchain for converting http://asciidoctor.org[AsciiDoc] markup into HTML, DocBook and custom formats.
+{uri-asciidoctor}[Asciidoctor] is a _fast_, open source text processor and publishing toolchain for converting {uri-asciidoc}[AsciiDoc] content into HTML5, DocBook 5 (or 4.5) and other formats.
 
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the https://github.com/asciidoctor/asciidoctor/commits/master[commit history] on GitHub.
 
-== 1.5.0 (pending) - @mojavelinux
+== 1.5.0 (2014-08-11) - @mojavelinux
 
 Performance::
 
@@ -26,7 +28,7 @@ Enhancements::
   * {star} enable compat-mode by default if document has atx-style doctitle
   * {star} output phrase surrounded by # as marked text (i.e., <mark>) (#225)
   * {star} add MathJax integration and corresponding blocks and macros (#492, #760)
-  * {star} switch to Open Source fonts (OpenSans, Noto Serif and Droid Sans Mono) in default stylesheet, make refinements to theme (#879)
+  * {star} switch to open source fonts (Open Sans, Noto Serif and Droid Sans Mono) in default stylesheet, major refinements to theme (#879)
   * {star} embed remote images when data-uri and allow-uri-read attributes are set (#612)
   * {star} support leveloffset on include directive and honor relative leveloffset values (#530)
   * {star} switch default docbook backend to docbook5 (@bk2204) (#554)

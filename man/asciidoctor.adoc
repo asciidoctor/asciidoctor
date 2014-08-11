@@ -1,9 +1,9 @@
 = asciidoctor(1)
-Dan Allen; Ryan Waldron
+Dan Allen; Sarah White; Ryan Waldron
 :doctype: manpage
 :man manual: Asciidoctor Manual
-:man source: Asciidoctor 1.5.0.dev
-:awestruct-layout: base
+:man source: Asciidoctor 1.5.0
+:page-layout: base
 
 == NAME
 
@@ -17,7 +17,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
 == DESCRIPTION
 
-The asciidoctor(1) command converts the AsciiDoc source file(s) 'FILE' to HTML 5,
+The asciidoctor(1) command converts the AsciiDoc source file(s) 'FILE' to HTML5,
 DocBook 4.5, DocBook 5.0 and other custom output formats.
 
 If 'FILE' is '-' then the AsciiDoc source is read from standard input.
@@ -183,7 +183,7 @@ Mailinglist / forum: <**http://discuss.asciidoctor.org**>
 
 == COPYING
 
-Copyright \(C) 2012-2014 Dan Allen and Ryan Waldron. Free use of this
+Copyright \(C) 2012-2014 Dan Allen, Ryan Waldron and the Asciidoctor Project. Free use of this
 software is granted under the terms of the MIT License.
 
 // vim: tw=80
