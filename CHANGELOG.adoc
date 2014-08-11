@@ -96,7 +96,7 @@ Improvements::
   * add implicit user-home attribute that resolves to user's home directory (#629)
   * enable sidebar toc for small screens (#628)
   * add square brackets around button in HTML output (#631)
-  * add sass and go to source language hover
+  * make language hover text work for all languages in listing block
   * set background color on toc2 to cover scrolling content (@neher)
   * make document parsing a discrete step, make Reader accessible as property on Document
   * allow custom converter to set backend info such as outfilesuffix and htmlsyntax
