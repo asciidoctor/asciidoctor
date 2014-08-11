@@ -928,7 +928,7 @@ module Asciidoctor
     #
     # NOTE we always capture the attributes so we know when to use compatible (i.e., legacy) behavior
     PassInlineRx = {
-      false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+?)\])?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CC_WORD})/m],
+      false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+?)\])?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CG_WORD})/m],
       true  => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+?)\])?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m]
     }
 
