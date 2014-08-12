@@ -1082,7 +1082,7 @@ http://asciidoc.org
 ++++
       EOS
 
-      expected = %(This is a <em>passthrough</em> block.\n<a href="http://asciidoc.org">http://asciidoc.org</a>)
+      expected = %(This is a <em>passthrough</em> block.\n<a href="http://asciidoc.org" class="bare">http://asciidoc.org</a>)
       output = render_embedded_string input
       assert_equal expected, output.strip
     end

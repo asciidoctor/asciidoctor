@@ -368,14 +368,12 @@ p{margin-bottom:1.25rem}
 .print-only{display:none!important}
 @media print{@page{margin:1.25cm .75cm}
 *{-webkit-box-shadow:none!important;box-shadow:none!important;text-shadow:none!important}
-a,a:visited{color:inherit!important;text-decoration:underline!important}
-a[href^="http:"]:after,a[href^="https:"]:after{content:" (" attr(href) ")"}
-a[href^="#"],a[href^="#"]:visited,a[href^="mailto:"],a[href^="mailto:"]:visited{text-decoration:none!important}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare):after,a[href^="https:"]:not(.bare):after,a[href^="mailto:"]:not(.bare):after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
 abbr[title]:after{content:" (" attr(title) ")"}
-pre,blockquote{page-break-inside:avoid}
-code{color:rgba(0,0,0,.9)}
+pre,blockquote,tr,img{page-break-inside:avoid}
 thead{display:table-header-group}
-tr,img{page-break-inside:avoid}
 img{max-width:100%!important}
 p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
 h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
@@ -383,7 +381,7 @@ h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
 #toc{border-bottom:1px solid #ddddd8!important;padding-bottom:0!important}
 .sect1{padding-bottom:0!important}
 .sect1+.sect1{border:0!important}
-#header>h1:first-child{margin:.5em 0 0 0}
+#header>h1:first-child{margin-top:1.25rem}
 body.book #header{text-align:center}
 body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em 0}
 body.book #header .details{border:0!important;display:block;padding:0!important}
@@ -392,8 +390,6 @@ body.book #header .details br{display:block}
 body.book #header .details br+span:before{content:none!important}
 body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
 body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
-.literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{background:#f7f7f7!important;padding:1em!important}
-.listingblock pre.highlightjs>code{padding:0!important;background:none!important}
 .listingblock code[data-lang]:before{display:block}
 #footer{background:none!important;padding:0 .9375em}
 #footer-text{color:rgba(0,0,0,.6)!important;font-size:.9em}

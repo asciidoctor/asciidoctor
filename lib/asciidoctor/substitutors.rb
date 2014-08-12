@@ -818,8 +818,11 @@ module Substitutors
 
           if text.end_with? '^'
             text = text.chop
-            attrs ||= {}
-            attrs['window'] = '_blank' unless attrs.has_key?('window')
+            if attrs
+              attrs['window'] ||= '_blank'
+            else
+              attrs = {'window' => '_blank'}
+            end
           end
         end
 
@@ -828,6 +831,12 @@ module Substitutors
             target.sub UriSniffRx, ''
           else
             target
+          end
+
+          if attrs
+            attrs['role'] = %(bare #{attrs['role']}).chomp ' '
+          else
+            attrs = {'role' => 'bare'}
           end
         end
 
@@ -847,19 +856,19 @@ module Substitutors
         end
         raw_target = m[1]
         mailto = m[0].start_with?('mailto:')
-        target = mailto ? "mailto:#{raw_target}" : raw_target
+        target = mailto ? %(mailto:#{raw_target}) : raw_target
 
         link_opts = { :type => :link, :target => target }
         attrs = nil
         #text = sub_attributes(m[2].gsub('\]', ']'))
         text = if use_link_attrs && (m[2].start_with?('"') || m[2].include?(','))
           attrs = parse_attributes(sub_attributes(m[2].gsub('\]', ']')), [])
-          link_opts[:id] = (attrs.delete 'id') if attrs.has_key? 'id'
+          link_opts[:id] = (attrs.delete 'id') if attrs.key? 'id'
           if mailto
-            if attrs.has_key? 2
+            if attrs.key? 2
               target = link_opts[:target] = "#{target}?subject=#{Helpers.encode_uri(attrs[2])}"
 
-              if attrs.has_key? 3
+              if attrs.key? 3
                 target = link_opts[:target] = "#{target}&amp;body=#{Helpers.encode_uri(attrs[3])}"
               end
             end
@@ -874,7 +883,7 @@ module Substitutors
 
         # TODO enable in Asciidoctor 1.5.1
         # support pipe-separated text and title
-        #unless attrs && (attrs.has_key? 'title')
+        #unless attrs && (attrs.key? 'title')
         #  if text.include? '|'
         #    attrs ||= {}
         #    text, attrs['title'] = text.split '|', 2
@@ -883,15 +892,29 @@ module Substitutors
 
         if text.end_with? '^'
           text = text.chop
-          attrs ||= {}
-          attrs['window'] = '_blank' unless attrs.has_key?('window')
+          if attrs
+            attrs['window'] ||= '_blank'
+          else
+            attrs = {'window' => '_blank'}
+          end
         end
 
         if text.empty?
-          if @document.attr? 'hide-uri-scheme'
-            text = raw_target.sub UriSniffRx, ''
-          else
+          # mailto is a special case, already processed
+          if mailto
             text = raw_target
+          else
+            if @document.attr? 'hide-uri-scheme'
+              text = raw_target.sub UriSniffRx, ''
+            else
+              text = raw_target
+            end
+
+            if attrs
+              attrs['role'] = %(bare #{attrs['role']}).chomp ' '
+            else
+              attrs = {'role' => 'bare'}
+            end
           end
         end
 

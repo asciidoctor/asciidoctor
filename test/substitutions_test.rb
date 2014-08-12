@@ -542,7 +542,7 @@ context 'Substitutions' do
   context 'Macros' do
     test 'a single-line link macro should be interpreted as a link' do
       para = block_from_string('link:/home.html[]')
-      assert_equal %q{<a href="/home.html">/home.html</a>}, para.sub_macros(para.source)
+      assert_equal %q{<a href="/home.html" class="bare">/home.html</a>}, para.sub_macros(para.source)
     end
 
     test 'a single-line link macro with text should be interpreted as a link' do
@@ -588,7 +588,7 @@ context 'Substitutions' do
 
     test 'a single-line raw url should be interpreted as a link' do
       para = block_from_string('http://google.com')
-      assert_equal %q{<a href="http://google.com">http://google.com</a>}, para.sub_macros(para.source)
+      assert_equal %q{<a href="http://google.com" class="bare">http://google.com</a>}, para.sub_macros(para.source)
     end
 
     test 'a single-line raw url with text should be interpreted as a link' do
@@ -614,7 +614,7 @@ context 'Substitutions' do
 
     test 'a comma separated list of links should not include commas in links' do
       para = block_from_string('http://foo.com, http://bar.com, http://example.org')
-      assert_equal %q{<a href="http://foo.com">http://foo.com</a>, <a href="http://bar.com">http://bar.com</a>, <a href="http://example.org">http://example.org</a>}, para.sub_macros(para.source)
+      assert_equal %q{<a href="http://foo.com" class="bare">http://foo.com</a>, <a href="http://bar.com" class="bare">http://bar.com</a>, <a href="http://example.org" class="bare">http://example.org</a>}, para.sub_macros(para.source)
     end
 
     test 'a single-line image macro should be interpreted as an image' do
@@ -782,7 +782,7 @@ context 'Substitutions' do
       assert_equal %(the JLine <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>\nlibrary.), result
       assert_equal 1, para.document.references[:footnotes].size
       fn1 = para.document.references[:footnotes].first
-      assert_equal '<a href="https://github.com/jline/jline2">https://github.com/jline/jline2</a>', fn1.text
+      assert_equal '<a href="https://github.com/jline/jline2" class="bare">https://github.com/jline/jline2</a>', fn1.text
     end
 
     test 'a footnote macro followed by a semi-colon may contain a plain URL' do
@@ -791,7 +791,7 @@ context 'Substitutions' do
       assert_equal %(the JLine <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>;\nlibrary.), result
       assert_equal 1, para.document.references[:footnotes].size
       fn1 = para.document.references[:footnotes].first
-      assert_equal '<a href="https://github.com/jline/jline2">https://github.com/jline/jline2</a>', fn1.text
+      assert_equal '<a href="https://github.com/jline/jline2" class="bare">https://github.com/jline/jline2</a>', fn1.text
     end
 
     test 'a footnote macro may contain an xref macro' do
@@ -1395,7 +1395,7 @@ EOS
       test 'should find and replace placeholder duplicated by substitution' do
         input = %q(+first passthrough+ followed by link:$$http://example.com/__u_no_format_me__$$[] with passthrough)
         result = render_embedded_string input, :doctype => :inline
-        assert_equal 'first passthrough followed by <a href="http://example.com/__u_no_format_me__">http://example.com/__u_no_format_me__</a> with passthrough', result
+        assert_equal 'first passthrough followed by <a href="http://example.com/__u_no_format_me__" class="bare">http://example.com/__u_no_format_me__</a> with passthrough', result
       end
     end
   end
