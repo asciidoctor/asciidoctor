@@ -330,7 +330,7 @@ The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and
 
 == Changelog
 
-=== 1.5.0 (2014-08-11) - @mojavelinux
+=== 1.5.0 (2014-08-12) - @mojavelinux
 
 Performance::
 
