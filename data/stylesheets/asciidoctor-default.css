@@ -201,7 +201,8 @@ table.tableblock #preamble>.sectionbody>.paragraph:first-of-type p{font-size:inh
 .listingblock pre.highlightjs>code{padding:1em;-webkit-border-radius:4px;border-radius:4px}
 .listingblock pre.prettyprint{border-width:0}
 .listingblock>.content{position:relative}
-.listingblock:hover code[data-lang]:before{content:attr(data-lang);position:absolute;font-size:.75em;top:.5rem;right:.5rem;line-height:1;text-transform:uppercase;color:#999}
+.listingblock code[data-lang]:before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.45rem;right:.5rem;line-height:1;text-transform:uppercase;color:#999}
+.listingblock:hover code[data-lang]:before{display:block}
 .listingblock.terminal pre .command:before{content:attr(data-prompt);padding-right:.5em;color:#999}
 .listingblock.terminal pre .command:not([data-prompt]):before{content:"$"}
 table.pyhltable{border-collapse:separate;border:0;margin-bottom:0;background:none}
@@ -393,6 +394,7 @@ body.book #toc{border:0!important;text-align:left!important;padding:0!important;
 body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
 .literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{background:#f7f7f7!important;padding:1em!important}
 .listingblock pre.highlightjs>code{padding:0!important;background:none!important}
+.listingblock code[data-lang]:before{display:block}
 #footer{background:none!important;padding:0 .9375em}
 #footer-text{color:rgba(0,0,0,.6)!important;font-size:.9em}
 .hide-on-print{display:none!important}
