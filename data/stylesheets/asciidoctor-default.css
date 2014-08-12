@@ -139,7 +139,7 @@ p a>code:hover{color:rgba(0,0,0,.9)}
 #header .details br+span#revremark:before{content:"\00a0|\00a0"}
 #header #revnumber{text-transform:capitalize}
 #header #revnumber:after{content:"\00a0"}
-#content>h1:first-child{color:rgba(0,0,0,.85);border-bottom:1px solid #ddddd8;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #ddddd8;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
 #toc{border-bottom:1px solid #efefed;padding-bottom:.5em}
 #toc>ul{margin-left:.125em}
 #toc ul.sectlevel0>li>a{font-style:italic}
