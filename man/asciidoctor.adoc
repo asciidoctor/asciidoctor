@@ -176,7 +176,7 @@ Git source repository on GitHub: <**https://github.com/asciidoctor/asciidoctor**
 
 Project web site: <**http://asciidoctor.org**>
 
-GitHub organization: <**http://github.com/asciidoctor**>
+GitHub organization: <**https://github.com/asciidoctor**>
 
 Mailinglist / forum: <**http://discuss.asciidoctor.org**>
 
