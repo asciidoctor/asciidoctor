@@ -178,7 +178,7 @@ body.toc2.toc-right{padding-left:0;padding-right:20em}}#content #toc{border-styl
 table.tableblock>caption.title{white-space:nowrap;overflow:visible;max-width:0}
 .paragraph.lead>p,#preamble>.sectionbody>.paragraph:first-of-type p{color:rgba(0,0,0,.85)}
 table.tableblock #preamble>.sectionbody>.paragraph:first-of-type p{font-size:inherit}
-.admonitionblock>table{border-collapse:separate;border:none;background:none;width:100%}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
 .admonitionblock>table td.icon{text-align:center;width:80px}
 .admonitionblock>table td.icon img{max-width:none}
 .admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
@@ -204,7 +204,7 @@ table.tableblock #preamble>.sectionbody>.paragraph:first-of-type p{font-size:inh
 .listingblock:hover code[data-lang]:before{content:attr(data-lang);position:absolute;font-size:.75em;top:.5rem;right:.5rem;line-height:1;text-transform:uppercase;color:#999}
 .listingblock.terminal pre .command:before{content:attr(data-prompt);padding-right:.5em;color:#999}
 .listingblock.terminal pre .command:not([data-prompt]):before{content:"$"}
-table.pyhltable{border-collapse:separate;border:none;margin-bottom:0;background:transparent}
+table.pyhltable{border-collapse:separate;border:0;margin-bottom:0;background:transparent}
 table.pyhltable td{vertical-align:top;padding-top:0;padding-bottom:0}
 table.pyhltable td.code{padding-left:.75em;padding-right:0}
 pre.pygments .lineno,table.pyhltable td:not(.code){color:#999;padding-left:0;padding-right:.5em;border-right:1px solid #ddddd8}
@@ -213,7 +213,7 @@ table.pyhltable .linenodiv{background-color:transparent!important;padding-right:
 .quoteblock{margin:0 1em 1.25em 1.5em;display:table}
 .quoteblock>.title{margin-left:-1.5em;margin-bottom:.75em}
 .quoteblock blockquote,.quoteblock blockquote p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
-.quoteblock blockquote{margin:0;padding:0;border:none}
+.quoteblock blockquote{margin:0;padding:0;border:0}
 .quoteblock blockquote:before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
 .quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
 .quoteblock .attribution{margin-top:.5em;margin-right:.5ex;text-align:right}
@@ -276,7 +276,7 @@ ol.upperalpha{list-style-type:upper-alpha}
 ol.lowerroman{list-style-type:lower-roman}
 ol.upperroman{list-style-type:upper-roman}
 ol.lowergreek{list-style-type:lower-greek}
-.hdlist>table,.colist>table{border:none;background:none}
+.hdlist>table,.colist>table{border:0;background:none}
 .hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
 td.hdlist1{padding-right:.75em;font-weight:bold}
 td.hdlist1,td.hdlist2{vertical-align:top}
@@ -302,7 +302,7 @@ span.footnote a:active,span.footnoteref a:active{text-decoration:underline}
 #footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none}
 #footnotes .footnote:last-of-type{margin-bottom:0}
 #content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
-.gist .file-data>table{border:none;background:#fff;width:100%;margin-bottom:0}
+.gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
 .gist .file-data>table td.line-data{width:99%}
 div.unbreakable{page-break-inside:avoid}
 .big{font-size:larger}
@@ -381,15 +381,15 @@ h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
 #toc,.sidebarblock{background:none!important}
 #toc{border-bottom:1px solid #ddddd8!important;padding-bottom:0!important}
 .sect1{padding-bottom:0!important}
-.sect1+.sect1{border:none!important}
+.sect1+.sect1{border:0!important}
 #header>h1:first-child{margin:.5em 0 0 0}
 body.book #header{text-align:center}
-body.book #header>h1:first-child{border:none!important;margin:2.5em 0 1em 0}
-body.book #header .details{border:none!important;display:block;padding:0!important}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em 0}
+body.book #header .details{border:0!important;display:block;padding:0!important}
 body.book #header .details span:first-child{margin-left:0!important}
 body.book #header .details br{display:block}
 body.book #header .details br+span:before{content:none!important}
-body.book #toc{border:none!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
 body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
 .literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{background:#f7f7f7!important;padding:1em!important}
 .listingblock pre.highlightjs>code{padding:0!important;background:none!important}
