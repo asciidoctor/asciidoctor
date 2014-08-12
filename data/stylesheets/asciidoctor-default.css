@@ -125,9 +125,9 @@ p a>code:hover{color:rgba(0,0,0,.9)}
 #header,#content,#footnotes,#footer{width:100%;margin-left:auto;margin-right:auto;margin-top:0;margin-bottom:0;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
 #header:before,#header:after,#content:before,#content:after,#footnotes:before,#footnotes:after,#footer:before,#footer:after{content:" ";display:table}
 #header:after,#content:after,#footnotes:after,#footer:after{clear:both}
+#content{margin-top:1.25em}
 #content:before{content:none}
-#header{margin-bottom:1.875em}
-#header>h1:first-child{color:rgba(0,0,0,.85);margin-bottom:0}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
 #header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #ddddd8}
 #header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #ddddd8;padding-bottom:8px}
 #header .details{border-bottom:1px solid #ddddd8;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:-ms-flexbox;display:-webkit-flex;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap}
@@ -139,7 +139,7 @@ p a>code:hover{color:rgba(0,0,0,.9)}
 #header .details br+span#revremark:before{content:"\00a0|\00a0"}
 #header #revnumber{text-transform:capitalize}
 #header #revnumber:after{content:"\00a0"}
-#content>h1:first-child{color:rgba(0,0,0,.85);border-bottom:1px solid #ddddd8;padding-bottom:.1em}
+#content>h1:first-child{color:rgba(0,0,0,.85);border-bottom:1px solid #ddddd8;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
 #toc{border-bottom:1px solid #efefed;padding-bottom:.5em}
 #toc>ul{margin-left:.125em}
 #toc ul.sectlevel0>li>a{font-style:italic}
