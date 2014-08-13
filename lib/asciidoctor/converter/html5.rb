@@ -48,7 +48,7 @@ module Asciidoctor
       result << %(<meta name="author" content="#{node.attr 'authors'}"#{slash}>) if node.attr? 'authors'
       result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
 
-      result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>) 
+      result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
         if (webfonts = node.attr 'webfonts')
           result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic|Noto+Serif:400,400italic,700,700italic|Droid+Sans+Mono:400' : webfonts}"#{slash}>)
@@ -100,6 +100,10 @@ module Asciidoctor
         result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'github'}.min.css"#{slash}>
 <script src="#{highlightjs_path}/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>)
+      when 'prismjs', 'prism.js'
+        prismjs_path = node.attr 'prismjsdir', %(#{cdn_base}/prism/0.0.1)
+        result << %(<link rel="stylesheet" href="#{prismjs_path}#{node.attr 'prismjs-theme', 'prism'}.min.css"#{slash}>
+<script src="#{prismjs_path}/prism.min.js"></script>)
       when 'prettify'
         prettify_path = node.attr 'prettifydir', %(#{cdn_base}/prettify/r298)
         result << %(<link rel="stylesheet" href="#{prettify_path}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>
@@ -505,7 +509,7 @@ Your browser does not support the audio tag.
 
     def image node
       align = (node.attr? 'align') ? (node.attr 'align') : nil
-      float = (node.attr? 'float') ? (node.attr 'float') : nil 
+      float = (node.attr? 'float') ? (node.attr 'float') : nil
       style_attribute = if align || float
         styles = [align ? %(text-align: #{align}) : nil, float ? %(float: #{float}) : nil].compact
         %( style="#{styles * ';'}")
@@ -591,7 +595,7 @@ Your browser does not support the audio tag.
       unless ((equation = node.content).start_with? open) && (equation.end_with? close)
         equation = %(#{open}#{equation}#{close})
       end
-      
+
       %(<div#{id_attribute} class="#{(role = node.role) ? ['stemblock', role] * ' ' : 'stemblock'}">
 #{title_element}<div class="content">
 #{equation}
@@ -733,7 +737,7 @@ Your browser does not support the audio tag.
     end
 
     def table node
-      result = [] 
+      result = []
       id_attribute = node.id ? %( id="#{node.id}") : nil
       classes = ['tableblock', %(frame-#{node.attr 'frame', 'all'}), %(grid-#{node.attr 'grid', 'all'})]
       styles = []
@@ -926,7 +930,7 @@ Your browser does not support the audio tag.
 <iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{node.attr 'target'}?rel=0#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
-      else 
+      else
         poster_attribute = %(#{poster = node.attr 'poster'}).empty? ? nil : %( poster="#{node.media_uri poster}")
         time_anchor = ((node.attr? 'start') || (node.attr? 'end')) ? %(#t=#{node.attr 'start'}#{(node.attr? 'end') ? ',' : nil}#{node.attr 'end'}) : nil
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
