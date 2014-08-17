@@ -63,7 +63,7 @@ Asciidoctor.js is used to power the AsciiDoc preview extensions for Chrome, Atom
 ====
 
 ifdef::env-github[]
-*Project health:* image:https://travis-ci.org/asciidoctor/asciidoctor.png?branch=master[Build Status, link="https://travis-ci.org/asciidoctor/asciidoctor"]
+*Project health:* image:http://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status, link="https://travis-ci.org/asciidoctor/asciidoctor"] image:http://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg["Coverage Status", link="https://coveralls.io/r/asciidoctor/asciidoctor"]
 endif::env-github[]
 
 == The Big Picture
