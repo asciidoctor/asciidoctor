@@ -55,7 +55,7 @@ Asciidoctor is open source, {uri-repo}[hosted on GitHub] and released under the 
 ====
 You can run Asciidoctor on the JVM using JRuby.
 To invoke the Asciidoctor API directly from Java and other JVM languages, use {uri-asciidoctorj}[AsciidoctorJ].
-There are plugins available, based on AsciidoctorJ, that integrate the Asciidoctor processor into Apache Maven, Grade or Javadoc builds.
+There are plugins available, based on AsciidoctorJ, that integrate the Asciidoctor processor into Apache Maven, Gradle or Javadoc builds.
 
 Asciidoctor also runs in JavaScript.
 We use http://opalrb.org[Opal] to transcompile the Ruby source to JavaScript to produce {uri-asciidoctorjs}[Asciidoctor.js], a fully-functional version of Asciidoctor that works in any JavaScript environment, such as a web browser or Node.js.
