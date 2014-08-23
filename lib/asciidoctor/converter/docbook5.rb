@@ -12,7 +12,7 @@ module Asciidoctor
       end
       result << '<?asciidoc-toc?>' if node.attr? 'toc'
       result << '<?asciidoc-numbered?>' if node.attr? 'sectnums'
-      lang_attribute = (node.attr? 'nolang') ? nil : %( lang="#{node.attr 'lang', 'en'}")
+      lang_attribute = (node.attr? 'nolang') ? nil : %( xml:lang="#{node.attr 'lang', 'en'}")
       result << %(<#{root_tag_name}#{document_ns_attributes node}#{lang_attribute}>)
       result << (document_info_element node, root_tag_name)
       result << node.content if node.blocks?
