@@ -12,7 +12,7 @@ module Asciidoctor
       end
       result << '<?asciidoc-toc?>' if node.attr? 'toc'
       result << '<?asciidoc-numbered?>' if node.attr? 'sectnums'
-      lang_attribute = (node.attr? 'nolang') ? nil : %( lang="#{node.attr 'lang', 'en'}")
+      lang_attribute = (node.attr? 'nolang') ? nil : %( #{lang_attribute_name}="#{node.attr 'lang', 'en'}")
       result << %(<#{root_tag_name}#{document_ns_attributes node}#{lang_attribute}>)
       result << (document_info_element node, root_tag_name)
       result << node.content if node.blocks?
@@ -661,6 +661,10 @@ module Asciidoctor
 
     def document_ns_attributes doc
       ' xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"'
+    end
+
+    def lang_attribute_name
+      'xml:lang'
     end
 
     def document_title_tags title

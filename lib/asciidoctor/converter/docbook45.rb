@@ -83,6 +83,10 @@ module Asciidoctor
       super doc, info_tag_prefix, true
     end
 
+    def lang_attribute_name
+      'lang'
+    end
+
     def document_ns_attributes doc
       if (ns = doc.attr 'xmlns')
         ns.empty? ? ' xmlns="http://docbook.org/ns/docbook"' : %( xmlns="#{ns}")
