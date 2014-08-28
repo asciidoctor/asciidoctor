@@ -13,7 +13,7 @@
 :pr-help-uri: {base-help-uri}/using-pull-requests
 :gist-uri: https://gist.github.com
 
-=== Submitting an Issue
+== Submitting an Issue
 
 We use the {issues-uri}[issue tracker on GitHub] associated with this project to track bugs and features.
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted.
@@ -23,7 +23,7 @@ Most importantly, since Asciidoctor is a text processor, reproducing most bugs r
 
 An ideal bug report would include a pull request with failing specs.
 
-=== Submitting a Pull Request
+== Submitting a Pull Request
 
 . {fork-help-uri}[Fork the repository].
 . Run +bundle install+ to install dependencies.
@@ -87,6 +87,8 @@ To run all the tests, simply execute +rake+:
 
  $ rake
 
+NOTE: The tests should only take a few seconds to run using Ruby 2.1.
+
 If you want to run a single test file, you can use +ruby+:
 
  $ ruby test/blocks_test.rb
@@ -107,7 +109,7 @@ Once you are done with your test, make sure to remove "wip" from the description
 
 We plan on switching to a more elegant testing framework in the future, such as RSpec or Cucumber, in order to make the tests more clear and robust.
 
-=== Supporting Additional Ruby Versions
+== Supporting Additional Ruby Versions
 
 If you would like this library to support another Ruby version, you may volunteer to be a maintainer.
 Being a maintainer entails making sure all tests run and pass on that implementation.
