@@ -1182,7 +1182,7 @@ module Asciidoctor
     [:mark, :unconstrained, /\\?(?:\[([^\]]+?)\])?##(#{CC_ALL}+?)##/m],
 
     # #mark# (referred to in AsciiDoc Python as unquoted)
-    [:mark, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+?)\])?#(\S|\S#{CC_ALL}*?\S)#(?!#{CG_WORD})/m],
+    [:mark, :constrained, /(^|[^#{CC_WORD}&;:}])(?:\[([^\]]+?)\])?#(\S|\S#{CC_ALL}*?\S)#(?!#{CG_WORD})/m],
 
     # ^superscript^
     [:superscript, :unconstrained, /\\?(?:\[([^\]]+?)\])?\^(\S+?)\^/],

@@ -135,6 +135,11 @@ context 'Substitutions' do
       assert_equal "<mark>a few\nwords</mark>", para.sub_quotes(para.source)
     end
 
+    test 'constrained marked string should not match entity references' do
+      para = block_from_string('111 #mark a# 222 "`quote a`" 333 #mark b# 444')
+      assert_equal %(111 <mark>mark a</mark> 222 &#8220;quote a&#8221; 333 <mark>mark b</mark> 444), para.sub_quotes(para.source)
+    end
+
     test 'single-line unconstrained marked string' do
       #para = block_from_string(%q{##--anything goes ##}, :attributes => {'compat-mode' => ''})
       #assert_equal '--anything goes ', para.sub_quotes(para.source)
