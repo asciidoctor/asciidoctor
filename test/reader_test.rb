@@ -708,6 +708,19 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         refute_match(/included content/, output)
       end
 
+      test 'include directive supports tagged selection in XML file' do
+        input = <<-EOS
+[source,xml,indent=0]
+----
+include::fixtures/include-file.xml[tag=snippet]
+----
+        EOS
+  
+        output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        assert_match('&lt;snippet&gt;content&lt;/snippet&gt;', output)
+        refute_match('root', output)
+      end
+
       test 'include directive does not select tagged lines inside tagged selection' do
         input = <<-EOS
 ++++
