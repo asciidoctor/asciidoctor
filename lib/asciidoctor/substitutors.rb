@@ -1446,6 +1446,7 @@ module Substitutors
         # TODO we could add the line numbers in ourselves instead of having to strip out the junk
         # FIXME move these regular expressions into constants
         if (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
+          linenums_mode = :table
           # NOTE these subs clean out HTML that messes up our styles
           result = lexer.highlight(source, :options => opts).
               sub(/<div class="pyhl">(.*)<\/div>/m, '\1').
@@ -1481,9 +1482,15 @@ module Substitutors
         lineno = lineno + 1
         if (conums = callout_marks.delete(lineno))
           tail = nil
-          if callout_on_last && callout_marks.empty? && (pos = line.index '</pre>')
-            tail = line[pos..-1]
-            line = line[0...pos]
+          if callout_on_last && callout_marks.empty?
+            # QUESTION when does this happen?
+            if (pos = line.index '</pre>')
+              tail = line[pos..-1]
+              line = %(#{line[0...pos].chomp ' '} )
+            else
+              # Give conum on final line breathing room if trailing space in source is dropped
+              line = %(#{line.chomp ' '} )
+            end
           end
           if conums.size == 1
             %(#{line}#{Inline.new(self, :callout, conums[0], :id => @document.callouts.read_next_id).convert }#{tail})
