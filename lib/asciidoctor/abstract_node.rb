@@ -187,10 +187,10 @@ class AbstractNode
 
   # Public: A convenience method that checks if the role attribute is specified
   def role?(expect = nil)
-    if expect.nil?
-      @attributes.has_key?('role') || @document.attributes.has_key?('role')
-    else
+    if expect
       expect == (@attributes['role'] || @document.attributes['role'])
+    else
+      @attributes.has_key?('role') || @document.attributes.has_key?('role')
     end
   end
 
