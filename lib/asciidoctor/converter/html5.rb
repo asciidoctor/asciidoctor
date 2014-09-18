@@ -946,6 +946,7 @@ Your browser does not support the video tag.
         refid = (node.attr 'refid') || target
         # NOTE we lookup text in converter because DocBook doesn't need this logic
         text = node.text || (node.document.references[:ids][refid] || %([#{refid}]))
+        # FIXME shouldn't target be refid? logic seems confused here
         %(<a href="#{target}">#{text}</a>)
       when :ref
         %(<a id="#{target}"></a>)
