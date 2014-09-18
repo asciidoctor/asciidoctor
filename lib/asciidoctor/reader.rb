@@ -894,8 +894,8 @@ class PreprocessorReader < Reader
           tags = attributes['tags'].split(DataDelimiterRx).uniq.to_set
         end
       end
-      if !inc_lines.nil?
-        if !inc_lines.empty?
+      if inc_lines
+        unless inc_lines.empty?
           selected = []
           inc_line_offset = 0
           inc_lineno = 0
@@ -926,8 +926,8 @@ class PreprocessorReader < Reader
           # FIXME not accounting for skipped lines in reader line numbering
           push_include selected, include_file, path, inc_line_offset, attributes
         end
-      elsif !tags.nil?
-        if !tags.empty?
+      elsif tags
+        unless tags.empty?
           selected = []
           inc_line_offset = 0
           inc_lineno = 0
@@ -940,21 +940,23 @@ class PreprocessorReader < Reader
                 # must force encoding here since we're performing String operations on line
                 l.force_encoding(::Encoding::UTF_8) if FORCE_ENCODING
                 l = l.rstrip
+                # tagged lines in XML may end with '-->'
+                tl = l.chomp('-->').rstrip
                 if active_tag
-                  if l.end_with?(%(end::#{active_tag}[])) && TagDirectiveRx =~ l
+                  if tl.end_with?(%(end::#{active_tag}[]))
                     active_tag = nil
                   else
-                    selected.push l unless l.end_with?('[]') && TagDirectiveRx =~ l
+                    selected.push l unless tl.end_with?('[]') && TagDirectiveRx =~ tl
                     inc_line_offset = inc_lineno if inc_line_offset == 0
                   end
                 else
                   tags.each do |tag|
-                    if l.end_with?(%(tag::#{tag}[])) && TagDirectiveRx =~ l
+                    if tl.end_with?(%(tag::#{tag}[]))
                       active_tag = tag
                       tags_found << tag
                       break
                     end
-                  end
+                  end if tl.end_with?('[]') && TagDirectiveRx =~ tl
                 end
               end
             end
