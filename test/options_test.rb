@@ -76,6 +76,11 @@ context 'Options' do
     assert_equal 'value=value', options[:attributes]['name']
   end
 
+  test 'should allow safe mode to be specified' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-S safe /dev/null))
+    assert_equal Asciidoctor::SafeMode::SAFE, options[:safe]
+  end
+
   test 'should allow any backend to be specified' do
     options = Asciidoctor::Cli::Options.parse!(%w(-b my_custom_backend test/fixtures/sample.asciidoc))
 
