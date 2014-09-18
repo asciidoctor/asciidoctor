@@ -382,7 +382,7 @@ Improvements::
   * use glyphs for checkboxes when not using font icons (#878)
   * prefer source-language attribute over language attribute for defining default source language (#888)
   * pass document as first argument to process method on Preprocessor
-  * don't parse link attributes when linkattrs is set unless text contains equal sign 
+  * don't parse link attributes when linkattrs is set unless text contains equal sign
   * detect bare links, mark with bare class; don't repeat URL of bare link in print styles
   * allow Treeprocessor#process method to replace tree (#1035)
   * add AbstractNode#find_by method to locate nodes in tree (#862)
