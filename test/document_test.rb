@@ -78,9 +78,21 @@ context 'Document' do
     end
 
     test 'toc and sectnums should be enabled by default for DocBook backend' do
-      doc = empty_document :backend => 'docbook', :parse => true
+      doc = document_from_string 'content', :backend => 'docbook', :parse => true
       assert doc.attr?('toc')
       assert doc.attr?('sectnums')
+      result = doc.convert
+      assert_match('<?asciidoc-toc?>', result)
+      assert_match('<?asciidoc-numbered?>', result)
+    end
+
+    test 'maxdepth attribute should be set on asciidoc-toc and asciidoc-numbered processing instructions in DocBook backend' do
+      doc = document_from_string 'content', :backend => 'docbook', :parse => true, :attributes => {'toclevels' => '1', 'sectnumlevels' => '1' }
+      assert doc.attr?('toc')
+      assert doc.attr?('sectnums')
+      result = doc.convert
+      assert_match('<?asciidoc-toc maxdepth="1"?>', result)
+      assert_match('<?asciidoc-numbered maxdepth="1"?>', result)
     end
 
     test 'should be able to disable toc and sectnums in document header for DocBook backend' do

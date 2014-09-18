@@ -10,8 +10,20 @@ module Asciidoctor
       if (doctype_line = doctype_declaration root_tag_name)
         result << doctype_line
       end
-      result << '<?asciidoc-toc?>' if node.attr? 'toc'
-      result << '<?asciidoc-numbered?>' if node.attr? 'sectnums'
+      if node.attr? 'toc'
+        if node.attr? 'toclevels'
+          result << %(<?asciidoc-toc maxdepth="#{node.attr 'toclevels'}"?>)
+        else
+          result << '<?asciidoc-toc?>'
+        end
+      end
+      if node.attr? 'sectnums'
+        if node.attr? 'sectnumlevels'
+          result << %(<?asciidoc-numbered maxdepth="#{node.attr 'sectnumlevels'}"?>)
+        else
+          result << '<?asciidoc-numbered?>'
+        end
+      end
       lang_attribute = (node.attr? 'nolang') ? nil : %( #{lang_attribute_name}="#{node.attr 'lang', 'en'}")
       result << %(<#{root_tag_name}#{document_ns_attributes node}#{lang_attribute}>)
       result << (document_info_element node, root_tag_name)
