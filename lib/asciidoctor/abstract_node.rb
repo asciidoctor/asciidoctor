@@ -27,19 +27,17 @@ class AbstractNode
   def initialize parent, context, opts = {}
     # document is a special case, should refer to itself
     if context == :document
-      @parent = nil
       @document = parent
     else
-      if (@parent = parent)
+      if parent
+        @parent = parent
         @document = parent.document
-      else
-        @document = nil
       end
     end
     @context = context
     @node_name = context.to_s
     # QUESTION are we correct in duplicating the attributes (seems to be just as fast)
-    @attributes = opts.key?(:attributes) ? (opts[:attributes] || {}).dup : {}
+    @attributes = (opts.key? :attributes) ? opts[:attributes].dup : {}
     @passthroughs = {}
   end
 
