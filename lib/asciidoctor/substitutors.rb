@@ -956,7 +956,7 @@ module Substitutors
         if m[1] == 'footnote'
           id = nil
           # REVIEW it's a dirty job, but somebody's gotta do it
-          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string m[2], true)))
+          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string m[2], true)), false)
           index = @document.counter('footnote-number')
           @document.register(:footnotes, Document::Footnote.new(index, id, text))
           type = nil
@@ -978,7 +978,7 @@ module Substitutors
             type = :xref
           else
             # REVIEW it's a dirty job, but somebody's gotta do it
-            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)))
+            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), false)
             index = @document.counter('footnote-number')
             @document.register(:footnotes, Document::Footnote.new(index, id, text))
             type = :ref

@@ -816,6 +816,15 @@ context 'Substitutions' do
       assert_equal 'a <a id="b"></a> [[c]] d', footnote1.text
     end
 
+    test 'subsequent footnote macros with escaped URLs should be restored in DocBook' do
+      input = <<-EOS
+foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
+      EOS
+
+      result = render_embedded_string input, :doctype => 'inline', :backend => 'docbook'
+      assert_equal 'foo<footnote><simpara>http://example.com</simpara></footnote>bar<footnote><simpara>http://acme.com</simpara></footnote>baz', result
+    end
+
     test 'a footnote macro may contain a bibliographic anchor macro' do
       para = block_from_string('text footnote:[a [[[b\]\]\] c]')
       assert_equal %(text <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span>), para.sub_macros(para.source)
