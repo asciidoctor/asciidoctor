@@ -341,10 +341,14 @@ Bug fixes::
   * add namespace to lang attribute in DocBook 5 backend
   * restore missing space before conum on last line of listing when highlighting with Pygments
   * place conums on correct lines when line numbers are enabled when highlighting with Pygments
+  * don't expand mailto links in print styles
 
 Improvements::
 
+  * implement File.read in Node (JavaScript) environment
   * assign sectnumlevels and toclevels values to maxdepth attribute on AsciiDoc processing instructions in DocBook output
+  * add test for usage of image block macro with data URI
+  * use badges from shields.io in README
 
 === 1.5.0 (2014-08-12) - @mojavelinux
 
