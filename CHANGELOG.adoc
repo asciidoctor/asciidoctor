@@ -11,6 +11,33 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the https://github.com/asciidoctor/asciidoctor/commits/master[commit history] on GitHub.
 
+== 1.5.1 (2014-09-29) - @mojavelinux
+
+Bug fixes::
+
+  * recognize tag directives inside comments within XML files for including tagged regions
+  * restore passthroughs inside footnotes when more than one footnote appears on the same line
+  * -S flag in cli recognizes safe mode name as lowercase string
+  * do not match # in character reference when looking for marked text
+  * add namespace to lang attribute in DocBook 5 backend
+  * restore missing space before conum on last line of listing when highlighting with Pygments
+  * place conums on correct lines when line numbers are enabled when highlighting with Pygments
+
+Improvements::
+
+  * assign sectnumlevels and toclevels values to maxdepth attribute on AsciiDoc processing instructions in DocBook output
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.1[issues resolved] |
+https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.1[git tag] |
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.0...v1.5.1[full diff]
+
 == 1.5.0 (2014-08-12) - @mojavelinux
 
 Performance::

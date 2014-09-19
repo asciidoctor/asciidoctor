@@ -330,6 +330,22 @@ The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and
 
 == Changelog
 
+== 1.5.1 (2014-09-29) - @mojavelinux
+
+Bug fixes::
+
+  * recognize tag directives inside comments within XML files for including tagged regions
+  * restore passthroughs inside footnotes when more than one footnote appears on the same line
+  * -S flag in cli recognizes safe mode name as lowercase string
+  * do not match # in character reference when looking for marked text
+  * add namespace to lang attribute in DocBook 5 backend
+  * restore missing space before conum on last line of listing when highlighting with Pygments
+  * place conums on correct lines when line numbers are enabled when highlighting with Pygments
+
+Improvements::
+
+  * assign sectnumlevels and toclevels values to maxdepth attribute on AsciiDoc processing instructions in DocBook output
+
 === 1.5.0 (2014-08-12) - @mojavelinux
 
 Performance::
