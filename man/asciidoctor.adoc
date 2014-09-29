@@ -12,81 +12,81 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
 == SYNOPSIS
 
-*asciidoctor* ['OPTION']... 'FILE'...
+*asciidoctor* [_OPTION_]... _FILE_...
 
 
 == DESCRIPTION
 
-The asciidoctor(1) command converts the AsciiDoc source file(s) 'FILE' to HTML5,
+The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5,
 DocBook 4.5, DocBook 5.0 and other custom output formats.
 
-If 'FILE' is '-' then the AsciiDoc source is read from standard input.
+If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 
 
 == OPTIONS
 
 === Security Settings
 
-*-B, --base-dir*='DIR'::
+*-B, --base-dir*=_DIR_::
     Base directory containing the document and resources. Defaults to the
     directory containing the source file, or the working directory if the
     source is read from a stream. Can be used as a way to chroot the execution
     of the program.
 
-*-S, --safe-mode*='SAFE_MODE'::
-    Set safe mode level: 'unsafe', 'safe', 'server' or 'secure'. Disables
+*-S, --safe-mode*=_SAFE_MODE_::
+    Set safe mode level: _unsafe_, _safe_, _server_ or _secure_. Disables
     potentially dangerous macros in source files, such as include::[]. If not
-    set, the safe mode level defaults to 'unsafe' when Asciidoctor is invoked
+    set, the safe mode level defaults to _unsafe_ when Asciidoctor is invoked
     using this script.
 
 *--safe*::
-    Set safe mode level to 'safe'. Enables include macros, but restricts access
+    Set safe mode level to _safe_. Enables include macros, but restricts access
     to ancestor paths of source file. Provided for compatibility with the
-    asciidoc command. If not set, the safe mode level defaults to 'unsafe' when
+    asciidoc command. If not set, the safe mode level defaults to _unsafe_ when
     Asciidoctor is invoked using this script.
 
 === Document Settings
 
-*-a, --attribute*='ATTRIBUTE'::
+*-a, --attribute*=_ATTRIBUTE_::
     Define, override or delete a document attribute. Command-line attributes
     take precedence over attributes defined in the source file.
 +
-'ATTRIBUTE' is normally formatted as a key-value pair, in the form 'NAME=VALUE'.
-Alternate acceptable forms are 'NAME' (where the 'VALUE' defaults to an empty
-string), 'NAME!' (unassigns the 'NAME' attribute) and 'NAME=VALUE@' (where
-'VALUE' does not override value of 'NAME' attribute if it's already defined in
+_ATTRIBUTE_ is normally formatted as a key-value pair, in the form _NAME=VALUE_.
+Alternate acceptable forms are _NAME_ (where the _VALUE_ defaults to an empty
+string), _NAME!_ (unassigns the _NAME_ attribute) and _NAME=VALUE@_ (where
+_VALUE_ does not override value of _NAME_ attribute if it's already defined in
 the source document). Values containing spaces should be enclosed in quotes.
 +
 This option may be specified more than once. 
 
-*-b, --backend*='BACKEND'::
-    Backend output file format: 'html5', 'docbook45' and 'docbook5' supported
-    out of the box. You can also use the backend alias names 'html' (aliased to
-    'html5') or 'docbook' (aliased to 'docbook5'). Defaults to 'html5'. Other
+*-b, --backend*=_BACKEND_::
+    Backend output file format: _html5_, _docbook45_ and _docbook5_ supported
+    out of the box. You can also use the backend alias names _html_ (aliased to
+    _html5_) or _docbook_ (aliased to _docbook5_). Defaults to _html5_. Other
     options can be passed, but if Asciidoctor cannot find the backend, it will
     fail during rendering.
 
-*-d, --doctype*='DOCTYPE'::
-    Document type: 'article', 'book', 'manpage' or 'inline'. Sets the root
-    element when using the 'docbook' backend and the style class on the HTML
-    body element when using the 'html' backend. The 'book' document type allows
-    multiple level-0 section titles in a single document. The 'manpage' document
+*-d, --doctype*=_DOCTYPE_::
+    Document type: _article_, _book_, _manpage_ or _inline_. Sets the root
+    element when using the _docbook_ backend and the style class on the HTML
+    body element when using the _html_ backend. The _book_ document type allows
+    multiple level-0 section titles in a single document. The _manpage_ document
     type enables parsing of metadata necessary to produce a manpage. The
-    'inline' document type allows the content of a single paragraph to be
+    _inline_ document type allows the content of a single paragraph to be
     formatted and returned without wrapping it in a containing element. Defaults
-    to 'article'.
+    to _article_.
 
 === Rendering Control
 
 *-C, --compact*::
     Compact the output by removing blank lines. (No longer in use).
 
-*-D, --destination-dir*='DIR'::
+*-D, --destination-dir*=_DIR_::
     Destination output directory. Defaults to the directory containing the
     source file, or the working directory if the source is read from a stream.
     If specified, the directory is resolved relative to the working directory.
 
-*-E, --template-engine*='NAME'::
+*-E, --template-engine*=_NAME_::
     Template engine to use for the custom render templates. The gem with the
     same name as the engine will be loaded automatically. This name is also
     used to build the full path to the custom templates. If a template engine
@@ -95,24 +95,24 @@ This option may be specified more than once.
 
 *-e, --eruby*::
     Specifies the eRuby implementation to use for rendering the custom ERB
-    templates. Supported values are 'erb' and 'erubis'. Defaults to 'erb'.
+    templates. Supported values are _erb_ and _erubis_. Defaults to _erb_.
 
 *-n, --section-numbers*::
     Auto-number section titles. Synonym for *--attribute numbered*.
 
-*-o, --out-file*='OUT_FILE'::
-    Write output to file 'OUT_FILE'. Defaults to the base name of the input
-    file suffixed with 'backend' extension. If the input is read from standard
-    input, then the output file defaults to stdout. If 'OUT_FILE' is '-' then
+*-o, --out-file*=_OUT_FILE_::
+    Write output to file _OUT_FILE_. Defaults to the base name of the input
+    file suffixed with _backend_ extension. If the input is read from standard
+    input, then the output file defaults to stdout. If _OUT_FILE_ is _-_ then
     the standard output is also used. If specified, the file is resolved
     relative to the working directory.
 
 *-s, --no-header-footer*::
     Suppress the document header and footer in the output.
 
-*-T, --template-dir*='DIR'::
+*-T, --template-dir*=_DIR_::
     A directory containing custom render templates that override one or more
-    templates from the built-in set. (requires 'tilt' gem)
+    templates from the built-in set. (requires _tilt_ gem)
 +
 If there is a subfolder that matches the engine name (if specified), that folder
 is appended to the template directory path. Similarly, if there is a subfolder
