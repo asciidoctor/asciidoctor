@@ -1441,6 +1441,26 @@ section body
       refute_match(RE_XMLNS_ATTRIBUTE, result)
     end
 
+    test 'docbook45 backend doctype manpage' do
+      input = <<-EOS
+= Title
+
+preamble
+
+== First Section
+
+section body
+      EOS
+      result = render_string(input, :attributes => {'backend' => 'docbook45', 'doctype' => 'manpage'})
+      assert_xpath '/refentry', result, 1
+      assert_xpath '/refentry/refentryinfo/title[text() = "Title"]', result, 1
+      assert_xpath '/refentry/simpara[text() = "preamble"]', result, 1
+      assert_xpath '/refentry/section', result, 1
+      assert_xpath '/refentry/section[@id = "_first_section"]/title[text() = "First Section"]', result, 1
+      assert_xpath '/refentry/section[@id = "_first_section"]/simpara[text() = "section body"]', result, 1
+    end
+
+
     test 'docbook45 backend doctype book' do
       input = <<-EOS
 = Title
@@ -1507,6 +1527,35 @@ section body
       assert_xpath '/xmlns:article/xmlns:simpara[text() = "preamble"]', result, 1
       assert_xpath '/xmlns:article/xmlns:section', result, 1
       section = xmlnodes_at_xpath('/xmlns:article/xmlns:section', result, 1).first
+      # nokogiri can't make up its mind
+      id_attr = section.attribute('id') || section.attribute('xml:id')
+      refute_nil id_attr
+      refute_nil id_attr.namespace
+      assert_equal 'xml', id_attr.namespace.prefix
+      assert_equal '_first_section', id_attr.value
+    end
+
+    test 'docbook5 backend doctype manpage' do
+      input = <<-EOS
+= Title
+Author Name
+
+preamble
+
+== First Section
+
+section body
+      EOS
+      result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'manpage'})
+      assert_xpath '/xmlns:refentry', result, 1
+      doc = xmlnodes_at_xpath('/xmlns:refentry', result, 1).first
+      assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
+      assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xlink']
+      assert_xpath '/xmlns:refentry[@version="5.0"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text() = "Title"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:simpara[text() = "preamble"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:section', result, 1
+      section = xmlnodes_at_xpath('/xmlns:refentry/xmlns:section', result, 1).first
       # nokogiri can't make up its mind
       id_attr = section.attribute('id') || section.attribute('xml:id')
       refute_nil id_attr

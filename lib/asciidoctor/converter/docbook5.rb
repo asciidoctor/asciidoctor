@@ -5,7 +5,9 @@ module Asciidoctor
   class Converter::DocBook5Converter < Converter::BuiltIn
     def document node
       result = []
-      root_tag_name = node.doctype
+      if (root_tag_name = node.doctype) == 'manpage'
+        root_tag_name = 'refentry'
+      end
       result << '<?xml version="1.0" encoding="UTF-8"?>'
       if (doctype_line = doctype_declaration root_tag_name)
         result << doctype_line
