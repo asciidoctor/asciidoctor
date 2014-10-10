@@ -1461,11 +1461,10 @@ section body
       assert_xpath '/refentry', result, 1
       assert_xpath '/refentry/refentryinfo/title[text() = "Title"]', result, 1
       assert_xpath '/refentry/simpara[text() = "preamble"]', result, 1
-      assert_xpath '/refentry/section', result, 1
-      assert_xpath '/refentry/section[@id = "_first_section"]/title[text() = "First Section"]', result, 1
-      assert_xpath '/refentry/section[@id = "_first_section"]/simpara[text() = "section body"]', result, 1
+      assert_xpath '/refentry/refsection', result, 1
+      assert_xpath '/refentry/refsection[@id = "_first_section"]/title[text() = "First Section"]', result, 1
+      assert_xpath '/refentry/refsection[@id = "_first_section"]/simpara[text() = "section body"]', result, 1
     end
-
 
     test 'docbook45 backend doctype book' do
       input = <<-EOS
@@ -1560,8 +1559,8 @@ section body
       assert_xpath '/xmlns:refentry[@version="5.0"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text() = "Title"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:simpara[text() = "preamble"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:section', result, 1
-      section = xmlnodes_at_xpath('/xmlns:refentry/xmlns:section', result, 1).first
+      assert_xpath '/xmlns:refentry/xmlns:refsection', result, 1
+      section = xmlnodes_at_xpath('/xmlns:refentry/xmlns:refsection', result, 1).first
       # nokogiri can't make up its mind
       id_attr = section.attribute('id') || section.attribute('xml:id')
       refute_nil id_attr

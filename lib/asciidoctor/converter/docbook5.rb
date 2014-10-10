@@ -41,10 +41,14 @@ module Asciidoctor
     alias :embedded :content
 
     def section node
+      doctype = node.document.doctype
       tag_name = if node.special
         node.level <= 1 ? node.sectname : 'section'
       else
-        node.document.doctype == 'book' && node.level <= 1 ? (node.level == 0 ? 'part' : 'chapter') : 'section'
+        doctype == 'book' && node.level <= 1 ? (node.level == 0 ? 'part' : 'chapter') : 'section'
+      end
+      if doctype == 'manpage' && tag_name.start_with?('sect')
+        tag_name = 'ref' + tag_name
       end
       %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
