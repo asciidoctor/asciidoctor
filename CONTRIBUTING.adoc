@@ -39,6 +39,8 @@ If your tests fail, return to step 5.
 . Add, commit, and push your changes.
 . {pr-help-uri}[Submit a pull request].
 
+For ideas about how to use pull requests, see the post http://blog.quickpeople.co.uk/2013/07/10/useful-github-patterns[Useful GitHub Patterns].
+
 === Writing and Executing Tests
 
 Tests live inside the test directory and are named <topic>_test.rb.
