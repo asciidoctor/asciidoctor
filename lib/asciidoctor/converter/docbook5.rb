@@ -47,8 +47,12 @@ module Asciidoctor
       else
         doctype == 'book' && node.level <= 1 ? (node.level == 0 ? 'part' : 'chapter') : 'section'
       end
-      if doctype == 'manpage' && tag_name.start_with?('sect')
-        tag_name = 'ref' + tag_name
+      if doctype == 'manpage'
+        if tag_name.start_with?('sect')
+          tag_name = 'ref' + tag_name
+        elsif tag_name == 'synopsis'
+          tag_name = 'refsynopsisdiv'
+        end
       end
       %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>

@@ -1455,6 +1455,10 @@ section body
 
 asciidoctor(1) - Process text
 
+== SYNOPSIS
+
+some text
+
 == First Section
 
 section body
@@ -1466,6 +1470,8 @@ section body
       assert_xpath '/refentry/refmeta/manvolnum[text() = "1"]', result, 1
       assert_xpath '/refentry/refnamediv/refname[text() = "asciidoctor"]', result, 1
       assert_xpath '/refentry/refnamediv/refpurpose[text() = "Process text"]', result, 1
+      assert_xpath '/refentry/refsynopsisdiv', result, 1
+      assert_xpath '/refentry/refsynopsisdiv/simpara[text() = "some text"]', result, 1
       assert_xpath '/refentry/refsection', result, 1
       assert_xpath '/refentry/refsection[@id = "_first_section"]/title[text() = "First Section"]', result, 1
       assert_xpath '/refentry/refsection[@id = "_first_section"]/simpara[text() = "section body"]', result, 1
@@ -1553,6 +1559,10 @@ section body
 
 asciidoctor(1) - Process text
 
+== SYNOPSIS
+
+some text
+
 == First Section
 
 section body
@@ -1568,6 +1578,8 @@ section body
       assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:manvolnum[text() = "1"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refname[text() = "asciidoctor"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refpurpose[text() = "Process text"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv/xmlns:simpara[text() = "some text"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refsection', result, 1
       section = xmlnodes_at_xpath('/xmlns:refentry/xmlns:refsection', result, 1).first
       # nokogiri can't make up its mind
