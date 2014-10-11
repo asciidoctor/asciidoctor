@@ -371,6 +371,7 @@ paragraph
     test 'should link to default stylesheet by default when safe mode is SECURE or greater' do
       sample_input_path = fixture_path('basic.asciidoc')
       output = Asciidoctor.convert_file sample_input_path, :header_footer => true, :to_file => false
+      assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
 
@@ -382,6 +383,7 @@ text
       EOS
 
       output = Asciidoctor.render(input, :safe => Asciidoctor::SafeMode::SERVER, :header_footer => true)
+      assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
       styles = stylenode.first.content
@@ -398,6 +400,7 @@ text
       EOS
 
       output = Asciidoctor.render(input, :header_footer => true)
+      assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
 
@@ -409,6 +412,7 @@ text
       EOS
 
       output = Asciidoctor.render(input, :header_footer => true, :attributes => {'linkcss!' => ''})
+      assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
 
@@ -431,6 +435,7 @@ text
       EOS
 
       output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet!' => ''})
+      assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
       assert_css 'html:root > head > link[rel="stylesheet"]', output, 0
     end
 
@@ -442,6 +447,7 @@ text
       EOS
 
       output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet' => './custom.css'})
+      assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
       assert_css 'html:root > head > link[rel="stylesheet"][href="./custom.css"]', output, 1
     end
 
