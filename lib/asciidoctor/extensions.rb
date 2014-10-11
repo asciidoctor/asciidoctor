@@ -58,6 +58,8 @@ module Extensions
       # This method automatically detects whether to use the include or extend keyword
       # based on what is appropriate.
       #
+      # NOTE Inspiration for this DSL design comes from https://corcoran.io/2013/09/04/simple-pattern-ruby-dsl/
+      #
       # Returns nothing
       def use_dsl
         if self.name.nil_or_empty?
