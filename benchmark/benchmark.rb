@@ -25,6 +25,8 @@ To get the best results under MRI, tune Ruby using environment variables as foll
 
 Asciidoctor starts with ~ 12,500 objects, adds ~ 300,000 each run, so tune RUBY_GC_HEAP_* accordingly
 
+See http://globaldev.co.uk/2014/05/ruby-2-1-in-detail/#gc-tuning-environment-variables
+
 Execute Ruby using the `--disable=gems` flag to speed up the initial load time, as shown below:
 
  $ ruby --disable=gems ...
