@@ -674,6 +674,18 @@ module Asciidoctor
       end
       result << %(</#{info_tag_prefix}info>)
 
+      if doc.doctype == 'manpage'
+        result << %(<refmeta>)
+        result << %(<refentrytitle>#{doc.attr 'mantitle'}</refentrytitle>) if doc.attr? 'mantitle'
+        result << %(<manvolnum>#{doc.attr 'manvolnum'}</manvolnum>) if doc.attr? 'manvolnum'
+
+        result << %(</refmeta>
+<refnamediv>)
+        result << %(<refname>#{doc.attr 'mantitle'}</refname>) if doc.attr? 'mantitle'
+        result << %(<refpurpose>#{doc.attr 'manpurpose'}</refpurpose>) if doc.attr? 'manpurpose'
+        result << %(</refnamediv>)
+      end
+
       result * EOL
     end
 
