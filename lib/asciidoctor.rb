@@ -651,6 +651,7 @@ module Asciidoctor
     #   * Foo
     #   - Foo
     #
+    # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
     UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5})#{CG_BLANK}+(.*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
@@ -666,6 +667,7 @@ module Asciidoctor
     #   I. Foo (upperroman)
     #
     # NOTE leading space match is not always necessary, but is used for list reader
+    # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
     OrderedListRx = /^#{CG_BLANK}*(\.{1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}+(.*)$/
 
     # Matches the ordinals for each type of ordered list.
@@ -720,6 +722,7 @@ module Asciidoctor
     #
     #   <1> Foo
     #
+    # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
     CalloutListRx = /^<?(\d+)>#{CG_BLANK}+(.*)/
 
     # Matches a callout reference inside literal text.
