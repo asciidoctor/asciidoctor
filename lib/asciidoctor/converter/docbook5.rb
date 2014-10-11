@@ -41,10 +41,18 @@ module Asciidoctor
     alias :embedded :content
 
     def section node
+      doctype = node.document.doctype
       tag_name = if node.special
         node.level <= 1 ? node.sectname : 'section'
       else
-        node.document.doctype == 'book' && node.level <= 1 ? (node.level == 0 ? 'part' : 'chapter') : 'section'
+        doctype == 'book' && node.level <= 1 ? (node.level == 0 ? 'part' : 'chapter') : 'section'
+      end
+      if doctype == 'manpage'
+        if tag_name.start_with?('sect')
+          tag_name = 'ref' + tag_name
+        elsif tag_name == 'synopsis'
+          tag_name = 'refsynopsisdiv'
+        end
       end
       %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
@@ -669,6 +677,18 @@ module Asciidoctor
         result << %(<orgname>#{doc.attr 'orgname'}</orgname>) if doc.attr? 'orgname'
       end
       result << %(</#{info_tag_prefix}info>)
+
+      if doc.doctype == 'manpage'
+        result << %(<refmeta>)
+        result << %(<refentrytitle>#{doc.attr 'mantitle'}</refentrytitle>) if doc.attr? 'mantitle'
+        result << %(<manvolnum>#{doc.attr 'manvolnum'}</manvolnum>) if doc.attr? 'manvolnum'
+
+        result << %(</refmeta>
+<refnamediv>)
+        result << %(<refname>#{doc.attr 'mantitle'}</refname>) if doc.attr? 'mantitle'
+        result << %(<refpurpose>#{doc.attr 'manpurpose'}</refpurpose>) if doc.attr? 'manpurpose'
+        result << %(</refnamediv>)
+      end
 
       result * EOL
     end

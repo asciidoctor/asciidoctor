@@ -1449,9 +1449,15 @@ section body
 
     test 'docbook45 backend doctype manpage' do
       input = <<-EOS
-= Title
+= asciidoctor(1)
 
-preamble
+== NAME
+
+asciidoctor(1) - Process text
+
+== SYNOPSIS
+
+some text
 
 == First Section
 
@@ -1459,13 +1465,17 @@ section body
       EOS
       result = render_string(input, :attributes => {'backend' => 'docbook45', 'doctype' => 'manpage'})
       assert_xpath '/refentry', result, 1
-      assert_xpath '/refentry/refentryinfo/title[text() = "Title"]', result, 1
-      assert_xpath '/refentry/simpara[text() = "preamble"]', result, 1
-      assert_xpath '/refentry/section', result, 1
-      assert_xpath '/refentry/section[@id = "_first_section"]/title[text() = "First Section"]', result, 1
-      assert_xpath '/refentry/section[@id = "_first_section"]/simpara[text() = "section body"]', result, 1
+      assert_xpath '/refentry/refentryinfo/title[text() = "asciidoctor(1)"]', result, 1
+      assert_xpath '/refentry/refmeta/refentrytitle[text() = "asciidoctor"]', result, 1
+      assert_xpath '/refentry/refmeta/manvolnum[text() = "1"]', result, 1
+      assert_xpath '/refentry/refnamediv/refname[text() = "asciidoctor"]', result, 1
+      assert_xpath '/refentry/refnamediv/refpurpose[text() = "Process text"]', result, 1
+      assert_xpath '/refentry/refsynopsisdiv', result, 1
+      assert_xpath '/refentry/refsynopsisdiv/simpara[text() = "some text"]', result, 1
+      assert_xpath '/refentry/refsection', result, 1
+      assert_xpath '/refentry/refsection[@id = "_first_section"]/title[text() = "First Section"]', result, 1
+      assert_xpath '/refentry/refsection[@id = "_first_section"]/simpara[text() = "section body"]', result, 1
     end
-
 
     test 'docbook45 backend doctype book' do
       input = <<-EOS
@@ -1543,10 +1553,15 @@ section body
 
     test 'docbook5 backend doctype manpage' do
       input = <<-EOS
-= Title
-Author Name
+= asciidoctor(1)
 
-preamble
+== NAME
+
+asciidoctor(1) - Process text
+
+== SYNOPSIS
+
+some text
 
 == First Section
 
@@ -1558,10 +1573,15 @@ section body
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xlink']
       assert_xpath '/xmlns:refentry[@version="5.0"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text() = "Title"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:simpara[text() = "preamble"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:section', result, 1
-      section = xmlnodes_at_xpath('/xmlns:refentry/xmlns:section', result, 1).first
+      assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text() = "asciidoctor(1)"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text() = "asciidoctor"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:manvolnum[text() = "1"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refname[text() = "asciidoctor"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refpurpose[text() = "Process text"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv/xmlns:simpara[text() = "some text"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refsection', result, 1
+      section = xmlnodes_at_xpath('/xmlns:refentry/xmlns:refsection', result, 1).first
       # nokogiri can't make up its mind
       id_attr = section.attribute('id') || section.attribute('xml:id')
       refute_nil id_attr
