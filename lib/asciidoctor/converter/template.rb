@@ -173,6 +173,13 @@ module Asciidoctor
       unless (template = @templates[template_name])
         raise %(Could not find a custom template to handle transform: #{template_name})
       end
+
+      # Slim doesn't include helpers in the template's execution scope such as
+      # HAML, so we must do it ourselves.
+      if defined?(::Slim::Helpers) && template.is_a?(::Slim::Template)
+        node.extend ::Slim::Helpers
+      end
+
       if template_name == 'document'
         (template.render node).strip
       else
