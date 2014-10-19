@@ -196,6 +196,11 @@ module Asciidoctor
             require 'asciidoctor/converter/html5'.to_s
           end
           Html5Converter.new backend, opts
+        when 'manpage'
+          unless defined? ::Asciidoctor::Converter::ManPageConverter
+            require 'asciidoctor/converter/manpage'.to_s
+          end
+          Html5Converter.new backend, opts
         when 'docbook5'
           unless defined? ::Asciidoctor::Converter::DocBook5Converter
             require 'asciidoctor/converter/docbook5'.to_s

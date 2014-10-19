@@ -885,6 +885,8 @@ class Document < AbstractBlock
         new_backend = new_backend[1..-1]
       elsif new_backend.start_with? 'html'
         attrs['htmlsyntax'] = 'html'
+      elsif new_backend.start_with? 'manpage'
+        attrs['htmlsyntax'] = 'html'
       end
       if (resolved_name = BACKEND_ALIASES[new_backend])
         new_backend = resolved_name
