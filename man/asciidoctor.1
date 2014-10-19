@@ -1,26 +1,32 @@
 '\" t
 .\"     Title: asciidoctor
-.\"    Author: Dan Allen
-.\" Generator: Asciidoctor 1.5.0
-.\"      Date: 2014-05-19
+.\"    Author: Dan Allen, Sarah White, Ryan Waldron
+.\" Generator: Asciidoctor 1.5.2.dev
+.\"      Date: 2014-10-01
 .\"    Manual: Asciidoctor Manual
 .\"    Source: Asciidoctor 1.5.0
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2014-08-12" "Asciidoctor 1\&.5\&.0" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2014-10-01" "Asciidoctor 1\&.5\&.0" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .nh
 .ad l
+
+.SH "NAME"
+asciidoctor \- converts AsciiDoc source files to HTML, DocBook and other formats
 .SH "SYNOPSIS"
 .sp
-\fBasciidoctor\fR [\fIOPTION\fR]... \fIFILE\fR...
+\fBasciidoctor\fR [\fIOPTION\fR]\&... \fIFILE\fR\&...
+.sp
 .SH "DESCRIPTION"
 .sp
 The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fR to HTML5, DocBook 4\&.5, DocBook 5\&.0 and other custom output formats\&.
 .sp
 If \fIFILE\fR is \fI\-\fR then the AsciiDoc source is read from standard input\&.
+.sp
 .SH "OPTIONS"
+.sp
 .SS "Security Settings"
 .PP
 \fB\-B, \-\-base\-dir\fR=\fIDIR\fR
@@ -46,6 +52,7 @@ Define, override or delete a document attribute\&. Command\-line attributes take
 \fIATTRIBUTE\fR is normally formatted as a key\-value pair, in the form \fINAME=VALUE\fR\&. Alternate acceptable forms are \fINAME\fR (where the \fIVALUE\fR defaults to an empty string), \fINAME!\fR (unassigns the \fINAME\fR attribute) and \fINAME=VALUE@\fR (where \fIVALUE\fR does not override value of \fINAME\fR attribute if it\(cqs already defined in the source document)\&. Values containing spaces should be enclosed in quotes\&.
 .sp
 This option may be specified more than once\&.
+.sp
 .RE
 .PP
 \fB\-b, \-\-backend\fR=\fIBACKEND\fR
@@ -101,6 +108,7 @@ A directory containing custom render templates that override one or more templat
 If there is a subfolder that matches the engine name (if specified), that folder is appended to the template directory path\&. Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path\&.
 .sp
 This option may be specified more than once\&. Matching templates found in subsequent directories override ones previously discovered\&.
+.sp
 .RE
 .SS "Processing Information"
 .PP
@@ -135,7 +143,7 @@ Show the help message\&.
 Print program version number\&.
 .RE
 .SH "EXIT STATUS"
-.PP
+.sp
 \fB0\fR
 .RS 4
 Success
@@ -148,11 +156,13 @@ Failure (syntax or usage error; configuration error; document processing failure
 .SH "BUGS"
 .sp
 See the \fBAsciidoctor\fR issue tracker: <\fBhttps://github\&.com/asciidoctor/asciidoctor/issues?q=is%3Aopen\fR>
+.sp
 .SH "AUTHORS"
 .sp
 \fBAsciidoctor\fR was written by Dan Allen, Ryan Waldron, Jason Porter, Nick Hengeveld and other contributors\&.
 .sp
 \fBAsciiDoc\fR was written by Stuart Rackham and has received contributions from many other individuals\&.
+.sp
 .SH "RESOURCES"
 .sp
 Git source repository on GitHub: <\fBhttps://github\&.com/asciidoctor/asciidoctor\fR>
@@ -162,10 +172,14 @@ Project web site: <\fBhttp://asciidoctor\&.org\fR>
 GitHub organization: <\fBhttps://github\&.com/asciidoctor\fR>
 .sp
 Discussion list / forum: <\fBhttp://discuss\&.asciidoctor\&.org\fR>
+.sp
 .SH "COPYING"
 .sp
 Copyright (C) 2012\-2014 Dan Allen, Ryan Waldron and the Asciidoctor Project\&. Free use of this software is granted under the terms of the MIT License\&.
-.SH "AUTHOR"
+.sp
+.SH "AUTHOR(S)"
 .PP
-\fBDan Allen\fR
+\fBDan Allen, Sarah White, Ryan Waldron\fR
+.RS 4
+Author(s).
 .RE
