@@ -267,6 +267,8 @@ module Asciidoctor
         if ext_name == 'slim'
           # slim doesn't get loaded by Tilt, so we have to load it explicitly
           Helpers.require_library 'slim' unless defined? ::Slim
+          # load include plugin
+          Helpers.require_library 'slim/include', false unless defined? ::Slim::Include
         elsif ext_name == 'erb'
           template_class, extra_engine_options = (eruby_loaded ||= load_eruby @eruby)
         end
