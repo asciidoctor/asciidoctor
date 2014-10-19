@@ -1,7 +1,7 @@
 module Asciidoctor
-  # A built-in {Converter} implementation that generates HTML 5 output
-  # consistent with the html5 backend from AsciiDoc Python.
-  class Converter::Html5Converter < Converter::BuiltIn
+  # A built-in {Converter} implementation that generates Troff Manpage output
+  # consistent with the a2x tool from AsciiDoc Python.
+  class Converter::ManPageConverter < Converter::BuiltIn
     QUOTE_TAGS = {
       :emphasis    => ['\fI',      '\fR',       true],
       :strong      => ['\fB',      '\fR',       true],

@@ -243,6 +243,8 @@ module Asciidoctor
     'docbook' => '.xml',
     'pdf' => '.pdf',
     'epub' => '.epub',
+    # FIXME: manpage extension is dependent of the manpage section it belongs to
+    'manpage' => '.1',
     'asciidoc' => '.adoc'
   }
 
