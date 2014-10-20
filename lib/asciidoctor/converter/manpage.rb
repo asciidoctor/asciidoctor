@@ -35,18 +35,25 @@ module Asciidoctor
       else
         str = str.tr_s("\n\t ", ' ')
       end
-      str = str
-          .gsub(/\./, '\\\&.')
-          .gsub('-', '\\-')
-          .gsub('&lt;', '<')
-          .gsub('&gt;', '>')
-          .gsub('&#8201;&#8212;&#8201;', ' \\(em ')
-          .gsub('&#8203;', '')
-          .gsub('&#8212;', '\\-\\-')
-          .gsub('&#8217;', '\\(cq')
-          .gsub('&#8230;', '\\\&...')
-          .gsub('\'', '\\*(Aq')
-          .rstrip + (append_newline ? "\n" : '')
+      str
+        .gsub(/\./, '\\\&.')
+        .gsub('-', '\\-')
+        .gsub('&lt;', '<')
+        .gsub('&gt;', '>')
+        .gsub('&#169;', '\\(co')
+        .gsub('&#174;', '\\(rg')
+        .gsub('&#8482;', '\\(tm')
+        .gsub('&#8201;', ' ') #.gsub('&#8201;&#8212;&#8201;', ' \\(em ')
+        .gsub('&#8203;', '')
+        .gsub('&#8212;', '\\-\\-') # .gsub('&#8212;', '\\(em')
+        .gsub('&#8230;', '...') #.gsub('&#8230;', '\\\&...')
+        .gsub('&#8217;', '\\(cq')
+        .gsub('&#8592;', '\\(<-')
+        .gsub('&#8594;', '\\(->')
+        .gsub('&#8656;', '\\(lA')
+        .gsub('&#8658;', '\\(rA')
+        .gsub('\'', '\\(aq')
+        .rstrip + (append_newline ? EOL : '')
     end
 
     def document node
@@ -253,78 +260,18 @@ Your browser does not support the audio tag.
 
     def dlist node
       result = []
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-
-      classes = case node.style
-      when 'qanda'
-        ['qlist', 'qanda', node.role]
-      when 'horizontal'
-        ['hdlist', node.role]
-      else
-        ['dlist', node.style, node.role]
-      end.compact
-
-      result << %(.SS #{node.title}) if node.title?
-      case node.style
-      when 'qanda'
-        result << '<ol>'
-        node.items.each do |terms, dd|
-          result << '<li>'
-          [*terms].each do |dt|
-            result << %(\\fI#{manify dt.text false}\\fR)
-          end
-          if dd
-            result << %(#{manify dd.text false}) if dd.text?
-            result << dd.content if dd.blocks?
-          end
-          result << '</li>'
+      counter = 0
+      node.items.each do |terms, dd|
+        counter += 1
+        [*terms].each do |dt|
+          result << %(#{manify dt.text}.RS 4)
         end
-        result << '</ol>'
-      when 'horizontal'
-        slash = @void_element_slash
-        result << '<table>'
-        if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
-          result << '<colgroup>'
-          col_style_attribute = (node.attr? 'labelwidth') ? %( style="width: #{(node.attr 'labelwidth').chomp '%'}%;") : nil
-          result << %(<col#{col_style_attribute}#{slash}>)
-          col_style_attribute = (node.attr? 'itemwidth') ? %( style="width: #{(node.attr 'itemwidth').chomp '%'}%;") : nil
-          result << %(<col#{col_style_attribute}#{slash}>)
-          result << '</colgroup>'
-        end
-        node.items.each do |terms, dd|
-          result << '<tr>'
-          result << %(<td class="hdlist1#{(node.option? 'strong') ? ' strong' : nil}">)
-          terms_array = [*terms]
-          last_term = terms_array[-1]
-          terms_array.each do |dt|
-            result << %(#{manify dt.text false} dt text)
-            result << %(<br#{slash}>) if dt != last_term
-          end
-          result << '</td>'
-          result << '<td class="hdlist2">'
-          if dd
-            result << %(#{manify dd.text false} dd text) if dd.text?
-            result << dd.content if dd.blocks?
-          end
-          result << '</td>'
-          result << '</tr>'
-        end
-        result << '</table>'
-      else
-        dt_style_attribute = node.style ? nil : ' class="hdlist1"'
-        counter = 0
-        node.items.each do |terms, dd|
-          counter += 1
-          [*terms].each do |dt|
-            result << %(#{manify dt.text}.RS 4)
-          end
-          if dd
-            result << %(#{manify dd.text, false}) if dd.text?
-            result << '.sp' if dd.text? && dd.blocks?
-            result << %(#{dd.content}) if dd.blocks?
-            result << ".RE"
-            result << ".PP" unless node.items.size == counter
-          end
+        if dd
+          result << %(#{manify dd.text, false}) if dd.text?
+          result << '.sp' if dd.text? && dd.blocks?
+          result << %(#{dd.content}) if dd.blocks?
+          result << ".RE"
+          result << ".PP" unless node.items.size == counter
         end
       end
 
@@ -503,13 +450,7 @@ Your browser does not support the audio tag.
     end
 
     def paragraph node
-      if node.title?
-        %(<div class="title">#{node.title}</div>
-#{manify node.content}
-</div>)
-      else
-        %(#{manify node.content}.sp)
-      end
+      %(#{manify node.content}.sp)
     end
 
     def preamble node
@@ -658,52 +599,19 @@ Your browser does not support the audio tag.
     end
 
     def ulist node
-      result = []
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      div_classes = ['ulist', node.style, node.role].compact
-      marker_checked = nil
-      marker_unchecked = nil
-      if (checklist = node.option? 'checklist')
-        div_classes.insert 1, 'checklist'
-        ul_class_attribute = ' class="checklist"'
-        if node.option? 'interactive'
-          if node.document.attr? 'htmlsyntax', 'xml'
-            marker_checked = '<input type="checkbox" data-item-complete="1" checked="checked"/> '
-            marker_unchecked = '<input type="checkbox" data-item-complete="0"/> '
-          else
-            marker_checked = '<input type="checkbox" data-item-complete="1" checked> '
-            marker_unchecked = '<input type="checkbox" data-item-complete="0"> '
-          end
-        else
-          if node.document.attr? 'icons', 'font'
-            marker_checked = '<i class="fa fa-check-square-o"></i> '
-            marker_unchecked = '<i class="fa fa-square-o"></i> '
-          else
-            marker_checked = '&#10003; '
-            marker_unchecked = '&#10063; '
-          end
-        end
-      else
-        ul_class_attribute = node.style ? %( class="#{node.style}") : nil
-      end
-      result << %(<div#{id_attribute} class="#{div_classes * ' '}">)
-      result << %(<div class="title">#{node.title}</div>) if node.title?
-      result << %(<ul#{ul_class_attribute}>)
-
-      node.items.each do |item|
-        result << '<li>'
-        if checklist && (item.attr? 'checkbox')
-          result << %(<p>#{(item.attr? 'checked') ? marker_checked : marker_unchecked}#{item.text}</p>)
-        else
-          result << %(<p>#{item.text}</p>)
-        end
-        result << item.content if item.blocks?
-        result << '</li>'
-      end
-
-      result << '</ul>'
-      result << '</div>'
-      result * EOL
+      node.items.map {|li|
+        %[.sp
+.RS 4
+.ie n \\{\\
+\\h'-04'\\(bu\\h'+03'\\c
+.\\}
+.el \\{\\
+.sp -1
+.IP \\(bu 2.3
+.\\}
+#{manify li.text, false}#{li.blocks? ? li.content : nil}
+.RE]
+      } * EOL
     end
 
     def verse node
@@ -780,27 +688,14 @@ Your browser does not support the video tag.
     def inline_anchor node
       target = node.target
       case node.type
-      when :xref
-        refid = (node.attr 'refid') || target
-        # NOTE we lookup text in converter because DocBook doesn't need this logic
-        text = node.text || (node.document.references[:ids][refid] || %([#{refid}]))
-        # FIXME shouldn't target be refid? logic seems confused here
-        %(<a href="#{target}">#{text}</a>)
-      when :ref
-        %(<a id="#{target}"></a>)
       when :link
-        attrs = []
-        attrs << %( id="#{node.id}") if node.id
-        if (role = node.role)
-          attrs << %( class="#{role}")
+        if target.start_with? 'mailto:'
+          target[7..-1]
+        else
+          target
         end
-        attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
-        attrs << %( target="#{node.attr 'window'}") if node.attr? 'window'
-        %(<a href="#{target}"#{attrs.join}>#{node.text}</a>)
-      when :bibref
-        %(<a id="#{target}"></a>[#{target}])
       else
-        warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
+        target
       end
     end
 
@@ -899,18 +794,18 @@ Your browser does not support the video tag.
     end
 
     def inline_quoted node
-      open, close, is_tag = QUOTE_TAGS[node.type]
-      if (role = node.role)
-        if is_tag
-          quoted_text = %(#{open.chop} class="#{role}">#{node.text}#{close})
-        else
-          quoted_text = %(<span class="#{role}">#{open}#{node.text}#{close}</span>)
-        end
+      case node.type
+      when :emphasis
+        %[\\fI#{node.text}\\fR]
+      when :strong
+        %[\\fB#{node.text}\\fR]
+      when :single
+        %[\\(oq#{node.text}\\(cq]
+      when :double
+        %[\\(lq#{node.text}\\(rq]
       else
-        quoted_text = %(#{open}#{node.text}#{close})
+        node.text
       end
-
-      node.id ? %(<a id="#{node.id}"></a>#{quoted_text}) : quoted_text
     end
 
     def append_boolean_attribute name, xml
