@@ -107,8 +107,11 @@ MathJax.Hub.Config({
       end
 
       unless node.noheader
-        result << %(.SH "#{node.attr 'manname-title'}"
-#{node.attr 'manname'} \\- #{node.attr 'manpurpose'})
+        result << %(.SH "#{node.attr 'manname-title'}")
+        # The next line after the manname and manpurpose is the preamble
+        # Do this to include the title and the preamble in the NAME section.
+        header_manname = (node.attr? 'manname') ? (node.attr 'manname') : header_title.downcase
+        result << %(#{header_manname} \\- #{node.attr 'manpurpose'})
       end
 
       result << %(#{node.content})
@@ -176,45 +179,24 @@ Author(s).
     end
 
     def admonition node
-      id_attr = node.id ? %( id="#{node.id}") : nil
-      name = node.attr 'name'
-      title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-      caption = if node.document.attr? 'icons'
-        if node.document.attr? 'icons', 'font'
-          %(<i class="fa icon-#{name}" title="#{node.caption}"></i>)
-        else
-          %(<img src="#{node.icon_uri name}" alt="#{node.caption}"#{@void_element_slash}>)
-        end
-      else
-        %(<div class="title">#{node.caption}</div>)
-      end
-      %(<div#{id_attr} class="admonitionblock #{name}#{(role = node.role) && " #{role}"}">
-<table>
-<tr>
-<td class="icon">
-#{caption}
-</td>
-<td class="content">
-#{title_element}#{node.content}
-</td>
-</tr>
-</table>
-</div>)
-    end
-
-    def audio node
-      xml = node.document.attr? 'htmlsyntax', 'xml'
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = ['audioblock', node.style, node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
-      title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
-      %(<div#{id_attribute}#{class_attribute}>
-#{title_element}<div class="content">
-<audio src="#{node.media_uri(node.attr 'target')}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}>
-Your browser does not support the audio tag.
-</audio>
-</div>
-</div>)
+      result = []
+      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
+      result << %(.if n \\{\\
+.sp
+.\\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\\fB#{ node.caption }\\fR
+.ps -1
+.br
+#{ manify node.content }
+.sp .5v
+.RE)
+      result * EOL
     end
 
     def colist node
@@ -324,56 +306,36 @@ Your browser does not support the audio tag.
     end
 
     def listing node
-      nowrap = !(node.document.attr? 'prewrap') || (node.option? 'nowrap')
-      if node.style == 'source'
-        if (language = node.attr 'language', nil, false)
-          code_attrs = %( data-lang="#{language}")
-        else
-          code_attrs = nil
-        end
-        case node.document.attr 'source-highlighter'
-        when 'coderay'
-          pre_class = %( class="CodeRay highlight#{nowrap ? ' nowrap' : nil}")
-        when 'pygments'
-          pre_class = %( class="pygments highlight#{nowrap ? ' nowrap' : nil}")
-        when 'highlightjs', 'highlight.js'
-          pre_class = %( class="highlightjs highlight#{nowrap ? ' nowrap' : nil}")
-          code_attrs = %( class="language-#{language}"#{code_attrs}) if language
-        when 'prettify'
-          pre_class = %( class="prettyprint highlight#{nowrap ? ' nowrap' : nil}#{(node.attr? 'linenums') ? ' linenums' : nil}")
-          code_attrs = %( class="language-#{language}"#{code_attrs}) if language
-        when 'html-pipeline'
-          pre_class = language ? %( lang="#{language}") : nil
-          code_attrs = nil
-        else
-          pre_class = %( class="highlight#{nowrap ? ' nowrap' : nil}")
-          code_attrs = %( class="language-#{language}"#{code_attrs}) if language
-        end
-        pre_start = %(<pre#{pre_class}><code#{code_attrs}>)
-        pre_end = '</code></pre>'
-      else
-        pre_start = %(<pre#{nowrap ? ' class="nowrap"' : nil}>)
-        pre_end = '</pre>'
-      end
-
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
-      %(<div#{id_attribute} class="listingblock#{(role = node.role) && " #{role}"}">
-#{title_element}<div class="content">
-#{pre_start}#{node.content}#{pre_end}
-</div>
-</div>)
+      result = []
+      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
+      result << %(.sp
+.if n \\{\\
+.RS 4
+.\\}
+.nf
+#{manify node.content, true, true}
+.fi
+.if n \\{\\
+.RE
+.\\})
+      result * EOL
     end
 
     def literal node
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-      nowrap = !(node.document.attr? 'prewrap') || (node.option? 'nowrap')
-      %(<div#{id_attribute} class="literalblock#{(role = node.role) && " #{role}"}">
-#{title_element}<div class="content">
-<pre#{nowrap ? ' class="nowrap"' : nil}>#{node.content}</pre>
-</div>
-</div>)
+      result = []
+      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
+      result << %(.sp
+.if n \\{\\
+.RS 4
+.\\}
+.nf
+#{manify node.content, true, true}
+.fi
+.if n \\{\\
+.RE
+.\\}
+)
+      result * EOL
     end
 
     def stem node
@@ -394,26 +356,21 @@ Your browser does not support the audio tag.
 
     def olist node
       result = []
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = ['olist', node.style, node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
+      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
 
-      result << %(<div#{id_attribute}#{class_attribute}>)
-      result << %(<div class="title">#{node.title}</div>) if node.title?
-
-      type_attribute = (keyword = node.list_marker_keyword) ? %( type="#{keyword}") : nil
-      start_attribute = (node.attr? 'start') ? %( start="#{node.attr 'start'}") : nil
-      result << %(<ol class="#{node.style}"#{type_attribute}#{start_attribute}>)
-
-      node.items.each do |item|
-        result << '<li>'
-        result << %(<p>#{item.text}</p>)
-        result << item.content if item.blocks?
-        result << '</li>'
+      node.items.each_with_index do |item, idx|
+        result << %(.sp
+.RS 4
+.ie n \\{\\
+\\h'-04' #{idx + 1}.\\h'+01'\\c
+.\\}
+.el \\{\\
+.sp -1
+.IP " #{idx + 1}." 4.2
+.\\}
+#{manify item.text}#{(item.blocks?) ? item.content : ''}
+.RE)
       end
-
-      result << '</ol>'
-      result << '</div>'
       result * EOL
     end
 
@@ -446,7 +403,7 @@ Your browser does not support the audio tag.
     end
 
     def page_break node
-      '<div style="page-break-after: always;"></div>'
+      ''
     end
 
     def paragraph node
@@ -454,18 +411,7 @@ Your browser does not support the audio tag.
     end
 
     def preamble node
-      toc = if (node.attr? 'toc') && (node.attr? 'toc-placement', 'preamble')
-        %(\n<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
-<div id="toctitle">#{node.attr 'toc-title'}</div>
-#{outline node.document}
-</div>)
-      end
-
-      %(<div id="preamble">
-<div class="sectionbody">
-#{node.content}
-</div>#{toc}
-</div>)
+      node.content
     end
 
     def quote node
@@ -506,96 +452,41 @@ Your browser does not support the audio tag.
 
     def table node
       result = []
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = ['tableblock', %(frame-#{node.attr 'frame', 'all'}), %(grid-#{node.attr 'grid', 'all'})]
-      styles = []
-      unless node.option? 'autowidth'
-        if (tablepcwidth = node.attr 'tablepcwidth') == 100
-          classes << 'spread'
-        else
-          styles << %(width: #{tablepcwidth}%;)
-        end
-      end
-      if (role = node.role)
-        classes << role
-      end
-      class_attribute = %( class="#{classes * ' '}")
-      styles << %(float: #{node.attr 'float'};) if node.attr? 'float'
-      style_attribute = styles.empty? ? nil : %( style="#{styles * ' '}")
-
-      result << %(<table#{id_attribute}#{class_attribute}#{style_attribute}>)
-      result << %(<caption class="title">#{node.captioned_title}</caption>) if node.title?
+      result << %(#{node.captioned_title}) if node.title?
       if (node.attr 'rowcount') > 0
-        slash = @void_element_slash
-        result << '<colgroup>'
-        if node.option? 'autowidth'
-          tag = %(<col#{slash}>)
-          node.columns.size.times do
-            result << tag
-          end
-        else
-          node.columns.each do |col|
-            result << %(<col style="width: #{col.attr 'colpcwidth'}%;"#{slash}>)
-          end
-        end
-        result << '</colgroup>'
+        result << %(|#{'=' * 4}\n.br)
         [:head, :foot, :body].select {|tsec| !node.rows[tsec].empty? }.each do |tsec|
-          result << %(<t#{tsec}>)
           node.rows[tsec].each do |row|
-            result << '<tr>'
             row.each do |cell|
               if tsec == :head
                 cell_content = cell.text
               else
                 case cell.style
                 when :asciidoc
-                  cell_content = %(<div>#{cell.content}</div>)
+                  cell_content = %(#{cell.content})
                 when :verse
-                  cell_content = %(<div class="verse">#{cell.text}</div>)
+                  cell_content = %(#{cell.text})
                 when :literal
-                  cell_content = %(<div class="literal"><pre>#{cell.text}</pre></div>)
+                  cell_content = %(#{cell.text})
                 else
                   cell_content = ''
                   cell.content.each do |text|
-                    cell_content = %(#{cell_content}<p class="tableblock">#{text}</p>)
+                    cell_content = %(#{cell_content}#{text})
                   end
                 end
               end
-
-              cell_tag_name = (tsec == :head || cell.style == :header ? 'th' : 'td')
-              cell_class_attribute = %( class="tableblock halign-#{cell.attr 'halign'} valign-#{cell.attr 'valign'}")
-              cell_colspan_attribute = cell.colspan ? %( colspan="#{cell.colspan}") : nil
-              cell_rowspan_attribute = cell.rowspan ? %( rowspan="#{cell.rowspan}") : nil
-              cell_style_attribute = (node.document.attr? 'cellbgcolor') ? %( style="background-color: #{node.document.attr 'cellbgcolor'};") : nil
-              result << %(<#{cell_tag_name}#{cell_class_attribute}#{cell_colspan_attribute}#{cell_rowspan_attribute}#{cell_style_attribute}>#{cell_content}</#{cell_tag_name}>)
+              result << %(| #{cell_content}\n.br)
             end
-            result << '</tr>'
+            if tsec == :foot
+              result << %(.br)
+            else
+              result << %(.sp)
+            end
           end
-          result << %(</t#{tsec}>)
         end
       end
-      result << '</table>'
+      result << %(|#{'=' * 4}\n)
       result * EOL
-    end
-
-    def toc node
-      return '<!-- toc disabled -->' unless (doc = node.document).attr?('toc-placement', 'macro') && doc.attr?('toc')
-
-      if node.id
-        id_attr = %( id="#{node.id}")
-        title_id_attr = %( id="#{node.id}title")
-      else
-        id_attr = ' id="toc"'
-        title_id_attr = ' id="toctitle"'
-      end
-      title = node.title? ? node.title : (doc.attr 'toc-title')
-      levels = (node.attr? 'levels') ? (node.attr 'levels').to_i : nil
-      role = node.role? ? node.role : (doc.attr 'toc-class', 'toc')
-
-      %(<div#{id_attr} class="#{role}">
-<div#{title_id_attr} class="title">#{title}</div>
-#{outline doc, :toclevels => levels}
-</div>)
     end
 
     def ulist node
@@ -615,74 +506,21 @@ Your browser does not support the audio tag.
     end
 
     def verse node
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = ['verseblock', node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
-      title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
+      result = []
+      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
+      title_element = node.title? ? %(\\fB#{node.title}\\fR\n.br) : nil
       attribution = (node.attr? 'attribution') ? (node.attr 'attribution') : nil
       citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
-      if attribution || citetitle
-        cite_element = citetitle ? %(<cite>#{citetitle}</cite>) : nil
-        attribution_text = attribution ? %(&#8212; #{attribution}#{citetitle ? "<br#{@void_element_slash}>\n" : nil}) : nil
-        attribution_element = %(\n<div class="attribution">\n#{attribution_text}#{cite_element}\n</div>)
-      else
-        attribution_element = nil
-      end
 
-      %(<div#{id_attribute}#{class_attribute}>#{title_element}
-<pre class="content">#{node.content}</pre>#{attribution_element}
-</div>)
-    end
-
-    def video node
-      xml = node.document.attr? 'htmlsyntax', 'xml'
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = ['videoblock', node.style, node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
-      title_element = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : nil
-      width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
-      height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
-      case node.attr 'poster'
-      when 'vimeo'
-        start_anchor = (node.attr? 'start') ? "#at=#{node.attr 'start'}" : nil
-        delimiter = '?'
-        autoplay_param = (node.option? 'autoplay') ? "#{delimiter}autoplay=1" : nil
-        delimiter = '&amp;' if autoplay_param
-        loop_param = (node.option? 'loop') ? "#{delimiter}loop=1" : nil
-        %(<div#{id_attribute}#{class_attribute}>#{title_element}
-<div class="content">
-<iframe#{width_attribute}#{height_attribute} src="//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{append_boolean_attribute 'webkitAllowFullScreen', xml}#{append_boolean_attribute 'mozallowfullscreen', xml}#{append_boolean_attribute 'allowFullScreen', xml}></iframe>
-</div>
-</div>)
-      when 'youtube'
-        start_param = (node.attr? 'start') ? "&amp;start=#{node.attr 'start'}" : nil
-        end_param = (node.attr? 'end') ? "&amp;end=#{node.attr 'end'}" : nil
-        autoplay_param = (node.option? 'autoplay') ? '&amp;autoplay=1' : nil
-        loop_param = (node.option? 'loop') ? '&amp;loop=1' : nil
-        controls_param = (node.option? 'nocontrols') ? '&amp;controls=0' : nil
-        # parse video/playlist syntax where playlist is optional
-        target, list = (node.attr 'target').split '/', 2
-        if (list ||= (node.attr 'list'))
-          list_param = %(&amp;list=#{list})
-        else
-          list_param = nil
-        end
-        %(<div#{id_attribute}#{class_attribute}>#{title_element}
-<div class="content">
-<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{target}?rel=0#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}#{list_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
-</div>
-</div>)
-      else
-        poster_attribute = %(#{poster = node.attr 'poster'}).empty? ? nil : %( poster="#{node.media_uri poster}")
-        time_anchor = ((node.attr? 'start') || (node.attr? 'end')) ? %(#t=#{node.attr 'start'}#{(node.attr? 'end') ? ',' : nil}#{node.attr 'end'}) : nil
-        %(<div#{id_attribute}#{class_attribute}>#{title_element}
-<div class="content">
-<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}>
-Your browser does not support the video tag.
-</video>
-</div>
-</div>)
-      end
+      result << %(.sp
+#{title_element}
+.nf
+#{node.content}
+.br
+#{citetitle} #{attribution}
+.fi
+)
+      result * EOL
     end
 
     def inline_anchor node
