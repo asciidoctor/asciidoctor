@@ -735,15 +735,18 @@ module Asciidoctor
     # Matches a callout reference inside literal text.
     # 
     # Examples
-    #   <1> (optionally prefixed by //, # or ;; line comment chars)
+    #   <1> (optionally prefixed by //, #, -- or ;; line comment chars)
     #   <1> <2> (multiple callouts on one line)
     #   <!--1--> (for XML-based languages)
     #
-    # NOTE special characters are already be replaced at this point during conversion to an SGML format
-    CalloutConvertRx = /(?:(?:\/\/|#|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL})/
-    # NOTE (con't) ...but not while scanning
+    # NOTE extract regexps are applied line-by-line, so we can use $ as end-of-line char
+    CalloutExtractRx = /(?:(?:\/\/|#|--|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*$)/
+    CalloutExtractRxt = "(\\\\)?<()(\\d+)>(?=(?: ?\\\\?<\\d+>)*$)"
+    # NOTE special characters have not been replaced when scanning
     CalloutQuickScanRx = /\\?<!?(--|)(\d+)\1>(?=(?: ?\\?<!?\1\d+\1>)*#{CC_EOL})/
-    CalloutScanRx = /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*#{CC_EOL})/
+    # NOTE special characters have already been replaced when converting to an SGML format
+    CalloutSourceRx = /(?:(?:\/\/|#|--|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL})/
+    CalloutSourceRxt = "(\\\\)?&lt;()(\\d+)&gt;(?=(?: ?\\\\?&lt;\\d+&gt;)*#{CC_EOL})"
 
     # A Hash of regexps for lists used for dynamic access.
     ListRxMap = {

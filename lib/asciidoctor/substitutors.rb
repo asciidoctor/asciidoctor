@@ -1105,13 +1105,15 @@ module Substitutors
     text
   end
 
-  # Public: Substitute callout references
+  # Public: Substitute callout source references
   #
   # text - The String text to process
   #
   # Returns the converted String text
   def sub_callouts(text)
-    text.gsub(CalloutConvertRx) {
+    # FIXME cache this dynamic regex
+    callout_rx = (attr? 'line-comment') ? /(?:#{::Regexp.escape(attr 'line-comment')} )?#{CalloutSourceRxt}/ : CalloutSourceRx
+    text.gsub(callout_rx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
@@ -1401,10 +1403,12 @@ module Substitutors
     if process_callouts
       callout_marks = {}
       last = -1
+      # FIXME cache this dynamic regex
+      callout_rx = (attr? 'line-comment') ? /(?:#{::Regexp.escape(attr 'line-comment')} )?#{CalloutExtractRxt}/ : CalloutExtractRx
       # extract callout marks, indexed by line number
       source = source.split(EOL).map {|line|
         lineno = lineno + 1
-        line.gsub(CalloutScanRx) {
+        line.gsub(callout_rx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
