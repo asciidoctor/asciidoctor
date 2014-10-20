@@ -176,7 +176,7 @@ module Asciidoctor
 
       # Slim doesn't include helpers in the template's execution scope such as
       # HAML, so we must do it ourselves.
-      if defined?(::Slim::Helpers) && template.is_a?(::Slim::Template)
+      if (defined? ::Slim::Helpers) && (template.is_a? ::Slim::Template)
         node.extend ::Slim::Helpers
       end
 
@@ -267,8 +267,10 @@ module Asciidoctor
         if ext_name == 'slim'
           # slim doesn't get loaded by Tilt, so we have to load it explicitly
           Helpers.require_library 'slim' unless defined? ::Slim
-          # load include plugin
-          Helpers.require_library 'slim/include', false unless defined? ::Slim::Include
+          # load include plugin when using Slim >= 2.1
+          unless ::Slim::VERSION < '2.1' || (defined? ::Slim::Include)
+            Helpers.require_library 'slim/include', false
+          end
         elsif ext_name == 'erb'
           template_class, extra_engine_options = (eruby_loaded ||= load_eruby @eruby)
         end
