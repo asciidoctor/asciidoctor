@@ -227,5 +227,16 @@ context 'Path Resolver' do
       assert_equal 'master', Asciidoctor::Helpers.rootname('master')
       assert_equal 'docs/master', Asciidoctor::Helpers.rootname('docs/master')
     end
+
+    test 'UriSniffRx should detect URIs' do
+      assert Asciidoctor::UriSniffRx =~ 'http://example.com'
+      assert Asciidoctor::UriSniffRx =~ 'https://example.com'
+      assert Asciidoctor::UriSniffRx =~ 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+    end
+
+    test 'UriSniffRx should not detect an absolute Windows path as a URI' do
+      assert Asciidoctor::UriSniffRx !~ 'c:/sample.adoc'
+      assert Asciidoctor::UriSniffRx !~ 'c:\\sample.adoc'
+    end
   end
 end

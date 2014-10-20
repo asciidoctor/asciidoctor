@@ -1078,7 +1078,9 @@ module Asciidoctor
     #   https://domain
     #   data:info
     #
-    UriSniffRx = %r{^#{CG_ALPHA}[#{CC_ALNUM}.+-]*:/{0,2}}
+    #   not c:/sample.adoc or c:\sample.adoc
+    #
+    UriSniffRx = %r{^#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2}}
 
     # Detects the end of an implicit URI in the text
     #

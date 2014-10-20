@@ -10,6 +10,7 @@ require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
 require 'minitest/autorun'
 require 'socket'
 require 'nokogiri'
+require 'tmpdir'
 
 autoload :FileUtils, 'fileutils'
 autoload :Pathname,  'pathname'
