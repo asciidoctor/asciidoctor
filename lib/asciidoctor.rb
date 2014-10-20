@@ -1342,6 +1342,8 @@ module Asciidoctor
     doc = (options[:parse] == false ? (Document.new lines, options) : (Document.new lines,options).parse)
     timings.record :parse if timings
     doc
+  rescue => e
+    raise e.class, %(asciidoctor: FAILED: #{attributes.fetch 'docfile', '<stdin>'}: Could not parse source, #{e.message})
   end
 
   # Public: Parse the contents of the AsciiDoc source file into an Asciidoctor::Document

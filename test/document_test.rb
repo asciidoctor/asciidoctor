@@ -133,6 +133,14 @@ context 'Document' do
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
     end
 
+    test 'should not load invalid file' do
+      sample_input_path = fixture_path('hello-asciidoctor.pdf')
+      exception = assert_raises ArgumentError do
+        Asciidoctor.load_file(sample_input_path, :safe => Asciidoctor::SafeMode::SAFE)
+      end
+      assert_match(/Could not parse source/, exception.message)
+    end if RUBY_MIN_VERSION_1_9
+
     test 'should load input IO' do
       input = StringIO.new(<<-EOS)
 Document Title
