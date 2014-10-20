@@ -167,11 +167,14 @@ class AbstractBlock < AbstractNode
   #   # => 2
   #
   # Returns nothing.
-  def <<(block)
+  def << block
     # parent assignment pending refactor
     #block.parent = self
     @blocks << block
   end
+
+  # NOTE append alias required for adapting to a Java API
+  alias :append :<<
 
   # Public: Get the Array of child Section objects
   #
