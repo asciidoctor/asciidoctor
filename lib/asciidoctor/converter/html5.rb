@@ -912,7 +912,7 @@ Your browser does not support the audio tag.
         loop_param = (node.option? 'loop') ? "#{delimiter}loop=1" : nil
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{append_boolean_attribute 'webkitAllowFullScreen', xml}#{append_boolean_attribute 'mozallowfullscreen', xml}#{append_boolean_attribute 'allowFullScreen', xml}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
       when 'youtube'
