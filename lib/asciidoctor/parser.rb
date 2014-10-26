@@ -734,8 +734,7 @@ class Parser
               # TODO could assume a floating title when inside a block context
               # FIXME Reader needs to be created w/ line info
               block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
-            elsif !text_only && lines.size > 1 && first_line.start_with?('"') &&
-                lines[-1].start_with?('-- ') && lines[-2].end_with?('"')
+            elsif is_quote(first_line, lines, text_only)
               lines[0] = first_line[1..-1]
               attribution, citetitle = lines.pop[3..-1].split(', ', 2)
               lines.pop while lines[-1].empty?
@@ -775,7 +774,7 @@ class Parser
 
         case block_context
         when :admonition
-          block = build_admonition_block(admonition_name, attributes, block, block_context, document, parent, reader, style, terminator)
+          block = build_admonition_block(admonition_name, attributes, block_context, document, parent, reader, style, terminator)
 
         when :comment
           build_block(block_context, :skip, terminator, parent, reader, attributes)
@@ -785,7 +784,7 @@ class Parser
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :listing, :fenced_code, :source
-          block = build_source_block(attributes, block, block_context, document, parent, reader, style, terminator, this_line)
+          block = build_source_block(attributes, block_context, document, parent, reader, terminator, this_line)
 
         when :literal
           block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
@@ -794,13 +793,13 @@ class Parser
           block = build_block(block_context, :raw, terminator, parent, reader, attributes)
 
         when :stem, :latexmath, :asciimath
-          block = build_expr_block(attributes, block, block_context, document, parent, reader, terminator)
+          block = build_expr_block(attributes, block_context, document, parent, reader, terminator)
 
         when :open, :sidebar
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :table
-          block = build_table_block(attributes, block, parent, reader, terminator)
+          block = build_table_block(attributes, parent, reader, terminator)
 
         when :quote, :verse
           AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
@@ -810,7 +809,7 @@ class Parser
           if block_extensions && (extension = extensions.registered_for_block?(block_context, cloaked_context))
             # TODO pass cloaked_context to extension somehow (perhaps a new instance for each cloaked_context?)
             content_model = extension.config[:content_model]
-            block = build_extension_block(attributes, block, block_context, content_model, default_attrs, extension, parent, reader, terminator)
+            block = build_extension_block(attributes, block_context, content_model, extension, parent, reader, terminator)
             unless block && content_model != :skip
               attributes.clear
               return
@@ -878,25 +877,30 @@ class Parser
     block
   end
 
-  def self.build_admonition_block(admonition_name, attributes, block, block_context, document, parent, reader, style, terminator)
-    attributes['name'] = admonition_name = style.downcase
-    attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
-    block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+  def self.is_quote(first_line, lines, text_only)
+    !text_only && lines.size > 1 && first_line.start_with?('"') &&
+        lines[-1].start_with?('-- ') && lines[-2].end_with?('"')
   end
 
-  def self.build_extension_block(attributes, block, block_context, content_model, default_attrs, extension, parent, reader, terminator)
+  def self.build_admonition_block(admonition_name, attributes, block_context, document, parent, reader, style, terminator)
+    attributes['name'] = admonition_name = style.downcase
+    attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
+    build_block(block_context, :compound, terminator, parent, reader, attributes)
+  end
+
+  def self.build_extension_block(attributes, block_context, content_model, extension, parent, reader, terminator)
     if content_model != :skip
-      if !(pos_attrs = extension.config[:pos_attrs] || []).empty?
+      unless (pos_attrs = extension.config[:pos_attrs] || []).empty?
         AttributeList.rekey(attributes, [nil].concat(pos_attrs))
       end
       if (default_attrs = extension.config[:default_attrs])
         default_attrs.each { |k, v| attributes[k] ||= v }
       end
     end
-    block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
+    build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
   end
 
-  def self.build_table_block(attributes, block, parent, reader, terminator)
+  def self.build_table_block(attributes, parent, reader, terminator)
     cursor = reader.cursor
     block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), cursor
     case terminator.chr
@@ -905,10 +909,10 @@ class Parser
       when ':'
         attributes['format'] = 'dsv'
     end
-    block = next_table(block_reader, parent, attributes)
+    next_table(block_reader, parent, attributes)
   end
 
-  def self.build_expr_block(attributes, block, block_context, document, parent, reader, terminator)
+  def self.build_expr_block(attributes, block_context, document, parent, reader, terminator)
     if block_context == :stem
       attributes['style'] = if (explicit_stem_syntax = attributes[2])
                               explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
@@ -918,12 +922,12 @@ class Parser
                               default_stem_syntax
                             end
     end
-    block = build_block(:stem, :raw, terminator, parent, reader, attributes)
+    build_block(:stem, :raw, terminator, parent, reader, attributes)
   end
 
-  def self.build_source_block(attributes, block, block_context, document, parent, reader, style, terminator, this_line)
+  def self.build_source_block(attributes, block_context, document, parent, reader, terminator, this_line)
     if block_context == :fenced_code
-      style = attributes['style'] = 'source'
+      attributes['style'] = 'source'
       language, linenums = this_line[3..-1].split(',', 2)
       if language && !(language = language.strip).empty?
         attributes['language'] = language
@@ -940,11 +944,11 @@ class Parser
         end
       end
     end
-    return build_block(:listing, :verbatim, terminator, parent, reader, attributes)
+    build_block(:listing, :verbatim, terminator, parent, reader, attributes)
   end
 
   def self.read_line_block(break_at_list, reader)
-    return reader.read_lines_until(
+    reader.read_lines_until(
         :break_on_blank_lines => true,
         :break_on_list_continuation => true,
         :preserve_last_line => true,
