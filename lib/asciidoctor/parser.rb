@@ -1432,26 +1432,13 @@ class Parser
           # list item will throw off the exit from it
           if LiteralParagraphRx =~ this_line
             reader.unshift_line this_line
-            buffer.concat reader.read_lines_until(
-                :preserve_last_line => true,
-                :break_on_blank_lines => true,
-                :break_on_list_continuation => true) {|line|
-              # we may be in an indented list disguised as a literal paragraph
-              # so we need to make sure we don't slurp up a legitimate sibling
-              list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
-            }
+            read_dlist(buffer, list_type, reader, sibling_trait)
             continuation = :inactive
           # let block metadata play out until we find the block
           elsif BlockTitleRx =~ this_line || BlockAttributeLineRx =~ this_line || AttributeEntryRx =~ this_line
             buffer << this_line
           else
-            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| ListRxMap[ctx] =~ this_line }
-              within_nested_list = true
-              if nested_list_type == :dlist && $~[3].nil_or_empty?
-                # get greedy again
-                has_text = false
-              end
-            end
+            has_text, within_nested_list = handle_nested_list(this_line, has_text, within_nested_list)
             buffer << this_line
             continuation = :inactive
           end
@@ -1486,14 +1473,7 @@ class Parser
               # NOTE we have to check for indented list items first
               elsif LiteralParagraphRx =~ this_line
                 reader.unshift_line this_line
-                buffer.concat reader.read_lines_until(
-                    :preserve_last_line => true,
-                    :break_on_blank_lines => true,
-                    :break_on_list_continuation => true) {|line|
-                  # we may be in an indented list disguised as a literal paragraph
-                  # so we need to make sure we don't slurp up a legitimate sibling
-                  list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
-                }
+                read_dlist(buffer, list_type, reader, sibling_trait)
               else
                 break
               end
@@ -1506,13 +1486,7 @@ class Parser
           end
         else
           has_text = true if !this_line.empty?
-          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| ListRxMap[ctx] =~ this_line }
-            within_nested_list = true
-            if nested_list_type == :dlist && $~[3].nil_or_empty?
-              # get greedy again
-              has_text = false
-            end
-          end
+          has_text, within_nested_list = handle_nested_list(this_line, has_text, within_nested_list)
           buffer << this_line
         end
       end
@@ -1536,6 +1510,29 @@ class Parser
     #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
 
     buffer
+  end
+
+  def self.handle_nested_list(this_line, has_text, within_nested_list)
+    nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect { |ctx| ListRxMap[ctx] =~ this_line }
+    if nested_list_type
+      within_nested_list = true
+      if nested_list_type == :dlist && $~[3].nil_or_empty?
+        # get greedy again
+        has_text = false
+      end
+    end
+    return has_text, within_nested_list
+  end
+
+  def self.read_dlist(buffer, list_type, reader, sibling_trait)
+    buffer.concat reader.read_lines_until(
+                      :preserve_last_line => true,
+                      :break_on_blank_lines => true,
+                      :break_on_list_continuation => true) { |line|
+      # we may be in an indented list disguised as a literal paragraph
+      # so we need to make sure we don't slurp up a legitimate sibling
+      list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
+    }
   end
 
   # Internal: Initialize a new Section object and assign any attributes provided
@@ -1729,26 +1726,14 @@ class Parser
         (match = AtxSectionRx.match(line1))
       sect_level = single_line_section_level match[1]
       sect_title = match[2]
-      if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
-        if anchor_match[2].nil?
-          sect_title = anchor_match[1]
-          sect_id = anchor_match[3]
-          sect_reftext = anchor_match[4]
-        end
-      end
+      sect_id, sect_reftext, sect_title = handle_section(sect_title)
     elsif Compliance.underline_style_section_titles
       if (line2 = reader.peek_line(true)) && SECTION_LEVELS.has_key?(line2.chr) && line2 =~ SetextSectionLineRx &&
         (name_match = SetextSectionTitleRx.match(line1)) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
         sect_title = name_match[1]
-        if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
-          if anchor_match[2].nil?
-            sect_title = anchor_match[1]
-            sect_id = anchor_match[3]
-            sect_reftext = anchor_match[4]
-          end
-        end
+        sect_id, sect_reftext, sect_title = handle_section(sect_title)
         sect_level = section_level line2
         single_line = false
         reader.advance
@@ -1758,6 +1743,17 @@ class Parser
       sect_level += document.attr('leveloffset', 0).to_i
     end
     [sect_id, sect_reftext, sect_title, sect_level, single_line]
+  end
+
+  def self.handle_section(sect_title)
+    if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
+      if anchor_match[2].nil?
+        sect_title = anchor_match[1]
+        sect_id = anchor_match[3]
+        sect_reftext = anchor_match[4]
+      end
+    end
+    return sect_id, sect_reftext, sect_title
   end
 
   # Public: Calculate the number of unicode characters in the line, excluding the endline
@@ -2377,12 +2373,7 @@ class Parser
         if m[2]
           # make this an operation
           colspec, rowspec = m[2].split '.'
-          if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
-            spec['halign'] = Table::ALIGNMENTS[:h][colspec]
-          end
-          if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
-            spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
-          end
+          parse_col_row_spec(colspec, rowspec, spec)
         end
 
         # to_i permits us to support percentage width by stripping the %
@@ -2456,12 +2447,7 @@ class Parser
     
     if m[3]
       colspec, rowspec = m[3].split '.'
-      if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
-        spec['halign'] = Table::ALIGNMENTS[:h][colspec]
-      end
-      if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
-        spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
-      end
+      parse_col_row_spec(colspec, rowspec, spec)
     end
 
     if m[4] && Table::TEXT_STYLES.has_key?(m[4])
@@ -2469,6 +2455,15 @@ class Parser
     end
 
     [spec, rest]
+  end
+
+  def self.parse_col_row_spec(colspec, rowspec, spec)
+    if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
+      spec['halign'] = Table::ALIGNMENTS[:h][colspec]
+    end
+    if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
+      spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
+    end
   end
 
   # Public: Parse the first positional attribute and assign named attributes
