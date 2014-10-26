@@ -397,10 +397,7 @@ class Parser
     # check for option to find list item text only
     # if skipped a line, assume a list continuation was
     # used and block content is acceptable
-    if (text_only = options[:text]) && skipped > 0
-      options.delete(:text)
-      text_only = false
-    end
+    text_only = is_text_only(options, skipped)
     
     parse_metadata = options.fetch(:parse_metadata, true)
     #parse_sections = options.fetch(:parse_sections, false)
@@ -490,13 +487,7 @@ class Parser
             elsif this_line.end_with?(']') && (match = MediaBlockMacroRx.match(this_line))
               blk_ctx = match[1].to_sym
               block = Block.new(parent, blk_ctx, :content_model => :empty)
-              if blk_ctx == :image
-                posattrs = ['alt', 'width', 'height']
-              elsif blk_ctx == :video
-                posattrs = ['poster', 'width', 'height']
-              else
-                posattrs = []
-              end
+              posattrs = get_posattrs(blk_ctx)
 
               unless !style || explicit_style
                 attributes['alt'] = style if blk_ctx == :image
@@ -875,6 +866,26 @@ class Parser
     end
 
     block
+  end
+
+  def self.get_posattrs(blk_ctx)
+    if blk_ctx == :image
+      posattrs = ['alt', 'width', 'height']
+    elsif blk_ctx == :video
+      posattrs = ['poster', 'width', 'height']
+    else
+      posattrs = []
+    end
+    posattrs
+  end
+
+  def self.is_text_only(options, skipped)
+    text_only = options[:text]
+    if text_only && skipped > 0
+      options.delete(:text)
+      text_only = false
+    end
+    text_only
   end
 
   def self.is_quote(first_line, lines, text_only)
