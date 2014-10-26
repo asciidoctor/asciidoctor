@@ -678,17 +678,7 @@ class Parser
           if style != 'normal' && LiteralParagraphRx =~ this_line
             # So we need to actually include this one in the read_lines group
             reader.unshift_line this_line
-            lines = reader.read_lines_until(
-                :break_on_blank_lines => true,
-                :break_on_list_continuation => true,
-                :preserve_last_line => true) {|line|
-              # a preceding blank line (skipped > 0) indicates we are in a list continuation
-              # and therefore we should not break at a list item
-              # (this won't stop breaking on item of same level since we've already parsed them out)
-              # QUESTION can we turn this block into a lambda or function call?
-              (break_at_list && AnyListRx =~ line) ||
-              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
-            }
+            lines = read_line_block(break_at_list, reader)
 
             reset_block_indent! lines
 
@@ -700,18 +690,7 @@ class Parser
           # a paragraph is contiguous nonblank/noncontinuation lines
           else
             reader.unshift_line this_line
-            lines = reader.read_lines_until(
-                :break_on_blank_lines => true,
-                :break_on_list_continuation => true,
-                :preserve_last_line => true,
-                :skip_line_comments => true) {|line|
-              # a preceding blank line (skipped > 0) indicates we are in a list continuation
-              # and therefore we should not break at a list item
-              # (this won't stop breaking on item of same level since we've already parsed them out)
-              # QUESTION can we turn this block into a lambda or function call?
-              (break_at_list && AnyListRx =~ line) ||
-              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
-            }
+            lines = read_line_block(break_at_list, reader)
 
             # NOTE we need this logic because we've asked the reader to skip
             # line comments, which may leave us w/ an empty buffer if those
@@ -796,9 +775,7 @@ class Parser
 
         case block_context
         when :admonition
-          attributes['name'] = admonition_name = style.downcase
-          attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
-          block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+          block = build_admonition_block(admonition_name, attributes, block, block_context, document, parent, reader, style, terminator)
 
         when :comment
           build_block(block_context, :skip, terminator, parent, reader, attributes)
@@ -808,25 +785,7 @@ class Parser
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :listing, :fenced_code, :source
-          if block_context == :fenced_code
-            style = attributes['style'] = 'source'
-            language, linenums = this_line[3..-1].split(',', 2)
-            if language && !(language = language.strip).empty?
-              attributes['language'] = language
-              attributes['linenums'] = '' if linenums && !linenums.strip.empty?
-            elsif (default_language = document.attributes['source-language'])
-              attributes['language'] = default_language
-            end
-            terminator = terminator[0..2]
-          elsif block_context == :source
-            AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
-            unless attributes.has_key? 'language'
-              if (default_language = document.attributes['source-language'])
-                attributes['language'] = default_language
-              end
-            end
-          end
-          block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
+          block = build_source_block(attributes, block, block_context, document, parent, reader, style, terminator, this_line)
 
         when :literal
           block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
@@ -835,30 +794,13 @@ class Parser
           block = build_block(block_context, :raw, terminator, parent, reader, attributes)
 
         when :stem, :latexmath, :asciimath
-          if block_context == :stem
-            attributes['style'] = if (explicit_stem_syntax = attributes[2])
-              explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
-            elsif (default_stem_syntax = document.attributes['stem']).nil_or_empty?
-              'asciimath'
-            else
-              default_stem_syntax
-            end
-          end
-          block = build_block(:stem, :raw, terminator, parent, reader, attributes)
+          block = build_expr_block(attributes, block, block_context, document, parent, reader, terminator)
 
         when :open, :sidebar
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :table
-          cursor = reader.cursor
-          block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), cursor
-          case terminator.chr
-            when ','
-              attributes['format'] = 'csv'
-            when ':'
-              attributes['format'] = 'dsv'
-          end
-          block = next_table(block_reader, parent, attributes)
+          block = build_table_block(attributes, block, parent, reader, terminator)
 
         when :quote, :verse
           AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
@@ -867,15 +809,8 @@ class Parser
         else
           if block_extensions && (extension = extensions.registered_for_block?(block_context, cloaked_context))
             # TODO pass cloaked_context to extension somehow (perhaps a new instance for each cloaked_context?)
-            if (content_model = extension.config[:content_model]) != :skip
-              if !(pos_attrs = extension.config[:pos_attrs] || []).empty?
-                AttributeList.rekey(attributes, [nil].concat(pos_attrs))
-              end
-              if (default_attrs = extension.config[:default_attrs])
-                default_attrs.each {|k, v| attributes[k] ||= v }
-              end
-            end
-            block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
+            content_model = extension.config[:content_model]
+            block = build_extension_block(attributes, block, block_context, content_model, default_attrs, extension, parent, reader, terminator)
             unless block && content_model != :skip
               attributes.clear
               return
@@ -941,6 +876,86 @@ class Parser
     end
 
     block
+  end
+
+  def self.build_admonition_block(admonition_name, attributes, block, block_context, document, parent, reader, style, terminator)
+    attributes['name'] = admonition_name = style.downcase
+    attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
+    block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+  end
+
+  def self.build_extension_block(attributes, block, block_context, content_model, default_attrs, extension, parent, reader, terminator)
+    if content_model != :skip
+      if !(pos_attrs = extension.config[:pos_attrs] || []).empty?
+        AttributeList.rekey(attributes, [nil].concat(pos_attrs))
+      end
+      if (default_attrs = extension.config[:default_attrs])
+        default_attrs.each { |k, v| attributes[k] ||= v }
+      end
+    end
+    block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
+  end
+
+  def self.build_table_block(attributes, block, parent, reader, terminator)
+    cursor = reader.cursor
+    block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), cursor
+    case terminator.chr
+      when ','
+        attributes['format'] = 'csv'
+      when ':'
+        attributes['format'] = 'dsv'
+    end
+    block = next_table(block_reader, parent, attributes)
+  end
+
+  def self.build_expr_block(attributes, block, block_context, document, parent, reader, terminator)
+    if block_context == :stem
+      attributes['style'] = if (explicit_stem_syntax = attributes[2])
+                              explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
+                            elsif (default_stem_syntax = document.attributes['stem']).nil_or_empty?
+                              'asciimath'
+                            else
+                              default_stem_syntax
+                            end
+    end
+    block = build_block(:stem, :raw, terminator, parent, reader, attributes)
+  end
+
+  def self.build_source_block(attributes, block, block_context, document, parent, reader, style, terminator, this_line)
+    if block_context == :fenced_code
+      style = attributes['style'] = 'source'
+      language, linenums = this_line[3..-1].split(',', 2)
+      if language && !(language = language.strip).empty?
+        attributes['language'] = language
+        attributes['linenums'] = '' if linenums && !linenums.strip.empty?
+      elsif (default_language = document.attributes['source-language'])
+        attributes['language'] = default_language
+      end
+      terminator = terminator[0..2]
+    elsif block_context == :source
+      AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
+      unless attributes.has_key? 'language'
+        if (default_language = document.attributes['source-language'])
+          attributes['language'] = default_language
+        end
+      end
+    end
+    return build_block(:listing, :verbatim, terminator, parent, reader, attributes)
+  end
+
+  def self.read_line_block(break_at_list, reader)
+    return reader.read_lines_until(
+        :break_on_blank_lines => true,
+        :break_on_list_continuation => true,
+        :preserve_last_line => true,
+        :skip_line_comments => true) { |line|
+      # a preceding blank line (skipped > 0) indicates we are in a list continuation
+      # and therefore we should not break at a list item
+      # (this won't stop breaking on item of same level since we've already parsed them out)
+      # QUESTION can we turn this block into a lambda or function call?
+      (break_at_list && AnyListRx =~ line) ||
+          (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
+    }
   end
 
   # Public: Determines whether this line is the start of any of the delimited blocks
