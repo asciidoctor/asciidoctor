@@ -2400,20 +2400,17 @@ class Parser
       # TODO might want to use scan rather than this mega-regexp
       if (m = ColumnSpecRx.match(record))
         spec = {}
-        if m[2]
-          # make this an operation
-          colspec, rowspec = m[2].split '.'
-          parse_col_row_spec(colspec, rowspec, spec)
-        end
+        halign, valign = parse_col_row_spec(m[2])
+        spec['halign'] = halign
+        spec['valign'] = valign
 
         # to_i permits us to support percentage width by stripping the %
         # NOTE this is slightly out of compliance w/ AsciiDoc, but makes way more sense
         spec['width'] = !m[3].nil? ? m[3].to_i : 1
 
         # make this an operation
-        if m[4] && Table::TEXT_STYLES.has_key?(m[4])
-          spec['style'] = Table::TEXT_STYLES[m[4]]
-        end
+        spec['style'] = Table::TEXT_STYLES[m[4]]
+        spec.delete_if { |_, v| v.nil? }
 
         repeat = !m[1].nil? ? m[1].to_i : 1
 
@@ -2474,26 +2471,24 @@ class Parser
         spec['repeatcol'] = colspec unless colspec == 1
       end
     end
-    
-    if m[3]
-      colspec, rowspec = m[3].split '.'
-      parse_col_row_spec(colspec, rowspec, spec)
-    end
 
-    if m[4] && Table::TEXT_STYLES.has_key?(m[4])
-      spec['style'] = Table::TEXT_STYLES[m[4]]
-    end
+    halign, valign = parse_col_row_spec(m[3])
+    spec['halign'] = halign
+    spec['valign'] = valign
+    spec['style'] = Table::TEXT_STYLES[m[4]]
+    spec.delete_if { |_, v| v.nil? }
 
     [spec, rest]
   end
 
-  def self.parse_col_row_spec(colspec, rowspec, spec)
-    if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
-      spec['halign'] = Table::ALIGNMENTS[:h][colspec]
+
+  def self.parse_col_row_spec(value)
+    if value
+      colspec, rowspec = value.split '.'
+      halign = Table::ALIGNMENTS[:h][colspec]
+      valign = Table::ALIGNMENTS[:v][rowspec]
     end
-    if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
-      spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
-    end
+    return halign, valign
   end
 
   # Public: Parse the first positional attribute and assign named attributes
