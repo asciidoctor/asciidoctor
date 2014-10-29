@@ -182,6 +182,8 @@ module Asciidoctor
 
     # Public: Converts an {AbstractNode} using the specified transform along
     # with additional options. Delegates to {#convert} without options by default.
+    # Used by the template-based converter to delegate to the converter for outline.
+    # (see https://github.com/asciidoctor/asciidoctor-backends/blob/master/slim/html5/block_toc.html.slim#L11)
     #
     # node      - The concrete instance of AbstractNode to convert
     # transform - An optional String transform that hints at which transformation
