@@ -1703,6 +1703,37 @@ image::../..//fixtures/./../../fixtures/dot.gif[Dot]
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
+
+    test 'can create reference to block image with caption' do
+      input = <<-EOS
+:xrefstyle: formal
+
+You can see the infamous AsciiDoc tiger in <<tiger>>.
+
+[[tiger]]
+.The AsciiDoc Tiger
+image::images/tiger.png[Tiger]
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath %(//a[@href="#tiger"][text()="Figure 1, #{expand_entity 8220}The AsciiDoc Tiger#{expand_entity 8221}"]), output, 1
+    end
+
+    test 'can create reference to block image with explicit caption' do
+      input = <<-EOS
+:xrefstyle: formal
+
+You can see the infamous AsciiDoc tiger in <<tiger>>.
+
+[[tiger]]
+[reftext="an image of the AsciiDoc tiger"]
+.The AsciiDoc Tiger
+image::images/tiger.png[Tiger]
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//a[@href="#tiger"][text()="an image of the AsciiDoc tiger"]', output, 1
+    end
   end
 
   context 'Media' do
