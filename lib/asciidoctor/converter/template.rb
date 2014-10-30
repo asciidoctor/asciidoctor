@@ -166,9 +166,11 @@ module Asciidoctor
     # template_name - the String name of the template to use, or the value of
     #                 the node_name property on the node if a template name is
     #                 not specified. (optional, default: nil)
+    # opts          - an optional Hash that is passed as local variables to the
+    #                 template. (optional, default: {})
     #
     # Returns the [String] result from rendering the template
-    def convert node, template_name = nil
+    def convert node, template_name = nil, opts = {}
       template_name ||= node.node_name
       unless (template = @templates[template_name])
         raise %(Could not find a custom template to handle transform: #{template_name})
@@ -181,32 +183,10 @@ module Asciidoctor
       end
 
       if template_name == 'document'
-        (template.render node).strip
+        (template.render node, opts).strip
       else
-        (template.render node).chomp
+        (template.render node, opts).chomp
       end
-    end
-
-    # Public: Convert an {AbstractNode} using the named template with the
-    # additional options provided.
-    #
-    # Looks for a template that matches the value of the
-    # {AbstractNode#node_name} property if a template name is not specified.
-    #
-    # node          - the AbstractNode to convert
-    # template_name - the String name of the template to use, or the value of
-    #                 the node_name property on the node if a template name is
-    #                 not specified. (optional, default: nil)
-    # opts          - an optional Hash that is passed as local variables to the
-    #                 template. (optional, default: {})
-    #
-    # Returns the [String] result from rendering the template
-    def convert_with_options node, template_name = nil, opts = {}
-      template_name ||= node.node_name
-      unless (template = @templates[template_name])
-        raise %(Could not find a custom template to handle transform: #{template_name})
-      end
-      (template.render node, opts).chomp
     end
 
     # Public: Checks whether there is a Tilt template registered with the specified name.
