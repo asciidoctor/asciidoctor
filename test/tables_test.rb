@@ -808,6 +808,17 @@ a:b:c
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 3
       assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
     end
+
+    test 'single cell in DSV table should only produce single row' do
+      input = <<-EOS
+:===
+single cell
+:===
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'table td', output, 1
+    end
   end
 
   context 'CSV' do
@@ -883,6 +894,17 @@ asciidoctor -o - -s test.adoc | view -
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 2
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(1) p', output, 1
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(2) .listingblock', output, 1
+    end
+
+    test 'single cell in CSV table should only produce single row' do
+      input = <<-EOS
+,===
+single cell
+,===
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'table td', output, 1
     end
   end
 end
