@@ -244,6 +244,25 @@ module Extensions
   end
   IncludeProcessor::DSL = ProcessorDsl
 
+  # Public: DocinfoProcessors are used to add additionnal `docinfo`
+  # in the source document.
+  #
+  # DocinfoProcessors implementations must extend DocinfoProcessor.
+  class DocinfoProcessor < Processor
+    attr_accessor :pos
+
+    def initialize config = {}
+      super config
+      @pos = @config[:pos] || :header
+    end
+
+    def process document, attributes
+      raise ::NotImplementedError
+    end
+  end
+
+  DocinfoProcessor::DSL = ProcessorDsl
+
   # Public: BlockProcessors are used to handle delimited blocks and paragraphs
   # that have a custom name.
   #
@@ -486,7 +505,7 @@ module Extensions
 
     def initialize groups = {}
       @groups = groups
-      @preprocessor_extensions = @treeprocessor_extensions = @postprocessor_extensions = @include_processor_extensions = nil
+      @preprocessor_extensions = @treeprocessor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions =nil
       @block_extensions = @block_macro_extensions = @inline_macro_extensions = nil
       @document = nil
     end
@@ -723,6 +742,58 @@ module Extensions
     # Returns an [Array] of Extension proxy objects.
     def include_processors
       @include_processor_extensions
+    end
+
+    # Public: Registers an {DocinfoProcessor} with the extension registry to
+    # add additionnal docinfo to the document.
+    #
+    # The DocinfoProcessor may be one of four types:
+    #
+    # * A DocinfoProcessor subclass
+    # * An instance of a DocinfoProcessor subclass
+    # * The String name of a DocinfoProcessor subclass
+    # * A method block (i.e., Proc) that conforms to the DocinfoProcessor contract
+    #
+    # Unless the DocinfoProcessor is passed as the method block, it must be the
+    # first argument to this method.
+    #
+    # Examples
+    #
+    #   # as an DocinfoProcessor subclass
+    #   docinfo_processor MetaRobotsDocinfoProcessor
+    #
+    #   # as an instance of a DocinfoProcessor subclass with an explicit position
+    #   docinfo_processor MetaRobotsDocinfoProcessor.new, :pos => :footer
+    #
+    #   # as a name of a DocinfoProcessor subclass
+    #   docinfo_processor 'MetaRobotsDocinfoProcessor'
+    #
+    #   # as a method block
+    #   docinfo_processor do
+    #     process |document, attributes|
+    #       ...
+    #     end
+    #   end
+    #
+    # Returns the [Extension] stored in the registry that proxies the
+    # instance of this DocinfoProcessor.
+    def docinfo_processor *args, &block
+      add_document_processor :docinfo_processor, args, &block
+    end
+
+    # Public: Checks whether any {DocinfoProcessor} extensions have been registered.
+    #
+    # Returns a [Boolean] indicating whether any DocinfoProcessor extensions are registered.
+    def docinfo_processors?
+      !!@docinfo_processor_extensions
+    end
+
+    # Public: Retrieves the {Extension} proxy objects for all the
+    # DocinfoProcessor instances stored in this registry.
+    #
+    # Returns an [Array] of Extension proxy objects.
+    def docinfo_processors
+      @docinfo_processor_extensions
     end
 
     # Public: Registers a {BlockProcessor} with the extension registry to
