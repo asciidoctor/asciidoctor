@@ -182,6 +182,7 @@ module Asciidoctor
         node.extend ::Slim::Helpers
       end
 
+      # NOTE opts become locals in the template
       if template_name == 'document'
         (template.render node, opts).strip
       else

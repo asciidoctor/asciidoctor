@@ -19,22 +19,18 @@ module Asciidoctor
     # Public: Converts the specified {AbstractNode} using the specified
     # transform and optionally additional options (when not empty).
     #
-    # Note: Method that handles the specified transform *may not* accept the
-    # second argument with additional options. In this case the {ArgumentError}
-    # is raised when the given +opts+ Hash is not empty.
-    # The additional options are currently used only in template-based
-    # converters to render outline node.
+    # CAUTION: Method that handles the specified transform *may not* accept the
+    # second argument with additional options, in which case an {ArgumentError}
+    # is raised if the given +opts+ Hash is not nil. The additional options are
+    # used in template-based backends to access convert helper methods such as
+    # outline.
     #
     # See {Converter#convert} for more details.
     #
     # Returns the [String] result of conversion
     def convert node, transform = nil, opts = {}
       transform ||= node.node_name
-      if opts.empty?
-        send transform, node
-      else
-        send transform, node, opts
-      end
+      opts.empty? ? (send transform, node) : (send transform, node, opts)
     end
 
     alias :handles? :respond_to?

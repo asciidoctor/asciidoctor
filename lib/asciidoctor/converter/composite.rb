@@ -27,9 +27,11 @@ module Asciidoctor
     # Returns the String result returned from the delegate's convert method
     def convert node, transform = nil, opts = {}
       transform ||= node.node_name
-      # QUESTION is there a way we can control whether to use convert or send?
       (converter_for transform).convert node, transform, opts
     end
+
+    # Alias for backward compatibility.
+    alias :convert_with_options :convert
 
     # Public: Retrieve the converter for the specified transform.
     #
