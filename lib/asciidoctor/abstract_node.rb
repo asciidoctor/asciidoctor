@@ -32,6 +32,9 @@ class AbstractNode
       if parent
         @parent = parent
         @document = parent.document
+      else
+        @parent = nil
+        @document = nil
       end
     end
     @context = context
