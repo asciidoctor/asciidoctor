@@ -2333,8 +2333,9 @@ class Parser
 
       skipped = table_reader.skip_blank_lines unless parser_ctx.cell_open?
 
-      if !table_reader.has_more_lines?
-        parser_ctx.close_cell true
+      unless table_reader.has_more_lines?
+        # NOTE may have already closed cell in csv or dsv table (see previous call to parser_ctx.close_cell(true))
+        parser_ctx.close_cell true if parser_ctx.cell_open?
       end
     end
 

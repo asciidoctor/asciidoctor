@@ -486,7 +486,7 @@ class Table::ParserContext
       # TODO perhaps the col_count/linenum logic should be in end_of_row? (or a should_end_row? method)
       close_row if end_of_row? && (@col_count != -1 || @linenum > 0 || (eol && i == repeat))
     end
-    @open_cell = false
+    @cell_open = false
     nil
   end
 
