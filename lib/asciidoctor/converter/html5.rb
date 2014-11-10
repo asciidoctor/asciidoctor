@@ -48,7 +48,7 @@ module Asciidoctor
       result << %(<meta name="author" content="#{node.attr 'authors'}"#{slash}>) if node.attr? 'authors'
       result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
 
-      result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>) 
+      result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
         if (webfonts = node.attr 'webfonts')
           result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400' : webfonts}"#{slash}>)
@@ -505,7 +505,7 @@ Your browser does not support the audio tag.
 
     def image node
       align = (node.attr? 'align') ? (node.attr 'align') : nil
-      float = (node.attr? 'float') ? (node.attr 'float') : nil 
+      float = (node.attr? 'float') ? (node.attr 'float') : nil
       style_attribute = if align || float
         styles = [align ? %(text-align: #{align}) : nil, float ? %(float: #{float}) : nil].compact
         %( style="#{styles * ';'}")
@@ -591,7 +591,7 @@ Your browser does not support the audio tag.
       unless ((equation = node.content).start_with? open) && (equation.end_with? close)
         equation = %(#{open}#{equation}#{close})
       end
-      
+
       %(<div#{id_attribute} class="#{(role = node.role) ? ['stemblock', role] * ' ' : 'stemblock'}">
 #{title_element}<div class="content">
 #{equation}
@@ -733,7 +733,7 @@ Your browser does not support the audio tag.
     end
 
     def table node
-      result = [] 
+      result = []
       id_attribute = node.id ? %( id="#{node.id}") : nil
       classes = ['tableblock', %(frame-#{node.attr 'frame', 'all'}), %(grid-#{node.attr 'grid', 'all'})]
       styles = []
@@ -905,37 +905,60 @@ Your browser does not support the audio tag.
       height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
       case node.attr 'poster'
       when 'vimeo'
-        start_anchor = (node.attr? 'start') ? "#at=#{node.attr 'start'}" : nil
+        start_anchor = (node.attr? 'start', nil, false) ? %(#at=#{node.attr 'start'}) : nil
         delimiter = '?'
-        autoplay_param = (node.option? 'autoplay') ? "#{delimiter}autoplay=1" : nil
+        autoplay_param = (node.option? 'autoplay') ? %(#{delimiter}autoplay=1) : nil
         delimiter = '&amp;' if autoplay_param
-        loop_param = (node.option? 'loop') ? "#{delimiter}loop=1" : nil
+        loop_param = (node.option? 'loop') ? %(#{delimiter}loop=1) : nil
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
 <iframe#{width_attribute}#{height_attribute} src="//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
       when 'youtube'
-        start_param = (node.attr? 'start') ? "&amp;start=#{node.attr 'start'}" : nil
-        end_param = (node.attr? 'end') ? "&amp;end=#{node.attr 'end'}" : nil
+        rel_param_val = (node.option? 'related') ? 1 : 0
+        start_param = (node.attr? 'start', nil, false) ? %(&amp;start=#{node.attr 'start'}) : nil
+        end_param = (node.attr? 'end', nil, false) ? %(&amp;end=#{node.attr 'end'}) : nil
         autoplay_param = (node.option? 'autoplay') ? '&amp;autoplay=1' : nil
         loop_param = (node.option? 'loop') ? '&amp;loop=1' : nil
         controls_param = (node.option? 'nocontrols') ? '&amp;controls=0' : nil
-        # parse video/playlist syntax where playlist is optional
+        # cover both ways of controlling fullscreen option
+        if node.option? 'nofullscreen'
+          fs_param = '&amp;fs=0'
+          fs_attribute = nil
+        else
+          fs_param = nil
+          fs_attribute = append_boolean_attribute 'allowfullscreen', xml
+        end
+        modest_param = (node.option? 'modest') ? '&amp;modestbranding=1' : nil
+        theme_param = (node.attr? 'theme', nil, false) ? %(&amp;theme=#{node.attr 'theme'}) : nil
+        hl_param = (node.attr? 'lang') ? %(&amp;hl=#{node.attr 'lang'}) : nil
+
+        # parse video_id/list_id syntax where list_id (i.e., playlist) is optional
         target, list = (node.attr 'target').split '/', 2
-        if (list ||= (node.attr 'list'))
+        if (list ||= (node.attr 'list', nil, false))
           list_param = %(&amp;list=#{list})
         else
-          list_param = nil
+          # parse dynamic playlist syntax: video_id1,video_id2,...
+          target, playlist = target.split ',', 2
+          if (playlist ||= (node.attr 'playlist', nil, false))
+            # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
+            list_param = %(&amp;playlist=#{playlist})
+          else
+            list_param = nil
+          end
         end
+
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{target}?rel=0#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}#{list_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
 </div>
 </div>)
-      else 
+      else
         poster_attribute = %(#{poster = node.attr 'poster'}).empty? ? nil : %( poster="#{node.media_uri poster}")
-        time_anchor = ((node.attr? 'start') || (node.attr? 'end')) ? %(#t=#{node.attr 'start'}#{(node.attr? 'end') ? ',' : nil}#{node.attr 'end'}) : nil
+        start_t = node.attr 'start', nil, false
+        end_t = node.attr 'end', nil, false
+        time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ',' : nil}#{end_t}) : nil
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
 <video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}>
