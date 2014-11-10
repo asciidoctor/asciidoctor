@@ -156,7 +156,13 @@ module Asciidoctor
 
     # Asciidoctor will allow the id, role and options to be set
     # on blocks using a shorthand syntax (e.g., #idname.rolename%optionname)
+    # Compliance value: false
     define :shorthand_property_syntax, true
+
+    # Asciidoctor will start counting at the following number
+    # when creating a unique id when there is a conflict
+    # Compliance value: 2
+    define :unique_id_start_index, 2
 
     # Asciidoctor will recognize commonly-used Markdown syntax
     # to the degree it does not interfere with existing

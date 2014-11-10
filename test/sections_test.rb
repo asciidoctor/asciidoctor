@@ -114,6 +114,28 @@ text
       assert_equal '_some_section_2', doc.blocks[1].id
     end
 
+    # NOTE test cannot be run in parallel with other tests
+    test 'can set start index of synthetic ids' do
+      old_unique_id_start_index = Asciidoctor::Compliance.unique_id_start_index
+      begin
+        input = <<-EOS
+== Some section
+
+text
+
+== Some section
+
+text
+        EOS
+        Asciidoctor::Compliance.unique_id_start_index = 1
+        doc = document_from_string input
+        assert_equal '_some_section', doc.blocks[0].id
+        assert_equal '_some_section_1', doc.blocks[1].id
+      ensure
+        Asciidoctor::Compliance.unique_id_start_index = old_unique_id_start_index
+      end
+    end
+
     test 'should use specified id and reftext when registering section reference' do
       input = <<-EOS
 [[install,Install Procedure]]
