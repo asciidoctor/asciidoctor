@@ -37,25 +37,56 @@ class Block < AbstractBlock
   #                     how the lines should be processed (:simple, :verbatim, :raw, :empty). (default: :simple)
   #                 * :attributes a Hash of attributes (key/value pairs) to assign to this Block. (default: {})
   #                 * :source a String or Array of raw source for this Block. (default: nil)
+  #
+  # IMPORTANT: If you don't specify the `:subs` option, you must explicitly call
+  # the `lock_in_subs` method to resolve and assign the substitutions to this
+  # block (which are resolved from the `subs` attribute, if specified, or the
+  # default substitutions based on this block's context). If you want to use the
+  # default subs for a block, pass the option `:subs => :default`. You can
+  # override the default subs using the `:default_subs` option.
   #--
   # QUESTION should we store source_data as lines for blocks that have compound content models?
   def initialize parent, context, opts = {}
     super
     @content_model = opts[:content_model] || DEFAULT_CONTENT_MODEL[context]
-    if opts.has_key? :subs
-      # FIXME this is a bit funky
-      # we have to be defensive to avoid lock_in_subs wiping out the override
-      if !(subs = opts[:subs]) || (subs.is_a? ::Array)
-        @subs = subs || []
-        @default_subs = @subs.dup
-        @attributes.delete('subs')
+    if opts.key? :subs
+      # FIXME feels funky; we have to be defensive to get lock_in_subs to honor override
+      # FIXME does not resolve substitution groups inside Array (e.g., [:normal])
+      if (subs = opts[:subs])
+        # e.g., :subs => :defult
+        # subs attribute is honored; falls back to opts[:default_subs], then built-in defaults based on context
+        if subs == :default
+          @default_subs = opts[:default_subs]
+        # e.g., :subs => [:quotes]
+        # subs attribute is not honored
+        elsif ::Array === subs
+          @default_subs = subs.dup
+          @attributes.delete 'subs'
+        # e.g., :subs => :normal or :subs => 'normal'
+        # subs attribute is not honored
+        else
+          @default_subs = nil
+          # interpolation is the fastest way to dup subs as a string
+          @attributes['subs'] = %(#{subs})
+        end
+        # resolve the subs eagerly only if subs option is specified
+        lock_in_subs
+      # e.g., :subs => nil
       else
-        @attributes['subs'] = %(#{subs})
+        @subs = []
+        # prevent subs from being resolved
+        @default_subs = []
+        @attributes.delete 'subs'
       end
+    # defer subs resolution; subs attribute is honored
+    else
+      @subs = []
+      # QUESTION should we honor :default_subs option (i.e., @default_subs = opts[:default_subs])?
+      @default_subs = nil
     end
-    if !(raw_source = opts[:source])
+    if (raw_source = opts[:source]).nil_or_empty?
       @lines = []
-    elsif raw_source.is_a? ::String
+    elsif ::String === raw_source
       @lines = Helpers.normalize_lines_from_string raw_source
     else
       @lines = raw_source.dup
