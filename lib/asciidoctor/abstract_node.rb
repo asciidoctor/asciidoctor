@@ -400,18 +400,27 @@ class AbstractNode
   # This method assumes that the path is safe to read. It checks
   # that the file is readable before attempting to read it.
   #
-  # path            - the String path from which to read the contents
-  # warn_on_failure - a Boolean that controls whether a warning is issued if
-  #                   the file cannot be read
+  # path - the String path from which to read the contents
+  # opts - a Hash of options to control processing (default: {})
+  #        * :warn_on_failure a Boolean that controls whether a warning
+  #          is issued if the file cannot be read (default: false)
+  #        * :normalize a Boolean that controls whether the lines
+  #          are normalized and coerced to UTF-8 (default: false)
   #
   # Returns the [String] content of the file at the specified path, or nil
   # if the file does not exist.
-  def read_asset(path, warn_on_failure = false)
+  def read_asset(path, opts = {})
+    # remap opts for backwards compatibility
+    opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
     if ::File.readable? path
-      # QUESTION should we use strip or rstrip instead of chomp here?
-      ::File.read(path).chomp
+      if opts[:normalize]
+        # QUESTION should we strip content?
+        Helpers.normalize_lines_from_string(::IO.read(path)) * EOL
+      else
+        ::IO.read(path)
+      end
     else
-      warn "asciidoctor: WARNING: file does not exist or cannot be read: #{path}" if warn_on_failure
+      warn %(asciidoctor: WARNING: file does not exist or cannot be read: #{path}) if opts[:warn_on_failure]
       nil
     end
   end
