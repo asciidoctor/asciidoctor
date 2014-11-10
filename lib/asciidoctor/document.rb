@@ -1084,43 +1084,34 @@ class Document < AbstractBlock
     if safe >= SafeMode::SECURE
       ''
     else
-      case pos
-      when :footer
-        qualifier = '-footer'
-      else
-        qualifier = nil
-      end
-      ext = @attributes['outfilesuffix'] if ext.nil?
+      qualifier = (pos == :footer ? '-footer' : nil)
+      ext = @attributes['outfilesuffix'] unless ext
 
       content = nil
 
       docinfo = @attributes.key?('docinfo')
       docinfo1 = @attributes.key?('docinfo1')
       docinfo2 = @attributes.key?('docinfo2')
-      docinfo_filename = "docinfo#{qualifier}#{ext}"
+      docinfo_filename = %(docinfo#{qualifier}#{ext})
       if docinfo1 || docinfo2
         docinfo_path = normalize_system_path(docinfo_filename)
-        content = read_asset(docinfo_path)
-        unless content.nil?
-          # FIXME normalize these lines!
-          content.force_encoding ::Encoding::UTF_8 if FORCE_ENCODING
-          content = sub_attributes(content.split EOL) * EOL
+        # NOTE normalizing the lines is essential if we're performing substitutions
+        if (content = read_asset(docinfo_path, :normalize => true))
+          content = sub_attributes(content)
         end
       end
 
       if (docinfo || docinfo2) && @attributes.key?('docname')
-        docinfo_path = normalize_system_path("#{@attributes['docname']}-#{docinfo_filename}")
-        content2 = read_asset(docinfo_path)
-        unless content2.nil?
-          # FIXME normalize these lines!
-          content2.force_encoding ::Encoding::UTF_8 if FORCE_ENCODING
-          content2 = sub_attributes(content2.split EOL) * EOL
-          content = content.nil? ? content2 : "#{content}#{EOL}#{content2}"
+        docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}))
+        # NOTE normalizing the lines is essential if we're performing substitutions
+        if (content2 = read_asset(docinfo_path, :normalize => true))
+          content2 = sub_attributes(content2)
+          content = content ? %(#{content}#{EOL}#{content2}) : content2
         end
       end
 
-      # to_s forces nil to empty string
-      content.to_s
+      # coerce to string (in case the value is nil)
+      %(#{content})
     end
   end
 
