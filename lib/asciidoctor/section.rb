@@ -96,7 +96,7 @@ class Section < AbstractBlock
         base_id = base_id[1..-1] while base_id.start_with?(sep)
       end
       gen_id = base_id
-      cnt = 2
+      cnt = Compliance.unique_id_start_index
       while @document.references[:ids].has_key? gen_id
         gen_id = "#{base_id}#{sep}#{cnt}"
         cnt += 1
