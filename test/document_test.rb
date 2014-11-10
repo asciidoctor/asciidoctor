@@ -650,6 +650,34 @@ text
       assert_css 'meta[http-equiv="imagetoolbar"]', output, 1
     end
 
+    test 'should include docinfo files for html backend with custom docinfodir' do
+      sample_input_path = fixture_path('basic.asciidoc')
+
+      output = Asciidoctor.convert_file sample_input_path, :to_file => false,
+                                        :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo' => '', 'docinfodir' => 'custom-docinfodir'}
+      assert !output.empty?
+      assert_css 'script[src="bootstrap.js"]', output, 1
+      assert_css 'meta[name="robots"]', output, 0
+
+      output = Asciidoctor.convert_file sample_input_path, :to_file => false,
+                                        :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo1' => '', 'docinfodir' => 'custom-docinfodir'}
+      assert !output.empty?
+      assert_css 'script[src="bootstrap.js"]', output, 0
+      assert_css 'meta[name="robots"]', output, 1
+
+      output = Asciidoctor.convert_file sample_input_path, :to_file => false,
+                                        :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => '', 'docinfodir' => './custom-docinfodir'}
+      assert !output.empty?
+      assert_css 'script[src="bootstrap.js"]', output, 1
+      assert_css 'meta[name="robots"]', output, 1
+
+      output = Asciidoctor.convert_file sample_input_path, :to_file => false,
+                                        :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => '', 'docinfodir' => 'custom-docinfodir/subfolder'}
+      assert !output.empty?
+      assert_css 'script[src="bootstrap.js"]', output, 0
+      assert_css 'meta[name="robots"]', output, 0
+    end
+
     test 'should include docinfo files for docbook backend' do
       sample_input_path = fixture_path('basic.asciidoc')
 
