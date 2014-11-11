@@ -59,14 +59,18 @@ class AbstractNode
   #
   # Returns [Boolean]
   def inline?
+    # :nocov:
     raise ::NotImplementedError
+    # :nocov:
   end
 
   # Public: Returns whether this {AbstractNode} is an instance of {Block}
   #
   # Returns [Boolean]
   def block?
+    # :nocov:
     raise ::NotImplementedError
+    # :nocov:
   end
 
   # Public: Get the value of the specified attribute
