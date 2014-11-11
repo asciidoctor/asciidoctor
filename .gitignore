@@ -8,3 +8,4 @@ pkg/
 /.ruby-version
 /.yardoc/
 /rdoc/
+/shippable/

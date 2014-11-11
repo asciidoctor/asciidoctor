@@ -5,6 +5,8 @@ if RUBY_VERSION < '1.9'
   require 'rubygems'
 end
 
+require 'simplecov' if ENV['COVERAGE'] == 'true'
+
 require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
 
 require 'minitest/autorun'
