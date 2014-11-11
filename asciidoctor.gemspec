@@ -42,7 +42,7 @@ A fast, open source text processor and publishing toolchain, written in Ruby, fo
   s.add_development_dependency 'rake', '~> 10.0.0'
   s.add_development_dependency 'rspec-expectations', '~> 2.14.0'
   s.add_development_dependency 'slim', '~> 2.0.0'
-  s.add_development_dependency 'thread_safe', '~> 0.1.3'
+  s.add_development_dependency 'thread_safe', '~> 0.3.4'
   s.add_development_dependency 'tilt', '~> 2.0.0'
   s.add_development_dependency 'yard', '~> 0.8.7'
   s.add_development_dependency 'yard-tomdoc', '~> 0.7.0'
