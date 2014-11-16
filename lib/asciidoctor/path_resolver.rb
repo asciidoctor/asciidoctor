@@ -406,10 +406,12 @@ class PathResolver
     uri_prefix = nil
 
     unless start.nil_or_empty? || (is_web_root? target)
-      target = %(#{start}#{SLASH}#{target})
       if (target.include? ':') && UriSniffRx =~ target
         uri_prefix = $~[0]
         target = target[uri_prefix.length..-1]
+      else
+        # Don't append start when the target is a URI
+        target = %(#{start}#{SLASH}#{target})
       end
     end
 

@@ -56,6 +56,10 @@ context 'Path Resolver' do
       assert_equal 'http://www.example.com/assets/images', @resolver.web_path('images', 'http://www.example.com/assets')
     end
 
+    test 'target with uri path and default directory' do
+      assert_equal 'file:///home/asciidoctor.css', @resolver.web_path('file:///home/asciidoctor.css', '.')
+    end
+
     test 'normalize target' do
       assert_equal '../images', @resolver.web_path('../images/../images')
     end
