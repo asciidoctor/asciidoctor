@@ -8,7 +8,7 @@ module Asciidoctor
 #   => "<em>This</em> is a &lt;test&gt;"
 class Block < AbstractBlock
 
-  DEFAULT_CONTENT_MODEL = ::Hash.new(:simple).merge({
+  DEFAULT_CONTENT_MODEL = {
     # TODO should probably fill in all known blocks
     :audio => :empty,
     :image => :empty,
@@ -20,7 +20,8 @@ class Block < AbstractBlock
     :pass => :raw,
     :thematic_break => :empty,
     :video => :empty
-  })
+  }
+  DEFAULT_CONTENT_MODEL.default = :simple
 
   # Public: Create alias for context to be consistent w/ AsciiDoc
   alias :blockname :context
