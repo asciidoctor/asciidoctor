@@ -276,11 +276,7 @@ class AbstractNode
   #
   # Returns A String reference for the target media
   def media_uri(target, asset_dir_key = 'imagesdir')
-    if is_uri? target
-      target
-    else
-      normalize_web_path target, (asset_dir_key ? @document.attr(asset_dir_key) : nil)
-    end
+    normalize_web_path target, (asset_dir_key ? @document.attr(asset_dir_key) : nil)
   end
 
   # Public: Construct a URI reference or data URI to the target image.
@@ -305,9 +301,9 @@ class AbstractNode
   def image_uri(target_image, asset_dir_key = 'imagesdir')
     if (doc = @document).safe < SafeMode::SECURE && doc.attr?('data-uri')
       if is_uri?(target_image) ||
-          (asset_dir_key && (images_base = doc.attr(asset_dir_key)) &&
-          is_uri?(images_base) && (target_image = normalize_web_path target_image, images_base))
-        if doc.attr? 'allow-uri-read'
+          (asset_dir_key && (images_base = doc.attr(asset_dir_key)) && is_uri?(images_base) &&
+          (target_image = normalize_web_path(target_image, images_base, false)))
+        if doc.attr?('allow-uri-read')
           generate_data_uri_from_uri target_image, doc.attr?('cache-uri')
         else
           target_image
@@ -315,8 +311,6 @@ class AbstractNode
       else
         generate_data_uri target_image, asset_dir_key
       end
-    elsif is_uri? target_image
-      target_image
     else
       normalize_web_path target_image, (asset_dir_key ? doc.attr(asset_dir_key) : nil)
     end
@@ -433,12 +427,17 @@ class AbstractNode
   #
   # See {PathResolver#web_path} for details.
   #
-  # target - the String target path
-  # start  - the String start (i.e, parent) path (optional, default: nil)
+  # target              - the String target path
+  # start               - the String start (i.e, parent) path (optional, default: nil)
+  # preserve_uri_target - a Boolean indicating whether target should be preserved if contains a URI (default: true)
   #
   # Returns the resolved [String] path 
-  def normalize_web_path(target, start = nil)
-    (@path_resolver ||= PathResolver.new).web_path(target, start)
+  def normalize_web_path(target, start = nil, preserve_uri_target = true)
+    if preserve_uri_target && is_uri?(target)
+      target
+    else
+      (@path_resolver ||= PathResolver.new).web_path target, start
+    end
   end
 
   # Public: Resolve and normalize a secure path from the target and start paths

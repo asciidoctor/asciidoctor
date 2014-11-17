@@ -1082,6 +1082,7 @@ module Asciidoctor
     # Examples
     #   http://domain
     #   https://domain
+    #   file:///path
     #   data:info
     #
     #   not c:/sample.adoc or c:\sample.adoc
