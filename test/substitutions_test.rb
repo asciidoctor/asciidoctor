@@ -1558,6 +1558,55 @@ foo&#8201;&#8212;&#8201;'
       block.lock_in_subs
       assert_equal [:specialcharacters], block.subs
     end
+
+    test 'should not use subs if subs option passed to block constructor is nil' do
+      doc = empty_document
+      block = Asciidoctor::Block.new doc, :paragraph, :source => '*bold* _italic_', :subs => nil, :attributes => {'subs' => 'quotes'}
+      assert block.subs.empty?
+      block.lock_in_subs
+      assert block.subs.empty?
+    end
+
+    test 'should not use subs if subs option passed to block constructor is empty array' do
+      doc = empty_document
+      block = Asciidoctor::Block.new doc, :paragraph, :source => '*bold* _italic_', :subs => [], :attributes => {'subs' => 'quotes'}
+      assert block.subs.empty?
+      block.lock_in_subs
+      assert block.subs.empty?
+    end
+
+    test 'should use subs from subs option passed to block constructor' do
+      doc = empty_document
+      block = Asciidoctor::Block.new doc, :paragraph, :source => '*bold* _italic_', :subs => [:specialcharacters], :attributes => {'subs' => 'quotes'}
+      assert_equal [:specialcharacters], block.subs
+      block.lock_in_subs
+      assert_equal [:specialcharacters], block.subs
+    end
+
+    test 'should use subs from subs attribute if subs option is not passed to block constructor' do
+      doc = empty_document
+      block = Asciidoctor::Block.new doc, :paragraph, :source => '*bold* _italic_', :attributes => {'subs' => 'quotes'}
+      assert block.subs.empty?
+      # in this case, we have to call lock_in_subs to resolve the subs
+      block.lock_in_subs
+      assert_equal [:quotes], block.subs
+    end
+
+    test 'should use subs from subs attribute if subs option passed to block constructor is :default' do
+      doc = empty_document
+      block = Asciidoctor::Block.new doc, :paragraph, :source => '*bold* _italic_', :subs => :default, :attributes => {'subs' => 'quotes'}
+      assert_equal [:quotes], block.subs
+      block.lock_in_subs
+      assert_equal [:quotes], block.subs
+    end
+
+    test 'should use built-in subs if subs option passed to block constructor is :default and subs attribute is absent' do
+      doc = empty_document
+      block = Asciidoctor::Block.new doc, :paragraph, :source => '*bold* _italic_', :subs => :default
+      assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
+      block.lock_in_subs
+      assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
+    end
   end
 
   # TODO move to helpers_test.rb
