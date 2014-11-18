@@ -217,6 +217,9 @@ class Parser
       doctype = parent.doctype
       if has_header || (doctype == 'book' && attributes[1] != 'abstract')
         preamble = intro = Block.new(parent, :preamble, :content_model => :compound)
+        if doctype == 'book' && (parent.attr? 'preface-title')
+          preamble.title = parent.attr 'preface-title'
+        end
         parent << preamble
       end
       section = parent

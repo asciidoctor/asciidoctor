@@ -263,6 +263,7 @@ class Document < AbstractBlock
     #attrs['listing-caption'] = 'Listing'
     attrs['table-caption'] = 'Table'
     attrs['toc-title'] = 'Table of Contents'
+    #attrs['preface-title'] = 'Preface'
     attrs['manname-title'] = 'NAME'
     attrs['untitled-label'] = 'Untitled'
     attrs['version-label'] = 'Version'
