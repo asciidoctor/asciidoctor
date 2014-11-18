@@ -26,7 +26,7 @@ class AttributeList
   BoundaryRxs = {
     '"' => /.*?[^\\](?=")/,
     '\'' => /.*?[^\\](?=')/,
-    ',' => /.*?(?=[ \t]*(,|$))/
+    ',' => /.*?(?=#{CG_BLANK}*(,|$))/
   }
 
   # Public: Regular expressions for unescaping quoted characters
@@ -35,16 +35,16 @@ class AttributeList
     '\'' => /\\'/
   }
 
-  # Public: A regular expression for an attribute name
+  # Public: A regular expression for an attribute name (approx. name token from XML)
   # TODO named attributes cannot contain dash characters
-  NameRx = /[A-Za-z:_][A-Za-z:_\-.]*/
+  NameRx = /#{CG_WORD}[#{CC_WORD}\-.]*/
 
-  BlankRx = /[ \t]+/
+  BlankRx = /#{CG_BLANK}+/
 
   # Public: Regular expressions for skipping blanks and delimiters
   SkipRxs = {
     :blank => BlankRx,
-    ',' => /[ \t]*(,|$)/
+    ',' => /#{CG_BLANK}*(,|$)/
   }
 
   def initialize source, block = nil, delimiter = ','
