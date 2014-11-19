@@ -108,15 +108,16 @@ module Asciidoctor
       end
 
       if node.attr? 'stem'
+        # IMPORTANT to_s calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
         result << %(<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {
-    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath]}],
-    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath]}],
+    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].to_s}],
+    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].to_s}],
     ignoreClass: "nostem|nolatexmath"
   },
   asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath]}],
+    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].to_s}],
     ignoreClass: "nostem|noasciimath"
   }
 });
