@@ -788,6 +788,20 @@ after: {counter:mycounter}
   end
 
   context 'Block attributes' do
+    test 'parses attribute names as name token' do
+      input = <<-EOS
+[normal,foo="bar",_foo="_bar",foo1="bar1",foo-foo="bar-bar",foo.foo="bar.bar"]
+content
+      EOS
+
+      block = block_from_string input
+      assert_equal 'bar', block.attr('foo') 
+      assert_equal '_bar', block.attr('_foo') 
+      assert_equal 'bar1', block.attr('foo1') 
+      assert_equal 'bar-bar', block.attr('foo-foo') 
+      assert_equal 'bar.bar', block.attr('foo.foo') 
+    end
+
     test 'positional attributes assigned to block' do
       input = <<-EOS
 [quote, author, source]
