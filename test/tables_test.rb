@@ -102,6 +102,24 @@ context 'Tables' do
       assert_xpath '/table/tbody/tr/td[2]/p[text()="a | there"]', output, 1
     end
 
+    test 'should treat trailing pipe as an empty cell' do
+      input = <<-EOS
+|====
+|A1 |
+|B1 |B2
+|C1 |C2
+|====
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > tbody > tr', output, 3
+      assert_xpath '/table/tbody/tr[1]/td', output, 2
+      assert_xpath '/table/tbody/tr[1]/td[1]/p[text()="A1"]', output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p', output, 0
+      assert_xpath '/table/tbody/tr[2]/td[1]/p[text()="B1"]', output, 1
+    end
+
     test 'should auto recover with warning if missing leading separator on first cell' do
       input = <<-EOS
 |===
@@ -819,9 +837,45 @@ single cell
       output = render_embedded_string input
       assert_css 'table td', output, 1
     end
+
+    test 'should treat trailing colon as an empty cell' do
+      input = <<-EOS
+:====
+A1:
+B1:B2
+C1:C2
+:====
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > tbody > tr', output, 3
+      assert_xpath '/table/tbody/tr[1]/td', output, 2
+      assert_xpath '/table/tbody/tr[1]/td[1]/p[text()="A1"]', output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p', output, 0
+      assert_xpath '/table/tbody/tr[2]/td[1]/p[text()="B1"]', output, 1
+    end
   end
 
   context 'CSV' do
+
+    test 'should treat trailing comma as an empty cell' do
+      input = <<-EOS
+,====
+A1,
+B1,B2
+C1,C2
+,====
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > tbody > tr', output, 3
+      assert_xpath '/table/tbody/tr[1]/td', output, 2
+      assert_xpath '/table/tbody/tr[1]/td[1]/p[text()="A1"]', output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p', output, 0
+      assert_xpath '/table/tbody/tr[2]/td[1]/p[text()="B1"]', output, 1
+    end
 
     test 'mixed unquoted records and quoted records with escaped quotes, commas and wrapped lines' do
       input = <<-EOS
