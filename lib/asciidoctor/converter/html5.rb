@@ -109,6 +109,9 @@ module Asciidoctor
 
       if node.attr? 'stem'
         # IMPORTANT to_s calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
+        eqnums_val = node.attr 'eqnums', 'none'
+        eqnums_val = 'AMS' if eqnums_val == ''
+        eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
         result << %(<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {
@@ -119,7 +122,8 @@ MathJax.Hub.Config({
   asciimath2jax: {
     delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].to_s}],
     ignoreClass: "nostem|noasciimath"
-  }
+  },
+  TeX: {#{eqnums_opt}}
 });
 </script>
 <script src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
