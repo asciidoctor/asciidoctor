@@ -2314,7 +2314,11 @@ class Parser
             parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
           end
 
-          line = m.post_match
+          if (line = m.post_match) == ''
+            # hack to prevent dropping empty cell found at end of line (see issue #1106)
+            seen = false
+          end
+
           parser_ctx.close_cell
         else
           # no other delimiters to see here
