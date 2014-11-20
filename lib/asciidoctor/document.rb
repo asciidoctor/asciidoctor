@@ -1087,6 +1087,7 @@ class Document < AbstractBlock
     else
       qualifier = (pos == :footer ? '-footer' : nil)
       ext = @attributes['outfilesuffix'] unless ext
+      docinfodir = @attributes['docinfodir']
 
       content = nil
 
@@ -1095,7 +1096,7 @@ class Document < AbstractBlock
       docinfo2 = @attributes.key?('docinfo2')
       docinfo_filename = %(docinfo#{qualifier}#{ext})
       if docinfo1 || docinfo2
-        docinfo_path = normalize_system_path(docinfo_filename)
+        docinfo_path = normalize_system_path(docinfo_filename, docinfodir)
         # NOTE normalizing the lines is essential if we're performing substitutions
         if (content = read_asset(docinfo_path, :normalize => true))
           content = sub_attributes(content)
@@ -1103,7 +1104,7 @@ class Document < AbstractBlock
       end
 
       if (docinfo || docinfo2) && @attributes.key?('docname')
-        docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}))
+        docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}), docinfodir)
         # NOTE normalizing the lines is essential if we're performing substitutions
         if (content2 = read_asset(docinfo_path, :normalize => true))
           content2 = sub_attributes(content2)
