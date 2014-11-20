@@ -457,6 +457,9 @@ text
       output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet' => './custom.css'})
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
       assert_css 'html:root > head > link[rel="stylesheet"][href="./custom.css"]', output, 1
+
+      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet' => 'file:///home/username/custom.css'})
+      assert_css 'html:root > head > link[rel="stylesheet"][href="file:///home/username/custom.css"]', output, 1
     end
 
     test 'should resolve custom stylesheet relative to stylesdir' do

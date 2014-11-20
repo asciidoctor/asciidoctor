@@ -54,7 +54,7 @@ module Asciidoctor
           result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400' : webfonts}"#{slash}>)
         end
         if linkcss
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', '')}"#{slash}>)
+          result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', ''), false}"#{slash}>)
         else
           result << @stylesheets.embed_primary_stylesheet
         end
@@ -73,7 +73,7 @@ module Asciidoctor
           result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base}/font-awesome/4.2.0/css/font-awesome.min.css]}"#{slash}>)
         else
           iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', '')}"#{slash}>)
+          result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
         end
       end
 
@@ -81,7 +81,7 @@ module Asciidoctor
       when 'coderay'
         if (node.attr 'coderay-css', 'class') == 'class'
           if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.coderay_stylesheet_name, (node.attr 'stylesdir', '')}"#{slash}>)
+            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.coderay_stylesheet_name, (node.attr 'stylesdir', ''), false}"#{slash}>)
           else
             result << @stylesheets.embed_coderay_stylesheet
           end
@@ -90,7 +90,7 @@ module Asciidoctor
         if (node.attr 'pygments-css', 'class') == 'class'
           pygments_style = node.attr 'pygments-style'
           if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', '')}"#{slash}>)
+            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', ''), false}"#{slash}>)
           else
             result << (@stylesheets.embed_pygments_stylesheet pygments_style)
           end
