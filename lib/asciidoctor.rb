@@ -1156,6 +1156,7 @@ module Asciidoctor
     'rdquo'      => '&#8221;',
     'wj'         => '&#8288;',
     'brvbar'     => '&#166;',
+    'cpp'        => 'C++',
     'amp'        => '&',
     'lt'         => '<',
     'gt'         => '>'
