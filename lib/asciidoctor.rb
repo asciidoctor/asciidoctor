@@ -1548,11 +1548,9 @@ module Asciidoctor
   end
 
   if RUBY_ENGINE == 'opal'
-    require 'asciidoctor/debug'
     require 'asciidoctor/version'
     require 'asciidoctor/timings'
   else
-    autoload :Debug,   'asciidoctor/debug'
     autoload :VERSION, 'asciidoctor/version'
     autoload :Timings, 'asciidoctor/timings'
   end
