@@ -2,173 +2,155 @@
 Dan Allen; Sarah White; Ryan Waldron
 :doctype: manpage
 :man manual: Asciidoctor Manual
-:man source: Asciidoctor 1.5.0
+:man source: Asciidoctor 1.5.2
 :page-layout: base
 
 == NAME
 
 asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
-
 == SYNOPSIS
 
 *asciidoctor* [_OPTION_]... _FILE_...
 
-
 == DESCRIPTION
 
-The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5,
-DocBook 4.5, DocBook 5.0 and other custom output formats.
+The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5, DocBook 4.5, DocBook 5.0 and other custom output formats.
 
 If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
-
 
 == OPTIONS
 
 === Security Settings
 
 *-B, --base-dir*=_DIR_::
-    Base directory containing the document and resources. Defaults to the
-    directory containing the source file, or the working directory if the
-    source is read from a stream. Can be used as a way to chroot the execution
-    of the program.
+  Base directory containing the document and resources.
+  Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
+  Can be used as a way to chroot the execution of the program.
 
 *-S, --safe-mode*=_SAFE_MODE_::
-    Set safe mode level: _unsafe_, _safe_, _server_ or _secure_. Disables
-    potentially dangerous macros in source files, such as include::[]. If not
-    set, the safe mode level defaults to _unsafe_ when Asciidoctor is invoked
-    using this script.
+  Set safe mode level: _unsafe_, _safe_, _server_ or _secure_.
+  Disables potentially dangerous macros in source files, such as `include::[]`.
+  If not set, the safe mode level defaults to _unsafe_ when Asciidoctor is invoked using this script.
 
 *--safe*::
-    Set safe mode level to _safe_. Enables include macros, but restricts access
-    to ancestor paths of source file. Provided for compatibility with the
-    asciidoc command. If not set, the safe mode level defaults to _unsafe_ when
-    Asciidoctor is invoked using this script.
+  Set safe mode level to _safe_.
+  Enables include macros, but restricts access to ancestor paths of source file.
+  Provided for compatibility with the asciidoc command.
+  If not set, the safe mode level defaults to _unsafe_ when Asciidoctor is invoked using this script.
 
 === Document Settings
 
 *-a, --attribute*=_ATTRIBUTE_::
-    Define, override or delete a document attribute. Command-line attributes
-    take precedence over attributes defined in the source file.
+  Define, override or delete a document attribute.
+  Command-line attributes take precedence over attributes defined in the source file.
 +
 _ATTRIBUTE_ is normally formatted as a key-value pair, in the form _NAME=VALUE_.
-Alternate acceptable forms are _NAME_ (where the _VALUE_ defaults to an empty
-string), _NAME!_ (unassigns the _NAME_ attribute) and _NAME=VALUE@_ (where
-_VALUE_ does not override value of _NAME_ attribute if it's already defined in
-the source document). Values containing spaces should be enclosed in quotes.
+Alternate acceptable forms are _NAME_ (where the _VALUE_ defaults to an empty string), _NAME!_ (unassigns the _NAME_ attribute) and _NAME=VALUE@_ (where _VALUE_ does not override value of _NAME_ attribute if it's already defined in the source document).
+Values containing spaces should be enclosed in quotes.
 +
-This option may be specified more than once. 
+This option may be specified more than once.
 
 *-b, --backend*=_BACKEND_::
-    Backend output file format: _html5_, _docbook45_ and _docbook5_ supported
-    out of the box. You can also use the backend alias names _html_ (aliased to
-    _html5_) or _docbook_ (aliased to _docbook5_). Defaults to _html5_. Other
-    options can be passed, but if Asciidoctor cannot find the backend, it will
-    fail during rendering.
+  Backend output file format: _html5_, _docbook45_ and _docbook5_ supported out of the box.
+  You can also use the backend alias names _html_ (aliased to _html5_) or _docbook_ (aliased to _docbook5_).
+  Defaults to _html5_.
+  Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during conversion.
 
 *-d, --doctype*=_DOCTYPE_::
-    Document type: _article_, _book_, _manpage_ or _inline_. Sets the root
-    element when using the _docbook_ backend and the style class on the HTML
-    body element when using the _html_ backend. The _book_ document type allows
-    multiple level-0 section titles in a single document. The _manpage_ document
-    type enables parsing of metadata necessary to produce a manpage. The
-    _inline_ document type allows the content of a single paragraph to be
-    formatted and returned without wrapping it in a containing element. Defaults
-    to _article_.
+  Document type: _article_, _book_, _manpage_ or _inline_.
+  Sets the root element when using the _docbook_ backend and the style class on the HTML body element when using the _html_ backend.
+  The _book_ document type allows multiple level-0 section titles in a single document.
+  The _manpage_ document type enables parsing of metadata necessary to produce a manpage.
+  The _inline_ document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element.
+  Defaults to _article_.
 
 === Rendering Control
 
 *-C, --compact*::
-    Compact the output by removing blank lines. (No longer in use).
+  Compact the output by removing blank lines.
+  (No longer in use).
 
 *-D, --destination-dir*=_DIR_::
-    Destination output directory. Defaults to the directory containing the
-    source file, or the working directory if the source is read from a stream.
-    If specified, the directory is resolved relative to the working directory.
+  Destination output directory.
+  Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
+  If specified, the directory is resolved relative to the working directory.
 
 *-E, --template-engine*=_NAME_::
-    Template engine to use for the custom render templates. The gem with the
-    same name as the engine will be loaded automatically. This name is also
-    used to build the full path to the custom templates. If a template engine
-    is not specified, it will be auto-detected based on the file extension
-    of the custom templates found.
+  Template engine to use for the custom converter templates.
+  The gem with the same name as the engine will be loaded automatically.
+  This name is also used to build the full path to the custom converter templates.
+  If a template engine is not specified, it will be auto-detected based on the file extension of the custom converter templates found.
 
 *-e, --eruby*::
-    Specifies the eRuby implementation to use for rendering the custom ERB
-    templates. Supported values are _erb_ and _erubis_. Defaults to _erb_.
+  Specifies the eRuby implementation to use for executing the custom converter templates written in ERB.
+  Supported values are _erb_ and _erubis_.
+  Defaults to _erb_.
 
 *-n, --section-numbers*::
-    Auto-number section titles. Synonym for *--attribute numbered*.
+  Auto-number section titles.
+  Synonym for *--attribute numbered*.
 
 *-o, --out-file*=_OUT_FILE_::
-    Write output to file _OUT_FILE_. Defaults to the base name of the input
-    file suffixed with _backend_ extension. If the input is read from standard
-    input, then the output file defaults to stdout. If _OUT_FILE_ is _-_ then
-    the standard output is also used. If specified, the file is resolved
-    relative to the working directory.
+  Write output to file _OUT_FILE_.
+  Defaults to the base name of the input file suffixed with _backend_ extension.
+  If the input is read from standard input, then the output file defaults to stdout.
+  If _OUT_FILE_ is _-_ then the standard output is also used.
+  If specified, the file is resolved relative to the working directory.
 
 *-s, --no-header-footer*::
-    Suppress the document header and footer in the output.
+  Suppress the document header and footer in the output.
 
 *-T, --template-dir*=_DIR_::
-    A directory containing custom render templates that override one or more
-    templates from the built-in set. (requires _tilt_ gem)
+  A directory containing custom converter templates that override one or more templates from the built-in set.
+  (requires _tilt_ gem)
 +
-If there is a subfolder that matches the engine name (if specified), that folder
-is appended to the template directory path. Similarly, if there is a subfolder
-in the resulting template directory that matches the name of the backend, that
-folder is appended to the template directory path.
+If there is a subfolder that matches the engine name (if specified), that folder is appended to the template directory path.
+Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path.
 +
-This option may be specified more than once. Matching templates found in
-subsequent directories override ones previously discovered.
+This option may be specified more than once.
+Matching templates found in subsequent directories override ones previously discovered.
 
 === Processing Information
 
 *-q, --quiet*::
-    Silence warnings.
+  Silence warnings.
 
 *--trace*::
-    Include backtrace information on errors. Not enabled by default.
+  Include backtrace information on errors.
+  Not enabled by default.
 
 *-v, --verbose*::
-    Verbosely print processing information and configuration file checks to
-    stderr.
+  Verbosely print processing information and configuration file checks to stderr.
 
 *-t, --timings*::
-    Display timings information (time to read, parse and convert)
+  Display timings information (time to read, parse and convert).
 
 === Program Information
 
 *-h, --help*::
-    Show the help message.
+  Show the help message.
 
 *-V, --version*::
-    Print program version number.
-
+  Print program version number.
 
 == EXIT STATUS
 
 *0*::
-    Success
+  Success.
 
 *1*::
-    Failure (syntax or usage error; configuration error; document processing
-    failure; unexpected error).
-
+  Failure (syntax or usage error; configuration error; document processing failure; unexpected error).
 
 == BUGS
 
 See the *Asciidoctor* issue tracker: <**https://github.com/asciidoctor/asciidoctor/issues?q=is%3Aopen**>
 
-
 == AUTHORS
 
-*Asciidoctor* was written by Dan Allen, Ryan Waldron, Jason Porter, Nick
-Hengeveld and other contributors.
+*Asciidoctor* was written by Dan Allen, Ryan Waldron, Jason Porter, Nick Hengeveld and other contributors.
 
-*AsciiDoc* was written by Stuart Rackham and has received contributions from
-many other individuals.
-
+*AsciiDoc* was written by Stuart Rackham and has received contributions from many other individuals.
 
 == RESOURCES
 
@@ -180,10 +162,9 @@ GitHub organization: <**https://github.com/asciidoctor**>
 
 Discussion list / forum: <**http://discuss.asciidoctor.org**>
 
-
 == COPYING
 
-Copyright \(C) 2012-2014 Dan Allen, Ryan Waldron and the Asciidoctor Project. Free use of this
-software is granted under the terms of the MIT License.
+Copyright \(C) 2012-2014 Dan Allen, Ryan Waldron and the Asciidoctor Project.
+Free use of this software is granted under the terms of the MIT License.
 
 // vim: tw=80
