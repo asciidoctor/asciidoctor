@@ -17,8 +17,6 @@ require 'tmpdir'
 autoload :FileUtils, 'fileutils'
 autoload :Pathname,  'pathname'
 
-ENV['SUPPRESS_DEBUG'] ||= 'true'
-
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
 RE_DOCTYPE = /\s*<!DOCTYPE (.*)/
 

@@ -1134,7 +1134,6 @@ class Parser
     else
       list_block.level = 1
     end
-    #Debug.debug { "Created #{list_type} block: #{list_block}" }
 
     while reader.has_more_lines? && (match = ListRxMap[list_type].match(reader.peek_line))
       marker = resolve_list_marker(list_type, match[1])

@@ -1031,14 +1031,6 @@ module Substitutors
         #else
         #  reftext = "[#{id}]"
         #end
-        if @document.references[:ids].has_key? id
-          # reftext may not match since inline substitutions have been applied
-          #if reftext != @document.references[:ids][id]
-          #  Debug.debug { "Mismatched reference for anchor #{id}" }
-          #end
-        else
-          Debug.debug { "Missing reference for anchor #{id}" }
-        end
         Inline.new(self, :anchor, reftext, :type => :ref, :target => id).convert
       }
     end
