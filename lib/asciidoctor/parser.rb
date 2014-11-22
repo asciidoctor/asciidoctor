@@ -2110,6 +2110,8 @@ class Parser
     end
 
     if accessible && attrs
+      # NOTE lookup resolved value (resolution occurs inside set_attribute)
+      value = doc.attributes[name] if value
       Document::AttributeEntry.new(name, value).save_to(attrs)
     end
 
