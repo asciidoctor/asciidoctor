@@ -235,7 +235,7 @@ class Document < AbstractBlock
     @callouts = Callouts.new
     @attributes_modified = ::Set.new
     @options = options
-    @docinfo_processor_extensions = nil
+    @docinfo_processor_extensions = {}
     header_footer = (options[:header_footer] ||= false)
 
     attrs = @attributes
@@ -1070,23 +1070,22 @@ class Document < AbstractBlock
     super
   end
 
-  # Public: Read the docinfo file(s) for inclusion in the
-  # document template
+  # Public: Read the docinfo file(s) for inclusion in the document template
   #
   # If the docinfo1 attribute is set, read the docinfo.ext file. If the docinfo
   # attribute is set, read the doc-name.docinfo.ext file. If the docinfo2
   # attribute is set, read both files in that order.
   #
-  # pos - The Symbol position of the docinfo, either :header or :footer. (default: :header)
-  # ext - The extension of the docinfo file(s). If not set, the extension
-  #       will be determined based on the basebackend. (default: nil)
+  # location - The Symbol location of the docinfo, either :header or :footer. (default: :header)
+  # ext      - The extension of the docinfo file(s). If not set, the extension
+  #            will be determined based on the basebackend. (default: nil)
   #
   # returns The contents of the docinfo file(s)
-  def docinfo(pos = :header, ext = nil)
+  def docinfo(location = :header, ext = nil)
     if safe >= SafeMode::SECURE
       ''
     else
-      qualifier = (pos == :footer ? '-footer' : nil)
+      qualifier = (location == :footer ? '-footer' : nil)
       ext = @attributes['outfilesuffix'] unless ext
       docinfodir = @attributes['docinfodir']
 
@@ -1113,12 +1112,10 @@ class Document < AbstractBlock
         end
       end
 
-      if docinfo_processors? && @docinfo_processor_extensions.find {|candidate| candidate.instance.pos.eql? pos }
-        extension_content = []
-        @docinfo_processor_extensions.each do |candidate|
-          extension_content << candidate.process_method[self, @attributes] if candidate.instance.pos.eql? pos
-        end
-        content = content ? %(#{content}#{EOL}#{extension_content.join(EOL)) : extension_content.join(EOL)
+      # TODO allow document to control whether extension docinfo is contributed
+      if @extensions && docinfo_processors?(location)
+        contentx = @docinfo_processor_extensions[location].map {|candidate| candidate.process_method[self] }.compact * EOL
+        content = content ? %(#{content}#{EOL}#{contentx}) : contentx
       end
 
       # coerce to string (in case the value is nil)
@@ -1126,17 +1123,16 @@ class Document < AbstractBlock
     end
   end
 
-  def docinfo_processors?
-    if !@docinfo_processor_extensions
-      if @document.extensions? && @document.extensions.docinfo_processors?
-        @docinfo_processor_extensions = @document.extensions.docinfo_processors
-        true
-      else
-        @docinfo_processor_extensions = false
-        false
-      end
+  def docinfo_processors?(location = :header)
+    if @docinfo_processor_extensions.key?(location)
+      # false means we already performed a lookup and didn't find any
+      @docinfo_processor_extensions[location] != false
     else
-      @docinfo_processor_extensions != false
+      if @extensions && @document.extensions.docinfo_processors?(location)
+        !!(@docinfo_processor_extensions[location] = @document.extensions.docinfo_processors(location))
+      else
+        @docinfo_processor_extensions[location] = false
+      end
     end
   end
 

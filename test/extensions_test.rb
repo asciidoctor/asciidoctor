@@ -118,13 +118,16 @@ class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
 end
 
 class MetaRobotsDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
-  def process document, attributes
+  def process document
     '<meta name="robots" content="index,follow">'
   end
 end
 
 class MetaAppDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
-  def process document, attributes
+  use_dsl
+  at_location :header
+
+  def process document
     '<meta name="application-name" content="Asciidoctor App">'
   end
 end
@@ -307,6 +310,7 @@ context 'Extensions' do
       registry.docinfo_processor SampleDocinfoProcessor
       registry.activate Asciidoctor::Document.new
       assert registry.docinfo_processors?
+      assert registry.docinfo_processors?(:header)
       extensions = registry.docinfo_processors
       assert_equal 1, extensions.size
       assert extensions.first.is_a? Asciidoctor::Extensions::ProcessorExtension
@@ -671,12 +675,20 @@ sample content
 
       begin
         Asciidoctor::Extensions.register do
-          docinfo_processor MetaRobotsDocinfoProcessor
           docinfo_processor MetaAppDocinfoProcessor
+          docinfo_processor MetaRobotsDocinfoProcessor, :position => :>>
+          docinfo_processor do
+            at_location :footer
+            process do |doc|
+              '<script><!-- analytics code --></script>'
+            end
+          end
         end
 
         doc = document_from_string input, :safe => :server
-        assert_equal '<meta name="robots" content="index,follow"><meta name="application-name" content="Asciidoctor App">', doc.docinfo
+        assert_equal '<meta name="robots" content="index,follow">
+<meta name="application-name" content="Asciidoctor App">', doc.docinfo(:header)
+        assert_equal '<script><!-- analytics code --></script>', doc.docinfo(:footer)
       ensure
         Asciidoctor::Extensions.unregister_all
       end

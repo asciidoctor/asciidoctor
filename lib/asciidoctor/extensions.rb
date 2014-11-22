@@ -111,7 +111,7 @@ module Extensions
     def parse_content parent, content, attributes = {}
       reader = (content.is_a? Reader) ? reader : (Reader.new content)
       while reader.has_more_lines?
-        block = Parser.next_block(reader, parent, attributes)
+        block = Parser.next_block reader, parent, attributes
         parent << block if block
       end
       nil
@@ -244,24 +244,35 @@ module Extensions
   end
   IncludeProcessor::DSL = ProcessorDsl
 
-  # Public: DocinfoProcessors are used to add additionnal `docinfo`
-  # in the source document.
+  # Public: DocinfoProcessors are used to add additional content to
+  # the header and/or footer of the generated document.
+  #
+  # The placement of docinfo content is controlled by the converter.
   #
   # DocinfoProcessors implementations must extend DocinfoProcessor.
+  # If a location is not specified, the DocinfoProcessor is assumed
+  # to add content to the header.
   class DocinfoProcessor < Processor
-    attr_accessor :pos
+    attr_accessor :location
 
     def initialize config = {}
       super config
-      @pos = @config[:pos] || :header
+      @config[:location] ||= :header
     end
 
-    def process document, attributes
+    def process document
       raise ::NotImplementedError
     end
   end
 
-  DocinfoProcessor::DSL = ProcessorDsl
+  module DocinfoProcessorDsl
+    include ProcessorDsl
+
+    def at_location value
+      option :location, value
+    end
+  end
+  DocinfoProcessor::DSL = DocinfoProcessorDsl
 
   # Public: BlockProcessors are used to handle delimited blocks and paragraphs
   # that have a custom name.
@@ -413,7 +424,7 @@ module Extensions
   class InlineMacroProcessor < MacroProcessor
     def initialize name, config = {}
       super
-      @config[:regexp] ||= (resolve_regexp @name, @config[:format])
+      @config[:regexp] ||= resolve_regexp @name, @config[:format]
     end
 
     def resolve_regexp name, format
@@ -469,7 +480,7 @@ module Extensions
 
     def initialize kind, instance, process_method = nil
       super kind, instance, instance.config
-      @process_method = process_method || instance.method(:process)
+      @process_method = process_method || (instance.method :process)
     end
   end
 
@@ -762,16 +773,17 @@ module Extensions
     #   # as an DocinfoProcessor subclass
     #   docinfo_processor MetaRobotsDocinfoProcessor
     #
-    #   # as an instance of a DocinfoProcessor subclass with an explicit position
-    #   docinfo_processor MetaRobotsDocinfoProcessor.new, :pos => :footer
+    #   # as an instance of a DocinfoProcessor subclass with an explicit location
+    #   docinfo_processor JQueryDocinfoProcessor.new, :location => :footer
     #
     #   # as a name of a DocinfoProcessor subclass
     #   docinfo_processor 'MetaRobotsDocinfoProcessor'
     #
     #   # as a method block
     #   docinfo_processor do
-    #     process |document, attributes|
-    #       ...
+    #     process |doc|
+    #       at_location :footer
+    #       'footer content'
     #     end
     #   end
     #
@@ -783,17 +795,37 @@ module Extensions
 
     # Public: Checks whether any {DocinfoProcessor} extensions have been registered.
     #
+    # location - A Symbol for selecting docinfo extensions at a given location (:header or :footer) (default: nil)
+    #
     # Returns a [Boolean] indicating whether any DocinfoProcessor extensions are registered.
-    def docinfo_processors?
-      !!@docinfo_processor_extensions
+    def docinfo_processors? location = nil
+      if @docinfo_processor_extensions
+        if location
+          @docinfo_processor_extensions.find {|ext| ext.config[:location] == location }
+        else
+          true
+        end
+      else
+        false
+      end
     end
 
     # Public: Retrieves the {Extension} proxy objects for all the
     # DocinfoProcessor instances stored in this registry.
     #
+    # location - A Symbol for selecting docinfo extensions at a given location (:header or :footer) (default: nil)
+    #
     # Returns an [Array] of Extension proxy objects.
-    def docinfo_processors
-      @docinfo_processor_extensions
+    def docinfo_processors location = nil
+      if @docinfo_processor_extensions
+        if location
+          @docinfo_processor_extensions.select {|ext| ext.config[:location] == location }
+        else
+          @docinfo_processor_extensions
+        end
+      else
+        nil
+      end
     end
 
     # Public: Registers a {BlockProcessor} with the extension registry to
