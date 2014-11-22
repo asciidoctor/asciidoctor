@@ -235,6 +235,7 @@ class Document < AbstractBlock
     @callouts = Callouts.new
     @attributes_modified = ::Set.new
     @options = options
+    @docinfo_processor_extensions = nil
     header_footer = (options[:header_footer] ||= false)
 
     attrs = @attributes
@@ -1112,8 +1113,29 @@ class Document < AbstractBlock
         end
       end
 
+      extension_content = ''
+      if docinfo_processors? && @docinfo_processor_extensions.find {|candidate| candidate.instance.pos.eql? pos }
+        @docinfo_processor_extensions.each {|candidate|
+          extension_content += candidate.process_method[self, @attributes] if candidate.instance.pos.eql? pos
+        }
+      end
+
       # coerce to string (in case the value is nil)
-      %(#{content})
+      %(#{content}) + extension_content
+    end
+  end
+
+  def docinfo_processors?
+    if !@docinfo_processor_extensions
+      if @document.extensions? && @document.extensions.docinfo_processors?
+        @docinfo_processor_extensions = @document.extensions.docinfo_processors
+        true
+      else
+        @docinfo_processor_extensions = false
+        false
+      end
+    else
+      @docinfo_processor_extensions != false
     end
   end
 
