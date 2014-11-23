@@ -467,9 +467,10 @@ class AbstractNode
   # parent references resolved and self references removed. If a jail is provided,
   # this path will be guaranteed to be contained within the jail.
   def normalize_system_path target, start = nil, jail = nil, opts = {}
+    path_resolver = (@path_resolver ||= PathResolver.new)
     if (doc = @document).safe < SafeMode::SAFE
       if start
-        start = ::File.join doc.base_dir, start unless (@path_resolver ||= PathResolver.new).is_root? start
+        start = ::File.join doc.base_dir, start unless path_resolver.is_root? start
       else
         start = doc.base_dir
       end
@@ -477,7 +478,7 @@ class AbstractNode
       start = doc.base_dir unless start
       jail = doc.base_dir unless jail
     end
-    (@path_resolver ||= PathResolver.new).system_path target, start, jail, opts
+    path_resolver.system_path target, start, jail, opts
   end
 
   # Public: Normalize the asset file or directory to a concrete and rinsed path
