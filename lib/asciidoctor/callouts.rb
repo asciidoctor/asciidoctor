@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
 # Public: Maintains a catalog of callouts and their associations.
 class Callouts

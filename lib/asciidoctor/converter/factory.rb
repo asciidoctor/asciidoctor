@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
   module Converter
     # A factory for instantiating converters that are used to convert a
