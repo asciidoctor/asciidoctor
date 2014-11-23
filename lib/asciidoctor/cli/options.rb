@@ -134,9 +134,7 @@ Example: asciidoctor -b html5 source.asciidoc
           end
 
           opts.on_tail('-V', '--version', 'display the version and runtime environment (or -v if no other flags or arguments)') do
-            $stdout.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
-            $stdout.puts %(Runtime Environment (#{RUBY_DESCRIPTION}))
-            return 0
+            return print_version $stdout
           end
           
         end
@@ -146,9 +144,7 @@ Example: asciidoctor -b html5 source.asciidoc
         
         if args.empty?
           if self[:verbose] == 2
-            $stdout.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
-            $stdout.puts %(Runtime Environment (#{RUBY_DESCRIPTION}))
-            return 0
+            return print_version $stdout
           else
             $stderr.puts opts_parser
             return 1
@@ -237,6 +233,19 @@ Example: asciidoctor -b html5 source.asciidoc
         $stderr.puts %(asciidoctor: #{$!.message})
         $stdout.puts opts_parser
         return 1
+      end
+
+      def print_version os = $stdout
+        os.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
+        if RUBY_VERSION >= '1.9.3'
+          encoding_info = {'lc' => 'locale', 'fs' => 'filesystem', 'in' => 'internal', 'ex' => 'external'}.map do |k,v|
+            %(#{k}:#{Encoding.find(v) || '-'})
+          end
+          os.puts %(Runtime Environment (#{RUBY_DESCRIPTION}) (#{encoding_info * ' '}))
+        else
+          os.puts %(Runtime Environment (#{RUBY_DESCRIPTION}))
+        end
+        0
       end
     end
   end
