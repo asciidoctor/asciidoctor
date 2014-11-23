@@ -108,7 +108,8 @@ context 'Invoker' do
         invoke_cli [switch]
         actual = out.string.rstrip
       end
-      assert_equal expected, actual, %(Expected to print version when using #{switch} switch)
+      refute_nil actual
+      assert actual.start_with?(expected), %(Expected to print version when using #{switch} switch)
     end
   end
 
