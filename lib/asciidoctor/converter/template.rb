@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
   # A {Converter} implementation that uses templates composed in template
   # languages supported by {https://github.com/rtomayko/tilt Tilt} to convert

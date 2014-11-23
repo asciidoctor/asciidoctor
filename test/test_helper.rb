@@ -1,3 +1,4 @@
+# encoding: UTF-8
 ASCIIDOCTOR_PROJECT_DIR = File.dirname File.dirname(__FILE__)
 Dir.chdir ASCIIDOCTOR_PROJECT_DIR
 

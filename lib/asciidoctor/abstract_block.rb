@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
 class AbstractBlock < AbstractNode
   # Public: The types of content that this block can accomodate

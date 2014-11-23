@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
 module Helpers
   # Internal: Require the specified library using Kernel#require.

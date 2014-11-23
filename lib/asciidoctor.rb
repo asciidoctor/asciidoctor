@@ -1,3 +1,4 @@
+# encoding: UTF-8
 RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
 RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
 RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
