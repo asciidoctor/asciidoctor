@@ -77,7 +77,7 @@ context 'Options' do
   end
 
   test 'should allow safe mode to be specified' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-S safe /dev/null))
+    options = Asciidoctor::Cli::Options.parse!(%w(-S safe test/fixtures/sample.asciidoc))
     assert_equal Asciidoctor::SafeMode::SAFE, options[:safe]
   end
 
