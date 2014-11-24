@@ -1430,8 +1430,8 @@ module Asciidoctor
       write_to_target = stream_output ? false : to_file
     end
 
-    if !options.key?(:header_footer) && (write_to_same_dir || write_to_target)
-      options[:header_footer] = true
+    unless options.key? :header_footer
+      options[:header_footer] = true if write_to_same_dir || write_to_target
     end
 
     doc = self.load input, options
