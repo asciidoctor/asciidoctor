@@ -349,7 +349,7 @@ class Document < AbstractBlock
       else
         # a value ending in @ indicates this attribute does not override
         # an attribute with the same key in the document souce
-        if (val.is_a? ::String) && (val.end_with? '@')
+        if ::String === val && (val.end_with? '@')
           val = val.chop
           verdict = true
         end
@@ -406,16 +406,20 @@ class Document < AbstractBlock
       attrs['stylesdir'] ||= '.'
       attrs['iconsdir'] ||= ::File.join(attrs.fetch('imagesdir', './images'), 'icons')
 
-      @extensions = if initialize_extensions
-        registry = if (ext_registry = options[:extensions_registry])
-          if (ext_registry.is_a? Extensions::Registry) ||
-              (::RUBY_ENGINE_JRUBY && (ext_registry.is_a? ::AsciidoctorJ::Extensions::ExtensionRegistry))
-            ext_registry
+      if initialize_extensions
+        if (registry = options[:extensions_registry])
+          if Extensions::Registry === registry || (::RUBY_ENGINE_JRUBY &&
+              ::AsciidoctorJ::Extensions::ExtensionRegistry === registry)
+            # take it as it is
+          else
+            registry = Extensions::Registry.new
           end
-        elsif (ext_block = options[:extensions]).is_a? ::Proc
-          Extensions.build_registry(&ext_block)
+        elsif ::Proc === (ext_block = options[:extensions])
+          registry = Extensions.build_registry(&ext_block)
+        else
+          registry = Extensions::Registry.new
         end
-        (registry ||= Extensions::Registry.new).activate self
+        @extensions = registry.activate self
       end
 
       @reader = PreprocessorReader.new self, data, Reader::Cursor.new(attrs['docfile'], @base_dir)
@@ -507,7 +511,7 @@ class Document < AbstractBlock
   #
   # returns the next value in the sequence according to the current value's type
   def nextval(current)
-    if current.is_a?(::Integer)
+    if ::Integer === current
       current + 1
     else
       intval = current.to_i
@@ -522,7 +526,7 @@ class Document < AbstractBlock
   def register(type, value)
     case type
     when :ids
-      if value.is_a?(::Array)
+      if ::Array === value
         @references[:ids][value[0]] = (value[1] || '[' + value[0] + ']')
       else
         @references[:ids][value] = '[' + value + ']'
@@ -905,7 +909,7 @@ class Document < AbstractBlock
       attrs['backend'] = new_backend
       attrs[%(backend-#{new_backend})] = ''
       # (re)initialize converter
-      if (@converter = create_converter).is_a? Converter::BackendInfo
+      if Converter::BackendInfo === (@converter = create_converter)
         new_basebackend = @converter.basebackend
         attrs['outfilesuffix'] = @converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
         new_filetype = @converter.filetype
@@ -977,10 +981,10 @@ class Document < AbstractBlock
       converter_opts[:template_engine_options] = @options[:template_engine_options]
       converter_opts[:eruby] = @options[:eruby]
     end
-    converter_factory = if (converter = @options[:converter])
-      Converter::Factory.new ::Hash[backend, converter]
+    if (converter = @options[:converter])
+      converter_factory = Converter::Factory.new ::Hash[backend, converter]
     else
-      Converter::Factory.default false
+      converter_factory = Converter::Factory.default false
     end
     # QUESTION should we honor the convert_opts?
     # QUESTION should we pass through all options and attributes too?
@@ -1032,7 +1036,7 @@ class Document < AbstractBlock
   # If the converter responds to :write, delegate the work of writing the file
   # to that method. Otherwise, write the output the specified file.
   def write output, target
-    if @converter.is_a? Writer
+    if Writer === @converter
       @converter.write output, target
     else
       if target.respond_to? :write
