@@ -1282,15 +1282,15 @@ module Asciidoctor
 
     attributes = options[:attributes] = if !(attrs = options[:attributes])
       {}
-    elsif (attrs.is_a? ::Hash) || (::RUBY_ENGINE_JRUBY && (attrs.is_a? ::Java::JavaUtil::Map))
+    elsif ::Hash === attrs || (::RUBY_ENGINE_JRUBY && ::Java::JavaUtil::Map === attrs)
       attrs.dup
-    elsif attrs.is_a? ::Array
+    elsif ::Array === attrs
       attrs.inject({}) do |accum, entry|
         k, v = entry.split '=', 2
         accum[k] = v || ''
         accum
       end
-    elsif attrs.is_a? ::String
+    elsif ::String === attrs
       # convert non-escaped spaces into null character, so we split on the
       # correct spaces chars, and restore escaped spaces
       capture_1 = ::RUBY_ENGINE_OPAL ? '$1' : '\1'
@@ -1314,11 +1314,11 @@ module Asciidoctor
     end
 
     lines = nil
-    if input.is_a? ::File
-      lines = input.readlines
+    if ::File === input
+      # TODO cli checks if input path can be read and is file, but might want to add check to API
+      input_path = ::File.expand_path input.path
       input_mtime = input.mtime
-      input = ::File.new ::File.expand_path input.path
-      input_path = input.path
+      lines = input.readlines
       # hold off on setting infile and indir until we get a better sense of their purpose
       attributes['docfile'] = input_path
       attributes['docdir'] = ::File.dirname input_path
@@ -1334,12 +1334,12 @@ module Asciidoctor
       rescue
       end
       lines = input.readlines
-    elsif input.is_a? ::String
+    elsif ::String === input
       lines = input.lines.entries
-    elsif input.is_a? ::Array
+    elsif ::Array === input
       lines = input.dup
     else
-      raise ::ArgumentError, %(Unsupported input type: #{input.class})
+      raise ::ArgumentError, %(unsupported input type: #{input.class})
     end
 
     if timings
@@ -1408,7 +1408,7 @@ module Asciidoctor
 
     case to_file
     when true, nil
-      write_to_same_dir = !to_dir && (input.is_a? ::File)
+      write_to_same_dir = !to_dir && ::File === input
       stream_output = false
       write_to_target = to_dir
       to_file = nil
@@ -1491,9 +1491,7 @@ module Asciidoctor
         copy_coderay_stylesheet = (doc.attr? 'source-highlighter', 'coderay') && (doc.attr 'coderay-css', 'class') == 'class'
         copy_pygments_stylesheet = (doc.attr? 'source-highlighter', 'pygments') && (doc.attr 'pygments-css', 'class') == 'class'
         if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet
-          outdir = doc.attr('outdir')
-          stylesoutdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir,
-              doc.safe >= SafeMode::SAFE ? outdir : nil)
+          stylesoutdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir, doc.safe >= SafeMode::SAFE ? outdir : nil)
           Helpers.mkdir_p stylesoutdir if mkdirs
 
           if copy_asciidoctor_stylesheet
