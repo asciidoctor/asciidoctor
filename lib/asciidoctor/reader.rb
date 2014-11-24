@@ -709,10 +709,10 @@ class PreprocessorReader < Reader
           @conditional_stack.pop
           @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
         else
-          warn "asciidoctor: ERROR: #{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]"
+          warn %(asciidoctor: ERROR: #{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[])
         end
       else
-        warn "asciidoctor: ERROR: #{line_info}: unmatched macro: endif::#{target}[]"
+        warn %(asciidoctor: ERROR: #{line_info}: unmatched macro: endif::#{target}[])
       end
       return true
     end
@@ -859,7 +859,7 @@ class PreprocessorReader < Reader
         # include file is resolved relative to dir of current include, or base_dir if within original docfile
         include_file = @document.normalize_system_path(target, @dir, nil, :target_name => 'include file')
         unless ::File.file? include_file
-          warn "asciidoctor: WARNING: #{line_info}: include file not found: #{include_file}"
+          warn %(asciidoctor: WARNING: #{line_info}: include file not found: #{include_file})
           replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
@@ -967,7 +967,7 @@ class PreprocessorReader < Reader
             return true
           end
           unless (missing_tags = tags.to_a - tags_found.to_a).empty?
-            warn "asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{include_file}"
+            warn %(asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{include_file})
           end
           advance
           # FIXME not accounting for skipped lines in reader line numbering
