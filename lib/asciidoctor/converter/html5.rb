@@ -97,7 +97,7 @@ module Asciidoctor
           end
         end
       when 'highlightjs', 'highlight.js'
-        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/8.1)
+        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/8.4)
         result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'github'}.min.css"#{slash}>
 <script src="#{highlightjs_path}/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>)

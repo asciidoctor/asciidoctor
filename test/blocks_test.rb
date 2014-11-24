@@ -1979,7 +1979,7 @@ puts "AsciiDoc, FTW!"
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
       assert_css 'html > head > link[rel="stylesheet"][href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css"]', output, 1
-      assert_css 'html > head > script[src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"]', output, 1
+      assert_css 'html > head > script[src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"]', output, 1
     end
 
     test 'should use no uri scheme for assets when asset-uri-scheme is blank' do
@@ -1996,7 +1996,7 @@ puts "AsciiDoc, FTW!"
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
       assert_css 'html > head > link[rel="stylesheet"][href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css"]', output, 1
-      assert_css 'html > head > script[src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"]', output, 1
+      assert_css 'html > head > script[src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"]', output, 1
     end
   end
 
