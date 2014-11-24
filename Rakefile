@@ -19,7 +19,7 @@ begin
   require 'rake/testtask'
   Rake::TestTask.new(:test) do |test|
     prepare_test_env
-    puts %(LANG: #{ENV['LANG']})
+    puts %(LANG: #{ENV['LANG']}) if ENV.key? 'TRAVIS_BUILD_ID'
     test.libs << 'test'
     test.pattern = 'test/**/*_test.rb'
     test.verbose = true
