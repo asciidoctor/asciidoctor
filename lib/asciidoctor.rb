@@ -99,7 +99,7 @@ module Asciidoctor
 
   # Flags to control compliance with the behavior of AsciiDoc
   module Compliance
-    @keys = [].to_set
+    @keys = ::Set.new
     class << self
       attr :keys
     end

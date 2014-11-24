@@ -892,7 +892,7 @@ class PreprocessorReader < Reader
         elsif attributes.has_key? 'tag'
           tags = [attributes['tag']].to_set
         elsif attributes.has_key? 'tags'
-          tags = attributes['tags'].split(DataDelimiterRx).uniq.to_set
+          tags = attributes['tags'].split(DataDelimiterRx).to_set
         end
       end
       if inc_lines
