@@ -1347,7 +1347,12 @@ module Asciidoctor
       timings.start :parse
     end
 
-    doc = (options[:parse] == false ? (Document.new lines, options) : (Document.new lines,options).parse)
+    if options[:parse] == false
+      doc = Document.new lines, options
+    else
+      doc = (Document.new lines, options).parse
+    end
+
     timings.record :parse if timings
     doc
   rescue => e
