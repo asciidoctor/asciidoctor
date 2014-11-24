@@ -1422,6 +1422,8 @@ module Asciidoctor
       stream_output = false
       write_to_target = false
       to_file = nil
+    when '/dev/null'
+      return self.load input, options
     else
       write_to_same_dir = false
       stream_output = to_file.respond_to? :write
@@ -1434,9 +1436,7 @@ module Asciidoctor
 
     doc = self.load input, options
 
-    if to_file == '/dev/null'
-      return doc
-    elsif write_to_same_dir
+    if write_to_same_dir
       infile = ::File.expand_path input.path
       outfile = ::File.join ::File.dirname(infile), %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
       if outfile == infile
