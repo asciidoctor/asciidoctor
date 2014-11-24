@@ -107,7 +107,7 @@ module Asciidoctor
     # Defines a new compliance key and assigns an initial value.
     def self.define key, value
       if key == :keys || (self.respond_to? key)
-        raise ::ArgumentError, %(Illegal key name: #{key})
+        raise ::ArgumentError, %(illegal key name: #{key})
       end
       instance_variable_set %(@#{key}), value
       class << self; self; end.send :attr_accessor, key
@@ -1356,7 +1356,7 @@ module Asciidoctor
     timings.record :parse if timings
     doc
   rescue => e
-    raise e.class, %(asciidoctor: FAILED: #{attributes.fetch 'docfile', '<stdin>'}: Could not parse source, #{e.message})
+    raise e.class, %(asciidoctor: FAILED: #{attributes.fetch 'docfile', '<stdin>'}: Failed to parse source, #{e.message})
   end
 
   # Public: Parse the contents of the AsciiDoc source file into an Asciidoctor::Document
@@ -1440,7 +1440,7 @@ module Asciidoctor
       infile = ::File.expand_path input.path
       outfile = ::File.join ::File.dirname(infile), %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
       if outfile == infile
-        raise ::IOError, 'Input file and output file are the same!'
+        raise ::IOError, %(input file and output file cannot be the same: #{infile})
       end
       outdir = ::File.dirname outfile
     elsif write_to_target

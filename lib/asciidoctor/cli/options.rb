@@ -50,7 +50,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   'document type to use when converting document: [article, book, manpage, inline] (default: article)') do |doc_type|
             self[:attributes]['doctype'] = doc_type
           end
-          opts.on('-o', '--out-file FILE', 'output file (default: based on input file path); use - to output to STDOUT') do |output_file|
+          opts.on('-o', '--out-file FILE', 'output file (default: based on path of input file); use - to output to STDOUT') do |output_file|
             self[:output_file] = output_file
           end
           opts.on('--safe',
@@ -180,8 +180,12 @@ Example: asciidoctor -b html5 source.asciidoc
         end
 
         infiles.each do |file|
-          unless file == '-' || (::File.readable? file)
-            $stderr.puts %(asciidoctor: FAILED: input file #{file} missing or cannot be read)
+          unless file == '-' || (::File.file? file)
+            if ::File.readable? file
+              $stderr.puts %(asciidoctor: FAILED: input path #{file} is a #{(::File.stat file).ftype}, not a file)
+            else
+              $stderr.puts %(asciidoctor: FAILED: input file #{file} missing or cannot be read)
+            end
             return 1
           end
         end
