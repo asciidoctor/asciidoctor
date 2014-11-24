@@ -134,6 +134,9 @@ class Document < AbstractBlock
   # If the source is a string, defaults to the current directory.
   attr_reader :base_dir
 
+  # Public: Get the Hash of resolved options used to initialize this Document
+  attr_reader :options
+
   # Public: Get a reference to the parent Document of this nested document.
   attr_reader :parent_document
 
@@ -151,6 +154,8 @@ class Document < AbstractBlock
   # data    - The AsciiDoc source data as a String or String Array. (default: nil)
   # options - A Hash of options to control processing (e.g., safe mode value (:safe), backend (:backend),
   #           header/footer toggle (:header_footer), custom attributes (:attributes)). (default: {})
+  #
+  # Duplication of the options Hash is handled in the enclosing API.
   #
   # Examples
   #
@@ -238,6 +243,7 @@ class Document < AbstractBlock
     @options = options
     @docinfo_processor_extensions = {}
     header_footer = (options[:header_footer] ||= false)
+    options.freeze
 
     attrs = @attributes
     attrs['encoding'] = 'UTF-8'
@@ -995,6 +1001,11 @@ class Document < AbstractBlock
   def convert opts = {}
     parse unless @parsed
     restore_attributes
+    unless @safe >= SafeMode::SERVER || opts.empty?
+      # QUESTION should we store these on the Document object?
+      @attributes.delete 'outfile' unless (@attributes['outfile'] = opts['outfile'])
+      @attributes.delete 'outdir' unless (@attributes['outdir'] = opts['outdir'])
+    end
 
     # QUESTION should we add processors that execute before conversion begins?
     unless @converter

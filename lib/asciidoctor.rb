@@ -1434,15 +1434,31 @@ module Asciidoctor
       options[:header_footer] = true if write_to_same_dir || write_to_target
     end
 
+    # NOTE at least make intended target directory available, if there is one
+    if write_to_same_dir
+      input_path = ::File.expand_path input.path
+      options[:to_dir] = (outdir = ::File.dirname input_path)
+    elsif write_to_target
+      if to_dir
+        if to_file
+          options[:to_dir] = ::File.dirname ::File.expand_path(::File.join to_dir, to_file)
+        else
+          options[:to_dir] = ::File.expand_path to_dir
+        end
+      elsif to_file
+        options[:to_dir] = ::File.dirname ::File.expand_path to_file
+      end
+    else
+      options[:to_dir] = nil
+    end
+
     doc = self.load input, options
 
     if write_to_same_dir
-      infile = ::File.expand_path input.path
-      outfile = ::File.join ::File.dirname(infile), %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
-      if outfile == infile
-        raise ::IOError, %(input file and output file cannot be the same: #{infile})
+      outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
+      if outfile == input_path
+        raise ::IOError, %(input file and output file cannot be the same: #{outfile})
       end
-      outdir = ::File.dirname outfile
     elsif write_to_target
       working_dir = options.has_key?(:base_dir) ? ::File.expand_path(options[:base_dir]) : ::File.expand_path(::Dir.pwd)
       # QUESTION should the jail be the working_dir or doc.base_dir???
@@ -1476,15 +1492,12 @@ module Asciidoctor
     end
 
     timings.start :convert if timings
-    output = doc.convert
+    opts = outfile && !stream_output ? { 'outfile' => outfile, 'outdir' => outdir } : {}
+    output = doc.convert opts
     timings.record :convert if timings
 
     if outfile
       timings.start :write if timings
-      unless stream_output
-        doc.attributes['outfile'] = outfile
-        doc.attributes['outdir'] = outdir
-      end
       doc.write output, outfile
       timings.record :write if timings
 
