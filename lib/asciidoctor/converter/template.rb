@@ -254,7 +254,7 @@ module Asciidoctor
             Helpers.require_library 'slim/include', false
           end
         elsif ext_name == 'erb'
-          template_class, extra_engine_options = (eruby_loaded ||= load_eruby @eruby)
+          template_class, extra_engine_options = (eruby_loaded ||= load_eruby(@eruby))
         end
         next unless ::Tilt.registered? ext_name
         unless template_cache && (template = template_cache[file])

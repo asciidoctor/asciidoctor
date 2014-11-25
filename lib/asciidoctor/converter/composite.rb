@@ -38,7 +38,7 @@ module Asciidoctor
     #
     # Returns the matching [Converter] object
     def converter_for transform
-      @converter_map[transform] ||= find_converter transform
+      @converter_map[transform] ||= (find_converter transform)
     end
 
     # Internal: Find the converter for the specified transform.
