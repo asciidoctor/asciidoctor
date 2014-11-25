@@ -98,8 +98,16 @@ class File
   def self.read(path)
     case JAVASCRIPT_PLATFORM
     when 'node'
-      %x(return require("fs").readFileSync(path, "utf8");)
-    #when 'java-nashorn'
+      %x(return require('fs').readFileSync(path, 'utf8');)
+    when 'java-nashorn'
+      %x(
+        var Paths = Java.type('java.nio.file.Paths');
+        var Files = Java.type('java.nio.file.Files');
+        var lines = Files.readAllLines(Paths.get(path), Java.type('java.nio.charset.StandardCharsets').UTF_8);
+        var data = [];
+        lines.forEach(function(line) { data.push(line); });
+        return data.join("\n");
+      )
     #when 'java-rhino'
     when 'browser'
       %x(
