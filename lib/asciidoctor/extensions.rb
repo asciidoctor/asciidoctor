@@ -1117,9 +1117,12 @@ module Extensions
         config = resolve_args args, 1
         # TODO if block arity is 0, assume block is process method
         processor = kind_class.new config
-        class << processor
-          include_dsl
-        end
+        # NOTE class << processor idiom doesn't work in Opal
+        #class << processor
+        #  include_dsl
+        #end
+        # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
+        processor.extend kind_class.const_get :DSL if kind_class.constants.grep :DSL
         processor.instance_exec(&block)
         processor.freeze
         unless processor.process_block_given?
@@ -1164,9 +1167,12 @@ module Extensions
       if block_given?
         name, config = resolve_args args, 2
         processor = kind_class.new as_symbol(name), config
-        class << processor
-          include_dsl
-        end
+        # NOTE class << processor idiom doesn't work in Opal
+        #class << processor
+        #  include_dsl
+        #end
+        # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
+        processor.extend kind_class.const_get :DSL if kind_class.constants.grep :DSL
         if block.arity == 1
           yield processor
         else
