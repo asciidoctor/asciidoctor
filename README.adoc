@@ -96,7 +96,7 @@ Asciidoctor also offers a modern, responsive theme based on {uri-foundation}[Fou
 
 == Requirements
 
-Asciidoctor works on Linux, OSX (Mac) and Windows and requires one of the following implementations of {uri-ruby}[Ruby]:
+Asciidoctor works on Linux, OSX (Mac) and Windows and requires one of the following implementations of Ruby:
 
 * MRI (Ruby 1.8.7, 1.9.3, 2.0.0 & 2.1.2)
 * JRuby 1.7 (Ruby 1.8 and 1.9 modes)
