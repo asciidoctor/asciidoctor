@@ -1389,17 +1389,17 @@ module Substitutors
   # incorrectly processed by the source highlighter.
   #
   # source - the source code String to highlight
-  # sub_callouts - a Boolean flag indicating whether callout marks should be substituted
+  # process_callouts - a Boolean flag indicating whether callout marks should be substituted
   #
   # returns the highlighted source code, if a source highlighter is defined
   # on the document, otherwise the unprocessed text
-  def highlight_source(source, sub_callouts, highlighter = nil)
+  def highlight_source(source, process_callouts, highlighter = nil)
     highlighter ||= @document.attributes['source-highlighter']
     Helpers.require_library highlighter, (highlighter == 'pygments' ? 'pygments.rb' : highlighter)
-    callout_marks = {}
     lineno = 0
     callout_on_last = false
-    if sub_callouts
+    if process_callouts
+      callout_marks = {}
       last = -1
       # extract callout marks, indexed by line number
       source = source.split(EOL).map {|line|
@@ -1418,6 +1418,9 @@ module Substitutors
         }
       } * EOL
       callout_on_last = (last == lineno)
+      callout_marks = nil if callout_marks.empty?
+    else
+      callout_marks = nil
     end
 
     linenums_mode = nil
@@ -1460,9 +1463,7 @@ module Substitutors
       result = result.gsub PASS_MATCH_HI, %(#{PASS_START}\\1#{PASS_END})
     end
 
-    if !sub_callouts || callout_marks.empty?
-      result
-    else
+    if process_callouts && callout_marks
       lineno = 0
       reached_code = linenums_mode != :table
       result.split(EOL).map {|line|
@@ -1495,6 +1496,8 @@ module Substitutors
           line
         end
       } * EOL
+    else
+      result
     end
   end
 
