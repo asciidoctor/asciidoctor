@@ -938,7 +938,7 @@ class Parser
 
       if block.sub? :callouts
         unless (catalog_callouts block.source, document)
-          # No need to look for callouts if they aren't there
+          # No need to sub callouts if they aren't there
           block.remove_sub :callouts
         end
       end
