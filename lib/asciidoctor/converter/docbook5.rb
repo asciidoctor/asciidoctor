@@ -766,8 +766,9 @@ module Asciidoctor
     end
 
     def quote_like node, content
+      tag_name = (node.has_role? 'epigraph') ? 'epigraph' : 'blockquote'
       result = []
-      result << %(<blockquote#{common_attributes node.id, node.role, node.reftext}>)
+      result << %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>)
       result << %(<title>#{node.title}</title>) if node.title?
       if (node.attr? 'attribution') || (node.attr? 'citetitle')
         result << '<attribution>'
@@ -780,7 +781,7 @@ module Asciidoctor
         result << '</attribution>'
       end
       result << content
-      result << '</blockquote>'
+      result << %(</#{tag_name}>)
       result * LF
     end
   end
