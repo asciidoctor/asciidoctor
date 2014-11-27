@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen
-.\" Generator: Asciidoctor 1.5.0
-.\"      Date: 2014-05-19
+.\" Generator: Asciidoctor 1.5.2
+.\"      Date: 2014-11-27
 .\"    Manual: Asciidoctor Manual
-.\"    Source: Asciidoctor 1.5.0
+.\"    Source: Asciidoctor 1.5.2
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2014-08-12" "Asciidoctor 1\&.5\&.0" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2014-11-27" "Asciidoctor 1\&.5\&.2" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .nh
@@ -50,7 +50,7 @@ This option may be specified more than once\&.
 .PP
 \fB\-b, \-\-backend\fR=\fIBACKEND\fR
 .RS 4
-Backend output file format: \fIhtml5\fR, \fIdocbook45\fR and \fIdocbook5\fR supported out of the box\&. You can also use the backend alias names \fIhtml\fR (aliased to \fIhtml5\fR) or \fIdocbook\fR (aliased to \fIdocbook5\fR)\&. Defaults to \fIhtml5\fR\&. Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during rendering\&.
+Backend output file format: \fIhtml5\fR, \fIdocbook45\fR and \fIdocbook5\fR supported out of the box\&. You can also use the backend alias names \fIhtml\fR (aliased to \fIhtml5\fR) or \fIdocbook\fR (aliased to \fIdocbook5\fR)\&. Defaults to \fIhtml5\fR\&. Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during conversion\&.
 .RE
 .PP
 \fB\-d, \-\-doctype\fR=\fIDOCTYPE\fR
@@ -71,12 +71,12 @@ Destination output directory\&. Defaults to the directory containing the source 
 .PP
 \fB\-E, \-\-template\-engine\fR=\fINAME\fR
 .RS 4
-Template engine to use for the custom render templates\&. The gem with the same name as the engine will be loaded automatically\&. This name is also used to build the full path to the custom templates\&. If a template engine is not specified, it will be auto\-detected based on the file extension of the custom templates found\&.
+Template engine to use for the custom converter templates\&. The gem with the same name as the engine will be loaded automatically\&. This name is also used to build the full path to the custom converter templates\&. If a template engine is not specified, it will be auto\-detected based on the file extension of the custom converter templates found\&.
 .RE
 .PP
 \fB\-e, \-\-eruby\fR
 .RS 4
-Specifies the eRuby implementation to use for rendering the custom ERB templates\&. Supported values are \fIerb\fR and \fIerubis\fR\&. Defaults to \fIerb\fR\&.
+Specifies the eRuby implementation to use for executing the custom converter templates written in ERB\&. Supported values are \fIerb\fR and \fIerubis\fR\&. Defaults to \fIerb\fR\&.
 .RE
 .PP
 \fB\-n, \-\-section\-numbers\fR
@@ -96,7 +96,7 @@ Suppress the document header and footer in the output\&.
 .PP
 \fB\-T, \-\-template\-dir\fR=\fIDIR\fR
 .RS 4
-A directory containing custom render templates that override one or more templates from the built\-in set\&. (requires \fItilt\fR gem)
+A directory containing custom converter templates that override one or more templates from the built\-in set\&. (requires \fItilt\fR gem)
 .sp
 If there is a subfolder that matches the engine name (if specified), that folder is appended to the template directory path\&. Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path\&.
 .sp
@@ -121,7 +121,7 @@ Verbosely print processing information and configuration file checks to stderr\&
 .PP
 \fB\-t, \-\-timings\fR
 .RS 4
-Display timings information (time to read, parse and convert)
+Display timings information (time to read, parse and convert)\&.
 .RE
 .SS "Program Information"
 .PP
@@ -129,7 +129,6 @@ Display timings information (time to read, parse and convert)
 .RS 4
 Show the help message\&.
 .RE
-.PP
 \fB\-V, \-\-version\fR
 .RS 4
 Print program version number\&.
@@ -138,7 +137,7 @@ Print program version number\&.
 .PP
 \fB0\fR
 .RS 4
-Success
+Success\&.
 .RE
 .PP
 \fB1\fR
