@@ -352,22 +352,7 @@ module Asciidoctor
     end
 
     def quote node
-      result = []
-      result << %(<blockquote#{common_attributes node.id, node.role, node.reftext}>)
-      result << %(<title>#{node.title}</title>) if node.title?
-      if (node.attr? 'attribution') || (node.attr? 'citetitle')
-        result << '<attribution>'
-        if node.attr? 'attribution'
-          result << (node.attr 'attribution')
-        end
-        if node.attr? 'citetitle'
-          result << %(<citetitle>#{node.attr 'citetitle'}</citetitle>)
-        end
-        result << '</attribution>'
-      end
-      result << (resolve_content node)
-      result << '</blockquote>'
-      result * LF
+      quote_like node, resolve_content(node)
     end
 
     def thematic_break node
@@ -485,22 +470,7 @@ module Asciidoctor
     end
 
     def verse node
-      result = []
-      result << %(<blockquote#{common_attributes node.id, node.role, node.reftext}>)
-      result << %(<title>#{node.title}</title>) if node.title?
-      if (node.attr? 'attribution') || (node.attr? 'citetitle')
-        result << '<attribution>'
-        if node.attr? 'attribution'
-          result << (node.attr 'attribution')
-        end
-        if node.attr? 'citetitle'
-          result << %(<citetitle>#{node.attr 'citetitle'}</citetitle>)
-        end
-        result << '</attribution>'
-      end
-      result << %(<literallayout>#{node.content}</literallayout>)
-      result << '</blockquote>'
-      result * LF
+      quote_like node, %(<literallayout>#{node.content}</literallayout>)
     end
 
     alias video skip
@@ -793,6 +763,25 @@ module Asciidoctor
       elsif use_placeholder
         %(<cover role="#{face}"/>)
       end
+    end
+
+    def quote_like node, content
+      result = []
+      result << %(<blockquote#{common_attributes node.id, node.role, node.reftext}>)
+      result << %(<title>#{node.title}</title>) if node.title?
+      if (node.attr? 'attribution') || (node.attr? 'citetitle')
+        result << '<attribution>'
+        if node.attr? 'attribution'
+          result << (node.attr 'attribution')
+        end
+        if node.attr? 'citetitle'
+          result << %(<citetitle>#{node.attr 'citetitle'}</citetitle>)
+        end
+        result << '</attribution>'
+      end
+      result << content
+      result << '</blockquote>'
+      result * LF
     end
   end
 end
