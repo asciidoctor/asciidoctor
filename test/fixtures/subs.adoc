@@ -1,0 +1,7 @@
+= Document Title
+Doc Writer <doc.writer@asciidoc.org>
+v1.0, 2013-01-01
+:bootstrap-version: 3.2.0
+
+Body content.
+
