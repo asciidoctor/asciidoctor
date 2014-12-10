@@ -87,6 +87,10 @@ This option may be specified more than once.
   Supported values are _erb_ and _erubis_.
   Defaults to _erb_.
 
+*-I, --load-path*=_DIRECTORY_::
+  Add the specified directory to the load path, so that _-r_ can load extensions from outside the default Ruby load path.
+  This option may be specified more than once.
+
 *-n, --section-numbers*::
   Auto-number section titles.
   Synonym for *--attribute numbered*.
@@ -97,6 +101,10 @@ This option may be specified more than once.
   If the input is read from standard input, then the output file defaults to stdout.
   If _OUT_FILE_ is _-_ then the standard output is also used.
   If specified, the file is resolved relative to the working directory.
+
+*-r, --require*=_LIBRARY_::
+  Require the specified library before executing the processor, using the standard Ruby require.
+  This option may be specified more than once.
 
 *-s, --no-header-footer*::
   Suppress the document header and footer in the output.
