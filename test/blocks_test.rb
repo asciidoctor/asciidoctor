@@ -850,6 +850,34 @@ end
       assert_equal expected.chomp, result
     end
 
+    test 'should set block indent to value specified by indent document attribute' do
+      input = <<-EOS
+:source-indent: 1
+
+----
+    def names
+
+      @names.split ' '
+
+    end
+----
+      EOS
+
+      expected = <<-EOS
+ def names
+ 
+   @names.split ' '
+ 
+ end
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'pre', output, 1
+      assert_css '.listingblock pre', output, 1
+      result = xmlnodes_at_xpath('//pre', output, 1).text
+      assert_equal expected.chomp, result
+    end
+
     test 'literal block should honor nowrap option' do
       input = <<-EOS
 [options="nowrap"]
