@@ -578,8 +578,8 @@ class PreprocessorReader < Reader
       result.pop while (last = result[-1]) && last.empty?
     end
 
-    if (indent = opts.fetch(:indent, nil))
-      Parser.reset_block_indent! result, indent.to_i
+    if opts.key? :indent
+      Parser.reset_block_indent! result, opts[:indent].to_i
     end
 
     result

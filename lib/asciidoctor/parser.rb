@@ -821,13 +821,19 @@ class Parser
             elsif (default_language = document.attributes['source-language'])
               attributes['language'] = default_language
             end
+            if !attributes.key?('indent') && document.attributes.key?('source-indent')
+              attributes['indent'] = document.attributes['source-indent']
+            end
             terminator = terminator[0..2]
           elsif block_context == :source
             AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
-            unless attributes.has_key? 'language'
+            unless attributes.key? 'language'
               if (default_language = document.attributes['source-language'])
                 attributes['language'] = default_language
               end
+            end
+            if !attributes.key?('indent') && document.attributes.key?('source-indent')
+              attributes['indent'] = document.attributes['source-indent']
             end
           end
           block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
@@ -1065,8 +1071,8 @@ class Parser
       return lines
     end
 
-    if content_model == :verbatim && (indent = attributes['indent'])
-      reset_block_indent! lines, indent.to_i
+    if content_model == :verbatim && attributes.key?('indent') && (indent = attributes['indent'].to_i) >= 0
+      reset_block_indent! lines, indent
     end
 
     if (extension = options[:extension])
@@ -2630,7 +2636,7 @@ class Parser
   #--
   # FIXME refactor gsub matchers into compiled regex
   def self.reset_block_indent!(lines, indent = 0)
-    return if !indent || lines.empty?
+    return unless indent && !lines.empty?
 
     tab_detected = false
     # TODO make tab size configurable
