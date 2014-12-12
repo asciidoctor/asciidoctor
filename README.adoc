@@ -129,7 +129,7 @@ If you want to install a pre-release version (e.g., a release candidate), use:
 ====
 If you have an earlier version of Asciidoctor installed, you can update it using:
 
- $ gem upgrade asciidoctor
+ $ gem update asciidoctor
 
 If you install a new version of the gem using `gem install` instead of gem update, you'll have multiple versions installed.
 If that's the case, use the following gem command to remove the old versions:
