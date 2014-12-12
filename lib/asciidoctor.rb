@@ -649,7 +649,7 @@ module Asciidoctor
     ## Lists
 
     # Detects the start of any list item.
-    AnyListRx = /^(?:<?\d+>#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*(?:-|(?:\*|\.){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*.*?(?::{2,4}|;;)(?:#{CG_BLANK}+#{CG_GRAPH}|$))/
+    AnyListRx = /^(?:<?\d+>#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*(?:-|(?:\*|\.|\u2022){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*.*?(?::{2,4}|;;)(?:#{CG_BLANK}+#{CG_GRAPH}|$))/
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -659,7 +659,7 @@ module Asciidoctor
     #   - Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5})#{CG_BLANK}+(.*)$/
+    UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5}|\u2022{1,5})#{CG_BLANK}+(.*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
     #
