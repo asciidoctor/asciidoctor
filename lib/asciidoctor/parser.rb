@@ -401,10 +401,7 @@ class Parser
     # check for option to find list item text only
     # if skipped a line, assume a list continuation was
     # used and block content is acceptable
-    if (text_only = options[:text]) && skipped > 0
-      options.delete(:text)
-      text_only = false
-    end
+    text_only = is_text_only(options, skipped)
     
     parse_metadata = options.fetch(:parse_metadata, true)
     #parse_sections = options.fetch(:parse_sections, false)
@@ -494,13 +491,7 @@ class Parser
             elsif this_line.end_with?(']') && (match = MediaBlockMacroRx.match(this_line))
               blk_ctx = match[1].to_sym
               block = Block.new(parent, blk_ctx, :content_model => :empty)
-              if blk_ctx == :image
-                posattrs = ['alt', 'width', 'height']
-              elsif blk_ctx == :video
-                posattrs = ['poster', 'width', 'height']
-              else
-                posattrs = []
-              end
+              posattrs = get_posattrs(blk_ctx)
 
               unless !style || explicit_style
                 attributes['alt'] = style if blk_ctx == :image
@@ -682,17 +673,7 @@ class Parser
           if style != 'normal' && LiteralParagraphRx =~ this_line
             # So we need to actually include this one in the read_lines group
             reader.unshift_line this_line
-            lines = reader.read_lines_until(
-                :break_on_blank_lines => true,
-                :break_on_list_continuation => true,
-                :preserve_last_line => true) {|line|
-              # a preceding blank line (skipped > 0) indicates we are in a list continuation
-              # and therefore we should not break at a list item
-              # (this won't stop breaking on item of same level since we've already parsed them out)
-              # QUESTION can we turn this block into a lambda or function call?
-              (break_at_list && AnyListRx =~ line) ||
-              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
-            }
+            lines = read_line_block(break_at_list, reader)
 
             reset_block_indent! lines
 
@@ -704,18 +685,7 @@ class Parser
           # a paragraph is contiguous nonblank/noncontinuation lines
           else
             reader.unshift_line this_line
-            lines = reader.read_lines_until(
-                :break_on_blank_lines => true,
-                :break_on_list_continuation => true,
-                :preserve_last_line => true,
-                :skip_line_comments => true) {|line|
-              # a preceding blank line (skipped > 0) indicates we are in a list continuation
-              # and therefore we should not break at a list item
-              # (this won't stop breaking on item of same level since we've already parsed them out)
-              # QUESTION can we turn this block into a lambda or function call?
-              (break_at_list && AnyListRx =~ line) ||
-              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
-            }
+            lines = read_line_block(break_at_list, reader)
 
             # NOTE we need this logic because we've asked the reader to skip
             # line comments, which may leave us w/ an empty buffer if those
@@ -759,8 +729,7 @@ class Parser
               # TODO could assume a floating title when inside a block context
               # FIXME Reader needs to be created w/ line info
               block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
-            elsif !text_only && lines.size > 1 && first_line.start_with?('"') &&
-                lines[-1].start_with?('-- ') && lines[-2].end_with?('"')
+            elsif is_quote(first_line, lines, text_only)
               lines[0] = first_line[1..-1]
               attribution, citetitle = lines.pop[3..-1].split(', ', 2)
               lines.pop while lines[-1].empty?
@@ -800,9 +769,7 @@ class Parser
 
         case block_context
         when :admonition
-          attributes['name'] = admonition_name = style.downcase
-          attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
-          block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+          block = build_admonition_block(admonition_name, attributes, block_context, document, parent, reader, style, terminator)
 
         when :comment
           build_block(block_context, :skip, terminator, parent, reader, attributes)
@@ -812,25 +779,7 @@ class Parser
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :listing, :fenced_code, :source
-          if block_context == :fenced_code
-            style = attributes['style'] = 'source'
-            language, linenums = this_line[3..-1].split(',', 2)
-            if language && !(language = language.strip).empty?
-              attributes['language'] = language
-              attributes['linenums'] = '' if linenums && !linenums.strip.empty?
-            elsif (default_language = document.attributes['source-language'])
-              attributes['language'] = default_language
-            end
-            terminator = terminator[0..2]
-          elsif block_context == :source
-            AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
-            unless attributes.has_key? 'language'
-              if (default_language = document.attributes['source-language'])
-                attributes['language'] = default_language
-              end
-            end
-          end
-          block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
+          block = build_source_block(attributes, block_context, document, parent, reader, terminator, this_line)
 
         when :literal
           block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
@@ -839,30 +788,13 @@ class Parser
           block = build_block(block_context, :raw, terminator, parent, reader, attributes)
 
         when :stem, :latexmath, :asciimath
-          if block_context == :stem
-            attributes['style'] = if (explicit_stem_syntax = attributes[2])
-              explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
-            elsif (default_stem_syntax = document.attributes['stem']).nil_or_empty?
-              'asciimath'
-            else
-              default_stem_syntax
-            end
-          end
-          block = build_block(:stem, :raw, terminator, parent, reader, attributes)
+          block = build_expr_block(attributes, block_context, document, parent, reader, terminator)
 
         when :open, :sidebar
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :table
-          cursor = reader.cursor
-          block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), cursor
-          case terminator.chr
-            when ','
-              attributes['format'] = 'csv'
-            when ':'
-              attributes['format'] = 'dsv'
-          end
-          block = next_table(block_reader, parent, attributes)
+          block = build_table_block(attributes, parent, reader, terminator)
 
         when :quote, :verse
           AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
@@ -871,15 +803,8 @@ class Parser
         else
           if block_extensions && (extension = extensions.registered_for_block?(block_context, cloaked_context))
             # TODO pass cloaked_context to extension somehow (perhaps a new instance for each cloaked_context?)
-            if (content_model = extension.config[:content_model]) != :skip
-              if !(pos_attrs = extension.config[:pos_attrs] || []).empty?
-                AttributeList.rekey(attributes, [nil].concat(pos_attrs))
-              end
-              if (default_attrs = extension.config[:default_attrs])
-                default_attrs.each {|k, v| attributes[k] ||= v }
-              end
-            end
-            block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
+            content_model = extension.config[:content_model]
+            block = build_extension_block(attributes, block_context, content_model, extension, parent, reader, terminator)
             unless block && content_model != :skip
               attributes.clear
               return
@@ -945,6 +870,111 @@ class Parser
     end
 
     block
+  end
+
+  def self.get_posattrs(blk_ctx)
+    if blk_ctx == :image
+      posattrs = ['alt', 'width', 'height']
+    elsif blk_ctx == :video
+      posattrs = ['poster', 'width', 'height']
+    else
+      posattrs = []
+    end
+    posattrs
+  end
+
+  def self.is_text_only(options, skipped)
+    text_only = options[:text]
+    if text_only && skipped > 0
+      options.delete(:text)
+      text_only = false
+    end
+    text_only
+  end
+
+  def self.is_quote(first_line, lines, text_only)
+    !text_only && lines.size > 1 && first_line.start_with?('"') &&
+        lines[-1].start_with?('-- ') && lines[-2].end_with?('"')
+  end
+
+  def self.build_admonition_block(admonition_name, attributes, block_context, document, parent, reader, style, terminator)
+    attributes['name'] = admonition_name = style.downcase
+    attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
+    build_block(block_context, :compound, terminator, parent, reader, attributes)
+  end
+
+  def self.build_extension_block(attributes, block_context, content_model, extension, parent, reader, terminator)
+    if content_model != :skip
+      unless (pos_attrs = extension.config[:pos_attrs] || []).empty?
+        AttributeList.rekey(attributes, [nil].concat(pos_attrs))
+      end
+      if (default_attrs = extension.config[:default_attrs])
+        default_attrs.each { |k, v| attributes[k] ||= v }
+      end
+    end
+    build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
+  end
+
+  def self.build_table_block(attributes, parent, reader, terminator)
+    cursor = reader.cursor
+    block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), cursor
+    case terminator.chr
+      when ','
+        attributes['format'] = 'csv'
+      when ':'
+        attributes['format'] = 'dsv'
+    end
+    next_table(block_reader, parent, attributes)
+  end
+
+  def self.build_expr_block(attributes, block_context, document, parent, reader, terminator)
+    if block_context == :stem
+      attributes['style'] = if (explicit_stem_syntax = attributes[2])
+                              explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
+                            elsif (default_stem_syntax = document.attributes['stem']).nil_or_empty?
+                              'asciimath'
+                            else
+                              default_stem_syntax
+                            end
+    end
+    build_block(:stem, :raw, terminator, parent, reader, attributes)
+  end
+
+  def self.build_source_block(attributes, block_context, document, parent, reader, terminator, this_line)
+    if block_context == :fenced_code
+      attributes['style'] = 'source'
+      language, linenums = this_line[3..-1].split(',', 2)
+      if language && !(language = language.strip).empty?
+        attributes['language'] = language
+        attributes['linenums'] = '' if linenums && !linenums.strip.empty?
+      elsif (default_language = document.attributes['source-language'])
+        attributes['language'] = default_language
+      end
+      terminator = terminator[0..2]
+    elsif block_context == :source
+      AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
+      unless attributes.has_key? 'language'
+        if (default_language = document.attributes['source-language'])
+          attributes['language'] = default_language
+        end
+      end
+    end
+    build_block(:listing, :verbatim, terminator, parent, reader, attributes)
+  end
+
+  def self.read_line_block(break_at_list, reader)
+    reader.read_lines_until(
+        :break_on_blank_lines => true,
+        :break_on_list_continuation => true,
+        :preserve_last_line => true,
+        :skip_line_comments => true) { |line|
+      # a preceding blank line (skipped > 0) indicates we are in a list continuation
+      # and therefore we should not break at a list item
+      # (this won't stop breaking on item of same level since we've already parsed them out)
+      # QUESTION can we turn this block into a lambda or function call?
+      (break_at_list && AnyListRx =~ line) ||
+          (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
+    }
   end
 
   # Public: Determines whether this line is the start of any of the delimited blocks
@@ -1435,26 +1465,13 @@ class Parser
           # list item will throw off the exit from it
           if LiteralParagraphRx =~ this_line
             reader.unshift_line this_line
-            buffer.concat reader.read_lines_until(
-                :preserve_last_line => true,
-                :break_on_blank_lines => true,
-                :break_on_list_continuation => true) {|line|
-              # we may be in an indented list disguised as a literal paragraph
-              # so we need to make sure we don't slurp up a legitimate sibling
-              list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
-            }
+            read_dlist(buffer, list_type, reader, sibling_trait)
             continuation = :inactive
           # let block metadata play out until we find the block
           elsif BlockTitleRx =~ this_line || BlockAttributeLineRx =~ this_line || AttributeEntryRx =~ this_line
             buffer << this_line
           else
-            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| ListRxMap[ctx] =~ this_line }
-              within_nested_list = true
-              if nested_list_type == :dlist && $~[3].nil_or_empty?
-                # get greedy again
-                has_text = false
-              end
-            end
+            has_text, within_nested_list = handle_nested_list(this_line, has_text, within_nested_list)
             buffer << this_line
             continuation = :inactive
           end
@@ -1489,14 +1506,7 @@ class Parser
               # NOTE we have to check for indented list items first
               elsif LiteralParagraphRx =~ this_line
                 reader.unshift_line this_line
-                buffer.concat reader.read_lines_until(
-                    :preserve_last_line => true,
-                    :break_on_blank_lines => true,
-                    :break_on_list_continuation => true) {|line|
-                  # we may be in an indented list disguised as a literal paragraph
-                  # so we need to make sure we don't slurp up a legitimate sibling
-                  list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
-                }
+                read_dlist(buffer, list_type, reader, sibling_trait)
               else
                 break
               end
@@ -1509,13 +1519,7 @@ class Parser
           end
         else
           has_text = true if !this_line.empty?
-          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| ListRxMap[ctx] =~ this_line }
-            within_nested_list = true
-            if nested_list_type == :dlist && $~[3].nil_or_empty?
-              # get greedy again
-              has_text = false
-            end
-          end
+          has_text, within_nested_list = handle_nested_list(this_line, has_text, within_nested_list)
           buffer << this_line
         end
       end
@@ -1539,6 +1543,29 @@ class Parser
     #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
 
     buffer
+  end
+
+  def self.handle_nested_list(this_line, has_text, within_nested_list)
+    nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect { |ctx| ListRxMap[ctx] =~ this_line }
+    if nested_list_type
+      within_nested_list = true
+      if nested_list_type == :dlist && $~[3].nil_or_empty?
+        # get greedy again
+        has_text = false
+      end
+    end
+    return has_text, within_nested_list
+  end
+
+  def self.read_dlist(buffer, list_type, reader, sibling_trait)
+    buffer.concat reader.read_lines_until(
+                      :preserve_last_line => true,
+                      :break_on_blank_lines => true,
+                      :break_on_list_continuation => true) { |line|
+      # we may be in an indented list disguised as a literal paragraph
+      # so we need to make sure we don't slurp up a legitimate sibling
+      list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
+    }
   end
 
   # Internal: Initialize a new Section object and assign any attributes provided
@@ -1732,26 +1759,14 @@ class Parser
         (match = AtxSectionRx.match(line1))
       sect_level = single_line_section_level match[1]
       sect_title = match[2]
-      if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
-        if anchor_match[2].nil?
-          sect_title = anchor_match[1]
-          sect_id = anchor_match[3]
-          sect_reftext = anchor_match[4]
-        end
-      end
+      sect_id, sect_reftext, sect_title = handle_section(sect_title)
     elsif Compliance.underline_style_section_titles
       if (line2 = reader.peek_line(true)) && SECTION_LEVELS.has_key?(line2.chr) && line2 =~ SetextSectionLineRx &&
         (name_match = SetextSectionTitleRx.match(line1)) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
         sect_title = name_match[1]
-        if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
-          if anchor_match[2].nil?
-            sect_title = anchor_match[1]
-            sect_id = anchor_match[3]
-            sect_reftext = anchor_match[4]
-          end
-        end
+        sect_id, sect_reftext, sect_title = handle_section(sect_title)
         sect_level = section_level line2
         single_line = false
         reader.advance
@@ -1761,6 +1776,17 @@ class Parser
       sect_level += document.attr('leveloffset', 0).to_i
     end
     [sect_id, sect_reftext, sect_title, sect_level, single_line]
+  end
+
+  def self.handle_section(sect_title)
+    if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
+      if anchor_match[2].nil?
+        sect_title = anchor_match[1]
+        sect_id = anchor_match[3]
+        sect_reftext = anchor_match[4]
+      end
+    end
+    return sect_id, sect_reftext, sect_title
   end
 
   # Public: Calculate the number of unicode characters in the line, excluding the endline
@@ -2384,25 +2410,17 @@ class Parser
       # TODO might want to use scan rather than this mega-regexp
       if (m = ColumnSpecRx.match(record))
         spec = {}
-        if m[2]
-          # make this an operation
-          colspec, rowspec = m[2].split '.'
-          if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
-            spec['halign'] = Table::ALIGNMENTS[:h][colspec]
-          end
-          if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
-            spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
-          end
-        end
+        halign, valign = parse_col_row_spec(m[2])
+        spec['halign'] = halign
+        spec['valign'] = valign
 
         # to_i permits us to support percentage width by stripping the %
         # NOTE this is slightly out of compliance w/ AsciiDoc, but makes way more sense
         spec['width'] = !m[3].nil? ? m[3].to_i : 1
 
         # make this an operation
-        if m[4] && Table::TEXT_STYLES.has_key?(m[4])
-          spec['style'] = Table::TEXT_STYLES[m[4]]
-        end
+        spec['style'] = Table::TEXT_STYLES[m[4]]
+        spec.delete_if { |_, v| v.nil? }
 
         repeat = !m[1].nil? ? m[1].to_i : 1
 
@@ -2463,22 +2481,24 @@ class Parser
         spec['repeatcol'] = colspec unless colspec == 1
       end
     end
-    
-    if m[3]
-      colspec, rowspec = m[3].split '.'
-      if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
-        spec['halign'] = Table::ALIGNMENTS[:h][colspec]
-      end
-      if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
-        spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
-      end
-    end
 
-    if m[4] && Table::TEXT_STYLES.has_key?(m[4])
-      spec['style'] = Table::TEXT_STYLES[m[4]]
-    end
+    halign, valign = parse_col_row_spec(m[3])
+    spec['halign'] = halign
+    spec['valign'] = valign
+    spec['style'] = Table::TEXT_STYLES[m[4]]
+    spec.delete_if { |_, v| v.nil? }
 
     [spec, rest]
+  end
+
+
+  def self.parse_col_row_spec(value)
+    if value
+      colspec, rowspec = value.split '.'
+      halign = Table::ALIGNMENTS[:h][colspec]
+      valign = Table::ALIGNMENTS[:v][rowspec]
+    end
+    return halign, valign
   end
 
   # Public: Parse the first positional attribute and assign named attributes
