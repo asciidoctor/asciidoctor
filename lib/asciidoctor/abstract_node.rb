@@ -352,6 +352,7 @@ class AbstractNode
     else
       bindata = ::File.open(image_path, 'rb') {|file| file.read }
     end
+    # NOTE base64 is autoloaded by reference to ::Base64
     %(data:#{mimetype};base64,#{::Base64.encode64(bindata).delete EOL})
   end
  
@@ -368,7 +369,6 @@ class AbstractNode
   # Returns A data URI string built from Base64 encoded data read from the URI
   # and the mime type specified in the Content Type header.
   def generate_data_uri_from_uri image_uri, cache_uri = false
-    Helpers.require_library 'base64'
     if cache_uri
       # caching requires the open-uri-cached gem to be installed
       # processing will be automatically aborted if these libraries can't be opened
@@ -384,7 +384,8 @@ class AbstractNode
         mimetype = file.content_type 
         file.read
       }
-      %(data:#{mimetype};base64,#{Base64.encode64(bindata).delete EOL})
+      # NOTE base64 is autoloaded by reference to ::Base64
+      %(data:#{mimetype};base64,#{::Base64.encode64(bindata).delete EOL})
     rescue
       warn %(asciidoctor: WARNING: could not retrieve image data from URI: #{image_uri})
       image_uri
