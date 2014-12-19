@@ -659,7 +659,7 @@ module Asciidoctor
     #   - Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5})#{CG_BLANK}+(.*)$/
+    UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5}|•{1,5})#{CG_BLANK}+(.*)$/u
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
     #

@@ -453,6 +453,17 @@ List
       assert_xpath '//ul/li', output, 3
     end
 
+    test 'indented unicode bullet elements using spaces' do
+      input = <<-EOS
+ • Foo
+ • Boo
+ • Blech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 3
+    end
+
     test 'indented asterisk elements using tabs' do
       input = <<-EOS
 \t*\tFoo
@@ -794,6 +805,27 @@ List
 **** Froo
 ***** Groo
 * Blech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 5
+      assert_xpath '(//ul)[1]/li', output, 2
+      assert_xpath '((//ul)[1]/li//ul)[1]/li', output, 1
+      assert_xpath '(((//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
+      assert_xpath '((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
+      assert_xpath '(((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
+    end
+
+    test "nested elements (5) with unicode bullet" do
+      input = <<-EOS
+List
+====
+
+• Foo
+•• Boo
+••• Snoo
+•••• Froo
+••••• Groo
+• Blech
       EOS
       output = render_string input
       assert_xpath '//ul', output, 5
