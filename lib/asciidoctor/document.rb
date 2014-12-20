@@ -1115,16 +1115,16 @@ class Document < AbstractBlock
         docinfo_path = normalize_system_path(docinfo_filename, docinfodir)
         # NOTE normalizing the lines is essential if we're performing substitutions
         if (content = read_asset(docinfo_path, :normalize => true))
-          content = sub_attributes(content)
+          content = docinfo_sub(content)
         end
       end
 
       if (docinfo || docinfo2) && @attributes.key?('docname')
         docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}), docinfodir)
         # NOTE normalizing the lines is essential if we're performing substitutions
-        if (content2 = read_asset(docinfo_path, :normalize => true))
-          content2 = sub_attributes(content2)
-          content = content ? %(#{content}#{EOL}#{content2}) : content2
+        if (content_asset = read_asset(docinfo_path, :normalize => true))
+          content_asset = docinfo_sub(content_asset)
+          content = content ? %(#{content}#{EOL}#{content_asset}) : content_asset
         end
       end
 
@@ -1137,6 +1137,35 @@ class Document < AbstractBlock
       # coerce to string (in case the value is nil)
       %(#{content})
     end
+  end
+
+  def docinfo_sub(content)
+    docinfosubs = (@attributes['docinfosubs'] || 'attributes,replacements').delete(' ').split(',')
+    if docinfosubs.include? 'specialcharacters'
+      content = sub_specialcharacters(content)
+    end
+    if docinfosubs.include? 'quotes'
+      content = sub_quotes(content)
+    end
+    if docinfosubs.include? 'attributes'
+      content = sub_attributes(content)
+    end
+    if docinfosubs.include? 'replacements'
+      content = sub_replacements(content)
+    end
+    if docinfosubs.include? 'macros'
+      content = sub_macros(content)
+    end
+    if docinfosubs.include? 'highlight'
+      content = highlight_source(content)
+    end
+    if docinfosubs.include? 'callouts'
+      content = sub_callouts(content)
+    end
+    if docinfosubs.include? 'post_replacements'
+      content = sub_post_replacements(content)
+    end
+    content
   end
 
   def docinfo_processors?(location = :header)
