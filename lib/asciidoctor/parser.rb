@@ -1065,7 +1065,7 @@ class Parser
       return lines
     end
 
-    if content_model == :verbatim && (indent = attributes['indent'])
+    if content_model == :verbatim && (indent = attributes['indent'] || parent.document.attributes['source-indent'])
       reset_block_indent! lines, indent.to_i
     end
 

@@ -578,7 +578,7 @@ class PreprocessorReader < Reader
       result.pop while (last = result[-1]) && last.empty?
     end
 
-    if (indent = opts.fetch(:indent, nil))
+    if (indent = opts.fetch(:indent, @document.attributes['source-indent']))
       Parser.reset_block_indent! result, indent.to_i
     end
 
