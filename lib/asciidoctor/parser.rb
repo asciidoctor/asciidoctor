@@ -814,10 +814,10 @@ class Parser
         when :listing, :fenced_code, :source
           if block_context == :fenced_code
             style = attributes['style'] = 'source'
-            language, linenums = this_line[3..-1].split(',', 2)
-            if language && !(language = language.strip).empty?
+            language, linenums = this_line[3..-1].tr(' ', '').split(',', 2)
+            if !language.nil_or_empty?
               attributes['language'] = language
-              attributes['linenums'] = '' if linenums && !linenums.strip.empty?
+              attributes['linenums'] = '' unless linenums.nil_or_empty?
             elsif (default_language = document.attributes['source-language'])
               attributes['language'] = default_language
             end
