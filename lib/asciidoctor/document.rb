@@ -1107,15 +1107,17 @@ class Document < AbstractBlock
 
       content = nil
 
-      docinfo = @attributes.key?('docinfo')
-      docinfo1 = @attributes.key?('docinfo1')
-      docinfo2 = @attributes.key?('docinfo2')
+      docinfo = @attributes.key? 'docinfo'
+      docinfo1 = @attributes.key? 'docinfo1'
+      docinfo2 = @attributes.key? 'docinfo2'
       docinfo_filename = %(docinfo#{qualifier}#{ext})
       if docinfo1 || docinfo2
         docinfo_path = normalize_system_path(docinfo_filename, docinfodir)
         # NOTE normalizing the lines is essential if we're performing substitutions
         if (content = read_asset(docinfo_path, :normalize => true))
-          content = sub_attributes(content)
+          if (docinfosubs ||= resolve_docinfo_subs)
+            content = (docinfosubs == :attributes) ? sub_attributes(content) : apply_subs(content, docinfosubs)
+          end
         end
       end
 
@@ -1123,7 +1125,9 @@ class Document < AbstractBlock
         docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}), docinfodir)
         # NOTE normalizing the lines is essential if we're performing substitutions
         if (content2 = read_asset(docinfo_path, :normalize => true))
-          content2 = sub_attributes(content2)
+          if (docinfosubs ||= resolve_docinfo_subs)
+            content2 = (docinfosubs == :attributes) ? sub_attributes(content2) : apply_subs(content2, docinfosubs)
+          end
           content = content ? %(#{content}#{EOL}#{content2}) : content2
         end
       end
@@ -1136,6 +1140,15 @@ class Document < AbstractBlock
 
       # coerce to string (in case the value is nil)
       %(#{content})
+    end
+  end
+
+  def resolve_docinfo_subs
+    if @attributes.key? 'docinfosubs'
+      subs = resolve_subs @attributes['docinfosubs'], :block, nil, 'docinfo'
+      subs.empty? ? nil : subs
+    else
+      :attributes
     end
   end
 

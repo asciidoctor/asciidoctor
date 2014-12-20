@@ -76,24 +76,21 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts.on('-C', '--compact', 'compact the output by removing blank lines. (No longer in use)') do
           end
-          opts.on('-a', '--attribute key[=value],key2[=value2],...', ::Array,
-                  'a list of document attributes to set in the form of key, key! or key=value pair',
-                  'unless @ is appended to the value, these attributes take precedence over attributes',
-                  'defined in the source document') do |attribs|
-            attribs.each do |attrib|
-              key, val = attrib.split '=', 2
-              # move leading ! to end for internal processing
-              #if val.nil? && key.start_with?('!')
-              #  key = "#{key[1..-1]}!"
-              #end
-              self[:attributes][key] = val || ''
-            end
+          opts.on('-a', '--attribute key[=value]', 'a document attribute to set in the form of key, key! or key=value pair',
+                  'unless @ is appended to the value, this attributes takes precedence over attributes',
+                  'defined in the source document') do |attr|
+            key, val = attr.split '=', 2
+            # move leading ! to end for internal processing
+            #if !val && key.start_with?('!')
+            #  key = "#{key[1..-1]}!"
+            #end
+            self[:attributes][key] = val || ''
           end
           opts.on('-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
                   'may be specified multiple times') do |template_dir|
             if self[:template_dirs].nil?
               self[:template_dirs] = [template_dir]
-            elsif self[:template_dirs].is_a? ::Array
+            elsif ::Array === self[:template_dirs]
               self[:template_dirs].push template_dir
             else
               self[:template_dirs] = [self[:template_dirs], template_dir]

@@ -817,6 +817,16 @@ text
       assert_css 'productname', output, 0
       assert_css 'copyright', output, 0
     end
+
+    test 'should apply explicit substitutions to docinfo files' do
+      sample_input_path = fixture_path('subs.adoc')
+
+      output = Asciidoctor.convert_file sample_input_path, :to_file => false,
+                                        :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo' => '', 'docinfosubs' => 'attributes,replacements', 'linkcss' => ''}
+      assert !output.empty?
+      assert_css 'script[src="bootstrap.3.2.0.min.js"]', output, 1
+      assert_xpath %(//meta[@name="copyright"][@content="#{entity 169} OpenDevise"]), output, 1
+    end
   end
 
   context 'MathJax' do
