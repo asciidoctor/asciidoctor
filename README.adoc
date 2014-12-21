@@ -31,7 +31,7 @@ endif::[]
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: http://discuss.asciidoctor.org
 :uri-irc: irc://irc.freenode.org/#asciidoctor
-:uri-rubygem: http://rubygems.org/gems/asciidoctor
+:uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
 :uri-install-doc: {uri-docs}/install-toolchain
@@ -72,10 +72,11 @@ Asciidoctor.js is used to power the AsciiDoc preview extensions for Chrome, Atom
 
 ifdef::env-github[]
 .*Project health*
-image:http://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status, link=https://travis-ci.org/asciidoctor/asciidoctor] 
-//image:http://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status, link=https://coveralls.io/r/asciidoctor/asciidoctor]
+image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor] 
+image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true[Build Status (AppVeyor), link=https://ci.appveyor.com/project/asciidoctor/asciidoctor] 
+//image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status, link=https://coveralls.io/r/asciidoctor/asciidoctor]
 image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate, link="https://codeclimate.com/github/asciidoctor/asciidoctor"]
-image:http://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="http://inch-ci.org/github/asciidoctor/asciidoctor"]
+image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="https://inch-ci.org/github/asciidoctor/asciidoctor"]
 endif::env-github[]
 
 == The Big Picture

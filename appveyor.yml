@@ -1,5 +1,7 @@
-version: "{build}"
+version: '{build}'
 skip_tags: true
+skip_commits:
+  message: /\[ci skip\]/
 clone_depth: 10
 environment:
   matrix:
