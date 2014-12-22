@@ -8,7 +8,7 @@ rvm:
   - jruby-19mode
   - jruby-18mode
   - rbx-2
-script: rake coverage test:all
+script: bundle exec rake coverage test:all
 notifications:
   email: false
   irc: 'irc.freenode.org#asciidoctor'
