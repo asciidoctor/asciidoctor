@@ -1359,7 +1359,11 @@ module Asciidoctor
     timings.record :parse if timings
     doc
   rescue => e
-    raise e.class, %(asciidoctor: FAILED: #{attributes.fetch 'docfile', '<stdin>'}: Failed to parse source, #{e.message})
+    backtrace = e.backtrace
+    # revise exception message to include info about source file and rethrow from original location
+    e = e.exception(%(asciidoctor: FAILED: #{attributes['docfile'] || '<stdin>'}: Failed to parse AsciiDoc source, #{e.message}))
+    e.set_backtrace backtrace
+    raise e
   end
 
   # Public: Parse the contents of the AsciiDoc source file into an Asciidoctor::Document
