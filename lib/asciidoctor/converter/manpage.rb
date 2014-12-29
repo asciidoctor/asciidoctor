@@ -86,9 +86,7 @@ module Asciidoctor
 .ie \\n\(.g .ds Aq \\\(aq
 .el       .ds Aq '
 .nh
-.ad l
-)
-
+.ad l)
       if node.attr? 'stem'
         result << %(<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -107,11 +105,10 @@ MathJax.Hub.Config({
       end
 
       unless node.noheader
-        result << %(.SH "#{node.attr 'manname-title'}")
-        # The next line after the manname and manpurpose is the preamble
-        # Do this to include the title and the preamble in the NAME section.
-        header_manname = (node.attr? 'manname') ? (node.attr 'manname') : header_title.downcase
-        result << %(#{header_manname} \\- #{node.attr 'manpurpose'})
+        if node.attr? 'manpurpose'
+          result << %(.SH "#{node.attr 'manname-title'}"\n.sp)
+          result << %(#{node.attr 'mantitle'} \\- #{node.attr 'manpurpose'})
+        end
       end
 
       result << %(#{node.content})
