@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
 # Public: Methods and constants for managing AsciiDoc table content in a document.
 # It supports all three of AsciiDoc's table formats: psv, dsv and csv.
@@ -486,7 +487,7 @@ class Table::ParserContext
       # TODO perhaps the col_count/linenum logic should be in end_of_row? (or a should_end_row? method)
       close_row if end_of_row? && (@col_count != -1 || @linenum > 0 || (eol && i == repeat))
     end
-    @open_cell = false
+    @cell_open = false
     nil
   end
 

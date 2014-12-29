@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
   # A {Converter} implementation that delegates to the chain of {Converter}
   # objects passed to the constructor. Selects the first {Converter} that
@@ -16,40 +17,28 @@ module Asciidoctor
     end
 
     # Public: Delegates to the first converter that identifies itself as the
-    # handler for the given transform.
-    #
-    # node      - the AbstractNode to convert
-    # transform - the optional String transform, or the name of the node if no
-    #             transform is specified. (default: nil)
-    #
-    # Returns the String result returned from the delegate's convert method
-    def convert node, transform = nil
-      transform ||= node.node_name
-      # QUESTION is there a way we can control whether to use convert or send?
-      (converter_for transform).convert node, transform
-    end
-
-    # Public: Delegates to the first converter that identifies itself as the
     # handler for the given transform. The optional Hash is passed as the last
     # option to the delegate's convert method.
     #
     # node      - the AbstractNode to convert
     # transform - the optional String transform, or the name of the node if no
     #             transform is specified. (default: nil)
-    # opts      - a optional Hash that is passed to the delegate's convert method. (default: {})
+    # opts      - an optional Hash that is passed to the delegate's convert method. (default: {})
     #
     # Returns the String result returned from the delegate's convert method
-    def convert_with_options node, transform = nil, opts = {}
+    def convert node, transform = nil, opts = {}
       transform ||= node.node_name
-      # QUESTION should we check arity, or perhaps do a rescue ::ArgumentError?
-      (converter_for transform).convert_with_options node, transform, opts
+      (converter_for transform).convert node, transform, opts
     end
+
+    # Alias for backward compatibility.
+    alias :convert_with_options :convert
 
     # Public: Retrieve the converter for the specified transform.
     #
     # Returns the matching [Converter] object
     def converter_for transform
-      @converter_map[transform] ||= find_converter transform
+      @converter_map[transform] ||= (find_converter transform)
     end
 
     # Internal: Find the converter for the specified transform.

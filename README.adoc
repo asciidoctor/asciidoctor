@@ -13,6 +13,7 @@ ifdef::env-github[:idprefix: user-content-]
 :uri-asciidoctorj: {uri-org}/asciidoctorj
 :uri-asciidoctorjs: {uri-org}/asciidoctor.js
 :uri-project: http://asciidoctor.org
+ifdef::awestruct-version[:uri-project: link:]
 :uri-docs: {uri-project}/docs
 :uri-news: {uri-project}/news
 :uri-manpage: {uri-project}/man/asciidoctor
@@ -30,7 +31,7 @@ endif::[]
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: http://discuss.asciidoctor.org
 :uri-irc: irc://irc.freenode.org/#asciidoctor
-:uri-rubygem: http://rubygems.org/gems/asciidoctor
+:uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
 :uri-install-doc: {uri-docs}/install-toolchain
@@ -46,13 +47,20 @@ endif::[]
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
-{uri-project}[Asciidoctor] is a _fast_ text processor and publishing toolchain for converting {uri-what-is-asciidoc}[AsciiDoc] content to HTML5, DocBook 5 (or 4.5) and other formats.
-Asciidoctor is written in {uri-ruby}[Ruby], packaged as a RubyGem and published to {uri-rubygem}[RubyGems.org].
+{uri-project}/[Asciidoctor] is a _fast_ text processor and publishing toolchain for converting {uri-what-is-asciidoc}[AsciiDoc] content to HTML5, DocBook 5 (or 4.5) and other formats.
+Asciidoctor is written in Ruby, packaged as a RubyGem and published to {uri-rubygem}[RubyGems.org].
 The gem is also included in several Linux distributions, including Fedora, Debian and Ubuntu.
 Asciidoctor is open source, {uri-repo}[hosted on GitHub] and released under the MIT license.
 
-[TIP]
-====
+.Key documentation
+[.compact]
+* {uri-docs}/what-is-asciidoc[What is Asciidoc?]
+* {uri-docs}/asciidoc-writers-guide[AsciiDoc Writer's Guide]
+* {uri-docs}/asciidoc-syntax-quick-reference[AsciiDoc Syntax Reference]
+* {uri-docs}/user-manual[Asciidoctor User Manual]
+
+.Where Ruby goes, Asciidoctor follows
+****
 You can run Asciidoctor on the JVM using JRuby.
 To invoke the Asciidoctor API directly from Java and other JVM languages, use {uri-asciidoctorj}[AsciidoctorJ].
 There are plugins available, based on AsciidoctorJ, that integrate the Asciidoctor processor into Apache Maven, Gradle or Javadoc builds.
@@ -60,16 +68,21 @@ There are plugins available, based on AsciidoctorJ, that integrate the Asciidoct
 Asciidoctor also runs in JavaScript.
 We use http://opalrb.org[Opal] to transcompile the Ruby source to JavaScript to produce {uri-asciidoctorjs}[Asciidoctor.js], a fully-functional version of Asciidoctor that works in any JavaScript environment, such as a web browser or Node.js.
 Asciidoctor.js is used to power the AsciiDoc preview extensions for Chrome, Atom, Brackets and other web-based tooling.
-====
+****
 
-ifdef::env-github[]
-*Project health:* image:http://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status, link="https://travis-ci.org/asciidoctor/asciidoctor"] image:http://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg["Coverage Status", link="https://coveralls.io/r/asciidoctor/asciidoctor"]
-endif::env-github[]
+//ifdef::env-github[]
+.*Project health*
+image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor] 
+image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true&amp;passingText=green%20bar&amp;failingText=%23fail&amp;pendingText=building%2E%2E%2E[Build Status (AppVeyor), link=https://ci.appveyor.com/project/asciidoctor/asciidoctor] 
+//image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status, link=https://coveralls.io/r/asciidoctor/asciidoctor]
+image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate, link="https://codeclimate.com/github/asciidoctor/asciidoctor"]
+image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="https://inch-ci.org/github/asciidoctor/asciidoctor"]
+//endif::env-github[]
 
 == The Big Picture
 
 Asciidoctor reads content written in plain text, as shown in the panel on the left in the image below, and converts it to HTML5, as shown rendered in the right panel.
-Asciidoctor adds a default stylesheet to the HTML5 document, as shown, to provide a pleasant out-of-the-box experience.
+Asciidoctor applies a default stylesheet to the HTML5 document to provide a pleasant out-of-the-box experience.
 
 image::{image-uri-screenshot}[Preview of AsciiDoc source and corresponding rendered HTML]
 
@@ -119,7 +132,7 @@ If you want to install a pre-release version (e.g., a release candidate), use:
 ====
 If you have an earlier version of Asciidoctor installed, you can update it using:
 
- $ gem upgrade asciidoctor
+ $ gem update asciidoctor
 
 If you install a new version of the gem using `gem install` instead of gem update, you'll have multiple versions installed.
 If that's the case, use the following gem command to remove the old versions:
@@ -302,11 +315,11 @@ Mailing list:: {uri-discuss}
 Twitter (Chat):: #asciidoctor hashtag
 IRC (Chat):: {uri-irc}[#asciidoctor] on FreeNode IRC
 
+ifdef::env-github[]
 Further information and documentation about Asciidoctor can be found on the project's website.
 
-Home:: {uri-project}
-News:: {uri-news}
-Docs:: {uri-docs}
+{uri-project}/[Home] | {uri-news}[News] | {uri-docs}[Docs]
+endif::[]
 
 The Asciidoctor organization on GitHub hosts the project's source code, issue tracker, and sub-projects.
 
@@ -329,6 +342,49 @@ The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and
 *AsciiDoc* was started by Stuart Rackham and has received contributions from many other individuals in the AsciiDoc community.
 
 == Changelog
+
+== 1.5.2 (2014-11-27) - @mojavelinux
+
+Enhancements::
+
+  * add docinfo extension (@mogztter) (#1162)
+  * allow docinfo to be in separate directory from content, specified by `docinfodir` attribute (@mogztter) (#511)
+  * enable TeX equation auto-numbering if `eqnums` attribute is set (@jxxcarlson) (#1110)
+
+Improvements::
+
+  * recognize `--` as valid line comment for callout numbers; make line comment configurable (#1068)
+  * upgrade highlight.js to version 8.4 (#1216)
+  * upgrade Font Awesome to version 4.2.0 (@clojens) (#1201)
+  * define JAVASCRIPT_PLATFORM constant to simplify conditional logic in the JavaScript environment (#897)
+  * provide access to destination directory, outfile and outdir via Document object (#1203)
+  * print encoding information in version report produced by `asciidoctor -v` (#1210)
+  * add intrinsic attribute named `cpp` with value `C++` (#1208)
+  * preserve URI targets passed to `stylesheet` and related attributes (#1192)
+  * allow numeric characters in block attribute name (#1103)
+  * support custom YouTube playlists (#1105)
+  * make start number for unique id generation configurable (#1148)
+  * normalize and force UTF-8 encoding of docinfo content (#831)
+  * allow subs and default_subs to be specified in Block constructor (#749)
+  * enhance error message when reading binary input files (@mogztter) (#1158)
+  * add `append` method as alias to `<<` method on AbstractBlock (#1085)
+  * assign value of `preface-title` as title of preface node (#1090)
+  * fix spacing around checkbox in checklist (#1138)
+  * automatically load Slim's include plugin when using slim templates (@jirutka) (#1151)
+  * mixin Slim helpers into execution scope of slim templates (@jirutka) (#1143)
+  * improve DocBook output for manpage doctype (@bk2204) (#1134, #1142)
+
+Compliance::
+
+  * substitute attribute entry value in attributes defined outside of header (#1130)
+  * allow empty cell to appear at end of table row (#1106)
+  * only produce one row for table in CSV or DSV format with a single cell (#1180)
+
+Bug fixes::
+
+  * add explicit to_s call to generate delimiter settings for MathJax config (#1198)
+  * fix includes that reference absolute Windows paths (#1144)
+  * apply DSL to extension block in a way compatible with Opal
 
 == 1.5.1 (2014-09-29) - @mojavelinux
 

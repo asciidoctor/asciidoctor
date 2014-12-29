@@ -453,6 +453,17 @@ List
       assert_xpath '//ul/li', output, 3
     end
 
+    test 'indented unicode bullet elements using spaces' do
+      input = <<-EOS
+ • Foo
+ • Boo
+ • Blech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 1
+      assert_xpath '//ul/li', output, 3
+    end if ::RUBY_MIN_VERSION_1_9
+
     test 'indented asterisk elements using tabs' do
       input = <<-EOS
 \t*\tFoo
@@ -803,6 +814,27 @@ List
       assert_xpath '((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
       assert_xpath '(((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
     end
+
+    test 'nested elements (5) with unicode bullet' do
+      input = <<-EOS
+List
+====
+
+• Foo
+•• Boo
+••• Snoo
+•••• Froo
+••••• Groo
+• Blech
+      EOS
+      output = render_string input
+      assert_xpath '//ul', output, 5
+      assert_xpath '(//ul)[1]/li', output, 2
+      assert_xpath '((//ul)[1]/li//ul)[1]/li', output, 1
+      assert_xpath '(((//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
+      assert_xpath '((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
+      assert_xpath '(((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
+    end if ::RUBY_MIN_VERSION_1_9
 
     test "nested ordered elements (2)" do
       input = <<-EOS
@@ -3990,30 +4022,56 @@ foo::
     assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
   end
 
-  test 'should remove leading line comment chars' do
+  test 'should remove line comment chars that precedes callout number' do
     input = <<-EOS
+[source,ruby]
 ----
 puts 'Hello, world!' # <1>
 ----
 <1> Ruby
 
+[source,groovy]
 ----
 println 'Hello, world!' // <1>
 ----
 <1> Groovy
 
+[source,clojure]
 ----
 (def hello (fn [] "Hello, world!")) ;; <1>
 (hello)
 ----
 <1> Clojure
+
+[source,haskell]
+----
+main = putStrLn "Hello, World!" -- <1>
+----
+<1> Haskell
+    EOS
+    [{}, {'source-highlighter' => 'coderay'}].each do |attributes|
+      output = render_embedded_string input, :attributes => attributes
+      assert_xpath '//b', output, 4
+      nodes = xmlnodes_at_css 'pre', output 
+      assert_equal %(puts 'Hello, world!' (1)), nodes[0].text
+      assert_equal %(println 'Hello, world!' (1)), nodes[1].text
+      assert_equal %((def hello (fn [] "Hello, world!")) (1)\n(hello)), nodes[2].text
+      assert_equal %(main = putStrLn "Hello, World!" (1)), nodes[3].text
+    end
+  end
+
+  test 'should allow line comment chars that precede callout number to be specified' do
+    input = <<-EOS
+[source,erlang,line-comment=%]
+----
+hello_world() -> io:fwrite("hello, world\n"). % <1>
+----
+<1> Erlang
     EOS
     output = render_embedded_string input
-    assert_xpath '//b', output, 3
+    assert_xpath '//b', output, 1
     nodes = xmlnodes_at_css 'pre', output 
-    assert_equal "puts 'Hello, world!' (1)", nodes[0].text
-    assert_equal "println 'Hello, world!' (1)", nodes[1].text
-    assert_equal %((def hello (fn [] "Hello, world!")) (1)\n(hello)), nodes[2].text
+    assert_equal %(hello_world() -> io:fwrite("hello, world\n"). (1)), nodes[0].text
   end
 
   test 'literal block with callouts' do

@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
   module Cli
 
@@ -49,7 +50,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   'document type to use when converting document: [article, book, manpage, inline] (default: article)') do |doc_type|
             self[:attributes]['doctype'] = doc_type
           end
-          opts.on('-o', '--out-file FILE', 'output file (default: based on input file path); use - to output to STDOUT') do |output_file|
+          opts.on('-o', '--out-file FILE', 'output file (default: based on path of input file); use - to output to STDOUT') do |output_file|
             self[:output_file] = output_file
           end
           opts.on('--safe',
@@ -75,24 +76,21 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts.on('-C', '--compact', 'compact the output by removing blank lines. (No longer in use)') do
           end
-          opts.on('-a', '--attribute key[=value],key2[=value2],...', ::Array,
-                  'a list of document attributes to set in the form of key, key! or key=value pair',
-                  'unless @ is appended to the value, these attributes take precedence over attributes',
-                  'defined in the source document') do |attribs|
-            attribs.each do |attrib|
-              key, val = attrib.split '=', 2
-              # move leading ! to end for internal processing
-              #if val.nil? && key.start_with?('!')
-              #  key = "#{key[1..-1]}!"
-              #end
-              self[:attributes][key] = val || ''
-            end
+          opts.on('-a', '--attribute key[=value]', 'a document attribute to set in the form of key, key! or key=value pair',
+                  'unless @ is appended to the value, this attributes takes precedence over attributes',
+                  'defined in the source document') do |attr|
+            key, val = attr.split '=', 2
+            # move leading ! to end for internal processing
+            #if !val && key.start_with?('!')
+            #  key = "#{key[1..-1]}!"
+            #end
+            self[:attributes][key] = val || ''
           end
           opts.on('-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
                   'may be specified multiple times') do |template_dir|
             if self[:template_dirs].nil?
               self[:template_dirs] = [template_dir]
-            elsif self[:template_dirs].is_a? ::Array
+            elsif ::Array === self[:template_dirs]
               self[:template_dirs].push template_dir
             else
               self[:template_dirs] = [self[:template_dirs], template_dir]
@@ -107,7 +105,7 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-D', '--destination-dir DIR', 'destination output directory (default: directory of source file)') do |dest_dir|
             self[:destination_dir] = dest_dir
           end
-          opts.on('-IDIRECTORY', '--load-path LIBRARY', 'add a directory to the $LOAD_PATH',
+          opts.on('-IDIRECTORY', '--load-path DIRECTORY', 'add a directory to the $LOAD_PATH',
               'may be specified more than once') do |path|
             (self[:load_paths] ||= []).concat(path.split ::File::PATH_SEPARATOR)
           end
@@ -134,9 +132,7 @@ Example: asciidoctor -b html5 source.asciidoc
           end
 
           opts.on_tail('-V', '--version', 'display the version and runtime environment (or -v if no other flags or arguments)') do
-            $stdout.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
-            $stdout.puts %(Runtime Environment (#{RUBY_DESCRIPTION}))
-            return 0
+            return print_version $stdout
           end
           
         end
@@ -146,9 +142,7 @@ Example: asciidoctor -b html5 source.asciidoc
         
         if args.empty?
           if self[:verbose] == 2
-            $stdout.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
-            $stdout.puts %(Runtime Environment (#{RUBY_DESCRIPTION}))
-            return 0
+            return print_version $stdout
           else
             $stderr.puts opts_parser
             return 1
@@ -183,8 +177,12 @@ Example: asciidoctor -b html5 source.asciidoc
         end
 
         infiles.each do |file|
-          unless file == '-' || (::File.readable? file)
-            $stderr.puts %(asciidoctor: FAILED: input file #{file} missing or cannot be read)
+          unless file == '-' || (::File.file? file)
+            if ::File.readable? file
+              $stderr.puts %(asciidoctor: FAILED: input path #{file} is a #{(::File.stat file).ftype}, not a file)
+            else
+              $stderr.puts %(asciidoctor: FAILED: input file #{file} missing or cannot be read)
+            end
             return 1
           end
         end
@@ -237,6 +235,19 @@ Example: asciidoctor -b html5 source.asciidoc
         $stderr.puts %(asciidoctor: #{$!.message})
         $stdout.puts opts_parser
         return 1
+      end
+
+      def print_version os = $stdout
+        os.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
+        if RUBY_VERSION >= '1.9.3'
+          encoding_info = {'lc' => 'locale', 'fs' => 'filesystem', 'in' => 'internal', 'ex' => 'external'}.map do |k,v|
+            %(#{k}:#{Encoding.find(v) || '-'})
+          end
+          os.puts %(Runtime Environment (#{RUBY_DESCRIPTION}) (#{encoding_info * ' '}))
+        else
+          os.puts %(Runtime Environment (#{RUBY_DESCRIPTION}))
+        end
+        0
       end
     end
   end

@@ -1,3 +1,4 @@
+# encoding: UTF-8
 ASCIIDOCTOR_PROJECT_DIR = File.dirname File.dirname(__FILE__)
 Dir.chdir ASCIIDOCTOR_PROJECT_DIR
 
@@ -5,16 +6,17 @@ if RUBY_VERSION < '1.9'
   require 'rubygems'
 end
 
+require 'simplecov' if ENV['COVERAGE'] == 'true'
+
 require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
 
 require 'minitest/autorun'
 require 'socket'
 require 'nokogiri'
+require 'tmpdir'
 
 autoload :FileUtils, 'fileutils'
 autoload :Pathname,  'pathname'
-
-ENV['SUPPRESS_DEBUG'] ||= 'true'
 
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
 RE_DOCTYPE = /\s*<!DOCTYPE (.*)/

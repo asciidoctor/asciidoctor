@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
 # Public: Methods for retrieving lines from AsciiDoc source files
 class Reader
@@ -577,8 +578,8 @@ class PreprocessorReader < Reader
       result.pop while (last = result[-1]) && last.empty?
     end
 
-    if (indent = opts.fetch(:indent, nil))
-      Parser.reset_block_indent! result, indent.to_i
+    if opts.key? :indent
+      Parser.reset_block_indent! result, opts[:indent].to_i
     end
 
     result
@@ -708,10 +709,10 @@ class PreprocessorReader < Reader
           @conditional_stack.pop
           @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
         else
-          warn "asciidoctor: ERROR: #{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]"
+          warn %(asciidoctor: ERROR: #{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[])
         end
       else
-        warn "asciidoctor: ERROR: #{line_info}: unmatched macro: endif::#{target}[]"
+        warn %(asciidoctor: ERROR: #{line_info}: unmatched macro: endif::#{target}[])
       end
       return true
     end
@@ -858,7 +859,7 @@ class PreprocessorReader < Reader
         # include file is resolved relative to dir of current include, or base_dir if within original docfile
         include_file = @document.normalize_system_path(target, @dir, nil, :target_name => 'include file')
         unless ::File.file? include_file
-          warn "asciidoctor: WARNING: #{line_info}: include file not found: #{include_file}"
+          warn %(asciidoctor: WARNING: #{line_info}: include file not found: #{include_file})
           replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
@@ -891,7 +892,7 @@ class PreprocessorReader < Reader
         elsif attributes.has_key? 'tag'
           tags = [attributes['tag']].to_set
         elsif attributes.has_key? 'tags'
-          tags = attributes['tags'].split(DataDelimiterRx).uniq.to_set
+          tags = attributes['tags'].split(DataDelimiterRx).to_set
         end
       end
       if inc_lines
@@ -966,7 +967,7 @@ class PreprocessorReader < Reader
             return true
           end
           unless (missing_tags = tags.to_a - tags_found.to_a).empty?
-            warn "asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{include_file}"
+            warn %(asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{include_file})
           end
           advance
           # FIXME not accounting for skipped lines in reader line numbering
@@ -1187,13 +1188,11 @@ class PreprocessorReader < Reader
   end
 
   def include_processors?
-    if !@include_processor_extensions
+    if @include_processor_extensions.nil?
       if @document.extensions? && @document.extensions.include_processors?
-        @include_processor_extensions = @document.extensions.include_processors
-        true
+        !!(@include_processor_extensions = @document.extensions.include_processors)
       else
         @include_processor_extensions = false
-        false
       end
     else
       @include_processor_extensions != false

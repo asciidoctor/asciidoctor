@@ -57,9 +57,9 @@ context 'Options' do
   end
 
   test 'standard attribute assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-a imagesdir=images,icons test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-a docinfosubs=attributes,replacements -a icons test/fixtures/sample.asciidoc))
 
-    assert_equal 'images', options[:attributes]['imagesdir']
+    assert_equal 'attributes,replacements', options[:attributes]['docinfosubs']
     assert_equal '', options[:attributes]['icons']
   end
 
@@ -77,7 +77,7 @@ context 'Options' do
   end
 
   test 'should allow safe mode to be specified' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-S safe /dev/null))
+    options = Asciidoctor::Cli::Options.parse!(%w(-S safe test/fixtures/sample.asciidoc))
     assert_equal Asciidoctor::SafeMode::SAFE, options[:safe]
   end
 

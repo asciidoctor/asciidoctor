@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
   # A built-in {Converter} implementation that generates HTML 5 output
   # consistent with the html5 backend from AsciiDoc Python.
@@ -48,13 +49,13 @@ module Asciidoctor
       result << %(<meta name="author" content="#{node.attr 'authors'}"#{slash}>) if node.attr? 'authors'
       result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
 
-      result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>) 
+      result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
         if (webfonts = node.attr 'webfonts')
           result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400' : webfonts}"#{slash}>)
         end
         if linkcss
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', '')}"#{slash}>)
+          result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', ''), false}"#{slash}>)
         else
           result << @stylesheets.embed_primary_stylesheet
         end
@@ -63,17 +64,17 @@ module Asciidoctor
           result << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{slash}>)
         else
           result << %(<style>
-#{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), true}
+#{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), :warn_on_failure => true}
 </style>)
         end
       end
 
       if node.attr? 'icons', 'font'
         if node.attr? 'iconfont-remote'
-          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base}/font-awesome/4.1.0/css/font-awesome.min.css]}"#{slash}>)
+          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base}/font-awesome/4.2.0/css/font-awesome.min.css]}"#{slash}>)
         else
           iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', '')}"#{slash}>)
+          result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
         end
       end
 
@@ -81,7 +82,7 @@ module Asciidoctor
       when 'coderay'
         if (node.attr 'coderay-css', 'class') == 'class'
           if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.coderay_stylesheet_name, (node.attr 'stylesdir', '')}"#{slash}>)
+            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.coderay_stylesheet_name, (node.attr 'stylesdir', ''), false}"#{slash}>)
           else
             result << @stylesheets.embed_coderay_stylesheet
           end
@@ -90,13 +91,13 @@ module Asciidoctor
         if (node.attr 'pygments-css', 'class') == 'class'
           pygments_style = node.attr 'pygments-style'
           if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', '')}"#{slash}>)
+            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', ''), false}"#{slash}>)
           else
             result << (@stylesheets.embed_pygments_stylesheet pygments_style)
           end
         end
       when 'highlightjs', 'highlight.js'
-        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/8.1)
+        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/8.4)
         result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'github'}.min.css"#{slash}>
 <script src="#{highlightjs_path}/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>)
@@ -108,17 +109,22 @@ module Asciidoctor
       end
 
       if node.attr? 'stem'
+        # IMPORTANT to_s calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
+        eqnums_val = node.attr 'eqnums', 'none'
+        eqnums_val = 'AMS' if eqnums_val == ''
+        eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
         result << %(<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {
-    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath]}],
-    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath]}],
+    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].to_s}],
+    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].to_s}],
     ignoreClass: "nostem|nolatexmath"
   },
   asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath]}],
+    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].to_s}],
     ignoreClass: "nostem|noasciimath"
-  }
+  },
+  TeX: {#{eqnums_opt}}
 });
 </script>
 <script src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
@@ -505,7 +511,7 @@ Your browser does not support the audio tag.
 
     def image node
       align = (node.attr? 'align') ? (node.attr 'align') : nil
-      float = (node.attr? 'float') ? (node.attr 'float') : nil 
+      float = (node.attr? 'float') ? (node.attr 'float') : nil
       style_attribute = if align || float
         styles = [align ? %(text-align: #{align}) : nil, float ? %(float: #{float}) : nil].compact
         %( style="#{styles * ';'}")
@@ -591,7 +597,7 @@ Your browser does not support the audio tag.
       unless ((equation = node.content).start_with? open) && (equation.end_with? close)
         equation = %(#{open}#{equation}#{close})
       end
-      
+
       %(<div#{id_attribute} class="#{(role = node.role) ? ['stemblock', role] * ' ' : 'stemblock'}">
 #{title_element}<div class="content">
 #{equation}
@@ -733,7 +739,7 @@ Your browser does not support the audio tag.
     end
 
     def table node
-      result = [] 
+      result = []
       id_attribute = node.id ? %( id="#{node.id}") : nil
       classes = ['tableblock', %(frame-#{node.attr 'frame', 'all'}), %(grid-#{node.attr 'grid', 'all'})]
       styles = []
@@ -905,37 +911,60 @@ Your browser does not support the audio tag.
       height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
       case node.attr 'poster'
       when 'vimeo'
-        start_anchor = (node.attr? 'start') ? "#at=#{node.attr 'start'}" : nil
+        start_anchor = (node.attr? 'start', nil, false) ? %(#at=#{node.attr 'start'}) : nil
         delimiter = '?'
-        autoplay_param = (node.option? 'autoplay') ? "#{delimiter}autoplay=1" : nil
+        autoplay_param = (node.option? 'autoplay') ? %(#{delimiter}autoplay=1) : nil
         delimiter = '&amp;' if autoplay_param
-        loop_param = (node.option? 'loop') ? "#{delimiter}loop=1" : nil
+        loop_param = (node.option? 'loop') ? %(#{delimiter}loop=1) : nil
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{append_boolean_attribute 'webkitAllowFullScreen', xml}#{append_boolean_attribute 'mozallowfullscreen', xml}#{append_boolean_attribute 'allowFullScreen', xml}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
       when 'youtube'
-        start_param = (node.attr? 'start') ? "&amp;start=#{node.attr 'start'}" : nil
-        end_param = (node.attr? 'end') ? "&amp;end=#{node.attr 'end'}" : nil
+        rel_param_val = (node.option? 'related') ? 1 : 0
+        start_param = (node.attr? 'start', nil, false) ? %(&amp;start=#{node.attr 'start'}) : nil
+        end_param = (node.attr? 'end', nil, false) ? %(&amp;end=#{node.attr 'end'}) : nil
         autoplay_param = (node.option? 'autoplay') ? '&amp;autoplay=1' : nil
         loop_param = (node.option? 'loop') ? '&amp;loop=1' : nil
         controls_param = (node.option? 'nocontrols') ? '&amp;controls=0' : nil
-        # parse video/playlist syntax where playlist is optional
+        # cover both ways of controlling fullscreen option
+        if node.option? 'nofullscreen'
+          fs_param = '&amp;fs=0'
+          fs_attribute = nil
+        else
+          fs_param = nil
+          fs_attribute = append_boolean_attribute 'allowfullscreen', xml
+        end
+        modest_param = (node.option? 'modest') ? '&amp;modestbranding=1' : nil
+        theme_param = (node.attr? 'theme', nil, false) ? %(&amp;theme=#{node.attr 'theme'}) : nil
+        hl_param = (node.attr? 'lang') ? %(&amp;hl=#{node.attr 'lang'}) : nil
+
+        # parse video_id/list_id syntax where list_id (i.e., playlist) is optional
         target, list = (node.attr 'target').split '/', 2
-        if (list ||= (node.attr 'list'))
+        if (list ||= (node.attr 'list', nil, false))
           list_param = %(&amp;list=#{list})
         else
-          list_param = nil
+          # parse dynamic playlist syntax: video_id1,video_id2,...
+          target, playlist = target.split ',', 2
+          if (playlist ||= (node.attr 'playlist', nil, false))
+            # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
+            list_param = %(&amp;playlist=#{playlist})
+          else
+            list_param = nil
+          end
         end
+
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{target}?rel=0#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}#{list_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
 </div>
 </div>)
-      else 
+      else
         poster_attribute = %(#{poster = node.attr 'poster'}).empty? ? nil : %( poster="#{node.media_uri poster}")
-        time_anchor = ((node.attr? 'start') || (node.attr? 'end')) ? %(#t=#{node.attr 'start'}#{(node.attr? 'end') ? ',' : nil}#{node.attr 'end'}) : nil
+        start_t = node.attr 'start', nil, false
+        end_t = node.attr 'end', nil, false
+        time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ',' : nil}#{end_t}) : nil
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
 <video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}>

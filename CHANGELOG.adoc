@@ -11,6 +11,60 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the https://github.com/asciidoctor/asciidoctor/commits/master[commit history] on GitHub.
 
+== 1.5.2 (2014-11-27) - @mojavelinux
+
+Enhancements::
+
+  * add docinfo extension (@mogztter) (#1162)
+  * allow docinfo to be in separate directory from content, specified by `docinfodir` attribute (@mogztter) (#511)
+  * enable TeX equation auto-numbering if `eqnums` attribute is set (@jxxcarlson) (#1110)
+
+Improvements::
+
+  * recognize `--` as valid line comment for callout numbers; make line comment configurable (#1068)
+  * upgrade highlight.js to version 8.4 (#1216)
+  * upgrade Font Awesome to version 4.2.0 (@clojens) (#1201)
+  * define JAVASCRIPT_PLATFORM constant to simplify conditional logic in the JavaScript environment (#897)
+  * provide access to destination directory, outfile and outdir via Document object (#1203)
+  * print encoding information in version report produced by `asciidoctor -v` (#1210)
+  * add intrinsic attribute named `cpp` with value `C++` (#1208)
+  * preserve URI targets passed to `stylesheet` and related attributes (#1192)
+  * allow numeric characters in block attribute name (#1103)
+  * support custom YouTube playlists (#1105)
+  * make start number for unique id generation configurable (#1148)
+  * normalize and force UTF-8 encoding of docinfo content (#831)
+  * allow subs and default_subs to be specified in Block constructor (#749)
+  * enhance error message when reading binary input files (@mogztter) (#1158)
+  * add `append` method as alias to `<<` method on AbstractBlock (#1085)
+  * assign value of `preface-title` as title of preface node (#1090)
+  * fix spacing around checkbox in checklist (#1138)
+  * automatically load Slim's include plugin when using slim templates (@jirutka) (#1151)
+  * mixin Slim helpers into execution scope of slim templates (@jirutka) (#1143)
+  * improve DocBook output for manpage doctype (@bk2204) (#1134, #1142)
+
+Compliance::
+
+  * substitute attribute entry value in attributes defined outside of header (#1130)
+  * allow empty cell to appear at end of table row (#1106)
+  * only produce one row for table in CSV or DSV format with a single cell (#1180)
+
+Bug fixes::
+
+  * add explicit to_s call to generate delimiter settings for MathJax config (#1198)
+  * fix includes that reference absolute Windows paths (#1144)
+  * apply DSL to extension block in a way compatible with Opal
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.2[issues resolved] |
+https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.2[git tag] |
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.0...v1.5.2[full diff]
+
 == 1.5.1 (2014-09-29) - @mojavelinux
 
 Bug fixes::

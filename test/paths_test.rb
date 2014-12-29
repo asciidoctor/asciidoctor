@@ -56,6 +56,16 @@ context 'Path Resolver' do
       assert_equal 'http://www.example.com/assets/images', @resolver.web_path('images', 'http://www.example.com/assets')
     end
 
+    # enable if we want to allow web_path to detect and preserve a target URI
+    #test 'target with file url appended to relative path' do
+    #  assert_equal 'file:///home/username/styles/asciidoctor.css', @resolver.web_path('file:///home/username/styles/asciidoctor.css', '.')
+    #end
+
+    # enable if we want to allow web_path to detect and preserve a target URI
+    #test 'target with http url appended to relative path' do
+    #  assert_equal 'http://example.com/asciidoctor.css', @resolver.web_path('http://example.com/asciidoctor.css', '.')
+    #end
+
     test 'normalize target' do
       assert_equal '../images', @resolver.web_path('../images/../images')
     end
@@ -226,6 +236,17 @@ context 'Path Resolver' do
     test 'rootname should file name if it has no extension' do
       assert_equal 'master', Asciidoctor::Helpers.rootname('master')
       assert_equal 'docs/master', Asciidoctor::Helpers.rootname('docs/master')
+    end
+
+    test 'UriSniffRx should detect URIs' do
+      assert Asciidoctor::UriSniffRx =~ 'http://example.com'
+      assert Asciidoctor::UriSniffRx =~ 'https://example.com'
+      assert Asciidoctor::UriSniffRx =~ 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+    end
+
+    test 'UriSniffRx should not detect an absolute Windows path as a URI' do
+      assert Asciidoctor::UriSniffRx !~ 'c:/sample.adoc'
+      assert Asciidoctor::UriSniffRx !~ 'c:\\sample.adoc'
     end
   end
 end

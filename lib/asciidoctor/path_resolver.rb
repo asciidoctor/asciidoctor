@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
 # Public: Handles all operations for resolving, cleaning and joining paths.
 # This class includes operations for handling both web paths (request URIs) and
@@ -394,6 +395,9 @@ class PathResolver
   # The main function of this operation is to resolve any parent
   # references and remove any self references.
   #
+  # The target is assumed to be a path, not a qualified URI.
+  # That check should happen before this method is invoked.
+  #
   # target - the String target path
   # start  - the String start (i.e., parent) path
   #
@@ -412,6 +416,20 @@ class PathResolver
         target = target[uri_prefix.length..-1]
       end
     end
+
+    # use this logic instead if we want to normalize target if it contains a URI
+    #unless is_web_root? target
+    #  if preserve_uri_target && (target.include? ':') && UriSniffRx =~ target
+    #    uri_prefix = $~[0]
+    #    target = target[uri_prefix.length..-1]
+    #  elsif !start.nil_or_empty?
+    #    target = %(#{start}#{SLASH}#{target})
+    #    if (target.include? ':') && UriSniffRx =~ target
+    #      uri_prefix = $~[0]
+    #      target = target[uri_prefix.length..-1]
+    #    end
+    #  end
+    #end
 
     target_segments, target_root, _ = partition_path target, true
     resolved_segments = []

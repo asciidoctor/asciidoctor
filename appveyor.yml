@@ -1,0 +1,31 @@
+version: '{build}'
+skip_tags: true
+# AppVeyor automatically skips the build if the commit contains [ci skip] or [skip ci]
+#skip_commits:
+#  message: /\[ci skip\]/
+clone_depth: 10
+environment:
+  matrix:
+    # there's a problem loading nokogiri 1.5.11 in Ruby 2.x on Windows
+    #- ruby_version: '21'
+    #- ruby_version: '21-x64'
+    #- ruby_version: '200'
+    #- ruby_version: '200-x64'
+    - ruby_version: '193'
+install:
+  # Take default Ruby out of path
+  - SET PATH=%PATH:C:\Ruby193\bin;=%
+  # Add Ruby to path from build matrix
+  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
+  - echo %PATH%
+  - ruby --version
+  - gem --version
+  - gem install bundler --quiet --no-ri --no-rdoc
+  - bundler --version
+  - bundle
+build_script:
+  - bundle exec rake build
+test_script:
+  - bundle exec rake test:all
+artifacts:
+  - path: pkg\*.gem

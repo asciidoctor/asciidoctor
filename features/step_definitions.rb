@@ -1,4 +1,15 @@
-require "#{File.dirname __FILE__}/../lib/asciidoctor"
+# encoding: UTF-8
+ASCIIDOCTOR_PROJECT_DIR = File.dirname File.dirname(__FILE__)
+Dir.chdir ASCIIDOCTOR_PROJECT_DIR
+
+if RUBY_VERSION < '1.9'
+  require 'rubygems'
+end
+
+require 'simplecov' if ENV['COVERAGE'] == 'true'
+
+require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
+
 require 'rspec/expectations'
 require 'tilt'
 require 'slim'

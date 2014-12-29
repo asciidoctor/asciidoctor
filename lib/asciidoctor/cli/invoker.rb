@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
   module Cli
     # Public Invocation class for starting Asciidoctor via CLI
@@ -104,8 +105,11 @@ module Asciidoctor
             raise e
           else
             err = (@err || $stderr)
-            err.print %(#{e.class}: ) if ::RuntimeError === e
-            err.puts e.message
+            if ::RuntimeError === e
+              err.puts %(#{e.message} (#{e.class}))
+            else
+              err.puts e.message
+            end
             err.puts '  Use --trace for backtrace'
           end
         end

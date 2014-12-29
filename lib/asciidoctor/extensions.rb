@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
 # Extensions provide a way to participate in the parsing and converting
 # phases of the AsciiDoc processor or extend the AsciiDoc syntax.
@@ -111,7 +112,7 @@ module Extensions
     def parse_content parent, content, attributes = {}
       reader = (content.is_a? Reader) ? reader : (Reader.new content)
       while reader.has_more_lines?
-        block = Parser.next_block(reader, parent, attributes)
+        block = Parser.next_block reader, parent, attributes
         parent << block if block
       end
       nil
@@ -243,6 +244,36 @@ module Extensions
     end
   end
   IncludeProcessor::DSL = ProcessorDsl
+
+  # Public: DocinfoProcessors are used to add additional content to
+  # the header and/or footer of the generated document.
+  #
+  # The placement of docinfo content is controlled by the converter.
+  #
+  # DocinfoProcessors implementations must extend DocinfoProcessor.
+  # If a location is not specified, the DocinfoProcessor is assumed
+  # to add content to the header.
+  class DocinfoProcessor < Processor
+    attr_accessor :location
+
+    def initialize config = {}
+      super config
+      @config[:location] ||= :header
+    end
+
+    def process document
+      raise ::NotImplementedError
+    end
+  end
+
+  module DocinfoProcessorDsl
+    include ProcessorDsl
+
+    def at_location value
+      option :location, value
+    end
+  end
+  DocinfoProcessor::DSL = DocinfoProcessorDsl
 
   # Public: BlockProcessors are used to handle delimited blocks and paragraphs
   # that have a custom name.
@@ -450,7 +481,7 @@ module Extensions
 
     def initialize kind, instance, process_method = nil
       super kind, instance, instance.config
-      @process_method = process_method || instance.method(:process)
+      @process_method = process_method || (instance.method :process)
     end
   end
 
@@ -486,7 +517,7 @@ module Extensions
 
     def initialize groups = {}
       @groups = groups
-      @preprocessor_extensions = @treeprocessor_extensions = @postprocessor_extensions = @include_processor_extensions = nil
+      @preprocessor_extensions = @treeprocessor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions =nil
       @block_extensions = @block_macro_extensions = @inline_macro_extensions = nil
       @document = nil
     end
@@ -723,6 +754,79 @@ module Extensions
     # Returns an [Array] of Extension proxy objects.
     def include_processors
       @include_processor_extensions
+    end
+
+    # Public: Registers an {DocinfoProcessor} with the extension registry to
+    # add additionnal docinfo to the document.
+    #
+    # The DocinfoProcessor may be one of four types:
+    #
+    # * A DocinfoProcessor subclass
+    # * An instance of a DocinfoProcessor subclass
+    # * The String name of a DocinfoProcessor subclass
+    # * A method block (i.e., Proc) that conforms to the DocinfoProcessor contract
+    #
+    # Unless the DocinfoProcessor is passed as the method block, it must be the
+    # first argument to this method.
+    #
+    # Examples
+    #
+    #   # as an DocinfoProcessor subclass
+    #   docinfo_processor MetaRobotsDocinfoProcessor
+    #
+    #   # as an instance of a DocinfoProcessor subclass with an explicit location
+    #   docinfo_processor JQueryDocinfoProcessor.new, :location => :footer
+    #
+    #   # as a name of a DocinfoProcessor subclass
+    #   docinfo_processor 'MetaRobotsDocinfoProcessor'
+    #
+    #   # as a method block
+    #   docinfo_processor do
+    #     process |doc|
+    #       at_location :footer
+    #       'footer content'
+    #     end
+    #   end
+    #
+    # Returns the [Extension] stored in the registry that proxies the
+    # instance of this DocinfoProcessor.
+    def docinfo_processor *args, &block
+      add_document_processor :docinfo_processor, args, &block
+    end
+
+    # Public: Checks whether any {DocinfoProcessor} extensions have been registered.
+    #
+    # location - A Symbol for selecting docinfo extensions at a given location (:header or :footer) (default: nil)
+    #
+    # Returns a [Boolean] indicating whether any DocinfoProcessor extensions are registered.
+    def docinfo_processors? location = nil
+      if @docinfo_processor_extensions
+        if location
+          @docinfo_processor_extensions.find {|ext| ext.config[:location] == location }
+        else
+          true
+        end
+      else
+        false
+      end
+    end
+
+    # Public: Retrieves the {Extension} proxy objects for all the
+    # DocinfoProcessor instances stored in this registry.
+    #
+    # location - A Symbol for selecting docinfo extensions at a given location (:header or :footer) (default: nil)
+    #
+    # Returns an [Array] of Extension proxy objects.
+    def docinfo_processors location = nil
+      if @docinfo_processor_extensions
+        if location
+          @docinfo_processor_extensions.select {|ext| ext.config[:location] == location }
+        else
+          @docinfo_processor_extensions
+        end
+      else
+        nil
+      end
     end
 
     # Public: Registers a {BlockProcessor} with the extension registry to
@@ -1013,9 +1117,12 @@ module Extensions
         config = resolve_args args, 1
         # TODO if block arity is 0, assume block is process method
         processor = kind_class.new config
-        class << processor
-          include_dsl
-        end
+        # NOTE class << processor idiom doesn't work in Opal
+        #class << processor
+        #  include_dsl
+        #end
+        # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
+        processor.extend kind_class.const_get :DSL if kind_class.constants.grep :DSL
         processor.instance_exec(&block)
         processor.freeze
         unless processor.process_block_given?
@@ -1060,9 +1167,12 @@ module Extensions
       if block_given?
         name, config = resolve_args args, 2
         processor = kind_class.new as_symbol(name), config
-        class << processor
-          include_dsl
-        end
+        # NOTE class << processor idiom doesn't work in Opal
+        #class << processor
+        #  include_dsl
+        #end
+        # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
+        processor.extend kind_class.const_get :DSL if kind_class.constants.grep :DSL
         if block.arity == 1
           yield processor
         else

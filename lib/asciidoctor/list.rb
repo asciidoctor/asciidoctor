@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
 # Public: Methods for managing AsciiDoc lists (ordered, unordered and labeled lists)
 class List < AbstractBlock

@@ -1,3 +1,4 @@
+# encoding: UTF-8
 RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
 RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
 RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
@@ -98,7 +99,7 @@ module Asciidoctor
 
   # Flags to control compliance with the behavior of AsciiDoc
   module Compliance
-    @keys = [].to_set
+    @keys = ::Set.new
     class << self
       attr :keys
     end
@@ -106,7 +107,7 @@ module Asciidoctor
     # Defines a new compliance key and assigns an initial value.
     def self.define key, value
       if key == :keys || (self.respond_to? key)
-        raise ::ArgumentError, %(Illegal key name: #{key})
+        raise ::ArgumentError, %(illegal key name: #{key})
       end
       instance_variable_set %(@#{key}), value
       class << self; self; end.send :attr_accessor, key
@@ -156,7 +157,13 @@ module Asciidoctor
 
     # Asciidoctor will allow the id, role and options to be set
     # on blocks using a shorthand syntax (e.g., #idname.rolename%optionname)
+    # Compliance value: false
     define :shorthand_property_syntax, true
+
+    # Asciidoctor will start counting at the following number
+    # when creating a unique id when there is a conflict
+    # Compliance value: 2
+    define :unique_id_start_index, 2
 
     # Asciidoctor will recognize commonly-used Markdown syntax
     # to the degree it does not interfere with existing
@@ -644,7 +651,7 @@ module Asciidoctor
     ## Lists
 
     # Detects the start of any list item.
-    AnyListRx = /^(?:<?\d+>#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*(?:-|(?:\*|\.){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*.*?(?::{2,4}|;;)(?:#{CG_BLANK}+#{CG_GRAPH}|$))/
+    AnyListRx = /^(?:<?\d+>#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*(?:-|(?:\*|\.|\u2022){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*.*?(?::{2,4}|;;)(?:#{CG_BLANK}+#{CG_GRAPH}|$))/
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -654,7 +661,7 @@ module Asciidoctor
     #   - Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5})#{CG_BLANK}+(.*)$/
+    UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5}|\u2022{1,5})#{CG_BLANK}+(.*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
     #
@@ -730,15 +737,18 @@ module Asciidoctor
     # Matches a callout reference inside literal text.
     # 
     # Examples
-    #   <1> (optionally prefixed by //, # or ;; line comment chars)
+    #   <1> (optionally prefixed by //, #, -- or ;; line comment chars)
     #   <1> <2> (multiple callouts on one line)
     #   <!--1--> (for XML-based languages)
     #
-    # NOTE special characters are already be replaced at this point during conversion to an SGML format
-    CalloutConvertRx = /(?:(?:\/\/|#|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL})/
-    # NOTE (con't) ...but not while scanning
+    # NOTE extract regexps are applied line-by-line, so we can use $ as end-of-line char
+    CalloutExtractRx = /(?:(?:\/\/|#|--|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*$)/
+    CalloutExtractRxt = "(\\\\)?<()(\\d+)>(?=(?: ?\\\\?<\\d+>)*$)"
+    # NOTE special characters have not been replaced when scanning
     CalloutQuickScanRx = /\\?<!?(--|)(\d+)\1>(?=(?: ?\\?<!?\1\d+\1>)*#{CC_EOL})/
-    CalloutScanRx = /(?:(?:\/\/|#|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*#{CC_EOL})/
+    # NOTE special characters have already been replaced when converting to an SGML format
+    CalloutSourceRx = /(?:(?:\/\/|#|--|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL})/
+    CalloutSourceRxt = "(\\\\)?&lt;()(\\d+)&gt;(?=(?: ?\\\\?&lt;\\d+&gt;)*#{CC_EOL})"
 
     # A Hash of regexps for lists used for dynamic access.
     ListRxMap = {
@@ -1078,9 +1088,12 @@ module Asciidoctor
     # Examples
     #   http://domain
     #   https://domain
+    #   file:///path
     #   data:info
     #
-    UriSniffRx = %r{^#{CG_ALPHA}[#{CC_ALNUM}.+-]*:/{0,2}}
+    #   not c:/sample.adoc or c:\sample.adoc
+    #
+    UriSniffRx = %r{^#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2}}
 
     # Detects the end of an implicit URI in the text
     #
@@ -1130,12 +1143,11 @@ module Asciidoctor
     'asterisk'   => '*',
     'tilde'      => '~',
     'plus'       => '&#43;',
-    'apostrophe' => '\'',
     'backslash'  => '\\',
     'backtick'   => '`',
+    'blank'      => '',
     'empty'      => '',
     'sp'         => ' ',
-    'space'      => ' ',
     'two-colons' => '::',
     'two-semicolons' => ';;',
     'nbsp'       => '&#160;',
@@ -1149,6 +1161,7 @@ module Asciidoctor
     'rdquo'      => '&#8221;',
     'wj'         => '&#8288;',
     'brvbar'     => '&#166;',
+    'cpp'        => 'C++',
     'amp'        => '&',
     'lt'         => '<',
     'gt'         => '>'
@@ -1274,15 +1287,15 @@ module Asciidoctor
 
     attributes = options[:attributes] = if !(attrs = options[:attributes])
       {}
-    elsif (attrs.is_a? ::Hash) || (::RUBY_ENGINE_JRUBY && (attrs.is_a? ::Java::JavaUtil::Map))
+    elsif ::Hash === attrs || (::RUBY_ENGINE_JRUBY && ::Java::JavaUtil::Map === attrs)
       attrs.dup
-    elsif attrs.is_a? ::Array
+    elsif ::Array === attrs
       attrs.inject({}) do |accum, entry|
         k, v = entry.split '=', 2
         accum[k] = v || ''
         accum
       end
-    elsif attrs.is_a? ::String
+    elsif ::String === attrs
       # convert non-escaped spaces into null character, so we split on the
       # correct spaces chars, and restore escaped spaces
       capture_1 = ::RUBY_ENGINE_OPAL ? '$1' : '\1'
@@ -1306,11 +1319,11 @@ module Asciidoctor
     end
 
     lines = nil
-    if input.is_a? ::File
-      lines = input.readlines
+    if ::File === input
+      # TODO cli checks if input path can be read and is file, but might want to add check to API
+      input_path = ::File.expand_path input.path
       input_mtime = input.mtime
-      input = ::File.new ::File.expand_path input.path
-      input_path = input.path
+      lines = input.readlines
       # hold off on setting infile and indir until we get a better sense of their purpose
       attributes['docfile'] = input_path
       attributes['docdir'] = ::File.dirname input_path
@@ -1326,12 +1339,12 @@ module Asciidoctor
       rescue
       end
       lines = input.readlines
-    elsif input.is_a? ::String
+    elsif ::String === input
       lines = input.lines.entries
-    elsif input.is_a? ::Array
+    elsif ::Array === input
       lines = input.dup
     else
-      raise ::ArgumentError, %(Unsupported input type: #{input.class})
+      raise ::ArgumentError, %(unsupported input type: #{input.class})
     end
 
     if timings
@@ -1339,9 +1352,20 @@ module Asciidoctor
       timings.start :parse
     end
 
-    doc = (options[:parse] == false ? (Document.new lines, options) : (Document.new lines,options).parse)
+    if options[:parse] == false
+      doc = Document.new lines, options
+    else
+      doc = (Document.new lines, options).parse
+    end
+
     timings.record :parse if timings
     doc
+  rescue => e
+    backtrace = e.backtrace
+    # revise exception message to include info about source file and rethrow from original location
+    e = e.exception(%(asciidoctor: FAILED: #{attributes['docfile'] || '<stdin>'}: Failed to parse AsciiDoc source, #{e.message}))
+    e.set_backtrace backtrace
+    raise e
   end
 
   # Public: Parse the contents of the AsciiDoc source file into an Asciidoctor::Document
@@ -1398,7 +1422,7 @@ module Asciidoctor
 
     case to_file
     when true, nil
-      write_to_same_dir = !to_dir && (input.is_a? ::File)
+      write_to_same_dir = !to_dir && ::File === input
       stream_output = false
       write_to_target = to_dir
       to_file = nil
@@ -1407,27 +1431,43 @@ module Asciidoctor
       stream_output = false
       write_to_target = false
       to_file = nil
+    when '/dev/null'
+      return self.load input, options
     else
       write_to_same_dir = false
       stream_output = to_file.respond_to? :write
       write_to_target = stream_output ? false : to_file
     end
 
-    if !options.key?(:header_footer) && (write_to_same_dir || write_to_target)
-      options[:header_footer] = true
+    unless options.key? :header_footer
+      options[:header_footer] = true if write_to_same_dir || write_to_target
+    end
+
+    # NOTE at least make intended target directory available, if there is one
+    if write_to_same_dir
+      input_path = ::File.expand_path input.path
+      options[:to_dir] = (outdir = ::File.dirname input_path)
+    elsif write_to_target
+      if to_dir
+        if to_file
+          options[:to_dir] = ::File.dirname ::File.expand_path(::File.join to_dir, to_file)
+        else
+          options[:to_dir] = ::File.expand_path to_dir
+        end
+      elsif to_file
+        options[:to_dir] = ::File.dirname ::File.expand_path to_file
+      end
+    else
+      options[:to_dir] = nil
     end
 
     doc = self.load input, options
 
-    if to_file == '/dev/null'
-      return doc
-    elsif write_to_same_dir
-      infile = ::File.expand_path input.path
-      outfile = ::File.join ::File.dirname(infile), %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
-      if outfile == infile
-        raise ::IOError, 'Input file and output file are the same!'
+    if write_to_same_dir
+      outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
+      if outfile == input_path
+        raise ::IOError, %(input file and output file cannot be the same: #{outfile})
       end
-      outdir = ::File.dirname outfile
     elsif write_to_target
       working_dir = options.has_key?(:base_dir) ? ::File.expand_path(options[:base_dir]) : ::File.expand_path(::Dir.pwd)
       # QUESTION should the jail be the working_dir or doc.base_dir???
@@ -1461,15 +1501,12 @@ module Asciidoctor
     end
 
     timings.start :convert if timings
-    output = doc.convert
+    opts = outfile && !stream_output ? { 'outfile' => outfile, 'outdir' => outdir } : {}
+    output = doc.convert opts
     timings.record :convert if timings
 
     if outfile
       timings.start :write if timings
-      unless stream_output
-        doc.attributes['outfile'] = outfile
-        doc.attributes['outdir'] = outdir
-      end
       doc.write output, outfile
       timings.record :write if timings
 
@@ -1481,9 +1518,7 @@ module Asciidoctor
         copy_coderay_stylesheet = (doc.attr? 'source-highlighter', 'coderay') && (doc.attr 'coderay-css', 'class') == 'class'
         copy_pygments_stylesheet = (doc.attr? 'source-highlighter', 'pygments') && (doc.attr 'pygments-css', 'class') == 'class'
         if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet
-          outdir = doc.attr('outdir')
-          stylesoutdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir,
-              doc.safe >= SafeMode::SAFE ? outdir : nil)
+          stylesoutdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir, doc.safe >= SafeMode::SAFE ? outdir : nil)
           Helpers.mkdir_p stylesoutdir if mkdirs
 
           if copy_asciidoctor_stylesheet
@@ -1539,11 +1574,9 @@ module Asciidoctor
   end
 
   if RUBY_ENGINE == 'opal'
-    require 'asciidoctor/debug'
     require 'asciidoctor/version'
     require 'asciidoctor/timings'
   else
-    autoload :Debug,   'asciidoctor/debug'
     autoload :VERSION, 'asciidoctor/version'
     autoload :Timings, 'asciidoctor/timings'
   end

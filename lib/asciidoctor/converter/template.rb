@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
   # A {Converter} implementation that uses templates composed in template
   # languages supported by {https://github.com/rtomayko/tilt Tilt} to convert
@@ -166,9 +167,11 @@ module Asciidoctor
     # template_name - the String name of the template to use, or the value of
     #                 the node_name property on the node if a template name is
     #                 not specified. (optional, default: nil)
+    # opts          - an optional Hash that is passed as local variables to the
+    #                 template. (optional, default: {})
     #
     # Returns the [String] result from rendering the template
-    def convert node, template_name = nil
+    def convert node, template_name = nil, opts = {}
       template_name ||= node.node_name
       unless (template = @templates[template_name])
         raise %(Could not find a custom template to handle transform: #{template_name})
@@ -176,37 +179,16 @@ module Asciidoctor
 
       # Slim doesn't include helpers in the template's execution scope such as
       # HAML, so we must do it ourselves.
-      if defined?(::Slim::Helpers) && template.is_a?(::Slim::Template)
+      if (defined? ::Slim::Helpers) && (template.is_a? ::Slim::Template)
         node.extend ::Slim::Helpers
       end
 
+      # NOTE opts become locals in the template
       if template_name == 'document'
-        (template.render node).strip
+        (template.render node, opts).strip
       else
-        (template.render node).chomp
+        (template.render node, opts).chomp
       end
-    end
-
-    # Public: Convert an {AbstractNode} using the named template with the
-    # additional options provided.
-    #
-    # Looks for a template that matches the value of the
-    # {AbstractNode#node_name} property if a template name is not specified.
-    #
-    # node          - the AbstractNode to convert
-    # template_name - the String name of the template to use, or the value of
-    #                 the node_name property on the node if a template name is
-    #                 not specified. (optional, default: nil)
-    # opts          - an optional Hash that is passed as local variables to the
-    #                 template. (optional, default: {})
-    #
-    # Returns the [String] result from rendering the template
-    def convert_with_options node, template_name = nil, opts = {}
-      template_name ||= node.node_name
-      unless (template = @templates[template_name])
-        raise %(Could not find a custom template to handle transform: #{template_name})
-      end
-      (template.render node, opts).chomp
     end
 
     # Public: Checks whether there is a Tilt template registered with the specified name.
@@ -267,8 +249,12 @@ module Asciidoctor
         if ext_name == 'slim'
           # slim doesn't get loaded by Tilt, so we have to load it explicitly
           Helpers.require_library 'slim' unless defined? ::Slim
+          # load include plugin when using Slim >= 2.1
+          unless ::Slim::VERSION < '2.1' || (defined? ::Slim::Include)
+            Helpers.require_library 'slim/include', false
+          end
         elsif ext_name == 'erb'
-          template_class, extra_engine_options = (eruby_loaded ||= load_eruby @eruby)
+          template_class, extra_engine_options = (eruby_loaded ||= load_eruby(@eruby))
         end
         next unless ::Tilt.registered? ext_name
         unless template_cache && (template = template_cache[file])

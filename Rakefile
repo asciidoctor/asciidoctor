@@ -19,7 +19,7 @@ begin
   require 'rake/testtask'
   Rake::TestTask.new(:test) do |test|
     prepare_test_env
-    puts "LANG: #{ENV['LANG']}"
+    puts %(LANG: #{ENV['LANG']}) if ENV.key? 'TRAVIS_BUILD_ID'
     test.libs << 'test'
     test.pattern = 'test/**/*_test.rb'
     test.verbose = true
@@ -50,6 +50,27 @@ begin
   Cucumber::Rake::Task.new(:features) do |t|
   end
 rescue LoadError
+end
+
+def ci_setup_tasks
+  tasks = []
+  begin
+    require 'ci/reporter/rake/minitest'
+    tasks << 'ci:setup:minitest'
+    # FIXME reporter for Cucumber tests not activating
+    #require 'ci/reporter/rake/cucumber'
+    #tasks << 'ci:setup:cucumber'
+  rescue LoadError
+  end if ENV['SHIPPABLE'] && RUBY_VERSION >= '1.9.3'
+  tasks
+end
+
+desc 'Activates coverage and JUnit-style XML reports for tests'
+task :coverage => ci_setup_tasks do
+  # exclude coverage run for Ruby 1.8.7 or (disabled) if running on Travis CI
+  ENV['COVERAGE'] = 'true' if RUBY_VERSION >= '1.9.3' # && (ENV['SHIPPABLE'] || !ENV['TRAVIS_BUILD_ID'])
+  ENV['CI_REPORTS'] = 'shippable/testresults'
+  ENV['COVERAGE_REPORTS'] = 'shippable/codecoverage'
 end
 
 namespace :test do

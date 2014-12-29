@@ -44,7 +44,7 @@ class File
 
     if block_given?
       lines = File.read(@path)
-      %x{
+      %x(
         self.eof = false;
         self.lineno = 0; 
         var chomped  = #{lines.chomp},
@@ -61,7 +61,7 @@ class File
           }
         }
         self.eof = true;
-      }
+      )
       self
     else
       read.each_line
@@ -96,14 +96,22 @@ class File
   end
   
   def self.read(path)
-    %x{
-      var data = ''
-      if (typeof module !== 'undefined' && module.exports) {
-        // Running under Node.js
-        var fs = require("fs");
-        data = fs.readFileSync(path, "utf8");
-      } else {
-        // Running under the browser
+    case JAVASCRIPT_PLATFORM
+    when 'node'
+      %x(return require('fs').readFileSync(path, 'utf8');)
+    when 'java-nashorn'
+      %x(
+        var Paths = Java.type('java.nio.file.Paths');
+        var Files = Java.type('java.nio.file.Files');
+        var lines = Files.readAllLines(Paths.get(path), Java.type('java.nio.charset.StandardCharsets').UTF_8);
+        var data = [];
+        lines.forEach(function(line) { data.push(line); });
+        return data.join("\n");
+      )
+    #when 'java-rhino'
+    when 'browser'
+      %x(
+        var data = '';
         var status = -1;
         try {
           var xhr = new XMLHttpRequest();
@@ -125,8 +133,13 @@ class File
         if (status == 404 || (status == 0 && data == '')) {
           throw #{IOError.new `'No such file or directory: ' + path`};
         }
-      }
-    }
-    `data`
+        return data;
+      )
+    # NOTE we're assuming standalone is SpiderMonkey
+    when 'standalone'
+      %x(return read(path);)
+    else
+      ''
+    end
   end
 end

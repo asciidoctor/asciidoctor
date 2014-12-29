@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Asciidoctor
   # A base module for defining converters that can be used to convert {AbstractNode}
   # objects in a parsed AsciiDoc document to a backend format such as HTML or
@@ -160,9 +161,9 @@ module Asciidoctor
     end
 =end
 
-    # Public: Converts an {AbstractNode} using the specified transform. If a
-    # transform is not specified, implementations typically derive one from the
-    # {AbstractNode#node_name} property.
+    # Public: Converts an {AbstractNode} using the specified transform along
+    # with additional options. If a transform is not specified, implementations
+    # typically derive one from the {AbstractNode#node_name} property.
     #
     # Implementations are free to decide how to carry out the conversion. In
     # the case of the built-in converters, the tranform value is used to
@@ -174,27 +175,16 @@ module Asciidoctor
     #             should be applied to this node. If a transform is not specified,
     #             the transform is typically derived from the value of the
     #             node's node_name property. (optional, default: nil)
+    # opts      - An optional Hash of options that provide additional hints about
+    #             how to convert the node. (optional, default: {})
     #
     # Returns the [String] result
-    def convert node, transform = nil
+    def convert node, transform = nil, opts = {}
       raise ::NotImplementedError
     end
 
-    # Public: Converts an {AbstractNode} using the specified transform along
-    # with additional options. Delegates to {#convert} without options by default.
-    #
-    # node      - The concrete instance of AbstractNode to convert
-    # transform - An optional String transform that hints at which transformation
-    #             should be applied to this node. If a transform is not specified,
-    #             the transform is typically derived from the value of the
-    #             node's node_name property. (optional, default: nil)
-    # opts      - An optional Hash of options that provide additional hints about
-    #             how to convert the node.
-    #
-    # Returns the [String] result
-    def convert_with_options node, transform = nil, opts = {}
-      convert node, transform
-    end
+    # Alias for backward compatibility.
+    alias :convert_with_options :convert
   end
 
   # A module that can be used to mix the {#write} method into a {Converter}
