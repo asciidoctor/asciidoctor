@@ -1,0 +1,56 @@
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+.TH "inline anchor" 1
+
+." .basic
+.PP
+.URL "http://www\&.asciidoctor\&.org"
+
+
+." .basic_with_text
+.PP
+.URL "irc://irc\&.freenode\&.org/#asciidoctor" "Asciidoctor IRC channel"
+
+
+." .basic_with_target_blank
+.PP
+.URL "view\-source:asciidoctor\&.org" "Asciidoctor homepage"
+
+
+." .basic_with_role
+.PP
+.URL "http://discuss\&.asciidoctor\&.org/" "\fBmailing list\fR"
+
+
+." .xref
+.PP
+The section
+.URL "#page\-break" "[page\-break]"
+describes how to add a page break\&.
+
+
+." .xref_with_text
+.PP
+The section
+.URL "#page\-break" "Page break"
+describes how to add a page break\&.
+
+
+." .xref_resolved_text
+.PP
+Refer to
+.URL "#_section_a" "Section A"
+\&.
+
+.SH "Section A"
+.sp
+
+
+." .bibref
+.PP
+.URL "prag"
+Andy Hunt &amp; Dave Thomas\&. The Pragmatic Programmer
+
