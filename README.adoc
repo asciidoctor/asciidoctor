@@ -150,7 +150,7 @@ If that's the case, use the following gem command to remove the old versions:
 source 'https://rubygems.org'
 gem 'asciidoctor'
 # or specify the version explicitly
-# gem 'asciidoctor', '1.5.0'
+# gem 'asciidoctor', '1.5.2'
 ----
 
 . Save the Gemfile
@@ -203,7 +203,7 @@ You should see information about the Asciidoctor version and your Ruby environme
 
 [.output]
 ....
-Asciidoctor 1.5.0 [http://asciidoctor.org]
+Asciidoctor 1.5.2 [http://asciidoctor.org]
 Runtime Environment (ruby 2.1.2p95 (2014-05-08 revision 45877) [x86_64-linux])
 ....
 
