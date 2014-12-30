@@ -10,13 +10,18 @@ require 'simplecov' if ENV['COVERAGE'] == 'true'
 
 require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
 
+require 'asciidoctor/doctest'
 require 'minitest/autorun'
+require 'minitest/rg'
 require 'socket'
 require 'nokogiri'
 require 'tmpdir'
 
 autoload :FileUtils, 'fileutils'
 autoload :Pathname,  'pathname'
+
+DocTest.examples_path.unshift 'test/examples/asciidoc'
+DocTest.examples_path.unshift 'test/examples/manpage'
 
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
 RE_DOCTYPE = /\s*<!DOCTYPE (.*)/

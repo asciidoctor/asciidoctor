@@ -16,7 +16,11 @@ def prepare_test_env
 end
 
 begin
+  require 'asciidoctor/doctest'
+  require 'asciidoctor/doctest/manpage/examples_suite'
   require 'rake/testtask'
+  require 'thread_safe'
+
   Rake::TestTask.new(:test) do |test|
     prepare_test_env
     puts %(LANG: #{ENV['LANG']}) if ENV.key? 'TRAVIS_BUILD_ID'
@@ -25,6 +29,22 @@ begin
     test.verbose = true
     test.warning = true
   end
+
+  Rake::TestTask.new(:test_manpage) do |test|
+    prepare_test_env
+    puts %(LANG: #{ENV['LANG']}) if ENV.key? 'TRAVIS_BUILD_ID'
+    test.libs << 'test'
+    test.pattern = 'test/doctest_manpage_test.rb'
+    test.verbose = true
+    test.warning = true
+  end
+
+  DocTest::GeneratorTask.new(:generate_manpage) do |task|
+    task.output_suite = DocTest::ManPage::ExamplesSuite.new(examples_path: 'test/examples/manpage')
+    task.converter_opts[:backend_name] = 'manpage'
+    task.examples_path.unshift 'test/examples/asciidoc'
+  end
+
   task :default => :test
 rescue LoadError
 end
