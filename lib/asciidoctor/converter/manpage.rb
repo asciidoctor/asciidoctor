@@ -619,12 +619,12 @@ Author(s).
     def inline_menu node
       menu = node.attr 'menu'
       if !(submenus = node.attr 'submenus').empty?
-        submenu_path = submenus.map {|submenu| %(<span class="submenu">#{submenu}</span>&#160;&#9656; ) }.join.chop
-        %(<span class="menuseq"><span class="menu">#{menu}</span>&#160;&#9656; #{submenu_path} <span class="menuitem">#{node.attr 'menuitem'}</span></span>)
+        submenu_path = submenus.join(' > ')
+        %(\\fB#{menu} > #{submenu_path} > #{node.attr 'menuitem'}\\fR\n)
       elsif (menuitem = node.attr 'menuitem')
-        %(<span class="menuseq"><span class="menu">#{menu}</span>&#160;&#9656; <span class="menuitem">#{menuitem}</span></span>)
+        %(\\fB#{menu} > #{menuitem}\\fR\n)
       else
-        %(<span class="menu">#{menu}</span>)
+        %(\\fB #{menu}\\fR\n)
       end
     end
 
