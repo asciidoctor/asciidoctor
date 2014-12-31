@@ -495,19 +495,24 @@ Author(s).
 
     def verse node
       result = []
-      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
-      title_element = node.title? ? %(\\fB#{node.title}\\fR\n.br) : nil
-      attribution = (node.attr? 'attribution') ? (node.attr 'attribution') : nil
-      citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
-
-      result << %(.sp
-#{title_element}
+      title_element = node.title? ? %(.in +.3i\n\\fB#{node.title}\\fR\n.br\n.in\n) : nil
+      attribution_line = (node.attr? 'citetitle') ? %(#{node.attr 'citetitle'} ) : nil
+      attribution_line = (node.attr? 'attribution') ? %(#{attribution_line}\\\(em #{node.attr 'attribution'}) : nil
+      result << %(#{title_element}.in +.5i
+.ll -.5i
 .nf
 #{node.content}
-.br
-#{citetitle} #{attribution}
 .fi
-)
+.br
+.in
+.ll)
+      if attribution_line
+        result << %(.in +.3i
+.ll -.3i
+#{attribution_line}
+.in
+.ll)
+      end
       result * EOL
     end
 
