@@ -58,12 +58,6 @@ module Asciidoctor
 
     def document node
       result = []
-      slash = @void_element_slash
-      br = %(<br#{slash}>)
-      asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')
-      asset_uri_scheme = %(#{asset_uri_scheme}:) unless asset_uri_scheme.empty?
-      cdn_base = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
-      linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
       # TODO
       # lang_attribute = (node.attr? 'nolang') ? nil : %( lang="#{node.attr 'lang', 'en'}")
       header_title     = node.doctitle.split('(').first
@@ -87,22 +81,6 @@ module Asciidoctor
 .el       .ds Aq '
 .nh
 .ad l)
-      if node.attr? 'stem'
-        result << %(<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  tex2jax: {
-    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath]}],
-    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath]}],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath]}],
-    ignoreClass: "nostem|noasciimath"
-  }
-});
-</script>
-<script src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
-      end
 
       unless node.noheader
         if node.attr? 'manpurpose'
@@ -326,22 +304,6 @@ Author(s).
       result * EOL
     end
 
-    def stem node
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-      open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
-
-      unless ((equation = node.content).start_with? open) && (equation.end_with? close)
-        equation = %(#{open}#{equation}#{close})
-      end
-
-      %(<div#{id_attribute} class="#{(role = node.role) ? ['stemblock', role] * ' ' : 'stemblock'}">
-#{title_element}<div class="content">
-#{equation}
-</div>
-</div>)
-    end
-
     def olist node
       result = []
       result << %(\\fB#{node.title}\\fR\n.br) if node.title?
@@ -436,6 +398,17 @@ Author(s).
 #{title_element}#{node.content}
 </div>
 </div>)
+    end
+
+    def stem node
+      title_element = node.title? ? %(\\fB#{node.title}\\fR\n.br\n) : nil
+      open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
+
+      unless ((equation = node.content).start_with? open) && (equation.end_with? close)
+        equation = %(#{open}#{equation}#{close})
+      end
+
+      %(#{title_element}#{equation})
     end
 
     def table node
@@ -545,14 +518,7 @@ Author(s).
     end
 
     def inline_callout node
-      if node.document.attr? 'icons', 'font'
-        %(<i class="conum" data-value="#{node.text}"></i><b>(#{node.text})</b>)
-      elsif node.document.attr? 'icons'
-        src = node.icon_uri("callouts/#{node.text}")
-        %(<img src="#{src}" alt="#{node.text}"#{@void_element_slash}>)
-      else
-        %(<b class="conum">(#{node.text})</b>)
-      end
+      %(\\fB#{node.text}\\fR\n)
     end
 
     def inline_footnote node
@@ -621,10 +587,6 @@ Author(s).
       else
         node.text
       end
-    end
-
-    def append_boolean_attribute name, xml
-      xml ? %( #{name}="#{name}") : %( #{name})
     end
   end
 end
