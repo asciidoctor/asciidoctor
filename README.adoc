@@ -204,7 +204,7 @@ You should see information about the Asciidoctor version and your Ruby environme
 [.output]
 ....
 Asciidoctor 1.5.2 [http://asciidoctor.org]
-Runtime Environment (ruby 2.1.2p95 (2014-05-08 revision 45877) [x86_64-linux])
+Runtime Environment (ruby 2.2.0p0 (2014-12-25 revision 49005) [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 Asciidoctor also provides an API.
@@ -329,7 +329,7 @@ Asciidoctor organization on GitHub:: {uri-org}
 
 == Copyright and Licensing
 
-Copyright (C) 2012-2014 Dan Allen, Ryan Waldron and the Asciidoctor Project.
+Copyright (C) 2012-2015 Dan Allen, Ryan Waldron and the Asciidoctor Project.
 Free use of this software is granted under the terms of the MIT License.
 
 See the {uri-license}[LICENSE] file for details.
