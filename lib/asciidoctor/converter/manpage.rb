@@ -568,39 +568,22 @@ Author(s).
 
     def inline_image node
       if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
-        style_class = %(fa fa-#{node.target})
-        if node.attr? 'size'
-          style_class = %(#{style_class} fa-#{node.attr 'size'})
-        end
-        if node.attr? 'rotate'
-          style_class = %(#{style_class} fa-rotate-#{node.attr 'rotate'})
-        end
-        if node.attr? 'flip'
-          style_class = %(#{style_class} fa-flip-#{node.attr 'flip'})
-        end
-        title_attribute = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : nil
-        img = %(<i class="#{style_class}"#{title_attribute}></i>)
+        img = node.attr 'title'
       elsif type == 'icon' && !(node.document.attr? 'icons')
-        img = %([#{node.attr 'alt'}])
+        img = node.attr 'alt'
       else
-        resolved_target = (type == 'icon') ? (node.icon_uri node.target) : (node.image_uri node.target)
-
-        attrs = ['alt', 'width', 'height', 'title'].map {|name|
-          (node.attr? name) ? %( #{name}="#{node.attr name}") : nil
-        }.join
-
-        img = %(<img src="#{resolved_target}"#{attrs}#{@void_element_slash}>)
+        if node.attr? 'title'
+          img = (node.attr? 'alt') ? %(#{node.attr 'alt'} > #{node.attr 'title'}) : node.attr('title')
+        elsif node.attr? 'alt'
+          img = node.attr 'alt'
+        end
       end
 
       if node.attr? 'link'
-        window_attr = (node.attr? 'window') ? %( target="#{node.attr 'window'}") : nil
-        img = %(<a class="image" href="#{node.attr 'link'}"#{window_attr}>#{img}</a>)
+        (img != nil) ? %(.URL "#{node.attr 'link'}" "#{img}"\n) : node.attr('link')
+      else
+        (img != nil) ? %(\\fB[#{img}]\\fR\n) : ''
       end
-
-      style_classes = (role = node.role) ? %(#{type} #{role}) : type
-      style_attr = (node.attr? 'float') ? %( style="float: #{node.attr 'float'}") : nil
-
-      %(<span class="#{style_classes}"#{style_attr}>#{img}</span>)
     end
 
     def inline_indexterm node
