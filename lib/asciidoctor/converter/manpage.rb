@@ -609,10 +609,10 @@ Author(s).
 
     def inline_kbd node
       if (keys = node.attr 'keys').size == 1
-        %(<kbd>#{keys[0]}</kbd>)
+        %([#{keys[0]}])
       else
-        key_combo = keys.map {|key| %(<kbd>#{key}</kbd>+) }.join.chop
-        %(<span class="keyseq">#{key_combo}</span>)
+        key_combo = keys.join(' + ')
+        %([#{key_combo}])
       end
     end
 
