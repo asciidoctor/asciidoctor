@@ -526,7 +526,7 @@ Author(s).
     end
 
     def inline_break node
-      %(#{node.text}<br#{@void_element_slash}>)
+      %(#{node.text}\n.br)
     end
 
     def inline_button node
