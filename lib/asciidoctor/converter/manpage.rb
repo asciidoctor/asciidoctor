@@ -114,14 +114,10 @@ MathJax.Hub.Config({
       result << %(#{node.content})
 
       if node.footnotes? && !(node.attr? 'nofootnotes')
-        result << %(<div id="footnotes">
-<hr#{slash}>)
+        result << %(.SH "NOTES")
         node.footnotes.each do |footnote|
-          result << %(<div class="footnote" id="_footnote_#{footnote.index}">
-<a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a>. #{footnote.text}
-</div>)
+          result << %(#{footnote.index}". #{footnote.text})
         end
-        result << '</div>'
       end
       if node.attr? 'authors'
         result << %Q(.SH "AUTHOR(S)"
@@ -145,15 +141,10 @@ Author(s).
       result << node.content
 
       if node.footnotes? && !(node.attr? 'nofootnotes')
-        result << %(<div id="footnotes">
-<hr#{@void_element_slash}>)
+        result << %(.SH "NOTES")
         node.footnotes.each do |footnote|
-          result << %(<div class="footnote" id="_footnote_#{footnote.index}">
-<a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a> #{footnote.text}
-</div>)
+          result << %(#{footnote.index}. #{footnote.text})
         end
-
-        result << '</div>'
       end
 
       result * EOL
@@ -555,14 +546,9 @@ Author(s).
 
     def inline_footnote node
       if (index = node.attr 'index')
-        if node.type == :xref
-          %(<span class="footnoteref">[<a class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
-        else
-          id_attr = node.id ? %( id="_footnote_#{node.id}") : nil
-          %(<span class="footnote"#{id_attr}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
-        end
+        %(\n.URL "#{index}" "View footnote."\n)
       elsif node.type == :xref
-        %(<span class="footnoteref red" title="Unresolved footnote reference.">[#{node.text}]</span>)
+        %(\n.URL "[#{node.text}]" "Unresolved footnote reference."\n)
       end
     end
 

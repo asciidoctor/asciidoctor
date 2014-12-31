@@ -1,0 +1,30 @@
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+.TH "Inline footnote" 1
+." .basic
+.PP
+Apocalyptic party.
+.URL "1" "View footnote."
+
+.SH "NOTES"
+1. The double hail-and-rainbow level makes my toes tingle.
+
+." .xref
+.PP
+A bold statement.
+.URL "1" "View footnote."
+
+Another outrageous statement.
+.URL "1" "View footnote."
+
+.SH "NOTES"
+1. Opinions are my own.
+
+." .xref_unresolved
+.PP
+A bold statement.
+.URL "[foobar]" "Unresolved footnote reference."
+
