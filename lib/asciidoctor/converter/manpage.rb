@@ -530,7 +530,7 @@ Author(s).
     end
 
     def inline_button node
-      %(<b class="button">#{node.text}</b>)
+      %([#{node.text}])
     end
 
     def inline_callout node
