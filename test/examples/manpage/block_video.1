@@ -1,0 +1,29 @@
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+.TH "block video" 1
+." .basic
+.URL "video_file.mp4" ""
+
+." .with_poster
+.URL "video_file.mp4" ""
+
+." .with_dimensions
+.URL "video_file.mp4" ""
+
+." .with_start
+.URL "video_file.mp4&start=10" ""
+
+." .with_end
+.URL "video_file.mp4&end=60" ""
+
+." .with_options
+.URL "video_file.mp4" ""
+
+." .with_title
+.URL "video_file.mp4" "Must watch!"
+
+." .with_id_and_role
+.URL "video_file.mp4" ""

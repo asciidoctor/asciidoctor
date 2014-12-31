@@ -511,6 +511,12 @@ Author(s).
       result * EOL
     end
 
+    def video node
+      start_param = (node.attr? 'start', nil, false) ? %(&start=#{node.attr 'start'}) : nil
+      end_param = (node.attr? 'end', nil, false) ? %(&end=#{node.attr 'end'}) : nil
+      %(.URL "#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}" "#{node.captioned_title}")
+    end
+
     def inline_anchor node
       target = node.target
       case node.type
