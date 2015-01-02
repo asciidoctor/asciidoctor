@@ -119,8 +119,9 @@ module Asciidoctor
 
       unless node.noheader
         if node.attr? 'manpurpose'
-          result << %(.SH "#{node.attr 'manname-title'}"\n.sp)
-          result << %(#{node.attr 'mantitle'} \\- #{node.attr 'manpurpose'})
+          #.SH Unnumbered section heading
+          result << %(.SH "#{manify node.attr 'manname-title'}")
+          result << %(#{manify node.attr 'mantitle'} \\- #{manify node.attr 'manpurpose'})
         end
       end
 
@@ -167,16 +168,15 @@ Author(s).
       slevel = node.level
       # QUESTION should the check for slevel be done in section?
       slevel = 1 if slevel == 0 && node.special
-
+      result = []
       if slevel <= 1
-        %(.SH "#{node.title}"
-.sp
+        result << %(.SH "#{manify node.title}"
 #{node.content})
       else
-        %(.SS "#{node.captioned_title}"
-.PP
-#{slevel == 1 ? %[.sp\n#{node.content}\n] : node.content})
+        result << %(.SS "#{manify node.captioned_title}")
+        result << node.content
       end
+      result * EOL
     end
 
     def admonition node
