@@ -1,6 +1,8 @@
 module Asciidoctor
   # A built-in {Converter} implementation that generates Troff Manpage output
-  # consistent with the a2x tool from AsciiDoc Python.
+  # The output follows groff man page definition:
+  # http://www.gnu.org/software/groff/manual/html_node/Man-usage.html#Man-usage
+  # but also tries to be consistent with the a2x tool from AsciiDoc Python.
   class Converter::ManPageConverter < Converter::BuiltIn
     QUOTE_TAGS = {
       :emphasis    => ['\fI',      '\fR',       true],
@@ -26,47 +28,58 @@ module Asciidoctor
     end
 
 
-    # Folds each endline into a single space, escapes special man characters,
+    # optionally folds each endline into a single space, escapes special man characters,
     # reverts HTML entity references back to their original form, strips trailing
     # whitespace and, optionally, appends a newline
-    def manify(str, append_newline = true, preserve_space = false)
+    def manify(str, append_newline = false, preserve_space = true)
       if preserve_space
         str = str.gsub("\t", (' ' * 8))
       else
         str = str.tr_s("\n\t ", ' ')
       end
-      str
-        .gsub(/\./, '\\\&.')
-        .gsub('-', '\\-')
-        .gsub('&lt;', '<')
-        .gsub('&gt;', '>')
-        .gsub('&#169;', '\\(co')
-        .gsub('&#174;', '\\(rg')
-        .gsub('&#8482;', '\\(tm')
-        .gsub('&#8201;', ' ') #.gsub('&#8201;&#8212;&#8201;', ' \\(em ')
-        .gsub('&#8203;', '')
-        .gsub('&#8212;', '\\-\\-') # .gsub('&#8212;', '\\(em')
-        .gsub('&#8230;', '...') #.gsub('&#8230;', '\\\&...')
-        .gsub('&#8217;', '\\(cq')
-        .gsub('&#8592;', '\\(<-')
-        .gsub('&#8594;', '\\(->')
-        .gsub('&#8656;', '\\(lA')
-        .gsub('&#8658;', '\\(rA')
-        .gsub('\'', '\\(aq')
-        .rstrip + (append_newline ? EOL : '')
+      # TODO:
+      # Do not manify . everywhere since it is used for troff macros
+      # To begin a line with a literal period, use the zero-width non-printing
+      # escape sequence \& to get the period away from the beginning of the
+      # line, which is the only place it is treated specially: \&. This line
+      # begins with a dot.
+      # http://web.archive.org/web/20060102165607/http://people.debian.org/~branden/talks/wtfm/wtfm.pdf
+      # .gsub(/\./, '\\\&.')
+      str.
+        gsub('-', '\\-').
+        gsub('&lt;', '<').
+        gsub('&gt;', '>').
+        gsub('&#169;', '\\(co').  # copyright sign
+        gsub('&#174;', '\\(rg').  # registered sign
+        gsub('&#8482;', '\\(tm'). # trademark sign
+        gsub('&#8201;', ' ').     # thin space #gsub('&#8201;&#8212;&#8201;', ' \\(em ').
+        gsub('&#8203;', '').      # zero width space
+        gsub('&#8211;', '\\(en'). # en-dash
+        gsub('&#8212;', '\\(em'). # em-dash
+        gsub('&#8216;', '\\(oq'). # left single quotation mark
+        gsub('&#8217;', '\\(cq'). # right single quotation mark
+        gsub('&#8220;', '\\(lq'). # left double quotation mark
+        gsub('&#8221;', '\\(rq'). # right double quotation mark
+        gsub('&#8230;', '...').   # horizontal ellipsis #gsub('&#8230;', '\\\&...').
+        gsub('&#8592;', '\\(<-'). # leftwards arrow
+        gsub('&#8594;', '\\(->'). # rightwards arrow
+        gsub('&#8656;', '\\(lA'). # leftwards double arrow
+        gsub('&#8658;', '\\(rA'). # rightwards double arrow
+        gsub('\'', '\\(aq').      # apostrophe-quote
+        rstrip + (append_newline ? EOL : '')
     end
 
     def document node
       result = []
       # TODO
       # lang_attribute = (node.attr? 'nolang') ? nil : %( lang="#{node.attr 'lang', 'en'}")
-      header_title     = node.doctitle.split('(').first
+      header_title     = (node.attr? 'mantitle') ? (node.attr 'mantitle') : node.doctitle.split('(').first
       header_number    = node.doctitle.split('(').last.chop
       header_author    = (node.attr? 'authors') ? (node.attr 'authors') : '[see the "AUTHORS" section]'
       header_generator = "Asciidoctor #{ node.attr 'asciidoctor-version' }"
       header_date      = node.attr 'docdate'
-      header_manual    = (manual = (node.attr? 'manmanual') ? (node.attr 'manmanual') : '\ \&')
-      header_source    = (source = (node.attr? 'mansource') ? (node.attr 'mansource') : '\ \&')
+      header_manual    = (node.attr? 'manmanual') ? (node.attr 'manmanual') : '\ \&'
+      header_source    = (node.attr? 'mansource') ? (node.attr 'mansource') : '\ \&'
       result << %Q('\\" t
 .\\"     Title: #{ header_title.downcase }
 .\\"    Author: #{ header_author }
@@ -75,12 +88,34 @@ module Asciidoctor
 .\\"    Manual: #{ header_manual }
 .\\"    Source: #{ header_source }
 .\\"  Language: English
-.\\"
-.TH "#{ manify header_title.upcase, false }" "#{ header_number }" "#{ header_date }" "#{manify header_source, false}" "#{manify header_manual, false}"
-.ie \\n\(.g .ds Aq \\\(aq
-.el       .ds Aq '
-.nh
-.ad l)
+.\\")
+      # .TH name section(1-8) date version
+      # Don't capitalize name, that's a presentation decision.
+      result << %Q(.TH "#{ manify header_title, false }" "#{ header_number }" "#{ header_date }" "#{manify header_source, false}" "#{manify header_manual, false}")
+      # http://bugs.debian.org/507673
+      # http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+      result << %(.ie \\n\(.g .ds Aq \\\(aq
+.el       .ds Aq ')
+      # disable hyphenation
+      result << %Q(.nh)
+      # disable justification (adjust text to left margin only)
+      result << %Q(.ad l)
+      # URL portability. Taken from:
+      # http://web.archive.org/web/20060102165607/http://people.debian.org/~branden/talks/wtfm/wtfm.pdf
+      # Use: .URL "http://www.debian.org" "Debian" "*"
+      # The first argument is the URL, the second is the text to be
+      # hyperlinked, and the third (optional) argument is any text that needs
+      # to immediately trail the hyperlink without intervening whitespace
+      # GNU roff defines a URL macro; what the above does is test for the
+      # presence of GNU roff, and source the www.tmac macro definition file
+      # (which itself also defines URL) if it is — this overrides the
+      # definition just made, but leaves it intact for non-GNU roff
+      # implementations.
+      result << %(.\\" URL Portability
+.de URL
+\\\\$2 \\\(laURL: \\\\$1 \\\(ra\\\\$3
+..
+.if \\n[.g] .mso www.tmac)
 
       unless node.noheader
         if node.attr? 'manpurpose'
