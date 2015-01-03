@@ -533,14 +533,20 @@ Author(s).
     def inline_anchor node
       target = node.target
       case node.type
+      when :xref
+        refid = (node.attr 'refid') || target
+        # NOTE we lookup text in converter because DocBook doesn't need this logic
+        text = node.text || (node.document.references[:ids][refid] || %([#{refid}]))
+        # FIXME shouldn't target be refid? logic seems confused here
+        %(\n.URL "#{target}" "#{manify text}"\n)
+      when :ref
+        %(\n.URL "#{target}"\n)
       when :link
-        if target.start_with? 'mailto:'
-          target[7..-1]
-        else
-          target
-        end
+        %(\n.URL "#{target}" "#{manify node.text}"\n)
+      when :bibref
+        %(\n.URL "#{target}"\n)
       else
-        target
+        %(\n.URL "#{target}"\n)
       end
     end
 
@@ -578,7 +584,7 @@ Author(s).
       end
 
       if node.attr? 'link'
-        (img != nil) ? %(.URL "#{node.attr 'link'}" "#{img}"\n) : node.attr('link')
+        (img != nil) ? %(\n.URL "#{node.attr 'link'}" "#{img}"\n) : node.attr('link')
       else
         (img != nil) ? %(\\fB[#{img}]\\fR\n) : ''
       end
