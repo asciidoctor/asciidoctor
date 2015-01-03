@@ -392,7 +392,17 @@ Author(s).
     end
 
     def paragraph node
-      %(#{manify node.content}.sp)
+      if node.title?
+        %(.B #{manify node.title}
+.br
+#{manify node.content}
+)
+      else
+        # Change paragraph separator to .sp instead of .PP
+        # .PP breaks indentation of outher blocks.
+        %(.sp
+#{manify node.content})
+      end
     end
 
     def preamble node
