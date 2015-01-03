@@ -453,43 +453,145 @@ Author(s).
       %(#{title_element}#{equation})
     end
 
+    # FIXME: The reason this method is so complicated is because we are not
+    # receiving empty(marked) cells when there are colspans or rowspans. This
+    # method has to create a map of all cells and in the case of rowspans
+    # create empty cells as placeholders of the span.
+    # To fix this, asciidoctor needs to provide an API to tell the user if a
+    # given cell is being used as a colspan or rowspan.
     def table node
-      result = []
-      result << %(#{node.captioned_title}) if node.title?
-      if (node.attr 'rowcount') > 0
-        result << %(|#{'=' * 4}\n.br)
-        [:head, :foot, :body].select {|tsec| !node.rows[tsec].empty? }.each do |tsec|
-          node.rows[tsec].each do |row|
-            row.each do |cell|
-              if tsec == :head
-                cell_content = cell.text
+      result = ""
+      if node.title?
+        result += %Q(.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.B #{manify node.captioned_title}
+)
+      end
+      result += %(.TS
+allbox tab(:);)
+      row_header = []
+      row_text = []
+      row_index = 0
+      [:head, :body, :foot].each do |tsec|
+        node.rows[tsec].each do |row|
+          row_header[row_index] ||= []
+          row_text[row_index] ||= []
+          # result += "\n"
+          # l left-adjusted
+          # r right-adjusted
+          # c centered-adjusted
+          # n numerical align
+          # a alphabetic align
+          # s spanned
+          # ^ vertically spanned
+          remaining_cells = row.size
+          row.each_with_index do |cell, cell_index|
+            remaining_cells -= 1
+            row_header[row_index][cell_index] ||= []
+            # Add an empty cell if this is a rowspan cell
+            if row_header[row_index][cell_index] == ["^t"]
+              row_text[row_index] <<  %Q(T{\n.sp\nT}:)
+            end
+            row_text[row_index] <<  %Q(T{\n.sp\n)
+            cell_halign = case cell.attr 'halign'
+                          when 'right'
+                            'r'
+                          when 'left'
+                            'l'
+                          when 'center'
+                            'c'
+                          else
+                            'l'
+                          end
+            if tsec == :head
+              if row_header[row_index].empty? ||
+                 row_header[row_index][cell_index].empty?
+                row_header[row_index][cell_index] << cell_halign + "tB"
               else
-                case cell.style
-                when :asciidoc
-                  cell_content = %(#{cell.content})
-                when :verse
-                  cell_content = %(#{cell.text})
-                when :literal
-                  cell_content = %(#{cell.text})
-                else
-                  cell_content = ''
-                  cell.content.each do |text|
-                    cell_content = %(#{cell_content}#{text})
-                  end
+                row_header[row_index][cell_index + 1] ||= []
+                row_header[row_index][cell_index + 1] << cell_halign + "tB"
+              end
+              row_text[row_index] << (cell.text + "\n")
+            elsif tsec == :body
+              if row_header[row_index].empty? ||
+                 row_header[row_index][cell_index].empty?
+                row_header[row_index][cell_index] << cell_halign + "t"
+              else
+                row_header[row_index][cell_index + 1] ||= []
+                row_header[row_index][cell_index + 1] << cell_halign + "t"
+              end
+              case cell.style
+              when :asciidoc
+                cell_content = %(#{cell.content})
+              when :verse
+                cell_content = %(#{cell.text})
+              when :literal
+                cell_content = %(#{cell.text})
+              else
+                cell_content = ''
+                cell.content.each do |text|
+                  cell_content = %(#{cell_content}#{text})
                 end
               end
-              result << %(| #{cell_content}\n.br)
+              row_text[row_index] << (cell_content + "\n")
+            elsif tsec == :foot
+              if row_header[row_index].empty? ||
+                 row_header[row_index][cell_index].empty?
+                row_header[row_index][cell_index] << cell_halign + "tB"
+              else
+                row_header[row_index][cell_index + 1] ||= []
+                row_header[row_index][cell_index + 1] << cell_halign + "tB"
+              end
+              row_text[row_index] << (cell.text + "\n")
             end
-            if tsec == :foot
-              result << %(.br)
+            if cell.colspan && cell.colspan > 1
+              (cell.colspan - 1).times do |i|
+                if row_header[row_index].empty? ||
+                   row_header[row_index][cell_index].empty?
+                  row_header[row_index][cell_index + i] << "st"
+                else
+                  row_header[row_index][cell_index + 1 + i] ||= []
+                  row_header[row_index][cell_index + 1 + i] << "st"
+                end
+              end
+            end
+            if cell.rowspan && cell.rowspan > 1
+              (cell.rowspan - 1).times do |i|
+                row_header[row_index + 1 + i] ||= []
+                if row_header[row_index + 1 + i].empty? ||
+                   row_header[row_index + 1 + i][cell_index].empty?
+                  row_header[row_index + 1 + i][cell_index] ||= []
+                  row_header[row_index + 1 + i][cell_index] << "^t"
+                else
+                  row_header[row_index + 1 + i][cell_index + 1] ||= []
+                  row_header[row_index + 1 + i][cell_index + 1] << "^t"
+                end
+              end
+            end
+            if remaining_cells >= 1
+              row_text[row_index] << %Q(T}:)
             else
-              result << %(.sp)
+              row_text[row_index] << %Q(T}\n)
             end
           end
+          row_index += 1
         end
       end
-      result << %(|#{'=' * 4}\n)
-      result * EOL
+      row_header.each do |row|
+        result += "\n"
+        row.each_with_index do |cell, i|
+          result += cell.join(' ')
+          result += ' ' if row.size > i+1
+        end
+      end
+      result += ".\n"
+      row_text.each do |row|
+        result += row.join('')
+      end
+      result += %(.TE\n.sp 1\n)
     end
 
     def thematic_break node

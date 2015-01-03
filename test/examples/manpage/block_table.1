@@ -1,0 +1,460 @@
+.TH "block table" 1
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+." Bug fix
+.ie \n\(.g .ds Aq \(aq
+.el       .ds Aq '
+." Disable hiphenation
+.nh
+." Disable justification
+.ad l
+.SH "NAME"
+block table \- test
+.SH "TESTS"
+." .basic
+.TS
+allbox tab(:);
+lt lt
+lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+T{
+.sp
+Cell in column 1, row 2
+T}:T{
+.sp
+Cell in column 2, row 2
+T}
+.TE
+.sp 1
+
+
+." .with_frame_sides
+.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_grid_cols
+.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_float
+.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_width
+.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_autowidth
+.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_title
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.B Table 1. Table FTW!
+.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_id_and_role
+.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_header
+.TS
+allbox tab(:);
+ltB ltB
+lt lt
+lt lt.
+T{
+.sp
+Name of Column 1
+T}:T{
+.sp
+Name of Column 2
+T}
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+T{
+.sp
+Cell in column 1, row 2
+T}:T{
+.sp
+Cell in column 2, row 2
+T}
+.TE
+.sp 1
+
+
+." .with_footer
+.TS
+allbox tab(:);
+lt lt
+lt lt
+ltB ltB.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}
+T{
+.sp
+Cell in column 1, row 2
+T}:T{
+.sp
+Cell in column 2, row 2
+T}
+T{
+.sp
+Footer in column 1, row 3
+T}:T{
+.sp
+Footer in column 2, row 3
+T}
+.TE
+.sp 1
+
+
+." .with_cols_width
+.TS
+allbox tab(:);
+lt lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}:T{
+.sp
+Cell in column 3, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_cols_halign
+.TS
+allbox tab(:);
+lt ct rt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}:T{
+.sp
+Cell in column 3, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_cols_valign
+.TS
+allbox tab(:);
+lt lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}:T{
+.sp
+Cell in column 3, row 1
+T}
+.TE
+.sp 1
+
+
+." .with_cols_styles
+.TS
+allbox tab(:);
+lt lt lt lt lt lt lt.
+T{
+.sp
+<div class="imageblock">
+<div class="content">
+<img src="sunset.jpg" alt="AsciiDoc content">
+</div>
+</div>
+T}:T{
+.sp
+\fIEmphasized text\fR
+T}:T{
+.sp
+Styled like a header
+T}:T{
+.sp
+Literal block
+T}:T{
+.sp
+Monospaced text
+T}:T{
+.sp
+\fBStrong text\fR
+T}:T{
+.sp
+Verse block
+T}
+.TE
+.sp 1
+
+
+." .colspan
+.TS
+allbox tab(:);
+lt lt lt
+lt st lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}:T{
+.sp
+Cell in column 3, row 1
+T}
+T{
+.sp
+Content in a single cell that spans columns 1 and 3
+T}:T{
+.sp
+Cell in column 3, row 1
+T}
+.TE
+.sp 1
+
+
+." .rowspan
+.TS
+allbox tab(:);
+lt lt lt
+lt lt lt
+^t lt lt.
+T{
+.sp
+Cell in column 1, row 1
+T}:T{
+.sp
+Cell in column 2, row 1
+T}:T{
+.sp
+Cell in column 3, row 1
+T}
+T{
+.sp
+Content in a single cell that spans rows 2 and 3
+T}:T{
+.sp
+Cell in column 2, row 2
+T}:T{
+.sp
+Cell in column 3, row 2
+T}
+T{
+.sp
+T}:T{
+.sp
+Cell in column 2, row 3
+T}:T{
+.sp
+Cell in column 3, row 3
+T}
+.TE
+.sp 1
+
+
+." .cell_with_paragraphs
+.TS
+allbox tab(:);
+lt
+lt.
+T{
+.sp
+Single paragraph on row 1
+T}
+T{
+.sp
+First paragraph on row 2
+Second paragraph on row 2
+T}
+.TE
+.sp 1
+
+
+." .aligns_per_cell
+.TS
+allbox tab(:);
+ct lt rt
+lt lt lt
+ct st st.
+T{
+.sp
+Prefix the {vbar} with {caret} to center content horizontally
+T}:T{
+.sp
+Prefix the {vbar} with &lt; to align the content to the left horizontally
+T}:T{
+.sp
+Prefix the {vbar} with &gt; to align the content to the right horizontally
+T}
+T{
+.sp
+Prefix the {vbar} with a . and {caret} to center the content in the cell vertically
+T}:T{
+.sp
+Prefix the {vbar} with a . and &lt; to align the content to the top of the cell
+T}:T{
+.sp
+Prefix the {vbar} with a . and &gt; to align the content to the bottom of the cell
+T}
+T{
+.sp
+This content spans three columns (3{plus}) and is centered horizontally ({caret}) and vertically (.{caret}) within the cell.
+T}
+.TE
+.sp 1
+
+
+." .insane_cells_formatting
+.TS
+allbox tab(:);
+rt rt
+ct lt
+^t lt
+^t lt.
+T{
+.sp
+This content is duplicated across two columns.
+It is aligned right horizontally.
+And it is monospaced.
+T}:T{
+.sp
+This content is duplicated across two columns.
+It is aligned right horizontally.
+And it is monospaced.
+T}
+T{
+.sp
+\fBThis cell spans 3 rows. The content is centered horizontally, aligned to the bottom of the cell, and strong.\fR
+T}:T{
+.sp
+\fIThis content is emphasized.\fR
+T}
+T{
+.sp
+T}:T{
+.sp
+This content is aligned to the top of the cell and literal.
+T}
+T{
+.sp
+T}:T{
+.sp
+This cell contains a verse
+that may one day expound on the
+wonders of tables in an
+epic sonnet.
+T}
+.TE
+.sp 1
+
