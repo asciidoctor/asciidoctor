@@ -1,0 +1,36 @@
+.TH "block paragraph" 1
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+." Bug fix
+.ie \n\(.g .ds Aq \(aq
+.el       .ds Aq '
+." Disable hiphenation
+.nh
+." Disable justification
+.ad l
+.SH "NAME"
+block paragraph \- test
+.SH "TESTS"
+." .basic
+.sp
+Paragraphs don\(cqt require any special markup in AsciiDoc.
+A paragraph is just one or more lines of consecutive text.
+.sp
+To begin a new paragraph, separate it by at least one blank line.
+
+." .with_title
+.B Paragraphs
+.br
+Paragraphs don\(cqt require any special markup in AsciiDoc.
+A paragraph is just one or more lines of consecutive text.
+
+.sp
+To begin a new paragraph, separate it by at least one blank line.
+
+." .with_id_and_role
+.sp
+Paragraphs don\(cqt require any special markup in AsciiDoc.
+A paragraph is just one or more lines of consecutive text.
