@@ -1,0 +1,98 @@
+.TH "Block quote" 1
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+." Bug fix
+.ie \n\(.g .ds Aq \(aq
+.el       .ds Aq '
+." Disable hiphenation
+.nh
+." Disable justification
+.ad l
+.SH "NAME"
+
+block quote \- test
+
+.SH "TESTS"
+
+." .basic
+.in +.5i
+.ll -.5i
+.nf
+Four score and seven years ago our fathers brought forth
+on this continent a new nation&#8230;&#8203;
+.fi
+.br
+.in
+.ll
+
+." .with_attribution
+.in +.5i
+.ll -.5i
+.nf
+A person who never made a mistake never tried anything new.
+.fi
+.br
+.in
+.ll
+.in +.3i
+.ll -.3i
+\(em Albert Einstein
+.in
+.ll
+
+." .with_attribution_and_citetitle
+.in +.5i
+.ll -.5i
+.nf
+Everybody remember where we parked.
+.fi
+.br
+.in
+.ll
+.in +.3i
+.ll -.3i
+Star Trek IV: The Voyage Home \(em Captain James T. Kirk
+.in
+.ll
+
+." .with_title
+.in +.3i
+\fBAfter landing the cloaked Klingon bird of prey in Golden Gate park:\fR
+.br
+.in
+.in +.5i
+.ll -.5i
+.nf
+Everybody remember where we parked.
+.fi
+.br
+.in
+.ll
+
+." .with_id_and_role
+.in +.5i
+.ll -.5i
+.nf
+Everybody remember where we parked.
+.fi
+.br
+.in
+.ll
+
+." .block
+.in +.5i
+.ll -.5i
+.nf
+.PP
+Dennis: Come and see the violence inherent in the system. Help! Help! I\(cqm being repressed!
+.PP
+King Arthur: Bloody peasant!
+.PP
+Dennis: Oh, what a giveaway! Did you hear that? Did you hear that, eh? That\(cqs what I\(cqm on about! Did you see him repressing me? You saw him, Didn\(cqt you?
+.fi
+.br
+.in
+.ll

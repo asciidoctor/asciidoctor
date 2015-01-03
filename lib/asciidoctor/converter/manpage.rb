@@ -400,29 +400,26 @@ Author(s).
     end
 
     def quote node
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = ['quoteblock', node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
-      title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
-      attribution = (node.attr? 'attribution') ? (node.attr 'attribution') : nil
-      citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
-      if attribution || citetitle
-        cite_element = citetitle ? %(<cite>#{citetitle}</cite>) : nil
-        attribution_text = attribution ? %(&#8212; #{attribution}#{citetitle ? "<br#{@void_element_slash}>\n" : nil}) : nil
-        attribution_element = %(\n<div class="attribution">\n#{attribution_text}#{cite_element}\n</div>)
-      else
-        attribution_element = nil
-      end
-
-      %(<div#{id_attribute}#{class_attribute}>#{title_element}
-<blockquote>
+      result = []
+      title_element = node.title? ? %(.in +.3i\n\\fB#{node.title}\\fR\n.br\n.in\n) : nil
+      attribution_line = (node.attr? 'citetitle') ? %(#{node.attr 'citetitle'} ) : nil
+      attribution_line = (node.attr? 'attribution') ? %(#{attribution_line}\\\(em #{node.attr 'attribution'}) : nil
+      result << %(#{title_element}.in +.5i
+.ll -.5i
+.nf
 #{node.content}
-</blockquote>#{attribution_element}
-</div>)
-    end
-
-    def thematic_break node
-      %(<hr#{@void_element_slash}>)
+.fi
+.br
+.in
+.ll)
+      if attribution_line
+        result << %(.in +.3i
+.ll -.3i
+#{attribution_line}
+.in
+.ll)
+      end
+      result * EOL
     end
 
     def sidebar node
@@ -483,6 +480,14 @@ Author(s).
       end
       result << %(|#{'=' * 4}\n)
       result * EOL
+    end
+
+    def thematic_break node
+      %(<hr#{@void_element_slash}>)
+    end
+
+    def toc node
+      ''
     end
 
     def ulist node
