@@ -245,19 +245,33 @@ Author(s).
       result = []
       counter = 0
       node.items.each do |terms, dd|
-        counter += 1
-        [*terms].each do |dt|
-          result << %(#{manify dt.text}.RS 4)
+        case node.style
+        when 'qanda'
+          counter += 1
+          [*terms].each do |dt|
+            result << ".sp"
+            result << %(#{counter}. #{manify dt.text}\n.RS 4)
+          end
+        when 'horizontal'
+          counter += 1
+          [*terms].each do |dt|
+            result << ".sp"
+            result << %(#{manify dt.text}\n.RS 4)
+          end
+        else
+          counter += 1
+          [*terms].each do |dt|
+            result << ".sp"
+            result << %(.B #{manify dt.text}\n.RS 4)
+          end
         end
         if dd
-          result << %(#{manify dd.text, false}) if dd.text?
-          result << '.sp' if dd.text? && dd.blocks?
+          result << %(#{manify dd.text}) if dd.text?
+          result << ".sp" if dd.text? && dd.blocks?
           result << %(#{dd.content}) if dd.blocks?
-          result << ".RE"
-          result << ".PP" unless node.items.size == counter
         end
+        result << ".RE"
       end
-
       result * EOL
     end
 
@@ -353,8 +367,9 @@ Author(s).
 .sp -1
 .IP " #{idx + 1}." 4.2
 .\\}
-#{manify item.text}#{(item.blocks?) ? item.content : ''}
-.RE)
+#{manify item.text})
+        result << item.content if item.blocks?
+        result << ".RE"
       end
       result * EOL
     end
@@ -603,8 +618,10 @@ allbox tab(:);)
     end
 
     def ulist node
-      node.items.map {|li|
-        %[.sp
+      result = []
+      result << %(\\fB#{node.title}\\fR) if node.title?
+      node.items.map {|item|
+        result << %[.sp
 .RS 4
 .ie n \\{\\
 \\h'-04'\\(bu\\h'+03'\\c
@@ -613,9 +630,11 @@ allbox tab(:);)
 .sp -1
 .IP \\(bu 2.3
 .\\}
-#{manify li.text, false}#{li.blocks? ? li.content : nil}
-.RE]
-      } * EOL
+#{manify item.text}]
+        result << item.content if item.blocks?
+        result << ".RE"
+      }
+      result * EOL
     end
 
     def verse node

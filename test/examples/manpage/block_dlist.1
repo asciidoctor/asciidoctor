@@ -1,0 +1,349 @@
+.TH "block dlist" 1
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+." Bug fix
+.ie \n\(.g .ds Aq \(aq
+.el       .ds Aq '
+." Disable hiphenation
+.nh
+." Disable justification
+.ad l
+.SH "NAME"
+block dlist \- test
+.SH "TESTS"
+." .basic
+.sp
+.B Asciidoctor
+.RS 4
+An implementation of the AsciiDoc processor in Ruby.
+.RE
+.sp
+.B Asciidoc
+.RS 4
+A text document format for writing notes, documentation, articles, books,
+ebooks, slideshows, web pages, man pages and blogs.
+.RE
+
+." .basic_block
+.sp
+.B About
+.RS 4
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+An implementation of the AsciiDoc processor in Ruby.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Fast text processor and publishing toolchain.
+.RE
+.RE
+.sp
+.B Authors
+.RS 4
+Asciidoctor is lead by Dan Allen and Sarah White and has received contributions
+from many other individuals in Asciidoctor’s awesome community.
+.sp
+.sp
+AsciiDoc was started by Stuart Rackham.
+.RE
+
+." .basic_missing_description
+.sp
+.B Definition without a description
+.RS 4
+.RE
+
+." .basic_with_title
+.sp
+.B License
+.RS 4
+MIT
+.RE
+
+." .basic_with_id_and_role
+.sp
+.B License
+.RS 4
+MIT
+.RE
+
+." .qanda
+.sp
+1. What is Asciidoctor?
+.RS 4
+An implementation of the AsciiDoc processor in Ruby.
+.RE
+.sp
+2. What is the answer to the Ultimate Question?
+.RS 4
+42
+.RE
+
+." .qanda_block
+.sp
+1. What is Asciidoctor?
+.RS 4
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+An implementation of the AsciiDoc processor in Ruby.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Fast text processor and publishing toolchain.
+.RE
+.RE
+.sp
+2. Who is behind Asciidoctor?
+.RS 4
+Asciidoctor is lead by Dan Allen and Sarah White and has received contributions
+from many other individuals in Asciidoctor’s awesome community.
+.sp
+.sp
+AsciiDoc was started by Stuart Rackham.
+.RE
+
+." .qanda_missing_answer
+.sp
+1. Who knows the answer?
+.RS 4
+.RE
+
+." .qanda_with_title
+.sp
+1. What is the answer to the Ultimate Question?
+.RS 4
+42
+.RE
+
+." .qanda_with_id_and_role
+.sp
+1. What is the answer to the Ultimate Question?
+.RS 4
+42
+.RE
+
+." .horizontal
+.sp
+Hard drive
+.RS 4
+Permanent storage for operating system and/or user files.
+.RE
+.sp
+RAM
+.RS 4
+Temporarily stores information the CPU uses during operation.
+.RE
+
+." .horizontal_with_dimensions
+.sp
+Hard drive
+.RS 4
+Permanent storage for operating system and/or user files.
+.RE
+.sp
+RAM
+.RS 4
+Temporarily stores information the CPU uses during operation.
+.RE
+
+." .horizontal_with_title
+.sp
+Hard drive
+.RS 4
+Permanent storage for operating system and/or user files.
+.RE
+.sp
+RAM
+.RS 4
+Temporarily stores information the CPU uses during operation.
+.RE
+
+." .horizontal_with_id_and_role
+.sp
+Hard drive
+.RS 4
+Permanent storage for operating system and/or user files.
+.RE
+.sp
+RAM
+.RS 4
+Temporarily stores information the CPU uses during operation.
+.RE
+
+." .mixed
+.sp
+.B Operating Systems
+.RS 4
+.sp
+.B Linux
+.RS 4
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP " 1." 4.2
+.\}
+Fedora
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Desktop
+.RE
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP " 2." 4.2
+.\}
+Ubuntu
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Desktop
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Server
+.RE
+.RE
+.RE
+.sp
+.B BSD
+.RS 4
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP " 1." 4.2
+.\}
+FreeBSD
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP " 2." 4.2
+.\}
+NetBSD
+.RE
+.RE
+.RE
+.sp
+.B Cloud Providers
+.RS 4
+.sp
+.B PaaS
+.RS 4
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP " 1." 4.2
+.\}
+OpenShift
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP " 2." 4.2
+.\}
+CloudBees
+.RE
+.RE
+.sp
+.B IaaS
+.RS 4
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP " 1." 4.2
+.\}
+Amazon EC2
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP " 2." 4.2
+.\}
+Rackspace
+.RE
+.RE
+.RE
