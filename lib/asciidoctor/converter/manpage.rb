@@ -25,8 +25,12 @@ module Asciidoctor
       @xml_mode = opts[:htmlsyntax] == 'xml'
       @void_element_slash = @xml_mode ? '/' : nil
       @stylesheets = Stylesheets.instance
+      # TODO:
+      # Use this list to make sure manify changes '.' at the beginning of line
+      # except when used in one of these commands.
+      # TODO: Complete the list
+      @used_troff_dot_commands = ['.SH ', '.SS ', '.PP', '.RS', '.RE', '.de', '.if']
     end
-
 
     # optionally folds each endline into a single space, escapes special man characters,
     # reverts HTML entity references back to their original form, strips trailing
@@ -46,6 +50,7 @@ module Asciidoctor
       # http://web.archive.org/web/20060102165607/http://people.debian.org/~branden/talks/wtfm/wtfm.pdf
       # .gsub(/\./, '\\\&.')
       str.
+        gsub('^.$', '\\\&.').     # lone . is also used in troff to indicate paragraph continuation with visual separator
         gsub('-', '\\-').
         gsub('&lt;', '<').
         gsub('&gt;', '>').
@@ -198,6 +203,10 @@ Author(s).
 .sp .5v
 .RE)
       result * EOL
+    end
+
+    def audio node
+      ''
     end
 
     def colist node
@@ -418,6 +427,10 @@ Author(s).
         %(.sp
 #{manify node.content})
       end
+    end
+
+    def pass node
+      node.content
     end
 
     def preamble node
