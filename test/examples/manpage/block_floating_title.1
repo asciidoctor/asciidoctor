@@ -1,0 +1,50 @@
+.TH "block floating title" 1
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+." Bug fix
+.ie \n\(.g .ds Aq \(aq
+.el       .ds Aq '
+." Disable hiphenation
+.nh
+." Disable justification
+.ad l
+.SH "NAME"
+block floating title \- test
+.SH "TESTS"
+." .level1
+.SS "Discrete Title Level 1"
+.sp
+
+
+." .level2
+.SS "Discrete Title Level 2"
+.sp
+
+
+." .level3
+.SS "Discrete Title Level 3"
+.sp
+
+
+." .level4
+.SS "Discrete Title Level 4"
+.sp
+
+
+." .level5
+.SS "Discrete Title Level 5"
+.sp
+
+
+." .with_custom_id
+.SS "Discrete Title Level 1"
+.sp
+
+
+." .with_roles
+.SS "Discrete Title Level 2"
+.sp
+

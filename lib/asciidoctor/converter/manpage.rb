@@ -277,10 +277,7 @@ T})
     end
 
     def floating_title node
-      tag_name = %(h#{node.level + 1})
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = [node.style, node.role].compact
-      %(<#{tag_name}#{id_attribute} class="#{classes * ' '}">#{node.title}</#{tag_name}>)
+      %(.SS "#{manify node.title}"\n.sp\n)
     end
 
     def image node
