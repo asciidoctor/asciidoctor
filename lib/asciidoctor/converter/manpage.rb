@@ -260,14 +260,20 @@ T})
     end
 
     def example node
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
-
-      %(<div#{id_attribute} class="#{(role = node.role) ? ['exampleblock', role] * ' ' : 'exampleblock'}">
-#{title_element}<div class="content">
-#{node.content}
-</div>
-</div>)
+      result = []
+      result << %(.B #{node.captioned_title}\n.br) if node.title?
+      result << %(.if n \\{\\
+.sp
+.\\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+#{ manify node.content }
+.sp .5v
+.RE)
+      result * EOL
     end
 
     def floating_title node
@@ -598,7 +604,7 @@ allbox tab(:);)
     end
 
     def thematic_break node
-      %(<hr#{@void_element_slash}>)
+      ''
     end
 
     def toc node

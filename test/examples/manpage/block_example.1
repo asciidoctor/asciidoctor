@@ -1,0 +1,64 @@
+.TH "block example" 1
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+." Bug fix
+.ie \n\(.g .ds Aq \(aq
+.el       .ds Aq '
+." Disable hiphenation
+.nh
+." Disable justification
+.ad l
+.SH "NAME"
+block example \- test
+.SH "TESTS"
+." .basic
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.sp
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua.
+.sp .5v
+.RE
+
+." .with_title
+.B Example 1. Sample document
+.br
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.sp
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua.
+.sp
+The document header is useful, but not required.
+.sp .5v
+.RE
+
+." .with_id_and_role
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.sp
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua.
+.sp .5v
+.RE
