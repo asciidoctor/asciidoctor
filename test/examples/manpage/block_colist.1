@@ -1,0 +1,115 @@
+.TH "Block colist" "1"
+." URL portability
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+." Bug fix
+.ie \n\(.g .ds Aq \(aq
+.el       .ds Aq '
+." Disable hiphenation
+.nh
+." Disable justification
+.ad l
+.SH "NAME"
+block_colist \- test
+.SH "TESTS"
+." .basic
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+require \(aqsinatra\(aq \fB1\fR
+
+
+get \(aq/hi\(aq do  \fB2\fR
+
+  "Hello World!" \fB3\fR
+
+end
+
+.fi
+.if n \{\
+.RE
+.\}
+.TS
+tab(:);
+r lw(\n(.lu*75u/100u).
+\fB1.\fR\h'-2n':T{
+Library import
+T}
+\fB2.\fR\h'-2n':T{
+URL mapping
+T}
+\fB3.\fR\h'-2n':T{
+Content for response
+T}
+.TE
+
+." .with_title
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+require \(aqsinatra\(aq \fB1\fR
+
+
+get \(aq/hi\(aq do  \fB2\fR
+
+  "Hello World!" \fB3\fR
+
+end
+
+.fi
+.if n \{\
+.RE
+.\}
+.B Description
+.TS
+tab(:);
+r lw(\n(.lu*75u/100u).
+\fB1.\fR\h'-2n':T{
+Library import
+T}
+\fB2.\fR\h'-2n':T{
+URL mapping
+T}
+\fB3.\fR\h'-2n':T{
+Content for response
+T}
+.TE
+
+." .with_id_and_role
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+require \(aqsinatra\(aq \fB1\fR
+
+
+get \(aq/hi\(aq do  \fB2\fR
+
+  "Hello World!" \fB3\fR
+
+end
+
+.fi
+.if n \{\
+.RE
+.\}
+.TS
+tab(:);
+r lw(\n(.lu*75u/100u).
+\fB1.\fR\h'-2n':T{
+Library import
+T}
+\fB2.\fR\h'-2n':T{
+URL mapping
+T}
+\fB3.\fR\h'-2n':T{
+Content for response
+T}
+.TE

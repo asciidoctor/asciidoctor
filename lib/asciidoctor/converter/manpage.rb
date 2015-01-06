@@ -211,42 +211,17 @@ Author(s).
 
     def colist node
       result = []
-      id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = ['colist', node.style, node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
+      result << %(.B #{manify node.title}) if node.title?
+      result << %(.TS
+tab\(:\);
+r lw\(\\n\(.lu*75u/100u\).)
 
-      result << %(<div#{id_attribute}#{class_attribute}>)
-      result << %(<div class="title">#{node.title}</div>) if node.title?
-
-      if node.document.attr? 'icons'
-        result << '<table>'
-
-        font_icons = node.document.attr? 'icons', 'font'
-        node.items.each_with_index do |item, i|
-          num = i + 1
-          num_element = if font_icons
-            %(<i class="conum" data-value="#{num}"></i><b>#{num}</b>)
-          else
-            %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}"#{@void_element_slash}>)
-          end
-          result << %(<tr>
-<td>#{num_element}</td>
-<td>#{item.text}</td>
-</tr>)
-        end
-
-        result << '</table>'
-      else
-        result << '<ol>'
-        node.items.each do |item|
-          result << %(<li>
-<p>#{item.text}</p>
-</li>)
-        end
-        result << '</ol>'
+      node.items.each_with_index do |item, index|
+        result << %(\\fB#{index + 1}.\\fR\\h'-2n':T{
+#{manify item.text}
+T})
       end
-
-      result << '</div>'
+      result << ".TE"
       result * EOL
     end
 
