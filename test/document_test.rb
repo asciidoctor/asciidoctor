@@ -835,6 +835,9 @@ text
     test 'should add MathJax script to HTML head if stem attribute is set' do
       output = render_string '', :attributes => {'stem' => ''}
       assert_match('<script type="text/x-mathjax-config">', output)
+      assert_match('inlineMath: [["\\\\(", "\\\\)"]]', output)
+      assert_match('displayMath: [["\\\\[", "\\\\]"]]', output)
+      assert_match('delimiters: [["\\\\$", "\\\\$"]]', output)
     end
   end
 
