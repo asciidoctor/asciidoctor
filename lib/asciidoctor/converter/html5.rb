@@ -116,12 +116,12 @@ module Asciidoctor
         result << %(<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {
-    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].to_s}],
-    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].to_s}],
+    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
+    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
     ignoreClass: "nostem|nolatexmath"
   },
   asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].to_s}],
+    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
     ignoreClass: "nostem|noasciimath"
   },
   TeX: {#{eqnums_opt}}
