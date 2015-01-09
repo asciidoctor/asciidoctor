@@ -66,7 +66,10 @@ module Asciidoctor
           (@engine_options[engine] ||= {}).update override_opts
         end
       end
-      @engine_options[:haml][:format] = @engine_options[:slim][:format] = :html5 if opts[:htmlsyntax] == 'html'
+      if opts[:htmlsyntax] == 'html'
+        @engine_options[:haml][:format] = :html5
+        @engine_options[:slim][:format] = :html
+      end
       case opts[:template_cache]
       when true
         @caches = self.class.caches

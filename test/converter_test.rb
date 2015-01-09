@@ -26,13 +26,13 @@ context 'Converter' do
       assert_equal :xhtml, selected.templates['paragraph'].options[:format]
     end
 
-    test 'should set Slim format to html5 for html5 backend' do
+    test 'should set Slim format to html for html5 backend' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false
       assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
       selected = doc.converter.find_converter('paragraph')
       assert selected.is_a? Asciidoctor::Converter::TemplateConverter
       assert selected.templates['paragraph'].is_a? Slim::Template
-      assert_equal :html5, selected.templates['paragraph'].options[:format]
+      assert_equal :html, selected.templates['paragraph'].options[:format]
     end
 
     test 'should set Slim format to nil for docbook backend' do
