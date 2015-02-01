@@ -44,7 +44,7 @@ Example: asciidoctor -b html5 source.asciidoc
           EOS
 
           opts.on('-b', '--backend BACKEND', 'set output format backend: [html5, xhtml, docbook, docbook45] (default: html5)',
-                  'Other backends such as [manpage, pdf, deckjs] can be added') do |backend|
+                  'additional backends are supported via extensions (e.g., manpage, pdf, latex)') do |backend|
             self[:attributes]['backend'] = backend
           end
           opts.on('-d', '--doctype DOCTYPE', ['article', 'book', 'manpage', 'inline'],
