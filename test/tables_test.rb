@@ -960,5 +960,57 @@ single cell
       output = render_embedded_string input
       assert_css 'table td', output, 1
     end
+
+    test 'table with breakable db45' do
+      input = <<-EOS
+.Table with breakable
+[options="breakable"]
+|===
+|Item       |Quantity
+|Item 1     |1        
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook45'
+      assert output.include?('<?dbfo keep-together="auto"?>')
+    end
+
+    test 'table with breakable db5' do
+      input = <<-EOS
+.Table with breakable
+[options="breakable"]
+|===
+|Item       |Quantity
+|Item 1     |1        
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook5'
+      assert output.include?('<?dbfo keep-together="auto"?>')
+    end
+
+    test 'table with unbreakable db5' do
+      input = <<-EOS
+.Table with unbreakable
+[options="unbreakable"]
+|===
+|Item       |Quantity
+|Item 1     |1        
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook5'
+      assert output.include?('<?dbfo keep-together="always"?>')
+    end
+
+    test 'table with unbreakable db45' do
+      input = <<-EOS
+.Table with unbreakable
+[options="unbreakable"]
+|===
+|Item       |Quantity
+|Item 1     |1        
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook45'
+      assert output.include?('<?dbfo keep-together="always"?>')
+    end
   end
 end
