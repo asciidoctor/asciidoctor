@@ -374,7 +374,6 @@ module Asciidoctor
       result = []
       pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : nil
       result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{node.attr 'frame', 'all'}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}">)
-      result << %(<title>#{node.title}</title>) if tag_name == 'table'
 
       if (node.option? 'breakable')
         result << %(<?dbfo keep-together="auto"?>)
@@ -383,6 +382,7 @@ module Asciidoctor
         result << %(<?dbfo keep-together="always"?>)
       end 
 
+      result << %(<title>#{node.title}</title>) if tag_name == 'table'
       if (width = (node.attr? 'width') ? (node.attr 'width') : nil)
         TABLE_PI_NAMES.each do |pi_name|
           result << %(<?#{pi_name} table-width="#{width}"?>)
