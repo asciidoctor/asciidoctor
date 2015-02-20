@@ -940,22 +940,22 @@ module Extensions
     # Examples
     #
     #   # as a BlockMacroProcessor subclass
-    #   block GistBlockMacro
+    #   block_macro GistBlockMacro
     #
     #   # as a BlockMacroProcessor subclass with an explicit macro name
-    #   block GistBlockMacro, :gist
+    #   block_macro GistBlockMacro, :gist
     #
     #   # as an instance of a BlockMacroProcessor subclass
-    #   block GistBlockMacro.new
+    #   block_macro GistBlockMacro.new
     #
     #   # as an instance of a BlockMacroProcessor subclass with an explicit macro name
-    #   block GistBlockMacro.new, :gist
+    #   block_macro GistBlockMacro.new, :gist
     #
     #   # as a name of a BlockMacroProcessor subclass
-    #   block 'GistBlockMacro'
+    #   block_macro 'GistBlockMacro'
     #
     #   # as a name of a BlockMacroProcessor subclass with an explicit macro name
-    #   block 'GistBlockMacro', :gist
+    #   block_macro 'GistBlockMacro', :gist
     #
     #   # as a method block
     #   block_macro do
@@ -1029,22 +1029,22 @@ module Extensions
     # Examples
     #
     #   # as an InlineMacroProcessor subclass
-    #   block ChromeInlineMacro
+    #   inline_macro ChromeInlineMacro
     #
     #   # as an InlineMacroProcessor subclass with an explicit macro name
-    #   block ChromeInineMacro, :chrome
+    #   inline_macro ChromeInineMacro, :chrome
     #
     #   # as an instance of an InlineMacroProcessor subclass
-    #   block ChromeInlineMacro.new
+    #   inline_macro ChromeInlineMacro.new
     #
     #   # as an instance of an InlineMacroProcessor subclass with an explicit macro name
-    #   block ChromeInlineMacro.new, :chrome
+    #   inline_macro ChromeInlineMacro.new, :chrome
     #
     #   # as a name of an InlineMacroProcessor subclass
-    #   block 'ChromeInlineMacro'
+    #   inline_macro 'ChromeInlineMacro'
     #
     #   # as a name of an InlineMacroProcessor subclass with an explicit macro name
-    #   block 'ChromeInineMacro', :chrome
+    #   inline_macro 'ChromeInineMacro', :chrome
     #
     #   # as a method block
     #   inline_macro do
