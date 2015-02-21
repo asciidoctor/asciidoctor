@@ -202,6 +202,16 @@ context 'Links' do
     assert_xpath '//a[@href="tigers.html"][text() = "[tigers]"]', doc.render, 1
   end
 
+  test 'xref using angled bracket syntax with ancestor path sans extension' do
+    doc = document_from_string '<<../tigers#,tigers>>', :header_footer => false
+    assert_xpath '//a[@href="../tigers.html"][text() = "tigers"]', doc.render, 1
+  end
+
+  test 'xref using angled bracket syntax with absolute path sans extension' do
+    doc = document_from_string '<</path/to/tigers#,tigers>>', :header_footer => false
+    assert_xpath '//a[@href="/path/to/tigers.html"][text() = "tigers"]', doc.render, 1
+  end
+
   test 'xref using angled bracket syntax with path and extension' do
     doc = document_from_string '<<tigers.adoc#>>', :header_footer => false
     assert_xpath '//a[@href="tigers.html"][text() = "[tigers]"]', doc.render, 1
