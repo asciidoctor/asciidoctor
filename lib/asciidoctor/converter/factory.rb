@@ -207,6 +207,11 @@ module Asciidoctor
             require 'asciidoctor/converter/docbook45'.to_s
           end
           DocBook45Converter.new backend, opts
+        when 'manpage'
+          unless defined? ::Asciidoctor::Converter::ManPageConverter
+            require 'asciidoctor/converter/manpage'.to_s
+          end
+          ManPageConverter.new backend, opts
         end
 
         return base_converter unless opts.key? :template_dirs
