@@ -1827,8 +1827,13 @@ class Parser
       if reader.has_more_lines? && !reader.next_line_empty?
         rev_line = reader.read_line 
         if (match = RevisionInfoLineRx.match(rev_line))
-          rev_metadata['revdate'] = match[2].strip
-          rev_metadata['revnumber'] = match[1].rstrip unless match[1].nil?
+          component = match[2].strip
+          if match[1].nil? && (component.start_with? 'v')
+            rev_metadata['revnumber'] = component[1..-1]
+          else
+            rev_metadata['revdate'] = component
+            rev_metadata['revnumber'] = match[1].rstrip unless match[1].nil?
+          end
           rev_metadata['revremark'] = match[3].rstrip unless match[3].nil?
         else
           # throw it back
