@@ -477,6 +477,30 @@ Ryan Waldron
     assert_equal '2013-12-18', metadata['revdate']
   end
 
+  test 'parse rev number with trailing comma' do
+    input = <<-EOS
+Stuart Rackham
+v8.6.8,
+    EOS
+    metadata, _ = parse_header_metadata input
+    assert_equal 7, metadata.size
+    assert_equal '8.6.8', metadata['revnumber']
+    assert !metadata.has_key?('revdate')
+    warn metadata.inspect
+  end
+
+  # Asciidoctor recognizes a standalone revision without a trailing comma
+  test 'parse rev number' do
+    input = <<-EOS
+Stuart Rackham
+v8.6.8
+    EOS
+    metadata, _ = parse_header_metadata input
+    assert_equal 7, metadata.size
+    assert_equal '8.6.8', metadata['revnumber']
+    assert !metadata.has_key?('revdate')
+  end
+
   # while compliant w/ AsciiDoc, this is just sloppy parsing
   test "treats arbitrary text on rev line as revdate" do
     input = <<-EOS
@@ -516,7 +540,7 @@ Joe Cool
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 'Must start revremark-only line with space', metadata['revremark']
-    assert_equal '', metadata['revdate']
+    assert !metadata.has_key?('revdate')
   end
 
   test "skip line comments before author" do
