@@ -425,7 +425,7 @@ module Extensions
   class InlineMacroProcessor < MacroProcessor
     def initialize name, config = {}
       super
-      @config[:regexp] ||= (resolve_regexp @name, @config[:format])
+      self.config[:regexp] ||= (resolve_regexp @name, @config[:format])
     end
 
     def resolve_regexp name, format
