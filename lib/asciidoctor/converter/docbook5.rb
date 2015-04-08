@@ -376,10 +376,9 @@ module Asciidoctor
       result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{node.attr 'frame', 'all'}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}">)
 
       if (node.option? 'breakable')
-        result << %(<?dbfo keep-together="auto"?>)
-      end 
-      else if (node.option? 'unbreakable')
-        result << %(<?dbfo keep-together="always"?>)
+        result << '<?dbfo keep-together="auto"?>'
+      elsif (node.option? 'unbreakable')
+        result << '<?dbfo keep-together="always"?>'
       end 
 
       result << %(<title>#{node.title}</title>) if tag_name == 'table'
