@@ -30,8 +30,9 @@ module Asciidoctor
       result = []
       slash = @void_element_slash
       br = %(<br#{slash}>)
-      asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')
-      asset_uri_scheme = %(#{asset_uri_scheme}:) unless asset_uri_scheme.empty?
+      unless (asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')).empty?
+        asset_uri_scheme = %(#{asset_uri_scheme}:)
+      end
       cdn_base = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
       linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
       result << '<!DOCTYPE html>'
@@ -911,6 +912,9 @@ Your browser does not support the audio tag.
       height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
       case node.attr 'poster'
       when 'vimeo'
+        unless (asset_uri_scheme = (node.document.attr 'asset-uri-scheme', 'https')).empty?
+          asset_uri_scheme = %(#{asset_uri_scheme}:)
+        end
         start_anchor = (node.attr? 'start', nil, false) ? %(#at=#{node.attr 'start'}) : nil
         delimiter = '?'
         autoplay_param = (node.option? 'autoplay') ? %(#{delimiter}autoplay=1) : nil
@@ -918,10 +922,13 @@ Your browser does not support the audio tag.
         loop_param = (node.option? 'loop') ? %(#{delimiter}loop=1) : nil
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="https://player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{(node.option? 'nofullscreen') ? nil : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
       when 'youtube'
+        unless (asset_uri_scheme = (node.document.attr 'asset-uri-scheme', 'https')).empty?
+          asset_uri_scheme = %(#{asset_uri_scheme}:)
+        end
         rel_param_val = (node.option? 'related') ? 1 : 0
         start_param = (node.attr? 'start', nil, false) ? %(&amp;start=#{node.attr 'start'}) : nil
         end_param = (node.attr? 'end', nil, false) ? %(&amp;end=#{node.attr 'end'}) : nil
@@ -957,7 +964,7 @@ Your browser does not support the audio tag.
 
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="https://www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
 </div>
 </div>)
       else
