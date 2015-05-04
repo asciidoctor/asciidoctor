@@ -877,7 +877,7 @@ module Extensions
     #   end
     #
     #   # as a method block with an explicit block name
-    #   register :shout do
+    #   block :shout do
     #     process |parent, reader, attrs|
     #       ...
     #     end
@@ -966,7 +966,7 @@ module Extensions
     #   end
     #
     #   # as a method block with an explicit macro name
-    #   register :gist do
+    #   block_macro :gist do
     #     process |parent, target, attrs|
     #       ...
     #     end
@@ -1055,7 +1055,7 @@ module Extensions
     #   end
     #
     #   # as a method block with an explicit macro name
-    #   register :chrome do
+    #   inline_macro :chrome do
     #     process |parent, target, attrs|
     #       ...
     #     end
