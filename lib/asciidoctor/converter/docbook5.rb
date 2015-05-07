@@ -561,8 +561,7 @@ module Asciidoctor
       if (keys = node.attr 'keys').size == 1
         %(<keycap>#{keys[0]}</keycap>)
       else
-        key_combo = keys.map {|key| %(<keycap>#{key}</keycap>) }.join
-        %(<keycombo>#{key_combo}</keycombo>)
+        %(<keycombo>#{keys.map {|key| "<keycap>#{key}</keycap>" }.join}</keycombo>)
       end
     end
 
