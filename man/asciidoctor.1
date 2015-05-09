@@ -1,170 +1,234 @@
 '\" t
 .\"     Title: asciidoctor
-.\"    Author: Dan Allen
-.\" Generator: Asciidoctor 1.5.2
-.\"      Date: 2014-11-27
+.\"    Author: Dan Allen, Sarah White, Ryan Waldron
+.\" Generator: Asciidoctor 1.5.3.dev
+.\"      Date: 2015-05-08
 .\"    Manual: Asciidoctor Manual
 .\"    Source: Asciidoctor 1.5.2
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2014-11-27" "Asciidoctor 1\&.5\&.2" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2015-05-08" "Asciidoctor 1.5.2" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
+.ss \n[.ss] 0
 .nh
 .ad l
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+.LINKSTYLE blue R < >
+.SH "NAME"
+asciidoctor \- converts AsciiDoc source files to HTML, DocBook and other formats
 .SH "SYNOPSIS"
 .sp
-\fBasciidoctor\fR [\fIOPTION\fR]... \fIFILE\fR...
+\fBasciidoctor\fP [\fIOPTION\fP]... \fIFILE\fP...
 .SH "DESCRIPTION"
 .sp
-The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fR to HTML5, DocBook 4\&.5, DocBook 5\&.0 and other custom output formats\&.
+The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fP to HTML5, DocBook 4.5, DocBook 5.0 and other custom output formats.
 .sp
-If \fIFILE\fR is \fI\-\fR then the AsciiDoc source is read from standard input\&.
+If \fIFILE\fP is \fI\-\fP then the AsciiDoc source is read from standard input.
 .SH "OPTIONS"
 .SS "Security Settings"
-.PP
-\fB\-B, \-\-base\-dir\fR=\fIDIR\fR
+.sp
+\fB\-B, \-\-base\-dir\fP=\fIDIR\fP
 .RS 4
-Base directory containing the document and resources\&. Defaults to the directory containing the source file, or the working directory if the source is read from a stream\&. Can be used as a way to chroot the execution of the program\&.
+Base directory containing the document and resources.
+Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
+Can be used as a way to chroot the execution of the program.
 .RE
-.PP
-\fB\-S, \-\-safe\-mode\fR=\fISAFE_MODE\fR
+.sp
+\fB\-S, \-\-safe\-mode\fP=\fISAFE_MODE\fP
 .RS 4
-Set safe mode level: \fIunsafe\fR, \fIsafe\fR, \fIserver\fR or \fIsecure\fR\&. Disables potentially dangerous macros in source files, such as include::[]\&. If not set, the safe mode level defaults to \fIunsafe\fR when Asciidoctor is invoked using this script\&.
+Set safe mode level: \fIunsafe\fP, \fIsafe\fP, \fIserver\fP or \fIsecure\fP.
+Disables potentially dangerous macros in source files, such as \f[CR]include::[]\fP.
+If not set, the safe mode level defaults to \fIunsafe\fP when Asciidoctor is invoked using this script.
 .RE
-.PP
-\fB\-\-safe\fR
+.sp
+\fB\-\-safe\fP
 .RS 4
-Set safe mode level to \fIsafe\fR\&. Enables include macros, but restricts access to ancestor paths of source file\&. Provided for compatibility with the asciidoc command\&. If not set, the safe mode level defaults to \fIunsafe\fR when Asciidoctor is invoked using this script\&.
+Set safe mode level to \fIsafe\fP.
+Enables include macros, but restricts access to ancestor paths of source file.
+Provided for compatibility with the asciidoc command.
+If not set, the safe mode level defaults to \fIunsafe\fP when Asciidoctor is invoked using this script.
 .RE
 .SS "Document Settings"
-.PP
-\fB\-a, \-\-attribute\fR=\fIATTRIBUTE\fR
-.RS 4
-Define, override or delete a document attribute\&. Command\-line attributes take precedence over attributes defined in the source file\&.
 .sp
-\fIATTRIBUTE\fR is normally formatted as a key\-value pair, in the form \fINAME=VALUE\fR\&. Alternate acceptable forms are \fINAME\fR (where the \fIVALUE\fR defaults to an empty string), \fINAME!\fR (unassigns the \fINAME\fR attribute) and \fINAME=VALUE@\fR (where \fIVALUE\fR does not override value of \fINAME\fR attribute if it\(cqs already defined in the source document)\&. Values containing spaces should be enclosed in quotes\&.
+\fB\-a, \-\-attribute\fP=\fIATTRIBUTE\fP
+.RS 4
+Define, override or delete a document attribute.
+Command\-line attributes take precedence over attributes defined in the source file.
 .sp
-This option may be specified more than once\&.
+\fIATTRIBUTE\fP is normally formatted as a key\-value pair, in the form \fINAME=VALUE\fP.
+Alternate acceptable forms are \fINAME\fP (where the \fIVALUE\fP defaults to an empty string), \fINAME!\fP (unassigns the \fINAME\fP attribute) and \fINAME=VALUE@\fP (where \fIVALUE\fP does not override value of \fINAME\fP attribute if it\(cqs already defined in the source document).
+Values containing spaces should be enclosed in quotes.
+.sp
+This option may be specified more than once.
 .RE
-.PP
-\fB\-b, \-\-backend\fR=\fIBACKEND\fR
+.sp
+\fB\-b, \-\-backend\fP=\fIBACKEND\fP
 .RS 4
-Backend output file format: \fIhtml5\fR, \fIdocbook45\fR and \fIdocbook5\fR supported out of the box\&. You can also use the backend alias names \fIhtml\fR (aliased to \fIhtml5\fR) or \fIdocbook\fR (aliased to \fIdocbook5\fR)\&. Defaults to \fIhtml5\fR\&. Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during conversion\&.
+Backend output file format: \fIhtml5\fP, \fIdocbook45\fP and \fIdocbook5\fP supported out of the box.
+You can also use the backend alias names \fIhtml\fP (aliased to \fIhtml5\fP) or \fIdocbook\fP (aliased to \fIdocbook5\fP).
+Defaults to \fIhtml5\fP.
+Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during conversion.
 .RE
-.PP
-\fB\-d, \-\-doctype\fR=\fIDOCTYPE\fR
+.sp
+\fB\-d, \-\-doctype\fP=\fIDOCTYPE\fP
 .RS 4
-Document type: \fIarticle\fR, \fIbook\fR, \fImanpage\fR or \fIinline\fR\&. Sets the root element when using the \fIdocbook\fR backend and the style class on the HTML body element when using the \fIhtml\fR backend\&. The \fIbook\fR document type allows multiple level\-0 section titles in a single document\&. The \fImanpage\fR document type enables parsing of metadata necessary to produce a manpage\&. The \fIinline\fR document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element\&. Defaults to \fIarticle\fR\&.
+Document type: \fIarticle\fP, \fIbook\fP, \fImanpage\fP or \fIinline\fP.
+Sets the root element when using the \fIdocbook\fP backend and the style class on the HTML body element when using the \fIhtml\fP backend.
+The \fIbook\fP document type allows multiple level\-0 section titles in a single document.
+The \fImanpage\fP document type enables parsing of metadata necessary to produce a manpage.
+The \fIinline\fP document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element.
+Defaults to \fIarticle\fP.
 .RE
 .SS "Rendering Control"
-.PP
-\fB\-C, \-\-compact\fR
-.RS 4
-Compact the output by removing blank lines\&. (No longer in use)\&.
-.RE
-.PP
-\fB\-D, \-\-destination\-dir\fR=\fIDIR\fR
-.RS 4
-Destination output directory\&. Defaults to the directory containing the source file, or the working directory if the source is read from a stream\&. If specified, the directory is resolved relative to the working directory\&.
-.RE
-.PP
-\fB\-E, \-\-template\-engine\fR=\fINAME\fR
-.RS 4
-Template engine to use for the custom converter templates\&. The gem with the same name as the engine will be loaded automatically\&. This name is also used to build the full path to the custom converter templates\&. If a template engine is not specified, it will be auto\-detected based on the file extension of the custom converter templates found\&.
-.RE
-.PP
-\fB\-e, \-\-eruby\fR
-.RS 4
-Specifies the eRuby implementation to use for executing the custom converter templates written in ERB\&. Supported values are \fIerb\fR and \fIerubis\fR\&. Defaults to \fIerb\fR\&.
-.RE
-.PP
-\fB\-n, \-\-section\-numbers\fR
-.RS 4
-Auto\-number section titles\&. Synonym for \fB\-\-attribute numbered\fR\&.
-.RE
-.PP
-\fB\-o, \-\-out\-file\fR=\fIOUT_FILE\fR
-.RS 4
-Write output to file \fIOUT_FILE\fR\&. Defaults to the base name of the input file suffixed with \fIbackend\fR extension\&. If the input is read from standard input, then the output file defaults to stdout\&. If \fIOUT_FILE\fR is \fI\-\fR then the standard output is also used\&. If specified, the file is resolved relative to the working directory\&.
-.RE
-.PP
-\fB\-s, \-\-no\-header\-footer\fR
-.RS 4
-Suppress the document header and footer in the output\&.
-.RE
-.PP
-\fB\-T, \-\-template\-dir\fR=\fIDIR\fR
-.RS 4
-A directory containing custom converter templates that override one or more templates from the built\-in set\&. (requires \fItilt\fR gem)
 .sp
-If there is a subfolder that matches the engine name (if specified), that folder is appended to the template directory path\&. Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path\&.
+\fB\-C, \-\-compact\fP
+.RS 4
+Compact the output by removing blank lines.
+(No longer in use).
+.RE
 .sp
-This option may be specified more than once\&. Matching templates found in subsequent directories override ones previously discovered\&.
+\fB\-D, \-\-destination\-dir\fP=\fIDIR\fP
+.RS 4
+Destination output directory.
+Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
+If specified, the directory is resolved relative to the working directory.
+.RE
+.sp
+\fB\-E, \-\-template\-engine\fP=\fINAME\fP
+.RS 4
+Template engine to use for the custom converter templates.
+The gem with the same name as the engine will be loaded automatically.
+This name is also used to build the full path to the custom converter templates.
+If a template engine is not specified, it will be auto\-detected based on the file extension of the custom converter templates found.
+.RE
+.sp
+\fB\-e, \-\-eruby\fP
+.RS 4
+Specifies the eRuby implementation to use for executing the custom converter templates written in ERB.
+Supported values are \fIerb\fP and \fIerubis\fP.
+Defaults to \fIerb\fP.
+.RE
+.sp
+\fB\-I, \-\-load\-path\fP=\fIDIRECTORY\fP
+.RS 4
+Add the specified directory to the load path, so that \fI\-r\fP can load extensions from outside the default Ruby load path.
+This option may be specified more than once.
+.RE
+.sp
+\fB\-n, \-\-section\-numbers\fP
+.RS 4
+Auto\-number section titles.
+Synonym for \fB\-\-attribute numbered\fP.
+.RE
+.sp
+\fB\-o, \-\-out\-file\fP=\fIOUT_FILE\fP
+.RS 4
+Write output to file \fIOUT_FILE\fP.
+Defaults to the base name of the input file suffixed with \fIbackend\fP extension.
+If the input is read from standard input, then the output file defaults to stdout.
+If \fIOUT_FILE\fP is \fI\-\fP then the standard output is also used.
+If specified, the file is resolved relative to the working directory.
+.RE
+.sp
+\fB\-r, \-\-require\fP=\fILIBRARY\fP
+.RS 4
+Require the specified library before executing the processor, using the standard Ruby require.
+This option may be specified more than once.
+.RE
+.sp
+\fB\-s, \-\-no\-header\-footer\fP
+.RS 4
+Suppress the document header and footer in the output.
+.RE
+.sp
+\fB\-T, \-\-template\-dir\fP=\fIDIR\fP
+.RS 4
+A directory containing custom converter templates that override one or more templates from the built\-in set.
+(requires \fItilt\fP gem)
+.sp
+If there is a subfolder that matches the engine name (if specified), that folder is appended to the template directory path.
+Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path.
+.sp
+This option may be specified more than once.
+Matching templates found in subsequent directories override ones previously discovered.
 .RE
 .SS "Processing Information"
-.PP
-\fB\-q, \-\-quiet\fR
+.sp
+\fB\-q, \-\-quiet\fP
 .RS 4
-Silence warnings\&.
+Silence warnings.
 .RE
-.PP
-\fB\-\-trace\fR
+.sp
+\fB\-\-trace\fP
 .RS 4
-Include backtrace information on errors\&. Not enabled by default\&.
+Include backtrace information on errors.
+Not enabled by default.
 .RE
-.PP
-\fB\-v, \-\-verbose\fR
+.sp
+\fB\-v, \-\-verbose\fP
 .RS 4
-Verbosely print processing information and configuration file checks to stderr\&.
+Verbosely print processing information and configuration file checks to stderr.
 .RE
-.PP
-\fB\-t, \-\-timings\fR
+.sp
+\fB\-t, \-\-timings\fP
 .RS 4
-Display timings information (time to read, parse and convert)\&.
+Display timings information (time to read, parse and convert).
 .RE
 .SS "Program Information"
-.PP
-\fB\-h, \-\-help\fR
+.sp
+\fB\-h, \-\-help\fP
 .RS 4
-Show the help message\&.
+Show the help message.
 .RE
-\fB\-V, \-\-version\fR
+.sp
+\fB\-V, \-\-version\fP
 .RS 4
-Print program version number\&.
+Print program version number.
 .RE
 .SH "EXIT STATUS"
-.PP
-\fB0\fR
+.sp
+\fB0\fP
 .RS 4
-Success\&.
+Success.
 .RE
-.PP
-\fB1\fR
+.sp
+\fB1\fP
 .RS 4
-Failure (syntax or usage error; configuration error; document processing failure; unexpected error)\&.
+Failure (syntax or usage error; configuration error; document processing failure; unexpected error).
 .RE
 .SH "BUGS"
 .sp
-See the \fBAsciidoctor\fR issue tracker: <\fBhttps://github\&.com/asciidoctor/asciidoctor/issues?q=is%3Aopen\fR>
+Refer to the \fBAsciidoctor\fP issue tracker at 
+.URL "https://github.com/asciidoctor/asciidoctor/issues?q=is%3Aopen" "" "."
 .SH "AUTHORS"
 .sp
-\fBAsciidoctor\fR was written by Dan Allen, Ryan Waldron, Jason Porter, Nick Hengeveld and other contributors\&.
+\fBAsciidoctor\fP was written by Dan Allen, Ryan Waldron, Jason Porter, Nick Hengeveld and other contributors.
 .sp
-\fBAsciiDoc\fR was written by Stuart Rackham and has received contributions from many other individuals\&.
+\fBAsciiDoc\fP was written by Stuart Rackham and has received contributions from many other individuals.
 .SH "RESOURCES"
 .sp
-Git source repository on GitHub: <\fBhttps://github\&.com/asciidoctor/asciidoctor\fR>
+\fBGit source repository on GitHub:\fP 
+.URL "https://github.com/asciidoctor/asciidoctor" "" ""
 .sp
-Project web site: <\fBhttp://asciidoctor\&.org\fR>
+\fBProject web site:\fP 
+.URL "http://asciidoctor.org" "" ""
 .sp
-GitHub organization: <\fBhttps://github\&.com/asciidoctor\fR>
+\fBGitHub organization:\fP 
+.URL "https://github.com/asciidoctor" "" ""
 .sp
-Discussion list / forum: <\fBhttp://discuss\&.asciidoctor\&.org\fR>
+\fBDiscussion list / forum:\fP 
+.URL "http://discuss.asciidoctor.org" "" ""
 .SH "COPYING"
 .sp
-Copyright (C) 2012\-2015 Dan Allen, Ryan Waldron and the Asciidoctor Project\&. Free use of this software is granted under the terms of the MIT License\&.
-.SH "AUTHOR"
-.PP
-\fBDan Allen\fR
+Copyright (C) 2012\-2015 Dan Allen, Ryan Waldron and the Asciidoctor Project.
+Free use of this software is granted under the terms of the MIT License.
+.SH "AUTHOR(S)"
+.sp
+\fBDan Allen, Sarah White, Ryan Waldron\fP
+.RS 4
+Author(s).
 .RE
