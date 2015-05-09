@@ -1,172 +1,145 @@
 module Asciidoctor
-  # A built-in {Converter} implementation that generates Troff Manpage output
-  # The output follows groff man page definition:
-  # http://www.gnu.org/software/groff/manual/html_node/Man-usage.html#Man-usage
-  # but also tries to be consistent with the a2x tool from AsciiDoc Python.
+  # A built-in {Converter} implementation that generates the man page (troff) format.
+  #
+  # The output follows the groff man page definition while also trying to be
+  # consistent with the output produced by the a2x tool from AsciiDoc Python.
+  #
+  # See http://www.gnu.org/software/groff/manual/html_node/Man-usage.html#Man-usage
   class Converter::ManPageConverter < Converter::BuiltIn
-    QUOTE_TAGS = {
-      :emphasis    => ['\fI',      '\fR',       true],
-      :strong      => ['\fB',      '\fR',       true],
-      # :monospaced  => ['<code>',   '</code>',   true],
-      # :superscript => ['<sup>',    '</sup>',    true],
-      # :subscript   => ['<sub>',    '</sub>',    true],
-      :double      => ['"',        '"',         false],
-      :single      => ["'",        "'",         false],
-      # :mark        => ['<mark>',   '</mark>',   true],
-      :asciimath   => ['\\$',      '\\$',       false],
-      :latexmath   => ['\\(',      '\\)',       false]
-      # Opal can't resolve these constants when referenced here
-      #:asciimath   => INLINE_MATH_DELIMITERS[:asciimath] + [false],
-      #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
-    }
-    QUOTE_TAGS.default = [nil, nil, nil]
+    LF = "\n"
+    TAB = "\t"
+    ETAB = ' ' * 8
 
-    def initialize backend, opts = {}
-      @xml_mode = opts[:htmlsyntax] == 'xml'
-      @void_element_slash = @xml_mode ? '/' : nil
-      @stylesheets = Stylesheets.instance
-      # TODO:
-      # Use this list to make sure manify changes '.' at the beginning of line
-      # except when used in one of these commands.
-      # TODO: Complete the list
-      @used_troff_dot_commands = ['.SH ', '.SS ', '.PP', '.RS', '.RE', '.de', '.if']
-    end
-
-    # optionally folds each endline into a single space, escapes special man characters,
-    # reverts HTML entity references back to their original form, strips trailing
-    # whitespace and, optionally, appends a newline
-    def manify(str, append_newline = false, preserve_space = true)
-      if preserve_space
-        str = str.gsub("\t", (' ' * 8))
-      else
-        str = str.tr_s("\n\t ", ' ')
-      end
-      # TODO:
-      # Do not manify . everywhere since it is used for troff macros
-      # To begin a line with a literal period, use the zero-width non-printing
-      # escape sequence \& to get the period away from the beginning of the
-      # line, which is the only place it is treated specially: \&. This line
-      # begins with a dot.
-      # http://web.archive.org/web/20060102165607/http://people.debian.org/~branden/talks/wtfm/wtfm.pdf
-      # .gsub(/\./, '\\\&.')
-      str.
-        gsub('^.$', '\\\&.').     # lone . is also used in troff to indicate paragraph continuation with visual separator
+    # Converts HTML entity references back to their original form, escapes
+    # special man characters and strips trailing whitespace.
+    #
+    # Optional features:
+    # * fold each endline into a single space
+    # * append a newline
+    def manify str, opts = {}
+      append_newline = opts[:append_newline]
+      preserve_space = opts.fetch :preserve_space, true
+      str = preserve_space ? str.gsub(TAB, ETAB) : str.tr_s(%(#{LF}#{TAB} ), ' ')
+      str = str.
+        gsub(/^\.$/, '\\\&.').    # a lone . is also used in troff to indicate paragraph continuation with visual separator
+        gsub(/\\$/, '\\(rs').     # a literal backslash at the end of a line
+        gsub(/^\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\3"). # quote last URL argument
+        gsub(/(?:\A\n|\n *(\n))^\.(URL|MTO) /, "\\1\.\\2 "). # strip blank lines in source that precede a URL
         gsub('-', '\\-').
         gsub('&lt;', '<').
         gsub('&gt;', '>').
         gsub('&#169;', '\\(co').  # copyright sign
         gsub('&#174;', '\\(rg').  # registered sign
         gsub('&#8482;', '\\(tm'). # trademark sign
-        gsub('&#8201;', ' ').     # thin space #gsub('&#8201;&#8212;&#8201;', ' \\(em ').
-        gsub('&#8203;', '').      # zero width space
+        gsub('&#8201;', ' ').     # thin space
         gsub('&#8211;', '\\(en'). # en-dash
-        gsub('&#8212;', '\\(em'). # em-dash
+        gsub(/&#8212(?:;&#8203;)?/, '\\(em'). # em-dash
         gsub('&#8216;', '\\(oq'). # left single quotation mark
         gsub('&#8217;', '\\(cq'). # right single quotation mark
         gsub('&#8220;', '\\(lq'). # left double quotation mark
         gsub('&#8221;', '\\(rq'). # right double quotation mark
-        gsub('&#8230;', '...').   # horizontal ellipsis #gsub('&#8230;', '\\\&...').
+        gsub(/&#8230;(?:&#8203;)?/, '...').   # horizontal ellipsis
         gsub('&#8592;', '\\(<-'). # leftwards arrow
         gsub('&#8594;', '\\(->'). # rightwards arrow
         gsub('&#8656;', '\\(lA'). # leftwards double arrow
         gsub('&#8658;', '\\(rA'). # rightwards double arrow
+        gsub('&#8203;', '\:').    # zero width space
         gsub('\'', '\\(aq').      # apostrophe-quote
-        rstrip + (append_newline ? EOL : '')
+        gsub(/<\/?BOUNDARY>/, '').# artificial boundary
+        rstrip                    # strip trailing space
+      append_newline ? %(#{str}#{LF}) : str
+    end
+
+    def skip_with_warning node, name = nil
+      warn %(asciidoctor: WARNING: converter missing for #{name || node.node_name} node in manpage backend)
+      nil
     end
 
     def document node
-      result = []
-      # TODO
-      # lang_attribute = (node.attr? 'nolang') ? nil : %( lang="#{node.attr 'lang', 'en'}")
-      header_title     = (node.attr? 'mantitle') ? (node.attr 'mantitle') : node.doctitle.split('(').first
-      header_number    = node.doctitle.split('(').last.chop
-      header_author    = (node.attr? 'authors') ? (node.attr 'authors') : '[see the "AUTHORS" section]'
-      header_generator = "Asciidoctor #{ node.attr 'asciidoctor-version' }"
-      header_date      = node.attr 'docdate'
-      header_manual    = (node.attr? 'manmanual') ? (node.attr 'manmanual') : '\ \&'
-      header_source    = (node.attr? 'mansource') ? (node.attr 'mansource') : '\ \&'
-      result << %Q('\\" t
-.\\"     Title: #{ header_title.downcase }
-.\\"    Author: #{ header_author }
-.\\" Generator: #{ header_generator }
-.\\"      Date: #{ header_date }
-.\\"    Manual: #{ header_manual }
-.\\"    Source: #{ header_source }
+      unless node.attr? 'mantitle'
+        raise 'asciidoctor: ERROR: doctype must be set to manpage when using manpage backend'
+      end
+      mantitle = node.attr 'mantitle'
+      manvolnum = node.attr 'manvolnum', '1'
+      manname = node.attr 'manname', mantitle
+      result = [%('\\" t
+.\\"     Title: #{mantitle}
+.\\"    Author: #{(node.attr? 'authors') ? (node.attr 'authors') : '[see the "AUTHORS" section]'}
+.\\" Generator: Asciidoctor #{node.attr 'asciidoctor-version'}
+.\\"      Date: #{docdate = node.attr 'docdate'}
+.\\"    Manual: #{manual = (node.attr? 'manmanual') ? (node.attr 'manmanual') : '\ \&'}
+.\\"    Source: #{source = (node.attr? 'mansource') ? (node.attr 'mansource') : '\ \&'}
 .\\"  Language: English
-.\\")
-      # .TH name section(1-8) date version
-      # Don't capitalize name, that's a presentation decision.
-      result << %Q(.TH "#{ manify header_title, false }" "#{ header_number }" "#{ header_date }" "#{manify header_source, false}" "#{manify header_manual, false}")
-      # http://bugs.debian.org/507673
-      # http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
-      result << %(.ie \\n\(.g .ds Aq \\\(aq
-.el       .ds Aq ')
+.\\")]
+      # TODO add document-level setting to disable capitalization of manname
+      result << %(.TH "#{manify manname.upcase}" "#{manvolnum}" "#{docdate}" "#{manify source}" "#{manify manual}")
+      # define portability settings
+      # see http://bugs.debian.org/507673
+      # see http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+      result << '.ie \n(.g .ds Aq \(aq'
+      result << '.el       .ds Aq \''
+      # set sentence_space_size to 0 to prevent extra space between sentences separated by a newline
+      # the alternative is to add \& at the end of the line
+      result << '.ss \n[.ss] 0'
       # disable hyphenation
-      result << %Q(.nh)
+      result << '.nh'
       # disable justification (adjust text to left margin only)
-      result << %Q(.ad l)
-      # URL portability. Taken from:
-      # http://web.archive.org/web/20060102165607/http://people.debian.org/~branden/talks/wtfm/wtfm.pdf
-      # Use: .URL "http://www.debian.org" "Debian" "*"
-      # The first argument is the URL, the second is the text to be
-      # hyperlinked, and the third (optional) argument is any text that needs
-      # to immediately trail the hyperlink without intervening whitespace
-      # GNU roff defines a URL macro; what the above does is test for the
-      # presence of GNU roff, and source the www.tmac macro definition file
-      # (which itself also defines URL) if it is — this overrides the
-      # definition just made, but leaves it intact for non-GNU roff
-      # implementations.
-      result << %(.\\" URL Portability
-.de URL
-\\\\$2 \\\(laURL: \\\\$1 \\\(ra\\\\$3
+      result << '.ad l'
+      # define URL macro for portability
+      # see http://web.archive.org/web/20060102165607/http://people.debian.org/~branden/talks/wtfm/wtfm.pdf
+      #
+      # Use: .URL "http://www.debian.org" "Debian" "."
+      #
+      # * First argument: the URL
+      # * Second argument: text to be hyperlinked
+      # * Third (optional) argument: text that needs to immediately trail
+      #   the hyperlink without intervening whitespace
+      result << '.de URL
+\\\\$2 \\(laURL: \\\\$1 \\(ra\\\\$3
 ..
-.if \\n[.g] .mso www.tmac)
+.if \n[.g] .mso www.tmac
+.LINKSTYLE blue R < >'
 
       unless node.noheader
         if node.attr? 'manpurpose'
-          #.SH Unnumbered section heading
-          result << %(.SH "#{manify node.attr 'manname-title'}")
-          result << %(#{manify node.attr 'mantitle'} \\- #{manify node.attr 'manpurpose'})
+          result << %(.SH "#{node.attr 'manname-title'}"
+#{manify mantitle} \\- #{manify node.attr 'manpurpose'})
         end
-      end
-
-      result << %(#{node.content})
-
-      if node.footnotes? && !(node.attr? 'nofootnotes')
-        result << %(.SH "NOTES")
-        node.footnotes.each do |footnote|
-          result << %(#{footnote.index}". #{footnote.text})
-        end
-      end
-      if node.attr? 'authors'
-        result << %Q(.SH "AUTHOR(S)"
-.PP
-\\fB#{ node.attr 'authors' }\\fR
-.RS 4
-Author(s).
-.RE
-)
-      end
-      result * EOL
-    end
-
-    def embedded node
-      result = []
-      if !node.notitle && node.has_header?
-        result << %(.SH #{node.header.title}
-.sp)
       end
 
       result << node.content
 
+      # QUESTION should NOTES come after AUTHOR(S)?
       if node.footnotes? && !(node.attr? 'nofootnotes')
-        result << %(.SH "NOTES")
-        node.footnotes.each do |footnote|
-          result << %(#{footnote.index}. #{footnote.text})
-        end
+        result << '.SH "NOTES"'
+        result.concat(node.footnotes.map {|fn| %(#{fn.index}. #{fn.text}) })
       end
 
-      result * EOL
+      # FIXME detect single author and use appropriate heading; itemize the authors if multiple
+      if node.attr? 'authors'
+        result << %(.SH "AUTHOR(S)"
+.sp
+\\fB#{node.attr 'authors'}\\fP
+.RS 4
+Author(s).
+.RE)
+      end
+
+      result * LF
+    end
+
+    # NOTE embedded doesn't really make sense in the manpage backend
+    def embedded node
+      result = [node.content]
+
+      if node.footnotes? && !(node.attr? 'nofootnotes')
+        result << '.SH "NOTES"'
+        result.concat(node.footnotes.map {|fn| %(#{fn.index}. #{fn.text}) })
+      end
+
+      # QUESTION should we add an AUTHOR(S) section?
+
+      result * LF
     end
 
     def section node
@@ -174,19 +147,21 @@ Author(s).
       # QUESTION should the check for slevel be done in section?
       slevel = 1 if slevel == 0 && node.special
       result = []
-      if slevel <= 1
-        result << %(.SH "#{manify node.title}"
-#{node.content})
+      if slevel > 1
+        macro = 'SS'
+        # QUESTION why captioned title? why not for slevel == 1?
+        stitle = node.captioned_title
       else
-        result << %(.SS "#{manify node.captioned_title}")
-        result << node.content
+        macro = 'SH'
+        stitle = node.title.upcase
       end
-      result * EOL
+      result << %(.#{macro} "#{manify stitle}"
+#{node.content})
+      result * LF
     end
 
     def admonition node
       result = []
-      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
       result << %(.if n \\{\\
 .sp
 .\\}
@@ -196,130 +171,119 @@ Author(s).
 .nr an-break-flag 1
 .br
 .ps +1
-\\fB#{ node.caption }\\fR
+.B #{node.caption}#{node.title? ? "\\fP #{manify node.title}" : nil}
 .ps -1
 .br
-#{ manify node.content }
+#{resolve_content node}
 .sp .5v
 .RE)
-      result * EOL
+      result * LF
     end
 
-    def audio node
-      ''
-    end
+    alias :audio :skip_with_warning
 
     def colist node
       result = []
-      result << %(.B #{manify node.title}) if node.title?
+      result << %(.sp
+.B #{manify node.title}
+.br) if node.title?
       result << %(.TS
 tab\(:\);
 r lw\(\\n\(.lu*75u/100u\).)
 
       node.items.each_with_index do |item, index|
-        result << %(\\fB#{index + 1}.\\fR\\h'-2n':T{
+        result << %(\\fB(#{index + 1})\\fP\\h'-2n':T{
 #{manify item.text}
 T})
       end
-      result << ".TE"
-      result * EOL
+      result << '.TE'
+      result * LF
     end
 
+    # TODO implement title for dlist
+    # TODO implement horizontal (if it makes sense)
     def dlist node
       result = []
       counter = 0
       node.items.each do |terms, dd|
+        counter += 1
         case node.style
         when 'qanda'
-          counter += 1
-          [*terms].each do |dt|
-            result << ".sp"
-            result << %(#{counter}. #{manify dt.text}\n.RS 4)
-          end
-        when 'horizontal'
-          counter += 1
-          [*terms].each do |dt|
-            result << ".sp"
-            result << %(#{manify dt.text}\n.RS 4)
-          end
+          result << %(.sp
+#{counter}. #{manify([*terms].map {|dt| dt.text }.join ' ')}
+.RS 4)
         else
-          counter += 1
-          [*terms].each do |dt|
-            result << ".sp"
-            result << %(.B #{manify dt.text}\n.RS 4)
-          end
+          result << %(.sp
+#{manify([*terms].map {|dt| dt.text }.join ', ')}
+.RS 4)
         end
         if dd
-          result << %(#{manify dd.text}) if dd.text?
-          result << ".sp" if dd.text? && dd.blocks?
-          result << %(#{dd.content}) if dd.blocks?
+          result << (manify dd.text) if dd.text?
+          result << dd.content if dd.blocks?
         end
-        result << ".RE"
+        result << '.RE'
       end
-      result * EOL
+      result * LF
     end
 
     def example node
       result = []
-      result << %(.B #{node.captioned_title}\n.br) if node.title?
-      result << %(.if n \\{\\
-.sp
-.\\}
-.RS 4
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-#{ manify node.content }
-.sp .5v
+      result << %(.sp
+.B #{manify node.captioned_title}
+.br) if node.title?
+      result << %(.RS 4
+#{resolve_content node}
 .RE)
-      result * EOL
+      result * LF
     end
 
     def floating_title node
-      %(.SS "#{manify node.title}"\n.sp\n)
+      %(.SS "#{manify node.title}")
     end
 
-    def image node
-      ''
-    end
+    alias :image :skip_with_warning
 
     def listing node
       result = []
-      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
+      result << %(.sp
+.B #{manify node.captioned_title}
+.br) if node.title?
       result << %(.sp
 .if n \\{\\
 .RS 4
 .\\}
 .nf
-#{manify node.content, true, true}
+#{manify node.content}
 .fi
 .if n \\{\\
 .RE
 .\\})
-      result * EOL
+      result * LF
     end
 
     def literal node
       result = []
-      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
+      result << %(.sp
+.B #{manify node.title}
+.br) if node.title?
       result << %(.sp
 .if n \\{\\
 .RS 4
 .\\}
 .nf
-#{manify node.content, true, true}
+#{manify node.content}
 .fi
 .if n \\{\\
 .RE
-.\\}
-)
-      result * EOL
+.\\})
+      result * LF
     end
 
     def olist node
       result = []
-      result << %(\\fB#{node.title}\\fR\n.br) if node.title?
+      result << %(.sp
+.B #{manify node.title}
+.br) if node.title?
 
       node.items.each_with_index do |item, idx|
         result << %(.sp
@@ -333,70 +297,72 @@ T})
 .\\}
 #{manify item.text})
         result << item.content if item.blocks?
-        result << ".RE"
+        result << '.RE'
       end
-      result * EOL
+      result * LF
     end
 
     def open node
-      node.content
+      case node.style
+      when 'abstract', 'partintro'
+        resolve_content node
+      else
+        node.content
+      end
     end
 
-    def page_break node
-      ''
-    end
+    # TODO use Page Control https://www.gnu.org/software/groff/manual/html_node/Page-Control.html#Page-Control
+    alias :page_break :skip
 
     def paragraph node
       if node.title?
-        %(.B #{manify node.title}
+        %(.sp
+.B #{manify node.title}
 .br
-#{manify node.content}
-)
+#{manify node.content})
       else
-        # Change paragraph separator to .sp instead of .PP
-        # .PP breaks indentation of outher blocks.
         %(.sp
 #{manify node.content})
       end
     end
 
-    def pass node
-      node.content
-    end
-
-    def preamble node
-      node.content
-    end
+    alias :preamble :content
 
     def quote node
       result = []
-      title_element = node.title? ? %(.in +.3i\n\\fB#{node.title}\\fR\n.br\n.in\n) : nil
+      if node.title?
+        result << %(.sp
+.in +.3i
+.B #{manify node.title}
+.br
+.in)
+      end
       attribution_line = (node.attr? 'citetitle') ? %(#{node.attr 'citetitle'} ) : nil
       attribution_line = (node.attr? 'attribution') ? %(#{attribution_line}\\\(em #{node.attr 'attribution'}) : nil
-      result << %(#{title_element}.in +.5i
-.ll -.5i
+      result << %(.in +.3i
+.ll -.3i
 .nf
-#{node.content}
+#{resolve_content node}
 .fi
 .br
 .in
 .ll)
       if attribution_line
-        result << %(.in +.3i
-.ll -.3i
+        result << %(.in +.5i
+.ll -.5i
 #{attribution_line}
 .in
 .ll)
       end
-      result * EOL
+      result * LF
     end
 
-    def sidebar node
-      ''
-    end
+    alias :sidebar :skip_with_warning
 
     def stem node
-      title_element = node.title? ? %(\\fB#{node.title}\\fR\n.br\n) : nil
+      title_element = node.title? ? %(.sp
+.B #{manify node.title}
+.br) : nil
       open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
 
       unless ((equation = node.content).start_with? open) && (equation.end_with? close)
@@ -413,18 +379,17 @@ T})
     # To fix this, asciidoctor needs to provide an API to tell the user if a
     # given cell is being used as a colspan or rowspan.
     def table node
-      result = ""
+      result = []
       if node.title?
-        result += %Q(.sp
+        result << %(.sp
 .it 1 an-trap
 .nr an-no-space-flag 1
 .nr an-break-flag 1
 .br
-.B #{manify node.captioned_title}
-)
+.B #{manify node.captioned_title})
       end
-      result += %(.TS
-allbox tab(:);)
+      result << '.TS
+allbox tab(:);'
       row_header = []
       row_text = []
       row_index = 0
@@ -432,7 +397,7 @@ allbox tab(:);)
         node.rows[tsec].each do |row|
           row_header[row_index] ||= []
           row_text[row_index] ||= []
-          # result += "\n"
+          # result << LF
           # l left-adjusted
           # r right-adjusted
           # c centered-adjusted
@@ -445,69 +410,55 @@ allbox tab(:);)
             remaining_cells -= 1
             row_header[row_index][cell_index] ||= []
             # Add an empty cell if this is a rowspan cell
-            if row_header[row_index][cell_index] == ["^t"]
-              row_text[row_index] <<  %Q(T{\n.sp\nT}:)
+            if row_header[row_index][cell_index] == ['^t']
+              row_text[row_index] << %(T{#{LF}.sp#{LF}T}:)
             end
-            row_text[row_index] <<  %Q(T{\n.sp\n)
-            cell_halign = case cell.attr 'halign'
-                          when 'right'
-                            'r'
-                          when 'left'
-                            'l'
-                          when 'center'
-                            'c'
-                          else
-                            'l'
-                          end
+            row_text[row_index] << %(T{#{LF}.sp#{LF})
+            cell_halign = (cell.attr 'halign', 'left')[0..0]
             if tsec == :head
               if row_header[row_index].empty? ||
                  row_header[row_index][cell_index].empty?
-                row_header[row_index][cell_index] << cell_halign + "tB"
+                row_header[row_index][cell_index] << %(#{cell_halign}tB)
               else
                 row_header[row_index][cell_index + 1] ||= []
-                row_header[row_index][cell_index + 1] << cell_halign + "tB"
+                row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << (cell.text + "\n")
+              row_text[row_index] << %(#{cell.text}#{LF})
             elsif tsec == :body
               if row_header[row_index].empty? ||
                  row_header[row_index][cell_index].empty?
-                row_header[row_index][cell_index] << cell_halign + "t"
+                row_header[row_index][cell_index] << %(#{cell_halign}t)
               else
                 row_header[row_index][cell_index + 1] ||= []
-                row_header[row_index][cell_index + 1] << cell_halign + "t"
+                row_header[row_index][cell_index + 1] << %(#{cell_halign}t)
               end
               case cell.style
               when :asciidoc
-                cell_content = %(#{cell.content})
-              when :verse
-                cell_content = %(#{cell.text})
-              when :literal
-                cell_content = %(#{cell.text})
+                cell_content = cell.content
+              when :verse, :literal
+                cell_content = cell.text
               else
-                cell_content = ''
-                cell.content.each do |text|
-                  cell_content = %(#{cell_content}#{text})
-                end
+                cell_content = cell.content.join
               end
-              row_text[row_index] << (cell_content + "\n")
+              row_text[row_index] << %(#{cell_content}#{LF})
             elsif tsec == :foot
               if row_header[row_index].empty? ||
                  row_header[row_index][cell_index].empty?
-                row_header[row_index][cell_index] << cell_halign + "tB"
+                row_header[row_index][cell_index] << %(#{cell_halign}tB)
               else
                 row_header[row_index][cell_index + 1] ||= []
-                row_header[row_index][cell_index + 1] << cell_halign + "tB"
+                row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << (cell.text + "\n")
+              row_text[row_index] << %(#{cell.text}#{LF})
             end
             if cell.colspan && cell.colspan > 1
               (cell.colspan - 1).times do |i|
                 if row_header[row_index].empty? ||
                    row_header[row_index][cell_index].empty?
-                  row_header[row_index][cell_index + i] << "st"
+                  row_header[row_index][cell_index + i] << 'st'
                 else
                   row_header[row_index][cell_index + 1 + i] ||= []
-                  row_header[row_index][cell_index + 1 + i] << "st"
+                  row_header[row_index][cell_index + 1 + i] << 'st'
                 end
               end
             end
@@ -517,47 +468,55 @@ allbox tab(:);)
                 if row_header[row_index + 1 + i].empty? ||
                    row_header[row_index + 1 + i][cell_index].empty?
                   row_header[row_index + 1 + i][cell_index] ||= []
-                  row_header[row_index + 1 + i][cell_index] << "^t"
+                  row_header[row_index + 1 + i][cell_index] << '^t'
                 else
                   row_header[row_index + 1 + i][cell_index + 1] ||= []
-                  row_header[row_index + 1 + i][cell_index + 1] << "^t"
+                  row_header[row_index + 1 + i][cell_index + 1] << '^t'
                 end
               end
             end
             if remaining_cells >= 1
-              row_text[row_index] << %Q(T}:)
+              row_text[row_index] << 'T}:'
             else
-              row_text[row_index] << %Q(T}\n)
+              row_text[row_index] << %(T}#{LF})
             end
           end
           row_index += 1
         end
       end
-      row_header.each do |row|
-        result += "\n"
-        row.each_with_index do |cell, i|
-          result += cell.join(' ')
-          result += ' ' if row.size > i+1
-        end
-      end
-      result += ".\n"
+
+      #row_header.each do |row|
+      #  result << LF
+      #  row.each_with_index do |cell, i|
+      #    result << (cell.join ' ')
+      #    result << ' ' if row.size > i + 1
+      #  end
+      #end
+      # FIXME temporary fix to get basic table to display
+      result << LF
+      result << row_header.first.map {|r| 'lt'}.join(' ')
+
+      result << %(.#{LF})
       row_text.each do |row|
-        result += row.join('')
+        result << row.join
       end
-      result += %(.TE\n.sp 1\n)
+      result << %(.TE#{LF}.sp)
+      result.join
     end
 
     def thematic_break node
-      ''
+      '.sp
+.ce
+\l\'\n(.lu*25u/100u\(ap\''
     end
 
-    def toc node
-      ''
-    end
+    alias :toc :skip
 
     def ulist node
       result = []
-      result << %(\\fB#{node.title}\\fR) if node.title?
+      result << %(.sp
+.B #{manify node.title}
+.br) if node.title?
       node.items.map {|item|
         result << %[.sp
 .RS 4
@@ -570,98 +529,96 @@ allbox tab(:);)
 .\\}
 #{manify item.text}]
         result << item.content if item.blocks?
-        result << ".RE"
+        result << '.RE'
       }
-      result * EOL
+      result * LF
     end
 
+    # FIXME git uses [verse] for the synopsis; detect this special case
     def verse node
       result = []
-      title_element = node.title? ? %(.in +.3i\n\\fB#{node.title}\\fR\n.br\n.in\n) : nil
+      if node.title?
+        result << %(.sp
+.B #{manify node.title}
+.br)
+      end
       attribution_line = (node.attr? 'citetitle') ? %(#{node.attr 'citetitle'} ) : nil
       attribution_line = (node.attr? 'attribution') ? %(#{attribution_line}\\\(em #{node.attr 'attribution'}) : nil
-      result << %(#{title_element}.in +.5i
-.ll -.5i
+      result << %(.sp
 .nf
-#{node.content}
+#{manify node.content}
 .fi
-.br
-.in
-.ll)
+.br)
       if attribution_line
-        result << %(.in +.3i
-.ll -.3i
+        result << %(.in +.5i
+.ll -.5i
 #{attribution_line}
 .in
 .ll)
       end
-      result * EOL
+      result * LF
     end
 
     def video node
       start_param = (node.attr? 'start', nil, false) ? %(&start=#{node.attr 'start'}) : nil
       end_param = (node.attr? 'end', nil, false) ? %(&end=#{node.attr 'end'}) : nil
-      %(.URL "#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}" "#{node.captioned_title}")
+      %(.sp
+#{manify node.captioned_title} (video) <#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}>)
     end
 
     def inline_anchor node
       target = node.target
       case node.type
+      when :link
+        if (text = node.text) == target
+          text = nil
+        else
+          text = text.gsub '"', '\\(dq'
+        end
+        if target.start_with? 'mailto:'
+          macro = 'MTO'
+          target = target[7..-1].sub('@', '\\(at')
+        else
+          macro = 'URL'
+        end
+        %(#{LF}.#{macro} "#{target}" "#{text}" )
       when :xref
         refid = (node.attr 'refid') || target
-        # NOTE we lookup text in converter because DocBook doesn't need this logic
-        text = node.text || (node.document.references[:ids][refid] || %([#{refid}]))
-        # FIXME shouldn't target be refid? logic seems confused here
-        %(\n.URL "#{target}" "#{manify text}"\n)
-      when :ref
-        %(\n.URL "#{target}"\n)
-      when :link
-        %(\n.URL "#{target}" "#{manify node.text}"\n)
-      when :bibref
-        %(\n.URL "#{target}"\n)
+        node.text || (node.document.references[:ids][refid] || %([#{refid}]))
+      when :ref, :bibref
+        # These are anchor points, which shouldn't be visual
+        ''
       else
-        %(\n.URL "#{target}"\n)
+        warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
       end
     end
 
     def inline_break node
-      %(#{node.text}\n.br)
+      %(#{node.text}
+.br)
     end
 
     def inline_button node
-      %([#{node.text}])
+      %(\\fB[\\ #{node.text}\\ ]\\fP)
     end
 
     def inline_callout node
-      %(\\fB#{node.text}\\fR\n)
+      %[\\fB(#{node.text})\\fP]
     end
 
+    # TODO supposedly groff has footnotes, but we're in search of an example
     def inline_footnote node
       if (index = node.attr 'index')
-        %(\n.URL "#{index}" "View footnote."\n)
+        %([#{index}])
       elsif node.type == :xref
-        %(\n.URL "[#{node.text}]" "Unresolved footnote reference."\n)
+        %([#{node.text}])
       end
     end
 
     def inline_image node
-      if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
-        img = node.attr 'title'
-      elsif type == 'icon' && !(node.document.attr? 'icons')
-        img = node.attr 'alt'
-      else
-        if node.attr? 'title'
-          img = (node.attr? 'alt') ? %(#{node.attr 'alt'} > #{node.attr 'title'}) : node.attr('title')
-        elsif node.attr? 'alt'
-          img = node.attr 'alt'
-        end
-      end
-
-      if node.attr? 'link'
-        (img != nil) ? %(\n.URL "#{node.attr 'link'}" "#{img}"\n) : node.attr('link')
-      else
-        (img != nil) ? %(\\fB[#{img}]\\fR\n) : ''
-      end
+      # NOTE alt should always be set
+      alt_text = (node.attr? 'alt') ? (node.attr 'alt') : node.target
+      (node.attr? 'link') ? %([#{alt_text}] <#{node.attr 'link'}>) : %([#{alt_text}])
     end
 
     def inline_indexterm node
@@ -670,38 +627,45 @@ allbox tab(:);)
 
     def inline_kbd node
       if (keys = node.attr 'keys').size == 1
-        %([#{keys[0]}])
+        keys[0]
       else
-        key_combo = keys.join(' + ')
-        %([#{key_combo}])
+        keys.join '\ +\ '
       end
     end
 
     def inline_menu node
+      caret = '\ \(fc\ '
       menu = node.attr 'menu'
       if !(submenus = node.attr 'submenus').empty?
-        submenu_path = submenus.join(' > ')
-        %(\\fB#{menu} > #{submenu_path} > #{node.attr 'menuitem'}\\fR\n)
+        submenu_path = submenus.map {|item| %(\\fI#{item}\\fP) }.join caret
+        %(\\fI#{menu}\\fP#{caret}#{submenu_path}#{caret}\\fI#{node.attr 'menuitem'}\\fP)
       elsif (menuitem = node.attr 'menuitem')
-        %(\\fB#{menu} > #{menuitem}\\fR\n)
+        %(\\fI#{menu}#{caret}#{menuitem}\\fP)
       else
-        %(\\fB #{menu}\\fR\n)
+        %(\\fI#{menu}\\fP)
       end
     end
 
+    # NOTE use fake <BOUNDARY> element to prevent creating artificial word boundaries
     def inline_quoted node
       case node.type
       when :emphasis
-        %[\\fI#{node.text}\\fR]
+        %[\\fI<BOUNDARY>#{node.text}</BOUNDARY>\\fP]
       when :strong
-        %[\\fB#{node.text}\\fR]
+        %[\\fB<BOUNDARY>#{node.text}</BOUNDARY>\\fP]
+      when :monospaced
+        %[\\f[CR]<BOUNDARY>#{node.text}</BOUNDARY>\\fP]
       when :single
-        %[\\(oq#{node.text}\\(cq]
+        %[\\(oq<BOUNDARY>#{node.text}</BOUNDARY>\\(cq]
       when :double
-        %[\\(lq#{node.text}\\(rq]
+        %[\\(lq<BOUNDARY>#{node.text}</BOUNDARY>\\(rq]
       else
         node.text
       end
+    end
+
+    def resolve_content node
+      node.content_model == :compound ? node.content : %(.sp#{LF}#{manify node.content})
     end
   end
 end

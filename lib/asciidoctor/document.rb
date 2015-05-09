@@ -383,8 +383,11 @@ class Document < AbstractBlock
       @parsed = true
     else
       # setup default backend and doctype
-      attrs['backend'] ||= DEFAULT_BACKEND
-      attrs['doctype'] ||= DEFAULT_DOCTYPE
+      if (attrs['backend'] ||= DEFAULT_BACKEND) == 'manpage'
+        attrs['doctype'] = attr_overrides['doctype'] = 'manpage'
+      else
+        attrs['doctype'] ||= DEFAULT_DOCTYPE
+      end
       update_backend_attributes attrs['backend'], true
 
       #attrs['indir'] = attrs['docdir']
@@ -897,8 +900,6 @@ class Document < AbstractBlock
         attrs['htmlsyntax'] = 'xml'
         new_backend = new_backend[1..-1]
       elsif new_backend.start_with? 'html'
-        attrs['htmlsyntax'] = 'html'
-      elsif new_backend.start_with? 'manpage'
         attrs['htmlsyntax'] = 'html'
       end
       if (resolved_name = BACKEND_ALIASES[new_backend])

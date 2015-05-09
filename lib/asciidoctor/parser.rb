@@ -138,6 +138,9 @@ class Parser
       document.attributes['manvolnum'] = m[2].strip
     else
       warn %(asciidoctor: ERROR: #{reader.prev_line_info}: malformed manpage title)
+      # provide sensible fallbacks
+      document.attributes['mantitle'] = document.attributes['doctitle']
+      document.attributes['manvolnum'] = '1'
     end
 
     reader.skip_blank_lines
