@@ -1874,4 +1874,25 @@ text
       assert_match(/missing converter for backend 'unknownBackend'/, exception.message)
     end
   end
+
+  context 'Timing report' do
+    test 'print_report does not lose precision' do
+      timings = Asciidoctor::Timings.new
+      log = timings.instance_variable_get(:@log)
+      log[:read] = 0.00001
+      log[:parse] = 0.00003
+      log[:convert] = 0.00005
+      timings.print_report(sink = StringIO.new)
+      expect = ['0.00004', '0.00005', '0.00009']
+      result = sink.string.split("\n").map {|l| l.sub(/.*:\s*([\d.]+)/, '\1') }
+      assert_equal expect, result
+    end
+
+    test 'print_report should print 0 for untimed phases' do
+      Asciidoctor::Timings.new.print_report(sink = StringIO.new)
+      expect = [].fill('0.00000', 0..2)
+      result = sink.string.split("\n").map {|l| l.sub(/.*:\s*([\d.]+)/, '\1') }
+      assert_equal expect, result
+    end
+  end
 end
