@@ -1161,6 +1161,38 @@ more info...
       assert_xpath '/article/info/author/email[text() = "founder@asciidoc.org"]', output, 1
     end
 
+    test 'should parse version alone as revnumber to DocBook45' do
+      input = <<-EOS
+= AsciiDoc
+Stuart Rackham <founder@asciidoc.org>
+v8.6.8
+
+== Sample Header
+
+Version {revnumber}
+      EOS
+      output = render_string input, :backend => 'docbook45'
+      assert_xpath '/article/articleinfo', output, 1
+      assert_xpath '/article/articleinfo/title[text() = "AsciiDoc"]', output, 1
+      assert_xpath '/article/section/simpara[text() = "Version 8.6.8"]', output, 1
+    end
+
+    test 'should parse version alone as revnumber to DocBook' do
+      input = <<-EOS
+= AsciiDoc
+Stuart Rackham <founder@asciidoc.org>
+v8.6.8
+
+== Sample Header
+
+Version {revnumber}
+      EOS
+      output = render_string input, :backend => 'docbook'
+      assert_xpath '/article/info', output, 1
+      assert_xpath '/article/info/title[text() = "AsciiDoc"]', output, 1
+      assert_xpath '/article/section/simpara[text() = "Version 8.6.8"]', output, 1
+    end
+
     test 'with author defined using attribute entry to DocBook 4.5' do
       input = <<-EOS
 = Document Title
