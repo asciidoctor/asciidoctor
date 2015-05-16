@@ -1069,6 +1069,9 @@ module Substitutors
 
         if id.include? '#'
           path, fragment = id.split('#')
+        # QUESTION perform this check and throw it back if it fails?
+        #elsif (start_chr = id.chr) == '.' || start_chr == '/'
+        #  next m[0][1..-1]
         else
           path = nil
           fragment = id
