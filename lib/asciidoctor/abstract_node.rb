@@ -90,7 +90,7 @@ class AbstractNode
   # return the value of the attribute or the default value if the attribute
   # is not found in the attributes of this node or the document node
   def attr(name, default_value = nil, inherit = true)
-    name = name.to_s if name.is_a?(::Symbol)
+    name = name.to_s if ::Symbol === name
     inherit = false if self == @document
     if inherit
       @attributes[name] || @document.attributes[name] || default_value
@@ -117,7 +117,7 @@ class AbstractNode
   # comparison value is specified, whether the value of the attribute matches
   # the comparison value
   def attr?(name, expect = nil, inherit = true)
-    name = name.to_s if name.is_a?(::Symbol)
+    name = name.to_s if ::Symbol === name
     inherit = false if self == @document
     if expect.nil?
       @attributes.has_key?(name) || (inherit && @document.attributes.has_key?(name))
