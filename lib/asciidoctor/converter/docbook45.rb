@@ -33,21 +33,21 @@ module Asciidoctor
     end
 
     def inline_anchor node
-      target = node.target
       case node.type
       when :ref
-        %(<anchor#{common_attributes target, nil, node.text}/>)
+        %(<anchor#{common_attributes node.target, nil, node.text}/>)
       when :xref
-        if node.attr? 'path', nil
-          linkend = (node.attr 'fragment') || target
-          (text = node.text) ? %(<link linkend="#{linkend}">#{text}</link>) : %(<xref linkend="#{linkend}"/>)
+        if (path = node.attributes['path'])
+          # QUESTION should we use refid as fallback text instead? (like the html5 backend?)
+          %(<ulink url="#{node.target}">#{node.text || path}</ulink>)
         else
-          text = node.text || (node.attr 'path')
-          %(<ulink url="#{target}">#{text}</ulink>)
+          linkend = node.attributes['fragment'] || node.target
+          (text = node.text) ? %(<link linkend="#{linkend}">#{text}</link>) : %(<xref linkend="#{linkend}"/>)
         end
       when :link
-        %(<ulink url="#{target}">#{node.text}</ulink>)
+        %(<ulink url="#{node.target}">#{node.text}</ulink>)
       when :bibref
+        target = node.target
         %(<anchor#{common_attributes target, nil, "[#{target}]"}/>[#{target}])
       end
     end

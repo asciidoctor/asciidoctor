@@ -488,16 +488,18 @@ module Asciidoctor
       when :ref
         %(<anchor#{common_attributes node.target, nil, node.text}/>)
       when :xref
-        if node.attr? 'path', nil
-          linkend = (node.attr 'fragment') || node.target
-          (text = node.text) ? %(<link linkend="#{linkend}">#{text}</link>) : %(<xref linkend="#{linkend}"/>)
+        if (path = node.attributes['path'])
+          # QUESTION should we use refid as fallback text instead? (like the html5 backend?)
+          %(<link xlink:href="#{node.target}">#{node.text || path}</link>)
         else
-          %(<link xlink:href="#{target}">#{node.text || (node.attr 'path')}</link>)
+          linkend = node.attributes['fragment'] || node.target
+          (text = node.text) ? %(<link linkend="#{linkend}">#{text}</link>) : %(<xref linkend="#{linkend}"/>)
         end
       when :link
         %(<link xlink:href="#{node.target}">#{node.text}</link>)
       when :bibref
-        %(<anchor#{common_attributes node.target, nil, "[#{node.target}]"}/>[#{node.target}])
+        target = node.target
+        %(<anchor#{common_attributes target, nil, "[#{target}]"}/>[#{target}])
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
       end

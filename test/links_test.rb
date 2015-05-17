@@ -202,6 +202,13 @@ context 'Links' do
     assert_xpath '//a[@href="tigers.html"][text() = "[tigers]"]', doc.render, 1
   end
 
+  test 'xref using angled bracket syntax with path sans extension using docbook backend' do
+    doc = document_from_string '<<tigers#>>', :header_footer => false, :backend => 'docbook'
+    assert_match '<link xlink:href="tigers.xml">tigers.xml</link>', doc.render, 1
+    doc = document_from_string '<<tigers#>>', :header_footer => false, :backend => 'docbook45'
+    assert_match '<ulink url="tigers.xml">tigers.xml</ulink>', doc.render, 1
+  end
+
   test 'xref using angled bracket syntax with ancestor path sans extension' do
     doc = document_from_string '<<../tigers#,tigers>>', :header_footer => false
     assert_xpath '//a[@href="../tigers.html"][text() = "tigers"]', doc.render, 1
