@@ -986,7 +986,7 @@ Your browser does not support the video tag.
       target = node.target
       case node.type
       when :xref
-        refid = (node.attr 'refid') || target
+        refid = node.attributes['refid'] || target
         # NOTE we lookup text in converter because DocBook doesn't need this logic
         text = node.text || (node.document.references[:ids][refid] || %([#{refid}]))
         # FIXME shouldn't target be refid? logic seems confused here
@@ -999,8 +999,8 @@ Your browser does not support the video tag.
         if (role = node.role)
           attrs << %( class="#{role}")
         end
-        attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
-        attrs << %( target="#{node.attr 'window'}") if node.attr? 'window'
+        attrs << %( title="#{node.attr 'title'}") if node.attr? 'title', nil, false
+        attrs << %( target="#{node.attr 'window'}") if node.attr? 'window', nil, false
         %(<a href="#{target}"#{attrs.join}>#{node.text}</a>)
       when :bibref
         %(<a id="#{target}"></a>[#{target}])
