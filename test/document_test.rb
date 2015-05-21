@@ -909,6 +909,23 @@ content
       assert_equal 'Subtitle', title.subtitle
     end
 
+    test 'document with subtitle and custom separator' do
+      input = <<-EOS
+[separator="$ "]
+= Main Title$ *Subtitle*
+Author Name
+
+content
+      EOS
+
+      doc = document_from_string input
+      title = doc.doctitle :partition => true, :sanitize => true
+      assert title.subtitle?
+      assert title.sanitized?
+      assert_equal 'Main Title', title.main
+      assert_equal 'Subtitle', title.subtitle
+    end
+
     test 'document with doctitle defined as attribute entry' do
      input = <<-EOS
 :doctitle: Document Title

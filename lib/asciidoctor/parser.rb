@@ -73,7 +73,8 @@ class Parser
   def self.parse_document_header(reader, document)
     # capture any lines of block-level metadata and plow away any comment lines
     # that precede first block
-    block_attributes = parse_block_metadata_lines(reader, document)
+    attributes = {}
+    block_attributes = parse_block_metadata_lines(reader, document, attributes)
 
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
@@ -98,6 +99,9 @@ class Parser
       unless assigned_doctitle
         document.title = doctitle
         assigned_doctitle = doctitle
+      end
+      if attributes.has_key? 'separator'
+        document.set_attribute :title_separator, attributes['separator']
       end
       # default to compat-mode if document uses atx-style doctitle
       document.set_attribute 'compat-mode', '' unless single_line
