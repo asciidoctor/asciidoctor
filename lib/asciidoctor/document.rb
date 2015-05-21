@@ -46,12 +46,13 @@ class Document < AbstractBlock
       if (@sanitized = opts[:sanitize]) && val.include?('<')
         val = val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
       end
-      if (@combined = val).include? ': '
-        @main, _, @subtitle = val.rpartition ': '
-      else
+      if (sep = opts[:separator] || ':').empty? || !val.include?(sep = %(#{sep} ))
         @main = val
         @subtitle = nil
+      else
+        @main, _, @subtitle = val.rpartition sep
       end
+      @combined = val
     end
 
     def sanitized?
@@ -632,8 +633,8 @@ class Document < AbstractBlock
       return
     end
     
-    if opts[:partition]
-      Title.new val, opts
+    if (separator = opts[:partition])
+      Title.new val, opts.merge({ :separator => (separator == true ? @attributes['title-separator'] : separator) })
     elsif opts[:sanitize] && val.include?('<')
       val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
     else

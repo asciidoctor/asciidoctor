@@ -893,9 +893,38 @@ text
       assert_nil doc.header
     end
 
+    test 'title partition API with default separator' do
+      title = Asciidoctor::Document::Title.new 'Main Title: And More: Subtitle'
+      assert_equal 'Main Title: And More', title.main
+      assert_equal 'Subtitle', title.subtitle
+    end
+
+    test 'title partition API with custom separator' do
+      title = Asciidoctor::Document::Title.new 'Main Title:: And More:: Subtitle', :separator => '::'
+      assert_equal 'Main Title:: And More', title.main
+      assert_equal 'Subtitle', title.subtitle
+    end
+
     test 'document with subtitle' do
       input = <<-EOS
 = Main Title: *Subtitle*
+Author Name
+
+content
+      EOS
+
+      doc = document_from_string input
+      title = doc.doctitle :partition => true, :sanitize => true
+      assert title.subtitle?
+      assert title.sanitized?
+      assert_equal 'Main Title', title.main
+      assert_equal 'Subtitle', title.subtitle
+    end
+
+    test 'document with subtitle and custom separator' do
+      input = <<-EOS
+[separator=::]
+= Main Title:: *Subtitle*
 Author Name
 
 content

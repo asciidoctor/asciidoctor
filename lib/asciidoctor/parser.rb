@@ -101,6 +101,9 @@ class Parser
       end
       # default to compat-mode if document uses atx-style doctitle
       document.set_attribute 'compat-mode', '' unless single_line
+      if (separator = block_attributes.delete('separator'))
+        document.set_attribute('title-separator', separator)
+      end
       document.header.source_location = source_location if source_location
       document.attributes['doctitle'] = section_title = doctitle
       # QUESTION: should the id assignment on Document be encapsulated in the Document class?
