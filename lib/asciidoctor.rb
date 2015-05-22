@@ -744,7 +744,7 @@ module Asciidoctor
     #
     # NOTE extract regexps are applied line-by-line, so we can use $ as end-of-line char
     CalloutExtractRx = /(?:(?:\/\/|#|--|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*$)/
-    CalloutExtractRxt = "(\\\\)?<()(\\d+)>(?=(?: ?\\\\?<\\d+>)*$)"
+    CalloutExtractRxt = '(\\\\)?<()(\\d+)>(?=(?: ?\\\\?<\\d+>)*$)'
     # NOTE special characters have not been replaced when scanning
     CalloutQuickScanRx = /\\?<!?(--|)(\d+)\1>(?=(?: ?\\?<!?\1\d+\1>)*#{CC_EOL})/
     # NOTE special characters have already been replaced when converting to an SGML format
