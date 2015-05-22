@@ -38,6 +38,7 @@ class Document < AbstractBlock
   # Public Parsed and stores a partitioned title (i.e., title & subtitle).
   class Title
     attr_reader :main
+    alias :title :main
     attr_reader :subtitle
     attr_reader :combined
 
