@@ -73,8 +73,7 @@ class Parser
   def self.parse_document_header(reader, document)
     # capture any lines of block-level metadata and plow away any comment lines
     # that precede first block
-    attributes = {}
-    block_attributes = parse_block_metadata_lines(reader, document, attributes)
+    block_attributes = parse_block_metadata_lines(reader, document)
 
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
@@ -100,11 +99,11 @@ class Parser
         document.title = doctitle
         assigned_doctitle = doctitle
       end
-      if attributes.has_key? 'separator'
-        document.set_attribute :title_separator, attributes['separator']
-      end
       # default to compat-mode if document uses atx-style doctitle
       document.set_attribute 'compat-mode', '' unless single_line
+      if (separator = block_attributes.delete('separator'))
+        document.set_attribute('title-separator', separator)
+      end
       document.header.source_location = source_location if source_location
       document.attributes['doctitle'] = section_title = doctitle
       # QUESTION: should the id assignment on Document be encapsulated in the Document class?
