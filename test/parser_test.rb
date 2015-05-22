@@ -486,7 +486,6 @@ v8.6.8,
     assert_equal 7, metadata.size
     assert_equal '8.6.8', metadata['revnumber']
     assert !metadata.has_key?('revdate')
-    warn metadata.inspect
   end
 
   # Asciidoctor recognizes a standalone revision without a trailing comma
