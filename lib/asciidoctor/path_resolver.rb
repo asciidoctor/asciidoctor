@@ -303,7 +303,6 @@ class PathResolver
   # any parent references resolved and self references removed and enforces
   # that the resolved path be contained within the jail, if provided
   def system_path target, start, jail = nil, opts = {}
-    recover = opts.fetch :recover, true
     if jail
       unless is_root? jail
         raise ::SecurityError, %(Jail is not an absolute path: #{jail})
@@ -325,7 +324,7 @@ class PathResolver
           return expand_path start
         end
       else
-        return system_path start, jail, jail 
+        return system_path start, jail, jail, opts
       end
     end
   
@@ -343,7 +342,7 @@ class PathResolver
     elsif is_root? start
       start = posixfy start
     else
-      start = system_path start, jail, jail
+      start = system_path start, jail, jail, opts
     end
   
     # both jail and start have been posixfied at this point
@@ -374,7 +373,7 @@ class PathResolver
         if jail
           if resolved_segments.length > jail_segments.length
             resolved_segments.pop
-          elsif !recover
+          elsif !(recover ||= (opts.fetch :recover, true))
             raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode))
           elsif !warned
             warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering)
