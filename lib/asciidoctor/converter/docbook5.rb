@@ -188,6 +188,8 @@ module Asciidoctor
     def image node
       width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : nil
       depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : nil
+      # FIXME if scaledwidth is set, we should remove width & depth
+      # See http://www.docbook.org/tdg/en/html/imagedata.html#d0e92271 for details
       swidth_attribute = (node.attr? 'scaledwidth') ? %( width="#{node.attr 'scaledwidth'}" scalefit="1") : nil
       scale_attribute = (node.attr? 'scale') ? %( scale="#{node.attr 'scale'}") : nil
       align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : nil

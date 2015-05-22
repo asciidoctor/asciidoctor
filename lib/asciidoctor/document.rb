@@ -42,7 +42,7 @@ class Document < AbstractBlock
     attr_reader :combined
 
     def initialize val, opts = {}
-      # TODO separate sanitization by type (:cdata for HTML/XML, :plain for non-SGML, false for none)
+      # TODO separate sanitization by type (:cdata for HTML/XML, :plain_text for non-SGML, false for none)
       if (@sanitized = opts[:sanitize]) && val.include?('<')
         val = val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
       end
@@ -616,6 +616,8 @@ class Document < AbstractBlock
   #
   # If the :partition attribute is specified, the value is parsed into an Document::Title object.
   # If the :sanitize attribute is specified, XML elements are removed from the value.
+  #
+  # TODO separate sanitization by type (:cdata for HTML/XML, :plain_text for non-SGML, false for none)
   #
   # Returns the resolved title as a [Title] if the :partition option is passed or a [String] if not
   # or nil if no value can be resolved.
