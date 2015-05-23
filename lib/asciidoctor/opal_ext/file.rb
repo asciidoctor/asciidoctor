@@ -143,8 +143,9 @@ class File
         if(afx) {
           try {
             data = afx.readAsciidoctorResource(path,null);
-            if(data==404)
-            throw new Error();
+            if(data==404) {
+				throw new Error();
+			}
           }
           catch (e) {
             throw #{IOError.new `'No such file or directory: ' + path`};

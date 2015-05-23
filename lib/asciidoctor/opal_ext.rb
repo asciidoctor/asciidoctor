@@ -8,9 +8,11 @@
   //else if (typeof document !== 'undefined' && document.nodeType) {
     value = 'browser';
 
-    if(typeof navigator != 'undefined' && navigator.appVersion)
-       if(navigator.appVersion.indexOf('JavaFX') != -1)
+    if(typeof navigator != 'undefined' && navigator.appVersion) {
+       if(navigator.appVersion.indexOf('JavaFX') != -1) {
           value = 'javafx'
+		}  
+	}	  
   }
   else if (typeof Java !== 'undefined' && Java.type) {
     value = 'java-nashorn';
