@@ -80,7 +80,7 @@ module Substitutors
     elsif subs == :normal
       subs = SUBS[:normal]
     elsif expand
-      if subs.is_a? ::Symbol
+      if ::Symbol === subs
         subs = COMPOSITE_SUBS[subs] || [subs]
       else
         effective_subs = []
@@ -98,7 +98,7 @@ module Substitutors
 
     return source if subs.empty?
 
-    text = (multiline = source.is_a? ::Array) ? (source * EOL) : source
+    text = (multiline = ::Array === source) ? source * EOL : source
 
     if (has_passthroughs = subs.include? :macros)
       text = extract_passthroughs text
@@ -138,7 +138,7 @@ module Substitutors
   #
   # returns - A String with normal substitutions performed
   def apply_normal_subs(lines)
-    apply_subs lines.is_a?(::Array) ? (lines * EOL) : lines
+    apply_subs(::Array === lines ? lines * EOL : lines)
   end
 
   # Public: Apply substitutions for titles.
@@ -448,7 +448,7 @@ module Substitutors
     return data if data.nil_or_empty?
 
     # normalizes data type to an array (string becomes single-element array)
-    if (string_data = String === data)
+    if (string_data = ::String === data)
       data = [data]
     end
 
@@ -520,7 +520,7 @@ module Substitutors
       result << line unless reject || (reject_if_empty && line.empty?)
     end
 
-    string_data ? (result * EOL) : result
+    string_data ? result * EOL : result
   end
 
   # Public: Substitute inline macros (e.g., links, images, etc)
