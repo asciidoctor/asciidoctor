@@ -2,7 +2,11 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9'
 
-require File.join File.dirname(__FILE__), '../lib/asciidoctor'
+if File.exist?(asciidoctor_lib_path = File.join(File.dirname(__FILE__), '../lib/asciidoctor'))
+  require asciidoctor_lib_path
+else
+  require 'asciidoctor'
+end
 require 'asciidoctor/cli'
 
 invoker = Asciidoctor::Cli::Invoker.new ARGV
