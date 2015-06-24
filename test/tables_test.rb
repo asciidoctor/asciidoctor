@@ -181,7 +181,7 @@ A | here| a | there
       assert_css 'table > tbody > tr:nth-child(2) > td', output, 4
     end
 
-    test 'colspec attribute sets number of columns' do
+    test 'colspec attribute using asterisk syntax sets number of columns' do
       input = <<-EOS
 [cols="3*"]
 |===
@@ -207,7 +207,7 @@ A | here| a | there
       assert_css 'table > tbody > tr', output, 2
     end
 
-    test 'table with explicit deprecated syntax column count can have multiple rows on a single line' do
+    test 'table with explicit deprecated colspec syntax can have multiple rows on a single line' do
       input = <<-EOS
 [cols="3"]
 |===
@@ -219,6 +219,20 @@ A | here| a | there
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 3
       assert_css 'table > tbody > tr', output, 2
+    end
+
+    test 'columns are added for empty records in colspec attribute' do
+      input = <<-EOS
+[cols="<,"]
+|===
+|one |two
+|1 |2 |a |b
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > tbody > tr', output, 3
     end
 
     test 'table with header and footer' do
