@@ -4211,4 +4211,21 @@ context 'Lists model' do
     assert_equal 3, items.size
     assert_equal list.items, list.content
   end
+
+  test 'list item should be the parent of block attached to a list item' do
+    input = <<-EOS
+* list item 1
++
+----
+listing block in list item 1
+----
+    EOS
+
+    doc = document_from_string input
+    list = doc.blocks.first
+    list_item_1 = list.items.first
+    listing_block = list_item_1.blocks.first
+    assert_equal :listing, listing_block.context
+    assert_equal list_item_1, listing_block.parent
+  end
 end

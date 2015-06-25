@@ -423,7 +423,7 @@ class Parser
       block_extensions = block_macro_extensions = false
     end
     #parent_context = parent.is_a?(Block) ? parent.context : nil
-    in_list = (parent.is_a? List)
+    in_list = ListItem === parent
     block = nil
     style = nil
     explicit_style = nil
@@ -1345,8 +1345,9 @@ class Parser
       # about sections) since the reader is confined within the boundaries of a
       # list
       while list_item_reader.has_more_lines?
-        new_block = next_block(list_item_reader, list_block, {}, options)
-        list_item << new_block if new_block
+        if (new_block = next_block(list_item_reader, list_item, {}, options))
+          list_item << new_block
+        end
       end
 
       list_item.fold_first(continuation_connects_first_block, content_adjacent)
