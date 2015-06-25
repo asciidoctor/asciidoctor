@@ -10,7 +10,12 @@ require 'simplecov' if ENV['COVERAGE'] == 'true'
 
 require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
 
-require 'minitest/autorun'
+# NOTE we require minitest libraries explicitly to avoid a superfluous warning
+require 'minitest/unit'
+require 'minitest/spec'
+require 'minitest/mock'
+MiniTest::Unit.autorun
+
 require 'socket'
 require 'nokogiri'
 require 'tmpdir'
