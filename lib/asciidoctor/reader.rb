@@ -849,7 +849,7 @@ class PreprocessorReader < Reader
         if @document.attributes.has_key? 'cache-uri'
           # caching requires the open-uri-cached gem to be installed
           # processing will be automatically aborted if these libraries can't be opened
-          Helpers.require_library 'open-uri/cached', 'open-uri-cached'
+          Helpers.require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
         elsif !::RUBY_ENGINE_OPAL
           # autoload open-uri
           ::OpenURI
