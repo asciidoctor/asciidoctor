@@ -1936,7 +1936,7 @@ class Parser
 
       segments = nil
       if names_only
-        # splitting on ' ' will collapse repeating spaces
+        # splitting on ' ' with limit will collapse repeating spaces
         segments = author_entry.split(' ', 3)
       elsif (match = AuthorInfoLineRx.match(author_entry))
         segments = match.to_a
@@ -2399,9 +2399,12 @@ class Parser
     end
 
     specs = []
-    records.split(',').each {|record|
+    # NOTE -1 argument ensures we don't drop empty records
+    records.split(',', -1).each {|record|
+      if record == ''
+        specs << { 'width' => 1 }
       # TODO might want to use scan rather than this mega-regexp
-      if (m = ColumnSpecRx.match(record))
+      elsif (m = ColumnSpecRx.match(record))
         spec = {}
         if m[2]
           # make this an operation
@@ -2416,18 +2419,20 @@ class Parser
 
         # to_i permits us to support percentage width by stripping the %
         # NOTE this is slightly out of compliance w/ AsciiDoc, but makes way more sense
-        spec['width'] = !m[3].nil? ? m[3].to_i : 1
+        spec['width'] = (m[3] ? m[3].to_i : 1)
 
         # make this an operation
         if m[4] && Table::TEXT_STYLES.has_key?(m[4])
           spec['style'] = Table::TEXT_STYLES[m[4]]
         end
 
-        repeat = !m[1].nil? ? m[1].to_i : 1
-
-        1.upto(repeat) {
-          specs << spec.dup
-        }
+        if m[1]
+          1.upto(m[1].to_i) {
+            specs << spec.dup
+          }
+        else
+          specs << spec
+        end
       end
     }
     specs
