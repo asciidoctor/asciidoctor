@@ -751,8 +751,7 @@ class Parser
               # TODO could assume a floating title when inside a block context
               # FIXME Reader needs to be created w/ line info
               block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
-            elsif !text_only && lines.size > 1 && first_line.start_with?('"') &&
-                lines[-1].start_with?('-- ') && lines[-2].end_with?('"')
+            elsif !text_only && quote_lines?(first_line, lines)
               lines[0] = first_line[1..-1]
               attribution, citetitle = lines.pop[3..-1].split(', ', 2)
               lines.pop while lines[-1].empty?
@@ -943,6 +942,11 @@ class Parser
     end
 
     block
+  end
+
+  def self.quote_lines?(first_line, lines)
+    lines.size > 1 && first_line.start_with?('"') &&
+        lines[-1].start_with?('-- ') && lines[-2].end_with?('"')
   end
 
   def self.read_paragraph(break_at_list, reader, reader_options)
