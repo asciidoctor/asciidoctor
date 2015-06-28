@@ -688,17 +688,10 @@ class Parser
           if style != 'normal' && LiteralParagraphRx =~ this_line
             # So we need to actually include this one in the read_lines group
             reader.unshift_line this_line
-            lines = reader.read_lines_until(
+            lines = read_paragraph(break_at_list, reader,
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true,
-                :preserve_last_line => true) {|line|
-              # a preceding blank line (skipped > 0) indicates we are in a list continuation
-              # and therefore we should not break at a list item
-              # (this won't stop breaking on item of same level since we've already parsed them out)
-              # QUESTION can we turn this block into a lambda or function call?
-              (break_at_list && AnyListRx =~ line) ||
-              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
-            }
+                :preserve_last_line => true)
 
             reset_block_indent! lines
 
@@ -710,18 +703,11 @@ class Parser
           # a paragraph is contiguous nonblank/noncontinuation lines
           else
             reader.unshift_line this_line
-            lines = reader.read_lines_until(
+            lines = read_paragraph(break_at_list, reader,
                 :break_on_blank_lines => true,
                 :break_on_list_continuation => true,
                 :preserve_last_line => true,
-                :skip_line_comments => true) {|line|
-              # a preceding blank line (skipped > 0) indicates we are in a list continuation
-              # and therefore we should not break at a list item
-              # (this won't stop breaking on item of same level since we've already parsed them out)
-              # QUESTION can we turn this block into a lambda or function call?
-              (break_at_list && AnyListRx =~ line) ||
-              (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
-            }
+                :skip_line_comments => true)
 
             # NOTE we need this logic because we've asked the reader to skip
             # line comments, which may leave us w/ an empty buffer if those
@@ -957,6 +943,17 @@ class Parser
     end
 
     block
+  end
+
+  def self.read_paragraph(break_at_list, reader, reader_options)
+    reader.read_lines_until(reader_options) { |line|
+      # a preceding blank line (skipped > 0) indicates we are in a list continuation
+      # and therefore we should not break at a list item
+      # (this won't stop breaking on item of same level since we've already parsed them out)
+      # QUESTION can we turn this block into a lambda or function call?
+      (break_at_list && AnyListRx =~ line) ||
+      (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
+    }
   end
 
   # Public: Determines whether this line is the start of any of the delimited blocks
