@@ -1377,6 +1377,22 @@ content
         end
         assert_equal "ifdef::holygrail[]\ncontent\nendif::holygrail[]", (lines * ::Asciidoctor::EOL)
       end
+
+      test 'ifeval comparing missing attribute to nil is included' do
+        input = <<-EOS
+ifeval::['{foo}' == '']
+No foo for you!
+endif::[]
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        lines = []
+        while reader.has_more_lines?
+          lines << reader.read_line
+        end
+        assert_equal 'No foo for you!', (lines * ::Asciidoctor::EOL)
+      end
   
       test 'ifeval comparing double-quoted attribute to matching string is included' do
         input = <<-EOS
@@ -1460,7 +1476,7 @@ endif::[]
   
       test 'ifeval arguments can be transposed' do
         input = <<-EOS
-ifeval::["0.1.0" <= "{asciidoctor-version}"]
+ifeval::['0.1.0' <= '{asciidoctor-version}']
 That version will do!
 endif::[]
         EOS
@@ -1474,14 +1490,30 @@ endif::[]
         assert_equal 'That version will do!', (lines * ::Asciidoctor::EOL)
       end
   
-      test 'ifeval matching numeric comparison is included' do
+      test 'ifeval matching numeric equality is included' do
         input = <<-EOS
 ifeval::[{rings} == 1]
 One ring to rule them all!
 endif::[]
         EOS
   
-        doc = Asciidoctor::Document.new input, :attributes => { 'rings' => 1 }
+        doc = Asciidoctor::Document.new input, :attributes => { 'rings' => '1' }
+        reader = doc.reader
+        lines = []
+        while reader.has_more_lines?
+          lines << reader.read_line
+        end
+        assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::EOL)
+      end
+
+      test 'ifeval matching numeric inequality is included' do
+        input = <<-EOS
+ifeval::[{rings} != 0]
+One ring to rule them all!
+endif::[]
+        EOS
+  
+        doc = Asciidoctor::Document.new input, :attributes => { 'rings' => '1' }
         reader = doc.reader
         lines = []
         while reader.has_more_lines?

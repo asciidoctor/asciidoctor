@@ -753,11 +753,14 @@ class PreprocessorReader < Reader
         end
 
         lhs = resolve_expr_val expr_match[1]
-        # regex enforces a restrict set of math-related operations
-        op = expr_match[2]
         rhs = resolve_expr_val expr_match[3]
 
-        skip = !(lhs.send op.to_sym, rhs)
+        # regex enforces a restricted set of math-related operations
+        if (op = expr_match[2]) == '!='
+          skip = lhs.send :==, rhs
+        else
+          skip = !(lhs.send op.to_sym, rhs)
+        end
       end
     end
 
@@ -1126,65 +1129,65 @@ class PreprocessorReader < Reader
   # Examples
   #
   #   expr = '"value"'
-  #   resolve_expr_val(expr)
+  #   resolve_expr_val expr
   #   # => "value"
   #
   #   expr = '"value'
-  #   resolve_expr_val(expr)
+  #   resolve_expr_val expr
   #   # => "\"value"
   #
   #   expr = '"{undefined}"'
-  #   resolve_expr_val(expr)
+  #   resolve_expr_val expr
   #   # => ""
   #
   #   expr = '{undefined}'
-  #   resolve_expr_val(expr)
+  #   resolve_expr_val expr
   #   # => nil
   #
   #   expr = '2'
-  #   resolve_expr_val(expr)
+  #   resolve_expr_val expr
   #   # => 2
   #
   #   @document.attributes['name'] = 'value'
   #   expr = '"{name}"'
-  #   resolve_expr_val(expr)
+  #   resolve_expr_val expr
   #   # => "value"
   #
   # Returns The value of the expression, coerced to the appropriate type
-  def resolve_expr_val(str)
-    val = str
-    type = nil
-
-    if val.start_with?('"') && val.end_with?('"') ||
-        val.start_with?('\'') && val.end_with?('\'')
-      type = :string
+  def resolve_expr_val val
+    if ((val.start_with? '"') && (val.end_with? '"')) ||
+        ((val.start_with? '\'') && (val.end_with? '\''))
+      quoted = true
       val = val[1...-1]
+    else
+      quoted = false
     end
 
     # QUESTION should we substitute first?
+    # QUESTION should we also require string to be single quoted (like block attribute values?)
     if val.include? '{'
-      val = @document.sub_attributes val
+      val = @document.sub_attributes val, :attribute_missing => 'drop'
     end
 
-    unless type == :string
+    if quoted
+      val
+    else
       if val.empty?
-        val = nil
-      elsif val.strip.empty?
-        val = ' '
+        nil
       elsif val == 'true'
-        val = true
+        true
       elsif val == 'false'
-        val = false
-      elsif val.include?('.')
-        val = val.to_f
+        false
+      elsif val.rstrip.empty?
+        ' '
+      elsif val.include? '.'
+        val.to_f
       else
         # fallback to coercing to integer, since we
         # require string values to be explicitly quoted
-        val = val.to_i
+        val.to_i
       end
     end
-
-    val
   end
 
   def include_processors?
