@@ -32,6 +32,14 @@ class Parser
   # Regexp for leading tab indentation
   TabIndentRx = /^\t+/
 
+  StartOfBlockProc = lambda {|l| ((l.start_with? '[') && BlockAttributeLineRx =~ l) || (is_delimited_block? l) }
+
+  StartOfListProc = lambda {|l| AnyListRx =~ l }
+
+  StartOfBlockOrListProc = lambda {|l| (is_delimited_block? l) || ((l.start_with? '[') && BlockAttributeLineRx =~ l) || AnyListRx =~ l }
+
+  NoOp = nil
+
   # Public: Make sure the Parser object doesn't get initialized.
   #
   # Raises RuntimeError if this constructor is invoked.
@@ -694,10 +702,7 @@ class Parser
           if style != 'normal' && LiteralParagraphRx =~ this_line
             # So we need to actually include this one in the read_lines group
             reader.unshift_line this_line
-            lines = read_paragraph(break_at_list, reader,
-                :break_on_blank_lines => true,
-                :break_on_list_continuation => true,
-                :preserve_last_line => true)
+            lines = read_paragraph_lines reader, break_at_list
 
             adjust_indentation! lines
 
@@ -709,11 +714,7 @@ class Parser
           # a paragraph is contiguous nonblank/noncontinuation lines
           else
             reader.unshift_line this_line
-            lines = read_paragraph(break_at_list, reader,
-                :break_on_blank_lines => true,
-                :break_on_list_continuation => true,
-                :preserve_last_line => true,
-                :skip_line_comments => true)
+            lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => true
 
             # NOTE we need this logic because we've asked the reader to skip
             # line comments, which may leave us w/ an empty buffer if those
@@ -757,7 +758,7 @@ class Parser
               # TODO could assume a floating title when inside a block context
               # FIXME Reader needs to be created w/ line info
               block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
-            elsif !text_only && quote_lines?(first_line, lines)
+            elsif !text_only && (blockquote? lines, first_line)
               lines[0] = first_line[1..-1]
               attribution, citetitle = lines.pop[3..-1].split(', ', 2)
               lines.pop while lines[-1].empty?
@@ -944,20 +945,19 @@ class Parser
     block
   end
 
-  def self.quote_lines?(first_line, lines)
-    lines.size > 1 && first_line.start_with?('"') &&
-        lines[-1].start_with?('-- ') && lines[-2].end_with?('"')
+  def self.blockquote? lines, first_line = nil
+    lines.size > 1 && ((first_line || lines[0]).start_with? '"') &&
+        (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
   end
 
-  def self.read_paragraph(break_at_list, reader, reader_options)
-    reader.read_lines_until(reader_options) { |line|
-      # a preceding blank line (skipped > 0) indicates we are in a list continuation
-      # and therefore we should not break at a list item
-      # (this won't stop breaking on item of same level since we've already parsed them out)
-      # QUESTION can we turn this block into a lambda or function call?
-      (break_at_list && AnyListRx =~ line) ||
-      (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
-    }
+  def self.read_paragraph_lines reader, break_at_list, opts = {}
+    opts[:break_on_blank_lines] = true
+    opts[:break_on_list_continuation] = true
+    opts[:preserve_last_line] = true
+    break_condition = (break_at_list ?
+        (Compliance.block_terminates_paragraph ? StartOfBlockOrListProc : StartOfListProc) :
+        (Compliance.block_terminates_paragraph ? StartOfBlockProc : NoOp))
+    reader.read_lines_until opts, &break_condition
   end
 
   # Public: Determines whether this line is the start of any of the delimited blocks
@@ -1048,14 +1048,7 @@ class Parser
         lines = reader.read_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
       else
         content_model = :simple if content_model == :compound
-        lines = reader.read_lines_until(
-            :break_on_blank_lines => true,
-            :break_on_list_continuation => true,
-            :preserve_last_line => true,
-            :skip_line_comments => true,
-            :skip_processing => skip_processing) {|line|
-          Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line)
-        }
+        lines = read_paragraph_lines reader, false, :skip_line_comments => true, :skip_processing => true
         # QUESTION check for empty lines after grabbing lines for simple content model?
       end
       block_reader = nil
