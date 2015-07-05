@@ -599,7 +599,7 @@ v0.0.7, 2013-12-18
     assert_equal 'SJR', blankdoc.attributes['authorinitials']
   end
 
-  test 'reset block indent to 0' do
+  test 'adjust indentation to 0' do
     input = <<-EOS.chomp
     def names
 
@@ -617,11 +617,11 @@ end
     EOS
 
     lines = input.split("\n")
-    Asciidoctor::Parser.reset_block_indent! lines
+    Asciidoctor::Parser.adjust_indentation! lines
     assert_equal expected, (lines * "\n")
   end
 
-  test 'reset block indent mixed with tabs and spaces to 0' do
+  test 'adjust indentation mixed with tabs and spaces to 0' do
     input = <<-EOS.chomp
     def names
 
@@ -639,11 +639,31 @@ end
     EOS
 
     lines = input.split("\n")
-    Asciidoctor::Parser.reset_block_indent! lines
+    Asciidoctor::Parser.adjust_indentation! lines, 0, 4
     assert_equal expected, (lines * "\n")
   end
 
-  test 'reset block indent to non-zero' do
+  test 'expands tabs to spaces' do
+    input = <<-EOS.chomp
+Filesystem				Size	Used	Avail	Use%	Mounted on
+Filesystem              Size    Used    Avail   Use%    Mounted on
+devtmpfs				3.9G	   0	 3.9G	  0%	/dev
+/dev/mapper/fedora-root	 48G	 18G	  29G	 39%	/
+    EOS
+
+    expected = <<-EOS.chomp
+Filesystem              Size    Used    Avail   Use%    Mounted on
+Filesystem              Size    Used    Avail   Use%    Mounted on
+devtmpfs                3.9G       0     3.9G     0%    /dev
+/dev/mapper/fedora-root  48G     18G      29G    39%    /
+    EOS
+
+    lines = input.split("\n")
+    Asciidoctor::Parser.adjust_indentation! lines, 0, 4
+    assert_equal expected, (lines * "\n")
+  end
+
+  test 'adjust indentation to non-zero' do
     input = <<-EOS.chomp
     def names
 
@@ -654,18 +674,18 @@ end
 
     expected = <<-EOS.chomp
   def names
-  
+
     @name.split ' '
-  
+
   end
     EOS
 
     lines = input.split("\n")
-    Asciidoctor::Parser.reset_block_indent! lines, 2
+    Asciidoctor::Parser.adjust_indentation! lines, 2
     assert_equal expected, (lines * "\n")
   end
 
-  test 'preserve block indent' do
+  test 'preserve block indent if indent is -1' do
     input = <<-EOS
     def names
     
@@ -677,16 +697,16 @@ end
     expected = input
 
     lines = input.lines.entries
-    Asciidoctor::Parser.reset_block_indent! lines, nil
+    Asciidoctor::Parser.adjust_indentation! lines, -1
     assert_equal expected, lines.join
   end
 
-  test 'reset block indent hands empty lines gracefully' do
+  test 'adjust indentation handles empty lines gracefully' do
     input = []
     expected = input
 
     lines = input.dup
-    Asciidoctor::Parser.reset_block_indent! lines
+    Asciidoctor::Parser.adjust_indentation! lines
     assert_equal expected, lines
   end
 

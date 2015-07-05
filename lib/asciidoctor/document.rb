@@ -248,7 +248,7 @@ class Document < AbstractBlock
     options.freeze
 
     attrs = @attributes
-    attrs['encoding'] = 'UTF-8'
+    #attrs['encoding'] = 'UTF-8'
     attrs['sectids'] = ''
     attrs['notitle'] = '' unless header_footer
     attrs['toc-placement'] = 'auto'

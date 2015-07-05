@@ -44,6 +44,8 @@ Feature: Text Formatting
   Scenario: Convert text that has ex-inline monospaced formatting
   Given the AsciiDoc source
     """
+    :encoding: UTF-8
+
     The document is assumed to be encoded as [x-]+{encoding}+.
     """
   When it is converted to html

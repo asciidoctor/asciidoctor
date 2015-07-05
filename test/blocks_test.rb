@@ -864,9 +864,9 @@ end
 
       expected = <<-EOS
  def names
- 
+
    @names.split ' '
- 
+
  end
       EOS
 
@@ -893,10 +893,39 @@ end
 
       expected = <<-EOS
  def names
- 
+
    @names.split ' '
- 
+
  end
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'pre', output, 1
+      assert_css '.listingblock pre', output, 1
+      result = xmlnodes_at_xpath('//pre', output, 1).text
+      assert_equal expected.chomp, result
+    end
+
+    test 'should expand tabs if tabsize attribute is positive' do
+      input = <<-EOS
+:tabsize: 4
+
+[indent=0]
+----
+	def names
+
+		@names.split ' '
+
+	end
+----
+      EOS
+
+      expected = <<-EOS
+def names
+
+    @names.split ' '
+
+end
       EOS
 
       output = render_embedded_string input
