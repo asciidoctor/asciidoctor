@@ -26,6 +26,12 @@ class Parser
 
   BlockMatchData = Struct.new :context, :masq, :tip, :terminator
 
+  # Regexp for replacing tab character
+  TabRx = /\t/
+
+  # Regexp for leading tab indentation
+  TabIndentRx = /^\t+/
+
   # Public: Make sure the Parser object doesn't get initialized.
   #
   # Raises RuntimeError if this constructor is invoked.
@@ -700,7 +706,7 @@ class Parser
               (Compliance.block_terminates_paragraph && (is_delimited_block?(line) || BlockAttributeLineRx =~ line))
             }
 
-            reset_block_indent! lines
+            adjust_indentation! lines
 
             block = Block.new(parent, :literal, :content_model => :verbatim, :source => lines, :attributes => attributes)
             # a literal gets special meaning inside of a definition list
@@ -777,16 +783,10 @@ class Parser
               attributes['citetitle'] = citetitle if citetitle
               block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
             else
-              # if [normal] is used over an indented paragraph, unindent it
-              if style == 'normal' && ((first_char = lines[0].chr) == ' ' || first_char == TAB)
-                first_line = lines[0]
-                first_line_shifted = first_line.lstrip
-                indent = line_length(first_line) - line_length(first_line_shifted)
-                lines[0] = first_line_shifted
-                # QUESTION should we fix the rest of the lines, since in XML output it's insignificant?
-                lines.size.times do |i|
-                  lines[i] = lines[i][indent..-1] if i > 0
-                end
+              # if [normal] is used over an indented paragraph, shift content to left margin
+              if style == 'normal'
+                # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
+                adjust_indentation! lines
               end
 
               block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
@@ -1077,8 +1077,12 @@ class Parser
       return lines
     end
 
-    if content_model == :verbatim && attributes.key?('indent') && (indent = attributes['indent'].to_i) >= 0
-      reset_block_indent! lines, indent
+    if content_model == :verbatim
+      if (indent = attributes['indent'])
+        adjust_indentation! lines, indent, (attributes['tabsize'] || parent.document.attributes['tabsize'])
+      elsif (tab_size = (attributes['tabsize'] || parent.document.attributes['tabsize']).to_i) > 0
+        adjust_indentation! lines, nil, tab_size
+      end 
     end
 
     if (extension = options[:extension])
@@ -2616,18 +2620,14 @@ class Parser
     end
   end
 
-  # Remove the indentation (block offset) shared by all the lines, then
-  # indent the lines by the specified amount if specified
+  # Remove the block indentation (the leading whitespace equal to the amount of
+  # leading whitespace of the least indented line), then replace tabs with
+  # spaces (using proper tab expansion logic) and, finally, indent the lines by
+  # the amount specified.
   #
-  # Trim the leading whitespace (indentation) equivalent to the length
-  # of the indent on the least indented line. If the indent argument
-  # is specified, indent the lines by this many spaces (columns).
-  # 
-  # The purpose of this method is to shift a block of text to
-  # align to the left margin, while still preserving the relative
-  # indentation between lines
+  # This method preserves the relative indentation of the lines.
   #
-  # lines  - the Array of String lines to process
+  # lines  - the Array of String lines to process (no trailing endlines)
   # indent - the integer number of spaces to add to the beginning
   #          of each line; if this value is nil, the existing
   #          space is preserved (optional, default: 0)
@@ -2640,55 +2640,83 @@ class Parser
   #       end
   #   EOS
   #
-  #   source.split("\n")
+  #   source.split "\n"
   #   # => ["    def names", "      @names.split ' '", "    end"]
   #
-  #   Parser.reset_block_indent(source.split "\n")
-  #   # => ["def names", "  @names.split ' '", "end"]
-  #
-  #   puts Parser.reset_block_indent(source.split "\n") * "\n"
+  #   puts Parser.adjust_indentation!(source.split "\n") * "\n"
   #   # => def names
   #   # =>   @names.split ' '
   #   # => end
   #
-  # returns the Array of String lines with block offset removed
+  # returns Nothing
   #--
-  # FIXME refactor gsub matchers into compiled regex
-  def self.reset_block_indent!(lines, indent = 0)
-    return unless indent && !lines.empty?
+  # QUESTION should indent be called margin?
+  def self.adjust_indentation! lines, indent = 0, tab_size = 0
+    return if lines.empty?
 
-    tab_detected = false
-    # TODO make tab size configurable
-    tab_expansion = '    '
-    # strip leading block indent
-    offsets = lines.map do |line|
-      # break if the first char is non-whitespace
-      break [] unless line.chr.lstrip.empty?
-      if line.include? TAB
-        tab_detected = true
-        line = line.gsub(TAB_PATTERN, tab_expansion)
+    # expand tabs if a tab is detected unless tab_size is nil
+    if (tab_size = tab_size.to_i) > 0 && (lines.join.include? TAB)
+    #if (tab_size = tab_size.to_i) > 0 && (lines.index {|line| line.include? TAB })
+      full_tab_space = ' ' * tab_size
+      lines.map! do |line|
+        next line if line.empty?
+
+        if line.start_with? TAB
+          line.sub!(TabIndentRx) {|tabs| full_tab_space * tabs.length }
+        end
+
+        if line.include? TAB
+          # keeps track of how many spaces were added to adjust offset in match data
+          spaces_added = 0
+          line.gsub!(TabRx) {
+            # calculate how many spaces this tab represents, then replace tab with spaces
+            if (offset = ($~.begin 0) + spaces_added) % tab_size == 0
+              spaces_added += (tab_size - 1)
+              full_tab_space
+            else
+              unless (spaces = tab_size - offset % tab_size) == 1
+                spaces_added += (spaces - 1)
+              end
+              ' ' * spaces
+            end
+          }
+        else
+          line
+        end
       end
-      if (flush_line = line.lstrip).empty?
-        nil
-      elsif (offset = line.length - flush_line.length) == 0
-        break []
+    end
+
+    # skip adjustment of gutter if indent is -1
+    return unless indent && (indent = indent.to_i) > -1
+
+    # determine width of gutter
+    gutter_width = nil
+    lines.each do |line|
+      next if line.empty?
+      # NOTE this logic assumes no whitespace-only lines
+      if (line_indent = line.length - line.lstrip.length) == 0
+        gutter_width = nil
+        break
       else
-        offset
-      end
-    end
-    
-    unless offsets.empty? || (offsets = offsets.compact).empty?
-      if (offset = offsets.min) > 0
-        lines.map! {|line|
-          line = line.gsub(TAB_PATTERN, tab_expansion) if tab_detected
-          line[offset..-1].to_s
-        }
+        unless gutter_width && line_indent > gutter_width
+          gutter_width = line_indent
+        end
       end
     end
 
-    if indent > 0
+    # remove gutter then apply new indent if specified
+    # NOTE gutter_width is > 0 if not nil
+    if indent == 0
+      if gutter_width
+        lines.map! {|line| line.empty? ? line : line[gutter_width..-1] }
+      end
+    else
       padding = ' ' * indent
-      lines.map! {|line| %(#{padding}#{line}) }
+      if gutter_width
+        lines.map! {|line| line.empty? ? line : padding + line[gutter_width..-1] }
+      else
+        lines.map! {|line| line.empty? ? line : padding + line }
+      end
     end
 
     nil
