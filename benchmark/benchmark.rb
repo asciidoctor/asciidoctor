@@ -78,7 +78,7 @@ when 'userguide'
   result = Benchmark.bmbm {|bm|
     bm.report(%(Convert #{sample_file} (x#{$repeat}))) {
       $repeat.times {
-        Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :eruby => 'erubis', :header_footer => true, :to_file => false, :attributes => {'linkcss' => '', 'toc' => nil, 'numbered' => nil, 'icons' => nil, 'compat-mode' => 'legacy'}
+        Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :eruby => 'erubis', :header_footer => true, :to_file => false, :attributes => {'linkcss' => '', 'toc' => nil, 'numbered' => nil, 'icons' => nil, 'compat-mode' => ''}
       }
     }
   }
@@ -99,7 +99,7 @@ when 'userguide-loop'
     outer_start = Time.now
     (1..$repeat).each do
       inner_start = Time.now
-      Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :eruby => 'erubis', :header_footer => true, :to_file => false, :attributes => {'linkcss' => '', 'toc' => nil, 'numbered' => nil, 'icons' => nil, 'compat-mode' => 'legacy'}
+      Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :eruby => 'erubis', :header_footer => true, :to_file => false, :attributes => {'linkcss' => '', 'toc' => nil, 'numbered' => nil, 'icons' => nil, 'compat-mode' => ''}
       puts (elapsed = Time.now - inner_start)
       best = (best ? [best, elapsed].min : elapsed)
     end
