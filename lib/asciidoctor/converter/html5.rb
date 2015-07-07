@@ -79,7 +79,7 @@ module Asciidoctor
         end
       end
 
-      case node.attr 'source-highlighter'
+      case (highlighter = node.attr 'source-highlighter')
       when 'coderay'
         if (node.attr 'coderay-css', 'class') == 'class'
           if linkcss
@@ -97,38 +97,6 @@ module Asciidoctor
             result << (@stylesheets.embed_pygments_stylesheet pygments_style)
           end
         end
-      when 'highlightjs', 'highlight.js'
-        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/8.4)
-        result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'github'}.min.css"#{slash}>
-<script src="#{highlightjs_path}/highlight.min.js"></script>
-<script>hljs.initHighlightingOnLoad()</script>)
-      when 'prettify'
-        prettify_path = node.attr 'prettifydir', %(#{cdn_base}/prettify/r298)
-        result << %(<link rel="stylesheet" href="#{prettify_path}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>
-<script src="#{prettify_path}/prettify.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>)
-      end
-
-      if node.attr? 'stem'
-        # IMPORTANT to_s calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
-        eqnums_val = node.attr 'eqnums', 'none'
-        eqnums_val = 'AMS' if eqnums_val == ''
-        eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
-        result << %(<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  tex2jax: {
-    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
-    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: {#{eqnums_opt}}
-});
-</script>
-<script src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
       end
 
       unless (docinfo_content = node.docinfo).empty?
@@ -236,6 +204,43 @@ MathJax.Hub.Config({
           result << docinfo_content
         end
         result << '</div>'
+      end
+      
+      # Load Javascript at the end of body for performance
+      # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
+      case highlighter
+      when 'highlightjs', 'highlight.js'
+        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/8.4)
+        result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'github'}.min.css"#{slash}>)
+        result << %(<script src="#{highlightjs_path}/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>)
+      when 'prettify'
+        prettify_path = node.attr 'prettifydir', %(#{cdn_base}/prettify/r298)
+        result << %(<link rel="stylesheet" href="#{prettify_path}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>)
+        result << %(<script src="#{prettify_path}/prettify.min.js"></script>
+<script>prettyPrint()</script>)
+      end
+
+      if node.attr? 'stem'
+        # IMPORTANT to_s calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
+        eqnums_val = node.attr 'eqnums', 'none'
+        eqnums_val = 'AMS' if eqnums_val == ''
+        eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
+        result << %(<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
+    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: {#{eqnums_opt}}
+});
+</script>
+<script src="#{cdn_base}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
       end
 
       result << '</body>'
