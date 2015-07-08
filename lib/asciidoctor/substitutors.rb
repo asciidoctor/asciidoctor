@@ -74,7 +74,7 @@ module Substitutors
   # expand -  A Boolean to control whether sub aliases are expanded (default: true)
   #
   # returns Either a String or String Array, whichever matches the type of the first argument
-  def apply_subs source, subs = :normal, expand = false
+  def apply_subs source, subs = :normal, expand = false, extraopts = {}
     if !subs
       return source
     elsif subs == :normal
@@ -118,7 +118,7 @@ module Substitutors
       when :macros
         text = sub_macros text
       when :highlight
-        text = highlight_source text, (subs.include? :callouts)
+        text = highlight_source text, (subs.include? :callouts), nil, extraopts
       when :callouts
         text = sub_callouts text unless subs.include? :highlight
       when :post_replacements
@@ -1397,7 +1397,7 @@ module Substitutors
   #
   # returns the highlighted source code, if a source highlighter is defined
   # on the document, otherwise the unprocessed text
-  def highlight_source(source, process_callouts, highlighter = nil)
+  def highlight_source(source, process_callouts, highlighter = nil, extraopts = {})
     highlighter ||= @document.attributes['source-highlighter']
     Helpers.require_library highlighter, (highlighter == 'pygments' ? 'pygments.rb' : highlighter)
     lineno = 0
@@ -1444,6 +1444,20 @@ module Substitutors
         opts[:noclasses] = true
         opts[:style] = (@document.attributes['pygments-style'] || Stylesheets::DEFAULT_PYGMENTS_STYLE)
       end
+      
+       _params = [:hl_lines]
+      newconfs = Hash[_params.select { |k| extraopts.key?(k.to_s) }.collect {
+                 |x| 
+				         [x,
+                 begin
+                  instance_eval(extraopts[x.to_s])
+                 rescue
+                  extraopts[x]
+                 end]
+                 }]
+    
+      opts = opts.merge(newconfs)
+      
       if attr? 'linenums'
         # TODO we could add the line numbers in ourselves instead of having to strip out the junk
         # FIXME move these regular expressions into constants
