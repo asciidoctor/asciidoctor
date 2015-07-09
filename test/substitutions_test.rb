@@ -627,6 +627,11 @@ context 'Substitutions' do
       assert_equal %{<span class="image"><img src="tiger.png" alt="tiger"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'should replace underscore and hyphen with space in generated alt text for an inline image' do
+      para = block_from_string('image:tiger-with-family_1.png[]')
+      assert_equal %{<span class="image"><img src="tiger-with-family_1.png" alt="tiger with family 1"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'a single-line image macro with text should be interpreted as an image with alt text' do
       para = block_from_string('image:tiger.png[Tiger]')
       assert_equal %{<span class="image"><img src="tiger.png" alt="Tiger"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
