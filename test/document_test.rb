@@ -1047,7 +1047,7 @@ text
 
     test 'should sanitize contents of HTML title element' do
       input = <<-EOS
-= *Document* image:logo.png[] _Title_ image:another-logo.png[]
+= *Document* image:logo.png[] _Title_ image:another-logo.png[another logo]
 
 content
       EOS
@@ -1056,7 +1056,7 @@ content
       assert_xpath '/html/head/title[text()="Document Title"]', output, 1
       nodes = xmlnodes_at_xpath('//*[@id="header"]/h1', output, 1)
       assert_equal 1, nodes.size
-      assert_match(/<h1><strong>Document<\/strong> <span class="image"><img src="logo.png" alt="logo"><\/span> <em>Title<\/em> <span class="image"><img src="another-logo.png" alt="another-logo"><\/span><\/h1>/, output)
+      assert_match('<h1><strong>Document</strong> <span class="image"><img src="logo.png" alt="logo"></span> <em>Title</em> <span class="image"><img src="another-logo.png" alt="another logo"></span></h1>', output)
     end
      
     test 'should not choke on empty source' do
