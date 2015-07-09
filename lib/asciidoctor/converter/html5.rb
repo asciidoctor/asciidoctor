@@ -669,17 +669,8 @@ Your browser does not support the audio tag.
     end
 
     def paragraph node
-      attributes = if node.id
-        if node.role
-          %( id="#{node.id}" class="paragraph #{node.role}")
-        else
-          %( id="#{node.id}" class="paragraph")
-        end
-      elsif node.role
-        %( class="paragraph #{node.role}")
-      else
-        ' class="paragraph"'
-      end
+      class_attribute = node.role ? %( class="#{node.role} paragraph") : ' class="paragraph"'
+      attributes = node.id ? %( id="#{node.id}" #{class_attribute}) : class_attribute
 
       if node.title?
         %(<div#{attributes}>
