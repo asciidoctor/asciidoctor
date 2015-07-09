@@ -134,8 +134,26 @@ module Helpers
   #
   # Returns the String filename with the file extension removed
   def self.rootname(file_name)
-    # alternatively, this could be written as ::File.basename file_name, ((::File.extname file_name) || '')
     (ext = ::File.extname(file_name)).empty? ? file_name : file_name[0...-ext.length]
+  end
+
+  # Public: Retrieves the basename of the filename, optionally removing the extension, if present
+  #
+  # file_name    - The String file name to process
+  # drop_extname - A Boolean flag indicating whether to drop the extension (default: false)
+  #
+  # Examples
+  #
+  #   Helpers.basename('images/tiger.png', true)
+  #   # => "tiger"
+  #
+  # Returns the String filename with leading directories removed and, if specified, the extension removed
+  def self.basename(file_name, drop_extname = false)
+    if drop_extname
+      ::File.basename file_name, ((::File.extname file_name) || '')
+    else
+      ::File.basename file_name
+    end
   end
 
   def self.mkdir_p(dir)

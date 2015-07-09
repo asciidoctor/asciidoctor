@@ -678,7 +678,7 @@ module Substitutors
           @document.register(:images, target)
         end
         attrs = parse_attributes(raw_attrs, posattrs)
-        attrs['alt'] ||= ::File.basename(target, ::File.extname(target)).tr('_-', ' ')
+        attrs['alt'] ||= Helpers.basename(target, true).tr('_-', ' ')
         Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
       }
     end

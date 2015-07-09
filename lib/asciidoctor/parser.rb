@@ -556,7 +556,7 @@ class Parser
               #    end
               #  end
               #  document.register(:images, target)
-              #  attributes['alt'] ||= ::File.basename(target, ::File.extname(target)).tr('_-', ' ')
+              #  attributes['alt'] ||= Helpers.basename(target, true).tr('_-', ' ')
               #  # QUESTION should video or audio have an auto-numbered caption?
               #  block.assign_caption attributes.delete('caption'), 'figure'
               #end
@@ -903,7 +903,7 @@ class Parser
       if block.context == :image
         resolved_target = attributes['target']
         block.document.register(:images, resolved_target)
-        attributes['alt'] ||= ::File.basename(resolved_target, ::File.extname(resolved_target)).tr('_-', ' ')
+        attributes['alt'] ||= Helpers.basename(resolved_target, true).tr('_-', ' ')
         attributes['alt'] = block.sub_specialcharacters attributes['alt']
         block.assign_caption attributes.delete('caption'), 'figure'
         if (scaledwidth = attributes['scaledwidth'])
