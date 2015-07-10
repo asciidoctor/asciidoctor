@@ -13,6 +13,12 @@
 :pr-help-uri: {base-help-uri}/using-pull-requests
 :gist-uri: https://gist.github.com
 
+== License Agreement
+
+By contributing changes to this repository, you agree to license your contributions under the MIT license.
+This ensures that your contributions have the same license as the project and that the community is free to use your contributions.
+You also assert that you are the original author of the work you are contributing unless otherwise stated.
+
 == Submitting an Issue
 
 We use the {issues-uri}[issue tracker on GitHub] associated with this project to track bugs and features.
