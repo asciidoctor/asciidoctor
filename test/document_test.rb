@@ -319,7 +319,7 @@ preamble
       assert_equal 1, section_1.lineno
     end
 
-    test 'find_by should return Array of blocks that match criteria' do
+    test 'find_by should return Array of blocks anywhere in document tree that match criteria' do
       input = <<-EOS
 = Document Title
 
@@ -336,7 +336,7 @@ Exhibit A::
 image::tiger.png[Tiger]
 --
 
-image::cat.png[Cat]
+image::shoe.png[Shoe]
 
 == Section B
 
@@ -349,7 +349,124 @@ paragraph
       assert_equal :image, result[0].context
       assert_equal 'tiger.png', result[0].attr('target')
       assert_equal :image, result[1].context
-      assert_equal 'cat.png', result[1].attr('target')
+      assert_equal 'shoe.png', result[1].attr('target')
+    end
+
+    test 'find_by should return an empty Array if no matches are found' do
+      input = <<-EOS
+paragraph
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by :context => :section
+      refute_nil result
+      assert_equal 0, result.size
+    end
+
+    test 'find_by should return Array of blocks that match style criteria' do
+      input = <<-EOS
+[square]
+* one
+* two
+* three
+
+---
+
+* apples
+* bananas
+* pears
+      EOS
+
+      doc = Asciidoctor.load input
+      result = doc.find_by :context => :ulist, :style => 'square'
+      assert_equal 1, result.size
+      assert_equal :ulist, result[0].context
+    end
+
+    test 'find_by should return Array of blocks that match role criteria' do
+      input = <<-EOS
+[#tiger.animal]
+image::tiger.png[Tiger]
+
+image::shoe.png[Shoe]
+      EOS
+
+      doc = Asciidoctor.load input
+      result = doc.find_by :context => :image, :role => 'animal'
+      assert_equal 1, result.size
+      assert_equal :image, result[0].context
+      assert_equal 'tiger.png', result[0].attr('target')
+    end
+
+    test 'find_by should return the document title section if context selector is :section' do
+      input = <<-EOS
+= Document Title
+
+preamble
+
+== Section One
+
+content
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by :context => :section
+      refute_nil result
+      assert_equal 2, result.size
+      assert_equal :section, result[0].context
+      assert_equal 'Document Title', result[0].title
+    end
+
+    test 'find_by should only return results for which the block argument yields true' do
+      input = <<-EOS
+== Section
+
+content
+
+=== Subsection
+
+content
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by(:context => :section) {|sect| sect.level == 1 }
+      refute_nil result
+      assert_equal 1, result.size
+      assert_equal :section, result[0].context
+      assert_equal 'Section', result[0].title
+    end
+
+    test 'find_by should only return one result when matching by id' do
+      input = <<-EOS
+== Section
+
+content
+
+[#subsection]
+=== Subsection
+
+content
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by(:context => :section, :id => 'subsection')
+      refute_nil result
+      assert_equal 1, result.size
+      assert_equal :section, result[0].context
+      assert_equal 'Subsection', result[0].title
+    end
+
+    test 'find_by should return an empty Array if the id criteria matches but the block argument yields false' do
+      input = <<-EOS
+== Section
+
+content
+
+[#subsection]
+=== Subsection
+
+content
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by(:context => :section, :id => 'subsection') {|sect| false }
+      refute_nil result
+      assert_equal 0, result.size
     end
   end
 
