@@ -248,7 +248,7 @@ class AbstractBlock < AbstractNode
   #   doc.find_by context: :listing, style: 'source'
   #   #=> Asciidoctor::Block@13136720 { context: :listing, content_model: :verbatim, style: "source", lines: 1 }
   #
-  # Returns An Array of block nodes that match the given selector or nil if no matches are found
+  # Returns An Array of block nodes that match the given selector or an empty Array if no matches are found
   #--
   # TODO support jQuery-style selector (e.g., image.thumb)
   def find_by selector = {}, &block
@@ -256,18 +256,24 @@ class AbstractBlock < AbstractNode
 
     if ((any_context = !(context_selector = selector[:context])) || context_selector == @context) &&
         (!(style_selector = selector[:style]) || style_selector == @style) &&
-        (!(role_selector = selector[:role]) || has_role?(role_selector)) &&
+        (!(role_selector = selector[:role]) || (has_role? role_selector)) &&
         (!(id_selector = selector[:id]) || id_selector == @id)
       if id_selector
-        return [(block_given? && yield(self) ? self : self)]
+        if block_given?
+          return (yield self) ? [self] : result
+        else
+          return [self]
+        end
+      elsif block_given?
+        result << self if (yield self)
       else
-        result << (block_given? && yield(self) ? self : self)
+        result << self
       end
     end
 
     # process document header as a section if present
     if @context == :document && (any_context || context_selector == :section) && header?
-      result.concat(@header.find_by(selector, &block) || [])
+      result.concat(@header.find_by selector, &block)
     end
 
     # yuck, dlist is a special case
@@ -275,17 +281,17 @@ class AbstractBlock < AbstractNode
       if @context == :dlist
         if any_context || context_selector != :section # optimization
           @blocks.flatten.each do |li|
-            result.concat(li.find_by(selector, &block) || [])
+            result.concat(li.find_by selector, &block)
           end
         end
       elsif
         @blocks.each do |b|
           next if (context_selector == :section && b.context != :section) # optimization
-          result.concat(b.find_by(selector, &block) || [])
+          result.concat(b.find_by selector, &block)
         end
       end
     end
-    result.empty? ? nil : result
+    result
   end
   alias :query :find_by
 
