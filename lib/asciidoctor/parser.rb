@@ -599,7 +599,8 @@ class Parser
             attributes['style'] = 'arabic'
             reader.unshift_line this_line
             expected_index = 1
-            begin
+            # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
+            while match || (reader.has_more_lines? && (match = CalloutListRx.match(reader.peek_line)))
               # might want to move this check to a validate method
               if match[1].to_i != expected_index
                 # FIXME this lineno - 2 hack means we need a proper look-behind cursor
@@ -617,7 +618,8 @@ class Parser
                   warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: no callouts refer to list item #{block.items.size})
                 end
               end
-            end while reader.has_more_lines? && (match = CalloutListRx.match(reader.peek_line))
+              match = nil
+            end
 
             document.callouts.next_list
             break
@@ -1248,7 +1250,8 @@ class Parser
     # that uses the same delimiter (::, :::, :::: or ;;)
     sibling_pattern = DefinitionListSiblingRx[match[2]]
 
-    begin
+    # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
+    while match || (reader.has_more_lines? && (match = sibling_pattern.match(reader.peek_line)))
       term, item = next_list_item(reader, list_block, match, sibling_pattern)
       if previous_pair && !previous_pair[-1]
         previous_pair.pop
@@ -1258,7 +1261,8 @@ class Parser
         # FIXME this misses the automatic parent assignment
         list_block.items << (previous_pair = [[term], item])
       end
-    end while reader.has_more_lines? && (match = sibling_pattern.match(reader.peek_line))
+      match = nil
+    end
 
     list_block
   end

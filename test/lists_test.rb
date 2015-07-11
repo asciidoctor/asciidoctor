@@ -2257,6 +2257,18 @@ section text
       assert_xpath '/*[@class="sect1"]/h2[text()="Section"]', output, 1
       assert_xpath '/*[@class="ulist"]/following-sibling::*[@class="sect1"]', output, 1
     end
+
+    test 'more than 4 consecutive colons should become part of description list term' do
+      input = <<-EOS
+A term::::: a description
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//dl', output, 1
+      assert_xpath '//dt', output, 1
+      assert_xpath '//dt[text()="A term:"]', output, 1
+      assert_xpath '//dd/p[text()="a description"]', output, 1
+    end
   end
 
   context "Nested lists" do
