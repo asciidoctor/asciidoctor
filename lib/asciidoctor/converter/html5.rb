@@ -669,16 +669,16 @@ Your browser does not support the audio tag.
     end
 
     def paragraph node
-      class_attribute = node.role ? %( class="#{node.role} paragraph") : ' class="paragraph"'
-      attributes = node.id ? %( id="#{node.id}" #{class_attribute}) : class_attribute
+      class_attribute = node.role ? %(class="paragraph #{node.role}") : 'class="paragraph"'
+      attributes = node.id ? %(id="#{node.id}" #{class_attribute}) : class_attribute
 
       if node.title?
-        %(<div#{attributes}>
+        %(<div #{attributes}>
 <div class="title">#{node.title}</div>
 <p>#{node.content}</p>
 </div>)
       else
-        %(<div#{attributes}>
+        %(<div #{attributes}>
 <p>#{node.content}</p>
 </div>)
       end
