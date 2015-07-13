@@ -50,6 +50,7 @@ class Block < AbstractBlock
   # QUESTION should we store source_data as lines for blocks that have compound content models?
   def initialize parent, context, opts = {}
     super
+	@extraopts =  if opts.key? :attributes then opts[:attributes] else {} end
     @content_model = opts[:content_model] || DEFAULT_CONTENT_MODEL[context]
     if opts.key? :subs
       # FIXME feels funky; we have to be defensive to get lock_in_subs to honor override
@@ -116,7 +117,7 @@ class Block < AbstractBlock
 
       # QUESTION could we use strip here instead of popping empty lines?
       # maybe apply_subs can know how to strip whitespace?
-      result = apply_subs @lines, @subs
+      result = apply_subs @lines, @subs, false, @extraopts
       if result.size < 2
         result[0]
       else
