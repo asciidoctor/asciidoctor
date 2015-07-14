@@ -135,6 +135,47 @@ class File
         }
         return data;
       )
+    # afx means asciidocfx
+    when 'javafx'
+      %x(
+        var data = '';
+
+        if(afx) {
+          try {
+            data = afx.readAsciidoctorResource(path,null);
+            if(data==404) {
+	      throw new Error();
+	    }
+          }
+          catch (e) {
+            throw #{IOError.new `'No such file or directory: ' + path`};
+          }
+          return data;
+        }
+
+        var status = -1;
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', path, false);
+          xhr.addEventListener('load', function() {
+            status = this.status;
+            // status is 0 for local file mode (i.e., file://)
+            if (status == 0 || status == 200) {
+              data = this.responseText;
+            }
+          });
+          xhr.overrideMimeType('text/plain');
+          xhr.send();
+        }
+        catch (e) {
+          status = 0;
+        }
+        // assume that no data in local file mode means it doesn't exist
+        if (status == 404 || (status == 0 && data == '')) {
+          throw #{IOError.new `'No such file or directory: ' + path`};
+        }
+        return data;
+      )
     # NOTE we're assuming standalone is SpiderMonkey
     when 'standalone'
       %x(return read(path);)
