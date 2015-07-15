@@ -77,6 +77,9 @@ image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master
 //image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status, link=https://coveralls.io/r/asciidoctor/asciidoctor]
 image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate, link="https://codeclimate.com/github/asciidoctor/asciidoctor"]
 image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="https://inch-ci.org/github/asciidoctor/asciidoctor"]
+
+* Community *
+image:https://badges.gitter.im/Join%20Chat.svg[Gitter, link="https://gitter.im/asciidoctor/asciidoctor"]
 //endif::env-github[]
 
 == The Big Picture
