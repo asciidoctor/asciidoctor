@@ -1509,14 +1509,23 @@ module Asciidoctor
       timings.record :write if timings
 
       # NOTE document cannot control this behavior if safe >= SafeMode::SERVER
-      if !stream_output && doc.safe < SafeMode::SECURE && (doc.attr? 'basebackend-html') &&
-          (doc.attr? 'linkcss') && (doc.attr? 'copycss')
-        copy_asciidoctor_stylesheet = DEFAULT_STYLESHEET_KEYS.include?(stylesheet = (doc.attr 'stylesheet'))
-        copy_user_stylesheet = !copy_asciidoctor_stylesheet && !stylesheet.nil_or_empty?
+      # NOTE skip if stylesdir is a URI
+      if !stream_output && doc.safe < SafeMode::SECURE && (doc.attr? 'linkcss') &&
+          (doc.attr? 'copycss') && (doc.attr? 'basebackend-html') &&
+          !((stylesdir = (doc.attr 'stylesdir')) && (stylesdir.include? ':') && UriSniffRx =~ stylesdir)
+        copy_asciidoctor_stylesheet = false
+        copy_user_stylesheet = false
+        if (stylesheet = (doc.attr 'stylesheet'))
+          if DEFAULT_STYLESHEET_KEYS.include? stylesheet
+            copy_asciidoctor_stylesheet = true
+          elsif !((stylesheet.include? ':') && UriSniffRx =~ stylesheet)
+            copy_user_stylesheet = true
+          end
+        end
         copy_coderay_stylesheet = (doc.attr? 'source-highlighter', 'coderay') && (doc.attr 'coderay-css', 'class') == 'class'
         copy_pygments_stylesheet = (doc.attr? 'source-highlighter', 'pygments') && (doc.attr 'pygments-css', 'class') == 'class'
         if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet
-          stylesoutdir = doc.normalize_system_path(doc.attr('stylesdir'), outdir, doc.safe >= SafeMode::SAFE ? outdir : nil)
+          stylesoutdir = doc.normalize_system_path(stylesdir, outdir, doc.safe >= SafeMode::SAFE ? outdir : nil)
           Helpers.mkdir_p stylesoutdir if mkdirs
 
           if copy_asciidoctor_stylesheet
@@ -1526,6 +1535,7 @@ module Asciidoctor
             if (stylesheet_src = (doc.attr 'copycss')).empty?
               stylesheet_src = doc.normalize_system_path stylesheet
             else
+              # NOTE in this case, copycss is a source location (but cannot be a URI)
               stylesheet_src = doc.normalize_system_path stylesheet_src
             end
             stylesheet_dst = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)

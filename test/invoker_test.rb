@@ -277,6 +277,22 @@ context 'Invoker' do
     end
   end
 
+  test 'should not copy custom stylesheet to target directory if stylesdir is a URI' do
+    destdir = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'output'))
+    sample_outpath = File.join destdir, 'sample-output.html'
+    stylesdir = File.join destdir, 'http:'
+    begin
+      invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a stylesdir=http://example.org/styles -a stylesheet=custom.css)
+      invoker.document
+      assert File.exist?(sample_outpath)
+      assert !File.exist?(stylesdir)
+    ensure
+      FileUtils.rm_f(sample_outpath)
+      FileUtils.rmdir(stylesdir) if File.directory? stylesdir
+      FileUtils.rmdir(destdir)
+    end
+  end
+
   test 'should render all passed files' do
     basic_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'basic.html'))
     sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.html'))
