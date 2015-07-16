@@ -415,9 +415,9 @@ class AbstractNode
     opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
     if ::File.readable? path
       if opts[:normalize]
-        # QUESTION should we strip content?
         Helpers.normalize_lines_from_string(::IO.read(path)) * EOL
       else
+        # QUESTION should we chomp or rstrip content?
         ::IO.read(path)
       end
     else
