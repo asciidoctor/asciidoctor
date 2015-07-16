@@ -77,9 +77,6 @@ image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master
 //image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status, link=https://coveralls.io/r/asciidoctor/asciidoctor]
 image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate, link="https://codeclimate.com/github/asciidoctor/asciidoctor"]
 image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="https://inch-ci.org/github/asciidoctor/asciidoctor"]
-
-*Community*
-image:https://badges.gitter.im/Join%20Chat.svg[Gitter, link="https://gitter.im/asciidoctor/asciidoctor"]
 //endif::env-github[]
 
 == The Big Picture
@@ -321,7 +318,8 @@ IRC (Chat):: {uri-irc}[#asciidoctor] on FreeNode IRC
 ifdef::env-github[]
 Further information and documentation about Asciidoctor can be found on the project's website.
 
-{uri-project}/[Home] | {uri-news}[News] | {uri-docs}[Docs]
+{uri-project}/[Home] | {uri-news}[News] | {uri-docs}[Docs] | image:https://badges.gitter.im/Join%20Chat.svg[Gitter, link="https://gitter.im/asciidoctor/asciidoctor"] |
+
 endif::[]
 
 The Asciidoctor organization on GitHub hosts the project's source code, issue tracker, and sub-projects.
