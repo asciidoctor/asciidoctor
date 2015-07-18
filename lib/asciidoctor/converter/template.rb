@@ -61,14 +61,14 @@ module Asciidoctor
         accum[engine] = default_opts.dup
         accum
       end
+      if opts[:htmlsyntax] == 'html'
+        @engine_options[:haml][:format] = :html5
+        @engine_options[:slim][:format] = :html
+      end
       if (overrides = opts[:template_engine_options])
         overrides.each do |engine, override_opts|
           (@engine_options[engine] ||= {}).update override_opts
         end
-      end
-      if opts[:htmlsyntax] == 'html'
-        @engine_options[:haml][:format] = :html5
-        @engine_options[:slim][:format] = :html
       end
       case opts[:template_cache]
       when true
