@@ -999,6 +999,7 @@ class Document < AbstractBlock
       converter_opts[:template_engine] = @options[:template_engine]
       converter_opts[:template_engine_options] = @options[:template_engine_options]
       converter_opts[:eruby] = @options[:eruby]
+      converter_opts[:safe] = @safe
     end
     if (converter = @options[:converter])
       converter_factory = Converter::Factory.new ::Hash[backend, converter]
