@@ -128,6 +128,7 @@ module Asciidoctor
 #{outline node}
 </div>)
           end
+          # QUESTION should this h2 have an auto-generated id?
           result << %(<h2>#{node.attr 'manname-title'}</h2>
 <div class="sectionbody">
 <p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
@@ -250,9 +251,22 @@ MathJax.Hub.Config({
 
     def embedded node
       result = []
-      if !node.notitle && node.has_header?
-        id_attr = node.id ? %( id="#{node.id}") : nil
-        result << %(<h1#{id_attr}>#{node.header.title}</h1>)
+      if node.doctype == 'manpage'
+        # QUESTION should notitle control the manual page title?
+        unless node.notitle
+          id_attr = node.id ? %( id="#{node.id}") : nil
+          result << %(<h1#{id_attr}>#{node.doctitle} Manual Page</h1>)
+        end
+        # QUESTION should this h2 have an auto-generated id?
+        result << %(<h2>#{node.attr 'manname-title'}</h2>
+<div class="sectionbody">
+<p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
+</div>)
+      else
+        if node.has_header? && !node.notitle
+          id_attr = node.id ? %( id="#{node.id}") : nil
+          result << %(<h1#{id_attr}>#{node.header.title}</h1>)
+        end
       end
 
       result << node.content

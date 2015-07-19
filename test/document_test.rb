@@ -1984,6 +1984,28 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       assert_xpath '//h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]/p[text()="asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats"]', output, 1
       assert_xpath '//*[@id="content"]/*[@class="sect1"]/h2[text()="SYNOPSIS"]', output, 1
     end
+
+    test 'should output special header block in embeddable HTML for manpage doctype' do
+      input = <<-EOS
+= asciidoctor(1)
+:doctype: manpage
+:showtitle:
+
+== NAME
+
+asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+
+== SYNOPSIS
+
+*asciidoctor* ['OPTION']... 'FILE'..
+      EOS
+
+      output = render_string input, :header_footer => false
+      assert_xpath '/h1[text()="asciidoctor(1) Manual Page"]', output, 1
+      assert_xpath '/h1/following-sibling::h2[text()="NAME"]', output, 1
+      assert_xpath '/h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]', output, 1
+      assert_xpath '/h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]/p[text()="asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats"]', output, 1
+    end
   end
 
   context 'Secure Asset Path' do
