@@ -108,7 +108,7 @@ module Substitutors
     subs.each do |type|
       case type
       when :specialcharacters
-        text = sub_specialcharacters text
+        text = sub_specialchars text
       when :quotes
         text = sub_quotes text
       when :attributes
@@ -356,12 +356,12 @@ module Substitutors
   # text - The String text to process
   #
   # returns The String text with special characters replaced
-  def sub_specialcharacters(text)
+  def sub_specialchars(text)
     SUPPORTS_GSUB_RESULT_HASH ?
       text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS) :
       text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
   end
-  alias :sub_specialchars :sub_specialcharacters
+  alias :sub_specialcharacters :sub_specialchars
 
   # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc)
   #
@@ -1396,10 +1396,34 @@ module Substitutors
   # process_callouts - a Boolean flag indicating whether callout marks should be substituted
   #
   # returns the highlighted source code, if a source highlighter is defined
-  # on the document, otherwise the unprocessed text
-  def highlight_source(source, process_callouts, highlighter = nil)
-    highlighter ||= @document.attributes['source-highlighter']
-    Helpers.require_library highlighter, (highlighter == 'pygments' ? 'pygments.rb' : highlighter)
+  # on the document, otherwise the source with verbatim substituions applied
+  def highlight_source source, process_callouts, highlighter = nil
+    case (highlighter ||= @document.attributes['source-highlighter'])
+    when 'coderay'
+      unless (highlighter_loaded = defined? ::CodeRay) || @document.attributes['coderay-unavailable']
+        if (Helpers.require_library 'coderay', true, :warn).nil?
+          # prevent further attempts to load CodeRay
+          @document.set_attr 'coderay-unavailable', true
+        else
+          highlighter_loaded = true
+        end
+      end
+    when 'pygments'
+      unless (highlighter_loaded = defined? ::Pygments) || @document.attributes['pygments-unavailable']
+        if (Helpers.require_library 'pygments', 'pygments.rb', :warn).nil?
+          # prevent further attempts to load Pygments
+          @document.set_attr 'pygments-unavailable', true
+        else
+          highlighter_loaded = true
+        end
+      end
+    else
+      # unknown highlighting library (something is misconfigured if we arrive here)
+      highlighter_loaded = false
+    end
+
+    return sub_source source, process_callouts unless highlighter_loaded
+
     lineno = 0
     callout_on_last = false
     if process_callouts
@@ -1505,6 +1529,16 @@ module Substitutors
     else
       result
     end
+  end
+
+  # Public: Apply verbatim substitutions on source (for use when highlighting is disabled).
+  #
+  # source - the source code String on which to apply verbatim substitutions
+  # process_callouts - a Boolean flag indicating whether callout marks should be substituted
+  #
+  # returns the substituted source
+  def sub_source source, process_callouts
+    return process_callouts ? sub_callouts(sub_specialchars(source)) : sub_specialchars(source)
   end
 
   # Internal: Lock-in the substitutions for this block
