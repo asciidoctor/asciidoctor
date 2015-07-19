@@ -139,6 +139,9 @@ class Document < AbstractBlock
   # Public: Get the Hash of resolved options used to initialize this Document
   attr_reader :options
 
+  # Public: Get the outfilesuffix defined at the end of the header.
+  attr_reader :outfilesuffix
+
   # Public: Get a reference to the parent Document of this nested document.
   attr_reader :parent_document
 
@@ -770,6 +773,9 @@ class Document < AbstractBlock
       @compat_mode = false
     end
 
+    # NOTE pin the outfilesuffix after the header is parsed
+    @outfilesuffix = attrs['outfilesuffix']
+
     @original_attributes = attrs.dup
 
     # unfreeze "flexible" attributes
@@ -1109,7 +1115,7 @@ class Document < AbstractBlock
       ''
     else
       qualifier = (location == :footer ? '-footer' : nil)
-      ext = @attributes['outfilesuffix'] unless ext
+      ext = @outfilesuffix unless ext
       docinfodir = @attributes['docinfodir']
 
       content = nil

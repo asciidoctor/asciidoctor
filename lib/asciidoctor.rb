@@ -1424,6 +1424,7 @@ module Asciidoctor
   # file, otherwise the converted String
   def convert input, options = {}
     options = options.dup
+    options.delete(:parse)
     to_file = options.delete(:to_file)
     to_dir = options.delete(:to_dir)
     mkdirs = options.delete(:mkdirs) || false
@@ -1471,9 +1472,11 @@ module Asciidoctor
     end
 
     doc = self.load input, options
+    # QUESTION should we restore_attributes eagerly?
+    #doc.restore_attributes
 
     if write_to_same_dir
-      outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
+      outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
       if outfile == input_path
         raise ::IOError, %(input file and output file cannot be the same: #{outfile})
       end
@@ -1488,7 +1491,7 @@ module Asciidoctor
           # reestablish outdir as the final target directory (in the case to_file had directory segments)
           outdir = ::File.dirname outfile
         else
-          outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.attributes['outfilesuffix']})
+          outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
         end
       elsif to_file
         outfile = doc.normalize_system_path(to_file, working_dir, jail, :target_name => 'to_dir', :recover => false)
