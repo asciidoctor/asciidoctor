@@ -130,23 +130,18 @@ class AbstractNode
 
   # Public: Assign the value to the attribute name for the current node.
   #
-  # name      - The String attribute name
-  # value     - The Object value to assign to the attribute name
+  # name      - The String attribute name to assign
+  # value     - The Object value to assign to the attribute
   # overwrite - A Boolean indicating whether to assign the attribute
-  #             if currently present in the attributes Hash
+  #             if currently present in the attributes Hash (default: true)
   #
   # Returns a [Boolean] indicating whether the assignment was performed
-  def set_attr name, value, overwrite = nil
-    if overwrite.nil?
+  def set_attr name, value, overwrite = true
+    if overwrite == false && (@attributes.key? name)
+      false
+    else
       @attributes[name] = value
       true
-    else
-      if overwrite || !(@attributes.key? name)
-        @attributes[name] = value
-        true
-      else
-        false
-      end
     end
   end
 
