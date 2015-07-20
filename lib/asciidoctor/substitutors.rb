@@ -1454,19 +1454,32 @@ module Substitutors
     end
 
     linenums_mode = nil
+    highlight_lines = nil
 
     case highlighter
     when 'coderay'
+      if (linenums_mode = (attr? 'linenums') ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)
+        if attr? 'highlight', nil, false
+          highlight_lines = resolve_lines_to_highlight(attr 'highlight', nil, false)
+        end
+      end
       result = ::CodeRay::Duo[attr('language', :text, false).to_sym, :html, {
           :css => (@document.attributes['coderay-css'] || :class).to_sym,
-          :line_numbers => (linenums_mode = ((attr? 'linenums') ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)),
-          :line_number_anchors => false}].highlight source
+          :line_numbers => linenums_mode,
+          :line_number_anchors => false,
+          :highlight_lines => highlight_lines,
+          :bold_every => false}].highlight source
     when 'pygments'
       lexer = ::Pygments::Lexer[attr('language', nil, false)] || ::Pygments::Lexer['text']
       opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
       unless (@document.attributes['pygments-css'] || 'class') == 'class'
         opts[:noclasses] = true
         opts[:style] = (@document.attributes['pygments-style'] || Stylesheets::DEFAULT_PYGMENTS_STYLE)
+      end
+      if attr? 'highlight', nil, false
+        unless (highlight_lines = resolve_lines_to_highlight(attr 'highlight', nil, false)).empty?
+          opts[:hl_lines] = highlight_lines * ' '
+        end
       end
       if attr? 'linenums'
         # TODO we could add the line numbers in ourselves instead of having to strip out the junk
@@ -1529,6 +1542,34 @@ module Substitutors
     else
       result
     end
+  end
+
+  # e.g., highlight="1-5, !2, 10" or highlight=1-5;!2,10
+  def resolve_lines_to_highlight spec
+    lines = []
+    spec.delete(' ').split(DataDelimiterRx).map do |entry|
+      negate = false
+      if entry.start_with? '!'
+        entry = entry[1..-1]
+        negate = true
+      end
+      if entry.include? '-'
+        s, e = entry.split '-', 2
+        line_nums = (s.to_i..e.to_i).to_a
+        if negate
+          lines -= line_nums
+        else
+          lines.concat line_nums
+        end
+      else
+        if negate
+          lines.delete entry.to_i
+        else
+          lines << entry.to_i
+        end
+      end
+    end
+    lines.sort.uniq
   end
 
   # Public: Apply verbatim substitutions on source (for use when highlighting is disabled).
