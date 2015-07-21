@@ -124,6 +124,30 @@ module Helpers
     data.each_line.map {|line| line.rstrip }
   end
 
+  # Public: Efficiently checks whether the specified String resembles a URI
+  #
+  # Uses the Asciidoctor::UriSniffRx regex to check whether the String begins
+  # with a URI prefix (e.g., http://). No validation of the URI is performed.
+  #
+  # str - the String to check
+  #
+  # returns true if the String is a URI, false if it is not
+  def self.uriish? str
+    (str.include? ':') && str =~ UriSniffRx
+  end
+
+  # Public: Efficiently retrieves the URI prefix of the specified String
+  #
+  # Uses the Asciidoctor::UriSniffRx regex to match the URI prefix in the
+  # specified String (e.g., http://), if present.
+  #
+  # str - the String to check
+  #
+  # returns the string URI prefix if the string is a URI, otherwise nil
+  def self.uri_prefix str
+    (str.include? ':') && str =~ UriSniffRx ? $& : nil
+  end
+
   # Matches the characters in a URI to encode
   REGEXP_ENCODE_URI_CHARS = /[^\w\-.!~*';:@=+$,()\[\]]/
 

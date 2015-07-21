@@ -410,21 +410,18 @@ class PathResolver
 
     unless start.nil_or_empty? || (is_web_root? target)
       target = %(#{start}#{SLASH}#{target})
-      if (target.include? ':') && UriSniffRx =~ target
-        uri_prefix = $~[0]
+      if (uri_prefix = Helpers.uri_prefix target)
         target = target[uri_prefix.length..-1]
       end
     end
 
     # use this logic instead if we want to normalize target if it contains a URI
     #unless is_web_root? target
-    #  if preserve_uri_target && (target.include? ':') && UriSniffRx =~ target
-    #    uri_prefix = $~[0]
+    #  if preserve_uri_target && (uri_prefix = Helpers.uri_prefix target)
     #    target = target[uri_prefix.length..-1]
     #  elsif !start.nil_or_empty?
     #    target = %(#{start}#{SLASH}#{target})
-    #    if (target.include? ':') && UriSniffRx =~ target
-    #      uri_prefix = $~[0]
+    #    if (uri_prefix = Helpers.uri_prefix target)
     #      target = target[uri_prefix.length..-1]
     #    end
     #  end
