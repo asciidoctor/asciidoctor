@@ -841,7 +841,7 @@ class PreprocessorReader < Reader
         else
           ::File.join @dir, target
         end
-      elsif target.include?(':') && UriSniffRx =~ target
+      elsif Helpers.uriish? target
         unless @document.attributes.has_key? 'allow-uri-read'
           replace_line %(link:#{target}[])
           return true

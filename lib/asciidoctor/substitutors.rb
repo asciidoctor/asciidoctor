@@ -828,10 +828,10 @@ module Substitutors
         end
 
         if text.empty?
-          text = if @document.attr? 'hide-uri-scheme'
-            target.sub UriSniffRx, ''
+          if @document.attr? 'hide-uri-scheme'
+            text = target.sub UriSniffRx, ''
           else
-            target
+            text = target
           end
 
           if attrs
