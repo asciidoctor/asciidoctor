@@ -212,6 +212,16 @@ module Asciidoctor
             require 'asciidoctor/converter/manpage'.to_s
           end
           ManPageConverter.new backend, opts
+        when 'revealjs'
+          unless defined? ::Asciidoctor::Converter::RevealjsConverter
+            require 'asciidoctor/converter/revealjs'.to_s
+          end
+          RevealjsConverter.new backend, opts
+        when 'deckjs'
+          unless defined? :: Asciidoctor::Converter::DeckjsConverter
+            require 'asciidoctor/converter/deckjs'.to_s
+            DeckjsConverter.new backend, opts
+          end
         end
 
         return base_converter unless opts.key? :template_dirs
