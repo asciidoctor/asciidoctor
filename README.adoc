@@ -94,7 +94,7 @@ You have the option of writing your own converter or providing {uri-tilt}[Tilt]-
 NOTE: Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor (`asciidoc.py`).
 The Asciidoctor test suite has {uri-tests}[> 1,500 tests] to ensure compatibility with the AsciiDoc syntax.
 
-In addition to the standard AsciiDoc syntax, Asciidoctor recognizes additional markup and formatting options, such as font-based icons (e.g., [x-]`icon:fire[]`) and UI elements (e.g., [x-]`button:[Save]`).
+In addition to the standard AsciiDoc syntax, Asciidoctor recognizes additional markup and formatting options, such as font-based icons (e.g., `+icon:fire[]+`) and UI elements (e.g., `+button:[Save]+`).
 Asciidoctor also offers a modern, responsive theme based on {uri-foundation}[Foundation] to style the HTML5 output.
 
 == Requirements
@@ -353,13 +353,13 @@ Enhancements::
 
 Improvements::
 
-  * recognize `--` as valid line comment for callout numbers; make line comment configurable (#1068)
+  * recognize `+--+` as valid line comment for callout numbers; make line comment configurable (#1068)
   * upgrade highlight.js to version 8.4 (#1216)
   * upgrade Font Awesome to version 4.2.0 (@clojens) (#1201)
   * define JAVASCRIPT_PLATFORM constant to simplify conditional logic in the JavaScript environment (#897)
   * provide access to destination directory, outfile and outdir via Document object (#1203)
   * print encoding information in version report produced by `asciidoctor -v` (#1210)
-  * add intrinsic attribute named `cpp` with value `C++` (#1208)
+  * add intrinsic attribute named `cpp` with value `pass:[C++]` (#1208)
   * preserve URI targets passed to `stylesheet` and related attributes (#1192)
   * allow numeric characters in block attribute name (#1103)
   * support custom YouTube playlists (#1105)
