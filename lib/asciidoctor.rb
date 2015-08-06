@@ -1361,7 +1361,7 @@ module Asciidoctor
   rescue => e
     backtrace = e.backtrace
     # revise exception message to include info about source file and rethrow from original location
-    e = e.exception(%(asciidoctor: FAILED: #{attributes['docfile'] || '<stdin>'}: Failed to parse AsciiDoc source, #{e.message}))
+    e = e.exception(%(asciidoctor: FAILED: #{attributes['docfile'] || '<stdin>'}: Failed to parse AsciiDoc source, #{e.message})) if e.respond_to? :exception
     e.set_backtrace backtrace
     raise e
   end
