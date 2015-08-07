@@ -138,7 +138,7 @@ context 'Document' do
       exception = assert_raises ArgumentError do
         Asciidoctor.load_file(sample_input_path, :safe => Asciidoctor::SafeMode::SAFE)
       end
-      assert_match(/Failed to parse AsciiDoc source/, exception.message)
+      assert_match(/Failed to load AsciiDoc document/, exception.message)
       # verify we have the correct backtrace (should be in at least first 5 lines)
       assert_match((RUBY_ENGINE == 'rbx' ? /parser\.rb/ : /helpers\.rb/), exception.backtrace[0..4].join("\n"))
     end if RUBY_MIN_VERSION_1_9
