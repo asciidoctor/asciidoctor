@@ -968,7 +968,8 @@ Your browser does not support the audio tag.
             # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
             list_param = %(&amp;playlist=#{playlist})
           else
-            list_param = nil
+            # NOTE for loop to work, playlist must be specified; use VIDEO_ID if there's no explicit playlist
+            list_param = loop_param ? %(&amp;playlist=#{target}) : nil
           end
         end
 
