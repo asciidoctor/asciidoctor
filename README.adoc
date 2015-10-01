@@ -587,3 +587,4 @@ Infrastructure::
   * rework README (@mogztter) (#651)
 
 Refer to the {uri-changelog}[CHANGELOG] for a complete list of changes in older releases.
+
