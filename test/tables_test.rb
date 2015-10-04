@@ -235,6 +235,21 @@ A | here| a | there
       assert_css 'table > tbody > tr', output, 3
     end
 
+    test 'empty cols attribute should be ignored' do
+      input = <<-EOS
+[cols=""]
+|===
+|one |two
+|1 |2 |a |b
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'col[style="width: 50%;"]', output, 2
+      assert_css 'table > tbody > tr', output, 3
+    end
+
     test 'table with header and footer' do
       input = <<-EOS
 [frame="topbot",options="header,footer"]

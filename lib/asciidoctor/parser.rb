@@ -2276,11 +2276,11 @@ class Parser
       table.assign_caption attributes.delete('caption')
     end
 
-    if attributes.has_key? 'cols'
+    if attributes['cols'].nil_or_empty?
+      explicit_col_specs = false
+    else
       table.create_columns(parse_col_specs(attributes['cols']))
       explicit_col_specs = true
-    else
-      explicit_col_specs = false
     end
 
     skipped = table_reader.skip_blank_lines
