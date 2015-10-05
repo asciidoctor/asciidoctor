@@ -281,8 +281,8 @@ ol.upperroman{list-style-type:upper-roman}
 ol.lowergreek{list-style-type:lower-greek}
 .hdlist>table,.colist>table{border:0;background:none}
 .hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
-td.hdlist1{padding-right:.75em;font-weight:bold}
-td.hdlist1,td.hdlist2{vertical-align:top}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
 .literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
 .colist>table tr>td:first-of-type{padding:0 .75em;line-height:1}
 .colist>table tr>td:last-of-type{padding:.25em 0}
