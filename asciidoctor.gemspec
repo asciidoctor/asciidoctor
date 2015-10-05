@@ -4,7 +4,6 @@ require File.expand_path '../lib/asciidoctor/version', __FILE__
 Gem::Specification.new do |s|
   s.name              = 'asciidoctor'
   s.version           = Asciidoctor::VERSION
-  s.rubyforge_project = s.name
 
   s.summary           = 'An implementation of the AsciiDoc text processor and publishing toolchain in Ruby'
   s.description       = <<-EOS
