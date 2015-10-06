@@ -1326,8 +1326,8 @@ module Asciidoctor
       attributes['docfile'] = input_path
       attributes['docdir'] = ::File.dirname input_path
       attributes['docname'] = Helpers.basename input_path, true
-      attributes['docdate'] = docdate = input_mtime.strftime('%Y-%m-%d')
-      attributes['doctime'] = doctime = input_mtime.strftime('%H:%M:%S %Z')
+      docdate = (attributes['docdate'] ||= input_mtime.strftime('%Y-%m-%d'))
+      doctime = (attributes['doctime'] ||= input_mtime.strftime('%H:%M:%S %Z'))
       attributes['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to? :readlines
       # NOTE tty, pipes & sockets can't be rewound, but can't be sniffed easily either
