@@ -1358,12 +1358,23 @@ module Asciidoctor
 
     timings.record :parse if timings
     doc
-  rescue => e
-    backtrace = e.backtrace
-    # revise exception message to include info about source file and rethrow from original location
-    e = e.exception(%(asciidoctor: FAILED: #{attributes['docfile'] || '<stdin>'}: Failed to parse AsciiDoc source, #{e.message}))
-    e.set_backtrace backtrace
-    raise e
+  rescue => ex
+    begin
+      context = %(asciidoctor: FAILED: #{attributes['docfile'] || '<stdin>'}: Failed to load AsciiDoc document, #{ex.message})
+      if ex.respond_to? :exception
+        # The original message must be explicitely preserved when wrapping a Ruby exception
+        wrapped_ex = ex.exception %(#{context} - #{ex.message})
+        # JRuby automatically sets backtrace, but not MRI
+        wrapped_ex.set_backtrace ex.backtrace
+      else
+        # Likely a Java exception class
+        wrapped_ex = ex.class.new context, ex
+        wrapped_ex.stack_trace = ex.stack_trace
+      end
+    rescue
+      wrapped_ex = ex
+    end
+    raise wrapped_ex
   end
 
   # Public: Parse the contents of the AsciiDoc source file into an Asciidoctor::Document
