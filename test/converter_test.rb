@@ -44,6 +44,19 @@ context 'Converter' do
       assert_nil selected.templates['paragraph'].options[:format]
     end
 
+    test 'should set safe mode of Slim AsciiDoc engine to match document safe mode when Slim >= 3' do
+      doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false, :safe => :unsafe
+      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      selected = doc.converter.find_converter('paragraph')
+      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
+      slim_asciidoc_opts = selected.instance_variable_get(:@engine_options)[:slim][:asciidoc]
+      if ::Slim::VERSION >= '3.0'
+        assert_equal({ :safe => Asciidoctor::SafeMode::UNSAFE }, slim_asciidoc_opts)
+      else
+        assert_nil slim_asciidoc_opts
+      end
+    end
+
     test 'should support custom template engine options for known engine' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false, :template_engine_options => { :slim => { :pretty => true } }
       assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
