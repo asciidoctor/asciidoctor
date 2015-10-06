@@ -4,26 +4,27 @@
 :idseparator: -
 :source-language: ruby
 :language: {source-language}
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 // URIs:
-:repo-uri: https://github.com/asciidoctor/asciidoctor
-:base-help-uri: https://help.github.com/articles
-:issues-uri: {repo-uri}/issues
-:fork-help-uri: {base-help-uri}/fork-a-repo
-:branch-help-uri: {fork-help-uri}#create-branches
-:pr-help-uri: {base-help-uri}/using-pull-requests
-:gist-uri: https://gist.github.com
+:uri-repo: https://github.com/asciidoctor/asciidoctor
+:uri-help-base: https://help.github.com/articles
+:uri-issues: {uri-repo}/issues
+:uri-fork-help: {uri-help-base}/fork-a-repo
+:uri-branch-help: {uri-fork-help}#create-branches
+:uri-pr-help: {uri-help-base}/using-pull-requests
+:uri-gist: https://gist.github.com
 
 == License Agreement
 
-By contributing changes to this repository, you agree to license your contributions under the MIT license.
-This ensures that your contributions have the same license as the project and that the community is free to use your contributions.
-You also assert that you are the original author of the work you are contributing unless otherwise stated.
+By contributing changes to this repository, you agree to license your contributions under the <<LICENSE#,MIT license>>.
+This ensures your contributions have the same license as the project and that the community is free to use your contributions.
+You also assert that you are the original author of the work that you are contributing unless otherwise stated.
 
 == Submitting an Issue
 
-We use the {issues-uri}[issue tracker on GitHub] associated with this project to track bugs and features.
+We use the {uri-issues}[issue tracker on GitHub] associated with this project to track bugs and features.
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted.
-When submitting a bug report, please include a {gist-uri}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
+When submitting a bug report, please include a {uri-gist}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
 
 Most importantly, since Asciidoctor is a text processor, reproducing most bugs requires that we have some snippet of text on which Asciidoctor exhibits the bad behavior.
 
@@ -31,9 +32,9 @@ An ideal bug report would include a pull request with failing specs.
 
 == Submitting a Pull Request
 
-. {fork-help-uri}[Fork the repository].
+. {uri-fork-help}[Fork the repository].
 . Run `bundle install` to install dependencies.
-. {branch-help-uri}[Create a topic branch].
+. {uri-branch-help}[Create a topic branch].
 . Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
 . Run `bundle exec rake` to run the tests.
 If your tests pass, return to step 3.
@@ -43,7 +44,7 @@ If your tests fail, return to step 5.
 . Add documentation for your feature or bug fix.
 . If your changes are not 100% documented, go back to step 7.
 . Add, commit, and push your changes.
-. {pr-help-uri}[Submit a pull request].
+. {uri-pr-help}[Submit a pull request].
 
 For ideas about how to use pull requests, see the post http://blog.quickpeople.co.uk/2013/07/10/useful-github-patterns[Useful GitHub Patterns].
 
@@ -126,6 +127,26 @@ You can also turn on verbose mode if you want to see more output:
 Once you are done with your test, make sure to remove `wip` from the description and run all the tests again using `rake`.
 
 We plan on switching to a more elegant testing framework in the future, such as RSpec or Cucumber, in order to make the tests more clear and robust.
+
+=== Running Asciidoctor in Development Mode
+
+Asciidoctor is designed so that you can run the script directly out of the cloned repository.
+Simply execute the `asciidoctor` command directly (referencing it either by relative or absolute path).
+There's no need to install it using the `gem` command first.
+
+For example, to convert the README file, switch to the root of the project and run:
+
+ $ ./bin/asciidoctor README.adoc
+
+IMPORTANT: You'll need to make sure you reference the correct relative path to the `asciidoctor` command.
+
+If you want to be able to execute the `asciidoctor` command from any directory without worrying about the relative (or absolute) path, you can setup the following Bash alias:
+
+ alias asciidoctor-dev="/path/to/asciidoctor/bin/asciidoctor"
+
+Now you can execute the `asciidoctor` command from any folder as follows:
+
+ $ asciidoctor-dev README.adoc
 
 == Supporting Additional Ruby Versions
 
