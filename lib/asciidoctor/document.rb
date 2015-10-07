@@ -537,13 +537,15 @@ class Document < AbstractBlock
     end
   end
 
-  def register(type, value)
+  def register(type, value, force = false)
     case type
     when :ids
-      if ::Array === value
-        @references[:ids][value[0]] = (value[1] || '[' + value[0] + ']')
+      id, reftext = [*value]
+      reftext ||= '[' + id + ']'
+      if force
+        @references[:ids][id] = reftext
       else
-        @references[:ids][value] = '[' + value + ']'
+        @references[:ids][id] ||= reftext
       end
     when :footnotes, :indexterms
       @references[type] << value

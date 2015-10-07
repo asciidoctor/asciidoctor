@@ -163,6 +163,42 @@ content
       refute_nil reftext
       assert_equal 'Install Procedure', reftext
     end
+
+    test 'should not overwrite existing id entry in references table' do
+      input = <<-EOS
+[#install]
+== First Install
+
+content
+
+[#install]
+== Second Install
+
+content
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['install']
+      refute_nil reftext
+      assert_equal 'First Install', reftext
+    end
+
+    test 'should not overwrite existing id entry with generated reftext in references table' do
+      input = <<-EOS
+[#install]
+== First Install
+
+content
+
+[#install]
+content
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['install']
+      refute_nil reftext
+      assert_equal 'First Install', reftext
+    end
   end
 
   context "document title (level 0)" do
