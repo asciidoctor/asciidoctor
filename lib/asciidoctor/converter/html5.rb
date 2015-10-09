@@ -270,6 +270,13 @@ MathJax.Hub.Config({
         end
       end
 
+      if (node.attr? 'toc') && !['macro', 'preamble'].include?(node.attr 'toc-placement')
+        result << %(<div id="toc" class="toc">
+<div id="toctitle">#{node.attr 'toc-title'}</div>
+#{outline node}
+</div>)
+      end
+
       result << node.content
 
       if node.footnotes? && !(node.attr? 'nofootnotes')
