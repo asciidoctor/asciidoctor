@@ -314,6 +314,7 @@ We encourage you to ask questions and discuss any aspects of the project on the 
 
 Mailing list:: {uri-discuss}
 Twitter (Chat):: #asciidoctor hashtag
+Gitter (Chat):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
 IRC (Chat):: {uri-irc}[#asciidoctor] on FreeNode IRC
 
 ifdef::env-github[]
