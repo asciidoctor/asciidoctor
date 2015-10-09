@@ -201,10 +201,11 @@ module Asciidoctor
           result << %(#{node.attr 'last-update-label'} #{node.attr 'docdatetime'})
         end
         result << '</div>'
-        unless (docinfo_content = node.docinfo :footer).empty?
-          result << docinfo_content
-        end
         result << '</div>'
+      end
+
+      unless (docinfo_content = node.docinfo :footer).empty?
+        result << docinfo_content
       end
       
       # Load Javascript at the end of body for performance
