@@ -2122,6 +2122,29 @@ They couldn't believe their eyes when...
       assert_css '#preamble:root .paragraph + #toc', output, 1
     end
 
+    test 'should render table of contents at default location in embedded document if toc attribute is set' do
+      input = <<-EOS
+= Article
+:showtitle:
+:toc:
+
+Once upon a time...
+
+== Section One
+
+It was a dark and stormy night...
+
+== Section Two
+
+They couldn't believe their eyes when...
+      EOS
+
+      output = render_string input, :header_footer => false
+      assert_css 'h1:root', output, 1
+      assert_css 'h1:root + #toc:root', output, 1
+      assert_css 'h1:root + #toc:root + #preamble:root', output, 1
+    end
+
     test 'should not activate toc macro if toc-placement is not set' do
       input = <<-EOS
 = Article
