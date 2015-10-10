@@ -579,6 +579,22 @@ d|9 2+>|10
       assert_xpath '/table/tbody/tr[3]/td[3]/p[text()="c"]', output, 1
     end
 
+    test 'ignores cell with colspan that exceeds colspec' do
+      input = <<-EOS
+[cols="1,1"]
+|===
+3+|A
+|B
+a|C
+
+more C
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table *', output, 0
+    end
+
     test 'paragraph, verse and literal content' do
       input = <<-EOS
 [cols=",^v,^l",options="header"]

@@ -473,7 +473,10 @@ class Table::ParserContext
         end
       else
         # QUESTION is this right for cells that span columns?
-        column = @table.columns[@current_row.size]
+        unless (column = @table.columns[@current_row.size])
+          warn %(asciidoctor: ERROR: #{@last_cursor.line_info}: dropping cell because it exceeds specified number of columns)
+          return
+        end
       end
 
       cell = Table::Cell.new(column, cell_text, cell_spec, @last_cursor)
