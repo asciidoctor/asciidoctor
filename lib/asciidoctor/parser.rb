@@ -2325,7 +2325,13 @@ class Parser
             end
           else
             if m.pre_match.end_with? '\\'
-              line = parser_ctx.skip_matched_delimiter(m, true)
+              # skip over escaped delimiter
+              # handle special case when end of line is reached (see issue #1306)
+              if (line = parser_ctx.skip_matched_delimiter(m, true)).empty?
+                parser_ctx.buffer = %(#{parser_ctx.buffer}#{EOL})
+                parser_ctx.keep_cell_open
+                break
+              end
               next
             end
           end
