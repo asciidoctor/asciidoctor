@@ -814,6 +814,16 @@ text
       assert_css 'meta[name="robots"]', output, 0
     end
 
+    test 'should include docinfo files in AsciiDoc format' do
+      sample_input_path = fixture_path('adocinfo.adoc')
+      output = Asciidoctor.convert_file sample_input_path, :to_file => false,
+          :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo' => '', 'nofooter' => '', 'linkcss' => '', 'uri-example' => 'http://example.org'}
+      assert !output.empty?
+      assert_xpath '//*[@class="paragraph"]/p[text()="main content"]', output, 1
+      assert_xpath '//*[@class="paragraph"]/p[text()="footer content"]', output, 1
+      assert_xpath '//a[@href="http://example.org"]', output, 1
+    end
+
     test 'should include docinfo files for docbook backend' do
       sample_input_path = fixture_path('basic.asciidoc')
 

@@ -377,7 +377,7 @@ class Document < AbstractBlock
 
       # don't need to do the extra processing within our own document
       # FIXME line info isn't reported correctly within include files in nested document
-      @reader = Reader.new data, options[:cursor]
+      @reader = options[:preprocess] ? (PreprocessorReader.new self, data, options[:cursor]) : (Reader.new data, options[:cursor])
 
       # Now parse the lines in the reader into blocks
       # Eagerly parse (for now) since a subdocument is not a publicly accessible object
@@ -1117,34 +1117,44 @@ class Document < AbstractBlock
     if safe >= SafeMode::SECURE
       ''
     else
-      qualifier = (location == :footer ? '-footer' : nil)
-      ext = @outfilesuffix unless ext
-      docinfodir = @attributes['docinfodir']
-
       content = nil
-
+      qualifier = (location == :footer ? '-footer' : nil)
+      out_ext = @outfilesuffix unless ext
+      adoc_ext = (@attributes.key? 'docfile') ? (::File.extname @attributes['docfile']) : '.adoc'
+      docinfodir = @attributes['docinfodir']
       docinfo = @attributes.key? 'docinfo'
       docinfo1 = @attributes.key? 'docinfo1'
       docinfo2 = @attributes.key? 'docinfo2'
-      docinfo_filename = %(docinfo#{qualifier}#{ext})
+      docinfo_filename = %(docinfo#{qualifier}#{out_ext})
       if docinfo1 || docinfo2
         docinfo_path = normalize_system_path(docinfo_filename, docinfodir)
-        # NOTE normalizing the lines is essential if we're performing substitutions
-        if (content = read_asset(docinfo_path, :normalize => true))
-          if (docinfosubs ||= resolve_docinfo_subs)
-            content = (docinfosubs == :attributes) ? sub_attributes(content) : apply_subs(content, docinfosubs)
+        if ::File.readable?(adocinfo_path = %(#{Helpers.rootname docinfo_path}#{adoc_ext}))
+          content = ::Asciidoctor.convert read_asset(adocinfo_path),
+              :parent => self, :preprocess => true, :cursor => Reader::Cursor.new(adocinfo_path, @base_dir)
+        else
+          # NOTE normalizing the lines is essential if we're performing substitutions
+          if (content = read_asset(docinfo_path, :normalize => true))
+            if (docinfosubs ||= resolve_docinfo_subs)
+              content = (docinfosubs == :attributes) ? sub_attributes(content) : apply_subs(content, docinfosubs)
+            end
           end
         end
       end
 
       if (docinfo || docinfo2) && @attributes.key?('docname')
         docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}), docinfodir)
-        # NOTE normalizing the lines is essential if we're performing substitutions
-        if (content2 = read_asset(docinfo_path, :normalize => true))
-          if (docinfosubs ||= resolve_docinfo_subs)
-            content2 = (docinfosubs == :attributes) ? sub_attributes(content2) : apply_subs(content2, docinfosubs)
-          end
+        if ::File.readable?(adocinfo_path = %(#{Helpers.rootname docinfo_path}#{adoc_ext}))
+          content2 = ::Asciidoctor.convert read_asset(adocinfo_path),
+              :parent => self, :preprocess => true, :cursor => Reader::Cursor.new(adocinfo_path, @base_dir)
           content = content ? %(#{content}#{EOL}#{content2}) : content2
+        else
+          # NOTE normalizing the lines is essential if we're performing substitutions
+          if (content2 = read_asset(docinfo_path, :normalize => true))
+            if (docinfosubs ||= resolve_docinfo_subs)
+              content2 = (docinfosubs == :attributes) ? sub_attributes(content2) : apply_subs(content2, docinfosubs)
+            end
+            content = content ? %(#{content}#{EOL}#{content2}) : content2
+          end
         end
       end
 
@@ -1153,8 +1163,6 @@ class Document < AbstractBlock
         contentx = @docinfo_processor_extensions[location].map {|candidate| candidate.process_method[self] }.compact * EOL
         content = content ? %(#{content}#{EOL}#{contentx}) : contentx
       end
-
-      # coerce to string (in case the value is nil)
       %(#{content})
     end
   end
