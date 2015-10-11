@@ -102,6 +102,28 @@ context 'Tables' do
       assert_xpath '/table/tbody/tr/td[2]/p[text()="a | there"]', output, 1
     end
 
+    test 'preserves escaped delimiters at the end of the line' do
+      input = <<-EOS
+[%header,cols="1,1"]
+|====
+|A |B\\|
+|A1 |B1\\|
+|A2 |B2\\|
+|====
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead > tr', output, 1
+      assert_css 'table > thead > tr:nth-child(1) > th', output, 2
+      assert_xpath '/table/thead/tr[1]/th[2][text()="B|"]', output, 1
+      assert_css 'table > tbody > tr', output, 2
+      assert_css 'table > tbody > tr:nth-child(1) > td', output, 2
+      assert_xpath '/table/tbody/tr[1]/td[2]/p[text()="B1|"]', output, 1
+      assert_css 'table > tbody > tr:nth-child(2) > td', output, 2
+      assert_xpath '/table/tbody/tr[2]/td[2]/p[text()="B2|"]', output, 1
+    end
+
     test 'should treat trailing pipe as an empty cell' do
       input = <<-EOS
 |====
