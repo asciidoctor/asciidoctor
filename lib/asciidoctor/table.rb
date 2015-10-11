@@ -73,7 +73,7 @@ class Table < AbstractBlock
     @rows = Rows.new
     @columns = []
 
-    @has_header_option = attributes.has_key? 'header-option'
+    @has_header_option = attributes.key? 'header-option'
 
     # smell like we need a utility method here
     # to resolve an integer width from potential bogus input
@@ -84,7 +84,7 @@ class Table < AbstractBlock
     end
     @attributes['tablepcwidth'] = pcwidth_intval
 
-    if @document.attributes.has_key? 'pagewidth'
+    if @document.attributes.key? 'pagewidth'
       @attributes['tableabswidth'] ||=
           ((@attributes['tablepcwidth'].to_f / 100) * @document.attributes['pagewidth']).round
     end
@@ -136,7 +136,7 @@ class Table < AbstractBlock
       @rows.head = [head]
     end
 
-    if num_body_rows > 0 && attributes.has_key?('footer-option')
+    if num_body_rows > 0 && attributes.key?('footer-option')
       @rows.foot = [@rows.body.pop]
     end
     
@@ -175,7 +175,7 @@ class Table::Column < AbstractNode
       width = even_width
     end
     @attributes['colpcwidth'] = width
-    if parent.attributes.has_key? 'tableabswidth'
+    if parent.attributes.key? 'tableabswidth'
       @attributes['colabswidth'] = ((width.to_f / 100) * parent.attributes['tableabswidth']).round
     end
 
@@ -215,8 +215,8 @@ class Table::Cell < AbstractNode
       @colspan = attributes.delete('colspan')
       @rowspan = attributes.delete('rowspan')
       # TODO eventualy remove the style attribute from the attributes hash
-      #@style = attributes.delete('style') if attributes.has_key? 'style'
-      @style = attributes['style'] if attributes.has_key? 'style'
+      #@style = attributes.delete('style') if attributes.key? 'style'
+      @style = attributes['style'] if attributes.key? 'style'
       update_attributes(attributes)
     end
     # only allow AsciiDoc cells in non-header rows
@@ -305,7 +305,7 @@ class Table::ParserContext
       @format = Table::DEFAULT_DATA_FORMAT
     end
 
-    @delimiter = if @format == 'psv' && !(attributes.has_key? 'separator') && table.document.nested?
+    @delimiter = if @format == 'psv' && !(attributes.key? 'separator') && table.document.nested?
       '!'
     else
       attributes['separator'] || Table::DEFAULT_DELIMITERS[@format]
@@ -437,13 +437,13 @@ class Table::ParserContext
     @buffer = ''
     if @format == 'psv'
       cell_spec = take_cell_spec
-      if cell_spec.nil?
-        warn "asciidoctor: ERROR: #{@last_cursor.line_info}: table missing leading separator, recovering automatically"
-        cell_spec = {}
-        repeat = 1
-      else
+      if cell_spec
         repeat = cell_spec.fetch('repeatcol', 1)
         cell_spec.delete('repeatcol')
+      else
+        warn %(asciidoctor: ERROR: #{@last_cursor.line_info}: table missing leading separator, recovering automatically)
+        cell_spec = {}
+        repeat = 1
       end
     else
       cell_spec = nil
@@ -466,14 +466,17 @@ class Table::ParserContext
       # make column resolving an operation
       if @col_count == -1
         @table.columns << (column = Table::Column.new(@table, @current_row.size + i - 1))
-        if cell_spec && (cell_spec.has_key? 'colspan') && (extra_cols = cell_spec['colspan'].to_i - 1) > 0
+        if cell_spec && (cell_spec.key? 'colspan') && (extra_cols = cell_spec['colspan'].to_i - 1) > 0
           extra_cols.times do |j|
             @table.columns << Table::Column.new(@table, @current_row.size + i + j - 1)
           end
         end
       else
         # QUESTION is this right for cells that span columns?
-        column = @table.columns[@current_row.size]
+        unless (column = @table.columns[@current_row.size])
+          warn %(asciidoctor: ERROR: #{@last_cursor.line_info}: dropping cell because it exceeds specified number of columns)
+          return
+        end
       end
 
       cell = Table::Cell.new(column, cell_text, cell_spec, @last_cursor)
