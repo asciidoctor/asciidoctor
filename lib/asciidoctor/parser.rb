@@ -643,7 +643,12 @@ class Parser
                 style = ORDERED_LIST_STYLES.detect{|s| OrderedListMarkerRxMap[s] =~ marker }
                 attributes['style'] = (style || ORDERED_LIST_STYLES[0]).to_s
               end
+
+              if (match[1] != '.')
+                attributes['start'] = enumerate_list_marker_offset(match[1], attributes['style'])
+              end
             end
+
             break
 
           elsif (match = DefinitionListRx.match(this_line))
@@ -1150,7 +1155,6 @@ class Parser
 
     while reader.has_more_lines? && (match = ListRxMap[list_type].match(reader.peek_line))
       marker = resolve_list_marker(list_type, match[1])
-
       # if we are moving to the next item, and the marker is different
       # determine if we are moving up or down in nesting
       if list_block.items? && marker != list_block.items[0].marker
@@ -2758,7 +2762,72 @@ class Parser
         result += digit
       end
     }
+    result
+  end
 
+  # Internal: Converts a ordered list marker to an integer value
+  #
+  # value - The marker to convert
+  #
+  # Returns the integer representation of this marker
+  #
+  # This is used to calculate the required value of the [start] attribute given the list marker
+  #
+  # Examples (with list_type omitted)
+  #
+  #   enumerate_list_marker_offset(2)
+  #   => 2
+  #
+  #   enumerate_list_marker_offset(c)
+  #   => 3
+  #
+  #   enumerate_list_marker_offset(Z)
+  #   => 26
+  #
+  #   enumerate_list_marker_offset(iv)
+  #   => 4
+  def self.enumerate_list_marker_offset(value,list_type)
+    value = value.chomp('.')
+    value = value.chomp(')')
+    list_type = list_type.to_s
+    case list_type
+    when ("upperroman" or "lowerroman")
+      result = roman_numeral_to_int(value)
+    when ("upperalpha" or "loweralpha")
+      result = alpha_to_int(value)
+    when "arabic"
+      result = value
+    else
+      warn %(asciidoctor: WARNING: list_type undetected for [start] offset)
+    end
+    result
+  end
+
+  # Internal: Converts a alphabetic character to an integer value.
+  #
+  # value - The character to convert
+  #
+  # Returns the integer for this character
+  #
+  # Examples
+  #
+  #   alpha_to_int(a)
+  #   => 1
+  #
+  #   alpha_to_int(z)
+  #   => 26
+  #
+  #   alpha_to_int(B)
+  #   => 2
+  def self.alpha_to_int(value)
+    asciiOffset = 'a'.ord - 1
+    value.downcase!
+    if value.length != 1
+      warn %(asciidoctor: WARNING: unexpected [start] offset from alpha list)
+      result = 1
+    else
+      result = value.ord - asciiOffset
+    end
     result
   end
 end

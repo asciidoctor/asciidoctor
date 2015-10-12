@@ -1738,6 +1738,18 @@ List
       assert_xpath '(//orderedlist)/listitem', output, 2
       assert_xpath '(//orderedlist)[@startingnumber = "7"]', output, 1
     end
+
+    test 'should offset ordered list to first marker' do
+      input = <<-EOS
+== List
+
+5. item 5
+6. item 6
+      EOS
+
+      output = render_string input
+      assert_xpath '//ol[@start = 5]', output, 1
+    end
   end
 end
 
