@@ -1472,8 +1472,6 @@ module Asciidoctor
     end
 
     doc = self.load input, options
-    # QUESTION should we restore_attributes eagerly?
-    #doc.restore_attributes
 
     if write_to_same_dir
       outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
