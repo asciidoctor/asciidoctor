@@ -312,6 +312,19 @@ content
       assert_equal 'baz', (node.attr 'foo')
     end
 
+    test 'set_attr should set header attribute in loaded document' do
+      input = <<-EOS
+:uri: http://example.org
+
+{uri}
+      EOS
+
+      doc = Asciidoctor.load input, :attributes => { 'uri' => 'https://github.com' }
+      doc.set_attr 'uri', 'https://google.com'
+      output = doc.convert
+      assert_xpath '//a[@href="https://google.com"]', output, 1
+    end
+
     test 'verify toc attribute matrix' do
       expected_data = <<-EOS
 #attributes                               |toc|toc-position|toc-placement|toc-class
