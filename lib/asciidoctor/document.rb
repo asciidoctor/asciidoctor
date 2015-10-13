@@ -383,8 +383,8 @@ class Document < AbstractBlock
       # Eagerly parse (for now) since a subdocument is not a publicly accessible object
       Parser.parse @reader, self
 
-      # should we call rewind in some sort of post-parse function?
-      @callouts.rewind
+      # should we call some sort of post-parse function?
+      restore_attributes
       @parsed = true
     else
       # setup default backend and doctype
@@ -468,8 +468,8 @@ class Document < AbstractBlock
       # Now parse the lines in the reader into blocks
       Parser.parse @reader, doc, :header_only => !!@options[:parse_header_only]
 
-      # should we call rewind in some sort of post-parse function?
-      @callouts.rewind
+      # should we call sort of post-parse function?
+      restore_attributes
 
       if exts && exts.treeprocessors?
         exts.treeprocessors.each do |ext|
@@ -778,7 +778,7 @@ class Document < AbstractBlock
     # NOTE pin the outfilesuffix after the header is parsed
     @outfilesuffix = attrs['outfilesuffix']
 
-    @original_attributes = attrs.dup
+    @header_attributes = attrs.dup
 
     # unfreeze "flexible" attributes
     unless nested?
@@ -792,12 +792,13 @@ class Document < AbstractBlock
     end
   end
 
-  # Internal: Restore the attributes to the previously saved state
+  # Internal: Restore the attributes to the previously saved state (attributes in header)
   #--
   # QUESTION should we restore attributes after parse?
   def restore_attributes
+    @callouts.rewind
     # QUESTION shouldn't this be a dup in case we convert again?
-    @attributes = @original_attributes
+    @attributes = @header_attributes
   end
 
   # Internal: Delete any attributes stored for playback
@@ -1020,7 +1021,6 @@ class Document < AbstractBlock
   # using the appropriate built-in template.
   def convert opts = {}
     parse unless @parsed
-    restore_attributes
     unless @safe >= SafeMode::SERVER || opts.empty?
       # QUESTION should we store these on the Document object?
       @attributes.delete 'outfile' unless (@attributes['outfile'] = opts['outfile'])
