@@ -95,6 +95,10 @@ class File
     true
   end
   
+  def self.readable?(path)
+    true
+  end
+
   def self.read(path)
     case JAVASCRIPT_PLATFORM
     when 'node'
@@ -142,4 +146,13 @@ class File
       ''
     end
   end
+
+end
+
+class IO
+
+  def self.read(path)
+    File.read(path)
+  end
+
 end
