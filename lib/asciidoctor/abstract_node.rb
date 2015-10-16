@@ -221,6 +221,21 @@ class AbstractNode
     end
   end
 
+  # Public: A convenience method that adds the given role directly to this node
+  def add_role(name)
+    unless (roles = (@attributes['role'] || '').split(' ')).include? name
+      @attributes['role'] = roles.push(name) * ' '
+    end
+  end
+
+  # Public: A convenience method that removes the given role directly from this node
+  def remove_role(name)
+    if (roles = (@attributes['role'] || '').split(' ')).include? name
+      roles.delete name
+      @attributes['role'] = roles * ' '
+    end
+  end
+
   # Public: A convenience method that checks if the reftext attribute is specified
   def reftext?
     @attributes.has_key?('reftext') || @document.attributes.has_key?('reftext')
