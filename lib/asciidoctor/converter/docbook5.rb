@@ -680,8 +680,8 @@ module Asciidoctor
           result << %(</revision>
 </revhistory>)
         end
-        unless (header_docinfo = doc.docinfo :header).empty?
-          result << header_docinfo
+        unless (head_docinfo = doc.docinfo).empty?
+          result << head_docinfo
         end
         result << %(<orgname>#{doc.attr 'orgname'}</orgname>) if doc.attr? 'orgname'
       end

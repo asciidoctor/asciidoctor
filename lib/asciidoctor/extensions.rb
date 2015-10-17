@@ -258,7 +258,7 @@ module Extensions
 
     def initialize config = {}
       super config
-      @config[:location] ||= :header
+      @config[:location] ||= :head
     end
 
     def process document
@@ -796,7 +796,7 @@ module Extensions
 
     # Public: Checks whether any {DocinfoProcessor} extensions have been registered.
     #
-    # location - A Symbol for selecting docinfo extensions at a given location (:header or :footer) (default: nil)
+    # location - A Symbol for selecting docinfo extensions at a given location (:head or :footer) (default: nil)
     #
     # Returns a [Boolean] indicating whether any DocinfoProcessor extensions are registered.
     def docinfo_processors? location = nil
@@ -814,7 +814,7 @@ module Extensions
     # Public: Retrieves the {Extension} proxy objects for all the
     # DocinfoProcessor instances stored in this registry.
     #
-    # location - A Symbol for selecting docinfo extensions at a given location (:header or :footer) (default: nil)
+    # location - A Symbol for selecting docinfo extensions at a given location (:head or :footer) (default: nil)
     #
     # Returns an [Array] of Extension proxy objects.
     def docinfo_processors location = nil
