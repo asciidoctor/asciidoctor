@@ -671,7 +671,9 @@ module Asciidoctor
       result = []
       result << %(<#{info_tag_prefix}info>)
       result << document_title_tags(doc.doctitle :partition => true, :use_fallback => true) unless doc.notitle
-      result << %(<date>#{(doc.attr? 'revdate') ? (doc.attr 'revdate') : (doc.attr 'docdate')}</date>)
+      if (date = (doc.attr? 'revdate') ? (doc.attr 'revdate') : ((doc.attr? 'reproducible') ? nil : (doc.attr 'docdate')))
+        result << %(<date>#{date}</date>)
+      end
       if doc.has_header?
         if doc.attr? 'author'
           if (authorcount = (doc.attr 'authorcount').to_i) < 2

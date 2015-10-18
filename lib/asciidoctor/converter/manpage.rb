@@ -67,15 +67,16 @@ module Asciidoctor
       mantitle = node.attr 'mantitle'
       manvolnum = node.attr 'manvolnum', '1'
       manname = node.attr 'manname', mantitle
+      docdate = (node.attr? 'reproducible') ? nil : (node.attr 'docdate')
       result = [%('\\" t
 .\\"     Title: #{mantitle}
 .\\"    Author: #{(node.attr? 'authors') ? (node.attr 'authors') : '[see the "AUTHORS" section]'}
-.\\" Generator: Asciidoctor #{node.attr 'asciidoctor-version'}
-.\\"      Date: #{docdate = node.attr 'docdate'}
-.\\"    Manual: #{(manual = node.attr 'manmanual') || '\ \&'}
+.\\" Generator: Asciidoctor #{node.attr 'asciidoctor-version'})]
+      result << %(.\\"      Date: #{docdate}) if docdate
+      result << %(.\\"    Manual: #{(manual = node.attr 'manmanual') || '\ \&'}
 .\\"    Source: #{(source = node.attr 'mansource') || '\ \&'}
 .\\"  Language: English
-.\\")]
+.\\")
       # TODO add document-level setting to disable capitalization of manname
       result << %(.TH "#{manify manname.upcase}" "#{manvolnum}" "#{docdate}" "#{source ? (manify source) : '\ \&'}" "#{manual ? (manify manual) : '\ \&'}")
       # define portability settings

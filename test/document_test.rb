@@ -261,6 +261,30 @@ preamble
       assert doc.attributes.has_key?('toc')
     end
 
+    test 'should output timestamps by default' do
+      doc = document_from_string 'text', :backend => :html5, :attributes => nil
+      result = doc.convert
+      assert doc.attr?('docdate')
+      refute doc.attr? 'reproducible'
+      assert_xpath '//div[@id="footer-text" and contains(string(.//text()), "Last updated")]', result, 1
+    end
+
+    test 'should not output timestamps if reproducible attribute is set in HTML 5' do
+      doc = document_from_string 'text', :backend => :html5, :attributes => { 'reproducible' => '' }
+      result = doc.convert
+      assert doc.attr?('docdate')
+      assert doc.attr?('reproducible')
+      assert_xpath '//div[@id="footer-text" and contains(string(.//text()), "Last updated")]', result, 0
+    end
+
+    test 'should not output timestamps if reproducible attribute is set in DocBook' do
+      doc = document_from_string 'text', :backend => :docbook, :attributes => { 'reproducible' => '' }
+      result = doc.convert
+      assert doc.attr?('docdate')
+      assert doc.attr?('reproducible')
+      assert_xpath '/article/info/date', result, 0
+    end
+
     test 'should not modify options argument' do
       options = {
         :safe => Asciidoctor::SafeMode::SAFE
