@@ -8,11 +8,7 @@ RUBY_MIN_VERSION_2 = (RUBY_VERSION >= '2')
 require 'set'
 
 # NOTE RUBY_ENGINE == 'opal' conditional blocks are filtered by the Opal preprocessor
-if RUBY_ENGINE == 'opal'
-  require 'encoding' # needed for String.bytes method
-  require 'strscan'
-  require 'asciidoctor/opal_ext'
-else
+unless RUBY_ENGINE == 'opal'
   autoload :Base64, 'base64'
   autoload :FileUtils, 'fileutils'
   autoload :OpenURI, 'open-uri'
