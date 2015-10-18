@@ -1113,7 +1113,7 @@ class Document < AbstractBlock
   #            will be determined based on the basebackend. (default: nil)
   #
   # returns The contents of the docinfo file(s)
-  def docinfo(location = :header, ext = nil)
+  def docinfo(location = :head, ext = nil)
     if safe >= SafeMode::SECURE
       ''
     else
@@ -1123,28 +1123,39 @@ class Document < AbstractBlock
 
       content = nil
 
-      docinfo = @attributes.key? 'docinfo'
-      docinfo1 = @attributes.key? 'docinfo1'
-      docinfo2 = @attributes.key? 'docinfo2'
-      docinfo_filename = %(docinfo#{qualifier}#{ext})
-      if docinfo1 || docinfo2
-        docinfo_path = normalize_system_path(docinfo_filename, docinfodir)
-        # NOTE normalizing the lines is essential if we're performing substitutions
-        if (content = read_asset(docinfo_path, :normalize => true))
-          if (docinfosubs ||= resolve_docinfo_subs)
-            content = (docinfosubs == :attributes) ? sub_attributes(content) : apply_subs(content, docinfosubs)
-          end
+      if (docinfo = @attributes['docinfo']).nil_or_empty?
+        if @attributes.key? 'docinfo2'
+          docinfo = ['private', 'shared']
+        elsif @attributes.key? 'docinfo1'
+          docinfo = ['shared']
+        else
+          docinfo = docinfo ? ['private'] : nil
         end
+      else
+        docinfo = docinfo.split(',').map(&:strip)
       end
 
-      if (docinfo || docinfo2) && @attributes.key?('docname')
-        docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}), docinfodir)
-        # NOTE normalizing the lines is essential if we're performing substitutions
-        if (content2 = read_asset(docinfo_path, :normalize => true))
-          if (docinfosubs ||= resolve_docinfo_subs)
-            content2 = (docinfosubs == :attributes) ? sub_attributes(content2) : apply_subs(content2, docinfosubs)
+      if docinfo
+        docinfo_filename = %(docinfo#{qualifier}#{ext})
+        unless (docinfo & ['shared', %(shared-#{location})]).empty?
+          docinfo_path = normalize_system_path(docinfo_filename, docinfodir)
+          # NOTE normalizing the lines is essential if we're performing substitutions
+          if (content = read_asset(docinfo_path, :normalize => true))
+            if (docinfosubs ||= resolve_docinfo_subs)
+              content = (docinfosubs == :attributes) ? sub_attributes(content) : apply_subs(content, docinfosubs)
+            end
           end
-          content = content ? %(#{content}#{EOL}#{content2}) : content2
+        end
+
+        unless @attributes['docname'].nil_or_empty? || (docinfo & ['private', %(private-#{location})]).empty?
+          docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}), docinfodir)
+          # NOTE normalizing the lines is essential if we're performing substitutions
+          if (content2 = read_asset(docinfo_path, :normalize => true))
+            if (docinfosubs ||= resolve_docinfo_subs)
+              content2 = (docinfosubs == :attributes) ? sub_attributes(content2) : apply_subs(content2, docinfosubs)
+            end
+            content = content ? %(#{content}#{EOL}#{content2}) : content2
+          end
         end
       end
 
@@ -1168,7 +1179,7 @@ class Document < AbstractBlock
     end
   end
 
-  def docinfo_processors?(location = :header)
+  def docinfo_processors?(location = :head)
     if @docinfo_processor_extensions.key?(location)
       # false means we already performed a lookup and didn't find any
       @docinfo_processor_extensions[location] != false
