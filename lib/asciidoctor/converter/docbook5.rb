@@ -256,8 +256,8 @@ module Asciidoctor
       if node.style == 'latexmath'
         equation_data = %(<alt><![CDATA[#{equation}]]></alt>
 <mediaobject><textobject><phrase></phrase></textobject></mediaobject>)
-      elsif node.style == 'asciimath' && (!(defined? @asciimath_loaded) ?
-          (@asciimath_loaded = Helpers.require_library 'asciimath', true, :warn) : @asciimath_loaded)
+      elsif node.style == 'asciimath' && ((defined? ::AsciiMath) || (!(defined? @asciimath_loaded) ?
+          (@asciimath_loaded = Helpers.require_library 'asciimath', true, :warn) : @asciimath_loaded))
         equation_data = ::AsciiMath.parse(equation).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML'
       else
         # Unsupported math style, so output raw expression in text object
