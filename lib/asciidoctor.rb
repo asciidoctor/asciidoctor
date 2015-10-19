@@ -8,7 +8,10 @@ RUBY_MIN_VERSION_2 = (RUBY_VERSION >= '2')
 require 'set'
 
 # NOTE RUBY_ENGINE == 'opal' conditional blocks are filtered by the Opal preprocessor
-unless RUBY_ENGINE == 'opal'
+if RUBY_ENGINE == 'opal'
+  # NOTE asciidoctor/opal_ext is supplied by the Asciidoctor.js build
+  require 'asciidoctor/opal_ext'
+else
   autoload :Base64, 'base64'
   autoload :FileUtils, 'fileutils'
   autoload :OpenURI, 'open-uri'
