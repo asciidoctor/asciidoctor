@@ -1050,13 +1050,13 @@ Your browser does not support the video tag.
     def inline_footnote node
       if (index = node.attr 'index')
         if node.type == :xref
-          %(<span class="footnoteref">[<a class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
+          %(<sup class="footnoteref">[<a class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</sup>)
         else
           id_attr = node.id ? %( id="_footnote_#{node.id}") : nil
-          %(<span class="footnote"#{id_attr}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</span>)
+          %(<sup class="footnote"#{id_attr}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</sup>)
         end
       elsif node.type == :xref
-        %(<span class="footnoteref red" title="Unresolved footnote reference.">[#{node.text}]</span>)
+        %(<sup class="footnoteref red" title="Unresolved footnote reference.">[#{node.text}]</sup>)
       end
     end
 
