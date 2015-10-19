@@ -1285,11 +1285,9 @@ x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
 ++++
       EOS
 
-      expect = <<-'EOS'
-<informalequation>
-<mediaobject><textobject><phrase><![CDATA[x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)]]></phrase></textobject></mediaobject>
-</informalequation>
-      EOS
+      expect = %(<informalequation>
+<mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:mfrac><mml:mi>b</mml:mi><mml:mrow><mml:mn>2</mml:mn><mml:mi>a</mml:mi></mml:mrow></mml:mfrac><mml:mo>&#x003C;</mml:mo><mml:mo>&#x00B1;</mml:mo><mml:msqrt><mml:mrow><mml:mfrac><mml:msup><mml:mi>b</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mrow><mml:mn>4</mml:mn><mml:msup><mml:mi>a</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:mrow></mml:mfrac><mml:mo>&#x2212;</mml:mo><mml:mfrac><mml:mi>c</mml:mi><mml:mi>a</mml:mi></mml:mfrac></mml:mrow></mml:msqrt></mml:math>
+</informalequation>)
 
       output = render_embedded_string input, :backend => :docbook
       assert_equal expect.strip, output.strip
