@@ -39,7 +39,7 @@ module Asciidoctor
     rescue ::LoadError
       @caches = { :scans => {}, :templates => {} }
       # FIXME perhaps only warn if the cache option is enabled?
-      warn 'asciidoctor: WARNING: gem \'thread_safe\' is not installed. This gem recommended when using custom backend templates.'
+      warn 'asciidoctor: WARNING: gem \'thread_safe\' is not installed. This gem is recommended when using custom backend templates.'
     end
 
     def self.caches
