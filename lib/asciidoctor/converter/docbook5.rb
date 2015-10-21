@@ -83,7 +83,7 @@ module Asciidoctor
       result * EOL
     end
 
-    DLIST_TAGS = {
+    (DLIST_TAGS = {
       'labeled' => {
         :list  => 'variablelist',
         :entry => 'varlistentry',
@@ -103,8 +103,7 @@ module Asciidoctor
         :term  => 'glossterm',
         :item  => 'glossdef'
       }
-    }
-    DLIST_TAGS.default = DLIST_TAGS['labeled']
+    }).default = DLIST_TAGS['labeled']
 
     def dlist node
       result = []
@@ -588,7 +587,7 @@ module Asciidoctor
       end
     end
 
-    QUOTE_TAGS = {
+    (QUOTE_TAGS = {
       :emphasis    => ['<emphasis>',               '</emphasis>',    true],
       :strong      => ['<emphasis role="strong">', '</emphasis>',    true],
       :monospaced  => ['<literal>',                '</literal>',     false],
@@ -597,8 +596,7 @@ module Asciidoctor
       :double      => ['&#8220;',                  '&#8221;',        true],
       :single      => ['&#8216;',                  '&#8217;',        true],
       :mark        => ['<emphasis role="marked">', '</emphasis>',    false]
-    }
-    QUOTE_TAGS.default = [nil, nil, true]
+    }).default = [nil, nil, true]
 
     def inline_quoted node
       if (type = node.type) == :latexmath

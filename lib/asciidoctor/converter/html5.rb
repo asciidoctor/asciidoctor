@@ -3,7 +3,7 @@ module Asciidoctor
   # A built-in {Converter} implementation that generates HTML 5 output
   # consistent with the html5 backend from AsciiDoc Python.
   class Converter::Html5Converter < Converter::BuiltIn
-    QUOTE_TAGS = {
+    (QUOTE_TAGS = {
       :emphasis    => ['<em>',     '</em>',     true],
       :strong      => ['<strong>', '</strong>', true],
       :monospaced  => ['<code>',   '</code>',   true],
@@ -17,8 +17,7 @@ module Asciidoctor
       # Opal can't resolve these constants when referenced here
       #:asciimath   => INLINE_MATH_DELIMITERS[:asciimath] + [false],
       #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
-    }
-    QUOTE_TAGS.default = [nil, nil, nil]
+    }).default = [nil, nil, nil]
 
     def initialize backend, opts = {}
       @xml_mode = opts[:htmlsyntax] == 'xml'
