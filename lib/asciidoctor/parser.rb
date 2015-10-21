@@ -2820,13 +2820,26 @@ class Parser
   #   alpha_to_int(B)
   #   => 2
   def self.alpha_to_int(value)
-    asciiOffset = 'a'.ord - 1
+
+    # If we have a Ruby version (such as 1.8.7) that does not have .ord for String, use string[0]. 
+    if "".respond_to?(:ord)
+      asciiOffset = 'a'.ord - 1
+    else
+      asciiOffset =  'a'[0] - 1
+    end
+
+    puts asciiOffset
+    
     value.downcase!
     if value.length != 1
       warn %(asciidoctor: WARNING: unexpected [start] offset from alpha list)
       result = 1
     else
-      result = value.ord - asciiOffset
+      if "".respond_to?(:ord) 
+        result = value.ord - asciiOffset
+      else
+        result = value[0] - asciiOffset
+      end
     end
     result
   end
