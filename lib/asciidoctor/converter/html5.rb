@@ -190,15 +190,12 @@ module Asciidoctor
         end
         result << '</div>'
       end
+
       unless node.nofooter
         result << '<div id="footer">'
         result << '<div id="footer-text">'
-        if node.attr? 'revnumber'
-          result << %(#{node.attr 'version-label'} #{node.attr 'revnumber'}#{br})
-        end
-        if node.attr? 'last-update-label'
-          result << %(#{node.attr 'last-update-label'} #{node.attr 'docdatetime'})
-        end
+        result << %(#{node.attr 'version-label'} #{node.attr 'revnumber'}#{br}) if node.attr? 'revnumber'
+        result << %(#{node.attr 'last-update-label'} #{node.attr 'docdatetime'}) if node.attr? 'last-update-label'
         result << '</div>'
         result << '</div>'
       end
