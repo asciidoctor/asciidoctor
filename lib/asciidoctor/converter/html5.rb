@@ -176,19 +176,14 @@ module Asciidoctor
         result << '</div>'
       end
 
-      result << %(<div id="content">
-#{node.content}
-</div>)
+      content_idx = result.length
+      result << nil
 
-      if node.footnotes? && !(node.attr? 'nofootnotes')
-        result << %(<div id="footnotes">
-<hr#{slash}>)
-        node.footnotes.each do |footnote|
-          result << %(<div class="footnote" id="_footnote_#{footnote.index}">
-<a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a>. #{footnote.text}
-</div>)
-        end
-        result << '</div>'
+      if node.attr? 'nofootnotes'
+        footnotes_idx = nil
+      else
+        footnotes_idx = result.length
+        result << nil
       end
 
       unless node.nofooter
@@ -243,6 +238,28 @@ MathJax.Hub.Config({
 
       result << '</body>'
       result << '</html>'
+
+      result[content_idx] = %(<div id="content">
+#{node.content}
+</div>)
+
+      if footnotes_idx
+        if node.footnotes?
+          footnotes = []
+          footnotes << %(<div id="footnotes">
+<hr#{slash}>)
+          node.footnotes.each do |footnote|
+            footnotes << %(<div class="footnote" id="_footnote_#{footnote.index}">
+<a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a>. #{footnote.text}
+</div>)
+          end
+          footnotes << '</div>'
+          result[footnotes_idx] = footnotes * EOL
+        else
+          result.delete_at footnotes_idx
+        end
+      end
+
       result * EOL
     end
 
@@ -273,9 +290,11 @@ MathJax.Hub.Config({
 </div>)
       end
 
+      show_footnotes = !(node.attr? 'nofootnotes')
+
       result << node.content
 
-      if node.footnotes? && !(node.attr? 'nofootnotes')
+      if show_footnotes && node.footnotes?
         result << %(<div id="footnotes">
 <hr#{@void_element_slash}>)
         node.footnotes.each do |footnote|
@@ -283,7 +302,6 @@ MathJax.Hub.Config({
 <a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a> #{footnote.text}
 </div>)
         end
-
         result << '</div>'
       end
 

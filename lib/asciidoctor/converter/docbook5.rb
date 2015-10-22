@@ -30,12 +30,21 @@ module Asciidoctor
       lang_attribute = (node.attr? 'nolang') ? nil : %( #{lang_attribute_name}="#{node.attr 'lang', 'en'}")
       result << %(<#{root_tag_name}#{document_ns_attributes node}#{lang_attribute}>)
       result << (document_info_element node, root_tag_name)
-      result << node.content if node.blocks?
+      if node.blocks?
+        content_idx = result.length
+        result << nil
+      else
+        content_idx = nil
+      end
       unless (footer_docinfo = node.docinfo :footer).empty?
         result << footer_docinfo
       end
       result << %(</#{root_tag_name}>)
-
+      if content_idx
+        result[content_idx] = node.content
+      else
+        result.delete_at content_idx
+      end
       result * EOL
     end
 

@@ -1418,6 +1418,21 @@ content
       assert_xpath '//*[@id="footer"]', result, 0
     end
 
+    test 'attributes defined outside of header do not affect footer' do
+      input = <<-EOS
+content
+
+:nofooter:
+:last-update-label: Last modified
+
+more content
+      EOS
+
+      result = render_string input
+      assert_xpath '//*[@id="footer"]', result, 1
+      assert_xpath '//*[@id="footer-text"][starts-with(normalize-space(text()), "Last updated ")]', result, 1
+    end
+
     test 'can disable last updated in footer' do
       doc = document_from_string "= Document Title\n\npreamble", :attributes => {'last-update-label!' => ''}
       result = doc.render
