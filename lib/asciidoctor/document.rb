@@ -793,8 +793,6 @@ class Document < AbstractBlock
   end
 
   # Internal: Restore the attributes to the previously saved state (attributes in header)
-  #--
-  # QUESTION should we restore attributes after parse?
   def restore_attributes
     @callouts.rewind
     # QUESTION shouldn't this be a dup in case we convert again?
@@ -1019,6 +1017,8 @@ class Document < AbstractBlock
   # loaded by the Converter. If a :template_dir is not specified,
   # or a template is missing, the converter will fall back to
   # using the appropriate built-in template.
+  #--
+  # QUESTION should we dup @header_attributes before converting?
   def convert opts = {}
     parse unless @parsed
     unless @safe >= SafeMode::SERVER || opts.empty?
