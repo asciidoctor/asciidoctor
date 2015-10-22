@@ -1407,6 +1407,17 @@ content
       assert_xpath '//*[@id="content"]', result, 1
     end
 
+    test 'does not render footer if nofooter is set' do
+      input = <<-EOS
+:nofooter:
+
+content
+      EOS
+
+      result = render_string input
+      assert_xpath '//*[@id="footer"]', result, 0
+    end
+
     test 'can disable last updated in footer' do
       doc = document_from_string "= Document Title\n\npreamble", :attributes => {'last-update-label!' => ''}
       result = doc.render
