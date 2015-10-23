@@ -438,7 +438,7 @@ class Reader
       break_on_blank_lines = options[:break_on_blank_lines]
       break_on_list_continuation = options[:break_on_list_continuation]
     end
-    skip_line_comments = options[:skip_line_comments]
+    skip_comments = options[:skip_line_comments]
     line_read = false
     line_restored = false
     
@@ -466,7 +466,7 @@ class Reader
           line_restored = true
         end
       else
-        unless skip_line_comments && line.start_with?('//') && CommentLineRx =~ line
+        unless skip_comments && line.start_with?('//') && CommentLineRx =~ line
           result << line
           line_read = true
         end

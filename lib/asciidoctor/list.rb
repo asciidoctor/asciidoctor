@@ -5,15 +5,13 @@ class List < AbstractBlock
 
   # Public: Create alias for blocks
   alias :items :blocks
+  # Public: Get the items in this list as an Array
+  alias :content :blocks
+  # Public: Create alias to check if this list has blocks
   alias :items? :blocks?
 
   def initialize parent, context
     super
-  end
-
-  # Public: Get the items in this list as an Array
-  def content
-    @blocks
   end
 
   def convert
@@ -71,7 +69,7 @@ class ListItem < AbstractBlock
   #
   # Returns nothing
   def fold_first(continuation_connects_first_block = false, content_adjacent = false)
-    if (first_block = @blocks[0]) && first_block.is_a?(Block) &&
+    if (first_block = @blocks[0]) && Block === first_block &&
         ((first_block.context == :paragraph && !continuation_connects_first_block) ||
         ((content_adjacent || !continuation_connects_first_block) && first_block.context == :literal &&
             first_block.option?('listparagraph')))
