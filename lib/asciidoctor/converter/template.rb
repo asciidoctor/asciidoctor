@@ -101,7 +101,8 @@ module Asciidoctor
       engine = @engine
       @template_dirs.each do |template_dir|
         # FIXME need to think about safe mode restrictions here
-        template_dir = path_resolver.system_path template_dir, nil
+        next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir, nil))
+
         # NOTE last matching template wins for template name if no engine is given
         file_pattern = '*'
         if engine
