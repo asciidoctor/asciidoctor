@@ -38,7 +38,7 @@ module Asciidoctor
       @caches = { :scans => ::ThreadSafe::Cache.new, :templates => ::ThreadSafe::Cache.new }
     rescue ::LoadError
       @caches = { :scans => {}, :templates => {} }
-      # FIXME perhaps only warn if the cache option is enabled?
+      # FIXME perhaps only warn if the cache option is enabled (meaning not disabled)?
       warn 'asciidoctor: WARNING: gem \'thread_safe\' is not installed. This gem is recommended when using custom backend templates.'
     end
 
@@ -52,6 +52,7 @@ module Asciidoctor
     end
 
     def initialize backend, template_dirs, opts = {}
+      Helpers.require_library 'tilt' unless defined? ::Tilt
       @backend = backend
       @templates = {}
       @template_dirs = template_dirs
@@ -181,11 +182,8 @@ module Asciidoctor
         raise %(Could not find a custom template to handle transform: #{template_name})
       end
 
-      # Slim doesn't include helpers in the template's execution scope such as
-      # HAML, so we must do it ourselves.
-      if (defined? ::Slim::Helpers) && (template.is_a? ::Slim::Template)
-        node.extend ::Slim::Helpers
-      end
+      # Slim doesn't include helpers in the template's execution scope (like HAML), so do it ourselves
+      node.extend ::Slim::Helpers if (defined? ::Slim::Helpers) && (::Slim::Template === template)
 
       # NOTE opts become locals in the template
       if template_name == 'document'
@@ -260,9 +258,7 @@ module Asciidoctor
             end
           end
           # load include plugin when using Slim >= 2.1
-          unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
-            Helpers.require_library 'slim/include', false
-          end
+          require 'slim/include' unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
         elsif ext_name == 'erb'
           template_class, extra_engine_options = (eruby_loaded ||= load_eruby(@eruby))
         end
