@@ -1880,6 +1880,39 @@ term2::
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
+    test "multi-line elements with indented paragraph content that includes comment lines" do
+      input = <<-EOS
+term1::
+ def1
+// comment
+term2::
+  def2
+// comment
+  def2 continued
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//dl', output, 1
+      assert_xpath '//dl/dt', output, 2
+      assert_xpath '//dl/dt/following-sibling::dd', output, 2
+      assert_xpath '(//dl/dt)[1][normalize-space(text()) = "term1"]', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "def1"]', output, 1
+      assert_xpath '(//dl/dt)[2][normalize-space(text()) = "term2"]', output, 1
+      assert_xpath %((//dl/dt)[2]/following-sibling::dd/p[text() = "def2\ndef2 continued"]), output, 1
+    end
+
+    test "should not strip comment line in literal paragraph block attached to list item" do
+      input = <<-EOS
+term1::
++
+ line 1
+// not a comment
+ line 3
+      EOS
+      output = render_embedded_string input
+      assert_xpath '//*[@class="literalblock"]', output, 1
+      assert_xpath %(//*[@class="literalblock"]//pre[text()=" line 1\n// not a comment\n line 3"]), output, 1
+    end
+
     test 'multi-line element with paragraph starting with multiple dashes should not be seen as list' do
       input = <<-EOS
 term1::

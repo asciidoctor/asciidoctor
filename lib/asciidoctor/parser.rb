@@ -704,7 +704,7 @@ class Parser
           if style != 'normal' && LiteralParagraphRx =~ this_line
             # So we need to actually include this one in the read_lines group
             reader.unshift_line this_line
-            lines = read_paragraph_lines reader, break_at_list
+            lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => text_only
 
             adjust_indentation! lines
 
