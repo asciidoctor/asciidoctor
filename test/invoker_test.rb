@@ -48,7 +48,6 @@ context 'Invoker' do
 
   test 'should allow docdate and doctime to be overridden' do
     sample_filepath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.asciidoc'))
-    sample_filedir = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures'))
     invoker = invoke_cli_to_buffer %w(-o /dev/null -a docdate=2015-01-01 -a doctime=10:00:00-07:00), sample_filepath
     doc = invoker.document
     assert doc.attr?('docdate', '2015-01-01')

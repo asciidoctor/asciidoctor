@@ -1561,6 +1561,42 @@ content
       assert_equal 'xml', (doc.attr 'htmlsyntax')
     end
 
+    test 'honor htmlsyntax attribute passed via API if backend is html' do
+      input = <<-EOS
+---
+      EOS
+      doc = document_from_string input, :safe => :safe, :attributes => { 'htmlsyntax' => 'xml' }
+      assert_equal 'html5', doc.backend
+      assert_equal 'xml', (doc.attr 'htmlsyntax')
+      result = doc.convert :header_footer => false
+      assert_equal '<hr/>', result
+    end
+
+    test 'honor htmlsyntax attribute in document header if followed by backend attribute' do
+      input = <<-EOS
+:htmlsyntax: xml
+:backend: html5
+
+---
+      EOS
+      doc = document_from_string input, :safe => :safe
+      assert_equal 'html5', doc.backend
+      assert_equal 'xml', (doc.attr 'htmlsyntax')
+      result = doc.convert :header_footer => false
+      assert_equal '<hr/>', result
+    end
+
+    test 'does not honor htmlsyntax attribute in document header if not followed by backend attribute' do
+      input = <<-EOS
+:backend: html5
+:htmlsyntax: xml
+
+---
+      EOS
+      result = render_embedded_string input, :safe => :safe
+      assert_equal '<hr>', result
+    end
+
     test 'should close all short tags when htmlsyntax is xml' do
       input = <<-EOS
 = Document Title
@@ -1615,23 +1651,6 @@ two
       rescue => e
         flunk "xhtml5 backend did not generate well-formed XML: #{e.message}\n#{result}"
       end
-      #refute_match(/<meta [^>]+[^\/]>/, result)
-      #refute_match(/<link [^>]+[^\/]>/, result)
-      #refute_match(/<img [^>]+[^\/]>/, result)
-      #refute_match(/<input [^>]+[^\/]>/, result)
-      #assert_match(/<input [^>]+checked="checked"/, result)
-      #assert_match(/<input [^>]+disabled="disabled"/, result)
-      #refute_match(/<col [^>]+[^\/]>/, result)
-      #refute_match(/<[bh]r>/, result)
-      #assert_match(/video [^>]+loop="loop"/, result)
-      #assert_match(/video [^>]+autoplay="autoplay"/, result)
-      #assert_match(/video [^>]+controls="controls"/, result)
-      #assert_match(/audio [^>]+loop="loop"/, result)
-      #assert_match(/audio [^>]+autoplay="autoplay"/, result)
-      #assert_match(/audio [^>]+controls="controls"/, result)
-      #assert_match(/iframe [^>]+webkitallowfullscreen="webkitallowfullscreen"/i, result)
-      #assert_match(/iframe [^>]+mozallowfullscreen="mozallowfullscreen"/i, result)
-      #assert_match(/iframe [^>]+allowfullscreen="allowfullscreen"/i, result)
     end
 
     test 'xhtml backend should emit elements in proper namespace' do

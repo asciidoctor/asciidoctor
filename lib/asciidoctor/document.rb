@@ -837,7 +837,7 @@ class Document < AbstractBlock
     else
       case name
       when 'backend'
-        update_backend_attributes apply_attribute_value_subs(value)
+        update_backend_attributes apply_attribute_value_subs(value), !!@attributes_modified.delete?('htmlsyntax')
       when 'doctype'
         update_doctype_attributes apply_attribute_value_subs(value)
       else
@@ -911,7 +911,7 @@ class Document < AbstractBlock
         attrs['htmlsyntax'] = 'xml'
         new_backend = new_backend[1..-1]
       elsif new_backend.start_with? 'html'
-        attrs['htmlsyntax'] = 'html'
+        attrs['htmlsyntax'] = 'html' unless attrs['htmlsyntax'] == 'xml'
       end
       if (resolved_name = BACKEND_ALIASES[new_backend])
         new_backend = resolved_name
