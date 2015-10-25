@@ -998,41 +998,45 @@ module Substitutors
           reftext = reftext.gsub ESC_R_SB, R_SB if reftext && (reftext.include? R_SB)
         end
 
-        if id.include? '#'
-          # QUESTION should we limit split to 2 segments?
-          path, fragment = id.split('#')
-        # QUESTION perform this check and throw it back if it fails?
-        #elsif (start_chr = id.chr) == '.' || start_chr == '/'
-        #  next m[0][1..-1]
+        if (hash_idx = id.index '#')
+          if hash_idx > 0
+            if (fragment_len = id.length - hash_idx - 1) > 0
+              path, fragment = (id.slice 0, hash_idx), (id.slice hash_idx + 1, fragment_len)
+            else
+              path, fragment = (id.slice 0, hash_idx), nil
+            end
+          else
+            target, path, fragment = id, nil, (id.slice 1, id.length)
+          end
         else
           path, fragment = nil, id
         end
 
-        # handles forms: doc#, doc.adoc#, doc#id and doc.adoc#id
-        if path
+        # handles: #id
+        if target
+          refid = fragment
+        # handles: path#, path.adoc#, path#id, or path.adoc#id
+        elsif path
           if (path.include? '.') && ASCIIDOC_EXTENSIONS[(extname = ::File.extname path)]
             path = path[0, path.length - extname.length]
           end
           # the referenced path is this document, or its contents has been included in this document
           if @document.attributes['docname'] == path || @document.catalog[:includes].include?(path)
-            refid = fragment
-            path = nil
-            target = %(##{fragment})
+            refid, path, target = fragment, nil, %(##{fragment})
           else
             refid = fragment ? %(#{path}##{fragment}) : path
             path = %(#{@document.attributes['relfileprefix']}#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'})
             target = fragment ? %(#{path}##{fragment}) : path
           end
-        # handles form: id or Section Title
+        # handles: id or Section Title
         else
-          # resolve fragment as reftext if cannot be resolved as refid and looks like reftext
+          # resolve fragment as reftext if it's not a known ID and resembles reftext (includes space or has uppercase char)
           if !(@document.catalog[:ids].key? fragment) &&
               ((fragment.include? ' ') || fragment.downcase != fragment) &&
               (resolved_id = @document.catalog[:ids].key fragment)
             fragment = resolved_id
           end
-          refid = fragment
-          target = %(##{fragment})
+          refid, target = fragment, %(##{fragment})
         end
         Inline.new(self, :anchor, reftext, :type => :xref, :target => target, :attributes => {'path' => path, 'fragment' => fragment, 'refid' => refid}).convert
       }
