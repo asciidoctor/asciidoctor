@@ -514,10 +514,10 @@ Wise words from a wise person.
         assert_equal '<a href="http://asciidoc.org">AsciiDoc</a> is a <em>lightweight</em> markup language&#8230;&#8203;', output
       end
 
-      test 'should output empty string if first block is not a paragraph' do
+      test 'should output nil if first block is not a paragraph' do
         input = '* bullet'
         output = render_string input, :doctype => 'inline'
-        assert output.empty?
+        assert output.nil?
       end
     end
   end
