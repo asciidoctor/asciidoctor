@@ -1037,7 +1037,7 @@ class Document < AbstractBlock
       if (block = @blocks[0]) && block.content_model != :compound
         output = block.content
       else
-        output = ''
+        output = nil
       end
     else
       transform = ((opts.key? :header_footer) ? opts[:header_footer] : @options[:header_footer]) ? 'document' : 'embedded'
@@ -1067,9 +1067,11 @@ class Document < AbstractBlock
       @converter.write output, target
     else
       if target.respond_to? :write
-        target.write output.chomp
-        # ensure there's a trailing endline
-        target.write EOL
+        unless output.nil_or_empty?
+          target.write output.chomp
+          # ensure there's a trailing endline
+          target.write EOL
+        end
       else
         ::File.open(target, 'w') {|f| f.write output }
       end

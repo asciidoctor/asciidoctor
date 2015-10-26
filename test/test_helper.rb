@@ -185,7 +185,7 @@ class Minitest::Test
     else
       # this is required because nokogiri is ignorant
       result = document_from_string(src, opts).render
-      result = result.sub(RE_XMLNS_ATTRIBUTE, '')
+      result = result.sub(RE_XMLNS_ATTRIBUTE, '') if result
       result
     end
   end
