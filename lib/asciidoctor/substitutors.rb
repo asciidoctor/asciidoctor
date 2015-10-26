@@ -632,7 +632,7 @@ module Substitutors
     # TODO this handling needs some cleanup
     if (extensions = @document.extensions) && extensions.inline_macros? # && found[:macroish]
       extensions.inline_macros.each do |extension|
-        result = result.gsub(extension.config[:regexp]) {
+        result = result.gsub(extension.instance.regexp) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape

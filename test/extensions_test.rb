@@ -589,6 +589,25 @@ snippet::12345[]
       end
     end
 
+    test 'should resolve regexp for inline macro lazily' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro do
+            named :label
+            using_format :short
+            process do |parent, target|
+              %(<label>#{target}</label>)
+            end
+          end
+        end
+
+        output = render_embedded_string 'label:[Checkbox]'
+        assert output.include?('<label>Checkbox</label>')
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should not carry over attributes if block processor returns nil' do
       begin
         Asciidoctor::Extensions.register do
