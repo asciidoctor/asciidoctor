@@ -423,8 +423,9 @@ module Extensions
   # for example, FormalInlineMacro, ShortInlineMacro (no target) and other patterns
   # FIXME for inline passthrough, we need to have some way to specify the text as a passthrough
   class InlineMacroProcessor < MacroProcessor
-    def initialize name, config = {}
-      super
+    # Lookup the regexp option, resolving it first if necessary.
+    # Once this method is called, the regexp is considered frozen.
+    def regexp
       @config[:regexp] ||= (resolve_regexp @name, @config[:format])
     end
 
