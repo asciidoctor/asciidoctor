@@ -48,6 +48,20 @@ If your tests fail, return to step 5.
 
 For ideas about how to use pull requests, see the post http://blog.quickpeople.co.uk/2013/07/10/useful-github-patterns[Useful GitHub Patterns].
 
+=== Background Knowledge
+
+As Asciidoctor is built using Ruby some basic knowledge of Ruby, RubyGems and Minitest is beneficial. The following resources provide a good starting point for contributors who may not be completely comfortable with these tools:
+
+* https://www.ruby-lang.org/en/documentation/quickstart/[Ruby in 20 minutes]
+* https://www.ruby-lang.org/en/documentation/ruby-from-other-languages/[Ruby from other languages]
+* http://guides.rubygems.org/rubygems-basics/[RubyGems basics]
+* http://guides.rubygems.org/what-is-a-gem/[What is a Gem?]
+* http://blog.teamtreehouse.com/short-introduction-minitest[How to use Minitest]
+* http://www.rubyinside.com/a-minitestspec-tutorial-elegant-spec-style-testing-that-comes-with-ruby-5354.html[Minitest spec tutorial]
+* https://github.com/seattlerb/minitest/blob/master/README.rdoc[Minitest Project Documentation]
+
+While these resources don't cover everything needed they serve as a good starting off point for beginners.
+
 === Writing and Executing Tests
 
 Tests live inside the test directory and are named <topic>_test.rb.
