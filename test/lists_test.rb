@@ -4273,4 +4273,83 @@ listing block in list item 1
     assert_equal :listing, listing_block.context
     assert_equal list_item_1, listing_block.parent
   end
+
+  test 'outline? should return true for unordered list' do
+    input = <<-EOS
+* one
+* two
+* three
+    EOS
+
+    doc = document_from_string input
+    list = doc.blocks.first
+    assert list.outline?
+  end
+
+  test 'outline? should return true for ordered list' do
+    input = <<-EOS
+. one
+. two
+. three
+    EOS
+
+    doc = document_from_string input
+    list = doc.blocks.first
+    assert list.outline?
+  end
+
+  test 'outline? should return false for description list' do
+    input = <<-EOS
+label:: desc
+    EOS
+
+    doc = document_from_string input
+    list = doc.blocks.first
+    assert !list.outline?
+  end
+
+  test 'simple? should return true for list item with no nested blocks' do
+    input = <<-EOS
+* one
+* two
+* three
+    EOS
+
+    doc = document_from_string input
+    list = doc.blocks.first
+    assert list.items.first.simple?
+    assert !list.items.first.compound?
+  end
+
+  test 'simple? should return true for list item with nested outline list' do
+    input = <<-EOS
+* one
+  ** more about one
+  ** and more
+* two
+* three
+    EOS
+
+    doc = document_from_string input
+    list = doc.blocks.first
+    assert list.items.first.simple?
+    assert !list.items.first.compound?
+  end
+
+  test 'simple? should return false for list item with block content' do
+    input = <<-EOS
+* one
++
+----
+listing block in list item 1
+----
+* two
+* three
+    EOS
+
+    doc = document_from_string input
+    list = doc.blocks.first
+    assert !list.items.first.simple?
+    assert list.items.first.compound?
+  end
 end

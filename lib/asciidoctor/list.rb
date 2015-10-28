@@ -1,6 +1,6 @@
 # encoding: UTF-8
 module Asciidoctor
-# Public: Methods for managing AsciiDoc lists (ordered, unordered and labeled lists)
+# Public: Methods for managing AsciiDoc lists (ordered, unordered and description lists)
 class List < AbstractBlock
 
   # Public: Create alias for blocks
@@ -12,6 +12,13 @@ class List < AbstractBlock
 
   def initialize parent, context
     super
+  end
+
+  # Check whether this list is an outline list (unordered or ordered).
+  #
+  # Return true if this list is an outline list. Otherwise, return false.
+  def outline?
+    @context == :ulist || @context == :olist
   end
 
   def convert
@@ -55,6 +62,22 @@ class ListItem < AbstractBlock
 
   def text
     apply_subs @text
+  end
+
+  # Check whether this list item has simple content (no nested blocks aside from a single outline list).
+  # Primarily relevant for outline lists.
+  #
+  # Return true if the list item contains no blocks or it contains a single outline list. Otherwise, return false.
+  def simple?
+    @blocks.empty? || (@blocks.size == 1 && List === (blk = @blocks[0]) && blk.outline?)
+  end
+
+  # Check whether this list item has compound content (nested blocks aside from a single outline list).
+  # Primarily relevant for outline lists.
+  #
+  # Return true if the list item contains blocks other than a single outline list. Otherwise, return false.
+  def compound?
+    !simple?
   end
 
   # Public: Fold the first paragraph block into the text
