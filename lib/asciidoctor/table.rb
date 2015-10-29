@@ -463,12 +463,13 @@ class Table::ParserContext
     end
 
     1.upto(repeat) do |i|
-      # make column resolving an operation
+      # TODO make column resolving an operation
       if @col_count == -1
-        @table.columns << (column = Table::Column.new(@table, @current_row.size + i - 1))
+        @table.columns << (column = Table::Column.new(@table, @table.columns.size + i - 1))
         if cell_spec && (cell_spec.key? 'colspan') && (extra_cols = cell_spec['colspan'].to_i - 1) > 0
+          offset = @table.columns.size
           extra_cols.times do |j|
-            @table.columns << Table::Column.new(@table, @current_row.size + i + j - 1)
+            @table.columns << Table::Column.new(@table, offset + j)
           end
         end
       else
