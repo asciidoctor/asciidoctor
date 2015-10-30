@@ -637,6 +637,40 @@ context 'Substitutions' do
       assert_equal %{<span class="image"><img src="tiger.png" alt="Tiger"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'an image macro with SVG image and text should be interpreted as an image with alt text' do
+      para = block_from_string('image:tiger.svg[Tiger]')
+      assert_equal %{<span class="image"><img src="tiger.svg" alt="Tiger"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'an image macro with an interactive SVG image and alt text should be converted to an object element' do
+      para = block_from_string('image:tiger.svg[Tiger,opts=interactive]', :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'imagesdir' => 'images' })
+      assert_equal %{<span class="image"><object type="image/svg+xml" data="images/tiger.svg"><span class="alt">Tiger</span></object></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'an image macro with an interactive SVG image, fallback and alt text should be converted to an object element' do
+      para = block_from_string('image:tiger.svg[Tiger,fallback=tiger.png,opts=interactive]', :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'imagesdir' => 'images' })
+      assert_equal %{<span class="image"><object type="image/svg+xml" data="images/tiger.svg"><img src="images/tiger.png" alt="Tiger"></object></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'an image macro with an inline SVG image should be converted to an svg element' do
+      para = block_from_string('image:circle.svg[Tiger,100,opts=inline]', :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'imagesdir' => 'fixtures', 'docdir' => ::File.dirname(__FILE__) })
+      result = para.sub_macros(para.source).gsub(/>\s+</, '><')
+      assert_match(/<svg [^>]*width="100px"[^>]*>/, result)
+      refute_match(/<svg [^>]*width="500px"[^>]*>/, result)
+      refute_match(/<svg [^>]*height="500px"[^>]*>/, result)
+      refute_match(/<svg [^>]*style="width:500px;height:500px"[^>]*>/, result)
+    end
+
+    test 'an image macro with an inline SVG image should be converted to an svg element even when data-uri is set' do
+      para = block_from_string('image:circle.svg[Tiger,100,opts=inline]', :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'data-uri' => '', 'imagesdir' => 'fixtures', 'docdir' => ::File.dirname(__FILE__) })
+      assert_match(/<svg [^>]*width="100px">/, para.sub_macros(para.source).gsub(/>\s+</, '><'))
+    end
+
+    test 'an image macro with an SVG image should not use an object element when safe mode is secure' do
+      para = block_from_string('image:tiger.svg[Tiger,opts=interactive]', :attributes => { 'imagesdir' => 'images' })
+      assert_equal %{<span class="image"><img src="images/tiger.svg" alt="Tiger"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'a single-line image macro with text containing escaped square bracket should be interpreted as an image with alt text' do
       para = block_from_string(%(image:tiger.png[[Another#{BACKSLASH}] Tiger]))
       assert_equal %{<span class="image"><img src="tiger.png" alt="[Another] Tiger"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')

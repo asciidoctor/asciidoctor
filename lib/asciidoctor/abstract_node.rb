@@ -407,6 +407,46 @@ class AbstractNode
     end
   end
 
+  # Public: Resolve the URI or system path to the specified target, then read and return its contents
+  #
+  # The URI or system path of the target is first resolved. If the resolved path is a URI, read the
+  # contents from the URI if the allow-uri-read attribute is set, enabling caching if the cache-uri
+  # attribute is also set. If the resolved path is not a URI, read the contents of the file from the
+  # file system. If the normalize option is set, the data will be normalized.
+  #
+  # target - The URI or local path from which to read the data.
+  # opts   - a Hash of options to control processing (default: {})
+  #          * :label the String label of the target to use in warning messages (default: 'asset')
+  #          * :normalize a Boolean that indicates whether the data should be normalized (default: false)
+  #          * :start the String relative base path to use when resolving the target (default: nil)
+  #          * :warn_on_failure a Boolean that indicates whether warnings are issued if the target cannot be read (default: true)
+  # Returns the contents of the resolved target or nil if the resolved target cannot be read
+  # --
+  # TODO refactor other methods in this class to use this method were possible (repurposing if necessary)
+  def read_contents target, opts = {}
+    doc = @document
+    if (Helpers.uriish? target) || ((start = opts[:start]) && (Helpers.uriish? start) &&
+        (target = (@path_resolver ||= PathResolver.new).web_path target, start))
+      if doc.attr? 'allow-uri-read'
+        Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
+        begin
+          data = ::OpenURI.open_uri(target) {|fd| fd.read }
+          data = (Helpers.normalize_lines_from_string data) * EOL if opts[:normalize]
+        rescue
+          warn %(asciidoctor: WARNING: could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
+          data = nil
+        end
+      else
+        warn %(asciidoctor: WARNING: cannot retrieve contents of #{opts[:label] || 'asset'} at URI: #{target} (allow-uri-read attribute not enabled)) if opts.fetch :warn_on_failure, true
+        data = nil
+      end
+    else
+      target = normalize_system_path target, opts[:start], nil, :target_name => (opts[:label] || 'asset')
+      data = read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true)
+    end
+    data
+  end
+
   # Public: Read the contents of the file at the specified path.
   # This method assumes that the path is safe to read. It checks
   # that the file is readable before attempting to read it.
@@ -525,6 +565,5 @@ class AbstractNode
   def list_marker_keyword(list_type = nil)
     ORDERED_LIST_KEYWORDS[list_type || @style]
   end
-
 end
 end
