@@ -601,6 +601,44 @@ d|9 2+>|10
       assert_xpath '/table/tbody/tr[3]/td[3]/p[text()="c"]', output, 1
     end
 
+    test 'calculates colnames correctly when using implicit column count and single cell with colspan' do
+      input = <<-EOS
+|===
+2+|Two Columns
+|One Column |One Column
+|===
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '//colspec', output, 2
+      assert_xpath '(//colspec)[1][@colname="col_1"]', output, 1
+      assert_xpath '(//colspec)[2][@colname="col_2"]', output, 1
+      assert_xpath '//row', output, 2
+      assert_xpath '(//row)[1]/entry', output, 1
+      assert_xpath '(//row)[1]/entry[@namest="col_1"][@nameend="col_2"]', output, 1
+    end
+
+    test 'calculates colnames correctly when using implicit column count and cells with mixed colspans' do
+      input = <<-EOS
+|===
+2+|Two Columns | One Column
+|One Column |One Column |One Column
+|===
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '//colspec', output, 3
+      assert_xpath '(//colspec)[1][@colname="col_1"]', output, 1
+      assert_xpath '(//colspec)[2][@colname="col_2"]', output, 1
+      assert_xpath '(//colspec)[3][@colname="col_3"]', output, 1
+      assert_xpath '//row', output, 2
+      assert_xpath '(//row)[1]/entry', output, 2
+      assert_xpath '(//row)[1]/entry[@namest="col_1"][@nameend="col_2"]', output, 1
+      assert_xpath '(//row)[2]/entry[@namest]', output, 0
+      assert_xpath '(//row)[2]/entry[@nameend]', output, 0
+      puts output
+    end
+
     test 'ignores cell with colspan that exceeds colspec' do
       input = <<-EOS
 [cols="1,1"]
