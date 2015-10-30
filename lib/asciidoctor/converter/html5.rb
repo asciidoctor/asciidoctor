@@ -19,6 +19,10 @@ module Asciidoctor
       #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
     }).default = [nil, nil, nil]
 
+    SvgPreambleRx = /\A.*?(?=<svg[ >])/m
+    SvgStartTagRx = /\A<svg[^>]*>/
+    DimensionAttributeRx = /\s(?:width|height|style)=(["']).*?\1/
+
     def initialize backend, opts = {}
       @xml_mode = opts[:htmlsyntax] == 'xml'
       @void_element_slash = @xml_mode ? '/' : nil
@@ -534,29 +538,34 @@ Your browser does not support the audio tag.
     end
 
     def image node
-      align = (node.attr? 'align') ? (node.attr 'align') : nil
-      float = (node.attr? 'float') ? (node.attr 'float') : nil
-      style_attribute = if align || float
-        styles = [align ? %(text-align: #{align}) : nil, float ? %(float: #{float}) : nil].compact
-        %( style="#{styles * ';'}")
+      target = node.attr 'target'
+      width_attr = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
+      height_attr = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
+      if ((node.attr? 'format', 'svg', false) || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+          ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
+        if svg
+          img = (read_svg_contents node, target) || %(<span class="alt">#{node.attr 'alt'}</span>)
+        elsif obj
+          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{node.attr 'alt'}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.attr 'alt'}</span>)
+          img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
+        end
       end
-
-      width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
-      height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
-
-      img_element = %(<img src="#{node.image_uri node.attr('target')}" alt="#{node.attr 'alt'}"#{width_attribute}#{height_attribute}#{@void_element_slash}>)
+      img ||= %(<img src="#{node.image_uri target}" alt="#{node.attr 'alt'}"#{width_attr}#{height_attr}#{@void_element_slash}>)
       if (link = node.attr 'link')
-        img_element = %(<a class="image" href="#{link}">#{img_element}</a>)
+        img = %(<a class="image" href="#{link}">#{img}</a>)
       end
-      id_attribute = node.id ? %( id="#{node.id}") : nil
+      id_attr = node.id ? %( id="#{node.id}") : nil
       classes = ['imageblock', node.style, node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
-      title_element = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : nil
-
-      %(<div#{id_attribute}#{class_attribute}#{style_attribute}>
+      class_attr = %( class="#{classes * ' '}")
+      styles = []
+      styles << %(text-align: #{node.attr 'align'}) if node.attr? 'align'
+      styles << %(float: #{node.attr 'float'}) if node.attr? 'float'
+      style_attr = styles.empty? ? nil : %( style="#{styles * ';'}")
+      title_el = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : nil
+      %(<div#{id_attr}#{class_attr}#{style_attr}>
 <div class="content">
-#{img_element}
-</div>#{title_element}
+#{img}
+</div>#{title_el}
 </div>)
     end
 
@@ -1058,39 +1067,35 @@ Your browser does not support the video tag.
 
     def inline_image node
       if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
-        style_class = %(fa fa-#{node.target})
-        if node.attr? 'size'
-          style_class = %(#{style_class} fa-#{node.attr 'size'})
+        class_attr_val = %(fa fa-#{node.target})
+        {'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-'}.each do |(key, prefix)|
+          class_attr_val = %(#{class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
         end
-        if node.attr? 'rotate'
-          style_class = %(#{style_class} fa-rotate-#{node.attr 'rotate'})
-        end
-        if node.attr? 'flip'
-          style_class = %(#{style_class} fa-flip-#{node.attr 'flip'})
-        end
-        title_attribute = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : nil
-        img = %(<i class="#{style_class}"#{title_attribute}></i>)
+        title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : nil
+        img = %(<i class="#{class_attr_val}"#{title_attr}></i>)
       elsif type == 'icon' && !(node.document.attr? 'icons')
         img = %([#{node.attr 'alt'}])
       else
-        resolved_target = (type == 'icon') ? (node.icon_uri node.target) : (node.image_uri node.target)
-
-        attrs = ['alt', 'width', 'height', 'title'].map {|name|
-          (node.attr? name) ? %( #{name}="#{node.attr name}") : nil
-        }.join
-
-        img = %(<img src="#{resolved_target}"#{attrs}#{@void_element_slash}>)
+        target = node.target
+        attrs = ['width', 'height', 'title'].map {|name| (node.attr? name) ? %( #{name}="#{node.attr name}") : nil }.join
+        if type != 'icon' && ((node.attr? 'format', 'svg', false) || (target.include? '.svg')) &&
+            node.document.safe < SafeMode::SECURE && ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
+          if svg
+            img = (read_svg_contents node, target) || %(<span class="alt">#{node.attr 'alt'}</span>)
+          elsif obj
+            fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{node.attr 'alt'}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.attr 'alt'}</span>)
+            img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{attrs}>#{fallback}</object>)
+          end
+        end
+        img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{node.attr 'alt'}"#{attrs}#{@void_element_slash}>)
       end
-
       if node.attr? 'link'
         window_attr = (node.attr? 'window') ? %( target="#{node.attr 'window'}") : nil
         img = %(<a class="image" href="#{node.attr 'link'}"#{window_attr}>#{img}</a>)
       end
-
-      style_classes = (role = node.role) ? %(#{type} #{role}) : type
+      class_attr_val = (role = node.role) ? %(#{type} #{role}) : type
       style_attr = (node.attr? 'float') ? %( style="float: #{node.attr 'float'}") : nil
-
-      %(<span class="#{style_classes}"#{style_attr}>#{img}</span>)
+      %(<span class="#{class_attr_val}"#{style_attr}>#{img}</span>)
     end
 
     def inline_indexterm node
@@ -1135,6 +1140,22 @@ Your browser does not support the video tag.
 
     def append_boolean_attribute name, xml
       xml ? %( #{name}="#{name}") : %( #{name})
+    end
+
+    def read_svg_contents node, target
+      if (svg = node.read_contents target, :start => (node.document.attr 'imagesdir'), :normalize => true, :label => 'SVG')
+        svg = svg.sub SvgPreambleRx, ''
+        start_tag = nil
+        ['width', 'height'].each do |dim|
+          if node.attr? dim
+            # NOTE width, height and style attributes are removed if either width or height is specified
+            start_tag ||= (svg.match SvgStartTagRx)[0].gsub DimensionAttributeRx, ''
+            start_tag = %(#{start_tag.chop} #{dim}="#{node.attr dim}px">)
+          end
+        end
+        svg = svg.sub SvgStartTagRx, start_tag if start_tag
+      end
+      svg
     end
   end
 end

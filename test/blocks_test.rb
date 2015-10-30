@@ -1447,6 +1447,111 @@ image::images/tiger.png[Tiger]
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
+    test 'renders SVG image using img element by default' do
+      input = <<-EOS
+image::tiger.svg[Tiger]
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_xpath '/*[@class="imageblock"]//img[@src="tiger.svg"][@alt="Tiger"]', output, 1
+    end
+
+    test 'renders interactive SVG image with alt text using object element' do
+      input = <<-EOS
+:imagesdir: images
+
+[%interactive]
+image::tiger.svg[Tiger,100]
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_xpath '/*[@class="imageblock"]//object[@type="image/svg+xml"][@data="images/tiger.svg"][@width="100"]/span[@class="alt"][text()="Tiger"]', output, 1
+    end
+
+    test 'renders SVG image with alt text using img element when safe mode is secure' do
+      input = <<-EOS
+[%interactive]
+image::images/tiger.svg[Tiger,100]
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.svg"][@alt="Tiger"]', output, 1
+    end
+
+    test 'inserts fallback image for SVG inside object element using same dimensions' do
+      input = <<-EOS
+:imagesdir: images
+
+[%interactive]
+image::tiger.svg[Tiger,100,fallback=tiger.png]
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_xpath '/*[@class="imageblock"]//object[@type="image/svg+xml"][@data="images/tiger.svg"][@width="100"]/img[@src="images/tiger.png"][@width="100"]', output, 1
+    end
+
+    test 'detects SVG image URI that contains a query string' do
+      input = <<-EOS
+:imagesdir: images
+
+[%interactive]
+image::http://example.org/tiger.svg?foo=bar[Tiger,100]
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_xpath '/*[@class="imageblock"]//object[@type="image/svg+xml"][@data="http://example.org/tiger.svg?foo=bar"][@width="100"]/span[@class="alt"][text()="Tiger"]', output, 1
+    end
+
+    test 'detects SVG image when format attribute is svg' do
+      input = <<-EOS
+:imagesdir: images
+
+[%interactive]
+image::http://example.org/tiger-svg[Tiger,100,format=svg]
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_xpath '/*[@class="imageblock"]//object[@type="image/svg+xml"][@data="http://example.org/tiger-svg"][@width="100"]/span[@class="alt"][text()="Tiger"]', output, 1
+    end
+
+    test 'renders inline SVG image using svg element' do
+      input = <<-EOS
+:imagesdir: fixtures
+
+[%inline]
+image::circle.svg[Tiger,100]
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => ::File.dirname(__FILE__) }
+      assert_match(/<svg [^>]*width="100px"[^>]*>/, output, 1)
+      refute_match(/<svg [^>]*width="500px"[^>]*>/, output)
+      refute_match(/<svg [^>]*height="500px"[^>]*>/, output)
+      refute_match(/<svg [^>]*style="width:500px;height:500px"[^>]*>/, output)
+    end
+
+    test 'renders inline SVG image using svg element even when data-uri is set' do
+      input = <<-EOS
+:imagesdir: fixtures
+:data-uri:
+
+[%inline]
+image::circle.svg[Tiger,100]
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => ::File.dirname(__FILE__) }
+      assert_match(/<svg [^>]*width="100px">/, output, 1)
+    end
+
+    test 'renders alt text for inline svg element if svg cannot be read' do
+      input = <<-EOS
+[%inline]
+image::no-such-image.svg[Alt Text]
+      EOS
+
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
+    end
+
     test 'can render block image with alt text defined in macro containing escaped square bracket' do
       input = <<-EOS
 image::images/tiger.png[A [Bengal\\] Tiger]
