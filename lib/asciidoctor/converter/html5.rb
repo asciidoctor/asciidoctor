@@ -284,10 +284,9 @@ MathJax.Hub.Config({
 <hr#{@void_element_slash}>)
         node.footnotes.each do |footnote|
           result << %(<div class="footnote" id="_footnote_#{footnote.index}">
-<a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a> #{footnote.text}
+<a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a>. #{footnote.text}
 </div>)
         end
-
         result << '</div>'
       end
 

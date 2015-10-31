@@ -1514,6 +1514,11 @@ Text that has supporting information{empty}footnote:[An example footnote.].
 
       output = render_embedded_string input
       assert_css '#footnotes', output, 1
+      assert_css '#footnotes .footnote', output, 1
+      assert_css '#footnotes .footnote#_footnote_1', output, 1
+      assert_xpath '//div[@id="footnotes"]/div[@id="_footnote_1"]/a[@href="#_footnoteref_1"][text()="1"]', output, 1
+      text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnote_1"]/text()', output, 1
+      assert_equal '. An example footnote.', text.text.strip
     end
 
     test 'does not render footnotes block in embedded document if nofootnotes attribute is set' do
