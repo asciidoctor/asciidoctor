@@ -1,6 +1,5 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>; Ryan Waldron <https://github.com/erebor[@erebor]>
-v1.5.3, 2015-10-31
 // settings:
 :page-layout: base
 :idprefix:
