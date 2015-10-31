@@ -2,7 +2,7 @@
 Dan Allen; Sarah White; Ryan Waldron
 :doctype: manpage
 :man manual: Asciidoctor Manual
-:man source: Asciidoctor 1.5.2
+:man source: Asciidoctor 1.5.3.dev
 :page-layout: base
 
 == NAME
@@ -15,7 +15,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
 == DESCRIPTION
 
-The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5, DocBook 4.5, DocBook 5.0 and other custom output formats.
+The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5, DocBook 5, DocBook 4.5, man(ual) page and other custom output formats.
 
 If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 
@@ -52,7 +52,7 @@ Values containing spaces should be enclosed in quotes.
 This option may be specified more than once.
 
 *-b, --backend*=_BACKEND_::
-  Backend output file format: _html5_, _docbook45_ and _docbook5_ supported out of the box.
+  Backend output file format: _html5_, _docbook5_, _docbook45_ and _manpage_ are supported out of the box.
   You can also use the backend alias names _html_ (aliased to _html5_) or _docbook_ (aliased to _docbook5_).
   Defaults to _html5_.
   Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during conversion.
@@ -141,6 +141,8 @@ Matching templates found in subsequent directories override ones previously disc
 
 *-V, --version*::
   Print program version number.
++
+`-v` can also be used if no other flags or arguments are present.
 
 == EXIT STATUS
 
@@ -162,9 +164,9 @@ Refer to the *Asciidoctor* issue tracker at https://github.com/asciidoctor/ascii
 
 == RESOURCES
 
-*Git source repository on GitHub:* https://github.com/asciidoctor/asciidoctor
-
 *Project web site:* http://asciidoctor.org
+
+*Git source repository on GitHub:* https://github.com/asciidoctor/asciidoctor
 
 *GitHub organization:* https://github.com/asciidoctor
 
@@ -174,5 +176,3 @@ Refer to the *Asciidoctor* issue tracker at https://github.com/asciidoctor/ascii
 
 Copyright \(C) 2012-2015 Dan Allen, Ryan Waldron and the Asciidoctor Project.
 Free use of this software is granted under the terms of the MIT License.
-
-// vim: tw=80

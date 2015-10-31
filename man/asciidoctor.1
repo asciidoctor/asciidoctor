@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White, Ryan Waldron
-.\" Generator: Asciidoctor 1.5.3.dev
-.\"      Date: 2015-05-08
+.\" Generator: Asciidoctor 1.5.3
+.\"      Date: 2015-10-30
 .\"    Manual: Asciidoctor Manual
-.\"    Source: Asciidoctor 1.5.2
+.\"    Source: Asciidoctor 1.5.3.dev
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2015-05-08" "Asciidoctor 1.5.2" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2015-10-30" "Asciidoctor 1.5.3.dev" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -25,7 +25,7 @@ asciidoctor \- converts AsciiDoc source files to HTML, DocBook and other formats
 \fBasciidoctor\fP [\fIOPTION\fP]... \fIFILE\fP...
 .SH "DESCRIPTION"
 .sp
-The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fP to HTML5, DocBook 4.5, DocBook 5.0 and other custom output formats.
+The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fP to HTML5, DocBook 5, DocBook 4.5, man(ual) page and other custom output formats.
 .sp
 If \fIFILE\fP is \fI\-\fP then the AsciiDoc source is read from standard input.
 .SH "OPTIONS"
@@ -68,7 +68,7 @@ This option may be specified more than once.
 .sp
 \fB\-b, \-\-backend\fP=\fIBACKEND\fP
 .RS 4
-Backend output file format: \fIhtml5\fP, \fIdocbook45\fP and \fIdocbook5\fP supported out of the box.
+Backend output file format: \fIhtml5\fP, \fIdocbook5\fP, \fIdocbook45\fP and \fImanpage\fP are supported out of the box.
 You can also use the backend alias names \fIhtml\fP (aliased to \fIhtml5\fP) or \fIdocbook\fP (aliased to \fIdocbook5\fP).
 Defaults to \fIhtml5\fP.
 Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during conversion.
@@ -188,6 +188,8 @@ Show the help message.
 \fB\-V, \-\-version\fP
 .RS 4
 Print program version number.
+.sp
+\f[CR]\-v\fP can also be used if no other flags or arguments are present.
 .RE
 .SH "EXIT STATUS"
 .sp
@@ -211,11 +213,11 @@ Refer to the \fBAsciidoctor\fP issue tracker at
 \fBAsciiDoc\fP was written by Stuart Rackham and has received contributions from many other individuals.
 .SH "RESOURCES"
 .sp
-\fBGit source repository on GitHub:\fP 
-.URL "https://github.com/asciidoctor/asciidoctor" "" ""
-.sp
 \fBProject web site:\fP 
 .URL "http://asciidoctor.org" "" ""
+.sp
+\fBGit source repository on GitHub:\fP 
+.URL "https://github.com/asciidoctor/asciidoctor" "" ""
 .sp
 \fBGitHub organization:\fP 
 .URL "https://github.com/asciidoctor" "" ""
