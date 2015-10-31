@@ -636,7 +636,6 @@ d|9 2+>|10
       assert_xpath '(//row)[1]/entry[@namest="col_1"][@nameend="col_2"]', output, 1
       assert_xpath '(//row)[2]/entry[@namest]', output, 0
       assert_xpath '(//row)[2]/entry[@nameend]', output, 0
-      puts output
     end
 
     test 'ignores cell with colspan that exceeds colspec' do
