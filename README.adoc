@@ -3,7 +3,6 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://g
 // settings:
 :page-layout: base
 :idprefix:
-ifdef::env-github[:idprefix: user-content-]
 :idseparator: -
 :source-language: ruby
 :language: {source-language}
@@ -93,7 +92,7 @@ Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the
 You have the option of writing your own converter or providing {uri-tilt}[Tilt]-supported templates to customize the generated output or produce alternative formats.
 
 NOTE: Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor (`asciidoc.py`).
-The Asciidoctor test suite has {uri-tests}[> 1,500 tests] to ensure compatibility with the AsciiDoc syntax.
+The Asciidoctor test suite has {uri-tests}[> 1,600 tests] to ensure compatibility with the AsciiDoc syntax.
 
 In addition to the standard AsciiDoc syntax, Asciidoctor recognizes additional markup and formatting options, such as font-based icons (e.g., `+icon:fire[]+`) and UI elements (e.g., `+button:[Save]+`).
 Asciidoctor also offers a modern, responsive theme based on {uri-foundation}[Foundation] to style the HTML5 output.
@@ -102,8 +101,8 @@ Asciidoctor also offers a modern, responsive theme based on {uri-foundation}[Fou
 
 Asciidoctor works on Linux, OSX (Mac) and Windows and requires one of the following implementations of {uri-ruby}[Ruby]:
 
-* MRI (Ruby 1.8.7, 1.9.3, 2.0.0 & 2.1.2)
-* JRuby 1.7 (Ruby 1.8 and 1.9 modes)
+* MRI (Ruby 1.8.7, 1.9.3, 2.0, 2.1 & 2.2)
+* JRuby 1.7 (Ruby 1.8 and 1.9 modes) & 9000
 * Rubinius 2.2.x
 * Opal (JavaScript)
 
@@ -120,7 +119,7 @@ If you need the latest version, you can always fallback to using the `gem` comma
 
 === (a) gem install
 
-Open a terminal and type: (without the leading `$`)
+Open a terminal and type (excluding the leading `$`):
 
  $ gem install asciidoctor
 
@@ -160,19 +159,19 @@ gem 'asciidoctor'
  $ bundle
 
 To upgrade the gem, specify the new version in the Gemfile and run `bundle` again.
-Using `bundle update` is not recommended as it will also update other gems, which may not be the desired result.
+Using `bundle update` is *not* recommended as it will also update other gems, which may not be the desired result.
 
 === (c) Linux package managers
 
-==== Yum (Fedora 18 or greater)
+==== Yum (Fedora 21 or greater)
 
-To install the gem on Fedora 18 or greater using yum, open a terminal and type:
+To install the gem on Fedora 21 or greater using yum, open a terminal and type:
 
- $ sudo yum install -y rubygem-asciidoctor
+ $ sudo yum install -y asciidoctor
 
 To upgrade the gem, use:
 
- $ sudo yum update -y rubygem-asciidoctor
+ $ sudo yum update -y asciidoctor
 
 TIP: Your Fedora system may be configured to automatically update packages, in which case no action is required by you to update the gem.
 
@@ -205,7 +204,7 @@ You should see information about the Asciidoctor version and your Ruby environme
 [.output]
 ....
 Asciidoctor 1.5.2 [http://asciidoctor.org]
-Runtime Environment (ruby 2.2.0p0 (2014-12-25 revision 49005) [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Runtime Environment (ruby 2.2.2p95 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 Asciidoctor also provides an API.
@@ -245,18 +244,18 @@ require 'asciidoctor'
 You can then convert an AsciiDoc source file to an HTML file using:
 
 [source]
-Asciidoctor.convert_file 'README.adoc', to_file: true, safe: 'safe'
+Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
 
 WARNING: When using Asciidoctor via the API, the default safe mode is `:secure`.
 In secure mode, several core features are disabled, including the `include` directive.
-If you want to enable these features, you'll need to explicitly set the safe mode to `server` (recommended) or `safe`.
+If you want to enable these features, you'll need to explicitly set the safe mode to `:server` (recommended) or `:safe`.
 
 You can also convert an AsciiDoc string to embeddable HTML (for inserting in an HTML page) using:
 
 [source]
 ----
 content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
-Asciidoctor.convert content, safe: 'safe'
+Asciidoctor.convert content, safe: :safe
 ----
 
 If you want the full HTML document, enable the `header_footer` option as follows:
@@ -264,7 +263,7 @@ If you want the full HTML document, enable the `header_footer` option as follows
 [source]
 ----
 content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
-html = Asciidoctor.convert content, header_footer: true, safe: 'safe'
+html = Asciidoctor.convert content, header_footer: true, safe: :safe
 ----
 
 If you need access to the parsed document, you can split the conversion into discrete steps:
@@ -272,15 +271,19 @@ If you need access to the parsed document, you can split the conversion into dis
 [source]
 ----
 content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
-document = Asciidoctor.load content, header_footer: true, safe: 'safe'
+document = Asciidoctor.load content, header_footer: true, safe: :safe
 puts document.doctitle
 html = document.convert
 ----
 
-Keep in mind, if you don't like the output Asciidoctor produces, _you can change it!_
-Asciidoctor supports custom {uri-tilt}[Tilt]-supported templates, which to allow you customize the output piecemeal, or custom converters, which give you 100% control over the output.
+Keep in mind that if you don't like the output Asciidoctor produces, _you can change it!_
+Asciidoctor supports custom converters that can handle converting from the parsed document to the generated output.
 
-For more information about how to use the API or to customize the output, see the {uri-user-manual}[user manual].
+One easy way to customize the output piecemeal is by using the template converter.
+The template converter allows you uses supply a {uri-tilt}[Tilt]-supported template file to handle converting any node in the document.
+
+However you go about it, you _can_ have 100% control over the output.
+For more information about how to use the API or to customize the output, refer to the {uri-user-manual}[user manual].
 
 == Contributing
 
