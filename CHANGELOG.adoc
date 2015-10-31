@@ -11,6 +11,112 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the https://github.com/asciidoctor/asciidoctor/commits/master[commit history] on GitHub.
 
+== 1.5.3 (2015-10-31) - @mojavelinux
+
+Enhancements::
+  * add support for interactive & inline SVGs (#1301, #1224)
+  * add built-in manpage backend (@davidgamba) (#651)
+  * create Mallard backend; asciidoctor/asciidoctor-mallard (@bk2204) (#425)
+  * add AsciiMath to MathML converter to support AsciiMath in DocBook converter (@pepijnve) (#954)
+  * allow text of selected lines to be highlighted in source block by Pygments or CodeRay (#1429)
+  * use value of `docinfo` attribute to control docinfo behavior (#1510)
+  * add `docinfosubs` attribute to control which substitutions are performed on docinfo files (@mogztter) (#405)
+  * add title accessor as alias to main on Document::Title (@rmannibucau) (#1350)
+  * make XrefInlineRx regexp more permissive (Mathieu Boespflug) (#844)
+
+Improvements::
+  * load JavaScript and CSS at the end of HTML document (@mogztter) (#1238)
+  * list available backends in help text (@plaindocs) (#1271)
+  * properly expand tabs in literal text (#1170, #841)
+  * add `source-indent` as document attribute (@mogztter) (#1169)
+  * upgrade MathJax to 2.5.3 (#1329)
+  * upgrade Font Awesome to 4.4.0 (@mogztter) (#1465)
+  * upgrade highlight.js to 8.6 (now 8.9.1) (#1390)
+  * don't abort if syntax highlighter isn't available (#1253)
+  * insert docinfo footer below footer div (#1503)
+  * insert toc at default location in embeddable HTML (#1443)
+  * replace _ and - in generated alt text for inline images
+  * restore attributes to header attributes after parse (#1255)
+  * allow docdate and doctime to be overridden (#1495)
+  * add CSS class `.center` for center block alignment (#1456)
+  * recognize U+2022 as alternative marker for unordered lists (@mogztter) (#1177)
+  * allow videos to work for local files by prepending asset-uri-scheme (Chris) (#1320)
+  * always assign playlist param when loop option is enabled for YouTube video
+  * parse isolated version in revision line (@bk2204) (#790)
+  * autoload Tilt when template converter is instantiated (#1313)
+  * don't overwrite existing id entry in references table (#1256)
+  * use outfilesuffix attribute defined in header when resolving outfile (#1412)
+  * make AsciiDoc safe mode option on Slim engine match document (#1347)
+  * honor htmlsyntax attribute when backend is html/html5 (#1530)
+  * tighten spacing of wrapped lines in TOC (#1542)
+  * tune padding around table cells in horizontal dlist (#1418)
+  * load Droid Sans Mono 700 in default stylesheet
+  * set line height of table cells used for syntax highlighting
+  * set font-family of kbd; refine styling (#1423)
+  * extract condition into `quote_lines?` method (@mogztter)
+  * extract inline code into `read_paragraph` method (@mogztter)
+  * parent of block in ListItem should be ListItem (#1359)
+  * add helper methods to List and ListItem (#1551)
+  * add method `AbstractNode#add_role` and `AbstractNode#remove_role` (@robertpanzer) (#1366)
+  * introduce helper methods for sniffing URIs (#1422)
+  * add helper to calculate basename without file extension
+  * document `-I` and `-r` options in the manual page (@bk2204)
+  * fix `+--help+` output text for `-I` (@bk2204)
+  * don't require open-uri-cached if already loaded
+  * do not attempt to scan pattern of non-existent directory
+
+Compliance::
+  * use `<sup>` for footnote reference in text instead of `<span>` (#1523)
+  * fix alignment of wrapped text in footnote (#1524)
+  * include full stop after footnote number in embeddable HTML
+  * show manpage title & name section in embeddable HTML (#1179)
+  * resolve missing attribute in ifeval to empty string (#1387)
+  * support unbreakable & breakable options on table (rockyallen) (#1140)
+
+Bug fixes::
+  * don't truncate exception stack in `Asciidoctor.load` (#1248)
+  * don't fail to save cause of Java exception (@robertpanzer) (#1458)
+  * fix precision error in timings report (#1342)
+  * resolve regexp for inline macro lazily (#1336)
+  * block argument to `find_by` should filter results (#1393)
+  * strip comment lines in indented text of dlist item (#1537)
+  * preserve escaped delimiter at end of line in a table (#1306)
+  * correctly calculate colnames for implicit columns (#1556)
+  * don't crash if colspan exceeds colspec (#1460)
+  * account for empty records in colspec (#1375)
+  * ignore empty cols attribute on table
+  * use `.inspect` to print MathJax delimiters (again) (#1198)
+  * use while loop instead of begin/while loop to address bug in Asciidoctor.js (#1408)
+  * force encoding of attribute values passed from cli (#1191)
+  * don't copy css if stylesheet or stylesdir is a URI (#1400)
+  * fix invalid color value in default CodeRay theme
+  * built-in writer no longer fails if output is nil (#1544)
+  * custom template engine options should take precedence
+  * fallback to require with a non-relative path to support Debian package (@mogztter)
+  * pass opts to recursive invocations of `PathResolver#system_path`
+  * fix and test external links in docbook backend
+  * use format symbol `:html` instead of `:html5` for Slim to fix warnings
+  * fix documentation for inline_macro and block_macro (Andrea Bedini)
+  * fix grammar in warning messages regarding thread_safe gem
+
+Infrastructure::
+  * migrate opal_ext from core to Asciidoctor.js (#1517)
+  * add Ruby 2.2 to CI build; only specify minor Ruby versions
+  * enable containerized builds on Travis CI
+  * add config to run CI build on AppVeyor
+  * exclude benchmark folder from gem (#1522)
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.3[issues resolved] |
+https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.3[git tag] |
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.2...v1.5.3[full diff]
+
 == 1.5.2 (2014-11-27) - @mojavelinux
 
 Enhancements::
@@ -63,7 +169,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.2[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.0...v1.5.2[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.1...v1.5.2[full diff]
 
 == 1.5.1 (2014-09-29) - @mojavelinux
 
