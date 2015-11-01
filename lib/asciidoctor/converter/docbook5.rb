@@ -103,7 +103,12 @@ module Asciidoctor
         :term  => 'glossterm',
         :item  => 'glossdef'
       }
-    }).default = DLIST_TAGS['labeled']
+    }).default = { # default value == DLIST['labeled'], expanded for Opal
+      :list => 'variablelist',
+      :entry => 'varlistentry',
+      :term => 'term',
+      :item => 'listitem'
+    }
 
     def dlist node
       result = []
