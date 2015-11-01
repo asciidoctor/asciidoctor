@@ -358,11 +358,11 @@ Enhancements::
   * allow text of selected lines to be highlighted in source block by Pygments or CodeRay (#1429)
   * use value of `docinfo` attribute to control docinfo behavior (#1510)
   * add `docinfosubs` attribute to control which substitutions are performed on docinfo files (@mogztter) (#405)
-  * add title accessor as alias to main on Document::Title (@rmannibucau) (#1350)
+  * make subtitle separator chars for document title configurable (@rmannibucau) (#1350)
   * make XrefInlineRx regexp more permissive (Mathieu Boespflug) (#844)
 
 Improvements::
-  * load JavaScript and CSS at the end of HTML document (@mogztter) (#1238)
+  * load JavaScript and CSS at bottom of HTML document (@mogztter) (#1238)
   * list available backends in help text (@plaindocs) (#1271)
   * properly expand tabs in literal text (#1170, #841)
   * add `source-indent` as document attribute (@mogztter) (#1169)
@@ -400,7 +400,7 @@ Improvements::
   * document `-I` and `-r` options in the manual page (@bk2204)
   * fix `+--help+` output text for `-I` (@bk2204)
   * don't require open-uri-cached if already loaded
-  * do not attempt to scan pattern of non-existent directory
+  * do not attempt to scan pattern of non-existent directory in template converter
 
 Compliance::
   * use `<sup>` for footnote reference in text instead of `<span>` (#1523)
