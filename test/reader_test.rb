@@ -1378,7 +1378,7 @@ content
         assert_equal "ifdef::holygrail[]\ncontent\nendif::holygrail[]", (lines * ::Asciidoctor::EOL)
       end
 
-      test 'ifeval comparing missing attribute to nil is included' do
+      test 'ifeval comparing missing attribute to nil includes content' do
         input = <<-EOS
 ifeval::['{foo}' == '']
 No foo for you!
@@ -1393,8 +1393,24 @@ endif::[]
         end
         assert_equal 'No foo for you!', (lines * ::Asciidoctor::EOL)
       end
+
+      test 'ifeval comparing missing attribute to 0 drops content' do
+        input = <<-EOS
+ifeval::[{leveloffset} == 0]
+I didn't make the cut!
+endif::[]
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        lines = []
+        while reader.has_more_lines?
+          lines << reader.read_line
+        end
+        assert_equal '', (lines * ::Asciidoctor::EOL)
+      end
   
-      test 'ifeval comparing double-quoted attribute to matching string is included' do
+      test 'ifeval comparing double-quoted attribute to matching string includes content' do
         input = <<-EOS
 ifeval::["{gem}" == "asciidoctor"]
 Asciidoctor it is!
@@ -1410,7 +1426,7 @@ endif::[]
         assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::EOL)
       end
   
-      test 'ifeval comparing single-quoted attribute to matching string is included' do
+      test 'ifeval comparing single-quoted attribute to matching string includes content' do
         input = <<-EOS
 ifeval::['{gem}' == 'asciidoctor']
 Asciidoctor it is!
@@ -1426,7 +1442,7 @@ endif::[]
         assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::EOL)
       end
   
-      test 'ifeval comparing quoted attribute to non-matching string is ignored' do
+      test 'ifeval comparing quoted attribute to non-matching string drops content' do
         input = <<-EOS
 ifeval::['{gem}' == 'asciidoctor']
 Asciidoctor it is!
@@ -1442,7 +1458,7 @@ endif::[]
         assert_equal '', (lines * ::Asciidoctor::EOL)
       end
   
-      test 'ifeval comparing attribute to lower version number is included' do
+      test 'ifeval comparing attribute to lower version number includes content' do
         input = <<-EOS
 ifeval::['{asciidoctor-version}' >= '0.1.0']
 That version will do!
@@ -1458,7 +1474,7 @@ endif::[]
         assert_equal 'That version will do!', (lines * ::Asciidoctor::EOL)
       end
   
-      test 'ifeval comparing attribute to self is included' do
+      test 'ifeval comparing attribute to self includes content' do
         input = <<-EOS
 ifeval::['{asciidoctor-version}' == '{asciidoctor-version}']
 Of course it's the same!
@@ -1490,7 +1506,7 @@ endif::[]
         assert_equal 'That version will do!', (lines * ::Asciidoctor::EOL)
       end
   
-      test 'ifeval matching numeric equality is included' do
+      test 'ifeval matching numeric equality includes content' do
         input = <<-EOS
 ifeval::[{rings} == 1]
 One ring to rule them all!
@@ -1506,7 +1522,7 @@ endif::[]
         assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::EOL)
       end
 
-      test 'ifeval matching numeric inequality is included' do
+      test 'ifeval matching numeric inequality includes content' do
         input = <<-EOS
 ifeval::[{rings} != 0]
 One ring to rule them all!
