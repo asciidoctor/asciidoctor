@@ -2153,6 +2153,20 @@ You can use icons for admonitions by setting the 'icons' attribute.
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa icon-tip"]', output, 1
     end
 
+    test 'font-based icon should not override icon specified on admonition' do
+      input = <<-EOS
+:icons: font
+
+[TIP,icon=a.png]
+Override the icon of an admonition block using an attribute
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa icon-tip"]', output, 0
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="a.png"]', output, 1
+    end
+
+
     test 'should use http uri scheme for assets when asset-uri-scheme is http' do
       input = <<-EOS
 :asset-uri-scheme: http
