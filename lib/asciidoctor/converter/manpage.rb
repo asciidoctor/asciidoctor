@@ -23,7 +23,7 @@ module Asciidoctor
       str = str.
         gsub(/^\.$/, '\\\&.').    # a lone . is also used in troff to indicate paragraph continuation with visual separator
         gsub(/\\$/, '\\(rs').     # a literal backslash at the end of a line
-        gsub(/^\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\3"). # quote last URL argument
+        gsub(/^\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c\\3"). # quote last URL argument
         gsub(/(?:\A\n|\n *(\n))^\.(URL|MTO) /, "\\1\.\\2 "). # strip blank lines in source that precede a URL
         gsub('-', '\\-').
         gsub('&lt;', '<').
