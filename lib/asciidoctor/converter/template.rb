@@ -253,10 +253,10 @@ module Asciidoctor
           unless defined? ::Slim
             # slim doesn't get loaded by Tilt, so we have to load it explicitly
             Helpers.require_library 'slim'
-            if @safe && ::Slim::VERSION >= '3.0'
-              slim_asciidoc_opts = (@engine_options[:slim][:asciidoc] ||= {})
-              slim_asciidoc_opts[:safe] ||= @safe
-            end
+          end
+          if @safe && ::Slim::VERSION >= '3.0'
+            slim_asciidoc_opts = (@engine_options[:slim][:asciidoc] ||= {})
+            slim_asciidoc_opts[:safe] ||= @safe
           end
           # load include plugin when using Slim >= 2.1
           require 'slim/include' unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
