@@ -22,6 +22,7 @@ module Asciidoctor
       str = preserve_space ? str.gsub(TAB, ETAB) : str.tr_s(%(#{LF}#{TAB} ), ' ')
       str = str.
         gsub(/^\.$/, '\\\&.').    # a lone . is also used in troff to indicate paragraph continuation with visual separator
+        gsub(/^\\\./, '\\\&.').   # line beginning with \. shouldn't be mistaken for troff macro
         gsub(/\\$/, '\\(rs').     # a literal backslash at the end of a line
         gsub(/^\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c\\3"). # quote last URL argument
         gsub(/(?:\A\n|\n *(\n))^\.(URL|MTO) /, "\\1\.\\2 "). # strip blank lines in source that precede a URL
