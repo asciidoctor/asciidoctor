@@ -503,13 +503,13 @@ module Asciidoctor
       when :xref
         if (path = node.attributes['path'])
           # QUESTION should we use refid as fallback text instead? (like the html5 backend?)
-          %(<link xlink:href="#{node.target}">#{node.text || path}</link>)
+          %(<link xl:href="#{node.target}">#{node.text || path}</link>)
         else
           linkend = node.attributes['fragment'] || node.target
           (text = node.text) ? %(<link linkend="#{linkend}">#{text}</link>) : %(<xref linkend="#{linkend}"/>)
         end
       when :link
-        %(<link xlink:href="#{node.target}">#{node.text}</link>)
+        %(<link xl:href="#{node.target}">#{node.text}</link>)
       when :bibref
         target = node.target
         %(<anchor#{common_attributes target, nil, "[#{target}]"}/>[#{target}])
@@ -707,7 +707,7 @@ module Asciidoctor
     end
 
     def document_ns_attributes doc
-      ' xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"'
+      ' xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"'
     end
 
     def lang_attribute_name
