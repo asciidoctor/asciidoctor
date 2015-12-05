@@ -1787,7 +1787,7 @@ section body
       assert_xpath '/xmlns:article', result, 1
       doc = xmlnodes_at_xpath('/xmlns:article', result, 1).first
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
-      assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xlink']
+      assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:article[@version="5.0"]', result, 1
       assert_xpath '/xmlns:article/xmlns:info/xmlns:title[text() = "Title"]', result, 1
       assert_xpath '/xmlns:article/xmlns:simpara[text() = "preamble"]', result, 1
@@ -1821,7 +1821,7 @@ section body
       assert_xpath '/xmlns:refentry', result, 1
       doc = xmlnodes_at_xpath('/xmlns:refentry', result, 1).first
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
-      assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xlink']
+      assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:refentry[@version="5.0"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text() = "asciidoctor(1)"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text() = "asciidoctor"]', result, 1
@@ -1855,7 +1855,7 @@ chapter body
       assert_xpath '/xmlns:book', result, 1
       doc = xmlnodes_at_xpath('/xmlns:book', result, 1).first
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
-      assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xlink']
+      assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:book[@version="5.0"]', result, 1
       assert_xpath '/xmlns:book/xmlns:info/xmlns:title[text() = "Title"]', result, 1
       assert_xpath '/xmlns:book/xmlns:preface/xmlns:simpara[text() = "preamble"]', result, 1

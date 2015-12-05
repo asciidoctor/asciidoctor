@@ -38,6 +38,16 @@ context 'Links' do
     assert_xpath %{//a[@href='http://asciidoc.org'][text() = 'AsciiDoc\nmarkup']}, render_string("We're parsing link:http://asciidoc.org[AsciiDoc\nmarkup]")
   end
 
+  test 'qualified url with label containing square brackets using link macro' do
+    str = 'http://example.com[[bracket1\]]'
+    doc = document_from_string str, :header_footer => false, :doctype => 'inline'
+    assert_match '<a href="http://example.com">[bracket1]</a>', doc.convert, 1
+    doc = document_from_string str, :header_footer => false, :backend => 'docbook', :doctype => 'inline'
+    assert_match '<link xl:href="http://example.com">[bracket1]</link>', doc.convert, 1
+    doc = document_from_string str, :header_footer => false, :backend => 'docbook45', :doctype => 'inline'
+    assert_match '<ulink url="http://example.com">[bracket1]</ulink>', doc.convert, 1
+  end
+
   test 'qualified url surrounded by angled brackets' do
     assert_xpath '//a[@href="http://asciidoc.org"][text()="http://asciidoc.org"]', render_string('<http://asciidoc.org> is the project page for AsciiDoc.'), 1
   end
@@ -204,7 +214,7 @@ context 'Links' do
 
   test 'xref using angled bracket syntax with path sans extension using docbook backend' do
     doc = document_from_string '<<tigers#>>', :header_footer => false, :backend => 'docbook'
-    assert_match '<link xlink:href="tigers.xml">tigers.xml</link>', doc.render, 1
+    assert_match '<link xl:href="tigers.xml">tigers.xml</link>', doc.render, 1
     doc = document_from_string '<<tigers#>>', :header_footer => false, :backend => 'docbook45'
     assert_match '<ulink url="tigers.xml">tigers.xml</ulink>', doc.render, 1
   end
