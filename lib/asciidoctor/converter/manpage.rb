@@ -51,6 +51,12 @@ module Asciidoctor
       append_newline ? %(#{str}#{LF}) : str
     end
 
+    def preserve_backslash str
+      str = str.
+        gsub(/\\/, '\\e')
+      str
+    end
+
     def skip_with_warning node, name = nil
       warn %(asciidoctor: WARNING: converter missing for #{name || node.node_name} node in manpage backend)
       nil
@@ -254,7 +260,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{manify node.content}
+#{preserve_backslash (manify node.content)}
 .fi
 .if n \\{\\
 .RE
@@ -272,7 +278,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{manify node.content}
+#{preserve_backslash (manify node.content)}
 .fi
 .if n \\{\\
 .RE
@@ -655,7 +661,7 @@ allbox tab(:);'
       when :strong
         %[\\fB<BOUNDARY>#{node.text}</BOUNDARY>\\fP]
       when :monospaced
-        %[\\f[CR]<BOUNDARY>#{node.text}</BOUNDARY>\\fP]
+        %[\\f[CR]<BOUNDARY>#{preserve_backslash node.text}</BOUNDARY>\\fP]
       when :single
         %[\\(oq<BOUNDARY>#{node.text}</BOUNDARY>\\(cq]
       when :double
