@@ -105,12 +105,10 @@ module Asciidoctor
 
     # Defines a new compliance key and assigns an initial value.
     def self.define key, value
-      if key == :keys || (self.respond_to? key)
-        raise ::ArgumentError, %(illegal key name: #{key})
-      end
       instance_variable_set %(@#{key}), value
       class << self; self; end.send :attr_accessor, key
       @keys << key
+      nil
     end
 
     # AsciiDoc terminates paragraphs adjacent to
