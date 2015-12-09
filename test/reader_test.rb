@@ -600,19 +600,43 @@ include::fixtures/parent-include.adoc[]
         assert_equal 'fixtures/parent-include.adoc', reader.path
       end
   
-      test 'missing file referenced by include directive does not crash processor' do
+      test 'missing file referenced by include directive is replaced by warning' do
         input = <<-EOS
 include::fixtures/no-such-file.adoc[]
+
+trailing content
         EOS
   
         begin
           doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
-          assert_equal 1, doc.blocks.size
+          assert_equal 2, doc.blocks.size
           assert_equal ['Unresolved directive in <stdin> - include::fixtures/no-such-file.adoc[]'], doc.blocks[0].lines
+          assert_equal ['trailing content'], doc.blocks[1].lines
         rescue
           flunk 'include directive should not raise exception on missing file'
         end
       end
+
+      test 'unreadable file referenced by include directive is replaced by warning' do
+        include_file = File.join DIRNAME, 'fixtures', 'chapter-a.adoc'
+        FileUtils.chmod 0000, include_file
+        input = <<-EOS
+include::fixtures/chapter-a.adoc[]
+
+trailing content
+        EOS
+  
+        begin
+          doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
+          assert_equal 2, doc.blocks.size
+          assert_equal ['Unresolved directive in <stdin> - include::fixtures/chapter-a.adoc[]'], doc.blocks[0].lines
+          assert_equal ['trailing content'], doc.blocks[1].lines
+        rescue
+          flunk 'include directive should not raise exception on missing file'
+        ensure
+          FileUtils.chmod 0644, include_file
+        end
+      end unless windows?
 
       # IMPORTANT this test needs to be run on Windows to verify proper behavior in Windows
       test 'can resolve include directive with absolute path' do
