@@ -21,6 +21,7 @@ Enhancements::
   * allow text of selected lines to be highlighted in source block by Pygments or CodeRay (#1429)
   * use value of `docinfo` attribute to control docinfo behavior (#1510)
   * add `docinfosubs` attribute to control which substitutions are performed on docinfo files (@mogztter) (#405)
+  * drop ability to specify multiple attributes with a single `-a` flag when using the CLI (@mogztter) (#405)
   * make subtitle separator chars for document title configurable (@rmannibucau) (#1350)
   * make XrefInlineRx regexp more permissive (Mathieu Boespflug) (#844)
 
