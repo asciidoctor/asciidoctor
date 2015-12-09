@@ -147,7 +147,7 @@ class Reader
   #           returns the first element of the internal @lines Array. (default: false)
   #
   # Returns the next line of the source data as a String if there are lines remaining.
-  # Returns nil if there is no more data.
+  # Returns nothing if there is no more data.
   def peek_line direct = false
     if direct || @look_ahead > 0
       @unescape_next_line ? @lines[0][1..-1] : @lines[0]
@@ -205,7 +205,7 @@ class Reader
   #           returns the first element of the internal @lines Array. (default: false)
   #
   # Returns the String of the next line of the source data if data is present.
-  # Returns nil if there is no more data.
+  # Returns nothing if there is no more data.
   def read_line direct = false
     if direct || @look_ahead > 0 || has_more_lines?
       shift
@@ -245,7 +245,7 @@ class Reader
   # direct  - A Boolean flag to bypasses the check for more lines and immediately
   #           returns the first element of the internal @lines Array. (default: true)
   #
-  # returns a Boolean indicating whether there was a line to discard.
+  # Returns a Boolean indicating whether there was a line to discard.
   def advance direct = true
     !!read_line(direct)
   end
@@ -255,7 +255,9 @@ class Reader
   # Since this line was (assumed to be) previously retrieved through the
   # reader, it is marked as seen.
   #
-  # returns nil
+  # line_to_restore - the line to restore onto the stack
+  #
+  # Returns nothing.
   def unshift_line line_to_restore
     unshift line_to_restore
     nil
@@ -267,7 +269,7 @@ class Reader
   # Since these lines were (assumed to be) previously retrieved through the
   # reader, they are marked as seen.
   #
-  # Returns nil
+  # Returns nothing.
   def unshift_lines lines_to_restore
     # QUESTION is it faster to use unshift(*lines_to_restore)?
     lines_to_restore.reverse_each {|line| unshift line }
@@ -275,20 +277,22 @@ class Reader
   end
   alias :restore_lines :unshift_lines
 
-  # Public: Replace the current line with the specified line.
+  # Public: Replace the next line with the specified line.
   #
   # Calls Reader#advance to consume the current line, then calls
   # Reader#unshift to push the replacement onto the top of the
   # line stack.
   #
-  # replacement  - The String line to put in place of the line at the cursor.
+  # replacement - The String line to put in place of the next line (i.e., the line at the cursor).
   #
   # Returns nothing.
-  def replace_line replacement
+  def replace_next_line replacement
     advance
     unshift replacement
     nil
   end
+  # deprecated
+  alias :replace_line :replace_next_line
 
   # Public: Strip off leading blank lines in the Array of lines.
   #
@@ -462,7 +466,7 @@ class Reader
           line_read = true
         end
         if options[:preserve_last_line]
-          restore_line line
+          unshift line
           line_restored = true
         end
       else
@@ -656,7 +660,7 @@ class PreprocessorReader < Reader
   #
   # Returns the next line of the source data as a String if there are lines remaining
   # in the current include context or a parent include context.
-  # Returns nil if there are no more lines remaining and the include stack is empty.
+  # Returns nothing if there are no more lines remaining and the include stack is empty.
   def peek_line direct = false
     if (line = super)
       line
@@ -687,7 +691,7 @@ class PreprocessorReader < Reader
   #              Used for a single-line conditional block in the case of the ifdef or
   #              ifndef directives, and for the conditional expression for the ifeval directive.
   #
-  # returns a Boolean indicating whether the cursor should be advanced
+  # Returns a Boolean indicating whether the cursor should be advanced
   def preprocess_conditional_inclusion directive, target, delimiter, text
     # must have a target before brackets if ifdef or ifndef
     # must not have text between brackets if endif
@@ -773,8 +777,9 @@ class PreprocessorReader < Reader
       unless @skipping || skip
         # FIXME slight hack to skip past conditional line
         # but keep our synthetic line marked as processed
+        # QUESTION can we use read_line true and unshift twice instead?
         conditional_line = peek_line true
-        replace_line text.rstrip
+        replace_next_line text.rstrip
         unshift conditional_line
         return true
       end
@@ -803,16 +808,14 @@ class PreprocessorReader < Reader
   # target - The name of the source document to include as specified in the
   #          target slot of the include::[] macro
   #
-  # returns a Boolean indicating whether the line under the cursor has changed.
+  # Returns a Boolean indicating whether the line under the cursor has changed.
   def preprocess_include raw_target, raw_attributes
     if (target = @document.sub_attributes raw_target, :attribute_missing => 'drop-line').empty?
+      advance
       if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
-        replace_line %(Unresolved directive in #{@path} - include::#{raw_target}[#{raw_attributes}])
-        true
-      else
-        advance
-        true
+        unshift %(Unresolved directive in #{@path} - include::#{raw_target}[#{raw_attributes}])
       end
+      true
     # assume that if an include processor is given, the developer wants
     # to handle when and how to process the include
     elsif include_processors? &&
@@ -825,7 +828,7 @@ class PreprocessorReader < Reader
     # however, be friendly and at least make it a link to the source document
     elsif @document.safe >= SafeMode::SECURE
       # FIXME we don't want to use a link macro if we are in a verbatim context
-      replace_line %(link:#{target}[])
+      replace_next_line %(link:#{target}[])
       true
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
       warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
@@ -843,7 +846,7 @@ class PreprocessorReader < Reader
         end
       elsif Helpers.uriish? target
         unless @document.attributes.has_key? 'allow-uri-read'
-          replace_line %(link:#{target}[])
+          replace_next_line %(link:#{target}[])
           return true
         end
 
@@ -863,7 +866,7 @@ class PreprocessorReader < Reader
         include_file = @document.normalize_system_path(target, @dir, nil, :target_name => 'include file')
         unless ::File.file? include_file
           warn %(asciidoctor: WARNING: #{line_info}: include file not found: #{include_file})
-          replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+          replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
         #path = @document.relative_path include_file
@@ -923,7 +926,7 @@ class PreprocessorReader < Reader
             end
           rescue
             warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
-            replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+            replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
             return true
           end
           advance
@@ -966,7 +969,7 @@ class PreprocessorReader < Reader
             end
           rescue
             warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
-            replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+            replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
             return true
           end
           unless (missing_tags = tags.to_a - tags_found.to_a).empty?
@@ -978,11 +981,13 @@ class PreprocessorReader < Reader
         end
       else
         begin
+          # NOTE read content first so that we only advance cursor if IO operation succeeds
+          include_content = open(include_file, 'r') {|f| f.read }
           advance
-          push_include open(include_file, 'r') {|f| f.read }, include_file, path, 1, attributes
+          push_include include_content, include_file, path, 1, attributes
         rescue
           warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
-          replace_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+          replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
       end
@@ -1005,7 +1010,7 @@ class PreprocessorReader < Reader
   #    data = IO.read file
   #    reader.push_include data, file, path
   #
-  # Returns nothing
+  # Returns nothing.
   def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
     if file
