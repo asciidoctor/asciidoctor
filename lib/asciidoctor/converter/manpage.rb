@@ -19,6 +19,7 @@ module Asciidoctor
     def manify str, opts = {}
       append_newline = opts[:append_newline]
       preserve_space = opts.fetch :preserve_space, true
+      preserve_backslash = opts[:preserve_backslash]
       str = preserve_space ? str.gsub(TAB, ETAB) : str.tr_s(%(#{LF}#{TAB} ), ' ')
       str = str.
         gsub(/^\.$/, '\\\&.').    # a lone . is also used in troff to indicate paragraph continuation with visual separator
@@ -49,12 +50,11 @@ module Asciidoctor
         gsub(/<\/?BOUNDARY>/, '').# artificial boundary
         rstrip                    # strip trailing space
       append_newline ? %(#{str}#{LF}) : str
+      preserve_backslash ? str.gsub('\\', '\\e') : str
     end
 
     def preserve_backslash str
-      str = str.
-        gsub(/\\/, '\\e')
-      str
+      str.gsub('\\', '\\e')
     end
 
     def skip_with_warning node, name = nil
@@ -260,7 +260,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{preserve_backslash (manify node.content)}
+#{manify node.content, :preserve_backslash => true}
 .fi
 .if n \\{\\
 .RE
@@ -278,7 +278,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{preserve_backslash (manify node.content)}
+#{manify node.content, :preserve_backslash => true}
 .fi
 .if n \\{\\
 .RE
