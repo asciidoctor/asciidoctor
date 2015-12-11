@@ -261,6 +261,30 @@ preamble
       assert doc.attributes.has_key?('toc')
     end
 
+    test 'should generate timestamps by default' do
+      doc = document_from_string 'text', :backend => :html5, :attributes => nil
+      result = doc.convert
+      assert doc.attributes.has_key?('docdate')
+      assert_equal doc.attributes['timestamps'], ''
+      assert_xpath '//div[@id="footer-text" and contains(string(.//text()), "Last updated")]', result
+    end
+
+    test 'should not generate timestamps if timestamps is unset in HTML 5' do
+      doc = document_from_string 'text', :backend => :html5, :attributes => { 'timestamps' => nil }
+      result = doc.convert
+      assert doc.attributes.has_key?('docdate')
+      assert !doc.attributes['timestamps']
+      assert_xpath '//div[@id="footer-text" and contains(string(.//text()), "Last updated")]', result, 0
+    end
+
+    test 'should not generate timestamps if timestamps is unset in DocBook' do
+      doc = document_from_string 'text', :backend => :docbook, :attributes => { 'timestamps' => nil }
+      result = doc.convert
+      assert doc.attributes.has_key?('docdate')
+      assert !doc.attributes['timestamps']
+      assert_xpath '/article/info/date', result, 0
+    end
+
     test 'should not modify options argument' do
       options = {
         :safe => Asciidoctor::SafeMode::SAFE

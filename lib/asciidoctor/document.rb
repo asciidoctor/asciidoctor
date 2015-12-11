@@ -262,6 +262,7 @@ class Document < AbstractBlock
     attrs['attribute-undefined'] = Compliance.attribute_undefined
     attrs['attribute-missing'] = Compliance.attribute_missing
     attrs['iconfont-remote'] = ''
+    attrs['timestamps'] = ''
 
     # language strings
     # TODO load these based on language settings
