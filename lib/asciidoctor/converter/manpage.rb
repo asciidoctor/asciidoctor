@@ -49,8 +49,8 @@ module Asciidoctor
         gsub('\'', '\\(aq').      # apostrophe-quote
         gsub(/<\/?BOUNDARY>/, '').# artificial boundary
         rstrip                    # strip trailing space
+      str = preserve_backslash ? str.gsub('\\', '\\e') : str
       append_newline ? %(#{str}#{LF}) : str
-      preserve_backslash ? str.gsub('\\', '\\e') : str
     end
 
     def preserve_backslash str
