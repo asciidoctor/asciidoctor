@@ -19,12 +19,10 @@ module Asciidoctor
     def manify str, opts = {}
       append_newline = opts[:append_newline]
       preserve_space = opts.fetch :preserve_space, true
-      preserve_backslash = opts[:preserve_backslash]
       str = preserve_space ? str.gsub(TAB, ETAB) : str.tr_s(%(#{LF}#{TAB} ), ' ')
       str = str.
-        gsub(/^\.$/, '\\\&.').    # a lone . is also used in troff to indicate paragraph continuation with visual separator
-        gsub(/^\\\./, '\\\&.').   # line beginning with \. shouldn't be mistaken for troff macro
-        gsub(/\\$/, '\\(rs').     # a literal backslash at the end of a line
+        gsub(/\\(?!f(?:B|I|P|\[CR\])|0|\()/, '\\(rs'). # literal backslash (ignores \fB, \fI, \fP, \f[CR], \0 & \( sequences)
+        gsub(/^\.$/, '\\\&.'). # lone . is also used in troff to indicate paragraph continuation with visual separator
         gsub(/^\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c\\3"). # quote last URL argument
         gsub(/(?:\A\n|\n *(\n))^\.(URL|MTO) /, "\\1\.\\2 "). # strip blank lines in source that precede a URL
         gsub('-', '\\-').
@@ -49,12 +47,7 @@ module Asciidoctor
         gsub('\'', '\\(aq').      # apostrophe-quote
         gsub(/<\/?BOUNDARY>/, '').# artificial boundary
         rstrip                    # strip trailing space
-      str = preserve_backslash ? str.gsub('\\', '\\e') : str
       append_newline ? %(#{str}#{LF}) : str
-    end
-
-    def preserve_backslash str
-      str.gsub('\\', '\\e')
     end
 
     def skip_with_warning node, name = nil
@@ -260,7 +253,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{manify node.content, :preserve_backslash => true}
+#{manify node.content}
 .fi
 .if n \\{\\
 .RE
@@ -278,7 +271,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{manify node.content, :preserve_backslash => true}
+#{manify node.content}
 .fi
 .if n \\{\\
 .RE
@@ -606,7 +599,7 @@ allbox tab(:);'
     end
 
     def inline_button node
-      %(\\fB[\\ #{node.text}\\ ]\\fP)
+      %(\\fB[\\0#{node.text}\\0]\\fP)
     end
 
     def inline_callout node
@@ -636,12 +629,12 @@ allbox tab(:);'
       if (keys = node.attr 'keys').size == 1
         keys[0]
       else
-        keys.join '\ +\ '
+        keys.join '\0+\0'
       end
     end
 
     def inline_menu node
-      caret = '\ \(fc\ '
+      caret = '\0\(fc\0'
       menu = node.attr 'menu'
       if !(submenus = node.attr 'submenus').empty?
         submenu_path = submenus.map {|item| %(\\fI#{item}\\fP) }.join caret
@@ -661,7 +654,7 @@ allbox tab(:);'
       when :strong
         %[\\fB<BOUNDARY>#{node.text}</BOUNDARY>\\fP]
       when :monospaced
-        %[\\f[CR]<BOUNDARY>#{preserve_backslash node.text}</BOUNDARY>\\fP]
+        %[\\f[CR]<BOUNDARY>#{node.text}</BOUNDARY>\\fP]
       when :single
         %[\\(oq<BOUNDARY>#{node.text}</BOUNDARY>\\(cq]
       when :double
