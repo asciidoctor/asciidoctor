@@ -2,8 +2,8 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9'
 
-if File.exist?(asciidoctor_lib_path = File.join(File.dirname(__FILE__), '../lib/asciidoctor'))
-  require asciidoctor_lib_path
+if File.exist?(app_lib_path = (File.expand_path '../../lib/asciidoctor', __FILE__))
+  require app_lib_path
 else
   require 'asciidoctor'
 end
