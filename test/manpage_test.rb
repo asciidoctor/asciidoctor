@@ -67,4 +67,39 @@ baz)
       assert_match '\(rsfB makes text bold', output
     end
   end
+
+  context 'URL macro' do
+    test 'should not swallow content following URL' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+http://asciidoc.org[AsciiDoc] can be used to create man pages.)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal '.URL "http://asciidoc.org" "AsciiDoc" " "
+\c
+can be used to create man pages.', output.lines.entries[-3..-1].join
+    end
+
+    test 'should not leave behind blank line before URL macro' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+First paragraph.
+
+http://asciidoc.org[AsciiDoc])
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal '.sp
+First paragraph.
+.sp
+.URL "http://asciidoc.org" "AsciiDoc" ""
+\c', output.lines.entries[-5..-1].join
+    end
+
+    test 'should pass adjacent character as last argument to URL macro' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+This is http://asciidoc.org[AsciiDoc].)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal 'This is
+.URL "http://asciidoc.org" "AsciiDoc" "."
+\c', output.lines.entries[-3..-1].join
+    end
+  end
 end

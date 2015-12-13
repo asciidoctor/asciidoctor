@@ -22,9 +22,9 @@ module Asciidoctor
     def manify str, opts = {}
       str = ((opts.fetch :preserve_space, true) ? (str.gsub TAB, ETAB) : (str.tr_s %(#{LF}#{TAB} ), ' ')).
         gsub('\\', '\\(rs').      # literal backslash
-        gsub(/^\.$/, '\\\&.').    # lone . is also used in troff to indicate paragraph continuation with visual separator
-        gsub(/^\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c\\3"). # quote last URL argument
-        gsub(/(?:\A\n|\n *(\n))^\.(URL|MTO) /, "\\1\.\\2 "). # strip blank lines in source that precede a URL
+        gsub(/^\.$/, '\\\&.').    # lone . is used in troff to indicate paragraph continuation with visual separator
+        gsub(/^\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c#{LF}\\3"). # quote last URL argument
+        gsub(/(?:\A\n|(?:\n *| +)(\n))^\.(URL|MTO) /, "\\1\.\\2 "). # strip blank lines in source that precede a URL
         gsub('-', '\\-').
         gsub('&lt;', '<').
         gsub('&gt;', '>').
@@ -32,13 +32,13 @@ module Asciidoctor
         gsub('&#174;', '\\(rg').  # registered sign
         gsub('&#8482;', '\\(tm'). # trademark sign
         gsub('&#8201;', ' ').     # thin space
-        gsub('&#8211;', '\\(en'). # en-dash
-        gsub(/&#8212(?:;&#8203;)?/, '\\(em'). # em-dash
+        gsub('&#8211;', '\\(en'). # en dash
+        gsub(/&#8212(?:;&#8203;)?/, '\\(em'). # em dash
         gsub('&#8216;', '\\(oq'). # left single quotation mark
         gsub('&#8217;', '\\(cq'). # right single quotation mark
         gsub('&#8220;', '\\(lq'). # left double quotation mark
         gsub('&#8221;', '\\(rq'). # right double quotation mark
-        gsub(/&#8230;(?:&#8203;)?/, '...').   # horizontal ellipsis
+        gsub(/&#8230;(?:&#8203;)?/, '...'). # horizontal ellipsis
         gsub('&#8592;', '\\(<-'). # leftwards arrow
         gsub('&#8594;', '\\(->'). # rightwards arrow
         gsub('&#8656;', '\\(lA'). # leftwards double arrow
