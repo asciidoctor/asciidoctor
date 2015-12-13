@@ -98,8 +98,8 @@ module Asciidoctor
       result << '.de URL
 \\\\$2 \\(laURL: \\\\$1 \\(ra\\\\$3
 ..
-.if \n[.g] .mso www.tmac
-.LINKSTYLE blue R < >'
+.if \n[.g] .mso www.tmac'
+      result << %(.LINKSTYLE #{node.attr 'man-linkstyle', 'blue R < >'})
 
       unless node.noheader
         if node.attr? 'manpurpose'

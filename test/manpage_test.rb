@@ -23,6 +23,21 @@ command - does stuff
 EOS
 
 context 'Manpage' do
+  context 'Configuration' do
+    test 'should define default linkstyle' do
+      input = SAMPLE_MANPAGE_HEADER
+      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      assert_match(/^\.LINKSTYLE blue R < >$/, output)
+    end
+
+    test 'should use linkstyle defined by man-linkstyle attribute' do
+      input = SAMPLE_MANPAGE_HEADER
+      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true,
+          :attributes => { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
+      assert_match(/^\.LINKSTYLE cyan B \\\[fo\] \\\[fc\]$/, output)
+    end
+  end
+
   context 'Manify' do
     test 'should escape lone period' do
       input = %(#{SAMPLE_MANPAGE_HEADER}
