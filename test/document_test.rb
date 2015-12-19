@@ -468,6 +468,19 @@ content
       refute_nil result
       assert_equal 0, result.size
     end
+
+    test 'find_by should not crash if dlist entry does not have description' do
+      input = <<-EOS
+term without description::
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by
+      refute_nil result
+      assert_equal 3, result.size
+      assert Asciidoctor::Document === result[0]
+      assert Asciidoctor::List === result[1]
+      assert Asciidoctor::ListItem === result[2]
+    end
   end
 
   context 'Convert APIs' do

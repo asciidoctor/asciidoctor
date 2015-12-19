@@ -281,7 +281,8 @@ class AbstractBlock < AbstractNode
       if @context == :dlist
         if any_context || context_selector != :section # optimization
           @blocks.flatten.each do |li|
-            result.concat(li.find_by selector, &block)
+            # NOTE the list item of a dlist can be nil, so we have to check
+            result.concat(li.find_by selector, &block) if li
           end
         end
       elsif
