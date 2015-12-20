@@ -1241,7 +1241,7 @@ line below
       expect = <<-'EOS'
 <informalequation>
 <alt><![CDATA[\sqrt{3x-1}+(1+x)^2 < y]]></alt>
-<mediaobject><textobject><phrase></phrase></textobject></mediaobject>
+<mathphrase><![CDATA[\sqrt{3x-1}+(1+x)^2 < y]]></mathphrase>
 </informalequation>
       EOS
 
