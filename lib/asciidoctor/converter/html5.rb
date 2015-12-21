@@ -270,11 +270,13 @@ MathJax.Hub.Config({
         end
       end
 
-      if (node.attr? 'toc') && !['macro', 'preamble'].include?(node.attr 'toc-placement')
-        result << %(<div id="toc" class="toc">
+      unless node.nested?
+        if (node.attr? 'toc') && !['macro', 'preamble'].include?(node.attr 'toc-placement')
+          result << %(<div id="toc" class="toc">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
 #{outline node}
 </div>)
+        end
       end
 
       result << node.content
@@ -952,6 +954,7 @@ Your browser does not support the audio tag.
           asset_uri_scheme = %(#{asset_uri_scheme}:)
         end
         rel_param_val = (node.option? 'related') ? 1 : 0
+        # NOTE start and end must be seconds (t parameter allows XmYs where X is minutes and Y is seconds)
         start_param = (node.attr? 'start', nil, false) ? %(&amp;start=#{node.attr 'start'}) : nil
         end_param = (node.attr? 'end', nil, false) ? %(&amp;end=#{node.attr 'end'}) : nil
         autoplay_param = (node.option? 'autoplay') ? '&amp;autoplay=1' : nil
