@@ -1365,10 +1365,18 @@ EOS
         assert_equal '\$a &lt; b\$', para.content
       end
 
-      test 'should not perform specialcharacters subs on asciimath macro content in docbook backend by default' do
+      # NOTE this test doesn't work once AsciiMath has been loaded
+      #test 'should not perform specialcharacters subs on asciimath macro content in docbook backend by default' do
+      #  input = 'asciimath:[a < b]'
+      #  para = block_from_string input, :backend => :docbook
+      #  para.document.converter.instance_variable_set :@asciimath_available, false
+      #  assert_equal '<inlineequation><mathphrase><![CDATA[a < b]]></mathphrase></inlineequation>', para.content
+      #end
+
+      test 'should convert asciimath macro content to MathML when asciimath gem is available' do
         input = 'asciimath:[a < b]'
         para = block_from_string input, :backend => :docbook
-        assert_equal 'a < b', para.content
+        assert_equal '<inlineequation><mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>a</mml:mi><mml:mo>&#x003C;</mml:mo><mml:mi>b</mml:mi></mml:math></inlineequation>', para.content
       end
 
       test 'should honor explicit subslist on asciimath macro' do
@@ -1398,7 +1406,7 @@ EOS
       test 'should not perform specialcharacters subs on latexmath macro content in docbook backend by default' do
         input = 'latexmath:[a < b]'
         para = block_from_string input, :backend => :docbook
-        assert para.content.include?('<alt><![CDATA[a < b]]></alt>')
+        assert_equal '<inlineequation><alt><![CDATA[a < b]]></alt><mathphrase><![CDATA[a < b]]></mathphrase></inlineequation>', para.content
       end
 
       test 'should honor explicit subslist on latexmath macro' do
