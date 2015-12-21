@@ -1098,6 +1098,22 @@ preamble
      assert_equal 'Document Title', doc.first_section.title
     end
 
+    test 'document with doctitle defined as attribute entry followed by block with title' do
+      input = <<-EOS
+:doctitle: Document Title
+
+.Block title
+Block content
+      EOS
+
+      doc = document_from_string input
+      assert_equal 'Document Title', doc.doctitle
+      assert doc.has_header?
+      assert_equal 1, doc.blocks.size
+      assert_equal :paragraph, doc.blocks[0].context
+      assert_equal 'Block title', doc.blocks[0].title
+    end
+
     test 'document with title attribute entry overrides doctitle' do
      input = <<-EOS
 = Document Title

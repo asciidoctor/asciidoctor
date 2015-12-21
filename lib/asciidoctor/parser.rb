@@ -85,13 +85,13 @@ class Parser
   #
   # returns the Hash of orphan block attributes captured above the header
   def self.parse_document_header(reader, document)
-    # capture any lines of block-level metadata and plow away any comment lines
-    # that precede first block
+    # capture lines of block-level metadata and plow away comment lines that precede first block
     block_attributes = parse_block_metadata_lines(reader, document)
 
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
-    if block_attributes.has_key?('title')
+    if (has_doctitle_line = is_next_line_document_title?(reader, block_attributes)) &&
+        block_attributes.has_key?('title')
       return document.finalize_header block_attributes, false
     end
 
@@ -99,19 +99,16 @@ class Parser
     # definitely an area for spec refinement
     assigned_doctitle = nil
     unless (val = document.attributes['doctitle']).nil_or_empty?
-      document.title = val
-      assigned_doctitle = val
+      document.title = assigned_doctitle = val
     end
 
     section_title = nil
-    # check if the first line is the document title
-    # if so, add a header to the document and parse the header metadata
-    if is_next_line_document_title?(reader, block_attributes)
+    # if the first line is the document title, add a header to the document and parse the header metadata
+    if has_doctitle_line
       source_location = reader.cursor if document.sourcemap
       document.id, _, doctitle, _, single_line = parse_section_title(reader, document)
       unless assigned_doctitle
-        document.title = doctitle
-        assigned_doctitle = doctitle
+        document.title = assigned_doctitle = doctitle
       end
       # default to compat-mode if document uses atx-style doctitle
       document.set_attribute 'compat-mode', '' unless single_line
@@ -127,16 +124,12 @@ class Parser
       parse_header_metadata(reader, document)
     end
 
-    if !(val = document.attributes['doctitle']).nil_or_empty? &&
-        val != section_title
-      document.title = val
-      assigned_doctitle = val
+    unless (val = document.attributes['doctitle']).nil_or_empty? || val == section_title
+      document.title = assigned_doctitle = val
     end
 
     # restore doctitle attribute to original assignment
-    if assigned_doctitle
-      document.attributes['doctitle'] = assigned_doctitle
-    end
+    document.attributes['doctitle'] = assigned_doctitle if assigned_doctitle
 
     # parse title and consume name section of manpage document
     parse_manpage_header(reader, document) if document.doctype == 'manpage'
