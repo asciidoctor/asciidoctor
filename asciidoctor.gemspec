@@ -16,7 +16,7 @@ A fast, open source text processor and publishing toolchain, written in Ruby, fo
   s.license           = 'MIT'
 
   begin
-    s.files           = `git ls-files -z -- */* {CHANGELOG,LICENSE,README,Rakefile}* :/!benchmark/`.split "\0"
+    s.files           = `git ls-files -z -- */* {CHANGELOG,LICENSE,README,Rakefile}* ':(exclude)benchmark/'`.split "\0"
   rescue
     s.files           = Dir['**/*']
   end
