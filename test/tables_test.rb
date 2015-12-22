@@ -856,6 +856,24 @@ a|AsciiDoc footnote:[A lightweight markup language.]
       assert_css 'table > tbody > tr > td:nth-child(2) table > tbody > tr > td', output, 2
     end
 
+    test 'toc from parent document should not be included in an AsciiDoc table cell' do
+      input = <<-EOS
+= Document Title
+:toc:
+
+== Section A
+
+[cols="1a"]
+|===
+|AsciiDoc content
+|===
+      EOS
+
+      output = render_string input
+      assert_css '.toc', output, 1
+      assert_css 'table .toc', output, 0
+    end
+
     test 'nested document in AsciiDoc cell should not see doctitle of parent' do
       input = <<-EOS
 = Document Title
