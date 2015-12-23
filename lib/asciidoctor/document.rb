@@ -184,8 +184,9 @@ class Document < AbstractBlock
       # QUESTION should we support setting attribute in parent document from nested document?
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
       attr_overrides = parent_doc.attributes.dup
-      attr_overrides.delete 'doctype'
-      attr_overrides.delete 'compat-mode'
+      ['doctype', 'compat-mode', 'toc', 'toc-placement', 'toc-position'].each do |key|
+        attr_overrides.delete key
+      end
       @attribute_overrides = attr_overrides
       @safe = parent_doc.safe
       @compat_mode = parent_doc.compat_mode
