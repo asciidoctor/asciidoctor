@@ -48,6 +48,7 @@ module Asciidoctor
         gsub(/<\/?BOUNDARY>/, '').# artificial boundary
         gsub(ESC, '\\').          # restore backslash used for escape sequences (NOTE could be applied on document content)
         rstrip                    # strip trailing space
+      str = opts[:inside_listing] ? str.gsub(/^\./, '\\\&.') : str # inside listings, escape leading dots so they don't cause troff calls
       opts[:append_newline] ? %(#{str}#{LF}) : str
     end
 
@@ -254,7 +255,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{manify node.content}
+#{manify node.content, :inside_listing => true}
 .fi
 .if n \\{\\
 .RE
@@ -272,7 +273,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{manify node.content}
+#{manify node.content, :inside_listing => true}
 .fi
 .if n \\{\\
 .RE
