@@ -22,8 +22,8 @@ module Asciidoctor
     def manify str, opts = {}
       str = ((opts.fetch :preserve_space, true) ? (str.gsub TAB, ETAB) : (str.tr_s %(#{LF}#{TAB} ), ' ')).
         gsub('\\', '\\(rs').      # literal backslash
-        gsub(/^\.$/, '\\\&.').    # lone . is used in troff to indicate paragraph continuation with visual separator
-        gsub(/^\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c#{LF}\\3"). # quote last URL argument
+        gsub(/^\./, '\\\&.').     # leading . is used in troff for macro call or other formatting
+        gsub(/^\!MAN!.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c#{LF}\\3"). # quote last URL argument
         gsub(/(?:\A\n|(?:\n *| +)(\n))^\.(URL|MTO) /, "\\1\.\\2 "). # strip blank lines in source that precede a URL
         gsub('-', '\\-').
         gsub('&lt;', '<').
@@ -48,7 +48,6 @@ module Asciidoctor
         gsub(/<\/?BOUNDARY>/, '').# artificial boundary
         gsub(ESC, '\\').          # restore backslash used for escape sequences (NOTE could be applied on document content)
         rstrip                    # strip trailing space
-      str = opts[:inside_listing] ? str.gsub(/^\./, '\\\&.') : str # inside listings, escape leading dots so they don't cause troff calls
       opts[:append_newline] ? %(#{str}#{LF}) : str
     end
 
@@ -255,7 +254,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{manify node.content, :inside_listing => true}
+#{manify node.content}
 .fi
 .if n \\{\\
 .RE
@@ -273,7 +272,7 @@ T})
 .RS 4
 .\\}
 .nf
-#{manify node.content, :inside_listing => true}
+#{manify node.content}
 .fi
 .if n \\{\\
 .RE
@@ -583,7 +582,7 @@ allbox tab(:);'
         else
           macro = 'URL'
         end
-        %(#{LF}.#{macro} "#{target}" "#{text}" )
+        %(#{LF}!MAN!.#{macro} "#{target}" "#{text}" )
       when :xref
         refid = (node.attr 'refid') || target
         node.text || (node.document.references[:ids][refid] || %([#{refid}]))
