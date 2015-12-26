@@ -863,15 +863,64 @@ a|AsciiDoc footnote:[A lightweight markup language.]
 
 == Section A
 
-[cols="1a"]
 |===
-|AsciiDoc content
+a|AsciiDoc content
 |===
       EOS
 
       output = render_string input
       assert_css '.toc', output, 1
       assert_css 'table .toc', output, 0
+    end
+
+    test 'should be able to enable toc in AsciiDoc table cell' do
+      input = <<-EOS
+= Document Title
+
+== Section A
+
+|===
+a|
+= Subdocument Title
+:toc:
+
+== Subdocument Section A
+
+content
+|===
+      EOS
+
+      output = render_string input
+      assert_css '.toc', output, 1
+      assert_css 'table .toc', output, 1
+    end
+
+    test 'should be able to enable toc in both outer document and AsciiDoc table cell' do
+      input = <<-EOS
+= Document Title
+:toc:
+
+== Section A
+
+|===
+a|
+= Subdocument Title
+:toc: macro
+
+[#table-cell-toc]
+toc::[]
+
+== Subdocument Section A
+
+content
+|===
+      EOS
+
+      output = render_string input
+      assert_css '.toc', output, 2
+      assert_css '#toc', output, 1
+      assert_css 'table .toc', output, 1
+      assert_css 'table #table-cell-toc', output, 1
     end
 
     test 'nested document in AsciiDoc cell should not see doctitle of parent' do
