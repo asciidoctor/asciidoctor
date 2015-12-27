@@ -357,7 +357,7 @@ MathJax.Hub.Config({
       name = node.attr 'name'
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
       caption = if node.document.attr? 'icons'
-        if node.document.attr? 'icons', 'font'
+        if node.document.attr?('icons', 'font') && !node.attr?('icon', nil, false)
           %(<i class="fa icon-#{name}" title="#{node.caption}"></i>)
         else
           %(<img src="#{node.icon_uri name}" alt="#{node.caption}"#{@void_element_slash}>)
