@@ -48,7 +48,8 @@ module Asciidoctor
         gsub('&#8203;', '\:').    # zero width space
         gsub('\'', '\\(aq').      # apostrophe-quote
         gsub(/<\/?BOUNDARY>/, '').# artificial boundary
-        gsub(ESC, '').            # remove escape sequence marker (NOTE could be applied on document content)
+        gsub(ESC_BS, '\\').       # unescape troff backslash
+        gsub(ESC_FS, '.').        # unescape troff full-stop
         rstrip                    # strip trailing space
       opts[:append_newline] ? %(#{str}#{LF}) : str
     end
