@@ -25,10 +25,10 @@ module Asciidoctor
       str = ((opts.fetch :preserve_space, true) ? (str.gsub TAB, ETAB) : (str.tr_s %(#{LF}#{TAB} ), ' ')).
         gsub(/(?:\A|[^#{ESC}])\\/, '\&(rs'). # literal backslash (not a troff escape sequence)
         gsub(/^\./, '\\\&.').     # leading . is used in troff for macro call or other formatting
-        # unescape troff macro and quote last URL argument
-        gsub(/^#{ESC}\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c#{LF}\\3").
-        # strip blank lines in source that precede a URL
-        gsub(/(?:\A\n|(?:\n *| +)(\n))^\.(URL|MTO) /, '\1.\2 ').
+        # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
+        gsub(/^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)(?: *#{ESC}\\c)?$/) {
+          (rest = $3.strip).empty? ? %(.#$1\"#$2\") : %(.#$1\"#$2\"#{LF}#{rest})
+        }.
         gsub('-', '\\-').
         gsub('&lt;', '<').
         gsub('&gt;', '>').
@@ -586,7 +586,7 @@ allbox tab(:);'
         else
           macro = 'URL'
         end
-        %(#{LF}#{ESC_FS}#{macro} "#{target}" "#{text}" )
+        %(#{ESC_BS}c#{LF}#{ESC_FS}#{macro} "#{target}" "#{text}" )
       when :xref
         refid = (node.attr 'refid') || target
         node.text || (node.document.references[:ids][refid] || %([#{refid}]))
