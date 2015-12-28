@@ -167,11 +167,12 @@ class AbstractBlock < AbstractNode
   #   block.blocks.size
   #   # => 2
   #
-  # Returns nothing.
+  # Returns The parent Block
   def << block
     # parent assignment pending refactor
     #block.parent = self
     @blocks << block
+    self
   end
 
   # NOTE append alias required for adapting to a Java API
@@ -183,20 +184,33 @@ class AbstractBlock < AbstractNode
   #
   # Examples
   #
-  #   section = Section.new(parent)
-  #   section << Block.new(section, :paragraph, :source => 'paragraph 1')
-  #   section << Section.new(parent)
-  #   section << Block.new(section, :paragraph, :source => 'paragraph 2')
-  #   section.blocks?
+  #   doc << (sect1 = Section.new doc, 1, false)
+  #   sect1.title = 'Section 1'
+  #   para1 = Block.new sect1, :paragraph, :source => 'Paragraph 1'
+  #   para2 = Block.new sect1, :paragraph, :source => 'Paragraph 2'
+  #   sect1 << para1 << para2
+  #   sect1 << (sect1_1 = Section.new sect1, 2, false)
+  #   sect1_1.title = 'Section 1.1'
+  #   sect1_1 << (Block.new sect1_1, :paragraph, :source => 'Paragraph 3')
+  #   sect1.blocks?
   #   # => true
-  #   section.blocks.size
+  #   sect1.blocks.size
   #   # => 3
-  #   section.sections.size
+  #   sect1.sections.size
   #   # => 1
   #
   # Returns an [Array] of Section objects
   def sections
     @blocks.select {|block| block.context == :section }
+  end
+
+  # Public: Check whether this block has any child Section objects.
+  #
+  # Only applies to Document and Section instances
+  #
+  # Returns A [Boolean] to indicate whether this block has child Section objects
+  def sections?
+    @next_section_index > 0
   end
 
 # stage the Enumerable mixin until we're sure we've got it right
@@ -377,6 +391,9 @@ class AbstractBlock < AbstractNode
   # and reassign the section 0-based index value to each Section
   # as it appears in document order.
   #
+  # IMPORTANT You must invoke this method on a node after removing
+  # child sections or else the internal counters will be off.
+  # 
   # Returns nothing
   def reindex_sections
     @next_section_index = 0

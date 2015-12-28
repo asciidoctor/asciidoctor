@@ -162,12 +162,10 @@ class Section < AbstractBlock
   #
   # block - The child Block to append to this parent Block
   #
-  # Returns nothing.
+  # Returns The parent Block
   def << block
+    assign_index block if block.context == :section
     super
-    if block.context == :section
-      assign_index block
-    end
   end
 
   def to_s

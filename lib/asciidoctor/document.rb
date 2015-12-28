@@ -693,12 +693,10 @@ class Document < AbstractBlock
   #
   # block - The child Block to append to this parent Block
   #
-  # Returns nothing.
-  def <<(block)
+  # Returns The parent Block
+  def << block
+    assign_index block if block.context == :section
     super
-    if block.context == :section
-      assign_index block
-    end
   end
 
   # Internal: called after the header has been parsed and before the content
