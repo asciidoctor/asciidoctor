@@ -10,6 +10,8 @@ module Asciidoctor
     TAB = "\t"
     ETAB = ' ' * 8
     ESC = "\u001b"
+    ESC_BS = "#{ESC}\\" # escaped backslash (indicates troff formatting sequence)
+    ESC_FS = "#{ESC}."  # escaped full stop (indicates troff macro)
 
     # Converts HTML entity references back to their original form, escapes
     # special man characters and strips trailing whitespace.
@@ -21,10 +23,10 @@ module Asciidoctor
     # * append a newline
     def manify str, opts = {}
       str = ((opts.fetch :preserve_space, true) ? (str.gsub TAB, ETAB) : (str.tr_s %(#{LF}#{TAB} ), ' ')).
-        gsub('\\', '\\(rs').      # literal backslash
-        gsub(/^\.$/, '\\\&.').    # lone . is used in troff to indicate paragraph continuation with visual separator
-        gsub(/^\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c#{LF}\\3"). # quote last URL argument
-        gsub(/(?:\A\n|(?:\n *| +)(\n))^\.(URL|MTO) /, "\\1\.\\2 "). # strip blank lines in source that precede a URL
+        gsub(/(?:\A|[^#{ESC}])\\/, '\&(rs'). # literal backslash (not a troff escape sequence)
+        gsub(/^\./, '\\\&.').     # leading . is used in troff for macro call or other formatting
+        gsub(/^#{ESC}\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c#{LF}\\3"). # quote last URL argument
+        gsub(/(?:\A\n|(?:\n *| +)(\n))^\.(URL|MTO) /, '\1.\2 '). # strip blank lines in source that precede a URL
         gsub('-', '\\-').
         gsub('&lt;', '<').
         gsub('&gt;', '>').
@@ -46,7 +48,8 @@ module Asciidoctor
         gsub('&#8203;', '\:').    # zero width space
         gsub('\'', '\\(aq').      # apostrophe-quote
         gsub(/<\/?BOUNDARY>/, '').# artificial boundary
-        gsub(ESC, '\\').          # restore backslash used for escape sequences (NOTE could be applied on document content)
+        gsub(ESC_BS, '\\').       # unescape troff backslash
+        gsub(ESC_FS, '.').        # unescape troff full-stop
         rstrip                    # strip trailing space
       opts[:append_newline] ? %(#{str}#{LF}) : str
     end
@@ -574,15 +577,15 @@ allbox tab(:);'
         if (text = node.text) == target
           text = nil
         else
-          text = text.gsub '"', %[#{ESC}(dq]
+          text = text.gsub '"', %[#{ESC_BS}(dq]
         end
         if target.start_with? 'mailto:'
           macro = 'MTO'
-          target = target[7..-1].sub '@', %[#{ESC}(at]
+          target = target[7..-1].sub '@', %[#{ESC_BS}(at]
         else
           macro = 'URL'
         end
-        %(#{LF}.#{macro} "#{target}" "#{text}" )
+        %(#{LF}#{ESC_FS}#{macro} "#{target}" "#{text}" )
       when :xref
         refid = (node.attr 'refid') || target
         node.text || (node.document.references[:ids][refid] || %([#{refid}]))
@@ -600,11 +603,11 @@ allbox tab(:);'
     end
 
     def inline_button node
-      %(#{ESC}fB[#{ESC}0#{node.text}#{ESC}0]#{ESC}fP)
+      %(#{ESC_BS}fB[#{ESC_BS}0#{node.text}#{ESC_BS}0]#{ESC_BS}fP)
     end
 
     def inline_callout node
-      %(#{ESC}fB(#{node.text})#{ESC}fP)
+      %(#{ESC_BS}fB(#{node.text})#{ESC_BS}fP)
     end
 
     # TODO supposedly groff has footnotes, but we're in search of an example
@@ -630,20 +633,20 @@ allbox tab(:);'
       if (keys = node.attr 'keys').size == 1
         keys[0]
       else
-        keys.join %(#{ESC}0+#{ESC}0)
+        keys.join %(#{ESC_BS}0+#{ESC_BS}0)
       end
     end
 
     def inline_menu node
-      caret = %[#{ESC}0#{ESC}(fc#{ESC}0]
+      caret = %[#{ESC_BS}0#{ESC_BS}(fc#{ESC_BS}0]
       menu = node.attr 'menu'
       if !(submenus = node.attr 'submenus').empty?
-        submenu_path = submenus.map {|item| %(#{ESC}fI#{item}#{ESC}fP) }.join caret
-        %(#{ESC}fI#{menu}#{ESC}fP#{caret}#{submenu_path}#{caret}#{ESC}fI#{node.attr 'menuitem'}#{ESC}fP)
+        submenu_path = submenus.map {|item| %(#{ESC_BS}fI#{item}#{ESC_BS}fP) }.join caret
+        %(#{ESC_BS}fI#{menu}#{ESC_BS}fP#{caret}#{submenu_path}#{caret}#{ESC_BS}fI#{node.attr 'menuitem'}#{ESC_BS}fP)
       elsif (menuitem = node.attr 'menuitem')
-        %(#{ESC}fI#{menu}#{caret}#{menuitem}#{ESC}fP)
+        %(#{ESC_BS}fI#{menu}#{caret}#{menuitem}#{ESC_BS}fP)
       else
-        %(#{ESC}fI#{menu}#{ESC}fP)
+        %(#{ESC_BS}fI#{menu}#{ESC_BS}fP)
       end
     end
 
@@ -651,15 +654,15 @@ allbox tab(:);'
     def inline_quoted node
       case node.type
       when :emphasis
-        %(#{ESC}fI<BOUNDARY>#{node.text}</BOUNDARY>#{ESC}fP)
+        %(#{ESC_BS}fI<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}fP)
       when :strong
-        %(#{ESC}fB<BOUNDARY>#{node.text}</BOUNDARY>#{ESC}fP)
+        %(#{ESC_BS}fB<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}fP)
       when :monospaced
-        %(#{ESC}f[CR]<BOUNDARY>#{node.text}</BOUNDARY>#{ESC}fP)
+        %(#{ESC_BS}f[CR]<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}fP)
       when :single
-        %[#{ESC}(oq<BOUNDARY>#{node.text}</BOUNDARY>#{ESC}(cq]
+        %[#{ESC_BS}(oq<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}(cq]
       when :double
-        %[#{ESC}(lq<BOUNDARY>#{node.text}</BOUNDARY>#{ESC}(rq]
+        %[#{ESC_BS}(lq<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}(rq]
       else
         node.text
       end

@@ -46,6 +46,17 @@ context 'Manpage' do
       output = Asciidoctor.convert input, :backend => :manpage
       assert_equal '\&.', output.lines.entries.last.chomp
     end
+
+    test 'should escape raw macro' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+AAA this line of text should be show
+.if 1 .nx
+BBB this line and the one above it should be visible)
+
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal '\&.if 1 .nx', output.lines.entries[-2].chomp
+    end
   end
 
   context 'Backslash' do
