@@ -26,6 +26,7 @@ module Asciidoctor
         gsub(/(?:\A|[^#{ESC}])\\/, '\&(rs'). # literal backslash (not a troff escape sequence)
         gsub(/^\./, '\\\&.').     # leading . is used in troff for macro call or other formatting
         # unescape troff macro and quote last URL argument
+        gsub(/^#{ESC}\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*) *$/,          ".\\1\"\\2\"#{LF}\\c").
         gsub(/^#{ESC}\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*) *(.*?)( *)$/, ".\\1\"\\2\"#{LF}\\c#{LF}\\3").
         # strip blank lines in source that precede a URL
         gsub(/(?:\A\n|(?:\n *| +)(\n))^\.(URL|MTO) /, '\1.\2 ').
