@@ -157,17 +157,15 @@ class Parser
 
     if is_next_line_section?(reader, {})
       name_section = initialize_section(reader, document, {})
+      document.attributes['man-first-section-name'] = name_section.title
+      document.attributes['man-first-section-level'] = name_section.level
       if name_section.level == 1
         name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join(' ').tr_s(' ', ' ')
+        document.attributes['man-first-section-first-line'] = name_section_buffer
         if (m = ManpageNamePurposeRx.match(name_section_buffer))
           document.attributes['manname'] = document.sub_attributes m[1]
           document.attributes['manpurpose'] = m[2]
           # TODO parse multiple man names
-
-          if document.backend == 'manpage'
-            document.attributes['docname'] = document.attributes['manname']
-            document.attributes['outfilesuffix'] = %(.#{document.attributes['manvolnum']})
-          end
         else
           warn %(asciidoctor: ERROR: #{reader.prev_line_info}: malformed name section body)
         end
@@ -176,6 +174,11 @@ class Parser
       end
     else
       warn %(asciidoctor: ERROR: #{reader.prev_line_info}: name section expected)
+    end
+
+    if document.backend == 'manpage'
+      document.attributes['docname'] = document.attributes['manname'] || document.attributes['mantitle']
+      document.attributes['outfilesuffix'] = %(.#{document.attributes['manvolnum']})
     end
   end
 
