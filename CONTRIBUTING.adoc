@@ -33,8 +33,9 @@ An ideal bug report would include a pull request with failing specs.
 == Submitting a Pull Request
 
 . {uri-fork-help}[Fork the repository].
-. Run `bundle install` to install dependencies.
-. {uri-branch-help}[Create a topic branch].
+. Run `bundle` to install development dependencies.
+  * If the `bundle` command is not available, run `gem install bundler` to install it.
+. {uri-branch-help}[Create a topic branch] (preferably using the pattern `issue-XYZ`, where `XYZ` is the issue number).
 . Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
 . Run `bundle exec rake` to run the tests.
 If your tests pass, return to step 3.
