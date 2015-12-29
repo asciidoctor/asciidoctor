@@ -36,7 +36,7 @@ module Extensions
   class Processor
     class << self
       # Public: Get the static configuration for this processor class.
-      # 
+      #
       # Returns a configuration [Hash]
       def config
         @config ||= {}
@@ -848,7 +848,7 @@ module Extensions
     # is not passed as an argument, it gets read from the name property of the
     # BlockProcessor instance. If a name still cannot be determined, an error
     # is raised.
-    # 
+    #
     # Examples
     #
     #   # as a BlockProcessor subclass
@@ -871,7 +871,7 @@ module Extensions
     #
     #   # as a method block
     #   block do
-    #     named :shout 
+    #     named :shout
     #     process |parent, reader, attrs|
     #       ...
     #     end
@@ -937,7 +937,7 @@ module Extensions
     # registered to handle. If a block macro name is not passed as an argument,
     # it gets read from the name property of the BlockMacroProcessor instance.
     # If a name still cannot be determined, an error is raised.
-    # 
+    #
     # Examples
     #
     #   # as a BlockMacroProcessor subclass
@@ -1026,7 +1026,7 @@ module Extensions
     # registered to handle. If a block macro name is not passed as an argument,
     # it gets read from the name property of the InlineMacroProcessor instance.
     # If a name still cannot be determined, an error is raised.
-    # 
+    #
     # Examples
     #
     #   # as an InlineMacroProcessor subclass

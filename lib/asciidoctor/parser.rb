@@ -133,7 +133,7 @@ class Parser
 
     # parse title and consume name section of manpage document
     parse_manpage_header(reader, document) if document.doctype == 'manpage'
- 
+
     # NOTE block_attributes are the block-level attributes (not document attributes) that
     # precede the first line of content (document title, first section or first block)
     document.finalize_header block_attributes
@@ -161,7 +161,7 @@ class Parser
         name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join(' ').tr_s(' ', ' ')
         if (m = ManpageNamePurposeRx.match(name_section_buffer))
           document.attributes['manname'] = document.sub_attributes m[1]
-          document.attributes['manpurpose'] = m[2] 
+          document.attributes['manpurpose'] = m[2]
           # TODO parse multiple man names
 
           if document.backend == 'manpage'
@@ -332,7 +332,7 @@ class Parser
               elsif first_block.content_model != :compound
                 intro = Block.new section, :open, :content_model => :compound
                 intro.style = 'partintro'
-                section.blocks.shift 
+                section.blocks.shift
                 if first_block.style == 'partintro'
                   first_block.context = :paragraph
                   first_block.style = nil
@@ -399,7 +399,7 @@ class Parser
   #
   # reader - The Reader from which to retrieve the next block
   # parent - The Document, Section or Block to which the next block belongs
-  # 
+  #
   # Returns a Section or Block object holding the parsed content of the processed lines
   #--
   # QUESTION should next_block have an option for whether it should keep looking until
@@ -418,7 +418,7 @@ class Parser
       options.delete(:text)
       text_only = false
     end
-    
+
     parse_metadata = options.fetch(:parse_metadata, true)
     #parse_sections = options.fetch(:parse_sections, false)
 
@@ -827,7 +827,7 @@ class Parser
 
         when :literal
           block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
-        
+
         when :pass
           block = build_block(block_context, :raw, terminator, parent, reader, attributes)
 
@@ -1071,7 +1071,7 @@ class Parser
         adjust_indentation! lines, indent, (attributes['tabsize'] || parent.document.attributes['tabsize'])
       elsif (tab_size = (attributes['tabsize'] || parent.document.attributes['tabsize']).to_i) > 0
         adjust_indentation! lines, nil, tab_size
-      end 
+      end
     end
 
     if (extension = options[:extension])
@@ -1318,7 +1318,7 @@ class Parser
     if list_item_reader.has_more_lines?
       comment_lines = list_item_reader.skip_line_comments
       subsequent_line = list_item_reader.peek_line
-      list_item_reader.unshift_lines comment_lines unless comment_lines.empty? 
+      list_item_reader.unshift_lines comment_lines unless comment_lines.empty?
 
       if !subsequent_line.nil?
         continuation_connects_first_block = subsequent_line.empty?
@@ -1367,7 +1367,7 @@ class Parser
   #
   # reader          - The Reader from which to retrieve the lines.
   # list_type       - The Symbol context of the list (:ulist, :olist, :colist or :dlist)
-  # sibling_trait   - A Regexp that matches a sibling of this list item or String list marker 
+  # sibling_trait   - A Regexp that matches a sibling of this list item or String list marker
   #                   of the items in this list (default: nil)
   # has_text        - Whether the list item has text defined inline (always true except for labeled lists)
   #
@@ -1377,7 +1377,7 @@ class Parser
 
     # three states for continuation: :inactive, :active & :frozen
     # :frozen signifies we've detected sequential continuation lines &
-    # continuation is not permitted until reset 
+    # continuation is not permitted until reset
     continuation = :inactive
 
     # if we are within a nested list, we don't throw away the list
@@ -1437,7 +1437,7 @@ class Parser
         break
       else
         if continuation == :active && !this_line.empty?
-          # literal paragraphs have special considerations (and this is one of 
+          # literal paragraphs have special considerations (and this is one of
           # two entry points into one)
           # if we don't process it as a whole, then a line in it that looks like a
           # list item will throw off the exit from it
@@ -1470,7 +1470,7 @@ class Parser
           # advance to the next line of content
           if this_line.empty?
             reader.skip_blank_lines
-            this_line = reader.read_line 
+            this_line = reader.read_line
             # if we hit eof or a sibling, stop reading
             break if this_line.nil? || is_sibling_list_item?(this_line, list_type, sibling_trait)
           end
@@ -1827,7 +1827,7 @@ class Parser
       rev_metadata = {}
 
       if reader.has_more_lines? && !reader.next_line_empty?
-        rev_line = reader.read_line 
+        rev_line = reader.read_line
         if (match = RevisionInfoLineRx.match(rev_line))
           rev_metadata['revnumber'] = match[1].rstrip if match[1]
           unless (component = match[2].strip) == ''
@@ -2180,7 +2180,7 @@ class Parser
   #  Parser.resolve_ordered_list_marker(marker, 1, true)
   #  # => 'A.'
   #
-  # Returns the String of the first marker in this number series 
+  # Returns the String of the first marker in this number series
   def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
     number_style = ORDERED_LIST_STYLES.detect {|s| OrderedListMarkerRxMap[s] =~ marker }
     expected = actual = nil
@@ -2231,7 +2231,7 @@ class Parser
   #
   # line          - The String line to check
   # list_type     - The context of the list (:olist, :ulist, :colist, :dlist)
-  # sibling_trait - The String marker for the list or the Regexp to match a sibling 
+  # sibling_trait - The String marker for the list or the Regexp to match a sibling
   #
   # Returns a Boolean indicating whether this line is a sibling list item given
   # the criteria provided
@@ -2386,7 +2386,7 @@ class Parser
   #
   # The column specs dictate the number of columns, relative
   # width of columns, default alignments for cells in each
-  # column, and/or default styles or filters applied to the cells in 
+  # column, and/or default styles or filters applied to the cells in
   # the column.
   #
   # Every column spec is guaranteed to have a width
@@ -2448,7 +2448,7 @@ class Parser
   # The default spec when pos == :end is {} since we already know we're at a
   # delimiter. When pos == :start, we *may* be at a delimiter, nil indicates
   # we're not.
-  # 
+  #
   # returns the Hash of attributes that indicate how to layout
   # and style this cell in the table.
   def self.parse_cell_spec(line, pos = :start, delimiter = nil)
@@ -2489,7 +2489,7 @@ class Parser
         spec['repeatcol'] = colspec unless colspec == 1
       end
     end
-    
+
     if m[3]
       colspec, rowspec = m[3].split '.'
       if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
@@ -2577,7 +2577,7 @@ class Parser
           collector.push c
         end
       end
-      
+
       # small optimization if no shorthand is found
       if type == :style
         parsed_style = attributes['style'] = raw_style
@@ -2603,7 +2603,7 @@ class Parser
             attributes[%(#{option}-option)] = ''
           end
           if (existing_opts = attributes['options'])
-            attributes['options'] = (options + existing_opts.split(',')) * ',' 
+            attributes['options'] = (options + existing_opts.split(',')) * ','
           else
             attributes['options'] = options * ','
           end
@@ -2748,7 +2748,7 @@ class Parser
     value = value.downcase
     digits = { 'i' => 1, 'v' => 5, 'x' => 10 }
     result = 0
-    
+
     (0..value.length - 1).each {|i|
       digit = digits[value[i..i]]
       if i + 1 < value.length && digits[value[i+1..i+1]] > digit

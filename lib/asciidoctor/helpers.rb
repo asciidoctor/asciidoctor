@@ -63,7 +63,7 @@ module Helpers
   # returns a String Array of normalized lines
   def self.normalize_lines_array data
     return [] if data.empty?
- 
+
     # NOTE if data encoding is UTF-*, we only need 0..1
     leading_bytes = (first_line = data[0])[0..2].bytes.to_a
     if COERCE_ENCODING
@@ -99,7 +99,7 @@ module Helpers
   # data - a String of lines to normalize
   #
   # returns a String Array of normalized lines
-  def self.normalize_lines_from_string data 
+  def self.normalize_lines_from_string data
     return [] if data.nil_or_empty?
 
     if COERCE_ENCODING

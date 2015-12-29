@@ -276,7 +276,7 @@ context 'Extensions' do
       ensure
         Asciidoctor::Extensions.unregister_all
       end
-      
+
     end
   end
 
@@ -444,7 +444,7 @@ after
         Asciidoctor::Extensions.unregister_all
       end
     end
-  
+
     test 'should call include processor to process include directive' do
       input = <<-EOS
 first line

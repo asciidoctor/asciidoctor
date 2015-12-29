@@ -1303,12 +1303,12 @@ module Substitutors
           current.push c
         end
       end
-  
+
       values << current.join.strip
     else
       values = str.split(',').map {|it| it.strip }
     end
-  
+
     values
   end
 

@@ -26,7 +26,7 @@ Paragraph.
 Winning.
       EOS
       output = render_embedded_string input
-      
+
       assert_css 'p', output, 2
       assert_xpath '(//p)[1]/preceding-sibling::*[@class = "title"]', output, 1
       assert_xpath '(//p)[1]/preceding-sibling::*[@class = "title"][text() = "Titled"]', output, 1
@@ -60,7 +60,7 @@ paragraph
 . wrapped line
       EOS
 
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css 'p', output, 1
       assert_xpath %(//p[text()="paragraph\n. wrapped line"]), output, 1
     end
@@ -71,7 +71,7 @@ paragraph
 .wrapped line
       EOS
 
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css 'p', output, 1
       assert_xpath %(//p[text()="paragraph\n.wrapped line"]), output, 1
     end

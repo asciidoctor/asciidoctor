@@ -349,10 +349,10 @@ toc toc-placement!                        |   |content     |macro        |nil
         raw_attrs, toc, toc_position, toc_placement, toc_class = expect
         attrs = Hash[*(raw_attrs.split ' ').map {|e| e.include?('=') ? e.split('=') : [e, ''] }.flatten]
         doc = document_from_string '', :attributes => attrs
-        toc ? (assert doc.attr?('toc', toc)) : (assert !doc.attr?('toc')) 
-        toc_position ? (assert doc.attr?('toc-position', toc_position)) : (assert !doc.attr?('toc-position')) 
-        toc_placement ? (assert doc.attr?('toc-placement', toc_placement)) : (assert !doc.attr?('toc-placement')) 
-        toc_class ? (assert doc.attr?('toc-class', toc_class)) : (assert !doc.attr?('toc-class')) 
+        toc ? (assert doc.attr?('toc', toc)) : (assert !doc.attr?('toc'))
+        toc_position ? (assert doc.attr?('toc-position', toc_position)) : (assert !doc.attr?('toc-position'))
+        toc_placement ? (assert doc.attr?('toc-placement', toc_placement)) : (assert !doc.attr?('toc-placement'))
+        toc_class ? (assert doc.attr?('toc-class', toc_class)) : (assert !doc.attr?('toc-class'))
       end
     end
   end
@@ -618,7 +618,7 @@ Belly up to the {foo}.
 
     test 'does not substitute attributes inside listing blocks' do
       input = <<-EOS
-:forecast: snow 
+:forecast: snow
 
 ----
 puts 'The forecast for today is {forecast}'
@@ -668,22 +668,22 @@ of the attribute named foo in your document.
     end
 
     test 'assigns attribute defined in attribute reference with set prefix and value' do
-      input = '{set:foo:bar}{foo}' 
-      output = render_embedded_string input 
+      input = '{set:foo:bar}{foo}'
+      output = render_embedded_string input
       assert_xpath '//p', output, 1
       assert_xpath '//p[text()="bar"]', output, 1
     end
 
     test 'assigns attribute defined in attribute reference with set prefix and no value' do
       input = "{set:foo}\n{foo}yes"
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_xpath '//p', output, 1
       assert_xpath '//p[normalize-space(text())="yes"]', output, 1
     end
 
     test 'assigns attribute defined in attribute reference with set prefix and empty value' do
       input = "{set:foo:}\n{foo}yes"
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_xpath '//p', output, 1
       assert_xpath '//p[normalize-space(text())="yes"]', output, 1
     end
@@ -793,7 +793,7 @@ of the attribute named foo in your document.
       assert_equal 'A', doc.attributes['mycounter']
       assert_xpath '//p[text()="A"]', output, 2
     end
-    
+
     test 'counter uses 0 as seed value if seed attribute is nil' do
       input = <<-EOS
 :mycounter:
@@ -836,11 +836,11 @@ content
       EOS
 
       block = block_from_string input
-      assert_equal 'bar', block.attr('foo') 
-      assert_equal '_bar', block.attr('_foo') 
-      assert_equal 'bar1', block.attr('foo1') 
-      assert_equal 'bar-bar', block.attr('foo-foo') 
-      assert_equal 'bar.bar', block.attr('foo.foo') 
+      assert_equal 'bar', block.attr('foo')
+      assert_equal '_bar', block.attr('_foo')
+      assert_equal 'bar1', block.attr('foo1')
+      assert_equal 'bar-bar', block.attr('foo-foo')
+      assert_equal 'bar.bar', block.attr('foo.foo')
     end
 
     test 'positional attributes assigned to block' do
@@ -1069,7 +1069,7 @@ Text
 
     test 'a role can be added using add_role when the node has no roles' do
         input = <<-EOS
-A normal paragraph        
+A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1081,7 +1081,7 @@ A normal paragraph
     test 'a role can be added using add_role when the node already has a role' do
         input = <<-EOS
 [.role1]
-A normal paragraph        
+A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1094,7 +1094,7 @@ A normal paragraph
     test 'a role is not added using add_role if the node already has that role' do
         input = <<-EOS
 [.role1]
-A normal paragraph        
+A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1106,7 +1106,7 @@ A normal paragraph
     test 'an existing role can be removed using remove_role' do
         input = <<-EOS
 [.role1.role2]
-A normal paragraph        
+A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1119,7 +1119,7 @@ A normal paragraph
     test 'roles are not changed when a non-existent role is removed using remove_role' do
         input = <<-EOS
 [.role1]
-A normal paragraph        
+A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1131,7 +1131,7 @@ A normal paragraph
 
     test 'roles are not changed when using remove_role if the node has no roles' do
         input = <<-EOS
-A normal paragraph        
+A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1223,7 +1223,7 @@ Reference Manual
 preamble
       EOS
       doc = document_from_string input
-      assert_equal 'reference', doc.id 
+      assert_equal 'reference', doc.id
       assert_equal 'refguide', doc.attr('css-signature')
       output = doc.render
       assert_xpath '//body[@id="reference"]', output, 1

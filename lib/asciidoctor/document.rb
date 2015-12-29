@@ -107,7 +107,7 @@ class Document < AbstractBlock
   # Public: Get the Boolean AsciiDoc compatibility mode
   #
   # enabling this attribute activates the following syntax changes:
-  # 
+  #
   #   * single quotes as constrained emphasis formatting marks
   #   * single backticks parsed as inline literal, formatted as monospace
   #   * single plus parsed as constrained, monospaced inline formatting
@@ -352,10 +352,10 @@ class Document < AbstractBlock
         attr_overrides['icons'] ||= nil
       end
     end
-    
+
     attr_overrides.delete_if do |key, val|
       verdict = false
-      # a nil value undefines the attribute 
+      # a nil value undefines the attribute
       if val.nil?
         attrs.delete(key)
       else
@@ -444,7 +444,7 @@ class Document < AbstractBlock
   # Public: Parse the AsciiDoc source stored in the {Reader} into an abstract syntax tree.
   #
   # If the data parameter is not nil, create a new {PreprocessorReader} and assigned it to the reader
-  # property of this object. Otherwise, continue with the reader that was created in {#initialize}. 
+  # property of this object. Otherwise, continue with the reader that was created in {#initialize}.
   # Pass the reader to {Parser.parse} to parse the source data into an abstract syntax tree.
   #
   # If parsing has already been performed, this method returns without performing any processing.
@@ -533,7 +533,7 @@ class Document < AbstractBlock
       if intval.to_s != current.to_s
         (current[0].ord + 1).chr
       else
-        intval + 1 
+        intval + 1
       end
     end
   end
@@ -639,7 +639,7 @@ class Document < AbstractBlock
     else
       return
     end
-    
+
     if (separator = opts[:partition])
       Title.new val, opts.merge({ :separator => (separator == true ? @attributes['title-separator'] : separator) })
     elsif opts[:sanitize] && val.include?('<')
@@ -711,7 +711,7 @@ class Document < AbstractBlock
     unrooted_attributes['invalid-header'] = true unless header_valid
     unrooted_attributes
   end
- 
+
   # Internal: Branch the attributes so that the original state can be restored
   # at a future time.
   def save_attributes
@@ -1093,7 +1093,7 @@ class Document < AbstractBlock
 
     start = ::Time.now.to_f if monitor
     r.write output, target
-    monitor[:write] = ::Time.now.to_f - start if monitor 
+    monitor[:write] = ::Time.now.to_f - start if monitor
 
     output
   end

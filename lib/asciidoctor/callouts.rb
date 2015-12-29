@@ -93,7 +93,7 @@ class Callouts
   def rewind
     @list_index = 1
     @co_index = 1
-    
+
     nil
   end
 

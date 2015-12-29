@@ -15,7 +15,7 @@ class Inline < AbstractNode
     super(parent, context)
     @node_name = %(inline_#{context})
 
-    @text = text 
+    @text = text
 
     @id = opts[:id]
     @type = opts[:type]
@@ -37,7 +37,7 @@ class Inline < AbstractNode
   def convert
     converter.convert self
   end
-  
+
   # Alias render to convert to maintain backwards compatibility
   alias :render :convert
 end

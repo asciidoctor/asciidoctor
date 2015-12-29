@@ -42,7 +42,7 @@ class Table < AbstractBlock
     'v' => :verse,
     'a' => :asciidoc
   }
-  
+
   # Public: A Hash mapping alignment abbreviations to alignments (horizontal
   # and vertial) that can be applies to a table column or cell
   ALIGNMENTS = {
@@ -139,7 +139,7 @@ class Table < AbstractBlock
     if num_body_rows > 0 && attributes.key?('footer-option')
       @rows.foot = [@rows.body.pop]
     end
-    
+
     nil
   end
 end
@@ -348,7 +348,7 @@ class Table::ParserContext
 
   # Public: Determines whether the buffer has unclosed quotes. Used for CSV data.
   #
-  # returns true if the buffer has unclosed quotes, false if it doesn't or it 
+  # returns true if the buffer has unclosed quotes, false if it doesn't or it
   # isn't quoted data
   def buffer_has_unclosed_quotes?(append = nil)
     record = %(#{@buffer}#{append}).strip
@@ -455,7 +455,7 @@ class Table::ParserContext
             # unquote
             cell_text = cell_text[1...-1].strip
           end
-          
+
           # collapses escaped quotes
           cell_text = cell_text.tr_s('"', '"')
         end

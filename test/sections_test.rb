@@ -266,7 +266,7 @@ preamble
     end
   end
 
-  context "level 1" do 
+  context "level 1" do
     test "with multiline syntax" do
       assert_xpath "//h2[@id='_my_section'][text() = 'My Section']", render_string("My Section\n-----------")
     end
@@ -292,7 +292,7 @@ preamble
     test "with XML entity" do
       assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where#{[8217].pack('U*')}s the love?\"]", render_string("== Where's the love?")
     end
-    
+
     test "with non-word character" do
       assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where’s the love?\"]", render_string("== Where’s the love?")
     end
@@ -351,7 +351,7 @@ content
     end if ::RUBY_MIN_VERSION_1_9
   end
 
-  context "level 2" do 
+  context "level 2" do
     test "with multiline syntax" do
       assert_xpath "//h3[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n~~~~~~~~~~~")
     end
@@ -359,9 +359,9 @@ content
     test "with single line syntax" do
       assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n=== My Title")
     end
-  end  
+  end
 
-  context "level 3" do 
+  context "level 3" do
     test "with multiline syntax" do
       assert_xpath "//h4[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n^^^^^^^^^^")
     end
@@ -371,7 +371,7 @@ content
     end
   end
 
-  context "level 4" do 
+  context "level 4" do
     test "with multiline syntax" do
       assert_xpath "//h5[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n++++++++++")
     end
@@ -381,7 +381,7 @@ content
     end
   end
 
-  context "level 5" do 
+  context "level 5" do
     test "with single line syntax" do
       assert_xpath "//h6[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n====== My Title")
     end
@@ -681,8 +681,8 @@ Master section text.
       end
 
       assert errors.empty?
-      assert_match(/Master document written by Doc Writer/, output) 
-      assert_match(/Standalone document written by Junior Writer/, output) 
+      assert_match(/Master document written by Doc Writer/, output)
+      assert_match(/Standalone document written by Junior Writer/, output)
       assert_xpath '//*[@class="sect1"]/h2[text() = "Standalone Document"]', output, 1
       assert_xpath '//*[@class="sect2"]/h3[text() = "Section in Standalone"]', output, 1
       assert_xpath '//*[@class="sect1"]/h2[text() = "Section in Master"]', output, 1
@@ -798,7 +798,7 @@ content
 = Title
 :sectnums:
 
-== Section_1 
+== Section_1
 
 text
 
@@ -822,7 +822,7 @@ text
 
 text
       EOS
-    
+
       output = render_string input
       assert_xpath '//h2[@id="_section_1"][starts-with(text(), "1. ")]', output, 1
       assert_xpath '//h3[@id="_section_1_1"][starts-with(text(), "1.1. ")]', output, 1
@@ -837,7 +837,7 @@ text
 = Title
 :numbered:
 
-== Section_1 
+== Section_1
 
 text
 
@@ -861,7 +861,7 @@ text
 
 text
       EOS
-    
+
       output = render_string input
       assert_xpath '//h2[@id="_section_1"][starts-with(text(), "1. ")]', output, 1
       assert_xpath '//h3[@id="_section_1_1"][starts-with(text(), "1.1. ")]', output, 1

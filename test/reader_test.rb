@@ -223,7 +223,7 @@ third line
       test 'source_lines should return copy of original data Array' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         reader.read_lines
-        assert_equal SAMPLE_DATA, reader.source_lines 
+        assert_equal SAMPLE_DATA, reader.source_lines
       end
 
       test 'source should return original data Array joined as String' do
@@ -494,12 +494,12 @@ include::include-file.asciidoc[]
         reader = doc.reader
         assert_equal 'link:include-file.asciidoc[]', reader.read_line
       end
-  
+
       test 'include directive is enabled when safe mode is less than SECURE' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[]
         EOS
-  
+
         doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         output = doc.render
         assert_match(/included content/, output)
@@ -509,7 +509,7 @@ include::fixtures/include-file.asciidoc[]
         input = <<-EOS
 include::fixtures/include file.asciidoc[]
         EOS
-  
+
         include_file = File.join DIRNAME, 'fixtures', 'include-file.asciidoc'
         include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.asciidoc'
         begin
@@ -526,7 +526,7 @@ include::fixtures/include file.asciidoc[]
         input = <<-EOS
 include::fixtures/include{sp}file.asciidoc[]
         EOS
-  
+
         include_file = File.join DIRNAME, 'fixtures', 'include-file.asciidoc'
         include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.asciidoc'
         begin
@@ -599,14 +599,14 @@ include::fixtures/parent-include.adoc[]
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/parent-include.adoc', reader.path
       end
-  
+
       test 'missing file referenced by include directive is replaced by warning' do
         input = <<-EOS
 include::fixtures/no-such-file.adoc[]
 
 trailing content
         EOS
-  
+
         begin
           doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
           assert_equal 2, doc.blocks.size
@@ -625,7 +625,7 @@ include::fixtures/chapter-a.adoc[]
 
 trailing content
         EOS
-  
+
         begin
           doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
           assert_equal 2, doc.blocks.size
@@ -650,7 +650,7 @@ include::#{include_path}[]
         result = document_from_string input, :safe => :unsafe, :base_dir => ::Dir.tmpdir
         assert_equal 'Chapter A', result.doctitle
       end
-  
+
       test 'include directive can retrieve data from uri' do
         #url = 'http://echo.jsontest.com/name/asciidoctor'
         url = %(http://#{resolve_localhost}:9876/name/asciidoctor)
@@ -667,7 +667,7 @@ include::#{url}[]
         refute_nil output
         assert_match(expect, output)
       end
-  
+
       test 'inaccessible uri referenced by include directive does not crash processor' do
         url = %(http://#{resolve_localhost}:9876/no_such_file)
         input = <<-EOS
@@ -686,12 +686,12 @@ include::#{url}[]
         refute_nil output
         assert_match(/Unresolved directive/, output)
       end
-  
+
       test 'include directive supports line selection' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         EOS
-  
+
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/first line/, output)
         refute_match(/second line/, output)
@@ -703,12 +703,12 @@ include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         assert_match(/eighth line/, output)
         assert_match(/last line of included content/, output)
       end
-  
+
       test 'include directive supports line selection using quoted attribute value' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         EOS
-  
+
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/first line/, output)
         refute_match(/second line/, output)
@@ -720,24 +720,24 @@ include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         assert_match(/eighth line/, output)
         assert_match(/last line of included content/, output)
       end
-  
+
       test 'include directive supports tagged selection' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tag=snippetA]
         EOS
-  
+
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/snippetA content/, output)
         refute_match(/snippetB content/, output)
         refute_match(/non-tagged content/, output)
         refute_match(/included content/, output)
       end
-  
+
       test 'include directive supports multiple tagged selection' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         EOS
-  
+
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/snippetA content/, output)
         assert_match(/snippetB content/, output)
@@ -752,7 +752,7 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
 include::fixtures/include-file.xml[tag=snippet]
 ----
         EOS
-  
+
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match('&lt;snippet&gt;content&lt;/snippet&gt;', output)
         refute_match('root', output)
@@ -778,7 +778,7 @@ snippetB content)
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tag=snippetZ]
         EOS
-  
+
         old_stderr = $stderr
         $stderr = StringIO.new
         begin
@@ -790,18 +790,18 @@ include::fixtures/include-file.asciidoc[tag=snippetZ]
           $stderr = old_stderr
         end
       end
-  
+
       test 'lines attribute takes precedence over tags attribute in include directive' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines=1, tags=snippetA;snippetB]
         EOS
-  
+
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         assert_match(/first line of included content/, output)
         refute_match(/snippetA content/, output)
         refute_match(/snippetB content/, output)
       end
-  
+
       test 'indent of included file can be reset to size of indent attribute' do
         input = <<-EOS
 [source, xml]
@@ -809,7 +809,7 @@ include::fixtures/include-file.asciidoc[lines=1, tags=snippetA;snippetB]
 include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
 ----
         EOS
-  
+
         output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         result = xmlnodes_at_xpath('//pre', output, 1).text
         assert_equal "<year>2013</year>\n<holder>Acme™, Inc.</holder>", result
@@ -819,20 +819,20 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
         input = <<-EOS
 include::fixtures/include-file.asciidoc[]
         EOS
-  
+
         include_processor = Class.new {
           def initialize document
           end
-  
+
           def handles? target
             false
           end
-  
+
           def process reader, target, attributes
             raise 'TestIncludeHandler should not have been invoked'
           end
         }
-  
+
         document = empty_safe_document :base_dir => DIRNAME
         reader = Asciidoctor::PreprocessorReader.new document, input
         reader.instance_variable_set '@include_processors', [include_processor.new(document)]
@@ -863,7 +863,7 @@ content
         document = Asciidoctor.load input, :safe => :safe, :base_dir => DIRNAME, :parse => false
         assert_equal expected, document.reader.read_lines
       end
-  
+
       test 'attributes are substituted in target of include directive' do
         input = <<-EOS
 :fixturesdir: fixtures
@@ -871,17 +871,17 @@ content
 
 include::{fixturesdir}/include-file.{ext}[]
         EOS
-  
+
         doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
         output = doc.render
         assert_match(/included content/, output)
       end
-  
+
       test 'line is skipped by default if target of include directive resolves to empty' do
         input = <<-EOS
 include::{foodir}/include-file.asciidoc[]
         EOS
-  
+
         doc = empty_safe_document :base_dir => DIRNAME
         reader = Asciidoctor::PreprocessorReader.new doc, input
         assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.asciidoc[]', reader.read_line
@@ -891,23 +891,23 @@ include::{foodir}/include-file.asciidoc[]
         input = <<-EOS
 include::{foodir}/include-file.asciidoc[]
         EOS
-  
+
         doc = empty_safe_document :base_dir => DIRNAME, :attributes => {'attribute-missing' => 'drop'}
         reader = Asciidoctor::PreprocessorReader.new doc, input
         assert_nil reader.read_line
       end
-  
+
       test 'line following dropped include is not dropped' do
         input = <<-EOS
 include::{foodir}/include-file.asciidoc[]
 yo
         EOS
-  
+
         doc = empty_safe_document :base_dir => DIRNAME, :attributes => {'attribute-missing' => 'drop'}
         reader = Asciidoctor::PreprocessorReader.new doc, input
         assert_equal 'yo', reader.read_line
       end
-  
+
       test 'escaped include directive is left unprocessed' do
         input = <<-EOS
 \\include::fixtures/include-file.asciidoc[]
@@ -922,7 +922,7 @@ yo
         assert_equal 'include::fixtures/include-file.asciidoc[]', reader.read_line
         assert_equal '\\escape preserved here', reader.read_line
       end
-  
+
       test 'include directive not at start of line is ignored' do
         input = <<-EOS
  include::include-file.asciidoc[]
@@ -933,7 +933,7 @@ yo
         assert_equal :literal, para.context
         assert_equal 'include::include-file.asciidoc[]', para.source
       end
-  
+
       test 'include directive is disabled when max-include-depth attribute is 0' do
         input = <<-EOS
 include::include-file.asciidoc[]
@@ -942,11 +942,11 @@ include::include-file.asciidoc[]
         assert_equal 1, para.lines.size
         assert_equal 'include::include-file.asciidoc[]', para.source
       end
-  
+
       test 'max-include-depth cannot be set by document' do
         input = <<-EOS
 :max-include-depth: 1
- 
+
 include::include-file.asciidoc[]
         EOS
         para = block_from_string input, :safe => :safe, :attributes => { 'max-include-depth' => 0 }
@@ -1018,7 +1018,7 @@ ifdef::asciidoctor[]
 Asciidoctor!
 endif::asciidoctor[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         assert_nil reader.process_line(reader.lines.first)
@@ -1030,14 +1030,14 @@ ifdef::asciidoctor[]
 Asciidoctor!
 endif::asciidoctor[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         assert_equal 1, reader.lineno
         assert_equal 'Asciidoctor!', reader.peek_line
         assert_equal 2, reader.lineno
       end
-  
+
       test 'process_line returns line if cursor not advanced' do
         input = <<-EOS
 content
@@ -1045,7 +1045,7 @@ ifdef::asciidoctor[]
 Asciidoctor!
 endif::asciidoctor[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         refute_nil reader.process_line(reader.lines.first)
@@ -1058,35 +1058,35 @@ ifdef::asciidoctor[]
 Asciidoctor!
 endif::asciidoctor[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         assert_equal 1, reader.lineno
         assert_equal 'content', reader.peek_line
         assert_equal 1, reader.lineno
       end
-  
+
       test 'peek_line returns nil if cursor advances past end of source' do
         input = <<-EOS
 ifdef::foobar[]
 swallowed content
 endif::foobar[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         assert_equal 1, reader.lineno
         assert_nil reader.peek_line
         assert_equal 4, reader.lineno
       end
-  
+
       test 'ifdef with defined attribute includes content' do
         input = <<-EOS
 ifdef::holygrail[]
 There is a holy grail!
 endif::holygrail[]
         EOS
-         
+
         doc = Asciidoctor::Document.new input, :attributes => { 'holygrail' => '' }
         reader = doc.reader
         lines = []
@@ -1095,14 +1095,14 @@ endif::holygrail[]
         end
         assert_equal 'There is a holy grail!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifdef with defined attribute includes text in brackets' do
         input = <<-EOS
 On our quest we go...
 ifdef::holygrail[There is a holy grail!]
 There was much rejoicing.
         EOS
-         
+
         doc = Asciidoctor::Document.new input, :attributes => { 'holygrail' => '' }
         reader = doc.reader
         lines = []
@@ -1123,14 +1123,14 @@ endif::showScript[]
         result = doc.reader.read
         assert_equal 'The script is shown!', result
       end
-  
+
       test 'ifndef with defined attribute does not include text in brackets' do
         input = <<-EOS
 On our quest we go...
 ifndef::hardships[There is a holy grail!]
 There was no rejoicing.
         EOS
-         
+
         doc = Asciidoctor::Document.new input, :attributes => { 'hardships' => '' }
         reader = doc.reader
         lines = []
@@ -1139,7 +1139,7 @@ There was no rejoicing.
         end
         assert_equal "On our quest we go...\nThere was no rejoicing.", (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'include with non-matching nested exclude' do
         input = <<-EOS
 ifdef::grail[]
@@ -1150,7 +1150,7 @@ endif::swallow[]
 grail
 endif::grail[]
         EOS
-         
+
         doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
         reader = doc.reader
         lines = []
@@ -1159,7 +1159,7 @@ endif::grail[]
         end
         assert_equal "holy\ngrail", (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'nested excludes with same condition' do
         input = <<-EOS
 ifndef::grail[]
@@ -1168,7 +1168,7 @@ not here
 endif::grail[]
 endif::grail[]
         EOS
-         
+
         doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
         reader = doc.reader
         lines = []
@@ -1177,7 +1177,7 @@ endif::grail[]
         end
         assert_equal '', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'include with nested exclude of inverted condition' do
         input = <<-EOS
 ifdef::grail[]
@@ -1188,7 +1188,7 @@ endif::grail[]
 grail
 endif::grail[]
         EOS
-         
+
         doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
         reader = doc.reader
         lines = []
@@ -1197,7 +1197,7 @@ endif::grail[]
         end
         assert_equal "holy\ngrail", (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'exclude with matching nested exclude' do
         input = <<-EOS
 poof
@@ -1210,7 +1210,7 @@ here
 endif::swallow[]
 gone
         EOS
-         
+
         doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
         reader = doc.reader
         lines = []
@@ -1219,7 +1219,7 @@ gone
         end
         assert_equal "poof\ngone", (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'exclude with nested include using shorthand end' do
         input = <<-EOS
 poof
@@ -1232,7 +1232,7 @@ in here
 endif::[]
 gone
         EOS
-         
+
         doc = Asciidoctor::Document.new input, :attributes => { 'grail' => '' }
         reader = doc.reader
         lines = []
@@ -1241,14 +1241,14 @@ gone
         end
         assert_equal "poof\ngone", (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifdef with one alternative attribute set includes content' do
         input = <<-EOS
 ifdef::holygrail,swallow[]
 Our quest is complete!
 endif::holygrail,swallow[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }
         reader = doc.reader
         lines = []
@@ -1257,14 +1257,14 @@ endif::holygrail,swallow[]
         end
         assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifdef with no alternative attributes set does not include content' do
         input = <<-EOS
 ifdef::holygrail,swallow[]
 Our quest is complete!
 endif::holygrail,swallow[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
@@ -1273,14 +1273,14 @@ endif::holygrail,swallow[]
         end
         assert_equal '', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifdef with all required attributes set includes content' do
         input = <<-EOS
 ifdef::holygrail+swallow[]
 Our quest is complete!
 endif::holygrail+swallow[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'holygrail' => '', 'swallow' => '' }
         reader = doc.reader
         lines = []
@@ -1289,14 +1289,14 @@ endif::holygrail+swallow[]
         end
         assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifdef with missing required attributes does not include content' do
         input = <<-EOS
 ifdef::holygrail+swallow[]
 Our quest is complete!
 endif::holygrail+swallow[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'holygrail' => '' }
         reader = doc.reader
         lines = []
@@ -1305,14 +1305,14 @@ endif::holygrail+swallow[]
         end
         assert_equal '', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifndef with undefined attribute includes block' do
         input = <<-EOS
 ifndef::holygrail[]
 Our quest continues to find the holy grail!
 endif::holygrail[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
@@ -1321,14 +1321,14 @@ endif::holygrail[]
         end
         assert_equal 'Our quest continues to find the holy grail!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifndef with one alternative attribute set includes content' do
         input = <<-EOS
 ifndef::holygrail,swallow[]
 Our quest is complete!
 endif::holygrail,swallow[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }
         reader = doc.reader
         lines = []
@@ -1337,14 +1337,14 @@ endif::holygrail,swallow[]
         end
         assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifndef with no alternative attributes set includes content' do
         input = <<-EOS
 ifndef::holygrail,swallow[]
 Our quest is complete!
 endif::holygrail,swallow[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
@@ -1353,14 +1353,14 @@ endif::holygrail,swallow[]
         end
         assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifndef with any required attributes set does not include content' do
         input = <<-EOS
 ifndef::holygrail+swallow[]
 Our quest is complete!
 endif::holygrail+swallow[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }
         reader = doc.reader
         lines = []
@@ -1369,14 +1369,14 @@ endif::holygrail+swallow[]
         end
         assert_equal '', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifndef with no required attributes set includes content' do
         input = <<-EOS
 ifndef::holygrail+swallow[]
 Our quest is complete!
 endif::holygrail+swallow[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
@@ -1385,14 +1385,14 @@ endif::holygrail+swallow[]
         end
         assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'escaped ifdef is unescaped and ignored' do
         input = <<-EOS
 \\ifdef::holygrail[]
 content
 \\endif::holygrail[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
@@ -1433,14 +1433,14 @@ endif::[]
         end
         assert_equal '', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifeval comparing double-quoted attribute to matching string includes content' do
         input = <<-EOS
 ifeval::["{gem}" == "asciidoctor"]
 Asciidoctor it is!
 endif::[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'gem' => 'asciidoctor' }
         reader = doc.reader
         lines = []
@@ -1449,14 +1449,14 @@ endif::[]
         end
         assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifeval comparing single-quoted attribute to matching string includes content' do
         input = <<-EOS
 ifeval::['{gem}' == 'asciidoctor']
 Asciidoctor it is!
 endif::[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'gem' => 'asciidoctor' }
         reader = doc.reader
         lines = []
@@ -1465,14 +1465,14 @@ endif::[]
         end
         assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifeval comparing quoted attribute to non-matching string drops content' do
         input = <<-EOS
 ifeval::['{gem}' == 'asciidoctor']
 Asciidoctor it is!
 endif::[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'gem' => 'tilt' }
         reader = doc.reader
         lines = []
@@ -1481,14 +1481,14 @@ endif::[]
         end
         assert_equal '', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifeval comparing attribute to lower version number includes content' do
         input = <<-EOS
 ifeval::['{asciidoctor-version}' >= '0.1.0']
 That version will do!
 endif::[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
@@ -1497,14 +1497,14 @@ endif::[]
         end
         assert_equal 'That version will do!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifeval comparing attribute to self includes content' do
         input = <<-EOS
 ifeval::['{asciidoctor-version}' == '{asciidoctor-version}']
 Of course it's the same!
 endif::[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
@@ -1513,14 +1513,14 @@ endif::[]
         end
         assert_equal 'Of course it\'s the same!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifeval arguments can be transposed' do
         input = <<-EOS
 ifeval::['0.1.0' <= '{asciidoctor-version}']
 That version will do!
 endif::[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
@@ -1529,14 +1529,14 @@ endif::[]
         end
         assert_equal 'That version will do!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifeval matching numeric equality includes content' do
         input = <<-EOS
 ifeval::[{rings} == 1]
 One ring to rule them all!
 endif::[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'rings' => '1' }
         reader = doc.reader
         lines = []
@@ -1552,7 +1552,7 @@ ifeval::[{rings} != 0]
 One ring to rule them all!
 endif::[]
         EOS
-  
+
         doc = Asciidoctor::Document.new input, :attributes => { 'rings' => '1' }
         reader = doc.reader
         lines = []
@@ -1561,13 +1561,13 @@ endif::[]
         end
         assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::EOL)
       end
-  
+
       test 'ifdef with no target is ignored' do
         input = <<-EOS
 ifdef::[]
 content
         EOS
-  
+
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []

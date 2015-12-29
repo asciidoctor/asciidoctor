@@ -7,7 +7,7 @@ class Reader
     attr_accessor :dir
     attr_accessor :path
     attr_accessor :lineno
-  
+
     def initialize file, dir = nil, path = nil, lineno = nil
       @file = file
       @dir = dir
@@ -445,7 +445,7 @@ class Reader
     skip_comments = options[:skip_line_comments]
     line_read = false
     line_restored = false
-    
+
     complete = false
     while !complete && (line = read_line)
       complete = while true
@@ -1080,7 +1080,7 @@ class PreprocessorReader < Reader
   end
 
   def include_depth
-    @include_stack.size 
+    @include_stack.size
   end
 
   def exceeded_max_depth?

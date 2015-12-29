@@ -144,7 +144,7 @@ The axe came swinging.
       EOS
 
       d = document_from_string(input)
-      assert_equal 'book', d.doctype 
+      assert_equal 'book', d.doctype
       output = d.render
       assert_xpath '//h1', output, 3
       assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{expand_entity 8230}#{expand_entity 8203}"]}, output, 1

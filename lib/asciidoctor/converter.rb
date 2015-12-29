@@ -136,7 +136,7 @@ module Asciidoctor
         converter.extend Config
       end
     end
-  
+
     include Config
     include BackendInfo
 

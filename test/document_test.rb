@@ -72,7 +72,7 @@ context 'Document' do
       doc = empty_document
       begin
         doc.safe = Asciidoctor::SafeMode::UNSAFE
-        flunk 'safe mode property of Asciidoctor::Document should not be writable!' 
+        flunk 'safe mode property of Asciidoctor::Document should not be writable!'
       rescue
       end
     end
@@ -304,7 +304,7 @@ preamble
       assert_equal 'sample.asciidoc', section_2.file
       assert_equal 18, section_2.lineno
 
-      last_block = section_2.blocks[-1] 
+      last_block = section_2.blocks[-1]
       assert_equal :ulist, last_block.context
       refute_nil last_block.source_location
       assert_equal 'sample.asciidoc', last_block.file
@@ -1219,7 +1219,7 @@ content
       assert_equal 1, nodes.size
       assert_match('<h1><strong>Document</strong> <span class="image"><img src="logo.png" alt="logo"></span> <em>Title</em> <span class="image"><img src="another-logo.png" alt="another logo"></span></h1>', output)
     end
-     
+
     test 'should not choke on empty source' do
       doc = Asciidoctor::Document.new ''
       assert doc.blocks.empty?
@@ -1560,7 +1560,7 @@ Text that has supporting information{empty}footnote:[An example footnote.].
     end
   end
 
-  context 'Backends and Doctypes' do 
+  context 'Backends and Doctypes' do
     test 'html5 backend doctype article' do
       result = render_string("= Title\n\nparagraph", :attributes => {'backend' => 'html5'})
       assert_xpath '/html', result, 1
@@ -2034,7 +2034,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       EOS
 
        doc = document_from_string input
-       synopsis_section = doc.blocks.first 
+       synopsis_section = doc.blocks.first
        refute_nil synopsis_section
        assert_equal :section, synopsis_section.context
        assert synopsis_section.special

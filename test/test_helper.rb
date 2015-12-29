@@ -234,7 +234,7 @@ class Minitest::Test
   alias :entity :expand_entity
 
   def invoke_cli_with_filenames(argv = [], filenames = [], &block)
-    
+
     filepaths = Array.new
 
     filenames.each { |filename|
@@ -304,7 +304,7 @@ class Minitest::Test
           session.close
           break
         end
-      
+
         if resource == '/name/asciidoctor'
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n)
           session.print %({"name": "asciidoctor"}\n)
@@ -343,7 +343,7 @@ class Minitest::Test
 end
 
 ###
-# 
+#
 # Context goodness provided by @citrusbyte's contest.
 # See https://github.com/citrusbyte/contest
 #

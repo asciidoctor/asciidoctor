@@ -207,7 +207,7 @@ module Asciidoctor
       unless (docinfo_content = node.docinfo :footer).empty?
         result << docinfo_content
       end
-      
+
       # Load Javascript at the end of body for performance
       # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
       case highlighter

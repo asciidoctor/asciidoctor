@@ -277,10 +277,10 @@ A | here| a | there
 [frame="topbot",options="header,footer"]
 |===
 |Item       |Quantity
-|Item 1     |1        
-|Item 2     |2        
-|Item 3     |3        
-|Total      |6        
+|Item 1     |1
+|Item 2     |2
+|Item 3     |3
+|Total      |6
 |===
       EOS
       output = render_embedded_string input
@@ -302,10 +302,10 @@ A | here| a | there
 [frame="topbot",options="header,footer"]
 |===
 |Item       |Quantity
-|Item 1     |1        
-|Item 2     |2        
-|Item 3     |3        
-|Total      |6        
+|Item 1     |1
+|Item 2     |2
+|Item 3     |3
+|Total      |6
 |===
       EOS
       output = render_embedded_string input, :backend => 'docbook'
@@ -538,7 +538,7 @@ d|9 2+>|10
       assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
       assert_css 'table > tbody > tr:nth-child(3) > td', output, 1
       assert_css 'table > tbody > tr:nth-child(4) > td', output, 2
-      
+
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(1).halign-left.valign-top p em', output, 1
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(2).halign-right.valign-top p strong', output, 1
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(3).halign-center.valign-top p', output, 1
@@ -564,7 +564,7 @@ d|9 2+>|10
 |AAA |BBB |CCC
 |===
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 2
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(1)[colspan="2"]', output, 1
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(2):not([colspan])', output, 1
@@ -684,10 +684,10 @@ that I can't know enough...
 that I am always hungrily operating on the margins
 of a potentially great harvest of future knowledge and wisdom.
 
-I wouldn't have it any other way. 
+I wouldn't have it any other way.
 |===
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 3
       assert_css 'table > thead', output, 1
@@ -783,7 +783,7 @@ output file name is used.
       table = doc.blocks.first
       assert !table.nil?
       tbody = table.rows.body
-      assert_equal 2, tbody.size  
+      assert_equal 2, tbody.size
       body_cell_1_3 = tbody[0][2]
       assert !body_cell_1_3.inner_document.nil?
       assert body_cell_1_3.inner_document.nested?
@@ -1060,7 +1060,7 @@ Year,Make,Model,Description,Price
 air, moon roof, loaded",4799.00
 |===
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col[style*="width: 20%"]', output, 5
       assert_css 'table > thead > tr', output, 1
@@ -1138,7 +1138,7 @@ single cell
 [options="breakable"]
 |===
 |Item       |Quantity
-|Item 1     |1        
+|Item 1     |1
 |===
       EOS
       output = render_embedded_string input, :backend => 'docbook45'
@@ -1151,7 +1151,7 @@ single cell
 [options="breakable"]
 |===
 |Item       |Quantity
-|Item 1     |1        
+|Item 1     |1
 |===
       EOS
       output = render_embedded_string input, :backend => 'docbook5'
@@ -1164,7 +1164,7 @@ single cell
 [options="unbreakable"]
 |===
 |Item       |Quantity
-|Item 1     |1        
+|Item 1     |1
 |===
       EOS
       output = render_embedded_string input, :backend => 'docbook5'
@@ -1177,7 +1177,7 @@ single cell
 [options="unbreakable"]
 |===
 |Item       |Quantity
-|Item 1     |1        
+|Item 1     |1
 |===
       EOS
       output = render_embedded_string input, :backend => 'docbook45'

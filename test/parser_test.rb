@@ -118,7 +118,7 @@ context "Parser" do
     line = 'height=100,caption="",link="images/octocat.png"'
     expected = {'height' => '100', 'caption' => '', 'link' => 'images/octocat.png'}
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
-    assert_equal expected, attributes 
+    assert_equal expected, attributes
   end
 
   test "collect named attribute single-quoted" do
@@ -134,7 +134,7 @@ context "Parser" do
     line = "height=100,caption='',link='images/octocat.png'"
     expected = {'height' => '100', 'caption' => '', 'link' => 'images/octocat.png'}
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
-    assert_equal expected, attributes 
+    assert_equal expected, attributes
   end
 
   test "collect named attributes unquoted" do
@@ -688,9 +688,9 @@ devtmpfs                3.9G       0     3.9G     0%    /dev
   test 'preserve block indent if indent is -1' do
     input = <<-EOS
     def names
-    
+
       @name.split ' '
-    
+
     end
     EOS
 

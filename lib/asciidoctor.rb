@@ -188,7 +188,7 @@ module Asciidoctor
 
   # Flag to indicate whether encoding can be coerced to UTF-8
   # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
-  # Addresses failures performing string operations that are reported as "invalid byte sequence in US-ASCII" 
+  # Addresses failures performing string operations that are reported as "invalid byte sequence in US-ASCII"
   # Ruby 1.8 doesn't seem to experience this problem (perhaps because it isn't validating the encodings)
   COERCE_ENCODING = !::RUBY_ENGINE_OPAL && ::RUBY_MIN_VERSION_1_9
 
@@ -422,7 +422,7 @@ module Asciidoctor
     #
     # Examples
     #
-    #   = asciidoctor ( 1 ) 
+    #   = asciidoctor ( 1 )
     #
     ManpageTitleVolnumRx = /^(.*)\((.*)\)$/
 
@@ -708,7 +708,7 @@ module Asciidoctor
     #
     # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
     # QUESTION should we check for line comment in regex or when scanning the lines?
-    # 
+    #
     DefinitionListRx = /^(?!\/\/)#{CG_BLANK}*(.*?)(:{2,4}|;;)(?:#{CG_BLANK}+(.*))?$/
 
     # Matches a sibling definition list item (which does not include the keyed type).
@@ -730,7 +730,7 @@ module Asciidoctor
     CalloutListRx = /^<?(\d+)>#{CG_BLANK}+(.*)/
 
     # Matches a callout reference inside literal text.
-    # 
+    #
     # Examples
     #   <1> (optionally prefixed by //, #, -- or ;; line comment chars)
     #   <1> <2> (multiple callouts on one line)
@@ -778,7 +778,7 @@ module Asciidoctor
     # Matches the general block macro pattern.
     #
     # Examples
-    # 
+    #
     #   gist::123456[]
     #
     #--
@@ -885,7 +885,7 @@ module Asciidoctor
     # Matches an implicit link and some of the link inline macro.
     #
     # Examples
-    # 
+    #
     #   http://github.com
     #   http://github.com[GitHub]
     #
@@ -1013,7 +1013,7 @@ module Asciidoctor
     #   one,two
     #   three;four
     #
-    DataDelimiterRx = /,|;/ 
+    DataDelimiterRx = /,|;/
 
     # Matches one or more consecutive digits on a single line.
     #
@@ -1053,7 +1053,7 @@ module Asciidoctor
     # Matches a space escaped by a backslash.
     #
     # Examples
-    # 
+    #
     #   one\ two\ three
     #
     EscapedSpaceRx = /\\(#{CG_BLANK})/

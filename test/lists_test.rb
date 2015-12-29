@@ -352,7 +352,7 @@ paragraph in list item 1
 
 - list item 2
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css 'ul', output, 1
       assert_css 'ul li', output, 2
       assert_xpath '(//ul/li)[1]/p[text()="list item 1"]', output, 1
@@ -1079,7 +1079,7 @@ Lists
 ----
 5.times { print "Odelay!" }
 ----
- 
+
 * Item two
       EOS
       output = render_string input
@@ -1099,7 +1099,7 @@ Lists
 * Item one, paragraph one
 +
 [source]
- 
+
 * Item two
       EOS
       output = render_string input
@@ -1117,7 +1117,7 @@ Lists
 * Item one, paragraph one
 +
 .Disappears into the ether
- 
+
 * Item two
       EOS
       output = render_string input
@@ -1218,7 +1218,7 @@ paragraph for list item 1
 
 . list item 2
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css '.olist ol', output, 1
       assert_css '.olist ol > li', output, 2
       assert_css '.ulist ul', output, 1
@@ -1251,7 +1251,7 @@ bullet 1 paragraph
 
 * bullet 2
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
 
       assert_xpath '(//ul)[1]/li', output, 2
 
@@ -1292,7 +1292,7 @@ paragraph for list item 1
 
 . list item 2
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css '.olist ol', output, 1
       assert_css '.olist ol > li', output, 2
       assert_css '.ulist ul', output, 1
@@ -1333,7 +1333,7 @@ paragraph for list item 1
 
 . list item 2
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css '.olist ol', output, 1
       assert_css '.olist ol > li', output, 2
       assert_css '.ulist ul', output, 1
@@ -1375,7 +1375,7 @@ paragraph for list item 1
 
 . list item 2
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css '.olist ol', output, 1
       assert_css '.olist ol > li', output, 2
       assert_css '.ulist ul', output, 1
@@ -1417,7 +1417,7 @@ bullet 1 paragraph
 
 * bullet 2
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
 
       assert_xpath '((//ul)[1]/li[1])/*', output, 3
       assert_xpath '(((//ul)[1]/li[1])/*)[1]/self::p[text()="bullet 1"]', output, 1
@@ -1577,7 +1577,7 @@ List
 . Refactor!
       EOS
 
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css '.olist.arabic.dry', output, 1
       assert_css '.olist ol.arabic', output, 1
     end
@@ -1590,7 +1590,7 @@ List
 . Refactor!
       EOS
 
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css '.olist.loweralpha.dry', output, 1
       assert_css '.olist ol.loweralpha', output, 1
     end
@@ -1603,7 +1603,7 @@ List
 . Refactor!
       EOS
 
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css '.olist.arabic.dry', output, 1
       assert_css '.olist ol.arabic', output, 1
     end
@@ -1616,7 +1616,7 @@ List
 . Refactor!
       EOS
 
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_css '.olist.loweralpha.dry', output, 1
       assert_css '.olist ol.loweralpha', output, 1
     end
@@ -2598,7 +2598,7 @@ definition
 
 last::
       EOS
-      output = render_embedded_string input 
+      output = render_embedded_string input
       assert_xpath '//tr', output, 2
       assert_xpath '(//tr)[1]/td[@class="hdlist1"]', output, 1
       # NOTE I'm trimming the trailing <br> in Asciidoctor
@@ -2616,7 +2616,7 @@ definition
 
 last::
       EOS
-      output = render_embedded_string input, :backend => 'docbook' 
+      output = render_embedded_string input, :backend => 'docbook'
       assert_xpath '//row', output, 2
       assert_xpath '(//row)[1]/entry', output, 2
       assert_xpath '((//row)[1]/entry)[1]/simpara', output, 2
@@ -2762,13 +2762,13 @@ context 'Description lists redux' do
 term1::
 def1
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="def1"]', output, 1
     end
-  
+
     test 'folds text from first line after blank lines' do
       input = <<-EOS
 == Lists
@@ -2778,13 +2778,13 @@ term1::
 
 def1
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="def1"]', output, 1
     end
-  
+
     test 'folds text from first line after blank line and immediately preceding next item' do
       input = <<-EOS
 == Lists
@@ -2794,7 +2794,7 @@ term1::
 def1
 term2:: def2
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 2
@@ -2811,14 +2811,14 @@ def1
 
 term2:: def2
       EOS
-  
+
       output = render_embedded_string input
       assert_css 'dl', output, 1
       assert_css 'dl > dt', output, 2
       assert_css 'dl > dd', output, 2
       assert_xpath '(//dl/dd)[1]/p[text()="def1"]', output, 1
     end
-  
+
     test 'folds text from first line after comment line' do
       input = <<-EOS
 == Lists
@@ -2827,13 +2827,13 @@ term1::
 // comment
 def1
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="def1"]', output, 1
     end
-  
+
     test 'folds text from line following comment line offset by blank line' do
       input = <<-EOS
 == Lists
@@ -2843,13 +2843,13 @@ term1::
 // comment
 def1
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="def1"]', output, 1
     end
-  
+
     test 'folds text from subsequent indented line' do
       input = <<-EOS
 == Lists
@@ -2857,13 +2857,13 @@ def1
 term1::
   def1
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="def1"]', output, 1
     end
-  
+
     test 'folds text from indented line after blank line' do
       input = <<-EOS
 == Lists
@@ -2872,13 +2872,13 @@ term1::
 
   def1
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="def1"]', output, 1
     end
-  
+
     test 'folds text that looks like ruler offset by blank line' do
       input = <<-EOS
 == Lists
@@ -2887,13 +2887,13 @@ term1::
 
 '''
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath %(//*[@class="dlist"]//dd/p[text()="'''"]), output, 1
     end
-  
+
     test 'folds text that looks like ruler offset by blank line and line comment' do
       input = <<-EOS
 == Lists
@@ -2903,13 +2903,13 @@ term1::
 // comment
 '''
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath %(//*[@class="dlist"]//dd/p[text()="'''"]), output, 1
     end
-  
+
     test 'folds text that looks like ruler and the line following it offset by blank line' do
       input = <<-EOS
 == Lists
@@ -2919,13 +2919,13 @@ term1::
 '''
 continued
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath %(//*[@class="dlist"]//dd/p[normalize-space(text())="''' continued"]), output, 1
     end
-  
+
     test 'folds text that looks like title offset by blank line' do
       input = <<-EOS
 == Lists
@@ -2934,13 +2934,13 @@ term1::
 
 .def1
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()=".def1"]', output, 1
     end
-  
+
     test 'folds text that looks like title offset by blank line and line comment' do
       input = <<-EOS
 == Lists
@@ -2950,13 +2950,13 @@ term1::
 // comment
 .def1
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()=".def1"]', output, 1
     end
-  
+
     test 'folds text that looks like admonition offset by blank line' do
       input = <<-EOS
 == Lists
@@ -2965,7 +2965,7 @@ term1::
 
 NOTE: def1
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -2980,14 +2980,14 @@ term1::
 
 == Another Section
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="== Another Section"]', output, 1
       assert_xpath '//h2', output, 1
     end
-  
+
     test 'folds text of first literal line offset by blank line appends subsequent literals offset by blank line as blocks' do
       input = <<-EOS
 == Lists
@@ -3001,7 +3001,7 @@ term1::
 
   literal
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3009,7 +3009,7 @@ term1::
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="literalblock"]', output, 2
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="literalblock"]//pre[text()="literal"]', output, 2
     end
-  
+
     test 'folds text of subsequent line and appends following literal line offset by blank line as block if term has no inline definition' do
       input = <<-EOS
 == Lists
@@ -3021,7 +3021,7 @@ def1
 
 term2:: def2
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 2
@@ -3029,7 +3029,7 @@ term2:: def2
       assert_xpath '(//*[@class="dlist"]//dd)[1]/p/following-sibling::*[@class="literalblock"]', output, 1
       assert_xpath '(//*[@class="dlist"]//dd)[1]/p/following-sibling::*[@class="literalblock"]//pre[text()="literal"]', output, 1
     end
-  
+
     test 'appends literal line attached by continuation as block if item has no inline definition' do
       input = <<-EOS
 == Lists
@@ -3038,7 +3038,7 @@ term1::
 +
   literal
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3046,7 +3046,7 @@ term1::
       assert_xpath '//*[@class="dlist"]//dd/*[@class="literalblock"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/*[@class="literalblock"]//pre[text()="literal"]', output, 1
     end
-  
+
     test 'appends literal line attached by continuation as block if item has no inline definition followed by ruler' do
       input = <<-EOS
 == Lists
@@ -3057,7 +3057,7 @@ term1::
 
 '''
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3066,7 +3066,7 @@ term1::
       assert_xpath '//*[@class="dlist"]//dd/*[@class="literalblock"]//pre[text()="literal"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::hr', output, 1
     end
-  
+
     test 'appends line attached by continuation as block if item has no inline definition followed by ruler' do
       input = <<-EOS
 == Lists
@@ -3077,7 +3077,7 @@ para
 
 '''
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3086,7 +3086,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]/p[text()="para"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::hr', output, 1
     end
-  
+
     test 'appends line attached by continuation as block if item has no inline definition followed by block' do
       input = <<-EOS
 == Lists
@@ -3099,7 +3099,7 @@ para
 literal
 ....
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3109,7 +3109,7 @@ literal
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="literalblock"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="literalblock"]//pre[text()="literal"]', output, 1
     end
-  
+
     test 'appends block attached by continuation but not subsequent block not attached by continuation' do
       input = <<-EOS
 == Lists
@@ -3123,7 +3123,7 @@ literal
 detached
 ....
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3133,7 +3133,7 @@ detached
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="literalblock"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="literalblock"]//pre[text()="detached"]', output, 1
     end
-  
+
     test 'appends list if item has no inline definition' do
       input = <<-EOS
 == Lists
@@ -3144,14 +3144,14 @@ term1::
 * two
 * three
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p', output, 0
       assert_xpath '//*[@class="dlist"]//dd//ul/li', output, 3
     end
-  
+
     test 'appends list to first term when followed immediately by second term' do
       input = <<-EOS
 == Lists
@@ -3163,7 +3163,7 @@ term1::
 * three
 term2:: def2
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 2
@@ -3227,7 +3227,7 @@ paragraph
       assert_xpath '(//*[@class="dlist"]//dd)[1]/p/following-sibling::*[@class="ulist"]//li', output, 3
       assert_css '.dlist + .paragraph', output, 1
     end
-  
+
     test 'appends list and paragraph block when line following list attached by continuation' do
       input = <<-EOS
 == Lists
@@ -3241,7 +3241,7 @@ term1::
 +
 para
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3251,7 +3251,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="ulist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/*[@class="ulist"]/following-sibling::*[@class="paragraph"]/p[text()="para"]', output, 1
     end
-  
+
     test 'first continued line associated with nested list item and second continued line associated with term' do
       input = <<-EOS
 == Lists
@@ -3264,7 +3264,7 @@ nested list para
 +
 term1 para
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3275,7 +3275,7 @@ term1 para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="ulist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/*[@class="ulist"]/following-sibling::*[@class="paragraph"]/p[text()="term1 para"]', output, 1
     end
-  
+
     test 'literal line attached by continuation swallows adjacent line that looks like term' do
       input = <<-EOS
 == Lists
@@ -3288,7 +3288,7 @@ notnestedterm:::
   literal
 notnestedterm:::
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3296,7 +3296,7 @@ notnestedterm:::
       assert_xpath '//*[@class="dlist"]//dd/*[@class="literalblock"]', output, 2
       assert_xpath %(//*[@class="dlist"]//dd/*[@class="literalblock"]//pre[text()="  literal\nnotnestedterm:::"]), output, 2
     end
-  
+
     test 'line attached by continuation is appended as paragraph if term has no inline definition' do
       input = <<-EOS
 == Lists
@@ -3305,7 +3305,7 @@ term1::
 +
 para
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3362,7 +3362,7 @@ not a term::: def
       assert_css '.dlist > dl > dd > .quoteblock', output, 1
       assert output.include?('not a term::: def')
     end
-  
+
     test 'appends line as paragraph if attached by continuation following blank line and line comment when term has no inline definition' do
       input = <<-EOS
 == Lists
@@ -3373,7 +3373,7 @@ term1::
 +
 para
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3381,7 +3381,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]/p[text()="para"]', output, 1
     end
-  
+
     test 'line attached by continuation offset by blank line is appended as paragraph if term has no inline definition' do
       input = <<-EOS
 == Lists
@@ -3391,7 +3391,7 @@ term1::
 +
 para
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3399,7 +3399,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]/p[text()="para"]', output, 1
     end
-  
+
     test 'delimited block breaks list even when term has no inline definition' do
       input = <<-EOS
 == Lists
@@ -3409,14 +3409,14 @@ term1::
 detached
 ====
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="exampleblock"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="exampleblock"]//p[text()="detached"]', output, 1
     end
-  
+
     test 'attribute line breaks list even when term has no inline definition' do
       input = <<-EOS
 == Lists
@@ -3425,14 +3425,14 @@ term1::
 [verse]
 detached
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="verseblock"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="verseblock"]/pre[text()="detached"]', output, 1
     end
-  
+
     test 'id line breaks list even when term has no inline definition' do
       input = <<-EOS
 == Lists
@@ -3441,7 +3441,7 @@ term1::
 [[id]]
 detached
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 0
@@ -3459,13 +3459,13 @@ detached
 term1:: def1
 continued
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath %(//*[@class="dlist"]//dd/p[text()="def1\ncontinued"]), output, 1
     end
-  
+
     test 'folds text from inline definition and subsequent lines' do
       input = <<-EOS
 == Lists
@@ -3474,13 +3474,13 @@ term1:: def1
 continued
 continued
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath %(//*[@class="dlist"]//dd/p[text()="def1\ncontinued\ncontinued"]), output, 1
     end
-  
+
     test 'folds text from inline definition and line following comment line' do
       input = <<-EOS
 == Lists
@@ -3489,13 +3489,13 @@ term1:: def1
 // comment
 continued
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath %(//*[@class="dlist"]//dd/p[text()="def1\ncontinued"]), output, 1
     end
-  
+
     test 'folds text from inline definition and subsequent indented line' do
       input = <<-EOS
 == Lists
@@ -3503,13 +3503,13 @@ continued
 term1:: def1
   continued
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
       assert_xpath %(//*[@class="dlist"]//dd/p[text()="def1\ncontinued"]), output, 1
     end
-  
+
     test 'appends literal line offset by blank line as block if item has inline definition' do
       input = <<-EOS
 == Lists
@@ -3518,7 +3518,7 @@ term1:: def1
 
   literal
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3526,7 +3526,7 @@ term1:: def1
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="literalblock"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="literalblock"]//pre[text()="literal"]', output, 1
     end
-  
+
     test 'appends literal line offset by blank line as block and appends line after continuation as block if item has inline definition' do
       input = <<-EOS
 == Lists
@@ -3537,7 +3537,7 @@ term1:: def1
 +
 para
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3547,7 +3547,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="literalblock"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/*[@class="literalblock"]/following-sibling::*[@class="paragraph"]/p[text()="para"]', output, 1
     end
-  
+
     test 'appends line after continuation as block and literal line offset by blank line as block if item has inline definition' do
       input = <<-EOS
 == Lists
@@ -3558,7 +3558,7 @@ para
 
   literal
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3568,7 +3568,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]/following-sibling::*[@class="literalblock"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]/following-sibling::*[@class="literalblock"]//pre[text()="literal"]', output, 1
     end
-  
+
     test 'appends list if item has inline definition' do
       input = <<-EOS
 == Lists
@@ -3579,14 +3579,14 @@ term1:: def1
 * two
 * three
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p[text()="def1"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="ulist"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="ulist"]/ul/li', output, 3
     end
-  
+
     test 'appends literal line attached by continuation as block if item has inline definition followed by ruler' do
       input = <<-EOS
 == Lists
@@ -3597,7 +3597,7 @@ term1:: def1
 
 '''
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3606,7 +3606,7 @@ term1:: def1
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="literalblock"]//pre[text()="literal"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::hr', output, 1
     end
-  
+
     test 'line offset by blank line breaks list if term has inline definition' do
       input = <<-EOS
 == Lists
@@ -3615,7 +3615,7 @@ term1:: def1
 
 detached
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3648,7 +3648,7 @@ Detached
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="sect2"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="sect2"]/h3[text()="Detached"]', output, 1
     end
-  
+
     test 'line attached by continuation is appended as paragraph if term has inline definition followed by detached paragraph' do
       input = <<-EOS
 == Lists
@@ -3659,7 +3659,7 @@ para
 
 detached
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3669,7 +3669,7 @@ detached
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]/p[text()="detached"]', output, 1
     end
-  
+
     test 'line attached by continuation is appended as paragraph if term has inline definition followed by detached block' do
       input = <<-EOS
 == Lists
@@ -3682,7 +3682,7 @@ para
 detached
 ****
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3692,7 +3692,7 @@ detached
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="sidebarblock"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="sidebarblock"]//p[text()="detached"]', output, 1
     end
-  
+
     test 'line attached by continuation offset by line comment is appended as paragraph if term has inline definition' do
       input = <<-EOS
 == Lists
@@ -3702,7 +3702,7 @@ term1:: def1
 +
 para
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3710,7 +3710,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="paragraph"]/p[text()="para"]', output, 1
     end
-  
+
     test 'line attached by continuation offset by blank line is appended as paragraph if term has inline definition' do
       input = <<-EOS
 == Lists
@@ -3720,7 +3720,7 @@ term1:: def1
 +
 para
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 1
       assert_xpath '//*[@class="dlist"]//dd', output, 1
@@ -3728,7 +3728,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]//dd/p/following-sibling::*[@class="paragraph"]/p[text()="para"]', output, 1
     end
-  
+
     test 'line comment offset by blank line divides lists because item has text' do
       input = <<-EOS
 == Lists
@@ -3739,11 +3739,11 @@ term1:: def1
 
 term2:: def2
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 2
     end
-  
+
     test 'ruler offset by blank line divides lists because item has text' do
       input = <<-EOS
 == Lists
@@ -3754,11 +3754,11 @@ term1:: def1
 
 term2:: def2
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 2
     end
-  
+
     test 'block title offset by blank line divides lists and becomes title of second list because item has text' do
       input = <<-EOS
 == Lists
@@ -3769,7 +3769,7 @@ term1:: def1
 
 term2:: def2
       EOS
-  
+
       output = render_embedded_string input
       assert_xpath '//*[@class="dlist"]/dl', output, 2
       assert_xpath '(//*[@class="dlist"])[2]/*[@class="title"][text()="title"]', output, 1
@@ -4097,7 +4097,7 @@ main = putStrLn "Hello, World!" -- <1>
     [{}, {'source-highlighter' => 'coderay'}].each do |attributes|
       output = render_embedded_string input, :attributes => attributes
       assert_xpath '//b', output, 4
-      nodes = xmlnodes_at_css 'pre', output 
+      nodes = xmlnodes_at_css 'pre', output
       assert_equal %(puts 'Hello, world!' (1)), nodes[0].text
       assert_equal %(println 'Hello, world!' (1)), nodes[1].text
       assert_equal %((def hello (fn [] "Hello, world!")) (1)\n(hello)), nodes[2].text
@@ -4115,7 +4115,7 @@ hello_world() -> io:fwrite("hello, world\n"). % <1>
     EOS
     output = render_embedded_string input
     assert_xpath '//b', output, 1
-    nodes = xmlnodes_at_css 'pre', output 
+    nodes = xmlnodes_at_css 'pre', output
     assert_equal %(hello_world() -> io:fwrite("hello, world\n"). (1)), nodes[0].text
   end
 

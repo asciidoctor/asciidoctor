@@ -140,7 +140,7 @@ module Asciidoctor
         end
         nil
       end
-    
+
       # Public: Lookup the custom converter registered with this factory to handle
       # the specified backend.
       #
@@ -190,7 +190,7 @@ module Asciidoctor
             return converter
           end
         end
-    
+
         base_converter = case backend
         when 'html5'
           unless defined? ::Asciidoctor::Converter::Html5Converter
@@ -215,7 +215,7 @@ module Asciidoctor
         end
 
         return base_converter unless opts.key? :template_dirs
-    
+
         unless defined? ::Asciidoctor::Converter::TemplateConverter
           require 'asciidoctor/converter/template'.to_s
         end

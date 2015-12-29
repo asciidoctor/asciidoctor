@@ -97,7 +97,7 @@ class Section < AbstractBlock
       while @document.references[:ids].has_key? gen_id
         gen_id = "#{base_id}#{sep}#{cnt}"
         cnt += 1
-      end 
+      end
       gen_id
     else
       nil

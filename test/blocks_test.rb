@@ -486,7 +486,7 @@ La la la <1>
 ____
 <1> Not pointing to a callout
       EOS
-     
+
       output = render_embedded_string input
       assert_xpath '//pre[text()="La la la <1>"]', output, 1
     end
@@ -675,7 +675,7 @@ listing content
 ----
 paragraph 2
       EOS
-      
+
       output = render_embedded_string input
       assert_xpath '/*[@class="paragraph"]/p', output, 2
       assert_xpath '/*[@class="listingblock"]', output, 1
@@ -1402,7 +1402,7 @@ section paragraph
 .Block title
 = Document Title
 
-== First Section 
+== First Section
 
 paragraph
       EOS
@@ -1740,7 +1740,7 @@ image::{bogus}[]
 
       output = render_embedded_string input
       assert_css 'img', output, 0
-      assert_css 'h2', output, 1 
+      assert_css 'h2', output, 1
       assert !output.include?('== Section Title')
     end
 
@@ -1790,7 +1790,7 @@ image::http://#{resolve_localhost}:9876/fixtures/dot.gif[Dot]
       output = using_test_webserver do
         render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
       end
-      
+
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
@@ -1805,7 +1805,7 @@ image::dot.gif[Dot]
       output = using_test_webserver do
         render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
       end
-      
+
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
@@ -1820,7 +1820,7 @@ image::#{image_uri}[Missing image]
       output = using_test_webserver do
         render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
       end
-      
+
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Missing image"]), output, 1
     end
 
@@ -1835,7 +1835,7 @@ image::#{image_uri}[Dot]
       output = using_test_webserver do
         render_embedded_string input, :safe => :safe
       end
-      
+
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Dot"]), output, 1
     end
 
@@ -1985,7 +1985,7 @@ video::http://example.org/videos/cats-vs-dogs.avi[]
       assert_css 'video', output, 1
       assert_css 'video[src="http://example.org/videos/cats-vs-dogs.avi"]', output, 1
     end
-    
+
     test 'video macro should output custom HTML with iframe for vimeo service' do
       input = <<-EOS
 video::67480300[vimeo, 400, 300, start=60, options=autoplay]
@@ -2248,7 +2248,7 @@ puts "Hello, World!"
       assert_css '.listingblock pre code', output, 1
       assert_css '.listingblock pre code:not([class])', output, 1
     end
- 
+
     test 'should not recognize fenced code blocks with more than three delimiters' do
       input = <<-EOS
 ````ruby

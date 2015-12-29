@@ -182,7 +182,7 @@ class AbstractBlock < AbstractNode
   # Only applies to Document and Section instances
   #
   # Examples
-  # 
+  #
   #   section = Section.new(parent)
   #   section << Block.new(section, :paragraph, :source => 'paragraph 1')
   #   section << Section.new(parent)
@@ -238,7 +238,7 @@ class AbstractBlock < AbstractNode
   #
   # Examples
   #
-  #   doc.find_by context: :section 
+  #   doc.find_by context: :section
   #   #=> Asciidoctor::Section@14459860 { level: 0, title: "Hello, AsciiDoc!", blocks: 0 }
   #   #=> Asciidoctor::Section@14505460 { level: 1, title: "First Section", blocks: 1 }
   #
@@ -376,7 +376,7 @@ class AbstractBlock < AbstractNode
   # Walk the descendents of the current Document or Section
   # and reassign the section 0-based index value to each Section
   # as it appears in document order.
-  # 
+  #
   # Returns nothing
   def reindex_sections
     @next_section_index = 0

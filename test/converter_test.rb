@@ -317,7 +317,7 @@ content
       EOS
 
       begin
-        Asciidoctor::Converter::Factory.unregister_all 
+        Asciidoctor::Converter::Factory.unregister_all
 
         class CustomConverterB
           include Asciidoctor::Converter
@@ -333,7 +333,7 @@ content
         output = render_string input, :backend => 'foobar'
         assert 'foobar content', output
       ensure
-        Asciidoctor::Converter::Factory.unregister_all 
+        Asciidoctor::Converter::Factory.unregister_all
       end
     end
 
@@ -343,7 +343,7 @@ content
       EOS
 
       begin
-        Asciidoctor::Converter::Factory.unregister_all 
+        Asciidoctor::Converter::Factory.unregister_all
 
         class CustomConverterC
           include Asciidoctor::Converter
@@ -358,7 +358,7 @@ content
         output = render_string input, :backend => 'foobaz'
         assert 'foobaz content', output
       ensure
-        Asciidoctor::Converter::Factory.unregister_all 
+        Asciidoctor::Converter::Factory.unregister_all
       end
     end
   end

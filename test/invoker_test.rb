@@ -194,7 +194,7 @@ context 'Invoker' do
     destination_path = File.expand_path(File.join(File.dirname(__FILE__), 'test_output'))
     sample_outpath = File.join(destination_path, 'sample.html')
     begin
-      FileUtils.mkdir_p(destination_path) 
+      FileUtils.mkdir_p(destination_path)
       # QUESTION should -D be relative to working directory or source directory?
       invoker = invoke_cli %w(-D test/test_output)
       #invoker = invoke_cli %w(-D ../../test/test_output)
@@ -481,7 +481,7 @@ context 'Invoker' do
   test 'default mode for cli should be unsafe' do
     invoker = invoke_cli_to_buffer %w(-o /dev/null)
     doc = invoker.document
-    assert_equal Asciidoctor::SafeMode::UNSAFE, doc.safe 
+    assert_equal Asciidoctor::SafeMode::UNSAFE, doc.safe
   end
 
   test 'should set safe mode if specified' do
@@ -529,7 +529,7 @@ context 'Invoker' do
       assert !stdout_lines.empty?
       stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
       stdout_str = stdout_lines.join
-      assert stdout_str.include?('Codierungen sind verrückt auf älteren Versionen von Ruby') 
+      assert stdout_str.include?('Codierungen sind verrückt auf älteren Versionen von Ruby')
     ensure
       ENV['LANG'] = old_lang
     end

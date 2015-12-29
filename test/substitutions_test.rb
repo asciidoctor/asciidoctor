@@ -12,7 +12,7 @@ context 'Substitutions' do
     test 'apply normal substitutions' do
       para = block_from_string("[blue]_http://asciidoc.org[AsciiDoc]_ & [red]*Ruby*\n&#167; Making +++<u>documentation</u>+++ together +\nsince (C) {inception_year}.")
       para.document.attributes['inception_year'] = '2012'
-      result = para.apply_normal_subs(para.lines) 
+      result = para.apply_normal_subs(para.lines)
       assert_equal %{<em class="blue"><a href="http://asciidoc.org">AsciiDoc</a></em> &amp; <strong class="red">Ruby</strong>\n&#167; Making <u>documentation</u> together<br>\nsince &#169; 2012.}, result
     end
   end
@@ -1108,47 +1108,47 @@ EOS
         para = block_from_string('kbd:[F3]', :attributes => {'experimental' => ''})
         assert_equal %q{<kbd>F3</kbd>}, para.sub_macros(para.source)
       end
-  
+
       test 'kbd macro with single key, docbook backend' do
         para = block_from_string('kbd:[F3]', :backend => 'docbook', :attributes => {'experimental' => ''})
         assert_equal %q{<keycap>F3</keycap>}, para.sub_macros(para.source)
       end
-  
+
       test 'kbd macro with key combination' do
         para = block_from_string('kbd:[Ctrl+Shift+T]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span>}, para.sub_macros(para.source)
       end
-  
+
       test 'kbd macro with key combination with spaces' do
         para = block_from_string('kbd:[Ctrl + Shift + T]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span>}, para.sub_macros(para.source)
       end
-  
+
       test 'kbd macro with key combination delimited by commas' do
         para = block_from_string('kbd:[Ctrl,Shift,T]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span>}, para.sub_macros(para.source)
       end
-  
+
       test 'kbd macro with key combination containing a plus key no spaces' do
         para = block_from_string('kbd:[Ctrl++]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>+</kbd></span>}, para.sub_macros(para.source)
       end
-  
+
       test 'kbd macro with key combination delimited by commands containing a comma key' do
         para = block_from_string('kbd:[Ctrl,,]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>,</kbd></span>}, para.sub_macros(para.source)
       end
-  
+
       test 'kbd macro with key combination containing a plus key with spaces' do
         para = block_from_string('kbd:[Ctrl + +]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>+</kbd></span>}, para.sub_macros(para.source)
       end
-  
+
       test 'kbd macro with key combination containing escaped bracket' do
         para = block_from_string('kbd:[Ctrl + \]]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>]</kbd></span>}, para.sub_macros(para.source)
       end
-  
+
       test 'kbd macro with key combination, docbook backend' do
         para = block_from_string('kbd:[Ctrl+Shift+T]', :backend => 'docbook', :attributes => {'experimental' => ''})
         assert_equal %q{<keycombo><keycap>Ctrl</keycap><keycap>Shift</keycap><keycap>T</keycap></keycombo>}, para.sub_macros(para.source)
@@ -1329,7 +1329,7 @@ EOS
 
     test 'complex inline passthrough macro' do
       text_to_escape = %q{[(] <'basic form'> <'logical operator'> <'basic form'> [)]}
-      para = block_from_string %($$#{text_to_escape}$$) 
+      para = block_from_string %($$#{text_to_escape}$$)
       result = para.extract_passthroughs(para.source)
       assert_equal 1, para.passthroughs.size
       assert_equal text_to_escape, para.passthroughs[0][:text]
@@ -1473,7 +1473,7 @@ EOS
     end
 
     test 'replaces dashes' do
-      para = block_from_string %(-- foo foo--bar foo\\--bar foo -- bar foo \\-- bar 
+      para = block_from_string %(-- foo foo--bar foo\\--bar foo -- bar foo \\-- bar
 stuff in between
 -- foo
 stuff in between
@@ -1495,7 +1495,7 @@ foo&#8201;&#8212;&#8201;'
     end if ::RUBY_MIN_VERSION_1_9
 
     test 'replaces marks' do
-      para = block_from_string '(C) (R) (TM) \(C) \(R) \(TM)' 
+      para = block_from_string '(C) (R) (TM) \(C) \(R) \(TM)'
       assert_equal '&#169; &#174; &#8482; (C) (R) (TM)', para.sub_replacements(para.source)
     end
 

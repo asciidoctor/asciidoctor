@@ -148,7 +148,7 @@ module Asciidoctor
     end
 
     # Internal: Creates a convert method for the specified name that delegates to the specified template.
-    # 
+    #
     # Returns nothing
     def create_handler name, template
       metaclass = class << self; self; end

@@ -85,7 +85,7 @@ context 'Links' do
   end
 
   test 'qualified url following smart apostrophe' do
-    output = render_embedded_string("l&#8217;http://www.irit.fr[IRIT]") 
+    output = render_embedded_string("l&#8217;http://www.irit.fr[IRIT]")
     assert_match(/l&#8217;<a href=/, output)
   end
 
@@ -317,7 +317,7 @@ context 'Links' do
 
 <\<_section_a>>
     EOS
-    
+
     output = render_embedded_string input
     assert_xpath '//h2[@id="_section_a"][text()="Section A"]', output, 1
     assert_xpath '//a[@href="#_section_a"][text()="Section A"]', output, 1

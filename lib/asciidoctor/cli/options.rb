@@ -136,12 +136,12 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on_tail('-V', '--version', 'display the version and runtime environment (or -v if no other flags or arguments)') do
             return print_version $stdout
           end
-          
+
         end
 
         infiles = []
         opts_parser.parse! args
-        
+
         if args.empty?
           if self[:verbose] == 2
             return print_version $stdout
