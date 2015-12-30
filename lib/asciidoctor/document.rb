@@ -181,6 +181,7 @@ class Document < AbstractBlock
         end
         accum
       end
+      @callouts = parent_doc.callouts
       # QUESTION should we support setting attribute in parent document from nested document?
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
       attr_overrides = parent_doc.attributes.dup
@@ -204,6 +205,7 @@ class Document < AbstractBlock
         :indexterms => [],
         :includes => ::Set.new,
       }
+      @callouts = Callouts.new
       # copy attributes map and normalize keys
       # attribute overrides are attributes that can only be set from the commandline
       # a direct assignment effectively makes the attribute a constant
@@ -244,7 +246,6 @@ class Document < AbstractBlock
     @parsed = false
     @header = nil
     @counters = {}
-    @callouts = Callouts.new
     @attributes_modified = ::Set.new
     @options = options
     @docinfo_processor_extensions = {}
@@ -782,7 +783,7 @@ class Document < AbstractBlock
     @header_attributes = attrs.dup
 
     # unfreeze "flexible" attributes
-    unless nested?
+    unless @parent_document
       FLEXIBLE_ATTRIBUTES.each do |name|
         # turning a flexible attribute off should be permanent
         # (we may need more config if that's not always the case)
@@ -795,7 +796,7 @@ class Document < AbstractBlock
 
   # Internal: Restore the attributes to the previously saved state (attributes in header)
   def restore_attributes
-    @callouts.rewind
+    @callouts.rewind unless @parent_document
     # QUESTION shouldn't this be a dup in case we convert again?
     @attributes = @header_attributes
   end
