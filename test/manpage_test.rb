@@ -95,17 +95,7 @@ baz)
   end
 
   context 'URL macro' do
-    test 'should not swallow content following URL' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
-
-http://asciidoc.org[AsciiDoc] can be used to create man pages.)
-      output = Asciidoctor.convert input, :backend => :manpage
-      assert_equal '.URL "http://asciidoc.org" "AsciiDoc" " "
-\c
-can be used to create man pages.', output.lines.entries[-3..-1].join
-    end
-
-    test 'should not leave behind blank line before URL macro' do
+    test 'should not leave blank line before URL macro' do
       input = %(#{SAMPLE_MANPAGE_HEADER}
 First paragraph.
 
@@ -114,18 +104,81 @@ http://asciidoc.org[AsciiDoc])
       assert_equal '.sp
 First paragraph.
 .sp
-.URL "http://asciidoc.org" "AsciiDoc" ""
-\c', output.lines.entries[-5..-1].join
+.URL "http://asciidoc.org" "AsciiDoc" ""', output.lines.entries[-4..-1].join
     end
 
-    test 'should pass adjacent character as last argument to URL macro' do
+    test 'should not swallow content following URL' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+http://asciidoc.org[AsciiDoc] can be used to create man pages.)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal '.URL "http://asciidoc.org" "AsciiDoc" " "
+can be used to create man pages.', output.lines.entries[-2..-1].join
+    end
+
+    test 'should pass adjacent character as final argument of URL macro' do
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 This is http://asciidoc.org[AsciiDoc].)
       output = Asciidoctor.convert input, :backend => :manpage
-      assert_equal 'This is
-.URL "http://asciidoc.org" "AsciiDoc" "."
-\c', output.lines.entries[-3..-1].join
+      assert_equal 'This is \c
+.URL "http://asciidoc.org" "AsciiDoc" "."', output.lines.entries[-2..-1].join
+    end
+
+    test 'should pass adjacent character as final argument of URL macro and move trailing content to next line' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+This is http://asciidoc.org[AsciiDoc], which can be used to write content.)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal 'This is \c
+.URL "http://asciidoc.org" "AsciiDoc" ","
+which can be used to write content.', output.lines.entries[-3..-1].join
+    end
+
+    test 'should not leave blank lines between URLs on contiguous lines of input' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+The corresponding implementations are
+http://clisp.sf.net[CLISP],
+http://ccl.clozure.com[Clozure CL],
+http://cmucl.org[CMUCL],
+http://ecls.sf.net[ECL],
+and http://sbcl.sf.net[SBCL].)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal '.sp
+The corresponding implementations are
+.URL "http://clisp.sf.net" "CLISP" ","
+.URL "http://ccl.clozure.com" "Clozure CL" ","
+.URL "http://cmucl.org" "CMUCL" ","
+.URL "http://ecls.sf.net" "ECL" ","
+and \c
+.URL "http://sbcl.sf.net" "SBCL" "."', output.lines.entries[-8..-1].join
+    end
+
+    test 'should not leave blank lines between URLs on same line of input' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+The corresponding implementations are http://clisp.sf.net[CLISP], http://ccl.clozure.com[Clozure CL], http://cmucl.org[CMUCL], http://ecls.sf.net[ECL], and http://sbcl.sf.net[SBCL].)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal '.sp
+The corresponding implementations are \c
+.URL "http://clisp.sf.net" "CLISP" ","
+.URL "http://ccl.clozure.com" "Clozure CL" ","
+.URL "http://cmucl.org" "CMUCL" ","
+.URL "http://ecls.sf.net" "ECL" ","
+and
+.URL "http://sbcl.sf.net" "SBCL" "."', output.lines.entries[-8..-1].join
+    end
+
+    test 'should not insert space between link and non-whitespace characters surrounding it' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+Please search |link:http://discuss.asciidoctor.org[the forums]| before asking.)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal '.sp
+Please search |\c
+.URL "http://discuss.asciidoctor.org" "the forums" "|"
+before asking.', output.lines.entries[-4..-1].join
     end
   end
 end
