@@ -2095,6 +2095,19 @@ You can use icons for admonitions by setting the 'icons' attribute.
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="icons/tip.png"][@alt="Tip"]', output, 1
     end
 
+    test 'should add file extension to custom icon if not specified' do
+      input = <<-EOS
+:icons: font
+:iconsdir: images/icons
+
+[TIP,icon=a]
+Override the icon of an admonition block using an attribute
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="images/icons/a.png"]', output, 1
+    end
+
     test 'embeds base64-encoded data uri of icon when data-uri attribute is set and safe mode level is less than SECURE' do
       input = <<-EOS
 :icons:
@@ -2156,6 +2169,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
     test 'font-based icon should not override icon specified on admonition' do
       input = <<-EOS
 :icons: font
+:iconsdir: images/icons
 
 [TIP,icon=a.png]
 Override the icon of an admonition block using an attribute
@@ -2163,9 +2177,8 @@ Override the icon of an admonition block using an attribute
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa icon-tip"]', output, 0
-      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="a.png"]', output, 1
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="images/icons/a.png"]', output, 1
     end
-
 
     test 'should use http uri scheme for assets when asset-uri-scheme is http' do
       input = <<-EOS
