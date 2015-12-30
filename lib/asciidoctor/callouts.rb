@@ -27,10 +27,9 @@ class Callouts
   #  # => "CO2-1"
   #
   # Returns The unique String id of this callout
-  def register(li_ordinal)
-    current_list << {:ordinal => li_ordinal.to_i, :id => (id = generate_next_callout_id)}
+  def register li_ordinal
+    current_list << { :ordinal => li_ordinal.to_i, :id => (id = generate_next_callout_id) }
     @co_index += 1
-
     id
   end
 
@@ -50,7 +49,6 @@ class Callouts
     end
 
     @co_index += 1
-
     id
   end
 
@@ -60,7 +58,7 @@ class Callouts
   #              retrieve the callouts
   #
   # Returns A space-separated String of callout ids associated with the specified list item
-  def callout_ids(li_ordinal)
+  def callout_ids li_ordinal
     current_list.map {|element| element[:ordinal] == li_ordinal ? %(#{element[:id]} ) : nil }.join.chop
   end
 
@@ -82,7 +80,6 @@ class Callouts
     end
 
     @co_index = 1
-
     nil
   end
 
@@ -93,7 +90,6 @@ class Callouts
   def rewind
     @list_index = 1
     @co_index = 1
-
     nil
   end
 
@@ -101,7 +97,7 @@ class Callouts
   #
   # Returns A unique String id for this callout
   def generate_next_callout_id
-    generate_callout_id(@list_index, @co_index)
+    generate_callout_id @list_index, @co_index
   end
 
   # Internal: Generate a unique id for the callout at the specified position
@@ -110,8 +106,8 @@ class Callouts
   # co_index   - The 1-based Integer index of the callout since the end of the last callout list
   #
   # Returns A unique String id for a callout
-  def generate_callout_id(list_index, co_index)
-    "CO#{list_index}-#{co_index}"
+  def generate_callout_id list_index, co_index
+    %(CO#{list_index}-#{co_index})
   end
 end
 end
