@@ -796,7 +796,7 @@ output file name is used.
       assert_css 'table > tbody > tr:nth-child(2) > td:nth-child(3) div.dlist', output, 1
     end
 
-    test 'preprocessor directive on first line of AsciiDoc cell should be processed' do
+    test 'preprocessor directive on first line of an AsciiDoc table cell should be processed' do
       input = <<-EOS
 |===
 a|include::fixtures/include-file.asciidoc[]
@@ -807,7 +807,7 @@ a|include::fixtures/include-file.asciidoc[]
       assert_match(/included content/, output)
     end
 
-    test 'cross reference link in AsciiDoc-style table cell should resolve to reference in main document' do
+    test 'cross reference link in an AsciiDoc table cell should resolve to reference in main document' do
       input = <<-EOS
 == Some
 
@@ -825,7 +825,7 @@ content
       assert_xpath '//a[@href="#_more"][text()="More"]', result, 1
     end
 
-    test 'footnotes should not be shared between AsciiDoc-style table cell and main document' do
+    test 'footnotes should not be shared between an AsciiDoc table cell and the main document' do
       input = <<-EOS
 |===
 a|AsciiDoc footnote:[A lightweight markup language.]
@@ -834,6 +834,54 @@ a|AsciiDoc footnote:[A lightweight markup language.]
 
       result = render_string input
       assert_css '#_footnote_1', result, 1
+    end
+
+    test 'callout numbers should be globally unique, including AsciiDoc table cells' do
+      input = <<-EOS
+= Document Title
+
+== Section 1
+
+|====
+a|
+[source, yaml]
+----
+key: value <1>
+----
+<1> First callout
+|====
+
+== Section 2
+
+|====
+a|
+[source, yaml]
+----
+key: value <1>
+----
+<1> Second callout
+|====
+
+== Section 3
+
+[source, yaml]
+----
+key: value <1>
+----
+<1> Third callout
+      EOS
+
+      result = render_string input, :backend => 'docbook'
+      conums = xmlnodes_at_xpath '//co', result
+      assert_equal 3, conums.size
+      ['CO1-1', 'CO2-1', 'CO3-1'].each_with_index do |conum, idx|
+        assert_equal conum, conums[idx].attribute('xml:id').value
+      end
+      callouts = xmlnodes_at_xpath '//callout', result
+      assert_equal 3, callouts.size
+      ['CO1-1', 'CO2-1', 'CO3-1'].each_with_index do |callout, idx|
+        assert_equal callout, callouts[idx].attribute('arearefs').value
+      end
     end
 
     test 'nested table' do
@@ -873,7 +921,7 @@ a|AsciiDoc content
       assert_css 'table .toc', output, 0
     end
 
-    test 'should be able to enable toc in AsciiDoc table cell' do
+    test 'should be able to enable toc in an AsciiDoc table cell' do
       input = <<-EOS
 = Document Title
 
@@ -895,7 +943,7 @@ content
       assert_css 'table .toc', output, 1
     end
 
-    test 'should be able to enable toc in both outer document and AsciiDoc table cell' do
+    test 'should be able to enable toc in both outer document and in an AsciiDoc table cell' do
       input = <<-EOS
 = Document Title
 :toc:
@@ -923,7 +971,7 @@ content
       assert_css 'table #table-cell-toc', output, 1
     end
 
-    test 'nested document in AsciiDoc cell should not see doctitle of parent' do
+    test 'document in an AsciiDoc table cell should not see doctitle of parent' do
       input = <<-EOS
 = Document Title
 
@@ -1101,7 +1149,7 @@ a;b;c
       assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
     end
 
-    test 'custom separator on AsciiDoc table cell' do
+    test 'custom separator for an AsciiDoc table cell' do
       input = <<-EOS
 [cols=2,separator=!]
 |===
