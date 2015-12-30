@@ -46,14 +46,13 @@ module Asciidoctor
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"#{slash}><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>
 <meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>)
-
       result << %(<meta name="application-name" content="#{node.attr 'app-name'}"#{slash}>) if node.attr? 'app-name'
       result << %(<meta name="description" content="#{node.attr 'description'}"#{slash}>) if node.attr? 'description'
       result << %(<meta name="keywords" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
       result << %(<meta name="author" content="#{node.attr 'authors'}"#{slash}>) if node.attr? 'authors'
       result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
-
       result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
+
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
         if (webfonts = node.attr 'webfonts')
           result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
@@ -108,24 +107,20 @@ module Asciidoctor
 
       result << '</head>'
       body_attrs = []
-      if node.id
-        body_attrs << %(id="#{node.id}")
-      end
-      if (node.attr? 'toc-class') && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
+      body_attrs << %(id="#{node.id}") if node.id
+      if (sectioned = node.sections?) && (node.attr? 'toc-class') && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
         body_attrs << %(class="#{node.doctype} #{node.attr 'toc-class'} toc-#{node.attr 'toc-position', 'header'}")
       else
         body_attrs << %(class="#{node.doctype}")
       end
-      if node.attr? 'max-width'
-        body_attrs << %(style="max-width: #{node.attr 'max-width'};")
-      end
+      body_attrs << %(style="max-width: #{node.attr 'max-width'};") if node.attr? 'max-width'
       result << %(<body #{body_attrs * ' '}>)
 
       unless node.noheader
         result << '<div id="header">'
         if node.doctype == 'manpage'
           result << %(<h1>#{node.doctitle} Manual Page</h1>)
-          if (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
+          if sectioned && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
             result << %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
 #{outline node}
@@ -170,7 +165,7 @@ module Asciidoctor
             end
           end
 
-          if (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
+          if sectioned && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
             result << %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
 #{outline node}
@@ -270,7 +265,7 @@ MathJax.Hub.Config({
         end
       end
 
-      if (node.attr? 'toc') && !['macro', 'preamble'].include?(node.attr 'toc-placement')
+      if node.sections? && (node.attr? 'toc') && (toc_p = node.attr 'toc-placement') != 'macro' && toc_p != 'preamble'
         result << %(<div id="toc" class="toc">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
 #{outline node}
@@ -294,10 +289,11 @@ MathJax.Hub.Config({
     end
 
     def outline node, opts = {}
-      return if (sections = node.sections).empty?
+      return unless node.sections?
       sectnumlevels = opts[:sectnumlevels] || (node.document.attr 'sectnumlevels', 3).to_i
       toclevels = opts[:toclevels] || (node.document.attr 'toclevels', 2).to_i
       result = []
+      sections = node.sections
       # FIXME the level for special sections should be set correctly in the model
       # slevel will only be 0 if we have a book doctype with parts
       slevel = (first_section = sections[0]).level
@@ -711,11 +707,14 @@ Your browser does not support the audio tag.
     end
 
     def preamble node
-      toc = if (node.attr? 'toc') && (node.attr? 'toc-placement', 'preamble')
-        %(\n<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
-<div id="toctitle">#{node.attr 'toc-title'}</div>
-#{outline node.document}
+      if (doc = node.document).attr?('toc-placement', 'preamble') && doc.sections? && (doc.attr? 'toc')
+        toc = %(
+<div id="toc" class="#{doc.attr 'toc-class', 'toc'}">
+<div id="toctitle">#{doc.attr 'toc-title'}</div>
+#{outline doc}
 </div>)
+      else
+        toc = nil
       end
 
       %(<div id="preamble">
@@ -836,7 +835,9 @@ Your browser does not support the audio tag.
     end
 
     def toc node
-      return '<!-- toc disabled -->' unless (doc = node.document).attr?('toc-placement', 'macro') && doc.attr?('toc')
+      unless (doc = node.document).attr?('toc-placement', 'macro') && doc.sections? && (doc.attr? 'toc')
+        return '<!-- toc disabled -->'
+      end
 
       if node.id
         id_attr = %( id="#{node.id}")

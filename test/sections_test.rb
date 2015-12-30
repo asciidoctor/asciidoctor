@@ -2312,6 +2312,25 @@ That's all she wrote!
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li/a[@href="#_interlude"][text()="Interlude"]', output, 1
       assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="Section Three"]', output, 1
     end
+
+    test 'should not display a table of contents if document has no sections' do
+      input_src = <<-EOS
+= Document Title
+:toc:
+
+toc::[]
+
+This document has no sections.
+
+It only has content.
+      EOS
+
+      ['', 'left', 'preamble', 'macro'].each do |placement|
+        input = input_src.gsub(':toc:', "\\& #{placement}")
+        output = render_string input
+        assert_css '#toctitle', output, 0
+      end
+    end
   end
 
   context 'article doctype' do
