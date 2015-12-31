@@ -1,8 +1,10 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>; Ryan Waldron <https://github.com/erebor[@erebor]>
-// FIXME we must work on a build system to provide a better DRY with settings
+// FIXME use build system to expand includes statically so document renders properly on GitHub
+ifeval::[{safe-mode-level} < 20]
 include::_settings-README.adoc[]
-ifndef::source-language[]
+endif::[]
+ifeval::[{safe-mode-level} >= 20]
 // settings:
 :page-layout: base
 :idprefix:
@@ -99,7 +101,7 @@ Vous avez la possibilité d'écrire votre propre convertisseur ou de fournir des
 NOTE: Asciidoctor est un remplaçant du processeur AsciiDoc orginal écrit en Python (`asciidoc.py`).
 La suite de tests Asciidoctor possède {uri-tests}[> 1,600 tests] pour garantir la compatibilité avec la syntaxe AsciiDoc.
 
-En plus de la syntaxe AsciiDoc standard, Asciidoctor reconnait des balises additionnelles ainsi que des options de formatage, comme les polices d'icônes (e.g., `+icon:fire[]+`) et des éléments d'interface (e.g., `+button:[Save]+`).
+En plus de la syntaxe AsciiDoc standard, Asciidoctor reconnait des balises additionnelles ainsi que des options de formatage, comme les polices d'icônes (e.g., `+icon:fire[]+`) et des éléments d'interface (e.g., `+button:[Enregistrer]+`).
 Asciidoctor offre aussi un thème moderne et responsive basé sur {uri-foundation}[Foundation] pour styliser le document HTML5 généré.
 
 == Prérequis
@@ -163,7 +165,7 @@ gem 'asciidoctor'
 
  $ bundle
 
-Pour mettre à jour la gem, spécifiez la nouvelle version dans le fichier GemFile et exécutez `bundle` à nouveau.
+Pour mettre à jour la gem, spécifiez la nouvelle version dans le fichier Gemfile et exécutez `bundle` à nouveau.
 Utiliser `bundle update` *n*'est *pas* recommandé car les autres gems seront également mises à jour, ce qui n'est pas forcément le résultat attendu.
 
 === (c) Gestionnaire de paquets Linux
@@ -246,7 +248,7 @@ Pour utiliser Asciidoctor dans votre application, vous avez tout d'abord besoin 
 [source]
 require 'asciidoctor'
 
- Vous pouvez ensuite convertir un fichier AsciiDoc en fichier HTML en utilisant :
+Vous pouvez ensuite convertir un fichier AsciiDoc en fichier HTML en utilisant :
 
 [source]
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
@@ -337,7 +339,7 @@ Repository des sources (git):: {uri-repo}
 Gestionnaire de tickets:: {uri-issues}
 L'organisation Asciidoctor sur GitHub:: {uri-org}
 
-== Copyright et Licence
+== Copyright et licence
 
 Copyright (C) 2012-2015 Dan Allen, Ryan Waldron et le projet Asciidoctor.
 Une utilisation libre de ce logiciel est autorisé sous les termes de la licence MIT.
@@ -353,6 +355,6 @@ Le projet a été initié en 2012 par https://github.com/erebor[Ryan Waldron] et
 
 == Changelog
 
-include::CHANGELOG.adoc[tags=compact;parse]
+include::CHANGELOG.adoc[tags=compact;parse,leveloffset=+1]
 
 Référez-vous au fichier {uri-changelog}[CHANGELOG] pour une liste complète des changements des versions précédentes.
