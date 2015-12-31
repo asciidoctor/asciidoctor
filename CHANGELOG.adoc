@@ -11,6 +11,7 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the https://github.com/asciidoctor/asciidoctor/commits/master[commit history] on GitHub.
 
+// tag::compact[]
 == 1.5.3 (2015-10-31) - @mojavelinux
 
 Enhancements::
@@ -203,6 +204,8 @@ https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.1[issues re
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.1[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v1.5.0...v1.5.1[full diff]
 
+// end::compact[]
+
 == 1.5.0 (2014-08-12) - @mojavelinux
 
 Performance::
@@ -255,7 +258,7 @@ Improvements::
   * {star} use glyphs for checkboxes when not using font icons (#878)
   * {star} prefer source-language attribute over language attribute for defining default source language (#888)
   * {star} pass document as first argument to process method on Preprocessor
-  * don't parse link attributes when linkattrs is set unless text contains equal sign 
+  * don't parse link attributes when linkattrs is set unless text contains equal sign
   * detect bare links, mark with bare class; don't repeat URL of bare link in print styles
   * allow Treeprocessor#process method to replace tree (#1035)
   * add AbstractNode#find_by method to locate nodes in tree (#862)
@@ -480,7 +483,7 @@ Improvements::
   * improved the built-in CodeRay theme to match Asciidoctor styles
   * link to CodeRay stylesheet if linkcss is set (#381)
   * style the video block (title & margin) (#590)
-  * added Groovy, Clojure, Python and YAML to floating language hint 
+  * added Groovy, Clojure, Python and YAML to floating language hint
   * only process callouts for blocks in which callouts are found
   * added content_model to AbstractBlock, rename buffer to lines
   * use Untitled as document title in rendered output if document has no title
