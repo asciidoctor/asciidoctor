@@ -355,6 +355,8 @@ Le projet a été initié en 2012 par https://github.com/erebor[Ryan Waldron] et
 
 == Changelog
 
+ifeval::[{safe-mode-level} < 20]
 include::CHANGELOG.adoc[tags=compact;parse,leveloffset=+1]
+endif::[]
 
 Référez-vous au fichier {uri-changelog}[CHANGELOG] pour une liste complète des changements des versions précédentes.
