@@ -1932,8 +1932,11 @@ class Parser
 
       segments = nil
       if names_only
-        # splitting on ' ' with limit will collapse repeating spaces
-        segments = author_entry.split(' ', 3)
+        # splitting on ' ' collapses repeating spaces uniformly
+        # `split ' ', 3` causes odd behavior in Opal; see https://github.com/asciidoctor/asciidoctor.js/issues/159
+        if (segments = author_entry.split ' ').size > 3
+          segments = segments[0..1].push(segments[2..-1].join ' ')
+        end
       elsif (match = AuthorInfoLineRx.match(author_entry))
         segments = match.to_a
         segments.shift
