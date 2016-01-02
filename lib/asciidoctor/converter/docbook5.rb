@@ -43,10 +43,10 @@ module Asciidoctor
 
     def section node
       doctype = node.document.doctype
-      tag_name = if node.special
-        node.level <= 1 ? node.sectname : 'section'
+      if node.special
+        tag_name = node.level > 1 ? 'section' : node.sectname
       else
-        doctype == 'book' && node.level <= 1 ? (node.level == 0 ? 'part' : 'chapter') : 'section'
+        tag_name = doctype == 'book' && node.level <= 1 ? (node.level == 0 ? 'part' : 'chapter') : 'section'
       end
       if doctype == 'manpage'
         if tag_name == 'section'
