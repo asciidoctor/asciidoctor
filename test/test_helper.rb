@@ -270,14 +270,10 @@ class Minitest::Test
   end
 
   def redirect_streams
-    old_stdout = $stdout
-    old_stderr = $stderr
-    stdout = StringIO.new
-    stderr = StringIO.new
-    $stdout = stdout
-    $stderr = stderr
+    old_stdout, $stdout = $stdout, (tmp_stdout = ::StringIO.new)
+    old_stderr, $stderr = $stderr, (tmp_stderr = ::StringIO.new)
     begin
-      yield(stdout, stderr)
+      yield tmp_stdout, tmp_stderr
     ensure
       $stdout = old_stdout
       $stderr = old_stderr

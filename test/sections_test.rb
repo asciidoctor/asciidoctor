@@ -636,14 +636,14 @@ text in standalone
 // end simulated include::[]
       EOS
 
-      output, errors = nil
+      output = warnings = nil
       redirect_streams do |out, err|
         output = render_string input
-        errors = err.string
+        warnings = err.string
       end
 
-      assert !errors.empty?
-      assert_match(/only book doctypes can contain level 0 sections/, errors)
+      assert !warnings.empty?
+      assert_match(/only book doctypes can contain level 0 sections/, warnings)
     end
 
     test 'should add level offset to section level' do
@@ -673,14 +673,13 @@ Standalone section text.
 Master section text.
       EOS
 
-      output = nil
-      errors = nil
+      output = warnings = nil
       redirect_streams do |out, err|
         output = render_string input
-        errors = out.string
+        warnings = err.string
       end
 
-      assert errors.empty?
+      assert warnings.empty?
       assert_match(/Master document written by Doc Writer/, output)
       assert_match(/Standalone document written by Junior Writer/, output)
       assert_xpath '//*[@class="sect1"]/h2[text() = "Standalone Document"]', output, 1
@@ -2493,8 +2492,7 @@ more part intro
 intro
       EOS
 
-      doc = nil
-      warnings = nil
+      doc = warnings = nil
       redirect_streams do |out, err|
         doc = document_from_string input
         warnings = err.string
@@ -2569,6 +2567,10 @@ Preface subsection content
 [partintro]
 Part intro content
 
+== Chapter 1
+
+content
+
 [appendix]
 = Appendix
 
@@ -2579,13 +2581,12 @@ Appendix content
 Appendix subsection content
       EOS
 
-      output = nil
-      errors = nil
+      output = warnings = nil
       redirect_streams do |out, err|
         output = render_string input, :backend => 'docbook'
-        errors = out.string
+        warnings = err.string
       end
-      assert errors.empty?
+      assert warnings.empty?
       assert_xpath '/book/preface', output, 1
       assert_xpath '/book/preface/section', output, 1
       assert_xpath '/book/part', output, 1
