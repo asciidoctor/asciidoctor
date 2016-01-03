@@ -1015,14 +1015,6 @@ module Asciidoctor
     #
     DataDelimiterRx = /,|;/
 
-    # Matches one or more consecutive digits on a single line.
-    #
-    # Examples
-    #
-    #   29
-    #
-    DigitsRx = /^\d+$/
-
     # Matches a single-line of text enclosed in double quotes, capturing the quote char and text.
     #
     # Examples

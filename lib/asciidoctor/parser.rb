@@ -2272,11 +2272,11 @@ class Parser
       table.assign_caption attributes.delete('caption')
     end
 
-    if (cols = attributes['cols']).nil_or_empty? || (cols = cols.rstrip).empty?
-      explicit_col_specs = false
-    else
-      table.create_columns(parse_col_specs cols)
+    if (attributes.key? 'cols') && !(col_specs = parse_col_specs attributes['cols']).empty?
+      table.create_columns col_specs
       explicit_col_specs = true
+    else
+      explicit_col_specs = false
     end
 
     skipped = table_reader.skip_blank_lines
@@ -2392,10 +2392,10 @@ class Parser
   #
   # returns a Hash of attributes that specify how to format
   # and layout the cells in the table.
-  def self.parse_col_specs(records)
+  def self.parse_col_specs records
+    records = records.tr ' ', '' if records.include? ' '
     # check for deprecated syntax: single number, equal column spread
-    # REVIEW could use records == records.to_i.to_s instead of regexp
-    if DigitsRx =~ records
+    if records == records.to_i.to_s
       return ::Array.new(records.to_i) { { 'width' => 1 } }
     end
 
