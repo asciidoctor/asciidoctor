@@ -44,7 +44,10 @@ module Asciidoctor
     def section node
       doctype = node.document.doctype
       if node.special
-        tag_name = node.level > 1 ? 'section' : node.sectname
+        if (tag_name = node.sectname).start_with? 'sect'
+          # a normal child section of a special section
+          tag_name = 'section'
+        end
       else
         tag_name = doctype == 'book' && node.level <= 1 ? (node.level == 0 ? 'part' : 'chapter') : 'section'
       end

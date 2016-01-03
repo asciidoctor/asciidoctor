@@ -1646,6 +1646,34 @@ Abstract content
       assert_xpath '/abstract[@id="abstract_title"]', output, 1
       assert_xpath '/abstract[@id="abstract_title"]/title[text()="Abstract Title"]', output, 1
     end
+
+    test 'should allow a special section to be nested at arbitrary depth in DocBook output' do
+      input = <<-EOS
+= Document Title
+:doctype: book
+
+== Glossaries
+
+[glossary]
+=== Glossary A
+
+Glossaries are optional.
+Glossaries entries are an example of a style of AsciiDoc labeled lists.
+
+[glossary]
+A glossary term::
+The corresponding definition.
+
+A second glossary term::
+The corresponding definition.
+      EOS
+
+      output = render_string input, :backend => :docbook
+      assert_xpath '//glossary', output, 1
+      assert_xpath '//chapter/glossary', output, 1
+      assert_xpath '//glossary/title[text()="Glossary A"]', output, 1
+      assert_xpath '//glossary/glossentry', output, 2
+    end
   end
 
   context "heading patterns in blocks" do
