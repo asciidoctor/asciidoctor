@@ -392,14 +392,17 @@ module Asciidoctor
         result << '<?dbfo keep-together="auto"?>'
       end
       result << %(<title>#{node.title}</title>) if tag_name == 'table'
-      if (width = (node.attr? 'width') ? (node.attr 'width') : nil)
+      col_width_key = if (width = (node.attr? 'width') ? (node.attr 'width') : nil)
         TABLE_PI_NAMES.each do |pi_name|
           result << %(<?#{pi_name} table-width="#{width}"?>)
         end
+        'colabswidth'
+      else
+        'colpcwidth'
       end
       result << %(<tgroup cols="#{node.attr 'colcount'}">)
       node.columns.each do |col|
-        result << %(<colspec colname="col_#{col.attr 'colnumber'}" colwidth="#{col.attr(width ? 'colabswidth' : 'colpcwidth')}*"/>)
+        result << %(<colspec colname="col_#{col.attr 'colnumber'}" colwidth="#{col.attr col_width_key}*"/>)
       end
       TABLE_SECTIONS.select {|tblsec| !node.rows[tblsec].empty? }.each do |tblsec|
         has_body = true if tblsec == :body
