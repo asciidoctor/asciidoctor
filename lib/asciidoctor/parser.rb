@@ -2272,10 +2272,10 @@ class Parser
       table.assign_caption attributes.delete('caption')
     end
 
-    if attributes['cols'].nil_or_empty?
+    if (cols = attributes['cols']).nil_or_empty? || (cols = cols.rstrip).empty?
       explicit_col_specs = false
     else
-      table.create_columns(parse_col_specs(attributes['cols']))
+      table.create_columns(parse_col_specs cols)
       explicit_col_specs = true
     end
 
@@ -2372,12 +2372,8 @@ class Parser
       end
     end
 
-    table.attributes['colcount'] ||= parser_ctx.col_count
-
-    if !explicit_col_specs
-      # TODO further encapsulate this logic (into table perhaps?)
-      even_width = (100.0 / parser_ctx.col_count).floor
-      table.columns.each {|c| c.assign_width(0, even_width) }
+    unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_col_specs
+      table.assign_col_widths
     end
 
     table.partition_header_footer attributes

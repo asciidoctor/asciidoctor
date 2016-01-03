@@ -99,21 +99,45 @@ class Table < AbstractBlock
   # Internal: Creates the Column objects from the column spec
   #
   # returns nothing
-  def create_columns(col_specs)
-    total_width = 0
+  def create_columns col_specs
     cols = []
+    width_base = 0
     col_specs.each do |col_spec|
-      total_width += col_spec['width']
-      cols << Column.new(self, cols.size, col_spec)
+      width_base += col_spec['width']
+      cols << (Column.new self, cols.size, col_spec)
     end
-
-    unless cols.empty?
+    unless (@columns = cols).empty?
       @attributes['colcount'] = cols.size
-      even_width = (100.0 / cols.size).floor
-      cols.each {|c| c.assign_width(total_width, even_width) }
+      assign_col_widths(width_base == 0 ? nil : width_base)
+    end
+    nil
+  end
+
+  # Internal: Assign column widths to columns
+  #
+  # This method rounds the percentage width values to 4 decimal places and
+  # donates the balance to the final column.
+  #
+  # This method assumes there's at least one column in the columns array.
+  #
+  # width_base - the total of the relative column values used for calculating percentage widths (default: nil)
+  #
+  # returns nothing
+  def assign_col_widths width_base = nil
+    pf = 10.0 ** 4 # precision factor (multipler / divisor) for managing precision of calculated result
+    total_width = col_pcwidth = 0
+
+    if width_base
+      @columns.each {|col| total_width += (col_pcwidth = col.assign_width nil, width_base, pf) }
+    else
+      col_pcwidth = ((100 * pf / @columns.size).to_i) / pf
+      col_pcwidth = col_pcwidth.to_i if col_pcwidth.to_i == col_pcwidth
+      @columns.each {|col| total_width += col.assign_width col_pcwidth }
     end
 
-    @columns = cols
+    # donate balance, if any, to final column
+    @columns[-1].assign_width(((100 - total_width + col_pcwidth) * pf).round / pf) unless total_width == 100
+
     nil
   end
 
@@ -167,19 +191,18 @@ class Table::Column < AbstractNode
   #
   # This method assigns the colpcwidth and colabswidth attributes.
   #
-  # returns nothing
-  def assign_width(total_width, even_width)
-    if total_width > 0
-      width = ((@attributes['width'].to_f / total_width) * 100).floor
-    else
-      width = even_width
+  # returns the resolved colpcwidth value
+  def assign_width col_pcwidth, width_base = nil, pf = 10000.0
+    if width_base
+      col_pcwidth = ((@attributes['width'].to_f / width_base) * 100 * pf).to_i / pf
+      col_pcwidth = col_pcwidth.to_i if col_pcwidth.to_i == col_pcwidth
     end
-    @attributes['colpcwidth'] = width
+    @attributes['colpcwidth'] = col_pcwidth
     if parent.attributes.key? 'tableabswidth'
-      @attributes['colabswidth'] = ((width.to_f / 100) * parent.attributes['tableabswidth']).round
+      # FIXME calculate more accurately (only used in DocBook output)
+      @attributes['colabswidth'] = ((col_pcwidth / 100.0) * parent.attributes['tableabswidth']).round
     end
-
-    nil
+    col_pcwidth
   end
 end
 
