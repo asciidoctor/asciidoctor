@@ -145,6 +145,9 @@ class PathResolver
     # Windows roots can begin with drive letter
     elsif @file_separator == BACKSLASH && WindowsRootRx =~ path
       true
+    # Absolute paths in the browser start with file:///
+    elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_PLATFORM == 'browser' && (path.start_with? 'file:///')
+      true
     else
       false
     end
@@ -238,7 +241,7 @@ class PathResolver
         # ex. /sample/path
         elsif posix_path.start_with? SLASH
           SLASH
-        # ex. c:/sample/path
+        # ex. c:/sample/path (or file:///sample/path in browser environment)
         else
           posix_path[0..(posix_path.index SLASH)]
         end
@@ -255,6 +258,11 @@ class PathResolver
     # shift twice for a UNC path
     if root == DOUBLE_SLASH
       path_segments = path_segments[2..-1]
+    # shift twice for a file:/// path and adjust root
+    # NOTE technically file:/// paths work without this adjustment
+    #elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_PLATFORM == 'browser' && root == 'file:/'
+    #  root = 'file://'
+    #  path_segments = path_segments[2..-1]
     # shift once for any other root
     elsif root
       path_segments.shift
