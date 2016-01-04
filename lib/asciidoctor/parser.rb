@@ -2272,11 +2272,11 @@ class Parser
       table.assign_caption attributes.delete('caption')
     end
 
-    if attributes['cols'].nil_or_empty?
-      explicit_col_specs = false
-    else
-      table.create_columns(parse_col_specs(attributes['cols']))
+    if (attributes.key? 'cols') && !(col_specs = parse_col_specs attributes['cols']).empty?
+      table.create_columns col_specs
       explicit_col_specs = true
+    else
+      explicit_col_specs = false
     end
 
     skipped = table_reader.skip_blank_lines
@@ -2372,12 +2372,8 @@ class Parser
       end
     end
 
-    table.attributes['colcount'] ||= parser_ctx.col_count
-
-    if !explicit_col_specs
-      # TODO further encapsulate this logic (into table perhaps?)
-      even_width = (100.0 / parser_ctx.col_count).floor
-      table.columns.each {|c| c.assign_width(0, even_width) }
+    unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_col_specs
+      table.assign_col_widths
     end
 
     table.partition_header_footer attributes
@@ -2396,10 +2392,10 @@ class Parser
   #
   # returns a Hash of attributes that specify how to format
   # and layout the cells in the table.
-  def self.parse_col_specs(records)
+  def self.parse_col_specs records
+    records = records.tr ' ', '' if records.include? ' '
     # check for deprecated syntax: single number, equal column spread
-    # REVIEW could use records == records.to_i.to_s instead of regexp
-    if DigitsRx =~ records
+    if records == records.to_i.to_s
       return ::Array.new(records.to_i) { { 'width' => 1 } }
     end
 
