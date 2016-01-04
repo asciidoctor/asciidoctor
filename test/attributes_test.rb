@@ -1213,22 +1213,6 @@ paragraph
       assert_equal 'coolio', subsec.id
     end
 
-    test 'block id above document title sets id on document' do
-      input = <<-EOS
-[[reference]]
-Reference Manual
-================
-:css-signature: refguide
-
-preamble
-      EOS
-      doc = document_from_string input
-      assert_equal 'reference', doc.id
-      assert_equal 'refguide', doc.attr('css-signature')
-      output = doc.render
-      assert_xpath '//body[@id="reference"]', output, 1
-    end
-
     test "trailing block attributes tranfer to the following section" do
       input = <<-EOS
 [[one]]

@@ -106,22 +106,30 @@ class Parser
     # if the first line is the document title, add a header to the document and parse the header metadata
     if has_doctitle_line
       source_location = reader.cursor if document.sourcemap
-      document.id, _, doctitle, _, single_line = parse_section_title(reader, document)
+      document.id, _, doctitle, _, single_line = parse_section_title reader, document
       unless assigned_doctitle
         document.title = assigned_doctitle = doctitle
       end
       # default to compat-mode if document uses atx-style doctitle
       document.set_attribute 'compat-mode', '' unless single_line
-      if (separator = block_attributes.delete('separator'))
-        document.set_attribute('title-separator', separator)
+      if (separator = block_attributes.delete 'separator')
+        document.set_attribute 'title-separator', separator
       end
       document.header.source_location = source_location if source_location
       document.attributes['doctitle'] = section_title = doctitle
       # QUESTION: should the id assignment on Document be encapsulated in the Document class?
-      unless document.id
-        document.id = block_attributes.delete('id')
+      if document.id
+        block_attributes.delete 1
+        block_attributes.delete 'id'
+      else
+        if (style = block_attributes.delete 1)
+          style_attrs = { 1 => style }
+          parse_style_attribute style_attrs, reader
+          block_attributes['id'] = style_attrs['id'] if style_attrs.key? 'id'
+        end
+        document.id = block_attributes.delete 'id'
       end
-      parse_header_metadata(reader, document)
+      parse_header_metadata reader, document
     end
 
     unless (val = document.attributes['doctitle']).nil_or_empty? || val == section_title

@@ -264,6 +264,68 @@ preamble
     test "document title with symmetric syntax" do
       assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title =")
     end
+
+    test 'should assign id on document title to body' do
+      input = <<-EOS
+[[idname]]
+= Document Title
+
+content
+      EOS
+      output = render_string input
+      assert_css 'body#idname', output, 1
+    end
+
+    test 'should assign id defined using shorthand syntax on document title to body' do
+      input = <<-EOS
+[#idname]
+= Document Title
+
+content
+      EOS
+      output = render_string input
+      assert_css 'body#idname', output, 1
+    end
+
+    test 'should use inline id instead of id defined in block attributes' do
+      input = <<-EOS
+[#idname-block]
+= Document Title [[idname-inline]]
+
+content
+      EOS
+      output = render_string input
+      assert_css 'body#idname-inline', output, 1
+    end
+
+    test 'block id above document title sets id on document' do
+      input = <<-EOS
+[[reference]]
+= Reference Manual
+:css-signature: refguide
+
+preamble
+      EOS
+      doc = document_from_string input
+      assert_equal 'reference', doc.id
+      assert_equal 'refguide', doc.attr('css-signature')
+      output = doc.render
+      assert_css 'body#reference', output, 1
+    end
+
+    test 'should discard style, role and options shorthand attributes defined on document title' do
+      input = <<-EOS
+[style#idname.rolename%optionname]
+= Document Title
+
+content
+      EOS
+      doc = document_from_string input
+      assert doc.blocks[0].attributes.empty?
+      output = doc.convert
+      assert_css 'body#idname', output, 1
+      assert_css '.rolename', output, 0
+    end
   end
 
   context "level 1" do
