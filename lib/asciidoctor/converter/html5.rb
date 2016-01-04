@@ -219,12 +219,13 @@ module Asciidoctor
       end
 
       if node.attr? 'stem'
-        # IMPORTANT to_s calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
         eqnums_val = node.attr 'eqnums', 'none'
         eqnums_val = 'AMS' if eqnums_val == ''
         eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
+        # IMPORTANT inspect calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
         result << %(<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
+  messageStyle: "none",
   tex2jax: {
     inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
     displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
@@ -237,7 +238,7 @@ MathJax.Hub.Config({
   TeX: {#{eqnums_opt}}
 });
 </script>
-<script src="#{cdn_base}/mathjax/2.5.3/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+<script src="#{cdn_base}/mathjax/2.6.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
       end
 
       result << '</body>'
