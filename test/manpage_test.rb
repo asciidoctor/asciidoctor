@@ -181,4 +181,23 @@ Please search |\c
 before asking.', output.lines.entries[-4..-1].join
     end
   end
+
+  context 'Callout List' do
+    test 'should generate callout list using proper formatting commands' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+----
+$ gem install asciidoctor # <1>
+----
+<1> Installs the asciidoctor gem from RubyGems.org)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert output.end_with? '.TS
+tab(:);
+r lw(\n(.lu*75u/100u).
+\fB(1)\fP\h\'-2n\':T{
+Installs the asciidoctor gem from RubyGems.org
+T}
+.TE'
+    end
+  end
 end
