@@ -2162,7 +2162,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
-      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"]', output, 1
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css"]', output, 1
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa icon-tip"]', output, 1
     end
 
@@ -2193,7 +2193,7 @@ puts "AsciiDoc, FTW!"
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
-      assert_css 'html > head > link[rel="stylesheet"][href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"]', output, 1
+      assert_css 'html > head > link[rel="stylesheet"][href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css"]', output, 1
       assert_css 'html > body > script[src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"]', output, 1
     end
 
@@ -2210,7 +2210,7 @@ puts "AsciiDoc, FTW!"
       EOS
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
-      assert_css 'html > head > link[rel="stylesheet"][href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"]', output, 1
+      assert_css 'html > head > link[rel="stylesheet"][href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css"]', output, 1
       assert_css 'html > body > script[src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"]', output, 1
     end
   end
