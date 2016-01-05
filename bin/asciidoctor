@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
-require 'rubygems' if RUBY_VERSION < '1.9'
+require 'rubygems' unless defined? Gem
 
-if File.exist?(app_lib_path = (File.expand_path '../../lib/asciidoctor', __FILE__))
-  require app_lib_path
+if File.exist?(asciidoctor = (File.expand_path '../../lib/asciidoctor', __FILE__))
+  require asciidoctor
 else
   require 'asciidoctor'
 end

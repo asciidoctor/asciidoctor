@@ -1,12 +1,15 @@
 #!/usr/bin/env ruby
 
-require 'rubygems' if RUBY_VERSION < '1.9'
+require 'rubygems' unless defined? Gem
 
-require File.join File.dirname(__FILE__), '../lib/asciidoctor'
+if File.exist?(asciidoctor = (File.expand_path '../../lib/asciidoctor', __FILE__))
+  require asciidoctor
+else
+  require 'asciidoctor'
+end
 require 'asciidoctor/cli'
 
-options = Asciidoctor::Cli::Options.parse! ARGV
-options[:safe] = Asciidoctor::SafeMode::SAFE
-invoker = Asciidoctor::Cli::Invoker.new options
+invoker = Asciidoctor::Cli::Invoker.new(ARGV + ['-S', 'safe'])
+GC.start
 invoker.invoke!
 exit invoker.code
