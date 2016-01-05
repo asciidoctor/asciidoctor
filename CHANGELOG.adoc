@@ -12,6 +12,65 @@ This document provides a high-level view of the changes introduced in Asciidocto
 For a detailed view of what has changed, refer to the https://github.com/asciidoctor/asciidoctor/commits/master[commit history] on GitHub.
 
 // tag::compact[]
+== 1.5.4 (2016-01-03) - @mojavelinux
+
+Enhancements::
+  * translate README into French (@anthonny, @mogztter, @gscheibel, @mgreau) (#1630)
+  * allow linkstyle in manpage output to be configured (#1610)
+
+Improvements::
+  * upgrade to MathJax 2.6.0 and disable loading messages
+  * upgrade to Font Awesome 4.5.0
+  * disable toc if document has no sections (#1633)
+  * convert inline asciimath to MathML (using asciimath gem) in DocBook converter (#1622)
+  * add attribute to control build reproducibility (@bk2204) (#1453)
+  * recognize \file:/// as a file root in Opal browser env (#1561)
+  * honor icon attribute on admonition block when font-based icons are enabled (@robertpanzer) (#1593)
+  * resolve custom icon relative to iconsdir; add file extension if absent (#1634)
+  * allow asciidoctor cli to resolve library path when invoked without leading ./
+
+Compliance::
+  * allow special section to be nested at any depth (#1591)
+  * ensure colpcwidth values add up to 100%; increase precision of values to 4 decimal places (#1647)
+  * ignore blank cols attribute on table (#1647)
+  * support shorthand syntax for block attributes on document title (#1650)
+
+Bug fixes::
+  * don't include default toc in AsciiDoc table cell; don't pass toc location attributes to nested document (#1582)
+  * guard against nil dlist list item in find_by (#1618)
+  * don't swallow trailing line when include file is not readable (#1602)
+  * change xlink namespace to xl in DocBook 5 output to prevent parse error (#1597)
+  * make callouts globally unique within document, including AsciiDoc table cells (#1626)
+  * initialize Slim-related attributes regardless of when Slim was loaded (@terceiro) (#1576)
+  * differentiate literal backslash from escape sequence in manpage output (@ds26gte) (#1604)
+  * don't mistake line beginning with \. for troff macro in manpage output (@ds26gte) (#1589)
+  * escape leading dots so user content doesn't trigger troff macros in manpage output (@ds26gte) (#1631)
+  * use \c after .URL macro to remove extraneous space in manpage output (@ds26gte) (#1590)
+  * fix missing endline after .URL macro in manpage output (#1613)
+  * properly handle spacing around .URL/.MTO macro in manpage output (@ds26gte) (#1641)
+  * don't swallow doctitle attribute followed by block title (#1587)
+  * change strategy for splitting names of author; fixes bug in Opal/Asciidoctor.js
+  * don't fail if library is loaded more than once
+
+Infrastructure::
+  * remove trailing endlines in project source code
+  * update contributing guidelines
+  * explicitly test ifeval scenario raised in issue #1585
+  * remove backreference substitution hack for Opal/Asciidoctor.js
+  * fix assignment of default Hash value for Opal/Asciidoctor.js
+  * add JRuby 9.0.4.0 and Ruby 2.3.0 to the Travis CI build matrix
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.4[issues resolved] |
+https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.4[git tag] |
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.3...v1.5.4[full diff]
+
 == 1.5.3 (2015-10-31) - @mojavelinux
 
 Enhancements::
@@ -172,6 +231,7 @@ Distribution Packages::
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.2[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v1.5.1...v1.5.2[full diff]
+// end::compact[]
 
 == 1.5.1 (2014-09-29) - @mojavelinux
 
@@ -203,8 +263,6 @@ Distribution Packages::
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.1[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.1[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v1.5.0...v1.5.1[full diff]
-
-// end::compact[]
 
 == 1.5.0 (2014-08-12) - @mojavelinux
 
