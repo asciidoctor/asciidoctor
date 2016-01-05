@@ -1,12 +1,15 @@
-language: ruby
 sudo: false
+git:
+  depth: 1
+language: ruby
 rvm:
-  - 2.2.1
-  - 2.1.6
+  - 2.3.0
+  - 2.2.4
+  - 2.1.8
   - 2.0.0
   - 1.9.3
   - 1.8.7
-  - jruby-head
+  - jruby-9.0.4.0
   - jruby-19mode
   - jruby-18mode
   - rbx-2
