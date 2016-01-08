@@ -118,6 +118,20 @@ TIP: The benefit of using a Linux package manager to install the gem is that it 
 The drawback is that the package may not be available immediately after the release of the gem.
 If you need the latest version, you can always fallback to using the `gem` command.
 
+[CAUTION]
+====
+If you're using a non-English Windows environment, you may encounter the following error:
+
+ ERROR:  While executing gem ... (Encoding::UndefinedConversionError)
+
+To solve this issue, we recommend changing the active code page in your console to UTF-8:
+
+ chcp 65001
+
+That way, all your Unicode headaches will be behind you.
+Asciidoctor works best when you use UTF-8 everywhere.
+====
+
 === (a) gem install
 
 Open a terminal and type (excluding the leading `$`):
