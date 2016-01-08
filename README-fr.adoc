@@ -108,8 +108,8 @@ Asciidoctor offre aussi un thème moderne et responsive basé sur {uri-foundatio
 
 Asciidoctor fonctionne sur Linux, OSX (Mac), Windows et requiert une des implémentations suivantes :
 
-* MRI (Ruby 1.8.7, 1.9.3, 2.0, 2.1 & 2.2)
-* JRuby 1.7 (Ruby 1.8 and 1.9 modes) & 9000
+* MRI (Ruby 1.8.7, 1.9.3, 2.0, 2.1, 2.2 & 2.3)
+* JRuby (1.7 en modes Ruby 1.8 et 1.9, 9000)
 * Rubinius 2.2.x
 * Opal (JavaScript)
 
@@ -157,7 +157,7 @@ Si c'est le cas, utilisez la commande gem suivante pour supprimer la vieille ver
 source 'https://rubygems.org'
 gem 'asciidoctor'
 # ou spécifier la version explicitement
-# gem 'asciidoctor', '1.5.3'
+# gem 'asciidoctor', '1.5.4'
 ----
 
 . Sauvegardez le fichier Gemfile,
@@ -170,15 +170,15 @@ Utiliser `bundle update` *n*'est *pas* recommandé car les autres gems seront é
 
 === (c) Gestionnaire de paquets Linux
 
-==== Yum (Fedora 21 ou supérieure)
+==== DNF (Fedora 21 ou supérieure)
 
-Pour installer la gem sur Fedora 21 ou supérieure en utilisant yum, ouvrez un terminal et tapez :
+Pour installer la gem sur Fedora 21 ou supérieure en utilisant dnf, ouvrez un terminal et tapez :
 
- $ sudo yum install -y asciidoctor
+ $ sudo dnf install -y asciidoctor
 
 Pour mettre à jour la gem, utilisez :
 
- $ sudo yum update -y asciidoctor
+ $ sudo dnf update -y asciidoctor
 
 TIP: Votre système Fedora peut être configuré pour mettre à jour les paquets automatiquement, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gem.
 
@@ -210,7 +210,7 @@ Vous devriez voir les informations concernant la version d'Asciidoctor et celle 
 
 [.output]
 ....
-Asciidoctor 1.5.3 [http://asciidoctor.org]
+Asciidoctor 1.5.4 [http://asciidoctor.org]
 Runtime Environment (ruby 2.2.2p95 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
