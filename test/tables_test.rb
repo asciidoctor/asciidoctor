@@ -671,6 +671,28 @@ d|9 2+>|10
       assert_xpath '(//row)[2]/entry[@nameend]', output, 0
     end
 
+    test 'assigns unique column names for table with implicit column count and colspans in first row' do
+      input = <<-EOS
+|====
+|                 2+| Node 0          2+| Node 1
+
+| Host processes    | Core 0 | Core 1   | Core 4 | Core 5
+| Guest processes   | Core 2 | Core 3   | Core 6 | Core 7
+|====
+      EOS
+
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_xpath '//colspec', output, 5
+      (1..5).each do |n|
+        assert_xpath %((//colspec)[#{n}][@colname="col_#{n}"]), output, 1
+      end
+      assert_xpath '(//row)[1]/entry', output, 3
+      assert_xpath '((//row)[1]/entry)[1][@namest]', output, 0
+      assert_xpath '((//row)[1]/entry)[1][@namend]', output, 0
+      assert_xpath '((//row)[1]/entry)[2][@namest="col_2"][@nameend="col_3"]', output, 1
+      assert_xpath '((//row)[1]/entry)[3][@namest="col_4"][@nameend="col_5"]', output, 1
+    end
+
     test 'ignores cell with colspan that exceeds colspec' do
       input = <<-EOS
 [cols="1,1"]
