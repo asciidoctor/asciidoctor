@@ -537,7 +537,7 @@ Your browser does not support the audio tag.
       target = node.attr 'target'
       width_attr = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
       height_attr = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
-      if ((node.attr? 'format', 'svg', false) || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+      if ((node.attr? 'format', 'svg', false) || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE &&
           ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
         if svg
           img = (read_svg_contents node, target) || %(<span class="alt">#{node.attr 'alt'}</span>)
