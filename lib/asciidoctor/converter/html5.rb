@@ -19,7 +19,7 @@ module Asciidoctor
       #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
     }).default = [nil, nil, nil]
 
-    SvgPreambleRx = /\A.*?(?=<svg[ >])/m
+    SvgPreambleRx = /\A.*?(?=<svg\b)/m
     SvgStartTagRx = /\A<svg[^>]*>/
     DimensionAttributeRx = /\s(?:width|height|style)=(["']).*?\1/
 
