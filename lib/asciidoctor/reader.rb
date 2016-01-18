@@ -883,7 +883,7 @@ class PreprocessorReader < Reader
           inc_lines = []
           attributes['lines'].split(DataDelimiterRx).each do |linedef|
             if linedef.include?('..')
-              from, to = linedef.split('..').map(&:to_i)
+              from, to = linedef.split('..', 2).map(&:to_i)
               if to == -1
                 inc_lines << from
                 inc_lines << 1.0/0.0
