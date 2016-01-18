@@ -1523,10 +1523,10 @@ image::circle.svg[Tiger,100]
       EOS
 
       output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => ::File.dirname(__FILE__) }
-      assert_match(/<svg [^>]*width="100px"[^>]*>/, output, 1)
-      refute_match(/<svg [^>]*width="500px"[^>]*>/, output)
-      refute_match(/<svg [^>]*height="500px"[^>]*>/, output)
-      refute_match(/<svg [^>]*style="width:500px;height:500px"[^>]*>/, output)
+      assert_match(/<svg\s[^>]*width="100px"[^>]*>/, output, 1)
+      refute_match(/<svg\s[^>]*width="500px"[^>]*>/, output)
+      refute_match(/<svg\s[^>]*height="500px"[^>]*>/, output)
+      refute_match(/<svg\s[^>]*style="width:500px;height:500px"[^>]*>/, output)
     end
 
     test 'renders inline SVG image using svg element even when data-uri is set' do
@@ -1539,7 +1539,7 @@ image::circle.svg[Tiger,100]
       EOS
 
       output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => ::File.dirname(__FILE__) }
-      assert_match(/<svg [^>]*width="100px">/, output, 1)
+      assert_match(/<svg\s[^>]*width="100px">/, output, 1)
     end
 
     test 'renders alt text for inline svg element if svg cannot be read' do

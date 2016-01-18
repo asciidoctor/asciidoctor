@@ -19,7 +19,7 @@ module Asciidoctor
       #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
     }).default = [nil, nil, nil]
 
-    SvgPreambleRx = /\A.*?(?=<svg[ >])/m
+    SvgPreambleRx = /\A.*?(?=<svg\b)/m
     SvgStartTagRx = /\A<svg[^>]*>/
     DimensionAttributeRx = /\s(?:width|height|style)=(["']).*?\1/
 
@@ -1146,16 +1146,17 @@ Your browser does not support the video tag.
 
     def read_svg_contents node, target
       if (svg = node.read_contents target, :start => (node.document.attr 'imagesdir'), :normalize => true, :label => 'SVG')
-        svg = svg.sub SvgPreambleRx, ''
-        start_tag = nil
+        svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
+        old_start_tag = new_start_tag = nil
+        # NOTE width, height and style attributes are removed if either width or height is specified
         ['width', 'height'].each do |dim|
           if node.attr? dim
-            # NOTE width, height and style attributes are removed if either width or height is specified
-            start_tag ||= (svg.match SvgStartTagRx)[0].gsub DimensionAttributeRx, ''
-            start_tag = %(#{start_tag.chop} #{dim}="#{node.attr dim}px">)
+            new_start_tag = (old_start_tag = (svg.match SvgStartTagRx)[0]).gsub DimensionAttributeRx, '' unless new_start_tag
+            # QUESTION should we add px since it's already the default?
+            new_start_tag = %(#{new_start_tag.chop} #{dim}="#{node.attr dim}px">)
           end
         end
-        svg = svg.sub SvgStartTagRx, start_tag if start_tag
+        svg = %(#{new_start_tag}#{svg[old_start_tag.length..-1]}) if new_start_tag
       end
       svg
     end
