@@ -559,16 +559,5 @@ class AbstractNode
   def is_uri? str
     Helpers.uriish? str
   end
-
-  # Public: Retrieve the list marker keyword for the specified list type.
-  #
-  # For use in the HTML type attribute.
-  #
-  # list_type - the type of list; default to the @style if not specified
-  #
-  # Returns the single-character [String] keyword that represents the marker for the specified list type
-  def list_marker_keyword(list_type = nil)
-    ORDERED_LIST_KEYWORDS[list_type || @style]
-  end
 end
 end
