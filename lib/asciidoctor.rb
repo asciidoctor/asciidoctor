@@ -727,7 +727,7 @@ module Asciidoctor
     #   <1> Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    CalloutListRx = /^<?(\d+)>#{CG_BLANK}+(.*)/
+    CalloutListRx = /^<?(\d+)>#{CG_BLANK}+(.*)$/
 
     # Matches a callout reference inside literal text.
     #
