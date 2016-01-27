@@ -656,6 +656,7 @@ module Asciidoctor
     #   - Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
+    # NOTE I want to use (-|([*\u2022])\2{0,4}) but breaks the parser since it relies on fixed match positions
     UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5}|\u2022{1,5})#{CG_BLANK}+(.*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
@@ -707,7 +708,7 @@ module Asciidoctor
     #   {foo_term}:: {foo_def}
     #
     # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
-    # QUESTION should we check for line comment in regex or when scanning the lines?
+    # TODO check for line comment when scanning lines instead of in regex
     #
     DefinitionListRx = /^(?!\/\/)#{CG_BLANK}*(.*?)(:{2,4}|;;)(?:#{CG_BLANK}+(.*))?$/
 
