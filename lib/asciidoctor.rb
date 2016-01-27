@@ -684,7 +684,7 @@ module Asciidoctor
       #:lowergreek => /[a-z]\]/
     }
 
-    # Matches a definition list item.
+    # Matches a description list entry.
     #
     # Examples
     #
@@ -693,26 +693,26 @@ module Asciidoctor
     #   foo::::
     #   foo;;
     #
-    #   # should be followed by a definition, on the same line...
+    #   # the term can be followed by a description on the same line...
     #
     #   foo:: That which precedes 'bar' (see also, <<bar>>)
     #
-    #   # ...or on a separate line
+    #   # ...or on a separate line (optionally indented)
     #
     #   foo::
     #     That which precedes 'bar' (see also, <<bar>>)
     #
-    #   # the term may be an attribute reference
+    #   # the term or description may be an attribute reference
     #
     #   {foo_term}:: {foo_def}
     #
     # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
     # QUESTION should we check for line comment in regex or when scanning the lines?
     #
-    DefinitionListRx = /^(?!\/\/)#{CG_BLANK}*(.*?)(:{2,4}|;;)(?:#{CG_BLANK}+(.*))?$/
+    DescriptionListRx = /^(?!\/\/)#{CG_BLANK}*(.*?)(:{2,4}|;;)(?:#{CG_BLANK}+(.*))?$/
 
-    # Matches a sibling definition list item (which does not include the keyed type).
-    DefinitionListSiblingRx = {
+    # Matches a sibling description list item (which does not include the type in the key).
+    DescriptionListSiblingRx = {
       # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
       '::' => /^(?!\/\/)#{CG_BLANK}*((?:.*[^:])?)(::)(?:#{CG_BLANK}+(.*))?$/,
       ':::' => /^(?!\/\/)#{CG_BLANK}*((?:.*[^:])?)(:::)(?:#{CG_BLANK}+(.*))?$/,
@@ -749,7 +749,7 @@ module Asciidoctor
     ListRxMap = {
       :ulist => UnorderedListRx,
       :olist => OrderedListRx,
-      :dlist => DefinitionListRx,
+      :dlist => DescriptionListRx,
       :colist => CalloutListRx
     }
 

@@ -1674,7 +1674,7 @@ image::tiger.png[]
 |===
 
 [horizontal, labelwidth="25%", itemwidth="75%"]
-term:: definition
+term:: description
 
 NOTE: note
 
