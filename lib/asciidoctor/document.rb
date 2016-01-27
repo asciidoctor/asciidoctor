@@ -1110,17 +1110,18 @@ class Document < AbstractBlock
   # attribute is set, read the doc-name.docinfo.ext file. If the docinfo2
   # attribute is set, read both files in that order.
   #
-  # location - The Symbol location of the docinfo, either :header or :footer. (default: :header)
-  # ext      - The extension of the docinfo file(s). If not set, the extension
-  #            will be determined based on the basebackend. (default: nil)
+  # location - The Symbol location of the docinfo (e.g., :head, :footer, etc). (default: :head)
+  # suffix   - The suffix of the docinfo file(s). If not set, the extension
+  #            will be set to the outfilesuffix. (default: nil)
   #
-  # returns The contents of the docinfo file(s)
-  def docinfo(location = :head, ext = nil)
+  # returns The contents of the docinfo file(s) or empty string if no files are
+  # found or the safe mode is secure or greater.
+  def docinfo location = :head, suffix = nil
     if safe >= SafeMode::SECURE
       ''
     else
-      qualifier = (location == :footer ? '-footer' : nil)
-      ext = @outfilesuffix unless ext
+      qualifier = location == :head ? nil : %(-#{location})
+      suffix = @outfilesuffix unless suffix
       docinfodir = @attributes['docinfodir']
 
       content = nil
@@ -1138,7 +1139,7 @@ class Document < AbstractBlock
       end
 
       if docinfo
-        docinfo_filename = %(docinfo#{qualifier}#{ext})
+        docinfo_filename = %(docinfo#{qualifier}#{suffix})
         unless (docinfo & ['shared', %(shared-#{location})]).empty?
           docinfo_path = normalize_system_path(docinfo_filename, docinfodir)
           # NOTE normalizing the lines is essential if we're performing substitutions
