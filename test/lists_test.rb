@@ -258,6 +258,18 @@ second wrapped line
       assert !output.include?('* Foo')
     end
 
+    test 'a list item that starts with a sequence of list markers characters should not match a nested list' do
+      input = <<-EOS
+ * first item
+ *. normal text
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ul', output, 1
+      assert_css 'ul li', output, 1
+      assert_xpath "//ul/li/p[text()='first item\n*. normal text']", output, 1
+    end
+
     test 'a list item for a different list terminates indented paragraph for text of list item' do
       input = <<-EOS
 == Example 1
