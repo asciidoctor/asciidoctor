@@ -647,7 +647,7 @@ class Parser
             end
             break
 
-          elsif (match = DefinitionListRx.match(this_line))
+          elsif (match = DescriptionListRx.match(this_line))
             reader.unshift_line this_line
             block = next_labeled_list(reader, match, parent)
             break
@@ -710,7 +710,7 @@ class Parser
             adjust_indentation! lines
 
             block = Block.new(parent, :literal, :content_model => :verbatim, :source => lines, :attributes => attributes)
-            # a literal gets special meaning inside of a definition list
+            # a literal gets special meaning inside of a description list
             # TODO this feels hacky, better way to distinguish from explicit literal block?
             block.set_option('listparagraph') if in_list
 
@@ -1237,7 +1237,7 @@ class Parser
     nil
   end
 
-  # Internal: Parse and construct a labeled (e.g., definition) list Block from the current position of the Reader
+  # Internal: Parse and construct a description list Block from the current position of the Reader
   #
   # reader    - The Reader from which to retrieve the labeled list
   # match     - The Regexp match for the head of the list
@@ -1249,7 +1249,7 @@ class Parser
     previous_pair = nil
     # allows us to capture until we find a labeled item
     # that uses the same delimiter (::, :::, :::: or ;;)
-    sibling_pattern = DefinitionListSiblingRx[match[2]]
+    sibling_pattern = DescriptionListSiblingRx[match[2]]
 
     # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
     while match || (reader.has_more_lines? && (match = sibling_pattern.match(reader.peek_line)))
@@ -1270,12 +1270,12 @@ class Parser
 
   # Internal: Parse and construct the next ListItem for the current bulleted
   # (unordered or ordered) list Block, callout lists included, or the next
-  # term ListItem and definition ListItem pair for the labeled list Block.
+  # term ListItem and description ListItem pair for the labeled list Block.
   #
   # First collect and process all the lines that constitute the next list
   # item for the parent list (according to its type). Next, parse those lines
   # into blocks and associate them with the ListItem (in the case of a
-  # labeled list, the definition ListItem). Finally, fold the first block
+  # labeled list, the description ListItem). Finally, fold the first block
   # into the item's text attribute according to rules described in ListItem.
   #
   # reader        - The Reader from which to retrieve the next list item
@@ -1370,7 +1370,7 @@ class Parser
   # through all the rules that determine what comprises a list item.
   #
   # Grab lines until a sibling list item is found, or the block is broken by a
-  # terminator (such as a line comment). Definition lists are more greedy if
+  # terminator (such as a line comment). Description lists are more greedy if
   # they don't have optional inline item text...they want that text
   #
   # reader          - The Reader from which to retrieve the lines.
