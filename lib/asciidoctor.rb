@@ -646,7 +646,9 @@ module Asciidoctor
     ## Lists
 
     # Detects the start of any list item.
-    AnyListRx = /^(?:<?\d+>#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*(?:-|(?:\*|\.|\u2022){1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}+#{CG_GRAPH}|#{CG_BLANK}*.*?(?::{2,4}|;;)(?:#{CG_BLANK}+#{CG_GRAPH}|$))/
+    #
+    # NOTE we only have to check as far as the blank character because we know it means non-whitespace follows.
+    AnyListRx = /^(?:#{CG_BLANK}*(?:-|([*.\u2022])\1{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}|#{CG_BLANK}*.*?(?::{2,4}|;;)(?:$|#{CG_BLANK})|<?\d+>#{CG_BLANK})/
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
