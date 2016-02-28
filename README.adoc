@@ -199,6 +199,18 @@ To upgrade the gem, use:
 
 TIP: Your Debian or Ubuntu system may be configured to automatically update packages, in which case no action is required by you to update the gem.
 
+==== apk (Alpine Linux)
+
+To install the gem on Alpine Linux, open a terminal and type:
+
+ $ sudo apk add asciidoctor
+
+To upgrade the gem, use:
+
+ $ sudo apk add -u asciidoctor
+
+TIP: Your Alpine Linux system may be configured to automatically update packages, in which case no action is required by you to update the gem.
+
 === Other installation options
 
 * {uri-install-docker}[Installing Asciidoctor using Docker]
