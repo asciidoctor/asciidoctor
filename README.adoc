@@ -338,13 +338,15 @@ The {uri-contribute}[Contributing] guide provides information on how to create, 
 == Getting Help
 
 The Asciidoctor project is developed to help you easily write and publish your content.
-But we can't do that without your feedback!
-We encourage you to ask questions and discuss any aspects of the project on the discussion list, Twitter or IRC.
+But we can't do it without your feedback!
+We encourage you to ask questions and discuss any aspects of the project on the discussion list, on Twitter or in the chat room.
 
-Mailing list:: {uri-discuss}
-Twitter (Chat):: #asciidoctor hashtag
-Gitter (Chat):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
-IRC (Chat):: {uri-irc}[#asciidoctor] on FreeNode IRC
+Discussion list (Nabble):: {uri-discuss}
+Twitter:: #asciidoctor hashtag or @asciidoctor mention
+Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
+////
+Chat (IRC):: {uri-irc}[#asciidoctor] on FreeNode IRC
+////
 
 ifdef::env-github[]
 Further information and documentation about Asciidoctor can be found on the project's website.
