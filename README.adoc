@@ -13,7 +13,7 @@ ifdef::env-github[:badges:]
 :uri-asciidoctorj: {uri-org}/asciidoctorj
 :uri-asciidoctorjs: {uri-org}/asciidoctor.js
 :uri-project: http://asciidoctor.org
-ifdef::awestruct-version[:uri-project: link:]
+ifdef::env-site[:uri-project: link:]
 :uri-docs: {uri-project}/docs
 :uri-news: {uri-project}/news
 :uri-manpage: {uri-project}/man/asciidoctor
@@ -21,7 +21,7 @@ ifdef::awestruct-version[:uri-project: link:]
 :uri-contributors: {uri-repo}/graphs/contributors
 :uri-rel-file-base: link:
 :uri-rel-tree-base: link:
-ifdef::awestruct-version[]
+ifdef::env-site[]
 :uri-rel-file-base: {uri-repo}/blob/master/
 :uri-rel-tree-base: {uri-repo}/tree/master/
 endif::[]
