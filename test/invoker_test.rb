@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# encoding: utf-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -550,4 +550,13 @@ context 'Invoker' do
     assert_match(/Total time/, error)
   end
 
+  test 'should get date from SOURCE_DATE_EPOCH for file' do
+    saved = ENV['SOURCE_DATE_EPOCH']
+    ENV['SOURCE_DATE_EPOCH'] = "1234123412"
+    sample_filepath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.asciidoc'))
+    invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
+    doc = invoker.document
+    ENV['SOURCE_DATE_EPOCH'] = saved
+    assert_equal '2009-02-08', doc.attr('docdate')
+  end
 end

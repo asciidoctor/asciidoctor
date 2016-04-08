@@ -200,4 +200,15 @@ T}
 .TE'
     end
   end
+
+  context 'Environment' do
+    test 'should get date from SOURCE_DATE_EPOCH' do
+      saved = ENV['SOURCE_DATE_EPOCH']
+      ENV['SOURCE_DATE_EPOCH'] = "1234123412"
+      output = Asciidoctor.convert SAMPLE_MANPAGE_HEADER, :backend => :manpage, :header_footer => true
+      ENV['SOURCE_DATE_EPOCH'] = saved
+      assert_match(/Date: 2009-02-08/, output)
+    end
+  end
+
 end
