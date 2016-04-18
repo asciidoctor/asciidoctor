@@ -1,6 +1,8 @@
 = Asciidoctor Changelog
-:uri-asciidoctor: https://github.com/asciidoctor/asciidoctor
-:uri-asciidoc: http://asciidoctor.org/docs/what-is-asciidoc
+:uri-asciidoctor: http://asciidoctor.org
+:uri-asciidoc: {uri-asciidoctor}/docs/what-is-asciidoc
+:uri-repo: https://github.com/asciidoctor/asciidoctor
+:icons: font
 :star: icon:star[role=red]
 ifndef::icons[]
 :star: &#9733;
@@ -9,7 +11,7 @@ endif::[]
 {uri-asciidoctor}[Asciidoctor] is a _fast_, open source text processor and publishing toolchain for converting {uri-asciidoc}[AsciiDoc] content into HTML5, DocBook 5 (or 4.5) and other formats.
 
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
-For a detailed view of what has changed, refer to the https://github.com/asciidoctor/asciidoctor/commits/master[commit history] on GitHub.
+For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
 // tag::compact[]
 == 1.5.4 (2016-01-03) - @mojavelinux
