@@ -16,4 +16,4 @@ rvm:
 script: bundle exec rake coverage test:all
 notifications:
   email: false
-  irc: 'irc.freenode.org#asciidoctor'
+  #irc: 'irc.freenode.org#asciidoctor'
