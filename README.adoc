@@ -199,6 +199,8 @@ To upgrade the gem, use:
 
 TIP: Your Debian or Ubuntu system may be configured to automatically update packages, in which case no action is required by you to update the gem.
 
+TIP: As of April 2016, the version of asciidoctor packaged with Debian is the out-of-date 0.1.4. You can use `gem update asciidoctor` as above to install the current version, but be aware that it will be installed in a different location, such as /usr/local/bin, and the older asciidoctor will still be installed in /usr/bin. 
+
 ==== apk (Alpine Linux)
 
 To install the gem on Alpine Linux, open a terminal and type:
