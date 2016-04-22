@@ -38,12 +38,12 @@ An ideal bug report would include a pull request with failing specs.
 . {uri-branch-help}[Create a topic branch] (preferably using the pattern `issue-XYZ`, where `XYZ` is the issue number).
 . Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
 . Run `bundle exec rake` to run the tests.
-If your tests pass, return to step 3.
+If your tests pass, return to step 4.
 . Implement your feature or bug fix.
 . Run `bundle exec rake` to run the tests.
-If your tests fail, return to step 5.
+If your tests fail, return to step 6.
 . Add documentation for your feature or bug fix.
-. If your changes are not 100% documented, go back to step 7.
+. If your changes are not 100% documented, go back to step 8.
 . Add, commit, and push your changes.
 . {uri-pr-help}[Submit a pull request].
 
