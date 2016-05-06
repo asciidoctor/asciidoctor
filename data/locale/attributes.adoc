@@ -1,0 +1,27 @@
+// Locale attributes for asciidoctor | MIT License
+// Please add your language!
+
+ifeval::["{lang}" == "de"]
+:caution-caption: Achtung
+
+endif::[]
+
+// Italian translation: Marco Ciampa <ciampix@libero.it>
+ifeval::["{lang}" == "it"]
+:appendix-caption: Appendice
+:caution-caption: Attenzione
+:example-caption: Esempio
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Ultimo aggiornamento
+//:listing-caption: Elenco
+:manname-title: Nome
+:note-caption: Nota
+//:preface-title: Prefazione
+:table-caption: Tabella
+:tip-caption: Suggerimento
+:toc-title: Indice
+:untitled-label: Senza titolo
+:version-label: Versione
+:warning-caption: Attenzione
+endif::[]
