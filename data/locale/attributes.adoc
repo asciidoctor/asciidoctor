@@ -3,7 +3,7 @@
 
 ifeval::["{lang}" == "de"]
 :caution-caption: Achtung
-
+//...
 endif::[]
 
 // Italian translation: Marco Ciampa <ciampix@libero.it>
@@ -29,19 +29,19 @@ endif::[]
 // French translation: Nicolas Comet <nicolas.comet@gmail.com>
 ifeval::["{lang}" == "fr"]
 :appendix-caption: Appendice
-:caution-caption: Attention
+:caution-caption: Avertissement
 :example-caption: Exemple
 :figure-caption: Figure
 :important-caption: Important
 :last-update-label: Dernière mise à jour
-:listing-caption: Liste
+//:listing-caption: Liste
 :manname-title: Nom
 :note-caption: Note
-:preface-title: Préface
+//:preface-title: Préface
 :table-caption: Table
-:tip-caption: Suggestion
+:tip-caption: Astuce
 :toc-title: Table des matières
 :untitled-label: Sans titre
 :version-label: Version
-:warning-caption: Avertissement
+:warning-caption: Attention
 endif::[]
