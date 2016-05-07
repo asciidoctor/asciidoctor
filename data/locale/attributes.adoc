@@ -63,7 +63,7 @@ ifeval::["{lang}" == "fr"]
 :warning-caption: Attention
 endif::[]
 
-// Arabic translation: Aboullaite Mohammed <aboullaite.mohammed@gmail.com>
+// Arabic translation, courtesy of Aboullaite Mohammed <aboullaite.mohammed@gmail.com>
 ifeval::["{lang}" == "ar"]
 :appendix-caption: ملحق
 :caution-caption: تنبيه
