@@ -968,12 +968,12 @@ module Asciidoctor
     ## Layout
 
     # Matches a trailing + preceded by at least one space character,
-    # which forces a hard line break (<br> tag in HTML outputs).
+    # which forces a hard line break (<br> tag in HTML output).
     #
     # Examples
     #
-    #    +
-    #   Foo +
+    #   Humpty Dumpty sat on a wall, +
+    #   Humpty Dumpty had a great fall.
     #
     if RUBY_ENGINE == 'opal'
       # NOTE JavaScript only treats ^ and $ as line boundaries in multiline regexp; . won't match newlines
