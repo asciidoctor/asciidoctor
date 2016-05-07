@@ -38,7 +38,7 @@ ifeval::["{lang}" == "fr"]
 :manname-title: Nom
 :note-caption: Note
 //:preface-title: Préface
-:table-caption: Table
+:table-caption: Tableau
 :tip-caption: Astuce
 :toc-title: Table des matières
 :untitled-label: Sans titre
