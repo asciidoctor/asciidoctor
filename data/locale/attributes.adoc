@@ -2,8 +2,22 @@
 // Please add your language!
 
 ifeval::["{lang}" == "de"]
+:appendix-caption: Anhang
 :caution-caption: Achtung
-//...
+:example-caption: Beispiel
+:figure-caption: Abbildung
+:important-caption: Wichtig
+:last-update-label: Zuletzt aktualisiert
+//:listing-caption: Listing
+:manname-title: NAME
+:note-caption: Anmerkung
+//:preface-title: Vorwort
+:table-caption: Tabelle
+:tip-caption: Hinweis
+:toc-title: Inhalt
+:untitled-label: Ohne Titel
+:version-label: Version
+:warning-caption: Warnung
 endif::[]
 
 // Italian translation: Marco Ciampa <ciampix@libero.it>
