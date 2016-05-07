@@ -25,3 +25,23 @@ ifeval::["{lang}" == "it"]
 :version-label: Versione
 :warning-caption: Attenzione
 endif::[]
+
+// French translation: Nicolas Comet <nicolas.comet@gmail.com>
+ifeval::["{lang}" == "fr"]
+:appendix-caption: Appendice
+:caution-caption: Attention
+:example-caption: Exemple
+:figure-caption: Figure
+:important-caption: Important
+:last-update-label: Dernière mise à jour
+:listing-caption: Liste
+:manname-title: Nom
+:note-caption: Note
+:preface-title: Préface
+:table-caption: Table
+:tip-caption: Suggestion
+:toc-title: Table des matières
+:untitled-label: Sans titre
+:version-label: Version
+:warning-caption: Avertissement
+endif::[]
