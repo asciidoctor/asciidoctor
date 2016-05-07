@@ -34,10 +34,10 @@ ifeval::["{lang}" == "fr"]
 :figure-caption: Figure
 :important-caption: Important
 :last-update-label: Dernière mise à jour
-//:listing-caption: Liste
+:listing-caption: Liste
 :manname-title: Nom
 :note-caption: Note
-//:preface-title: Préface
+:preface-title: Préface
 :table-caption: Table
 :tip-caption: Suggestion
 :toc-title: Table des matières
