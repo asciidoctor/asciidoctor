@@ -102,4 +102,23 @@ ifeval::["{lang}" == "es"]
 :untitled-label: Sin título
 :version-label: Versión
 :warning-caption: Aviso
+//
+// Catalan translation, courtesy Abel Salgado Romero <abelromero@gmail.com> and Alex Soto
+ifeval::["{lang}" == "ca"]
+:appendix-caption: Apendix
+:caution-caption: Atenció
+:example-caption: Exemple
+:figure-caption: Figura
+:important-caption: Important
+:last-update-label: Última actualització
+//:listing-caption: Llista
+:manname-title: Nom
+:note-caption: Nota
+//:preface-title: Prefaci
+:table-caption: Taula
+:tip-caption: Suggeriment
+:toc-title: Índex
+:untitled-label: Sense títol
+:version-label: Versió
+:warning-caption: Advertència
 endif::[]
