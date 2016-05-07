@@ -45,3 +45,23 @@ ifeval::["{lang}" == "fr"]
 :version-label: Version
 :warning-caption: Attention
 endif::[]
+
+// Spanish translation: Eddú Meléndez <eddu.melendez@gmail.com>
+ifeval::["{lang}" == "es"]
+:appendix-caption: Apéndice
+:caution-caption: Precaución
+:example-caption: Ejemplo
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Ultima actualización
+//:listing-caption: Lista
+:manname-title: Nombre
+:note-caption: Nota
+//:preface-title: Prefacio
+:table-caption: Tabla
+:tip-caption: Sugerencia
+:toc-title: Tabla de Contenido
+:untitled-label: Sin título
+:version-label: Versión
+:warning-caption: Aviso
+endif::[]
