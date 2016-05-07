@@ -1,5 +1,8 @@
-// Locale attributes for asciidoctor | MIT License
-// Please add your language!
+// This file provides translations for all built-in attributes in Asciidoctor that output localized content.
+// See http://asciidoctor.org/docs/user-manual/#customizing-built-in-labels to learn how to use it.
+
+// NOTE: Please use a line comment in front of the listing-caption and preface-title entries.
+// These attributes are optional and not set by default.
 
 ifeval::["{lang}" == "de"]
 :appendix-caption: Anhang
@@ -20,7 +23,7 @@ ifeval::["{lang}" == "de"]
 :warning-caption: Warnung
 endif::[]
 
-// Italian translation: Marco Ciampa <ciampix@libero.it>
+// Italian translation, courtesy of Marco Ciampa <ciampix@libero.it>
 ifeval::["{lang}" == "it"]
 :appendix-caption: Appendice
 :caution-caption: Attenzione
@@ -40,7 +43,7 @@ ifeval::["{lang}" == "it"]
 :warning-caption: Attenzione
 endif::[]
 
-// French translation: Nicolas Comet <nicolas.comet@gmail.com>
+// French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
 ifeval::["{lang}" == "fr"]
 :appendix-caption: Appendice
 :caution-caption: Avertissement
