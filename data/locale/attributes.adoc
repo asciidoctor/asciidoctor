@@ -62,3 +62,23 @@ ifeval::["{lang}" == "fr"]
 :version-label: Version
 :warning-caption: Attention
 endif::[]
+
+// Arabic translation: Aboullaite Mohammed <aboullaite.mohammed@gmail.com>
+ifeval::["{lang}" == "ar"]
+:appendix-caption: ملحق
+:caution-caption: تنبيه
+:example-caption: مثال
+:figure-caption: الشكل
+:important-caption: مهم
+:last-update-label: اخر تحديث
+//:listing-caption: قائمة
+:manname-title: اسم
+:note-caption: ملاحظة
+//:preface-title: تمهيد
+:table-caption: جدول
+:tip-caption: تلميح
+:toc-title: فهرس
+:untitled-label: بدون عنوان
+:version-label: نسخة
+:warning-caption: تحذير
+endif::[]
