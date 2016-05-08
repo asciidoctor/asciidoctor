@@ -24,6 +24,7 @@ ifeval::["{lang}" == "ar"]
 :untitled-label: بدون عنوان
 :version-label: نسخة
 :warning-caption: تحذير
+endif::[]
 //
 // Catalan translation, courtesy of Abel Salgado Romero <abelromero@gmail.com> and Alex Soto
 ifeval::["{lang}" == "ca"]
@@ -83,6 +84,7 @@ ifeval::["{lang}" == "es"]
 :untitled-label: Sin título
 :version-label: Versión
 :warning-caption: Aviso
+endif::[]
 //
 // French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
 ifeval::["{lang}" == "fr"]
@@ -142,4 +144,24 @@ ifeval::["{lang}" == "nl"]
 :untitled-label: Naamloos
 :version-label: Versie
 :warning-caption: Waarschuwing
+endif::[]
+//
+// Russian translation, courtesy of Alexander Zobkov <alexander.zobkov@gmail.com>
+ifeval::["{lang}" == "ru"]
+:appendix-caption: Приложение
+:caution-caption: Внимание
+:example-caption: Пример
+:figure-caption: Рисунок
+:important-caption: Важно
+:last-update-label: Последний раз обновлено
+//:listing-caption: Листинг
+:manname-title: Название
+:note-caption: Примечание
+//:preface-title: Предисловие
+:table-caption: Таблица
+:tip-caption: Подсказка
+:toc-title: Содержание
+:untitled-label: Без названия
+:version-label: Версия
+:warning-caption: Предупреждение
 endif::[]
