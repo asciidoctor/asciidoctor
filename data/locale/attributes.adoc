@@ -6,6 +6,46 @@
 //
 // IMPORTANT: Do not add any blank lines.
 //
+// Arabic translation, courtesy of Aboullaite Mohammed <aboullaite.mohammed@gmail.com>
+ifeval::["{lang}" == "ar"]
+:appendix-caption: ملحق
+:caution-caption: تنبيه
+:example-caption: مثال
+:figure-caption: الشكل
+:important-caption: مهم
+:last-update-label: اخر تحديث
+//:listing-caption: قائمة
+:manname-title: اسم
+:note-caption: ملاحظة
+//:preface-title: تمهيد
+:table-caption: جدول
+:tip-caption: تلميح
+:toc-title: فهرس
+:untitled-label: بدون عنوان
+:version-label: نسخة
+:warning-caption: تحذير
+//
+// Catalan translation, courtesy of Abel Salgado Romero <abelromero@gmail.com> and Alex Soto
+ifeval::["{lang}" == "ca"]
+:appendix-caption: Apendix
+:caution-caption: Atenció
+:example-caption: Exemple
+:figure-caption: Figura
+:important-caption: Important
+:last-update-label: Última actualització
+//:listing-caption: Llista
+:manname-title: Nom
+:note-caption: Nota
+//:preface-title: Prefaci
+:table-caption: Taula
+:tip-caption: Suggeriment
+:toc-title: Índex
+:untitled-label: Sense títol
+:version-label: Versió
+:warning-caption: Advertència
+endif::[]
+//
+// German translation, courtesy of Florian Wilhelm
 ifeval::["{lang}" == "de"]
 :appendix-caption: Anhang
 :caution-caption: Achtung
@@ -23,6 +63,45 @@ ifeval::["{lang}" == "de"]
 :untitled-label: Ohne Titel
 :version-label: Version
 :warning-caption: Warnung
+endif::[]
+//
+// Spanish translation, courtesy of Eddú Meléndez <eddu.melendez@gmail.com>
+ifeval::["{lang}" == "es"]
+:appendix-caption: Apéndice
+:caution-caption: Precaución
+:example-caption: Ejemplo
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Ultima actualización
+//:listing-caption: Lista
+:manname-title: Nombre
+:note-caption: Nota
+//:preface-title: Prefacio
+:table-caption: Tabla
+:tip-caption: Sugerencia
+:toc-title: Tabla de Contenido
+:untitled-label: Sin título
+:version-label: Versión
+:warning-caption: Aviso
+//
+// French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
+ifeval::["{lang}" == "fr"]
+:appendix-caption: Appendice
+:caution-caption: Avertissement
+:example-caption: Exemple
+:figure-caption: Figure
+:important-caption: Important
+:last-update-label: Dernière mise à jour
+//:listing-caption: Liste
+:manname-title: Nom
+:note-caption: Note
+//:preface-title: Préface
+:table-caption: Tableau
+:tip-caption: Astuce
+:toc-title: Table des matières
+:untitled-label: Sans titre
+:version-label: Version
+:warning-caption: Attention
 endif::[]
 //
 // Italian translation, courtesy of Marco Ciampa <ciampix@libero.it>
@@ -45,85 +124,7 @@ ifeval::["{lang}" == "it"]
 :warning-caption: Attenzione
 endif::[]
 //
-// French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
-ifeval::["{lang}" == "fr"]
-:appendix-caption: Appendice
-:caution-caption: Avertissement
-:example-caption: Exemple
-:figure-caption: Figure
-:important-caption: Important
-:last-update-label: Dernière mise à jour
-//:listing-caption: Liste
-:manname-title: Nom
-:note-caption: Note
-//:preface-title: Préface
-:table-caption: Tableau
-:tip-caption: Astuce
-:toc-title: Table des matières
-:untitled-label: Sans titre
-:version-label: Version
-:warning-caption: Attention
-endif::[]
-//
-// Arabic translation, courtesy of Aboullaite Mohammed <aboullaite.mohammed@gmail.com>
-ifeval::["{lang}" == "ar"]
-:appendix-caption: ملحق
-:caution-caption: تنبيه
-:example-caption: مثال
-:figure-caption: الشكل
-:important-caption: مهم
-:last-update-label: اخر تحديث
-//:listing-caption: قائمة
-:manname-title: اسم
-:note-caption: ملاحظة
-//:preface-title: تمهيد
-:table-caption: جدول
-:tip-caption: تلميح
-:toc-title: فهرس
-:untitled-label: بدون عنوان
-:version-label: نسخة
-:warning-caption: تحذير
-//
-// Spanish translation, courtesy of Eddú Meléndez <eddu.melendez@gmail.com>
-ifeval::["{lang}" == "es"]
-:appendix-caption: Apéndice
-:caution-caption: Precaución
-:example-caption: Ejemplo
-:figure-caption: Figura
-:important-caption: Importante
-:last-update-label: Ultima actualización
-//:listing-caption: Lista
-:manname-title: Nombre
-:note-caption: Nota
-//:preface-title: Prefacio
-:table-caption: Tabla
-:tip-caption: Sugerencia
-:toc-title: Tabla de Contenido
-:untitled-label: Sin título
-:version-label: Versión
-:warning-caption: Aviso
-//
-// Catalan translation, courtesy Abel Salgado Romero <abelromero@gmail.com> and Alex Soto
-ifeval::["{lang}" == "ca"]
-:appendix-caption: Apendix
-:caution-caption: Atenció
-:example-caption: Exemple
-:figure-caption: Figura
-:important-caption: Important
-:last-update-label: Última actualització
-//:listing-caption: Llista
-:manname-title: Nom
-:note-caption: Nota
-//:preface-title: Prefaci
-:table-caption: Taula
-:tip-caption: Suggeriment
-:toc-title: Índex
-:untitled-label: Sense títol
-:version-label: Versió
-:warning-caption: Advertència
-endif::[]
-//
-// Dutch translation, courtesy Roel Van Steenberghe <roel.vansteenberghe@gmail.com>
+// Dutch translation, courtesy of Roel Van Steenberghe <roel.vansteenberghe@gmail.com>
 ifeval::["{lang}" == "nl"]
 :appendix-caption: Bijlage
 :caution-caption: Opgelet
