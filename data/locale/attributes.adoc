@@ -122,3 +122,23 @@ ifeval::["{lang}" == "ca"]
 :version-label: Versió
 :warning-caption: Advertència
 endif::[]
+//
+// Dutch translation, courtesy Roel Van Steenberghe <roel.vansteenberghe@gmail.com>
+ifeval::["{lang}" == "nl"]
+:appendix-caption: Bijlage
+:caution-caption: Opgelet
+:example-caption: Voorbeeld
+:figure-caption: Figuur
+:important-caption: Belangrijk
+:last-update-label: Laatste aanpassing
+//:listing-caption: Lijst
+:manname-title: Naam
+:note-caption: Noot
+//:preface-title: Inleiding
+:table-caption: Tabel
+:tip-caption: Tip
+:toc-title: Ínhoudsopgave
+:untitled-label: Naamloos
+:version-label: Versie
+:warning-caption: Waarschuwing
+endif::[]
