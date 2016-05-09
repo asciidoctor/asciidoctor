@@ -143,3 +143,23 @@ ifeval::["{lang}" == "nl"]
 :version-label: Versie
 :warning-caption: Waarschuwing
 endif::[]
+//
+// Turkish translation, courtesy of Rahman Usta <rahman.usta.88@gmail.com>
+ifeval::["{lang}" == "tr"]
+:appendix-caption: Ek bölüm
+:caution-caption: Dikkat
+:example-caption: Örnek
+:figure-caption: Görsel
+:important-caption: Önemli
+:last-update-label: Son güncelleme
+//:listing-caption: Listeleme
+:manname-title: İsim
+:note-caption: Not
+//:preface-title: Ön söz
+:table-caption: Tablo
+:tip-caption: İpucu
+:toc-title: İçindekiler
+:untitled-label: İsimsiz
+:version-label: Versiyon
+:warning-caption: Uyarı
+endif::[]
