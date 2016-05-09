@@ -143,3 +143,23 @@ ifeval::["{lang}" == "nl"]
 :version-label: Versie
 :warning-caption: Waarschuwing
 endif::[]
+//
+// Brazillian Portuguese translation, courtesy of Rafael Pestano <rmpestano@gmail.com>
+ifeval::["{lang}" == "pt-br"]
+:appendix-caption: Apéndice
+:caution-caption: Cuidado
+:example-caption: Exemplo
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Atualizado em
+//:listing-caption: Listagem
+:manname-title: Nome
+:note-caption: Nota
+//:preface-title: Prefácio
+:table-caption: Tabela
+:tip-caption: Dica
+:toc-title: Índice
+:untitled-label: Sem título
+:version-label: Versão
+:warning-caption: Aviso
+endif::[]
