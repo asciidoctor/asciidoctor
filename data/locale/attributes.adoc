@@ -267,6 +267,26 @@ ifeval::["{lang}" == "no"]
 :warning-caption: Advarsel
 endif::[]
 //
+// Brazilian Portuguese translation, courtesy of Rafael Pestano <rmpestano@gmail.com>
+ifeval::["{lang}" == "pt-BR"]
+:appendix-caption: Apêndice
+:caution-caption: Cuidado
+:example-caption: Exemplo
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Última atualização
+//:listing-caption: Listagem
+:manname-title: NOME
+:note-caption: Nota
+//:preface-title: Prefácio
+:table-caption: Tabela
+:tip-caption: Dica
+:toc-title: Índice
+:untitled-label: Sem título
+:version-label: Versão
+:warning-caption: Aviso
+endif::[]
+//
 // Russian translation, courtesy of Alexander Zobkov <alexander.zobkov@gmail.com>
 ifeval::["{lang}" == "ru"]
 :appendix-caption: Приложение
