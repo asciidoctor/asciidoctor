@@ -186,7 +186,7 @@ ifeval::["{lang}" == "tr"]
 :warning-caption: Uyarı
 //
 // Korean translation, courtesy of Sungsik Nam <jmyl@me.com>
-ifeval::["{lang}" == "tr"]
+ifeval::["{lang}" == "kr"]
 :appendix-caption: 부록
 :caution-caption: 주의
 :example-caption: 예시
