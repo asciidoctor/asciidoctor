@@ -146,12 +146,12 @@ endif::[]
 //
 // Brazillian Portuguese translation, courtesy of Rafael Pestano <rmpestano@gmail.com>
 ifeval::["{lang}" == "pt-br"]
-:appendix-caption: Apéndice
+:appendix-caption: Apêndice
 :caution-caption: Cuidado
 :example-caption: Exemplo
 :figure-caption: Figura
 :important-caption: Importante
-:last-update-label: Atualizado em
+:last-update-label: Última atualização
 //:listing-caption: Listagem
 :manname-title: Nome
 :note-caption: Nota
