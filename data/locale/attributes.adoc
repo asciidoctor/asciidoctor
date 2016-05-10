@@ -86,6 +86,26 @@ ifeval::["{lang}" == "es"]
 :warning-caption: Aviso
 endif::[]
 //
+// Persian (Farsi) translation, courtesy of Shahryar Eivazzadeh <shahryareiv@gmail.com>
+ifeval::["{lang}" == "fa"]
+:appendix-caption: پیوست
+:caution-caption: گوشزد
+:example-caption: نمونه
+:figure-caption: نمودار
+:important-caption: مهم
+:last-update-label: آخرین به روز رسانی
+//:listing-caption: فهرست
+:manname-title: نام
+:note-caption: یادداشت
+//:preface-title: پیشگفتار
+:table-caption: جدول
+:tip-caption: نکته
+:toc-title: فهرست مطالب
+:untitled-label: بی‌نام
+:version-label: نگارش
+:warning-caption: هشدار
+endif::[]
+//
 // French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
 ifeval::["{lang}" == "fr"]
 :appendix-caption: Appendice
@@ -146,6 +166,26 @@ ifeval::["{lang}" == "ja"]
 :warning-caption: 警告
 endif::[]
 //
+// Korean translation, courtesy of Sungsik Nam <jmyl@me.com>
+ifeval::["{lang}" == "kr"]
+:appendix-caption: 부록
+:caution-caption: 주의
+:example-caption: 예시
+:figure-caption: 그림
+:important-caption: 중요
+:last-update-label: 마지막 업데이트
+//:listing-caption: 목록
+:manname-title: 이름
+:note-caption: 노트
+//:preface-title: 머리말
+:table-caption: 표
+:tip-caption: 힌트
+:toc-title: 차례
+:untitled-label: 익명
+:version-label: 버전
+:warning-caption: 경고
+endif::[]
+//
 // Dutch translation, courtesy of Roel Van Steenberghe <roel.vansteenberghe@gmail.com>
 ifeval::["{lang}" == "nl"]
 :appendix-caption: Bijlage
@@ -166,24 +206,24 @@ ifeval::["{lang}" == "nl"]
 :warning-caption: Waarschuwing
 endif::[]
 //
-// Persian (Farsi) translation, courtesy of Shahryar Eivazzadeh <shahryareiv@gmail.com>
-ifeval::["{lang}" == "fa"]
-:appendix-caption: پیوست
-:caution-caption: گوشزد
-:example-caption: نمونه
-:figure-caption: نمودار
-:important-caption: مهم
-:last-update-label: آخرین به روز رسانی
-//:listing-caption: فهرست
-:manname-title: نام
-:note-caption: یادداشت
-//:preface-title: پیشگفتار
-:table-caption: جدول
-:tip-caption: نکته
-:toc-title: فهرست مطالب
-:untitled-label: بی‌نام
-:version-label: نگارش
-:warning-caption: هشدار
+// Norwegian, courtesy of Aslak Knutsen <aslak@4fs.no>
+ifeval::["{lang}" == "no"]
+:appendix-caption: Vedlegg
+:caution-caption: Forsiktig
+:example-caption: Eksempel
+:figure-caption: Figur
+:important-caption: Viktig
+:last-update-label: Sist oppdatert
+//:listing-caption: 
+:manname-title: Navn
+:note-caption: Notat
+//:preface-title: 
+:table-caption: Tabell
+:tip-caption: Tips
+:toc-title: Innholdsfortegnelse
+:untitled-label: Navnløs
+:version-label: Versjon
+:warning-caption: Advarsel
 endif::[]
 //
 // Russian translation, courtesy of Alexander Zobkov <alexander.zobkov@gmail.com>
@@ -226,26 +266,6 @@ ifeval::["{lang}" == "tr"]
 :warning-caption: Uyarı
 endif::[]
 //
-// Korean translation, courtesy of Sungsik Nam <jmyl@me.com>
-ifeval::["{lang}" == "kr"]
-:appendix-caption: 부록
-:caution-caption: 주의
-:example-caption: 예시
-:figure-caption: 그림
-:important-caption: 중요
-:last-update-label: 마지막 업데이트
-//:listing-caption: 목록
-:manname-title: 이름
-:note-caption: 노트
-//:preface-title: 머리말
-:table-caption: 표
-:tip-caption: 힌트
-:toc-title: 차례
-:untitled-label: 익명
-:version-label: 버전
-:warning-caption: 경고
-endif::[]
-//
 // Simplified Chinese translation, courtesy of John Dong <dongwqs@gmail.com>
 ifeval::["{lang}" == "zh-CN"]
 :appendix-caption: 附录
@@ -264,24 +284,4 @@ ifeval::["{lang}" == "zh-CN"]
 :untitled-label: 暂无标题
 :version-label: 版本
 :warning-caption: 警告
-endif::[]
-//
-// Norwegian, courtesy of Aslak Knutsen <aslak@4fs.no>
-ifeval::["{lang}" == "no"]
-:appendix-caption: Vedlegg
-:caution-caption: Forsiktig
-:example-caption: Eksempel
-:figure-caption: Figur
-:important-caption: Viktig
-:last-update-label: Sist oppdatert
-//:listing-caption: 
-:manname-title: Navn
-:note-caption: Notat
-//:preface-title: 
-:table-caption: Tabell
-:tip-caption: Tips
-:toc-title: Innholdsfortegnelse
-:untitled-label: Navnløs
-:version-label: Versjon
-:warning-caption: Advarsel
 endif::[]
