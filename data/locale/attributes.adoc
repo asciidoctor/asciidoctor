@@ -26,6 +26,26 @@ ifeval::["{lang}" == "ar"]
 :warning-caption: تحذير
 endif::[]
 //
+// Bulgarian translation, courtesy of Ivan St. Ivanov <ivan.st.ivanov@gmail.com>
+ifeval::["{lang}" == "bg"]
+:appendix-caption: Приложение
+:caution-caption: Внимание
+:example-caption: Пример
+:figure-caption: Фигура
+:important-caption: Важно
+:last-update-label: Последно обновен
+//:listing-caption: Листинг
+:manname-title: Име
+:note-caption: Забележка
+//:preface-title: Предговор
+:table-caption: Таблица
+:tip-caption: Подсказка
+:toc-title: Съдържание
+:untitled-label: Без заглавие
+:version-label: Версия
+:warning-caption: Внимание
+endif::[]
+//
 // Catalan translation, courtesy of Abel Salgado Romero <abelromero@gmail.com> and Alex Soto
 ifeval::["{lang}" == "ca"]
 :appendix-caption: Apendix
