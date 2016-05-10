@@ -184,4 +184,23 @@ ifeval::["{lang}" == "tr"]
 :untitled-label: İsimsiz
 :version-label: Versiyon
 :warning-caption: Uyarı
+//
+// Korean translation, courtesy of Sungsik Nam <jmyl@me.com>
+ifeval::["{lang}" == "tr"]
+:appendix-caption: 부록
+:caution-caption: 주의
+:example-caption: 예시
+:figure-caption: 그림
+:important-caption: 중요
+:last-update-label: 마지막 업데이트
+//:listing-caption: 목록
+:manname-title: 이름
+:note-caption: 노트
+//:preface-title: 머리말
+:table-caption: 표
+:tip-caption: 힌트
+:toc-title: 차례
+:untitled-label: 익명
+:version-label: 버전
+:warning-caption: 경고
 endif::[]
