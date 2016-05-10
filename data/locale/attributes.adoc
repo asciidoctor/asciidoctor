@@ -146,6 +146,26 @@ ifeval::["{lang}" == "nl"]
 :warning-caption: Waarschuwing
 endif::[]
 //
+// Persian (Farsi) translation, courtesy of Shahryar Eivazzadeh <shahryareiv@gmail.com>
+ifeval::["{lang}" == "fa"]
+:appendix-caption: پیوست
+:caution-caption: گوشزد
+:example-caption: نمونه
+:figure-caption: نمودار
+:important-caption: مهم
+:last-update-label: آخرین به روز رسانی
+//:listing-caption: فهرست
+:manname-title: نام
+:note-caption: یادداشت
+//:preface-title: پیشگفتار
+:table-caption: جدول
+:tip-caption: نکته
+:toc-title: فهرست مطالب
+:untitled-label: بی‌نام
+:version-label: نگارش
+:warning-caption: هشدار
+endif::[]
+//
 // Russian translation, courtesy of Alexander Zobkov <alexander.zobkov@gmail.com>
 ifeval::["{lang}" == "ru"]
 :appendix-caption: Приложение
