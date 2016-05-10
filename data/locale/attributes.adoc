@@ -245,3 +245,23 @@ ifeval::["{lang}" == "zh-CN"]
 :version-label: 版本
 :warning-caption: 警告
 endif::[]
+//
+// Japanese translation, courtesy of Takayuki Konishi <seannos.takayuki@gmail.com>
+ifeval::["{lang}" == "ja"]
+:appendix-caption: 付録
+:caution-caption: 注意
+:example-caption: 例
+:figure-caption: 図
+:important-caption: 重要
+:last-update-label: 最終更新
+//:listing-caption: リスト
+:manname-title: 名前
+:note-caption: 注記
+//:preface-title: まえがき
+:table-caption: 表
+:tip-caption: ヒント
+:toc-title: 目次
+:untitled-label: 無題
+:version-label: バージョン
+:warning-caption: 警告
+endif::[]
