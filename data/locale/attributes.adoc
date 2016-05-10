@@ -35,7 +35,7 @@ ifeval::["{lang}" == "bg"]
 :important-caption: Важно
 :last-update-label: Последно обновен
 //:listing-caption: Листинг
-:manname-title: Име
+:manname-title: ИМЕ
 :note-caption: Забележка
 //:preface-title: Предговор
 :table-caption: Таблица
@@ -55,7 +55,7 @@ ifeval::["{lang}" == "ca"]
 :important-caption: Important
 :last-update-label: Última actualització
 //:listing-caption: Llista
-:manname-title: Nom
+:manname-title: NOM
 :note-caption: Nota
 //:preface-title: Prefaci
 :table-caption: Taula
@@ -75,7 +75,7 @@ ifeval::["{lang}" == "da"]
 :important-caption: Vigtig
 :last-update-label: Sidst opdateret
 :listing-caption: List
-:manname-title: Navn
+:manname-title: NAVN
 :note-caption: Notat
 //:preface-title: 
 :table-caption: Tabel
@@ -95,7 +95,7 @@ ifeval::["{lang}" == "de"]
 :important-caption: Wichtig
 :last-update-label: Zuletzt aktualisiert
 //:listing-caption: Listing
-:manname-title: NAME
+:manname-title: BEZEICHNUNG
 :note-caption: Anmerkung
 //:preface-title: Vorwort
 :table-caption: Tabelle
@@ -115,7 +115,7 @@ ifeval::["{lang}" == "es"]
 :important-caption: Importante
 :last-update-label: Ultima actualización
 //:listing-caption: Lista
-:manname-title: Nombre
+:manname-title: NOMBRE
 :note-caption: Nota
 //:preface-title: Prefacio
 :table-caption: Tabla
@@ -155,7 +155,7 @@ ifeval::["{lang}" == "fr"]
 :important-caption: Important
 :last-update-label: Dernière mise à jour
 //:listing-caption: Liste
-:manname-title: Nom
+:manname-title: NOM
 :note-caption: Note
 //:preface-title: Préface
 :table-caption: Tableau
@@ -176,7 +176,7 @@ ifeval::["{lang}" == "it"]
 :important-caption: Importante
 :last-update-label: Ultimo aggiornamento
 //:listing-caption: Elenco
-:manname-title: Nome
+:manname-title: NOME
 :note-caption: Nota
 //:preface-title: Prefazione
 :table-caption: Tabella
@@ -236,7 +236,7 @@ ifeval::["{lang}" == "nl"]
 :important-caption: Belangrijk
 :last-update-label: Laatste aanpassing
 //:listing-caption: Lijst
-:manname-title: Naam
+:manname-title: NAAM
 :note-caption: Noot
 //:preface-title: Inleiding
 :table-caption: Tabel
@@ -256,7 +256,7 @@ ifeval::["{lang}" == "no"]
 :important-caption: Viktig
 :last-update-label: Sist oppdatert
 //:listing-caption: 
-:manname-title: Navn
+:manname-title: NAVN
 :note-caption: Notat
 //:preface-title: 
 :table-caption: Tabell
@@ -296,7 +296,7 @@ ifeval::["{lang}" == "ru"]
 :important-caption: Важно
 :last-update-label: Последний раз обновлено
 //:listing-caption: Листинг
-:manname-title: Название
+:manname-title: НАЗВАНИЕ
 :note-caption: Примечание
 //:preface-title: Предисловие
 :table-caption: Таблица
@@ -316,7 +316,7 @@ ifeval::["{lang}" == "tr"]
 :important-caption: Önemli
 :last-update-label: Son güncelleme
 //:listing-caption: Listeleme
-:manname-title: İsim
+:manname-title: İSİM
 :note-caption: Not
 //:preface-title: Ön söz
 :table-caption: Tablo
