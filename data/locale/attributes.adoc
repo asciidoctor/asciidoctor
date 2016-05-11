@@ -346,3 +346,24 @@ ifeval::["{lang}" == "zh-CN"]
 :version-label: 版本
 :warning-caption: 警告
 endif::[]
+
+//
+// Danish, courtesy of Max Rydahl Andersen <manderse@redhat.com>
+ifeval::["{lang}" == "da"]
+:appendix-caption: Appendix
+:caution-caption: Forsigtig
+:example-caption: Eksempel
+:figure-caption: Figur
+:important-caption: Vigtig
+:last-update-label: Sidst opdateret
+:listing-caption: List
+:manname-title: Navn
+:note-caption: Notat
+//:preface-title: 
+:table-caption: Tabel
+:tip-caption: Tips
+:toc-title: Indholdsfortegnelse
+:untitled-label: Unavngivet
+:version-label: Version
+:warning-caption: Advarsel
+endif::[]
