@@ -346,3 +346,24 @@ ifeval::["{lang}" == "zh-CN"]
 :version-label: 版本
 :warning-caption: 警告
 endif::[]
+//
+// Traditional Chinese translation, courtesy of John Dong <dongwqs@gmail.com>
+ifeval::["{lang}" == "zh-TW"]
+:appendix-caption: 附錄
+:caution-caption: 注意
+:example-caption: 示例
+:figure-caption: 圖表
+:important-caption: 重要
+:last-update-label: 最後更新
+//:listing-caption: 列表
+:manname-title: 名稱
+:note-caption: 筆記
+//:preface-title: 序言
+:table-caption: 表格
+:tip-caption: 提示
+:toc-title: 目錄
+:untitled-label: 暫無標題
+:version-label: 版本
+:warning-caption: 警告
+endif::[]
+
