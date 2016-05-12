@@ -26,6 +26,26 @@ ifeval::["{lang}" == "ar"]
 :warning-caption: تحذير
 endif::[]
 //
+// Bulgarian translation, courtesy of Ivan St. Ivanov <ivan.st.ivanov@gmail.com>
+ifeval::["{lang}" == "bg"]
+:appendix-caption: Приложение
+:caution-caption: Внимание
+:example-caption: Пример
+:figure-caption: Фигура
+:important-caption: Важно
+:last-update-label: Последно обновен
+//:listing-caption: Листинг
+:manname-title: ИМЕ
+:note-caption: Забележка
+//:preface-title: Предговор
+:table-caption: Таблица
+:tip-caption: Подсказка
+:toc-title: Съдържание
+:untitled-label: Без заглавие
+:version-label: Версия
+:warning-caption: Внимание
+endif::[]
+//
 // Catalan translation, courtesy of Abel Salgado Romero <abelromero@gmail.com> and Alex Soto
 ifeval::["{lang}" == "ca"]
 :appendix-caption: Apendix
@@ -35,7 +55,7 @@ ifeval::["{lang}" == "ca"]
 :important-caption: Important
 :last-update-label: Última actualització
 //:listing-caption: Llista
-:manname-title: Nom
+:manname-title: NOM
 :note-caption: Nota
 //:preface-title: Prefaci
 :table-caption: Taula
@@ -44,6 +64,26 @@ ifeval::["{lang}" == "ca"]
 :untitled-label: Sense títol
 :version-label: Versió
 :warning-caption: Advertència
+endif::[]
+//
+// Danish translation, courtesy of Max Rydahl Andersen <manderse@redhat.com>
+ifeval::["{lang}" == "da"]
+:appendix-caption: Appendix
+:caution-caption: Forsigtig
+:example-caption: Eksempel
+:figure-caption: Figur
+:important-caption: Vigtig
+:last-update-label: Sidst opdateret
+:listing-caption: List
+:manname-title: NAVN
+:note-caption: Notat
+//:preface-title: 
+:table-caption: Tabel
+:tip-caption: Tips
+:toc-title: Indholdsfortegnelse
+:untitled-label: Unavngivet
+:version-label: Version
+:warning-caption: Advarsel
 endif::[]
 //
 // German translation, courtesy of Florian Wilhelm
@@ -55,7 +95,7 @@ ifeval::["{lang}" == "de"]
 :important-caption: Wichtig
 :last-update-label: Zuletzt aktualisiert
 //:listing-caption: Listing
-:manname-title: NAME
+:manname-title: BEZEICHNUNG
 :note-caption: Anmerkung
 //:preface-title: Vorwort
 :table-caption: Tabelle
@@ -75,7 +115,7 @@ ifeval::["{lang}" == "es"]
 :important-caption: Importante
 :last-update-label: Ultima actualización
 //:listing-caption: Lista
-:manname-title: Nombre
+:manname-title: NOMBRE
 :note-caption: Nota
 //:preface-title: Prefacio
 :table-caption: Tabla
@@ -84,6 +124,26 @@ ifeval::["{lang}" == "es"]
 :untitled-label: Sin título
 :version-label: Versión
 :warning-caption: Aviso
+endif::[]
+//
+// Persian (Farsi) translation, courtesy of Shahryar Eivazzadeh <shahryareiv@gmail.com>
+ifeval::["{lang}" == "fa"]
+:appendix-caption: پیوست
+:caution-caption: گوشزد
+:example-caption: نمونه
+:figure-caption: نمودار
+:important-caption: مهم
+:last-update-label: آخرین به روز رسانی
+//:listing-caption: فهرست
+:manname-title: نام
+:note-caption: یادداشت
+//:preface-title: پیشگفتار
+:table-caption: جدول
+:tip-caption: نکته
+:toc-title: فهرست مطالب
+:untitled-label: بی‌نام
+:version-label: نگارش
+:warning-caption: هشدار
 endif::[]
 //
 // French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
@@ -95,7 +155,7 @@ ifeval::["{lang}" == "fr"]
 :important-caption: Important
 :last-update-label: Dernière mise à jour
 //:listing-caption: Liste
-:manname-title: Nom
+:manname-title: NOM
 :note-caption: Note
 //:preface-title: Préface
 :table-caption: Tableau
@@ -110,12 +170,13 @@ endif::[]
 ifeval::["{lang}" == "it"]
 :appendix-caption: Appendice
 :caution-caption: Attenzione
+:chapter-label: // Capitolo
 :example-caption: Esempio
 :figure-caption: Figura
 :important-caption: Importante
 :last-update-label: Ultimo aggiornamento
 //:listing-caption: Elenco
-:manname-title: Nome
+:manname-title: NOME
 :note-caption: Nota
 //:preface-title: Prefazione
 :table-caption: Tabella
@@ -124,6 +185,46 @@ ifeval::["{lang}" == "it"]
 :untitled-label: Senza titolo
 :version-label: Versione
 :warning-caption: Attenzione
+endif::[]
+//
+// Japanese translation, courtesy of Takayuki Konishi <seannos.takayuki@gmail.com>
+ifeval::["{lang}" == "ja"]
+:appendix-caption: 付録
+:caution-caption: 注意
+:example-caption: 例
+:figure-caption: 図
+:important-caption: 重要
+:last-update-label: 最終更新
+//:listing-caption: リスト
+:manname-title: 名前
+:note-caption: 注記
+//:preface-title: まえがき
+:table-caption: 表
+:tip-caption: ヒント
+:toc-title: 目次
+:untitled-label: 無題
+:version-label: バージョン
+:warning-caption: 警告
+endif::[]
+//
+// Korean translation, courtesy of Sungsik Nam <jmyl@me.com>
+ifeval::["{lang}" == "kr"]
+:appendix-caption: 부록
+:caution-caption: 주의
+:example-caption: 예시
+:figure-caption: 그림
+:important-caption: 중요
+:last-update-label: 마지막 업데이트
+//:listing-caption: 목록
+:manname-title: 이름
+:note-caption: 노트
+//:preface-title: 머리말
+:table-caption: 표
+:tip-caption: 힌트
+:toc-title: 차례
+:untitled-label: 익명
+:version-label: 버전
+:warning-caption: 경고
 endif::[]
 //
 // Dutch translation, courtesy of Roel Van Steenberghe <roel.vansteenberghe@gmail.com>
@@ -135,7 +236,7 @@ ifeval::["{lang}" == "nl"]
 :important-caption: Belangrijk
 :last-update-label: Laatste aanpassing
 //:listing-caption: Lijst
-:manname-title: Naam
+:manname-title: NAAM
 :note-caption: Noot
 //:preface-title: Inleiding
 :table-caption: Tabel
@@ -144,6 +245,46 @@ ifeval::["{lang}" == "nl"]
 :untitled-label: Naamloos
 :version-label: Versie
 :warning-caption: Waarschuwing
+endif::[]
+//
+// Norwegian, courtesy of Aslak Knutsen <aslak@4fs.no>
+ifeval::["{lang}" == "no"]
+:appendix-caption: Vedlegg
+:caution-caption: Forsiktig
+:example-caption: Eksempel
+:figure-caption: Figur
+:important-caption: Viktig
+:last-update-label: Sist oppdatert
+//:listing-caption: 
+:manname-title: NAVN
+:note-caption: Notat
+//:preface-title: 
+:table-caption: Tabell
+:tip-caption: Tips
+:toc-title: Innholdsfortegnelse
+:untitled-label: Navnløs
+:version-label: Versjon
+:warning-caption: Advarsel
+endif::[]
+//
+// Brazilian Portuguese translation, courtesy of Rafael Pestano <rmpestano@gmail.com>
+ifeval::["{lang}" == "pt-BR"]
+:appendix-caption: Apêndice
+:caution-caption: Cuidado
+:example-caption: Exemplo
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Última atualização
+//:listing-caption: Listagem
+:manname-title: NOME
+:note-caption: Nota
+//:preface-title: Prefácio
+:table-caption: Tabela
+:tip-caption: Dica
+:toc-title: Índice
+:untitled-label: Sem título
+:version-label: Versão
+:warning-caption: Aviso
 endif::[]
 //
 // Russian translation, courtesy of Alexander Zobkov <alexander.zobkov@gmail.com>
@@ -155,7 +296,7 @@ ifeval::["{lang}" == "ru"]
 :important-caption: Важно
 :last-update-label: Последний раз обновлено
 //:listing-caption: Листинг
-:manname-title: Название
+:manname-title: НАЗВАНИЕ
 :note-caption: Примечание
 //:preface-title: Предисловие
 :table-caption: Таблица
@@ -175,7 +316,7 @@ ifeval::["{lang}" == "tr"]
 :important-caption: Önemli
 :last-update-label: Son güncelleme
 //:listing-caption: Listeleme
-:manname-title: İsim
+:manname-title: İSİM
 :note-caption: Not
 //:preface-title: Ön söz
 :table-caption: Tablo
@@ -225,3 +366,4 @@ ifeval::["{lang}" == "zh-TW"]
 :version-label: 版本
 :warning-caption: 警告
 endif::[]
+
