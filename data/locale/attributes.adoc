@@ -268,7 +268,7 @@ ifeval::["{lang}" == "no"]
 endif::[]
 //
 // Brazilian Portuguese translation, courtesy of Rafael Pestano <rmpestano@gmail.com>
-ifeval::["{lang}" == "pt-BR"]
+ifeval::["{lang}" == "pt_BR"]
 :appendix-caption: Apêndice
 :caution-caption: Cuidado
 :example-caption: Exemplo
@@ -328,7 +328,7 @@ ifeval::["{lang}" == "tr"]
 endif::[]
 //
 // Simplified Chinese translation, courtesy of John Dong <dongwqs@gmail.com>
-ifeval::["{lang}" == "zh-CN"]
+ifeval::["{lang}" == "zh_CN"]
 :appendix-caption: 附录
 :caution-caption: 注意
 :example-caption: 示例
@@ -343,6 +343,26 @@ ifeval::["{lang}" == "zh-CN"]
 :tip-caption: 提示
 :toc-title: 目录
 :untitled-label: 暂无标题
+:version-label: 版本
+:warning-caption: 警告
+endif::[]
+//
+// Traditional Chinese translation, courtesy of John Dong <dongwqs@gmail.com>
+ifeval::["{lang}" == "zh_TW"]
+:appendix-caption: 附錄
+:caution-caption: 注意
+:example-caption: 示例
+:figure-caption: 圖表
+:important-caption: 重要
+:last-update-label: 最後更新
+//:listing-caption: 列表
+:manname-title: 名稱
+:note-caption: 筆記
+//:preface-title: 序言
+:table-caption: 表格
+:tip-caption: 提示
+:toc-title: 目錄
+:untitled-label: 暫無標題
 :version-label: 版本
 :warning-caption: 警告
 endif::[]
