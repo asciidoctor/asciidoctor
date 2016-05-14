@@ -170,7 +170,7 @@ endif::[]
 ifeval::["{lang}" == "it"]
 :appendix-caption: Appendice
 :caution-caption: Attenzione
-:chapter-label: // Capitolo
+:chapter-label: Capitolo
 :example-caption: Esempio
 :figure-caption: Figura
 :important-caption: Importante
