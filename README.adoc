@@ -187,7 +187,7 @@ To upgrade the gem, use:
 
 TIP: Your Fedora system may be configured to automatically update packages, in which case no action is required by you to update the gem.
 
-==== apt-get (Debian, Ubuntu, Mint)
+==== apt-get (Debian Sid, Ubuntu Saucy or greater, Mint)
 
 To install the gem on Debian, Ubuntu or Mint, open a terminal and type:
 
@@ -197,7 +197,7 @@ To upgrade the gem, use:
 
  $ sudo apt-get upgrade -y asciidoctor
 
-TIP: Your system may be configured to automatically update deb packages, in which case no action is required by you to update the gem.
+TIP: Your Debian or Ubuntu system may be configured to automatically update packages, in which case no action is required by you to update the gem.
 
 The version of Asciidoctor installed by the package manager (apt-get) may not match the latest release of Asciidoctor.
 Consult the package repository for your distribution to find out which version is packaged per distribution release.
