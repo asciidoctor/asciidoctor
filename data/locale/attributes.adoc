@@ -366,3 +366,22 @@ ifeval::["{lang}" == "zh_TW"]
 :version-label: 版本
 :warning-caption: 警告
 endif::[]
+// Portuguese translation, courtesy of Roberto Cortez <radcortez@yahoo.com>
+ifeval::["{lang}" == "pt"]
+:appendix-caption: Apêndice
+:caution-caption: Atenção
+:example-caption: Exemplo
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Última actualização
+//:listing-caption: Listagem
+:manname-title: NOME
+:note-caption: Nota
+//:preface-title: Prefácio
+:table-caption: Tabela
+:tip-caption: Sugestão
+:toc-title: Índice
+:untitled-label: Sem título
+:version-label: Versão
+:warning-caption: Aviso
+endif::[]
