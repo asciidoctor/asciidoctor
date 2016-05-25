@@ -2,29 +2,27 @@
 require File.expand_path '../lib/asciidoctor/version', __FILE__
 
 Gem::Specification.new do |s|
-  s.name              = 'asciidoctor'
-  s.version           = Asciidoctor::VERSION
-  s.summary           = 'An implementation of the AsciiDoc text processor and publishing toolchain in Ruby'
-  s.description       = <<-EOS
-A fast, open source text processor and publishing toolchain, written in Ruby, for converting AsciiDoc content to HTML5, DocBook 5 (or 4.5) and other formats.
-  EOS
-  s.authors           = ['Dan Allen', 'Sarah White', 'Ryan Waldron', 'Jason Porter', 'Nick Hengeveld', 'Jeremy McAnally']
-  s.email             = ['dan.j.allen@gmail.com']
-  s.homepage          = 'http://asciidoctor.org'
-  s.license           = 'MIT'
+  s.name = 'asciidoctor'
+  s.version = Asciidoctor::VERSION
+  s.summary = 'An implementation of the AsciiDoc text processor and publishing toolchain in Ruby'
+  s.description = 'A fast, open source text processor and publishing toolchain, written in Ruby, for converting AsciiDoc content to HTML5, DocBook 5 (or 4.5) and other formats.'
+  s.authors = ['Dan Allen', 'Sarah White', 'Ryan Waldron', 'Jason Porter', 'Nick Hengeveld', 'Jeremy McAnally']
+  s.email = ['dan.j.allen@gmail.com']
+  s.homepage = 'http://asciidoctor.org'
+  s.license = 'MIT'
 
-  s.files             = begin
+  s.files = begin
     `git ls-files -z`.split "\0"
   rescue
     Dir['**/*']
   end.grep(/^(?:(?:bin|data|features|lib|man|test)\/.+|Rakefile|(?:CHANGELOG|CONTRIBUTING|LICENSE|README)\.adoc)$/)
 
-  s.executables       = ['asciidoctor', 'asciidoctor-safe']
-  s.test_files        = s.files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
-  s.require_paths     = ['lib']
-  s.has_rdoc          = true
-  s.rdoc_options      = ['--charset=UTF-8']
-  s.extra_rdoc_files  = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE.adoc']
+  s.executables = s.files.grep(/^bin\//).map {|f| File.basename f }
+  s.test_files = s.files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
+  s.require_paths = ['lib']
+  s.has_rdoc = true
+  s.rdoc_options = ['--charset=UTF-8']
+  s.extra_rdoc_files = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE.adoc']
 
   # asciimath is needed for testing AsciiMath in DocBook backend
   s.add_development_dependency 'asciimath', '~> 1.0.2'
