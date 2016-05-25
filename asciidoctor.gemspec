@@ -13,11 +13,12 @@ A fast, open source text processor and publishing toolchain, written in Ruby, fo
   s.homepage          = 'http://asciidoctor.org'
   s.license           = 'MIT'
 
-  begin
-    s.files           = `git ls-files -z -- bin data features lib man test CHANGELOG.adoc CONTRIBUTING.adoc LICENSE.adoc README.adoc Rakefile`.split "\0"
+  s.files             = begin
+    `git ls-files -z`.split "\0"
   rescue
-    s.files           = Dir['**/*']
-  end
+    Dir['**/*']
+  end.grep(/^(?:(?:bin|data|features|lib|man|test)\/.+|Rakefile|(?:CHANGELOG|CONTRIBUTING|LICENSE|README)\.adoc)$/)
+
   s.executables       = ['asciidoctor', 'asciidoctor-safe']
   s.test_files        = s.files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
   s.require_paths     = ['lib']
