@@ -53,6 +53,10 @@ Asciidoctor is written in Ruby, packaged as a RubyGem and published to {uri-ruby
 The gem is also included in several Linux distributions, including Fedora, Debian and Ubuntu.
 Asciidoctor is open source, {uri-repo}[hosted on GitHub] and released under {uri-license}[the MIT license].
 
+.Translations of the document are available in the following languages:
+* link:README_zh-CN.adoc[汉语]
+* link:README-fr.adoc[Français]
+
 .Key documentation
 [.compact]
 * {uri-docs}/what-is-asciidoc[What is Asciidoc?]
@@ -73,8 +77,8 @@ Asciidoctor.js is used to power the AsciiDoc preview extensions for Chrome, Atom
 
 ifdef::status[]
 .*Project health*
-image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor] 
-image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true&amp;passingText=green%20bar&amp;failingText=%23fail&amp;pendingText=building%2E%2E%2E[Build Status (AppVeyor), link=https://ci.appveyor.com/project/asciidoctor/asciidoctor] 
+image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor]
+image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true&amp;passingText=green%20bar&amp;failingText=%23fail&amp;pendingText=building%2E%2E%2E[Build Status (AppVeyor), link=https://ci.appveyor.com/project/asciidoctor/asciidoctor]
 //image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status, link=https://coveralls.io/r/asciidoctor/asciidoctor]
 image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate, link="https://codeclimate.com/github/asciidoctor/asciidoctor"]
 image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="https://inch-ci.org/github/asciidoctor/asciidoctor"]
@@ -197,7 +201,7 @@ To upgrade the gem, use:
 
  $ sudo apt-get upgrade -y asciidoctor
 
-TIP: Your system may be configured to automatically update deb packages, in which case no action is required by you to update the gem.
+TIP: Your Debian or Ubuntu system may be configured to automatically update packages, in which case no action is required by you to update the gem.
 
 The version of Asciidoctor installed by the package manager (apt-get) may not match the latest release of Asciidoctor.
 Consult the package repository for your distribution to find out which version is packaged per distribution release.
