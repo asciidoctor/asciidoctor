@@ -191,7 +191,7 @@ To upgrade the gem, use:
 
 TIP: Your Fedora system may be configured to automatically update packages, in which case no action is required by you to update the gem.
 
-==== apt-get (Debian Sid, Ubuntu Saucy or greater, Mint)
+==== apt-get (Debian, Ubuntu, Mint)
 
 To install the gem on Debian, Ubuntu or Mint, open a terminal and type:
 
