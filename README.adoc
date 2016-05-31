@@ -53,6 +53,12 @@ Asciidoctor is written in Ruby, packaged as a RubyGem and published to {uri-ruby
 The gem is also included in several Linux distributions, including Fedora, Debian and Ubuntu.
 Asciidoctor is open source, {uri-repo}[hosted on GitHub] and released under {uri-license}[the MIT license].
 
+ifndef::env-site[]
+.Translations of the document are available in the following languages:
+* {uri-rel-file-base}README-zh_CN.adoc[汉语]
+* {uri-rel-file-base}README-fr.adoc[Français]
+endif::[]
+
 .Key documentation
 [.compact]
 * {uri-docs}/what-is-asciidoc[What is Asciidoc?]
