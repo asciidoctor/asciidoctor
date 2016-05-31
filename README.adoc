@@ -108,7 +108,7 @@ Asciidoctor works on Linux, OS X (Mac) and Windows and requires one of the follo
 * Opal (JavaScript)
 
 We welcome your help testing Asciidoctor on these and other platforms.
-Refer to <<{idprefix}contributing,Contributing>> to learn how to get involved.
+Refer to the <<Contributing>> section to learn how to get involved.
 
 [CAUTION]
 ====
