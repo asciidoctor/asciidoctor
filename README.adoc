@@ -185,7 +185,7 @@ To upgrade the gem, use:
 
  $ sudo dnf update -y asciidoctor
 
-TIP: Your Fedora system may be configured to automatically update packages, in which case no action is required by you to update the gem.
+TIP: Your system may be configured to automatically update rpm packages, in which case no action is required by you to update the gem.
 
 ==== apt-get (Debian, Ubuntu, Mint)
 
@@ -227,7 +227,7 @@ To upgrade the gem, use:
 
  $ sudo apk add -u asciidoctor
 
-TIP: Your Alpine Linux system may be configured to automatically update packages, in which case no action is required by you to update the gem.
+TIP: Your system may be configured to automatically update apk packages, in which case no action is required by you to update the gem.
 
 === Other installation options
 
