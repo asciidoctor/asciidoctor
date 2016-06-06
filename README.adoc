@@ -57,6 +57,7 @@ ifndef::env-site[]
 .Translations of the document are available in the following languages:
 * {uri-rel-file-base}README-zh_CN.adoc[汉语]
 * {uri-rel-file-base}README-fr.adoc[Français]
+* {uri-rel-file-base}README-jp.adoc[日本語]
 endif::[]
 
 .Key documentation
