@@ -3,13 +3,14 @@ git:
   depth: 1
 language: ruby
 rvm:
-  - 2.3.0
-  - 2.2.4
-  - 2.1.8
+  - 2.3.1
+  - 2.2.5
+  - 2.1.10
   - 2.0.0
   - 1.9.3
   - 1.8.7
-  - jruby-9.0.4.0
+  - jruby-9.0.5.0
+  - jruby-9.1.2.0
   - jruby-19mode
   - jruby-18mode
   - rbx-2
