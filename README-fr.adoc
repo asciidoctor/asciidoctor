@@ -11,7 +11,7 @@ ifeval::[{safe-mode-level} >= 20]
 :idseparator: -
 :source-language: ruby
 :language: {source-language}
-ifdef::env-github[:badges:]
+ifdef::env-github[:status:]
 // URIs:
 :uri-org: https://github.com/asciidoctor
 :uri-repo: {uri-org}/asciidoctor
@@ -59,6 +59,13 @@ Asciidoctor est écrit en Ruby, packagé sous forme de RubyGem et publié sur {u
 La gemme est aussi incluse dans plusieurs distributions Linux, dont Fedora, Debian et Ubuntu.
 Asciidoctor est open source, {uri-repo}[hébergé sur GitHub] et distribué sous {uri-license}[licence MIT].
 
+ifndef::env-site[]
+.Ce document est traduit dans les langues suivantes :
+* {uri-rel-file-base}README.adoc[Anglais]
+* {uri-rel-file-base}README-zh_CN.adoc[Chinois]
+* {uri-rel-file-base}README-jp.adoc[Japonais]
+endif::[]
+
 .Documentation clé
 [.compact]
 * {uri-docs}/what-is-asciidoc[Qu'est ce qu'AsciiDoc ?]
@@ -77,7 +84,7 @@ Nous utilisons http://opalrb.org[Opal] pour transcrire le code source Ruby en Ja
 Asciidoctor.js est utilisé pour faire fonctionner les extensions AsciiDoc Preview pour Chrome, Atom, Brackets et autres outils web.
 ****
 
-ifdef::badges[]
+ifdef::status[]
 .*Santé du projet*
 image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor]
 image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true&amp;passingText=green%20bar&amp;failingText=%23fail&amp;pendingText=building%2E%2E%2E[Build Status (AppVeyor), link=https://ci.appveyor.com/project/asciidoctor/asciidoctor]
@@ -115,7 +122,7 @@ Asciidoctor fonctionne sur Linux, OS X (Mac), Windows et requiert une des implé
 * Opal (JavaScript)
 
 Votre aide est appréciée pour tester Asciidoctor sur l'une de ces plateformes.
-Référez-vous au paragraphe <<{idprefix}contributions,Contributions>> si vous souhaitez vous impliquer dans ce projet.
+Référez-vous au paragraphe <<Contributions>> si vous souhaitez vous impliquer dans ce projet.
 
 [CAUTION]
 ====
@@ -125,6 +132,7 @@ Pour corriger ce problème, nous recommandons de changer la page de code en UTF-
  chcp 65001
 
 Après ce changement, tous les maux de tête liés à l'Unicode seront derrière vous.
+Si vous utilisez un environnement de développement comme Eclipse, assurez-vous de définir l'encodage en UTF-8.
 Asciidoctor fonctionne mieux lorsque vous utilisez UTF-8 partout.
 ====
 
@@ -192,7 +200,7 @@ Pour mettre à jour la gemme, utilisez :
 
  $ sudo dnf update -y asciidoctor
 
-TIP: Votre système Fedora peut être configuré pour mettre à jour les paquets automatiquement, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gemme.
+TIP: Votre système peut être configuré pour mettre à jour automatiquement les paquets rpm, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gemme.
 
 ==== apt-get (Debian, Ubuntu, Mint)
 
@@ -204,7 +212,7 @@ Pour mettre à jour la gemme, utilisez :
 
  $ sudo apt-get upgrade -y asciidoctor
 
-TIP: Votre système peut être configuré pour mettre à jour les paquets deb automatiquement, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gemme.
+TIP: Votre système peut être configuré pour mettre à jour automatiquement les paquets deb, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gemme.
 
 La version d'Asciidoctor installé par le gestionnaire de paquets (apt-get) peut ne pas correspondre à la dernière version d'Asciidoctor.
 Consultez le dépôt de paquets de votre distribution pour trouver quelle version est disponible par version de distribution.
@@ -234,7 +242,7 @@ Pour mettre à jour la gemme, utilisez :
 
  $ sudo apk add -u asciidoctor
 
-TIP: Votre système Alpine Linux peut être configuré pour mettre à jour les paquets automatiquement, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gemme.
+TIP: Votre système peut être configuré pour mettre à jour automatiquement les paquets apk, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gemme.
 
 === Autres options d'installation
 
