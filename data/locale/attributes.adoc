@@ -77,7 +77,7 @@ ifeval::["{lang}" == "da"]
 :listing-caption: List
 :manname-title: NAVN
 :note-caption: Notat
-//:preface-title: 
+//:preface-title:
 :table-caption: Tabel
 :tip-caption: Tips
 :toc-title: Indholdsfortegnelse
@@ -164,6 +164,26 @@ ifeval::["{lang}" == "fr"]
 :untitled-label: Sans titre
 :version-label: Version
 :warning-caption: Attention
+endif::[]
+//
+// Hungarian translation, courtesy of István Pató <istvan.pato@gmail.com>
+ifeval::["{lang}" == "hu"]
+:appendix-caption: függelék
+:caution-caption: Figyelmeztetés
+:example-caption: Példa
+:figure-caption: Ábra
+:important-caption: Fontos
+:last-update-label: Utolsó frissítés
+//:listing-caption: Lista
+:manname-title: NÉV
+:note-caption: Megjegyzés
+//:preface-title: Előszó
+:table-caption: Táblázat
+:tip-caption: Tipp
+:toc-title: Tartalomjegyzék
+:untitled-label: Névtelen
+:version-label: Verzió
+:warning-caption: Figyelem
 endif::[]
 //
 // Italian translation, courtesy of Marco Ciampa <ciampix@libero.it>
@@ -255,10 +275,10 @@ ifeval::["{lang}" == "no"]
 :figure-caption: Figur
 :important-caption: Viktig
 :last-update-label: Sist oppdatert
-//:listing-caption: 
+//:listing-caption:
 :manname-title: NAVN
 :note-caption: Notat
-//:preface-title: 
+//:preface-title:
 :table-caption: Tabell
 :tip-caption: Tips
 :toc-title: Innholdsfortegnelse
