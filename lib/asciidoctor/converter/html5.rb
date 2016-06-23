@@ -22,6 +22,24 @@ module Asciidoctor
     SvgPreambleRx = /\A.*?(?=<svg\b)/m
     SvgStartTagRx = /\A<svg[^>]*>/
     DimensionAttributeRx = /\s(?:width|height|style)=(["']).*?\1/
+    IconSets = {
+      'fa' => {
+        :cdn_path => 'font-awesome/4.6.3/css/font-awesome.min.css',
+        :default_name => 'font-awesome'
+      },
+      'fi' => {
+        :cdn_path => 'foundicons/3.0.0/foundation-icons.min.css',
+        :default_name => 'foundation-icons'
+      },
+      'octicon' => {
+        :cdn_path =>'octicons/3.5.0/octicons.min.css',
+        :default_name => 'octicons'
+      },
+      'pf' => {
+        :cdn_path => 'paymentfont/1.1.2/css/paymentfont.min.css',
+        :default_name => 'paymentfont'
+      }
+    }
 
     def initialize backend, opts = {}
       @xml_mode = opts[:htmlsyntax] == 'xml'
@@ -73,11 +91,19 @@ module Asciidoctor
       end
 
       if node.attr? 'icons', 'font'
+        valid_icon_sets = (node.attr 'icon-sets', 'fa').split(',').select { |name| IconSets.include? name }
+        icon_sets = (valid_icon_sets.empty? ? ['fa'] : valid_icon_sets)
         if node.attr? 'iconfont-remote'
-          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base}/font-awesome/4.6.3/css/font-awesome.min.css]}"#{slash}>)
+          icon_sets.each do |name|
+            icon_set = IconSets[name]
+            result << %(<link rel="stylesheet" href="#{node.attr "iconfont-#{name}-cdn", %[#{cdn_base}/#{icon_set[:cdn_path]}]}"#{slash}>)
+          end
         else
-          iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
+          icon_sets.each do |name|
+            icon_set = IconSets[name]
+            iconfont_stylesheet = %(#{node.attr "iconfont-#{name}-name", icon_set[:default_name]}.css)
+            result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
+          end
         end
       end
 
@@ -1073,9 +1099,23 @@ Your browser does not support the video tag.
 
     def inline_image node
       if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
-        class_attr_val = %(fa fa-#{node.target})
-        {'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-'}.each do |key, prefix|
-          class_attr_val = %(#{class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
+        icon_set = node.attr 'set', ((node.document.attr 'icon-sets', 'fa').split(',').first)
+        icon_set = 'fa' unless IconSets.include? icon_set
+        if node.attr? 'size'
+          size = node.attr 'size'
+          if icon_set == 'octicon' && size == 'mega'
+            size_attr = " #{size}-octicon"
+          elsif icon_set == 'fa'
+             size_attr = " fa-#{size}"
+          end
+        else
+          size_attr = nil
+        end
+        class_attr_val = %(#{icon_set} #{icon_set}-#{node.target}#{size_attr})
+        if icon_set == 'fa'
+          {'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-'}.each do |(key, prefix)|
+            class_attr_val = %(#{class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
+          end
         end
         title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : nil
         img = %(<i class="#{class_attr_val}"#{title_attr}></i>)

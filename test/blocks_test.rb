@@ -2166,6 +2166,88 @@ You can use icons for admonitions by setting the 'icons' attribute.
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa icon-tip"]', output, 1
     end
 
+    test 'should import Font Awesome by default when icon-sets is unknown' do
+      input = <<-EOS
+:icons: font
+:icon-sets: unknwon_icon_set
+
+icon:star[]
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"]', output, 1
+      assert_xpath '//i[@class="fa fa-star"]', output, 1
+    end
+
+    test 'should import both Octicon and Font Awesome and use Octicon icons when icon-sets is fa,octicon and set is undefined' do
+      input = <<-EOS
+:icons: font
+:icon-sets: octicon,fa
+
+icon:octoface[size=mega]
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css"]', output, 1
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"]', output, 1
+      assert_xpath '//i[@class="octicon octicon-octoface mega-octicon"]', output, 1
+    end
+
+    test 'should import both Octicon and Payment Font and use Payment Font icons when icon-sets is octicon,pf and set is pf' do
+      input = <<-EOS
+:icons: font
+:icon-sets: octicon,pf
+
+icon:bitcoin[set=pf]
+icon:octoface[size=mega]
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css"]', output, 1
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/paymentfont/1.1.2/css/paymentfont.min.css"]', output, 1
+      assert_xpath '//i[@class="pf pf-bitcoin"]', output, 1
+      assert_xpath '//i[@class="octicon octicon-octoface mega-octicon"]', output, 1
+    end
+
+    test 'should import Octicon and use font-based icons when icon-sets is octicon' do
+      input = <<-EOS
+:icons: font
+:icon-sets: octicon
+
+icon:octoface[size=mega]
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css"]', output, 1
+      assert_xpath '//i[@class="octicon octicon-octoface mega-octicon"]', output, 1
+    end
+
+    test 'should import Payment Font and use font-based icons when icon-sets is pf' do
+      input = <<-EOS
+:icons: font
+:icon-sets: pf
+
+icon:bitcoin[]
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/paymentfont/1.1.2/css/paymentfont.min.css"]', output, 1
+      assert_xpath '//i[@class="pf pf-bitcoin"]', output, 1
+    end
+
+    test 'should import Foundation Icon and use font-based icons when icon-sets is fi' do
+      input = <<-EOS
+:icons: font
+:icon-sets: fi
+
+icon:social-zurb[]
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SERVER
+      assert_css 'html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.min.css"]', output, 1
+      assert_xpath '//i[@class="fi fi-social-zurb"]', output, 1
+    end
+
     test 'font-based icon should not override icon specified on admonition' do
       input = <<-EOS
 :icons: font
