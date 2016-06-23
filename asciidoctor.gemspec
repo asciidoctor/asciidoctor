@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
     Dir['**/*']
   end
   s.files = files.grep(/^(?:(?:bin|data|features|lib|man|test)\/.+|Rakefile|(?:CHANGELOG|CONTRIBUTING|LICENSE|README)\.adoc)$/)
-
   s.executables = s.files.grep(/^bin\//).map {|f| File.basename f }
   s.test_files = s.files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
   s.require_paths = ['lib']
