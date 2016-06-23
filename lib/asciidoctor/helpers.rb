@@ -189,7 +189,7 @@ module Helpers
   # Returns the String filename with leading directories removed and, if specified, the extension removed
   def self.basename(file_name, drop_extname = false)
     if drop_extname
-      ::File.basename file_name, ((::File.extname file_name) || '')
+      ::File.basename file_name, (::File.extname file_name)
     else
       ::File.basename file_name
     end
