@@ -901,7 +901,7 @@ class Parser
     if block
       block.source_location = source_location if source_location
       # REVIEW seems like there is a better way to organize this wrap-up
-      block.title     = attributes['title'] unless block.title?
+      block.title = attributes['title'] unless block.title?
       # FIXME HACK don't hardcode logic for alt, caption and scaledwidth on images down here
       if block.context == :image
         resolved_target = attributes['target']
@@ -1034,7 +1034,7 @@ class Parser
     end
   end
 
-  # whether a block supports complex content should be a config setting
+  # whether a block supports compound content should be a config setting
   # if terminator is false, that means the all the lines in the reader should be parsed
   # NOTE could invoke filter in here, before and after parsing
   def self.build_block(block_context, content_model, terminator, parent, reader, attributes, options = {})
