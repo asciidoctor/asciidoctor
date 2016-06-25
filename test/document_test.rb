@@ -520,6 +520,18 @@ term without description::
       assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
     end
 
+    test 'lines in output should be separated by line feed' do
+      sample_input_path = fixture_path('sample.asciidoc')
+
+      output = Asciidoctor.convert_file sample_input_path, :header_footer => true, :to_file => false
+      assert !output.empty?
+      lines = output.split("\n")
+      assert lines.size == output.split(/\r\n|\r|\n/).size
+      raw_lengths = lines.map(&:length)
+      trimmed_lengths = lines.map {|line| line.rstrip.length }
+      assert raw_lengths == trimmed_lengths
+    end
+
     test 'should accept attributes as array' do
       sample_input_path = fixture_path('sample.asciidoc')
       output = Asciidoctor.convert_file sample_input_path, :attributes => %w(sectnums idprefix idseparator=-), :to_file => false
