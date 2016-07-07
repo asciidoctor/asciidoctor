@@ -13,7 +13,6 @@ if RUBY_ENGINE == 'opal'
   require 'asciidoctor/opal_ext'
 else
   autoload :Base64, 'base64'
-  autoload :FileUtils, 'fileutils'
   autoload :OpenURI, 'open-uri'
   autoload :StringScanner, 'strscan'
 end
@@ -1490,7 +1489,7 @@ module Asciidoctor
 
       unless ::File.directory? outdir
         if mkdirs
-          ::FileUtils.mkdir_p outdir
+          Helpers.mkdir_p outdir
         else
           # NOTE we intentionally refer to the directory as it was passed to the API
           raise ::IOError, %(target directory does not exist: #{to_dir})
