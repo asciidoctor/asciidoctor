@@ -406,8 +406,8 @@ class Document < AbstractBlock
       unless (localtime = attrs['localtime'])
         begin
           localtime = attrs['localtime'] = now.strftime('%H:%M:%S %Z')
-        rescue
-          localtime = attrs['localtime'] = now.strftime('%H:%M:%S')
+        rescue # Asciidoctor.js fails if timezone string has characters outside basic Latin (see asciidoctor.js#23)
+          localtime = attrs['localtime'] = now.strftime('%H:%M:%S %z')
         end
       end
       attrs['localdatetime'] ||= %(#{localdate} #{localtime})
