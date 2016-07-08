@@ -12,7 +12,8 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
 
   files = begin
-    IO.popen('git ls-files -z') {|io| io.read }.split "\0"
+    output = IO.popen('git ls-files -z', :err => (defined? File::NULL) ? File::NULL : '/dev/null') {|io| io.read }.split %(\0)
+    $?.success? ? output : Dir['**/*']
   rescue
     Dir['**/*']
   end
