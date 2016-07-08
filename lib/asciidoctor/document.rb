@@ -679,7 +679,7 @@ class Document < AbstractBlock
 
   # QUESTION move to AbstractBlock?
   def first_section
-    has_header? ? @header : (@blocks || []).detect{|e| e.context == :section }
+    has_header? ? @header : (@blocks || []).detect {|e| e.context == :section }
   end
 
   def has_header?
