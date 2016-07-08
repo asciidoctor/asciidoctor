@@ -17,9 +17,9 @@ Gem::Specification.new do |s|
   rescue
     Dir['**/*']
   end
-  s.files = files.grep(/^(?:(?:bin|data|features|lib|man|test)\/.+|Rakefile|(?:CHANGELOG|CONTRIBUTING|LICENSE|README)\.adoc)$/)
-  s.executables = s.files.grep(/^bin\//).map {|f| File.basename f }
-  s.test_files = s.files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
+  s.files = files.grep(/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|(?:CHANGELOG|CONTRIBUTING|LICENSE|README(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/)
+  s.executables = files.grep(/^bin\//).map {|f| File.basename f }
+  s.test_files = files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
   s.require_paths = ['lib']
   s.has_rdoc = true
   s.rdoc_options = ['--charset=UTF-8']
