@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 require File.expand_path '../lib/asciidoctor/version', __FILE__
+require 'open3' unless defined? Open3
 
 Gem::Specification.new do |s|
   s.name = 'asciidoctor'
@@ -12,8 +13,7 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
 
   files = begin
-    output = IO.popen('git ls-files -z', :err => (defined? File::NULL) ? File::NULL : '/dev/null') {|io| io.read }.split %(\0)
-    $?.success? ? output : Dir['**/*']
+    (result = Open3.popen3('git ls-files -z') {|_, out| out.read }.split %(\0)).empty? ? Dir['**/*'] : result
   rescue
     Dir['**/*']
   end
