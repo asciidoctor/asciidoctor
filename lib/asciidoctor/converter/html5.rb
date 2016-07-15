@@ -666,7 +666,7 @@ Your browser does not support the audio tag.
           ''
         else
           id_attr = node.id ? %( id="#{node.id}") : nil
-          title_el = node.title? ? %(<div class="title">#{node.title}</div>) : nil
+          title_el = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
           %(<div#{id_attr} class="quoteblock abstract#{(role = node.role) && " #{role}"}">
 #{title_el}<blockquote>
 #{node.content}
@@ -678,7 +678,7 @@ Your browser does not support the audio tag.
         ''
       else
           id_attr = node.id ? %( id="#{node.id}") : nil
-          title_el = node.title? ? %(<div class="title">#{node.title}</div>) : nil
+          title_el = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
         %(<div#{id_attr} class="openblock#{style && style != 'open' ? " #{style}" : ''}#{(role = node.role) && " #{role}"}">
 #{title_el}<div class="content">
 #{node.content}
