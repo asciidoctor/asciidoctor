@@ -1106,12 +1106,15 @@ class PreprocessorReader < Reader
   # Private: Ignore front-matter, commonly used in static site generators
   def skip_front_matter! data, increment_linenos = true
     front_matter = nil
-    if data[0] == '---'
+    yaml_front = '---'
+    toml_front = '+++'
+    front = data[0]
+    if front == yaml_front or front == toml_front
       original_data = data.dup
       front_matter = []
       data.shift
       @lineno += 1 if increment_linenos
-      while !data.empty? && data[0] != '---'
+      while !data.empty? && data[0] != front
         front_matter.push data.shift
         @lineno += 1 if increment_linenos
       end
