@@ -1108,13 +1108,15 @@ class PreprocessorReader < Reader
     front_matter = nil
     yaml_front = '---'
     toml_front = '+++'
+    json_front = '{{{'
     front = data[0]
-    if front == yaml_front or front == toml_front
+    matter = (front == json_front ? '}}}' : front)
+    if front == yaml_front or front == toml_front or front == json_front
       original_data = data.dup
       front_matter = []
       data.shift
       @lineno += 1 if increment_linenos
-      while !data.empty? && data[0] != front
+      while !data.empty? && data[0] != matter
         front_matter.push data.shift
         @lineno += 1 if increment_linenos
       end
