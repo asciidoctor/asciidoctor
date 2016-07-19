@@ -1109,9 +1109,10 @@ class PreprocessorReader < Reader
     yaml_front = '---'
     toml_front = '+++'
     json_front = '{'
+    json_front3 = '{{{'
     front = data[0]
-    matter = (front == json_front ? '}' : front)
-    if front == yaml_front or front == toml_front or front == json_front
+    matter = (front == json_front3 ? '}}}' : (front == json_front ? '}' : front))
+    if front == yaml_front or front == toml_front or front == json_front3 or front == json_front
       original_data = data.dup
       front_matter = []
       data.shift
