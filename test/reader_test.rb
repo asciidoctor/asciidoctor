@@ -454,12 +454,12 @@ preamble
 
       test 'should not skip JSON front matter by default' do
         input = <<-EOS
-{{{
+{
 layout: post
 title: Document Title
 author: username
 tags: [ first, second ]
-}}}
+}
 = Document Title
 Author Name
 
@@ -469,7 +469,7 @@ preamble
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         assert !doc.attributes.key?('front-matter')
-        assert_equal '{{{', reader.peek_line
+        assert_equal '{', reader.peek_line
       end
 
       test 'should skip YAML front matter if specified by skip-front-matter attribute' do
@@ -520,9 +520,9 @@ title: Document Title
 author: username
 tags: [ first, second ])
         input = <<-EOS
-{{{
+{
 #{front_matter}
-}}}
+}
 = Document Title
 Author Name
 
