@@ -351,6 +351,7 @@ endif::[]
 ifeval::["{lang}" == "sr"]
 :appendix-caption: Додатак
 :caution-caption: Опрез
+//:chapter-label: Поглавље
 :example-caption: Пример
 :figure-caption: Слика
 :important-caption: Важно
@@ -371,6 +372,7 @@ endif::[]
 ifeval::["{lang}" == "sr_Latn"]
 :appendix-caption: Dodatak
 :caution-caption: Oprez
+//:chapter-label: Poglavlje
 :example-caption: Primer
 :figure-caption: Slika
 :important-caption: Važno
