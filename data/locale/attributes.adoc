@@ -347,6 +347,48 @@ ifeval::["{lang}" == "ru"]
 :warning-caption: Предупреждение
 endif::[]
 //
+// Serbian Cyrillic translation, courtesy of Bojan Stipic <bojan-7@live.com>
+ifeval::["{lang}" == "sr"]
+:appendix-caption: Додатак
+:caution-caption: Опрез
+//:chapter-label: Поглавље
+:example-caption: Пример
+:figure-caption: Слика
+:important-caption: Важно
+:last-update-label: Последње ажурирано
+//:listing-caption: Списак
+:manname-title: НАЗИВ
+:note-caption: Белешка
+//:preface-title: Предговор
+:table-caption: Табела
+:tip-caption: Савет
+:toc-title: Садржај
+:untitled-label: Без назива
+:version-label: Верзија
+:warning-caption: Упозорење
+endif::[]
+//
+// Serbian Latin translation, courtesy of Bojan Stipic <bojan-7@live.com>
+ifeval::["{lang}" == "sr_Latn"]
+:appendix-caption: Dodatak
+:caution-caption: Oprez
+//:chapter-label: Poglavlje
+:example-caption: Primer
+:figure-caption: Slika
+:important-caption: Važno
+:last-update-label: Poslednje ažurirano
+//:listing-caption: Spisak
+:manname-title: NAZIV
+:note-caption: Beleška
+//:preface-title: Predgovor
+:table-caption: Tabela
+:tip-caption: Savet
+:toc-title: Sadržaj
+:untitled-label: Bez naziva
+:version-label: Verzija
+:warning-caption: Upozorenje
+endif::[]
+//
 // Turkish translation, courtesy of Rahman Usta <rahman.usta.88@gmail.com>
 ifeval::["{lang}" == "tr"]
 :appendix-caption: Ek bölüm
