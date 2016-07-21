@@ -479,7 +479,7 @@ Improvements::
   * restore attributes to header attributes after parse (#1255)
   * allow docdate and doctime to be overridden (#1495)
   * add CSS class `.center` for center block alignment (#1456)
-  * recognize U+2022 as alternative marker for unordered lists (@mogztter) (#1177)
+  * recognize U+2022 (bullet) as alternative marker for unordered lists (@mogztter) (#1177)
   * allow videos to work for local files by prepending asset-uri-scheme (Chris) (#1320)
   * always assign playlist param when loop option is enabled for YouTube video
   * parse isolated version in revision line (@bk2204) (#790)
@@ -504,6 +504,7 @@ Improvements::
   * fix `+--help+` output text for `-I` (@bk2204)
   * don't require open-uri-cached if already loaded
   * do not attempt to scan pattern of non-existent directory in template converter
+  * prevent CodeRay from bolding every 10th line number
 
 Compliance::
   * use `<sup>` for footnote reference in text instead of `<span>` (#1523)
