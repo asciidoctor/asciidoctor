@@ -243,7 +243,7 @@ Example: asciidoctor -b html5 source.asciidoc
         os.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
         if RUBY_VERSION >= '1.9.3'
           encoding_info = {'lc' => 'locale', 'fs' => 'filesystem', 'in' => 'internal', 'ex' => 'external'}.map do |k,v|
-            %(#{k}:#{Encoding.find(v) || '-'})
+            %(#{k}:#{::Encoding.find(v) || '-'})
           end
           os.puts %(Runtime Environment (#{RUBY_DESCRIPTION}) (#{encoding_info * ' '}))
         else
