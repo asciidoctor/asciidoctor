@@ -803,7 +803,7 @@ module Extensions
     def docinfo_processors? location = nil
       if @docinfo_processor_extensions
         if location
-          @docinfo_processor_extensions.find {|ext| ext.config[:location] == location }
+          @docinfo_processor_extensions.any? {|ext| ext.config[:location] == location }
         else
           true
         end
