@@ -87,8 +87,8 @@ class Section < AbstractBlock
       sep = @document.attributes['idseparator'] || '_'
       pre = @document.attributes['idprefix'] || '_'
       base_id = %(#{pre}#{title.downcase.gsub(InvalidSectionIdCharsRx, sep).tr_s(sep, sep).chomp(sep)})
-      # ensure id doesn't begin with idprefix if requested it doesn't
-      if pre.empty? && base_id.start_with?(sep)
+      # ensure id doesn't begin with idseparator if idprefix is empty and idseparator is not empty
+      if pre.empty? && !sep.empty? && base_id.start_with?(sep)
         base_id = base_id[1..-1]
         base_id = base_id[1..-1] while base_id.start_with?(sep)
       end
