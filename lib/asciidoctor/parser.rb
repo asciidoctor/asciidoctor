@@ -641,7 +641,7 @@ class Parser
                 #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES[0]).to_s
                 attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || ORDERED_LIST_STYLES[0]).to_s
               else
-                style = ORDERED_LIST_STYLES.detect{|s| OrderedListMarkerRxMap[s] =~ marker }
+                style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s] =~ marker }
                 attributes['style'] = (style || ORDERED_LIST_STYLES[0]).to_s
               end
             end
@@ -1464,7 +1464,7 @@ class Parser
           elsif BlockTitleRx =~ this_line || BlockAttributeLineRx =~ this_line || AttributeEntryRx =~ this_line
             buffer << this_line
           else
-            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| ListRxMap[ctx] =~ this_line }
+            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line }
               within_nested_list = true
               if nested_list_type == :dlist && $~[3].nil_or_empty?
                 # get greedy again
@@ -1494,7 +1494,7 @@ class Parser
               # TODO any way to combine this with the check after skipping blank lines?
               if is_sibling_list_item?(this_line, list_type, sibling_trait)
                 break
-              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.detect {|ctx| ListRxMap[ctx] =~ this_line }
+              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.find {|ctx| ListRxMap[ctx] =~ this_line }
                 buffer << this_line
                 within_nested_list = true
                 if nested_list_type == :dlist && $~[3].nil_or_empty?
@@ -1525,7 +1525,7 @@ class Parser
           end
         else
           has_text = true if !this_line.empty?
-          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).detect {|ctx| ListRxMap[ctx] =~ this_line }
+          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line }
             within_nested_list = true
             if nested_list_type == :dlist && $~[3].nil_or_empty?
               # get greedy again
@@ -2193,7 +2193,7 @@ class Parser
   #
   # Returns the String of the first marker in this number series
   def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
-    number_style = ORDERED_LIST_STYLES.detect {|s| OrderedListMarkerRxMap[s] =~ marker }
+    number_style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s] =~ marker }
     expected = actual = nil
     case number_style
       when :arabic

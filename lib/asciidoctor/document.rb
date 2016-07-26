@@ -287,7 +287,7 @@ class Document < AbstractBlock
     attr_overrides['asciidoctor'] = ''
     attr_overrides['asciidoctor-version'] = VERSION
 
-    safe_mode_name = SafeMode.constants.detect {|l| SafeMode.const_get(l) == @safe }.to_s.downcase
+    safe_mode_name = SafeMode.constants.find {|l| SafeMode.const_get(l) == @safe }.to_s.downcase
     attr_overrides['safe-mode-name'] = safe_mode_name
     attr_overrides["safe-mode-#{safe_mode_name}"] = ''
     attr_overrides['safe-mode-level'] = @safe
@@ -679,7 +679,7 @@ class Document < AbstractBlock
 
   # QUESTION move to AbstractBlock?
   def first_section
-    has_header? ? @header : (@blocks || []).detect {|e| e.context == :section }
+    has_header? ? @header : (@blocks || []).find {|e| e.context == :section }
   end
 
   def has_header?

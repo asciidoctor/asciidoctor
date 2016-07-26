@@ -732,10 +732,10 @@ class PreprocessorReader < Reader
           skip = !@document.attributes.has_key?(target)
         when ','
           # if any attribute is defined, then don't skip
-          skip = !target.split(',').detect {|name| @document.attributes.has_key? name }
+          skip = !target.split(',').find {|name| @document.attributes.has_key? name }
         when '+'
           # if any attribute is undefined, then skip
-          skip = target.split('+').detect {|name| !@document.attributes.has_key? name }
+          skip = target.split('+').find {|name| !@document.attributes.has_key? name }
         end
       when 'ifndef'
         case delimiter
@@ -744,10 +744,10 @@ class PreprocessorReader < Reader
           skip = @document.attributes.has_key?(target)
         when ','
           # if any attribute is undefined, then don't skip
-          skip = !target.split(',').detect {|name| !@document.attributes.has_key? name }
+          skip = !target.split(',').find {|name| !@document.attributes.has_key? name }
         when '+'
           # if any attribute is defined, then skip
-          skip = target.split('+').detect {|name| @document.attributes.has_key? name }
+          skip = target.split('+').find {|name| @document.attributes.has_key? name }
         end
       when 'ifeval'
         # the text in brackets must match an expression
