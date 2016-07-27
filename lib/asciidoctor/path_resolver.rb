@@ -417,7 +417,7 @@ class PathResolver
     uri_prefix = nil
 
     unless start.nil_or_empty? || (is_web_root? target)
-      target = %(#{start}#{SLASH}#{target})
+      target = %(#{start.chomp '/'}#{SLASH}#{target})
       if (uri_prefix = Helpers.uri_prefix target)
         target = target[uri_prefix.length..-1]
       end
@@ -448,6 +448,8 @@ class PathResolver
         end
       else
         resolved_segments << segment
+        # checking for empty would eliminate repeating forward slashes
+        #resolved_segments << segment unless segment.empty?
       end
     end
 
