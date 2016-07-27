@@ -110,7 +110,7 @@ when 'userguide-loop'
 when 'mdbasics-loop'
   require '../lib/asciidoctor.rb'
   GC.start
-  sample_file = ENV['BENCH_TEST_FILE'] || 'sample-data/userguide.adoc'
+  sample_file = ENV['BENCH_TEST_FILE'] || 'sample-data/mdbasics.adoc'
   backend = ENV['BENCH_BACKEND'] || 'html5'
 
   best = nil
