@@ -1838,7 +1838,7 @@ class Parser
         rev_line = reader.read_line
         if (match = RevisionInfoLineRx.match(rev_line))
           rev_metadata['revnumber'] = match[1].rstrip if match[1]
-          unless (component = match[2].strip) == ''
+          unless (component = match[2].strip).empty?
             # version must begin with 'v' if date is absent
             if !match[1] && (component.start_with? 'v')
               rev_metadata['revnumber'] = component[1..-1]
@@ -2348,7 +2348,7 @@ class Parser
             parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
           end
 
-          if (line = m.post_match) == ''
+          if (line = m.post_match).empty?
             # hack to prevent dropping empty cell found at end of line (see issue #1106)
             seen = false
           end
@@ -2410,7 +2410,7 @@ class Parser
     specs = []
     # NOTE -1 argument ensures we don't drop empty records
     records.split(',', -1).each {|record|
-      if record == ''
+      if record.empty?
         specs << { 'width' => 1 }
       # TODO might want to use scan rather than this mega-regexp
       elsif (m = ColumnSpecRx.match(record))

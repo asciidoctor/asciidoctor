@@ -220,7 +220,7 @@ module Asciidoctor
 
       if node.attr? 'stem'
         eqnums_val = node.attr 'eqnums', 'none'
-        eqnums_val = 'AMS' if eqnums_val == ''
+        eqnums_val = 'AMS' if eqnums_val.empty?
         eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
         # IMPORTANT inspect calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
         result << %(<script type="text/x-mathjax-config">

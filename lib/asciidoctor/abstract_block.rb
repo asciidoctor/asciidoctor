@@ -380,10 +380,10 @@ class AbstractBlock < AbstractNode
     if section.sectname == 'appendix'
       appendix_number = @document.counter 'appendix-number', 'A'
       section.number = appendix_number if section.numbered
-      if (caption = @document.attr 'appendix-caption', '') != ''
-        section.caption = %(#{caption} #{appendix_number}: )
-      else
+      if (caption = @document.attr 'appendix-caption', '').empty?
         section.caption = %(#{appendix_number}. )
+      else
+        section.caption = %(#{caption} #{appendix_number}: )
       end
     elsif section.numbered
       # chapters in a book doctype should be sequential even when divided into parts
