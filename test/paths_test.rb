@@ -43,7 +43,10 @@ context 'Path Resolver' do
     test 'target with relative path appended to start path' do
       assert_equal 'assets/images', @resolver.web_path('images', 'assets')
       assert_equal '/assets/images', @resolver.web_path('images', '/assets')
+      #assert_equal '/assets/images/tiger.png', @resolver.web_path('tiger.png', '/assets//images')
       assert_equal './assets/images', @resolver.web_path('images', './assets')
+      assert_equal '/theme.css', @resolver.web_path('theme.css', '/')
+      assert_equal '/css/theme.css', @resolver.web_path('theme.css', '/css/')
     end
 
     test 'target with path relative to current directory appended to start path' do
