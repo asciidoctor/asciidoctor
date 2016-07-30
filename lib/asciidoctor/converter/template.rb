@@ -246,20 +246,24 @@ module Asciidoctor
         elsif name.start_with? 'block_'
           name = name[6..-1]
         end
-        ext_name = path_segments[-1]
+        
         template_class = ::Tilt
         extra_engine_options = {}
-        if ext_name == 'slim'
+        case (ext_name = path_segments[-1])
+        when 'slim'
           # slim doesn't get loaded by Tilt, so we have to load it explicitly
           Helpers.require_library 'slim' unless defined? ::Slim
           # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
           (@engine_options[:slim][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
           # load include plugin when using Slim >= 2.1
           require 'slim/include' unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
-        elsif ext_name == 'erb'
+        when 'erb'
           template_class, extra_engine_options = (eruby_loaded ||= load_eruby(@eruby))
+        when 'rb'
+          next
+        else
+          next unless ::Tilt.registered? ext_name
         end
-        next unless ::Tilt.registered? ext_name
         unless template_cache && (template = template_cache[file])
           template = template_class.new file, 1, (@engine_options[ext_name.to_sym] || {}).merge(extra_engine_options)
         end
