@@ -1500,9 +1500,15 @@ foo&#8201;&#8212;&#8201;'
     end
 
     test 'preserves entity references' do
-      input = '&amp; &#169; &#10004; &#x2022;'
+      input = '&amp; &#169; &#10004; &#128512; &#x2022; &#x1f600;'
       result = render_embedded_string input, :doctype => :inline
       assert_equal input, result
+    end
+
+    test 'only preserves named entities with two or more letters' do
+      input = '&amp; &a; &gt;'
+      result = render_embedded_string input, :doctype => :inline
+      assert_equal '&amp; &amp;a; &gt;', result
     end
 
     test 'replaces punctuation' do
