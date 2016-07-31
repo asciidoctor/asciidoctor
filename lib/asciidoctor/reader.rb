@@ -41,7 +41,7 @@ class Reader
       @file = @dir = nil
       @path = '<stdin>'
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
-    elsif cursor.is_a? ::String
+    elsif ::String === cursor
       @file = cursor
       @dir, @path = ::File.split @file
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
@@ -84,7 +84,7 @@ class Reader
   #
   # Returns The String lines extracted from the data
   def prepare_lines data, opts = {}
-    if data.is_a? ::String
+    if ::String === data
       if opts[:normalize]
         Helpers.normalize_lines_from_string data
       else
@@ -911,7 +911,7 @@ class PreprocessorReader < Reader
               f.each_line do |l|
                 inc_lineno += 1
                 take = inc_lines[0]
-                if take.is_a?(::Float) && take.infinite?
+                if ::Float === take && take.infinite?
                   selected.push l
                   inc_line_offset = inc_lineno if inc_line_offset == 0
                 else

@@ -437,7 +437,7 @@ class Parser
     else
       block_extensions = block_macro_extensions = false
     end
-    #parent_context = parent.is_a?(Block) ? parent.context : nil
+    #parent_context = Block === parent ? parent.context : nil
     in_list = ListItem === parent
     block = nil
     style = nil
@@ -1818,7 +1818,7 @@ class Parser
           # apply header subs and assign to document
           author_metadata.each do |key, val|
             unless document.attributes.has_key? key
-              document.attributes[key] = ((val.is_a? ::String) ? document.apply_header_subs(val) : val)
+              document.attributes[key] = ::String === val ? (document.apply_header_subs val) : val
             end
           end
 
@@ -2247,7 +2247,7 @@ class Parser
   # Returns a Boolean indicating whether this line is a sibling list item given
   # the criteria provided
   def self.is_sibling_list_item?(line, list_type, sibling_trait)
-    if sibling_trait.is_a? ::Regexp
+    if ::Regexp === sibling_trait
       matcher = sibling_trait
       expected_marker = false
     else
