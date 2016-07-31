@@ -665,6 +665,44 @@ content
       end
     end
 
+    test 'parse_content should not share attributes between parsed blocks' do
+      begin
+        Asciidoctor::Extensions.register do
+          block do
+            named :wrap
+            on_context :open
+            process do |parent, reader, attrs|
+              wrap = create_open_block parent, nil, attrs
+              parse_content wrap, reader.read_lines
+            end
+          end
+        end
+        input = <<-EOS
+[wrap]
+--
+[foo=bar]
+====
+content
+====
+
+[baz=qux]
+====
+content
+====
+--
+        EOS
+        doc = document_from_string input
+        assert_equal 1, doc.blocks.size
+        wrap = doc.blocks[0]
+        assert_equal 2, wrap.blocks.size
+        assert_equal 2, wrap.blocks[0].attributes.size
+        assert_equal 2, wrap.blocks[1].attributes.size
+        assert_nil wrap.blocks[1].attributes['foo']
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should add docinfo to document' do
       input = <<-EOS
 = Document Title
