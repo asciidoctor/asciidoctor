@@ -145,7 +145,7 @@ module Extensions
     def process *args, &block
       # need to check for both block/proc and lambda
       # TODO need test for this!
-      #if block_given? || (args.size == 1 && ((block = args[0]).is_a? ::Proc))
+      #if block_given? || (args.size == 1 && ::Proc === (block = args[0]))
       if block_given?
         @process_block = block
       elsif @process_block
@@ -326,7 +326,7 @@ module Extensions
 
     # FIXME this isn't the prettiest thing
     def named value
-      if self.is_a? Processor
+      if Processor === self
         @name = value
       else
         option :name, value
@@ -379,7 +379,7 @@ module Extensions
     # QUESTION perhaps include a SyntaxDsl?
 
     def named value
-      if self.is_a? Processor
+      if Processor === self
         @name = value
       else
         option :name, value
@@ -1133,7 +1133,7 @@ module Extensions
       else
         processor, config = resolve_args args, 2
         # style 2: specified as class or class name
-        if (processor.is_a? ::Class) || ((processor.is_a? ::String) && (processor = Extensions.class_for_name processor))
+        if ::Class === processor || (::String === processor && (processor = Extensions.class_for_name processor))
           unless processor < kind_class || (kind_java_class && processor < kind_java_class)
             raise ::ArgumentError.new %(Invalid type for #{kind_name} extension: #{processor})
           end
@@ -1141,7 +1141,7 @@ module Extensions
           processor_instance.freeze
           ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
-        elsif (processor.is_a? kind_class) || (kind_java_class && (processor.is_a? kind_java_class))
+        elsif kind_class === processor || (kind_java_class && kind_java_class === processor)
           processor.update_config config
           processor.freeze
           ProcessorExtension.new kind, processor
@@ -1190,7 +1190,7 @@ module Extensions
       else
         processor, name, config = resolve_args args, 3
         # style 2: specified as class or class name
-        if (processor.is_a? ::Class) || ((processor.is_a? ::String) && (processor = Extensions.class_for_name processor))
+        if ::Class === processor || (::String === processor && (processor = Extensions.class_for_name processor))
           unless processor < kind_class || (kind_java_class && processor < kind_java_class)
             raise ::ArgumentError.new %(Class specified for #{kind_name} extension does not inherit from #{kind_class}: #{processor})
           end
@@ -1201,7 +1201,7 @@ module Extensions
           processor.freeze
           kind_store[name] = ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
-        elsif (processor.is_a? kind_class) || (kind_java_class && (processor.is_a? kind_java_class))
+        elsif kind_class === processor || (kind_java_class && kind_java_class === processor)
           processor.update_config config
           # TODO need a test for this override!
           unless (name = name ? (processor.name = as_symbol name) : (as_symbol processor.name))
@@ -1216,7 +1216,7 @@ module Extensions
     end
 
     def resolve_args args, expect
-      opts = (args[-1].is_a? ::Hash) ? args.pop : {}
+      opts = ::Hash === args[-1] ? args.pop : {}
       return opts if expect == 1
       num_args = args.size
       if (missing = expect - 1 - num_args) > 0
@@ -1229,7 +1229,7 @@ module Extensions
     end
 
     def as_symbol name
-      name ? ((name.is_a? ::Symbol) ? name : name.to_sym) : nil
+      name ? name.to_sym : nil
     end
   end
 
@@ -1323,7 +1323,7 @@ module Extensions
 
     # unused atm, but tested
     def resolve_class object
-      (object.is_a? ::Class) ? object : (class_for_name object.to_s)
+      ::Class === object ? object : (class_for_name object.to_s)
     end
 
     # Public: Resolves the Class object for the qualified name.

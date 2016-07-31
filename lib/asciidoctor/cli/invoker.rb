@@ -13,12 +13,13 @@ module Asciidoctor
         @err = nil
         @code = 0
         options = options.flatten
-        if (first_option = options[0]).is_a?(Cli::Options)
+        case (first_option = options[0])
+        when Options
           @options = first_option
-        elsif first_option.is_a?(::Hash)
-          @options = Cli::Options.new(options)
+        when ::Hash
+          @options = Options.new options
         else
-          if (result = Cli::Options.parse! options).is_a? ::Integer
+          if ::Integer === (result = Options.parse! options)
             @code = result
             @options = nil
           else
