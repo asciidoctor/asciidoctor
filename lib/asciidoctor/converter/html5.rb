@@ -377,7 +377,7 @@ MathJax.Hub.Config({
     end
 
     def audio node
-      xml = node.document.attr? 'htmlsyntax', 'xml'
+      xml = @xml_mode
       id_attribute = node.id ? %( id="#{node.id}") : nil
       classes = ['audioblock', node.style, node.role].compact
       class_attribute = %( class="#{classes * ' '}")
@@ -867,7 +867,7 @@ Your browser does not support the audio tag.
         div_classes.insert 1, 'checklist'
         ul_class_attribute = ' class="checklist"'
         if node.option? 'interactive'
-          if node.document.attr? 'htmlsyntax', 'xml'
+          if @xml_mode
             marker_checked = '<input type="checkbox" data-item-complete="1" checked="checked"/> '
             marker_unchecked = '<input type="checkbox" data-item-complete="0"/> '
           else
@@ -927,7 +927,7 @@ Your browser does not support the audio tag.
     end
 
     def video node
-      xml = node.document.attr? 'htmlsyntax', 'xml'
+      xml = @xml_mode
       id_attribute = node.id ? %( id="#{node.id}") : nil
       classes = ['videoblock', node.style, node.role].compact
       class_attribute = %( class="#{classes * ' '}")
