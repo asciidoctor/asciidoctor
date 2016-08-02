@@ -1607,6 +1607,19 @@ List
       assert_css '.olist ol.loweralpha', output, 1
     end
 
+    test 'should set reversed attribute on list if reversed option is set' do
+      input = <<-EOS
+[%reversed, start=3]
+. three
+. two
+. one
+. blast off!
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ol[reversed][start="3"]', output, 1
+    end
+
     test 'should represent implicit role attribute as style class' do
       input = <<-EOS
 [.dry]

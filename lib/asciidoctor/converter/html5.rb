@@ -645,7 +645,8 @@ Your browser does not support the audio tag.
 
       type_attribute = (keyword = node.list_marker_keyword) ? %( type="#{keyword}") : nil
       start_attribute = (node.attr? 'start') ? %( start="#{node.attr 'start'}") : nil
-      result << %(<ol class="#{node.style}"#{type_attribute}#{start_attribute}>)
+      reversed_attribute = (node.option? 'reversed') ? (append_boolean_attribute 'reversed', @xml_mode) : nil
+      result << %(<ol class="#{node.style}"#{type_attribute}#{start_attribute}#{reversed_attribute}>)
 
       node.items.each do |item|
         result << '<li>'
