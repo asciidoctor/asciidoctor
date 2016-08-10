@@ -455,11 +455,11 @@ preamble
     end
 
     context 'Include Stack' do
-      test 'PreprocessorReader#push_include method should return nil' do
+      test 'PreprocessorReader#push_include method should return reader' do
         reader = empty_document.reader
         append_lines = %w(one two three)
         result = reader.push_include append_lines, '<stdin>', '<stdin>'
-        assert_nil result
+        assert_equal reader, result
       end
 
       test 'PreprocessorReader#push_include method should put lines on top of stack' do

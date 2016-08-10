@@ -1010,7 +1010,7 @@ class PreprocessorReader < Reader
   #    data = IO.read file
   #    reader.push_include data, file, path
   #
-  # Returns nothing.
+  # Returns this Reader object.
   def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
     if file
@@ -1064,7 +1064,7 @@ class PreprocessorReader < Reader
       @eof = false
       @look_ahead = 0
     end
-    nil
+    self
   end
 
   def pop_include
