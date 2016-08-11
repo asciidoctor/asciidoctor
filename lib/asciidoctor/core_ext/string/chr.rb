@@ -2,5 +2,5 @@
 class String
   def chr
     self[0..0]
-  end unless respond_to? :chr
+  end unless method_defined? :chr
 end

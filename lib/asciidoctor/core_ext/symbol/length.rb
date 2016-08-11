@@ -2,5 +2,5 @@
 class Symbol
   def length
     to_s.length
-  end unless respond_to? :length
+  end unless method_defined? :length
 end
