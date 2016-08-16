@@ -1928,7 +1928,7 @@ class Parser
     author_entries.each_with_index do |author_entry, idx|
       next if author_entry.empty?
       key_map = {}
-      if idx.zero?
+      if idx == 0
         keys.each do |key|
           key_map[key.to_sym] = key
         end
@@ -1977,7 +1977,7 @@ class Parser
           author_metadata[%(#{key}_1)] = author_metadata[key] if author_metadata.has_key? key
         end
       end
-      if idx.zero?
+      if idx == 0
         author_metadata['authors'] = author_metadata[key_map[:author]]
       else
         author_metadata['authors'] = %(#{author_metadata['authors']}, #{author_metadata[key_map[:author]]})
@@ -2295,7 +2295,7 @@ class Parser
       loop_idx += 1
       line = table_reader.read_line
 
-      if skipped == 0 && loop_idx.zero? && !attributes.has_key?('options') &&
+      if skipped == 0 && loop_idx == 0 && !attributes.has_key?('options') &&
           !(next_line = table_reader.peek_line).nil? && next_line.empty?
         table.has_header_option = true
         table.set_option 'header'

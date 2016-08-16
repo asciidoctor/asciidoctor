@@ -674,7 +674,7 @@ Your browser does not support the audio tag.
 </blockquote>
 </div>)
         end
-      elsif style == 'partintro' && (node.level != 0 || node.parent.context != :section || node.document.doctype != 'book')
+      elsif style == 'partintro' && (node.level > 0 || node.parent.context != :section || node.document.doctype != 'book')
         warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a book part. Excluding block content.'
         ''
       else
