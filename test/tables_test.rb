@@ -384,6 +384,27 @@ A | here| a | there
       assert_css 'table > tbody > tr', output, 2
     end
 
+    test 'table with implicit header row when other options set' do
+      input = <<-EOS
+[%autowidth]
+|===
+|Column 1 |Column 2
+
+|Data A1
+|Data B1
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table[style*="width"]', output, 0
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 1
+      assert_css 'table > thead > tr', output, 1
+      assert_css 'table > thead > tr > th', output, 2
+      assert_css 'table > tbody', output, 1
+      assert_css 'table > tbody > tr', output, 1
+    end
+
     test 'no implicit header row if second line not blank' do
       input = <<-EOS
 |===
@@ -425,9 +446,9 @@ A | here| a | there
       assert_css 'table > tbody > tr', output, 3
     end
 
-    test 'no implicit header row if options is specified' do
+    test 'no implicit header row if noheader option is specified' do
       input = <<-EOS
-[options=""]
+[%noheader]
 |===
 |Column 1 |Column 2
 
