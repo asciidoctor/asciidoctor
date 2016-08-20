@@ -332,7 +332,7 @@ Keep in mind that if you don't like the output Asciidoctor produces, _you can ch
 Asciidoctor supports custom converters that can handle converting from the parsed document to the generated output.
 
 One easy way to customize the output piecemeal is by using the template converter.
-The template converter allows you uses supply a {uri-tilt}[Tilt]-supported template file to handle converting any node in the document.
+The template converter allows you to supply a {uri-tilt}[Tilt]-supported template file to handle converting any node in the document.
 
 However you go about it, you _can_ have 100% control over the output.
 For more information about how to use the API or to customize the output, refer to the {uri-user-manual}[user manual].
