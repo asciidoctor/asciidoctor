@@ -767,7 +767,7 @@ Your browser does not support the audio tag.
       id_attribute = node.id ? %( id="#{node.id}") : nil
       classes = ['tableblock', %(frame-#{node.attr 'frame', 'all'}), %(grid-#{node.attr 'grid', 'all'})]
       styles = []
-      unless node.option? 'autowidth'
+      unless (node.option? 'autowidth') && !(node.attr? 'width')
         if (tablepcwidth = node.attr 'tablepcwidth') == 100
           classes << 'spread'
         else

@@ -191,6 +191,22 @@ A | here| a | there
       assert_css 'table colgroup col[width]', output, 0
     end
 
+    test 'explicit table width is used even when autowidth option is specified' do
+      input = <<-EOS
+[%autowidth,width=75%]
+|=======
+|A |B |C
+|a |b |c
+|1 |2 |3
+|=======
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table[style*="width"]', output, 1
+      assert_css 'table colgroup col', output, 3
+      assert_css 'table colgroup col[width]', output, 0
+    end
+
     test 'first row sets number of columns when not specified' do
       input = <<-EOS
 |====
