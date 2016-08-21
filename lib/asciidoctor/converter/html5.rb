@@ -1071,7 +1071,7 @@ Your browser does not support the video tag.
     def inline_image node
       if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
         class_attr_val = %(fa fa-#{node.target})
-        {'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-'}.each do |(key, prefix)|
+        {'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-'}.each do |key, prefix|
           class_attr_val = %(#{class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
         end
         title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : nil
