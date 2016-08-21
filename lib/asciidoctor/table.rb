@@ -77,9 +77,11 @@ class Table < AbstractBlock
 
     # smell like we need a utility method here
     # to resolve an integer width from potential bogus input
-    pcwidth = attributes['width']
-    pcwidth_intval = pcwidth.to_i.abs
-    if pcwidth_intval == 0 && pcwidth != '0' || pcwidth_intval > 100
+    if (pcwidth = attributes['width'])
+      if (pcwidth_intval = pcwidth.to_i) > 100 || pcwidth_intval < 1
+        pcwidth_intval = 100 unless pcwidth_intval == 0 && (pcwidth == '0' || pcwidth == '0%')
+      end
+    else
       pcwidth_intval = 100
     end
     @attributes['tablepcwidth'] = pcwidth_intval
