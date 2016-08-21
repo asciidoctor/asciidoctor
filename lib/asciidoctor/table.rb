@@ -392,7 +392,7 @@ class Table::ParserContext
   # when the cell is being closed.
   #
   # returns The cell spec Hash captured from parsing the previous cell
-  def take_cell_spec()
+  def take_cell_spec
     @cell_specs.shift
   end
 

@@ -2290,15 +2290,17 @@ class Parser
     skipped = table_reader.skip_blank_lines
 
     parser_ctx = Table::ParserContext.new(table_reader, table, attributes)
+    skip_implicit_header = (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
     loop_idx = -1
     while table_reader.has_more_lines?
       loop_idx += 1
       line = table_reader.read_line
 
-      if skipped == 0 && loop_idx == 0 && !attributes.has_key?('options') &&
+      if !skip_implicit_header && skipped == 0 && loop_idx == 0 &&
           !(next_line = table_reader.peek_line).nil? && next_line.empty?
         table.has_header_option = true
-        table.set_option 'header'
+        attributes['header-option'] = ''
+        attributes['options'] = (attributes.key? 'options') ? %(#{attributes['options']},header) : 'header'
       end
 
       if parser_ctx.format == 'psv'
