@@ -2667,11 +2667,13 @@ class Parser
       lines.map! do |line|
         next line if line.empty?
 
+        # NOTE Opal has to patch this use of sub!
         line.sub!(TabIndentRx) {|tabs| full_tab_space * tabs.length } if line.start_with? TAB
 
         if line.include? TAB
           # keeps track of how many spaces were added to adjust offset in match data
           spaces_added = 0
+          # NOTE Opal has to patch this use of gsub!
           line.gsub!(TabRx) {
             # calculate how many spaces this tab represents, then replace tab with spaces
             if (offset = ($~.begin 0) + spaces_added) % tab_size == 0

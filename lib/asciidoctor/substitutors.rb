@@ -642,7 +642,7 @@ module Substitutors
 
           target = m[1]
           attributes = if extension.config[:format] == :short
-            # if content_model is :attributes, set target to nil and parse attributes
+            # TODO if content_model is :attributes, set target to nil and parse attributes
             # maybe if content_model is :text, we should put content into text attribute
             {}
           else
