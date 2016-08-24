@@ -2667,9 +2667,7 @@ class Parser
       lines.map! do |line|
         next line if line.empty?
 
-        if line.start_with? TAB
-          line.sub!(TabIndentRx) {|tabs| full_tab_space * tabs.length }
-        end
+        line.sub!(TabIndentRx) {|tabs| full_tab_space * tabs.length } if line.start_with? TAB
 
         if line.include? TAB
           # keeps track of how many spaces were added to adjust offset in match data
