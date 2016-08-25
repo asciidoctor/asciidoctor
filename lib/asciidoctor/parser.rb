@@ -2280,11 +2280,11 @@ class Parser
       table.assign_caption attributes.delete('caption')
     end
 
-    if (attributes.key? 'cols') && !(col_specs = parse_col_specs attributes['cols']).empty?
-      table.create_columns col_specs
-      explicit_col_specs = true
+    if (attributes.key? 'cols') && !(colspecs = parse_colspecs attributes['cols']).empty?
+      table.create_columns colspecs
+      explicit_colspecs = true
     else
-      explicit_col_specs = false
+      explicit_colspecs = false
     end
 
     skipped = table_reader.skip_blank_lines
@@ -2382,7 +2382,7 @@ class Parser
       end
     end
 
-    unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_col_specs
+    unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_colspecs
       table.assign_col_widths
     end
 
@@ -2402,7 +2402,7 @@ class Parser
   #
   # returns a Hash of attributes that specify how to format
   # and layout the cells in the table.
-  def self.parse_col_specs records
+  def self.parse_colspecs records
     records = records.tr ' ', '' if records.include? ' '
     # check for deprecated syntax: single number, equal column spread
     if records == records.to_i.to_s

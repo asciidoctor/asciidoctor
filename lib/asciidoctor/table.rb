@@ -101,12 +101,12 @@ class Table < AbstractBlock
   # Internal: Creates the Column objects from the column spec
   #
   # returns nothing
-  def create_columns col_specs
+  def create_columns colspecs
     cols = []
     width_base = 0
-    col_specs.each do |col_spec|
-      width_base += col_spec['width']
-      cols << (Column.new self, cols.size, col_spec)
+    colspecs.each do |colspec|
+      width_base += colspec['width']
+      cols << (Column.new self, cols.size, colspec)
     end
     unless (@columns = cols).empty?
       @attributes['colcount'] = cols.size
