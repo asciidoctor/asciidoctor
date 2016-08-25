@@ -341,7 +341,7 @@ class Table::ParserContext
     @cellspecs = []
     @cell_open = false
     @active_rowspans = [0]
-    @col_visits = 0
+    @column_visits = 0
     @current_row = []
     @linenum = -1
   end
@@ -509,7 +509,7 @@ class Table::ParserContext
       unless !cell.rowspan || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))
       end
-      @col_visits += (cell.colspan || 1)
+      @column_visits += (cell.colspan || 1)
       @current_row << cell
       # don't close the row if we're on the first line and the column count has not been set explicitly
       # TODO perhaps the colcount/linenum logic should be in end_of_row? (or a should_end_row? method)
@@ -527,8 +527,8 @@ class Table::ParserContext
     @table.rows.body << @current_row
     # don't have to account for active rowspans here
     # since we know this is first row
-    @colcount = @col_visits if @colcount == -1
-    @col_visits = 0
+    @colcount = @column_visits if @colcount == -1
+    @column_visits = 0
     @current_row = []
     @active_rowspans.shift
     @active_rowspans[0] ||= 0
@@ -549,13 +549,13 @@ class Table::ParserContext
 
   # Public: Check whether we've met the number of effective columns for the current row.
   def end_of_row?
-    @colcount == -1 || effective_col_visits == @colcount
+    @colcount == -1 || effective_column_visits == @colcount
   end
 
   # Public: Calculate the effective column visits, which consists of the number of
   # cells plus any active rowspans.
-  def effective_col_visits
-    @col_visits + @active_rowspans[0]
+  def effective_column_visits
+    @column_visits + @active_rowspans[0]
   end
 
   # Internal: Advance to the next line (which may come after the parser begins processing
