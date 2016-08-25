@@ -2309,10 +2309,10 @@ class Parser
           # push an empty cell spec if boundary at start of line
           parser_ctx.close_open_cell
         else
-          next_cell_spec, line = parse_cell_spec(line, :start, parser_ctx.delimiter)
+          next_cellspec, line = parse_cellspec(line, :start, parser_ctx.delimiter)
           # if the cell spec is not null, then we're at a cell boundary
-          if !next_cell_spec.nil?
-            parser_ctx.close_open_cell next_cell_spec
+          if !next_cellspec.nil?
+            parser_ctx.close_open_cell next_cellspec
           else
             # QUESTION do we not advance to next line? if so, when will we if we came into this block?
           end
@@ -2343,8 +2343,8 @@ class Parser
           end
 
           if parser_ctx.format == 'psv'
-            next_cell_spec, cell_text = parse_cell_spec(m.pre_match, :end)
-            parser_ctx.push_cell_spec next_cell_spec
+            next_cellspec, cell_text = parse_cellspec(m.pre_match, :end)
+            parser_ctx.push_cellspec next_cellspec
             parser_ctx.buffer = %(#{parser_ctx.buffer}#{cell_text})
           else
             parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
@@ -2460,7 +2460,7 @@ class Parser
   #
   # returns the Hash of attributes that indicate how to layout
   # and style this cell in the table.
-  def self.parse_cell_spec(line, pos = :start, delimiter = nil)
+  def self.parse_cellspec(line, pos = :start, delimiter = nil)
     m = nil
     rest = ''
 

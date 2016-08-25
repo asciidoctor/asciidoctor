@@ -338,7 +338,7 @@ class Table::ParserContext
     @delimiter_re = /#{Regexp.escape @delimiter}/
     @colcount = table.columns.empty? ? -1 : table.columns.size
     @buffer = ''
-    @cell_specs = []
+    @cellspecs = []
     @cell_open = false
     @active_rowspans = [0]
     @col_visits = 0
@@ -394,17 +394,17 @@ class Table::ParserContext
   # when the cell is being closed.
   #
   # returns The cell spec Hash captured from parsing the previous cell
-  def take_cell_spec
-    @cell_specs.shift
+  def take_cellspec
+    @cellspecs.shift
   end
 
   # Public: Puts a cell spec onto the stack. Cell specs precede the delimiter, so a
   # stack is used to carry over the spec to the next cell.
   #
   # returns nothing
-  def push_cell_spec(cell_spec = {})
+  def push_cellspec(cellspec = {})
     # this shouldn't be nil, but we check anyway
-    @cell_specs << (cell_spec || {})
+    @cellspecs << (cellspec || {})
     nil
   end
 
@@ -445,8 +445,8 @@ class Table::ParserContext
   # by the next cell.
   #
   # returns nothing
-  def close_open_cell(next_cell_spec = {})
-    push_cell_spec next_cell_spec
+  def close_open_cell(next_cellspec = {})
+    push_cellspec next_cellspec
     close_cell(true) if cell_open?
     advance
     nil
@@ -461,17 +461,16 @@ class Table::ParserContext
     cell_text = @buffer.strip
     @buffer = ''
     if @format == 'psv'
-      cell_spec = take_cell_spec
-      if cell_spec
-        repeat = cell_spec.fetch('repeatcol', 1)
-        cell_spec.delete('repeatcol')
+      cellspec = take_cellspec
+      if cellspec
+        repeat = cellspec.delete('repeatcol') || 1
       else
         warn %(asciidoctor: ERROR: #{@last_cursor.line_info}: table missing leading separator, recovering automatically)
-        cell_spec = {}
+        cellspec = {}
         repeat = 1
       end
     else
-      cell_spec = nil
+      cellspec = nil
       repeat = 1
       if @format == 'csv'
         if !cell_text.empty? && cell_text.include?('"')
@@ -491,7 +490,7 @@ class Table::ParserContext
       # TODO make column resolving an operation
       if @colcount == -1
         @table.columns << (column = Table::Column.new(@table, @table.columns.size + i - 1))
-        if cell_spec && (cell_spec.key? 'colspan') && (extra_cols = cell_spec['colspan'].to_i - 1) > 0
+        if cellspec && (cellspec.key? 'colspan') && (extra_cols = cellspec['colspan'].to_i - 1) > 0
           offset = @table.columns.size
           extra_cols.times do |j|
             @table.columns << Table::Column.new(@table, offset + j)
@@ -505,7 +504,7 @@ class Table::ParserContext
         end
       end
 
-      cell = Table::Cell.new(column, cell_text, cell_spec, @last_cursor)
+      cell = Table::Cell.new(column, cell_text, cellspec, @last_cursor)
       @last_cursor = @reader.cursor
       unless !cell.rowspan || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))
