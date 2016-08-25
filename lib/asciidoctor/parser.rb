@@ -2383,7 +2383,7 @@ class Parser
     end
 
     unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_colspecs
-      table.assign_col_widths
+      table.assign_column_widths
     end
 
     table.partition_header_footer attributes
