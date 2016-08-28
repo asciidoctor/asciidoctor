@@ -388,7 +388,7 @@ module Asciidoctor
       has_body = false
       result = []
       pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : nil
-      result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{node.attr 'frame', 'all'}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}">)
+      result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{node.attr 'frame', 'all'}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', nil) ? ' orient="land"' : nil}>)
       if (node.option? 'unbreakable')
         result << '<?dbfo keep-together="always"?>'
       elsif (node.option? 'breakable')
