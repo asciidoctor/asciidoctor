@@ -43,6 +43,9 @@ end
 # Public: Methods for managing items for AsciiDoc olists, ulist, and dlists.
 class ListItem < AbstractBlock
 
+  # A contextual alias for the list parent node; counterpart to the items alias on List
+  alias :list :parent
+
   # Public: Get/Set the String used to mark this list item
   attr_accessor :marker
 
