@@ -90,6 +90,8 @@ class Table < AbstractBlock
       @attributes['tableabswidth'] ||=
           ((@attributes['tablepcwidth'].to_f / 100) * @document.attributes['pagewidth']).round
     end
+
+    attributes['orientation'] = 'landscape' if attributes.key? 'rotate-option'
   end
 
   # Internal: Returns whether the current row being processed is

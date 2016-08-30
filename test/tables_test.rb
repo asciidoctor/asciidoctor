@@ -378,6 +378,21 @@ A | here| a | there
       assert_css 'table > tgroup > tbody > row', output, 3
     end
 
+    test 'table with landscape orientation in DocBook' do
+      ['orientation=landscape', '%rotate'].each do |attrs|
+        input = <<-EOS
+[#{attrs}]
+|===
+|Column A | Column B | Column C
+|===
+        EOS
+
+        output = render_embedded_string input, :backend => 'docbook'
+        assert_css 'informaltable', output, 1
+        assert_css 'informaltable[orient="land"]', output, 1
+      end
+    end
+
     test 'table with implicit header row' do
       input = <<-EOS
 |===
