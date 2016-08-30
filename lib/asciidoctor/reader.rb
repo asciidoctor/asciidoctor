@@ -949,6 +949,7 @@ class PreprocessorReader < Reader
                 l = l.rstrip
                 # tagged lines in XML may end with '-->'
                 tl = l.chomp('-->').rstrip
+                tl = l.chomp('*)').rstrip
                 if active_tag
                   if tl.end_with?(%(end::#{active_tag}[]))
                     active_tag = nil
