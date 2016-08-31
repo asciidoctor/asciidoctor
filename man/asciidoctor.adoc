@@ -134,6 +134,9 @@ Matching templates found in subsequent directories override ones previously disc
 *-t, --timings*::
   Display timings information (time to read, parse and convert).
 
+*-t, --timings*::
+    Display timings information (time to read, parse and convert)
+
 === Program Information
 
 *-h, --help*::

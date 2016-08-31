@@ -87,7 +87,7 @@ module Asciidoctor
         inputs.each do |input|
           # NOTE processor will dup options and attributes internally
           input_opts = tofile.nil? ? opts : opts.merge(:to_file => tofile)
-          if show_timings
+          if @options[:timings]
             timings = Timings.new
             @documents << ::Asciidoctor.convert(input, input_opts.merge(:timings => timings))
             timings.print_report((@err || $stderr), ((input.respond_to? :path) ? input.path : '-'))
