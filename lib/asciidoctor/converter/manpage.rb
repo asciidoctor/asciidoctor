@@ -14,6 +14,13 @@ module Asciidoctor
     ESC_BS = %(#{ESC}\\) # escaped backslash (indicates troff formatting sequence)
     ESC_FS = %(#{ESC}.)  # escaped full stop (indicates troff macro)
 
+    LiteralBackslashRx = /(?:\A|[^#{ESC}])\\/
+    LeadingPeriodRx = /^\./
+    EscapedMacroRx = /^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)(?: *#{ESC}\\c)?$/
+    MockBoundaryRx = /<\/?BOUNDARY>/
+    EmDashCharRefRx = /&#8212(?:;&#8203;)?/
+    EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
+
     # Converts HTML entity references back to their original form, escapes
     # special man characters and strips trailing whitespace.
     #
@@ -26,12 +33,10 @@ module Asciidoctor
     #        * :append_newline a Boolean that indicates whether to append an endline to the result (default: false)
     def manify str, opts = {}
       str = ((opts.fetch :preserve_space, true) ? (str.gsub TAB, ET) : (str.tr_s WHITESPACE, ' ')).
-        gsub(/(?:\A|[^#{ESC}])\\/, '\&(rs'). # literal backslash (not a troff escape sequence)
-        gsub(/^\./, '\\\&.').     # leading . is used in troff for macro call or other formatting; replace with \&.
+        gsub(LiteralBackslashRx, '\&(rs'). # literal backslash (not a troff escape sequence)
+        gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
         # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
-        gsub(/^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)(?: *#{ESC}\\c)?$/) {
-          (rest = $3.lstrip).empty? ? %(.#$1"#$2") : %(.#$1"#$2"#{LF}#{rest})
-        }.
+        gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#$1"#$2") : %(.#$1"#$2"#{LF}#{rest}) }.
         gsub('-', '\-').
         gsub('&lt;', '<').
         gsub('&gt;', '>').
@@ -41,20 +46,20 @@ module Asciidoctor
         gsub('&#8482;', '\(tm').  # trademark sign
         gsub('&#8201;', ' ').     # thin space
         gsub('&#8211;', '\(en').  # en dash
-        gsub(/&#8212(?:;&#8203;)?/, '\(em'). # em dash
+        gsub(EmDashCharRefRx, '\(em'). # em dash
         gsub('&#8216;', '\(oq').  # left single quotation mark
         gsub('&#8217;', '\(cq').  # right single quotation mark
         gsub('&#8220;', '\(lq').  # left double quotation mark
         gsub('&#8221;', '\(rq').  # right double quotation mark
-        gsub(/&#8230;(?:&#8203;)?/, '...'). # horizontal ellipsis
+        gsub(EllipsisCharRefRx, '...'). # horizontal ellipsis
         gsub('&#8592;', '\(<-').  # leftwards arrow
         gsub('&#8594;', '\(->').  # rightwards arrow
         gsub('&#8656;', '\(lA').  # leftwards double arrow
         gsub('&#8658;', '\(rA').  # rightwards double arrow
         gsub('&#8203;', '\:').    # zero width space
         gsub('\'', '\(aq').       # apostrophe-quote
-        gsub(/<\/?BOUNDARY>/, '').# artificial boundary
-        gsub(ESC_BS, '\\').       # unescape troff backslash (NOTE update if more escaped are added)
+        gsub(MockBoundaryRx, ''). # mock boundary
+        gsub(ESC_BS, '\\').       # unescape troff backslash (NOTE update if more escapes are added)
         rstrip                    # strip trailing space
       opts[:append_newline] ? %(#{str}#{LF}) : str
     end
