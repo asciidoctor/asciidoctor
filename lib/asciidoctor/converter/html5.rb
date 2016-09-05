@@ -379,7 +379,7 @@ MathJax.Hub.Config({
     def audio node
       xml = @xml_mode
       id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = ['audioblock', node.style, node.role].compact
+      classes = ['audioblock', node.role].compact
       class_attribute = %( class="#{classes * ' '}")
       title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
       %(<div#{id_attribute}#{class_attribute}>
@@ -551,7 +551,7 @@ Your browser does not support the audio tag.
         img = %(<a class="image" href="#{link}">#{img}</a>)
       end
       id_attr = node.id ? %( id="#{node.id}") : nil
-      classes = ['imageblock', node.style, node.role].compact
+      classes = ['imageblock', node.role].compact
       class_attr = %( class="#{classes * ' '}")
       styles = []
       styles << %(text-align: #{node.attr 'align'}) if node.attr? 'align'
@@ -930,7 +930,7 @@ Your browser does not support the audio tag.
     def video node
       xml = @xml_mode
       id_attribute = node.id ? %( id="#{node.id}") : nil
-      classes = ['videoblock', node.style, node.role].compact
+      classes = ['videoblock', node.role].compact
       class_attribute = %( class="#{classes * ' '}")
       title_element = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : nil
       width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil

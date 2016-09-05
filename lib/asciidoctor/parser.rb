@@ -523,9 +523,11 @@ class Parser
                 posattrs = []
               end
 
-              unless !style || explicit_style
+              # QUESTION why did we make exception for explicit style?
+              #if style && !explicit_style
+              if style
                 attributes['alt'] = style if blk_ctx == :image
-                attributes.delete('style')
+                attributes.delete 'style'
                 style = nil
               end
 
@@ -633,7 +635,7 @@ class Parser
           elsif (match = OrderedListRx.match(this_line))
             reader.unshift_line this_line
             block = next_outline_list(reader, :olist, parent)
-            # QUESTION move this logic to next_outline_list?
+            # TODO move this logic into next_outline_list
             if !attributes['style'] && !block.attributes['style']
               marker = block.items[0].marker
               if marker.start_with? '.'
