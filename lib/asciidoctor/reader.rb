@@ -830,10 +830,11 @@ class PreprocessorReader < Reader
       # FIXME we don't want to use a link macro if we are in a verbatim context
       replace_next_line %(link:#{target}[])
       true
-    elsif (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
-      warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
-      false
-    elsif abs_maxdepth > 0
+    elsif (abs_maxdepth = @maxdepth[:abs]) > 0
+      if @include_stack.size >= abs_maxdepth
+        warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
+        return false
+      end
       if ::RUBY_ENGINE_OPAL
         # NOTE resolves uri relative to currently loaded document
         # NOTE we defer checking if file exists and catch the 404 error if it does not
