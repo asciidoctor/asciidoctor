@@ -341,6 +341,7 @@ class Document < AbstractBlock
       attr_overrides['docdir'] = ''
       attr_overrides['user-home'] = '.'
       if @safe >= SafeMode::SECURE
+        attr_overrides['max-attribute-value-size'] = 4096 unless attr_overrides.key? 'max-attribute-value-size'
         # assign linkcss (preventing css embedding) unless explicitly disabled from the commandline or API
         # effectively the same has "has key 'linkcss' and value == nil"
         unless attr_overrides.fetch('linkcss', '').nil?
@@ -350,6 +351,9 @@ class Document < AbstractBlock
         attr_overrides['icons'] ||= nil
       end
     end
+
+    # the only way to set the max-attribute-value-size attribute is via the API; disabled by default
+    @max_attribute_value_size = (val = (attr_overrides['max-attribute-value-size'] ||= nil)) ? val.to_i.abs : nil
 
     attr_overrides.delete_if do |key, val|
       verdict = false
@@ -832,13 +836,18 @@ class Document < AbstractBlock
     if attribute_locked?(name)
       false
     else
+      if @max_attribute_value_size
+        resolved_value = (apply_attribute_value_subs value).limit @max_attribute_value_size
+      else
+        resolved_value = apply_attribute_value_subs value
+      end
       case name
       when 'backend'
-        update_backend_attributes apply_attribute_value_subs(value), !!@attributes_modified.delete?('htmlsyntax')
+        update_backend_attributes resolved_value, !!@attributes_modified.delete?('htmlsyntax')
       when 'doctype'
-        update_doctype_attributes apply_attribute_value_subs(value)
+        update_doctype_attributes resolved_value
       else
-        @attributes[name] = apply_attribute_value_subs(value)
+        @attributes[name] = resolved_value
       end
       @attributes_modified << name
       true
