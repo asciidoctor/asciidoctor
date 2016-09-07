@@ -295,14 +295,11 @@ class Document < AbstractBlock
     # sync the embedded attribute w/ the value of options...do not allow override
     attr_overrides['embedded'] = header_footer ? nil : ''
 
-    # the only way to set the max-include-depth attribute is via the document options
-    # 64 is the AsciiDoc default
+    # the only way to set the max-include-depth attribute is via the API; default to 64 like AsciiDoc Python
     attr_overrides['max-include-depth'] ||= 64
 
-    # the only way to enable uri reads is via the document options, disabled by default
-    unless !attr_overrides['allow-uri-read'].nil?
-      attr_overrides['allow-uri-read'] = nil
-    end
+    # the only way to set the allow-uri-read attribute is via the API; disabled by default
+    attr_overrides['allow-uri-read'] ||= nil
 
     attr_overrides['user-home'] = USER_HOME
 
