@@ -124,6 +124,58 @@ content
       assert result.include? '<em>big</em>foot'
     end
 
+    test 'should limit maximum size of attribute value if safe mode is SECURE' do
+      expected = 'a' * 4096
+      input = <<-EOS
+:name: #{'a' * 5000}
+
+{name}
+      EOS
+
+      result = render_embedded_string input, :doctype => :inline
+      assert_equal expected, result
+      assert_equal 4096, result.bytesize
+    end
+
+    test 'should handle multibyte characters when limiting attribute value size' do
+      expected = '日本'
+      input = <<-EOS
+:name: 日本語
+
+{name}
+      EOS
+
+      result = render_embedded_string input, :doctype => :inline, :attributes => { 'max-attribute-value-size' => 6 }
+      assert_equal expected, result
+      assert_equal 6, result.bytesize
+    end
+
+    test 'should not mangle multibyte characters when limiting attribute value size' do
+      expected = '日本'
+      input = <<-EOS
+:name: 日本語
+
+{name}
+      EOS
+
+      result = render_embedded_string input, :doctype => :inline, :attributes => { 'max-attribute-value-size' => 8 }
+      assert_equal expected, result
+      assert_equal 6, result.bytesize
+    end
+
+    test 'should allow maximize size of attribute value to be disabled' do
+      expected = 'a' * 5000
+      input = <<-EOS
+:name: #{'a' * 5000}
+
+{name}
+      EOS
+
+      result = render_embedded_string input, :doctype => :inline, :attributes => { 'max-attribute-value-size' => nil }
+      assert_equal expected, result
+      assert_equal 5000, result.bytesize
+    end
+
     test 'resolves user-home attribute if safe mode is less than SERVER' do
       input = <<-EOS
 :imagesdir: {user-home}/etc/images
