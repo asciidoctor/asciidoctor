@@ -236,8 +236,8 @@ class Document < AbstractBlock
           @safe = SafeMode::SECURE
         end
       end
+      @compat_mode = attr_overrides.key? 'compat-mode'
       @sourcemap = options[:sourcemap]
-      @compat_mode = false
       @converter = nil
       initialize_extensions = defined? ::Asciidoctor::Extensions
       @extensions = nil # initialize furthur down
@@ -371,8 +371,6 @@ class Document < AbstractBlock
       end
       verdict
     end
-
-    @compat_mode = true if attrs.key? 'compat-mode'
 
     if parent_doc
       # setup default doctype (backend is fixed)
