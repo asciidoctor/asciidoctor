@@ -244,11 +244,10 @@ class AbstractBlock < AbstractNode
   end
 =end
 
-  # Public: Query for all descendant block nodes in the document tree that
-  # match the specified Symbol filter_context and, optionally, the style and/or
-  # role specified in the options Hash. If a block is provided, it's used as an
-  # additional filter. If no filters are specified, all block nodes in the tree
-  # are returned.
+  # Public: Query for all descendant block-level nodes in the document tree
+  # that match the specified selector (context, style, id, and/or role). If a
+  # Ruby block is given, it's used as an additional filter. If no selector or
+  # Ruby block is supplied, all block-level nodes in the tree are returned.
   #
   # Examples
   #
@@ -262,7 +261,7 @@ class AbstractBlock < AbstractNode
   #   doc.find_by context: :listing, style: 'source'
   #   #=> Asciidoctor::Block@13136720 { context: :listing, content_model: :verbatim, style: "source", lines: 1 }
   #
-  # Returns An Array of block nodes that match the given selector or an empty Array if no matches are found
+  # Returns An Array of block-level nodes that match the filter or an empty Array if no matches are found
   #--
   # TODO support jQuery-style selector (e.g., image.thumb)
   def find_by selector = {}, &block
