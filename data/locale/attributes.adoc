@@ -146,6 +146,26 @@ ifeval::["{lang}" == "fa"]
 :warning-caption: هشدار
 endif::[]
 //
+// Finnish translation by Tero Hänninen
+ifeval::["{lang}" == "fi"]
+:appendix-caption: Liitteet
+:caution-caption: Huom
+:example-caption: Esimerkki
+:figure-caption: Kuvio
+:important-caption: Tärkeää
+:last-update-label: Viimeksi päivitetty
+//:listing-caption: Listaus
+:manname-title: NIMI
+:note-caption: Huomio
+//:preface-title: Esipuhe
+:table-caption: Taulukko
+:tip-caption: Vinkki
+:toc-title: Sisällysluettelo
+:untitled-label: Nimetön
+:version-label: Versio
+:warning-caption: Varoitus
+endif::[]
+//
 // French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
 ifeval::["{lang}" == "fr"]
 :appendix-caption: Appendice
