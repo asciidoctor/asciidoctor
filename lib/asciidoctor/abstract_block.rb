@@ -289,8 +289,8 @@ class AbstractBlock < AbstractNode
       result.concat(@header.find_by selector, &block)
     end
 
-    # yuck, dlist is a special case
     unless context_selector == :document # optimization
+      # yuck, dlist is a special case
       if @context == :dlist
         if any_context || context_selector != :section # optimization
           @blocks.flatten.each do |li|
