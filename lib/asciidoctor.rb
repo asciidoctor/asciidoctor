@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# encoding: utf-8
 RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
 RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
 RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
@@ -1310,7 +1310,15 @@ module Asciidoctor
     if ::File === input
       # TODO cli checks if input path can be read and is file, but might want to add check to API
       input_path = ::File.expand_path input.path
-      input_mtime = input.mtime
+      # If the environment variable SOURCE_DATE_EPOCH is set, use it
+      # as the epoch of the document date. If not, use the file last
+      # modification date.
+      # See https://reproducible-builds.org/specs/source-date-epoch/
+      if ENV['SOURCE_DATE_EPOCH'].nil?
+        input_mtime = input.mtime
+      else
+        input_mtime = ::Time.at(ENV['SOURCE_DATE_EPOCH'].to_i).gmtime
+      end
       lines = input.readlines
       # hold off on setting infile and indir until we get a better sense of their purpose
       attributes['docfile'] = input_path

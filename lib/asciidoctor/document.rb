@@ -400,7 +400,14 @@ class Document < AbstractBlock
       #attrs['infile'] = attrs['docfile']
 
       # dynamic intrinstic attribute values
-      now = ::Time.now
+      # If the environment variable SOURCE_DATE_EPOCH is set, use it
+      # as the epoch of the document date. If not, use current date.
+      # See https://reproducible-builds.org/specs/source-date-epoch/
+      if ENV['SOURCE_DATE_EPOCH'].nil?
+        now = ::Time.now
+      else
+        now = ::Time.at(ENV['SOURCE_DATE_EPOCH'].to_i).gmtime
+      end
       localdate = (attrs['localdate'] ||= now.strftime('%Y-%m-%d'))
       unless (localtime = attrs['localtime'])
         begin
