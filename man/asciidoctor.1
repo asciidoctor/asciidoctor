@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White, Ryan Waldron
-.\" Generator: Asciidoctor 1.5.4
-.\"      Date: 2016-01-05
+.\" Generator: Asciidoctor 1.5.5
+.\"      Date: 2016-10-05
 .\"    Manual: Asciidoctor Manual
-.\"    Source: Asciidoctor 1.5.4
+.\"    Source: Asciidoctor 1.5.5
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2016-01-05" "Asciidoctor 1.5.4" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2016-10-05" "Asciidoctor 1.5.5" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -191,6 +191,13 @@ Print program version number.
 .sp
 \f[CR]\-v\fP can also be used if no other flags or arguments are present.
 .RE
+.SH "ENVIRONMENT"
+.sp
+\fBAsciidoctor\fP honors the SOURCE_DATE_EPOCH environment variable.
+If this variable is assigned an integer value, that value is used as the epoch of all input documents and as the local date and time.
+See \c
+.URL "https://reproducible\-builds.org/specs/source\-date\-epoch/" "" " "
+for more information about this environment variable.
 .SH "EXIT STATUS"
 .sp
 \fB0\fP

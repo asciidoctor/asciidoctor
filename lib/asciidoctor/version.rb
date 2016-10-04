@@ -1,3 +1,3 @@
 module Asciidoctor
-  VERSION = '1.5.5.dev'
+  VERSION = '1.5.5'
 end

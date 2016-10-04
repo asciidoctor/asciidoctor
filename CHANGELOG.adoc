@@ -14,6 +14,70 @@ This document provides a high-level view of the changes introduced in Asciidocto
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
 // tag::compact[]
+== 1.5.5 (2016-10-05) - @mojavelinux
+
+Enhancements::
+  * Add preference to limit the maximum size of an attribute value (#1861)
+  * Honor SOURCE_DATE_EPOCH environment variable to accomodate reproducible builds (@JojoBoulix) (#1721)
+  * Add reversed attribute to ordered list if reversed option is enabled (#1830)
+  * Add support for additional docinfo locations (e.g., :header)
+  * Configure default stylesheet to break monospace word if exceeds length of line; add roles to prevent breaks (#1814)
+  * Introduce translation file for built-in labels (@ciampix)
+  * Provide translations for built-in labels (@JmyL - kr, @ciampix - it, @ivannov - bg, @maxandersen - da, @radcortez - pt, @eddumelendez - es, @leathersole - jp, @aslakknutsen - no, @shahryareiv - fa, @AlexanderZobkov - ru, @dongwq - zh, @rmpestano - pt_BR, @ncomet - fr, @lgvz - fi, @patoi - hu, @BojanStipic - sr, @fwilhe - de, @rahmanusta - tr, @abelsromero - ca, @aboullaite - ar, @roelvs - nl)
+  * Translate README to Chinese (@diguage)
+  * Translate README to Japanese (@Mizuho32)
+
+Improvements::
+  * Style nested emphasized phrases properly when using default stylesheet (#1691)
+  * Honor explicit table width even when autowidth option is set (#1843)
+  * Only explicit noheader option on table should disable implicit table header (#1849)
+  * Support docbook orient="land" attribute on tables (#1815)
+  * Add alias named list to retrieve parent List of ListItem
+  * Update push_include method to support chaining (#1836)
+  * Enable font smoothing on Firefox on OSX (#1837)
+  * Support combined use of sectanchors and sectlinks in HTML5 output (#1806)
+  * fix API docs for find_by
+  * Upgrade to Font Awesome 4.6.3 (@allenan, @mogztter) (#1723)
+  * README: add install instructions for Alpine Linux
+  * README: Switch yum commands to dnf in README
+  * README: Mention Mint as a Debian distro that packages Asciidoctor
+  * README: Add caution advising against using gem update to update a system-managed gem (@oddhack)
+  * README: sync French version with English version (@flashcode)
+  * Add missing endline after title element when converting open block to HTML
+  * Move list_marker_keyword method from AbstractNode to AbstractBlock
+  * Rename definition list to description list internally
+
+Compliance::
+  * Support 6-digit decimal char refs, 5-digit hexidecimal char refs (#1824)
+  * Compatibility fixes for Opal
+  * Check for number using Integer instead of Fixnum class for compatibility with Ruby 2.4
+
+Bug fixes::
+  * Use method_defined? instead of respond_to? to check if method is already defined when patching (#1838)
+  * Fix invalid conditional in HTML5 converter when handling of SVG
+  * Processor#parse_content helper no longer shares attribute list between blocks (#1651)
+  * Fix infinite loop if unordered list marker is immediately followed by a dot (#1679)
+  * Don't break SVG source when cleaning if svg start tag name is immediately followed by endline (#1676)
+  * Prevent template converter from crashing if .rb file found in template directory (#1827)
+  * Fix crash when generating section ID when both idprefix & idseparator are blank (#1821)
+  * Use stronger CSS rule for general text color in Pygments stylesheet (#1802)
+  * Don't duplicate forward slash for path relative to root (#1822)
+
+Infrastructure::
+  * Build gem properly in the absense of a git workspace, make compatible with JRuby (#1779)
+  * Run tests in CI using latest versions of Ruby, including Ruby 2.3 (@ferdinandrosario)
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.5[issues resolved] |
+https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.5[git tag] |
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.4...v1.5.5[full diff]
+
 == 1.5.4 (2016-01-03) - @mojavelinux
 
 Enhancements::
@@ -180,6 +244,7 @@ Distribution Packages::
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.3[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.3[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v1.5.2...v1.5.3[full diff]
+// end::compact[]
 
 == 1.5.2 (2014-11-27) - @mojavelinux
 
@@ -234,7 +299,6 @@ Distribution Packages::
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.2[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v1.5.1...v1.5.2[full diff]
-// end::compact[]
 
 == 1.5.1 (2014-09-29) - @mojavelinux
 

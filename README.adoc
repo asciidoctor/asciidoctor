@@ -1,5 +1,6 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>; Ryan Waldron <https://github.com/erebor[@erebor]>
+v1.5.5, 2016-10-05
 // settings:
 :page-layout: base
 :idprefix:
@@ -54,7 +55,7 @@ The gem is also included in several Linux distributions, including Fedora, Debia
 Asciidoctor is open source, {uri-repo}[hosted on GitHub] and released under {uri-license}[the MIT license].
 
 ifndef::env-site[]
-.Translations of the document are available in the following languages:
+.Translations of this document are available in the following languages:
 * {uri-rel-file-base}README-zh_CN.adoc[汉语]
 * {uri-rel-file-base}README-fr.adoc[Français]
 * {uri-rel-file-base}README-jp.adoc[日本語]
@@ -170,7 +171,7 @@ If that's the case, use the following gem command to remove the old versions:
 source 'https://rubygems.org'
 gem 'asciidoctor'
 # or specify the version explicitly
-# gem 'asciidoctor', '1.5.4'
+# gem 'asciidoctor', '1.5.5'
 ----
 
 . Save the Gemfile
@@ -255,7 +256,7 @@ You should see information about the Asciidoctor version and your Ruby environme
 
 [.output]
 ....
-Asciidoctor 1.5.4 [http://asciidoctor.org]
+Asciidoctor 1.5.5 [http://asciidoctor.org]
 Runtime Environment (ruby 2.2.2p95 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
@@ -402,6 +403,59 @@ The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and
 
 == Changelog
 
+== 1.5.5 (2016-10-05) - @mojavelinux
+
+Enhancements::
+  * Add preference to limit the maximum size of an attribute value (#1861)
+  * Honor SOURCE_DATE_EPOCH environment variable to accomodate reproducible builds (@JojoBoulix) (#1721)
+  * Add reversed attribute to ordered list if reversed option is enabled (#1830)
+  * Add support for additional docinfo locations (e.g., :header)
+  * Configure default stylesheet to break monospace word if exceeds length of line; add roles to prevent breaks (#1814)
+  * Introduce translation file for built-in labels (@ciampix)
+  * Provide translations for built-in labels (@JmyL - kr, @ciampix - it, @ivannov - bg, @maxandersen - da, @radcortez - pt, @eddumelendez - es, @leathersole - jp, @aslakknutsen - no, @shahryareiv - fa, @AlexanderZobkov - ru, @dongwq - zh, @rmpestano - pt_BR, @ncomet - fr, @lgvz - fi, @patoi - hu, @BojanStipic - sr, @fwilhe - de, @rahmanusta - tr, @abelsromero - ca, @aboullaite - ar, @roelvs - nl)
+  * Translate README to Chinese (@diguage)
+  * Translate README to Japanese (@Mizuho32)
+
+Improvements::
+  * Style nested emphasized phrases properly when using default stylesheet (#1691)
+  * Honor explicit table width even when autowidth option is set (#1843)
+  * Only explicit noheader option on table should disable implicit table header (#1849)
+  * Support docbook orient="land" attribute on tables (#1815)
+  * Add alias named list to retrieve parent List of ListItem
+  * Update push_include method to support chaining (#1836)
+  * Enable font smoothing on Firefox on OSX (#1837)
+  * Support combined use of sectanchors and sectlinks in HTML5 output (#1806)
+  * fix API docs for find_by
+  * Upgrade to Font Awesome 4.6.3 (@allenan, @mogztter) (#1723)
+  * README: add install instructions for Alpine Linux
+  * README: Switch yum commands to dnf in README
+  * README: Mention Mint as a Debian distro that packages Asciidoctor
+  * README: Add caution advising against using gem update to update a system-managed gem (@oddhack)
+  * README: sync French version with English version (@flashcode)
+  * Add missing endline after title element when converting open block to HTML
+  * Move list_marker_keyword method from AbstractNode to AbstractBlock
+  * Rename definition list to description list internally
+
+Compliance::
+  * Support 6-digit decimal char refs, 5-digit hexidecimal char refs (#1824)
+  * Compatibility fixes for Opal
+  * Check for number using Integer instead of Fixnum class for compatibility with Ruby 2.4
+
+Bug fixes::
+  * Use method_defined? instead of respond_to? to check if method is already defined when patching (#1838)
+  * Fix invalid conditional in HTML5 converter when handling of SVG
+  * Processor#parse_content helper no longer shares attribute list between blocks (#1651)
+  * Fix infinite loop if unordered list marker is immediately followed by a dot (#1679)
+  * Don't break SVG source when cleaning if svg start tag name is immediately followed by endline (#1676)
+  * Prevent template converter from crashing if .rb file found in template directory (#1827)
+  * Fix crash when generating section ID when both idprefix & idseparator are blank (#1821)
+  * Use stronger CSS rule for general text color in Pygments stylesheet (#1802)
+  * Don't duplicate forward slash for path relative to root (#1822)
+
+Infrastructure::
+  * Build gem properly in the absense of a git workspace, make compatible with JRuby (#1779)
+  * Run tests in CI using latest versions of Ruby, including Ruby 2.3 (@ferdinandrosario)
+
 == 1.5.4 (2016-01-03) - @mojavelinux
 
 Enhancements::
@@ -546,48 +600,5 @@ Infrastructure::
   * enable containerized builds on Travis CI
   * add config to run CI build on AppVeyor
   * exclude benchmark folder from gem (#1522)
-
-== 1.5.2 (2014-11-27) - @mojavelinux
-
-Enhancements::
-
-  * add docinfo extension (@mogztter) (#1162)
-  * allow docinfo to be in separate directory from content, specified by `docinfodir` attribute (@mogztter) (#511)
-  * enable TeX equation auto-numbering if `eqnums` attribute is set (@jxxcarlson) (#1110)
-
-Improvements::
-
-  * recognize `+--+` as valid line comment for callout numbers; make line comment configurable (#1068)
-  * upgrade highlight.js to version 8.4 (#1216)
-  * upgrade Font Awesome to version 4.2.0 (@clojens) (#1201)
-  * define JAVASCRIPT_PLATFORM constant to simplify conditional logic in the JavaScript environment (#897)
-  * provide access to destination directory, outfile and outdir via Document object (#1203)
-  * print encoding information in version report produced by `asciidoctor -v` (#1210)
-  * add intrinsic attribute named `cpp` with value `pass:[C++]` (#1208)
-  * preserve URI targets passed to `stylesheet` and related attributes (#1192)
-  * allow numeric characters in block attribute name (#1103)
-  * support custom YouTube playlists (#1105)
-  * make start number for unique id generation configurable (#1148)
-  * normalize and force UTF-8 encoding of docinfo content (#831)
-  * allow subs and default_subs to be specified in Block constructor (#749)
-  * enhance error message when reading binary input files (@mogztter) (#1158)
-  * add `append` method as alias to `<<` method on AbstractBlock (#1085)
-  * assign value of `preface-title` as title of preface node (#1090)
-  * fix spacing around checkbox in checklist (#1138)
-  * automatically load Slim's include plugin when using slim templates (@jirutka) (#1151)
-  * mixin Slim helpers into execution scope of slim templates (@jirutka) (#1143)
-  * improve DocBook output for manpage doctype (@bk2204) (#1134, #1142)
-
-Compliance::
-
-  * substitute attribute entry value in attributes defined outside of header (#1130)
-  * allow empty cell to appear at end of table row (#1106)
-  * only produce one row for table in CSV or DSV format with a single cell (#1180)
-
-Bug fixes::
-
-  * add explicit to_s call to generate delimiter settings for MathJax config (#1198)
-  * fix includes that reference absolute Windows paths (#1144)
-  * apply DSL to extension block in a way compatible with Opal
 
 Refer to the {uri-changelog}[CHANGELOG] for a complete list of changes in older releases.
