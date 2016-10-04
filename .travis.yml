@@ -13,7 +13,7 @@ rvm:
   - jruby-9.1.2.0
   - jruby-19mode # based on jruby-1.7.19
   - jruby-18mode # based on jruby-1.7.19
-  - rbx-2
+  #- rbx-3.60 # NOTE not working currently
 script: bundle exec rake coverage test:all
 notifications:
   email: false
