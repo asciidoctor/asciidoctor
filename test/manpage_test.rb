@@ -200,4 +200,19 @@ T}
 .TE'
     end
   end
+
+  context 'Environment' do
+    test 'should use SOURCE_DATE_EPOCH as modified time of input file and local time' do
+      old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+      begin
+        ENV['SOURCE_DATE_EPOCH'] = '1234123412'
+        output = Asciidoctor.convert SAMPLE_MANPAGE_HEADER, :backend => :manpage, :header_footer => true
+        assert_match(/Date: 2009-02-08/, output)
+        assert_match(/^\.TH "COMMAND" "1" "2009-02-08" "Command 1.2.3" "Command Manual"$/, output)
+      ensure
+        ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch if old_source_date_epoch
+      end
+    end
+  end
+
 end

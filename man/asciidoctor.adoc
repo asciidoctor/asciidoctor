@@ -144,6 +144,12 @@ Matching templates found in subsequent directories override ones previously disc
 +
 `-v` can also be used if no other flags or arguments are present.
 
+== ENVIRONMENT
+
+*Asciidoctor* honors the SOURCE_DATE_EPOCH environment variable.
+If this variable is assigned an integer value, that value is used as the epoch of all input documents and as the local date and time.
+See https://reproducible-builds.org/specs/source-date-epoch/ for more information about this environment variable.
+
 == EXIT STATUS
 
 *0*::

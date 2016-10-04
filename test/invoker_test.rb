@@ -550,4 +550,19 @@ context 'Invoker' do
     assert_match(/Total time/, error)
   end
 
+  test 'should use SOURCE_DATE_EPOCH as modified time of input file and local time' do
+    old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+    begin
+      ENV['SOURCE_DATE_EPOCH'] = '1234123412'
+      sample_filepath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.asciidoc'))
+      invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
+      doc = invoker.document
+      assert_equal '2009-02-08', (doc.attr 'docdate')
+      assert_equal '2009-02-08 20:03:32 UTC', (doc.attr 'docdatetime')
+      assert_equal '2009-02-08', (doc.attr 'localdate')
+      assert_equal '2009-02-08 20:03:32 UTC', (doc.attr 'localdatetime')
+    ensure
+      ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch if old_source_date_epoch
+    end
+  end
 end
