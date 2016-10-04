@@ -558,9 +558,9 @@ context 'Invoker' do
       invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
       doc = invoker.document
       assert_equal '2009-02-08', (doc.attr 'docdate')
-      assert_equal '2009-02-08 20:03:32 UTC', (doc.attr 'docdatetime')
+      assert_match(/2009-02-08 20:03:32 (GMT|UTC)/, (doc.attr 'docdatetime'))
       assert_equal '2009-02-08', (doc.attr 'localdate')
-      assert_equal '2009-02-08 20:03:32 UTC', (doc.attr 'localdatetime')
+      assert_match(/2009-02-08 20:03:32 (GMT|UTC)/, (doc.attr 'localdatetime'))
     ensure
       ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch if old_source_date_epoch
     end
