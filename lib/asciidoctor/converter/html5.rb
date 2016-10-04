@@ -321,15 +321,18 @@ MathJax.Hub.Config({
       htag = %(h#{slevel + 1})
       id_attr = anchor = link_start = link_end = nil
       if node.id
-        id_attr = %( id="#{node.id}")
-        if node.document.attr? 'sectanchors'
-          anchor = %(<a class="anchor" href="##{node.id}"></a>)
+        id_attr = %( id="#{id = node.id}")
+        if (doc = node.document).attr? 'sectanchors'
+          anchor = %(<a class="anchor" href="##{id}"></a>)
           # possible idea - anchor icons GitHub-style
-          #if node.document.attr? 'icons', 'font'
-          #  anchor = %(<a class="anchor" href="##{node.id}"><i class="fa fa-anchor"></i></a>)
+          #if doc.attr? 'icons', 'font'
+          #  anchor = %(<a class="anchor" href="##{id}"><i class="fa fa-anchor"></i></a>)
           #else
-        elsif node.document.attr? 'sectlinks'
-          link_start = %(<a class="link" href="##{node.id}">)
+          #  anchor = %(<a class="anchor" href="##{id}"></a>)
+          #end
+        end
+        if doc.attr? 'sectlinks'
+          link_start = %(<a class="link" href="##{id}">)
           link_end = '</a>'
         end
       end
