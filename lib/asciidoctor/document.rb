@@ -353,7 +353,7 @@ class Document < AbstractBlock
     end
 
     # the only way to set the max-attribute-value-size attribute is via the API; disabled by default
-    @max_attribute_value_size = (val = (attr_overrides['max-attribute-value-size'] ||= nil)) ? val.to_i.abs : nil
+    @max_attribute_value_size = (size = (attr_overrides['max-attribute-value-size'] ||= nil)) ? size.to_i.abs : nil
 
     attr_overrides.delete_if do |key, val|
       verdict = false
