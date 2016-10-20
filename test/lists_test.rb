@@ -4182,7 +4182,7 @@ puts doc.render # <3>
     (1..3).each do |i|
       assert_xpath %((/div[@class="listingblock"]//code/img)[#{i}][@src="./images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
     end
-    assert_css '.colist table td img', output, 3
+    assert_css '.colist table td.icon img', output, 3
     (1..3).each do |i|
       assert_xpath %((/div[@class="colist arabic"]//td/img)[#{i}][@src="./images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
     end
