@@ -1,5 +1,5 @@
 // This file provides translations for all built-in attributes in Asciidoctor that output localized content.
-// See http://asciidoctor.org/docs/user-manual/#customizing-built-in-labels to learn how to use it.
+// See http://asciidoctor.org/docs/user-manual/#customizing-labels to learn how to use it.
 //
 // NOTE: Please use a line comment in front of the listing-caption and preface-title entries.
 // These attributes are optional and not set by default.
