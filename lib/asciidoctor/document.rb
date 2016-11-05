@@ -837,7 +837,7 @@ class Document < AbstractBlock
       false
     else
       if @max_attribute_value_size
-        resolved_value = (apply_attribute_value_subs value).limit @max_attribute_value_size
+        resolved_value = (apply_attribute_value_subs value).limit_bytesize @max_attribute_value_size
       else
         resolved_value = apply_attribute_value_subs value
       end
