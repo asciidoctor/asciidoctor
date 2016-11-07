@@ -175,6 +175,20 @@ A | here| a | there
       assert_xpath %(//tbody/tr/td[2]/p[text()='Coming soon#{expand_entity 8230}#{expand_entity 8203}']), output, 1
     end
 
+    test 'should only substitute specialchars for literal table cells' do
+      input = <<-EOS
+|===
+l|one
+*two*
+three
+<four>
+|===
+      EOS
+      output = render_embedded_string input
+      result = xmlnodes_at_xpath('/table//pre', output, 1)
+      assert_equal %(<pre>one\n*two*\nthree\n&lt;four&gt;</pre>), result.to_s
+    end
+
     test 'table and col width not assigned when autowidth option is specified' do
       input = <<-EOS
 [options="autowidth"]
