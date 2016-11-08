@@ -268,9 +268,11 @@ class Table::Cell < AbstractNode
     end
   end
 
-  # Public: Get the text with normal substitutions applied for this cell. Used for cells in the head rows
+  # Public: Get the text with normal substitutions applied for this cell. Used for cells in the head
+  # row as well as for literal and verse cells. This method should not be called on cells with other
+  # styles.
   def text
-    apply_normal_subs(@text).strip
+    (apply_subs @text, (@style == :literal ? [:specialcharacters] : :normal)).strip
   end
 
   # Public: Handles the body data (tbody, tfoot), applying styles and partitioning into paragraphs
