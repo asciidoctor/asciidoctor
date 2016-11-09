@@ -3799,6 +3799,18 @@ term2:: def2
       assert_xpath '//*[@class="dlist"]/dl', output, 2
       assert_xpath '(//*[@class="dlist"])[2]/*[@class="title"][text()="title"]', output, 1
     end
+
+    test 'within section, should include anchor if dtanchors document attribute is set' do
+      input = <<-EOS
+Terms
+-----
+term:: def
+      EOS
+
+      output = render_embedded_string input, :attributes => {'sectanchors' => '', 'dtanchors' => ''}
+      assert_xpath '//*[@class="dlist"]/dl/dt[@id="_terms-term"]', output, 1
+      assert_xpath '//*[@class="dlist"]/dl/dt[@id="_terms-term"]/a[@class="anchor"][@href="#_terms-term"]', output, 1
+    end
   end
 end
 
