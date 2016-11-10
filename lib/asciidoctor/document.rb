@@ -115,8 +115,8 @@ class Document < AbstractBlock
   #
   attr_reader :compat_mode
 
-  # Public: Get the Boolean flag that indicates whether source map information is tracked by the parser
-  attr_reader :sourcemap
+  # Public: Get or set the Boolean flag that indicates whether source map information should be tracked by the parser
+  attr :sourcemap
 
   # Public: Get the Hash of document references
   attr_reader :references
