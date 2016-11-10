@@ -90,6 +90,7 @@ endif::[]
 ifeval::["{lang}" == "de"]
 :appendix-caption: Anhang
 :caution-caption: Achtung
+:chapter-label: Kapitel
 :example-caption: Beispiel
 :figure-caption: Abbildung
 :important-caption: Wichtig
