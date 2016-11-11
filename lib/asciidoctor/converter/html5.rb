@@ -816,10 +816,7 @@ Your browser does not support the audio tag.
                 when :literal
                   cell_content = %(<div class="literal"><pre>#{cell.text}</pre></div>)
                 else
-                  cell_content = ''
-                  cell.content.each do |text|
-                    cell_content = %(#{cell_content}<p class="tableblock">#{text}</p>)
-                  end
+                  cell_content = cell.content.map {|text| %(<p class="tableblock">#{text}</p>) } * EOL
                 end
               end
 
