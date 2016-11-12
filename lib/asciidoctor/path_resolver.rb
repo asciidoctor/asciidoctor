@@ -145,8 +145,8 @@ class PathResolver
     # Windows roots can begin with drive letter
     elsif @file_separator == BACKSLASH && WindowsRootRx =~ path
       true
-    # Absolute paths in the browser start with file:///
-    elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_PLATFORM == 'browser' && (path.start_with? 'file:///')
+    # Absolute paths in the browser start with file://
+    elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_PLATFORM == 'browser' && (path.start_with? 'file://')
       true
     else
       false
