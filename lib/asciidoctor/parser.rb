@@ -1040,8 +1040,11 @@ class Parser
   # if terminator is false, that means the all the lines in the reader should be parsed
   # NOTE could invoke filter in here, before and after parsing
   def self.build_block(block_context, content_model, terminator, parent, reader, attributes, options = {})
-    if content_model == :skip || content_model == :raw
-      skip_processing = content_model == :skip
+    if content_model == :skip
+      skip_processing = true
+      parse_as_content_model = :simple
+    elsif content_model == :raw
+      skip_processing = false
       parse_as_content_model = :simple
     else
       skip_processing = false
@@ -1050,7 +1053,7 @@ class Parser
 
     if terminator.nil?
       if parse_as_content_model == :verbatim
-        lines = reader.read_lines_until(:break_on_blank_lines => true, :break_on_list_continuation => true)
+        lines = reader.read_lines_until :break_on_blank_lines => true, :break_on_list_continuation => true
       else
         content_model = :simple if content_model == :compound
         lines = read_paragraph_lines reader, false, :skip_line_comments => true, :skip_processing => true
@@ -1058,7 +1061,7 @@ class Parser
       end
       block_reader = nil
     elsif parse_as_content_model != :compound
-      lines = reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing)
+      lines = reader.read_lines_until :terminator => terminator, :skip_processing => skip_processing
       block_reader = nil
     # terminator is false when reader has already been prepared
     elsif terminator == false
