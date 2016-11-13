@@ -418,6 +418,26 @@ Content goes here
       assert_xpath "//*[@class='sidebarblock']//p", result, 1
     end
 
+    test 'should process preprocessor conditional in paragrpah content' do
+      input = <<-EOS
+ifdef::asciidoctor-version[]
+[sidebar]
+First line of sidebar.
+ifdef::backend[The backend is {backend}.]
+Last line of sidebar.
+endif::[]
+      EOS
+
+      result = render_embedded_string input
+      assert_equal %(<div class="sidebarblock">
+<div class="content">
+First line of sidebar.
+The backend is html5.
+Last line of sidebar.
+</div>
+</div>), result
+    end
+
     context 'Styled Paragraphs' do
       test 'should wrap text in simpara for styled paragraphs when rendered to DocBook' do
         input = <<-EOS
