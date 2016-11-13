@@ -1003,10 +1003,15 @@ module Asciidoctor
 
     ## General
 
-    # Matches a blank line.
+    # Matches consecutive blank lines.
     #
-    # NOTE allows for empty space in line as it could be left by the template engine
-    BlankLineRx = /^#{CG_BLANK}*\n/
+    # Examples
+    #
+    #   one
+    #
+    #   two
+    #
+    BlankLineRx = /\n{2,}/
 
     # Matches a comma or semi-colon delimiter.
     #
