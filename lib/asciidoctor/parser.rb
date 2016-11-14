@@ -635,16 +635,15 @@ class Parser
           elsif (match = OrderedListRx.match(this_line))
             reader.unshift_line this_line
             block = next_outline_list(reader, :olist, parent)
-            # TODO move this logic into next_outline_list
-            if !attributes['style'] && !block.attributes['style']
+            # FIXME move this logic into next_outline_list
+            unless style
               marker = block.items[0].marker
               if marker.start_with? '.'
                 # first one makes more sense, but second one is AsciiDoc-compliant
                 #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES[0]).to_s
                 attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || ORDERED_LIST_STYLES[0]).to_s
               else
-                style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s] =~ marker }
-                attributes['style'] = (style || ORDERED_LIST_STYLES[0]).to_s
+                attributes['style'] = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s] =~ marker } || ORDERED_LIST_STYLES[0]).to_s
               end
             end
             break
@@ -810,7 +809,7 @@ class Parser
 
         when :listing, :fenced_code, :source
           if block_context == :fenced_code
-            style = attributes['style'] = 'source'
+            attributes['style'] = 'source'
             language, linenums = this_line[3..-1].tr(' ', '').split(',', 2)
             if !language.nil_or_empty?
               attributes['language'] = language
