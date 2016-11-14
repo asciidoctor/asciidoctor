@@ -1055,7 +1055,8 @@ class Parser
         lines = reader.read_lines_until :break_on_blank_lines => true, :break_on_list_continuation => true
       else
         content_model = :simple if content_model == :compound
-        lines = read_paragraph_lines reader, false, :skip_line_comments => true, :skip_processing => true
+        # TODO we could also skip processing if we're able to detect reader is a BlockReader
+        lines = read_paragraph_lines reader, false, :skip_line_comments => true, :skip_processing => skip_processing
         # QUESTION check for empty lines after grabbing lines for simple content model?
       end
       block_reader = nil
