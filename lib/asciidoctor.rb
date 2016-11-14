@@ -305,13 +305,13 @@ module Asciidoctor
   ORDERED_LIST_STYLES = [:arabic, :loweralpha, :lowerroman, :upperalpha, :upperroman] #, :lowergreek]
 
   ORDERED_LIST_KEYWORDS = {
+    #'arabic'     => '1',
+    #'decimal'    => '1',
     'loweralpha' => 'a',
     'lowerroman' => 'i',
+    #'lowergreek' => 'a',
     'upperalpha' => 'A',
     'upperroman' => 'I'
-    #'lowergreek' => 'a'
-    #'arabic'     => '1'
-    #'decimal'    => '1'
   }
 
   LIST_CONTINUATION = '+'
