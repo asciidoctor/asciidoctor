@@ -630,6 +630,10 @@ class Parser
           elsif UnorderedListRx =~ this_line
             reader.unshift_line this_line
             block = next_outline_list(reader, :ulist, parent)
+            if !style && Section === parent && parent.sectname == 'bibliography' &&
+                parent.blocks.none? {|b| b.context == :ulist }
+              attributes['style'] = 'bibliography'
+            end
             break
 
           elsif (match = OrderedListRx.match(this_line))
