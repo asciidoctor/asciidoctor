@@ -83,25 +83,7 @@ class Section < AbstractBlock
   #   yet_another_section.generate_id
   #   => "_ben_jerry"
   def generate_id
-    if @document.attributes.has_key? 'sectids'
-      sep = @document.attributes['idseparator'] || '_'
-      pre = @document.attributes['idprefix'] || '_'
-      base_id = %(#{pre}#{title.downcase.gsub(InvalidSectionIdCharsRx, sep).tr_s(sep, sep).chomp(sep)})
-      # ensure id doesn't begin with idseparator if idprefix is empty and idseparator is not empty
-      if pre.empty? && !sep.empty? && base_id.start_with?(sep)
-        base_id = base_id[1..-1]
-        base_id = base_id[1..-1] while base_id.start_with?(sep)
-      end
-      gen_id = base_id
-      cnt = Compliance.unique_id_start_index
-      while @document.references[:ids].has_key? gen_id
-        gen_id = %(#{base_id}#{sep}#{cnt})
-        cnt += 1
-      end
-      gen_id
-    else
-      nil
-    end
+    Section.generate_id title, @document
   end
 
   # Public: Get the section number for the current Section
@@ -174,6 +156,46 @@ class Section < AbstractBlock
       %(#<#{self.class}@#{object_id} {level: #{@level}, title: #{qualified_title.inspect}, blocks: #{@blocks.size}}>)
     else
       super
+    end
+  end
+
+  # Public: Generate a String id for the given section title.
+  #
+  # The generated id is prefixed with value of the 'idprefix' attribute, which
+  # is an underscore by default.
+  #
+  # If the generated id is already in use in the document, a count is appended
+  # until a unique id is found.
+  #
+  # Section id synthesis can be disabled by undefining the 'sectids' attribute.
+  #
+  # Examples
+  #
+  #   Section.generate_id 'Foo', document
+  #   => "_foo"
+  #
+  def self.generate_id title, document
+    if (attrs = document.attributes).key? 'sectids'
+      sep = attrs['idseparator'] || '_'
+      pre = attrs['idprefix'] || '_'
+      gen_id = %(#{pre}#{title.downcase.gsub(InvalidSectionIdCharsRx, sep)})
+      unless sep.empty?
+        # remove repeat and trailing separator characters
+        gen_id = (gen_id.tr_s sep, sep).chomp sep
+        # ensure id doesn't begin with idseparator if idprefix is empty and idseparator is not empty
+        if pre.empty?
+          gen_id = gen_id[1..-1] while (gen_id.start_with? sep)
+        end
+      end
+      if (ids = document.references[:ids]) && (ids.key? gen_id)
+        cnt = Compliance.unique_id_start_index
+        cnt += 1 while ids.key?(tmp_id = %(#{gen_id}#{sep}#{cnt}))
+        tmp_id
+      else
+        gen_id
+      end
+    else
+      nil
     end
   end
 end
