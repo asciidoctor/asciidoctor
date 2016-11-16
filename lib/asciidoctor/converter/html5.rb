@@ -385,9 +385,12 @@ MathJax.Hub.Config({
       classes = ['audioblock', node.role].compact
       class_attribute = %( class="#{classes * ' '}")
       title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
+      start_t = node.attr 'start', nil, false
+      end_t = node.attr 'end', nil, false
+      time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ',' : nil}#{end_t}) : nil
       %(<div#{id_attribute}#{class_attribute}>
 #{title_element}<div class="content">
-<audio src="#{node.media_uri(node.attr 'target')}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}>
+<audio src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}>
 Your browser does not support the audio tag.
 </audio>
 </div>

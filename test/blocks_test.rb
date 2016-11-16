@@ -2067,6 +2067,17 @@ audio::podcast.mp3[options="autoplay,nocontrols,loop"]
       assert_css 'audio:not([controls])', output, 1
       assert_css 'audio[loop]', output, 1
     end
+
+    test 'audio macro should support start and end time' do
+      input = <<-EOS
+audio::podcast.mp3[start=1,end=2]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'audio', output, 1
+      assert_css 'audio[controls]', output, 1
+      assert_css 'audio[src="podcast.mp3#t=1,2"]', output, 1
+    end
   end
 
   context 'Admonition icons' do
