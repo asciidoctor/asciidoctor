@@ -1441,8 +1441,7 @@ module Asciidoctor
       return self.load input, options
     else
       write_to_same_dir = false
-      stream_output = to_file.respond_to? :write
-      write_to_target = stream_output ? false : to_file
+      write_to_target = (stream_output = to_file.respond_to? :write) ? false : to_file
     end
 
     unless options.key? :header_footer
