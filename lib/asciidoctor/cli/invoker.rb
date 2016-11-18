@@ -33,19 +33,12 @@ module Asciidoctor
         return unless @options
 
         old_verbose = $VERBOSE
-        case @options[:verbose]
-        when 0
-          $VERBOSE = nil
-        when 1
-          $VERBOSE = false
-        when 2
-          $VERBOSE = true
-        end
-
         opts = {}
         infiles = []
         outfile = nil
         tofile = nil
+        show_timings = false
+
         @options.map do |key, val|
           case key
           when :input_files
@@ -57,23 +50,28 @@ module Asciidoctor
           when :attributes
             # NOTE processor will dup attributes internally
             opts[:attributes] = val
+          when :timings
+            show_timings = val
           when :trace
             # currently, nothing
+          when :verbose
+            case val
+            when 0
+              $VERBOSE = nil
+            when 1
+              $VERBOSE = false
+            when 2
+              $VERBOSE = true
+            end
           else
             opts[key] = val unless val.nil?
           end
         end
 
-        if infiles.size == 1 && infiles[0] == '-'
-          # allows use of block to supply stdin, particularly useful for tests
-          inputs = [block_given? ? yield : STDIN]
-        else
-          inputs = infiles.map {|infile| ::File.new infile, 'r'}
-        end
-
+        stdin = infiles.size == 1 && infiles[0] == '-'
         # NOTE if infile is stdin, default to outfile as stout
-        if outfile == '-' || (!outfile && infiles.size == 1 && infiles[0] == '-')
-          tofile = (@out || $stdout)
+        if outfile == '-' || (!outfile && stdin)
+          tofile = @out || $stdout
         elsif outfile
           tofile = outfile
           opts[:mkdirs] = true
@@ -83,16 +81,27 @@ module Asciidoctor
           opts[:mkdirs] = true
         end
 
-        show_timings = @options[:timings]
-        inputs.each do |input|
-          # NOTE processor will dup options and attributes internally
+        if stdin
+          # allows use of block to supply stdin, particularly useful for tests
+          input = block_given? ? yield : STDIN
+          # NOTE processor will dup options internally
           input_opts = tofile.nil? ? opts : opts.merge(:to_file => tofile)
           if show_timings
-            timings = Timings.new
-            @documents << ::Asciidoctor.convert(input, input_opts.merge(:timings => timings))
-            timings.print_report((@err || $stderr), ((input.respond_to? :path) ? input.path : '-'))
+            @documents << ::Asciidoctor.convert(input, input_opts.merge(:timings => (timings = Timings.new)))
+            timings.print_report((@err || $stderr), '-')
           else
             @documents << ::Asciidoctor.convert(input, input_opts)
+          end
+        else
+          infiles.each do |infile|
+            # NOTE processor will dup options internally
+            input_opts = tofile.nil? ? opts : opts.merge(:to_file => tofile)
+            if show_timings
+              @documents << ::Asciidoctor.convert_file(infile, input_opts.merge(:timings => (timings = Timings.new)))
+              timings.print_report((@err || $stderr), infile)
+            else
+              @documents << ::Asciidoctor.convert_file(infile, input_opts)
+            end
           end
         end
       rescue ::Exception => e
