@@ -664,14 +664,7 @@ class Parser
             attributes['reftext'] = float_reftext if float_reftext
             float_id ||= attributes['id'] if attributes.has_key?('id')
             block = Block.new(parent, :floating_title, :content_model => :empty)
-            if float_id.nil_or_empty?
-              # FIXME remove hack of creating throwaway Section to get at the generate_id method
-              tmp_sect = Section.new(parent)
-              tmp_sect.title = float_title
-              block.id = tmp_sect.generate_id
-            else
-              block.id = float_id
-            end
+            block.id = float_id.nil_or_empty? ? (Section.generate_id float_title, document) : float_id
             block.level = float_level
             block.title = float_title
             break
@@ -1606,17 +1599,14 @@ class Parser
       section.sectname = %(sect#{section.level})
     end
 
-    if !section.id && (id = attributes['id'])
-      section.id = id
-    else
-      # generate an id if one was not *embedded* in the heading line
-      # or as an anchor above the section
-      section.id ||= section.generate_id
+    unless (id = section.id)
+      # generate an id if one was not embedded or specified as anchor above section title
+      section.id = (id = attributes['id'] || (Section.generate_id section.title, document))
     end
 
-    if section.id
+    if id
       # TODO sub reftext
-      section.document.register(:ids, [section.id, (attributes['reftext'] || section.title)])
+      document.register(:ids, [id, (attributes['reftext'] || section.title)])
     end
     section.update_attributes(attributes)
     reader.skip_blank_lines
