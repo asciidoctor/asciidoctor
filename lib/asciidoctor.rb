@@ -1386,7 +1386,7 @@ module Asciidoctor
   #
   # Returns the Asciidoctor::Document
   def load_file filename, options = {}
-    self.load ::File.new(filename || ''), options
+    ::File.open(filename) {|file| self.load file, options }
   end
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and
@@ -1547,9 +1547,7 @@ module Asciidoctor
             end
             stylesheet_dst = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
             unless stylesheet_src == stylesheet_dst || (stylesheet_content = doc.read_asset stylesheet_src).nil?
-              ::File.open(stylesheet_dst, 'w') {|f|
-                f.write stylesheet_content
-              }
+              ::File.open(stylesheet_dst, 'w') {|f| f.write stylesheet_content }
             end
           end
 
@@ -1580,7 +1578,7 @@ module Asciidoctor
   # Returns the Document object if the converted String is written to a
   # file, otherwise the converted String
   def convert_file filename, options = {}
-    self.convert ::File.new(filename || ''), options
+    ::File.open(filename) {|file| self.convert file, options }
   end
 
   # Alias render_file to convert_file to maintain backwards compatibility
