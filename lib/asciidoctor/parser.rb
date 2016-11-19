@@ -1636,7 +1636,7 @@ class Parser
   # returns the section level if the Reader is positioned at a section title,
   # false otherwise
   def self.is_next_line_section?(reader, attributes)
-    if !(val = attributes[1]).nil? && ((ord_0 = val[0].ord) == 100 || ord_0 == 102) && val =~ FloatingTitleStyleRx
+    if !(val = attributes[1]).nil? && ((ord_0 = val[0].ord) == 100 || ord_0 == 102) && FloatingTitleStyleRx =~ val
       return false
     end
     return false unless reader.has_more_lines?
@@ -1682,7 +1682,7 @@ class Parser
 
   def self.is_two_line_section_title?(line1, line2)
     if line1 && line2 && SECTION_LEVELS.has_key?(line2.chr) &&
-        line2 =~ SetextSectionLineRx && line1 =~ SetextSectionTitleRx &&
+        SetextSectionLineRx =~ line2 && SetextSectionTitleRx =~ line1 &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
       section_level line2
@@ -1755,7 +1755,7 @@ class Parser
         end
       end
     elsif Compliance.underline_style_section_titles
-      if (line2 = reader.peek_line(true)) && SECTION_LEVELS.has_key?(line2.chr) && line2 =~ SetextSectionLineRx &&
+      if (line2 = reader.peek_line(true)) && SECTION_LEVELS.has_key?(line2.chr) && SetextSectionLineRx =~ line2 &&
         (name_match = SetextSectionTitleRx.match(line1)) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
