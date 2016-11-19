@@ -22,7 +22,7 @@ else
     def limit_bytesize size
       return self unless size < bytesize
       result = (unpack %(a#{size}))[0]
-      result.chop! until result.empty? || ValidTrailingCharRx =~ result
+      result.chop! until result.empty? || (ValidTrailingCharRx.match? result)
       result
     end unless method_defined? :limit_bytesize
   end

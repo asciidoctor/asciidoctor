@@ -1318,7 +1318,7 @@ module Substitutors
   def resolve_subs subs, type = :block, defaults = nil, subject = nil
     return [] if subs.nil_or_empty?
     candidates = nil
-    modifiers_present = SubModifierSniffRx =~ subs
+    modifiers_present = SubModifierSniffRx.match? subs
     subs.tr(' ', '').split(',').each do |key|
       modifier_operation = nil
       if modifiers_present
