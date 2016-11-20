@@ -349,7 +349,7 @@ class Reader
       elsif (commentish = next_line.start_with?('//')) && (match = CommentBlockRx.match(next_line))
         comment_lines << shift
         comment_lines.push(*(read_lines_until(:terminator => match[0], :read_last_line => true, :skip_processing => true)))
-      elsif commentish && CommentLineRx =~ next_line
+      elsif commentish && (CommentLineRx.match? next_line)
         comment_lines << shift
       else
         break
@@ -366,7 +366,7 @@ class Reader
     comment_lines = []
     # optimized code for shortest execution path
     while (next_line = peek_line)
-      if CommentLineRx =~ next_line
+      if CommentLineRx.match? next_line
         comment_lines << shift
       else
         break
@@ -470,7 +470,7 @@ class Reader
           line_restored = true
         end
       else
-        unless skip_comments && line.start_with?('//') && CommentLineRx =~ line
+        unless skip_comments && (line.start_with? '//') && (CommentLineRx.match? line)
           result << line
           line_read = true
         end
@@ -954,7 +954,7 @@ class PreprocessorReader < Reader
                   if tl.end_with?(%(end::#{active_tag}[]))
                     active_tag = nil
                   else
-                    selected.push l unless tl.end_with?('[]') && TagDirectiveRx =~ tl
+                    selected.push l unless (tl.end_with? '[]') && (TagDirectiveRx.match? tl)
                     inc_line_offset = inc_lineno if inc_line_offset == 0
                   end
                 else
@@ -964,7 +964,7 @@ class PreprocessorReader < Reader
                       tags_found << tag
                       break
                     end
-                  end if tl.end_with?('[]') && TagDirectiveRx =~ tl
+                  end if (tl.end_with? '[]') && (TagDirectiveRx.match? tl)
                 end
               end
             end

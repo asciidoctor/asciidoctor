@@ -32,11 +32,11 @@ class Parser
   # Regexp for leading tab indentation
   TabIndentRx = /^\t+/
 
-  StartOfBlockProc = lambda {|l| ((l.start_with? '[') && BlockAttributeLineRx =~ l) || (is_delimited_block? l) }
+  StartOfBlockProc = lambda {|l| ((l.start_with? '[') && (BlockAttributeLineRx.match? l)) || (is_delimited_block? l) }
 
-  StartOfListProc = lambda {|l| AnyListRx =~ l }
+  StartOfListProc = lambda {|l| AnyListRx.match? l }
 
-  StartOfBlockOrListProc = lambda {|l| (is_delimited_block? l) || ((l.start_with? '[') && BlockAttributeLineRx =~ l) || AnyListRx =~ l }
+  StartOfBlockOrListProc = lambda {|l| (is_delimited_block? l) || ((l.start_with? '[') && (BlockAttributeLineRx.match? l)) || (AnyListRx.match? l) }
 
   NoOp = nil
 
@@ -508,7 +508,7 @@ class Parser
             first_char = Compliance.markdown_syntax ? this_line.lstrip.chr : this_line.chr
             # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
             if (LAYOUT_BREAK_LINES.has_key? first_char) && this_line.length >= 3 &&
-                (Compliance.markdown_syntax ? LayoutBreakLinePlusRx : LayoutBreakLineRx) =~ this_line
+                ((Compliance.markdown_syntax ? LayoutBreakLinePlusRx : LayoutBreakLineRx).match? this_line)
               block = Block.new(parent, LAYOUT_BREAK_LINES[first_char], :content_model => :empty)
               break
 
@@ -627,7 +627,7 @@ class Parser
             document.callouts.next_list
             break
 
-          elsif UnorderedListRx =~ this_line
+          elsif UnorderedListRx.match? this_line
             reader.unshift_line this_line
             block = next_outline_list(reader, :ulist, parent)
             if !style && Section === parent && parent.sectname == 'bibliography' &&
@@ -647,7 +647,7 @@ class Parser
                 #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES[0]).to_s
                 attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || ORDERED_LIST_STYLES[0]).to_s
               else
-                attributes['style'] = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s] =~ marker } || ORDERED_LIST_STYLES[0]).to_s
+                attributes['style'] = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker } || ORDERED_LIST_STYLES[0]).to_s
               end
             end
             break
@@ -700,7 +700,7 @@ class Parser
           break_at_list = (skipped == 0 && in_list)
 
           # a literal paragraph is contiguous lines starting at least one space
-          if style != 'normal' && LiteralParagraphRx =~ this_line
+          if style != 'normal' && (LiteralParagraphRx.match? this_line)
             # So we need to actually include this one in the read_lines group
             reader.unshift_line this_line
             lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => text_only
@@ -1443,7 +1443,7 @@ class Parser
       # technically BlockAttributeLineRx only breaks if ensuing line is not a list item
       # which really means BlockAttributeLineRx only breaks if it's acting as a block delimiter
       # FIXME to be AsciiDoc compliant, we shouldn't break if style in attribute line is "literal" (i.e., [literal])
-      elsif list_type == :dlist && continuation != :active && BlockAttributeLineRx =~ this_line
+      elsif list_type == :dlist && continuation != :active && (BlockAttributeLineRx.match? this_line)
         break
       else
         if continuation == :active && !this_line.empty?
@@ -1451,7 +1451,7 @@ class Parser
           # two entry points into one)
           # if we don't process it as a whole, then a line in it that looks like a
           # list item will throw off the exit from it
-          if LiteralParagraphRx =~ this_line
+          if LiteralParagraphRx.match? this_line
             reader.unshift_line this_line
             buffer.concat reader.read_lines_until(
                 :preserve_last_line => true,
@@ -1463,10 +1463,10 @@ class Parser
             }
             continuation = :inactive
           # let block metadata play out until we find the block
-          elsif BlockTitleRx =~ this_line || BlockAttributeLineRx =~ this_line || AttributeEntryRx =~ this_line
+          elsif (BlockTitleRx.match? this_line) || (BlockAttributeLineRx.match? this_line) || (AttributeEntryRx.match? this_line)
             buffer << this_line
           else
-            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line }
+            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line }
               within_nested_list = true
               if nested_list_type == :dlist && $~[3].nil_or_empty?
                 # get greedy again
@@ -1505,7 +1505,7 @@ class Parser
                 end
               # slurp up any literal paragraph offset by blank lines
               # NOTE we have to check for indented list items first
-              elsif LiteralParagraphRx =~ this_line
+              elsif LiteralParagraphRx.match? this_line
                 reader.unshift_line this_line
                 buffer.concat reader.read_lines_until(
                     :preserve_last_line => true,
@@ -1636,7 +1636,7 @@ class Parser
   # returns the section level if the Reader is positioned at a section title,
   # false otherwise
   def self.is_next_line_section?(reader, attributes)
-    if !(val = attributes[1]).nil? && ((ord_0 = val[0].ord) == 100 || ord_0 == 102) && FloatingTitleStyleRx =~ val
+    if !(val = attributes[1]).nil? && ((ord_0 = val[0].ord) == 100 || ord_0 == 102) && (FloatingTitleStyleRx.match? val)
       return false
     end
     return false unless reader.has_more_lines?
@@ -1682,7 +1682,7 @@ class Parser
 
   def self.is_two_line_section_title?(line1, line2)
     if line1 && line2 && SECTION_LEVELS.has_key?(line2.chr) &&
-        SetextSectionLineRx =~ line2 && SetextSectionTitleRx =~ line1 &&
+        (SetextSectionLineRx.match? line2) && (SetextSectionTitleRx.match? line1) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
       section_level line2
@@ -1755,7 +1755,7 @@ class Parser
         end
       end
     elsif Compliance.underline_style_section_titles
-      if (line2 = reader.peek_line(true)) && SECTION_LEVELS.has_key?(line2.chr) && SetextSectionLineRx =~ line2 &&
+      if (line2 = reader.peek_line(true)) && (SECTION_LEVELS.key? line2.chr) && (SetextSectionLineRx.match? line2) &&
         (name_match = SetextSectionTitleRx.match(line1)) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
@@ -2034,7 +2034,7 @@ class Parser
     if (commentish = next_line.start_with?('//')) && (match = CommentBlockRx.match(next_line))
       terminator = match[0]
       reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :skip_processing => true)
-    elsif commentish && CommentLineRx =~ next_line
+    elsif commentish && (CommentLineRx.match? next_line)
       # do nothing, we'll skip it
     elsif !options[:text] && next_line.start_with?(':') && (match = AttributeEntryRx.match(next_line))
       process_attribute_entry(reader, parent, attributes, match)
@@ -2192,7 +2192,7 @@ class Parser
   #
   # Returns the String of the first marker in this number series
   def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
-    number_style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s] =~ marker }
+    number_style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker }
     expected = actual = nil
     case number_style
       when :arabic

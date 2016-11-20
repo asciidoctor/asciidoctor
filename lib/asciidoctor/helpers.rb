@@ -133,7 +133,7 @@ module Helpers
   #
   # returns true if the String is a URI, false if it is not
   def self.uriish? str
-    (str.include? ':') && UriSniffRx =~ str
+    (str.include? ':') && (UriSniffRx.match? str)
   end
 
   # Public: Efficiently retrieves the URI prefix of the specified String
