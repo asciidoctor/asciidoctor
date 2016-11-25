@@ -878,6 +878,34 @@ after: {counter:mycounter}
       assert_xpath '//p[text()="before: 1 2 3"]', output, 1
       assert_xpath '//p[text()="after: 1"]', output, 1
     end
+
+    test 'nested document should use counter from parent document' do
+      input = <<-EOS
+.Title for Foo
+image::foo.jpg[]
+
+[cols="2*a"]
+|===
+|
+.Title for Bar
+image::bar.jpg[]
+
+|
+.Title for Baz
+image::baz.jpg[]
+|===
+
+.Title for Qux
+image::qux.jpg[]
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//div[@class="title"]', output, 4
+      assert_xpath '//div[@class="title"][text() = "Figure 1. Title for Foo"]', output, 1
+      assert_xpath '//div[@class="title"][text() = "Figure 2. Title for Bar"]', output, 1
+      assert_xpath '//div[@class="title"][text() = "Figure 3. Title for Baz"]', output, 1
+      assert_xpath '//div[@class="title"][text() = "Figure 4. Title for Qux"]', output, 1
+    end
   end
 
   context 'Block attributes' do
