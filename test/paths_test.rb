@@ -95,6 +95,10 @@ context 'Path Resolver' do
       assert_equal 'assets/images', @resolver.web_path('assets\\images')
       assert_equal '../assets/images', @resolver.web_path('assets\\images', '..\\images\\..')
     end
+
+    test 'URL encode spaces in path' do
+      assert_equal 'assets%20and%20stuff/lots%20of%20images', @resolver.web_path('lots of images', 'assets and stuff')
+    end
   end
 
   context 'System Paths' do

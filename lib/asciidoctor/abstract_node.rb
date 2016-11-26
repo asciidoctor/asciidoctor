@@ -315,21 +315,22 @@ class AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
-    if (doc = @document).safe < SafeMode::SECURE && doc.attr?('data-uri')
+    if (doc = @document).safe < SafeMode::SECURE && (doc.attr? 'data-uri')
       if (Helpers.uriish? target_image) ||
-          (asset_dir_key && (images_base = doc.attr(asset_dir_key)) && (Helpers.uriish? images_base) &&
-          (target_image = normalize_web_path(target_image, images_base, false)))
-        if doc.attr?('allow-uri-read')
-          generate_data_uri_from_uri target_image, doc.attr?('cache-uri')
+          (asset_dir_key && (images_base = doc.attr asset_dir_key) && (Helpers.uriish? images_base) &&
+          (target_image = normalize_web_path target_image, images_base, false))
+        if doc.attr? 'allow-uri-read'
+          generate_data_uri_from_uri target_image, (doc.attr? 'cache-uri')
         else
-          (target_image.include? ' ') ? (target_image.gsub ' ', '%20') : target_image
+          target_image
         end
       else
         generate_data_uri target_image, asset_dir_key
       end
+    elsif asset_dir_key
+      normalize_web_path target_image, (doc.attr asset_dir_key)
     else
-      target_image = normalize_web_path target_image, (asset_dir_key ? doc.attr(asset_dir_key) : nil)
-      (target_image.include? ' ') ? (target_image.gsub ' ', '%20') : target_image
+      normalize_web_path target_image
     end
   end
 
@@ -482,9 +483,9 @@ class AbstractNode
     end
   end
 
-  # Public: Normalize the web page using the PathResolver.
+  # Public: Normalize the web path using the PathResolver.
   #
-  # See {PathResolver#web_path} for details.
+  # See {PathResolver#web_path} for details about path resolution and encoding.
   #
   # target              - the String target path
   # start               - the String start (i.e, parent) path (optional, default: nil)
