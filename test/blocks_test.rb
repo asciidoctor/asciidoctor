@@ -1562,6 +1562,17 @@ image::images/tiger.png[A [Bengal\\] Tiger]
       assert_equal 'A [Bengal] Tiger', img.attr('alt').value
     end
 
+    test 'can render block image with target containing spaces' do
+      input = <<-EOS
+image::images/big tiger.png[A Big Tiger]
+      EOS
+
+      output = render_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'images/big%20tiger.png', img.attr('src').value
+      assert_equal 'A Big Tiger', img.attr('alt').value
+    end
+
     test 'can render block image with alt text defined in block attribute above macro' do
       input = <<-EOS
 [Tiger]

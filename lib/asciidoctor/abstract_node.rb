@@ -322,13 +322,14 @@ class AbstractNode
         if doc.attr?('allow-uri-read')
           generate_data_uri_from_uri target_image, doc.attr?('cache-uri')
         else
-          target_image
+          (target_image.include? ' ') ? (target_image.gsub ' ', '%20') : target_image
         end
       else
         generate_data_uri target_image, asset_dir_key
       end
     else
-      normalize_web_path target_image, (asset_dir_key ? doc.attr(asset_dir_key) : nil)
+      target_image = normalize_web_path target_image, (asset_dir_key ? doc.attr(asset_dir_key) : nil)
+      (target_image.include? ' ') ? (target_image.gsub ' ', '%20') : target_image
     end
   end
 
