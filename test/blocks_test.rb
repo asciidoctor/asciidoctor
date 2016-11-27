@@ -1656,7 +1656,7 @@ image::images/tiger.png[Tiger]
 
     test 'can align image in DocBook backend' do
       input = <<-EOS
-image::images/sunset.jpg[Sunset, align="right"]
+image::images/sunset.jpg[Sunset,align=right]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
@@ -1664,36 +1664,55 @@ image::images/sunset.jpg[Sunset, align="right"]
       assert_xpath '//imagedata[@align="right"]', output, 1
     end
 
-    test 'can scale image in DocBook backend' do
+    test 'should set content width and depth in DocBook backend if no scaling' do
       input = <<-EOS
-image::images/sunset.jpg[Sunset, scale="200"]
+image::images/sunset.jpg[Sunset,500,332]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
       assert_xpath '//imagedata', output, 1
-      assert_xpath '//imagedata[@scale="200"]', output, 1
+      assert_xpath '//imagedata[@contentwidth="500"]', output, 1
+      assert_xpath '//imagedata[@contentdepth="332"]', output, 1
+      assert_xpath '//imagedata[@width]', output, 0
+      assert_xpath '//imagedata[@depth]', output, 0
     end
 
-    test 'can scale image width in DocBook backend' do
+    test 'can scale image in DocBook backend' do
       input = <<-EOS
-image::images/sunset.jpg[Sunset, scaledwidth="25%"]
+image::images/sunset.jpg[Sunset,500,332,scale=200]
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      warn output
+      assert_xpath '//imagedata', output, 1
+      assert_xpath '//imagedata[@scale="200"]', output, 1
+      assert_xpath '//imagedata[@width]', output, 0
+      assert_xpath '//imagedata[@depth]', output, 0
+      assert_xpath '//imagedata[@contentwidth]', output, 0
+      assert_xpath '//imagedata[@contentdepth]', output, 0
+    end
+
+    test 'scale image width in DocBook backend' do
+      input = <<-EOS
+image::images/sunset.jpg[Sunset,500,332,scaledwidth=25%]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@width="25%"]', output, 1
-      assert_xpath '//imagedata[@scalefit="1"]', output, 1
+      assert_xpath '//imagedata[@depth]', output, 0
+      assert_xpath '//imagedata[@contentwidth]', output, 0
+      assert_xpath '//imagedata[@contentdepth]', output, 0
     end
 
     test 'adds % to scaled width if no units given in DocBook backend ' do
       input = <<-EOS
-image::images/sunset.jpg[Sunset, scaledwidth="25"]
+image::images/sunset.jpg[Sunset,scaledwidth=25]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@width="25%"]', output, 1
-      assert_xpath '//imagedata[@scalefit="1"]', output, 1
     end
 
     test 'keeps line unprocessed if image target is missing attribute reference and attribute-missing is skip' do

@@ -193,17 +193,27 @@ module Asciidoctor
     end
 
     def image node
-      width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : nil
-      depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : nil
-      # FIXME if scaledwidth is set, we should remove width & depth
-      # See http://www.docbook.org/tdg/en/html/imagedata.html#d0e92271 for details
-      swidth_attribute = (node.attr? 'scaledwidth') ? %( width="#{node.attr 'scaledwidth'}" scalefit="1") : nil
-      scale_attribute = (node.attr? 'scale') ? %( scale="#{node.attr 'scale'}") : nil
+      # NOTE according to the DocBook spec, content area, scaling, and scaling to fit are mutually exclusive
+      # See http://tdg.docbook.org/tdg/4.5/imagedata-x.html#d0e79635
+      if node.attr? 'scaledwidth'
+        width_attribute = %( width="#{node.attr 'scaledwidth'}")
+        depth_attribute = nil
+        scale_attribute = nil
+      elsif node.attr? 'scale'
+        # QUESTION should we set the viewport using width and depth? (the scaled image would be contained within this box)
+        #width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
+        #depth_attribute = (node.attr? 'height') ? %( depth="#{node.attr 'height'}") : nil
+        scale_attribute = %( scale="#{node.attr 'scale'}")
+      else
+        width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : nil
+        depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : nil
+        scale_attribute = nil
+      end
       align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : nil
 
       mediaobject = %(<mediaobject>
 <imageobject>
-<imagedata fileref="#{node.image_uri(node.attr 'target')}"#{width_attribute}#{depth_attribute}#{swidth_attribute}#{scale_attribute}#{align_attribute}/>
+<imagedata fileref="#{node.image_uri(node.attr 'target')}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}/>
 </imageobject>
 <textobject><phrase>#{node.attr 'alt'}</phrase></textobject>
 </mediaobject>)
