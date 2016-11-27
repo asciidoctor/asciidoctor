@@ -101,6 +101,22 @@ context 'Invoker' do
     end
   end
 
+  test 'should accept input from named pipe and output to stdout' do
+    sample_inpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample-pipe.adoc'))
+    begin
+      %x(mkfifo #{sample_inpath})
+      write_thread = Thread.new do
+        ::File.write sample_inpath, 'pipe content'
+      end
+      invoker = invoke_cli_to_buffer %w(-a stylesheet!), sample_inpath
+      result = invoker.read_output
+      assert_match(/pipe content/, result)
+      write_thread.join
+    ensure
+      ::FileUtils.rm_f sample_inpath
+    end
+  end if RUBY_MIN_VERSION_1_9 && !windows?
+
   test 'should allow docdir to be specified when input is a string' do
     expected_docdir = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures'))
     invoker = invoke_cli_to_buffer(%w(-s --base-dir test/fixtures -o /dev/null), '-') { 'content' }

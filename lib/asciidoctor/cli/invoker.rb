@@ -7,7 +7,7 @@ module Asciidoctor
       attr_reader :documents
       attr_reader :code
 
-      def initialize(*options)
+      def initialize *options
         @documents = []
         @out = nil
         @err = nil
@@ -36,7 +36,7 @@ module Asciidoctor
         opts = {}
         infiles = []
         outfile = nil
-        tofile = nil
+        err = @err || $stderr
         show_timings = false
 
         @options.map do |key, val|
@@ -53,7 +53,7 @@ module Asciidoctor
           when :timings
             show_timings = val
           when :trace
-            # currently, nothing
+            # currently does nothing
           when :verbose
             case val
             when 0
@@ -68,39 +68,44 @@ module Asciidoctor
           end
         end
 
-        stdin = infiles.size == 1 && infiles[0] == '-'
-        # NOTE if infile is stdin, default to outfile as stout
-        if outfile == '-' || (!outfile && stdin)
-          tofile = @out || $stdout
+        stdin = if infiles.size == 1
+          if (infile0 = infiles[0]) == '-'
+            outfile ||= infile0
+            true
+          elsif ::File.pipe? infile0
+            outfile ||= '-'
+            nil
+          end
+        end
+
+        tofile = if outfile == '-'
+          @out || $stdout
         elsif outfile
-          tofile = outfile
           opts[:mkdirs] = true
+          outfile
         else
-          # automatically calculate outfile based on infile unless to_dir is set
-          tofile = nil
           opts[:mkdirs] = true
+          nil # automatically calculate outfile based on infile
         end
 
         if stdin
           # allows use of block to supply stdin, particularly useful for tests
           input = block_given? ? yield : STDIN
-          # NOTE processor will dup options internally
-          input_opts = tofile.nil? ? opts : opts.merge(:to_file => tofile)
+          input_opts = opts.merge :to_file => tofile
           if show_timings
-            @documents << ::Asciidoctor.convert(input, input_opts.merge(:timings => (timings = Timings.new)))
-            timings.print_report((@err || $stderr), '-')
+            @documents << (::Asciidoctor.convert input, (input_opts.merge :timings => (timings = Timings.new)))
+            timings.print_report err, '-'
           else
-            @documents << ::Asciidoctor.convert(input, input_opts)
+            @documents << (::Asciidoctor.convert input, input_opts)
           end
         else
-          infiles.each do |infile|
-            # NOTE processor will dup options internally
-            input_opts = tofile.nil? ? opts : opts.merge(:to_file => tofile)
+          infiles.each do |input|
+            input_opts = opts.merge :to_file => tofile
             if show_timings
-              @documents << ::Asciidoctor.convert_file(infile, input_opts.merge(:timings => (timings = Timings.new)))
-              timings.print_report((@err || $stderr), infile)
+              @documents << (::Asciidoctor.convert_file input, (input_opts.merge :timings => (timings = Timings.new)))
+              timings.print_report err, input
             else
-              @documents << ::Asciidoctor.convert_file(infile, input_opts)
+              @documents << (::Asciidoctor.convert_file input, input_opts)
             end
           end
         end
@@ -108,13 +113,12 @@ module Asciidoctor
         if ::SignalException === e
           @code = e.signo
           # add extra endline if Ctrl+C is used
-          (@err || $stderr).puts if ::Interrupt === e
+          err.puts if ::Interrupt === e
         else
           @code = (e.respond_to? :status) ? e.status : 1
           if @options[:trace]
             raise e
           else
-            err = (@err || $stderr)
             if ::RuntimeError === e
               err.puts %(#{e.message} (#{e.class}))
             else
@@ -132,7 +136,7 @@ module Asciidoctor
         @documents[0]
       end
 
-      def redirect_streams(out, err = nil)
+      def redirect_streams out, err = nil
         @out = out
         @err = err
       end
