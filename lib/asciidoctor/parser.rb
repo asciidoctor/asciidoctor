@@ -907,11 +907,9 @@ class Parser
         attributes['alt'] ||= Helpers.basename(resolved_target, true).tr('_-', ' ')
         attributes['alt'] = block.sub_specialchars attributes['alt']
         block.assign_caption attributes.delete('caption'), 'figure'
-        if (scaledwidth = attributes['scaledwidth'])
-          # append % to scaledwidth if ends in number (no units present)
-          if (48..57).include?((scaledwidth[-1] || 0).ord)
-            attributes['scaledwidth'] = %(#{scaledwidth}%)
-          end
+        unless (scaledwidth = attributes.delete 'scaledwidth').nil_or_empty?
+          # append % to scaledwidth if it ends with a number (no units present)
+          attributes['scaledwidth'] = ((48..57).include? scaledwidth[-1].ord) ? %(#{scaledwidth}%) : scaledwidth
         end
       else
         block.caption ||= attributes.delete('caption')
