@@ -455,6 +455,15 @@ context "Parser" do
     assert_equal 'John Smith', metadata['author_2']
   end
 
+  test 'parse name with more than 3 parts in author attribute' do
+    doc = empty_document
+    metadata, _ = parse_header_metadata ':author: Leroy  Harold  Scherer,  Jr.', doc
+    assert_equal 'Leroy Harold Scherer, Jr.', doc.attributes['author']
+    assert_equal 'Leroy', doc.attributes['firstname']
+    assert_equal 'Harold', doc.attributes['middlename']
+    assert_equal 'Scherer, Jr.', doc.attributes['lastname']
+  end
+
   test "parse rev number date remark" do
     input = <<-EOS
 Ryan Waldron
@@ -591,12 +600,11 @@ v0.0.7, 2013-12-18
     assert_equal '2013-12-18', metadata['revdate']
   end
 
-  test "attribute entry overrides generated author initials" do
-    blankdoc = Asciidoctor::Document.new
-    reader = Asciidoctor::Reader.new "Stuart Rackham <founder@asciidoc.org>\n:Author Initials: SJR".lines.entries
-    metadata = Asciidoctor::Parser.parse_header_metadata(reader, blankdoc)
+  test 'attribute entry overrides generated author initials' do
+    doc = empty_document
+    metadata, _ = parse_header_metadata %(Stuart Rackham <founder@asciidoc.org>\n:Author Initials: SJR), doc
     assert_equal 'SR', metadata['authorinitials']
-    assert_equal 'SJR', blankdoc.attributes['authorinitials']
+    assert_equal 'SJR', doc.attributes['authorinitials']
   end
 
   test 'adjust indentation to 0' do
