@@ -19,8 +19,8 @@ Gem::Specification.new do |s|
   end
   s.files = files.grep(/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|(?:CHANGELOG|CONTRIBUTING|LICENSE|README(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/)
   s.executables = files.grep(/^bin\//).map {|f| File.basename f }
-  s.test_files = files.grep(/^(?:test\/.*_test\.rb|features\/.*\.(?:feature|rb))$/)
   s.require_paths = ['lib']
+  s.test_files = files.grep(/^(?:(?:features|test)\/.+)$/)
   s.has_rdoc = true
   s.rdoc_options = ['--charset=UTF-8']
   s.extra_rdoc_files = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE.adoc']
