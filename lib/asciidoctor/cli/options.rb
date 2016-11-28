@@ -179,7 +179,7 @@ Example: asciidoctor -b html5 source.asciidoc
         end
 
         infiles.each do |file|
-          unless file == '-' || (::File.file? file)
+          unless file == '-' || (::File.file? file) || (::File.pipe? file)
             if ::File.readable? file
               $stderr.puts %(asciidoctor: FAILED: input path #{file} is a #{(::File.stat file).ftype}, not a file)
             else
