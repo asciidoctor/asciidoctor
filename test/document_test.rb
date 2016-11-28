@@ -1934,6 +1934,28 @@ chapter body
       assert_equal '_first_chapter', id_attr.value
     end
 
+    test 'adds a front and back cover image to DocBook 5 when doctype is book' do
+      input = <<-EOS
+= Title
+:doctype: book
+:imagesdir: images
+:front-cover-image: image:front-cover.jpg[scaledwidth=210mm]
+:back-cover-image: image:back-cover.jpg[scaledwidth=210mm]
+
+preamble
+
+== First Chapter
+
+chapter body
+      EOS
+
+      result = render_string input, :attributes => {'backend' => 'docbook5'}
+      assert_xpath '//info/cover[@role="front"]', result, 1
+      assert_xpath '//info/cover[@role="front"]//imagedata[@fileref="images/front-cover.jpg"]', result, 1
+      assert_xpath '//info/cover[@role="back"]', result, 1
+      assert_xpath '//info/cover[@role="back"]//imagedata[@fileref="images/back-cover.jpg"]', result, 1
+    end
+
     test 'should be able to set backend using :backend option key' do
       doc = empty_document :backend => 'html5'
       assert_equal 'html5', doc.attributes['backend']

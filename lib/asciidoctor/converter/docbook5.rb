@@ -4,6 +4,8 @@ module Asciidoctor
   # similar to the docbook45 backend from AsciiDoc Python, but migrated to the
   # DocBook 5 specification.
   class Converter::DocBook5Converter < Converter::BuiltIn
+    ImageMacroRx = /^image::?(.+?)\[(.*?)\]$/
+
     def document node
       result = []
       if (root_tag_name = node.doctype) == 'manpage'
@@ -683,7 +685,7 @@ module Asciidoctor
     end
 
     def document_info_element doc, info_tag_prefix, use_info_tag_prefix = false
-      info_tag_prefix = '' unless use_info_tag_prefix
+      info_tag_prefix = nil unless use_info_tag_prefix
       result = []
       result << %(<#{info_tag_prefix}info>)
       result << document_title_tags(doc.doctitle :partition => true, :use_fallback => true) unless doc.notitle
@@ -712,6 +714,16 @@ module Asciidoctor
           result << %(<revremark>#{doc.attr 'revremark'}</revremark>) if doc.attr? 'revremark'
           result << %(</revision>
 </revhistory>)
+        end
+        unless use_info_tag_prefix
+          if (doc.attr? 'front-cover-image') || (doc.attr? 'back-cover-image')
+            if (back_cover_tag = cover_tag doc, 'back')
+              result << (cover_tag doc, 'front', true)
+              result << back_cover_tag
+            elsif (front_cover_tag = cover_tag doc, 'front')
+              result << front_cover_tag
+            end
+          end
         end
         unless (head_docinfo = doc.docinfo).empty?
           result << head_docinfo
@@ -758,6 +770,35 @@ module Asciidoctor
 
     def title_tag node, optional = true
       !optional || node.title? ? %(<title>#{node.title}</title>\n) : nil
+    end
+
+    def cover_tag doc, face, use_placeholder = false
+      if (cover_image = doc.attr %(#{face}-cover-image))
+        width_attr = nil
+        depth_attr = nil
+        if (cover_image.include? ':') && cover_image =~ ImageMacroRx
+          cover_image = doc.image_uri $1
+          unless $2.empty?
+            attrs = (AttributeList.new $2).parse ['alt', 'width', 'height']
+            if attrs.key? 'scaledwidth'
+              # NOTE scalefit="1" is the default in this case
+              width_attr = %( width="#{attrs['scaledwidth']}")
+            else
+              width_attr = %( contentwidth="#{attrs['width']}") if attrs.key? 'width'
+              depth_attr = %( contentdepth="#{attrs['height']}") if attrs.key? 'height'
+            end
+          end
+        end
+        %(<cover role="#{face}">
+<mediaobject>
+<imageobject>
+<imagedata fileref="#{cover_image}"#{width_attr}#{depth_attr}/>
+</imageobject>
+</mediaobject>
+</cover>)
+      elsif use_placeholder
+        %(<cover role="#{face}"/>)
+      end
     end
   end
 end
