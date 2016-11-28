@@ -93,7 +93,7 @@ Example: asciidoctor -b html5 source.asciidoc
             if self[:template_dirs].nil?
               self[:template_dirs] = [template_dir]
             elsif ::Array === self[:template_dirs]
-              self[:template_dirs].push template_dir
+              self[:template_dirs] << template_dir
             else
               self[:template_dirs] = [self[:template_dirs], template_dir]
             end
@@ -153,7 +153,7 @@ Example: asciidoctor -b html5 source.asciidoc
 
         # shave off the file to process so that options errors appear correctly
         if args.size == 1 && args[0] == '-'
-          infiles.push args.pop
+          infiles << args.pop
         elsif
           args.each do |file|
             if file == '-' || (file.start_with? '-')

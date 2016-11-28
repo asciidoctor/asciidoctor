@@ -391,7 +391,7 @@ class PathResolver
           resolved_segments.pop
         end
       else
-        resolved_segments.push segment
+        resolved_segments << segment
       end
     end
 

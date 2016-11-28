@@ -1136,7 +1136,7 @@ module Substitutors
       lines = (text.split EOL)
       return text if lines.size == 1
       last = lines.pop
-      lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).convert }.push(last) * EOL
+      (lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).convert } << last) * EOL
     elsif text.include? '+'
       text.gsub(LineBreakRx) { Inline.new(self, :break, $~[1], :type => :line).convert }
     else
@@ -1290,7 +1290,7 @@ module Substitutors
         case c
         when ','
           if quote_open
-            current.push c
+            current << c
           else
             values << current.join.strip
             current = []
@@ -1298,7 +1298,7 @@ module Substitutors
         when '"'
           quote_open = !quote_open
         else
-          current.push c
+          current << c
         end
       end
 

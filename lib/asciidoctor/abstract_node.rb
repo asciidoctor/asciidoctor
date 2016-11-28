@@ -224,7 +224,7 @@ class AbstractNode
   # Public: A convenience method that adds the given role directly to this node
   def add_role(name)
     unless (roles = (@attributes['role'] || '').split(' ')).include? name
-      @attributes['role'] = roles.push(name) * ' '
+      @attributes['role'] = (roles << name) * ' '
     end
   end
 

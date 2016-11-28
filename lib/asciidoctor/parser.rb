@@ -1937,10 +1937,9 @@ class Parser
 
       segments = nil
       if names_only
-        # splitting on ' ' collapses repeating spaces uniformly
-        # `split ' ', 3` causes odd behavior in Opal; see https://github.com/asciidoctor/asciidoctor.js/issues/159
-        if (segments = author_entry.split ' ').size > 3
-          segments = segments[0..1].push(segments[2..-1].join ' ')
+        # NOTE split names and collapse repeating spaces
+        if (segments = author_entry.split ' ', 3).size == 3
+          segments << (segments.pop.tr_s ' ', ' ')
         end
       elsif (match = AuthorInfoLineRx.match(author_entry))
         segments = match.to_a
@@ -2554,8 +2553,7 @@ class Parser
         else
           case type
           when :role, :option
-            parsed[type] ||= []
-            parsed[type].push collector.join
+            (parsed[type] ||= []) << collector.join
           when :id
             if parsed.has_key? :id
               warn %(asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} multiple ids detected in style attribute)
@@ -2580,7 +2578,7 @@ class Parser
             type = :option
           end
         else
-          collector.push c
+          collector << c
         end
       end
 

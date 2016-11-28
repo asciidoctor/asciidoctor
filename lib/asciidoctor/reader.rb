@@ -913,11 +913,11 @@ class PreprocessorReader < Reader
                 inc_lineno += 1
                 take = inc_lines[0]
                 if ::Float === take && take.infinite?
-                  selected.push l
+                  selected << l
                   inc_line_offset = inc_lineno if inc_line_offset == 0
                 else
                   if f.lineno == take
-                    selected.push l
+                    selected << l
                     inc_line_offset = inc_lineno if inc_line_offset == 0
                     inc_lines.shift
                   end
@@ -954,7 +954,7 @@ class PreprocessorReader < Reader
                   if tl.end_with?(%(end::#{active_tag}[]))
                     active_tag = nil
                   else
-                    selected.push l unless (tl.end_with? '[]') && (TagDirectiveRx.match? tl)
+                    selected << l unless (tl.end_with? '[]') && (TagDirectiveRx.match? tl)
                     inc_line_offset = inc_lineno if inc_line_offset == 0
                   end
                 else
@@ -1049,11 +1049,11 @@ class PreprocessorReader < Reader
       if attributes.has_key? 'leveloffset'
         @lines.unshift ''
         @lines.unshift %(:leveloffset: #{attributes['leveloffset']})
-        @lines.push ''
+        @lines << ''
         if (old_leveloffset = @document.attr 'leveloffset')
-          @lines.push %(:leveloffset: #{old_leveloffset})
+          @lines << %(:leveloffset: #{old_leveloffset})
         else
-          @lines.push ':leveloffset!:'
+          @lines << ':leveloffset!:'
         end
         # compensate for these extra lines
         @lineno -= 2
@@ -1113,7 +1113,7 @@ class PreprocessorReader < Reader
       data.shift
       @lineno += 1 if increment_linenos
       while !data.empty? && data[0] != '---'
-        front_matter.push data.shift
+        front_matter << data.shift
         @lineno += 1 if increment_linenos
       end
 
