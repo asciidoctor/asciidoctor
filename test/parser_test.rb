@@ -457,7 +457,7 @@ context "Parser" do
 
   test 'parse name with more than 3 parts in author attribute' do
     doc = empty_document
-    metadata, _ = parse_header_metadata ':author: Leroy  Harold  Scherer,  Jr.', doc
+    parse_header_metadata ':author: Leroy  Harold  Scherer,  Jr.', doc
     assert_equal 'Leroy Harold Scherer, Jr.', doc.attributes['author']
     assert_equal 'Leroy', doc.attributes['firstname']
     assert_equal 'Harold', doc.attributes['middlename']

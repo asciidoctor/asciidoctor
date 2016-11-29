@@ -99,13 +99,13 @@ module Asciidoctor
             @documents << (::Asciidoctor.convert input, input_opts)
           end
         else
-          infiles.each do |input|
+          infiles.each do |infile|
             input_opts = opts.merge :to_file => tofile
             if show_timings
-              @documents << (::Asciidoctor.convert_file input, (input_opts.merge :timings => (timings = Timings.new)))
-              timings.print_report err, input
+              @documents << (::Asciidoctor.convert_file infile, (input_opts.merge :timings => (timings = Timings.new)))
+              timings.print_report err, infile
             else
-              @documents << (::Asciidoctor.convert_file input, input_opts)
+              @documents << (::Asciidoctor.convert_file infile, input_opts)
             end
           end
         end

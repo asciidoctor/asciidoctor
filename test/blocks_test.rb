@@ -1683,7 +1683,6 @@ image::images/sunset.jpg[Sunset,500,332,scale=200]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
-      warn output
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@scale="200"]', output, 1
       assert_xpath '//imagedata[@width]', output, 0
