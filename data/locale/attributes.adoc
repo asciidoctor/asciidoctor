@@ -469,3 +469,23 @@ ifeval::["{lang}" == "zh_TW"]
 :version-label: 版本
 :warning-caption: 警告
 endif::[]
+//
+// Ukrainian translation, courtesy of Kyrylo Yatsenko <hedrok@gmail.com>
+ifeval::["{lang}" == "uk"]
+:appendix-caption: Додаток
+:caution-caption: Обережно
+:example-caption: Приклад
+:figure-caption: Зображення
+:important-caption: Важливо
+:last-update-label: Востаннє оновлено
+//:listing-caption: Лістинг
+:manname-title: НАЗВА
+:note-caption: Зауваження
+//:preface-title: Передмова
+:table-caption: Таблиця
+:tip-caption: Підказка
+:toc-title: Зміст
+:untitled-label: Без назви
+:version-label: Версія
+:warning-caption: Попередження
+endif::[]
