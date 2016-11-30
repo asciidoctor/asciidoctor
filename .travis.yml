@@ -3,7 +3,7 @@ git:
   depth: 1
 language: ruby
 rvm:
-  - 2.3.1
+  - 2.3.3
   - 2.2.5
   - 2.1.10
   - 2.0.0
@@ -13,7 +13,12 @@ rvm:
   - jruby-9.1.2.0
   - jruby-19mode # based on jruby-1.7.19
   - jruby-18mode # based on jruby-1.7.19
-  #- rbx-3.60 # NOTE not working currently
+  #- rbx-3 # NOTE not working currently
+before_install: rvm list known
+env:
+  global:
+    # use system libraries to speed up installation of nokogiri
+    - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
 script: bundle exec rake coverage test:all
 notifications:
   email: false
