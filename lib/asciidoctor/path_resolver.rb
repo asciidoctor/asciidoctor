@@ -453,11 +453,11 @@ class PathResolver
       end
     end
 
-    if uri_prefix
-      %(#{uri_prefix}#{join_path resolved_segments, target_root})
-    else
-      join_path resolved_segments, target_root
+    if (resolved_path = join_path resolved_segments, target_root).include? ' '
+      resolved_path = resolved_path.gsub ' ', '%20'
     end
+
+    uri_prefix ? %(#{uri_prefix}#{resolved_path}) : resolved_path
   end
 
   # Public: Calculate the relative path to this absolute filename from the specified base directory
