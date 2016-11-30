@@ -38,12 +38,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake', '~> 10.0.0'
   s.add_development_dependency 'rspec-expectations', '~> 2.14.0'
   # slim is needed for testing custom templates
-  s.add_development_dependency 'slim', '~> 2.0.0'
+  s.add_development_dependency 'slim', '~> 3.0.0'
   s.add_development_dependency 'thread_safe', '~> 0.3.4'
   # tilt is needed for testing custom templates
   s.add_development_dependency 'tilt', '~> 2.0.0'
   s.add_development_dependency 'yard', '~> 0.8.7'
   s.add_development_dependency 'yard-tomdoc', '~> 0.7.0'
   s.add_development_dependency 'minitest', '~> 5.3.0'
-  s.add_development_dependency 'racc', '~> 1.4.10' if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
 end
