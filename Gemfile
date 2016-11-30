@@ -3,6 +3,11 @@ source 'https://rubygems.org'
 # Look in asciidoctor.gemspec for runtime and development dependencies
 gemspec
 
+group :development do
+  gem 'racc', '~> 1.4.10' if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
+  gem 'slim', '~> 2.0.0' unless (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '1.9.2')
+end
+
 # enable this group to use Guard for continuous testing
 # after removing comments, run `bundle install` then `guard` 
 #group :guardtest do
