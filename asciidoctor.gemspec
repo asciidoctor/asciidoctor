@@ -26,23 +26,23 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE.adoc']
 
   # asciimath is needed for testing AsciiMath in DocBook backend
-  s.add_development_dependency 'asciimath', '~> 1.0.2'
+  s.add_development_dependency 'asciimath', '~> 1.0.0'
   # coderay is needed for testing syntax highlighting
   s.add_development_dependency 'coderay', '~> 1.1.0'
-  s.add_development_dependency 'cucumber', '~> 1.3.1'
+  s.add_development_dependency 'cucumber', '~> 1.3.0'
   # erubis is needed for testing use of alternative eRuby impls
   s.add_development_dependency 'erubis', '~> 2.7.0'
   # haml is needed for testing custom templates
   s.add_development_dependency 'haml', '~> 4.0.0'
-  s.add_development_dependency 'nokogiri', '~> 1.5.10'
+  s.add_development_dependency 'nokogiri', '~> 1.5.0'
   s.add_development_dependency 'rake', '~> 10.0.0'
   s.add_development_dependency 'rspec-expectations', '~> 2.14.0'
   # slim is needed for testing custom templates
   s.add_development_dependency 'slim', '~> 3.0.0'
-  s.add_development_dependency 'thread_safe', '~> 0.3.4'
+  s.add_development_dependency 'thread_safe', '~> 0.3.0'
   # tilt is needed for testing custom templates
   s.add_development_dependency 'tilt', '~> 2.0.0'
-  s.add_development_dependency 'yard', '~> 0.8.7'
+  s.add_development_dependency 'yard', '~> 0.8.7.0'
   s.add_development_dependency 'yard-tomdoc', '~> 0.7.0'
   s.add_development_dependency 'minitest', '~> 5.3.0'
 end

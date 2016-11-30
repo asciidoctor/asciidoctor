@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'racc', '~> 1.4.10' if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
+  gem 'racc', '~> 1.4.0' if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
   gem 'slim', '~> 2.0.0' unless (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '1.9.2')
 end
 
