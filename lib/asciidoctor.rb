@@ -1455,12 +1455,12 @@ module Asciidoctor
     elsif write_to_target
       if to_dir
         if to_file
-          options[:to_dir] = ::File.dirname ::File.expand_path(::File.join to_dir, to_file)
+          options[:to_dir] = ::File.expand_path ::File.join to_dir, to_file, '..'
         else
           options[:to_dir] = ::File.expand_path to_dir
         end
       elsif to_file
-        options[:to_dir] = ::File.dirname ::File.expand_path to_file
+        options[:to_dir] = ::File.expand_path to_file, '..'
       end
     else
       options[:to_dir] = nil
