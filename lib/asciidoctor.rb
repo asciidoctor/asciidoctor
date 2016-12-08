@@ -1448,7 +1448,7 @@ module Asciidoctor
       options[:header_footer] = true if write_to_same_dir || write_to_target
     end
 
-    # NOTE at least make intended target directory available, if there is one
+    # NOTE outfile may be controlled by document attributes, so resolve outfile after loading
     if write_to_same_dir
       input_path = ::File.expand_path input.path
       options[:to_dir] = (outdir = ::File.dirname input_path)
@@ -1468,12 +1468,12 @@ module Asciidoctor
 
     doc = self.load input, options
 
-    if write_to_same_dir
+    if write_to_same_dir # write to file in same directory
       outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
       if outfile == input_path
         raise ::IOError, %(input file and output file cannot be the same: #{outfile})
       end
-    elsif write_to_target
+    elsif write_to_target # write to explicit file or directory
       working_dir = (options.key? :base_dir) ? (::File.expand_path options[:base_dir]) : (::File.expand_path ::Dir.pwd)
       # QUESTION should the jail be the working_dir or doc.base_dir???
       jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
@@ -1492,6 +1492,10 @@ module Asciidoctor
         outdir = ::File.dirname outfile
       end
 
+      if ::File === input && outfile == (::File.expand_path input.path)
+        raise ::IOError, %(input file and output file cannot be the same: #{outfile})
+      end
+
       unless ::File.directory? outdir
         if mkdirs
           Helpers.mkdir_p outdir
@@ -1500,7 +1504,7 @@ module Asciidoctor
           raise ::IOError, %(target directory does not exist: #{to_dir})
         end
       end
-    else
+    else # write to stream
       outfile = to_file
       outdir = nil
     end
