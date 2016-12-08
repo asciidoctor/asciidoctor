@@ -103,13 +103,13 @@ context 'Invoker' do
 
   test 'should fail if input file matches resolved output file' do
     invoker = invoke_cli_to_buffer %W(-a outfilesuffix=.asciidoc), 'sample.asciidoc'
-    assert_match /input file and output file cannot be the same/, invoker.read_error
+    assert_match(/input file and output file cannot be the same/, invoker.read_error)
   end
 
   test 'should fail if input file matches specified output file' do
     sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.asciidoc'))
     invoker = invoke_cli_to_buffer %W(-o #{sample_outpath}), 'sample.asciidoc'
-    assert_match /input file and output file cannot be the same/, invoker.read_error
+    assert_match(/input file and output file cannot be the same/, invoker.read_error)
   end
 
   test 'should accept input from named pipe and output to stdout' do
