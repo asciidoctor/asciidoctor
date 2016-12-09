@@ -343,6 +343,18 @@ preamble
       assert_equal 1, section_1.lineno
     end
 
+    test 'should allow sourcemap option on document to be modified' do
+      doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), :parse => false
+      doc.sourcemap = true
+      doc = doc.parse
+
+      section_1 = doc.sections[0]
+      assert_equal 'Section A', section_1.title
+      refute_nil section_1.source_location
+      assert_equal 'sample.asciidoc', section_1.file
+      assert_equal 10, section_1.lineno
+    end
+
     test 'find_by should return Array of blocks anywhere in document tree that match criteria' do
       input = <<-EOS
 = Document Title
