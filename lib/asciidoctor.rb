@@ -99,7 +99,7 @@ module Asciidoctor
   module Compliance
     @keys = ::Set.new
     class << self
-      attr :keys
+      attr_reader :keys
     end
 
     # Defines a new compliance key and assigns an initial value.

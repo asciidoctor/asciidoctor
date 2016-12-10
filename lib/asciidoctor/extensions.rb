@@ -463,9 +463,9 @@ module Extensions
   #--
   # QUESTION call this ExtensionInfo?
   class Extension
-    attr :kind
-    attr :config
-    attr :instance
+    attr_reader :kind
+    attr_reader :config
+    attr_reader :instance
 
     def initialize kind, instance, config
       @kind = kind
@@ -478,7 +478,7 @@ module Extensions
   # reference to the {Processor#process} method. By storing this reference, its
   # possible to accomodate both concrete extension implementations and Procs.
   class ProcessorExtension < Extension
-    attr :process_method
+    attr_reader :process_method
 
     def initialize kind, instance, process_method = nil
       super kind, instance, instance.config
