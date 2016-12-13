@@ -133,7 +133,7 @@ class Reader
     peek_line.nil_or_empty?
   end
 
-  # Public: Peek at the next line of source data. Processes the line, if not
+  # Public: Peek at the next line of source data. Processes the line if not
   # already marked as processed, but does not consume it.
   #
   # This method will probe the reader for more lines. If there is a next line
@@ -167,7 +167,7 @@ class Reader
     end
   end
 
-  # Public: Peek at the next multiple lines of source data. Processes the lines, if not
+  # Public: Peek at the next multiple lines of source data. Processes the lines if not
   # already marked as processed, but does not consume them.
   #
   # This method delegates to Reader#read_line to process and collect the line, then
@@ -252,8 +252,10 @@ class Reader
 
   # Public: Push the String line onto the beginning of the Array of source data.
   #
-  # Since this line was (assumed to be) previously retrieved through the
-  # reader, it is marked as seen.
+  # A line pushed on the reader using this method is not processed again. The
+  # method assumes the line was previously retrieved from the reader or does
+  # not otherwise contain preprocessor directives. Therefore, it is marked as
+  # processed immediately.
   #
   # line_to_restore - the line to restore onto the stack
   #
@@ -266,8 +268,10 @@ class Reader
 
   # Public: Push an Array of lines onto the front of the Array of source data.
   #
-  # Since these lines were (assumed to be) previously retrieved through the
-  # reader, they are marked as seen.
+  # Lines pushed on the reader using this method are not processed again. The
+  # method assumes the lines were previously retrieved from the reader or do
+  # not otherwise contain preprocessor directives. Therefore, they are marked
+  # as processed immediately.
   #
   # Returns nothing.
   def unshift_lines lines_to_restore
