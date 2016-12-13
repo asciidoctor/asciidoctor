@@ -300,8 +300,8 @@ class PathResolver
   # specified in the constructor.
   #
   # target - the String target path
-  # start  - the String start (i.e., parent) path
-  # jail   - the String jail path to confine the resolved path
+  # start  - the String start (i.e., parent) path (default: nil)
+  # jail   - the String jail path to confine the resolved path (default: nil)
   # opts   - an optional Hash of options to control processing (default: {}):
   #          * :recover is used to control whether the processor should auto-recover
   #              when an illegal path is encountered
@@ -310,7 +310,7 @@ class PathResolver
   # returns a String path that joins the target path with the start path with
   # any parent references resolved and self references removed and enforces
   # that the resolved path be contained within the jail, if provided
-  def system_path target, start, jail = nil, opts = {}
+  def system_path target, start = nil, jail = nil, opts = {}
     if jail
       unless is_root? jail
         raise ::SecurityError, %(Jail is not an absolute path: #{jail})
