@@ -185,6 +185,7 @@ context 'Path Resolver' do
       pwd = File.expand_path(Dir.pwd)
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', '')
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', nil)
+      assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png')
     end
 
     test 'resolves relative hidden target relative to current directory if start is empty' do
