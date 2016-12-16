@@ -1086,6 +1086,50 @@ text
       assert_nil doc.header
     end
 
+    test 'should enable compat mode for document with legacy doctitle' do
+      input = <<-EOS
+Document Title
+==============
+
++content+
+      EOS
+
+      doc = document_from_string input
+      assert(doc.attr? 'compat-mode')
+      result = doc.convert
+      assert_xpath '//code[text()="content"]', result, 1
+    end
+
+    test 'should not enable compat mode for document with legacy doctitle if compat mode disable by header' do
+      input = <<-EOS
+Document Title
+==============
+:compat-mode!:
+
++content+
+      EOS
+
+      doc = document_from_string input
+      assert_nil(doc.attr 'compat-mode')
+      result = doc.convert
+      assert_xpath '//code[text()="content"]', result, 0
+    end
+
+    test 'should not enable compat mode for document with legacy doctitle if compat mode is locked by API' do
+      input = <<-EOS
+Document Title
+==============
+
++content+
+      EOS
+
+      doc = document_from_string input, :attributes => { 'compat-mode' => nil }
+      assert(doc.attribute_locked? 'compat-mode')
+      assert_nil(doc.attr 'compat-mode')
+      result = doc.convert
+      assert_xpath '//code[text()="content"]', result, 0
+    end
+
     test 'title partition API with default separator' do
       title = Asciidoctor::Document::Title.new 'Main Title: And More: Subtitle'
       assert_equal 'Main Title: And More', title.main
@@ -1124,6 +1168,23 @@ content
       EOS
 
       doc = document_from_string input
+      title = doc.doctitle :partition => true, :sanitize => true
+      assert title.subtitle?
+      assert title.sanitized?
+      assert_equal 'Main Title', title.main
+      assert_equal 'Subtitle', title.subtitle
+    end
+
+    test 'should not honor custom separator for doctitle if attribute is locked by API' do
+      input = <<-EOS
+[separator=::]
+= Main Title - *Subtitle*
+Author Name
+
+content
+      EOS
+
+      doc = document_from_string input, :attributes => { 'title-separator' => ' -' }
       title = doc.doctitle :partition => true, :sanitize => true
       assert title.subtitle?
       assert title.sanitized?
