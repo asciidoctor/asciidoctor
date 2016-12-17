@@ -13,8 +13,8 @@ rvm:
   - jruby-9.1.2.0
   - jruby-19mode # based on jruby-1.7.19
   - jruby-18mode # based on jruby-1.7.19
-  #- rbx-3 # NOTE not working currently
-before_install: rvm list known
+  #- rbx-3 # NOTE not currently recognized
+#before_install: rvm list known
 env:
   global:
     # use system libraries to speed up installation of nokogiri
