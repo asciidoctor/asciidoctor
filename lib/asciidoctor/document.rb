@@ -821,14 +821,14 @@ class Document < AbstractBlock
   #
   # If the attribute is locked, false is returned. Otherwise, the value is
   # assigned to the attribute name after first performing attribute
-  # substitutions on the value. If the attribute name is 'backend', then the
-  # value of backend-related attributes are updated.
+  # substitutions on the value. If the attribute name is 'backend' or
+  # 'doctype', then the value of backend-related attributes are updated.
   #
   # name  - the String attribute name
-  # value - the String attribute value
+  # value - the String attribute value (default: '')
   #
   # returns true if the attribute was set, false if it was not set because it's locked
-  def set_attribute(name, value)
+  def set_attribute(name, value = '')
     if attribute_locked?(name)
       false
     else

@@ -1401,7 +1401,7 @@ module Substitutors
       unless (highlighter_loaded = defined? ::CodeRay) || @document.attributes['coderay-unavailable']
         if (Helpers.require_library 'coderay', true, :warn).nil?
           # prevent further attempts to load CodeRay
-          @document.set_attr 'coderay-unavailable', ''
+          @document.set_attr 'coderay-unavailable'
         else
           highlighter_loaded = true
         end
@@ -1410,7 +1410,7 @@ module Substitutors
       unless (highlighter_loaded = defined? ::Pygments) || @document.attributes['pygments-unavailable']
         if (Helpers.require_library 'pygments', 'pygments.rb', :warn).nil?
           # prevent further attempts to load Pygments
-          @document.set_attr 'pygments-unavailable', ''
+          @document.set_attr 'pygments-unavailable'
         else
           highlighter_loaded = true
         end

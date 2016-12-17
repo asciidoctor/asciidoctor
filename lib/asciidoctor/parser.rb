@@ -111,9 +111,9 @@ class Parser
         document.title = assigned_doctitle = doctitle
       end
       # default to compat-mode if document uses atx-style doctitle
-      document.set_attribute 'compat-mode', '' unless single_line
+      document.set_attr 'compat-mode' unless single_line || (document.attribute_locked? 'compat-mode')
       if (separator = block_attributes.delete 'separator')
-        document.set_attribute 'title-separator', separator
+        document.set_attr 'title-separator', separator unless document.attribute_locked? 'title-separator'
       end
       document.header.source_location = source_location if source_location
       document.attributes['doctitle'] = section_title = doctitle
