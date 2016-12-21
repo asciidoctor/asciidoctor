@@ -1582,7 +1582,7 @@ module Asciidoctor
   # Returns the Document object if the converted String is written to a
   # file, otherwise the converted String
   def convert_file filename, options = {}
-    ::File.open(filename) {|file| self.convert file, options }
+    ::File.open(filename.encode("utf-8")) {|file| self.convert file, options }
   end
 
   # Alias render_file to convert_file to maintain backwards compatibility
