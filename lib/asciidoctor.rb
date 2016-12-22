@@ -363,8 +363,8 @@ module Asciidoctor
       CC_EOL   = '(?=\\n|$)'
       CG_GRAPH = '[\\x21-\\x7E]' # non-blank character
       CC_ALL   = '[\s\S]' # any character, including newlines (alternatively, [^])
-      CC_WORD  = 'a-zA-Z0-9_'
-      CG_WORD  = '[a-zA-Z0-9_]'
+      CC_WORD  = 'a-zA-Z0-9_\u3041-\u3096\u30A1-\u30FC\u4E00-\u9F00'
+      CG_WORD  = '[a-zA-Z0-9_\u3041-\u3096\u30A1-\u30FC\u4E00-\u9F00]'
     # character classes for the Regexp engine in Ruby >= 2 (Ruby 1.9 supports \p{} but has problems w/ encoding)
     elsif ::RUBY_MIN_VERSION_2
       CC_ALPHA = CG_ALPHA = '\p{Alpha}'
