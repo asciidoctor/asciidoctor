@@ -87,7 +87,7 @@ class Table < AbstractBlock
     @attributes['tablepcwidth'] = pcwidth_intval
 
     if @document.attributes.key? 'pagewidth'
-      # FIXME calculate more accurately; don't use round (only used in DocBook output)
+      # FIXME calculate more accurately (only used in DocBook output)
       @attributes['tableabswidth'] ||=
           ((@attributes['tablepcwidth'].to_f / 100) * @document.attributes['pagewidth']).round
     end
@@ -144,11 +144,13 @@ class Table < AbstractBlock
 
     # donate balance, if any, to final column (using half up rounding)
     unless total_width == 100
-      numerator = (raw_numerator = (100 - total_width + col_pcwidth) * pf).to_i
-      numerator += 1 if raw_numerator >= numerator + 0.5
-      @columns[-1].assign_width numerator / pf
+      @columns[-1].assign_width(((100 - total_width + col_pcwidth) * pf).round / pf)
+      # or (manual half up rounding)...
+      #numerator = (raw_numerator = (100 - total_width + col_pcwidth) * pf).to_i
+      #numerator += 1 if raw_numerator >= numerator + 0.5
+      #@columns[-1].assign_width numerator / pf
       # or...
-      #@columns[-1].assign_width((100 - total_width + col_pcwidth).round 4, half: :up)
+      #@columns[-1].assign_width((100 - total_width + col_pcwidth).round 4)
     end
 
     nil
@@ -214,7 +216,7 @@ class Table::Column < AbstractNode
     end
     @attributes['colpcwidth'] = col_pcwidth
     if parent.attributes.key? 'tableabswidth'
-      # FIXME calculate more accurately; don't use round (only used in DocBook output)
+      # FIXME calculate more accurately (only used in DocBook output)
       @attributes['colabswidth'] = ((col_pcwidth / 100.0) * parent.attributes['tableabswidth']).round
     end
     col_pcwidth
