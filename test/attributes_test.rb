@@ -350,6 +350,12 @@ content
       assert doc.attributes.has_key? 'basebackend-html'
     end
 
+    test 'set_attr should set value to empty string if no value is specified' do
+      node = Asciidoctor::Block.new nil, :paragraph, :attributes => {}
+      node.set_attr 'foo'
+      assert_equal '', (node.attr 'foo')
+    end
+
     test 'set_attr should not overwrite existing key if overwrite is false' do
       node = Asciidoctor::Block.new nil, :paragraph, :attributes => { 'foo' => 'bar' }
       assert_equal 'bar', (node.attr 'foo')
