@@ -383,6 +383,31 @@ content
       assert_xpath '//a[@href="https://google.com"]', output, 1
     end
 
+    test 'set_attribute should set attribute if key is not locked' do
+      doc = empty_document
+      assert !(doc.attr? 'foo')
+      res = doc.set_attribute 'foo', 'baz'
+      assert res
+      assert_equal 'baz', (doc.attr 'foo')
+    end
+
+    test 'set_attribute should not set key if key is locked' do
+      doc = empty_document :attributes => { 'foo' => 'bar' }
+      assert_equal 'bar', (doc.attr 'foo')
+      res = doc.set_attribute 'foo', 'baz'
+      assert !res
+      assert_equal 'bar', (doc.attr 'foo')
+    end
+
+    test 'set_attribute should update backend attributes' do
+      doc = empty_document :attributes => { 'backend' => 'html5@' }
+      assert_equal '', (doc.attr 'backend-html5')
+      res = doc.set_attribute 'backend', 'docbook5'
+      assert res
+      assert !(doc.attr? 'backend-html5')
+      assert_equal '', (doc.attr 'backend-docbook5')
+    end
+
     test 'verify toc attribute matrix' do
       expected_data = <<-EOS
 #attributes                               |toc|toc-position|toc-placement|toc-class
