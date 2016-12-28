@@ -92,6 +92,17 @@ module Extensions
       raise ::NotImplementedError
     end
 
+    # QUESTION should attributes be an option instead of a parameter?
+    def create_section parent, title, attrs, opts = {}
+      doc = parent.document
+      id = attrs.delete 'id'
+      sect = Section.new parent, opts[:level], (opts.fetch :numbered, (doc.attr? 'sectnums')), { :attributes => attrs }.merge(opts)
+      sect.title = title
+      # NOTE set id attribute to false to disable id assignment
+      sect.id = sect.attributes['id'] = id || (id.nil? ? (Section.generate_id sect.title, doc) : nil)
+      sect
+    end
+
     def create_block parent, context, source, attrs, opts = {}
       Block.new parent, context, { :source => source, :attributes => attrs }.merge(opts)
     end
