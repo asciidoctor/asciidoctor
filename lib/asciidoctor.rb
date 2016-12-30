@@ -1321,7 +1321,7 @@ module Asciidoctor
       # hold off on setting infile and indir until we get a better sense of their purpose
       attributes['docfile'] = input_path
       attributes['docdir'] = ::File.dirname input_path
-      attributes['docname'] = Helpers.basename input_path, true
+      attributes['docname'] = Helpers.basename input_path, (attributes['docfilesuffix'] = ::File.extname input_path)
       docdate = (attributes['docdate'] ||= input_mtime.strftime('%Y-%m-%d'))
       doctime = (attributes['doctime'] ||= input_mtime.strftime('%H:%M:%S %Z'))
       attributes['docdatetime'] = %(#{docdate} #{doctime})
