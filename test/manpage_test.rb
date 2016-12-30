@@ -215,4 +215,17 @@ T}
     end
   end
 
+  context 'Escaped commands' do
+    test 'should preserve inline breaks' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+Before break. +
+After break.)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal 'Before break.
+.br
+After break.', output.lines.entries[-3..-1].join
+    end
+  end
+
 end
