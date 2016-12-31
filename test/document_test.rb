@@ -123,6 +123,7 @@ context 'Document' do
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
+      assert_equal '.asciidoc', doc.attr('docfilesuffix')
     end
 
     test 'should load input file from filename' do
@@ -131,6 +132,7 @@ context 'Document' do
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
+      assert_equal '.asciidoc', doc.attr('docfilesuffix')
     end
 
     test 'should not load invalid file' do
