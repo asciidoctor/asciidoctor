@@ -27,14 +27,26 @@ context 'Manpage' do
     test 'should define default linkstyle' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
-      assert_match(/^\.LINKSTYLE blue R < >$/, output)
+      assert_includes output.lines, %(.LINKSTYLE blue R < >\n)
     end
 
-    test 'should use linkstyle defined by man-linkstyle attribute' do
+    test 'wip should use linkstyle defined by man-linkstyle attribute' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true,
           :attributes => { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
-      assert_match(/^\.LINKSTYLE cyan B \\\[fo\] \\\[fc\]$/, output)
+      assert_includes output.lines, %(.LINKSTYLE cyan B \\[fo] \\[fc]\n)
+    end
+
+    test 'should require specialchars in value of man-linkstyle attribute defined in document to be escaped' do
+      input = %(:man-linkstyle: cyan R < >
+#{SAMPLE_MANPAGE_HEADER})
+      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      assert_includes output.lines, %(.LINKSTYLE cyan R &lt; &gt;\n)
+
+      input = %(:man-linkstyle: pass:[cyan R < >]
+#{SAMPLE_MANPAGE_HEADER})
+      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      assert_includes output.lines, %(.LINKSTYLE cyan R < >\n)
     end
   end
 
