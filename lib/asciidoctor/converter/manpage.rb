@@ -60,6 +60,7 @@ module Asciidoctor
         gsub('\'', '\(aq').       # apostrophe-quote
         gsub(MockBoundaryRx, ''). # mock boundary
         gsub(ESC_BS, '\\').       # unescape troff backslash (NOTE update if more escapes are added)
+        gsub(ESC_FS, '.').        # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
         rstrip                    # strip trailing space
       opts[:append_newline] ? %(#{str}#{LF}) : str
     end
@@ -610,8 +611,7 @@ allbox tab(:);'
     end
 
     def inline_break node
-      %(#{node.text}
-.br)
+      %(#{node.text}#{LF}#{ESC_FS}br)
     end
 
     def inline_button node
