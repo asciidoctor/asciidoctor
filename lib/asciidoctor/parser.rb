@@ -808,11 +808,13 @@ class Parser
           if block_context == :fenced_code
             attributes['style'] = 'source'
             language, linenums = this_line[3..-1].tr(' ', '').split(',', 2)
-            if !language.nil_or_empty?
+            if language.nil_or_empty?
+              if (default_language = document.attributes['source-language'])
+                attributes['language'] = default_language
+              end
+            else
               attributes['language'] = language
               attributes['linenums'] = '' unless linenums.nil_or_empty?
-            elsif (default_language = document.attributes['source-language'])
-              attributes['language'] = default_language
             end
             if !attributes.key?('indent') && document.attributes.key?('source-indent')
               attributes['indent'] = document.attributes['source-indent']
