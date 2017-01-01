@@ -2367,6 +2367,19 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       assert_match(/\.CodeRay *\{/, output)
     end
 
+    test 'should number lines if third positional attribute is set' do
+      input = <<-EOS
+:source-highlighter: coderay
+
+[source,ruby,linenums]
+----
+puts 'Hello, World!'
+----
+      EOS
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_xpath '//td[@class="line-numbers"]', output, 1
+    end
+
     test 'should read source language from source-language document attribute if not specified on source block' do
       input = <<-EOS
 :source-highlighter: coderay
