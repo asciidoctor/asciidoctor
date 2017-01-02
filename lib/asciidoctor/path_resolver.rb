@@ -176,7 +176,7 @@ class PathResolver
   # path - the String path to normalize
   #
   # returns a String path with any backslashes replaced with forward slashes
-  def posixfy path
+  def posixify path
     if path.nil_or_empty?
       ''
     elsif path.include? BACKSLASH
@@ -185,6 +185,7 @@ class PathResolver
       path
     end
   end
+  alias :posixfy :posixify
 
   # Public: Expand the path by resolving any parent references (..)
   # and cleaning self references (.).
@@ -220,7 +221,7 @@ class PathResolver
       return result
     end
 
-    posix_path = posixfy path
+    posix_path = posixify path
 
     root = if web_path
       # ex. /sample/path
@@ -315,7 +316,7 @@ class PathResolver
       unless is_root? jail
         raise ::SecurityError, %(Jail is not an absolute path: #{jail})
       end
-      jail = posixfy jail
+      jail = posixify jail
     end
 
     if target.nil_or_empty?
@@ -348,7 +349,7 @@ class PathResolver
     if start.nil_or_empty?
       start = jail ? jail : @working_dir
     elsif is_root? start
-      start = posixfy start
+      start = posixify start
     else
       start = system_path start, jail, jail, opts
     end
@@ -412,8 +413,8 @@ class PathResolver
   # start path with any parent references resolved and self
   # references removed
   def web_path target, start = nil
-    target = posixfy target
-    start = posixfy start
+    target = posixify target
+    start = posixify start
     uri_prefix = nil
 
     unless start.nil_or_empty? || (is_web_root? target)

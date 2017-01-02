@@ -88,7 +88,7 @@ context 'Path Resolver' do
       assert_equal 'assets/images', @resolver.web_path(nil, 'assets/images')
     end
 
-    test 'posixfies windows paths' do
+    test 'posixifies windows paths' do
       assert_equal '/images', @resolver.web_path('\\images')
       assert_equal '../images', @resolver.web_path('..\\images')
       assert_equal '/images', @resolver.web_path('\\..\\images')
@@ -202,7 +202,7 @@ context 'Path Resolver' do
       assert_equal "#{JAIL}/assets/images", @resolver.system_path('', '../assets/images', JAIL)
     end
 
-    test 'posixfies windows paths' do
+    test 'posixifies windows paths' do
       assert_equal "#{JAIL}/assets/css", @resolver.system_path('..\\css', 'assets\\stylesheets', JAIL)
     end
 
