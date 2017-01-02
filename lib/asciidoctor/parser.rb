@@ -871,7 +871,6 @@ class Parser
 
         else
           if block_extensions && (extension = extensions.registered_for_block?(block_context, cloaked_context))
-            # TODO pass cloaked_context to extension somehow (perhaps a new instance for each cloaked_context?)
             if (content_model = extension.config[:content_model]) != :skip
               if !(pos_attrs = extension.config[:pos_attrs] || []).empty?
                 AttributeList.rekey(attributes, [nil].concat(pos_attrs))
@@ -879,6 +878,8 @@ class Parser
               if (default_attrs = extension.config[:default_attrs])
                 default_attrs.each {|k, v| attributes[k] ||= v }
               end
+              # QUESTION should we clone the extension for each cloaked context and set in config?
+              attributes['cloaked-context'] = cloaked_context
             end
             block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
             unless block && content_model != :skip
