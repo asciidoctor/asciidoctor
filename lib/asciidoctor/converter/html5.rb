@@ -207,7 +207,7 @@ module Asciidoctor
       # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
       case highlighter
       when 'highlightjs', 'highlight.js'
-        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/8.9.1)
+        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/9.9.0)
         result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'github'}.min.css"#{slash}>)
         result << %(<script src="#{highlightjs_path}/highlight.min.js"></script>
 <script>hljs.initHighlighting()</script>)
