@@ -30,7 +30,7 @@ context 'Manpage' do
       assert_includes output.lines, %(.LINKSTYLE blue R < >\n)
     end
 
-    test 'wip should use linkstyle defined by man-linkstyle attribute' do
+    test 'should use linkstyle defined by man-linkstyle attribute' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true,
           :attributes => { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
@@ -233,7 +233,28 @@ T}
         assert_match(/Date: 2009-02-08/, output)
         assert_match(/^\.TH "COMMAND" "1" "2009-02-08" "Command 1.2.3" "Command Manual"$/, output)
       ensure
-        ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch if old_source_date_epoch
+        if old_source_date_epoch
+          ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+        else
+          ENV.delete 'SOURCE_DATE_EPOCH'
+        end
+      end
+    end
+
+    test 'should fail if SOURCE_DATE_EPOCH is malformed' do
+      old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+      begin
+        ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
+        Asciidoctor.convert SAMPLE_MANPAGE_HEADER, :backend => :manpage, :header_footer => true
+        assert false
+      rescue
+        assert true
+      ensure
+        if old_source_date_epoch
+          ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+        else
+          ENV.delete 'SOURCE_DATE_EPOCH'
+        end
       end
     end
   end

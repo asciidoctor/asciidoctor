@@ -589,7 +589,26 @@ context 'Invoker' do
       assert_equal '2009-02-08', (doc.attr 'localdate')
       assert_match(/2009-02-08 20:03:32 (GMT|UTC)/, (doc.attr 'localdatetime'))
     ensure
-      ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch if old_source_date_epoch
+      if old_source_date_epoch
+        ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+      else
+        ENV.delete 'SOURCE_DATE_EPOCH'
+      end
+    end
+  end
+
+  test 'should fail if SOURCE_DATE_EPOCH is malformed' do
+    old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+    begin
+      ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
+      sample_filepath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.asciidoc'))
+      assert_equal 1, (invoke_cli_to_buffer %w(-o /dev/null), sample_filepath).code
+    ensure
+      if old_source_date_epoch
+        ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+      else
+        ENV.delete 'SOURCE_DATE_EPOCH'
+      end
     end
   end
 end

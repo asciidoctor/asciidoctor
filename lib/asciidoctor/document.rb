@@ -402,7 +402,7 @@ class Document < AbstractBlock
       # dynamic intrinstic attribute values
 
       # See https://reproducible-builds.org/specs/source-date-epoch/
-      now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? (::Time.at ::ENV['SOURCE_DATE_EPOCH'].to_i).utc : ::Time.now
+      now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : ::Time.now
       localdate = (attrs['localdate'] ||= now.strftime('%Y-%m-%d'))
       unless (localtime = attrs['localtime'])
         begin
