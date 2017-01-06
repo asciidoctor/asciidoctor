@@ -403,19 +403,23 @@ class Document < AbstractBlock
 
       # See https://reproducible-builds.org/specs/source-date-epoch/
       now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : ::Time.now
-      localdate = (attrs['localdate'] ||= now.strftime('%Y-%m-%d'))
-      unless (localtime = attrs['localtime'])
-        begin
-          localtime = attrs['localtime'] = now.strftime('%H:%M:%S %Z')
-        rescue # Asciidoctor.js fails if timezone string has characters outside basic Latin (see asciidoctor.js#23)
-          localtime = attrs['localtime'] = now.strftime('%H:%M:%S %z')
-        end
+      if (localdate = attrs['localdate'])
+        localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? localdate[0..3] : nil))
+      else
+        localdate = attrs['localdate'] = now.strftime '%Y-%m-%d'
+        localyear = (attrs['localyear'] ||= now.year.to_s)
       end
+      localtime = (attrs['localtime'] ||= begin
+          now.strftime '%H:%M:%S %Z'
+        rescue # Asciidoctor.js fails if timezone string has characters outside basic Latin (see asciidoctor.js#23)
+          now.strftime '%H:%M:%S %z'
+        end)
       attrs['localdatetime'] ||= %(#{localdate} #{localtime})
 
       # docdate, doctime and docdatetime should default to
       # localdate, localtime and localdatetime if not otherwise set
       attrs['docdate'] ||= localdate
+      attrs['docyear'] ||= localyear
       attrs['doctime'] ||= localtime
       attrs['docdatetime'] ||= %(#{localdate} #{localtime})
 

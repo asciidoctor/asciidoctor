@@ -41,6 +41,7 @@ context 'Invoker' do
     assert_equal sample_filepath, doc.attr('docfile')
     assert_equal sample_filedir, doc.attr('docdir')
     assert doc.attr?('docdate')
+    assert doc.attr?('docyear')
     assert doc.attr?('doctime')
     assert doc.attr?('docdatetime')
     assert invoker.read_output.empty?
@@ -51,6 +52,7 @@ context 'Invoker' do
     invoker = invoke_cli_to_buffer %w(-o /dev/null -a docdate=2015-01-01 -a doctime=10:00:00-07:00), sample_filepath
     doc = invoker.document
     assert doc.attr?('docdate', '2015-01-01')
+    assert doc.attr?('docyear', '2015')
     assert doc.attr?('doctime', '10:00:00-07:00')
     assert doc.attr?('docdatetime', '2015-01-01 10:00:00-07:00')
   end
@@ -62,6 +64,7 @@ context 'Invoker' do
     assert !doc.attr?('docfile')
     assert_equal Dir.pwd, doc.attr('docdir')
     assert_equal doc.attr('docdate'), doc.attr('localdate')
+    assert_equal doc.attr('docyear'), doc.attr('localyear')
     assert_equal doc.attr('doctime'), doc.attr('localtime')
     assert_equal doc.attr('docdatetime'), doc.attr('localdatetime')
     assert !doc.attr?('outfile')
@@ -91,6 +94,7 @@ context 'Invoker' do
       assert !doc.attr?('docfile')
       assert_equal Dir.pwd, doc.attr('docdir')
       assert_equal doc.attr('docdate'), doc.attr('localdate')
+      assert_equal doc.attr('docyear'), doc.attr('localyear')
       assert_equal doc.attr('doctime'), doc.attr('localtime')
       assert_equal doc.attr('docdatetime'), doc.attr('localdatetime')
       assert doc.attr?('outfile')
@@ -585,8 +589,10 @@ context 'Invoker' do
       invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
       doc = invoker.document
       assert_equal '2009-02-08', (doc.attr 'docdate')
+      assert_equal '2009', (doc.attr 'docyear')
       assert_match(/2009-02-08 20:03:32 (GMT|UTC)/, (doc.attr 'docdatetime'))
       assert_equal '2009-02-08', (doc.attr 'localdate')
+      assert_equal '2009', (doc.attr 'localyear')
       assert_match(/2009-02-08 20:03:32 (GMT|UTC)/, (doc.attr 'localdatetime'))
     ensure
       if old_source_date_epoch

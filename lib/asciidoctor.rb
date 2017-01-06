@@ -1322,7 +1322,12 @@ module Asciidoctor
       attributes['docfile'] = input_path
       attributes['docdir'] = ::File.dirname input_path
       attributes['docname'] = Helpers.basename input_path, (attributes['docfilesuffix'] = ::File.extname input_path)
-      docdate = (attributes['docdate'] ||= input_mtime.strftime('%Y-%m-%d'))
+      if (docdate = attributes['docdate'])
+        attributes['docyear'] ||= ((docdate.index '-') == 4 ? docdate[0..3] : nil)
+      else
+        docdate = attributes['docdate'] = input_mtime.strftime '%Y-%m-%d'
+        attributes['docyear'] ||= input_mtime.year.to_s
+      end
       doctime = (attributes['doctime'] ||= input_mtime.strftime('%H:%M:%S %Z'))
       attributes['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to? :readlines
