@@ -607,9 +607,10 @@ class Document < AbstractBlock
     @attributes['title']
   end
 
-  def title=(title)
-    @header ||= Section.new(self, 0)
-    @header.title = title
+  def title= title
+    sect = (@header ||= Section.new self, 0)
+    sect.sectname = 'header'
+    sect.title = title
   end
 
   # Public: Resolves the primary title for the document

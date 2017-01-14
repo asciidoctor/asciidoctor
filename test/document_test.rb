@@ -13,6 +13,9 @@ context 'Document' do
       doc = example_document(:asciidoc_index)
       assert_equal 'AsciiDoc Home Page', doc.doctitle
       assert_equal 'AsciiDoc Home Page', doc.name
+      refute_nil doc.header
+      assert_equal :section, doc.header.context
+      assert_equal 'header', doc.header.sectname
       assert_equal 14, doc.blocks.size
       assert_equal :preamble, doc.blocks[0].context
       assert doc.blocks[1].context == :section
