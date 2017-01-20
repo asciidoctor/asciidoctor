@@ -119,8 +119,16 @@ module Asciidoctor
 
       unless node.noheader
         if node.attr? 'manpurpose'
-          result << %(.SH "#{node.attr 'manname-title'}"
-#{manify mantitle} \\- #{manify node.attr 'manpurpose'})
+          result << %(.SH "#{manify node.attr 'man-first-section-name'}")
+          result << %(#{manify mantitle} \\- #{manify node.attr 'manpurpose'})
+        elsif node.attr? 'man-first-section-name'
+          if (node.attr 'man-first-section-level') > 1
+            secmacro = '.SS'
+          else
+            secmacro = '.SH'
+          end
+          result << %(.#{secmacro} "#{manify node.attr 'man-first-section-name'}")
+          result << %(#{manify node.attr 'man-first-section-first-line'})
         end
       end
 
