@@ -1325,7 +1325,7 @@ module Asciidoctor
       if (docdate = attributes['docdate'])
         attributes['docyear'] ||= ((docdate.index '-') == 4 ? docdate[0..3] : nil)
       else
-        docdate = attributes['docdate'] = input_mtime.strftime '%Y-%m-%d'
+        docdate = attributes['docdate'] = (input_mtime.strftime '%Y-%m-%d')
         attributes['docyear'] ||= input_mtime.year.to_s
       end
       doctime = (attributes['doctime'] ||= input_mtime.strftime('%H:%M:%S %Z'))

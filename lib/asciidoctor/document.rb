@@ -406,7 +406,7 @@ class Document < AbstractBlock
       if (localdate = attrs['localdate'])
         localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? localdate[0..3] : nil))
       else
-        localdate = attrs['localdate'] = now.strftime '%Y-%m-%d'
+        localdate = attrs['localdate'] = (now.strftime '%Y-%m-%d')
         localyear = (attrs['localyear'] ||= now.year.to_s)
       end
       localtime = (attrs['localtime'] ||= begin
@@ -607,9 +607,10 @@ class Document < AbstractBlock
     @attributes['title']
   end
 
-  def title=(title)
-    @header ||= Section.new(self, 0)
-    @header.title = title
+  def title= title
+    sect = (@header ||= Section.new self, 0)
+    sect.sectname = 'header'
+    sect.title = title
   end
 
   # Public: Resolves the primary title for the document
