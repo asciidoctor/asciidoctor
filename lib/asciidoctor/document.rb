@@ -406,7 +406,7 @@ class Document < AbstractBlock
       if (localdate = attrs['localdate'])
         localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? localdate[0..3] : nil))
       else
-        localdate = attrs['localdate'] = now.strftime '%Y-%m-%d'
+        localdate = attrs['localdate'] = (now.strftime '%Y-%m-%d')
         localyear = (attrs['localyear'] ||= now.year.to_s)
       end
       localtime = (attrs['localtime'] ||= begin
