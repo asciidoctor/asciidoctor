@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'thread_safe', '~> 0.3.0'
   # tilt is needed for testing custom templates
   s.add_development_dependency 'tilt', '~> 2.0.0'
-  s.add_development_dependency 'yard', '~> 0.8.7.0'
+  s.add_development_dependency 'yard', '~> 0.9.0'
   s.add_development_dependency 'yard-tomdoc', '~> 0.7.0'
   s.add_development_dependency 'minitest', '~> 5.3.0'
 end
