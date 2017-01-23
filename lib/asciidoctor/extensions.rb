@@ -1229,9 +1229,8 @@ module Extensions
     def resolve_args args, expect
       opts = ::Hash === args[-1] ? args.pop : {}
       return opts if expect == 1
-      num_args = args.size
-      if (missing = expect - 1 - num_args) > 0
-        args.fill nil, num_args, missing
+      if (missing = expect - 1 - args.size) > 0
+        args += (::Array.new missing)
       elsif missing < 0
         args.pop(-missing)
       end
