@@ -4,7 +4,9 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  if (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '1.9.2')
+  if (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '1.9.3')
+    gem 'cucumber', '~> 2.4.0' 
+  else
     gem 'nokogiri', '~> 1.5.0'
     gem 'slim', '~> 2.0.0'
   end
