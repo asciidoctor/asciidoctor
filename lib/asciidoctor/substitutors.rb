@@ -1469,7 +1469,7 @@ module Substitutors
           :bold_every => false}].highlight source
     when 'pygments'
       lexer = ::Pygments::Lexer[attr('language', nil, false)] || ::Pygments::Lexer['text']
-      opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
+      opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true, :startinline => true }
       unless (@document.attributes['pygments-css'] || 'class') == 'class'
         opts[:noclasses] = true
         opts[:style] = (@document.attributes['pygments-style'] || Stylesheets::DEFAULT_PYGMENTS_STYLE)
