@@ -1469,7 +1469,8 @@ module Substitutors
           :bold_every => false}].highlight source
     when 'pygments'
       lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer['text']
-      opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true, :startinline => true }
+      opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
+      opts[:startinline] = !(option? 'mixed') if lexer.name == 'PHP'
       unless (@document.attributes['pygments-css'] || 'class') == 'class'
         opts[:noclasses] = true
         opts[:style] = (@document.attributes['pygments-style'] || Stylesheets::DEFAULT_PYGMENTS_STYLE)
