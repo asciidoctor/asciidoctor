@@ -1468,7 +1468,7 @@ module Substitutors
           :highlight_lines => highlight_lines,
           :bold_every => false}].highlight source
     when 'pygments'
-      lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer['text']
+      lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer.find_by_mimetype('text/plain')
       opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
       opts[:startinline] = !(option? 'mixed') if lexer.name == 'PHP'
       unless (@document.attributes['pygments-css'] || 'class') == 'class'
