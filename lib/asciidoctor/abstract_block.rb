@@ -13,9 +13,6 @@ class AbstractBlock < AbstractNode
   # Public: Set the Integer level of this Section or the Section level in which this Block resides
   attr_accessor :level
 
-  # Public: Set the String block title.
-  attr_writer :title
-
   # Public: Get/Set the String style (block type qualifier) for this block.
   attr_accessor :style
 
@@ -33,6 +30,7 @@ class AbstractBlock < AbstractNode
     @blocks = []
     @id = nil
     @title = nil
+    @title_converted = nil
     @caption = nil
     @style = nil
     @level = if context == :document
@@ -119,16 +117,17 @@ class AbstractBlock < AbstractNode
   #   block.title
   #   => "Foo 3^ # :: Bar(1)"
   #
-  # Returns the String title of this Block
+  # Returns the converted String title for this Block, or nil if the assigned title is falsy
   def title
-    # prevent substitutions from being applied multiple times
-    if defined?(@subbed_title)
-      @subbed_title
-    elsif @title
-      @subbed_title = apply_title_subs(@title)
-    else
-      @title
-    end
+    # prevent substitutions from being applied to title multiple times
+    @title_converted ? @title_ : (@title_ = (@title_converted = true) && @title && (apply_title_subs @title))
+  end
+
+  # Public: Set the String block title.
+  #
+  # Returns the new String title assigned to this Block
+  def title= val
+    @title = (@title_converted = nil) || val
   end
 
   # Public: Convenience method that returns the interpreted title of the Block
@@ -139,8 +138,8 @@ class AbstractBlock < AbstractNode
   # two values. If the Block does not have a caption, the interpreted title is
   # returned.
   #
-  # Returns the String title prefixed with the caption, or just the title if no
-  # caption is set
+  # Returns the converted String title prefixed with the caption, or just the
+  # converted String title if no caption is set
   def captioned_title
     %(#{@caption}#{title})
   end

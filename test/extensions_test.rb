@@ -518,6 +518,37 @@ content
       end
     end
 
+    test 'should honor block title assigned in treeprocessor' do
+      input = <<-EOS
+= Document Title
+:!example-caption:
+
+.Old block title
+====
+example block content
+====
+      EOS
+
+      old_title = nil
+      begin
+        Asciidoctor::Extensions.register do
+          treeprocessor do
+            process do |doc|
+              ex = (doc.find_by :context => :example)[0]
+              old_title = ex.title
+              ex.title = 'New block title'
+            end
+          end
+        end
+
+        doc = document_from_string input
+        assert_equal 'Old block title', old_title
+        assert_equal 'New block title', (doc.find_by :context => :example)[0].title
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke postprocessors after rendering document' do
       input = <<-EOS
 * one
