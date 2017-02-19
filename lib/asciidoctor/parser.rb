@@ -662,9 +662,9 @@ class Parser
             attributes['reftext'] = float_reftext if float_reftext
             float_id ||= attributes['id'] if attributes.has_key?('id')
             block = Block.new(parent, :floating_title, :content_model => :empty)
-            block.id = float_id.nil_or_empty? ? (Section.generate_id float_title, document) : float_id
-            block.level = float_level
             block.title = float_title
+            block.id = float_id.nil_or_empty? ? (Section.generate_id block.title, document) : float_id
+            block.level = float_level
             break
 
           # FIXME create another set for "passthrough" styles
