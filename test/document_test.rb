@@ -13,6 +13,9 @@ context 'Document' do
       doc = example_document(:asciidoc_index)
       assert_equal 'AsciiDoc Home Page', doc.doctitle
       assert_equal 'AsciiDoc Home Page', doc.name
+      refute_nil doc.header
+      assert_equal :section, doc.header.context
+      assert_equal 'header', doc.header.sectname
       assert_equal 14, doc.blocks.size
       assert_equal :preamble, doc.blocks[0].context
       assert doc.blocks[1].context == :section
@@ -119,10 +122,11 @@ context 'Document' do
   context 'Load APIs' do
     test 'should load input file' do
       sample_input_path = fixture_path('sample.asciidoc')
-      doc = Asciidoctor.load(File.new(sample_input_path), :safe => Asciidoctor::SafeMode::SAFE)
+      doc = File.open(sample_input_path) {|file| Asciidoctor.load file, :safe => Asciidoctor::SafeMode::SAFE }
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
+      assert_equal '.asciidoc', doc.attr('docfilesuffix')
     end
 
     test 'should load input file from filename' do
@@ -131,6 +135,7 @@ context 'Document' do
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
+      assert_equal '.asciidoc', doc.attr('docfilesuffix')
     end
 
     test 'should not load invalid file' do
@@ -341,6 +346,18 @@ preamble
       refute_nil section_1.source_location
       assert_equal fixture_path('chapter-a.adoc'), section_1.file
       assert_equal 1, section_1.lineno
+    end
+
+    test 'should allow sourcemap option on document to be modified' do
+      doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), :parse => false
+      doc.sourcemap = true
+      doc = doc.parse
+
+      section_1 = doc.sections[0]
+      assert_equal 'Section A', section_1.title
+      refute_nil section_1.source_location
+      assert_equal 'sample.asciidoc', section_1.file
+      assert_equal 10, section_1.lineno
     end
 
     test 'find_by should return Array of blocks anywhere in document tree that match criteria' do
@@ -1074,6 +1091,50 @@ text
       assert_nil doc.header
     end
 
+    test 'should enable compat mode for document with legacy doctitle' do
+      input = <<-EOS
+Document Title
+==============
+
++content+
+      EOS
+
+      doc = document_from_string input
+      assert(doc.attr? 'compat-mode')
+      result = doc.convert
+      assert_xpath '//code[text()="content"]', result, 1
+    end
+
+    test 'should not enable compat mode for document with legacy doctitle if compat mode disable by header' do
+      input = <<-EOS
+Document Title
+==============
+:compat-mode!:
+
++content+
+      EOS
+
+      doc = document_from_string input
+      assert_nil(doc.attr 'compat-mode')
+      result = doc.convert
+      assert_xpath '//code[text()="content"]', result, 0
+    end
+
+    test 'should not enable compat mode for document with legacy doctitle if compat mode is locked by API' do
+      input = <<-EOS
+Document Title
+==============
+
++content+
+      EOS
+
+      doc = document_from_string input, :attributes => { 'compat-mode' => nil }
+      assert(doc.attribute_locked? 'compat-mode')
+      assert_nil(doc.attr 'compat-mode')
+      result = doc.convert
+      assert_xpath '//code[text()="content"]', result, 0
+    end
+
     test 'title partition API with default separator' do
       title = Asciidoctor::Document::Title.new 'Main Title: And More: Subtitle'
       assert_equal 'Main Title: And More', title.main
@@ -1112,6 +1173,23 @@ content
       EOS
 
       doc = document_from_string input
+      title = doc.doctitle :partition => true, :sanitize => true
+      assert title.subtitle?
+      assert title.sanitized?
+      assert_equal 'Main Title', title.main
+      assert_equal 'Subtitle', title.subtitle
+    end
+
+    test 'should not honor custom separator for doctitle if attribute is locked by API' do
+      input = <<-EOS
+[separator=::]
+= Main Title - *Subtitle*
+Author Name
+
+content
+      EOS
+
+      doc = document_from_string input, :attributes => { 'title-separator' => ' -' }
       title = doc.doctitle :partition => true, :sanitize => true
       assert title.subtitle?
       assert title.sanitized?
@@ -1932,6 +2010,28 @@ chapter body
       refute_nil id_attr.namespace
       assert_equal 'xml', id_attr.namespace.prefix
       assert_equal '_first_chapter', id_attr.value
+    end
+
+    test 'adds a front and back cover image to DocBook 5 when doctype is book' do
+      input = <<-EOS
+= Title
+:doctype: book
+:imagesdir: images
+:front-cover-image: image:front-cover.jpg[scaledwidth=210mm]
+:back-cover-image: image:back-cover.jpg[scaledwidth=210mm]
+
+preamble
+
+== First Chapter
+
+chapter body
+      EOS
+
+      result = render_string input, :attributes => {'backend' => 'docbook5'}
+      assert_xpath '//info/cover[@role="front"]', result, 1
+      assert_xpath '//info/cover[@role="front"]//imagedata[@fileref="images/front-cover.jpg"]', result, 1
+      assert_xpath '//info/cover[@role="back"]', result, 1
+      assert_xpath '//info/cover[@role="back"]//imagedata[@fileref="images/back-cover.jpg"]', result, 1
     end
 
     test 'should be able to set backend using :backend option key' do

@@ -131,12 +131,12 @@ class AbstractNode
   # Public: Assign the value to the attribute name for the current node.
   #
   # name      - The String attribute name to assign
-  # value     - The Object value to assign to the attribute
+  # value     - The Object value to assign to the attribute (default: '')
   # overwrite - A Boolean indicating whether to assign the attribute
   #             if currently present in the attributes Hash (default: true)
   #
   # Returns a [Boolean] indicating whether the assignment was performed
-  def set_attr name, value, overwrite = true
+  def set_attr name, value = '', overwrite = true
     if overwrite == false && (@attributes.key? name)
       false
     else
@@ -224,7 +224,7 @@ class AbstractNode
   # Public: A convenience method that adds the given role directly to this node
   def add_role(name)
     unless (roles = (@attributes['role'] || '').split(' ')).include? name
-      @attributes['role'] = roles.push(name) * ' '
+      @attributes['role'] = (roles << name) * ' '
     end
   end
 
@@ -315,20 +315,22 @@ class AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
-    if (doc = @document).safe < SafeMode::SECURE && doc.attr?('data-uri')
+    if (doc = @document).safe < SafeMode::SECURE && (doc.attr? 'data-uri')
       if (Helpers.uriish? target_image) ||
-          (asset_dir_key && (images_base = doc.attr(asset_dir_key)) && (Helpers.uriish? images_base) &&
-          (target_image = normalize_web_path(target_image, images_base, false)))
-        if doc.attr?('allow-uri-read')
-          generate_data_uri_from_uri target_image, doc.attr?('cache-uri')
+          (asset_dir_key && (images_base = doc.attr asset_dir_key) && (Helpers.uriish? images_base) &&
+          (target_image = normalize_web_path target_image, images_base, false))
+        if doc.attr? 'allow-uri-read'
+          generate_data_uri_from_uri target_image, (doc.attr? 'cache-uri')
         else
           target_image
         end
       else
         generate_data_uri target_image, asset_dir_key
       end
+    elsif asset_dir_key
+      normalize_web_path target_image, (doc.attr asset_dir_key)
     else
-      normalize_web_path target_image, (asset_dir_key ? doc.attr(asset_dir_key) : nil)
+      normalize_web_path target_image
     end
   end
 
@@ -481,9 +483,9 @@ class AbstractNode
     end
   end
 
-  # Public: Normalize the web page using the PathResolver.
+  # Public: Normalize the web path using the PathResolver.
   #
-  # See {PathResolver#web_path} for details.
+  # See {PathResolver#web_path} for details about path resolution and encoding.
   #
   # target              - the String target path
   # start               - the String start (i.e, parent) path (optional, default: nil)

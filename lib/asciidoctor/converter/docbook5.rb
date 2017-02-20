@@ -4,6 +4,8 @@ module Asciidoctor
   # similar to the docbook45 backend from AsciiDoc Python, but migrated to the
   # DocBook 5 specification.
   class Converter::DocBook5Converter < Converter::BuiltIn
+    ImageMacroRx = /^image::?(.+?)\[(.*?)\]$/
+
     def document node
       result = []
       if (root_tag_name = node.doctype) == 'manpage'
@@ -193,17 +195,27 @@ module Asciidoctor
     end
 
     def image node
-      width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : nil
-      depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : nil
-      # FIXME if scaledwidth is set, we should remove width & depth
-      # See http://www.docbook.org/tdg/en/html/imagedata.html#d0e92271 for details
-      swidth_attribute = (node.attr? 'scaledwidth') ? %( width="#{node.attr 'scaledwidth'}" scalefit="1") : nil
-      scale_attribute = (node.attr? 'scale') ? %( scale="#{node.attr 'scale'}") : nil
+      # NOTE according to the DocBook spec, content area, scaling, and scaling to fit are mutually exclusive
+      # See http://tdg.docbook.org/tdg/4.5/imagedata-x.html#d0e79635
+      if node.attr? 'scaledwidth'
+        width_attribute = %( width="#{node.attr 'scaledwidth'}")
+        depth_attribute = nil
+        scale_attribute = nil
+      elsif node.attr? 'scale'
+        # QUESTION should we set the viewport using width and depth? (the scaled image would be contained within this box)
+        #width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
+        #depth_attribute = (node.attr? 'height') ? %( depth="#{node.attr 'height'}") : nil
+        scale_attribute = %( scale="#{node.attr 'scale'}")
+      else
+        width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : nil
+        depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : nil
+        scale_attribute = nil
+      end
       align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : nil
 
       mediaobject = %(<mediaobject>
 <imageobject>
-<imagedata fileref="#{node.image_uri(node.attr 'target')}"#{width_attribute}#{depth_attribute}#{swidth_attribute}#{scale_attribute}#{align_attribute}/>
+<imagedata fileref="#{node.image_uri(node.attr 'target')}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}/>
 </imageobject>
 <textobject><phrase>#{node.attr 'alt'}</phrase></textobject>
 </mediaobject>)
@@ -673,7 +685,7 @@ module Asciidoctor
     end
 
     def document_info_element doc, info_tag_prefix, use_info_tag_prefix = false
-      info_tag_prefix = '' unless use_info_tag_prefix
+      info_tag_prefix = nil unless use_info_tag_prefix
       result = []
       result << %(<#{info_tag_prefix}info>)
       result << document_title_tags(doc.doctitle :partition => true, :use_fallback => true) unless doc.notitle
@@ -702,6 +714,16 @@ module Asciidoctor
           result << %(<revremark>#{doc.attr 'revremark'}</revremark>) if doc.attr? 'revremark'
           result << %(</revision>
 </revhistory>)
+        end
+        unless use_info_tag_prefix
+          if (doc.attr? 'front-cover-image') || (doc.attr? 'back-cover-image')
+            if (back_cover_tag = cover_tag doc, 'back')
+              result << (cover_tag doc, 'front', true)
+              result << back_cover_tag
+            elsif (front_cover_tag = cover_tag doc, 'front')
+              result << front_cover_tag
+            end
+          end
         end
         unless (head_docinfo = doc.docinfo).empty?
           result << head_docinfo
@@ -748,6 +770,35 @@ module Asciidoctor
 
     def title_tag node, optional = true
       !optional || node.title? ? %(<title>#{node.title}</title>\n) : nil
+    end
+
+    def cover_tag doc, face, use_placeholder = false
+      if (cover_image = doc.attr %(#{face}-cover-image))
+        width_attr = nil
+        depth_attr = nil
+        if (cover_image.include? ':') && cover_image =~ ImageMacroRx
+          cover_image = doc.image_uri $1
+          unless $2.empty?
+            attrs = (AttributeList.new $2).parse ['alt', 'width', 'height']
+            if attrs.key? 'scaledwidth'
+              # NOTE scalefit="1" is the default in this case
+              width_attr = %( width="#{attrs['scaledwidth']}")
+            else
+              width_attr = %( contentwidth="#{attrs['width']}") if attrs.key? 'width'
+              depth_attr = %( contentdepth="#{attrs['height']}") if attrs.key? 'height'
+            end
+          end
+        end
+        %(<cover role="#{face}">
+<mediaobject>
+<imageobject>
+<imagedata fileref="#{cover_image}"#{width_attr}#{depth_attr}/>
+</imageobject>
+</mediaobject>
+</cover>)
+      elsif use_placeholder
+        %(<cover role="#{face}"/>)
+      end
     end
   end
 end

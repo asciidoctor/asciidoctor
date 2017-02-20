@@ -187,9 +187,9 @@ class Minitest::Test
     document_from_string(src, opts).render
   end
 
-  def parse_header_metadata(source)
+  def parse_header_metadata(source, doc = nil)
     reader = Asciidoctor::Reader.new source.split ::Asciidoctor::EOL
-    [::Asciidoctor::Parser.parse_header_metadata(reader), reader]
+    [::Asciidoctor::Parser.parse_header_metadata(reader, doc), reader]
   end
 
   def assign_default_test_options(opts)

@@ -207,7 +207,7 @@ module Asciidoctor
       # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
       case highlighter
       when 'highlightjs', 'highlight.js'
-        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/8.9.1)
+        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/9.9.0)
         result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'github'}.min.css"#{slash}>)
         result << %(<script src="#{highlightjs_path}/highlight.min.js"></script>
 <script>hljs.initHighlighting()</script>)
@@ -385,9 +385,12 @@ MathJax.Hub.Config({
       classes = ['audioblock', node.role].compact
       class_attribute = %( class="#{classes * ' '}")
       title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
+      start_t = node.attr 'start', nil, false
+      end_t = node.attr 'end', nil, false
+      time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ',' : nil}#{end_t}) : nil
       %(<div#{id_attribute}#{class_attribute}>
 #{title_element}<div class="content">
-<audio src="#{node.media_uri(node.attr 'target')}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}>
+<audio src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}>
 Your browser does not support the audio tag.
 </audio>
 </div>
@@ -833,10 +836,7 @@ Your browser does not support the audio tag.
                 when :literal
                   cell_content = %(<div class="literal"><pre>#{cell.text}</pre></div>)
                 else
-                  cell_content = ''
-                  cell.content.each do |text|
-                    cell_content = %(#{cell_content}<p class="tableblock">#{text}</p>)
-                  end
+                  cell_content = cell.content.map {|text| %(<p class="tableblock">#{text}</p>) } * EOL
                 end
               end
 

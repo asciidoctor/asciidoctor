@@ -92,6 +92,17 @@ module Extensions
       raise ::NotImplementedError
     end
 
+    # QUESTION should attributes be an option instead of a parameter?
+    def create_section parent, title, attrs, opts = {}
+      doc = parent.document
+      id = attrs.delete 'id'
+      sect = Section.new parent, opts[:level], (opts.fetch :numbered, (doc.attr? 'sectnums')), { :attributes => attrs }.merge(opts)
+      sect.title = title
+      # NOTE set id attribute to false to disable id assignment
+      sect.id = sect.attributes['id'] = id || (id.nil? ? (Section.generate_id sect.title, doc) : nil)
+      sect
+    end
+
     def create_block parent, context, source, attrs, opts = {}
       Block.new parent, context, { :source => source, :attributes => attrs }.merge(opts)
     end
@@ -463,9 +474,9 @@ module Extensions
   #--
   # QUESTION call this ExtensionInfo?
   class Extension
-    attr :kind
-    attr :config
-    attr :instance
+    attr_reader :kind
+    attr_reader :config
+    attr_reader :instance
 
     def initialize kind, instance, config
       @kind = kind
@@ -478,7 +489,7 @@ module Extensions
   # reference to the {Processor#process} method. By storing this reference, its
   # possible to accomodate both concrete extension implementations and Procs.
   class ProcessorExtension < Extension
-    attr :process_method
+    attr_reader :process_method
 
     def initialize kind, instance, process_method = nil
       super kind, instance, instance.config
@@ -1218,9 +1229,8 @@ module Extensions
     def resolve_args args, expect
       opts = ::Hash === args[-1] ? args.pop : {}
       return opts if expect == 1
-      num_args = args.size
-      if (missing = expect - 1 - num_args) > 0
-        args.fill nil, num_args, missing
+      if (missing = expect - 1 - args.size) > 0
+        args += (::Array.new missing)
       elsif missing < 0
         args.pop(-missing)
       end

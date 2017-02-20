@@ -27,14 +27,26 @@ context 'Manpage' do
     test 'should define default linkstyle' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
-      assert_match(/^\.LINKSTYLE blue R < >$/, output)
+      assert_includes output.lines, %(.LINKSTYLE blue R < >\n)
     end
 
     test 'should use linkstyle defined by man-linkstyle attribute' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true,
           :attributes => { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
-      assert_match(/^\.LINKSTYLE cyan B \\\[fo\] \\\[fc\]$/, output)
+      assert_includes output.lines, %(.LINKSTYLE cyan B \\[fo] \\[fc]\n)
+    end
+
+    test 'should require specialchars in value of man-linkstyle attribute defined in document to be escaped' do
+      input = %(:man-linkstyle: cyan R < >
+#{SAMPLE_MANPAGE_HEADER})
+      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      assert_includes output.lines, %(.LINKSTYLE cyan R &lt; &gt;\n)
+
+      input = %(:man-linkstyle: pass:[cyan R < >]
+#{SAMPLE_MANPAGE_HEADER})
+      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      assert_includes output.lines, %(.LINKSTYLE cyan R < >\n)
     end
   end
 
@@ -56,6 +68,19 @@ BBB this line and the one above it should be visible)
 
       output = Asciidoctor.convert input, :backend => :manpage
       assert_equal '\&.if 1 .nx', output.lines.entries[-2].chomp
+    end
+
+    test 'should manify normal table cell content' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+[%header%footer,cols=2*]
+|===
+|*Col A* |_Col B_
+|*bold* |`mono`
+|_italic_ | #mark#
+|===)
+      output = Asciidoctor.convert input, :backend => :manpage
+      refute_match(/<\/?BOUNDARY>/, output)
     end
   end
 
@@ -91,6 +116,17 @@ baz)
  \\fB makes text bold)
       output = Asciidoctor.convert input, :backend => :manpage
       assert_match '\(rsfB makes text bold', output
+    end
+
+    test 'should preserve inline breaks' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+Before break. +
+After break.)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal 'Before break.
+.br
+After break.', output.lines.entries[-3..-1].join
     end
   end
 
@@ -210,9 +246,29 @@ T}
         assert_match(/Date: 2009-02-08/, output)
         assert_match(/^\.TH "COMMAND" "1" "2009-02-08" "Command 1.2.3" "Command Manual"$/, output)
       ensure
-        ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch if old_source_date_epoch
+        if old_source_date_epoch
+          ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+        else
+          ENV.delete 'SOURCE_DATE_EPOCH'
+        end
+      end
+    end
+
+    test 'should fail if SOURCE_DATE_EPOCH is malformed' do
+      old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+      begin
+        ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
+        Asciidoctor.convert SAMPLE_MANPAGE_HEADER, :backend => :manpage, :header_footer => true
+        assert false
+      rescue
+        assert true
+      ensure
+        if old_source_date_epoch
+          ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+        else
+          ENV.delete 'SOURCE_DATE_EPOCH'
+        end
       end
     end
   end
-
 end

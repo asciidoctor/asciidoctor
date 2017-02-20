@@ -98,9 +98,9 @@ This option may be specified more than once.
 *-o, --out-file*=_OUT_FILE_::
   Write output to file _OUT_FILE_.
   Defaults to the base name of the input file suffixed with _backend_ extension.
-  If the input is read from standard input, then the output file defaults to stdout.
-  If _OUT_FILE_ is _-_ then the standard output is also used.
-  If specified, the file is resolved relative to the working directory.
+  The file is resolved relative to the working directory.
+  If the input is read from standard input or a named pipe (fifo), then the output file defaults to stdout.
+  If _OUT_FILE_ is _-_, then the output file is written to standard output.
 
 *-r, --require*=_LIBRARY_::
   Require the specified library before executing the processor, using the standard Ruby require.

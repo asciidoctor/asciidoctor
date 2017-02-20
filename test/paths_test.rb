@@ -88,12 +88,16 @@ context 'Path Resolver' do
       assert_equal 'assets/images', @resolver.web_path(nil, 'assets/images')
     end
 
-    test 'posixfies windows paths' do
+    test 'posixifies windows paths' do
       assert_equal '/images', @resolver.web_path('\\images')
       assert_equal '../images', @resolver.web_path('..\\images')
       assert_equal '/images', @resolver.web_path('\\..\\images')
       assert_equal 'assets/images', @resolver.web_path('assets\\images')
       assert_equal '../assets/images', @resolver.web_path('assets\\images', '..\\images\\..')
+    end
+
+    test 'URL encode spaces in path' do
+      assert_equal 'assets%20and%20stuff/lots%20of%20images', @resolver.web_path('lots of images', 'assets and stuff')
     end
   end
 
@@ -181,6 +185,7 @@ context 'Path Resolver' do
       pwd = File.expand_path(Dir.pwd)
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', '')
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', nil)
+      assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png')
     end
 
     test 'resolves relative hidden target relative to current directory if start is empty' do
@@ -197,7 +202,7 @@ context 'Path Resolver' do
       assert_equal "#{JAIL}/assets/images", @resolver.system_path('', '../assets/images', JAIL)
     end
 
-    test 'posixfies windows paths' do
+    test 'posixifies windows paths' do
       assert_equal "#{JAIL}/assets/css", @resolver.system_path('..\\css', 'assets\\stylesheets', JAIL)
     end
 

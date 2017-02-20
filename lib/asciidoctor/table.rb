@@ -87,6 +87,7 @@ class Table < AbstractBlock
     @attributes['tablepcwidth'] = pcwidth_intval
 
     if @document.attributes.key? 'pagewidth'
+      # FIXME calculate more accurately (only used in DocBook output)
       @attributes['tableabswidth'] ||=
           ((@attributes['tablepcwidth'].to_f / 100) * @document.attributes['pagewidth']).round
     end
@@ -135,12 +136,22 @@ class Table < AbstractBlock
       @columns.each {|col| total_width += (col_pcwidth = col.assign_width nil, width_base, pf) }
     else
       col_pcwidth = ((100 * pf / @columns.size).to_i) / pf
+      # or...
+      #col_pcwidth = (100.0 / @columns.size).truncate 4
       col_pcwidth = col_pcwidth.to_i if col_pcwidth.to_i == col_pcwidth
       @columns.each {|col| total_width += col.assign_width col_pcwidth }
     end
 
-    # donate balance, if any, to final column
-    @columns[-1].assign_width(((100 - total_width + col_pcwidth) * pf).round / pf) unless total_width == 100
+    # donate balance, if any, to final column (using half up rounding)
+    unless total_width == 100
+      @columns[-1].assign_width(((100 - total_width + col_pcwidth) * pf).round / pf)
+      # or (manual half up rounding)...
+      #numerator = (raw_numerator = (100 - total_width + col_pcwidth) * pf).to_i
+      #numerator += 1 if raw_numerator >= numerator + 0.5
+      #@columns[-1].assign_width numerator / pf
+      # or...
+      #@columns[-1].assign_width((100 - total_width + col_pcwidth).round 4)
+    end
 
     nil
   end
@@ -199,6 +210,8 @@ class Table::Column < AbstractNode
   def assign_width col_pcwidth, width_base = nil, pf = 10000.0
     if width_base
       col_pcwidth = ((@attributes['width'].to_f / width_base) * 100 * pf).to_i / pf
+      # or...
+      #col_pcwidth = (@attributes['width'].to_f * 100.0 / width_base).truncate 4
       col_pcwidth = col_pcwidth.to_i if col_pcwidth.to_i == col_pcwidth
     end
     @attributes['colpcwidth'] = col_pcwidth

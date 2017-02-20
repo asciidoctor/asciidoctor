@@ -556,6 +556,33 @@ Hi there!
       end
     end
 
+    test 'should pass cloaked context in attributes passed to process method of custom block' do
+      input = <<-EOS
+[custom]
+****
+sidebar
+****
+      EOS
+
+      cloaked_context = nil
+      begin
+        Asciidoctor::Extensions.register do
+          block :custom do
+            on_context :sidebar
+            process do |doc, reader, attrs|
+              cloaked_context = attrs['cloaked-context']
+              nil
+            end
+          end
+        end
+
+        render_embedded_string input
+        assert_equal :sidebar, cloaked_context
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke processor for custom block macro' do
       input = <<-EOS
 snippet::12345[]

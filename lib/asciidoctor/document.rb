@@ -115,8 +115,8 @@ class Document < AbstractBlock
   #
   attr_reader :compat_mode
 
-  # Public: Get the Boolean flag that indicates whether source map information is tracked by the parser
-  attr_reader :sourcemap
+  # Public: Get or set the Boolean flag that indicates whether source map information should be tracked by the parser
+  attr_accessor :sourcemap
 
   # Public: Get the Hash of document references
   attr_reader :references
@@ -402,20 +402,24 @@ class Document < AbstractBlock
       # dynamic intrinstic attribute values
 
       # See https://reproducible-builds.org/specs/source-date-epoch/
-      now = ::ENV['SOURCE_DATE_EPOCH'] ? (::Time.at ::ENV['SOURCE_DATE_EPOCH'].to_i).utc : ::Time.now
-      localdate = (attrs['localdate'] ||= now.strftime('%Y-%m-%d'))
-      unless (localtime = attrs['localtime'])
-        begin
-          localtime = attrs['localtime'] = now.strftime('%H:%M:%S %Z')
-        rescue # Asciidoctor.js fails if timezone string has characters outside basic Latin (see asciidoctor.js#23)
-          localtime = attrs['localtime'] = now.strftime('%H:%M:%S %z')
-        end
+      now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : ::Time.now
+      if (localdate = attrs['localdate'])
+        localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? localdate[0..3] : nil))
+      else
+        localdate = attrs['localdate'] = (now.strftime '%Y-%m-%d')
+        localyear = (attrs['localyear'] ||= now.year.to_s)
       end
+      localtime = (attrs['localtime'] ||= begin
+          now.strftime '%H:%M:%S %Z'
+        rescue # Asciidoctor.js fails if timezone string has characters outside basic Latin (see asciidoctor.js#23)
+          now.strftime '%H:%M:%S %z'
+        end)
       attrs['localdatetime'] ||= %(#{localdate} #{localtime})
 
       # docdate, doctime and docdatetime should default to
       # localdate, localtime and localdatetime if not otherwise set
       attrs['docdate'] ||= localdate
+      attrs['docyear'] ||= localyear
       attrs['doctime'] ||= localtime
       attrs['docdatetime'] ||= %(#{localdate} #{localtime})
 
@@ -493,19 +497,15 @@ class Document < AbstractBlock
   # seed  - the initial value as a String or Integer
   #
   # returns the next number in the sequence for the specified counter
-  def counter(name, seed = nil)
-    if (attr_is_seed = !(attr_val = @attributes[name]).nil_or_empty?) && @counters.key?(name)
-      @counters[name] = nextval(attr_val)
+  def counter name, seed = nil
+    return (@parent_document.counter name, seed) if @parent_document
+    if (attr_seed = !(attr_val = @attributes[name]).nil_or_empty?) && (@counters.key? name)
+      @attributes[name] = @counters[name] = (nextval attr_val)
+    elsif seed
+      @attributes[name] = @counters[name] = (seed == seed.to_i.to_s ? seed.to_i : seed)
     else
-      if seed.nil?
-        seed = nextval(attr_is_seed ? attr_val : 0)
-      elsif seed.to_i.to_s == seed
-        seed = seed.to_i
-      end
-      @counters[name] = seed
+      @attributes[name] = @counters[name] = nextval(attr_seed ? attr_val : 0)
     end
-
-    (@attributes[name] = @counters[name])
   end
 
   # Public: Increment the specified counter and store it in the block's attributes
@@ -607,9 +607,10 @@ class Document < AbstractBlock
     @attributes['title']
   end
 
-  def title=(title)
-    @header ||= Section.new(self, 0)
-    @header.title = title
+  def title= title
+    sect = (@header ||= Section.new self, 0)
+    sect.sectname = 'header'
+    sect.title = title
   end
 
   # Public: Resolves the primary title for the document
@@ -825,14 +826,14 @@ class Document < AbstractBlock
   #
   # If the attribute is locked, false is returned. Otherwise, the value is
   # assigned to the attribute name after first performing attribute
-  # substitutions on the value. If the attribute name is 'backend', then the
-  # value of backend-related attributes are updated.
+  # substitutions on the value. If the attribute name is 'backend' or
+  # 'doctype', then the value of backend-related attributes are updated.
   #
   # name  - the String attribute name
-  # value - the String attribute value
+  # value - the String attribute value (default: '')
   #
   # returns true if the attribute was set, false if it was not set because it's locked
-  def set_attribute(name, value)
+  def set_attribute(name, value = '')
     if attribute_locked?(name)
       false
     else

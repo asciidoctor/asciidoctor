@@ -533,6 +533,20 @@ not in section
       assert_xpath '/h3/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
     end
 
+    test 'should generate id for floating title from converted title' do
+      input = <<-EOS
+[discrete]
+=== {sp}Heading{sp}
+
+not in section
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/h3', output, 1
+      assert_xpath '/h3[@class="discrete"][@id="_heading"]', output, 1
+      assert_xpath '/h3[@class="discrete"][@id="_heading"][text()=" Heading "]', output, 1
+    end
+
     test 'should create floating title if style is float with shorthand role and id' do
       input = <<-EOS
 [float.independent#first]

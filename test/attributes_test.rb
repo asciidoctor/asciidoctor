@@ -350,6 +350,12 @@ content
       assert doc.attributes.has_key? 'basebackend-html'
     end
 
+    test 'set_attr should set value to empty string if no value is specified' do
+      node = Asciidoctor::Block.new nil, :paragraph, :attributes => {}
+      node.set_attr 'foo'
+      assert_equal '', (node.attr 'foo')
+    end
+
     test 'set_attr should not overwrite existing key if overwrite is false' do
       node = Asciidoctor::Block.new nil, :paragraph, :attributes => { 'foo' => 'bar' }
       assert_equal 'bar', (node.attr 'foo')
@@ -375,6 +381,31 @@ content
       doc.set_attr 'uri', 'https://google.com'
       output = doc.convert
       assert_xpath '//a[@href="https://google.com"]', output, 1
+    end
+
+    test 'set_attribute should set attribute if key is not locked' do
+      doc = empty_document
+      assert !(doc.attr? 'foo')
+      res = doc.set_attribute 'foo', 'baz'
+      assert res
+      assert_equal 'baz', (doc.attr 'foo')
+    end
+
+    test 'set_attribute should not set key if key is locked' do
+      doc = empty_document :attributes => { 'foo' => 'bar' }
+      assert_equal 'bar', (doc.attr 'foo')
+      res = doc.set_attribute 'foo', 'baz'
+      assert !res
+      assert_equal 'bar', (doc.attr 'foo')
+    end
+
+    test 'set_attribute should update backend attributes' do
+      doc = empty_document :attributes => { 'backend' => 'html5@' }
+      assert_equal '', (doc.attr 'backend-html5')
+      res = doc.set_attribute 'backend', 'docbook5'
+      assert res
+      assert !(doc.attr? 'backend-html5')
+      assert_equal '', (doc.attr 'backend-docbook5')
     end
 
     test 'verify toc attribute matrix' do
@@ -877,6 +908,34 @@ after: {counter:mycounter}
       assert_equal 1, doc.attributes['mycounter']
       assert_xpath '//p[text()="before: 1 2 3"]', output, 1
       assert_xpath '//p[text()="after: 1"]', output, 1
+    end
+
+    test 'nested document should use counter from parent document' do
+      input = <<-EOS
+.Title for Foo
+image::foo.jpg[]
+
+[cols="2*a"]
+|===
+|
+.Title for Bar
+image::bar.jpg[]
+
+|
+.Title for Baz
+image::baz.jpg[]
+|===
+
+.Title for Qux
+image::qux.jpg[]
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//div[@class="title"]', output, 4
+      assert_xpath '//div[@class="title"][text() = "Figure 1. Title for Foo"]', output, 1
+      assert_xpath '//div[@class="title"][text() = "Figure 2. Title for Bar"]', output, 1
+      assert_xpath '//div[@class="title"][text() = "Figure 3. Title for Baz"]', output, 1
+      assert_xpath '//div[@class="title"][text() = "Figure 4. Title for Qux"]', output, 1
     end
   end
 

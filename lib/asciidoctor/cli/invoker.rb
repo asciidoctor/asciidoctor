@@ -7,7 +7,7 @@ module Asciidoctor
       attr_reader :documents
       attr_reader :code
 
-      def initialize(*options)
+      def initialize *options
         @documents = []
         @out = nil
         @err = nil
@@ -33,19 +33,12 @@ module Asciidoctor
         return unless @options
 
         old_verbose = $VERBOSE
-        case @options[:verbose]
-        when 0
-          $VERBOSE = nil
-        when 1
-          $VERBOSE = false
-        when 2
-          $VERBOSE = true
-        end
-
         opts = {}
         infiles = []
         outfile = nil
-        tofile = nil
+        err = @err || $stderr
+        show_timings = false
+
         @options.map do |key, val|
           case key
           when :input_files
@@ -57,55 +50,75 @@ module Asciidoctor
           when :attributes
             # NOTE processor will dup attributes internally
             opts[:attributes] = val
+          when :timings
+            show_timings = val
           when :trace
-            # currently, nothing
+            # currently does nothing
+          when :verbose
+            case val
+            when 0
+              $VERBOSE = nil
+            when 1
+              $VERBOSE = false
+            when 2
+              $VERBOSE = true
+            end
           else
             opts[key] = val unless val.nil?
           end
         end
 
-        if infiles.size == 1 && infiles[0] == '-'
-          # allows use of block to supply stdin, particularly useful for tests
-          inputs = [block_given? ? yield : STDIN]
-        else
-          inputs = infiles.map {|infile| ::File.new infile, 'r'}
+        stdin = if infiles.size == 1
+          if (infile0 = infiles[0]) == '-'
+            outfile ||= infile0
+            true
+          elsif ::File.pipe? infile0
+            outfile ||= '-'
+            nil
+          end
         end
 
-        # NOTE if infile is stdin, default to outfile as stout
-        if outfile == '-' || (!outfile && infiles.size == 1 && infiles[0] == '-')
-          tofile = (@out || $stdout)
+        tofile = if outfile == '-'
+          @out || $stdout
         elsif outfile
-          tofile = outfile
           opts[:mkdirs] = true
+          outfile
         else
-          # automatically calculate outfile based on infile unless to_dir is set
-          tofile = nil
           opts[:mkdirs] = true
+          nil # automatically calculate outfile based on infile
         end
 
-        show_timings = @options[:timings]
-        inputs.each do |input|
-          # NOTE processor will dup options and attributes internally
-          input_opts = tofile.nil? ? opts : opts.merge(:to_file => tofile)
+        if stdin
+          # allows use of block to supply stdin, particularly useful for tests
+          input = block_given? ? yield : STDIN
+          input_opts = opts.merge :to_file => tofile
           if show_timings
-            timings = Timings.new
-            @documents << ::Asciidoctor.convert(input, input_opts.merge(:timings => timings))
-            timings.print_report((@err || $stderr), ((input.respond_to? :path) ? input.path : '-'))
+            @documents << (::Asciidoctor.convert input, (input_opts.merge :timings => (timings = Timings.new)))
+            timings.print_report err, '-'
           else
-            @documents << ::Asciidoctor.convert(input, input_opts)
+            @documents << (::Asciidoctor.convert input, input_opts)
+          end
+        else
+          infiles.each do |infile|
+            input_opts = opts.merge :to_file => tofile
+            if show_timings
+              @documents << (::Asciidoctor.convert_file infile, (input_opts.merge :timings => (timings = Timings.new)))
+              timings.print_report err, infile
+            else
+              @documents << (::Asciidoctor.convert_file infile, input_opts)
+            end
           end
         end
       rescue ::Exception => e
         if ::SignalException === e
           @code = e.signo
           # add extra endline if Ctrl+C is used
-          (@err || $stderr).puts if ::Interrupt === e
+          err.puts if ::Interrupt === e
         else
           @code = (e.respond_to? :status) ? e.status : 1
           if @options[:trace]
             raise e
           else
-            err = (@err || $stderr)
             if ::RuntimeError === e
               err.puts %(#{e.message} (#{e.class}))
             else
@@ -123,7 +136,7 @@ module Asciidoctor
         @documents[0]
       end
 
-      def redirect_streams(out, err = nil)
+      def redirect_streams out, err = nil
         @out = out
         @err = err
       end

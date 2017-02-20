@@ -1136,7 +1136,7 @@ module Substitutors
       lines = (text.split EOL)
       return text if lines.size == 1
       last = lines.pop
-      lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).convert }.push(last) * EOL
+      (lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).convert } << last) * EOL
     elsif text.include? '+'
       text.gsub(LineBreakRx) { Inline.new(self, :break, $~[1], :type => :line).convert }
     else
@@ -1290,7 +1290,7 @@ module Substitutors
         case c
         when ','
           if quote_open
-            current.push c
+            current << c
           else
             values << current.join.strip
             current = []
@@ -1298,7 +1298,7 @@ module Substitutors
         when '"'
           quote_open = !quote_open
         else
-          current.push c
+          current << c
         end
       end
 
@@ -1318,7 +1318,7 @@ module Substitutors
   def resolve_subs subs, type = :block, defaults = nil, subject = nil
     return [] if subs.nil_or_empty?
     candidates = nil
-    modifiers_present = SubModifierSniffRx =~ subs
+    modifiers_present = SubModifierSniffRx.match? subs
     subs.tr(' ', '').split(',').each do |key|
       modifier_operation = nil
       if modifiers_present
@@ -1401,7 +1401,7 @@ module Substitutors
       unless (highlighter_loaded = defined? ::CodeRay) || @document.attributes['coderay-unavailable']
         if (Helpers.require_library 'coderay', true, :warn).nil?
           # prevent further attempts to load CodeRay
-          @document.set_attr 'coderay-unavailable', ''
+          @document.set_attr 'coderay-unavailable'
         else
           highlighter_loaded = true
         end
@@ -1410,7 +1410,7 @@ module Substitutors
       unless (highlighter_loaded = defined? ::Pygments) || @document.attributes['pygments-unavailable']
         if (Helpers.require_library 'pygments', 'pygments.rb', :warn).nil?
           # prevent further attempts to load Pygments
-          @document.set_attr 'pygments-unavailable', ''
+          @document.set_attr 'pygments-unavailable'
         else
           highlighter_loaded = true
         end
@@ -1468,8 +1468,9 @@ module Substitutors
           :highlight_lines => highlight_lines,
           :bold_every => false}].highlight source
     when 'pygments'
-      lexer = ::Pygments::Lexer[attr('language', nil, false)] || ::Pygments::Lexer['text']
+      lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer.find_by_mimetype('text/plain')
       opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
+      opts[:startinline] = !(option? 'mixed') if lexer.name == 'PHP'
       unless (@document.attributes['pygments-css'] || 'class') == 'class'
         opts[:noclasses] = true
         opts[:style] = (@document.attributes['pygments-style'] || Stylesheets::DEFAULT_PYGMENTS_STYLE)

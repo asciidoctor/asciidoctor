@@ -99,7 +99,7 @@ module Asciidoctor
   module Compliance
     @keys = ::Set.new
     class << self
-      attr :keys
+      attr_reader :keys
     end
 
     # Defines a new compliance key and assigns an initial value.
@@ -117,7 +117,7 @@ module Asciidoctor
     # Compliance value: true
     define :block_terminates_paragraph, true
 
-    # AsciiDoc does not treat paragraphs labeled with a verbatim style
+    # AsciiDoc does not parse paragraphs labeled with a verbatim style
     # (literal, listing, source, verse) as verbatim
     # This options allows this behavior to be modified
     # Compliance value: false
@@ -305,13 +305,13 @@ module Asciidoctor
   ORDERED_LIST_STYLES = [:arabic, :loweralpha, :lowerroman, :upperalpha, :upperroman] #, :lowergreek]
 
   ORDERED_LIST_KEYWORDS = {
+    #'arabic'     => '1',
+    #'decimal'    => '1',
     'loweralpha' => 'a',
     'lowerroman' => 'i',
+    #'lowergreek' => 'a',
     'upperalpha' => 'A',
     'upperroman' => 'I'
-    #'lowergreek' => 'a'
-    #'arabic'     => '1'
-    #'decimal'    => '1'
   }
 
   LIST_CONTINUATION = '+'
@@ -794,7 +794,7 @@ module Asciidoctor
     #   image::filename.png[Caption]
     #   video::http://youtube.com/12345[Cats vs Dogs]
     #
-    MediaBlockMacroRx = /^(image|video|audio)::(\S+?)\[((?:\\\]|[^\]])*?)\]$/
+    MediaBlockMacroRx = /^(image|video|audio)::(.+?)\[((?:\\\]|[^\]])*?)\]$/
 
     # Matches the TOC block macro.
     #
@@ -1003,10 +1003,15 @@ module Asciidoctor
 
     ## General
 
-    # Matches a blank line.
+    # Matches consecutive blank lines.
     #
-    # NOTE allows for empty space in line as it could be left by the template engine
-    BlankLineRx = /^#{CG_BLANK}*\n/
+    # Examples
+    #
+    #   one
+    #
+    #   two
+    #
+    BlankLineRx = /\n{2,}/
 
     # Matches a comma or semi-colon delimiter.
     #
@@ -1311,13 +1316,18 @@ module Asciidoctor
       # TODO cli checks if input path can be read and is file, but might want to add check to API
       input_path = ::File.expand_path input.path
       # See https://reproducible-builds.org/specs/source-date-epoch/
-      input_mtime = ::ENV['SOURCE_DATE_EPOCH'] ? (::Time.at ::ENV['SOURCE_DATE_EPOCH'].to_i).utc : input.mtime
+      input_mtime = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : input.mtime
       lines = input.readlines
       # hold off on setting infile and indir until we get a better sense of their purpose
       attributes['docfile'] = input_path
       attributes['docdir'] = ::File.dirname input_path
-      attributes['docname'] = Helpers.basename input_path, true
-      docdate = (attributes['docdate'] ||= input_mtime.strftime('%Y-%m-%d'))
+      attributes['docname'] = Helpers.basename input_path, (attributes['docfilesuffix'] = ::File.extname input_path)
+      if (docdate = attributes['docdate'])
+        attributes['docyear'] ||= ((docdate.index '-') == 4 ? docdate[0..3] : nil)
+      else
+        docdate = attributes['docdate'] = (input_mtime.strftime '%Y-%m-%d')
+        attributes['docyear'] ||= input_mtime.year.to_s
+      end
       doctime = (attributes['doctime'] ||= input_mtime.strftime('%H:%M:%S %Z'))
       attributes['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to? :readlines
@@ -1381,7 +1391,7 @@ module Asciidoctor
   #
   # Returns the Asciidoctor::Document
   def load_file filename, options = {}
-    self.load ::File.new(filename || ''), options
+    ::File.open(filename) {|file| self.load file, options }
   end
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and
@@ -1436,27 +1446,26 @@ module Asciidoctor
       return self.load input, options
     else
       write_to_same_dir = false
-      stream_output = to_file.respond_to? :write
-      write_to_target = stream_output ? false : to_file
+      write_to_target = (stream_output = to_file.respond_to? :write) ? false : to_file
     end
 
     unless options.key? :header_footer
       options[:header_footer] = true if write_to_same_dir || write_to_target
     end
 
-    # NOTE at least make intended target directory available, if there is one
+    # NOTE outfile may be controlled by document attributes, so resolve outfile after loading
     if write_to_same_dir
       input_path = ::File.expand_path input.path
       options[:to_dir] = (outdir = ::File.dirname input_path)
     elsif write_to_target
       if to_dir
         if to_file
-          options[:to_dir] = ::File.dirname ::File.expand_path(::File.join to_dir, to_file)
+          options[:to_dir] = ::File.expand_path ::File.join to_dir, to_file, '..'
         else
           options[:to_dir] = ::File.expand_path to_dir
         end
       elsif to_file
-        options[:to_dir] = ::File.dirname ::File.expand_path to_file
+        options[:to_dir] = ::File.expand_path to_file, '..'
       end
     else
       options[:to_dir] = nil
@@ -1464,13 +1473,13 @@ module Asciidoctor
 
     doc = self.load input, options
 
-    if write_to_same_dir
+    if write_to_same_dir # write to file in same directory
       outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
       if outfile == input_path
         raise ::IOError, %(input file and output file cannot be the same: #{outfile})
       end
-    elsif write_to_target
-      working_dir = options.has_key?(:base_dir) ? ::File.expand_path(options[:base_dir]) : ::File.expand_path(::Dir.pwd)
+    elsif write_to_target # write to explicit file or directory
+      working_dir = (options.key? :base_dir) ? (::File.expand_path options[:base_dir]) : (::File.expand_path ::Dir.pwd)
       # QUESTION should the jail be the working_dir or doc.base_dir???
       jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
       if to_dir
@@ -1488,6 +1497,10 @@ module Asciidoctor
         outdir = ::File.dirname outfile
       end
 
+      if ::File === input && outfile == (::File.expand_path input.path)
+        raise ::IOError, %(input file and output file cannot be the same: #{outfile})
+      end
+
       unless ::File.directory? outdir
         if mkdirs
           Helpers.mkdir_p outdir
@@ -1496,7 +1509,7 @@ module Asciidoctor
           raise ::IOError, %(target directory does not exist: #{to_dir})
         end
       end
-    else
+    else # write to stream
       outfile = to_file
       outdir = nil
     end
@@ -1543,9 +1556,7 @@ module Asciidoctor
             end
             stylesheet_dst = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
             unless stylesheet_src == stylesheet_dst || (stylesheet_content = doc.read_asset stylesheet_src).nil?
-              ::File.open(stylesheet_dst, 'w') {|f|
-                f.write stylesheet_content
-              }
+              ::File.open(stylesheet_dst, 'w') {|f| f.write stylesheet_content }
             end
           end
 
@@ -1576,7 +1587,7 @@ module Asciidoctor
   # Returns the Document object if the converted String is written to a
   # file, otherwise the converted String
   def convert_file filename, options = {}
-    self.convert ::File.new(filename || ''), options
+    ::File.open(filename) {|file| self.convert file, options }
   end
 
   # Alias render_file to convert_file to maintain backwards compatibility

@@ -133,7 +133,7 @@ class Reader
     peek_line.nil_or_empty?
   end
 
-  # Public: Peek at the next line of source data. Processes the line, if not
+  # Public: Peek at the next line of source data. Processes the line if not
   # already marked as processed, but does not consume it.
   #
   # This method will probe the reader for more lines. If there is a next line
@@ -167,7 +167,7 @@ class Reader
     end
   end
 
-  # Public: Peek at the next multiple lines of source data. Processes the lines, if not
+  # Public: Peek at the next multiple lines of source data. Processes the lines if not
   # already marked as processed, but does not consume them.
   #
   # This method delegates to Reader#read_line to process and collect the line, then
@@ -252,8 +252,10 @@ class Reader
 
   # Public: Push the String line onto the beginning of the Array of source data.
   #
-  # Since this line was (assumed to be) previously retrieved through the
-  # reader, it is marked as seen.
+  # A line pushed on the reader using this method is not processed again. The
+  # method assumes the line was previously retrieved from the reader or does
+  # not otherwise contain preprocessor directives. Therefore, it is marked as
+  # processed immediately.
   #
   # line_to_restore - the line to restore onto the stack
   #
@@ -266,8 +268,10 @@ class Reader
 
   # Public: Push an Array of lines onto the front of the Array of source data.
   #
-  # Since these lines were (assumed to be) previously retrieved through the
-  # reader, they are marked as seen.
+  # Lines pushed on the reader using this method are not processed again. The
+  # method assumes the lines were previously retrieved from the reader or do
+  # not otherwise contain preprocessor directives. Therefore, they are marked
+  # as processed immediately.
   #
   # Returns nothing.
   def unshift_lines lines_to_restore
@@ -349,7 +353,7 @@ class Reader
       elsif (commentish = next_line.start_with?('//')) && (match = CommentBlockRx.match(next_line))
         comment_lines << shift
         comment_lines.push(*(read_lines_until(:terminator => match[0], :read_last_line => true, :skip_processing => true)))
-      elsif commentish && CommentLineRx =~ next_line
+      elsif commentish && (CommentLineRx.match? next_line)
         comment_lines << shift
       else
         break
@@ -366,7 +370,7 @@ class Reader
     comment_lines = []
     # optimized code for shortest execution path
     while (next_line = peek_line)
-      if CommentLineRx =~ next_line
+      if CommentLineRx.match? next_line
         comment_lines << shift
       else
         break
@@ -470,7 +474,7 @@ class Reader
           line_restored = true
         end
       else
-        unless skip_comments && line.start_with?('//') && CommentLineRx =~ line
+        unless skip_comments && (line.start_with? '//') && (CommentLineRx.match? line)
           result << line
           line_read = true
         end
@@ -913,11 +917,11 @@ class PreprocessorReader < Reader
                 inc_lineno += 1
                 take = inc_lines[0]
                 if ::Float === take && take.infinite?
-                  selected.push l
+                  selected << l
                   inc_line_offset = inc_lineno if inc_line_offset == 0
                 else
                   if f.lineno == take
-                    selected.push l
+                    selected << l
                     inc_line_offset = inc_lineno if inc_line_offset == 0
                     inc_lines.shift
                   end
@@ -954,7 +958,7 @@ class PreprocessorReader < Reader
                   if tl.end_with?(%(end::#{active_tag}[]))
                     active_tag = nil
                   else
-                    selected.push l unless tl.end_with?('[]') && TagDirectiveRx =~ tl
+                    selected << l unless (tl.end_with? '[]') && (TagDirectiveRx.match? tl)
                     inc_line_offset = inc_lineno if inc_line_offset == 0
                   end
                 else
@@ -964,7 +968,7 @@ class PreprocessorReader < Reader
                       tags_found << tag
                       break
                     end
-                  end if tl.end_with?('[]') && TagDirectiveRx =~ tl
+                  end if (tl.end_with? '[]') && (TagDirectiveRx.match? tl)
                 end
               end
             end
@@ -1049,11 +1053,11 @@ class PreprocessorReader < Reader
       if attributes.has_key? 'leveloffset'
         @lines.unshift ''
         @lines.unshift %(:leveloffset: #{attributes['leveloffset']})
-        @lines.push ''
+        @lines << ''
         if (old_leveloffset = @document.attr 'leveloffset')
-          @lines.push %(:leveloffset: #{old_leveloffset})
+          @lines << %(:leveloffset: #{old_leveloffset})
         else
-          @lines.push ':leveloffset!:'
+          @lines << ':leveloffset!:'
         end
         # compensate for these extra lines
         @lineno -= 2
@@ -1113,7 +1117,7 @@ class PreprocessorReader < Reader
       data.shift
       @lineno += 1 if increment_linenos
       while !data.empty? && data[0] != '---'
-        front_matter.push data.shift
+        front_matter << data.shift
         @lineno += 1 if increment_linenos
       end
 

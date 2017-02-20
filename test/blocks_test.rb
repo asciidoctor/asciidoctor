@@ -1562,6 +1562,17 @@ image::images/tiger.png[A [Bengal\\] Tiger]
       assert_equal 'A [Bengal] Tiger', img.attr('alt').value
     end
 
+    test 'can render block image with target containing spaces' do
+      input = <<-EOS
+image::images/big tiger.png[A Big Tiger]
+      EOS
+
+      output = render_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'images/big%20tiger.png', img.attr('src').value
+      assert_equal 'A Big Tiger', img.attr('alt').value
+    end
+
     test 'can render block image with alt text defined in block attribute above macro' do
       input = <<-EOS
 [Tiger]
@@ -1656,7 +1667,7 @@ image::images/tiger.png[Tiger]
 
     test 'can align image in DocBook backend' do
       input = <<-EOS
-image::images/sunset.jpg[Sunset, align="right"]
+image::images/sunset.jpg[Sunset,align=right]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
@@ -1664,36 +1675,54 @@ image::images/sunset.jpg[Sunset, align="right"]
       assert_xpath '//imagedata[@align="right"]', output, 1
     end
 
+    test 'should set content width and depth in DocBook backend if no scaling' do
+      input = <<-EOS
+image::images/sunset.jpg[Sunset,500,332]
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_xpath '//imagedata', output, 1
+      assert_xpath '//imagedata[@contentwidth="500"]', output, 1
+      assert_xpath '//imagedata[@contentdepth="332"]', output, 1
+      assert_xpath '//imagedata[@width]', output, 0
+      assert_xpath '//imagedata[@depth]', output, 0
+    end
+
     test 'can scale image in DocBook backend' do
       input = <<-EOS
-image::images/sunset.jpg[Sunset, scale="200"]
+image::images/sunset.jpg[Sunset,500,332,scale=200]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@scale="200"]', output, 1
+      assert_xpath '//imagedata[@width]', output, 0
+      assert_xpath '//imagedata[@depth]', output, 0
+      assert_xpath '//imagedata[@contentwidth]', output, 0
+      assert_xpath '//imagedata[@contentdepth]', output, 0
     end
 
-    test 'can scale image width in DocBook backend' do
+    test 'scale image width in DocBook backend' do
       input = <<-EOS
-image::images/sunset.jpg[Sunset, scaledwidth="25%"]
+image::images/sunset.jpg[Sunset,500,332,scaledwidth=25%]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@width="25%"]', output, 1
-      assert_xpath '//imagedata[@scalefit="1"]', output, 1
+      assert_xpath '//imagedata[@depth]', output, 0
+      assert_xpath '//imagedata[@contentwidth]', output, 0
+      assert_xpath '//imagedata[@contentdepth]', output, 0
     end
 
     test 'adds % to scaled width if no units given in DocBook backend ' do
       input = <<-EOS
-image::images/sunset.jpg[Sunset, scaledwidth="25"]
+image::images/sunset.jpg[Sunset,scaledwidth=25]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@width="25%"]', output, 1
-      assert_xpath '//imagedata[@scalefit="1"]', output, 1
     end
 
     test 'keeps line unprocessed if image target is missing attribute reference and attribute-missing is skip' do
@@ -2067,6 +2096,17 @@ audio::podcast.mp3[options="autoplay,nocontrols,loop"]
       assert_css 'audio:not([controls])', output, 1
       assert_css 'audio[loop]', output, 1
     end
+
+    test 'audio macro should support start and end time' do
+      input = <<-EOS
+audio::podcast.mp3[start=1,end=2]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'audio', output, 1
+      assert_css 'audio[controls]', output, 1
+      assert_css 'audio[src="podcast.mp3#t=1,2"]', output, 1
+    end
   end
 
   context 'Admonition icons' do
@@ -2194,7 +2234,7 @@ puts "AsciiDoc, FTW!"
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
       assert_css 'html > head > link[rel="stylesheet"][href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"]', output, 1
-      assert_css 'html > body > script[src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"]', output, 1
+      assert_css 'html > body > script[src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"]', output, 1
     end
 
     test 'should use no uri scheme for assets when asset-uri-scheme is blank' do
@@ -2211,7 +2251,7 @@ puts "AsciiDoc, FTW!"
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
       assert_css 'html > head > link[rel="stylesheet"][href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"]', output, 1
-      assert_css 'html > body > script[src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"]', output, 1
+      assert_css 'html > body > script[src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"]', output, 1
     end
   end
 
@@ -2325,6 +2365,19 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
       assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
       assert_match(/\.CodeRay *\{/, output)
+    end
+
+    test 'should number lines if third positional attribute is set' do
+      input = <<-EOS
+:source-highlighter: coderay
+
+[source,ruby,linenums]
+----
+puts 'Hello, World!'
+----
+      EOS
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_xpath '//td[@class="line-numbers"]', output, 1
     end
 
     test 'should read source language from source-language document attribute if not specified on source block' do

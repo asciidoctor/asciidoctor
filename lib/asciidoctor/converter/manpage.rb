@@ -60,6 +60,7 @@ module Asciidoctor
         gsub('\'', '\(aq').       # apostrophe-quote
         gsub(MockBoundaryRx, ''). # mock boundary
         gsub(ESC_BS, '\\').       # unescape troff backslash (NOTE update if more escapes are added)
+        gsub(ESC_FS, '.').        # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
         rstrip                    # strip trailing space
       opts[:append_newline] ? %(#{str}#{LF}) : str
     end
@@ -432,17 +433,15 @@ allbox tab(:);'
             row_text[row_index] << %(T{#{LF}.sp#{LF})
             cell_halign = (cell.attr 'halign', 'left')[0..0]
             if tsec == :head
-              if row_header[row_index].empty? ||
-                 row_header[row_index][cell_index].empty?
+              if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}tB)
               else
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{cell.text}#{LF})
+              row_text[row_index] << %(#{manify cell.text}#{LF})
             elsif tsec == :body
-              if row_header[row_index].empty? ||
-                 row_header[row_index][cell_index].empty?
+              if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}t)
               else
                 row_header[row_index][cell_index + 1] ||= []
@@ -454,23 +453,21 @@ allbox tab(:);'
               when :verse, :literal
                 cell_content = cell.text
               else
-                cell_content = cell.content.join
+                cell_content = manify cell.content.join
               end
               row_text[row_index] << %(#{cell_content}#{LF})
             elsif tsec == :foot
-              if row_header[row_index].empty? ||
-                 row_header[row_index][cell_index].empty?
+              if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}tB)
               else
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{cell.text}#{LF})
+              row_text[row_index] << %(#{manify cell.text}#{LF})
             end
             if cell.colspan && cell.colspan > 1
               (cell.colspan - 1).times do |i|
-                if row_header[row_index].empty? ||
-                   row_header[row_index][cell_index].empty?
+                if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                   row_header[row_index][cell_index + i] << 'st'
                 else
                   row_header[row_index][cell_index + 1 + i] ||= []
@@ -481,8 +478,7 @@ allbox tab(:);'
             if cell.rowspan && cell.rowspan > 1
               (cell.rowspan - 1).times do |i|
                 row_header[row_index + 1 + i] ||= []
-                if row_header[row_index + 1 + i].empty? ||
-                   row_header[row_index + 1 + i][cell_index].empty?
+                if row_header[row_index + 1 + i].empty? || row_header[row_index + 1 + i][cell_index].empty?
                   row_header[row_index + 1 + i][cell_index] ||= []
                   row_header[row_index + 1 + i][cell_index] << '^t'
                 else
@@ -610,8 +606,7 @@ allbox tab(:);'
     end
 
     def inline_break node
-      %(#{node.text}
-.br)
+      %(#{node.text}#{LF}#{ESC_FS}br)
     end
 
     def inline_button node

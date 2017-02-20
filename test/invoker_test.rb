@@ -41,6 +41,7 @@ context 'Invoker' do
     assert_equal sample_filepath, doc.attr('docfile')
     assert_equal sample_filedir, doc.attr('docdir')
     assert doc.attr?('docdate')
+    assert doc.attr?('docyear')
     assert doc.attr?('doctime')
     assert doc.attr?('docdatetime')
     assert invoker.read_output.empty?
@@ -51,6 +52,7 @@ context 'Invoker' do
     invoker = invoke_cli_to_buffer %w(-o /dev/null -a docdate=2015-01-01 -a doctime=10:00:00-07:00), sample_filepath
     doc = invoker.document
     assert doc.attr?('docdate', '2015-01-01')
+    assert doc.attr?('docyear', '2015')
     assert doc.attr?('doctime', '10:00:00-07:00')
     assert doc.attr?('docdatetime', '2015-01-01 10:00:00-07:00')
   end
@@ -62,6 +64,7 @@ context 'Invoker' do
     assert !doc.attr?('docfile')
     assert_equal Dir.pwd, doc.attr('docdir')
     assert_equal doc.attr('docdate'), doc.attr('localdate')
+    assert_equal doc.attr('docyear'), doc.attr('localyear')
     assert_equal doc.attr('doctime'), doc.attr('localtime')
     assert_equal doc.attr('docdatetime'), doc.attr('localdatetime')
     assert !doc.attr?('outfile')
@@ -91,6 +94,7 @@ context 'Invoker' do
       assert !doc.attr?('docfile')
       assert_equal Dir.pwd, doc.attr('docdir')
       assert_equal doc.attr('docdate'), doc.attr('localdate')
+      assert_equal doc.attr('docyear'), doc.attr('localyear')
       assert_equal doc.attr('doctime'), doc.attr('localtime')
       assert_equal doc.attr('docdatetime'), doc.attr('localdatetime')
       assert doc.attr?('outfile')
@@ -100,6 +104,33 @@ context 'Invoker' do
       FileUtils.rm_f(sample_outpath)
     end
   end
+
+  test 'should fail if input file matches resolved output file' do
+    invoker = invoke_cli_to_buffer %W(-a outfilesuffix=.asciidoc), 'sample.asciidoc'
+    assert_match(/input file and output file cannot be the same/, invoker.read_error)
+  end
+
+  test 'should fail if input file matches specified output file' do
+    sample_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.asciidoc'))
+    invoker = invoke_cli_to_buffer %W(-o #{sample_outpath}), 'sample.asciidoc'
+    assert_match(/input file and output file cannot be the same/, invoker.read_error)
+  end
+
+  test 'should accept input from named pipe and output to stdout' do
+    sample_inpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample-pipe.adoc'))
+    begin
+      %x(mkfifo #{sample_inpath})
+      write_thread = Thread.new do
+        ::File.write sample_inpath, 'pipe content'
+      end
+      invoker = invoke_cli_to_buffer %w(-a stylesheet!), sample_inpath
+      result = invoker.read_output
+      assert_match(/pipe content/, result)
+      write_thread.join
+    ensure
+      ::FileUtils.rm_f sample_inpath
+    end
+  end if RUBY_MIN_VERSION_1_9 && !windows?
 
   test 'should allow docdir to be specified when input is a string' do
     expected_docdir = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures'))
@@ -558,11 +589,32 @@ context 'Invoker' do
       invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
       doc = invoker.document
       assert_equal '2009-02-08', (doc.attr 'docdate')
+      assert_equal '2009', (doc.attr 'docyear')
       assert_match(/2009-02-08 20:03:32 (GMT|UTC)/, (doc.attr 'docdatetime'))
       assert_equal '2009-02-08', (doc.attr 'localdate')
+      assert_equal '2009', (doc.attr 'localyear')
       assert_match(/2009-02-08 20:03:32 (GMT|UTC)/, (doc.attr 'localdatetime'))
     ensure
-      ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch if old_source_date_epoch
+      if old_source_date_epoch
+        ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+      else
+        ENV.delete 'SOURCE_DATE_EPOCH'
+      end
+    end
+  end
+
+  test 'should fail if SOURCE_DATE_EPOCH is malformed' do
+    old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+    begin
+      ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
+      sample_filepath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'sample.asciidoc'))
+      assert_equal 1, (invoke_cli_to_buffer %w(-o /dev/null), sample_filepath).code
+    ensure
+      if old_source_date_epoch
+        ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+      else
+        ENV.delete 'SOURCE_DATE_EPOCH'
+      end
     end
   end
 end

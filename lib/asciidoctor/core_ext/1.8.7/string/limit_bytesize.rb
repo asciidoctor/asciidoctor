@@ -16,12 +16,13 @@ if RUBY_ENGINE_JRUBY
   end
 else
   class String
+    ValidTrailingCharRx = /.$/u
     # Safely truncate the string to the specified number of bytes.
     # If a multibyte char gets split, the dangling fragment is removed.
     def limit_bytesize size
       return self unless size < bytesize
       result = (unpack %(a#{size}))[0]
-      result.chop! until result.empty? || /.$/u =~ result
+      result.chop! until result.empty? || (ValidTrailingCharRx.match? result)
       result
     end unless method_defined? :limit_bytesize
   end

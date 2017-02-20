@@ -826,6 +826,24 @@ I wouldn't have it any other way.
       assert_equal 26, literal.text.lines.entries.size
     end
 
+    test 'should strip trailing endline when splitting paragraphs' do
+      input = <<-EOS
+|===
+|first wrapped
+paragraph
+
+second paragraph
+
+third paragraph
+|===
+      EOS
+
+      result = render_embedded_string input
+      assert_xpath %((//p[@class="tableblock"])[1][text()="first wrapped\nparagraph"]), result, 1
+      assert_xpath %((//p[@class="tableblock"])[2][text()="second paragraph"]), result, 1
+      assert_xpath %((//p[@class="tableblock"])[3][text()="third paragraph"]), result, 1
+    end
+
     test 'basic asciidoc cell' do
       input = <<-EOS
 |===
