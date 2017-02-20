@@ -440,7 +440,7 @@ allbox tab(:);'
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{cell.text}#{LF})
+              row_text[row_index] << %(#{manify cell.text}#{LF})
             elsif tsec == :body
               if row_header[row_index].empty? ||
                  row_header[row_index][cell_index].empty?
@@ -455,9 +455,8 @@ allbox tab(:);'
               when :verse, :literal
                 cell_content = cell.text
               else
-                cell_content = cell.content.join
+                cell_content = manify cell.content.join
               end
-              cell_content = manify cell_content
               row_text[row_index] << %(#{cell_content}#{LF})
             elsif tsec == :foot
               if row_header[row_index].empty? ||
@@ -467,7 +466,7 @@ allbox tab(:);'
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{cell.text}#{LF})
+              row_text[row_index] << %(#{manify cell.text}#{LF})
             end
             if cell.colspan && cell.colspan > 1
               (cell.colspan - 1).times do |i|

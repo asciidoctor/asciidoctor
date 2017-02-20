@@ -70,12 +70,14 @@ BBB this line and the one above it should be visible)
       assert_equal '\&.if 1 .nx', output.lines.entries[-2].chomp
     end
 
-    test 'should not leave boundary element in tables' do
+    test 'should manify normal table cell content' do
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
+[%header%footer,cols=2*]
 |===
-| A   | B
-| `0` | *1*
+|*Col A* |_Col B_
+|*bold* |`mono`
+|_italic_ | #mark#
 |===)
       output = Asciidoctor.convert input, :backend => :manpage
       refute_match(/<\/?BOUNDARY>/, output)
