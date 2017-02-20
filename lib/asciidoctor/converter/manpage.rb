@@ -433,8 +433,7 @@ allbox tab(:);'
             row_text[row_index] << %(T{#{LF}.sp#{LF})
             cell_halign = (cell.attr 'halign', 'left')[0..0]
             if tsec == :head
-              if row_header[row_index].empty? ||
-                 row_header[row_index][cell_index].empty?
+              if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}tB)
               else
                 row_header[row_index][cell_index + 1] ||= []
@@ -442,8 +441,7 @@ allbox tab(:);'
               end
               row_text[row_index] << %(#{manify cell.text}#{LF})
             elsif tsec == :body
-              if row_header[row_index].empty? ||
-                 row_header[row_index][cell_index].empty?
+              if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}t)
               else
                 row_header[row_index][cell_index + 1] ||= []
@@ -459,8 +457,7 @@ allbox tab(:);'
               end
               row_text[row_index] << %(#{cell_content}#{LF})
             elsif tsec == :foot
-              if row_header[row_index].empty? ||
-                 row_header[row_index][cell_index].empty?
+              if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}tB)
               else
                 row_header[row_index][cell_index + 1] ||= []
@@ -470,8 +467,7 @@ allbox tab(:);'
             end
             if cell.colspan && cell.colspan > 1
               (cell.colspan - 1).times do |i|
-                if row_header[row_index].empty? ||
-                   row_header[row_index][cell_index].empty?
+                if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                   row_header[row_index][cell_index + i] << 'st'
                 else
                   row_header[row_index][cell_index + 1 + i] ||= []
@@ -482,8 +478,7 @@ allbox tab(:);'
             if cell.rowspan && cell.rowspan > 1
               (cell.rowspan - 1).times do |i|
                 row_header[row_index + 1 + i] ||= []
-                if row_header[row_index + 1 + i].empty? ||
-                   row_header[row_index + 1 + i][cell_index].empty?
+                if row_header[row_index + 1 + i].empty? || row_header[row_index + 1 + i][cell_index].empty?
                   row_header[row_index + 1 + i][cell_index] ||= []
                   row_header[row_index + 1 + i][cell_index] << '^t'
                 else
