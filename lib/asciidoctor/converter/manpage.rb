@@ -457,6 +457,7 @@ allbox tab(:);'
               else
                 cell_content = cell.content.join
               end
+              cell_content = manify cell_content
               row_text[row_index] << %(#{cell_content}#{LF})
             elsif tsec == :foot
               if row_header[row_index].empty? ||
