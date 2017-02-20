@@ -69,6 +69,17 @@ BBB this line and the one above it should be visible)
       output = Asciidoctor.convert input, :backend => :manpage
       assert_equal '\&.if 1 .nx', output.lines.entries[-2].chomp
     end
+
+    test 'should not leave boundary element in tables' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+|===
+| A   | B
+| `0` | *1*
+|===)
+      output = Asciidoctor.convert input, :backend => :manpage
+      refute_match(/<\/?BOUNDARY>/, output)
+    end
   end
 
   context 'Backslash' do
