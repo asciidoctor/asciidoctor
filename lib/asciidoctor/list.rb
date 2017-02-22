@@ -59,6 +59,8 @@ class ListItem < AbstractBlock
     @level = parent.level
   end
 
+  # Public: A convenience method that checks whether the text of this list item
+  # is not blank (i.e., not nil or empty string).
   def text?
     !@text.nil_or_empty?
   end

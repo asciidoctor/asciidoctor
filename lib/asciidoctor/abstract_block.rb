@@ -99,8 +99,8 @@ class AbstractBlock < AbstractNode
     @subs.include? name
   end
 
-  # Public: A convenience method that indicates whether the title instance
-  # variable is blank (nil or empty)
+  # Public: A convenience method that checks whether the title of this block is
+  # not blank (i.e., not nil or empty string).
   def title?
     !@title.nil_or_empty?
   end
