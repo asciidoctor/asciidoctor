@@ -4401,4 +4401,19 @@ listing block in list item 1
     assert !list.items.first.simple?
     assert list.items.first.compound?
   end
+
+  test 'should allow text of ListItem to be assigned' do
+    input = <<-EOS
+* one
+* two
+* three
+    EOS
+
+    doc = document_from_string input
+    list = (doc.find_by :context => :ulist).first
+    assert_equal 3, list.items.size 
+    assert_equal 'one', list.items[0].text
+    list.items[0].text = 'un'
+    assert_equal 'un', list.items[0].text
+  end
 end

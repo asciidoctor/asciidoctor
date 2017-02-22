@@ -65,8 +65,18 @@ class ListItem < AbstractBlock
     !@text.nil_or_empty?
   end
 
+  # Public: Get the String text of this ListItem with substitutions applied.
+  #
+  # Returns the converted String text for this ListItem
   def text
     apply_subs @text
+  end
+
+  # Public: Set the String text.
+  #
+  # Returns the new String text assigned to this ListItem
+  def text= val
+    @text = val
   end
 
   # Check whether this list item has simple content (no nested blocks aside from a single outline list).
