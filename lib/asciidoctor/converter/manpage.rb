@@ -450,8 +450,10 @@ allbox tab(:);'
               case cell.style
               when :asciidoc
                 cell_content = cell.content
-              when :verse, :literal
-                cell_content = cell.text
+              when :literal
+                cell_content = %(.nf#{LF}#{manify cell.text}#{LF}.fi)
+              when :verse
+                cell_content = %(.nf#{LF}#{manify cell.text}#{LF}.fi)
               else
                 cell_content = manify cell.content.join
               end

@@ -69,19 +69,6 @@ BBB this line and the one above it should be visible)
       output = Asciidoctor.convert input, :backend => :manpage
       assert_equal '\&.if 1 .nx', output.lines.entries[-2].chomp
     end
-
-    test 'should manify normal table cell content' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
-
-[%header%footer,cols=2*]
-|===
-|*Col A* |_Col B_
-|*bold* |`mono`
-|_italic_ | #mark#
-|===)
-      output = Asciidoctor.convert input, :backend => :manpage
-      refute_match(/<\/?BOUNDARY>/, output)
-    end
   end
 
   context 'Backslash' do
@@ -215,6 +202,75 @@ Please search |link:http://discuss.asciidoctor.org[the forums]| before asking.)
 Please search |\c
 .URL "http://discuss.asciidoctor.org" "the forums" "|"
 before asking.', output.lines.entries[-4..-1].join
+    end
+  end
+
+  context 'Table' do
+    test 'should manify normal table cell content' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+[%header%footer,cols=2*]
+|===
+|*Col A* |_Col B_
+|*bold* |`mono`
+|_italic_ | #mark#
+|===)
+      output = Asciidoctor.convert input, :backend => :manpage
+      refute_match(/<\/?BOUNDARY>/, output)
+    end
+
+    test 'should manify and preserve whitespace in literal table cell' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+|===
+|a l|b
+c    _d_
+.
+|===)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert output.end_with? '.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+a
+T}:T{
+.sp
+.nf
+b
+c    _d_
+\\&.
+.fi
+T}
+.TE
+.sp'
+    end
+
+    test 'should manify and preserve whitespace in verse table cell' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+|===
+|a v|b
+c    _d_
+.
+|===)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert output.end_with? '.TS
+allbox tab(:);
+lt lt.
+T{
+.sp
+a
+T}:T{
+.sp
+.nf
+b
+c    \\fId\\fP
+\\&.
+.fi
+T}
+.TE
+.sp'
     end
   end
 
