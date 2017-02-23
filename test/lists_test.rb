@@ -4416,4 +4416,27 @@ listing block in list item 1
     list.items[0].text = 'un'
     assert_equal 'un', list.items[0].text
   end
+
+  test 'should allow API control over substitutions applied to ListItem text' do
+    input = <<-EOS
+* *one*
+* _two_
+* `three`
+* #four#
+    EOS
+
+    doc = document_from_string input
+    list = (doc.find_by :context => :ulist).first
+    assert_equal 4, list.items.size 
+    list.items[0].remove_sub :quotes
+    assert_equal '*one*', list.items[0].text
+    refute_includes list.items[0].subs, :quotes
+    list.items[1].subs.clear
+    assert_empty list.items[1].subs
+    assert_equal '_two_', list.items[1].text
+    list.items[2].subs.replace [:specialcharacters]
+    assert_equal [:specialcharacters], list.items[2].subs
+    assert_equal '`three`', list.items[2].text
+    assert_equal '<mark>four</mark>', list.items[3].text
+  end
 end

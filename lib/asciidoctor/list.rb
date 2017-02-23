@@ -57,6 +57,7 @@ class ListItem < AbstractBlock
     super parent, :list_item
     @text = text
     @level = parent.level
+    @subs = SUBS[:normal].dup
   end
 
   # Public: A convenience method that checks whether the text of this list item
@@ -67,9 +68,12 @@ class ListItem < AbstractBlock
 
   # Public: Get the String text of this ListItem with substitutions applied.
   #
+  # By default, normal substitutions are applied to the text. The substitutions
+  # can be modified by altering the subs property of this object.
+  #
   # Returns the converted String text for this ListItem
   def text
-    apply_subs @text
+    apply_subs @text, @subs
   end
 
   # Public: Set the String text.
