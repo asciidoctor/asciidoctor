@@ -14,21 +14,21 @@ module Substitutors
   SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
 
   SUBS = {
-    :basic    => [:specialcharacters],
-    :normal   => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements],
-    :verbatim => [:specialcharacters, :callouts],
-    :title    => [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements],
-    :header   => [:specialcharacters, :attributes],
+    :basic    => [:specialcharacters].freeze,
+    :normal   => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements].freeze,
+    :verbatim => [:specialcharacters, :callouts].freeze,
+    :title    => [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements].freeze,
+    :header   => [:specialcharacters, :attributes].freeze,
     # by default, AsciiDoc performs :attributes and :macros on a pass block
     # TODO make this a compliance setting
-    :pass     => []
+    :pass     => [].freeze
   }
 
   COMPOSITE_SUBS = {
-    :none => [],
+    :none => [].freeze,
     :normal => SUBS[:normal],
     :verbatim => SUBS[:verbatim],
-    :specialchars => [:specialcharacters]
+    :specialchars => [:specialcharacters].freeze
   }
 
   SUB_SYMBOLS = {
