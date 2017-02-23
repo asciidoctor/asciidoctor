@@ -475,7 +475,7 @@ ____
       EOS
 
       verse = block_from_string input
-      assert_equal Asciidoctor::Substitutors::SUBS[:normal], verse.subs
+      assert_equal Asciidoctor::Substitutors::NORMAL_SUBS, verse.subs
     end
 
     test 'should not recognize callouts in a verse' do
