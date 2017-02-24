@@ -4,7 +4,6 @@ module Asciidoctor
 # is intented to be mixed-in to Section and Block to provide operations for performing
 # the necessary substitutions.
 module Substitutors
-
   SPECIAL_CHARS = {
     '&' => '&amp;',
     '<' => '&lt;',
@@ -13,25 +12,22 @@ module Substitutors
 
   SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
 
-  SUBS = {
-    :basic    => [:specialcharacters].freeze,
-    :normal   => [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements].freeze,
-    :verbatim => [:specialcharacters, :callouts].freeze,
-    :title    => [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements].freeze,
-    :header   => [:specialcharacters, :attributes].freeze,
-    # by default, AsciiDoc performs :attributes and :macros on a pass block
-    # TODO make this a compliance setting
-    :pass     => [].freeze
-  }
+  BASIC_SUBS = [:specialcharacters].freeze
+  HEADER_SUBS = [:specialcharacters, :attributes].freeze
+  NORMAL_SUBS = [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements].freeze
+  # TODO make this a compliance setting; AsciiDoc Python performs :attributes and :macros on a pass block
+  PASS_SUBS = [].freeze
+  TITLE_SUBS = [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements].freeze
+  VERBATIM_SUBS = [:specialcharacters, :callouts].freeze
 
-  COMPOSITE_SUBS = {
+  SUB_GROUPS = {
     :none => [].freeze,
-    :normal => SUBS[:normal],
-    :verbatim => SUBS[:verbatim],
-    :specialchars => [:specialcharacters].freeze
+    :normal => NORMAL_SUBS,
+    :verbatim => VERBATIM_SUBS,
+    :specialchars => BASIC_SUBS
   }
 
-  SUB_SYMBOLS = {
+  SUB_HINTS = {
     :a => :attributes,
     :m => :macros,
     :n => :normal,
@@ -43,8 +39,8 @@ module Substitutors
   }
 
   SUB_OPTIONS = {
-    :block  => COMPOSITE_SUBS.keys + SUBS[:normal] + [:callouts],
-    :inline => COMPOSITE_SUBS.keys + SUBS[:normal]
+    :block  => SUB_GROUPS.keys + NORMAL_SUBS + [:callouts],
+    :inline => SUB_GROUPS.keys + NORMAL_SUBS
   }
 
   SUB_HIGHLIGHT = ['coderay', 'pygments']
@@ -78,15 +74,15 @@ module Substitutors
     if !subs
       return source
     elsif subs == :normal
-      subs = SUBS[:normal]
+      subs = NORMAL_SUBS
     elsif expand
       if ::Symbol === subs
-        subs = COMPOSITE_SUBS[subs] || [subs]
+        subs = SUB_GROUPS[subs] || [subs]
       else
         effective_subs = []
         subs.each do |key|
-          if COMPOSITE_SUBS.has_key? key
-            effective_subs += COMPOSITE_SUBS[key]
+          if SUB_GROUPS.has_key? key
+            effective_subs += SUB_GROUPS[key]
           else
             effective_subs << key
           end
@@ -147,7 +143,7 @@ module Substitutors
   #
   # returns - A String with title substitutions performed
   def apply_title_subs(title)
-    apply_subs title, SUBS[:title]
+    apply_subs title, TITLE_SUBS
   end
 
   # Public: Apply substitutions for header metadata and attribute assignments
@@ -156,7 +152,7 @@ module Substitutors
   #
   # returns - A String with header substitutions performed
   def apply_header_subs(text)
-    apply_subs text, SUBS[:header]
+    apply_subs text, HEADER_SUBS
   end
 
   # Internal: Extract the passthrough text from the document for reinsertion after processing.
@@ -217,12 +213,12 @@ module Substitutors
           # must enclose string following next in " for Opal
           next "#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary}"
         end
-        subs = (boundary == '+++' ? [] : [:specialcharacters])
+        subs = (boundary == '+++' ? [] : BASIC_SUBS)
 
         pass_key = @passthroughs.size
         if attributes
           if old_behavior
-            @passthroughs[pass_key] = {:text => content, :subs => SUBS[:normal], :type => :monospaced, :attributes => attributes}
+            @passthroughs[pass_key] = {:text => content, :subs => NORMAL_SUBS, :type => :monospaced, :attributes => attributes}
           else
             @passthroughs[pass_key] = {:text => content, :subs => subs, :type => :unquoted, :attributes => attributes}
           end
@@ -283,16 +279,16 @@ module Substitutors
 
       pass_key = @passthroughs.size
       if compat_mode
-        @passthroughs[pass_key] = {:text => content, :subs => [:specialcharacters], :attributes => attributes, :type => :monospaced}
+        @passthroughs[pass_key] = {:text => content, :subs => BASIC_SUBS, :attributes => attributes, :type => :monospaced}
       elsif attributes
         if old_behavior
-          subs = (format_mark == '`' ? [:specialcharacters] : SUBS[:normal])
+          subs = (format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS)
           @passthroughs[pass_key] = {:text => content, :subs => subs, :attributes => attributes, :type => :monospaced}
         else
-          @passthroughs[pass_key] = {:text => content, :subs => [:specialcharacters], :attributes => attributes, :type => :unquoted}
+          @passthroughs[pass_key] = {:text => content, :subs => BASIC_SUBS, :attributes => attributes, :type => :unquoted}
         end
       else
-        @passthroughs[pass_key] = {:text => content, :subs => [:specialcharacters]}
+        @passthroughs[pass_key] = {:text => content, :subs => BASIC_SUBS}
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -312,7 +308,7 @@ module Substitutors
       end
       content = unescape_brackets m[3]
       if m[2].nil_or_empty?
-        subs = (@document.basebackend? 'html') ? [:specialcharacters] : []
+        subs = (@document.basebackend? 'html') ? BASIC_SUBS : []
       else
         subs = resolve_pass_subs m[2]
       end
@@ -1336,12 +1332,12 @@ module Substitutors
       key = key.to_sym
       # special case to disable callouts for inline subs
       if type == :inline && (key == :verbatim || key == :v)
-        resolved_keys = [:specialcharacters]
-      elsif COMPOSITE_SUBS.key? key
-        resolved_keys = COMPOSITE_SUBS[key]
-      elsif type == :inline && key.length == 1 && (SUB_SYMBOLS.key? key)
-        resolved_key = SUB_SYMBOLS[key]
-        if (candidate = COMPOSITE_SUBS[resolved_key])
+        resolved_keys = BASIC_SUBS
+      elsif SUB_GROUPS.key? key
+        resolved_keys = SUB_GROUPS[key]
+      elsif type == :inline && key.length == 1 && (SUB_HINTS.key? key)
+        resolved_key = SUB_HINTS[key]
+        if (candidate = SUB_GROUPS[resolved_key])
           resolved_keys = candidate
         else
           resolved_keys = [resolved_key]
@@ -1583,49 +1579,46 @@ module Substitutors
 
   # Internal: Lock-in the substitutions for this block
   #
-  # Looks for an attribute named "subs". If present, resolves the
-  # substitutions and assigns it to the subs property on this block.
-  # Otherwise, assigns a set of default substitutions based on the
-  # content model of the block.
+  # Looks for an attribute named "subs". If present, resolves substitutions
+  # from the value of that attribute and assigns them to the subs property on
+  # this block. Otherwise, uses the substitutions assigned to the default_subs
+  # property, if specified, or selects a default set of substitutions based on
+  # the content model of the block.
   #
-  # Returns nothing
+  # Returns The Array of resolved substitutions now assigned to this block
   def lock_in_subs
-    if @default_subs
-      default_subs = @default_subs
-    else
+    unless (default_subs = @default_subs)
       case @content_model
       when :simple
-        default_subs = SUBS[:normal]
+        default_subs = NORMAL_SUBS
       when :verbatim
         if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
-          default_subs = SUBS[:verbatim]
+          default_subs = VERBATIM_SUBS
         elsif @context == :verse
-          default_subs = SUBS[:normal]
+          default_subs = NORMAL_SUBS
         else
-          default_subs = SUBS[:basic]
+          default_subs = BASIC_SUBS
         end
       when :raw
         if @context == :stem
-          default_subs = SUBS[:basic]
+          default_subs = BASIC_SUBS
         else
-          default_subs = SUBS[:pass]
+          default_subs = PASS_SUBS
         end
       else
-        return
+        return @subs
       end
     end
 
-    if (custom_subs = @attributes['subs'])
-      @subs = resolve_block_subs custom_subs, default_subs, @context
-    else
-      @subs = default_subs.dup
-    end
+    @subs = (custom_subs = @attributes['subs']) ? (resolve_block_subs custom_subs, default_subs, @context) : default_subs.dup
 
     # QUESION delegate this logic to a method?
-    if @context == :listing && @style == 'source' && @attributes['language'] &&
-        @document.basebackend?('html') && SUB_HIGHLIGHT.include?(@document.attributes['source-highlighter'])
-      @subs = @subs.map {|sub| sub == :specialcharacters ? :highlight : sub }
+    if @context == :listing && @style == 'source' && (@attributes.key? 'language') && (@document.basebackend? 'html') &&
+        (SUB_HIGHLIGHT.include? @document.attributes['source-highlighter']) && (idx = @subs.index :specialcharacters)
+      @subs[idx] = :highlight
     end
+
+    @subs
   end
 end
 end

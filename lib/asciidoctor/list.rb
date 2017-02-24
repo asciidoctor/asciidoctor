@@ -57,7 +57,7 @@ class ListItem < AbstractBlock
     super parent, :list_item
     @text = text
     @level = parent.level
-    @subs = SUBS[:normal].dup
+    @subs = NORMAL_SUBS.dup
   end
 
   # Public: A convenience method that checks whether the text of this list item
