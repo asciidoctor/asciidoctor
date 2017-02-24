@@ -81,7 +81,7 @@ module Substitutors
       else
         effective_subs = []
         subs.each do |key|
-          if SUB_GROUPS.has_key? key
+          if SUB_GROUPS.key? key
             effective_subs += SUB_GROUPS[key]
           else
             effective_subs << key
@@ -532,8 +532,9 @@ module Substitutors
     found[:colon] = found_colon = source.include?(':')
     found[:macroish] = (found[:square_bracket] && found_colon)
     found[:macroish_short_form] = (found[:square_bracket] && found_colon && source.include?(':['))
-    use_link_attrs = @document.attributes.has_key?('linkattrs')
-    experimental = @document.attributes.has_key?('experimental')
+    doc_attrs = @document.attributes
+    use_link_attrs = doc_attrs.key? 'linkattrs'
+    experimental = doc_attrs.key? 'experimental'
 
     # NOTE interpolation is faster than String#dup
     result = %(#{source})
@@ -796,7 +797,7 @@ module Substitutors
         else
           if use_link_attrs && (m[3].start_with?('"') || (m[3].include?(',') && m[3].include?('=')))
             attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')), [])
-            link_opts[:id] = (attrs.delete 'id') if attrs.has_key? 'id'
+            link_opts[:id] = (attrs.delete 'id') if attrs.key? 'id'
             text = attrs[1] || ''
           else
             text = sub_attributes(m[3].gsub('\]', ']'))
@@ -804,7 +805,7 @@ module Substitutors
 
           # TODO enable in Asciidoctor 1.5.1
           # support pipe-separated text and title
-          #unless attrs && (attrs.has_key? 'title')
+          #unless attrs && (attrs.key? 'title')
           #  if text.include? '|'
           #    attrs ||= {}
           #    text, attrs['title'] = text.split '|', 2
@@ -822,7 +823,7 @@ module Substitutors
         end
 
         if text.empty?
-          if @document.attr? 'hide-uri-scheme'
+          if doc_attrs.key? 'hide-uri-scheme'
             text = target.sub UriSniffRx, ''
           else
             text = target
@@ -899,7 +900,7 @@ module Substitutors
           if mailto
             text = raw_target
           else
-            if @document.attr? 'hide-uri-scheme'
+            if doc_attrs.key? 'hide-uri-scheme'
               text = raw_target.sub UriSniffRx, ''
             else
               text = raw_target
@@ -1087,7 +1088,7 @@ module Substitutors
         # handles form: id or Section Title
         else
           # resolve fragment as reftext if cannot be resolved as refid and looks like reftext
-          if !(@document.references[:ids].has_key? fragment) &&
+          if !(@document.references[:ids].key? fragment) &&
               ((fragment.include? ' ') || fragment.downcase != fragment) &&
               (resolved_id = RUBY_MIN_VERSION_1_9 ? (@document.references[:ids].key fragment) : (@document.references[:ids].index fragment))
             fragment = resolved_id
@@ -1128,7 +1129,7 @@ module Substitutors
   #
   # Returns the converted String text
   def sub_post_replacements(text)
-    if (@document.attributes.has_key? 'hardbreaks') || (@attributes.has_key? 'hardbreaks-option')
+    if (@document.attributes.key? 'hardbreaks') || (@attributes.key? 'hardbreaks-option')
       lines = (text.split EOL)
       return text if lines.size == 1
       last = lines.pop
