@@ -74,14 +74,14 @@ class Block < AbstractBlock
         lock_in_subs
       # e.g., :subs => nil
       else
-        @subs = []
+        # NOTE @subs is initialized as empty array by super constructor
         # prevent subs from being resolved
         @default_subs = []
         @attributes.delete 'subs'
       end
     # defer subs resolution; subs attribute is honored
     else
-      @subs = []
+      # NOTE @subs is initialized as empty array by super constructor
       # QUESTION should we honor :default_subs option (i.e., @default_subs = opts[:default_subs])?
       @default_subs = nil
     end
