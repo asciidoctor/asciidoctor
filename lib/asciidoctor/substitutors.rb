@@ -10,7 +10,7 @@ module Substitutors
     '>' => '&gt;'
   }
 
-  SPECIAL_CHARS_PATTERN = /[#{SPECIAL_CHARS.keys.join}]/
+  SPECIAL_CHARS_PATTERN = /[&<>]/
 
   BASIC_SUBS = [:specialcharacters].freeze
   HEADER_SUBS = [:specialcharacters, :attributes].freeze
