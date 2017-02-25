@@ -2360,8 +2360,8 @@ class Parser
             parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} )
           end
           line = ''
-          if parser_ctx.format == 'psv' || (parser_ctx.format == 'csv' &&
-              parser_ctx.buffer_has_unclosed_quotes?)
+          if parser_ctx.format == 'psv' ||
+              (parser_ctx.format == 'csv' && parser_ctx.buffer_has_unclosed_quotes?)
             parser_ctx.keep_cell_open
           else
             parser_ctx.close_cell true
