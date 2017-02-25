@@ -281,11 +281,25 @@ class Table::Cell < AbstractNode
     end
   end
 
-  # Public: Get the text with normal substitutions applied for this cell. Used for cells in the head
-  # row as well as for literal and verse cells. This method should not be called on cells with other
-  # styles.
+  # Public: Get the String text of this cell with substitutions applied.
+  #
+  # Used for cells in the head row as well as text-only (non-AsciiDoc) cells in
+  # the foot row and body.
+  #
+  # This method shouldn't be used for cells that have the AsciiDoc style.
+  #
+  # Returns the converted String text for this Cell
   def text
-    (apply_subs @text, (@style == :literal ? [:specialcharacters] : :normal)).strip
+    apply_subs @text, (@style == :literal ? BASIC_SUBS : NORMAL_SUBS)
+  end
+
+  # Public: Set the String text.
+  #
+  # This method shouldn't be used for cells that have the AsciiDoc style.
+  #
+  # Returns the new String text assigned to this Cell
+  def text= val
+    @text = val
   end
 
   # Public: Handles the body data (tbody, tfoot), applying styles and partitioning into paragraphs
@@ -334,7 +348,7 @@ class Table::ParserContext
   # Public: The cell delimiter compiled Regexp for this table.
   attr_reader :delimiter_re
 
-  def initialize(reader, table, attributes = {})
+  def initialize reader, table, attributes = {}
     @reader = reader
     @table = table
     # TODO if reader.cursor becomes a reference, this would require .dup
