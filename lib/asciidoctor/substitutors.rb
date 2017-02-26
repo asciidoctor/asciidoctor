@@ -1419,7 +1419,7 @@ module Substitutors
       # FIXME cache this dynamic regex
       callout_rx = (attr? 'line-comment') ? /(?:#{::Regexp.escape(attr 'line-comment')} )?#{CalloutExtractRxt}/ : CalloutExtractRx
       # extract callout marks, indexed by line number
-      source = source.split(EOL).map {|line|
+      source = source.split(EOL, -1).map {|line|
         lineno = lineno + 1
         line.gsub(callout_rx) {
           # alias match for Ruby 1.8.7 compat
@@ -1457,8 +1457,14 @@ module Substitutors
           :highlight_lines => highlight_lines,
           :bold_every => false}].highlight source
     when 'pygments'
+      Substitutors.const_set :PygmentsWrapperRx, {
+        :table_linenums_div => %r|<div class="pyhl">(.*)</div>|m,
+        :table_linenums_pre => %r|<pre[^>]*>(?:<span></span>)?(.*?)</pre>\s*|m,
+        :linenums_pre => %r|<div class="pyhl"><pre[^>]*>(?:<span></span>)?(.*?)</pre></div>|m,
+        :pre => %r|^<div class="pyhl"><pre>(?:<span></span>)?(.*)</pre></div>$|m
+      } unless Substitutors.const_defined? :PygmentsWrapperRx
       lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer.find_by_mimetype('text/plain')
-      opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true }
+      opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true, :stripnl => false }
       opts[:startinline] = !(option? 'mixed') if lexer.name == 'PHP'
       unless (@document.attributes['pygments-css'] || 'class') == 'class'
         opts[:noclasses] = true
@@ -1471,21 +1477,16 @@ module Substitutors
       end
       if attr? 'linenums'
         # TODO we could add the line numbers in ourselves instead of having to strip out the junk
-        # FIXME move these regular expressions into constants
         if (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
           linenums_mode = :table
-          # NOTE these subs clean out HTML that messes up our styles
-          result = lexer.highlight(source, :options => opts).
-              sub(/<div class="pyhl">(.*)<\/div>/m, '\1').
-              gsub(/<pre[^>]*>(.*?)<\/pre>\s*/m, '\1')
+          result = lexer.highlight(source, :options => opts).sub(PygmentsWrapperRx[:table_linenums_div], '\1').
+              gsub(PygmentsWrapperRx[:table_linenums_pre], '\1')
         else
-          result = lexer.highlight(source, :options => opts).
-              sub(/<div class="pyhl"><pre[^>]*>(.*?)<\/pre><\/div>/m, '\1')
+          result = lexer.highlight(source, :options => opts).sub(PygmentsWrapperRx[:linenums_pre], '\1')
         end
       else
-        # nowrap gives us just the highlighted source; won't work when we need linenums though
-        opts[:nowrap] = true
-        result = lexer.highlight(source, :options => opts)
+        # NOTE while the nowrap option gives us just the highlighted source, it drops trailing whitespace
+        result = lexer.highlight(source, :options => opts).sub(PygmentsWrapperRx[:pre], '\1')
       end
     end
 
@@ -1497,33 +1498,19 @@ module Substitutors
     if process_callouts && callout_marks
       lineno = 0
       reached_code = linenums_mode != :table
-      result.split(EOL).map {|line|
+      result.split(EOL, -1).map {|line|
         unless reached_code
-          unless line.include?('<td class="code">')
-            next line
-          end
+          next line unless line.include?('<td class="code">')
           reached_code = true
         end
-        lineno = lineno + 1
+        lineno += 1
         if (conums = callout_marks.delete(lineno))
           tail = nil
-          if callout_on_last && callout_marks.empty?
-            case highlighter
-            when 'coderay'
-              if linenums_mode == :table && (pos = line.index '</pre>')
-                line, tail = line[0...pos], line[pos..-1]
-              end
-            when 'pygments'
-              # NOTE preserve space before conum on final line; assumes all spaces were removed, if any
-              if (source.end_with? ' ') && !(line.end_with? ' ')
-                sp = ' ' * (source.size - source.rstrip.size)
-                if line.end_with? '>'
-                  # NOTE sometimes spaces get caught inside a span
-                  line = %(#{line}#{sp}) unless (line.gsub '</span>', '').end_with? ' '
-                else
-                  line = %(#{line}#{sp})
-                end
-              end
+          if callout_on_last && callout_marks.empty? && linenums_mode == :table
+            if highlighter == 'coderay' && (pos = line.index '</pre>')
+              line, tail = line[0...pos], line[pos..-1]
+            elsif highlighter == 'pygments' && (pos = line.start_with? '</td>')
+              line, tail = '', line
             end
           end
           if conums.size == 1
