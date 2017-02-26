@@ -823,11 +823,7 @@ module Substitutors
         end
 
         if text.empty?
-          if doc_attrs.key? 'hide-uri-scheme'
-            text = target.sub UriSniffRx, ''
-          else
-            text = target
-          end
+          text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
 
           if attrs
             attrs['role'] = %(bare #{attrs['role']}).chomp ' '
