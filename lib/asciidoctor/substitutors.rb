@@ -1508,17 +1508,26 @@ module Substitutors
         if (conums = callout_marks.delete(lineno))
           tail = nil
           if callout_on_last && callout_marks.empty?
-            # QUESTION when does this happen?
-            if (pos = line.index '</pre>')
-              tail = line[pos..-1]
-              line = %(#{line[0...pos].chomp ' '} )
-            else
-              # Give conum on final line breathing room if trailing space in source is dropped
-              line = %(#{line.chomp ' '} )
+            case highlighter
+            when 'coderay'
+              if linenums_mode == :table && (pos = line.index '</pre>')
+                line, tail = line[0...pos], line[pos..-1]
+              end
+            when 'pygments'
+              # NOTE preserve space before conum on final line; assumes all spaces were removed, if any
+              if (source.end_with? ' ') && !(line.end_with? ' ')
+                sp = ' ' * (source.size - source.rstrip.size)
+                if line.end_with? '>'
+                  # NOTE sometimes spaces get caught inside a span
+                  line = %(#{line}#{sp}) unless (line.gsub '</span>', '').end_with? ' '
+                else
+                  line = %(#{line}#{sp})
+                end
+              end
             end
           end
           if conums.size == 1
-            %(#{line}#{Inline.new(self, :callout, conums[0], :id => @document.callouts.read_next_id).convert }#{tail})
+            %(#{line}#{Inline.new(self, :callout, conums[0], :id => @document.callouts.read_next_id).convert}#{tail})
           else
             conums_markup = conums.map {|conum| Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).convert } * ' '
             %(#{line}#{conums_markup}#{tail})

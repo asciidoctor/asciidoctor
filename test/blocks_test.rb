@@ -2467,6 +2467,43 @@ exit 0 # <5><6>
       assert_match(/exit.* <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b><\/pre>/, output)
     end
 
+    test 'should preserve space before callout on final line' do
+      inputs = []
+
+      inputs << <<-EOS
+[source,yaml]
+----
+a: 'a'
+key: 'value' #<1>
+----
+<1> key-value pair
+      EOS
+
+      inputs << <<-EOS
+[source,ruby]
+----
+puts 'hi'
+puts 'value' #<1>
+----
+<1> print to stdout
+      EOS
+
+      inputs << <<-EOS
+[source,python]
+----
+print 'hi'
+print 'value' #<1>
+----
+<1> print to stdout
+      EOS
+
+      inputs.each do |input|
+        output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'source-highlighter' => 'coderay' }
+        output = output.gsub(/<\/?span.*?>/, '')
+        assert_includes output, '\'value\' <b class="conum">(1)</b>'
+      end
+    end
+
     test 'should preserve passthrough placeholders when highlighting source using coderay' do
       input = <<-EOS
 :source-highlighter: coderay
