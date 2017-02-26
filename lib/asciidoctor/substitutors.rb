@@ -826,7 +826,7 @@ module Substitutors
           text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
 
           if attrs
-            attrs['role'] = %(bare #{attrs['role']}).chomp ' '
+            attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
           else
             attrs = {'role' => 'bare'}
           end
@@ -896,14 +896,10 @@ module Substitutors
           if mailto
             text = raw_target
           else
-            if doc_attrs.key? 'hide-uri-scheme'
-              text = raw_target.sub UriSniffRx, ''
-            else
-              text = raw_target
-            end
+            text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
 
             if attrs
-              attrs['role'] = %(bare #{attrs['role']}).chomp ' '
+              attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
             else
               attrs = {'role' => 'bare'}
             end

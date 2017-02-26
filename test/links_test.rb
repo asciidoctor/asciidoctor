@@ -10,6 +10,10 @@ context 'Links' do
     assert_xpath "//a[@href='http://asciidoc.org'][@class='bare'][text() = 'http://asciidoc.org']", render_string("The AsciiDoc project is located at http://asciidoc.org.")
   end
 
+  test 'qualified url with role inline with text' do
+    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", render_string("The AsciiDoc project is located at http://asciidoc.org[,role=project].", :attributes => {'linkattrs' => ''})
+  end
+
   test 'qualified http url inline with hide-uri-scheme set' do
     assert_xpath "//a[@href='http://asciidoc.org'][@class='bare'][text() = 'asciidoc.org']", render_string("The AsciiDoc project is located at http://asciidoc.org.", :attributes => {'hide-uri-scheme' => ''})
   end
@@ -32,6 +36,10 @@ context 'Links' do
 
   test 'qualified url with label using link macro' do
     assert_xpath "//a[@href='http://asciidoc.org'][text() = 'AsciiDoc']", render_string("We're parsing link:http://asciidoc.org[AsciiDoc] markup")
+  end
+
+  test 'qualified url with role using link macro' do
+    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", render_string("We're parsing link:http://asciidoc.org[,role=project] markup", :attributes => {'linkattrs' => ''})
   end
 
   test 'qualified url using macro syntax with multi-line label inline with text' do
