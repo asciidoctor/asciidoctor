@@ -189,6 +189,40 @@ three
       assert_equal %(<pre>one\n*two*\nthree\n&lt;four&gt;</pre>), result.to_s
     end
 
+    test 'should preserving leading spaces but not leading endlines or trailing spaces in literal table cells' do
+      input = <<-EOS
+[cols=2*]
+|===
+l|
+  one
+  two
+three
+
+  | normal
+|===
+      EOS
+      output = render_embedded_string input
+      result = xmlnodes_at_xpath('/table//pre', output, 1)
+      assert_equal %(<pre>  one\n  two\nthree</pre>), result.to_s
+    end
+
+    test 'should preserving leading spaces but not leading endlines or trailing spaces in verse table cells' do
+      input = <<-EOS
+[cols=2*]
+|===
+v|
+  one
+  two
+three
+
+  | normal
+|===
+      EOS
+      output = render_embedded_string input
+      result = xmlnodes_at_xpath('/table//div[@class="verse"]', output, 1)
+      assert_equal %(<div class="verse">  one\n  two\nthree</div>), result.to_s
+    end
+
     test 'table and col width not assigned when autowidth option is specified' do
       input = <<-EOS
 [options="autowidth"]

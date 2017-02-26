@@ -240,34 +240,44 @@ class Table::Cell < AbstractNode
   # Public: The internal Asciidoctor::Document for a cell that has the asciidoc style
   attr_reader :inner_document
 
-  def initialize column, text, attributes = {}, cursor = nil
+  def initialize column, cell_text, attributes = {}, opts = {}
     super column, :cell
-    @text = text
-    @style = nil
-    @colspan = nil
-    @rowspan = nil
-    # TODO feels hacky
     if column
-      @style = column.attributes['style']
-      update_attributes(column.attributes)
+      cell_style = (in_header_row = column.table.header_row?) ? nil : column.attributes['style']
+      # REVIEW feels hacky to inherit all attributes from column
+      update_attributes column.attributes
+    else
+      in_header_row = cell_style = nil
     end
     if attributes
-      @colspan = attributes.delete('colspan')
-      @rowspan = attributes.delete('rowspan')
-      # TODO eventualy remove the style attribute from the attributes hash
-      #@style = attributes.delete('style') if attributes.key? 'style'
-      @style = attributes['style'] if attributes.key? 'style'
-      update_attributes(attributes)
+      @colspan = attributes.delete 'colspan'
+      @rowspan = attributes.delete 'rowspan'
+      # TODO eventually remove the style attribute from the attributes hash
+      #cell_style = attributes.delete 'style' unless in_header_row || !(attributes.key? 'style')
+      cell_style = attributes['style'] unless in_header_row || !(attributes.key? 'style')
+      if opts[:strip_text]
+        if cell_style == :literal || cell_style == :verse
+          cell_text = cell_text.rstrip
+          cell_text = cell_text.slice 1, cell_text.size while cell_text.start_with? EOL
+        else
+          cell_text = cell_text.strip
+        end
+      end
+      update_attributes attributes
+    else
+      @colspan = nil
+      @rowspan = nil
     end
-    # only allow AsciiDoc cells in non-header rows
-    if @style == :asciidoc && !column.table.header_row?
+    # NOTE only true for non-header rows
+    if cell_style == :asciidoc
       # FIXME hide doctitle from nested document; temporary workaround to fix
       # nested document seeing doctitle and assuming it has its own document title
       parent_doctitle = @document.attributes.delete('doctitle')
       # NOTE we need to process the first line of content as it may not have been processed
       # the included content cannot expect to match conditional terminators in the remaining
       # lines of table cell content, it must be self-contained logic
-      inner_document_lines = @text.split(EOL)
+      # QUESTION should we reset cell_text to nil?
+      inner_document_lines = cell_text.split EOL
       unless inner_document_lines.empty? || !inner_document_lines[0].include?('::')
         unprocessed_lines = inner_document_lines[0]
         processed_lines = PreprocessorReader.new(@document, unprocessed_lines).readlines
@@ -276,9 +286,11 @@ class Table::Cell < AbstractNode
           inner_document_lines.unshift(*processed_lines)
         end
       end
-      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => cursor)
+      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => opts[:cursor])
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
     end
+    @text = cell_text
+    @style = cell_style
   end
 
   # Public: Get the String text of this cell with substitutions applied.
@@ -303,6 +315,10 @@ class Table::Cell < AbstractNode
   end
 
   # Public: Handles the body data (tbody, tfoot), applying styles and partitioning into paragraphs
+  #
+  # This method should not be used for cells in the head row or that have the literal or verse style.
+  #
+  # Returns the converted String for this Cell
   def content
     if @style == :asciidoc
       @inner_document.convert
@@ -489,11 +505,11 @@ class Table::ParserContext
   #
   # returns nothing
   def close_cell(eol = false)
-    cell_text = @buffer.strip
-    @buffer = ''
     if @format == 'psv'
-      cellspec = take_cellspec
-      if cellspec
+      strip_text = true
+      cell_text = @buffer
+      @buffer = ''
+      if (cellspec = take_cellspec)
         repeat = cellspec.delete('repeatcol') || 1
       else
         warn %(asciidoctor: ERROR: #{@last_cursor.line_info}: table missing leading separator, recovering automatically)
@@ -501,6 +517,9 @@ class Table::ParserContext
         repeat = 1
       end
     else
+      strip_text = false
+      cell_text = @buffer.strip
+      @buffer = ''
       cellspec = nil
       repeat = 1
       if @format == 'csv'
@@ -535,7 +554,7 @@ class Table::ParserContext
         end
       end
 
-      cell = Table::Cell.new(column, cell_text, cellspec, @last_cursor)
+      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @last_cursor, :strip_text => strip_text)
       @last_cursor = @reader.cursor
       unless !cell.rowspan || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))
