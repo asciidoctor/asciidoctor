@@ -88,7 +88,7 @@ class Reader
       if opts[:normalize]
         Helpers.normalize_lines_from_string data
       else
-        data.split EOL
+        data.split EOL, -1
       end
     else
       if opts[:normalize]

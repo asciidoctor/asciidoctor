@@ -15,6 +15,17 @@ context 'Substitutions' do
       result = para.apply_normal_subs(para.lines)
       assert_equal %{<em class="blue"><a href="http://asciidoc.org">AsciiDoc</a></em> &amp; <strong class="red">Ruby</strong>\n&#167; Making <u>documentation</u> together<br>\nsince &#169; 2012.}, result
     end
+
+    test 'should not drop trailing blank lines when performing substitutions' do
+      para = block_from_string %([%hardbreaks]\nthis\nis\n-> {program})
+      para.lines << ''
+      para.lines << ''
+      para.document.attributes['program'] = 'Asciidoctor' 
+      result = para.apply_subs(para.lines)
+      assert_equal ['this<br>', 'is<br>', '&#8594; Asciidoctor<br>', '<br>', ''], result
+      result = para.apply_subs(para.lines * "\n")
+      assert_equal %(this<br>\nis<br>\n&#8594; Asciidoctor<br>\n<br>\n), result
+    end
   end
 
   context 'Quotes' do

@@ -277,7 +277,7 @@ class Table::Cell < AbstractNode
       # the included content cannot expect to match conditional terminators in the remaining
       # lines of table cell content, it must be self-contained logic
       # QUESTION should we reset cell_text to nil?
-      inner_document_lines = cell_text.split EOL
+      inner_document_lines = cell_text.split EOL, -1
       unless inner_document_lines.empty? || !inner_document_lines[0].include?('::')
         unprocessed_lines = inner_document_lines[0]
         processed_lines = PreprocessorReader.new(@document, unprocessed_lines).readlines
