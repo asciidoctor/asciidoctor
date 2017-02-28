@@ -214,12 +214,10 @@ class AbstractNode
   end
 
   # Public: A convenience method that returns the role names as an Array
+  #
+  # Returns the role names as an Array or an empty Array if the role attribute is absent.
   def roles
-    if (val = (@attributes['role'] || @document.attributes['role']))
-      val.split(' ')
-    else
-      []
-    end
+    (val = (@attributes['role'] || @document.attributes['role'])) ? val.split : []
   end
 
   # Public: A convenience method that adds the given role directly to this node
