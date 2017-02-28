@@ -191,9 +191,8 @@ class AbstractNode
   # Public: A convenience method that checks if the role attribute is specified
   def role?(expect = nil)
     if expect
-      expect == role
+      expect == (@attributes['role'] || @document.attributes['role'])
     else
-      # QUESTION should this be !role.nil_or_empty?
       @attributes.has_key?('role') || @document.attributes.has_key?('role')
     end
   end
@@ -207,14 +206,14 @@ class AbstractNode
   # in the list of roles on this node
   def has_role?(name)
     # NOTE center + include? is faster than split + include?
-    (val = role).nil_or_empty? ? false : %( #{val} ).include?(%( #{name} ))
+    (val = @attributes['role'] || @document.attributes['role']).nil_or_empty? ? false : %( #{val} ).include?(%( #{name} ))
   end
 
   # Public: A convenience method that returns the role names as an Array
   #
   # Returns the role names as an Array or an empty Array if the role attribute is absent.
   def roles
-    (val = role).nil_or_empty? ? [] : val.split
+    (val = @attributes['role'] || @document.attributes['role']).nil_or_empty? ? [] : val.split
   end
 
   # Public: A convenience method that adds the given role directly to this node
