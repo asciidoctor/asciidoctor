@@ -108,7 +108,7 @@ module Substitutors
       when :quotes
         text = sub_quotes text
       when :attributes
-        text = sub_attributes(text.split EOL) * EOL
+        text = sub_attributes(text.split EOL, -1) * EOL
       when :replacements
         text = sub_replacements text
       when :macros
@@ -125,7 +125,7 @@ module Substitutors
     end
     text = restore_passthroughs text if has_passthroughs
 
-    multiline ? (text.split EOL) : text
+    multiline ? (text.split EOL, -1) : text
   end
 
   # Public: Apply normal substitutions.
@@ -1122,7 +1122,7 @@ module Substitutors
   # Returns the converted String text
   def sub_post_replacements(text)
     if (@document.attributes.key? 'hardbreaks') || (@attributes.key? 'hardbreaks-option')
-      lines = (text.split EOL)
+      lines = (text.split EOL, -1)
       return text if lines.size == 1
       last = lines.pop
       (lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).convert } << last) * EOL
