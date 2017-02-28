@@ -1184,7 +1184,8 @@ A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
-      para.add_role 'role1'
+      res = para.add_role 'role1'
+      assert res
       assert_equal 'role1', para.attributes['role']
       assert para.has_role? 'role1'
     end
@@ -1196,7 +1197,8 @@ A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
-      para.add_role 'role2'
+      res = para.add_role 'role2'
+      assert res
       assert_equal 'role1 role2', para.attributes['role']
       assert para.has_role? 'role1'
       assert para.has_role? 'role2'
@@ -1209,7 +1211,8 @@ A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
-      para.add_role 'role1'
+      res = para.add_role 'role1'
+      refute res
       assert_equal 'role1', para.attributes['role']
       assert para.has_role? 'role1'
     end
@@ -1221,10 +1224,25 @@ A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
-      para.remove_role 'role1'
+      res = para.remove_role 'role1'
+      assert res
       assert_equal 'role2', para.attributes['role']
       assert para.has_role? 'role2'
       assert !para.has_role?('role1')
+    end
+
+    test 'roles are removed when last role is removed using remove_role' do
+        input = <<-EOS
+[.role1]
+A normal paragraph
+        EOS
+      doc = document_from_string(input)
+      para = doc.blocks.first
+      res = para.remove_role 'role1'
+      assert res
+      refute para.role?
+      assert_equal nil, para.attributes['role']
+      refute para.has_role? 'role1'
     end
 
     test 'roles are not changed when a non-existent role is removed using remove_role' do
@@ -1234,7 +1252,8 @@ A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
-      para.remove_role 'role2'
+      res = para.remove_role 'role2'
+      refute res
       assert_equal 'role1', para.attributes['role']
       assert para.has_role? 'role1'
       assert !para.has_role?('role2')
@@ -1246,7 +1265,8 @@ A normal paragraph
         EOS
       doc = document_from_string(input)
       para = doc.blocks.first
-      para.remove_role 'role1'
+      res = para.remove_role 'role1'
+      refute res
       assert_equal nil, para.attributes['role']
       assert !para.has_role?('role1')
     end

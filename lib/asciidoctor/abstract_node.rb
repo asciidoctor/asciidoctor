@@ -205,33 +205,48 @@ class AbstractNode
   # Public: A convenience method that checks if the specified role is present
   # in the list of roles on this node
   def has_role?(name)
-    if (val = (@attributes['role'] || @document.attributes['role']))
-      # NOTE this technique is faster than split + include?
-      %( #{val} ).include?(%( #{name} ))
-    else
-      false
-    end
+    # NOTE center + include? is faster than split + include?
+    (val = @attributes['role'] || @document.attributes['role']).nil_or_empty? ? false : %( #{val} ).include?(%( #{name} ))
   end
 
   # Public: A convenience method that returns the role names as an Array
   #
   # Returns the role names as an Array or an empty Array if the role attribute is absent.
   def roles
-    (val = (@attributes['role'] || @document.attributes['role'])) ? val.split : []
+    (val = @attributes['role'] || @document.attributes['role']).nil_or_empty? ? [] : val.split
   end
 
   # Public: A convenience method that adds the given role directly to this node
+  #
+  # Returns a Boolean indicating whether the role was added.
   def add_role(name)
-    unless (roles = (@attributes['role'] || '').split(' ')).include? name
-      @attributes['role'] = (roles << name) * ' '
+    if (val = @attributes['role']).nil_or_empty?
+      @attributes['role'] = name
+      true
+    # NOTE center + include? is faster than split + include?
+    elsif %( #{val} ).include?(%( #{name} ))
+      false
+    else
+      @attributes['role'] = %(#{val} #{name})
+      true
     end
   end
 
   # Public: A convenience method that removes the given role directly from this node
+  #
+  # Returns a Boolean indicating whether the role was removed.
   def remove_role(name)
-    if (roles = (@attributes['role'] || '').split(' ')).include? name
-      roles.delete name
-      @attributes['role'] = roles * ' '
+    if (val = @attributes['role']).nil_or_empty?
+      false
+    elsif (val = val.split).delete name
+      if val.empty?
+        @attributes.delete('role')
+      else
+        @attributes['role'] = val * ' '
+      end
+      true
+    else
+      false
     end
   end
 
