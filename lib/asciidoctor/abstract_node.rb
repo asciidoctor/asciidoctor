@@ -206,7 +206,8 @@ class AbstractNode
   # in the list of roles on this node
   def has_role?(name)
     if (val = (@attributes['role'] || @document.attributes['role']))
-      val.split(' ').include?(name)
+      # NOTE this technique is faster than split + include?
+      %( #{val} ).include?(%( #{name} ))
     else
       false
     end
