@@ -611,7 +611,7 @@ v0.0.7, 2013-12-18
     input = <<-EOS.chomp
     def names
 
-      @name.split ' '
+      @name.split
 
     end
     EOS
@@ -619,7 +619,7 @@ v0.0.7, 2013-12-18
     expected = <<-EOS.chomp
 def names
 
-  @name.split ' '
+  @name.split
 
 end
     EOS
@@ -633,7 +633,7 @@ end
     input = <<-EOS.chomp
     def names
 
-\t  @name.split ' '
+\t  @name.split
 
     end
     EOS
@@ -641,7 +641,7 @@ end
     expected = <<-EOS.chomp
 def names
 
-  @name.split ' '
+  @name.split
 
 end
     EOS
@@ -675,7 +675,7 @@ devtmpfs                3.9G       0     3.9G     0%    /dev
     input = <<-EOS.chomp
     def names
 
-      @name.split ' '
+      @name.split
 
     end
     EOS
@@ -683,7 +683,7 @@ devtmpfs                3.9G       0     3.9G     0%    /dev
     expected = <<-EOS.chomp
   def names
 
-    @name.split ' '
+    @name.split
 
   end
     EOS
@@ -697,7 +697,7 @@ devtmpfs                3.9G       0     3.9G     0%    /dev
     input = <<-EOS
     def names
 
-      @name.split ' '
+      @name.split
 
     end
     EOS

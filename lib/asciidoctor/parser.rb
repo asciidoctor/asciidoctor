@@ -1936,8 +1936,8 @@ class Parser
 
       segments = nil
       if names_only
-        # NOTE split names and collapse repeating spaces
-        if (segments = author_entry.split ' ', 3).size == 3
+        # NOTE split names and collapse repeating whitespace
+        if (segments = author_entry.split nil, 3).size == 3
           segments << (segments.pop.tr_s ' ', ' ')
         end
       elsif (match = AuthorInfoLineRx.match(author_entry))
@@ -2636,16 +2636,16 @@ class Parser
   #
   #   source = <<EOS
   #       def names
-  #         @name.split ' ')
+  #         @name.split
   #       end
   #   EOS
   #
   #   source.split "\n"
-  #   # => ["    def names", "      @names.split ' '", "    end"]
+  #   # => ["    def names", "      @names.split", "    end"]
   #
   #   puts Parser.adjust_indentation!(source.split "\n") * "\n"
   #   # => def names
-  #   # =>   @names.split ' '
+  #   # =>   @names.split
   #   # => end
   #
   # returns Nothing

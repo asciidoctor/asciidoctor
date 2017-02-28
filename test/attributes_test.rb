@@ -430,7 +430,7 @@ toc toc-placement!                        |   |content     |macro        |nil
 
       expected.each do |expect|
         raw_attrs, toc, toc_position, toc_placement, toc_class = expect
-        attrs = Hash[*(raw_attrs.split ' ').map {|e| e.include?('=') ? e.split('=') : [e, ''] }.flatten]
+        attrs = Hash[*raw_attrs.split.map {|e| e.include?('=') ? e.split('=', 2) : [e, ''] }.flatten]
         doc = document_from_string '', :attributes => attrs
         toc ? (assert doc.attr?('toc', toc)) : (assert !doc.attr?('toc'))
         toc_position ? (assert doc.attr?('toc-position', toc_position)) : (assert !doc.attr?('toc-position'))

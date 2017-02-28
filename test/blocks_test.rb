@@ -802,7 +802,7 @@ source line 2\r
 ----
     def names
 
-      @names.split ' '
+      @names.split
 
     end
 ----
@@ -811,7 +811,7 @@ source line 2\r
       expected = <<-EOS
 def names
 
-  @names.split ' '
+  @names.split
 
 end
       EOS
@@ -829,7 +829,7 @@ end
 ----
     def names
 
-      @names.split ' '
+      @names.split
 
     end
 ----
@@ -838,7 +838,7 @@ end
       expected = <<-EOS
     def names
 
-      @names.split ' '
+      @names.split
 
     end
       EOS
@@ -856,7 +856,7 @@ end
 ----
     def names
 
-      @names.split ' '
+      @names.split
 
     end
 ----
@@ -865,7 +865,7 @@ end
       expected = <<-EOS
  def names
 
-   @names.split ' '
+   @names.split
 
  end
       EOS
@@ -885,7 +885,7 @@ end
 ----
     def names
 
-      @names.split ' '
+      @names.split
 
     end
 ----
@@ -894,7 +894,7 @@ end
       expected = <<-EOS
  def names
 
-   @names.split ' '
+   @names.split
 
  end
       EOS
@@ -914,7 +914,7 @@ end
 ----
 	def names
 
-		@names.split ' '
+		@names.split
 
 	end
 ----
@@ -923,7 +923,7 @@ end
       expected = <<-EOS
 def names
 
-    @names.split ' '
+    @names.split
 
 end
       EOS
