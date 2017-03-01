@@ -1097,7 +1097,7 @@ module Asciidoctor
     #   &gt;http://google.com&lt;
     #   (See http://google.com):
     #
-    UriTerminator = /[);:]$/
+    UriTerminatorRx = /[);:]$/
 
     # Detects XML tags
     XmlSanitizeRx = /<[^>]+>/

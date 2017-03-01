@@ -757,7 +757,7 @@ module Substitutors
         prefix = (m[1] != 'link:' ? m[1] : '')
         target = m[2]
         suffix = ''
-        unless m[3] || target !~ UriTerminator
+        unless m[3] || UriTerminatorRx !~ target
           case $~[0]
           when ')'
             # strip the trailing )
