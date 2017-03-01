@@ -776,7 +776,7 @@ module Asciidoctor
       if (cover_image = doc.attr %(#{face}-cover-image))
         width_attr = nil
         depth_attr = nil
-        if (cover_image.include? ':') && cover_image =~ ImageMacroRx
+        if (cover_image.include? ':') && ImageMacroRx =~ cover_image
           cover_image = doc.image_uri $1
           unless $2.empty?
             attrs = (AttributeList.new $2).parse ['alt', 'width', 'height']
