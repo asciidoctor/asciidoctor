@@ -60,6 +60,11 @@ module Substitutors
   # fix placeholder record after syntax highlighting
   PASS_MATCH_HI = /<span[^>]*>\u0096<\/span>[^\d]*(\d+)[^\d]*<span[^>]*>\u0097<\/span>/
 
+  PygmentsWrapperDivRx = %r|<div class="pyhl">(.*)</div>|m
+  # NOTE handles all permutations of <pre> wrapper
+  # NOTE trailing whitespace appears when pygments-linenums-mode=table; <pre> has style attribute when pygments-css=inline
+  PygmentsWrapperPreRx = %r|<pre[^>]*>(.*?)</pre>\s*|m
+
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs
 
@@ -1457,12 +1462,6 @@ module Substitutors
           :highlight_lines => highlight_lines,
           :bold_every => false}].highlight source
     when 'pygments'
-      Substitutors.const_set :PygmentsWrapperRx, {
-        :table_linenums_div => %r|<div class="pyhl">(.*)</div>|m,
-        :table_linenums_pre => %r|<pre[^>]*>(?:<span></span>)?(.*?)</pre>\s*|m,
-        :linenums_pre => %r|<div class="pyhl"><pre[^>]*>(?:<span></span>)?(.*?)</pre></div>|m,
-        :pre => %r|^<div class="pyhl"><pre>(?:<span></span>)?(.*)</pre></div>$|m
-      } unless Substitutors.const_defined? :PygmentsWrapperRx
       lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer.find_by_mimetype('text/plain')
       opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true, :stripnl => false }
       opts[:startinline] = !(option? 'mixed') if lexer.name == 'PHP'
@@ -1475,18 +1474,14 @@ module Substitutors
           opts[:hl_lines] = highlight_lines * ' '
         end
       end
-      if attr? 'linenums'
-        # TODO we could add the line numbers in ourselves instead of having to strip out the junk
-        if (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
-          linenums_mode = :table
-          result = lexer.highlight(source, :options => opts).sub(PygmentsWrapperRx[:table_linenums_div], '\1').
-              gsub(PygmentsWrapperRx[:table_linenums_pre], '\1')
-        else
-          result = lexer.highlight(source, :options => opts).sub(PygmentsWrapperRx[:linenums_pre], '\1')
-        end
+      # TODO we could add the line numbers in ourselves instead of having to strip out the junk
+      if (attr? 'linenums') && (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
+        linenums_mode = :table
+        result = lexer.highlight(source, :options => opts).sub(PygmentsWrapperDivRx, '\1').gsub(PygmentsWrapperPreRx, '\1')
       else
-        # NOTE while the nowrap option gives us just the highlighted source, it drops trailing whitespace
-        result = lexer.highlight(source, :options => opts).sub(PygmentsWrapperRx[:pre], '\1')
+        if PygmentsWrapperPreRx =~ (result = lexer.highlight(source, :options => opts))
+          result = $1
+        end
       end
     end
 
