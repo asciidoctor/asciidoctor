@@ -217,10 +217,10 @@ class Parser
   #   # and hold attributes extracted from header
   #   doc = Document.new
   #
-  #   Parser.next_section(reader, doc).first.title
+  #   Parser.next_section(reader, doc)[0].title
   #   # => "Greetings"
   #
-  #   Parser.next_section(reader, doc).first.title
+  #   Parser.next_section(reader, doc)[0].title
   #   # => "Salutations"
   #
   # returns a two-element Array containing the Section and Hash of orphaned attributes
