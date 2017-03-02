@@ -893,12 +893,7 @@ class Document < AbstractBlock
   # Returns The String value with substitutions performed
   def apply_attribute_value_subs(value)
     if (m = AttributeEntryPassMacroRx.match(value))
-      if !m[1].empty?
-        subs = resolve_pass_subs m[1]
-        subs.empty? ? m[2] : (apply_subs m[2], subs)
-      else
-        m[2]
-      end
+      m[1].empty? ? m[2] : (apply_subs m[2], (resolve_pass_subs m[1]))
     else
       apply_header_subs value
     end
@@ -1151,7 +1146,7 @@ class Document < AbstractBlock
           docinfo_path = normalize_system_path(docinfo_filename, docinfodir)
           # NOTE normalizing the lines is essential if we're performing substitutions
           if (content = read_asset(docinfo_path, :normalize => true))
-            if (docinfosubs ||= resolve_docinfo_subs)
+            unless (docinfosubs ||= resolve_docinfo_subs).empty?
               content = (docinfosubs == :attributes) ? sub_attributes(content) : apply_subs(content, docinfosubs)
             end
           end
@@ -1161,7 +1156,7 @@ class Document < AbstractBlock
           docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}), docinfodir)
           # NOTE normalizing the lines is essential if we're performing substitutions
           if (content2 = read_asset(docinfo_path, :normalize => true))
-            if (docinfosubs ||= resolve_docinfo_subs)
+            unless (docinfosubs ||= resolve_docinfo_subs).empty?
               content2 = (docinfosubs == :attributes) ? sub_attributes(content2) : apply_subs(content2, docinfosubs)
             end
             content = content ? %(#{content}#{EOL}#{content2}) : content2
@@ -1180,10 +1175,15 @@ class Document < AbstractBlock
     end
   end
 
+  # Internal: Resolve the list of comma-delimited subs to apply to docinfo files.
+  #
+  # Resolve the list of substitutions from the value of the docinfosubs
+  # document attribute, if specified. Otherwise, return the Symbol :attributes.
+  #
+  # Returns an Array of substitution Symbols or the Symbol :attributes.
   def resolve_docinfo_subs
     if @attributes.key? 'docinfosubs'
-      subs = resolve_subs @attributes['docinfosubs'], :block, nil, 'docinfo'
-      subs.empty? ? nil : subs
+      resolve_subs @attributes['docinfosubs'], :block, nil, 'docinfo'
     else
       :attributes
     end

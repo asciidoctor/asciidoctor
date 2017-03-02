@@ -5,5 +5,6 @@ if RUBY_MIN_VERSION_1_9
 elsif RUBY_ENGINE != 'opal'
   require 'asciidoctor/core_ext/1.8.7/string/chr'
   require 'asciidoctor/core_ext/1.8.7/string/limit_bytesize'
+  require 'asciidoctor/core_ext/1.8.7/symbol/empty'
   require 'asciidoctor/core_ext/1.8.7/symbol/length'
 end

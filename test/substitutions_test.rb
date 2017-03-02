@@ -26,6 +26,17 @@ context 'Substitutions' do
       result = para.apply_subs(para.lines * "\n")
       assert_equal %(this<br>\nis<br>\n&#8594; Asciidoctor<br>\n<br>\n), result
     end
+
+    test 'should expand subs passed to apply_subs when expand argument is set' do
+      para = block_from_string %({program}\n*bold*\n2 > 1)
+      para.document.attributes['program'] = 'Asciidoctor'
+      result = para.apply_subs para.lines, [:specialchars], true
+      assert_equal ['{program}', '*bold*', '2 &gt; 1'], result
+      result = para.apply_subs para.lines, [:none], true
+      assert_equal ['{program}', '*bold*', '2 > 1'], result
+      result = para.apply_subs para.lines, [:normal], true
+      assert_equal ['Asciidoctor', '<strong>bold</strong>', '2 &gt; 1'], result
+    end
   end
 
   context 'Quotes' do
