@@ -2662,7 +2662,7 @@ class Parser
         next line if line.empty?
 
         # NOTE Opal has to patch this use of sub!
-        line.sub!(TabIndentRx) {|tabs| full_tab_space * tabs.length } if line.start_with? TAB
+        line.sub!(TabIndentRx) { full_tab_space * $&.length } if line.start_with? TAB
 
         if line.include? TAB
           # keeps track of how many spaces were added to adjust offset in match data
