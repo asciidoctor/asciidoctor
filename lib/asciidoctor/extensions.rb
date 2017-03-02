@@ -1301,7 +1301,7 @@ module Extensions
     #
     # Returns the [Proc, Class or Object] instance, matching the type passed to this method.
     def register *args, &block
-      argc = args.length
+      argc = args.size
       resolved_group = if block_given?
         block
       elsif !(group = args.pop)

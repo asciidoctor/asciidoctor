@@ -194,7 +194,7 @@ module Substitutors
           attributes = nil if attributes == ''
         end
 
-        escape_count = m[3].size
+        escape_count = m[3].length
         content = m[5]
         old_behavior = false
 
@@ -1196,7 +1196,7 @@ module Substitutors
     elsif (str.start_with?('.') || str.start_with?('#')) && Compliance.shorthand_property_syntax
       segments = str.split('#', 2)
 
-      if segments.length > 1
+      if segments.size > 1
         id, *more_roles = segments[1].split('.')
       else
         id = nil
@@ -1204,11 +1204,11 @@ module Substitutors
       end
 
       roles = segments[0].empty? ? [] : segments[0].split('.')
-      if roles.length > 1
+      if roles.size > 1
         roles.shift
       end
 
-      if more_roles.length > 0
+      if more_roles.size > 0
         roles.concat more_roles
       end
 

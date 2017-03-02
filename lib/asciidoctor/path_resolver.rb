@@ -380,7 +380,7 @@ class PathResolver
     target_segments.each do |segment|
       if segment == DOT_DOT
         if jail
-          if resolved_segments.length > jail_segments.length
+          if resolved_segments.size > jail_segments.size
             resolved_segments.pop
           elsif !(recover ||= (opts.fetch :recover, true))
             raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode))

@@ -134,8 +134,8 @@ class Minitest::Test
       else
         assert true
       end
-    elsif (count && results.length != count)
-      flunk "#{type_name} #{path} yielded #{results.length} elements rather than #{count} for:\n#{content}"
+    elsif (count && results.size != count)
+      flunk "#{type_name} #{path} yielded #{results.size} elements rather than #{count} for:\n#{content}"
     elsif (count.nil? && results.empty?)
       flunk "#{type_name} #{path} not found in:\n#{content}"
     else
