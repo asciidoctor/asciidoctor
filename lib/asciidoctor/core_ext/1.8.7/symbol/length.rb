@@ -1,4 +1,4 @@
-# Educate Ruby 1.8.7 about the Symbol#length method.
+# Educate Ruby 1.8.7 about the Symbol#empty? and Symbol#length methods.
 class Symbol
   def length
     to_s.length

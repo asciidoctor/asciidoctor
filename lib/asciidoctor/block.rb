@@ -109,7 +109,7 @@ class Block < AbstractBlock
     when :compound
       super
     when :simple
-      apply_subs(@lines * EOL, @subs)
+      apply_subs @lines * EOL, @subs
     when :verbatim, :raw
       #((apply_subs @lines.join(EOL), @subs).sub StripLineWiseRx, '\1')
 

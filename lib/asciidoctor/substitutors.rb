@@ -68,36 +68,34 @@ module Substitutors
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs
 
-  # Public: Apply the specified substitutions to the lines of text
+  # Public: Apply the specified substitutions to the source.
   #
-  # source  - The String or String Array of text to process
-  # subs    - The substitutions to perform. Can be a Symbol or a Symbol Array (default: :normal)
-  # expand -  A Boolean to control whether sub aliases are expanded (default: true)
+  # source  - The String or String Array of text to process; must not be nil.
+  # subs    - The substitutions to perform; can be a Symbol or Symbol Array; must not be nil (default: :normal).
+  # expand  - A Boolean to control whether substitution aliases are expanded (default: false).
   #
-  # returns Either a String or String Array, whichever matches the type of the first argument
-  def apply_subs source, subs = :normal, expand = false
-    if !subs
+  # Returns a String or String Array with substitutions applied, matching the type of source argument.
+  def apply_subs source, subs = NORMAL_SUBS, expand = false
+    if source.empty? || subs.empty?
       return source
-    elsif subs == :normal
-      subs = NORMAL_SUBS
     elsif expand
       if ::Symbol === subs
         subs = SUB_GROUPS[subs] || [subs]
       else
         effective_subs = []
         subs.each do |key|
-          if SUB_GROUPS.key? key
-            effective_subs += SUB_GROUPS[key]
+          if (sub_group = SUB_GROUPS[key])
+            effective_subs += sub_group unless sub_group.empty?
           else
             effective_subs << key
           end
         end
 
-        subs = effective_subs
+        if (subs = effective_subs).empty?
+          return source
+        end
       end
     end
-
-    return source if subs.empty?
 
     text = (multiline = ::Array === source) ? source * EOL : source
 
@@ -339,7 +337,7 @@ module Substitutors
     text.gsub(PASS_MATCH) {
       # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
       pass = @passthroughs[$~[1].to_i]
-      subbed_text = (subs = pass[:subs]) ? apply_subs(pass[:text], subs) : pass[:text]
+      subbed_text = apply_subs(pass[:text], pass[:subs])
       if (type = pass[:type])
         subbed_text = Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).convert
       end
