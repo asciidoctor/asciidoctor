@@ -195,10 +195,9 @@ module Asciidoctor
   FORCE_ENCODING = COERCE_ENCODING && ::Encoding.default_external != ::Encoding::UTF_8
 
   # Byte arrays for UTF-* Byte Order Marks
-  # hex escape sequence used for Ruby 1.8 compatibility
-  BOM_BYTES_UTF_8 = "\xef\xbb\xbf".bytes.to_a
-  BOM_BYTES_UTF_16LE = "\xff\xfe".bytes.to_a
-  BOM_BYTES_UTF_16BE = "\xfe\xff".bytes.to_a
+  BOM_BYTES_UTF_8 = [0xef, 0xbb, 0xbf]
+  BOM_BYTES_UTF_16LE = [0xff, 0xfe]
+  BOM_BYTES_UTF_16BE = [0xfe, 0xff]
 
   # Flag to indicate that line length should be calculated using a unicode mode hint
   FORCE_UNICODE_LINE_LENGTH = !::RUBY_MIN_VERSION_1_9
