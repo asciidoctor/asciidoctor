@@ -1030,11 +1030,11 @@ class PreprocessorReader < Reader
       @process_lines = true
     end
 
-    @path = if path
+    if path
       @includes << Helpers.rootname(path)
-      path
+      @path = path
     else
-      '<stdin>'
+      @path = '<stdin>'
     end
 
     @lineno = lineno

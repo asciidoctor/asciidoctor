@@ -33,10 +33,12 @@ class AbstractBlock < AbstractNode
     @title_converted = nil
     @caption = nil
     @style = nil
-    @level = if context == :document
-      0
+    if context == :document
+      @level = 0
     elsif parent && context != :section
-      parent.level
+      @level = parent.level
+    else
+      @level = nil
     end
     @next_section_index = 0
     @next_section_number = 1
