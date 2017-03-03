@@ -38,8 +38,7 @@ class AbstractNode
         @document = nil
       end
     end
-    @context = context
-    @node_name = context.to_s
+    @node_name = (@context = context).to_s
     # QUESTION are we correct in duplicating the attributes (seems to be just as fast)
     @attributes = (opts.key? :attributes) ? opts[:attributes].dup : {}
     @passthroughs = {}
