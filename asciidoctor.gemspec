@@ -29,12 +29,12 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'asciimath', '~> 1.0.0'
   # coderay is needed for testing syntax highlighting
   s.add_development_dependency 'coderay', '~> 1.1.0'
-  s.add_development_dependency 'cucumber', '~> 1.3.0'
+  s.add_development_dependency 'cucumber', '~> 2.4.0'
   # erubis is needed for testing use of alternative eRuby impls
   s.add_development_dependency 'erubis', '~> 2.7.0'
   # haml is needed for testing custom templates
   s.add_development_dependency 'haml', '~> 4.0.0'
-  s.add_development_dependency 'nokogiri', '~> 1.6.0'
+  s.add_development_dependency 'nokogiri', '~> 1.7.0'
   s.add_development_dependency 'rake', '~> 10.0.0'
   s.add_development_dependency 'rspec-expectations', '~> 2.14.0'
   # slim is needed for testing custom templates

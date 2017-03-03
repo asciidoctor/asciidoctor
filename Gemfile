@@ -4,11 +4,12 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  if (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '1.9.3')
-    gem 'cucumber', '~> 2.4.0' 
-  else
+  if (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '1.9.3')
+    gem 'cucumber', '~> 1.3.0'
     gem 'nokogiri', '~> 1.5.0'
     gem 'slim', '~> 2.0.0'
+  elsif (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.1.0')
+    gem 'nokogiri', '~> 1.6.0'
   end
   gem 'racc', '~> 1.4.0' if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
 end
