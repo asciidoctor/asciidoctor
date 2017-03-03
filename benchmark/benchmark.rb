@@ -106,7 +106,7 @@ when 'userguide-loop'
   end
   best_time = nil
   timings.each do |loop_timings|
-    puts %(#{loop_timings * "\n"}\nRun Total: #{loop_timings.sum})
+    puts %(#{loop_timings * "\n"}\nRun Total: #{loop_timings.reduce :+})
     best_time = best_time ? [best_time, loop_timings.min].min : loop_timings.min
   end
   puts %(Best Time: #{best_time})
@@ -129,7 +129,7 @@ when 'mdbasics-loop'
   end
   best_time = nil
   timings.each do |loop_timings|
-    puts %(#{loop_timings * "\n"}\nRun Total: #{loop_timings.sum})
+    puts %(#{loop_timings * "\n"}\nRun Total: #{loop_timings.reduce :+})
     best_time = best_time ? [best_time, loop_timings.min].min : loop_timings.min
   end
   puts %(Best Time: #{best_time})
