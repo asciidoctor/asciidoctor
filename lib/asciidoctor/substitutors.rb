@@ -111,7 +111,7 @@ module Substitutors
       when :quotes
         text = sub_quotes text
       when :attributes
-        text = sub_attributes(text.split EOL, -1) * EOL
+        text = sub_attributes(text.split EOL, -1) * EOL if text.include? '{'
       when :replacements
         text = sub_replacements text
       when :macros
