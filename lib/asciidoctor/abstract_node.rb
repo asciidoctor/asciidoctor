@@ -26,9 +26,9 @@ class AbstractNode
   attr_reader :attributes
 
   def initialize parent, context, opts = {}
-    # document is a special case, should refer to itself
     if context == :document
-      @document = parent
+      # document is a special case, should refer to itself
+      @document = self
     else
       if parent
         @parent = parent
