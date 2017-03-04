@@ -176,16 +176,20 @@ module Helpers
 
   # Public: Retrieves the basename of the filename, optionally removing the extension, if present
   #
-  # file_name    - The String file name to process
-  # drop_extname - A Boolean flag indicating whether to drop the extension (default: false)
+  # file_name    - The String file name to process.
+  # drop_extname - A Boolean flag indicating whether to drop the extension
+  #                or an explicit String extension to drop (default: nil).
   #
   # Examples
   #
   #   Helpers.basename('images/tiger.png', true)
   #   # => "tiger"
   #
+  #   Helpers.basename('images/tiger.png', '.png')
+  #   # => "tiger"
+  #
   # Returns the String filename with leading directories removed and, if specified, the extension removed
-  def self.basename(file_name, drop_extname = false)
+  def self.basename(file_name, drop_extname = nil)
     if drop_extname
       ::File.basename file_name, (drop_extname == true ? (::File.extname file_name) : drop_extname)
     else
