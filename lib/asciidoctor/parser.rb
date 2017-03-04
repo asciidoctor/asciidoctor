@@ -1948,21 +1948,21 @@ class Parser
       unless segments.nil?
         author_metadata[key_map[:firstname]] = fname = segments[0].tr('_', ' ')
         author_metadata[key_map[:author]] = fname
-        author_metadata[key_map[:authorinitials]] = fname[0, 1]
+        author_metadata[key_map[:authorinitials]] = fname.chr
         if !segments[1].nil? && !segments[2].nil?
           author_metadata[key_map[:middlename]] = mname = segments[1].tr('_', ' ')
           author_metadata[key_map[:lastname]] = lname = segments[2].tr('_', ' ')
           author_metadata[key_map[:author]] = [fname, mname, lname].join ' '
-          author_metadata[key_map[:authorinitials]] = [fname[0, 1], mname[0, 1], lname[0, 1]].join
+          author_metadata[key_map[:authorinitials]] = %(#{fname.chr}#{mname.chr}#{lname.chr})
         elsif !segments[1].nil?
           author_metadata[key_map[:lastname]] = lname = segments[1].tr('_', ' ')
           author_metadata[key_map[:author]] = [fname, lname].join ' '
-          author_metadata[key_map[:authorinitials]] = [fname[0, 1], lname[0, 1]].join
+          author_metadata[key_map[:authorinitials]] = %(#{fname.chr}#{lname.chr})
         end
         author_metadata[key_map[:email]] = segments[3] unless names_only || segments[3].nil?
       else
         author_metadata[key_map[:author]] = author_metadata[key_map[:firstname]] = fname = author_entry.strip.tr_s(' ', ' ')
-        author_metadata[key_map[:authorinitials]] = fname[0, 1]
+        author_metadata[key_map[:authorinitials]] = fname.chr
       end
 
       author_metadata['authorcount'] = idx + 1

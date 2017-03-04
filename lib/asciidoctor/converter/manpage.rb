@@ -431,7 +431,7 @@ allbox tab(:);'
               row_text[row_index] << %(T{#{LF}.sp#{LF}T}:)
             end
             row_text[row_index] << %(T{#{LF}.sp#{LF})
-            cell_halign = (cell.attr 'halign', 'left')[0..0]
+            cell_halign = (cell.attr 'halign', 'left').chr
             if tsec == :head
               if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}tB)
