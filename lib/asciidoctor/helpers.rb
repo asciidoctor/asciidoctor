@@ -162,7 +162,7 @@ module Helpers
 
   # Public: Removes the file extension from filename and returns the result
   #
-  # file_name - The String file name to process
+  # filename - The String file name to process
   #
   # Examples
   #
@@ -170,15 +170,15 @@ module Helpers
   #   # => "part1/chapter1"
   #
   # Returns the String filename with the file extension removed
-  def self.rootname(file_name)
-    file_name[0, file_name.length - ::File.extname(file_name).length]
+  def self.rootname(filename)
+    filename[0, filename.length - ::File.extname(filename).length]
   end
 
   # Public: Retrieves the basename of the filename, optionally removing the extension, if present
   #
-  # file_name    - The String file name to process.
-  # drop_extname - A Boolean flag indicating whether to drop the extension
-  #                or an explicit String extension to drop (default: nil).
+  # filename - The String file name to process.
+  # drop_ext - A Boolean flag indicating whether to drop the extension
+  #            or an explicit String extension to drop (default: nil).
   #
   # Examples
   #
@@ -189,11 +189,11 @@ module Helpers
   #   # => "tiger"
   #
   # Returns the String filename with leading directories removed and, if specified, the extension removed
-  def self.basename(file_name, drop_extname = nil)
-    if drop_extname
-      ::File.basename file_name, (drop_extname == true ? (::File.extname file_name) : drop_extname)
+  def self.basename(filename, drop_ext = nil)
+    if drop_ext
+      ::File.basename filename, (drop_ext == true ? (::File.extname filename) : drop_ext)
     else
-      ::File.basename file_name
+      ::File.basename filename
     end
   end
 
