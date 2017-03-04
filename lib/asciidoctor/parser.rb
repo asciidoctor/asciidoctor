@@ -815,7 +815,7 @@ class Parser
             if !attributes.key?('indent') && document.attributes.key?('source-indent')
               attributes['indent'] = document.attributes['source-indent']
             end
-            terminator = terminator[0..2]
+            terminator = terminator[0, 3]
           elsif block_context == :source
             AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
             unless attributes.key? 'language'
@@ -961,7 +961,7 @@ class Parser
   # returns the match data if this line is the first line of a delimited block or nil if not
   def self.is_delimited_block? line, return_match_data = false
     # highly optimized for best performance
-    return unless (line_len = line.length) > 1 && (DELIMITED_BLOCK_LEADERS.include? line[0..1])
+    return unless (line_len = line.length) > 1 && (DELIMITED_BLOCK_LEADERS.include? line[0, 2])
     # catches open block
     if line_len == 2
       tip = line
@@ -972,7 +972,7 @@ class Parser
         tip = line
         tl = line_len
       else
-        tip = line[0..3]
+        tip = line[0, 4]
         tl = 4
       end
 

@@ -286,7 +286,7 @@ module Asciidoctor
     '```'  => [:fenced_code, ::Set.new]
   }
 
-  DELIMITED_BLOCK_LEADERS = DELIMITED_BLOCKS.keys.map {|key| key[0..1] }.to_set
+  DELIMITED_BLOCK_LEADERS = DELIMITED_BLOCKS.keys.map {|key| key[0, 2] }.to_set
 
   LAYOUT_BREAK_LINES = {
     '\'' => :thematic_break,
@@ -1322,7 +1322,7 @@ module Asciidoctor
       attributes['docdir'] = ::File.dirname input_path
       attributes['docname'] = Helpers.basename input_path, (attributes['docfilesuffix'] = ::File.extname input_path)
       if (docdate = attributes['docdate'])
-        attributes['docyear'] ||= ((docdate.index '-') == 4 ? docdate[0..3] : nil)
+        attributes['docyear'] ||= ((docdate.index '-') == 4 ? docdate[0, 4] : nil)
       else
         docdate = attributes['docdate'] = (input_mtime.strftime '%Y-%m-%d')
         attributes['docyear'] ||= input_mtime.year.to_s

@@ -561,7 +561,7 @@ module Substitutors
               # need to use closure to work around lack of negative lookbehind
               keys = keys.split(KbdDelimiterRx).inject([]) {|c, key|
                 if key.end_with?('++')
-                  c << key[0..-3].strip
+                  c << key[0...-2].strip
                   c << '+'
                 else
                   c << key.strip
@@ -763,29 +763,30 @@ module Substitutors
         unless m[3] || UriTerminatorRx !~ target
           case $~[0]
           when ')'
-            # strip the trailing )
-            target = target[0..-2]
+            # strip trailing )
+            target = target.chop
             suffix = ')'
           when ';'
-            # strip the <> around the link
+            # strip <> around URI
             if prefix.start_with?('&lt;') && target.end_with?('&gt;')
               prefix = prefix[4..-1]
-              target = target[0..-5]
-            # strip the ); from the end of the link
-            elsif target.end_with?(');')
-              target = target[0..-3]
-              suffix = ');'
+              target = target[0...-4]
             else
-              target = target[0..-2]
-              suffix = ';'
+              # strip trailing ;
+              # check for trailing );
+              if (target = target.chop).end_with?(')')
+                target = target.chop
+                suffix = ');'
+              else
+                suffix = ';'
+              end
             end
           when ':'
-            # strip the ): from the end of the link
-            if target.end_with?('):')
-              target = target[0..-3]
-              suffix = '):'
+            # strip trailing :
+            # check for trailing ):
+            if (target = target.chop).end_with?(')')
+              target = target.chop
             else
-              target = target[0..-2]
               suffix = ':'
             end
           end
@@ -1501,7 +1502,7 @@ module Substitutors
           tail = nil
           if callout_on_last && callout_marks.empty? && linenums_mode == :table
             if highlighter == 'coderay' && (pos = line.index '</pre>')
-              line, tail = line[0...pos], line[pos..-1]
+              line, tail = line[0, pos], line[pos..-1]
             elsif highlighter == 'pygments' && (pos = line.start_with? '</td>')
               line, tail = '', line
             end
