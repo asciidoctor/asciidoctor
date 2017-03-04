@@ -171,7 +171,7 @@ module Helpers
   #
   # Returns the String filename with the file extension removed
   def self.rootname(file_name)
-    (ext = ::File.extname(file_name)).empty? ? file_name : file_name[0...-ext.length]
+    file_name[0, file_name.length - ::File.extname(file_name).length]
   end
 
   # Public: Retrieves the basename of the filename, optionally removing the extension, if present
