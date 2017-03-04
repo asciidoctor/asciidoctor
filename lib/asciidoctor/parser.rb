@@ -1589,7 +1589,7 @@ class Parser
       else
         section.sectname = %(sect#{section.level})
       end
-    elsif sect_title.downcase == 'synopsis' && document.doctype == 'manpage'
+    elsif sect_title.casecmp('synopsis') == 0 && document.doctype == 'manpage'
       section.special = true
       section.sectname = 'synopsis'
     else
