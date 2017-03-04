@@ -80,6 +80,10 @@ context 'Links' do
     assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', render_string('(http://asciidoctor.org): where text gets parsed'), 1
   end
 
+  test 'qualified url in round brackets with trailing semi-colon' do
+    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', render_string('(http://asciidoctor.org); where text gets parsed'), 1
+  end
+
   test 'qualified url containing round brackets' do
     assert_xpath '//a[@href="http://jruby.org/apidocs/org/jruby/Ruby.html#addModule(org.jruby.RubyModule)"][text()="addModule() adds a Ruby module"]', render_string('http://jruby.org/apidocs/org/jruby/Ruby.html#addModule(org.jruby.RubyModule)[addModule() adds a Ruby module]'), 1
   end
