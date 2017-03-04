@@ -69,7 +69,7 @@ module Helpers
       utf8 = ::Encoding::UTF_8
       if (leading_2_bytes = leading_bytes[0, 2]) == BOM_BYTES_UTF_16LE
         # Ruby messes up trailing whitespace on UTF-16LE, so take a different route
-        return ((data.join.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8).lines.map &:rstrip
+        return ((data.join.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8).lines.map(&:rstrip)
       elsif leading_2_bytes == BOM_BYTES_UTF_16BE
         data[0] = (first_line.force_encoding ::Encoding::UTF_16BE)[1..-1]
         return data.map {|line| "#{((line.force_encoding ::Encoding::UTF_16BE).encode utf8).rstrip}" }
@@ -83,7 +83,7 @@ module Helpers
       if leading_bytes == BOM_BYTES_UTF_8
         data[0] = first_line[3..-1]
       end
-      data.map &:rstrip
+      data.map(&:rstrip)
     end
   end
 
@@ -119,7 +119,7 @@ module Helpers
         data = data[3..-1]
       end
     end
-    data.each_line.map &:rstrip
+    data.each_line.map(&:rstrip)
   end
 
   # Public: Efficiently checks whether the specified String resembles a URI
