@@ -404,7 +404,7 @@ class Document < AbstractBlock
       # See https://reproducible-builds.org/specs/source-date-epoch/
       now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : ::Time.now
       if (localdate = attrs['localdate'])
-        localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? localdate[0..3] : nil))
+        localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? localdate[0, 4] : nil))
       else
         localdate = attrs['localdate'] = (now.strftime '%Y-%m-%d')
         localyear = (attrs['localyear'] ||= now.year.to_s)
