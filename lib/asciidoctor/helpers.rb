@@ -62,7 +62,7 @@ module Helpers
   #
   # returns a String Array of normalized lines
   def self.normalize_lines_array data
-    return [] if data.empty?
+    return data if data.empty?
 
     leading_bytes = (first_line = data[0]).unpack 'C3'
     if COERCE_ENCODING
