@@ -605,43 +605,39 @@ class PreprocessorReader < Reader
     if line.end_with?(']') && !line.start_with?('[') && line.include?('::')
       if line.include?('if') && (match = ConditionalDirectiveRx.match(line))
         # if escaped, mark as processed and return line unescaped
-        if line.start_with?('\\')
+        if line.start_with? '\\'
           @unescape_next_line = true
           @look_ahead += 1
           line[1..-1]
+        elsif preprocess_conditional_directive(*match.captures)
+          # move the pointer past the conditional line
+          advance
+          # treat next line as uncharted territory
+          nil
         else
-          if preprocess_conditional_directive(*match.captures)
-            # move the pointer past the conditional line
-            advance
-            # treat next line as uncharted territory
-            nil
-          else
-            # the line was not a valid conditional line
-            # mark it as visited and return it
-            @look_ahead += 1
-            line
-          end
+          # the line was not a valid conditional line
+          # mark it as visited and return it
+          @look_ahead += 1
+          line
         end
       elsif @skipping
         advance
         nil
       elsif (line.start_with? 'inc', '\\inc') && (match = IncludeDirectiveRx.match(line))
         # if escaped, mark as processed and return line unescaped
-        if line.start_with?('\\')
+        if line.start_with? '\\'
           @unescape_next_line = true
           @look_ahead += 1
           line[1..-1]
+        # QUESTION should we strip whitespace from raw attributes in Substitutors#parse_attributes? (check perf)
+        elsif preprocess_include_directive match[1], match[2].strip
+          # peek again since the content has changed
+          nil
         else
-          # QUESTION should we strip whitespace from raw attributes in Substitutors#parse_attributes? (check perf)
-          if preprocess_include_directive match[1], match[2].strip
-            # peek again since the content has changed
-            nil
-          else
-            # the line was not a valid include line and is unchanged
-            # mark it as visited and return it
-            @look_ahead += 1
-            line
-          end
+          # the line was not a valid include line and is unchanged
+          # mark it as visited and return it
+          @look_ahead += 1
+          line
         end
       else
         # NOTE optimization to inline super
