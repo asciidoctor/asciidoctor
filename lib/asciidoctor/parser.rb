@@ -746,13 +746,11 @@ class Parser
 
               if lines[-1].start_with? '-- '
                 attribution, citetitle = lines.pop[3..-1].split(', ', 2)
+                attributes['attribution'] = attribution if attribution
+                attributes['citetitle'] = citetitle if citetitle
                 lines.pop while lines[-1].empty?
-              else
-                attribution, citetitle = nil
               end
               attributes['style'] = 'quote'
-              attributes['attribution'] = attribution if attribution
-              attributes['citetitle'] = citetitle if citetitle
               # NOTE will only detect headings that are floating titles (not section titles)
               # TODO could assume a floating title when inside a block context
               # FIXME Reader needs to be created w/ line info
@@ -760,12 +758,12 @@ class Parser
             elsif !text_only && (blockquote? lines, first_line)
               lines[0] = first_line[1..-1]
               attribution, citetitle = lines.pop[3..-1].split(', ', 2)
+              attributes['attribution'] = attribution if attribution
+              attributes['citetitle'] = citetitle if citetitle
               lines.pop while lines[-1].empty?
               # strip trailing quote
               lines[-1] = lines[-1].chop
               attributes['style'] = 'quote'
-              attributes['attribution'] = attribution if attribution
-              attributes['citetitle'] = citetitle if citetitle
               block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
             else
               # if [normal] is used over an indented paragraph, shift content to left margin
