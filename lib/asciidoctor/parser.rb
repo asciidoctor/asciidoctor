@@ -482,13 +482,12 @@ class Parser
       end
 
       unless delimited_block
-
-        # this loop only executes once; used for flow control
+        # this loop is used for flow control
+        # it only executes once, and only if delimited_block is false
         # break once a block is found or at end of loop
         # returns nil if the line must be dropped
         # Implementation note - while(true) is twice as fast as loop
         while true
-
           # process lines verbatim
           if style && Compliance.strict_verbatim_paragraphs && VERBATIM_STYLES.include?(style)
             block_context = style.to_sym
@@ -499,99 +498,97 @@ class Parser
 
           # process lines normally
           unless text_only
-            first_char = Compliance.markdown_syntax ? this_line.lstrip.chr : this_line.chr
-            # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-            if (LAYOUT_BREAK_LINES.key? first_char) && this_line.length >= 3 &&
-                ((Compliance.markdown_syntax ? LayoutBreakLinePlusRx : LayoutBreakLineRx).match? this_line)
-              block = Block.new(parent, LAYOUT_BREAK_LINES[first_char], :content_model => :empty)
-              break
-
-            elsif this_line.end_with?(']') && (match = MediaBlockMacroRx.match(this_line))
-              blk_ctx = match[1].to_sym
-              block = Block.new(parent, blk_ctx, :content_model => :empty)
-              if blk_ctx == :image
-                posattrs = ['alt', 'width', 'height']
-              elsif blk_ctx == :video
-                posattrs = ['poster', 'width', 'height']
-              else
-                posattrs = []
-              end
-
-              # QUESTION why did we make exception for explicit style?
-              #if style && !explicit_style
-              if style
-                attributes['alt'] = style if blk_ctx == :image
-                attributes.delete 'style'
-                style = nil
-              end
-
-              block.parse_attributes(match[3], posattrs,
-                  :unescape_input => (blk_ctx == :image),
-                  :sub_input => true,
-                  :sub_result => false,
-                  :into => attributes)
-              target = block.sub_attributes(match[2], :attribute_missing => 'drop-line')
-              if target.empty?
-                # retain as unparsed if attribute-missing is skip
-                if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
-                  return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
-                # otherwise, drop the line
-                else
-                  attributes.clear
-                  return
+            if this_line.start_with? ' '
+              chr0 = ' '
+              if Compliance.markdown_syntax
+                chr0_nosp = (flush_line = this_line.lstrip).chr
+                if (LAYOUT_BREAK_LINES.key? chr0_nosp) && flush_line.length > 2 && (LayoutBreakLinePlusRx.match? this_line)
+                  # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
+                  block = Block.new(parent, LAYOUT_BREAK_LINES[chr0_nosp], :content_model => :empty)
+                  break
                 end
               end
+            else
+              chr0 = this_line.chr
+              if (LAYOUT_BREAK_LINES.key? chr0) && this_line.length > 2 &&
+                  ((Compliance.markdown_syntax ? LayoutBreakLinePlusRx : LayoutBreakLineRx).match? this_line)
+                # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
+                block = Block.new(parent, LAYOUT_BREAK_LINES[chr0], :content_model => :empty)
+                break
+              elsif (this_line.include? '::') && (this_line.end_with? ']')
+                if (chr0 == 'i' || (this_line.start_with? 'video', 'audio')) && (match = MediaBlockMacroRx.match(this_line))
+                  blk_ctx = match[1].to_sym
+                  block = Block.new(parent, blk_ctx, :content_model => :empty)
+                  if blk_ctx == :image
+                    posattrs = ['alt', 'width', 'height']
+                  elsif blk_ctx == :video
+                    posattrs = ['poster', 'width', 'height']
+                  else
+                    posattrs = []
+                  end
 
-              attributes['target'] = target
-              # now done down below
-              #block.title = attributes.delete('title') if attributes.key?('title')
-              #if blk_ctx == :image
-              #  if attributes.key? 'scaledwidth'
-              #    # append % to scaledwidth if ends in number (no units present)
-              #    if (48..57).include?((attributes['scaledwidth'][-1] || 0).ord)
-              #      attributes['scaledwidth'] = %(#{attributes['scaledwidth']}%)
-              #    end
-              #  end
-              #  document.register(:images, target)
-              #  attributes['alt'] ||= Helpers.basename(target, true).tr('_-', ' ')
-              #  # QUESTION should video or audio have an auto-numbered caption?
-              #  block.assign_caption attributes.delete('caption'), 'figure'
-              #end
-              break
+                  # QUESTION why did we make exception for explicit style?
+                  #if style && !explicit_style
+                  if style
+                    attributes['alt'] = style if blk_ctx == :image
+                    attributes.delete 'style'
+                    style = nil
+                  end
 
-            # NOTE we're letting the toc macro have attributes
-            elsif first_char == 't' && (match = TocBlockMacroRx.match(this_line))
-              block = Block.new(parent, :toc, :content_model => :empty)
-              block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
-              break
+                  block.parse_attributes(match[3], posattrs,
+                      :unescape_input => (blk_ctx == :image),
+                      :sub_input => true,
+                      :sub_result => false,
+                      :into => attributes)
+                  target = block.sub_attributes(match[2], :attribute_missing => 'drop-line')
+                  if target.empty?
+                    # retain as unparsed if attribute-missing is skip
+                    if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
+                      return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
+                    # otherwise, drop the line
+                    else
+                      attributes.clear
+                      return
+                    end
+                  end
 
-            elsif block_macro_extensions && (match = GenericBlockMacroRx.match(this_line)) &&
-                (extension = extensions.registered_for_block_macro?(match[1]))
-              target = match[2]
-              raw_attributes = match[3]
-              if extension.config[:content_model] == :attributes
-                unless raw_attributes.empty?
-                  document.parse_attributes(raw_attributes, (extension.config[:pos_attrs] || []),
-                      :sub_input => true, :sub_result => false, :into => attributes)
+                  attributes['target'] = target
+                  break
+
+                elsif chr0 == 't' && (match = TocBlockMacroRx.match(this_line))
+                  block = Block.new(parent, :toc, :content_model => :empty)
+                  block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
+                  break
+
+                elsif block_macro_extensions && (match = GenericBlockMacroRx.match(this_line)) &&
+                    (extension = extensions.registered_for_block_macro?(match[1]))
+                  target = match[2]
+                  raw_attributes = match[3]
+                  if extension.config[:content_model] == :attributes
+                    unless raw_attributes.empty?
+                      document.parse_attributes(raw_attributes, (extension.config[:pos_attrs] || []),
+                          :sub_input => true, :sub_result => false, :into => attributes)
+                    end
+                  else
+                    attributes['text'] = raw_attributes
+                  end
+                  if (default_attrs = extension.config[:default_attrs])
+                    attributes.update(default_attrs) {|k, old_v, _| old_v }
+                  end
+                  if (block = extension.process_method[parent, target, attributes])
+                    attributes.replace block.attributes
+                  else
+                    attributes.clear
+                    return
+                  end
+                  break
                 end
-              else
-                attributes['text'] = raw_attributes
               end
-              if (default_attrs = extension.config[:default_attrs])
-                attributes.update(default_attrs) {|k, old_v, _| old_v }
-              end
-              if (block = extension.process_method[parent, target, attributes])
-                attributes.replace block.attributes
-              else
-                attributes.clear
-                return
-              end
-              break
             end
           end
 
           # haven't found anything yet, continue
-          if (match = CalloutListRx.match(this_line))
+          if chr0 != ' ' && (this_line.include? '>') && (match = CalloutListRx.match(this_line))
             block = List.new(parent, :colist)
             attributes['style'] = 'arabic'
             reader.unshift_line this_line
@@ -638,10 +635,11 @@ class Parser
               marker = block.items[0].marker
               if marker.start_with? '.'
                 # first one makes more sense, but second one is AsciiDoc-compliant
-                #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || ORDERED_LIST_STYLES[0]).to_s
-                attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || ORDERED_LIST_STYLES[0]).to_s
+                # TODO control behavior using a compliance setting
+                #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || 'arabic').to_s
+                attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || 'arabic').to_s
               else
-                attributes['style'] = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker } || ORDERED_LIST_STYLES[0]).to_s
+                attributes['style'] = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker } || 'arabic').to_s
               end
             end
             break
@@ -651,7 +649,7 @@ class Parser
             block = next_description_list(reader, match, parent)
             break
 
-          elsif (style == 'float' || style == 'discrete') &&
+          elsif chr0 != ' ' && (style == 'float' || style == 'discrete') &&
               is_section_title?(this_line, (Compliance.underline_style_section_titles ? reader.peek_line(true) : nil))
             reader.unshift_line this_line
             float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
