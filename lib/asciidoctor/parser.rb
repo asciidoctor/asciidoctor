@@ -1218,21 +1218,19 @@ class Parser
   #
   # Returns nothing
   def self.catalog_inline_anchors(text, document)
-    if text.include? '['
-      text.scan(InlineAnchorRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        next if m[0].start_with? '\\'
-        id = m[1] || m[3]
-        reftext = m[2] || m[4]
-        # enable if we want to allow double quoted values
-        #id = id.sub(DoubleQuotedRx, '\2')
-        #if reftext
-        #  reftext = reftext.sub(DoubleQuotedMultiRx, '\2')
-        #end
-        document.register(:ids, [id, reftext])
-      }
-    end
+    text.scan(InlineAnchorRx) {
+      # alias match for Ruby 1.8.7 compat
+      m = $~
+      next if m[0].start_with? '\\'
+      id = m[1] || m[3]
+      reftext = m[2] || m[4]
+      # enable if we want to allow double quoted values
+      #id = id.sub(DoubleQuotedRx, '\2')
+      #if reftext
+      #  reftext = reftext.sub(DoubleQuotedMultiRx, '\2')
+      #end
+      document.register(:ids, [id, reftext])
+    } if text.include? '['
     nil
   end
 
