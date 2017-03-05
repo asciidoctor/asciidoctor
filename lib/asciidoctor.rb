@@ -993,12 +993,13 @@ module Asciidoctor
     #
     # Examples
     #
-    #   ''' or ' ' ' (horizontal rule)
-    #   --- or - - - (horizontal rule)
-    #   *** or * * * (horizontal rule)
+    #   ''' (horizontal rule)
     #   <<< (page break)
+    #   --- or - - - (horizontal rule, Markdown)
+    #   *** or * * * (horizontal rule, Markdown)
+    #   ___ or _ _ _ (horizontal rule, Markdown)
     #
-    LayoutBreakLinePlusRx = /^(?:'|<){3,}$|^ {0,3}([-\*_])( *)\1\2\1$/
+    LayoutBreakLinePlusRx = /^(?:'|<){3,}$|^ {0,3}([-*_])( *)\1\2\1$/
 
     ## General
 
