@@ -140,7 +140,8 @@ module Extensions
       [:create_anchor,        :create_inline, :anchor]
     ].each do |method_name, delegate_method_name, context|
       define_method method_name do |*args|
-        send delegate_method_name, *args.dup.insert(1, context)
+        args.unshift args.shift, context
+        send delegate_method_name, *args
       end
     end
   end

@@ -268,10 +268,12 @@ module Asciidoctor
 
     def stem node
       if (idx = node.subs.index :specialcharacters)
-        node.subs.delete :specialcharacters
+        node.subs.delete_at idx
+        equation = node.content
+        idx > 0 ? (node.subs.insert idx, :specialcharacters) : (node.subs.unshift :specialcharacters)
+      else
+        equation = node.content
       end
-      equation = node.content
-      node.subs.insert idx, :specialcharacters if idx
       if node.style == 'asciimath'
         if ((defined? ::AsciiMath) || ((defined? @asciimath_available) ? @asciimath_available :
             (@asciimath_available = Helpers.require_library 'asciimath', true, :warn)))

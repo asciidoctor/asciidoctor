@@ -868,7 +868,7 @@ Your browser does not support the audio tag.
       marker_checked = nil
       marker_unchecked = nil
       if (checklist = node.option? 'checklist')
-        div_classes.insert 1, 'checklist'
+        div_classes.unshift div_classes.shift, 'checklist'
         ul_class_attribute = ' class="checklist"'
         if node.option? 'interactive'
           if @xml_mode
