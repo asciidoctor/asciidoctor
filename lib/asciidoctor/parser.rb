@@ -856,10 +856,10 @@ class Parser
           cursor = reader.cursor
           block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), cursor
           case terminator.chr
-            when ','
-              attributes['format'] = 'csv'
-            when ':'
-              attributes['format'] = 'dsv'
+          when ','
+            attributes['format'] = 'csv'
+          when ':'
+            attributes['format'] = 'dsv'
           end
           block = next_table(block_reader, parent, attributes)
 
@@ -2191,38 +2191,38 @@ class Parser
     number_style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker }
     expected = actual = nil
     case number_style
-      when :arabic
-        if validate
-          expected = ordinal + 1
-          actual = marker.to_i
-        end
-        marker = '1.'
-      when :loweralpha
-        if validate
-          expected = ('a'[0].ord + ordinal).chr
-          actual = marker.chomp('.')
-        end
-        marker = 'a.'
-      when :upperalpha
-        if validate
-          expected = ('A'[0].ord + ordinal).chr
-          actual = marker.chomp('.')
-        end
-        marker = 'A.'
-      when :lowerroman
-        if validate
-          # TODO report this in roman numerals; see https://github.com/jamesshipton/roman-numeral/blob/master/lib/roman_numeral.rb
-          expected = ordinal + 1
-          actual = roman_numeral_to_int(marker.chomp(')'))
-        end
-        marker = 'i)'
-      when :upperroman
-        if validate
-          # TODO report this in roman numerals; see https://github.com/jamesshipton/roman-numeral/blob/master/lib/roman_numeral.rb
-          expected = ordinal + 1
-          actual = roman_numeral_to_int(marker.chomp(')'))
-        end
-        marker = 'I)'
+    when :arabic
+      if validate
+        expected = ordinal + 1
+        actual = marker.to_i
+      end
+      marker = '1.'
+    when :loweralpha
+      if validate
+        expected = ('a'[0].ord + ordinal).chr
+        actual = marker.chomp('.')
+      end
+      marker = 'a.'
+    when :upperalpha
+      if validate
+        expected = ('A'[0].ord + ordinal).chr
+        actual = marker.chomp('.')
+      end
+      marker = 'A.'
+    when :lowerroman
+      if validate
+        # TODO report this in roman numerals; see https://github.com/jamesshipton/roman-numeral/blob/master/lib/roman_numeral.rb
+        expected = ordinal + 1
+        actual = roman_numeral_to_int(marker.chomp(')'))
+      end
+      marker = 'i)'
+    when :upperroman
+      if validate
+        # TODO report this in roman numerals; see https://github.com/jamesshipton/roman-numeral/blob/master/lib/roman_numeral.rb
+        expected = ordinal + 1
+        actual = roman_numeral_to_int(marker.chomp(')'))
+      end
+      marker = 'I)'
     end
 
     if validate && expected != actual
