@@ -678,38 +678,37 @@ class PreprocessorReader < Reader
 
   # Internal: Preprocess the directive to conditionally include or exclude content.
   #
-  # Preprocess the conditional inclusion directive (ifdef, ifndef, ifeval,
-  # endif) under the cursor. If the Reader is currently skipping content, then
-  # simply track the open and close delimiters of any nested conditional
-  # blocks. If the Reader is not skipping, mark whether the condition is
-  # satisfied and continue preprocessing recursively until the next line of
-  # available content is found.
+  # Preprocess the conditional directive (ifdef, ifndef, ifeval, endif) under
+  # the cursor. If Reader is currently skipping content, then simply track the
+  # open and close delimiters of any nested conditional blocks. If Reader is
+  # not skipping, mark whether the condition is satisfied and continue
+  # preprocessing recursively until the next line of available content is
+  # found.
   #
-  # directive  - The conditional inclusion directive (ifdef, ifndef, ifeval, endif)
-  # target     - The target, which is the name of one or more attributes that are
-  #              used in the condition (blank in the case of the ifeval directive)
-  # delimiter  - The conditional delimiter for multiple attributes ('+' means all
-  #              attributes must be defined or undefined, ',' means any of the attributes
-  #              can be defined or undefined.
-  # text       - The text associated with this directive (occurring between the square brackets)
-  #              Used for a single-line conditional block in the case of the ifdef or
-  #              ifndef directives, and for the conditional expression for the ifeval directive.
+  # keyword   - The conditional inclusion directive (ifdef, ifndef, ifeval, endif)
+  # target    - The target, which is the name of one or more attributes that are
+  #             used in the condition (blank in the case of the ifeval directive)
+  # delimiter - The conditional delimiter for multiple attributes ('+' means all
+  #             attributes must be defined or undefined, ',' means any of the attributes
+  #             can be defined or undefined.
+  # text      - The text associated with this directive (occurring between the square brackets)
+  #             Used for a single-line conditional block in the case of the ifdef or
+  #             ifndef directives, and for the conditional expression for the ifeval directive.
   #
   # Returns a Boolean indicating whether the cursor should be advanced
-  def preprocess_conditional_directive directive, target, delimiter, text
+  def preprocess_conditional_directive keyword, target, delimiter, text
     # must have a target before brackets if ifdef or ifndef
     # must not have text between brackets if endif
     # don't honor match if it doesn't meet this criteria
     # QUESTION should we warn for these bogus declarations?
-    if ((directive == 'ifdef' || directive == 'ifndef') && target.empty?) ||
-        (directive == 'endif' && text)
+    if ((keyword == 'ifdef' || keyword == 'ifndef') && target.empty?) || (keyword == 'endif' && text)
       return false
     end
 
     # attributes are case insensitive
     target = target.downcase
 
-    if directive == 'endif'
+    if keyword == 'endif'
       stack_size = @conditional_stack.size
       if stack_size > 0
         pair = @conditional_stack[-1]
@@ -728,7 +727,7 @@ class PreprocessorReader < Reader
     skip = false
     unless @skipping
       # QUESTION any way to wrap ifdef & ifndef logic up together?
-      case directive
+      case keyword
       when 'ifdef'
         case delimiter
         when nil
@@ -773,7 +772,7 @@ class PreprocessorReader < Reader
     end
 
     # conditional inclusion block
-    if directive == 'ifeval' || !text
+    if keyword == 'ifeval' || !text
       @skipping = true if skip
       @conditional_stack << {:target => target, :skip => skip, :skipping => @skipping}
     # single line conditional inclusion
