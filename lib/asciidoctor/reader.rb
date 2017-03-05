@@ -610,7 +610,7 @@ class PreprocessorReader < Reader
           @look_ahead += 1
           line[1..-1]
         else
-          if preprocess_conditional_inclusion(*match.captures)
+          if preprocess_conditional_directive(*match.captures)
             # move the pointer past the conditional line
             advance
             # treat next line as uncharted territory
@@ -633,7 +633,7 @@ class PreprocessorReader < Reader
           line[1..-1]
         else
           # QUESTION should we strip whitespace from raw attributes in Substitutors#parse_attributes? (check perf)
-          if preprocess_include match[1], match[2].strip
+          if preprocess_include_directive match[1], match[2].strip
             # peek again since the content has changed
             nil
           else
@@ -676,7 +676,7 @@ class PreprocessorReader < Reader
     end
   end
 
-  # Internal: Preprocess the directive (macro) to conditionally include content.
+  # Internal: Preprocess the directive to conditionally include or exclude content.
   #
   # Preprocess the conditional inclusion directive (ifdef, ifndef, ifeval,
   # endif) under the cursor. If the Reader is currently skipping content, then
@@ -696,7 +696,7 @@ class PreprocessorReader < Reader
   #              ifndef directives, and for the conditional expression for the ifeval directive.
   #
   # Returns a Boolean indicating whether the cursor should be advanced
-  def preprocess_conditional_inclusion directive, target, delimiter, text
+  def preprocess_conditional_directive directive, target, delimiter, text
     # must have a target before brackets if ifdef or ifndef
     # must not have text between brackets if endif
     # don't honor match if it doesn't meet this criteria
@@ -792,7 +792,7 @@ class PreprocessorReader < Reader
     true
   end
 
-  # Internal: Preprocess the directive (macro) to include the target document.
+  # Internal: Preprocess the directive to include lines from another document.
   #
   # Preprocess the directive to include the target document. The scenarios
   # are as follows:
@@ -813,7 +813,7 @@ class PreprocessorReader < Reader
   #          target slot of the include::[] macro
   #
   # Returns a Boolean indicating whether the line under the cursor has changed.
-  def preprocess_include raw_target, raw_attributes
+  def preprocess_include_directive raw_target, raw_attributes
     if (target = @document.sub_attributes raw_target, :attribute_missing => 'drop-line').empty?
       advance
       if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
