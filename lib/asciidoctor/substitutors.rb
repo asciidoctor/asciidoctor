@@ -1191,7 +1191,7 @@ module Substitutors
 
     if str.empty?
       {}
-    elsif (str.start_with?('.') || str.start_with?('#')) && Compliance.shorthand_property_syntax
+    elsif (str.start_with? '.', '#') && Compliance.shorthand_property_syntax
       segments = str.split('#', 2)
 
       if segments.size > 1

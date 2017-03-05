@@ -1298,7 +1298,7 @@ class Parser
           checkbox = true
           checked = false
           text = text[3..-1].lstrip
-        elsif text.start_with?('[x] ') || text.start_with?('[*] ')
+        elsif text.start_with?('[x] ', '[*] ')
           checkbox = true
           checked = true
           text = text[3..-1].lstrip

@@ -625,9 +625,9 @@ class PreprocessorReader < Reader
       elsif @skipping
         advance
         nil
-      elsif ((escaped = line.start_with?('\\include::')) || line.start_with?('include::')) && (match = IncludeDirectiveRx.match(line))
+      elsif (line.start_with? 'inc', '\\inc') && (match = IncludeDirectiveRx.match(line))
         # if escaped, mark as processed and return line unescaped
-        if escaped
+        if line.start_with?('\\')
           @unescape_next_line = true
           @look_ahead += 1
           line[1..-1]
