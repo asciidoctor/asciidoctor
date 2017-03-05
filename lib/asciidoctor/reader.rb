@@ -192,7 +192,7 @@ class Reader
     end
 
     unless result.empty?
-      result.reverse_each {|line| unshift line }
+      unshift_all result
       @look_ahead = old_look_ahead if direct
     end
 
@@ -275,8 +275,7 @@ class Reader
   #
   # Returns nothing.
   def unshift_lines lines_to_restore
-    # QUESTION is it faster to use unshift(*lines_to_restore)?
-    lines_to_restore.reverse_each {|line| unshift line }
+    unshift_all lines_to_restore
     nil
   end
   alias :restore_lines :unshift_lines
@@ -506,6 +505,14 @@ class Reader
     @look_ahead += 1
     @eof = false
     @lines.unshift line
+  end
+
+  # Internal: Restore the lines to the stack and decrement the lineno
+  def unshift_all lines
+    @lineno -= lines.size
+    @look_ahead += lines.size
+    @eof = false
+    @lines.unshift(*lines)
   end
 
   def cursor
