@@ -999,14 +999,14 @@ class Parser
       # tip is the full line when delimiter is minimum length
       if tl < 4 || tl == line_len
         if return_match_data
-          context, masq = *DELIMITED_BLOCKS[tip]
+          context, masq = DELIMITED_BLOCKS[tip]
           BlockMatchData.new(context, masq, tip, tip)
         else
           true
         end
       elsif %(#{tip}#{tip[-1..-1] * (line_len - tl)}) == line
         if return_match_data
-          context, masq = *DELIMITED_BLOCKS[tip]
+          context, masq = DELIMITED_BLOCKS[tip]
           BlockMatchData.new(context, masq, tip, line)
         else
           true
@@ -1014,7 +1014,7 @@ class Parser
       # only enable if/when we decide to support non-congruent block delimiters
       #elsif (match = BlockDelimiterRx.match(line))
       #  if return_match_data
-      #    context, masq = *DELIMITED_BLOCKS[tip]
+      #    context, masq = DELIMITED_BLOCKS[tip]
       #    BlockMatchData.new(context, masq, tip, match[0])
       #  else
       #    true
