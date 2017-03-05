@@ -2023,9 +2023,8 @@ class Parser
   def self.parse_block_metadata_line(reader, parent, attributes, options = {})
     return false unless reader.has_more_lines?
     next_line = reader.peek_line
-    if (commentish = next_line.start_with?('//')) && (match = CommentBlockRx.match(next_line))
-      terminator = match[0]
-      reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => terminator, :skip_processing => true)
+    if (commentish = next_line.start_with?('//')) && (CommentBlockRx.match? next_line)
+      reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => next_line, :skip_processing => true)
     elsif commentish && (CommentLineRx.match? next_line)
       # do nothing, we'll skip it
     elsif !options[:text] && next_line.start_with?(':') && (match = AttributeEntryRx.match(next_line))

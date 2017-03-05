@@ -446,7 +446,7 @@ module Asciidoctor
     #   endif::basebackend-html[]
     #   endif::[]
     #
-    ConditionalDirectiveRx = /^\\?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,\+])\S+?)?)\[(.+)?\]$/
+    ConditionalDirectiveRx = /^(\\)?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,\+])\S+?)?)\[(.+)?\]$/
 
     # Matches a restricted (read as safe) eval expression.
     #
@@ -463,7 +463,7 @@ module Asciidoctor
     #   include::chapter1.ad[]
     #   include::example.txt[lines=1;2;5..10]
     #
-    IncludeDirectiveRx = /^\\?include::([^\[]+)\[(.*?)\]$/
+    IncludeDirectiveRx = /^(\\)?include::([^\[]+)\[(.*?)\]$/
 
     # Matches a trailing tag directive in an include file.
     #
@@ -581,7 +581,7 @@ module Asciidoctor
     #   This is a block comment.
     #   It can span one or more lines.
     #   ////
-    CommentBlockRx = %r{^/{4,}$}
+    CommentBlockRx = %r"^/{4,}$"
 
     # Matches a comment line.
     #
@@ -589,7 +589,7 @@ module Asciidoctor
     #
     #   // an then whatever
     #
-    CommentLineRx = %r{^//(?:[^/]|$)}
+    CommentLineRx = %r"^//(?=[^/]|$)"
 
     ## Section titles
 

@@ -349,9 +349,9 @@ class Reader
     while (next_line = peek_line)
       if include_blank_lines && next_line.empty?
         comment_lines << shift
-      elsif (commentish = next_line.start_with?('//')) && (match = CommentBlockRx.match(next_line))
+      elsif (commentish = next_line.start_with?('//')) && (CommentBlockRx.match? next_line)
         comment_lines << shift
-        comment_lines.push(*(read_lines_until(:terminator => match[0], :read_last_line => true, :skip_processing => true)))
+        comment_lines.push(*(read_lines_until(:terminator => next_line, :read_last_line => true, :skip_processing => true)))
       elsif commentish && (CommentLineRx.match? next_line)
         comment_lines << shift
       else
@@ -610,13 +610,13 @@ class PreprocessorReader < Reader
 
     # NOTE highly optimized
     if line.end_with?(']') && !line.start_with?('[') && line.include?('::')
-      if line.include?('if') && (match = ConditionalDirectiveRx.match(line))
+      if (line.include? 'if') && ConditionalDirectiveRx =~ line
         # if escaped, mark as processed and return line unescaped
-        if line.start_with? '\\'
+        if $1 == '\\'
           @unescape_next_line = true
           @look_ahead += 1
           line[1..-1]
-        elsif preprocess_conditional_directive(*match.captures)
+        elsif preprocess_conditional_directive $2, $3, $4, $5
           # move the pointer past the conditional line
           advance
           # treat next line as uncharted territory
@@ -630,14 +630,14 @@ class PreprocessorReader < Reader
       elsif @skipping
         advance
         nil
-      elsif (line.start_with? 'inc', '\\inc') && (match = IncludeDirectiveRx.match(line))
+      elsif (line.start_with? 'inc', '\\inc') && IncludeDirectiveRx =~ line
         # if escaped, mark as processed and return line unescaped
-        if line.start_with? '\\'
+        if $1 == '\\'
           @unescape_next_line = true
           @look_ahead += 1
           line[1..-1]
         # QUESTION should we strip whitespace from raw attributes in Substitutors#parse_attributes? (check perf)
-        elsif preprocess_include_directive match[1], match[2].strip
+        elsif preprocess_include_directive $2, $3.strip
           # peek again since the content has changed
           nil
         else
@@ -758,15 +758,15 @@ class PreprocessorReader < Reader
       when 'ifeval'
         # the text in brackets must match an expression
         # don't honor match if it doesn't meet this criteria
-        if !target.empty? || !(expr_match = EvalExpressionRx.match(text.strip))
-          return false
-        end
+        return false unless target.empty? && EvalExpressionRx =~ text.strip
 
-        lhs = resolve_expr_val expr_match[1]
-        rhs = resolve_expr_val expr_match[3]
+        # NOTE save values eagerly for Ruby 1.8.7 compat
+        lhs, op, rhs = $1, $2, $3
+        lhs = resolve_expr_val lhs
+        rhs = resolve_expr_val rhs
 
         # regex enforces a restricted set of math-related operations
-        if (op = expr_match[2]) == '!='
+        if op == '!='
           skip = lhs.send :==, rhs
         else
           skip = !(lhs.send op.to_sym, rhs)
