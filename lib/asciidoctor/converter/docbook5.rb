@@ -617,15 +617,15 @@ module Asciidoctor
     end
 
     (QUOTE_TAGS = {
+      :monospaced  => ['<literal>',                '</literal>',     false],
       :emphasis    => ['<emphasis>',               '</emphasis>',    true],
       :strong      => ['<emphasis role="strong">', '</emphasis>',    true],
-      :monospaced  => ['<literal>',                '</literal>',     false],
-      :superscript => ['<superscript>',            '</superscript>', false],
-      :subscript   => ['<subscript>',              '</subscript>',   false],
       :double      => ['&#8220;',                  '&#8221;',        true],
       :single      => ['&#8216;',                  '&#8217;',        true],
-      :mark        => ['<emphasis role="marked">', '</emphasis>',    false]
-    }).default = [nil, nil, true]
+      :mark        => ['<emphasis role="marked">', '</emphasis>',    false],
+      :superscript => ['<superscript>',            '</superscript>', false],
+      :subscript   => ['<subscript>',              '</subscript>',   false]
+    }).default = ['', '', true]
 
     def inline_quoted node
       if (type = node.type) == :asciimath
@@ -642,11 +642,11 @@ module Asciidoctor
       else
         open, close, supports_phrase = QUOTE_TAGS[type]
         text = node.text
-        if (role = node.role)
+        if node.role
           if supports_phrase
-            quoted_text = %(#{open}<phrase role="#{role}">#{text}</phrase>#{close})
+            quoted_text = %(#{open}<phrase role="#{node.role}">#{text}</phrase>#{close})
           else
-            quoted_text = %(#{open.chop} role="#{role}">#{text}#{close})
+            quoted_text = %(#{open.chop} role="#{node.role}">#{text}#{close})
           end
         else
           quoted_text = %(#{open}#{text}#{close})

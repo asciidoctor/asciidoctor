@@ -4,20 +4,20 @@ module Asciidoctor
   # consistent with the html5 backend from AsciiDoc Python.
   class Converter::Html5Converter < Converter::BuiltIn
     (QUOTE_TAGS = {
+      :monospaced  => ['<code>',   '</code>',   true],
       :emphasis    => ['<em>',     '</em>',     true],
       :strong      => ['<strong>', '</strong>', true],
-      :monospaced  => ['<code>',   '</code>',   true],
-      :superscript => ['<sup>',    '</sup>',    true],
-      :subscript   => ['<sub>',    '</sub>',    true],
       :double      => ['&#8220;',  '&#8221;',   false],
       :single      => ['&#8216;',  '&#8217;',   false],
       :mark        => ['<mark>',   '</mark>',   true],
+      :superscript => ['<sup>',    '</sup>',    true],
+      :subscript   => ['<sub>',    '</sub>',    true],
       :asciimath   => ['\\$',      '\\$',       false],
       :latexmath   => ['\\(',      '\\)',       false]
       # Opal can't resolve these constants when referenced here
       #:asciimath   => INLINE_MATH_DELIMITERS[:asciimath] + [false],
       #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
-    }).default = [nil, nil, nil]
+    }).default = ['', '', false]
 
     SvgPreambleRx = /\A.*?(?=<svg\b)/m
     SvgStartTagRx = /\A<svg[^>]*>/
@@ -1131,11 +1131,11 @@ Your browser does not support the video tag.
 
     def inline_quoted node
       open, close, is_tag = QUOTE_TAGS[node.type]
-      if (role = node.role)
+      if node.role
         if is_tag
-          quoted_text = %(#{open.chop} class="#{role}">#{node.text}#{close})
+          quoted_text = %(#{open.chop} class="#{node.role}">#{node.text}#{close})
         else
-          quoted_text = %(<span class="#{role}">#{open}#{node.text}#{close}</span>)
+          quoted_text = %(<span class="#{node.role}">#{open}#{node.text}#{close}</span>)
         end
       else
         quoted_text = %(#{open}#{node.text}#{close})
