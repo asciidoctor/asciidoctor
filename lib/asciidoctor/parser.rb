@@ -903,8 +903,9 @@ class Parser
       if block.context == :image
         resolved_target = attributes['target']
         block.document.register(:images, resolved_target)
-        attributes['alt'] ||= Helpers.basename(resolved_target, true).tr('_-', ' ')
-        attributes['alt'] = block.sub_specialchars attributes['alt']
+        alt = (attributes['alt'] || Helpers.basename(resolved_target, true).tr('_-', ' '))
+        alt = block.sub_specialchars alt if (alt.include? '<') || (alt.include? '&') || (alt.include? '>')
+        attributes['alt'] = alt
         block.assign_caption attributes.delete('caption'), 'figure'
         unless (scaledwidth = attributes.delete 'scaledwidth').nil_or_empty?
           # append % to scaledwidth if it ends with a number (no units present)

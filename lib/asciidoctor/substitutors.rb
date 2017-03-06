@@ -4,13 +4,8 @@ module Asciidoctor
 # is intented to be mixed-in to Section and Block to provide operations for performing
 # the necessary substitutions.
 module Substitutors
-  SPECIAL_CHARS = {
-    '&' => '&amp;',
-    '<' => '&lt;',
-    '>' => '&gt;'
-  }
-
-  SPECIAL_CHARS_PATTERN = /[&<>]/
+  SpecialCharsRx = /[<&>]/
+  SpecialCharsTr = { '>' => '&gt;', '<' => '&lt;', '&' => '&amp;' }
 
   BASIC_SUBS = [:specialcharacters].freeze
   HEADER_SUBS = [:specialcharacters, :attributes].freeze
@@ -107,7 +102,7 @@ module Substitutors
     subs.each do |type|
       case type
       when :specialcharacters
-        text = sub_specialchars text
+        text = sub_specialchars text if (text.include? '<') || (text.include? '&') || (text.include? '>')
       when :quotes
         text = sub_quotes text
       when :attributes
@@ -350,15 +345,20 @@ module Substitutors
 
   # Public: Substitute special characters (i.e., encode XML)
   #
-  # Special characters are defined in the Asciidoctor::SPECIAL_CHARS Array constant
+  # The special characters are <, &, and >, which get replaced with &lt;,
+  # &amp;, and &gt;, respectively.
   #
   # text - The String text to process
   #
   # returns The String text with special characters replaced
-  def sub_specialchars(text)
-    SUPPORTS_GSUB_RESULT_HASH ?
-      text.gsub(SPECIAL_CHARS_PATTERN, SPECIAL_CHARS) :
-      text.gsub(SPECIAL_CHARS_PATTERN) { SPECIAL_CHARS[$&] }
+  if SUPPORTS_GSUB_RESULT_HASH
+    def sub_specialchars text
+      text.gsub SpecialCharsRx, SpecialCharsTr
+    end
+  else
+    def sub_specialchars text 
+      text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }
+    end
   end
   alias :sub_specialcharacters :sub_specialchars
 
@@ -1557,7 +1557,11 @@ module Substitutors
   #
   # returns the substituted source
   def sub_source source, process_callouts
-    return process_callouts ? sub_callouts(sub_specialchars(source)) : sub_specialchars(source)
+    if (source.include? '<') || (source.include? '&') || (source.include? '>')
+      process_callouts ? sub_callouts(sub_specialchars(source)) : sub_specialchars(source)
+    else
+      process_callouts ? sub_callouts(source) : source
+    end
   end
 
   # Internal: Lock-in the substitutions for this block
