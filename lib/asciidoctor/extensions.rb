@@ -293,7 +293,7 @@ module Extensions
   # When Asciidoctor encounters a delimited block or paragraph with an
   # unrecognized name while parsing the document, it looks for a BlockProcessor
   # registered to handle this name and, if found, invokes its {Processor#process}
-  # method to build a cooresponding node in the document tree.
+  # method to build a corresponding node in the document tree.
   #
   # AsciiDoc example:
   #
