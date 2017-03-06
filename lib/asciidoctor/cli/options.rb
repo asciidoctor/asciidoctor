@@ -60,10 +60,10 @@ Example: asciidoctor -b html5 source.asciidoc
                   'provided for compatibility with the asciidoc command') do
             self[:safe] = SafeMode::SAFE
           end
-          opts.on('-S', '--safe-mode SAFE_MODE', (safe_mode_names = SafeMode.constants.map(&:to_s).map(&:downcase)),
+          opts.on('-S', '--safe-mode SAFE_MODE', (safe_mode_names = SafeMode.names),
                   %(set safe mode level explicitly: [#{safe_mode_names * ', '}] (default: unsafe)),
-                  'disables potentially dangerous macros in source files, such as include::[]') do |safe_mode|
-            self[:safe] = SafeMode.const_get safe_mode.upcase
+                  'disables potentially dangerous macros in source files, such as include::[]') do |name|
+            self[:safe] = SafeMode.value_for_name name
           end
           opts.on('-s', '--no-header-footer', 'suppress output of header and footer (default: false)') do
             self[:header_footer] = false

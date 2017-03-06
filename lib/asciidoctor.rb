@@ -93,6 +93,21 @@ module Asciidoctor
     # enforced)!
     #PARANOID = 100;
 
+    rec = {}
+    constants.each {|sym| rec[const_get sym] = sym.to_s.downcase }
+    @names_by_value = rec
+
+    def self.value_for_name name
+      const_get name.upcase
+    end
+
+    def self.name_for_value value
+      @names_by_value[value]
+    end
+
+    def self.names
+      @names_by_value.values
+    end
   end
 
   # Flags to control compliance with the behavior of AsciiDoc

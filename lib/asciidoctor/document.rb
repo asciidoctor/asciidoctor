@@ -231,7 +231,7 @@ class Document < AbstractBlock
       else
         # NOTE: not using infix rescue for performance reasons, see https://github.com/jruby/jruby/issues/1816
         begin
-          @safe = SafeMode.const_get(safe_mode.to_s.upcase)
+          @safe = SafeMode.value_for_name safe_mode.to_s
         rescue
           @safe = SafeMode::SECURE
         end
@@ -287,8 +287,7 @@ class Document < AbstractBlock
     attr_overrides['asciidoctor'] = ''
     attr_overrides['asciidoctor-version'] = VERSION
 
-    safe_mode_name = SafeMode.constants.find {|l| SafeMode.const_get(l) == @safe }.to_s.downcase
-    attr_overrides['safe-mode-name'] = safe_mode_name
+    attr_overrides['safe-mode-name'] = (safe_mode_name = SafeMode.name_for_value @safe)
     attr_overrides["safe-mode-#{safe_mode_name}"] = ''
     attr_overrides['safe-mode-level'] = @safe
 
