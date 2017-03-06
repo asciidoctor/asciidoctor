@@ -24,6 +24,19 @@ EOS
 
 context 'Manpage' do
   context 'Configuration' do
+    test 'should set proper manpage-related attributes' do
+      input = SAMPLE_MANPAGE_HEADER
+      doc = Asciidoctor.load input, :backend => :manpage
+      assert_equal 'man', doc.attributes['filetype']
+      assert_equal '', doc.attributes['filetype-man']
+      assert_equal '1', doc.attributes['manvolnum']
+      assert_equal '.1', doc.attributes['outfilesuffix']
+      assert_equal 'command', doc.attributes['manname']
+      assert_equal 'command', doc.attributes['mantitle']
+      assert_equal 'does stuff', doc.attributes['manpurpose']
+      assert_equal 'command', doc.attributes['docname']
+    end
+
     test 'should define default linkstyle' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
