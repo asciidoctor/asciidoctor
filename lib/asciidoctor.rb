@@ -1633,7 +1633,6 @@ require 'asciidoctor/attribute_list'
 require 'asciidoctor/block'
 require 'asciidoctor/callouts'
 require 'asciidoctor/converter'
-require 'asciidoctor/converter/html5' if RUBY_ENGINE_OPAL
 require 'asciidoctor/document'
 require 'asciidoctor/inline'
 require 'asciidoctor/list'
