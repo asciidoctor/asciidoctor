@@ -1353,7 +1353,7 @@ module Asciidoctor
       end
       lines = input.readlines
     elsif ::String === input
-      lines = input.lines.entries
+      lines = ::RUBY_MIN_VERSION_2 ? input.lines : input.each_line.to_a
     elsif ::Array === input
       lines = input.dup
     else
