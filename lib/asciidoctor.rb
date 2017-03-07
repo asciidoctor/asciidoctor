@@ -1329,7 +1329,8 @@ module Asciidoctor
       # TODO cli checks if input path can be read and is file, but might want to add check to API
       input_path = ::File.expand_path input.path
       # See https://reproducible-builds.org/specs/source-date-epoch/
-      input_mtime = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : input.mtime
+      # NOTE Opal can't call key? on ENV
+      input_mtime = ::ENV['SOURCE_DATE_EPOCH'] ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : input.mtime
       lines = input.readlines
       # hold off on setting infile and indir until we get a better sense of their purpose
       attributes['docfile'] = input_path
