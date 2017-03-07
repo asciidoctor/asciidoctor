@@ -1086,7 +1086,7 @@ module Substitutors
           # resolve fragment as reftext if cannot be resolved as refid and looks like reftext
           if !(@document.references[:ids].key? fragment) &&
               ((fragment.include? ' ') || fragment.downcase != fragment) &&
-              (resolved_id = RUBY_MIN_VERSION_1_9 ? (@document.references[:ids].key fragment) : (@document.references[:ids].index fragment))
+              (resolved_id = ::RUBY_MIN_VERSION_1_9 ? (@document.references[:ids].key fragment) : (@document.references[:ids].index fragment))
             fragment = resolved_id
           end
           refid = fragment
