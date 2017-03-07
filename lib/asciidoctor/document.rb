@@ -936,9 +936,12 @@ class Document < AbstractBlock
         new_filetype = @converter.filetype
       else
         new_basebackend = new_backend.sub TrailingDigitsRx, ''
-        # QUESTION should we be forcing the basebackend to html if unknown?
-        new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend] || '.html'
-        new_filetype = new_outfilesuffix[1..-1]
+        if (new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend])
+          new_filetype = new_outfilesuffix[1..-1]
+        else
+          new_outfilesuffix = '.html'
+          new_basebackend = new_filetype = 'html'
+        end
         attrs['outfilesuffix'] = new_outfilesuffix unless attribute_locked? 'outfilesuffix'
       end
       if (current_filetype = attrs['filetype'])

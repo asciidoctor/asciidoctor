@@ -257,6 +257,7 @@ module Asciidoctor
     'docbook' => '.xml',
     'pdf' => '.pdf',
     'epub' => '.epub',
+    'manpage' => '.man',
     'asciidoc' => '.adoc'
   }
 
