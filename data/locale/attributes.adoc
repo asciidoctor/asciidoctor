@@ -207,6 +207,27 @@ ifeval::["{lang}" == "hu"]
 :warning-caption: Figyelem
 endif::[]
 //
+// Bahasa Indonesia, courtesy of Triyan W. Nugroho <triyan.wn@gmail.com>
+ifeval::["{lang}" == "id"]
+:appendix-caption: Lampiran
+:caution-caption: Perhatian
+:chapter-label: Bab
+:example-caption: Contoh
+:figure-caption: Gambar
+:important-caption: Penting
+:last-update-label: Pembaruan terakhir
+//:listing-caption: Daftar
+:manname-title: NAMA
+:note-caption: Catatan
+//:preface-title:
+:table-caption: Tabel
+:tip-caption: Tips
+:toc-title: Daftar Isi
+:untitled-label: Tak Berjudul
+:version-label: Versi
+:warning-caption: Peringatan
+endif::[]
+//
 // Italian translation, courtesy of Marco Ciampa <ciampix@libero.it>
 ifeval::["{lang}" == "it"]
 :appendix-caption: Appendice
