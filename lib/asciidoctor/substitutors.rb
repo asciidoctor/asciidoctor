@@ -351,7 +351,7 @@ module Substitutors
   # text - The String text to process
   #
   # returns The String text with special characters replaced
-  if SUPPORTS_GSUB_RESULT_HASH
+  if ::RUBY_MIN_VERSION_1_9
     def sub_specialchars text
       text.gsub SpecialCharsRx, SpecialCharsTr
     end
