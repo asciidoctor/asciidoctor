@@ -74,7 +74,7 @@ ifeval::["{lang}" == "da"]
 :figure-caption: Figur
 :important-caption: Vigtig
 :last-update-label: Sidst opdateret
-:listing-caption: List
+//:listing-caption: List
 :manname-title: NAVN
 :note-caption: Notat
 //:preface-title:
@@ -451,6 +451,26 @@ ifeval::["{lang}" == "tr"]
 :warning-caption: Uyarı
 endif::[]
 //
+// Ukrainian translation, courtesy of Kyrylo Yatsenko <hedrok@gmail.com>
+ifeval::["{lang}" == "uk"]
+:appendix-caption: Додаток
+:caution-caption: Обережно
+:example-caption: Приклад
+:figure-caption: Зображення
+:important-caption: Важливо
+:last-update-label: Востаннє оновлено
+//:listing-caption: Лістинг
+:manname-title: НАЗВА
+:note-caption: Зауваження
+//:preface-title: Передмова
+:table-caption: Таблиця
+:tip-caption: Підказка
+:toc-title: Зміст
+:untitled-label: Без назви
+:version-label: Версія
+:warning-caption: Попередження
+endif::[]
+//
 // Simplified Chinese translation, courtesy of John Dong <dongwqs@gmail.com>
 ifeval::["{lang}" == "zh_CN"]
 :appendix-caption: 附录
@@ -489,24 +509,4 @@ ifeval::["{lang}" == "zh_TW"]
 :untitled-label: 暫無標題
 :version-label: 版本
 :warning-caption: 警告
-endif::[]
-//
-// Ukrainian translation, courtesy of Kyrylo Yatsenko <hedrok@gmail.com>
-ifeval::["{lang}" == "uk"]
-:appendix-caption: Додаток
-:caution-caption: Обережно
-:example-caption: Приклад
-:figure-caption: Зображення
-:important-caption: Важливо
-:last-update-label: Востаннє оновлено
-//:listing-caption: Лістинг
-:manname-title: НАЗВА
-:note-caption: Зауваження
-//:preface-title: Передмова
-:table-caption: Таблиця
-:tip-caption: Підказка
-:toc-title: Зміст
-:untitled-label: Без назви
-:version-label: Версія
-:warning-caption: Попередження
 endif::[]
