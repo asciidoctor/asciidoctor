@@ -582,7 +582,7 @@ class PreprocessorReader < Reader
     result = super
 
     # QUESTION should this work for AsciiDoc table cell content? Currently it does not.
-    if @document && (@document.attributes.has_key? 'skip-front-matter')
+    if @document && (@document.attributes.key? 'skip-front-matter')
       if (front_matter = skip_front_matter! result)
         @document.attributes['front-matter'] = front_matter * EOL
       end
@@ -735,25 +735,25 @@ class PreprocessorReader < Reader
         case delimiter
         when nil
           # if the attribute is undefined, then skip
-          skip = !@document.attributes.has_key?(target)
+          skip = !@document.attributes.key?(target)
         when ','
           # if any attribute is defined, then don't skip
-          skip = target.split(',').none? {|name| @document.attributes.has_key? name }
+          skip = target.split(',').none? {|name| @document.attributes.key? name }
         when '+'
           # if any attribute is undefined, then skip
-          skip = target.split('+').any? {|name| !@document.attributes.has_key? name }
+          skip = target.split('+').any? {|name| !@document.attributes.key? name }
         end
       when 'ifndef'
         case delimiter
         when nil
           # if the attribute is defined, then skip
-          skip = @document.attributes.has_key?(target)
+          skip = @document.attributes.key?(target)
         when ','
           # if any attribute is undefined, then don't skip
-          skip = target.split(',').none? {|name| !@document.attributes.has_key? name }
+          skip = target.split(',').none? {|name| !@document.attributes.key? name }
         when '+'
           # if any attribute is defined, then skip
-          skip = target.split('+').any? {|name| @document.attributes.has_key? name }
+          skip = target.split('+').any? {|name| @document.attributes.key? name }
         end
       when 'ifeval'
         # the text in brackets must match an expression
@@ -852,14 +852,14 @@ class PreprocessorReader < Reader
           ::File.join @dir, target
         end
       elsif Helpers.uriish? target
-        unless @document.attributes.has_key? 'allow-uri-read'
+        unless @document.attributes.key? 'allow-uri-read'
           replace_next_line %(link:#{target}[])
           return true
         end
 
         target_type = :uri
         include_file = path = target
-        if @document.attributes.has_key? 'cache-uri'
+        if @document.attributes.key? 'cache-uri'
           # caching requires the open-uri-cached gem to be installed
           # processing will be automatically aborted if these libraries can't be opened
           Helpers.require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
@@ -886,7 +886,7 @@ class PreprocessorReader < Reader
       if !raw_attributes.empty?
         # QUESTION should we use @document.parse_attribues?
         attributes = AttributeList.new(raw_attributes).parse
-        if attributes.has_key? 'lines'
+        if attributes.key? 'lines'
           inc_lines = []
           attributes['lines'].split(DataDelimiterRx).each do |linedef|
             if linedef.include?('..')
@@ -902,9 +902,9 @@ class PreprocessorReader < Reader
             end
           end
           inc_lines = inc_lines.sort.uniq
-        elsif attributes.has_key? 'tag'
+        elsif attributes.key? 'tag'
           tags = [attributes['tag']].to_set
-        elsif attributes.has_key? 'tags'
+        elsif attributes.key? 'tags'
           tags = attributes['tags'].split(DataDelimiterRx).to_set
         end
       end
@@ -1041,7 +1041,7 @@ class PreprocessorReader < Reader
 
     @lineno = lineno
 
-    if attributes.has_key? 'depth'
+    if attributes.key? 'depth'
       depth = attributes['depth'].to_i
       depth = 1 if depth <= 0
       @maxdepth = {:abs => (@include_stack.size - 1) + depth, :rel => depth}
@@ -1052,7 +1052,7 @@ class PreprocessorReader < Reader
       pop_include
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines
-      if attributes.has_key? 'leveloffset'
+      if attributes.key? 'leveloffset'
         @lines.unshift ''
         @lines.unshift %(:leveloffset: #{attributes['leveloffset']})
         @lines << ''

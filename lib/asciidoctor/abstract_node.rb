@@ -119,7 +119,7 @@ class AbstractNode
     name = name.to_s if ::Symbol === name
     inherit = false if self == @document
     if expect.nil?
-      @attributes.has_key?(name) || (inherit && @document.attributes.has_key?(name))
+      @attributes.key?(name) || (inherit && @document.attributes.key?(name))
     elsif inherit
       expect == (@attributes[name] || @document.attributes[name])
     else
@@ -146,7 +146,7 @@ class AbstractNode
 
   # TODO document me
   def set_option(name)
-    if @attributes.has_key? 'options'
+    if @attributes.key? 'options'
       @attributes['options'] = "#{@attributes['options']},#{name}"
     else
       @attributes['options'] = name
@@ -164,7 +164,7 @@ class AbstractNode
   #
   # return a Boolean indicating whether the option has been specified
   def option?(name)
-    @attributes.has_key? %(#{name}-option)
+    @attributes.key? %(#{name}-option)
   end
 
   # Public: Update the attributes of this node with the new values in
@@ -192,7 +192,7 @@ class AbstractNode
     if expect
       expect == (@attributes['role'] || @document.attributes['role'])
     else
-      @attributes.has_key?('role') || @document.attributes.has_key?('role')
+      @attributes.key?('role') || @document.attributes.key?('role')
     end
   end
 
@@ -251,7 +251,7 @@ class AbstractNode
 
   # Public: A convenience method that checks if the reftext attribute is specified
   def reftext?
-    @attributes.has_key?('reftext') || @document.attributes.has_key?('reftext')
+    @attributes.key?('reftext') || @document.attributes.key?('reftext')
   end
 
   # Public: A convenience method that returns the value of the reftext attribute

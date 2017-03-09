@@ -90,8 +90,7 @@ class Parser
 
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
-    if (has_doctitle_line = is_next_line_document_title?(reader, block_attributes)) &&
-        block_attributes.has_key?('title')
+    if (has_doctitle_line = is_next_line_document_title?(reader, block_attributes)) && block_attributes.key?('title')
       return document.finalize_header block_attributes, false
     end
 
@@ -245,7 +244,7 @@ class Parser
       section = parent
 
       current_level = 0
-      if parent.attributes.has_key? 'fragment'
+      if parent.attributes.key? 'fragment'
         expected_next_levels = nil
       # small tweak to allow subsequent level-0 sections for book doctype
       elsif doctype == 'book'
@@ -505,7 +504,7 @@ class Parser
           unless text_only
             first_char = Compliance.markdown_syntax ? this_line.lstrip.chr : this_line.chr
             # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-            if (LAYOUT_BREAK_LINES.has_key? first_char) && this_line.length >= 3 &&
+            if (LAYOUT_BREAK_LINES.key? first_char) && this_line.length >= 3 &&
                 ((Compliance.markdown_syntax ? LayoutBreakLinePlusRx : LayoutBreakLineRx).match? this_line)
               block = Block.new(parent, LAYOUT_BREAK_LINES[first_char], :content_model => :empty)
               break
@@ -548,9 +547,9 @@ class Parser
 
               attributes['target'] = target
               # now done down below
-              #block.title = attributes.delete('title') if attributes.has_key?('title')
+              #block.title = attributes.delete('title') if attributes.key?('title')
               #if blk_ctx == :image
-              #  if attributes.has_key? 'scaledwidth'
+              #  if attributes.key? 'scaledwidth'
               #    # append % to scaledwidth if ends in number (no units present)
               #    if (48..57).include?((attributes['scaledwidth'][-1] || 0).ord)
               #      attributes['scaledwidth'] = %(#{attributes['scaledwidth']}%)
@@ -660,7 +659,7 @@ class Parser
             reader.unshift_line this_line
             float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
             attributes['reftext'] = float_reftext if float_reftext
-            float_id ||= attributes['id'] if attributes.has_key?('id')
+            float_id ||= attributes['id'] if attributes.key?('id')
             block = Block.new(parent, :floating_title, :content_model => :empty)
             block.title = float_title
             block.id = float_id.nil_or_empty? ? (Section.generate_id block.title, document) : float_id
@@ -927,7 +926,7 @@ class Parser
       block.attributes.update(attributes) unless attributes.empty?
       block.lock_in_subs
 
-      #if document.attributes.has_key? :pending_attribute_entries
+      #if document.attributes.key? :pending_attribute_entries
       #  document.attributes.delete(:pending_attribute_entries).each do |entry|
       #    entry.save_to block.attributes
       #  end
@@ -996,7 +995,7 @@ class Parser
       return if tl == 3 && !fenced_code
     end
 
-    if DELIMITED_BLOCKS.has_key? tip
+    if DELIMITED_BLOCKS.key? tip
       # tip is the full line when delimiter is minimum length
       if tl < 4 || tl == line_len
         if return_match_data
@@ -1101,7 +1100,7 @@ class Parser
     end
 
     # QUESTION should we have an explicit map or can we rely on check for *-caption attribute?
-    if (attributes.has_key? 'title') && (block.document.attr? %(#{block.context}-caption))
+    if (attributes.key? 'title') && (block.document.attr? %(#{block.context}-caption))
       block.title = attributes.delete 'title'
       block.assign_caption attributes.delete('caption')
     end
@@ -1566,7 +1565,7 @@ class Parser
     source_location = reader.cursor if document.sourcemap
     sect_id, sect_reftext, sect_title, sect_level, _ = parse_section_title(reader, document)
     attributes['reftext'] = sect_reftext if sect_reftext
-    section = Section.new parent, sect_level, document.attributes.has_key?('sectnums')
+    section = Section.new parent, sect_level, document.attributes.key?('sectnums')
     section.source_location = source_location if source_location
     section.id = sect_id
     section.title = sect_title
@@ -1675,7 +1674,7 @@ class Parser
   end
 
   def self.is_two_line_section_title?(line1, line2)
-    if line1 && line2 && SECTION_LEVELS.has_key?(line2.chr) &&
+    if line1 && line2 && SECTION_LEVELS.key?(line2.chr) &&
         (SetextSectionLineRx.match? line2) && (SetextSectionTitleRx.match? line1) &&
         # chomp so that a (non-visible) endline does not impact calculation
         (line_length(line1) - line_length(line2)).abs <= 1
@@ -1810,7 +1809,7 @@ class Parser
         if document
           # apply header subs and assign to document
           author_metadata.each do |key, val|
-            unless document.attributes.has_key? key
+            unless document.attributes.key? key
               document.attributes[key] = ::String === val ? (document.apply_header_subs val) : val
             end
           end
@@ -1850,7 +1849,7 @@ class Parser
         if document
           # apply header subs and assign to document
           rev_metadata.each do |key, val|
-            unless document.attributes.has_key? key
+            unless document.attributes.key? key
               document.attributes[key] = document.apply_header_subs(val)
             end
           end
@@ -1868,18 +1867,16 @@ class Parser
     if document
       # process author attribute entries that override (or stand in for) the implicit author line
       author_metadata = nil
-      if document.attributes.has_key?('author') &&
-          (author_line = document.attributes['author']) != implicit_author
+      if document.attributes.key?('author') && (author_line = document.attributes['author']) != implicit_author
         # do not allow multiple, process as names only
         author_metadata = process_authors author_line, true, false
-      elsif document.attributes.has_key?('authors') &&
-          (author_line = document.attributes['authors']) != implicit_authors
+      elsif document.attributes.key?('authors') && (author_line = document.attributes['authors']) != implicit_authors
         # allow multiple, process as names only
         author_metadata = process_authors author_line, true
       else
         authors = []
         author_key = %(author_#{authors.size + 1})
-        while document.attributes.has_key? author_key
+        while document.attributes.key? author_key
           authors << document.attributes[author_key]
           author_key = %(author_#{authors.size + 1})
         end
@@ -1896,7 +1893,7 @@ class Parser
         document.attributes.update author_metadata
 
         # special case
-        if !document.attributes.has_key?('email') && document.attributes.has_key?('email_1')
+        if !document.attributes.key?('email') && document.attributes.key?('email_1')
           document.attributes['email'] = document.attributes['email_1']
         end
       end
@@ -1966,7 +1963,7 @@ class Parser
       # only assign the _1 attributes if there are multiple authors
       if idx == 1
         keys.each do |key|
-          author_metadata[%(#{key}_1)] = author_metadata[key] if author_metadata.has_key? key
+          author_metadata[%(#{key}_1)] = author_metadata[key] if author_metadata.key? key
         end
       end
       if idx == 0
@@ -2266,7 +2263,7 @@ class Parser
   # returns an instance of Asciidoctor::Table parsed from the provided reader
   def self.next_table(table_reader, parent, attributes)
     table = Table.new(parent, attributes)
-    if (attributes.has_key? 'title')
+    if (attributes.key? 'title')
       table.title = attributes.delete 'title'
       table.assign_caption attributes.delete('caption')
     end
@@ -2356,8 +2353,7 @@ class Parser
             parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} )
           end
           line = ''
-          if parser_ctx.format == 'psv' ||
-              (parser_ctx.format == 'csv' && parser_ctx.buffer_has_unclosed_quotes?)
+          if parser_ctx.format == 'psv' || (parser_ctx.format == 'csv' && parser_ctx.buffer_has_unclosed_quotes?)
             parser_ctx.keep_cell_open
           else
             parser_ctx.close_cell true
@@ -2411,10 +2407,10 @@ class Parser
         if m[2]
           # make this an operation
           colspec, rowspec = m[2].split '.'
-          if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
+          if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].key?(colspec)
             spec['halign'] = Table::ALIGNMENTS[:h][colspec]
           end
-          if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
+          if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].key?(rowspec)
             spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
           end
         end
@@ -2424,7 +2420,7 @@ class Parser
         spec['width'] = (m[3] ? m[3].to_i : 1)
 
         # make this an operation
-        if m[4] && Table::TEXT_STYLES.has_key?(m[4])
+        if m[4] && Table::TEXT_STYLES.key?(m[4])
           spec['style'] = Table::TEXT_STYLES[m[4]]
         end
 
@@ -2492,15 +2488,15 @@ class Parser
 
     if m[3]
       colspec, rowspec = m[3].split '.'
-      if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].has_key?(colspec)
+      if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].key?(colspec)
         spec['halign'] = Table::ALIGNMENTS[:h][colspec]
       end
-      if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].has_key?(rowspec)
+      if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].key?(rowspec)
         spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
       end
     end
 
-    if m[4] && Table::TEXT_STYLES.has_key?(m[4])
+    if m[4] && Table::TEXT_STYLES.key?(m[4])
       spec['style'] = Table::TEXT_STYLES[m[4]]
     end
 
@@ -2550,7 +2546,7 @@ class Parser
           when :role, :option
             (parsed[type] ||= []) << collector.join
           when :id
-            if parsed.has_key? :id
+            if parsed.key? :id
               warn %(asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} multiple ids detected in style attribute)
             end
             parsed[type] = collector.join
@@ -2583,21 +2579,17 @@ class Parser
       else
         save_current.call
 
-        if parsed.has_key? :style
+        if parsed.key? :style
           parsed_style = attributes['style'] = parsed[:style]
         else
           parsed_style = nil
         end
 
-        if parsed.has_key? :id
-          attributes['id'] = parsed[:id]
-        end
+        attributes['id'] = parsed[:id] if parsed.key? :id
 
-        if parsed.has_key? :role
-          attributes['role'] = parsed[:role] * ' '
-        end
+        attributes['role'] = parsed[:role] * ' ' if parsed.key? :role
 
-        if parsed.has_key? :option
+        if parsed.key? :option
           (options = parsed[:option]).each do |option|
             attributes[%(#{option}-option)] = ''
           end
