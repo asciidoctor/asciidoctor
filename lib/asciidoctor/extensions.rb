@@ -1184,7 +1184,7 @@ module Extensions
 
     def add_document_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
-      kind_class_symbol = kind_name.split.map(&:capitalize).join.to_sym
+      kind_class_symbol = kind_name.split.map {|name| name.capitalize }.join.to_sym
       kind_class = Extensions.const_get kind_class_symbol
       kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol) : nil
       kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, [])
@@ -1234,7 +1234,7 @@ module Extensions
 
     def add_syntax_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
-      kind_class_symbol = (kind_name.split.map(&:capitalize).push 'Processor').join.to_sym
+      kind_class_symbol = (kind_name.split.map {|name| name.capitalize }.push 'Processor').join.to_sym
       kind_class = Extensions.const_get kind_class_symbol
       kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol) : nil
       kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, {})

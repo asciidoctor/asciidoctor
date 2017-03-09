@@ -508,7 +508,7 @@ allbox tab(:);'
       #end
       # FIXME temporary fix to get basic table to display
       result << LF
-      result << row_header[0].map {|r| 'lt'}.join(' ')
+      result << row_header[0].map { 'lt' }.join(' ')
 
       result << %(.#{LF})
       row_text.each do |row|
