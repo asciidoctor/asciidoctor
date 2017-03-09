@@ -1273,7 +1273,7 @@ C1,C2
       assert_xpath '/table/tbody/tr[2]/td[1]/p[text()="B1"]', output, 1
     end
 
-    test 'mixed unquoted records and quoted records with escaped quotes, commas and wrapped lines' do
+    test 'mixed unquoted records and quoted records with escaped quotes, commas, and wrapped lines' do
       input = <<-EOS
 [format="csv",options="header"]
 |===
@@ -1283,16 +1283,20 @@ Year,Make,Model,Description,Price
 1999,Chevy,"Venture ""Extended Edition, Very Large""",,5000.00
 1996,Jeep,Grand Cherokee,"MUST SELL!
 air, moon roof, loaded",4799.00
+2000,Toyota,Tundra,"""This one's gonna to blow you're socks off,"" per the sticker",10000.00
+2000,Toyota,Tundra,"Check it, ""this one's gonna to blow you're socks off"", per the sticker",10000.00
 |===
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col[style*="width: 20%"]', output, 5
       assert_css 'table > thead > tr', output, 1
-      assert_css 'table > tbody > tr', output, 4
+      assert_css 'table > tbody > tr', output, 6
       assert_xpath '((//tbody/tr)[1]/td)[4]/p[text()="ac, abs, moon"]', output, 1
       assert_xpath %(((//tbody/tr)[2]/td)[3]/p[text()='Venture "Extended Edition"']), output, 1
       assert_xpath '((//tbody/tr)[4]/td)[4]/p[text()="MUST SELL! air, moon roof, loaded"]', output, 1
+      assert_xpath %(((//tbody/tr)[5]/td)[4]/p[text()='"This one#{expand_entity 8217}s gonna to blow you#{expand_entity 8217}re socks off," per the sticker']), output, 1
+      assert_xpath %(((//tbody/tr)[6]/td)[4]/p[text()='Check it, "this one#{expand_entity 8217}s gonna to blow you#{expand_entity 8217}re socks off", per the sticker']), output, 1
     end
 
     test 'csv format shorthand' do
