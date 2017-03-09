@@ -84,7 +84,7 @@ Example: asciidoctor -b html5 source.asciidoc
             val = val ? (FORCE_ENCODING ? (val.force_encoding ::Encoding::UTF_8) : val) : ''
             # move leading ! to end for internal processing
             #if !val && key.start_with?('!')
-            #  key = "#{key[1..-1]}!"
+            #  key = %(#{key[1..-1]}!)
             #end
             self[:attributes][key] = val
           end
@@ -158,7 +158,7 @@ Example: asciidoctor -b html5 source.asciidoc
           args.each do |file|
             if file == '-' || (file.start_with? '-')
               # warn, but don't panic; we may have enough to proceed, so we won't force a failure
-              $stderr.puts "asciidoctor: WARNING: extra arguments detected (unparsed arguments: #{args.map{|a| "'#{a}'"} * ', '}) or incorrect usage of stdin"
+              $stderr.puts %(asciidoctor: WARNING: extra arguments detected (unparsed arguments: '#{args.join "', '"}') or incorrect usage of stdin)
             else
               if ::File.readable? file
                 matches = [file]

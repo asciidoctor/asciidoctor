@@ -427,20 +427,20 @@ module Asciidoctor
             rowspan_attribute = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : nil
             # NOTE <entry> may not have whitespace (e.g., line breaks) as a direct descendant according to DocBook rules
             entry_start = %(<entry#{halign_attribute}#{valign_attribute}#{colspan_attribute}#{rowspan_attribute}>)
-            cell_content = if tblsec == :head
-              cell.text
+            if tblsec == :head
+              cell_content = cell.text
             else
               case cell.style
               when :asciidoc
-                cell.content
+                cell_content = cell.content
               when :verse
-                %(<literallayout>#{cell.text}</literallayout>)
+                cell_content = %(<literallayout>#{cell.text}</literallayout>)
               when :literal
-                %(<literallayout class="monospaced">#{cell.text}</literallayout>)
+                cell_content = %(<literallayout class="monospaced">#{cell.text}</literallayout>)
               when :header
-                cell.content.map {|text| %(<simpara><emphasis role="strong">#{text}</emphasis></simpara>) }.join
+                cell_content = (cell_content = cell.content).empty? ? '' : %(<simpara><emphasis role="strong">#{cell_content * '</emphasis></simpara><simpara><emphasis role="strong">'}</emphasis></simpara>)
               else
-                cell.content.map {|text| %(<simpara>#{text}</simpara>) }.join
+                cell_content = (cell_content = cell.content).empty? ? '' : %(<simpara>#{cell_content * '</simpara><simpara>'}</simpara>)
               end
             end
             entry_end = (node.document.attr? 'cellbgcolor') ? %(<?dbfo bgcolor="#{node.document.attr 'cellbgcolor'}"?></entry>) : '</entry>'
@@ -594,15 +594,14 @@ module Asciidoctor
       if (keys = node.attr 'keys').size == 1
         %(<keycap>#{keys[0]}</keycap>)
       else
-        %(<keycombo>#{keys.map {|key| "<keycap>#{key}</keycap>" }.join}</keycombo>)
+        %(<keycombo><keycap>#{keys * '</keycap><keycap>'}</keycap></keycombo>)
       end
     end
 
     def inline_menu node
       menu = node.attr 'menu'
       if !(submenus = node.attr 'submenus').empty?
-        submenu_path = submenus.map {|submenu| %(<guisubmenu>#{submenu}</guisubmenu> ) }.join.chop
-        %(<menuchoice><guimenu>#{menu}</guimenu> #{submenu_path} <guimenuitem>#{node.attr 'menuitem'}</guimenuitem></menuchoice>)
+        %(<menuchoice><guimenu>#{menu}</guimenu> <guisubmenu>#{submenus * '</guisubmenu> <guisubmenu>'}</guisubmenu> <guimenuitem>#{node.attr 'menuitem'}</guimenuitem></menuchoice>)
       elsif (menuitem = node.attr 'menuitem')
         %(<menuchoice><guimenu>#{menu}</guimenu> <guimenuitem>#{menuitem}</guimenuitem></menuchoice>)
       else
