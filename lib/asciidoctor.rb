@@ -1033,7 +1033,7 @@ module Asciidoctor
     #   one,two
     #   three;four
     #
-    DataDelimiterRx = /,|;/
+    DataDelimiterRx = /[,;]/
 
     # Matches a single-line of text enclosed in double quotes, capturing the quote char and text.
     #
