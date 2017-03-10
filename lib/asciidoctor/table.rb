@@ -422,18 +422,16 @@ class Table::ParserContext
   #
   # returns true if the buffer has unclosed quotes, false if it doesn't or it
   # isn't quoted data
-  def buffer_has_unclosed_quotes?(append = nil)
-    record = %(#{@buffer}#{append}).strip
-    record.start_with?('"') && !record.start_with?('""') && !record.end_with?('"')
-  end
-
-  # Public: Determines whether the buffer contains quoted data. Used for CSV data.
-  #
-  # returns true if the buffer starts with a double quote (and not an escaped double quote),
-  # false otherwise
-  def buffer_quoted?
-    @buffer = @buffer.lstrip
-    @buffer.start_with?('"') && !@buffer.start_with?('""')
+  def buffer_has_unclosed_quotes? append = nil
+    if (record = append ? (buffer + append).strip : buffer.strip).start_with? '"'
+      if ((trailing_quote = record.end_with? '"') && (record.end_with? '""')) || (record.start_with? '""')
+        ((record = record.gsub '""', '').start_with? '"') && !(record.end_with? '"')
+      else
+        !trailing_quote
+      end
+    else
+      false
+    end
   end
 
   # Public: Takes a cell spec from the stack. Cell specs precede the delimiter, so a
