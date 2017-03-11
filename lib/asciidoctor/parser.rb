@@ -486,7 +486,6 @@ class Parser
       # it only executes once, and only if delimited_block is false
       # break once a block is found or at end of loop
       # returns nil if the line must be dropped
-      # NOTE: while(true) is twice as fast as loop
       while true
         # process lines verbatim
         if style && Compliance.strict_verbatim_paragraphs && VERBATIM_STYLES.include?(style)
@@ -497,26 +496,30 @@ class Parser
         end
 
         # process lines normally
+        flush_left = true
         unless text_only
           if this_line.start_with? ' '
-            chr0 = ' '
+            flush_left = false
             if Compliance.markdown_syntax
-              chr0_nosp = (flush_line = this_line.lstrip).chr
-              if (LAYOUT_BREAK_LINES.key? chr0_nosp) && flush_line.length > 2 && (LayoutBreakLinePlusRx.match? this_line)
+              if (flush_line = this_line.lstrip).start_with?(*MARKDOWN_THEMATIC_BREAK_CHARS.keys) &&
+                flush_line.length > 2 && (MarkdownThematicBreakRx.match? this_line)
                 # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-                block = Block.new(parent, LAYOUT_BREAK_LINES[chr0_nosp], :content_model => :empty)
+                block = Block.new(parent, :thematic_break, :content_model => :empty)
                 break
               end
             end
+          #elsif this_line.start_with? TAB # extremely rare
+          #  flush_left = false
           else
-            chr0 = this_line.chr
-            if (LAYOUT_BREAK_LINES.key? chr0) && this_line.length > 2 &&
-                ((Compliance.markdown_syntax ? LayoutBreakLinePlusRx : LayoutBreakLineRx).match? this_line)
+            layout_break_chars = (md_syntax = Compliance.markdown_syntax) ? HYBRID_LAYOUT_BREAK_CHARS : LAYOUT_BREAK_CHARS
+            if (this_line.start_with?(*layout_break_chars.keys)) &&
+                (md_syntax ? (HybridLayoutBreakRx.match? this_line) : (this_line == this_line.chr * this_line.length))
               # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-              block = Block.new(parent, LAYOUT_BREAK_LINES[chr0], :content_model => :empty)
+              block = Block.new(parent, layout_break_chars[this_line.chr], :content_model => :empty)
               break
-            elsif (this_line.include? '::') && (this_line.end_with? ']')
-              if (chr0 == 'i' || (this_line.start_with? 'video', 'audio')) && (match = MediaBlockMacroRx.match(this_line))
+            # NOTE very rare that a text-only line will end with ] (e.g., inline macro), so check it first
+            elsif (this_line.end_with? ']') && (this_line.include? '::')
+              if (this_line.start_with? 'image', 'video', 'audio') && (match = MediaBlockMacroRx.match(this_line))
                 blk_ctx = match[1].to_sym
                 block = Block.new(parent, blk_ctx, :content_model => :empty)
                 if blk_ctx == :image
@@ -554,7 +557,7 @@ class Parser
                 attributes['target'] = target
                 break
 
-              elsif chr0 == 't' && (match = TocBlockMacroRx.match(this_line))
+              elsif (this_line.start_with? 'toc') && (match = TocBlockMacroRx.match(this_line))
                 block = Block.new(parent, :toc, :content_model => :empty)
                 block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
                 break
@@ -587,7 +590,7 @@ class Parser
         end
 
         # haven't found anything yet, continue
-        if chr0 != ' ' && (this_line.include? '>') && (match = CalloutListRx.match(this_line))
+        if flush_left && (this_line.include? '>') && (match = CalloutListRx.match(this_line))
           block = List.new(parent, :colist)
           attributes['style'] = 'arabic'
           reader.unshift_line this_line
@@ -648,7 +651,7 @@ class Parser
           block = next_description_list(reader, match, parent)
           break
 
-        elsif chr0 != ' ' && (style == 'float' || style == 'discrete') &&
+        elsif flush_left && (style == 'float' || style == 'discrete') &&
             is_section_title?(this_line, (Compliance.underline_style_section_titles ? reader.peek_line(true) : nil))
           reader.unshift_line this_line
           float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
@@ -769,8 +772,7 @@ class Parser
           end
         end
 
-        # forbid loop from executing more than once
-        break
+        break # forbid loop from executing more than once
       end unless delimited_block
 
       # either delimited block or styled paragraph

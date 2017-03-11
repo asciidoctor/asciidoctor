@@ -301,13 +301,18 @@ module Asciidoctor
 
   DELIMITED_BLOCK_LEADERS = DELIMITED_BLOCKS.keys.map {|key| key[0, 2] }.to_set
 
-  LAYOUT_BREAK_LINES = {
+  LAYOUT_BREAK_CHARS = {
     '\'' => :thematic_break,
-    '-'  => :thematic_break,
-    '*'  => :thematic_break,
-    '_'  => :thematic_break,
     '<'  => :page_break
   }
+
+  MARKDOWN_THEMATIC_BREAK_CHARS = {
+    '-'  => :thematic_break,
+    '*'  => :thematic_break,
+    '_'  => :thematic_break
+  }
+
+  HYBRID_LAYOUT_BREAK_CHARS = LAYOUT_BREAK_CHARS.merge MARKDOWN_THEMATIC_BREAK_CHARS
 
   #LIST_CONTEXTS = [:ulist, :olist, :dlist, :colist]
 
@@ -997,7 +1002,17 @@ module Asciidoctor
     #   ''' (horizontal rule)
     #   <<< (page break)
     #
-    LayoutBreakLineRx = /^('|<){3,}$/
+    #LayoutBreakRx = /^(?:'|<){3,}$/
+
+    # Matches a Markdown horizontal rule.
+    #
+    # Examples
+    #
+    #   --- or - - -
+    #   *** or * * *
+    #   ___ or _ _ _
+    #
+    MarkdownThematicBreakRx = /^ {0,3}([-*_])( *)\1\2\1$/
 
     # Matches an AsciiDoc or Markdown horizontal rule or AsciiDoc page break.
     #
@@ -1009,7 +1024,7 @@ module Asciidoctor
     #   *** or * * * (horizontal rule, Markdown)
     #   ___ or _ _ _ (horizontal rule, Markdown)
     #
-    LayoutBreakLinePlusRx = /^(?:'|<){3,}$|^ {0,3}([-*_])( *)\1\2\1$/
+    HybridLayoutBreakRx = /^(?:(?:'|<){3,}|([-*_])( *)\1\2\1)$/
 
     ## General
 
