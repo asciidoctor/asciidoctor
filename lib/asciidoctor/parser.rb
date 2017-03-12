@@ -496,28 +496,31 @@ class Parser
         end
 
         # process lines normally
-        flush_left = true
-        unless text_only
+        if text_only
+          indented = this_line.start_with? ' ', TAB
+        else
+          indented = false
+          md_syntax = Compliance.markdown_syntax
           if this_line.start_with? ' '
-            flush_left = false
-            if Compliance.markdown_syntax
-              if (flush_line = this_line.lstrip).start_with?(*MARKDOWN_THEMATIC_BREAK_CHARS.keys) &&
-                flush_line.length > 2 && (MarkdownThematicBreakRx.match? this_line)
-                # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-                block = Block.new(parent, :thematic_break, :content_model => :empty)
-                break
-              end
+            indented = true
+            # QUESTION should we test line length?
+            if md_syntax && this_line.lstrip.start_with?(*MARKDOWN_THEMATIC_BREAK_CHARS.keys) &&
+                #!(this_line.start_with? '    ') &&
+                (MarkdownThematicBreakRx.match? this_line)
+              # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
+              block = Block.new(parent, :thematic_break, :content_model => :empty)
+              break
             end
-          #elsif this_line.start_with? TAB # extremely rare
-          #  flush_left = false
+          elsif this_line.start_with? TAB
+            indented = true
           else
-            layout_break_chars = (md_syntax = Compliance.markdown_syntax) ? HYBRID_LAYOUT_BREAK_CHARS : LAYOUT_BREAK_CHARS
-            if (this_line.start_with?(*layout_break_chars.keys)) &&
-                (md_syntax ? (HybridLayoutBreakRx.match? this_line) : (this_line == this_line.chr * this_line.length))
+            layout_break_chars = md_syntax ? HYBRID_LAYOUT_BREAK_CHARS : LAYOUT_BREAK_CHARS
+            if (this_line.start_with?(*layout_break_chars.keys)) && (md_syntax ?
+                (HybridLayoutBreakRx.match? this_line) : (this_line == this_line.chr * (ll = this_line.length) && ll > 2))
               # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
               block = Block.new(parent, layout_break_chars[this_line.chr], :content_model => :empty)
               break
-            # NOTE very rare that a text-only line will end with ] (e.g., inline macro), so check it first
+            # NOTE very rare that a text-only line will end in ] (e.g., inline macro), so check that first
             elsif (this_line.end_with? ']') && (this_line.include? '::')
               if (this_line.start_with? 'image', 'video', 'audio') && (match = MediaBlockMacroRx.match(this_line))
                 blk_ctx = match[1].to_sym
@@ -590,7 +593,7 @@ class Parser
         end
 
         # haven't found anything yet, continue
-        if flush_left && (this_line.include? '>') && (match = CalloutListRx.match(this_line))
+        if !indented && (this_line.include? '>') && (match = CalloutListRx.match(this_line))
           block = List.new(parent, :colist)
           attributes['style'] = 'arabic'
           reader.unshift_line this_line
@@ -651,15 +654,14 @@ class Parser
           block = next_description_list(reader, match, parent)
           break
 
-        elsif flush_left && (style == 'float' || style == 'discrete') &&
-            is_section_title?(this_line, (Compliance.underline_style_section_titles ? reader.peek_line(true) : nil))
+        elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
+            (is_section_title? this_line, (reader.peek_line true)) : !indented && (is_section_title? this_line))
           reader.unshift_line this_line
           float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
           attributes['reftext'] = float_reftext if float_reftext
-          float_id ||= attributes['id'] if attributes.key?('id')
           block = Block.new(parent, :floating_title, :content_model => :empty)
           block.title = float_title
-          block.id = float_id.nil_or_empty? ? (Section.generate_id block.title, document) : float_id
+          block.id = float_id || attributes['id'] || (Section.generate_id block.title, document)
           block.level = float_level
           break
 
@@ -694,7 +696,7 @@ class Parser
         break_at_list = (skipped == 0 && in_list)
 
         # a literal paragraph is contiguous lines starting at least one space
-        if style != 'normal' && (LiteralParagraphRx.match? this_line)
+        if indented && style != 'normal' && (LiteralParagraphRx.match? this_line)
           # So we need to actually include this one in the read_lines group
           reader.unshift_line this_line
           lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => text_only
@@ -722,24 +724,25 @@ class Parser
 
           catalog_inline_anchors(lines.join(EOL), document)
 
-          first_line = lines[0]
-          if !text_only && (admonition_match = AdmonitionParagraphRx.match(first_line))
+          # NOTE I can't find a case when this is true
+          #unless this_line == lines[0]
+          #  this_line = lines[0]
+          #  indented = this_line.start_with? ' ', TAB
+          #end
+
+          if text_only
+            # if [normal] is used over an indented paragraph, shift content to left margin
+            # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
+            adjust_indentation! lines if style == 'normal' && indented
+            block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
+          elsif (this_line.include? ':') && (admonition_match = AdmonitionParagraphRx.match(this_line))
             lines[0] = admonition_match.post_match.lstrip
             attributes['style'] = admonition_match[1]
             attributes['name'] = admonition_name = admonition_match[1].downcase
             attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
             block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
-          elsif !text_only && Compliance.markdown_syntax && first_line.start_with?('> ')
-            lines.map! {|line|
-              if line == '>'
-                line[1..-1]
-              elsif line.start_with? '> '
-                line[2..-1]
-              else
-                line
-              end
-            }
-
+          elsif md_syntax && this_line.start_with?('> ')
+            lines.map! {|line| line == '>' ? line[1..-1] : ((line.start_with? '> ') ? line[2..-1] : line) }
             if lines[-1].start_with? '-- '
               attribution, citetitle = lines.pop[3..-1].split(', ', 2)
               attributes['attribution'] = attribution if attribution
@@ -751,8 +754,8 @@ class Parser
             # TODO could assume a floating title when inside a block context
             # FIXME Reader needs to be created w/ line info
             block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
-          elsif !text_only && (blockquote? lines, first_line)
-            lines[0] = first_line[1..-1]
+          elsif blockquote? lines, this_line
+            lines[0] = this_line[1..-1]
             attribution, citetitle = lines.pop[3..-1].split(', ', 2)
             attributes['attribution'] = attribution if attribution
             attributes['citetitle'] = citetitle if citetitle
@@ -763,11 +766,8 @@ class Parser
             block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
           else
             # if [normal] is used over an indented paragraph, shift content to left margin
-            if style == 'normal'
-              # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
-              adjust_indentation! lines
-            end
-
+            # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
+            adjust_indentation! lines if style == 'normal' && indented
             block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
           end
         end
