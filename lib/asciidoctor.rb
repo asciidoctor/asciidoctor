@@ -995,15 +995,6 @@ module Asciidoctor
       LineBreakRx = /^(.*) \+$/
     end
 
-    # Matches an AsciiDoc horizontal rule or AsciiDoc page break.
-    #
-    # Examples
-    #
-    #   ''' (horizontal rule)
-    #   <<< (page break)
-    #
-    #LayoutBreakRx = /^(?:'|<){3,}$/
-
     # Matches a Markdown horizontal rule.
     #
     # Examples
@@ -1024,7 +1015,7 @@ module Asciidoctor
     #   *** or * * * (horizontal rule, Markdown)
     #   ___ or _ _ _ (horizontal rule, Markdown)
     #
-    HybridLayoutBreakRx = /^(?:(?:'|<){3,}|([-*_])( *)\1\2\1)$/
+    HybridLayoutBreakRx = /^(?:'{3,}|<{3,}|([-*_])( *)\1\2\1)$/
 
     ## General
 
@@ -1119,11 +1110,14 @@ module Asciidoctor
 
     # Unused
 
-    # Detects any fenced block delimiter, including:
-    #   listing, literal, example, sidebar, quote, passthrough, table and fenced code
-    # Does not match open blocks or air quotes
-    # TIP position the most common blocks towards the front of the pattern
-    #BlockDelimiterRx = %r{^(?:(?:-|\.|=|\*|_|\+|/){4,}|[\|,;!]={3,}|(?:`|~){3,}.*)$}
+    # Matches an AsciiDoc horizontal rule or AsciiDoc page break.
+    #
+    # Examples
+    #
+    #   ''' (horizontal rule)
+    #   <<< (page break)
+    #
+    #LayoutBreakRx = /^(?:'{3,}|<{3,})$/
 
     # Matches a single-line of text enclosed in double quotes, capturing the quote char and text.
     #
