@@ -1086,9 +1086,7 @@ module Asciidoctor
     #
     # NOTE If necessary to hide use of the language modifier (u) from JavaScript, use (Regexp.new '.', false, 'u')
     #
-    UnicodeCharScanRx = unless RUBY_ENGINE == 'opal'
-      FORCE_UNICODE_LINE_LENGTH ? /./u : nil
-    end
+    UnicodeCharScanRx = FORCE_UNICODE_LINE_LENGTH ? /./u : nil unless RUBY_ENGINE == 'opal'
 
     # Detects strings that resemble URIs.
     #
