@@ -5,22 +5,39 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
 end
 
 context "Blocks" do
-  context 'Line Breaks' do
-    test "ruler" do
-      output = render_string("'''")
-      assert_xpath '//*[@id="content"]/hr', output, 1
-      assert_xpath '//*[@id="content"]/*', output, 1
+  context 'Layout Breaks' do
+    test 'horizontal rule' do
+      %w(''' '''' '''''').each do |line|
+        output = render_embedded_string line
+        assert_includes output, '<hr>'
+      end
     end
 
-    test "ruler between blocks" do
-      output = render_string("Block above\n\n'''\n\nBlock below")
-      assert_xpath '//*[@id="content"]/hr', output, 1
-      assert_xpath '//*[@id="content"]/hr/preceding-sibling::*', output, 1
-      assert_xpath '//*[@id="content"]/hr/following-sibling::*', output, 1
+    test '< 3 chars does not make horizontal rule' do
+      %w(' '').each do |line|
+        output = render_embedded_string line
+        refute_includes output, '<hr>'
+        assert_includes output, %(<p>#{line}</p>)
+      end
     end
 
-    test "page break" do
-      output = render_embedded_string("page 1\n\n<<<\n\npage 2")
+    test 'mixed chars does not make horizontal rule' do
+      [%q(''<), %q('''<), %q(' ' ')].each do |line|
+        output = render_embedded_string line
+        refute_includes output, '<hr>'
+        assert_includes output, %(<p>#{line.sub '<', '&lt;'}</p>)
+      end
+    end
+
+    test 'horizontal rule between blocks' do
+      output = render_embedded_string %(Block above\n\n'''\n\nBlock below)
+      assert_xpath '/hr', output, 1
+      assert_xpath '/hr/preceding-sibling::*', output, 1
+      assert_xpath '/hr/following-sibling::*', output, 1
+    end
+
+    test 'page break' do
+      output = render_embedded_string %(page 1\n\n<<<\n\npage 2)
       assert_xpath '/*[translate(@style, ";", "")="page-break-after: always"]', output, 1
       assert_xpath '/*[translate(@style, ";", "")="page-break-after: always"]/preceding-sibling::div/p[text()="page 1"]', output, 1
       assert_xpath '/*[translate(@style, ";", "")="page-break-after: always"]/following-sibling::div/p[text()="page 2"]', output, 1
