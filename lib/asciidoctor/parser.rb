@@ -495,12 +495,13 @@ class Parser
         end
 
         # process lines normally
+        ch0 = this_line.chr
         if text_only
-          indented = this_line.start_with? ' ', TAB
+          indented = ch0 == ' ' || ch0 == TAB
         else
-          indented = false
+          # NOTE move this declaration up if we need it when text_only is false
           md_syntax = Compliance.markdown_syntax
-          if this_line.start_with? ' '
+          if ch0 == ' '
             indented = true
             # QUESTION should we test line length?
             if md_syntax && this_line.lstrip.start_with?(*MARKDOWN_THEMATIC_BREAK_CHARS.keys) &&
@@ -510,18 +511,20 @@ class Parser
               block = Block.new(parent, :thematic_break, :content_model => :empty)
               break
             end
-          elsif this_line.start_with? TAB
+          elsif ch0 == TAB
             indented = true
           else
+            indented = false
             layout_break_chars = md_syntax ? HYBRID_LAYOUT_BREAK_CHARS : LAYOUT_BREAK_CHARS
-            if (this_line.start_with?(*layout_break_chars.keys)) && (md_syntax ?
-                (HybridLayoutBreakRx.match? this_line) : (this_line == this_line.chr * (ll = this_line.length) && ll > 2))
+            if (layout_break_chars.key? ch0) && (md_syntax ?
+                (HybridLayoutBreakRx.match? this_line) : (this_line == ch0 * (ll = this_line.length) && ll > 2))
               # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-              block = Block.new(parent, layout_break_chars[this_line.chr], :content_model => :empty)
+              block = Block.new(parent, layout_break_chars[ch0], :content_model => :empty)
               break
             # NOTE very rare that a text-only line will end in ] (e.g., inline macro), so check that first
             elsif (this_line.end_with? ']') && (this_line.include? '::')
-              if (this_line.start_with? 'image', 'video', 'audio') && (match = MediaBlockMacroRx.match(this_line))
+              #if (this_line.start_with? 'image', 'video', 'audio') && (match = MediaBlockMacroRx.match(this_line))
+              if (ch0 == 'i' || (this_line.start_with? 'video', 'audio')) && (match = MediaBlockMacroRx.match(this_line))
                 blk_ctx = match[1].to_sym
                 block = Block.new(parent, blk_ctx, :content_model => :empty)
                 if blk_ctx == :image
@@ -559,7 +562,7 @@ class Parser
                 attributes['target'] = target
                 break
 
-              elsif (this_line.start_with? 'toc') && (match = TocBlockMacroRx.match(this_line))
+              elsif ch0 == 't' && (this_line.start_with? 'toc') && (match = TocBlockMacroRx.match(this_line))
                 block = Block.new(parent, :toc, :content_model => :empty)
                 block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
                 break
@@ -592,7 +595,8 @@ class Parser
         end
 
         # haven't found anything yet, continue
-        if !indented && (this_line.include? '>') && (match = CalloutListRx.match(this_line))
+        if !indented && (ch0 == '<' || ((DIGITS.key? ch0) && (this_line.include? '>'))) &&
+            (match = CalloutListRx.match(this_line))
           block = List.new(parent, :colist)
           attributes['style'] = 'arabic'
           reader.unshift_line this_line
@@ -734,13 +738,13 @@ class Parser
             # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
             adjust_indentation! lines if style == 'normal' && indented
             block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
-          elsif (this_line.include? ':') && (admonition_match = AdmonitionParagraphRx.match(this_line))
+          elsif (this_line.include? ':') && ch0.upcase == ch0 && (admonition_match = AdmonitionParagraphRx.match(this_line))
             lines[0] = admonition_match.post_match.lstrip
             attributes['style'] = admonition_match[1]
             attributes['name'] = admonition_name = admonition_match[1].downcase
             attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
             block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
-          elsif md_syntax && this_line.start_with?('> ')
+          elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
             lines.map! {|line| line == '>' ? line[1..-1] : ((line.start_with? '> ') ? line[2..-1] : line) }
             if lines[-1].start_with? '-- '
               attribution, citetitle = lines.pop[3..-1].split(', ', 2)
@@ -753,14 +757,13 @@ class Parser
             # TODO could assume a floating title when inside a block context
             # FIXME Reader needs to be created w/ line info
             block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
-          elsif blockquote? lines, this_line
-            lines[0] = this_line[1..-1]
+          elsif ch0 == '"' && lines.size > 1 && (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
+            lines[0] = this_line[1..-1] # strip leading quote
             attribution, citetitle = lines.pop[3..-1].split(', ', 2)
             attributes['attribution'] = attribution if attribution
             attributes['citetitle'] = citetitle if citetitle
             lines.pop while lines[-1].empty?
-            # strip trailing quote
-            lines[-1] = lines[-1].chop
+            lines[-1] = lines[-1].chop # strip trailing quote
             attributes['style'] = 'quote'
             block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
           else
@@ -942,11 +945,6 @@ class Parser
     end
 
     block
-  end
-
-  def self.blockquote? lines, first_line = nil
-    lines.size > 1 && ((first_line || lines[0]).start_with? '"') &&
-        (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
   end
 
   def self.read_paragraph_lines reader, break_at_list, opts = {}

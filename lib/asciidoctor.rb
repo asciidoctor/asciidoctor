@@ -331,6 +331,8 @@ module Asciidoctor
     'upperroman' => 'I'
   }
 
+  DIGITS = { '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9 }
+
   LIST_CONTINUATION = '+'
 
   # NOTE AsciiDoc Python allows + to be preceded by TAB; Asciidoctor does not
