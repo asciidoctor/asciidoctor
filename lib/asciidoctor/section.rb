@@ -178,25 +178,24 @@ class Section < AbstractBlock
     if (attrs = document.attributes).key? 'sectids'
       sep = attrs['idseparator'] || '_'
       pre = attrs['idprefix'] || '_'
-      gen_id = %(#{pre}#{title.downcase.gsub(InvalidSectionIdCharsRx, sep)})
+      gen_id = %(#{pre}#{title.downcase.gsub InvalidSectionIdCharsRx, sep})
       unless sep.empty?
         # remove repeat and trailing separator characters
         gen_id = gen_id.tr_s sep, sep
         gen_id = gen_id.chop if gen_id.end_with? sep
         # ensure id doesn't begin with idseparator if idprefix is empty and idseparator is not empty
         if pre.empty?
-          gen_id = gen_id[1..-1] while (gen_id.start_with? sep)
+          gen_id = gen_id[1..-1] while gen_id.start_with? sep
         end
       end
-      if (ids = document.references[:ids]) && (ids.key? gen_id)
+      if document.references[:ids].key? gen_id
+        ids = document.references[:ids]
         cnt = Compliance.unique_id_start_index
         cnt += 1 while ids.key?(tmp_id = %(#{gen_id}#{sep}#{cnt}))
         tmp_id
       else
         gen_id
       end
-    else
-      nil
     end
   end
 end
