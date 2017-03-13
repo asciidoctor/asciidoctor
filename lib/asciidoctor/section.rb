@@ -181,7 +181,8 @@ class Section < AbstractBlock
       gen_id = %(#{pre}#{title.downcase.gsub(InvalidSectionIdCharsRx, sep)})
       unless sep.empty?
         # remove repeat and trailing separator characters
-        gen_id = (gen_id.tr_s sep, sep).chomp sep
+        gen_id = gen_id.tr_s sep, sep
+        gen_id = gen_id.chop if gen_id.end_with? sep
         # ensure id doesn't begin with idseparator if idprefix is empty and idseparator is not empty
         if pre.empty?
           gen_id = gen_id[1..-1] while (gen_id.start_with? sep)
