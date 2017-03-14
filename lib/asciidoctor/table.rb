@@ -17,19 +17,6 @@ class Table < AbstractBlock
     alias :[] :send
   end
 
-  # Public: A String key that specifies the default table format in AsciiDoc (psv)
-  DEFAULT_DATA_FORMAT = 'psv'
-
-  # Public: An Array of String keys that represent the table formats in AsciiDoc
-  DATA_FORMATS = ['psv', 'dsv', 'csv']
-
-  # Public: A Hash mapping the AsciiDoc table formats to their default delimiters
-  DEFAULT_DELIMITERS = {
-    'psv' => '|',
-    'dsv' => ':',
-    'csv' => ','
-  }
-
   # Public: A Hash mapping styles abbreviations to styles that can be applied
   # to a table column or cell
   TEXT_STYLES = {
@@ -341,11 +328,24 @@ end
 # instantiated, the row is closed if the cell satisifies the column count and,
 # finally, a new buffer is allocated to track the next cell.
 class Table::ParserContext
+  # Public: An Array of String keys that represent the table formats in AsciiDoc
+  #--
+  # QUESTION should we recognize !sv as a valid format value?
+  FORMATS = ['psv', 'csv', 'dsv', 'tsv'].to_set
+
+  # Public: A Hash mapping the AsciiDoc table formats to default delimiters
+  DELIMITERS = {
+    'psv' => ['|', /\|/],
+    'csv' => [',', /,/],
+    'dsv' => [':', /:/],
+    'tsv' => [%(\t), /\t/],
+    '!sv' => ['!', /!/]
+  }
 
   # Public: The Table currently being parsed
   attr_accessor :table
 
-  # Public: The AsciiDoc table format (psv, dsv or csv)
+  # Public: The AsciiDoc table format (psv, dsv, or csv)
   attr_accessor :format
 
   # Public: Get the expected column count for a row
@@ -367,22 +367,38 @@ class Table::ParserContext
   def initialize reader, table, attributes = {}
     @reader = reader
     @table = table
-    # TODO if reader.cursor becomes a reference, this would require .dup
+    # IMPORTANT if reader.cursor becomes a reference, this assignment would require .dup
     @last_cursor = reader.cursor
-    if (@format = attributes['format'])
-      unless Table::DATA_FORMATS.include? @format
-        raise %(Illegal table format: #{@format})
+
+    if attributes.key? 'format'
+      if FORMATS.include?(xsv = attributes['format'])
+        if xsv == 'tsv'
+          # NOTE tsv is just an alias for csv with a tab separator
+          @format = 'csv'
+        elsif (@format = xsv) == 'psv' && table.document.nested?
+          xsv = '!sv'
+        end
+      else
+        warn %(asciidoctor: ERROR: #{reader.prev_line_info}: illegal table format: #{xsv})
+        @format, xsv = 'psv', (table.document.nested? ? '!sv' : 'psv')
       end
     else
-      @format = Table::DEFAULT_DATA_FORMAT
+      @format, xsv = 'psv', (table.document.nested? ? '!sv' : 'psv')
     end
 
-    if @format == 'psv' && !(attributes.key? 'separator') && table.document.nested?
-      @delimiter = '!'
+    if attributes.key? 'separator'
+      if (sep = attributes['separator']).nil_or_empty?
+        @delimiter, @delimiter_re = DELIMITERS[xsv]
+      # QUESTION should we support any other escape codes or multiple tabs?
+      elsif sep == '\t'
+        @delimiter, @delimiter_re = DELIMITERS['tsv']
+      else
+        @delimiter, @delimiter_re = sep, /#{::Regexp.escape sep}/
+      end
     else
-      @delimiter = attributes['separator'] || Table::DEFAULT_DELIMITERS[@format]
+      @delimiter, @delimiter_re = DELIMITERS[xsv]
     end
-    @delimiter_re = /#{Regexp.escape @delimiter}/
+
     @colcount = table.columns.empty? ? -1 : table.columns.size
     @buffer = ''
     @cellspecs = []

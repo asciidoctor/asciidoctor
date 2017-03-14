@@ -859,11 +859,10 @@ class Parser
 
         when :table
           block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), reader.cursor
-          case terminator.chr
-          when ','
-            attributes['format'] = 'csv'
-          when ':'
-            attributes['format'] = 'dsv'
+          # NOTE it's very rare that format is set when using a format hint char, so short-circuit
+          unless terminator.start_with? '|', '!'
+            # NOTE infer dsv once all other format hint chars are ruled out
+            attributes['format'] ||= (terminator.start_with? ',') ? 'csv' : 'dsv'
           end
           block = next_table(block_reader, parent, attributes)
 

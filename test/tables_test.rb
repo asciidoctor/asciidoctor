@@ -1072,9 +1072,28 @@ key: value <1>
       output = render_embedded_string input
       assert_css 'table', output, 2
       assert_css 'table table', output, 1
-      assert_css 'table table', output, 1
       assert_css 'table > tbody > tr > td:nth-child(2) table', output, 1
       assert_css 'table > tbody > tr > td:nth-child(2) table > tbody > tr > td', output, 2
+    end
+
+    test 'can set format of nested table to psv' do
+      input = <<-EOS
+[cols="2*"]
+|===
+|normal cell
+a|
+[format=psv]
+!===
+!nested cell
+!===
+|===
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'table', output, 2
+      assert_css 'table table', output, 1
+      assert_css 'table > tbody > tr > td:nth-child(2) table', output, 1
+      assert_css 'table > tbody > tr > td:nth-child(2) table > tbody > tr > td', output, 1
     end
 
     test 'toc from parent document should not be included in an AsciiDoc table cell' do
@@ -1314,13 +1333,45 @@ a,b,c
       assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
     end
 
-    test 'custom separator' do
+    test 'tsv as format' do
       input = <<-EOS
-[format="csv", separator=";"]
+[format=tsv]
+,===
+a\tb\tc
+1\t2\t3
+,===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 3
+      assert_css 'table > tbody > tr', output, 2
+      assert_css 'table > tbody > tr:nth-child(1) > td', output, 3
+      assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
+    end
+
+    test 'custom csv separator' do
+      input = <<-EOS
+[format=csv,separator=;]
 |===
 a;b;c
 1;2;3
 |===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 3
+      assert_css 'table > tbody > tr', output, 2
+      assert_css 'table > tbody > tr:nth-child(1) > td', output, 3
+      assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
+    end
+
+    test 'tab as separator' do
+      input = <<-EOS
+[separator=\\t]
+,===
+a\tb\tc
+1\t2\t3
+,===
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
