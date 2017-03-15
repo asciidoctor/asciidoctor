@@ -8,6 +8,7 @@ end
 # - test negatives
 # - test role on every quote type
 context 'Substitutions' do
+  BACKSLASH = '\\'
   context 'Dispatcher' do
     test 'apply normal substitutions' do
       para = block_from_string("[blue]_http://asciidoc.org[AsciiDoc]_ & [red]*Ruby*\n&#167; Making +++<u>documentation</u>+++ together +\nsince (C) {inception_year}.")
@@ -40,8 +41,6 @@ context 'Substitutions' do
   end
 
   context 'Quotes' do
-    BACKSLASH = '\\'
-
     test 'single-line double-quoted string' do
       para = block_from_string(%q{``a few quoted words''}, :attributes => {'compat-mode' => ''})
       assert_equal '&#8220;a few quoted words&#8221;', para.sub_quotes(para.source)
@@ -1275,6 +1274,18 @@ EOS
       assert_equal 1, para.passthroughs.size
       assert_equal '<code>{code}</code>', para.passthroughs[0][:text]
       assert_equal [:specialcharacters], para.passthroughs[0][:subs]
+    end
+
+    test 'should allow inline double plus passthrough to be escaped using backslash' do
+      para = block_from_string("you need to replace `int a = n#{BACKSLASH}++;` with `int a = ++n;`!")
+      result = para.apply_subs para.source
+      assert_equal 'you need to replace <code>int a = n++;</code> with <code>int a = ++n;</code>!', result
+    end
+
+    test 'should allow inline double plus passthrough with attributes to be escaped using backslash' do
+      para = block_from_string("=[attrs]#{BACKSLASH}#{BACKSLASH}++text++")
+      result = para.apply_subs para.source
+      assert_equal '=[attrs]++text++', result
     end
 
     test 'collect multi-line inline double dollar passthroughs' do
