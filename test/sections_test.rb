@@ -495,6 +495,15 @@ blah blah
       output = render_string input
       assert_xpath "//h2[@id='_section_one'][text() = 'Section One']", output, 1
     end
+
+    test 'should not match mixed single-line syntax' do
+      input = <<-EOS
+=#= My Title
+      EOS
+      output = render_embedded_string input
+      assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", output, 0
+      assert_includes output, '<p>=#= My Title</p>'
+    end
   end
 
   context 'Floating Title' do
