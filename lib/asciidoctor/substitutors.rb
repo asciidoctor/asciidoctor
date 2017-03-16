@@ -786,6 +786,7 @@ module Substitutors
             # check for trailing ):
             if (target = target.chop).end_with?(')')
               target = target.chop
+              suffix = '):'
             else
               suffix = ':'
             end

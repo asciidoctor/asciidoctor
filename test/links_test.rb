@@ -80,8 +80,22 @@ context 'Links' do
     assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', render_string('(http://asciidoctor.org): where text gets parsed'), 1
   end
 
+  test 'qualified url with trailing round bracket followed by colon' do
+    result = render_embedded_string '(from http://asciidoctor.org): where text gets parsed'
+    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]/preceding-sibling::text()[.="(from "]', result, 1
+    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]/following-sibling::text()[.="): where text gets parsed"]', result, 1
+  end
+
   test 'qualified url in round brackets with trailing semi-colon' do
     assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', render_string('(http://asciidoctor.org); where text gets parsed'), 1
+  end
+
+  test 'qualified url with trailing round bracket followed by semi-colon' do
+    result = render_embedded_string '(from http://asciidoctor.org); where text gets parsed'
+    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]/preceding-sibling::text()[.="(from "]', result, 1
+    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]/following-sibling::text()[.="); where text gets parsed"]', result, 1
   end
 
   test 'qualified url containing round brackets' do
