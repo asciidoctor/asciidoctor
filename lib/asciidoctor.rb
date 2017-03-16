@@ -268,7 +268,7 @@ module Asciidoctor
     '.txt' => true
   }
 
-  SECTION_LEVELS = {
+  SETEXT_SECTION_LEVELS = {
     '=' => 0,
     '-' => 1,
     '~' => 2,
@@ -633,7 +633,7 @@ module Asciidoctor
     #
     # NOTE Asciidoctor permits a single character underline (like Markdown); AsciiDoc Python requires at least 2 characters.
     #
-    SetextSectionLineRx = /^(?:=+|-+|~+|\^+|\++)$/
+    #SetextSectionLineRx = /^(?:=+|-+|~+|\^+|\++)$/
 
     # Matches an anchor (i.e., id + optional reference text) inside a section title.
     #
@@ -1087,7 +1087,9 @@ module Asciidoctor
     #
     # NOTE If necessary to hide use of the language modifier (u) from JavaScript, use (Regexp.new '.', false, 'u')
     #
-    UnicodeCharScanRx = FORCE_UNICODE_LINE_LENGTH ? /./u : nil unless RUBY_ENGINE == 'opal'
+    unless RUBY_ENGINE == 'opal'
+      UnicodeCharScanRx = /./u if FORCE_UNICODE_LINE_LENGTH
+    end
 
     # Detects strings that resemble URIs.
     #

@@ -139,9 +139,12 @@ class Reader
   # This method will probe the reader for more lines. If there is a next line
   # that has not previously been visited, the line is passed to the
   # Reader#process_line method to be initialized. This call gives
-  # sub-classess the opportunity to do preprocessing. If the return value of
+  # sub-classes the opportunity to do preprocessing. If the return value of
   # the Reader#process_line is nil, the data is assumed to be changed and
   # Reader#peek_line is invoked again to perform further processing.
+  #
+  # If has_more_lines? is called immediately before peek_line, the direct flag
+  # is implicitly true (since the line is flagged as visited).
   #
   # direct  - A Boolean flag to bypasses the check for more lines and immediately
   #           returns the first element of the internal @lines Array. (default: false)
