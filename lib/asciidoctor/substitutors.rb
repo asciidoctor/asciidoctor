@@ -44,10 +44,10 @@ module Substitutors
   # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
 
   # SPA, start of guarded protected area (\u0096)
-  PASS_START = "\u0096"
+  PASS_START = %(\u0096)
 
   # EPA, end of guarded protected area (\u0097)
-  PASS_END = "\u0097"
+  PASS_END = %(\u0097)
 
   # match placeholder record
   PASS_MATCH = /\u0096(\d+)\u0097/
@@ -194,8 +194,7 @@ module Substitutors
         if attributes
           if escape_count > 0
             # NOTE we don't look for nested unconstrained pass macros
-            # must enclose string following next in " for Opal
-            next "#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary}"
+            next %(#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
           elsif m[1] == '\\'
             preceding = %([#{attributes}])
             attributes = nil
@@ -208,8 +207,7 @@ module Substitutors
           end
         elsif escape_count > 0
           # NOTE we don't look for nested unconstrained pass macros
-          # must enclose string following next in " for Opal
-          next "#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary}"
+          next %(#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
         end
         subs = (boundary == '+++' ? [] : BASIC_SUBS)
 
@@ -253,13 +251,12 @@ module Substitutors
 
       if attributes
         if format_mark == '`' && !old_behavior
-          # must enclose string following next in " for Opal
-          next "#{preceding}[#{attributes}]#{escape_mark}`#{extract_passthroughs content}`"
+          next %(#{preceding}[#{attributes}]#{escape_mark}`#{extract_passthroughs content}`)
         end
 
         if escape_mark
-          # honor the escape of the formatting mark (must enclose string following next in " for Opal)
-          next "#{preceding}[#{attributes}]#{m[3][1..-1]}"
+          # honor the escape of the formatting mark
+          next %(#{preceding}[#{attributes}]#{m[3][1..-1]})
         elsif preceding == '\\'
           # honor the escape of the attributes
           preceding = %([#{attributes}])
@@ -268,11 +265,10 @@ module Substitutors
           attributes = parse_attributes attributes
         end
       elsif format_mark == '`' && !old_behavior
-        # must enclose string following next in " for Opal
-        next "#{preceding}#{escape_mark}`#{extract_passthroughs content}`"
+        next %(#{preceding}#{escape_mark}`#{extract_passthroughs content}`)
       elsif escape_mark
-        # honor the escape of the formatting mark (must enclose string following next in " for Opal)
-        next "#{preceding}#{m[3][1..-1]}"
+        # honor the escape of the formatting mark
+        next %(#{preceding}#{m[3][1..-1]})
       end
 
       pass_key = @passthroughs.size
@@ -745,8 +741,7 @@ module Substitutors
         m = $~
         # honor the escape
         if m[2].start_with? '\\'
-          # must enclose string following next in " for Opal
-          next "#{m[1]}#{m[2][1..-1]}#{m[3]}"
+          next %(#{m[1]}#{m[2][1..-1]}#{m[3]})
         end
         # fix non-matching group results in Opal under Firefox
         if ::RUBY_ENGINE_OPAL
@@ -862,10 +857,10 @@ module Substitutors
           link_opts[:id] = (attrs.delete 'id') if attrs.key? 'id'
           if mailto
             if attrs.key? 2
-              target = link_opts[:target] = "#{target}?subject=#{Helpers.encode_uri(attrs[2])}"
+              target = link_opts[:target] = %(#{target}?subject=#{Helpers.encode_uri(attrs[2])})
 
               if attrs.key? 3
-                target = link_opts[:target] = "#{target}&amp;body=#{Helpers.encode_uri(attrs[3])}"
+                target = link_opts[:target] = %(#{target}&amp;body=#{Helpers.encode_uri(attrs[3])})
               end
             end
           end
@@ -1021,7 +1016,7 @@ module Substitutors
         #if reftext
         #  reftext = reftext.sub(DoubleQuotedMultiRx, '\2')
         #else
-        #  reftext = "[#{id}]"
+        #  reftext = %([#{id}])
         #end
         Inline.new(self, :anchor, reftext, :type => :ref, :target => id).convert
       }
@@ -1078,7 +1073,7 @@ module Substitutors
             target = %(##{fragment})
           else
             refid = fragment ? %(#{path}##{fragment}) : path
-            path = "#{@document.attributes['relfileprefix']}#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'}"
+            path = %(#{@document.attributes['relfileprefix']}#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'})
             target = fragment ? %(#{path}##{fragment}) : path
           end
         # handles form: id or Section Title
