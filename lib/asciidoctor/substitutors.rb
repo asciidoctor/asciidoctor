@@ -331,7 +331,7 @@ module Substitutors
 
     text.gsub(PASS_MATCH) {
       # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
-      pass = @passthroughs[$~[1].to_i]
+      pass = @passthroughs[$1.to_i]
       subbed_text = apply_subs(pass[:text], pass[:subs])
       if (type = pass[:type])
         subbed_text = Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).convert
@@ -761,7 +761,7 @@ module Substitutors
         target = m[2]
         suffix = ''
         unless m[3] || UriTerminatorRx !~ target
-          case $~[0]
+          case $&
           when ')'
             # strip trailing )
             target = target.chop
@@ -1132,7 +1132,7 @@ module Substitutors
       last = lines.pop
       (lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).convert } << last) * EOL
     elsif text.include? '+'
-      text.gsub(LineBreakRx) { Inline.new(self, :break, $~[1], :type => :line).convert }
+      text.gsub(LineBreakRx) { Inline.new(self, :break, $1, :type => :line).convert }
     else
       text
     end

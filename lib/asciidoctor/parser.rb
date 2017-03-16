@@ -1461,7 +1461,7 @@ class Parser
           else
             if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line }
               within_nested_list = true
-              if nested_list_type == :dlist && $~[3].nil_or_empty?
+              if nested_list_type == :dlist && $3.nil_or_empty?
                 # get greedy again
                 has_text = false
               end
@@ -1492,7 +1492,7 @@ class Parser
               elsif nested_list_type = NESTABLE_LIST_CONTEXTS.find {|ctx| ListRxMap[ctx] =~ this_line }
                 buffer << this_line
                 within_nested_list = true
-                if nested_list_type == :dlist && $~[3].nil_or_empty?
+                if nested_list_type == :dlist && $3.nil_or_empty?
                   # get greedy again
                   has_text = false
                 end
@@ -1522,7 +1522,7 @@ class Parser
           has_text = true if !this_line.empty?
           if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line }
             within_nested_list = true
-            if nested_list_type == :dlist && $~[3].nil_or_empty?
+            if nested_list_type == :dlist && $3.nil_or_empty?
               # get greedy again
               has_text = false
             end
