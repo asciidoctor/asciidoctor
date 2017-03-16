@@ -619,7 +619,7 @@ module Asciidoctor
     # match[1] is the delimiter, whose length determines the level
     # match[2] is the title itself
     # match[3] is an inline anchor, which becomes the section id
-    AtxSectionRx = /^((?:=|#){1,6})#{CG_BLANK}+(\S.*?)(?:#{CG_BLANK}+\1)?$/
+    AtxSectionRx = /^(={1,6}|\#{1,6})#{CG_BLANK}+(\S.*?)(?:#{CG_BLANK}+\1)?$/
 
     # Matches the restricted section name for a two-line (Setext-style) section title.
     # The name cannot begin with a dot and has at least one alphanumeric character.
