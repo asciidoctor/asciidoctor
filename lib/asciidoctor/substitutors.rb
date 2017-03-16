@@ -195,7 +195,7 @@ module Substitutors
           if escape_count > 0
             # NOTE we don't look for nested unconstrained pass macros
             # must enclose string following next in " for Opal
-            next "#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})"
+            next "#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary}"
           elsif m[1] == '\\'
             preceding = %([#{attributes}])
             attributes = nil
@@ -209,7 +209,7 @@ module Substitutors
         elsif escape_count > 0
           # NOTE we don't look for nested unconstrained pass macros
           # must enclose string following next in " for Opal
-          next "#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary}"
+          next "#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary}"
         end
         subs = (boundary == '+++' ? [] : BASIC_SUBS)
 
