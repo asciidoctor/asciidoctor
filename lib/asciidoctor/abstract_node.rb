@@ -147,11 +147,11 @@ class AbstractNode
   # TODO document me
   def set_option(name)
     if @attributes.key? 'options'
-      @attributes['options'] = "#{@attributes['options']},#{name}"
+      @attributes['options'] = %(#{@attributes['options']},#{name})
     else
       @attributes['options'] = name
     end
-    @attributes["#{name}-option"] = ''
+    @attributes[%(#{name}-option)] = ''
   end
 
   # Public: A convenience method to check if the specified option attribute is
@@ -371,8 +371,7 @@ class AbstractNode
 
     unless ::File.readable? image_path
       warn %(asciidoctor: WARNING: image to embed not found or not readable: #{image_path})
-      # must enclose string following return in " for Opal
-      return "data:#{mimetype}:base64,"
+      return %(data:#{mimetype}:base64,)
       # uncomment to return 1 pixel white dot instead
       #return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     end
