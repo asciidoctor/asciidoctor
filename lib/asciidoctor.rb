@@ -669,7 +669,6 @@ module Asciidoctor
     #   - Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    # NOTE I want to use (-|([*\u2022])\2{0,4}) but breaks the parser since it relies on fixed match positions
     UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5}|\u2022{1,5})#{CG_BLANK}+(.*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
