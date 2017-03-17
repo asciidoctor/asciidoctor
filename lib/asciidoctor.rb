@@ -629,9 +629,11 @@ module Asciidoctor
     #
     # Examples
     #
-    #   ======  || ------ || ~~~~~~ || ^^^^^^ || ++++++
+    #   ====== || ------ || ~~~~~~ || ^^^^^^ || ++++++
     #
-    SetextSectionLineRx = /^(?:=|-|~|\^|\+)+$/
+    # NOTE Asciidoctor permits a single character underline (like Markdown); AsciiDoc Python requires at least 2 characters.
+    #
+    SetextSectionLineRx = /^(?:=+|-+|~+|\^+|\++)$/
 
     # Matches an anchor (i.e., id + optional reference text) inside a section title.
     #
