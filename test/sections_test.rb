@@ -343,6 +343,17 @@ content
       assert_xpath "//h2[@id='_my_section'][text() = 'My Section']", render_string("My Section\n-----------")
     end
 
+    test 'should not recognize underline containing a mix of characters' do
+      input = <<-EOS
+My Section
+----^^----
+      EOS
+
+      result = render_embedded_string input
+      assert_xpath '//h2[@id="_my_section"][text() = "My Section"]', result, 0
+      assert_includes result, '----^^----'
+    end
+
     test "heading title with multiline syntax cannot begin with a dot" do
       title = ".My Title"
       chars = "-" * title.length
