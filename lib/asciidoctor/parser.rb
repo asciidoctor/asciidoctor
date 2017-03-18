@@ -601,7 +601,7 @@ class Parser
               # might want to move this check to a validate method
               if match[1].to_i != expected_index
                 # FIXME this lineno - 2 hack means we need a proper look-behind cursor
-                warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: callout list item index: expected #{expected_index} got #{match[1]})
+                warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: callout list item index: expected #{expected_index}, got #{match[1]})
               end
               list_item = next_list_item(reader, block, match)
               expected_index += 1
