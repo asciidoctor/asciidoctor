@@ -799,14 +799,25 @@ class Parser
         when :listing, :fenced_code, :source
           if block_context == :fenced_code
             attributes['style'] = 'source'
-            language, linenums = this_line[3..-1].tr(' ', '').split(',', 2)
+            if (ll = this_line.length) == 3
+              language = nil
+            elsif (comma_idx = (language = this_line[3, ll - 3]).index ',')
+              if comma_idx > 0
+                language = language[0, comma_idx].strip
+                attributes['linenums'] = '' if comma_idx < ll - 4
+              else
+                language = nil
+                attributes['linenums'] = '' if ll > 4
+              end
+            else
+              language = language.lstrip
+            end
             if language.nil_or_empty?
               if (default_language = document.attributes['source-language'])
                 attributes['language'] = default_language
               end
             else
               attributes['language'] = language
-              attributes['linenums'] = '' unless linenums.nil_or_empty?
             end
             if !attributes.key?('indent') && document.attributes.key?('source-indent')
               attributes['indent'] = document.attributes['source-indent']
@@ -2345,7 +2356,7 @@ class Parser
   # returns a Hash of attributes that specify how to format
   # and layout the cells in the table.
   def self.parse_colspecs records
-    records = records.tr ' ', '' if records.include? ' '
+    records = records.delete ' ' if records.include? ' '
     # check for deprecated syntax: single number, equal column spread
     if records == records.to_i.to_s
       return ::Array.new(records.to_i) { { 'width' => 1 } }

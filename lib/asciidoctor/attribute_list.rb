@@ -163,7 +163,12 @@ class AttributeList
       case name
       when 'options', 'opts'
         name = 'options'
-        value.tr(' ', '').split(',').each {|opt| @attributes[%(#{opt}-option)] = '' }
+        if value.include? ','
+          value = value.delete ' ' if value.include? ' '
+          value.split(',').each {|opt| @attributes[%(#{opt}-option)] = '' unless opt.empty? }
+        else
+          @attributes[%(#{value = value.strip}-option)] = ''
+        end
         @attributes[name] = value
       when 'title'
         @attributes[name] = value
