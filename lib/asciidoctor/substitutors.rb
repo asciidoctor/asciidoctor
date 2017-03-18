@@ -1309,7 +1309,8 @@ module Substitutors
     return [] if subs.nil_or_empty?
     candidates = nil
     modifiers_present = SubModifierSniffRx.match? subs
-    subs.tr(' ', '').split(',').each do |key|
+    subs = subs.delete ' ' if subs.include? ' '
+    subs.split(',').each do |key|
       modifier_operation = nil
       if modifiers_present
         if (first = key.chr) == '+'
