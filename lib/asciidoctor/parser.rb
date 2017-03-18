@@ -235,7 +235,7 @@ class Parser
     # that we are at a section title (so we don't have to check)
     if parent.context == :document && parent.blocks.empty? &&
         ((has_header = parent.has_header?) || attributes.delete('invalid-header') || !is_next_line_section?(reader, attributes))
-      doctype = parent.doctype
+      doctype = (document = parent).doctype
       if has_header || (doctype == 'book' && attributes[1] != 'abstract')
         preamble = intro = Block.new(parent, :preamble, :content_model => :compound)
         preamble.title = parent.attr 'preface-title' if doctype == 'book' && (parent.attr? 'preface-title')
@@ -253,7 +253,7 @@ class Parser
         expected_next_levels = [1]
       end
     else
-      doctype = parent.document.doctype
+      doctype = (document = parent.document).doctype
       section = initialize_section(reader, parent, attributes)
       # clear attributes, except for title which carries over
       # section title to next block of content
@@ -286,15 +286,13 @@ class Parser
     while reader.has_more_lines?
       parse_block_metadata_lines(reader, section, attributes)
 
-      if (next_level = is_next_line_section? reader, attributes)
-        next_level += section.document.attr('leveloffset', 0).to_i
-        if next_level > current_level || (section.context == :document && next_level == 0)
+      if (next_level = is_next_line_section?(reader, attributes))
+        next_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
+        if next_level > current_level || (next_level == 0 && section.context == :document)
           if next_level == 0 && doctype != 'book'
             warn %(asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections)
           elsif expected_next_levels && !expected_next_levels.include?(next_level)
-            warn %(asciidoctor: WARNING: #{reader.line_info}: section title out of sequence: ) +
-                %(expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, ) +
-                %(got level #{next_level})
+            warn %(asciidoctor: WARNING: #{reader.line_info}: section title out of sequence: expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, got level #{next_level})
           end
           # the attributes returned are those that are orphaned
           new_section, attributes = next_section(reader, section, attributes)
@@ -369,7 +367,6 @@ class Parser
     # that would require reworking assumptions in next_section since the preamble
     # is treated like an untitled section
     elsif preamble # implies parent == document
-      document = parent
       if preamble.blocks?
         # unwrap standalone preamble (i.e., no sections), if permissible
         if Compliance.unwrap_standalone_preamble && document.blocks.size == 1 && doctype != 'book'
@@ -1604,33 +1601,18 @@ class Parser
     section
   end
 
-  # Private: Get the Integer section level based on the characters
-  # used in the ASCII line under the section title.
-  #
-  # line - the String line from under the section title.
-  def self.section_level(line)
-    SECTION_LEVELS[line.chr]
-  end
-
-  #--
-  # = is level 0, == is level 1, etc.
-  def self.single_line_section_level(marker)
-    marker.length - 1
-  end
-
   # Internal: Checks if the next line on the Reader is a section title
   #
   # reader     - the source Reader
   # attributes - a Hash of attributes collected above the current line
   #
-  # returns the section level if the Reader is positioned at a section title,
-  # false otherwise
+  # Returns the Integer section level if the Reader is positioned at a section title or nil otherwise
   def self.is_next_line_section?(reader, attributes)
-    if !(val = attributes[1]).nil? && ((ord_0 = val[0].ord) == 100 || ord_0 == 102) && (FloatingTitleStyleRx.match? val)
-      return false
+    if attributes.key?(1) && (attr1 = attributes[1] || '').start_with?('float', 'discrete') && FloatingTitleStyleRx.match?(attr1)
+      return
+    elsif reader.has_more_lines?
+      Compliance.underline_style_section_titles ? is_section_title?(*reader.peek_lines(2)) : is_section_title?(reader.peek_line)
     end
-    return false unless reader.has_more_lines?
-    Compliance.underline_style_section_titles ? is_section_title?(*reader.peek_lines(2)) : is_section_title?(reader.peek_line)
   end
 
   # Internal: Convenience API for checking if the next line on the Reader is the document title
@@ -1648,36 +1630,24 @@ class Parser
   # line1 - the first line as a String
   # line2 - the second line as a String (default: nil)
   #
-  # returns the section level if these lines are a section title,
-  # false otherwise
+  # Returns the Integer section level if these lines are a section title or nil otherwise
   def self.is_section_title?(line1, line2 = nil)
-    if (level = is_single_line_section_title?(line1))
-      level
-    elsif line2 && (level = is_two_line_section_title?(line1, line2))
-      level
-    else
-      false
-    end
+    is_single_line_section_title?(line1) || (line2.nil_or_empty? ? nil : is_two_line_section_title?(line1, line2))
   end
 
   def self.is_single_line_section_title?(line1)
-    first_char = line1 ? line1.chr : nil
-    if (first_char == '=' || (Compliance.markdown_syntax && first_char == '#')) &&
-        (match = AtxSectionRx.match(line1))
-      single_line_section_level match[1]
-    else
-      false
+    if (line1.start_with?('=') || (Compliance.markdown_syntax && line1.start_with?('#'))) && AtxSectionRx =~ line1
+    #if line1.start_with?('=', '#') && AtxSectionRx =~ line1 && (line1.start_with?('=') || Compliance.markdown_syntax)
+      # NOTE level is 1 less than number of line markers
+      $1.length - 1
     end
   end
 
   def self.is_two_line_section_title?(line1, line2)
-    if line1 && line2 && SECTION_LEVELS.key?(line2.chr) &&
-        (SetextSectionLineRx.match? line2) && (SetextSectionTitleRx.match? line1) &&
-        # chomp so that a (non-visible) endline does not impact calculation
-        (line_length(line1) - line_length(line2)).abs <= 1
-      section_level line2
-    else
-      false
+    if (level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
+        line2_ch1 * (line2_len = line2.length) == line2 && SetextSectionTitleRx.match?(line1) &&
+        (line_length(line1) - line2_len).abs < 2
+      level
     end
   end
 
@@ -1725,46 +1695,29 @@ class Parser
   #--
   # NOTE for efficiency, we don't reuse methods that check for a section title
   def self.parse_section_title(reader, document)
+    sect_id = sect_reftext = nil
     line1 = reader.read_line
-    sect_id = nil
-    sect_title = nil
-    sect_level = -1
-    sect_reftext = nil
-    single_line = true
 
-    first_char = line1.chr
-    if (first_char == '=' || (Compliance.markdown_syntax && first_char == '#')) &&
-        (match = AtxSectionRx.match(line1))
-      sect_level = single_line_section_level match[1]
-      sect_title = match[2]
-      if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
-        if anchor_match[2].nil?
-          sect_title = anchor_match[1]
-          sect_id = anchor_match[3]
-          sect_reftext = anchor_match[4]
-        end
+    #if line1.start_with?('=', '#') && AtxSectionRx =~ line1 && (line1.start_with?('=') || Compliance.markdown_syntax)
+    if (line1.start_with?('=') || (Compliance.markdown_syntax && line1.start_with?('#'))) && AtxSectionRx =~ line1
+      # NOTE level is 1 less than number of line markers
+      sect_level, sect_title, single_line = $1.length - 1, $2, true
+      if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$2 # escaped
+        sect_title, sect_id, sect_reftext = $1, $3, $4
       end
-    elsif Compliance.underline_style_section_titles
-      if (line2 = reader.peek_line(true)) && (SECTION_LEVELS.key? line2.chr) && (SetextSectionLineRx.match? line2) &&
-        (name_match = SetextSectionTitleRx.match(line1)) &&
-        # chomp so that a (non-visible) endline does not impact calculation
-        (line_length(line1) - line_length(line2)).abs <= 1
-        sect_title = name_match[1]
-        if sect_title.end_with?(']]') && (anchor_match = InlineSectionAnchorRx.match(sect_title))
-          if anchor_match[2].nil?
-            sect_title = anchor_match[1]
-            sect_id = anchor_match[3]
-            sect_reftext = anchor_match[4]
-          end
-        end
-        sect_level = section_level line2
-        single_line = false
-        reader.advance
+    elsif Compliance.underline_style_section_titles && (line2 = reader.peek_line(true)) &&
+        (sect_level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
+        line2_ch1 * (line2_len = line2.length) == line2 && (sect_title = SetextSectionTitleRx =~ line1 && $1) &&
+        (line_length(line1) - line2_len).abs < 2
+      single_line = false
+      if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$2 # escaped
+        sect_title, sect_id, sect_reftext = $1, $3, $4
       end
+      reader.advance
+    else
+      raise %(Unrecognized section at #{reader.prev_line_info})
     end
-    if sect_level >= 0
-      sect_level += document.attr('leveloffset', 0).to_i
-    end
+    sect_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
     [sect_id, sect_reftext, sect_title, sect_level, single_line]
   end
 
@@ -1773,8 +1726,14 @@ class Parser
   # line - the String to calculate
   #
   # returns the number of unicode characters in the line
-  def self.line_length(line)
-    FORCE_UNICODE_LINE_LENGTH ? line.scan(UnicodeCharScanRx).size : line.length
+  if FORCE_UNICODE_LINE_LENGTH
+    def self.line_length(line)
+      line.scan(UnicodeCharScanRx).size
+    end
+  else
+    def self.line_length(line)
+      line.length
+    end
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).
