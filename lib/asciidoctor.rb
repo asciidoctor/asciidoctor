@@ -1085,8 +1085,6 @@ module Asciidoctor
 
     # Matches any character with multibyte support explicitly enabled (length of multibyte char = 1)
     #
-    # NOTE If necessary to hide use of the language modifier (u) from JavaScript, use (Regexp.new '.', false, 'u')
-    #
     unless RUBY_ENGINE == 'opal'
       UnicodeCharScanRx = /./u if FORCE_UNICODE_LINE_LENGTH
     end
