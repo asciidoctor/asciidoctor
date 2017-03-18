@@ -2137,39 +2137,38 @@ class Parser
   #
   # Returns the String of the first marker in this number series
   def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
-    number_style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker }
     expected = actual = nil
-    case number_style
+    case ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker }
     when :arabic
       if validate
         expected = ordinal + 1
-        actual = marker.to_i
+        actual = marker.to_i # remove trailing . and coerce to int
       end
       marker = '1.'
     when :loweralpha
       if validate
         expected = ('a'[0].ord + ordinal).chr
-        actual = marker.chomp('.')
+        actual = marker.chop # remove trailing .
       end
       marker = 'a.'
     when :upperalpha
       if validate
         expected = ('A'[0].ord + ordinal).chr
-        actual = marker.chomp('.')
+        actual = marker.chop # remove trailing .
       end
       marker = 'A.'
     when :lowerroman
       if validate
         # TODO report this in roman numerals; see https://github.com/jamesshipton/roman-numeral/blob/master/lib/roman_numeral.rb
         expected = ordinal + 1
-        actual = roman_numeral_to_int(marker.chomp(')'))
+        actual = roman_numeral_to_int(marker.chop) # remove trailing ) and coerce to int
       end
       marker = 'i)'
     when :upperroman
       if validate
         # TODO report this in roman numerals; see https://github.com/jamesshipton/roman-numeral/blob/master/lib/roman_numeral.rb
         expected = ordinal + 1
-        actual = roman_numeral_to_int(marker.chomp(')'))
+        actual = roman_numeral_to_int(marker.chop) # remove trailing ) and coerce to int
       end
       marker = 'I)'
     end

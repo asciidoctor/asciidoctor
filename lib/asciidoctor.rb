@@ -691,7 +691,7 @@ module Asciidoctor
 
     # Matches the ordinals for each type of ordered list.
     OrderedListMarkerRxMap = {
-      :arabic => /\d+[.>]/,
+      :arabic => /\d+\./,
       :loweralpha => /[a-z]\./,
       :lowerroman => /[ivx]+\)/,
       :upperalpha => /[A-Z]\./,
