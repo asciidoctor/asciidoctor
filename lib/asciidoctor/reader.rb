@@ -956,9 +956,9 @@ class PreprocessorReader < Reader
                 inc_lineno += 1
                 # must force encoding here since we're performing String operations on line
                 l.force_encoding(::Encoding::UTF_8) if FORCE_ENCODING
-                l = l.rstrip
+                tl = l = l.rstrip
                 # tagged lines in XML may end with '-->'
-                tl = l.chomp('-->').rstrip
+                tl = tl[0, tl.length - 3].rstrip if tl.end_with? '-->'
                 if active_tag
                   if tl.end_with?(%(end::#{active_tag}[]))
                     active_tag = nil
