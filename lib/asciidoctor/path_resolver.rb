@@ -270,8 +270,8 @@ class PathResolver
     end
     # strip out all dot entries
     path_segments.delete DOT
-    # QUESTION should we chomp trailing /? (we pay a small fraction)
-    #posix_path = posix_path.chomp '/'
+    # QUESTION should we chop trailing /? (we pay a small fraction)
+    #posix_path = posix_path.chop if posix_path.end_with? SLASH
     (web_path ? @_partition_path_web : @_partition_path_sys)[path] = [path_segments, root, posix_path]
   end
 
@@ -418,7 +418,7 @@ class PathResolver
     uri_prefix = nil
 
     unless start.nil_or_empty? || (is_web_root? target)
-      target = %(#{start.chomp '/'}#{SLASH}#{target})
+      target = (start.end_with? SLASH) ? %(#{start}#{target}) : %(#{start}#{SLASH}#{target})
       if (uri_prefix = Helpers.uri_prefix target)
         target = target[uri_prefix.length..-1]
       end
@@ -471,7 +471,7 @@ class PathResolver
   # Return the relative path String of the filename calculated from the base directory
   def relative_path filename, base_directory
     if (is_root? filename) && (is_root? base_directory)
-      offset = base_directory.chomp(@file_separator).length + 1
+      offset = (base_directory.end_with? @file_separator) ? base_directory.length : base_directory.length + 1
       filename[offset..-1]
     else
       filename
