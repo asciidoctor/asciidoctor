@@ -328,7 +328,7 @@ module Asciidoctor
 
   LIST_CONTINUATION = '+'
 
-  # NOTE AsciiDoc Python recognizes both a preceding TAB and a space
+  # NOTE AsciiDoc Python allows + to be preceded by TAB; Asciidoctor does not
   LINE_BREAK = ' +'
 
   LINE_CONTINUATION = ' \\'
@@ -982,16 +982,18 @@ module Asciidoctor
     # Matches a trailing + preceded by at least one space character,
     # which forces a hard line break (<br> tag in HTML output).
     #
+    # NOTE AsciiDoc Python allows + to be preceded by TAB; Asciidoctor does not
+    #
     # Examples
     #
     #   Humpty Dumpty sat on a wall, +
     #   Humpty Dumpty had a great fall.
     #
     if RUBY_ENGINE == 'opal'
-      # NOTE JavaScript only treats ^ and $ as line boundaries in multiline regexp; . won't match newlines
-      LineBreakRx = /^(.*)[ \t]\+$/m
+      # NOTE In Ruby, ^ and $ always match start and end of line, respectively; JavaScript only does so in multiline mode
+      LineBreakRx = /^(.*) \+$/m
     else
-      LineBreakRx = /^(.*)[[:blank:]]\+$/
+      LineBreakRx = /^(.*) \+$/
     end
 
     # Matches an AsciiDoc horizontal rule or AsciiDoc page break.

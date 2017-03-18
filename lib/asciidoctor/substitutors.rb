@@ -55,6 +55,8 @@ module Substitutors
   # fix placeholder record after syntax highlighting
   PASS_MATCH_HI = /<span[^>]*>\u0096<\/span>[^\d]*(\d+)[^\d]*<span[^>]*>\u0097<\/span>/
 
+  PLUS = '+'
+
   PygmentsWrapperDivRx = %r|<div class="pyhl">(.*)</div>|m
   # NOTE handles all permutations of <pre> wrapper
   # NOTE trailing whitespace appears when pygments-linenums-mode=table; <pre> has style attribute when pygments-css=inline
@@ -1123,10 +1125,12 @@ module Substitutors
   def sub_post_replacements(text)
     if (@document.attributes.key? 'hardbreaks') || (@attributes.key? 'hardbreaks-option')
       lines = (text.split EOL, -1)
-      return text if lines.size == 1
+      return text if lines.size < 2
       last = lines.pop
-      (lines.map {|line| Inline.new(self, :break, line.rstrip.chomp(LINE_BREAK), :type => :line).convert } << last) * EOL
-    elsif text.include? '+'
+      (lines.map {|line|
+        Inline.new(self, :break, (line.end_with? LINE_BREAK) ? line[0, line.length - 2] : line, :type => :line).convert
+      } << last) * EOL
+    elsif (text.include? PLUS) && (text.include? LINE_BREAK)
       text.gsub(LineBreakRx) { Inline.new(self, :break, $1, :type => :line).convert }
     else
       text
