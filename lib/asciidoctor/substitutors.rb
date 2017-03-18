@@ -1242,16 +1242,14 @@ module Substitutors
 
   # Internal: Strip bounding whitespace, fold endlines and unescaped closing
   # square brackets from text extracted from brackets
-  def unescape_bracketed_text(text)
-    return '' if text.empty?
-    # FIXME make \] a regex
-    text.strip.tr(EOL, ' ').gsub('\]', ']')
+  def unescape_bracketed_text text
+    text.empty? ? text : text.strip.tr(EOL, ' ').gsub('\]', ']')
   end
 
   # Internal: Strip bounding whitespace and fold endlines
   def normalize_string str, unescape_brackets = false
     if str.empty?
-      ''
+      str
     elsif unescape_brackets
       unescape_brackets str.strip.tr(EOL, ' ')
     else
@@ -1262,8 +1260,7 @@ module Substitutors
   # Internal: Unescape closing square brackets.
   # Intended for text extracted from square brackets.
   def unescape_brackets str
-    # FIXME make \] a regex
-    str.empty? ? '' : str.gsub('\]', ']')
+    str.empty? ? str : str.gsub('\]', ']')
   end
 
   # Internal: Split text formatted as CSV with support
