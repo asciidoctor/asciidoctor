@@ -1327,19 +1327,19 @@ class Parser
     cursor = reader.cursor
     list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), cursor
     if list_item_reader.has_more_lines?
+      # NOTE peek on the other side of any comment lines
       comment_lines = list_item_reader.skip_line_comments
-      subsequent_line = list_item_reader.peek_line
-      list_item_reader.unshift_lines comment_lines unless comment_lines.empty?
-
-      if !subsequent_line.nil?
-        continuation_connects_first_block = subsequent_line.empty?
-        # if there's no continuation connecting the first block, then
-        # treat the lines as paragraph text (activated when has_text = false)
-        if !continuation_connects_first_block && list_type != :dlist
-          has_text = false
+      if (subsequent_line = list_item_reader.peek_line)
+        list_item_reader.unshift_lines comment_lines unless comment_lines.empty?
+        if (continuation_connects_first_block = subsequent_line.empty?)
+          content_adjacent = false
+        else
+          content_adjacent = true
+          # treat lines as paragraph text if continuation does not connect first block (i.e., has_text = false)
+          has_text = false unless list_type == :dlist
         end
-        content_adjacent = !continuation_connects_first_block && !subsequent_line.empty?
       else
+        # NOTE we have no use for any trailing comment lines we might have found
         continuation_connects_first_block = false
         content_adjacent = false
       end
@@ -1477,13 +1477,13 @@ class Parser
             buffer << this_line
             continuation = :inactive
           end
-        elsif !prev_line.nil? && prev_line.empty?
+        elsif prev_line && prev_line.empty?
           # advance to the next line of content
           if this_line.empty?
             reader.skip_blank_lines
             this_line = reader.read_line
-            # if we hit eof or a sibling, stop reading
-            break if this_line.nil? || is_sibling_list_item?(this_line, list_type, sibling_trait)
+            # stop reading if we hit eof or a sibling list item
+            break unless this_line && !is_sibling_list_item?(this_line, list_type, sibling_trait)
           end
 
           if this_line == LIST_CONTINUATION
@@ -1906,21 +1906,23 @@ class Parser
         segments.shift
       end
 
-      unless segments.nil?
+      if segments
         author_metadata[key_map[:firstname]] = fname = segments[0].tr('_', ' ')
         author_metadata[key_map[:author]] = fname
         author_metadata[key_map[:authorinitials]] = fname.chr
-        if !segments[1].nil? && !segments[2].nil?
-          author_metadata[key_map[:middlename]] = mname = segments[1].tr('_', ' ')
-          author_metadata[key_map[:lastname]] = lname = segments[2].tr('_', ' ')
-          author_metadata[key_map[:author]] = [fname, mname, lname].join ' '
-          author_metadata[key_map[:authorinitials]] = %(#{fname.chr}#{mname.chr}#{lname.chr})
-        elsif !segments[1].nil?
-          author_metadata[key_map[:lastname]] = lname = segments[1].tr('_', ' ')
-          author_metadata[key_map[:author]] = [fname, lname].join ' '
-          author_metadata[key_map[:authorinitials]] = %(#{fname.chr}#{lname.chr})
+        if segments[1]
+          if segments[2]
+            author_metadata[key_map[:middlename]] = mname = segments[1].tr('_', ' ')
+            author_metadata[key_map[:lastname]] = lname = segments[2].tr('_', ' ')
+            author_metadata[key_map[:author]] = [fname, mname, lname].join ' '
+            author_metadata[key_map[:authorinitials]] = %(#{fname.chr}#{mname.chr}#{lname.chr})
+          else
+            author_metadata[key_map[:lastname]] = lname = segments[1].tr('_', ' ')
+            author_metadata[key_map[:author]] = [fname, lname].join ' '
+            author_metadata[key_map[:authorinitials]] = %(#{fname.chr}#{lname.chr})
+          end
         end
-        author_metadata[key_map[:email]] = segments[3] unless names_only || segments[3].nil?
+        author_metadata[key_map[:email]] = segments[3] unless names_only || !segments[3]
       else
         author_metadata[key_map[:author]] = author_metadata[key_map[:firstname]] = fname = author_entry.strip.tr_s(' ', ' ')
         author_metadata[key_map[:authorinitials]] = fname.chr
@@ -2000,7 +2002,7 @@ class Parser
         # AsciiDoc always uses [id] as the reftext in HTML output,
         # but I'd like to do better in Asciidoctor
         # registration is deferred until the block or section is processed
-        attributes['reftext'] = match[2] unless match[2].nil?
+        attributes['reftext'] = match[2] if match[2]
       end
     elsif in_square_brackets && (match = BlockAttributeListRx.match(next_line))
       parent.document.parse_attributes(match[1], [], :sub_input => true, :into => attributes)
@@ -2251,7 +2253,7 @@ class Parser
       line = table_reader.read_line
 
       if !skip_implicit_header && skipped == 0 && loop_idx == 0 &&
-          !(next_line = table_reader.peek_line).nil? && next_line.empty?
+          (next_line = table_reader.peek_line) && next_line.empty?
         table.has_header_option = true
         attributes['header-option'] = ''
         attributes['options'] = (attributes.key? 'options') ? %(#{attributes['options']},header) : 'header'
@@ -2265,7 +2267,7 @@ class Parser
         else
           next_cellspec, line = parse_cellspec(line, :start, parser_ctx.delimiter)
           # if the cell spec is not null, then we're at a cell boundary
-          if !next_cellspec.nil?
+          if next_cellspec
             parser_ctx.close_open_cell next_cellspec
           else
             # QUESTION do we not advance to next line? if so, when will we if we came into this block?
@@ -2504,8 +2506,8 @@ class Parser
       # QUESTION should this be a private method? (though, it's never called if shorthand isn't used)
       save_current = lambda {
         if collector.empty?
-          if type != :style
-            warn %(asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} invalid empty #{type} detected in style attribute)
+          unless type == :style
+            warn %(asciidoctor: WARNING:#{reader ? " #{reader.prev_line_info}:" : nil} invalid empty #{type} detected in style attribute)
           end
         else
           case type
@@ -2513,7 +2515,7 @@ class Parser
             (parsed[type] ||= []) << collector.join
           when :id
             if parsed.key? :id
-              warn %(asciidoctor: WARNING:#{reader.nil? ? nil : " #{reader.prev_line_info}:"} multiple ids detected in style attribute)
+              warn %(asciidoctor: WARNING:#{reader ? " #{reader.prev_line_info}:" : nil} multiple ids detected in style attribute)
             end
             parsed[type] = collector.join
           else
