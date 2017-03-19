@@ -858,8 +858,7 @@ class Parser
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
         when :table
-          cursor = reader.cursor
-          block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), cursor
+          block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), reader.cursor
           case terminator.chr
           when ','
             attributes['format'] = 'csv'
@@ -1069,8 +1068,7 @@ class Parser
       block_reader = reader
     else
       lines = nil
-      cursor = reader.cursor
-      block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing), cursor
+      block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing), reader.cursor
     end
 
     if content_model == :skip
@@ -1324,8 +1322,7 @@ class Parser
 
     # first skip the line with the marker / term
     reader.advance
-    cursor = reader.cursor
-    list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), cursor
+    list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), reader.cursor
     if list_item_reader.has_more_lines?
       # NOTE peek on the other side of any comment lines
       comment_lines = list_item_reader.skip_line_comments
@@ -1360,10 +1357,11 @@ class Parser
     end
 
     if list_type == :dlist
-      unless list_item.text? || list_item.blocks?
-        list_item = nil
+      if list_item.text? || list_item.blocks?
+        [list_term, list_item]
+      else
+        [list_term, nil]
       end
-      [list_term, list_item]
     else
       list_item
     end
