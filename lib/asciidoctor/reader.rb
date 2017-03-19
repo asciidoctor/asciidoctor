@@ -844,10 +844,9 @@ class PreprocessorReader < Reader
         warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
         return false
       end
-      if ::RUBY_ENGINE_OPAL
+      if ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest'
         # NOTE resolves uri relative to currently loaded document
         # NOTE we defer checking if file exists and catch the 404 error if it does not
-        # TODO only use this logic if env-browser is set
         target_type = :file
         include_file = path = if @include_stack.empty?
           ::Dir.pwd == @document.base_dir ? target : (::File.join @dir, target)

@@ -132,24 +132,24 @@ class PathResolver
     @_partition_path_web = {}
   end
 
-  # Public: Check if the specified path is an absolute root path
-  # This operation correctly handles both posix and windows paths.
+  # Public: Check if the specified path is an absolute root path.
+  # This operation considers posix paths, windows paths, and file URLs.
+  #
+  # Unix absolute paths and UNC paths start with slash. Windows roots can start
+  # with a drive letter. Absolute paths in the browser start with file://.
   #
   # path - the String path to check
   #
   # returns a Boolean indicating whether the path is an absolute root path
-  def is_root? path
-    # Unix absolute paths and UNC paths start with slash
-    if path.start_with? SLASH
-      true
-    # Windows roots can begin with drive letter
-    elsif @file_separator == BACKSLASH && (WindowsRootRx.match? path)
-      true
-    # Absolute paths in the browser start with file://
-    elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_PLATFORM == 'browser' && (path.start_with? 'file://')
-      true
-    else
-      false
+  if RUBY_ENGINE == 'opal'
+    def is_root? path
+      (path.start_with? SLASH) ||
+          (::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && (path.start_with? 'file://')) ||
+          (@file_separator == BACKSLASH && (WindowsRootRx.match? path))
+    end
+  else
+    def is_root? path
+      (path.start_with? SLASH) || (@file_separator == BACKSLASH && (WindowsRootRx.match? path))
     end
   end
 
@@ -261,7 +261,7 @@ class PathResolver
       path_segments = path_segments[2..-1]
     # shift twice for a file:/// path and adjust root
     # NOTE technically file:/// paths work without this adjustment
-    #elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_PLATFORM == 'browser' && root == 'file:/'
+    #elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && root == 'file:/'
     #  root = 'file://'
     #  path_segments = path_segments[2..-1]
     # shift once for any other root
