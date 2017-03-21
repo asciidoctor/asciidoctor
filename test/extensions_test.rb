@@ -219,7 +219,7 @@ context 'Extensions' do
       begin
         Asciidoctor::Extensions.class_for_name('InvalidModule::InvalidClass')
         flunk 'Expecting RuntimeError to be raised'
-      rescue RuntimeError => e
+      rescue NameError => e
         assert_equal 'Could not resolve class for name: InvalidModule::InvalidClass', e.message
       end
     end

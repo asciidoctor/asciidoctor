@@ -7,7 +7,7 @@ if RUBY_ENGINE_JRUBY
       result = (unpack %(a#{size}))[0]
       begin
         result.unpack 'U*'
-      rescue ArgumentError
+      rescue ::ArgumentError
         result.chop!
         retry
       end

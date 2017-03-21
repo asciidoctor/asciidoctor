@@ -89,7 +89,7 @@ module Extensions
     end
 
     def process *args
-      raise ::NotImplementedError
+      raise ::NotImplementedError, %(Asciidoctor::Extensions::Processor subclass must implement ##{__method__} method)
     end
 
     # QUESTION should attributes be an option instead of a parameter?
@@ -166,6 +166,7 @@ module Extensions
         # TODO need a test for this!
         @process_block.call(*args)
       else
+        # TODO add exception message here
         raise ::NotImplementedError
       end
     end
@@ -191,7 +192,7 @@ module Extensions
   # Preprocessor implementations must extend the Preprocessor class.
   class Preprocessor < Processor
     def process document, reader
-      raise ::NotImplementedError
+      raise ::NotImplementedError, %(Asciidoctor::Extensions::Preprocessor subclass must implement ##{__method__} method)
     end
   end
   Preprocessor::DSL = ProcessorDsl
@@ -208,7 +209,7 @@ module Extensions
   # QUESTION should the treeprocessor get invoked after parse header too?
   class Treeprocessor < Processor
     def process document
-      raise ::NotImplementedError
+      raise ::NotImplementedError, %(Asciidoctor::Extensions::Treeprocessor subclass must implement ##{__method__} method)
     end
   end
   Treeprocessor::DSL = ProcessorDsl
@@ -230,7 +231,7 @@ module Extensions
   # Postprocessor implementations must Postprocessor.
   class Postprocessor < Processor
     def process document, output
-      raise ::NotImplementedError
+      raise ::NotImplementedError, %(Asciidoctor::Extensions::Postprocessor subclass must implement ##{__method__} method)
     end
   end
   Postprocessor::DSL = ProcessorDsl
@@ -248,7 +249,7 @@ module Extensions
   # TODO add file extension or regexp to shortcut handles?
   class IncludeProcessor < Processor
     def process document, reader, target, attributes
-      raise ::NotImplementedError
+      raise ::NotImplementedError, %(Asciidoctor::Extensions::IncludeProcessor subclass must implement ##{__method__} method)
     end
 
     def handles? target
@@ -274,7 +275,7 @@ module Extensions
     end
 
     def process document
-      raise ::NotImplementedError
+      raise ::NotImplementedError, %(Asciidoctor::Extensions::DocinfoProcessor subclass must implement ##{__method__} method)
     end
   end
 
@@ -329,7 +330,7 @@ module Extensions
     end
 
     def process parent, reader, attributes
-      raise ::NotImplementedError
+      raise ::NotImplementedError, %(Asciidoctor::Extensions::BlockProcessor subclass must implement ##{__method__} method)
     end
   end
 
@@ -382,7 +383,7 @@ module Extensions
     end
 
     def process parent, target, attributes
-      raise ::NotImplementedError
+      raise ::NotImplementedError, %(Asciidoctor::Extensions::MacroProcessor subclass must implement ##{__method__} method)
     end
   end
 
@@ -1139,7 +1140,7 @@ module Extensions
         processor.instance_exec(&block)
         processor.freeze
         unless processor.process_block_given?
-          raise ::ArgumentError.new %(No block specified to process #{kind_name} extension at #{block.source_location})
+          raise ::ArgumentError, %(No block specified to process #{kind_name} extension at #{block.source_location})
         end
         ProcessorExtension.new kind, processor
       else
@@ -1147,7 +1148,7 @@ module Extensions
         # style 2: specified as class or class name
         if ::Class === processor || (::String === processor && (processor = Extensions.class_for_name processor))
           unless processor < kind_class || (kind_java_class && processor < kind_java_class)
-            raise ::ArgumentError.new %(Invalid type for #{kind_name} extension: #{processor})
+            raise ::ArgumentError, %(Invalid type for #{kind_name} extension: #{processor})
           end
           processor_instance = processor.new config
           processor_instance.freeze
@@ -1158,7 +1159,7 @@ module Extensions
           processor.freeze
           ProcessorExtension.new kind, processor
         else
-          raise ::ArgumentError.new %(Invalid arguments specified for registering #{kind_name} extension: #{args})
+          raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
 
@@ -1191,10 +1192,10 @@ module Extensions
           processor.instance_exec(&block)
         end
         unless (name = as_symbol processor.name)
-          raise ::ArgumentError.new %(No name specified for #{kind_name} extension at #{block.source_location})
+          raise ::ArgumentError, %(No name specified for #{kind_name} extension at #{block.source_location})
         end
         unless processor.process_block_given?
-          raise ::NoMethodError.new %(No block specified to process #{kind_name} extension at #{block.source_location})
+          raise ::NoMethodError, %(No block specified to process #{kind_name} extension at #{block.source_location})
         end
         processor.freeze
         kind_store[name] = ProcessorExtension.new kind, processor
@@ -1203,11 +1204,11 @@ module Extensions
         # style 2: specified as class or class name
         if ::Class === processor || (::String === processor && (processor = Extensions.class_for_name processor))
           unless processor < kind_class || (kind_java_class && processor < kind_java_class)
-            raise ::ArgumentError.new %(Class specified for #{kind_name} extension does not inherit from #{kind_class}: #{processor})
+            raise ::ArgumentError, %(Class specified for #{kind_name} extension does not inherit from #{kind_class}: #{processor})
           end
           processor_instance = processor.new as_symbol(name), config
           unless (name = as_symbol processor_instance.name)
-            raise ::ArgumentError.new %(No name specified for #{kind_name} extension: #{processor})
+            raise ::ArgumentError, %(No name specified for #{kind_name} extension: #{processor})
           end
           processor.freeze
           kind_store[name] = ProcessorExtension.new kind, processor_instance
@@ -1216,12 +1217,12 @@ module Extensions
           processor.update_config config
           # TODO need a test for this override!
           unless (name = name ? (processor.name = as_symbol name) : (as_symbol processor.name))
-            raise ::ArgumentError.new %(No name specified for #{kind_name} extension: #{processor})
+            raise ::ArgumentError, %(No name specified for #{kind_name} extension: #{processor})
           end
           processor.freeze
           kind_store[name] = ProcessorExtension.new kind, processor
         else
-          raise ::ArgumentError.new %(Invalid arguments specified for registering #{kind_name} extension: #{args})
+          raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
     end
@@ -1305,7 +1306,7 @@ module Extensions
       resolved_group = if block_given?
         block
       elsif !(group = args.pop)
-        raise ::ArgumentError.new %(Extension group to register not specified)
+        raise ::ArgumentError, %(Extension group to register not specified)
       else
         # QUESTION should we instantiate the group class here or defer until
         # activation??
@@ -1322,7 +1323,7 @@ module Extensions
       end
       name = args.pop || generate_name
       unless args.empty?
-        raise ::ArgumentError.new %(Wrong number of arguments (#{argc} for 1..2))
+        raise ::ArgumentError, %(Wrong number of arguments (#{argc} for 1..2))
       end
       groups[name] = resolved_group
     end
@@ -1347,7 +1348,7 @@ module Extensions
         elsif resolved_class.const_defined? name
           resolved_class = resolved_class.const_get name
         else
-          raise %(Could not resolve class for name: #{qualified_name})
+          raise ::NameError, %(Could not resolve class for name: #{qualified_name})
         end
       end
       resolved_class
