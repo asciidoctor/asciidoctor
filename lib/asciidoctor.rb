@@ -7,10 +7,10 @@ RUBY_MIN_VERSION_2 = (RUBY_VERSION >= '2')
 
 require 'set'
 
-# NOTE RUBY_ENGINE == 'opal' conditional blocks are filtered by the Opal preprocessor
+# NOTE RUBY_ENGINE == 'opal' conditional blocks like this are filtered by the Opal preprocessor
 if RUBY_ENGINE == 'opal'
-  # NOTE asciidoctor/opal_ext is supplied by the Asciidoctor.js build
-  require 'asciidoctor/opal_ext'
+  # this require is satisfied by the Asciidoctor.js build; it augments the Ruby environment for Asciidoctor.js
+  require 'asciidoctor/js'
 else
   autoload :Base64, 'base64'
   autoload :OpenURI, 'open-uri'
@@ -365,20 +365,8 @@ module Asciidoctor
 
     # NOTE \w matches only the ASCII word characters, whereas [[:word:]] or \p{Word} matches any character in the Unicode word category.
 
-    # character classes for the Regexp engine(s) in JavaScript
-    if RUBY_ENGINE == 'opal'
-      CC_ALPHA = 'a-zA-Z'
-      CG_ALPHA = '[a-zA-Z]'
-      CC_ALNUM = 'a-zA-Z0-9'
-      CG_ALNUM = '[a-zA-Z0-9]'
-      CG_BLANK = '[ \\t]'
-      CC_EOL   = '(?=\\n|$)'
-      CG_GRAPH = '[\\x21-\\x7E]' # non-blank character
-      CC_ALL   = '[\s\S]' # any character, including newlines (alternatively, [^])
-      CC_WORD  = 'a-zA-Z0-9_'
-      CG_WORD  = '[a-zA-Z0-9_]'
     # character classes for the Regexp engine in Ruby >= 2 (Ruby 1.9 supports \p{} but has problems w/ encoding)
-    elsif ::RUBY_MIN_VERSION_2
+    if ::RUBY_MIN_VERSION_2
       CC_ALPHA = CG_ALPHA = '\p{Alpha}'
       CC_ALNUM = CG_ALNUM = '\p{Alnum}'
       CC_ALL   = '.'
@@ -404,7 +392,7 @@ module Asciidoctor
         CC_WORD = '[:alnum:]_'
         CG_WORD = '[[:alnum:]_]'
       end
-    end
+    end unless RUBY_ENGINE == 'opal'
 
     ## Document header
 
@@ -1644,3 +1632,6 @@ require 'asciidoctor/reader'
 require 'asciidoctor/section'
 require 'asciidoctor/stylesheets'
 require 'asciidoctor/table'
+
+# this require is satisfied by the Asciidoctor.js build; it supplies compile and runtime overrides for Asciidoctor.js
+require 'asciidoctor/js/postscript' if RUBY_ENGINE == 'opal'

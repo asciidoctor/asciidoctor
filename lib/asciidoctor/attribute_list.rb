@@ -23,14 +23,6 @@ module Asciidoctor
 #
 class AttributeList
 
-  # FIXME Opal not inheriting constants from parent scope
-  # NOTE can't use ::RUBY_ENGINE_OPAL here either
-  if ::RUBY_ENGINE == 'opal'
-    CG_BLANK = '[ \\t]'
-    CC_WORD  = 'a-zA-Z0-9_'
-    CG_WORD  = '[a-zA-Z0-9_]'
-  end
-
   # Public: Regular expressions for detecting the boundary of a value
   BoundaryRxs = {
     '"' => /.*?[^\\](?=")/,
