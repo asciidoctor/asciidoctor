@@ -1809,6 +1809,20 @@ image::dot.gif[Dot]
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
+    test 'embeds empty base64-encoded data uri for unreadable image when data-uri attribute is set' do
+      input = <<-EOS
+:data-uri:
+:imagesdir: fixtures
+
+image::unreadable.gif[Dot]
+      EOS
+
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_equal 'fixtures', doc.attributes['imagesdir']
+      output = doc.render
+      assert_xpath '//img[@src="data:image/gif;base64,"]', output, 1
+    end
+
     test 'embeds base64-encoded data uri for remote image when data-uri attribute is set' do
       input = <<-EOS
 :data-uri:
