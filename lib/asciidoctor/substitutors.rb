@@ -1015,9 +1015,9 @@ module Substitutors
         id = m[1] || m[3]
         reftext = m[2] || m[4] || %([#{id}])
         # enable if we want to allow double quoted values
-        #id = id.sub(DoubleQuotedRx, '\2')
+        #id = id[1, id.length - 2] if (id.start_with? '"') && (id.end_with? '"')
         #if reftext
-        #  reftext = reftext.sub(DoubleQuotedMultiRx, '\2')
+        #  reftext = reftext[1, reftext.length - 2] if (reftext.start_with? '"') && (reftext.end_with? '"')
         #else
         #  reftext = %([#{id}])
         #end
@@ -1044,12 +1044,14 @@ module Substitutors
         end
         if m[1]
           id, reftext = m[1].split(',', 2).map {|it| it.strip }
-          id = id.sub(DoubleQuotedRx, '\2')
+          id = id[1, id.length - 2] if (id.start_with? '"') && (id.end_with? '"')
           # NOTE In Opal, reftext is set to empty string if comma is missing
           reftext = if reftext.nil_or_empty?
             nil
+          elsif (reftext.start_with? '"') && (reftext.end_with? '"')
+            reftext[1, reftext.length - 2]
           else
-            reftext.sub(DoubleQuotedMultiRx, '\2')
+            reftext
           end
         else
           id = m[2]
