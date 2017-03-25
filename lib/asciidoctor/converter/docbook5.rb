@@ -89,12 +89,6 @@ module Asciidoctor
     end
 
     (DLIST_TAGS = {
-      'labeled' => {
-        :list  => 'variablelist',
-        :entry => 'varlistentry',
-        :term  => 'term',
-        :item  => 'listitem'
-      },
       'qanda' => {
         :list  => 'qandaset',
         :entry => 'qandaentry',
@@ -108,7 +102,7 @@ module Asciidoctor
         :term  => 'glossterm',
         :item  => 'glossdef'
       }
-    }).default = { # default value == DLIST['labeled'], expanded for Opal
+    }).default = { # default is variable
       :list => 'variablelist',
       :entry => 'varlistentry',
       :term => 'term',

@@ -132,8 +132,8 @@ module Asciidoctor
     # Compliance value: true
     define :block_terminates_paragraph, true
 
-    # AsciiDoc does not parse paragraphs labeled with a verbatim style
-    # (literal, listing, source, verse) as verbatim
+    # AsciiDoc does not parse paragraphs with a verbatim style
+    # (i.e., literal, listing, source, verse) as verbatim content.
     # This options allows this behavior to be modified
     # Compliance value: false
     define :strict_verbatim_paragraphs, true
