@@ -1764,7 +1764,7 @@ Abstract content
 === Glossary A
 
 Glossaries are optional.
-Glossaries entries are an example of a style of AsciiDoc labeled lists.
+Glossaries entries are an example of a style of AsciiDoc description lists.
 
 [glossary]
 A glossary term::
@@ -1829,7 +1829,7 @@ This should be a tip, not a heading.
       assert_xpath "//*[@class='admonitionblock tip']//p[text() = 'This should be a tip, not a heading.']", output, 1
     end
 
-    test "should not match a heading in a labeled list" do
+    test "should not match a heading in a description list" do
       input = <<-EOS
 Section
 -------

@@ -648,7 +648,7 @@ class Parser
 
           elsif (match = DescriptionListRx.match(this_line))
             reader.unshift_line this_line
-            block = next_labeled_list(reader, match, parent)
+            block = next_description_list(reader, match, parent)
             break
 
           elsif (style == 'float' || style == 'discrete') &&
@@ -1240,15 +1240,15 @@ class Parser
 
   # Internal: Parse and construct a description list Block from the current position of the Reader
   #
-  # reader    - The Reader from which to retrieve the labeled list
+  # reader    - The Reader from which to retrieve the description list
   # match     - The Regexp match for the head of the list
-  # parent    - The parent Block to which this labeled list belongs
+  # parent    - The parent Block to which this description list belongs
   #
-  # Returns the Block encapsulating the parsed labeled list
-  def self.next_labeled_list(reader, match, parent)
+  # Returns the Block encapsulating the parsed description list
+  def self.next_description_list(reader, match, parent)
     list_block = List.new(parent, :dlist)
     previous_pair = nil
-    # allows us to capture until we find a labeled item
+    # allows us to capture until we find a description item
     # that uses the same delimiter (::, :::, :::: or ;;)
     sibling_pattern = DescriptionListSiblingRx[match[2]]
 
@@ -1271,12 +1271,12 @@ class Parser
 
   # Internal: Parse and construct the next ListItem for the current bulleted
   # (unordered or ordered) list Block, callout lists included, or the next
-  # term ListItem and description ListItem pair for the labeled list Block.
+  # term ListItem and description ListItem pair for the description list Block.
   #
   # First collect and process all the lines that constitute the next list
   # item for the parent list (according to its type). Next, parse those lines
   # into blocks and associate them with the ListItem (in the case of a
-  # labeled list, the description ListItem). Finally, fold the first block
+  # description list, the description ListItem). Finally, fold the first block
   # into the item's text attribute according to rules described in ListItem.
   #
   # reader        - The Reader from which to retrieve the next list item
@@ -1378,7 +1378,7 @@ class Parser
   # list_type       - The Symbol context of the list (:ulist, :olist, :colist or :dlist)
   # sibling_trait   - A Regexp that matches a sibling of this list item or String list marker
   #                   of the items in this list (default: nil)
-  # has_text        - Whether the list item has text defined inline (always true except for labeled lists)
+  # has_text        - Whether the list item has text defined inline (always true except for description lists)
   #
   # Returns an Array of lines belonging to the current list item.
   def self.read_lines_for_list_item(reader, list_type, sibling_trait = nil, has_text = true)

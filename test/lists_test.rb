@@ -999,7 +999,7 @@ literal
       assert_xpath '(//*[@class="ulist"])[1]/following-sibling::*[@class="literalblock"]/*[@class="title"]', output, 1
     end
 
-    test "lines with alternating markers of bulleted and labeled list types separated by blank lines should be nested" do
+    test "lines with alternating markers of bulleted and description list types separated by blank lines should be nested" do
       input = <<-EOS
 List
 ====
@@ -1480,7 +1480,7 @@ attached paragraph
       end
     end
 
-    test 'indented labeled list item inside outline list item offset by a blank line should be recognized as a nested list' do
+    test 'indented description list item inside outline list item offset by a blank line should be recognized as a nested list' do
       input = <<-EOS
 * item 1
 
@@ -2058,7 +2058,7 @@ def2
       assert_xpath '(//dl/dt)[2]/a[@id = "term2"]', output, 1
     end
 
-    test "missing space before term does not produce labeled list" do
+    test "missing space before term does not produce description list" do
       input = <<-EOS
 term1::def1
 term2::def2
@@ -2067,7 +2067,7 @@ term2::def2
       assert_xpath '//dl', output, 0
     end
 
-    test "literal block inside labeled list" do
+    test "literal block inside description list" do
       input = <<-EOS
 term::
 +
@@ -2086,7 +2086,7 @@ anotherterm:: def
       assert_xpath '(//dl/dd)[2]/p[text() = "def"]', output, 1
     end
 
-    test "literal block inside labeled list with trailing line continuation" do
+    test "literal block inside description list with trailing line continuation" do
       input = <<-EOS
 term::
 +
@@ -2106,7 +2106,7 @@ anotherterm:: def
       assert_xpath '(//dl/dd)[2]/p[text() = "def"]', output, 1
     end
 
-    test "multiple listing blocks inside labeled list" do
+    test "multiple listing blocks inside description list" do
       input = <<-EOS
 term::
 +
@@ -2131,7 +2131,7 @@ anotherterm:: def
       assert_xpath '(//dl/dd)[2]/p[text() = "def"]', output, 1
     end
 
-    test "open block inside labeled list" do
+    test "open block inside description list" do
       input = <<-EOS
 term::
 +
@@ -2147,7 +2147,7 @@ anotherterm:: def
       assert_xpath '(//dl/dd)[1]//*[@class="openblock"]//p', output, 2
     end
 
-    test "paragraph attached by a list continuation on either side in a labeled list" do
+    test "paragraph attached by a list continuation on either side in a description list" do
       input = <<-EOS
 term1:: def1
 +
@@ -2163,7 +2163,7 @@ term2:: def2
       assert_xpath '(//dl/dd)[1]/p/following-sibling::*[@class="paragraph"]/p[text() = "more detail"]', output, 1
     end
 
-    test "paragraph attached by a list continuation on either side to a multi-line element in a labeled list" do
+    test "paragraph attached by a list continuation on either side to a multi-line element in a description list" do
       input = <<-EOS
 term1::
 def1
@@ -2180,7 +2180,7 @@ term2:: def2
       assert_xpath '(//dl/dd)[1]/p/following-sibling::*[@class="paragraph"]/p[text() = "more detail"]', output, 1
     end
 
-    test "verse paragraph inside a labeled list" do
+    test "verse paragraph inside a description list" do
       input = <<-EOS
 term1:: def
 +
@@ -2194,7 +2194,7 @@ term2:: def
       assert_xpath '(//dl/dd)[1]/*[@class="verseblock"]/pre[text() = "la la la"]', output, 1
     end
 
-    test "list inside a labeled list" do
+    test "list inside a description list" do
       input = <<-EOS
 term1::
 * level 1
@@ -2209,7 +2209,7 @@ term2:: def
       assert_xpath '((//dl/dd)[1]//ul)[1]//ul', output, 1
     end
 
-    test "list inside a labeled list offset by blank lines" do
+    test "list inside a description list offset by blank lines" do
       input = <<-EOS
 term1::
 
@@ -2299,7 +2299,7 @@ A new paragraph.
       assert_xpath '(//*[@class="dlist"]/following-sibling::*[@class="paragraph"])[1]/p[text() = "A new paragraph."]', output, 1
     end
 
-    test 'should not match comment line that looks like labeled list term' do
+    test 'should not match comment line that looks like description list term' do
       input = <<-EOS
 * item
 
@@ -3363,7 +3363,7 @@ para
       assert_xpath '//*[@class="dlist"]//dd/*[@class="paragraph"]/p[text()="para"]', output, 1
     end
 
-    test 'attached paragraph does not break on adjacent nested labeled list term' do
+    test 'attached paragraph does not break on adjacent nested description list term' do
       input = <<-EOS
 term1:: def
 +
@@ -3380,7 +3380,7 @@ not a term::: def
 
     # FIXME pending
 =begin
-    test 'attached paragraph does not break on adjacent sibling labeled list term' do
+    test 'attached paragraph does not break on adjacent sibling description list term' do
       input = <<-EOS
 term1:: def
 +
@@ -3396,7 +3396,7 @@ not a term:: def
     end
 =end
 
-    test 'attached styled paragraph does not break on adjacent nested labeled list term' do
+    test 'attached styled paragraph does not break on adjacent nested description list term' do
       input = <<-EOS
 term1:: def
 +
@@ -4090,7 +4090,7 @@ Second line <2-->
     assert_xpath '//b', output, 0
   end
 
-  test 'should not recognize callouts in an indented labeled list paragraph' do
+  test 'should not recognize callouts in an indented description list paragraph' do
     input = <<-EOS
 foo::
   bar <1>
