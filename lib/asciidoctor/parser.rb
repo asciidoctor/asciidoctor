@@ -1229,9 +1229,9 @@ class Parser
       id = m[1] || m[3]
       reftext = m[2] || m[4]
       # enable if we want to allow double quoted values
-      #id = id.sub(DoubleQuotedRx, '\2')
+      #id = id[1, id.length - 2] if (id.start_with? '"') && (id.end_with? '"')
       #if reftext
-      #  reftext = reftext.sub(DoubleQuotedMultiRx, '\2')
+      #  reftext = reftext[1, reftext.length - 2] if (reftext.start_with? '"') && (reftext.end_with? '"')
       #end
       document.register(:ids, [id, reftext])
     } if text.include? '['

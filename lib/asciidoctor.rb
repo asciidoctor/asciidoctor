@@ -1026,14 +1026,6 @@ module Asciidoctor
     #
     DataDelimiterRx = /[,;]/
 
-    # Matches a single-line of text enclosed in double quotes, capturing the quote char and text.
-    #
-    # Examples
-    #
-    #   "Who goes there?"
-    #
-    DoubleQuotedRx = /^("|)(.*)\1$/
-
     # Matches multiple lines of text enclosed in double quotes, capturing the quote char and text.
     #
     # Examples
@@ -1111,6 +1103,14 @@ module Asciidoctor
     # Does not match open blocks or air quotes
     # TIP position the most common blocks towards the front of the pattern
     #BlockDelimiterRx = %r{^(?:(?:-|\.|=|\*|_|\+|/){4,}|[\|,;!]={3,}|(?:`|~){3,}.*)$}
+
+    # Matches a single-line of text enclosed in double quotes, capturing the quote char and text.
+    #
+    # Examples
+    #
+    #   "Who goes there?"
+    #
+    #DoubleQuotedRx = /^("|)(.*)\1$/
 
     # Matches an escaped single quote within a word
     #
