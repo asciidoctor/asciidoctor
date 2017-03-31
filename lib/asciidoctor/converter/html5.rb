@@ -998,13 +998,14 @@ Your browser does not support the audio tag.
 </div>
 </div>)
       else
-        poster_attribute = %(#{poster = node.attr 'poster'}).empty? ? nil : %( poster="#{node.media_uri poster}")
+        poster_attribute = (val = node.attr 'poster', nil, false).nil_or_empty? ? nil : %( poster="#{node.media_uri val}")
+        preload_attribute = (val = node.attr 'preload', nil, false).nil_or_empty? ? nil : %( preload="#{val}")
         start_t = node.attr 'start', nil, false
         end_t = node.attr 'end', nil, false
         time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ',' : nil}#{end_t}) : nil
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}>
+<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : nil}#{(node.option? 'nocontrols') ? nil : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : nil}#{preload_attribute}>
 Your browser does not support the video tag.
 </video>
 </div>

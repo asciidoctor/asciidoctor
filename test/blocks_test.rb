@@ -1962,7 +1962,7 @@ video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]
 
     test 'video macro should honor all options' do
       input = <<-EOS
-video::cats-vs-dogs.avi[options="autoplay,nocontrols,loop"]
+video::cats-vs-dogs.avi[options="autoplay,nocontrols,loop",preload="metadata"]
       EOS
 
       output = render_embedded_string input
@@ -1970,6 +1970,7 @@ video::cats-vs-dogs.avi[options="autoplay,nocontrols,loop"]
       assert_css 'video[autoplay]', output, 1
       assert_css 'video:not([controls])', output, 1
       assert_css 'video[loop]', output, 1
+      assert_css 'video[preload=metadata]', output, 1
     end
 
     test 'video macro should add time range anchor with start time if start attribute is set' do
