@@ -1829,9 +1829,8 @@ class Parser
       reader.skip_blank_lines
     end
 
+    # process author attribute entries that override (or stand in for) the implicit author line
     if document
-      # process author attribute entries that override (or stand in for) the implicit author line
-      author_metadata = nil
       if document.attributes.key?('author') && (author_line = document.attributes['author']) != implicit_author
         # do not allow multiple, process as names only
         author_metadata = process_authors author_line, true, false
@@ -1839,22 +1838,38 @@ class Parser
         # allow multiple, process as names only
         author_metadata = process_authors author_line, true
       else
-        authors = []
-        author_key = %(author_#{authors.size + 1})
+        authors, author_idx, author_key, explicit, sparse = [], 1, 'author_1', false, false
         while document.attributes.key? author_key
-          authors << document.attributes[author_key]
-          author_key = %(author_#{authors.size + 1})
+          # only use indexed author attribute if value is different
+          # leaves corner case if line matches with underscores converted to spaces; use double space to force
+          if (explicit_author = document.attributes[author_key]) == author_metadata[author_key]
+            authors << nil
+            sparse = true
+          else
+            authors << explicit_author 
+            explicit = true
+          end
+          author_key = %(author_#{author_idx += 1})
         end
-        if authors.size == 1
-          # do not allow multiple, process as names only
-          author_metadata = process_authors authors[0], true, false
-        elsif authors.size > 1
-          # allow multiple, process as names only
-          author_metadata = process_authors authors.join('; '), true
+        if explicit
+          # rebuild implicit author names to reparse
+          authors.each_with_index do |author, idx|
+            unless author
+              authors[idx] = [
+                author_metadata[%(firstname_#{name_idx = idx + 1})],
+                author_metadata[%(middlename_#{name_idx})],
+                author_metadata[%(lastname_#{name_idx})]
+              ].compact.map {|name| name.tr ' ', '_' } * ' '
+            end
+          end if sparse
+          # process as names only
+          author_metadata = process_authors authors, true, false
+        else
+          author_metadata = {}
         end
       end
 
-      if author_metadata
+      unless author_metadata.empty?
         document.attributes.update author_metadata
 
         # special case
@@ -1879,7 +1894,7 @@ class Parser
   def self.process_authors(author_line, names_only = false, multiple = true)
     author_metadata = {}
     keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
-    author_entries = multiple ? (author_line.split ';').map {|line| line.strip } : [author_line]
+    author_entries = multiple ? (author_line.split ';').map {|line| line.strip } : Array(author_line)
     author_entries.each_with_index do |author_entry, idx|
       next if author_entry.empty?
       key_map = {}

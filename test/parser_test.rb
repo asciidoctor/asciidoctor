@@ -464,6 +464,34 @@ context "Parser" do
     assert_equal 'Scherer, Jr.', doc.attributes['lastname']
   end
 
+  test 'does not drop name joiner when using multiple authors' do
+    input = <<-EOS
+Kismet Chameleon; Lazarus het_Draeke
+    EOS
+    doc = empty_document
+    parse_header_metadata input, doc
+    assert_equal 2, doc.attributes['authorcount']
+    assert_equal 'Kismet Chameleon, Lazarus het Draeke', doc.attributes['authors']
+    assert_equal 'Kismet Chameleon', doc.attributes['author_1']
+    assert_equal 'Lazarus het Draeke', doc.attributes['author_2']
+    assert_equal 'het Draeke', doc.attributes['lastname_2']
+  end
+
+  test 'allows authors to be overridden using explicit author attributes' do
+    input = <<-EOS
+Kismet Chameleon; Johnny Bravo; Lazarus het_Draeke
+:author_2: Danger Mouse
+    EOS
+    doc = empty_document
+    parse_header_metadata input, doc
+    assert_equal 3, doc.attributes['authorcount']
+    assert_equal 'Kismet Chameleon, Danger Mouse, Lazarus het Draeke', doc.attributes['authors']
+    assert_equal 'Kismet Chameleon', doc.attributes['author_1']
+    assert_equal 'Danger Mouse', doc.attributes['author_2']
+    assert_equal 'Lazarus het Draeke', doc.attributes['author_3']
+    assert_equal 'het Draeke', doc.attributes['lastname_3']
+  end
+
   test "parse rev number date remark" do
     input = <<-EOS
 Ryan Waldron
