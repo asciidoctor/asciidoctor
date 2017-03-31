@@ -1842,11 +1842,11 @@ class Parser
         while document.attributes.key? author_key
           # only use indexed author attribute if value is different
           # leaves corner case if line matches with underscores converted to spaces; use double space to force
-          if (explicit_author = document.attributes[author_key]) == author_metadata[author_key]
+          if (author_override = document.attributes[author_key]) == author_metadata[author_key]
             authors << nil
             sparse = true
           else
-            authors << explicit_author 
+            authors << author_override
             explicit = true
           end
           author_key = %(author_#{author_idx += 1})
