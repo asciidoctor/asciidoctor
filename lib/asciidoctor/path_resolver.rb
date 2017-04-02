@@ -470,12 +470,10 @@ class PathResolver
   #
   # Return the relative path String of the filename calculated from the base directory
   def relative_path filename, base_directory
-    if (is_root? filename) && (is_root? base_directory)
-      offset = (base_directory.end_with? @file_separator) ? base_directory.length : base_directory.length + 1
-      filename[offset..-1]
-    else
-      filename
-    end
+    Helpers.require_library 'pathname'
+    f = Pathname.new filename
+    d = Pathname.new base_directory
+    (f.relative_path_from d).to_s
   end
 end
 end
