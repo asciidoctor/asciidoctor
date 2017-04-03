@@ -187,6 +187,11 @@ class Minitest::Test
     document_from_string(src, opts).render
   end
 
+  def render_inline_string(src, opts = {})
+    opts[:doctype] = :inline
+    document_from_string(src, opts).render
+  end
+
   def parse_header_metadata(source, doc = nil)
     reader = Asciidoctor::Reader.new source.split ::Asciidoctor::EOL
     [::Asciidoctor::Parser.parse_header_metadata(reader, doc), reader]
