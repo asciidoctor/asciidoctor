@@ -219,6 +219,18 @@ context 'Links' do
     end
   end
 
+  test 'repeating inline anchor macro with empty reftext' do
+    input = 'anchor:one[] anchor:two[] anchor:three[]'
+    result = render_inline_string input
+    assert_equal '<a id="one"></a> <a id="two"></a> <a id="three"></a>', result
+  end
+
+  test 'mixed inline anchor macro and anchor shorthand with empty reftext' do
+    input = 'anchor:one[][[two]]anchor:three[][[four]]anchor:five[]'
+    result = render_inline_string input
+    assert_equal '<a id="one"></a><a id="two"></a><a id="three"></a><a id="four"></a><a id="five"></a>', result
+  end
+
   test 'xref using angled bracket syntax' do
     doc = document_from_string '<<tigers>>'
     doc.references[:ids]['tigers'] = '[tigers]'
