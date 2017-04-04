@@ -183,12 +183,6 @@ module Substitutors
         end
 
         attributes = m[2]
-
-        # fix non-matching group results in Opal under Firefox
-        if ::RUBY_ENGINE_OPAL
-          attributes = nil if attributes == ''
-        end
-
         escape_count = m[3].length
         content = m[5]
         old_behavior = false
@@ -237,11 +231,6 @@ module Substitutors
       escape_mark = (m[3].start_with? '\\') ? '\\' : nil
       format_mark = m[4]
       content = m[5]
-
-      # fix non-matching group results in Opal under Firefox
-      if ::RUBY_ENGINE_OPAL
-        attributes = nil if attributes == ''
-      end
 
       if compat_mode
         old_behavior = true
@@ -693,11 +682,6 @@ module Substitutors
           next m[0][1..-1]
         end
 
-        # fix non-matching group results in Opal under Firefox
-        if ::RUBY_ENGINE_OPAL
-          m[1] = nil if m[1] == ''
-        end
-
         num_brackets = 0
         text_in_brackets = nil
         unless (macro_name = m[1])
@@ -744,10 +728,6 @@ module Substitutors
         # honor the escape
         if m[2].start_with? '\\'
           next %(#{m[1]}#{m[2][1..-1]}#{m[3]})
-        end
-        # fix non-matching group results in Opal under Firefox
-        if ::RUBY_ENGINE_OPAL
-          m[3] = nil if m[3] == ''
         end
         # not a valid macro syntax w/o trailing square brackets
         # we probably shouldn't even get here...our regex is doing too much
@@ -954,8 +934,14 @@ module Substitutors
         else
           id, text = m[2].split(',', 2)
           id = id.strip
-          # NOTE In Opal, text is set to empty string if comma is missing
-          if text.nil_or_empty?
+          if text
+            # REVIEW it's a dirty job, but somebody's gotta do it
+            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), false)
+            index = @document.counter('footnote-number')
+            @document.register(:footnotes, Document::Footnote.new(index, id, text))
+            type = :ref
+            target = nil
+          else
             if (footnote = @document.references[:footnotes].find {|fn| fn.id == id })
               index = footnote.index
               text = footnote.text
@@ -966,13 +952,6 @@ module Substitutors
             target = id
             id = nil
             type = :xref
-          else
-            # REVIEW it's a dirty job, but somebody's gotta do it
-            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), false)
-            index = @document.counter('footnote-number')
-            @document.register(:footnotes, Document::Footnote.new(index, id, text))
-            type = :ref
-            target = nil
           end
         end
         Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).convert
@@ -1006,12 +985,6 @@ module Substitutors
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        # fix non-matching group results in Opal under Firefox
-        if ::RUBY_ENGINE_OPAL
-          m[1] = nil if m[1] == ''
-          m[2] = nil if m[2] == ''
-          m[4] = nil if m[4] == ''
-        end
         id = m[1] || m[3]
         reftext = m[2] || m[4] || %([#{id}])
         # enable if we want to allow double quoted values
@@ -1038,34 +1011,22 @@ module Substitutors
         if m[0].start_with? '\\'
           next m[0][1..-1]
         end
-        # fix non-matching group results in Opal under Firefox
-        if ::RUBY_ENGINE_OPAL
-          m[1] = nil if m[1] == ''
-        end
         if m[1]
           id, reftext = m[1].split(',', 2).map {|it| it.strip }
           id = id[1, id.length - 2] if (id.start_with? '"') && (id.end_with? '"')
-          # NOTE In Opal, reftext is set to empty string if comma is missing
-          reftext = if reftext.nil_or_empty?
-            nil
-          elsif (reftext.start_with? '"') && (reftext.end_with? '"')
-            reftext[1, reftext.length - 2]
-          else
-            reftext
-          end
+          reftext = reftext[1, reftext.length - 2] if reftext && (reftext.start_with? '"') && (reftext.end_with? '"')
         else
-          id = m[2]
-          reftext = m[3] unless m[3].nil_or_empty?
+          id, reftext = m[2], m[3]
         end
 
         if id.include? '#'
+          # QUESTION should we limit split to 2 segments?
           path, fragment = id.split('#')
         # QUESTION perform this check and throw it back if it fails?
         #elsif (start_chr = id.chr) == '.' || start_chr == '/'
         #  next m[0][1..-1]
         else
-          path = nil
-          fragment = id
+          path, fragment = nil, id
         end
 
         # handles forms: doc#, doc.adoc#, doc#id and doc.adoc#id
