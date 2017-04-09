@@ -3,7 +3,6 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
 end
-require 'asciidoctor/extensions'
 
 class SamplePreprocessor < Asciidoctor::Extensions::Preprocessor
   def process doc, reader
