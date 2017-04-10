@@ -1604,6 +1604,7 @@ module Asciidoctor
   else
     autoload :VERSION, 'asciidoctor/version'
     autoload :Timings, 'asciidoctor/timings'
+    autoload :Extensions, 'asciidoctor/extensions'
   end
 end
 
