@@ -147,11 +147,11 @@ TIP: Linuxパッケージマネージャを用いてインストールするこ�
 .アップグレード
 [TIP]
 ====
-もしAsciidoctorの以前のバージョンあインストール済みであれば, 以下によってアップデートできます:
+もしAsciidoctorの以前のバージョンがインストール済みであれば, 以下によってアップデートできます:
  
  $ gem update asciidoctor
 
-もし gem update の代わりに `gem install` を使ってgemを新バージョンにした場合, 複数バージョンばインストールされるでしょう.
+もし gem update の代わりに `gem install` を使ってgemを新バージョンにした場合, 複数バージョンがインストールされるでしょう.
 そのときは, 以下のgemコマンドで古いバージョンを削除しましょう:
 
  $ gem cleanup asciidoctor
@@ -336,7 +336,7 @@ APIの使い方や出力のカスタマイズ方法についてのより詳し�
 
 == Contributing
 
-{uri-freesoftware}[free software] の精神においては,  _everyone_ がこのプロジェクトを改良するのをたすけることが勧められている.
+{uri-freesoftware}[free software] の精神においては,  _everyone_ がこのプロジェクトを改良するのをたすけることが勧められています.
 もしエラーや手抜かりをソースコード, ドキュメント, あるいはウェブサイトに見つけたのなら, 恥じることなく修正と共にpull requestの開設やissueの送信をしてください.
 New contributors are always welcome!
 
@@ -356,7 +356,7 @@ New contributors are always welcome!
 *  {uri-issues}[issues] の修正
 * パッチの批評
 
-{uri-contribute}[Contributing] ガイドはどうやってスタイルをつくるか, issueを送るか, 機能リクエスト, コーディング, ドキュメンテーションをAsciidoctor Projectにするかの情報を提供しています.
+{uri-contribute}[Contributing] ガイドはどうやってスタイルをつくるか, issueを送るか, 機能リクエスト, コーディング, ドキュメンテーションをAsciidoctor Projectにするかについての情報を提供しています.
 
 == Getting Help
 
