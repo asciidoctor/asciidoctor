@@ -1412,5 +1412,136 @@ single cell
       output = render_embedded_string input, :backend => 'docbook45'
       assert output.include?('<?dbfo keep-together="always"?>')
     end
+
+    test 'table with even stripes by default' do
+      input = <<-EOS
+.Table with stripes by default
+|===
+| Column 1  | Column 2
+| Row 1     | Row 1
+| Row 2     | Row 2
+| Row 3     | Row 3
+| Row 4     | Row 4
+|===
+      EOS
+      output = render_embedded_string input
+      assert_xpath '(/table/tbody/tr)[1][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[2][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[3][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[4][@style="background-color: #f8f8f7;"]', output, 1
+    end
+
+    test 'table with odd stripes' do
+      input = <<-EOS
+.Table with odd stripes
+[stripes=odd]
+|===
+| Column 1  | Column 2
+| Row 1     | Row 1
+| Row 2     | Row 2
+| Row 3     | Row 3
+| Row 4     | Row 4
+|===
+      EOS
+      output = render_embedded_string input
+      assert_xpath '(/table/tbody/tr)[1][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[2][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[3][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[4][@style="background-color: #f8f8f7;"]', output, 0
+    end
+
+    test 'table with all stripes' do
+      input = <<-EOS
+.Table with odd stripes
+[stripes=all]
+|===
+| Column 1  | Column 2
+| Row 1     | Row 1
+| Row 2     | Row 2
+| Row 3     | Row 3
+| Row 4     | Row 4
+|===
+      EOS
+      output = render_embedded_string input
+      assert_xpath '(/table/tbody/tr)[1][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[2][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[3][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[4][@style="background-color: #f8f8f7;"]', output, 1
+    end
+
+    test 'table with no stripes' do
+      input = <<-EOS
+.Table with no stripes
+[stripes=none]
+|===
+| Column 1  | Column 2
+| Row 1     | Row 1
+| Row 2     | Row 2
+| Row 3     | Row 3
+| Row 4     | Row 4
+|===
+      EOS
+      output = render_embedded_string input
+      assert_xpath '(/table/tbody/tr)[1][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[2][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[3][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[4][@style="background-color: #f8f8f7;"]', output, 0
+    end
+
+    test 'table with custom colored stripes' do
+      input = <<-EOS
+{set:stripesbgcolor:red}
+.Table with red stripes
+|===
+| Column 1  | Column 2
+| Row 1     | Row 1
+| Row 2     | Row 2
+| Row 3     | Row 3
+| Row 4     | Row 4
+|===
+{set:stripesbgcolor!}
+      EOS
+      output = render_embedded_string input
+      assert_xpath '(/table/tbody/tr)[1][@style="background-color: red;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[2][@style="background-color: red;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[3][@style="background-color: red;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[4][@style="background-color: red;"]', output, 1
+    end
+
+    test 'table with headers and stripes' do
+      input = <<-EOS
+.Table with headers and stripes
+[%header]
+|===
+| Header 1  | Header 2
+| Row 1     | Row 1
+| Row 2     | Row 2
+| Row 3     | Row 3
+^h| Sub-header 4     ^h| Sub-header 4
+.2+^h| Weird sub-header 5 h|12312
+^h| Row 6
+| Row 7     | Row 7
+.3+| Row with rowspan=3 8 h| sdfsdf
+| Row 9 
+| Row 10 
+| Row 11     | Row 11
+.3+| Row 12  | Row 12
+| Row 13
+| Row 14
+|===
+      EOS
+      output = render_embedded_string input
+      assert_xpath '(/table/tbody/tr)[1][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[2][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[3][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[6][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[7][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[9][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[10][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[11][@style="background-color: #f8f8f7;"]', output, 0
+      assert_xpath '(/table/tbody/tr)[12][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[13][@style="background-color: #f8f8f7;"]', output, 1
+      assert_xpath '(/table/tbody/tr)[14][@style="background-color: #f8f8f7;"]', output, 1
+    end
   end
 end

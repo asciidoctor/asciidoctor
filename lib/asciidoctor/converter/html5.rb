@@ -805,8 +805,40 @@ Your browser does not support the audio tag.
         result << '</colgroup>'
         [:head, :foot, :body].select {|tsec| !node.rows[tsec].empty? }.each do |tsec|
           result << %(<t#{tsec}>)
+          striped_rows_counter = 0
+          rowspan = 0
+          same_strip = false
           node.rows[tsec].each do |row|
-            result << '<tr>'
+            row_style_attribute = nil
+            if tsec == :body
+              row_without_headers = (row.all? { |cell| cell.style != :header })
+              if rowspan > 0
+                same_strip = true
+                rowspan -= 1
+              else
+                same_strip = false
+                row.each { |cell| rowspan = [cell.rowspan ? cell.rowspan - 1 : 0, rowspan].max }
+              end
+              if row_without_headers
+                unless same_strip
+                    striped_rows_counter += 1
+                end
+                stripesbgcolor = node.document.attr 'stripesbgcolor', '#f8f8f7'
+                case node.attr 'stripes', 'even', false
+                  when 'all'
+                    row_style_attribute = %( style="background-color: #{stripesbgcolor};")
+                  when 'even'
+                    row_style_attribute = striped_rows_counter.even? ? %( style="background-color: #{stripesbgcolor};") : nil
+                  when 'odd'
+                    row_style_attribute = striped_rows_counter.odd? ? %( style="background-color: #{stripesbgcolor};") : nil
+                  else # none
+                    row_style_attribute = nil
+                end
+              else
+                striped_rows_counter = 0
+              end
+            end
+            result << %(<tr#{row_style_attribute}>)
             row.each do |cell|
               if tsec == :head
                 cell_content = cell.text
