@@ -369,6 +369,26 @@ ifeval::["{lang}" == "pt_BR"]
 :warning-caption: Aviso
 endif::[]
 //
+// Romanian translation, courtesy of Vitalie Lazu <vitalie.lazu@gmail.com>
+ifeval::["{lang}" == "ro"]
+:appendix-caption: Apendix
+:caution-caption: Precauție
+:example-caption: Exemplu
+:figure-caption: Figură
+:important-caption: Important
+:last-update-label: Ultima actualizare
+//:listing-caption: Listare
+:manname-title: NUME
+:note-caption: Notă
+//:preface-title: Prefață
+:table-caption: Tabela
+:tip-caption: Sfat
+:toc-title: Cuprins
+:untitled-label: Fără denumire
+:version-label: Versiunea
+:warning-caption: Atenție
+endif::[]
+//
 // Russian translation, courtesy of Alexander Zobkov <alexander.zobkov@gmail.com>
 ifeval::["{lang}" == "ru"]
 :appendix-caption: Приложение
