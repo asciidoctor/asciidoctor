@@ -155,12 +155,15 @@ module Extensions
     end
 
     def process *args, &block
-      # need to check for both block/proc and lambda
-      # TODO need test for this!
-      #if block_given? || (args.size == 1 && ::Proc === (block = args[0]))
       if block_given?
+        raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
         @process_block = block
-      elsif @process_block
+      # TODO enable if we want to support passing proc or lambda as argument instead of block
+      #elsif ::Proc === args[0]
+      #  block = args.shift
+      #  raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
+      #  @process_block = block
+      elsif defined? @process_block
         # NOTE Proc automatically expands a single array argument
         # ...but lambda doesn't (and we want to accept lambdas too)
         # TODO need a test for this!
@@ -246,7 +249,7 @@ module Extensions
   #
   # IncludeProcessor implementations must extend IncludeProcessor.
   #--
-  # TODO add file extension or regexp to shortcut handles?
+  # TODO add file extension or regexp as shortcut for handles? method
   class IncludeProcessor < Processor
     def process document, reader, target, attributes
       raise ::NotImplementedError, %(Asciidoctor::Extensions::IncludeProcessor subclass must implement ##{__method__} method)
@@ -256,7 +259,27 @@ module Extensions
       true
     end
   end
-  IncludeProcessor::DSL = ProcessorDsl
+
+  module IncludeProcessorDsl
+    include ProcessorDsl
+
+    def handles? *args, &block
+      if block_given?
+        raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
+        @handles_block = block
+      # TODO enable if we want to support passing proc or lambda as argument instead of block
+      #elsif ::Proc === args[0]
+      #  block = args.shift
+      #  raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
+      #  @handles_block = block
+      elsif defined? @handles_block
+        @handles_block.call args[0]
+      else
+        true
+      end
+    end
+  end
+  IncludeProcessor::DSL = IncludeProcessorDsl
 
   # Public: DocinfoProcessors are used to add additional content to
   # the header and/or footer of the generated document.
