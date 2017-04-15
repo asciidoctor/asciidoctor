@@ -578,9 +578,9 @@ class Parser
                 attributes['text'] = raw_attributes
               end
               if (default_attrs = extension.config[:default_attrs])
-                default_attrs.each {|k, v| attributes[k] ||= v }
+                attributes.update(default_attrs) {|k, old_v, _| old_v }
               end
-              if (block = extension.process_method[parent, target, attributes.dup])
+              if (block = extension.process_method[parent, target, attributes])
                 attributes.replace block.attributes
               else
                 attributes.clear

@@ -635,6 +635,9 @@ module Substitutors
               { 'text' => (unescape_bracketed_text m[2]) }
             end
           end
+          if (default_attrs = extension.config[:default_attrs])
+            attributes.update(default_attrs) {|k, old_v, _| old_v }
+          end
           extension.process_method[self, target, attributes]
         }
       end
