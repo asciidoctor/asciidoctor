@@ -99,19 +99,49 @@ class SnippetMacro < Asciidoctor::Extensions::BlockMacroProcessor
   end
 end
 
+def round_with_precision value, precision = 0
+  if precision  > 0
+    factor = 10 ** precision
+    (value * factor).round.fdiv factor
+  else
+    value.round
+  end
+end
+
 class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
   named :degrees
   name_attributes 'units'
+  seed_attributes_with 'precision' => '1'
   def process parent, target, attributes
     units = attributes['units'] || (parent.document.attr 'temperature-unit', 'C')
+    precision = attributes['precision'].to_i
     c = target.to_f
     case units
     when 'C'
-      %(#{c} &#176;C)
+      %(#{round_with_precision c, precision} &#176;C)
     when 'F'
-      %(#{c * 1.8 + 32 } &#176;F)
+      %(#{round_with_precision c * 1.8 + 32, precision} &#176;F)
     else
-      c
+      raise ::ArgumentError, %(Unknown temperature units: #{units})
+    end
+  end
+
+  if (::Numeric.instance_method :round).arity == 0
+    def round_with_precision value, precision = 0
+      if precision == 0
+        value.round
+      else
+        factor = 10 ** precision
+        if precision < 0
+          (value * factor).round.div factor
+        else
+          (value * factor).round.fdiv factor
+        end
+      end
+    end
+  else
+    def round_with_precision value, precision = 0
+      value.round precision
     end
   end
 end
@@ -637,14 +667,14 @@ snippet::12345[]
     test 'should invoke processor for custom inline macro' do
       begin
         Asciidoctor::Extensions.register do
-          inline_macro TemperatureMacro, :degrees
+          inline_macro TemperatureMacro, :deg
         end
 
-        output = render_embedded_string 'Room temperature is degrees:25[C].', :attributes => {'temperature-unit' => 'F'}
-        assert output.include?('Room temperature is 25.0 &#176;C.')
+        output = render_embedded_string 'Room temperature is deg:25[C,precision=0].', :attributes => { 'temperature-unit' => 'F' }
+        assert output.include?('Room temperature is 25 &#176;C.')
 
-        output = render_embedded_string 'Room temperature is degrees:25[].', :attributes => {'temperature-unit' => 'F'}
-        assert output.include?('Room temperature is 77.0 &#176;F.')
+        output = render_embedded_string 'Normal body temperature is deg:37[].', :attributes => { 'temperature-unit' => 'F' }
+        assert output.include?('Normal body temperature is 98.6 &#176;F.')
       ensure
         Asciidoctor::Extensions.unregister_all
       end
