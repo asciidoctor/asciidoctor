@@ -4,7 +4,7 @@ module Asciidoctor
 # The section responds as an Array of content blocks by delegating
 # block-related methods to its @blocks Array.
 #
-# Examples
+# Examples:
 #
 #   section = Asciidoctor::Section.new
 #   section.title = 'Section 1'
