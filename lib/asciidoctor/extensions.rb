@@ -468,9 +468,9 @@ module Extensions
     def resolve_regexp name, format
       # TODO memoize these regular expressions!
       if format == :short
-        %r(\\?#{name}:\[((?:\\\]|[^\]])*?)\])
+        /\\?#{name}:(){0}\[((?:\\\]|[^\]])*?)\]/
       else
-        %r(\\?#{name}:(\S+?)\[((?:\\\]|[^\]])*?)\])
+        /\\?#{name}:(\S+?)\[((?:\\\]|[^\]])*?)\]/
       end
     end
   end

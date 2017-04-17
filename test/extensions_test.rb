@@ -686,6 +686,7 @@ snippet::12345[]
           inline_macro do
             named :label
             using_format :short
+            parse_content_as :text
             process do |parent, target|
               %(<label>#{target}</label>)
             end
@@ -694,6 +695,84 @@ snippet::12345[]
 
         output = render_embedded_string 'label:[Checkbox]'
         assert output.include?('<label>Checkbox</label>')
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should assign captures correctly for inline macros' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro do
+            named :short_attributes
+            using_format :short
+            process do |parent, target, attrs|
+              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+            end
+          end
+
+          inline_macro do
+            named :short_text
+            using_format :short
+            parse_content_as :text
+            process do |parent, target, attrs|
+              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+            end
+          end
+
+          inline_macro do
+            named :full_attributes
+            process do |parent, target, attrs|
+              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+            end
+          end
+
+          inline_macro do
+            named :full_text
+            parse_content_as :text
+            process do |parent, target, attrs|
+              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+            end
+          end
+
+          inline_macro do
+            named :short_match
+            using_format :short
+            parse_content_as :text
+            match /@(\w+)/
+            process do |parent, target, attrs|
+              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+            end
+          end
+        end
+
+        input = <<-EOS
+[subs=normal]
+++++
+short_attributes:[]
+short_attributes:[key=val]
+short_text:[]
+short_text:[[text\\]]
+full_attributes:target[]
+full_attributes:target[key=val]
+full_text:target[]
+full_text:target[[text\\]]
+@target
+++++
+        EOS
+        expected = <<-EOS.chomp
+target="", attributes={}
+target="key=val", attributes={"key"=>"val"}
+target="", attributes={"text"=>""}
+target="[text]", attributes={"text"=>"[text]"}
+target="target", attributes={}
+target="target", attributes={"key"=>"val"}
+target="target", attributes={"text"=>""}
+target="target", attributes={"text"=>"[text]"}
+target="target", attributes={}
+        EOS
+        output = render_embedded_string input
+        assert_equal expected, output
       ensure
         Asciidoctor::Extensions.unregister_all
       end
