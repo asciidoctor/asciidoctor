@@ -386,7 +386,8 @@ Chat (IRC):: {uri-irc}[#asciidoctor] on FreeNode IRC
 ifdef::env-github[]
 Further information and documentation about Asciidoctor can be found on the project's website.
 
-{uri-project}/[Home] | {uri-news}[News] | {uri-docs}[Docs]
+{uri-project}/[Home] | {uri-news}[News] | {uri-docs}[Docs] | image:https://badges.gitter.im/Join%20Chat.svg[Gitter, link="https://gitter.im/asciidoctor/asciidoctor"] |
+
 endif::[]
 
 The Asciidoctor organization on GitHub hosts the project's source code, issue tracker, and sub-projects.
