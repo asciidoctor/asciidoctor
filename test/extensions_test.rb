@@ -99,19 +99,9 @@ class SnippetMacro < Asciidoctor::Extensions::BlockMacroProcessor
   end
 end
 
-def round_with_precision value, precision = 0
-  if precision  > 0
-    factor = 10 ** precision
-    (value * factor).round.fdiv factor
-  else
-    value.round
-  end
-end
-
 class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
   named :degrees
-  name_attributes 'units'
-  seed_attributes_with 'precision' => '1'
+  resolves_attributes '1:units', 'precision=1'
   def process parent, target, attributes
     units = attributes['units'] || (parent.document.attr 'temperature-unit', 'C')
     precision = attributes['precision'].to_i
@@ -152,8 +142,7 @@ class MetaRobotsDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
   end
 end
 
-class MetaAppDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
-  use_dsl
+class MetaAppDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor; use_dsl
   at_location :head
 
   def process document
@@ -686,7 +675,7 @@ snippet::12345[mode=edit]
           inline_macro do
             named :label
             using_format :short
-            parse_content_as :text
+            resolves_attributes false
             process do |parent, target|
               %(<label>#{target}</label>)
             end
@@ -706,42 +695,44 @@ snippet::12345[mode=edit]
           inline_macro do
             named :short_attributes
             using_format :short
+            resolves_attributes '1:name'
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
             end
           end
 
           inline_macro do
             named :short_text
             using_format :short
-            parse_content_as :text
+            resolves_attributes false
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
             end
           end
 
           inline_macro do
             named :full_attributes
+            resolves_attributes '1:name' => nil
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
             end
           end
 
           inline_macro do
             named :full_text
-            parse_content_as :text
+            resolves_attributes false
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
             end
           end
 
           inline_macro do
             named :short_match
             using_format :short
-            parse_content_as :text
+            resolves_attributes false
             match %r/@(\w+)/
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
             end
           end
         end
@@ -750,26 +741,26 @@ snippet::12345[mode=edit]
 [subs=normal]
 ++++
 short_attributes:[]
-short_attributes:[key=val]
+short_attributes:[value,key=val]
 short_text:[]
 short_text:[[text\\]]
 full_attributes:target[]
-full_attributes:target[key=val]
+full_attributes:target[value,key=val]
 full_text:target[]
 full_text:target[[text\\]]
 @target
 ++++
         EOS
         expected = <<-EOS.chomp
-target="", attributes={}
-target="key=val", attributes={"key"=>"val"}
-target="", attributes={"text"=>""}
-target="[text]", attributes={"text"=>"[text]"}
-target="target", attributes={}
-target="target", attributes={"key"=>"val"}
-target="target", attributes={"text"=>""}
-target="target", attributes={"text"=>"[text]"}
-target="target", attributes={}
+target="", attributes=[]
+target="value,key=val", attributes=[[1, "value"], ["key", "val"], ["name", "value"]]
+target="", attributes=[["text", ""]]
+target="[text]", attributes=[["text", "[text]"]]
+target="target", attributes=[]
+target="target", attributes=[[1, "value"], ["key", "val"], ["name", "value"]]
+target="target", attributes=[["text", ""]]
+target="target", attributes=[["text", "[text]"]]
+target="target", attributes=[]
         EOS
         output = render_embedded_string input
         assert_equal expected, output
@@ -783,7 +774,7 @@ target="target", attributes={}
         Asciidoctor::Extensions.register do
           inline_macro do
             named :mention
-            parse_content_as :text
+            resolves_attributes false
             process do |parent, target, attrs|
               if (text = attrs['text']).empty?
                 text = %(@#{target})

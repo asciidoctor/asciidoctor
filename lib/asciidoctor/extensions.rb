@@ -180,6 +180,86 @@ module Extensions
     end
   end
 
+  module SyntaxDsl
+    include ProcessorDsl
+
+    def named value
+      # NOTE due to how processors get initialized, we must defer this assignment in some scenarios
+      if Processor === self
+        @name = value
+      else
+        option :name, value
+      end
+    end
+    alias :match_name :named
+    alias :bind_to :named
+
+    def content_model value
+      option :content_model, value
+    end
+    alias :parse_content_as :content_model
+
+    def positional_attributes *value
+      option :pos_attrs, value.flatten
+    end
+    alias :pos_attrs :positional_attributes
+    alias :name_attributes :positional_attributes
+    alias :name_positional_attributes :positional_attributes
+
+    def default_attrs value
+      option :default_attrs, value
+    end
+    alias :seed_attributes_with :default_attrs
+
+    def resolves_attributes *args
+      # NOTE assume true as default value; rewrap single-argument string or symbol
+      if (args = args.fetch 0, true).respond_to? :to_sym
+        args = [args]
+      end unless args.size > 1
+      case args
+      when true
+        option :pos_attrs, []
+        option :default_attrs, {}
+      when ::Array
+        names, defaults = [], {}
+        args.each do |arg|
+          if (arg = arg.to_s).include? '='
+            name, value = arg.split '=', 2
+            if name.include? ':'
+              idx, name = name.split ':', 2
+              idx = idx == '@' ? names.size : idx.to_i
+              names[idx] = name
+            end
+            defaults[name] = value
+          elsif arg.include? ':'
+            idx, name = arg.split ':', 2
+            idx = idx == '@' ? names.size : idx.to_i
+            names[idx] = name
+          else
+            names << arg
+          end
+        end
+        option :pos_attrs, names.compact
+        option :default_attrs, defaults
+      when ::Hash
+        names, defaults = [], {}
+        args.each do |key, val|
+          if (name = key.to_s).include? ':'
+            idx, name = name.split ':', 2
+            idx = idx == '@' ? names.size : idx.to_i
+            names[idx] = name
+          end
+          defaults[name] = val if val
+        end
+        option :pos_attrs, names.compact
+        option :default_attrs, defaults
+      else
+        raise ::ArgumentError, %(unsupported attributes specification for macro: #{args.inspect})
+      end
+    end
+    alias :resolve_attributes :resolves_attributes
+  end
+
   # Public: Preprocessors are run after the source text is split into lines and
   # normalized, but before parsing begins.
   #
@@ -329,7 +409,8 @@ module Extensions
   # * :named - The name of the block (required: true)
   # * :contexts - The blocks contexts on which this style can be used (default: [:paragraph, :open]
   # * :content_model - The structure of the content supported in this block (default: :compound)
-  # * :positional_attributes - A list of attribute names used to map positional attributes (default: nil)
+  # * :pos_attrs - A list of attribute names used to map positional attributes (default: nil)
+  # * :default_attrs - A hash of attribute names and values used to seed the attributes hash (default: nil)
   # * ...
   #
   # BlockProcessor implementations must extend BlockProcessor.
@@ -358,41 +439,13 @@ module Extensions
   end
 
   module BlockProcessorDsl
-    include ProcessorDsl
-
-    # FIXME this isn't the prettiest thing
-    def named value
-      if Processor === self
-        @name = value
-      else
-        option :name, value
-      end
-    end
-    alias :match_name :named
-    alias :bind_to :named
+    include SyntaxDsl
 
     def contexts *value
       option :contexts, value.flatten
     end
     alias :on_contexts :contexts
     alias :on_context :contexts
-
-    def content_model value
-      option :content_model, value
-    end
-    alias :parse_content_as :content_model
-
-    def positional_attributes *value
-      option :pos_attrs, value.flatten
-    end
-    alias :pos_attrs :positional_attributes
-    alias :name_attributes :positional_attributes
-    alias :name_positional_attributes :positional_attributes
-
-    def default_attrs value
-      option :default_attrs, value
-    end
-    alias :seed_attributes_with :default_attrs
   end
   BlockProcessor::DSL = BlockProcessorDsl
 
@@ -411,35 +464,17 @@ module Extensions
   end
 
   module MacroProcessorDsl
-    include ProcessorDsl
-    # QUESTION perhaps include a SyntaxDsl?
+    include SyntaxDsl
 
-    def named value
-      if Processor === self
-        @name = value
-      else
-        option :name, value
+    def resolves_attributes *args
+      if args.size == 1 && !args[0]
+        option :content_model, :text
+        return
       end
+      super
+      option :content_model, :attributes
     end
-    alias :match_name :named
-    alias :bind_to :named
-
-    def content_model value
-      option :content_model, value
-    end
-    alias :parse_content_as :content_model
-
-    def positional_attributes *value
-      option :pos_attrs, value.flatten
-    end
-    alias :pos_attrs :positional_attributes
-    alias :name_attributes :positional_attributes
-    alias :name_positional_attributes :positional_attributes
-
-    def default_attrs value
-      option :default_attrs, value
-    end
-    alias :seed_attributes_with :default_attrs
+    alias :resolve_attributes :resolves_attributes
   end
 
   # Public: BlockMacroProcessors are used to handle block macros that have a
