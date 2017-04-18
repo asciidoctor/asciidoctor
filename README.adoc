@@ -234,6 +234,23 @@ Then, you can safely use the `gem` command to install or update the Asciidoctor 
 When using RVM, gems are installed in a location isolated from the system.
 ====
 
+The version of Asciidoctor installed by the package manager may not match the latest release of Asciidoctor.
+Consult the package repository for your distribution to find out which version is packaged per distribution release.
+
+* https://packages.debian.org/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Debian release]
+* http://packages.ubuntu.com/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Ubuntu release]
+* https://community.linuxmint.com/software/view/asciidoctor[asciidoctor package by Mint release]
+
+[CAUTION]
+====
+You're advised against using the `gem` command to update a gem that is managed by the package manager (e.g., `sudo gem update asciidoctor`).
+Doing so puts the system into an inconsistent state as the package manager can no longer track the files that it installed.
+Simply put, system gems should be managed by the system.
+
+If you want to use a version of Asciidoctor newer than what is provided by the package manager, you should use http://rvm.io[RVM] to install Ruby in user space (i.e., your home directory).
+You can then safely use the `gem` command to install or update the Asciidoctor gem.
+====
+
 ==== apk (Alpine Linux)
 
 To install the gem on Alpine Linux, open a terminal and type:
