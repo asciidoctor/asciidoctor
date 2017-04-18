@@ -778,6 +778,28 @@ target="target", attributes={}
       end
     end
 
+    test 'should invoke convert on return value if value is an inline node' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro do
+            named :mention
+            parse_content_as :text
+            process do |parent, target, attrs|
+              if (text = attrs['text']).empty?
+                text = %(@#{target})
+              end
+              create_anchor parent, text, :type => :link, :target => %(https://github.com/#{target})
+            end
+          end
+        end
+
+        output = render_embedded_string 'mention:mojavelinux[Dan]'
+        assert output.include?('<a href="https://github.com/mojavelinux">Dan</a>')
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should not carry over attributes if block processor returns nil' do
       begin
         Asciidoctor::Extensions.register do
