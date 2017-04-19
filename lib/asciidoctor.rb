@@ -633,7 +633,9 @@ module Asciidoctor
     InlineSectionAnchorRx = /^(.*?)#{CG_BLANK}+(\\)?\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(\S.*?))?\]\]$/
 
     # Matches invalid characters in a section id.
-    InvalidSectionIdCharsRx = /&(?:[a-zA-Z]{2,}|#\d{2,6}|#x[a-fA-F0-9]{2,5});|[^#{CC_WORD}]+?/
+    #
+    # NOTE uppercase chars are not included here since expression is used on a lowercased string
+    InvalidSectionIdCharsRx = /&(?:[a-z]{2,}|#\d{2,6}|#x[0-9a-f]{2,5});|[^#{CC_WORD}]+?/
 
     # Matches the block style used to designate a section title as a floating title.
     #
@@ -1258,7 +1260,7 @@ module Asciidoctor
     # left double arrow <=
     [/\\?&lt;=/, '&#8656;', :none],
     # restore entities
-    [/\\?(&)amp;((?:[a-zA-Z]{2,}|#\d{2,6}|#x[a-fA-F0-9]{2,5});)/, '', :bounding]
+    [/\\?(&)amp;((?:[a-zA-Z]{2,}|#\d{2,6}|#x[0-9a-fA-F]{2,5});)/, '', :bounding]
   ]
 
   class << self

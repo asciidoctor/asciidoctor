@@ -26,6 +26,11 @@ context 'Sections' do
       assert_equal '_ben_jerry_company_ice_cream_brothers', sec.id
     end
 
+    test 'synthetic id removes adjacent entities with mixed case' do
+      sec = block_from_string('== a &#xae;&AMP;&#xA9; b')
+      assert_equal '_a_b', sec.id
+    end
+
     test 'synthetic id prefix can be customized' do
       sec = block_from_string(":idprefix: id_\n\n== Section One")
       assert_equal 'id_section_one', sec.id
