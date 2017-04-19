@@ -456,22 +456,20 @@ module Extensions
   # InlineMacroProcessor implementations must extend InlineMacroProcessor.
   #--
   # TODO break this out into different pattern types
-  # for example, FormalInlineMacro, ShortInlineMacro (no target) and other patterns
+  # for example, FullInlineMacro, ShortInlineMacro (no target) and other patterns
   # FIXME for inline passthrough, we need to have some way to specify the text as a passthrough
   class InlineMacroProcessor < MacroProcessor
+    @@rx_cache = {}
+
     # Lookup the regexp option, resolving it first if necessary.
     # Once this method is called, the regexp is considered frozen.
     def regexp
-      @config[:regexp] ||= (resolve_regexp @name, @config[:format])
+      @config[:regexp] ||= resolve_regexp @name.to_s, @config[:format]
     end
 
     def resolve_regexp name, format
-      # TODO memoize these regular expressions!
-      if format == :short
-        /\\?#{name}:(){0}\[((?:\\\]|[^\]])*?)\]/
-      else
-        /\\?#{name}:(\S+?)\[((?:\\\]|[^\]])*?)\]/
-      end
+      raise ::ArgumentError, %(invalid name for inline macro: #{name}) unless MacroNameRx.match? name
+      @@rx_cache[[name, format]] ||= /\\?#{name}:#{format == :short ? '(){0}' : '(\S+?)'}\[(|.*?[^\\])\]/
     end
   end
 

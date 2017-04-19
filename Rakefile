@@ -95,7 +95,6 @@ begin
   require 'yard'
   require 'yard-tomdoc'
   require './lib/asciidoctor'
-  require './lib/asciidoctor/extensions'
 
   # Prevent YARD from breaking command statements in literal paragraphs
   class CommandBlockPostprocessor < Asciidoctor::Extensions::Postprocessor
