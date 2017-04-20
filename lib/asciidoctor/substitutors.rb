@@ -635,14 +635,14 @@ module Substitutors
             content = unescape_bracketed_text content
             if extconf[:content_model] == :attributes
               # QUESTION should we store the text in the _text key?
-              parse_attributes content, (extconf[:pos_attrs] || []), :sub_result => false, :into => attributes
+              parse_attributes content, extconf[:pos_attrs] || [], :sub_result => false, :into => attributes
             else
               attributes['text'] = content
             end
           end
-          # NOTE (deprecated; remove in 1.6.0) set target to content if target is not set (applies to short form)
-          target ||= content
-          extension.process_method[self, target, attributes]
+          # NOTE use content if target is not set (short form only); deprecated - remove in 1.6.0
+          replacement = extension.process_method[self, target || content, attributes]
+          Inline === replacement ? replacement.convert : replacement
         }
       end
     end
