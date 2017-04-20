@@ -739,7 +739,7 @@ snippet::12345[]
             named :short_match
             using_format :short
             parse_content_as :text
-            match /@(\w+)/
+            match %r/@(\w+)/
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.inspect})
             end

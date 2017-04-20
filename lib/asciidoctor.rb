@@ -906,6 +906,10 @@ module Asciidoctor
     #
     LinkInlineMacroRx = /\\?(?:link|mailto):([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/
 
+    # Matches the name of a macro.
+    #
+    MacroNameRx = /^#{CG_WORD}+$/
+
     # Matches a stem (and alternatives, asciimath and latexmath) inline macro, which may span multiple lines.
     #
     # Examples
