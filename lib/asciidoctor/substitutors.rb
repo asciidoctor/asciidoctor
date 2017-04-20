@@ -623,21 +623,25 @@ module Substitutors
             next m[0][1..-1]
           end
 
-          target = m[1]
-          attributes = if extension.config[:format] == :short
-            # TODO if content_model is :attributes, set target to nil and parse attributes
-            # maybe if content_model is :text, we should put content into text attribute
-            {}
+          if (m.names rescue []).empty?
+            target, content, extconf = m[1], m[2], extension.config
           else
-            if extension.config[:content_model] == :attributes
-              parse_attributes m[2], (extension.config[:pos_attrs] || []), :sub_input => true, :unescape_input => true
+            target, content, extconf = (m[:target] rescue nil), (m[:content] rescue nil), extension.config
+          end
+          attributes = (attributes = extconf[:default_attrs]) ? attributes.dup : {}
+          if content.nil_or_empty?
+            attributes['text'] = content if content && extconf[:content_model] != :attributes
+          else
+            content = unescape_bracketed_text content
+            if extconf[:content_model] == :attributes
+              # QUESTION should we store the text in the _text key?
+              parse_attributes content, (extconf[:pos_attrs] || []), :sub_result => false, :into => attributes
             else
-              { 'text' => (unescape_bracketed_text m[2]) }
+              attributes['text'] = content
             end
           end
-          if (default_attrs = extension.config[:default_attrs])
-            attributes.update(default_attrs) {|k, old_v, _| old_v }
-          end
+          # NOTE (deprecated; remove in 1.6.0) set target to content if target is not set (applies to short form)
+          target ||= content
           extension.process_method[self, target, attributes]
         }
       end
