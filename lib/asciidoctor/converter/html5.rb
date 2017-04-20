@@ -418,7 +418,7 @@ Your browser does not support the audio tag.
             %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}"#{@void_element_slash}>)
           end
           result << %(<tr>
-<td>#{num_element}</td>
+<td class='icon'>#{num_element}</td>
 <td>#{item.text}</td>
 </tr>)
         end
