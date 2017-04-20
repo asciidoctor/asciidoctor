@@ -75,7 +75,9 @@ h4,h5{font-size:1.125em}
 h6{font-size:1em}
 hr{border:solid #ddddd8;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em;height:0}
 em,i{font-style:italic;line-height:inherit}
+em em{font-style:normal;line-height:inherit}
 strong,b{font-weight:bold;line-height:inherit}
+strong strong{font-weight:normal;line-height:inherit}
 small{font-size:60%;line-height:inherit}
 code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
 ul,ol,dl{font-size:1em;line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
