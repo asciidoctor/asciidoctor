@@ -85,9 +85,9 @@ class StripAttributesPostprocessor < Asciidoctor::Extensions::Postprocessor
 end
 
 class UppercaseBlock < Asciidoctor::Extensions::BlockProcessor; use_dsl
-  match_name :yell
-  on_contexts :paragraph
-  parse_content_as :simple
+  named :yell
+  bound_to :paragraph
+  parses_content_as :simple
   def process parent, reader, attributes
     create_paragraph parent, reader.lines.map(&:upcase), attributes
   end
@@ -674,7 +674,7 @@ snippet::12345[mode=edit]
         Asciidoctor::Extensions.register do
           inline_macro do
             named :label
-            using_format :short
+            with_format :short
             resolves_attributes false
             process do |parent, target|
               %(<label>#{target}</label>)
@@ -694,7 +694,7 @@ snippet::12345[mode=edit]
         Asciidoctor::Extensions.register do
           inline_macro do
             named :short_attributes
-            using_format :short
+            with_format :short
             resolves_attributes '1:name'
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
@@ -703,7 +703,7 @@ snippet::12345[mode=edit]
 
           inline_macro do
             named :short_text
-            using_format :short
+            with_format :short
             resolves_attributes false
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
@@ -727,10 +727,9 @@ snippet::12345[mode=edit]
           end
 
           inline_macro do
-            named :short_match
-            using_format :short
+            named :@short_match
+            matching %r/@(\w+)/
             resolves_attributes false
-            match %r/@(\w+)/
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
             end
@@ -797,7 +796,7 @@ target="target", attributes=[]
           block do
             named :skip
             on_context :paragraph
-            parse_content_as :raw
+            parses_content_as :raw
             process do |parent, reader, attrs|
               nil
             end
@@ -826,7 +825,7 @@ rendered
           block do
             named :foo
             on_context :paragraph
-            parse_content_as :raw
+            parses_content_as :raw
             process do |parent, reader, attrs|
               original_attrs = attrs.dup
               attrs.delete('title')
