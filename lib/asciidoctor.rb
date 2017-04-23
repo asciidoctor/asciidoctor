@@ -1287,36 +1287,29 @@ module Asciidoctor
       timings.start :read
     end
 
-    attributes = options[:attributes] = if !(attrs = options[:attributes])
-      {}
+    if !(attrs = options[:attributes])
+      attrs = {}
     elsif ::Hash === attrs || (::RUBY_ENGINE_JRUBY && ::Java::JavaUtil::Map === attrs)
-      attrs.dup
+      attrs = attrs.dup
     elsif ::Array === attrs
-      attrs.inject({}) do |accum, entry|
+      attrs = attrs.inject({}) do |accum, entry|
         k, v = entry.split '=', 2
         accum[k] = v || ''
         accum
       end
     elsif ::String === attrs
-      # convert non-escaped spaces into null character, so we split on the
-      # correct spaces chars, and restore escaped spaces
-      capture_1 = '\1'
-      attrs = attrs.gsub(SpaceDelimiterRx, %(#{capture_1}#{NULL})).gsub(EscapedSpaceRx, capture_1)
-      attrs.split(NULL).inject({}) do |accum, entry|
+      # convert non-escaped spaces to null, split on null, then restore escaped spaces
+      attrs = attrs.gsub(SpaceDelimiterRx, %(\\1#{NULL})).gsub(EscapedSpaceRx, '\1').split(NULL).
+          inject({}) do |accum, entry|
         k, v = entry.split '=', 2
         accum[k] = v || ''
         accum
       end
     elsif (attrs.respond_to? :keys) && (attrs.respond_to? :[])
       # convert it to a Hash as we know it
-      original_attrs = attrs
-      attrs = {}
-      original_attrs.keys.each do |key|
-        attrs[key] = original_attrs[key]
-      end
-      attrs
+      attrs = ::Hash[attrs.keys.map {|k| [k, attrs[k]] }]
     else
-      raise ::ArgumentError, %(illegal type for attributes option: #{attrs.class.ancestors})
+      raise ::ArgumentError, %(illegal type for attributes option: #{attrs.class.ancestors * ' < '})
     end
 
     lines = nil
@@ -1328,17 +1321,17 @@ module Asciidoctor
       input_mtime = ::ENV['SOURCE_DATE_EPOCH'] ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : input.mtime
       lines = input.readlines
       # hold off on setting infile and indir until we get a better sense of their purpose
-      attributes['docfile'] = input_path
-      attributes['docdir'] = ::File.dirname input_path
-      attributes['docname'] = Helpers.basename input_path, (attributes['docfilesuffix'] = ::File.extname input_path)
-      if (docdate = attributes['docdate'])
-        attributes['docyear'] ||= ((docdate.index '-') == 4 ? docdate[0, 4] : nil)
+      attrs['docfile'] = input_path
+      attrs['docdir'] = ::File.dirname input_path
+      attrs['docname'] = Helpers.basename input_path, (attrs['docfilesuffix'] = ::File.extname input_path)
+      if (docdate = attrs['docdate'])
+        attrs['docyear'] ||= ((docdate.index '-') == 4 ? docdate[0, 4] : nil)
       else
-        docdate = attributes['docdate'] = (input_mtime.strftime '%Y-%m-%d')
-        attributes['docyear'] ||= input_mtime.year.to_s
+        docdate = attrs['docdate'] = (input_mtime.strftime '%Y-%m-%d')
+        attrs['docyear'] ||= input_mtime.year.to_s
       end
-      doctime = (attributes['doctime'] ||= input_mtime.strftime('%H:%M:%S %Z'))
-      attributes['docdatetime'] = %(#{docdate} #{doctime})
+      doctime = (attrs['doctime'] ||= input_mtime.strftime('%H:%M:%S %Z'))
+      attrs['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to? :readlines
       # NOTE tty, pipes & sockets can't be rewound, but can't be sniffed easily either
       # just fail the rewind operation silently to handle all cases
@@ -1360,17 +1353,14 @@ module Asciidoctor
       timings.start :parse
     end
 
-    if options[:parse] == false
-      doc = Document.new lines, options
-    else
-      doc = (Document.new lines, options).parse
-    end
+    options[:attributes] = attrs
+    doc = options[:parse] == false ? (Document.new lines, options) : (Document.new lines, options).parse
 
     timings.record :parse if timings
     doc
   rescue => ex
     begin
-      context = %(asciidoctor: FAILED: #{attributes['docfile'] || '<stdin>'}: Failed to load AsciiDoc document)
+      context = %(asciidoctor: FAILED: #{attrs['docfile'] || '<stdin>'}: Failed to load AsciiDoc document)
       if ex.respond_to? :exception
         # The original message must be explicitely preserved when wrapping a Ruby exception
         wrapped_ex = ex.exception %(#{context} - #{ex.message})
