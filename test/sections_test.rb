@@ -280,6 +280,14 @@ preamble
       assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title =")
     end
 
+    test 'document title created from leveloffset shift defined in document' do
+      assert_xpath "//h1[not(@id)][text() = 'Document Title']", render_string(%(:leveloffset: -1\n== Document Title))
+    end
+
+    test 'document title created from leveloffset shift defined in API' do
+      assert_xpath "//h1[not(@id)][text() = 'Document Title']", render_string('== Document Title', :attributes => { 'leveloffset' => '-1@' })
+    end
+
     test 'should assign id on document title to body' do
       input = <<-EOS
 [[idname]]
