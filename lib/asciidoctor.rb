@@ -278,6 +278,10 @@ module Asciidoctor
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'].to_set
 
+  ADMONITION_STYLE_LEADERS = ['N', 'T', 'I', 'W', 'C'].to_set
+
+  CALLOUT_LIST_LEADERS = ['<', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].to_set
+
   PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro'].to_set
 
   VERBATIM_STYLES = ['literal', 'listing', 'source', 'verse'].to_set
@@ -330,8 +334,6 @@ module Asciidoctor
     'upperalpha' => 'A',
     'upperroman' => 'I'
   }
-
-  DIGITS = { '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9 }
 
   LIST_CONTINUATION = '+'
 
@@ -740,6 +742,9 @@ module Asciidoctor
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
     CalloutListRx = /^<?(\d+)>#{CG_BLANK}+(.*)$/
+
+    # Detects a potential callout list item.
+    CalloutListSniffRx = /^<?[0-9]\d*>/
 
     # Matches a callout reference inside literal text.
     #
