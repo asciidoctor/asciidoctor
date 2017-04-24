@@ -309,24 +309,46 @@ ifeval::["{lang}" == "nl"]
 :warning-caption: Waarschuwing
 endif::[]
 //
-// Norwegian, courtesy of Aslak Knutsen <aslak@4fs.no>
-ifeval::["{lang}" == "no"]
+// Norwegian Bokmål, courtesy of Aslak Knutsen <aslak@4fs.no>, with updates from Karl Ove Hufthammer <karl@huftis.org>
+ifeval::["{lang}" == "nb"]
 :appendix-caption: Vedlegg
-:caution-caption: Forsiktig
+:caution-caption: OBS
+:chapter-label: Kapittel
 :example-caption: Eksempel
 :figure-caption: Figur
 :important-caption: Viktig
 :last-update-label: Sist oppdatert
-//:listing-caption:
+//:listing-caption: Programkode
 :manname-title: NAVN
-:note-caption: Notat
-//:preface-title:
+:note-caption: Merk
+//:preface-title: Forord
 :table-caption: Tabell
 :tip-caption: Tips
-:toc-title: Innholdsfortegnelse
+:toc-title: Innhold
 :untitled-label: Navnløs
 :version-label: Versjon
 :warning-caption: Advarsel
+endif::[]
+//
+// Norwegian Nynorsk, courtesy of Karl Ove Hufthammer <karl@huftis.org>
+ifeval::["{lang}" == "nn"]
+:appendix-caption: Vedlegg
+:caution-caption: OBS
+:chapter-label: Kapittel
+:example-caption: Eksempel
+:figure-caption: Figur
+:important-caption: Viktig
+:last-update-label: Sist oppdatert
+//:listing-caption: Programkode
+:manname-title: NAMN
+:note-caption: Merk
+//:preface-title: Forord
+:table-caption: Tabell
+:tip-caption: Tips
+:toc-title: Innhald
+:untitled-label: Namnlaus
+:version-label: Versjon
+:warning-caption: Åtvaring
 endif::[]
 //
 // Polish translation, courtesy of Łukasz Dziedziul <l.dziedziul@gmail.com>
