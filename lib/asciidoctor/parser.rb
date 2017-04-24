@@ -569,14 +569,14 @@ class Parser
               elsif block_macro_extensions && (match = GenericBlockMacroRx.match(this_line)) &&
                   (extension = extensions.registered_for_block_macro?(match[1]))
                 target = match[2]
-                raw_attributes = match[3]
+                content = match[3]
                 if extension.config[:content_model] == :attributes
-                  unless raw_attributes.empty?
-                    document.parse_attributes(raw_attributes, (extension.config[:pos_attrs] || []),
+                  unless content.empty?
+                    document.parse_attributes(content, (extension.config[:pos_attrs] || []),
                         :sub_input => true, :sub_result => false, :into => attributes)
                   end
                 else
-                  attributes['text'] = raw_attributes
+                  attributes['text'] = content
                 end
                 if (default_attrs = extension.config[:default_attrs])
                   attributes.update(default_attrs) {|_, old_v| old_v }

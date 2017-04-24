@@ -95,7 +95,7 @@ end
 
 class SnippetMacro < Asciidoctor::Extensions::BlockMacroProcessor
   def process parent, target, attributes
-    create_pass_block parent, %(<script src="http://example.com/#{target}.js"></script>), {}, :content_model => :raw
+    create_pass_block parent, %(<script src="http://example.com/#{target}.js?_mode=#{attributes['mode']}"></script>), {}, :content_model => :raw
   end
 end
 
@@ -649,7 +649,7 @@ sidebar
 
     test 'should invoke processor for custom block macro' do
       input = <<-EOS
-snippet::12345[]
+snippet::12345[mode=edit]
       EOS
 
       begin
@@ -658,7 +658,7 @@ snippet::12345[]
         end
 
         output = render_embedded_string input
-        assert output.include?('<script src="http://example.com/12345.js"></script>')
+        assert output.include?('<script src="http://example.com/12345.js?_mode=edit"></script>')
       ensure
         Asciidoctor::Extensions.unregister_all
       end
