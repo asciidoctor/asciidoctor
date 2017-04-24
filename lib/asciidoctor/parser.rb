@@ -90,7 +90,8 @@ class Parser
 
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
-    if (has_doctitle_line = is_next_line_document_title?(reader, block_attributes)) && block_attributes.key?('title')
+    if (implicit_doctitle = is_next_line_doctitle? reader, block_attributes, document.attributes['leveloffset']) &&
+        (block_attributes.key? 'title')
       return document.finalize_header block_attributes, false
     end
 
@@ -103,7 +104,7 @@ class Parser
 
     section_title = nil
     # if the first line is the document title, add a header to the document and parse the header metadata
-    if has_doctitle_line
+    if implicit_doctitle
       source_location = reader.cursor if document.sourcemap
       document.id, _, doctitle, _, single_line = parse_section_title reader, document
       unless assigned_doctitle
@@ -1625,12 +1626,17 @@ class Parser
 
   # Internal: Convenience API for checking if the next line on the Reader is the document title
   #
-  # reader     - the source Reader
-  # attributes - a Hash of attributes collected above the current line
+  # reader      - the source Reader
+  # attributes  - a Hash of attributes collected above the current line
+  # leveloffset - an Integer (or integer String value) the represents the current leveloffset
   #
   # returns true if the Reader is positioned at the document title, false otherwise
-  def self.is_next_line_document_title?(reader, attributes)
-    is_next_line_section?(reader, attributes) == 0
+  def self.is_next_line_doctitle? reader, attributes, leveloffset
+    if leveloffset
+      (sect_level = is_next_line_section? reader, attributes) && (sect_level + leveloffset.to_i == 0)
+    else
+      (is_next_line_section? reader, attributes) == 0
+    end
   end
 
   # Public: Checks if these lines are a section title
