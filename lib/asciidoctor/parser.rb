@@ -581,7 +581,7 @@ class Parser
                   attributes['text'] = raw_attributes
                 end
                 if (default_attrs = extension.config[:default_attrs])
-                  attributes.update(default_attrs) {|k, old_v, _| old_v }
+                  attributes.update(default_attrs) {|_, old_v| old_v }
                 end
                 if (block = extension.process_method[parent, target, attributes])
                   attributes.replace block.attributes
