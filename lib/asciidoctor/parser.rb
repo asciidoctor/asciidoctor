@@ -627,7 +627,7 @@ class Parser
 
         elsif UnorderedListRx.match? this_line
           reader.unshift_line this_line
-          block = next_outline_list(reader, :ulist, parent)
+          block = next_item_list(reader, :ulist, parent)
           if !style && Section === parent && parent.sectname == 'bibliography' &&
               parent.blocks.none? {|b| b.context == :ulist }
             attributes['style'] = 'bibliography'
@@ -636,8 +636,8 @@ class Parser
 
         elsif (match = OrderedListRx.match(this_line))
           reader.unshift_line this_line
-          block = next_outline_list(reader, :olist, parent)
-          # FIXME move this logic into next_outline_list
+          block = next_item_list(reader, :olist, parent)
+          # FIXME move this logic into next_item_list
           unless style
             marker = block.items[0].marker
             if marker.start_with? '.'
@@ -1125,14 +1125,14 @@ class Parser
     end
   end
 
-  # Internal: Parse and construct an outline list Block from the current position of the Reader
+  # Internal: Parse and construct an item list (ordered or unordered) from the current position of the Reader
   #
   # reader    - The Reader from which to retrieve the outline list
   # list_type - A Symbol representing the list type (:olist for ordered, :ulist for unordered)
   # parent    - The parent Block to which this outline list belongs
   #
   # Returns the Block encapsulating the parsed outline (unordered or ordered) list
-  def self.next_outline_list(reader, list_type, parent)
+  def self.next_item_list(reader, list_type, parent)
     list_block = List.new(parent, list_type)
     if parent.context == list_type
       list_block.level = parent.level + 1
