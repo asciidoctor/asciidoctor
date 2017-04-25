@@ -552,7 +552,7 @@ module Extensions
 
     def initialize groups = {}
       @groups = groups
-      @preprocessor_extensions = @treeprocessor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions =nil
+      @preprocessor_extensions = @treeprocessor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions = nil
       @block_extensions = @block_macro_extensions = @inline_macro_extensions = nil
       @document = nil
     end
