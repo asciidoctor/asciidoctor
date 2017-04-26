@@ -178,7 +178,7 @@ class Reader
   # be processed and marked as such so that subsequent reads will not need to process
   # the lines again.
   #
-  # num    - The Integer number of lines to peek.
+  # num    - The positive Integer number of lines to peek (must be greater than 0).
   # direct - A Boolean indicating whether processing should be disabled when reading lines
   #
   # Returns A String Array of the next multiple lines of source data, or an empty Array
@@ -190,6 +190,7 @@ class Reader
       if (line = read_line direct)
         result << line
       else
+        @lineno -= 1 if direct
         break
       end
     end

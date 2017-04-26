@@ -150,6 +150,12 @@ third line
         assert_equal 1, reader.lineno
       end
 
+      test 'peek_lines should not increment line number if reader overruns buffer' do
+        reader = Asciidoctor::Reader.new SAMPLE_DATA
+        assert_equal SAMPLE_DATA, (reader.peek_lines SAMPLE_DATA.size * 2)
+        assert_equal 1, reader.lineno
+      end
+
       test 'peek_lines should not invert order of lines' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         assert_equal SAMPLE_DATA, reader.lines
