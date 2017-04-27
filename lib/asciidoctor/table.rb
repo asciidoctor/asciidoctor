@@ -264,15 +264,15 @@ class Table::Cell < AbstractNode
       # the included content cannot expect to match conditional terminators in the remaining
       # lines of table cell content, it must be self-contained logic
       # QUESTION should we reset cell_text to nil?
+      # QUESTION is is faster to check for :: before splitting?
       inner_document_lines = cell_text.split EOL, -1
-      unless inner_document_lines.empty? || !inner_document_lines[0].include?('::')
-        unprocessed_lines = inner_document_lines[0]
-        processed_lines = (PreprocessorReader.new @document, unprocessed_lines).readlines
-        if processed_lines != unprocessed_lines
+      if (unprocessed_line1 = inner_document_lines[0]).include? '::'
+        preprocessed_lines = (PreprocessorReader.new @document, [unprocessed_line1]).readlines
+        unless unprocessed_line1 == preprocessed_lines[0] && preprocessed_lines.size < 2
           inner_document_lines.shift
-          inner_document_lines.unshift(*processed_lines)
+          inner_document_lines.unshift(*preprocessed_lines) unless preprocessed_lines.empty?
         end
-      end
+      end unless inner_document_lines.empty?
       @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => opts[:cursor])
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
     end
