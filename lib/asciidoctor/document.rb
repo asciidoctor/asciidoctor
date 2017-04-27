@@ -436,7 +436,7 @@ class Document < AbstractBlock
             registry = Extensions::Registry.new
           end
         elsif ::Proc === (ext_block = options[:extensions])
-          registry = Extensions.build_registry(&ext_block)
+          registry = Extensions.create(&ext_block)
         else
           registry = Extensions::Registry.new
         end

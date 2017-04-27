@@ -1320,14 +1320,15 @@ module Extensions
       @groups ||= {}
     end
 
-    def build_registry name = nil, &block
+    def create name = nil, &block
       if block_given?
-        name ||= generate_name
-        Registry.new({ name => block })
+        Registry.new({ (name || generate_name) => block })
       else
         Registry.new
       end
     end
+    # Deprecated: Use create instead of build_registry
+    alias :build_registry :create
 
     # Public: Registers an extension Group that subsequently registers a
     # collection of extensions.
