@@ -253,6 +253,25 @@ context 'Extensions' do
       refute_nil clazz
       assert_equal Asciidoctor::Extensions, clazz
     end
+
+    test 'should allow standalone registry to be created but not registered' do
+      registry = Asciidoctor::Extensions.create 'sample' do
+        block do
+          named :whisper
+          bound_to :paragraph
+          parses_content_as :simple
+          def process parent, reader, attributes
+            create_paragraph parent, reader.lines.map(&:downcase), attributes
+          end
+        end
+      end
+
+      assert_instance_of Asciidoctor::Extensions::Registry, registry
+      refute_nil registry.groups
+      assert_equal 1, registry.groups.size
+      assert_equal 'sample', registry.groups.keys.first
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+    end
   end
 
   context 'Activate' do
