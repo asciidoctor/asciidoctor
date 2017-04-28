@@ -151,7 +151,7 @@ class Document < AbstractBlock
   # Public: Get the Converter associated with this document
   attr_reader :converter
 
-  # Public: Get the extensions registry
+  # Public: Get the activated Extensions::Registry associated with this document.
   attr_reader :extensions
 
   # Public: Initialize a {Document} object.
@@ -428,19 +428,18 @@ class Document < AbstractBlock
       attrs['iconsdir'] ||= ::File.join(attrs.fetch('imagesdir', './images'), 'icons')
 
       if initialize_extensions
-        if (registry = options[:extensions_registry])
-          if Extensions::Registry === registry || (::RUBY_ENGINE_JRUBY &&
-              ::AsciidoctorJ::Extensions::ExtensionRegistry === registry)
-            # take it as it is
-          else
-            registry = Extensions::Registry.new
+        if (ext_registry = options[:extension_registry])
+          # QUESTION should we warn the value type of the option is not a registry or boolean?
+          unless Extensions::Registry === ext_registry || (::RUBY_ENGINE_JRUBY &&
+              ::AsciidoctorJ::Extensions::ExtensionRegistry === ext_registry)
+            ext_registry = Extensions::Registry.new
           end
         elsif ::Proc === (ext_block = options[:extensions])
-          registry = Extensions.create(&ext_block)
+          ext_registry = Extensions.create(&ext_block)
         else
-          registry = Extensions::Registry.new
+          ext_registry = Extensions::Registry.new
         end
-        @extensions = registry.activate self
+        @extensions = ext_registry.activate self
       end
 
       @reader = PreprocessorReader.new self, data, Reader::Cursor.new(attrs['docfile'], @base_dir)

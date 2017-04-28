@@ -17,6 +17,9 @@ class SampleDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
 end
 
 class SampleTreeprocessor < Asciidoctor::Extensions::Treeprocessor
+  def process document
+    nil
+  end
 end
 
 class SamplePostprocessor < Asciidoctor::Extensions::Postprocessor
@@ -434,6 +437,30 @@ context 'Extensions' do
   end
 
   context 'Integration' do
+    test 'can provide extension registry as option' do
+      registry = Asciidoctor::Extensions.create do
+        treeprocessor SampleTreeprocessor 
+      end
+
+      doc = document_from_string %(= Document Title\n\ncontent), :extension_registry => registry
+      refute_nil doc.extensions
+      assert_equal 1, doc.extensions.groups.size
+      assert doc.extensions.treeprocessors?
+      assert_equal 1, doc.extensions.treeprocessors.size
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+    end
+
+    test 'can provide extensions proc as option' do
+      doc = document_from_string %(= Document Title\n\ncontent), :extensions => proc {
+        treeprocessor SampleTreeprocessor 
+      }
+      refute_nil doc.extensions
+      assert_equal 1, doc.extensions.groups.size
+      assert doc.extensions.treeprocessors?
+      assert_equal 1, doc.extensions.treeprocessors.size
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+    end
+
     test 'should invoke preprocessors before parsing document' do
       input = <<-EOS
 junk line
