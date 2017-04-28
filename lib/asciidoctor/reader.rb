@@ -36,7 +36,7 @@ class Reader
   attr_accessor :process_lines
 
   # Public: Initialize the Reader object
-  def initialize data = nil, cursor = nil, opts = {:normalize => false}
+  def initialize data = nil, cursor = nil, opts = {}
     if !cursor
       @file = @dir = nil
       @path = '<stdin>'
