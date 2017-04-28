@@ -531,7 +531,7 @@ last line
           reader.push_include content, target, target, 1, attributes
         end
       end
-      reader = Asciidoctor::PreprocessorReader.new document, input
+      reader = Asciidoctor::PreprocessorReader.new document, input, nil, :normalize => true
       lines = []
       lines << reader.read_line
       lines << reader.read_line

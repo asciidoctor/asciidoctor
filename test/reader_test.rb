@@ -557,7 +557,7 @@ include::fixtures/parent-include.adoc[]
         grandchild_include_docfile = File.join fixtures_dir, 'grandchild-include.adoc'
 
         doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, input, pseudo_docfile
+        reader = Asciidoctor::PreprocessorReader.new doc, input, pseudo_docfile, :normalize => true
 
         assert_equal pseudo_docfile, reader.file
         assert_equal DIRNAME, reader.dir
@@ -840,7 +840,7 @@ include::fixtures/include-file.asciidoc[]
         }
 
         document = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new document, input
+        reader = Asciidoctor::PreprocessorReader.new document, input, nil, :normalize => true
         reader.instance_variable_set '@include_processors', [include_processor.new(document)]
         lines = reader.read_lines
         source = lines * ::Asciidoctor::EOL
@@ -889,7 +889,7 @@ include::{foodir}/include-file.asciidoc[]
         EOS
 
         doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
         assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.asciidoc[]', reader.read_line
       end
 
@@ -899,7 +899,7 @@ include::{foodir}/include-file.asciidoc[]
         EOS
 
         doc = empty_safe_document :base_dir => DIRNAME, :attributes => {'attribute-missing' => 'drop'}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
         assert_nil reader.read_line
       end
 
@@ -910,7 +910,7 @@ yo
         EOS
 
         doc = empty_safe_document :base_dir => DIRNAME, :attributes => {'attribute-missing' => 'drop'}
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
         assert_equal 'yo', reader.read_line
       end
 
@@ -920,7 +920,7 @@ yo
 \\escape preserved here
         EOS
         doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, input
+        reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
         # we should be able to peek it multiple times and still have the backslash preserved
         # this is the test for @unescape_next_line
         assert_equal 'include::fixtures/include-file.asciidoc[]', reader.peek_line
@@ -968,7 +968,7 @@ include::fixtures/parent-include.adoc[depth=1]
         pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
 
         doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile)
+        reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), :normalize => true
 
         lines = reader.readlines
         assert lines.include?('include::child-include.adoc[]')
@@ -982,7 +982,7 @@ include::fixtures/parent-include-restricted.adoc[depth=3]
         pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
 
         doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile)
+        reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), :normalize => true
 
         lines = reader.readlines
         assert lines.include?('first line of child')
@@ -997,7 +997,7 @@ include::fixtures/no-such-file.adoc[]
         EOS
 
         doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, lines
+        reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
         reader.read_line
         result = reader.read_lines_until(:terminator => '////', :skip_processing => true)
         assert_equal lines.map {|l| l.chomp}[1..1], result
@@ -1011,7 +1011,7 @@ include::fixtures/no-such-file.adoc[]
         EOS
 
         doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, lines
+        reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
         result = reader.skip_comment_lines
         assert_equal lines.map {|l| l.chomp}, result
       end

@@ -442,7 +442,7 @@ class Document < AbstractBlock
         @extensions = ext_registry.activate self
       end
 
-      @reader = PreprocessorReader.new self, data, Reader::Cursor.new(attrs['docfile'], @base_dir)
+      @reader = PreprocessorReader.new self, data, (Reader::Cursor.new attrs['docfile'], @base_dir), :normalize => true
     end
   end
 
@@ -463,7 +463,9 @@ class Document < AbstractBlock
     else
       doc = self
       # create reader if data is provided (used when data is not known at the time the Document object is created)
-      @reader = PreprocessorReader.new doc, data, Reader::Cursor.new(@attributes['docfile'], @base_dir) if data
+      if data
+        @reader = PreprocessorReader.new doc, data, (Reader::Cursor.new @attributes['docfile'], @base_dir), :normalize => true
+      end
 
       if (exts = @parent_document ? nil : @extensions) && exts.preprocessors?
         exts.preprocessors.each do |ext|

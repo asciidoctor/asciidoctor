@@ -568,9 +568,9 @@ class PreprocessorReader < Reader
   attr_reader :includes
 
   # Public: Initialize the PreprocessorReader object
-  def initialize document, data = nil, cursor = nil
+  def initialize document, data = nil, cursor = nil, opts = {}
     @document = document
-    super data, cursor, :normalize => true
+    super data, cursor, opts
     include_depth_default = document.attributes.fetch('max-include-depth', 64).to_i
     include_depth_default = 0 if include_depth_default < 0
     # track both absolute depth for comparing to size of include stack and relative depth for reporting

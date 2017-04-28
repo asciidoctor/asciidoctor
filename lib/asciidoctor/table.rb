@@ -267,7 +267,7 @@ class Table::Cell < AbstractNode
       inner_document_lines = cell_text.split EOL, -1
       unless inner_document_lines.empty? || !inner_document_lines[0].include?('::')
         unprocessed_lines = inner_document_lines[0]
-        processed_lines = PreprocessorReader.new(@document, unprocessed_lines).readlines
+        processed_lines = (PreprocessorReader.new @document, unprocessed_lines).readlines
         if processed_lines != unprocessed_lines
           inner_document_lines.shift
           inner_document_lines.unshift(*processed_lines)
