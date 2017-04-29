@@ -22,7 +22,7 @@ context 'Sections' do
     end
 
     test 'synthetic id removes entities' do
-      sec = block_from_string('== Ben & Jerry &amp; Company &#34;Ice Cream Brothers&#34; &#10046;')
+      sec = block_from_string('== Ben & Jerry &amp; Company&sup1; &#34;Ice Cream Brothers&#34; &#12354;')
       assert_equal '_ben_jerry_company_ice_cream_brothers', sec.id
     end
 

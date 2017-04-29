@@ -1496,8 +1496,8 @@ EOS
 
   context 'Replacements' do
     test 'unescapes XML entities' do
-      para = block_from_string '< &quot; &#34; &#x22; >'
-      assert_equal '&lt; &quot; &#34; &#x22; &gt;', para.apply_normal_subs(para.lines)
+      para = block_from_string '< &quot; &there4; &#34; &#x22; >'
+      assert_equal '&lt; &quot; &there4; &#34; &#x22; &gt;', para.apply_normal_subs(para.lines)
     end
 
     test 'replaces arrows' do
