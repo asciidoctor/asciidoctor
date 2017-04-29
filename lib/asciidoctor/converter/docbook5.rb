@@ -313,7 +313,7 @@ module Asciidoctor
     def open node
       case node.style
       when 'abstract'
-        if node.parent == node.document && node.document.attr?('doctype', 'book')
+        if node.parent == node.document && node.document.doctype == 'book'
           warn 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
           ''
         else

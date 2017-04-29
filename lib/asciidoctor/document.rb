@@ -115,6 +115,12 @@ class Document < AbstractBlock
   #
   attr_reader :compat_mode
 
+  # Public: Get the cached value of the backend attribute for this document
+  attr_reader :backend
+
+  # Public: Get the cached value of the doctype attribute for this document
+  attr_reader :doctype
+
   # Public: Get or set the Boolean flag that indicates whether source map information should be tracked by the parser
   attr_accessor :sourcemap
 
@@ -373,8 +379,9 @@ class Document < AbstractBlock
     end
 
     if parent_doc
+      @backend = attrs['backend']
       # reset doctype unless it matches the default value
-      unless (attrs['doctype'] = parent_doctype) == DEFAULT_DOCTYPE
+      unless (@doctype = attrs['doctype'] = parent_doctype) == DEFAULT_DOCTYPE
         update_doctype_attributes DEFAULT_DOCTYPE
       end
 
@@ -391,10 +398,11 @@ class Document < AbstractBlock
       @parsed = true
     else
       # setup default backend and doctype
+      @backend = nil
       if (attrs['backend'] ||= DEFAULT_BACKEND) == 'manpage'
-        attrs['doctype'] = attr_overrides['doctype'] = 'manpage'
+        @doctype = attrs['doctype'] = attr_overrides['doctype'] = 'manpage'
       else
-        attrs['doctype'] ||= DEFAULT_DOCTYPE
+        @doctype = (attrs['doctype'] ||= DEFAULT_DOCTYPE)
       end
       update_backend_attributes attrs['backend'], true
 
@@ -592,14 +600,6 @@ class Document < AbstractBlock
   # Make the raw source lines for the Document available.
   def source_lines
     @reader.source_lines if @reader
-  end
-
-  def doctype
-    @doctype ||= @attributes['doctype']
-  end
-
-  def backend
-    @backend ||= @attributes['backend']
   end
 
   def basebackend? base
@@ -908,32 +908,30 @@ class Document < AbstractBlock
   # This method also handles updating the related doctype attributes if the
   # doctype attribute is assigned at the time this method is called.
   def update_backend_attributes new_backend, force = false
-    if force || (new_backend && new_backend != @attributes['backend'])
+    if force || (new_backend && new_backend != @backend)
       attrs = @attributes
-      current_backend = attrs['backend']
-      current_basebackend = attrs['basebackend']
-      current_doctype = attrs['doctype']
+      current_backend, current_basebackend, current_doctype = @backend, attrs['basebackend'], @doctype
       if new_backend.start_with? 'xhtml'
         attrs['htmlsyntax'] = 'xml'
         new_backend = new_backend[1..-1]
       elsif new_backend.start_with? 'html'
         attrs['htmlsyntax'] = 'html' unless attrs['htmlsyntax'] == 'xml'
       end
-      if (resolved_name = BACKEND_ALIASES[new_backend])
-        new_backend = resolved_name
-      end
-      if current_backend
-        attrs.delete %(backend-#{current_backend})
-        if current_doctype
-          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
-        end
+      if (new_backend_resolved = BACKEND_ALIASES[new_backend])
+        new_backend = new_backend_resolved
       end
       if current_doctype
-        attrs[%(doctype-#{current_doctype})] = ''
+        if current_backend
+          attrs.delete %(backend-#{current_backend})
+          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
+        end
         attrs[%(backend-#{new_backend}-doctype-#{current_doctype})] = ''
+        attrs[%(doctype-#{current_doctype})] = ''
+      elsif current_backend
+        attrs.delete %(backend-#{current_backend})
       end
-      attrs['backend'] = new_backend
       attrs[%(backend-#{new_backend})] = ''
+      @backend = attrs['backend'] = new_backend
       # (re)initialize converter
       if Converter::BackendInfo === (@converter = create_converter)
         new_basebackend = @converter.basebackend
@@ -944,8 +942,7 @@ class Document < AbstractBlock
         if (new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend])
           new_filetype = new_outfilesuffix[1..-1]
         else
-          new_outfilesuffix = '.html'
-          new_basebackend = new_filetype = 'html'
+          new_outfilesuffix, new_basebackend, new_filetype = '.html', 'html', 'html'
         end
         attrs['outfilesuffix'] = new_outfilesuffix unless attribute_locked? 'outfilesuffix'
       end
@@ -960,38 +957,41 @@ class Document < AbstractBlock
         attrs.delete 'pagewidth'
       end
       if new_basebackend != current_basebackend
-        if current_basebackend
-          attrs.delete %(basebackend-#{current_basebackend})
-          if current_doctype
+        if current_doctype
+          if current_basebackend
+            attrs.delete %(basebackend-#{current_basebackend})
             attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
           end
+          attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = ''
+        elsif current_basebackend
+          attrs.delete %(basebackend-#{current_basebackend})
         end
-        attrs['basebackend'] = new_basebackend
         attrs[%(basebackend-#{new_basebackend})] = ''
-        attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = '' if current_doctype
+        attrs['basebackend'] = new_basebackend
       end
-      # clear cached backend value
-      @backend = nil
     end
   end
 
   def update_doctype_attributes new_doctype
-    if new_doctype && new_doctype != @attributes['doctype']
+    if new_doctype && new_doctype != @doctype
       attrs = @attributes
-      current_doctype = attrs['doctype']
-      current_backend = attrs['backend']
-      current_basebackend = attrs['basebackend']
+      current_backend, current_basebackend, current_doctype = @backend, attrs['basebackend'], @doctype
       if current_doctype
         attrs.delete %(doctype-#{current_doctype})
-        attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype}) if current_backend
-        attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype}) if current_basebackend
+        if current_backend
+          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
+          attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = ''
+        end
+        if current_basebackend
+          attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
+          attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = ''
+        end
+      else
+        attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
+        attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
       end
-      attrs['doctype'] = new_doctype
       attrs[%(doctype-#{new_doctype})] = ''
-      attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
-      attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
-      # clear cached doctype value
-      @doctype = nil
+      @doctype = attrs['doctype'] = new_doctype
     end
   end
 
