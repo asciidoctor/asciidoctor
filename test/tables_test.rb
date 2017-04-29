@@ -912,6 +912,53 @@ content
       assert_css 'table.tableblock .paragraph', result, 0
     end
 
+    test 'should reset doctype to default in AsciiDoc table cell' do
+      input = <<-EOS
+= Book Title
+:doctype: book
+
+== Chapter 1
+
+|===
+a|
+= AsciiDoc Table Cell
+
+doctype={doctype}
+{backend-html5-doctype-article}
+{backend-html5-doctype-book}
+|===
+      EOS
+
+      result = render_embedded_string input, :attributes => { 'attribute-missing' => 'skip' }
+      assert_includes result, 'doctype=article'
+      refute_includes result, '{backend-html5-doctype-article}'
+      assert_includes result, '{backend-html5-doctype-book}'
+    end
+
+    test 'should update doctype-related attributes in AsciiDoc table cell when doctype is set' do
+      input = <<-EOS
+= Document Title
+:doctype: article
+
+== Chapter 1
+
+|===
+a|
+= AsciiDoc Table Cell
+:doctype: book
+
+doctype={doctype}
+{backend-html5-doctype-book}
+{backend-html5-doctype-article}
+|===
+      EOS
+
+      result = render_embedded_string input, :attributes => { 'attribute-missing' => 'skip' }
+      assert_includes result, 'doctype=book'
+      refute_includes result, '{backend-html5-doctype-book}'
+      assert_includes result, '{backend-html5-doctype-article}'
+    end
+
     test 'compat mode can be activated in asciidoc table cell' do
       input = <<-EOS
 |===
