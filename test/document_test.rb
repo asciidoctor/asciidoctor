@@ -2251,10 +2251,10 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 = Document Title
 text
       EOS
-      exception = assert_raises RuntimeError do
-        Asciidoctor.render(input, :backend => "unknownBackend")
+      exception = assert_raises NotImplementedError do
+        Asciidoctor.convert input, :backend => 'unknownBackend'
       end
-      assert_match(/missing converter for backend 'unknownBackend'/, exception.message)
+      assert_includes exception.message, 'missing converter for backend \'unknownBackend\''
     end
   end
 

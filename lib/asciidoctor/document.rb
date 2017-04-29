@@ -1035,7 +1035,7 @@ class Document < AbstractBlock
 
     # QUESTION should we add processors that execute before conversion begins?
     unless @converter
-      fail %(asciidoctor: FAILED: missing converter for backend '#{backend}'. Processing aborted.)
+      raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{backend}'. Processing aborted.)
     end
 
     if doctype == 'inline'
