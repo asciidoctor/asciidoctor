@@ -744,7 +744,7 @@ module Asciidoctor
     CalloutListRx = /^<?(\d+)>#{CG_BLANK}+(.*)$/
 
     # Detects a potential callout list item.
-    CalloutListSniffRx = /^<?[0-9]\d*>/
+    CalloutListSniffRx = /^<?\d+>/
 
     # Matches a callout reference inside literal text.
     #
