@@ -88,7 +88,6 @@ module Asciidoctor
         # If the custom converter is not found, an attempt will be made to find
         # and instantiate a built-in converter.
         #
-        #
         # backend - The String backend name
         # opts - A Hash of options to pass to the converter
         #
