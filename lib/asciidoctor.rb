@@ -643,8 +643,8 @@ module Asciidoctor
 
     # Matches invalid characters in a section id.
     #
-    # NOTE uppercase chars are not included here since expression is used on a lowercased string
-    InvalidSectionIdCharsRx = /&(?:[a-z]{2,}|#\d{2,6}|#x[0-9a-f]{2,5});|[^#{CC_WORD}]+?/
+    # NOTE uppercase chars are not included since the expression is used on a lowercased string
+    InvalidSectionIdCharsRx = /&(?:[a-z][a-z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-f][\da-f][\da-f]{0,3});|[^#{CC_WORD}]+?/
 
     # Matches the block style used to designate a section title as a floating title.
     #
@@ -1280,7 +1280,7 @@ module Asciidoctor
     # left double arrow <=
     [/\\?&lt;=/, '&#8656;', :none],
     # restore entities
-    [/\\?(&)amp;((?:[a-zA-Z]{2,}|#\d{2,6}|#x[0-9a-fA-F]{2,5});)/, '', :bounding]
+    [/\\?(&)amp;((?:[a-zA-Z][a-zA-Z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-fA-F][\da-fA-F][\da-fA-F]{0,3});)/, '', :bounding]
   ]
 
   class << self
