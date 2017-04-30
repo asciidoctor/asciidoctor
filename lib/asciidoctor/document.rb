@@ -937,7 +937,7 @@ class Document < AbstractBlock
         new_basebackend = @converter.basebackend
         attrs['outfilesuffix'] = @converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
         new_filetype = @converter.filetype
-      else
+      elsif @converter
         new_basebackend = new_backend.sub TrailingDigitsRx, ''
         if (new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend])
           new_filetype = new_outfilesuffix[1..-1]
@@ -945,6 +945,9 @@ class Document < AbstractBlock
           new_outfilesuffix, new_basebackend, new_filetype = '.html', 'html', 'html'
         end
         attrs['outfilesuffix'] = new_outfilesuffix unless attribute_locked? 'outfilesuffix'
+      else
+        # NOTE ideally we shouldn't need the converter before the converter phase, but we do
+        raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{new_backend}'. Processing aborted.)
       end
       if (current_filetype = attrs['filetype'])
         attrs.delete %(filetype-#{current_filetype})
@@ -1036,10 +1039,12 @@ class Document < AbstractBlock
       @attributes.delete 'outdir' unless (@attributes['outdir'] = opts['outdir'])
     end
 
-    # QUESTION should we add processors that execute before conversion begins?
-    unless @converter
-      raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{backend}'. Processing aborted.)
-    end
+    # QUESTION should we add extensions that execute before conversion begins?
+
+    # NOTE we're now checking for the converter eagerly
+    #unless @converter
+    #  raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{backend}'. Processing aborted.)
+    #end
 
     if doctype == 'inline'
       # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
