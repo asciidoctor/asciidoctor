@@ -227,11 +227,11 @@ T})
         case node.style
         when 'qanda'
           result << %(.sp
-#{counter}. #{manify([*terms].map {|dt| dt.text }.join ' ')}
+#{counter}. #{manify([*terms].map(&:text).join ' ')}
 .RS 4)
         else
           result << %(.sp
-#{manify([*terms].map {|dt| dt.text }.join ', ')}
+#{manify([*terms].map(&:text).join ', ')}
 .RS 4)
         end
         if dd
@@ -508,7 +508,7 @@ allbox tab(:);'
       #end
       # FIXME temporary fix to get basic table to display
       result << LF
-      result << row_header[0].map {|r| 'lt'}.join(' ')
+      result << row_header[0].map { 'lt' }.join(' ')
 
       result << %(.#{LF})
       row_text.each do |row|

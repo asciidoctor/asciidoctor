@@ -819,7 +819,9 @@ Your browser does not support the audio tag.
                 when :literal
                   cell_content = %(<div class="literal"><pre>#{cell.text}</pre></div>)
                 else
-                  cell_content = cell.content.map {|text| %(<p class="tableblock">#{text}</p>) } * EOL
+                  unless (cell_content = cell.content * %(</p>#{EOL}<p class="tableblock">)).empty?
+                    cell_content = %(<p class="tableblock">#{cell_content}</p>)
+                  end
                 end
               end
 
@@ -1113,16 +1115,14 @@ Your browser does not support the video tag.
       if (keys = node.attr 'keys').size == 1
         %(<kbd>#{keys[0]}</kbd>)
       else
-        key_combo = keys.map {|key| %(<kbd>#{key}</kbd>+) }.join.chop
-        %(<span class="keyseq">#{key_combo}</span>)
+        %(<span class="keyseq"><kbd>#{keys * '</kbd>+<kbd>'}</kbd></span>)
       end
     end
 
     def inline_menu node
       menu = node.attr 'menu'
       if !(submenus = node.attr 'submenus').empty?
-        submenu_path = submenus.map {|submenu| %(<span class="submenu">#{submenu}</span>&#160;&#9656; ) }.join.chop
-        %(<span class="menuseq"><span class="menu">#{menu}</span>&#160;&#9656; #{submenu_path} <span class="menuitem">#{node.attr 'menuitem'}</span></span>)
+        %(<span class="menuseq"><span class="menu">#{menu}</span>&#160;&#9656; <span class="submenu">#{submenus * '</span>&#160;&#9656; <span class="submenu">'}</span>&#160;&#9656; <span class="menuitem">#{node.attr 'menuitem'}</span></span>)
       elsif (menuitem = node.attr 'menuitem')
         %(<span class="menuseq"><span class="menu">#{menu}</span>&#160;&#9656; <span class="menuitem">#{menuitem}</span></span>)
       else
