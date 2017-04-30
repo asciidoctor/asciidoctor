@@ -1033,7 +1033,7 @@ Your browser does not support the video tag.
         end
         attrs << %( title="#{node.attr 'title'}") if node.attr? 'title', nil, false
         attrs << %( target="#{node.attr 'window'}") if node.attr? 'window', nil, false
-        %(<a href="#{target}"#{attrs.join}>#{node.text}</a>)
+        %(<a href="#{target}"#{attrs.join} rel="noopener noreferrer">#{node.text}</a>)
       when :bibref
         %(<a id="#{target}"></a>[#{target}])
       else
