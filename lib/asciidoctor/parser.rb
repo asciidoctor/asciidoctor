@@ -1887,7 +1887,7 @@ class Parser
   def self.process_authors(author_line, names_only = false, multiple = true)
     author_metadata = {}
     keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
-    author_entries = multiple ? (author_line.split ';').map {|line| line.strip } : Array(author_line)
+    author_entries = multiple ? (author_line.split ';').map(&:strip) : Array(author_line)
     author_entries.each_with_index do |author_entry, idx|
       next if author_entry.empty?
       key_map = {}

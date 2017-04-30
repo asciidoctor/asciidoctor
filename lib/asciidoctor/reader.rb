@@ -893,7 +893,7 @@ class PreprocessorReader < Reader
           inc_lines = []
           attributes['lines'].split(DataDelimiterRx).each do |linedef|
             if linedef.include?('..')
-              from, to = linedef.split('..', 2).map {|it| it.to_i }
+              from, to = linedef.split('..', 2).map(&:to_i)
               if to == -1
                 inc_lines << from
                 inc_lines << 1.0/0.0
@@ -1218,7 +1218,7 @@ class PreprocessorReader < Reader
   end
 
   def to_s
-    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s }.join ', '}]}>)
+    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map(&:to_s).join ', '}]}>)
   end
 end
 end

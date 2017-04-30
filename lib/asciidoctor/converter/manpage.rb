@@ -227,11 +227,11 @@ T})
         case node.style
         when 'qanda'
           result << %(.sp
-#{counter}. #{manify([*terms].map {|dt| dt.text }.join ' ')}
+#{counter}. #{manify([*terms].map(&:text).join ' ')}
 .RS 4)
         else
           result << %(.sp
-#{manify([*terms].map {|dt| dt.text }.join ', ')}
+#{manify([*terms].map(&:text).join ', ')}
 .RS 4)
         end
         if dd

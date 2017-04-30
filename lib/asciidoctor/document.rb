@@ -1149,7 +1149,7 @@ class Document < AbstractBlock
           docinfo = docinfo ? ['private'] : nil
         end
       else
-        docinfo = docinfo.split(',').map {|it| it.strip }
+        docinfo = docinfo.split(',').map(&:strip)
       end
 
       if docinfo

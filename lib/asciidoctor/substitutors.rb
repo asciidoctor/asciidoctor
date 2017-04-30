@@ -581,7 +581,7 @@ module Substitutors
             menuitem = nil
           else
             if (delim = items.include?('&gt;') ? '&gt;' : (items.include?(',') ? ',' : nil))
-              submenus = items.split(delim).map {|it| it.strip }
+              submenus = items.split(delim).map(&:strip)
               menuitem = submenus.pop
             else
               submenus = []
@@ -604,7 +604,7 @@ module Substitutors
 
           input = m[1]
 
-          menu, *submenus = input.split('&gt;').map {|it| it.strip }
+          menu, *submenus = input.split('&gt;').map(&:strip)
           menuitem = submenus.pop
           Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).convert
         }
@@ -1019,7 +1019,7 @@ module Substitutors
           next m[0][1..-1]
         end
         if m[1]
-          id, reftext = m[1].split(',', 2).map {|it| it.strip }
+          id, reftext = m[1].split(',', 2).map(&:strip)
           id = id[1, id.length - 2] if (id.start_with? '"') && (id.end_with? '"')
           reftext = reftext[1, reftext.length - 2] if reftext && (reftext.start_with? '"') && (reftext.end_with? '"')
         else
@@ -1264,7 +1264,7 @@ module Substitutors
 
       values << current.join.strip
     else
-      values = str.split(',').map {|it| it.strip }
+      values = str.split(',').map(&:strip)
     end
 
     values

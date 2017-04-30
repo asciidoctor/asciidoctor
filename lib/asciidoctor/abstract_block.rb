@@ -77,7 +77,7 @@ class AbstractBlock < AbstractNode
   # Public: Get the converted result of the child blocks by converting the
   # children appropriate to content model that this block supports.
   def content
-    @blocks.map {|b| b.convert } * EOL
+    @blocks.map(&:convert) * EOL
   end
 
   # Public: Get the source file where this block started
