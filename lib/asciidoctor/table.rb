@@ -17,34 +17,6 @@ class Table < AbstractBlock
     alias :[] :send
   end
 
-  # Public: A Hash mapping styles abbreviations to styles that can be applied
-  # to a table column or cell
-  TEXT_STYLES = {
-    'd' => :none,
-    's' => :strong,
-    'e' => :emphasis,
-    'm' => :monospaced,
-    'h' => :header,
-    'l' => :literal,
-    'v' => :verse,
-    'a' => :asciidoc
-  }
-
-  # Public: A Hash mapping alignment abbreviations to alignments (horizontal
-  # and vertial) that can be applies to a table column or cell
-  ALIGNMENTS = {
-    :h => {
-      '<' => 'left',
-      '>' => 'right',
-      '^' => 'center'
-    },
-    :v => {
-      '<' => 'top',
-      '>' => 'bottom',
-      '^' => 'middle'
-    }
-  }
-
   # Public: Get/Set the columns for this table
   attr_accessor :columns
 

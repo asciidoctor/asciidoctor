@@ -40,6 +40,35 @@ class Parser
 
   NoOp = nil
 
+  # Internal: A Hash mapping horizontal alignment abbreviations to alignments
+  # that can be applied to a table cell (or to all cells in a column)
+  TableCellHorzAlignments = {
+    '<' => 'left',
+    '>' => 'right',
+    '^' => 'center'
+  }
+
+  # Internal: A Hash mapping vertical alignment abbreviations to alignments
+  # that can be applied to a table cell (or to all cells in a column)
+  TableCellVertAlignments = {
+    '<' => 'top',
+    '>' => 'bottom',
+    '^' => 'middle'
+  }
+
+  # Internal: A Hash mapping styles abbreviations to styles that can be applied
+  # to a table cell (or to all cells in a column)
+  TableCellStyles = {
+    'd' => :none,
+    's' => :strong,
+    'e' => :emphasis,
+    'm' => :monospaced,
+    'h' => :header,
+    'l' => :literal,
+    'v' => :verse,
+    'a' => :asciidoc
+  }
+
   # Public: Make sure the Parser object doesn't get initialized.
   #
   # Raises RuntimeError if this constructor is invoked.
@@ -2381,11 +2410,11 @@ class Parser
         if m[2]
           # make this an operation
           colspec, rowspec = m[2].split '.'
-          if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].key?(colspec)
-            spec['halign'] = Table::ALIGNMENTS[:h][colspec]
+          if !colspec.nil_or_empty? && TableCellHorzAlignments.key?(colspec)
+            spec['halign'] = TableCellHorzAlignments[colspec]
           end
-          if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].key?(rowspec)
-            spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
+          if !rowspec.nil_or_empty? && TableCellVertAlignments.key?(rowspec)
+            spec['valign'] = TableCellVertAlignments[rowspec]
           end
         end
 
@@ -2394,8 +2423,8 @@ class Parser
         spec['width'] = (m[3] ? m[3].to_i : 1)
 
         # make this an operation
-        if m[4] && Table::TEXT_STYLES.key?(m[4])
-          spec['style'] = Table::TEXT_STYLES[m[4]]
+        if m[4] && TableCellStyles.key?(m[4])
+          spec['style'] = TableCellStyles[m[4]]
         end
 
         if m[1]
@@ -2462,16 +2491,16 @@ class Parser
 
     if m[3]
       colspec, rowspec = m[3].split '.'
-      if !colspec.nil_or_empty? && Table::ALIGNMENTS[:h].key?(colspec)
-        spec['halign'] = Table::ALIGNMENTS[:h][colspec]
+      if !colspec.nil_or_empty? && TableCellHorzAlignments.key?(colspec)
+        spec['halign'] = TableCellHorzAlignments[colspec]
       end
-      if !rowspec.nil_or_empty? && Table::ALIGNMENTS[:v].key?(rowspec)
-        spec['valign'] = Table::ALIGNMENTS[:v][rowspec]
+      if !rowspec.nil_or_empty? && TableCellVertAlignments.key?(rowspec)
+        spec['valign'] = TableCellVertAlignments[rowspec]
       end
     end
 
-    if m[4] && Table::TEXT_STYLES.key?(m[4])
-      spec['style'] = Table::TEXT_STYLES[m[4]]
+    if m[4] && TableCellStyles.key?(m[4])
+      spec['style'] = TableCellStyles[m[4]]
     end
 
     [spec, rest]
