@@ -184,11 +184,12 @@ class Document < AbstractBlock
       @callouts = parent_doc.callouts
       # QUESTION should we support setting attribute in parent document from nested document?
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
-      attr_overrides = parent_doc.attributes.dup
-      ['doctype', 'compat-mode', 'toc', 'toc-placement', 'toc-position'].each do |key|
-        attr_overrides.delete key
-      end
-      @attribute_overrides = attr_overrides
+      @attribute_overrides = attr_overrides = parent_doc.attributes.dup
+      parent_doctype = attr_overrides.delete 'doctype'
+      attr_overrides.delete 'compat-mode'
+      attr_overrides.delete 'toc'
+      attr_overrides.delete 'toc-placement'
+      attr_overrides.delete 'toc-position'
       @safe = parent_doc.safe
       @compat_mode = parent_doc.compat_mode
       @sourcemap = parent_doc.sourcemap
@@ -372,8 +373,10 @@ class Document < AbstractBlock
     end
 
     if parent_doc
-      # setup default doctype (backend is fixed)
-      attrs['doctype'] ||= DEFAULT_DOCTYPE
+      # reset doctype unless it matches the default value
+      unless (attrs['doctype'] = parent_doctype) == DEFAULT_DOCTYPE
+        update_doctype_attributes DEFAULT_DOCTYPE
+      end
 
       # don't need to do the extra processing within our own document
       # FIXME line info isn't reported correctly within include files in nested document
