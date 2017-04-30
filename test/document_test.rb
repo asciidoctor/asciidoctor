@@ -2246,9 +2246,24 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       assert_match(/^#{doc.base_dir}/, secure_path)
     end
 
-    test 'should raise an exception when a converter cannot be resolved' do
+    test 'should raise an exception when a converter cannot be resolved before conversion' do
       input = <<-EOS
 = Document Title
+
+text
+      EOS
+      exception = assert_raises NotImplementedError do
+        Asciidoctor.convert input, :backend => 'unknownBackend'
+      end
+      assert_includes exception.message, 'missing converter for backend \'unknownBackend\''
+    end
+
+    test 'should raise an exception when a converter cannot be resolved while parsing' do
+      input = <<-EOS
+= Document Title
+
+== A _Big_ Section
+
 text
       EOS
       exception = assert_raises NotImplementedError do
