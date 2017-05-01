@@ -1032,7 +1032,7 @@ Your browser does not support the video tag.
           attrs << %( class="#{role}")
         end
         attrs << %( title="#{node.attr 'title'}") if node.attr? 'title', nil, false
-        attrs << %( target="#{node.attr 'window'}") if node.attr? 'window', nil, false
+        attrs << %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window', nil, false
         %(<a href="#{target}"#{attrs.join}>#{node.text}</a>)
       when :bibref
         %(<a id="#{target}"></a>[#{target}])
@@ -1098,7 +1098,7 @@ Your browser does not support the video tag.
         img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{node.attr 'alt'}"#{attrs}#{@void_element_slash}>)
       end
       if node.attr? 'link'
-        window_attr = (node.attr? 'window') ? %( target="#{node.attr 'window'}") : nil
+        window_attr = %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window'
         img = %(<a class="image" href="#{node.attr 'link'}"#{window_attr}>#{img}</a>)
       end
       class_attr_val = (role = node.role) ? %(#{type} #{role}) : type

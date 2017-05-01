@@ -497,7 +497,7 @@ context 'Substitutions' do
 
     test 'does not confuse superscript and links with blank window shorthand' do
       para = block_from_string(%Q{http://localhost[Text^] on the 21^st^ and 22^nd^})
-      assert_equal '<a href="http://localhost" target="_blank">Text</a> on the 21<sup>st</sup> and 22<sup>nd</sup>', para.content
+      assert_equal '<a href="http://localhost" target="_blank" rel="noopener">Text</a> on the 21<sup>st</sup> and 22<sup>nd</sup>', para.content
     end
 
     test 'single-line subscript chars' do
@@ -712,6 +712,18 @@ context 'Substitutions' do
     test 'a single-line image macro with text and link should be interpreted as a linked image with alt text' do
       para = block_from_string('image:tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]')
       assert_equal %{<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger"><img src="tiger.png" alt="Tiger"></a></span>},
+          para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'rel=noopener should be added to an image with a link that targets the _blank window' do
+      para = block_from_string 'image:tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=_blank]'
+      assert_equal %{<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger" target="_blank" rel="noopener"><img src="tiger.png" alt="Tiger"></a></span>},
+          para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'rel=noopener should be added to an image with a link that targets a named window when the noopener option is set' do
+      para = block_from_string 'image:tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=name,opts=noopener]'
+      assert_equal %{<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger" target="name" rel="noopener"><img src="tiger.png" alt="Tiger"></a></span>},
           para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 

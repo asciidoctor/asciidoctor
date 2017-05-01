@@ -171,6 +171,20 @@ context 'Links' do
     assert_xpath '//a[@href="http://google.com"][@target="_blank"]', render_embedded_string('http://google.com[Google^]'), 1
   end
 
+  test 'rel=noopener should be added to a link that targets the _blank window' do
+    assert_xpath '//a[@href="http://google.com"][@target="_blank"][@rel="noopener"]', render_embedded_string('http://google.com[Google^]'), 1
+  end
+
+  test 'rel=noopener should be added to a link that targets a named window when the noopener option is set' do
+    assert_xpath '//a[@href="http://google.com"][@target="name"][@rel="noopener"]', render_embedded_string('http://google.com[Google,window=name,opts=noopener]', :attributes => {'linkattrs' => ''}), 1
+  end
+
+  test 'rel=noopener should not be added to a link if it does not target a window' do
+    result = render_embedded_string 'http://google.com[Google,opts=noopener]', :attributes => {'linkattrs' => ''}
+    assert_xpath '//a[@href="http://google.com"]', result, 1
+    assert_xpath '//a[@href="http://google.com"][@rel="noopener"]', result, 0
+  end
+
   test 'id attribute on link are processed when linkattrs is set' do
     assert_xpath '//a[@href="http://google.com"][@id="link-1"]', render_embedded_string('http://google.com[Google, id="link-1"]', :attributes => {'linkattrs' => ''}), 1
   end
