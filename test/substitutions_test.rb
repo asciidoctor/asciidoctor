@@ -1191,7 +1191,7 @@ EOS
     context 'Menu macro' do
       test 'should process menu using macro sytnax' do
         para = block_from_string('menu:File[]', :attributes => {'experimental' => ''})
-        assert_equal %q{<span class="menu">File</span>}, para.sub_macros(para.source)
+        assert_equal %q{<b class="menuref">File</b>}, para.sub_macros(para.source)
       end
 
       test 'should process menu for docbook backend' do
@@ -1201,7 +1201,12 @@ EOS
 
       test 'should process menu with menu item using macro syntax' do
         para = block_from_string('menu:File[Save As&#8230;]', :attributes => {'experimental' => ''})
-        assert_equal %q{<span class="menuseq"><span class="menu">File</span>&#160;&#9656; <span class="menuitem">Save As&#8230;</span></span>}, para.sub_macros(para.source)
+        assert_equal %q{<span class="menuseq"><b class="menu">File</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Save As&#8230;</b></span>}, para.sub_macros(para.source)
+      end
+
+      test 'should process menu with menu item using macro syntax when fonts icons are enabled' do
+        para = block_from_string('menu:Tools[More Tools &gt; Extensions]', :attributes => {'experimental' => '', 'icons' => 'font'})
+        assert_equal %q{<span class="menuseq"><b class="menu">Tools</b>&#160;<i class="fa fa-angle-right caret"></i> <b class="submenu">More Tools</b>&#160;<i class="fa fa-angle-right caret"></i> <b class="menuitem">Extensions</b></span>}, para.sub_macros(para.source)
       end
 
       test 'should process menu with menu item for docbook backend' do
@@ -1211,7 +1216,7 @@ EOS
 
       test 'should process menu with menu item in submenu using macro syntax' do
         para = block_from_string('menu:Tools[Project &gt; Build]', :attributes => {'experimental' => ''})
-        assert_equal %q{<span class="menuseq"><span class="menu">Tools</span>&#160;&#9656; <span class="submenu">Project</span>&#160;&#9656; <span class="menuitem">Build</span></span>}, para.sub_macros(para.source)
+        assert_equal %q{<span class="menuseq"><b class="menu">Tools</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">Project</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Build</b></span>}, para.sub_macros(para.source)
       end
 
       test 'should process menu with menu item in submenu for docbook backend' do
@@ -1221,17 +1226,17 @@ EOS
 
       test 'should process menu with menu item in submenu using macro syntax and comma delimiter' do
         para = block_from_string('menu:Tools[Project, Build]', :attributes => {'experimental' => ''})
-        assert_equal %q{<span class="menuseq"><span class="menu">Tools</span>&#160;&#9656; <span class="submenu">Project</span>&#160;&#9656; <span class="menuitem">Build</span></span>}, para.sub_macros(para.source)
+        assert_equal %q{<span class="menuseq"><b class="menu">Tools</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">Project</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Build</b></span>}, para.sub_macros(para.source)
       end
 
       test 'should process menu with menu item using inline syntax' do
         para = block_from_string('"File &gt; Save As&#8230;"', :attributes => {'experimental' => ''})
-        assert_equal %q{<span class="menuseq"><span class="menu">File</span>&#160;&#9656; <span class="menuitem">Save As&#8230;</span></span>}, para.sub_macros(para.source)
+        assert_equal %q{<span class="menuseq"><b class="menu">File</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Save As&#8230;</b></span>}, para.sub_macros(para.source)
       end
 
       test 'should process menu with menu item in submenu using inline syntax' do
         para = block_from_string('"Tools &gt; Project &gt; Build"', :attributes => {'experimental' => ''})
-        assert_equal %q{<span class="menuseq"><span class="menu">Tools</span>&#160;&#9656; <span class="submenu">Project</span>&#160;&#9656; <span class="menuitem">Build</span></span>}, para.sub_macros(para.source)
+        assert_equal %q{<span class="menuseq"><b class="menu">Tools</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">Project</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Build</b></span>}, para.sub_macros(para.source)
       end
 
       test 'inline syntax should not closing quote of XML attribute' do
@@ -1241,12 +1246,12 @@ EOS
 
       test 'should process menu macro with items containing multibyte characters' do
         para = block_from_string('menu:视图[放大, 重置]', :attributes => {'experimental' => ''})
-        assert_equal %q{<span class="menuseq"><span class="menu">视图</span>&#160;&#9656; <span class="submenu">放大</span>&#160;&#9656; <span class="menuitem">重置</span></span>}, para.sub_macros(para.source)
+        assert_equal %q{<span class="menuseq"><b class="menu">视图</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">放大</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">重置</b></span>}, para.sub_macros(para.source)
       end if ::RUBY_MIN_VERSION_1_9
 
       test 'should process inline menu with items containing multibyte characters' do
         para = block_from_string('"视图 &gt; 放大 &gt; 重置"', :attributes => {'experimental' => ''})
-        assert_equal %q{<span class="menuseq"><span class="menu">视图</span>&#160;&#9656; <span class="submenu">放大</span>&#160;&#9656; <span class="menuitem">重置</span></span>}, para.sub_macros(para.source)
+        assert_equal %q{<span class="menuseq"><b class="menu">视图</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">放大</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">重置</b></span>}, para.sub_macros(para.source)
       end if ::RUBY_MIN_VERSION_1_9
     end
   end
