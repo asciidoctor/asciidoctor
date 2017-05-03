@@ -1119,13 +1119,15 @@ Your browser does not support the video tag.
     end
 
     def inline_menu node
+      caret = (node.document.attr? 'icons', 'font') ? '&#160;<i class="fa fa-angle-right caret"></i> ' : '&#160;<b class="caret">&#8250;</b> '
+      submenu_joiner = %(</b>#{caret}<b class="submenu">)
       menu = node.attr 'menu'
       if !(submenus = node.attr 'submenus').empty?
-        %(<span class="menuseq"><span class="menu">#{menu}</span>&#160;&#9656; <span class="submenu">#{submenus * '</span>&#160;&#9656; <span class="submenu">'}</span>&#160;&#9656; <span class="menuitem">#{node.attr 'menuitem'}</span></span>)
+        %(<span class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="submenu">#{submenus * submenu_joiner}</b>#{caret}<b class="menuitem">#{node.attr 'menuitem'}</b></span>)
       elsif (menuitem = node.attr 'menuitem')
-        %(<span class="menuseq"><span class="menu">#{menu}</span>&#160;&#9656; <span class="menuitem">#{menuitem}</span></span>)
+        %(<span class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="menuitem">#{menuitem}</b></span>)
       else
-        %(<span class="menu">#{menu}</span>)
+        %(<b class="menuref">#{menu}</b>)
       end
     end
 
