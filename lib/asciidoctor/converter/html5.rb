@@ -553,8 +553,9 @@ Your browser does not support the audio tag.
         end
       end
       img ||= %(<img src="#{node.image_uri target}" alt="#{node.attr 'alt'}"#{width_attr}#{height_attr}#{@void_element_slash}>)
-      if (link = node.attr 'link')
-        img = %(<a class="image" href="#{link}">#{img}</a>)
+      if node.attr? 'link'
+        window_attr = %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window'
+        img = %(<a class="image" href="#{node.attr 'link'}"#{window_attr}>#{img}</a>)
       end
       id_attr = node.id ? %( id="#{node.id}") : nil
       classes = ['imageblock', node.role].compact
