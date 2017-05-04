@@ -109,6 +109,18 @@ context 'Document' do
       assert !doc.attr?('sectnums')
     end
 
+    test 'noheader attribute should suppress info element when converting to DocBook' do
+      input = <<-EOS
+= Document Title
+:noheader:
+
+content
+      EOS
+      result = render_string input, :backend => 'docbook'
+      assert_xpath '/article', result, 1
+      assert_xpath '/article/info', result, 0
+    end
+
     test 'should be able to disable section numbering using numbered attribute in document header for DocBook backend' do
       input = <<-EOS
 = Document Title
