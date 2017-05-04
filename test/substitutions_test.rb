@@ -1239,7 +1239,7 @@ EOS
         assert_equal %q{<span class="menuseq"><b class="menu">Tools</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">Project</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Build</b></span>}, para.sub_macros(para.source)
       end
 
-      test 'inline syntax should not closing quote of XML attribute' do
+      test 'inline menu syntax should not match closing quote of XML attribute' do
         para = block_from_string('<span class="xmltag">&lt;node&gt;</span><span class="classname">r</span>', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="xmltag">&lt;node&gt;</span><span class="classname">r</span>}, para.sub_macros(para.source)
       end
@@ -1253,6 +1253,16 @@ EOS
         para = block_from_string('"视图 &gt; 放大 &gt; 重置"', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="menuseq"><b class="menu">视图</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">放大</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">重置</b></span>}, para.sub_macros(para.source)
       end if ::RUBY_MIN_VERSION_1_9
+
+      test 'should process a menu macro with a target that begins with a character reference' do
+        para = block_from_string('menu:&#8942;[More Tools, Extensions]', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menuseq"><b class="menu">&#8942;</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">More Tools</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Extensions</b></span>}, para.sub_macros(para.source)
+      end
+
+      test 'should process an inline menu that begins with a character reference' do
+        para = block_from_string('"&#8942; &gt; More Tools &gt; Extensions"', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="menuseq"><b class="menu">&#8942;</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">More Tools</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Extensions</b></span>}, para.sub_macros(para.source)
+      end
     end
   end
 
