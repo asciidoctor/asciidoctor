@@ -940,7 +940,7 @@ module Asciidoctor
     #   menu:View[Page Style > No Style]
     #   menu:View[Page Style, No Style]
     #
-    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|#{CG_WORD}.*?\S)\[#{CG_BLANK}*(.+?)?\]/
+    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&].*?\S)\[#{CG_BLANK}*(.+?)?\]/
 
     # Matches an implicit menu inline macro.
     #
@@ -948,7 +948,7 @@ module Asciidoctor
     #
     #   "File > New..."
     #
-    MenuInlineRx = /\\?"(#{CG_WORD}[^"]*?#{CG_BLANK}*&gt;#{CG_BLANK}*[^" \t][^"]*)"/
+    MenuInlineRx = /\\?"([#{CC_WORD}&][^"]*?#{CG_BLANK}*&gt;#{CG_BLANK}*[^" \t][^"]*)"/
 
     # Matches an inline passthrough value, which may span multiple lines.
     #
