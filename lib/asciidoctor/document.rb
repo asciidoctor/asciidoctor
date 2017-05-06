@@ -38,7 +38,7 @@ class Document < AbstractBlock
   # Public Parsed and stores a partitioned title (i.e., title & subtitle).
   class Title
     attr_reader :main
-    alias :title :main
+    alias title main
     attr_reader :subtitle
     attr_reader :combined
 
@@ -655,7 +655,7 @@ class Document < AbstractBlock
       val
     end
   end
-  alias :name :doctitle
+  alias name doctitle
 
   # Public: Convenience method to retrieve the document attribute 'author'
   #
@@ -691,7 +691,7 @@ class Document < AbstractBlock
   def has_header?
     @header ? true : false
   end
-  alias :header? :has_header?
+  alias header? has_header?
 
   # Public: Append a content Block to this Document.
   #
@@ -1070,7 +1070,7 @@ class Document < AbstractBlock
   end
 
   # Alias render to convert to maintain backwards compatibility
-  alias :render :convert
+  alias render convert
 
   # Public: Write the output to the specified file
   #

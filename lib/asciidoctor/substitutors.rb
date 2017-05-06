@@ -347,7 +347,7 @@ module Substitutors
       text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }
     end
   end
-  alias :sub_specialcharacters :sub_specialchars
+  alias sub_specialcharacters sub_specialchars
 
   if RUBY_ENGINE == 'opal'
     def sub_quotes text

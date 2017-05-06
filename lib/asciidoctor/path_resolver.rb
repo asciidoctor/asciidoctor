@@ -185,7 +185,7 @@ class PathResolver
       path
     end
   end
-  alias :posixfy :posixify
+  alias posixfy posixify
 
   # Public: Expand the path by resolving any parent references (..)
   # and cleaning self references (.).

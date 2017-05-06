@@ -24,7 +24,7 @@ class Block < AbstractBlock
   }).default = :simple
 
   # Public: Create alias for context to be consistent w/ AsciiDoc
-  alias :blockname :context
+  alias blockname context
 
   # Public: Get/Set the original Array content for this block, if applicable
   attr_accessor :lines

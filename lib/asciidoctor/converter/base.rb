@@ -34,7 +34,7 @@ module Asciidoctor
       opts.empty? ? (send transform, node) : (send transform, node, opts)
     end
 
-    alias :handles? :respond_to?
+    alias handles? respond_to?
 
     # Public: Returns the converted content of the {AbstractNode}.
     #
@@ -43,7 +43,7 @@ module Asciidoctor
       node.content
     end
 
-    alias :pass :content
+    alias pass content
 
     # Public: Skips conversion of the {AbstractNode}.
     #

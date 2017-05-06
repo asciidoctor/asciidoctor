@@ -54,7 +54,7 @@ class Section < AbstractBlock
   end
 
   # Public: The name of this section, an alias of the section title
-  alias :name :title
+  alias name title
 
   # Public: Generate a String id for this section.
   #

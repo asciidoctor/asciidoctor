@@ -41,7 +41,7 @@ module Asciidoctor
       result * EOL
     end
 
-    alias :embedded :content
+    alias embedded content
 
     def section node
       doctype = node.document.doctype
@@ -72,7 +72,7 @@ module Asciidoctor
 </#{tag_name}>)
     end
 
-    alias :audio :skip
+    alias audio skip
 
     def colist node
       result = []
@@ -457,7 +457,7 @@ module Asciidoctor
       result * EOL
     end
 
-    alias :toc :skip
+    alias toc skip
 
     def ulist node
       result = []
@@ -512,7 +512,7 @@ module Asciidoctor
       result * EOL
     end
 
-    alias :video :skip
+    alias video skip
 
     def inline_anchor node
       case node.type

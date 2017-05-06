@@ -184,7 +184,7 @@ module Asciidoctor
     end
 
     # Alias for backward compatibility.
-    alias :convert_with_options :convert
+    alias convert_with_options convert
   end
 
   # A module that can be used to mix the {#write} method into a {Converter}

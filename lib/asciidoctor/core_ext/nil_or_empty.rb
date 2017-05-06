@@ -3,21 +3,21 @@
 # String, Array, Hash, and Numeric.
 
 class NilClass
-  alias :nil_or_empty? :nil? unless method_defined? :nil_or_empty?
+  alias nil_or_empty? nil? unless method_defined? :nil_or_empty?
 end
 
 class String
-  alias :nil_or_empty? :empty? unless method_defined? :nil_or_empty?
+  alias nil_or_empty? empty? unless method_defined? :nil_or_empty?
 end
 
 class Array
-  alias :nil_or_empty? :empty? unless method_defined? :nil_or_empty?
+  alias nil_or_empty? empty? unless method_defined? :nil_or_empty?
 end
 
 class Hash
-  alias :nil_or_empty? :empty? unless method_defined? :nil_or_empty?
+  alias nil_or_empty? empty? unless method_defined? :nil_or_empty?
 end
 
 class Numeric
-  alias :nil_or_empty? :nil? unless method_defined? :nil_or_empty?
+  alias nil_or_empty? nil? unless method_defined? :nil_or_empty?
 end
