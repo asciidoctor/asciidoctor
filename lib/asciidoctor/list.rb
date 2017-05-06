@@ -4,11 +4,11 @@ module Asciidoctor
 class List < AbstractBlock
 
   # Public: Create alias for blocks
-  alias :items :blocks
+  alias items blocks
   # Public: Get the items in this list as an Array
-  alias :content :blocks
+  alias content blocks
   # Public: Create alias to check if this list has blocks
-  alias :items? :blocks?
+  alias items? blocks?
 
   def initialize parent, context
     super
@@ -32,7 +32,7 @@ class List < AbstractBlock
   end
 
   # Alias render to convert to maintain backwards compatibility
-  alias :render :convert
+  alias render convert
 
   def to_s
     %(#<#{self.class}@#{object_id} {context: #{@context.inspect}, style: #{@style.inspect}, items: #{items.size}}>)
@@ -44,7 +44,7 @@ end
 class ListItem < AbstractBlock
 
   # A contextual alias for the list parent node; counterpart to the items alias on List
-  alias :list :parent
+  alias list parent
 
   # Public: Get/Set the String used to mark this list item
   attr_accessor :marker

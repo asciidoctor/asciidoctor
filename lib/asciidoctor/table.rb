@@ -14,7 +14,7 @@ class Table < AbstractBlock
       @body = body
     end
 
-    alias :[] :send
+    alias [] send
   end
 
   # Public: Get/Set the columns for this table
@@ -159,7 +159,7 @@ class Table::Column < AbstractNode
   end
 
   # Public: An alias to the parent block (which is always a Table)
-  alias :table :parent
+  alias table parent
 
   # Internal: Calculate and assign the widths (percentage and absolute) for this column
   #
@@ -194,7 +194,7 @@ class Table::Cell < AbstractNode
   attr_accessor :rowspan
 
   # Public: An alias to the parent block (which is always a Column)
-  alias :column :parent
+  alias column parent
 
   # Public: The internal Asciidoctor::Document for a cell that has the asciidoc style
   attr_reader :inner_document

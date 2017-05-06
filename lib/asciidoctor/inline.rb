@@ -39,6 +39,6 @@ class Inline < AbstractNode
   end
 
   # Alias render to convert to maintain backwards compatibility
-  alias :render :convert
+  alias render convert
 end
 end

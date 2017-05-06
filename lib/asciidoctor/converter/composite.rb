@@ -32,7 +32,7 @@ module Asciidoctor
     end
 
     # Alias for backward compatibility.
-    alias :convert_with_options :convert
+    alias convert_with_options convert
 
     # Public: Retrieve the converter for the specified transform.
     #

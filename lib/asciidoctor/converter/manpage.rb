@@ -197,7 +197,7 @@ Author(s).
       result * LF
     end
 
-    alias :audio :skip_with_warning
+    alias audio skip_with_warning
 
     def colist node
       result = []
@@ -258,7 +258,7 @@ T})
       %(.SS "#{manify node.title}")
     end
 
-    alias :image :skip_with_warning
+    alias image skip_with_warning
 
     def listing node
       result = []
@@ -329,7 +329,7 @@ T})
     end
 
     # TODO use Page Control https://www.gnu.org/software/groff/manual/html_node/Page-Control.html#Page-Control
-    alias :page_break :skip
+    alias page_break skip
 
     def paragraph node
       if node.title?
@@ -343,7 +343,7 @@ T})
       end
     end
 
-    alias :preamble :content
+    alias preamble content
 
     def quote node
       result = []
@@ -374,7 +374,7 @@ T})
       result * LF
     end
 
-    alias :sidebar :skip_with_warning
+    alias sidebar skip_with_warning
 
     def stem node
       title_element = node.title? ? %(.sp
@@ -524,7 +524,7 @@ allbox tab(:);'
 \l\'\n(.lu*25u/100u\(ap\''
     end
 
-    alias :toc :skip
+    alias toc skip
 
     def ulist node
       result = []

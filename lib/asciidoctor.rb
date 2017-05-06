@@ -1589,7 +1589,7 @@ module Asciidoctor
   end
 
   # Alias render to convert to maintain backwards compatibility
-  alias :render :convert
+  alias render convert
 
   # Public: Parse the contents of the AsciiDoc source file into an
   # Asciidoctor::Document and convert it to the specified backend format.
@@ -1606,7 +1606,7 @@ module Asciidoctor
   end
 
   # Alias render_file to convert_file to maintain backwards compatibility
-  alias :render_file :convert_file
+  alias render_file convert_file
 
   end
 

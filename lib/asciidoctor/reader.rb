@@ -19,7 +19,7 @@ class Reader
       %(#{path}: line #{lineno})
     end
 
-    alias :to_s :line_info
+    alias to_s line_info
   end
 
   attr_reader :file
@@ -233,7 +233,7 @@ class Reader
     end
     lines
   end
-  alias :readlines :read_lines
+  alias readlines read_lines
 
   # Public: Get the remaining lines of source data joined as a String.
   #
@@ -268,7 +268,7 @@ class Reader
     unshift line_to_restore
     nil
   end
-  alias :restore_line :unshift_line
+  alias restore_line unshift_line
 
   # Public: Push an Array of lines onto the front of the Array of source data.
   #
@@ -282,7 +282,7 @@ class Reader
     unshift_all lines_to_restore
     nil
   end
-  alias :restore_lines :unshift_lines
+  alias restore_lines unshift_lines
 
   # Public: Replace the next line with the specified line.
   #
@@ -299,7 +299,7 @@ class Reader
     nil
   end
   # deprecated
-  alias :replace_line :replace_next_line
+  alias replace_line replace_next_line
 
   # Public: Strip off leading blank lines in the Array of lines.
   #
@@ -400,7 +400,7 @@ class Reader
   def eof?
     !has_more_lines?
   end
-  alias :empty? :eof?
+  alias empty? eof?
 
   # Public: Return all the lines from `@lines` until we (1) run out them,
   #   (2) find a blank line with :break_on_blank_lines => true, or (3) find
@@ -529,7 +529,7 @@ class Reader
   def line_info
     %(#{@path}: line #{@lineno})
   end
-  alias :next_line_info :line_info
+  alias next_line_info line_info
 
   def prev_line_info
     %(#{@path}: line #{@lineno - 1})

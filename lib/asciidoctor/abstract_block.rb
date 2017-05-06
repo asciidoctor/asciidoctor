@@ -72,7 +72,7 @@ class AbstractBlock < AbstractNode
   end
 
   # Alias render to convert to maintain backwards compatibility
-  alias :render :convert
+  alias render convert
 
   # Public: Get the converted result of the child blocks by converting the
   # children appropriate to content model that this block supports.
@@ -177,7 +177,7 @@ class AbstractBlock < AbstractNode
   end
 
   # NOTE append alias required for adapting to a Java API
-  alias :append :<<
+  alias append <<
 
   # Public: Get the Array of child Section objects
   #
@@ -308,7 +308,7 @@ class AbstractBlock < AbstractNode
     end
     result
   end
-  alias :query :find_by
+  alias query find_by
 
   # Public: Remove a substitution from this block
   #

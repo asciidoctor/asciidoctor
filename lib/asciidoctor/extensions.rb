@@ -73,8 +73,8 @@ module Extensions
           extend const_get :DSL if constants.grep :DSL
         end
       end
-      alias :extend_dsl :use_dsl
-      alias :include_dsl :use_dsl
+      alias extend_dsl use_dsl
+      alias include_dsl use_dsl
     end
 
     # Public: Get the configuration Hash for this processor instance.
@@ -191,21 +191,21 @@ module Extensions
       end
     end
     # NOTE match_name may get deprecated
-    alias :match_name :named
+    alias match_name named
 
     def content_model value
       option :content_model, value
     end
-    alias :parse_content_as :content_model
-    alias :parses_content_as :content_model
-    #alias :parse_as :content_model
-    #alias :parsed_as :content_model
+    alias parse_content_as content_model
+    alias parses_content_as content_model
+    #alias parse_as content_model
+    #alias parsed_as content_model
 
     def positional_attrs *value
       option :pos_attrs, value.flatten
     end
-    alias :name_attributes :positional_attrs
-    alias :name_positional_attributes :positional_attrs
+    alias name_attributes positional_attrs
+    alias name_positional_attributes positional_attrs
 
     def default_attrs value
       option :default_attrs, value
@@ -258,7 +258,7 @@ module Extensions
       end
     end
     # NOTE we may decide to drop this alias
-    alias :resolve_attributes :resolves_attributes
+    alias resolve_attributes resolves_attributes
   end
 
   # Public: Preprocessors are run after the source text is split into lines and
@@ -445,9 +445,9 @@ module Extensions
     def contexts *value
       option :contexts, value.flatten
     end
-    alias :on_contexts :contexts
-    alias :on_context :contexts
-    alias :bound_to :contexts
+    alias on_contexts contexts
+    alias on_context contexts
+    alias bound_to contexts
   end
   BlockProcessor::DSL = BlockProcessorDsl
 
@@ -477,7 +477,7 @@ module Extensions
       option :content_model, :attributes
     end
     # NOTE we may decide to drop this alias
-    alias :resolve_attributes :resolves_attributes
+    alias resolve_attributes resolves_attributes
   end
 
   # Public: BlockMacroProcessors are used to handle block macros that have a
@@ -517,13 +517,13 @@ module Extensions
     def with_format value
       option :format, value
     end
-    alias :using_format :with_format
+    alias using_format with_format
 
     def matches value
       option :regexp, value
     end
-    alias :match :matches
-    alias :matching :matches
+    alias match matches
+    alias matching matches
   end
   InlineMacroProcessor::DSL = InlineMacroProcessorDsl
 
@@ -1328,7 +1328,7 @@ module Extensions
       end
     end
     # Deprecated: Use create instead of build_registry
-    alias :build_registry :create
+    alias build_registry create
 
     # Public: Registers an extension Group that subsequently registers a
     # collection of extensions.
