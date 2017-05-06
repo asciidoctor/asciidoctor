@@ -34,6 +34,10 @@ context 'Links' do
     assert_xpath "//a[@href='http://asciidoc.org'][text() = '[Ascii]Doc']", render_string("We're parsing http://asciidoc.org[[Ascii\\]Doc] markup")
   end
 
+  test 'qualified url with backslash label' do
+    assert_xpath "//a[@href='https://google.com'][text() = 'Google for \\']", render_string("I advise you to https://google.com[Google for +\\+]")
+  end
+
   test 'qualified url with label using link macro' do
     assert_xpath "//a[@href='http://asciidoc.org'][text() = 'AsciiDoc']", render_string("We're parsing link:http://asciidoc.org[AsciiDoc] markup")
   end

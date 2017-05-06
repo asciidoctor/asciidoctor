@@ -901,7 +901,7 @@ module Substitutors
     end
 
     if result.include? '@'
-      result = result.gsub(EmailInlineMacroRx) {
+      result = result.gsub(EmailInlineRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         address = m[0]

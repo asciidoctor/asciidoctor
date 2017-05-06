@@ -364,8 +364,8 @@ module Asciidoctor
   # contents between square brackets, ignoring escaped closing brackets
   # (closing brackets prefixed with a backslash '\' character)
   #
-  #   Pattern: (?:\[((?:\\\]|[^\]])*?)\])
-  #   Matches: [enclosed text here] or [enclosed [text\] here]
+  #   Pattern: \[(|.*?[^\\])\]
+  #   Matches: [enclosed text] and [enclosed [text\]], not [enclosed text \\] or [\\] (as these require a trailing space)
   #
   #(pseudo)module Rx
 
@@ -473,7 +473,7 @@ module Asciidoctor
     #   include::chapter1.ad[]
     #   include::example.txt[lines=1;2;5..10]
     #
-    IncludeDirectiveRx = /^(\\)?include::([^\[]+)\[(.*?)\]$/
+    IncludeDirectiveRx = /^(\\)?include::(.+?)\[(.*)\]$/
 
     # Matches a trailing tag directive in an include file.
     #
@@ -790,7 +790,7 @@ module Asciidoctor
     #
     #--
     # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
-    GenericBlockMacroRx = /^(#{CG_WORD}+)::(\S*?)\[((?:\\\]|[^\]])*?)\]$/
+    GenericBlockMacroRx = /^(#{CG_WORD}+)::(\S*?)\[(.*)\]$/
 
     # Matches an image, video or audio block macro.
     #
@@ -799,7 +799,7 @@ module Asciidoctor
     #   image::filename.png[Caption]
     #   video::http://youtube.com/12345[Cats vs Dogs]
     #
-    MediaBlockMacroRx = /^(image|video|audio)::(.+?)\[((?:\\\]|[^\]])*?)\]$/
+    MediaBlockMacroRx = /^(image|video|audio)::(.+?)\[(.*)\]$/
 
     # Matches the TOC block macro.
     #
@@ -808,7 +808,7 @@ module Asciidoctor
     #   toc::[]
     #   toc::[levels=2]
     #
-    TocBlockMacroRx = /^toc::\[(.*?)\]$/
+    TocBlockMacroRx = /^toc::\[(.*)\]$/
 
     ## Inline macros
 
@@ -835,7 +835,7 @@ module Asciidoctor
     #
     #   doc.writer@example.com
     #
-    EmailInlineMacroRx = /([\\>:\/])?#{CG_WORD}[#{CC_WORD}.%+-]*@#{CG_ALNUM}[#{CC_ALNUM}.-]*\.#{CG_ALPHA}{2,4}\b/
+    EmailInlineRx = /([\\>:\/])?#{CG_WORD}[#{CC_WORD}.%+-]*@#{CG_ALNUM}[#{CC_ALNUM}.-]*\.#{CG_ALPHA}{2,4}\b/
 
     # Matches an inline footnote macro, which is allowed to span multiple lines.
     #
@@ -855,7 +855,7 @@ module Asciidoctor
     #   image:filename.png[More [Alt\] Text] (alt text becomes "More [Alt] Text")
     #   icon:github[large]
     #
-    ImageInlineMacroRx = /\\?(?:image|icon):([^:\[][^\[]*)\[((?:\\\]|[^\]])*?)\]/
+    ImageInlineMacroRx = /\\?i(?:mage|con):([^:\[].*?)\[(|#{CC_ALL}*?[^\\])\]/m
 
     # Matches an indexterm inline macro, which may span multiple lines.
     #
@@ -878,7 +878,7 @@ module Asciidoctor
     #   kbd:[Ctrl,T]
     #   btn:[Save]
     #
-    KbdBtnInlineMacroRx = /\\?(?:kbd|btn):\[((?:\\\]|[^\]])+?)\]/
+    KbdBtnInlineMacroRx = /\\?(?:kbd|btn):\[(.*?[^\\])\]/
 
     # Matches the delimiter used for kbd value.
     #
@@ -897,7 +897,7 @@ module Asciidoctor
     #   http://github.com[GitHub]
     #
     # FIXME revisit! the main issue is we need different rules for implicit vs explicit
-    LinkInlineRx = %r{(^|link:|&lt;|[\s>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[((?:\\\]|[^\]])*?)\])?}
+    LinkInlineRx = %r{(^|link:|&lt;|[\s>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[(|#{CC_ALL}*?[^\\])\])?}m
 
     # Match a link or e-mail inline macro.
     #
@@ -906,7 +906,7 @@ module Asciidoctor
     #   link:path[label]
     #   mailto:doc.writer@example.com[]
     #
-    LinkInlineMacroRx = /\\?(?:link|mailto):([^\s\[]+)(?:\[((?:\\\]|[^\]])*?)\])/
+    LinkInlineMacroRx = /\\?(?:link|mailto):([^\s\[]\S*?)\[(|#{CC_ALL}*?[^\\])\]/m
 
     # Matches the name of a macro.
     #
