@@ -195,7 +195,7 @@ class Parser
     if is_next_line_section?(reader, {})
       name_section = initialize_section(reader, document, {})
       if name_section.level == 1
-        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join(' ').tr_s(' ', ' ')
+        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join(' ').squeeze(' ')
         if (m = ManpageNamePurposeRx.match(name_section_buffer))
           document.attributes['manname'] = document.sub_attributes m[1]
           document.attributes['manpurpose'] = m[2]
@@ -1934,7 +1934,7 @@ class Parser
       if names_only
         # NOTE split names and collapse repeating whitespace
         if (segments = author_entry.split nil, 3).size == 3
-          segments << (segments.pop.tr_s ' ', ' ')
+          segments << (segments.pop.squeeze ' ')
         end
       elsif (match = AuthorInfoLineRx.match(author_entry))
         segments = match.to_a
@@ -1959,7 +1959,7 @@ class Parser
         end
         author_metadata[key_map[:email]] = segments[3] unless names_only || !segments[3]
       else
-        author_metadata[key_map[:author]] = author_metadata[key_map[:firstname]] = fname = author_entry.strip.tr_s(' ', ' ')
+        author_metadata[key_map[:author]] = author_metadata[key_map[:firstname]] = fname = author_entry.squeeze(' ').strip
         author_metadata[key_map[:authorinitials]] = fname.chr
       end
 

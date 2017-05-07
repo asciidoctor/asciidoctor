@@ -45,7 +45,7 @@ class Document < AbstractBlock
     def initialize val, opts = {}
       # TODO separate sanitization by type (:cdata for HTML/XML, :plain_text for non-SGML, false for none)
       if (@sanitized = opts[:sanitize]) && val.include?('<')
-        val = val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
+        val = val.gsub(XmlSanitizeRx, '').squeeze(' ').strip
       end
       if (sep = opts[:separator] || ':').empty? || !val.include?(sep = %(#{sep} ))
         @main = val
@@ -650,7 +650,7 @@ class Document < AbstractBlock
     if (separator = opts[:partition])
       Title.new val, opts.merge({ :separator => (separator == true ? @attributes['title-separator'] : separator) })
     elsif opts[:sanitize] && val.include?('<')
-      val.gsub(XmlSanitizeRx, '').tr_s(' ', ' ').strip
+      val.gsub(XmlSanitizeRx, '').squeeze(' ').strip
     else
       val
     end

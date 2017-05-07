@@ -516,8 +516,8 @@ class Table::ParserContext
             cell_text = cell_text[1...-1].strip
           end
 
-          # collapses escaped quotes
-          cell_text = cell_text.tr_s('"', '"')
+          # collapse escaped quotes
+          cell_text = cell_text.squeeze('"')
         end
       end
     end
