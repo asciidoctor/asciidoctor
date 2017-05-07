@@ -266,12 +266,12 @@ module Extensions
   #
   # Prior to invoking the preprocessor, Asciidoctor splits the source text into
   # lines and normalizes them. The normalize process strips trailing whitespace
-  # from each line and leaves behind a line-feed character (i.e., "\n").
+  # and the end of line character sequence from each line.
   #
-  # Asciidoctor passes a reference to the Reader and a copy of the lines Array
-  # to the {Processor#process} method of an instance of each registered
-  # Preprocessor. The Preprocessor modifies the Array as necessary and either
-  # returns a reference to the same Reader or a reference to a new Reader.
+  # Asciidoctor passes the document and the document's Reader to the
+  # {Processor#process} method of the Preprocessor instance. The Preprocessor
+  # can modify the Reader as necessary and either return the same Reader (or
+  # falsy, which is equivalent) or a reference to a substitute Reader.
   #
   # Preprocessor implementations must extend the Preprocessor class.
   class Preprocessor < Processor
@@ -653,7 +653,7 @@ module Extensions
     #
     #   # as a method block
     #   preprocessor do
-    #     process |reader, lines|
+    #     process |doc, reader|
     #       ...
     #     end
     #   end
