@@ -16,11 +16,13 @@ end
 class SampleDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
 end
 
+# NOTE intentionally using the deprecated name
 class SampleTreeprocessor < Asciidoctor::Extensions::Treeprocessor
   def process document
     nil
   end
 end
+SampleTreeProcessor = SampleTreeprocessor
 
 class SamplePostprocessor < Asciidoctor::Extensions::Postprocessor
 end
@@ -63,7 +65,7 @@ class BoilerplateTextIncludeProcessor < Asciidoctor::Extensions::IncludeProcesso
   end
 end
 
-class ReplaceAuthorTreeprocessor < Asciidoctor::Extensions::Treeprocessor
+class ReplaceAuthorTreeProcessor < Asciidoctor::Extensions::TreeProcessor
   def process document
     document.attributes['firstname'] = 'Ghost'
     document.attributes['author'] = 'Ghost Writer'
@@ -71,7 +73,7 @@ class ReplaceAuthorTreeprocessor < Asciidoctor::Extensions::Treeprocessor
   end
 end
 
-class ReplaceTreeTreeprocessor < Asciidoctor::Extensions::Treeprocessor
+class ReplaceTreeTreeProcessor < Asciidoctor::Extensions::TreeProcessor
   def process document
     if document.doctitle == 'Original Document'
       Asciidoctor.load %(== Replacement Document\nReplacement Author\n\ncontent)
@@ -358,7 +360,8 @@ context 'Extensions' do
       assert extensions.first.process_method.is_a? ::Method
     end
 
-    test 'should instantiate treeprocessors' do
+    # NOTE intentionally using the legacy names
+    test 'should instantiate tree processors' do
       registry = Asciidoctor::Extensions::Registry.new
       registry.treeprocessor SampleTreeprocessor
       registry.activate Asciidoctor::Document.new
@@ -439,25 +442,25 @@ context 'Extensions' do
   context 'Integration' do
     test 'can provide extension registry as option' do
       registry = Asciidoctor::Extensions.create do
-        treeprocessor SampleTreeprocessor 
+        tree_processor SampleTreeProcessor 
       end
 
       doc = document_from_string %(= Document Title\n\ncontent), :extension_registry => registry
       refute_nil doc.extensions
       assert_equal 1, doc.extensions.groups.size
-      assert doc.extensions.treeprocessors?
-      assert_equal 1, doc.extensions.treeprocessors.size
+      assert doc.extensions.tree_processors?
+      assert_equal 1, doc.extensions.tree_processors.size
       assert_equal 0, Asciidoctor::Extensions.groups.size
     end
 
     test 'can provide extensions proc as option' do
       doc = document_from_string %(= Document Title\n\ncontent), :extensions => proc {
-        treeprocessor SampleTreeprocessor 
+        tree_processor SampleTreeProcessor 
       }
       refute_nil doc.extensions
       assert_equal 1, doc.extensions.groups.size
-      assert doc.extensions.treeprocessors?
-      assert_equal 1, doc.extensions.treeprocessors.size
+      assert doc.extensions.tree_processors?
+      assert_equal 1, doc.extensions.tree_processors.size
       assert_equal 0, Asciidoctor::Extensions.groups.size
     end
 
@@ -546,7 +549,7 @@ last line
       assert_match(/^middle line$/, source)
     end
 
-    test 'should invoke treeprocessors after parsing document' do
+    test 'should invoke tree processors after parsing document' do
       input = <<-EOS
 = Document Title
 Doc Writer
@@ -556,7 +559,7 @@ content
 
       begin
         Asciidoctor::Extensions.register do
-          treeprocessor ReplaceAuthorTreeprocessor
+          tree_processor ReplaceAuthorTreeProcessor
         end
 
         doc = document_from_string input
@@ -566,7 +569,7 @@ content
       end
     end
 
-    test 'should allow treeprocessor to replace tree' do
+    test 'should allow tree processor to replace tree' do
       input = <<-EOS
 = Original Document
 Doc Writer
@@ -576,7 +579,7 @@ content
 
       begin
         Asciidoctor::Extensions.register do
-          treeprocessor ReplaceTreeTreeprocessor
+          tree_processor ReplaceTreeTreeProcessor
         end
 
         doc = document_from_string input
@@ -586,7 +589,7 @@ content
       end
     end
 
-    test 'should honor block title assigned in treeprocessor' do
+    test 'should honor block title assigned in tree processor' do
       input = <<-EOS
 = Document Title
 :!example-caption:
@@ -600,7 +603,7 @@ example block content
       old_title = nil
       begin
         Asciidoctor::Extensions.register do
-          treeprocessor do
+          tree_processor do
             process do |doc|
               ex = (doc.find_by :context => :example)[0]
               old_title = ex.title

@@ -11,7 +11,7 @@ module Asciidoctor
 # 2. The Parser parses the block-level content into an abstract syntax tree.
 #    Custom blocks and block macros are processed by associated {BlockProcessor}s
 #    and {BlockMacroProcessor}s, respectively.
-# 3. {Treeprocessor}s are run on the abstract syntax tree.
+# 3. {TreeProcessor}s are run on the abstract syntax tree.
 # 4. Conversion of the document begins, at which point inline markup is processed
 #    and converted. Custom inline macros are processed by associated {InlineMacroProcessor}s.
 # 5. {Postprocessor}s modify or replace the converted document.
@@ -281,22 +281,25 @@ module Extensions
   end
   Preprocessor::DSL = ProcessorDsl
 
-  # Public: Treeprocessors are run on the Document after the source has been
+  # Public: TreeProcessors are run on the Document after the source has been
   # parsed into an abstract syntax tree (AST), as represented by the Document
   # object and its child Node objects (e.g., Section, Block, List, ListItem).
   #
   # Asciidoctor invokes the {Processor#process} method on an instance of each
-  # registered Treeprocessor.
+  # registered TreeProcessor.
   #
-  # Treeprocessor implementations must extend Treeprocessor.
+  # TreeProcessor implementations must extend TreeProcessor.
   #--
-  # QUESTION should the treeprocessor get invoked after parse header too?
-  class Treeprocessor < Processor
+  # QUESTION should the tree processor get invoked after parse header too?
+  class TreeProcessor < Processor
     def process document
-      raise ::NotImplementedError, %(Asciidoctor::Extensions::Treeprocessor subclass must implement ##{__method__} method)
+      raise ::NotImplementedError, %(Asciidoctor::Extensions::TreeProcessor subclass must implement ##{__method__} method)
     end
   end
-  Treeprocessor::DSL = ProcessorDsl
+  TreeProcessor::DSL = ProcessorDsl
+
+  # Alias deprecated class name for backwards compatibility
+  Treeprocessor = TreeProcessor
 
   # Public: Postprocessors are run after the document is converted, but before
   # it is written to the output stream.
@@ -593,7 +596,7 @@ module Extensions
 
     def initialize groups = {}
       @groups = groups
-      @preprocessor_extensions = @treeprocessor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions = nil
+      @preprocessor_extensions = @tree_processor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions = nil
       @block_extensions = @block_macro_extensions = @inline_macro_extensions = nil
       @document = nil
     end
@@ -676,57 +679,62 @@ module Extensions
       @preprocessor_extensions
     end
 
-    # Public: Registers a {Treeprocessor} with the extension registry to process
+    # Public: Registers a {TreeProcessor} with the extension registry to process
     # the AsciiDoc source after parsing is complete.
     #
-    # The Treeprocessor may be one of four types:
+    # The TreeProcessor may be one of four types:
     #
-    # * A Treeprocessor subclass
-    # * An instance of a Treeprocessor subclass
-    # * The String name of a Treeprocessor subclass
-    # * A method block (i.e., Proc) that conforms to the Treeprocessor contract
+    # * A TreeProcessor subclass
+    # * An instance of a TreeProcessor subclass
+    # * The String name of a TreeProcessor subclass
+    # * A method block (i.e., Proc) that conforms to the TreeProcessor contract
     #
-    # Unless the Treeprocessor is passed as the method block, it must be the
+    # Unless the TreeProcessor is passed as the method block, it must be the
     # first argument to this method.
     #
     # Examples
     #
-    #   # as a Treeprocessor subclass
-    #   treeprocessor ShellTreeprocessor
+    #   # as a TreeProcessor subclass
+    #   tree_processor ShellTreeProcessor
     #
-    #   # as an instance of a Treeprocessor subclass
-    #   treeprocessor ShellTreeprocessor.new
+    #   # as an instance of a TreeProcessor subclass
+    #   tree_processor ShellTreeProcessor.new
     #
-    #   # as a name of a Treeprocessor subclass
-    #   treeprocessor 'ShellTreeprocessor'
+    #   # as a name of a TreeProcessor subclass
+    #   tree_processor 'ShellTreeProcessor'
     #
     #   # as a method block
-    #   treeprocessor do
+    #   tree_processor do
     #     process |document|
     #       ...
     #     end
     #   end
     #
     # Returns the [Extension] stored in the registry that proxies the
-    # instance of this Treeprocessor.
-    def treeprocessor *args, &block
-      add_document_processor :treeprocessor, args, &block
+    # instance of this TreeProcessor.
+    def tree_processor *args, &block
+      add_document_processor :tree_processor, args, &block
     end
 
-    # Public: Checks whether any {Treeprocessor} extensions have been registered.
+    # Public: Checks whether any {TreeProcessor} extensions have been registered.
     #
-    # Returns a [Boolean] indicating whether any Treeprocessor extensions are registered.
-    def treeprocessors?
-      !!@treeprocessor_extensions
+    # Returns a [Boolean] indicating whether any TreeProcessor extensions are registered.
+    def tree_processors?
+      !!@tree_processor_extensions
     end
 
     # Public: Retrieves the {Extension} proxy objects for all
-    # Treeprocessor instances in this registry.
+    # TreeProcessor instances in this registry.
     #
     # Returns an [Array] of Extension proxy objects.
-    def treeprocessors
-      @treeprocessor_extensions
+    def tree_processors
+      @tree_processor_extensions
     end
+
+    # Alias deprecated methods for backwards compatibility
+    alias treeprocessor tree_processor
+    alias treeprocessors? tree_processors?
+    alias treeprocessors tree_processors
 
     # Public: Registers a {Postprocessor} with the extension registry to process
     # the output after conversion is complete.

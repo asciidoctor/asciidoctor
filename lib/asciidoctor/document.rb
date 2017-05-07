@@ -490,8 +490,8 @@ class Document < AbstractBlock
       # should we call sort of post-parse function?
       restore_attributes
 
-      if exts && exts.treeprocessors?
-        exts.treeprocessors.each do |ext|
+      if exts && exts.tree_processors?
+        exts.tree_processors.each do |ext|
           if (result = ext.process_method[doc]) && Document === result && result != doc
             doc = result
           end
@@ -708,7 +708,7 @@ class Document < AbstractBlock
   # Internal: called after the header has been parsed and before the content
   # will be parsed.
   #--
-  # QUESTION should we invoke the Treeprocessors here, passing in a phase?
+  # QUESTION should we invoke the TreeProcessors here, passing in a phase?
   # QUESTION is finalize_header the right name?
   def finalize_header unrooted_attributes, header_valid = true
     clear_playback_attributes unrooted_attributes
