@@ -1360,6 +1360,13 @@ EOS
       assert_equal '<strong><html5></strong>', result
     end
 
+    test 'should allow content of inline pass macro to be empty' do
+      para = block_from_string 'pass:[]'
+      result = para.extract_passthroughs para.source
+      assert_equal 1, para.passthroughs.size
+      assert_equal '', para.restore_passthroughs(result)
+    end
+
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs without subs' do
       para = block_from_string("some #{Asciidoctor::Substitutors::PASS_START}" + '0' + "#{Asciidoctor::Substitutors::PASS_END} to study")

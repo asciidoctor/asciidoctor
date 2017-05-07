@@ -167,14 +167,7 @@ module Substitutors
       m = $~
       preceding = nil
 
-      if (boundary = m[4]).nil_or_empty? # pass:[]
-        if m[6] == '\\'
-          # NOTE we don't look for nested pass:[] macros
-          next m[0][1..-1]
-        end
-
-        @passthroughs[pass_key = @passthroughs.size] = {:text => (unescape_brackets m[8]), :subs => (m[7].nil_or_empty? ? [] : (resolve_pass_subs m[7]))}
-      else # $$, ++ or +++
+      if (boundary = m[4]) # $$, ++, or +++
         # skip ++ in compat mode, handled as normal quoted text
         if compat_mode && boundary == '++'
           next m[2].nil_or_empty? ?
@@ -217,6 +210,13 @@ module Substitutors
         else
           @passthroughs[pass_key] = {:text => content, :subs => subs}
         end
+      else # pass:[]
+        if m[6] == '\\'
+          # NOTE we don't look for nested pass:[] macros
+          next m[0][1..-1]
+        end
+
+        @passthroughs[pass_key = @passthroughs.size] = {:text => (unescape_brackets m[8]), :subs => (m[7].nil_or_empty? ? [] : (resolve_pass_subs m[7]))}
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
