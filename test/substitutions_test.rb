@@ -627,10 +627,21 @@ context 'Substitutions' do
       assert_equal %{<a href="http://google.com">Google\nHomepage</a>}, para.sub_macros(para.source)
     end
 
-    test 'a multi-line raw url with attribute as text should be interpreted as a link with resolved attribute' do
+    test 'a single-line raw url with attribute as text should be interpreted as a link with resolved attribute' do
       para = block_from_string("http://google.com[{google_homepage}]")
       para.document.attributes['google_homepage'] = 'Google Homepage'
-      assert_equal %q{<a href="http://google.com">Google Homepage</a>}, para.sub_macros(para.source)
+      assert_equal %q{<a href="http://google.com">Google Homepage</a>}, para.sub_macros(para.sub_attributes(para.source))
+    end
+
+    test 'should not resolve an escaped attribute in link text' do
+      {
+        'http://google.com' => "http://google.com[#{BACKSLASH}{google_homepage}]",
+        'http://google.com?q=,' => "link:http://google.com?q=,[#{BACKSLASH}{google_homepage}]"
+      }.each do |uri, macro|
+        para = block_from_string macro
+        para.document.attributes['google_homepage'] = 'Google Homepage'
+        assert_equal %(<a href="#{uri}">{google_homepage}</a>), para.sub_macros(para.sub_attributes(para.source))
+      end
     end
 
     test 'a single-line escaped raw url should not be interpreted as a link' do
