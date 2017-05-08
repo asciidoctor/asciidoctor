@@ -1913,7 +1913,7 @@ class Parser
   #                semicolon-separated entries in the author line (default: true)
   #
   # returns a Hash of author metadata
-  def self.process_authors(author_line, names_only = false, multiple = true)
+  def self.process_authors author_line, names_only = false, multiple = true
     author_metadata = {}
     keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
     author_entries = multiple ? (author_line.split ';').map {|it| it.strip } : Array(author_line)
@@ -1931,32 +1931,36 @@ class Parser
       end
 
       segments = nil
-      if names_only
-        # NOTE split names and collapse repeating whitespace
+      if names_only # when parsing an attribute value
+        # QUESTION should we rstrip author_entry?
+        if author_entry.include? '<'
+          author_metadata[key_map[:author]] = author_entry.tr('_', ' ')
+          author_entry = author_entry.gsub XmlSanitizeRx, ''
+        end
+        # NOTE split names and collapse repeating whitespace (split drops any leading whitespace)
         if (segments = author_entry.split nil, 3).size == 3
           segments << (segments.pop.squeeze ' ')
         end
       elsif (match = AuthorInfoLineRx.match(author_entry))
-        segments = match.to_a
-        segments.shift
+        (segments = match.to_a).shift
       end
 
       if segments
-        author_metadata[key_map[:firstname]] = fname = segments[0].tr('_', ' ')
-        author_metadata[key_map[:author]] = fname
+        author = author_metadata[key_map[:firstname]] = fname = segments[0].tr('_', ' ')
         author_metadata[key_map[:authorinitials]] = fname.chr
         if segments[1]
           if segments[2]
             author_metadata[key_map[:middlename]] = mname = segments[1].tr('_', ' ')
             author_metadata[key_map[:lastname]] = lname = segments[2].tr('_', ' ')
-            author_metadata[key_map[:author]] = [fname, mname, lname].join ' '
+            author = fname + ' ' + mname + ' ' + lname
             author_metadata[key_map[:authorinitials]] = %(#{fname.chr}#{mname.chr}#{lname.chr})
           else
             author_metadata[key_map[:lastname]] = lname = segments[1].tr('_', ' ')
-            author_metadata[key_map[:author]] = [fname, lname].join ' '
+            author = fname + ' ' + lname
             author_metadata[key_map[:authorinitials]] = %(#{fname.chr}#{lname.chr})
           end
         end
+        author_metadata[key_map[:author]] ||= author
         author_metadata[key_map[:email]] = segments[3] unless names_only || !segments[3]
       else
         author_metadata[key_map[:author]] = author_metadata[key_map[:firstname]] = fname = author_entry.squeeze(' ').strip

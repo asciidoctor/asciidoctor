@@ -1494,6 +1494,18 @@ content
       assert_xpath '//articleinfo/authorinitials[text() = "DW"]', output, 1
     end
 
+    test 'should sanitize content of HTML meta authors tag' do
+      input = <<-EOS
+= Document Title
+:author: pass:n[http://example.org/community/team.html[Ze *Product* team]]
+
+content
+      EOS
+
+      output = render_string input
+      assert_xpath '//meta[@name="author"][@content="Ze Product team"]', output, 1
+    end
+
     test 'should include multiple authors in HTML output' do
       input = <<-EOS
 = Document Title

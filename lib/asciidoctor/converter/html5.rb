@@ -49,7 +49,7 @@ module Asciidoctor
       result << %(<meta name="application-name" content="#{node.attr 'app-name'}"#{slash}>) if node.attr? 'app-name'
       result << %(<meta name="description" content="#{node.attr 'description'}"#{slash}>) if node.attr? 'description'
       result << %(<meta name="keywords" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
-      result << %(<meta name="author" content="#{node.attr 'authors'}"#{slash}>) if node.attr? 'authors'
+      result << %(<meta name="author" content="#{((authors = node.attr 'authors').include? '<') ? (authors.gsub XmlSanitizeRx, '') : authors}"#{slash}>) if node.attr? 'authors'
       result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
       result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
 

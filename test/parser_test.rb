@@ -492,6 +492,19 @@ Kismet Chameleon; Johnny Bravo; Lazarus het_Draeke
     assert_equal 'het Draeke', doc.attributes['lastname_3']
   end
 
+  test 'removes formatting before partitioning author defined using author attribute' do
+    input = <<-EOS
+:author: pass:n[http://example.org/community/team.html[Ze_**Project** team]]
+    EOS
+
+    doc = empty_document
+    parse_header_metadata input, doc
+    assert_equal 1, doc.attributes['authorcount']
+    assert_equal '<a href="http://example.org/community/team.html">Ze <strong>Project</strong> team</a>', doc.attributes['authors']
+    assert_equal 'Ze Project', doc.attributes['firstname']
+    assert_equal 'team', doc.attributes['lastname']
+  end
+
   test "parse rev number date remark" do
     input = <<-EOS
 Ryan Waldron
