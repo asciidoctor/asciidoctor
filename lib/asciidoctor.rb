@@ -622,16 +622,6 @@ module Asciidoctor
     # The name cannot begin with a dot and has at least one alphanumeric character.
     SetextSectionTitleRx = /^((?=.*#{CG_WORD}+.*)[^.].*?)$/
 
-    # Matches the underline in a two-line (Setext-style) section title.
-    #
-    # Examples
-    #
-    #   ====== || ------ || ~~~~~~ || ^^^^^^ || ++++++
-    #
-    # NOTE Asciidoctor permits a single character underline (like Markdown); AsciiDoc Python requires at least 2 characters.
-    #
-    #SetextSectionLineRx = /^(?:=+|-+|~+|\^+|\++)$/
-
     # Matches an anchor (i.e., id + optional reference text) inside a section title.
     #
     # Examples
@@ -1045,16 +1035,6 @@ module Asciidoctor
     #
     DataDelimiterRx = /[,;]/
 
-    # Matches multiple lines of text enclosed in double quotes, capturing the quote char and text.
-    #
-    # Examples
-    #
-    #   "I am a run-on sentence and I like
-    #   to take up multiple lines and I
-    #   still want to be matched."
-    #
-    DoubleQuotedMultiRx = /^("|)(#{CC_ALL}*)\1$/m
-
     # Matches one or more consecutive digits at the end of a line.
     #
     # Examples
@@ -1114,43 +1094,6 @@ module Asciidoctor
 
     # Detects XML tags
     XmlSanitizeRx = /<[^>]+>/
-
-    # Unused
-
-    # Matches an AsciiDoc horizontal rule or AsciiDoc page break.
-    #
-    # Examples
-    #
-    #   ''' (horizontal rule)
-    #   <<< (page break)
-    #
-    #LayoutBreakRx = /^(?:'{3,}|<{3,})$/
-
-    # Matches a single-line of text enclosed in double quotes, capturing the quote char and text.
-    #
-    # Examples
-    #
-    #   "Who goes there?"
-    #
-    #DoubleQuotedRx = /^("|)(.*)\1$/
-
-    # Matches an escaped single quote within a word
-    #
-    # Examples
-    #
-    #   Here\'s Johnny!
-    #
-    #EscapedSingleQuoteRx = /(#{CG_WORD})\\'(#{CG_WORD})/
-    # an alternative if our backend generates single-quoted html/xml attributes
-    #EscapedSingleQuoteRx = /(#{CG_WORD}|=)\\'(#{CG_WORD})/
-
-    # Matches whitespace at the beginning of the line
-    #LeadingSpacesRx = /^(#{CG_BLANK}*)/
-
-    # Matches parent directory references at the beginning of a path
-    #LeadingParentDirsRx = /^(?:\.\.\/)*/
-
-    #StripLineWise = /\A(?:\s*\n)?(#{CC_ALL}*?)\s*\z/m
   #end
 
   INTRINSIC_ATTRIBUTES = {
