@@ -635,6 +635,7 @@ module Substitutors
             content = unescape_bracketed_text content
             if extconf[:content_model] == :attributes
               # QUESTION should we store the text in the _text key?
+              # QUESTION why is the sub_result option false? why isn't the unescape_input option true?
               parse_attributes content, extconf[:pos_attrs] || [], :sub_result => false, :into => attributes
             else
               attributes['text'] = content
@@ -657,19 +658,14 @@ module Substitutors
           next m[0][1..-1]
         end
 
-        raw_attrs = unescape_bracketed_text m[2]
         if m[0].start_with? 'icon:'
-          type = 'icon'
-          posattrs = ['size']
+          type, posattrs = 'icon', ['size']
         else
-          type = 'image'
-          posattrs = ['alt', 'width', 'height']
+          type, posattrs = 'image', ['alt', 'width', 'height']
         end
-        target = sub_attributes(m[1])
-        unless type == 'icon'
-          @document.register(:images, target)
-        end
-        attrs = parse_attributes(raw_attrs, posattrs)
+        target = m[1]
+        @document.register(:images, target) unless type == 'icon'
+        attrs = parse_attributes(m[2], posattrs, :unescape_input => true)
         attrs['alt'] ||= Helpers.basename(target, true).tr('_-', ' ')
         Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
       }
@@ -780,16 +776,15 @@ module Substitutors
 
         link_opts = { :type => :link, :target => target }
         attrs = nil
-        #text = m[3] ? sub_attributes(m[3].gsub('\]', ']')) : ''
         if m[3].nil_or_empty?
           text = ''
         else
           if use_link_attrs && (m[3].start_with?('"') || (m[3].include?(',') && m[3].include?('=')))
-            attrs = parse_attributes(sub_attributes(m[3].gsub('\]', ']')), [])
+            attrs = parse_attributes(m[3].gsub('\]', ']'), [])
             link_opts[:id] = (attrs.delete 'id') if attrs.key? 'id'
             text = attrs[1] || ''
           else
-            text = sub_attributes(m[3].gsub('\]', ']'))
+            text = m[3].gsub('\]', ']')
           end
 
           # TODO enable in Asciidoctor 1.5.1
@@ -841,9 +836,8 @@ module Substitutors
 
         link_opts = { :type => :link, :target => target }
         attrs = nil
-        #text = sub_attributes(m[2].gsub('\]', ']'))
-        text = if use_link_attrs && (m[2].start_with?('"') || m[2].include?(','))
-          attrs = parse_attributes(sub_attributes(m[2].gsub('\]', ']')), [])
+        if use_link_attrs && (m[2].start_with?('"') || m[2].include?(','))
+          attrs = parse_attributes(m[2].gsub('\]', ']'), [])
           link_opts[:id] = (attrs.delete 'id') if attrs.key? 'id'
           if mailto
             if attrs.key? 2
@@ -854,9 +848,9 @@ module Substitutors
               end
             end
           end
-          attrs[1]
+          text = attrs[1]
         else
-          sub_attributes(m[2].gsub('\]', ']'))
+          text = m[2].gsub('\]', ']')
         end
 
         # QUESTION should a mailto be registered as an e-mail address?
@@ -1155,6 +1149,7 @@ module Substitutors
   def parse_quoted_text_attributes(str)
     return unless str
     return {} if str.empty?
+    # NOTE attributes are typically resolved after quoted text, so substitute eagerly
     str = sub_attributes(str) if str.include?('{')
     str = str.strip
     # for compliance, only consider first positional attribute
@@ -1201,12 +1196,8 @@ module Substitutors
     return {} if attrline.empty?
     attrline = @document.sub_attributes(attrline) if opts[:sub_input] && (attrline.include? '{')
     attrline = unescape_bracketed_text(attrline) if opts[:unescape_input]
-    block = nil
-    if opts.fetch(:sub_result, true)
-      # substitutions are only performed on attribute values if block is not nil
-      block = self
-    end
-
+    # substitutions are only performed on attribute values if block is not nil
+    block = opts.fetch(:sub_result, true) ? self : nil
     if (into = opts[:into])
       AttributeList.new(attrline, block).parse_into(into, posattrs)
     else
