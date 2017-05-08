@@ -820,7 +820,8 @@ class PreprocessorReader < Reader
   #
   # Returns a Boolean indicating whether the line under the cursor has changed.
   def preprocess_include_directive raw_target, raw_attributes
-    if (target = @document.sub_attributes raw_target, :attribute_missing => 'drop-line').empty?
+    target = (raw_target.include? '{') ? (@document.sub_attributes raw_target, :attribute_missing => 'drop-line') : raw_target
+    if target.empty?
       advance
       if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
         unshift %(Unresolved directive in #{@path} - include::#{raw_target}[#{raw_attributes}])
@@ -1180,9 +1181,7 @@ class PreprocessorReader < Reader
 
     # QUESTION should we substitute first?
     # QUESTION should we also require string to be single quoted (like block attribute values?)
-    if val.include? '{'
-      val = @document.sub_attributes val, :attribute_missing => 'drop'
-    end
+    val = @document.sub_attributes val, :attribute_missing => 'drop' if val.include? '{'
 
     if quoted
       val

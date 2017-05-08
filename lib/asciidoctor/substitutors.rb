@@ -1199,7 +1199,7 @@ module Substitutors
   def parse_attributes(attrline, posattrs = ['role'], opts = {})
     return unless attrline
     return {} if attrline.empty?
-    attrline = @document.sub_attributes(attrline) if opts[:sub_input]
+    attrline = @document.sub_attributes(attrline) if opts[:sub_input] && (attrline.include? '{')
     attrline = unescape_bracketed_text(attrline) if opts[:unescape_input]
     block = nil
     if opts.fetch(:sub_result, true)

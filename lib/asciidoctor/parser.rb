@@ -575,7 +575,9 @@ class Parser
                     :sub_input => true,
                     :sub_result => false,
                     :into => attributes)
-                target = block.sub_attributes(match[2], :attribute_missing => 'drop-line')
+                if (target = match[2]).include? '{'
+                  target = block.sub_attributes target, :attribute_missing => 'drop-line'
+                end
                 if target.empty?
                   # retain as unparsed if attribute-missing is skip
                   if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
