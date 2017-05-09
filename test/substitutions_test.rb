@@ -1387,6 +1387,14 @@ EOS
       assert_equal '<strong><html5></strong>', result
     end
 
+    test 'should not recognize pass macro with invalid subsitution list' do
+      [',', '42', 'a,'].each do |subs|
+        para = block_from_string %(pass:#{subs}[foobar])
+        result = para.extract_passthroughs para.source
+        assert_equal %(pass:#{subs}[foobar]), result
+      end
+    end
+
     test 'should allow content of inline pass macro to be empty' do
       para = block_from_string 'pass:[]'
       result = para.extract_passthroughs para.source
@@ -1545,6 +1553,20 @@ EOS
         input = 'stem:[C = \alpha + \beta Y^{\gamma} + \epsilon]'
         para = block_from_string input, :attributes => {'stem' => 'latexmath'}
         assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
+      end
+
+      test 'should apply substitutions specified on stem macro' do
+        input = 'stem:c,a[sqrt(x) <=> {solve-for-x}]'
+        para = block_from_string input, :attributes => {'stem' => 'asciimath', 'solve-for-x' => '13'}
+        assert_equal '\$sqrt(x) &lt;=&gt; 13\$', para.content
+      end
+
+      test 'should not recognize stem macro with invalid substitution list' do
+        [',', '42', 'a,'].each do |subs|
+          input = %(stem:#{subs}[x^2])
+          para = block_from_string input, :attributes => {'stem' => 'asciimath'}
+          assert_equal %(stem:#{subs}[x^2]), para.content
+        end
       end
     end
   end

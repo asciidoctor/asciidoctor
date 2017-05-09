@@ -895,9 +895,9 @@ class Document < AbstractBlock
   # value - The String attribute value on which to perform substitutions
   #
   # Returns The String value with substitutions performed
-  def apply_attribute_value_subs(value)
-    if (m = AttributeEntryPassMacroRx.match(value))
-      m[1].empty? ? m[2] : (apply_subs m[2], (resolve_pass_subs m[1]))
+  def apply_attribute_value_subs value
+    if AttributeEntryPassMacroRx =~ value
+      $1 ? (apply_subs $2, (resolve_pass_subs $1)) : $2
     else
       apply_header_subs value
     end

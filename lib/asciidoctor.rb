@@ -514,7 +514,7 @@ module Asciidoctor
     #
     #   pass:[text]
     #
-    AttributeEntryPassMacroRx = /^pass:([a-z,]*)\[(.*)\]$/
+    AttributeEntryPassMacroRx = /^pass:([a-z]+(?:,[a-z]+)*)?\[(.*)\]$/
 
     # Matches an inline attribute reference.
     #
@@ -920,7 +920,7 @@ module Asciidoctor
     #   asciimath:[x != 0]
     #   latexmath:[\sqrt{4} = 2]
     #
-    StemInlineMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z,]*)\[(#{CC_ALL}*?[^\\])\]/m
+    StemInlineMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z]+(?:,[a-z]+)*)?\[(#{CC_ALL}*?[^\\])\]/m
 
     # Matches a menu inline macro.
     #
@@ -961,7 +961,8 @@ module Asciidoctor
     #   $$text$$
     #   pass:quotes[text]
     #
-    PassInlineMacroRx = /(?:(?:(\\?)\[([^\]]+?)\])?(\\{0,2})(\+{2,3}|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z,]*)\[(|#{CC_ALL}*?[^\\])\])/m
+    # NOTE we have to support an empty pass:[] for compatibility with AsciiDoc Python
+    PassInlineMacroRx = /(?:(?:(\\?)\[([^\]]+?)\])?(\\{0,2})(\+{2,3}|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
 
     # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
     #
