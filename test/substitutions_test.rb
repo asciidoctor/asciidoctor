@@ -1372,6 +1372,12 @@ EOS
       assert_equal [:specialcharacters, :quotes], para.passthroughs[0][:subs]
     end
 
+    test 'should find and replace placeholder duplicated by substitution' do
+      input = %q(+first passthrough+ followed by link:$$http://example.com/__u_no_format_me__$$[] with passthrough)
+      result = render_embedded_string input, :doctype => :inline
+      assert_equal 'first passthrough followed by <a href="http://example.com/__u_no_format_me__" class="bare">http://example.com/__u_no_format_me__</a> with passthrough', result
+    end
+
     test 'resolves sub shorthands on inline pass macro' do
       para = block_from_string 'pass:q,a[*<{backend}>*]'
       result = para.extract_passthroughs para.source
@@ -1539,12 +1545,6 @@ EOS
         input = 'stem:[C = \alpha + \beta Y^{\gamma} + \epsilon]'
         para = block_from_string input, :attributes => {'stem' => 'latexmath'}
         assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
-      end
-
-      test 'should find and replace placeholder duplicated by substitution' do
-        input = %q(+first passthrough+ followed by link:$$http://example.com/__u_no_format_me__$$[] with passthrough)
-        result = render_embedded_string input, :doctype => :inline
-        assert_equal 'first passthrough followed by <a href="http://example.com/__u_no_format_me__" class="bare">http://example.com/__u_no_format_me__</a> with passthrough', result
       end
     end
   end
