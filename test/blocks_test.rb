@@ -1569,9 +1569,9 @@ image::no-such-image.svg[Alt Text]
       assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
     end
 
-    test 'can render block image with alt text defined in macro containing escaped square bracket' do
+    test 'can render block image with alt text defined in macro containing square bracket' do
       input = <<-EOS
-image::images/tiger.png[A [Bengal\\] Tiger]
+image::images/tiger.png[A [Bengal] Tiger]
       EOS
 
       output = render_string input

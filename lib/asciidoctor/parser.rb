@@ -570,11 +570,7 @@ class Parser
                   attributes.delete 'style'
                   style = nil
                 end
-                block.parse_attributes(match[3], posattrs,
-                    :unescape_input => (blk_ctx == :image),
-                    :sub_input => true,
-                    :sub_result => false,
-                    :into => attributes)
+                block.parse_attributes(match[3], posattrs, :sub_input => true, :sub_result => false, :into => attributes)
                 if (target = match[2]).include? '{'
                   target = block.sub_attributes target, :attribute_missing => 'drop-line'
                 end
