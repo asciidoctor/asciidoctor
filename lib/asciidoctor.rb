@@ -591,7 +591,7 @@ module Asciidoctor
     #   This is a block comment.
     #   It can span one or more lines.
     #   ////
-    CommentBlockRx = %r"^/{4,}$"
+    CommentBlockRx = %r(^/{4,}$)
 
     # Matches a comment line.
     #
@@ -599,7 +599,7 @@ module Asciidoctor
     #
     #   // an then whatever
     #
-    CommentLineRx = %r"^//(?=[^/]|$)"
+    CommentLineRx = %r(^//(?=[^/]|$))
 
     ## Section titles
 
@@ -713,15 +713,15 @@ module Asciidoctor
     # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
     # TODO check for line comment when scanning lines instead of in regex
     #
-    DescriptionListRx = /^(?!\/\/)#{CG_BLANK}*(.*?)(:{2,4}|;;)(?:#{CG_BLANK}+(.*))?$/
+    DescriptionListRx = %r(^(?!//)#{CG_BLANK}*(.*?)(:{2,4}|;;)(?:#{CG_BLANK}+(.*))?$)
 
     # Matches a sibling description list item (which does not include the type in the key).
     DescriptionListSiblingRx = {
       # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-      '::' => /^(?!\/\/)#{CG_BLANK}*((?:.*[^:])?)(::)(?:#{CG_BLANK}+(.*))?$/,
-      ':::' => /^(?!\/\/)#{CG_BLANK}*((?:.*[^:])?)(:::)(?:#{CG_BLANK}+(.*))?$/,
-      '::::' => /^(?!\/\/)#{CG_BLANK}*((?:.*[^:])?)(::::)(?:#{CG_BLANK}+(.*))?$/,
-      ';;' => /^(?!\/\/)#{CG_BLANK}*(.*)(;;)(?:#{CG_BLANK}+(.*))?$/
+      '::' => %r(^(?!//)#{CG_BLANK}*((?:.*[^:])?)(::)(?:#{CG_BLANK}+(.*))?$),
+      ':::' => %r(^(?!//)#{CG_BLANK}*((?:.*[^:])?)(:::)(?:#{CG_BLANK}+(.*))?$),
+      '::::' => %r(^(?!//)#{CG_BLANK}*((?:.*[^:])?)(::::)(?:#{CG_BLANK}+(.*))?$),
+      ';;' => %r(^(?!//)#{CG_BLANK}*(.*)(;;)(?:#{CG_BLANK}+(.*))?$)
     }
 
     # Matches a callout list item.
@@ -744,12 +744,12 @@ module Asciidoctor
     #   <!--1--> (for XML-based languages)
     #
     # NOTE extract regexps are applied line-by-line, so we can use $ as end-of-line char
-    CalloutExtractRx = /(?:(?:\/\/|#|--|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*$)/
+    CalloutExtractRx = %r((?:(?://|#|--|;;) ?)?(\\)?<!?(--|)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*$))
     CalloutExtractRxt = '(\\\\)?<()(\\d+)>(?=(?: ?\\\\?<\\d+>)*$)'
     # NOTE special characters have not been replaced when scanning
     CalloutQuickScanRx = /\\?<!?(--|)(\d+)\1>(?=(?: ?\\?<!?\1\d+\1>)*#{CC_EOL})/
     # NOTE special characters have already been replaced when converting to an SGML format
-    CalloutSourceRx = /(?:(?:\/\/|#|--|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL})/
+    CalloutSourceRx = %r((?:(?://|#|--|;;) ?)?(\\)?&lt;!?(--|)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL}))
     CalloutSourceRxt = "(\\\\)?&lt;()(\\d+)&gt;(?=(?: ?\\\\?&lt;\\d+&gt;)*#{CC_EOL})"
 
     # A Hash of regexps for lists used for dynamic access.
@@ -835,7 +835,7 @@ module Asciidoctor
     #
     #   doc.writer@example.com
     #
-    EmailInlineRx = /([\\>:\/])?#{CG_WORD}[#{CC_WORD}.%+-]*@#{CG_ALNUM}[#{CC_ALNUM}.-]*\.#{CG_ALPHA}{2,4}\b/
+    EmailInlineRx = %r(([\\>:/])?#{CG_WORD}[#{CC_WORD}.%+-]*@#{CG_ALNUM}[#{CC_ALNUM}.-]*\.#{CG_ALPHA}{2,4}\b)
 
     # Matches an inline footnote macro, which is allowed to span multiple lines.
     #
@@ -897,7 +897,7 @@ module Asciidoctor
     #   http://github.com[GitHub]
     #
     # FIXME revisit! the main issue is we need different rules for implicit vs explicit
-    LinkInlineRx = %r{(^|link:|&lt;|[\s>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[(|#{CC_ALL}*?[^\\])\])?}m
+    LinkInlineRx = %r((^|link:|&lt;|[\s>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[(|#{CC_ALL}*?[^\\])\])?)m
 
     # Match a link or e-mail inline macro.
     #
@@ -971,7 +971,7 @@ module Asciidoctor
     #   xref:id[reftext]
     #
     # NOTE special characters have already been escaped, hence the entity references
-    XrefInlineMacroRx = /\\?(?:&lt;&lt;([#{CC_WORD}":.\/]#{CC_ALL}*?)&gt;&gt;|xref:([#{CC_WORD}":.\/]#{CC_ALL}*?)\[(#{CC_ALL}+?)?\])/m
+    XrefInlineMacroRx = %r(\\?(?:&lt;&lt;([#{CC_WORD}":./]#{CC_ALL}*?)&gt;&gt;|xref:([#{CC_WORD}":./]#{CC_ALL}*?)\[(#{CC_ALL}+?)?\]))m
 
     ## Layout
 
@@ -1080,7 +1080,7 @@ module Asciidoctor
     #
     #   not c:/sample.adoc or c:\sample.adoc
     #
-    UriSniffRx = %r{^#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2}}
+    UriSniffRx = %r(^#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2})
 
     # Detects the end of an implicit URI in the text
     #
