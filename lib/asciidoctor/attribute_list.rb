@@ -22,6 +22,7 @@ module Asciidoctor
 #    => {'style' => 'quote', 'attribution' => 'Famous Person', 'citetitle' => 'Famous Book (2001)'}
 #
 class AttributeList
+  BACKSLASH = '\\'
 
   # Public: Regular expressions for detecting the boundary of a value
   BoundaryRxs = {
@@ -31,9 +32,9 @@ class AttributeList
   }
 
   # Public: Regular expressions for unescaping quoted characters
-  EscapedQuoteRxs = {
-    '"' => /\\"/,
-    '\'' => /\\'/
+  EscapedQuote = {
+    '"' => '\\"',
+    '\'' => '\\\''
   }
 
   # Public: A regular expression for an attribute name (approx. name token from XML)
@@ -190,7 +191,11 @@ class AttributeList
 
     if (value = scan_to_quote quote)
       @scanner.get_byte
-      value.gsub EscapedQuoteRxs[quote], quote
+      if value.include? BACKSLASH
+        value.gsub EscapedQuote[quote], quote
+      else
+        value
+      end
     else
       %(#{quote}#{scan_to_delimiter})
     end
