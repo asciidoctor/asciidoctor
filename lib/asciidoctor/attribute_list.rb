@@ -32,7 +32,7 @@ class AttributeList
   }
 
   # Public: Regular expressions for unescaping quoted characters
-  EscapedQuote = {
+  EscapedQuotes = {
     '"' => '\\"',
     '\'' => '\\\''
   }
@@ -192,7 +192,7 @@ class AttributeList
     if (value = scan_to_quote quote)
       @scanner.get_byte
       if value.include? BACKSLASH
-        value.gsub EscapedQuote[quote], quote
+        value.gsub EscapedQuotes[quote], quote
       else
         value
       end
