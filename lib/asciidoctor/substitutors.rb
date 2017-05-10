@@ -216,7 +216,7 @@ module Substitutors
           next m[0][1..-1]
         end
 
-        @passthroughs[pass_key = @passthroughs.size] = {:text => (unescape_brackets m[8]), :subs => (m[7].nil_or_empty? ? [] : (resolve_pass_subs m[7]))}
+        @passthroughs[pass_key = @passthroughs.size] = {:text => (unescape_brackets m[8]), :subs => (m[7] ? (resolve_pass_subs m[7]) : [])}
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -292,12 +292,7 @@ module Substitutors
         type = ((default_stem_type = document.attributes['stem']).nil_or_empty? ? 'asciimath' : default_stem_type).to_sym
       end
       content = unescape_brackets m[3]
-      if m[2].nil_or_empty?
-        subs = (@document.basebackend? 'html') ? BASIC_SUBS : []
-      else
-        subs = resolve_pass_subs m[2]
-      end
-
+      subs = m[2] ? (resolve_pass_subs m[2]) : ((@document.basebackend? 'html') ? BASIC_SUBS : [])
       @passthroughs[pass_key = @passthroughs.size] = {:text => content, :subs => subs, :type => type}
       %(#{PASS_START}#{pass_key}#{PASS_END})
     } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
@@ -1268,9 +1263,10 @@ module Substitutors
   # returns An Array of Symbols representing the substitution operation
   def resolve_subs subs, type = :block, defaults = nil, subject = nil
     return [] if subs.nil_or_empty?
+    # QUESTION should we store candidates as a Set instead of an Array?
     candidates = nil
-    modifiers_present = SubModifierSniffRx.match? subs
     subs = subs.delete ' ' if subs.include? ' '
+    modifiers_present = SubModifierSniffRx.match? subs
     subs.split(',').each do |key|
       modifier_operation = nil
       if modifiers_present
@@ -1317,8 +1313,8 @@ module Substitutors
         candidates += resolved_keys
       end
     end
-    # weed out invalid options and remove duplicates (first wins)
-    # TODO may be use a set instead?
+    return [] unless candidates
+    # weed out invalid options and remove duplicates (order is preserved; first occurence wins)
     resolved = candidates & SUB_OPTIONS[type]
     unless (candidates - resolved).empty?
       invalid = candidates - resolved

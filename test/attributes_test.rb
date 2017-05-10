@@ -213,6 +213,13 @@ EOS
       assert_equal '&lt;&gt;&amp;', doc.attributes['xml-busters']
     end
 
+    test 'should not recognize pass macro with invalid substitution list in attribute value' do
+      [',', '42', 'a,'].each do |subs|
+        doc = document_from_string %(:pass-fail: pass:#{subs}[whale])
+        assert_equal %(pass:#{subs}[whale]), doc.attributes['pass-fail']
+      end
+    end
+
     test "attribute is treated as defined until it's not" do
       input = <<-EOS
 :holygrail:

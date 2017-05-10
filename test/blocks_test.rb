@@ -2970,6 +2970,19 @@ part intro paragraph
   end
 
   context 'Substitutions' do
+    test 'processor should not crash if subs are empty' do
+      input = <<-EOS
+[subs=","]
+....
+content
+....
+      EOS
+
+      doc = document_from_string input
+      block = doc.blocks.first
+      assert_equal [], block.subs
+    end
+
     test 'should be able to append subs to default block substitution list' do
       input = <<-EOS
 :application: Asciidoctor
