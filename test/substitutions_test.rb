@@ -1225,6 +1225,18 @@ EOS
         assert_equal %q{<span class="menuseq"><b class="menu">File</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Save As&#8230;</b></span>}, para.sub_macros(para.source)
       end
 
+      test 'should process menu macro that spans multiple lines' do
+        input = %(menu:Preferences[Compile\non\nSave])
+        para = block_from_string input, :attributes => {'experimental' => ''}
+        assert_equal %(<span class="menuseq"><b class="menu">Preferences</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Compile\non\nSave</b></span>), para.sub_macros(para.source)
+      end
+
+      test 'should unescape escaped closing bracket in menu macro' do
+        input = 'menu:Preferences[Compile [on\\] Save]'
+        para = block_from_string input, :attributes => {'experimental' => ''}
+        assert_equal %q(<span class="menuseq"><b class="menu">Preferences</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Compile [on] Save</b></span>), para.sub_macros(para.source)
+      end
+
       test 'should process menu with menu item using macro syntax when fonts icons are enabled' do
         para = block_from_string('menu:Tools[More Tools &gt; Extensions]', :attributes => {'experimental' => '', 'icons' => 'font'})
         assert_equal %q{<span class="menuseq"><b class="menu">Tools</b>&#160;<i class="fa fa-angle-right caret"></i> <b class="submenu">More Tools</b>&#160;<i class="fa fa-angle-right caret"></i> <b class="menuitem">Extensions</b></span>}, para.sub_macros(para.source)

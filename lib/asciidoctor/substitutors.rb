@@ -568,20 +568,18 @@ module Substitutors
             next captured[1..-1]
           end
 
-          menu = m[1]
-          items = m[2]
+          menu, items = m[1], m[2]
 
-          if !items
-            submenus = []
-            menuitem = nil
-          else
+          if items
+            items = items.gsub '\]', ']' if items.include? '\\'
             if (delim = items.include?('&gt;') ? '&gt;' : (items.include?(',') ? ',' : nil))
               submenus = items.split(delim).map {|it| it.strip }
               menuitem = submenus.pop
             else
-              submenus = []
-              menuitem = items.rstrip
+              submenus, menuitem = [], items.rstrip
             end
+          else
+            submenus, menuitem = [], nil
           end
 
           Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).convert
