@@ -790,7 +790,7 @@ module Asciidoctor
     #
     #--
     # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
-    GenericBlockMacroRx = /^(#{CG_WORD}+)::(\S*?)\[(.*)\]$/
+    GenericBlockMacroRx = /^(#{CG_WORD}+)::(\S|\S.*?\S)\[(.*)\]$/
 
     # Matches an image, video or audio block macro.
     #
@@ -799,7 +799,7 @@ module Asciidoctor
     #   image::filename.png[Caption]
     #   video::http://youtube.com/12345[Cats vs Dogs]
     #
-    MediaBlockMacroRx = /^(image|video|audio)::(.+?)\[(.*)\]$/
+    MediaBlockMacroRx = /^(image|video|audio)::(\S|\S.*?\S)\[(.*)\]$/
 
     # Matches the TOC block macro.
     #

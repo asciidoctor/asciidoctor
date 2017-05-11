@@ -1590,6 +1590,15 @@ image::images/big tiger.png[A Big Tiger]
       assert_equal 'A Big Tiger', img.attr('alt').value
     end
 
+    test 'should not recognize block image if target has leading or trailing spaces' do
+      [' tiger.png', 'tiger.png '].each do |target|
+        input = %(image::#{target}[Tiger])
+
+        output = render_embedded_string input
+        assert_xpath '//img', output, 0
+      end
+    end
+
     test 'can render block image with alt text defined in block attribute above macro' do
       input = <<-EOS
 [Tiger]
