@@ -345,13 +345,13 @@ module Asciidoctor
   LINE_CONTINUATION_LEGACY = ' +'
 
   BLOCK_MATH_DELIMITERS = {
-    :asciimath => ['\\$', '\\$'],
-    :latexmath => ['\\[', '\\]'],
+    :asciimath => ['\$', '\$'],
+    :latexmath => ['\[', '\]'],
   }
 
   INLINE_MATH_DELIMITERS = {
-    :asciimath => ['\\$', '\\$'],
-    :latexmath => ['\\(', '\\)'],
+    :asciimath => ['\$', '\$'],
+    :latexmath => ['\(', '\)'],
   }
 
   # attributes which be changed within the content of the document (but not

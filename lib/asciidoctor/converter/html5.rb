@@ -12,8 +12,8 @@ module Asciidoctor
       :mark        => ['<mark>',   '</mark>',   true],
       :superscript => ['<sup>',    '</sup>',    true],
       :subscript   => ['<sub>',    '</sub>',    true],
-      :asciimath   => ['\\$',      '\\$',       false],
-      :latexmath   => ['\\(',      '\\)',       false]
+      :asciimath   => ['\$',       '\$',        false],
+      :latexmath   => ['\(',       '\)',        false]
       # Opal can't resolve these constants when referenced here
       #:asciimath   => INLINE_MATH_DELIMITERS[:asciimath] + [false],
       #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
