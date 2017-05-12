@@ -55,6 +55,8 @@ module Substitutors
   # fix passthrough slot after syntax highlighting
   HighlightedPassSlotRx = %r(<span\b[^>]*>\u0096</span>[^\d]*(\d+)[^\d]*<span\b[^>]*>\u0097</span>)
 
+  BACKSLASH = '\\'
+
   PLUS = '+'
 
   PygmentsWrapperDivRx = %r(<div class="pyhl">(.*)</div>)m
@@ -183,8 +185,8 @@ module Substitutors
         if attributes
           if escape_count > 0
             # NOTE we don't look for nested unconstrained pass macros
-            next %(#{m[1]}[#{attributes}]#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
-          elsif m[1] == '\\'
+            next %(#{m[1]}[#{attributes}]#{BACKSLASH * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
+          elsif m[1] == BACKSLASH
             preceding = %([#{attributes}])
             attributes = nil
           else
@@ -196,7 +198,7 @@ module Substitutors
           end
         elsif escape_count > 0
           # NOTE we don't look for nested unconstrained pass macros
-          next %(#{'\\' * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
+          next %(#{BACKSLASH * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
         end
         subs = (boundary == '+++' ? [] : BASIC_SUBS)
 
@@ -211,7 +213,7 @@ module Substitutors
           @passthroughs[pass_key] = {:text => content, :subs => subs}
         end
       else # pass:[]
-        if m[6] == '\\'
+        if m[6] == BACKSLASH
           # NOTE we don't look for nested pass:[] macros
           next m[0][1..-1]
         end
@@ -228,7 +230,7 @@ module Substitutors
       m = $~
       preceding = m[1]
       attributes = m[2]
-      escape_mark = (m[3].start_with? '\\') ? '\\' : nil
+      escape_mark = BACKSLASH if m[3].start_with? BACKSLASH
       format_mark = m[4]
       content = m[5]
 
@@ -248,7 +250,7 @@ module Substitutors
         if escape_mark
           # honor the escape of the formatting mark
           next %(#{preceding}[#{attributes}]#{m[3][1..-1]})
-        elsif preceding == '\\'
+        elsif preceding == BACKSLASH
           # honor the escape of the attributes
           preceding = %([#{attributes}])
           attributes = nil
@@ -284,7 +286,7 @@ module Substitutors
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
-      if m[0].start_with? '\\'
+      if m[0].start_with? BACKSLASH
         next m[0][1..-1]
       end
 
@@ -394,8 +396,9 @@ module Substitutors
   #
   # returns The String text with the replacement characters substituted
   def do_replacement m, replacement, restore
-    if (matched = m[0]).include? '\\'
-      matched.tr '\\', ''
+    if (captured = m[0]).include? BACKSLASH
+      # we have to use sub since we aren't sure it's the first char
+      captured.sub BACKSLASH, ''
     else
       case restore
       when :none
@@ -439,7 +442,7 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # escaped attribute, return unescaped
-        if m[1] == '\\' || m[4] == '\\'
+        if m[1] == BACKSLASH || m[4] == BACKSLASH
           %({#{m[2]}})
         elsif !m[3].nil_or_empty?
           offset = (directive = m[3]).length + 1
@@ -530,7 +533,7 @@ module Substitutors
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
-          if (captured = m[0]).start_with? '\\'
+          if (captured = m[0]).start_with? BACKSLASH
             next captured[1..-1]
           end
 
@@ -564,14 +567,14 @@ module Substitutors
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
-          if (captured = m[0]).start_with? '\\'
+          if (captured = m[0]).start_with? BACKSLASH
             next captured[1..-1]
           end
 
           menu, items = m[1], m[2]
 
           if items
-            items = items.gsub '\]', ']' if items.include? '\\'
+            items = items.gsub '\]', ']' if items.include? BACKSLASH
             if (delim = items.include?('&gt;') ? '&gt;' : (items.include?(',') ? ',' : nil))
               submenus = items.split(delim).map {|it| it.strip }
               menuitem = submenus.pop
@@ -591,7 +594,7 @@ module Substitutors
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
-          if (captured = m[0]).start_with? '\\'
+          if (captured = m[0]).start_with? BACKSLASH
             next captured[1..-1]
           end
 
@@ -612,7 +615,7 @@ module Substitutors
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
-          if m[0].start_with? '\\'
+          if m[0].start_with? BACKSLASH
             next m[0][1..-1]
           end
 
@@ -647,11 +650,11 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
+        if (captured = m[0]).start_with? BACKSLASH
+          next captured[1..-1]
         end
 
-        if m[0].start_with? 'icon:'
+        if captured.start_with? 'icon:'
           type, posattrs = 'icon', ['size']
         else
           type, posattrs = 'image', ['alt', 'width', 'height']
@@ -674,7 +677,7 @@ module Substitutors
         m = $~
 
         # honor the escape
-        if m[0].start_with? '\\'
+        if m[0].start_with? BACKSLASH
           next m[0][1..-1]
         end
 
@@ -722,7 +725,7 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[2].start_with? '\\'
+        if m[2].start_with? BACKSLASH
           next %(#{m[1]}#{m[2][1..-1]}#{m[3]})
         end
         # not a valid macro syntax w/o trailing square brackets
@@ -820,12 +823,10 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[0].start_with? '\\'
-          next m[0][1..-1]
+        if (captured = m[0]).start_with? BACKSLASH
+          next captured[1..-1]
         end
-        raw_target = m[1]
-        mailto = m[0].start_with?('mailto:')
-        target = mailto ? %(mailto:#{raw_target}) : raw_target
+        target = (mailto = captured.start_with? 'mailto:') ? %(mailto:#{m[1]}) : m[1]
 
         link_opts = { :type => :link, :target => target }
         attrs = nil
@@ -870,7 +871,7 @@ module Substitutors
         if text.empty?
           # mailto is a special case, already processed
           if mailto
-            text = raw_target
+            text = m[1]
           else
             text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
 
@@ -889,16 +890,9 @@ module Substitutors
 
     if result.include? '@'
       result = result.gsub(EmailInlineRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        address = m[0]
-        if (lead = m[1])
-          case lead
-          when '\\'
-            next address[1..-1]
-          else
-            next address
-          end
+        address, tip = $&, $1
+        if tip
+          next (tip == BACKSLASH ? address[1..-1] : address)
         end
 
         target = %(mailto:#{address})
@@ -914,7 +908,7 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[0].start_with? '\\'
+        if m[0].start_with? BACKSLASH
           next m[0][1..-1]
         end
         if m[1] == 'footnote'
@@ -962,7 +956,7 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[0].start_with? '\\'
+        if m[0].start_with? BACKSLASH
           next m[0][1..-1]
         end
         id = reftext = m[1]
@@ -976,7 +970,7 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[0].start_with? '\\'
+        if m[0].start_with? BACKSLASH
           next m[0][1..-1]
         end
         id = m[1] || m[3]
@@ -1002,7 +996,7 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[0].start_with? '\\'
+        if m[0].start_with? BACKSLASH
           next m[0][1..-1]
         end
         if m[1]
@@ -1063,14 +1057,11 @@ module Substitutors
     # FIXME cache this dynamic regex
     callout_rx = (attr? 'line-comment') ? /(?:#{::Regexp.escape(attr 'line-comment')} )?#{CalloutSourceRxt}/ : CalloutSourceRx
     text.gsub(callout_rx) {
-      # alias match for Ruby 1.8.7 compat
-      m = $~
-      # honor the escape
-      if m[1] == '\\'
-        # we have to do a sub since we aren't sure it's the first char
-        next m[0].sub('\\', '')
+      if $1
+        # we have to use sub since we aren't sure it's the first char
+        next $&.sub(BACKSLASH, '')
       end
-      Inline.new(self, :callout, m[3], :id => @document.callouts.read_next_id).convert
+      Inline.new(self, :callout, $3, :id => @document.callouts.read_next_id).convert
     }
   end
 
@@ -1103,7 +1094,7 @@ module Substitutors
   # Returns The converted String text for the quoted text region
   def convert_quoted_text(match, type, scope)
     unescaped_attrs = nil
-    if match[0].start_with? '\\'
+    if match[0].start_with? BACKSLASH
       if scope == :constrained && !(attrs = match[2]).nil_or_empty?
         unescaped_attrs = %([#{attrs}])
       else
@@ -1382,8 +1373,9 @@ module Substitutors
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
-          if m[1] == '\\'
-            m[0].sub('\\', '')
+          if m[1] == BACKSLASH
+            # we have to use sub since we aren't sure it's the first char
+            m[0].sub BACKSLASH, ''
           else
             (callout_marks[lineno] ||= []) << m[3]
             last = lineno
