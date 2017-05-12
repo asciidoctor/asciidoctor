@@ -1092,6 +1092,19 @@ text
         assert converter.respond_to? element
       end
     end
+
+    test 'should add favicon if favicon attribute is set' do
+      {
+        '' => %w(favicon.ico image/x-icon),
+        '/favicon.ico' => %w(/favicon.ico image/x-icon),
+        '/img/favicon.png' => %w(/img/favicon.png image/png)
+      }.each {|val, (href, type)|
+        result = render_string %(= Untitled), :attributes => { 'favicon' => val }
+        assert_css 'link[rel="shortcut icon"]', result, 1
+        assert_css %(link[rel="shortcut icon"][href="#{href}"]), result, 1
+        assert_css %(link[rel="shortcut icon"][type="#{type}"]), result, 1
+      }
+    end
   end
 
   context 'Structure' do

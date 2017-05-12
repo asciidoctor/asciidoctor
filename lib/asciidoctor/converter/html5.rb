@@ -51,6 +51,14 @@ module Asciidoctor
       result << %(<meta name="keywords" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
       result << %(<meta name="author" content="#{((authors = node.attr 'authors').include? '<') ? (authors.gsub XmlSanitizeRx, '') : authors}"#{slash}>) if node.attr? 'authors'
       result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
+      if node.attr? 'favicon'
+        if (icon_href = node.attr 'favicon').empty?
+          icon_href, icon_type = 'favicon.ico', 'image/x-icon'
+        else
+          icon_type = (icon_ext = ::File.extname icon_href) == '.ico' ? 'image/x-icon' : %(image/#{icon_ext[1..-1]})
+        end
+        result << %(<link rel="shortcut icon" type="#{icon_type}" href="#{icon_href}">)
+      end
       result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
 
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
