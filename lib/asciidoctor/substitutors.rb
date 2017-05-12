@@ -1005,6 +1005,7 @@ module Substitutors
           reftext = reftext[1, reftext.length - 2] if reftext && (reftext.start_with? '"') && (reftext.end_with? '"')
         else
           id, reftext = m[2], m[3]
+          reftext = reftext.gsub '\]', ']' if reftext && (reftext.include? BACKSLASH)
         end
 
         if id.include? '#'

@@ -972,7 +972,7 @@ module Asciidoctor
     #   xref:id[reftext]
     #
     # NOTE special characters have already been escaped, hence the entity references
-    XrefInlineMacroRx = %r(\\?(?:&lt;&lt;([#{CC_WORD}":./]#{CC_ALL}*?)&gt;&gt;|xref:([#{CC_WORD}":./]#{CC_ALL}*?)\[(#{CC_ALL}+?)?\]))m
+    XrefInlineMacroRx = %r(\\?(?:&lt;&lt;([#{CC_WORD}":./]#{CC_ALL}*?)&gt;&gt;|xref:([#{CC_WORD}":./]#{CC_ALL}*?)\[(#{CC_ALL}*?[^\\])?\]))m
 
     ## Layout
 

@@ -352,6 +352,10 @@ context 'Links' do
     assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, render_string("Want to learn xref:tigers[about\ntigers]?"), 1
   end
 
+  test 'xref using macro syntax with text that contains an escaped closing bracket' do
+    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', render_string('xref:tigers[[tigers\\]]'), 1
+  end
+
   test 'xref using invalid macro syntax does not create link' do
     doc = document_from_string 'xref:tigers'
     doc.references[:ids]['tigers'] = '[tigers]'
