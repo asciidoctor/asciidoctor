@@ -772,15 +772,14 @@ module Substitutors
 
         link_opts = { :type => :link, :target => target }
         attrs = nil
-        if m[3].nil_or_empty?
+        if (text = m[3]).nil_or_empty?
           text = ''
         else
-          if use_link_attrs && (m[3].start_with?('"') || (m[3].include?(',') && m[3].include?('=')))
-            attrs = parse_attributes(m[3].gsub('\]', ']'), [])
-            link_opts[:id] = (attrs.delete 'id') if attrs.key? 'id'
+          text = text.gsub '\]', ']' if text.include? BACKSLASH
+          if use_link_attrs && ((text.start_with? '"') || ((text.include? ',') && (text.include? '=')))
+            attrs = parse_attributes text, []
+            link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
             text = attrs[1] || ''
-          else
-            text = m[3].gsub('\]', ']')
           end
 
           # TODO enable in Asciidoctor 1.5.1
@@ -830,21 +829,22 @@ module Substitutors
 
         link_opts = { :type => :link, :target => target }
         attrs = nil
-        if use_link_attrs && (m[2].start_with?('"') || m[2].include?(','))
-          attrs = parse_attributes(m[2].gsub('\]', ']'), [])
-          link_opts[:id] = (attrs.delete 'id') if attrs.key? 'id'
-          if mailto
-            if attrs.key? 2
-              target = link_opts[:target] = %(#{target}?subject=#{Helpers.encode_uri(attrs[2])})
+        unless (text = m[2]).empty?
+          text = text.gsub '\]', ']' if text.include? BACKSLASH
+          if use_link_attrs && ((text.start_with? '"') || (text.include? ','))
+            attrs = parse_attributes text, []
+            link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
+            if mailto
+              if attrs.key? 2
+                target = link_opts[:target] = %(#{target}?subject=#{Helpers.encode_uri(attrs[2])})
 
-              if attrs.key? 3
-                target = link_opts[:target] = %(#{target}&amp;body=#{Helpers.encode_uri(attrs[3])})
+                if attrs.key? 3
+                  target = link_opts[:target] = %(#{target}&amp;body=#{Helpers.encode_uri(attrs[3])})
+                end
               end
             end
+            text = attrs[1]
           end
-          text = attrs[1]
-        else
-          text = m[2].gsub('\]', ']')
         end
 
         # QUESTION should a mailto be registered as an e-mail address?
@@ -1193,24 +1193,28 @@ module Substitutors
   # Internal: Strip bounding whitespace, fold endlines and unescaped closing
   # square brackets from text extracted from brackets
   def unescape_bracketed_text text
-    text.empty? ? text : text.strip.tr(EOL, ' ').gsub('\]', ']')
+    if (text = text.strip.tr EOL, ' ').include? BACKSLASH
+      text = text.gsub '\]', ']'
+    end unless text.empty?
+    text
   end
 
   # Internal: Strip bounding whitespace and fold endlines
   def normalize_string str, unescape_brackets = false
-    if str.empty?
-      str
-    elsif unescape_brackets
-      unescape_brackets str.strip.tr(EOL, ' ')
-    else
-      str.strip.tr(EOL, ' ')
+    unless str.empty?
+      str = str.strip.tr EOL, ' '
+      str = str.gsub '\]', ']' if unescape_brackets && (str.include? BACKSLASH)
     end
+    str
   end
 
   # Internal: Unescape closing square brackets.
   # Intended for text extracted from square brackets.
   def unescape_brackets str
-    str.empty? ? str : str.gsub('\]', ']')
+    if str.include? BACKSLASH
+      str = str.gsub '\]', ']'
+    end unless str.empty?
+    str
   end
 
   # Internal: Split text formatted as CSV with support
