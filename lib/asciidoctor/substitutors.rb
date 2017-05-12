@@ -49,18 +49,18 @@ module Substitutors
   # EPA, end of guarded protected area (\u0097)
   PASS_END = %(\u0097)
 
-  # match placeholder record
-  PASS_MATCH = /\u0096(\d+)\u0097/
+  # match passthrough slot
+  PassSlotRx = /\u0096(\d+)\u0097/
 
-  # fix placeholder record after syntax highlighting
-  PASS_MATCH_HI = /<span[^>]*>\u0096<\/span>[^\d]*(\d+)[^\d]*<span[^>]*>\u0097<\/span>/
+  # fix passthrough slot after syntax highlighting
+  HighlightedPassSlotRx = %r(<span\b[^>]*>\u0096</span>[^\d]*(\d+)[^\d]*<span\b[^>]*>\u0097</span>)
 
   PLUS = '+'
 
-  PygmentsWrapperDivRx = %r|<div class="pyhl">(.*)</div>|m
+  PygmentsWrapperDivRx = %r(<div class="pyhl">(.*)</div>)m
   # NOTE handles all permutations of <pre> wrapper
   # NOTE trailing whitespace appears when pygments-linenums-mode=table; <pre> has style attribute when pygments-css=inline
-  PygmentsWrapperPreRx = %r|<pre[^>]*>(.*?)</pre>\s*|m
+  PygmentsWrapperPreRx = %r(<pre\b[^>]*>(.*?)</pre>\s*)m
 
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs
@@ -311,7 +311,7 @@ module Substitutors
       return text
     end
 
-    text.gsub(PASS_MATCH) {
+    text.gsub(PassSlotRx) {
       # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
       pass = @passthroughs[$1.to_i]
       subbed_text = apply_subs(pass[:text], pass[:subs])
@@ -1439,7 +1439,7 @@ module Substitutors
 
     # fix passthrough placeholders that got caught up in syntax highlighting
     unless @passthroughs.empty?
-      result = result.gsub PASS_MATCH_HI, %(#{PASS_START}\\1#{PASS_END})
+      result = result.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END})
     end
 
     if process_callouts && callout_marks
