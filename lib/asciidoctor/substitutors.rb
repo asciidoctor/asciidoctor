@@ -295,7 +295,7 @@ module Substitutors
       end
 
       if (type = m[1].to_sym) == :stem
-        type = ((default_stem_type = document.attributes['stem']).nil_or_empty? ? 'asciimath' : default_stem_type).to_sym
+        type = ((default_stem_type = @document.attributes['stem']).nil_or_empty? ? 'asciimath' : default_stem_type).to_sym
       end
       content = unescape_brackets m[3]
       subs = m[2] ? (resolve_pass_subs m[2]) : ((@document.basebackend? 'html') ? BASIC_SUBS : [])
