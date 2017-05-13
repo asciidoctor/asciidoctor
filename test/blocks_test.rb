@@ -1229,7 +1229,7 @@ line below
 
       output = render_embedded_string input
       assert_css '.stemblock', output, 1
-      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
       assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
     end
 
@@ -1243,7 +1243,7 @@ line below
 
       output = render_embedded_string input
       assert_css '.stemblock', output, 1
-      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
       assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
     end
 
@@ -1276,7 +1276,7 @@ sqrt(3x-1)+(1+x)^2 < y
 
       output = render_embedded_string input
       assert_css '.stemblock', output, 1
-      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
       assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
     end
 
@@ -1290,7 +1290,7 @@ sqrt(3x-1)+(1+x)^2 < y
 
       output = render_embedded_string input
       assert_css '.stemblock', output, 1
-      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
       assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
     end
 
@@ -1359,7 +1359,7 @@ sqrt(3x-1)+(1+x)^2 < y
       ].each do |attributes|
         output = render_embedded_string input, :attributes => attributes
         assert_css '.stemblock', output, 1
-        nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+        nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
         assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
       end
     end
@@ -1374,7 +1374,7 @@ sqrt(3x-1)+(1+x)^2 < y
 
       output = render_embedded_string input, :attributes => {'stem' => 'latexmath'}
       assert_css '.stemblock', output, 1
-      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
       assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
     end
   end
@@ -1576,7 +1576,7 @@ image::images/tiger.png[A [Bengal] Tiger]
 
       output = render_string input
       img = xmlnodes_at_xpath '//img', output, 1
-      assert_equal 'A [Bengal] Tiger', img.attr('alt').value
+      assert_equal 'A [Bengal] Tiger', img.attr('alt')
     end
 
     test 'can render block image with target containing spaces' do
@@ -1586,8 +1586,8 @@ image::images/big tiger.png[A Big Tiger]
 
       output = render_string input
       img = xmlnodes_at_xpath '//img', output, 1
-      assert_equal 'images/big%20tiger.png', img.attr('src').value
-      assert_equal 'A Big Tiger', img.attr('alt').value
+      assert_equal 'images/big%20tiger.png', img.attr('src')
+      assert_equal 'A Big Tiger', img.attr('alt')
     end
 
     test 'should not recognize block image if target has leading or trailing spaces' do

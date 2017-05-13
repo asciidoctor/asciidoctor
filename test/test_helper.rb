@@ -86,11 +86,11 @@ class Minitest::Test
   end
 
   def xmlnodes_at_css(css, content, count = nil)
-    xmlnodes_at_path(:css, css, content)
+    xmlnodes_at_path(:css, css, content, count)
   end
 
   def xmlnodes_at_xpath(xpath, content, count = nil)
-    xmlnodes_at_path(:xpath, xpath, content)
+    xmlnodes_at_path(:xpath, xpath, content, count)
   end
 
   def xmlnodes_at_path(type, path, content, count = nil)

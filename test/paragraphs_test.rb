@@ -156,29 +156,29 @@ Note that multi-entry terms generate separate index entries.
 
       output = render_embedded_string input, :attributes => {'backend' => 'docbook45'}
       assert_xpath '/simpara', output, 1
-      term1 = (xmlnodes_at_xpath '(//indexterm)[1]', output, 1).first
+      term1 = xmlnodes_at_xpath '(//indexterm)[1]', output, 1
       assert_equal '<indexterm><primary>tigers</primary></indexterm>', term1.to_s
       assert term1.next.content.start_with?('tigers')
 
-      term2 = (xmlnodes_at_xpath '(//indexterm)[2]', output, 1).first
+      term2 = xmlnodes_at_xpath '(//indexterm)[2]', output, 1
       term2_elements = term2.elements
       assert_equal 3, term2_elements.size
       assert_equal '<primary>Big cats</primary>', term2_elements[0].to_s
       assert_equal '<secondary>Tigers</secondary>', term2_elements[1].to_s
       assert_equal '<tertiary>Siberian Tiger</tertiary>', term2_elements[2].to_s
 
-      term3 = (xmlnodes_at_xpath '(//indexterm)[3]', output, 1).first
+      term3 = xmlnodes_at_xpath '(//indexterm)[3]', output, 1
       term3_elements = term3.elements
       assert_equal 2, term3_elements.size
       assert_equal '<primary>Tigers</primary>', term3_elements[0].to_s
       assert_equal '<secondary>Siberian Tiger</secondary>', term3_elements[1].to_s
 
-      term4 = (xmlnodes_at_xpath '(//indexterm)[4]', output, 1).first
+      term4 = xmlnodes_at_xpath '(//indexterm)[4]', output, 1
       term4_elements = term4.elements
       assert_equal 1, term4_elements.size
       assert_equal '<primary>Siberian Tiger</primary>', term4_elements[0].to_s
 
-      term5 = (xmlnodes_at_xpath '(//indexterm)[5]', output, 1).first
+      term5 = xmlnodes_at_xpath '(//indexterm)[5]', output, 1
       assert_equal '<indexterm><primary>Linux</primary></indexterm>', term5.to_s
       assert term5.next.content.start_with?('Linux')
 

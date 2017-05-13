@@ -591,7 +591,7 @@ text
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
-      styles = stylenode.first.content
+      styles = stylenode.content
       assert !styles.nil?
       assert !styles.strip.empty?
     end
@@ -627,7 +627,7 @@ text
           :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'linkcss!' => ''}
       assert_css 'html:root > head > style', output, 1
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
-      styles = stylenode.first.content
+      styles = stylenode.content
       assert !styles.nil?
       assert !styles.strip.empty?
     end
@@ -675,7 +675,7 @@ text
       output = Asciidoctor.convert_file sample_input_path, :header_footer => true, :safe => Asciidoctor::SafeMode::SAFE, :to_file => false,
           :attributes => {'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets', 'linkcss!' => ''}
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
-      styles = stylenode.first.content
+      styles = stylenode.content
       assert !styles.nil?
       assert !styles.strip.empty?
     end
@@ -1341,7 +1341,7 @@ content
 
       output = render_string input
       assert_xpath '/html/head/title[text()="Document Title"]', output, 1
-      nodes = xmlnodes_at_xpath('//*[@id="header"]/h1', output, 1)
+      nodes = xmlnodes_at_xpath('//*[@id="header"]/h1', output)
       assert_equal 1, nodes.size
       assert_match('<h1><strong>Document</strong> <span class="image"><img src="logo.png" alt="logo"></span> <em>Title</em> <span class="image"><img src="another-logo.png" alt="another logo"></span></h1>', output)
     end
@@ -1666,11 +1666,11 @@ finally a reference to the second footnote footnoteref:[note2].
       assert_css '#footnotes .footnote', output, 2
       assert_css '#footnotes .footnote#_footnote_1', output, 1
       assert_xpath '//div[@id="footnotes"]/div[@id="_footnote_1"]/a[@href="#_footnoteref_1"][text()="1"]', output, 1
-      text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnote_1"]/text()', output, 1
+      text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnote_1"]/text()', output
       assert_equal '. An example footnote.', text.text.strip
       assert_css '#footnotes .footnote#_footnote_2', output, 1
       assert_xpath '//div[@id="footnotes"]/div[@id="_footnote_2"]/a[@href="#_footnoteref_2"][text()="2"]', output, 1
-      text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnote_2"]/text()', output, 1
+      text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnote_2"]/text()', output
       assert_equal '. Second footnote.', text.text.strip
     end
 
@@ -1684,7 +1684,7 @@ Text that has supporting information{empty}footnote:[An example footnote.].
       assert_css '#footnotes .footnote', output, 1
       assert_css '#footnotes .footnote#_footnote_1', output, 1
       assert_xpath '/div[@id="footnotes"]/div[@id="_footnote_1"]/a[@href="#_footnoteref_1"][text()="1"]', output, 1
-      text = xmlnodes_at_xpath '/div[@id="footnotes"]/div[@id="_footnote_1"]/text()', output, 1
+      text = xmlnodes_at_xpath '/div[@id="footnotes"]/div[@id="_footnote_1"]/text()', output
       assert_equal '. An example footnote.', text.text.strip
     end
 
@@ -1952,14 +1952,14 @@ section body
       EOS
       result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5'})
       assert_xpath '/xmlns:article', result, 1
-      doc = xmlnodes_at_xpath('/xmlns:article', result, 1).first
+      doc = xmlnodes_at_xpath('/xmlns:article', result, 1)
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:article[@version="5.0"]', result, 1
       assert_xpath '/xmlns:article/xmlns:info/xmlns:title[text() = "Title"]', result, 1
       assert_xpath '/xmlns:article/xmlns:simpara[text() = "preamble"]', result, 1
       assert_xpath '/xmlns:article/xmlns:section', result, 1
-      section = xmlnodes_at_xpath('/xmlns:article/xmlns:section', result, 1).first
+      section = xmlnodes_at_xpath('/xmlns:article/xmlns:section', result, 1)
       # nokogiri can't make up its mind
       id_attr = section.attribute('id') || section.attribute('xml:id')
       refute_nil id_attr
@@ -1986,7 +1986,7 @@ section body
       EOS
       result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'manpage'})
       assert_xpath '/xmlns:refentry', result, 1
-      doc = xmlnodes_at_xpath('/xmlns:refentry', result, 1).first
+      doc = xmlnodes_at_xpath('/xmlns:refentry', result, 1)
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:refentry[@version="5.0"]', result, 1
@@ -1998,7 +1998,7 @@ section body
       assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv/xmlns:simpara[text() = "some text"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refsection', result, 1
-      section = xmlnodes_at_xpath('/xmlns:refentry/xmlns:refsection', result, 1).first
+      section = xmlnodes_at_xpath('/xmlns:refentry/xmlns:refsection', result, 1)
       # nokogiri can't make up its mind
       id_attr = section.attribute('id') || section.attribute('xml:id')
       refute_nil id_attr
@@ -2020,14 +2020,14 @@ chapter body
       EOS
       result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'book'})
       assert_xpath '/xmlns:book', result, 1
-      doc = xmlnodes_at_xpath('/xmlns:book', result, 1).first
+      doc = xmlnodes_at_xpath('/xmlns:book', result, 1)
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:book[@version="5.0"]', result, 1
       assert_xpath '/xmlns:book/xmlns:info/xmlns:title[text() = "Title"]', result, 1
       assert_xpath '/xmlns:book/xmlns:preface/xmlns:simpara[text() = "preamble"]', result, 1
       assert_xpath '/xmlns:book/xmlns:chapter', result, 1
-      chapter = xmlnodes_at_xpath('/xmlns:book/xmlns:chapter', result, 1).first
+      chapter = xmlnodes_at_xpath('/xmlns:book/xmlns:chapter', result, 1)
       # nokogiri can't make up its mind
       id_attr = chapter.attribute('id') || chapter.attribute('xml:id')
       refute_nil id_attr
