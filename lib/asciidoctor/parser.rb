@@ -941,8 +941,8 @@ class Parser
         block.caption ||= attributes.delete('caption')
       end
       # TODO eventualy remove the style attribute from the attributes hash
-      #block.style     = attributes.delete('style')
-      block.style     = attributes['style']
+      #block.style = attributes.delete('style')
+      block.style = attributes['style']
       # AsciiDoc always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
       if (block_id = (block.id ||= attributes['id']))
