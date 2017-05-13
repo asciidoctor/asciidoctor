@@ -2023,26 +2023,24 @@ class Parser
   def self.parse_block_metadata_line(reader, parent, attributes, options = {})
     return false unless reader.has_more_lines?
     next_line = reader.peek_line
-    if (commentish = next_line.start_with?('//')) && (CommentBlockRx.match? next_line)
+    if (commentish = (next_line.start_with? '//')) && (CommentBlockRx.match? next_line)
       reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => next_line, :skip_processing => true)
     elsif commentish && (CommentLineRx.match? next_line)
       # do nothing, we'll skip it
-    elsif !options[:text] && next_line.start_with?(':') && (match = AttributeEntryRx.match(next_line))
-      process_attribute_entry(reader, parent, attributes, match)
-    elsif (in_square_brackets = next_line.start_with?('[') && next_line.end_with?(']')) && (match = BlockAnchorRx.match(next_line))
-      unless match[1].nil_or_empty?
-        attributes['id'] = match[1]
-        # AsciiDoc always uses [id] as the reftext in HTML output,
-        # but I'd like to do better in Asciidoctor
-        # registration is deferred until the block or section is processed
-        attributes['reftext'] = match[2] if match[2]
-      end
-    elsif in_square_brackets && (match = BlockAttributeListRx.match(next_line))
-      parent.document.parse_attributes(match[1], [], :sub_input => true, :into => attributes)
+    elsif !options[:text] && (next_line.start_with? ':') && (match = AttributeEntryRx.match next_line)
+      process_attribute_entry reader, parent, attributes, match
+    elsif (in_square_brackets = (next_line.start_with? '[') && (next_line.end_with? ']')) && BlockAnchorRx =~ next_line
+      attributes['id'] = $1
+      # AsciiDoc Python always uses [id] as the reftext in HTML output,
+      # but I'd like to do better in Asciidoctor
+      # registration is deferred until the block or section is processed
+      attributes['reftext'] = $2 if $2
+    elsif in_square_brackets && BlockAttributeListRx =~ next_line
+      parent.document.parse_attributes $1, [], :sub_input => true, :into => attributes
     # NOTE title doesn't apply to section, but we need to stash it for the first block
     # TODO should issue an error if this is found above the document title
-    elsif !options[:text] && (match = BlockTitleRx.match(next_line))
-      attributes['title'] = match[1]
+    elsif !options[:text] && BlockTitleRx =~ next_line
+      attributes['title'] = $1
     else
       return false
     end
