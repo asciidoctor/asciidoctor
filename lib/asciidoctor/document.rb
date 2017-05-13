@@ -1041,11 +1041,6 @@ class Document < AbstractBlock
 
     # QUESTION should we add extensions that execute before conversion begins?
 
-    # NOTE we're now checking for the converter eagerly
-    #unless @converter
-    #  raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{backend}'. Processing aborted.)
-    #end
-
     if doctype == 'inline'
       # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
       if (block = @blocks[0]) && block.content_model != :compound
