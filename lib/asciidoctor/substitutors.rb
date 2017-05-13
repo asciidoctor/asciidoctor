@@ -963,6 +963,7 @@ module Substitutors
         if m[0].start_with? RS
           next m[0][1..-1]
         end
+        # NOTE built-in html converter doesn't use reftext
         id = reftext = m[1]
         Inline.new(self, :anchor, reftext, :type => :bibref, :target => id).convert
       }
@@ -978,14 +979,12 @@ module Substitutors
           next m[0][1..-1]
         end
         id = m[1] || m[3]
-        reftext = m[2] || m[4] || %([#{id}])
-        # enable if we want to allow double quoted values
-        #id = id[1, id.length - 2] if (id.start_with? '"') && (id.end_with? '"')
-        #if reftext
-        #  reftext = reftext[1, reftext.length - 2] if (reftext.start_with? '"') && (reftext.end_with? '"')
-        #else
-        #  reftext = %([#{id}])
-        #end
+        # NOTE built-in html converter doesn't use reftext
+        if (reftext = m[2] || m[4])
+          reftext = apply_title_subs reftext
+        else
+          reftext = %([#{id}])
+        end
         Inline.new(self, :anchor, reftext, :type => :ref, :target => id).convert
       }
     end
