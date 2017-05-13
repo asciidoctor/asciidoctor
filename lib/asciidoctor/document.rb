@@ -206,6 +206,7 @@ class Document < AbstractBlock
       @parent_document = nil
       @references = {
         :ids => {},
+        :id_origins => {},
         :footnotes => [],
         :links => [],
         :images => [],
@@ -562,6 +563,9 @@ class Document < AbstractBlock
       else
         @references[:ids][id] ||= reftext
       end
+    when :id_origins
+      id, origin = *value
+      @references[:id_origins][id] = origin
     when :footnotes, :indexterms
       @references[type] << value
     else
@@ -900,6 +904,19 @@ class Document < AbstractBlock
       $1 ? (apply_subs $2, (resolve_pass_subs $1)) : $2
     else
       apply_header_subs value
+    end
+  end
+
+  # Internal: apply subs for the section-label attribute
+  #
+  # This has to be an extra step because the substitution can only
+  # be done after the parsing is done and the section sectnums are
+  # set correctly.
+  def apply_section_label_subs
+    references[:id_origins].each do |id, section|
+      reftext = references[:ids][id]
+      reftext = section.sub_attributes(reftext, { :section_reftext => { :sectnum => section.sectnum, :secttitle => section.title }})
+      register(:ids, [id, reftext], true)
     end
   end
 
