@@ -440,6 +440,32 @@ context 'Invoker' do
     assert_xpath '/html/body[@class="book"]', output, 1
   end
 
+  test 'should warn if doctype is inline and the first block is not a candidate for inline conversion' do
+    ['== Section Title', 'image::tiger.png[]'].each do |input|
+      warnings = redirect_streams do |out, err|
+        invoke_cli_to_buffer(%w(-d inline), '-') { input }
+        err.string
+      end
+      assert_match(/WARNING: no inline candidate/, warnings)
+    end
+  end
+
+  test 'should not warn if doctype is inline and the document has no blocks' do
+    warnings = redirect_streams do |out, err|
+      invoke_cli_to_buffer(%w(-d inline), '-') { '// comment' }
+      err.string
+    end
+    refute_match(/WARNING/, warnings)
+  end
+
+  test 'should not warn if doctype is inline and the document contains multiple blocks' do
+    warnings = redirect_streams do |out, err|
+      invoke_cli_to_buffer(%w(-d inline), '-') { %(paragraph one\n\nparagraph two\n\nparagraph three) }
+      err.string
+    end
+    refute_match(/WARNING/, warnings)
+  end
+
   test 'should locate custom templates based on template dir, template engine and backend' do
     custom_backend_root = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends'))
     invoker = invoke_cli_to_buffer %W(-E haml -T #{custom_backend_root} -o -)

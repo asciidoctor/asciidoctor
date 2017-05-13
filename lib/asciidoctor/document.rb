@@ -1042,11 +1042,12 @@ class Document < AbstractBlock
     # QUESTION should we add extensions that execute before conversion begins?
 
     if doctype == 'inline'
-      # QUESTION should we warn if @blocks.size > 0 and the first block is not a paragraph?
-      if (block = @blocks[0]) && block.content_model != :compound
-        output = block.content
-      else
-        output = nil
+      if (block = @blocks[0])
+        if block.content_model == :compound || block.content_model == :empty
+          warn %(asciidoctor: WARNING: no inline candidate; use the inline doctype to convert a single paragragh, verbatim, or raw block)
+        else
+          output = block.content
+        end
       end
     else
       transform = ((opts.key? :header_footer) ? opts[:header_footer] : @options[:header_footer]) ? 'document' : 'embedded'
