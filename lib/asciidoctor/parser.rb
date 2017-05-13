@@ -1216,17 +1216,13 @@ class Parser
   # Returns A Boolean indicating whether callouts were found
   def self.catalog_callouts(text, document)
     found = false
-    if text.include? '<'
-      text.scan(CalloutQuickScanRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        if m[0].chr != '\\'
-          document.callouts.register(m[2])
-        end
-        # we have to mark as found even if it's escaped so it can be unescaped
-        found = true
-      }
-    end
+    text.scan(CalloutQuickScanRx) {
+      # lead with assignments for Ruby 1.8.7 compat
+      captured, num = $&, $2
+      document.callouts.register num unless captured.start_with? '\\'
+      # we have to mark as found even if it's escaped so it can be unescaped
+      found = true
+    } if text.include? '<'
     found
   end
 
