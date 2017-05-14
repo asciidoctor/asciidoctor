@@ -269,12 +269,9 @@ class Minitest::Test
   def redirect_streams
     old_stdout, $stdout = $stdout, (tmp_stdout = ::StringIO.new)
     old_stderr, $stderr = $stderr, (tmp_stderr = ::StringIO.new)
-    begin
-      yield tmp_stdout, tmp_stderr
-    ensure
-      $stdout = old_stdout
-      $stderr = old_stderr
-    end
+    yield tmp_stdout, tmp_stderr
+  ensure
+    $stdout, $stderr = old_stdout, old_stderr
   end
 
   def resolve_localhost
