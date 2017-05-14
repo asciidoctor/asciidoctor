@@ -887,7 +887,7 @@ class PreprocessorReader < Reader
       inc_lines = nil
       tags = nil
       attributes = {}
-      if !raw_attributes.empty?
+      unless raw_attributes.empty?
         # QUESTION should we use @document.parse_attribues?
         attributes = AttributeList.new(raw_attributes).parse
         if attributes.key? 'lines'
@@ -912,6 +912,7 @@ class PreprocessorReader < Reader
           tags = attributes['tags'].split(DataDelimiterRx).to_set
         end
       end
+
       if inc_lines
         unless inc_lines.empty?
           selected = []
