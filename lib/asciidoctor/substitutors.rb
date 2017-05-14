@@ -732,15 +732,18 @@ module Substitutors
         if m[2].start_with? RS
           next %(#{m[1]}#{m[2][1..-1]}#{m[3]})
         end
-        # not a valid macro syntax w/o trailing square brackets
-        # we probably shouldn't even get here...our regex is doing too much
-        if m[1] == 'link:' && !m[3]
-          next m[0]
+        # NOTE if text is non-nil, then we've matched a formal macro (i.e., trailing square brackets)
+        prefix, target, text, suffix = m[1], m[2], (macro = m[3]) || '', ''
+        if prefix == 'link:'
+          if macro
+            prefix = ''
+          else
+            # invalid macro syntax (link: prefix w/o trailing square brackets)
+            # we probably shouldn't even get here...our regex is doing too much
+            next m[0]
+          end
         end
-        prefix = (m[1] != 'link:' ? m[1] : '')
-        target = m[2]
-        suffix = ''
-        unless m[3] || UriTerminatorRx !~ target
+        unless macro || UriTerminatorRx !~ target
           case $&
           when ')'
             # strip trailing )
@@ -772,13 +775,9 @@ module Substitutors
             end
           end
         end
-        @document.register(:links, target)
 
-        link_opts = { :type => :link, :target => target }
-        attrs = nil
-        if (text = m[3]).nil_or_empty?
-          text = ''
-        else
+        attrs, link_opts = nil, { :type => :link }
+        unless text.empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if use_link_attrs && ((text.start_with? '"') || ((text.include? ',') && (text.include? '=')))
             attrs = parse_attributes text, []
@@ -786,7 +785,7 @@ module Substitutors
             text = attrs[1] || ''
           end
 
-          # TODO enable in Asciidoctor 1.5.1
+          # TODO enable in Asciidoctor 1.6.x
           # support pipe-separated text and title
           #unless attrs && (attrs.key? 'title')
           #  if text.include? '|'
@@ -800,21 +799,21 @@ module Substitutors
             if attrs
               attrs['window'] ||= '_blank'
             else
-              attrs = {'window' => '_blank'}
+              attrs = { 'window' => '_blank' }
             end
           end
         end
 
         if text.empty?
           text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
-
           if attrs
             attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
           else
-            attrs = {'role' => 'bare'}
+            attrs = { 'role' => 'bare' }
           end
         end
 
+        @document.register :links, (link_opts[:target] = target)
         link_opts[:attributes] = attrs if attrs
         %(#{prefix}#{Inline.new(self, :anchor, text, link_opts).convert}#{suffix})
       }
@@ -830,45 +829,40 @@ module Substitutors
           next captured[1..-1]
         end
         target = (mailto = captured.start_with? 'mailto:') ? %(mailto:#{m[1]}) : m[1]
-
-        link_opts = { :type => :link, :target => target }
-        attrs = nil
+        attrs, link_opts = nil, { :type => :link }
         unless (text = m[2]).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if use_link_attrs && ((text.start_with? '"') || (text.include? ','))
+          if use_link_attrs && ((text.start_with? '"') || ((text.include? ',') && (mailto || (text.include? '='))))
             attrs = parse_attributes text, []
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
             if mailto
               if attrs.key? 2
-                target = link_opts[:target] = %(#{target}?subject=#{Helpers.encode_uri(attrs[2])})
-
                 if attrs.key? 3
-                  target = link_opts[:target] = %(#{target}&amp;body=#{Helpers.encode_uri(attrs[3])})
+                  target = %(#{target}?subject=#{Helpers.encode_uri attrs[2]}&amp;body=#{Helpers.encode_uri attrs[3]})
+                else
+                  target = %(#{target}?subject=#{Helpers.encode_uri attrs[2]})
                 end
               end
             end
-            text = attrs[1]
+            text = attrs[1] || ''
           end
-        end
 
-        # QUESTION should a mailto be registered as an e-mail address?
-        @document.register(:links, target)
+          # TODO enable in Asciidoctor 1.6.x
+          # support pipe-separated text and title
+          #unless attrs && (attrs.key? 'title')
+          #  if text.include? '|'
+          #    attrs ||= {}
+          #    text, attrs['title'] = text.split '|', 2
+          #  end
+          #end
 
-        # TODO enable in Asciidoctor 1.5.1
-        # support pipe-separated text and title
-        #unless attrs && (attrs.key? 'title')
-        #  if text.include? '|'
-        #    attrs ||= {}
-        #    text, attrs['title'] = text.split '|', 2
-        #  end
-        #end
-
-        if text.end_with? '^'
-          text = text.chop
-          if attrs
-            attrs['window'] ||= '_blank'
-          else
-            attrs = {'window' => '_blank'}
+          if text.end_with? '^'
+            text = text.chop
+            if attrs
+              attrs['window'] ||= '_blank'
+            else
+              attrs = { 'window' => '_blank' }
+            end
           end
         end
 
@@ -878,15 +872,16 @@ module Substitutors
             text = m[1]
           else
             text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
-
             if attrs
               attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
             else
-              attrs = {'role' => 'bare'}
+              attrs = { 'role' => 'bare' }
             end
           end
         end
 
+        # QUESTION should a mailto be registered as an e-mail address?
+        @document.register :links, (link_opts[:target] = target)
         link_opts[:attributes] = attrs if attrs
         Inline.new(self, :anchor, text, link_opts).convert
       }

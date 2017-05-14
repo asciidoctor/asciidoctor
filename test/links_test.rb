@@ -171,6 +171,16 @@ context 'Links' do
     assert_xpath '//a[@href="http://google.com"][@class="external"][@target="_blank"]', render_embedded_string('http://google.com[Google, role="external", window="_blank"]', :attributes => {'linkattrs' => ''}), 1
   end
 
+  test 'link macro with attributes but no text should use URL as text when linkattrs is set' do
+    url = 'https://fonts.googleapis.com/css?family=Roboto:400,400italic,'
+    assert_xpath %(//a[@href="#{url}"][text()="#{url}"]), render_embedded_string(%(link:#{url}[family=Roboto,weight=400]), :attributes => {'linkattrs' => ''}), 1
+  end
+
+  test 'link macro with comma but no explicit attributes in text should not parse text when linkattrs is set' do
+    url = 'https://fonts.googleapis.com/css?family=Roboto:400,400italic,'
+    assert_xpath %(//a[@href="#{url}"][text()="Roboto,400"]), render_embedded_string(%(link:#{url}[Roboto,400]), :attributes => {'linkattrs' => ''}), 1
+  end
+
   test 'link text that ends in ^ should set link window to _blank' do
     assert_xpath '//a[@href="http://google.com"][@target="_blank"]', render_embedded_string('http://google.com[Google^]'), 1
   end
