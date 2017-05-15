@@ -965,16 +965,20 @@ class PreprocessorReader < Reader
           end
         else
           select = base_select = !(inc_tags.value? true)
-          wildcard = (inc_tags.key? '*') ? (inc_tags.delete '*') : nil
+          wildcard = inc_tags.delete '*'
+        end
+        if (ext_idx = include_file.rindex '.') && (circ_cmt = CIRCUMFIX_COMMENTS[include_file.slice ext_idx, include_file.length])
+          cmt_suffix_len = (tag_suffix = %([] #{circ_cmt[:suffix]})).length - 2
         end
         begin
           open(include_file, 'r') do |f|
             f.each_line do |l|
               inc_lineno += 1
               # must force encoding since we're performing String operations on line
-              l.force_encoding(::Encoding::UTF_8) if FORCE_ENCODING
-              # NOTE tagged lines in XML may end with -->
-              if ((l = l.rstrip).end_with? '[]', '[] -->') && TagDirectiveRx =~ l
+              l.force_encoding ::Encoding::UTF_8 if FORCE_ENCODING
+              if (((tl = l.chomp).end_with? '[]') ||
+                  (tag_suffix && (tl.end_with? tag_suffix) && (tl = tl.slice 0, tl.length - cmt_suffix_len))) &&
+                  TagDirectiveRx =~ tl
                 if $1 # end tag
                   if (this_tag = $2) == active_tag
                     tag_stack.pop
