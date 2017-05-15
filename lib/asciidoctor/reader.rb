@@ -905,7 +905,7 @@ class PreprocessorReader < Reader
               inc_lines << linedef.to_i
             end
           end
-          inc_lines = inc_lines.sort.uniq
+          inc_lines = inc_lines.empty? ? nil : inc_lines.sort.uniq
         elsif attributes.key? 'tag'
           tags = [attributes['tag']].to_set
         elsif attributes.key? 'tags'
@@ -914,37 +914,35 @@ class PreprocessorReader < Reader
       end
 
       if inc_lines
-        unless inc_lines.empty?
-          selected = []
-          inc_line_offset = 0
-          inc_lineno = 0
-          begin
-            open(include_file, 'r') do |f|
-              f.each_line do |l|
-                inc_lineno += 1
-                take = inc_lines[0]
-                if ::Float === take && take.infinite?
-                  selected << l
-                  inc_line_offset = inc_lineno if inc_line_offset == 0
-                else
-                  if f.lineno == take
-                    selected << l
-                    inc_line_offset = inc_lineno if inc_line_offset == 0
-                    inc_lines.shift
-                  end
-                  break if inc_lines.empty?
+        selected_lines, inc_offset, inc_lineno = [], nil, 0
+        begin
+          open(include_file, 'r') do |f|
+            f.each_line do |l|
+              inc_lineno += 1
+              select = inc_lines[0]
+              if ::Float === select && select.infinite?
+                # NOTE record line where we started selecting
+                inc_offset ||= inc_lineno
+                selected_lines << l
+              else
+                if inc_lineno == select
+                  # NOTE record line where we started selecting
+                  inc_offset ||= inc_lineno
+                  selected_lines << l
+                  inc_lines.shift
                 end
+                break if inc_lines.empty?
               end
             end
-          rescue
-            warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
-            replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
-            return true
           end
-          advance
-          # FIXME not accounting for skipped lines in reader line numbering
-          push_include selected, include_file, path, inc_line_offset, attributes
+        rescue
+          warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
+          replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+          return true
         end
+        advance
+        # FIXME not accounting for skipped lines in reader line numbering
+        push_include selected_lines, include_file, path, inc_offset, attributes if inc_offset
       elsif tags
         unless tags.empty?
           selected = []

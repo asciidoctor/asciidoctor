@@ -727,6 +727,18 @@ include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         assert_match(/last line of included content/, output)
       end
 
+      test 'include directive ignores empty lines attribute' do
+        input = <<-EOS
+++++
+include::fixtures/include-file.asciidoc[lines=]
+++++
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        assert_includes output, 'first line of included content'
+        assert_includes output, 'last line of included content'
+      end
+
       test 'include directive supports tagged selection' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tag=snippetA]
