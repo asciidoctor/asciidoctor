@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# encoding: UTF-8
 require File.expand_path '../lib/asciidoctor/version', __FILE__
 require 'open3' unless defined? Open3
 
