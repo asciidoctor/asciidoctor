@@ -442,7 +442,7 @@ context 'Extensions' do
   context 'Integration' do
     test 'can provide extension registry as option' do
       registry = Asciidoctor::Extensions.create do
-        tree_processor SampleTreeProcessor 
+        tree_processor SampleTreeProcessor
       end
 
       doc = document_from_string %(= Document Title\n\ncontent), :extension_registry => registry
@@ -455,7 +455,7 @@ context 'Extensions' do
 
     test 'can provide extensions proc as option' do
       doc = document_from_string %(= Document Title\n\ncontent), :extensions => proc {
-        tree_processor SampleTreeProcessor 
+        tree_processor SampleTreeProcessor
       }
       refute_nil doc.extensions
       assert_equal 1, doc.extensions.groups.size

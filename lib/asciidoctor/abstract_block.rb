@@ -404,7 +404,7 @@ class AbstractBlock < AbstractNode
   #
   # IMPORTANT You must invoke this method on a node after removing
   # child sections or else the internal counters will be off.
-  # 
+  #
   # Returns nothing
   def reindex_sections
     @next_section_index = 0

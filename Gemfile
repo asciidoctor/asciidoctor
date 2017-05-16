@@ -18,7 +18,7 @@ group :development do
 end
 
 # enable this group to use Guard for continuous testing
-# after removing comments, run `bundle install` then `guard` 
+# after removing comments, run `bundle install` then `guard`
 #group :guardtest do
 #  gem 'guard'
 #  gem 'guard-test'

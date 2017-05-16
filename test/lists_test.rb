@@ -4411,7 +4411,7 @@ listing block in list item 1
 
     doc = document_from_string input
     list = (doc.find_by :context => :ulist).first
-    assert_equal 3, list.items.size 
+    assert_equal 3, list.items.size
     assert_equal 'one', list.items[0].text
     list.items[0].text = 'un'
     assert_equal 'un', list.items[0].text
@@ -4427,7 +4427,7 @@ listing block in list item 1
 
     doc = document_from_string input
     list = (doc.find_by :context => :ulist).first
-    assert_equal 4, list.items.size 
+    assert_equal 4, list.items.size
     list.items[0].remove_sub :quotes
     assert_equal '*one*', list.items[0].text
     refute_includes list.items[0].subs, :quotes

@@ -344,7 +344,7 @@ module Substitutors
       text.gsub SpecialCharsRx, SpecialCharsTr
     end
   else
-    def sub_specialchars text 
+    def sub_specialchars text
       text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }
     end
   end

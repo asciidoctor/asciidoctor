@@ -21,7 +21,7 @@ context 'Substitutions' do
       para = block_from_string %([%hardbreaks]\nthis\nis\n-> {program})
       para.lines << ''
       para.lines << ''
-      para.document.attributes['program'] = 'Asciidoctor' 
+      para.document.attributes['program'] = 'Asciidoctor'
       result = para.apply_subs(para.lines)
       assert_equal ['this<br>', 'is<br>', '&#8594; Asciidoctor<br>', '<br>', ''], result
       result = para.apply_subs(para.lines * "\n")

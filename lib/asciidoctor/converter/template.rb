@@ -246,7 +246,7 @@ module Asciidoctor
         elsif name.start_with? 'block_'
           name = name[6..-1]
         end
-        
+
         template_class = ::Tilt
         extra_engine_options = {}
         case (ext_name = path_segments[-1])

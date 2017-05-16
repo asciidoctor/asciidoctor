@@ -11,9 +11,9 @@ Feature: Cross References
     |===
     a|See <<_install>>
     |===
-    
+
     == Install
-    
+
     Instructions go here.
     """
   When it is converted to html
