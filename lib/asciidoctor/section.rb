@@ -150,6 +150,23 @@ class Section < AbstractBlock
     super
   end
 
+  # TODO document me
+  def set_references
+    set_reference
+    sections.each do |section|
+      section.set_references
+    end
+  end
+
+  def set_reference
+    if id
+      if (reftext = (attributes['reftext'] || document.attributes['section-label']))
+        reftext = sub_attributes(reftext, section_reftext: { sectnum: sectnum, secttitle: title })
+      end
+      document.register(:ids, [id, (reftext || title)])
+    end
+  end
+
   def to_s
     if @title != nil
       qualified_title = @numbered ? %(#{sectnum} #{@title}) : @title

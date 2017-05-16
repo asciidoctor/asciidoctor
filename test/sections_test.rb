@@ -216,6 +216,70 @@ content
     end
   end
 
+  test 'should sub section number for {sectnum} in section-label' do
+    input = <<-EOS
+:sectnums:
+:section-label: {sectnum}
+
+== First Install
+EOS
+    doc = document_from_string input
+    reftext = doc.references[:ids]['_first_install']
+    refute_nil reftext
+    assert_equal '1.', reftext
+  end
+
+  test 'should insert section title for {secttitle} in section-label' do
+    input = <<-EOS
+:sectnums:
+:section-label: {secttitle}
+
+== First Install
+EOS
+    doc = document_from_string input
+    reftext = doc.references[:ids]['_first_install']
+    refute_nil reftext
+    assert_equal 'First Install', reftext
+  end
+
+  test 'should sub sectnum and secttitle in local section reftext' do
+    input = <<-EOS
+:sectnums:
+:section-label: {secttitle}
+
+[reftext="{sectnum} {secttitle}"]
+== First Install
+EOS
+    doc = document_from_string input
+    reftext = doc.references[:ids]['_first_install']
+    refute_nil reftext
+    assert_equal '1. First Install', reftext
+  end
+
+  test 'should sub with correct sectnum for subsection' do
+    input = <<-EOS
+:sectnums:
+:section-label: {secttitle}
+
+== Install
+
+== First Install
+
+content
+
+=== Subsection One
+
+[reftext="{sectnum} {secttitle}"]
+=== Subsection Two
+
+content
+EOS
+    doc = document_from_string input, parse: true
+    reftext = doc.references[:ids]['_subsection_two']
+    refute_nil reftext
+    assert_equal '2.2. Subsection Two', reftext
+  end
+
   context "document title (level 0)" do
     test "document title with multiline syntax" do
       title = "My Title"

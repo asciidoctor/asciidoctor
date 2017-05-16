@@ -701,7 +701,10 @@ class Document < AbstractBlock
   #
   # Returns The parent Block
   def << block
-    assign_index block if block.context == :section
+    if block.context == :section
+      assign_index block
+      block.set_references
+    end
     super
   end
 

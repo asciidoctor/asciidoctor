@@ -1610,10 +1610,7 @@ class Parser
     end
 
     # generate an id if one was not embedded or specified as anchor above section title
-    id = (section.id ||= (attributes['id'] || (Section.generate_id section.title, document)))
-
-    # TODO sub reftext
-    document.register(:ids, [id, (attributes['reftext'] || section.title)]) if id
+    section.id ||= (attributes['id'] || (Section.generate_id section.title, document))
 
     section.update_attributes(attributes)
     reader.skip_blank_lines

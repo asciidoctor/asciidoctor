@@ -415,6 +415,7 @@ class AbstractBlock < AbstractNode
         block.reindex_sections
       end
     }
+    sections.each(&:set_references)
   end
 end
 end
