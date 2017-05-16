@@ -461,7 +461,7 @@ class AbstractNode
       end
     else
       target = normalize_system_path target, opts[:start], nil, :target_name => (opts[:label] || 'asset')
-      data = read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true)
+      data = read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true), :label => opts[:label]
     end
     data
   end
@@ -479,19 +479,18 @@ class AbstractNode
   #
   # Returns the [String] content of the file at the specified path, or nil
   # if the file does not exist.
-  def read_asset(path, opts = {})
+  def read_asset path, opts = {}
     # remap opts for backwards compatibility
     opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
     if ::File.readable? path
       if opts[:normalize]
-        Helpers.normalize_lines_from_string(::IO.read(path)) * EOL
+        Helpers.normalize_lines_from_string(::IO.read path) * EOL
       else
         # QUESTION should we chomp or rstrip content?
-        ::IO.read(path)
+        ::IO.read path
       end
-    else
-      warn %(asciidoctor: WARNING: file does not exist or cannot be read: #{path}) if opts[:warn_on_failure]
-      nil
+    elsif opts[:warn_on_failure]
+      warn %(asciidoctor: WARNING: #{(attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
     end
   end
 

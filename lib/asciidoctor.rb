@@ -1514,7 +1514,7 @@ module Asciidoctor
               stylesheet_src = doc.normalize_system_path stylesheet_src
             end
             stylesheet_dst = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
-            unless stylesheet_src == stylesheet_dst || (stylesheet_content = doc.read_asset stylesheet_src).nil?
+            if stylesheet_src != stylesheet_dst && (stylesheet_content = doc.read_asset stylesheet_src, :warn_on_failure => true, :label => 'stylesheet')
               ::File.open(stylesheet_dst, 'w') {|f| f.write stylesheet_content }
             end
           end
