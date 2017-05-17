@@ -853,8 +853,8 @@ module Asciidoctor
     #   image:filename.png[More [Alt\] Text] (alt text becomes "More [Alt] Text")
     #   icon:github[large]
     #
-    # NOTE be as non-greedy as possible while allowing spaces in the filename
-    ImageInlineMacroRx = /\\?i(?:mage|con):([^:\s\[][^\[\n]*)\[(|#{CC_ALL}*?[^\\])\]/m
+    # NOTE be as non-greedy as possible by not allowing endline or left square bracket in target
+    ImageInlineMacroRx = /\\?i(?:mage|con):([^:\s\[][^\n\[]*)\[(|#{CC_ALL}*?[^\\])\]/m
 
     # Matches an indexterm inline macro, which may span multiple lines.
     #
@@ -907,7 +907,8 @@ module Asciidoctor
     #   link:path[label]
     #   mailto:doc.writer@example.com[]
     #
-    LinkInlineMacroRx = /\\?(?:link|mailto):([^\s\[]\S*?)\[(|#{CC_ALL}*?[^\\])\]/m
+    # NOTE be as non-greedy as possible by not allowing space or left square bracket in target
+    LinkInlineMacroRx = /\\?(?:link|(mailto)):(|[^:\s\[][^\s\[]*)\[(|#{CC_ALL}*?[^\\])\]/m
 
     # Matches the name of a macro.
     #

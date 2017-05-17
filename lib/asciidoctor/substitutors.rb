@@ -825,12 +825,12 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if (captured = m[0]).start_with? RS
-          next captured[1..-1]
+        if m[0].start_with? RS
+          next m[0][1..-1]
         end
-        target = (mailto = captured.start_with? 'mailto:') ? %(mailto:#{m[1]}) : m[1]
+        target = (mailto = m[1]) ? %(mailto:#{m[2]}) : m[2]
         attrs, link_opts = nil, { :type => :link }
-        unless (text = m[2]).empty?
+        unless (text = m[3]).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if use_link_attrs && ((text.start_with? '"') || ((text.include? ',') && (mailto || (text.include? '='))))
             attrs = parse_attributes text, []
@@ -869,7 +869,7 @@ module Substitutors
         if text.empty?
           # mailto is a special case, already processed
           if mailto
-            text = m[1]
+            text = m[2]
           else
             text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
             if attrs
