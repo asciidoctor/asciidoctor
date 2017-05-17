@@ -857,11 +857,11 @@ context 'Substitutions' do
     end
 
     test 'a footnote macro may contain a link macro' do
-      para = block_from_string('Share your code. footnote:[http://github.com[GitHub]]')
+      para = block_from_string('Share your code. footnote:[https://github.com[GitHub]]')
       assert_equal %(Share your code. <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
       assert_equal 1, para.document.references[:footnotes].size
       footnote1 = para.document.references[:footnotes][0]
-      assert_equal '<a href="http://github.com">GitHub</a>', footnote1.text
+      assert_equal '<a href="https://github.com">GitHub</a>', footnote1.text
     end
 
     test 'a footnote macro may contain a plain URL' do

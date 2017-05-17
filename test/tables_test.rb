@@ -551,7 +551,7 @@ three
 [cols="1h,1s,1e",options="header,footer"]
 |====
 |Name |Occupation| Website
-|Octocat |Social coding| http://github.com
+|Octocat |Social coding| https://github.com
 |Name |Occupation| Website
 |====
       EOS
@@ -579,7 +579,7 @@ three
 
 |Name |Occupation| Website
 
-|Octocat |Social coding| http://github.com
+|Octocat |Social coding| https://github.com
 
 |Name |Occupation| Website
 

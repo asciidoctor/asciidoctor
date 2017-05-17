@@ -140,11 +140,11 @@ context 'Links' do
   end
 
   test 'inline qualified url followed by an endline should not include endline in link' do
-    assert_xpath '//a[@href="http://github.com/asciidoctor"]', render_string("The source code for Asciidoctor can be found at http://github.com/asciidoctor\nwhich is a GitHub organization."), 1
+    assert_xpath '//a[@href="https://github.com/asciidoctor"]', render_string("The source code for Asciidoctor can be found at https://github.com/asciidoctor\nwhich is a GitHub organization."), 1
   end
 
   test 'qualified url divided by endline using macro syntax should not create link' do
-    assert_xpath '//a', render_string("The source code for Asciidoctor can be found at link:http://github.com/asciidoctor\n[]which is a GitHub organization."), 0
+    assert_xpath '//a', render_string("The source code for Asciidoctor can be found at link:https://github.com/asciidoctor\n[]which is a GitHub organization."), 0
   end
 
   test 'qualified url containing whitespace using macro syntax should not create link' do
@@ -156,7 +156,7 @@ context 'Links' do
   end
 
   test 'inline quoted qualified url should not consume surrounding angled brackets' do
-    assert_xpath '//a[@href="http://github.com/asciidoctor"]', render_string('Asciidoctor GitHub organization: <**http://github.com/asciidoctor**>'), 1
+    assert_xpath '//a[@href="https://github.com/asciidoctor"]', render_string('Asciidoctor GitHub organization: <**https://github.com/asciidoctor**>'), 1
   end
 
   test 'link with quoted text should not be separated into attributes when linkattrs is set' do
