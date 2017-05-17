@@ -893,8 +893,10 @@ module Asciidoctor
     #
     # Examples
     #
-    #   http://github.com
-    #   http://github.com[GitHub]
+    #   https://github.com
+    #   https://github.com[GitHub]
+    #   <https://github.com>
+    #   link:https://github.com[]
     #
     # FIXME revisit! the main issue is we need different rules for implicit vs explicit
     LinkInlineRx = %r((^|link:|&lt;|[\s>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[(|#{CC_ALL}*?[^\\])\])?)m
