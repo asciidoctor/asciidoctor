@@ -376,14 +376,8 @@ class AbstractNode
       #return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     end
 
-    bindata = nil
-    if ::IO.respond_to? :binread
-      bindata = ::IO.binread(image_path)
-    else
-      bindata = ::File.open(image_path, 'rb') {|file| file.read }
-    end
     # NOTE base64 is autoloaded by reference to ::Base64
-    %(data:#{mimetype};base64,#{::Base64.encode64(bindata).delete EOL})
+    %(data:#{mimetype};base64,#{::Base64.encode64(::IO.binread image_path).delete EOL})
   end
 
   # Public: Read the image data from the specified URI and generate a data URI
@@ -410,9 +404,9 @@ class AbstractNode
 
     begin
       mimetype = nil
-      bindata = open(image_uri, 'rb') {|file|
-        mimetype = file.content_type
-        file.read
+      bindata = open(image_uri, 'rb') {|fd|
+        mimetype = fd.content_type
+        fd.read
       }
       # NOTE base64 is autoloaded by reference to ::Base64
       %(data:#{mimetype};base64,#{::Base64.encode64(bindata).delete EOL})
