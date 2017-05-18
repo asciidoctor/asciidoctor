@@ -992,7 +992,7 @@ class PreprocessorReader < Reader
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
-          include_content = open(include_file, 'r') {|f| f.read }
+          include_content = target_type == :file ? (::IO.read include_file) : open(include_file, 'r') {|f| f.read }
           advance
           push_include include_content, include_file, path, 1, attributes
         rescue

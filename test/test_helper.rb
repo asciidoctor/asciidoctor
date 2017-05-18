@@ -65,7 +65,7 @@ class Minitest::Test
   end
 
   def example_document(name, opts = {})
-    document_from_string File.read(sample_doc_path(name)), opts
+    document_from_string IO.read(sample_doc_path(name)), opts
   end
 
   def assert_difference(expression, difference = 1, message = nil, &block)

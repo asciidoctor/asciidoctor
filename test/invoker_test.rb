@@ -121,14 +121,14 @@ context 'Invoker' do
     begin
       %x(mkfifo #{sample_inpath})
       write_thread = Thread.new do
-        ::File.write sample_inpath, 'pipe content'
+        IO.write sample_inpath, 'pipe content'
       end
       invoker = invoke_cli_to_buffer %w(-a stylesheet!), sample_inpath
       result = invoker.read_output
       assert_match(/pipe content/, result)
       write_thread.join
     ensure
-      ::FileUtils.rm_f sample_inpath
+      FileUtils.rm_f sample_inpath
     end
   end if RUBY_MIN_VERSION_1_9 && !windows?
 
@@ -209,7 +209,7 @@ context 'Invoker' do
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
-      output = File.read(sample_outpath)
+      output = IO.read(sample_outpath)
       assert !output.empty?
       assert_xpath '/html', output, 1
       assert_xpath '/html/head', output, 1
@@ -375,7 +375,7 @@ context 'Invoker' do
     basic_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'basic.html'))
     glob = File.join(File.dirname(__FILE__), 'fixtures', 'ba*.asciidoc')
     # test Windows using backslash-style pathname
-    if ::File::ALT_SEPARATOR == '\\'
+    if File::ALT_SEPARATOR == '\\'
       glob = glob.tr '/', '\\'
     end
 

@@ -1083,7 +1083,7 @@ class Document < AbstractBlock
           target.write EOL
         end
       else
-        ::File.open(target, 'w') {|f| f.write output }
+        ::IO.write target, output
       end
       nil
     end

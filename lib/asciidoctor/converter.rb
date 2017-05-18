@@ -204,7 +204,7 @@ module Asciidoctor
         # ensure there's a trailing endline to be nice to terminals
         target.write EOL
       else
-        ::File.open(target, 'w') {|f| f.write output }
+        ::IO.write target, output
       end
       nil
     end

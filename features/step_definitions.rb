@@ -20,7 +20,7 @@ end
 
 When /it is converted to html/ do
   @output = Asciidoctor.convert @source
-  #File.open('/tmp/test.adoc', 'w') {|f| f.write @source }
+  #IO.write '/tmp/test.adoc', @source
   #@output = %x{asciidoc -f compat/asciidoc.conf -o - -s /tmp/test.adoc | XMLLINT_INDENT='' xmllint --format - | tail -n +2}.rstrip
   ##@output = %x{asciidoc -f compat/asciidoc.conf -o - -s /tmp/test.adoc}
 end

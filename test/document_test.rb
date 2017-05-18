@@ -686,7 +686,7 @@ text
       begin
         Asciidoctor.convert_file sample_input_path
         assert File.exist?(sample_output_path)
-        output = File.read(sample_output_path)
+        output = IO.read(sample_output_path)
         assert !output.empty?
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -704,7 +704,7 @@ text
       begin
         Asciidoctor.convert_file sample_input_path, :to_file => sample_output_path
         assert File.exist?(sample_output_path)
-        output = File.read(sample_output_path)
+        output = IO.read(sample_output_path)
         assert !output.empty?
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -723,7 +723,7 @@ text
       begin
         Asciidoctor.convert_file sample_input_path, :to_file => 'result.html', :base_dir => fixture_dir
         assert File.exist?(sample_output_path)
-        output = File.read(sample_output_path)
+        output = IO.read(sample_output_path)
         assert !output.empty?
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
