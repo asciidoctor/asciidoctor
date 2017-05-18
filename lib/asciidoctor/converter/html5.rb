@@ -75,7 +75,7 @@ module Asciidoctor
           result << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{slash}>)
         else
           result << %(<style>
-#{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), :warn_on_failure => true}
+#{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), :warn_on_failure => true, :label => 'stylesheet'}
 </style>)
         end
       end
