@@ -853,7 +853,8 @@ module Asciidoctor
     #   image:filename.png[More [Alt\] Text] (alt text becomes "More [Alt] Text")
     #   icon:github[large]
     #
-    ImageInlineMacroRx = /\\?i(?:mage|con):([^:\[].*?)\[(|#{CC_ALL}*?[^\\])\]/m
+    # NOTE be as non-greedy as possible while allowing spaces in the filename
+    ImageInlineMacroRx = /\\?i(?:mage|con):([^:\s\[][^\[\n]*)\[(|#{CC_ALL}*?[^\\])\]/m
 
     # Matches an indexterm inline macro, which may span multiple lines.
     #

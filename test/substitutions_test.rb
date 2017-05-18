@@ -774,6 +774,19 @@ context 'Substitutions' do
           para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'should match an inline image macro if target contains a space character' do
+      para = block_from_string(%(Beware of the image:big cats.png[] around here.))
+      assert_equal %(Beware of the <span class="image"><img src="big%20cats.png" alt="big cats"></span> around here.),
+          para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'should not match an inline image macro if target contains an endline character' do
+      para = block_from_string(%(Fear not. There are no image::big\ncats.png[] around here.))
+      result = para.sub_macros(para.source)
+      assert !result.include?('<img ')
+      assert_includes result, %(image::big\ncats.png[])
+    end
+
     test 'a block image macro should not be detected within paragraph text' do
       para = block_from_string(%(Not an inline image macro image::tiger.png[].))
       result = para.sub_macros(para.source)
