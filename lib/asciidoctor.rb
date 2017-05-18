@@ -381,7 +381,6 @@ module Asciidoctor
       CC_ALL   = '.'
       CG_BLANK = '\p{Blank}'
       CC_EOL   = '$'
-      CG_GRAPH = '\p{Graph}'
       CC_WORD  = CG_WORD = '\p{Word}'
     # character classes for the Regexp engine in Ruby < 2
     else
@@ -392,7 +391,6 @@ module Asciidoctor
       CG_ALNUM = '[[:alnum:]]'
       CG_BLANK = '[[:blank:]]'
       CC_EOL   = '$'
-      CG_GRAPH = '[[:graph:]]' # non-blank character
       if ::RUBY_MIN_VERSION_1_9
         CC_WORD = '[:word:]'
         CG_WORD = '[[:word:]]'
