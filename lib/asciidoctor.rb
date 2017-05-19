@@ -462,7 +462,7 @@ module Asciidoctor
     #
     #   "{asciidoctor-version}" >= "0.1.0"
     #
-    EvalExpressionRx = /^(\S.*?)#{CG_BLANK}*(==|!=|<=|>=|<|>)#{CG_BLANK}*(\S.*)$/
+    EvalExpressionRx = /^(.+?)#{CG_BLANK}*([=!><]=|[><])#{CG_BLANK}*(.+)$/
 
     # Matches an include preprocessor directive.
     #
