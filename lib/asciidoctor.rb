@@ -819,7 +819,7 @@ module Asciidoctor
     #   anchor:idname[]
     #   anchor:idname[Reference Text]
     #
-    InlineAnchorRx = /\\?(?:\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(\S.*?))?\]\]|anchor:([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\]))/
+    InlineAnchorRx = /\\?(?:\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(.+?))?\]\]|anchor:([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\]))/
 
     # Matches a bibliography anchor anywhere inline.
     #
