@@ -60,6 +60,19 @@ context 'Links' do
     assert_match '<ulink url="http://example.com">[bracket1]</ulink>', doc.convert, 1
   end
 
+  test 'link macro with empty target' do
+    input = 'Link to link:[this page].'
+    output = render_embedded_string input
+    assert_xpath '//a', output, 1
+    assert_xpath '//a[@href=""]', output, 1
+  end
+
+  test 'should not recognize link macro with double colons' do
+    input = 'The link::http://example.org[example domain] is reserved for tests and documentation.'
+    output = render_embedded_string input
+    assert_includes output, 'link::http://example.org[example domain]'
+  end
+
   test 'qualified url surrounded by angled brackets' do
     assert_xpath '//a[@href="http://asciidoc.org"][text()="http://asciidoc.org"]', render_string('<http://asciidoc.org> is the project page for AsciiDoc.'), 1
   end
