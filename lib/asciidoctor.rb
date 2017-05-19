@@ -534,7 +534,7 @@ module Asciidoctor
     #   [[idname]]
     #   [[idname,Reference Text]]
     #
-    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(\S.*))?)\]\]$/
+    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(.+))?)\]\]$/
 
     # Matches an attribute list above a block element.
     #
@@ -554,7 +554,7 @@ module Asciidoctor
     # A combined pattern that matches either a block anchor or a block attribute list.
     #
     # TODO this one gets hit a lot, should be optimized as much as possible
-    BlockAttributeLineRx = /^\[(|#{CG_BLANK}*[#{CC_WORD}\{,.#"'%].*|\[(?:|[#{CC_ALPHA}:_][#{CC_WORD}:.-]*(?:,#{CG_BLANK}*\S.*)?)\])\]$/
+    BlockAttributeLineRx = /^\[(|#{CG_BLANK}*[#{CC_WORD}\{,.#"'%].*|\[(?:|[#{CC_ALPHA}:_][#{CC_WORD}:.-]*(?:,#{CG_BLANK}*.+)?)\])\]$/
 
     # Matches a title above a block.
     #
