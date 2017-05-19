@@ -792,6 +792,137 @@ snippetB content)
         assert_equal expect, output
       end
 
+      test 'include directive skips lines marked with negated tags' do
+        input = <<-EOS
+----
+include::fixtures/tagged-class-enclosed.rb[tags=all;!bark]
+----
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        expected = %(class Dog
+  def initialize breed
+    @breed = breed
+  end
+end)
+        assert_includes output, expected
+      end
+
+      test 'include directive takes all lines without tag directives when value is double asterisk' do
+        input = <<-EOS
+----
+include::fixtures/tagged-class.rb[tags=**]
+----
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        expected = %(class Dog
+  def initialize breed
+    @breed = breed
+  end
+
+  def bark
+    if @breed == 'beagle'
+      'woof woof woof woof woof'
+    else
+      'woof woof'
+    end
+  end
+end)
+        assert_includes output, expected
+      end
+
+      test 'include directive takes all lines except negated tags when value contains double asterisk' do
+        input = <<-EOS
+----
+include::fixtures/tagged-class.rb[tags=**;!bark]
+----
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        expected = %(class Dog
+  def initialize breed
+    @breed = breed
+  end
+end)
+        assert_includes output, expected
+      end
+
+      test 'include directive selects lines for all tags when value of tags attribute is wildcard' do
+        input = <<-EOS
+----
+include::fixtures/tagged-class-enclosed.rb[tags=*]
+----
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        expected = %(class Dog
+  def initialize breed
+    @breed = breed
+  end
+
+  def bark
+    if @breed == 'beagle'
+      'woof woof woof woof woof'
+    else
+      'woof woof'
+    end
+  end
+end)
+        assert_includes output, expected
+      end
+
+      test 'include directive selects lines for all tags except exclusions when value of tags attribute is wildcard' do
+        input = <<-EOS
+----
+include::fixtures/tagged-class-enclosed.rb[tags=*;!init]
+----
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        expected = %(class Dog
+
+  def bark
+    if @breed == 'beagle'
+      'woof woof woof woof woof'
+    else
+      'woof woof'
+    end
+  end
+end)
+        assert_includes output, expected
+      end
+
+      test 'include directive skips lines all tagged lines when value of tags attribute is negated wildcard' do
+        input = <<-EOS
+----
+include::fixtures/tagged-class.rb[tags=!*]
+----
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        expected = %(class Dog
+end)
+        assert_includes output, expected
+      end
+
+      test 'include directive selects specified tagged lines and ignores the other tag directives' do
+        input = <<-EOS
+[indent=0]
+----
+include::fixtures/tagged-class.rb[tags=bark;!bark-other]
+----
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        expected = %(def bark
+  if @breed == 'beagle'
+    'woof woof woof woof woof'
+  end
+end)
+        assert_includes output, expected
+      end
+
       test 'should warn if tag is not found in include file' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tag=snippetZ]
@@ -806,6 +937,34 @@ include::fixtures/include-file.asciidoc[tag=snippetZ]
           assert_match(/WARNING.*snippetZ/, warning)
         ensure
           $stderr = old_stderr
+        end
+      end
+
+      test 'should warn if end tag in included file is mismatched' do
+        input = <<-EOS
+++++
+include::fixtures/mismatched-end-tag.adoc[tags=a;b]
+++++
+        EOS
+
+        result, warnings = redirect_streams do |out, err|
+          [(render_embedded_string input, :safe => :safe, :base_dir => DIRNAME), err.string]
+        end
+        assert_equal %(a\nb), result
+        refute_nil warnings
+        assert_match(/WARNING: .*end tag/, warnings)
+      end
+
+      test 'include directive ignores tags attribute when empty' do
+        ['tag', 'tags'].each do |attr_name|
+          input = <<-EOS
+++++
+include::fixtures/include-file.xml[#{attr_name}=]
+++++
+          EOS
+
+          output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          assert_match(/(?:tag|end)::/, output, 2)
         end
       end
 

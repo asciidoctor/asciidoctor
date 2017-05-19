@@ -884,9 +884,7 @@ class PreprocessorReader < Reader
         path = PathResolver.new.relative_path include_file, @document.base_dir
       end
 
-      inc_lines = nil
-      tags = nil
-      attributes = {}
+      inc_lines, inc_tags, attributes = nil, nil, {}
       unless raw_attributes.empty?
         # QUESTION should we use @document.parse_attribues?
         attributes = AttributeList.new(raw_attributes).parse
@@ -907,9 +905,23 @@ class PreprocessorReader < Reader
           end
           inc_lines = inc_lines.empty? ? nil : inc_lines.sort.uniq
         elsif attributes.key? 'tag'
-          tags = [attributes['tag']].to_set
+          unless (tag = attributes['tag']).empty?
+            if tag.start_with? '!'
+              inc_tags = { tag[1, tag.length - 1] => false } unless tag == '!'
+            else
+              inc_tags = { tag => true }
+            end
+          end
         elsif attributes.key? 'tags'
-          tags = attributes['tags'].split(DataDelimiterRx).to_set
+          inc_tags = {}
+          attributes['tags'].split(DataDelimiterRx).each do |tagdef|
+            if tagdef.start_with? '!'
+              inc_tags[tagdef[1, tagdef.length - 1]] = false unless tagdef == '!'
+            else
+              inc_tags[tagdef] = true
+            end unless tagdef.empty?
+          end
+          inc_tags = nil if inc_tags.empty?
         end
       end
 
@@ -943,52 +955,65 @@ class PreprocessorReader < Reader
         advance
         # FIXME not accounting for skipped lines in reader line numbering
         push_include selected_lines, include_file, path, inc_offset, attributes if inc_offset
-      elsif tags
-        unless tags.empty?
-          selected = []
-          inc_line_offset = 0
-          inc_lineno = 0
-          active_tag = nil
-          tags_found = ::Set.new
-          begin
-            open(include_file, 'r') do |f|
-              f.each_line do |l|
-                inc_lineno += 1
-                # must force encoding here since we're performing String operations on line
-                l.force_encoding(::Encoding::UTF_8) if FORCE_ENCODING
-                tl = l = l.rstrip
-                # tagged lines in XML may end with '-->'
-                tl = tl[0, tl.length - 3].rstrip if tl.end_with? '-->'
-                if active_tag
-                  if tl.end_with?(%(end::#{active_tag}[]))
-                    active_tag = nil
-                  else
-                    selected << l unless (tl.end_with? '[]') && (TagDirectiveRx.match? tl)
-                    inc_line_offset = inc_lineno if inc_line_offset == 0
-                  end
-                else
-                  tags.each do |tag|
-                    if tl.end_with?(%(tag::#{tag}[]))
-                      active_tag = tag
-                      tags_found << tag
-                      break
+      elsif inc_tags
+        selected_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
+        if inc_tags.key? '**'
+          if inc_tags.key? '*'
+            select = base_select = (inc_tags.delete '**')
+            wildcard = inc_tags.delete '*'
+          else
+            select = base_select = wildcard = (inc_tags.delete '**')
+          end
+        else
+          select = base_select = !(inc_tags.value? true)
+          wildcard = (inc_tags.key? '*') ? (inc_tags.delete '*') : nil
+        end
+        begin
+          open(include_file, 'r') do |f|
+            f.each_line do |l|
+              inc_lineno += 1
+              # must force encoding since we're performing String operations on line
+              l.force_encoding(::Encoding::UTF_8) if FORCE_ENCODING
+              # NOTE tagged lines in XML may end with -->
+              if ((l = l.rstrip).end_with? '[]', '[] -->') && TagDirectiveRx =~ l
+                if $1 # end tag
+                  if (this_tag = $2) == active_tag
+                    tag_stack.pop
+                    active_tag, select = tag_stack.empty? ? [nil, base_select] : tag_stack[-1]
+                  elsif inc_tags.key? this_tag
+                    if (idx = tag_stack.rindex {|key, _| key == this_tag })
+                      idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
+                      warn %(asciidoctor: WARNING: #{target}: line #{inc_lineno}: mismatched end tag in include: expected #{active_tag}, found #{this_tag})
+                    else
+                      warn %(asciidoctor: WARNING: #{target}: line #{inc_lineno}: unexpected end tag in include: #{this_tag})
                     end
-                  end if (tl.end_with? '[]') && (TagDirectiveRx.match? tl)
+                  end
+                elsif inc_tags.key?(this_tag = $2)
+                  tags_used << this_tag
+                  # QUESTION should we prevent tag from being selected when enclosing tag is excluded?
+                  tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag])]
+                elsif !wildcard.nil?
+                  select = active_tag && !select ? false : wildcard
+                  tag_stack << [(active_tag = this_tag), select]
                 end
+              elsif select
+                # NOTE record the line where we started selecting
+                inc_offset ||= inc_lineno
+                selected_lines << l
               end
             end
-          rescue
-            warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
-            replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
-            return true
           end
-          unless (missing_tags = tags.to_a - tags_found.to_a).empty?
-            warn %(asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{include_file})
-          end
-          advance
-          # FIXME not accounting for skipped lines in reader line numbering
-          push_include selected, include_file, path, inc_line_offset, attributes
+        rescue
+          warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{include_file})
+          replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+          return true
         end
+        unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
+          warn %(asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{include_file})
+        end
+        advance
+        # FIXME not accounting for skipped lines in reader line numbering
+        push_include selected_lines, include_file, path, inc_offset, attributes if inc_offset
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds

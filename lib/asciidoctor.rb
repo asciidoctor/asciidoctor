@@ -484,7 +484,7 @@ module Asciidoctor
     #     log(e);
     #   }
     #   // end::try-catch[]
-    TagDirectiveRx = /\b(?:tag|end)::\S+\[\]$/
+    TagDirectiveRx = /\b(?:tag|(end))::(\S+)\[\](?: -->)?$/
 
     ## Attribute entries and references
 
