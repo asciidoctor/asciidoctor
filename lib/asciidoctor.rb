@@ -389,13 +389,14 @@ module Asciidoctor
       CC_ALL   = '.'
       CC_ALNUM = '[:alnum:]'
       CG_ALNUM = '[[:alnum:]]'
-      CG_BLANK = '[[:blank:]]'
       CC_EOL   = '$'
       if ::RUBY_MIN_VERSION_1_9
+        CG_BLANK = '[[:blank:]]'
         CC_WORD = '[:word:]'
         CG_WORD = '[[:word:]]'
       else
         # NOTE Ruby 1.8 cannot match word characters beyond the ASCII range; if you need this feature, upgrade!
+        CG_BLANK = '[ \t]'
         CC_WORD = '[:alnum:]_'
         CG_WORD = '[[:alnum:]_]'
       end
@@ -422,15 +423,16 @@ module Asciidoctor
     #   v1.0, 2013-01-01: Ring in the new year release
     #   1.0, Jan 01, 2013
     #
-    RevisionInfoLineRx = /^(?:\D*(.*?),)?(?:\s*(?!:)(.*?))(?:\s*(?!^):\s*(.*))?$/
+    RevisionInfoLineRx = /^(?:\D*(.*?),)?(?: *(?!:)(.*?))(?: *(?!^): *(.*))?$/
 
     # Matches the title and volnum in the manpage doctype.
     #
     # Examples
     #
+    #   = asciidoctor(1)
     #   = asciidoctor ( 1 )
     #
-    ManpageTitleVolnumRx = /^(.*)\((.*)\)$/
+    ManpageTitleVolnumRx = /^(.+?) *\( *(.+?) *\)$/
 
     # Matches the name and purpose in the manpage doctype.
     #
@@ -438,7 +440,7 @@ module Asciidoctor
     #
     #   asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     #
-    ManpageNamePurposeRx = /^(.*?)#{CG_BLANK}+-#{CG_BLANK}+(.*)$/
+    ManpageNamePurposeRx = /^(.+?) +- +(.+)$/
 
     ## Preprocessor directives
 
@@ -462,7 +464,7 @@ module Asciidoctor
     #
     #   "{asciidoctor-version}" >= "0.1.0"
     #
-    EvalExpressionRx = /^(.+?)#{CG_BLANK}*([=!><]=|[><])#{CG_BLANK}*(.+)$/
+    EvalExpressionRx = /^(.+?) *([=!><]=|[><]) *(.+)$/
 
     # Matches an include preprocessor directive.
     #
@@ -501,7 +503,7 @@ module Asciidoctor
     #                collapsing the line breaks and indentation to
     #                a single space.
     #
-    AttributeEntryRx = /^:(!?\w.*?):(?:#{CG_BLANK}+(.*))?$/
+    AttributeEntryRx = /^:(!?\w.*?):(?:[ \t]+(.*))?$/
 
     # Matches invalid characters in an attribute name.
     InvalidAttributeNameCharsRx = /[^\w\-]/
@@ -541,7 +543,7 @@ module Asciidoctor
     #   [[idname]]
     #   [[idname,Reference Text]]
     #
-    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(.+))?)\]\]$/
+    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:, *(.+))?)\]\]$/
 
     # Matches an attribute list above a block element.
     #
@@ -556,12 +558,12 @@ module Asciidoctor
     #   # as attribute reference
     #   [{lead}]
     #
-    BlockAttributeListRx = /^\[(|#{CG_BLANK}*[#{CC_WORD}\{,.#"'%].*)\]$/
+    BlockAttributeListRx = /^\[(|[#{CC_WORD}\{,.#"'%].*)\]$/
 
     # A combined pattern that matches either a block anchor or a block attribute list.
     #
     # TODO this one gets hit a lot, should be optimized as much as possible
-    BlockAttributeLineRx = /^\[(|#{CG_BLANK}*[#{CC_WORD}\{,.#"'%].*|\[(?:|[#{CC_ALPHA}:_][#{CC_WORD}:.-]*(?:,#{CG_BLANK}*.+)?)\])\]$/
+    BlockAttributeLineRx = /^\[(?:|[#{CC_WORD}\{,.#"'%].*|\[(?:|[#{CC_ALPHA}:_][#{CC_WORD}:.-]*(?:, *.+)?)\])\]$/
 
     # Matches a title above a block.
     #
@@ -569,7 +571,7 @@ module Asciidoctor
     #
     #   .Title goes here
     #
-    BlockTitleRx = /^\.([^\s.].*)$/
+    BlockTitleRx = /^\.([^ \t.].*)$/
 
     # Matches an admonition label at the start of a paragraph.
     #
@@ -578,7 +580,7 @@ module Asciidoctor
     #   NOTE: Just a little note.
     #   TIP: Don't forget!
     #
-    AdmonitionParagraphRx = /^(#{ADMONITION_STYLES.to_a * '|'}):#{CG_BLANK}/
+    AdmonitionParagraphRx = /^(#{ADMONITION_STYLES.to_a * '|'}):[ \t]+/
 
     # Matches a literal paragraph, which is a line of text preceded by at least one space.
     #
@@ -586,7 +588,7 @@ module Asciidoctor
     #
     #   <SPACE>Foo
     #   <TAB>Foo
-    LiteralParagraphRx = /^(#{CG_BLANK}+.*)$/
+    LiteralParagraphRx = /^([ \t]+.*)$/
 
     # Matches a comment block.
     #
@@ -621,7 +623,7 @@ module Asciidoctor
     # match[1] is the delimiter, whose length determines the level
     # match[2] is the title itself
     # match[3] is an inline anchor, which becomes the section id
-    AtxSectionRx = /^(={1,6}|\#{1,6})#{CG_BLANK}+(.+?)(?:#{CG_BLANK}+\1)?$/
+    AtxSectionRx = /^(={1,6}|\#{1,6})[ \t]+(.+?)(?:[ \t]+\1)?$/
 
     # Matches the restricted section name for a two-line (Setext-style) section title.
     # The name cannot begin with a dot and has at least one alphanumeric character.
@@ -634,7 +636,7 @@ module Asciidoctor
     #   Section Title [[idname]]
     #   Section Title [[idname,Reference Text]]
     #
-    InlineSectionAnchorRx = /^(.*?)#{CG_BLANK}+(\\)?\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(.+))?\]\]$/
+    InlineSectionAnchorRx = /^(.*?) +(\\)?\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:, *(.+))?\]\]$/
 
     # Matches invalid characters in a section id.
     #
@@ -655,7 +657,7 @@ module Asciidoctor
     # Detects the start of any list item.
     #
     # NOTE we only have to check as far as the blank character because we know it means non-whitespace follows.
-    AnyListRx = /^(?:#{CG_BLANK}*(?:-|([*.\u2022])\1{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}|#{CG_BLANK}*.*?(?::{2,4}|;;)(?:$|#{CG_BLANK})|<?\d+>#{CG_BLANK})/
+    AnyListRx = /^(?:[ \t]*(?:-|([*.\u2022])\1{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|[ \t]*.*?(?::{2,4}|;;)(?:$|[ \t])|<?\d+>[ \t])/
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -665,7 +667,7 @@ module Asciidoctor
     #   - Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    UnorderedListRx = /^#{CG_BLANK}*(-|\*{1,5}|\u2022{1,5})#{CG_BLANK}+(.*)$/
+    UnorderedListRx = /^[ \t]*(-|\*{1,5}|\u2022{1,5})[ \t]+(.*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
     #
@@ -681,7 +683,7 @@ module Asciidoctor
     #
     # NOTE leading space match is not always necessary, but is used for list reader
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    OrderedListRx = /^#{CG_BLANK}*(\.{1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))#{CG_BLANK}+(.*)$/
+    OrderedListRx = /^[ \t]*(\.{1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]+(.*)$/
 
     # Matches the ordinals for each type of ordered list.
     OrderedListMarkerRxMap = {
@@ -718,15 +720,15 @@ module Asciidoctor
     # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
     # TODO check for line comment when scanning lines instead of in regex
     #
-    DescriptionListRx = %r(^(?!//)#{CG_BLANK}*(.*?)(:{2,4}|;;)(?:#{CG_BLANK}+(.*))?$)
+    DescriptionListRx = %r(^(?!//)[ \t]*(.*?)(:{2,4}|;;)(?:[ \t]+(.*))?$)
 
     # Matches a sibling description list item (which does not include the type in the key).
     DescriptionListSiblingRx = {
       # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-      '::' => %r(^(?!//)#{CG_BLANK}*((?:.*[^:])?)(::)(?:#{CG_BLANK}+(.*))?$),
-      ':::' => %r(^(?!//)#{CG_BLANK}*((?:.*[^:])?)(:::)(?:#{CG_BLANK}+(.*))?$),
-      '::::' => %r(^(?!//)#{CG_BLANK}*((?:.*[^:])?)(::::)(?:#{CG_BLANK}+(.*))?$),
-      ';;' => %r(^(?!//)#{CG_BLANK}*(.*)(;;)(?:#{CG_BLANK}+(.*))?$)
+      '::' => %r(^(?!//)[ \t]*((?:.*[^:])?)(::)(?:[ \t]+(.*))?$),
+      ':::' => %r(^(?!//)[ \t]*((?:.*[^:])?)(:::)(?:[ \t]+(.*))?$),
+      '::::' => %r(^(?!//)[ \t]*((?:.*[^:])?)(::::)(?:[ \t]+(.*))?$),
+      ';;' => %r(^(?!//)[ \t]*(.*)(;;)(?:[ \t]+(.*))?$)
     }
 
     # Matches a callout list item.
@@ -736,7 +738,7 @@ module Asciidoctor
     #   <1> Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    CalloutListRx = /^<?(\d+)>#{CG_BLANK}+(.*)$/
+    CalloutListRx = /^<?(\d+)>[ \t]+(.*)$/
 
     # Detects a potential callout list item.
     CalloutListSniffRx = /^<?\d+>/
@@ -782,8 +784,8 @@ module Asciidoctor
     #   2.3+<.>m
     #
     # FIXME use step-wise scan (or treetop) rather than this mega-regexp
-    CellSpecStartRx = /^#{CG_BLANK}*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
-    CellSpecEndRx = /#{CG_BLANK}+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
+    CellSpecStartRx = /^[ \t]*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
+    CellSpecEndRx = /[ \t]+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
 
     # Block macros
 
@@ -826,7 +828,7 @@ module Asciidoctor
     #   anchor:idname[]
     #   anchor:idname[Reference Text]
     #
-    InlineAnchorRx = /\\?(?:\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:,#{CG_BLANK}*(.+?))?\]\]|anchor:([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\]))/
+    InlineAnchorRx = /\\?(?:\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]|anchor:([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\]))/
 
     # Matches a bibliography anchor anywhere inline.
     #
@@ -893,7 +895,7 @@ module Asciidoctor
     #   Ctrl + Alt+T
     #   Ctrl,T
     #
-    KbdDelimiterRx = /(?:\+|,)(?=#{CG_BLANK}*[^\1])/
+    KbdDelimiterRx = /(?:\+|,)(?= *[^\1])/
 
     # Matches an implicit link and some of the link inline macro.
     #
@@ -905,7 +907,7 @@ module Asciidoctor
     #   link:https://github.com[]
     #
     # FIXME revisit! the main issue is we need different rules for implicit vs explicit
-    LinkInlineRx = %r((^|link:|&lt;|[\s>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[(|#{CC_ALL}*?[^\\])\])?)m
+    LinkInlineRx = %r((^|link:|#{CG_BLANK}|&lt;|[>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[(|#{CC_ALL}*?[^\\])\])?)m
 
     # Match a link or e-mail inline macro.
     #
@@ -939,7 +941,7 @@ module Asciidoctor
     #   menu:View[Page Style > No Style]
     #   menu:View[Page Style, No Style]
     #
-    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&].*?\S)\[\s*(#{CC_ALL}*?[^\\])?\]/m
+    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&].*?\S)\[ *(#{CC_ALL}*?[^\\])?\]/m
 
     # Matches an implicit menu inline macro.
     #
@@ -1060,7 +1062,7 @@ module Asciidoctor
     #
     #   three\ blind\ mice
     #
-    EscapedSpaceRx = /\\(\s)/
+    EscapedSpaceRx = /\\([ \t\n])/
 
     # Matches a whitespace delimiter, a sequence of spaces, tabs, and/or newlines.
 	# Matches the parsing rules of %w strings in Ruby.
@@ -1070,8 +1072,8 @@ module Asciidoctor
     #   one two	 three   four
     #   five	six
     #
-    # TODO change to /(?<!\\)\s+/ after dropping support for Ruby 1.8.7
-    SpaceDelimiterRx = /([^\\])\s+/
+    # TODO change to /(?<!\\)[ \t\n]+/ after dropping support for Ruby 1.8.7
+    SpaceDelimiterRx = /([^\\])[ \t\n]+/
 
     # Matches a + or - modifier in a subs list
     #
