@@ -221,8 +221,10 @@ preamble
     end
 
     test 'should accept attributes as string' do
-	  # NOTE there's a tab character before idseparator
-      doc = Asciidoctor.load('text', :attributes => 'toc sectnums  source-highlighter=coderay idprefix	idseparator=-')
+      doc = Asciidoctor.load('text', :attributes => 'toc sectnums
+source-highlighter=coderay
+idprefix
+idseparator=-')
       assert doc.attributes.is_a?(Hash)
       assert doc.attr?('toc')
       assert_equal '', doc.attr('toc')
@@ -237,15 +239,14 @@ preamble
     end
 
     test 'should accept values containing spaces in attributes string' do
-	  # NOTE there's a tab character before self:
-      doc = Asciidoctor.load('text', :attributes => 'idprefix idseparator=-   note-caption=Note\ to\	self: toc')
+      doc = Asciidoctor.load('text', :attributes => %(idprefix idseparator=-   note-caption=Note\\ to\\\tself toc))
       assert doc.attributes.is_a?(Hash)
       assert doc.attr?('idprefix')
       assert_equal '', doc.attr('idprefix')
       assert doc.attr?('idseparator')
       assert_equal '-', doc.attr('idseparator')
       assert doc.attr?('note-caption')
-      assert_equal "Note to	self:", doc.attr('note-caption')
+      assert_equal "Note to\tself", doc.attr('note-caption')
     end
 
     test 'should accept attributes as empty string' do

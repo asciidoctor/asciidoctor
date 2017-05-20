@@ -1047,21 +1047,24 @@ module Asciidoctor
     #
     TrailingDigitsRx = /\d+$/
 
-    # Matches a space escaped by a backslash.
+    # Matches whitespace (space, tab, newline) escaped by a backslash.
     #
     # Examples
     #
-    #   one\ two\ three
+    #   three\ blind\ mice
     #
-    EscapedSpaceRx = /\\(#{CG_BLANK})/
+    EscapedSpaceRx = /\\(\s)/
 
-    # Matches a space delimiter that's not escaped.
+    # Matches a whitespace delimiter, a sequence of spaces, tabs, and/or newlines.
+	# Matches the parsing rules of %w strings in Ruby.
     #
     # Examples
     #
-    #   one two	three	four
+    #   one two	 three   four
+    #   five	six
     #
-    SpaceDelimiterRx = /([^\\])#{CG_BLANK}+/
+    # TODO change to /(?<!\\)\s+/ after dropping support for Ruby 1.8.7
+    SpaceDelimiterRx = /([^\\])\s+/
 
     # Matches a + or - modifier in a subs list
     #
@@ -1260,7 +1263,7 @@ module Asciidoctor
         accum
       end
     elsif ::String === attrs
-      # convert non-escaped spaces to null, split on null, then restore escaped spaces
+      # condense and convert non-escaped spaces to null, restore escaped spaces, and split on null
       attrs = attrs.gsub(SpaceDelimiterRx, %(\\1#{NULL})).gsub(EscapedSpaceRx, '\1').split(NULL).
           inject({}) do |accum, entry|
         k, v = entry.split '=', 2
