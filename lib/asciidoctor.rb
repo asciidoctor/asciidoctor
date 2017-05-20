@@ -940,7 +940,7 @@ module Asciidoctor
     #
     #   "File > New..."
     #
-    MenuInlineRx = /\\?"([#{CC_WORD}&][^"]*?#{CG_BLANK}*&gt;#{CG_BLANK}*[^" \t][^"]*)"/
+    MenuInlineRx = /\\?"([#{CC_WORD}&][^"]*?[ \n]+&gt;[ \n]+[^"]*)"/
 
     # Matches an inline passthrough value, which may span multiple lines.
     #
