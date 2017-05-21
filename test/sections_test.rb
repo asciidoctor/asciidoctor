@@ -1641,7 +1641,7 @@ Appendix text
       assert_xpath '//h2[@id = "_appendix"]', output, 1
     end
 
-    test 'should output docbook elements that coorespond to special sections in book doctype' do
+    test 'should output docbook elements that correspond to special sections in book doctype' do
       input = <<-EOS
 = Multipart Book
 :doctype: book
