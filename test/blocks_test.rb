@@ -3140,5 +3140,18 @@ $ apt-get install asciidoctor
       refute_nil reftext
       assert_equal 'Debian Install', reftext
     end
+
+    test 'should apply title substitutions to reftext when registering block reference' do
+      input = <<-EOS
+[[generics,Java types with that <T> thing]]
+All about generics.
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['generics']
+      refute_nil reftext
+      assert_equal 'Java types with that &lt;T&gt; thing', reftext
+      assert_equal 'Java types with that &lt;T&gt; thing', doc.blocks[0].attributes['reftext']
+    end
   end
 end

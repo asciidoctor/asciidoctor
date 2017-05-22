@@ -250,6 +250,15 @@ context 'Links' do
     end
   end
 
+  test 'inline ref with reftext converted to DocBook' do
+    %w([[tigers,<Tigers>]] anchor:tigers[<Tigers>]).each do |anchor|
+      doc = document_from_string %(Here you can read about tigers.#{anchor}), :backend => :docbook45
+      output = doc.convert :header_footer => false
+      assert_equal '&lt;Tigers&gt;', doc.references[:ids]['tigers']
+      assert_includes output, '<anchor id="tigers" xreflabel="&lt;Tigers&gt;"/>'
+    end
+  end
+
   test 'escaped inline ref' do
     variations = %w([[tigers]] anchor:tigers[])
     variations.each do |anchor|

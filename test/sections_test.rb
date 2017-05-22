@@ -179,6 +179,21 @@ content
       assert_equal 'Install Procedure', reftext
     end
 
+    test 'should apply title substitutions to reftext when registering section reference' do
+      input = <<-EOS
+[[generics,Java types with that <T> thing]]
+== Generics
+
+content
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.references[:ids]['generics']
+      refute_nil reftext
+      assert_equal 'Java types with that &lt;T&gt; thing', reftext
+      assert_equal 'Java types with that &lt;T&gt; thing', doc.sections[0].attributes['reftext']
+    end
+
     test 'should not overwrite existing id entry in references table' do
       input = <<-EOS
 [#install]

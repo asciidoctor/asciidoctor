@@ -163,7 +163,7 @@ class AttributeList
           @attributes[%(#{value = value.strip}-option)] = ''
         end
         @attributes[name] = value
-      when 'title'
+      when 'title', 'reftext'
         @attributes[name] = value
       else
         @attributes[name] = single_quoted_value && !value.empty? && @block ? (@block.apply_normal_subs value) : value
