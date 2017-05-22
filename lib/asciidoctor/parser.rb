@@ -290,12 +290,13 @@ class Parser
       attributes = (title = attributes['title']) ? { 'title' => title } : {}
       current_level = section.level
       if current_level == 0 && doctype == 'book'
-        part = !section.special
+        if (part = (sectname = section.sectname) == 'part')
+          expected_next_levels = [1]
         # subsections in preface & appendix in multipart books start at level 2
-        if section.special && (['preface', 'appendix'].include? section.sectname)
-          expected_next_levels = [current_level + 2]
+        elsif section.special && (sectname == 'preface' || sectname == 'appendix')
+          expected_next_levels = [2]
         else
-          expected_next_levels = [current_level + 1]
+          expected_next_levels = [1]
         end
       else
         expected_next_levels = [current_level + 1]
@@ -1586,27 +1587,30 @@ class Parser
     section.source_location = source_location if source_location
     section.id = sect_id
     section.title = sect_title
-    # parse style, id and role from first positional attribute
-    if attributes[1]
-      style, _ = parse_style_attribute attributes, reader
-      # handle case where only id and/or role are given (e.g., #idname.rolename)
-      if style
+    # parse style, id, and role from first positional attribute if present
+    style, _ = parse_style_attribute attributes, reader unless attributes[1].nil_or_empty?
+    if style
+      if style == 'abstract' && document.doctype == 'book'
+        section.sectname = 'chapter'
+        section.level = 1
+      else
         section.sectname = style
         section.special = true
-        # HACK needs to be refactored so it's driven by config
-        if section.sectname == 'abstract' && document.doctype == 'book'
-          section.sectname = 'sect1'
-          section.special = false
-          section.level = 1
+      end
+    else
+      case document.doctype
+      when 'book'
+        section.sectname = sect_level == 0 ? 'part' : (sect_level == 1 ? 'chapter' : 'section')
+      when 'manpage'
+        if (sect_title.casecmp 'synopsis') == 0
+          section.sectname = 'synopsis'
+          section.special = true
+        else
+          section.sectname = 'section'
         end
       else
-        section.sectname = %(sect#{section.level})
+        section.sectname = 'section'
       end
-    elsif sect_title.casecmp('synopsis') == 0 && document.doctype == 'manpage'
-      section.special = true
-      section.sectname = 'synopsis'
-    else
-      section.sectname = %(sect#{section.level})
     end
 
     # generate an id if one was not embedded or specified as anchor above section title

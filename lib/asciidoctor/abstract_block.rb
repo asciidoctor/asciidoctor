@@ -387,7 +387,7 @@ class AbstractBlock < AbstractNode
       end
     elsif section.numbered
       # chapters in a book doctype should be sequential even when divided into parts
-      if (section.level == 1 || (section.level == 0 && section.special)) && @document.doctype == 'book'
+      if section.sectname == 'chapter'
         section.number = @document.counter('chapter-number', 1)
       else
         section.number = @next_section_number
