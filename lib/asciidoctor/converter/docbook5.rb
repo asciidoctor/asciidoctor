@@ -43,22 +43,13 @@ module Asciidoctor
 
     alias embedded content
 
+    MANPAGE_SECTION_TAGS = { 'section' => 'refsection', 'synopsis' => 'refsynopsisdiv' }
+
     def section node
-      doctype = node.document.doctype
-      if node.special
-        if (tag_name = node.sectname).start_with? 'sect'
-          # a normal child section of a special section
-          tag_name = 'section'
-        end
+      if node.document.doctype == 'manpage'
+        tag_name = MANPAGE_SECTION_TAGS[tag_name = node.sectname] || tag_name
       else
-        tag_name = doctype == 'book' && node.level <= 1 ? (node.level == 0 ? 'part' : 'chapter') : 'section'
-      end
-      if doctype == 'manpage'
-        if tag_name == 'section'
-          tag_name = 'refsection'
-        elsif tag_name == 'synopsis'
-          tag_name = 'refsynopsisdiv'
-        end
+        tag_name = node.sectname
       end
       %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>

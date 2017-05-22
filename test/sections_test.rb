@@ -2480,7 +2480,7 @@ It only has content.
   end
 
   context 'article doctype' do
-    test 'should create sections only in docbook backend' do
+    test 'should create only sections in docbook backend' do
       input = <<-EOS
 = Article
 Doc Writer
@@ -2565,6 +2565,38 @@ That's all she wrote!
       assert_xpath '//h1[@id="_chapter_one"][text() = "Chapter One"]', output, 1
       assert_xpath '//h1[@id="_chapter_two"][text() = "Chapter Two"]', output, 1
       assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
+    end
+
+    test 'should assign appropriate sectname for section type' do
+      input = <<-EOS
+= Book Title
+:doctype: book
+:idprefix:
+:idseparator: -
+
+= Part Title
+
+== Chapter Title
+
+=== Section Title
+
+content
+
+[appendix]
+== Appendix Title
+
+=== Appendix Section Title
+
+content
+      EOS
+
+      doc = document_from_string input
+      assert_equal 'header', doc.header.sectname
+      assert_equal 'part', (doc.find_by :id => 'part-title')[0].sectname
+      assert_equal 'chapter', (doc.find_by :id => 'chapter-title')[0].sectname
+      assert_equal 'section', (doc.find_by :id => 'section-title')[0].sectname
+      assert_equal 'appendix', (doc.find_by :id => 'appendix-title')[0].sectname
+      assert_equal 'section', (doc.find_by :id => 'appendix-section-title')[0].sectname
     end
 
     test 'should add partintro style to child paragraph of part' do
