@@ -206,6 +206,7 @@ class Document < AbstractBlock
       @parent_document = nil
       @catalog = {
         :ids => {},
+        :refs => {},
         :footnotes => [],
         :links => [],
         :images => [],
@@ -285,7 +286,6 @@ class Document < AbstractBlock
     attrs['note-caption'] = 'Note'
     attrs['tip-caption'] = 'Tip'
     attrs['warning-caption'] = 'Warning'
-    attrs['appendix-caption'] = 'Appendix'
     attrs['example-caption'] = 'Example'
     attrs['figure-caption'] = 'Figure'
     #attrs['listing-caption'] = 'Listing'
@@ -293,6 +293,10 @@ class Document < AbstractBlock
     attrs['toc-title'] = 'Table of Contents'
     #attrs['preface-title'] = 'Preface'
     attrs['manname-title'] = 'NAME'
+    attrs['section-refsig'] = 'Section'
+    #attrs['part-refsig'] = 'Part'
+    attrs['chapter-refsig'] = 'Chapter'
+    attrs['appendix-caption'] = attrs['appendix-refsig'] = 'Appendix'
     attrs['untitled-label'] = 'Untitled'
     attrs['version-label'] = 'Version'
     attrs['last-update-label'] = 'Last updated'
@@ -557,9 +561,15 @@ class Document < AbstractBlock
 
   def register type, value
     case type
-    when :ids
+    when :ids # deprecated
       id, reftext = value
-      @catalog[:ids][id] ||= (reftext || '[' + id + ']')
+      @catalog[:ids][id] ||= reftext || ('[' + id + ']')
+    when :refs
+      id, ref, reftext = value
+      unless (refs = @catalog[:refs]).key? id
+        refs[id] = ref
+        @catalog[:ids][id] = reftext || ('[' + id + ']')
+      end
     when :footnotes, :indexterms
       @catalog[type] << value
     else

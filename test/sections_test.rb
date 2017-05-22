@@ -190,6 +190,22 @@ content
       assert_equal 'Install Procedure', reftext
     end
 
+    test 'should substitute attributes when registering reftext for section' do
+      input = <<-EOS
+:platform-name: Linux
+
+[[install,install on {platform-name}]]
+== Install
+
+content
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.catalog[:ids]['install']
+      refute_nil reftext
+      assert_equal 'install on Linux', reftext
+    end
+
     test 'duplicate section id should not overwrite existing section id entry in references table' do
       input = <<-EOS
 [#install]
@@ -1367,10 +1383,10 @@ Details
       assert_xpath '//h2[text()="App A: Attribute Options"]', output, 1
     end
 
-    test 'should only assign letter to appendix when numbered is enabled and appendix caption is empty' do
+    test 'should only assign letter to appendix when numbered is enabled and appendix caption is not set' do
       input = <<-EOS
 :numbered:
-:appendix-caption:
+:!appendix-caption:
 
 [appendix]
 == Attribute Options

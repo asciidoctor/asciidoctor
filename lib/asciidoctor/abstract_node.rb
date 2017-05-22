@@ -249,16 +249,6 @@ class AbstractNode
     end
   end
 
-  # Public: A convenience method that checks if the reftext attribute is specified
-  def reftext?
-    @attributes.key?('reftext') || @document.attributes.key?('reftext')
-  end
-
-  # Public: A convenience method that returns the value of the reftext attribute
-  def reftext
-    @attributes['reftext'] || @document.attributes['reftext']
-  end
-
   # Public: Construct a reference or data URI to an icon image for the
   # specified icon name.
   #

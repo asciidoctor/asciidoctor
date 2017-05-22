@@ -12,6 +12,7 @@ module Substitutors
   (NORMAL_SUBS = [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements]).freeze
   (NONE_SUBS = []).freeze
   (TITLE_SUBS = [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements]).freeze
+  (REFTEXT_SUBS = [:specialcharacters, :quotes, :replacements]).freeze
   (VERBATIM_SUBS = [:specialcharacters, :callouts]).freeze
 
   SUB_GROUPS = {
@@ -151,6 +152,15 @@ module Substitutors
   # returns - A String with title substitutions performed
   def apply_title_subs(title)
     apply_subs title, TITLE_SUBS
+  end
+
+  # Public: Apply substitutions for reftext.
+  #
+  # text - The String to process
+  #
+  # Returns a String with all substitutions from the reftext substitution group applied
+  def apply_reftext_subs text
+    apply_subs text, REFTEXT_SUBS
   end
 
   # Public: Apply substitutions for header metadata and attribute assignments
@@ -972,8 +982,10 @@ module Substitutors
           id, reftext = id.split ',', 2
           reftext = reftext.lstrip if reftext
         else
-          id, reftext = m[2], m[3]
-          reftext = reftext.gsub ESC_R_SB, R_SB if reftext && (reftext.include? R_SB)
+          id = m[2]
+          if (reftext = m[3]) && (reftext.include? R_SB)
+            reftext = reftext.gsub ESC_R_SB, R_SB
+          end
         end
 
         if (hash_idx = id.index '#')

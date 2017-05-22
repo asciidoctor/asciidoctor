@@ -1025,27 +1025,28 @@ Your browser does not support the video tag.
     end
 
     def inline_anchor node
-      target = node.target
       case node.type
       when :xref
-        refid = node.attributes['refid'] || target
-        # NOTE we lookup text in converter because DocBook doesn't need this logic
-        text = node.text || node.document.catalog[:ids][refid] || %([#{refid}])
-        # FIXME shouldn't target be refid? logic seems confused here
-        %(<a href="#{target}">#{text}</a>)
+        unless (text = node.text)
+          if AbstractNode === (ref = node.document.catalog[:refs][refid = node.attributes['refid']])
+            text = ref.xreftext((@xrefstyle ||= node.document.attributes['xrefstyle'])) || %([#{refid}])
+          else
+            text = %([#{refid}])
+          end
+        end
+        %(<a href="#{node.target}">#{text}</a>)
       when :ref
-        %(<a id="#{target}"></a>)
+        %(<a id="#{node.target}"></a>)
       when :link
-        attrs = []
-        attrs << %( id="#{node.id}") if node.id
+        attrs = node.id ? [%( id="#{node.id}")] : []
         if (role = node.role)
           attrs << %( class="#{role}")
         end
         attrs << %( title="#{node.attr 'title'}") if node.attr? 'title', nil, false
         attrs << %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window', nil, false
-        %(<a href="#{target}"#{attrs.join}>#{node.text}</a>)
+        %(<a href="#{node.target}"#{attrs.join}>#{node.text}</a>)
       when :bibref
-        %(<a id="#{target}"></a>#{node.text})
+        %(<a id="#{node.target}"></a>#{node.text})
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
       end

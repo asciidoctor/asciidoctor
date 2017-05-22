@@ -631,7 +631,7 @@ class Parser
           block = next_item_list(reader, :ulist, parent)
           if (style || (Section === parent && parent.sectname)) == 'bibliography'
             attributes['style'] = 'bibliography' unless style
-            block.items.each {|item| catalog_inline_biblio_anchor item.instance_variable_get(:@text), document }
+            block.items.each {|item| catalog_inline_biblio_anchor item.instance_variable_get(:@text), item, document }
           end
           break
 
@@ -726,8 +726,6 @@ class Parser
             return
           end
 
-          catalog_inline_anchors lines * LF, document
-
           # NOTE don't check indented here since it's extremely rare
           #if text_only || indented
           if text_only
@@ -768,6 +766,8 @@ class Parser
             adjust_indentation! lines if indented && style == 'normal'
             block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
           end
+
+          catalog_inline_anchors lines * LF, block, document
         end
 
         break # forbid loop from executing more than once
@@ -904,16 +904,16 @@ class Parser
       block.source_location = source_location if source_location
       # FIXME title should have already been assigned
       block.title = attributes.delete 'title' if attributes.key? 'title'
+      #unless attributes.key? 'reftext'
+      #  attributes['reftext'] = document.attributes['reftext'] if document.attributes.key? 'reftext'
+      #end
       # FIXME caption should have already been assigned
       block.caption ||= attributes.delete 'caption'
       # TODO eventually remove the style attribute from the attributes hash
       #block.style = attributes.delete 'style'
       block.style = attributes['style']
-      # AsciiDoc Python always use [id] as the reftext in HTML output,
-      # but I'd like to do better in Asciidoctor
       if (block_id = (block.id ||= attributes['id']))
-        # TODO sub reftext
-        document.register(:ids, [block_id, (attributes['reftext'] || (block.title? ? block.title : nil))])
+        document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
       end
       # FIXME remove the need for this update!
       block.attributes.update(attributes) unless attributes.empty?
@@ -1192,36 +1192,42 @@ class Parser
     found
   end
 
-  # Internal: Catalog any inline anchors found in the text, but don't process them
+  # Internal: Catalog any inline anchors found in the text (but don't convert)
   #
   # text     - The String text in which to look for inline anchors
-  # document - The current document in which the references are stored
+  # block    - The block in which the references should be searched
+  # document - The current Document on which the references are stored
   #
   # Returns nothing
-  def self.catalog_inline_anchors text, document
+  def self.catalog_inline_anchors text, block, document
     text.scan(InlineAnchorScanRx) do
       if (id = $1)
-        reftext = $2
+        if (reftext = $2)
+          next if (reftext.include? '{') && (reftext = document.sub_attributes reftext).empty?
+        end
       else
         id = $3
-        if (reftext = $4) && (reftext.include? ']')
-          reftext = reftext.gsub '\]', ']'
+        if (reftext = $4)
+          reftext = reftext.gsub '\]', ']' if reftext.include? ']'
+          next if (reftext.include? '{') && (reftext = document.sub_attributes reftext).empty?
         end
       end
-      document.register :ids, [id, reftext]
+      document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :target => id), reftext]
     end if (text.include? '[[') || (text.include? 'or:')
     nil
   end
 
-  # Internal: Catalog any bibliography inline anchors found in the text, but don't process them
+  # Internal: Catalog the bibliography inline anchor found in the start of the list item (but don't convert)
   #
-  # text     - The String text in which to look for inline bibliography anchors
-  # document - The current document in which the references are stored
+  # text     - The String text in which to look for an inline bibliography anchor
+  # block    - The ListItem block in which the reference should be searched
+  # document - The current document in which the reference is stored
   #
   # Returns nothing
-  def self.catalog_inline_biblio_anchor text, document
+  def self.catalog_inline_biblio_anchor text, block, document
     if InlineBiblioAnchorRx =~ text
-      document.register :ids, [$1, %([#{$2 || $1}])]
+      # QUESTION should we sub attributes in reftext (like with regular anchors)?
+      document.register :refs, [(id = $1), (Inline.new block, :anchor, (reftext = %([#{$2 || id}])), :type => :bibref, :target => id), reftext]
     end
     nil
   end
@@ -1562,6 +1568,8 @@ class Parser
       attributes['reftext'] = sect_reftext
     elsif attributes.key? 'reftext'
       sect_reftext = attributes['reftext']
+    #elsif document.attributes.key? 'reftext'
+    #  sect_reftext = attributes['reftext'] = document.attributes['reftext']
     end
 
     # parse style, id, and role attributes from first positional attribute if present
@@ -1602,8 +1610,7 @@ class Parser
     # generate an ID if one was not embedded or specified as anchor above section title
     if (id = section.id ||= (attributes['id'] ||
         ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil)))
-      # TODO sub reftext
-      document.register :ids, [id, sect_reftext || section.title]
+      document.register :refs, [id, section, sect_reftext || section.title]
     end
 
     section.update_attributes(attributes)
@@ -2013,11 +2020,11 @@ class Parser
       if next_line.start_with? '['
         if next_line.start_with? '[['
           if (next_line.end_with? ']]') && BlockAnchorRx =~ next_line
+            # NOTE registration of id and reftext is deferred until block is processed
             attributes['id'] = $1
-            # AsciiDoc Python always uses [id] as the reftext in HTML output,
-            # but I'd like to do better in Asciidoctor
-            # registration is deferred until the block or section is processed
-            attributes['reftext'] = $2 if $2
+            if (reftext = $2)
+              attributes['reftext'] = (reftext.include? '{') ? (document.sub_attributes reftext) : reftext
+            end
             return true
           end
         elsif (next_line.end_with? ']') && BlockAttributeListRx =~ next_line

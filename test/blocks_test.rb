@@ -3238,6 +3238,25 @@ $ apt-get install asciidoctor
       assert_equal 'Debian, Ubuntu', reftext
     end
 
+    test 'should substitute attribute references in reftext when registering block reference' do
+      input = <<-EOS
+:label-tiger: Tiger
+
+[[tiger-evolution,Evolution of the {label-tiger}]]
+****
+Information about the evolution of the tiger.
+****
+      EOS
+
+      doc = document_from_string input
+      reftext = doc.catalog[:ids]['tiger-evolution']
+      refute_nil reftext
+      assert_equal 'Evolution of the Tiger', reftext
+      ref = doc.catalog[:refs]['tiger-evolution']
+      refute_nil ref
+      assert_equal 'Evolution of the Tiger', ref.attributes['reftext']
+    end
+
     test 'should use specified reftext when registering block reference' do
       input = <<-EOS
 [[debian]]

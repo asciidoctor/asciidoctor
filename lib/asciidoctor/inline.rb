@@ -47,5 +47,27 @@ class Inline < AbstractNode
   def alt
     attr 'alt'
   end
+
+  def reftext?
+    @text && (@type == :ref || @type == :bibref)
+  end
+
+  def reftext
+    (val = @text) ? (apply_reftext_subs val) : nil
+  end
+
+  # Public: Generate cross reference text (xreftext) that can be used to refer
+  # to this inline node.
+  #
+  # Use the explicit reftext for this inline node, if specified, retrieved by
+  # calling the reftext method. Otherwise, returns nil.
+  #
+  # xrefstyle - Not currently used (default: nil).
+  #
+  # Returns the [String] reftext to refer to this inline node or nothing if no
+  # reftext is defined.
+  def xreftext xrefstyle = nil
+    reftext
+  end
 end
 end
