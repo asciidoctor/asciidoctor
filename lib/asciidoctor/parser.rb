@@ -253,21 +253,19 @@ class Parser
   #   # => "Salutations"
   #
   # returns a two-element Array containing the Section and Hash of orphaned attributes
-  def self.next_section(reader, parent, attributes = {})
-    preamble = false
-    part = false
-    intro = false
+  def self.next_section reader, parent, attributes = {}
+    preamble = intro = part = false
 
     # FIXME if attributes[1] is a verbatim style, then don't check for section
 
     # check if we are at the start of processing the document
     # NOTE we could drop a hint in the attributes to indicate
     # that we are at a section title (so we don't have to check)
-    if parent.context == :document && parent.blocks.empty? &&
-        ((has_header = parent.has_header?) || attributes.delete('invalid-header') || !is_next_line_section?(reader, attributes))
+    if parent.context == :document && parent.blocks.empty? && ((has_header = parent.has_header?) ||
+        (attributes.delete 'invalid-header') || !(is_next_line_section? reader, attributes))
       doctype = (document = parent).doctype
       if has_header || (doctype == 'book' && attributes[1] != 'abstract')
-        preamble = intro = Block.new(parent, :preamble, :content_model => :compound)
+        preamble = intro = (Block.new parent, :preamble, :content_model => :compound)
         preamble.title = parent.attr 'preface-title' if doctype == 'book' && (parent.attr? 'preface-title')
         parent << preamble
       end
@@ -284,12 +282,11 @@ class Parser
       end
     else
       doctype = (document = parent.document).doctype
-      section = initialize_section(reader, parent, attributes)
+      section = initialize_section reader, parent, attributes
       # clear attributes, except for title which carries over
       # section title to next block of content
       attributes = (title = attributes['title']) ? { 'title' => title } : {}
-      current_level = section.level
-      if current_level == 0 && doctype == 'book'
+      if (current_level = section.level) == 0 && doctype == 'book'
         if (part = (sectname = section.sectname) == 'part')
           expected_next_levels = [1]
         # subsections in preface & appendix in multipart books start at level 2
@@ -315,7 +312,7 @@ class Parser
     # We have to parse all the metadata lines before continuing with the loop,
     # otherwise subsequent metadata lines get interpreted as block content
     while reader.has_more_lines?
-      parse_block_metadata_lines(reader, section, attributes)
+      parse_block_metadata_lines reader, section, attributes
 
       if (next_level = is_next_line_section?(reader, attributes))
         next_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
@@ -326,7 +323,7 @@ class Parser
             warn %(asciidoctor: WARNING: #{reader.line_info}: section title out of sequence: expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, got level #{next_level})
           end
           # the attributes returned are those that are orphaned
-          new_section, attributes = next_section(reader, section, attributes)
+          new_section, attributes = next_section reader, section, attributes
           section << new_section
         else
           if next_level == 0 && doctype != 'book'
@@ -1578,15 +1575,14 @@ class Parser
   # reader     - the source reader
   # parent     - the parent Section or Document of this Section
   # attributes - a Hash of attributes to assign to this section (default: {})
-  def self.initialize_section(reader, parent, attributes = {})
+  def self.initialize_section reader, parent, attributes = {}
     document = parent.document
     source_location = reader.cursor if document.sourcemap
-    sect_id, sect_reftext, sect_title, sect_level, _ = parse_section_title(reader, document)
+    sect_id, sect_reftext, sect_title, sect_level, _ = parse_section_title reader, document
     attributes['reftext'] = sect_reftext if sect_reftext
-    section = Section.new parent, sect_level, document.attributes.key?('sectnums')
+    section = Section.new parent, sect_level, (document.attributes.key? 'sectnums')
     section.source_location = source_location if source_location
-    section.id = sect_id
-    section.title = sect_title
+    section.id, section.title = sect_id, sect_title
     # parse style, id, and role from first positional attribute if present
     style, _ = parse_style_attribute attributes, reader unless attributes[1].nil_or_empty?
     if style
