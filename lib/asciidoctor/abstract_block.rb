@@ -19,6 +19,11 @@ class AbstractBlock < AbstractNode
   # Public: Get/Set the caption for this block
   attr_accessor :caption
 
+  # Public: Get/Set the number of this block (if section, relative to parent, otherwise absolute)
+  # Only assigned to section if automatic section numbering is enabled
+  # Only assigned to formal block (block with title) if corresponding caption attribute is present
+  attr_accessor :number
+
   # Public: Gets/Sets the location in the AsciiDoc source where this block begins
   attr_accessor :source_location
 
@@ -32,6 +37,7 @@ class AbstractBlock < AbstractNode
     @title = nil
     @title_converted = nil
     @caption = nil
+    @number = nil
     @style = nil
     if context == :document
       @level = 0
@@ -331,26 +337,18 @@ class AbstractBlock < AbstractNode
   # If an explicit caption has been specified on this block, then
   # do nothing.
   #
+  # The parts of a complete caption are: <label> <number>. <title>
+  # This partial caption represents the part the precedes the title.
+  #
   # key         - The prefix of the caption and counter attribute names.
   #               If not provided, the name of the context for this block
   #               is used. (default: nil).
   #
   # Returns nothing
-  def assign_caption(caption = nil, key = nil)
-    return unless title? || !@caption
-
-    if caption
-      @caption = caption
-    else
-      if (value = @document.attributes['caption'])
-        @caption = value
-      elsif title?
-        key ||= @context.to_s
-        caption_key = "#{key}-caption"
-        if (caption_title = @document.attributes[caption_key])
-          caption_num = @document.counter_increment("#{key}-number", self)
-          @caption = "#{caption_title} #{caption_num}. "
-        end
+  def assign_caption caption = nil, key = nil
+    unless @caption || !title? || (@caption = caption || @document.attributes['caption'])
+      if (label = @document.attributes[%(#{key ||= @context}-caption)])
+        @caption = %(#{label} #{@number = @document.counter_increment "#{key}-number", self}. )
       end
     end
     nil
