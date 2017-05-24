@@ -335,7 +335,7 @@ class Parser
       else
         # just take one block or else we run the risk of overrunning section boundaries
         block_line_info = reader.line_info
-        if (new_block = next_block reader, (intro || section), attributes, :parse_metadata => false)
+        if (new_block = next_block reader, intro || section, attributes, :parse_metadata => false)
           # REVIEW this may be doing too much
           if part
             if !section.blocks?
@@ -597,7 +597,7 @@ class Parser
                 content = match[3]
                 if extension.config[:content_model] == :attributes
                   unless content.empty?
-                    document.parse_attributes(content, (extension.config[:pos_attrs] || []),
+                    document.parse_attributes(content, extension.config[:pos_attrs] || [],
                         :sub_input => true, :sub_result => false, :into => attributes)
                   end
                 else
@@ -748,7 +748,7 @@ class Parser
             return
           end
 
-          catalog_inline_anchors(lines.join(EOL), document)
+          catalog_inline_anchors lines.join(EOL), document
 
           # NOTE don't check indented here since it's extremely rare
           #if text_only || indented
