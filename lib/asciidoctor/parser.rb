@@ -2057,30 +2057,23 @@ class Parser
     end
   end
 
-  def self.process_attribute_entry(reader, parent, attributes = nil, match = nil)
-    match ||= (reader.has_more_lines? ? AttributeEntryRx.match(reader.peek_line) : nil)
-    if match
-      name = match[1]
-      unless (value = match[2] || '').empty?
-        if value.end_with?(line_continuation = LINE_CONTINUATION) ||
-            value.end_with?(line_continuation = LINE_CONTINUATION_LEGACY)
-          value = value.chop.rstrip
-          while reader.advance
-            break if (next_line = reader.peek_line.strip).empty?
-            if (keep_open = next_line.end_with? line_continuation)
-              next_line = next_line.chop.rstrip
-            end
-            separator = (value.end_with? LINE_BREAK) ? EOL : ' '
-            value = %(#{value}#{separator}#{next_line})
-            break unless keep_open
+  def self.process_attribute_entry reader, parent, attributes = nil, match = nil
+    if (match ||= (reader.has_more_lines? ? (AttributeEntryRx.match reader.peek_line) : nil))
+      if (value = match[2]).nil_or_empty?
+        value = ''
+      elsif value.end_with? LINE_CONTINUATION, LINE_CONTINUATION_LEGACY
+        con, value = (value.slice -2, 2), (value.slice 0, value.length - 2).rstrip
+        while reader.advance && !(next_line = reader.peek_line.lstrip).empty?
+          if (keep_open = next_line.end_with? con)
+            next_line = (next_line.slice 0, next_line.length - 2).rstrip
           end
+          value = %(#{value}#{(value.end_with? LINE_BREAK) ? EOL : ' '}#{next_line})
+          break unless keep_open
         end
       end
 
-      store_attribute(name, value, (parent ? parent.document : nil), attributes)
+      store_attribute match[1], value, (parent ? parent.document : nil), attributes
       true
-    else
-      false
     end
   end
 
