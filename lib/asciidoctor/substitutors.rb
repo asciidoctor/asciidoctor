@@ -480,6 +480,12 @@ module Substitutors
           end
         elsif doc_attrs.key?(key = m[2].downcase)
           doc_attrs[key]
+        elsif (section_subs = opts[:section_reftext])
+          if 'sectnum' == m[2].downcase
+            section_subs[:sectnum]
+          elsif 'secttitle' == m[2].downcase
+            section_subs[:secttitle]
+          end
         elsif INTRINSIC_ATTRIBUTES.key? key
           INTRINSIC_ATTRIBUTES[key]
         else
