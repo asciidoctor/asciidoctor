@@ -938,10 +938,10 @@ class Parser
       else
         block.caption ||= attributes.delete('caption')
       end
-      # TODO eventualy remove the style attribute from the attributes hash
+      # TODO eventually remove the style attribute from the attributes hash
       #block.style = attributes.delete('style')
       block.style = attributes['style']
-      # AsciiDoc always use [id] as the reftext in HTML output,
+      # AsciiDoc Python always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
       if (block_id = (block.id ||= attributes['id']))
         # TODO sub reftext
@@ -1230,20 +1230,12 @@ class Parser
   # document - The current document on which the references are stored
   #
   # Returns nothing
-  def self.catalog_inline_anchors(text, document)
-    text.scan(InlineAnchorRx) {
-      # alias match for Ruby 1.8.7 compat
-      m = $~
-      next if m[0].start_with? '\\'
-      id = m[1] || m[3]
-      reftext = m[2] || m[4]
-      # enable if we want to allow double quoted values
-      #id = id[1, id.length - 2] if (id.start_with? '"') && (id.end_with? '"')
-      #if reftext
-      #  reftext = reftext[1, reftext.length - 2] if (reftext.start_with? '"') && (reftext.end_with? '"')
-      #end
-      document.register(:ids, [id, reftext])
-    } if text.include? '['
+  def self.catalog_inline_anchors text, document
+    text.scan(InlineAnchorRx) do
+      # lead with assignments for Ruby 1.8.7 compat
+      id, reftext = $1 || $3, $2 || $4
+      document.register :ids, [id, reftext] unless $&.start_with? '\\'
+    end if (text.include? '[[') || (text.include? 'or:')
     nil
   end
 
@@ -1579,7 +1571,11 @@ class Parser
     document = parent.document
     source_location = reader.cursor if document.sourcemap
     sect_id, sect_reftext, sect_title, sect_level, _ = parse_section_title reader, document
-    attributes['reftext'] = sect_reftext if sect_reftext
+    if sect_reftext
+      attributes['reftext'] = sect_reftext
+    elsif attributes.key? 'reftext'
+      sect_reftext = attributes['reftext']
+    end
     section = Section.new parent, sect_level, (document.attributes.key? 'sectnums')
     section.source_location = source_location if source_location
     section.id, section.title = sect_id, sect_title
@@ -1610,10 +1606,10 @@ class Parser
     end
 
     # generate an id if one was not embedded or specified as anchor above section title
-    id = (section.id ||= (attributes['id'] || (Section.generate_id section.title, document)))
-
-    # TODO sub reftext
-    document.register(:ids, [id, (attributes['reftext'] || section.title)]) if id
+    if (id = (section.id ||= (attributes['id'] || (Section.generate_id section.title, document))))
+      # TODO sub reftext
+      document.register :ids, [id, sect_reftext || section.title]
+    end
 
     section.update_attributes(attributes)
     reader.skip_blank_lines
