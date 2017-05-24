@@ -553,6 +553,8 @@ You futz with XML.
       EOS
 
       doc = document_from_string input
+      assert_equal 1, doc.blocks[0].number
+      assert_equal 2, doc.blocks[1].number
       output = doc.render
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Example 1. Writing Docs with AsciiDoc"]', output, 1
       assert_xpath '(//*[@class="exampleblock"])[2]/*[@class="title"][text()="Example 2. Writing Docs with DocBook"]', output, 1
@@ -579,6 +581,8 @@ You futz with XML.
       EOS
 
       doc = document_from_string input
+      assert_equal 'A', doc.blocks[0].number
+      assert_equal 'B', doc.blocks[1].number
       output = doc.render
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Example A. Writing Docs with AsciiDoc"]', output, 1
       assert_xpath '(//*[@class="exampleblock"])[2]/*[@class="title"][text()="Example B. Writing Docs with DocBook"]', output, 1
@@ -597,6 +601,7 @@ You just write.
       EOS
 
       doc = document_from_string input
+      assert_nil doc.blocks[0].number
       output = doc.render
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
       assert !doc.attributes.has_key?('example-number')
@@ -1682,13 +1687,14 @@ image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=nam
       assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"][@target="name"][@rel="noopener"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
-    test "can render block image with caption" do
+    test 'can render block image with caption' do
       input = <<-EOS
 .The AsciiDoc Tiger
 image::images/tiger.png[Tiger]
       EOS
 
       doc = document_from_string input
+      assert_equal 1, doc.blocks[0].number
       output = doc.render
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Figure 1. The AsciiDoc Tiger"]', output, 1
@@ -1703,6 +1709,7 @@ image::images/tiger.png[Tiger]
       EOS
 
       doc = document_from_string input
+      assert_nil doc.blocks[0].number
       output = doc.render
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Voila! The AsciiDoc Tiger"]', output, 1

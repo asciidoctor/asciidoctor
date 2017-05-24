@@ -24,10 +24,6 @@ class Section < AbstractBlock
   # Public: Get/Set the 0-based index order of this section within the parent block
   attr_accessor :index
 
-  # Public: Get/Set the number of this section within the parent block
-  # Only relevant if the attribute numbered is true
-  attr_accessor :number
-
   # Public: Get/Set the section name of this section
   attr_accessor :sectname
 
