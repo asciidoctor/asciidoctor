@@ -1278,7 +1278,7 @@ Linux installation instructions.
   end
 
   context 'Special sections' do
-    test 'should assign sectname and caption to appendix section' do
+    test 'should assign sectname, numbered, and caption to appendix section by default' do
       input = <<-EOS
 [appendix]
 == Attribute Options
@@ -1286,12 +1286,13 @@ Linux installation instructions.
 Details
       EOS
 
-      output = block_from_string input
-      assert_equal 'appendix', output.sectname
-      assert_equal 'Appendix A: ', output.caption
+      appendix = block_from_string input
+      assert_equal 'appendix', appendix.sectname
+      assert_equal 'Appendix A: ', appendix.caption
+      assert_equal true, appendix.numbered
     end
 
-    test 'should render appendix title prefixed with caption' do
+    test 'should prefix appendix title by numbered label even when section numbering is disabled' do
       input = <<-EOS
 [appendix]
 == Attribute Options
