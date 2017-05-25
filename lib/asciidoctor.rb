@@ -506,13 +506,20 @@ module Asciidoctor
     # Matches invalid characters in an attribute name.
     InvalidAttributeNameCharsRx = /[^\w\-]/
 
-    # Matches the pass inline macro allowed in value of attribute assignment.
+    # Matches a pass inline macro that surrounds the value of an attribute
+    # entry once it has been parsed.
     #
     # Examples
     #
     #   pass:[text]
+    #   pass:a[{a} {b} {c}]
     #
-    AttributeEntryPassMacroRx = /^pass:([a-z]+(?:,[a-z]+)*)?\[(.*)\]$/
+    if RUBY_ENGINE == 'opal'
+      # In JavaScript, ^ and $ match the boundaries of the string when the m flag is not set
+      AttributeEntryPassMacroRx = /^pass:([a-z]+(?:,[a-z]+)*)?\[([\S\s]*)\]$/
+    else
+      AttributeEntryPassMacroRx = /\Apass:([a-z]+(?:,[a-z]+)*)?\[(.*)\]\Z/m
+    end
 
     # Matches an inline attribute reference.
     #

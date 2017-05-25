@@ -46,6 +46,16 @@ linus.torvalds@example.com
       assert_equal %(Linus Torvalds +\nLinux Hacker +\nlinus.torvalds@example.com), doc.attributes['signature']
     end
 
+    test 'should allow pass macro to surround a multi-line value that contains line breaks' do
+      str = <<-EOS
+:signature: pass:a[{author} + \\
+{title} + \\
+{email}]
+      EOS
+      doc = document_from_string str, :attributes => { 'author' => 'Linus Torvalds', 'title' => 'Linux Hacker', 'email' => 'linus.torvalds@example.com' }
+      assert_equal %(Linus Torvalds +\nLinux Hacker +\nlinus.torvalds@example.com), (doc.attr 'signature')
+    end
+
     test 'should delete an attribute that ends with !' do
       doc = document_from_string(":frog: Tanglefoot\n:frog!:")
       assert_equal nil, doc.attributes['frog']
