@@ -454,7 +454,7 @@ module Asciidoctor
     #   endif::basebackend-html[]
     #   endif::[]
     #
-    ConditionalDirectiveRx = /^(\\)?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,\+])\S+?)?)\[(.+)?\]$/
+    ConditionalDirectiveRx = /^(\\)?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,+])\S+?)?)\[(.+)?\]$/
 
     # Matches a restricted (read as safe) eval expression.
     #
