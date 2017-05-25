@@ -67,6 +67,7 @@ module Asciidoctor
         @engine_options[:haml][:format] = :html5
         @engine_options[:slim][:format] = :html
       end
+      @engine_options[:slim][:include_dirs] = template_dirs.reverse.map {|dir| ::File.expand_path dir }
       if (overrides = opts[:template_engine_options])
         overrides.each do |engine, override_opts|
           (@engine_options[engine] ||= {}).update override_opts

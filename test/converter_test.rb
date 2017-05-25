@@ -26,6 +26,19 @@ context 'Converter' do
       assert_equal :xhtml, selected.templates['paragraph'].options[:format]
     end
 
+    test 'should configure Slim to resolve includes in specified template dirs' do
+      template_dirs = [
+        File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'),
+        File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim-overrides'),
+      ]
+      doc = Asciidoctor::Document.new [], :template_dirs => template_dirs, :template_cache => false
+      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      selected = doc.converter.find_converter('paragraph')
+      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
+      assert selected.templates['paragraph'].is_a? Slim::Template
+      assert_equal template_dirs.reverse.map {|dir| File.expand_path dir }, selected.templates['paragraph'].options[:include_dirs]
+    end
+
     test 'should set Slim format to html for html5 backend' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false
       assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
