@@ -170,8 +170,8 @@ module Helpers
   #   # => "part1/chapter1"
   #
   # Returns the String filename with the file extension removed
-  def self.rootname(filename)
-    filename[0, filename.length - ::File.extname(filename).length]
+  def self.rootname filename
+    filename[0, filename.length - (::File.extname filename).length]
   end
 
   # Public: Retrieves the basename of the filename, optionally removing the extension, if present
