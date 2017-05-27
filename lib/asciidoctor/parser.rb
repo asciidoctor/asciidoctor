@@ -2139,8 +2139,8 @@ class Parser
   #
   # Returns the String 0-index marker for this list item
   def self.resolve_list_marker(list_type, marker, ordinal = 0, validate = false, reader = nil)
-    if list_type == :olist && !marker.start_with?('.')
-      resolve_ordered_list_marker(marker, ordinal, validate, reader)
+    if list_type == :olist
+      (marker.start_with? '.') ? marker : (resolve_ordered_list_marker marker, ordinal, validate, reader)
     elsif list_type == :colist
       '<1>'
     else
