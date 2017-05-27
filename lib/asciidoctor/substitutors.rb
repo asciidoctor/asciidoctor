@@ -53,7 +53,7 @@ module Substitutors
   PassSlotRx = /\u0096(\d+)\u0097/
 
   # fix passthrough slot after syntax highlighting
-  HighlightedPassSlotRx = %r(<span\b[^>]*>\u0096</span>[^\d]*(\d+)[^\d]*<span\b[^>]*>\u0097</span>)
+  HighlightedPassSlotRx = %r(<span\b[^>]*?>\u0096</span>[^\d]*(\d+)[^\d]*<span\b[^>]*?>\u0097</span>)
 
   RS = '\\'
 
@@ -66,7 +66,7 @@ module Substitutors
   PygmentsWrapperDivRx = %r(<div class="pyhl">(.*)</div>)m
   # NOTE handles all permutations of <pre> wrapper
   # NOTE trailing whitespace appears when pygments-linenums-mode=table; <pre> has style attribute when pygments-css=inline
-  PygmentsWrapperPreRx = %r(<pre\b[^>]*>(.*?)</pre>\s*)m
+  PygmentsWrapperPreRx = %r(<pre\b[^>]*?>(.*?)</pre>\s*)m
 
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs

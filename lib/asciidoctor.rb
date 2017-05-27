@@ -410,7 +410,7 @@ module Asciidoctor
     #   Doc Writer <doc@example.com>
     #   Mary_Sue Brontë
     #
-    AuthorInfoLineRx = /^(#{CG_WORD}[#{CC_WORD}\-'.]*)(?: +(#{CG_WORD}[#{CC_WORD}\-'.]*))?(?: +(#{CG_WORD}[#{CC_WORD}\-'.]*))?(?: +<([^>]+)>)?$/
+    AuthorInfoLineRx = /^(#{CG_WORD}[#{CC_WORD}\-'.]*)(?: +(#{CG_WORD}[#{CC_WORD}\-'.]*))?(?: +(#{CG_WORD}[#{CC_WORD}\-'.]*))?(?: +<([^>]+?)>)?$/
 
     # Matches the revision info line, which appears immediately following
     # the author info line beneath the document title.
@@ -1106,7 +1106,7 @@ module Asciidoctor
     UriTerminatorRx = /[);:]$/
 
     # Detects XML tags
-    XmlSanitizeRx = /<[^>]+>/
+    XmlSanitizeRx = /<[^>]+?>/
   #end
 
   INTRINSIC_ATTRIBUTES = {
