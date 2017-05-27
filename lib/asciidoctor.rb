@@ -795,7 +795,7 @@ module Asciidoctor
     #
     #--
     # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
-    GenericBlockMacroRx = /^(#{CG_WORD}+)::(\S|\S.*?\S)\[(.*)\]$/
+    GenericBlockMacroRx = /^(#{CG_WORD}+)::(|\S|\S.*?\S)\[(.*)\]$/
 
     # Matches an image, video or audio block macro.
     #

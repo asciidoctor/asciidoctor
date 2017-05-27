@@ -702,6 +702,32 @@ snippet::12345[mode=edit]
       end
     end
 
+    test 'should match short form of block macro' do
+      input = <<-EOS
+custom_toc::[]
+      EOS
+
+      resolved_target = nil
+
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro do
+            named :custom_toc
+            process do |parent, target, attrs|
+              resolved_target = target
+              create_pass_block parent, '<!-- custom toc goes here -->', {}, :content_model => :raw
+            end
+          end
+        end
+
+        output = render_embedded_string input
+        assert_equal '<!-- custom toc goes here -->', output
+        assert_equal '', resolved_target
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke processor for custom inline macro' do
       begin
         Asciidoctor::Extensions.register do
