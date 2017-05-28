@@ -50,10 +50,10 @@ module Substitutors
   PASS_END = %(\u0097)
 
   # match passthrough slot
-  PassSlotRx = /\u0096(\d+)\u0097/
+  PassSlotRx = /#{PASS_START}(\d+)#{PASS_END}/
 
   # fix passthrough slot after syntax highlighting
-  HighlightedPassSlotRx = %r(<span\b[^>]*?>\u0096</span>[^\d]*(\d+)[^\d]*<span\b[^>]*?>\u0097</span>)
+  HighlightedPassSlotRx = %r(<span\b[^>]*?>#{PASS_START}</span>[^\d]*(\d+)[^\d]*<span\b[^>]*?>#{PASS_END}</span>)
 
   RS = '\\'
 

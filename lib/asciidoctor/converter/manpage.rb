@@ -10,7 +10,7 @@ module Asciidoctor
     TAB = %(\t)
     WHITESPACE = %(#{LF}#{TAB} )
     ET = ' ' * 8
-    ESC = %(\u001b)      # troff leader marker
+    ESC = %(\u001b) # troff leader marker
     ESC_BS = %(#{ESC}\\) # escaped backslash (indicates troff formatting sequence)
     ESC_FS = %(#{ESC}.)  # escaped full stop (indicates troff macro)
 
