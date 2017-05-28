@@ -1304,20 +1304,6 @@ Details
       assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
     end
 
-    test 'should prefix appendix title by label and letter only when numbered is enabled' do
-      input = <<-EOS
-:numbered:
-
-[appendix]
-== Attribute Options
-
-Details
-      EOS
-
-      output = render_embedded_string input
-      assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
-    end
-
     test 'should use custom appendix caption if specified' do
       input = <<-EOS
 :appendix-caption: App
