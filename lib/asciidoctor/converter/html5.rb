@@ -812,9 +812,10 @@ Your browser does not support the audio tag.
           end
         end
         result << '</colgroup>'
-        [:head, :foot, :body].select {|tsec| !node.rows[tsec].empty? }.each do |tsec|
+        node.rows.by_section.each do |tsec, rows|
+          next if rows.empty?
           result << %(<t#{tsec}>)
-          node.rows[tsec].each do |row|
+          rows.each do |row|
             result << '<tr>'
             row.each do |cell|
               if tsec == :head
