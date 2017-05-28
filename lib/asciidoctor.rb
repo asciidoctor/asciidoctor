@@ -1264,18 +1264,17 @@ module Asciidoctor
     elsif ::Hash === attrs || (::RUBY_ENGINE_JRUBY && ::Java::JavaUtil::Map === attrs)
       attrs = attrs.dup
     elsif ::Array === attrs
-      attrs = attrs.inject({}) do |accum, entry|
+      attrs, attrs_arr = {}, attrs
+      attrs_arr.each do |entry|
         k, v = entry.split '=', 2
-        accum[k] = v || ''
-        accum
+        attrs[k] = v || ''
       end
     elsif ::String === attrs
-      # condense and convert non-escaped spaces to null, restore escaped spaces, and split on null
-      attrs = attrs.gsub(SpaceDelimiterRx, %(\\1#{NULL})).gsub(EscapedSpaceRx, '\1').split(NULL).
-          inject({}) do |accum, entry|
+      # condense and convert non-escaped spaces to null, unescape escaped spaces, then split on null
+      attrs, attrs_arr = {}, attrs.gsub(SpaceDelimiterRx, %(\\1#{NULL})).gsub(EscapedSpaceRx, '\1').split(NULL)
+      attrs_arr.each do |entry|
         k, v = entry.split '=', 2
-        accum[k] = v || ''
-        accum
+        attrs[k] = v || ''
       end
     elsif (attrs.respond_to? :keys) && (attrs.respond_to? :[])
       # convert it to a Hash as we know it
