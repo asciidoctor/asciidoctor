@@ -15,6 +15,16 @@ class Table < AbstractBlock
     end
 
     alias [] send
+
+    # Public: Returns the rows grouped by section.
+    #
+    # The keys are the section names as symbols. Each value is an Array of
+    # rows. The keys are sorted in document order (head, foot, body).
+    #
+    # Returns a Hash of rows grouped by section.
+    def by_section
+      { :head => @head, :foot => @foot, :body => @body }
+    end
   end
 
   # Public: Get/Set the columns for this table

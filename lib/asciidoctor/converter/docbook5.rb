@@ -381,7 +381,6 @@ module Asciidoctor
     end
 
     TABLE_PI_NAMES = ['dbhtml', 'dbfo', 'dblatex']
-    TABLE_SECTIONS = [:head, :foot, :body]
 
     def table node
       has_body = false
@@ -406,10 +405,11 @@ module Asciidoctor
       node.columns.each do |col|
         result << %(<colspec colname="col_#{col.attr 'colnumber'}" colwidth="#{col.attr col_width_key}*"/>)
       end
-      TABLE_SECTIONS.select {|tblsec| !node.rows[tblsec].empty? }.each do |tblsec|
-        has_body = true if tblsec == :body
-        result << %(<t#{tblsec}>)
-        node.rows[tblsec].each do |row|
+      node.rows.by_section.each do |tsec, rows|
+        next if rows.empty?
+        has_body = true if tsec == :body
+        result << %(<t#{tsec}>)
+        rows.each do |row|
           result << '<row>'
           row.each do |cell|
             halign_attribute = (cell.attr? 'halign') ? %( align="#{cell.attr 'halign'}") : nil
@@ -418,7 +418,7 @@ module Asciidoctor
             rowspan_attribute = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : nil
             # NOTE <entry> may not have whitespace (e.g., line breaks) as a direct descendant according to DocBook rules
             entry_start = %(<entry#{halign_attribute}#{valign_attribute}#{colspan_attribute}#{rowspan_attribute}>)
-            if tblsec == :head
+            if tsec == :head
               cell_content = cell.text
             else
               case cell.style
@@ -439,7 +439,7 @@ module Asciidoctor
           end
           result << '</row>'
         end
-        result << %(</t#{tblsec}>)
+        result << %(</t#{tsec}>)
       end
       result << '</tgroup>'
       result << %(</#{tag_name}>)

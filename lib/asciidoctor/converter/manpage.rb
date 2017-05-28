@@ -410,8 +410,8 @@ allbox tab(:);'
       row_header = []
       row_text = []
       row_index = 0
-      [:head, :body, :foot].each do |tsec|
-        node.rows[tsec].each do |row|
+      node.rows.by_section.each do |tsec, rows|
+        rows.each do |row|
           row_header[row_index] ||= []
           row_text[row_index] ||= []
           # result << LF
@@ -496,7 +496,7 @@ allbox tab(:);'
             end
           end
           row_index += 1
-        end
+        end unless rows.empty?
       end
 
       #row_header.each do |row|
