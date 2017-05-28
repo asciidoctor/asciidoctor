@@ -187,7 +187,7 @@ This line is separated by something that is not a horizontal rule...
   end
 
   test 'emphasized text with single quote using apostrophe characters' do
-    rsquo = [8217].pack 'U*'
+    rsquo = decode_char 8217
     assert_xpath %(//em[text()="Johnny#{rsquo}s"]), render_string(%q(It's 'Johnny's' phone), :attributes => {'compat-mode' => ''})
     assert_xpath %(//p[text()="It#{rsquo}s 'Johnny#{rsquo}s' phone"]), render_string(%q(It's 'Johnny's' phone))
   end

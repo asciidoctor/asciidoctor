@@ -216,19 +216,18 @@ class Minitest::Test
     nil
   end
 
-  # Expand the character for an entity such as &#8212; into a glyph
-  # so it can be used to match in an XPath expression
+  # Decode the numeric character reference, such as 8212, to a Unicode glyph
+  # so it may be used in an XPath expression.
   #
   # Examples
   #
-  #   expand_entity 60
+  #   decode_char 60
   #   # => "<"
   #
-  # Returns the String entity expanded to its equivalent UTF-8 glyph
-  def expand_entity(number)
-    [number].pack('U*')
+  # Returns the decoded String that corresponds to the numeric character reference
+  def decode_char number
+    [number].pack 'U1'
   end
-  alias :entity :expand_entity
 
   def invoke_cli_with_filenames(argv = [], filenames = [], &block)
 

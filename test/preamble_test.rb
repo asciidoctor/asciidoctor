@@ -147,7 +147,7 @@ The axe came swinging.
       assert_equal 'book', d.doctype
       output = d.render
       assert_xpath '//h1', output, 3
-      assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{expand_entity 8230}#{expand_entity 8203}"]}, output, 1
+      assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{decode_char 8230}#{decode_char 8203}"]}, output, 1
   end
 
   test 'should render table of contents in preamble if toc-placement attribute value is preamble' do

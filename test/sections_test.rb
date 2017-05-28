@@ -386,7 +386,7 @@ My Section
     end
 
     test "with XML entity" do
-      assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where#{[8217].pack('U*')}s the love?\"]", render_string("== Where's the love?")
+      assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where#{decode_char 8217}s the love?\"]", render_string("== Where's the love?")
     end
 
     test "with non-word character" do

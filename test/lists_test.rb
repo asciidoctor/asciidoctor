@@ -1952,7 +1952,7 @@ term2::
       assert_xpath '//dl/dt', output, 2
       assert_xpath '//dl/dt/following-sibling::dd', output, 2
       assert_xpath '(//dl/dt)[1][normalize-space(text()) = "term1"]', output, 1
-      assert_xpath %((//dl/dt)[1]/following-sibling::dd/p[text() = "def1#{entity 8201}#{entity 8212}#{entity 8201}and a note"]), output, 1
+      assert_xpath %((//dl/dt)[1]/following-sibling::dd/p[text() = "def1#{decode_char 8201}#{decode_char 8212}#{decode_char 8201}and a note"]), output, 1
       assert_xpath '(//dl/dt)[2][normalize-space(text()) = "term2"]', output, 1
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
@@ -4252,10 +4252,10 @@ context 'Checklists' do
 
     output = render_embedded_string input
     assert_css '.ulist.checklist', output, 1
-    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[1]/p[text()="#{expand_entity 10063} todo"]), output, 1
-    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[2]/p[text()="#{expand_entity 10003} done"]), output, 1
-    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[3]/p[text()="#{expand_entity 10063} another todo"]), output, 1
-    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[4]/p[text()="#{expand_entity 10003} another done"]), output, 1
+    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[1]/p[text()="#{decode_char 10063} todo"]), output, 1
+    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[2]/p[text()="#{decode_char 10003} done"]), output, 1
+    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[3]/p[text()="#{decode_char 10063} another todo"]), output, 1
+    assert_xpath %((/*[@class="ulist checklist"]/ul/li)[4]/p[text()="#{decode_char 10003} another done"]), output, 1
     assert_xpath '(/*[@class="ulist checklist"]/ul/li)[5]/p[text()="plain"]', output, 1
   end
 

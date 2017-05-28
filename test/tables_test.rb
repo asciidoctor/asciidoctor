@@ -172,7 +172,7 @@ A | here| a | there
       EOS
       output = render_embedded_string input
       assert_xpath '//tbody/tr/td[1]/p[text()="Cool new show"]', output, 1
-      assert_xpath %(//tbody/tr/td[2]/p[text()='Coming soon#{expand_entity 8230}#{expand_entity 8203}']), output, 1
+      assert_xpath %(//tbody/tr/td[2]/p[text()='Coming soon#{decode_char 8230}#{decode_char 8203}']), output, 1
     end
 
     test 'should only substitute specialchars for literal table cells' do
@@ -1361,8 +1361,8 @@ air, moon roof, loaded",4799.00
       assert_xpath '((//tbody/tr)[1]/td)[4]/p[text()="ac, abs, moon"]', output, 1
       assert_xpath %(((//tbody/tr)[2]/td)[3]/p[text()='Venture "Extended Edition"']), output, 1
       assert_xpath '((//tbody/tr)[4]/td)[4]/p[text()="MUST SELL! air, moon roof, loaded"]', output, 1
-      assert_xpath %(((//tbody/tr)[5]/td)[4]/p[text()='"This one#{expand_entity 8217}s gonna to blow you#{expand_entity 8217}re socks off," per the sticker']), output, 1
-      assert_xpath %(((//tbody/tr)[6]/td)[4]/p[text()='Check it, "this one#{expand_entity 8217}s gonna to blow you#{expand_entity 8217}re socks off", per the sticker']), output, 1
+      assert_xpath %(((//tbody/tr)[5]/td)[4]/p[text()='"This one#{decode_char 8217}s gonna to blow you#{decode_char 8217}re socks off," per the sticker']), output, 1
+      assert_xpath %(((//tbody/tr)[6]/td)[4]/p[text()='Check it, "this one#{decode_char 8217}s gonna to blow you#{decode_char 8217}re socks off", per the sticker']), output, 1
     end
 
     test 'csv format shorthand' do

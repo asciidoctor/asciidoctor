@@ -1038,7 +1038,7 @@ text
                                         :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo' => '', 'docinfosubs' => 'attributes,replacements', 'linkcss' => ''}
       assert !output.empty?
       assert_css 'script[src="bootstrap.3.2.0.min.js"]', output, 1
-      assert_xpath %(//meta[@name="copyright"][@content="#{entity 169} OpenDevise"]), output, 1
+      assert_xpath %(//meta[@name="copyright"][@content="#{decode_char 169} OpenDevise"]), output, 1
     end
   end
 

@@ -271,7 +271,7 @@ ____
       assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Book (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
       author = attribution.children.first
-      assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
+      assert_equal "#{decode_char 8212} Famous Person", author.text.strip
     end
 
     test 'quote block with attribute and id and role shorthand' do
@@ -391,7 +391,7 @@ Some more inspiring words.
       assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source, Volume 1 (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
       author = attribution.children.first
-      assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
+      assert_equal "#{decode_char 8212} Famous Person", author.text.strip
     end
 
     test 'quoted paragraph-style quote block with attribution' do
@@ -410,7 +410,7 @@ Some more inspiring words."
       assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source, Volume 1 (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
       author = attribution.children.first
-      assert_equal "#{expand_entity 8212} Famous Person", author.text.strip
+      assert_equal "#{decode_char 8212} Famous Person", author.text.strip
     end
 
     test 'single-line verse block without attribution' do
@@ -445,7 +445,7 @@ ____
       assert_xpath '//*[@class = "verseblock"]/*[@class = "attribution"]/cite[text() = "Famous Poem"]', output, 1
       attribution = xmlnodes_at_xpath '//*[@class = "verseblock"]/*[@class = "attribution"]', output, 1
       author = attribution.children.first
-      assert_equal "#{expand_entity 8212} Famous Poet", author.text.strip
+      assert_equal "#{decode_char 8212} Famous Poet", author.text.strip
     end
 
     test 'multi-stanza verse block' do
