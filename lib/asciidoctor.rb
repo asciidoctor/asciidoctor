@@ -636,7 +636,7 @@ module Asciidoctor
     #   Section Title [[idname]]
     #   Section Title [[idname,Reference Text]]
     #
-    InlineSectionAnchorRx = /^(.*?) +(\\)?\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:, *(.+))?\]\]$/
+    InlineSectionAnchorRx = / (\\)?\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:, *(.+))?\]\]$/
 
     # Matches invalid characters in a section id.
     #

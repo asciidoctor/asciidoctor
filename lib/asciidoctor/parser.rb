@@ -1722,16 +1722,16 @@ class Parser
     if (line1.start_with?('=') || (Compliance.markdown_syntax && line1.start_with?('#'))) && AtxSectionRx =~ line1
       # NOTE level is 1 less than number of line markers
       sect_level, sect_title, single_line = $1.length - 1, $2, true
-      if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$2 # escaped
-        sect_title, sect_id, sect_reftext = $1, $3, $4
+      if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
+        sect_title, sect_id, sect_reftext = sect_title[0, sect_title.length - $&.length], $2, $3
       end
     elsif Compliance.underline_style_section_titles && (line2 = reader.peek_line(true)) &&
         (sect_level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
         line2_ch1 * (line2_len = line2.length) == line2 && (sect_title = SetextSectionTitleRx =~ line1 && $1) &&
         (line_length(line1) - line2_len).abs < 2
       single_line = false
-      if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$2 # escaped
-        sect_title, sect_id, sect_reftext = $1, $3, $4
+      if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
+        sect_title, sect_id, sect_reftext = sect_title[0, sect_title.length - $&.length], $2, $3
       end
       reader.advance
     else
