@@ -82,6 +82,17 @@ context 'Sections' do
       assert_equal 'Section One', sec.title
     end
 
+    test 'explicit id can be defined using an embedded anchor when using setext section titles' do
+      input = <<-EOS
+Section Title [[refid,reftext]]
+-------------------------------
+      EOS
+      sec = block_from_string input
+      assert_equal 'Section Title', sec.title
+      assert_equal 'refid', sec.id
+      assert_equal 'reftext', (sec.attr 'reftext')
+    end
+
     test 'explicit id can be defined using an embedded anchor with reftext' do
       sec = block_from_string("== Section One [[one,Section Uno]] ==")
       assert_equal 'one', sec.id
