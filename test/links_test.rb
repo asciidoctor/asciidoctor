@@ -127,6 +127,10 @@ context 'Links' do
     assert_xpath '//a[@href="http://asciidoc.org"][text()="AsciiDoc"]', render_string(')http://asciidoc.org[AsciiDoc] project page.'), 1
   end
 
+  test 'qualified url following no-break space' do
+    assert_xpath '//a[@href="http://asciidoc.org"][text()="AsciiDoc"]', render_string(%(#{[0xa0].pack 'U1'}http://asciidoc.org[AsciiDoc] project page.)), 1
+  end if ::RUBY_MIN_VERSION_1_9
+
   test 'qualified url following smart apostrophe' do
     output = render_embedded_string("l&#8217;http://www.irit.fr[IRIT]")
     assert_match(/l&#8217;<a href=/, output)

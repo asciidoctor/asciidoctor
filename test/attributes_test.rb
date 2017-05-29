@@ -1028,7 +1028,7 @@ content
       assert_xpath '//*[@class="title"]/strong[text()="title"]', output, 1
     end
 
-    test 'attribute list may begin with space' do
+    test 'attribute list may not begin with space' do
       input = <<-EOS
 [ quote]
 ____
@@ -1037,8 +1037,8 @@ ____
       EOS
 
       doc = document_from_string input
-      qb = doc.blocks.first
-      assert_equal 'quote', qb.style
+      b1 = doc.blocks.first
+      assert_equal ['[ quote]'], b1.lines
     end
 
     test 'attribute list may begin with comma' do
@@ -1361,7 +1361,7 @@ paragraph
       assert_equal 'coolio', subsec.id
     end
 
-    test "trailing block attributes tranfer to the following section" do
+    test "trailing block attributes transfer to the following section" do
       input = <<-EOS
 [[one]]
 

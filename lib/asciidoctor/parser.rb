@@ -180,9 +180,9 @@ class Parser
   #
   # returns Nothing
   def self.parse_manpage_header(reader, document)
-    if (m = ManpageTitleVolnumRx.match(document.attributes['doctitle']))
-      document.attributes['mantitle'] = document.sub_attributes(m[1].rstrip.downcase)
-      document.attributes['manvolnum'] = m[2].strip
+    if ManpageTitleVolnumRx =~ document.attributes['doctitle']
+      document.attributes['mantitle'] = document.sub_attributes $1.downcase
+      document.attributes['manvolnum'] = $2
     else
       warn %(asciidoctor: ERROR: #{reader.prev_line_info}: malformed manpage title)
       # provide sensible fallbacks
@@ -195,7 +195,7 @@ class Parser
     if is_next_line_section?(reader, {})
       name_section = initialize_section(reader, document, {})
       if name_section.level == 1
-        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join(' ').squeeze(' ')
+        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join ' '
         if (m = ManpageNamePurposeRx.match(name_section_buffer))
           document.attributes['manname'] = document.sub_attributes m[1]
           document.attributes['manpurpose'] = m[2]
@@ -758,9 +758,8 @@ class Parser
             adjust_indentation! lines if indented && style == 'normal'
             block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
           elsif (ADMONITION_STYLE_LEADERS.include? ch0) && (this_line.include? ':') && (admonition_match = AdmonitionParagraphRx.match this_line)
-            lines[0] = admonition_match.post_match.lstrip
-            attributes['style'] = admonition_match[1]
-            attributes['name'] = admonition_name = admonition_match[1].downcase
+            lines[0] = admonition_match.post_match
+            attributes['name'] = admonition_name = (attributes['style'] = admonition_match[1]).downcase
             attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
             block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
           elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
