@@ -892,10 +892,12 @@ module Asciidoctor
     #
     # Examples
     #
-    #   Ctrl + Alt+T
+    #   Ctrl + Alt + T
+    #   Ctrl+,
     #   Ctrl,T
+    #   Ctrl,+
     #
-    KbdDelimiterRx = /(?:\+|,)(?= *[^\1])/
+    KbdDelimiterRx = /[+,]/
 
     # Matches an implicit link and some of the link inline macro.
     #

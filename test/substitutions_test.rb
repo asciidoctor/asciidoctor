@@ -1181,7 +1181,12 @@ EOS
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span>}, para.sub_macros(para.source)
       end
 
-      test 'kbd macro with key combination with spaces' do
+      test 'kbd macro with key combination, docbook backend' do
+        para = block_from_string('kbd:[Ctrl+Shift+T]', :backend => 'docbook', :attributes => {'experimental' => ''})
+        assert_equal %q{<keycombo><keycap>Ctrl</keycap><keycap>Shift</keycap><keycap>T</keycap></keycombo>}, para.sub_macros(para.source)
+      end
+
+      test 'kbd macro with key combination delimited by pluses with spaces' do
         para = block_from_string('kbd:[Ctrl + Shift + T]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span>}, para.sub_macros(para.source)
       end
@@ -1191,19 +1196,29 @@ EOS
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span>}, para.sub_macros(para.source)
       end
 
-      test 'kbd macro with key combination containing a plus key no spaces' do
-        para = block_from_string('kbd:[Ctrl++]', :attributes => {'experimental' => ''})
-        assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>+</kbd></span>}, para.sub_macros(para.source)
+      test 'kbd macro with key combination delimited by commas with spaces' do
+        para = block_from_string('kbd:[Ctrl, Shift, T]', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span>}, para.sub_macros(para.source)
       end
 
-      test 'kbd macro with key combination delimited by commands containing a comma key' do
-        para = block_from_string('kbd:[Ctrl,,]', :attributes => {'experimental' => ''})
+      test 'kbd macro with key combination delimited by plus containing a comma key' do
+        para = block_from_string('kbd:[Ctrl+,]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>,</kbd></span>}, para.sub_macros(para.source)
       end
 
-      test 'kbd macro with key combination containing a plus key with spaces' do
+      test 'kbd macro with key combination delimited by commas containing a plus key' do
+        para = block_from_string('kbd:[Ctrl, +, Shift]', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>+</kbd>+<kbd>Shift</kbd></span>}, para.sub_macros(para.source)
+      end
+
+      test 'kbd macro with key combination where last key matches plus delimiter' do
         para = block_from_string('kbd:[Ctrl + +]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>+</kbd></span>}, para.sub_macros(para.source)
+      end
+
+      test 'kbd macro with key combination where last key matches comma delimiter' do
+        para = block_from_string('kbd:[Ctrl, ,]', :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>,</kbd></span>}, para.sub_macros(para.source)
       end
 
       test 'kbd macro with key combination containing escaped bracket' do
@@ -1214,11 +1229,6 @@ EOS
       test 'kbd macro with key combination ending in backslash' do
         para = block_from_string("kbd:[Ctrl + #{BACKSLASH} ]", :attributes => {'experimental' => ''})
         assert_equal %q(<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>\\</kbd></span>), para.sub_macros(para.source)
-      end
-
-      test 'kbd macro with key combination, docbook backend' do
-        para = block_from_string('kbd:[Ctrl+Shift+T]', :backend => 'docbook', :attributes => {'experimental' => ''})
-        assert_equal %q{<keycombo><keycap>Ctrl</keycap><keycap>Shift</keycap><keycap>T</keycap></keycombo>}, para.sub_macros(para.source)
       end
     end
 
