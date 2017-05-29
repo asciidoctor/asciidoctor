@@ -544,19 +544,19 @@ module Substitutors
           if captured.start_with?('kbd')
             keys = unescape_bracketed_text m[1]
 
-            if keys == '+'
-              keys = ['+']
-            else
-              # need to use closure to work around lack of negative lookbehind
-              keys = keys.split(KbdDelimiterRx).inject([]) {|c, key|
-                if key.end_with?('++')
-                  c << key[0...-2].strip
-                  c << '+'
-                else
-                  c << key.strip
+            if keys.length > 1 && (delim = keys[KbdDelimiterRx])
+              # NOTE handle special case of Ctrl++ or Ctrl,,
+              if keys.end_with? delim
+                keys = keys.split(delim, -1).map {|key| key.strip }
+                if keys[-1].empty?
+                  keys.pop
+                  keys[-1] = delim if keys[-1].empty?
                 end
-                c
-              }
+              else
+                keys = keys.split(delim).map {|key| key.strip }
+              end
+            else
+              keys = [keys]
             end
             Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).convert
           elsif captured.start_with?('btn')
