@@ -623,7 +623,7 @@ module Asciidoctor
     # match[1] is the delimiter, whose length determines the level
     # match[2] is the title itself
     # match[3] is an inline anchor, which becomes the section id
-    AtxSectionRx = /^(={1,6}|\#{1,6})[ \t]+(.+?)(?:[ \t]+\1)?$/
+    AtxSectionRx = /^(=={0,5}|#\#{0,5})[ \t]+(.+?)(?:[ \t]+\1)?$/
 
     # Matches the restricted section name for a two-line (Setext-style) section title.
     # The name cannot begin with a dot and has at least one alphanumeric character.
@@ -657,7 +657,7 @@ module Asciidoctor
     # Detects the start of any list item.
     #
     # NOTE we only have to check as far as the blank character because we know it means non-whitespace follows.
-    AnyListRx = /^(?:[ \t]*(?:-|([*.\u2022])\1{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|[ \t]*.*?(?::{2,4}|;;)(?:$|[ \t])|<?\d+>[ \t])/
+    AnyListRx = /^(?:[ \t]*(?:-|\*\*{0,4}|\.\.{0,4}|\u2022\u2022{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|[ \t]*.*?(?::{2,4}|;;)(?:$|[ \t])|<?\d+>[ \t])/
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -667,7 +667,7 @@ module Asciidoctor
     #   - Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    UnorderedListRx = /^[ \t]*(-|\*{1,5}|\u2022{1,5})[ \t]+(.*)$/
+    UnorderedListRx = /^[ \t]*(-|\*\*{0,4}|\u2022\u2022{0,4})[ \t]+(.*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
     #
@@ -683,7 +683,7 @@ module Asciidoctor
     #
     # NOTE leading space match is not always necessary, but is used for list reader
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    OrderedListRx = /^[ \t]*(\.{1,5}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]+(.*)$/
+    OrderedListRx = /^[ \t]*(\.\.{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]+(.*)$/
 
     # Matches the ordinals for each type of ordered list.
     OrderedListMarkerRxMap = {
@@ -975,7 +975,7 @@ module Asciidoctor
     #   pass:quotes[text]
     #
     # NOTE we have to support an empty pass:[] for compatibility with AsciiDoc Python
-    PassInlineMacroRx = /(?:(?:(\\?)\[([^\]]+?)\])?(\\{0,2})(\+{2,3}|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
+    PassInlineMacroRx = /(?:(?:(\\?)\[([^\]]+?)\])?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
 
     # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
     #
