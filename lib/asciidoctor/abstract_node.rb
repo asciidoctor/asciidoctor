@@ -144,6 +144,15 @@ class AbstractNode
     end
   end
 
+  # Public: Remove the attribute from the current node.
+  #
+  # name      - The String attribute name to remove
+  #
+  # Returns the previous [String] value, or nil if the attribute was not present.
+  def remove_attr name
+    @attributes.delete name
+  end
+
   # TODO document me
   def set_option(name)
     if @attributes.key? 'options'

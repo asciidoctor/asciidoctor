@@ -373,6 +373,13 @@ content
       assert_equal '', (node.attr 'foo')
     end
 
+    test 'remove_attr should remove attribute and return previous value' do
+      doc = empty_document
+      node = Asciidoctor::Block.new doc, :paragraph, :attributes => { 'foo' => 'bar' }
+      assert_equal 'bar', (node.remove_attr 'foo')
+      assert_nil node.attr('foo')
+    end
+
     test 'set_attr should not overwrite existing key if overwrite is false' do
       node = Asciidoctor::Block.new nil, :paragraph, :attributes => { 'foo' => 'bar' }
       assert_equal 'bar', (node.attr 'foo')
