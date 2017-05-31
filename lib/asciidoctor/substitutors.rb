@@ -982,7 +982,8 @@ module Substitutors
 
   # Internal: Substitute cross reference links
   def sub_inline_xrefs(text, found = nil)
-    if (!found || found[:macroish]) || text.include?('&lt;&lt;')
+    if ((found ? found[:macroish] : (text.include? '[')) && (text.include? 'xref:')) ||
+        ((text.include? '&') && (text.include? '&lt;&lt;'))
       text = text.gsub(XrefInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
