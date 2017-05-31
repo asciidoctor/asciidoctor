@@ -1012,7 +1012,9 @@ module Substitutors
 
         # handles forms: doc#, doc.adoc#, doc#id and doc.adoc#id
         if path
-          path = Helpers.rootname(path)
+          if (path.include? '.') && ASCIIDOC_EXTENSIONS[(extname = ::File.extname path)]
+            path = path[0, path.length - extname.length]
+          end
           # the referenced path is this document, or its contents has been included in this document
           if @document.attributes['docname'] == path || @document.references[:includes].include?(path)
             refid = fragment
