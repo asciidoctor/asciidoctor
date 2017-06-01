@@ -81,20 +81,19 @@ class AbstractNode
   # Document node and return the value of the attribute if found. Otherwise,
   # return the default value, which defaults to nil.
   #
-  # name          - the String or Symbol name of the attribute to lookup
-  # default_value - the Object value to return if the attribute is not found (default: nil)
-  # inherit       - a Boolean indicating whether to check for the attribute on the
-  #                 AsciiDoctor::Document if not found on this node (default: false)
+  # name        - the String or Symbol name of the attribute to lookup
+  # default_val - the Object value to return if the attribute is not found (default: nil)
+  # inherit     - a Boolean indicating whether to check for the attribute on the
+  #               AsciiDoctor::Document if not found on this node (default: false)
   #
   # return the value of the attribute or the default value if the attribute
   # is not found in the attributes of this node or the document node
-  def attr(name, default_value = nil, inherit = true)
+  def attr name, default_val = nil, inherit = true
     name = name.to_s
-    inherit = false if self == @document
     if inherit
-      @attributes[name] || @document.attributes[name] || default_value
+      @attributes[name] || (self == @document ? nil : @document.attributes[name]) || default_val
     else
-      @attributes[name] || default_value
+      @attributes[name] || default_val
     end
   end
 
@@ -107,23 +106,26 @@ class AbstractNode
   # comparison value is specified (not nil), return whether the two values match.
   # Otherwise, return whether the attribute was found.
   #
-  # name    - the String or Symbol name of the attribute to lookup
-  # expect  - the expected Object value of the attribute (default: nil)
-  # inherit - a Boolean indicating whether to check for the attribute on the
-  #           AsciiDoctor::Document if not found on this node (default: false)
+  # name       - the String or Symbol name of the attribute to lookup
+  # expect_val - the expected Object value of the attribute (default: nil)
+  # inherit    - a Boolean indicating whether to check for the attribute on the
+  #              AsciiDoctor::Document if not found on this node (default: false)
   #
   # return a Boolean indicating whether the attribute exists and, if a
   # comparison value is specified, whether the value of the attribute matches
   # the comparison value
-  def attr?(name, expect = nil, inherit = true)
+  def attr? name, expect_val = nil, inherit = true
     name = name.to_s
-    inherit = false if self == @document
-    if expect.nil?
-      @attributes.key?(name) || (inherit && @document.attributes.key?(name))
+    if expect_val.nil?
+      if inherit
+        (@attributes.key? name) || (self == @document ? false : (@document.attributes.key? name))
+      else
+        @attributes.key? name
+      end
     elsif inherit
-      expect == (@attributes[name] || @document.attributes[name])
+      expect_val == (@attributes[name] || (self == @document ? nil : @document.attributes[name]))
     else
-      expect == @attributes[name]
+      expect_val == @attributes[name]
     end
   end
 
@@ -188,9 +190,9 @@ class AbstractNode
   end
 
   # Public: A convenience method that checks if the role attribute is specified
-  def role?(expect = nil)
-    if expect
-      expect == (@attributes['role'] || @document.attributes['role'])
+  def role? expect_val = nil
+    if expect_val
+      expect_val == (@attributes['role'] || @document.attributes['role'])
     else
       @attributes.key?('role') || @document.attributes.key?('role')
     end
