@@ -295,6 +295,16 @@ context 'Links' do
     assert_xpath '//a[@href="tigers.html"][text() = "[tigers]"]', doc.render, 1
   end
 
+  test 'inter-document xref should not truncate after period if path has no extension' do
+    result = render_embedded_string '<<using-.net-web-services#,Using .NET web services>>'
+    assert_xpath '//a[@href="using-.net-web-services.html"][text() = "Using .NET web services"]', result, 1
+  end
+
+  test 'inter-document xref should only remove the file extension part if the path contains a period elsewhere' do
+    result = render_embedded_string '<<using-.net-web-services.adoc#,Using .NET web services>>'
+    assert_xpath '//a[@href="using-.net-web-services.html"][text() = "Using .NET web services"]', result, 1
+  end
+
   test 'xref using angled bracket syntax with path sans extension using docbook backend' do
     doc = document_from_string '<<tigers#>>', :header_footer => false, :backend => 'docbook'
     assert_match '<link xl:href="tigers.xml">tigers.xml</link>', doc.render, 1
