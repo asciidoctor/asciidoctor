@@ -28,14 +28,12 @@ class AbstractNode
   def initialize parent, context, opts = {}
     if context == :document
       # document is a special case, should refer to itself
-      @document = self
+      @document, @parent = self, nil
     else
       if parent
-        @parent = parent
-        @document = parent.document
+        @document, @parent = parent.document, parent
       else
-        @parent = nil
-        @document = nil
+        @document = @parent = nil
       end
     end
     @node_name = (@context = context).to_s
