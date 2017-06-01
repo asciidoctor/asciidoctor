@@ -88,11 +88,8 @@ class AbstractNode
   # is not found in the attributes of this node or the document node
   def attr name, default_val = nil, inherit = true
     name = name.to_s
-    if inherit
-      @attributes[name] || (self == @document ? nil : @document.attributes[name]) || default_val
-    else
-      @attributes[name] || default_val
-    end
+    # NOTE if @parent is set, it means @document is also set
+    @attributes[name] || (inherit && @parent ? @document.attributes[name] || default_val : default_val)
   end
 
   # Public: Check if the attribute is defined, optionally performing a
@@ -114,16 +111,11 @@ class AbstractNode
   # the comparison value
   def attr? name, expect_val = nil, inherit = true
     name = name.to_s
+    # NOTE if @parent is set, it means @document is also set
     if expect_val.nil?
-      if inherit
-        (@attributes.key? name) || (self == @document ? false : (@document.attributes.key? name))
-      else
-        @attributes.key? name
-      end
-    elsif inherit
-      expect_val == (@attributes[name] || (self == @document ? nil : @document.attributes[name]))
+      (@attributes.key? name) || (inherit && @parent && (@document.attributes.key? name))
     else
-      expect_val == @attributes[name]
+      expect_val == (@attributes[name] || (inherit && @parent ? @document.attributes[name] : nil))
     end
   end
 
