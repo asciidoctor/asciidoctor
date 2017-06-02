@@ -376,7 +376,6 @@ class AbstractBlock < AbstractNode
     @next_section_index += 1
     if section.sectname == 'appendix'
       section.number = @document.counter 'appendix-number', 'A'
-      section.numbered = true
       if (caption = @document.attr 'appendix-caption').nil_or_empty?
         section.caption = %(#{section.number}. )
       else

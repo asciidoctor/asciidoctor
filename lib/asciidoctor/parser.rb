@@ -1575,33 +1575,39 @@ class Parser
     elsif attributes.key? 'reftext'
       sect_reftext = attributes['reftext']
     end
-    section = Section.new parent, sect_level, (document.attributes.key? 'sectnums')
-    section.source_location = source_location if source_location
-    section.id, section.title = sect_id, sect_title
+
     # parse style, id, and role from first positional attribute if present
     style, _ = parse_style_attribute attributes, reader unless attributes[1].nil_or_empty?
     if style
       if style == 'abstract' && document.doctype == 'book'
-        section.sectname = 'chapter'
-        section.level = 1
+        sect_name, sect_level = 'chapter', 1
       else
-        section.sectname = style
-        section.special = true
+        sect_name, sect_special = style, true
+        sect_numbered_force = style == 'appendix'
       end
     else
       case document.doctype
       when 'book'
-        section.sectname = sect_level == 0 ? 'part' : (sect_level == 1 ? 'chapter' : 'section')
+        sect_name = sect_level == 0 ? 'part' : (sect_level == 1 ? 'chapter' : 'section')
       when 'manpage'
         if (sect_title.casecmp 'synopsis') == 0
-          section.sectname = 'synopsis'
-          section.special = true
+          sect_name, sect_special = 'synopsis', true
         else
-          section.sectname = 'section'
+          sect_name = 'section'
         end
       else
-        section.sectname = 'section'
+        sect_name = 'section'
       end
+    end
+
+    section = Section.new parent, sect_level, false
+    section.id, section.title, section.sectname, section.source_location = sect_id, sect_title, sect_name, source_location
+    # TODO honor special section numbering option (#661)
+    if sect_special
+      section.special = true
+      section.numbered = true if sect_numbered_force
+    elsif sect_level > 0 && (document.attributes.key? 'sectnums')
+      section.numbered = section.special ? (parent.context == :section && parent.numbered) : true
     end
 
     # generate an id if one was not embedded or specified as anchor above section title
