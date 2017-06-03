@@ -301,21 +301,24 @@ MathJax.Hub.Config({
       return unless node.sections?
       sectnumlevels = opts[:sectnumlevels] || (node.document.attr 'sectnumlevels', 3).to_i
       toclevels = opts[:toclevels] || (node.document.attr 'toclevels', 2).to_i
-      result = []
       sections = node.sections
-      # FIXME the level for special sections should be set correctly in the model
-      # slevel will only be 0 if we have a book doctype with parts
-      slevel = (first_section = sections[0]).level
-      slevel = 1 if slevel == 0 && first_section.special
-      result << %(<ul class="sectlevel#{slevel}">)
+      # FIXME top level is incorrect if a multipart book starts with a special section defined at level 0
+      result = [%(<ul class="sectlevel#{sections[0].level}">)]
       sections.each do |section|
-        section_num = (section.numbered && !section.caption && section.level <= sectnumlevels) ? %(#{section.sectnum} ) : nil
-        if section.level < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :secnumlevels => sectnumlevels)
-          result << %(<li><a href="##{section.id}">#{section_num}#{section.captioned_title}</a>)
+        slevel = section.level
+        if section.caption
+          stitle = section.captioned_title
+        elsif section.numbered && slevel <= sectnumlevels
+          stitle = %(#{section.sectnum} #{section.title})
+        else
+          stitle = section.title
+        end
+        if slevel < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :secnumlevels => sectnumlevels)
+          result << %(<li><a href="##{section.id}">#{stitle}</a>)
           result << child_toc_level
           result << '</li>'
         else
-          result << %(<li><a href="##{section.id}">#{section_num}#{section.captioned_title}</a></li>)
+          result << %(<li><a href="##{section.id}">#{stitle}</a></li>)
         end
       end
       result << '</ul>'
@@ -324,8 +327,6 @@ MathJax.Hub.Config({
 
     def section node
       slevel = node.level
-      # QUESTION should the check for slevel be done in section?
-      slevel = 1 if slevel == 0 && node.special
       htag = %(h#{slevel + 1})
       id_attr = anchor = link_start = link_end = nil
       if node.id
