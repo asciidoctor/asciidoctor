@@ -591,12 +591,14 @@ module Asciidoctor
 
     def inline_menu node
       menu = node.attr 'menu'
-      if !(submenus = node.attr 'submenus').empty?
-        %(<menuchoice><guimenu>#{menu}</guimenu> <guisubmenu>#{submenus * '</guisubmenu> <guisubmenu>'}</guisubmenu> <guimenuitem>#{node.attr 'menuitem'}</guimenuitem></menuchoice>)
-      elsif (menuitem = node.attr 'menuitem')
-        %(<menuchoice><guimenu>#{menu}</guimenu> <guimenuitem>#{menuitem}</guimenuitem></menuchoice>)
+      if (submenus = node.attr 'submenus').empty?
+        if (menuitem = node.attr 'menuitem', nil, false)
+          %(<menuchoice><guimenu>#{menu}</guimenu> <guimenuitem>#{menuitem}</guimenuitem></menuchoice>)
+        else
+          %(<guimenu>#{menu}</guimenu>)
+        end
       else
-        %(<guimenu>#{menu}</guimenu>)
+        %(<menuchoice><guimenu>#{menu}</guimenu> <guisubmenu>#{submenus * '</guisubmenu> <guisubmenu>'}</guisubmenu> <guimenuitem>#{node.attr 'menuitem'}</guimenuitem></menuchoice>)
       end
     end
 
