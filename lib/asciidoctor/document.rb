@@ -612,8 +612,9 @@ class Document < AbstractBlock
   end
 
   def title= title
-    sect = (@header ||= Section.new self, 0)
-    sect.sectname = 'header'
+    unless (sect = @header)
+      (sect = (@header = Section.new self, 0, false)).sectname = 'header'
+    end
     sect.title = title
   end
 

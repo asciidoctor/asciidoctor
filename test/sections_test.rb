@@ -1543,12 +1543,16 @@ Terms
       assert_xpath '//*[@id="toc"]//a[@href="#_level_3"][text()="Level 3"]', output, 1
     end
 
-    # reenable once we have :specialnumbered!: implemented
-=begin
-    test 'should not number special sections or subsections' do
+    test 'should not number special sections or their subsections by default except for appendices' do
       input = <<-EOS
-:numbered:
-:specialnumbered!:
+:sectnums:
+
+[dedication]
+== Dedication
+
+=== Dedication Subsection
+
+content
 
 == Section One
 
@@ -1573,18 +1577,26 @@ Terms
       EOS
 
       output = render_embedded_string input
-      assert_xpath '(//h2)[1][text()="1. Section One"]', output, 1
-      assert_xpath '(//h2)[2][text()="Appendix A: Attribute Options"]', output, 1
-      assert_xpath '(//h2)[3][text()="Appendix B: Migration"]', output, 1
-      assert_xpath '(//h3)[1][text()="Gotchas"]', output, 1
-      assert_xpath '(//h2)[4][text()="Glossary"]', output, 1
+      assert_xpath '(//h2)[1][text()="Dedication"]', output, 1
+      assert_xpath '(//h3)[1][text()="Dedication Subsection"]', output, 1
+      assert_xpath '(//h2)[2][text()="1. Section One"]', output, 1
+      assert_xpath '(//h2)[3][text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '(//h2)[4][text()="Appendix B: Migration"]', output, 1
+      assert_xpath '(//h3)[2][text()="B.1. Gotchas"]', output, 1
+      assert_xpath '(//h2)[5][text()="Glossary"]', output, 1
     end
 
-    test 'should not number special sections or subsections in toc' do
+    test 'should not number special sections or their subsections in toc by default except for appendices' do
       input = <<-EOS
-:numbered:
-:specialnumbered!:
+:sectnums:
 :toc:
+
+[dedication]
+== Dedication
+
+=== Dedication Subsection
+
+content
 
 == Section One
 
@@ -1609,13 +1621,14 @@ Terms
       EOS
 
       output = render_string input
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="Dedication"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="Dedication Subsection"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="1. Section One"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix B: Migration"]', output, 1
-      assert_xpath '//*[@id="toc"]/ul//li/a[text()="Gotchas"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="B.1. Gotchas"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Glossary"]', output, 1
     end
-=end
 
     test 'level 0 special sections in multipart book should be rendered as level 1' do
       input = <<-EOS
