@@ -394,7 +394,7 @@ class AbstractBlock < AbstractNode
   # Returns nothing
   def reindex_sections
     @next_section_index = 0
-    @next_section_number = 0
+    @next_section_number = 1
     @blocks.each do |block|
       if block.context == :section
         assign_index(block)
