@@ -684,9 +684,8 @@ class Document < AbstractBlock
     @attributes.key? 'nofooter'
   end
 
-  # QUESTION move to AbstractBlock?
   def first_section
-    has_header? ? @header : (@blocks || []).find {|e| e.context == :section }
+    @header || @blocks.find {|e| e.context == :section }
   end
 
   def has_header?
