@@ -365,24 +365,21 @@ class AbstractBlock < AbstractNode
   #
   # Returns nothing
   def assign_index section
-    section.index = @next_section_index
-    @next_section_index += 1
-    if section.sectname == 'appendix'
+    @next_section_index = (section.index = @next_section_index) + 1
+    if (sectname = section.sectname) == 'appendix'
       section.number = @document.counter 'appendix-number', 'A'
       if (caption = @document.attr 'appendix-caption').nil_or_empty?
         section.caption = %(#{section.number}. )
       else
         section.caption = %(#{caption} #{section.number}: )
       end
-    elsif section.numbered
-      # chapters in a book doctype should be sequential even when divided into parts
-      if section.sectname == 'chapter'
-        section.number = @document.counter 'chapter-number', 1
-      else
-        section.number = @next_section_number
-        @next_section_number += 1
-      end
-    end
+    # NOTE currently chapters in a book doctype are sequential even for multi-part books (see #979)
+    elsif sectname == 'chapter'
+      section.number = @document.counter 'chapter-number', 1
+    else
+      @next_section_number = (section.number = @next_section_number) + 1
+    end if section.numbered
+    nil
   end
 
   # Internal: Reassign the section indexes
