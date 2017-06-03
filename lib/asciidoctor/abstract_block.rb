@@ -30,15 +30,9 @@ class AbstractBlock < AbstractNode
   def initialize parent, context, opts = {}
     super
     @content_model = :compound
-    @subs = []
-    @default_subs = nil
     @blocks = []
-    @id = nil
-    @title = nil
-    @title_converted = nil
-    @caption = nil
-    @number = nil
-    @style = nil
+    @subs = []
+    @id = @title = @title_converted = @caption = @number = @style = @default_subs = @source_location = nil
     if context == :document
       @level = 0
     elsif parent && context != :section
@@ -48,7 +42,6 @@ class AbstractBlock < AbstractNode
     end
     @next_section_index = 0
     @next_section_number = 1
-    @source_location = nil
   end
 
   def block?

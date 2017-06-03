@@ -461,11 +461,8 @@ class Parser
     end
     #parent_context = Block === parent ? parent.context : nil
     in_list = ListItem === parent
-    block = nil
-    style = nil
-    explicit_style = nil
+    block = style = explicit_style = source_location = nil
     sourcemap = document.sourcemap
-    source_location = nil
 
     while !block && reader.has_more_lines?
       # if parsing metadata, read until there is no more to read
@@ -480,10 +477,7 @@ class Parser
       # QUESTION should we introduce a parsing context object?
       source_location = reader.cursor if sourcemap
       this_line = reader.read_line
-      delimited_block = nil
-      block_context = nil
-      cloaked_context = nil
-      terminator = nil
+      delimited_block = block_context = cloaked_context = terminator = nil
       # QUESTION put this inside call to rekey attributes?
       if attributes[1]
         style, explicit_style = parse_style_attribute(attributes, reader)
@@ -1780,14 +1774,10 @@ class Parser
     # NOTE this will discard away any comment lines, but not skip blank lines
     process_attribute_entries(reader, document)
 
-    metadata = {}
-    implicit_author = nil
-    implicit_authors = nil
+    metadata, implicit_author, implicit_authors = {}, nil, nil
 
     if reader.has_more_lines? && !reader.next_line_empty?
-      author_metadata = process_authors reader.read_line
-
-      unless author_metadata.empty?
+      unless (author_metadata = process_authors reader.read_line).empty?
         if document
           # apply header subs and assign to document
           author_metadata.each do |key, val|

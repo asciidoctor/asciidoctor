@@ -48,8 +48,7 @@ class AbstractNode
   #
   # Returns nothing
   def parent=(parent)
-    @parent = parent
-    @document = parent.document
+    @parent, @document = parent, parent.document
     nil
   end
 
