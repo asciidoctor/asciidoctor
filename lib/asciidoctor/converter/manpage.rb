@@ -160,13 +160,10 @@ Author(s).
     end
 
     def section node
-      slevel = node.level
-      # QUESTION should the check for slevel be done in section?
-      slevel = 1 if slevel == 0 && node.special
       result = []
-      if slevel > 1
+      if node.level > 1
         macro = 'SS'
-        # QUESTION why captioned title? why not for slevel == 1?
+        # QUESTION why captioned title? why not when level == 1?
         stitle = node.captioned_title
       else
         macro = 'SH'

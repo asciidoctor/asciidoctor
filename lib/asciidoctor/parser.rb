@@ -281,21 +281,10 @@ class Parser
     else
       doctype = (document = parent.document).doctype
       section = initialize_section reader, parent, attributes
-      # clear attributes, except for title which carries over
-      # section title to next block of content
+      # clear attributes except for title attribute, which must be carried over to next content block
       attributes = (title = attributes['title']) ? { 'title' => title } : {}
-      if (current_level = section.level) == 0 && doctype == 'book'
-        if (part = (sectname = section.sectname) == 'part')
-          expected_next_levels = [1]
-        # subsections in preface & appendix in multipart books start at level 2
-        elsif section.special && (sectname == 'preface' || sectname == 'appendix')
-          expected_next_levels = [2]
-        else
-          expected_next_levels = [1]
-        end
-      else
-        expected_next_levels = [current_level + 1]
-      end
+      part = section.sectname == 'part'
+      expected_next_levels = [(current_level = section.level) + 1]
     end
 
     reader.skip_blank_lines
@@ -1575,6 +1564,7 @@ class Parser
         sect_name, sect_level = 'chapter', 1
       else
         sect_name, sect_special = style, true
+        sect_level = 1 if sect_level == 0
         sect_numbered_force = style == 'appendix'
       end
     else
