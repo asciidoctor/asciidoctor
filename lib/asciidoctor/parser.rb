@@ -1995,36 +1995,51 @@ class Parser
   # parent     - the parent of the current line
   # attributes - a Hash of attributes in which any metadata found will be stored
   # options    - a Hash of options to control processing: (default: {})
-  #              *  :text indicates that parser is only looking for text content
-  #                   and thus the block title should not be captured
+  #              *  :text indicates the parser is only looking for text content,
+  #                   thus neither a block title or attribute entry should be captured
   #
   # returns true if the line contains metadata, otherwise false
-  def self.parse_block_metadata_line(reader, parent, attributes, options = {})
-    return false unless reader.has_more_lines?
-    next_line = reader.peek_line
-    if (commentish = (next_line.start_with? '//')) && (CommentBlockRx.match? next_line)
-      reader.read_lines_until(:skip_first_line => true, :preserve_last_line => true, :terminator => next_line, :skip_processing => true)
-    elsif commentish && (CommentLineRx.match? next_line)
-      # do nothing, we'll skip it
-    elsif !options[:text] && (next_line.start_with? ':') && (match = AttributeEntryRx.match next_line)
-      process_attribute_entry reader, parent, attributes, match
-    elsif (in_square_brackets = (next_line.start_with? '[') && (next_line.end_with? ']')) && BlockAnchorRx =~ next_line
-      attributes['id'] = $1
-      # AsciiDoc Python always uses [id] as the reftext in HTML output,
-      # but I'd like to do better in Asciidoctor
-      # registration is deferred until the block or section is processed
-      attributes['reftext'] = $2 if $2
-    elsif in_square_brackets && BlockAttributeListRx =~ next_line
-      parent.document.parse_attributes $1, [], :sub_input => true, :into => attributes
-    # NOTE title doesn't apply to section, but we need to stash it for the first block
-    # TODO should issue an error if this is found above the document title
-    elsif !options[:text] && BlockTitleRx =~ next_line
-      attributes['title'] = $1
-    else
-      return false
+  def self.parse_block_metadata_line reader, parent, attributes, options = {}
+    if (next_line = reader.peek_line) &&
+        (options[:text] ? (next_line.start_with? '[', '/') : (normal = next_line.start_with? '[', '.', '/', ':'))
+      if next_line.start_with? '['
+        if next_line.start_with? '[['
+          if (next_line.end_with? ']]') && BlockAnchorRx =~ next_line
+            attributes['id'] = $1
+            # AsciiDoc Python always uses [id] as the reftext in HTML output,
+            # but I'd like to do better in Asciidoctor
+            # registration is deferred until the block or section is processed
+            attributes['reftext'] = $2 if $2
+            return true
+          end
+        elsif (next_line.end_with? ']') && BlockAttributeListRx =~ next_line
+          parent.document.parse_attributes $1, [], :sub_input => true, :into => attributes
+          return true
+        end
+      elsif normal && (next_line.start_with? '.')
+        if BlockTitleRx =~ next_line
+          # NOTE title doesn't apply to section, but we need to stash it for the first block
+          # TODO should issue an error if this is found above the document title
+          attributes['title'] = $1
+          return true
+        end
+      elsif next_line.start_with? '/'
+        if next_line == '//'
+          return true
+        elsif normal && '/' * (ll = next_line.length) == next_line
+          unless ll == 3
+            reader.read_lines_until :skip_first_line => true, :preserve_last_line => true, :terminator => next_line, :skip_processing => true
+            return true
+          end
+        else
+          return true unless next_line.start_with? '///'
+        end if next_line.start_with? '//'
+      # NOTE the final condition can be consolidated into single line
+      elsif normal && (next_line.start_with? ':') && AttributeEntryRx =~ next_line
+        process_attribute_entry reader, parent, attributes, $~
+        return true
+      end
     end
-
-    true
   end
 
   def self.process_attribute_entries(reader, parent, attributes = nil)
