@@ -118,17 +118,17 @@ class AbstractBlock < AbstractNode
   #   block.title
   #   => "Foo 3^ # :: Bar(1)"
   #
-  # Returns the converted String title for this Block, or nil if the assigned title is falsy
+  # Returns the converted String title for this Block, or nil if the source title is falsy
   def title
     # prevent substitutions from being applied to title multiple times
-    @title_converted ? @title_ : (@title_ = (@title_converted = true) && @title && (apply_title_subs @title))
+    @title_converted ? @converted_title : (@converted_title = (@title_converted = true) && @title && (apply_title_subs @title))
   end
 
   # Public: Set the String block title.
   #
   # Returns the new String title assigned to this Block
   def title= val
-    @title = (@title_converted = nil) || val
+    @title, @title_converted = val, nil
   end
 
   # Public: Convenience method that returns the interpreted title of the Block
