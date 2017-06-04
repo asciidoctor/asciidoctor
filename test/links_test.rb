@@ -237,7 +237,7 @@ context 'Links' do
     variations.each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
       output = doc.render
-      assert_equal '[tigers]', doc.references[:ids]['tigers']
+      assert_equal '[tigers]', doc.catalog[:ids]['tigers']
       assert_xpath '//a[@id = "tigers"]', output, 1
       assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
     end
@@ -248,7 +248,7 @@ context 'Links' do
     variations.each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
       output = doc.render
-      assert_equal 'Tigers', doc.references[:ids]['tigers']
+      assert_equal 'Tigers', doc.catalog[:ids]['tigers']
       assert_xpath '//a[@id = "tigers"]', output, 1
       assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
     end
@@ -259,7 +259,7 @@ context 'Links' do
     variations.each do |anchor|
       doc = document_from_string %(Here you can read about tigers.\\#{anchor})
       output = doc.render
-      assert !doc.references[:ids].has_key?('tigers')
+      assert !doc.catalog[:ids].has_key?('tigers')
       assert_xpath '//a[@id = "tigers"]', output, 0
     end
   end
@@ -278,7 +278,7 @@ context 'Links' do
 
   test 'xref using angled bracket syntax' do
     doc = document_from_string '<<tigers>>'
-    doc.references[:ids]['tigers'] = '[tigers]'
+    doc.catalog[:ids]['tigers'] = '[tigers]'
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
@@ -345,13 +345,13 @@ context 'Links' do
 
   test 'xref using angled bracket syntax with path which has been included in this document' do
     doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
-    doc.references[:includes] << 'tigers'
+    doc.catalog[:includes] << 'tigers'
     assert_xpath '//a[@href="#about"][text() = "About Tigers"]', doc.render, 1
   end
 
   test 'xref using angled bracket syntax with nested path which has been included in this document' do
     doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
-    doc.references[:includes] << 'part1/tigers'
+    doc.catalog[:includes] << 'part1/tigers'
     assert_xpath '//a[@href="#about"][text() = "About Tigers"]', doc.render, 1
   end
 
@@ -373,7 +373,7 @@ context 'Links' do
 
   test 'xref using macro syntax' do
     doc = document_from_string 'xref:tigers[]'
-    doc.references[:ids]['tigers'] = '[tigers]'
+    doc.catalog[:ids]['tigers'] = '[tigers]'
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
@@ -395,7 +395,7 @@ context 'Links' do
 
   test 'xref using invalid macro syntax does not create link' do
     doc = document_from_string 'xref:tigers'
-    doc.references[:ids]['tigers'] = '[tigers]'
+    doc.catalog[:ids]['tigers'] = '[tigers]'
     assert_xpath '//a', doc.render, 0
   end
 
@@ -424,21 +424,21 @@ context 'Links' do
 
   test 'anchor creates reference' do
     doc = document_from_string "[[tigers]]Tigers roam here."
-    assert_equal({'tigers' => '[tigers]'}, doc.references[:ids])
+    assert_equal({'tigers' => '[tigers]'}, doc.catalog[:ids])
   end
 
   test 'anchor with label creates reference' do
     doc = document_from_string "[[tigers,Tigers]]Tigers roam here."
-    assert_equal({'tigers' => 'Tigers'}, doc.references[:ids])
+    assert_equal({'tigers' => 'Tigers'}, doc.catalog[:ids])
   end
 
   test 'anchor with quoted label creates reference with quoted label text' do
     doc = document_from_string %([[tigers,"Tigers roam here"]]Tigers roam here.)
-    assert_equal({'tigers' => '"Tigers roam here"'}, doc.references[:ids])
+    assert_equal({'tigers' => '"Tigers roam here"'}, doc.catalog[:ids])
   end
 
   test 'anchor with label containing a comma creates reference' do
     doc = document_from_string %([[tigers,Tigers, scary tigers, roam here]]Tigers roam here.)
-    assert_equal({'tigers' => 'Tigers, scary tigers, roam here'}, doc.references[:ids])
+    assert_equal({'tigers' => 'Tigers, scary tigers, roam here'}, doc.catalog[:ids])
   end
 end

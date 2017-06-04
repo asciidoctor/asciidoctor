@@ -180,8 +180,8 @@ class Section < AbstractBlock
           gen_id = gen_id[1..-1] while gen_id.start_with? sep
         end
       end
-      if document.references[:ids].key? gen_id
-        ids, cnt = document.references[:ids], Compliance.unique_id_start_index
+      if document.catalog[:ids].key? gen_id
+        ids, cnt = document.catalog[:ids], Compliance.unique_id_start_index
         cnt += 1 while ids.key?(candidate_id = %(#{gen_id}#{sep}#{cnt}))
         candidate_id
       else

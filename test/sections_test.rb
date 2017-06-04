@@ -171,7 +171,7 @@ content
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['install']
+      reftext = doc.catalog[:ids]['install']
       refute_nil reftext
       assert_equal 'Install Procedure', reftext
     end
@@ -185,12 +185,12 @@ content
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['_install']
+      reftext = doc.catalog[:ids]['_install']
       refute_nil reftext
       assert_equal 'Install Procedure', reftext
     end
 
-    test 'should not overwrite existing id entry in references table' do
+    test 'duplicate section id should not overwrite existing section id entry in references table' do
       input = <<-EOS
 [#install]
 == First Install
@@ -204,12 +204,12 @@ content
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['install']
+      reftext = doc.catalog[:ids]['install']
       refute_nil reftext
       assert_equal 'First Install', reftext
     end
 
-    test 'should not overwrite existing id entry with generated reftext in references table' do
+    test 'duplicate block id should not overwrite existing section id entry in references table' do
       input = <<-EOS
 [#install]
 == First Install
@@ -221,7 +221,7 @@ content
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['install']
+      reftext = doc.catalog[:ids]['install']
       refute_nil reftext
       assert_equal 'First Install', reftext
     end
@@ -639,7 +639,7 @@ not in section
       assert floatingtitle.context != :section
       assert_equal :floating_title, floatingtitle.context
       assert_equal '_independent_heading', floatingtitle.id
-      assert doc.references[:ids].has_key?('_independent_heading')
+      assert doc.catalog[:ids].has_key?('_independent_heading')
     end
 
     test 'can assign explicit id to floating title' do
@@ -654,7 +654,7 @@ not in section
       doc = document_from_string input
       floating_title = doc.blocks.first
       assert_equal 'unchained', floating_title.id
-      assert doc.references[:ids].has_key?('unchained')
+      assert doc.catalog[:ids].has_key?('unchained')
     end
 
     test 'should not include floating title in toc' do
@@ -728,7 +728,7 @@ content
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['install']
+      reftext = doc.catalog[:ids]['install']
       refute_nil reftext
       assert_equal 'Install Procedure', reftext
     end
@@ -743,7 +743,7 @@ content
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['_install']
+      reftext = doc.catalog[:ids]['_install']
       refute_nil reftext
       assert_equal 'Install Procedure', reftext
     end

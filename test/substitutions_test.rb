@@ -827,8 +827,8 @@ context 'Substitutions' do
     test 'a single-line footnote macro should be registered and rendered as a footnote' do
       para = block_from_string('Sentence text footnote:[An example footnote.].')
       assert_equal %(Sentence text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote = para.document.references[:footnotes].first
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote = para.document.catalog[:footnotes].first
       assert_equal 1, footnote.index
       assert footnote.id.nil?
       assert_equal 'An example footnote.', footnote.text
@@ -837,8 +837,8 @@ context 'Substitutions' do
     test 'a multi-line footnote macro should be registered and rendered as a footnote without endline' do
       para = block_from_string("Sentence text footnote:[An example footnote\nwith wrapped text.].")
       assert_equal %(Sentence text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote = para.document.references[:footnotes].first
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote = para.document.catalog[:footnotes].first
       assert_equal 1, footnote.index
       assert footnote.id.nil?
       assert_equal "An example footnote with wrapped text.", footnote.text
@@ -847,8 +847,8 @@ context 'Substitutions' do
     test 'an escaped closing square bracket in a footnote should be unescaped when rendered' do
       para = block_from_string(%(footnote:[a #{BACKSLASH}] b].))
       assert_equal %(<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote = para.document.references[:footnotes].first
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote = para.document.catalog[:footnotes].first
       assert_equal "a ] b", footnote.text
     end
 
@@ -860,20 +860,20 @@ context 'Substitutions' do
     test 'a footnote macro may contain an escaped backslash' do
       para = block_from_string("footnote:[\\]]\nfootnote:[a \\] b]\nfootnote:[a \\]\\] b]")
       para.sub_macros(para.source)
-      assert_equal 3, para.document.references[:footnotes].size
-      footnote1 = para.document.references[:footnotes][0]
+      assert_equal 3, para.document.catalog[:footnotes].size
+      footnote1 = para.document.catalog[:footnotes][0]
       assert_equal ']', footnote1.text
-      footnote2 = para.document.references[:footnotes][1]
+      footnote2 = para.document.catalog[:footnotes][1]
       assert_equal 'a ] b', footnote2.text
-      footnote3 = para.document.references[:footnotes][2]
+      footnote3 = para.document.catalog[:footnotes][2]
       assert_equal 'a ]] b', footnote3.text
     end
 
     test 'a footnote macro may contain a link macro' do
       para = block_from_string('Share your code. footnote:[https://github.com[GitHub]]')
       assert_equal %(Share your code. <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote1 = para.document.references[:footnotes][0]
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote1 = para.document.catalog[:footnotes][0]
       assert_equal '<a href="https://github.com">GitHub</a>', footnote1.text
     end
 
@@ -881,8 +881,8 @@ context 'Substitutions' do
       para = block_from_string %(the JLine footnote:[https://github.com/jline/jline2]\nlibrary.)
       result = para.sub_macros para.source
       assert_equal %(the JLine <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>\nlibrary.), result
-      assert_equal 1, para.document.references[:footnotes].size
-      fn1 = para.document.references[:footnotes].first
+      assert_equal 1, para.document.catalog[:footnotes].size
+      fn1 = para.document.catalog[:footnotes].first
       assert_equal '<a href="https://github.com/jline/jline2" class="bare">https://github.com/jline/jline2</a>', fn1.text
     end
 
@@ -890,8 +890,8 @@ context 'Substitutions' do
       para = block_from_string %(the JLine footnote:[https://github.com/jline/jline2];\nlibrary.)
       result = para.sub_macros para.source
       assert_equal %(the JLine <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>;\nlibrary.), result
-      assert_equal 1, para.document.references[:footnotes].size
-      fn1 = para.document.references[:footnotes].first
+      assert_equal 1, para.document.catalog[:footnotes].size
+      fn1 = para.document.catalog[:footnotes].first
       assert_equal '<a href="https://github.com/jline/jline2" class="bare">https://github.com/jline/jline2</a>', fn1.text
     end
 
@@ -899,16 +899,16 @@ context 'Substitutions' do
       # specialcharacters escaping is simulated
       para = block_from_string('text footnote:[&lt;&lt;_install,Install&gt;&gt;]')
       assert_equal %(text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote1 = para.document.references[:footnotes][0]
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote1 = para.document.catalog[:footnotes][0]
       assert_equal '<a href="#_install">Install</a>', footnote1.text
     end
 
     test 'a footnote macro may contain an anchor macro' do
       para = block_from_string('text footnote:[a [[b\]\] \[[c\]\] d]')
       assert_equal %(text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote1 = para.document.references[:footnotes][0]
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote1 = para.document.catalog[:footnotes][0]
       assert_equal 'a <a id="b"></a> [[c]] d', footnote1.text
     end
 
@@ -924,20 +924,20 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
     test 'a footnote macro may contain a bibliographic anchor macro' do
       para = block_from_string('text footnote:[a [[[b\]\]\] c]')
       assert_equal %(text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote1 = para.document.references[:footnotes][0]
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote1 = para.document.catalog[:footnotes][0]
       assert_equal 'a <a id="b"></a>[b] c', footnote1.text
     end
 
     test 'should increment index of subsequent footnote macros' do
       para = block_from_string("Sentence text footnote:[An example footnote.]. Sentence text footnote:[Another footnote.].")
       assert_equal %(Sentence text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>. Sentence text <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnote_2" title="View footnote.">2</a>]</sup>.), para.sub_macros(para.source)
-      assert_equal 2, para.document.references[:footnotes].size
-      footnote1 = para.document.references[:footnotes][0]
+      assert_equal 2, para.document.catalog[:footnotes].size
+      footnote1 = para.document.catalog[:footnotes][0]
       assert_equal 1, footnote1.index
       assert footnote1.id.nil?
       assert_equal "An example footnote.", footnote1.text
-      footnote2 = para.document.references[:footnotes][1]
+      footnote2 = para.document.catalog[:footnotes][1]
       assert_equal 2, footnote2.index
       assert footnote2.id.nil?
       assert_equal "Another footnote.", footnote2.text
@@ -946,8 +946,8 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
     test 'a footnoteref macro with id and single-line text should be registered and rendered as a footnote' do
       para = block_from_string('Sentence text footnoteref:[ex1, An example footnote.].')
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote = para.document.references[:footnotes].first
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote = para.document.catalog[:footnotes].first
       assert_equal 1, footnote.index
       assert_equal 'ex1', footnote.id
       assert_equal 'An example footnote.', footnote.text
@@ -956,8 +956,8 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
     test 'a footnoteref macro with id and multi-line text should be registered and rendered as a footnote without endlines' do
       para = block_from_string("Sentence text footnoteref:[ex1, An example footnote\nwith wrapped text.].")
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote = para.document.references[:footnotes].first
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote = para.document.catalog[:footnotes].first
       assert_equal 1, footnote.index
       assert_equal 'ex1', footnote.id
       assert_equal "An example footnote with wrapped text.", footnote.text
@@ -966,8 +966,8 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
     test 'a footnoteref macro with id should refer to footnoteref with same id' do
       para = block_from_string('Sentence text footnoteref:[ex1, An example footnote.]. Sentence text footnoteref:[ex1].')
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>. Sentence text <sup class="footnoteref">[<a class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
-      assert_equal 1, para.document.references[:footnotes].size
-      footnote = para.document.references[:footnotes].first
+      assert_equal 1, para.document.catalog[:footnotes].size
+      footnote = para.document.catalog[:footnotes].first
       assert_equal 1, footnote.index
       assert_equal 'ex1', footnote.id
       assert_equal 'An example footnote.', footnote.text
@@ -985,8 +985,8 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
         para = block_from_string("#{sentence}#{macro}")
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.references[:indexterms].size
-        assert_equal ['Tigers'], para.document.references[:indexterms].first
+        assert_equal 1, para.document.catalog[:indexterms].size
+        assert_equal ['Tigers'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -997,8 +997,8 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
         para = block_from_string("#{sentence}#{macro}")
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.references[:indexterms].size
-        assert_equal ['Big cats', 'Tigers'], para.document.references[:indexterms].first
+        assert_equal 1, para.document.catalog[:indexterms].size
+        assert_equal ['Big cats', 'Tigers'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1009,8 +1009,8 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
         para = block_from_string("#{sentence}#{macro}")
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.references[:indexterms].size
-        assert_equal ['Big cats', 'Tigers', 'Panthera tigris'], para.document.references[:indexterms].first
+        assert_equal 1, para.document.catalog[:indexterms].size
+        assert_equal ['Big cats', 'Tigers', 'Panthera tigris'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1021,8 +1021,8 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
         para = block_from_string("#{sentence}#{macro}")
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.references[:indexterms].size
-        assert_equal ['Panthera tigris'], para.document.references[:indexterms].first
+        assert_equal 1, para.document.catalog[:indexterms].size
+        assert_equal ['Panthera tigris'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1043,8 +1043,8 @@ EOS
         para = block_from_string input
         output = para.sub_macros(para.source)
         assert_equal input.lines.first, output
-        assert_equal 1, para.document.references[:indexterms].size
-        terms = para.document.references[:indexterms].first
+        assert_equal 1, para.document.catalog[:indexterms].size
+        terms = para.document.catalog[:indexterms].first
         assert_equal 2, terms.size
         assert_equal 'Tigers', terms.first
         assert_equal '[Big], scary cats', terms.last
@@ -1058,8 +1058,8 @@ EOS
         para = block_from_string("#{sentence}#{macro}")
         output = para.apply_normal_subs(para.lines)
         assert_equal sentence, output
-        assert_equal 1, para.document.references[:indexterms].size
-        assert_equal ['<strong>Tigers</strong>'], para.document.references[:indexterms].first
+        assert_equal 1, para.document.catalog[:indexterms].size
+        assert_equal ['<strong>Tigers</strong>'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1069,9 +1069,9 @@ EOS
       para = block_from_string("#{sentence}\n#{macros}")
       output = para.sub_macros(para.source)
       assert_equal sentence, output.rstrip
-      assert_equal 2, para.document.references[:indexterms].size
-      assert_equal ['Tigers'], para.document.references[:indexterms][0]
-      assert_equal ['Animals', 'Cats'], para.document.references[:indexterms][1]
+      assert_equal 2, para.document.catalog[:indexterms].size
+      assert_equal ['Tigers'], para.document.catalog[:indexterms][0]
+      assert_equal ['Animals', 'Cats'], para.document.catalog[:indexterms][1]
     end
 
     test 'an index term macro with round bracket syntax may contain round brackets in term' do
@@ -1080,8 +1080,8 @@ EOS
       para = block_from_string("#{sentence}#{macro}")
       output = para.sub_macros(para.source)
       assert_equal sentence, output
-      assert_equal 1, para.document.references[:indexterms].size
-      assert_equal ['Tiger (Panthera tigris)'], para.document.references[:indexterms].first
+      assert_equal 1, para.document.catalog[:indexterms].size
+      assert_equal ['Tiger (Panthera tigris)'], para.document.catalog[:indexterms].first
     end
 
     test 'an index term macro with square bracket syntax may contain square brackets in term' do
@@ -1090,8 +1090,8 @@ EOS
       para = block_from_string("#{sentence}#{macro}")
       output = para.sub_macros(para.source)
       assert_equal sentence, output
-      assert_equal 1, para.document.references[:indexterms].size
-      assert_equal ['Tiger [Panthera tigris]'], para.document.references[:indexterms].first
+      assert_equal 1, para.document.catalog[:indexterms].size
+      assert_equal ['Tiger [Panthera tigris]'], para.document.catalog[:indexterms].first
     end
 
     test 'a single-line index term 2 macro should be registered as an index reference and retain term inline' do
@@ -1101,8 +1101,8 @@ EOS
         para = block_from_string(macro)
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.references[:indexterms].size
-        assert_equal ['tiger'], para.document.references[:indexterms].first
+        assert_equal 1, para.document.catalog[:indexterms].size
+        assert_equal ['tiger'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1113,8 +1113,8 @@ EOS
         para = block_from_string(macro)
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.references[:indexterms].size
-        assert_equal ['panthera tigris'], para.document.references[:indexterms].first
+        assert_equal 1, para.document.catalog[:indexterms].size
+        assert_equal ['panthera tigris'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1123,9 +1123,9 @@ EOS
       para = block_from_string(sentence)
       output = para.sub_macros(para.source)
       assert_equal 'The tiger (Panthera tigris) is the largest cat species.', output
-      assert_equal 2, para.document.references[:indexterms].size
-      assert_equal ['tiger'], para.document.references[:indexterms][0]
-      assert_equal ['cat'], para.document.references[:indexterms][1]
+      assert_equal 2, para.document.catalog[:indexterms].size
+      assert_equal ['tiger'], para.document.catalog[:indexterms][0]
+      assert_equal ['cat'], para.document.catalog[:indexterms][1]
     end
 
     test 'normal substitutions are performed on an index term 2 macro' do
@@ -1133,8 +1133,8 @@ EOS
       para = block_from_string sentence
       output = para.apply_normal_subs(para.lines)
       assert_equal 'The <strong>tiger</strong> (Panthera tigris) is the largest cat species.', output
-      assert_equal 1, para.document.references[:indexterms].size
-      assert_equal ['<strong>tiger</strong>'], para.document.references[:indexterms].first
+      assert_equal 1, para.document.catalog[:indexterms].size
+      assert_equal ['<strong>tiger</strong>'], para.document.catalog[:indexterms].first
     end
 
     test 'index term 2 macro with round bracket syntex should not interfer with index term macro with round bracket syntax' do
@@ -1142,7 +1142,7 @@ EOS
       para = block_from_string sentence
       output = para.sub_macros(para.source)
       assert_equal "The panthera tigris is the largest cat species.\n", output
-      terms = para.document.references[:indexterms]
+      terms = para.document.catalog[:indexterms]
       assert_equal 2, terms.size
       assert_equal ['panthera tigris'], terms[0]
       assert_equal ['Big cats', 'Tigers'], terms[1]

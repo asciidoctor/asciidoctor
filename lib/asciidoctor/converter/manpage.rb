@@ -598,7 +598,7 @@ allbox tab(:);'
         %(#{ESC_BS}c#{LF}#{ESC_FS}#{macro} "#{target}" "#{text}" )
       when :xref
         refid = (node.attr 'refid') || target
-        node.text || (node.document.references[:ids][refid] || %([#{refid}]))
+        node.text || (node.document.catalog[:ids][refid] || %([#{refid}]))
       when :ref, :bibref
         # These are anchor points, which shouldn't be visual
         ''

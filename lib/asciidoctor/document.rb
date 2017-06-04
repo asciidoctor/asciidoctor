@@ -124,8 +124,11 @@ class Document < AbstractBlock
   # Public: Get or set the Boolean flag that indicates whether source map information should be tracked by the parser
   attr_accessor :sourcemap
 
-  # Public: Get the Hash of document references
-  attr_reader :references
+  # Public: Get the document catalog Hash
+  attr_reader :catalog
+
+  # Public: Alias catalog property as references for backwards compatiblity
+  alias references catalog
 
   # Public: Get the Hash of document counters
   attr_reader :counters
@@ -179,12 +182,8 @@ class Document < AbstractBlock
     if (parent_doc = options.delete :parent)
       @parent_document = parent_doc
       options[:base_dir] ||= parent_doc.base_dir
-      @references = parent_doc.references.inject({}) do |accum, (key,ref)|
-        if key == :footnotes
-          accum[:footnotes] = []
-        else
-          accum[key] = ref
-        end
+      @catalog = parent_doc.catalog.inject({}) do |accum, (key, table)|
+        accum[key] = (key == :footnotes ? [] : table)
         accum
       end
       @callouts = parent_doc.callouts
@@ -204,7 +203,7 @@ class Document < AbstractBlock
       @extensions = parent_doc.extensions
     else
       @parent_document = nil
-      @references = {
+      @catalog = {
         :ids => {},
         :footnotes => [],
         :links => [],
@@ -552,31 +551,24 @@ class Document < AbstractBlock
     end
   end
 
-  def register(type, value, force = nil)
+  def register type, value
     case type
     when :ids
-      id, reftext = [*value]
-      reftext ||= '[' + id + ']'
-      if force
-        @references[:ids][id] = reftext
-      else
-        @references[:ids][id] ||= reftext
-      end
+      id, reftext = value
+      @catalog[:ids][id] ||= (reftext || '[' + id + ']')
     when :footnotes, :indexterms
-      @references[type] << value
+      @catalog[type] << value
     else
-      if @options[:catalog_assets]
-        @references[type] << value
-      end
+      @catalog[type] << value if @options[:catalog_assets]
     end
   end
 
   def footnotes?
-    @references[:footnotes].empty? ? false : true
+    @catalog[:footnotes].empty? ? false : true
   end
 
   def footnotes
-    @references[:footnotes]
+    @catalog[:footnotes]
   end
 
   def nested?
