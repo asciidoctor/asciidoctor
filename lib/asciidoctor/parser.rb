@@ -73,7 +73,7 @@ class Parser
   #
   # Raises RuntimeError if this constructor is invoked.
   def initialize
-    raise 'Au contraire, mon frere. No lexer instances will be running around.'
+    raise 'Au contraire, mon frere. No parser instances will be running around.'
   end
 
   # Public: Parses AsciiDoc source read from the Reader into the Document
@@ -1978,7 +1978,7 @@ class Parser
   # parent     - the parent to which the lines belong
   # attributes - a Hash of attributes in which any metadata found will be stored (default: {})
   # options    - a Hash of options to control processing: (default: {})
-  #              *  :text indicates that lexer is only looking for text content
+  #              *  :text indicates that parser is only looking for text content
   #                   and thus the block title should not be captured
   #
   # returns the Hash of attributes including any metadata found
@@ -2007,7 +2007,7 @@ class Parser
   # parent     - the parent of the current line
   # attributes - a Hash of attributes in which any metadata found will be stored
   # options    - a Hash of options to control processing: (default: {})
-  #              *  :text indicates that lexer is only looking for text content
+  #              *  :text indicates that parser is only looking for text content
   #                   and thus the block title should not be captured
   #
   # returns true if the line contains metadata, otherwise false
