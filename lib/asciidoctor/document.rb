@@ -61,7 +61,7 @@ class Document < AbstractBlock
     end
 
     def subtitle?
-      !!@subtitle
+      @subtitle ? true : false
     end
 
     def to_s
@@ -485,7 +485,7 @@ class Document < AbstractBlock
       end
 
       # Now parse the lines in the reader into blocks
-      Parser.parse @reader, doc, :header_only => !!@options[:parse_header_only]
+      Parser.parse @reader, doc, :header_only => @options[:parse_header_only]
 
       # should we call sort of post-parse function?
       restore_attributes
@@ -552,7 +552,7 @@ class Document < AbstractBlock
     end
   end
 
-  def register(type, value, force = false)
+  def register(type, value, force = nil)
     case type
     when :ids
       id, reftext = [*value]
@@ -572,7 +572,7 @@ class Document < AbstractBlock
   end
 
   def footnotes?
-    !@references[:footnotes].empty?
+    @references[:footnotes].empty? ? false : true
   end
 
   def footnotes
@@ -580,7 +580,7 @@ class Document < AbstractBlock
   end
 
   def nested?
-    !!@parent_document
+    @parent_document ? true : false
   end
 
   def embedded?
@@ -589,7 +589,7 @@ class Document < AbstractBlock
   end
 
   def extensions?
-    !!@extensions
+    @extensions ? true : false
   end
 
   # Make the raw source for the Document available.
@@ -848,7 +848,7 @@ class Document < AbstractBlock
       end
       case name
       when 'backend'
-        update_backend_attributes resolved_value, !!@attributes_modified.delete?('htmlsyntax')
+        update_backend_attributes resolved_value, (@attributes_modified.delete? 'htmlsyntax')
       when 'doctype'
         update_doctype_attributes resolved_value
       else
@@ -907,7 +907,7 @@ class Document < AbstractBlock
   #
   # This method also handles updating the related doctype attributes if the
   # doctype attribute is assigned at the time this method is called.
-  def update_backend_attributes new_backend, force = false
+  def update_backend_attributes new_backend, force = nil
     if force || (new_backend && new_backend != @backend)
       attrs = @attributes
       current_backend, current_basebackend, current_doctype = @backend, attrs['basebackend'], @doctype
