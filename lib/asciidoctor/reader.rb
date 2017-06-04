@@ -576,7 +576,7 @@ class PreprocessorReader < Reader
     # track both absolute depth for comparing to size of include stack and relative depth for reporting
     @maxdepth = {:abs => include_depth_default, :rel => include_depth_default}
     @include_stack = []
-    @includes = (document.references[:includes] ||= [])
+    @includes = document.catalog[:includes]
     @skipping = false
     @conditional_stack = []
     @include_processor_extensions = nil

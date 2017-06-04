@@ -1712,6 +1712,30 @@ Text that has supporting information{empty}footnote:[An example footnote.].
     end
   end
 
+  context 'Catalog' do
+    test 'document catalog is aliased as references' do
+      input = <<-EOS
+= Document Title
+
+== Section A
+
+content
+
+== Section B
+
+content{blank}footnote:[commentary]
+      EOS
+
+      doc = document_from_string input
+      refute_nil doc.catalog
+      assert_equal %w(footnotes ids images includes indexterms links), doc.catalog.keys.map(&:to_s).sort
+      assert_same doc.catalog, doc.references
+      assert_same doc.catalog[:footnotes], doc.references[:footnotes]
+      assert_same doc.catalog[:ids], doc.references[:ids]
+      assert_equal 'Section A', doc.references[:ids]['_section_a']
+    end
+  end
+
   context 'Backends and Doctypes' do
     test 'html5 backend doctype article' do
       result = render_string("= Title\n\nparagraph", :attributes => {'backend' => 'html5'})

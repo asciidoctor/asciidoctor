@@ -929,7 +929,7 @@ module Substitutors
             type = :ref
             target = nil
           else
-            if (footnote = @document.references[:footnotes].find {|fn| fn.id == id })
+            if (footnote = @document.footnotes.find {|fn| fn.id == id })
               index = footnote.index
               text = footnote.text
             else
@@ -1016,7 +1016,7 @@ module Substitutors
             path = path[0, path.length - extname.length]
           end
           # the referenced path is this document, or its contents has been included in this document
-          if @document.attributes['docname'] == path || @document.references[:includes].include?(path)
+          if @document.attributes['docname'] == path || @document.catalog[:includes].include?(path)
             refid = fragment
             path = nil
             target = %(##{fragment})
@@ -1028,9 +1028,9 @@ module Substitutors
         # handles form: id or Section Title
         else
           # resolve fragment as reftext if cannot be resolved as refid and looks like reftext
-          if !(@document.references[:ids].key? fragment) &&
+          if !(@document.catalog[:ids].key? fragment) &&
               ((fragment.include? ' ') || fragment.downcase != fragment) &&
-              (resolved_id = ::RUBY_MIN_VERSION_1_9 ? (@document.references[:ids].key fragment) : (@document.references[:ids].index fragment))
+              (resolved_id = ::RUBY_MIN_VERSION_1_9 ? (@document.catalog[:ids].key fragment) : (@document.catalog[:ids].index fragment))
             fragment = resolved_id
           end
           refid = fragment

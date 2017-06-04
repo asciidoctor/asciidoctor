@@ -3084,7 +3084,7 @@ content
       block = doc.blocks.first
       assert_nil block.id
       assert_nil(block.attr 'reftext')
-      assert !doc.references[:ids].has_key?('illegal$id')
+      assert !doc.catalog[:ids].has_key?('illegal$id')
     end
 
     test 'should use specified id and reftext when registering block reference' do
@@ -3097,7 +3097,7 @@ $ apt-get install asciidoctor
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['debian']
+      reftext = doc.catalog[:ids]['debian']
       refute_nil reftext
       assert_equal 'Debian Install', reftext
     end
@@ -3112,7 +3112,7 @@ $ apt-get install asciidoctor
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['debian']
+      reftext = doc.catalog[:ids]['debian']
       refute_nil reftext
       assert_equal '[Debian] Install', reftext
     end
@@ -3127,7 +3127,7 @@ $ apt-get install asciidoctor
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['debian']
+      reftext = doc.catalog[:ids]['debian']
       refute_nil reftext
       assert_equal 'Debian, Ubuntu', reftext
     end
@@ -3143,7 +3143,7 @@ $ apt-get install asciidoctor
       EOS
 
       doc = document_from_string input
-      reftext = doc.references[:ids]['debian']
+      reftext = doc.catalog[:ids]['debian']
       refute_nil reftext
       assert_equal 'Debian Install', reftext
     end
