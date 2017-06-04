@@ -181,10 +181,9 @@ class Section < AbstractBlock
         end
       end
       if document.references[:ids].key? gen_id
-        ids = document.references[:ids]
-        cnt = Compliance.unique_id_start_index
-        cnt += 1 while ids.key?(tmp_id = %(#{gen_id}#{sep}#{cnt}))
-        tmp_id
+        ids, cnt = document.references[:ids], Compliance.unique_id_start_index
+        cnt += 1 while ids.key?(candidate_id = %(#{gen_id}#{sep}#{cnt}))
+        candidate_id
       else
         gen_id
       end
