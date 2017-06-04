@@ -91,12 +91,10 @@ class Parser
   def self.parse(reader, document, options = {})
     block_attributes = parse_document_header(reader, document)
 
-    unless options[:header_only]
-      while reader.has_more_lines?
-        new_section, block_attributes = next_section(reader, document, block_attributes)
-        document << new_section if new_section
-      end
-    end
+    while reader.has_more_lines?
+      new_section, block_attributes = next_section(reader, document, block_attributes)
+      document << new_section if new_section
+    end unless options[:header_only]
 
     document
   end
