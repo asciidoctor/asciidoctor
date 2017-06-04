@@ -534,10 +534,15 @@ Wise words from a wise person.
         assert_equal '<a href="http://asciidoc.org">AsciiDoc</a> is a <em>lightweight</em> markup language&#8230;&#8203;', output
       end
 
-      test 'should output nil if first block is not a paragraph' do
+      test 'should output nil and warn if first block is not a paragraph' do
         input = '* bullet'
-        output = render_string input, :doctype => 'inline'
+        output = nil
+        warnings = redirect_streams do |_, err|
+          output =  render_string input, :doctype => 'inline'
+          err.string
+        end
         assert output.nil?
+        assert_includes warnings, 'no inline candidate'
       end
     end
   end
