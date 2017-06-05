@@ -155,21 +155,27 @@ class AttributeList
       # opts is an alias for options
       case name
       when 'options', 'opts'
-        name = 'options'
         if value.include? ','
           value = value.delete ' ' if value.include? ' '
-          value.split(',').each {|opt| @attributes[%(#{opt}-option)] = '' unless opt.empty? }
+          (value.split ',').each {|opt| @attributes[%(#{opt}-option)] = '' unless opt.empty? }
         else
           @attributes[%(#{value = value.strip}-option)] = ''
         end
-        @attributes[name] = value
-      when 'title'
-        @attributes[name] = value
+        @attributes['options'] = value
       else
-        @attributes[name] = single_quoted_value && !value.empty? && @block ? (@block.apply_normal_subs value) : value
+        if single_quoted_value && @block
+          case name
+          when 'title', 'reftext'
+            @attributes[name] = value
+          else
+            @attributes[name] = value.empty? ? value : (@block.apply_normal_subs value)
+          end
+        else
+          @attributes[name] = value
+        end
       end
     else
-      resolved_name = single_quoted_value && !name.empty? && @block ? (@block.apply_normal_subs name) : name
+      resolved_name = single_quoted_value && @block && !name.empty? ? (@block.apply_normal_subs name) : name
       if (pos_name = pos_attrs[index])
         @attributes[pos_name] = resolved_name
       end
