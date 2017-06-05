@@ -2079,42 +2079,40 @@ class Parser
   # attrs - the attributes for the current context
   #
   # returns a 2-element array containing the attribute name and value
-  def self.store_attribute(name, value, doc = nil, attrs = nil)
+  def self.store_attribute name, value, doc = nil, attrs = nil
     # TODO move processing of attribute value to utility method
-    if name.end_with?('!')
-      # a nil value signals the attribute should be deleted (undefined)
-      value = nil
-      name = name.chop
-    elsif name.start_with?('!')
-      # a nil value signals the attribute should be deleted (undefined)
-      value = nil
-      name = name[1..-1]
+    if name.end_with? '!'
+      # a nil value signals the attribute should be deleted (unset)
+      name, value = name.chop, nil
+    elsif name.start_with? '!'
+      # a nil value signals the attribute should be deleted (unset)
+      name, value = (name.slice 1, name.length), nil
     end
 
-    name = sanitize_attribute_name(name)
-    accessible = true
+    name = sanitize_attribute_name name
+    # alias numbered attribute to sectnums
+    name = 'sectnums' if name == 'numbered'
+
     if doc
-      # alias numbered attribute to sectnums
-      if name == 'numbered'
-        name = 'sectnums'
-      # support relative leveloffset values
-      elsif name == 'leveloffset'
-        if value
-          case value.chr
-          when '+'
+      if value
+        if name == 'leveloffset'
+          # support relative leveloffset values
+          if value.start_with? '+'
             value = ((doc.attr 'leveloffset', 0).to_i + (value[1..-1] || 0).to_i).to_s
-          when '-'
+          elsif value.start_with? '-'
             value = ((doc.attr 'leveloffset', 0).to_i - (value[1..-1] || 0).to_i).to_s
           end
         end
+        # QUESTION should we set value to locked value if set_attribute returns false?
+        if (resolved_value = doc.set_attribute name, value)
+          value = resolved_value
+          (Document::AttributeEntry.new name, value).save_to attrs if attrs
+        end
+      elsif (doc.delete_attribute name) && attrs
+        (Document::AttributeEntry.new name, value).save_to attrs
       end
-      accessible = value ? doc.set_attribute(name, value) : doc.delete_attribute(name)
-    end
-
-    if accessible && attrs
-      # NOTE lookup resolved value (resolution occurs inside set_attribute)
-      value = doc.attributes[name] if value
-      Document::AttributeEntry.new(name, value).save_to(attrs)
+    elsif attrs
+      (Document::AttributeEntry.new name, value).save_to attrs
     end
 
     [name, value]

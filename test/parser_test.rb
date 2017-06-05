@@ -17,6 +17,85 @@ context "Parser" do
     assert_equal 'foo3-bar', Asciidoctor::Parser.sanitize_attribute_name("Foo 3^ # - Bar[")
   end
 
+  test 'store attribute with value' do
+    attr_name, attr_value = Asciidoctor::Parser.store_attribute 'foo', 'bar'
+    assert_equal 'foo', attr_name
+    assert_equal 'bar', attr_value
+  end
+
+  test 'store attribute with negated value' do
+    { 'foo!' => nil, '!foo' => nil, 'foo' => nil }.each do |name, value|
+      attr_name, attr_value = Asciidoctor::Parser.store_attribute name, value
+      assert_equal name.sub('!', ''), attr_name
+      assert_nil attr_value
+    end
+  end
+
+  test 'store accessible attribute on document with value' do
+    doc = empty_document
+    doc.set_attribute 'foo', 'baz'
+    attrs = {}
+    attr_name, attr_value = Asciidoctor::Parser.store_attribute 'foo', 'bar', doc, attrs
+    assert_equal 'foo', attr_name
+    assert_equal 'bar', attr_value
+    assert_equal 'bar', (doc.attr 'foo')
+    assert attrs.key?(:attribute_entries)
+    assert_equal 1, attrs[:attribute_entries].size
+    assert_equal 'foo', attrs[:attribute_entries][0].name
+    assert_equal 'bar', attrs[:attribute_entries][0].value
+  end
+
+  test 'store accessible attribute on document with value that contains attribute reference' do
+    doc = empty_document
+    doc.set_attribute 'foo', 'baz'
+    doc.set_attribute 'release', 'ultramega'
+    attrs = {}
+    attr_name, attr_value = Asciidoctor::Parser.store_attribute 'foo', '{release}', doc, attrs
+    assert_equal 'foo', attr_name
+    assert_equal 'ultramega', attr_value
+    assert_equal 'ultramega', (doc.attr 'foo')
+    assert attrs.key?(:attribute_entries)
+    assert_equal 1, attrs[:attribute_entries].size
+    assert_equal 'foo', attrs[:attribute_entries][0].name
+    assert_equal 'ultramega', attrs[:attribute_entries][0].value
+  end
+
+  test 'store inaccessible attribute on document with value' do
+    doc = empty_document :attributes => { 'foo' => 'baz' }
+    attrs = {}
+    attr_name, attr_value = Asciidoctor::Parser.store_attribute 'foo', 'bar', doc, attrs
+    assert_equal 'foo', attr_name
+    assert_equal 'bar', attr_value
+    assert_equal 'baz', (doc.attr 'foo')
+    refute attrs.key?(:attribute_entries)
+  end
+
+  test 'store accessible attribute on document with negated value' do
+    { 'foo!' => nil, '!foo' => nil, 'foo' => nil }.each do |name, value|
+      doc = empty_document
+      doc.set_attribute 'foo', 'baz'
+      attrs = {}
+      attr_name, attr_value = Asciidoctor::Parser.store_attribute name, value, doc, attrs
+      assert_equal name.sub('!', ''), attr_name
+      assert_nil attr_value
+      assert attrs.key?(:attribute_entries)
+      assert_equal 1, attrs[:attribute_entries].size
+      assert_equal 'foo', attrs[:attribute_entries][0].name
+      assert_nil attrs[:attribute_entries][0].value
+    end
+  end
+
+  test 'store inaccessible attribute on document with negated value' do
+    { 'foo!' => nil, '!foo' => nil, 'foo' => nil }.each do |name, value|
+      doc = empty_document :attributes => { 'foo' => 'baz' }
+      attrs = {}
+      attr_name, attr_value = Asciidoctor::Parser.store_attribute name, value, doc, attrs
+      assert_equal name.sub('!', ''), attr_name
+      assert_nil attr_value
+      refute attrs.key?(:attribute_entries)
+    end
+  end
+
   test "collect unnamed attribute" do
     attributes = {}
     line = 'quote'
