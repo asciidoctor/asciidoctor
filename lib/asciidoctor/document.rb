@@ -253,19 +253,25 @@ class Document < AbstractBlock
     @header = nil
     @counters = {}
     @attributes_modified = ::Set.new
-    @options = options
     @docinfo_processor_extensions = {}
     header_footer = (options[:header_footer] ||= false)
-    options.freeze
+    (@options = options).freeze
 
     attrs = @attributes
     #attrs['encoding'] = 'UTF-8'
     attrs['sectids'] = ''
-    attrs['notitle'] = '' unless header_footer
     attrs['toc-placement'] = 'auto'
+    if header_footer
+      attrs['copycss'] = ''
+      # sync embedded attribute with :header_footer option value
+      attr_overrides['embedded'] = nil
+    else
+      attrs['notitle'] = ''
+      # sync embedded attribute with :header_footer option value
+      attr_overrides['embedded'] = ''
+    end
     attrs['stylesheet'] = ''
     attrs['webfonts'] = ''
-    attrs['copycss'] = '' if header_footer
     attrs['prewrap'] = ''
     attrs['attribute-undefined'] = Compliance.attribute_undefined
     attrs['attribute-missing'] = Compliance.attribute_missing
@@ -296,9 +302,6 @@ class Document < AbstractBlock
     attr_overrides['safe-mode-name'] = (safe_mode_name = SafeMode.name_for_value @safe)
     attr_overrides["safe-mode-#{safe_mode_name}"] = ''
     attr_overrides['safe-mode-level'] = @safe
-
-    # sync the embedded attribute w/ the value of options...do not allow override
-    attr_overrides['embedded'] = header_footer ? nil : ''
 
     # the only way to set the max-include-depth attribute is via the API; default to 64 like AsciiDoc Python
     attr_overrides['max-include-depth'] ||= 64
@@ -576,7 +579,6 @@ class Document < AbstractBlock
   end
 
   def embedded?
-    # QUESTION should this be !@options[:header_footer] ?
     @attributes.key? 'embedded'
   end
 
