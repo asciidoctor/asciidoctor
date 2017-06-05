@@ -7,16 +7,15 @@ module Substitutors
   SpecialCharsRx = /[<&>]/
   SpecialCharsTr = { '>' => '&gt;', '<' => '&lt;', '&' => '&amp;' }
 
-  BASIC_SUBS = [:specialcharacters].freeze
-  HEADER_SUBS = [:specialcharacters, :attributes].freeze
-  NORMAL_SUBS = [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements].freeze
-  # TODO make this a compliance setting; AsciiDoc Python performs :attributes and :macros on a pass block
-  PASS_SUBS = [].freeze
-  TITLE_SUBS = [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements].freeze
-  VERBATIM_SUBS = [:specialcharacters, :callouts].freeze
+  (BASIC_SUBS = [:specialcharacters]).freeze
+  (HEADER_SUBS = [:specialcharacters, :attributes]).freeze
+  (NORMAL_SUBS = [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements]).freeze
+  (NONE_SUBS = []).freeze
+  (TITLE_SUBS = [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements]).freeze
+  (VERBATIM_SUBS = [:specialcharacters, :callouts]).freeze
 
   SUB_GROUPS = {
-    :none => [].freeze,
+    :none => NONE_SUBS,
     :normal => NORMAL_SUBS,
     :verbatim => VERBATIM_SUBS,
     :specialchars => BASIC_SUBS
@@ -1531,11 +1530,8 @@ module Substitutors
           default_subs = BASIC_SUBS
         end
       when :raw
-        if @context == :stem
-          default_subs = BASIC_SUBS
-        else
-          default_subs = PASS_SUBS
-        end
+        # TODO make pass subs a compliance setting; AsciiDoc Python performs :attributes and :macros on a pass block
+        default_subs = @context == :stem ? BASIC_SUBS : NONE_SUBS
       else
         return @subs
       end
