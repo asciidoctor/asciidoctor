@@ -209,7 +209,7 @@ module Asciidoctor
     #
     # Returns a [Hash] of Tilt template objects keyed by template name.
     def templates
-      @templates.dup.freeze
+      @templates.dup
     end
 
     # Public: Registers a Tilt template with this converter.
