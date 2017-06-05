@@ -113,7 +113,7 @@ class Parser
   # returns the Hash of orphan block attributes captured above the header
   def self.parse_document_header(reader, document)
     # capture lines of block-level metadata and plow away comment lines that precede first block
-    block_attributes = parse_block_metadata_lines(reader, document)
+    block_attributes = parse_block_metadata_lines reader, document
 
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
@@ -299,7 +299,7 @@ class Parser
     # We have to parse all the metadata lines before continuing with the loop,
     # otherwise subsequent metadata lines get interpreted as block content
     while reader.has_more_lines?
-      parse_block_metadata_lines reader, section, attributes
+      parse_block_metadata_lines reader, document, attributes
 
       if (next_level = is_next_line_section?(reader, attributes))
         next_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
@@ -453,7 +453,7 @@ class Parser
 
     while !block && reader.has_more_lines?
       # if parsing metadata, read until there is no more to read
-      if parse_metadata && parse_block_metadata_line(reader, document, attributes, options)
+      if parse_metadata && (parse_block_metadata_line reader, document, attributes, options)
         reader.advance
         next
       #elsif parse_sections && !parent_context && is_next_line_section?(reader, attributes)
@@ -1760,7 +1760,7 @@ class Parser
   #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.'}
   def self.parse_header_metadata(reader, document = nil)
     # NOTE this will discard away any comment lines, but not skip blank lines
-    process_attribute_entries(reader, document)
+    process_attribute_entries reader, document
 
     metadata, implicit_author, implicit_authors = {}, nil, nil
 
@@ -1782,7 +1782,7 @@ class Parser
       end
 
       # NOTE this will discard any comment lines, but not skip blank lines
-      process_attribute_entries(reader, document)
+      process_attribute_entries reader, document
 
       rev_metadata = {}
 
@@ -1819,7 +1819,7 @@ class Parser
       end
 
       # NOTE this will discard any comment lines, but not skip blank lines
-      process_attribute_entries(reader, document)
+      process_attribute_entries reader, document
 
       reader.skip_blank_lines
     end
@@ -1963,15 +1963,15 @@ class Parser
   # blank lines and comments.
   #
   # reader     - the source reader
-  # parent     - the parent to which the lines belong
+  # document   - the current Document
   # attributes - a Hash of attributes in which any metadata found will be stored (default: {})
   # options    - a Hash of options to control processing: (default: {})
   #              *  :text indicates that parser is only looking for text content
   #                   and thus the block title should not be captured
   #
   # returns the Hash of attributes including any metadata found
-  def self.parse_block_metadata_lines(reader, parent, attributes = {}, options = {})
-    while parse_block_metadata_line(reader, parent, attributes, options)
+  def self.parse_block_metadata_lines reader, document, attributes = {}, options = {}
+    while parse_block_metadata_line reader, document, attributes, options
       # discard the line just processed
       reader.advance
       reader.skip_blank_lines
@@ -1992,14 +1992,14 @@ class Parser
   # If the line contains block metadata, the method returns true, otherwise false.
   #
   # reader     - the source reader
-  # parent     - the parent of the current line
+  # document   - the current Document
   # attributes - a Hash of attributes in which any metadata found will be stored
   # options    - a Hash of options to control processing: (default: {})
   #              *  :text indicates the parser is only looking for text content,
   #                   thus neither a block title or attribute entry should be captured
   #
   # returns true if the line contains metadata, otherwise false
-  def self.parse_block_metadata_line reader, parent, attributes, options = {}
+  def self.parse_block_metadata_line reader, document, attributes, options = {}
     if (next_line = reader.peek_line) &&
         (options[:text] ? (next_line.start_with? '[', '/') : (normal = next_line.start_with? '[', '.', '/', ':'))
       if next_line.start_with? '['
@@ -2013,7 +2013,7 @@ class Parser
             return true
           end
         elsif (next_line.end_with? ']') && BlockAttributeListRx =~ next_line
-          parent.document.parse_attributes $1, [], :sub_input => true, :into => attributes
+          document.parse_attributes $1, [], :sub_input => true, :into => attributes
           return true
         end
       elsif normal && (next_line.start_with? '.')
@@ -2036,22 +2036,22 @@ class Parser
         end if next_line.start_with? '//'
       # NOTE the final condition can be consolidated into single line
       elsif normal && (next_line.start_with? ':') && AttributeEntryRx =~ next_line
-        process_attribute_entry reader, parent, attributes, $~
+        process_attribute_entry reader, document, attributes, $~
         return true
       end
     end
   end
 
-  def self.process_attribute_entries(reader, parent, attributes = nil)
+  def self.process_attribute_entries reader, document, attributes = nil
     reader.skip_comment_lines
-    while process_attribute_entry(reader, parent, attributes)
+    while process_attribute_entry reader, document, attributes
       # discard line just processed
       reader.advance
       reader.skip_comment_lines
     end
   end
 
-  def self.process_attribute_entry reader, parent, attributes = nil, match = nil
+  def self.process_attribute_entry reader, document, attributes = nil, match = nil
     if (match ||= (reader.has_more_lines? ? (AttributeEntryRx.match reader.peek_line) : nil))
       if (value = match[2]).nil_or_empty?
         value = ''
@@ -2066,7 +2066,7 @@ class Parser
         end
       end
 
-      store_attribute match[1], value, (parent ? parent.document : nil), attributes
+      store_attribute match[1], value, document, attributes
       true
     end
   end
