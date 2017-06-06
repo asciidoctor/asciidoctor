@@ -165,7 +165,7 @@ class AttributeList
       else
         if single_quoted_value && @block
           case name
-          when 'title', 'reftext'
+          when 'title'
             @attributes[name] = value
           else
             @attributes[name] = value.empty? ? value : (@block.apply_normal_subs value)

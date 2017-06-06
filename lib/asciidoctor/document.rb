@@ -828,11 +828,11 @@ class Document < AbstractBlock
   # 'doctype', then the value of backend-related attributes are updated.
   #
   # name  - the String attribute name
-  # value - the String attribute value (default: '')
+  # value - the String attribute value; must not be nil (default: '')
   #
-  # returns true if the attribute was set, false if it was not set because it's locked
-  def set_attribute(name, value = '')
-    if attribute_locked?(name)
+  # Returns the resolved value if the attribute was set or false if it was not because it's locked.
+  def set_attribute name, value = ''
+    if attribute_locked? name
       false
     else
       if @max_attribute_value_size
@@ -849,7 +849,7 @@ class Document < AbstractBlock
         @attributes[name] = resolved_value
       end
       @attributes_modified << name
-      true
+      resolved_value
     end
   end
 
@@ -897,22 +897,23 @@ class Document < AbstractBlock
     end
   end
 
-  # Public: Update the backend attributes to reflect a change in the selected backend
+  # Public: Update the backend attributes to reflect a change in the active backend.
   #
   # This method also handles updating the related doctype attributes if the
   # doctype attribute is assigned at the time this method is called.
+  #
+  # Returns the resolved String backend if updated, nothing otherwise.
   def update_backend_attributes new_backend, force = nil
     if force || (new_backend && new_backend != @backend)
-      attrs = @attributes
-      current_backend, current_basebackend, current_doctype = @backend, attrs['basebackend'], @doctype
+      current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
       if new_backend.start_with? 'xhtml'
         attrs['htmlsyntax'] = 'xml'
         new_backend = new_backend[1..-1]
       elsif new_backend.start_with? 'html'
         attrs['htmlsyntax'] = 'html' unless attrs['htmlsyntax'] == 'xml'
       end
-      if (new_backend_resolved = BACKEND_ALIASES[new_backend])
-        new_backend = new_backend_resolved
+      if (resolved_backend = BACKEND_ALIASES[new_backend])
+        new_backend = resolved_backend
       end
       if current_doctype
         if current_backend
@@ -966,13 +967,16 @@ class Document < AbstractBlock
         attrs[%(basebackend-#{new_basebackend})] = ''
         attrs['basebackend'] = new_basebackend
       end
+      return new_backend
     end
   end
 
+  # TODO document me
+  #
+  # Returns the String doctype if updated, nothing otherwise.
   def update_doctype_attributes new_doctype
     if new_doctype && new_doctype != @doctype
-      attrs = @attributes
-      current_backend, current_basebackend, current_doctype = @backend, attrs['basebackend'], @doctype
+      current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
       if current_doctype
         attrs.delete %(doctype-#{current_doctype})
         if current_backend
@@ -988,7 +992,7 @@ class Document < AbstractBlock
         attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
       end
       attrs[%(doctype-#{new_doctype})] = ''
-      @doctype = attrs['doctype'] = new_doctype
+      return @doctype = attrs['doctype'] = new_doctype
     end
   end
 
