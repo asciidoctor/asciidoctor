@@ -371,6 +371,22 @@ context 'Links' do
     assert_xpath %(//a[@href="#tigers"]/code[text()="[tigers]"]), output, 1
   end
 
+  test 'xref with target that begins with attribute reference in title' do
+    ['<<{lessonsdir}/lesson-1#,Lesson 1>>', 'xref:{lessonsdir}/lesson-1#[Lesson 1]'].each do |xref|
+      input = <<-EOS
+:lessonsdir: lessons
+
+[#lesson-1-listing]
+== #{xref}
+
+A summary of the first lesson.
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//h2/a[@href="lessons/lesson-1.html"]', output, 1
+    end
+  end
+
   test 'xref using macro syntax' do
     doc = document_from_string 'xref:tigers[]'
     doc.catalog[:ids]['tigers'] = '[tigers]'
