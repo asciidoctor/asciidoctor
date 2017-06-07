@@ -991,9 +991,8 @@ module Substitutors
           next m[0][1..-1]
         end
         if m[1]
-          id, reftext = m[1].split(',', 2).map {|it| it.strip }
-          id = id[1, id.length - 2] if (id.start_with? '"') && (id.end_with? '"')
-          reftext = reftext[1, reftext.length - 2] if reftext && (reftext.start_with? '"') && (reftext.end_with? '"')
+          id, reftext = m[1].split ',', 2
+          reftext = reftext.lstrip if reftext
         else
           id, reftext = m[2], m[3]
           reftext = reftext.gsub ESC_R_SB, R_SB if reftext && (reftext.include? R_SB)
