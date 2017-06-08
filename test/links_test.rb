@@ -287,7 +287,7 @@ context 'Links' do
   end
 
   test 'xref using angled bracket syntax with quoted label' do
-    assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string('<<tigers,"About Tigers">>'), 1
+    assert_xpath %q(//a[@href="#tigers"][text() = '"About Tigers"']), render_string('<<tigers,"About Tigers">>'), 1
   end
 
   test 'xref using angled bracket syntax with path sans extension' do
@@ -366,7 +366,7 @@ context 'Links' do
   test 'xref with escaped text' do
     # when \x0 was used as boundary character for passthrough, it was getting stripped
     # now using unicode marks as boundary characters, which resolves issue
-    input = 'See the <<tigers , `[tigers]`>> section for data about tigers'
+    input = 'See the <<tigers, `+[tigers]+`>> section for data about tigers'
     output = render_embedded_string input
     assert_xpath %(//a[@href="#tigers"]/code[text()="[tigers]"]), output, 1
   end
