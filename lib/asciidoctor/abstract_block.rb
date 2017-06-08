@@ -347,24 +347,13 @@ class AbstractBlock < AbstractNode
     nil
   end
 
-  # Public: Retrieve the list marker keyword for the specified list type.
+  # Internal: Assign the next index (0-based) and number (1-based) to the section
   #
-  # For use in the HTML type attribute.
-  #
-  # list_type - the type of list; default to the @style if not specified
-  #
-  # Returns the single-character [String] keyword that represents the marker for the specified list type
-  def list_marker_keyword list_type = nil
-    ORDERED_LIST_KEYWORDS[list_type || @style]
-  end
-
-  # Internal: Assign the next index (0-based) to this section
-  #
-  # Assign the next index of this section within the parent
-  # Block (in document order)
+  # Assign to the specified section the next index and, if the section is
+  # numbered, number within this block (its parent).
   #
   # Returns nothing
-  def assign_index section
+  def enumerate_section section
     @next_section_index = (section.index = @next_section_index) + 1
     if (sectname = section.sectname) == 'appendix'
       section.number = @document.counter 'appendix-number', 'A'
@@ -382,6 +371,17 @@ class AbstractBlock < AbstractNode
     nil
   end
 
+  # Public: Retrieve the list marker keyword for the specified list type.
+  #
+  # For use in the HTML type attribute.
+  #
+  # list_type - the type of list; default to the @style if not specified
+  #
+  # Returns the single-character [String] keyword that represents the marker for the specified list type
+  def list_marker_keyword list_type = nil
+    ORDERED_LIST_KEYWORDS[list_type || @style]
+  end
+
   # Internal: Reassign the section indexes
   #
   # Walk the descendents of the current Document or Section
@@ -397,7 +397,7 @@ class AbstractBlock < AbstractNode
     @next_section_number = 1
     @blocks.each do |block|
       if block.context == :section
-        assign_index(block)
+        enumerate_section block
         block.reindex_sections
       end
     end
