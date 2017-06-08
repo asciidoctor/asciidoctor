@@ -138,7 +138,7 @@ class Section < AbstractBlock
   #
   # Returns The parent Block
   def << block
-    assign_index block if block.context == :section
+    enumerate_section block if block.context == :section
     super
   end
 
