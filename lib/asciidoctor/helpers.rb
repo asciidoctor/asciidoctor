@@ -67,7 +67,7 @@ module Helpers
     leading_bytes = (first_line = data[0]).unpack 'C3'
     if COERCE_ENCODING
       utf8 = ::Encoding::UTF_8
-      if (leading_2_bytes = leading_bytes[0, 2]) == BOM_BYTES_UTF_16LE
+      if (leading_2_bytes = leading_bytes.slice 0, 2) == BOM_BYTES_UTF_16LE
         # HACK Ruby messes up trailing whitespace on UTF-16LE, so take a different route
         return ((data.join.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8).each_line.map {|line| line.rstrip }
       elsif leading_2_bytes == BOM_BYTES_UTF_16BE
@@ -104,7 +104,7 @@ module Helpers
     leading_bytes = data.unpack 'C3'
     if COERCE_ENCODING
       utf8 = ::Encoding::UTF_8
-      if (leading_2_bytes = leading_bytes[0, 2]) == BOM_BYTES_UTF_16LE
+      if (leading_2_bytes = leading_bytes.slice 0, 2) == BOM_BYTES_UTF_16LE
         data = (data.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8
       elsif leading_2_bytes == BOM_BYTES_UTF_16BE
         data = (data.force_encoding ::Encoding::UTF_16BE)[1..-1].encode utf8
@@ -171,7 +171,7 @@ module Helpers
   #
   # Returns the String filename with the file extension removed
   def self.rootname filename
-    filename[0, filename.length - (::File.extname filename).length]
+    filename.slice 0, filename.length - (::File.extname filename).length
   end
 
   # Public: Retrieves the basename of the filename, optionally removing the extension, if present

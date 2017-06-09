@@ -802,7 +802,7 @@ class Parser
               language = nil
             elsif (comma_idx = (language = this_line.slice 3, ll).index ',')
               if comma_idx > 0
-                language = language[0, comma_idx].strip
+                language = (language.slice 0, comma_idx).strip
                 attributes['linenums'] = '' if comma_idx < ll - 4
               else
                 language = nil
@@ -821,7 +821,7 @@ class Parser
             if !attributes.key?('indent') && document.attributes.key?('source-indent')
               attributes['indent'] = document.attributes['source-indent']
             end
-            terminator = terminator[0, 3]
+            terminator = terminator.slice 0, 3
           elsif block_context == :source
             AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
             unless attributes.key? 'language'
@@ -961,7 +961,7 @@ class Parser
   # returns the match data if this line is the first line of a delimited block or nil if not
   def self.is_delimited_block? line, return_match_data = false
     # highly optimized for best performance
-    return unless (line_len = line.length) > 1 && (DELIMITED_BLOCK_LEADERS.include? line[0, 2])
+    return unless (line_len = line.length) > 1 && DELIMITED_BLOCK_LEADERS.include?(line.slice 0, 2)
     # catches open block
     if line_len == 2
       tip = line
@@ -972,7 +972,7 @@ class Parser
         tip = line
         tl = line_len
       else
-        tip = line[0, 4]
+        tip = line.slice 0, 4
         tl = 4
       end
 
@@ -1711,7 +1711,7 @@ class Parser
       # NOTE level is 1 less than number of line markers
       sect_level, sect_title, single_line = $1.length - 1, $2, true
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
-        sect_title, sect_id, sect_reftext = sect_title[0, sect_title.length - $&.length], $2, $3
+        sect_title, sect_id, sect_reftext = (sect_title.slice 0, sect_title.length - $&.length), $2, $3
       end
     elsif Compliance.underline_style_section_titles && (line2 = reader.peek_line(true)) &&
         (sect_level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
@@ -1719,7 +1719,7 @@ class Parser
         (line_length(line1) - line2_len).abs < 2
       single_line = false
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
-        sect_title, sect_id, sect_reftext = sect_title[0, sect_title.length - $&.length], $2, $3
+        sect_title, sect_id, sect_reftext = (sect_title.slice 0, sect_title.length - $&.length), $2, $3
       end
       reader.advance
     else

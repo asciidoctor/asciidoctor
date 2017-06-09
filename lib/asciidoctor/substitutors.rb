@@ -1018,7 +1018,7 @@ module Substitutors
         # handles: path#, path.adoc#, path#id, or path.adoc#id
         elsif path
           if (path.include? '.') && ASCIIDOC_EXTENSIONS[(extname = ::File.extname path)]
-            path = path[0, path.length - extname.length]
+            path = path.slice 0, path.length - extname.length
           end
           # the referenced path is this document, or its contents has been included in this document
           if @document.attributes['docname'] == path || @document.catalog[:includes].include?(path)
@@ -1073,7 +1073,7 @@ module Substitutors
       return text if lines.size < 2
       last = lines.pop
       (lines.map {|line|
-        Inline.new(self, :break, (line.end_with? LINE_BREAK) ? line[0, line.length - 2] : line, :type => :line).convert
+        Inline.new(self, :break, (line.end_with? LINE_BREAK) ? (line.slice 0, line.length - 2) : line, :type => :line).convert
       } << last) * EOL
     elsif (text.include? PLUS) && (text.include? LINE_BREAK)
       text.gsub(LineBreakRx) { Inline.new(self, :break, $1, :type => :line).convert }

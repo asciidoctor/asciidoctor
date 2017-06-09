@@ -244,7 +244,7 @@ class PathResolver
           SLASH
         # ex. C:/sample/path (or file:///sample/path in browser environment)
         else
-          posix_path[0, (posix_path.index SLASH) + 1]
+          posix_path.slice 0, (posix_path.index SLASH) + 1
         end
       # ex. ./sample/path
       elsif posix_path.start_with? DOT_SLASH
