@@ -1017,8 +1017,8 @@ module Substitutors
           refid = fragment
         # handles: path#, path.adoc#, path#id, or path.adoc#id
         elsif path
-          if (path.include? '.') && ASCIIDOC_EXTENSIONS[(extname = ::File.extname path)]
-            path = path.slice 0, path.length - extname.length
+          if (last_dot_idx = path.rindex '.') && ASCIIDOC_EXTENSIONS[path.slice last_dot_idx, path.length]
+            path = path.slice 0, last_dot_idx
           end
           # the referenced path is this document, or its contents has been included in this document
           if @document.attributes['docname'] == path || @document.catalog[:includes].include?(path)
