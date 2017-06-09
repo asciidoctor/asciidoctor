@@ -1028,7 +1028,7 @@ module Substitutors
           # resolve fragment as reftext if cannot be resolved as refid and looks like reftext
           if !(@document.catalog[:ids].key? fragment) &&
               ((fragment.include? ' ') || fragment.downcase != fragment) &&
-              (resolved_id = ::RUBY_MIN_VERSION_1_9 ? (@document.catalog[:ids].key fragment) : (@document.catalog[:ids].index fragment))
+              (resolved_id = @document.catalog[:ids].key fragment)
             fragment = resolved_id
           end
           refid = fragment
