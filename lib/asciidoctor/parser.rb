@@ -800,7 +800,7 @@ class Parser
             attributes['style'] = 'source'
             if (ll = this_line.length) == 3
               language = nil
-            elsif (comma_idx = (language = this_line[3, ll - 3]).index ',')
+            elsif (comma_idx = (language = this_line.slice 3, ll).index ',')
               if comma_idx > 0
                 language = language[0, comma_idx].strip
                 attributes['linenums'] = '' if comma_idx < ll - 4

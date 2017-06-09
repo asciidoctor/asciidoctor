@@ -907,7 +907,7 @@ class PreprocessorReader < Reader
         elsif attributes.key? 'tag'
           unless (tag = attributes['tag']).empty?
             if tag.start_with? '!'
-              inc_tags = { tag[1, tag.length - 1] => false } unless tag == '!'
+              inc_tags = { (tag.slice 1, tag.length) => false } unless tag == '!'
             else
               inc_tags = { tag => true }
             end
@@ -916,7 +916,7 @@ class PreprocessorReader < Reader
           inc_tags = {}
           attributes['tags'].split(DataDelimiterRx).each do |tagdef|
             if tagdef.start_with? '!'
-              inc_tags[tagdef[1, tagdef.length - 1]] = false unless tagdef == '!'
+              inc_tags[tagdef.slice 1, tagdef.length] = false unless tagdef == '!'
             else
               inc_tags[tagdef] = true
             end unless tagdef.empty?
