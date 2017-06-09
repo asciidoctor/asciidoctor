@@ -418,7 +418,7 @@ class Document < AbstractBlock
       # NOTE Opal can't call key? on ENV
       now = ::ENV['SOURCE_DATE_EPOCH'] ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : ::Time.now
       if (localdate = attrs['localdate'])
-        localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? localdate[0, 4] : nil))
+        localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? (localdate.slice 0, 4) : nil))
       else
         localdate = attrs['localdate'] = (now.strftime '%Y-%m-%d')
         localyear = (attrs['localyear'] ||= now.year.to_s)
