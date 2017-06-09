@@ -986,7 +986,7 @@ module Asciidoctor
     #
     # NOTE special characters have already been escaped, hence the entity references
     # NOTE { is included in start characters to support target that begins with attribute reference in title content
-    XrefInlineMacroRx = %r(\\?(?:&lt;&lt;([#{CC_WORD}/.:{]#{CC_ALL}*?)&gt;&gt;|xref:([#{CC_WORD}/.:{]#{CC_ALL}*?)\[(#{CC_ALL}*?[^\\])?\]))m
+    XrefInlineMacroRx = %r(\\?(?:&lt;&lt;([#{CC_WORD}#/.:{]#{CC_ALL}*?)&gt;&gt;|xref:([#{CC_WORD}#/.:{]#{CC_ALL}*?)\[(#{CC_ALL}*?[^\\])?\]))m
 
     ## Layout
 

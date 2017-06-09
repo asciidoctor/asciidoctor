@@ -282,6 +282,12 @@ context 'Links' do
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
+  test 'xref using angled bracket syntax with explicit hash' do
+    doc = document_from_string '<<#tigers>>'
+    doc.catalog[:ids]['tigers'] = 'Tigers'
+    assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', doc.render, 1
+  end
+
   test 'xref using angled bracket syntax with label' do
     assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string('<<tigers,About Tigers>>'), 1
   end
@@ -391,6 +397,12 @@ A summary of the first lesson.
     doc = document_from_string 'xref:tigers[]'
     doc.catalog[:ids]['tigers'] = '[tigers]'
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
+  end
+
+  test 'xref using macro syntax with explicit hash' do
+    doc = document_from_string 'xref:#tigers[]'
+    doc.catalog[:ids]['tigers'] = 'Tigers'
+    assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', doc.render, 1
   end
 
   test 'xref using macro syntax with label' do
