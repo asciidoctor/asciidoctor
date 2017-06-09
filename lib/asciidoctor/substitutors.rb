@@ -1448,7 +1448,7 @@ module Substitutors
           tail = nil
           if callout_on_last && callout_marks.empty? && linenums_mode == :table
             if highlighter == 'coderay' && (pos = line.index '</pre>')
-              line, tail = line[0, pos], line[pos, line.length - pos]
+              line, tail = (line.slice 0, pos), (line.slice pos, line.length)
             elsif highlighter == 'pygments' && (pos = line.start_with? '</td>')
               line, tail = '', line
             end
