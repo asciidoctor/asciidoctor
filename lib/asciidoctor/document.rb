@@ -32,6 +32,7 @@ class Document < AbstractBlock
 
     def save_to block_attributes
       (block_attributes[:attribute_entries] ||= []) << self
+      self
     end
   end
 
@@ -512,7 +513,7 @@ class Document < AbstractBlock
   #
   # returns the next number in the sequence for the specified counter
   def counter name, seed = nil
-    return (@parent_document.counter name, seed) if @parent_document
+    return @parent_document.counter name, seed if @parent_document
     if (attr_seed = !(attr_val = @attributes[name]).nil_or_empty?) && (@counters.key? name)
       @attributes[name] = @counters[name] = (nextval attr_val)
     elsif seed
@@ -528,11 +529,11 @@ class Document < AbstractBlock
   # block        - the Block on which to save the counter
   #
   # returns the next number in the sequence for the specified counter
-  def counter_increment(counter_name, block)
-    val = counter(counter_name)
-    AttributeEntry.new(counter_name, val).save_to(block.attributes)
-    val
+  def increment_and_store_counter counter_name, block
+    ((AttributeEntry.new counter_name, (counter counter_name)).save_to block.attributes).value
   end
+  # Deprecated: Map old counter_increment method to increment_counter for backwards compatibility
+  alias counter_increment increment_and_store_counter
 
   # Internal: Get the next value in the sequence.
   #

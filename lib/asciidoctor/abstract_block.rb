@@ -341,7 +341,7 @@ class AbstractBlock < AbstractNode
   def assign_caption caption = nil, key = nil
     unless @caption || !title? || (@caption = caption || @document.attributes['caption'])
       if (label = @document.attributes[%(#{key ||= @context}-caption)])
-        @caption = %(#{label} #{@number = @document.counter_increment "#{key}-number", self}. )
+        @caption = %(#{label} #{@number = @document.increment_and_store_counter "#{key}-number", self}. )
       end
     end
     nil
