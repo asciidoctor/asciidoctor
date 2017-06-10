@@ -836,7 +836,7 @@ module Asciidoctor
     #
     #   [[[Foo]]]
     #
-    InlineBiblioAnchorRx = /\\?\[\[\[([#{CC_WORD}:][#{CC_WORD}:.-]*?)\]\]\]/
+    InlineBiblioAnchorRx = /\\?\[\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)\]\]\]/
 
     # Matches an inline e-mail address.
     #
