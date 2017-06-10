@@ -1103,40 +1103,34 @@ module Substitutors
       if unescaped_attrs
         %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type).convert})
       else
-        if (attributes = parse_quoted_text_attributes(match[2]))
-          id = attributes.delete 'id'
+        if (attrlist = match[2])
+          id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
           type = :unquoted if type == :mark
-        else
-          id = nil
         end
         %(#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :id => id, :attributes => attributes).convert})
       end
     else
-      if (attributes = parse_quoted_text_attributes(match[1]))
-        id = attributes.delete 'id'
+      if (attrlist = match[1])
+        id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
         type = :unquoted if type == :mark
-      else
-        id = nil
       end
       Inline.new(self, :quoted, match[2], :type => type, :id => id, :attributes => attributes).convert
     end
   end
 
-  # Internal: Parse the attributes that are defined on quoted text
+  # Internal: Parse the attributes that are defined on quoted (aka formatted) text
   #
-  # str       - A String of unprocessed attributes (space-separated roles or the id/role shorthand syntax)
+  # str - A non-nil String of unprocessed attributes;
+  #       space-separated roles (e.g., role1 role2) or the id/role shorthand syntax (e.g., #idname.role)
   #
-  # returns nil if str is nil, an empty Hash if str is empty, otherwise a Hash of attributes (role and id only)
-  def parse_quoted_text_attributes(str)
-    return unless str
-    return {} if str.empty?
+  # Returns a Hash of attributes (role and id only)
+  def parse_quoted_text_attributes str
     # NOTE attributes are typically resolved after quoted text, so substitute eagerly
-    str = sub_attributes(str) if str.include?('{')
-    str = str.strip
+    str = sub_attributes str if str.include? '{'
     # for compliance, only consider first positional attribute
-    str, _ = str.split(',', 2) if str.include?(',')
+    str = str.slice 0, (str.index ',') if str.include? ','
 
-    if str.empty?
+    if (str = str.strip).empty?
       {}
     elsif (str.start_with? '.', '#') && Compliance.shorthand_property_syntax
       segments = str.split('#', 2)
