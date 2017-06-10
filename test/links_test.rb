@@ -243,6 +243,19 @@ context 'Links' do
     end
   end
 
+  test 'inline ref can start with colon' do
+    input = '[[:idname]] text'
+    output = render_embedded_string input
+    assert_xpath '//a[@id = ":idname"]', output, 1
+  end
+
+  test 'inline ref cannot start with digit' do
+    input = '[[1-install]] text'
+    output = render_embedded_string input
+    assert_includes output, '[[1-install]]'
+    assert_xpath '//a[@id = "1-install"]', output, 0
+  end
+
   test 'inline ref with reftext' do
     variations = %w([[tigers,Tigers]] anchor:tigers[Tigers])
     variations.each do |anchor|

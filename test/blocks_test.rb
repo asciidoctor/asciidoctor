@@ -3087,6 +3087,31 @@ content
       assert !doc.catalog[:ids].has_key?('illegal$id')
     end
 
+    test 'should not recognize block anchor that starts with digit' do
+      input = <<-EOS
+[[3-blind-mice]]
+--
+see how they run
+--
+      EOS
+
+      output = render_embedded_string input
+      assert_includes output, '[[3-blind-mice]]'
+      assert_xpath '/*[@id = ":3-blind-mice"]', output, 0
+    end
+
+    test 'should recognize block anchor that starts with colon' do
+      input = <<-EOS
+[[:idname]]
+--
+content
+--
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/*[@id = ":idname"]', output, 1
+    end
+
     test 'should use specified id and reftext when registering block reference' do
       input = <<-EOS
 [[debian,Debian Install]]
