@@ -543,7 +543,7 @@ module Asciidoctor
     #   [[idname]]
     #   [[idname,Reference Text]]
     #
-    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:, *(.+))?)\]\]$/
+    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+))?)\]\]$/
 
     # Matches an attribute list above a block element.
     #
@@ -563,7 +563,7 @@ module Asciidoctor
     # A combined pattern that matches either a block anchor or a block attribute list.
     #
     # TODO this one gets hit a lot, should be optimized as much as possible
-    BlockAttributeLineRx = /^\[(?:|[#{CC_WORD}.#%{,"'].*|\[(?:|[#{CC_ALPHA}:_][#{CC_WORD}:.-]*(?:, *.+)?)\])\]$/
+    BlockAttributeLineRx = /^\[(?:|[#{CC_WORD}.#%{,"'].*|\[(?:|[#{CC_ALPHA}_:][#{CC_WORD}:.-]*(?:, *.+)?)\])\]$/
 
     # Matches a title above a block.
     #
@@ -636,7 +636,7 @@ module Asciidoctor
     #   Section Title [[idname]]
     #   Section Title [[idname,Reference Text]]
     #
-    InlineSectionAnchorRx = / (\\)?\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:, *(.+))?\]\]$/
+    InlineSectionAnchorRx = / (\\)?\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+))?\]\]$/
 
     # Matches invalid characters in a section id.
     #
@@ -828,7 +828,7 @@ module Asciidoctor
     #   anchor:idname[]
     #   anchor:idname[Reference Text]
     #
-    InlineAnchorRx = /\\?(?:\[\[([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]|anchor:([#{CC_ALPHA}:_][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\]))/
+    InlineAnchorRx = /\\?(?:\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]|anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\]))/
 
     # Matches a bibliography anchor anywhere inline.
     #
@@ -836,7 +836,7 @@ module Asciidoctor
     #
     #   [[[Foo]]]
     #
-    InlineBiblioAnchorRx = /\\?\[\[\[([#{CC_WORD}:][#{CC_WORD}:.-]*?)\]\]\]/
+    InlineBiblioAnchorRx = /\\?\[\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\]\]\]/
 
     # Matches an inline e-mail address.
     #

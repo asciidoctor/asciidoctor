@@ -2797,6 +2797,29 @@ content
       assert_equal ulists[0].style, 'bibliography'
       assert_nil ulists[1].style
     end
+
+    test 'should not recognize bibliography anchor that begins with a digit' do
+      input = <<-EOS
+[bibliography]
+- [[[1984]]] George Orwell. '1984'. New American Library. 1950.
+      EOS
+
+      output = render_embedded_string input
+      assert_includes output, '[[[1984]]]'
+      assert_xpath '//a[@id="1984"]', output, 0
+    end
+
+    test 'should recognize bibliography anchor that contains a number' do
+      input = <<-EOS
+[bibliography]
+- [[[_1984]]] George Orwell. '1984'. New American Library. 1950.
+      EOS
+
+      output = render_embedded_string input
+      refute_includes output, '[[[_1984]]]'
+      assert_includes output, '[_1984]'
+      assert_xpath '//a[@id="_1984"]', output, 1
+    end
   end
 end
 
