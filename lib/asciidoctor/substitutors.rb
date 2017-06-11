@@ -963,7 +963,7 @@ module Substitutors
     end
 
     if ((!found || found[:square_bracket]) && text.include?('[[')) ||
-        ((!found || found[:macroish]) && text.include?('anchor:'))
+        ((!found || found[:macroish]) && text.include?('or:'))
       text = text.gsub(InlineAnchorRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
