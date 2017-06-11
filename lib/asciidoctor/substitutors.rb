@@ -971,7 +971,15 @@ module Substitutors
         if m[0].start_with? RS
           next m[0][1..-1]
         end
-        id, reftext = m[1] || m[3], m[2] || m[4] || %([#{id}])
+        # NOTE reftext is only used in DocBook output as value of xreflabel attribute
+        if (id = m[1])
+          reftext = m[2]
+        else
+          id = m[3]
+          if (reftext = m[4]) && (reftext.include? R_SB)
+            reftext = reftext.gsub ESC_R_SB, R_SB
+          end
+        end
         Inline.new(self, :anchor, reftext, :type => :ref, :target => id).convert
       }
     end
@@ -990,8 +998,8 @@ module Substitutors
         if m[0].start_with? RS
           next m[0][1..-1]
         end
-        if m[1]
-          id, reftext = m[1].split ',', 2
+        if (id = m[1])
+          id, reftext = id.split ',', 2
           reftext = reftext.lstrip if reftext
         else
           id, reftext = m[2], m[3]
