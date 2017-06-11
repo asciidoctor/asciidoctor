@@ -1244,6 +1244,30 @@ content
         assert_xpath %(//h2[@id="_chapter_#{num}"][text()="#{num}. Chapter #{num}"]), result, 1
       end
     end
+
+    test 'reindex_sections should correct section enumeration after sections are modified' do
+      input = <<-EOS
+:sectnums:
+
+== First Section
+
+content
+
+== Last Section
+
+content
+      EOS
+
+      doc = document_from_string input
+      second_section = Asciidoctor::Section.new doc
+      doc.blocks.insert 1, second_section 
+      doc.reindex_sections
+      sections = doc.sections
+      [0, 1, 2].each do |index|
+        assert_equal index, sections[index].index
+        assert_equal index + 1, sections[index].number
+      end
+    end
   end
 
   context 'Links and anchors' do
