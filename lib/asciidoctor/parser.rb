@@ -1213,8 +1213,16 @@ class Parser
   def self.catalog_inline_anchors text, document
     text.scan(InlineAnchorRx) do
       # lead with assignments for Ruby 1.8.7 compat
-      id, reftext = $1 || $3, $2 || $4
-      document.register :ids, [id, reftext] unless $&.start_with? '\\'
+      if (id = $1)
+        reftext = $2
+        document.register :ids, [id, reftext] unless $&.start_with? '\\'
+      else
+        id, reftext = $3, $4
+        unless $&.start_with? '\\'
+          reftext = reftext.gsub '\]', ']' if reftext && (reftext.include? '\]')
+          document.register :ids, [id, reftext]
+        end
+      end
     end if (text.include? '[[') || (text.include? 'or:')
     nil
   end

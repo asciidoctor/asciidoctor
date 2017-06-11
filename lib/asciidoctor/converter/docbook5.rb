@@ -508,7 +508,7 @@ module Asciidoctor
     def inline_anchor node
       case node.type
       when :ref
-        %(<anchor#{common_attributes node.target, nil, node.text}/>)
+        %(<anchor#{common_attributes node.target, nil, node.text || %([#{node.target}])}/>)
       when :xref
         if (path = node.attributes['path'])
           # QUESTION should we use refid as fallback text instead? (like the html5 backend?)

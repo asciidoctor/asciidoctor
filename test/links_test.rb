@@ -289,6 +289,18 @@ context 'Links' do
     assert_equal '<a id="one"></a><a id="two"></a><a id="three"></a><a id="four"></a><a id="five"></a>', result
   end
 
+  test 'assigns xreflabel value for anchor macro without reftext in DocBook output' do
+    input = 'anchor:foo[]'
+    result = render_inline_string input, :backend => :docbook
+    assert_equal '<anchor xml:id="foo" xreflabel="[foo]"/>', result
+  end
+
+  test 'unescapes square bracket in reftext of anchor macro in DocBook output' do
+    input = 'anchor:foo[b[a\]r]'
+    result = render_inline_string input, :backend => :docbook
+    assert_equal '<anchor xml:id="foo" xreflabel="b[a]r"/>', result
+  end
+
   test 'xref using angled bracket syntax' do
     doc = document_from_string '<<tigers>>'
     doc.catalog[:ids]['tigers'] = '[tigers]'
@@ -432,6 +444,15 @@ A summary of the first lesson.
 
   test 'xref using macro syntax with text that contains an escaped closing bracket' do
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', render_string('xref:tigers[[tigers\\]]'), 1
+  end
+
+  test 'unescapes square bracket in reftext used by xref' do
+    input = 'anchor:foo[b[a\]r]about
+
+see <<foo>>'
+    result = render_embedded_string input
+    assert_xpath '//a[@href="#foo"]', result, 1
+    assert_xpath '//a[@href="#foo"][text()="b[a]r"]', result, 1
   end
 
   test 'xref using invalid macro syntax does not create link' do
