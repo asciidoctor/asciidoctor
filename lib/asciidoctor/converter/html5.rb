@@ -596,7 +596,7 @@ Your browser does not support the audio tag.
           pre_class = %( class="pygments highlight#{nowrap ? ' nowrap' : nil}")
         when 'highlightjs', 'highlight.js'
           pre_class = %( class="highlightjs highlight#{nowrap ? ' nowrap' : nil}")
-          code_attrs = %( class="language-#{language}"#{code_attrs}) if language
+          code_attrs = %( class="language-#{language} hljs"#{code_attrs}) if language
         when 'prettify'
           pre_class = %( class="prettyprint highlight#{nowrap ? ' nowrap' : nil}#{(node.attr? 'linenums') ? ' linenums' : nil}")
           code_attrs = %( class="language-#{language}"#{code_attrs}) if language
