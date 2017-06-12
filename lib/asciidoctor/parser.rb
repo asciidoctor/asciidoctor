@@ -2270,18 +2270,11 @@ class Parser
     skipped = table_reader.skip_blank_lines
 
     parser_ctx = Table::ParserContext.new(table_reader, table, attributes)
-    skip_implicit_header = (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
+    implicit_header = false if (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
     loop_idx = -1
     while table_reader.has_more_lines?
       loop_idx += 1
       line = table_reader.read_line
-
-      if !skip_implicit_header && skipped == 0 && loop_idx == 0 &&
-          (next_line = table_reader.peek_line) && next_line.empty?
-        table.has_header_option = true
-        attributes['header-option'] = ''
-        attributes['options'] = (attributes.key? 'options') ? %(#{attributes['options']},header) : 'header'
-      end
 
       if parser_ctx.format == 'psv'
         if parser_ctx.starts_with_delimiter? line
@@ -2293,11 +2286,14 @@ class Parser
           # if the cell spec is not null, then we're at a cell boundary
           if next_cellspec
             parser_ctx.close_open_cell next_cellspec
-          else
-            # QUESTION do we not advance to next line? if so, when will we if we came into this block?
+          elsif implicit_header && loop_idx == 2
+            implicit_header = false
           end
         end
       end
+
+      implicit_header = true if loop_idx == 0 && implicit_header.nil? && skipped == 0 &&
+          table_reader.has_more_lines? && table_reader.peek_line.empty?
 
       seen = false
       while !seen || !line.empty?
@@ -2345,7 +2341,10 @@ class Parser
             parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} )
           end
           line = ''
-          if parser_ctx.format == 'psv' || (parser_ctx.format == 'csv' && parser_ctx.buffer_has_unclosed_quotes?)
+          if parser_ctx.format == 'psv'
+            parser_ctx.keep_cell_open
+          elsif parser_ctx.format == 'csv' && parser_ctx.buffer_has_unclosed_quotes?
+            implicit_header = false if implicit_header && loop_idx == 0
             parser_ctx.keep_cell_open
           else
             parser_ctx.close_cell true
@@ -2363,6 +2362,12 @@ class Parser
 
     unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_colspecs
       table.assign_column_widths
+    end
+
+    if implicit_header
+      table.has_header_option = true
+      attributes['header-option'] = ''
+      attributes['options'] = (attributes.key? 'options') ? %(#{attributes['options']},header) : 'header'
     end
 
     table.partition_header_footer attributes

@@ -503,6 +503,52 @@ three
       assert_css 'table > tbody > tr', output, 3
     end
 
+    test 'no implicit header row if cell in first line spans multiple lines' do
+      input = <<-EOS
+[cols=2*]
+|===
+|A1
+
+A1 continued|B1
+
+|A2
+|B2
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 0
+      assert_css 'table > tbody', output, 1
+      assert_css 'table > tbody > tr', output, 2
+      assert_xpath '(//td)[1]/p', output, 2
+    end
+
+    test 'no implicit header row if AsciiDoc cell in first line spans multiple lines' do
+      input = <<-EOS
+[cols=2*]
+|===
+a|contains AsciiDoc content
+
+* a
+* b
+* c
+a|contains no AsciiDoc content
+
+just text
+|A2
+|B2
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 0
+      assert_css 'table > tbody', output, 1
+      assert_css 'table > tbody > tr', output, 2
+      assert_xpath '(//td)[1]//ul', output, 1
+    end
+
     test 'no implicit header row if first line blank' do
       input = <<-EOS
 |===
@@ -1509,6 +1555,25 @@ single cell
       EOS
       output = render_embedded_string input, :backend => 'docbook45'
       assert output.include?('<?dbfo keep-together="always"?>')
+    end
+
+    test 'no implicit header row if cell in first line is quoted and spans multiple lines' do
+      input = <<-EOS
+[cols=2*]
+,===
+"A1
+
+A1 continued",B1
+A2,B2
+,===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 0
+      assert_css 'table > tbody', output, 1
+      assert_css 'table > tbody > tr', output, 2
+      assert_xpath '(//td)[1]/p[text()="A1 A1 continued"]', output, 1
     end
   end
 end
