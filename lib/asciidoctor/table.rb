@@ -129,7 +129,7 @@ class Table < AbstractBlock
   # by the options on the table
   #
   # returns nothing
-  def partition_header_footer(attributes)
+  def partition_header_footer(attrs)
     # set rowcount before splitting up body rows
     @attributes['rowcount'] = @rows.body.size
 
@@ -144,7 +144,7 @@ class Table < AbstractBlock
       @rows.head = [head]
     end
 
-    if num_body_rows > 0 && attributes.key?('footer-option')
+    if num_body_rows > 0 && attrs.key?('footer-option')
       @rows.foot = [@rows.body.pop]
     end
 
