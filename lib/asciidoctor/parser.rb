@@ -1212,17 +1212,17 @@ class Parser
   # Returns nothing
   def self.catalog_inline_anchors text, document
     text.scan(InlineAnchorRx) do
-      # lead with assignments for Ruby 1.8.7 compat
-      if (id = $1)
-        reftext = $2
-        document.register :ids, [id, reftext] unless $&.start_with? '\\'
+      # honor the escape
+      next if $1
+      if (id = $2)
+        reftext = $3
       else
-        id, reftext = $3, $4
-        unless $&.start_with? '\\'
-          reftext = reftext.gsub '\]', ']' if reftext && (reftext.include? '\]')
-          document.register :ids, [id, reftext]
+        id = $4
+        if (reftext = $5) && (reftext.include? ']')
+          reftext = reftext.gsub '\]', ']'
         end
       end
+      document.register :ids, [id, reftext]
     end if (text.include? '[[') || (text.include? 'or:')
     nil
   end

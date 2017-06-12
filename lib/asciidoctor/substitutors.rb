@@ -965,18 +965,14 @@ module Substitutors
     if ((!found || found[:square_bracket]) && text.include?('[[')) ||
         ((!found || found[:macroish]) && text.include?('or:'))
       text = text.gsub(InlineAnchorRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
         # honor the escape
-        if m[0].start_with? RS
-          next m[0][1..-1]
-        end
-        # NOTE reftext is only used in DocBook output as value of xreflabel attribute
-        if (id = m[1])
-          reftext = m[2]
+        next $&.slice 1, $&.length if $1
+        # NOTE reftext is only relevant for DocBook output; used as value of xreflabel attribute
+        if (id = $2)
+          reftext = $3
         else
-          id = m[3]
-          if (reftext = m[4]) && (reftext.include? R_SB)
+          id = $4
+          if (reftext = $5) && (reftext.include? R_SB)
             reftext = reftext.gsub ESC_R_SB, R_SB
           end
         end
