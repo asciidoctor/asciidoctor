@@ -2263,37 +2263,43 @@ class Parser
     if (attributes.key? 'cols') && !(colspecs = parse_colspecs attributes['cols']).empty?
       table.create_columns colspecs
       explicit_colspecs = true
-    else
-      explicit_colspecs = false
     end
 
     skipped = table_reader.skip_blank_lines
 
     parser_ctx = Table::ParserContext.new(table_reader, table, attributes)
     implicit_header = false if (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
+    implicit_header_boundary = nil
     loop_idx = -1
-    while table_reader.has_more_lines?
+    while (line = table_reader.read_line)
       loop_idx += 1
-      line = table_reader.read_line
 
       if parser_ctx.format == 'psv'
-        if parser_ctx.starts_with_delimiter? line
-          line = line[1..-1]
-          # push an empty cell spec if boundary at start of line
+        if loop_idx > 0 && line.empty?
+          implicit_header_boundary += 1 if implicit_header_boundary
+        elsif parser_ctx.starts_with_delimiter? line
+          line = line.slice 1, line.length
+          # push empty cell spec if cell boundary appears at start of line
           parser_ctx.close_open_cell
+          implicit_header_boundary = nil if implicit_header_boundary
         else
-          next_cellspec, line = parse_cellspec(line, :start, parser_ctx.delimiter)
-          # if the cell spec is not null, then we're at a cell boundary
+          next_cellspec, line = parse_cellspec line, :start, parser_ctx.delimiter
+          # if cell spec is not nil, then we're at a cell boundary
           if next_cellspec
             parser_ctx.close_open_cell next_cellspec
-          elsif implicit_header && loop_idx == 2
-            implicit_header = false
+            implicit_header_boundary = nil if implicit_header_boundary
+          # otherwise, the cell continues from previous line
+          elsif implicit_header && loop_idx == implicit_header_boundary
+            implicit_header, implicit_header_boundary = false, nil
           end
         end
       end
 
-      implicit_header = true if loop_idx == 0 && implicit_header.nil? && skipped == 0 &&
+      # NOTE implicit header is offset by one or more blank lines; value tracks index of line following gap
+      if loop_idx == 0 && implicit_header.nil? && skipped == 0 &&
           table_reader.has_more_lines? && table_reader.peek_line.empty?
+        implicit_header, implicit_header_boundary = true, 1
+      end
 
       seen = false
       while !seen || !line.empty?
@@ -2352,7 +2358,7 @@ class Parser
         end
       end
 
-      skipped = table_reader.skip_blank_lines unless parser_ctx.cell_open?
+      table_reader.skip_blank_lines unless parser_ctx.cell_open?
 
       unless table_reader.has_more_lines?
         # NOTE may have already closed cell in csv or dsv table (see previous call to parser_ctx.close_cell(true))
