@@ -2267,15 +2267,17 @@ class Parser
 
     skipped = table_reader.skip_blank_lines
 
-    parser_ctx = Table::ParserContext.new(table_reader, table, attributes)
+    parser_ctx = Table::ParserContext.new table_reader, table, attributes
+    format = parser_ctx.format
     implicit_header = false if (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
-    implicit_header_boundary = nil
-    loop_idx = -1
+    format, loop_idx, implicit_header_boundary = parser_ctx.format, -1, nil
     while (line = table_reader.read_line)
-      loop_idx += 1
+      if (loop_idx += 1) > 0 && line.empty?
+        line = nil
+      end
 
-      if parser_ctx.format == 'psv'
-        if loop_idx > 0 && line.empty?
+      if format == 'psv'
+        if !line
           implicit_header_boundary += 1 if implicit_header_boundary
         elsif parser_ctx.starts_with_delimiter? line
           line = line.slice 1, line.length
@@ -2301,40 +2303,39 @@ class Parser
         implicit_header, implicit_header_boundary = true, 1
       end
 
-      seen = false
-      while !seen || !line.empty?
-        seen = true
-        if (m = parser_ctx.match_delimiter(line))
-          if parser_ctx.format == 'csv'
-            if parser_ctx.buffer_has_unclosed_quotes?(m.pre_match)
+      # this loop is used for flow control; internal logic controls how many times it executes
+      while true
+        if line && (m = parser_ctx.match_delimiter line)
+          if format == 'csv'
+            if parser_ctx.buffer_has_unclosed_quotes? m.pre_match
               # throw it back, it's too small
-              line = parser_ctx.skip_matched_delimiter(m)
-              next
-            end
-          else
-            if m.pre_match.end_with? '\\'
-              # skip over escaped delimiter
-              # handle special case when end of line is reached (see issue #1306)
-              if (line = parser_ctx.skip_matched_delimiter(m, true)).empty?
-                parser_ctx.buffer = %(#{parser_ctx.buffer}#{EOL})
-                parser_ctx.keep_cell_open
+              if (line = parser_ctx.skip_matched_delimiter m).empty?
                 break
               end
-              next
+              redo
             end
+          elsif m.pre_match.end_with? '\\'
+            # skip over escaped delimiter
+            # handle special case when end of line is reached (see issue #1306)
+            if (line = parser_ctx.skip_matched_delimiter m, true).empty?
+              parser_ctx.buffer = %(#{parser_ctx.buffer}#{EOL})
+              parser_ctx.keep_cell_open
+              break
+            end
+            redo
           end
 
-          if parser_ctx.format == 'psv'
-            next_cellspec, cell_text = parse_cellspec(m.pre_match, :end)
+          if format == 'psv'
+            next_cellspec, cell_text = parse_cellspec m.pre_match, :end
             parser_ctx.push_cellspec next_cellspec
             parser_ctx.buffer = %(#{parser_ctx.buffer}#{cell_text})
           else
             parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
           end
 
+          # don't break if empty to preserve empty cell found at end of line (see issue #1106)
           if (line = m.post_match).empty?
-            # hack to prevent dropping empty cell found at end of line (see issue #1106)
-            seen = false
+            line = nil
           end
 
           parser_ctx.close_cell
@@ -2343,18 +2344,16 @@ class Parser
           # suck up this line into the buffer and move on
           parser_ctx.buffer = %(#{parser_ctx.buffer}#{line}#{EOL})
           # QUESTION make stripping endlines in csv data an option? (unwrap-option?)
-          if parser_ctx.format == 'csv'
-            parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} )
-          end
-          line = ''
-          if parser_ctx.format == 'psv'
+          parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} ) if format == 'csv'
+          if format == 'psv'
             parser_ctx.keep_cell_open
-          elsif parser_ctx.format == 'csv' && parser_ctx.buffer_has_unclosed_quotes?
+          elsif format == 'csv' && parser_ctx.buffer_has_unclosed_quotes?
             implicit_header = false if implicit_header && loop_idx == 0
             parser_ctx.keep_cell_open
           else
             parser_ctx.close_cell true
           end
+          break
         end
       end
 
