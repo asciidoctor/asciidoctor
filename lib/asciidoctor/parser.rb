@@ -2268,90 +2268,93 @@ class Parser
     skipped = table_reader.skip_blank_lines
 
     parser_ctx = Table::ParserContext.new table_reader, table, attributes
-    format = parser_ctx.format
-    implicit_header = false if (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
     format, loop_idx, implicit_header_boundary = parser_ctx.format, -1, nil
+    implicit_header = true unless skipped > 0 || (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
     while (line = table_reader.read_line)
       if (loop_idx += 1) > 0 && line.empty?
         line = nil
-      end
-
-      if format == 'psv'
-        if !line
-          implicit_header_boundary += 1 if implicit_header_boundary
-        elsif parser_ctx.starts_with_delimiter? line
+        implicit_header_boundary += 1 if implicit_header_boundary
+      elsif format == 'psv'
+        if parser_ctx.starts_with_delimiter? line
           line = line.slice 1, line.length
           # push empty cell spec if cell boundary appears at start of line
           parser_ctx.close_open_cell
           implicit_header_boundary = nil if implicit_header_boundary
         else
           next_cellspec, line = parse_cellspec line, :start, parser_ctx.delimiter
-          # if cell spec is not nil, then we're at a cell boundary
+          # if cellspec is not nil, we're at a cell boundary
           if next_cellspec
             parser_ctx.close_open_cell next_cellspec
             implicit_header_boundary = nil if implicit_header_boundary
           # otherwise, the cell continues from previous line
-          elsif implicit_header && loop_idx == implicit_header_boundary
+          elsif implicit_header_boundary && implicit_header_boundary == loop_idx
             implicit_header, implicit_header_boundary = false, nil
           end
         end
       end
 
-      # NOTE implicit header is offset by one or more blank lines; value tracks index of line following gap
-      if loop_idx == 0 && implicit_header.nil? && skipped == 0 &&
-          table_reader.has_more_lines? && table_reader.peek_line.empty?
-        implicit_header, implicit_header_boundary = true, 1
+      # NOTE implicit header is offset by at least one blank line; implicit_header_boundary tracks size of gap
+      if loop_idx == 0 && implicit_header
+        if table_reader.has_more_lines? && table_reader.peek_line.empty?
+          implicit_header_boundary = 1
+        else
+          implicit_header = false
+        end
       end
 
       # this loop is used for flow control; internal logic controls how many times it executes
       while true
         if line && (m = parser_ctx.match_delimiter line)
-          if format == 'csv'
+          case format
+          when 'csv'
             if parser_ctx.buffer_has_unclosed_quotes? m.pre_match
-              # throw it back, it's too small
-              if (line = parser_ctx.skip_matched_delimiter m).empty?
+              break if (line = parser_ctx.skip_past_delimiter m).empty?
+              redo
+            end
+            parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
+          when 'dsv'
+            if m.pre_match.end_with? '\\'
+              if (line = parser_ctx.skip_past_escaped_delimiter m).empty?
+                parser_ctx.buffer = %(#{parser_ctx.buffer}#{EOL})
+                parser_ctx.keep_cell_open
                 break
               end
               redo
             end
-          elsif m.pre_match.end_with? '\\'
-            # skip over escaped delimiter
-            # handle special case when end of line is reached (see issue #1306)
-            if (line = parser_ctx.skip_matched_delimiter m, true).empty?
-              parser_ctx.buffer = %(#{parser_ctx.buffer}#{EOL})
-              parser_ctx.keep_cell_open
-              break
+            parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
+          else # psv
+            if m.pre_match.end_with? '\\'
+              if (line = parser_ctx.skip_past_escaped_delimiter m).empty?
+                parser_ctx.buffer = %(#{parser_ctx.buffer}#{EOL})
+                parser_ctx.keep_cell_open
+                break
+              end
+              redo
             end
-            redo
-          end
-
-          if format == 'psv'
             next_cellspec, cell_text = parse_cellspec m.pre_match, :end
             parser_ctx.push_cellspec next_cellspec
             parser_ctx.buffer = %(#{parser_ctx.buffer}#{cell_text})
-          else
-            parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
           end
-
           # don't break if empty to preserve empty cell found at end of line (see issue #1106)
-          if (line = m.post_match).empty?
-            line = nil
-          end
-
+          line = nil if (line = m.post_match).empty?
           parser_ctx.close_cell
         else
-          # no other delimiters to see here
-          # suck up this line into the buffer and move on
+          # no other delimiters to see here; suck up this line into the buffer and move on
           parser_ctx.buffer = %(#{parser_ctx.buffer}#{line}#{EOL})
-          # QUESTION make stripping endlines in csv data an option? (unwrap-option?)
-          parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} ) if format == 'csv'
-          if format == 'psv'
-            parser_ctx.keep_cell_open
-          elsif format == 'csv' && parser_ctx.buffer_has_unclosed_quotes?
-            implicit_header = false if implicit_header && loop_idx == 0
-            parser_ctx.keep_cell_open
-          else
+          case format
+          when 'csv'
+            # QUESTION make stripping endlines in csv data an option? (unwrap-option?)
+            parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} )
+            if parser_ctx.buffer_has_unclosed_quotes?
+              implicit_header, implicit_header_boundary = false, nil if implicit_header_boundary && loop_idx == 0
+              parser_ctx.keep_cell_open
+            else
+              parser_ctx.close_cell true
+            end
+          when 'dsv'
             parser_ctx.close_cell true
+          else # psv
+            parser_ctx.keep_cell_open
           end
           break
         end

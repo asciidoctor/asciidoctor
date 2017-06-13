@@ -407,12 +407,19 @@ class Table::ParserContext
     @delimiter_re.match(line)
   end
 
-  # Public: Skip beyond the matched delimiter because it was a false positive
-  # (either because it was escaped or in a quoted context)
+  # Public: Skip past the matched delimiter because it's inside quoted text.
   #
   # returns the String after the match
-  def skip_matched_delimiter(match, escaped = false)
-    @buffer = %(#{@buffer}#{escaped ? match.pre_match.chop : match.pre_match}#{@delimiter})
+  def skip_past_delimiter(match)
+    @buffer = %(#{@buffer}#{match.pre_match}#{@delimiter})
+    match.post_match
+  end
+
+  # Public: Skip past the matched delimiter because it's escaped.
+  #
+  # returns the String after the match
+  def skip_past_escaped_delimiter(match)
+    @buffer = %(#{@buffer}#{match.pre_match.chop}#{@delimiter})
     match.post_match
   end
 
