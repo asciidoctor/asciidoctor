@@ -2331,7 +2331,7 @@ class Parser
               end
               redo
             end
-            next_cellspec, cell_text = parse_cellspec m.pre_match, :end
+            next_cellspec, cell_text = parse_cellspec m.pre_match
             parser_ctx.push_cellspec next_cellspec
             parser_ctx.buffer = %(#{parser_ctx.buffer}#{cell_text})
           end
@@ -2452,12 +2452,10 @@ class Parser
   #
   # returns the Hash of attributes that indicate how to layout
   # and style this cell in the table.
-  def self.parse_cellspec(line, pos = :start, delimiter = nil)
-    m = nil
-    rest = ''
+  def self.parse_cellspec(line, pos = :end, delimiter = nil)
+    m, rest = nil, ''
 
-    case pos
-    when :start
+    if pos == :start
       if line.include? delimiter
         spec_part, rest = line.split delimiter, 2
         if (m = CellSpecStartRx.match spec_part)
@@ -2468,7 +2466,7 @@ class Parser
       else
         return [nil, line]
       end
-    when :end
+    else # pos == :end
       if (m = CellSpecEndRx.match line)
         # NOTE return the line stripped of trailing whitespace if no cellspec is found in this case
         return [{}, line.rstrip] if m[0].lstrip.empty?
