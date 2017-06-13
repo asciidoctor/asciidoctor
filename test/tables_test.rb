@@ -463,6 +463,22 @@ three
       assert_css 'table > tbody > tr', output, 2
     end
 
+    test 'table with implicit header row only' do
+      input = <<-EOS
+|===
+|Column 1 |Column 2
+
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 1
+      assert_css 'table > thead > tr', output, 1
+      assert_css 'table > thead > tr > th', output, 2
+      assert_css 'table > tbody', output, 0
+    end
+
     test 'table with implicit header row when other options set' do
       input = <<-EOS
 [%autowidth]
