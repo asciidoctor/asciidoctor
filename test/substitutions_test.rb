@@ -1154,6 +1154,11 @@ EOS
         assert_equal %q{<b class="button">Save</b>}, para.sub_macros(para.source)
       end
 
+      test 'btn macro that spans multiple lines' do
+        para = block_from_string(%(btn:[Rebase and\nmerge]), :attributes => {'experimental' => ''})
+        assert_equal %q{<b class="button">Rebase and merge</b>}, para.sub_macros(para.source)
+      end
+
       test 'btn macro for docbook backend' do
         para = block_from_string('btn:[Save]', :backend => 'docbook', :attributes => {'experimental' => ''})
         assert_equal %q{<guibutton>Save</guibutton>}, para.sub_macros(para.source)
@@ -1179,6 +1184,11 @@ EOS
       test 'kbd macro with key combination' do
         para = block_from_string('kbd:[Ctrl+Shift+T]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></span>}, para.sub_macros(para.source)
+      end
+
+      test 'kbd macro with key combination that spans multiple lines' do
+        para = block_from_string(%(kbd:[Ctrl +\nT]), :attributes => {'experimental' => ''})
+        assert_equal %q{<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>T</kbd></span>}, para.sub_macros(para.source)
       end
 
       test 'kbd macro with key combination, docbook backend' do
