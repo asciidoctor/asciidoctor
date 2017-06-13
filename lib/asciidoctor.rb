@@ -886,7 +886,7 @@ module Asciidoctor
     #   kbd:[Ctrl,T]
     #   btn:[Save]
     #
-    KbdBtnInlineMacroRx = /\\?(?:kbd|btn):\[(.*?[^\\])\]/
+    KbdBtnInlineMacroRx = /\\?(?:kbd|btn):\[(#{CC_ALL}*?[^\\])\]/m
 
     # Matches the delimiter used for kbd value.
     #
