@@ -668,7 +668,8 @@ class Parser
           attributes['reftext'] = float_reftext if float_reftext
           block = Block.new(parent, :floating_title, :content_model => :empty)
           block.title = float_title
-          block.id = float_id || attributes['id'] || (Section.generate_id block.title, document)
+          block.id = float_id || attributes['id'] ||
+              ((document.attributes.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
           block.level = float_level
           break
 
@@ -1599,8 +1600,9 @@ class Parser
       section.numbered = section.special ? (parent.context == :section && parent.numbered) : true
     end
 
-    # generate an id if one was not embedded or specified as anchor above section title
-    if (id = (section.id ||= (attributes['id'] || (Section.generate_id section.title, document))))
+    # generate an ID if one was not embedded or specified as anchor above section title
+    if (id = section.id ||= (attributes['id'] ||
+        ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil)))
       # TODO sub reftext
       document.register :ids, [id, sect_reftext || section.title]
     end

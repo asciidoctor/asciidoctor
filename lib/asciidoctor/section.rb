@@ -48,32 +48,9 @@ class Section < AbstractBlock
   # Public: The name of this section, an alias of the section title
   alias name title
 
-  # Public: Generate a String id for this section.
+  # Public: Generate a String ID from the title of this section.
   #
-  # The generated id is prefixed with value of the 'idprefix' attribute, which
-  # is an underscore by default.
-  #
-  # Section id synthesis can be disabled by undefining the 'sectids' attribute.
-  #
-  # If the generated id is already in use in the document, a count is appended
-  # until a unique id is found.
-  #
-  # Examples
-  #
-  #   section = Section.new(parent)
-  #   section.title = "Foo"
-  #   section.generate_id
-  #   => "_foo"
-  #
-  #   another_section = Section.new(parent)
-  #   another_section.title = "Foo"
-  #   another_section.generate_id
-  #   => "_foo_1"
-  #
-  #   yet_another_section = Section.new(parent)
-  #   yet_another_section.title = "Ben & Jerry"
-  #   yet_another_section.generate_id
-  #   => "_ben_jerry"
+  # See Section.generate_id for details.
   def generate_id
     Section.generate_id title, @document
   end
@@ -151,15 +128,16 @@ class Section < AbstractBlock
     end
   end
 
-  # Public: Generate a String id for the given section title.
+  # Public: Generate a String ID from the given section title.
   #
-  # The generated id is prefixed with value of the 'idprefix' attribute, which
-  # is an underscore by default.
+  # The generated ID is prefixed with value of the 'idprefix' attribute, which
+  # is an underscore by default. Invalid characters are replaced with the
+  # value of the 'idseparator' attribute, which is an underscore by default.
   #
-  # If the generated id is already in use in the document, a count is appended
+  # If the generated ID is already in use in the document, a count is appended
   # until a unique id is found.
   #
-  # Section id synthesis can be disabled by undefining the 'sectids' attribute.
+  # Section ID generation can be disabled by undefining the 'sectids' attribute.
   #
   # Examples
   #
@@ -167,26 +145,25 @@ class Section < AbstractBlock
   #   => "_foo"
   #
   def self.generate_id title, document
-    if (attrs = document.attributes).key? 'sectids'
-      sep = attrs['idseparator'] || '_'
-      pre = attrs['idprefix'] || '_'
-      gen_id = %(#{pre}#{title.downcase.gsub InvalidSectionIdCharsRx, sep})
-      unless sep.empty?
-        # remove repeat and trailing separator characters
-        gen_id = gen_id.tr_s sep, sep
-        gen_id = gen_id.chop if gen_id.end_with? sep
-        # ensure id doesn't begin with idseparator if idprefix is empty and idseparator is not empty
-        if pre.empty?
-          gen_id = gen_id[1..-1] while gen_id.start_with? sep
-        end
+    attrs = document.attributes
+    sep = attrs['idseparator'] || '_'
+    pre = attrs['idprefix'] || '_'
+    gen_id = %(#{pre}#{title.downcase.gsub InvalidSectionIdCharsRx, sep})
+    unless sep.empty?
+      # remove repeat and trailing separator characters
+      gen_id = gen_id.tr_s sep, sep
+      gen_id = gen_id.chop if gen_id.end_with? sep
+      # ensure id doesn't begin with idseparator if idprefix is empty and idseparator is not empty
+      if pre.empty?
+        gen_id = gen_id[1..-1] while gen_id.start_with? sep
       end
-      if document.catalog[:ids].key? gen_id
-        ids, cnt = document.catalog[:ids], Compliance.unique_id_start_index
-        cnt += 1 while ids.key?(candidate_id = %(#{gen_id}#{sep}#{cnt}))
-        candidate_id
-      else
-        gen_id
-      end
+    end
+    if document.catalog[:ids].key? gen_id
+      ids, cnt = document.catalog[:ids], Compliance.unique_id_start_index
+      cnt += 1 while ids.key?(candidate_id = %(#{gen_id}#{sep}#{cnt}))
+      candidate_id
+    else
+      gen_id
     end
   end
 end

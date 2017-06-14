@@ -98,8 +98,10 @@ module Extensions
       id = attrs.delete 'id'
       sect = Section.new parent, opts[:level], (opts.fetch :numbered, (doc.attr? 'sectnums')), { :attributes => attrs }.merge(opts)
       sect.title = title
-      # NOTE set id attribute to false to disable id assignment
-      sect.id = sect.attributes['id'] = id || (id.nil? ? (Section.generate_id sect.title, doc) : nil)
+      # NOTE set ID attribute to false to disable ID generation / assignment
+      unless id == false
+        sect.id = sect.attributes['id'] = id || ((doc.attributes.key? 'sectids') ? (Section.generate_id sect.title, doc) : nil)
+      end
       sect
     end
 
