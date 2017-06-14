@@ -2080,12 +2080,13 @@ class Parser
 
   # Public: Store the attribute in the document and register attribute entry if accessible
   #
-  # name  - the String name of the attribute to store
+  # name  - the String name of the attribute to store;
+  #         if name begins or ends with !, it signals to remove the attribute with that root name
   # value - the String value of the attribute to store
   # doc   - the Document being parsed
   # attrs - the attributes for the current context
   #
-  # returns a 2-element array containing the attribute name and value
+  # returns a 2-element array containing the resolved attribute name (minus the ! indicator) and value
   def self.store_attribute name, value, doc = nil, attrs = nil
     # TODO move processing of attribute value to utility method
     if name.end_with? '!'
