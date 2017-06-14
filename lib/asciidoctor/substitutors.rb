@@ -533,16 +533,13 @@ module Substitutors
     if experimental
       if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
         result = result.gsub(KbdBtnInlineMacroRx) {
-          # alias match for Ruby 1.8.7 compat
-          m = $~
           # honor the escape
-          if (captured = m[0]).start_with? RS
-            next captured[1..-1]
-          end
-
-          if captured.start_with?('kbd')
-            keys = unescape_bracketed_text m[1]
-
+          if $1
+            $&.slice 1, $&.length
+          elsif $2 == 'kbd'
+            if (keys = $3.strip).include? R_SB
+              keys = keys.gsub ESC_R_SB, R_SB
+            end
             if keys.length > 1 && (delim = keys[KbdDelimiterRx])
               # NOTE handle special case of Ctrl++ or Ctrl,,
               if keys.end_with? delim
@@ -557,10 +554,9 @@ module Substitutors
             else
               keys = [keys]
             end
-            Inline.new(self, :kbd, nil, :attributes => {'keys' => keys}).convert
-          elsif captured.start_with?('btn')
-            label = unescape_bracketed_text m[1]
-            Inline.new(self, :button, label).convert
+            (Inline.new self, :kbd, nil, :attributes => { 'keys' => keys }).convert
+          else # $2 == 'btn'
+            (Inline.new self, :button, (unescape_bracketed_text $3)).convert
           end
         }
       end
