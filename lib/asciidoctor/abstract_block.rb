@@ -309,6 +309,12 @@ class AbstractBlock < AbstractNode
   end
   alias query find_by
 
+  # Move to the next adjacent block in document order. If the current block is the last
+  # item in a list, this method will return the following sibling of the list block.
+  def next_adjacent_block
+    (sib = (p = parent).blocks[(p.blocks.find_index self) + 1]) ? sib : p.next_adjacent_block unless @context == :document
+  end
+
   # Public: Remove a substitution from this block
   #
   # sub  - The Symbol substitution name
