@@ -1046,7 +1046,7 @@ Your browser does not support the video tag.
         attrs << %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window', nil, false
         %(<a href="#{target}"#{attrs.join}>#{node.text}</a>)
       when :bibref
-        %(<a id="#{target}"></a>[#{target}])
+        %(<a id="#{target}"></a>#{node.text})
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
       end
