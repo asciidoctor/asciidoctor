@@ -2774,28 +2774,26 @@ last question::
       assert_css 'bibliodiv > bibliomixed:nth-child(2) > bibliomisc > anchor[xreflabel="[walsh-muellner]"]', output, 1
     end
 
-    test 'should automatically add bibliography style to first list in bibliography section' do
+    test 'should automatically add bibliography style to top-level lists in bibliography section' do
       input = <<-EOS
 [bibliography]
 == Bibliography
 
-content
-
-- [[[taoup]]] Eric Steven Raymond. 'The Art of Unix
-  Programming'. Addison-Wesley. ISBN 0-13-142901-9.
-- [[[walsh-muellner]]] Norman Walsh & Leonard Muellner.
-  'DocBook - The Definitive Guide'. O'Reilly & Associates. 1999.
+.Books
+* [[[taoup]]] Eric Steven Raymond. _The Art of Unix
+  Programming_. Addison-Wesley. ISBN 0-13-142901-9.
+* [[[walsh-muellner]]] Norman Walsh & Leonard Muellner.
+  _DocBook - The Definitive Guide_. O'Reilly & Associates. 1999.
   ISBN 1-56592-580-7.
 
-content
-
-- another
-- list
+.Periodicals
+* [[[doc-writer]]] Doc Writer. _Documentation As Code_. Static Times, 54. August 2016.
       EOS
       doc = document_from_string input
       ulists = doc.find_by :context => :ulist
+      assert_equal 2, ulists.size
       assert_equal ulists[0].style, 'bibliography'
-      assert_nil ulists[1].style
+      assert_equal ulists[1].style, 'bibliography'
     end
 
     test 'should not recognize bibliography anchor that begins with a digit' do
