@@ -1193,7 +1193,7 @@ class Parser
   # Returns A Boolean indicating whether callouts were found
   def self.catalog_callouts(text, document)
     found = false
-    text.scan(CalloutQuickScanRx) {
+    text.scan(CalloutScanRx) {
       # lead with assignments for Ruby 1.8.7 compat
       captured, num = $&, $2
       document.callouts.register num unless captured.start_with? '\\'
