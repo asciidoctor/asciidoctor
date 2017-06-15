@@ -470,11 +470,11 @@ see <<foo>>'
     input = <<-EOS
 == Section A
 
-<\<_section_b>>
+<<_section_b>>
 
 == Section B
 
-<\<_section_a>>
+<<_section_a>>
     EOS
 
     output = render_embedded_string input
