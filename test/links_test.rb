@@ -277,6 +277,11 @@ context 'Links' do
     end
   end
 
+  test 'does not match bibliography anchor in prose when scanning for inline anchor' do
+    doc = document_from_string 'Use [[[label]]] to assign a label to a bibliography entry.'
+    refute doc.catalog[:ids].key?('label')
+  end
+
   test 'repeating inline anchor macro with empty reftext' do
     input = 'anchor:one[] anchor:two[] anchor:three[]'
     result = render_inline_string input

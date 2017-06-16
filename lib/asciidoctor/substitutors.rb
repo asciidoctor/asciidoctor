@@ -945,16 +945,9 @@ module Substitutors
 
   # Internal: Substitute normal and bibliographic anchors
   def sub_inline_anchors(text, found = nil)
-    if (!found || found[:square_bracket]) && text.include?('[[[')
-      text = text.gsub(InlineBiblioAnchorRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
-        if m[0].start_with? RS
-          next m[0][1..-1]
-        end
-        id = reftext = m[1]
-        Inline.new(self, :anchor, reftext, :type => :bibref, :target => id).convert
+    if @context == :list_item && @parent.style == 'bibliography'
+      text = text.sub(InlineBiblioAnchorRx) {
+        Inline.new(self, :anchor, %([#{$2 || $1}]), :type => :bibref, :target => $1).convert
       }
     end
 

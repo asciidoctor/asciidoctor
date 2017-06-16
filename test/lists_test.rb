@@ -2807,7 +2807,7 @@ last question::
       assert_xpath '//a[@id="1984"]', output, 0
     end
 
-    test 'should recognize bibliography anchor that contains a number' do
+    test 'should recognize bibliography anchor that contains a digit but does not start with one' do
       input = <<-EOS
 [bibliography]
 - [[[_1984]]] George Orwell. '1984'. New American Library. 1950.
@@ -2817,6 +2817,58 @@ last question::
       refute_includes output, '[[[_1984]]]'
       assert_includes output, '[_1984]'
       assert_xpath '//a[@id="_1984"]', output, 1
+    end
+
+    test 'should catalog bibliography anchors in bibliography list' do
+      input = <<-EOS
+= Article Title
+
+Please read #{'<<'}Fowler_1997>>.
+
+[bibliography]
+== References
+
+* [[[Fowler_1997]]] Fowler M. _Analysis Patterns: Reusable Object Models_. Addison-Wesley. 1997.
+      EOS
+
+      doc = document_from_string input
+      ids = doc.catalog[:ids]
+      assert ids.key?('Fowler_1997')
+      assert_equal '[Fowler_1997]', ids['Fowler_1997']
+    end
+
+    test 'should use reftext from bibliography anchor at xref and entry' do
+      input = <<-EOS
+= Article Title
+
+Please read #{'<<'}Fowler_1997>>.
+
+[bibliography]
+== References
+
+* [[[Fowler_1997,1]]] Fowler M. _Analysis Patterns: Reusable Object Models_. Addison-Wesley. 1997.
+      EOS
+
+      doc = document_from_string input, :header_footer => false
+      ids = doc.catalog[:ids]
+      assert ids.key?('Fowler_1997')
+      assert_equal '[1]', ids['Fowler_1997']
+      result = doc.convert
+      assert_xpath '//a[@href="#Fowler_1997"]', result, 1
+      assert_xpath '//a[@href="#Fowler_1997"][text()="[1]"]', result, 1
+      assert_xpath '//a[@id="Fowler_1997"]', result, 1
+      text = (xmlnodes_at_xpath '(//a[@id="Fowler_1997"])[1]/following-sibling::text()', result, 1).text
+      assert text.start_with?('[1] ')
+    end
+
+    test 'should assign reftext of bibliography anchor to xreflabel in DocBook backend' do
+      input = <<-EOS
+[bibliography]
+* [[[Fowler_1997,1]]] Fowler M. _Analysis Patterns: Reusable Object Models_. Addison-Wesley. 1997.
+      EOS
+
+      result = render_embedded_string input, :backend => :docbook
+      assert_includes result, '<anchor xml:id="Fowler_1997" xreflabel="[1]"/>'
     end
   end
 end

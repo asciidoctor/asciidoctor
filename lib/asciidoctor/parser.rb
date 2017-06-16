@@ -634,8 +634,9 @@ class Parser
         elsif UnorderedListRx.match? this_line
           reader.unshift_line this_line
           block = next_item_list(reader, :ulist, parent)
-          unless style
-            attributes['style'] = 'bibliography' if Section === parent && parent.sectname == 'bibliography'
+          if (style || (Section === parent && parent.sectname)) == 'bibliography'
+            attributes['style'] = 'bibliography' unless style
+            block.items.each {|item| catalog_inline_biblio_anchor item.instance_variable_get(:@text), document }
           end
           break
 
@@ -1189,7 +1190,7 @@ class Parser
   # Internal: Catalog any callouts found in the text, but don't process them
   #
   # text     - The String of text in which to look for callouts
-  # document - The current document on which the callouts are stored
+  # document - The current document in which the callouts are stored
   #
   # Returns A Boolean indicating whether callouts were found
   def self.catalog_callouts(text, document)
@@ -1207,23 +1208,34 @@ class Parser
   # Internal: Catalog any inline anchors found in the text, but don't process them
   #
   # text     - The String text in which to look for inline anchors
-  # document - The current document on which the references are stored
+  # document - The current document in which the references are stored
   #
   # Returns nothing
   def self.catalog_inline_anchors text, document
-    text.scan(InlineAnchorRx) do
-      # honor the escape
-      next if $1
-      if (id = $2)
-        reftext = $3
+    text.scan(InlineAnchorScanRx) do
+      if (id = $1)
+        reftext = $2
       else
-        id = $4
-        if (reftext = $5) && (reftext.include? ']')
+        id = $3
+        if (reftext = $4) && (reftext.include? ']')
           reftext = reftext.gsub '\]', ']'
         end
       end
       document.register :ids, [id, reftext]
     end if (text.include? '[[') || (text.include? 'or:')
+    nil
+  end
+
+  # Internal: Catalog any bibliography inline anchors found in the text, but don't process them
+  #
+  # text     - The String text in which to look for inline bibliography anchors
+  # document - The current document in which the references are stored
+  #
+  # Returns nothing
+  def self.catalog_inline_biblio_anchor text, document
+    if InlineBiblioAnchorRx =~ text
+      document.register :ids, [$1, %([#{$2 || $1}])]
+    end
     nil
   end
 

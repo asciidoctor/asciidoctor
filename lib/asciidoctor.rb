@@ -830,13 +830,16 @@ module Asciidoctor
     #
     InlineAnchorRx = /(\\)?(?:\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]|anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\]))/
 
-    # Matches a bibliography anchor anywhere inline.
+    # Scans for a non-escaped anchor (i.e., id + optional reference text) in the flow of text.
+    InlineAnchorScanRx = /(?:^|[^\\\[])\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]|(?:^|[^\\])anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\])/
+
+    # Matches a bibliography anchor at the start of the list item text (in a bibliography list).
     #
     # Examples
     #
-    #   [[[Foo]]]
+    #   [[[Fowler_1997]]] Fowler M. ...
     #
-    InlineBiblioAnchorRx = /\\?\[\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\]\]\]/
+    InlineBiblioAnchorRx = /^\[\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]\]/
 
     # Matches an inline e-mail address.
     #
