@@ -1076,6 +1076,30 @@ EOS
       assert_equal ['Tiger (Panthera tigris)'], para.document.catalog[:indexterms].first
     end
 
+    test 'visible shorthand index term macro should not consume trailing round bracket' do
+      input = '(text with ((index term)))'
+      expected = '(text with <indexterm><primary>index term</primary></indexterm>index term)'
+      expected_term = ['index term']
+      para = block_from_string input, :backend => :docbook
+      output = para.sub_macros para.source
+      indexterms_table = para.document.catalog[:indexterms]
+      assert_equal 1, indexterms_table.size
+      assert_equal expected_term, indexterms_table[0]
+      assert_equal expected, output
+    end
+
+    test 'visible shorthand index term macro should not consume leading round bracket' do
+      input = '(((index term)) for text)'
+      expected = '(<indexterm><primary>index term</primary></indexterm>index term for text)'
+      expected_term = ['index term']
+      para = block_from_string input, :backend => :docbook
+      output = para.sub_macros para.source
+      indexterms_table = para.document.catalog[:indexterms]
+      assert_equal 1, indexterms_table.size
+      assert_equal expected_term, indexterms_table[0]
+      assert_equal expected, output
+    end
+
     test 'an index term macro with square bracket syntax may contain square brackets in term' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macro = 'indexterm:[Tiger [Panthera tigris\\]]'

@@ -667,10 +667,10 @@ module Substitutors
     end
 
     if found[:macroish_short_form] || found[:round_bracket]
-      # indexterm:[Tigers,Big cats]
       # (((Tigers,Big cats)))
-      # indexterm2:[Tigers]
+      # indexterm:[Tigers,Big cats]
       # ((Tigers))
+      # indexterm2:[Tigers]
       result = result.gsub(IndextermInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -680,40 +680,44 @@ module Substitutors
           next m[0][1..-1]
         end
 
-        num_brackets = 0
-        text_in_brackets = nil
-        unless (macro_name = m[1])
-          text_in_brackets = m[3]
-          if (text_in_brackets.start_with? '(') && (text_in_brackets.end_with? ')')
-            text_in_brackets = text_in_brackets[1...-1]
-            num_brackets = 3
-          else
-            num_brackets = 2
-          end
-        end
-
-        # non-visible
-        if macro_name == 'indexterm' || num_brackets == 3
-          if !macro_name
-            # (((Tigers,Big cats)))
-            terms = split_simple_csv normalize_string(text_in_brackets)
-          else
-            # indexterm:[Tigers,Big cats]
-            terms = split_simple_csv normalize_string(m[2], true)
-          end
-          @document.register(:indexterms, [*terms])
-          Inline.new(self, :indexterm, nil, :attributes => {'terms' => terms}).convert
-        # visible
+        case m[1]
+        when 'indexterm'
+          # indexterm:[Tigers,Big cats]
+          terms = split_simple_csv(normalize_string m[2], true)
+          @document.register :indexterms, terms
+          (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
+        when 'indexterm2'
+          # indexterm2:[Tigers]
+          term = normalize_string m[2], true
+          @document.register :indexterms, [term]
+          (Inline.new self, :indexterm, term, :type => :visible).convert
         else
-          if !macro_name
-            # ((Tigers))
-            text = normalize_string text_in_brackets
-          else
-            # indexterm2:[Tigers]
-            text = normalize_string m[2], true
+          text, visible, before, after = m[3], true, nil, nil
+          if text.start_with? '('
+            if text.end_with? ')'
+              text, visible = (text.slice 1, text.length - 2), false
+            else
+              text, before, after = (text.slice 1, text.length - 1), '(', ''
+            end
+          elsif text.end_with? ')'
+            if text.start_with? '('
+              text, visible = (text.slice 1, text.length - 2), false
+            else
+              text, before, after = (text.slice 0, text.length - 1), '', ')'
+            end
           end
-          @document.register(:indexterms, [text])
-          Inline.new(self, :indexterm, text, :type => :visible).convert
+          if visible
+            # ((Tigers))
+            term = normalize_string text
+            @document.register :indexterms, [term]
+            result = (Inline.new self, :indexterm, term, :type => :visible).convert
+          else
+            # (((Tigers,Big cats)))
+            terms = split_simple_csv(normalize_string text)
+            @document.register :indexterms, terms
+            result = (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
+          end
+          before ? %(#{before}#{result}#{after}) : result
         end
       }
     end
