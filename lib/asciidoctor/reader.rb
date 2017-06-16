@@ -785,13 +785,12 @@ class PreprocessorReader < Reader
     # single line conditional inclusion
     else
       unless @skipping || skip
-        # FIXME slight hack to skip past conditional line
-        # but keep our synthetic line marked as processed
-        # QUESTION can we use read_line true and unshift twice instead?
-        conditional_line = peek_line true
         replace_next_line text.rstrip
-        unshift conditional_line
-        return true
+        # HACK push dummy line to stand in for the opening conditional directive that's subsequently dropped
+        unshift ''
+        # NOTE force line to be processed again if it looks like an include directive
+        # QUESTION should we just call preprocess_include_directive here?
+        @look_ahead -= 1 if text.start_with? 'include::'
       end
     end
 
