@@ -519,18 +519,16 @@ module Substitutors
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
     found[:square_bracket] = source.include?('[')
-    found[:round_bracket] = source.include?('(')
-    found[:colon] = found_colon = source.include?(':')
-    found[:macroish] = (found[:square_bracket] && found_colon)
-    found[:macroish_short_form] = (found[:square_bracket] && found_colon && source.include?(':['))
+    found[:colon] = found_colon = (source.include? ':')
+    found[:macroish] = found[:square_bracket] && found_colon
+    found[:macroish_short_form] = found[:square_bracket] && found_colon && (source.include? ':[')
     doc_attrs = @document.attributes
     use_link_attrs = doc_attrs.key? 'linkattrs'
-    experimental = doc_attrs.key? 'experimental'
 
     # NOTE interpolation is faster than String#dup
     result = %(#{source})
 
-    if experimental
+    if doc_attrs.key? 'experimental'
       if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
         result = result.gsub(KbdBtnInlineMacroRx) {
           # honor the escape
@@ -666,7 +664,8 @@ module Substitutors
       }
     end
 
-    if found[:macroish_short_form] || found[:round_bracket]
+    if ((result.include? '((') && (result.include? '))')) ||
+        (found[:macroish_short_form] && (result.include? 'indexterm'))
       # (((Tigers,Big cats)))
       # indexterm:[Tigers,Big cats]
       # ((Tigers))
