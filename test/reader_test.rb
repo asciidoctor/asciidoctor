@@ -1289,6 +1289,20 @@ There was much rejoicing.
         assert_equal "On our quest we go...\nThere is a holy grail!\nThere was much rejoicing.", (lines * ::Asciidoctor::EOL)
       end
 
+      test 'ifdef with defined attribute processes include directive in brackets' do
+        input = <<-EOS
+ifdef::asciidoctor-version[include::fixtures/include-file.asciidoc[tag=snippetA]]
+        EOS
+
+        doc = Asciidoctor::Document.new input, :safe => :safe, :base_dir => DIRNAME
+        reader = doc.reader
+        lines = []
+        while reader.has_more_lines?
+          lines << reader.read_line
+        end
+        assert_equal 'snippetA content', lines[0]
+      end
+
       test 'ifdef attribute name is not case sensitive' do
         input = <<-EOS
 ifdef::showScript[]
