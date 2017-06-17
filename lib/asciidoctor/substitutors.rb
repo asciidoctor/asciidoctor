@@ -524,9 +524,7 @@ module Substitutors
     found[:macroish_short_form] = found[:square_bracket] && found_colon && (source.include? ':[')
     doc_attrs = @document.attributes
     use_link_attrs = doc_attrs.key? 'linkattrs'
-
-    # NOTE interpolation is faster than String#dup
-    result = %(#{source})
+    result = source
 
     if doc_attrs.key? 'experimental'
       if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
