@@ -1282,7 +1282,7 @@ module Extensions
           unless (name = as_symbol processor_instance.name)
             raise ::ArgumentError, %(No name specified for #{kind_name} extension: #{processor})
           end
-          processor.freeze
+          processor_instance.freeze
           kind_store[name] = ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
         elsif kind_class === processor || (kind_java_class && kind_java_class === processor)
