@@ -1217,12 +1217,12 @@ module Extensions
         ProcessorExtension.new kind, processor
       else
         processor, config = resolve_args args, 2
-        # style 2: specified as class or class name
-        if ::Class === processor || (::String === processor && (processor = Extensions.class_for_name processor))
-          unless processor < kind_class || (kind_java_class && processor < kind_java_class)
+        # style 2: specified as Class or String class name
+        if (processor_class = Extensions.resolve_class processor)
+          unless processor_class < kind_class || (kind_java_class && processor_class < kind_java_class)
             raise ::ArgumentError, %(Invalid type for #{kind_name} extension: #{processor})
           end
-          processor_instance = processor.new config
+          processor_instance = processor_class.new config
           processor_instance.freeze
           ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
@@ -1273,12 +1273,12 @@ module Extensions
         kind_store[name] = ProcessorExtension.new kind, processor
       else
         processor, name, config = resolve_args args, 3
-        # style 2: specified as class or class name
-        if ::Class === processor || (::String === processor && (processor = Extensions.class_for_name processor))
-          unless processor < kind_class || (kind_java_class && processor < kind_java_class)
+        # style 2: specified as Class or String class name
+        if (processor_class = Extensions.resolve_class processor)
+          unless processor_class < kind_class || (kind_java_class && processor_class < kind_java_class)
             raise ::ArgumentError, %(Class specified for #{kind_name} extension does not inherit from #{kind_class}: #{processor})
           end
-          processor_instance = processor.new as_symbol(name), config
+          processor_instance = processor_class.new as_symbol(name), config
           unless (name = as_symbol processor_instance.name)
             raise ::ArgumentError, %(No name specified for #{kind_name} extension: #{processor})
           end
@@ -1376,23 +1376,13 @@ module Extensions
     # Returns the [Proc, Class or Object] instance, matching the type passed to this method.
     def register *args, &block
       argc = args.size
-      resolved_group = if block_given?
-        block
-      elsif !(group = args.pop)
-        raise ::ArgumentError, %(Extension group to register not specified)
+      if block_given?
+        resolved_group = block
+      elsif (group = args.pop)
+        # QUESTION should we instantiate the group class here or defer until activation??
+        resolved_group = (resolve_class group) || group
       else
-        # QUESTION should we instantiate the group class here or defer until
-        # activation??
-        case group
-        when ::Class
-          group
-        when ::String
-          class_for_name group
-        when ::Symbol
-          class_for_name group.to_s
-        else
-          group
-        end
+        raise ::ArgumentError, %(Extension group to register not specified)
       end
       name = args.pop || generate_name
       unless args.empty?
@@ -1405,26 +1395,33 @@ module Extensions
       @groups = {}
     end
 
-    # unused atm, but tested
+    # Internal: Resolve the specified object as a Class
+    #
+    # object - The object to resolve as a Class
+    #
+    # Returns a Class if the specified object is a Class (but not a Module) or
+    # a String that resolves to a Class; otherwise, nil
     def resolve_class object
-      ::Class === object ? object : (class_for_name object.to_s)
+      case object
+      when ::Class
+        object
+      when ::String
+        class_for_name object
+      end
     end
 
     # Public: Resolves the Class object for the qualified name.
     #
     # Returns Class
     def class_for_name qualified_name
-      resolved_class = ::Object
-      qualified_name.split('::').each do |name|
-        if name.empty?
-          # do nothing
-        elsif resolved_class.const_defined? name
-          resolved_class = resolved_class.const_get name
-        else
+      resolved = ::Object
+      (qualified_name.split '::').each do |name|
+        unless name.empty? || ((resolved.const_defined? name) && ::Module === (resolved = resolved.const_get name))
           raise ::NameError, %(Could not resolve class for name: #{qualified_name})
         end
       end
-      resolved_class
+      raise ::NameError, %(Could not resolve class for name: #{qualified_name}) unless ::Class === resolved
+      resolved
     end
   end
 
