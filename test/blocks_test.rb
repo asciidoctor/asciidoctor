@@ -1624,6 +1624,18 @@ image::images/tiger.png[Tiger]
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
+    test 'style attribute is dropped from image macro' do
+      input = <<-EOS
+[style=value]
+image::images/tiger.png[Tiger]
+      EOS
+
+      doc = document_from_string input
+      img = doc.blocks[0]
+      refute(img.attributes.key? 'style')
+      assert_nil img.style
+    end
+
     test 'alt text is escaped in HTML backend' do
       input = <<-EOS
 image::images/open.png[File > Open]

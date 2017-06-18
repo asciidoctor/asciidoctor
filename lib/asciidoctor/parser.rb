@@ -448,7 +448,7 @@ class Parser
     end
     #parent_context = Block === parent ? parent.context : nil
     in_list = ListItem === parent
-    block = style = explicit_style = source_location = nil
+    block = style = source_location = nil
     sourcemap = document.sourcemap
 
     while !block && reader.has_more_lines?
@@ -467,7 +467,7 @@ class Parser
       delimited_block = block_context = cloaked_context = terminator = nil
       # QUESTION put this inside call to rekey attributes?
       if attributes[1]
-        style, explicit_style = parse_style_attribute(attributes, reader)
+        style, _ = parse_style_attribute(attributes, reader)
       end
 
       if (delimited_blk_match = is_delimited_block? this_line, true)
@@ -534,22 +534,20 @@ class Parser
               if (ch0 == 'i' || (this_line.start_with? 'video:', 'audio:')) && (match = MediaBlockMacroRx.match(this_line))
                 blk_ctx = match[1].to_sym
                 block = Block.new(parent, blk_ctx, :content_model => :empty)
-                if blk_ctx == :image
-                  posattrs = ['alt', 'width', 'height']
-                elsif blk_ctx == :video
+                case blk_ctx
+                when :video
                   posattrs = ['poster', 'width', 'height']
-                else
+                when :audio
                   posattrs = []
-                end
-
-                # QUESTION why did we make exception for explicit style?
-                #if style && !explicit_style
-                if style
-                  attributes['alt'] = style if blk_ctx == :image
-                  attributes.delete 'style'
-                  style = nil
+                else # :image
+                  posattrs = ['alt', 'width', 'height']
                 end
                 block.parse_attributes(match[3], posattrs, :sub_input => true, :sub_result => false, :into => attributes)
+                if attributes.key? 'style'
+                  # NOTE style is the value of the first positional attribute in the block attribute line
+                  attributes['alt'] ||= style if style && blk_ctx == :image
+                  attributes.delete 'style'
+                end
                 if (target = match[2]).include? '{'
                   target = block.sub_attributes target, :attribute_missing => 'drop-line'
                 end
