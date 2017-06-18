@@ -436,20 +436,16 @@ class Parser
       text_only = false
     end
 
-    parse_metadata = options.fetch(:parse_metadata, true)
-    #parse_sections = options.fetch(:parse_sections, false)
+    parse_metadata = options.fetch :parse_metadata, true
+    #parse_sections, parent_context = (options.fetch :parse_sections, false), (Block === parent ? parent.context : nil)
 
-    document = parent.document
+    document, block, in_list = parent.document, nil, ListItem === parent
+    sourcemap, source_location = document.sourcemap, nil
     if (extensions = document.extensions)
-      block_extensions = extensions.blocks?
-      block_macro_extensions = extensions.block_macros?
+      block_extensions, block_macro_extensions = extensions.blocks?, extensions.block_macros?
     else
       block_extensions = block_macro_extensions = false
     end
-    #parent_context = Block === parent ? parent.context : nil
-    in_list = ListItem === parent
-    block = style = source_location = nil
-    sourcemap = document.sourcemap
 
     while !block && reader.has_more_lines?
       # if parsing metadata, read until there is no more to read
