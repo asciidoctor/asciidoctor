@@ -800,15 +800,16 @@ class Parser
           block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
 
         when :source
-          AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
-          unless attributes.key? 'language'
-            if (default_language = document.attributes['source-language'])
-              attributes['language'] = default_language
-            end
-          end
-          if !attributes.key?('indent') && document.attributes.key?('source-indent')
+          AttributeList.rekey attributes, [nil, 'language', 'linenums']
+          if document.attributes.key? 'source-language'
+            attributes['language'] = document.attributes['source-language'] || 'text'
+          end unless attributes.key? 'language'
+          if (attributes.key? 'linenums-option') || (document.attributes.key? 'source-linenums-option')
+            attributes['linenums'] = ''
+          end unless attributes.key? 'linenums'
+          if document.attributes.key? 'source-indent'
             attributes['indent'] = document.attributes['source-indent']
-          end
+          end unless attributes.key? 'indent'
           block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
 
         when :fenced_code
@@ -827,15 +828,18 @@ class Parser
             language = language.lstrip
           end
           if language.nil_or_empty?
-            if (default_language = document.attributes['source-language'])
-              attributes['language'] = default_language
+            if document.attributes.key? 'source-language'
+              attributes['language'] = document.attributes['source-language'] || 'text'
             end
           else
             attributes['language'] = language
           end
-          if !attributes.key?('indent') && document.attributes.key?('source-indent')
+          if (attributes.key? 'linenums-option') || (document.attributes.key? 'source-linenums-option')
+            attributes['linenums'] = ''
+          end unless attributes.key? 'linenums'
+          if document.attributes.key? 'source-indent'
             attributes['indent'] = document.attributes['source-indent']
-          end
+          end unless attributes.key? 'indent'
           terminator = terminator.slice 0, 3
           block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
 
