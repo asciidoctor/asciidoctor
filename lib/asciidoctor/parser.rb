@@ -796,48 +796,48 @@ class Parser
         when :example
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
-        when :listing, :fenced_code, :source
-          if block_context == :fenced_code
-            attributes['style'] = 'source'
-            if (ll = this_line.length) == 3
-              language = nil
-            elsif (comma_idx = (language = this_line.slice 3, ll).index ',')
-              if comma_idx > 0
-                language = (language.slice 0, comma_idx).strip
-                attributes['linenums'] = '' if comma_idx < ll - 4
-              else
-                language = nil
-                attributes['linenums'] = '' if ll > 4
-              end
-            else
-              language = language.lstrip
+        when :listing, :literal
+          block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
+
+        when :source
+          AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
+          unless attributes.key? 'language'
+            if (default_language = document.attributes['source-language'])
+              attributes['language'] = default_language
             end
-            if language.nil_or_empty?
-              if (default_language = document.attributes['source-language'])
-                attributes['language'] = default_language
-              end
-            else
-              attributes['language'] = language
-            end
-            if !attributes.key?('indent') && document.attributes.key?('source-indent')
-              attributes['indent'] = document.attributes['source-indent']
-            end
-            terminator = terminator.slice 0, 3
-          elsif block_context == :source
-            AttributeList.rekey(attributes, [nil, 'language', 'linenums'])
-            unless attributes.key? 'language'
-              if (default_language = document.attributes['source-language'])
-                attributes['language'] = default_language
-              end
-            end
-            if !attributes.key?('indent') && document.attributes.key?('source-indent')
-              attributes['indent'] = document.attributes['source-indent']
-            end
+          end
+          if !attributes.key?('indent') && document.attributes.key?('source-indent')
+            attributes['indent'] = document.attributes['source-indent']
           end
           block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
 
-        when :literal
-          block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
+        when :fenced_code
+          attributes['style'] = 'source'
+          if (ll = this_line.length) == 3
+            language = nil
+          elsif (comma_idx = (language = this_line.slice 3, ll).index ',')
+            if comma_idx > 0
+              language = (language.slice 0, comma_idx).strip
+              attributes['linenums'] = '' if comma_idx < ll - 4
+            else
+              language = nil
+              attributes['linenums'] = '' if ll > 4
+            end
+          else
+            language = language.lstrip
+          end
+          if language.nil_or_empty?
+            if (default_language = document.attributes['source-language'])
+              attributes['language'] = default_language
+            end
+          else
+            attributes['language'] = language
+          end
+          if !attributes.key?('indent') && document.attributes.key?('source-indent')
+            attributes['indent'] = document.attributes['source-indent']
+          end
+          terminator = terminator.slice 0, 3
+          block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
 
         when :pass
           block = build_block(block_context, :raw, terminator, parent, reader, attributes)
