@@ -465,10 +465,7 @@ class Parser
       source_location = reader.cursor if sourcemap
       this_line = reader.read_line
       delimited_block = block_context = cloaked_context = terminator = nil
-      # QUESTION put this inside call to rekey attributes?
-      if attributes[1]
-        style, _ = parse_style_attribute(attributes, reader)
-      end
+      style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
 
       if (delimited_blk_match = is_delimited_block? this_line, true)
         delimited_block = true
@@ -1575,8 +1572,8 @@ class Parser
       sect_reftext = attributes['reftext']
     end
 
-    # parse style, id, and role from first positional attribute if present
-    style, _ = parse_style_attribute attributes, reader unless attributes[1].nil_or_empty?
+    # parse style, id, and role attributes from first positional attribute if present
+    style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
     if style
       if style == 'abstract' && document.doctype == 'book'
         sect_name, sect_level = 'chapter', 1
@@ -2522,34 +2519,27 @@ class Parser
   #
   # Parse the first positional attribute to extract the style, role and id
   # parts, assign the values to their cooresponding attribute keys and return
-  # both the original style attribute and the parsed value from the first
-  # positional attribute.
+  # the parsed style from the first positional attribute.
   #
   # attributes - The Hash of attributes to process and update
   #
   # Examples
   #
   #   puts attributes
-  #   => {1 => "abstract#intro.lead%fragment", "style" => "preamble"}
+  #   => { 1 => "abstract#intro.lead%fragment", "style" => "preamble" }
   #
   #   parse_style_attribute(attributes)
-  #   => ["abstract", "preamble"]
+  #   => "abstract"
   #
   #   puts attributes
-  #   => {1 => "abstract#intro.lead", "style" => "abstract", "id" => "intro",
-  #         "role" => "lead", "options" => ["fragment"], "fragment-option" => ''}
+  #   => { 1 => "abstract#intro.lead%fragment", "style" => "abstract", "id" => "intro",
+  #         "role" => "lead", "options" => "fragment", "fragment-option" => '' }
   #
-  # Returns a two-element Array of the parsed style from the
-  # first positional attribute and the original style that was
-  # replaced
+  # Returns the String style parsed from the first positional attribute
   def self.parse_style_attribute(attributes, reader = nil)
-    original_style = attributes['style']
-    raw_style = attributes[1]
-    # NOTE spaces are not allowed in shorthand, so if we find one, this ain't shorthand
-    if raw_style && !raw_style.include?(' ') && Compliance.shorthand_property_syntax
-      type = :style
-      collector = []
-      parsed = {}
+    # NOTE spaces are not allowed in shorthand, so if we detect one, this ain't no shorthand
+    if (raw_style = attributes[1]) && !raw_style.include?(' ') && Compliance.shorthand_property_syntax
+      type, collector, parsed = :style, [], {}
       # QUESTION should this be a private method? (though, it's never called if shorthand isn't used)
       save_current = lambda {
         if collector.empty?
@@ -2590,36 +2580,29 @@ class Parser
 
       # small optimization if no shorthand is found
       if type == :style
-        parsed_style = attributes['style'] = raw_style
+        attributes['style'] = raw_style
       else
         save_current.call
 
-        if parsed.key? :style
-          parsed_style = attributes['style'] = parsed[:style]
-        else
-          parsed_style = nil
-        end
+        parsed_style = attributes['style'] = parsed[:style] if parsed.key? :style
 
         attributes['id'] = parsed[:id] if parsed.key? :id
 
         attributes['role'] = parsed[:role] * ' ' if parsed.key? :role
 
         if parsed.key? :option
-          (options = parsed[:option]).each do |option|
-            attributes[%(#{option}-option)] = ''
-          end
+          (options = parsed[:option]).each {|option| attributes[%(#{option}-option)] = '' }
           if (existing_opts = attributes['options'])
             attributes['options'] = (options + existing_opts.split(',')) * ','
           else
             attributes['options'] = options * ','
           end
         end
-      end
 
-      [parsed_style, original_style]
+        parsed_style
+      end
     else
       attributes['style'] = raw_style
-      [raw_style, original_style]
     end
   end
 

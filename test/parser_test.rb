@@ -281,9 +281,8 @@ context "Parser" do
 
   test 'parse style attribute with id and role' do
     attributes = {1 => 'style#id.role'}
-    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
+    style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
-    assert_nil original_style
     assert_equal 'style', attributes['style']
     assert_equal 'id', attributes['id']
     assert_equal 'role', attributes['role']
@@ -292,9 +291,8 @@ context "Parser" do
 
   test 'parse style attribute with style, role, id and option' do
     attributes = {1 => 'style.role#id%fragment'}
-    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
+    style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
-    assert_nil original_style
     assert_equal 'style', attributes['style']
     assert_equal 'id', attributes['id']
     assert_equal 'role', attributes['role']
@@ -305,9 +303,8 @@ context "Parser" do
 
   test 'parse style attribute with style, id and multiple roles' do
     attributes = {1 => 'style#id.role1.role2'}
-    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
+    style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
-    assert_nil original_style
     assert_equal 'style', attributes['style']
     assert_equal 'id', attributes['id']
     assert_equal 'role1 role2', attributes['role']
@@ -316,9 +313,8 @@ context "Parser" do
 
   test 'parse style attribute with style, multiple roles and id' do
     attributes = {1 => 'style.role1.role2#id'}
-    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
+    style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
-    assert_nil original_style
     assert_equal 'style', attributes['style']
     assert_equal 'id', attributes['id']
     assert_equal 'role1 role2', attributes['role']
@@ -327,18 +323,16 @@ context "Parser" do
 
   test 'parse style attribute with positional and original style' do
     attributes = {1 => 'new_style', 'style' => 'original_style'}
-    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
+    style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'new_style', style
-    assert_equal 'original_style', original_style
     assert_equal 'new_style', attributes['style']
     assert_equal 'new_style', attributes[1]
   end
 
   test 'parse style attribute with id and role only' do
     attributes = {1 => '#id.role'}
-    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
+    style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
-    assert_nil original_style
     assert_equal 'id', attributes['id']
     assert_equal 'role', attributes['role']
     assert_equal '#id.role', attributes[1]
@@ -346,9 +340,8 @@ context "Parser" do
 
   test 'parse empty style attribute' do
     attributes = {1 => nil}
-    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
+    style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
-    assert_nil original_style
     assert_nil attributes['id']
     assert_nil attributes['role']
     assert_nil attributes[1]
@@ -356,9 +349,8 @@ context "Parser" do
 
   test 'parse style attribute with option should preserve existing options' do
     attributes = {1 => '%header', 'options' => 'footer', 'footer-option' => ''}
-    style, original_style = Asciidoctor::Parser.parse_style_attribute(attributes)
+    style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
-    assert_nil original_style
     assert_equal 'header,footer', attributes['options']
     assert_equal '', attributes['header-option']
     assert_equal '', attributes['footer-option']
