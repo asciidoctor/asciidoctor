@@ -518,16 +518,16 @@ module Substitutors
 
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
-    found[:square_bracket] = source.include?('[')
-    found[:colon] = found_colon = (source.include? ':')
-    found[:macroish] = found[:square_bracket] && found_colon
-    found[:macroish_short_form] = found[:square_bracket] && found_colon && (source.include? ':[')
+    found_square_bracket = found[:square_bracket] = (source.include? '[')
+    found_colon = source.include? ':'
+    found_macroish = found[:macroish] = found_square_bracket && found_colon
+    found_macroish_short = found_macroish && (source.include? ':[')
     doc_attrs = @document.attributes
     use_link_attrs = doc_attrs.key? 'linkattrs'
     result = source
 
     if doc_attrs.key? 'experimental'
-      if found[:macroish_short_form] && (result.include?('kbd:') || result.include?('btn:'))
+      if found_macroish_short && ((result.include? 'kbd:') || (result.include? 'btn:'))
         result = result.gsub(KbdBtnInlineMacroRx) {
           # honor the escape
           if $1
@@ -557,7 +557,7 @@ module Substitutors
         }
       end
 
-      if found[:macroish] && result.include?('menu:')
+      if found_macroish && (result.include? 'menu:')
         result = result.gsub(MenuInlineMacroRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
@@ -584,7 +584,7 @@ module Substitutors
         }
       end
 
-      if result.include?('"') && result.include?('&gt;')
+      if (result.include? '"') && (result.include? '&gt;')
         result = result.gsub(MenuInlineRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
@@ -604,7 +604,7 @@ module Substitutors
 
     # FIXME this location is somewhat arbitrary, probably need to be able to control ordering
     # TODO this handling needs some cleanup
-    if (extensions = @document.extensions) && extensions.inline_macros? # && found[:macroish]
+    if (extensions = @document.extensions) && extensions.inline_macros? # && found_macroish
       extensions.inline_macros.each do |extension|
         result = result.gsub(extension.instance.regexp) {
           # alias match for Ruby 1.8.7 compat
@@ -639,7 +639,7 @@ module Substitutors
       end
     end
 
-    if found[:macroish] && (result.include?('image:') || result.include?('icon:'))
+    if found_macroish && ((result.include? 'image:') || (result.include? 'icon:'))
       # image:filename.png[Alt Text]
       result = result.gsub(ImageInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
@@ -663,7 +663,7 @@ module Substitutors
     end
 
     if ((result.include? '((') && (result.include? '))')) ||
-        (found[:macroish_short_form] && (result.include? 'indexterm'))
+        (found_macroish_short && (result.include? 'indexterm'))
       # (((Tigers,Big cats)))
       # indexterm:[Tigers,Big cats]
       # ((Tigers))
@@ -815,7 +815,7 @@ module Substitutors
       }
     end
 
-    if found[:macroish] && (result.include? 'link:') || (result.include? 'mailto:')
+    if found_macroish && ((result.include? 'link:') || (result.include? 'mailto:'))
       # inline link macros, link:target[text]
       result = result.gsub(LinkInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
@@ -898,7 +898,7 @@ module Substitutors
       }
     end
 
-    if found[:macroish_short_form] && result.include?('footnote')
+    if found_macroish_short && (result.include? 'footnote')
       result = result.gsub(FootnoteInlineMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
