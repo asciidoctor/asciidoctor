@@ -1391,8 +1391,22 @@ module Extensions
       groups[name] = resolved_group
     end
 
+    # Public: Unregister all statically-registered extension groups.
+    #
+    # Returns nothing
     def unregister_all
       @groups = {}
+      nil
+    end
+
+    # Public: Unregister statically-registered extension groups by name.
+    #
+    # names - one or more Symbol or String group names to unregister
+    #
+    # Returns nothing
+    def unregister *names
+      names.each {|group| @groups.delete group.to_sym }
+      nil
     end
 
     # Internal: Resolve the specified object as a Class

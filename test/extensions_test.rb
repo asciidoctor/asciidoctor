@@ -220,6 +220,43 @@ context 'Extensions' do
       end
     end
 
+    test 'should unregister extension group by symbol name' do
+      begin
+        Asciidoctor::Extensions.register :sample, SampleExtensionGroup
+        refute_nil Asciidoctor::Extensions.groups
+        assert_equal 1, Asciidoctor::Extensions.groups.size
+        Asciidoctor::Extensions.unregister :sample
+        assert_equal 0, Asciidoctor::Extensions.groups.size
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should unregister extension group by string name' do
+      begin
+        Asciidoctor::Extensions.register :sample, SampleExtensionGroup
+        refute_nil Asciidoctor::Extensions.groups
+        assert_equal 1, Asciidoctor::Extensions.groups.size
+        Asciidoctor::Extensions.unregister 'sample'
+        assert_equal 0, Asciidoctor::Extensions.groups.size
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should unregister multiple extension groups by name' do
+      begin
+        Asciidoctor::Extensions.register :sample1, SampleExtensionGroup
+        Asciidoctor::Extensions.register :sample2, SampleExtensionGroup
+        refute_nil Asciidoctor::Extensions.groups
+        assert_equal 2, Asciidoctor::Extensions.groups.size
+        Asciidoctor::Extensions.unregister :sample1, :sample2
+        assert_equal 0, Asciidoctor::Extensions.groups.size
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should get class for top-level class name' do
       clazz = Asciidoctor::Extensions.class_for_name 'String'
       refute_nil clazz
