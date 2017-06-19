@@ -1063,7 +1063,7 @@ module Substitutors
   # Returns the converted String text
   def sub_post_replacements(text)
     if (@document.attributes.key? 'hardbreaks') || (@attributes.key? 'hardbreaks-option')
-      lines = (text.split EOL, -1)
+      lines = text.split EOL, -1
       return text if lines.size < 2
       last = lines.pop
       (lines.map {|line|
