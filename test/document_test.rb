@@ -2318,7 +2318,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     test 'keeps naughty relative paths from getting outside' do
       naughty_path = 'safe/ok/../../../../../etc/passwd'
       doc = empty_document
-      secure_path = doc.normalize_asset_path(naughty_path)
+      secure_path = redirect_streams { doc.normalize_asset_path(naughty_path) }
       assert naughty_path != secure_path
       assert_match(/^#{doc.base_dir}/, secure_path)
     end
