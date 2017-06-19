@@ -96,14 +96,25 @@ linus.torvalds@example.com
       assert_equal 'Asciidoctor 1.0', doc.attributes['release']
     end
 
-    test "assigns attribute to empty string if substitution fails to resolve attribute" do
-      doc = document_from_string ":release: Asciidoctor {version}", :attributes => { 'attribute-missing' => 'drop-line' }
+    test 'assigns attribute to empty string if substitution fails to resolve attribute' do
+      input = ':release: Asciidoctor {version}'
+      doc, warnings = redirect_streams do |_, err|
+        [(document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }), err.string]
+      end
       assert_equal '', doc.attributes['release']
+      assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
-    test "assigns multi-line attribute to empty string if substitution fails to resolve attribute" do
-      doc = document_from_string ":release: Asciidoctor +\n          {version}", :attributes => { 'attribute-missing' => 'drop-line' }
+    test 'assigns multi-line attribute to empty string if substitution fails to resolve attribute' do
+      input = <<-EOS
+:release: Asciidoctor +
+          {version}
+      EOS
+      doc, warnings = redirect_streams do |_, err|
+        [(document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }), err.string]
+      end
       assert_equal '', doc.attributes['release']
+      assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
     test 'resolves attributes inside attribute value within header' do
@@ -503,7 +514,7 @@ Yo, {myfrog}!
       assert_xpath '(//p)[1][text()="Yo, Tanglefoot!"]', output, 1
     end
 
-    test "ignores lines with bad attributes if attribute-missing is drop-line" do
+    test 'ignores lines with bad attributes if attribute-missing is drop-line' do
       input = <<-EOS
 :attribute-missing: drop-line
 
@@ -511,9 +522,10 @@ This is
 blah blah {foobarbaz}
 all there is.
       EOS
-      html = render_embedded_string input
-      result = Nokogiri::HTML(html)
-      refute_match(/blah blah/m, result.css("p").first.content.strip)
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+      para = xmlnodes_at_css 'p', output, 1
+      refute_includes 'blah blah', para.content
+      assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
     test "attribute value gets interpretted when rendering" do
@@ -531,9 +543,10 @@ Line 1: This line should appear in the output.
 Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
       EOS
 
-      output = render_embedded_string input
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert_match(/Line 1/, output)
       refute_match(/Line 2/, output)
+      assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
     test 'should not drop line with reference to missing attribute by default' do
@@ -803,7 +816,7 @@ of the attribute named foo in your document.
 {set:foo!}
 {foo}yes
       EOS
-      output = render_embedded_string input
+      output = redirect_streams { render_embedded_string input }
       assert_xpath '//p', output, 1
       assert_xpath '//p/child::text()', output, 0
     end
