@@ -1022,20 +1022,6 @@ doctype={doctype}
       assert_includes result, '{backend-html5-doctype-article}'
     end
 
-    test 'compat mode can be activated in asciidoc table cell' do
-      input = <<-EOS
-|===
-a|
-:compat-mode:
-
-'italic'
-|===
-      EOS
-
-      result = render_embedded_string input
-      assert_css 'table.tableblock td em', result, 1
-    end
-
     test 'asciidoc content' do
       input = <<-EOS
 [cols="1e,1,5a",frame="topbot",options="header"]
@@ -1165,6 +1151,68 @@ key: value <1>
       ['CO1-1', 'CO2-1', 'CO3-1'].each_with_index do |callout, idx|
         assert_equal callout, callouts[idx].attribute('arearefs').value
       end
+    end
+
+    test 'compat mode can be activated in AsciiDoc table cell' do
+      input = <<-EOS
+|===
+a|
+:compat-mode:
+
+The word 'italic' is emphasized.
+|===
+      EOS
+
+      result = render_embedded_string input
+      assert_xpath '//em[text()="italic"]', result, 1
+    end
+
+    test 'compat mode in AsciiDoc table cell inherits from parent document' do
+      input = <<-EOS
+:compat-mode:
+
+The word 'italic' is emphasized.
+
+[cols=1*]
+|===
+|The word 'oblique' is emphasized.
+a|
+The word 'slanted' is emphasized.
+|===
+
+The word 'askew' is emphasized.
+      EOS
+
+      result = render_embedded_string input
+      assert_xpath '//em[text()="italic"]', result, 1
+      assert_xpath '//em[text()="oblique"]', result, 1
+      assert_xpath '//em[text()="slanted"]', result, 1
+      assert_xpath '//em[text()="askew"]', result, 1
+    end
+
+    test 'compat mode in AsciiDoc table cell can be unset if set in parent document' do
+      input = <<-EOS
+:compat-mode:
+
+The word 'italic' is emphasized.
+
+[cols=1*]
+|===
+|The word 'oblique' is emphasized.
+a|
+:!compat-mode:
+
+The word 'slanted' is not emphasized.
+|===
+
+The word 'askew' is emphasized.
+      EOS
+
+      result = render_embedded_string input
+      assert_xpath '//em[text()="italic"]', result, 1
+      assert_xpath '//em[text()="oblique"]', result, 1
+      assert_xpath '//em[text()="slanted"]', result, 0
+      assert_xpath '//em[text()="askew"]', result, 1
     end
 
     test 'nested table' do

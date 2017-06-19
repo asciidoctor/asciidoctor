@@ -197,7 +197,7 @@ class Document < AbstractBlock
       attr_overrides.delete 'toc-placement'
       attr_overrides.delete 'toc-position'
       @safe = parent_doc.safe
-      @compat_mode = parent_doc.compat_mode
+      @attributes['compat-mode'] = '' if (@compat_mode = parent_doc.compat_mode)
       @sourcemap = parent_doc.sourcemap
       @converter = parent_doc.converter
       initialize_extensions = false
@@ -769,11 +769,8 @@ class Document < AbstractBlock
       attrs['toc-class'] ||= default_toc_class if default_toc_class
     end
 
-    if attrs.key? 'compat-mode'
+    if (@compat_mode = attrs.key? 'compat-mode')
       attrs['source-language'] = attrs['language'] if attrs.key? 'language'
-      @compat_mode = true
-    else
-      @compat_mode = false
     end
 
     # NOTE pin the outfilesuffix after the header is parsed
