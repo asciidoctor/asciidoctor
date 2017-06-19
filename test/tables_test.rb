@@ -152,7 +152,7 @@ context 'Tables' do
 A | here| a | there
 |===
       EOS
-      output = render_embedded_string input
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 4
       assert_css 'table > tbody > tr', output, 1
@@ -161,6 +161,7 @@ A | here| a | there
       assert_xpath '/table/tbody/tr/td[2]/p[text()="here"]', output, 1
       assert_xpath '/table/tbody/tr/td[3]/p[text()="a"]', output, 1
       assert_xpath '/table/tbody/tr/td[4]/p[text()="there"]', output, 1
+      assert_includes warnings, 'table missing leading separator'
     end
 
     test 'performs normal substitutions on cell content' do
@@ -867,9 +868,10 @@ a|C
 more C
 |===
       EOS
-      output = render_embedded_string input
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert_css 'table', output, 1
       assert_css 'table *', output, 0
+      assert_includes warnings, 'exceeds specified number of columns'
     end
 
     test 'paragraph, verse and literal content' do
