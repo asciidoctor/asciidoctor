@@ -202,7 +202,7 @@ module Asciidoctor
 <imageobject>
 <imagedata fileref="#{node.image_uri(node.attr 'target')}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}/>
 </imageobject>
-<textobject><phrase>#{node.attr 'alt'}</phrase></textobject>
+<textobject><phrase>#{encode_alt_text node, (node.attr 'alt')}</phrase></textobject>
 </mediaobject>)
 
       if node.title?

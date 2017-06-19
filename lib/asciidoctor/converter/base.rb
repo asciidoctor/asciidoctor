@@ -51,5 +51,11 @@ module Asciidoctor
     def skip node
       nil
     end
+
+    # QUESTION does this method belong somewhere else?
+    def encode_alt_text node, val, to_attr = false
+      val = node.sub_specialchars val if (val.include? '<') || (val.include? '&') || (val.include? '>')
+      to_attr && (val.include? '"') ? (val.gsub '"', '&quot;') : val
+    end
   end
 end

@@ -1638,20 +1638,20 @@ image::images/tiger.png[Tiger]
 
     test 'alt text is escaped in HTML backend' do
       input = <<-EOS
-image::images/open.png[File > Open]
+image::images/open.png[Select "File > Open"]
       EOS
 
       output = render_embedded_string input
-      assert_match(/File &gt; Open/, output)
+      assert_match(/Select &quot;File &gt; Open&quot;/, output)
     end
 
     test 'alt text is escaped in DocBook backend' do
       input = <<-EOS
-image::images/open.png[File > Open]
+image::images/open.png[Select "File > Open"]
       EOS
 
       output = render_embedded_string input, :backend => :docbook
-      assert_match(/File &gt; Open/, output)
+      assert_match(/Select "File &gt; Open"/, output)
     end
 
     test "can render block image with auto-generated alt text" do
