@@ -4170,10 +4170,11 @@ foo::
 
 <1> Not pointing to a callout
     EOS
-    output = render_embedded_string input
+    output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
     assert_xpath '//dl//b', output, 0
     assert_xpath '//dl/dd/p[text()="bar <1>"]', output, 1
     assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
+    assert_includes warnings, 'no callouts refer to list item 1'
   end
 
   test 'should not recognize callouts in an indented outline list paragraph' do
@@ -4183,10 +4184,11 @@ foo::
 
 <1> Not pointing to a callout
     EOS
-    output = render_embedded_string input
+    output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
     assert_xpath '//ul//b', output, 0
     assert_xpath %(//ul/li/p[text()="foo\nbar <1>"]), output, 1
     assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
+    assert_includes warnings, 'no callouts refer to list item 1'
   end
 
   test 'should remove line comment chars that precedes callout number' do
