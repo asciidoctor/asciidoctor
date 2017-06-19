@@ -718,6 +718,20 @@ not in section
       assert_xpath '/h2[@class="float isolated"]', output, 1
     end
 
+    test 'should ignore title attribute on discrete heading' do
+      input = <<-EOS
+[discrete,title="Captured!"]
+== Independent Heading!
+
+not in section
+      EOS
+
+      doc = document_from_string input
+      heading = doc.blocks[0]
+      assert_equal 'Independent Heading!', heading.title
+      refute heading.attributes.key? 'title'
+    end
+
     test 'should use specified id and reftext when registering discrete section reference' do
       input = <<-EOS
 [[install,Install Procedure]]

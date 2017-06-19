@@ -660,6 +660,7 @@ class Parser
           attributes['reftext'] = float_reftext if float_reftext
           block = Block.new(parent, :floating_title, :content_model => :empty)
           block.title = float_title
+          attributes.delete 'title'
           block.id = float_id || attributes['id'] ||
               ((document.attributes.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
           block.level = float_level
@@ -894,7 +895,7 @@ class Parser
     if block
       block.source_location = source_location if source_location
       # REVIEW seems like there is a better way to organize this wrap-up
-      block.title = attributes['title'] unless block.title?
+      block.title = attributes.delete 'title' if attributes.key? 'title'
       # FIXME HACK don't hardcode logic for alt, caption and scaledwidth on images down here
       if block.context == :image
         resolved_target = attributes['target']
@@ -908,7 +909,7 @@ class Parser
           attributes['scaledwidth'] = ((48..57).include? scaledwidth[-1].ord) ? %(#{scaledwidth}%) : scaledwidth
         end
       else
-        block.caption ||= attributes.delete('caption')
+        block.caption ||= attributes.delete 'caption'
       end
       # TODO eventually remove the style attribute from the attributes hash
       #block.style = attributes.delete('style')
