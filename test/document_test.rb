@@ -361,6 +361,21 @@ idseparator=-')
       assert_equal 1, section_1.lineno
     end
 
+    test 'should assign correct source location if section occurs on last line of input' do
+      input = <<-EOS
+= Document Title
+
+== Section A
+
+content
+
+== Section B
+      EOS
+
+      doc = document_from_string input, :sourcemap => true
+      assert_equal [1, 3, 7], (doc.find_by :context => :section).map(&:lineno)
+    end
+
     test 'should allow sourcemap option on document to be modified' do
       doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), :parse => false
       doc.sourcemap = true
