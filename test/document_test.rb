@@ -352,6 +352,19 @@ idseparator=-')
       assert_equal 'sample.asciidoc', last_block.file
       assert_equal 23, last_block.lineno
 
+      list_items = last_block.blocks
+      refute_nil list_items[0].source_location
+      assert_equal 'sample.asciidoc', list_items[0].file
+      assert_equal 23, list_items[0].lineno
+
+      refute_nil list_items[1].source_location
+      assert_equal 'sample.asciidoc', list_items[1].file
+      assert_equal 24, list_items[1].lineno
+
+      refute_nil list_items[2].source_location
+      assert_equal 'sample.asciidoc', list_items[2].file
+      assert_equal 25, list_items[2].lineno
+
       doc = Asciidoctor.load_file fixture_path('master.adoc'), :sourcemap => true, :safe => :safe
 
       section_1 = doc.sections[0]
@@ -359,6 +372,129 @@ idseparator=-')
       refute_nil section_1.source_location
       assert_equal fixture_path('chapter-a.adoc'), section_1.file
       assert_equal 1, section_1.lineno
+    end
+
+    test 'should track file and line information on list items if sourcemap option is set' do
+      doc = Asciidoctor.load_file fixture_path('lists.adoc'), :sourcemap => true
+
+      first_section = doc.blocks[1]
+
+      unordered_basic_list = first_section.blocks[0]
+      assert_equal 11, unordered_basic_list.lineno
+      unordered_basic_list_items = unordered_basic_list.find_by(:context => :list_item)
+      assert_equal 3, unordered_basic_list_items.length
+      assert_equal 11, unordered_basic_list_items[0].lineno
+      assert_equal 12, unordered_basic_list_items[1].lineno
+      assert_equal 13, unordered_basic_list_items[2].lineno
+
+      unordered_max_nesting = first_section.blocks[1]
+      assert_equal 16, unordered_max_nesting.lineno
+      unordered_max_nesting_items = unordered_max_nesting.find_by(:context => :list_item)
+      assert_equal 2, unordered_max_nesting.blocks.length
+      assert_equal 6, unordered_max_nesting_items.length
+      assert_equal 16, unordered_max_nesting_items[0].lineno
+      assert_equal 17, unordered_max_nesting_items[1].lineno
+      assert_equal 18, unordered_max_nesting_items[2].lineno
+      assert_equal 19, unordered_max_nesting_items[3].lineno
+      assert_equal 20, unordered_max_nesting_items[4].lineno
+      assert_equal 21, unordered_max_nesting_items[5].lineno
+
+      checklist = first_section.blocks[2]
+      assert_equal 24, checklist.lineno
+      checklist_list_items = checklist.find_by(:context => :list_item)
+      assert_equal 4, checklist_list_items.length
+      assert_equal 24, checklist_list_items[0].lineno
+      assert_equal 25, checklist_list_items[1].lineno
+      assert_equal 26, checklist_list_items[2].lineno
+      assert_equal 27, checklist_list_items[3].lineno
+
+      ordered_basic = first_section.blocks[3]
+      assert_equal 30, ordered_basic.lineno
+      ordered_basic_list_items = ordered_basic.find_by(:context => :list_item)
+      assert_equal 3, ordered_basic_list_items.length
+      assert_equal 30, ordered_basic_list_items[0].lineno
+      assert_equal 31, ordered_basic_list_items[1].lineno
+      assert_equal 32, ordered_basic_list_items[2].lineno
+
+      ordered_nested = first_section.blocks[4]
+      assert_equal 35, ordered_nested.lineno
+      ordered_nested_list_items = ordered_nested.find_by(:context => :list_item)
+      assert_equal 5, ordered_nested_list_items.length
+      assert_equal 35, ordered_nested_list_items[0].lineno
+      assert_equal 36, ordered_nested_list_items[1].lineno
+      assert_equal 37, ordered_nested_list_items[2].lineno
+      assert_equal 38, ordered_nested_list_items[3].lineno
+      assert_equal 39, ordered_nested_list_items[4].lineno
+
+      ordered_max_nesting = first_section.blocks[5]
+      assert_equal 42, ordered_max_nesting.lineno
+      ordered_max_nesting_items = ordered_max_nesting.find_by(:context => :list_item)
+      assert_equal 6, ordered_max_nesting_items.length
+      assert_equal 42, ordered_max_nesting_items[0].lineno
+      assert_equal 43, ordered_max_nesting_items[1].lineno
+      assert_equal 44, ordered_max_nesting_items[2].lineno
+      assert_equal 45, ordered_max_nesting_items[3].lineno
+      assert_equal 46, ordered_max_nesting_items[4].lineno
+      assert_equal 47, ordered_max_nesting_items[5].lineno
+
+      labeled_singleline = first_section.blocks[6]
+      assert_equal 50, labeled_singleline.lineno
+      labeled_singleline_items = labeled_singleline.find_by(:context => :list_item)
+      assert_equal 4, labeled_singleline_items.length
+      assert_equal 50, labeled_singleline_items[0].lineno
+      assert_equal 50, labeled_singleline_items[1].lineno
+      assert_equal 51, labeled_singleline_items[2].lineno
+      assert_equal 51, labeled_singleline_items[3].lineno
+
+      labeled_multiline = first_section.blocks[7]
+      assert_equal 54, labeled_multiline.lineno
+      labeled_multiline_items = labeled_multiline.find_by(:context => :list_item)
+      assert_equal 4, labeled_multiline_items.length
+      assert_equal 54, labeled_multiline_items[0].lineno
+      assert_equal 55, labeled_multiline_items[1].lineno
+      assert_equal 56, labeled_multiline_items[2].lineno
+      assert_equal 57, labeled_multiline_items[3].lineno
+
+      qanda = first_section.blocks[8]
+      assert_equal 61, qanda.lineno
+      qanda_items = qanda.find_by(:context => :list_item)
+      assert_equal 4, qanda_items.length
+      assert_equal 61, qanda_items[0].lineno
+      assert_equal 62, qanda_items[1].lineno
+      assert_equal 63, qanda_items[2].lineno
+      assert_equal 63, qanda_items[3].lineno
+
+      mixed = first_section.blocks[9]
+      assert_equal 66, mixed.lineno
+      mixed_items = mixed.find_by(:context => :list_item){|block| block.text?}
+      assert_equal 17, mixed_items.length
+      assert_equal 66, mixed_items[0].lineno
+      assert_equal 67, mixed_items[1].lineno
+      assert_equal 68, mixed_items[2].lineno
+      assert_equal 69, mixed_items[3].lineno
+      assert_equal 70, mixed_items[4].lineno
+      assert_equal 71, mixed_items[5].lineno
+      assert_equal 72, mixed_items[6].lineno
+      assert_equal 73, mixed_items[7].lineno
+      assert_equal 74, mixed_items[8].lineno
+      assert_equal 75, mixed_items[9].lineno
+      assert_equal 77, mixed_items[10].lineno
+      assert_equal 78, mixed_items[11].lineno
+      assert_equal 79, mixed_items[12].lineno
+      assert_equal 80, mixed_items[13].lineno
+      assert_equal 81, mixed_items[14].lineno
+      assert_equal 82, mixed_items[15].lineno
+      assert_equal 83, mixed_items[16].lineno
+
+      unordered_complex_list = first_section.blocks[10]
+      assert_equal 86, unordered_complex_list.lineno
+      unordered_complex_items = unordered_complex_list.find_by(:context => :list_item)
+      assert_equal 5, unordered_complex_items.length
+      assert_equal 86, unordered_complex_items[0].lineno
+      assert_equal 87, unordered_complex_items[1].lineno
+      assert_equal 88, unordered_complex_items[2].lineno
+      assert_equal 92, unordered_complex_items[3].lineno
+      assert_equal 96, unordered_complex_items[4].lineno
     end
 
     test 'should allow sourcemap option on document to be modified' do

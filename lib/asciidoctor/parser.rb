@@ -1282,7 +1282,9 @@ class Parser
   def self.next_list_item(reader, list_block, match, sibling_trait = nil)
     if (list_type = list_block.context) == :dlist
       list_term = ListItem.new(list_block, match[1])
+      list_term.source_location = reader.cursor if list_block.document.sourcemap
       list_item = ListItem.new(list_block, match[3])
+      list_item.source_location = reader.cursor if list_block.document.sourcemap
       has_text = !match[3].nil_or_empty?
     else
       # Create list item using first line as the text of the list item
@@ -1300,6 +1302,7 @@ class Parser
         end
       end
       list_item = ListItem.new(list_block, text)
+      list_item.source_location = reader.cursor if list_block.document.sourcemap
 
       if checkbox
         # FIXME checklist never makes it into the options attribute
@@ -1315,7 +1318,9 @@ class Parser
 
     # first skip the line with the marker / term
     reader.advance
-    list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), reader.cursor
+    cursor = reader.cursor
+
+    list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), cursor
     if list_item_reader.has_more_lines?
       # NOTE peek on the other side of any comment lines
       comment_lines = list_item_reader.skip_line_comments
@@ -1342,6 +1347,9 @@ class Parser
       # list
       while list_item_reader.has_more_lines?
         if (new_block = next_block(list_item_reader, list_item, {}, options))
+          if list_type == :dlist
+            list_item.source_location = cursor if list_block.document.sourcemap
+          end
           list_item << new_block
         end
       end
