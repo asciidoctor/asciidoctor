@@ -1051,7 +1051,7 @@ class PreprocessorReader < Reader
       @file = file
       @dir = File.dirname file
       # only process lines in AsciiDoc files
-      @process_lines = ASCIIDOC_EXTENSIONS[::File.extname(file)]
+      @process_lines = ASCIIDOC_EXTENSIONS[::File.extname file]
     else
       @file = nil
       @dir = '.' # right?
