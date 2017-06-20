@@ -1841,6 +1841,28 @@ foo&#8201;&#8212;&#8201;'
       block.lock_in_subs
       assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
     end
+
+    test 'should print a warning if verbose flag is set and xref is not found' do
+      xref = 'testing1'
+      input = <<-EOS
+[[testing]]
+== Section 1
+
+== Section 2
+
+See <<#{xref}>>.
+EOS
+      old_verbose = $VERBOSE
+      $VERBOSE = true
+      warnings = nil
+      redirect_streams do |out, err|
+        render_string input
+        warnings = err.string
+      end
+      $VERBOSE = old_verbose
+      assert !warnings.empty?
+      assert_match(/asciidoctor: WARNING: could not resolve xref: #{xref}/, warnings.chomp)
+    end
   end
 
   # TODO move to helpers_test.rb
