@@ -1023,11 +1023,13 @@ module Substitutors
           end
         # handles: id or Section Title
         else
+          if !(@document.catalog[:ids].key? fragment)
+            warn %(asciidoctor: WARNING: could not resolve xref: #{fragment}) if $VERBOSE
           # resolve fragment as reftext if it's not a known ID and resembles reftext (includes space or has uppercase char)
-          if !(@document.catalog[:ids].key? fragment) &&
-              ((fragment.include? ' ') || fragment.downcase != fragment) &&
+            if ((fragment.include? ' ') || fragment.downcase != fragment) &&
               (resolved_id = @document.catalog[:ids].key fragment)
-            fragment = resolved_id
+              fragment = resolved_id
+            end
           end
           refid, target = fragment, %(##{fragment})
         end
