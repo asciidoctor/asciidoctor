@@ -356,7 +356,7 @@ module Asciidoctor
 
   # attributes which be changed within the content of the document (but not
   # header) because it has semantic meaning; ex. sectnums
-  FLEXIBLE_ATTRIBUTES = %w(sectnums)
+  FLEXIBLE_ATTRIBUTES = ['sectnums']
 
   # A collection of regular expressions used by the parser.
   #
