@@ -536,11 +536,8 @@ class Parser
                   posattrs = ['alt', 'width', 'height']
                 end
                 block.parse_attributes(match[3], posattrs, :sub_input => true, :sub_result => false, :into => attributes)
-                if attributes.key? 'style'
-                  # NOTE style is the value of the first positional attribute in the block attribute line
-                  attributes['alt'] ||= style if style && blk_ctx == :image
-                  attributes.delete 'style'
-                end
+                # style doesn't have special meaning for media macros
+                attributes.delete 'style' if attributes.key? 'style'
                 if (target = match[2]).include? '{'
                   target = block.sub_attributes target, :attribute_missing => 'drop-line'
                 end
@@ -554,7 +551,17 @@ class Parser
                     return
                   end
                 end
-
+                if blk_ctx == :image
+                  block.document.register :images, target
+                  # NOTE style is the value of the first positional attribute in the block attribute line
+                  attributes['alt'] ||= style || ((Helpers.basename target, true).tr '_-', ' ')
+                  unless (scaledwidth = attributes.delete 'scaledwidth').nil_or_empty?
+                    # NOTE assume % units if not specified
+                    attributes['scaledwidth'] = (TrailingDigitsRx.match? scaledwidth) ? %(#{scaledwidth}%) : scaledwidth
+                  end
+                  block.title = attributes.delete 'title'
+                  block.assign_caption((attributes.delete 'caption'), 'figure')
+                end
                 attributes['target'] = target
                 break
 
@@ -894,25 +901,12 @@ class Parser
     # FIXME we've got to clean this up, it's horrible!
     if block
       block.source_location = source_location if source_location
-      # REVIEW seems like there is a better way to organize this wrap-up
+      # FIXME title should have already been assigned
       block.title = attributes.delete 'title' if attributes.key? 'title'
-      # FIXME HACK don't hardcode logic for alt, caption and scaledwidth on images down here
-      if block.context == :image
-        resolved_target = attributes['target']
-        block.document.register(:images, resolved_target)
-        alt = (attributes['alt'] || Helpers.basename(resolved_target, true).tr('_-', ' '))
-        alt = block.sub_specialchars alt if (alt.include? '<') || (alt.include? '&') || (alt.include? '>')
-        attributes['alt'] = alt
-        block.assign_caption attributes.delete('caption'), 'figure'
-        unless (scaledwidth = attributes.delete 'scaledwidth').nil_or_empty?
-          # append % to scaledwidth if it ends with a number (no units present)
-          attributes['scaledwidth'] = ((48..57).include? scaledwidth[-1].ord) ? %(#{scaledwidth}%) : scaledwidth
-        end
-      else
-        block.caption ||= attributes.delete 'caption'
-      end
+      # FIXME caption should have already been assigned
+      block.caption ||= attributes.delete 'caption'
       # TODO eventually remove the style attribute from the attributes hash
-      #block.style = attributes.delete('style')
+      #block.style = attributes.delete 'style'
       block.style = attributes['style']
       # AsciiDoc Python always use [id] as the reftext in HTML output,
       # but I'd like to do better in Asciidoctor
