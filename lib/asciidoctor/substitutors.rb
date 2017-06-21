@@ -1383,7 +1383,7 @@ module Substitutors
 
     case highlighter
     when 'coderay'
-      if (linenums_mode = (attr? 'linenums') ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)
+      if (linenums_mode = (attr? 'linenums', nil, false) ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)
         if attr? 'highlight', nil, false
           highlight_lines = resolve_highlight_lines(attr 'highlight', nil, false)
         end
@@ -1408,7 +1408,7 @@ module Substitutors
         end
       end
       # TODO we could add the line numbers in ourselves instead of having to strip out the junk
-      if (attr? 'linenums') && (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
+      if (attr? 'linenums', nil, false) && (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
         linenums_mode = :table
         result = lexer.highlight(source, :options => opts).sub(PygmentsWrapperDivRx, '\1').gsub(PygmentsWrapperPreRx, '\1')
       else

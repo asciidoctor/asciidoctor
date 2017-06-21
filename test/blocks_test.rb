@@ -2458,6 +2458,33 @@ puts 'Hello, World!'
       assert_xpath '//td[@class="line-numbers"]', output, 1
     end
 
+    test 'should number lines if linenums option is set on source block' do
+      input = <<-EOS
+:source-highlighter: coderay
+
+[source%linenums,ruby]
+----
+puts 'Hello, World!'
+----
+      EOS
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_xpath '//td[@class="line-numbers"]', output, 1
+    end
+
+    test 'should number lines of source block if source-linenums-option document attribute is set' do
+      input = <<-EOS
+:source-highlighter: coderay
+:source-linenums-option:
+
+[source,ruby]
+----
+puts 'Hello, World!'
+----
+      EOS
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_xpath '//td[@class="line-numbers"]', output, 1
+    end
+
     test 'should read source language from source-language document attribute if not specified on source block' do
       input = <<-EOS
 :source-highlighter: coderay
