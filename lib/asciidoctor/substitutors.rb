@@ -536,14 +536,13 @@ module Substitutors
             if (keys = $3.strip).include? R_SB
               keys = keys.gsub ESC_R_SB, R_SB
             end
-            if keys.length > 1 && (delim = keys[KbdDelimiterRx])
-              # NOTE handle special case of Ctrl++ or Ctrl,,
+            if keys.length > 1 && (delim_idx = (delim_idx = keys.index ',', 1) ?
+                [delim_idx, (keys.index '+', 1)].compact.min : (keys.index '+', 1))
+              delim = keys.slice delim_idx, 1
+              # NOTE handle special case where keys ends with delimiter (e.g., Ctrl++ or Ctrl,,)
               if keys.end_with? delim
-                keys = keys.split(delim, -1).map {|key| key.strip }
-                if keys[-1].empty?
-                  keys.pop
-                  keys[-1] = delim if keys[-1].empty?
-                end
+                keys = (keys.chop.split delim, -1).map {|key| key.strip }
+                keys[-1] = %(#{keys[-1]}#{delim})
               else
                 keys = keys.split(delim).map {|key| key.strip }
               end
