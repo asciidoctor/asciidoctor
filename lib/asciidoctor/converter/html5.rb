@@ -555,13 +555,13 @@ Your browser does not support the audio tag.
       if ((node.attr? 'format', 'svg', false) || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE &&
           ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
         if svg
-          img = (read_svg_contents node, target) || %(<span class="alt">#{encode_alt_text node, (node.attr 'alt')}</span>)
+          img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt_text}</span>)
         elsif obj
-          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{encode_alt_text node, (node.attr 'alt'), true}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{encode_alt_text node, (node.attr 'alt')}</span>)
+          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{node.alt_text :attr}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt_text}</span>)
           img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
         end
       end
-      img ||= %(<img src="#{node.image_uri target}" alt="#{encode_alt_text node, (node.attr 'alt'), true}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+      img ||= %(<img src="#{node.image_uri target}" alt="#{node.alt_text :attr}"#{width_attr}#{height_attr}#{@void_element_slash}>)
       if node.attr? 'link'
         window_attr = %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window'
         img = %(<a class="image" href="#{node.attr 'link'}"#{window_attr}>#{img}</a>)
