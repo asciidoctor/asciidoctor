@@ -155,7 +155,7 @@ class Section < AbstractBlock
       gen_id = gen_id.chop if gen_id.end_with? sep
       # ensure id doesn't begin with idseparator if idprefix is empty and idseparator is not empty
       if pre.empty?
-        gen_id = gen_id[1..-1] while gen_id.start_with? sep
+        gen_id = gen_id.slice 1, gen_id.length while gen_id.start_with? sep
       end
     end
     if document.catalog[:ids].key? gen_id
