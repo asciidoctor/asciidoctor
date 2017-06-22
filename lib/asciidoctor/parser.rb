@@ -741,8 +741,8 @@ class Parser
           elsif (ADMONITION_STYLE_LEADERS.include? ch0) && (this_line.include? ':') && (admonition_match = AdmonitionParagraphRx.match this_line)
             lines[0] = admonition_match.post_match
             attributes['name'] = admonition_name = (attributes['style'] = admonition_match[1]).downcase
-            attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
             block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
+            block.caption = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
           elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
             lines.map! {|line| line == '>' ? line[1..-1] : ((line.start_with? '> ') ? line[2..-1] : line) }
             if lines[-1].start_with? '-- '
@@ -785,8 +785,8 @@ class Parser
         case block_context
         when :admonition
           attributes['name'] = admonition_name = style.downcase
-          attributes['caption'] ||= document.attributes[%(#{admonition_name}-caption)]
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+          block.caption = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
 
         when :comment
           build_block(block_context, :skip, terminator, parent, reader, attributes)
