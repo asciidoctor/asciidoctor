@@ -1256,6 +1256,16 @@ EOS
         para = block_from_string("kbd:[Ctrl + #{BACKSLASH} ]", :attributes => {'experimental' => ''})
         assert_equal %q(<span class="keyseq"><kbd>Ctrl</kbd>+<kbd>\\</kbd></span>), para.sub_macros(para.source)
       end
+
+      test 'kbd macro looks for delimiter beyond first character' do
+        para = block_from_string('kbd:[,te]', :attributes => {'experimental' => ''})
+        assert_equal %q(<kbd>,te</kbd>), para.sub_macros(para.source)
+      end
+
+      test 'kbd macro restores trailing delimiter as key value' do
+        para = block_from_string('kbd:[te,]', :attributes => {'experimental' => ''})
+        assert_equal %q(<kbd>te,</kbd>), para.sub_macros(para.source)
+      end
     end
 
     context 'Menu macro' do

@@ -902,17 +902,6 @@ module Asciidoctor
     #
     KbdBtnInlineMacroRx = /(\\)?(kbd|btn):\[(#{CC_ALL}*?[^\\])\]/m
 
-    # Matches the delimiter used for kbd value.
-    #
-    # Examples
-    #
-    #   Ctrl + Alt + T
-    #   Ctrl+,
-    #   Ctrl,T
-    #   Ctrl,+
-    #
-    KbdDelimiterRx = /[+,]/
-
     # Matches an implicit link and some of the link inline macro.
     #
     # Examples
