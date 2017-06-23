@@ -79,7 +79,7 @@ when 'userguide'
   result = Benchmark.bmbm {|bm|
     bm.report(%(Convert #{sample_file} (x#{$repeat}))) {
       $repeat.times {
-        Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :eruby => 'erubis', :header_footer => true, :to_file => false, :attributes => {'linkcss' => '', 'toc' => nil, 'numbered' => nil, 'icons' => nil, 'compat-mode' => ''}
+        Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :eruby => 'erubis', :header_footer => true, :to_file => false, :attributes => {'stylesheet' => nil, 'toc' => nil, 'numbered' => nil, 'icons' => nil, 'compat-mode' => ''}
       }
     }
   }
@@ -100,7 +100,7 @@ when 'userguide-loop'
     loop_timings = []
     (1..$repeat).each do
       start = Time.now
-      Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :eruby => 'erubis', :header_footer => true, :to_file => false, :attributes => { 'linkcss' => '', 'toc' => nil, 'numbered' => nil, 'icons' => nil, 'compat-mode' => '' }
+      Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :eruby => 'erubis', :header_footer => true, :to_file => false, :attributes => { 'stylesheet' => nil, 'toc' => nil, 'numbered' => nil, 'icons' => nil, 'compat-mode' => '' }
       loop_timings << (Time.now - start)
     end
     timings << loop_timings
@@ -123,7 +123,7 @@ when 'mdbasics-loop'
     loop_timings = []
     (1..$repeat).each do
       start = Time.now
-      Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :header_footer => false, :to_file => false, :attributes => { 'linkcss' => '', 'idprefix' => '', 'idseparator' => '-', 'showtitle' => '' }
+      Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :header_footer => false, :to_file => false, :attributes => { 'stylesheet' => nil, 'idprefix' => '', 'idseparator' => '-', 'showtitle' => '' }
       loop_timings << (Time.now - start)
     end
     timings << loop_timings
