@@ -340,10 +340,8 @@ class AbstractNode
       else
         generate_data_uri target_image, asset_dir_key
       end
-    elsif asset_dir_key
-      normalize_web_path target_image, (doc.attr asset_dir_key)
     else
-      normalize_web_path target_image
+      normalize_web_path target_image, (asset_dir_key ? (doc.attr asset_dir_key) : nil)
     end
   end
 
