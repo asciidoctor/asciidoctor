@@ -128,8 +128,7 @@ class PathResolver
     else
       @working_dir = ::File.expand_path ::Dir.pwd
     end
-    @_partition_path_sys = {}
-    @_partition_path_web = {}
+    @_partition_path_sys, @_partition_path_web = {}, {}
   end
 
   # Public: Check if the specified path is an absolute root path.
@@ -207,23 +206,23 @@ class PathResolver
   # or segments that are self references (.). The path is converted to a posix
   # path before being partitioned.
   #
-  # path     - the String path to partition
-  # web_path - a Boolean indicating whether the path should be handled
-  #            as a web path (optional, default: false)
+  # path - the String path to partition
+  # web  - a Boolean indicating whether the path should be handled
+  #        as a web path (optional, default: false)
   #
   # Returns a 3-item Array containing the Array of String path segments, the
   # path root (e.g., '/', './', 'c:/') if the path is absolute and the posix
   # version of the path.
   #--
   # QUESTION is it worth it to normalize slashes? it doubles the time elapsed
-  def partition_path path, web_path = false
-    if (result = web_path ? @_partition_path_web[path] : @_partition_path_sys[path])
+  def partition_path path, web = nil
+    if (result = (cache = web ? @_partition_path_web : @_partition_path_sys)[path])
       return result
     end
 
     posix_path = posixify path
 
-    root = if web_path
+    root = if web
       # ex. /sample/path
       if is_web_root? posix_path
         SLASH
@@ -272,7 +271,7 @@ class PathResolver
     path_segments.delete DOT
     # QUESTION should we chop trailing /? (we pay a small fraction)
     #posix_path = posix_path.chop if posix_path.end_with? SLASH
-    (web_path ? @_partition_path_web : @_partition_path_sys)[path] = [path_segments, root, posix_path]
+    cache[path] = [path_segments, root, posix_path]
   end
 
   # Public: Join the segments using the posix file separator (since Ruby knows
