@@ -285,11 +285,7 @@ class PathResolver
   # returns a String path formed by joining the segments using the posix file
   # separator and prepending the root, if specified
   def join_path segments, root = nil
-    if root
-      %(#{root}#{segments * SLASH})
-    else
-      segments * SLASH
-    end
+    root ? %(#{root}#{segments.join SLASH}) : (segments.join SLASH)
   end
 
   # Public: Resolve a system path from the target and start paths. If a jail
