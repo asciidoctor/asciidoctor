@@ -833,9 +833,9 @@ module Substitutors
             if mailto
               if attrs.key? 2
                 if attrs.key? 3
-                  target = %(#{target}?subject=#{Helpers.encode_uri attrs[2]}&amp;body=#{Helpers.encode_uri attrs[3]})
+                  target = %(#{target}?subject=#{Helpers.uri_encode attrs[2]}&amp;body=#{Helpers.uri_encode attrs[3]})
                 else
-                  target = %(#{target}?subject=#{Helpers.encode_uri attrs[2]})
+                  target = %(#{target}?subject=#{Helpers.uri_encode attrs[2]})
                 end
               end
             end

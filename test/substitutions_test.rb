@@ -1871,13 +1871,13 @@ EOS
     test 'should URI encode non-word characters generally' do
       given = ' /%&?\\'
       expect = '%20%2F%25%26%3F%5C'
-      assert_equal expect, (Asciidoctor::Helpers.encode_uri given)
+      assert_equal expect, (Asciidoctor::Helpers.uri_encode given)
     end
 
     test 'should not URI select non-word characters' do
       given = '-.!~*\';:@=+$,()[]'
       expect = given
-      assert_equal expect, (Asciidoctor::Helpers.encode_uri given)
+      assert_equal expect, (Asciidoctor::Helpers.uri_encode given)
     end
   end
 end

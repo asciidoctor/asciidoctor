@@ -149,15 +149,13 @@ module Helpers
   # Matches the characters in a URI to encode
   REGEXP_ENCODE_URI_CHARS = /[^\w\-.!~*';:@=+$,()\[\]]/
 
-  # Public: Encode a string for inclusion in a URI
+  # Public: Encode a String for inclusion in a URI.
   #
-  # str - the string to encode
+  # str - the String to URI encode
   #
-  # returns an encoded version of the str
-  def self.encode_uri(str)
-    str.gsub(REGEXP_ENCODE_URI_CHARS) do
-      $&.each_byte.map {|c| sprintf '%%%02X', c }.join
-    end
+  # Returns the String with all URI reserved characters encoded.
+  def self.uri_encode str
+    str.gsub(REGEXP_ENCODE_URI_CHARS) { $&.each_byte.map {|c| sprintf '%%%02X', c }.join }
   end
 
   # Public: Removes the file extension from filename and returns the result
