@@ -897,11 +897,13 @@ context 'Substitutions' do
 
     test 'a footnote macro may contain an xref macro' do
       # specialcharacters escaping is simulated
-      para = block_from_string('text footnote:[&lt;&lt;_install,Install&gt;&gt;]')
+      para = block_from_string('text footnote:[&lt;&lt;_install,install&gt;&gt;]')
+      catalog = para.document.catalog
+      catalog[:ids]['_install'] = 'Install'
       assert_equal %(text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
-      assert_equal 1, para.document.catalog[:footnotes].size
-      footnote1 = para.document.catalog[:footnotes][0]
-      assert_equal '<a href="#_install">Install</a>', footnote1.text
+      assert_equal 1, catalog[:footnotes].size
+      footnote1 = catalog[:footnotes][0]
+      assert_equal '<a href="#_install">install</a>', footnote1.text
     end
 
     test 'a footnote macro may contain an anchor macro' do
