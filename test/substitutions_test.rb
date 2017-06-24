@@ -1843,29 +1843,6 @@ foo&#8201;&#8212;&#8201;'
       block.lock_in_subs
       assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
     end
-
-    test 'should warn if verbose flag is set and reference is not found' do
-      input = <<-EOS
-[#foobar]
-== Foobar
-
-== Section B
-
-See <<foobaz>>.
-EOS
-      begin
-        old_verbose, $VERBOSE = $VERBOSE, true
-        warnings = redirect_streams do |_, err|
-          render_embedded_string input
-          err.string
-        end
-        $VERBOSE = old_verbose
-        refute warnings.empty?
-        assert_includes warnings, 'asciidoctor: WARNING: invalid reference: foobaz'
-      ensure
-        $VERBOSE = old_verbose
-      end
-    end
   end
 
   # TODO move to helpers_test.rb

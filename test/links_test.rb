@@ -319,11 +319,23 @@ context 'Links' do
   end
 
   test 'xref using angled bracket syntax with label' do
-    assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string('<<tigers,About Tigers>>'), 1
+    input = <<-EOS
+<<tigers,About Tigers>>
+
+[#tigers]
+== Tigers
+    EOS
+    assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string(input), 1
   end
 
   test 'xref using angled bracket syntax with quoted label' do
-    assert_xpath %q(//a[@href="#tigers"][text() = '"About Tigers"']), render_string('<<tigers,"About Tigers">>'), 1
+    input = <<-EOS
+<<tigers,"About Tigers">>
+
+[#tigers]
+== Tigers
+    EOS
+    assert_xpath %q(//a[@href="#tigers"][text() = '"About Tigers"']), render_string(input), 1
   end
 
   test 'xref using angled bracket syntax with path sans extension' do
@@ -392,17 +404,35 @@ context 'Links' do
   end
 
   test 'xref using angled bracket syntax inline with text' do
-    assert_xpath '//a[@href="#tigers"][text() = "about tigers"]', render_string('Want to learn <<tigers,about tigers>>?'), 1
+    input = <<-EOS
+Want to learn <<tigers,about tigers>>?
+
+[#tigers]
+== Tigers
+    EOS
+    assert_xpath '//a[@href="#tigers"][text() = "about tigers"]', render_string(input), 1
   end
 
   test 'xref using angled bracket syntax with multi-line label inline with text' do
-    assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, render_string("Want to learn <<tigers,about\ntigers>>?"), 1
+    input = <<-EOS
+Want to learn <<tigers,about
+tigers>>?
+
+[#tigers]
+== Tigers
+    EOS
+    assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, render_string(input), 1
   end
 
   test 'xref with escaped text' do
     # when \x0 was used as boundary character for passthrough, it was getting stripped
     # now using unicode marks as boundary characters, which resolves issue
-    input = 'See the <<tigers, `+[tigers]+`>> section for data about tigers'
+    input = <<-EOS
+See the <<tigers, `+[tigers]+`>> section for details about tigers.
+
+[#tigers]
+== Tigers
+    EOS
     output = render_embedded_string input
     assert_xpath %(//a[@href="#tigers"]/code[text()="[tigers]"]), output, 1
   end
@@ -436,19 +466,45 @@ A summary of the first lesson.
   end
 
   test 'xref using macro syntax with label' do
-    assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string('xref:tigers[About Tigers]'), 1
+    input = <<-EOS
+xref:tigers[About Tigers]
+
+[#tigers]
+== Tigers
+    EOS
+    assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', render_string(input), 1
   end
 
   test 'xref using macro syntax inline with text' do
-    assert_xpath '//a[@href="#tigers"][text() = "about tigers"]', render_string('Want to learn xref:tigers[about tigers]?'), 1
+    input = <<-EOS
+Want to learn xref:tigers[about tigers]?
+
+[#tigers]
+== Tigers
+    EOS
+
+    assert_xpath '//a[@href="#tigers"][text() = "about tigers"]', render_string(input), 1
   end
 
   test 'xref using macro syntax with multi-line label inline with text' do
-    assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, render_string("Want to learn xref:tigers[about\ntigers]?"), 1
+    input = <<-EOS
+Want to learn xref:tigers[about
+tigers]?
+
+[#tigers]
+== Tigers
+    EOS
+    assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, render_string(input), 1
   end
 
   test 'xref using macro syntax with text that contains an escaped closing bracket' do
-    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', render_string('xref:tigers[[tigers\\]]'), 1
+    input = <<-EOS
+xref:tigers[[tigers\\]]
+
+[#tigers]
+== Tigers
+    EOS
+    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', render_string(input), 1
   end
 
   test 'unescapes square bracket in reftext used by xref' do
@@ -466,9 +522,24 @@ see <<foo>>'
     assert_xpath '//a', doc.render, 0
   end
 
-  test 'xref creates link for unknown reference' do
-    doc = document_from_string '<<tigers>>'
-    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
+  test 'should warn and create link if verbose flag is set and reference is not found' do
+    input = <<-EOS
+[#foobar]
+== Foobar
+
+== Section B
+
+See <<foobaz>>.
+    EOS
+    begin
+      old_verbose, $VERBOSE = $VERBOSE, true
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+      assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
+      refute warnings.empty?
+      assert_includes warnings, 'asciidoctor: WARNING: invalid reference: foobaz'
+    ensure
+      $VERBOSE = old_verbose
+    end
   end
 
   test 'xref shows label from title of target for forward and backward references in html backend' do
