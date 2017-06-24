@@ -1083,7 +1083,7 @@ include::{foodir}/include-file.asciidoc[]
         assert_includes warnings, 'dropping line containing reference to missing attribute'
       end
 
-      test 'line is dropped if target of include directive resolves to empty and attribute-missing attribute is not skip' do
+      test 'wip line is dropped if target of include directive resolves to empty and attribute-missing attribute is not skip' do
         input = <<-EOS
 include::{foodir}/include-file.asciidoc[]
         EOS
@@ -1094,6 +1094,7 @@ include::{foodir}/include-file.asciidoc[]
           [reader.read_line, err.string]
         end
         assert_nil line
+        assert_includes warnings, 'dropping line containing reference to missing attribute'
       end
 
       test 'line following dropped include is not dropped' do
@@ -1108,6 +1109,7 @@ yo
           [reader.read_line, err.string]
         end
         assert_equal 'yo', line
+        assert_includes warnings, 'dropping line containing reference to missing attribute'
       end
 
       test 'escaped include directive is left unprocessed' do
