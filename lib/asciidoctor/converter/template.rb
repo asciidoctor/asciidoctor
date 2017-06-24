@@ -235,9 +235,13 @@ module Asciidoctor
     # Returns the scan result as a [Hash]
     def scan_dir template_dir, pattern, template_cache = nil
       result = {}
+      helpers = nil
       # Grab the files in the top level of the directory (do not recurse)
       ::Dir.glob(pattern).select {|match| ::File.file? match }.each do |file|
-        if (basename = ::File.basename file) == 'helpers.rb' || (path_segments = basename.split '.').size < 2
+        if (basename = ::File.basename file) == 'helpers.rb'
+          helpers = file
+          next
+        elsif (path_segments = basename.split '.').size < 2
           next
         end
         # TODO we could derive the basebackend from the minor extension of the template file
@@ -272,7 +276,7 @@ module Asciidoctor
         end
         result[name] = template
       end
-      if ::File.file?(helpers = (::File.join template_dir, 'helpers.rb'))
+      if helpers || ::File.file?(helpers = (::File.join template_dir, 'helpers.rb'))
         require helpers
       end
       result
