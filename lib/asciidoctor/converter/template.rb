@@ -59,6 +59,7 @@ module Asciidoctor
       @template_dirs = template_dirs
       @eruby = opts[:eruby]
       @safe = opts[:safe]
+      @engines_loaded = {}
       @engine = opts[:template_engine]
       @engine_options = DEFAULT_ENGINE_OPTIONS.inject({}) do |accum, (engine, default_opts)|
         accum[engine] = default_opts.dup
@@ -234,40 +235,40 @@ module Asciidoctor
     # Returns the scan result as a [Hash]
     def scan_dir template_dir, pattern, template_cache = nil
       result = {}
-      eruby_loaded = nil
       # Grab the files in the top level of the directory (do not recurse)
       ::Dir.glob(pattern).select {|match| ::File.file? match }.each do |file|
         if (basename = ::File.basename file) == 'helpers.rb' || (path_segments = basename.split '.').size < 2
           next
         end
         # TODO we could derive the basebackend from the minor extension of the template file
-        #name, *rest, ext_name = *path_segments # this form only works in Ruby >= 1.9
         name = path_segments[0]
         if name == 'block_ruler'
           name = 'thematic_break'
         elsif name.start_with? 'block_'
           name = name.slice 6, name.length
         end
-
         template_class = ::Tilt
         extra_engine_options = {}
-        case (ext_name = path_segments[-1])
-        when 'slim'
-          # slim doesn't get loaded by Tilt, so we have to load it explicitly
-          Helpers.require_library 'slim' unless defined? ::Slim
-          # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
-          (@engine_options[:slim][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
-          # load include plugin when using Slim >= 2.1
-          require 'slim/include' unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
-        when 'erb'
-          template_class, extra_engine_options = (eruby_loaded ||= load_eruby(@eruby))
-        when 'rb'
+        case (extsym = path_segments[-1].to_sym)
+        when :slim
+          unless @engines_loaded[extsym]
+            # NOTE slim doesn't get automatically loaded by Tilt
+            Helpers.require_library 'slim' unless defined? ::Slim
+            # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
+            (@engine_options[extsym][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
+            # load include plugin when using Slim >= 2.1
+            require 'slim/include' unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
+            @engines_loaded[extsym] = true
+          end
+        when :erb
+          template_class, extra_engine_options = (@engines_loaded[extsym] ||= (load_eruby @eruby))
+        when :rb
           next
         else
-          next unless ::Tilt.registered? ext_name
+          next unless ::Tilt.registered? extsym.to_s
         end
         unless template_cache && (template = template_cache[file])
-          template = template_class.new file, 1, (@engine_options[ext_name.to_sym] || {}).merge(extra_engine_options)
+          template = template_class.new file, 1, (@engine_options[extsym] || {}).merge(extra_engine_options)
         end
         result[name] = template
       end
