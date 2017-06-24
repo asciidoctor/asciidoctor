@@ -504,8 +504,9 @@ ____
 <1> Not pointing to a callout
       EOS
 
-      output = render_embedded_string input
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert_xpath '//pre[text()="La la la <1>"]', output, 1
+      assert_includes warnings, 'no callouts refer to list item'
     end
 
     test 'should perform normal subs on a verse block' do
@@ -1421,6 +1422,7 @@ section paragraph
 
     test 'block title above document title gets carried over to first block in first section if no preamble' do
       input = <<-EOS
+:doctype: book
 .Block title
 = Document Title
 
@@ -1428,7 +1430,10 @@ section paragraph
 
 paragraph
       EOS
-      output = render_string input
+      doc = document_from_string input
+      # NOTE block title demotes document title to level-0 section
+      refute doc.header?
+      output = doc.convert
       assert_xpath '//*[@class="sect1"]//*[@class="paragraph"]/*[@class="title"][text() = "Block title"]', output, 1
     end
 
@@ -1570,8 +1575,9 @@ image::circle.svg[Tiger,100]
 image::no-such-image.svg[Alt Text]
       EOS
 
-      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER), err.string] }
       assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
+      assert_includes warnings, 'SVG does not exist or cannot be read'
     end
 
     test 'can render block image with alt text defined in macro containing square bracket' do
@@ -1795,8 +1801,9 @@ image::images/sunset.jpg[Sunset,scaledwidth=25]
 image::{bogus}[]
       EOS
 
-      output = render_embedded_string input
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert output.include?('image::{bogus}[]')
+      assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
     test 'drops line if image target is missing attribute reference and attribute-missing is drop' do
@@ -1806,8 +1813,9 @@ image::{bogus}[]
 image::{bogus}[]
       EOS
 
-      output = render_embedded_string input
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert output.strip.empty?
+      assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
     test 'drops line if image target is missing attribute reference and attribute-missing is drop-line' do
@@ -1817,8 +1825,9 @@ image::{bogus}[]
 image::{bogus}[]
       EOS
 
-      output = render_embedded_string input
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert output.strip.empty?
+      assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
     test 'dropped image does not break processing of following section and attribute-missing is drop-line' do
@@ -1830,10 +1839,11 @@ image::{bogus}[]
 == Section Title
       EOS
 
-      output = render_embedded_string input
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert_css 'img', output, 0
       assert_css 'h2', output, 1
       assert !output.include?('== Section Title')
+      assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
     test 'should pass through image that references uri' do
@@ -1891,8 +1901,9 @@ image::unreadable.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal 'fixtures', doc.attributes['imagesdir']
-      output = doc.render
+      output, warnings = redirect_streams {|_, err| [doc.render, err.string] }
       assert_xpath '//img[@src="data:image/gif;base64,"]', output, 1
+      assert_includes warnings, 'image to embed not found or not readable'
     end
 
     test 'embeds base64-encoded data uri for remote image when data-uri attribute is set' do
@@ -1932,11 +1943,16 @@ image::dot.gif[Dot]
 image::#{image_uri}[Missing image]
       EOS
 
-      output = using_test_webserver do
-        render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+      output = warnings = nil
+      redirect_streams do |_, err|
+        output = using_test_webserver do
+          render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        end
+        warnings = err.string
       end
 
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Missing image"]), output, 1
+      assert_includes warnings, 'could not retrieve image data from URI'
     end
 
     test 'uses remote image uri when data-uri attribute is set and allow-uri-read is not set' do
@@ -1974,7 +1990,6 @@ image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
-    # this test will cause a warning to be printed to the console (until we have a message facility)
     test 'cleans reference to ancestor directories in imagesdir before reading image if safe mode level is at least SAFE' do
       input = <<-EOS
 :data-uri:
@@ -1985,10 +2000,11 @@ image::dot.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal '../..//fixtures/./../../fixtures', doc.attributes['imagesdir']
-      output = doc.render
+      output, warnings = redirect_streams {|_, err| [doc.render, err.string] }
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+      assert_includes warnings, 'image has illegal reference to ancestor of jail'
     end
 
     test 'cleans reference to ancestor directories in target before reading image if safe mode level is at least SAFE' do
@@ -2001,10 +2017,11 @@ image::../..//fixtures/./../../fixtures/dot.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal './', doc.attributes['imagesdir']
-      output = doc.render
+      output, warnings = redirect_streams {|_, err| [doc.render, err.string] }
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+      assert_includes warnings, 'image has illegal reference to ancestor of jail'
     end
   end
 
@@ -2276,8 +2293,11 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      output, warnings = redirect_streams do |_, err|
+        [(render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}), err.string]
+      end
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
+      assert_includes warnings, 'image has illegal reference to ancestor of jail'
     end
 
     test 'should import Font Awesome and use font-based icons when value of icons attribute is font' do
@@ -2354,8 +2374,8 @@ image::asciidoctor.png[Asciidoctor]
       assert doc.safe >= Asciidoctor::SafeMode::SAFE
 
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
-      assert_equal File.join(basedir, 'etc/images'), block.normalize_asset_path("#{disk_root}etc/images")
-      assert_equal File.join(basedir, 'images'), block.normalize_asset_path('../../images')
+      assert_equal File.join(basedir, 'etc/images'), redirect_streams { block.normalize_asset_path("#{disk_root}etc/images") }
+      assert_equal File.join(basedir, 'images'), redirect_streams { block.normalize_asset_path('../../images') }
     end
 
     test 'does not restrict access to ancestor directories when safe mode is disabled' do
@@ -2945,8 +2965,9 @@ content
 part intro paragraph
       EOS
 
-      output = render_string input
+      output, warnings = redirect_streams {|_, err| [(render_string input), err.string] }
       assert_css '.partintro', output, 0
+      assert_includes warnings, 'partintro block can only be used when doctype is book and it\'s a child of a book part'
     end
 
     test 'should not allow partintro unless doctype is book' do
@@ -2955,8 +2976,9 @@ part intro paragraph
 part intro paragraph
       EOS
 
-      output = render_string input
+      output, warnings = redirect_streams {|_, err| [(render_string input), err.string] }
       assert_css '.partintro', output, 0
+      assert_includes warnings, 'partintro block can only be used when doctype is book and it\'s a child of a book part'
     end
 
     test 'should accept partintro on open block without title rendered to DocBook' do
@@ -3018,8 +3040,9 @@ content
 part intro paragraph
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output, warnings = redirect_streams {|_, err| [(render_string input, :backend => 'docbook'), err.string] }
       assert_css 'partintro', output, 0
+      assert_includes warnings, 'partintro block can only be used when doctype is book and it\'s a child of a part section'
     end
 
     test 'should not allow partintro unless doctype is book rendered to DocBook' do
@@ -3028,8 +3051,9 @@ part intro paragraph
 part intro paragraph
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output, warnings = redirect_streams {|_, err| [(render_string input, :backend => 'docbook'), err.string] }
       assert_css 'partintro', output, 0
+      assert_includes warnings, 'partintro block can only be used when doctype is book and it\'s a child of a part section'
     end
   end
 
