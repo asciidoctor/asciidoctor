@@ -59,7 +59,7 @@ module Asciidoctor
       @template_dirs = template_dirs
       @eruby = opts[:eruby]
       @safe = opts[:safe]
-      @engines_loaded = {}
+      @active_engines = {}
       @engine = opts[:template_engine]
       @engine_options = DEFAULT_ENGINE_OPTIONS.inject({}) do |accum, (engine, default_opts)|
         accum[engine] = default_opts.dup
@@ -252,7 +252,7 @@ module Asciidoctor
           template_class, extra_engine_options, extsym = ::Tilt, {}, path_segments[-1].to_sym
           case extsym
           when :slim
-            unless @engines_loaded[extsym]
+            unless @active_engines[extsym]
               # NOTE slim doesn't get automatically loaded by Tilt
               Helpers.require_library 'slim' unless defined? ::Slim
               # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
@@ -260,17 +260,17 @@ module Asciidoctor
               (@engine_options[extsym][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
               # load include plugin when using Slim >= 2.1
               require 'slim/include' unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
-              @engines_loaded[extsym] = true
+              @active_engines[extsym] = true
             end
           when :haml
-            unless @engines_loaded[extsym]
+            unless @active_engines[extsym]
               Helpers.require_library 'haml' unless defined? ::Haml
               # NOTE Haml 5 dropped support for pretty printing
               @engine_options[extsym].delete :ugly if defined? ::Haml::TempleEngine
-              @engines_loaded[extsym] = true
+              @active_engines[extsym] = true
             end
           when :erb
-            template_class, extra_engine_options = (@engines_loaded[extsym] ||= (load_eruby @eruby))
+            template_class, extra_engine_options = (@active_engines[extsym] ||= (load_eruby @eruby))
           when :rb
             next
           else
