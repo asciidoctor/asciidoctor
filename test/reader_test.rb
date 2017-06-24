@@ -614,10 +614,13 @@ trailing content
         EOS
 
         begin
-          doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
+          doc, warnings = redirect_streams do |_, err|
+            [(document_from_string input, :safe => :safe, :base_dir => DIRNAME), err.string]
+          end
           assert_equal 2, doc.blocks.size
           assert_equal ['Unresolved directive in <stdin> - include::fixtures/no-such-file.adoc[]'], doc.blocks[0].lines
           assert_equal ['trailing content'], doc.blocks[1].lines
+          assert_includes warnings, 'include file not found'
         rescue
           flunk 'include directive should not raise exception on missing file'
         end
@@ -633,10 +636,13 @@ trailing content
         EOS
 
         begin
-          doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
+          doc, warnings = redirect_streams do |_, err|
+            [(document_from_string input, :safe => :safe, :base_dir => DIRNAME), err.string]
+          end
           assert_equal 2, doc.blocks.size
           assert_equal ['Unresolved directive in <stdin> - include::fixtures/chapter-a.adoc[]'], doc.blocks[0].lines
           assert_equal ['trailing content'], doc.blocks[1].lines
+          assert_includes warnings, 'include file not readable'
         rescue
           flunk 'include directive should not raise exception on missing file'
         ensure
@@ -682,15 +688,20 @@ include::#{url}[]
 ....
         EOS
 
-        output = begin
-          using_test_webserver do
-            render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        begin
+          output = warnings = nil
+          redirect_streams do |_, err|
+            output = using_test_webserver do
+              render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+            end
+            warnings = err.string
           end
+          refute_nil output
+          assert_match(/Unresolved directive/, output)
+          assert_includes warnings, 'include uri not readable'
         rescue
           flunk 'include directive should not raise exception on inaccessible uri'
         end
-        refute_nil output
-        assert_match(/Unresolved directive/, output)
       end
 
       test 'include directive supports line selection' do
@@ -1063,9 +1074,13 @@ include::{fixturesdir}/include-file.{ext}[]
 include::{foodir}/include-file.asciidoc[]
         EOS
 
-        doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
-        assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.asciidoc[]', reader.read_line
+        line, warnings = redirect_streams do |_, err|
+          doc = empty_safe_document :base_dir => DIRNAME
+          reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
+          [reader.read_line, err.string]
+        end
+        assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.asciidoc[]', line
+        assert_includes warnings, 'dropping line containing reference to missing attribute'
       end
 
       test 'line is dropped if target of include directive resolves to empty and attribute-missing attribute is not skip' do
@@ -1073,9 +1088,12 @@ include::{foodir}/include-file.asciidoc[]
 include::{foodir}/include-file.asciidoc[]
         EOS
 
-        doc = empty_safe_document :base_dir => DIRNAME, :attributes => {'attribute-missing' => 'drop'}
-        reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
-        assert_nil reader.read_line
+        line, warnings = redirect_streams do |_, err|
+          doc = empty_safe_document :base_dir => DIRNAME, :attributes => {'attribute-missing' => 'drop'}
+          reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
+          [reader.read_line, err.string]
+        end
+        assert_nil line
       end
 
       test 'line following dropped include is not dropped' do
@@ -1084,9 +1102,12 @@ include::{foodir}/include-file.asciidoc[]
 yo
         EOS
 
-        doc = empty_safe_document :base_dir => DIRNAME, :attributes => {'attribute-missing' => 'drop'}
-        reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
-        assert_equal 'yo', reader.read_line
+        line, warnings = redirect_streams do |_, err|
+          doc = empty_safe_document :base_dir => DIRNAME, :attributes => {'attribute-missing' => 'drop'}
+          reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
+          [reader.read_line, err.string]
+        end
+        assert_equal 'yo', line
       end
 
       test 'escaped include directive is left unprocessed' do
@@ -1140,13 +1161,14 @@ include::include-file.asciidoc[]
 include::fixtures/parent-include.adoc[depth=1]
         EOS
 
-        pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
-
-        doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), :normalize => true
-
-        lines = reader.readlines
+        lines, warnings = redirect_streams do |_, err|
+          pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
+          doc = empty_safe_document :base_dir => DIRNAME
+          reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), :normalize => true
+          [reader.readlines, err.string]
+        end
         assert lines.include?('include::child-include.adoc[]')
+        assert_match(/maximum include depth .* exceeded/, warnings)
       end
 
       test 'include directive should be disabled if max include depth set in nested context has been exceeded' do
@@ -1154,14 +1176,15 @@ include::fixtures/parent-include.adoc[depth=1]
 include::fixtures/parent-include-restricted.adoc[depth=3]
         EOS
 
-        pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
-
-        doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), :normalize => true
-
-        lines = reader.readlines
+        lines, warnings = redirect_streams do |_, err|
+          pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
+          doc = empty_safe_document :base_dir => DIRNAME
+          reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), :normalize => true
+          [reader.readlines, err.string]
+        end
         assert lines.include?('first line of child')
         assert lines.include?('include::grandchild-include.adoc[]')
+        assert_match(/maximum include depth .* exceeded/, warnings)
       end
 
       test 'read_lines_until should not process lines if process option is false' do
