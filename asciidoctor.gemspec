@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   # erubis is needed for testing use of alternative eRuby impls
   s.add_development_dependency 'erubis', '~> 2.7.0'
   # haml is needed for testing custom templates
-  s.add_development_dependency 'haml', '~> 4.0.0'
+  s.add_development_dependency 'haml', '~> 5.0.0'
   s.add_development_dependency 'nokogiri', '~> 1.7.0'
   s.add_development_dependency 'rake', '~> 10.0.0'
   s.add_development_dependency 'rspec-expectations', '~> 2.14.0'
