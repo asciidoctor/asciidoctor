@@ -246,7 +246,7 @@ module Asciidoctor
         if name == 'block_ruler'
           name = 'thematic_break'
         elsif name.start_with? 'block_'
-          name = name[6..-1]
+          name = name.slice 6, name.length
         end
 
         template_class = ::Tilt
