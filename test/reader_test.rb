@@ -709,7 +709,7 @@ include::#{url}[]
 include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         EOS
 
-        output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/first line/, output)
         refute_match(/second line/, output)
         assert_match(/third line/, output)
@@ -726,7 +726,7 @@ include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
 include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         EOS
 
-        output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/first line/, output)
         refute_match(/second line/, output)
         assert_match(/third line/, output)
@@ -755,7 +755,7 @@ include::fixtures/include-file.asciidoc[lines=]
 include::fixtures/include-file.asciidoc[tag=snippetA]
         EOS
 
-        output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/snippetA content/, output)
         refute_match(/snippetB content/, output)
         refute_match(/non-tagged content/, output)
@@ -767,7 +767,7 @@ include::fixtures/include-file.asciidoc[tag=snippetA]
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         EOS
 
-        output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/snippetA content/, output)
         assert_match(/snippetB content/, output)
         refute_match(/non-tagged content/, output)
@@ -946,7 +946,7 @@ include::fixtures/include-file.asciidoc[tag=snippetZ]
         old_stderr = $stderr
         $stderr = StringIO.new
         begin
-          render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+          render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
           warning = $stderr.tap(&:rewind).read
           refute_nil warning
           assert_match(/WARNING.*snippetZ/, warning)
@@ -988,7 +988,7 @@ include::fixtures/include-file.xml[#{attr_name}=]
 include::fixtures/include-file.asciidoc[lines=1, tags=snippetA;snippetB]
         EOS
 
-        output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/first line of included content/, output)
         refute_match(/snippetA content/, output)
         refute_match(/snippetB content/, output)
@@ -1002,7 +1002,7 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
 ----
         EOS
 
-        output = render_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
         result = xmlnodes_at_xpath('//pre', output, 1).text
         assert_equal "<year>2013</year>\n<holder>Acme™, Inc.</holder>", result
       end

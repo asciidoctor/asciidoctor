@@ -2312,7 +2312,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input, :header_footer => false
+      output = render_embedded_string input
       assert_css '#preamble:root #toc', output, 1
       assert_css '#preamble:root .paragraph + #toc', output, 1
     end
@@ -2334,7 +2334,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input, :header_footer => false
+      output = render_embedded_string input
       assert_css 'h1:root', output, 1
       assert_css 'h1:root + #toc:root', output, 1
       assert_css 'h1:root + #toc:root + #preamble:root', output, 1
