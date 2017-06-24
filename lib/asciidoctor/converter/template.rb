@@ -29,7 +29,7 @@ module Asciidoctor
       :erb =>  { :trim => '<' },
       # TODO line 466 of haml/compiler.rb sorts the attributes; file an issue to make this configurable
       # NOTE AsciiDoc syntax expects HTML/XML output to use double quotes around attribute values
-      :haml => { :format => :xhtml, :attr_wrapper => '"', :ugly => true, :escape_attrs => false },
+      :haml => { :format => :xhtml, :attr_wrapper => '"', :escape_attrs => false, :ugly => true },
       :slim => { :disable_escape => true, :sort_attrs => false, :pretty => false }
     }
 
@@ -262,6 +262,13 @@ module Asciidoctor
             (@engine_options[extsym][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
             # load include plugin when using Slim >= 2.1
             require 'slim/include' unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
+            @engines_loaded[extsym] = true
+          end
+        when :haml
+          unless @engines_loaded[extsym]
+            Helpers.require_library 'haml' unless defined? ::Haml
+            # NOTE Haml 5 dropped support for pretty printing
+            @engine_options[extsym].delete :ugly if defined? ::Haml::TempleEngine
             @engines_loaded[extsym] = true
           end
         when :erb
