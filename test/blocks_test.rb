@@ -1847,6 +1847,15 @@ image::http://asciidoc.org/images/tiger.png[Tiger]
       assert_xpath '/*[@class="imageblock"]//img[@src="http://asciidoc.org/images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
+    test 'should encode spaces in image target if value is a URI' do
+      input = <<-EOS
+image::http://example.org/svg?digraph=digraph G { a -> b; }[diagram]
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath %(/*[@class="imageblock"]//img[@src="http://example.org/svg?digraph=digraph%20G%20{%20a%20-#{decode_char 62}%20b;%20}"]), output, 1
+    end
+
     test 'can resolve image relative to imagesdir' do
       input = <<-EOS
 :imagesdir: images
