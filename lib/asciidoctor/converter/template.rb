@@ -234,8 +234,7 @@ module Asciidoctor
     #
     # Returns the scan result as a [Hash]
     def scan_dir template_dir, pattern, template_cache = nil
-      result = {}
-      helpers = nil
+      result, helpers = {}, nil
       # Grab the files in the top level of the directory (do not recurse)
       ::Dir.glob(pattern).select {|match| ::File.file? match }.each do |file|
         if (basename = ::File.basename file) == 'helpers.rb'
@@ -244,42 +243,40 @@ module Asciidoctor
         elsif (path_segments = basename.split '.').size < 2
           next
         end
-        # TODO we could derive the basebackend from the minor extension of the template file
-        name = path_segments[0]
-        if name == 'block_ruler'
+        if (name = path_segments[0]) == 'block_ruler'
           name = 'thematic_break'
         elsif name.start_with? 'block_'
           name = name.slice 6, name.length
         end
-        template_class = ::Tilt
-        extra_engine_options = {}
-        case (extsym = path_segments[-1].to_sym)
-        when :slim
-          unless @engines_loaded[extsym]
-            # NOTE slim doesn't get automatically loaded by Tilt
-            Helpers.require_library 'slim' unless defined? ::Slim
-            # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
-            (@engine_options[extsym][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
-            # load include plugin when using Slim >= 2.1
-            require 'slim/include' unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
-            @engines_loaded[extsym] = true
-          end
-        when :haml
-          unless @engines_loaded[extsym]
-            Helpers.require_library 'haml' unless defined? ::Haml
-            # NOTE Haml 5 dropped support for pretty printing
-            @engine_options[extsym].delete :ugly if defined? ::Haml::TempleEngine
-            @engines_loaded[extsym] = true
-          end
-        when :erb
-          template_class, extra_engine_options = (@engines_loaded[extsym] ||= (load_eruby @eruby))
-        when :rb
-          next
-        else
-          next unless ::Tilt.registered? extsym.to_s
-        end
         unless template_cache && (template = template_cache[file])
-          template = template_class.new file, 1, (@engine_options[extsym] || {}).merge(extra_engine_options)
+          template_class, extra_engine_options, extsym = ::Tilt, {}, path_segments[-1].to_sym
+          case extsym
+          when :slim
+            unless @engines_loaded[extsym]
+              # NOTE slim doesn't get automatically loaded by Tilt
+              Helpers.require_library 'slim' unless defined? ::Slim
+              # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
+              # NOTE safe mode won't get updated if using template cache and changing safe mode
+              (@engine_options[extsym][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
+              # load include plugin when using Slim >= 2.1
+              require 'slim/include' unless (defined? ::Slim::Include) || ::Slim::VERSION < '2.1'
+              @engines_loaded[extsym] = true
+            end
+          when :haml
+            unless @engines_loaded[extsym]
+              Helpers.require_library 'haml' unless defined? ::Haml
+              # NOTE Haml 5 dropped support for pretty printing
+              @engine_options[extsym].delete :ugly if defined? ::Haml::TempleEngine
+              @engines_loaded[extsym] = true
+            end
+          when :erb
+            template_class, extra_engine_options = (@engines_loaded[extsym] ||= (load_eruby @eruby))
+          when :rb
+            next
+          else
+            next unless ::Tilt.registered? extsym.to_s
+          end
+          template = template_class.new file, 1, (@engine_options[extsym] ||= {}).merge(extra_engine_options)
         end
         result[name] = template
       end
