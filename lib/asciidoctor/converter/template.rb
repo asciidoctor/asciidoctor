@@ -5,9 +5,9 @@ module Asciidoctor
   # {AbstractNode} objects from a parsed AsciiDoc document tree to the backend
   # format.
   #
-  # The converter scans the provided directories for template files that are
+  # The converter scans the specified directories for template files that are
   # supported by Tilt. If an engine name (e.g., "slim") is specified in the
-  # options Hash passed to the constructor, the scan is limited to template
+  # options Hash passed to the constructor, the scan is restricted to template
   # files that have a matching extension (e.g., ".slim"). The scanner trims any
   # extensions from the basename of the file and uses the resulting name as the
   # key under which to store the template. When the {Converter#convert} method
@@ -15,14 +15,15 @@ module Asciidoctor
   # table and use it to convert the node.
   #
   # For example, the template file "path/to/templates/paragraph.html.slim" will
-  # be registered as the "paragraph" transform. The template would then be used
-  # to convert a paragraph {Block} object from the parsed AsciiDoc tree to an
-  # HTML backend format (e.g., "html5").
+  # be registered as the "paragraph" transform. The template is then used to
+  # convert a paragraph {Block} object from the parsed AsciiDoc tree to an HTML
+  # backend format (e.g., "html5").
   #
   # As an optimization, scan results and templates are cached for the lifetime
   # of the Ruby process. If the {https://rubygems.org/gems/thread_safe
   # thread_safe} gem is installed, these caches are guaranteed to be thread
-  # safe. If this gem is not present, they are not and a warning is issued.
+  # safe. If this gem is not present, there is no such guarantee and a warning
+  # will be issued.
   class Converter::TemplateConverter < Converter::Base
     DEFAULT_ENGINE_OPTIONS = {
       :erb =>  { :trim => '<' },
