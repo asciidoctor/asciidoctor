@@ -18,12 +18,13 @@ class Table < AbstractBlock
 
     # Public: Returns the rows grouped by section.
     #
-    # The keys are the section names as symbols. Each value is an Array of
-    # rows. The keys are sorted in document order (head, foot, body).
+    # Creates a 2-dimensional array of two element entries. The first element
+    # is the section name as a symbol. The second element is the Array of rows
+    # in that section. The entries are in document order (head, foot, body).
     #
-    # Returns a Hash of rows grouped by section.
+    # Returns a 2-dimentional Array of rows grouped by section.
     def by_section
-      { :head => @head, :foot => @foot, :body => @body }
+      [[:head, @head], [:foot, @foot], [:body, @body]]
     end
   end
 
