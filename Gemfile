@@ -4,14 +4,19 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  if (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '1.9.3')
-    gem 'cucumber', '~> 1.3.0'
-    gem 'nokogiri', '~> 1.5.0'
-    gem 'slim', '~> 2.1.0'
-  elsif (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.1.0')
-    gem 'nokogiri', '~> 1.6.0'
-    if (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.0.0')
-      gem 'slim', '<= 3.0.7'
+  if (ruby_version = Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.1.0')
+    if ruby_version < (Gem::Version.new '2.0.0')
+      gem 'haml', '~> 4.0.0'
+      if ruby_version < (Gem::Version.new '1.9.3')
+        gem 'cucumber', '~> 1.3.0'
+        gem 'nokogiri', '~> 1.5.0'
+        gem 'slim', '~> 2.1.0'
+      else
+        gem 'nokogiri', '~> 1.6.0'
+        gem 'slim', '<= 3.0.7'
+      end
+    else
+      gem 'nokogiri', '~> 1.6.0'
     end
   end
   gem 'racc', '~> 1.4.0' if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
