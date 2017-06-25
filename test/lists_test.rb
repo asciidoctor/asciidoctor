@@ -2853,7 +2853,7 @@ Please read #{'<<'}Fowler_1997>>.
       ids = doc.catalog[:ids]
       assert ids.key?('Fowler_1997')
       assert_equal '[1]', ids['Fowler_1997']
-      result = doc.convert
+      result = doc.convert :header_footer => false
       assert_xpath '//a[@href="#Fowler_1997"]', result, 1
       assert_xpath '//a[@href="#Fowler_1997"][text()="[1]"]', result, 1
       assert_xpath '//a[@id="Fowler_1997"]', result, 1
