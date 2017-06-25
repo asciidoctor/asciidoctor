@@ -1274,7 +1274,7 @@ content
 
       doc = document_from_string input
       second_section = Asciidoctor::Section.new doc
-      doc.blocks.insert 1, second_section 
+      doc.blocks.insert 1, second_section
       doc.reindex_sections
       sections = doc.sections
       [0, 1, 2].each do |index|

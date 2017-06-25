@@ -216,7 +216,7 @@ context 'Path Resolver' do
       result, warnings = redirect_streams do |_, err|
         [(@resolver.system_path '', '../assets/images', JAIL), err.string]
       end
-      assert_equal %(#{JAIL}/assets/images), result 
+      assert_equal %(#{JAIL}/assets/images), result
       assert_includes warnings, 'path has illegal reference to ancestor of jail'
     end
 
