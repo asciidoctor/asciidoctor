@@ -30,7 +30,6 @@ module Asciidoctor
     end
 
     def document node
-      result = []
       slash = @void_element_slash
       br = %(<br#{slash}>)
       unless (asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')).empty?
@@ -38,7 +37,7 @@ module Asciidoctor
       end
       cdn_base = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
       linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
-      result << '<!DOCTYPE html>'
+      result = ['<!DOCTYPE html>']
       lang_attribute = (node.attr? 'nolang') ? nil : %( lang="#{node.attr 'lang', 'en'}")
       result << %(<html#{@xml_mode ? ' xmlns="http://www.w3.org/1999/xhtml"' : nil}#{lang_attribute}>)
       result << %(<head>
