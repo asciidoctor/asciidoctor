@@ -635,7 +635,7 @@ class Document < AbstractBlock
   def doctitle opts = {}
     if !(val = @attributes['title'].nil_or_empty?)
       val = title
-    elsif (sect = first_section) && sect.title?
+    elsif (sect = first_section)
       val = sect.title
     elsif opts[:use_fallback] && (val = @attributes['untitled-label'])
       # use val set in condition

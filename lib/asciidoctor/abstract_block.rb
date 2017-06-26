@@ -100,10 +100,11 @@ class AbstractBlock < AbstractNode
     @subs.include? name
   end
 
-  # Public: A convenience method that checks whether the title of this block is
-  # not blank (i.e., not nil or empty string).
+  # Public: A convenience method that checks whether the title of this block is defined.
+  #
+  # Returns a [Boolean] indicating whether this block has a title.
   def title?
-    !@title.nil_or_empty?
+    @title ? true : false
   end
 
   # Public: Get the String title of this Block with title substitions applied
@@ -345,7 +346,7 @@ class AbstractBlock < AbstractNode
   #
   # Returns nothing
   def assign_caption caption = nil, key = nil
-    unless @caption || !title? || (@caption = caption || @document.attributes['caption'])
+    unless @caption || !@title || (@caption = caption || @document.attributes['caption'])
       if (label = @document.attributes[%(#{key ||= @context}-caption)])
         @caption = %(#{label} #{@number = @document.increment_and_store_counter "#{key}-number", self}. )
       end
