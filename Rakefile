@@ -29,22 +29,6 @@ begin
 rescue LoadError
 end
 
-=begin
-# Run tests with Encoding.default_external set to US-ASCII
-begin
-  Rake::TestTask.new(:test_us_ascii) do |test|
-    prepare_test_env
-    puts "LANG: #{ENV['LANG']}"
-    test.libs << 'test'
-    test.pattern = 'test/**/*_test.rb'
-    test.ruby_opts << '-EUS-ASCII' if RUBY_VERSION >= '1.9'
-    test.verbose = true
-    test.warning = true
-  end
-rescue LoadError
-end
-=end
-
 begin
   require 'cucumber/rake/task'
   Cucumber::Rake::Task.new(:features) do |t|
