@@ -52,7 +52,7 @@ module Substitutors
   PassSlotRx = /#{PASS_START}(\d+)#{PASS_END}/
 
   # fix passthrough slot after syntax highlighting
-  HighlightedPassSlotRx = %r(<span\b[^>]*?>#{PASS_START}</span>[^\d]*(\d+)[^\d]*<span\b[^>]*?>#{PASS_END}</span>)
+  HighlightedPassSlotRx = %r(<span\b[^>]*>#{PASS_START}</span>[^\d]*(\d+)[^\d]*<span\b[^>]*>#{PASS_END}</span>)
 
   RS = '\\'
 
