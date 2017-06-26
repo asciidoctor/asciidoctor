@@ -48,6 +48,7 @@ end
 begin
   require 'cucumber/rake/task'
   Cucumber::Rake::Task.new(:features) do |t|
+    t.cucumber_opts = %w(-f progress)
   end
 rescue LoadError
 end
