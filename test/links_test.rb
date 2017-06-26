@@ -542,7 +542,7 @@ See <<foobaz>>.
     end
   end
 
-  test 'xref shows label from title of target for forward and backward references in html backend' do
+  test 'xref uses title of target as label for forward and backward references in html output' do
     input = <<-EOS
 == Section A
 
