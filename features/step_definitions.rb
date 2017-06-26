@@ -36,9 +36,9 @@ end
 Then /the result should match the (HTML|XML) structure/ do |format, expect|
   case format
   when 'HTML'
-    options = { :format => :html }
+    options = { :format => :html, :disable_escape => true, :sort_attrs => false }
   when 'XML'
-    options = { :format => :xhtml }
+    options = { :format => :xhtml, :disable_escape => true, :sort_attrs => false }
   else
     options = {}
   end
