@@ -17,15 +17,15 @@ end
 
 begin
   require 'rake/testtask'
-  Rake::TestTask.new(:test) do |test|
+  Rake::TestTask.new(:test) do |t|
     prepare_test_env
     puts %(LANG: #{ENV['LANG']}) if ENV.key? 'TRAVIS_BUILD_ID'
-    test.libs << 'test'
-    test.pattern = 'test/**/*_test.rb'
-    test.verbose = true
-    test.warning = true
+    t.libs << 'test'
+    t.pattern = 'test/**/*_test.rb'
+    t.verbose = true
+    t.warning = true
   end
-  task :default => :test
+  task :default => 'test:all'
 rescue LoadError
 end
 
@@ -60,7 +60,7 @@ end
 
 namespace :test do
   desc 'Run unit and feature tests'
-  task :all => [:test,:features]
+  task :all => [:test, :features]
 end
 
 =begin
