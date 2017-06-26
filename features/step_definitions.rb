@@ -42,7 +42,7 @@ Then /the result should match the (HTML|XML) structure/ do |format, expect|
   else
     options = {}
   end
-  slim_friendly_output = @output.lines.entries.map {|line|
+  slim_friendly_output = @output.each_line.map {|line|
     if line.start_with? '<'
       line
     else
