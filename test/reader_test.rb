@@ -1526,6 +1526,24 @@ endif::holygrail+swallow[]
         assert_equal '', (lines * ::Asciidoctor::EOL)
       end
 
+      test 'ifdef should permit leading, trailing, and repeat operators' do
+        {
+          'asciidoctor,' => 'content',
+          ',asciidoctor' => 'content',
+          'asciidoctor+' => '',
+          '+asciidoctor' => '',
+          'asciidoctor,,asciidoctor-version' => 'content',
+          'asciidoctor++asciidoctor-version' => ''
+        }.each do |condition, expected|
+          input = <<-EOS
+ifdef::#{condition}[]
+content
+endif::[]
+          EOS
+          assert_equal expected, (document_from_string input, :parse => false).reader.read
+        end
+      end
+
       test 'ifndef with undefined attribute includes block' do
         input = <<-EOS
 ifndef::holygrail[]

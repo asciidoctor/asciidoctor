@@ -704,29 +704,26 @@ class PreprocessorReader < Reader
   #
   # Returns a Boolean indicating whether the cursor should be advanced
   def preprocess_conditional_directive keyword, target, delimiter, text
+    # attributes are case insensitive
+    target = target.downcase unless (no_target = target.empty?)
+
     # must have a target before brackets if ifdef or ifndef
     # must not have text between brackets if endif
-    # don't honor match if it doesn't meet this criteria
+    # skip line if it doesn't meet this criteria
     # QUESTION should we warn for these bogus declarations?
-    if ((keyword == 'ifdef' || keyword == 'ifndef') && target.empty?) || (keyword == 'endif' && text)
-      return false
-    end
-
-    # attributes are case insensitive
-    target = target.downcase
+    return false if (no_target && (keyword == 'ifdef' || keyword == 'ifndef')) || (text && keyword == 'endif')
 
     if keyword == 'endif'
-      stack_size = @conditional_stack.size
-      if stack_size > 0
+      if @conditional_stack.empty?
+        warn %(asciidoctor: ERROR: #{line_info}: unmatched macro: endif::#{target}[])
+      else
         pair = @conditional_stack[-1]
-        if target.empty? || target == pair[:target]
+        if no_target || target == pair[:target]
           @conditional_stack.pop
           @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
         else
           warn %(asciidoctor: ERROR: #{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[])
         end
-      else
-        warn %(asciidoctor: ERROR: #{line_info}: unmatched macro: endif::#{target}[])
       end
       return true
     end
@@ -737,32 +734,32 @@ class PreprocessorReader < Reader
       case keyword
       when 'ifdef'
         case delimiter
-        when nil
-          # if the attribute is undefined, then skip
-          skip = !@document.attributes.key?(target)
         when ','
           # if any attribute is defined, then don't skip
-          skip = target.split(',').none? {|name| @document.attributes.key? name }
+          skip = target.split(',', -1).none? {|name| @document.attributes.key? name }
         when '+'
           # if any attribute is undefined, then skip
-          skip = target.split('+').any? {|name| !@document.attributes.key? name }
+          skip = target.split('+', -1).any? {|name| !@document.attributes.key? name }
+        else
+          # if the attribute is undefined, then skip
+          skip = !@document.attributes.key?(target)
         end
       when 'ifndef'
         case delimiter
-        when nil
-          # if the attribute is defined, then skip
-          skip = @document.attributes.key?(target)
         when ','
           # if any attribute is undefined, then don't skip
-          skip = target.split(',').none? {|name| !@document.attributes.key? name }
+          skip = target.split(',', -1).none? {|name| !@document.attributes.key? name }
         when '+'
           # if any attribute is defined, then skip
-          skip = target.split('+').any? {|name| @document.attributes.key? name }
+          skip = target.split('+', -1).any? {|name| @document.attributes.key? name }
+        else
+          # if the attribute is defined, then skip
+          skip = @document.attributes.key?(target)
         end
       when 'ifeval'
         # the text in brackets must match an expression
         # don't honor match if it doesn't meet this criteria
-        return false unless target.empty? && EvalExpressionRx =~ text.strip
+        return false unless no_target && EvalExpressionRx =~ text.strip
 
         # NOTE save values eagerly for Ruby 1.8.7 compat
         lhs, op, rhs = $1, $2, $3
