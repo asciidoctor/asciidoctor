@@ -716,20 +716,18 @@ class PreprocessorReader < Reader
     if keyword == 'endif'
       if @conditional_stack.empty?
         warn %(asciidoctor: ERROR: #{line_info}: unmatched macro: endif::#{target}[])
+      elsif no_target || target == (pair = @conditional_stack[-1])[:target]
+        @conditional_stack.pop
+        @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
       else
-        pair = @conditional_stack[-1]
-        if no_target || target == pair[:target]
-          @conditional_stack.pop
-          @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
-        else
-          warn %(asciidoctor: ERROR: #{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[])
-        end
+        warn %(asciidoctor: ERROR: #{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[])
       end
       return true
     end
 
-    skip = false
-    unless @skipping
+    if @skipping
+      skip = false
+    else
       # QUESTION any way to wrap ifdef & ifndef logic up together?
       case keyword
       when 'ifdef'
