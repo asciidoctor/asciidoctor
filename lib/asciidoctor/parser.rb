@@ -953,10 +953,11 @@ class Parser
   def self.is_delimited_block? line, return_match_data = false
     # highly optimized for best performance
     return unless (line_len = line.length) > 1 && DELIMITED_BLOCK_LEADERS.include?(line.slice 0, 2)
-    # catches open block
+    # catches (deprecated) "two hyphen" syntax for open blocks
     if line_len == 2
       tip = line
       tl = 2
+      warn %(asciidoctor: WARNING: 2 hyphen open block syntax is deprecated, use tildes instead - e.g. "~~~~" )
     else
       # catches all other delimited blocks, including fenced code
       if line_len <= 4

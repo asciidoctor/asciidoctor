@@ -287,7 +287,9 @@ module Asciidoctor
   VERBATIM_STYLES = ['literal', 'listing', 'source', 'verse'].to_set
 
   DELIMITED_BLOCKS = {
+    # DEPRECATED: The two hyphen syntax for open blocks is deprecated - tildes should be used instead as these allow nesting of open blocks.
     '--'   => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro'].to_set],
+    '~~~~' => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro'].to_set],
     '----' => [:listing, ['literal', 'source'].to_set],
     '....' => [:literal, ['listing', 'source'].to_set],
     '====' => [:example, ['admonition'].to_set],
