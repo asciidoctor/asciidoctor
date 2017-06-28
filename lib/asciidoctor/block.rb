@@ -129,19 +129,6 @@ class Block < AbstractBlock
     end
   end
 
-  # Public: Returns the converted alt text for this block image.
-  #
-  # for_attr - A Boolean indicated whether to encode the text for use in the value of an XML attribute.
-  #
-  # Returns the value of the alt attribute with special character substitutions applied.
-  #--
-  # QUESTION: should this be renamed to converted_alt_text or convert_alt_text?
-  def alt_text for_attr = nil
-    val = attr 'alt'
-    val = sub_specialchars val if (val.include? '<') || (val.include? '&') || (val.include? '>')
-    for_attr && (val.include? '"') ? (val.gsub '"', '&quot;') : val
-  end
-
   # Public: Returns the preprocessed source of this block
   #
   # Returns the a String containing the lines joined together or nil if there

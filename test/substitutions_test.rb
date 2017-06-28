@@ -669,6 +669,13 @@ context 'Substitutions' do
       assert_equal %{<span class="image"><img src="tiger.png" alt="Tiger"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'should encode special characters in alt text of inline image' do
+      input = 'A tiger\'s "roar" is < a bear\'s "growl"'
+      expected = 'A tiger&#8217;s &quot;roar&quot; is &lt; a bear&#8217;s &quot;growl&quot;'
+      output = (render_embedded_string %(image:tiger-roar.png[#{input}]), :doctype => :inline).gsub(/>\s+</, '><')
+      assert_equal %(<span class="image"><img src="tiger-roar.png" alt="#{expected}"></span>), output
+    end
+
     test 'an image macro with SVG image and text should be interpreted as an image with alt text' do
       para = block_from_string('image:tiger.svg[Tiger]')
       assert_equal %{<span class="image"><img src="tiger.svg" alt="Tiger"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')

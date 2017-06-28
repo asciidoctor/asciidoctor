@@ -40,5 +40,12 @@ class Inline < AbstractNode
 
   # Alias render to convert to maintain backwards compatibility
   alias render convert
+
+  # Public: Returns the converted alt text for this inline image.
+  #
+  # Returns the [String] value of the alt attribute.
+  def alt_text
+    attr 'alt'
+  end
 end
 end
