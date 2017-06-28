@@ -1560,20 +1560,26 @@ endif::holygrail[]
         assert_equal 'Our quest continues to find the holy grail!', (lines * ::Asciidoctor::EOL)
       end
 
-      test 'ifndef with one alternative attribute set includes content' do
+      test 'ifndef with one alternative attribute set does not include content' do
         input = <<-EOS
 ifndef::holygrail,swallow[]
 Our quest is complete!
 endif::holygrail,swallow[]
         EOS
 
-        doc = Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }
-        reader = doc.reader
-        lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
+        result = (Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }).reader.read
+        assert_empty result
+      end
+
+      test 'ifndef with both alternative attributes set does not include content' do
+        input = <<-EOS
+ifndef::holygrail,swallow[]
+Our quest is complete!
+endif::holygrail,swallow[]
+        EOS
+
+        result = (Asciidoctor::Document.new input, :attributes => { 'swallow' => '', 'holygrail' => '' }).reader.read
+        assert_empty result
       end
 
       test 'ifndef with no alternative attributes set includes content' do
@@ -1583,29 +1589,8 @@ Our quest is complete!
 endif::holygrail,swallow[]
         EOS
 
-        doc = Asciidoctor::Document.new input
-        reader = doc.reader
-        lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
-      end
-
-      test 'ifndef with any required attributes set does not include content' do
-        input = <<-EOS
-ifndef::holygrail+swallow[]
-Our quest is complete!
-endif::holygrail+swallow[]
-        EOS
-
-        doc = Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }
-        reader = doc.reader
-        lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal '', (lines * ::Asciidoctor::EOL)
+        result = (Asciidoctor::Document.new input).reader.read
+        assert_equal 'Our quest is complete!', result
       end
 
       test 'ifndef with no required attributes set includes content' do
@@ -1615,13 +1600,30 @@ Our quest is complete!
 endif::holygrail+swallow[]
         EOS
 
-        doc = Asciidoctor::Document.new input
-        reader = doc.reader
-        lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
+        result = (Asciidoctor::Document.new input).reader.read
+        assert_equal 'Our quest is complete!', result
+      end
+
+      test 'ifndef with all required attributes set does not include content' do
+        input = <<-EOS
+ifndef::holygrail+swallow[]
+Our quest is complete!
+endif::holygrail+swallow[]
+        EOS
+
+        result = (Asciidoctor::Document.new input, :attributes => { 'swallow' => '', 'holygrail' => '' }).reader.read
+        assert_empty result
+      end
+
+      test 'ifndef with at least one required attributes set does not include content' do
+        input = <<-EOS
+ifndef::holygrail+swallow[]
+Our quest is complete!
+endif::holygrail+swallow[]
+        EOS
+
+        result = (Asciidoctor::Document.new input, :attributes => { 'swallow' => '' }).reader.read
+        assert_equal 'Our quest is complete!', result
       end
 
       test 'escaped ifdef is unescaped and ignored' do

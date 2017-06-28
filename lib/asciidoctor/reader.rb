@@ -733,10 +733,10 @@ class PreprocessorReader < Reader
       when 'ifdef'
         case delimiter
         when ','
-          # if any attribute is defined, then don't skip
+          # skip if no attribute is defined
           skip = target.split(',', -1).none? {|name| @document.attributes.key? name }
         when '+'
-          # if any attribute is undefined, then skip
+          # skip if any attribute is undefined
           skip = target.split('+', -1).any? {|name| !@document.attributes.key? name }
         else
           # if the attribute is undefined, then skip
@@ -745,11 +745,11 @@ class PreprocessorReader < Reader
       when 'ifndef'
         case delimiter
         when ','
-          # if any attribute is undefined, then don't skip
-          skip = target.split(',', -1).none? {|name| !@document.attributes.key? name }
+          # skip if any attribute is defined
+          skip = target.split(',', -1).any? {|name| @document.attributes.key? name }
         when '+'
-          # if any attribute is defined, then skip
-          skip = target.split('+', -1).any? {|name| @document.attributes.key? name }
+          # skip if all attributes are defined
+          skip = target.split('+', -1).all? {|name| @document.attributes.key? name }
         else
           # if the attribute is defined, then skip
           skip = @document.attributes.key?(target)
