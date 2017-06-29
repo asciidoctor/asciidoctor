@@ -330,24 +330,6 @@ module Substitutors
     @passthroughs.clear if outer
   end
 
-  # Public: Substitute special characters (i.e., encode XML)
-  #
-  # The special characters are <, &, and >, which get replaced with &lt;,
-  # &amp;, and &gt;, respectively.
-  #
-  # text - The String text to process
-  #
-  # returns The String text with special characters replaced
-  if ::RUBY_MIN_VERSION_1_9
-    def sub_specialchars text
-      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
-    end
-  else
-    def sub_specialchars text
-      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }) : text
-    end
-  end
-  alias sub_specialcharacters sub_specialchars
 
   if RUBY_ENGINE == 'opal'
     def sub_quotes text
@@ -362,6 +344,10 @@ module Substitutors
         text = text.gsub(pattern) { do_replacement $~, replacement, restore }
       end
       text
+    end
+
+    def sub_specialchars text
+      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
     end
   else
     # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc)
@@ -393,7 +379,26 @@ module Substitutors
       end
       text
     end
+
+    # Public: Substitute special characters (i.e., encode XML)
+    #
+    # The special characters are <, &, and >, which get replaced with &lt;,
+    # &amp;, and &gt;, respectively.
+    #
+    # text - The String text to process
+    #
+    # returns The String text with special characters replaced
+    if ::RUBY_MIN_VERSION_1_9
+      def sub_specialchars text
+        (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub! SpecialCharsRx, SpecialCharsTr) : text
+      end
+    else
+      def sub_specialchars text
+        (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }) : text
+      end
+    end
   end
+  alias sub_specialcharacters sub_specialchars
 
   # Internal: Substitute replacement text for matched location
   #
