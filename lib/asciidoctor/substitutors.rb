@@ -109,7 +109,7 @@ module Substitutors
     subs.each do |type|
       case type
       when :specialcharacters
-        text = sub_specialchars text if (text.include? '<') || (text.include? '&') || (text.include? '>')
+        text = sub_specialchars text
       when :quotes
         text = sub_quotes text
       when :attributes
@@ -340,11 +340,11 @@ module Substitutors
   # returns The String text with special characters replaced
   if ::RUBY_MIN_VERSION_1_9
     def sub_specialchars text
-      text.gsub SpecialCharsRx, SpecialCharsTr
+      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
     end
   else
     def sub_specialchars text
-      text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }
+      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }) : text
     end
   end
   alias sub_specialcharacters sub_specialchars
@@ -1493,11 +1493,7 @@ module Substitutors
   #
   # returns the substituted source
   def sub_source source, process_callouts
-    if (source.include? '<') || (source.include? '&') || (source.include? '>')
-      process_callouts ? sub_callouts(sub_specialchars(source)) : sub_specialchars(source)
-    else
-      process_callouts ? sub_callouts(source) : source
-    end
+    process_callouts ? sub_callouts(sub_specialchars source) : (sub_specialchars source)
   end
 
   # Internal: Lock-in the substitutions for this block

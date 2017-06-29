@@ -150,9 +150,7 @@ class AbstractBlock < AbstractNode
   #
   # Returns the [String] value of the alt attribute with XML special character substitutions applied.
   def alt_text
-    val = attr 'alt'
-    val = sub_specialchars val if (val.include? '<') || (val.include? '&') || (val.include? '>')
-    val
+    sub_specialchars attr('alt')
   end
 
   # Public: Determine whether this Block contains block content
