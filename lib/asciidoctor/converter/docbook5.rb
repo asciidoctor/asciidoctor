@@ -553,7 +553,7 @@ module Asciidoctor
 <imageobject>
 <imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{width_attribute}#{depth_attribute}/>
 </imageobject>
-<textobject><phrase>#{node.attr 'alt'}</phrase></textobject>
+<textobject><phrase>#{node.alt_text}</phrase></textobject>
 </inlinemediaobject>)
     end
 

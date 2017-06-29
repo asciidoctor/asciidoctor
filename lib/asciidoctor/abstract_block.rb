@@ -146,6 +146,15 @@ class AbstractBlock < AbstractNode
     %(#{@caption}#{title})
   end
 
+  # Public: Returns the converted alt text for this block image.
+  #
+  # Returns the [String] value of the alt attribute with XML special character substitutions applied.
+  def alt_text
+    val = attr 'alt'
+    val = sub_specialchars val if (val.include? '<') || (val.include? '&') || (val.include? '>')
+    val
+  end
+
   # Public: Determine whether this Block contains block content
   #
   # Returns A Boolean indicating whether this Block has block content
