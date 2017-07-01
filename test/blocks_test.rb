@@ -1630,6 +1630,16 @@ image::images/tiger.png[Tiger]
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
+    test 'should substitute attribute references in alt text defined in image block macro' do
+      input = <<-EOS
+:alt-text: Tiger
+
+image::images/tiger.png[{alt-text}]
+      EOS
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
     test 'style attribute is dropped from image macro' do
       input = <<-EOS
 [style=value]
@@ -1642,22 +1652,18 @@ image::images/tiger.png[Tiger]
       assert_nil img.style
     end
 
-    test 'alt text is escaped in HTML backend' do
-      input = <<-EOS
-image::images/open.png[Select "File > Open"]
-      EOS
-
-      output = render_embedded_string input
-      assert_match(/Select &quot;File &gt; Open&quot;/, output)
+    test 'should apply specialcharacters and replacement substitutions to alt text' do
+      input = 'A tiger\'s "roar" is < a bear\'s "growl"'
+      expected = 'A tiger&#8217;s &quot;roar&quot; is &lt; a bear&#8217;s &quot;growl&quot;'
+      result = render_embedded_string %(image::images/tiger-roar.png[#{input}])
+      assert_includes result, %(alt="#{expected}")
     end
 
-    test 'alt text is escaped in DocBook backend' do
-      input = <<-EOS
-image::images/open.png[Select "File > Open"]
-      EOS
-
-      output = render_embedded_string input, :backend => :docbook
-      assert_match(/Select "File &gt; Open"/, output)
+    test 'should not encode double quotes in alt text when converting to DocBook' do
+      input = 'Select "File > Open"'
+      expected = 'Select "File &gt; Open"'
+      result = render_embedded_string %(image::images/open.png[#{input}]), :backend => :docbook
+      assert_includes result, %(<phrase>#{expected}</phrase>)
     end
 
     test "can render block image with auto-generated alt text" do
