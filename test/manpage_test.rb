@@ -287,6 +287,24 @@ T}
     end
   end
 
+  context 'Images' do
+    test 'should replace inline image with alt text' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+The Magic 8 Ball says image:signs-point-to-yes.jpg[].)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_includes output, 'The Magic 8 Ball says [signs point to yes].'
+    end
+
+    test 'should place link after alt text for inline image if link is defined' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+The Magic 8 Ball says image:signs-point-to-yes.jpg[link=https://en.wikipedia.org/wiki/Magic_8-Ball].)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_includes output, 'The Magic 8 Ball says [signs point to yes] <https://en.wikipedia.org/wiki/Magic_8\-Ball>.'
+    end
+  end
+
   context 'Callout List' do
     test 'should generate callout list using proper formatting commands' do
       input = %(#{SAMPLE_MANPAGE_HEADER}

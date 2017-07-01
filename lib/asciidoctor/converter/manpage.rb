@@ -626,9 +626,7 @@ allbox tab(:);'
     end
 
     def inline_image node
-      # NOTE alt should always be set
-      alt_text = (node.attr? 'alt') ? (node.attr 'alt') : node.target
-      (node.attr? 'link') ? %([#{alt_text}] <#{node.attr 'link'}>) : %([#{alt_text}])
+      (node.attr? 'link') ? %([#{node.alt_text}] <#{node.attr 'link'}>) : %([#{node.alt_text}])
     end
 
     def inline_indexterm node
