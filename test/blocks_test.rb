@@ -1666,13 +1666,16 @@ image::images/tiger.png[Tiger]
       assert_includes result, %(<phrase>#{expected}</phrase>)
     end
 
-    test "can render block image with auto-generated alt text" do
+    test 'should auto-generate alt text for block image if alt text is not specified' do
       input = <<-EOS
-image::images/tiger.png[]
+image::images/lions-and-tigers.png[]
       EOS
 
-      output = render_embedded_string input
-      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="tiger"]', output, 1
+      image = block_from_string input
+      assert_equal 'lions and tigers', (image.attr 'alt')
+      assert_equal 'lions and tigers', (image.attr 'default-alt')
+      output = image.convert
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/lions-and-tigers.png"][@alt="lions and tigers"]', output, 1
     end
 
     test "can render block image with alt text and height and width" do

@@ -1070,6 +1070,10 @@ module Asciidoctor
     #
     EscapedSpaceRx = /\\([ \t\n])/
 
+    # Detects if text is a candidate for replacements.
+    #
+    ReplaceableTextRx = /(?:[;\(']|--|\.\.\.)/
+
     # Matches a whitespace delimiter, a sequence of spaces, tabs, and/or newlines.
 	# Matches the parsing rules of %w strings in Ruby.
     #
