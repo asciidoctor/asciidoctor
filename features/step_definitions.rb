@@ -29,25 +29,21 @@ When /it is converted to docbook/ do
   @output = Asciidoctor.convert @source, :backend => :docbook
 end
 
-Then /the result should match the (HTML|XML) source/ do |format, expect|
-  @output.should == expect
+Then /the result should (match|contain) the (HTML|XML) source/ do |matcher, format, expected|
+  match_expectation = matcher == 'match' ? (eq expected) : (include expected)
+  (expect @output).to match_expectation
 end
 
-Then /the result should match the (HTML|XML) structure/ do |format, expect|
-  case format
-  when 'HTML'
+Then /the result should (match|contain) the (HTML|XML) structure/ do |matcher, format, expected|
+  result = @output
+  if format == 'HTML'
     options = { :format => :html, :disable_escape => true, :sort_attrs => false }
-  when 'XML'
+  else # format == 'XML'
     options = { :format => :xhtml, :disable_escape => true, :sort_attrs => false }
-  else
-    options = {}
+    result = result.gsub '"/>', '" />' if result.include? '"/>'
   end
-  slim_friendly_output = @output.each_line.map {|line|
-    if line.start_with? '<'
-      line
-    else
-      %(|#{line})
-    end
-  }.join
-  Slim::Template.new(options) { slim_friendly_output }.render.should == Slim::Template.new(options) { expect }.render
+  result = Slim::Template.new(options) { result.each_line.map {|l| (l.start_with? '<') ? l : %(|#{l}) }.join }.render
+  expected = Slim::Template.new(options) { expected }.render
+  match_expectation = matcher == 'match' ? (eq expected) : (include expected)
+  (expect result).to match_expectation
 end
