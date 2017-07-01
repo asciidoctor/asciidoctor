@@ -525,7 +525,7 @@ class Parser
             elsif (this_line.end_with? ']') && (this_line.include? '::')
               #if (this_line.start_with? 'image', 'video', 'audio') && (match = MediaBlockMacroRx.match(this_line))
               if (ch0 == 'i' || (this_line.start_with? 'video:', 'audio:')) && (match = MediaBlockMacroRx.match(this_line))
-                blk_ctx = match[1].to_sym
+                blk_ctx, target = match[1].to_sym, match[2]
                 block = Block.new(parent, blk_ctx, :content_model => :empty)
                 case blk_ctx
                 when :video
@@ -538,10 +538,7 @@ class Parser
                 block.parse_attributes(match[3], posattrs, :sub_input => true, :sub_result => false, :into => attributes)
                 # style doesn't have special meaning for media macros
                 attributes.delete 'style' if attributes.key? 'style'
-                if (target = match[2]).include? '{'
-                  target = block.sub_attributes target, :attribute_missing => 'drop-line'
-                end
-                if target.empty?
+                if (target.include? '{') && (target = block.sub_attributes target, :attribute_missing => 'drop-line').empty?
                   # retain as unparsed if attribute-missing is skip
                   if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
                     return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
