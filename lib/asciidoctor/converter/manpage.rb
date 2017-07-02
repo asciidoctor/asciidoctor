@@ -573,8 +573,12 @@ allbox tab(:);'
     def video node
       start_param = (node.attr? 'start', nil, false) ? %(&start=#{node.attr 'start'}) : nil
       end_param = (node.attr? 'end', nil, false) ? %(&end=#{node.attr 'end'}) : nil
-      %(.sp
-#{manify node.captioned_title} (video) <#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}>)
+      result = []
+      result << %(.sp
+.B #{manify node.captioned_title}
+.br) if node.title?
+      result << %(<#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}> (video))
+      result * LF
     end
 
     def inline_anchor node
