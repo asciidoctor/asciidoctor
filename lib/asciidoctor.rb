@@ -218,7 +218,7 @@ module Asciidoctor
   FORCE_UNICODE_LINE_LENGTH = !::RUBY_MIN_VERSION_1_9
 
   # The endline character used for output; stored in constant table as an optimization
-  EOL = "\n"
+  LF = "\n"
 
   # The null character to use for splitting attribute values
   NULL = "\0"

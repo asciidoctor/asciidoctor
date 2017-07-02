@@ -202,7 +202,7 @@ module Asciidoctor
       if target.respond_to? :write
         target.write output.chomp
         # ensure there's a trailing endline to be nice to terminals
-        target.write EOL
+        target.write LF
       else
         ::IO.write target, output
       end

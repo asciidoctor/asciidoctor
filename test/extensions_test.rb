@@ -590,7 +590,7 @@ last line
       while reader.has_more_lines?
         lines << reader.read_line
       end
-      source = lines * ::Asciidoctor::EOL
+      source = lines * ::Asciidoctor::LF
       assert_match(/^include target:: include-file.asciidoc$/, source)
       assert_match(/^middle line$/, source)
     end

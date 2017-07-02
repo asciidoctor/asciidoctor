@@ -375,7 +375,7 @@ class AbstractNode
     end
 
     # NOTE base64 is autoloaded by reference to ::Base64
-    %(data:#{mimetype};base64,#{::Base64.encode64(::IO.binread image_path).delete EOL})
+    %(data:#{mimetype};base64,#{::Base64.encode64(::IO.binread image_path).delete LF})
   end
 
   # Public: Read the image data from the specified URI and generate a data URI
@@ -407,7 +407,7 @@ class AbstractNode
         fd.read
       }
       # NOTE base64 is autoloaded by reference to ::Base64
-      %(data:#{mimetype};base64,#{::Base64.encode64(bindata).delete EOL})
+      %(data:#{mimetype};base64,#{::Base64.encode64(bindata).delete LF})
     rescue
       warn %(asciidoctor: WARNING: could not retrieve image data from URI: #{image_uri})
       image_uri
@@ -442,7 +442,7 @@ class AbstractNode
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
         begin
           data = ::OpenURI.open_uri(target) {|fd| fd.read }
-          data = (Helpers.normalize_lines_from_string data) * EOL if opts[:normalize]
+          data = (Helpers.normalize_lines_from_string data) * LF if opts[:normalize]
         rescue
           warn %(asciidoctor: WARNING: could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
           data = nil
@@ -476,7 +476,7 @@ class AbstractNode
     opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
     if ::File.readable? path
       if opts[:normalize]
-        Helpers.normalize_lines_from_string(::IO.read path) * EOL
+        Helpers.normalize_lines_from_string(::IO.read path) * LF
       else
         # QUESTION should we chomp or rstrip content?
         ::IO.read path

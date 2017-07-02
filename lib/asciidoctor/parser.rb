@@ -726,7 +726,7 @@ class Parser
             return
           end
 
-          catalog_inline_anchors lines.join(EOL), document
+          catalog_inline_anchors lines.join(LF), document
 
           # NOTE don't check indented here since it's extremely rare
           #if text_only || indented
@@ -1540,7 +1540,7 @@ class Parser
     # a blank line would have served the same purpose in the document
     buffer.pop if !buffer.empty? && buffer[-1] == LIST_CONTINUATION
 
-    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer * EOL}<BUFFER"
+    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer * LF}<BUFFER"
     #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
 
     buffer
@@ -2069,7 +2069,7 @@ class Parser
           if (keep_open = next_line.end_with? con)
             next_line = (next_line.slice 0, next_line.length - 2).rstrip
           end
-          value = %(#{value}#{(value.end_with? LINE_BREAK) ? EOL : ' '}#{next_line})
+          value = %(#{value}#{(value.end_with? LINE_BREAK) ? LF : ' '}#{next_line})
           break unless keep_open
         end
       end
@@ -2316,7 +2316,7 @@ class Parser
           when 'dsv'
             if m.pre_match.end_with? '\\'
               if (line = parser_ctx.skip_past_escaped_delimiter m).empty?
-                parser_ctx.buffer = %(#{parser_ctx.buffer}#{EOL})
+                parser_ctx.buffer = %(#{parser_ctx.buffer}#{LF})
                 parser_ctx.keep_cell_open
                 break
               end
@@ -2326,7 +2326,7 @@ class Parser
           else # psv
             if m.pre_match.end_with? '\\'
               if (line = parser_ctx.skip_past_escaped_delimiter m).empty?
-                parser_ctx.buffer = %(#{parser_ctx.buffer}#{EOL})
+                parser_ctx.buffer = %(#{parser_ctx.buffer}#{LF})
                 parser_ctx.keep_cell_open
                 break
               end
@@ -2341,7 +2341,7 @@ class Parser
           parser_ctx.close_cell
         else
           # no other delimiters to see here; suck up this line into the buffer and move on
-          parser_ctx.buffer = %(#{parser_ctx.buffer}#{line}#{EOL})
+          parser_ctx.buffer = %(#{parser_ctx.buffer}#{line}#{LF})
           case format
           when 'csv'
             # QUESTION make stripping endlines in csv data an option? (unwrap-option?)

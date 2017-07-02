@@ -38,7 +38,7 @@ module Asciidoctor
       end
       result << %(</#{root_tag_name}>)
 
-      result * EOL
+      result * LF
     end
 
     alias embedded content
@@ -76,7 +76,7 @@ module Asciidoctor
         result << '</callout>'
       end
       result << %(</calloutlist>)
-      result * EOL
+      result * LF
     end
 
     (DLIST_TAGS = {
@@ -159,7 +159,7 @@ module Asciidoctor
         result << %(</#{list_tag}>) if list_tag
       end
 
-      result * EOL
+      result * LF
     end
 
     def example node
@@ -298,7 +298,7 @@ module Asciidoctor
         result << '</listitem>'
       end
       result << %(</orderedlist>)
-      result * EOL
+      result * LF
     end
 
     def open node
@@ -367,7 +367,7 @@ module Asciidoctor
       end
       result << (resolve_content node)
       result << '</blockquote>'
-      result * EOL
+      result * LF
     end
 
     def thematic_break node
@@ -445,7 +445,7 @@ module Asciidoctor
       result << %(</#{tag_name}>)
 
       warn 'asciidoctor: WARNING: tables must have at least one body row' unless has_body
-      result * EOL
+      result * LF
     end
 
     alias toc skip
@@ -481,7 +481,7 @@ module Asciidoctor
         result << '</itemizedlist>'
       end
 
-      result * EOL
+      result * LF
     end
 
     def verse node
@@ -500,7 +500,7 @@ module Asciidoctor
       end
       result << %(<literallayout>#{node.content}</literallayout>)
       result << '</blockquote>'
-      result * EOL
+      result * LF
     end
 
     alias video skip
@@ -576,7 +576,7 @@ module Asciidoctor
         result << %(<indexterm>
 <primary>#{terms[-1]}</primary>
 </indexterm>)
-        result * EOL
+        result * LF
       end
     end
 
@@ -657,7 +657,7 @@ module Asciidoctor
       result << %(<email>#{doc.attr email_key}</email>) if doc.attr? email_key
       result << '</author>'
 
-      result * EOL
+      result * LF
     end
 
     def common_attributes id, role = nil, reftext = nil
@@ -730,7 +730,7 @@ module Asciidoctor
         result << '</refnamediv>'
       end
 
-      result * EOL
+      result * LF
     end
 
     def document_ns_attributes doc

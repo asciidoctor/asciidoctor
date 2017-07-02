@@ -228,7 +228,7 @@ class Table::Cell < AbstractNode
       if opts[:strip_text]
         if cell_style == :literal || cell_style == :verse
           cell_text = cell_text.rstrip
-          cell_text = cell_text.slice 1, cell_text.length - 1 while cell_text.start_with? EOL
+          cell_text = cell_text.slice 1, cell_text.length - 1 while cell_text.start_with? LF
         else
           cell_text = cell_text.strip
         end
@@ -248,7 +248,7 @@ class Table::Cell < AbstractNode
       # lines of table cell content, it must be self-contained logic
       # QUESTION should we reset cell_text to nil?
       # QUESTION is is faster to check for :: before splitting?
-      inner_document_lines = cell_text.split EOL, -1
+      inner_document_lines = cell_text.split LF, -1
       if (unprocessed_line1 = inner_document_lines[0]).include? '::'
         preprocessed_lines = (PreprocessorReader.new @document, [unprocessed_line1]).readlines
         unless unprocessed_line1 == preprocessed_lines[0] && preprocessed_lines.size < 2
