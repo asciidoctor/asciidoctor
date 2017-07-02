@@ -232,6 +232,50 @@ before asking.', output.lines.entries[-4..-1].join
       refute_match(/<\/?BOUNDARY>/, output)
     end
 
+    test 'should manify table title' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+.Table of options
+|===
+| Name | Description | Default
+
+| dim
+| dimension of the object
+| 3
+|===)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert output.end_with? '.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.B Table 1. Table of options
+.TS
+allbox tab(:);
+lt lt lt.
+T{
+.sp
+Name
+T}:T{
+.sp
+Description
+T}:T{
+.sp
+Default
+T}
+T{
+.sp
+dim
+T}:T{
+.sp
+dimension of the object
+T}:T{
+.sp
+3
+T}
+.TE
+.sp'
+    end
+
     test 'should manify and preserve whitespace in literal table cell' do
       input = %(#{SAMPLE_MANPAGE_HEADER}
 

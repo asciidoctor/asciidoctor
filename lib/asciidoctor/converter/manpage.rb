@@ -400,7 +400,8 @@ T})
 .nr an-no-space-flag 1
 .nr an-break-flag 1
 .br
-.B #{manify node.captioned_title})
+.B #{manify node.captioned_title}
+)
       end
       result << '.TS
 allbox tab(:);'
