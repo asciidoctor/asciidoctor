@@ -509,9 +509,9 @@ module Asciidoctor
     #   :First Name: Dan
     #   :sectnums!:
     #   :!toc:
-    #   :long-entry: Attribute value lines ending in ' +'
-    #                are joined together as a single value,
-    #                collapsing the line breaks and indentation to
+    #   :long-entry: Attribute value lines ending in ' \' \
+    #                are joined together as a single value, \
+    #                collapsing the line breaks and indentation to \
     #                a single space.
     #
     AttributeEntryRx = /^:(!?\w.*?):(?:[ \t]+(.*))?$/
