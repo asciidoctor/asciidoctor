@@ -538,12 +538,12 @@ module Asciidoctor
     #
     # Examples
     #
-    #   {foo}
-    #   {counter:pcount:1}
+    #   {foobar} or {app_name} or {product-version}
+    #   {counter:sequence-name:1}
     #   {set:foo:bar}
     #   {set:name!}
     #
-    AttributeReferenceRx = /(\\)?\{((set|counter2?):.+?|\w+(?:[\-]\w+)*)(\\)?\}/
+    AttributeReferenceRx = /(\\)?\{(\w+[-\w]*|(set|counter2?):.+?)(\\)?\}/
 
     ## Paragraphs and delimited blocks
 
