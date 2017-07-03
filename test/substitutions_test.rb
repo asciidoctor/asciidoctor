@@ -1360,6 +1360,14 @@ EOS
         assert_equal %q{<span class="menuseq"><b class="menu">&#8942;</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">More Tools</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Extensions</b></span>}, para.sub_macros(para.source)
       end
 
+      test 'should not process a menu macro with a target that ends with a space' do
+        input = 'menu:foo [bar] menu:File[Save]'
+        para = block_from_string input, :attributes => {'experimental' => ''}
+        result = para.sub_macros para.source
+        assert_xpath '/span[@class="menuseq"]', result, 1
+        assert_xpath '//b[@class="menu"][text()="File"]', result, 1
+      end
+
       test 'should process an inline menu that begins with a character reference' do
         para = block_from_string('"&#8942; &gt; More Tools &gt; Extensions"', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="menuseq"><b class="menu">&#8942;</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">More Tools</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Extensions</b></span>}, para.sub_macros(para.source)

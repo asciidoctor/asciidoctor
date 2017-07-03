@@ -942,11 +942,11 @@ module Asciidoctor
     #
     # Examples
     #
-    #   menu:File[New...]
+    #   menu:File[Save As...]
     #   menu:View[Page Style > No Style]
     #   menu:View[Page Style, No Style]
     #
-    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&].*?\S)\[ *(#{CC_ALL}*?[^\\])?\]/m
+    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&][^\[\n]*[^\[\s])\[ *(#{CC_ALL}*?[^\\])?\]/m
 
     # Matches an implicit menu inline macro.
     #
