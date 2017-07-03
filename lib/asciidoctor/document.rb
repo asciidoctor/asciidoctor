@@ -1076,7 +1076,7 @@ class Document < AbstractBlock
         unless output.nil_or_empty?
           target.write output.chomp
           # ensure there's a trailing endline
-          target.write EOL
+          target.write LF
         end
       else
         ::IO.write target, output
@@ -1163,15 +1163,15 @@ class Document < AbstractBlock
             unless (docinfosubs ||= resolve_docinfo_subs).empty?
               content2 = (docinfosubs == :attributes) ? sub_attributes(content2) : apply_subs(content2, docinfosubs)
             end
-            content = content ? %(#{content}#{EOL}#{content2}) : content2
+            content = content ? %(#{content}#{LF}#{content2}) : content2
           end
         end
       end
 
       # TODO allow document to control whether extension docinfo is contributed
       if @extensions && docinfo_processors?(location)
-        contentx = @docinfo_processor_extensions[location].map {|candidate| candidate.process_method[self] }.compact * EOL
-        content = content ? %(#{content}#{EOL}#{contentx}) : contentx
+        contentx = @docinfo_processor_extensions[location].map {|candidate| candidate.process_method[self] }.compact * LF
+        content = content ? %(#{content}#{LF}#{contentx}) : contentx
       end
 
       # coerce to string (in case the value is nil)

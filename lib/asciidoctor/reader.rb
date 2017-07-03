@@ -88,7 +88,7 @@ class Reader
       if opts[:normalize]
         Helpers.normalize_lines_from_string data
       else
-        data.split EOL, -1
+        data.split LF, -1
       end
     else
       if opts[:normalize]
@@ -241,7 +241,7 @@ class Reader
   #
   # Returns the lines read joined as a String
   def read
-    read_lines * EOL
+    read_lines * LF
   end
 
   # Public: Advance to the next line by discarding the line at the front of the stack
@@ -544,12 +544,12 @@ class Reader
 
   # Public: Get a copy of the remaining lines managed by this Reader joined as a String
   def string
-    @lines * EOL
+    @lines * LF
   end
 
   # Public: Get the source lines for this Reader joined as a String
   def source
-    @source_lines * EOL
+    @source_lines * LF
   end
 
   # Public: Get a summary of this Reader.
@@ -588,7 +588,7 @@ class PreprocessorReader < Reader
     # QUESTION should this work for AsciiDoc table cell content? Currently it does not.
     if @document && (@document.attributes.key? 'skip-front-matter')
       if (front_matter = skip_front_matter! result)
-        @document.attributes['front-matter'] = front_matter * EOL
+        @document.attributes['front-matter'] = front_matter * LF
       end
     end
 

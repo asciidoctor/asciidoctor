@@ -250,7 +250,7 @@ MathJax.Hub.Config({
 
       result << '</body>'
       result << '</html>'
-      result * EOL
+      result * LF
     end
 
     def embedded node
@@ -293,7 +293,7 @@ MathJax.Hub.Config({
         result << '</div>'
       end
 
-      result * EOL
+      result * LF
     end
 
     def outline node, opts = {}
@@ -321,7 +321,7 @@ MathJax.Hub.Config({
         end
       end
       result << '</ul>'
-      result * EOL
+      result * LF
     end
 
     def section node
@@ -443,7 +443,7 @@ Your browser does not support the audio tag.
       end
 
       result << '</div>'
-      result * EOL
+      result * LF
     end
 
     def dlist node
@@ -526,7 +526,7 @@ Your browser does not support the audio tag.
       end
 
       result << '</div>'
-      result * EOL
+      result * LF
     end
 
     def example node
@@ -672,7 +672,7 @@ Your browser does not support the audio tag.
 
       result << '</ol>'
       result << '</div>'
-      result * EOL
+      result * LF
     end
 
     def open node
@@ -847,7 +847,7 @@ Your browser does not support the audio tag.
         end
       end
       result << '</table>'
-      result * EOL
+      result * LF
     end
 
     def toc node
@@ -918,7 +918,7 @@ Your browser does not support the audio tag.
 
       result << '</ul>'
       result << '</div>'
-      result * EOL
+      result * LF
     end
 
     def verse node

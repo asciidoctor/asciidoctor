@@ -7,7 +7,7 @@ end
 class ReaderTest < Minitest::Test
   DIRNAME = File.expand_path(File.dirname(__FILE__))
 
-  SAMPLE_DATA = <<-EOS.chomp.split(::Asciidoctor::EOL)
+  SAMPLE_DATA = <<-EOS.chomp.split(::Asciidoctor::LF)
 first line
 second line
 third line
@@ -26,7 +26,7 @@ third line
       end
 
       test 'should remove UTF-8 BOM from first line of String data' do
-        data = "\xef\xbb\xbf#{SAMPLE_DATA.join ::Asciidoctor::EOL}"
+        data = "\xef\xbb\xbf#{SAMPLE_DATA.join ::Asciidoctor::LF}"
         reader = Asciidoctor::Reader.new data, nil, :normalize => true
         assert_equal 'f', reader.lines.first.chr
         assert_equal SAMPLE_DATA, reader.lines
@@ -42,28 +42,28 @@ third line
 
       if Asciidoctor::COERCE_ENCODING
         test 'should encode UTF-16LE string to UTF-8 when BOM is found' do
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::EOL}".encode('UTF-16LE').force_encoding('UTF-8')
+          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding('UTF-8')
           reader = Asciidoctor::Reader.new data, nil, :normalize => true
           assert_equal 'f', reader.lines.first.chr
           assert_equal SAMPLE_DATA, reader.lines
         end
 
         test 'should encode UTF-16LE string array to UTF-8 when BOM is found' do
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::EOL}".encode('UTF-16LE').force_encoding('UTF-8').lines.to_a
+          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding('UTF-8').lines.to_a
           reader = Asciidoctor::Reader.new data, nil, :normalize => true
           assert_equal 'f', reader.lines.first.chr
           assert_equal SAMPLE_DATA, reader.lines
         end
 
         test 'should encode UTF-16BE string to UTF-8 when BOM is found' do
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::EOL}".encode('UTF-16BE').force_encoding('UTF-8')
+          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding('UTF-8')
           reader = Asciidoctor::Reader.new data, nil, :normalize => true
           assert_equal 'f', reader.lines.first.chr
           assert_equal SAMPLE_DATA, reader.lines
         end
 
         test 'should encode UTF-16BE string array to UTF-8 when BOM is found' do
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::EOL}".encode('UTF-16BE').force_encoding('UTF-8').lines.to_a
+          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding('UTF-8').lines.to_a
           reader = Asciidoctor::Reader.new data, nil, :normalize => true
           assert_equal 'f', reader.lines.first.chr
           assert_equal SAMPLE_DATA, reader.lines
@@ -190,7 +190,7 @@ third line
 
       test 'read should return all lines joined as String' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
-        assert_equal SAMPLE_DATA.join(::Asciidoctor::EOL), reader.read
+        assert_equal SAMPLE_DATA.join(::Asciidoctor::LF), reader.read
       end
 
       test 'has_more_lines? should return false after read_lines is invoked' do
@@ -235,7 +235,7 @@ third line
       test 'source should return original data Array joined as String' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         reader.read_lines
-        assert_equal SAMPLE_DATA.join(::Asciidoctor::EOL), reader.source
+        assert_equal SAMPLE_DATA.join(::Asciidoctor::LF), reader.source
       end
 
     end
@@ -292,7 +292,7 @@ This is another paragraph.
       end
 
       test 'Read lines until until blank line preserving last line' do
-        lines = <<-EOS.chomp.split(::Asciidoctor::EOL)
+        lines = <<-EOS.chomp.split(::Asciidoctor::LF)
 This is one paragraph.
 
 This is another paragraph.
@@ -306,7 +306,7 @@ This is another paragraph.
       end
 
       test 'Read lines until until condition is true' do
-        lines = <<-EOS.chomp.split(::Asciidoctor::EOL)
+        lines = <<-EOS.chomp.split(::Asciidoctor::LF)
 --
 This is one paragraph inside the block.
 
@@ -325,7 +325,7 @@ This is a paragraph outside the block.
       end
 
       test 'Read lines until until condition is true, taking last line' do
-        lines = <<-EOS.chomp.split(::Asciidoctor::EOL)
+        lines = <<-EOS.chomp.split(::Asciidoctor::LF)
 --
 This is one paragraph inside the block.
 
@@ -344,7 +344,7 @@ This is a paragraph outside the block.
       end
 
       test 'Read lines until until condition is true, taking and preserving last line' do
-        lines = <<-EOS.chomp.split(::Asciidoctor::EOL)
+        lines = <<-EOS.chomp.split(::Asciidoctor::LF)
 --
 This is one paragraph inside the block.
 
@@ -393,7 +393,7 @@ This is a paragraph outside the block.
         data = SAMPLE_DATA.map {|line| line.chomp}
         data.unshift ' '
         data.push ' '
-        data_as_string = data * ::Asciidoctor::EOL
+        data_as_string = data * ::Asciidoctor::LF
         doc = Asciidoctor::Document.new data_as_string
         reader = doc.reader
         assert_equal SAMPLE_DATA, reader.lines
@@ -407,7 +407,7 @@ CRLF\r
 endlines\r
       EOS
 
-        [input, input.lines.to_a, input.split(::Asciidoctor::EOL), input.split(::Asciidoctor::EOL).join(::Asciidoctor::EOL)].each do |lines|
+        [input, input.lines.to_a, input.split(::Asciidoctor::LF), input.split(::Asciidoctor::LF).join(::Asciidoctor::LF)].each do |lines|
           doc = Asciidoctor::Document.new lines
           reader = doc.reader
           reader.lines.each do |line|
@@ -1029,7 +1029,7 @@ include::fixtures/include-file.asciidoc[]
         reader = Asciidoctor::PreprocessorReader.new document, input, nil, :normalize => true
         reader.instance_variable_set '@include_processors', [include_processor.new(document)]
         lines = reader.read_lines
-        source = lines * ::Asciidoctor::EOL
+        source = lines * ::Asciidoctor::LF
         assert_match(/included content/, source)
       end
 
@@ -1038,7 +1038,7 @@ include::fixtures/include-file.asciidoc[]
 include::fixtures/master.adoc[]
         EOS
 
-        expected = <<-EOS.chomp.split(::Asciidoctor::EOL)
+        expected = <<-EOS.chomp.split(::Asciidoctor::LF)
 = Master Document
 
 preamble
@@ -1299,7 +1299,7 @@ endif::holygrail[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'There is a holy grail!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'There is a holy grail!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifdef with defined attribute includes text in brackets' do
@@ -1315,7 +1315,7 @@ There was much rejoicing.
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal "On our quest we go...\nThere is a holy grail!\nThere was much rejoicing.", (lines * ::Asciidoctor::EOL)
+        assert_equal "On our quest we go...\nThere is a holy grail!\nThere was much rejoicing.", (lines * ::Asciidoctor::LF)
       end
 
       test 'ifdef with defined attribute processes include directive in brackets' do
@@ -1357,7 +1357,7 @@ There was no rejoicing.
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal "On our quest we go...\nThere was no rejoicing.", (lines * ::Asciidoctor::EOL)
+        assert_equal "On our quest we go...\nThere was no rejoicing.", (lines * ::Asciidoctor::LF)
       end
 
       test 'include with non-matching nested exclude' do
@@ -1377,7 +1377,7 @@ endif::grail[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal "holy\ngrail", (lines * ::Asciidoctor::EOL)
+        assert_equal "holy\ngrail", (lines * ::Asciidoctor::LF)
       end
 
       test 'nested excludes with same condition' do
@@ -1395,7 +1395,7 @@ endif::grail[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal '', (lines * ::Asciidoctor::EOL)
+        assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
       test 'include with nested exclude of inverted condition' do
@@ -1415,7 +1415,7 @@ endif::grail[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal "holy\ngrail", (lines * ::Asciidoctor::EOL)
+        assert_equal "holy\ngrail", (lines * ::Asciidoctor::LF)
       end
 
       test 'exclude with matching nested exclude' do
@@ -1437,7 +1437,7 @@ gone
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal "poof\ngone", (lines * ::Asciidoctor::EOL)
+        assert_equal "poof\ngone", (lines * ::Asciidoctor::LF)
       end
 
       test 'exclude with nested include using shorthand end' do
@@ -1459,7 +1459,7 @@ gone
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal "poof\ngone", (lines * ::Asciidoctor::EOL)
+        assert_equal "poof\ngone", (lines * ::Asciidoctor::LF)
       end
 
       test 'ifdef with one alternative attribute set includes content' do
@@ -1475,7 +1475,7 @@ endif::holygrail,swallow[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifdef with no alternative attributes set does not include content' do
@@ -1491,7 +1491,7 @@ endif::holygrail,swallow[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal '', (lines * ::Asciidoctor::EOL)
+        assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifdef with all required attributes set includes content' do
@@ -1507,7 +1507,7 @@ endif::holygrail+swallow[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifdef with missing required attributes does not include content' do
@@ -1523,7 +1523,7 @@ endif::holygrail+swallow[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal '', (lines * ::Asciidoctor::EOL)
+        assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifdef should permit leading, trailing, and repeat operators' do
@@ -1557,7 +1557,7 @@ endif::holygrail[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'Our quest continues to find the holy grail!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'Our quest continues to find the holy grail!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifndef with one alternative attribute set does not include content' do
@@ -1639,7 +1639,7 @@ content
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal "ifdef::holygrail[]\ncontent\nendif::holygrail[]", (lines * ::Asciidoctor::EOL)
+        assert_equal "ifdef::holygrail[]\ncontent\nendif::holygrail[]", (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval comparing missing attribute to nil includes content' do
@@ -1655,7 +1655,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'No foo for you!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'No foo for you!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval comparing missing attribute to 0 drops content' do
@@ -1671,7 +1671,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal '', (lines * ::Asciidoctor::EOL)
+        assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval comparing double-quoted attribute to matching string includes content' do
@@ -1687,7 +1687,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval comparing single-quoted attribute to matching string includes content' do
@@ -1703,7 +1703,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval comparing quoted attribute to non-matching string drops content' do
@@ -1719,7 +1719,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal '', (lines * ::Asciidoctor::EOL)
+        assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval comparing attribute to lower version number includes content' do
@@ -1735,7 +1735,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'That version will do!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'That version will do!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval comparing attribute to self includes content' do
@@ -1751,7 +1751,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'Of course it\'s the same!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'Of course it\'s the same!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval arguments can be transposed' do
@@ -1767,7 +1767,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'That version will do!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'That version will do!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval matching numeric equality includes content' do
@@ -1783,7 +1783,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifeval matching numeric inequality includes content' do
@@ -1799,7 +1799,7 @@ endif::[]
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::EOL)
+        assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::LF)
       end
 
       test 'ifdef with no target is ignored' do
@@ -1814,7 +1814,7 @@ content
         while reader.has_more_lines?
           lines << reader.read_line
         end
-        assert_equal "ifdef::[]\ncontent", (lines * ::Asciidoctor::EOL)
+        assert_equal "ifdef::[]\ncontent", (lines * ::Asciidoctor::LF)
       end
     end
   end

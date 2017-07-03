@@ -193,7 +193,7 @@ class Minitest::Test
   end
 
   def parse_header_metadata(source, doc = nil)
-    reader = Asciidoctor::Reader.new source.split ::Asciidoctor::EOL
+    reader = Asciidoctor::Reader.new source.split ::Asciidoctor::LF
     [::Asciidoctor::Parser.parse_header_metadata(reader, doc), reader]
   end
 

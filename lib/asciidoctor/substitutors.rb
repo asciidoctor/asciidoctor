@@ -99,7 +99,7 @@ module Substitutors
       end
     end
 
-    text = (multiline = ::Array === source) ? source * EOL : source
+    text = (multiline = ::Array === source) ? source * LF : source
 
     if (has_passthroughs = subs.include? :macros)
       text = extract_passthroughs text
@@ -113,7 +113,7 @@ module Substitutors
       when :quotes
         text = sub_quotes text
       when :attributes
-        text = sub_attributes(text.split EOL, -1) * EOL if text.include? '{'
+        text = sub_attributes(text.split LF, -1) * LF if text.include? '{'
       when :replacements
         text = sub_replacements text
       when :macros
@@ -130,7 +130,7 @@ module Substitutors
     end
     text = restore_passthroughs text if has_passthroughs
 
-    multiline ? (text.split EOL, -1) : text
+    multiline ? (text.split LF, -1) : text
   end
 
   # Public: Apply normal substitutions.
@@ -139,7 +139,7 @@ module Substitutors
   #
   # returns - A String with normal substitutions performed
   def apply_normal_subs(lines)
-    apply_subs(::Array === lines ? lines * EOL : lines)
+    apply_subs(::Array === lines ? lines * LF : lines)
   end
 
   # Public: Apply substitutions for titles.
@@ -508,7 +508,7 @@ module Substitutors
       result << line unless reject || (reject_if_empty && line.empty?)
     end
 
-    string_data ? result * EOL : result
+    string_data ? result * LF : result
   end
 
   # Public: Substitute inline macros (e.g., links, images, etc)
@@ -1070,12 +1070,12 @@ module Substitutors
   # Returns the converted String text
   def sub_post_replacements(text)
     if (@document.attributes.key? 'hardbreaks') || (@attributes.key? 'hardbreaks-option')
-      lines = text.split EOL, -1
+      lines = text.split LF, -1
       return text if lines.size < 2
       last = lines.pop
       (lines.map {|line|
         Inline.new(self, :break, (line.end_with? LINE_BREAK) ? (line.slice 0, line.length - 2) : line, :type => :line).convert
-      } << last) * EOL
+      } << last) * LF
     elsif (text.include? PLUS) && (text.include? LINE_BREAK)
       text.gsub(LineBreakRx) { Inline.new(self, :break, $1, :type => :line).convert }
     else
@@ -1184,7 +1184,7 @@ module Substitutors
   # Internal: Strip bounding whitespace, fold endlines and unescaped closing
   # square brackets from text extracted from brackets
   def unescape_bracketed_text text
-    if (text = text.strip.tr EOL, ' ').include? R_SB
+    if (text = text.strip.tr LF, ' ').include? R_SB
       text = text.gsub ESC_R_SB, R_SB
     end unless text.empty?
     text
@@ -1193,7 +1193,7 @@ module Substitutors
   # Internal: Strip bounding whitespace and fold endlines
   def normalize_string str, unescape_brackets = false
     unless str.empty?
-      str = str.strip.tr EOL, ' '
+      str = str.strip.tr LF, ' '
       str = str.gsub ESC_R_SB, R_SB if unescape_brackets && (str.include? R_SB)
     end
     str
@@ -1363,7 +1363,7 @@ module Substitutors
       # FIXME cache this dynamic regex
       callout_rx = (attr? 'line-comment') ? /(?:#{::Regexp.escape(attr 'line-comment')} )?#{CalloutExtractRxt}/ : CalloutExtractRx
       # extract callout marks, indexed by line number
-      source = source.split(EOL, -1).map {|line|
+      source = source.split(LF, -1).map {|line|
         lineno = lineno + 1
         line.gsub(callout_rx) {
           # alias match for Ruby 1.8.7 compat
@@ -1378,7 +1378,7 @@ module Substitutors
             nil
           end
         }
-      } * EOL
+      } * LF
       callout_on_last = (last == lineno)
       callout_marks = nil if callout_marks.empty?
     else
@@ -1433,7 +1433,7 @@ module Substitutors
     if process_callouts && callout_marks
       lineno = 0
       reached_code = linenums_mode != :table
-      result.split(EOL, -1).map {|line|
+      result.split(LF, -1).map {|line|
         unless reached_code
           next line unless line.include?('<td class="code">')
           reached_code = true
@@ -1457,7 +1457,7 @@ module Substitutors
         else
           line
         end
-      } * EOL
+      } * LF
     else
       result
     end
