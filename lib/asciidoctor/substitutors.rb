@@ -661,7 +661,7 @@ module Substitutors
         target = m[1]
         @document.register(:images, target) unless type == 'icon'
         attrs = parse_attributes(m[2], posattrs, :unescape_input => true)
-        attrs['alt'] ||= Helpers.basename(target, true).tr('_-', ' ')
+        attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
         Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
       }
     end

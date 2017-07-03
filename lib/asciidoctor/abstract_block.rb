@@ -148,9 +148,17 @@ class AbstractBlock < AbstractNode
 
   # Public: Returns the converted alt text for this block image.
   #
-  # Returns the [String] value of the alt attribute with XML special character substitutions applied.
+  # Returns the [String] value of the alt attribute with XML special character
+  # and replacement substitutions applied.
   def alt
-    sub_replacements(sub_specialchars(attr 'alt'))
+    if (text = @attributes['alt'])
+      if text == @attributes['default-alt']
+        sub_specialchars text
+      else
+        text = sub_specialchars text
+        (ReplaceableTextRx.match? text) ? (sub_replacements text) : text
+      end
+    end
   end
 
   # Public: Determine whether this Block contains block content
