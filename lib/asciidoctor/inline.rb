@@ -44,7 +44,7 @@ class Inline < AbstractNode
   # Public: Returns the converted alt text for this inline image.
   #
   # Returns the [String] value of the alt attribute.
-  def alt_text
+  def alt
     attr 'alt'
   end
 end

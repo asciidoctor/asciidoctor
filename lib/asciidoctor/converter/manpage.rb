@@ -631,7 +631,7 @@ allbox tab(:);'
     end
 
     def inline_image node
-      (node.attr? 'link') ? %([#{node.alt_text}] <#{node.attr 'link'}>) : %([#{node.alt_text}])
+      (node.attr? 'link') ? %([#{node.alt}] <#{node.attr 'link'}>) : %([#{node.alt}])
     end
 
     def inline_indexterm node

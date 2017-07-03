@@ -149,7 +149,7 @@ class AbstractBlock < AbstractNode
   # Public: Returns the converted alt text for this block image.
   #
   # Returns the [String] value of the alt attribute with XML special character substitutions applied.
-  def alt_text
+  def alt
     sub_replacements(sub_specialchars(attr 'alt'))
   end
 

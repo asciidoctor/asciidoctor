@@ -202,7 +202,7 @@ module Asciidoctor
 <imageobject>
 <imagedata fileref="#{node.image_uri(node.attr 'target')}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}/>
 </imageobject>
-<textobject><phrase>#{node.alt_text}</phrase></textobject>
+<textobject><phrase>#{node.alt}</phrase></textobject>
 </mediaobject>)
 
       if node.title?
@@ -553,7 +553,7 @@ module Asciidoctor
 <imageobject>
 <imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{width_attribute}#{depth_attribute}/>
 </imageobject>
-<textobject><phrase>#{node.alt_text}</phrase></textobject>
+<textobject><phrase>#{node.alt}</phrase></textobject>
 </inlinemediaobject>)
     end
 
