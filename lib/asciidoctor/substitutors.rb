@@ -433,12 +433,8 @@ module Substitutors
   # so that a missing key doesn't wipe out the whole block of data
   # when attribute-undefined and/or attribute-missing is drop-line
   def sub_attributes data, opts = {}
-    return data if data.nil_or_empty?
-
     # normalizes data type to an array (string becomes single-element array)
-    if (string_data = ::String === data)
-      data = [data]
-    end
+    data = [data] if (input_is_string = ::String === data)
 
     doc_attrs = @document.attributes
     attribute_missing = nil
@@ -508,7 +504,7 @@ module Substitutors
       result << line unless reject || (reject_if_empty && line.empty?)
     end
 
-    string_data ? result * LF : result
+    input_is_string ? result * LF : result
   end
 
   # Public: Substitute inline macros (e.g., links, images, etc)
