@@ -1046,12 +1046,30 @@ text
       assert_css 'copyright', output, 0
     end
 
-    test 'should apply explicit substitutions to docinfo files' do
-      sample_input_path = fixture_path('subs.adoc')
+    test 'should substitute attributes in docinfo files by default' do
+      sample_input_path = fixture_path 'subs.adoc'
+      output, warnings = redirect_streams do |_, err|
+        output = Asciidoctor.convert_file sample_input_path,
+            :to_file => false,
+            :header_footer => true,
+            :safe => :server,
+            :attributes => { 'docinfo' => '', 'bootstrap-version' => nil, 'linkcss' => '', 'attribute-missing' => 'drop-line' }
+        [output, err.string]
+      end
+      refute output.empty?
+      assert_css 'script', output, 0
+      assert_xpath %(//meta[@name="copyright"][@content="(C) OpenDevise"]), output, 1
+      assert_includes warnings, 'dropping line containing reference to missing attribute'
+    end
 
-      output = Asciidoctor.convert_file sample_input_path, :to_file => false,
-                                        :header_footer => true, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo' => '', 'docinfosubs' => 'attributes,replacements', 'linkcss' => ''}
-      assert !output.empty?
+    test 'should apply explicit substitutions to docinfo files' do
+      sample_input_path = fixture_path 'subs.adoc'
+      output = Asciidoctor.convert_file sample_input_path,
+          :to_file => false,
+          :header_footer => true,
+          :safe => :server,
+          :attributes => { 'docinfo' => '', 'docinfosubs' => 'attributes,replacements', 'linkcss' => '' }
+      refute output.empty?
       assert_css 'script[src="bootstrap.3.2.0.min.js"]', output, 1
       assert_xpath %(//meta[@name="copyright"][@content="#{decode_char 169} OpenDevise"]), output, 1
     end
