@@ -2031,7 +2031,7 @@ class Parser
           attributes['title'] = $1
           return true
         end
-      elsif next_line.start_with? '/'
+      elsif !normal || (next_line.start_with? '/')
         if next_line == '//'
           return true
         elsif normal && '/' * (ll = next_line.length) == next_line
