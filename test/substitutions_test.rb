@@ -788,13 +788,22 @@ context 'Substitutions' do
     end
 
     test 'should not match an inline image macro if target contains an endline character' do
-      para = block_from_string(%(Fear not. There are no image::big\ncats.png[] around here.))
+      para = block_from_string(%(Fear not. There are no image:big\ncats.png[] around here.))
       result = para.sub_macros(para.source)
       assert !result.include?('<img ')
-      assert_includes result, %(image::big\ncats.png[])
+      assert_includes result, %(image:big\ncats.png[])
     end
 
-    test 'a block image macro should not be detected within paragraph text' do
+    test 'should not match an inline image macro if target begins or ends with space character' do
+      ['image: big cats.png[]', 'image:big cats.png []'].each do |input|
+        para = block_from_string %(Fear not. There are no #{input} around here.)
+        result = para.sub_macros(para.source)
+        assert !result.include?('<img ')
+        assert_includes result, input
+      end
+    end
+
+    test 'should not detect a block image macro found inline' do
       para = block_from_string(%(Not an inline image macro image::tiger.png[].))
       result = para.sub_macros(para.source)
       assert !result.include?('<img ')

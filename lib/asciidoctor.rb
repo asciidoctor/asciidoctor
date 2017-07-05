@@ -877,7 +877,7 @@ module Asciidoctor
     #   icon:github[large]
     #
     # NOTE be as non-greedy as possible by not allowing endline or left square bracket in target
-    ImageInlineMacroRx = /\\?i(?:mage|con):([^:\s\[][^\n\[]*)\[(|#{CC_ALL}*?[^\\])\]/m
+    ImageInlineMacroRx = /\\?i(?:mage|con):([^:\s\[](?:[^\n\[]*[^\s\[])?)\[(|#{CC_ALL}*?[^\\])\]/m
 
     # Matches an indexterm inline macro, which may span multiple lines.
     #
@@ -946,7 +946,7 @@ module Asciidoctor
     #   menu:View[Page Style > No Style]
     #   menu:View[Page Style, No Style]
     #
-    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&][^\[\n]*[^\[\s])\[ *(#{CC_ALL}*?[^\\])?\]/m
+    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&][^\n\[]*[^\s\[])\[ *(#{CC_ALL}*?[^\\])?\]/m
 
     # Matches an implicit menu inline macro.
     #
