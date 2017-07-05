@@ -800,7 +800,7 @@ module Asciidoctor
 
     # Block macros
 
-    # Matches the general block macro pattern.
+    # Matches the custom block macro pattern.
     #
     # Examples
     #
@@ -808,7 +808,7 @@ module Asciidoctor
     #
     #--
     # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
-    GenericBlockMacroRx = /^(#{CG_WORD}+)::(|\S|\S.*?\S)\[(.*)\]$/
+    CustomBlockMacroRx = /^(#{CG_WORD}+)::(|\S|\S.*?\S)\[(.*)\]$/
 
     # Matches an image, video or audio block macro.
     #
@@ -817,7 +817,7 @@ module Asciidoctor
     #   image::filename.png[Caption]
     #   video::http://youtube.com/12345[Cats vs Dogs]
     #
-    MediaBlockMacroRx = /^(image|video|audio)::(\S|\S.*?\S)\[(.*)\]$/
+    BlockMediaMacroRx = /^(image|video|audio)::(\S|\S.*?\S)\[(.*)\]$/
 
     # Matches the TOC block macro.
     #
@@ -826,7 +826,7 @@ module Asciidoctor
     #   toc::[]
     #   toc::[levels=2]
     #
-    TocBlockMacroRx = /^toc::\[(.*)\]$/
+    BlockTocMacroRx = /^toc::\[(.*)\]$/
 
     ## Inline macros
 
@@ -865,7 +865,7 @@ module Asciidoctor
     #   footnoteref:[id,text]
     #   footnoteref:[id]
     #
-    FootnoteInlineMacroRx = /\\?(footnote(?:ref)?):\[(#{CC_ALL}*?[^\\])\]/m
+    InlineFootnoteMacroRx = /\\?(footnote(?:ref)?):\[(#{CC_ALL}*?[^\\])\]/m
 
     # Matches an image or icon inline macro.
     #
@@ -877,7 +877,7 @@ module Asciidoctor
     #   icon:github[large]
     #
     # NOTE be as non-greedy as possible by not allowing endline or left square bracket in target
-    ImageInlineMacroRx = /\\?i(?:mage|con):([^:\s\[](?:[^\n\[]*[^\s\[])?)\[(|#{CC_ALL}*?[^\\])\]/m
+    InlineImageMacroRx = /\\?i(?:mage|con):([^:\s\[](?:[^\n\[]*[^\s\[])?)\[(|#{CC_ALL}*?[^\\])\]/m
 
     # Matches an indexterm inline macro, which may span multiple lines.
     #
@@ -888,7 +888,7 @@ module Asciidoctor
     #   indexterm2:[Tigers]
     #   ((Tigers))
     #
-    IndextermInlineMacroRx = /\\?(?:(indexterm2?):\[(#{CC_ALL}*?[^\\])\]|\(\((#{CC_ALL}+?)\)\)(?!\)))/m
+    InlineIndextermMacroRx = /\\?(?:(indexterm2?):\[(#{CC_ALL}*?[^\\])\]|\(\((#{CC_ALL}+?)\)\)(?!\)))/m
 
     # Matches either the kbd or btn inline macro.
     #
@@ -900,7 +900,7 @@ module Asciidoctor
     #   kbd:[Ctrl,T]
     #   btn:[Save]
     #
-    KbdBtnInlineMacroRx = /(\\)?(kbd|btn):\[(#{CC_ALL}*?[^\\])\]/m
+    InlineKbdBtnMacroRx = /(\\)?(kbd|btn):\[(#{CC_ALL}*?[^\\])\]/m
 
     # Matches an implicit link and some of the link inline macro.
     #
@@ -922,7 +922,7 @@ module Asciidoctor
     #   mailto:doc.writer@example.com[]
     #
     # NOTE be as non-greedy as possible by not allowing space or left square bracket in target
-    LinkInlineMacroRx = /\\?(?:link|(mailto)):(|[^:\s\[][^\s\[]*)\[(|#{CC_ALL}*?[^\\])\]/m
+    InlineLinkMacroRx = /\\?(?:link|(mailto)):(|[^:\s\[][^\s\[]*)\[(|#{CC_ALL}*?[^\\])\]/m
 
     # Matches the name of a macro.
     #
@@ -936,7 +936,7 @@ module Asciidoctor
     #   asciimath:[x != 0]
     #   latexmath:[\sqrt{4} = 2]
     #
-    StemInlineMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z]+(?:,[a-z]+)*)?\[(#{CC_ALL}*?[^\\])\]/m
+    InlineStemMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z]+(?:,[a-z]+)*)?\[(#{CC_ALL}*?[^\\])\]/m
 
     # Matches a menu inline macro.
     #
@@ -946,7 +946,7 @@ module Asciidoctor
     #   menu:View[Page Style > No Style]
     #   menu:View[Page Style, No Style]
     #
-    MenuInlineMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&][^\n\[]*[^\s\[])\[ *(#{CC_ALL}*?[^\\])?\]/m
+    InlineMenuMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&][^\n\[]*[^\s\[])\[ *(#{CC_ALL}*?[^\\])?\]/m
 
     # Matches an implicit menu inline macro.
     #
@@ -978,7 +978,7 @@ module Asciidoctor
     #   pass:quotes[text]
     #
     # NOTE we have to support an empty pass:[] for compatibility with AsciiDoc Python
-    PassInlineMacroRx = /(?:(?:(\\?)\[([^\]]+)\])?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
+    InlinePassMacroRx = /(?:(?:(\\?)\[([^\]]+)\])?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
 
     # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
     #
@@ -989,7 +989,7 @@ module Asciidoctor
     #
     # NOTE special characters have already been escaped, hence the entity references
     # NOTE { is included in start characters to support target that begins with attribute reference in title content
-    XrefInlineMacroRx = %r(\\?(?:&lt;&lt;([#{CC_WORD}#/.:{]#{CC_ALL}*?)&gt;&gt;|xref:([#{CC_WORD}#/.:{]#{CC_ALL}*?)\[(#{CC_ALL}*?[^\\])?\]))m
+    InlineXrefMacroRx = %r(\\?(?:&lt;&lt;([#{CC_WORD}#/.:{]#{CC_ALL}*?)&gt;&gt;|xref:([#{CC_WORD}#/.:{]#{CC_ALL}*?)\[(#{CC_ALL}*?[^\\])?\]))m
 
     ## Layout
 
