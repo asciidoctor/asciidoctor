@@ -533,7 +533,7 @@ Your browser does not support the audio tag.
       id_attribute = node.id ? %( id="#{node.id}") : nil
       title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
 
-      %(<div#{id_attribute} class="#{(role = node.role) ? ['exampleblock', role] * ' ' : 'exampleblock'}">
+      %(<div#{id_attribute} class="exampleblock#{(role = node.role) && " #{role}"}">
 #{title_element}<div class="content">
 #{node.content}
 </div>
@@ -642,7 +642,7 @@ Your browser does not support the audio tag.
         equation = %(#{open}#{equation}#{close})
       end
 
-      %(<div#{id_attribute} class="#{(role = node.role) ? ['stemblock', role] * ' ' : 'stemblock'}">
+      %(<div#{id_attribute} class="stemblock#{(role = node.role) && " #{role}"}">
 #{title_element}<div class="content">
 #{equation}
 </div>
@@ -770,7 +770,7 @@ Your browser does not support the audio tag.
     def sidebar node
       id_attribute = node.id ? %( id="#{node.id}") : nil
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-      %(<div#{id_attribute} class="#{(role = node.role) ? ['sidebarblock', role] * ' ' : 'sidebarblock'}">
+      %(<div#{id_attribute} class="sidebarblock#{(role = node.role) && " #{role}"}">
 <div class="content">
 #{title_element}#{node.content}
 </div>
