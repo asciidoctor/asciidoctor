@@ -1126,11 +1126,9 @@ class Document < AbstractBlock
     if safe >= SafeMode::SECURE
       ''
     else
-      qualifier = location == :head ? nil : %(-#{location})
+      content = []
+      qualifier = %(-#{location}) unless location == :head
       suffix = @outfilesuffix unless suffix
-      docinfodir = @attributes['docinfodir']
-
-      content = nil
 
       if (docinfo = @attributes['docinfo']).nil_or_empty?
         if @attributes.key? 'docinfo2'
@@ -1145,52 +1143,42 @@ class Document < AbstractBlock
       end
 
       if docinfo
-        docinfo_filename = %(docinfo#{qualifier}#{suffix})
+        docinfo_file, docinfo_dir, docinfo_subs = %(docinfo#{qualifier}#{suffix}), @attributes['docinfodir'], resolve_docinfo_subs
         unless (docinfo & ['shared', %(shared-#{location})]).empty?
-          docinfo_path = normalize_system_path(docinfo_filename, docinfodir)
+          docinfo_path = normalize_system_path docinfo_file, docinfo_dir
           # NOTE normalizing the lines is essential if we're performing substitutions
-          if (content = read_asset(docinfo_path, :normalize => true))
-            unless (docinfosubs ||= resolve_docinfo_subs).empty?
-              content = (docinfosubs == :attributes) ? sub_attributes(content) : apply_subs(content, docinfosubs)
-            end
+          if (shd_content = (read_asset docinfo_path, :normalize => true))
+            content << (apply_subs shd_content, docinfo_subs)
           end
         end
 
         unless @attributes['docname'].nil_or_empty? || (docinfo & ['private', %(private-#{location})]).empty?
-          docinfo_path = normalize_system_path(%(#{@attributes['docname']}-#{docinfo_filename}), docinfodir)
+          docinfo_path = normalize_system_path %(#{@attributes['docname']}-#{docinfo_file}), docinfo_dir
           # NOTE normalizing the lines is essential if we're performing substitutions
-          if (content2 = read_asset(docinfo_path, :normalize => true))
-            unless (docinfosubs ||= resolve_docinfo_subs).empty?
-              content2 = (docinfosubs == :attributes) ? sub_attributes(content2) : apply_subs(content2, docinfosubs)
-            end
-            content = content ? %(#{content}#{LF}#{content2}) : content2
+          if (pvt_content = (read_asset docinfo_path, :normalize => true))
+            content << (apply_subs pvt_content, docinfo_subs)
           end
         end
       end
 
       # TODO allow document to control whether extension docinfo is contributed
-      if @extensions && docinfo_processors?(location)
-        contentx = @docinfo_processor_extensions[location].map {|candidate| candidate.process_method[self] }.compact * LF
-        content = content ? %(#{content}#{LF}#{contentx}) : contentx
+      if @extensions && (docinfo_processors? location)
+        content += @docinfo_processor_extensions[location].map {|ext| ext.process_method[self] }.compact
       end
 
-      # coerce to string (in case the value is nil)
-      %(#{content})
+      content * LF
     end
   end
 
   # Internal: Resolve the list of comma-delimited subs to apply to docinfo files.
   #
   # Resolve the list of substitutions from the value of the docinfosubs
-  # document attribute, if specified. Otherwise, return the Symbol :attributes.
+  # document attribute, if specified. Otherwise, return an Array containing
+  # the Symbol :attributes.
   #
-  # Returns an Array of substitution Symbols or the Symbol :attributes.
+  # Returns an [Array] of substitution [Symbol]s
   def resolve_docinfo_subs
-    if @attributes.key? 'docinfosubs'
-      resolve_subs @attributes['docinfosubs'], :block, nil, 'docinfo'
-    else
-      :attributes
-    end
+    (@attributes.key? 'docinfosubs') ? (resolve_subs @attributes['docinfosubs'], :block, nil, 'docinfo') : [:attributes]
   end
 
   def docinfo_processors?(location = :head)
