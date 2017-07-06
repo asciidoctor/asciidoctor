@@ -523,8 +523,8 @@ class Parser
               break
             # NOTE very rare that a text-only line will end in ] (e.g., inline macro), so check that first
             elsif (this_line.end_with? ']') && (this_line.include? '::')
-              #if (this_line.start_with? 'image', 'video', 'audio') && (match = MediaBlockMacroRx.match(this_line))
-              if (ch0 == 'i' || (this_line.start_with? 'video:', 'audio:')) && (match = MediaBlockMacroRx.match(this_line))
+              #if (this_line.start_with? 'image', 'video', 'audio') && (match = BlockMediaMacroRx.match(this_line))
+              if (ch0 == 'i' || (this_line.start_with? 'video:', 'audio:')) && (match = BlockMediaMacroRx.match(this_line))
                 blk_ctx, target = match[1].to_sym, match[2]
                 block = Block.new(parent, blk_ctx, :content_model => :empty)
                 case blk_ctx
@@ -562,12 +562,12 @@ class Parser
                 attributes['target'] = target
                 break
 
-              elsif ch0 == 't' && (this_line.start_with? 'toc:') && (match = TocBlockMacroRx.match(this_line))
+              elsif ch0 == 't' && (this_line.start_with? 'toc:') && (match = BlockTocMacroRx.match(this_line))
                 block = Block.new(parent, :toc, :content_model => :empty)
                 block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
                 break
 
-              elsif block_macro_extensions && (match = GenericBlockMacroRx.match(this_line)) &&
+              elsif block_macro_extensions && (match = CustomBlockMacroRx.match(this_line)) &&
                   (extension = extensions.registered_for_block_macro?(match[1]))
                 target = match[2]
                 content = match[3]

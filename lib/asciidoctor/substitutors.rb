@@ -167,7 +167,7 @@ module Substitutors
   # returns - The text with the passthrough region substituted with placeholders
   def extract_passthroughs(text)
     compat_mode = @document.compat_mode
-    text = text.gsub(PassInlineMacroRx) {
+    text = text.gsub(InlinePassMacroRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       preceding = nil
@@ -285,7 +285,7 @@ module Substitutors
     } if (text.include? pass_inline_char1) || (pass_inline_char2 && (text.include? pass_inline_char2))
 
     # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
-    text = text.gsub(StemInlineMacroRx) {
+    text = text.gsub(InlineStemMacroRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
@@ -529,7 +529,7 @@ module Substitutors
 
     if doc_attrs.key? 'experimental'
       if found_macroish_short && ((result.include? 'kbd:') || (result.include? 'btn:'))
-        result = result.gsub(KbdBtnInlineMacroRx) {
+        result = result.gsub(InlineKbdBtnMacroRx) {
           # honor the escape
           if $1
             $&.slice 1, $&.length
@@ -558,7 +558,7 @@ module Substitutors
       end
 
       if found_macroish && (result.include? 'menu:')
-        result = result.gsub(MenuInlineMacroRx) {
+        result = result.gsub(InlineMenuMacroRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -641,7 +641,7 @@ module Substitutors
 
     if found_macroish && ((result.include? 'image:') || (result.include? 'icon:'))
       # image:filename.png[Alt Text]
-      result = result.gsub(ImageInlineMacroRx) {
+      result = result.gsub(InlineImageMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -668,7 +668,7 @@ module Substitutors
       # indexterm:[Tigers,Big cats]
       # ((Tigers))
       # indexterm2:[Tigers]
-      result = result.gsub(IndextermInlineMacroRx) {
+      result = result.gsub(InlineIndextermMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
 
@@ -817,7 +817,7 @@ module Substitutors
 
     if found_macroish && ((result.include? 'link:') || (result.include? 'mailto:'))
       # inline link macros, link:target[text]
-      result = result.gsub(LinkInlineMacroRx) {
+      result = result.gsub(InlineLinkMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -899,7 +899,7 @@ module Substitutors
     end
 
     if found_macroish_short && (result.include? 'footnote')
-      result = result.gsub(FootnoteInlineMacroRx) {
+      result = result.gsub(InlineFootnoteMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -977,7 +977,7 @@ module Substitutors
   def sub_inline_xrefs(text, found = nil)
     if ((found ? found[:macroish] : (text.include? '[')) && (text.include? 'xref:')) ||
         ((text.include? '&') && (text.include? '&lt;&lt;'))
-      text = text.gsub(XrefInlineMacroRx) {
+      text = text.gsub(InlineXrefMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
