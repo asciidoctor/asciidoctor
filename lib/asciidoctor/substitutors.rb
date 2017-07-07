@@ -457,7 +457,7 @@ module Substitutors
             _, value = Parser.store_attribute(args[0], args[1] || '', @document)
             unless value
               # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
-              if doc_attrs.fetch('attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
+              if (doc_attrs.fetch 'attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
                 reject = true
                 break ''
               end
@@ -483,9 +483,11 @@ module Substitutors
         elsif INTRINSIC_ATTRIBUTES.key? key
           INTRINSIC_ATTRIBUTES[key]
         else
-          case (attribute_missing ||= (opts[:attribute_missing] || doc_attrs.fetch('attribute-missing', Compliance.attribute_missing)))
-          when 'skip'
-            m[0]
+          case (attribute_missing ||= opts[:attribute_missing] || (doc_attrs.fetch 'attribute-missing', Compliance.attribute_missing))
+          when 'drop'
+            # QUESTION should we warn in this case?
+            reject_if_empty = true
+            ''
           when 'drop-line'
             warn %(asciidoctor: WARNING: dropping line containing reference to missing attribute: #{key})
             reject = true
@@ -493,10 +495,8 @@ module Substitutors
           when 'warn'
             warn %(asciidoctor: WARNING: skipping reference to missing attribute: #{key})
             m[0]
-          else # 'drop'
-            # QUESTION should we warn in this case?
-            reject_if_empty = true
-            ''
+          else # 'skip'
+            m[0]
           end
         end
       } if line.include? '{'
