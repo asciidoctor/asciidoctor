@@ -580,7 +580,7 @@ Line 2: {set:a!}This line should not appear in the output.
 :a:
 
 Line 1: This line should appear in the output.
-Line 2: {set:a!}This line should not appear in the output.
+Line 2: {set:a!}This line should appear in the output.
       EOS
 
       output = render_embedded_string input
