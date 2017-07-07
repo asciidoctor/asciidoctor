@@ -158,7 +158,7 @@ Example: asciidoctor -b html5 source.asciidoc
           args.each do |file|
             if file == '-' || (file.start_with? '-')
               # warn, but don't panic; we may have enough to proceed, so we won't force a failure
-              $stderr.puts %(asciidoctor: WARNING: extra arguments detected (unparsed arguments: '#{args.join "', '"}') or incorrect usage of stdin)
+              $stderr.puts %(asciidoctor: WARNING: extra arguments detected (unparsed arguments: '#{args * "', '"}') or incorrect usage of stdin)
             else
               if ::File.readable? file
                 matches = [file]

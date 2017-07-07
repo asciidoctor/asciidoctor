@@ -224,11 +224,11 @@ T})
         case node.style
         when 'qanda'
           result << %(.sp
-#{counter}. #{manify([*terms].map {|dt| dt.text }.join ' ')}
+#{counter}. #{manify([*terms].map {|dt| dt.text } * ' ')}
 .RS 4)
         else
           result << %(.sp
-#{manify([*terms].map {|dt| dt.text }.join ', ')}
+#{manify([*terms].map {|dt| dt.text } * ', ')}
 .RS 4)
         end
         if dd
@@ -500,13 +500,13 @@ allbox tab(:);'
       #row_header.each do |row|
       #  result << LF
       #  row.each_with_index do |cell, i|
-      #    result << (cell.join ' ')
+      #    result << (cell * ' ')
       #    result << ' ' if row.size > i + 1
       #  end
       #end
       # FIXME temporary fix to get basic table to display
       result << LF
-      result << row_header[0].map { 'lt' }.join(' ')
+      result << row_header[0].map { 'lt' } * ' '
 
       result << %(.#{LF})
       row_text.each do |row|
@@ -642,7 +642,7 @@ allbox tab(:);'
       if (keys = node.attr 'keys').size == 1
         keys[0]
       else
-        keys.join %(#{ESC_BS}0+#{ESC_BS}0)
+        keys * %(#{ESC_BS}0+#{ESC_BS}0)
       end
     end
 
@@ -650,7 +650,7 @@ allbox tab(:);'
       caret = %[#{ESC_BS}0#{ESC_BS}(fc#{ESC_BS}0]
       menu = node.attr 'menu'
       if !(submenus = node.attr 'submenus').empty?
-        submenu_path = submenus.map {|item| %(#{ESC_BS}fI#{item}#{ESC_BS}fP) }.join caret
+        submenu_path = submenus.map {|item| %(#{ESC_BS}fI#{item}#{ESC_BS}fP) } * caret
         %(#{ESC_BS}fI#{menu}#{ESC_BS}fP#{caret}#{submenu_path}#{caret}#{ESC_BS}fI#{node.attr 'menuitem'}#{ESC_BS}fP)
       elsif (menuitem = node.attr 'menuitem')
         %(#{ESC_BS}fI#{menu}#{caret}#{menuitem}#{ESC_BS}fP)

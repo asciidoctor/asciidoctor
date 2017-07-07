@@ -111,7 +111,7 @@ class Block < AbstractBlock
     when :simple
       apply_subs @lines * LF, @subs
     when :verbatim, :raw
-      #((apply_subs @lines.join(LF), @subs).sub StripLineWiseRx, '\1')
+      #((apply_subs @lines * LF, @subs).sub StripLineWiseRx, '\1')
 
       # QUESTION could we use strip here instead of popping empty lines?
       # maybe apply_subs can know how to strip whitespace?

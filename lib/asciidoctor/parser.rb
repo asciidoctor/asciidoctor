@@ -193,7 +193,7 @@ class Parser
     if is_next_line_section?(reader, {})
       name_section = initialize_section(reader, document, {})
       if name_section.level == 1
-        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true).join ' '
+        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true) * ' '
         if (m = ManpageNamePurposeRx.match(name_section_buffer))
           document.attributes['manname'] = document.sub_attributes m[1]
           document.attributes['manpurpose'] = m[2]
@@ -726,7 +726,7 @@ class Parser
             return
           end
 
-          catalog_inline_anchors lines.join(LF), document
+          catalog_inline_anchors lines * LF, document
 
           # NOTE don't check indented here since it's extremely rare
           #if text_only || indented
