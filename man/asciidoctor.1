@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White, Ryan Waldron
-.\" Generator: Asciidoctor 1.5.5
-.\"      Date: 2016-10-05
+.\" Generator: Asciidoctor 1.5.6
+.\"      Date: 2017-07-08
 .\"    Manual: Asciidoctor Manual
 .\"    Source: Asciidoctor 1.5.5
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2016-10-05" "Asciidoctor 1.5.5" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2017-07-08" "Asciidoctor 1.5.5" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -79,7 +79,7 @@ Other options can be passed, but if Asciidoctor cannot find the backend, it will
 Document type: \fIarticle\fP, \fIbook\fP, \fImanpage\fP or \fIinline\fP.
 Sets the root element when using the \fIdocbook\fP backend and the style class on the HTML body element when using the \fIhtml\fP backend.
 The \fIbook\fP document type allows multiple level\-0 section titles in a single document.
-The \fImanpage\fP document type enables parsing of metadata necessary to produce a manpage.
+The \fImanpage\fP document type enables parsing of metadata necessary to produce a man page.
 The \fIinline\fP document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element.
 Defaults to \fIarticle\fP.
 .RE
@@ -129,9 +129,9 @@ Synonym for \fB\-\-attribute numbered\fP.
 .RS 4
 Write output to file \fIOUT_FILE\fP.
 Defaults to the base name of the input file suffixed with \fIbackend\fP extension.
-If the input is read from standard input, then the output file defaults to stdout.
-If \fIOUT_FILE\fP is \fI\-\fP then the standard output is also used.
-If specified, the file is resolved relative to the working directory.
+The file is resolved relative to the working directory.
+If the input is read from standard input or a named pipe (fifo), then the output file defaults to stdout.
+If \fIOUT_FILE\fP is \fI\-\fP, then the output file is written to standard output.
 .RE
 .sp
 \fB\-r, \-\-require\fP=\fILIBRARY\fP
@@ -180,9 +180,11 @@ Display timings information (time to read, parse and convert).
 .RE
 .SS "Program Information"
 .sp
-\fB\-h, \-\-help\fP
+\fB\-h, \-\-help\fP [\fITOPIC\fP]
 .RS 4
-Show the help message.
+Print the help message.
+Show the command usage if \fITOPIC\fP is not specified (or not recognized).
+Dump the Asciidoctor man page (in troff/groff format) if \fITOPIC\fP is \fImanpage\fP.
 .RE
 .sp
 \fB\-V, \-\-version\fP

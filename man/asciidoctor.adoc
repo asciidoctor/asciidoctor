@@ -61,7 +61,7 @@ This option may be specified more than once.
   Document type: _article_, _book_, _manpage_ or _inline_.
   Sets the root element when using the _docbook_ backend and the style class on the HTML body element when using the _html_ backend.
   The _book_ document type allows multiple level-0 section titles in a single document.
-  The _manpage_ document type enables parsing of metadata necessary to produce a manpage.
+  The _manpage_ document type enables parsing of metadata necessary to produce a man page.
   The _inline_ document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element.
   Defaults to _article_.
 
@@ -136,8 +136,10 @@ Matching templates found in subsequent directories override ones previously disc
 
 === Program Information
 
-*-h, --help*::
-  Show the help message.
+*-h, --help* [_TOPIC_]::
+  Print the help message.
+  Show the command usage if _TOPIC_ is not specified (or not recognized).
+  Dump the Asciidoctor man page (in troff/groff format) if _TOPIC_ is _manpage_.
 
 *-V, --version*::
   Print program version number.
