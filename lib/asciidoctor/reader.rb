@@ -814,18 +814,16 @@ class PreprocessorReader < Reader
   #
   # Returns a Boolean indicating whether the line under the cursor has changed.
   def preprocess_include_directive raw_target, raw_attributes
-    target = (raw_target.include? '{') ? (@document.sub_attributes raw_target, :attribute_missing => 'drop-line') : raw_target
-    if target.empty?
+    if ((target = raw_target).include? '{') &&
+        (target = @document.sub_attributes raw_target, :attribute_missing => 'drop-line').empty?
       advance
       if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
         unshift %(Unresolved directive in #{@path} - include::#{raw_target}[#{raw_attributes}])
       end
       true
-    # assume that if an include processor is given, the developer wants
-    # to handle when and how to process the include
     elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? target })
       advance
-      # FIXME parse attributes if requested by extension
+      # FIXME parse attributes only if requested by extension
       ext.process_method[@document, self, target, AttributeList.new(raw_attributes).parse]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
