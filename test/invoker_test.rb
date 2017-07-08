@@ -373,7 +373,7 @@ context 'Invoker' do
 
   test 'should render all files that matches an absolute path glob expression' do
     basic_outpath = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'basic.html'))
-    glob = File.join(File.dirname(__FILE__), 'fixtures', 'ba*.asciidoc')
+    glob = File.join(File.expand_path(File.dirname(__FILE__)), 'fixtures', 'ba*.asciidoc')
     # test Windows using backslash-style pathname
     if File::ALT_SEPARATOR == '\\'
       glob = glob.tr '/', '\\'
