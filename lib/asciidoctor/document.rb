@@ -79,7 +79,7 @@ class Document < AbstractBlock
   #
   # A value of 1 (SAFE) closely parallels safe mode in AsciiDoc. In particular,
   # it prevents access to files which reside outside of the parent directory
-  # of the source file and disables any macro other than the include macro.
+  # of the source file and disables any macro other than the include directive.
   #
   # A value of 10 (SERVER) disallows the document from setting attributes that
   # would affect the conversion of the document, in addition to all the security
@@ -91,7 +91,7 @@ class Document < AbstractBlock
   # A value of 20 (SECURE) disallows the document from attempting to read files
   # from the file system and including the contents of them into the document,
   # in addition to all the security features of SafeMode::SECURE. In
-  # particular, it disallows use of the include::[] macro and the embedding of
+  # particular, it disallows use of the include::[] directive and the embedding of
   # binary content (data uri), stylesheets and JavaScripts referenced by the
   # document. (Asciidoctor and trusted extensions may still be allowed to embed
   # trusted content into the document).

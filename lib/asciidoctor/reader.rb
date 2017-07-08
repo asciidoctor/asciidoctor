@@ -810,7 +810,7 @@ class PreprocessorReader < Reader
   # If none of the above apply, emit the include directive line verbatim.
   #
   # target - The name of the source document to include as specified in the
-  #          target slot of the include::[] macro
+  #          target slot of the include::[] directive
   #
   # Returns a Boolean indicating whether the line under the cursor has changed.
   def preprocess_include_directive raw_target, raw_attributes

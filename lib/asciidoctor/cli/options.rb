@@ -56,7 +56,7 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts.on('--safe',
                   'set safe mode level to safe (default: unsafe)',
-                  'enables include macros, but restricts access to ancestor paths of source file',
+                  'enables include directives, but prevents access to ancestor paths of source file',
                   'provided for compatibility with the asciidoc command') do
             self[:safe] = SafeMode::SAFE
           end

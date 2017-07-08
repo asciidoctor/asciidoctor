@@ -62,7 +62,7 @@ module Asciidoctor
 
     # A safe mode level that closely parallels safe mode in AsciiDoc. This value
     # prevents access to files which reside outside of the parent directory of
-    # the source file and disables any macro other than the include::[] macro.
+    # the source file and disables any macro other than the include::[] directive.
     SAFE = 1;
 
     # A safe mode level that disallows the document from setting attributes
@@ -76,7 +76,7 @@ module Asciidoctor
     # A safe mode level that disallows the document from attempting to read
     # files from the file system and including the contents of them into the
     # document, in additional to all the security features of SafeMode::SERVER.
-    # For instance, this level disallows use of the include::[] macro and the
+    # For instance, this level disallows use of the include::[] directive and the
     # embedding of binary content (data uri), stylesheets and JavaScripts
     # referenced by the document.(Asciidoctor and trusted extensions may still
     # be allowed to embed trusted content into the document).

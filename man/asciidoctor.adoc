@@ -35,7 +35,7 @@ If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 
 *--safe*::
   Set safe mode level to _safe_.
-  Enables include macros, but restricts access to ancestor paths of source file.
+  Enables include directives, but prevents access to ancestor paths of source file.
   Provided for compatibility with the asciidoc command.
   If not set, the safe mode level defaults to _unsafe_ when Asciidoctor is invoked using this script.
 
