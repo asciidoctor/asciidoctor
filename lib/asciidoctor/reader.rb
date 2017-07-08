@@ -843,7 +843,7 @@ class PreprocessorReader < Reader
         # NOTE resolves uri relative to currently loaded document
         # NOTE we defer checking if file exists and catch the 404 error if it does not
         target_type = :file
-        inc_path = path = @include_stack.empty? && ::Dir.pwd == @document.base_dir ? target : (::File.join @dir, target)
+        inc_path = relpath = @include_stack.empty? && ::Dir.pwd == @document.base_dir ? target : (::File.join @dir, target)
       elsif Helpers.uriish? target
         unless @document.attributes.key? 'allow-uri-read'
           replace_next_line %(link:#{target}[])
@@ -851,7 +851,7 @@ class PreprocessorReader < Reader
         end
 
         target_type = :uri
-        inc_path = path = target
+        inc_path = relpath = target
         if @document.attributes.key? 'cache-uri'
           # caching requires the open-uri-cached gem to be installed
           # processing will be automatically aborted if these libraries can't be opened
@@ -863,14 +863,15 @@ class PreprocessorReader < Reader
       else
         target_type = :file
         # include file is resolved relative to dir of current include, or base_dir if within original docfile
-        inc_path = @document.normalize_system_path(target, @dir, nil, :target_name => 'include file')
+        inc_path = @document.normalize_system_path target, @dir, nil, :target_name => 'include file'
         unless ::File.file? inc_path
           warn %(asciidoctor: WARNING: #{line_info}: include file not found: #{inc_path})
           replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
-        #path = @document.relative_path inc_path
-        path = PathResolver.new.relative_path inc_path, @document.base_dir
+        # NOTE relpath is the path relative to the outermost document (or base_dir, if set)
+        #relpath = @document.relative_path inc_path
+        relpath = PathResolver.new.relative_path inc_path, @document.base_dir
       end
 
       inc_linenos, inc_tags, attributes = nil, nil, {}
@@ -943,7 +944,7 @@ class PreprocessorReader < Reader
         end
         advance
         # FIXME not accounting for skipped lines in reader line numbering
-        push_include inc_lines, inc_path, path, inc_offset, attributes if inc_offset
+        push_include inc_lines, inc_path, relpath, inc_offset, attributes if inc_offset
       elsif inc_tags
         inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
         if inc_tags.key? '**'
@@ -1006,13 +1007,13 @@ class PreprocessorReader < Reader
         end
         advance
         # FIXME not accounting for skipped lines in reader line numbering
-        push_include inc_lines, inc_path, path, inc_offset, attributes if inc_offset
+        push_include inc_lines, inc_path, relpath, inc_offset, attributes if inc_offset
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
           inc_content = target_type == :file ? (::IO.read inc_path) : open(inc_path, 'r') {|f| f.read }
           advance
-          push_include inc_content, inc_path, path, 1, attributes
+          push_include inc_content, inc_path, relpath, 1, attributes
         rescue
           warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{inc_path})
           replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
