@@ -187,7 +187,7 @@ module Asciidoctor
   ROOT_PATH = ::File.dirname ::File.dirname ::File.expand_path __FILE__
 
   # The absolute lib path of the Asciidoctor RubyGem
-  LIB_PATH = ::File.join ROOT_PATH, 'lib'
+  #LIB_PATH = ::File.join ROOT_PATH, 'lib'
 
   # The absolute data path of the Asciidoctor RubyGem
   DATA_PATH = ::File.join ROOT_PATH, 'data'
