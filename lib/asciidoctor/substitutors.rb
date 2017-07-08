@@ -435,50 +435,32 @@ module Substitutors
   def sub_attributes data, opts = {}
     # normalizes data type to an array (string becomes single-element array)
     data = [data] if (input_is_string = ::String === data)
-
-    doc_attrs = @document.attributes
-    attribute_missing = nil
-    result = []
+    doc_attrs, result = @document.attributes, []
     data.each do |line|
-      reject = false
-      reject_if_empty = false
+      reject = reject_if_empty = false
       line = line.gsub(AttributeReferenceRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
         # escaped attribute, return unescaped
-        if m[1] == RS || m[4] == RS
-          %({#{m[2]}})
-        elsif !m[3].nil_or_empty?
-          offset = (directive = m[3]).length + 1
-          expr = m[2][offset..-1]
-          case directive
+        if $1 == RS || $4 == RS
+          %({#{$2}})
+        elsif $3
+          case (args = $2.split ':', 3).shift
           when 'set'
-            args = expr.split(':')
-            _, value = Parser.store_attribute(args[0], args[1] || '', @document)
-            unless value
-              # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
-              if (doc_attrs.fetch 'attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
-                reject = true
-                break ''
-              end
-            end
+            _, value = Parser.store_attribute args[0], args[1] || '', @document
+            # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
+            if (doc_attrs.fetch 'attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
+              reject = true
+              break ''
+            end unless value
             reject_if_empty = true
             ''
-          when 'counter', 'counter2'
-            args = expr.split(':')
-            val = @document.counter(args[0], args[1])
-            if directive == 'counter2'
-              reject_if_empty = true
-              ''
-            else
-              val
-            end
-          else
-            # if we get here, our AttributeReference regex is too loose
-            warn %(asciidoctor: WARNING: illegal attribute directive: #{m[3]})
-            m[0]
+          when 'counter2'
+            @document.counter(*args)
+            reject_if_empty = true
+            ''
+          else # 'counter'
+            @document.counter(*args)
           end
-        elsif doc_attrs.key?(key = m[2].downcase)
+        elsif doc_attrs.key?(key = $2.downcase)
           doc_attrs[key]
         elsif INTRINSIC_ATTRIBUTES.key? key
           INTRINSIC_ATTRIBUTES[key]
@@ -494,9 +476,9 @@ module Substitutors
             break ''
           when 'warn'
             warn %(asciidoctor: WARNING: skipping reference to missing attribute: #{key})
-            m[0]
+            $&
           else # 'skip'
-            m[0]
+            $&
           end
         end
       } if line.include? '{'
