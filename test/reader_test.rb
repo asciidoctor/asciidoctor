@@ -1083,7 +1083,7 @@ include::{foodir}/include-file.asciidoc[]
         assert_includes warnings, 'dropping line containing reference to missing attribute'
       end
 
-      test 'wip line is dropped if target of include directive resolves to empty and attribute-missing attribute is not skip' do
+      test 'line is dropped if target of include directive resolves to empty and attribute-missing attribute is not skip' do
         input = <<-EOS
 include::{foodir}/include-file.asciidoc[]
         EOS
