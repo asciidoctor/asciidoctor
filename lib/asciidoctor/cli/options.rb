@@ -128,8 +128,19 @@ Example: asciidoctor -b html5 source.asciidoc
             self[:timings] = true
           end
 
-          opts.on_tail('-h', '--help', 'show this message') do
-            $stdout.puts opts
+          opts.on_tail('-h', '--help [TOPIC]', 'print the help message',
+              'show the command usage if TOPIC is not specified (or not recognized)',
+              'dump the Asciidoctor man page (in troff/groff format) if TOPIC is manpage') do |topic|
+            if topic == 'manpage'
+              if ::File.exist?(manpage_path = (::File.join ::Asciidoctor::ROOT_PATH, 'man', 'asciidoctor.1'))
+                $stdout.puts(::IO.read manpage_path)
+              else
+                $stderr.puts 'asciidoctor: FAILED: man page not found; try `man asciidoctor`'
+                return 1
+              end
+            else
+              $stdout.puts opts
+            end
             return 0
           end
 

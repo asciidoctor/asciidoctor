@@ -6,12 +6,29 @@ end
 require 'asciidoctor/cli/options'
 
 context 'Options' do
-  test 'should return error code 0 when help flag is present' do
+  test 'should print usage and return error code 0 when help flag is present' do
     redirect_streams do |stdout, stderr|
       exitval = Asciidoctor::Cli::Options.parse!(%w(-h))
       assert_equal 0, exitval
       assert_match(/^Usage:/, stdout.string)
     end
+  end
+
+  test 'should print usage and return error code 0 when help flag is unknown' do
+    exitval, output = redirect_streams do |out, _|
+      [Asciidoctor::Cli::Options.parse!(%w(-h unknown)), out.string]
+    end
+    assert_equal 0, exitval
+    assert_match(/^Usage:/, output)
+  end
+
+  test 'should dump man page and return error code 0 when help topic is manpage' do
+    exitval, output = redirect_streams do |out, _|
+      [Asciidoctor::Cli::Options.parse!(%w(-h manpage)), out.string]
+    end
+    assert_equal 0, exitval
+    assert_includes output, 'Manual: Asciidoctor Manual'
+    assert_includes output, '.TH "ASCIIDOCTOR"'
   end
 
   test 'should return error code 1 when invalid option present' do
