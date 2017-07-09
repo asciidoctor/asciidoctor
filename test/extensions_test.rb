@@ -1006,6 +1006,52 @@ content
       end
     end
 
+    test 'create_section should set up all section properties' do
+      begin
+        sect = nil
+        Asciidoctor::Extensions.register do
+          block_macro do
+            named :sect
+            process do |parent, target, attrs|
+              opts = (level = attrs.delete 'level') ? { :level => level.to_i } : {}
+              attrs['id'] = false if attrs['id'] == 'false'
+              sect = create_section parent, 'Section Title', attrs, opts
+              nil
+            end
+          end
+        end
+
+        input_tpl = <<-EOS
+= Document Title
+:doctype: book
+:sectnums:
+
+sect::[%s]
+        EOS
+
+        {
+          ''                       => ['chapter',  1, false, true, '_section_title'],
+          'level=0'                => ['part',     0, false, false, '_section_title'],
+          'level=0,style=appendix' => ['appendix', 1, true,  true, '_section_title'],
+          'style=appendix'         => ['appendix', 1, true,  true, '_section_title'],
+          'style=glossary'         => ['glossary', 1, true,  false, '_section_title'],
+          'style=abstract'         => ['chapter',  1, false, true, '_section_title'],
+          'id=section-title'       => ['chapter',  1, false, true, 'section-title'],
+          'id=false'               => ['chapter',  1, false, true, nil]
+        }.each do |attrlist, (expect_sectname, expect_level, expect_special, expect_numbered, expect_id)|
+          input = input_tpl % attrlist
+          document_from_string input, :safe => :server
+          assert_equal expect_sectname, sect.sectname
+          assert_equal expect_level, sect.level
+          assert_equal expect_special, sect.special
+          assert_equal expect_numbered, sect.numbered
+          assert_equal expect_id, sect.id
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should add docinfo to document' do
       input = <<-EOS
 = Document Title
