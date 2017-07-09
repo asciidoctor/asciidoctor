@@ -93,15 +93,53 @@ module Extensions
     end
 
     # QUESTION should attributes be an option instead of a parameter?
+
+    # Public: Creates a new Section node.
+    #
+    # Creates a Section node in the same manner as the parser.
+    #
+    # parent - The parent Section (or Document) of this new Section.
+    # title  - The String title of the new Section.
+    # attrs  - A Hash of attributes to control how the section is built.
+    #          Use the style attribute to set the name of a special section (ex. appendix).
+    #          Use the id attribute to assign an explicit ID or set the value to false to
+    #          disable automatic ID generation (when sectids document attribute is set).
+    # opts   - An optional Hash of options (default: {}):
+    #          :level    - [Integer] The level to assign to this section; defaults to
+    #                      one greater than the parent level (optional).
+    #          :numbered - [Boolean] A flag to force numbering, which falls back to the 
+    #                      state of the sectnums document attribute (optional).
+    #
+    # Returns a [Section] node with all properties properly initialized.
     def create_section parent, title, attrs, opts = {}
       doc = parent.document
-      id = attrs.delete 'id'
-      sect = Section.new parent, opts[:level], (opts.fetch :numbered, (doc.attr? 'sectnums')), { :attributes => attrs }.merge(opts)
-      sect.title = title
-      # NOTE set ID attribute to false to disable ID generation / assignment
-      unless id == false
-        sect.id = sect.attributes['id'] = id || ((doc.attributes.key? 'sectids') ? (Section.generate_id sect.title, doc) : nil)
+      doctype, level = doc.doctype, (opts[:level] || parent.level + 1)
+      if (style = attrs.delete 'style')
+        if style == 'abstract' && doctype == 'book'
+          sectname, level = 'chapter', 1
+        else
+          sectname, special = style, true
+          level = 1 if level == 0
+        end
+      elsif doctype == 'book'
+        sectname = level == 0 ? 'part' : (level == 1 ? 'chapter' : 'section')
+      elsif doctype == 'manpage' && (title.casecmp 'synopsis') == 0
+        sectname, special = 'synopsis', true
+      else
+        sectname = 'section'
       end
+      sect = Section.new parent, level, false
+      sect.title, sect.sectname = title, sectname
+      if special
+        sect.special = true
+        sect.numbered = true if opts.fetch :numbered, (style == 'appendix')
+      elsif opts.fetch :numbered, (level > 0 && (doc.attributes.key? 'sectnums'))
+        sect.numbered = sect.special ? (parent.context == :section && parent.numbered) : true
+      end
+      unless (id = attrs.delete 'id') == false
+        sect.id = attrs['id'] = id || ((doc.attributes.key? 'sectids') ? (Section.generate_id sect.title, doc) : nil)
+      end
+      sect.update_attributes attrs
       sect
     end
 
