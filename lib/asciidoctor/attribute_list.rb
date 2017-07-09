@@ -168,14 +168,14 @@ class AttributeList
           when 'title'
             @attributes[name] = value
           else
-            @attributes[name] = value.empty? ? value : (@block.apply_normal_subs value)
+            @attributes[name] = @block.apply_subs value
           end
         else
           @attributes[name] = value
         end
       end
     else
-      resolved_name = single_quoted_value && @block && !name.empty? ? (@block.apply_normal_subs name) : name
+      resolved_name = single_quoted_value && @block ? (@block.apply_subs name) : name
       if (pos_name = pos_attrs[index])
         @attributes[pos_name] = resolved_name
       end

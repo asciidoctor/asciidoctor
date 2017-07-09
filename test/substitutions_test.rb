@@ -13,7 +13,7 @@ context 'Substitutions' do
     test 'apply normal substitutions' do
       para = block_from_string("[blue]_http://asciidoc.org[AsciiDoc]_ & [red]*Ruby*\n&#167; Making +++<u>documentation</u>+++ together +\nsince (C) {inception_year}.")
       para.document.attributes['inception_year'] = '2012'
-      result = para.apply_normal_subs(para.lines)
+      result = para.apply_subs(para.source)
       assert_equal %{<em class="blue"><a href="http://asciidoc.org">AsciiDoc</a></em> &amp; <strong class="red">Ruby</strong>\n&#167; Making <u>documentation</u> together<br>\nsince &#169; 2012.}, result
     end
 
@@ -243,10 +243,10 @@ context 'Substitutions' do
 
     test 'escaped single-quotes inside emphasized words are restored' do
       para = block_from_string(%('Here#{BACKSLASH}'s Johnny!'), :attributes => {'compat-mode' => ''})
-      assert_equal %q(<em>Here's Johnny!</em>), para.apply_normal_subs(para.lines)
+      assert_equal %q(<em>Here's Johnny!</em>), para.apply_subs(para.source)
 
       para = block_from_string(%('Here#{BACKSLASH}'s Johnny!'))
-      assert_equal %q('Here's Johnny!'), para.apply_normal_subs(para.lines)
+      assert_equal %q('Here's Johnny!'), para.apply_subs(para.source)
     end
 
     test 'single-line constrained emphasized underline variation string' do
@@ -264,67 +264,67 @@ context 'Substitutions' do
       assert_equal "<em>a few\nemphasized words</em>", para.sub_quotes(para.source)
     end
 
-    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'single-line constrained monospaced string' do
       para = block_from_string(%(`a few <{monospaced}> words`), :attributes => {'monospaced' => 'monospaced', 'compat-mode' => ''})
-      assert_equal '<code>a few &lt;{monospaced}&gt; words</code>', para.apply_normal_subs(para.lines)
+      assert_equal '<code>a few &lt;{monospaced}&gt; words</code>', para.apply_subs(para.source)
 
       para = block_from_string(%(`a few <{monospaced}> words`), :attributes => {'monospaced' => 'monospaced'})
-      assert_equal '<code>a few &lt;monospaced&gt; words</code>', para.apply_normal_subs(para.lines)
+      assert_equal '<code>a few &lt;monospaced&gt; words</code>', para.apply_subs(para.source)
     end
 
-    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'single-line constrained monospaced string with role' do
       para = block_from_string(%([input]`a few <{monospaced}> words`), :attributes => {'monospaced' => 'monospaced', 'compat-mode' => ''})
-      assert_equal '<code class="input">a few &lt;{monospaced}&gt; words</code>', para.apply_normal_subs(para.lines)
+      assert_equal '<code class="input">a few &lt;{monospaced}&gt; words</code>', para.apply_subs(para.source)
 
       para = block_from_string(%([input]`a few <{monospaced}> words`), :attributes => {'monospaced' => 'monospaced'})
-      assert_equal '<code class="input">a few &lt;monospaced&gt; words</code>', para.apply_normal_subs(para.lines)
+      assert_equal '<code class="input">a few &lt;monospaced&gt; words</code>', para.apply_subs(para.source)
     end
 
-    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'escaped single-line constrained monospaced string' do
       para = block_from_string(%(#{BACKSLASH}`a few <monospaced> words`), :attributes => {'compat-mode' => ''})
-      assert_equal '`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
+      assert_equal '`a few &lt;monospaced&gt; words`', para.apply_subs(para.source)
 
       para = block_from_string(%(#{BACKSLASH}`a few <monospaced> words`))
-      assert_equal '`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
+      assert_equal '`a few &lt;monospaced&gt; words`', para.apply_subs(para.source)
     end
 
-    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'escaped single-line constrained monospaced string with role' do
       para = block_from_string(%([input]#{BACKSLASH}`a few <monospaced> words`), :attributes => {'compat-mode' => ''})
-      assert_equal '[input]`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
+      assert_equal '[input]`a few &lt;monospaced&gt; words`', para.apply_subs(para.source)
 
       para = block_from_string(%([input]#{BACKSLASH}`a few <monospaced> words`))
-      assert_equal '[input]`a few &lt;monospaced&gt; words`', para.apply_normal_subs(para.lines)
+      assert_equal '[input]`a few &lt;monospaced&gt; words`', para.apply_subs(para.source)
     end
 
-    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'escaped role on single-line constrained monospaced string' do
       para = block_from_string(%(#{BACKSLASH}[input]`a few <monospaced> words`), :attributes => {'compat-mode' => ''})
-      assert_equal '[input]<code>a few &lt;monospaced&gt; words</code>', para.apply_normal_subs(para.lines)
+      assert_equal '[input]<code>a few &lt;monospaced&gt; words</code>', para.apply_subs(para.source)
 
       para = block_from_string(%(#{BACKSLASH}[input]`a few <monospaced> words`))
-      assert_equal '[input]<code>a few &lt;monospaced&gt; words</code>', para.apply_normal_subs(para.lines)
+      assert_equal '[input]<code>a few &lt;monospaced&gt; words</code>', para.apply_subs(para.source)
     end
 
-    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'escaped role on escaped single-line constrained monospaced string' do
       para = block_from_string(%(#{BACKSLASH}[input]#{BACKSLASH}`a few <monospaced> words`), :attributes => {'compat-mode' => ''})
-      assert_equal %(#{BACKSLASH}[input]`a few &lt;monospaced&gt; words`), para.apply_normal_subs(para.lines)
+      assert_equal %(#{BACKSLASH}[input]`a few &lt;monospaced&gt; words`), para.apply_subs(para.source)
 
       para = block_from_string(%(#{BACKSLASH}[input]#{BACKSLASH}`a few <monospaced> words`))
-      assert_equal %(#{BACKSLASH}[input]`a few &lt;monospaced&gt; words`), para.apply_normal_subs(para.lines)
+      assert_equal %(#{BACKSLASH}[input]`a few &lt;monospaced&gt; words`), para.apply_subs(para.source)
     end
 
-    # NOTE must use apply_normal_subs because constrained monospaced is handled as a passthrough
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'multi-line constrained monospaced string' do
       para = block_from_string(%(`a few\n<{monospaced}> words`), :attributes => {'monospaced' => 'monospaced', 'compat-mode' => ''})
-      assert_equal "<code>a few\n&lt;{monospaced}&gt; words</code>", para.apply_normal_subs(para.lines)
+      assert_equal "<code>a few\n&lt;{monospaced}&gt; words</code>", para.apply_subs(para.source)
 
       para = block_from_string(%(`a few\n<{monospaced}> words`), :attributes => {'monospaced' => 'monospaced'})
-      assert_equal "<code>a few\n&lt;monospaced&gt; words</code>", para.apply_normal_subs(para.lines)
+      assert_equal "<code>a few\n&lt;monospaced&gt; words</code>", para.apply_subs(para.source)
     end
 
     test 'single-line unconstrained strong chars' do
@@ -600,7 +600,7 @@ context 'Substitutions' do
       para = block_from_string('doc.writer@asciidoc.org')
       assert_equal %q{<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>}, para.sub_macros(para.source)
       para = block_from_string('<doc.writer@asciidoc.org>')
-      assert_equal %q{&lt;<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>&gt;}, para.apply_normal_subs(para.lines)
+      assert_equal %q{&lt;<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>&gt;}, para.apply_subs(para.source)
       para = block_from_string('author+website@4fs.no')
       assert_equal %q{<a href="mailto:author+website@4fs.no">author+website@4fs.no</a>}, para.sub_macros(para.source)
       para = block_from_string('john@domain.uk.co')
@@ -1066,7 +1066,7 @@ EOS
       macros = ['indexterm:[*Tigers*]', '(((*Tigers*)))']
       macros.each do |macro|
         para = block_from_string("#{sentence}#{macro}")
-        output = para.apply_normal_subs(para.lines)
+        output = para.apply_subs(para.source)
         assert_equal sentence, output
         assert_equal 1, para.document.catalog[:indexterms].size
         assert_equal ['<strong>Tigers</strong>'], para.document.catalog[:indexterms].first
@@ -1165,7 +1165,7 @@ EOS
     test 'normal substitutions are performed on an index term 2 macro' do
       sentence = 'The ((*tiger*)) (Panthera tigris) is the largest cat species.'
       para = block_from_string sentence
-      output = para.apply_normal_subs(para.lines)
+      output = para.apply_subs(para.source)
       assert_equal 'The <strong>tiger</strong> (Panthera tigris) is the largest cat species.', output
       assert_equal 1, para.document.catalog[:indexterms].size
       assert_equal ['<strong>tiger</strong>'], para.document.catalog[:indexterms].first
@@ -1671,12 +1671,12 @@ EOS
   context 'Replacements' do
     test 'unescapes XML entities' do
       para = block_from_string '< &quot; &there4; &#34; &#x22; >'
-      assert_equal '&lt; &quot; &there4; &#34; &#x22; &gt;', para.apply_normal_subs(para.lines)
+      assert_equal '&lt; &quot; &there4; &#34; &#x22; &gt;', para.apply_subs(para.source)
     end
 
     test 'replaces arrows' do
       para = block_from_string '<- -> <= => \<- \-> \<= \=>'
-      assert_equal '&#8592; &#8594; &#8656; &#8658; &lt;- -&gt; &lt;= =&gt;', para.apply_normal_subs(para.source)
+      assert_equal '&#8592; &#8594; &#8656; &#8658; &lt;- -&gt; &lt;= =&gt;', para.apply_subs(para.source)
     end
 
     test 'replaces dashes' do

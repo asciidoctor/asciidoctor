@@ -135,11 +135,13 @@ module Substitutors
 
   # Public: Apply normal substitutions.
   #
-  # lines  - The lines of text to process. Can be a String or a String Array
+  # An alias for apply_subs with default remaining arguments.
   #
-  # returns - A String with normal substitutions performed
-  def apply_normal_subs(lines)
-    apply_subs(::Array === lines ? lines * LF : lines)
+  # text  - The String text to which to apply normal substitutions
+  #
+  # Returns the String with normal substitutions applied.
+  def apply_normal_subs text
+    apply_subs text
   end
 
   # Public: Apply substitutions for titles.
