@@ -26,7 +26,7 @@ If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 *-B, --base-dir*=_DIR_::
   Base directory containing the document and resources.
   Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
-  Can be used as a way to chroot the execution of the program.
+  When combined with the safe mode setting, can be used to chroot the execution of the program.
 
 *-S, --safe-mode*=_SAFE_MODE_::
   Set safe mode level: _unsafe_, _safe_, _server_ or _secure_.
@@ -43,7 +43,7 @@ If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 
 *-a, --attribute*=_ATTRIBUTE_::
   Define, override or delete a document attribute.
-  Command-line attributes take precedence over attributes defined in the source file.
+  Command-line attributes take precedence over attributes defined in the source file unless the value ends with _@_.
 +
 _ATTRIBUTE_ is normally formatted as a key-value pair, in the form _NAME=VALUE_.
 Alternate acceptable forms are _NAME_ (where the _VALUE_ defaults to an empty string), _NAME!_ (unassigns the _NAME_ attribute) and _NAME=VALUE@_ (where _VALUE_ does not override value of _NAME_ attribute if it's already defined in the source document).
@@ -54,8 +54,8 @@ This option may be specified more than once.
 *-b, --backend*=_BACKEND_::
   Backend output file format: _html5_, _docbook5_, _docbook45_ and _manpage_ are supported out of the box.
   You can also use the backend alias names _html_ (aliased to _html5_) or _docbook_ (aliased to _docbook5_).
+  Other values can be passed, but if Asciidoctor cannot resolve the backend to a converter, it will fail.
   Defaults to _html5_.
-  Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during conversion.
 
 *-d, --doctype*=_DOCTYPE_::
   Document type: _article_, _book_, _manpage_ or _inline_.
@@ -148,7 +148,7 @@ Matching templates found in subsequent directories override ones previously disc
 
 == ENVIRONMENT
 
-*Asciidoctor* honors the SOURCE_DATE_EPOCH environment variable.
+*Asciidoctor* honors the *SOURCE_DATE_EPOCH* environment variable.
 If this variable is assigned an integer value, that value is used as the epoch of all input documents and as the local date and time.
 See https://reproducible-builds.org/specs/source-date-epoch/ for more information about this environment variable.
 

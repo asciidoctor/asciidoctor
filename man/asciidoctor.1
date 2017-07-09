@@ -35,7 +35,7 @@ If \fIFILE\fP is \fI\-\fP then the AsciiDoc source is read from standard input.
 .RS 4
 Base directory containing the document and resources.
 Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
-Can be used as a way to chroot the execution of the program.
+When combined with the safe mode setting, can be used to chroot the execution of the program.
 .RE
 .sp
 \fB\-S, \-\-safe\-mode\fP=\fISAFE_MODE\fP
@@ -57,7 +57,7 @@ If not set, the safe mode level defaults to \fIunsafe\fP when Asciidoctor is inv
 \fB\-a, \-\-attribute\fP=\fIATTRIBUTE\fP
 .RS 4
 Define, override or delete a document attribute.
-Command\-line attributes take precedence over attributes defined in the source file.
+Command\-line attributes take precedence over attributes defined in the source file unless the value ends with \fI@\fP.
 .sp
 \fIATTRIBUTE\fP is normally formatted as a key\-value pair, in the form \fINAME=VALUE\fP.
 Alternate acceptable forms are \fINAME\fP (where the \fIVALUE\fP defaults to an empty string), \fINAME!\fP (unassigns the \fINAME\fP attribute) and \fINAME=VALUE@\fP (where \fIVALUE\fP does not override value of \fINAME\fP attribute if it\(cqs already defined in the source document).
@@ -70,8 +70,8 @@ This option may be specified more than once.
 .RS 4
 Backend output file format: \fIhtml5\fP, \fIdocbook5\fP, \fIdocbook45\fP and \fImanpage\fP are supported out of the box.
 You can also use the backend alias names \fIhtml\fP (aliased to \fIhtml5\fP) or \fIdocbook\fP (aliased to \fIdocbook5\fP).
+Other values can be passed, but if Asciidoctor cannot resolve the backend to a converter, it will fail.
 Defaults to \fIhtml5\fP.
-Other options can be passed, but if Asciidoctor cannot find the backend, it will fail during conversion.
 .RE
 .sp
 \fB\-d, \-\-doctype\fP=\fIDOCTYPE\fP
@@ -195,7 +195,7 @@ Print program version number.
 .RE
 .SH "ENVIRONMENT"
 .sp
-\fBAsciidoctor\fP honors the SOURCE_DATE_EPOCH environment variable.
+\fBAsciidoctor\fP honors the \fBSOURCE_DATE_EPOCH\fP environment variable.
 If this variable is assigned an integer value, that value is used as the epoch of all input documents and as the local date and time.
 See \c
 .URL "https://reproducible\-builds.org/specs/source\-date\-epoch/" "" " "
