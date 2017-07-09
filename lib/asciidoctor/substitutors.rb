@@ -352,8 +352,10 @@ module Substitutors
     end
 
     def sub_replacements text
-      REPLACEMENTS.each do |pattern, replacement, restore|
-        text = text.gsub(pattern) { do_replacement $~, replacement, restore }
+      if ReplaceableTextRx.match? text
+        REPLACEMENTS.each do |pattern, replacement, restore|
+          text = text.gsub(pattern) { do_replacement $~, replacement, restore }
+        end
       end
       text
     end
@@ -383,11 +385,13 @@ module Substitutors
     #
     # returns The String text with the replacement characters substituted
     def sub_replacements text
-      # NOTE interpolation is faster than String#dup
-      text = %(#{text})
-      # NOTE Using gsub! as optimization
-      REPLACEMENTS.each do |pattern, replacement, restore|
-        text.gsub!(pattern) { do_replacement $~, replacement, restore }
+      if ReplaceableTextRx.match? text
+        # NOTE interpolation is faster than String#dup
+        text = %(#{text})
+        REPLACEMENTS.each do |pattern, replacement, restore|
+          # NOTE Using gsub! as optimization
+          text.gsub!(pattern) { do_replacement $~, replacement, restore }
+        end
       end
       text
     end
