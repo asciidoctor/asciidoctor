@@ -1092,12 +1092,10 @@ class Parser
       block.assign_caption attributes.delete('caption')
     end
 
-    if content_model == :compound
-      # we can look for blocks until there are no more lines (and not worry
-      # about sections) since the reader is confined within the boundaries of a
-      # delimited block
-      parse_blocks block_reader, block
-    end
+    # reader is confined within boundaries of a delimited block, so look for
+    # blocks until there are no more lines
+    parse_blocks block_reader, block if content_model == :compound
+
     block
   end
 
