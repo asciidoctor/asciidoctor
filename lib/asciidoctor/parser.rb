@@ -459,7 +459,7 @@ class Parser
 
       # QUESTION should we introduce a parsing context object?
       source_location = reader.cursor if sourcemap
-      this_line = reader.read_line
+      this_path, this_lineno, this_line = reader.path, reader.lineno, reader.read_line
       delimited_block = block_context = cloaked_context = terminator = nil
       style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
 
@@ -477,7 +477,7 @@ class Parser
           elsif block_extensions && extensions.registered_for_block?(style, block_context)
             block_context = style.to_sym
           else
-            warn %(asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for #{block_context} block: #{style})
+            warn %(asciidoctor: WARNING: #{this_path}: line #{this_lineno}: invalid style for #{block_context} block: #{style})
             style = block_context.to_s
           end
         end
@@ -608,9 +608,7 @@ class Parser
             unless match[1] == expected_index.to_s
               warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: callout list item index: expected #{expected_index} got #{match[1]})
             end
-            list_item = next_list_item(reader, block, match)
-            expected_index += 1
-            if list_item
+            if (list_item = next_list_item reader, block, match)
               block << list_item
               if (coids = document.callouts.callout_ids block.items.size).empty?
                 warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: no callouts refer to list item #{block.items.size})
@@ -618,6 +616,7 @@ class Parser
                 list_item.attributes['coids'] = coids
               end
             end
+            expected_index += 1
             match = nil
           end
 
@@ -690,7 +689,7 @@ class Parser
             # advance to block parsing =>
             break
           else
-            warn %(asciidoctor: WARNING: #{reader.prev_line_info}: invalid style for paragraph: #{style})
+            warn %(asciidoctor: WARNING: #{this_path}: line #{this_lineno}: invalid style for paragraph: #{style})
             style = nil
             # continue to process paragraph
           end
@@ -909,7 +908,9 @@ class Parser
       #block.style = attributes.delete 'style'
       block.style = attributes['style']
       if (block_id = (block.id ||= attributes['id']))
-        document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
+        unless document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
+          warn %(asciidoctor: WARNING: #{this_path}: line #{this_lineno}: id assigned to block already in use: #{block_id})
+        end
       end
       # FIXME remove the need for this update!
       block.attributes.update(attributes) unless attributes.empty?
@@ -1207,7 +1208,9 @@ class Parser
           next if (reftext.include? '{') && (reftext = document.sub_attributes reftext).empty?
         end
       end
-      document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :id => id), reftext]
+      unless document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :id => id), reftext]
+        warn %(asciidoctor: WARNING: #{document.reader.path}: id assigned to anchor already in use: #{id})
+      end
     end if (text.include? '[[') || (text.include? 'or:')
     nil
   end
@@ -1222,7 +1225,9 @@ class Parser
   def self.catalog_inline_biblio_anchor text, block, document
     if InlineBiblioAnchorRx =~ text
       # QUESTION should we sub attributes in reftext (like with regular anchors)?
-      document.register :refs, [(id = $1), (Inline.new block, :anchor, (reftext = %([#{$2 || id}])), :type => :bibref, :id => id), reftext]
+      unless document.register :refs, [(id = $1), (Inline.new block, :anchor, (reftext = %([#{$2 || id}])), :type => :bibref, :id => id), reftext]
+        warn %(asciidoctor: WARNING: #{document.reader.path}: id assigned to bibliography anchor already in use: #{id})
+      end
     end
     nil
   end
@@ -1558,7 +1563,7 @@ class Parser
   def self.initialize_section reader, parent, attributes = {}
     document = parent.document
     source_location = reader.cursor if document.sourcemap
-    sect_id, sect_reftext, sect_title, sect_level, _ = parse_section_title reader, document
+    sect_id, sect_reftext, sect_title, sect_level, single_line = parse_section_title reader, document
     if sect_reftext
       attributes['reftext'] = sect_reftext
     elsif attributes.key? 'reftext'
@@ -1605,7 +1610,9 @@ class Parser
     # generate an ID if one was not embedded or specified as anchor above section title
     if (id = section.id ||= (attributes['id'] ||
         ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil)))
-      document.register :refs, [id, section, sect_reftext || section.title]
+      unless document.register :refs, [id, section, sect_reftext || section.title]
+        warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - (single_line ? 1 : 2)}: id assigned to section already in use: #{id})
+      end
     end
 
     section.update_attributes(attributes)

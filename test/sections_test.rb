@@ -219,10 +219,11 @@ content
 content
       EOS
 
-      doc = document_from_string input
+      doc, warnings = redirect_streams {|_, err| [(document_from_string input), err.string]}
       reftext = doc.catalog[:ids]['install']
       refute_nil reftext
       assert_equal 'First Install', reftext
+      assert_includes warnings, 'line 7: id assigned to section already in use: install'
     end
 
     test 'duplicate block id should not overwrite existing section id entry in references table' do
@@ -236,10 +237,11 @@ content
 content
       EOS
 
-      doc = document_from_string input
+      doc, warnings = redirect_streams {|_, err| [(document_from_string input), err.string] }
       reftext = doc.catalog[:ids]['install']
       refute_nil reftext
       assert_equal 'First Install', reftext
+      assert_includes warnings, 'line 7: id assigned to block already in use: install'
     end
   end
 
