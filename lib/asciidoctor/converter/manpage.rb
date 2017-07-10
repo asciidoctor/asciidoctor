@@ -185,7 +185,7 @@ Author(s).
 .nr an-break-flag 1
 .br
 .ps +1
-.B #{node.caption}#{node.title? ? "\\fP #{manify node.title}" : nil}
+.B #{node.attr 'textlabel'}#{node.title? ? "\\fP: #{manify node.title}" : nil}
 .ps -1
 .br
 #{resolve_content node}
@@ -576,7 +576,7 @@ allbox tab(:);'
       end_param = (node.attr? 'end', nil, false) ? %(&end=#{node.attr 'end'}) : nil
       result = []
       result << %(.sp
-.B #{manify node.captioned_title}
+.B #{manify node.title}
 .br) if node.title?
       result << %(<#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}> (video))
       result * LF
