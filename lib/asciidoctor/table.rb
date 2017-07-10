@@ -38,6 +38,9 @@ class Table < AbstractBlock
   # Public: Boolean specifies whether this table has a header row
   attr_accessor :has_header_option
 
+  # Public: Get the caption for this table
+  attr_reader :caption
+
   def initialize parent, attributes
     super parent, :table
     @rows = Rows.new

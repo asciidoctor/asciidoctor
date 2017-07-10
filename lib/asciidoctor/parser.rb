@@ -733,11 +733,11 @@ class Parser
             # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
             adjust_indentation! lines if indented && style == 'normal'
             block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
-          elsif (ADMONITION_STYLE_LEADERS.include? ch0) && (this_line.include? ':') && (admonition_match = AdmonitionParagraphRx.match this_line)
-            lines[0] = admonition_match.post_match
-            attributes['name'] = admonition_name = (attributes['style'] = admonition_match[1]).downcase
+          elsif (ADMONITION_STYLE_LEADERS.include? ch0) && (this_line.include? ':') && (AdmonitionParagraphRx =~ this_line)
+            lines[0] = $' # string after match
+            attributes['name'] = admonition_name = (attributes['style'] = $1).downcase
+            attributes['textlabel'] = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
             block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
-            block.caption = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
           elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
             lines.map! {|line| line == '>' ? line[1..-1] : ((line.start_with? '> ') ? line[2..-1] : line) }
             if lines[-1].start_with? '-- '
@@ -782,8 +782,8 @@ class Parser
         case block_context
         when :admonition
           attributes['name'] = admonition_name = style.downcase
+          attributes['textlabel'] = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
           block = build_block(block_context, :compound, terminator, parent, reader, attributes)
-          block.caption = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
 
         when :comment
           build_block(block_context, :skip, terminator, parent, reader, attributes)
@@ -902,13 +902,11 @@ class Parser
     # FIXME we've got to clean this up, it's horrible!
     if block
       block.source_location = source_location if source_location
-      # FIXME title should have already been assigned
+      # FIXME title should be assigned when block is constructed
       block.title = attributes.delete 'title' if attributes.key? 'title'
       #unless attributes.key? 'reftext'
       #  attributes['reftext'] = document.attributes['reftext'] if document.attributes.key? 'reftext'
       #end
-      # FIXME caption should have already been assigned
-      block.caption ||= attributes.delete 'caption'
       # TODO eventually remove the style attribute from the attributes hash
       #block.style = attributes.delete 'style'
       block.style = attributes['style']
@@ -1087,9 +1085,10 @@ class Parser
     end
 
     # QUESTION should we have an explicit map or can we rely on check for *-caption attribute?
-    if (attributes.key? 'title') && (block.document.attr? %(#{block.context}-caption))
+    if (attributes.key? 'title') && block.context != :admonition &&
+        (parent.document.attributes.key? %(#{block.context}-caption))
       block.title = attributes.delete 'title'
-      block.assign_caption attributes.delete('caption')
+      block.assign_caption(attributes.delete 'caption')
     end
 
     # reader is confined within boundaries of a delimited block, so look for
@@ -2261,9 +2260,9 @@ class Parser
   # returns an instance of Asciidoctor::Table parsed from the provided reader
   def self.next_table(table_reader, parent, attributes)
     table = Table.new(parent, attributes)
-    if (attributes.key? 'title')
+    if attributes.key? 'title'
       table.title = attributes.delete 'title'
-      table.assign_caption attributes.delete('caption')
+      table.assign_caption(attributes.delete 'caption')
     end
 
     if (attributes.key? 'cols') && !(colspecs = parse_colspecs attributes['cols']).empty?

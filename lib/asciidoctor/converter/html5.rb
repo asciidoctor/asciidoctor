@@ -364,20 +364,20 @@ MathJax.Hub.Config({
       id_attr = node.id ? %( id="#{node.id}") : nil
       name = node.attr 'name'
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-      caption = if node.document.attr? 'icons'
+      if node.document.attr? 'icons'
         if (node.document.attr? 'icons', 'font') && !(node.attr? 'icon')
-          %(<i class="fa icon-#{name}" title="#{node.caption}"></i>)
+          label = %(<i class="fa icon-#{name}" title="#{node.attr 'textlabel'}"></i>)
         else
-          %(<img src="#{node.icon_uri name}" alt="#{node.caption}"#{@void_element_slash}>)
+          label = %(<img src="#{node.icon_uri name}" alt="#{node.attr 'textlabel'}"#{@void_element_slash}>)
         end
       else
-        %(<div class="title">#{node.caption}</div>)
+        label = %(<div class="title">#{node.attr 'textlabel'}</div>)
       end
       %(<div#{id_attr} class="admonitionblock #{name}#{(role = node.role) && " #{role}"}">
 <table>
 <tr>
 <td class="icon">
-#{caption}
+#{label}
 </td>
 <td class="content">
 #{title_element}#{node.content}
@@ -392,7 +392,7 @@ MathJax.Hub.Config({
       id_attribute = node.id ? %( id="#{node.id}") : nil
       classes = ['audioblock', node.role].compact
       class_attribute = %( class="#{classes * ' '}")
-      title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
+      title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
       start_t = node.attr 'start', nil, false
       end_t = node.attr 'end', nil, false
       time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ',' : nil}#{end_t}) : nil
@@ -946,7 +946,7 @@ Your browser does not support the audio tag.
       id_attribute = node.id ? %( id="#{node.id}") : nil
       classes = ['videoblock', node.role].compact
       class_attribute = %( class="#{classes * ' '}")
-      title_element = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : nil
+      title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : nil
       width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
       height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : nil
       case node.attr 'poster'

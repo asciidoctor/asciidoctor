@@ -608,20 +608,6 @@ You just write.
       assert !doc.attributes.has_key?('example-number')
     end
 
-    test 'explicit caption is set on block even if block has no title' do
-      input = <<-EOS
-[caption="Look!"]
-====
-Just write.
-====
-      EOS
-
-      doc = document_from_string input
-      assert_equal 'Look!', doc.blocks.first.caption
-      output = doc.render
-      refute_match(/Look/, output)
-    end
-
     test 'automatic caption can be turned off and on and modified' do
       input = <<-EOS
 .first example

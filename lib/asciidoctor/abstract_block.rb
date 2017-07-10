@@ -16,8 +16,8 @@ class AbstractBlock < AbstractNode
   # Public: Get/Set the String style (block type qualifier) for this block.
   attr_accessor :style
 
-  # Public: Get/Set the caption for this block
-  attr_accessor :caption
+  # Public: Set the caption for this block
+  attr_writer :caption
 
   # Public: Get/Set the number of this block (if section, relative to parent, otherwise absolute)
   # Only assigned to section if automatic section numbering is enabled
@@ -132,6 +132,17 @@ class AbstractBlock < AbstractNode
     @title, @title_converted = val, nil
   end
 
+  # Gets the caption for this block.
+  #
+  # This method routes the deprecated use of the caption method on an
+  # admonition block to the textlabel attribute.
+  #
+  # Returns the [String] caption for this block (or the value of the textlabel
+  # attribute if this is an admonition block).
+  def caption
+    @context == :admonition ? @attributes['textlabel'] : @caption
+  end
+
   # Public: Convenience method that returns the interpreted title of the Block
   # with the caption prepended.
   #
@@ -176,11 +187,11 @@ class AbstractBlock < AbstractNode
   #
   # Use the explicit reftext for this block, if specified, retrieved from the
   # {#reftext} method. Otherwise, if this is a section or captioned block (a
-  # block with both a title and caption, excluding admonitions), generate the
-  # xreftext according to the value of the xrefstyle argument (e.g., full,
-  # short). This logic may leverage the {Substitutors#sub_quotes} method to
-  # apply formatting to the text. If this is not a captioned block, return the
-  # title, if present, or nil otherwise.
+  # block with both a title and caption), generate the xreftext according to
+  # the value of the xrefstyle argument (e.g., full, short). This logic may
+  # leverage the {Substitutors#sub_quotes} method to apply formatting to the
+  # text. If this is not a captioned block, return the title, if present, or
+  # nil otherwise.
   #
   # xrefstyle - An optional String that specifies the style to use to format
   #             the xreftext ('full', 'short', or 'basic') (default: nil).
@@ -191,18 +202,17 @@ class AbstractBlock < AbstractNode
     if (val = reftext) && !val.empty?
       val
     # NOTE xrefstyle only applies to blocks with a title and a caption or number
-    # FIXME admonition blocks misuse the caption property, so exclude for now
-    elsif xrefstyle && @title && @caption && (type = @context) != :admonition
+    elsif xrefstyle && @title && @caption
       case xrefstyle
       when 'full'
         quoted_title = sprintf sub_quotes(@document.compat_mode ? %q(``%s'') : '"`%s`"'), title
-        if @number && (prefix = @document.attributes[type == :image ? 'figure-caption' : %(#{type}-caption)])
+        if @number && (prefix = @document.attributes[@context == :image ? 'figure-caption' : %(#{@context}-caption)])
           %(#{prefix} #{@number}, #{quoted_title})
         else
           %(#{@caption.chomp '. '}, #{quoted_title})
         end
       when 'short'
-        if @number && (prefix = @document.attributes[type == :image ? 'figure-caption' : %(#{type}-caption)])
+        if @number && (prefix = @document.attributes[@context == :image ? 'figure-caption' : %(#{@context}-caption)])
           %(#{prefix} #{@number})
         else
           @caption.chomp '. '
@@ -395,32 +405,30 @@ class AbstractBlock < AbstractNode
     nil
   end
 
-  # Public: Generate a caption and assign it to this block if one
-  # is not already assigned.
+  # Public: Generate and assign caption to block if not already assigned.
   #
-  # If the block has a title and a caption prefix is available
-  # for this block, then build a caption from this information,
-  # assign it a number and store it to the caption attribute on
-  # the block.
+  # If the block has a title and a caption prefix is available for this block,
+  # then build a caption from this information, assign it a number and store it
+  # to the caption attribute on the block.
   #
-  # If an explicit caption has been specified on this block, then
-  # do nothing.
+  # If a caption has already been assigned to this block, do nothing.
   #
-  # The parts of a complete caption are: <label> <number>. <title>
+  # The parts of a complete caption are: <prefix> <number>. <title>
   # This partial caption represents the part the precedes the title.
   #
-  # key         - The prefix of the caption and counter attribute names.
-  #               If not provided, the name of the context for this block
-  #               is used. (default: nil).
+  # value - The explicit String caption to assign to this block (default: nil).
+  # key   - The String prefix for the caption and counter attribute names.
+  #         If not provided, the name of the context for this block is used.
+  #         (default: nil)
   #
-  # Returns nothing
-  def assign_caption caption = nil, key = nil
-    unless @caption || !@title || (@caption = caption || @document.attributes['caption'])
-      if (label = @document.attributes[%(#{key ||= @context}-caption)])
-        @caption = %(#{label} #{@number = @document.increment_and_store_counter "#{key}-number", self}. )
+  # Returns nothing.
+  def assign_caption value = nil, key = nil
+    unless @caption || !@title || (@caption = value || @document.attributes['caption'])
+      if (prefix = @document.attributes[%(#{key ||= @context}-caption)])
+        @caption = %(#{prefix} #{@number = @document.increment_and_store_counter "#{key}-number", self}. )
+        nil
       end
     end
-    nil
   end
 
   # Internal: Assign the next index (0-based) and number (1-based) to the section

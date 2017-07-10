@@ -33,6 +33,9 @@ class Section < AbstractBlock
   # Public: Get the state of the numbered attribute at this section (need to preserve for creating TOC)
   attr_accessor :numbered
 
+  # Public: Get the caption for this section (only relevant for appendices)
+  attr_reader :caption
+
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent - The parent Asciidoc Object.
