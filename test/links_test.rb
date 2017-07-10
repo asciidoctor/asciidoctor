@@ -238,8 +238,21 @@ context 'Links' do
       doc = document_from_string %(Here you can read about tigers.#{anchor})
       output = doc.render
       assert_equal '[tigers]', doc.catalog[:ids]['tigers']
+      assert doc.catalog[:refs]['tigers'].is_a? Asciidoctor::Inline
+      assert_nil doc.catalog[:refs]['tigers'].text
       assert_xpath '//a[@id = "tigers"]', output, 1
       assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
+    end
+  end
+
+  test 'escaped inline ref' do
+    variations = %w([[tigers]] anchor:tigers[])
+    variations.each do |anchor|
+      doc = document_from_string %(Here you can read about tigers.\\#{anchor})
+      output = doc.render
+      refute doc.catalog[:ids].key?('tigers')
+      refute doc.catalog[:refs].key?('tigers')
+      assert_xpath '//a[@id = "tigers"]', output, 0
     end
   end
 
@@ -257,29 +270,48 @@ context 'Links' do
   end
 
   test 'inline ref with reftext' do
-    variations = %w([[tigers,Tigers]] anchor:tigers[Tigers])
-    variations.each do |anchor|
+    %w([[tigers,Tigers]] anchor:tigers[Tigers]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
       output = doc.render
       assert_equal 'Tigers', doc.catalog[:ids]['tigers']
+      assert doc.catalog[:refs]['tigers'].is_a? Asciidoctor::Inline
+      assert_equal 'Tigers', doc.catalog[:refs]['tigers'].text
       assert_xpath '//a[@id = "tigers"]', output, 1
       assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
     end
   end
 
-  test 'escaped inline ref' do
-    variations = %w([[tigers]] anchor:tigers[])
-    variations.each do |anchor|
-      doc = document_from_string %(Here you can read about tigers.\\#{anchor})
-      output = doc.render
-      assert !doc.catalog[:ids].has_key?('tigers')
-      assert_xpath '//a[@id = "tigers"]', output, 0
+  test 'should encode double quotes in reftext of anchor macro in DocBook output' do
+    input = 'anchor:uncola[the "un"-cola]'
+    result = render_inline_string input, :backend => :docbook
+    assert_equal '<anchor xml:id="uncola" xreflabel="the &quot;un&quot;-cola"/>', result
+  end
+
+  test 'should substitute attribute references in reftext when registering inline ref' do
+    %w([[tigers,{label-tigers}]] anchor:tigers[{label-tigers}]).each do |anchor|
+      doc = document_from_string %(Here you can read about tigers.#{anchor}), :attributes => { 'label-tigers' => 'Tigers' }
+      doc.render
+      assert doc.catalog[:refs]['tigers'].is_a? Asciidoctor::Inline
+      assert_equal 'Tigers', doc.catalog[:refs]['tigers'].text
+      assert_equal 'Tigers', doc.catalog[:ids]['tigers']
+    end
+  end
+
+  test 'inline ref with reftext converted to DocBook' do
+    %w([[tigers,<Tigers>]] anchor:tigers[<Tigers>]).each do |anchor|
+      doc = document_from_string %(Here you can read about tigers.#{anchor}), :backend => :docbook45
+      output = doc.convert :header_footer => false
+      assert doc.catalog[:refs]['tigers'].is_a? Asciidoctor::Inline
+      assert_equal '<Tigers>', doc.catalog[:refs]['tigers'].text
+      assert_equal '<Tigers>', doc.references[:ids]['tigers']
+      assert_includes output, '<anchor id="tigers" xreflabel="&lt;Tigers&gt;"/>'
     end
   end
 
   test 'does not match bibliography anchor in prose when scanning for inline anchor' do
     doc = document_from_string 'Use [[[label]]] to assign a label to a bibliography entry.'
     refute doc.catalog[:ids].key?('label')
+    refute doc.catalog[:refs].key?('label')
   end
 
   test 'repeating inline anchor macro with empty reftext' do
@@ -300,6 +332,14 @@ context 'Links' do
     assert_equal '<anchor xml:id="foo" xreflabel="[foo]"/>', result
   end
 
+  test 'unescapes square bracket in reftext of anchor macro' do
+    input = 'see <<foo>>
+
+anchor:foo[b[a\]r]text'
+    result = render_embedded_string input
+    assert_includes result, 'see <a href="#foo">b[a]r</a>'
+  end
+
   test 'unescapes square bracket in reftext of anchor macro in DocBook output' do
     input = 'anchor:foo[b[a\]r]'
     result = render_inline_string input, :backend => :docbook
@@ -308,13 +348,13 @@ context 'Links' do
 
   test 'xref using angled bracket syntax' do
     doc = document_from_string '<<tigers>>'
-    doc.catalog[:ids]['tigers'] = '[tigers]'
+    doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, '[tigers]', :type => :ref, :target => 'tigers'), '[tigers]']
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
   test 'xref using angled bracket syntax with explicit hash' do
     doc = document_from_string '<<#tigers>>'
-    doc.catalog[:ids]['tigers'] = 'Tigers'
+    doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, 'Tigers', :type => :ref, :target => 'tigers'), 'Tigers']
     assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', doc.render, 1
   end
 
@@ -455,13 +495,13 @@ A summary of the first lesson.
 
   test 'xref using macro syntax' do
     doc = document_from_string 'xref:tigers[]'
-    doc.catalog[:ids]['tigers'] = '[tigers]'
+    doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, '[tigers]', :type => :ref, :target => 'tigers'), '[tigers]']
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
   test 'xref using macro syntax with explicit hash' do
     doc = document_from_string 'xref:#tigers[]'
-    doc.catalog[:ids]['tigers'] = 'Tigers'
+    doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, 'Tigers', :type => :ref, :target => 'tigers'), 'Tigers']
     assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', doc.render, 1
   end
 
@@ -518,7 +558,7 @@ see <<foo>>'
 
   test 'xref using invalid macro syntax does not create link' do
     doc = document_from_string 'xref:tigers'
-    doc.catalog[:ids]['tigers'] = '[tigers]'
+    doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, 'Tigers', :type => :ref, :target => 'tigers'), 'Tigers']
     assert_xpath '//a', doc.render, 0
   end
 

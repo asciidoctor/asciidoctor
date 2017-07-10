@@ -161,6 +161,60 @@ class AbstractBlock < AbstractNode
     end
   end
 
+  # Public: A convenience method that checks if the reftext attribute is defined.
+  def reftext?
+    @attributes.key? 'reftext'
+  end
+
+  # Public: A convenience method that returns the value of the reftext attribute with substitutions applied.
+  def reftext
+    (val = @attributes['reftext']) ? (apply_reftext_subs val) : nil
+  end
+
+  # Public: Generate cross reference text (xreftext) that can be used to refer
+  # to this block.
+  #
+  # Use the explicit reftext for this block, if specified, retrieved from the
+  # {#reftext} method. Otherwise, if this is a section or captioned block (a
+  # block with both a title and caption, excluding admonitions), generate the
+  # xreftext according to the value of the xrefstyle argument (e.g., full,
+  # short). This logic may leverage the {Substitutors#sub_quotes} method to
+  # apply formatting to the text. If this is not a captioned block, return the
+  # title, if present, or nil otherwise.
+  #
+  # xrefstyle - An optional String that specifies the style to use to format
+  #             the xreftext ('full', 'short', or 'basic') (default: nil).
+  #
+  # Returns the generated [String] xreftext used to refer to this block or
+  # nothing if there isn't sufficient information to generate one.
+  def xreftext xrefstyle = nil
+    if (val = reftext) && !val.empty?
+      val
+    # NOTE xrefstyle only applies to blocks with a title and a caption or number
+    # FIXME admonition blocks misuse the caption property, so exclude for now
+    elsif xrefstyle && @title && @caption && (type = @context) != :admonition
+      case xrefstyle
+      when 'full'
+        quoted_title = sprintf sub_quotes(@document.compat_mode ? %q(``%s'') : '"`%s`"'), title
+        if @number && (prefix = @document.attributes[type == :image ? 'figure-caption' : %(#{type}-caption)])
+          %(#{prefix} #{@number}, #{quoted_title})
+        else
+          %(#{@caption.chomp '. '}, #{quoted_title})
+        end
+      when 'short'
+        if @number && (prefix = @document.attributes[type == :image ? 'figure-caption' : %(#{type}-caption)])
+          %(#{prefix} #{@number})
+        else
+          @caption.chomp '. '
+        end
+      else # 'basic'
+        title
+      end
+    else
+      title
+    end
+  end
+
   # Public: Determine whether this Block contains block content
   #
   # Returns A Boolean indicating whether this Block has block content
@@ -379,10 +433,10 @@ class AbstractBlock < AbstractNode
     @next_section_index = (section.index = @next_section_index) + 1
     if (sectname = section.sectname) == 'appendix'
       section.number = @document.counter 'appendix-number', 'A'
-      if (caption = @document.attr 'appendix-caption').nil_or_empty?
-        section.caption = %(#{section.number}. )
-      else
+      if (caption = @document.attributes['appendix-caption'])
         section.caption = %(#{caption} #{section.number}: )
+      else
+        section.caption = %(#{section.number}. )
       end
     # NOTE currently chapters in a book doctype are sequential even for multi-part books (see #979)
     elsif sectname == 'chapter'

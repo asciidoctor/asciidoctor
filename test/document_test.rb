@@ -1761,7 +1761,7 @@ content{blank}footnote:[commentary]
 
       doc = document_from_string input
       refute_nil doc.catalog
-      assert_equal [:footnotes, :ids, :images, :includes, :indexterms, :links].to_set, doc.catalog.keys.to_set
+      assert_equal [:footnotes, :ids, :images, :includes, :indexterms, :links, :refs].to_set, doc.catalog.keys.to_set
       assert_same doc.catalog, doc.references
       assert_same doc.catalog[:footnotes], doc.references[:footnotes]
       assert_same doc.catalog[:ids], doc.references[:ids]

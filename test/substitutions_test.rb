@@ -914,8 +914,9 @@ context 'Substitutions' do
     test 'a footnote macro may contain an xref macro' do
       # specialcharacters escaping is simulated
       para = block_from_string('text footnote:[&lt;&lt;_install,install&gt;&gt;]')
-      catalog = para.document.catalog
-      catalog[:ids]['_install'] = 'Install'
+      doc = para.document
+      doc.register :refs, ['_install', (Asciidoctor::Inline.new doc, :anchor, 'Install', :type => :ref, :target => '_install'), 'Install']
+      catalog = doc.catalog
       assert_equal %(text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
       assert_equal 1, catalog[:footnotes].size
       footnote1 = catalog[:footnotes][0]

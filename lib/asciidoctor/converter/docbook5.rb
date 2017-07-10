@@ -508,7 +508,7 @@ module Asciidoctor
     def inline_anchor node
       case node.type
       when :ref
-        %(<anchor#{common_attributes node.target, nil, node.text || %([#{node.target}])}/>)
+        %(<anchor#{common_attributes node.target, nil, node.reftext || %([#{node.target}])}/>)
       when :xref
         if (path = node.attributes['path'])
           # QUESTION should we use refid as fallback text instead? (like the html5 backend?)
@@ -661,10 +661,16 @@ module Asciidoctor
     end
 
     def common_attributes id, role = nil, reftext = nil
-      res = id ? %( xml:id="#{id}") : ''
-      res = %(#{res} role="#{role}") if role
-      res = %(#{res} xreflabel="#{reftext}") if reftext
-      res
+      attrs = id ? %( xml:id="#{id}") : ''
+      attrs = %(#{attrs} role="#{role}") if role
+      if reftext
+        if (reftext.include? '<') && ((reftext = reftext.gsub XmlSanitizeRx, '').include? ' ')
+          reftext = (reftext.squeeze ' ').strip
+        end
+        reftext = (reftext.gsub '"', '&quot;') if reftext.include? '"'
+        attrs = %(#{attrs} xreflabel="#{reftext}")
+      end
+      attrs
     end
 
     def doctype_declaration root_tag_name

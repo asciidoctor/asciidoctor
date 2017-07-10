@@ -107,6 +107,41 @@ class Section < AbstractBlock
     end
   end
 
+  # (see AbstractBlock#xreftext)
+  def xreftext xrefstyle = nil
+    if (val = reftext) && !val.empty?
+      val
+    elsif xrefstyle
+      if @numbered
+        case xrefstyle
+        when 'full'
+          if (type = @sectname) == 'chapter' || type == 'appendix'
+            quoted_title = sprintf sub_quotes('_%s_'), title
+          else
+            quoted_title = sprintf sub_quotes(@document.compat_mode ? %q(``%s'') : '"`%s`"'), title
+          end
+          if (signifier = @document.attributes[%(#{type}-refsig)])
+            %(#{signifier} #{sectnum '.', ','} #{quoted_title})
+          else
+            %(#{sectnum '.', ','} #{quoted_title})
+          end
+        when 'short'
+          if (signifier = @document.attributes[%(#{@sectname}-refsig)])
+            %(#{signifier} #{sectnum '.', ''})
+          else
+            sectnum '.', ''
+          end
+        else # 'basic'
+          (type = @sectname) == 'chapter' || type == 'appendix' ? (sprintf sub_quotes('_%s_'), title) : title
+        end
+      else # apply basic styling
+        (type = @sectname) == 'chapter' || type == 'appendix' ? (sprintf sub_quotes('_%s_'), title) : title
+      end
+    else
+      title
+    end
+  end
+
   # Public: Append a content block to this block's list of blocks.
   #
   # If the child block is a Section, assign an index to it.
