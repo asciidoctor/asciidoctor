@@ -602,7 +602,7 @@ allbox tab(:);'
         refid = (node.attr 'refid') || target
         node.text || (node.document.catalog[:ids][refid] || %([#{refid}]))
       when :ref, :bibref
-        # These are anchor points, which shouldn't be visual
+        # These are anchor points, which shouldn't be visible
         ''
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})

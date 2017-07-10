@@ -1036,7 +1036,7 @@ Your browser does not support the video tag.
         end
         %(<a href="#{node.target}">#{text}</a>)
       when :ref
-        %(<a id="#{node.target}"></a>)
+        %(<a id="#{node.id}"></a>)
       when :link
         attrs = node.id ? [%( id="#{node.id}")] : []
         if (role = node.role)
@@ -1046,7 +1046,8 @@ Your browser does not support the video tag.
         attrs << %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window', nil, false
         %(<a href="#{node.target}"#{attrs.join}>#{node.text}</a>)
       when :bibref
-        %(<a id="#{node.target}"></a>#{node.text})
+        # NOTE technically node.text should be node.reftext, but subs have already been applied to text
+        %(<a id="#{node.id}"></a>#{node.text})
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
       end

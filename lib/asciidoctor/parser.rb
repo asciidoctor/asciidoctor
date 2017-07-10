@@ -1212,7 +1212,7 @@ class Parser
           next if (reftext.include? '{') && (reftext = document.sub_attributes reftext).empty?
         end
       end
-      document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :target => id), reftext]
+      document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :id => id), reftext]
     end if (text.include? '[[') || (text.include? 'or:')
     nil
   end
@@ -1227,7 +1227,7 @@ class Parser
   def self.catalog_inline_biblio_anchor text, block, document
     if InlineBiblioAnchorRx =~ text
       # QUESTION should we sub attributes in reftext (like with regular anchors)?
-      document.register :refs, [(id = $1), (Inline.new block, :anchor, (reftext = %([#{$2 || id}])), :type => :bibref, :target => id), reftext]
+      document.register :refs, [(id = $1), (Inline.new block, :anchor, (reftext = %([#{$2 || id}])), :type => :bibref, :id => id), reftext]
     end
     nil
   end
