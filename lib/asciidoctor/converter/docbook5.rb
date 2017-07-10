@@ -508,7 +508,7 @@ module Asciidoctor
     def inline_anchor node
       case node.type
       when :ref
-        %(<anchor#{common_attributes node.target, nil, node.reftext || %([#{node.target}])}/>)
+        %(<anchor#{common_attributes((id = node.id), nil, node.reftext || %([#{id}]))}/>)
       when :xref
         if (path = node.attributes['path'])
           # QUESTION should we use refid as fallback text instead? (like the html5 backend?)
@@ -520,7 +520,8 @@ module Asciidoctor
       when :link
         %(<link xl:href="#{node.target}">#{node.text}</link>)
       when :bibref
-        %(<anchor#{common_attributes node.target, nil, (text = node.text)}/>#{text})
+        # NOTE technically node.text should be node.reftext, but subs have already been applied to text
+        %(<anchor#{common_attributes node.id, nil, (text = node.text)}/>#{text})
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
       end

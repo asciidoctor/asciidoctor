@@ -942,7 +942,8 @@ module Substitutors
   def sub_inline_anchors(text, found = nil)
     if @context == :list_item && @parent.style == 'bibliography'
       text = text.sub(InlineBiblioAnchorRx) {
-        Inline.new(self, :anchor, %([#{$2 || $1}]), :type => :bibref, :target => $1).convert
+        # NOTE target property on :bibref is deprecated
+        Inline.new(self, :anchor, %([#{$2 || $1}]), :type => :bibref, :id => $1, :target => $1).convert
       }
     end
 
@@ -960,7 +961,8 @@ module Substitutors
             reftext = reftext.gsub ESC_R_SB, R_SB
           end
         end
-        Inline.new(self, :anchor, reftext, :type => :ref, :target => id).convert
+        # NOTE target property on :ref is deprecated
+        Inline.new(self, :anchor, reftext, :type => :ref, :id => id, :target => id).convert
       }
     end
 
