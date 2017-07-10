@@ -406,7 +406,7 @@ module Substitutors
       end
     else
       def sub_specialchars text
-        (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }) : text
+        (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub!(SpecialCharsRx) { SpecialCharsTr[$&] }) : text
       end
     end
   end
