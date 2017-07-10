@@ -1343,7 +1343,7 @@ Linux installation instructions.
   end
 
   context 'Special sections' do
-    test 'should assign sectname, numbered, and caption to appendix section by default' do
+    test 'should assign sectname, caption, and numeral to appendix section by default' do
       input = <<-EOS
 [appendix]
 == Attribute Options
@@ -1354,6 +1354,7 @@ Details
       appendix = block_from_string input
       assert_equal 'appendix', appendix.sectname
       assert_equal 'Appendix A: ', appendix.caption
+      assert_equal 'A', appendix.number
       assert_equal true, appendix.numbered
     end
 
