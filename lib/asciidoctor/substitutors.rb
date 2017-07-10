@@ -520,8 +520,7 @@ module Substitutors
   #
   # returns The converted String text
   def sub_macros(source)
-    return source if source.nil_or_empty?
-
+    #return source if source.nil_or_empty?
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
     found_square_bracket = found[:square_bracket] = (source.include? '[')
