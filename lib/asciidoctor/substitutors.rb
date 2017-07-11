@@ -7,6 +7,9 @@ module Substitutors
   SpecialCharsRx = /[<&>]/
   SpecialCharsTr = { '>' => '&gt;', '<' => '&lt;', '&' => '&amp;' }
 
+  # Detects if text is a possible candidate for the quotes substitution.
+  QuotedTextSniffRx = { false => /[*_`#^~]/, true => /[*'_+#^~]/ }
+
   (BASIC_SUBS = [:specialcharacters]).freeze
   (HEADER_SUBS = [:specialcharacters, :attributes]).freeze
   (NORMAL_SUBS = [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements]).freeze
@@ -345,15 +348,19 @@ module Substitutors
 
   if RUBY_ENGINE == 'opal'
     def sub_quotes text
-      QUOTE_SUBS[@document.compat_mode].each do |type, scope, pattern|
-        text = text.gsub(pattern) { convert_quoted_text $~, type, scope }
+      if QuotedTextSniffRx[compat = @document.compat_mode].match? text
+        QUOTE_SUBS[compat].each do |type, scope, pattern|
+          text = text.gsub(pattern) { convert_quoted_text $~, type, scope }
+        end
       end
       text
     end
 
     def sub_replacements text
-      REPLACEMENTS.each do |pattern, replacement, restore|
-        text = text.gsub(pattern) { do_replacement $~, replacement, restore }
+      if ReplaceableTextRx.match? text
+        REPLACEMENTS.each do |pattern, replacement, restore|
+          text = text.gsub(pattern) { do_replacement $~, replacement, restore }
+        end
       end
       text
     end
@@ -368,11 +375,13 @@ module Substitutors
     #
     # returns The converted String text
     def sub_quotes text
-      # NOTE interpolation is faster than String#dup
-      text = %(#{text})
-      # NOTE using gsub! here as an MRI Ruby optimization
-      QUOTE_SUBS[@document.compat_mode].each do |type, scope, pattern|
-        text.gsub!(pattern) { convert_quoted_text $~, type, scope }
+      if QuotedTextSniffRx[compat = @document.compat_mode].match? text
+        # NOTE interpolation is faster than String#dup
+        text = %(#{text})
+        QUOTE_SUBS[compat].each do |type, scope, pattern|
+          # NOTE using gsub! here as an MRI Ruby optimization
+          text.gsub!(pattern) { convert_quoted_text $~, type, scope }
+        end
       end
       text
     end
@@ -383,11 +392,13 @@ module Substitutors
     #
     # returns The String text with the replacement characters substituted
     def sub_replacements text
-      # NOTE interpolation is faster than String#dup
-      text = %(#{text})
-      # NOTE Using gsub! as optimization
-      REPLACEMENTS.each do |pattern, replacement, restore|
-        text.gsub!(pattern) { do_replacement $~, replacement, restore }
+      if ReplaceableTextRx.match? text
+        # NOTE interpolation is faster than String#dup
+        text = %(#{text})
+        REPLACEMENTS.each do |pattern, replacement, restore|
+          # NOTE Using gsub! as optimization
+          text.gsub!(pattern) { do_replacement $~, replacement, restore }
+        end
       end
       text
     end
@@ -509,8 +520,7 @@ module Substitutors
   #
   # returns The converted String text
   def sub_macros(source)
-    return source if source.nil_or_empty?
-
+    #return source if source.nil_or_empty?
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
     found_square_bracket = found[:square_bracket] = (source.include? '[')

@@ -1070,7 +1070,7 @@ module Asciidoctor
     #
     EscapedSpaceRx = /\\([ \t\n])/
 
-    # Detects if text is a candidate for replacements.
+    # Detects if text is a possible candidate for the replacements substitution.
     #
     ReplaceableTextRx = /[&']|--|\.\.\.|\([CRT]M?\)/
 
