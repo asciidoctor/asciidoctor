@@ -127,37 +127,33 @@ task :console do
   sh 'bundle console', :verbose => false
 end
 
-desc 'Trigger a build on Travis for all dependent projects'
-task :build_dependent_projects do
-  require 'net/http'
-  require 'uri'
-  require 'json'
-
-  projects = [
-    { :org => "asciidoctor", :name => "asciidoctor.js", :token => "#{ENV['ASCIIDOCTOR_JS_TRAVIS_TOKEN']}" }
-  ]
-  for project in projects
-    uri = URI.parse("https://api.travis-ci.org/repo/#{project[:org]}%2F#{project[:name]}/requests")
-    header = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Travis-API-Version': '3',
-      'Authorization': "token #{project[:token]}"
-    }
-    user = {
-      request: {
-        branch: 'master'
+namespace :build do
+desc 'Trigger builds for all dependent projects on Travis CI'
+  task :dependents do
+    if ENV['TRAVIS'].to_s == 'true'
+      next unless ENV['TRAVIS_PULL_REQUEST'].to_s == 'false'
+    end
+    next unless (token = ENV['TRAVIS_TOKEN'])
+    %w(
+      asciidoctor/asciidoctor.js
+    ).each do |project|
+      org, name = project.split '/', 2
+      header = {
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+        'Travis-API-Version' => '3',
+        'Authorization' => %(token #{token})
       }
-    }
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    request = Net::HTTP::Post.new(uri.request_uri, header)
-    request.body = user.to_json
-    response = http.request(request)
-    if response.code == '200'
-      p "Build successfuly triggered on #{project[:name]}"
-    else
-      abort("Unable to build #{project[:name]}, #{response.code} - #{response.message}")
+      payload = '{ "request": { "branch": "master" } }'
+      (http = Net::HTTP.new 'api.travis-ci.org', 443).use_ssl = true
+      request = Net::HTTP::Post.new %(/repo/#{org}%2F#{name}/requests), header
+      request.body = payload
+      response = http.request request
+      if response.code == '202'
+        puts %(Build successfuly triggered on #{project})
+      else
+        warn %(Unable to build #{project}: #{response.code} - #{response.message})
+      end
     end
   end
 end
