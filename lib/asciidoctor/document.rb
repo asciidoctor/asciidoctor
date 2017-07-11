@@ -567,8 +567,8 @@ class Document < AbstractBlock
     when :refs
       id, ref, reftext = value
       unless (refs = @catalog[:refs]).key? id
-        refs[id] = ref
         @catalog[:ids][id] = reftext || ('[' + id + ']')
+        refs[id] = ref
       end
     when :footnotes, :indexterms
       @catalog[type] << value
