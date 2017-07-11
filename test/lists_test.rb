@@ -4062,7 +4062,7 @@ puts doc.render # <2>
     assert_xpath '((//calloutlist)[2]/callout)[2][@arearefs = "CO2-2"]', output, 1
   end
 
-  test 'callout list with block content' do
+  test 'wip callout list with block content' do
     input = <<-EOS
 [source, ruby]
 ----
@@ -4174,7 +4174,7 @@ foo::
     assert_xpath '//dl//b', output, 0
     assert_xpath '//dl/dd/p[text()="bar <1>"]', output, 1
     assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
-    assert_includes warnings, 'no callouts refer to list item 1'
+    assert_includes warnings, 'line 4: no callouts refer to list item 1'
   end
 
   test 'should not recognize callouts in an indented outline list paragraph' do
@@ -4188,7 +4188,24 @@ foo::
     assert_xpath '//ul//b', output, 0
     assert_xpath %(//ul/li/p[text()="foo\nbar <1>"]), output, 1
     assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
-    assert_includes warnings, 'no callouts refer to list item 1'
+    assert_includes warnings, 'line 4: no callouts refer to list item 1'
+  end
+
+  test 'should warn if numbers in callout list are out of sequence' do
+    input = <<-EOS
+----
+<beans> <1>
+  <bean class="com.example.HelloWorld"/>
+</beans>
+----
+<1> Container of beans.
+Beans are fun.
+<3> An actual bean.
+    EOS
+    output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+    assert_xpath '//ol/li', output, 2
+    assert_includes warnings, 'line 8: callout list item index: expected 2 got 3'
+    assert_includes warnings, 'line 8: no callouts refer to list item 2'
   end
 
   test 'should remove line comment chars that precedes callout number' do

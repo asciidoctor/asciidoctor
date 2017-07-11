@@ -603,21 +603,19 @@ class Parser
           expected_index = 1
           # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
           while match || (reader.has_more_lines? && (match = CalloutListRx.match(reader.peek_line)))
+            list_item_lineno = reader.lineno
             # might want to move this check to a validate method
-            if match[1].to_i != expected_index
-              # FIXME this lineno - 2 hack means we need a proper look-behind cursor
-              warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: callout list item index: expected #{expected_index} got #{match[1]})
+            unless match[1] == expected_index.to_s
+              warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: callout list item index: expected #{expected_index} got #{match[1]})
             end
             list_item = next_list_item(reader, block, match)
             expected_index += 1
             if list_item
               block << list_item
-              coids = document.callouts.callout_ids(block.items.size)
-              if !coids.empty?
-                list_item.attributes['coids'] = coids
+              if (coids = document.callouts.callout_ids block.items.size).empty?
+                warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: no callouts refer to list item #{block.items.size})
               else
-                # FIXME this lineno - 2 hack means we need a proper look-behind cursor
-                warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - 2}: no callouts refer to list item #{block.items.size})
+                list_item.attributes['coids'] = coids
               end
             end
             match = nil

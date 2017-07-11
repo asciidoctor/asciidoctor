@@ -506,7 +506,7 @@ ____
 
       output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert_xpath '//pre[text()="La la la <1>"]', output, 1
-      assert_includes warnings, 'no callouts refer to list item'
+      assert_includes warnings, 'line 5: no callouts refer to list item 1'
     end
 
     test 'should perform normal subs on a verse block' do
