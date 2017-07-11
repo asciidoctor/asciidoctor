@@ -126,3 +126,34 @@ desc 'Open an irb session preloaded with this library'
 task :console do
   sh 'bundle console', :verbose => false
 end
+
+namespace :build do
+desc 'Trigger builds for all dependent projects on Travis CI'
+  task :dependents do
+    if ENV['TRAVIS'].to_s == 'true'
+      next unless ENV['TRAVIS_PULL_REQUEST'].to_s == 'false'
+    end
+    next unless (token = ENV['TRAVIS_TOKEN'])
+    %w(
+      asciidoctor/asciidoctor.js
+    ).each do |project|
+      org, name = project.split '/', 2
+      header = {
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+        'Travis-API-Version' => '3',
+        'Authorization' => %(token #{token})
+      }
+      payload = '{ "request": { "branch": "master" } }'
+      (http = Net::HTTP.new 'api.travis-ci.org', 443).use_ssl = true
+      request = Net::HTTP::Post.new %(/repo/#{org}%2F#{name}/requests), header
+      request.body = payload
+      response = http.request request
+      if response.code == '202'
+        puts %(Build successfuly triggered on #{project})
+      else
+        warn %(Unable to build #{project}: #{response.code} - #{response.message})
+      end
+    end
+  end
+end
