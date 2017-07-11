@@ -205,10 +205,12 @@ Author(s).
 tab(:);
 r lw(\n(.lu*75u/100u).'
 
-      node.items.each_with_index do |item, index|
-        result << %(\\fB(#{index + 1})\\fP\\h'-2n':T{
-#{manify item.text}
-T})
+      num = 0
+      node.items.each do |item|
+        result << %(\\fB(#{num += 1})\\fP\\h'-2n':T{)
+        result << (manify item.text)
+        result << item.content if item.blocks?
+        result << 'T}'
       end
       result << '.TE'
       result * LF
