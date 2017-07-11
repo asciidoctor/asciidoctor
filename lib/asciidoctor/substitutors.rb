@@ -434,10 +434,10 @@ module Substitutors
       case restore
       when :none
         replacement
-      when :leading
-        %(#{m[1]}#{replacement})
       when :bounding
         %(#{m[1]}#{replacement}#{m[2]})
+      else # :leading
+        %(#{m[1]}#{replacement})
       end
     end
   end
@@ -1095,7 +1095,6 @@ module Substitutors
   #
   # Returns The converted String text for the quoted text region
   def convert_quoted_text(match, type, scope)
-    unescaped_attrs = nil
     if match[0].start_with? RS
       if scope == :constrained && !(attrs = match[2]).nil_or_empty?
         unescaped_attrs = %([#{attrs}])
