@@ -134,6 +134,7 @@ desc 'Trigger builds for all dependent projects on Travis CI'
       next unless ENV['TRAVIS_PULL_REQUEST'].to_s == 'false'
     end
     next unless (token = ENV['TRAVIS_TOKEN'])
+    require 'net/http'
     %w(
       asciidoctor/asciidoctor.js
     ).each do |project|
