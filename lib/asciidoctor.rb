@@ -338,7 +338,7 @@ module Asciidoctor
   LIST_CONTINUATION = '+'
 
   # NOTE AsciiDoc Python allows + to be preceded by TAB; Asciidoctor does not
-  LINE_BREAK = ' +'
+  HARD_LINE_BREAK = ' +'
 
   LINE_CONTINUATION = ' \\'
 
@@ -1005,9 +1005,9 @@ module Asciidoctor
     #
     if RUBY_ENGINE == 'opal'
       # NOTE In Ruby, ^ and $ always match start and end of line, respectively; JavaScript only does so in multiline mode
-      LineBreakRx = /^(.*) \+$/m
+      HardLineBreakRx = /^(.*) \+$/m
     else
-      LineBreakRx = /^(.*) \+$/
+      HardLineBreakRx = /^(.*) \+$/
     end
 
     # Matches a Markdown horizontal rule.

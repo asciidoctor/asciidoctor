@@ -1078,10 +1078,10 @@ module Substitutors
       return text if lines.size < 2
       last = lines.pop
       (lines.map {|line|
-        Inline.new(self, :break, (line.end_with? LINE_BREAK) ? (line.slice 0, line.length - 2) : line, :type => :line).convert
+        Inline.new(self, :break, (line.end_with? HARD_LINE_BREAK) ? (line.slice 0, line.length - 2) : line, :type => :line).convert
       } << last) * LF
-    elsif (text.include? PLUS) && (text.include? LINE_BREAK)
-      text.gsub(LineBreakRx) { Inline.new(self, :break, $1, :type => :line).convert }
+    elsif (text.include? PLUS) && (text.include? HARD_LINE_BREAK)
+      text.gsub(HardLineBreakRx) { Inline.new(self, :break, $1, :type => :line).convert }
     else
       text
     end

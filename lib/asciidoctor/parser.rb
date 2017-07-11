@@ -2073,7 +2073,7 @@ class Parser
           if (keep_open = next_line.end_with? con)
             next_line = (next_line.slice 0, next_line.length - 2).rstrip
           end
-          value = %(#{value}#{(value.end_with? LINE_BREAK) ? LF : ' '}#{next_line})
+          value = %(#{value}#{(value.end_with? HARD_LINE_BREAK) ? LF : ' '}#{next_line})
           break unless keep_open
         end
       end
