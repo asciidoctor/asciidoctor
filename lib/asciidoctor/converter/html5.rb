@@ -416,27 +416,25 @@ Your browser does not support the audio tag.
 
       if node.document.attr? 'icons'
         result << '<table>'
-
-        font_icons = node.document.attr? 'icons', 'font'
-        node.items.each_with_index do |item, i|
-          num = i + 1
-          num_element = if font_icons
-            %(<i class="conum" data-value="#{num}"></i><b>#{num}</b>)
+        font_icons, num = (node.document.attr? 'icons', 'font'), 0
+        node.items.each do |item|
+          num += 1
+          if font_icons
+            num_label = %(<i class="conum" data-value="#{num}"></i><b>#{num}</b>)
           else
-            %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}"#{@void_element_slash}>)
+            num_label = %(<img src="#{node.icon_uri "callouts/#{num}"}" alt="#{num}"#{@void_element_slash}>)
           end
           result << %(<tr>
-<td>#{num_element}</td>
-<td>#{item.text}</td>
+<td>#{num_label}</td>
+<td>#{item.text}#{item.blocks? ? LF + item.content : ''}</td>
 </tr>)
         end
-
         result << '</table>'
       else
         result << '<ol>'
         node.items.each do |item|
           result << %(<li>
-<p>#{item.text}</p>
+<p>#{item.text}</p>#{item.blocks? ? LF + item.content : ''}
 </li>)
         end
         result << '</ol>'

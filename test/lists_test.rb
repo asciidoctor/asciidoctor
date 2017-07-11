@@ -4062,7 +4062,32 @@ puts doc.render # <2>
     assert_xpath '((//calloutlist)[2]/callout)[2][@arearefs = "CO2-2"]', output, 1
   end
 
-  test 'wip callout list with block content' do
+  test 'callout list retains block content' do
+    input = <<-EOS
+[source, ruby]
+----
+require 'asciidoctor' # <1>
+doc = Asciidoctor::Document.new('Hello, World!') # <2>
+puts doc.render # <3>
+----
+<1> Imports the library
+as a RubyGem
+<2> Creates a new document
+* Scans the lines for known blocks
+* Converts the lines into blocks
+<3> Renders the document
++
+You can write this to file rather than printing to stdout.
+    EOS
+    output = render_embedded_string input
+    assert_xpath '//ol/li', output, 3
+    assert_xpath %((//ol/li)[1]/p[text()="Imports the library\nas a RubyGem"]), output, 1
+    assert_xpath %((//ol/li)[2]//ul), output, 1
+    assert_xpath %((//ol/li)[2]//ul/li), output, 2
+    assert_xpath %((//ol/li)[3]//p), output, 2
+  end
+
+  test 'callout list retains block content when converted to DocBook' do
     input = <<-EOS
 [source, ruby]
 ----
