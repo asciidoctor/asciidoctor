@@ -1,5 +1,6 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>; Ryan Waldron <https://github.com/erebor[@erebor]>
+v1.5.6, 2017-07-12
 // settings:
 :page-layout: base
 :idprefix:
@@ -172,7 +173,7 @@ TIP: 使用 Linux 包管理器安装的好处是如果 Ruby 和 RubyGems 库没�
 source 'https://rubygems.org'
 gem 'asciidoctor'
 # 或者明确指明版本
-# gem 'asciidoctor', '1.5.4'
+# gem 'asciidoctor', '1.5.6'
 ----
 
 . 保存 `Gemfile` 文件
@@ -261,7 +262,7 @@ TIP: 如果你的 Alpine Linux 系统配置的是自动升级包，在这种情�
 
 [.output]
 ....
-Asciidoctor 1.5.4 [http://asciidoctor.org]
+Asciidoctor 1.5.6 [http://asciidoctor.org]
 Runtime Environment (ruby 2.2.2p95 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
@@ -396,7 +397,7 @@ Asciidoctor 组织在 Github 托管代码、议案跟踪和相关子项目。
 [#copyright-and-licensing]
 == 版权和协议
 
-Copyright (C) 2012-2016 Dan Allen, Ryan Waldron and the Asciidoctor Project.
+Copyright (C) 2012-2017 Dan Allen, Ryan Waldron and the Asciidoctor Project.
 这个软件的免费使用是在MIT许可条款授予的。
 
 请看 {uri-license}[版权声明] 文件来获取更多详细信息。

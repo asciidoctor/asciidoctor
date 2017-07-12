@@ -1,5 +1,6 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>; Ryan Waldron <https://github.com/erebor[@erebor]>
+v1.5.6, 2017-07-12
 // settings:
 :page-layout: base
 :idprefix:
@@ -167,7 +168,7 @@ TIP: Linuxパッケージマネージャを用いてインストールするこ�
 source 'https://rubygems.org'
 gem 'asciidoctor'
 # or specify the version explicitly
-# gem 'asciidoctor', '1.5.4'
+# gem 'asciidoctor', '1.5.6'
 ----
 
 . Gemfileを保存
@@ -252,7 +253,7 @@ AsciidoctorのバージョンとRuby環境についての情報がターミナ�
 
 [.output]
 ....
-Asciidoctor 1.5.4 [http://asciidoctor.org]
+Asciidoctor 1.5.6 [http://asciidoctor.org]
 Runtime Environment (ruby 2.2.2p95 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
@@ -382,7 +383,7 @@ Asciidoctor organization on GitHub:: {uri-org}
 
 == Copyright and Licensing
 
-Copyright (C) 2012-2016 Dan Allen, Ryan Waldron and the Asciidoctor Project.
+Copyright (C) 2012-2017 Dan Allen, Ryan Waldron and the Asciidoctor Project.
 Free use of this software is granted under the terms of the MIT License.
 
 See the {uri-license}[LICENSE] file for details.

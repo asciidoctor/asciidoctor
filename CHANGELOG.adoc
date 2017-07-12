@@ -14,6 +14,222 @@ This document provides a high-level view of the changes introduced in Asciidocto
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
 // tag::compact[]
+== 1.5.6 (2017-07-12) - @mojavelinux
+
+Enhancements::
+  * use custom cross reference text if xrefstyle attribute is set (full, short, basic) (#858, #1132)
+  * store referenceable nodes under refs key in document catalog (PR #2220)
+  * apply reftext substitutions (specialchars, quotes, replacements) to value returned by reftext method (PR #2220)
+  * add xreftext method to AbstractBlock, Section, and Inline to produce formatted text for xref (PR #2220)
+  * introduce attributes chapter-refsig, section-refsig, and appendix-refsig to set reference signifier for chapter, section, and appendix, respectively (PR #2220)
+  * add rel="noopener" to links that target _blank or when noopener option is set (#2071)
+  * add option to exclude tags when including a file (#1516)
+  * add meta for shortcut icon if favicon attribute is set (#1574)
+  * allow use of linenums option to enable line numbers on a source block (#1981)
+  * allow extension groups to be unregistered individually (#1701)
+  * catalog bibliography anchors and capture reftext (#560, #1562)
+  * automatically add bibliography style to unordered list in bibliography section (#1924)
+  * disable startinline option when highlighting PHP if mixed option is set on source block (PR #2015) (@ricpelo)
+  * configure Slim to resolve includes in specified template dirs (#2214)
+  * dump manpage when -h manpage flag is passed to CLI (#2302)
+  * add resolves_attributes method to DSL for macros (#2122)
+  * invoke convert on result of custom inline macro if value is an inline node (#2132)
+  * resolve attributes for custom short inline macros if requested (#1797)
+  * add convenience method to create section from extension; use same initialization logic as parser (#1957)
+  * add handles? method to DSL for IncludeProcessor (#2119)
+  * pass through preload attribute to video tag (#2046)
+  * add start and end times for audio element (#1930)
+  * set localyear and docyear attributes (#1372)
+  * pass cloaked context to block extension via cloaked-context attribute (#1606)
+  * add support for covers in DocBook 5 converter (#1939)
+  * accept named pipe (fifo) as the input file (#1948)
+  * add AbstractBlock#next_adjacent_block helper method
+  * rename Document#references to catalog; alias references to catalog (PR #2237)
+  * rename extensions_registry option to extension_registry
+  * rename Extensions.build_registry method to create
+  * autoload extensions source file when Asciidoctor::Extensions is referenced (PR #2114, PR #2312)
+  * apply default_attrs to custom inline macro (PR #2127)
+  * allow tab separator for table to be specified using \t (#2073)
+  * add Cell#text= method
+
+Improvements::
+  * significant improvements to performance, especially in parser and substitutors
+  * process include directive inside text of short form preprocessor conditional (#2146)
+  * add support for include tags in languages that only support only circumfix comments (#1729)
+  * allow spaces in target of block image; target must start and end with non-space (#1943)
+  * add warning in verbose mode if xref is not found (@fap-) (#2268)
+  * add warning if duplicate ID is detected (#2244)
+  * validate that output file will not overwrite input file (#1956)
+  * include docfile in warning when stylesheet cannot be read (#2089)
+  * warn if doctype=inline is used and block has unexpected content model (#1890)
+  * set built-in docfilesuffix attribute (#1673)
+  * make sourcemap field on Document read/write (#1916)
+  * allow target of xref to begin with attribute reference (#2007)
+  * allow target of xref to be expressed with leading # (#1546)
+  * allow kbd and btn macros to wrap across multiple lines (#2249)
+  * allow menu macro to span multiple lines; unescape escaped closing bracket
+  * make menu macro less greedy
+  * allow ampersand to be used as the first character of the first segment of a menu (#2171)
+  * enclose menu caret in HTML tag (#2165)
+  * use black text for menu reference; tighten word spacing (#2148)
+  * fix parsing of keys in kbd macro (PR #2222)
+  * add support for the window option for the link on a block image (#2172)
+  * set correct level for special sections in parser (#1261)
+  * always set numbered property on appendix to true
+  * store number for formal block on node (#2208)
+  * set sectname of header section to header (#1996)
+  * add the remove_attr method to AbstractNode (#2227)
+  * use empty string as default value for set_attr method (#1967)
+  * make start argument to system_path optional (#1965)
+  * allow API to control subs applied to ListItem text (#2035)
+  * allow text of ListItem to be assigned (in an extension) (#2033)
+  * make generate_id method on section a static method (#1929)
+  * validate name of custom inline macro; cache inline macro rx (#2136)
+  * align number in conum list to top by default (#1999)
+  * fix CSS positioning of interactive checkbox (#1840)
+  * fix indentation of list items when markers are disabled (none, no-bullet, unnumbered, unstyled) (PR #2286)
+  * instruct icon to inherit cursor if inside a link
+  * close all files opened internally (#1897)
+  * be more precise about splitting kbd characters (#1660)
+  * rename limit method on String to limit_bytesize (#1889)
+  * leverage Ruby's match? method to speed up non-capturing regexps (PR #1938)
+  * preserve inline break in manpages (@letheed)
+  * check for presence of SOURCE_DATE_EPOCH instead of value; fail if value is malformed
+  * add Rows#by_section method to return table sections (#2219)
+  * cache which template engines have been loaded to avoid unnecessary processing
+  * rename assign_index method to enumerate_section (PR #2242)
+  * don't process double quotes in xref macro (PR #2241)
+  * optimize attr and attr? methods (PR #2232)
+  * use IO.write instead of File.open w/ block; backport for Opal
+  * backport IO.binread to Ruby 1.8.7 to avoid runtime check
+  * cache backend and doctype values on document
+  * allow normalize option to be set on PreprocessorReader; change default to false
+  * move regular expression constants for Opal to Asciidoctor.js build (PR #2070)
+  * add missing comma in warning message for callout list item out of sequence
+  * combine start_with? / end_with? checks into a single method call
+  * rename UriTerminator constant to UriTerminatorRx
+  * promote subs to top-level constants; freeze arrays
+  * rename PASS_SUBS constant to NONE_SUBS
+  * rename EOL constant to LF (retain EOL as alias)
+  * rename macro regexp constants so name follows type (e.g., InlineImageMacroRx)
+
+Compliance::
+  * retain block content in items of callout list when converting to HTML and man page (#1478)
+  * only substitute specialchars for content in literal table cells (#1912)
+  * fix operator logic for ifndef directive with multiple attributes (#1983)
+  * only recognize uniform underline for setext section title (#2083)
+  * don't match headings with mixed leading characters (#2074)
+  * fix layout break from matching lines it shouldn't
+  * fix behavior of attribute substitution in docinfo content (PR #2296)
+  * encode spaces in URI (PR #2274)
+  * treat empty string as a valid block title
+  * preprocess lines of a simple block (#1923)
+  * don't drop trailing blank lines when splitting source into lines (PR #2045)
+  * only drop known AsciiDoc extensions from the inter-document xref path (#2217)
+  * don't number special sections or special subsections by default (#2234)
+  * assign sectname based on name of manuscript element (#2206)
+  * honor leveloffset when resolving implicit doctitle (#2140)
+  * permit leading, trailing, and repeat operators in target of preprocessor conditional (PR #2279)
+  * don't match link macro in block form (i.e., has two colons after prefix) (#2202)
+  * do not match bibliography anchor that begins with digit (#2247)
+  * use [ \t] (or \s) instead of \p{Blank} to match spaces (#2204)
+  * allow named entity to have trailing digits (e.g., there4) (#2144)
+  * only assign style to image alt text if alt text is not specified
+  * substitute replacements in non-generated alt text of block image (PR #2285)
+  * keep track of whether alt text is auto-generated by assigning default-alt attribute (PR #2287)
+  * suppress info element in docbook output if noheader attribute is set (#2155)
+  * preserve leading indentation in literal and verse table cells (#2037)
+  * preserve whitespace in literal and verse table cells (#2029)
+  * set doctype-related attributes in AsciiDoc table cell (#2159)
+  * fix comparison logic when preprocessing first line of AsciiDoc table cell
+  * set filetype to man when backend is manpage (#2055)
+  * respect image scaling in DocBook converter (#1059)
+  * share counters between AsciiDoc table cells and main document (#1942)
+  * generate ID for floating title from converted title (#2016)
+  * split "treeprocessor" into two words; add aliases for compatibility (PR #2179)
+  * allow trailing hyphen in attribute name used in attribute reference
+  * allow escaped closing bracket in text of xref macro
+  * process pass inline macro with empty text; invert extract logic
+  * drop support for reftext document attribute (must be specified on node)
+  * fix compliance with Haml >= 5 (load Haml eagerly; remove ugly option)
+  * don't match inline image macro if target contains endline or leading or trailing spaces
+  * assign id instead of target on ref/bibref node (PR #2307)
+  * remove regexp hacks for Opal (#2110)
+  * drop outdated quoting exceptions for Opal (PR #2081)
+
+Bug fixes::
+  * don't allow table borders to cascade to nested tables (#2151)
+  * escape special characters in reftext of anchor (#1694)
+  * sanitize content of authors meta tag in HTML output (#2112)
+  * fix stray marks added when unescaping unconstrained passthroughs (PR #2079)
+  * don't confuse escaped quotes in CSV data as enclosing quotes (#2008)
+  * don't activate implicit header if cell in first line of table contains a blank line (#1284, #644)
+  * allow compat-mode in AsciiDoc table cell to inherit from parent document (#2153)
+  * manify all normal table cell content (head, body, foot) in manpage output
+  * add missing newline after table caption in manpage output (#2253)
+  * correctly format block title on video in manpage output
+  * don't crash if substitution list resolves to nil (#2183)
+  * fail with informative message if converter cannot be resolved (#2161)
+  * fix regression of not matching short form of custom block macro
+  * encode double quotes in image alt text when used in an attribute (#2061)
+  * encode double quote and strip XML tags in value of xreflabel attribute in DocBook converter (PR #2220)
+  * fix typo in base64 data (PR #2094) (@mogztter)
+  * permit pass macro to surround a multi-line attribute value with hard line breaks (#2211)
+  * fix sequential inline anchor macros with empty reftext (#1689)
+  * don't mangle compound names when document has multiple authors (#663)
+  * don't drop last line of verbatim block if it contains only a callout number (#2043)
+  * prevent leading & trailing round brackets from getting caught in indexterm (#1581)
+  * remove cached title when title is set on block (#2022)
+  * remove max-width on the callout number icon (#1895)
+  * eagerly add hljs class for highlight.js (#2221)
+  * fix SOURCE_DATE_EPOCH lookup in Opal
+  * fix paths with file URI scheme are inevitably absolute (PR #1925) (@mogztter)
+  * only resolve file URLs when JavaScript IO module is xmlhttprequest (PR #1898) (@mogztter)
+  * fix formatting of video title in manpage converter
+  * don't increment line number if peek_lines overruns buffer (fixes some cases when line number is off)
+  * freeze extension processor instance, not class
+  * fix numbering bug in reindex_sections
+  * handle cases when there are no lines for include directive to select
+
+Documentation::
+  * enable admonition icons in README when displayed on GitHub
+  * add German translation of chapter-label (PR #1920) (@fap-)
+  * add Ukrainian translation of built-in attributes (PR #1955) (@hedrok)
+  * add Norwegian Nynorsk translation; updated Norwegian Bokmål translation of built-in attributes (PR #2142) (@huftis)
+  * add Polish translation of built-in attributes (PR #2131) (@ldziedziul)
+  * add Romanian translation of built-in attributes (PR #2125) (@vitaliel)
+  * fix Japanese translation of built-in attributes (PR #2116) (@haradats)
+  * add Bahasa Indonesia translation of built-in labels (@triyanwn)
+
+Build / Infrastructure::
+  * upgrade highlight.js to 9.12.0 (#1652)
+  * include entire test suite in gem (PR #1952) (@voxik)
+  * upgrade Slim development dependency to 3.0.x (PR #1953) (@voxik)
+  * upgrade Haml development dependency to 5.0.x
+  * upgrade Nokogiri to 1.6.x (except on Ruby 1.8) (PR #1213)
+  * add Ruby 2.4 to CI test matrix (PR #1980)
+  * upgrade cucumber and JRuby in CI build (PR #2005)
+  * fix reference to documentation in attributes.adoc (PR #1901) (@stonio)
+  * trap and verify all warnings when tests are run with warnings enabled
+  * set default task in build to test:all
+  * configure run-tests.sh script to run all tests
+  * configure feature tests to only show progress
+  * configure Slim in feature tests to use html as format instead of deprecated html5
+  * lock version of yard to fix invalid byte sequence in Ruby 1.9.3
+  * modify rake build to trigger dependent builds (specifically, Asciidoctor.js) (@mogztter) (PR #2305)
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6[issues resolved] |
+https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6[git tag] |
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.5...v1.5.6[full diff]
+// end::compact[]
+
 == 1.5.5 (2016-10-05) - @mojavelinux
 
 Enhancements::
@@ -244,7 +460,6 @@ Distribution Packages::
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.3[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.3[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v1.5.2...v1.5.3[full diff]
-// end::compact[]
 
 == 1.5.2 (2014-11-27) - @mojavelinux
 
