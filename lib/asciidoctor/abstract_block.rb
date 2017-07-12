@@ -172,16 +172,6 @@ class AbstractBlock < AbstractNode
     end
   end
 
-  # Public: A convenience method that checks if the reftext attribute is defined.
-  def reftext?
-    @attributes.key? 'reftext'
-  end
-
-  # Public: A convenience method that returns the value of the reftext attribute with substitutions applied.
-  def reftext
-    (val = @attributes['reftext']) ? (apply_reftext_subs val) : nil
-  end
-
   # Public: Generate cross reference text (xreftext) that can be used to refer
   # to this block.
   #

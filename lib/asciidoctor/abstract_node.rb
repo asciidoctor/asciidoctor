@@ -249,6 +249,16 @@ class AbstractNode
     end
   end
 
+  # Public: A convenience method that checks if the reftext attribute is defined.
+  def reftext?
+    @attributes.key? 'reftext'
+  end
+
+  # Public: A convenience method that returns the value of the reftext attribute with substitutions applied.
+  def reftext
+    (val = @attributes['reftext']) ? (apply_reftext_subs val) : nil
+  end
+
   # Public: Construct a reference or data URI to an icon image for the
   # specified icon name.
   #

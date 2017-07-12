@@ -48,10 +48,12 @@ class Inline < AbstractNode
     attr 'alt'
   end
 
+  # (see AbstractNode#reftext?)
   def reftext?
     @text && (@type == :ref || @type == :bibref)
   end
 
+  # (see AbstractNode#reftext)
   def reftext
     (val = @text) ? (apply_reftext_subs val) : nil
   end
