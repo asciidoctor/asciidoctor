@@ -4,6 +4,24 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
   require 'test_helper'
 end
 
+class ExtensionsInitTest < Minitest::Test
+  def test_autoload
+    doc = empty_document
+    refute doc.extensions?, 'Extensions should not be enabled by default'
+
+    begin
+      # NOTE trigger extensions to autoload
+      Asciidoctor::Extensions.groups
+    rescue; end
+
+    doc = empty_document
+    assert doc.extensions?, 'Extensions should be enabled after being autoloaded'
+
+    self.class.remove_tests self.class
+  end
+  self
+end.new(nil).test_autoload
+
 class SamplePreprocessor < Asciidoctor::Extensions::Preprocessor
   def process doc, reader
     nil

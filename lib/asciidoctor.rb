@@ -1575,15 +1575,33 @@ module Asciidoctor
   # Alias render_file to convert_file to maintain backwards compatibility
   alias render_file convert_file
 
+  # Internal: Automatically load the Asciidoctor::Extensions module.
+  #
+  # Requires the Asciidoctor::Extensions module if the name is :Extensions.
+  # Otherwise, delegates to the super method.
+  #
+  # This method provides the same functionality as using autoload on
+  # Asciidoctor::Extensions, except that the constant isn't recognized as
+  # defined prior to it being loaded.
+  #
+  # Returns the resolved constant, if resolved, otherwise nothing.
+  def const_missing name
+    if name == :Extensions
+      require 'asciidoctor/extensions'
+      Extensions
+    else
+      super
+    end
+  end unless RUBY_ENGINE == 'opal'
+
   end
 
   if RUBY_ENGINE == 'opal'
-    require 'asciidoctor/version'
     require 'asciidoctor/timings'
+    require 'asciidoctor/version'
   else
-    autoload :VERSION, 'asciidoctor/version'
     autoload :Timings, 'asciidoctor/timings'
-    autoload :Extensions, 'asciidoctor/extensions'
+    autoload :VERSION, 'asciidoctor/version'
   end
 end
 
