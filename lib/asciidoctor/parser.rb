@@ -404,23 +404,26 @@ class Parser
     [section != parent ? section : nil, attributes.dup]
   end
 
-  # Public: Return the next Section or Block object from the Reader.
+  # Public: Parse and return the next Block at the Reader's current location
   #
-  # Begins by skipping over blank lines to find the start of the next Section
-  # or Block. Processes each line of the reader in sequence until a Section or
-  # Block is found or the reader has no more lines.
+  # This method begins by skipping over blank lines to find the start of the
+  # next block (paragraph, block macro, or delimited block). If a block is
+  # found, that block is parsed, initialized as a Block object, and returned.
+  # Otherwise, the method returns nothing.
   #
-  # Uses regular expressions from the Asciidoctor module to match Section
-  # and Block delimiters. The ensuing lines are then processed according
-  # to the type of content.
+  # Regular expressions from the Asciidoctor module are used to match block
+  # boundaries. The ensuing lines are then processed according to the content
+  # model.
   #
-  # reader - The Reader from which to retrieve the next block
-  # parent - The Document, Section or Block to which the next block belongs
+  # reader     - The Reader from which to retrieve the next Block.
+  # parent     - The Document, Section or Block to which the next Block belongs.
+  # attributes - A Hash of attributes that will become the attributes
+  #              associated with the parsed Block (default: {}).
+  # options    - An options Hash to control parsing (default: {}):
+  #              * :text indicates that the parser is only looking for text content
   #
-  # Returns a Section or Block object holding the parsed content of the processed lines
-  #--
-  # QUESTION should next_block have an option for whether it should keep looking until
-  # a block is found? right now it bails when it encounters a line to be skipped
+  # Returns a Block object built from the parsed content of the processed
+  # lines, or nothing if no block is found.
   def self.next_block(reader, parent, attributes = {}, options = {})
     # Skip ahead to the block content
     skipped = reader.skip_blank_lines
@@ -432,500 +435,489 @@ class Parser
     # if skipped a line, assume a list continuation was
     # used and block content is acceptable
     if (text_only = options[:text]) && skipped > 0
-      options.delete(:text)
+      options.delete :text
       text_only = false
     end
 
-    parse_metadata = options.fetch :parse_metadata, true
-    #parse_sections, parent_context = (options.fetch :parse_sections, false), (Block === parent ? parent.context : nil)
+    document = parent.document
 
-    document, block, in_list = parent.document, nil, ListItem === parent
-    sourcemap, source_location = document.sourcemap, nil
-    if (extensions = document.extensions)
-      block_extensions, block_macro_extensions = extensions.blocks?, extensions.block_macros?
-    else
-      block_extensions = block_macro_extensions = false
+    if options.fetch :parse_metadata, true
+      # read lines until there are no more metadata lines to read
+      while parse_block_metadata_line reader, document, attributes, options
+        advanced = reader.advance
+      end
+      if advanced && !reader.has_more_lines?
+        # NOTE there are no cases when these attributes are used, but clear them anyway
+        attributes.clear
+        return
+      end
     end
 
-    while !block && reader.has_more_lines?
-      # if parsing metadata, read until there is no more to read
-      if parse_metadata && (parse_block_metadata_line reader, document, attributes, options)
-        reader.advance
-        next
-      #elsif parse_sections && !parent_context && is_next_line_section?(reader, attributes)
-      #  block, attributes = next_section(reader, parent, attributes)
-      #  break
-      end
+    if (extensions = document.extensions)
+      block_extensions, block_macro_extensions = extensions.blocks?, extensions.block_macros?
+    end
 
-      # QUESTION should we introduce a parsing context object?
-      source_location = reader.cursor if sourcemap
-      this_path, this_lineno, this_line = reader.path, reader.lineno, reader.read_line
-      delimited_block = block_context = cloaked_context = terminator = nil
-      style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
+    # QUESTION should we introduce a parsing context object?
+    source_location = reader.cursor if document.sourcemap
+    this_path, this_lineno, this_line, in_list = reader.path, reader.lineno, reader.read_line, ListItem === parent
+    block = block_context = cloaked_context = terminator = nil
+    style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
 
-      if (delimited_blk_match = is_delimited_block? this_line, true)
-        delimited_block = true
-        block_context = cloaked_context = delimited_blk_match.context
-        terminator = delimited_blk_match.terminator
-        if !style
-          style = attributes['style'] = block_context.to_s
-        elsif style != block_context.to_s
-          if delimited_blk_match.masq.include? style
-            block_context = style.to_sym
-          elsif delimited_blk_match.masq.include?('admonition') && ADMONITION_STYLES.include?(style)
-            block_context = :admonition
-          elsif block_extensions && extensions.registered_for_block?(style, block_context)
-            block_context = style.to_sym
-          else
-            warn %(asciidoctor: WARNING: #{this_path}: line #{this_lineno}: invalid style for #{block_context} block: #{style})
-            style = block_context.to_s
-          end
-        end
-      end
-
-      # this loop is used for flow control; it only executes once, and only if delimited_block is true
-      # break once a block is found or at end of loop
-      # returns nil if the line should be dropped
-      while true
-        # process lines verbatim
-        if style && Compliance.strict_verbatim_paragraphs && VERBATIM_STYLES.include?(style)
+    if (delimited_block = is_delimited_block? this_line, true)
+      block_context = cloaked_context = delimited_block.context
+      terminator = delimited_block.terminator
+      if !style
+        style = attributes['style'] = block_context.to_s
+      elsif style != block_context.to_s
+        if delimited_block.masq.include? style
           block_context = style.to_sym
-          reader.unshift_line this_line
-          # advance to block parsing =>
-          break
-        end
-
-        # process lines normally
-        if text_only
-          indented = this_line.start_with? ' ', TAB
+        elsif delimited_block.masq.include?('admonition') && ADMONITION_STYLES.include?(style)
+          block_context = :admonition
+        elsif block_extensions && extensions.registered_for_block?(style, block_context)
+          block_context = style.to_sym
         else
-          # NOTE move this declaration up if we need it when text_only is false
-          md_syntax = Compliance.markdown_syntax
-          if this_line.start_with? ' '
-            indented, ch0 = true, ' '
-            # QUESTION should we test line length?
-            if md_syntax && this_line.lstrip.start_with?(*MARKDOWN_THEMATIC_BREAK_CHARS.keys) &&
-                #!(this_line.start_with? '    ') &&
-                (MarkdownThematicBreakRx.match? this_line)
-              # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-              block = Block.new(parent, :thematic_break, :content_model => :empty)
-              break
-            end
-          elsif this_line.start_with? TAB
-            indented, ch0 = true, TAB
-          else
-            indented, ch0 = false, this_line.chr
-            layout_break_chars = md_syntax ? HYBRID_LAYOUT_BREAK_CHARS : LAYOUT_BREAK_CHARS
-            if (layout_break_chars.key? ch0) && (md_syntax ? (HybridLayoutBreakRx.match? this_line) :
-                (this_line == ch0 * (ll = this_line.length) && ll > 2))
-              # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-              block = Block.new(parent, layout_break_chars[ch0], :content_model => :empty)
-              break
-            # NOTE very rare that a text-only line will end in ] (e.g., inline macro), so check that first
-            elsif (this_line.end_with? ']') && (this_line.include? '::')
-              #if (this_line.start_with? 'image', 'video', 'audio') && (match = BlockMediaMacroRx.match(this_line))
-              if (ch0 == 'i' || (this_line.start_with? 'video:', 'audio:')) && (match = BlockMediaMacroRx.match(this_line))
-                blk_ctx, target = match[1].to_sym, match[2]
-                block = Block.new(parent, blk_ctx, :content_model => :empty)
-                case blk_ctx
-                when :video
-                  posattrs = ['poster', 'width', 'height']
-                when :audio
-                  posattrs = []
-                else # :image
-                  posattrs = ['alt', 'width', 'height']
-                end
-                block.parse_attributes(match[3], posattrs, :sub_input => true, :sub_result => false, :into => attributes)
-                # style doesn't have special meaning for media macros
-                attributes.delete 'style' if attributes.key? 'style'
-                if (target.include? '{') && (target = block.sub_attributes target, :attribute_missing => 'drop-line').empty?
-                  # retain as unparsed if attribute-missing is skip
-                  if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
-                    return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
-                  # otherwise, drop the line
-                  else
-                    attributes.clear
-                    return
-                  end
-                end
-                if blk_ctx == :image
-                  block.document.register :images, target
-                  # NOTE style is the value of the first positional attribute in the block attribute line
-                  attributes['alt'] ||= style || (attributes['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
-                  unless (scaledwidth = attributes.delete 'scaledwidth').nil_or_empty?
-                    # NOTE assume % units if not specified
-                    attributes['scaledwidth'] = (TrailingDigitsRx.match? scaledwidth) ? %(#{scaledwidth}%) : scaledwidth
-                  end
-                  block.title = attributes.delete 'title'
-                  block.assign_caption((attributes.delete 'caption'), 'figure')
-                end
-                attributes['target'] = target
-                break
+          warn %(asciidoctor: WARNING: #{this_path}: line #{this_lineno}: invalid style for #{block_context} block: #{style})
+          style = block_context.to_s
+        end
+      end
+    end
 
-              elsif ch0 == 't' && (this_line.start_with? 'toc:') && (match = BlockTocMacroRx.match(this_line))
-                block = Block.new(parent, :toc, :content_model => :empty)
-                block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
-                break
+    # this loop is used for flow control; it only executes once, and only when delimited_block is set
+    # break once a block is found or at end of loop
+    # returns nil if the line should be dropped
+    while true
+      # process lines verbatim
+      if style && Compliance.strict_verbatim_paragraphs && VERBATIM_STYLES.include?(style)
+        block_context = style.to_sym
+        reader.unshift_line this_line
+        # advance to block parsing =>
+        break
+      end
 
-              elsif block_macro_extensions && (match = CustomBlockMacroRx.match(this_line)) &&
-                  (extension = extensions.registered_for_block_macro?(match[1]))
-                target = match[2]
-                content = match[3]
-                if extension.config[:content_model] == :attributes
-                  unless content.empty?
-                    document.parse_attributes(content, extension.config[:pos_attrs] || [],
-                        :sub_input => true, :sub_result => false, :into => attributes)
-                  end
-                else
-                  attributes['text'] = content
-                end
-                if (default_attrs = extension.config[:default_attrs])
-                  attributes.update(default_attrs) {|_, old_v| old_v }
-                end
-                if (block = extension.process_method[parent, target, attributes])
-                  attributes.replace block.attributes
+      # process lines normally
+      if text_only
+        indented = this_line.start_with? ' ', TAB
+      else
+        # NOTE move this declaration up if we need it when text_only is false
+        md_syntax = Compliance.markdown_syntax
+        if this_line.start_with? ' '
+          indented, ch0 = true, ' '
+          # QUESTION should we test line length?
+          if md_syntax && this_line.lstrip.start_with?(*MARKDOWN_THEMATIC_BREAK_CHARS.keys) &&
+              #!(this_line.start_with? '    ') &&
+              (MarkdownThematicBreakRx.match? this_line)
+            # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
+            block = Block.new(parent, :thematic_break, :content_model => :empty)
+            break
+          end
+        elsif this_line.start_with? TAB
+          indented, ch0 = true, TAB
+        else
+          indented, ch0 = false, this_line.chr
+          layout_break_chars = md_syntax ? HYBRID_LAYOUT_BREAK_CHARS : LAYOUT_BREAK_CHARS
+          if (layout_break_chars.key? ch0) && (md_syntax ? (HybridLayoutBreakRx.match? this_line) :
+              (this_line == ch0 * (ll = this_line.length) && ll > 2))
+            # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
+            block = Block.new(parent, layout_break_chars[ch0], :content_model => :empty)
+            break
+          # NOTE very rare that a text-only line will end in ] (e.g., inline macro), so check that first
+          elsif (this_line.end_with? ']') && (this_line.include? '::')
+            #if (this_line.start_with? 'image', 'video', 'audio') && (match = BlockMediaMacroRx.match(this_line))
+            if (ch0 == 'i' || (this_line.start_with? 'video:', 'audio:')) && (match = BlockMediaMacroRx.match(this_line))
+              blk_ctx, target = match[1].to_sym, match[2]
+              block = Block.new(parent, blk_ctx, :content_model => :empty)
+              case blk_ctx
+              when :video
+                posattrs = ['poster', 'width', 'height']
+              when :audio
+                posattrs = []
+              else # :image
+                posattrs = ['alt', 'width', 'height']
+              end
+              block.parse_attributes(match[3], posattrs, :sub_input => true, :sub_result => false, :into => attributes)
+              # style doesn't have special meaning for media macros
+              attributes.delete 'style' if attributes.key? 'style'
+              if (target.include? '{') && (target = block.sub_attributes target, :attribute_missing => 'drop-line').empty?
+                # retain as unparsed if attribute-missing is skip
+                if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
+                  return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
+                # otherwise, drop the line
                 else
                   attributes.clear
                   return
                 end
-                break
               end
-            end
-          end
-        end
+              if blk_ctx == :image
+                block.document.register :images, target
+                # NOTE style is the value of the first positional attribute in the block attribute line
+                attributes['alt'] ||= style || (attributes['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
+                unless (scaledwidth = attributes.delete 'scaledwidth').nil_or_empty?
+                  # NOTE assume % units if not specified
+                  attributes['scaledwidth'] = (TrailingDigitsRx.match? scaledwidth) ? %(#{scaledwidth}%) : scaledwidth
+                end
+                block.title = attributes.delete 'title'
+                block.assign_caption((attributes.delete 'caption'), 'figure')
+              end
+              attributes['target'] = target
+              break
 
-        # haven't found anything yet, continue
-        if !indented && CALLOUT_LIST_LEADERS.include?(ch0 ||= this_line.chr) &&
-            (CalloutListSniffRx.match? this_line) && (match = CalloutListRx.match this_line)
-          block = List.new(parent, :colist)
-          attributes['style'] = 'arabic'
-          reader.unshift_line this_line
-          expected_index = 1
-          # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
-          while match || (reader.has_more_lines? && (match = CalloutListRx.match(reader.peek_line)))
-            list_item_lineno = reader.lineno
-            # might want to move this check to a validate method
-            unless match[1] == expected_index.to_s
-              warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: callout list item index: expected #{expected_index} got #{match[1]})
-            end
-            if (list_item = next_list_item reader, block, match)
-              block << list_item
-              if (coids = document.callouts.callout_ids block.items.size).empty?
-                warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: no callouts refer to list item #{block.items.size})
+            elsif ch0 == 't' && (this_line.start_with? 'toc:') && (match = BlockTocMacroRx.match(this_line))
+              block = Block.new(parent, :toc, :content_model => :empty)
+              block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
+              break
+
+            elsif block_macro_extensions && (match = CustomBlockMacroRx.match(this_line)) &&
+                (extension = extensions.registered_for_block_macro?(match[1]))
+              target = match[2]
+              content = match[3]
+              if extension.config[:content_model] == :attributes
+                unless content.empty?
+                  document.parse_attributes(content, extension.config[:pos_attrs] || [],
+                      :sub_input => true, :sub_result => false, :into => attributes)
+                end
               else
-                list_item.attributes['coids'] = coids
+                attributes['text'] = content
+              end
+              if (default_attrs = extension.config[:default_attrs])
+                attributes.update(default_attrs) {|_, old_v| old_v }
+              end
+              if (block = extension.process_method[parent, target, attributes])
+                attributes.replace block.attributes
+                break
+              else
+                attributes.clear
+                return
               end
             end
-            expected_index += 1
-            match = nil
-          end
-
-          document.callouts.next_list
-          break
-
-        elsif UnorderedListRx.match? this_line
-          reader.unshift_line this_line
-          block = next_item_list(reader, :ulist, parent)
-          if (style || (Section === parent && parent.sectname)) == 'bibliography'
-            attributes['style'] = 'bibliography' unless style
-            block.items.each {|item| catalog_inline_biblio_anchor item.instance_variable_get(:@text), item, document }
-          end
-          break
-
-        elsif (match = OrderedListRx.match(this_line))
-          reader.unshift_line this_line
-          block = next_item_list(reader, :olist, parent)
-          # FIXME move this logic into next_item_list
-          unless style
-            marker = block.items[0].marker
-            if marker.start_with? '.'
-              # first one makes more sense, but second one is AsciiDoc-compliant
-              # TODO control behavior using a compliance setting
-              #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || 'arabic').to_s
-              attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || 'arabic').to_s
-            else
-              attributes['style'] = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker } || 'arabic').to_s
-            end
-          end
-          break
-
-        elsif (match = DescriptionListRx.match(this_line))
-          reader.unshift_line this_line
-          block = next_description_list(reader, match, parent)
-          break
-
-        elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
-            (is_section_title? this_line, (reader.peek_line true)) : !indented && (is_section_title? this_line))
-          reader.unshift_line this_line
-          float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
-          attributes['reftext'] = float_reftext if float_reftext
-          block = Block.new(parent, :floating_title, :content_model => :empty)
-          block.title = float_title
-          attributes.delete 'title'
-          block.id = float_id || attributes['id'] ||
-              ((document.attributes.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
-          block.level = float_level
-          break
-
-        # FIXME create another set for "passthrough" styles
-        # FIXME make this more DRY!
-        elsif style && style != 'normal'
-          if PARAGRAPH_STYLES.include?(style)
-            block_context = style.to_sym
-            cloaked_context = :paragraph
-            reader.unshift_line this_line
-            # advance to block parsing =>
-            break
-          elsif ADMONITION_STYLES.include?(style)
-            block_context = :admonition
-            cloaked_context = :paragraph
-            reader.unshift_line this_line
-            # advance to block parsing =>
-            break
-          elsif block_extensions && extensions.registered_for_block?(style, :paragraph)
-            block_context = style.to_sym
-            cloaked_context = :paragraph
-            reader.unshift_line this_line
-            # advance to block parsing =>
-            break
-          else
-            warn %(asciidoctor: WARNING: #{this_path}: line #{this_lineno}: invalid style for paragraph: #{style})
-            style = nil
-            # continue to process paragraph
           end
         end
+      end
 
-        break_at_list = (skipped == 0 && in_list)
+      # haven't found anything yet, continue
+      if !indented && CALLOUT_LIST_LEADERS.include?(ch0 ||= this_line.chr) &&
+          (CalloutListSniffRx.match? this_line) && (match = CalloutListRx.match this_line)
+        block = List.new(parent, :colist)
+        attributes['style'] = 'arabic'
         reader.unshift_line this_line
-
-        # a literal paragraph: contiguous lines starting with at least one whitespace character
-        # NOTE style can only be nil or "normal" at this point
-        if indented && !style
-          lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => text_only
-
-          adjust_indentation! lines
-
-          block = Block.new(parent, :literal, :content_model => :verbatim, :source => lines, :attributes => attributes)
-          # a literal gets special meaning inside of a description list
-          # TODO this feels hacky, better way to distinguish from explicit literal block?
-          block.set_option('listparagraph') if in_list
-
-        # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
-        else
-          lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => true
-
-          # NOTE we need this logic because we've asked the reader to skip
-          # line comments, which may leave us w/ an empty buffer if those
-          # were the only lines found
-          if in_list && lines.empty?
-            # call advance since the reader preserved the last line
-            reader.advance
-            return
+        expected_index = 1
+        # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
+        while match || (reader.has_more_lines? && (match = CalloutListRx.match(reader.peek_line)))
+          list_item_lineno = reader.lineno
+          # might want to move this check to a validate method
+          unless match[1] == expected_index.to_s
+            warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: callout list item index: expected #{expected_index} got #{match[1]})
           end
-
-          # NOTE don't check indented here since it's extremely rare
-          #if text_only || indented
-          if text_only
-            # if [normal] is used over an indented paragraph, shift content to left margin
-            # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
-            adjust_indentation! lines if indented && style == 'normal'
-            block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
-          elsif (ADMONITION_STYLE_LEADERS.include? ch0) && (this_line.include? ':') && (AdmonitionParagraphRx =~ this_line)
-            lines[0] = $' # string after match
-            attributes['name'] = admonition_name = (attributes['style'] = $1).downcase
-            attributes['textlabel'] = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
-            block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
-          elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
-            lines.map! {|line| line == '>' ? line[1..-1] : ((line.start_with? '> ') ? line[2..-1] : line) }
-            if lines[-1].start_with? '-- '
-              attribution, citetitle = lines.pop[3..-1].split(', ', 2)
-              attributes['attribution'] = attribution if attribution
-              attributes['citetitle'] = citetitle if citetitle
-              lines.pop while lines[-1].empty?
+          if (list_item = next_list_item reader, block, match)
+            block << list_item
+            if (coids = document.callouts.callout_ids block.items.size).empty?
+              warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: no callouts refer to list item #{block.items.size})
+            else
+              list_item.attributes['coids'] = coids
             end
-            attributes['style'] = 'quote'
-            # NOTE will only detect headings that are floating titles (not section titles)
-            # TODO could assume a floating title when inside a block context
-            # FIXME Reader needs to be created w/ line info
-            block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
-          elsif ch0 == '"' && lines.size > 1 && (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
-            lines[0] = this_line[1..-1] # strip leading quote
+          end
+          expected_index += 1
+          match = nil
+        end
+
+        document.callouts.next_list
+        break
+
+      elsif UnorderedListRx.match? this_line
+        reader.unshift_line this_line
+        block = next_item_list(reader, :ulist, parent)
+        if (style || (Section === parent && parent.sectname)) == 'bibliography'
+          attributes['style'] = 'bibliography' unless style
+          block.items.each {|item| catalog_inline_biblio_anchor item.instance_variable_get(:@text), item, document }
+        end
+        break
+
+      elsif (match = OrderedListRx.match(this_line))
+        reader.unshift_line this_line
+        block = next_item_list(reader, :olist, parent)
+        # FIXME move this logic into next_item_list
+        unless style
+          marker = block.items[0].marker
+          if marker.start_with? '.'
+            # first one makes more sense, but second one is AsciiDoc-compliant
+            # TODO control behavior using a compliance setting
+            #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || 'arabic').to_s
+            attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || 'arabic').to_s
+          else
+            attributes['style'] = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker } || 'arabic').to_s
+          end
+        end
+        break
+
+      elsif (match = DescriptionListRx.match(this_line))
+        reader.unshift_line this_line
+        block = next_description_list(reader, match, parent)
+        break
+
+      elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
+          (is_section_title? this_line, (reader.peek_line true)) : !indented && (is_section_title? this_line))
+        reader.unshift_line this_line
+        float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
+        attributes['reftext'] = float_reftext if float_reftext
+        block = Block.new(parent, :floating_title, :content_model => :empty)
+        block.title = float_title
+        attributes.delete 'title'
+        block.id = float_id || attributes['id'] ||
+            ((document.attributes.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
+        block.level = float_level
+        break
+
+      # FIXME create another set for "passthrough" styles
+      # FIXME make this more DRY!
+      elsif style && style != 'normal'
+        if PARAGRAPH_STYLES.include?(style)
+          block_context = style.to_sym
+          cloaked_context = :paragraph
+          reader.unshift_line this_line
+          # advance to block parsing =>
+          break
+        elsif ADMONITION_STYLES.include?(style)
+          block_context = :admonition
+          cloaked_context = :paragraph
+          reader.unshift_line this_line
+          # advance to block parsing =>
+          break
+        elsif block_extensions && extensions.registered_for_block?(style, :paragraph)
+          block_context = style.to_sym
+          cloaked_context = :paragraph
+          reader.unshift_line this_line
+          # advance to block parsing =>
+          break
+        else
+          warn %(asciidoctor: WARNING: #{this_path}: line #{this_lineno}: invalid style for paragraph: #{style})
+          style = nil
+          # continue to process paragraph
+        end
+      end
+
+      break_at_list = (skipped == 0 && in_list)
+      reader.unshift_line this_line
+
+      # a literal paragraph: contiguous lines starting with at least one whitespace character
+      # NOTE style can only be nil or "normal" at this point
+      if indented && !style
+        lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => text_only
+
+        adjust_indentation! lines
+
+        block = Block.new(parent, :literal, :content_model => :verbatim, :source => lines, :attributes => attributes)
+        # a literal gets special meaning inside of a description list
+        # TODO this feels hacky, better way to distinguish from explicit literal block?
+        block.set_option('listparagraph') if in_list
+
+      # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
+      else
+        lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => true
+
+        # NOTE we need this logic because we've asked the reader to skip
+        # line comments, which may leave us w/ an empty buffer if those
+        # were the only lines found
+        if in_list && lines.empty?
+          # call advance since the reader preserved the last line
+          reader.advance
+          return
+        end
+
+        # NOTE don't check indented here since it's extremely rare
+        #if text_only || indented
+        if text_only
+          # if [normal] is used over an indented paragraph, shift content to left margin
+          # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
+          adjust_indentation! lines if indented && style == 'normal'
+          block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
+        elsif (ADMONITION_STYLE_LEADERS.include? ch0) && (this_line.include? ':') && (AdmonitionParagraphRx =~ this_line)
+          lines[0] = $' # string after match
+          attributes['name'] = admonition_name = (attributes['style'] = $1).downcase
+          attributes['textlabel'] = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
+          block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
+        elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
+          lines.map! {|line| line == '>' ? line[1..-1] : ((line.start_with? '> ') ? line[2..-1] : line) }
+          if lines[-1].start_with? '-- '
             attribution, citetitle = lines.pop[3..-1].split(', ', 2)
             attributes['attribution'] = attribution if attribution
             attributes['citetitle'] = citetitle if citetitle
             lines.pop while lines[-1].empty?
-            lines[-1] = lines[-1].chop # strip trailing quote
-            attributes['style'] = 'quote'
-            block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
-          else
-            # if [normal] is used over an indented paragraph, shift content to left margin
-            # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
-            adjust_indentation! lines if indented && style == 'normal'
-            block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
           end
-
-          catalog_inline_anchors lines * LF, block, document
+          attributes['style'] = 'quote'
+          # NOTE will only detect headings that are floating titles (not section titles)
+          # TODO could assume a floating title when inside a block context
+          # FIXME Reader needs to be created w/ line info
+          block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
+        elsif ch0 == '"' && lines.size > 1 && (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
+          lines[0] = this_line[1..-1] # strip leading quote
+          attribution, citetitle = lines.pop[3..-1].split(', ', 2)
+          attributes['attribution'] = attribution if attribution
+          attributes['citetitle'] = citetitle if citetitle
+          lines.pop while lines[-1].empty?
+          lines[-1] = lines[-1].chop # strip trailing quote
+          attributes['style'] = 'quote'
+          block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
+        else
+          # if [normal] is used over an indented paragraph, shift content to left margin
+          # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
+          adjust_indentation! lines if indented && style == 'normal'
+          block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
         end
 
-        break # forbid loop from executing more than once
-      end unless delimited_block
+        catalog_inline_anchors lines * LF, block, document
+      end
 
-      # either delimited block or styled paragraph
-      if !block && block_context
-        # abstract and partintro should be handled by open block
-        # FIXME kind of hackish...need to sort out how to generalize this
-        block_context = :open if block_context == :abstract || block_context == :partintro
+      break # forbid loop from executing more than once
+    end unless delimited_block
 
-        case block_context
-        when :admonition
-          attributes['name'] = admonition_name = style.downcase
-          attributes['textlabel'] = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
-          block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+    # either delimited block or styled paragraph
+    unless block
+      # abstract and partintro should be handled by open block
+      # FIXME kind of hackish...need to sort out how to generalize this
+      block_context = :open if block_context == :abstract || block_context == :partintro
 
-        when :comment
-          build_block(block_context, :skip, terminator, parent, reader, attributes)
-          return
+      case block_context
+      when :admonition
+        attributes['name'] = admonition_name = style.downcase
+        attributes['textlabel'] = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
+        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
-        when :example
-          block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+      when :comment
+        build_block(block_context, :skip, terminator, parent, reader, attributes)
+        return
 
-        when :listing, :literal
-          block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
+      when :example
+        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
-        when :source
-          AttributeList.rekey attributes, [nil, 'language', 'linenums']
+      when :listing, :literal
+        block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
+
+      when :source
+        AttributeList.rekey attributes, [nil, 'language', 'linenums']
+        if document.attributes.key? 'source-language'
+          attributes['language'] = document.attributes['source-language'] || 'text'
+        end unless attributes.key? 'language'
+        if (attributes.key? 'linenums-option') || (document.attributes.key? 'source-linenums-option')
+          attributes['linenums'] = ''
+        end unless attributes.key? 'linenums'
+        if document.attributes.key? 'source-indent'
+          attributes['indent'] = document.attributes['source-indent']
+        end unless attributes.key? 'indent'
+        block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
+
+      when :fenced_code
+        attributes['style'] = 'source'
+        if (ll = this_line.length) == 3
+          language = nil
+        elsif (comma_idx = (language = this_line.slice 3, ll).index ',')
+          if comma_idx > 0
+            language = (language.slice 0, comma_idx).strip
+            attributes['linenums'] = '' if comma_idx < ll - 4
+          else
+            language = nil
+            attributes['linenums'] = '' if ll > 4
+          end
+        else
+          language = language.lstrip
+        end
+        if language.nil_or_empty?
           if document.attributes.key? 'source-language'
             attributes['language'] = document.attributes['source-language'] || 'text'
-          end unless attributes.key? 'language'
-          if (attributes.key? 'linenums-option') || (document.attributes.key? 'source-linenums-option')
-            attributes['linenums'] = ''
-          end unless attributes.key? 'linenums'
-          if document.attributes.key? 'source-indent'
-            attributes['indent'] = document.attributes['source-indent']
-          end unless attributes.key? 'indent'
-          block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
-
-        when :fenced_code
-          attributes['style'] = 'source'
-          if (ll = this_line.length) == 3
-            language = nil
-          elsif (comma_idx = (language = this_line.slice 3, ll).index ',')
-            if comma_idx > 0
-              language = (language.slice 0, comma_idx).strip
-              attributes['linenums'] = '' if comma_idx < ll - 4
-            else
-              language = nil
-              attributes['linenums'] = '' if ll > 4
-            end
-          else
-            language = language.lstrip
           end
-          if language.nil_or_empty?
-            if document.attributes.key? 'source-language'
-              attributes['language'] = document.attributes['source-language'] || 'text'
-            end
-          else
-            attributes['language'] = language
-          end
-          if (attributes.key? 'linenums-option') || (document.attributes.key? 'source-linenums-option')
-            attributes['linenums'] = ''
-          end unless attributes.key? 'linenums'
-          if document.attributes.key? 'source-indent'
-            attributes['indent'] = document.attributes['source-indent']
-          end unless attributes.key? 'indent'
-          terminator = terminator.slice 0, 3
-          block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
-
-        when :pass
-          block = build_block(block_context, :raw, terminator, parent, reader, attributes)
-
-        when :stem, :latexmath, :asciimath
-          if block_context == :stem
-            attributes['style'] = if (explicit_stem_syntax = attributes[2])
-              explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
-            elsif (default_stem_syntax = document.attributes['stem']).nil_or_empty?
-              'asciimath'
-            else
-              default_stem_syntax
-            end
-          end
-          block = build_block(:stem, :raw, terminator, parent, reader, attributes)
-
-        when :open, :sidebar
-          block = build_block(block_context, :compound, terminator, parent, reader, attributes)
-
-        when :table
-          block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), reader.cursor
-          # NOTE it's very rare that format is set when using a format hint char, so short-circuit
-          unless terminator.start_with? '|', '!'
-            # NOTE infer dsv once all other format hint chars are ruled out
-            attributes['format'] ||= (terminator.start_with? ',') ? 'csv' : 'dsv'
-          end
-          block = next_table(block_reader, parent, attributes)
-
-        when :quote, :verse
-          AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
-          block = build_block(block_context, (block_context == :verse ? :verbatim : :compound), terminator, parent, reader, attributes)
-
         else
-          if block_extensions && (extension = extensions.registered_for_block?(block_context, cloaked_context))
-            if (content_model = extension.config[:content_model]) != :skip
-              if !(pos_attrs = extension.config[:pos_attrs] || []).empty?
-                AttributeList.rekey(attributes, [nil].concat(pos_attrs))
-              end
-              if (default_attrs = extension.config[:default_attrs])
-                default_attrs.each {|k, v| attributes[k] ||= v }
-              end
-              # QUESTION should we clone the extension for each cloaked context and set in config?
-              attributes['cloaked-context'] = cloaked_context
-            end
-            block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
-            unless block && content_model != :skip
-              attributes.clear
-              return
-            end
+          attributes['language'] = language
+        end
+        if (attributes.key? 'linenums-option') || (document.attributes.key? 'source-linenums-option')
+          attributes['linenums'] = ''
+        end unless attributes.key? 'linenums'
+        if document.attributes.key? 'source-indent'
+          attributes['indent'] = document.attributes['source-indent']
+        end unless attributes.key? 'indent'
+        terminator = terminator.slice 0, 3
+        block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
+
+      when :pass
+        block = build_block(block_context, :raw, terminator, parent, reader, attributes)
+
+      when :stem, :latexmath, :asciimath
+        if block_context == :stem
+          attributes['style'] = if (explicit_stem_syntax = attributes[2])
+            explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
+          elsif (default_stem_syntax = document.attributes['stem']).nil_or_empty?
+            'asciimath'
           else
-            # this should only happen if there's a misconfiguration
-            raise %(Unsupported block type #{block_context} at #{reader.line_info})
+            default_stem_syntax
           end
+        end
+        block = build_block(:stem, :raw, terminator, parent, reader, attributes)
+
+      when :open, :sidebar
+        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+
+      when :table
+        block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), reader.cursor
+        # NOTE it's very rare that format is set when using a format hint char, so short-circuit
+        unless terminator.start_with? '|', '!'
+          # NOTE infer dsv once all other format hint chars are ruled out
+          attributes['format'] ||= (terminator.start_with? ',') ? 'csv' : 'dsv'
+        end
+        block = next_table(block_reader, parent, attributes)
+
+      when :quote, :verse
+        AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
+        block = build_block(block_context, (block_context == :verse ? :verbatim : :compound), terminator, parent, reader, attributes)
+
+      else
+        if block_extensions && (extension = extensions.registered_for_block?(block_context, cloaked_context))
+          if (content_model = extension.config[:content_model]) != :skip
+            if !(pos_attrs = extension.config[:pos_attrs] || []).empty?
+              AttributeList.rekey(attributes, [nil].concat(pos_attrs))
+            end
+            if (default_attrs = extension.config[:default_attrs])
+              default_attrs.each {|k, v| attributes[k] ||= v }
+            end
+            # QUESTION should we clone the extension for each cloaked context and set in config?
+            attributes['cloaked-context'] = cloaked_context
+          end
+          block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
+          unless block && content_model != :skip
+            attributes.clear
+            return
+          end
+        else
+          # this should only happen if there's a misconfiguration
+          raise %(Unsupported block type #{block_context} at #{reader.line_info})
         end
       end
     end
 
-    # when looking for nested content, one or more line comments, comment
-    # blocks or trailing attribute lists could leave us without a block,
-    # so handle accordingly
-    # REVIEW we may no longer need this nil check
     # FIXME we've got to clean this up, it's horrible!
-    if block
-      block.source_location = source_location if source_location
-      # FIXME title should be assigned when block is constructed
-      block.title = attributes.delete 'title' if attributes.key? 'title'
-      #unless attributes.key? 'reftext'
-      #  attributes['reftext'] = document.attributes['reftext'] if document.attributes.key? 'reftext'
-      #end
-      # TODO eventually remove the style attribute from the attributes hash
-      #block.style = attributes.delete 'style'
-      block.style = attributes['style']
-      if (block_id = (block.id ||= attributes['id']))
-        unless document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
-          warn %(asciidoctor: WARNING: #{this_path}: line #{this_lineno}: id assigned to block already in use: #{block_id})
-        end
+    block.source_location = source_location if source_location
+    # FIXME title should be assigned when block is constructed
+    block.title = attributes.delete 'title' if attributes.key? 'title'
+    #unless attributes.key? 'reftext'
+    #  attributes['reftext'] = document.attributes['reftext'] if document.attributes.key? 'reftext'
+    #end
+    # TODO eventually remove the style attribute from the attributes hash
+    #block.style = attributes.delete 'style'
+    block.style = attributes['style']
+    if (block_id = (block.id ||= attributes['id']))
+      unless document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
+        warn %(asciidoctor: WARNING: #{this_path}: line #{this_lineno}: id assigned to block already in use: #{block_id})
       end
-      # FIXME remove the need for this update!
-      block.attributes.update(attributes) unless attributes.empty?
-      block.lock_in_subs
+    end
+    # FIXME remove the need for this update!
+    block.attributes.update(attributes) unless attributes.empty?
+    block.lock_in_subs
 
-      #if document.attributes.key? :pending_attribute_entries
-      #  document.attributes.delete(:pending_attribute_entries).each do |entry|
-      #    entry.save_to block.attributes
-      #  end
-      #end
+    #if document.attributes.key? :pending_attribute_entries
+    #  document.attributes.delete(:pending_attribute_entries).each do |entry|
+    #    entry.save_to block.attributes
+    #  end
+    #end
 
-      if block.sub? :callouts
-        # No need to sub callouts if none are found when cataloging
-        block.remove_sub :callouts unless catalog_callouts block.source, document
-      end
+    if block.sub? :callouts
+      # No need to sub callouts if none are found when cataloging
+      block.remove_sub :callouts unless catalog_callouts block.source, document
     end
 
     block
