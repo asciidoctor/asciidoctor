@@ -486,7 +486,7 @@ module Extensions
     include SyntaxDsl
 
     def contexts *value
-      option :contexts, value.flatten
+      option :contexts, value.flatten.to_set
     end
     alias on_contexts contexts
     alias on_context contexts
