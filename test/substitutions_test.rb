@@ -38,6 +38,12 @@ context 'Substitutions' do
       result = para.apply_subs para.lines, [:normal], true
       assert_equal ['Asciidoctor', '<strong>bold</strong>', '2 &gt; 1'], result
     end
+
+    test 'apply_subs should allow the subs argument to be nil' do
+      block = block_from_string %([pass]\n*raw*)
+      result = block.apply_subs block.source, nil
+      assert_equal '*raw*', result
+    end
   end
 
   context 'Quotes' do

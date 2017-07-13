@@ -77,12 +77,12 @@ module Substitutors
   # Public: Apply the specified substitutions to the source.
   #
   # source  - The String or String Array of text to process; must not be nil.
-  # subs    - The substitutions to perform; can be a Symbol or Symbol Array; must not be nil (default: :normal).
-  # expand  - A Boolean to control whether substitution aliases are expanded (default: false).
+  # subs    - The substitutions to perform; can be a Symbol, Symbol Array or nil (default: NORMAL_SUBS).
+  # expand  - A Boolean (or nil) to control whether substitution aliases are expanded (default: nil).
   #
   # Returns a String or String Array with substitutions applied, matching the type of source argument.
-  def apply_subs source, subs = NORMAL_SUBS, expand = false
-    if source.empty? || subs.empty?
+  def apply_subs source, subs = NORMAL_SUBS, expand = nil
+    if source.empty? || !subs
       return source
     elsif expand
       if ::Symbol === subs
@@ -101,6 +101,8 @@ module Substitutors
           return source
         end
       end
+    elsif subs.empty?
+      return source
     end
 
     text = (multiline = ::Array === source) ? source * LF : source
