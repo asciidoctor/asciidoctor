@@ -152,9 +152,9 @@ desc 'Trigger builds for all dependent projects on Travis CI'
       request.body = payload
       response = http.request request
       if response.code == '202'
-        puts %(Build successfuly triggered on #{project})
+        puts %(Successfully triggered build on #{project} repository)
       else
-        warn %(Unable to build #{project}: #{response.code} - #{response.message})
+        warn %(Unable to trigger build on #{project} repository: #{response.code} - #{response.message})
       end
     end
   end
