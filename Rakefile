@@ -137,6 +137,7 @@ desc 'Trigger builds for all dependent projects on Travis CI'
     require 'net/http'
     %w(
       asciidoctor/asciidoctor.js
+      asciidoctor/asciidoctorj
     ).each do |project|
       org, name = project.split '/', 2
       header = {
