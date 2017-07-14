@@ -146,7 +146,10 @@ desc 'Trigger builds for all dependent projects on Travis CI'
         'Travis-API-Version' => '3',
         'Authorization' => %(token #{token})
       }
-      payload = '{ "request": { "branch": "master", "message": "Build triggered by change to Asciidoctor core" } }'
+      if (commit_hash = ENV['TRAVIS_COMMIT'])
+        commit_memo = %( (#{commit_hash}))
+      end
+      payload = %({ "request": { "branch": "master", "message": "Build triggered by change to Asciidoctor#{commit_memo}" } })
       (http = Net::HTTP.new 'api.travis-ci.org', 443).use_ssl = true
       request = Net::HTTP::Post.new %(/repo/#{org}%2F#{name}/requests), header
       request.body = payload
