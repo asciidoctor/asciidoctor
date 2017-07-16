@@ -621,23 +621,23 @@ module Asciidoctor
 
     ## Section titles
 
-    # Matches a single-line (Atx-style) section title.
+    # Matches an Atx (single-line) section title.
     #
     # Examples
     #
     #   == Foo
-    #   # ^ a level 1 (h2) section title
+    #   // ^ a level 1 (h2) section title
     #
     #   == Foo ==
-    #   # ^ also a level 1 (h2) section title
+    #   // ^ also a level 1 (h2) section title
     #
-    # match[1] is the delimiter, whose length determines the level
-    # match[2] is the title itself
-    # match[3] is an inline anchor, which becomes the section id
-    AtxSectionTitleRx = /^(=={0,5}|#\#{0,5})[ \t]+(.+?)(?:[ \t]+\1)?$/
+    AtxSectionTitleRx = /^(=={0,5})[ \t]+(.+?)(?:[ \t]+\1)?$/
 
-    # Matches the restricted section name for a two-line (Setext-style) section title.
-    # The name cannot begin with a dot and has at least one alphanumeric character.
+    # Matches an extended Atx section title that includes support for the Markdown variant.
+    ExtAtxSectionTitleRx = /^(=={0,5}|#\#{0,5})[ \t]+(.+?)(?:[ \t]+\1)?$/
+
+    # Matches the title only (first line) of an Setext (two-line) section title.
+    # The title cannot begin with a dot and must have at least one alphanumeric character.
     SetextSectionTitleRx = /^((?=.*#{CG_WORD}+.*)[^.].*?)$/
 
     # Matches an anchor (i.e., id + optional reference text) inside a section title.
