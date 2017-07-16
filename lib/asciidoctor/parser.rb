@@ -1622,7 +1622,7 @@ class Parser
     if attributes.key?(1) && (attr1 = attributes[1] || '').start_with?('float', 'discrete') && FloatingTitleStyleRx.match?(attr1)
       return
     elsif reader.has_more_lines?
-      Compliance.underline_style_section_titles ? is_section_title?(*reader.peek_lines(2)) : is_section_title?(reader.peek_line)
+      Compliance.underline_style_section_titles ? is_section_title?(*reader.peek_lines(2)) : is_single_line_section_title?(reader.peek_line)
     end
   end
 
