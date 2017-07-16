@@ -138,8 +138,10 @@ desc 'Trigger builds for all dependent projects on Travis CI'
     %w(
       asciidoctor/asciidoctor.js
       asciidoctor/asciidoctorj
+      asciidoctor/asciidoctorj/asciidoctorj-1.6.0
     ).each do |project|
-      org, name = project.split '/', 2
+      org, name, branch = project.split '/', 3
+      branch ||= 'master'
       header = {
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
@@ -149,7 +151,7 @@ desc 'Trigger builds for all dependent projects on Travis CI'
       if (commit_hash = ENV['TRAVIS_COMMIT'])
         commit_memo = %( (#{commit_hash})\\n\\nhttps://github.com/#{ENV['TRAVIS_REPO_SLUG'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
       end
-      payload = %({ "request": { "branch": "master", "message": "Build triggered by Asciidoctor#{commit_memo}" } })
+      payload = %({ "request": { "branch": "#{branch}", "message": "Build triggered by Asciidoctor#{commit_memo}" } })
       (http = Net::HTTP.new 'api.travis-ci.org', 443).use_ssl = true
       request = Net::HTTP::Post.new %(/repo/#{org}%2F#{name}/requests), header
       request.body = payload
