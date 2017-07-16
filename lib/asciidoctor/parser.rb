@@ -1652,8 +1652,8 @@ class Parser
   end
 
   def self.is_single_line_section_title?(line1)
-    if (line1.start_with?('=') || (Compliance.markdown_syntax && line1.start_with?('#'))) && AtxSectionRx =~ line1
-    #if line1.start_with?('=', '#') && AtxSectionRx =~ line1 && (line1.start_with?('=') || Compliance.markdown_syntax)
+    if (line1.start_with?('=') || (Compliance.markdown_syntax && line1.start_with?('#'))) && AtxSectionTitleRx =~ line1
+    #if line1.start_with?('=', '#') && AtxSectionTitleRx =~ line1 && (line1.start_with?('=') || Compliance.markdown_syntax)
       # NOTE level is 1 less than number of line markers
       $1.length - 1
     end
@@ -1714,8 +1714,8 @@ class Parser
     sect_id = sect_reftext = nil
     line1 = reader.read_line
 
-    #if line1.start_with?('=', '#') && AtxSectionRx =~ line1 && (line1.start_with?('=') || Compliance.markdown_syntax)
-    if (line1.start_with?('=') || (Compliance.markdown_syntax && line1.start_with?('#'))) && AtxSectionRx =~ line1
+    #if line1.start_with?('=', '#') && AtxSectionTitleRx =~ line1 && (line1.start_with?('=') || Compliance.markdown_syntax)
+    if (line1.start_with?('=') || (Compliance.markdown_syntax && line1.start_with?('#'))) && AtxSectionTitleRx =~ line1
       # NOTE level is 1 less than number of line markers
       sect_level, sect_title, single_line = $1.length - 1, $2, true
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
