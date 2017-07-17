@@ -444,13 +444,12 @@ class Parser
     if options.fetch :parse_metadata, true
       # read lines until there are no more metadata lines to read
       while parse_block_metadata_line reader, document, attributes, options
+        # discard the line just processed
         advanced = reader.advance
+        reader.skip_blank_lines
       end
-      if advanced && reader.empty?
-        # NOTE there are no cases when these attributes are used, but clear them anyway
-        attributes.clear
-        return
-      end
+      # QUESTION should we clear the attributes? no known cases when it's necessary
+      return if advanced && reader.empty?
     end
 
     if (extensions = document.extensions)

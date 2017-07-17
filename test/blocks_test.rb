@@ -85,6 +85,23 @@ second paragraph
       assert_xpath '//p', output, 2
     end
 
+    test 'comment block between paragraphs offset by blank lines inside delimited block' do
+      input = <<-EOS
+====
+first paragraph
+
+////
+block comment
+////
+
+second paragraph
+====
+      EOS
+      output = render_embedded_string input
+      refute_match(/block comment/, output)
+      assert_xpath '//p', output, 2
+    end
+
     test 'adjacent comment block between paragraphs' do
       input = <<-EOS
 first paragraph
