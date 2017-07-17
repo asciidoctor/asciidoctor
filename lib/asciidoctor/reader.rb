@@ -64,7 +64,6 @@ class Reader
     end
     @lines = data ? (prepare_lines data, opts) : []
     @source_lines = @lines.dup
-    @eof = @lines.empty?
     @look_ahead = 0
     @process_lines = true
     @unescape_next_line = false
@@ -121,8 +120,26 @@ class Reader
   #
   # Returns True if there are more lines, False if there are not.
   def has_more_lines?
-    !(@eof || (@eof = peek_line.nil?))
+    if @lines.empty?
+      @look_ahead = 0
+      false
+    else
+      true
+    end
   end
+
+  # Public: Check whether this reader is empty (contains no lines)
+  #
+  # Returns true if there are no more lines to peek, otherwise false.
+  def empty?
+    if @lines.empty?
+      @look_ahead = 0
+      true
+    else
+      false
+    end
+  end
+  alias eof? empty?
 
   # Public: Peek at the next line and check if it's empty (i.e., whitespace only)
   #
@@ -154,8 +171,7 @@ class Reader
   def peek_line direct = false
     if direct || @look_ahead > 0
       @unescape_next_line ? @lines[0][1..-1] : @lines[0]
-    elsif @eof || @lines.empty?
-      @eof = true
+    elsif @lines.empty?
       @look_ahead = 0
       nil
     else
@@ -209,8 +225,6 @@ class Reader
   def read_line direct = false
     if direct || @look_ahead > 0 || has_more_lines?
       shift
-    else
-      nil
     end
   end
 
@@ -312,7 +326,7 @@ class Reader
   #
   # Returns an Integer of the number of lines skipped
   def skip_blank_lines
-    return 0 if eof?
+    return 0 if empty?
 
     num_skipped = 0
     # optimized code for shortest execution path
@@ -342,7 +356,7 @@ class Reader
   #
   # Returns the Array of lines that were skipped
   def skip_comment_lines opts = {}
-    return [] if eof?
+    return [] if empty?
 
     comment_lines = []
     include_blank_lines = opts[:include_blank_lines]
@@ -364,7 +378,7 @@ class Reader
 
   # Public: Skip consecutive lines that are line comments and return them.
   def skip_line_comments
-    return [] if eof?
+    return [] if empty?
 
     comment_lines = []
     # optimized code for shortest execution path
@@ -385,18 +399,9 @@ class Reader
   def terminate
     @lineno += @lines.size
     @lines.clear
-    @eof = true
     @look_ahead = 0
     nil
   end
-
-  # Public: Check whether this reader is empty (contains no lines)
-  #
-  # Returns true if there are no more lines to peek, otherwise false.
-  def eof?
-    !has_more_lines?
-  end
-  alias empty? eof?
 
   # Public: Return all the lines from `@lines` until we (1) run out them,
   #   (2) find a blank line with :break_on_blank_lines => true, or (3) find
@@ -503,7 +508,6 @@ class Reader
   def unshift line
     @lineno -= 1
     @look_ahead += 1
-    @eof = false
     @lines.unshift line
   end
 
@@ -511,7 +515,6 @@ class Reader
   def unshift_all lines
     @lineno -= lines.size
     @look_ahead += lines.size
-    @eof = false
     @lines.unshift(*lines)
   end
 
@@ -660,6 +663,17 @@ class PreprocessorReader < Reader
       line
     end
   end
+
+  # (see Reader#has_more_lines?)
+  def has_more_lines?
+    peek_line ? true : false
+  end
+
+  # (see Reader#empty?)
+  def empty?
+    peek_line ? false : true
+  end
+  alias eof? empty?
 
   # Public: Override the Reader#peek_line method to pop the include
   # stack if the last line has been reached and there's at least
@@ -1084,7 +1098,6 @@ class PreprocessorReader < Reader
       # FIXME kind of a hack
       #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
       #Document::AttributeEntry.new('indir', @dir).save_to_next_block @document
-      @eof = false
       @look_ahead = 0
     end
     self
@@ -1096,10 +1109,9 @@ class PreprocessorReader < Reader
       # FIXME kind of a hack
       #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
       #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
-      @eof = @lines.empty?
       @look_ahead = 0
+      nil
     end
-    nil
   end
 
   def include_depth
