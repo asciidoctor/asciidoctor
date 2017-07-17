@@ -1100,10 +1100,7 @@ class Parser
   #
   # Returns nothing.
   def self.parse_blocks(reader, parent)
-    while reader.has_more_lines?
-      if (block = next_block reader, parent)
-        parent << block
-      end
+    while ((block = next_block reader, parent) && parent << block) || reader.has_more_lines?
     end
   end
 
@@ -1331,13 +1328,10 @@ class Parser
       # only relevant for :dlist
       options = {:text => !has_text}
 
-      # we can look for blocks until there are no more lines (and not worry
-      # about sections) since the reader is confined within the boundaries of a
-      # list
-      while list_item_reader.has_more_lines?
-        if (new_block = next_block(list_item_reader, list_item, {}, options))
-          list_item << new_block
-        end
+      # we can look for blocks until lines are exhausted without worrying about
+      # sections since reader is confined to boundaries of list
+      while ((block = next_block list_item_reader, list_item, {}, options) && list_item << block) ||
+          list_item_reader.has_more_lines?
       end
 
       list_item.fold_first(continuation_connects_first_block, content_adjacent)
