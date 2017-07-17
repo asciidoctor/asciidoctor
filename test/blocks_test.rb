@@ -237,6 +237,24 @@ not this text
       assert_xpath '/*[@class="exampleblock"]', result, 1
       assert_xpath '/*[@class="exampleblock"]//*[normalize-space(text())="not this text"]', result, 1
     end
+
+    # NOTE this test verifies the nil return value of Parser#next_block
+    test 'should not drop content that follows skipped content inside a delimited block' do
+      input = <<-EOS
+====
+paragraph
+
+[comment#idname]
+skip
+
+paragraph
+====
+      EOS
+      result = render_embedded_string input
+      assert_xpath '/*[@class="exampleblock"]', result, 1
+      assert_xpath '/*[@class="exampleblock"]//*[@class="paragraph"]', result, 2
+      assert_xpath '//*[@class="paragraph"][@id="idname"]', result, 0
+    end
   end
 
   context 'Quote and Verse Blocks' do
