@@ -161,12 +161,8 @@ class Reader
     else
       # FIXME the problem with this approach is that we aren't
       # retaining the modified line (hence the @unescape_next_line tweak)
-      # perhaps we need a stack of proxy lines
-      if !(line = process_line @lines[0])
-        peek_line
-      else
-        line
-      end
+      # perhaps we need a stack of proxied lines
+      (line = process_line @lines[0]) ? line : peek_line
     end
   end
 
@@ -609,7 +605,7 @@ class PreprocessorReader < Reader
 
     if line.empty?
       @look_ahead += 1
-      return ''
+      return line
     end
 
     # NOTE highly optimized
