@@ -163,8 +163,9 @@ module Extensions
     def parse_content parent, content, attributes = nil
       reader = Reader === content ? content : (Reader.new content)
       while reader.has_more_lines?
-        block = Parser.next_block reader, parent, (attributes ? attributes.dup : {})
-        parent << block if block
+        if (block = Parser.next_block reader, parent, (attributes ? attributes.dup : {}))
+          parent << block
+        end
       end
       parent
     end
