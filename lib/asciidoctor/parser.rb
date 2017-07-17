@@ -1100,8 +1100,10 @@ class Parser
   #
   # Returns nothing.
   def self.parse_blocks(reader, parent)
-    while (block = next_block reader, parent)
-      parent << block
+    while reader.has_more_lines?
+      if (block = next_block reader, parent)
+        parent << block
+      end
     end
   end
 
