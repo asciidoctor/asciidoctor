@@ -446,7 +446,7 @@ class Parser
       while parse_block_metadata_line reader, document, attributes, options
         advanced = reader.advance
       end
-      if advanced && !reader.has_more_lines?
+      if advanced && reader.empty?
         # NOTE there are no cases when these attributes are used, but clear them anyway
         attributes.clear
         return
