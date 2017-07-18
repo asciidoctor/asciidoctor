@@ -1025,7 +1025,7 @@ Your browser does not support the video tag.
     def inline_anchor node
       case node.type
       when :xref
-        unless (text = node.text)
+        unless (text = node.text) || (text = node.attributes['path'])
           if AbstractNode === (ref = node.document.catalog[:refs][refid = node.attributes['refid']])
             text = ref.xreftext((@xrefstyle ||= node.document.attributes['xrefstyle'])) || %([#{refid}])
           else
