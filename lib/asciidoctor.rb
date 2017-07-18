@@ -1030,7 +1030,7 @@ module Asciidoctor
     #   *** or * * * (horizontal rule, Markdown)
     #   ___ or _ _ _ (horizontal rule, Markdown)
     #
-    HybridLayoutBreakRx = /^(?:'{3,}|<{3,}|([-*_])( *)\1\2\1)$/
+    ExtLayoutBreakRx = /^(?:'{3,}|<{3,}|([-*_])( *)\1\2\1)$/
 
     ## General
 

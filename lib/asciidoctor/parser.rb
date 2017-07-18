@@ -514,7 +514,7 @@ class Parser
         else
           indented, ch0 = false, this_line.chr
           layout_break_chars = md_syntax ? HYBRID_LAYOUT_BREAK_CHARS : LAYOUT_BREAK_CHARS
-          if (layout_break_chars.key? ch0) && (md_syntax ? (HybridLayoutBreakRx.match? this_line) :
+          if (layout_break_chars.key? ch0) && (md_syntax ? (ExtLayoutBreakRx.match? this_line) :
               (this_line == ch0 * (ll = this_line.length) && ll > 2))
             # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
             block = Block.new(parent, layout_break_chars[ch0], :content_model => :empty)
