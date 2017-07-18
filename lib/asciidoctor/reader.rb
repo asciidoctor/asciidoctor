@@ -349,19 +349,22 @@ class Reader
   #   => ["bar"]
   #
   # Returns the Array of lines that were skipped
-  def skip_comment_lines opts = {}
+  def skip_comment_lines
     return [] if empty?
 
     comment_lines = []
-    include_blank_lines = opts[:include_blank_lines]
-    while (next_line = peek_line)
-      if include_blank_lines && next_line.empty?
-        comment_lines << shift
-      elsif (commentish = next_line.start_with?('//')) && (CommentBlockRx.match? next_line)
-        comment_lines << shift
-        comment_lines.push(*(read_lines_until(:terminator => next_line, :read_last_line => true, :skip_processing => true)))
-      elsif commentish && (CommentLineRx.match? next_line)
-        comment_lines << shift
+    while (next_line = peek_line) && !next_line.empty?
+      if next_line.start_with? '//'
+        if next_line.start_with? '///'
+          if (ll = next_line.length) > 3 && next_line == '/' * ll
+            comment_lines << shift
+            comment_lines.push(*(read_lines_until(:terminator => next_line, :read_last_line => true, :skip_processing => true)))
+          else
+            break
+          end
+        else
+          comment_lines << shift
+        end
       else
         break
       end
