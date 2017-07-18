@@ -199,7 +199,7 @@ class Reader
     old_look_ahead = @look_ahead
     result = []
     num.times do
-      if (line = read_line direct)
+      if (line = direct ? shift : read_line)
         result << line
       else
         @lineno -= 1 if direct
@@ -217,15 +217,11 @@ class Reader
 
   # Public: Get the next line of source data. Consumes the line returned.
   #
-  # direct  - A Boolean flag to bypasses the check for more lines and immediately
-  #           returns the first element of the internal @lines Array. (default: false)
-  #
   # Returns the String of the next line of the source data if data is present.
   # Returns nothing if there is no more data.
-  def read_line direct = false
-    if direct || @look_ahead > 0 || has_more_lines?
-      shift
-    end
+  def read_line
+    # has_more_lines? triggers preprocessor
+    shift if @look_ahead > 0 || has_more_lines?
   end
 
   # Public: Get the remaining lines of source data.
@@ -238,6 +234,7 @@ class Reader
   # Returns the lines read as a String Array
   def read_lines
     lines = []
+    # has_more_lines? triggers preprocessor
     while has_more_lines?
       lines << shift
     end
@@ -256,12 +253,9 @@ class Reader
 
   # Public: Advance to the next line by discarding the line at the front of the stack
   #
-  # direct  - A Boolean flag to bypasses the check for more lines and immediately
-  #           returns the first element of the internal @lines Array. (default: true)
-  #
   # Returns a Boolean indicating whether there was a line to discard.
-  def advance direct = true
-    !!read_line(direct)
+  def advance
+    shift ? true : false
   end
 
   # Public: Push the String line onto the beginning of the Array of source data.
