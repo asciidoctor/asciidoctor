@@ -710,16 +710,8 @@ class Parser
 
       # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
       else
+        # NOTE we only get here if there's at least one line that's not a line comment
         lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => true
-
-        # NOTE we need this logic because we've asked the reader to skip
-        # line comments, which may leave us w/ an empty buffer if those
-        # were the only lines found
-        if in_list && lines.empty?
-          # call advance since the reader preserved the last line
-          reader.advance
-          return
-        end
 
         # NOTE don't check indented here since it's extremely rare
         #if text_only || indented
