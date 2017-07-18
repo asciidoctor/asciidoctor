@@ -477,7 +477,7 @@ class Reader
           line_restored = true
         end
       else
-        unless skip_comments && (line.start_with? '//') && (CommentLineRx.match? line)
+        unless skip_comments && (line.start_with? '//') && !(line.start_with? '///')
           result << line
           line_read = true
         end

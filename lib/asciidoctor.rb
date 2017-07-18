@@ -609,15 +609,15 @@ module Asciidoctor
     #   This is a block comment.
     #   It can span one or more lines.
     #   ////
-    CommentBlockRx = %r(^/{4,}$)
+    #CommentBlockRx = %r(^/{4,}$)
 
     # Matches a comment line.
     #
     # Examples
     #
-    #   // an then whatever
+    #   // note to author
     #
-    CommentLineRx = %r(^//(?=[^/]|$))
+    #CommentLineRx = %r(^//(?=[^/]|$))
 
     ## Section titles
 
