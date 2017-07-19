@@ -371,7 +371,7 @@ class Parser
         end
       end
 
-      reader.skip_blank_lines
+      reader.skip_blank_lines || break
     end
 
     if part
@@ -425,11 +425,8 @@ class Parser
   # Returns a Block object built from the parsed content of the processed
   # lines, or nothing if no block is found.
   def self.next_block(reader, parent, attributes = {}, options = {})
-    # Skip ahead to the block content
-    skipped = reader.skip_blank_lines
-
-    # bail if we've reached the end of the parent block or document
-    return unless reader.has_more_lines?
+    # skip ahead to the block content; bail if we've reached the end of the reader
+    return unless (skipped = reader.skip_blank_lines)
 
     # check for option to find list item text only
     # if skipped a line, assume a list continuation was
@@ -445,11 +442,10 @@ class Parser
       # read lines until there are no more metadata lines to read
       while parse_block_metadata_line reader, document, attributes, options
         # discard the line just processed
-        advanced = reader.advance
-        reader.skip_blank_lines
+        reader.shift
+        # QUESTION should we clear the attributes? no known cases when it's necessary
+        reader.skip_blank_lines || return
       end
-      # QUESTION should we clear the attributes? no known cases when it's necessary
-      return if advanced && reader.empty?
     end
 
     if (extensions = document.extensions)
@@ -1145,7 +1141,7 @@ class Parser
       list_block << list_item if list_item
       list_item = nil
 
-      reader.skip_blank_lines
+      reader.skip_blank_lines || break
     end
 
     list_block
@@ -1450,10 +1446,10 @@ class Parser
         elsif prev_line && prev_line.empty?
           # advance to the next line of content
           if this_line.empty?
-            reader.skip_blank_lines
-            this_line = reader.read_line
-            # stop reading if we hit eof or a sibling list item
-            break unless this_line && !is_sibling_list_item?(this_line, list_type, sibling_trait)
+            # stop reading if we reach eof
+            break unless (this_line = reader.skip_blank_lines && reader.read_line)
+            # stop reading if we hit a sibling list item
+            break if is_sibling_list_item? this_line, list_type, sibling_trait
           end
 
           if this_line == LIST_CONTINUATION
@@ -1969,7 +1965,7 @@ class Parser
     while parse_block_metadata_line reader, document, attributes, options
       # discard the line just processed
       reader.shift
-      reader.skip_blank_lines
+      reader.skip_blank_lines || break
     end
     attributes
   end
@@ -2253,11 +2249,11 @@ class Parser
       explicit_colspecs = true
     end
 
-    skipped = table_reader.skip_blank_lines
-
+    skipped = table_reader.skip_blank_lines || 0
     parser_ctx = Table::ParserContext.new table_reader, table, attributes
     format, loop_idx, implicit_header_boundary = parser_ctx.format, -1, nil
     implicit_header = true unless skipped > 0 || (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
+
     while (line = table_reader.read_line)
       if (loop_idx += 1) > 0 && line.empty?
         line = nil
@@ -2348,11 +2344,11 @@ class Parser
         end
       end
 
-      table_reader.skip_blank_lines unless parser_ctx.cell_open?
-
-      unless table_reader.has_more_lines?
-        # NOTE may have already closed cell in csv or dsv table (see previous call to parser_ctx.close_cell(true))
-        parser_ctx.close_cell true if parser_ctx.cell_open?
+      # NOTE cell may already be closed if table format is csv or dsv
+      if parser_ctx.cell_open?
+        parser_ctx.close_cell true unless table_reader.has_more_lines?
+      else
+        table_reader.skip_blank_lines || break
       end
     end
 
