@@ -1434,6 +1434,21 @@ more info...
       assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revremark"][text() = "See changelog."]', output, 1
     end
 
+    test 'should parse revision line if date is empty' do
+      input = <<-EOS
+= Document Title
+Author Name
+v1.0.0,:remark
+
+content
+      EOS
+
+      doc = document_from_string input
+      assert_equal '1.0.0', doc.attributes['revnumber']
+      assert_nil doc.attributes['revdate']
+      assert_equal 'remark', doc.attributes['revremark']
+    end
+
     test 'should include revision history if revdate and revnumber is set' do
       input = <<-EOS
 = Document Title
