@@ -1244,6 +1244,40 @@ endif::asciidoctor[]
         assert_equal 2, reader.lineno
       end
 
+      test 'peek_lines should preprocess lines if direct is false' do
+        input = <<-EOS
+The Asciidoctor
+ifdef::asciidoctor[is in.]
+        EOS
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        result = reader.peek_lines 2, false
+        assert_equal ['The Asciidoctor', 'is in.'], result
+      end
+
+      test 'peek_lines should not preprocess lines if direct is true' do
+        input = <<-EOS
+The Asciidoctor
+ifdef::asciidoctor[is in.]
+        EOS
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        result = reader.peek_lines 2, true
+        assert_equal ['The Asciidoctor', 'ifdef::asciidoctor[is in.]'], result
+      end
+
+      test 'peek_lines should not prevent subsequent preprocessing of peeked lines' do
+        input = <<-EOS
+The Asciidoctor
+ifdef::asciidoctor[is in.]
+        EOS
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        result = reader.peek_lines 2, true
+        result = reader.peek_lines 2, false
+        assert_equal ['The Asciidoctor', 'is in.'], result
+      end
+
       test 'process_line returns line if cursor not advanced' do
         input = <<-EOS
 content
