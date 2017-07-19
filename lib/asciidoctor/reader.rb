@@ -195,7 +195,7 @@ class Reader
   #
   # Returns A String Array of the next multiple lines of source data, or an empty Array
   # if there are no more lines in this Reader.
-  def peek_lines num = 1, direct = true
+  def peek_lines num, direct = false
     old_look_ahead = @look_ahead
     result = []
     num.times do

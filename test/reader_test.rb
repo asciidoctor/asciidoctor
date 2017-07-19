@@ -90,7 +90,7 @@ third line
       end
 
       test 'peek_lines should return empty Array with empty data' do
-        assert_equal [], Asciidoctor::Reader.new.peek_lines
+        assert_equal [], Asciidoctor::Reader.new.peek_lines(1)
       end
 
       test 'read_line should return nil with empty data' do
