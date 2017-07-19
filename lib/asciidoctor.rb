@@ -434,7 +434,7 @@ module Asciidoctor
     #   v1.0, 2013-01-01: Ring in the new year release
     #   1.0, Jan 01, 2013
     #
-    RevisionInfoLineRx = /^(?:\D*(.*?),)?(?: *(?!:)(.*?))(?: *(?!^): *(.*))?$/
+    RevisionInfoLineRx = /^(?:\D*(.*?),)? *(?!:)(.*?)(?: *(?!^): *(.*))?$/
 
     # Matches the title and volnum in the manpage doctype.
     #
