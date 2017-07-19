@@ -396,6 +396,17 @@ My Section
       assert_includes result, '----^^----'
     end
 
+    test 'should preprocess second line of setext section title' do
+      input = <<-EOS
+Section Title
+ifdef::asciidoctor[]
+-------------
+endif::[]
+      EOS
+      result = render_embedded_string input
+      assert_xpath '//h2', result, 1
+    end
+
     test "heading title with multiline syntax cannot begin with a dot" do
       title = ".My Title"
       chars = "-" * title.length
