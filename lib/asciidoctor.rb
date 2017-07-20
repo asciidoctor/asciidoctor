@@ -654,14 +654,14 @@ module Asciidoctor
     # NOTE uppercase chars are not included since the expression is used on a lowercased string
     InvalidSectionIdCharsRx = /&(?:[a-z][a-z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-f][\da-f][\da-f]{0,3});|[^#{CC_WORD}]+?/
 
-    # Matches the block style used to designate a section title as a floating title.
+    # Matches the block style used to designate a discrete (aka free-floating) heading.
     #
     # Examples
     #
-    #   [float]
-    #   = Floating Title
+    #   [discrete]
+    #   = Discrete Heading
     #
-    FloatingTitleStyleRx = /^(?:float|discrete)\b/
+    DiscreteHeadingStyleRx = /^(?:discrete|float)\b/
 
     ## Lists
 

@@ -734,8 +734,8 @@ class Parser
             lines.pop while lines[-1].empty?
           end
           attributes['style'] = 'quote'
-          # NOTE will only detect headings that are floating titles (not section titles)
-          # TODO could assume a floating title when inside a block context
+          # NOTE will only detect discrete (aka free-floating) headings
+          # TODO could assume a discrete heading when inside a block context
           # FIXME Reader needs to be created w/ line info
           block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
         elsif ch0 == '"' && lines.size > 1 && (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
@@ -1606,7 +1606,7 @@ class Parser
   #
   # Returns the Integer section level if the Reader is positioned at a section title or nil otherwise
   def self.is_next_line_section?(reader, attributes)
-    if attributes.key?(1) && (attr1 = attributes[1] || '').start_with?('float', 'discrete') && FloatingTitleStyleRx.match?(attr1)
+    if (style = attributes[1]) && (style.start_with? 'discrete', 'float') && (DiscreteHeadingStyleRx.match? style)
       return
     elsif reader.has_more_lines?
       Compliance.underline_style_section_titles ? is_section_title?(*reader.peek_lines(2, true)) : is_single_line_section_title?(reader.peek_line)
