@@ -1296,7 +1296,7 @@ class Parser
     end
 
     # first skip the line with the marker / term
-    reader.advance
+    reader.shift
     list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), reader.cursor
     if list_item_reader.has_more_lines?
       # NOTE peek on the other side of any comment lines
@@ -1716,7 +1716,7 @@ class Parser
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
         sect_title, sect_id, sect_reftext = (sect_title.slice 0, sect_title.length - $&.length), $2, $3
       end
-      reader.advance
+      reader.shift
     else
       raise %(Unrecognized section at #{reader.prev_line_info})
     end
@@ -1968,7 +1968,7 @@ class Parser
   def self.parse_block_metadata_lines reader, document, attributes = {}, options = {}
     while parse_block_metadata_line reader, document, attributes, options
       # discard the line just processed
-      reader.advance
+      reader.shift
       reader.skip_blank_lines
     end
     attributes
@@ -2041,7 +2041,7 @@ class Parser
     reader.skip_comment_lines
     while process_attribute_entry reader, document, attributes
       # discard line just processed
-      reader.advance
+      reader.shift
       reader.skip_comment_lines
     end
   end

@@ -298,7 +298,7 @@ class Reader
   #
   # Returns nothing.
   def replace_next_line replacement
-    advance
+    shift
     unshift replacement
     nil
   end
@@ -326,7 +326,7 @@ class Reader
     # optimized code for shortest execution path
     while (next_line = peek_line)
       if next_line.empty?
-        advance
+        shift
         num_skipped += 1
       else
         return num_skipped
@@ -434,7 +434,7 @@ class Reader
   #   => ["First line", "Second line"]
   def read_lines_until options = {}
     result = []
-    advance if options[:skip_first_line]
+    shift if options[:skip_first_line]
     if @process_lines && options[:skip_processing]
       @process_lines = false
       restore_process_lines = true
@@ -495,6 +495,7 @@ class Reader
   #
   # This method can be used directly when you've already called peek_line
   # and determined that you do, in fact, want to pluck that line off the stack.
+  # Use read_line if the line hasn't (or many not have been) visited yet.
   #
   # Returns The String line at the top of the stack
   def shift
@@ -620,7 +621,7 @@ class PreprocessorReader < Reader
           line[1..-1]
         elsif preprocess_conditional_directive $2, $3, $4, $5
           # move the pointer past the conditional line
-          advance
+          shift
           # treat next line as uncharted territory
           nil
         else
@@ -630,7 +631,7 @@ class PreprocessorReader < Reader
           line
         end
       elsif @skipping
-        advance
+        shift
         nil
       elsif (line.start_with? 'inc', '\\inc') && IncludeDirectiveRx =~ line
         # if escaped, mark as processed and return line unescaped
@@ -654,7 +655,7 @@ class PreprocessorReader < Reader
         line
       end
     elsif @skipping
-      advance
+      shift
       nil
     else
       # NOTE optimization to inline super
@@ -825,13 +826,13 @@ class PreprocessorReader < Reader
   def preprocess_include_directive raw_target, raw_attributes
     if ((target = raw_target).include? '{') &&
         (target = @document.sub_attributes raw_target, :attribute_missing => 'drop-line').empty?
-      advance
+      shift
       if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
         unshift %(Unresolved directive in #{@path} - include::#{raw_target}[#{raw_attributes}])
       end
       true
     elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? target })
-      advance
+      shift
       # FIXME parse attributes only if requested by extension
       ext.process_method[@document, self, target, AttributeList.new(raw_attributes).parse]
       true
@@ -949,7 +950,7 @@ class PreprocessorReader < Reader
           replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
-        advance
+        shift
         # FIXME not accounting for skipped lines in reader line numbering
         push_include inc_lines, inc_path, relpath, inc_offset, attributes if inc_offset
       elsif inc_tags
@@ -1012,14 +1013,14 @@ class PreprocessorReader < Reader
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
           warn %(asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path})
         end
-        advance
+        shift
         # FIXME not accounting for skipped lines in reader line numbering
         push_include inc_lines, inc_path, relpath, inc_offset, attributes if inc_offset
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
           inc_content = target_type == :file ? (::IO.read inc_path) : open(inc_path, 'r') {|f| f.read }
-          advance
+          shift
           push_include inc_content, inc_path, relpath, 1, attributes
         rescue
           warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{inc_path})
