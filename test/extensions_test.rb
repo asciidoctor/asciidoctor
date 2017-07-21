@@ -933,7 +933,7 @@ target="target", attributes=[]
       begin
         Asciidoctor::Extensions.register do
           block do
-            named :skip
+            named :skipme
             on_context :paragraph
             parses_content_as :raw
             process do |parent, reader, attrs|
@@ -943,7 +943,7 @@ target="target", attributes=[]
         end
         input = <<-EOS
 .unused title
-[skip]
+[skipme]
 not rendered
 
 --
@@ -951,6 +951,38 @@ rendered
 --
         EOS
         doc = document_from_string input
+        assert_equal 1, doc.blocks.size
+        assert_nil doc.blocks[0].attributes['title']
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should not invoke process method or carry over attributes if block processor declares skip content model' do
+      begin
+        process_method_called = false
+        Asciidoctor::Extensions.register do
+          block do
+            named :ignore
+            on_context :paragraph
+            parses_content_as :skip
+            process do |parent, reader, attrs|
+              process_method_called = true
+              nil
+            end
+          end
+        end
+        input = <<-EOS
+.unused title
+[ignore]
+not rendered
+
+--
+rendered
+--
+        EOS
+        doc = document_from_string input
+        refute process_method_called
         assert_equal 1, doc.blocks.size
         assert_nil doc.blocks[0].attributes['title']
       ensure

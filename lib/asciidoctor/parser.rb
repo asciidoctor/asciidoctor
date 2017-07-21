@@ -770,6 +770,7 @@ class Parser
 
       when :comment
         build_block(block_context, :skip, terminator, parent, reader, attributes)
+        attributes.clear
         return
 
       when :example
@@ -866,7 +867,7 @@ class Parser
             attributes['cloaked-context'] = cloaked_context
           end
           block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
-          unless block && content_model != :skip
+          unless block
             attributes.clear
             return
           end
@@ -1028,18 +1029,15 @@ class Parser
       block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing), reader.cursor
     end
 
-    if content_model == :skip
-      attributes.clear
-      # FIXME we shouldn't be mixing return types
-      return lines
-    end
-
     if content_model == :verbatim
       if (indent = attributes['indent'])
         adjust_indentation! lines, indent, (attributes['tabsize'] || parent.document.attributes['tabsize'])
       elsif (tab_size = (attributes['tabsize'] || parent.document.attributes['tabsize']).to_i) > 0
         adjust_indentation! lines, nil, tab_size
       end
+    elsif content_model == :skip
+      # QUESTION should we still invoke process method if extension is specified?
+      return
     end
 
     if (extension = options[:extension])
@@ -1055,7 +1053,6 @@ class Parser
           block_reader = Reader.new lines
         end
       else
-        # FIXME need a test to verify this returns nil at the right time
         return
       end
     else
