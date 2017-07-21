@@ -1425,7 +1425,7 @@ module Extensions
       unless args.empty?
         raise ::ArgumentError, %(Wrong number of arguments (#{argc} for 1..2))
       end
-      groups[name] = resolved_group
+      groups[name.to_sym] = resolved_group
     end
 
     # Public: Unregister all statically-registered extension groups.
