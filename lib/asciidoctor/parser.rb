@@ -996,14 +996,11 @@ class Parser
   # NOTE could invoke filter in here, before and after parsing
   def self.build_block(block_context, content_model, terminator, parent, reader, attributes, options = {})
     if content_model == :skip
-      skip_processing = true
-      parse_as_content_model = :simple
+      skip_processing, parse_as_content_model = true, :simple
     elsif content_model == :raw
-      skip_processing = false
-      parse_as_content_model = :simple
+      skip_processing, parse_as_content_model = false, :simple
     else
-      skip_processing = false
-      parse_as_content_model = content_model
+      skip_processing, parse_as_content_model = false, content_model
     end
 
     if terminator.nil?
