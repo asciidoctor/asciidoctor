@@ -139,6 +139,7 @@ desc 'Trigger builds for all dependent projects on Travis CI'
       asciidoctor/asciidoctor.js
       asciidoctor/asciidoctorj
       asciidoctor/asciidoctorj/asciidoctorj-1.6.0
+      asciidoctor/asciidoctor-diagram
     ).each do |project|
       org, name, branch = project.split '/', 3
       branch ||= 'master'
