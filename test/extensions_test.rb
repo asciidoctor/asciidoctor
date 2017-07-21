@@ -228,11 +228,22 @@ context 'Extensions' do
 
     test 'should register extension block' do
       begin
-        Asciidoctor::Extensions.register(:sample) do
+        Asciidoctor::Extensions.register :sample do
         end
         refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
         assert Asciidoctor::Extensions.groups[:sample].is_a? Proc
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should coerce group name to symbol when registering' do
+      begin
+        Asciidoctor::Extensions.register 'sample', SampleExtensionGroup
+        refute_nil Asciidoctor::Extensions.groups
+        assert_equal 1, Asciidoctor::Extensions.groups.size
+        assert_equal SampleExtensionGroup, Asciidoctor::Extensions.groups[:sample]
       ensure
         Asciidoctor::Extensions.unregister_all
       end
