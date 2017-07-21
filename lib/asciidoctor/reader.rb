@@ -305,22 +305,21 @@ class Reader
   # deprecated
   alias replace_line replace_next_line
 
-  # Public: Strip off leading blank lines in the Array of lines.
+  # Public: Skip blank lines at the cursor.
   #
   # Examples
   #
-  #   @lines
+  #   reader.lines
   #   => ["", "", "Foo", "Bar", ""]
-  #
-  #   skip_blank_lines
+  #   reader.skip_blank_lines
   #   => 2
-  #
-  #   @lines
+  #   reader.lines
   #   => ["Foo", "Bar", ""]
   #
-  # Returns an Integer of the number of lines skipped
+  # Returns the [Integer] number of lines skipped or nothing if all lines have
+  # been consumed (even if lines were skipped by this method).
   def skip_blank_lines
-    return 0 if empty?
+    return if empty?
 
     num_skipped = 0
     # optimized code for shortest execution path
@@ -332,8 +331,6 @@ class Reader
         return num_skipped
       end
     end
-
-    num_skipped
   end
 
   # Public: Skip consecutive lines containing line comments and return them.
