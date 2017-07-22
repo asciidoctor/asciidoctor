@@ -671,6 +671,18 @@ not in section
       assert doc.catalog[:ids].has_key?('_independent_heading')
     end
 
+    test 'should preprocess second line of setext floating title' do
+      input = <<-EOS
+[discrete]
+Heading Title
+ifdef::asciidoctor[]
+-------------
+endif::[]
+      EOS
+      result = render_embedded_string input
+      assert_xpath '//h2', result, 1
+    end
+
     test 'can assign explicit id to floating title' do
       input = <<-EOS
 [[unchained]]

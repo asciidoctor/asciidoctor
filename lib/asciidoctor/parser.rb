@@ -649,7 +649,7 @@ class Parser
         break
 
       elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
-          (is_section_title? this_line, (reader.peek_line true)) : !indented && (is_section_title? this_line))
+          (is_section_title? this_line, reader.peek_line) : !indented && (is_single_line_section_title? this_line))
         reader.unshift_line this_line
         float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
         attributes['reftext'] = float_reftext if float_reftext
@@ -1600,7 +1600,7 @@ class Parser
       return
     elsif reader.has_more_lines?
       Compliance.underline_style_section_titles ?
-          is_section_title?(*reader.peek_lines(2, style ? style == 'comment' : false)) :
+          is_section_title?(*reader.peek_lines(2, style && style == 'comment')) :
           is_single_line_section_title?(reader.peek_line)
     end
   end
