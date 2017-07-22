@@ -301,7 +301,7 @@ preamble
       assert_xpath '//h1', render_string(title + "\n" + chars), 0
     end
 
-    test "document title with single-line syntax" do
+    test "document title with atx syntax" do
       assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title")
     end
 
@@ -385,7 +385,7 @@ content
       assert_xpath "//h2[@id='_my_section'][text() = 'My Section']", render_string("My Section\n-----------")
     end
 
-    test 'should not recognize underline containing a mix of characters' do
+    test 'should not recognize underline containing a mix of characters as setext section title' do
       input = <<-EOS
 My Section
 ----^^----
@@ -413,15 +413,15 @@ endif::[]
       assert_xpath '//h2', render_string(title + "\n" + chars), 0
     end
 
-    test "with single-line syntax" do
+    test "with atx syntax" do
       assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", render_string("== My Title")
     end
 
-    test "with single-line symmetric syntax" do
+    test "with atx symmetric syntax" do
       assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", render_string("== My Title ==")
     end
 
-    test "with single-line non-matching symmetric syntax" do
+    test "with atx non-matching symmetric syntax" do
       assert_xpath "//h2[@id='_my_title'][text() = 'My Title ===']", render_string("== My Title ===")
     end
 
@@ -492,7 +492,7 @@ content
       assert_xpath "//h3[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n~~~~~~~~~~~")
     end
 
-    test "with single line syntax" do
+    test "with atx line syntax" do
       assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n=== My Title")
     end
   end
@@ -502,7 +502,7 @@ content
       assert_xpath "//h4[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n^^^^^^^^^^")
     end
 
-    test "with single line syntax" do
+    test "with atx line syntax" do
       assert_xpath "//h4[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n==== My Title")
     end
   end
@@ -512,19 +512,19 @@ content
       assert_xpath "//h5[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n++++++++++")
     end
 
-    test "with single line syntax" do
+    test "with atx line syntax" do
       assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n===== My Title")
     end
   end
 
   context "level 5" do
-    test "with single line syntax" do
+    test "with atx line syntax" do
       assert_xpath "//h6[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n====== My Title")
     end
   end
 
   context 'Markdown-style headings' do
-    test 'single-line document title with leading marker' do
+    test 'atx document title with leading marker' do
       input = <<-EOS
 # Document Title
       EOS
@@ -532,7 +532,7 @@ content
       assert_xpath "//h1[not(@id)][text() = 'Document Title']", output, 1
     end
 
-    test 'single-line document title with symmetric markers' do
+    test 'atx document title with symmetric markers' do
       input = <<-EOS
 # Document Title #
       EOS
@@ -540,7 +540,7 @@ content
       assert_xpath "//h1[not(@id)][text() = 'Document Title']", output, 1
     end
 
-    test 'single-line section title with leading marker' do
+    test 'atx section title with leading marker' do
       input = <<-EOS
 ## Section One
 
@@ -550,7 +550,7 @@ blah blah
       assert_xpath "//h2[@id='_section_one'][text() = 'Section One']", output, 1
     end
 
-    test 'single-line section title with symmetric markers' do
+    test 'atx section title with symmetric markers' do
       input = <<-EOS
 ## Section One ##
 
@@ -560,7 +560,7 @@ blah blah
       assert_xpath "//h2[@id='_section_one'][text() = 'Section One']", output, 1
     end
 
-    test 'should not match mixed single-line syntax' do
+    test 'should not match atx syntax with mixed markers' do
       input = <<-EOS
 =#= My Title
       EOS
