@@ -570,8 +570,8 @@ blah blah
     end
   end
 
-  context 'Floating Title' do
-    test 'should create floating title if style is float' do
+  context 'Discrete Heading' do
+    test 'should create discrete heading instead of section if style is float' do
       input = <<-EOS
 [float]
 = Independent Heading!
@@ -588,7 +588,7 @@ not in section
       assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
     end
 
-    test 'should create floating title if style is discrete' do
+    test 'should create discrete heading instead of section if style is discrete' do
       input = <<-EOS
 [discrete]
 === Independent Heading!
@@ -606,7 +606,7 @@ not in section
       assert_xpath '/h3/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
     end
 
-    test 'should generate id for floating title from converted title' do
+    test 'should generate id for discrete heading from converted title' do
       input = <<-EOS
 [discrete]
 === {sp}Heading{sp}
@@ -620,7 +620,7 @@ not in section
       assert_xpath '/h3[@class="discrete"][@id="_heading"][text()=" Heading "]', output, 1
     end
 
-    test 'should create floating title if style is float with shorthand role and id' do
+    test 'should create discrete heading if style is float with shorthand role and id' do
       input = <<-EOS
 [float.independent#first]
 = Independent Heading!
@@ -637,7 +637,7 @@ not in section
       assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
     end
 
-    test 'should create floating title if style is discrete with shorthand role and id' do
+    test 'should create discrete heading if style is discrete with shorthand role and id' do
       input = <<-EOS
 [discrete.independent#first]
 = Independent Heading!
@@ -654,7 +654,7 @@ not in section
       assert_xpath '/h1/following-sibling::*[@class="paragraph"]/p[text()="not in section"]', output, 1
     end
 
-    test 'floating title should be a block with context floating_title' do
+    test 'discrete heading should be a block with context floating_title' do
       input = <<-EOS
 [float]
 === Independent Heading!
@@ -663,15 +663,27 @@ not in section
       EOS
 
       doc = document_from_string input
-      floatingtitle = doc.blocks.first
-      assert floatingtitle.is_a?(Asciidoctor::Block)
-      assert floatingtitle.context != :section
-      assert_equal :floating_title, floatingtitle.context
-      assert_equal '_independent_heading', floatingtitle.id
+      heading = doc.blocks.first
+      assert heading.is_a?(Asciidoctor::Block)
+      assert heading.context != :section
+      assert_equal :floating_title, heading.context
+      assert_equal '_independent_heading', heading.id
       assert doc.catalog[:ids].has_key?('_independent_heading')
     end
 
-    test 'can assign explicit id to floating title' do
+    test 'should preprocess second line of setext discrete heading' do
+      input = <<-EOS
+[discrete]
+Heading Title
+ifdef::asciidoctor[]
+-------------
+endif::[]
+      EOS
+      result = render_embedded_string input
+      assert_xpath '//h2', result, 1
+    end
+
+    test 'can assign explicit id to discrete heading' do
       input = <<-EOS
 [[unchained]]
 [float]
@@ -681,12 +693,12 @@ not in section
       EOS
 
       doc = document_from_string input
-      floating_title = doc.blocks.first
-      assert_equal 'unchained', floating_title.id
+      heading = doc.blocks.first
+      assert_equal 'unchained', heading.id
       assert doc.catalog[:ids].has_key?('unchained')
     end
 
-    test 'should not include floating title in toc' do
+    test 'should not include discrete heading in toc' do
       input = <<-EOS
 :toc:
 
@@ -704,7 +716,7 @@ not in section
       assert_xpath %(//*[@id="toc"]//a[text()="Miss Independent"]), output, 0
     end
 
-    test 'should not set id on floating title if sectids attribute is unset' do
+    test 'should not set id on discrete heading if sectids attribute is unset' do
       input = <<-EOS
 [float]
 === Independent Heading!
@@ -718,7 +730,7 @@ not in section
       assert_xpath '/h3[@class="float"]', output, 1
     end
 
-    test 'should use explicit id for floating title if specified' do
+    test 'should use explicit id for discrete heading if specified' do
       input = <<-EOS
 [[free]]
 [float]
@@ -733,7 +745,7 @@ not in section
       assert_xpath '/h2[@class="float"]', output, 1
     end
 
-    test 'should add role to class attribute on floating title' do
+    test 'should add role to class attribute on discrete heading' do
       input = <<-EOS
 [float, role="isolated"]
 == Independent Heading!
@@ -860,7 +872,7 @@ Master section text.
       assert_xpath '//*[@class="sect1"]/h2[text() = "Section in Master"]', output, 1
     end
 
-    test 'level offset should be added to floating title' do
+    test 'level offset should be added to discrete heading' do
       input = <<-EOS
 = Master Document
 Doc Writer
@@ -868,11 +880,11 @@ Doc Writer
 :leveloffset: 1
 
 [float]
-= Floating Title
+= Discrete Heading
       EOS
 
       output = render_string input
-      assert_xpath '//h2[@class="float"][text() = "Floating Title"]', output, 1
+      assert_xpath '//h2[@class="float"][text() = "Discrete Heading"]', output, 1
     end
 
     test 'should be able to reset level offset' do
