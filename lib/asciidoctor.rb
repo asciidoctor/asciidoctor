@@ -278,9 +278,9 @@ module Asciidoctor
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'].to_set
 
-  ADMONITION_STYLE_LEADERS = ['N', 'T', 'I', 'W', 'C'].to_set
+  ADMONITION_STYLE_HEADS = ['N', 'T', 'I', 'W', 'C'].to_set
 
-  CALLOUT_LIST_LEADERS = ['<', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].to_set
+  CALLOUT_LIST_HEADS = ['<', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].to_set
 
   PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro'].to_set
 
@@ -303,7 +303,7 @@ module Asciidoctor
     '```'  => [:fenced_code, ::Set.new]
   }
 
-  DELIMITED_BLOCK_LEADERS = DELIMITED_BLOCKS.keys.map {|key| key.slice 0, 2 }.to_set
+  DELIMITED_BLOCK_HEADS = DELIMITED_BLOCKS.keys.map {|key| key.slice 0, 2 }.to_set
 
   LAYOUT_BREAK_CHARS = {
     '\'' => :thematic_break,

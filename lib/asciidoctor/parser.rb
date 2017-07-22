@@ -589,7 +589,7 @@ class Parser
       end
 
       # haven't found anything yet, continue
-      if !indented && CALLOUT_LIST_LEADERS.include?(ch0 ||= this_line.chr) &&
+      if !indented && CALLOUT_LIST_HEADS.include?(ch0 ||= this_line.chr) &&
           (CalloutListSniffRx.match? this_line) && (match = CalloutListRx.match this_line)
         block = List.new(parent, :colist)
         attributes['style'] = 'arabic'
@@ -716,7 +716,7 @@ class Parser
           # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
           adjust_indentation! lines if indented && style == 'normal'
           block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
-        elsif (ADMONITION_STYLE_LEADERS.include? ch0) && (this_line.include? ':') && (AdmonitionParagraphRx =~ this_line)
+        elsif (ADMONITION_STYLE_HEADS.include? ch0) && (this_line.include? ':') && (AdmonitionParagraphRx =~ this_line)
           lines[0] = $' # string after match
           attributes['name'] = admonition_name = (attributes['style'] = $1).downcase
           attributes['textlabel'] = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
@@ -926,7 +926,7 @@ class Parser
   # returns the match data if this line is the first line of a delimited block or nil if not
   def self.is_delimited_block? line, return_match_data = false
     # highly optimized for best performance
-    return unless (line_len = line.length) > 1 && DELIMITED_BLOCK_LEADERS.include?(line.slice 0, 2)
+    return unless (line_len = line.length) > 1 && DELIMITED_BLOCK_HEADS.include?(line.slice 0, 2)
     # catches open block
     if line_len == 2
       tip = line
