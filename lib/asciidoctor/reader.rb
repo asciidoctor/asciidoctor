@@ -821,7 +821,7 @@ class PreprocessorReader < Reader
   #
   # Returns a Boolean indicating whether the line under the cursor has changed.
   def preprocess_include_directive raw_target, raw_attributes
-    if ((target = raw_target).include? '{') &&
+    if ((target = raw_target).include? ATTR_REF_HEAD) &&
         (target = @document.sub_attributes raw_target, :attribute_missing => 'drop-line').empty?
       shift
       if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
@@ -1202,7 +1202,7 @@ class PreprocessorReader < Reader
 
     # QUESTION should we substitute first?
     # QUESTION should we also require string to be single quoted (like block attribute values?)
-    val = @document.sub_attributes val, :attribute_missing => 'drop' if val.include? '{'
+    val = @document.sub_attributes val, :attribute_missing => 'drop' if val.include? ATTR_REF_HEAD
 
     if quoted
       val

@@ -119,7 +119,7 @@ module Substitutors
       when :quotes
         text = sub_quotes text
       when :attributes
-        text = sub_attributes(text.split LF, -1) * LF if text.include? '{'
+        text = sub_attributes(text.split LF, -1) * LF if text.include? ATTR_REF_HEAD
       when :replacements
         text = sub_replacements text
       when :macros
@@ -506,7 +506,7 @@ module Substitutors
             $&
           end
         end
-      } if line.include? '{'
+      } if line.include? ATTR_REF_HEAD
 
       result << line unless reject || (reject_if_empty && line.empty?)
     end
@@ -651,7 +651,7 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if (captured = m[0]).start_with? RS
+        if (captured = $&).start_with? RS
           next captured[1..-1]
         end
 
@@ -660,7 +660,10 @@ module Substitutors
         else
           type, posattrs = 'image', ['alt', 'width', 'height']
         end
-        target = m[1]
+        if (target = m[1]).include? ATTR_REF_HEAD
+          # TODO remove this special case once titles use normal substitution order
+          target = sub_attributes target
+        end
         @document.register(:images, target) unless type == 'icon'
         attrs = parse_attributes(m[2], posattrs, :unescape_input => true)
         attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
@@ -1132,7 +1135,7 @@ module Substitutors
   # Returns a Hash of attributes (role and id only)
   def parse_quoted_text_attributes str
     # NOTE attributes are typically resolved after quoted text, so substitute eagerly
-    str = sub_attributes str if str.include? '{'
+    str = sub_attributes str if str.include? ATTR_REF_HEAD
     # for compliance, only consider first positional attribute
     str = str.slice 0, (str.index ',') if str.include? ','
 
@@ -1175,7 +1178,7 @@ module Substitutors
   def parse_attributes(attrline, posattrs = ['role'], opts = {})
     return unless attrline
     return {} if attrline.empty?
-    attrline = @document.sub_attributes(attrline) if opts[:sub_input] && (attrline.include? '{')
+    attrline = @document.sub_attributes(attrline) if opts[:sub_input] && (attrline.include? ATTR_REF_HEAD)
     attrline = unescape_bracketed_text(attrline) if opts[:unescape_input]
     # substitutions are only performed on attribute values if block is not nil
     block = opts.fetch(:sub_result, true) ? self : nil
