@@ -192,9 +192,9 @@ module Substitutors
       if (boundary = m[4]) # $$, ++, or +++
         # skip ++ in compat mode, handled as normal quoted text
         if compat_mode && boundary == '++'
-          next m[2].nil_or_empty? ?
-              %(#{m[1]}#{m[3]}++#{extract_passthroughs m[5]}++) :
-              %(#{m[1]}[#{m[2]}]#{m[3]}++#{extract_passthroughs m[5]}++)
+          next m[2] ?
+              %(#{m[1]}[#{m[2]}]#{m[3]}++#{extract_passthroughs m[5]}++) :
+              %(#{m[1]}#{m[3]}++#{extract_passthroughs m[5]}++)
         end
 
         attributes = m[2]
@@ -1098,7 +1098,7 @@ module Substitutors
   # Returns The converted String text for the quoted text region
   def convert_quoted_text(match, type, scope)
     if match[0].start_with? RS
-      if scope == :constrained && !(attrs = match[2]).nil_or_empty?
+      if scope == :constrained && (attrs = match[2])
         unescaped_attrs = %([#{attrs}])
       else
         return match[0][1..-1]

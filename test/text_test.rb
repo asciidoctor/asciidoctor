@@ -286,16 +286,18 @@ This line is separated by something that is not a horizontal rule...
       assert_xpath "//code/strong", rendered
     end
 
-    test "unconstrained quotes" do
-      rendered_chars = render_string("**B**__I__++M++", :attributes => {'compat-mode' => ''})
-      assert_xpath "//strong", rendered_chars
-      assert_xpath "//em", rendered_chars
-      assert_xpath "//code", rendered_chars
+    test 'unconstrained quotes' do
+      rendered_chars = render_string('**B**__I__++M++[role]++M++', :attributes => {'compat-mode' => ''})
+      assert_xpath '//strong', rendered_chars, 1
+      assert_xpath '//em', rendered_chars, 1
+      assert_xpath '//code[not(@class)]', rendered_chars, 1
+      assert_xpath '//code[@class="role"]', rendered_chars, 1
 
-      rendered_chars = render_string("**B**__I__``M``")
-      assert_xpath "//strong", rendered_chars
-      assert_xpath "//em", rendered_chars
-      assert_xpath "//code", rendered_chars
+      rendered_chars = render_string('**B**__I__``M``[role]``M``')
+      assert_xpath '//strong', rendered_chars, 1
+      assert_xpath '//em', rendered_chars, 1
+      assert_xpath '//code[not(@class)]', rendered_chars, 1
+      assert_xpath '//code[@class="role"]', rendered_chars, 1
     end
   end
 
