@@ -14,6 +14,58 @@ This document provides a high-level view of the changes introduced in Asciidocto
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
 // tag::compact[]
+== Unreleased
+
+Bug fixes::
+
+  * continue to read blocks inside a delimited block after content is skipped (PR #2318)
+  * don't create an empty paragraph for skipped content inside a delimited block (PR #2319)
+  * allow the subs argument of Substitutors#apply_subs to be nil
+  * coerce group name to symbol when registering extension (#2324)
+  * eagerly substitute attributes in target of inline image macro (#2330)
+  * don't warn if source stylesheet can't be read but destination already exists (#2323)
+  * track include path correctly if path is absolute and outside of base directory (#2107)
+  * preprocess second line of setext section title (PR #2321)
+  * preprocess second line of setext discrete heading (PR #2332)
+  * return filename as relative path if filename doesn't share common root with base directory (#2107)
+
+Improvements / Refactoring::
+
+  * change default text for inter-document xref (PR #2316)
+  * add additional tests to test behavior of Reader#peek_lines
+  * parse revision info line correctly that only has version and remark; add missing test for scenario
+  * rename AtxSectionRx constant to AtxSectionTitleRx for consistency with SetextSectionTitleRx constant
+  * use terms "atx" and "setext" to refer to section title syntax (PR #2334)
+  * rename HybridLayoutBreakRx constant to ExtLayoutBreakRx
+  * change terminology from "floating title" to "discrete heading"
+  * consolidate skip blank lines and check for end of reader (PR #2325)
+  * have Reader#skip_blank_lines report end of file (PR #2325)
+  * don't mix return type of Parser.build_block method (PR #2328)
+  * don't track eof state in reader (PR #2320)
+  * use shift instead of advance to consume line when return value isn't needed (PR #2322)
+  * replace terminology "floating title" with "discrete heading"
+  * remove unnecessary nil_or_empty? checks in substitutor
+  * leverage built-in assert / refute methods in test suite
+
+Build / Infrastructure::
+
+  * config Travis CI job to release gem (PR #2333)
+  * add SHA1 hash to message used for triggered builds
+  * trigger build of AsciidoctorJ on every change to core
+  * trigger build of Asciidoctor Diagram on every change to core
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.1[issues resolved] |
+https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.1[git tag] |
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.6...v1.5.6.1[full diff]
+// end::compact[]
+
 == 1.5.6 (2017-07-12) - @mojavelinux
 
 Enhancements::
@@ -228,7 +280,6 @@ Distribution Packages::
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v1.5.5...v1.5.6[full diff]
-// end::compact[]
 
 == 1.5.5 (2016-10-05) - @mojavelinux
 
