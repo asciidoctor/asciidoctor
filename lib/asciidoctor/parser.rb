@@ -1599,7 +1599,9 @@ class Parser
     if (style = attributes[1]) && (style.start_with? 'discrete', 'float') && (DiscreteHeadingStyleRx.match? style)
       return
     elsif reader.has_more_lines?
-      Compliance.underline_style_section_titles ? is_section_title?(*reader.peek_lines(2, true)) : is_single_line_section_title?(reader.peek_line)
+      Compliance.underline_style_section_titles ?
+          is_section_title?(*reader.peek_lines(2, style ? style == 'comment' : false)) :
+          is_single_line_section_title?(reader.peek_line)
     end
   end
 

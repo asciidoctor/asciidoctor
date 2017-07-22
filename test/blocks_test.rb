@@ -198,9 +198,9 @@ line should not be rendered
       assert_xpath '//p', output, 0
     end
 
-    # WARNING if first line of content is a directive, it will get interpretted before we know it's a comment block
-    # it happens because we always look a line ahead...not sure what we can do about it
-    test 'preprocessor directives should not be processed within comment paragraph' do
+    # WARNING this assertion fails if the directive is the first line of the paragraph instead of the second
+    # it happens because we always look a line ahead; not sure what we can do about it
+    test 'preprocessor directives should not be processed on subsequent lines of a comment paragraph' do
       input = <<-EOS
 [comment]
 first line of content
