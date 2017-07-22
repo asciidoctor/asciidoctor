@@ -3,25 +3,31 @@ git:
   depth: 1
 language: ruby
 rvm:
-  - 2.4.0
-  - 2.3.3
-  - 2.2.6
-  - 2.1.10
-  - 2.0.0
-  - 1.9.3
-  - 1.8.7
-  - jruby-9.0.5.0
-  - jruby-9.1.6.0
-  - jruby-19mode # based on jruby-1.7.19
-  - jruby-18mode # based on jruby-1.7.19
-  #- rbx-3 # NOTE not currently recognized
-#before_install: rvm list known
+- &release_ruby 2.4.0
+- 2.3.3
+- 2.2.6
+- 2.1.10
+- 2.0.0
+- 1.9.3
+- 1.8.7
+- jruby-9.0.5.0
+- jruby-9.1.6.0
+- jruby-19mode # based on jruby-1.7.19
+- jruby-18mode # based on jruby-1.7.19
+#- rbx-3 # NOTE not currently recognized
 env:
   global:
-    # use system libraries to speed up installation of nokogiri
-    - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
+  # use system libraries to speed up installation of nokogiri
+  - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
 script: bundle exec rake coverage test:all
 after_success: bundle exec rake build:dependents
 notifications:
   email: false
   #irc: 'irc.freenode.org#asciidoctor'
+deploy:
+  provider: rubygems
+  on:
+    tags: true
+    rvm: *release_ruby
+  api_key:
+    secure: ID1RBCpwJhdr/QTOmoLC1rTipuV9y1Up7X7JPK3GcwB5CeTOLX8Ny3JX2QfDW8Fb1cC5oDOp6uCuCvxD3CCTxlA0JxMP/FoXcg5JY5gffyTsaod4cn5Eu2dY9rGcYROJ79C+5syAf3pO1iefFx2LwuGwnNjbmnpNmnuWbZ48Mbg=
