@@ -248,6 +248,14 @@ context 'Path Resolver' do
       assert_equal 'part1/chapter1/section1.adoc', @resolver.relative_path(filename, JAIL)
     end
 
+    test 'should calculate relative path' do
+      filename = @resolver.system_path('common/shared/stuff.adoc', nil, JAIL)
+      dir = @resolver.system_path('part1/chapter1', nil, JAIL)
+      assert_equal "#{JAIL}/common/shared/stuff.adoc", filename
+      assert_equal "#{JAIL}/part1/chapter1", dir
+      assert_equal '../../common/shared/stuff.adoc', @resolver.relative_path(filename, dir)
+    end
+
     test 'should resolve relative path relative to base dir in unsafe mode' do
       base_dir = fixture_path 'base'
       doc = empty_document :base_dir => base_dir, :safe => Asciidoctor::SafeMode::UNSAFE
