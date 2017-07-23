@@ -73,7 +73,7 @@ third line
 
     context 'With empty data' do
       test 'has_more_lines? should return false with empty data' do
-        assert !Asciidoctor::Reader.new.has_more_lines?
+        refute Asciidoctor::Reader.new.has_more_lines?
       end
 
       test 'empty? should return true with empty data' do
@@ -112,13 +112,13 @@ third line
 
       test 'empty? should return false if there are lines remaining' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
-        assert !reader.empty?
-        assert !reader.eof?
+        refute reader.empty?
+        refute reader.eof?
       end
 
       test 'next_line_empty? should return false if next line is not blank' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
-        assert !reader.next_line_empty?
+        refute reader.next_line_empty?
       end
 
       test 'next_line_empty? should return true if next line is blank' do
@@ -180,7 +180,7 @@ third line
         assert reader.advance
         assert reader.advance
         assert reader.advance
-        assert !reader.advance
+        refute reader.advance
       end
 
       test 'read_lines should return all lines' do
@@ -196,7 +196,7 @@ third line
       test 'has_more_lines? should return false after read_lines is invoked' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         reader.read_lines
-        assert !reader.has_more_lines?
+        refute reader.has_more_lines?
       end
 
       test 'unshift puts line onto Reader as next line to read' do
@@ -273,7 +273,7 @@ This is another paragraph.
         result = reader.read_lines_until
         assert_equal 3, result.size
         assert_equal lines.map {|l| l.chomp }, result
-        assert !reader.has_more_lines?
+        refute reader.has_more_lines?
         assert reader.eof?
       end
 
@@ -411,9 +411,9 @@ endlines\r
           doc = Asciidoctor::Document.new lines
           reader = doc.reader
           reader.lines.each do |line|
-            assert !line.end_with?("\r"), "CRLF not properly cleaned for source lines: #{lines.inspect}"
-            assert !line.end_with?("\r\n"), "CRLF not properly cleaned for source lines: #{lines.inspect}"
-            assert !line.end_with?("\n"), "CRLF not properly cleaned for source lines: #{lines.inspect}"
+            refute line.end_with?("\r"), "CRLF not properly cleaned for source lines: #{lines.inspect}"
+            refute line.end_with?("\r\n"), "CRLF not properly cleaned for source lines: #{lines.inspect}"
+            refute line.end_with?("\n"), "CRLF not properly cleaned for source lines: #{lines.inspect}"
           end
         end
       end
@@ -434,7 +434,7 @@ preamble
 
         doc = Asciidoctor::Document.new input
         reader = doc.reader
-        assert !doc.attributes.key?('front-matter')
+        refute doc.attributes.key?('front-matter')
         assert_equal '---', reader.peek_line
     end
 

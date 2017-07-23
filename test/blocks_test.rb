@@ -150,7 +150,7 @@ block comment
       EOS
 
       output = render_embedded_string input
-      assert !output.strip.empty?, "Line should be emitted => #{input.rstrip}"
+      refute_empty output.strip, "Line should be emitted => #{input.rstrip}"
     end
 
     test 'preprocessor directives should not be processed within comment block within block metadata' do
@@ -640,7 +640,7 @@ You just write.
       assert_nil doc.blocks[0].number
       output = doc.render
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
-      assert !doc.attributes.has_key?('example-number')
+      refute doc.attributes.has_key?('example-number')
     end
 
     test 'automatic caption can be turned off and on and modified' do
@@ -1162,7 +1162,7 @@ This is a passthrough block.
       EOS
 
       block = block_from_string input
-      assert !block.nil?
+      refute_nil block
       assert_equal 1, block.lines.size
       assert_equal 'This is a passthrough block.', block.source
     end
@@ -1437,7 +1437,7 @@ section paragraph
       assert_xpath '//*[@id="content"]/h1[text()="Section Title"]', output, 1
       assert_xpath '//*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
-      assert !errors.empty?
+      refute_empty errors
       assert_match(/only book doctypes can contain level 0 sections/, errors)
     end
 
@@ -1468,7 +1468,7 @@ Block content
 
       output = render_embedded_string input
       assert output.include?('Block content')
-      assert !output.include?('[]')
+      refute output.include?('[]')
     end
 
     test 'empty block anchor should not appear in output' do
@@ -1481,7 +1481,7 @@ Block content
 
       output = render_embedded_string input
       assert output.include?('Block content')
-      assert !output.include?('[[]]')
+      refute output.include?('[[]]')
     end
   end
 
@@ -1761,7 +1761,7 @@ image::images/tiger.png[Tiger]
       output = doc.render
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Voila! The AsciiDoc Tiger"]', output, 1
-      assert !doc.attributes.has_key?('figure-number')
+      refute doc.attributes.has_key?('figure-number')
     end
 
     test 'can align image in DocBook backend' do
@@ -1844,7 +1844,7 @@ image::{bogus}[]
       EOS
 
       output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
-      assert output.strip.empty?
+      assert_empty output.strip
       assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
@@ -1856,7 +1856,7 @@ image::{bogus}[]
       EOS
 
       output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
-      assert output.strip.empty?
+      assert_empty output.strip
       assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
@@ -1872,7 +1872,7 @@ image::{bogus}[]
       output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert_css 'img', output, 0
       assert_css 'h2', output, 1
-      assert !output.include?('== Section Title')
+      refute output.include?('== Section Title')
       assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
@@ -2686,7 +2686,7 @@ public class Printer {
       assert_match(/\.<em>out<\/em>\./, output, 1)
       assert_match(/\*asterisks\*/, output, 1)
       assert_match(/<strong>bold<\/strong>/, output, 1)
-      assert !output.include?(Asciidoctor::Substitutors::PASS_START)
+      refute output.include?(Asciidoctor::Substitutors::PASS_START)
     end
 
     test 'should link to CodeRay stylesheet if source-highlighter is coderay and linkcss is set' do
@@ -2778,7 +2778,7 @@ puts HTML::Pipeline.new(filters, {}).call(input)[:output]
 :source-highlighter: coderay
       EOS
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SERVER
-      assert doc.attributes['source-highlighter'].nil?
+      assert_nil doc.attributes['source-highlighter']
     end
   end
 
@@ -3186,7 +3186,7 @@ content
       block = doc.blocks.first
       assert_nil block.id
       assert_nil(block.attr 'reftext')
-      assert !doc.catalog[:ids].has_key?('illegal$id')
+      refute doc.catalog[:ids].has_key?('illegal$id')
     end
 
     test 'should not recognize block anchor that starts with digit' do

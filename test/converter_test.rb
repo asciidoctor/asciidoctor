@@ -167,25 +167,25 @@ Sidebar content
         caches = Asciidoctor::Converter::TemplateConverter.caches
         if defined? ::ThreadSafe::Cache
           assert caches[:templates].is_a?(::ThreadSafe::Cache)
-          assert !caches[:templates].empty?
+          refute_empty caches[:templates]
           paragraph_template_before = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
-          assert !paragraph_template_before.nil?
+          refute_nil paragraph_template_before
 
           # should use cache
           doc = Asciidoctor::Document.new [], :template_dir => template_dir
           template_converter = doc.converter.find_converter('paragraph')
           paragraph_template_after = template_converter.templates['paragraph']
-          assert !paragraph_template_after.nil?
+          refute_nil paragraph_template_after
           assert paragraph_template_before.eql?(paragraph_template_after)
 
           # should not use cache
           doc = Asciidoctor::Document.new [], :template_dir => template_dir, :template_cache => false
           template_converter = doc.converter.find_converter('paragraph')
           paragraph_template_after = template_converter.templates['paragraph']
-          assert !paragraph_template_after.nil?
-          assert !paragraph_template_before.eql?(paragraph_template_after)
+          refute_nil paragraph_template_after
+          refute paragraph_template_before.eql?(paragraph_template_after)
         else
-          assert caches.empty?
+          assert_empty caches
         end
       ensure
         # clean up
@@ -199,10 +199,10 @@ Sidebar content
       caches = { :scans => {}, :templates => {} }
       doc = Asciidoctor::Document.new [], :template_dir => template_dir, :template_cache => caches
       doc.converter
-      assert !caches[:scans].empty?
-      assert !caches[:templates].empty?
+      refute_empty caches[:scans]
+      refute_empty caches[:templates]
       paragraph_template = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
-      assert !paragraph_template.nil?
+      refute_nil paragraph_template
       assert paragraph_template.is_a? ::Tilt::HamlTemplate
     end
 
@@ -231,7 +231,7 @@ Sidebar content
         assert selected.is_a? Asciidoctor::Converter::TemplateConverter
         template = selected.templates[node_name]
         assert template.is_a? Tilt::ERBTemplate
-        assert !(template.is_a? Tilt::ErubisTemplate)
+        refute template.is_a? Tilt::ErubisTemplate
         assert template.instance_variable_get('@engine').is_a? ::ERB
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end

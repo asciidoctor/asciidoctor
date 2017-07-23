@@ -362,12 +362,12 @@ content
         assert_equal val, doc.attributes[key]
       end
 
-      assert !doc.attributes.key?('backend-html5')
-      assert !doc.attributes.key?('backend-html5-doctype-article')
-      assert !doc.attributes.key?('basebackend-html')
-      assert !doc.attributes.key?('basebackend-html-doctype-article')
-      assert !doc.attributes.key?('doctype-article')
-      assert !doc.attributes.key?('filetype-html')
+      refute doc.attributes.key?('backend-html5')
+      refute doc.attributes.key?('backend-html5-doctype-article')
+      refute doc.attributes.key?('basebackend-html')
+      refute doc.attributes.key?('basebackend-html-doctype-article')
+      refute doc.attributes.key?('doctype-article')
+      refute doc.attributes.key?('filetype-html')
     end
 
     test 'backend attributes defined in document options overrides backend attribute in document' do
@@ -420,7 +420,7 @@ content
 
     test 'set_attribute should set attribute if key is not locked' do
       doc = empty_document
-      assert !(doc.attr? 'foo')
+      refute doc.attr? 'foo'
       res = doc.set_attribute 'foo', 'baz'
       assert res
       assert_equal 'baz', (doc.attr 'foo')
@@ -430,7 +430,7 @@ content
       doc = empty_document :attributes => { 'foo' => 'bar' }
       assert_equal 'bar', (doc.attr 'foo')
       res = doc.set_attribute 'foo', 'baz'
-      assert !res
+      refute res
       assert_equal 'bar', (doc.attr 'foo')
     end
 
@@ -439,7 +439,7 @@ content
       assert_equal '', (doc.attr 'backend-html5')
       res = doc.set_attribute 'backend', 'docbook5'
       assert res
-      assert !(doc.attr? 'backend-html5')
+      refute doc.attr? 'backend-html5'
       assert_equal '', (doc.attr 'backend-docbook5')
     end
 
@@ -467,10 +467,10 @@ toc toc-placement!                        |   |content     |macro        |nil
         raw_attrs, toc, toc_position, toc_placement, toc_class = expect
         attrs = Hash[*raw_attrs.split.map {|e| e.include?('=') ? e.split('=', 2) : [e, ''] }.flatten]
         doc = document_from_string '', :attributes => attrs
-        toc ? (assert doc.attr?('toc', toc)) : (assert !doc.attr?('toc'))
-        toc_position ? (assert doc.attr?('toc-position', toc_position)) : (assert !doc.attr?('toc-position'))
-        toc_placement ? (assert doc.attr?('toc-placement', toc_placement)) : (assert !doc.attr?('toc-placement'))
-        toc_class ? (assert doc.attr?('toc-class', toc_class)) : (assert !doc.attr?('toc-class'))
+        toc ? (assert doc.attr?('toc', toc)) : (refute doc.attr?('toc'))
+        toc_position ? (assert doc.attr?('toc-position', toc_position)) : (refute doc.attr?('toc-position'))
+        toc_placement ? (assert doc.attr?('toc-placement', toc_placement)) : (refute doc.attr?('toc-placement'))
+        toc_class ? (assert doc.attr?('toc-class', toc_class)) : (refute doc.attr?('toc-class'))
       end
     end
   end
@@ -1116,7 +1116,7 @@ paragraph
 
       doc = document_from_string input
       para = doc.blocks.first
-      assert !para.attributes.has_key?('id')
+      refute para.attributes.has_key?('id')
     end
 
     test 'role? returns true if role is assigned' do
@@ -1140,7 +1140,7 @@ A paragraph
       p = doc.blocks.first
       assert p.role?('lead')
       p2 = doc.blocks.last
-      assert !p2.role?('final')
+      refute p2.role?('final')
     end
 
     test 'has_role? can check for precense of role name' do
@@ -1151,7 +1151,7 @@ A paragraph
 
       doc = document_from_string input
       p = doc.blocks.first
-      assert !p.role?('lead')
+      refute p.role?('lead')
       assert p.has_role?('lead')
     end
 
@@ -1265,7 +1265,7 @@ A normal paragraph
       assert res
       assert_equal 'role2', para.attributes['role']
       assert para.has_role? 'role2'
-      assert !para.has_role?('role1')
+      refute para.has_role?('role1')
     end
 
     test 'roles are removed when last role is removed using remove_role' do
@@ -1293,7 +1293,7 @@ A normal paragraph
       refute res
       assert_equal 'role1', para.attributes['role']
       assert para.has_role? 'role1'
-      assert !para.has_role?('role2')
+      refute para.has_role?('role2')
     end
 
     test 'roles are not changed when using remove_role if the node has no roles' do
@@ -1305,7 +1305,7 @@ A normal paragraph
       res = para.remove_role 'role1'
       refute res
       assert_equal nil, para.attributes['role']
-      assert !para.has_role?('role1')
+      refute para.has_role?('role1')
     end
 
     test 'option can be specified in first position of block style using shorthand syntax' do
@@ -1344,7 +1344,7 @@ content
       section = doc.blocks[0]
       refute_nil section
       assert_equal :section, section.context
-      assert !section.special
+      refute section.special
       output = doc.convert
       assert_css 'section', output, 1
       assert_css 'section#idname', output, 1

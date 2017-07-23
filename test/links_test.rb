@@ -575,7 +575,7 @@ See <<foobaz>>.
       old_verbose, $VERBOSE = $VERBOSE, true
       output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-      refute warnings.empty?
+      refute_empty warnings
       assert_includes warnings, 'asciidoctor: WARNING: invalid reference: foobaz'
     ensure
       $VERBOSE = old_verbose
