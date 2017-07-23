@@ -133,12 +133,12 @@ class Parser
     # if the first line is the document title, add a header to the document and parse the header metadata
     if implicit_doctitle
       source_location = reader.cursor if document.sourcemap
-      document.id, _, doctitle, _, single_line = parse_section_title reader, document
+      document.id, _, doctitle, _, atx = parse_section_title reader, document
       unless assigned_doctitle
         document.title = assigned_doctitle = doctitle
       end
       # default to compat-mode if document uses atx-style doctitle
-      document.set_attr 'compat-mode' unless single_line || (document.attribute_locked? 'compat-mode')
+      document.set_attr 'compat-mode' unless atx || (document.attribute_locked? 'compat-mode')
       if (separator = block_attributes.delete 'separator')
         document.set_attr 'title-separator', separator unless document.attribute_locked? 'title-separator'
       end
@@ -649,7 +649,7 @@ class Parser
         break
 
       elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
-          (is_section_title? this_line, reader.peek_line) : !indented && (is_single_line_section_title? this_line))
+          (is_section_title? this_line, reader.peek_line) : !indented && (atx_section_title? this_line))
         reader.unshift_line this_line
         float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
         attributes['reftext'] = float_reftext if float_reftext
@@ -1531,7 +1531,7 @@ class Parser
   def self.initialize_section reader, parent, attributes = {}
     document = parent.document
     source_location = reader.cursor if document.sourcemap
-    sect_id, sect_reftext, sect_title, sect_level, single_line = parse_section_title reader, document
+    sect_id, sect_reftext, sect_title, sect_level, atx = parse_section_title reader, document
     if sect_reftext
       attributes['reftext'] = sect_reftext
     elsif attributes.key? 'reftext'
@@ -1579,7 +1579,7 @@ class Parser
     if (id = section.id ||= (attributes['id'] ||
         ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil)))
       unless document.register :refs, [id, section, sect_reftext || section.title]
-        warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - (single_line ? 1 : 2)}: id assigned to section already in use: #{id})
+        warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - (atx ? 1 : 2)}: id assigned to section already in use: #{id})
       end
     end
 
@@ -1601,7 +1601,7 @@ class Parser
     elsif reader.has_more_lines?
       Compliance.underline_style_section_titles ?
           is_section_title?(*reader.peek_lines(2, style && style == 'comment')) :
-          is_single_line_section_title?(reader.peek_line)
+          atx_section_title?(reader.peek_line)
     end
   end
 
@@ -1620,25 +1620,37 @@ class Parser
     end
   end
 
-  # Public: Checks if these lines are a section title
+  # Public: Checks whether the lines given are an atx or setext section title.
   #
-  # line1 - the first line as a String
-  # line2 - the second line as a String (default: nil)
+  # line1 - [String] candidate title.
+  # line2 - [String] candidate underline (default: nil).
   #
-  # Returns the Integer section level if these lines are a section title or nil otherwise
+  # Returns the [Integer] section level if these lines are a section title, otherwise nothing.
   def self.is_section_title?(line1, line2 = nil)
-    is_single_line_section_title?(line1) || (line2.nil_or_empty? ? nil : is_two_line_section_title?(line1, line2))
+    atx_section_title?(line1) || (line2.nil_or_empty? ? nil : setext_section_title?(line1, line2))
   end
 
-  # NOTE level is 1 less than number of line markers
-  def self.is_single_line_section_title?(line)
+  # Checks whether the line given is an atx section title.
+  #
+  # The level returned is 1 less than number of leading markers.
+  #
+  # line - [String] candidate title with leading atx marker.
+  #
+  # Returns the [Integer] section level if this line is an atx section title, otherwise nothing.
+  def self.atx_section_title? line
     if Compliance.markdown_syntax ? ((line.start_with? '=', '#') && ExtAtxSectionTitleRx =~ line) :
         ((line.start_with? '=') && AtxSectionTitleRx =~ line)
       $1.length - 1
     end
   end
 
-  def self.is_two_line_section_title?(line1, line2)
+  # Checks whether the lines given are an setext section title.
+  #
+  # line1 - [String] candidate title
+  # line2 - [String] candidate underline
+  #
+  # Returns the [Integer] section level if these lines are an setext section title, otherwise nothing.
+  def self.setext_section_title? line1, line2
     if (level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
         line2_ch1 * (line2_len = line2.length) == line2 && SetextSectionTitleRx.match?(line1) &&
         (line_length(line1) - line2_len).abs < 2
@@ -1648,18 +1660,20 @@ class Parser
 
   # Internal: Parse the section title from the current position of the reader
   #
-  # Parse a single or double-line section title. After this method is called,
+  # Parse an atx (single-line) or setext (underlined) section title. After this method is called,
   # the Reader will be positioned at the line after the section title.
   #
-  # reader  - the source reader, positioned at a section title
-  # document- the current document
+  # For efficiency, we don't reuse methods internally that check for a section title.
+  #
+  # reader   - the source [Reader], positioned at a section title.
+  # document - the current [Document].
   #
   # Examples
   #
   #   reader.lines
   #   # => ["Foo", "~~~"]
   #
-  #   id, reftext, title, level, single = parse_section_title(reader, document)
+  #   id, reftext, title, level, atx = parse_section_title(reader, document)
   #
   #   title
   #   # => "Foo"
@@ -1667,13 +1681,13 @@ class Parser
   #   # => 2
   #   id
   #   # => nil
-  #   single
+  #   atx
   #   # => false
   #
   #   line1
   #   # => "==== Foo"
   #
-  #   id, reftext, title, level, single = parse_section_title(reader, document)
+  #   id, reftext, title, level, atx = parse_section_title(reader, document)
   #
   #   title
   #   # => "Foo"
@@ -1681,14 +1695,12 @@ class Parser
   #   # => 3
   #   id
   #   # => nil
-  #   single
+  #   atx
   #   # => true
   #
-  # returns an Array of [String, String, Integer, String, Boolean], representing the
-  # id, reftext, title, level and line count of the Section, or nil.
-  #
-  #--
-  # NOTE for efficiency, we don't reuse methods that check for a section title
+  # Returns an 5-element [Array] containing the id (String), reftext (String),
+  # title (String), level (Integer), and flag (Boolean) indicating whether an
+  # atx section title was matched, or nothing.
   def self.parse_section_title(reader, document)
     sect_id = sect_reftext = nil
     line1 = reader.read_line
@@ -1696,7 +1708,7 @@ class Parser
     if Compliance.markdown_syntax ? ((line1.start_with? '=', '#') && ExtAtxSectionTitleRx =~ line1) :
         ((line1.start_with? '=') && AtxSectionTitleRx =~ line1)
       # NOTE level is 1 less than number of line markers
-      sect_level, sect_title, single_line = $1.length - 1, $2, true
+      sect_level, sect_title, atx = $1.length - 1, $2, true
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
         sect_title, sect_id, sect_reftext = (sect_title.slice 0, sect_title.length - $&.length), $2, $3
       end
@@ -1704,7 +1716,7 @@ class Parser
         (sect_level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
         line2_ch1 * (line2_len = line2.length) == line2 && (sect_title = SetextSectionTitleRx =~ line1 && $1) &&
         (line_length(line1) - line2_len).abs < 2
-      single_line = false
+      atx = false
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
         sect_title, sect_id, sect_reftext = (sect_title.slice 0, sect_title.length - $&.length), $2, $3
       end
@@ -1713,7 +1725,7 @@ class Parser
       raise %(Unrecognized section at #{reader.prev_line_info})
     end
     sect_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
-    [sect_id, sect_reftext, sect_title, sect_level, single_line]
+    [sect_id, sect_reftext, sect_title, sect_level, atx]
   end
 
   # Public: Calculate the number of unicode characters in the line, excluding the endline

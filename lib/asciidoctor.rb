@@ -145,9 +145,8 @@ module Asciidoctor
     # Compliance value: false
     #define :congruent_block_delimiters, true
 
-    # AsciiDoc supports both single-line and underlined
-    # section titles.
-    # This option disables the underlined variant.
+    # AsciiDoc supports both atx (single-line) and setext (underlined) section titles.
+    # This option can be used to disable the setext variant.
     # Compliance value: true
     define :underline_style_section_titles, true
 
