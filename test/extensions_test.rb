@@ -476,7 +476,7 @@ context 'Extensions' do
       registry = Asciidoctor::Extensions::Registry.new
       registry.block SampleBlock, :sample
       registry.activate Asciidoctor::Document.new
-      assert !(registry.registered_for_block? :sample, :sidebar)
+      refute registry.registered_for_block? :sample, :sidebar
     end
 
     test 'should instantiate block macro processor' do
@@ -1173,7 +1173,7 @@ sample content
                                           :header_footer => true,
                                           :safe => Asciidoctor::SafeMode::SERVER,
                                           :attributes => {'docinfo' => ''}
-        assert !output.empty?
+        refute_empty output
         assert_css 'script[src="modernizr.js"]', output, 1
         assert_css 'meta[name="robots"]', output, 1
         assert_css 'meta[http-equiv="imagetoolbar"]', output, 0

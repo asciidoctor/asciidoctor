@@ -185,7 +185,7 @@ Bar
 
       output = render_embedded_string input
       assert_css 'ul ul', output, 1
-      assert !output.include?('* Foo')
+      refute output.include?('* Foo')
     end
 
     test 'a list item for a different list terminates non-indented paragraph for text of list item' do
@@ -205,9 +205,9 @@ term:: def
 
       output = render_embedded_string input
       assert_css 'ul ol', output, 1
-      assert !output.include?('* Foo')
+      refute output.include?('* Foo')
       assert_css 'ul dl', output, 1
-      assert !output.include?('term:: def')
+      refute output.include?('term:: def')
     end
 
     test 'an indented wrapped line is unindented and folded into text of list item' do
@@ -255,7 +255,7 @@ second wrapped line
 
       output = render_embedded_string input
       assert_css 'ul ul', output, 1
-      assert !output.include?('* Foo')
+      refute output.include?('* Foo')
     end
 
     test 'a list item that starts with a sequence of list markers characters should not match a nested list' do
@@ -287,9 +287,9 @@ term:: def
 
       output = render_embedded_string input
       assert_css 'ul ol', output, 1
-      assert !output.include?('* Foo')
+      refute output.include?('* Foo')
       assert_css 'ul dl', output, 1
-      assert !output.include?('term:: def')
+      refute output.include?('term:: def')
     end
 
     test "a literal paragraph offset by blank lines in list content is appended as a literal block" do
@@ -4471,7 +4471,7 @@ label:: desc
 
     doc = document_from_string input
     list = doc.blocks.first
-    assert !list.outline?
+    refute list.outline?
   end
 
   test 'simple? should return true for list item with no nested blocks' do
@@ -4484,7 +4484,7 @@ label:: desc
     doc = document_from_string input
     list = doc.blocks.first
     assert list.items.first.simple?
-    assert !list.items.first.compound?
+    refute list.items.first.compound?
   end
 
   test 'simple? should return true for list item with nested outline list' do
@@ -4499,7 +4499,7 @@ label:: desc
     doc = document_from_string input
     list = doc.blocks.first
     assert list.items.first.simple?
-    assert !list.items.first.compound?
+    refute list.items.first.compound?
   end
 
   test 'simple? should return false for list item with block content' do
@@ -4515,7 +4515,7 @@ listing block in list item 1
 
     doc = document_from_string input
     list = doc.blocks.first
-    assert !list.items.first.simple?
+    refute list.items.first.simple?
     assert list.items.first.compound?
   end
 

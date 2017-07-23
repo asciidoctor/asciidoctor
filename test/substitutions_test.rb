@@ -796,7 +796,7 @@ context 'Substitutions' do
     test 'should not match an inline image macro if target contains an endline character' do
       para = block_from_string(%(Fear not. There are no image:big\ncats.png[] around here.))
       result = para.sub_macros(para.source)
-      assert !result.include?('<img ')
+      refute result.include?('<img ')
       assert_includes result, %(image:big\ncats.png[])
     end
 
@@ -804,7 +804,7 @@ context 'Substitutions' do
       ['image: big cats.png[]', 'image:big cats.png []'].each do |input|
         para = block_from_string %(Fear not. There are no #{input} around here.)
         result = para.sub_macros(para.source)
-        assert !result.include?('<img ')
+        refute result.include?('<img ')
         assert_includes result, input
       end
     end
@@ -812,7 +812,7 @@ context 'Substitutions' do
     test 'should not detect a block image macro found inline' do
       para = block_from_string(%(Not an inline image macro image::tiger.png[].))
       result = para.sub_macros(para.source)
-      assert !result.include?('<img ')
+      refute result.include?('<img ')
       assert result.include?('image::tiger.png[]')
     end
 
@@ -827,7 +827,7 @@ context 'Substitutions' do
       end
       assert sect.document.catalog[:images].include? 'fixtures/dot.gif'
       refute_nil warnings
-      assert warnings.empty?
+      assert_empty warnings
     end
 
     test 'an icon macro should be interpreted as an icon if icons are enabled' do
@@ -866,7 +866,7 @@ context 'Substitutions' do
       assert_equal 1, para.document.catalog[:footnotes].size
       footnote = para.document.catalog[:footnotes].first
       assert_equal 1, footnote.index
-      assert footnote.id.nil?
+      assert_nil footnote.id
       assert_equal 'An example footnote.', footnote.text
     end
 
@@ -876,7 +876,7 @@ context 'Substitutions' do
       assert_equal 1, para.document.catalog[:footnotes].size
       footnote = para.document.catalog[:footnotes].first
       assert_equal 1, footnote.index
-      assert footnote.id.nil?
+      assert_nil footnote.id
       assert_equal "An example footnote with wrapped text.", footnote.text
     end
 
@@ -966,11 +966,11 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
       assert_equal 2, para.document.catalog[:footnotes].size
       footnote1 = para.document.catalog[:footnotes][0]
       assert_equal 1, footnote1.index
-      assert footnote1.id.nil?
+      assert_nil footnote1.id
       assert_equal "An example footnote.", footnote1.text
       footnote2 = para.document.catalog[:footnotes][1]
       assert_equal 2, footnote2.index
-      assert footnote2.id.nil?
+      assert_nil footnote2.id
       assert_equal "Another footnote.", footnote2.text
     end
 
@@ -1412,7 +1412,7 @@ EOS
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
       assert_equal '<code>inline code</code>', para.passthroughs[0][:text]
-      assert para.passthroughs[0][:subs].empty?
+      assert_empty para.passthroughs[0][:subs]
     end
 
     test 'collect multi-line inline triple plus passthroughs' do
@@ -1421,7 +1421,7 @@ EOS
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, para.passthroughs.size
       assert_equal "<code>inline\ncode</code>", para.passthroughs[0][:text]
-      assert para.passthroughs[0][:subs].empty?
+      assert_empty para.passthroughs[0][:subs]
     end
 
     test 'collect inline double dollar passthroughs' do
@@ -1843,17 +1843,17 @@ foo&#8201;&#8212;&#8201;'
     test 'should not use subs if subs option passed to block constructor is nil' do
       doc = empty_document
       block = Asciidoctor::Block.new doc, :paragraph, :source => '*bold* _italic_', :subs => nil, :attributes => {'subs' => 'quotes'}
-      assert block.subs.empty?
+      assert_empty block.subs
       block.lock_in_subs
-      assert block.subs.empty?
+      assert_empty block.subs
     end
 
     test 'should not use subs if subs option passed to block constructor is empty array' do
       doc = empty_document
       block = Asciidoctor::Block.new doc, :paragraph, :source => '*bold* _italic_', :subs => [], :attributes => {'subs' => 'quotes'}
-      assert block.subs.empty?
+      assert_empty block.subs
       block.lock_in_subs
-      assert block.subs.empty?
+      assert_empty block.subs
     end
 
     test 'should use subs from subs option passed to block constructor' do
@@ -1867,7 +1867,7 @@ foo&#8201;&#8212;&#8201;'
     test 'should use subs from subs attribute if subs option is not passed to block constructor' do
       doc = empty_document
       block = Asciidoctor::Block.new doc, :paragraph, :source => '*bold* _italic_', :attributes => {'subs' => 'quotes'}
-      assert block.subs.empty?
+      assert_empty block.subs
       # in this case, we have to call lock_in_subs to resolve the subs
       block.lock_in_subs
       assert_equal [:quotes], block.subs

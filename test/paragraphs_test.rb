@@ -541,7 +541,7 @@ Wise words from a wise person.
           output =  render_string input, :doctype => 'inline'
           err.string
         end
-        assert output.nil?
+        assert_nil output
         assert_includes warnings, 'no inline candidate'
       end
     end

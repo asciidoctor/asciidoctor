@@ -14,9 +14,9 @@ context 'Invoker' do
       invoker = invoke_cli %w(-o -)
       output = out.string
     end
-    assert !invoker.nil?
+    refute_nil invoker
     doc = invoker.document
-    assert !doc.nil?
+    refute_nil doc
     assert_equal 'Document Title', doc.doctitle
     assert_equal 'Doc Writer', doc.attr('author')
     assert_equal 'html5', doc.attr('backend')
@@ -24,7 +24,7 @@ context 'Invoker' do
     assert_equal 'article', doc.attr('doctype')
     assert doc.blocks?
     assert_equal :preamble, doc.blocks.first.context
-    assert !output.empty?
+    refute_empty output
     assert_xpath '/html', output, 1
     assert_xpath '/html/head', output, 1
     assert_xpath '/html/body', output, 1
@@ -44,7 +44,7 @@ context 'Invoker' do
     assert doc.attr?('docyear')
     assert doc.attr?('doctime')
     assert doc.attr?('docdatetime')
-    assert invoker.read_output.empty?
+    assert_empty invoker.read_output
   end
 
   test 'should allow docdate and doctime to be overridden' do
@@ -60,16 +60,16 @@ context 'Invoker' do
   test 'should accept document from stdin and write to stdout' do
     invoker = invoke_cli_to_buffer(%w(-s), '-') { 'content' }
     doc = invoker.document
-    assert !doc.attr?('docname')
-    assert !doc.attr?('docfile')
+    refute doc.attr?('docname')
+    refute doc.attr?('docfile')
     assert_equal Dir.pwd, doc.attr('docdir')
     assert_equal doc.attr('docdate'), doc.attr('localdate')
     assert_equal doc.attr('docyear'), doc.attr('localyear')
     assert_equal doc.attr('doctime'), doc.attr('localtime')
     assert_equal doc.attr('docdatetime'), doc.attr('localdatetime')
-    assert !doc.attr?('outfile')
+    refute doc.attr?('outfile')
     output = invoker.read_output
-    assert !output.empty?
+    refute_empty output
     assert_xpath '/*[@class="paragraph"]/p[text()="content"]', output, 1
   end
 
@@ -90,8 +90,8 @@ context 'Invoker' do
     begin
       invoker = invoke_cli(%W(-s -o #{sample_outpath}), '-') { 'content' }
       doc = invoker.document
-      assert !doc.attr?('docname')
-      assert !doc.attr?('docfile')
+      refute doc.attr?('docname')
+      refute doc.attr?('docfile')
       assert_equal Dir.pwd, doc.attr('docdir')
       assert_equal doc.attr('docdate'), doc.attr('localdate')
       assert_equal doc.attr('docyear'), doc.attr('localyear')
@@ -210,7 +210,7 @@ context 'Invoker' do
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
       output = IO.read(sample_outpath)
-      assert !output.empty?
+      refute_empty output
       assert_xpath '/html', output, 1
       assert_xpath '/html/head', output, 1
       assert_xpath '/html/body', output, 1
@@ -274,7 +274,7 @@ context 'Invoker' do
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a copycss!)
       invoker.document
       assert File.exist?(sample_outpath)
-      assert !File.exist?(default_stylesheet)
+      refute File.exist?(default_stylesheet)
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rm_f(default_stylesheet)
@@ -308,7 +308,7 @@ context 'Invoker' do
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a stylesdir=./styles -a stylesheet=custom.css -a copycss!)
       invoker.document
       assert File.exist?(sample_outpath)
-      assert !File.exist?(custom_stylesheet)
+      refute File.exist?(custom_stylesheet)
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rm_f(custom_stylesheet)
@@ -325,7 +325,7 @@ context 'Invoker' do
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a stylesdir=http://example.org/styles -a stylesheet=custom.css)
       invoker.document
       assert File.exist?(sample_outpath)
-      assert !File.exist?(stylesdir)
+      refute File.exist?(stylesdir)
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rmdir(stylesdir) if File.directory? stylesdir
@@ -401,8 +401,8 @@ context 'Invoker' do
       invoker = invoke_cli %w(-o -)
       output = out.string
     end
-    assert !invoker.nil?
-    assert !output.nil?
+    refute_nil invoker
+    refute_nil output
     assert output.end_with?("\n")
   end
 
@@ -529,7 +529,7 @@ context 'Invoker' do
   test 'should unset attribute ending in bang' do
     invoker = invoke_cli_to_buffer %w(-a sectids! -s -o -)
     doc = invoker.document
-    assert !doc.attr?('sectids')
+    refute doc.attr?('sectids')
     output = invoker.read_output
     # leave the count loose in case we add more sections
     assert_xpath '//h2[not(@id)]', output
@@ -581,9 +581,9 @@ context 'Invoker' do
       _, out, _ = Open3.popen3 cmd
       #stderr_lines = stderr.readlines
       # warnings may be issued, so don't assert on stderr
-      #assert stderr_lines.empty?, 'Command failed. Expected to receive a rendered document.'
+      #assert_empty stderr_lines, 'Command failed. Expected to receive a rendered document.'
       stdout_lines = out.readlines
-      assert !stdout_lines.empty?
+      refute_empty stdout_lines
       stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
       stdout_str = stdout_lines.join
       assert stdout_str.include?('Codierungen sind verrückt auf älteren Versionen von Ruby')
@@ -602,8 +602,8 @@ context 'Invoker' do
       invoker = invoke_cli(%w(-t -o /dev/null), '-') { input }
       error = err.string
     end
-    assert !invoker.nil?
-    assert !error.nil?
+    refute_nil invoker
+    refute_nil error
     assert_match(/Total time/, error)
   end
 

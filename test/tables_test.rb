@@ -1052,11 +1052,11 @@ output file name is used.
       EOS
       doc = document_from_string input
       table = doc.blocks.first
-      assert !table.nil?
+      refute_nil table
       tbody = table.rows.body
       assert_equal 2, tbody.size
       body_cell_1_3 = tbody[0][2]
-      assert !body_cell_1_3.inner_document.nil?
+      refute_nil body_cell_1_3.inner_document
       assert body_cell_1_3.inner_document.nested?
       assert_equal doc, body_cell_1_3.inner_document.parent_document
       assert_equal doc.converter, body_cell_1_3.inner_document.converter

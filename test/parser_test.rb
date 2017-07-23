@@ -606,7 +606,7 @@ v8.6.8,
     metadata, _ = parse_header_metadata input
     assert_equal 7, metadata.size
     assert_equal '8.6.8', metadata['revnumber']
-    assert !metadata.has_key?('revdate')
+    refute metadata.has_key?('revdate')
   end
 
   # Asciidoctor recognizes a standalone revision without a trailing comma
@@ -618,7 +618,7 @@ v8.6.8
     metadata, _ = parse_header_metadata input
     assert_equal 7, metadata.size
     assert_equal '8.6.8', metadata['revnumber']
-    assert !metadata.has_key?('revdate')
+    refute metadata.has_key?('revdate')
   end
 
   # while compliant w/ AsciiDoc, this is just sloppy parsing
@@ -650,7 +650,7 @@ Joe Cool
     EOS
     metadata, _ = parse_header_metadata input
     refute_equal 'page-layout: post', metadata['revremark']
-    assert !metadata.has_key?('revdate')
+    refute metadata.has_key?('revdate')
   end
 
   test "parse rev remark only" do
@@ -660,7 +660,7 @@ Joe Cool
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 'Must start revremark-only line with space', metadata['revremark']
-    assert !metadata.has_key?('revdate')
+    refute metadata.has_key?('revdate')
   end
 
   test "skip line comments before author" do

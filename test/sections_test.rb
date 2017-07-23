@@ -68,7 +68,7 @@ context 'Sections' do
 
     test 'synthetic ids can be disabled' do
       sec = block_from_string(":sectids!:\n\n== Section One\n")
-      assert sec.id.nil?
+      assert_nil sec.id
     end
 
     test 'explicit id in anchor above section title overrides synthetic id' do
@@ -373,7 +373,7 @@ preamble
 content
       EOS
       doc = document_from_string input
-      assert doc.blocks[0].attributes.empty?
+      assert_empty doc.blocks[0].attributes
       output = doc.convert
       assert_css 'body#idname', output, 1
       assert_css '.rolename', output, 0
@@ -665,7 +665,6 @@ not in section
       doc = document_from_string input
       heading = doc.blocks.first
       assert heading.is_a?(Asciidoctor::Block)
-      assert heading.context != :section
       assert_equal :floating_title, heading.context
       assert_equal '_independent_heading', heading.id
       assert doc.catalog[:ids].has_key?('_independent_heading')
@@ -827,7 +826,7 @@ text in standalone
         warnings = err.string
       end
 
-      assert !warnings.empty?
+      refute_empty warnings
       assert_match(/only book doctypes can contain level 0 sections/, warnings)
     end
 
@@ -864,7 +863,7 @@ Master section text.
         warnings = err.string
       end
 
-      assert warnings.empty?
+      assert_empty warnings
       assert_match(/Master document written by Doc Writer/, output)
       assert_match(/Standalone document written by Junior Writer/, output)
       assert_xpath '//*[@class="sect1"]/h2[text() = "Standalone Document"]', output, 1
@@ -2769,7 +2768,7 @@ intro
       end
 
       refute_nil warnings
-      assert !warnings.empty?
+      refute_empty warnings
       assert_match(/ERROR:.*section/, warnings)
     end
 
@@ -2856,7 +2855,7 @@ Appendix subsection content
         output = render_string input, :backend => 'docbook'
         warnings = err.string
       end
-      assert warnings.empty?
+      assert_empty warnings
       assert_xpath '/book/preface', output, 1
       assert_xpath '/book/preface/section', output, 1
       assert_xpath '/book/part', output, 1
