@@ -16,6 +16,8 @@ ifdef::env-github[]
 :tip-caption: :bulb:
 :warning-caption: :warning:
 endif::[]
+// Variables:
+:release-version: 1.5.6
 // URIs:
 :uri-org: https://github.com/asciidoctor
 :uri-repo: {uri-org}/asciidoctor
@@ -174,12 +176,12 @@ If that's the case, use the following gem command to remove the old versions:
 . Create a Gemfile in the root folder of your project (or the current directory)
 . Add the `asciidoctor` gem to your Gemfile as follows:
 +
-[source]
+[source,subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
 # or specify the version explicitly
-# gem 'asciidoctor', '1.5.6'
+# gem 'asciidoctor', '{release-version}'
 ----
 
 . Save the Gemfile
@@ -262,10 +264,10 @@ To verify it's available, run the following in your terminal:
 
 You should see information about the Asciidoctor version and your Ruby environment printed in the terminal.
 
-[.output]
+[.output,subs=attributes+]
 ....
-Asciidoctor 1.5.6 [http://asciidoctor.org]
-Runtime Environment (ruby 2.2.2p95 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Asciidoctor {release-version} [http://asciidoctor.org]
+Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 Asciidoctor also provides an API.

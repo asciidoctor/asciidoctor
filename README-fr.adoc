@@ -1,17 +1,23 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>; Ryan Waldron <https://github.com/erebor[@erebor]>
-// FIXME use build system to expand includes statically so document renders properly on GitHub
-ifeval::[{safe-mode-level} < 20]
-include::_settings-README.adoc[]
-endif::[]
-ifeval::[{safe-mode-level} >= 20]
 // settings:
 :page-layout: base
 :idprefix:
 :idseparator: -
 :source-language: ruby
 :language: {source-language}
-ifdef::env-github[:status:]
+ifndef::env-github[:icons: font]
+ifdef::env-github[]
+:status:
+:outfilesuffix: .adoc
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+// Variables:
+:release-version: 1.5.6
 // URIs:
 :uri-org: https://github.com/asciidoctor
 :uri-repo: {uri-org}/asciidoctor
@@ -52,7 +58,6 @@ endif::[]
 :uri-ruby: https://ruby-lang.org
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
-endif::[]
 
 {uri-project}/[Asciidoctor] est un processeur de texte _rapide_ et une chaîne de publication pour convertir du contenu {uri-what-is-asciidoc}[AsciiDoc] en HTML5, DocBook 5 (ou 4.5) et d'autres formats.
 Asciidoctor est écrit en Ruby, packagé sous forme de RubyGem et publié sur {uri-rubygem}[RubyGems.org].
@@ -172,12 +177,12 @@ Si c'est le cas, utilisez la commande gem suivante pour supprimer la vieille ver
 . Créez un fichier Gemfile à la racine de votre projet (ou du répertoire courant)
 . Ajoutez la gemme `asciidoctor` dans votre fichier Gemfile comme ci-dessous :
 +
-[source]
+[source,subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
 # ou spécifier la version explicitement
-# gem 'asciidoctor', '1.5.6'
+# gem 'asciidoctor', '{release-version}'
 ----
 
 . Sauvegardez le fichier Gemfile
@@ -260,10 +265,10 @@ Pour vérifier sa disponibilité, exécutez la commande suivante dans votre term
 
 Vous devriez voir les informations concernant la version d'Asciidoctor et celle de votre environnement Ruby s'afficher dans le terminal.
 
-[.output]
+[.output,subs=attributes+]
 ....
-Asciidoctor 1.5.6 [http://asciidoctor.org]
-Runtime Environment (ruby 2.2.2p95 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Asciidoctor {release-version} [http://asciidoctor.org]
+Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 Asciidoctor fournit aussi une API.
@@ -410,7 +415,7 @@ Le projet a été initié en 2012 par https://github.com/erebor[Ryan Waldron] et
 == Changelog
 
 ifeval::[{safe-mode-level} < 20]
-include::CHANGELOG.adoc[tags=compact;parse,leveloffset=+1]
+include::CHANGELOG.adoc[tag=compact,leveloffset=+1]
 endif::[]
 
 Référez-vous au fichier {uri-changelog}[CHANGELOG] pour une liste complète des changements des versions précédentes.

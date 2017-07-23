@@ -6,7 +6,18 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://g
 :idseparator: -
 :source-language: ruby
 :language: {source-language}
-ifdef::env-github[:status:]
+ifndef::env-github[:icons: font]
+ifdef::env-github[]
+:status:
+:outfilesuffix: .adoc
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+// Variables:
+:release-version: 1.5.6
 // URIs:
 :uri-org: https://github.com/asciidoctor
 :uri-repo: {uri-org}/asciidoctor
@@ -75,7 +86,7 @@ Asciidoctor 也可以运行在 JavaScript 上。
 Asciidoctor.js 被用于 AsciiDoc 预览，支持 Chrome 扩展，Atom，Brackets 或其他基于 Web 的工具。
 ****
 
-ifdef::badges[]
+ifdef::status[]
 .*Project health*
 image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor]
 image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true&amp;passingText=green%20bar&amp;failingText=%23fail&amp;pendingText=building%2E%2E%2E[Build Status (AppVeyor), link=https://ci.appveyor.com/project/asciidoctor/asciidoctor]
@@ -167,12 +178,12 @@ TIP: 使用 Linux 包管理器安装的好处是如果 Ruby 和 RubyGems 库没�
 . 在项目的根目录（或者当前路径），创建一个 `Gemfile` 文件；
 . 在这个文件中添加 `asciidoctor` gem 如下：
 +
-[source]
+[source,subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
 # 或者明确指明版本
-# gem 'asciidoctor', '1.5.6'
+# gem 'asciidoctor', '{release-version}'
 ----
 
 . 保存 `Gemfile` 文件
@@ -259,10 +270,10 @@ TIP: 如果你的 Alpine Linux 系统配置的是自动升级包，在这种情�
 
 你应该看到关于 Asciidoctor 和 Ruby 环境信息将打印到你的终端上。
 
-[.output]
+[.output,subs=attributes+]
 ....
-Asciidoctor 1.5.6 [http://asciidoctor.org]
-Runtime Environment (ruby 2.2.2p95 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Asciidoctor {release-version} [http://asciidoctor.org]
+Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 Asciidoctor 还提供了一套 API。
