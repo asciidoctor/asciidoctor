@@ -335,6 +335,8 @@ module Asciidoctor
     'upperroman' => 'I'
   }
 
+  ATTR_REF_HEAD = '{'
+
   LIST_CONTINUATION = '+'
 
   # NOTE AsciiDoc Python allows + to be preceded by TAB; Asciidoctor does not

@@ -816,6 +816,20 @@ context 'Substitutions' do
       assert result.include?('image::tiger.png[]')
     end
 
+    # NOTE this test verifies attributes get substituted eagerly in target of image in title
+    test 'should substitute attributes in target of inline image in section title' do
+      input = <<-EOS
+== image:{iconsdir}/dot.gif[dot] Title
+      EOS
+
+      sect, warnings = redirect_streams do |_, err|
+        [(block_from_string input, :attributes => { 'data-uri' => '', 'iconsdir' => 'fixtures', 'docdir' => ::File.dirname(__FILE__) }, :safe => :server, :catalog_assets => true), err.string]
+      end
+      assert sect.document.catalog[:images].include? 'fixtures/dot.gif'
+      refute_nil warnings
+      assert warnings.empty?
+    end
+
     test 'an icon macro should be interpreted as an icon if icons are enabled' do
       para = block_from_string 'icon:github[]', :attributes => {'icons' => ''}
       assert_equal %{<span class="icon"><img src="./images/icons/github.png" alt="github"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')

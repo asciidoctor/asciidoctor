@@ -532,7 +532,7 @@ class Parser
               block.parse_attributes(match[3], posattrs, :sub_input => true, :sub_result => false, :into => attributes)
               # style doesn't have special meaning for media macros
               attributes.delete 'style' if attributes.key? 'style'
-              if (target.include? '{') && (target = block.sub_attributes target, :attribute_missing => 'drop-line').empty?
+              if (target.include? ATTR_REF_HEAD) && (target = block.sub_attributes target, :attribute_missing => 'drop-line').empty?
                 # retain as unparsed if attribute-missing is skip
                 if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
                   return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
@@ -1170,13 +1170,13 @@ class Parser
     text.scan(InlineAnchorScanRx) do
       if (id = $1)
         if (reftext = $2)
-          next if (reftext.include? '{') && (reftext = document.sub_attributes reftext).empty?
+          next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
         end
       else
         id = $3
         if (reftext = $4)
           reftext = reftext.gsub '\]', ']' if reftext.include? ']'
-          next if (reftext.include? '{') && (reftext = document.sub_attributes reftext).empty?
+          next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
         end
       end
       unless document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :id => id), reftext]
@@ -1995,7 +1995,7 @@ class Parser
             # NOTE registration of id and reftext is deferred until block is processed
             attributes['id'] = $1
             if (reftext = $2)
-              attributes['reftext'] = (reftext.include? '{') ? (document.sub_attributes reftext) : reftext
+              attributes['reftext'] = (reftext.include? ATTR_REF_HEAD) ? (document.sub_attributes reftext) : reftext
             end
             return true
           end
