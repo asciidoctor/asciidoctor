@@ -65,7 +65,8 @@ gemはいくつかのLinuxディストリビューション, Fedora, Debian, Ubu
 Asciidoctorはオープンソース {uri-repo}[hosted on Github] で {uri-license}[the MIT licence]のもとに配布されます.
 
 ifndef::env-site[]
-.Translations of this document are available in the following languages:
+Translations of this document are available in the following languages:
+
 * {uri-rel-file-base}README-zh_CN.adoc[汉语]
 * {uri-rel-file-base}README.adoc[English]
 * {uri-rel-file-base}README-fr.adoc[Français]

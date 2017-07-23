@@ -64,7 +64,8 @@ Asciidoctor 由 Ruby 编写，打包成 RubyGem，然后发布到 {uri-rubygem}[
 这个 gem 还被包含道几个 Linux 发行版中，其中包括 Fedora、Debian 和 Ubuntu。
 Asciidoctor 是开源的，{uri-repo}[代码托管在 GitHub]，并且是以 {uri-license}[MIT 协议]授权。
 
-.该文档有如下语言的翻译版：
+该文档有如下语言的翻译版：
+
 * {uri-rel-file-base}README.adoc[English]
 * {uri-rel-file-base}README-fr.adoc[Français]
 

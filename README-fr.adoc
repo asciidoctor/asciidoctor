@@ -65,7 +65,8 @@ La gemme est aussi incluse dans plusieurs distributions Linux, dont Fedora, Debi
 Asciidoctor est open source, {uri-repo}[hébergé sur GitHub] et distribué sous {uri-license}[licence MIT].
 
 ifndef::env-site[]
-.Ce document est traduit dans les langues suivantes :
+Ce document est traduit dans les langues suivantes :
+
 * {uri-rel-file-base}README.adoc[Anglais]
 * {uri-rel-file-base}README-zh_CN.adoc[Chinois]
 * {uri-rel-file-base}README-jp.adoc[Japonais]
