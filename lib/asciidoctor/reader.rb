@@ -874,9 +874,9 @@ class PreprocessorReader < Reader
           replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
-        # NOTE relpath is the path relative to the outermost document (or base_dir, if set)
-        #relpath = @document.relative_path inc_path
-        relpath = PathResolver.new.relative_path inc_path, @document.base_dir
+        # NOTE relpath is the path relative to the root document (or base_dir, if set)
+        # QUESTION should we move relative_path method to Document
+        relpath = (@path_resolver ||= PathResolver.new).relative_path inc_path, @document.base_dir
       end
 
       inc_linenos, inc_tags, attributes = nil, nil, {}
@@ -1060,8 +1060,7 @@ class PreprocessorReader < Reader
     end
 
     if path
-      @includes << Helpers.rootname(path)
-      @path = path
+      @includes << Helpers.rootname(@path = path)
     else
       @path = '<stdin>'
     end
