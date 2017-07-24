@@ -1,6 +1,7 @@
 sudo: false
 git:
-  depth: 1
+  # use depth 2 just in case two refs get pushed at once (like a tag)
+  depth: 2
 language: ruby
 rvm:
 - &release_ruby 2.5.0
