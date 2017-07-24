@@ -11,6 +11,7 @@ group :development do
         gem 'cucumber', '~> 1.3.0'
         gem 'nokogiri', '~> 1.5.0'
         gem 'slim', '~> 2.1.0'
+        gem 'tilt', '2.0.7'
       else
         gem 'nokogiri', '~> 1.6.0'
         gem 'slim', '<= 3.0.7'
