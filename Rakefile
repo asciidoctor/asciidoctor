@@ -131,8 +131,9 @@ namespace :build do
 desc 'Trigger builds for all dependent projects on Travis CI'
   task :dependents do
     if ENV['TRAVIS'].to_s == 'true'
-      p ENV['TRAVIS_TAG']
-      next if ENV['TRAVIS_PULL_REQUEST'].to_s == 'true' || ENV['TRAVIS_TAG'] || !(ENV['TRAVIS_JOB_NUMBER'].to_s.end_with? '.1')
+      next unless ENV['TRAVIS_PULL_REQUEST'].to_s == 'false' &&
+          ENV['TRAVIS_TAG'].to_s.empty? &&
+          (ENV['TRAVIS_JOB_NUMBER'].to_s.end_with? '.1')
     end
     next unless (token = ENV['TRAVIS_TOKEN'])
     require 'net/http'
