@@ -1422,12 +1422,13 @@ module Substitutors
           opts[:hl_lines] = highlight_lines * ' '
         end
       end
+      # NOTE highlight can return nil if something goes wrong; fallback to source if this happens
       # TODO we could add the line numbers in ourselves instead of having to strip out the junk
       if (attr? 'linenums', nil, false) && (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
         linenums_mode = :table
-        result = lexer.highlight(source, :options => opts).sub(PygmentsWrapperDivRx, '\1').gsub(PygmentsWrapperPreRx, '\1')
+        result = ((lexer.highlight source, :options => opts) || source).sub(PygmentsWrapperDivRx, '\1').gsub(PygmentsWrapperPreRx, '\1')
       else
-        if PygmentsWrapperPreRx =~ (result = lexer.highlight(source, :options => opts))
+        if PygmentsWrapperPreRx =~ (result = (lexer.highlight source, :options => opts) || source)
           result = $1
         end
       end
