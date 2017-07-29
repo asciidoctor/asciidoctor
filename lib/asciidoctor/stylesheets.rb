@@ -70,11 +70,12 @@ class Stylesheets
   # returns the [String] Pygments stylesheet data
   def pygments_stylesheet_data style = nil
     if load_pygments
-      (@pygments_stylesheet_data ||= {})[style || DEFAULT_PYGMENTS_STYLE] ||=
-          (::Pygments.css '.listingblock .pygments', :classprefix => 'tok-', :style => (style || DEFAULT_PYGMENTS_STYLE)).
+      style ||= DEFAULT_PYGMENTS_STYLE
+      (@pygments_stylesheet_data ||= {})[style] ||=
+          ((::Pygments.css '.listingblock .pygments', :classprefix => 'tok-', :style => style) || '/* Failed to load Pygments CSS. */').
           sub('.listingblock .pygments  {', '.listingblock .pygments, .listingblock .pygments code {')
     else
-      '/* Pygments styles disabled. Pygments is not available. */'
+      '/* Pygments CSS disabled. Pygments is not available. */'
     end
   end
 
