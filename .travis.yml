@@ -32,4 +32,4 @@ deploy:
     repo: asciidoctor/asciidoctor
     rvm: *release_ruby
   api_key:
-    secure: ID1RBCpwJhdr/QTOmoLC1rTipuV9y1Up7X7JPK3GcwB5CeTOLX8Ny3JX2QfDW8Fb1cC5oDOp6uCuCvxD3CCTxlA0JxMP/FoXcg5JY5gffyTsaod4cn5Eu2dY9rGcYROJ79C+5syAf3pO1iefFx2LwuGwnNjbmnpNmnuWbZ48Mbg=
+    secure: p0mMZ7Fl5IdIv3ZIH8/4nK3C/6pRjpT8nHnsvAcgBk8TyEMYQO0gZExwMVpk8kB4Nm4Y6dXJqjoHOb1x7dpylEOqyF5fB+mJ8wfWTbGYI4kLYS7O/pkW8XAvH9BqaSnvLb7jZirxxu936ehCw+VlxZfn1n8lC8+jrIoDKMZkKmk=
