@@ -1,0 +1,22 @@
+// Italian translation, courtesy of Marco Ciampa <ciampix@libero.it>
+:appendix-caption: Appendice
+:appendix-refsig: {appendix-caption}
+:caution-caption: Attenzione
+:chapter-label: Capitolo
+:chapter-refsig: {chapter-label}
+:example-caption: Esempio
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Ultimo aggiornamento
+ifdef::listing-caption[:listing-caption: Elenco]
+:manname-title: NOME
+:note-caption: Nota
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Prefazione]
+//:section-refsig: ???
+:table-caption: Tabella
+:tip-caption: Suggerimento
+:toc-title: Indice
+:untitled-label: Senza titolo
+:version-label: Versione
+:warning-caption: Attenzione

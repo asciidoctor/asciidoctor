@@ -1,0 +1,22 @@
+// Serbian Latin translation, courtesy of Bojan Stipic <bojan-7@live.com>
+:appendix-caption: Dodatak
+:appendix-refsig: {appendix-caption}
+:caution-caption: Oprez
+:chapter-label: Poglavlje
+:chapter-refsig: {chapter-label}
+:example-caption: Primer
+:figure-caption: Slika
+:important-caption: Važno
+:last-update-label: Poslednje ažurirano
+ifdef::listing-caption[:listing-caption: Spisak]
+:manname-title: NAZIV
+:note-caption: Beleška
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Predgovor]
+//:section-refsig: ???
+:table-caption: Tabela
+:tip-caption: Savet
+:toc-title: Sadržaj
+:untitled-label: Bez naziva
+:version-label: Verzija
+:warning-caption: Upozorenje

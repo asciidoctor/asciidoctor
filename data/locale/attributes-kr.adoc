@@ -1,0 +1,22 @@
+// Korean translation, courtesy of Sungsik Nam <jmyl@me.com>
+:appendix-caption: 부록
+:appendix-refsig: {appendix-caption}
+:caution-caption: 주의
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: 예시
+:figure-caption: 그림
+:important-caption: 중요
+:last-update-label: 마지막 업데이트
+ifdef::listing-caption[:listing-caption: 목록]
+:manname-title: 이름
+:note-caption: 노트
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: 머리말]
+//:section-refsig: ???
+:table-caption: 표
+:tip-caption: 힌트
+:toc-title: 차례
+:untitled-label: 익명
+:version-label: 버전
+:warning-caption: 경고

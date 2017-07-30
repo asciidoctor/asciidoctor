@@ -1,0 +1,22 @@
+// Romanian translation, courtesy of Vitalie Lazu <vitalie.lazu@gmail.com>
+:appendix-caption: Apendix
+:appendix-refsig: {appendix-caption}
+:caution-caption: Precauție
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: Exemplu
+:figure-caption: Figură
+:important-caption: Important
+:last-update-label: Ultima actualizare
+ifdef::listing-caption[:listing-caption: Listare]
+:manname-title: NUME
+:note-caption: Notă
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Prefață]
+//:section-refsig: ???
+:table-caption: Tabela
+:tip-caption: Sfat
+:toc-title: Cuprins
+:untitled-label: Fără denumire
+:version-label: Versiunea
+:warning-caption: Atenție

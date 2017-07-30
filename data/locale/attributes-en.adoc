@@ -1,0 +1,23 @@
+// English translation, for reference only; matches the built-in behavior of core
+:appendix-caption: Appendix
+:appendix-refsig: {appendix-caption}
+:caution-caption: Caution
+:chapter-label: Chapter
+:chapter-refsig: {chapter-label}
+:example-caption: Example
+:figure-caption: Figure
+:important-caption: Important
+:last-update-label: Last updated
+ifdef::listing-caption[:listing-caption: Listing]
+//NOTE the value of manname-title should be uppercase, if the language supports it
+:manname-title: NAME
+:note-caption: Note
+:part-refsig: Part
+ifdef::preface-title[:preface-title: Preface]
+:section-refsig: Section
+:table-caption: Table
+:tip-caption: Tip
+:toc-title: Table of Contents
+:untitled-label: Untitled
+:version-label: Version
+:warning-caption: Warning

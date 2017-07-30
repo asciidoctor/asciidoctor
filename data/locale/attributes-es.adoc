@@ -1,0 +1,22 @@
+// Spanish translation, courtesy of Eddú Meléndez <eddu.melendez@gmail.com>
+:appendix-caption: Apéndice
+:appendix-refsig: {appendix-caption}
+:caution-caption: Precaución
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: Ejemplo
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Ultima actualización
+ifdef::listing-caption[:listing-caption: Lista]
+:manname-title: NOMBRE
+:note-caption: Nota
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Prefacio]
+//:section-refsig: ???
+:table-caption: Tabla
+:tip-caption: Sugerencia
+:toc-title: Tabla de Contenido
+:untitled-label: Sin título
+:version-label: Versión
+:warning-caption: Aviso

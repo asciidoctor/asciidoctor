@@ -1,0 +1,22 @@
+// Japanese translation, courtesy of Takayuki Konishi <seannos.takayuki@gmail.com>
+:appendix-caption: 付録
+:appendix-refsig: {appendix-caption}
+:caution-caption: 注意
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: 例
+:figure-caption: 図
+:important-caption: 重要
+:last-update-label: 最終更新
+ifdef::listing-caption[:listing-caption: リスト]
+:manname-title: 名前
+:note-caption: 注記
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: まえがき]
+//:section-refsig: ???
+:table-caption: 表
+:tip-caption: ヒント
+:toc-title: 目次
+:untitled-label: 無題
+:version-label: バージョン
+:warning-caption: 警告

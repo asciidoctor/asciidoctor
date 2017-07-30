@@ -1,0 +1,22 @@
+// Danish translation, courtesy of Max Rydahl Andersen <manderse@redhat.com>
+:appendix-caption: Appendix
+:appendix-refsig: {appendix-caption}
+:caution-caption: Forsigtig
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: Eksempel
+:figure-caption: Figur
+:important-caption: Vigtig
+:last-update-label: Sidst opdateret
+ifdef::listing-caption[:listing-caption: List]
+:manname-title: NAVN
+:note-caption: Notat
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Forord]
+//:section-refsig: ???
+:table-caption: Tabel
+:tip-caption: Tips
+:toc-title: Indholdsfortegnelse
+:untitled-label: Unavngivet
+:version-label: Version
+:warning-caption: Advarsel
