@@ -1,0 +1,22 @@
+// Bulgarian translation, courtesy of Ivan St. Ivanov <ivan.st.ivanov@gmail.com>
+:appendix-caption: Приложение
+:appendix-refsig: {appendix-caption}
+:caution-caption: Внимание
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: Пример
+:figure-caption: Фигура
+:important-caption: Важно
+:last-update-label: Последно обновен
+ifdef::listing-caption[:listing-caption: Листинг]
+:manname-title: ИМЕ
+:note-caption: Забележка
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Предговор]
+//:section-refsig: ???
+:table-caption: Таблица
+:tip-caption: Подсказка
+:toc-title: Съдържание
+:untitled-label: Без заглавие
+:version-label: Версия
+:warning-caption: Внимание

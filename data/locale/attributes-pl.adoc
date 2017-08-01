@@ -1,0 +1,22 @@
+// Polish translation, courtesy of Łukasz Dziedziul <l.dziedziul@gmail.com>
+:appendix-caption: Dodatek
+:appendix-refsig: {appendix-caption}
+:caution-caption: Uwaga
+:chapter-label: Rozdział
+:chapter-refsig: {chapter-label}
+:example-caption: Przykład
+:figure-caption: Rysunek
+:important-caption: Ważne
+:last-update-label: Ostatnio zmodyfikowany
+//ifdef::listing-caption[:listing-caption: ???]
+:manname-title: NAZWA
+:note-caption: Notka
+//:part-refsig: ???
+//ifdef::preface-title[:preface-title: ???]
+//:section-refsig: ???
+:table-caption: Tabela
+:tip-caption: Sugestia
+:toc-title: Spis treści
+:untitled-label: Bez tytułu
+:version-label: Wersja
+:warning-caption: Ostrzeżenie

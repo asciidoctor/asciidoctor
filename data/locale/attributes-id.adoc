@@ -1,0 +1,22 @@
+// Bahasa Indonesia, courtesy of Triyan W. Nugroho <triyan.wn@gmail.com>
+:appendix-caption: Lampiran
+:appendix-refsig: {appendix-caption}
+:caution-caption: Perhatian
+:chapter-label: Bab
+:chapter-refsig: {chapter-label}
+:example-caption: Contoh
+:figure-caption: Gambar
+:important-caption: Penting
+:last-update-label: Pembaruan terakhir
+ifdef::listing-caption[:listing-caption: Daftar]
+:manname-title: NAMA
+:note-caption: Catatan
+//:part-refsig: ???
+//ifdef::preface-title[:preface-title: ???]
+//:section-refsig: ???
+:table-caption: Tabel
+:tip-caption: Tips
+:toc-title: Daftar Isi
+:untitled-label: Tak Berjudul
+:version-label: Versi
+:warning-caption: Peringatan

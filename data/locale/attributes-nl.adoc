@@ -1,0 +1,22 @@
+// Dutch translation, courtesy of Roel Van Steenberghe <roel.vansteenberghe@gmail.com>
+:appendix-caption: Bijlage
+:appendix-refsig: {appendix-caption}
+:caution-caption: Opgelet
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: Voorbeeld
+:figure-caption: Figuur
+:important-caption: Belangrijk
+:last-update-label: Laatste aanpassing
+ifdef::listing-caption[:listing-caption: Lijst]
+:manname-title: NAAM
+:note-caption: Noot
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Inleiding]
+//:section-refsig: ???
+:table-caption: Tabel
+:tip-caption: Tip
+:toc-title: Ínhoudsopgave
+:untitled-label: Naamloos
+:version-label: Versie
+:warning-caption: Waarschuwing

@@ -1,0 +1,22 @@
+// French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
+:appendix-caption: Appendice
+:appendix-refsig: {appendix-caption}
+:caution-caption: Avertissement
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: Exemple
+:figure-caption: Figure
+:important-caption: Important
+:last-update-label: Dernière mise à jour
+ifdef::listing-caption[:listing-caption: Liste]
+:manname-title: NOM
+:note-caption: Note
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Préface]
+//:section-refsig: ???
+:table-caption: Tableau
+:tip-caption: Astuce
+:toc-title: Table des matières
+:untitled-label: Sans titre
+:version-label: Version
+:warning-caption: Attention

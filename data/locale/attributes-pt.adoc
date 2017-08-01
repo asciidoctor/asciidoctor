@@ -1,0 +1,22 @@
+// Portuguese translation, courtesy of Roberto Cortez <radcortez@yahoo.com>
+:appendix-caption: Apêndice
+:appendix-refsig: {appendix-caption}
+:caution-caption: Atenção
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: Exemplo
+:figure-caption: Figura
+:important-caption: Importante
+:last-update-label: Última actualização
+ifdef::listing-caption[:listing-caption: Listagem]
+:manname-title: NOME
+:note-caption: Nota
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Prefácio]
+//:section-refsig: ???
+:table-caption: Tabela
+:tip-caption: Sugestão
+:toc-title: Índice
+:untitled-label: Sem título
+:version-label: Versão
+:warning-caption: Aviso

@@ -1,0 +1,22 @@
+// Simplified Chinese translation, courtesy of John Dong <dongwqs@gmail.com>
+:appendix-caption: 附录
+:appendix-refsig: {appendix-caption}
+:caution-caption: 注意
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: 示例
+:figure-caption: 图表
+:important-caption: 重要
+:last-update-label: 最后更新
+ifdef::listing-caption[:listing-caption: 列表]
+:manname-title: 名称
+:note-caption: 笔记
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: 序言]
+//:section-refsig: ???
+:table-caption: 表格
+:tip-caption: 提示
+:toc-title: 目录
+:untitled-label: 暂无标题
+:version-label: 版本
+:warning-caption: 警告

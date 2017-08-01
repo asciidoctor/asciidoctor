@@ -1,0 +1,22 @@
+// Turkish translation, courtesy of Rahman Usta <rahman.usta.88@gmail.com>
+:appendix-caption: Ek bölüm
+:appendix-refsig: {appendix-caption}
+:caution-caption: Dikkat
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: Örnek
+:figure-caption: Görsel
+:important-caption: Önemli
+:last-update-label: Son güncelleme
+ifdef::listing-caption[:listing-caption: Listeleme]
+:manname-title: İSİM
+:note-caption: Not
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Ön söz]
+//:section-refsig: ???
+:table-caption: Tablo
+:tip-caption: İpucu
+:toc-title: İçindekiler
+:untitled-label: İsimsiz
+:version-label: Versiyon
+:warning-caption: Uyarı

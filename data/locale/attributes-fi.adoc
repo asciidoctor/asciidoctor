@@ -1,0 +1,22 @@
+// Finnish translation by Tero Hänninen
+:appendix-caption: Liitteet
+:appendix-refsig: {appendix-caption}
+:caution-caption: Huom
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: Esimerkki
+:figure-caption: Kuvio
+:important-caption: Tärkeää
+:last-update-label: Viimeksi päivitetty
+ifdef::listing-caption[:listing-caption: Listaus]
+:manname-title: NIMI
+:note-caption: Huomio
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: Esipuhe]
+//:section-refsig: ???
+:table-caption: Taulukko
+:tip-caption: Vinkki
+:toc-title: Sisällysluettelo
+:untitled-label: Nimetön
+:version-label: Versio
+:warning-caption: Varoitus

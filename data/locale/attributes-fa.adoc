@@ -1,0 +1,22 @@
+// Persian (Farsi) translation, courtesy of Shahryar Eivazzadeh <shahryareiv@gmail.com>
+:appendix-caption: پیوست
+:appendix-refsig: {appendix-caption}
+:caution-caption: گوشزد
+//:chapter-label: ???
+//:chapter-refsig: {chapter-label}
+:example-caption: نمونه
+:figure-caption: نمودار
+:important-caption: مهم
+:last-update-label: آخرین به روز رسانی
+ifdef::listing-caption[:listing-caption: فهرست]
+:manname-title: نام
+:note-caption: یادداشت
+//:part-refsig: ???
+ifdef::preface-title[:preface-title: پیشگفتار]
+//:section-refsig: ???
+:table-caption: جدول
+:tip-caption: نکته
+:toc-title: فهرست مطالب
+:untitled-label: بی‌نام
+:version-label: نگارش
+:warning-caption: هشدار
