@@ -180,6 +180,17 @@ class SampleExtensionGroup < Asciidoctor::Extensions::Group
   end
 end
 
+def register_cat_picture_block_macro attrs = {}
+  Asciidoctor::Extensions.create do
+    block_macro do
+      named :cat_picture
+      process do |parent|
+        create_image_block parent, attrs
+      end
+    end
+  end
+end
+
 context 'Extensions' do
   context 'Register' do
     test 'should register extension group class' do
@@ -1161,7 +1172,6 @@ sample content
       end
     end
 
-
     test 'should append docinfo to document' do
       begin
         Asciidoctor::Extensions.register do
@@ -1180,6 +1190,45 @@ sample content
       ensure
         Asciidoctor::Extensions.unregister_all
       end
+    end
+
+    test 'should raise an exception if mandatory attribute target is not provided' do
+      input = <<-EOS
+.My picture
+cat_picture::[]
+      EOS
+      # target and alt attributes are missing
+      exception = assert_raises ArgumentError do
+        attrs = {'alt' => 'A lazy cat'}
+        doc = document_from_string input, :extension_registry => (register_cat_picture_block_macro attrs)
+        doc.convert
+      end
+      assert_match(/target attribute must be defined/, exception.message)
+    end
+
+    test 'should raise an exception if mandatory attribute alt is not provided' do
+      input = <<-EOS
+.My picture
+cat_picture::[]
+      EOS
+      # alt attribute is missing
+      exception = assert_raises ArgumentError do
+        attrs = {'target' => 'cat.png'}
+        doc = document_from_string input, :extension_registry => (register_cat_picture_block_macro attrs)
+        doc.convert
+      end
+      assert_match(/alt attribute must be defined/, exception.message)
+    end
+
+    test 'should create an image block if all mandatory attributes are provided' do
+      input = <<-EOS
+.My picture
+cat_picture::[]
+      EOS
+      # mandatory attributes are provided, all good!
+      attrs = {'target' => 'cat.png', 'alt' => 'A lazy cat'}
+      doc = document_from_string input, :extension_registry => (register_cat_picture_block_macro attrs)
+      doc.convert
     end
   end
 end

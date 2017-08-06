@@ -147,7 +147,18 @@ module Extensions
       Block.new parent, context, { :source => source, :attributes => attrs }.merge(opts)
     end
 
+    # Public: Creates an image block attached to the parent.
+    #
+    # parent - The parent Section (or Document) of this new image block.
+    # attrs  - A Hash of attributes to control how the image block is built.
+    #          Use the target attribute to set the source of the image.
+    #          Use the alt attribute to specify an alternate text for the image.
+    # opts   - An optional Hash of options (default: {})
+    #
+    # Returns a [Block] node with all properties properly initialized.
     def create_image_block parent, attrs, opts = {}
+      raise ::ArgumentError, 'Unable to create an image block, target attribute must be defined' unless attrs.has_key? 'target'
+      raise ::ArgumentError, 'Unable to create an image block, alt attribute must be defined' unless attrs.has_key? 'alt'
       create_block parent, :image, nil, attrs, opts
     end
 
