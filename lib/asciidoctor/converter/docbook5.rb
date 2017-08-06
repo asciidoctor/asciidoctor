@@ -606,8 +606,8 @@ module Asciidoctor
       :monospaced  => ['<literal>',                '</literal>',     false],
       :emphasis    => ['<emphasis>',               '</emphasis>',    true],
       :strong      => ['<emphasis role="strong">', '</emphasis>',    true],
-      :double      => ['&#8220;',                  '&#8221;',        true],
-      :single      => ['&#8216;',                  '&#8217;',        true],
+      :double      => ['<quote>',                  '</quote>',       true],
+      :single      => ['<quote>',                  '</quote>',       true],
       :mark        => ['<emphasis role="marked">', '</emphasis>',    false],
       :superscript => ['<superscript>',            '</superscript>', false],
       :subscript   => ['<subscript>',              '</subscript>',   false]
