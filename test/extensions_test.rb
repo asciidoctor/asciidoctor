@@ -180,12 +180,19 @@ class SampleExtensionGroup < Asciidoctor::Extensions::Group
   end
 end
 
-def register_cat_picture_block_macro attrs = {}
+def create_cat_in_sink_block_macro
   Asciidoctor::Extensions.create do
     block_macro do
-      named :cat_picture
-      process do |parent|
-        create_image_block parent, attrs
+      named :cat_in_sink
+      process do |parent, target, attrs|
+        image_attrs = {}
+        unless target.nil_or_empty?
+          image_attrs['target'] = %(cat-in-sink-day-#{target}.png)
+        end
+        if (alt = attrs.delete 1)
+          image_attrs['alt'] = alt
+        end
+        create_image_block parent, image_attrs
       end
     end
   end
@@ -1192,43 +1199,41 @@ sample content
       end
     end
 
-    test 'should raise an exception if mandatory attribute target is not provided' do
+    test 'should raise an exception if mandatory target attribute is not provided for image block' do
       input = <<-EOS
-.My picture
-cat_picture::[]
+.Cat in Sink?
+cat_in_sink::[]
       EOS
-      # target and alt attributes are missing
       exception = assert_raises ArgumentError do
-        attrs = {'alt' => 'A lazy cat'}
-        doc = document_from_string input, :extension_registry => (register_cat_picture_block_macro attrs)
-        doc.convert
+        render_embedded_string input, :extension_registry => create_cat_in_sink_block_macro
       end
-      assert_match(/target attribute must be defined/, exception.message)
+      assert_match(/target attribute is required/, exception.message)
     end
 
-    test 'should raise an exception if mandatory attribute alt is not provided' do
+    test 'should assign alt attribute to image block if alt is not provided' do
       input = <<-EOS
-.My picture
-cat_picture::[]
+.Cat in Sink?
+cat_in_sink::25[]
       EOS
-      # alt attribute is missing
-      exception = assert_raises ArgumentError do
-        attrs = {'target' => 'cat.png'}
-        doc = document_from_string input, :extension_registry => (register_cat_picture_block_macro attrs)
-        doc.convert
-      end
-      assert_match(/alt attribute must be defined/, exception.message)
+      doc = document_from_string input, :header_footer => false, :extension_registry => create_cat_in_sink_block_macro
+      image = doc.blocks[0]
+      assert_equal 'cat in sink day 25', (image.attr 'alt')
+      assert_equal 'cat in sink day 25', (image.attr 'default-alt')
+      output = doc.convert
+      assert_includes output, '<img src="cat-in-sink-day-25.png" alt="cat in sink day 25">'
     end
 
-    test 'should create an image block if all mandatory attributes are provided' do
+    test 'should create an image block if mandatory attributes are provided' do
       input = <<-EOS
-.My picture
-cat_picture::[]
+.Cat in Sink?
+cat_in_sink::30[cat in sink (yes)]
       EOS
-      # mandatory attributes are provided, all good!
-      attrs = {'target' => 'cat.png', 'alt' => 'A lazy cat'}
-      doc = document_from_string input, :extension_registry => (register_cat_picture_block_macro attrs)
-      doc.convert
+      doc = document_from_string input, :header_footer => false, :extension_registry => create_cat_in_sink_block_macro
+      image = doc.blocks[0]
+      assert_equal 'cat in sink (yes)', (image.attr 'alt')
+      refute(image.attr? 'default-alt')
+      output = doc.convert
+      assert_includes output, '<img src="cat-in-sink-day-30.png" alt="cat in sink (yes)">'
     end
   end
 end
