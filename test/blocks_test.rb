@@ -1067,6 +1067,20 @@ AssertionError
       assert_equal output.rstrip, output2.rstrip
     end
 
+    test 'first character of block title may be a period if not followed by space' do
+      input = <<-EOS
+..gitignore
+----
+/.bundle/
+/build/
+/Gemfile.lock
+----
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//*[@class="title"][text()=".gitignore"]', output
+    end
+
     test 'listing block without title should generate screen element in docbook' do
       input = <<-EOS
 ----
