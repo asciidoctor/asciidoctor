@@ -706,11 +706,7 @@ module Substitutors
               text, before, after = (text.slice 1, text.length - 1), '(', ''
             end
           elsif text.end_with? ')'
-            if text.start_with? '('
-              text, visible = (text.slice 1, text.length - 2), false
-            else
-              text, before, after = (text.slice 0, text.length - 1), '', ')'
-            end
+            text, before, after = (text.slice 0, text.length - 1), '', ')'
           end
           if visible
             # ((Tigers))
