@@ -671,8 +671,7 @@ module Substitutors
       }
     end
 
-    if ((result.include? '((') && (result.include? '))')) ||
-        (found_macroish_short && (result.include? 'indexterm'))
+    if ((result.include? '((') && (result.include? '))')) || (found_macroish_short && (result.include? 'indexterm'))
       # (((Tigers,Big cats)))
       # indexterm:[Tigers,Big cats]
       # ((Tigers))
@@ -681,32 +680,46 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
 
-        # honor the escape
-        if m[0].start_with? RS
-          next m[0][1..-1]
-        end
-
         case m[1]
         when 'indexterm'
+          # honor the escape
+          if m[0].start_with? RS
+            next m[0][1..-1]
+          end
           # indexterm:[Tigers,Big cats]
-          terms = split_simple_csv(normalize_string m[2], true)
+          terms = split_simple_csv normalize_string m[2], true
           @document.register :indexterms, terms
           (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
         when 'indexterm2'
+          # honor the escape
+          if m[0].start_with? RS
+            next m[0][1..-1]
+          end
           # indexterm2:[Tigers]
           term = normalize_string m[2], true
           @document.register :indexterms, [term]
           (Inline.new self, :indexterm, term, :type => :visible).convert
         else
-          text, visible, before, after = m[3], true, nil, nil
-          if text.start_with? '('
-            if text.end_with? ')'
-              text, visible = (text.slice 1, text.length - 2), false
+          # honor the escape
+          if m[0].start_with? RS
+            # escape concealed index term, but process nested flow index term
+            if ((text = m[3]).start_with? '(') && (text.end_with? ')')
+              text = text.slice 1, text.length - 2
+              visible, before, after = true, '(', ')'
             else
-              text, before, after = (text.slice 1, text.length - 1), '(', ''
+              next m[0][1..-1]
             end
-          elsif text.end_with? ')'
-            text, before, after = (text.slice 0, text.length - 1), '', ')'
+          else
+            text, visible = m[3], true
+            if text.start_with? '('
+              if text.end_with? ')'
+                text, visible = (text.slice 1, text.length - 2), false
+              else
+                text, before, after = (text.slice 1, text.length - 1), '(', ''
+              end
+            elsif text.end_with? ')'
+              text, before, after = (text.slice 0, text.length - 1), '', ')'
+            end
           end
           if visible
             # ((Tigers))

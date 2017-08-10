@@ -1063,6 +1063,16 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
       end
     end
 
+    test 'should only escape enclosing brackets if concealed index term is preceded by a backslash' do
+      input = %[National Institute of Science and Technology #{BACKSLASH}(((NIST)))]
+      doc = document_from_string input, :header_footer => false
+      output = doc.render
+      assert_xpath '//p[text()="National Institute of Science and Technology (NIST)"]', output, 1
+      term = doc.catalog[:indexterms].first
+      assert_equal 1, term.size
+      assert_equal 'NIST', term.first
+    end
+
     test 'should not split index terms on commas inside of quoted terms' do
       inputs = []
       inputs.push <<-EOS
