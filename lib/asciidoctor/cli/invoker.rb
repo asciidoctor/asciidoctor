@@ -68,24 +68,23 @@ module Asciidoctor
           end
         end
 
-        stdin = if infiles.size == 1
+        if infiles.size == 1
           if (infile0 = infiles[0]) == '-'
             outfile ||= infile0
-            true
+            stdin = true
           elsif ::File.pipe? infile0
             outfile ||= '-'
-            nil
           end
         end
 
-        tofile = if outfile == '-'
-          @out || $stdout
+        if outfile == '-'
+          tofile = @out || $stdout
         elsif outfile
           opts[:mkdirs] = true
-          outfile
+          tofile = outfile
         else
           opts[:mkdirs] = true
-          nil # automatically calculate outfile based on infile
+          # automatically calculate outfile based on infile
         end
 
         if stdin
