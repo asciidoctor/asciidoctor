@@ -841,6 +841,32 @@ text
         flunk %(options argument should not be modified)
       end
     end
+
+    test 'should set to_dir option to parent directory of specified output file' do
+      sample_input_path = fixture_path 'basic.asciidoc'
+      sample_output_path = fixture_path 'basic.html'
+      begin
+        doc = Asciidoctor.convert_file sample_input_path, :to_file => sample_output_path
+        assert_equal File.dirname(sample_output_path), doc.options[:to_dir]
+      ensure
+        FileUtils.rm(sample_output_path)
+      end
+    end
+
+    test 'should set to_dir option to parent directory of specified output directory and file' do
+      sample_input_path = fixture_path 'basic.asciidoc'
+      sample_output_path = fixture_path 'basic.html'
+      fixture_base_path = File.dirname sample_output_path
+      fixture_parent_path = File.dirname fixture_base_path
+      sample_output_relpath = File.join 'fixtures', 'basic.html'
+      begin
+        # FIXME we shouldn't need unsafe here since combined file is within jail
+        doc = Asciidoctor.convert_file sample_input_path, :to_dir => fixture_parent_path, :to_file => sample_output_relpath, :safe => :unsafe
+        assert_equal fixture_base_path, doc.options[:to_dir]
+      ensure
+        FileUtils.rm(sample_output_path)
+      end
+    end
   end
 
   context 'Docinfo files' do
