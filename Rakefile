@@ -154,7 +154,18 @@ desc 'Trigger builds for all dependent projects on Travis CI'
       if (commit_hash = ENV['TRAVIS_COMMIT'])
         commit_memo = %( (#{commit_hash.slice 0, 8})\\n\\nhttps://github.com/#{ENV['TRAVIS_REPO_SLUG'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
       end
-      payload = %({ "request": { "branch": "#{branch}", "message": "Build triggered by Asciidoctor#{commit_memo}" } })
+      payload = %({ 
+                    "request": { 
+                      "branch": "#{branch}", 
+                      "message": "Build triggered by Asciidoctor#{commit_memo}", 
+                      "config": {
+                        "merge_mode": "deep_merge",
+                        "env": {
+                          "BUILD_REASON": "UPDATE_UPSTREAM"
+                        }
+                      }
+                    } 
+                  })
       (http = Net::HTTP.new 'api.travis-ci.org', 443).use_ssl = true
       request = Net::HTTP::Post.new %(/repo/#{org}%2F#{name}/requests), header
       request.body = payload
