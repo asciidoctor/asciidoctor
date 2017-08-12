@@ -677,40 +677,40 @@ module Substitutors
       # ((Tigers))
       # indexterm2:[Tigers]
       result = result.gsub(InlineIndextermMacroRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-
-        case m[1]
+        case $1
         when 'indexterm'
+          text = $2
           # honor the escape
-          if m[0].start_with? RS
-            next m[0][1..-1]
+          if (m0 = $&).start_with? RS
+            next m0.slice 1, m0.length
           end
           # indexterm:[Tigers,Big cats]
-          terms = split_simple_csv normalize_string m[2], true
+          terms = split_simple_csv normalize_string text, true
           @document.register :indexterms, terms
           (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
         when 'indexterm2'
+          text = $2
           # honor the escape
-          if m[0].start_with? RS
-            next m[0][1..-1]
+          if (m0 = $&).start_with? RS
+            next m0.slice 1, m0.length
           end
           # indexterm2:[Tigers]
-          term = normalize_string m[2], true
+          term = normalize_string text, true
           @document.register :indexterms, [term]
           (Inline.new self, :indexterm, term, :type => :visible).convert
         else
+          text = $3
           # honor the escape
-          if m[0].start_with? RS
+          if (m0 = $&).start_with? RS
             # escape concealed index term, but process nested flow index term
-            if ((text = m[3]).start_with? '(') && (text.end_with? ')')
+            if (text.start_with? '(') && (text.end_with? ')')
               text = text.slice 1, text.length - 2
               visible, before, after = true, '(', ')'
             else
-              next m[0][1..-1]
+              next m0.slice 1, m0.length
             end
           else
-            text, visible = m[3], true
+            visible = true
             if text.start_with? '('
               if text.end_with? ')'
                 text, visible = (text.slice 1, text.length - 2), false
