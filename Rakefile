@@ -158,7 +158,7 @@ desc 'Trigger builds for all dependent projects on Travis CI'
       if (commit_hash = ENV['TRAVIS_COMMIT'])
         commit_memo = %( (#{commit_hash.slice 0, 8})\n\nhttps://github.com/#{ENV['TRAVIS_REPO_SLUG'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
       end
-      config = YAML.load open(%(https://raw.githubusercontent.com/#{project}/.travis-upstream-only.yml')) {|fd| fd.read } rescue {}
+      config = YAML.load open(%(https://raw.githubusercontent.com/#{project}/.travis-upstream-only.yml)) {|fd| fd.read } rescue {}
       payload = {
         'request' => {
           'branch' => branch,
