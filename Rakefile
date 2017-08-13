@@ -148,6 +148,7 @@ desc 'Trigger builds for all dependent projects on Travis CI'
     ).each do |project|
       org, name, branch = project.split '/', 3
       branch ||= 'master'
+      project = [org, name, branch] * '/'
       header = {
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
@@ -155,14 +156,14 @@ desc 'Trigger builds for all dependent projects on Travis CI'
         'Authorization' => %(token #{token})
       }
       if (commit_hash = ENV['TRAVIS_COMMIT'])
-        commit_memo = %( (#{commit_hash.slice 0, 8})\\n\\nhttps://github.com/#{ENV['TRAVIS_REPO_SLUG'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
+        commit_memo = %( (#{commit_hash.slice 0, 8})\n\nhttps://github.com/#{ENV['TRAVIS_REPO_SLUG'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
       end
       config = YAML.load open(%(https://raw.githubusercontent.com/#{project}/.travis-upstream-only.yml')) {|fd| fd.read } rescue {}
       payload = {
-        request: {
-          branch: branch,
-          message: %(Build triggered by Asciidoctor#{commit_memo}),
-          config: config
+        'request' => {
+          'branch' => branch,
+          'message' => %(Build triggered by Asciidoctor#{commit_memo}),
+          'config' => config
         }
       }.to_json
       (http = Net::HTTP.new 'api.travis-ci.org', 443).use_ssl = true
