@@ -689,26 +689,20 @@ class Parser
         end
       end
 
-      break_at_list = (skipped == 0 && in_list)
       reader.unshift_line this_line
 
       # a literal paragraph: contiguous lines starting with at least one whitespace character
       # NOTE style can only be nil or "normal" at this point
       if indented && !style
-        lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => text_only
-
+        lines = read_paragraph_lines reader, (in_list && skipped == 0), :skip_line_comments => text_only
         adjust_indentation! lines
-
         block = Block.new(parent, :literal, :content_model => :verbatim, :source => lines, :attributes => attributes)
         # a literal gets special meaning inside of a description list
         # TODO this feels hacky, better way to distinguish from explicit literal block?
         block.set_option('listparagraph') if in_list
-
       # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
       else
-        # NOTE we only get here if there's at least one line that's not a line comment
-        lines = read_paragraph_lines reader, break_at_list, :skip_line_comments => true
-
+        lines = read_paragraph_lines reader, (in_list && skipped == 0), :skip_line_comments => true
         # NOTE don't check indented here since it's extremely rare
         #if text_only || indented
         if text_only
