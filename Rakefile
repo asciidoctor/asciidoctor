@@ -136,7 +136,10 @@ desc 'Trigger builds for all dependent projects on Travis CI'
           (ENV['TRAVIS_JOB_NUMBER'].to_s.end_with? '.1')
     end
     next unless (token = ENV['TRAVIS_TOKEN'])
+    require 'json'
     require 'net/http'
+    require 'open-uri'
+    require 'yaml'
     %w(
       asciidoctor/asciidoctor.js
       asciidoctor/asciidoctorj
@@ -154,7 +157,14 @@ desc 'Trigger builds for all dependent projects on Travis CI'
       if (commit_hash = ENV['TRAVIS_COMMIT'])
         commit_memo = %( (#{commit_hash.slice 0, 8})\\n\\nhttps://github.com/#{ENV['TRAVIS_REPO_SLUG'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
       end
-      payload = %({ "request": { "branch": "#{branch}", "message": "Build triggered by Asciidoctor#{commit_memo}" } })
+      config = YAML.load open(%(https://raw.githubusercontent.com/#{project}/.travis-upstream-only.yml')) {|fd| fd.read } rescue {}
+      payload = {
+        request: {
+          branch: branch,
+          message: %(Build triggered by Asciidoctor#{commit_memo}),
+          config: config
+        }
+      }.to_json
       (http = Net::HTTP.new 'api.travis-ci.org', 443).use_ssl = true
       request = Net::HTTP::Post.new %(/repo/#{org}%2F#{name}/requests), header
       request.body = payload
