@@ -1429,7 +1429,7 @@ module Asciidoctor
       return self.load input, options
     else
       write_to_same_dir = false
-      write_to_target = (stream_output = to_file.respond_to? :write) ? false : to_file
+      write_to_target = (stream_output = to_file.respond_to? :write) ? false : (options[:to_file] = to_file)
     end
 
     unless options.key? :header_footer
@@ -1450,10 +1450,10 @@ module Asciidoctor
       elsif to_file
         options[:to_dir] = ::File.dirname ::File.expand_path to_file
       end
-    #else
-    #  options[:to_dir] = nil
     end
 
+    # NOTE :to_dir always set when outputting to a file
+    # NOTE :to_file option only passed if assigned an explicit path
     doc = self.load input, options
 
     if write_to_same_dir # write to file in same directory

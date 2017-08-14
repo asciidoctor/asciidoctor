@@ -229,6 +229,9 @@ class Document < AbstractBlock
         end
         attr_overrides[key.downcase] = value
       end
+      if (to_file = options[:to_file])
+        attr_overrides['outfilesuffix'] = ::File.extname to_file
+      end
       @attribute_overrides = attr_overrides
       # safely resolve the safe mode from const, int or string
       if !(safe_mode = options[:safe])
