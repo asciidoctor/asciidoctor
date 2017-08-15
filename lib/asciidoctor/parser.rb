@@ -454,7 +454,7 @@ class Parser
 
     # QUESTION should we introduce a parsing context object?
     source_location = reader.cursor if document.sourcemap
-    this_path, this_lineno, this_line = reader.path, reader.lineno, reader.read_line
+    this_path, this_lineno, this_line, doc_attrs = reader.path, reader.lineno, reader.read_line, document.attributes
     block = block_context = cloaked_context = terminator = nil
     style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
 
@@ -534,7 +534,7 @@ class Parser
               attributes.delete 'style' if attributes.key? 'style'
               if (target.include? ATTR_REF_HEAD) && (target = block.sub_attributes target, :attribute_missing => 'drop-line').empty?
                 # retain as unparsed if attribute-missing is skip
-                if document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
+                if doc_attrs.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
                   return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
                 # otherwise, drop the line
                 else
@@ -657,7 +657,7 @@ class Parser
         block.title = float_title
         attributes.delete 'title'
         block.id = float_id || attributes['id'] ||
-            ((document.attributes.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
+            ((doc_attrs.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
         block.level = float_level
         break
 
@@ -713,7 +713,7 @@ class Parser
         elsif (ADMONITION_STYLE_HEADS.include? ch0) && (this_line.include? ':') && (AdmonitionParagraphRx =~ this_line)
           lines[0] = $' # string after match
           attributes['name'] = admonition_name = (attributes['style'] = $1).downcase
-          attributes['textlabel'] = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
+          attributes['textlabel'] = (attributes.delete 'caption') || doc_attrs[%(#{admonition_name}-caption)]
           block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
         elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
           lines.map! {|line| line == '>' ? line[1..-1] : ((line.start_with? '> ') ? line[2..-1] : line) }
@@ -759,7 +759,7 @@ class Parser
       case block_context
       when :admonition
         attributes['name'] = admonition_name = style.downcase
-        attributes['textlabel'] = (attributes.delete 'caption') || document.attributes[%(#{admonition_name}-caption)]
+        attributes['textlabel'] = (attributes.delete 'caption') || doc_attrs[%(#{admonition_name}-caption)]
         block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
       when :comment
@@ -775,14 +775,14 @@ class Parser
 
       when :source
         AttributeList.rekey attributes, [nil, 'language', 'linenums']
-        if document.attributes.key? 'source-language'
-          attributes['language'] = document.attributes['source-language'] || 'text'
+        if doc_attrs.key? 'source-language'
+          attributes['language'] = doc_attrs['source-language'] || 'text'
         end unless attributes.key? 'language'
-        if (attributes.key? 'linenums-option') || (document.attributes.key? 'source-linenums-option')
+        if (attributes.key? 'linenums-option') || (doc_attrs.key? 'source-linenums-option')
           attributes['linenums'] = ''
         end unless attributes.key? 'linenums'
-        if document.attributes.key? 'source-indent'
-          attributes['indent'] = document.attributes['source-indent']
+        if doc_attrs.key? 'source-indent'
+          attributes['indent'] = doc_attrs['source-indent']
         end unless attributes.key? 'indent'
         block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
 
@@ -802,17 +802,17 @@ class Parser
           language = language.lstrip
         end
         if language.nil_or_empty?
-          if document.attributes.key? 'source-language'
-            attributes['language'] = document.attributes['source-language'] || 'text'
+          if doc_attrs.key? 'source-language'
+            attributes['language'] = doc_attrs['source-language'] || 'text'
           end
         else
           attributes['language'] = language
         end
-        if (attributes.key? 'linenums-option') || (document.attributes.key? 'source-linenums-option')
+        if (attributes.key? 'linenums-option') || (doc_attrs.key? 'source-linenums-option')
           attributes['linenums'] = ''
         end unless attributes.key? 'linenums'
-        if document.attributes.key? 'source-indent'
-          attributes['indent'] = document.attributes['source-indent']
+        if doc_attrs.key? 'source-indent'
+          attributes['indent'] = doc_attrs['source-indent']
         end unless attributes.key? 'indent'
         terminator = terminator.slice 0, 3
         block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
@@ -824,7 +824,7 @@ class Parser
         if block_context == :stem
           attributes['style'] = if (explicit_stem_syntax = attributes[2])
             explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
-          elsif (default_stem_syntax = document.attributes['stem']).nil_or_empty?
+          elsif (default_stem_syntax = doc_attrs['stem']).nil_or_empty?
             'asciimath'
           else
             default_stem_syntax
@@ -877,7 +877,7 @@ class Parser
     # FIXME title should be assigned when block is constructed
     block.title = attributes.delete 'title' if attributes.key? 'title'
     #unless attributes.key? 'reftext'
-    #  attributes['reftext'] = document.attributes['reftext'] if document.attributes.key? 'reftext'
+    #  attributes['reftext'] = doc_attrs['reftext'] if doc_attrs.key? 'reftext'
     #end
     # TODO eventually remove the style attribute from the attributes hash
     #block.style = attributes.delete 'style'
@@ -891,8 +891,8 @@ class Parser
     block.attributes.update(attributes) unless attributes.empty?
     block.lock_in_subs
 
-    #if document.attributes.key? :pending_attribute_entries
-    #  document.attributes.delete(:pending_attribute_entries).each do |entry|
+    #if doc_attrs.key? :pending_attribute_entries
+    #  doc_attrs.delete(:pending_attribute_entries).each do |entry|
     #    entry.save_to block.attributes
     #  end
     #end
