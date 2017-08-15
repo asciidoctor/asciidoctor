@@ -454,7 +454,7 @@ class Parser
 
     # QUESTION should we introduce a parsing context object?
     source_location = reader.cursor if document.sourcemap
-    this_path, this_lineno, this_line, in_list = reader.path, reader.lineno, reader.read_line, ListItem === parent
+    this_path, this_lineno, this_line = reader.path, reader.lineno, reader.read_line
     block = block_context = cloaked_context = terminator = nil
     style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
 
@@ -694,7 +694,7 @@ class Parser
       # a literal paragraph: contiguous lines starting with at least one whitespace character
       # NOTE style can only be nil or "normal" at this point
       if indented && !style
-        lines = read_paragraph_lines reader, (in_list && skipped == 0), :skip_line_comments => text_only
+        lines = read_paragraph_lines reader, (in_list = ListItem === parent) && skipped == 0, :skip_line_comments => text_only
         adjust_indentation! lines
         block = Block.new(parent, :literal, :content_model => :verbatim, :source => lines, :attributes => attributes)
         # a literal gets special meaning inside of a description list
@@ -702,7 +702,7 @@ class Parser
         block.set_option('listparagraph') if in_list
       # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
       else
-        lines = read_paragraph_lines reader, (in_list && skipped == 0), :skip_line_comments => true
+        lines = read_paragraph_lines reader, skipped == 0 && ListItem === parent, :skip_line_comments => true
         # NOTE don't check indented here since it's extremely rare
         #if text_only || indented
         if text_only
