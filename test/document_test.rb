@@ -775,6 +775,20 @@ text
       end
     end
 
+    test 'should set outfilesuffix to match file extension of target file' do
+      sample_input = '{outfilesuffix}'
+      sample_output_path = fixture_path('result.htm')
+      begin
+        Asciidoctor.convert sample_input, :to_file => sample_output_path, :header_footer => false
+        assert File.exist?(sample_output_path)
+        output = IO.read(sample_output_path)
+        refute_empty output
+        assert_includes output, '<p>.htm</p>'
+      ensure
+        FileUtils.rm(sample_output_path)
+      end
+    end
+
     test 'output should be relative to to_dir option' do
       sample_input_path = fixture_path('sample.asciidoc')
       output_dir = File.join(File.dirname(sample_input_path), 'test_output')
