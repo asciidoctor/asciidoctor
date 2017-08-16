@@ -529,11 +529,9 @@ module Substitutors
     found_colon = source.include? ':'
     found_macroish = found[:macroish] = found_square_bracket && found_colon
     found_macroish_short = found_macroish && (source.include? ':[')
-    doc_attrs = @document.attributes
-    use_link_attrs = doc_attrs.key? 'linkattrs'
     result = source
 
-    if doc_attrs.key? 'experimental'
+    if (doc_attrs = @document.attributes).key? 'experimental'
       if found_macroish_short && ((result.include? 'kbd:') || (result.include? 'btn:'))
         result = result.gsub(InlineKbdBtnMacroRx) {
           # honor the escape
@@ -793,7 +791,7 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless text.empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if use_link_attrs && ((text.start_with? '"') || ((text.include? ',') && (text.include? '=')))
+          if (doc_attrs.key? 'linkattrs') && ((text.start_with? '"') || ((text.include? ',') && (text.include? '=')))
             attrs = parse_attributes text, []
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
             text = attrs[1] || ''
@@ -846,7 +844,7 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless (text = m[3]).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if use_link_attrs && ((text.start_with? '"') || ((text.include? ',') && (mailto || (text.include? '='))))
+          if (doc_attrs.key? 'linkattrs') && ((text.start_with? '"') || ((text.include? ',') && (mailto || (text.include? '='))))
             attrs = parse_attributes text, []
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
             if mailto
