@@ -643,7 +643,7 @@ module Extensions
     # Public: Returns the {Asciidoctor::Document} on which the extensions in this registry are being used.
     attr_reader :document
 
-    # Public: Returns the Array of {Group} classes, instances and/or Procs that have been registered.
+    # Public: Returns the Hash of {Group} classes, instances, and/or Procs that have been registered with this registry.
     attr_reader :groups
 
     def initialize groups = {}
