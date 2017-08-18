@@ -659,8 +659,9 @@ module Extensions
     #
     # Returns the instance of this [Registry].
     def activate document
+      return if (ext_groups = Extensions.groups.values + @groups.values).empty?
       @document = document
-      (Extensions.groups.values + @groups.values).each do |group|
+      ext_groups.each do |group|
         case group
         when ::Proc
           case group.arity
