@@ -107,7 +107,7 @@ module Extensions
     # opts   - An optional Hash of options (default: {}):
     #          :level    - [Integer] The level to assign to this section; defaults to
     #                      one greater than the parent level (optional).
-    #          :numbered - [Boolean] A flag to force numbering, which falls back to the 
+    #          :numbered - [Boolean] A flag to force numbering, which falls back to the
     #                      state of the sectnums document attribute (optional).
     #
     # Returns a [Section] node with all properties properly initialized.
