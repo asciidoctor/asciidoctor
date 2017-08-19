@@ -11,13 +11,15 @@ class ExtensionsInitTest < Minitest::Test
 
     begin
       # NOTE trigger extensions to autoload
-      Asciidoctor::Extensions.groups
+      Asciidoctor::Extensions.register {}
     rescue; end
 
     doc = empty_document
     assert doc.extensions?, 'Extensions should be enabled after being autoloaded'
 
     self.class.remove_tests self.class
+  ensure
+    Asciidoctor::Extensions.unregister_all
   end
   self
 end.new(nil).test_autoload
@@ -200,6 +202,12 @@ end
 
 context 'Extensions' do
   context 'Register' do
+    test 'should not activate registry if no extension groups are registered' do
+      assert defined? Asciidoctor::Extensions
+      doc = empty_document
+      refute doc.extensions?, 'Extensions should not be enabled if not groups are registered'
+    end
+
     test 'should register extension group class' do
       begin
         Asciidoctor::Extensions.register :sample, SampleExtensionGroup
@@ -614,19 +622,21 @@ include::include-file.asciidoc[]
 last line
       EOS
 
-      # Safe Mode is not required here
-      document = empty_document :base_dir => File.expand_path(File.dirname(__FILE__))
-      document.extensions.include_processor do
-        handles? do |target|
-          target == 'include-file.asciidoc'
-        end
+      registry = Asciidoctor::Extensions.create do
+        include_processor do
+          handles? do |target|
+            target == 'include-file.asciidoc'
+          end
 
-        process do |doc, reader, target, attributes|
-          # demonstrate that push_include normalizes endlines
-          content = ["include target:: #{target}\n", "\n", "middle line\n"]
-          reader.push_include content, target, target, 1, attributes
+          process do |doc, reader, target, attributes|
+            # demonstrate that push_include normalizes endlines
+            content = ["include target:: #{target}\n", "\n", "middle line\n"]
+            reader.push_include content, target, target, 1, attributes
+          end
         end
       end
+      # Safe Mode is not required here
+      document = empty_document :base_dir => File.expand_path(File.dirname(__FILE__)), :extension_registry => registry
       reader = Asciidoctor::PreprocessorReader.new document, input, nil, :normalize => true
       lines = []
       lines << reader.read_line
