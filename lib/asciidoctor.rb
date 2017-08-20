@@ -515,7 +515,7 @@ module Asciidoctor
     #                collapsing the line breaks and indentation to \
     #                a single space.
     #
-    AttributeEntryRx = /^:(!?\w.*?):(?:[ \t]+(.*))?$/
+    AttributeEntryRx = /^:(!?\w[^:]*):(?:[ \t]+(.*))?$/
 
     # Matches invalid characters in an attribute name.
     InvalidAttributeNameCharsRx = /[^\w\-]/

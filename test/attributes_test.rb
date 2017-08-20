@@ -16,6 +16,28 @@ context 'Attributes' do
       assert_equal nil, doc.attributes['foo']
     end
 
+    # NOTE AsciiDoc Python recognizes this entry
+    test 'does not recognize attribute entry if name contains colon' do
+      input = <<-EOS.chomp
+:foo:bar: baz
+      EOS
+      doc = document_from_string input
+      refute doc.attr?('foo:bar')
+      assert_equal 1, doc.blocks.size
+      assert_equal :paragraph, doc.blocks[0].context
+    end
+
+    # NOTE AsciiDoc Python recognizes this entry
+    test 'does not recognize attribute entry if name ends with colon' do
+      input = <<-EOS.chomp
+:foo:: bar
+      EOS
+      doc = document_from_string input
+      refute doc.attr?('foo:')
+      assert_equal 1, doc.blocks.size
+      assert_equal :dlist, doc.blocks[0].context
+    end
+
     test 'creates an attribute by fusing a legacy multi-line value' do
       str = <<-EOS
 :description: This is the first      +
