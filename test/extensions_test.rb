@@ -10,8 +10,9 @@ class ExtensionsInitTest < Minitest::Test
     refute doc.extensions?, 'Extensions should not be enabled by default'
 
     begin
-      # NOTE trigger extensions to autoload
-      Asciidoctor::Extensions.register {}
+      # NOTE trigger extensions to autoload by registering empty group
+      Asciidoctor::Extensions.register do
+      end
     rescue; end
 
     doc = empty_document
@@ -541,7 +542,7 @@ context 'Extensions' do
   end
 
   context 'Integration' do
-    test 'can provide extension registry as option' do
+    test 'can provide extension registry as an option' do
       registry = Asciidoctor::Extensions.create do
         tree_processor SampleTreeProcessor
       end
@@ -549,6 +550,19 @@ context 'Extensions' do
       doc = document_from_string %(= Document Title\n\ncontent), :extension_registry => registry
       refute_nil doc.extensions
       assert_equal 1, doc.extensions.groups.size
+      assert doc.extensions.tree_processors?
+      assert_equal 1, doc.extensions.tree_processors.size
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+    end
+
+    # NOTE I'm not convinced we want to continue to support this use case
+    test 'can provide extension registry created without any groups as option' do
+      registry = Asciidoctor::Extensions.create
+      registry.tree_processor SampleTreeProcessor
+
+      doc = document_from_string %(= Document Title\n\ncontent), :extension_registry => registry
+      refute_nil doc.extensions
+      assert_equal 0, doc.extensions.groups.size
       assert doc.extensions.tree_processors?
       assert_equal 1, doc.extensions.tree_processors.size
       assert_equal 0, Asciidoctor::Extensions.groups.size

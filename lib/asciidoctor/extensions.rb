@@ -659,21 +659,22 @@ module Extensions
     #
     # Returns the instance of this [Registry].
     def activate document
-      return if (ext_groups = Extensions.groups.values + @groups.values).empty?
       @document = document
-      ext_groups.each do |group|
-        case group
-        when ::Proc
-          case group.arity
-          when 0, -1
-            instance_exec(&group)
-          when 1
-            group.call self
+      unless (ext_groups = Extensions.groups.values + @groups.values).empty?
+        ext_groups.each do |group|
+          case group
+          when ::Proc
+            case group.arity
+            when 0, -1
+              instance_exec(&group)
+            when 1
+              group.call self
+            end
+          when ::Class
+            group.new.activate self
+          else
+            group.activate self
           end
-        when ::Class
-          group.new.activate self
-        else
-          group.activate self
         end
       end
       self

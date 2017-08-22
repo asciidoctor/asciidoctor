@@ -450,17 +450,16 @@ class Document < AbstractBlock
 
       if initialize_extensions
         if (ext_registry = options[:extension_registry])
-          # QUESTION should we warn the value type of the option is not a registry or boolean?
-          unless Extensions::Registry === ext_registry || (::RUBY_ENGINE_JRUBY &&
+          # QUESTION should we warn the value type of the option is not a registry
+          if Extensions::Registry === ext_registry || (::RUBY_ENGINE_JRUBY &&
               ::AsciidoctorJ::Extensions::ExtensionRegistry === ext_registry)
-            ext_registry = Extensions::Registry.new
+            @extensions = ext_registry.activate self
           end
         elsif ::Proc === (ext_block = options[:extensions])
-          ext_registry = Extensions.create(&ext_block)
-        else
-          ext_registry = Extensions::Registry.new
+          @extensions = Extensions.create(&ext_block).activate self
+        elsif !Extensions.groups.empty?
+          @extensions = Extensions::Registry.new.activate self
         end
-        @extensions = ext_registry.activate self
       end
 
       @reader = PreprocessorReader.new self, data, (Reader::Cursor.new attrs['docfile'], @base_dir), :normalize => true
