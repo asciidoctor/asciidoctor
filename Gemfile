@@ -19,6 +19,8 @@ group :development do
     else
       gem 'nokogiri', '~> 1.6.0'
     end
+  elsif ruby_version < (Gem::Version.new '2.2.0')
+    gem 'nokogiri', '~> 1.7.0' if Gem::Platform.local =~ 'x86-mingw32' || Gem::Platform.local =~ 'x64-mingw32'
   end
   gem 'racc', '~> 1.4.0' if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
 end
