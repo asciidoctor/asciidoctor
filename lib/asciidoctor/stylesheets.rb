@@ -8,6 +8,7 @@ class Stylesheets
   DEFAULT_STYLESHEET_NAME = 'asciidoctor.css'
   DEFAULT_PYGMENTS_STYLE = 'default'
   STYLESHEETS_DATA_PATH = ::File.join DATA_PATH, 'stylesheets'
+  PygmentsBgColorRx = /^\.pygments +{ *background: *([^;]+);/
 
   @__instance__ = new
 
@@ -63,6 +64,12 @@ class Stylesheets
 
   def pygments_stylesheet_name style = nil
     %(pygments-#{style || DEFAULT_PYGMENTS_STYLE}.css)
+  end
+
+  def pygments_background style = nil
+    if load_pygments && PygmentsBgColorRx =~ (::Pygments.css '.pygments', style: style || DEFAULT_PYGMENTS_STYLE)
+      $1
+    end
   end
 
   # Public: Generate the Pygments stylesheet with the specified style.
