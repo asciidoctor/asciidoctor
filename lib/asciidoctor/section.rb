@@ -184,10 +184,14 @@ class Section < AbstractBlock
   #
   def self.generate_id title, document
     attrs = document.attributes
-    sep = attrs['idseparator'] || '_'
+    if (sep = attrs['idseparator'])
+      sep, sep_len = (attrs['idseparator'] = sep.chr), 1 if (sep_len = sep.length) > 1
+    else
+      sep, sep_len = '_', 1
+    end
     pre = attrs['idprefix'] || '_'
     gen_id = %(#{pre}#{title.downcase.gsub InvalidSectionIdCharsRx, sep})
-    unless sep.empty?
+    if sep_len > 0
       # remove repeat and trailing separator characters
       gen_id = gen_id.tr_s sep, sep
       gen_id = gen_id.chop if gen_id.end_with? sep
