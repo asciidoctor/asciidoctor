@@ -6,12 +6,16 @@ skip_tags: true
 clone_depth: 10
 environment:
   matrix:
-    # there's a problem loading nokogiri 1.5.11 in Ruby 2.x on Windows
-    #- ruby_version: '21'
-    #- ruby_version: '21-x64'
-    #- ruby_version: '200'
-    #- ruby_version: '200-x64'
-    - ruby_version: '193'
+    - ruby_version: '24'
+    - ruby_version: '24-x64'
+    - ruby_version: '23'
+    - ruby_version: '23-x64'
+    - ruby_version: '22'
+    - ruby_version: '22-x64'
+    - ruby_version: '22'
+    - ruby_version: '22-x64'
+    - ruby_version: '21'
+    - ruby_version: '21-x64'
 install:
   # Take default Ruby out of path
   - SET PATH=%PATH:C:\Ruby193\bin;=%
