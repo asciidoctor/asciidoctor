@@ -51,6 +51,16 @@ context 'Sections' do
       assert_equal '_section-one', sec.id
     end
 
+    test 'synthetic id separator can only be one character' do
+      input = <<-EOS
+:idseparator: -=-
+
+== This Section Is All You Need
+      EOS
+      sec = block_from_string input
+      assert_equal '_this-section-is-all-you-need', sec.id
+    end
+
     test 'synthetic id separator can be set to blank' do
       sec = block_from_string(":idseparator:\n\n== Section One")
       assert_equal '_sectionone', sec.id
