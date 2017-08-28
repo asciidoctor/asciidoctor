@@ -238,7 +238,7 @@ module Substitutors
           next m[0][1..-1]
         end
 
-        @passthroughs[pass_key = @passthroughs.size] = {:text => (unescape_brackets m[8]), :subs => (m[7] ? (resolve_pass_subs m[7]) : [])}
+        @passthroughs[pass_key = @passthroughs.size] = {:text => (unescape_brackets m[8]), :subs => (m[7] ? (resolve_pass_subs m[7]) : nil)}
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -314,7 +314,7 @@ module Substitutors
         type = ((default_stem_type = @document.attributes['stem']).nil_or_empty? ? 'asciimath' : default_stem_type).to_sym
       end
       content = unescape_brackets m[3]
-      subs = m[2] ? (resolve_pass_subs m[2]) : ((@document.basebackend? 'html') ? BASIC_SUBS : [])
+      subs = m[2] ? (resolve_pass_subs m[2]) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
       @passthroughs[pass_key = @passthroughs.size] = {:text => content, :subs => subs, :type => type}
       %(#{PASS_START}#{pass_key}#{PASS_END})
     } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
@@ -1260,9 +1260,9 @@ module Substitutors
   #
   # subs - A comma-delimited String of substitution aliases
   #
-  # returns An Array of Symbols representing the substitution operation
+  # returns An Array of Symbols representing the substitution operation or nothing if no subs are found.
   def resolve_subs subs, type = :block, defaults = nil, subject = nil
-    return [] if subs.nil_or_empty?
+    return if subs.nil_or_empty?
     # QUESTION should we store candidates as a Set instead of an Array?
     candidates = nil
     subs = subs.delete ' ' if subs.include? ' '
@@ -1313,7 +1313,7 @@ module Substitutors
         candidates += resolved_keys
       end
     end
-    return [] unless candidates
+    return unless candidates
     # weed out invalid options and remove duplicates (order is preserved; first occurence wins)
     resolved = candidates & SUB_OPTIONS[type]
     unless (candidates - resolved).empty?
@@ -1547,7 +1547,11 @@ module Substitutors
       end
     end
 
-    @subs = (custom_subs = @attributes['subs']) ? (resolve_block_subs custom_subs, default_subs, @context) : default_subs.dup
+    if (custom_subs = @attributes['subs'])
+      @subs = (resolve_block_subs custom_subs, default_subs, @context) || []
+    else
+      @subs = default_subs.dup
+    end
 
     # QUESION delegate this logic to a method?
     if @context == :listing && @style == 'source' && (@attributes.key? 'language') && (@document.basebackend? 'html') &&
