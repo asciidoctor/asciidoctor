@@ -190,15 +190,15 @@ class Reader
   # be processed and marked as such so that subsequent reads will not need to process
   # the lines again.
   #
-  # num    - The positive Integer number of lines to peek (must be greater than 0).
-  # direct - A Boolean indicating whether processing should be disabled when reading lines
+  # num    - The positive Integer number of lines to peek or nil to peek all lines (default: nil).
+  # direct - A Boolean indicating whether processing should be disabled when reading lines (default: false).
   #
   # Returns A String Array of the next multiple lines of source data, or an empty Array
   # if there are no more lines in this Reader.
-  def peek_lines num, direct = false
+  def peek_lines num = nil, direct = false
     old_look_ahead = @look_ahead
     result = []
-    num.times do
+    (num || ::Float::MAX.to_i).times do
       if (line = direct ? shift : read_line)
         result << line
       else

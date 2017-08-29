@@ -156,6 +156,12 @@ third line
         assert_equal 1, reader.lineno
       end
 
+      test 'peek_lines should peek all lines if no arguments are given' do
+        reader = Asciidoctor::Reader.new SAMPLE_DATA
+        assert_equal SAMPLE_DATA, reader.peek_lines
+        assert_equal 1, reader.lineno
+      end
+
       test 'peek_lines should not invert order of lines' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         assert_equal SAMPLE_DATA, reader.lines
