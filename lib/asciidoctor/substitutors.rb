@@ -366,10 +366,6 @@ module Substitutors
       end
       text
     end
-
-    def sub_specialchars text
-      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
-    end
   else
     # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc)
     #
@@ -404,23 +400,23 @@ module Substitutors
       end
       text
     end
+  end
 
-    # Public: Substitute special characters (i.e., encode XML)
-    #
-    # The special characters are <, &, and >, which get replaced with &lt;,
-    # &amp;, and &gt;, respectively.
-    #
-    # text - The String text to process
-    #
-    # returns The String text with special characters replaced
-    if ::RUBY_MIN_VERSION_1_9
-      def sub_specialchars text
-        (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub! SpecialCharsRx, SpecialCharsTr) : text
-      end
-    else
-      def sub_specialchars text
-        (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub!(SpecialCharsRx) { SpecialCharsTr[$&] }) : text
-      end
+  # Public: Substitute special characters (i.e., encode XML)
+  #
+  # The special characters <, &, and > get replaced with &lt;,
+  # &amp;, and &gt;, respectively.
+  #
+  # text - The String text to process.
+  #
+  # returns The String text with special characters replaced.
+  if ::RUBY_MIN_VERSION_1_9
+    def sub_specialchars text
+      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
+    end
+  else
+    def sub_specialchars text
+      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }) : text
     end
   end
   alias sub_specialcharacters sub_specialchars

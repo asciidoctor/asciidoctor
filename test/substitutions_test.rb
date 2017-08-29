@@ -17,6 +17,15 @@ context 'Substitutions' do
       assert_equal %{<em class="blue"><a href="http://asciidoc.org">AsciiDoc</a></em> &amp; <strong class="red">Ruby</strong>\n&#167; Making <u>documentation</u> together<br>\nsince &#169; 2012.}, result
     end
 
+    test 'apply_subs should not modify string directly' do
+      input = '<html> -- the root of all web'
+      para = block_from_string input
+      para_source = para.source
+      result = para.apply_subs para_source
+      assert_equal '&lt;html&gt;&#8201;&#8212;&#8201;the root of all web', result
+      assert_equal input, para_source
+    end
+
     test 'should not drop trailing blank lines when performing substitutions' do
       para = block_from_string %([%hardbreaks]\nthis\nis\n-> {program})
       para.lines << ''
