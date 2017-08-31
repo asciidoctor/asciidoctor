@@ -373,7 +373,7 @@ MathJax.Hub.Config({
       else
         label = %(<div class="title">#{node.attr 'textlabel'}</div>)
       end
-      %(<div#{id_attr} class="admonitionblock #{name}#{(role = node.role) && " #{role}"}">
+      %(<div#{id_attr} class="admonitionblock #{name}#{(role = node.role) ? " #{role}" : ''}">
 <table>
 <tr>
 <td class="icon">
@@ -531,7 +531,7 @@ Your browser does not support the audio tag.
       id_attribute = node.id ? %( id="#{node.id}") : nil
       title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
 
-      %(<div#{id_attribute} class="exampleblock#{(role = node.role) && " #{role}"}">
+      %(<div#{id_attribute} class="exampleblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
 #{node.content}
 </div>
@@ -618,7 +618,7 @@ Your browser does not support the audio tag.
 
       id_attribute = node.id ? %( id="#{node.id}") : nil
       title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : nil
-      %(<div#{id_attribute} class="listingblock#{(role = node.role) && " #{role}"}">
+      %(<div#{id_attribute} class="listingblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
 #{pre_start}#{node.content}#{pre_end}
 </div>
@@ -629,7 +629,7 @@ Your browser does not support the audio tag.
       id_attribute = node.id ? %( id="#{node.id}") : nil
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
       nowrap = !(node.document.attr? 'prewrap') || (node.option? 'nowrap')
-      %(<div#{id_attribute} class="literalblock#{(role = node.role) && " #{role}"}">
+      %(<div#{id_attribute} class="literalblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
 <pre#{nowrap ? ' class="nowrap"' : nil}>#{node.content}</pre>
 </div>
@@ -645,7 +645,7 @@ Your browser does not support the audio tag.
         equation = %(#{open}#{equation}#{close})
       end
 
-      %(<div#{id_attribute} class="stemblock#{(role = node.role) && " #{role}"}">
+      %(<div#{id_attribute} class="stemblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
 #{equation}
 </div>
@@ -686,7 +686,7 @@ Your browser does not support the audio tag.
         else
           id_attr = node.id ? %( id="#{node.id}") : nil
           title_el = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-          %(<div#{id_attr} class="quoteblock abstract#{(role = node.role) && " #{role}"}">
+          %(<div#{id_attr} class="quoteblock abstract#{(role = node.role) ? " #{role}" : ''}">
 #{title_el}<blockquote>
 #{node.content}
 </blockquote>
@@ -698,7 +698,7 @@ Your browser does not support the audio tag.
       else
           id_attr = node.id ? %( id="#{node.id}") : nil
           title_el = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-        %(<div#{id_attr} class="openblock#{style && style != 'open' ? " #{style}" : ''}#{(role = node.role) && " #{role}"}">
+        %(<div#{id_attr} class="openblock#{style && style != 'open' ? " #{style}" : ''}#{(role = node.role) ? " #{role}" : ''}">
 #{title_el}<div class="content">
 #{node.content}
 </div>
@@ -773,7 +773,7 @@ Your browser does not support the audio tag.
     def sidebar node
       id_attribute = node.id ? %( id="#{node.id}") : nil
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : nil
-      %(<div#{id_attribute} class="sidebarblock#{(role = node.role) && " #{role}"}">
+      %(<div#{id_attribute} class="sidebarblock#{(role = node.role) ? " #{role}" : ''}">
 <div class="content">
 #{title_element}#{node.content}
 </div>
