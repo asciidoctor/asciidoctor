@@ -515,10 +515,10 @@ module Asciidoctor
     #                collapsing the line breaks and indentation to \
     #                a single space.
     #
-    AttributeEntryRx = /^:(!?\w[^:]*):(?:[ \t]+(.*))?$/
+    AttributeEntryRx = /^:(!?#{CG_WORD}[^:]*):(?:[ \t]+(.*))?$/
 
     # Matches invalid characters in an attribute name.
-    InvalidAttributeNameCharsRx = /[^\w\-]/
+    InvalidAttributeNameCharsRx = /[^#{CC_WORD}\-]/
 
     # Matches a pass inline macro that surrounds the value of an attribute
     # entry once it has been parsed.
@@ -544,7 +544,7 @@ module Asciidoctor
     #   {set:foo:bar}
     #   {set:name!}
     #
-    AttributeReferenceRx = /(\\)?\{(\w+[-\w]*|(set|counter2?):.+?)(\\)?\}/
+    AttributeReferenceRx = /(\\)?\{(#{CG_WORD}+[-#{CC_WORD}]*|(set|counter2?):.+?)(\\)?\}/
 
     ## Paragraphs and delimited blocks
 
