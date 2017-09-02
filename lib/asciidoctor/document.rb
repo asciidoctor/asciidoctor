@@ -134,9 +134,6 @@ class Document < AbstractBlock
   # Public: Get the Hash of document counters
   attr_reader :counters
 
-  # Public: Get the Hash of callouts
-  attr_reader :callouts
-
   # Public: Get the level-0 Section
   attr_reader :header
 
@@ -187,7 +184,6 @@ class Document < AbstractBlock
         accum[key] = (key == :footnotes ? [] : table)
         accum
       end
-      @callouts = parent_doc.callouts
       # QUESTION should we support setting attribute in parent document from nested document?
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
       @attribute_overrides = attr_overrides = parent_doc.attributes.dup
@@ -211,9 +207,9 @@ class Document < AbstractBlock
         :links => [],
         :images => [],
         :indexterms => [],
+        :callouts => Callouts.new,
         :includes => ::Set.new,
       }
-      @callouts = Callouts.new
       # copy attributes map and normalize keys
       # attribute overrides are attributes that can only be set from the commandline
       # a direct assignment effectively makes the attribute a constant
@@ -587,6 +583,10 @@ class Document < AbstractBlock
     @catalog[:footnotes]
   end
 
+  def callouts
+    @catalog[:callouts]
+  end
+
   def nested?
     @parent_document ? true : false
   end
@@ -804,7 +804,7 @@ class Document < AbstractBlock
 
   # Internal: Restore the attributes to the previously saved state (attributes in header)
   def restore_attributes
-    @callouts.rewind unless @parent_document
+    @catalog[:callouts].rewind unless @parent_document
     # QUESTION shouldn't this be a dup in case we convert again?
     @attributes = @header_attributes
   end
