@@ -135,6 +135,8 @@ desc 'Trigger builds for all dependent projects on Travis CI'
           ENV['TRAVIS_TAG'].to_s.empty? &&
           (ENV['TRAVIS_JOB_NUMBER'].to_s.end_with? '.1')
     end
+    # NOTE TRAVIS_TOKEN env var must be defined in Travis interface
+    # Retrieve this token using the `travis token` command.
     next unless (token = ENV['TRAVIS_TOKEN'])
     require 'json'
     require 'net/http'
