@@ -400,6 +400,13 @@ content
       assert doc.attributes.has_key? 'basebackend-html'
     end
 
+    test 'can only access a positional attribute from the attributes hash' do
+      node = Asciidoctor::Block.new nil, :paragraph, :attributes => { 1 => 'position 1' }
+      assert_nil node.attr(1)
+      refute node.attr?(1)
+      assert_equal 'position 1', node.attributes[1]
+    end
+
     test 'set_attr should set value to empty string if no value is specified' do
       node = Asciidoctor::Block.new nil, :paragraph, :attributes => {}
       node.set_attr 'foo'
