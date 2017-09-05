@@ -1342,19 +1342,21 @@ module Substitutors
   def highlight_source source, process_callouts, highlighter = nil
     case (highlighter ||= @document.attributes['source-highlighter'])
     when 'coderay'
-      unless (highlighter_loaded = defined? ::CodeRay) || @document.attributes['coderay-unavailable']
+      unless (highlighter_loaded = defined? ::CodeRay) ||
+          (defined? @@coderay_unavailable) || @document.attributes['coderay-unavailable']
         if (Helpers.require_library 'coderay', true, :warn).nil?
-          # prevent further attempts to load CodeRay
-          @document.set_attr 'coderay-unavailable'
+          # prevent further attempts to load CodeRay in this process
+          @@coderay_unavailable = true
         else
           highlighter_loaded = true
         end
       end
     when 'pygments'
-      unless (highlighter_loaded = defined? ::Pygments) || @document.attributes['pygments-unavailable']
+      unless (highlighter_loaded = defined? ::Pygments) ||
+          (defined? @@pygments_unavailable) || @document.attributes['pygments-unavailable']
         if (Helpers.require_library 'pygments', 'pygments.rb', :warn).nil?
-          # prevent further attempts to load Pygments
-          @document.set_attr 'pygments-unavailable'
+          # prevent further attempts to load Pygments in this process
+          @@pygments_unavailable = true
         else
           highlighter_loaded = true
         end
