@@ -21,6 +21,9 @@ env:
   global:
   # use system libraries to speed up installation of nokogiri
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
+before_install:
+- gem update bundler
+- gem cleanup bundler
 script: bundle exec rake coverage test:all
 after_success: bundle exec rake build:dependents
 notifications:
