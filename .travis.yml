@@ -26,9 +26,9 @@ before_install:
 - gem cleanup bundler
 script: bundle exec rake coverage test:all
 after_success: bundle exec rake build:dependents
-notifications:
-  email: false
-  #irc: 'irc.freenode.org#asciidoctor'
+#notifications:
+#  email: false
+#  irc: 'irc.freenode.org#asciidoctor'
 deploy:
   provider: rubygems
   gem: asciidoctor
