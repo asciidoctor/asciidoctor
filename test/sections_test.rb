@@ -2667,6 +2667,31 @@ That's all she wrote!
       assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
     end
 
+    test 'should add class matching role to part' do
+      input = <<-EOS
+= Book Title
+:doctype: book
+
+[.newbie]
+= Part 1
+
+== Chapter A
+
+content
+
+= Part 2
+
+== Chapter B
+
+content
+      EOS
+
+      result = render_embedded_string input
+      assert_css 'h1.sect0', result, 2
+      assert_css 'h1.sect0.newbie', result, 1
+      assert_css 'h1.sect0.newbie#_part_1', result, 1
+    end
+
     test 'should assign appropriate sectname for section type' do
       input = <<-EOS
 = Book Title
