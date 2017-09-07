@@ -38,6 +38,20 @@ context 'Attributes' do
       assert_equal :dlist, doc.blocks[0].context
     end
 
+    # NOTE AsciiDoc Python does not recognize this entry
+    test 'allows any word character defined by Unicode in an attribute name' do
+      [['café', 'a coffee shop'], ['سمن', %(سازمان مردمنهاد)]].each do |(name, value)|
+        str = <<-EOS
+:#{name}: #{value}
+
+{#{name}}
+        EOS
+        result = render_embedded_string str
+        assert_includes result, %(<p>#{value}</p>)
+      end
+
+    end if ::RUBY_MIN_VERSION_1_9
+
     test 'creates an attribute by fusing a legacy multi-line value' do
       str = <<-EOS
 :description: This is the first      +
