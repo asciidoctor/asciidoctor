@@ -325,8 +325,7 @@ MathJax.Hub.Config({
     end
 
     def section node
-      slevel = node.level
-      htag = %(h#{slevel + 1})
+      htag = %(h#{(slevel = node.level) + 1})
       id_attr = anchor = link_start = link_end = nil
       if node.id
         id_attr = %( id="#{id = node.id}")
@@ -340,8 +339,7 @@ MathJax.Hub.Config({
           #end
         end
         if doc.attr? 'sectlinks'
-          link_start = %(<a class="link" href="##{id}">)
-          link_end = '</a>'
+          link_start, link_end = %(<a class="link" href="##{id}">), '</a>'
         end
       end
 
@@ -350,9 +348,7 @@ MathJax.Hub.Config({
 #{node.content})
       else
         class_attr = (role = node.role) ? %( class="sect#{slevel} #{role}") : %( class="sect#{slevel}")
-        sectnum = if node.numbered && !node.caption && slevel <= (node.document.attr 'sectnumlevels', 3).to_i
-          %(#{node.sectnum} )
-        end
+        sectnum = node.numbered && !node.caption && slevel <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} ) : ''
         %(<div#{class_attr}>
 <#{htag}#{id_attr}>#{anchor}#{link_start}#{sectnum}#{node.captioned_title}#{link_end}</#{htag}>
 #{slevel == 1 ? %[<div class="sectionbody">\n#{node.content}\n</div>] : node.content}
