@@ -239,8 +239,7 @@ class AbstractBlock < AbstractNode
   #
   # Returns The parent Block
   def << block
-    # parent assignment pending refactor
-    #block.parent = self
+    block.parent = self unless block.parent == self
     @blocks << block
     self
   end
