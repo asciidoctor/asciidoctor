@@ -1214,12 +1214,10 @@ class Parser
     # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
     while match || (reader.has_more_lines? && (match = sibling_pattern.match(reader.peek_line)))
       term, item = next_list_item(reader, list_block, match, sibling_pattern)
-      if previous_pair && !previous_pair[-1]
-        previous_pair.pop
+      if previous_pair && !previous_pair[1]
         previous_pair[0] << term
-        previous_pair << item
+        previous_pair[1] = item
       else
-        # FIXME this misses the automatic parent assignment
         list_block.items << (previous_pair = [[term], item])
       end
       match = nil
@@ -1316,7 +1314,7 @@ class Parser
       if list_item.text? || list_item.blocks?
         [list_term, list_item]
       else
-        [list_term, nil]
+        [list_term]
       end
     else
       list_item
