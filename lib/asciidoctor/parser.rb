@@ -334,9 +334,8 @@ class Parser
                   new_block.style = 'partintro'
                 # emulate [partintro] open block
                 else
-                  intro = Block.new section, :open, :content_model => :compound
+                  new_block.parent = (intro = Block.new section, :open, :content_model => :compound)
                   intro.style = 'partintro'
-                  new_block.parent = intro
                   section << intro
                 end
               end
@@ -344,11 +343,10 @@ class Parser
               first_block = section.blocks[0]
               # open the [partintro] open block for appending
               if !intro && first_block.content_model == :compound
-                #new_block.parent = (intro = first_block)
                 warn %(asciidoctor: ERROR: #{block_line_info}: illegal block content outside of partintro block)
               # rebuild [partintro] paragraph as an open block
               elsif first_block.content_model != :compound
-                intro = Block.new section, :open, :content_model => :compound
+                new_block.parent = (intro = Block.new section, :open, :content_model => :compound)
                 intro.style = 'partintro'
                 section.blocks.shift
                 if first_block.style == 'partintro'
@@ -357,7 +355,6 @@ class Parser
                 end
                 first_block.parent = intro
                 intro << first_block
-                new_block.parent = intro
                 section << intro
               end
             end
