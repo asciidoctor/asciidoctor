@@ -152,7 +152,7 @@ module Extensions
     # parent - The parent Block (Block, Section, or Document) of this new image block.
     # attrs  - A Hash of attributes to control how the image block is built.
     #          Use the target attribute to set the source of the image.
-    #          Use the alt attribute to specify an alternate text for the image.
+    #          Use the alt attribute to specify an alternative text for the image.
     # opts   - An optional Hash of options (default: {})
     #
     # Returns a [Block] node with all properties properly initialized.
