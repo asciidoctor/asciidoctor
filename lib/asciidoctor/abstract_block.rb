@@ -427,7 +427,7 @@ class AbstractBlock < AbstractNode
   # numbered, number within this block (its parent).
   #
   # Returns nothing
-  def enumerate_section section
+  def assign_section_numeral section
     @next_section_index = (section.index = @next_section_index) + 1
     if (sectname = section.sectname) == 'appendix'
       section.number = @document.counter 'appendix-number', 'A'
@@ -471,7 +471,7 @@ class AbstractBlock < AbstractNode
     @next_section_number = 1
     @blocks.each do |block|
       if block.context == :section
-        enumerate_section block
+        assign_section_numeral block
         block.reindex_sections
       end
     end
