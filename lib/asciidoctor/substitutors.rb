@@ -1015,9 +1015,14 @@ module Substitutors
             else
               path = id.slice 0, hash_idx
             end
+            if (ext_idx = path.rindex '.') && ASCIIDOC_EXTENSIONS[path.slice ext_idx, path.length]
+              path = path.slice 0, ext_idx
+            end
           else
             target, fragment = id, (id.slice 1, id.length)
           end
+        elsif (ext_idx = id.rindex '.') && ASCIIDOC_EXTENSIONS[id.slice ext_idx, id.length]
+          path = id.slice 0, ext_idx
         else
           fragment = id
         end
@@ -1025,11 +1030,8 @@ module Substitutors
         # handles: #id
         if target
           refid = fragment
-        # handles: path#, path.adoc#, path#id, or path.adoc#id
+        # handles: path#, path.adoc#, path#id, path.adoc#id, or path (from path.adoc)
         elsif path
-          if (ext_idx = path.rindex '.') && ASCIIDOC_EXTENSIONS[path.slice ext_idx, path.length]
-            path = path.slice 0, ext_idx
-          end
           # the referenced path is this document, or its contents has been included in this document
           if @document.attributes['docname'] == path || @document.catalog[:includes].include?(path)
             refid, path, target = fragment, nil, %(##{fragment})

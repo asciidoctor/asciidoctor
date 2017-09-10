@@ -410,8 +410,13 @@ anchor:foo[b[a\]r]text'
     assert_xpath '//a[@href="/path/to/tigers.html"][text() = "tigers"]', doc.render, 1
   end
 
-  test 'xref using angled bracket syntax with path and extension' do
+  test 'xref using angled bracket syntax with path and extension with hash' do
     doc = document_from_string '<<tigers.adoc#>>', :header_footer => false
+    assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.render, 1
+  end
+
+  test 'xref using angled bracket syntax with path and extension' do
+    doc = document_from_string '<<tigers.adoc>>', :header_footer => false
     assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.render, 1
   end
 
