@@ -47,7 +47,7 @@ class AbstractNode
   # parent - The Block to set as the parent of this Block
   #
   # Returns nothing
-  def parent=(parent)
+  def parent= parent
     @parent, @document = parent, parent.document
     nil
   end

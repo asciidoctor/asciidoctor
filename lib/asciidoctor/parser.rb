@@ -93,7 +93,10 @@ class Parser
 
     while reader.has_more_lines?
       new_section, block_attributes = next_section(reader, document, block_attributes)
-      document << new_section if new_section
+      if new_section
+        document.assign_section_numeral new_section
+        document.blocks << new_section
+      end
     end unless options[:header_only]
 
     document
@@ -265,7 +268,7 @@ class Parser
       if has_header || (doctype == 'book' && attributes[1] != 'abstract')
         preamble = intro = (Block.new parent, :preamble, :content_model => :compound)
         preamble.title = parent.attr 'preface-title' if doctype == 'book' && (parent.attr? 'preface-title')
-        parent << preamble
+        parent.blocks << preamble
       end
       section = parent
 
@@ -311,7 +314,8 @@ class Parser
           end
           # the attributes returned are those that are orphaned
           new_section, attributes = next_section reader, section, attributes
-          section << new_section
+          section.assign_section_numeral new_section
+          section.blocks << new_section
         else
           if next_level == 0 && doctype != 'book'
             warn %(asciidoctor: ERROR: #{reader.line_info}: only book doctypes can contain level 0 sections)
@@ -336,7 +340,7 @@ class Parser
                 else
                   new_block.parent = (intro = Block.new section, :open, :content_model => :compound)
                   intro.style = 'partintro'
-                  section << intro
+                  section.blocks << intro
                 end
               end
             elsif section.blocks.size == 1
@@ -353,14 +357,13 @@ class Parser
                   first_block.context = :paragraph
                   first_block.style = nil
                 end
-                first_block.parent = intro
                 intro << first_block
-                section << intro
+                section.blocks << intro
               end
             end
           end
 
-          (intro || section) << new_block
+          (intro || section).blocks << new_block
           attributes = {}
         #else
         #  # don't clear attributes if we don't find a block because they may
@@ -384,7 +387,6 @@ class Parser
         if Compliance.unwrap_standalone_preamble && document.blocks.size == 1 && doctype != 'book'
           document.blocks.shift
           while (child_block = preamble.blocks.shift)
-            child_block.parent = document
             document << child_block
           end
         end
@@ -600,7 +602,7 @@ class Parser
             warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: callout list item index: expected #{expected_index} got #{match[1]})
           end
           if (list_item = next_list_item reader, block, match)
-            block << list_item
+            block.items << list_item
             if (coids = document.callouts.callout_ids block.items.size).empty?
               warn %(asciidoctor: WARNING: #{reader.path}: line #{list_item_lineno}: no callouts refer to list item #{block.items.size})
             else
@@ -1072,7 +1074,7 @@ class Parser
   #
   # Returns nothing.
   def self.parse_blocks(reader, parent)
-    while ((block = next_block reader, parent) && parent << block) || reader.has_more_lines?
+    while ((block = next_block reader, parent) && parent.blocks << block) || reader.has_more_lines?
     end
   end
 
@@ -1123,7 +1125,7 @@ class Parser
         list_block.items[-1] << next_block(reader, list_block)
       end
 
-      list_block << list_item if list_item
+      list_block.items << list_item if list_item
       list_item = nil
 
       reader.skip_blank_lines || break
@@ -1300,7 +1302,7 @@ class Parser
 
       # we can look for blocks until lines are exhausted without worrying about
       # sections since reader is confined to boundaries of list
-      while ((block = next_block list_item_reader, list_item, {}, options) && list_item << block) ||
+      while ((block = next_block list_item_reader, list_item, {}, options) && list_item.blocks << block) ||
           list_item_reader.has_more_lines?
       end
 
