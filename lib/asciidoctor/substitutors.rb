@@ -1013,13 +1013,13 @@ module Substitutors
             if (fragment_len = id.length - hash_idx - 1) > 0
               path, fragment = (id.slice 0, hash_idx), (id.slice hash_idx + 1, fragment_len)
             else
-              path, fragment = (id.slice 0, hash_idx), nil
+              path = id.slice 0, hash_idx
             end
           else
-            target, path, fragment = id, nil, (id.slice 1, id.length)
+            target, fragment = id, (id.slice 1, id.length)
           end
         else
-          path, fragment = nil, id
+          fragment = id
         end
 
         # handles: #id
