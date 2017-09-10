@@ -1257,8 +1257,9 @@ module Asciidoctor
   # Public: Parse the AsciiDoc source input into a {Document}
   #
   # Accepts input as an IO (or StringIO), String or String Array object. If the
-  # input is a File, information about the file is stored in attributes on the
-  # Document object.
+  # input is a File, the object is expected to be opened for reading and is not
+  # closed afterwards by this method. Information about the file (filename,
+  # directory name, etc) gets assigned to attributes on the Document object.
   #
   # input   - the AsciiDoc source as a IO, String or Array.
   # options - a String, Array or Hash of options to control processing (default: {})
@@ -1363,10 +1364,6 @@ module Asciidoctor
 
   # Public: Parse the contents of the AsciiDoc source file into an Asciidoctor::Document
   #
-  # Accepts input as an IO, String or String Array object. If the
-  # input is a File, information about the file is stored in
-  # attributes on the Document.
-  #
   # input   - the String AsciiDoc source filename
   # options - a String, Array or Hash of options to control processing (default: {})
   #           String and Array values are converted into a Hash.
@@ -1380,11 +1377,12 @@ module Asciidoctor
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and
   # convert it to the specified backend format.
   #
-  # Accepts input as an IO, String or String Array object. If the
-  # input is a File, information about the file is stored in
-  # attributes on the Document.
+  # Accepts input as an IO (or StringIO), String or String Array object. If the
+  # input is a File, the object is expected to be opened for reading and is not
+  # closed afterwards by this method. Information about the file (filename,
+  # directory name, etc) gets assigned to attributes on the Document object.
   #
-  # If the :in_place option is true, and the input is a File, the output is
+  # If the :to_file option is true, and the input is a File, the output is
   # written to a file adjacent to the input file, having an extension that
   # corresponds to the backend format. Otherwise, if the :to_file option is
   # specified, the file is written to that file. If :to_file is not an absolute
