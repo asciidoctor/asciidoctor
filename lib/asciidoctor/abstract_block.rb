@@ -420,13 +420,17 @@ class AbstractBlock < AbstractNode
     end
   end
 
-  # Internal: Assign the next index (0-based) and number (1-based) to the section
+  # Internal: Assign the next index (0-based) and numeral (1-based) to the section.
+  # If the section is an appendix, the numeral is a letter (starting with A). This
+  # method also assigns the appendix caption.
+  #
+  # section - The section to which to assign the next index and numeral.
   #
   # Assign to the specified section the next index and, if the section is
-  # numbered, number within this block (its parent).
+  # numbered, the numeral within this block (its parent).
   #
   # Returns nothing
-  def assign_section_numeral section
+  def assign_numeral section
     @next_section_index = (section.index = @next_section_index) + 1
     if (sectname = section.sectname) == 'appendix'
       section.number = @document.counter 'appendix-number', 'A'
@@ -470,7 +474,7 @@ class AbstractBlock < AbstractNode
     @next_section_number = 1
     @blocks.each do |block|
       if block.context == :section
-        assign_section_numeral block
+        assign_numeral block
         block.reindex_sections
       end
     end

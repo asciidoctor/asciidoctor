@@ -708,7 +708,7 @@ class Document < AbstractBlock
   #
   # Returns The parent Block
   def << block
-    assign_section_numeral block if block.context == :section
+    assign_numeral block if block.context == :section
     super
   end
 

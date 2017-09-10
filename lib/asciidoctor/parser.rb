@@ -94,7 +94,7 @@ class Parser
     while reader.has_more_lines?
       new_section, block_attributes = next_section(reader, document, block_attributes)
       if new_section
-        document.assign_section_numeral new_section
+        document.assign_numeral new_section
         document.blocks << new_section
       end
     end unless options[:header_only]
@@ -314,7 +314,7 @@ class Parser
           end
           # the attributes returned are those that are orphaned
           new_section, attributes = next_section reader, section, attributes
-          section.assign_section_numeral new_section
+          section.assign_numeral new_section
           section.blocks << new_section
         else
           if next_level == 0 && doctype != 'book'
