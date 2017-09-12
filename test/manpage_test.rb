@@ -40,26 +40,26 @@ context 'Manpage' do
     test 'should define default linkstyle' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
-      assert_includes output.lines, %(.LINKSTYLE blue R < >\n)
+      assert_includes output.lines, %(.  LINKSTYLE blue R < >\n)
     end
 
     test 'should use linkstyle defined by man-linkstyle attribute' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true,
           :attributes => { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
-      assert_includes output.lines, %(.LINKSTYLE cyan B \\[fo] \\[fc]\n)
+      assert_includes output.lines, %(.  LINKSTYLE cyan B \\[fo] \\[fc]\n)
     end
 
     test 'should require specialchars in value of man-linkstyle attribute defined in document to be escaped' do
       input = %(:man-linkstyle: cyan R < >
 #{SAMPLE_MANPAGE_HEADER})
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
-      assert_includes output.lines, %(.LINKSTYLE cyan R &lt; &gt;\n)
+      assert_includes output.lines, %(.  LINKSTYLE cyan R &lt; &gt;\n)
 
       input = %(:man-linkstyle: pass:[cyan R < >]
 #{SAMPLE_MANPAGE_HEADER})
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
-      assert_includes output.lines, %(.LINKSTYLE cyan R < >\n)
+      assert_includes output.lines, %(.  LINKSTYLE cyan R < >\n)
     end
   end
 
@@ -215,6 +215,20 @@ Please search |link:http://discuss.asciidoctor.org[the forums]| before asking.)
 Please search |\c
 .URL "http://discuss.asciidoctor.org" "the forums" "|"
 before asking.', output.lines.entries[-4..-1].join
+    end
+  end
+
+  context 'MTO macro' do
+    test 'should convert inline email macro into MTO macro' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+First paragraph.
+
+mailto:doc@example.org[Contact the doc])
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal '.sp
+First paragraph.
+.sp
+.MTO "doc\\(atexample.org" "Contact the doc" ""', output.lines.entries[-4..-1].join
     end
   end
 

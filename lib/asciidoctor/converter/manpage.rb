@@ -105,17 +105,27 @@ module Asciidoctor
       # define URL macro for portability
       # see http://web.archive.org/web/20060102165607/http://people.debian.org/~branden/talks/wtfm/wtfm.pdf
       #
-      # Use: .URL "http://www.debian.org" "Debian" "."
+      # Usage
+      #
+      # .URL "http://www.debian.org" "Debian" "."
       #
       # * First argument: the URL
       # * Second argument: text to be hyperlinked
-      # * Third (optional) argument: text that needs to immediately trail
-      #   the hyperlink without intervening whitespace
+      # * Third (optional) argument: text that needs to immediately trail the hyperlink without intervening whitespace
       result << '.de URL
 \\fI\\\\$2\\fP <\\\\$1>\\\\$3
 ..
-.if \n[.g] .mso www.tmac'
-      result << %(.LINKSTYLE #{node.attr 'man-linkstyle', 'blue R < >'})
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .'
+      result << %(.  LINKSTYLE #{node.attr 'man-linkstyle', 'blue R < >'})
+      result << '.\}'
 
       unless node.noheader
         if node.attr? 'manpurpose'
