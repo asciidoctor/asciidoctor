@@ -176,9 +176,7 @@ Author(s).
 
     def admonition node
       result = []
-      result << %(.if n \\{\\
-.sp
-.\\}
+      result << %(.if n .sp
 .RS 4
 .it 1 an-trap
 .nr an-no-space-flag 1
@@ -265,15 +263,11 @@ r lw(\n(.lu*75u/100u).'
 .B #{manify node.captioned_title}
 .br) if node.title?
       result << %(.sp
-.if n \\{\\
-.RS 4
-.\\}
+.if n .RS 4
 .nf
 #{manify node.content}
 .fi
-.if n \\{\\
-.RE
-.\\})
+.if n .RE)
       result * LF
     end
 
@@ -283,15 +277,11 @@ r lw(\n(.lu*75u/100u).'
 .B #{manify node.title}
 .br) if node.title?
       result << %(.sp
-.if n \\{\\
-.RS 4
-.\\}
+.if n .RS 4
 .nf
 #{manify node.content}
 .fi
-.if n \\{\\
-.RE
-.\\})
+.if n .RE)
       result * LF
     end
 
@@ -308,8 +298,8 @@ r lw(\n(.lu*75u/100u).'
 \\h'-04' #{idx + 1}.\\h'+01'\\c
 .\\}
 .el \\{\\
-.sp -1
-.IP " #{idx + 1}." 4.2
+.  sp -1
+.  IP " #{idx + 1}." 4.2
 .\\}
 #{manify item.text})
         result << item.content if item.blocks?
@@ -538,8 +528,8 @@ allbox tab(:);'
 \\h'-04'\\(bu\\h'+03'\\c
 .\\}
 .el \\{\\
-.sp -1
-.IP \\(bu 2.3
+.  sp -1
+.  IP \\(bu 2.3
 .\\}
 #{manify item.text}]
         result << item.content if item.blocks?
