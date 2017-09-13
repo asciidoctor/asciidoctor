@@ -322,7 +322,7 @@ module Asciidoctor
 </partintro>)
         end
       else
-        node.content
+        resolve_content node
       end
     end
 
