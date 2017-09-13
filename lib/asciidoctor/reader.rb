@@ -842,7 +842,7 @@ class PreprocessorReader < Reader
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0
       if @include_stack.size >= abs_maxdepth
         warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
-        return false
+        return
       elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest'
         # NOTE resolves uri relative to currently loaded document
         # NOTE we defer checking if file exists and catch the 404 error if it does not
@@ -1025,8 +1025,6 @@ class PreprocessorReader < Reader
         end
       end
       true
-    else
-      false
     end
   end
 
