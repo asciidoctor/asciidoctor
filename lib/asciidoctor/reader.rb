@@ -637,7 +637,7 @@ class PreprocessorReader < Reader
           @look_ahead += 1
           line[1..-1]
         # QUESTION should we strip whitespace from raw attributes in Substitutors#parse_attributes? (check perf)
-        elsif preprocess_include_directive $2, $3.strip
+        elsif preprocess_include_directive $2, $3
           # peek again since the content has changed
           nil
         else
@@ -831,7 +831,7 @@ class PreprocessorReader < Reader
     elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? target })
       shift
       # FIXME parse attributes only if requested by extension
-      ext.process_method[@document, self, target, AttributeList.new(raw_attributes).parse]
+      ext.process_method[@document, self, target, raw_attributes ? AttributeList.new(raw_attributes).parse : {}]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
@@ -879,7 +879,7 @@ class PreprocessorReader < Reader
       end
 
       inc_linenos, inc_tags, attributes = nil, nil, {}
-      unless raw_attributes.empty?
+      if raw_attributes
         # QUESTION should we use @document.parse_attribues?
         attributes = AttributeList.new(raw_attributes).parse
         if attributes.key? 'lines'

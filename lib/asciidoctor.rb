@@ -485,7 +485,7 @@ module Asciidoctor
     #   include::chapter1.ad[]
     #   include::example.txt[lines=1;2;5..10]
     #
-    IncludeDirectiveRx = /^(\\)?include::([^\[][^\[]*)\[(.*)\]$/
+    IncludeDirectiveRx = /^(\\)?include::([^\[][^\[]*)\[(.+)?\]$/
 
     # Matches a trailing tag directive in an include file.
     #
