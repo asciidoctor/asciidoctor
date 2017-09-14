@@ -105,24 +105,25 @@ module Asciidoctor
       engine = @engine
       @template_dirs.each do |template_dir|
         # FIXME need to think about safe mode restrictions here
-        next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir, nil))
+        next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir))
 
-        # NOTE last matching template wins for template name if no engine is given
-        file_pattern = '*'
         if engine
           file_pattern = %(*.#{engine})
           # example: templates/haml
-          if ::File.directory?(engine_dir = (::File.join template_dir, engine))
+          if ::File.directory?(engine_dir = %(#{template_dir}/#{engine}))
             template_dir = engine_dir
           end
+        else
+          # NOTE last matching template wins for template name if no engine is given
+          file_pattern = '*'
         end
 
-        # example: templates/html5 or templates/haml/html5
-        if ::File.directory?(backend_dir = (::File.join template_dir, backend))
+        # example: templates/html5 (engine not set) or templates/haml/html5 (engine set)
+        if ::File.directory?(backend_dir = %(#{template_dir}/#{backend}))
           template_dir = backend_dir
         end
 
-        pattern = ::File.join template_dir, file_pattern
+        pattern = %(#{template_dir}/#{file_pattern})
 
         if (scan_cache = @caches[:scans])
           template_cache = @caches[:templates]
@@ -280,7 +281,7 @@ module Asciidoctor
         end
         result[name] = template
       end
-      if helpers || ::File.file?(helpers = (::File.join template_dir, 'helpers.rb'))
+      if helpers || ::File.file?(helpers = %(#{template_dir}/helpers.rb))
         require helpers
       end
       result
