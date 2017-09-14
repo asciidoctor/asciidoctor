@@ -465,6 +465,9 @@ As you can see here.
 
 [quote]
 Wise words from a wise person.
+
+[open]
+Make it what you want.
         EOS
 
         output = render_string input, :backend => 'docbook'
@@ -473,6 +476,18 @@ Wise words from a wise person.
         assert_css 'sidebar > simpara', output, 1
         assert_css 'informalexample > simpara', output, 1
         assert_css 'blockquote > simpara', output, 1
+        assert_css 'chapter > simpara', output, 1
+      end
+
+      test 'should convert open paragraph to open block' do
+        input = <<-EOS
+[open]
+Make it what you want.
+        EOS
+
+        output = render_embedded_string input
+        assert_css '.openblock', output, 1
+        assert_css '.openblock p', output, 0
       end
 
       test 'should wrap text in simpara for styled paragraphs with title when rendered to DocBook' do
