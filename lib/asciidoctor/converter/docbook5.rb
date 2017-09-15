@@ -732,7 +732,7 @@ module Asciidoctor
         result << %(<manvolnum>#{doc.attr 'manvolnum'}</manvolnum>) if doc.attr? 'manvolnum'
         result << '</refmeta>'
         result << '<refnamediv>'
-        result << %(<refname>#{doc.attr 'manname'}</refname>) if doc.attr? 'manname'
+        result += (doc.attr 'mannames').map {|n| %(<refname>#{n}</refname>) } if doc.attr? 'mannames'
         result << %(<refpurpose>#{doc.attr 'manpurpose'}</refpurpose>) if doc.attr? 'manpurpose'
         result << '</refnamediv>'
       end
