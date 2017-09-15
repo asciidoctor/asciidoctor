@@ -683,5 +683,16 @@ allbox tab(:);'
     def resolve_content node
       node.content_model == :compound ? node.content : %(.sp#{LF}#{manify node.content})
     end
+
+    def write_alternate_pages mannames, manvolnum, target
+      if mannames && mannames.size > 1
+        mannames.shift
+        manvolext = %(.#{manvolnum})
+        dir, basename = ::File.split target
+        mannames.each do |manname|
+          ::IO.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename})
+        end
+      end
+    end
   end
 end

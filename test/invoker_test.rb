@@ -394,6 +394,38 @@ context 'Invoker' do
     assert_xpath '/*[@id="preamble"]', output, 1
   end
 
+  test 'should write page for each alternate manname' do
+    outdir = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures'))
+    outfile_1 = File.join outdir, 'eve.1'
+    outfile_2 = File.join outdir, 'islifeform.1'
+    input = <<-EOS
+= eve(1)
+Andrew Stanton
+v1.0.0
+:doctype: manpage
+:manmanual: EVE
+:mansource: EVE
+
+== NAME
+
+eve, islifeform - analyzes an image to determine if it's a picture of a life form
+
+== SYNOPSIS
+
+*eve* ['OPTION']... 'FILE'...
+    EOS
+
+    begin
+      invoke_cli(%W(-b manpage -o #{outfile_1}), '-') { input }
+      assert File.exist?(outfile_1)
+      assert File.exist?(outfile_2)
+      assert_equal '.so eve.1', (IO.read outfile_2).chomp
+    ensure
+      FileUtils.rm_f outfile_1
+      FileUtils.rm_f outfile_2
+    end
+  end
+
   test 'should output a trailing endline to stdout' do
     invoker = nil
     output = nil
