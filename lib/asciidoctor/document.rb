@@ -1093,6 +1093,9 @@ class Document < AbstractBlock
       else
         ::IO.write target, output
       end
+      if @backend == 'manpage' && ::String === target && (@converter.respond_to? :write_alternate_pages)
+        @converter.write_alternate_pages @attributes['mannames'], @attributes['manvolnum'], target
+      end
       nil
     end
   end
