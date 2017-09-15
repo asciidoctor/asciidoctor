@@ -792,14 +792,14 @@ puts 'The forecast for today is {forecast}'
     end
 
     test 'does not substitute attributes inside literal blocks' do
-       input = <<-EOS
+      input = <<-EOS
 :foo: bar
 
 ....
 You insert the text {foo} to expand the value
 of the attribute named foo in your document.
 ....
-       EOS
+      EOS
       output = render_string(input)
       assert_match(/\{foo\}/, output)
     end

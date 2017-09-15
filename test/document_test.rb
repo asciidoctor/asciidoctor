@@ -1502,9 +1502,9 @@ preamble
 asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       EOS
 
-       doc = document_from_string input
-       assert_equal 'asciidoctor', doc.attr('mantitle')
-       assert_equal '1', doc.attr('manvolnum')
+      doc = document_from_string input
+      assert_equal 'asciidoctor', doc.attr('mantitle')
+      assert_equal '1', doc.attr('manvolnum')
     end
 
     test 'should perform attribute substitution on mantitle in manpage doctype' do
@@ -1518,8 +1518,8 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       EOS
 
-       doc = document_from_string input
-       assert_equal 'asciidoctor', doc.attr('mantitle')
+      doc = document_from_string input
+      assert_equal 'asciidoctor', doc.attr('mantitle')
     end
 
     test 'should consume name section as manname and manpurpose for manpage doctype' do
@@ -1532,10 +1532,10 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       EOS
 
-       doc = document_from_string input
-       assert_equal 'asciidoctor', doc.attr('manname')
-       assert_equal 'converts AsciiDoc source files to HTML, DocBook and other formats', doc.attr('manpurpose')
-       assert_equal 0, doc.blocks.size
+      doc = document_from_string input
+      assert_equal 'asciidoctor', doc.attr('manname')
+      assert_equal 'converts AsciiDoc source files to HTML, DocBook and other formats', doc.attr('manpurpose')
+      assert_equal 0, doc.blocks.size
     end
 
     test 'should set docname and outfilesuffix from manname and manvolnum for manpage backend and doctype' do
@@ -1548,9 +1548,9 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       EOS
 
-       doc = document_from_string input, :backend => 'manpage'
-       assert_equal 'asciidoctor', doc.attributes['docname']
-       assert_equal '.1', doc.attributes['outfilesuffix']
+      doc = document_from_string input, :backend => 'manpage'
+      assert_equal 'asciidoctor', doc.attributes['docname']
+      assert_equal '.1', doc.attributes['outfilesuffix']
     end
 
     test 'should mark synopsis as special section in manpage doctype' do
@@ -1567,12 +1567,12 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 *asciidoctor* ['OPTION']... 'FILE'..
       EOS
 
-       doc = document_from_string input
-       synopsis_section = doc.blocks.first
-       refute_nil synopsis_section
-       assert_equal :section, synopsis_section.context
-       assert synopsis_section.special
-       assert_equal 'synopsis', synopsis_section.sectname
+      doc = document_from_string input
+      synopsis_section = doc.blocks.first
+      refute_nil synopsis_section
+      assert_equal :section, synopsis_section.context
+      assert synopsis_section.special
+      assert_equal 'synopsis', synopsis_section.sectname
     end
 
     test 'should output special header block in HTML for manpage doctype' do

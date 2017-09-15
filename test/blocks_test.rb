@@ -676,37 +676,37 @@ yet another example
 
   context 'Admonition Blocks' do
     test 'caption block-level attribute should be used as caption' do
-       input = <<-EOS
+      input = <<-EOS
 :tip-caption: Pro Tip
 
 [caption="Pro Tip"]
 TIP: Override the caption of an admonition block using an attribute entry
-       EOS
+      EOS
 
-       output = render_embedded_string input
-       assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
     end
 
     test 'can override caption of admonition block using document attribute' do
-       input = <<-EOS
+      input = <<-EOS
 :tip-caption: Pro Tip
 
 TIP: Override the caption of an admonition block using an attribute entry
-       EOS
+      EOS
 
-       output = render_embedded_string input
-       assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"]', output, 1
     end
 
     test 'blank caption document attribute should not blank admonition block caption' do
-       input = <<-EOS
+      input = <<-EOS
 :caption:
 
 TIP: Override the caption of an admonition block using an attribute entry
-       EOS
+      EOS
 
-       output = render_embedded_string input
-       assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Tip"]', output, 1
+      output = render_embedded_string input
+      assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Tip"]', output, 1
     end
   end
 
