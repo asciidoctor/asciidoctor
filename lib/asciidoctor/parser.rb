@@ -197,13 +197,18 @@ class Parser
       name_section = initialize_section(reader, document, {})
       if name_section.level == 1
         name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true) * ' '
-        if (m = ManpageNamePurposeRx.match(name_section_buffer))
-          document.attributes['manname'] = document.sub_attributes m[1]
-          document.attributes['manpurpose'] = m[2]
-          # TODO parse multiple man names
+        if ManpageNamePurposeRx =~ name_section_buffer
+          document.attributes['manpurpose'] = $2
+          if (manname = document.sub_attributes $1).include? ','
+            manname = (mannames = (manname.split ',').map {|n| n.strip })[0]
+          else
+            mannames = [manname]
+          end
+          document.attributes['manname'] = manname
+          document.attributes['mannames'] = mannames
 
           if document.backend == 'manpage'
-            document.attributes['docname'] = document.attributes['manname']
+            document.attributes['docname'] = manname
             document.attributes['outfilesuffix'] = %(.#{document.attributes['manvolnum']})
           end
         else

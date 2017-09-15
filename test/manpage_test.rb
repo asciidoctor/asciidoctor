@@ -37,6 +37,12 @@ context 'Manpage' do
       assert_equal 'command', doc.attributes['docname']
     end
 
+    test 'should output multiple mannames in NAME section' do
+      input = SAMPLE_MANPAGE_HEADER.sub(/^command - /, 'command, alt_command - ')
+      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      assert_includes output.lines, %(command, alt_command \\- does stuff\n)
+    end
+
     test 'should define default linkstyle' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true

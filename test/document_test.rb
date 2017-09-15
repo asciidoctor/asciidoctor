@@ -1410,6 +1410,30 @@ chapter body
       assert_equal '_first_chapter', id_attr.value
     end
 
+    test 'adds refname to DocBook output for each name defined in NAME section of manpage' do
+      input = <<-EOS
+= eve(1)
+Andrew Stanton
+v1.0.0
+:doctype: manpage
+:manmanual: EVE
+:mansource: EVE
+
+== NAME
+
+eve, islifeform - analyzes an image to determine if it's a picture of a life form
+
+== SYNOPSIS
+
+*eve* ['OPTION']... 'FILE'...
+      EOS
+
+      result = render_string input, :backend => 'docbook5'
+      assert_xpath '/refentry/refnamediv/refname', result, 2
+      assert_xpath '(/refentry/refnamediv/refname)[1][text()="eve"]', result, 1
+      assert_xpath '(/refentry/refnamediv/refname)[2][text()="islifeform"]', result, 1
+    end
+
     test 'adds a front and back cover image to DocBook 5 when doctype is book' do
       input = <<-EOS
 = Title
