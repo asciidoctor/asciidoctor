@@ -5,17 +5,16 @@ git:
   depth: 2
 language: ruby
 rvm:
-- &release_ruby 2.4.1
-- 2.3.4
-- 2.2.7
+- &release_ruby 2.4.2
+- 2.3.5
+- 2.2.8
 - 2.1.10
 - 2.0.0-p648
 - 1.9.3-p551
 - 1.8.7-p374
+- jruby-9.1.13.0
 - jruby-9.0.5.0
-- jruby-9.1.12.0
-- jruby-19mode # based on jruby-1.7.19
-- jruby-18mode # based on jruby-1.7.19
+- jruby-1.7.27
 #- rbx-3 # NOTE not currently recognized
 env:
   global:
