@@ -5,22 +5,24 @@ git:
   depth: 2
 language: ruby
 rvm:
-- &release_ruby 2.4.2
-- 2.3.5
-- 2.2.8
-- 2.1.10
-- 2.0.0-p648
-- 1.9.3-p551
-- 1.8.7-p374
+#- &release_ruby 2.4.2
+#- 2.3.5
+#- 2.2.8
+#- 2.1.10
+#- 2.0.0-p648
+#- 1.9.3-p551
+#- 1.8.7-p374
 - jruby-9.1.13.0
-- jruby-9.0.5.0
-- jruby-1.7.27
+#- jruby-9.0.5.0
+#- jruby-1.7.27
 #- rbx-3 # NOTE not currently recognized
 env:
   global:
+  #- JRUBY_OPTS=
   # use system libraries to speed up installation of nokogiri
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
 before_install:
+- echo $JRUBY_OPTS
 - gem update bundler
 - gem cleanup bundler
 script: bundle exec rake coverage test:all
@@ -28,12 +30,12 @@ after_success: bundle exec rake build:dependents
 #notifications:
 #  email: false
 #  irc: 'irc.freenode.org#asciidoctor'
-deploy:
-  provider: rubygems
-  gem: asciidoctor
-  on:
-    tags: true
-    repo: asciidoctor/asciidoctor
-    rvm: *release_ruby
-  api_key:
-    secure: p0mMZ7Fl5IdIv3ZIH8/4nK3C/6pRjpT8nHnsvAcgBk8TyEMYQO0gZExwMVpk8kB4Nm4Y6dXJqjoHOb1x7dpylEOqyF5fB+mJ8wfWTbGYI4kLYS7O/pkW8XAvH9BqaSnvLb7jZirxxu936ehCw+VlxZfn1n8lC8+jrIoDKMZkKmk=
+#deploy:
+#  provider: rubygems
+#  gem: asciidoctor
+#  on:
+#    tags: true
+#    repo: asciidoctor/asciidoctor
+#    rvm: *release_ruby
+#  api_key:
+#    secure: p0mMZ7Fl5IdIv3ZIH8/4nK3C/6pRjpT8nHnsvAcgBk8TyEMYQO0gZExwMVpk8kB4Nm4Y6dXJqjoHOb1x7dpylEOqyF5fB+mJ8wfWTbGYI4kLYS7O/pkW8XAvH9BqaSnvLb7jZirxxu936ehCw+VlxZfn1n8lC8+jrIoDKMZkKmk=
