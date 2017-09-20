@@ -38,7 +38,7 @@ ifdef::env-site[]
 endif::[]
 :uri-changelog: {uri-rel-file-base}CHANGELOG.adoc
 :uri-contribute: {uri-rel-file-base}CONTRIBUTING.adoc
-:uri-license: {uri-rel-file-base}LICENSE.adoc
+:uri-license: {uri-rel-file-base}LICENSE
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: http://discuss.asciidoctor.org
 :uri-irc: irc://irc.freenode.org/#asciidoctor
