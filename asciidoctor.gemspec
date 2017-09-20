@@ -17,13 +17,13 @@ Gem::Specification.new do |s|
   rescue
     Dir['**/*']
   end
-  s.files = files.grep(/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|(?:CHANGELOG|CONTRIBUTING|LICENSE|README(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/)
+  s.files = files.grep(/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|LICENSE|(?:CHANGELOG|CONTRIBUTINGREADME(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/)
   s.executables = files.grep(/^bin\//).map {|f| File.basename f }
   s.require_paths = ['lib']
   s.test_files = files.grep(/^(?:(?:features|test)\/.+)$/)
   s.has_rdoc = true
   s.rdoc_options = ['--charset=UTF-8']
-  s.extra_rdoc_files = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE.adoc']
+  s.extra_rdoc_files = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE']
 
   # asciimath is needed for testing AsciiMath in DocBook backend
   s.add_development_dependency 'asciimath', '~> 1.0.0'
