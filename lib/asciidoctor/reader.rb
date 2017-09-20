@@ -847,7 +847,7 @@ class PreprocessorReader < Reader
         # NOTE resolves uri relative to currently loaded document
         # NOTE we defer checking if file exists and catch the 404 error if it does not
         target_type = :file
-        inc_path = relpath = @include_stack.empty? && ::Dir.pwd == @document.base_dir ? target : (::File.join @dir, target)
+        inc_path = relpath = @include_stack.empty? && ::Dir.pwd == @document.base_dir ? target : %(#{@dir}/#{target})
       elsif Helpers.uriish? target
         unless @document.attributes.key? 'allow-uri-read'
           replace_next_line %(link:#{target}[])

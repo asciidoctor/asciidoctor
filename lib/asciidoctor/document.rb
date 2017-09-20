@@ -442,7 +442,7 @@ class Document < AbstractBlock
 
       # fallback directories
       attrs['stylesdir'] ||= '.'
-      attrs['iconsdir'] ||= ::File.join(attrs.fetch('imagesdir', './images'), 'icons')
+      attrs['iconsdir'] ||= %(#{attrs.fetch 'imagesdir', './images'}/icons)
 
       if initialize_extensions
         if (ext_registry = options[:extension_registry])
