@@ -189,7 +189,7 @@ context 'Invoker' do
   test 'should report error if input file does not exist' do
     redirect_streams do |out, err|
       invoker = invoke_cli [], 'missing_file.asciidoc'
-      assert_match(/input file .* missing or cannot be read/, err.string)
+      assert_match(/input file .* is missing/, err.string)
       assert_equal 1, invoker.code
     end
   end
@@ -197,7 +197,7 @@ context 'Invoker' do
   test 'should treat extra arguments as files' do
     redirect_streams do |out, err|
       invoker = invoke_cli %w(-o /dev/null extra arguments sample.asciidoc), nil
-      assert_match(/input file .* missing or cannot be read/, err.string)
+      assert_match(/input file .* is missing/, err.string)
       assert_equal 1, invoker.code
     end
   end

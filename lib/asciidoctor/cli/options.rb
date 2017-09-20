@@ -171,31 +171,39 @@ Example: asciidoctor -b html5 source.asciidoc
               # warn, but don't panic; we may have enough to proceed, so we won't force a failure
               $stderr.puts %(asciidoctor: WARNING: extra arguments detected (unparsed arguments: '#{args * "', '"}') or incorrect usage of stdin)
             else
-              if ::File.readable? file
-                matches = [file]
+              if ::File.file? file
+                infiles << file
+              # NOTE only attempt to glob if file is not found
               else
                 # Tilt backslashes in Windows paths the Ruby-friendly way
                 if ::File::ALT_SEPARATOR == '\\' && (file.include? '\\')
                   file = file.tr '\\', '/'
                 end
                 if (matches = ::Dir.glob file).empty?
-                  $stderr.puts %(asciidoctor: FAILED: input file #{file} missing or cannot be read)
-                  return 1
+                  # NOTE if no matches, assume it's just a missing file and proceed
+                  infiles << file
+                else
+                  infiles.concat matches
                 end
               end
-
-              infiles.concat matches
             end
           end
         end
 
-        infiles.each do |file|
-          unless file == '-' || (::File.file? file) || (::File.pipe? file)
-            if ::File.readable? file
-              $stderr.puts %(asciidoctor: FAILED: input path #{file} is a #{(::File.stat file).ftype}, not a file)
+        infiles.reject {|file| file == '-' }.each do |file|
+          begin
+            fstat = ::File.stat file
+            if fstat.file? || fstat.pipe?
+              unless fstat.readable?
+                $stderr.puts %(asciidoctor: FAILED: input file #{file} is not readable)
+                return 1
+              end
             else
-              $stderr.puts %(asciidoctor: FAILED: input file #{file} missing or cannot be read)
+              $stderr.puts %(asciidoctor: FAILED: input path #{file} is a #{fstat.ftype}, not a file)
+              return 1
             end
+          rescue ::Errno::ENOENT
+            $stderr.puts %(asciidoctor: FAILED: input file #{file} is missing)
             return 1
           end
         end
