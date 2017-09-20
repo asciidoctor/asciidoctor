@@ -612,6 +612,25 @@ include::fixtures/parent-include.adoc[]
         assert_equal 'fixtures/parent-include.adoc', reader.path
       end
 
+      test 'missing file referenced by include directive is skipped when optional option is set' do
+        input = <<-EOS
+include::fixtures/no-such-file.adoc[opts=optional]
+
+trailing content
+        EOS
+
+        begin
+          doc, warnings = redirect_streams do |_, err|
+            [(document_from_string input, :safe => :safe, :base_dir => DIRNAME), err.string]
+          end
+          assert_equal 1, doc.blocks.size
+          assert_equal ['trailing content'], doc.blocks[0].lines
+          assert_equal 0, warnings.size
+        rescue
+          flunk 'include directive should not raise exception on missing file'
+        end
+      end
+
       test 'missing file referenced by include directive is replaced by warning' do
         input = <<-EOS
 include::fixtures/no-such-file.adoc[]

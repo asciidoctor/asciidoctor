@@ -819,7 +819,8 @@ class PreprocessorReader < Reader
   # target - The name of the source document to include as specified in the
   #          target slot of the include::[] directive
   #
-  # Returns a Boolean indicating whether the line under the cursor has changed.
+  # Returns a [Boolean] indicating whether the line under the cursor was changed.
+  # To skip over the directive, call shift and return true.
   def preprocess_include_directive raw_target, raw_attributes
     if ((target = raw_target).include? ATTR_REF_HEAD) &&
         (target = @document.sub_attributes raw_target, :attribute_missing => 'drop-line').empty?
@@ -869,8 +870,12 @@ class PreprocessorReader < Reader
         # include file is resolved relative to dir of current include, or base_dir if within original docfile
         inc_path = @document.normalize_system_path target, @dir, nil, :target_name => 'include file'
         unless ::File.file? inc_path
-          warn %(asciidoctor: WARNING: #{line_info}: include file not found: #{inc_path})
-          replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+          if raw_attributes && ((AttributeList.new raw_attributes).parse.key? 'optional-option')
+            shift
+          else
+            warn %(asciidoctor: WARNING: #{line_info}: include file not found: #{inc_path})
+            replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+          end
           return true
         end
         # NOTE relpath is the path relative to the root document (or base_dir, if set)
