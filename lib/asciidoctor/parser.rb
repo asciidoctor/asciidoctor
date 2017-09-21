@@ -521,19 +521,21 @@ class Parser
             break
           # NOTE very rare that a text-only line will end in ] (e.g., inline macro), so check that first
           elsif (this_line.end_with? ']') && (this_line.include? '::')
-            #if (this_line.start_with? 'image', 'video', 'audio') && (match = BlockMediaMacroRx.match(this_line))
-            if (ch0 == 'i' || (this_line.start_with? 'video:', 'audio:')) && (match = BlockMediaMacroRx.match(this_line))
-              blk_ctx, target = match[1].to_sym, match[2]
-              block = Block.new(parent, blk_ctx, :content_model => :empty)
-              case blk_ctx
-              when :video
-                posattrs = ['poster', 'width', 'height']
-              when :audio
-                posattrs = []
-              else # :image
-                posattrs = ['alt', 'width', 'height']
+            #if (this_line.start_with? 'image', 'video', 'audio') && BlockMediaMacroRx =~ this_line
+            if (ch0 == 'i' || (this_line.start_with? 'video:', 'audio:')) && BlockMediaMacroRx =~ this_line
+              blk_ctx, target, blk_attrs = $1.to_sym, $2, $3
+              block = Block.new parent, blk_ctx, :content_model => :empty
+              if blk_attrs
+                case blk_ctx
+                when :video
+                  posattrs = ['poster', 'width', 'height']
+                when :audio
+                  posattrs = []
+                else # :image
+                  posattrs = ['alt', 'width', 'height']
+                end
+                block.parse_attributes blk_attrs, posattrs, :sub_input => true, :sub_result => false, :into => attributes
               end
-              block.parse_attributes(match[3], posattrs, :sub_input => true, :sub_result => false, :into => attributes)
               # style doesn't have special meaning for media macros
               attributes.delete 'style' if attributes.key? 'style'
               if (target.include? ATTR_REF_HEAD) && (target = block.sub_attributes target, :attribute_missing => 'drop-line').empty?

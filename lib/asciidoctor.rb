@@ -818,7 +818,7 @@ module Asciidoctor
     #   image::filename.png[Caption]
     #   video::http://youtube.com/12345[Cats vs Dogs]
     #
-    BlockMediaMacroRx = /^(image|video|audio)::(\S|\S.*?\S)\[(.*)\]$/
+    BlockMediaMacroRx = /^(image|video|audio)::(\S|\S.*?\S)\[(.+)?\]$/
 
     # Matches the TOC block macro.
     #
