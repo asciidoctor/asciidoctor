@@ -567,17 +567,15 @@ class Parser
               block.parse_attributes($1, [], :sub_result => false, :into => attributes) if $1
               break
 
-            elsif block_macro_extensions && (match = CustomBlockMacroRx.match(this_line)) &&
-                (extension = extensions.registered_for_block_macro?(match[1]))
-              target = match[2]
-              content = match[3]
+            elsif block_macro_extensions && CustomBlockMacroRx =~ this_line &&
+                (extension = extensions.registered_for_block_macro? $1)
+              target, content = $2, $3
               if extension.config[:content_model] == :attributes
-                unless content.empty?
-                  document.parse_attributes(content, extension.config[:pos_attrs] || [],
-                      :sub_input => true, :sub_result => false, :into => attributes)
+                if content
+                  document.parse_attributes content, extension.config[:pos_attrs] || [], :sub_input => true, :sub_result => false, :into => attributes
                 end
               else
-                attributes['text'] = content
+                attributes['text'] = content || ''
               end
               if (default_attrs = extension.config[:default_attrs])
                 attributes.update(default_attrs) {|_, old_v| old_v }
