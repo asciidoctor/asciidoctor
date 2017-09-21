@@ -827,7 +827,7 @@ module Asciidoctor
     #   toc::[]
     #   toc::[levels=2]
     #
-    BlockTocMacroRx = /^toc::\[(.*)\]$/
+    BlockTocMacroRx = /^toc::\[(.+)?\]$/
 
     ## Inline macros
 

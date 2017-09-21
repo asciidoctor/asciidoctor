@@ -562,9 +562,9 @@ class Parser
               attributes['target'] = target
               break
 
-            elsif ch0 == 't' && (this_line.start_with? 'toc:') && (match = BlockTocMacroRx.match(this_line))
-              block = Block.new(parent, :toc, :content_model => :empty)
-              block.parse_attributes(match[1], [], :sub_result => false, :into => attributes)
+            elsif ch0 == 't' && (this_line.start_with? 'toc:') && BlockTocMacroRx =~ this_line
+              block = Block.new parent, :toc, :content_model => :empty
+              block.parse_attributes($1, [], :sub_result => false, :into => attributes) if $1
               break
 
             elsif block_macro_extensions && (match = CustomBlockMacroRx.match(this_line)) &&
