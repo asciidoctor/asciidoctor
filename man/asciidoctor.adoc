@@ -102,6 +102,12 @@ This option may be specified more than once.
   If the input is read from standard input or a named pipe (fifo), then the output file defaults to stdout.
   If _OUT_FILE_ is _-_, then the output file is written to standard output.
 
+*-R, --source-dir*=_DIR_::
+  Source directory.
+  Currently only used if the destination directory is also specified.
+  Used to preserve the directory structure of files converted within this directory in the destination directory.
+  If specified, the directory is resolved relative to the working directory.
+
 *-r, --require*=_LIBRARY_::
   Require the specified library before executing the processor, using the standard Ruby require.
   This option may be specified more than once.

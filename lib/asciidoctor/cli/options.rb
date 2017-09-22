@@ -24,6 +24,7 @@ module Asciidoctor
         self[:load_paths] = options[:load_paths] || nil
         self[:requires] = options[:requires] || nil
         self[:base_dir] = options[:base_dir]
+        self[:source_dir] = options[:source_dir] || nil
         self[:destination_dir] = options[:destination_dir] || nil
         self[:trace] = false
         self[:timings] = false
@@ -103,6 +104,9 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts.on('-B', '--base-dir DIR', 'base directory containing the document and resources (default: directory of source file)') do |base_dir|
             self[:base_dir] = base_dir
+          end
+          opts.on('-R', '--source-dir DIR', 'source root directory (used for calculating path in destination directory)') do |src_dir|
+            self[:source_dir] = src_dir
           end
           opts.on('-D', '--destination-dir DIR', 'destination output directory (default: directory of source file)') do |dest_dir|
             self[:destination_dir] = dest_dir

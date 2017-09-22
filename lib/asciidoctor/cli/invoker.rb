@@ -36,6 +36,8 @@ module Asciidoctor
         opts = {}
         infiles = []
         outfile = nil
+        abs_srcdir_posix = nil
+        non_posix_env = ::File::ALT_SEPARATOR == '\\'
         err = @err || $stderr
         show_timings = false
 
@@ -45,6 +47,11 @@ module Asciidoctor
             infiles = val
           when :output_file
             outfile = val
+          when :source_dir
+            if val
+              abs_srcdir_posix = ::File.expand_path val
+              abs_srcdir_posix = abs_srcdir_posix.tr '\\', '/' if non_posix_env && (abs_srcdir_posix.include? '\\')
+            end
           when :destination_dir
             opts[:to_dir] = val if val
           when :attributes
@@ -100,6 +107,17 @@ module Asciidoctor
         else
           infiles.each do |infile|
             input_opts = opts.merge :to_file => tofile
+            if abs_srcdir_posix && (input_opts.key? :to_dir)
+              abs_indir = ::File.dirname ::File.expand_path infile
+              if non_posix_env
+                abs_indir_posix = (abs_indir.include? '\\') ? (abs_indir.tr '\\', '/') : abs_indir
+              else
+                abs_indir_posix = abs_indir
+              end
+              if abs_indir_posix.start_with? %(#{abs_srcdir_posix}/)
+                input_opts[:to_dir] += abs_indir.slice abs_srcdir_posix.length, abs_indir.length
+              end
+            end
             if show_timings
               @documents << (::Asciidoctor.convert_file infile, (input_opts.merge :timings => (timings = Timings.new)))
               timings.print_report err, infile
