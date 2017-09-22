@@ -674,7 +674,7 @@ not in section
 
       doc = document_from_string input
       heading = doc.blocks.first
-      assert heading.is_a?(Asciidoctor::Block)
+      assert_kind_of Asciidoctor::Block, heading
       assert_equal :floating_title, heading.context
       assert_equal '_independent_heading', heading.id
       assert doc.catalog[:ids].has_key?('_independent_heading')

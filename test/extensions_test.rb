@@ -247,7 +247,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register :sample, SampleExtensionGroup.new
         refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
-        assert Asciidoctor::Extensions.groups[:sample].is_a? SampleExtensionGroup
+        assert_kind_of SampleExtensionGroup, Asciidoctor::Extensions.groups[:sample]
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -259,7 +259,7 @@ context 'Extensions' do
         end
         refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
-        assert Asciidoctor::Extensions.groups[:sample].is_a? Proc
+        assert_kind_of Proc, Asciidoctor::Extensions.groups[:sample]
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -416,7 +416,7 @@ context 'Extensions' do
         SampleExtensionGroup.register
         doc = Asciidoctor::Document.new
         assert doc.extensions?
-        assert doc.extensions.is_a? Asciidoctor::Extensions::Registry
+        assert_kind_of Asciidoctor::Extensions::Registry, doc.extensions
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -432,9 +432,9 @@ context 'Extensions' do
       assert registry.preprocessors?
       extensions = registry.preprocessors
       assert_equal 1, extensions.size
-      assert extensions.first.is_a? Asciidoctor::Extensions::ProcessorExtension
-      assert extensions.first.instance.is_a? SamplePreprocessor
-      assert extensions.first.process_method.is_a? ::Method
+      assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
+      assert_kind_of SamplePreprocessor, extensions.first.instance
+      assert_kind_of Method, extensions.first.process_method
     end
 
     test 'should instantiate include processors' do
@@ -444,9 +444,9 @@ context 'Extensions' do
       assert registry.include_processors?
       extensions = registry.include_processors
       assert_equal 1, extensions.size
-      assert extensions.first.is_a? Asciidoctor::Extensions::ProcessorExtension
-      assert extensions.first.instance.is_a? SampleIncludeProcessor
-      assert extensions.first.process_method.is_a? ::Method
+      assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
+      assert_kind_of SampleIncludeProcessor, extensions.first.instance
+      assert_kind_of Method, extensions.first.process_method
     end
 
     test 'should instantiate docinfo processors' do
@@ -457,9 +457,9 @@ context 'Extensions' do
       assert registry.docinfo_processors?(:head)
       extensions = registry.docinfo_processors
       assert_equal 1, extensions.size
-      assert extensions.first.is_a? Asciidoctor::Extensions::ProcessorExtension
-      assert extensions.first.instance.is_a? SampleDocinfoProcessor
-      assert extensions.first.process_method.is_a? ::Method
+      assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
+      assert_kind_of SampleDocinfoProcessor, extensions.first.instance
+      assert_kind_of Method, extensions.first.process_method
     end
 
     # NOTE intentionally using the legacy names
@@ -470,9 +470,9 @@ context 'Extensions' do
       assert registry.treeprocessors?
       extensions = registry.treeprocessors
       assert_equal 1, extensions.size
-      assert extensions.first.is_a? Asciidoctor::Extensions::ProcessorExtension
-      assert extensions.first.instance.is_a? SampleTreeprocessor
-      assert extensions.first.process_method.is_a? ::Method
+      assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
+      assert_kind_of SampleTreeprocessor, extensions.first.instance
+      assert_kind_of Method, extensions.first.process_method
     end
 
     test 'should instantiate postprocessors' do
@@ -482,9 +482,9 @@ context 'Extensions' do
       assert registry.postprocessors?
       extensions = registry.postprocessors
       assert_equal 1, extensions.size
-      assert extensions.first.is_a? Asciidoctor::Extensions::ProcessorExtension
-      assert extensions.first.instance.is_a? SamplePostprocessor
-      assert extensions.first.process_method.is_a? ::Method
+      assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
+      assert_kind_of SamplePostprocessor, extensions.first.instance
+      assert_kind_of Method, extensions.first.process_method
     end
 
     test 'should instantiate block processor' do
@@ -494,9 +494,9 @@ context 'Extensions' do
       assert registry.blocks?
       assert registry.registered_for_block? :sample, :paragraph
       extension = registry.find_block_extension :sample
-      assert extension.is_a? Asciidoctor::Extensions::ProcessorExtension
-      assert extension.instance.is_a? SampleBlock
-      assert extension.process_method.is_a? ::Method
+      assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extension
+      assert_kind_of SampleBlock, extension.instance
+      assert_kind_of Method, extension.process_method
     end
 
     test 'should not match block processor for unsupported context' do
@@ -513,9 +513,9 @@ context 'Extensions' do
       assert registry.block_macros?
       assert registry.registered_for_block_macro? 'sample'
       extension = registry.find_block_macro_extension 'sample'
-      assert extension.is_a? Asciidoctor::Extensions::ProcessorExtension
-      assert extension.instance.is_a? SampleBlockMacro
-      assert extension.process_method.is_a? ::Method
+      assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extension
+      assert_kind_of SampleBlockMacro, extension.instance
+      assert_kind_of Method, extension.process_method
     end
 
     test 'should instantiate inline macro processor' do
@@ -525,9 +525,9 @@ context 'Extensions' do
       assert registry.inline_macros?
       assert registry.registered_for_inline_macro? 'sample'
       extension = registry.find_inline_macro_extension 'sample'
-      assert extension.is_a? Asciidoctor::Extensions::ProcessorExtension
-      assert extension.instance.is_a? SampleInlineMacro
-      assert extension.process_method.is_a? ::Method
+      assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extension
+      assert_kind_of SampleInlineMacro, extension.instance
+      assert_kind_of Method, extension.process_method
     end
 
     test 'should allow processors to be registered by a string name' do
@@ -537,7 +537,7 @@ context 'Extensions' do
       assert registry.preprocessors?
       extensions = registry.preprocessors
       assert_equal 1, extensions.size
-      assert extensions.first.is_a? Asciidoctor::Extensions::ProcessorExtension
+      assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
     end
   end
 

@@ -4417,7 +4417,7 @@ context 'Lists model' do
 
     doc = document_from_string input
     list = doc.blocks.first
-    assert list.is_a? Asciidoctor::List
+    assert_kind_of Asciidoctor::List, list
     items = list.items
     assert_equal 3, items.size
     assert_equal list.items, list.content

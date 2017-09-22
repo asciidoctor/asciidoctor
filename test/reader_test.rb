@@ -374,7 +374,7 @@ This is a paragraph outside the block.
     context 'Type hierarchy' do
       test 'PreprocessorReader should extend from Reader' do
         reader = empty_document.reader
-        assert reader.is_a?(Asciidoctor::Reader)
+        assert_kind_of Asciidoctor::PreprocessorReader, reader
       end
 
       test 'PreprocessorReader should invoke or emulate Reader initializer' do

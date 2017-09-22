@@ -238,7 +238,7 @@ context 'Links' do
       doc = document_from_string %(Here you can read about tigers.#{anchor})
       output = doc.render
       assert_equal '[tigers]', doc.catalog[:ids]['tigers']
-      assert doc.catalog[:refs]['tigers'].is_a? Asciidoctor::Inline
+      assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_nil doc.catalog[:refs]['tigers'].text
       assert_xpath '//a[@id = "tigers"]', output, 1
       assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
@@ -274,7 +274,7 @@ context 'Links' do
       doc = document_from_string %(Here you can read about tigers.#{anchor})
       output = doc.render
       assert_equal 'Tigers', doc.catalog[:ids]['tigers']
-      assert doc.catalog[:refs]['tigers'].is_a? Asciidoctor::Inline
+      assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal 'Tigers', doc.catalog[:refs]['tigers'].text
       assert_xpath '//a[@id = "tigers"]', output, 1
       assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
@@ -291,7 +291,7 @@ context 'Links' do
     %w([[tigers,{label-tigers}]] anchor:tigers[{label-tigers}]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor}), :attributes => { 'label-tigers' => 'Tigers' }
       doc.render
-      assert doc.catalog[:refs]['tigers'].is_a? Asciidoctor::Inline
+      assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal 'Tigers', doc.catalog[:refs]['tigers'].text
       assert_equal 'Tigers', doc.catalog[:ids]['tigers']
     end
@@ -301,7 +301,7 @@ context 'Links' do
     %w([[tigers,<Tigers>]] anchor:tigers[<Tigers>]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor}), :backend => :docbook45
       output = doc.convert :header_footer => false
-      assert doc.catalog[:refs]['tigers'].is_a? Asciidoctor::Inline
+      assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal '<Tigers>', doc.catalog[:refs]['tigers'].text
       assert_equal '<Tigers>', doc.references[:ids]['tigers']
       assert_includes output, '<anchor id="tigers" xreflabel="&lt;Tigers&gt;"/>'

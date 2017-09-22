@@ -58,7 +58,7 @@ context 'Options' do
   test 'should emit warning when unparsed options remain' do
     redirect_streams do |stdout, stderr|
       options = Asciidoctor::Cli::Options.parse!(%w(-b docbook - -))
-      assert options.is_a? Hash
+      assert_kind_of Hash, options
       assert_match(/asciidoctor: WARNING: extra arguments .*/, stderr.string.chomp)
     end
   end

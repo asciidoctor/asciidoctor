@@ -502,10 +502,10 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
     custom_backend_root = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends'))
     invoker = invoke_cli_to_buffer %W(-E haml -T #{custom_backend_root} -o -)
     doc = invoker.document
-    assert doc.converter.is_a? Asciidoctor::Converter::CompositeConverter
+    assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
     selected = doc.converter.find_converter 'paragraph'
-    assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-    assert selected.templates['paragraph'].is_a? Tilt::HamlTemplate
+    assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+    assert_kind_of Tilt::HamlTemplate, selected.templates['paragraph']
   end
 
   test 'should load custom templates from multiple template directories' do
