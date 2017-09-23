@@ -89,6 +89,7 @@ context 'Path Resolver' do
     end
 
     test 'posixifies windows paths' do
+      @resolver.file_separator = '\\'
       assert_equal '/images', @resolver.web_path('\\images')
       assert_equal '../images', @resolver.web_path('..\\images')
       assert_equal '/images', @resolver.web_path('\\..\\images')
@@ -221,6 +222,7 @@ context 'Path Resolver' do
     end
 
     test 'posixifies windows paths' do
+      @resolver.file_separator = '\\'
       assert_equal "#{JAIL}/assets/css", @resolver.system_path('..\\css', 'assets\\stylesheets', JAIL)
     end
 

@@ -176,12 +176,10 @@ class PathResolver
   #
   # returns a String path with any backslashes replaced with forward slashes
   def posixify path
-    if path.nil_or_empty?
-      ''
-    elsif path.include? BACKSLASH
-      path.tr BACKSLASH, SLASH
+    if path
+      @file_separator == BACKSLASH && (path.include? BACKSLASH) ? (path.tr BACKSLASH, SLASH) : path
     else
-      path
+      ''
     end
   end
   alias posixfy posixify
