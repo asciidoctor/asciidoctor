@@ -3,6 +3,7 @@ module Asciidoctor
   module Cli
     # Public Invocation class for starting Asciidoctor via CLI
     class Invoker
+
       attr_reader :options
       attr_reader :documents
       attr_reader :code
@@ -37,7 +38,7 @@ module Asciidoctor
         infiles = []
         outfile = nil
         abs_srcdir_posix = nil
-        non_posix_env = ::File::ALT_SEPARATOR == '\\'
+        non_posix_env = ::File::ALT_SEPARATOR == RS
         err = @err || $stderr
         show_timings = false
 
@@ -50,7 +51,7 @@ module Asciidoctor
           when :source_dir
             if val
               abs_srcdir_posix = ::File.expand_path val
-              abs_srcdir_posix = abs_srcdir_posix.tr '\\', '/' if non_posix_env && (abs_srcdir_posix.include? '\\')
+              abs_srcdir_posix = abs_srcdir_posix.tr RS, FS if non_posix_env && (abs_srcdir_posix.include? RS)
             end
           when :destination_dir
             opts[:to_dir] = val if val
@@ -110,7 +111,7 @@ module Asciidoctor
             if abs_srcdir_posix && (input_opts.key? :to_dir)
               abs_indir = ::File.dirname ::File.expand_path infile
               if non_posix_env
-                abs_indir_posix = (abs_indir.include? '\\') ? (abs_indir.tr '\\', '/') : abs_indir
+                abs_indir_posix = (abs_indir.include? RS) ? (abs_indir.tr RS, FS) : abs_indir
               else
                 abs_indir_posix = abs_indir
               end

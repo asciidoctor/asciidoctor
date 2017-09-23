@@ -1,6 +1,8 @@
 # encoding: UTF-8
 module Asciidoctor
   module Cli
+    FS = '/'
+    RS = '\\'
 
     # Public: List of options that can be specified on the command line
     class Options < ::Hash
@@ -180,8 +182,8 @@ Example: asciidoctor -b html5 source.asciidoc
               # NOTE only attempt to glob if file is not found
               else
                 # Tilt backslashes in Windows paths the Ruby-friendly way
-                if ::File::ALT_SEPARATOR == '\\' && (file.include? '\\')
-                  file = file.tr '\\', '/'
+                if ::File::ALT_SEPARATOR == RS && (file.include? FS)
+                  file = file.tr FS, FS
                 end
                 if (matches = ::Dir.glob file).empty?
                   # NOTE if no matches, assume it's just a missing file and proceed
