@@ -873,7 +873,7 @@ class PreprocessorReader < Reader
           if raw_attributes && ((AttributeList.new raw_attributes).parse.key? 'optional-option')
             shift
           else
-            warn %(asciidoctor: WARNING: #{line_info}: include file not found: #{inc_path})
+            warn %(asciidoctor: ERROR: #{line_info}: include file not found: #{inc_path})
             replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           end
           return true
@@ -947,7 +947,7 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{inc_path})
+          warn %(asciidoctor: ERROR: #{line_info}: include #{target_type} not readable: #{inc_path})
           replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
@@ -1007,7 +1007,7 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{inc_path})
+          warn %(asciidoctor: ERROR: #{line_info}: include #{target_type} not readable: #{inc_path})
           replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
@@ -1024,7 +1024,7 @@ class PreprocessorReader < Reader
           shift
           push_include inc_content, inc_path, relpath, 1, attributes
         rescue
-          warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{inc_path})
+          warn %(asciidoctor: ERROR: #{line_info}: include #{target_type} not readable: #{inc_path})
           replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
           return true
         end
