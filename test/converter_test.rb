@@ -10,19 +10,19 @@ context 'Converter' do
   context 'View options' do
     test 'should set Haml format to html5 for html5 backend' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'), :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
-      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-      assert selected.templates['paragraph'].is_a? Tilt::HamlTemplate
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+      assert_kind_of Tilt::HamlTemplate, selected.templates['paragraph']
       assert_equal :html5, selected.templates['paragraph'].options[:format]
     end
 
     test 'should set Haml format to xhtml for docbook backend' do
       doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'), :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
-      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-      assert selected.templates['paragraph'].is_a? Tilt::HamlTemplate
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+      assert_kind_of Tilt::HamlTemplate, selected.templates['paragraph']
       assert_equal :xhtml, selected.templates['paragraph'].options[:format]
     end
 
@@ -32,36 +32,36 @@ context 'Converter' do
         File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim-overrides'),
       ]
       doc = Asciidoctor::Document.new [], :template_dirs => template_dirs, :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
-      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-      assert selected.templates['paragraph'].is_a? Slim::Template
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+      assert_kind_of Slim::Template, selected.templates['paragraph']
       assert_equal template_dirs.reverse.map {|dir| File.expand_path dir }, selected.templates['paragraph'].options[:include_dirs]
     end
 
     test 'should set Slim format to html for html5 backend' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
-      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-      assert selected.templates['paragraph'].is_a? Slim::Template
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+      assert_kind_of Slim::Template, selected.templates['paragraph']
       assert_equal :html, selected.templates['paragraph'].options[:format]
     end
 
     test 'should set Slim format to nil for docbook backend' do
       doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
-      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-      assert selected.templates['paragraph'].is_a? Slim::Template
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+      assert_kind_of Slim::Template, selected.templates['paragraph']
       assert_nil selected.templates['paragraph'].options[:format]
     end
 
     test 'should set safe mode of Slim AsciiDoc engine to match document safe mode when Slim >= 3' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false, :safe => :unsafe
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
-      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
       slim_asciidoc_opts = selected.instance_variable_get(:@engine_options)[:slim][:asciidoc]
       if ::Slim::VERSION >= '3.0'
         assert_equal({ :safe => Asciidoctor::SafeMode::UNSAFE }, slim_asciidoc_opts)
@@ -72,19 +72,19 @@ context 'Converter' do
 
     test 'should support custom template engine options for known engine' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false, :template_engine_options => { :slim => { :pretty => true } }
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
-      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-      assert selected.templates['paragraph'].is_a? Slim::Template
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+      assert_kind_of Slim::Template, selected.templates['paragraph']
       assert_equal true, selected.templates['paragraph'].options[:pretty]
     end
 
     test 'should support custom template engine options' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false, :template_engine_options => { :slim => { :pretty => true } }
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
-      assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-      assert selected.templates['paragraph'].is_a? Slim::Template
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+      assert_kind_of Slim::Template, selected.templates['paragraph']
       assert_equal false, selected.templates['paragraph'].options[:sort_attrs]
       assert_equal true, selected.templates['paragraph'].options[:pretty]
     end
@@ -93,11 +93,11 @@ context 'Converter' do
   context 'Custom backends' do
     test 'should load Haml templates for default backend' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'), :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       ['paragraph', 'sidebar'].each do |node_name|
         selected = doc.converter.find_converter node_name
-        assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-        assert selected.templates[node_name].is_a? Tilt::HamlTemplate
+        assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+        assert_kind_of Tilt::HamlTemplate, selected.templates[node_name]
         assert_equal %(block_#{node_name}.html.haml), File.basename(selected.templates[node_name].file)
       end
     end
@@ -124,11 +124,11 @@ context 'Converter' do
 
     test 'should load Haml templates for docbook45 backend' do
       doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'), :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       ['paragraph'].each do |node_name|
         selected = doc.converter.find_converter node_name
-        assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-        assert selected.templates[node_name].is_a? Tilt::HamlTemplate
+        assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+        assert_kind_of Tilt::HamlTemplate, selected.templates[node_name]
         assert_equal %(block_#{node_name}.xml.haml), File.basename(selected.templates[node_name].file)
       end
     end
@@ -166,7 +166,7 @@ Sidebar content
         doc.converter
         caches = Asciidoctor::Converter::TemplateConverter.caches
         if defined? ::ThreadSafe::Cache
-          assert caches[:templates].is_a?(::ThreadSafe::Cache)
+          assert_kind_of ::ThreadSafe::Cache, caches[:templates]
           refute_empty caches[:templates]
           paragraph_template_before = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
           refute_nil paragraph_template_before
@@ -203,7 +203,7 @@ Sidebar content
       refute_empty caches[:templates]
       paragraph_template = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
       refute_nil paragraph_template
-      assert paragraph_template.is_a? ::Tilt::HamlTemplate
+      assert_kind_of ::Tilt::HamlTemplate, paragraph_template
     end
 
     test 'should be able to disable template cache' do
@@ -225,50 +225,50 @@ Sidebar content
 
     test 'should load ERB templates using ERBTemplate if eruby is not set' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'erb'), :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       ['paragraph'].each do |node_name|
         selected = doc.converter.find_converter node_name
-        assert selected.is_a? Asciidoctor::Converter::TemplateConverter
+        assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         template = selected.templates[node_name]
-        assert template.is_a? Tilt::ERBTemplate
-        refute template.is_a? Tilt::ErubisTemplate
-        assert template.instance_variable_get('@engine').is_a? ::ERB
+        assert_kind_of Tilt::ERBTemplate, template
+        refute_kind_of Tilt::ErubisTemplate, template
+        assert_kind_of ::ERB, template.instance_variable_get('@engine')
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end
     end
 
     test 'should load ERB templates using ErubisTemplate if eruby is set to erubis' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'erb'), :template_cache => false, :eruby => 'erubis'
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       ['paragraph'].each do |node_name|
         selected = doc.converter.find_converter node_name
-        assert selected.is_a? Asciidoctor::Converter::TemplateConverter
+        assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         template = selected.templates[node_name]
-        assert template.is_a? Tilt::ERBTemplate
-        assert template.is_a? Tilt::ErubisTemplate
-        assert template.instance_variable_get('@engine').is_a? ::Erubis::FastEruby
+        assert_kind_of Tilt::ERBTemplate, template
+        assert_kind_of Tilt::ErubisTemplate, template
+        assert_kind_of ::Erubis::FastEruby, template.instance_variable_get('@engine')
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end
     end
 
     test 'should load Slim templates for default backend' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       ['paragraph', 'sidebar'].each do |node_name|
         selected = doc.converter.find_converter node_name
-        assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-        assert selected.templates[node_name].is_a? Slim::Template
+        assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+        assert_kind_of Slim::Template, selected.templates[node_name]
         assert_equal %(block_#{node_name}.html.slim), File.basename(selected.templates[node_name].file)
       end
     end
 
     test 'should load Slim templates for docbook45 backend' do
       doc = Asciidoctor::Document.new [], :backend => 'docbook45', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false
-      assert doc.converter.is_a?(Asciidoctor::Converter::CompositeConverter)
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       ['paragraph'].each do |node_name|
         selected = doc.converter.find_converter node_name
-        assert selected.is_a? Asciidoctor::Converter::TemplateConverter
-        assert selected.templates[node_name].is_a? Slim::Template
+        assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+        assert_kind_of Slim::Template, selected.templates[node_name]
         assert_equal %(block_#{node_name}.xml.slim), File.basename(selected.templates[node_name].file)
       end
     end
