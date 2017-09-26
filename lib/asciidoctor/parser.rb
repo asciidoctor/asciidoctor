@@ -132,7 +132,6 @@ class Parser
       document.title = assigned_doctitle = val
     end
 
-    section_title = nil
     # if the first line is the document title, add a header to the document and parse the header metadata
     if implicit_doctitle
       source_location = reader.cursor if document.sourcemap
@@ -148,7 +147,7 @@ class Parser
       document.header.source_location = source_location if source_location
       document.attributes['doctitle'] = section_title = doctitle
       # QUESTION: should the id assignment on Document be encapsulated in the Document class?
-      if document.id
+      if (doc_id = document.id)
         block_attributes.delete 1
         block_attributes.delete 'id'
       else
@@ -157,9 +156,13 @@ class Parser
           parse_style_attribute style_attrs, reader
           block_attributes['id'] = style_attrs['id'] if style_attrs.key? 'id'
         end
-        document.id = block_attributes.delete 'id'
+        document.id = (doc_id = block_attributes.delete 'id')
+      end
+      if (doc_reftext = block_attributes.delete 'reftext')
+        document.attributes['reftext'] = doc_reftext
       end
       parse_header_metadata reader, document
+      document.register :refs, [doc_id, document] if doc_id
     end
 
     unless (val = document.attributes['doctitle']).nil_or_empty? || val == section_title
@@ -880,9 +883,6 @@ class Parser
     block.source_location = source_location if source_location
     # FIXME title should be assigned when block is constructed
     block.title = attributes.delete 'title' if attributes.key? 'title'
-    #unless attributes.key? 'reftext'
-    #  attributes['reftext'] = doc_attrs['reftext'] if doc_attrs.key? 'reftext'
-    #end
     # TODO eventually remove the style attribute from the attributes hash
     #block.style = attributes.delete 'style'
     block.style = attributes['style']
@@ -1532,8 +1532,6 @@ class Parser
       attributes['reftext'] = sect_reftext
     elsif attributes.key? 'reftext'
       sect_reftext = attributes['reftext']
-    #elsif document.attributes.key? 'reftext'
-    #  sect_reftext = attributes['reftext'] = document.attributes['reftext']
     end
 
     # parse style, id, and role attributes from first positional attribute if present
