@@ -130,6 +130,12 @@ Section Title [[refid,reftext]]
       assert_equal 'Section One [[one]]', sec.title
     end
 
+    test 'should not process inline anchor in section title if section has explicit ID' do
+      sec = block_from_string(%([#sect-one]\n== Section One [[one]]))
+      assert_equal 'sect-one', sec.id
+      assert_equal 'Section One <a id="one"></a>', sec.title
+    end
+
     test 'title substitutions are applied before generating id' do
       sec = block_from_string("== Section{sp}One\n")
       assert_equal '_section_one', sec.id
@@ -810,6 +816,19 @@ content
       reftext = doc.catalog[:ids]['_install']
       refute_nil reftext
       assert_equal 'Install Procedure', reftext
+    end
+
+    test 'should not process inline anchor in discrete heading if explicit ID is assigned' do
+      input = <<-EOS
+[discrete#install]
+== Install [[installation]]
+
+content
+      EOS
+
+      block = block_from_string input
+      assert_equal block.id, 'install'
+      assert_equal 'Install <a id="installation"></a>', block.title
     end
   end
 

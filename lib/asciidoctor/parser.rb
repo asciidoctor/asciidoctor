@@ -655,13 +655,12 @@ class Parser
       elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
           (is_section_title? this_line, reader.peek_line) : !indented && (atx_section_title? this_line))
         reader.unshift_line this_line
-        float_id, float_reftext, float_title, float_level, _ = parse_section_title(reader, document)
+        float_id, float_reftext, float_title, float_level, _ = parse_section_title reader, document, attributes['id']
         attributes['reftext'] = float_reftext if float_reftext
         block = Block.new(parent, :floating_title, :content_model => :empty)
         block.title = float_title
         attributes.delete 'title'
-        block.id = float_id || attributes['id'] ||
-            ((doc_attrs.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
+        block.id = float_id || ((doc_attrs.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
         block.level = float_level
         break
 
@@ -1527,7 +1526,10 @@ class Parser
   def self.initialize_section reader, parent, attributes = {}
     document = parent.document
     source_location = reader.cursor if document.sourcemap
-    sect_id, sect_reftext, sect_title, sect_level, atx = parse_section_title reader, document
+    # parse style, id, and role attributes from first positional attribute if present
+    style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
+    sect_id, sect_reftext, sect_title, sect_level, atx = parse_section_title reader, document, attributes['id']
+
     if sect_reftext
       attributes['reftext'] = sect_reftext
     elsif attributes.key? 'reftext'
@@ -1536,8 +1538,6 @@ class Parser
     #  sect_reftext = attributes['reftext'] = document.attributes['reftext']
     end
 
-    # parse style, id, and role attributes from first positional attribute if present
-    style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
     if style
       if style == 'abstract' && document.doctype == 'book'
         sect_name, sect_level = 'chapter', 1
@@ -1572,8 +1572,7 @@ class Parser
     end
 
     # generate an ID if one was not embedded or specified as anchor above section title
-    if (id = section.id ||= (attributes['id'] ||
-        ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil)))
+    if (id = section.id ||= ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
       unless document.register :refs, [id, section, sect_reftext || section.title]
         warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - (atx ? 1 : 2)}: id assigned to section already in use: #{id})
       end
@@ -1697,8 +1696,8 @@ class Parser
   # Returns an 5-element [Array] containing the id (String), reftext (String),
   # title (String), level (Integer), and flag (Boolean) indicating whether an
   # atx section title was matched, or nothing.
-  def self.parse_section_title(reader, document)
-    sect_id = sect_reftext = nil
+  def self.parse_section_title(reader, document, sect_id = nil)
+    sect_reftext = nil
     line1 = reader.read_line
 
     if Compliance.markdown_syntax ? ((line1.start_with? '=', '#') && ExtAtxSectionTitleRx =~ line1) :
@@ -1707,7 +1706,7 @@ class Parser
       sect_level, sect_title, atx = $1.length - 1, $2, true
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
         sect_title, sect_id, sect_reftext = (sect_title.slice 0, sect_title.length - $&.length), $2, $3
-      end
+      end unless sect_id
     elsif Compliance.underline_style_section_titles && (line2 = reader.peek_line(true)) &&
         (sect_level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
         line2_ch1 * (line2_len = line2.length) == line2 && (sect_title = SetextSectionTitleRx =~ line1 && $1) &&
@@ -1715,7 +1714,7 @@ class Parser
       atx = false
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
         sect_title, sect_id, sect_reftext = (sect_title.slice 0, sect_title.length - $&.length), $2, $3
-      end
+      end unless sect_id
       reader.shift
     else
       raise %(Unrecognized section at #{reader.prev_line_info})
