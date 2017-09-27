@@ -381,6 +381,19 @@ preamble
       assert_css 'body#reference', output, 1
     end
 
+    test 'should register document in catalog if id is set' do
+      input = <<-EOS
+[[manual,Manual]]
+= Reference Manual
+
+preamble
+      EOS
+      doc = document_from_string input
+      assert_equal 'manual', doc.id
+      assert_equal 'Manual', doc.attributes['reftext']
+      assert_equal doc, doc.catalog[:refs]['manual']
+    end
+
     test 'should discard style, role and options shorthand attributes defined on document title' do
       input = <<-EOS
 [style#idname.rolename%optionname]
