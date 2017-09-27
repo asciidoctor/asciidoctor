@@ -625,7 +625,7 @@ Block content
      EOS
      doc = document_from_string input
      assert_equal 'Override', doc.doctitle
-     assert_nil doc.title
+     assert_nil doc.attributes['title']
      assert doc.has_header?
      assert_equal 'Override', doc.header.title
      assert_equal 'Override', doc.first_section.title
@@ -643,7 +643,7 @@ Block content
      EOS
      doc = document_from_string input
      assert_equal 'Override', doc.doctitle
-     assert_nil doc.title
+     assert_nil doc.attributes['title']
      assert doc.has_header?
      assert_equal 'Override', doc.header.title
      assert_equal 'Override', doc.first_section.title
