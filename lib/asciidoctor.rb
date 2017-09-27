@@ -363,7 +363,7 @@ module Asciidoctor
   CIRCUMFIX_COMMENTS = {
     ['/*', '*/'] => ['.css'],
     ['(*', '*)'] => ['.ml', '.mli', '.nb'],
-    ['<!--', '-->'] => ['.html', '.xhtml', '.xml', '.xsl'],
+    ['<!--', '-->'] => ['.html', '.xhtml', '.xml', '.xsl', '.plist'],
     ['<%--', '--%>'] => ['.asp', '.jsp']
   }.inject({}) {|accum, (affixes, exts)|
     exts.each {|ext| accum[ext] = { :prefix => affixes[0], :suffix => affixes[-1] } }
