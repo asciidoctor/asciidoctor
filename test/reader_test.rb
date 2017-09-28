@@ -1194,7 +1194,7 @@ include::fixtures/parent-include.adoc[depth=1]
           reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), :normalize => true
           [reader.readlines, err.string]
         end
-        assert lines.include?('include::child-include.adoc[]')
+        assert_includes lines, 'include::child-include.adoc[]'
         assert_match(/maximum include depth .* exceeded/, warnings)
       end
 
@@ -1209,8 +1209,8 @@ include::fixtures/parent-include-restricted.adoc[depth=3]
           reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), :normalize => true
           [reader.readlines, err.string]
         end
-        assert lines.include?('first line of child')
-        assert lines.include?('include::grandchild-include.adoc[]')
+        assert_includes lines, 'first line of child'
+        assert_includes lines, 'include::grandchild-include.adoc[]'
         assert_match(/maximum include depth .* exceeded/, warnings)
       end
 
