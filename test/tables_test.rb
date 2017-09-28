@@ -1586,7 +1586,7 @@ single cell
 |===
       EOS
       output = render_embedded_string input, :backend => 'docbook45'
-      assert output.include?('<?dbfo keep-together="auto"?>')
+      assert_includes output, '<?dbfo keep-together="auto"?>'
     end
 
     test 'table with breakable db5' do
@@ -1599,7 +1599,7 @@ single cell
 |===
       EOS
       output = render_embedded_string input, :backend => 'docbook5'
-      assert output.include?('<?dbfo keep-together="auto"?>')
+      assert_includes output, '<?dbfo keep-together="auto"?>'
     end
 
     test 'table with unbreakable db5' do
@@ -1612,7 +1612,7 @@ single cell
 |===
       EOS
       output = render_embedded_string input, :backend => 'docbook5'
-      assert output.include?('<?dbfo keep-together="always"?>')
+      assert_includes output, '<?dbfo keep-together="always"?>'
     end
 
     test 'table with unbreakable db45' do
@@ -1625,7 +1625,7 @@ single cell
 |===
       EOS
       output = render_embedded_string input, :backend => 'docbook45'
-      assert output.include?('<?dbfo keep-together="always"?>')
+      assert_includes output, '<?dbfo keep-together="always"?>'
     end
 
     test 'no implicit header row if cell in first line is quoted and spans multiple lines' do
