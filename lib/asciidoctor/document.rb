@@ -613,9 +613,11 @@ class Document < AbstractBlock
     @attributes['basebackend'] == base
   end
 
-  # The title explicitly defined in the document attributes
+  # Public: Return the doctitle as a String
+  #
+  # Returns the resolved doctitle as a [String] or nil if a doctitle cannot be resolved
   def title
-    @attributes['title']
+    doctitle
   end
 
   def title= title
