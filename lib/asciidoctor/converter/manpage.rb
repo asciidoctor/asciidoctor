@@ -225,10 +225,12 @@ r lw(\n(.lu*75u/100u).'
       result * LF
     end
 
-    # TODO implement title for dlist
     # TODO implement horizontal (if it makes sense)
     def dlist node
       result = []
+      result << %(.sp
+.B #{manify node.title}
+.br) if node.title?
       counter = 0
       node.items.each do |terms, dd|
         counter += 1
