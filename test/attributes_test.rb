@@ -163,7 +163,7 @@ linus.torvalds@example.com
       EOS
 
       result = render_embedded_string input
-      assert result.include? 'bigfoot'
+      assert_includes result, 'bigfoot'
     end
 
     test 'resolves attributes and pass macro inside attribute value outside header' do
@@ -178,7 +178,7 @@ content
       EOS
 
       result = render_embedded_string input
-      assert result.include? '<em>big</em>foot'
+      assert_includes result, '<em>big</em>foot'
     end
 
     test 'should limit maximum size of attribute value if safe mode is SECURE' do
@@ -704,8 +704,8 @@ v1.0, 2010-01-01: First release!
       assert_equal 'value', doc.attr('a2')
 
       output = doc.render
-      assert output.include?('value == value')
-      assert output.include?('2010-01-01 == 2010-01-01')
+      assert_includes output, 'value == value'
+      assert_includes output, '2010-01-01 == 2010-01-01'
     end
 
     test 'substitutes inside block title' do
