@@ -811,7 +811,7 @@ context 'Substitutions' do
     test 'should not match an inline image macro if target contains an endline character' do
       para = block_from_string(%(Fear not. There are no image:big\ncats.png[] around here.))
       result = para.sub_macros(para.source)
-      refute result.include?('<img ')
+      refute_includes result, '<img '
       assert_includes result, %(image:big\ncats.png[])
     end
 
@@ -819,7 +819,7 @@ context 'Substitutions' do
       ['image: big cats.png[]', 'image:big cats.png []'].each do |input|
         para = block_from_string %(Fear not. There are no #{input} around here.)
         result = para.sub_macros(para.source)
-        refute result.include?('<img ')
+        refute_includes result, '<img '
         assert_includes result, input
       end
     end
@@ -827,8 +827,8 @@ context 'Substitutions' do
     test 'should not detect a block image macro found inline' do
       para = block_from_string(%(Not an inline image macro image::tiger.png[].))
       result = para.sub_macros(para.source)
-      refute result.include?('<img ')
-      assert result.include?('image::tiger.png[]')
+      refute_includes result, '<img '
+      assert_includes result, 'image::tiger.png[]'
     end
 
     # NOTE this test verifies attributes get substituted eagerly in target of image in title
@@ -840,7 +840,7 @@ context 'Substitutions' do
       sect, warnings = redirect_streams do |_, err|
         [(block_from_string input, :attributes => { 'data-uri' => '', 'iconsdir' => 'fixtures', 'docdir' => ::File.dirname(__FILE__) }, :safe => :server, :catalog_assets => true), err.string]
       end
-      assert sect.document.catalog[:images].include? 'fixtures/dot.gif'
+      assert_includes sect.document.catalog[:images], 'fixtures/dot.gif'
       refute_nil warnings
       assert_empty warnings
     end
