@@ -636,7 +636,7 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
       refute_empty stdout_lines
       stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
       stdout_str = stdout_lines.join
-      assert stdout_str.include?('Codierungen sind verrückt auf älteren Versionen von Ruby')
+      assert_includes stdout_str, 'Codierungen sind verrückt auf älteren Versionen von Ruby'
     ensure
       ENV['LANG'] = old_lang
     end
