@@ -185,7 +185,7 @@ Bar
 
       output = render_embedded_string input
       assert_css 'ul ul', output, 1
-      refute output.include?('* Foo')
+      refute_includes output, '* Foo'
     end
 
     test 'a list item for a different list terminates non-indented paragraph for text of list item' do
@@ -205,9 +205,9 @@ term:: def
 
       output = render_embedded_string input
       assert_css 'ul ol', output, 1
-      refute output.include?('* Foo')
+      refute_includes output, '* Foo'
       assert_css 'ul dl', output, 1
-      refute output.include?('term:: def')
+      refute_includes output, 'term:: def'
     end
 
     test 'an indented wrapped line is unindented and folded into text of list item' do
@@ -255,7 +255,7 @@ second wrapped line
 
       output = render_embedded_string input
       assert_css 'ul ul', output, 1
-      refute output.include?('* Foo')
+      refute_includes output, '* Foo'
     end
 
     test 'a list item that starts with a sequence of list markers characters should not match a nested list' do
@@ -287,9 +287,9 @@ term:: def
 
       output = render_embedded_string input
       assert_css 'ul ol', output, 1
-      refute output.include?('* Foo')
+      refute_includes output, '* Foo'
       assert_css 'ul dl', output, 1
-      refute output.include?('term:: def')
+      refute_includes output, 'term:: def'
     end
 
     test "a literal paragraph offset by blank lines in list content is appended as a literal block" do
@@ -637,7 +637,7 @@ item
       assert_css 'ul', output, 1
       assert_css 'ul > li', output, 2
       assert_css 'h2', output, 0
-      assert output.include?('== Not a section')
+      assert_includes output, '== Not a section'
       assert_xpath %((//li)[2]/p[text() = "second\n== Not a section"]), output, 1
     end
   end
@@ -3448,7 +3448,7 @@ not a term::: def
       assert_css '.dlist > dl > dt', output, 1
       assert_css '.dlist > dl > dd', output, 1
       assert_css '.dlist > dl > dd > .paragraph', output, 1
-      assert output.include?('not a term::: def')
+      assert_includes output, 'not a term::: def'
     end
 
     # FIXME pending
@@ -3465,7 +3465,7 @@ not a term:: def
       assert_css '.dlist > dl > dt', output, 1
       assert_css '.dlist > dl > dd', output, 1
       assert_css '.dlist > dl > dd > .paragraph', output, 1
-      assert output.include?('not a term:: def')
+      assert_includes output, 'not a term:: def'
     end
 =end
 
@@ -3482,7 +3482,7 @@ not a term::: def
       assert_css '.dlist > dl > dt', output, 1
       assert_css '.dlist > dl > dd', output, 1
       assert_css '.dlist > dl > dd > .quoteblock', output, 1
-      assert output.include?('not a term::: def')
+      assert_includes output, 'not a term::: def'
     end
 
     test 'appends line as paragraph if attached by continuation following blank line and line comment when term has no inline description' do
