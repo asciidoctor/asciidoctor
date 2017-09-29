@@ -619,9 +619,9 @@ after
 
         result = render_string input, :safe => :server
         assert_css '.paragraph > p', result, 3
-        assert result.include?('before')
-        assert result.include?('Lorem ipsum')
-        assert result.include?('after')
+        assert_includes result, 'before'
+        assert_includes result, 'Lorem ipsum'
+        assert_includes result, 'after'
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -813,7 +813,7 @@ snippet::12345[mode=edit]
         end
 
         output = render_embedded_string input
-        assert output.include?('<script src="http://example.com/12345.js?_mode=edit"></script>')
+        assert_includes output, '<script src="http://example.com/12345.js?_mode=edit"></script>'
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -852,10 +852,10 @@ custom_toc::[]
         end
 
         output = render_embedded_string 'Room temperature is deg:25[C,precision=0].', :attributes => { 'temperature-unit' => 'F' }
-        assert output.include?('Room temperature is 25 &#176;C.')
+        assert_includes output, 'Room temperature is 25 &#176;C.'
 
         output = render_embedded_string 'Normal body temperature is deg:37[].', :attributes => { 'temperature-unit' => 'F' }
-        assert output.include?('Normal body temperature is 98.6 &#176;F.')
+        assert_includes output, 'Normal body temperature is 98.6 &#176;F.'
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -875,7 +875,7 @@ custom_toc::[]
         end
 
         output = render_embedded_string 'label:[Checkbox]'
-        assert output.include?('<label>Checkbox</label>')
+        assert_includes output, '<label>Checkbox</label>'
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -976,7 +976,7 @@ target="target", attributes=[]
         end
 
         output = render_embedded_string 'mention:mojavelinux[Dan]'
-        assert output.include?('<a href="https://github.com/mojavelinux">Dan</a>')
+        assert_includes output, '<a href="https://github.com/mojavelinux">Dan</a>'
       ensure
         Asciidoctor::Extensions.unregister_all
       end
