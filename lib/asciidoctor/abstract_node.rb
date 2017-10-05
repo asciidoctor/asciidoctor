@@ -52,19 +52,25 @@ class AbstractNode
     nil
   end
 
-  # Public: Returns whether this {AbstractNode} is an instance of {Inline}
-  #
-  # Returns [Boolean]
-  def inline?
-    # :nocov:
-    raise ::NotImplementedError
-    # :nocov:
+  # Public: Get the Asciidoctor::Converter instance being used to convert the
+  # current Asciidoctor::Document.
+  def converter
+    @document.converter
   end
 
   # Public: Returns whether this {AbstractNode} is an instance of {Block}
   #
   # Returns [Boolean]
   def block?
+    # :nocov:
+    raise ::NotImplementedError
+    # :nocov:
+  end
+
+  # Public: Returns whether this {AbstractNode} is an instance of {Inline}
+  #
+  # Returns [Boolean]
+  def inline?
     # :nocov:
     raise ::NotImplementedError
     # :nocov:
@@ -144,16 +150,6 @@ class AbstractNode
     @attributes.delete name
   end
 
-  # TODO document me
-  def set_option(name)
-    if @attributes.key? 'options'
-      @attributes['options'] = %(#{@attributes['options']},#{name})
-    else
-      @attributes['options'] = name
-    end
-    @attributes[%(#{name}-option)] = ''
-  end
-
   # Public: A convenience method to check if the specified option attribute is
   # enabled on the current node.
   #
@@ -165,6 +161,16 @@ class AbstractNode
   # return a Boolean indicating whether the option has been specified
   def option?(name)
     @attributes.key? %(#{name}-option)
+  end
+
+  # TODO document me
+  def set_option(name)
+    if @attributes.key? 'options'
+      @attributes['options'] = %(#{@attributes['options']},#{name})
+    else
+      @attributes['options'] = name
+    end
+    @attributes[%(#{name}-option)] = ''
   end
 
   # Public: Update the attributes of this node with the new values in
@@ -181,10 +187,16 @@ class AbstractNode
     nil
   end
 
-  # Public: Get the Asciidoctor::Converter instance being used to convert the
-  # current Asciidoctor::Document.
-  def converter
-    @document.converter
+  # Public: A convenience method that returns the value of the role attribute
+  def role
+    @attributes['role'] || @document.attributes['role']
+  end
+
+  # Public: A convenience method that returns the role names as an Array
+  #
+  # Returns the role names as an Array or an empty Array if the role attribute is absent.
+  def roles
+    (val = @attributes['role'] || @document.attributes['role']).nil_or_empty? ? [] : val.split
   end
 
   # Public: A convenience method that checks if the role attribute is specified
@@ -196,23 +208,11 @@ class AbstractNode
     end
   end
 
-  # Public: A convenience method that returns the value of the role attribute
-  def role
-    @attributes['role'] || @document.attributes['role']
-  end
-
   # Public: A convenience method that checks if the specified role is present
   # in the list of roles on this node
   def has_role?(name)
     # NOTE center + include? is faster than split + include?
     (val = @attributes['role'] || @document.attributes['role']).nil_or_empty? ? false : %( #{val} ).include?(%( #{name} ))
-  end
-
-  # Public: A convenience method that returns the role names as an Array
-  #
-  # Returns the role names as an Array or an empty Array if the role attribute is absent.
-  def roles
-    (val = @attributes['role'] || @document.attributes['role']).nil_or_empty? ? [] : val.split
   end
 
   # Public: A convenience method that adds the given role directly to this node
@@ -249,14 +249,14 @@ class AbstractNode
     end
   end
 
-  # Public: A convenience method that checks if the reftext attribute is defined.
-  def reftext?
-    @attributes.key? 'reftext'
-  end
-
   # Public: A convenience method that returns the value of the reftext attribute with substitutions applied.
   def reftext
     (val = @attributes['reftext']) ? (apply_reftext_subs val) : nil
+  end
+
+  # Public: A convenience method that checks if the reftext attribute is defined.
+  def reftext?
+    @attributes.key? 'reftext'
   end
 
   # Public: Construct a reference or data URI to an icon image for the
@@ -288,24 +288,6 @@ class AbstractNode
     else
       image_uri %(#{name}.#{@document.attr 'icontype', 'png'}), 'iconsdir'
     end
-  end
-
-  # Public: Construct a URI reference to the target media.
-  #
-  # If the target media is a URI reference, then leave it untouched.
-  #
-  # The target media is resolved relative to the directory retrieved from the
-  # specified attribute key, if provided.
-  #
-  # The return value can be safely used in a media tag (img, audio, video).
-  #
-  # target        - A String reference to the target media
-  # asset_dir_key - The String attribute key used to lookup the directory where
-  #                 the media is located (default: 'imagesdir')
-  #
-  # Returns A String reference for the target media
-  def media_uri(target, asset_dir_key = 'imagesdir')
-    normalize_web_path target, (asset_dir_key ? @document.attr(asset_dir_key) : nil)
   end
 
   # Public: Construct a URI reference or data URI to the target image.
@@ -343,6 +325,24 @@ class AbstractNode
     else
       normalize_web_path target_image, (asset_dir_key ? (doc.attr asset_dir_key) : nil)
     end
+  end
+
+  # Public: Construct a URI reference to the target media.
+  #
+  # If the target media is a URI reference, then leave it untouched.
+  #
+  # The target media is resolved relative to the directory retrieved from the
+  # specified attribute key, if provided.
+  #
+  # The return value can be safely used in a media tag (img, audio, video).
+  #
+  # target        - A String reference to the target media
+  # asset_dir_key - The String attribute key used to lookup the directory where
+  #                 the media is located (default: 'imagesdir')
+  #
+  # Returns A String reference for the target media
+  def media_uri(target, asset_dir_key = 'imagesdir')
+    normalize_web_path target, (asset_dir_key ? @document.attr(asset_dir_key) : nil)
   end
 
   # Public: Generate a data URI that can be used to embed an image in the output document
@@ -418,98 +418,13 @@ class AbstractNode
     end
   end
 
-  # Public: Resolve the URI or system path to the specified target, then read and return its contents
+  # Public: Normalize the asset file or directory to a concrete and rinsed path
   #
-  # The URI or system path of the target is first resolved. If the resolved path is a URI, read the
-  # contents from the URI if the allow-uri-read attribute is set, enabling caching if the cache-uri
-  # attribute is also set. If the resolved path is not a URI, read the contents of the file from the
-  # file system. If the normalize option is set, the data will be normalized.
-  #
-  # target - The URI or local path from which to read the data.
-  # opts   - a Hash of options to control processing (default: {})
-  #          * :label the String label of the target to use in warning messages (default: 'asset')
-  #          * :normalize a Boolean that indicates whether the data should be normalized (default: false)
-  #          * :start the String relative base path to use when resolving the target (default: nil)
-  #          * :warn_on_failure a Boolean that indicates whether warnings are issued if the target cannot be read (default: true)
-  # Returns the contents of the resolved target or nil if the resolved target cannot be read
-  # --
-  # TODO refactor other methods in this class to use this method were possible (repurposing if necessary)
-  def read_contents target, opts = {}
-    doc = @document
-    if (Helpers.uriish? target) || ((start = opts[:start]) && (Helpers.uriish? start) &&
-        (target = (@path_resolver ||= PathResolver.new).web_path target, start))
-      if doc.attr? 'allow-uri-read'
-        Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
-        begin
-          data = ::OpenURI.open_uri(target) {|fd| fd.read }
-          data = (Helpers.normalize_lines_from_string data) * LF if opts[:normalize]
-        rescue
-          warn %(asciidoctor: WARNING: could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
-          data = nil
-        end
-      else
-        warn %(asciidoctor: WARNING: cannot retrieve contents of #{opts[:label] || 'asset'} at URI: #{target} (allow-uri-read attribute not enabled)) if opts.fetch :warn_on_failure, true
-        data = nil
-      end
-    else
-      target = normalize_system_path target, opts[:start], nil, :target_name => (opts[:label] || 'asset')
-      data = read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true), :label => opts[:label]
-    end
-    data
-  end
-
-  # Public: Read the contents of the file at the specified path.
-  # This method assumes that the path is safe to read. It checks
-  # that the file is readable before attempting to read it.
-  #
-  # path - the String path from which to read the contents
-  # opts - a Hash of options to control processing (default: {})
-  #        * :warn_on_failure a Boolean that controls whether a warning
-  #          is issued if the file cannot be read (default: false)
-  #        * :normalize a Boolean that controls whether the lines
-  #          are normalized and coerced to UTF-8 (default: false)
-  #
-  # Returns the [String] content of the file at the specified path, or nil
-  # if the file does not exist.
-  def read_asset path, opts = {}
-    # remap opts for backwards compatibility
-    opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
-    if ::File.readable? path
-      if opts[:normalize]
-        Helpers.normalize_lines_from_string(::IO.read path) * LF
-      else
-        # QUESTION should we chomp or rstrip content?
-        ::IO.read path
-      end
-    elsif opts[:warn_on_failure]
-      warn %(asciidoctor: WARNING: #{(attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
-    end
-  end
-
-  # Public: Normalize the web path using the PathResolver.
-  #
-  # See {PathResolver#web_path} for details about path resolution and encoding.
-  #
-  # target              - the String target path
-  # start               - the String start (i.e, parent) path (optional, default: nil)
-  # preserve_uri_target - a Boolean indicating whether target should be preserved if contains a URI (default: true)
-  #
-  # Returns the resolved [String] path
-  def normalize_web_path(target, start = nil, preserve_uri_target = true)
-    if preserve_uri_target && (Helpers.uriish? target)
-      uri_encode_spaces target
-    else
-      (@path_resolver ||= PathResolver.new).web_path target, start
-    end
-  end
-
-  # Internal: URI encode spaces in a String
-  #
-  # str - the String to encode
-  #
-  # Returns the String with all spaces replaced with %20.
-  def uri_encode_spaces str
-    (str.include? ' ') ? (str.gsub ' ', '%20') : str
+  # Delegates to normalize_system_path, with the start path set to the value of
+  # the base_dir instance variable on the Document object.
+  def normalize_asset_path(asset_ref, asset_name = 'path', autocorrect = true)
+    normalize_system_path(asset_ref, @document.base_dir, nil,
+        :target_name => asset_name, :recover => autocorrect)
   end
 
   # Public: Resolve and normalize a secure path from the target and start paths
@@ -552,13 +467,98 @@ class AbstractNode
     path_resolver.system_path target, start, jail, opts
   end
 
-  # Public: Normalize the asset file or directory to a concrete and rinsed path
+  # Public: Normalize the web path using the PathResolver.
   #
-  # Delegates to normalize_system_path, with the start path set to the value of
-  # the base_dir instance variable on the Document object.
-  def normalize_asset_path(asset_ref, asset_name = 'path', autocorrect = true)
-    normalize_system_path(asset_ref, @document.base_dir, nil,
-        :target_name => asset_name, :recover => autocorrect)
+  # See {PathResolver#web_path} for details about path resolution and encoding.
+  #
+  # target              - the String target path
+  # start               - the String start (i.e, parent) path (optional, default: nil)
+  # preserve_uri_target - a Boolean indicating whether target should be preserved if contains a URI (default: true)
+  #
+  # Returns the resolved [String] path
+  def normalize_web_path(target, start = nil, preserve_uri_target = true)
+    if preserve_uri_target && (Helpers.uriish? target)
+      uri_encode_spaces target
+    else
+      (@path_resolver ||= PathResolver.new).web_path target, start
+    end
+  end
+
+  # Public: Read the contents of the file at the specified path.
+  # This method assumes that the path is safe to read. It checks
+  # that the file is readable before attempting to read it.
+  #
+  # path - the String path from which to read the contents
+  # opts - a Hash of options to control processing (default: {})
+  #        * :warn_on_failure a Boolean that controls whether a warning
+  #          is issued if the file cannot be read (default: false)
+  #        * :normalize a Boolean that controls whether the lines
+  #          are normalized and coerced to UTF-8 (default: false)
+  #
+  # Returns the [String] content of the file at the specified path, or nil
+  # if the file does not exist.
+  def read_asset path, opts = {}
+    # remap opts for backwards compatibility
+    opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
+    if ::File.readable? path
+      if opts[:normalize]
+        Helpers.normalize_lines_from_string(::IO.read path) * LF
+      else
+        # QUESTION should we chomp or rstrip content?
+        ::IO.read path
+      end
+    elsif opts[:warn_on_failure]
+      warn %(asciidoctor: WARNING: #{(attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
+    end
+  end
+
+  # Public: Resolve the URI or system path to the specified target, then read and return its contents
+  #
+  # The URI or system path of the target is first resolved. If the resolved path is a URI, read the
+  # contents from the URI if the allow-uri-read attribute is set, enabling caching if the cache-uri
+  # attribute is also set. If the resolved path is not a URI, read the contents of the file from the
+  # file system. If the normalize option is set, the data will be normalized.
+  #
+  # target - The URI or local path from which to read the data.
+  # opts   - a Hash of options to control processing (default: {})
+  #          * :label the String label of the target to use in warning messages (default: 'asset')
+  #          * :normalize a Boolean that indicates whether the data should be normalized (default: false)
+  #          * :start the String relative base path to use when resolving the target (default: nil)
+  #          * :warn_on_failure a Boolean that indicates whether warnings are issued if the target cannot be read (default: true)
+  # Returns the contents of the resolved target or nil if the resolved target cannot be read
+  # --
+  # TODO refactor other methods in this class to use this method were possible (repurposing if necessary)
+  def read_contents target, opts = {}
+    doc = @document
+    if (Helpers.uriish? target) || ((start = opts[:start]) && (Helpers.uriish? start) &&
+        (target = (@path_resolver ||= PathResolver.new).web_path target, start))
+      if doc.attr? 'allow-uri-read'
+        Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
+        begin
+          data = ::OpenURI.open_uri(target) {|fd| fd.read }
+          data = (Helpers.normalize_lines_from_string data) * LF if opts[:normalize]
+        rescue
+          warn %(asciidoctor: WARNING: could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
+          data = nil
+        end
+      else
+        warn %(asciidoctor: WARNING: cannot retrieve contents of #{opts[:label] || 'asset'} at URI: #{target} (allow-uri-read attribute not enabled)) if opts.fetch :warn_on_failure, true
+        data = nil
+      end
+    else
+      target = normalize_system_path target, opts[:start], nil, :target_name => (opts[:label] || 'asset')
+      data = read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true), :label => opts[:label]
+    end
+    data
+  end
+
+  # Internal: URI encode spaces in a String
+  #
+  # str - the String to encode
+  #
+  # Returns the String with all spaces replaced with %20.
+  def uri_encode_spaces str
+    (str.include? ' ') ? (str.gsub ' ', '%20') : str
   end
 
   # Public: Check whether the specified String is a URI by
