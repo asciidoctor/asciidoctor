@@ -7,23 +7,23 @@ class AbstractNode
 
   include Substitutors
 
-  # Public: Get the element which is the parent of this node
-  attr_reader :parent
-
-  # Public: Get the Asciidoctor::Document to which this node belongs
-  attr_reader :document
+  # Public: Get the Hash of attributes for this node
+  attr_reader :attributes
 
   # Public: Get the Symbol context for this node
   attr_reader :context
 
-  # Public: Get the String name of this node
-  attr_reader :node_name
+  # Public: Get the Asciidoctor::Document to which this node belongs
+  attr_reader :document
 
   # Public: Get/Set the id of this node
   attr_accessor :id
 
-  # Public: Get the Hash of attributes for this node
-  attr_reader :attributes
+  # Public: Get the String name of this node
+  attr_reader :node_name
+
+  # Public: Get the element which is the parent of this node
+  attr_reader :parent
 
   def initialize parent, context, opts = {}
     if context == :document
@@ -42,22 +42,6 @@ class AbstractNode
     @passthroughs = {}
   end
 
-  # Public: Associate this Block with a new parent Block
-  #
-  # parent - The Block to set as the parent of this Block
-  #
-  # Returns nothing
-  def parent= parent
-    @parent, @document = parent, parent.document
-    nil
-  end
-
-  # Public: Get the Asciidoctor::Converter instance being used to convert the
-  # current Asciidoctor::Document.
-  def converter
-    @document.converter
-  end
-
   # Public: Returns whether this {AbstractNode} is an instance of {Block}
   #
   # Returns [Boolean]
@@ -74,6 +58,22 @@ class AbstractNode
     # :nocov:
     raise ::NotImplementedError
     # :nocov:
+  end
+
+  # Public: Get the Asciidoctor::Converter instance being used to convert the
+  # current Asciidoctor::Document.
+  def converter
+    @document.converter
+  end
+
+  # Public: Associate this Block with a new parent Block
+  #
+  # parent - The Block to set as the parent of this Block
+  #
+  # Returns nothing
+  def parent= parent
+    @parent, @document = parent, parent.document
+    nil
   end
 
   # Public: Get the value of the specified attribute
