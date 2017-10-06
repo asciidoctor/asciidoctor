@@ -957,7 +957,7 @@ module Asciidoctor
     #
     MenuInlineRx = /\\?"([#{CC_WORD}&][^"]*?[ \n]+&gt;[ \n]+[^"]*)"/
 
-    # Matches an inline passthrough value, which may span multiple lines.
+    # Matches an inline passthrough, which may span multiple lines.
     #
     # Examples
     #
@@ -969,6 +969,15 @@ module Asciidoctor
       false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+)\])?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CG_WORD})/m],
       true  => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+)\])?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m]
     }
+
+    # Matches an inline plus passthrough spanning multiple lines, but only when it occurs directly
+    # inside constrained monospaced formatting in non-compat mode.
+    #
+    # Examples
+    #
+    #   +text+
+    #
+    SinglePlusPassInlineRx = /^(\\)?\+(\S|\S#{CC_ALL}*?\S)\+$/m
 
     # Matches several variants of the passthrough inline macro, which may span multiple lines.
     #
