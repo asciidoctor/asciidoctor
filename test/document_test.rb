@@ -856,6 +856,18 @@ content
       assert_xpath '//meta[@name="author"][@content="Ze Product team"]', output, 1
     end
 
+    test 'should not double escape ampersand in author attribute' do
+      input = <<-EOS
+= Document Title
+R&D Lab
+
+{author}
+      EOS
+
+      output = render_string input
+      assert_includes output, 'R&amp;D Lab', 2
+    end
+
     test 'should include multiple authors in HTML output' do
       input = <<-EOS
 = Document Title
