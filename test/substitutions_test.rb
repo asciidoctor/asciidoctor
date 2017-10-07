@@ -1674,6 +1674,24 @@ EOS
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
       end
 
+      test 'should not process an escaped passthrough macro inside a monospaced phrase' do
+        input = 'use the `\pass:c[]` macro'
+        para = block_from_string input
+        assert_equal 'use the <code>pass:c[]</code> macro', para.content
+      end
+
+      test 'should not process an escaped passthrough macro inside a monospaced phrase with attributes' do
+        input = 'use the [syntax]`\pass:c[]` macro'
+        para = block_from_string input
+        assert_equal 'use the <code class="syntax">pass:c[]</code> macro', para.content
+      end
+
+      test 'should honor an escaped single plus passthrough inside a monospaced phrase' do
+        input = 'use `\+{author}+` to show an attribute reference'
+        para = block_from_string input
+        assert_equal 'use <code>+{author}+</code> to show an attribute reference', para.content
+      end
+
       test 'should not recognize stem macro with no content' do
         input = 'stem:[]'
         para = block_from_string input

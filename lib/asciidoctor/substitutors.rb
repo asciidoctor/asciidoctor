@@ -264,7 +264,8 @@ module Substitutors
 
       if attributes
         if format_mark == '`' && !old_behavior
-          next %(#{preceding}[#{attributes}]#{escape_mark}`#{extract_passthroughs content}`)
+          # extract nested single-plus passthrough; otherwise return unprocessed
+          next (extract_inner_passthrough content, %(#{preceding}[#{attributes}]#{escape_mark}), attributes)
         end
 
         if escape_mark
@@ -278,7 +279,8 @@ module Substitutors
           attributes = parse_attributes attributes
         end
       elsif format_mark == '`' && !old_behavior
-        next %(#{preceding}#{escape_mark}`#{extract_passthroughs content}`)
+        # extract nested single-plus passthrough; otherwise return unprocessed
+        next (extract_inner_passthrough content, %(#{preceding}#{escape_mark}))
       elsif escape_mark
         # honor the escape of the formatting mark
         next %(#{preceding}#{m[3][1..-1]})
@@ -320,6 +322,21 @@ module Substitutors
     } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
     text
+  end
+
+  def extract_inner_passthrough text, pre, attributes = nil
+    if (text.end_with? '+') && (text.start_with? '+', '\+') && SinglePlusPassInlineRx =~ text
+      if $1
+        %(#{pre}`+#{$2}+`)
+      else
+        @passthroughs[pass_key = @passthroughs.size] = attributes ?
+            { :text => $2, :subs => BASIC_SUBS, :attributes => attributes, :type => :unquoted } :
+            { :text => $2, :subs => BASIC_SUBS }
+        %(#{pre}`#{PASS_START}#{pass_key}#{PASS_END}`)
+      end
+    else
+      %(#{pre}`#{text}`)
+    end
   end
 
   # Internal: Restore the passthrough text by reinserting into the placeholder positions
