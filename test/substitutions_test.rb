@@ -553,12 +553,12 @@ context 'Substitutions' do
 
     test 'quoted text with id shorthand' do
       para = block_from_string(%q{[#bond]#007#})
-      assert_equal '<a id="bond"></a>007', para.sub_quotes(para.source)
+      assert_equal '<span id="bond">007</span>', para.sub_quotes(para.source)
     end
 
     test 'quoted text with id and role shorthand' do
       para = block_from_string(%q{[#bond.white.red-background]#007#})
-      assert_equal '<a id="bond"></a><span class="white red-background">007</span>', para.sub_quotes(para.source)
+      assert_equal '<span id="bond" class="white red-background">007</span>', para.sub_quotes(para.source)
     end
 
     test 'quoted text with id and role shorthand using docbook backend' do
