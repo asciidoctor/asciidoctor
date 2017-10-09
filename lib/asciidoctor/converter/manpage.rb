@@ -81,7 +81,7 @@ module Asciidoctor
       # NOTE the first line enables the table (tbl) preprocessor, necessary for non-Linux systems
       result = [%('\\" t
 .\\"     Title: #{mantitle}
-.\\"    Author: #{(node.attr? 'authors') ? (node.attr 'authors') : '[see the "AUTHORS" section]'}
+.\\"    Author: #{(node.attr? 'authors') ? (node.attr 'authors') : '[see the "AUTHOR(S)" section]'}
 .\\" Generator: Asciidoctor #{node.attr 'asciidoctor-version'})]
       result << %(.\\"      Date: #{docdate}) if docdate
       result << %(.\\"    Manual: #{(manual = node.attr 'manmanual') || '\ \&'}
@@ -143,14 +143,19 @@ module Asciidoctor
         result.concat(node.footnotes.map {|fn| %(#{fn.index}. #{fn.text}) })
       end
 
-      # FIXME detect single author and use appropriate heading; itemize the authors if multiple
-      if node.attr? 'authors'
-        result << %(.SH "AUTHOR(S)"
+      # FIXME we really need an API that returns the authors as an array
+      if (num_authors = (node.attr 'authorcount') || 0) > 0
+        if num_authors == 1
+          result << %(.SH "AUTHOR"
 .sp
-\\fB#{node.attr 'authors'}\\fP
-.RS 4
-Author(s).
-.RE)
+#{node.attr 'author'})
+        else
+          result << '.SH "AUTHORS"'
+          (1.upto num_authors).each do |i|
+            result << %(.sp
+#{node.attr "author_#{i}"})
+          end
+        end
       end
 
       result * LF
