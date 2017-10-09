@@ -1051,7 +1051,14 @@ module Substitutors
         elsif path
           # the referenced path is this document, or its contents has been included in this document
           if @document.attributes['docname'] == path || @document.catalog[:includes].include?(path)
-            refid, path, target = fragment, nil, %(##{fragment})
+            if fragment
+              refid, path, target = fragment, nil, %(##{fragment})
+              if $VERBOSE
+                warn %(asciidoctor: WARNING: invalid reference: #{fragment}) unless @document.catalog[:ids].key? fragment
+              end
+            else
+              refid, path, target = nil, nil, '#'
+            end
           else
             refid = fragment ? %(#{path}##{fragment}) : path
             path = %(#{@document.attributes['relfileprefix']}#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'})
