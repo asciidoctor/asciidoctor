@@ -244,7 +244,7 @@ module Substitutors
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
     } if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
-    pass_inline_char1, pass_inline_char2, pass_inline_rx = PassInlineRx[compat_mode]
+    pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
     text = text.gsub(pass_inline_rx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
@@ -325,7 +325,7 @@ module Substitutors
   end
 
   def extract_inner_passthrough text, pre, attributes = nil
-    if (text.end_with? '+') && (text.start_with? '+', '\+') && SinglePlusPassInlineRx =~ text
+    if (text.end_with? '+') && (text.start_with? '+', '\+') && SinglePlusInlinePassRx =~ text
       if $1
         %(#{pre}`+#{$2}+`)
       else
@@ -602,7 +602,7 @@ module Substitutors
       end
 
       if (result.include? '"') && (result.include? '&gt;')
-        result = result.gsub(MenuInlineRx) {
+        result = result.gsub(InlineMenuRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -750,7 +750,7 @@ module Substitutors
 
     if found_colon && (result.include? '://')
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
-      result = result.gsub(LinkInlineRx) {
+      result = result.gsub(InlineLinkRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -913,7 +913,7 @@ module Substitutors
     end
 
     if result.include? '@'
-      result = result.gsub(EmailInlineRx) {
+      result = result.gsub(InlineEmailRx) {
         address, tip = $&, $1
         if tip
           next (tip == RS ? address[1..-1] : address)

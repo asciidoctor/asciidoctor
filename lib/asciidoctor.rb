@@ -857,7 +857,7 @@ module Asciidoctor
     #
     #   doc.writer@example.com
     #
-    EmailInlineRx = %r(([\\>:/])?#{CG_WORD}[#{CC_WORD}.%+-]*@#{CG_ALNUM}[#{CC_ALNUM}.-]*\.#{CG_ALPHA}{2,4}\b)
+    InlineEmailRx = %r(([\\>:/])?#{CG_WORD}[#{CC_WORD}.%+-]*@#{CG_ALNUM}[#{CC_ALNUM}.-]*\.#{CG_ALPHA}{2,4}\b)
 
     # Matches an inline footnote macro, which is allowed to span multiple lines.
     #
@@ -913,7 +913,7 @@ module Asciidoctor
     #   link:https://github.com[]
     #
     # FIXME revisit! the main issue is we need different rules for implicit vs explicit
-    LinkInlineRx = %r((^|link:|#{CG_BLANK}|&lt;|[>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[(|#{CC_ALL}*?[^\\])\])?)m
+    InlineLinkRx = %r((^|link:|#{CG_BLANK}|&lt;|[>\(\)\[\];])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*[^\s.,\[\]<])(?:\[(|#{CC_ALL}*?[^\\])\])?)m
 
     # Match a link or e-mail inline macro.
     #
@@ -955,7 +955,7 @@ module Asciidoctor
     #
     #   "File > New..."
     #
-    MenuInlineRx = /\\?"([#{CC_WORD}&][^"]*?[ \n]+&gt;[ \n]+[^"]*)"/
+    InlineMenuRx = /\\?"([#{CC_WORD}&][^"]*?[ \n]+&gt;[ \n]+[^"]*)"/
 
     # Matches an inline passthrough, which may span multiple lines.
     #
@@ -965,7 +965,7 @@ module Asciidoctor
     #   `text` (compat)
     #
     # NOTE we always capture the attributes so we know when to use compatible (i.e., legacy) behavior
-    PassInlineRx = {
+    InlinePassRx = {
       false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+)\])?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CG_WORD})/m],
       true  => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+)\])?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m]
     }
@@ -977,7 +977,7 @@ module Asciidoctor
     #
     #   +text+
     #
-    SinglePlusPassInlineRx = /^(\\)?\+(\S|\S#{CC_ALL}*?\S)\+$/m
+    SinglePlusInlinePassRx = /^(\\)?\+(\S|\S#{CC_ALL}*?\S)\+$/m
 
     # Matches several variants of the passthrough inline macro, which may span multiple lines.
     #
