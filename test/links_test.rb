@@ -542,14 +542,24 @@ tigers]?
     assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, render_string(input), 1
   end
 
-  test 'xref using macro syntax with text that contains an escaped closing bracket' do
+  test 'xref using macro syntax with text that ends with an escaped closing bracket' do
     input = <<-EOS
 xref:tigers[[tigers\\]]
 
 [#tigers]
 == Tigers
     EOS
-    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', render_string(input), 1
+    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', render_embedded_string(input), 1
+  end
+
+  test 'xref using macro syntax with text that contains an escaped closing bracket' do
+    input = <<-EOS
+xref:tigers[[tigers\\] are cats]
+
+[#tigers]
+== Tigers
+    EOS
+    assert_xpath '//a[@href="#tigers"][text() = "[tigers] are cats"]', render_embedded_string(input), 1
   end
 
   test 'unescapes square bracket in reftext used by xref' do
