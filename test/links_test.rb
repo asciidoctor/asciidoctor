@@ -587,6 +587,26 @@ See <<foobaz>>.
     end
   end
 
+  test 'should warn and create link if verbose flag is set, inter-doc xref points to current document, and reference is not found' do
+    input = <<-EOS
+[#foobar]
+== Foobar
+
+== Section B
+
+See <<test.adoc#foobaz>>.
+    EOS
+    begin
+      old_verbose, $VERBOSE = $VERBOSE, true
+      output, warnings = redirect_streams {|_, err| [(render_embedded_string input, :attributes => { 'docname' => 'test' }), err.string] }
+      assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
+      refute_empty warnings
+      assert_includes warnings, 'asciidoctor: WARNING: invalid reference: foobaz'
+    ensure
+      $VERBOSE = old_verbose
+    end
+  end
+
   test 'xref uses title of target as label for forward and backward references in html output' do
     input = <<-EOS
 == Section A
