@@ -291,7 +291,7 @@ class Document < AbstractBlock
     attrs['table-caption'] = 'Table'
     attrs['toc-title'] = 'Table of Contents'
     #attrs['preface-title'] = 'Preface'
-    attrs['manname-title'] = 'NAME'
+    attrs['manname-title'] = 'Name'
     attrs['section-refsig'] = 'Section'
     #attrs['part-refsig'] = 'Part'
     attrs['chapter-refsig'] = 'Chapter'

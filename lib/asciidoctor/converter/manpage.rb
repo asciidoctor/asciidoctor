@@ -130,7 +130,7 @@ module Asciidoctor
       unless node.noheader
         if node.attr? 'manpurpose'
           mannames = node.attr 'mannames', [manname]
-          result << %(.SH "#{node.attr 'manname-title'}"
+          result << %(.SH "#{(node.attr 'manname-title').upcase}"
 #{mannames.map {|n| manify n } * ', '} \\- #{manify node.attr 'manpurpose'})
         end
       end

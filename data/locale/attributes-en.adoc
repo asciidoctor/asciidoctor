@@ -9,8 +9,7 @@
 :important-caption: Important
 :last-update-label: Last updated
 ifdef::listing-caption[:listing-caption: Listing]
-//NOTE the value of manname-title should be uppercase, if the language supports it
-:manname-title: NAME
+:manname-title: Name
 :note-caption: Note
 :part-refsig: Part
 ifdef::preface-title[:preface-title: Preface]
