@@ -499,6 +499,21 @@ A summary of the first lesson.
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
   end
 
+  test 'multiple xref macros with implicit text in single line' do
+    input = <<-EOS
+This document has two sections, xref:sect-a[] and xref:sect-b[].
+
+[#sect-a]
+== Section A
+
+[#sect-b]
+== Section B
+    EOS
+    result = render_embedded_string input
+    assert_xpath '//a[@href="#sect-a"][text() = "Section A"]', result, 1
+    assert_xpath '//a[@href="#sect-b"][text() = "Section B"]', result, 1
+  end
+
   test 'xref using macro syntax with explicit hash' do
     doc = document_from_string 'xref:#tigers[]'
     doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, 'Tigers', :type => :ref, :target => 'tigers'), 'Tigers']
