@@ -724,9 +724,7 @@ class Parser
         elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
           lines.map! {|line| line == '>' ? line[1..-1] : ((line.start_with? '> ') ? line[2..-1] : line) }
           if lines[-1].start_with? '-- '
-            attribution, citetitle = lines.pop[3..-1].split(', ', 2)
-            attributes['attribution'] = attribution if attribution
-            attributes['citetitle'] = citetitle if citetitle
+            credit_line = (credit_line = lines.pop[3..-1])
             lines.pop while lines[-1].empty?
           end
           attributes['style'] = 'quote'
@@ -734,15 +732,19 @@ class Parser
           # TODO could assume a discrete heading when inside a block context
           # FIXME Reader needs to be created w/ line info
           block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
-        elsif ch0 == '"' && lines.size > 1 && (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
-          lines[0] = this_line[1..-1] # strip leading quote
-          attribution, citetitle = lines.pop[3..-1].split(', ', 2)
+          attribution, citetitle = (block.apply_subs credit_line).split ', ', 2
           attributes['attribution'] = attribution if attribution
           attributes['citetitle'] = citetitle if citetitle
+        elsif ch0 == '"' && lines.size > 1 && (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
+          lines[0] = this_line[1..-1] # strip leading quote
+          credit_line = (credit_line = lines.pop).slice(3, credit_line.length)
           lines.pop while lines[-1].empty?
           lines[-1] = lines[-1].chop # strip trailing quote
           attributes['style'] = 'quote'
           block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
+          attribution, citetitle = (block.apply_subs credit_line).split ', ', 2
+          attributes['attribution'] = attribution if attribution
+          attributes['citetitle'] = citetitle if citetitle
         else
           # if [normal] is used over an indented paragraph, shift content to left margin
           # QUESTION do we even need to shift since whitespace is normalized by XML in this case?

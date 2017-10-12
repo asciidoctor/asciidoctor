@@ -413,7 +413,7 @@ Some more inspiring words.
       input = <<-EOS
 > A famous quote.
 > Some more inspiring words.
-> -- Famous Person, Famous Source, Volume 1 (1999)
+> -- Famous Person, "Famous Source, Volume 1 (1999)"
       EOS
       output = render_string input
       assert_css '.quoteblock', output, 1
@@ -429,11 +429,23 @@ Some more inspiring words.
       assert_equal "#{decode_char 8212} Famous Person", author.text.strip
     end
 
+    test 'should parse credit line in markdown-style quote block like positional block attributes' do
+      input = <<-EOS
+> I hold it that a little rebellion now and then is a good thing,
+> and as necessary in the political world as storms in the physical.
+-- Thomas Jefferson, 'https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]'
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock cite a[href="https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1"]', output, 1
+    end
+
     test 'quoted paragraph-style quote block with attribution' do
       input = <<-EOS
 "A famous quote.
 Some more inspiring words."
--- Famous Person, Famous Source, Volume 1 (1999)
+-- Famous Person, "Famous Source, Volume 1 (1999)"
       EOS
       output = render_string input
       assert_css '.quoteblock', output, 1
@@ -446,6 +458,18 @@ Some more inspiring words."
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
       author = attribution.children.first
       assert_equal "#{decode_char 8212} Famous Person", author.text.strip
+    end
+
+    test 'should parse credit line in quoted paragraph-style quote block like positional block attributes' do
+      input = <<-EOS
+"I hold it that a little rebellion now and then is a good thing,
+and as necessary in the political world as storms in the physical."
+-- Thomas Jefferson, 'https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]'
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock cite a[href="https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1"]', output, 1
     end
 
     test 'single-line verse block without attribution' do
