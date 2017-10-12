@@ -311,15 +311,15 @@ ____
 
     test 'quote block with attribute and id and role shorthand' do
       input = <<-EOS
-[quote#think.big, Donald Trump]
+[quote#justice-to-all.solidarity, Martin Luther King, Jr.]
 ____
-As long as your going to be thinking anyway, think big.
+Injustice anywhere is a threat to justice everywhere.
 ____
       EOS
 
       output = render_embedded_string input
       assert_css '.quoteblock', output, 1
-      assert_css '#think.quoteblock.big', output, 1
+      assert_css '#justice-to-all.quoteblock.solidarity', output, 1
       assert_css '.quoteblock > .attribution', output, 1
     end
 
