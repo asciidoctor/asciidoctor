@@ -437,15 +437,33 @@ anchor:foo[b[a\]r]text'
   end
 
   test 'xref using angled bracket syntax with path which has been included in this document' do
-    doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
-    doc.catalog[:includes] << 'tigers'
-    assert_xpath '//a[@href="#about"][text() = "About Tigers"]', doc.render, 1
+    begin
+      old_verbose, $VERBOSE = $VERBOSE, true
+      output, warnings = redirect_streams do |_, err|
+        doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
+        doc.catalog[:includes] << 'tigers'
+        [doc.convert, err.string]
+      end
+      assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
+      assert_includes warnings, 'invalid reference: about'
+    ensure
+      $VERBOSE = old_verbose
+    end
   end
 
   test 'xref using angled bracket syntax with nested path which has been included in this document' do
-    doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
-    doc.catalog[:includes] << 'part1/tigers'
-    assert_xpath '//a[@href="#about"][text() = "About Tigers"]', doc.render, 1
+    begin
+      old_verbose, $VERBOSE = $VERBOSE, true
+      output, warnings = redirect_streams do |_, err|
+        doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
+        doc.catalog[:includes] << 'part1/tigers'
+        [doc.convert, err.string]
+      end
+      assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
+      assert_includes warnings, 'invalid reference: about'
+    ensure
+      $VERBOSE = old_verbose
+    end
   end
 
   test 'xref using angled bracket syntax inline with text' do
