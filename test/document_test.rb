@@ -1625,7 +1625,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 *asciidoctor* ['OPTION']... 'FILE'..
       EOS
 
-      output = render_string input, :attributes => { 'manname-title' => 'NAME' }
+      output = render_string input
       assert_css 'body.manpage', output, 1
       assert_xpath '//body/*[@id="header"]/h1[text()="asciidoctor(1) Manual Page"]', output, 1
       assert_xpath '//body/*[@id="header"]/h1/following-sibling::h2[text()="NAME"]', output, 1
@@ -1649,7 +1649,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 *asciidoctor* ['OPTION']... 'FILE'..
       EOS
 
-      output = render_embedded_string input, :attributes => { 'manname-title' => 'NAME' }
+      output = render_embedded_string input
       assert_xpath '/h1[text()="asciidoctor(1) Manual Page"]', output, 1
       assert_xpath '/h1/following-sibling::h2[text()="NAME"]', output, 1
       assert_xpath '/h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]', output, 1
