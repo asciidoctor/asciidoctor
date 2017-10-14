@@ -278,6 +278,15 @@ class Minitest::Test
         Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
   end
 
+  def in_verbose_mode
+    begin
+      old_verbose, $VERBOSE = $VERBOSE, true
+      yield
+    ensure
+      $VERBOSE = old_verbose
+    end
+  end
+
   def using_test_webserver host = resolve_localhost, port = 9876
     server = TCPServer.new host, port
     base_dir = File.expand_path File.dirname __FILE__

@@ -437,8 +437,7 @@ anchor:foo[b[a\]r]text'
   end
 
   test 'xref using angled bracket syntax with path which has been included in this document' do
-    begin
-      old_verbose, $VERBOSE = $VERBOSE, true
+    in_verbose_mode do
       output, warnings = redirect_streams do |_, err|
         doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
         doc.catalog[:includes] << 'tigers'
@@ -446,14 +445,11 @@ anchor:foo[b[a\]r]text'
       end
       assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
       assert_includes warnings, 'invalid reference: about'
-    ensure
-      $VERBOSE = old_verbose
     end
   end
 
   test 'xref using angled bracket syntax with nested path which has been included in this document' do
-    begin
-      old_verbose, $VERBOSE = $VERBOSE, true
+    in_verbose_mode do
       output, warnings = redirect_streams do |_, err|
         doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
         doc.catalog[:includes] << 'part1/tigers'
@@ -461,8 +457,6 @@ anchor:foo[b[a\]r]text'
       end
       assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
       assert_includes warnings, 'invalid reference: about'
-    ensure
-      $VERBOSE = old_verbose
     end
   end
 
@@ -619,14 +613,11 @@ see <<foo>>'
 
 See <<foobaz>>.
     EOS
-    begin
-      old_verbose, $VERBOSE = $VERBOSE, true
+    in_verbose_mode do
       output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
       assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
       refute_empty warnings
       assert_includes warnings, 'asciidoctor: WARNING: invalid reference: foobaz'
-    ensure
-      $VERBOSE = old_verbose
     end
   end
 
@@ -639,14 +630,11 @@ See <<foobaz>>.
 
 See <<test.adoc#foobaz>>.
     EOS
-    begin
-      old_verbose, $VERBOSE = $VERBOSE, true
+    in_verbose_mode do
       output, warnings = redirect_streams {|_, err| [(render_embedded_string input, :attributes => { 'docname' => 'test' }), err.string] }
       assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
       refute_empty warnings
       assert_includes warnings, 'asciidoctor: WARNING: invalid reference: foobaz'
-    ensure
-      $VERBOSE = old_verbose
     end
   end
 
