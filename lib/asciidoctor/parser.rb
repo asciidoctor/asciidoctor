@@ -732,9 +732,11 @@ class Parser
           # TODO could assume a discrete heading when inside a block context
           # FIXME Reader needs to be created w/ line info
           block = build_block(:quote, :compound, false, parent, Reader.new(lines), attributes)
-          attribution, citetitle = (block.apply_subs credit_line).split ', ', 2
-          attributes['attribution'] = attribution if attribution
-          attributes['citetitle'] = citetitle if citetitle
+          if credit_line
+            attribution, citetitle = (block.apply_subs credit_line).split ', ', 2
+            attributes['attribution'] = attribution if attribution
+            attributes['citetitle'] = citetitle if citetitle
+          end
         elsif ch0 == '"' && lines.size > 1 && (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
           lines[0] = this_line[1..-1] # strip leading quote
           credit_line = (credit_line = lines.pop).slice(3, credit_line.length)

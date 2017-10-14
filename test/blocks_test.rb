@@ -413,7 +413,7 @@ Some more inspiring words.
       input = <<-EOS
 > A famous quote.
 > Some more inspiring words.
-> -- Famous Person, "Famous Source, Volume 1 (1999)"
+> -- Famous Person, Famous Source, Volume 1 (1999)
       EOS
       output = render_string input
       assert_css '.quoteblock', output, 1
@@ -433,7 +433,7 @@ Some more inspiring words.
       input = <<-EOS
 > I hold it that a little rebellion now and then is a good thing,
 > and as necessary in the political world as storms in the physical.
--- Thomas Jefferson, 'https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]'
+-- Thomas Jefferson, https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]
       EOS
 
       output = render_embedded_string input
@@ -445,7 +445,7 @@ Some more inspiring words.
       input = <<-EOS
 "A famous quote.
 Some more inspiring words."
--- Famous Person, "Famous Source, Volume 1 (1999)"
+-- Famous Person, Famous Source, Volume 1 (1999)
       EOS
       output = render_string input
       assert_css '.quoteblock', output, 1
@@ -464,7 +464,7 @@ Some more inspiring words."
       input = <<-EOS
 "I hold it that a little rebellion now and then is a good thing,
 and as necessary in the political world as storms in the physical."
--- Thomas Jefferson, 'https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]'
+-- Thomas Jefferson, https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]
       EOS
 
       output = render_embedded_string input
