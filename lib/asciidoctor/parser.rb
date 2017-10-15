@@ -196,11 +196,12 @@ class Parser
 
     reader.skip_blank_lines
 
-    if is_next_line_section?(reader, {})
-      name_section = initialize_section(reader, document, {})
+    if is_next_line_section? reader, {}
+      name_section = initialize_section reader, document, {}
       if name_section.level == 1
-        name_section_buffer = reader.read_lines_until(:break_on_blank_lines => true) * ' '
+        name_section_buffer = (reader.read_lines_until :break_on_blank_lines => true) * ' '
         if ManpageNamePurposeRx =~ name_section_buffer
+          document.attributes['manname-id'] = name_section.id if name_section.id
           document.attributes['manpurpose'] = $2
           if (manname = document.sub_attributes $1).include? ','
             manname = (mannames = (manname.split ',').map {|n| n.strip })[0]

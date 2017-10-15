@@ -137,8 +137,8 @@ module Asciidoctor
           if (next_section = node.sections[0]) && (next_section_title = next_section.title) == next_section_title.upcase
             manname_title = manname_title.upcase
           end
-          # QUESTION should this h2 have an auto-generated id?
-          result << %(<h2>#{manname_title}</h2>
+          manname_id_attr = (manname_id = node.attr 'manname-id') ? %( id="#{manname_id}") : ''
+          result << %(<h2#{manname_id_attr}>#{manname_title}</h2>
 <div class="sectionbody">
 <p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
 </div>)
@@ -269,8 +269,8 @@ MathJax.Hub.Config({
         if (next_section = node.sections[0]) && (next_section_title = next_section.title) == next_section_title.upcase
           manname_title = manname_title.upcase
         end
-        # QUESTION should this h2 have an auto-generated id?
-        result << %(<h2>#{manname_title}</h2>
+        manname_id_attr = (manname_id = node.attr 'manname-id') ? %( id="#{manname_id}") : ''
+        result << %(<h2#{manname_id_attr}>#{manname_title}</h2>
 <div class="sectionbody">
 <p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
 </div>)

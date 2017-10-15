@@ -1571,6 +1571,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       doc = document_from_string input
       assert_equal 'asciidoctor', doc.attr('manname')
       assert_equal 'converts AsciiDoc source files to HTML, DocBook and other formats', doc.attr('manpurpose')
+      assert_equal '_name', doc.attr('manname-id')
       assert_equal 0, doc.blocks.size
     end
 
@@ -1629,6 +1630,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       assert_css 'body.manpage', output, 1
       assert_xpath '//body/*[@id="header"]/h1[text()="asciidoctor(1) Manual Page"]', output, 1
       assert_xpath '//body/*[@id="header"]/h1/following-sibling::h2[text()="NAME"]', output, 1
+      assert_xpath '//h2[@id="_name"][text()="NAME"]', output, 1
       assert_xpath '//h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]', output, 1
       assert_xpath '//h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]/p[text()="asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats"]', output, 1
       assert_xpath '//*[@id="content"]/*[@class="sect1"]/h2[text()="SYNOPSIS"]', output, 1
@@ -1652,6 +1654,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       output = render_embedded_string input
       assert_xpath '/h1[text()="asciidoctor(1) Manual Page"]', output, 1
       assert_xpath '/h1/following-sibling::h2[text()="NAME"]', output, 1
+      assert_xpath '/h2[@id="_name"][text()="NAME"]', output, 1
       assert_xpath '/h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]', output, 1
       assert_xpath '/h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]/p[text()="asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats"]', output, 1
     end
