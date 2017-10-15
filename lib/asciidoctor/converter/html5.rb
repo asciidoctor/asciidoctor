@@ -133,15 +133,7 @@ module Asciidoctor
 #{outline node}
 </div>)
           end
-          manname_title = node.attr 'manname-title'
-          if (next_section = node.sections[0]) && (next_section_title = next_section.title) == next_section_title.upcase
-            manname_title = manname_title.upcase
-          end
-          manname_id_attr = (manname_id = node.attr 'manname-id') ? %( id="#{manname_id}") : ''
-          result << %(<h2#{manname_id_attr}>#{manname_title}</h2>
-<div class="sectionbody">
-<p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
-</div>)
+          result << (generate_manname_section node)
         else
           if node.has_header?
             result << %(<h1>#{node.header.title}</h1>) unless node.notitle
@@ -265,15 +257,7 @@ MathJax.Hub.Config({
           id_attr = node.id ? %( id="#{node.id}") : nil
           result << %(<h1#{id_attr}>#{node.doctitle} Manual Page</h1>)
         end
-        manname_title = node.attr 'manname-title'
-        if (next_section = node.sections[0]) && (next_section_title = next_section.title) == next_section_title.upcase
-          manname_title = manname_title.upcase
-        end
-        manname_id_attr = (manname_id = node.attr 'manname-id') ? %( id="#{manname_id}") : ''
-        result << %(<h2#{manname_id_attr}>#{manname_title}</h2>
-<div class="sectionbody">
-<p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
-</div>)
+        result << (generate_manname_section node)
       else
         if node.has_header? && !node.notitle
           id_attr = node.id ? %( id="#{node.id}") : nil
@@ -1173,6 +1157,18 @@ Your browser does not support the video tag.
 
     def encode_quotes val
       (val.include? '"') ? (val.gsub '"', '&quot;') : val
+    end
+
+    def generate_manname_section node
+      manname_title = node.attr 'manname-title'
+      if (next_section = node.sections[0]) && (next_section_title = next_section.title) == next_section_title.upcase
+        manname_title = manname_title.upcase
+      end
+      manname_id_attr = (manname_id = node.attr 'manname-id') ? %( id="#{manname_id}") : ''
+      %(<h2#{manname_id_attr}>#{manname_title}</h2>
+<div class="sectionbody">
+<p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
+</div>)
     end
 
     def read_svg_contents node, target
