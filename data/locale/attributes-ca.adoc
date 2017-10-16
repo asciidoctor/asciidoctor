@@ -9,7 +9,7 @@
 :important-caption: Important
 :last-update-label: Última actualització
 ifdef::listing-caption[:listing-caption: Llista]
-:manname-title: NOM
+//:manname-title: NOM
 :note-caption: Nota
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: Prefaci]

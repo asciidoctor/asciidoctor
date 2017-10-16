@@ -9,7 +9,7 @@
 :important-caption: Important
 :last-update-label: Ultima actualizare
 ifdef::listing-caption[:listing-caption: Listare]
-:manname-title: NUME
+//:manname-title: NUME
 :note-caption: Notă
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: Prefață]

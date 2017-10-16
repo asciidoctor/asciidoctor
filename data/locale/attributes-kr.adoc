@@ -9,7 +9,7 @@
 :important-caption: 중요
 :last-update-label: 마지막 업데이트
 ifdef::listing-caption[:listing-caption: 목록]
-:manname-title: 이름
+//:manname-title: 이름
 :note-caption: 노트
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: 머리말]

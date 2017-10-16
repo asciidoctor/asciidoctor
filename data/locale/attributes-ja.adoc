@@ -9,7 +9,7 @@
 :important-caption: 重要
 :last-update-label: 最終更新
 ifdef::listing-caption[:listing-caption: リスト]
-:manname-title: 名前
+//:manname-title: 名前
 :note-caption: 注記
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: まえがき]

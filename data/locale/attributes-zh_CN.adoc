@@ -9,7 +9,7 @@
 :important-caption: 重要
 :last-update-label: 最后更新
 ifdef::listing-caption[:listing-caption: 列表]
-:manname-title: 名称
+//:manname-title: 名称
 :note-caption: 笔记
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: 序言]

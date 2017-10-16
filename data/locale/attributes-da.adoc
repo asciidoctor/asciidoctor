@@ -9,7 +9,7 @@
 :important-caption: Vigtig
 :last-update-label: Sidst opdateret
 ifdef::listing-caption[:listing-caption: List]
-:manname-title: NAVN
+//:manname-title: NAVN
 :note-caption: Notat
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: Forord]

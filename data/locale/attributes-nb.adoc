@@ -9,7 +9,7 @@
 :important-caption: Viktig
 :last-update-label: Sist oppdatert
 ifdef::listing-caption[:listing-caption: Programkode]
-:manname-title: NAVN
+//:manname-title: NAVN
 :note-caption: Merk
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: Forord]

@@ -9,7 +9,7 @@
 :important-caption: Важно
 :last-update-label: Последно обновен
 ifdef::listing-caption[:listing-caption: Листинг]
-:manname-title: ИМЕ
+//:manname-title: ИМЕ
 :note-caption: Забележка
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: Предговор]

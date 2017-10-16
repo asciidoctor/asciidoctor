@@ -9,7 +9,7 @@
 :important-caption: Penting
 :last-update-label: Pembaruan terakhir
 ifdef::listing-caption[:listing-caption: Daftar]
-:manname-title: NAMA
+//:manname-title: NAMA
 :note-caption: Catatan
 //:part-refsig: ???
 //ifdef::preface-title[:preface-title: ???]

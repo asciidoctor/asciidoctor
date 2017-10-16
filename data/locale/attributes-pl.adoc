@@ -9,7 +9,7 @@
 :important-caption: Ważne
 :last-update-label: Ostatnio zmodyfikowany
 //ifdef::listing-caption[:listing-caption: ???]
-:manname-title: NAZWA
+//:manname-title: NAZWA
 :note-caption: Notka
 //:part-refsig: ???
 //ifdef::preface-title[:preface-title: ???]

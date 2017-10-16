@@ -9,7 +9,7 @@
 :important-caption: مهم
 :last-update-label: اخر تحديث
 ifdef::listing-caption[:listing-caption: قائمة]
-:manname-title: اسم
+//:manname-title: اسم
 :note-caption: ملاحظة
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: تمهيد]
