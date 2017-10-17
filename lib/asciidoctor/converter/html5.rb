@@ -1138,17 +1138,17 @@ Your browser does not support the video tag.
 
     def inline_quoted node
       open, close, is_tag = QUOTE_TAGS[node.type]
-      if node.role
+      class_attr = node.role ? %( class="#{node.role}") : nil
+      id_attr = node.id ? %( id="#{node.id}") : nil
+      if class_attr || id_attr
         if is_tag
-          quoted_text = %(#{open.chop} class="#{node.role}">#{node.text}#{close})
+          %(#{open.chop}#{id_attr}#{class_attr}>#{node.text}#{close})
         else
-          quoted_text = %(<span class="#{node.role}">#{open}#{node.text}#{close}</span>)
+          %(<span#{id_attr}#{class_attr}>#{open}#{node.text}#{close}</span>)
         end
       else
-        quoted_text = %(#{open}#{node.text}#{close})
+        %(#{open}#{node.text}#{close})
       end
-
-      node.id ? %(<a id="#{node.id}"></a>#{quoted_text}) : quoted_text
     end
 
     def append_boolean_attribute name, xml
