@@ -133,7 +133,7 @@ module Asciidoctor
 #{outline node}
 </div>)
           end
-          result << (generate_manname_section node)
+          result << (generate_manname_section node) if node.attr? 'manpurpose'
         else
           if node.has_header?
             result << %(<h1>#{node.header.title}</h1>) unless node.notitle
@@ -257,7 +257,7 @@ MathJax.Hub.Config({
           id_attr = node.id ? %( id="#{node.id}") : nil
           result << %(<h1#{id_attr}>#{node.doctitle} Manual Page</h1>)
         end
-        result << (generate_manname_section node)
+        result << (generate_manname_section node) if node.attr? 'manpurpose'
       else
         if node.has_header? && !node.notitle
           id_attr = node.id ? %( id="#{node.id}") : nil
