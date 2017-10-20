@@ -195,12 +195,12 @@ module Helpers
     end
   end
 
-  def self.mkdir_p(dir)
+  def self.mkdir_p dir
     unless ::File.directory? dir
-      if !::File.directory?(parent_dir = ::File.dirname(dir)) && parent_dir != '.'
-        mkdir_p(parent_dir)
+      unless (parent_dir = ::File.dirname dir) == '.' || (::File.directory? parent_dir)
+        mkdir_p parent_dir
       end
-      ::Dir.mkdir(dir)
+      ::Dir.mkdir dir
     end
   end
 end
