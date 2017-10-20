@@ -197,7 +197,7 @@ module Helpers
 
   def self.mkdir_p dir
     unless ::File.directory? dir
-      unless (parent_dir = ::File.dirname dir) == '.' || (::File.directory? parent_dir)
+      unless (parent_dir = ::File.dirname dir) == '.'
         mkdir_p parent_dir
       end
       ::Dir.mkdir dir
