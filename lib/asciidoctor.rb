@@ -1491,13 +1491,11 @@ module Asciidoctor
         raise ::IOError, %(input file and output file cannot be the same: #{outfile})
       end
 
-      unless ::File.directory? outdir
-        if mkdirs
-          Helpers.mkdir_p outdir
-        else
-          # NOTE we intentionally refer to the directory as it was passed to the API
-          raise ::IOError, %(target directory does not exist: #{to_dir})
-        end
+      if mkdirs
+        Helpers.mkdir_p outdir
+      else
+        # NOTE we intentionally refer to the directory as it was passed to the API
+        raise ::IOError, %(target directory does not exist: #{to_dir} (hint: set mkdirs option)) unless ::File.directory? outdir
       end
     else # write to stream
       outfile = to_file
@@ -1532,7 +1530,11 @@ module Asciidoctor
         copy_pygments_stylesheet = (doc.attr? 'source-highlighter', 'pygments') && (doc.attr 'pygments-css', 'class') == 'class'
         if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet
           stylesoutdir = doc.normalize_system_path(stylesdir, outdir, doc.safe >= SafeMode::SAFE ? outdir : nil)
-          Helpers.mkdir_p stylesoutdir if mkdirs
+          if mkdirs
+            Helpers.mkdir_p stylesoutdir
+          else
+            raise ::IOError, %(target stylesheet directory does not exist: #{stylesoutdir} (hint: set mkdirs option)) unless ::File.directory? stylesoutdir
+          end
 
           if copy_asciidoctor_stylesheet
             Stylesheets.instance.write_primary_stylesheet stylesoutdir
