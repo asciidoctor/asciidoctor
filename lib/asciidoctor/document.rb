@@ -646,7 +646,7 @@ class Document < AbstractBlock
   # Returns the resolved title as a [Title] if the :partition option is passed or a [String] if not
   # or nil if no value can be resolved.
   def doctitle opts = {}
-    if (val = @attributes['title']).nil_or_empty?
+    unless (val = @attributes['title'])
       if (sect = first_section)
         val = sect.title
       elsif !(opts[:use_fallback] && (val = @attributes['untitled-label']))

@@ -593,6 +593,24 @@ Block content
      assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.render, 1
     end
 
+    test 'document with blank title attribute entry overrides doctitle' do
+     input = <<-EOS
+= Document Title
+:title:
+
+{doctitle}
+
+== First Section
+     EOS
+     doc = document_from_string input
+     assert_equal '', doc.doctitle
+     assert_equal '', doc.title
+     assert doc.has_header?
+     assert_equal 'Document Title', doc.header.title
+     assert_equal 'Document Title', doc.first_section.title
+     assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.render, 1
+    end
+
     test 'document with title attribute entry overrides doctitle attribute entry' do
      input = <<-EOS
 = Document Title
