@@ -200,7 +200,11 @@ module Helpers
       unless (parent_dir = ::File.dirname dir) == '.'
         mkdir_p parent_dir
       end
-      ::Dir.mkdir dir
+      begin
+        ::Dir.mkdir dir
+      rescue ::SystemCallError
+        raise unless ::File.directory? dir
+      end
     end
   end
 end
