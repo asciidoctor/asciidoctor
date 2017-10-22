@@ -116,7 +116,7 @@ module Asciidoctor
           end
           result << %(</entry>
 <entry>)
-          unless dd.nil?
+          if dd
             result << %(<simpara>#{dd.text}</simpara>) if dd.text?
             result << dd.content if dd.blocks?
           end
@@ -148,7 +148,7 @@ module Asciidoctor
 
           result << %(</#{label_tag}>) if label_tag
           result << %(<#{item_tag}>)
-          unless dd.nil?
+          if dd
             result << %(<simpara>#{dd.text}</simpara>) if dd.text?
             result << dd.content if dd.blocks?
           end
