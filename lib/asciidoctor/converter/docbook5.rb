@@ -29,7 +29,7 @@ module Asciidoctor
           result << '<?asciidoc-numbered?>'
         end
       end
-      lang_attribute = (node.attr? 'nolang') ? nil : %( #{lang_attribute_name}="#{node.attr 'lang', 'en'}")
+      lang_attribute = (node.attr? 'nolang') ? '' : %( #{lang_attribute_name}="#{node.attr 'lang', 'en'}")
       result << %(<#{root_tag_name}#{document_ns_attributes node}#{lang_attribute}>)
       result << (document_info_element node, root_tag_name) unless node.noheader
       result << node.content if node.blocks?
@@ -184,19 +184,19 @@ module Asciidoctor
       # See http://tdg.docbook.org/tdg/4.5/imagedata-x.html#d0e79635
       if node.attr? 'scaledwidth'
         width_attribute = %( width="#{node.attr 'scaledwidth'}")
-        depth_attribute = nil
-        scale_attribute = nil
+        depth_attribute = ''
+        scale_attribute = ''
       elsif node.attr? 'scale'
         # QUESTION should we set the viewport using width and depth? (the scaled image would be contained within this box)
-        #width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : nil
-        #depth_attribute = (node.attr? 'height') ? %( depth="#{node.attr 'height'}") : nil
+        #width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
+        #depth_attribute = (node.attr? 'height') ? %( depth="#{node.attr 'height'}") : ''
         scale_attribute = %( scale="#{node.attr 'scale'}")
       else
-        width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : nil
-        depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : nil
-        scale_attribute = nil
+        width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : ''
+        depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : ''
+        scale_attribute = ''
       end
-      align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : nil
+      align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
 
       mediaobject = %(<mediaobject>
 <imageobject>
@@ -222,9 +222,9 @@ module Asciidoctor
       listing_attributes = (common_attributes node.id, node.role, node.reftext)
       if node.style == 'source' && (node.attr? 'language')
         numbering = (node.attr? 'linenums', nil, false) ? 'numbered' : 'unnumbered'
-        listing_content = %(<programlisting#{informal ? listing_attributes : nil} language="#{node.attr 'language', nil, false}" linenumbering="#{numbering}">#{node.content}</programlisting>)
+        listing_content = %(<programlisting#{informal ? listing_attributes : ''} language="#{node.attr 'language', '', false}" linenumbering="#{numbering}">#{node.content}</programlisting>)
       else
-        listing_content = %(<screen#{informal ? listing_attributes : nil}>#{node.content}</screen>)
+        listing_content = %(<screen#{informal ? listing_attributes : ''}>#{node.content}</screen>)
       end
       if informal
         listing_content
@@ -287,8 +287,8 @@ module Asciidoctor
 
     def olist node
       result = []
-      num_attribute = node.style ? %( numeration="#{node.style}") : nil
-      start_attribute = (node.attr? 'start') ? %( startingnumber="#{node.attr 'start'}") : nil
+      num_attribute = node.style ? %( numeration="#{node.style}") : ''
+      start_attribute = (node.attr? 'start') ? %( startingnumber="#{node.attr 'start'}") : ''
       result << %(<orderedlist#{common_attributes node.id, node.role, node.reftext}#{num_attribute}#{start_attribute}>)
       result << %(<title>#{node.title}</title>) if node.title?
       node.items.each do |item|
@@ -385,8 +385,8 @@ module Asciidoctor
     def table node
       has_body = false
       result = []
-      pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : nil
-      result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{node.attr 'frame', 'all'}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', nil) ? ' orient="land"' : nil}>)
+      pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : ''
+      result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{node.attr 'frame', 'all'}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', false) ? ' orient="land"' : ''}>)
       if (node.option? 'unbreakable')
         result << '<?dbfo keep-together="always"?>'
       elsif (node.option? 'breakable')
@@ -412,10 +412,10 @@ module Asciidoctor
         rows.each do |row|
           result << '<row>'
           row.each do |cell|
-            halign_attribute = (cell.attr? 'halign') ? %( align="#{cell.attr 'halign'}") : nil
-            valign_attribute = (cell.attr? 'valign') ? %( valign="#{cell.attr 'valign'}") : nil
-            colspan_attribute = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{colnum + cell.colspan - 1}") : nil
-            rowspan_attribute = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : nil
+            halign_attribute = (cell.attr? 'halign') ? %( align="#{cell.attr 'halign'}") : ''
+            valign_attribute = (cell.attr? 'valign') ? %( valign="#{cell.attr 'valign'}") : ''
+            colspan_attribute = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{colnum + cell.colspan - 1}") : ''
+            rowspan_attribute = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : ''
             # NOTE <entry> may not have whitespace (e.g., line breaks) as a direct descendant according to DocBook rules
             entry_start = %(<entry#{halign_attribute}#{valign_attribute}#{colspan_attribute}#{rowspan_attribute}>)
             if tsec == :head
@@ -464,14 +464,14 @@ module Asciidoctor
         result << '</bibliodiv>'
       else
         mark_type = (checklist = node.option? 'checklist') ? 'none' : node.style
-        mark_attribute = mark_type ? %( mark="#{mark_type}") : nil
+        mark_attribute = mark_type ? %( mark="#{mark_type}") : ''
         result << %(<itemizedlist#{common_attributes node.id, node.role, node.reftext}#{mark_attribute}>)
         result << %(<title>#{node.title}</title>) if node.title?
         node.items.each do |item|
           text_marker = if checklist && (item.attr? 'checkbox')
             (item.attr? 'checked') ? '&#10003; ' : '&#10063; '
           else
-            nil
+            ''
           end
           result << '<listitem>'
           result << %(<simpara>#{text_marker}#{item.text}</simpara>)
@@ -548,8 +548,8 @@ module Asciidoctor
     end
 
     def inline_image node
-      width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : nil
-      depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : nil
+      width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : ''
+      depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : ''
       %(<inlinemediaobject>
 <imageobject>
 <imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{width_attribute}#{depth_attribute}/>
@@ -679,7 +679,7 @@ module Asciidoctor
     end
 
     def document_info_element doc, info_tag_prefix, use_info_tag_prefix = false
-      info_tag_prefix = nil unless use_info_tag_prefix
+      info_tag_prefix = '' unless use_info_tag_prefix
       result = []
       result << %(<#{info_tag_prefix}info>)
       result << document_title_tags(doc.doctitle :partition => true, :use_fallback => true) unless doc.notitle
@@ -763,13 +763,13 @@ module Asciidoctor
     end
 
     def title_tag node, optional = true
-      !optional || node.title? ? %(<title>#{node.title}</title>\n) : nil
+      !optional || node.title? ? %(<title>#{node.title}</title>\n) : ''
     end
 
     def cover_tag doc, face, use_placeholder = false
       if (cover_image = doc.attr %(#{face}-cover-image))
-        width_attr = nil
-        depth_attr = nil
+        width_attr = ''
+        depth_attr = ''
         if (cover_image.include? ':') && ImageMacroRx =~ cover_image
           cover_image = doc.image_uri $1
           unless $2.empty?
