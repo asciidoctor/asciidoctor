@@ -593,7 +593,7 @@ Feature: Cross References
         .paragraph: p Instructions go here.
     """
 
-    Scenario: Create a cross reference using the target section title
+    Scenario: Create a cross reference using the title of the target section
     Given the AsciiDoc source
       """
       == Section One
@@ -617,7 +617,7 @@ Feature: Cross References
           a< href='#_section_one' Section One
       """
 
-    Scenario: Create a natural cross reference using the reftext of the target section
+    Scenario: Create a cross reference using the reftext of the target section
     Given the AsciiDoc source
       """
       [reftext="the first section"]
@@ -654,7 +654,7 @@ Feature: Cross References
           xref< linkend='_section_one'/
       """
 
-    Scenario: Create a cross reference using the formatted target title
+    Scenario: Create a cross reference using the formatted title of the target section
     Given the AsciiDoc source
       """
       == Section *One*
@@ -677,4 +677,31 @@ Feature: Cross References
         .sectionbody: .paragraph: p
           |refer to
           a< href='#_section_strong_one_strong' Section <strong>One</strong>
+      """
+
+    Scenario: Does not process a natural cross reference in compat mode
+    Given the AsciiDoc source
+      """
+      :compat-mode:
+
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to <<Section One>>
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_section_one
+          |Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#Section One' [Section One]
       """

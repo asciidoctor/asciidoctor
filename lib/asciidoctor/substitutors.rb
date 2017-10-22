@@ -1068,7 +1068,8 @@ module Substitutors
         else
           # resolve fragment as reftext if it's not a known ID and resembles reftext (includes space or has uppercase char)
           unless @document.catalog[:ids].key? fragment
-            if ((fragment.include? ' ') || fragment.downcase != fragment) &&
+            if Compliance.natural_xrefs && !@document.compat_mode &&
+                ((fragment.include? ' ') || fragment.downcase != fragment) &&
                 (resolved_id = @document.catalog[:ids].key fragment)
               fragment = resolved_id
             elsif $VERBOSE
