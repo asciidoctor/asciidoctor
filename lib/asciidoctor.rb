@@ -170,6 +170,11 @@ module Asciidoctor
     # Compliance value: false
     define :shorthand_property_syntax, true
 
+    # Asciidoctor will attempt to resolve the target of a cross reference by
+    # matching its reference text (reftext or title) (e.g., <<Section Title>>)
+    # Compliance value: false
+    define :natural_xrefs, true
+
     # Asciidoctor will start counting at the following number
     # when creating a unique id when there is a conflict
     # Compliance value: 2
