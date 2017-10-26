@@ -2335,6 +2335,21 @@ You can use icons for admonitions by setting the 'icons' attribute.
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
+    test 'should embed base64-encoded data uri of custom icon when data-uri attribute is set' do
+      input = <<-EOS
+:icons:
+:iconsdir: fixtures
+:icontype: gif
+:data-uri:
+
+[TIP,icon=tip]
+You can set a custom icon using the icon attribute on the block.
+      EOS
+
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
+    end
+
     test 'does not embed base64-encoded data uri of icon when safe mode level is SECURE or greater' do
       input = <<-EOS
 :icons:
