@@ -279,15 +279,14 @@ class AbstractNode
   # Returns A String reference or data URI for an icon image
   def icon_uri name
     if attr? 'icon'
-      # QUESTION should we add extension if resolved value is an absolute URI?
-      if ::File.extname(uri = (image_uri attr('icon'), 'iconsdir')).empty?
-        %(#{uri}.#{@document.attr 'icontype', 'png'})
-      else
-        uri
+      if ::File.extname(icon = (attr 'icon')).empty?
+        # QUESTION should we be adding the extension if the icon is an absolute URI?
+        icon = %(#{icon}.#{@document.attr 'icontype', 'png'})
       end
     else
-      image_uri %(#{name}.#{@document.attr 'icontype', 'png'}), 'iconsdir'
+      icon = %(#{name}.#{@document.attr 'icontype', 'png'})
     end
+    image_uri icon, 'iconsdir'
   end
 
   # Public: Construct a URI reference or data URI to the target image.
