@@ -1,3 +1,5 @@
+require 'asciidoctor'.to_s unless defined? Asciidoctor
+
 # encoding: UTF-8
 module Asciidoctor
 # Extensions provide a way to participate in the parsing and converting
