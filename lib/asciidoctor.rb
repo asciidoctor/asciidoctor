@@ -360,6 +360,8 @@ module Asciidoctor
     :latexmath => ['\(', '\)'],
   }
 
+  FONT_AWESOME_VERSION = '4.7.0'
+
   # attributes which be changed within the content of the document (but not
   # header) because it has semantic meaning; ex. sectnums
   FLEXIBLE_ATTRIBUTES = ['sectnums']
