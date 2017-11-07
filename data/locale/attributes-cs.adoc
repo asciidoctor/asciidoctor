@@ -1,0 +1,22 @@
+// czech translation, for reference only; matches the built-in behavior of core
+:appendix-caption: Příloha
+:appendix-refsig: {appendix-caption}
+:caution-caption: Upozornění
+:chapter-label: Kapitola
+:chapter-refsig: {chapter-label}
+:example-caption: Příklad
+:figure-caption: Obrázek
+:important-caption: Důležité
+:last-update-label: Změněno
+ifdef::listing-caption[:listing-caption: Seznam]
+//:manname-title: Název
+:note-caption: Poznámka
+:part-refsig: Část
+ifdef::preface-title[:preface-title: Úvod]
+:section-refsig: Oddíl
+:table-caption: Tabulka
+:tip-caption: Tip
+:toc-title: Obsah
+:untitled-label: Nepojmenovaný
+:version-label: Verze
+:warning-caption: Varování
