@@ -2187,16 +2187,14 @@ class Parser
       marker = 'A.'
     when :lowerroman
       if validate
-        # TODO report this in roman numerals; see https://github.com/jamesshipton/roman-numeral/blob/master/lib/roman_numeral.rb
-        expected = ordinal + 1
-        actual = roman_numeral_to_int(marker.chop) # remove trailing ) and coerce to int
+        expected = int_to_roman_numeral(ordinal + 1)
+        actual = marker.chop # remove trailing )
       end
       marker = 'i)'
     when :upperroman
       if validate
-        # TODO report this in roman numerals; see https://github.com/jamesshipton/roman-numeral/blob/master/lib/roman_numeral.rb
-        expected = ordinal + 1
-        actual = roman_numeral_to_int(marker.chop) # remove trailing ) and coerce to int
+        expected = int_to_roman_numeral(ordinal + 1)
+        actual = marker.chop # remove trailing )
       end
       marker = 'I)'
     end
@@ -2710,6 +2708,24 @@ class Parser
     name.gsub(InvalidAttributeNameCharsRx, '').downcase
   end
 
+  ROMAN_NUMERALS = ::Hash[
+    'M', 1000, 'CM', 900, 'D', 500, 'CD', 400, 'C', 100, 'XC', 90,
+    'L', 50, 'XL', 40, 'X', 10, 'IX', 9, 'V', 5, 'IV', 4, 'I', 1
+  ]
+
+  # Internal: Converts an integer to a Roman numeral.
+  #
+  # value - The integer to convert
+  #
+  # Returns the String Roman numeral for this integer
+  def self.int_to_roman_numeral value
+    ROMAN_NUMERALS.map {|l, i| 
+      repeat, value = value.divmod i
+      l * repeat
+    }.join
+  end
+
+=begin
   # Internal: Converts a Roman numeral to an integer value.
   #
   # value - The String Roman numeral to convert
@@ -2731,5 +2747,6 @@ class Parser
 
     result
   end
+=end
 end
 end
