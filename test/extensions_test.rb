@@ -1148,7 +1148,11 @@ sect::[%s]
           assert_equal expect_level, sect.level
           assert_equal expect_special, sect.special
           assert_equal expect_numbered, sect.numbered
-          assert_equal expect_id, sect.id
+          if expect_id
+            assert_equal expect_id, sect.id
+          else
+            assert_nil sect.id
+          end
         end
       ensure
         Asciidoctor::Extensions.unregister_all

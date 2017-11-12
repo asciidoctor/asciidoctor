@@ -13,7 +13,7 @@ context 'Attributes' do
 
     test 'requires a space after colon following attribute name' do
       doc = document_from_string 'foo:bar'
-      assert_equal nil, doc.attributes['foo']
+      assert_nil doc.attributes['foo']
     end
 
     # NOTE AsciiDoc Python recognizes this entry
@@ -94,32 +94,32 @@ linus.torvalds@example.com
 
     test 'should delete an attribute that ends with !' do
       doc = document_from_string(":frog: Tanglefoot\n:frog!:")
-      assert_equal nil, doc.attributes['frog']
+      assert_nil doc.attributes['frog']
     end
 
     test 'should delete an attribute that ends with ! set via API' do
       doc = document_from_string(":frog: Tanglefoot", :attributes => {'frog!' => ''})
-      assert_equal nil, doc.attributes['frog']
+      assert_nil doc.attributes['frog']
     end
 
     test 'should delete an attribute that begins with !' do
       doc = document_from_string(":frog: Tanglefoot\n:!frog:")
-      assert_equal nil, doc.attributes['frog']
+      assert_nil doc.attributes['frog']
     end
 
     test 'should delete an attribute that begins with ! set via API' do
       doc = document_from_string(":frog: Tanglefoot", :attributes => {'!frog' => ''})
-      assert_equal nil, doc.attributes['frog']
+      assert_nil doc.attributes['frog']
     end
 
     test 'should delete an attribute set via API to nil value' do
       doc = document_from_string(":frog: Tanglefoot", :attributes => {'frog' => nil})
-      assert_equal nil, doc.attributes['frog']
+      assert_nil doc.attributes['frog']
     end
 
     test "doesn't choke when deleting a non-existing attribute" do
       doc = document_from_string(':frog!:')
-      assert_equal nil, doc.attributes['frog']
+      assert_nil doc.attributes['frog']
     end
 
     test "replaces special characters in attribute value" do
@@ -308,9 +308,9 @@ endif::holygrail[]
 
     test 'attribute undefined in document options cannot be assigned in document' do
       doc = document_from_string(':cash: money', :attributes => {'cash!' => '' })
-      assert_equal nil, doc.attributes['cash']
+      assert_nil doc.attributes['cash']
       doc = document_from_string(':cash: money', :attributes => {'cash' => nil })
-      assert_equal nil, doc.attributes['cash']
+      assert_nil doc.attributes['cash']
     end
 
     test 'backend and doctype attributes are set by default in default configuration' do
@@ -1321,7 +1321,7 @@ A normal paragraph
       res = para.remove_role 'role1'
       assert res
       refute para.role?
-      assert_equal nil, para.attributes['role']
+      assert_nil para.attributes['role']
       refute para.has_role? 'role1'
     end
 
@@ -1347,7 +1347,7 @@ A normal paragraph
       para = doc.blocks.first
       res = para.remove_role 'role1'
       refute res
-      assert_equal nil, para.attributes['role']
+      assert_nil para.attributes['role']
       refute para.has_role?('role1')
     end
 
