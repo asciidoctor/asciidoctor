@@ -557,16 +557,20 @@ content
       input = <<-EOS
 # Document Title
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_string input
       assert_xpath "//h1[not(@id)][text() = 'Document Title']", output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'atx document title with symmetric markers' do
       input = <<-EOS
 # Document Title #
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_string input
       assert_xpath "//h1[not(@id)][text() = 'Document Title']", output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'atx section title with leading marker' do
@@ -575,8 +579,10 @@ content
 
 blah blah
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_string input
       assert_xpath "//h2[@id='_section_one'][text() = 'Section One']", output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'atx section title with symmetric markers' do
@@ -585,17 +591,21 @@ blah blah
 
 blah blah
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_string input
       assert_xpath "//h2[@id='_section_one'][text() = 'Section One']", output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'should not match atx syntax with mixed markers' do
       input = <<-EOS
 =#= My Title
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_embedded_string input
       assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", output, 0
       assert_includes output, '<p>=#= My Title</p>'
+      Asciidoctor::Compliance.markdown_syntax = false
     end
   end
 

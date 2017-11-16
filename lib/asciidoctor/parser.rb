@@ -1706,6 +1706,9 @@ class Parser
 
     if Compliance.markdown_syntax ? ((line1.start_with? '=', '#') && ExtAtxSectionTitleRx =~ line1) :
         ((line1.start_with? '=') && AtxSectionTitleRx =~ line1)
+      if (line1.start_with? '=')
+          Compliance.markdown_syntax = false
+      end
       # NOTE level is 1 less than number of line markers
       sect_level, sect_title, atx = $1.length - 1, $2, true
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped

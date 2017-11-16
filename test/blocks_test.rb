@@ -357,12 +357,14 @@ A famous quote.
 > A famous quote.
 > Some more inspiring words.
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_string input
       assert_css '.quoteblock', output, 1
       assert_css '.quoteblock > blockquote', output, 1
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
       assert_css '.quoteblock > .attribution', output, 0
       assert_xpath %(//*[@class = "quoteblock"]//p[text() = "A famous quote.\nSome more inspiring words."]), output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'lazy markdown-style quote block with single paragraph and no attribution' do
@@ -370,12 +372,14 @@ A famous quote.
 > A famous quote.
 Some more inspiring words.
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_string input
       assert_css '.quoteblock', output, 1
       assert_css '.quoteblock > blockquote', output, 1
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
       assert_css '.quoteblock > .attribution', output, 0
       assert_xpath %(//*[@class = "quoteblock"]//p[text() = "A famous quote.\nSome more inspiring words."]), output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'markdown-style quote block with multiple paragraphs and no attribution' do
@@ -384,6 +388,7 @@ Some more inspiring words.
 >
 > Some more inspiring words.
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_string input
       assert_css '.quoteblock', output, 1
       assert_css '.quoteblock > blockquote', output, 1
@@ -391,6 +396,7 @@ Some more inspiring words.
       assert_css '.quoteblock > .attribution', output, 0
       assert_xpath %((//*[@class = "quoteblock"]//p)[1][text() = "A famous quote."]), output, 1
       assert_xpath %((//*[@class = "quoteblock"]//p)[2][text() = "Some more inspiring words."]), output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'markdown-style quote block with multiple blocks and no attribution' do
@@ -399,6 +405,7 @@ Some more inspiring words.
 >
 > NOTE: Some more inspiring words.
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_string input
       assert_css '.quoteblock', output, 1
       assert_css '.quoteblock > blockquote', output, 1
@@ -407,6 +414,7 @@ Some more inspiring words.
       assert_css '.quoteblock > .attribution', output, 0
       assert_xpath %((//*[@class = "quoteblock"]//p)[1][text() = "A famous quote."]), output, 1
       assert_xpath %((//*[@class = "quoteblock"]//*[@class = "admonitionblock note"]//*[@class="content"])[1][normalize-space(text()) = "Some more inspiring words."]), output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'markdown-style quote block with single paragraph and attribution' do
@@ -415,6 +423,7 @@ Some more inspiring words.
 > Some more inspiring words.
 > -- Famous Person, Famous Source, Volume 1 (1999)
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_string input
       assert_css '.quoteblock', output, 1
       assert_css '.quoteblock > blockquote', output, 1
@@ -427,6 +436,7 @@ Some more inspiring words.
       attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
       author = attribution.children.first
       assert_equal "#{decode_char 8212} Famous Person", author.text.strip
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'should parse credit line in markdown-style quote block like positional block attributes' do
@@ -436,9 +446,11 @@ Some more inspiring words.
 -- Thomas Jefferson, https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]
       EOS
 
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_embedded_string input
       assert_css '.quoteblock', output, 1
       assert_css '.quoteblock cite a[href="https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1"]', output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'quoted paragraph-style quote block with attribution' do
@@ -2486,10 +2498,12 @@ puts "Hello, World!"
 ```
       EOS
 
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_embedded_string input
       assert_css '.listingblock', output, 1
       assert_css '.listingblock pre code', output, 1
       assert_css '.listingblock pre code:not([class])', output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'should not recognize fenced code blocks with more than three delimiters' do
@@ -2518,10 +2532,12 @@ alert("Hello, World!")
 ```
       EOS
 
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_embedded_string input
       assert_css '.listingblock', output, 2
       assert_css '.listingblock pre code.language-ruby[data-lang=ruby]', output, 1
       assert_css '.listingblock pre code.language-javascript[data-lang=javascript]', output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'should support fenced code blocks with languages and numbering' do
@@ -2535,10 +2551,12 @@ alert("Hello, World!")
 ```
       EOS
 
+      Asciidoctor::Compliance.markdown_syntax = true
       output = render_embedded_string input
       assert_css '.listingblock', output, 2
       assert_css '.listingblock pre code.language-ruby[data-lang=ruby]', output, 1
       assert_css '.listingblock pre code.language-javascript[data-lang=javascript]', output, 1
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'should highlight source if source-highlighter attribute is coderay' do
