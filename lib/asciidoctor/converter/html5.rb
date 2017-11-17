@@ -318,17 +318,15 @@ MathJax.Hub.Config({
 
     def section node
       htag = %(h#{(slevel = node.level) + 1})
-      id_attr = anchor = link_start = link_end = ''
+      id_attr = anchor_before = anchor_after = link_start = link_end = ''
       if node.id
         id_attr = %( id="#{id = node.id}")
         if (doc = node.document).attr? 'sectanchors'
-          anchor = %(<a class="anchor" href="##{id}"></a>)
-          # possible idea - anchor icons GitHub-style
-          #if doc.attr? 'icons', 'font'
-          #  anchor = %(<a class="anchor" href="##{id}"><i class="fa fa-anchor"></i></a>)
-          #else
-          #  anchor = %(<a class="anchor" href="##{id}"></a>)
-          #end
+          if doc.attr? 'sectanchors', 'after'
+            anchor_after = %(<a class="anchor" href="##{id}"></a>)
+          else
+            anchor_before = %(<a class="anchor" href="##{id}"></a>)
+          end
         end
         if doc.attr? 'sectlinks'
           link_start, link_end = %(<a class="link" href="##{id}">), '</a>'
@@ -337,12 +335,12 @@ MathJax.Hub.Config({
 
       ex_class = (role = node.role) ? %( #{role}) : ''
       if slevel == 0
-        %(<h1#{id_attr} class="sect0#{ex_class}">#{anchor}#{link_start}#{node.title}#{link_end}</h1>
+        %(<h1#{id_attr} class="sect0#{ex_class}">#{anchor_before}#{link_start}#{node.title}#{link_end}#{anchor_after}</h1>
 #{node.content})
       else
         sectnum = node.numbered && !node.caption && slevel <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} ) : ''
         %(<div class="sect#{slevel}#{ex_class}">
-<#{htag}#{id_attr}>#{anchor}#{link_start}#{sectnum}#{node.captioned_title}#{link_end}</#{htag}>
+<#{htag}#{id_attr}>#{anchor_before}#{link_start}#{sectnum}#{node.captioned_title}#{link_end}#{anchor_after}</#{htag}>
 #{slevel == 1 ? %[<div class="sectionbody">\n#{node.content}\n</div>] : node.content}
 </div>)
       end

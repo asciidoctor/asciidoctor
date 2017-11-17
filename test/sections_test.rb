@@ -1387,6 +1387,26 @@ Linux installation instructions.
       assert_xpath '//*[@class="sect2"]/h3[@id="_linux"]/a/following-sibling::text()="Linux"', output, true
     end
 
+    test 'should position after title text if sectanchors is set to after' do
+      input = <<-EOS
+== Installation
+
+Installation section.
+
+=== Linux
+
+Linux installation instructions.
+      EOS
+
+      output = render_embedded_string input, :attributes => {'sectanchors' => 'after'}
+      assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a', output, 1
+      assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a[@class="anchor"][@href="#_installation"]', output, 1
+      assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a/preceding-sibling::text()="Installation"', output, true
+      assert_xpath '//*[@class="sect2"]/h3[@id="_linux"]/a', output, 1
+      assert_xpath '//*[@class="sect2"]/h3[@id="_linux"]/a[@class="anchor"][@href="#_linux"]', output, 1
+      assert_xpath '//*[@class="sect2"]/h3[@id="_linux"]/a/preceding-sibling::text()="Linux"', output, true
+    end
+
     test 'should link section if sectlinks document attribute is set' do
       input = <<-EOS
 == Installation
