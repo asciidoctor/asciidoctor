@@ -923,6 +923,19 @@ content
       assert_xpath '//articleinfo/authorgroup/author[2]/firstname[text() = "Junior"]', output, 1
     end
 
+    test 'with author defined by indexed attribute name' do
+      input = <<-EOS
+= Document Title
+:author_1: Doc Writer
+
+{author}
+      EOS
+
+      doc = document_from_string input
+      assert_equal 'Doc Writer', (doc.attr 'author')
+      assert_equal 'Doc Writer', (doc.attr 'author_1')
+    end
+
     test 'with authors defined using attribute entry to DocBook' do
       input = <<-EOS
 = Document Title
