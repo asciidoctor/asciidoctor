@@ -393,6 +393,7 @@ class Document < AbstractBlock
       # don't need to do the extra processing within our own document
       # FIXME line info isn't reported correctly within include files in nested document
       @reader = Reader.new data, options[:cursor]
+      @source_location = @reader.cursor if @sourcemap
 
       # Now parse the lines in the reader into blocks
       # Eagerly parse (for now) since a subdocument is not a publicly accessible object
@@ -458,6 +459,7 @@ class Document < AbstractBlock
       end
 
       @reader = PreprocessorReader.new self, data, (Reader::Cursor.new attrs['docfile'], @base_dir), :normalize => true
+      @source_location = @reader.cursor if @sourcemap
     end
   end
 
@@ -480,6 +482,7 @@ class Document < AbstractBlock
       # create reader if data is provided (used when data is not known at the time the Document object is created)
       if data
         @reader = PreprocessorReader.new doc, data, (Reader::Cursor.new @attributes['docfile'], @base_dir), :normalize => true
+        @source_location = @reader.cursor if @sourcemap
       end
 
       if (exts = @parent_document ? nil : @extensions) && exts.preprocessors?

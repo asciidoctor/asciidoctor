@@ -208,6 +208,10 @@ idseparator=-')
     test 'should track file and line information with blocks if sourcemap option is set' do
       doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), :sourcemap => true
 
+      refute_nil doc.source_location
+      assert_equal 'sample.asciidoc', doc.file
+      assert_equal 1, doc.lineno
+
       section_1 = doc.sections[0]
       assert_equal 'Section A', section_1.title
       refute_nil section_1.source_location
