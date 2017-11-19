@@ -1757,7 +1757,7 @@ class Parser
   #  # => {'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
   #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.'}
   def self.parse_header_metadata(reader, document = nil)
-    # NOTE this will discard away any comment lines, but not skip blank lines
+    # NOTE this will discard any comment lines, but not skip blank lines
     process_attribute_entries reader, document
 
     metadata, implicit_author, implicit_authors = {}, nil, nil
@@ -1820,6 +1820,8 @@ class Parser
       process_attribute_entries reader, document
 
       reader.skip_blank_lines
+    else
+      author_metadata = {}
     end
 
     # process author attribute entries that override (or stand in for) the implicit author line
