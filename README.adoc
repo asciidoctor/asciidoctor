@@ -143,7 +143,7 @@ Asciidoctor works best when you use UTF-8 everywhere.
 
 == Installation
 
-Asciidoctor can be installed using (a) the `gem install` command, (b) Bundler or (c) package managers for macOS and popular Linux distributions.
+Asciidoctor can be installed using (a) the `gem install` command, (b) Bundler, (c) package managers for popular Linux distributions, or (d) Homebrew for OS X.
 
 TIP: The benefit of using a Linux package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
 The drawback is that the package may not be available immediately after the release of the gem.
@@ -193,20 +193,7 @@ gem 'asciidoctor'
 To upgrade the gem, specify the new version in the Gemfile and run `bundle` again.
 Using `bundle update` is *not* recommended as it will also update other gems, which may not be the desired result.
 
-=== (c) Package managers
-
-==== Homebrew (macOS)
-
-To install Asciidoctor on macOS with Homebrew, first follow the instructions at https://brew.sh/[brew.sh] to install Homebrew if you have not done so, then open a terminal and type:
-
- $ brew install asciidoctor
-
-To upgrade the gem, use:
-
- $ brew update
- $ brew upgrade asciidoctor
-
-TIP: Homebrew installs the `asciidoctor` gem into an exclusive prefix that is independent of system gems.
+=== (c) Linux package managers
 
 ==== DNF (Fedora 21 or greater)
 
@@ -261,6 +248,20 @@ To upgrade the gem, use:
  $ sudo apk add -u asciidoctor
 
 TIP: Your system may be configured to automatically update apk packages, in which case no action is required by you to update the gem.
+
+=== (d) Homebrew (OS X)
+
+To install Asciidoctor on OS X with Homebrew, first follow the instructions at https://brew.sh/[brew.sh] to install Homebrew.
+Once Homebrew is installed, open a terminal and type:
+
+ $ brew install asciidoctor
+
+To upgrade the gem, use:
+
+ $ brew update
+ $ brew upgrade asciidoctor
+
+TIP: Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
 
 === Other installation options
 
