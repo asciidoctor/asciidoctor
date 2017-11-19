@@ -262,7 +262,7 @@ Pour mettre à jour la gemme, utiliser:
  $ brew update
  $ brew upgrade asciidoctor
 
-TIP: Homebrew installe la gemme `asciidoctor` avec un prefixe spécifique qui est indépendant des gemmes système.
+TIP: Homebrew installe la gemme `asciidoctor` dans un répertoire spécifique qui est indépendant des gemmes système.
 
 === Autres options d'installation
 
