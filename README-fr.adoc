@@ -144,7 +144,7 @@ Asciidoctor fonctionne mieux lorsque vous utilisez UTF-8 partout.
 
 == Installation
 
-Asciidoctor peut être installé en utilisant la commande (a) `gem install`, (b) Bundler ou (c) les gestionnaires de paquets pour les distributions Linux populaires.
+Asciidoctor peut être installé en utilisant la commande (a) `gem install`, (b) Bundler, (c) les gestionnaires de paquets pour les distributions Linux populaires, ou (d) Homebrew pour OS X.
 
 TIP: L'avantage d'utiliser le gestionnaire de paquets pour installer la gemme est que l'installation englobe celle des librairies Ruby et RubyGems si elles ne sont pas déjà installés.
 L'inconvénient est que le paquet n'est pas forcément mis à jour immédiatement après la mise à disposition de la gemme.
@@ -194,7 +194,7 @@ gem 'asciidoctor'
 Pour mettre à jour la gemme, spécifiez la nouvelle version dans le fichier Gemfile et exécutez `bundle` à nouveau.
 Utiliser `bundle update` *n*'est *pas* recommandé car les autres gemmes seront également mises à jour, ce qui n'est pas forcément le résultat voulu.
 
-=== (c) Gestionnaire de paquets Linux
+=== (c) Gestionnaires de paquets Linux
 
 ==== DNF (Fedora 21 ou supérieure)
 
@@ -249,6 +249,20 @@ Pour mettre à jour la gemme, utilisez :
  $ sudo apk add -u asciidoctor
 
 TIP: Votre système peut être configuré pour mettre à jour automatiquement les paquets apk, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gemme.
+
+=== (d) Homebrew (OS X)
+
+Tout d'abord suivre les instructions sur https://brew.sh/[brew.sh] pour installer Homebrew.
+Une fois Homebrew installé, ouvrir un terminal et exécuter:
+
+ $ brew install asciidoctor
+
+Pour mettre à jour la gemme, utiliser:
+
+ $ brew update
+ $ brew upgrade asciidoctor
+
+TIP: Homebrew installe la gemme `asciidoctor` avec un prefixe spécifique qui est indépendant des gemmes système.
 
 === Autres options d'installation
 
