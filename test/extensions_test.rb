@@ -686,6 +686,25 @@ content
       end
     end
 
+    test 'should set source_location on document before invoking tree processors' do
+      begin
+        Asciidoctor::Extensions.register do
+          tree_processor do
+            process do |doc|
+              para = create_paragraph doc.blocks.last.parent, %(file: #{doc.file}, lineno: #{doc.lineno}), {}
+              doc << para
+            end
+          end
+        end
+
+        sample_doc = fixture_path 'sample.asciidoc'
+        doc = Asciidoctor.load_file sample_doc, :sourcemap => true
+        assert_includes doc.convert, 'file: sample.asciidoc, lineno: 1'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should allow tree processor to replace tree' do
       input = <<-EOS
 = Original Document
