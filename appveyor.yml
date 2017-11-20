@@ -24,7 +24,7 @@ install:
   - echo %PATH%
   - ruby --version
   - gem --version
-  - gem install bundler --quiet --no-ri --no-rdoc
+  #- gem install bundler --force --quiet --no-ri --no-rdoc
   - bundler --version
   - bundle
 build_script:
