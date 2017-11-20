@@ -251,8 +251,11 @@ TIP: Your system may be configured to automatically update apk packages, in whic
 
 === (d) Homebrew (OS X)
 
-To install Asciidoctor on OS X with Homebrew, first follow the instructions at https://brew.sh/[brew.sh] to install Homebrew.
-Once Homebrew is installed, open a terminal and type:
+You can use Homebrew to install Asciidoctor on OS X.
+If you haven't yet installed Homebrew, follow the instructions at https://brew.sh/[brew.sh].
+
+Once Homebrew is installed, you can install the `asciidoctor` gem using the http://brewformulas.org/Asciidoctor[asciidoctor] package.
+To do so, open a terminal and type:
 
  $ brew install asciidoctor
 
