@@ -69,6 +69,11 @@ class Parser
     'a' => :asciidoc
   }
 
+  ROMAN_NUMERALS = ::Hash[
+    'M', 1000, 'CM', 900, 'D', 500, 'CD', 400, 'C', 100, 'XC', 90,
+    'L', 50, 'XL', 40, 'X', 10, 'IX', 9, 'V', 5, 'IV', 4, 'I', 1
+  ]
+
   # Public: Make sure the Parser object doesn't get initialized.
   #
   # Raises RuntimeError if this constructor is invoked.
@@ -2710,11 +2715,6 @@ class Parser
     name.gsub(InvalidAttributeNameCharsRx, '').downcase
   end
 
-  ROMAN_NUMERALS = ::Hash[
-    'M', 1000, 'CM', 900, 'D', 500, 'CD', 400, 'C', 100, 'XC', 90,
-    'L', 50, 'XL', 40, 'X', 10, 'IX', 9, 'V', 5, 'IV', 4, 'I', 1
-  ]
-
   # Internal: Converts an integer to a Roman numeral.
   #
   # value - The integer to convert
@@ -2726,29 +2726,5 @@ class Parser
       l * repeat
     }.join
   end
-
-=begin
-  # Internal: Converts a Roman numeral to an integer value.
-  #
-  # value - The String Roman numeral to convert
-  #
-  # Returns the Integer for this Roman numeral
-  def self.roman_numeral_to_int(value)
-    value = value.downcase
-    digits = { 'i' => 1, 'v' => 5, 'x' => 10 }
-    result = 0
-
-    (0..value.length - 1).each {|i|
-      digit = digits[value[i..i]]
-      if i + 1 < value.length && digits[value[i+1..i+1]] > digit
-        result -= digit
-      else
-        result += digit
-      end
-    }
-
-    result
-  end
-=end
 end
 end
