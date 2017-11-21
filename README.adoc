@@ -47,7 +47,7 @@ endif::[]
 :uri-user-manual: {uri-docs}/user-manual
 :uri-install-docker: https://github.com/asciidoctor/docker-asciidoctor
 //:uri-install-doc: {uri-docs}/install-toolchain
-:uri-install-osx-doc: {uri-docs}/install-asciidoctor-macosx
+:uri-install-macos-doc: {uri-docs}/install-asciidoctor-macosx
 :uri-render-doc: {uri-docs}/render-documents
 :uri-themes-doc: {uri-docs}/produce-custom-themes-using-asciidoctor-stylesheet-factory
 :uri-gitscm-repo: https://github.com/git/git-scm.com
@@ -61,7 +61,7 @@ endif::[]
 
 {uri-project}/[Asciidoctor] is a _fast_ text processor and publishing toolchain for converting {uri-what-is-asciidoc}[AsciiDoc] content to HTML5, DocBook 5 (or 4.5) and other formats.
 Asciidoctor is written in Ruby, packaged as a RubyGem and published to {uri-rubygem}[RubyGems.org].
-The gem is also included in several Linux distributions, including Fedora, Debian and Ubuntu.
+The gem is also included in several Linux distributions, including Fedora, Debian, Ubuntu, and Alpine.
 Asciidoctor is open source, {uri-repo}[hosted on GitHub] and released under {uri-license}[the MIT license].
 
 ifndef::env-site[]
@@ -119,7 +119,7 @@ Asciidoctor also offers a modern, responsive theme based on {uri-foundation}[Fou
 
 == Requirements
 
-Asciidoctor works on Linux, OS X (Mac) and Windows and requires one of the following implementations of {uri-ruby}[Ruby]:
+Asciidoctor works on Linux, macOS and Windows and requires one of the following implementations of {uri-ruby}[Ruby]:
 
 * MRI (Ruby 1.8.7, 1.9.3, 2.0, 2.1, 2.2 & 2.3)
 * JRuby (1.7 in Ruby 1.8 and 1.9 modes, 9000)
@@ -143,7 +143,7 @@ Asciidoctor works best when you use UTF-8 everywhere.
 
 == Installation
 
-Asciidoctor can be installed using (a) the `gem install` command, (b) Bundler, (c) package managers for popular Linux distributions, or (d) Homebrew for OS X.
+Asciidoctor can be installed using (a) the `gem install` command, (b) Bundler, (c) package managers for popular Linux distributions, or (d) Homebrew for macOS.
 
 TIP: The benefit of using a Linux package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
 The drawback is that the package may not be available immediately after the release of the gem.
@@ -249,9 +249,9 @@ To upgrade the gem, use:
 
 TIP: Your system may be configured to automatically update apk packages, in which case no action is required by you to update the gem.
 
-=== (d) Homebrew (OS X)
+=== (d) Homebrew (macOS)
 
-You can use Homebrew to install Asciidoctor on OS X.
+You can use Homebrew to install Asciidoctor on macOS.
 If you haven't yet installed Homebrew, follow the instructions at https://brew.sh/[brew.sh].
 
 Once Homebrew is installed, you can install the `asciidoctor` gem using the http://brewformulas.org/Asciidoctor[asciidoctor] package.
@@ -269,7 +269,7 @@ TIP: Homebrew installs the `asciidoctor` gem into an exclusive prefix that's ind
 === Other installation options
 
 * {uri-install-docker}[Installing Asciidoctor using Docker]
-* {uri-install-osx-doc}[Installing Asciidoctor on Mac OS X]
+* {uri-install-macos-doc}[Installing Asciidoctor on macOS]
 // at the moment, the following entry is just a reiteration of the information in this README
 //* {uri-install-doc}[Installing the Asciidoctor toolchain]
 
