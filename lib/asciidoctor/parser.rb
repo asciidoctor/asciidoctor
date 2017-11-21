@@ -2189,7 +2189,7 @@ class Parser
       marker = 'A.'
     when :lowerroman
       if validate
-        expected = int_to_roman_numeral(ordinal + 1)
+        expected = int_to_roman_numeral(ordinal + 1).downcase
         actual = marker.chop # remove trailing )
       end
       marker = 'i)'

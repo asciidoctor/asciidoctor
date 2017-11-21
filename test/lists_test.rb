@@ -1765,7 +1765,7 @@ List
     end
   end
 
-  test 'should warn if explicit numbers in list are out of sequence' do
+  test 'should warn if explicit uppercase roman numerals in list are out of sequence' do
     input = <<-EOS
 I) one
 III) three
@@ -1773,6 +1773,16 @@ III) three
     output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
     assert_xpath '//ol/li', output, 2
     assert_includes warnings, 'line 2: list item index: expected II, got III'
+  end
+
+  test 'should warn if explicit lowercase roman numerals in list are out of sequence' do
+    input = <<-EOS
+i) one
+iii) three
+    EOS
+    output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+    assert_xpath '//ol/li', output, 2
+    assert_includes warnings, 'line 2: list item index: expected ii, got iii'
   end
 end
 
