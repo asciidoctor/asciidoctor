@@ -317,31 +317,39 @@ MathJax.Hub.Config({
     end
 
     def section node
-      htag = %(h#{(slevel = node.level) + 1})
-      id_attr = anchor_before = anchor_after = link_start = link_end = ''
+      if (level = node.level) == 0
+        title = node.title
+        sect0 = true
+      else
+        num = node.numbered && !node.caption && level <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} ) : ''
+        title = %(#{num}#{node.captioned_title})
+      end
       if node.id
         id_attr = %( id="#{id = node.id}")
-        if (doc = node.document).attr? 'sectanchors'
-          if doc.attr? 'sectanchors', 'after'
-            anchor_after = %(<a class="anchor" href="##{id}"></a>)
+        if (doc_attrs = node.document.attributes).key? 'sectlinks'
+          title = %(<a class="link" href="##{id}">#{title}</a>)
+        end
+        if doc_attrs.key? 'sectanchors'
+          # QUESTION should we add a font-based icon in anchor if icons=font?
+          if doc_attrs['sectanchors'] == 'after'
+            title = %(#{title}<a class="anchor" href="##{id}"></a>)
           else
-            anchor_before = %(<a class="anchor" href="##{id}"></a>)
+            title = %(<a class="anchor" href="##{id}"></a>#{title})
           end
         end
-        if doc.attr? 'sectlinks'
-          link_start, link_end = %(<a class="link" href="##{id}">), '</a>'
-        end
+      else
+        id_attr = ''
       end
 
-      ex_class = (role = node.role) ? %( #{role}) : ''
-      if slevel == 0
-        %(<h1#{id_attr} class="sect0#{ex_class}">#{anchor_before}#{link_start}#{node.title}#{link_end}#{anchor_after}</h1>
+      if sect0
+        %(<h1#{id_attr} class="sect0#{(role = node.role) ? " #{role}" : ''}">#{title}</h1>
 #{node.content})
       else
-        sectnum = node.numbered && !node.caption && slevel <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} ) : ''
-        %(<div class="sect#{slevel}#{ex_class}">
-<#{htag}#{id_attr}>#{anchor_before}#{link_start}#{sectnum}#{node.captioned_title}#{link_end}#{anchor_after}</#{htag}>
-#{slevel == 1 ? %[<div class="sectionbody">\n#{node.content}\n</div>] : node.content}
+        %(<div class="sect#{level}#{(role = node.role) ? " #{role}" : ''}">
+<h#{level + 1}#{id_attr}>#{title}</h#{level + 1}>
+#{level == 1 ? %[<div class="sectionbody">
+#{node.content}
+</div>] : node.content}
 </div>)
       end
     end
