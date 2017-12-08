@@ -273,7 +273,7 @@ APIは他のRubyソフトウェア, Rails, SinatraとGitHub, そして他の言�
 
 === Command line interface (CLI)
 
-`asciidoctorjs` コマンドはAsciidoctorをコマンドライン(つまりターミナル)から起動することを可能にします.
+`asciidoctor` コマンドはAsciidoctorをコマンドライン(つまりターミナル)から起動することを可能にします.
 
 次のコマンドはファイルREADME.adocをHTMLに変換し, 結果を同じディレクトリのREADME.htmlに保存します.
 生成されたHTMLファイルの名前はソースファイル依存し, その拡張子を `.html` に変えます.
