@@ -1,3 +1,4 @@
+# NOTE .to_s hides require from Opal
 require 'asciidoctor'.to_s unless defined? Asciidoctor
 
 # encoding: UTF-8
