@@ -37,7 +37,7 @@ module Asciidoctor
         # the registry of converters is initialized using a normal Hash.
         #
         # initialize_singleton - A Boolean to indicate whether the singleton should
-        #                        be initialize if it has not already been created.
+        #                        be initialized if it has not already been created.
         #                        If false, and a singleton has not been previously
         #                        initialized, a fresh instance is returned.
         #
