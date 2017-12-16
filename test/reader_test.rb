@@ -689,7 +689,6 @@ include::#{include_path}[]
       end
 
       test 'include directive can retrieve data from uri' do
-        #url = 'http://echo.jsontest.com/name/asciidoctor'
         url = %(http://#{resolve_localhost}:9876/name/asciidoctor)
         input = <<-EOS
 ....
@@ -703,6 +702,31 @@ include::#{url}[]
 
         refute_nil output
         assert_match(expect, output)
+      end
+
+      test 'nested include directive in data included from uri is resolved relative to uri' do
+        url = %(http://#{resolve_localhost}:9876/fixtures/outer-include.adoc)
+        input = <<-EOS
+....
+include::#{url}[]
+....
+        EOS
+        output = using_test_webserver do
+          render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        end
+
+        expected = 'first line of outer
+
+first line of middle
+
+first line of inner
+
+last line of inner
+
+last line of middle
+
+last line of outer'
+        assert_includes output, expected
       end
 
       test 'inaccessible uri referenced by include directive does not crash processor' do

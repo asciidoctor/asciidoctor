@@ -1,0 +1,5 @@
+first line of outer
+
+include::subdir/middle-include.adoc[]
+
+last line of outer
