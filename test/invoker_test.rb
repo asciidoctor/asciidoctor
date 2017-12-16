@@ -245,7 +245,7 @@ context 'Invoker' do
     sample_outpath = File.join destination_subdir_path, 'index.html'
     begin
       FileUtils.mkdir_p(destination_path)
-      invoker = invoke_cli %W(-D #{destination_path} -R test/fixtures), sample_inpath
+      invoke_cli %W(-D #{destination_path} -R test/fixtures), sample_inpath
       assert File.directory?(destination_subdir_path)
       assert File.exist?(sample_outpath)
     ensure
