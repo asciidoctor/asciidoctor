@@ -246,7 +246,6 @@ context 'Invoker' do
     begin
       FileUtils.mkdir_p(destination_path)
       invoker = invoke_cli %W(-D #{destination_path} -R test/fixtures), sample_inpath
-      doc = invoker.document
       assert File.directory?(destination_subdir_path)
       assert File.exist?(sample_outpath)
     ensure
