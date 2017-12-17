@@ -704,6 +704,28 @@ include::#{url}[]
         assert_match(expect, output)
       end
 
+      test 'nested include directives are resolved relative to current file' do
+        input = <<-EOS
+....
+include::fixtures/outer-include.adoc[]
+....
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        expected = 'first line of outer
+
+first line of middle
+
+first line of inner
+
+last line of inner
+
+last line of middle
+
+last line of outer'
+        assert_includes output, expected
+      end
+
       test 'nested include directive in data included from uri is resolved relative to uri' do
         url = %(http://#{resolve_localhost}:9876/fixtures/outer-include.adoc)
         input = <<-EOS
