@@ -38,7 +38,8 @@ class Reader
   # Public: Initialize the Reader object
   def initialize data = nil, cursor = nil, opts = {}
     if !cursor
-      @file = @dir = nil
+      @file = nil
+      @dir = '.'
       @path = '<stdin>'
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     elsif ::String === cursor
@@ -50,15 +51,9 @@ class Reader
       @dir = cursor.dir
       @path = cursor.path || '<stdin>'
       if @file
-        unless @dir
-          # REVIEW might to look at this assignment closer
-          @dir = ::File.dirname @file
-          @dir = nil if @dir == '.' # right?
-        end
-
-        unless cursor.path
-          @path = ::File.basename @file
-        end
+        # REVIEW might to look at this dir assignment closer
+        @dir = ::File.dirname @file unless @dir
+        @path = ::File.basename @file unless cursor.path
       end
       @lineno = cursor.lineno || 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     end
@@ -849,7 +844,7 @@ class PreprocessorReader < Reader
         # NOTE we defer checking if file exists and catch the 404 error if it does not
         target_type = :file
         inc_path = relpath = @include_stack.empty? && ::Dir.pwd == @document.base_dir ? target : %(#{@dir}/#{target})
-      elsif Helpers.uriish? target
+      elsif (Helpers.uriish? target) || ((Helpers.uriish? @dir) && (target = %(#{@dir}/#{target})))
         unless @document.attributes.key? 'allow-uri-read'
           replace_next_line %(link:#{target}[])
           return true
@@ -1056,7 +1051,7 @@ class PreprocessorReader < Reader
       @process_lines = ASCIIDOC_EXTENSIONS[::File.extname file]
     else
       @file = nil
-      @dir = '.' # right?
+      @dir = '.'
       # we don't know what file type we have, so assume AsciiDoc
       @process_lines = true
     end
