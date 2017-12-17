@@ -844,14 +844,11 @@ class PreprocessorReader < Reader
         # NOTE we defer checking if file exists and catch the 404 error if it does not
         target_type = :file
         inc_path = relpath = @include_stack.empty? && ::Dir.pwd == @document.base_dir ? target : %(#{@dir}/#{target})
-      elsif (Helpers.uriish? target) || ((Helpers.uriish? @dir) && (target = %(#{@dir}/#{target})))
+      elsif (Helpers.uriish? target) || ((::URI === @dir) && (target = %(#{@dir}/#{target})))
         unless @document.attributes.key? 'allow-uri-read'
           replace_next_line %(link:#{target}[])
           return true
         end
-
-        target_type = :uri
-        inc_path = relpath = target
         if @document.attributes.key? 'cache-uri'
           # caching requires the open-uri-cached gem to be installed
           # processing will be automatically aborted if these libraries can't be opened
@@ -860,6 +857,7 @@ class PreprocessorReader < Reader
           # autoload open-uri
           ::OpenURI
         end
+        target_type, relpath, inc_path = :uri, target, (::URI.parse target)
       else
         target_type = :file
         # include file is resolved relative to dir of current include, or base_dir if within original docfile
@@ -962,7 +960,8 @@ class PreprocessorReader < Reader
           select = base_select = !(inc_tags.value? true)
           wildcard = inc_tags.delete '*'
         end
-        if (ext_idx = inc_path.rindex '.') && (circ_cmt = CIRCUMFIX_COMMENTS[inc_path.slice ext_idx, inc_path.length])
+        inc_path_str = target_type == :uri ? inc_path.path : inc_path
+        if (ext_idx = inc_path_str.rindex '.') && (circ_cmt = CIRCUMFIX_COMMENTS[inc_path_str.slice ext_idx, inc_path_str.length])
           cmt_suffix_len = (tag_suffix = %([] #{circ_cmt[:suffix]})).length - 2
         end
         begin
@@ -1046,7 +1045,7 @@ class PreprocessorReader < Reader
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
     if file
       @file = file
-      @dir = ::File.dirname file
+      @dir = ::URI === file ? (::URI.parse ::File.dirname(file = file.to_s)) : (::File.dirname file)
       # only process lines in AsciiDoc files
       @process_lines = ASCIIDOC_EXTENSIONS[::File.extname file]
     else
