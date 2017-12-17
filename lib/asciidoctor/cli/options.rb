@@ -234,7 +234,7 @@ Example: asciidoctor -b html5 source.asciidoc
 
         if (load_paths = self[:load_paths])
           (self[:load_paths] = load_paths.uniq).reverse_each do |path|
-            $:.unshift File.expand_path(path)
+            $:.unshift ::File.expand_path(path)
           end
         end
 

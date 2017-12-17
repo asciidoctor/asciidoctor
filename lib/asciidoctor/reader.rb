@@ -1046,7 +1046,7 @@ class PreprocessorReader < Reader
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
     if file
       @file = file
-      @dir = File.dirname file
+      @dir = ::File.dirname file
       # only process lines in AsciiDoc files
       @process_lines = ASCIIDOC_EXTENSIONS[::File.extname file]
     else
