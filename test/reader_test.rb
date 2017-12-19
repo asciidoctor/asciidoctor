@@ -726,7 +726,7 @@ last line of outer'
         assert_includes output, expected
       end
 
-      test 'nested include directive in data included from uri is resolved relative to uri' do
+      test 'nested remote include directive is resolved relative to uri of current file' do
         url = %(http://#{resolve_localhost}:9876/fixtures/outer-include.adoc)
         input = <<-EOS
 ....
@@ -748,6 +748,24 @@ last line of inner
 last line of middle
 
 last line of outer'
+        assert_includes output, expected
+      end
+
+      test 'tag filtering is supported for remote includes' do
+        url = %(http://#{resolve_localhost}:9876/fixtures/tagged-class.rb)
+        input = <<-EOS
+[source,ruby]
+----
+include::#{url}[tag=init,indent=0]
+----
+        EOS
+        output = using_test_webserver do
+          render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        end
+
+        expected = '<code class="language-ruby" data-lang="ruby">def initialize breed
+  @breed = breed
+end</code>'
         assert_includes output, expected
       end
 
