@@ -712,6 +712,20 @@ v0.0.7, 2013-12-18
     assert_equal '2013-12-18', metadata['revdate']
   end
 
+  test 'break header at line with three forward slashes' do
+    input = <<-EOS
+Joe Cool
+v1.0
+///
+stuff
+    EOS
+    metadata, _ = parse_header_metadata input
+    assert_equal 7, metadata.size
+    assert_equal 1, metadata['authorcount']
+    assert_equal 'Joe Cool', metadata['author']
+    assert_equal '1.0', metadata['revnumber']
+  end
+
   test 'attribute entry overrides generated author initials' do
     doc = empty_document
     metadata, _ = parse_header_metadata %(Stuart Rackham <founder@asciidoc.org>\n:Author Initials: SJR), doc
