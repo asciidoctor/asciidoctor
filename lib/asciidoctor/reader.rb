@@ -899,21 +899,17 @@ class PreprocessorReader < Reader
           end
           inc_linenos = inc_linenos.empty? ? nil : inc_linenos.sort.uniq
         elsif attributes.key? 'tag'
-          unless (tag = attributes['tag']).empty?
-            if tag.start_with? '!'
-              inc_tags = { (tag.slice 1, tag.length) => false } unless tag == '!'
-            else
-              inc_tags = { tag => true }
-            end
+          unless (tag = attributes['tag']).empty? || tag == '!'
+            inc_tags = (tag.start_with? '!') ? { (tag.slice 1, tag.length) => false } : { tag => true }
           end
         elsif attributes.key? 'tags'
           inc_tags = {}
           attributes['tags'].split(DataDelimiterRx).each do |tagdef|
             if tagdef.start_with? '!'
-              inc_tags[tagdef.slice 1, tagdef.length] = false unless tagdef == '!'
+              inc_tags[tagdef.slice 1, tagdef.length] = false
             else
               inc_tags[tagdef] = true
-            end unless tagdef.empty?
+            end unless tagdef.empty? || tagdef == '!'
           end
           inc_tags = nil if inc_tags.empty?
         end
