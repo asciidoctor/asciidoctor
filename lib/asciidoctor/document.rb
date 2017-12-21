@@ -324,13 +324,11 @@ class Document < AbstractBlock
     # directory of the input is a string
     if options[:base_dir]
       @base_dir = attr_overrides['docdir'] = ::File.expand_path(options[:base_dir])
+    elsif attr_overrides['docdir']
+      @base_dir = attr_overrides['docdir'] = ::File.expand_path(attr_overrides['docdir'])
     else
-      if attr_overrides['docdir']
-        @base_dir = attr_overrides['docdir'] = ::File.expand_path(attr_overrides['docdir'])
-      else
-        #warn 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
-        @base_dir = attr_overrides['docdir'] = ::File.expand_path(::Dir.pwd)
-      end
+      #warn 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
+      @base_dir = attr_overrides['docdir'] = ::File.expand_path(::Dir.pwd)
     end
 
     # allow common attributes backend and doctype to be set using options hash, coerce values to string
@@ -1195,12 +1193,10 @@ class Document < AbstractBlock
     if @docinfo_processor_extensions.key?(location)
       # false means we already performed a lookup and didn't find any
       @docinfo_processor_extensions[location] != false
+    elsif @extensions && @document.extensions.docinfo_processors?(location)
+      !!(@docinfo_processor_extensions[location] = @document.extensions.docinfo_processors(location))
     else
-      if @extensions && @document.extensions.docinfo_processors?(location)
-        !!(@docinfo_processor_extensions[location] = @document.extensions.docinfo_processors(location))
-      else
-        @docinfo_processor_extensions[location] = false
-      end
+      @docinfo_processor_extensions[location] = false
     end
   end
 

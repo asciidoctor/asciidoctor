@@ -89,12 +89,10 @@ class Reader
       else
         data.split LF, -1
       end
+    elsif opts[:normalize]
+      Helpers.normalize_lines_array data
     else
-      if opts[:normalize]
-        Helpers.normalize_lines_array data
-      else
-        data.dup
-      end
+      data.dup
     end
   end
 
@@ -1205,22 +1203,20 @@ class PreprocessorReader < Reader
 
     if quoted
       val
+    elsif val.empty?
+      nil
+    elsif val == 'true'
+      true
+    elsif val == 'false'
+      false
+    elsif val.rstrip.empty?
+      ' '
+    elsif val.include? '.'
+      val.to_f
     else
-      if val.empty?
-        nil
-      elsif val == 'true'
-        true
-      elsif val == 'false'
-        false
-      elsif val.rstrip.empty?
-        ' '
-      elsif val.include? '.'
-        val.to_f
-      else
-        # fallback to coercing to integer, since we
-        # require string values to be explicitly quoted
-        val.to_i
-      end
+      # fallback to coercing to integer, since we
+      # require string values to be explicitly quoted
+      val.to_i
     end
   end
 
