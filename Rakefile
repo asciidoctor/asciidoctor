@@ -63,51 +63,6 @@ namespace :test do
   task :all => [:test, :features]
 end
 
-=begin
-begin
-  require 'rdoc/task'
-  RDoc::Task.new do |rdoc|
-    rdoc.rdoc_dir = 'rdoc'
-    rdoc.title = "Asciidoctor #{Asciidoctor::VERSION}"
-    rdoc.markup = 'tomdoc' if rdoc.respond_to?(:markup)
-    rdoc.rdoc_files.include('LICENSE', 'lib/**/*.rb')
-  end
-rescue LoadError
-end
-=end
-
-begin
-  require 'yard'
-  require 'yard-tomdoc'
-  require './lib/asciidoctor'
-
-  # Prevent YARD from breaking command statements in literal paragraphs
-  class CommandBlockPostprocessor < Asciidoctor::Extensions::Postprocessor
-    def process document, output
-      output.gsub(/<pre>\$ (.+?)<\/pre>/m, '<pre class="command code"><span class="const">$</span> \1</pre>')
-    end
-  end
-  Asciidoctor::Extensions.register do
-    postprocessor CommandBlockPostprocessor
-  end
-
-  # register .adoc extension for AsciiDoc markup helper
-  YARD::Templates::Helpers::MarkupHelper::MARKUP_EXTENSIONS[:asciidoc] = %w(adoc)
-  YARD::Rake::YardocTask.new do |yard|
-    yard.files = %w(
-        lib/**/*.rb
-        -
-        CHANGELOG.adoc
-        CONTRIBUTING.adoc
-        LICENSE
-    )
-    # --no-highlight enabled to prevent verbatim blocks in AsciiDoc that begin with $ from being dropped
-    # need to patch htmlify method to not attempt to syntax highlight blocks (or fix what's wrong)
-    yard.options = (IO.readlines '.yardopts').map {|l| l.chomp.delete('"').split ' ', 2 }.flatten if ::File.file? '.yardopts'
-  end
-rescue LoadError
-end
-
 begin
   require 'bundler/gem_tasks'
 
