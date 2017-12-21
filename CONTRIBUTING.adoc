@@ -13,6 +13,8 @@ ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 :uri-branch-help: {uri-fork-help}#create-branches
 :uri-pr-help: {uri-help-base}/using-pull-requests
 :uri-gist: https://gist.github.com
+:uri-yard: https://yardoc.org
+:uri-tomdoc: http://tomdoc.org
 
 == License Agreement
 
@@ -162,6 +164,18 @@ If you want to be able to execute the `asciidoctor` command from any directory w
 Now you can execute the `asciidoctor` command from any folder as follows:
 
  $ asciidoctor-dev README.adoc
+
+== Building the API Documentation
+
+The API documentation is written in the {uri-tomdoc}[TomDoc] dialect and built using {uri-yard}[Yard].
+
+The options for Yard are configured in the [.path]_.yardopts_ file at the root of the project.
+
+To build the API documentation locally, run the following command:
+
+ $ bundle exec yard
+
+The documentation will be built into the [.path]_rdoc_ folder.
 
 == Supporting Additional Ruby Versions
 

@@ -1,5 +1,11 @@
---exclude opal_ext
+--charset UTF-8
+--readme README.adoc
 --hide-api private
 --plugin tomdoc
 --title "Asciidoctor API Documentation"
 --output-dir rdoc
+lib/**/*.rb
+-
+CHANGELOG.adoc
+CONTRIBUTING.adoc
+LICENSE

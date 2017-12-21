@@ -634,7 +634,7 @@ Enhancements::
   * match implicit URLs that use the file scheme (#853)
   * added sectnumlevels to control depth of section numbering (#549)
   * add hardbreaks option to block (#630)
-  * sub attributes in manname (e.g., pass:[{docname}])
+  * substitute attribute references in manname
   * warn on reference to missing attribute if attribute-missing is "warn"
   * only enable toc macro if toc is enabled and toc-placement attribute has the value macro (#706)
   * add sectnums attribute as alternative alias to numbered attribute (#684)
