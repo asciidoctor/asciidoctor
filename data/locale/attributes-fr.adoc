@@ -1,5 +1,5 @@
 // French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
-:appendix-caption: Appendice
+:appendix-caption: Annexe
 :appendix-refsig: {appendix-caption}
 :caution-caption: Avertissement
 //:chapter-label: ???
