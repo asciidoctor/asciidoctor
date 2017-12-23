@@ -495,6 +495,16 @@ preamble
         assert_nil reader.file
         assert_equal '<stdin>', reader.path
       end
+
+      test 'PreprocessorReader#push_include method should set path from file automatically if not specified' do
+        lines = %w(a b c)
+        doc = Asciidoctor::Document.new lines
+        reader = doc.reader
+        append_lines = %w(one two three)
+        reader.push_include append_lines, '/tmp/lines.adoc'
+        assert_equal '/tmp/lines.adoc', reader.file
+        assert_equal 'lines.adoc', reader.path
+      end
     end
 
     context 'Include Directive' do
