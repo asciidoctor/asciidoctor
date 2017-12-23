@@ -47,13 +47,12 @@ class Reader
       @dir, @path = ::File.split @file
       @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     else
-      @file = cursor.file
-      @dir = cursor.dir
-      @path = cursor.path || '<stdin>'
-      if @file
-        # REVIEW might to look at this dir assignment closer
-        @dir = ::File.dirname @file unless @dir
-        @path = ::File.basename @file unless cursor.path
+      if (@file = cursor.file)
+        @dir = cursor.dir || (::File.dirname @file)
+        @path = cursor.path || (::File.basename @file)
+      else
+        @dir = cursor.dir || '.'
+        @path = cursor.path || '<stdin>'
       end
       @lineno = cursor.lineno || 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     end
