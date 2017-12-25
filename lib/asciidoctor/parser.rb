@@ -1869,7 +1869,9 @@ class Parser
         end
       end
 
-      unless author_metadata.empty?
+      if author_metadata.empty?
+        metadata['authorcount'] ||= (document.attributes['authorcount'] = 0)
+      else
         document.attributes.update author_metadata
 
         # special case
@@ -1893,22 +1895,23 @@ class Parser
   # returns a Hash of author metadata
   def self.process_authors author_line, names_only = false, multiple = true
     author_metadata = {}
+    author_idx = 0
     keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
     author_entries = multiple ? (author_line.split ';').map {|it| it.strip } : Array(author_line)
-    author_entries.each_with_index do |author_entry, idx|
+    author_entries.each do |author_entry|
       next if author_entry.empty?
+      author_idx += 1
       key_map = {}
-      if idx == 0
+      if author_idx == 1
         keys.each do |key|
           key_map[key.to_sym] = key
         end
       else
         keys.each do |key|
-          key_map[key.to_sym] = %(#{key}_#{idx + 1})
+          key_map[key.to_sym] = %(#{key}_#{author_idx})
         end
       end
 
-      segments = nil
       if names_only # when parsing an attribute value
         # QUESTION should we rstrip author_entry?
         if author_entry.include? '<'
@@ -1945,20 +1948,20 @@ class Parser
         author_metadata[key_map[:authorinitials]] = fname.chr
       end
 
-      author_metadata['authorcount'] = idx + 1
-      # only assign the _1 attributes if there are multiple authors
-      if idx == 1
-        keys.each do |key|
-          author_metadata[%(#{key}_1)] = author_metadata[key] if author_metadata.key? key
-        end
-      end
-      if idx == 0
+      if author_idx == 1
         author_metadata['authors'] = author_metadata[key_map[:author]]
       else
+        # only assign the _1 attributes once we see the second author
+        if author_idx == 2
+          keys.each do |key|
+            author_metadata[%(#{key}_1)] = author_metadata[key] if author_metadata.key? key
+          end
+        end
         author_metadata['authors'] = %(#{author_metadata['authors']}, #{author_metadata[key_map[:author]]})
       end
     end
 
+    author_metadata['authorcount'] = author_idx
     author_metadata
   end
 
