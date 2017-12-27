@@ -1,22 +1,85 @@
 # encoding: UTF-8
 module Asciidoctor
-# Public: Methods for parsing and converting AsciiDoc documents.
+# Public: The Document class represents a parsed AsciiDoc document.
 #
-# There are several strategies for getting the title of the document:
+# Document is the root node of a parsed AsciiDoc document. It provides an
+# abstract syntax tree (AST) that represents the structure of the AsciiDoc
+# document from which the Document object was parsed.
 #
-# doctitle - value of title attribute, if assigned and non-empty,
-#            otherwise title of first section in document, if present
-#            otherwise nil
-# name - an alias of doctitle
-# title - value of the title attribute, or nil if not present
-# first_section.title - title of first section in document, if present
-# header.title - title of section level 0
+# Although the constructor can be used to create an empty document object, more
+# commonly, you'll load the document object from AsciiDoc source using the
+# primary API methods, {Asciidoctor.load} or {Asciidoctor.load_file}. When
+# using one of these APIs, you almost always want to set the safe mode to
+# :safe (or :unsafe) to enable all of Asciidoctor's features.
 #
-# Keep in mind that you'll want to honor these document settings:
+#   Asciidoctor.load '= Hello, AsciiDoc!', safe: :safe
+#   # => Asciidoctor::Document { doctype: "article", doctitle: "Hello, Asciidoc!", blocks: 0 }
 #
-# notitle  - The h1 heading should not be shown
-# noheader - The header block (h1 heading, author, revision info) should not be shown
-# nofooter - the footer block should not be shown
+# Instances of this class can be used to extract information from the document
+# or alter its structure. As such, the Document object is most often used in
+# extensions and by integrations.
+#
+# The most basic usage of the Document object is to retrieve the document's
+# title.
+#
+#   source = '= Document Title'
+#   document = Asciidoctor.load source, safe: :safe
+#   document.doctitle
+#   # => 'Document Title'
+#
+# If the document has no title, the {Document#doctitle} method returns the
+# title of the first section. If that check falls through, you can have the
+# method return a fallback value (the value of the untitled-label attribute).
+#
+#   Asciidoctor.load('no doctitle', safe: :safe).doctitle use_fallback: true
+#   # => "Untitled"
+#
+# You can also use the Document object to access document attributes defined in
+# the header, such as the author and doctype.
+#
+#   source = '= Document Title
+#   Author Name
+#   :doctype: book'
+#   document = Asciidoctor.load source, safe: :safe
+#   document.author
+#   # => 'Author Name'
+#   document.doctype
+#   # => 'book'
+#
+# You can retrieve arbitrary document attributes defined in the header using
+# {Document#attr} or check for the existence of one using {Document#attr?}:
+#
+#   source = '= Asciidoctor
+#   :uri-project: http://asciidoctor.org'
+#   document = Asciidoctor.load source, safe: :safe
+#   document.attr 'uri-project'
+#   # => 'http://asciidoctor.org'
+#   document.attr? 'icons'
+#   # => false
+#
+# Starting at the Document object, you can begin walking the document tree using
+# the {Document#blocks} method:
+#
+#   source = 'paragraph contents
+#
+#   [sidebar]
+#   sidebar contents'
+#   doc = Asciidoctor.load source, safe: :safe
+#   doc.blocks.map {|block| block.context }
+#   # => [:paragraph, :sidebar]
+#
+# You can discover block nodes at any depth in the tree using the
+# {AbstractBlock#find_by} method.
+#
+#   source = '****
+#   paragraph in sidebar
+#   ****'
+#   doc = Asciidoctor.load source, safe: :safe
+#   doc.find_by(context: :paragraph).map {|block| block.context }
+#   # => [:paragraph]
+#
+# Loading a document object is the first step in the conversion process. You
+# can take the process to completion by calling the {Document#convert} method.
 class Document < AbstractBlock
 
   Footnote = ::Struct.new :index, :id, :text
