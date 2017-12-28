@@ -21,8 +21,9 @@ class Inline < AbstractNode
     @type = opts[:type]
     @target = opts[:target]
 
-    unless (more_attributes = opts[:attributes]).nil_or_empty?
-      update_attributes more_attributes
+    # value of attributes option for inline nodes may be nil
+    if (attrs = opts[:attributes])
+      @attributes = attrs.dup
     end
   end
 
