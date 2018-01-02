@@ -761,6 +761,28 @@ last line of outer'
         assert_includes output, expected
       end
 
+      test 'nested remote include directive that cannot be resolved does not crash processor' do
+        include_url = %(http://#{resolve_localhost}:9876/fixtures/file-with-missing-include.adoc)
+        nested_include_url = %(http://#{resolve_localhost}:9876/fixtures/no-such-file.adoc)
+        input = <<-EOS
+....
+include::#{include_url}[]
+....
+        EOS
+        begin
+          output, warnings = redirect_streams do |_, err|
+            result = using_test_webserver do
+              render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+            end
+            [result, err.string]
+          end
+
+          assert_includes output, %(Unresolved directive in #{include_url} - include::#{nested_include_url}[])
+        rescue
+          flunk 'include directive should not raise exception on missing file'
+        end
+      end
+
       test 'tag filtering is supported for remote includes' do
         url = %(http://#{resolve_localhost}:9876/fixtures/tagged-class.rb)
         input = <<-EOS
