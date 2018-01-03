@@ -778,6 +778,7 @@ include::#{include_url}[]
           end
 
           assert_includes output, %(Unresolved directive in #{include_url} - include::#{nested_include_url}[])
+          assert_includes warnings, 'include uri not readable'
         rescue
           flunk 'include directive should not raise exception on missing file'
         end

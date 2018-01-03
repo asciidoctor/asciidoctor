@@ -862,9 +862,9 @@ text in standalone
 // end simulated include::[]
       EOS
 
-      output = warnings = nil
+      warnings = nil
       redirect_streams do |out, err|
-        output = render_string input
+        render_string input
         warnings = err.string
       end
 
@@ -2848,9 +2848,9 @@ more part intro
 intro
       EOS
 
-      doc = warnings = nil
+      warnings = nil
       redirect_streams do |out, err|
-        doc = document_from_string input
+        document_from_string input
         warnings = err.string
       end
 
