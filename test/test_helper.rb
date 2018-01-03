@@ -145,13 +145,13 @@ class Minitest::Test
 
   def xmldoc_from_string(content)
     if content.match(RE_XMLNS_ATTRIBUTE)
-      doc = Nokogiri::XML::Document.parse(content)
+      Nokogiri::XML::Document.parse(content)
     elsif !(doctype_match = content.match(RE_DOCTYPE))
-      doc = Nokogiri::HTML::DocumentFragment.parse(content)
+      Nokogiri::HTML::DocumentFragment.parse(content)
     elsif doctype_match[1].start_with? 'html'
-      doc = Nokogiri::HTML::Document.parse(content)
+      Nokogiri::HTML::Document.parse(content)
     else
-      doc = Nokogiri::XML::Document.parse(content)
+      Nokogiri::XML::Document.parse(content)
     end
   end
 
