@@ -1575,13 +1575,13 @@ EOS
     test 'complex inline passthrough macro' do
       text_to_escape = %q{[(] <'basic form'> <'logical operator'> <'basic form'> [)]}
       para = block_from_string %($$#{text_to_escape}$$)
-      result = para.extract_passthroughs(para.source)
+      para.extract_passthroughs(para.source)
       assert_equal 1, para.passthroughs.size
       assert_equal text_to_escape, para.passthroughs[0][:text]
 
       text_to_escape_escaped = %q{[(\] <'basic form'> <'logical operator'> <'basic form'> [)\]}
       para = block_from_string %(pass:specialcharacters[#{text_to_escape_escaped}])
-      result = para.extract_passthroughs(para.source)
+      para.extract_passthroughs(para.source)
       assert_equal 1, para.passthroughs.size
       assert_equal text_to_escape, para.passthroughs[0][:text]
     end
