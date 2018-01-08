@@ -1,7 +1,6 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>; Ryan Waldron <https://github.com/erebor[@erebor]>
 // settings:
-:page-layout: base
 :idprefix:
 :idseparator: -
 :source-language: ruby
@@ -47,7 +46,7 @@ endif::[]
 :uri-user-manual: {uri-docs}/user-manual
 :uri-install-docker: https://github.com/asciidoctor/docker-asciidoctor
 //:uri-install-doc: {uri-docs}/install-toolchain
-:uri-install-macos-doc: {uri-docs}/install-asciidoctor-macosx
+:uri-install-macos-doc: {uri-docs}/install-asciidoctor-macos
 :uri-render-doc: {uri-docs}/render-documents
 :uri-themes-doc: {uri-docs}/produce-custom-themes-using-asciidoctor-stylesheet-factory
 :uri-gitscm-repo: https://github.com/git/git-scm.com
@@ -207,7 +206,7 @@ To upgrade the gem, use:
 
 TIP: Your system may be configured to automatically update rpm packages, in which case no action is required by you to update the gem.
 
-==== apt-get (Debian, Ubuntu, Mint)
+==== apt-get (Debian, Ubuntu, or Mint)
 
 To install the gem on Debian, Ubuntu or Mint, open a terminal and type:
 
@@ -429,6 +428,7 @@ The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and
 
 *AsciiDoc* was started by Stuart Rackham and has received contributions from many other individuals in the AsciiDoc community.
 
+ifndef::env-site[]
 == Changelog
 
 ifeval::[{safe-mode-level} < 20]
@@ -436,3 +436,4 @@ include::CHANGELOG.adoc[tag=compact,leveloffset=+1]
 endif::[]
 
 Refer to the {uri-changelog}[CHANGELOG] for a complete list of changes in older releases.
+endif::[]
