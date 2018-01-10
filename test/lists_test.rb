@@ -2347,6 +2347,18 @@ A term::::: a description
       assert_xpath '//dt[text()="A term:"]', output, 1
       assert_xpath '//dd/p[text()="a description"]', output, 1
     end
+
+    test 'text method of dd node should return nil if dd node only contains blocks' do
+      input = <<-EOS
+term::
++
+paragraph
+      EOS
+
+      doc = document_from_string input
+      dd = doc.blocks[0].items[0][1]
+      assert_nil dd.text
+    end
   end
 
   context "Nested lists" do

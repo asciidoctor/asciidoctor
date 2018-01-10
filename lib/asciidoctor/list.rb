@@ -73,7 +73,8 @@ class ListItem < AbstractBlock
   #
   # Returns the converted String text for this ListItem
   def text
-    apply_subs @text, @subs
+    # NOTE @text can be nil if dd node only has block content
+    @text && (apply_subs @text, @subs)
   end
 
   # Public: Set the String text.
