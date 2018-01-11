@@ -396,7 +396,7 @@ But we can't do it without your feedback!
 We encourage you to ask questions and discuss any aspects of the project on the discussion list, on Twitter or in the chat room.
 
 Discussion list (Nabble):: {uri-discuss}
-Twitter:: #asciidoctor hashtag or @asciidoctor mention
+Twitter:: https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag or https://twitter.com/asciidoctor[@asciidoctor] mention
 Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
 ////
 Chat (IRC):: {uri-irc}[#asciidoctor] on FreeNode IRC
