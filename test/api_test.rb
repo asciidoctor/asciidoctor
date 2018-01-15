@@ -153,6 +153,13 @@ idseparator=-')
       assert doc.attributes.has_key?('toc')
     end
 
+    test 'should not expand value of docdir attribute if specified via API' do
+      docdir = 'virtual/directory'
+      doc = document_from_string '', :safe => :safe, :attributes => { 'docdir' => docdir }
+      assert_equal docdir, (doc.attr 'docdir')
+      assert_equal docdir, doc.base_dir
+    end
+
     test 'should output timestamps by default' do
       doc = document_from_string 'text', :backend => :html5, :attributes => nil
       result = doc.convert
