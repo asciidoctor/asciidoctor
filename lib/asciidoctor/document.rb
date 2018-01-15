@@ -319,13 +319,13 @@ class Document < AbstractBlock
     # legacy support for numbered attribute
     attr_overrides['sectnums'] = attr_overrides.delete 'numbered' if attr_overrides.key? 'numbered'
 
-    # if the base_dir option is specified, it overrides docdir as the root for relative paths
-    # otherwise, the base_dir is the directory of the source file (docdir) or the current
-    # directory of the input is a string
+    # If the base_dir option is specified, it overrides docdir and used as the root for relative
+    # paths. Otherwise, the base_dir is the directory of the source file (docdir), if set, or else
+    # the current directory.
     if options[:base_dir]
       @base_dir = attr_overrides['docdir'] = ::File.expand_path(options[:base_dir])
     elsif attr_overrides['docdir']
-      @base_dir = attr_overrides['docdir'] = ::File.expand_path(attr_overrides['docdir'])
+      @base_dir = attr_overrides['docdir']
     else
       #warn 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
       @base_dir = attr_overrides['docdir'] = ::File.expand_path(::Dir.pwd)
