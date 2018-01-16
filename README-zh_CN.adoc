@@ -139,6 +139,7 @@ Asciidoctor 可以在 Linux，OSX (Mac) 和 Windows，并且需要下面其中�
 
 一旦你做了这个改变，所有的编码问题，都将迎刃而解。
 只要你在任何地方都是 UTF-8，Asciidoctor 总会工作地很好。
+如果你使用的是像 Eclipse 这样的 IDE 集成开发工具，你也需要确保他被你设置为 UTF-8 编码。
 ====
 
 [#installation]
