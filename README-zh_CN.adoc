@@ -392,7 +392,7 @@ Asciidoctor 支持自定义转化器，它可以操作从待处理文件到生�
 我们鼓励你在讨论组、Twitter或聊天室里，提问为题，讨论项目的方方面面，
 
 讨论组 (Nabble):: {uri-discuss}
-Twitter:: #asciidoctor 井号或 @asciidoctor 提醒
+Twitter:: https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] 来加入话题 或 https://twitter.com/asciidoctor[@asciidoctor] at并提醒我们
 聊天 (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
 
 ifdef::env-github[]
