@@ -4588,4 +4588,20 @@ listing block in list item 1
     assert_equal '`three`', list.items[2].text
     assert_equal '<mark>four</mark>', list.items[3].text
   end
+
+  test 'lineno should return source line number where the list started' do
+    input = <<-EOS
+* bullet 1
+** bullet 1.1
+*** bullet 1.1.1
+* bullet 2
+    EOS
+    doc = document_from_string input, { :sourcemap => true }
+    list1 = (doc.find_by :context => :ulist).first
+    list2 = list1.items[0].blocks[0]
+    list3 = list2.items[0].blocks[0]
+    assert_equal 1, list1.lineno
+    assert_equal 2, list2.lineno
+    assert_equal 3, list3.lineno
+  end
 end
