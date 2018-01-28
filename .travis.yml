@@ -20,14 +20,6 @@ env:
   global:
   # use system libraries to speed up installation of nokogiri
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-before_install:
-- >-
-  if [ "`rvm current`" == "ruby-2.5.0" ]; then
-  rvm use @global &&
-  gem uninstall -x --silent bundler &&
-  rvm use @ &&
-  gem install --silent bundler;
-  fi
 script: bundle exec rake coverage test:all
 after_success: bundle exec rake build:dependents
 notifications:
