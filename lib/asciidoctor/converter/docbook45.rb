@@ -18,8 +18,8 @@ module Asciidoctor
 
     def olist node
       result = []
-      num_attribute = node.style ? %( numeration="#{node.style}") : nil
-      start_attribute = (node.attr? 'start') ? %( override="#{node.attr 'start'}") : nil
+      num_attribute = node.style ? %( numeration="#{node.style}") : ''
+      start_attribute = (node.attr? 'start') ? %( override="#{node.attr 'start'}") : ''
       result << %(<orderedlist#{common_attributes node.id, node.role, node.reftext}#{num_attribute}>)
       result << %(<title>#{node.title}</title>) if node.title?
       node.items.each_with_index do |item, idx|
@@ -53,10 +53,17 @@ module Asciidoctor
     end
 
     def author_element doc, index = nil
-      firstname_key = index ? %(firstname_#{index}) : 'firstname'
-      middlename_key = index ? %(middlename_#{index}) : 'middlename'
-      lastname_key = index ? %(lastname_#{index}) : 'lastname'
-      email_key = index ? %(email_#{index}) : 'email'
+      if index
+        firstname_key = %(firstname_#{index})
+        middlename_key = %(middlename_#{index})
+        lastname_key = %(lastname_#{index})
+        email_key = %(email_#{index})
+      else
+        firstname_key = 'firstname'
+        middlename_key = 'middlename'
+        lastname_key = 'lastname'
+        email_key = 'email'
+      end
 
       result = []
       result << '<author>'
@@ -92,7 +99,7 @@ module Asciidoctor
       if (ns = doc.attr 'xmlns')
         ns.empty? ? ' xmlns="http://docbook.org/ns/docbook"' : %( xmlns="#{ns}")
       else
-        nil
+        ''
       end
     end
   end
