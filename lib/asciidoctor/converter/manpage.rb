@@ -200,7 +200,7 @@ module Asciidoctor
 .nr an-break-flag 1
 .br
 .ps +1
-.B #{node.attr 'textlabel'}#{node.title? ? "\\fP: #{manify node.title}" : nil}
+.B #{node.attr 'textlabel'}#{node.title? ? "\\fP: #{manify node.title}" : ''}
 .ps -1
 .br
 #{resolve_content node}
@@ -387,7 +387,7 @@ r lw(\n(.lu*75u/100u).'
     def stem node
       title_element = node.title? ? %(.sp
 .B #{manify node.title}
-.br) : nil
+.br) : ''
       open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
 
       unless ((equation = node.content).start_with? open) && (equation.end_with? close)
@@ -583,8 +583,8 @@ allbox tab(:);'
     end
 
     def video node
-      start_param = (node.attr? 'start', nil, false) ? %(&start=#{node.attr 'start'}) : nil
-      end_param = (node.attr? 'end', nil, false) ? %(&end=#{node.attr 'end'}) : nil
+      start_param = (node.attr? 'start', nil, false) ? %(&start=#{node.attr 'start'}) : ''
+      end_param = (node.attr? 'end', nil, false) ? %(&end=#{node.attr 'end'}) : ''
       result = []
       result << %(.sp
 .B #{manify node.title}
@@ -598,7 +598,7 @@ allbox tab(:);'
       case node.type
       when :link
         if (text = node.text) == target
-          text = nil
+          text = ''
         else
           text = text.gsub '"', %[#{ESC_BS}(dq]
         end
