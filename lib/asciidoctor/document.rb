@@ -434,7 +434,7 @@ class Document < AbstractBlock
         attrs.delete(key)
       else
         # a value ending in @ indicates this attribute does not override
-        # an attribute with the same key in the document souce
+        # an attribute with the same key in the document source
         if ::String === val && (val.end_with? '@')
           val = val.chop
           verdict = true
