@@ -1113,6 +1113,23 @@ content{blank}footnote:[commentary]
       assert_same doc.catalog[:ids], doc.references[:ids]
       assert_equal 'Section A', doc.references[:ids]['_section_a']
     end
+
+    test 'should catalog assets inside nested document' do
+      input = <<-EOS
+image::outer.png[]
+
+|===
+a|
+image::inner.png[]
+|===
+      EOS
+
+      doc = document_from_string input, :catalog_assets => true
+      images = doc.catalog[:images]
+      refute_empty images
+      assert_equal 2, images.size
+      assert_equal images, ['outer.png', 'inner.png']
+    end
   end
 
   context 'Backends and Doctypes' do
