@@ -419,7 +419,9 @@ allbox tab(:);'
       row_header = []
       row_text = []
       row_index = 0
-      node.rows.by_section.each do |tsec, rows|
+      rows_by_section = node.rows.by_section
+      rows_by_section << (rows_by_section.delete_at 1)
+      rows_by_section.each do |tsec, rows|
         rows.each do |row|
           row_header[row_index] ||= []
           row_text[row_index] ||= []

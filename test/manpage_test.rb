@@ -247,12 +247,45 @@ First paragraph.
   end
 
   context 'Table' do
+    test 'should create header, body, and footer rows in correct order' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+[%header%footer]
+|===
+|Header
+|Body 1
+|Body 2
+|Footer
+|===)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert output.end_with? 'allbox tab(:);
+lt.
+T{
+.sp
+Header
+T}
+T{
+.sp
+Body 1
+T}
+T{
+.sp
+Body 2
+T}
+T{
+.sp
+Footer
+T}
+.TE
+.sp'
+    end
+
     test 'should manify normal table cell content' do
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
-[%header%footer,cols=2*]
 |===
 |*Col A* |_Col B_
+
 |*bold* |`mono`
 |_italic_ | #mark#
 |===)
