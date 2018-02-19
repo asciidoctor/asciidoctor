@@ -243,6 +243,7 @@ class Document < AbstractBlock
     if (parent_doc = options.delete :parent)
       @parent_document = parent_doc
       options[:base_dir] ||= parent_doc.base_dir
+      options[:catalog_assets] = true if parent_doc.options[:catalog_assets]
       @catalog = parent_doc.catalog.inject({}) do |accum, (key, table)|
         accum[key] = (key == :footnotes ? [] : table)
         accum
