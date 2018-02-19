@@ -869,8 +869,7 @@ class Document < AbstractBlock
   # Internal: Restore the attributes to the previously saved state (attributes in header)
   def restore_attributes
     @catalog[:callouts].rewind unless @parent_document
-    # QUESTION shouldn't this be a dup in case we convert again?
-    @attributes = @header_attributes
+    @attributes.replace @header_attributes
   end
 
   # Internal: Delete any attributes stored for playback

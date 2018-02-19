@@ -212,6 +212,25 @@ idseparator=-')
       end
     end
 
+    test 'should be able to restore header attributes after call to convert' do
+      input = <<-EOS
+= Document Title
+:foo: bar
+
+content
+
+:foo: baz
+
+content
+      EOS
+      doc = Asciidoctor.load input
+      assert_equal 'bar', (doc.attr 'foo')
+      doc.convert
+      assert_equal 'baz', (doc.attr 'foo')
+      doc.restore_attributes
+      assert_equal 'bar', (doc.attr 'foo')
+    end
+
     test 'should track file and line information with blocks if sourcemap option is set' do
       doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), :sourcemap => true
 
