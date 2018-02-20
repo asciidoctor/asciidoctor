@@ -422,9 +422,9 @@ content
         '/img/favicon.png' => %w(/img/favicon.png image/png)
       }.each {|val, (href, type)|
         result = render_string %(= Untitled), :attributes => { 'favicon' => val }
-        assert_css 'link[rel="shortcut icon"]', result, 1
-        assert_css %(link[rel="shortcut icon"][href="#{href}"]), result, 1
-        assert_css %(link[rel="shortcut icon"][type="#{type}"]), result, 1
+        assert_css 'link[rel="icon"]', result, 1
+        assert_css %(link[rel="icon"][href="#{href}"]), result, 1
+        assert_css %(link[rel="icon"][type="#{type}"]), result, 1
       }
     end
   end
