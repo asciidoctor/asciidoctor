@@ -1287,6 +1287,7 @@ module Asciidoctor
   # Returns the Document
   def load input, options = {}
     options = options.dup
+
     if (timings = options[:timings])
       timings.start :read
     end
@@ -1511,15 +1512,11 @@ module Asciidoctor
       outdir = nil
     end
 
-    timings.start :convert if timings
     opts = outfile && !stream_output ? { 'outfile' => outfile, 'outdir' => outdir } : {}
     output = doc.convert opts
-    timings.record :convert if timings
 
     if outfile
-      timings.start :write if timings
       doc.write output, outfile
-      timings.record :write if timings
 
       # NOTE document cannot control this behavior if safe >= SafeMode::SERVER
       # NOTE skip if stylesdir is a URI
