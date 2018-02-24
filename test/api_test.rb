@@ -454,6 +454,14 @@ term without description::
       assert_kind_of Asciidoctor::List, result[1]
       assert_kind_of Asciidoctor::ListItem, result[2]
     end
+
+    test 'timings are recorded for each step when load and convert are called separately' do
+      sample_input_path = fixture_path 'asciidoc_index.txt'
+      (Asciidoctor.load_file sample_input_path, :timings => (timings = Asciidoctor::Timings.new)).convert
+      refute_equal '0.00000', '%05.5f' % timings.read_parse.to_f
+      refute_equal '0.00000', '%05.5f' % timings.convert.to_f
+      refute_equal timings.read_parse, timings.total
+    end
   end
   
   context 'Convert' do
@@ -784,6 +792,14 @@ text
       ensure
         FileUtils.rm(sample_output_path)
       end
+    end
+
+    test 'timings are recorded for each step' do
+      sample_input_path = fixture_path 'asciidoc_index.txt'
+      Asciidoctor.convert_file sample_input_path, :timings => (timings = Asciidoctor::Timings.new), :to_file => false
+      refute_equal '0.00000', '%05.5f' % timings.read_parse.to_f
+      refute_equal '0.00000', '%05.5f' % timings.convert.to_f
+      refute_equal timings.read_parse, timings.total
     end
   end
 end

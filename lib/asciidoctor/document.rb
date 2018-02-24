@@ -259,6 +259,7 @@ class Document < AbstractBlock
       @safe = parent_doc.safe
       @attributes['compat-mode'] = '' if (@compat_mode = parent_doc.compat_mode)
       @sourcemap = parent_doc.sourcemap
+      @timings = nil
       @converter = parent_doc.converter
       initialize_extensions = false
       @extensions = parent_doc.extensions
@@ -309,6 +310,7 @@ class Document < AbstractBlock
       end
       @compat_mode = attr_overrides.key? 'compat-mode'
       @sourcemap = options[:sourcemap]
+      @timings = options.delete :timings
       @converter = nil
       initialize_extensions = defined? ::Asciidoctor::Extensions
       @extensions = nil # initialize furthur down
@@ -1100,9 +1102,8 @@ class Document < AbstractBlock
   # loaded by the Converter. If a :template_dir is not specified,
   # or a template is missing, the converter will fall back to
   # using the appropriate built-in template.
-  #--
-  # QUESTION should we dup @header_attributes before converting?
   def convert opts = {}
+    @timings.start :convert if @timings
     parse unless @parsed
     unless @safe >= SafeMode::SERVER || opts.empty?
       # QUESTION should we store these on the Document object?
@@ -1133,6 +1134,7 @@ class Document < AbstractBlock
       end
     end
 
+    @timings.record :convert if @timings
     output
   end
 
@@ -1143,7 +1145,10 @@ class Document < AbstractBlock
   #
   # If the converter responds to :write, delegate the work of writing the file
   # to that method. Otherwise, write the output the specified file.
+  #
+  # Returns nothing
   def write output, target
+    @timings.start :write if @timings
     if Writer === @converter
       @converter.write output, target
     else
@@ -1159,8 +1164,9 @@ class Document < AbstractBlock
       if @backend == 'manpage' && ::String === target && (@converter.respond_to? :write_alternate_pages)
         @converter.write_alternate_pages @attributes['mannames'], @attributes['manvolnum'], target
       end
-      nil
     end
+    @timings.record :write if @timings
+    nil
   end
 
 =begin
