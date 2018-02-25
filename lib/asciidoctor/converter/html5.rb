@@ -635,7 +635,15 @@ Your browser does not support the audio tag.
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
       open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
 
-      unless ((equation = node.content).start_with? open) && (equation.end_with? close)
+      equation = node.content
+
+      slash = @void_element_slash
+      br = %(<br#{slash}>)
+      if node.style == 'asciimath'
+        equation = equation.gsub(/(\R|\\)\R+/, %(#{close}#{br}#{open}))
+      end
+
+      unless (equation.start_with? open) && (equation.end_with? close)
         equation = %(#{open}#{equation}#{close})
       end
 
