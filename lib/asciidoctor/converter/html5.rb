@@ -19,6 +19,7 @@ module Asciidoctor
       #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
     }).default = ['', '', false]
 
+    StemBreakRx = /(?:\n| +\\)\n+/
     SvgPreambleRx = /\A.*?(?=<svg\b)/m
     SvgStartTagRx = /\A<svg[^>]*>/
     DimensionAttributeRx = /\s(?:width|height|style)=(["']).*?\1/
@@ -633,9 +634,15 @@ Your browser does not support the audio tag.
     def stem node
       id_attribute = node.id ? %( id="#{node.id}") : ''
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
-      open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
+      open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
+      equation = node.content
 
-      unless ((equation = node.content).start_with? open) && (equation.end_with? close)
+      if style == :asciimath && (equation.include? LF)
+        equationSep = %(#{close}<br#{@void_element_slash}>#{LF}#{open})
+        equation = equation.gsub StemBreakRx, equationSep
+      end
+
+      unless (equation.start_with? open) && (equation.end_with? close)
         equation = %(#{open}#{equation}#{close})
       end
 
