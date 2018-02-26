@@ -14,20 +14,37 @@ module Asciidoctor
       @log[key] = (now - (@timers.delete key))
     end
 
+    def time *keys
+      time = keys.reduce(0) {|sum, key| sum + (@log[key] || 0) }
+      time > 0 ? time : nil
+    end
+
+    def read
+      time :read
+    end
+
+    def parse
+      time :parse
+    end
+
     def read_parse
-      (time = (@log[:read] || 0) + (@log[:parse] || 0)) > 0 ? time : nil
+      time :read, :parse
     end
 
     def convert
-      @log[:convert] || 0
+      time :convert
     end
 
     def read_parse_convert
-      (time = (@log[:read] || 0) + (@log[:parse] || 0) + (@log[:convert] || 0)) > 0 ? time : nil
+      time :read, :parse, :convert
+    end
+
+    def write
+      time :write
     end
 
     def total
-      (time = (@log[:read] || 0) + (@log[:parse] || 0) + (@log[:convert] || 0) + (@log[:write] || 0)) > 0 ? time : nil
+      time :read, :parse, :convert, :write
     end
 
     def print_report to = $stdout, subject = nil
