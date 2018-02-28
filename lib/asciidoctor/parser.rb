@@ -204,7 +204,7 @@ class Parser
     if is_next_line_section? reader, {}
       name_section = initialize_section reader, document, {}
       if name_section.level == 1
-        name_section_buffer = (reader.read_lines_until :break_on_blank_lines => true) * ' '
+        name_section_buffer = (reader.read_lines_until :break_on_blank_lines => true, :skip_line_comments => true) * ' '
         if ManpageNamePurposeRx =~ name_section_buffer
           document.attributes['manname-title'] ||= name_section.title
           document.attributes['manname-id'] = name_section.id if name_section.id
