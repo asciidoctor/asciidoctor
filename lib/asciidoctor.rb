@@ -1390,7 +1390,7 @@ module Asciidoctor
   #
   # Returns the Asciidoctor::Document
   def load_file filename, options = {}
-    ::File.open(filename) {|file| self.load file, options }
+    ::File.open(filename, 'rb') {|file| self.load file, options }
   end
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and
@@ -1587,7 +1587,7 @@ module Asciidoctor
   # Returns the Document object if the converted String is written to a
   # file, otherwise the converted String
   def convert_file filename, options = {}
-    ::File.open(filename) {|file| self.convert file, options }
+    ::File.open(filename, 'rb') {|file| self.convert file, options }
   end
 
   # Alias render_file to convert_file to maintain backwards compatibility
