@@ -43,6 +43,33 @@ context 'Manpage' do
       assert_includes output.lines, %(command, alt_command \\- does stuff\n)
     end
 
+    test 'should skip line comments in NAME section' do
+      input = <<-EOS
+= foobar (1)
+Author Name
+:doctype: manpage
+:man manual: Foo Bar Manual
+:man source: Foo Bar 1.0
+
+== NAME
+
+// follows the form `name - description`
+foobar - puts some foo on the bar
+// a little bit of this, a little bit of that
+
+== SYNOPSIS
+
+*foobar* [_OPTIONS_]...
+
+== DESCRIPTION
+
+When you need to put some foo on the bar.
+      EOS
+
+      doc = Asciidoctor.load input, :backend => :manpage, :header_footer => true
+      assert_equal 'puts some foo on the bar', (doc.attr 'manpurpose') 
+    end
+
     test 'should define default linkstyle' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
