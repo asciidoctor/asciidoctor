@@ -1331,11 +1331,11 @@ line below
       assert_equal expect.strip, output.strip
     end
 
-    test 'should not split equation in AsciiMath block if newline is escaped' do
+    test 'should not split equation in AsciiMath block at single newline' do
       input = <<-'EOS'
 [asciimath]
 ++++
-f: bbb"N" -> bbb"N" \
+f: bbb"N" -> bbb"N"
 f: x |-> x + 1
 ++++
       EOS
@@ -1350,16 +1350,37 @@ f: x |-&gt; x + 1\$
       assert_equal expected, nodes.first.inner_html.strip
     end
 
-    test 'should split equation in AsciiMath block at unescaped newline' do
+    test 'should split equation in AsciiMath block at escaped newline' do
       input = <<-'EOS'
 [asciimath]
 ++++
-f: bbb"N" -> bbb"N"
+f: bbb"N" -> bbb"N" \
 f: x |-> x + 1
 ++++
       EOS
       expected = <<-'EOS'.chomp
 \$f: bbb"N" -&gt; bbb"N"\$<br>
+\$f: x |-&gt; x + 1\$
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.stemblock', output, 1
+      nodes = xmlnodes_at_xpath '//*[@class="content"]', output
+      assert_equal expected, nodes.first.inner_html.strip
+    end
+
+    test 'should split equation in AsciiMath block at sequence of escaped newlines' do
+      input = <<-'EOS'
+[asciimath]
+++++
+f: bbb"N" -> bbb"N" \
+\
+f: x |-> x + 1
+++++
+      EOS
+      expected = <<-'EOS'.chomp
+\$f: bbb"N" -&gt; bbb"N"\$<br>
+<br>
 \$f: x |-&gt; x + 1\$
       EOS
 
@@ -1375,11 +1396,13 @@ f: x |-> x + 1
 ++++
 f: bbb"N" -> bbb"N"
 
+
 f: x |-> x + 1
 ++++
       EOS
       expected = <<-'EOS'.chomp
 \$f: bbb"N" -&gt; bbb"N"\$<br>
+<br>
 <br>
 \$f: x |-&gt; x + 1\$
 EOS

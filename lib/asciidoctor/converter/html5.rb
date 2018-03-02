@@ -19,7 +19,7 @@ module Asciidoctor
       #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
     }).default = ['', '', false]
 
-    StemBreakRx = /( +\\)?(\n+)/
+    StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
     SvgPreambleRx = /\A.*?(?=<svg\b)/m
     SvgStartTagRx = /\A<svg[^>]*>/
     DimensionAttributeRx = /\s(?:width|height|style)=(["']).*?\1/
@@ -639,7 +639,7 @@ Your browser does not support the audio tag.
 
       if style == :asciimath && (equation.include? LF)
         br = %(<br#{@void_element_slash}>#{LF})
-        equation = equation.gsub(StemBreakRx) { $1 ? LF : %(#{close}#{br * $2.length}#{open}) }
+        equation = equation.gsub(StemBreakRx) { %(#{close}#{br * ($&.count LF)}#{open}) }
       end
 
       unless (equation.start_with? open) && (equation.end_with? close)
