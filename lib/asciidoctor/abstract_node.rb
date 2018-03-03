@@ -456,7 +456,7 @@ class AbstractNode
     path_resolver = (@path_resolver ||= PathResolver.new)
     if (doc = @document).safe < SafeMode::SAFE
       if start
-        start = ::File.join doc.base_dir, start unless path_resolver.is_root? start
+        start = ::File.join doc.base_dir, start unless path_resolver.root? start
       else
         start = doc.base_dir
       end

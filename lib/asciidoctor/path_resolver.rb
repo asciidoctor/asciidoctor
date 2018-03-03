@@ -124,7 +124,7 @@ class PathResolver
   def initialize file_separator = nil, working_dir = nil
     @file_separator = file_separator ? file_separator : (::File::ALT_SEPARATOR || ::File::SEPARATOR)
     if working_dir
-      @working_dir = (is_root? working_dir) ? working_dir : (::File.expand_path working_dir)
+      @working_dir = (root? working_dir) ? working_dir : (::File.expand_path working_dir)
     else
       @working_dir = ::File.expand_path ::Dir.pwd
     end
@@ -141,13 +141,13 @@ class PathResolver
   #
   # returns a Boolean indicating whether the path is an absolute root path
   if RUBY_ENGINE == 'opal'
-    def is_root? path
+    def root? path
       (path.start_with? SLASH) ||
           (::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && (path.start_with? 'file://')) ||
           (@file_separator == BACKSLASH && (WindowsRootRx.match? path))
     end
   else
-    def is_root? path
+    def root? path
       (path.start_with? SLASH) || (@file_separator == BACKSLASH && (WindowsRootRx.match? path))
     end
   end
@@ -157,7 +157,7 @@ class PathResolver
   # path - the String path to check
   #
   # returns a Boolean indicating whether the path is a UNC path
-  def is_unc? path
+  def unc? path
     path.start_with? DOUBLE_SLASH
   end
 
@@ -166,7 +166,7 @@ class PathResolver
   # path - the String path to check
   #
   # returns a Boolean indicating whether the path is an absolute (root) web path
-  def is_web_root? path
+  def web_root? path
     path.start_with? SLASH
   end
 
@@ -224,7 +224,7 @@ class PathResolver
 
     root = if web
       # ex. /sample/path
-      if is_web_root? posix_path
+      if web_root? posix_path
         SLASH
       # ex. ./sample/path
       elsif posix_path.start_with? DOT_SLASH
@@ -234,9 +234,9 @@ class PathResolver
         nil
       end
     else
-      if is_root? posix_path
+      if root? posix_path
         # ex. //sample/path
-        if is_unc? posix_path
+        if unc? posix_path
           DOUBLE_SLASH
         # ex. /sample/path
         elsif posix_path.start_with? SLASH
@@ -308,7 +308,7 @@ class PathResolver
   # that the resolved path be contained within the jail, if provided
   def system_path target, start = nil, jail = nil, opts = {}
     if jail
-      unless is_root? jail
+      unless root? jail
         raise ::SecurityError, %(Jail is not an absolute path: #{jail})
       end
       jail = posixify jail
@@ -323,7 +323,7 @@ class PathResolver
     if target_segments.empty?
       if start.nil_or_empty?
         return jail ? jail : @working_dir
-      elsif is_root? start
+      elsif root? start
         unless jail
           return expand_path start
         end
@@ -343,7 +343,7 @@ class PathResolver
 
     if start.nil_or_empty?
       start = jail ? jail : @working_dir
-    elsif is_root? start
+    elsif root? start
       start = posixify start
     else
       start = system_path start, jail, jail, opts
@@ -412,7 +412,7 @@ class PathResolver
     start = posixify start
     uri_prefix = nil
 
-    unless start.nil_or_empty? || (is_web_root? target)
+    unless start.nil_or_empty? || (web_root? target)
       target = (start.end_with? SLASH) ? %(#{start}#{target}) : %(#{start}#{SLASH}#{target})
       if (uri_prefix = Helpers.uri_prefix target)
         target = target[uri_prefix.length..-1]
@@ -420,7 +420,7 @@ class PathResolver
     end
 
     # use this logic instead if we want to normalize target if it contains a URI
-    #unless is_web_root? target
+    #unless web_root? target
     #  if preserve_uri_target && (uri_prefix = Helpers.uri_prefix target)
     #    target = target[uri_prefix.length..-1]
     #  elsif !start.nil_or_empty?
@@ -466,7 +466,7 @@ class PathResolver
   #
   # Return the [String] relative path of the filename calculated from the base directory.
   def relative_path filename, base_directory
-    if (is_root? filename) && (filename.start_with? base_directory)
+    if (root? filename) && (filename.start_with? base_directory)
       filename.slice base_directory.length + 1, filename.length
     else
       filename
