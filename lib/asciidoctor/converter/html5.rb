@@ -778,6 +778,9 @@ Your browser does not support the audio tag.
       result = []
       id_attribute = node.id ? %( id="#{node.id}") : ''
       classes = ['tableblock', %(frame-#{node.attr 'frame', 'all'}), %(grid-#{node.attr 'grid', 'all'})]
+      if (stripe = node.attr 'stripe')
+        classes << %(stripe-#{stripe})
+      end
       styles = []
       unless (node.option? 'autowidth') && !(node.attr? 'width', nil, false)
         if node.attr? 'tablepcwidth', 100
