@@ -577,7 +577,7 @@ Feature: Cross References
   When it is converted to html
   Then the result should match the HTML structure
     """
-    table.tableblock.frame-all.grid-all.spread
+    table.tableblock.frame-all.grid-all.stretch
       colgroup
         col style='width: 100%;'
       tbody

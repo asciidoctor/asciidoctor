@@ -21,7 +21,7 @@ context 'Tables' do
       assert 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert
       assert_css 'table', output, 1
-      assert_css 'table.tableblock.frame-all.grid-all.spread', output, 1
+      assert_css 'table.tableblock.frame-all.grid-all.stretch', output, 1
       assert_css 'table > colgroup > col[style*="width: 33.3333%"]', output, 2
       assert_css 'table > colgroup > col:last-of-type[style*="width: 33.3334%"]', output, 1
       assert_css 'table tr', output, 3
