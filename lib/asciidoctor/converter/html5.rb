@@ -791,7 +791,7 @@ Your browser does not support the audio tag.
       styles = []
       unless (node.option? 'autowidth') && !(node.attr? 'width', nil, false)
         if node.attr? 'tablepcwidth', 100
-          classes << 'spread'
+          classes << 'stretch'
         else
           styles << %(width: #{node.attr 'tablepcwidth'}%;)
         end
