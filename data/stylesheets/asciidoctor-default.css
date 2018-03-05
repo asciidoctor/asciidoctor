@@ -257,6 +257,8 @@ table.grid-all>tbody>tr:last-child>.tableblock,table.grid-all>thead:last-child>t
 table.frame-all{border-width:1px}
 table.frame-sides{border-width:0 1px}
 table.frame-topbot{border-width:1px 0}
+table.stripe-all tr,table.stripe-odd tr:nth-of-type(odd){background:#f8f8f7}
+table.stripe-none tr,table.stripe-odd tr:nth-of-type(even){background:none}
 th.halign-left,td.halign-left{text-align:left}
 th.halign-right,td.halign-right{text-align:right}
 th.halign-center,td.halign-center{text-align:center}
