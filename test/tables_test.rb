@@ -947,7 +947,7 @@ third paragraph
       assert_xpath %((//p[@class="tableblock"])[3][text()="third paragraph"]), result, 1
     end
 
-    test 'basic asciidoc cell' do
+    test 'basic AsciiDoc cell' do
       input = <<-EOS
 |===
 a|--
@@ -966,7 +966,19 @@ content
       assert_css 'table.tableblock td.tableblock .openblock .paragraph', result, 1
     end
 
-    test 'doctype can be set in asciidoc table cell' do
+    test 'AsciiDoc table cell should be wrapped in div with class "content"' do
+      input = <<-EOS
+|===
+a|AsciiDoc table cell
+|===
+      EOS
+
+      result = render_embedded_string input
+      assert_css 'table.tableblock td.tableblock > div.content', result, 1
+      assert_css 'table.tableblock td.tableblock > div.content > div.paragraph', result, 1
+    end
+
+    test 'doctype can be set in AsciiDoc table cell' do
       input = <<-EOS
 |===
 a|
@@ -1028,7 +1040,7 @@ doctype={doctype}
       assert_includes result, '{backend-html5-doctype-article}'
     end
 
-    test 'asciidoc content' do
+    test 'AsciiDoc content' do
       input = <<-EOS
 [cols="1e,1,5a",frame="topbot",options="header"]
 |===

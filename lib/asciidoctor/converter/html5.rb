@@ -830,7 +830,7 @@ Your browser does not support the audio tag.
               else
                 case cell.style
                 when :asciidoc
-                  cell_content = %(<div>#{cell.content}</div>)
+                  cell_content = %(<div class="content">#{cell.content}</div>)
                 when :verse
                   cell_content = %(<div class="verse">#{cell.text}</div>)
                 when :literal

@@ -583,7 +583,7 @@ Feature: Cross References
       tbody
         tr
           td.tableblock.halign-left.valign-top
-            div
+            div.content
               .paragraph: p
                 |See
                 a< href='#_install' Install
