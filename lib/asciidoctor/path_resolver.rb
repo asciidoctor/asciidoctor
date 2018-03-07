@@ -135,7 +135,8 @@ class PathResolver
   # This operation considers posix paths, windows paths, and file URLs.
   #
   # Unix absolute paths and UNC paths start with slash. Windows roots can start
-  # with a drive letter. Absolute paths in the browser start with file://.
+  # with a drive letter. Absolute paths may start with file://, http://, or
+  # https:// when the IO module is xmlhttprequest (Opal runtime only).
   #
   # path - the String path to check
   #
@@ -143,8 +144,8 @@ class PathResolver
   if RUBY_ENGINE == 'opal'
     def root? path
       (path.start_with? SLASH) ||
-          (::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && (path.start_with? 'file://')) ||
-          (@file_separator == BACKSLASH && (WindowsRootRx.match? path))
+          (@file_separator == BACKSLASH && (WindowsRootRx.match? path)) ||
+          (::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && (path.start_with? 'file://', 'http://', 'https://'))
     end
   else
     def root? path
