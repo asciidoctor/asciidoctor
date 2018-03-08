@@ -826,6 +826,31 @@ include::#{url}[]
         end
       end
 
+      test 'relative uri should be resolved using the base_dir' do
+        input = <<-EOS
+....
+include::asciidoctor[]
+....
+        EOS
+
+        begin
+          output = warnings = nil
+          redirect_streams do |_, err|
+            output = using_test_webserver do
+              render_embedded_string input,
+                                     :safe => :safe,
+                                     :base_dir => "http://#{resolve_localhost}:9876/name",
+                                     :attributes => {'allow-uri-read' => ''}
+            end
+            warnings = err.string
+          end
+          refute_nil output
+          assert_match(/\{"name": "asciidoctor"\}/, output)
+        rescue
+          flunk 'include directive should not raise exception on relative uri'
+        end
+      end
+
       test 'include directive supports line selection' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]

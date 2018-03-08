@@ -386,8 +386,12 @@ class Document < AbstractBlock
     # If the base_dir option is specified, it overrides docdir and used as the root for relative
     # paths. Otherwise, the base_dir is the directory of the source file (docdir), if set, or else
     # the current directory.
-    if options[:base_dir]
-      @base_dir = attr_overrides['docdir'] = ::File.expand_path(options[:base_dir])
+    if (base_dir_val = options[:base_dir])
+      @base_dir = attr_overrides['docdir'] = if Helpers.uriish? base_dir_val
+        ::URI.parse(base_dir_val)
+      else
+        ::File.expand_path(base_dir_val)
+      end
     elsif attr_overrides['docdir']
       @base_dir = attr_overrides['docdir']
     else
