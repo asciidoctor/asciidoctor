@@ -319,16 +319,20 @@ class Document < AbstractBlock
     # legacy support for numbered attribute
     attr_overrides['sectnums'] = attr_overrides.delete 'numbered' if attr_overrides.key? 'numbered'
 
-    # If the base_dir option is specified, it overrides docdir and used as the root for relative
-    # paths. Otherwise, the base_dir is the directory of the source file (docdir), if set, or else
+    # If the base_dir option is specified, it overrides docdir and is used as the root for relative
+    # paths. Otherwise, the base_dir is the directory of the source file (docdir), if set, otherwise
     # the current directory.
-    if options[:base_dir]
-      @base_dir = attr_overrides['docdir'] = ::File.expand_path(options[:base_dir])
+    if (base_dir_val = options[:base_dir])
+      if ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && (Helpers.uriish? base_dir_val)
+        @base_dir = attr_overrides['docdir'] = base_dir_val
+      else
+        @base_dir = (attr_overrides['docdir'] = ::File.expand_path base_dir_val)
+      end
     elsif attr_overrides['docdir']
       @base_dir = attr_overrides['docdir']
     else
       #warn 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
-      @base_dir = attr_overrides['docdir'] = ::File.expand_path(::Dir.pwd)
+      @base_dir = attr_overrides['docdir'] = ::Dir.pwd
     end
 
     # allow common attributes backend and doctype to be set using options hash, coerce values to string
