@@ -131,26 +131,53 @@ class PathResolver
     @_partition_path_sys, @_partition_path_web = {}, {}
   end
 
-  # Public: Check if the specified path is an absolute root path.
-  # This operation considers posix paths, windows paths, and file URLs.
-  #
-  # Unix absolute paths and UNC paths start with slash. Windows roots can start
-  # with a drive letter. Absolute paths may start with file://, http://, or
-  # https:// when the IO module is xmlhttprequest (Opal runtime only).
-  #
-  # path - the String path to check
-  #
-  # returns a Boolean indicating whether the path is an absolute root path
   if RUBY_ENGINE == 'opal'
-    def root? path
-      (path.start_with? SLASH) ||
-          (@file_separator == BACKSLASH && (WindowsRootRx.match? path)) ||
-          (::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && (path.start_with? 'file://', 'http://', 'https://'))
+    if ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest'
+      def absolute_path? path
+        (path.start_with? SLASH) || (WindowsRootRx.match? path)
+      end
+
+      def root? path
+        (absolute_path? path) || (path.start_with? 'file://', 'http://', 'https://')
+      end
+    else
+      def absolute_path? path
+        (path.start_with? SLASH) || (@file_separator == BACKSLASH && (WindowsRootRx.match? path))
+      end
+
+      alias root? absolute_path?
     end
   else
-    def root? path
+    # Public: Check if the specified path is an absolute path.
+    #
+    # This operation considers both posix paths and Windows paths. It does not
+    # consider URIs.
+    #
+    # Unix absolute paths and UNC paths start with slash. Windows roots can start
+    # with a drive letter.
+    #
+    # path - the String path to check
+    #
+    # returns a Boolean indicating whether the path is an absolute root path
+    def absolute_path? path
       (path.start_with? SLASH) || (@file_separator == BACKSLASH && (WindowsRootRx.match? path))
     end
+
+    # Public: Check if the specified path is an absolute root path (or, in the
+    # browser environment, an absolute URI)
+    #
+    # This operation considers both posix paths and Windows paths. If the JavaScript IO
+    # module is xmlhttprequest, this operation also considers absolute URIs.
+    #
+    # Unix absolute paths and UNC paths start with slash. Windows roots can start
+    # with a drive letter. Absolute paths may start with file://, http://, or
+    # https:// when the IO module is xmlhttprequest (Opal runtime only).
+    #
+    # path - the String path to check
+    #
+    # returns a Boolean indicating whether the path is an absolute root path (or
+    # an absolute URI when the JavaScript IO module is xmlhttprequest)
+    alias root? absolute_path?
   end
 
   # Public: Determine if the path is a UNC (root) path
