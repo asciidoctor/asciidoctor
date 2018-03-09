@@ -131,26 +131,42 @@ class PathResolver
     @_partition_path_sys, @_partition_path_web = {}, {}
   end
 
-  # Public: Check if the specified path is an absolute root path.
-  # This operation considers posix paths, windows paths, and file URLs.
+  # Public: Check whether the specified path is an absolute path.
   #
-  # Unix absolute paths and UNC paths start with slash. Windows roots can start
-  # with a drive letter. Absolute paths may start with file://, http://, or
-  # https:// when the IO module is xmlhttprequest (Opal runtime only).
+  # This operation considers both posix paths and Windows paths. It does not
+  # consider URIs.
+  #
+  # Unix absolute paths and UNC paths both start with slash. Windows roots can
+  # start with a drive letter.
   #
   # path - the String path to check
   #
   # returns a Boolean indicating whether the path is an absolute root path
-  if RUBY_ENGINE == 'opal'
+  def absolute_path? path
+    (path.start_with? SLASH) || (@file_separator == BACKSLASH && (WindowsRootRx.match? path))
+  end
+
+  # Public: Check if the specified path is an absolute root path (or, in the
+  # browser environment, an absolute URI as well)
+  #
+  # This operation considers both posix paths and Windows paths. If the JavaScript IO
+  # module is xmlhttprequest, this operation also considers absolute URIs.
+  #
+  # Unix absolute paths and UNC paths start with slash. Windows roots can
+  # start with a drive letter. When the IO module is xmlhttprequest (Opal
+  # runtime only), an absolute (qualified) URI (starts with file://, http://,
+  # or https://) is also considered to be an absolute path.
+  #
+  # path - the String path to check
+  #
+  # returns a Boolean indicating whether the path is an absolute root path (or
+  # an absolute URI when the JavaScript IO module is xmlhttprequest)
+  if RUBY_ENGINE == 'opal' && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest'
     def root? path
-      (path.start_with? SLASH) ||
-          (@file_separator == BACKSLASH && (WindowsRootRx.match? path)) ||
-          (::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && (path.start_with? 'file://', 'http://', 'https://'))
+      (absolute_path? path) || (path.start_with? 'file://', 'http://', 'https://')
     end
   else
-    def root? path
-      (path.start_with? SLASH) || (@file_separator == BACKSLASH && (WindowsRootRx.match? path))
-    end
+    alias root? absolute_path?
   end
 
   # Public: Determine if the path is a UNC (root) path
@@ -169,6 +185,18 @@ class PathResolver
   # returns a Boolean indicating whether the path is an absolute (root) web path
   def web_root? path
     path.start_with? SLASH
+  end
+
+  # Public: Determine whether path descends from base.
+  #
+  # If path equals base, or base is a parent of path, return true.
+  #
+  # path - The String path to check. Can be relative.
+  # base - The String base path to check against. Can be relative.
+  #
+  # returns If path descends from base, return the offset, otherwise false.
+  def descends_from? path, base
+    base == path ? 0 : ((path.start_with? base + '/') ? base.length + 1 : false)
   end
 
   # Public: Normalize path by converting any backslashes to forward slashes
