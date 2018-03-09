@@ -837,10 +837,26 @@ class PreprocessorReader < Reader
         warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
         return
       elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest'
-        # NOTE resolves uri relative to currently loaded document
-        # NOTE we defer checking if file exists and catch the 404 error if it does not
+        # NOTE the only way to check if the file exists is to catch a 404 response in the IO module
         target_type = :file
-        inc_path = relpath = @include_stack.empty? && ::Dir.pwd == @document.base_dir ? target : %(#{@dir}/#{target})
+        if Helpers.uriish? target
+          unless (target.start_with? 'file://') || (@document.attributes.key? 'allow-uri-read')
+            replace_next_line %(link:#{target}[])
+            return true
+          end
+          inc_path = relpath = target
+        elsif (@path_resolver ||= PathResolver.new).absolute_path? target
+          if target.start_with? '/'
+            inc_path = relpath = 'file://' + target
+          else
+            target = target.tr '\\', '/' if target.include? '\\'
+            inc_path = relpath = 'file:///' + target
+          end
+        elsif @include_stack.empty? && ::Dir.pwd == @document.base_dir
+          inc_path = relpath = target
+        else
+          inc_path = relpath = %(#{@dir}/#{target})
+        end
       elsif (Helpers.uriish? target) || ((::URI === @dir) && (target = %(#{@dir}/#{target})))
         unless @document.attributes.key? 'allow-uri-read'
           replace_next_line %(link:#{target}[])
