@@ -105,6 +105,17 @@ When you need to put some foo on the bar.
       assert_equal '\\(co & \\(rg are translated to character references, but not the &.', output.lines.entries.last.chomp
     end
 
+    test 'should replace emdashes' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+go -- to
+
+go--to)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_includes output, 'go \\(em to'
+      assert_includes output, 'go\\(emto'
+    end
+
     test 'should escape lone period' do
       input = %(#{SAMPLE_MANPAGE_HEADER}
 

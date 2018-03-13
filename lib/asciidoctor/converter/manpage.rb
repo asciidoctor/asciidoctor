@@ -18,7 +18,7 @@ module Asciidoctor
     LeadingPeriodRx = /^\./
     EscapedMacroRx = /^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)(?: *#{ESC}\\c)?$/
     MockBoundaryRx = /<\/?BOUNDARY>/
-    EmDashCharRefRx = /&#8212(?:;&#8203;)?/
+    EmDashCharRefRx = /&#8212;(?:&#8203;)?/
     EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
 
     # Converts HTML entity references back to their original form, escapes
