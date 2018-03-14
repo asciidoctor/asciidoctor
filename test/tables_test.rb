@@ -1066,7 +1066,7 @@ DocBook outputs. If the input file is the standard input then the
 output file name is used.
 |===
       EOS
-      doc = document_from_string input
+      doc = document_from_string input, { :sourcemap => true }
       table = doc.blocks.first
       refute_nil table
       tbody = table.rows.body
@@ -1076,6 +1076,7 @@ output file name is used.
       assert body_cell_1_3.inner_document.nested?
       assert_equal doc, body_cell_1_3.inner_document.parent_document
       assert_equal doc.converter, body_cell_1_3.inner_document.converter
+      assert_equal 6, body_cell_1_3.inner_document.lineno
       output = doc.render
 
       assert_css 'table > tbody > tr', output, 2
