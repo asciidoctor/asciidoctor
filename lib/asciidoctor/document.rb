@@ -387,11 +387,7 @@ class Document < AbstractBlock
     # paths. Otherwise, the base_dir is the directory of the source file (docdir), if set, otherwise
     # the current directory.
     if (base_dir_val = options[:base_dir])
-      if ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && (Helpers.uriish? base_dir_val)
-        @base_dir = attr_overrides['docdir'] = base_dir_val
-      else
-        @base_dir = (attr_overrides['docdir'] = ::File.expand_path base_dir_val)
-      end
+      @base_dir = (attr_overrides['docdir'] = ::File.expand_path base_dir_val)
     elsif attr_overrides['docdir']
       @base_dir = attr_overrides['docdir']
     else
