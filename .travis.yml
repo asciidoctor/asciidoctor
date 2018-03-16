@@ -22,7 +22,6 @@ env:
   # use system libraries to speed up installation of nokogiri
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
 script: bundle exec rake coverage test:all
-after_success: bundle exec rake build:dependents
 #notifications:
 #  email: false
 #  irc: 'irc.freenode.org#asciidoctor'
