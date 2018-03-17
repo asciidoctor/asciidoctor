@@ -115,6 +115,26 @@ context 'Links' do
     assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]/following-sibling::text()[.="); where text gets parsed"]', result, 1
   end
 
+  test 'URI scheme with trailing characters should not be converted to a link' do
+    input_sources = %w(
+      (https://)
+      http://;
+      file://:
+      <ftp://>
+    )
+    expected_outputs = %w(
+      (https://)
+      http://;
+      file://:
+      &lt;ftp://&gt;
+    )
+    input_sources.each_with_index do |input_source, i|
+      expected_output = expected_outputs[i]
+      actual = block_from_string input_source
+      assert_equal expected_output, actual.content
+    end
+  end
+
   test 'qualified url containing round brackets' do
     assert_xpath '//a[@href="http://jruby.org/apidocs/org/jruby/Ruby.html#addModule(org.jruby.RubyModule)"][text()="addModule() adds a Ruby module"]', render_string('http://jruby.org/apidocs/org/jruby/Ruby.html#addModule(org.jruby.RubyModule)[addModule() adds a Ruby module]'), 1
   end

@@ -779,15 +779,13 @@ module Substitutors
             if prefix.start_with?('&lt;') && target.end_with?('&gt;')
               prefix = prefix[4..-1]
               target = target[0...-4]
+            # strip trailing ;
+            # check for trailing );
+            elsif (target = target.chop).end_with?(')')
+              target = target.chop
+              suffix = ');'
             else
-              # strip trailing ;
-              # check for trailing );
-              if (target = target.chop).end_with?(')')
-                target = target.chop
-                suffix = ');'
-              else
-                suffix = ';'
-              end
+              suffix = ';'
             end
           when ':'
             # strip trailing :
@@ -799,6 +797,8 @@ module Substitutors
               suffix = ':'
             end
           end
+          # NOTE handle case when remaining target is a URI scheme (e.g., http://)
+          return m[0] if target.end_with? '://'
         end
 
         attrs, link_opts = nil, { :type => :link }
