@@ -763,7 +763,7 @@ last line of outer'
 
       test 'nested remote include directive that cannot be resolved does not crash processor' do
         include_url = %(http://#{resolve_localhost}:9876/fixtures/file-with-missing-include.adoc)
-        nested_include_url = %(http://#{resolve_localhost}:9876/fixtures/no-such-file.adoc)
+        nested_include_url = 'no-such-file.adoc'
         input = <<-EOS
 ....
 include::#{include_url}[]

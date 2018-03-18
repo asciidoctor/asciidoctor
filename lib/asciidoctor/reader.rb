@@ -808,104 +808,46 @@ class PreprocessorReader < Reader
   #
   # If none of the above apply, emit the include directive line verbatim.
   #
-  # target - The name of the source document to include as specified in the
-  #          target slot of the include::[] directive
+  # target   - The unsubstituted String name of the target document to include as specified in the
+  #            target slot of the include directive.
+  # attrlist - An attribute list String, which is the text between the square brackets of the
+  #            include directive.
   #
-  # Returns a [Boolean] indicating whether the line under the cursor was changed.
-  # To skip over the directive, call shift and return true.
-  def preprocess_include_directive raw_target, raw_attributes
-    if ((target = raw_target).include? ATTR_REF_HEAD) &&
-        (target = @document.sub_attributes raw_target, :attribute_missing => 'drop-line').empty?
+  # Returns a [Boolean] indicating whether the line under the cursor was changed. To skip over the
+  # directive, call shift and return true.
+  def preprocess_include_directive target, attrlist
+    if ((expanded_target = target).include? ATTR_REF_HEAD) &&
+        (expanded_target = @document.sub_attributes target, :attribute_missing => 'drop-line').empty?
       shift
       if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
-        unshift %(Unresolved directive in #{@path} - include::#{raw_target}[#{raw_attributes}])
+        unshift %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
       end
       true
-    elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? target })
+    elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
       shift
       # FIXME parse attributes only if requested by extension
-      ext.process_method[@document, self, target, raw_attributes ? AttributeList.new(raw_attributes).parse : {}]
+      ext.process_method[@document, self, expanded_target, attrlist ? (AttributeList.new attrlist).parse : {}]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif @document.safe >= SafeMode::SECURE
       # FIXME we don't want to use a link macro if we are in a verbatim context
-      replace_next_line %(link:#{target}[])
+      replace_next_line %(link:#{expanded_target}[])
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0
       if @include_stack.size >= abs_maxdepth
         warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
         return
-      elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest'
-        # NOTE when the IO module is xmlhttprequest, the only way to check if the file exists is to catch a 404 response
-        p_target = (@path_resolver ||= PathResolver.new '\\').posixify target
-        target_type, base_dir = :file, @document.base_dir
-        if p_target.start_with? 'file://'
-          inc_path = relpath = p_target
-        elsif Helpers.uriish? p_target
-          unless (@path_resolver.descends_from? p_target, base_dir) || (@document.attributes.key? 'allow-uri-read')
-            return replace_next_line %(link:#{target}[])
-          end
-          inc_path = relpath = p_target
-        elsif @path_resolver.absolute_path? p_target
-          inc_path = relpath = %(file://#{(p_target.start_with? '/') ? '' : '/'}#{p_target})
-        elsif (ctx_dir = (top_level = @include_stack.empty?) ? base_dir : @dir) == '.'
-          # WARNING relative include won't work in the Firefox web extension (unless we use the second line)
-          inc_path = relpath = p_target
-          #inc_path = %(#{File.dirname `window.location.href`}/#{relpath = p_target})
-        elsif (ctx_dir.start_with? 'file://') || !(Helpers.uriish? ctx_dir)
-          # WARNING relative nested include won't work in the Firefox web extension if base_dir is '.'
-          inc_path = %(#{ctx_dir}/#{p_target})
-          if top_level
-            relpath = p_target
-          elsif base_dir == '.' || !(offset = @path_resolver.descends_from? inc_path, base_dir)
-            relpath = inc_path
-          else
-            relpath = inc_path.slice offset, inc_path.length
-          end
-        elsif top_level
-          inc_path = %(#{ctx_dir}/#{relpath = p_target})
-        elsif (offset = @path_resolver.descends_from? ctx_dir, base_dir) || (@document.attributes.key? 'allow-uri-read')
-          inc_path = %(#{ctx_dir}/#{p_target})
-          relpath = offset ? (inc_path.slice offset, inc_path.length) : p_target
-        else
-          return replace_next_line %(link:#{target}[])
-        end
-      elsif (Helpers.uriish? target) || ((::URI === @dir) && (target = %(#{@dir}/#{target})))
-        return replace_next_line %(link:#{target}[]) unless @document.attributes.key? 'allow-uri-read'
-        if @document.attributes.key? 'cache-uri'
-          # caching requires the open-uri-cached gem to be installed
-          # processing will be automatically aborted if these libraries can't be opened
-          Helpers.require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
-        elsif !::RUBY_ENGINE_OPAL
-          # autoload open-uri
-          ::OpenURI
-        end
-        target_type, relpath, inc_path = :uri, target, (::URI.parse target)
-      else
-        target_type = :file
-        # include file is resolved relative to dir of current include, or base_dir if within original docfile
-        inc_path = @document.normalize_system_path target, @dir, nil, :target_name => 'include file'
-        unless ::File.file? inc_path
-          if raw_attributes && ((AttributeList.new raw_attributes).parse.key? 'optional-option')
-            shift
-          else
-            warn %(asciidoctor: ERROR: #{line_info}: include file not found: #{inc_path})
-            replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
-          end
-          return true
-        end
-        # NOTE relpath is the path relative to the root document (or base_dir, if set)
-        # QUESTION should we move relative_path method to Document
-        relpath = (@path_resolver ||= PathResolver.new).relative_path inc_path, @document.base_dir
       end
 
-      inc_linenos, inc_tags, attributes = nil, nil, {}
-      if raw_attributes
-        # QUESTION should we use @document.parse_attribues?
-        attributes = AttributeList.new(raw_attributes).parse
-        if attributes.key? 'lines'
+      parsed_attributes = attrlist ? (AttributeList.new attrlist).parse : {}
+      inc_path, target_type, relpath = resolve_include_path expanded_target, attrlist, parsed_attributes
+      return inc_path unless target_type
+
+      inc_linenos = inc_tags = nil
+      if attrlist
+        if parsed_attributes.key? 'lines'
           inc_linenos = []
-          attributes['lines'].split(DataDelimiterRx).each do |linedef|
+          parsed_attributes['lines'].split(DataDelimiterRx).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..', 2).map {|it| it.to_i }
               if to == -1
@@ -919,13 +861,13 @@ class PreprocessorReader < Reader
             end
           end
           inc_linenos = inc_linenos.empty? ? nil : inc_linenos.sort.uniq
-        elsif attributes.key? 'tag'
-          unless (tag = attributes['tag']).empty? || tag == '!'
+        elsif parsed_attributes.key? 'tag'
+          unless (tag = parsed_attributes['tag']).empty? || tag == '!'
             inc_tags = (tag.start_with? '!') ? { (tag.slice 1, tag.length) => false } : { tag => true }
           end
-        elsif attributes.key? 'tags'
+        elsif parsed_attributes.key? 'tags'
           inc_tags = {}
-          attributes['tags'].split(DataDelimiterRx).each do |tagdef|
+          parsed_attributes['tags'].split(DataDelimiterRx).each do |tagdef|
             if tagdef.start_with? '!'
               inc_tags[tagdef.slice 1, tagdef.length] = false
             else
@@ -960,11 +902,11 @@ class PreprocessorReader < Reader
           end
         rescue
           warn %(asciidoctor: ERROR: #{line_info}: include #{target_type} not readable: #{inc_path})
-          return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+          return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         shift
         # FIXME not accounting for skipped lines in reader line numbering
-        push_include inc_lines, inc_path, relpath, inc_offset, attributes if inc_offset
+        push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes if inc_offset
       elsif inc_tags
         inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
         if inc_tags.key? '**'
@@ -998,9 +940,9 @@ class PreprocessorReader < Reader
                   elsif inc_tags.key? this_tag
                     if (idx = tag_stack.rindex {|key, _| key == this_tag })
                       idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
-                      warn %(asciidoctor: WARNING: #{target}: line #{inc_lineno}: mismatched end tag in include: expected #{active_tag}, found #{this_tag})
+                      warn %(asciidoctor: WARNING: #{expanded_target}: line #{inc_lineno}: mismatched end tag in include: expected #{active_tag}, found #{this_tag})
                     else
-                      warn %(asciidoctor: WARNING: #{target}: line #{inc_lineno}: unexpected end tag in include: #{this_tag})
+                      warn %(asciidoctor: WARNING: #{expanded_target}: line #{inc_lineno}: unexpected end tag in include: #{this_tag})
                     end
                   end
                 elsif inc_tags.key?(this_tag = $2)
@@ -1020,26 +962,75 @@ class PreprocessorReader < Reader
           end
         rescue
           warn %(asciidoctor: ERROR: #{line_info}: include #{target_type} not readable: #{inc_path})
-          return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+          return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
           warn %(asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path})
         end
         shift
         # FIXME not accounting for skipped lines in reader line numbering
-        push_include inc_lines, inc_path, relpath, inc_offset, attributes if inc_offset
+        push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes if inc_offset
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
           inc_content = target_type == :file ? (::IO.read inc_path) : open(inc_path, 'r') {|f| f.read }
           shift
-          push_include inc_content, inc_path, relpath, 1, attributes
+          push_include inc_content, inc_path, relpath, 1, parsed_attributes
         rescue
           warn %(asciidoctor: ERROR: #{line_info}: include #{target_type} not readable: #{inc_path})
-          return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
+          return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
       end
       true
+    end
+  end
+
+  # Internal: Resolve the target of an include directive.
+  #
+  # An internal method to resolve the target of an include directive. This method must return an
+  # Array containing the resolved (absolute) path of the target, the target type (:file or :uri),
+  # and the path of the target relative to the outermost document. Alternately, the method may
+  # return a boolean to halt processing of the include directive line and to indicate whether the
+  # cursor should be advanced beyond this line (true) or the line should be reprocessed (false).
+  #
+  # This method is overridden in Asciidoctor.js to resolve the target of an include in the browser
+  # environment.
+  #
+  # target     - A String containing the unresolved include target.
+  #              (Attribute references in target value have already been resolved).
+  # attrlist   - An attribute list String (i.e., the text between the square brackets).
+  # attributes - A Hash of attributes parsed from attrlist.
+  #
+  # Returns An Array containing the resolved (absolute) include path, the target type, and the path
+  # relative to the outermost document. May also return a boolean to halt processing of the include.
+  def resolve_include_path target, attrlist, attributes
+    if (Helpers.uriish? target) || ((::URI === @dir) && (target = %(#{@dir}/#{target})))
+      return replace_next_line %(link:#{target}[#{attrlist}]) unless @document.attributes.key? 'allow-uri-read'
+      if @document.attributes.key? 'cache-uri'
+        # caching requires the open-uri-cached gem to be installed
+        # processing will be automatically aborted if these libraries can't be opened
+        Helpers.require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
+      elsif !::RUBY_ENGINE_OPAL
+        # autoload open-uri
+        ::OpenURI
+      end
+      [(::URI.parse target), :uri, target]
+    else
+      # include file is resolved relative to dir of current include, or base_dir if within original docfile
+      inc_path = @document.normalize_system_path target, @dir, nil, :target_name => 'include file'
+      unless ::File.file? inc_path
+        if attributes.key? 'optional-option'
+          shift
+          return true
+        else
+          warn %(asciidoctor: ERROR: #{line_info}: include file not found: #{inc_path})
+          return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
+        end
+      end
+      # NOTE relpath is the path relative to the root document (or base_dir, if set)
+      # QUESTION should we move relative_path method to Document
+      relpath = (@path_resolver ||= PathResolver.new).relative_path inc_path, @document.base_dir
+      [inc_path, :file, relpath]
     end
   end
 
