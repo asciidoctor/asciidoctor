@@ -294,11 +294,11 @@ class Reader
   #
   # replacement - The String line to put in place of the next line (i.e., the line at the cursor).
   #
-  # Returns nothing.
+  # Returns true.
   def replace_next_line replacement
     shift
     unshift replacement
-    nil
+    true
   end
   # deprecated
   alias replace_line replace_next_line
@@ -836,11 +836,10 @@ class PreprocessorReader < Reader
     elsif @document.safe >= SafeMode::SECURE
       # FIXME we don't want to use a link macro if we are in a verbatim context
       replace_next_line %(link:#{target}[])
-      true
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0
       if @include_stack.size >= abs_maxdepth
         warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
-        return false
+        return
       end
       if ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest'
         # NOTE when the IO module is xmlhttprequest, the only way to check if the file exists is to catch a 404 response
@@ -850,8 +849,7 @@ class PreprocessorReader < Reader
           inc_path = relpath = p_target
         elsif Helpers.uriish? p_target
           unless (@path_resolver.descends_from? p_target, base_dir) || (@document.attributes.key? 'allow-uri-read')
-            replace_next_line %(link:#{target}[])
-            return true
+            return replace_next_line %(link:#{target}[])
           end
           inc_path = relpath = p_target
         elsif @path_resolver.absolute_path? p_target
@@ -876,14 +874,10 @@ class PreprocessorReader < Reader
           inc_path = %(#{ctx_dir}/#{p_target})
           relpath = offset ? (inc_path.slice offset, inc_path.length) : p_target
         else
-          replace_next_line %(link:#{target}[])
-          return true
+          return replace_next_line %(link:#{target}[])
         end
       elsif Helpers.uriish? target
-        unless @document.attributes.key? 'allow-uri-read'
-          replace_next_line %(link:#{target}[])
-          return true
-        end
+        return replace_next_line %(link:#{target}[]) unless @document.attributes.key? 'allow-uri-read'
 
         target_type = :uri
         inc_path = relpath = target
@@ -901,8 +895,7 @@ class PreprocessorReader < Reader
         inc_path = @document.normalize_system_path target, @dir, nil, :target_name => 'include file'
         unless ::File.file? inc_path
           warn %(asciidoctor: WARNING: #{line_info}: include file not found: #{inc_path})
-          replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
-          return true
+          return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
         end
         # NOTE relpath is the path relative to the root document (or base_dir, if set)
         # QUESTION should we move relative_path method to Document
@@ -974,8 +967,7 @@ class PreprocessorReader < Reader
           end
         rescue
           warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{inc_path})
-          replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
-          return true
+          return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
         end
         shift
         # FIXME not accounting for skipped lines in reader line numbering
@@ -1034,8 +1026,7 @@ class PreprocessorReader < Reader
           end
         rescue
           warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{inc_path})
-          replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
-          return true
+          return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
         end
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
           warn %(asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path})
@@ -1051,8 +1042,7 @@ class PreprocessorReader < Reader
           push_include inc_content, inc_path, relpath, 1, attributes
         rescue
           warn %(asciidoctor: WARNING: #{line_info}: include #{target_type} not readable: #{inc_path})
-          replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
-          return true
+          return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{raw_attributes}])
         end
       end
       true
