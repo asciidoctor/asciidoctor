@@ -39,6 +39,15 @@ context 'Converter' do
       assert_equal template_dirs.reverse.map {|dir| File.expand_path dir }, selected.templates['paragraph'].options[:include_dirs]
     end
 
+    test 'should coerce template_dirs option to an Array' do
+      template_dirs = File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim')
+      doc = Asciidoctor::Document.new [], :template_dirs => template_dirs, :template_cache => false
+      assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
+      selected = doc.converter.find_converter('paragraph')
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
+      assert_kind_of Array, (selected.instance_variable_get :@template_dirs)
+    end
+
     test 'should set Slim format to html for html5 backend' do
       doc = Asciidoctor::Document.new [], :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'slim'), :template_cache => false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter

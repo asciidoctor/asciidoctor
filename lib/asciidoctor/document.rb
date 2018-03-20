@@ -1075,12 +1075,13 @@ class Document < AbstractBlock
   def create_converter
     converter_opts = {}
     converter_opts[:htmlsyntax] = @attributes['htmlsyntax']
-    template_dirs = if (template_dir = @options[:template_dir])
-      converter_opts[:template_dirs] = [template_dir]
+    if (template_dir = @options[:template_dir])
+      template_dirs = [template_dir]
     elsif (template_dirs = @options[:template_dirs])
-      converter_opts[:template_dirs] = template_dirs
+      template_dirs = Array template_dirs
     end
     if template_dirs
+      converter_opts[:template_dirs] = template_dirs
       converter_opts[:template_cache] = @options.fetch :template_cache, true
       converter_opts[:template_engine] = @options[:template_engine]
       converter_opts[:template_engine_options] = @options[:template_engine_options]
