@@ -1458,18 +1458,22 @@ module Substitutors
       # TODO we could add the line numbers in ourselves instead of having to strip out the junk
       if (attr? 'linenums', nil, false) && (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
         linenums_mode = :table
-        result = ((lexer.highlight source, :options => opts) || source).sub(PygmentsWrapperDivRx, '\1').gsub(PygmentsWrapperPreRx, '\1')
-      else
-        if PygmentsWrapperPreRx =~ (result = (lexer.highlight source, :options => opts) || source)
+        if (result = lexer.highlight source, :options => opts)
+          result = (result.sub PygmentsWrapperDivRx, '\1').gsub PygmentsWrapperPreRx, '\1'
+        else
+          result = sub_specialchars source
+        end
+      elsif (result = lexer.highlight source, :options => opts)
+        if PygmentsWrapperPreRx =~ result
           result = $1
         end
+      else
+        result = sub_specialchars source
       end
     end
 
     # fix passthrough placeholders that got caught up in syntax highlighting
-    unless @passthroughs.empty?
-      result = result.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END})
-    end
+    result = result.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END}) unless @passthroughs.empty?
 
     if process_callouts && callout_marks
       lineno = 0
