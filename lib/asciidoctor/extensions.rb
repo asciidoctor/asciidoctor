@@ -1481,17 +1481,36 @@ module Extensions
     # Public: Resolves the Class object for the qualified name.
     #
     # Returns Class
-    def class_for_name qualified_name
-      resolved = ::Object
-      (qualified_name.split '::').each do |name|
-        unless name.empty? || ((resolved.const_defined? name) && ::Module === (resolved = resolved.const_get name))
-          raise ::NameError, %(Could not resolve class for name: #{qualified_name})
-        end
+    if RUBY_MIN_VERSION_2
+      def class_for_name qualified_name
+        resolved = ::Object.const_get qualified_name, false
+        raise unless ::Class === resolved
+        resolved
+      rescue
+        raise ::NameError, %(Could not resolve class for name: #{qualified_name})
       end
-      raise ::NameError, %(Could not resolve class for name: #{qualified_name}) unless ::Class === resolved
-      resolved
+    elsif RUBY_MIN_VERSION_1_9
+      def class_for_name qualified_name
+        resolved = (qualified_name.split '::').reduce ::Object do |current, name|
+          name.empty? ? current : (current.const_get name, false)
+        end
+        raise unless ::Class === resolved
+        resolved
+      rescue
+        raise ::NameError, %(Could not resolve class for name: #{qualified_name})
+      end
+    else
+      def class_for_name qualified_name
+        resolved = (qualified_name.split '::').reduce ::Object do |current, name|
+          # NOTE on Ruby 1.8, const_defined? only checks for constant in current scope
+          name.empty? ? current : ((current.const_defined? name) ? (current.const_get name) : raise)
+        end
+        raise unless ::Class === resolved
+        resolved
+      rescue
+        raise ::NameError, %(Could not resolve class for name: #{qualified_name})
+      end
     end
   end
-
 end
 end

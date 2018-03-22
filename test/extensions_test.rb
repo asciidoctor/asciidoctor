@@ -340,6 +340,24 @@ context 'Extensions' do
       end
     end
 
+    test 'should raise exception if constant name is invalid' do
+      begin
+        Asciidoctor::Extensions.class_for_name 'foobar'
+        flunk 'Expecting RuntimeError to be raised'
+      rescue NameError => e
+        assert_equal 'Could not resolve class for name: foobar', e.message
+      end
+    end
+
+    test 'should raise exception if class not found in scope' do
+      begin
+        Asciidoctor::Extensions.class_for_name 'Asciidoctor::Extensions::String'
+        flunk 'Expecting RuntimeError to be raised'
+      rescue NameError => e
+        assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', e.message
+      end
+    end
+
     test 'should raise exception if name resolves to module' do
       begin
         Asciidoctor::Extensions.class_for_name 'Asciidoctor::Extensions'
@@ -359,6 +377,29 @@ context 'Extensions' do
       clazz = Asciidoctor::Extensions.resolve_class 'Asciidoctor::Document'
       refute_nil clazz
       assert_equal Asciidoctor::Document, clazz
+    end
+
+    test 'should not resolve class if not in scope' do
+      begin
+        Asciidoctor::Extensions.resolve_class 'Asciidoctor::Extensions::String'
+        flunk 'Expecting RuntimeError to be raised'
+      rescue NameError => e
+        assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', e.message
+      end
+    end
+
+    test 'should raise NameError if extension class cannot be resolved from string' do
+      begin
+        Asciidoctor::Extensions.register do
+          block 'foobar'
+        end
+        doc = empty_document
+        flunk 'Expecting RuntimeError to be raised'
+      rescue NameError => e
+        assert_equal 'Could not resolve class for name: foobar', e.message
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
     end
 
     test 'should allow standalone registry to be created but not registered' do
@@ -1196,7 +1237,6 @@ sample content
         Asciidoctor::Extensions.unregister_all
       end
     end
-
 
     test 'should add multiple docinfo to document' do
       input = <<-EOS
