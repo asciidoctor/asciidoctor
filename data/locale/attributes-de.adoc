@@ -13,7 +13,7 @@
 :note-caption: Anmerkung
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: Vorwort]
-//:section-refsig: ???
+:section-refsig: Abschnitt
 :table-caption: Tabelle
 :tip-caption: Hinweis
 :toc-title: Inhalt
