@@ -249,36 +249,30 @@ class PathResolver
 
     posix_path = posixify path
 
-    root = if web
+    if web
       # ex. /sample/path
       if web_root? posix_path
-        SLASH
+        root = SLASH
       # ex. ./sample/path
       elsif posix_path.start_with? DOT_SLASH
-        DOT_SLASH
-      # ex. sample/path
-      else
-        nil
+        root = DOT_SLASH
+      # else ex. sample/path
       end
-    else
-      if root? posix_path
-        # ex. //sample/path
-        if unc? posix_path
-          DOUBLE_SLASH
-        # ex. /sample/path
-        elsif posix_path.start_with? SLASH
-          SLASH
-        # ex. C:/sample/path (or file:///sample/path in browser environment)
-        else
-          posix_path.slice 0, (posix_path.index SLASH) + 1
-        end
-      # ex. ./sample/path
-      elsif posix_path.start_with? DOT_SLASH
-        DOT_SLASH
-      # ex. sample/path
+    elsif root? posix_path
+      # ex. //sample/path
+      if unc? posix_path
+        root = DOUBLE_SLASH
+      # ex. /sample/path
+      elsif posix_path.start_with? SLASH
+        root = SLASH
+      # ex. C:/sample/path (or file:///sample/path in browser environment)
       else
-        nil
+        root = posix_path.slice 0, (posix_path.index SLASH) + 1
       end
+    # ex. ./sample/path
+    elsif posix_path.start_with? DOT_SLASH
+      root = DOT_SLASH
+    # else ex. sample/path
     end
 
     path_segments = posix_path.split SLASH
