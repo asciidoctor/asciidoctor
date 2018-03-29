@@ -1405,6 +1405,8 @@ section body
     test 'docbook5 backend doctype manpage' do
       input = <<-EOS
 = asciidoctor(1)
+:mansource: Asciidoctor
+:manmanual: Asciidoctor Manual
 
 == NAME
 
@@ -1427,6 +1429,8 @@ section body
       assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text() = "asciidoctor(1)"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text() = "asciidoctor"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:manvolnum[text() = "1"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text() = "Asciidoctor"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text() = "Asciidoctor Manual"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refname[text() = "asciidoctor"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refpurpose[text() = "Process text"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv', result, 1
@@ -1439,6 +1443,23 @@ section body
       refute_nil id_attr.namespace
       assert_equal 'xml', id_attr.namespace.prefix
       assert_equal '_first_section', id_attr.value
+    end
+
+    test 'should output non-breaking space for source and manual in docbook5 manpage output if absent from source' do
+      input = <<-EOS
+= asciidoctor(1)
+
+== NAME
+
+asciidoctor - Process text
+
+== SYNOPSIS
+
+some text
+      EOS
+      result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'manpage'})
+      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text() = "#{decode_char 160}"]), result, 1
+      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text() = "#{decode_char 160}"]), result, 1
     end
 
     test 'docbook5 backend doctype book' do
