@@ -730,12 +730,8 @@ module Asciidoctor
         result << '<refmeta>'
         result << %(<refentrytitle>#{doc.attr 'mantitle'}</refentrytitle>) if doc.attr? 'mantitle'
         result << %(<manvolnum>#{doc.attr 'manvolnum'}</manvolnum>) if doc.attr? 'manvolnum'
-        if doc.attr? 'mansource'
-          result << %(<refmiscinfo class="source">#{doc.attr 'mansource'}</refmiscinfo>)
-        else
-          result << '<refmiscinfo class="source">&#160;</refmiscinfo>'
-        end
-        result << %(<refmiscinfo class="manual">#{doc.attr 'manmanual'}</refmiscinfo>) if doc.attr? 'manmanual'
+        result << %(<refmiscinfo class="source">#{doc.attr 'mansource', '&#160;'}</refmiscinfo>)
+        result << %(<refmiscinfo class="manual">#{doc.attr 'manmanual', '&#160;'}</refmiscinfo>)
         result << '</refmeta>'
         result << '<refnamediv>'
         result += (doc.attr 'mannames').map {|n| %(<refname>#{n}</refname>) } if doc.attr? 'mannames'
