@@ -50,10 +50,10 @@ module Asciidoctor
 # {Document#attr} or check for the existence of one using {Document#attr?}:
 #
 #   source = '= Asciidoctor
-#   :uri-project: http://asciidoctor.org'
+#   :uri-project: https://asciidoctor.org'
 #   document = Asciidoctor.load source, safe: :safe
 #   document.attr 'uri-project'
-#   # => 'http://asciidoctor.org'
+#   # => 'https://asciidoctor.org'
 #   document.attr? 'icons'
 #   # => false
 #

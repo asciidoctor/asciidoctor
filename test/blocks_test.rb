@@ -3283,7 +3283,7 @@ content
 
 [subs="attributes+,-verbatim,+specialcharacters,+macros"]
 ....
-http://{application}.org[{gt}{gt}] <1>
+https://{application}.org[{gt}{gt}] <1>
 ....
       EOS
 
@@ -3291,7 +3291,7 @@ http://{application}.org[{gt}{gt}] <1>
       block = doc.blocks.first
       assert_equal [:attributes, :specialcharacters, :macros], block.subs
       result = doc.render
-      assert_includes result, '<pre><a href="http://asciidoctor.org">&gt;&gt;</a> &lt;1&gt;</pre>'
+      assert_includes result, '<pre><a href="https://asciidoctor.org">&gt;&gt;</a> &lt;1&gt;</pre>'
     end
 
     test 'should be able to set subs then modify them' do

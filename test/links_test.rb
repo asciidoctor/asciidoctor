@@ -82,37 +82,37 @@ context 'Links' do
   end
 
   test 'qualified url with trailing round bracket' do
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', render_string('Asciidoctor is a Ruby-based AsciiDoc processor (see http://asciidoctor.org)'), 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', render_string('Asciidoctor is a Ruby-based AsciiDoc processor (see https://asciidoctor.org)'), 1
   end
 
   test 'qualified url with trailing semi-colon' do
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', render_string('http://asciidoctor.org; where text gets parsed'), 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', render_string('https://asciidoctor.org; where text gets parsed'), 1
   end
 
   test 'qualified url with trailing colon' do
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', render_string('http://asciidoctor.org: where text gets parsed'), 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', render_string('https://asciidoctor.org: where text gets parsed'), 1
   end
 
   test 'qualified url in round brackets with trailing colon' do
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', render_string('(http://asciidoctor.org): where text gets parsed'), 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', render_string('(https://asciidoctor.org): where text gets parsed'), 1
   end
 
   test 'qualified url with trailing round bracket followed by colon' do
-    result = render_embedded_string '(from http://asciidoctor.org): where text gets parsed'
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', result, 1
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]/preceding-sibling::text()[.="(from "]', result, 1
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]/following-sibling::text()[.="): where text gets parsed"]', result, 1
+    result = render_embedded_string '(from https://asciidoctor.org): where text gets parsed'
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/preceding-sibling::text()[.="(from "]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/following-sibling::text()[.="): where text gets parsed"]', result, 1
   end
 
   test 'qualified url in round brackets with trailing semi-colon' do
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', render_string('(http://asciidoctor.org); where text gets parsed'), 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', render_string('(https://asciidoctor.org); where text gets parsed'), 1
   end
 
   test 'qualified url with trailing round bracket followed by semi-colon' do
-    result = render_embedded_string '(from http://asciidoctor.org); where text gets parsed'
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]', result, 1
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]/preceding-sibling::text()[.="(from "]', result, 1
-    assert_xpath '//a[@href="http://asciidoctor.org"][text()="http://asciidoctor.org"]/following-sibling::text()[.="); where text gets parsed"]', result, 1
+    result = render_embedded_string '(from https://asciidoctor.org); where text gets parsed'
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/preceding-sibling::text()[.="(from "]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/following-sibling::text()[.="); where text gets parsed"]', result, 1
   end
 
   test 'URI scheme with trailing characters should not be converted to a link' do

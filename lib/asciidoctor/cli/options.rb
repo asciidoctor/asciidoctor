@@ -265,7 +265,7 @@ Example: asciidoctor -b html5 source.asciidoc
       end
 
       def print_version os = $stdout
-        os.puts %(Asciidoctor #{::Asciidoctor::VERSION} [http://asciidoctor.org])
+        os.puts %(Asciidoctor #{::Asciidoctor::VERSION} [https://asciidoctor.org])
         if RUBY_MIN_VERSION_1_9
           encoding_info = { 'lc' => 'locale', 'fs' => 'filesystem', 'in' => 'internal', 'ex' => 'external' }.map do |k, v|
             %(#{k}:#{v == 'internal' ? (::File.open(__FILE__) {|f| f.getc }).encoding : (::Encoding.find v)})

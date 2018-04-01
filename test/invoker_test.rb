@@ -141,7 +141,7 @@ context 'Invoker' do
   end
 
   test 'should display version and exit' do
-    expected = %(Asciidoctor #{Asciidoctor::VERSION} [http://asciidoctor.org]\nRuntime Environment (#{RUBY_DESCRIPTION}))
+    expected = %(Asciidoctor #{Asciidoctor::VERSION} [https://asciidoctor.org]\nRuntime Environment (#{RUBY_DESCRIPTION}))
     ['--version', '-V'].each do |switch|
       actual = nil
       redirect_streams do |out, err|
