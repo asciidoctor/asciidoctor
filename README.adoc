@@ -52,7 +52,7 @@ endif::[]
 :uri-gitscm-repo: https://github.com/git/git-scm.com
 :uri-prototype: {uri-gitscm-repo}/commits/master/lib/asciidoc.rb
 :uri-freesoftware: https://www.gnu.org/philosophy/free-sw.html
-:uri-foundation: http://foundation.zurb.com
+:uri-foundation: https://foundation.zurb.com
 :uri-tilt: https://github.com/rtomayko/tilt
 :uri-ruby: https://ruby-lang.org
 // images:
@@ -222,7 +222,7 @@ The version of Asciidoctor installed by the package manager (apt-get) may not ma
 Consult the package repository for your distribution to find out which version is packaged per distribution release.
 
 * https://packages.debian.org/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Debian release]
-* http://packages.ubuntu.com/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Ubuntu release]
+* https://packages.ubuntu.com/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Ubuntu release]
 * https://community.linuxmint.com/software/view/asciidoctor[asciidoctor package by Mint release]
 
 [CAUTION]
@@ -231,7 +231,7 @@ You're advised against using the `gem update` command to update a gem managed by
 Doing so puts the system into an inconsistent state as the package manager can no longer track the files (which get installed under /usr/local).
 Simply put, system gems should only be managed by the package manager.
 
-If you want to use a version of Asciidoctor that is newer than what is installed by the package manager, you should use http://rvm.io[RVM] to install Ruby in your home directory (i.e., user space).
+If you want to use a version of Asciidoctor that is newer than what is installed by the package manager, you should use https://rvm.io[RVM] to install Ruby in your home directory (i.e., user space).
 Then, you can safely use the `gem` command to install or update the Asciidoctor gem.
 When using RVM, gems are installed in a location isolated from the system.
 ====
@@ -283,7 +283,7 @@ You should see information about the Asciidoctor version and your Ruby environme
 
 [.output,subs=attributes+]
 ....
-Asciidoctor {release-version} [http://asciidoctor.org]
+Asciidoctor {release-version} [https://asciidoctor.org]
 Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
@@ -334,7 +334,7 @@ You can also convert an AsciiDoc string to embeddable HTML (for inserting in an 
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
 ----
 
@@ -342,7 +342,7 @@ If you want the full HTML document, enable the `header_footer` option as follows
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
 ----
 
@@ -350,7 +350,7 @@ If you need access to the parsed document, you can split the conversion into dis
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe
 puts document.doctitle
 html = document.convert
