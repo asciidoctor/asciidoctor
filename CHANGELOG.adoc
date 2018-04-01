@@ -63,7 +63,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.1[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.1[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.6...v1.5.6.1[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.6\...v1.5.6.1[full diff]
 // end::compact[]
 
 == 1.5.6 (2017-07-12) - @mojavelinux
@@ -279,7 +279,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.5...v1.5.6[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.5\...v1.5.6[full diff]
 
 == 1.5.5 (2016-10-05) - @mojavelinux
 
@@ -343,7 +343,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.5[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.5[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.4...v1.5.5[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.4\...v1.5.5[full diff]
 
 == 1.5.4 (2016-01-03) - @mojavelinux
 
@@ -402,7 +402,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.4[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.4[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.3...v1.5.4[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.3\...v1.5.4[full diff]
 
 == 1.5.3 (2015-10-31) - @mojavelinux
 
@@ -510,7 +510,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.3[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.3[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.2...v1.5.3[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.2\...v1.5.3[full diff]
 
 == 1.5.2 (2014-11-27) - @mojavelinux
 
@@ -564,7 +564,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.2[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.1...v1.5.2[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.1\...v1.5.2[full diff]
 
 == 1.5.1 (2014-09-29) - @mojavelinux
 
@@ -595,7 +595,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.1[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.1[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.0...v1.5.1[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.0\...v1.5.1[full diff]
 
 == 1.5.0 (2014-08-12) - @mojavelinux
 
@@ -785,7 +785,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?milestone=8&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.0[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v0.1.4...v1.5.0[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v0.1.4\...v1.5.0[full diff]
 
 == 0.1.4 (2013-09-05) - @mojavelinux
 
@@ -919,7 +919,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?milestone=7&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.4[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v0.1.3...v0.1.4[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v0.1.3\...v0.1.4[full diff]
 
 == 0.1.3 (2013-05-30) - @mojavelinux
 
@@ -988,7 +988,7 @@ Distribution Packages::
 http://asciidoctor.org/news/2013/05/31/asciidoctor-0-1-3-released[release notes] |
 https://github.com/asciidoctor/asciidoctor/issues?milestone=4&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.3[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v0.1.2...v0.1.3[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v0.1.2\...v0.1.3[full diff]
 
 == 0.1.2 (2013-04-25) - @mojavelinux
 
@@ -1043,7 +1043,7 @@ Distribution Packages::
 http://asciidoctor.org/news/2013/04/25/asciidoctor-0-1-2-released[release notes] |
 https://github.com/asciidoctor/asciidoctor/issues?milestone=3&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.2[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v0.1.1...v0.1.2[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v0.1.1\...v0.1.2[full diff]
 
 == 0.1.1 (2013-02-26) - @erebor
 
@@ -1098,7 +1098,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?milestone=1&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.1[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v0.1.0...v0.1.1[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v0.1.0\...v0.1.1[full diff]
 
 == 0.1.0 (2013-02-04) - @erebor
 
@@ -1150,7 +1150,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?milestone=12&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.0[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v0.0.9...v0.1.0[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v0.0.9\...v0.1.0[full diff]
 
 == Older releases (pre-0.0.1)
 
