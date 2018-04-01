@@ -54,7 +54,7 @@ endif::[]
 :uri-freesoftware: https://www.gnu.org/philosophy/free-sw.html
 :uri-foundation: https://foundation.zurb.com
 :uri-tilt: https://github.com/rtomayko/tilt
-:uri-ruby: https://ruby-lang.org
+:uri-ruby: https://www.ruby-lang.org
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
