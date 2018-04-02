@@ -11,6 +11,11 @@ Gem::Specification.new do |s|
   s.email = ['dan.j.allen@gmail.com']
   s.homepage = 'http://asciidoctor.org'
   s.license = 'MIT'
+  s.metadata = {
+    'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor/issues',
+    'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor/blob/master/CHANGELOG.adoc',
+    'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor'
+  }
 
   files = begin
     (result = Open3.popen3('git ls-files -z') {|_, out| out.read }.split %(\0)).empty? ? Dir['**/*'] : result
