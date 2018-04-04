@@ -196,7 +196,7 @@ class PathResolver
   #
   # returns If path descends from base, return the offset, otherwise false.
   def descends_from? path, base
-    base == path ? 0 : ((path.start_with? base + '/') ? base.length + 1 : false)
+    base == path ? 0 : ((path.start_with? base + SLASH) ? base.length + 1 : false)
   end
 
   # Public: Normalize path by converting any backslashes to forward slashes
