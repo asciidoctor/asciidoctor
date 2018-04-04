@@ -109,6 +109,22 @@ context 'Path Resolver' do
       @resolver = Asciidoctor::PathResolver.new
     end
 
+    test 'raises security error if jail is not an absolute path' do
+      begin
+        @resolver.system_path('images/tiger.png', '/etc', 'foo')
+        flunk 'Expecting SecurityError to be raised'
+      rescue SecurityError
+      end
+    end
+
+    test 'raises security error if jail is not a canoncial path' do
+      begin
+        @resolver.system_path('images/tiger.png', '/etc', %(#{JAIL}/../foo))
+        flunk 'Expecting SecurityError to be raised'
+      rescue SecurityError
+      end
+    end
+
     test 'prevents access to paths outside of jail' do
       result, warnings = redirect_streams do |_, err|
         [(@resolver.system_path '../../../../../css', %(#{JAIL}/assets/stylesheets), JAIL), err.string]
@@ -120,7 +136,7 @@ context 'Path Resolver' do
         [(@resolver.system_path '/../../../../../css', %(#{JAIL}/assets/stylesheets), JAIL), err.string]
       end
       assert_equal %(#{JAIL}/css), result
-      assert_includes warnings, 'path has illegal reference to ancestor of jail'
+      assert_includes warnings, 'path is outside of jail'
 
       result, warnings = redirect_streams do |_, err|
         [(@resolver.system_path '../../../css', '../../..', JAIL), err.string]
@@ -146,15 +162,30 @@ context 'Path Resolver' do
       assert_equal "#{JAIL}/stylesheets", @resolver.system_path('', "#{JAIL}/assets/../stylesheets", JAIL)
     end
 
+    test 'expands parent references in start path if target is not empty' do
+      assert_equal "#{JAIL}/stylesheets/site.css", @resolver.system_path('site.css', "#{JAIL}/assets/../stylesheets", JAIL)
+    end
+
     test 'resolves start path if target is dot' do
       assert_equal "#{JAIL}/assets/stylesheets", @resolver.system_path('.', "#{JAIL}/assets/stylesheets", JAIL)
       assert_equal "#{JAIL}/assets/stylesheets", @resolver.system_path('./', "#{JAIL}/assets/stylesheets", JAIL)
     end
 
-    test 'treats absolute target as relative when jail is specified' do
-      assert_equal "#{JAIL}/assets/stylesheets", @resolver.system_path('/', "#{JAIL}/assets/stylesheets", JAIL)
-      assert_equal "#{JAIL}/assets/stylesheets/foo", @resolver.system_path('/foo', "#{JAIL}/assets/stylesheets", JAIL)
-      assert_equal "#{JAIL}/assets/foo", @resolver.system_path('/../foo', "#{JAIL}/assets/stylesheets", JAIL)
+    test 'treats absolute target outside of jail as relative when jail is specified' do
+      result, warnings = redirect_streams do |_, err|
+        [(@resolver.system_path '/', "#{JAIL}/assets/stylesheets", JAIL), err.string]
+      end
+      assert_equal JAIL, result
+
+      result, warnings = redirect_streams do |_, err|
+        [(@resolver.system_path '/foo', "#{JAIL}/assets/stylesheets", JAIL), err.string]
+      end
+      assert_equal "#{JAIL}/foo", result
+
+      result, warnings = redirect_streams do |_, err|
+        [(@resolver.system_path '/../foo', "#{JAIL}/assets/stylesheets", JAIL), err.string]
+      end
+      assert_equal "#{JAIL}/foo", result
     end
 
     test 'allows use of absolute target or start if resolved path is sub-path of jail' do
@@ -170,18 +201,36 @@ context 'Path Resolver' do
       assert_equal "#{JAIL}/images/tiger.png", @resolver.system_path('images/tiger.png', nil, JAIL)
     end
 
-    test 'raises security error if start is not contained within jail' do
+    test 'warns if start is not contained within jail' do
+      result, warnings = redirect_streams do |_, err|
+        [(@resolver.system_path 'images/tiger.png', '/etc', JAIL), err.string]
+      end
+      assert_equal %(#{JAIL}/images/tiger.png), result
+      assert_includes warnings, 'start path is outside of jail'
+
+      result, warnings = redirect_streams do |_, err|
+        [(@resolver.system_path '.', '/etc', JAIL), err.string]
+      end
+      assert_equal JAIL, result
+      assert_includes warnings, 'start path is outside of jail'
+    end
+
+    test 'raises security error if start is not contained within jail and recover is disabled' do
       begin
-        @resolver.system_path('images/tiger.png', '/etc', JAIL)
+        @resolver.system_path('images/tiger.png', '/etc', JAIL, :recover => false)
         flunk 'Expecting SecurityError to be raised'
       rescue SecurityError
       end
 
       begin
-        @resolver.system_path('.', '/etc', JAIL)
+        @resolver.system_path('.', '/etc', JAIL, :recover => false)
         flunk 'Expecting SecurityError to be raised'
       rescue SecurityError
       end
+    end
+
+    test 'expands parent references in absolute path if jail is not specified' do
+      assert_equal '/etc/stylesheet.css', @resolver.system_path('/usr/share/../../etc/stylesheet.css')
     end
 
     test 'resolves absolute directory if jail is not specified' do
