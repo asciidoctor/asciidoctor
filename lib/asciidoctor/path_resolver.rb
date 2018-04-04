@@ -225,8 +225,7 @@ class PathResolver
   #
   # returns a String path with any parent or self references resolved.
   def expand_path path
-    path_segments, path_root, _ = partition_path path
-    join_path path_segments, path_root
+    join_path *partition_path(path)
   end
 
   # Public: Partition the path into path segments and remove any empty segments
@@ -237,11 +236,8 @@ class PathResolver
   # web  - a Boolean indicating whether the path should be handled
   #        as a web path (optional, default: false)
   #
-  # Returns a 3-item Array containing the Array of String path segments, the
-  # path root (e.g., '/', './', 'c:/') if the path is absolute and the posix
-  # version of the path.
-  #--
-  # QUESTION is it worth it to normalize slashes? it doubles the time elapsed
+  # Returns a 2-item Array containing the Array of String path segments and the
+  # path root (e.g., '/', './', 'c:/', or '//'), which is nil unless the path is absolute.
   def partition_path path, web = nil
     if (result = (cache = web ? @_partition_path_web : @_partition_path_sys)[path])
       return result
@@ -275,24 +271,10 @@ class PathResolver
     # else ex. sample/path
     end
 
-    path_segments = posix_path.split SLASH
-    # shift twice for a UNC path
-    if root == DOUBLE_SLASH
-      path_segments = path_segments[2..-1]
-    # shift twice for a file:/// path and adjust root
-    # NOTE technically file:/// paths work without this adjustment
-    #elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && root == 'file:/'
-    #  root = 'file://'
-    #  path_segments = path_segments[2..-1]
-    # shift once for any other root
-    elsif root
-      path_segments.shift
-    end
+    path_segments = (root ? (posix_path.slice root.length, posix_path.length) : posix_path).split SLASH
     # strip out all dot entries
     path_segments.delete DOT
-    # QUESTION should we chop trailing /? (we pay a small fraction)
-    #posix_path = posix_path.chop if posix_path.end_with? SLASH
-    cache[path] = [path_segments, root, posix_path]
+    cache[path] = [path_segments, root]
   end
 
   # Public: Join the segments using the posix file separator (since Ruby knows
@@ -338,7 +320,7 @@ class PathResolver
     if target.nil_or_empty?
       target_segments = []
     else
-      target_segments, target_root, _ = partition_path target
+      target_segments, target_root = partition_path target
     end
 
     if target_segments.empty?
@@ -372,22 +354,22 @@ class PathResolver
 
     # both jail and start have been posixfied at this point
     if jail == start
-      jail_segments, jail_root, _ = partition_path jail
+      jail_segments, jail_root = partition_path jail
       start_segments = jail_segments.dup
     elsif jail
       unless start.start_with? jail
         raise ::SecurityError, %(#{opts[:target_name] || 'Start path'} #{start} is outside of jail: #{jail} (disallowed in safe mode))
       end
 
-      start_segments, start_root, _ = partition_path start
-      jail_segments, jail_root, _ = partition_path jail
+      start_segments, start_root = partition_path start
+      jail_segments, jail_root = partition_path jail
 
       # Already checked for this condition
       #if start_root != jail_root
       #  raise ::SecurityError, %(Jail root #{jail_root} does not match root of #{opts[:target_name] || 'start path'}: #{start_root})
       #end
     else
-      start_segments, start_root, _ = partition_path start
+      start_segments, start_root = partition_path start
       jail_root = start_root
     end
 
@@ -452,7 +434,7 @@ class PathResolver
     #  end
     #end
 
-    target_segments, target_root, _ = partition_path target, true
+    target_segments, target_root = partition_path target, true
     resolved_segments = []
     target_segments.each do |segment|
       if segment == DOT_DOT
