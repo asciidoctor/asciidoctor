@@ -212,7 +212,9 @@ context 'Path Resolver' do
     test 'resolves and normalizes start with target is empty' do
       pwd = File.expand_path Dir.pwd
       assert_equal '/home/doctor/docs', (@resolver.system_path '', '/home/doctor/docs')
+      assert_equal '/home/doctor/docs', (@resolver.system_path '', '/home/doctor/./docs')
       assert_equal '/home/doctor/docs', (@resolver.system_path nil, '/home/doctor/docs')
+      assert_equal '/home/doctor/docs', (@resolver.system_path nil, '/home/doctor/./docs')
       assert_equal %(#{pwd}/assets/images), (@resolver.system_path nil, 'assets/images')
       result, warnings = redirect_streams do |_, err|
         [(@resolver.system_path '', '../assets/images', JAIL), err.string]
