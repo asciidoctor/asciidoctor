@@ -142,6 +142,10 @@ context 'Path Resolver' do
       assert_equal "#{JAIL}/assets/stylesheets", @resolver.system_path(nil, "#{JAIL}/assets/stylesheets", JAIL)
     end
 
+    test 'expands parent references in start path if target is empty' do
+      assert_equal "#{JAIL}/stylesheets", @resolver.system_path('', "#{JAIL}/assets/../stylesheets", JAIL)
+    end
+
     test 'resolves start path if target is dot' do
       assert_equal "#{JAIL}/assets/stylesheets", @resolver.system_path('.', "#{JAIL}/assets/stylesheets", JAIL)
       assert_equal "#{JAIL}/assets/stylesheets", @resolver.system_path('./', "#{JAIL}/assets/stylesheets", JAIL)

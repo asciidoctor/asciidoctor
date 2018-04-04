@@ -213,19 +213,28 @@ class PathResolver
   end
   alias posixfy posixify
 
-  # Public: Expand the path by resolving any parent references (..)
-  # and cleaning self references (.).
-  #
-  # The result will be relative if the path is relative and
-  # absolute if the path is absolute. The file separator used
-  # in the expanded path is the one specified when the class
-  # was constructed.
+  # Public: Expand the specified path by converting the path to a posix path, resolving parent
+  # references (..), and removing self references (.).
   #
   # path - the String path to expand
   #
-  # returns a String path with any parent or self references resolved.
+  # returns a String path as a posix path with parent references resolved and self references removed.
+  # The result will be relative if the path is relative and absolute if the path is absolute.
   def expand_path path
-    join_path *partition_path(path)
+    path_segments, path_root = partition_path path
+    if path_segments.include? DOT_DOT
+      resolved_segments = []
+      path_segments.each do |segment|
+        if segment == DOT_DOT
+          resolved_segments.pop
+        else
+          resolved_segments << segment
+        end
+      end
+      join_path resolved_segments, path_root
+    else
+      join_path path_segments, path_root
+    end
   end
 
   # Public: Partition the path into path segments and remove any empty segments
