@@ -1,7 +1,6 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>; Ryan Waldron <https://github.com/erebor[@erebor]>
 // settings:
-:page-layout: base
 :idprefix:
 :idseparator: -
 :source-language: ruby
@@ -47,7 +46,7 @@ endif::[]
 :uri-user-manual: {uri-docs}/user-manual
 :uri-install-docker: https://github.com/asciidoctor/docker-asciidoctor
 //:uri-install-doc: {uri-docs}/install-toolchain
-:uri-install-osx-doc: {uri-docs}/install-asciidoctor-macosx
+:uri-install-macos-doc: {uri-docs}/install-asciidoctor-macos
 :uri-render-doc: {uri-docs}/render-documents
 :uri-themes-doc: {uri-docs}/produce-custom-themes-using-asciidoctor-stylesheet-factory
 :uri-gitscm-repo: https://github.com/git/git-scm.com
@@ -61,7 +60,7 @@ endif::[]
 
 {uri-project}/[Asciidoctor] est un processeur de texte _rapide_ et une chaîne de publication pour convertir du contenu {uri-what-is-asciidoc}[AsciiDoc] en HTML5, DocBook 5 (ou 4.5) et d'autres formats.
 Asciidoctor est écrit en Ruby, packagé sous forme de RubyGem et publié sur {uri-rubygem}[RubyGems.org].
-La gemme est aussi incluse dans plusieurs distributions Linux, dont Fedora, Debian et Ubuntu.
+La gemme est aussi incluse dans plusieurs distributions Linux, dont Fedora, Debian, Ubuntu et Alpine.
 Asciidoctor est open source, {uri-repo}[hébergé sur GitHub] et distribué sous {uri-license}[licence MIT].
 
 ifndef::env-site[]
@@ -95,7 +94,7 @@ ifdef::status[]
 image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor]
 image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true&amp;passingText=green%20bar&amp;failingText=%23fail&amp;pendingText=building%2E%2E%2E[Build Status (AppVeyor), link=https://ci.appveyor.com/project/asciidoctor/asciidoctor]
 //image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status, link=https://coveralls.io/r/asciidoctor/asciidoctor]
-image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate, link="https://codeclimate.com/github/asciidoctor/asciidoctor"]
+//image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate, link="https://codeclimate.com/github/asciidoctor/asciidoctor"]
 image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="https://inch-ci.org/github/asciidoctor/asciidoctor"]
 endif::[]
 
@@ -113,16 +112,16 @@ Asciidoctor lit et analyse la syntaxe du texte écrit en AsciiDoc afin de créer
 Vous avez la possibilité d'écrire votre propre convertisseur ou de fournir des templates supportant {uri-tilt}[Tilt] pour personnaliser le résultat généré ou pour produire des formats alternatifs.
 
 NOTE: Asciidoctor est un remplaçant du processeur AsciiDoc original écrit en Python (`asciidoc.py`).
-La suite de tests Asciidoctor possède {uri-tests}[> 1,600 tests] pour garantir la compatibilité avec la syntaxe AsciiDoc.
+La suite de tests Asciidoctor possède {uri-tests}[> 1,900 tests] pour garantir la compatibilité avec la syntaxe AsciiDoc.
 
 En plus de la syntaxe AsciiDoc standard, Asciidoctor reconnaît des balises additionnelles ainsi que des options de formatage, comme les polices d'icônes (par exemple `+icon:fire[]+`) et des éléments d'interface (par exemple `+button:[Enregistrer]+`).
 Asciidoctor offre aussi un thème moderne et « responsive » basé sur {uri-foundation}[Foundation] pour styliser le document HTML5 généré.
 
 == Prérequis
 
-Asciidoctor fonctionne sur Linux, OS X (Mac), Windows et requiert une des implémentations suivantes :
+Asciidoctor fonctionne sur Linux, macOS et Windows et requiert une des implémentations suivantes de {uri-ruby}[Ruby] :
 
-* MRI (Ruby 1.8.7, 1.9.3, 2.0, 2.1, 2.2 & 2.3)
+* Ruby (MRI/CRuby 1.8.7 - 2.5)
 * JRuby (1.7 dans les modes Ruby 1.8 et 1.9, 9000)
 * Rubinius 2.2.x
 * Opal (JavaScript)
@@ -144,7 +143,7 @@ Asciidoctor fonctionne mieux lorsque vous utilisez UTF-8 partout.
 
 == Installation
 
-Asciidoctor peut être installé en utilisant la commande (a) `gem install`, (b) Bundler, (c) les gestionnaires de paquets pour les distributions Linux populaires, ou (d) Homebrew pour OS X.
+Asciidoctor peut être installé en utilisant la commande (a) `gem install`, (b) Bundler, (c) les gestionnaires de paquets pour les distributions Linux populaires, ou (d) Homebrew pour macOS.
 
 TIP: L'avantage d'utiliser le gestionnaire de paquets pour installer la gemme est que l'installation englobe celle des librairies Ruby et RubyGems si elles ne sont pas déjà installés.
 L'inconvénient est que le paquet n'est pas forcément mis à jour immédiatement après la mise à disposition de la gemme.
@@ -208,7 +207,7 @@ Pour mettre à jour la gemme, utilisez :
 
 TIP: Votre système peut être configuré pour mettre à jour automatiquement les paquets rpm, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gemme.
 
-==== apt-get (Debian, Ubuntu, Mint)
+==== apt-get (Debian, Ubuntu, ou Mint)
 
 Pour installer la gemme sur Debian, Ubuntu ou Mint, ouvrez un terminal et tapez :
 
@@ -250,14 +249,17 @@ Pour mettre à jour la gemme, utilisez :
 
 TIP: Votre système peut être configuré pour mettre à jour automatiquement les paquets apk, auquel cas aucune action de votre part ne sera nécessaire pour mettre à jour la gemme.
 
-=== (d) Homebrew (OS X)
+=== (d) Homebrew (macOS)
 
-Tout d'abord suivre les instructions sur https://brew.sh/[brew.sh] pour installer Homebrew.
-Une fois Homebrew installé, ouvrir un terminal et exécuter:
+Vous pouvez utiliser Homebrew pour installer Asciidoctor sur macOS.
+Si vous n'avez pas encore installé Homebrew, suivez les instructions sur https://brew.sh/[brew.sh].
+
+Une fois Homebrew installé, vous pouvez installer la gemme `asciidoctor` avec le paquet http://brewformulas.org/Asciidoctor[asciidoctor].
+Ouvrez un terminal et tapez :
 
  $ brew install asciidoctor
 
-Pour mettre à jour la gemme, utiliser:
+Pour mettre à jour la gemme, utilisez :
 
  $ brew update
  $ brew upgrade asciidoctor
@@ -267,7 +269,7 @@ TIP: Homebrew installe la gemme `asciidoctor` dans un répertoire spécifique q
 === Autres options d'installation
 
 * {uri-install-docker}[Installation d'Asciidoctor avec Docker]
-* {uri-install-osx-doc}[Installation d'Asciidoctor sur Mac OS X]
+* {uri-install-macos-doc}[Installation d'Asciidoctor sur macOS]
 // pour l'instant, l'entrée suivante est juste une répétition de l'information dans ce README
 //* {uri-install-doc}[Installation de l'outillage Asciidoctor]
 
@@ -395,7 +397,7 @@ Mais nous ne pouvons pas le faire sans avoir vos avis !
 Nous vous encourageons à poser vos questions et discuter de n'importe quels aspects du projet sur la liste de discussion, Twitter ou dans le salon de discussion.
 
 Mailing list:: {uri-discuss}
-Twitter (Chat):: hashtag #asciidoctor ou la mention @asciidoctor
+Twitter:: hashtag https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] ou la mention https://twitter.com/asciidoctor[@asciidoctor]
 Gitter (Chat):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
 ////
 IRC (Chat):: {uri-irc}[#asciidoctor] sur FreeNode IRC
@@ -427,6 +429,7 @@ Le projet a été initié en 2012 par https://github.com/erebor[Ryan Waldron] et
 
 *AsciiDoc* a été démarré par Stuart Rackham et a reçu de nombreuses contributions de la part de la communauté AsciiDoc.
 
+ifndef::env-site[]
 == Changelog
 
 ifeval::[{safe-mode-level} < 20]
@@ -434,3 +437,4 @@ include::CHANGELOG.adoc[tag=compact,leveloffset=+1]
 endif::[]
 
 Référez-vous au fichier {uri-changelog}[CHANGELOG] pour une liste complète des changements des versions précédentes.
+endif::[]
