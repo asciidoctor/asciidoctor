@@ -393,7 +393,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           block 'foobar'
         end
-        doc = empty_document
+        empty_document
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
         assert_equal 'Could not resolve class for name: foobar', e.message
