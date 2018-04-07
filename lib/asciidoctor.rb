@@ -1478,7 +1478,7 @@ module Asciidoctor
         raise ::IOError, %(input file and output file cannot be the same: #{outfile})
       end
     elsif write_to_target # write to explicit file or directory
-      working_dir = (options.key? :base_dir) ? (::File.expand_path options[:base_dir]) : (::File.expand_path ::Dir.pwd)
+      working_dir = (options.key? :base_dir) ? (::File.expand_path options[:base_dir]) : ::Dir.pwd
       # QUESTION should the jail be the working_dir or doc.base_dir???
       jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
       if to_dir

@@ -126,7 +126,7 @@ class PathResolver
     if working_dir
       @working_dir = (root? working_dir) ? (posixify working_dir) : (::File.expand_path working_dir)
     else
-      @working_dir = ::File.expand_path ::Dir.pwd
+      @working_dir = ::Dir.pwd
     end
     @_partition_path_sys, @_partition_path_web = {}, {}
   end
