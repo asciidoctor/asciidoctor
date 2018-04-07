@@ -204,6 +204,9 @@ context 'Path Resolver' do
       assert_equal "#{JAIL}/my/path", @resolver.system_path('', "#{JAIL}/my/path", JAIL)
       assert_equal "#{JAIL}/my/path", @resolver.system_path(nil, "#{JAIL}/my/path", JAIL)
       assert_equal "#{JAIL}/my/path", @resolver.system_path('path', "#{JAIL}/my", JAIL)
+      assert_equal '/foo/bar/baz.adoc', @resolver.system_path('/foo/bar/baz.adoc', nil, '/')
+      assert_equal '/foo/bar/baz.adoc', @resolver.system_path('baz.adoc', '/foo/bar', '/')
+      assert_equal '/foo/bar/baz.adoc', @resolver.system_path('baz.adoc', 'foo/bar', '/')
     end
 
     test 'uses jail path if start path is empty' do
@@ -300,7 +303,7 @@ context 'Path Resolver' do
       assert_equal "#{pwd}/.images/tiger.png", @resolver.system_path('.images/tiger.png', nil)
     end
 
-    test 'resolves and normalizes start with target is empty' do
+    test 'resolves and normalizes start when target is empty' do
       pwd = File.expand_path Dir.pwd
       assert_equal '/home/doctor/docs', (@resolver.system_path '', '/home/doctor/docs')
       assert_equal '/home/doctor/docs', (@resolver.system_path '', '/home/doctor/./docs')

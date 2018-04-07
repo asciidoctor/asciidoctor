@@ -196,7 +196,13 @@ class PathResolver
   #
   # returns If path descends from base, return the offset, otherwise false.
   def descends_from? path, base
-    base == path ? 0 : ((path.start_with? base + SLASH) ? base.length + 1 : false)
+    if base == path
+      0
+    elsif base == SLASH
+      (path.start_with? SLASH) ? 1 : false
+    else
+      (path.start_with? base + SLASH) ? base.length + 1 : false
+    end
   end
 
   # Public: Normalize path by converting any backslashes to forward slashes
@@ -369,7 +375,7 @@ class PathResolver
       start = posixify start if jail
     else
       #start = system_path start, jail, jail, opts
-      start = %(#{jail || @working_dir}/#{start})
+      start = %(#{(jail || @working_dir).chomp '/'}/#{start})
     end
 
     # both jail and start have been posixified at this point if jail is set
