@@ -124,7 +124,7 @@ class PathResolver
   def initialize file_separator = nil, working_dir = nil
     @file_separator = file_separator ? file_separator : (::File::ALT_SEPARATOR || ::File::SEPARATOR)
     if working_dir
-      @working_dir = (root? working_dir) ? working_dir : (::File.expand_path working_dir)
+      @working_dir = (root? working_dir) ? (posixify working_dir) : (::File.expand_path working_dir)
     else
       @working_dir = ::File.expand_path ::Dir.pwd
     end
@@ -221,8 +221,8 @@ class PathResolver
   # returns a String path as a posix path with parent references resolved and self references removed.
   # The result will be relative if the path is relative and absolute if the path is absolute.
   def expand_path path
+    path_segments, path_root = partition_path path
     if path.include? DOT_DOT
-      path_segments, path_root = partition_path path
       resolved_segments = []
       path_segments.each do |segment|
         if segment == DOT_DOT
@@ -233,7 +233,7 @@ class PathResolver
       end
       join_path resolved_segments, path_root
     else
-      join_path(*partition_path(path))
+      join_path path_segments, path_root
     end
   end
 
@@ -329,23 +329,25 @@ class PathResolver
       jail = posixify jail
     end
 
-    if target.nil_or_empty?
-      target_segments = []
-    elsif root? target
-      target_path = expand_path target
-      if jail && !(descends_from? target_path, jail)
-        if opts.fetch :recover, true
-          warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
-          target_segments, _ = partition_path target_path
-          jail_segments, jail_root = partition_path jail
-          return join_path jail_segments + target_segments, jail_root
-        else
-          raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} is outside of jail: #{jail} (disallowed in safe mode))
+    if target
+      if root? target
+        target_path = expand_path target
+        if jail && !(descends_from? target_path, jail)
+          if opts.fetch :recover, true
+            warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
+            target_segments, _ = partition_path target_path
+            jail_segments, jail_root = partition_path jail
+            return join_path jail_segments + target_segments, jail_root
+          else
+            raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} is outside of jail: #{jail} (disallowed in safe mode))
+          end
         end
+        return target_path
+      else
+        target_segments, _ = partition_path target
       end
-      return target_path
     else
-      target_segments, _ = partition_path target
+      target_segments = []
     end
 
     if target_segments.empty?
@@ -358,44 +360,45 @@ class PathResolver
           return expand_path start
         end
       else
-        return system_path start, jail, jail, opts
+        target_segments, _ = partition_path start
+        start = jail || @working_dir
       end
     elsif start.nil_or_empty?
       start = jail || @working_dir
     elsif root? start
-      start = posixify start
+      start = posixify start if jail
     else
-      start = system_path start, jail, jail, opts
+      #start = system_path start, jail, jail, opts
+      start = %(#{jail || @working_dir}/#{start})
     end
 
-    # both jail and start have been posixified at this point
-    if jail && !(descends_from? start, jail)
+    # both jail and start have been posixified at this point if jail is set
+    if jail && (recheck = !(descends_from? start, jail)) && @file_separator == BACKSLASH
       start_segments, start_root = partition_path start
       jail_segments, jail_root = partition_path jail
       if start_root != jail_root
-        if (recover ||= (opts.fetch :recover, true))
+        if opts.fetch :recover, true
           warn %(asciidoctor: WARNING: start path for #{opts[:target_name] || 'path'} is outside of jail root, auto-recovering)
           start_segments = jail_segments
+          recheck = false
         else
           raise ::SecurityError, %(start path for #{opts[:target_name] || 'path'} #{start} refers to location outside jail root: #{jail} (disallowed in safe mode))
         end
-      else
-        recheck = true
       end
     else
       start_segments, jail_root = partition_path start
     end
 
-    if ((resolved_segments = start_segments + target_segments).include? DOT_DOT)
-      raw_segments, resolved_segments = resolved_segments, []
+    if (resolved_segments = start_segments + target_segments).include? DOT_DOT
+      unresolved_segments, resolved_segments = resolved_segments, []
       if jail
-        jail_segments, _ = partition_path jail
+        jail_segments, _ = partition_path jail unless jail_segments
         warned = false
-        raw_segments.each do |segment|
+        unresolved_segments.each do |segment|
           if segment == DOT_DOT
             if resolved_segments.size > jail_segments.size
               resolved_segments.pop
-            elsif (recover ||= (opts.fetch :recover, true))
+            elsif opts.fetch :recover, true
               warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering) unless warned
             else
               raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode))
@@ -405,21 +408,18 @@ class PathResolver
           end
         end
       else
-        raw_segments.each do |segment|
-          if segment == DOT_DOT
-            resolved_segments.pop
-          else
-            resolved_segments << segment
-          end
+        unresolved_segments.each do |segment|
+          segment == DOT_DOT ? resolved_segments.pop : resolved_segments << segment
         end
       end
     end
 
     if recheck
-      if (resolved_segments.slice 0, jail_segments.length) == jail_segments
-        join_path resolved_segments, jail_root
-      elsif (recover ||= (opts.fetch :recover, true))
+      if descends_from?((target_path = join_path resolved_segments, jail_root), jail)
+        target_path
+      elsif opts.fetch :recover, true
         warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
+        jail_segments, _ = partition_path jail unless jail_segments
         join_path jail_segments + target_segments, jail_root
       else
         raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} is outside of jail: #{jail} (disallowed in safe mode))
