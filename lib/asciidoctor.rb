@@ -1429,7 +1429,6 @@ module Asciidoctor
     to_file = options.delete(:to_file)
     to_dir = options.delete(:to_dir)
     mkdirs = options.delete(:mkdirs) || false
-    timings = options[:timings]
 
     case to_file
     when true, nil
