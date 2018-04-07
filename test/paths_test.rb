@@ -117,13 +117,13 @@ context 'Path Resolver' do
       end
     end
 
-    test 'raises security error if jail is not a canoncial path' do
-      begin
-        @resolver.system_path('images/tiger.png', '/etc', %(#{JAIL}/../foo))
-        flunk 'Expecting SecurityError to be raised'
-      rescue SecurityError
-      end
-    end
+    #test 'raises security error if jail is not a canoncial path' do
+    #  begin
+    #    @resolver.system_path('images/tiger.png', '/etc', %(#{JAIL}/../foo))
+    #    flunk 'Expecting SecurityError to be raised'
+    #  rescue SecurityError
+    #  end
+    #end
 
     test 'prevents access to paths outside of jail' do
       result, warnings = redirect_streams do |_, err|
@@ -176,16 +176,26 @@ context 'Path Resolver' do
         [(@resolver.system_path '/', "#{JAIL}/assets/stylesheets", JAIL), err.string]
       end
       assert_equal JAIL, result
+      assert_includes warnings, 'outside of jail'
 
       result, warnings = redirect_streams do |_, err|
         [(@resolver.system_path '/foo', "#{JAIL}/assets/stylesheets", JAIL), err.string]
       end
       assert_equal "#{JAIL}/foo", result
+      assert_includes warnings, 'outside of jail'
 
       result, warnings = redirect_streams do |_, err|
         [(@resolver.system_path '/../foo', "#{JAIL}/assets/stylesheets", JAIL), err.string]
       end
       assert_equal "#{JAIL}/foo", result
+      assert_includes warnings, 'outside of jail'
+
+      @resolver.file_separator = '\\'
+      result, warnings = redirect_streams do |_, err|
+        [(@resolver.system_path 'baz.adoc', 'C:/foo', 'C:/bar'), err.string]
+      end
+      assert_equal 'C:/bar/baz.adoc', result
+      assert_includes warnings, 'outside of jail'
     end
 
     test 'allows use of absolute target or start if resolved path is sub-path of jail' do
@@ -206,13 +216,41 @@ context 'Path Resolver' do
         [(@resolver.system_path 'images/tiger.png', '/etc', JAIL), err.string]
       end
       assert_equal %(#{JAIL}/images/tiger.png), result
-      assert_includes warnings, 'start path is outside of jail'
+      assert_includes warnings, 'path is outside of jail'
 
       result, warnings = redirect_streams do |_, err|
         [(@resolver.system_path '.', '/etc', JAIL), err.string]
       end
       assert_equal JAIL, result
-      assert_includes warnings, 'start path is outside of jail'
+      assert_includes warnings, 'path is outside of jail'
+
+      @resolver.file_separator = '\\'
+      result, warnings = redirect_streams do |_, err|
+        [(@resolver.system_path '.', 'C:/foo', 'C:/bar'), err.string]
+      end
+      assert_equal 'C:/bar', result
+      assert_includes warnings, 'path is outside of jail'
+    end
+
+    test 'allows start path to be parent of jail if resolved target is inside jail' do
+      assert_equal "#{JAIL}/foo/path", @resolver.system_path('foo/path', JAIL, "#{JAIL}/foo")
+      @resolver.file_separator = '\\'
+      assert_equal "C:/dev/project/README.adoc", @resolver.system_path('project/README.adoc', 'C:/dev', 'C:/dev/project')
+    end
+
+    test 'relocates target to jail if resolved value fails outside of jail' do
+      result, warnings = redirect_streams do |_, err|
+        [(@resolver.system_path 'bar/baz.adoc', JAIL, "#{JAIL}/foo"), err.string]
+      end
+      assert_equal %(#{JAIL}/foo/bar/baz.adoc), result
+      assert_includes warnings, 'path is outside of jail'
+
+      @resolver.file_separator = '\\'
+      result, warnings = redirect_streams do |_, err|
+        [(@resolver.system_path 'bar/baz.adoc', 'D:/', 'C:/foo'), err.string]
+      end
+      assert_equal 'C:/foo/bar/baz.adoc', result
+      assert_includes warnings, 'path is outside of jail'
     end
 
     test 'raises security error if start is not contained within jail and recover is disabled' do
