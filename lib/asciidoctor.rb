@@ -1468,7 +1468,7 @@ module Asciidoctor
       end
     end
 
-    # NOTE :to_dir always set when outputting to a file
+    # NOTE :to_dir is always set when outputting to a file
     # NOTE :to_file option only passed if assigned an explicit path
     doc = self.load input, options
 

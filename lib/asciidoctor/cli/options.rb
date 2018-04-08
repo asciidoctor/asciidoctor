@@ -78,8 +78,6 @@ Example: asciidoctor -b html5 source.asciidoc
                   'specify eRuby implementation to use when rendering custom ERB templates: [erb, erubis] (default: erb)') do |eruby|
             self[:eruby] = eruby
           end
-          opts.on('-C', '--compact', 'compact the output by removing blank lines. (No longer in use)') do
-          end
           opts.on('-a', '--attribute key[=value]', 'a document attribute to set in the form of key, key! or key=value pair',
                   'unless @ is appended to the value, this attributes takes precedence over attributes',
                   'defined in the source document') do |attr|

@@ -2,7 +2,7 @@
 Dan Allen; Sarah White; Ryan Waldron
 :doctype: manpage
 :man manual: Asciidoctor Manual
-:man source: Asciidoctor 1.5.6.1
+:man source: Asciidoctor 1.5.6.2
 :page-layout: base
 
 == NAME
@@ -66,10 +66,6 @@ This option may be specified more than once.
   Defaults to _article_.
 
 === Rendering Control
-
-*-C, --compact*::
-  Compact the output by removing blank lines.
-  (No longer in use).
 
 *-D, --destination-dir*=_DIR_::
   Destination output directory.
