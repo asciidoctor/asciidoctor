@@ -3,7 +3,6 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :keywords: release policy
-:table-caption!:
 
 == 1.5.7 Version Policy
 
@@ -64,15 +63,15 @@ Dates are formatted as year/month/day.
 |GA/GS
 |2017/07/23
 |2017/07/23
-|2018/06*
-|2018/06*
+|2018/06 ^[1]^
+|2018/06 ^[1]^
 
 |Asciidoctor 1.5.7
 |Scheduling pre-release
-|2018/06*
-|2018/06*
-|2018/12*
-|2018/12*
+|2018/06 ^[1]^
+|2018/06 ^[1]^
+|2018/12 ^[1]^
+|2018/12 ^[1]^
 
 |Asciidoctor 2.0
 |In planning
@@ -82,6 +81,6 @@ Dates are formatted as year/month/day.
 |
 |===
 
-+*+ Date is estimated and subject to change.
+^[1]^ Date is estimated and subject to change.
 
 The information on this page is believed to be accurate as of the date of publication, but updates and revisions may be posted periodically and without notice.
