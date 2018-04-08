@@ -465,6 +465,14 @@ term without description::
   end
   
   context 'Convert' do
+    test 'render_file is aliased to convert_file' do
+      assert_equal Asciidoctor.method(:convert_file), Asciidoctor.method(:render_file)
+    end
+
+    test 'render is aliased to convert' do
+      assert_equal Asciidoctor.method(:convert), Asciidoctor.method(:render)
+    end
+
     test 'should convert source document to string when to_file is false' do
       sample_input_path = fixture_path('sample.asciidoc')
 
@@ -515,7 +523,7 @@ term without description::
 text
       EOS
 
-      output = Asciidoctor.render(input, :safe => Asciidoctor::SafeMode::SERVER, :header_footer => true)
+      output = Asciidoctor.convert input, :safe => Asciidoctor::SafeMode::SERVER, :header_footer => true
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
@@ -532,7 +540,7 @@ text
 text
       EOS
 
-      output = Asciidoctor.render(input, :header_footer => true)
+      output = Asciidoctor.convert input, :header_footer => true
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
@@ -546,7 +554,7 @@ text
 
       #[{ 'linkcss!' => '' }, { 'linkcss' => nil }, { 'linkcss' => false }].each do |attrs|
       [{ 'linkcss!' => '' }, { 'linkcss' => nil }].each do |attrs|
-        output = Asciidoctor.render(input, :header_footer => true, :attributes => attrs)
+        output = Asciidoctor.convert input, :header_footer => true, :attributes => attrs
         assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
         assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
         stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
@@ -574,7 +582,7 @@ text
 text
       EOS
 
-      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet!' => ''})
+      output = Asciidoctor.convert input, :header_footer => true, :attributes => {'stylesheet!' => ''}
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
       assert_css 'html:root > head > link[rel="stylesheet"]', output, 0
     end
@@ -586,11 +594,11 @@ text
 text
       EOS
 
-      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet' => './custom.css'})
+      output = Asciidoctor.convert input, :header_footer => true, :attributes => {'stylesheet' => './custom.css'}
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
       assert_css 'html:root > head > link[rel="stylesheet"][href="./custom.css"]', output, 1
 
-      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet' => 'file:///home/username/custom.css'})
+      output = Asciidoctor.convert input, :header_footer => true, :attributes => {'stylesheet' => 'file:///home/username/custom.css'}
       assert_css 'html:root > head > link[rel="stylesheet"][href="file:///home/username/custom.css"]', output, 1
     end
 
@@ -601,7 +609,7 @@ text
 text
       EOS
 
-      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets'})
+      output = Asciidoctor.convert input, :header_footer => true, :attributes => {'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets'}
       assert_css 'html:root > head > link[rel="stylesheet"][href="./stylesheets/custom.css"]', output, 1
     end
 
