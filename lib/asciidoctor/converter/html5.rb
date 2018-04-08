@@ -37,7 +37,7 @@ module Asciidoctor
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
       cdn_base = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
-      linkcss = node.safe >= SafeMode::SECURE || (node.attr? 'linkcss')
+      linkcss = node.attr? 'linkcss'
       result = ['<!DOCTYPE html>']
       lang_attribute = (node.attr? 'nolang') ? '' : %( lang="#{node.attr 'lang', 'en'}")
       result << %(<html#{@xml_mode ? ' xmlns="http://www.w3.org/1999/xhtml"' : ''}#{lang_attribute}>)

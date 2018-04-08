@@ -524,7 +524,7 @@ text
       refute_empty styles.strip
     end
 
-    test 'should link to default stylesheet by default even if linkcss is unset in document' do
+    test 'should not allow linkcss be unset from document if SafeMode is SECURE or greater' do
       input = <<-EOS
 = Document Title
 :linkcss!:
@@ -537,19 +537,26 @@ text
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
 
-    test 'should link to default stylesheet by default if linkcss is unset' do
+    test 'should embed default stylesheet if linkcss is unset from API and SafeMode is SECURE or greater' do
       input = <<-EOS
 = Document Title
 
 text
       EOS
 
-      output = Asciidoctor.render(input, :header_footer => true, :attributes => {'linkcss!' => ''})
-      assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
-      assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
+      #[{ 'linkcss!' => '' }, { 'linkcss' => nil }, { 'linkcss' => false }].each do |attrs|
+      [{ 'linkcss!' => '' }, { 'linkcss' => nil }].each do |attrs|
+        output = Asciidoctor.render(input, :header_footer => true, :attributes => attrs)
+        assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
+        assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
+        stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
+        styles = stylenode.content
+        refute_nil styles
+        refute_empty styles.strip
+      end
     end
 
-    test 'should embed default stylesheet if safe mode is less than secure and linkcss is unset' do
+    test 'should embed default stylesheet if safe mode is less than SECURE and linkcss is unset from API' do
       sample_input_path = fixture_path('basic.asciidoc')
       output = Asciidoctor.convert_file sample_input_path, :header_footer => true, :to_file => false,
           :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'linkcss!' => ''}

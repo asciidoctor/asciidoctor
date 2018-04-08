@@ -418,10 +418,8 @@ class Document < AbstractBlock
       if @safe >= SafeMode::SECURE
         attr_overrides['max-attribute-value-size'] = 4096 unless attr_overrides.key? 'max-attribute-value-size'
         # assign linkcss (preventing css embedding) unless explicitly disabled from the commandline or API
-        # effectively the same has "has key 'linkcss' and value == nil"
-        unless attr_overrides.fetch('linkcss', '').nil?
-          attr_overrides['linkcss'] = ''
-        end
+        #attr_overrides['linkcss'] = (attr_overrides.fetch 'linkcss', '') || nil
+        attr_overrides['linkcss'] = '' unless attr_overrides.key? 'linkcss'
         # restrict document from enabling icons
         attr_overrides['icons'] ||= nil
       end
