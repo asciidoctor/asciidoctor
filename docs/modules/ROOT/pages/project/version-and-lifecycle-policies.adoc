@@ -1,0 +1,87 @@
+= Asciidoctor Version and Lifecycle Policies
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:keywords: release policy
+:table-caption!:
+
+== 1.5.7 Version Policy
+
+Any Asciidoctor versions prior to Asciidoctor 2.0.0 may introduce significant functionality changes and not be backwards compatible with previous versions.
+Bug fixes are only provided for the most recent version.
+
+== 2.0.0 and Greater Version Policy
+
+Asciidoctor will follow the semantic versioning rules with the release of Asciidoctor 2.0.0.
+Each Asciidoctor release will be versioned *major.minor.patch*.
+
+Major::
+Major releases occur when there are substantial changes in functionality or when new functionality breaks backwards compatibility.
+Releases within the same major version number will maintain API compatibility.
+
+Minor::
+Minor releases add new features, improvements to existing features, and fixes that maintain backwards compatibility.
+
+Patch::
+Patch releases fix bugs and maintain backwards compatibility.
+Only the latest minor release for a major release will receive patches.
+Patch releases happen as needed depending on the urgency of the fix.
+
+Pre-release::
+Major and minor releases may include pre-release versions (major.minor.patch-alpha.n | -beta.n | -rc.n).
+Once a release candidate (rc) has been thoroughly tested, the stable release will be published.
+
+== 2.0 and Greater Lifecycle Policy
+
+Each major version of Asciidoctor will be supported for at least one year after the major version enters General Availability (GA).
+Once a major version reaches End of Life (EOL), it will not receive patch releases.
+
+[#lifecycle-phases]
+=== Lifecycle phases
+
+General Availability (GA)::
+Software enters General Availability on the date an initial major version is released and is available for download.
+
+General Support (GS)::
+General Support begins on the date a major release enters General Availability.
+
+End of General Support (EOGS)::
+General Support ends on the date a major release reaches its End of Life.
+
+End of Life (EOL)::
+The date after which the software no longer receives maintenance releases.
+
+[#ga-and-eol]
+== Release GA and EOL Matrix
+
+Dates are formatted as year/month/day.
+
+[cols="2,2,1,1,1,1"]
+|===
+|	|Status |GA |GS	|EOL |EOGS
+
+|Asciidoctor 1.5.6.x
+|GA/GS
+|2017/07/23
+|2017/07/23
+|2018/06*
+|2018/06*
+
+|Asciidoctor 1.5.7
+|Scheduling pre-release
+|2018/06*
+|2018/06*
+|2018/12*
+|2018/12*
+
+|Asciidoctor 2.0
+|In planning
+|
+|
+|
+|
+|===
+
++*+ Date is estimated and subject to change.
+
+The information on this page is believed to be accurate as of the date of publication, but updates and revisions may be posted periodically and without notice.
