@@ -3,7 +3,8 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 
-Asciidoctor operates on macOS, Windows, and most Linux distributions.
+Asciidoctor Core operates on macOS, Windows, and most Linux distributions.
+//AsciidoctorJ, Asciidoctor.js, as well as the Asciidoctor build integrations, alternate converters, and extensions may have additional requirements.
 
 == Supported Platforms
 
@@ -58,4 +59,35 @@ Windows Server 2012 R2
 
 |MS Edge
 |Latest stable version
+|===
+
+== Feature-specific Platforms
+
+The following platforms are only required of you're using certain Asciidoctor features such as source code highlighting.
+
+.Asciidoctor 2.x
+[cols="20,25a",width="45%"]
+|===
+|Supported Platform |Supported Version(s)
+
+|MathJax
+|?
+
+|CodeRay
+|?
+
+|highlight.js
+|?
+
+|prettify
+|?
+
+|Pygments
+|?
+
+|Rouge
+|?
+
+|Font Awesome Icons
+|?
 |===

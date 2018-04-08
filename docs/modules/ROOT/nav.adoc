@@ -1,2 +1,3 @@
-* xref:platforms.adoc[Platform Requirements]
+* xref:setup:platforms.adoc[Platform Requirements]
+* xref:setup:upgrade-syntax.adoc[Modified & Deprecated Syntax]
 * xref:project/version-and-lifecycle-policies.adoc[Version & Lifecycle Policies]
