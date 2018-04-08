@@ -31,7 +31,7 @@ Pre-release::
 Major and minor releases may include pre-release versions (major.minor.patch-alpha.n | -beta.n | -rc.n).
 Once a release candidate (rc) has been thoroughly tested, the stable release will be published.
 
-== 2.0 and Greater Lifecycle Policy
+== 2.0.0 and Greater Lifecycle Policy
 
 Each major version of Asciidoctor will be supported for at least one year after the major version enters General Availability (GA).
 Once a major version reaches End of Life (EOL), it will not receive patch releases.

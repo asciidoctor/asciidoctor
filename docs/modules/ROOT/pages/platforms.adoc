@@ -1,0 +1,61 @@
+= Platform Requirements
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+
+Asciidoctor operates on macOS, Windows, and most Linux distributions.
+
+== Supported Platforms
+
+Platform support is specific to each major Asciidoctor version.
+
+[NOTE]
+.Linux Distributions
+====
+While we only test Asciidoctor on Alpine, Debian, and Fedora, it should operate as expected on most Linux distributions.
+====
+
+.Asciidoctor 2.x
+[cols="20,25a",width="45%"]
+|===
+|Supported Platform |Supported Version(s)
+
+|Ruby
+|[%hardbreaks]
+2.5
+2.4
+2.3
+
+|Alpine
+|[%hardbreaks]
+3.7
+
+|Debian
+|9.3
+
+|Fedora
+|[%hardbreaks]
+27
+
+|macOS
+|High Sierra
+
+|Microsoft
+|[%hardbreaks]
+Windows 10
+Windows 8.1
+Windows Server 2016
+Windows Server 2012 R2
+
+|Chrome
+|Latest stable version
+
+|Firefox
+|Latest stable version
+
+|Internet Explorer
+|11
+
+|MS Edge
+|Latest stable version
+|===
