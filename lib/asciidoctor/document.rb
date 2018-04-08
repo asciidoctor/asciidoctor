@@ -282,7 +282,7 @@ class Document < AbstractBlock
       attr_overrides = {}
       (options[:attributes] || {}).each do |key, value|
         if key.start_with? '!'
-          key = key[1..-1]
+          key = key.slice 1, key.length
           value = nil
         elsif key.end_with? '!'
           key = key.chop
@@ -983,7 +983,7 @@ class Document < AbstractBlock
       current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
       if new_backend.start_with? 'xhtml'
         attrs['htmlsyntax'] = 'xml'
-        new_backend = new_backend[1..-1]
+        new_backend = new_backend.slice 1, new_backend.length
       elsif new_backend.start_with? 'html'
         attrs['htmlsyntax'] = 'html' unless attrs['htmlsyntax'] == 'xml'
       end
@@ -1010,7 +1010,7 @@ class Document < AbstractBlock
       elsif @converter
         new_basebackend = new_backend.sub TrailingDigitsRx, ''
         if (new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend])
-          new_filetype = new_outfilesuffix[1..-1]
+          new_filetype = new_outfilesuffix.slice 1, new_outfilesuffix.length
         else
           new_outfilesuffix, new_basebackend, new_filetype = '.html', 'html', 'html'
         end
