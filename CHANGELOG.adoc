@@ -17,18 +17,60 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Enhancements::
 
+  * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
   * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI
   * interpret false attribute value defined using API as a soft unset
   * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font)
   * allow manpage path for manpage help topic to be specified using ASCIIDOCTOR_MANPAGE_PATH environment variable
   * if manpage cannot be found in default path inside gem, use `man -w asciidoctor` to resolve installed path
   * uncompress contents of manpage for manpage help topic if path ends with .gz
+  * define source and manual refmiscinfo entries in manpage output if manual and source attributes are defined (PR #2636) (*@tiwai*)
+  * add syntax for adding hard line breaks in block AsciiMath equations (#2497, PR #2579) (*@dimztimz*)
+  * add positioning option to sectanchors attribute (before or after) (#2485, PR #2486)
+  * allow table stripes to be configured using stripe attribute or stripe roles on table; valid values are even, odd, all, and none (#1365, PR #2588)
+  * assign Document#source_location when sourcemap option is enabled (#2478, PR #2488)
+  * allow local include to be flagged as optional by setting optional option (#2389, PR #2413)
+  * allow attribute name to contain word characters as defined by Unicode (#2376, PR #2393)
+  * allow block title to begin with a period (#2358, PR #2359)
+  * register document in catalog if id is set; assign reftext to document attributes if specified in a block attribute line (#2301, PR #2428)
+  * use the quote element in DocBook converter for smart quotes (#2272, PR #2356) (*@bk2204*)
+  * parse and pass all manpage names to output document master (shadown man pages) (#1811, #2543, PR #2414)
+  * parse credit line of shorthand quote block as block attributes; apply normal subs to credit line in shorthand quote blocks (#1667, PR #2452)
+  * preserve directories if source dir and destination dir are set (#1394, PR #2421)
+  * allow linkcss to be disabled from API when safe mode is secure
 
 Bug fixes::
 
+  * set :to_dir option correctly when output file is specified (#2382)
+  * fix typo in gemspec that removed README and CONTRIBUTING files from the generated gem (PR #2650) (*@aerostitch*)
+  * don't turn bare URI scheme (no host) into a link (#2609, PR #2611)
+  * fix em dash replacement in manpage converter (#2604, PR #2607)
   * fix behavior of PathResolver#descends_from? when base path equals /
   * automatically recover if start path passed to PathResolver#system_path is outside of jail path
   * enforce that absolute start path passed to PathResolver#system_path is inside of jail path
+  * re-enable left justification after invoking tmac URL macro (#2400, PR #2409)
+  * record timings when calling convert and write on Document (#2574, PR #2575)
+  * duplicate header attributes when restoring; allows header attributes to be restored an arbitrary number of times (#2567, PR #2570)
+  * propagate catalog_assets option to nested document (#2564, PR #2565)
+  * output table footer after body rows (#2556, PR #2566) (*@PauloFrancaLacerda*)
+  * move @page outside of @media print in default stylesheet (#2531, PR #2532)
+  * don't throw exception if text of dd node is nil (#2529, PR #2530)
+  * don't double escape ampersand in manpage output (#2525) (*@dimztimz*)
+  * fix crash when author_1 attribute is assigned directly (#2481, PR #2487)
+  * fix CSS for highlighted source block inside colist (#2474, PR #2490)
+  * don't append file extension to data uri of admonition icon (#2465, PR #2466)
+  * fix race condition in Helpers.mkdir_p (#2457, PR #2458)
+  * correctly process nested passthrough inside unconstrained monospaced (#2442, PR #2443)
+  * add test to ensure ampersand in author line is not double escaped (#2439, PR #2440)
+  * fix alignment of icons in footnote (#2415, PR #2416)
+  * add graceful fallback if pygments.rb fails to return a value (#2341, PR #2342)
+  * escape specialchars in source if pygments fails to highlight (#2341)
+  * do not recognize attribute entry line if name contains colon (PR #2377)
+  * allow flow indexterm to be enclosed in round brackets (#2363, PR #2364)
+  * set outfilesuffix to match file extension of output file (#2258, PR #2367)
+  * add block title to dlist in manpage output (#1611, PR #2434)
+  * scale text to 80% in print styles (#1484, PR #2576)
+  * output non-breaking space for man manual if absent in DocBook output
 
 Improvements / Refactoring::
 
@@ -37,6 +79,51 @@ Improvements / Refactoring::
   * allow start path passed to PathResolver#system_path to be outside jail if target brings resolved path back inside jail
   * don't run File.expand_path on Dir.pwd (assume Dir.pwd is absolute)
   * posixify working_dir passed to PathResolver constructor if absolute
+  * coerce value of template_dirs option to an Array (PR #2621)
+  * allow paragraph to masquerade as open block (PR #2412)
+  * move callouts into document catalog (PR #2394)
+  * skip line comments in name section of manpage (#2584, PR #2585)
+  * always activate extension registry passed to processor (PR #2379)
+  * skip extension registry activation if no groups are registered (PR #2373)
+  * don't apply lead style to first paragraph if role is present (#2624, PR #2625)
+  * raise clearer exception when extension class cannot be resolved (#2622, PR #2623)
+  * rename table spread role to stretch (#2589, PR #2591)
+  * add methods to read results from timings (#2578, PR #2580)
+  * collapse bottom margin of last block in AsciiDoc table cell (#2568, PR #2593)
+  * set authorcount to 0 if there are no authors (#2519, PR #2520)
+  * validate fragment of interdoc xref that resolves to current doc (#2448, PR #2449)
+  * put id attribute on tag around phrase instead of preceding anchor (#2445, PR #2446)
+  * add .plist extension to XML circumfix comment family (#2430, PR #2431) (*@akosma*)
+  * alias Document#title method to no args Document#doctitle method (#2429, PR #2432)
+  * upgrade missing or unreadable include file to an error (#2424, PR #2426)
+  * add compliance setting to disable natural cross references (#2405, PR #2460)
+  * make hash in inter-document xref target optional if target has extension (#2404, PR #2406)
+  * add CSS class to part that matches role (#2401, PR #2402)
+  * automatically assign parent reference when adding node to parent (#2398, PR #2403)
+  * leave inline anchor in section title as is if section has ID (#2243, PR #2427)
+  * align and improve error message about invalid use of partintro between HTML5 and DocBook converters
+  * only warn if thread_safe gem is missing when using built-in template cache
+  * rename enumerate_section to assign_numeral; update API docs
+  * drop deprecated compact option from CLI; remove from manpage
+  * purge render method from test suite (except to verify alias)
+
+Documentation::
+
+  * translate 'section-refsig' for German language (PR #2633) (*@ahus1*)
+  * synchronize French README with English version (PR #2637) (*@flashcode*)
+
+Build / Infrastructure::
+
+  * update Ruby versions in appveyor build matrix (PR #2388) (*@miltador*)
+  * add mailinglist, changelog, source, and issues URI to gem spec
+  * allow blocks and substitutions tests to be run directly
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
 
 // tag::compact[]
 == 1.5.6.2 (2018-03-20) - @mojavelinux
@@ -51,7 +138,7 @@ Improvements / Refactoring::
   * resolve include target correctly in browser (xmlhttprequest IO module) (#2599, #2602)
   * extract method to resolve include path (allowing Asciidoctor.js to override) (#2610)
   * don't expand docdir value passed to API (#2518)
-  * check mandatory attributes when creating an image block (#2349)
+  * check mandatory attributes when creating an image block (#2349, PR #2355) (@mogztter)
   * drop is_ prefix from boolean methods in PathResolver (PR #2587)
   * change Reader#replace_next_line to return true
   * organize methods in AbstractNode
@@ -60,7 +147,7 @@ Build / Infrastructure::
 
   * clean up dependencies
   * add Ruby 2.5.0 to CI build matrix (PR #2528)
-  * update nokogiri to 1.8.0 for ruby >= 2.1 (PR #2380)
+  * update nokogiri to 1.8.0 for ruby >= 2.1 (PR #2380) (@miltador)
 
 Distribution Packages::
 
