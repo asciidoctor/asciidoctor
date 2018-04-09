@@ -1,5 +1,6 @@
 # encoding: UTF-8
-ASCIIDOCTOR_PROJECT_DIR = File.dirname File.dirname(__FILE__)
+ASCIIDOCTOR_TEST_DIR = File.expand_path File.dirname __FILE__
+ASCIIDOCTOR_PROJECT_DIR = File.dirname ASCIIDOCTOR_TEST_DIR
 Dir.chdir ASCIIDOCTOR_PROJECT_DIR
 
 if RUBY_VERSION < '1.9'
@@ -31,7 +32,7 @@ class Minitest::Test
   end
 
   def disk_root
-    "#{windows? ? File.expand_path(__FILE__).split('/').first : nil}/"
+    %(#{windows? ? ASCIIDOCTOR_PROJECT_DIR.split('/')[0] : ''}/)
   end
 
   def empty_document options = {}
@@ -60,8 +61,16 @@ class Minitest::Test
     fixture_path(name)
   end
 
-  def fixture_path(name)
-    File.join(File.expand_path(File.dirname(__FILE__)), 'fixtures', name)
+  def testdir
+    ASCIIDOCTOR_TEST_DIR
+  end
+
+  def fixturedir
+    File.join testdir, 'fixtures'
+  end
+
+  def fixture_path name
+    File.join fixturedir, name
   end
 
   def example_document(name, opts = {})
@@ -289,7 +298,7 @@ class Minitest::Test
 
   def using_test_webserver host = resolve_localhost, port = 9876
     server = TCPServer.new host, port
-    base_dir = File.expand_path File.dirname __FILE__
+    base_dir = testdir
     t = Thread.new do
       while (session = server.accept)
         request = session.gets

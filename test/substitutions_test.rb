@@ -713,7 +713,7 @@ context 'Substitutions' do
     end
 
     test 'an image macro with an inline SVG image should be converted to an svg element' do
-      para = block_from_string('image:circle.svg[Tiger,100,opts=inline]', :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'imagesdir' => 'fixtures', 'docdir' => ::File.dirname(__FILE__) })
+      para = block_from_string('image:circle.svg[Tiger,100,opts=inline]', :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'imagesdir' => 'fixtures', 'docdir' => testdir })
       result = para.sub_macros(para.source).gsub(/>\s+</, '><')
       assert_match(/<svg\s[^>]*width="100px"[^>]*>/, result)
       refute_match(/<svg\s[^>]*width="500px"[^>]*>/, result)
@@ -722,7 +722,7 @@ context 'Substitutions' do
     end
 
     test 'an image macro with an inline SVG image should be converted to an svg element even when data-uri is set' do
-      para = block_from_string('image:circle.svg[Tiger,100,opts=inline]', :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'data-uri' => '', 'imagesdir' => 'fixtures', 'docdir' => ::File.dirname(__FILE__) })
+      para = block_from_string('image:circle.svg[Tiger,100,opts=inline]', :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'data-uri' => '', 'imagesdir' => 'fixtures', 'docdir' => testdir })
       assert_match(/<svg\s[^>]*width="100px">/, para.sub_macros(para.source).gsub(/>\s+</, '><'))
     end
 
@@ -838,7 +838,7 @@ context 'Substitutions' do
       EOS
 
       sect, warnings = redirect_streams do |_, err|
-        [(block_from_string input, :attributes => { 'data-uri' => '', 'iconsdir' => 'fixtures', 'docdir' => ::File.dirname(__FILE__) }, :safe => :server, :catalog_assets => true), err.string]
+        [(block_from_string input, :attributes => { 'data-uri' => '', 'iconsdir' => 'fixtures', 'docdir' => testdir }, :safe => :server, :catalog_assets => true), err.string]
       end
       assert_includes sect.document.catalog[:images], 'fixtures/dot.gif'
       refute_nil warnings

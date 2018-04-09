@@ -1690,7 +1690,7 @@ image::http://example.org/tiger-svg[Tiger,100,format=svg]
 image::circle.svg[Tiger,100]
       EOS
 
-      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => ::File.dirname(__FILE__) }
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => testdir }
       assert_match(/<svg\s[^>]*width="100px"[^>]*>/, output, 1)
       refute_match(/<svg\s[^>]*width="500px"[^>]*>/, output)
       refute_match(/<svg\s[^>]*height="500px"[^>]*>/, output)
@@ -1706,7 +1706,7 @@ image::circle.svg[Tiger,100]
 image::circle.svg[Tiger,100]
       EOS
 
-      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => ::File.dirname(__FILE__) }
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => testdir }
       assert_match(/<svg\s[^>]*width="100px">/, output, 1)
     end
 
@@ -2035,7 +2035,7 @@ image::tiger.png[Tiger]
 image::dot.gif[Dot]
       EOS
 
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => testdir }
       assert_equal 'fixtures', doc.attributes['imagesdir']
       output = doc.convert
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
@@ -2049,7 +2049,7 @@ image::dot.gif[Dot]
 image::unreadable.gif[Dot]
       EOS
 
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => testdir }
       assert_equal 'fixtures', doc.attributes['imagesdir']
       output, warnings = redirect_streams {|_, err| [doc.convert, err.string] }
       assert_xpath '//img[@src="data:image/gif;base64,"]', output, 1
@@ -2148,7 +2148,7 @@ image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Do
 image::dot.gif[Dot]
       EOS
 
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => testdir }
       assert_equal '../..//fixtures/./../../fixtures', doc.attributes['imagesdir']
       output, warnings = redirect_streams {|_, err| [doc.convert, err.string] }
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
@@ -2165,7 +2165,7 @@ image::dot.gif[Dot]
 image::../..//fixtures/./../../fixtures/dot.gif[Dot]
       EOS
 
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
       assert_equal './', doc.attributes['imagesdir']
       output, warnings = redirect_streams {|_, err| [doc.convert, err.string] }
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
@@ -2413,7 +2413,7 @@ Override the icon of an admonition block using an attribute
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
@@ -2428,7 +2428,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can set a custom icon using the icon attribute on the block.
       EOS
 
-      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
@@ -2459,7 +2459,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output, warnings = redirect_streams do |_, err|
-        [(render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}), err.string]
+        [(render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }), err.string]
       end
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
       assert_includes warnings, 'image has illegal reference to ancestor of jail'
@@ -2533,7 +2533,7 @@ puts "AsciiDoc, FTW!"
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
-      basedir = File.expand_path File.dirname(__FILE__)
+      basedir = testdir
       block = block_from_string input, :attributes => {'docdir' => basedir}
       doc = block.document
       assert doc.safe >= Asciidoctor::SafeMode::SAFE
@@ -2547,7 +2547,7 @@ image::asciidoctor.png[Asciidoctor]
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
-      basedir = File.expand_path File.dirname(__FILE__)
+      basedir = testdir
       block = block_from_string input, :safe => Asciidoctor::SafeMode::UNSAFE, :attributes => {'docdir' => basedir}
       doc = block.document
       assert doc.safe == Asciidoctor::SafeMode::UNSAFE
