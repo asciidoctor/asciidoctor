@@ -682,7 +682,7 @@ Your browser does not support the audio tag.
     def open node
       if (style = node.style) == 'abstract'
         if node.parent == node.document && node.document.doctype == 'book'
-          warn 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+          logger.warn 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
           ''
         else
           id_attr = node.id ? %( id="#{node.id}") : ''
@@ -694,7 +694,7 @@ Your browser does not support the audio tag.
 </div>)
         end
       elsif style == 'partintro' && (node.level > 0 || node.parent.context != :section || node.document.doctype != 'book')
-        warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
+        logger.error 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
         ''
       else
           id_attr = node.id ? %( id="#{node.id}") : ''
@@ -1059,7 +1059,7 @@ Your browser does not support the video tag.
         # NOTE technically node.text should be node.reftext, but subs have already been applied to text
         %(<a id="#{node.id}"></a>#{node.text})
       else
-        warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
+        logger.warn %(unknown anchor type: #{node.type.inspect})
         nil
       end
     end

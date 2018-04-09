@@ -4,7 +4,7 @@ module Asciidoctor
 # node of AsciiDoc content. The state and methods on this class are comment to
 # all content segments in an AsciiDoc document.
 class AbstractNode
-
+  include Logging
   include Substitutors
 
   # Public: Get the Hash of attributes for this node
@@ -369,7 +369,7 @@ class AbstractNode
       # NOTE base64 is autoloaded by reference to ::Base64
       %(data:#{mimetype};base64,#{::Base64.encode64(::IO.binread image_path).delete LF})
     else
-      warn %(asciidoctor: WARNING: image to embed not found or not readable: #{image_path})
+      logger.warn %(image to embed not found or not readable: #{image_path})
       %(data:#{mimetype};base64,)
       # uncomment to return 1 pixel white dot instead
       #'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
@@ -407,7 +407,7 @@ class AbstractNode
       # NOTE base64 is autoloaded by reference to ::Base64
       %(data:#{mimetype};base64,#{::Base64.encode64(bindata).delete LF})
     rescue
-      warn %(asciidoctor: WARNING: could not retrieve image data from URI: #{image_uri})
+      logger.warn %(could not retrieve image data from URI: #{image_uri})
       image_uri
       # uncomment to return empty data (however, mimetype needs to be resolved)
       #%(data:#{mimetype}:base64,)
@@ -506,7 +506,7 @@ class AbstractNode
         ::IO.read path
       end
     elsif opts[:warn_on_failure]
-      warn %(asciidoctor: WARNING: #{(attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
+      logger.warn %(#{(attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
       nil
     end
   end
@@ -538,11 +538,11 @@ class AbstractNode
           data = (Helpers.normalize_lines_from_string data) * LF if opts[:normalize]
           return data
         rescue
-          warn %(asciidoctor: WARNING: could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
+          logger.warn %(could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
           return
         end
       else
-        warn %(asciidoctor: WARNING: cannot retrieve contents of #{opts[:label] || 'asset'} at URI: #{target} (allow-uri-read attribute not enabled)) if opts.fetch :warn_on_failure, true
+        logger.warn %(cannot retrieve contents of #{opts[:label] || 'asset'} at URI: #{target} (allow-uri-read attribute not enabled)) if opts.fetch :warn_on_failure, true
         return
       end
     else

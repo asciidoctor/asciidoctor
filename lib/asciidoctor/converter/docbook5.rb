@@ -305,7 +305,7 @@ module Asciidoctor
       case node.style
       when 'abstract'
         if node.parent == node.document && node.document.doctype == 'book'
-          warn 'asciidoctor: WARNING: abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+          logger.warn 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
           ''
         else
           %(<abstract>
@@ -314,7 +314,7 @@ module Asciidoctor
         end
       when 'partintro'
         unless node.level == 0 && node.parent.context == :section && node.document.doctype == 'book'
-          warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
+          logger.error 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
           ''
         else
           %(<partintro#{common_attributes node.id, node.role, node.reftext}>
@@ -429,7 +429,7 @@ module Asciidoctor
       result << '</tgroup>'
       result << %(</#{tag_name}>)
 
-      warn 'asciidoctor: WARNING: tables must have at least one body row' unless has_body
+      logger.warn 'tables must have at least one body row' unless has_body
       result * LF
     end
 
@@ -493,7 +493,7 @@ module Asciidoctor
         # NOTE technically node.text should be node.reftext, but subs have already been applied to text
         %(<anchor#{common_attributes node.id, nil, (text = node.text)}/>#{text})
       else
-        warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
+        logger.warn %(unknown anchor type: #{node.type.inspect})
         nil
       end
     end

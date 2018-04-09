@@ -101,6 +101,8 @@ module Asciidoctor
 #     => start path /etc is outside of jail: /path/to/docs'
 #
 class PathResolver
+  include Logging
+
   DOT = '.'
   DOT_DOT = '..'
   DOT_SLASH = './'
@@ -336,7 +338,7 @@ class PathResolver
         target_path = expand_path target
         if jail && !(descends_from? target_path, jail)
           if opts.fetch :recover, true
-            warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
+            logger.warn %(#{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
             target_segments, _ = partition_path target_path
             jail_segments, jail_root = partition_path jail
             return join_path jail_segments + target_segments, jail_root
@@ -380,7 +382,7 @@ class PathResolver
       jail_segments, jail_root = partition_path jail
       if start_root != jail_root
         if opts.fetch :recover, true
-          warn %(asciidoctor: WARNING: start path for #{opts[:target_name] || 'path'} is outside of jail root, auto-recovering)
+          logger.warn %(start path for #{opts[:target_name] || 'path'} is outside of jail root, auto-recovering)
           start_segments = jail_segments
           recheck = false
         else
@@ -401,7 +403,10 @@ class PathResolver
             if resolved_segments.size > jail_segments.size
               resolved_segments.pop
             elsif opts.fetch :recover, true
-              warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering) unless warned
+              unless warned
+                logger.warn %(#{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering)
+                warned = true
+              end
             else
               raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode))
             end
@@ -421,7 +426,7 @@ class PathResolver
       if descends_from? target_path, jail
         target_path
       elsif opts.fetch :recover, true
-        warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
+        logger.warn %(#{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
         jail_segments, _ = partition_path jail unless jail_segments
         join_path jail_segments + target_segments, jail_root
       else

@@ -66,10 +66,12 @@ module Asciidoctor
             case val
             when 0
               $VERBOSE = nil
+              LoggerManager.logger = Logger::NullLogger.new
             when 1
               $VERBOSE = false
             when 2
               $VERBOSE = true
+              #LoggerManager.logger.level = ::Logger::Severity::DEBUG
             end
           else
             opts[key] = val unless val.nil?
