@@ -113,21 +113,21 @@ context 'Converter' do
 
     test 'should set outfilesuffix according to backend info' do
       doc = Asciidoctor.load 'content'
-      doc.render
+      doc.convert
       assert_equal '.html', doc.attributes['outfilesuffix']
 
       doc = Asciidoctor.load 'content', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'), :template_cache => false
-      doc.render
+      doc.convert
       assert_equal '.html', doc.attributes['outfilesuffix']
     end
 
     test 'should not override outfilesuffix attribute if locked' do
       doc = Asciidoctor.load 'content', :attributes => {'outfilesuffix' => '.foo'}
-      doc.render
+      doc.convert
       assert_equal '.foo', doc.attributes['outfilesuffix']
 
       doc = Asciidoctor.load 'content', :template_dir => File.join(File.dirname(__FILE__), 'fixtures', 'custom-backends', 'haml'), :template_cache => false, :attributes => {'outfilesuffix' => '.foo'}
-      doc.render
+      doc.convert
       assert_equal '.foo', doc.attributes['outfilesuffix']
     end
 

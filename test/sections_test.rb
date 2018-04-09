@@ -377,7 +377,7 @@ preamble
       doc = document_from_string input
       assert_equal 'reference', doc.id
       assert_equal 'refguide', doc.attr('css-signature')
-      output = doc.render
+      output = doc.convert
       assert_css 'body#reference', output, 1
     end
 

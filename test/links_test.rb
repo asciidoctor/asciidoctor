@@ -256,7 +256,7 @@ context 'Links' do
     variations = %w([[tigers]] anchor:tigers[])
     variations.each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
-      output = doc.render
+      output = doc.convert
       assert_equal '[tigers]', doc.catalog[:ids]['tigers']
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_nil doc.catalog[:refs]['tigers'].text
@@ -269,7 +269,7 @@ context 'Links' do
     variations = %w([[tigers]] anchor:tigers[])
     variations.each do |anchor|
       doc = document_from_string %(Here you can read about tigers.\\#{anchor})
-      output = doc.render
+      output = doc.convert
       refute doc.catalog[:ids].key?('tigers')
       refute doc.catalog[:refs].key?('tigers')
       assert_xpath '//a[@id = "tigers"]', output, 0
@@ -292,7 +292,7 @@ context 'Links' do
   test 'inline ref with reftext' do
     %w([[tigers,Tigers]] anchor:tigers[Tigers]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
-      output = doc.render
+      output = doc.convert
       assert_equal 'Tigers', doc.catalog[:ids]['tigers']
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal 'Tigers', doc.catalog[:refs]['tigers'].text
@@ -310,7 +310,7 @@ context 'Links' do
   test 'should substitute attribute references in reftext when registering inline ref' do
     %w([[tigers,{label-tigers}]] anchor:tigers[{label-tigers}]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor}), :attributes => { 'label-tigers' => 'Tigers' }
-      doc.render
+      doc.convert
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal 'Tigers', doc.catalog[:refs]['tigers'].text
       assert_equal 'Tigers', doc.catalog[:ids]['tigers']
@@ -369,13 +369,13 @@ anchor:foo[b[a\]r]text'
   test 'xref using angled bracket syntax' do
     doc = document_from_string '<<tigers>>'
     doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, '[tigers]', :type => :ref, :target => 'tigers'), '[tigers]']
-    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
+    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with explicit hash' do
     doc = document_from_string '<<#tigers>>'
     doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, 'Tigers', :type => :ref, :target => 'tigers'), 'Tigers']
-    assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', doc.render, 1
+    assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with label' do
@@ -400,7 +400,7 @@ anchor:foo[b[a\]r]text'
 
   test 'xref using angled bracket syntax with path sans extension' do
     doc = document_from_string '<<tigers#>>', :header_footer => false
-    assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.render, 1
+    assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
   test 'inter-document xref should not truncate after period if path has no extension' do
@@ -415,45 +415,45 @@ anchor:foo[b[a\]r]text'
 
   test 'xref using angled bracket syntax with path sans extension using docbook backend' do
     doc = document_from_string '<<tigers#>>', :header_footer => false, :backend => 'docbook'
-    assert_match '<link xl:href="tigers.xml">tigers.xml</link>', doc.render, 1
+    assert_match '<link xl:href="tigers.xml">tigers.xml</link>', doc.convert, 1
     doc = document_from_string '<<tigers#>>', :header_footer => false, :backend => 'docbook45'
-    assert_match '<ulink url="tigers.xml">tigers.xml</ulink>', doc.render, 1
+    assert_match '<ulink url="tigers.xml">tigers.xml</ulink>', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with ancestor path sans extension' do
     doc = document_from_string '<<../tigers#,tigers>>', :header_footer => false
-    assert_xpath '//a[@href="../tigers.html"][text() = "tigers"]', doc.render, 1
+    assert_xpath '//a[@href="../tigers.html"][text() = "tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with absolute path sans extension' do
     doc = document_from_string '<</path/to/tigers#,tigers>>', :header_footer => false
-    assert_xpath '//a[@href="/path/to/tigers.html"][text() = "tigers"]', doc.render, 1
+    assert_xpath '//a[@href="/path/to/tigers.html"][text() = "tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path and extension with hash' do
     doc = document_from_string '<<tigers.adoc#>>', :header_footer => false
-    assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.render, 1
+    assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path and extension' do
     doc = document_from_string '<<tigers.adoc>>', :header_footer => false
-    assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.render, 1
+    assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path and fragment' do
     doc = document_from_string '<<tigers#about>>', :header_footer => false
-    assert_xpath '//a[@href="tigers.html#about"][text() = "tigers.html"]', doc.render, 1
+    assert_xpath '//a[@href="tigers.html#about"][text() = "tigers.html"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path, fragment and text' do
     doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
-    assert_xpath '//a[@href="tigers.html#about"][text() = "About Tigers"]', doc.render, 1
+    assert_xpath '//a[@href="tigers.html#about"][text() = "About Tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path and custom relfilesuffix and outfilesuffix' do
     attributes = {'relfileprefix' => '../', 'outfilesuffix' => '/'}
     doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false, :attributes => attributes
-    assert_xpath '//a[@href="../tigers/#about"][text() = "About Tigers"]', doc.render, 1
+    assert_xpath '//a[@href="../tigers/#about"][text() = "About Tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path which has been included in this document' do
@@ -533,7 +533,7 @@ A summary of the first lesson.
   test 'xref using macro syntax' do
     doc = document_from_string 'xref:tigers[]'
     doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, '[tigers]', :type => :ref, :target => 'tigers'), '[tigers]']
-    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.render, 1
+    assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', doc.convert, 1
   end
 
   test 'multiple xref macros with implicit text in single line' do
@@ -554,7 +554,7 @@ This document has two sections, xref:sect-a[] and xref:sect-b[].
   test 'xref using macro syntax with explicit hash' do
     doc = document_from_string 'xref:#tigers[]'
     doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, 'Tigers', :type => :ref, :target => 'tigers'), 'Tigers']
-    assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', doc.render, 1
+    assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', doc.convert, 1
   end
 
   test 'xref using macro syntax with label' do
@@ -621,7 +621,7 @@ see <<foo>>'
   test 'xref using invalid macro syntax does not create link' do
     doc = document_from_string 'xref:tigers'
     doc.register :refs, ['tigers', (Asciidoctor::Inline.new doc, :anchor, 'Tigers', :type => :ref, :target => 'tigers'), 'Tigers']
-    assert_xpath '//a', doc.render, 0
+    assert_xpath '//a', doc.convert, 0
   end
 
   test 'should warn and create link if verbose flag is set and reference is not found' do

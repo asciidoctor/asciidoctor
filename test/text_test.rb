@@ -6,25 +6,25 @@ end
 
 context "Text" do
   test "proper encoding to handle utf8 characters in document using html backend" do
-    output = example_document(:encoding).render
+    output = example_document(:encoding).convert
     assert_xpath '//p', output, 4
     assert_xpath '//a', output, 1
   end
 
   test "proper encoding to handle utf8 characters in embedded document using html backend" do
-    output = example_document(:encoding, :header_footer => false).render
+    output = example_document(:encoding, :header_footer => false).convert
     assert_xpath '//p', output, 4
     assert_xpath '//a', output, 1
   end
 
   test "proper encoding to handle utf8 characters in document using docbook45 backend" do
-    output = example_document(:encoding, :attributes => {'backend' => 'docbook45', 'xmlns' => ''}).render
+    output = example_document(:encoding, :attributes => {'backend' => 'docbook45', 'xmlns' => ''}).convert
     assert_xpath '//xmlns:simpara', output, 4
     assert_xpath '//xmlns:ulink', output, 1
   end
 
   test "proper encoding to handle utf8 characters in embedded document using docbook45 backend" do
-    output = example_document(:encoding, :header_footer => false, :attributes => {'backend' => 'docbook45'}).render
+    output = example_document(:encoding, :header_footer => false, :attributes => {'backend' => 'docbook45'}).convert
     assert_xpath '//simpara', output, 4
     assert_xpath '//ulink', output, 1
   end
@@ -37,7 +37,7 @@ context "Text" do
     doc = empty_document
     reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
     block = Asciidoctor::Parser.next_block(reader, doc)
-    assert_xpath '//pre', block.render.gsub(/^\s*\n/, ''), 1
+    assert_xpath '//pre', block.convert.gsub(/^\s*\n/, ''), 1
   end
 
   test 'proper encoding to handle utf8 characters from included file' do
@@ -47,7 +47,7 @@ include::fixtures/encoding.asciidoc[tags=romé]
     doc = empty_safe_document :base_dir => File.expand_path(File.dirname(__FILE__))
     reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
     block = Asciidoctor::Parser.next_block(reader, doc)
-    output = block.render
+    output = block.convert
     assert_css '.paragraph', output, 1
   end
 

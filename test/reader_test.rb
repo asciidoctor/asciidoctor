@@ -523,7 +523,7 @@ include::fixtures/include-file.asciidoc[]
         EOS
 
         doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
-        output = doc.render
+        output = doc.convert
         assert_match(/included content/, output)
       end
 
@@ -537,7 +537,7 @@ include::fixtures/include file.asciidoc[]
         begin
           FileUtils.cp include_file, include_file_with_sp
           doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
-          output = doc.render
+          output = doc.convert
           assert_match(/included content/, output)
         ensure
           FileUtils.rm include_file_with_sp
@@ -554,7 +554,7 @@ include::fixtures/include{sp}file.asciidoc[]
         begin
           FileUtils.cp include_file, include_file_with_sp
           doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
-          output = doc.render
+          output = doc.convert
           assert_match(/included content/, output)
         ensure
           FileUtils.rm include_file_with_sp
@@ -1183,7 +1183,7 @@ include::{fixturesdir}/include-file.{ext}[]
         EOS
 
         doc = document_from_string input, :safe => :safe, :base_dir => DIRNAME
-        output = doc.render
+        output = doc.convert
         assert_match(/included content/, output)
       end
 

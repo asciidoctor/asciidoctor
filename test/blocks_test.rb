@@ -141,7 +141,7 @@ block comment
       EOS
       d = document_from_string input
       assert_equal 1, d.blocks.size
-      assert_xpath '//p', d.render, 1
+      assert_xpath '//p', d.convert, 1
     end
 
     test 'line starting with three slashes should not be line comment' do
@@ -615,7 +615,7 @@ You futz with XML.
       doc = document_from_string input
       assert_equal 1, doc.blocks[0].number
       assert_equal 2, doc.blocks[1].number
-      output = doc.render
+      output = doc.convert
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Example 1. Writing Docs with AsciiDoc"]', output, 1
       assert_xpath '(//*[@class="exampleblock"])[2]/*[@class="title"][text()="Example 2. Writing Docs with DocBook"]', output, 1
       assert_equal 2, doc.attributes['example-number']
@@ -643,7 +643,7 @@ You futz with XML.
       doc = document_from_string input
       assert_equal 'A', doc.blocks[0].number
       assert_equal 'B', doc.blocks[1].number
-      output = doc.render
+      output = doc.convert
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Example A. Writing Docs with AsciiDoc"]', output, 1
       assert_xpath '(//*[@class="exampleblock"])[2]/*[@class="title"][text()="Example B. Writing Docs with DocBook"]', output, 1
       assert_equal 'B', doc.attributes['example-number']
@@ -662,7 +662,7 @@ You just write.
 
       doc = document_from_string input
       assert_nil doc.blocks[0].number
-      output = doc.render
+      output = doc.convert
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
       refute doc.attributes.has_key?('example-number')
     end
@@ -844,7 +844,7 @@ last line
       doc = document_from_string input, :header_footer => false
       block = doc.blocks.first
       assert_equal ['', '', '  first line', '', 'last line', '', '{empty}', ''], block.lines
-      result = doc.render
+      result = doc.convert
       assert_xpath %(//pre[text()="  first line\n\nlast line"]), result, 1
     end
 
@@ -1038,7 +1038,7 @@ Map<String, String> *attributes*; //<1>
 
       block = block_from_string input
       assert_equal [:specialcharacters,:callouts,:quotes], block.subs
-      output = block.render
+      output = block.convert
       assert_includes output, 'Map&lt;String, String&gt; <strong>attributes</strong>;'
       assert_xpath '//pre/b[text()="(1)"]', output, 1
     end
@@ -1052,7 +1052,7 @@ No callout here <1>
       EOS
       block = block_from_string input
       assert_equal [:specialcharacters], block.subs
-      output = block.render
+      output = block.convert
       assert_xpath '//pre/b[text()="(1)"]', output, 0
     end
 
@@ -1278,7 +1278,7 @@ line below
       doc = document_from_string input, :header_footer => false
       block = doc.blocks[1]
       assert_equal ['', '', '  first line', '', 'last line', '', ''], block.lines
-      result = doc.render
+      result = doc.convert
       assert_equal "line above\n  first line\n\nlast line\nline below", result, 1
     end
   end
@@ -1863,7 +1863,7 @@ image::images/tiger.png[Tiger]
 
       doc = document_from_string input
       assert_equal 1, doc.blocks[0].number
-      output = doc.render
+      output = doc.convert
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Figure 1. The AsciiDoc Tiger"]', output, 1
       assert_equal 1, doc.attributes['figure-number']
@@ -1878,7 +1878,7 @@ image::images/tiger.png[Tiger]
 
       doc = document_from_string input
       assert_nil doc.blocks[0].number
-      output = doc.render
+      output = doc.convert
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Voila! The AsciiDoc Tiger"]', output, 1
       refute doc.attributes.has_key?('figure-number')
@@ -2037,7 +2037,7 @@ image::dot.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal 'fixtures', doc.attributes['imagesdir']
-      output = doc.render
+      output = doc.convert
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
@@ -2051,7 +2051,7 @@ image::unreadable.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal 'fixtures', doc.attributes['imagesdir']
-      output, warnings = redirect_streams {|_, err| [doc.render, err.string] }
+      output, warnings = redirect_streams {|_, err| [doc.convert, err.string] }
       assert_xpath '//img[@src="data:image/gif;base64,"]', output, 1
       assert_includes warnings, 'image to embed not found or not readable'
     end
@@ -2150,7 +2150,7 @@ image::dot.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal '../..//fixtures/./../../fixtures', doc.attributes['imagesdir']
-      output, warnings = redirect_streams {|_, err| [doc.render, err.string] }
+      output, warnings = redirect_streams {|_, err| [doc.convert, err.string] }
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
@@ -2167,7 +2167,7 @@ image::../..//fixtures/./../../fixtures/dot.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => File.dirname(__FILE__)}
       assert_equal './', doc.attributes['imagesdir']
-      output, warnings = redirect_streams {|_, err| [doc.render, err.string] }
+      output, warnings = redirect_streams {|_, err| [doc.convert, err.string] }
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
@@ -3290,7 +3290,7 @@ https://{application}.org[{gt}{gt}] <1>
       doc = document_from_string input, :header_footer => false
       block = doc.blocks.first
       assert_equal [:attributes, :specialcharacters, :macros], block.subs
-      result = doc.render
+      result = doc.convert
       assert_includes result, '<pre><a href="https://asciidoctor.org">&gt;&gt;</a> &lt;1&gt;</pre>'
     end
 
@@ -3303,7 +3303,7 @@ _hey now_ <1>
       doc = document_from_string input, :header_footer => false
       block = doc.blocks.first
       assert_equal [:specialcharacters], block.subs
-      result = doc.render
+      result = doc.convert
       assert_includes result, '_hey now_ &lt;1&gt;'
     end
   end

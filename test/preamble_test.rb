@@ -145,7 +145,7 @@ The axe came swinging.
 
       d = document_from_string(input)
       assert_equal 'book', d.doctype
-      output = d.render
+      output = d.convert
       assert_xpath '//h1', output, 3
       assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{decode_char 8230}#{decode_char 8203}"]}, output, 1
   end

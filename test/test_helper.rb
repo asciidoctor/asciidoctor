@@ -173,10 +173,10 @@ class Minitest::Test
   def render_string(src, opts = {})
     keep_namespaces = opts.delete(:keep_namespaces)
     if keep_namespaces
-      document_from_string(src, opts).render
+      document_from_string(src, opts).convert
     else
       # this is required because nokogiri is ignorant
-      result = document_from_string(src, opts).render
+      result = document_from_string(src, opts).convert
       result = result.sub(RE_XMLNS_ATTRIBUTE, '') if result
       result
     end
@@ -184,12 +184,12 @@ class Minitest::Test
 
   def render_embedded_string(src, opts = {})
     opts[:header_footer] = false
-    document_from_string(src, opts).render
+    document_from_string(src, opts).convert
   end
 
   def render_inline_string(src, opts = {})
     opts[:doctype] = :inline
-    document_from_string(src, opts).render
+    document_from_string(src, opts).convert
   end
 
   def parse_header_metadata(source, doc = nil)

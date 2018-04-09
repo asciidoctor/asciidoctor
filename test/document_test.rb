@@ -590,7 +590,7 @@ Block content
      assert doc.has_header?
      assert_equal 'Document Title', doc.header.title
      assert_equal 'Document Title', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.render, 1
+     assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.convert, 1
     end
 
     test 'document with blank title attribute entry overrides doctitle' do
@@ -608,7 +608,7 @@ Block content
      assert doc.has_header?
      assert_equal 'Document Title', doc.header.title
      assert_equal 'Document Title', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.render, 1
+     assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.convert, 1
     end
 
     test 'document with title attribute entry overrides doctitle attribute entry' do
@@ -628,7 +628,7 @@ Block content
      assert doc.has_header?
      assert_equal 'doctitle', doc.header.title
      assert_equal 'doctitle', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Document Title, doctitle"]', doc.render, 1
+     assert_xpath '//*[@id="preamble"]//p[text()="Document Title, doctitle"]', doc.convert, 1
     end
 
     test 'document with doctitle attribute entry overrides header title and doctitle' do
@@ -647,7 +647,7 @@ Block content
      assert doc.has_header?
      assert_equal 'Override', doc.header.title
      assert_equal 'Override', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Document Title, Override"]', doc.render, 1
+     assert_xpath '//*[@id="preamble"]//p[text()="Document Title, Override"]', doc.convert, 1
     end
 
     test 'doctitle attribute entry above header overrides header title and doctitle' do
@@ -665,7 +665,7 @@ Block content
      assert doc.has_header?
      assert_equal 'Override', doc.header.title
      assert_equal 'Override', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Override"]', doc.render, 1
+     assert_xpath '//*[@id="preamble"]//p[text()="Override"]', doc.convert, 1
     end
 
     test 'should recognize document title when preceded by blank lines' do
@@ -959,7 +959,7 @@ content
     test 'with header footer' do
       doc = document_from_string "= Title\n\nparagraph"
       refute doc.attr?('embedded')
-      result = doc.render
+      result = doc.convert
       assert_xpath '/html', result, 1
       assert_xpath '//*[@id="header"]', result, 1
       assert_xpath '//*[@id="header"]/h1', result, 1
@@ -980,7 +980,7 @@ content
 
     test 'can disable last updated in footer' do
       doc = document_from_string "= Document Title\n\npreamble", :attributes => {'last-update-label!' => ''}
-      result = doc.render
+      result = doc.convert
       assert_xpath '//*[@id="footer-text"]', result, 1
       assert_xpath '//*[@id="footer-text"][normalize-space(text())=""]', result, 1
     end
@@ -988,7 +988,7 @@ content
     test 'no header footer' do
       doc = document_from_string "= Document Title\n\ncontent", :header_footer => false
       assert doc.attr?('embedded')
-      result = doc.render
+      result = doc.convert
       assert_xpath '/html', result, 0
       assert_xpath '/h1', result, 0
       assert_xpath '/*[@id="header"]', result, 0

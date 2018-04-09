@@ -3938,7 +3938,7 @@ context 'Callout lists' do
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
-puts doc.render # <3>
+puts doc.convert # <3>
 ----
 <1> Describe the first line
 <2> Describe the second line
@@ -3962,7 +3962,7 @@ puts doc.render # <3>
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
-puts doc.render # <3>
+puts doc.convert # <3>
 ----
 
 Paragraph.
@@ -3990,7 +3990,7 @@ Paragraph.
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
-puts doc.render # <2>
+puts doc.convert # <2>
 ----
 <1> Import the library
 <2> Where the magic happens
@@ -4012,7 +4012,7 @@ puts doc.render # <2>
 ----
 require 'asciidoctor' # <2>
 doc = Asciidoctor::Document.new('Hello, World!') # <3>
-puts doc.render # <1>
+puts doc.convert # <1>
 ----
 <1> Describe the first line
 <2> Describe the second line
@@ -4042,7 +4042,7 @@ require 'asciidoctor' # <1>
 [source, ruby]
 ----
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
-puts doc.render # <3>
+puts doc.convert # <3>
 ----
 
 <1> Describe the first line
@@ -4074,7 +4074,7 @@ require 'asciidoctor' # <1>
 [source, ruby]
 ----
 doc = Asciidoctor::Document.new('Hello, World!') # <1>
-puts doc.render # <2>
+puts doc.convert # <2>
 ----
 <1> Describe the second line
 <2> Describe the third line
@@ -4100,7 +4100,7 @@ puts doc.render # <2>
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
-puts doc.render # <3>
+puts doc.convert # <3>
 ----
 <1> Imports the library
 as a RubyGem
@@ -4125,7 +4125,7 @@ You can write this to file rather than printing to stdout.
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
-puts doc.render # <3>
+puts doc.convert # <3>
 ----
 <1> Imports the library
 as a RubyGem
@@ -4174,7 +4174,7 @@ puts "The syntax <1> at the end of the line makes a code callout"
 ----
 require 'asciidoctor' <1>
 doc = Asciidoctor.load('Hello, World!') # <2> <3> <4>
-puts doc.render <5><6>
+puts doc.convert <5><6>
 exit 0
 ----
 <1> Require library
@@ -4344,7 +4344,7 @@ Violets are blue <2>
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') # <2>
-puts doc.render # <3>
+puts doc.convert # <3>
 ----
 <1> Describe the first line
 <2> Describe the second line
@@ -4367,7 +4367,7 @@ puts doc.render # <3>
 ----
 require 'asciidoctor' # <1>
 doc = Asciidoctor::Document.new('Hello, World!') #<2>
-puts doc.render #<3>
+puts doc.convert #<3>
 ----
 <1> Describe the first line
 <2> Describe the second line

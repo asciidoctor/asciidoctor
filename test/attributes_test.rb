@@ -574,7 +574,7 @@ all there is.
     test "attribute value gets interpretted when rendering" do
       doc = document_from_string(":google: http://google.com[Google]\n\n{google}")
       assert_equal 'http://google.com[Google]', doc.attributes['google']
-      output = doc.render
+      output = doc.convert
       assert_xpath '//a[@href="http://google.com"][text() = "Google"]', output, 1
     end
 
@@ -703,7 +703,7 @@ v1.0, 2010-01-01: First release!
       assert_equal 'value', doc.attr('a')
       assert_equal 'value', doc.attr('a2')
 
-      output = doc.render
+      output = doc.convert
       assert_includes output, 'value == value'
       assert_includes output, '2010-01-01 == 2010-01-01'
     end
@@ -891,7 +891,7 @@ of the attribute named foo in your document.
       EOS
 
       doc = document_from_string input
-      output = doc.render
+      output = doc.convert
       assert_equal 1, doc.attributes['mycounter']
       assert_xpath '//p[text()="1"]', output, 1
     end
@@ -902,7 +902,7 @@ of the attribute named foo in your document.
       EOS
 
       doc = document_from_string input
-      output = doc.render
+      output = doc.convert
       assert_equal 1, doc.attributes['mycounter']
       assert_xpath '//p[text()="1"]', output, 0
     end
@@ -913,7 +913,7 @@ of the attribute named foo in your document.
       EOS
 
       doc = document_from_string input
-      doc.render
+      doc.convert
       assert_equal 10, doc.attributes['mycounter']
     end
 
@@ -923,7 +923,7 @@ of the attribute named foo in your document.
       EOS
 
       doc = document_from_string input
-      doc.render
+      doc.convert
       assert_equal 'A', doc.attributes['mycounter']
     end
 
@@ -937,7 +937,7 @@ of the attribute named foo in your document.
       EOS
 
       doc = document_from_string input
-      output = doc.render
+      output = doc.convert
       assert_equal 2, doc.attributes['mycounter']
       assert_xpath '//p[text()="2"]', output, 2
     end
@@ -952,7 +952,7 @@ of the attribute named foo in your document.
       EOS
 
       doc = document_from_string input
-      output = doc.render
+      output = doc.convert
       assert_equal 'A', doc.attributes['mycounter']
       assert_xpath '//p[text()="A"]', output, 2
     end
@@ -967,7 +967,7 @@ of the attribute named foo in your document.
       EOS
 
       doc = document_from_string input
-      output = doc.render :header_footer => false
+      output = doc.convert :header_footer => false
       assert_equal 1, doc.attributes['mycounter']
       assert_xpath '//p[text()="1"]', output, 2
     end
@@ -984,7 +984,7 @@ after: {counter:mycounter}
       EOS
 
       doc = document_from_string input
-      output = doc.render :header_footer => false
+      output = doc.convert :header_footer => false
       assert_equal 1, doc.attributes['mycounter']
       assert_xpath '//p[text()="before: 1 2 3"]', output, 1
       assert_xpath '//p[text()="after: 1"]', output, 1

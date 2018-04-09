@@ -1076,7 +1076,7 @@ output file name is used.
       assert body_cell_1_3.inner_document.nested?
       assert_equal doc, body_cell_1_3.inner_document.parent_document
       assert_equal doc.converter, body_cell_1_3.inner_document.converter
-      output = doc.render
+      output = doc.convert
 
       assert_css 'table > tbody > tr', output, 2
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(3) div.admonitionblock', output, 1
