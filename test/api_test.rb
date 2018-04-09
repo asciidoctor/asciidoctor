@@ -160,6 +160,21 @@ idseparator=-')
       assert_equal docdir, doc.base_dir
     end
 
+    test 'render method on node is aliased to convert method' do
+      input = <<-EOS
+paragraph text
+
+* list item
+      EOS
+      doc = Asciidoctor.load input
+      assert_equal 2, doc.blocks.length
+      ([doc] + doc.blocks).each do |block|
+        assert_equal block.method(:convert), block.method(:render)
+      end
+      inline = Asciidoctor::Inline.new doc.blocks[0], :image, nil, :type => 'image', :target => 'tiger.png'
+      assert_equal inline.method(:convert), inline.method(:render)
+    end
+
     test 'should output timestamps by default' do
       doc = document_from_string 'text', :backend => :html5, :attributes => nil
       result = doc.convert
