@@ -1060,6 +1060,7 @@ Your browser does not support the video tag.
         %(<a id="#{node.id}"></a>#{node.text})
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
+        nil
       end
     end
 

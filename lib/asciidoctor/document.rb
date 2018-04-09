@@ -1115,7 +1115,7 @@ class Document < AbstractBlock
     if doctype == 'inline'
       if (block = @blocks[0] || @header)
         if block.content_model == :compound || block.content_model == :empty
-          warn %(asciidoctor: WARNING: no inline candidate; use the inline doctype to convert a single paragragh, verbatim, or raw block)
+          warn 'asciidoctor: WARNING: no inline candidate; use the inline doctype to convert a single paragragh, verbatim, or raw block'
         else
           output = block.content
         end

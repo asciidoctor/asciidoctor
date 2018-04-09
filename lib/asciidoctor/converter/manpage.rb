@@ -617,6 +617,7 @@ allbox tab(:);'
         ''
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
+        nil
       end
     end
 

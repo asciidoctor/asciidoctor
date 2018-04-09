@@ -508,6 +508,7 @@ class AbstractNode
       end
     elsif opts[:warn_on_failure]
       warn %(asciidoctor: WARNING: #{(attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
+      nil
     end
   end
 
@@ -536,19 +537,19 @@ class AbstractNode
         begin
           data = ::OpenURI.open_uri(target) {|fd| fd.read }
           data = (Helpers.normalize_lines_from_string data) * LF if opts[:normalize]
+          return data
         rescue
           warn %(asciidoctor: WARNING: could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
-          data = nil
+          return
         end
       else
         warn %(asciidoctor: WARNING: cannot retrieve contents of #{opts[:label] || 'asset'} at URI: #{target} (allow-uri-read attribute not enabled)) if opts.fetch :warn_on_failure, true
-        data = nil
+        return
       end
     else
       target = normalize_system_path target, opts[:start], nil, :target_name => (opts[:label] || 'asset')
-      data = read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true), :label => opts[:label]
+      return read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true), :label => opts[:label]
     end
-    data
   end
 
   # Internal: URI encode spaces in a String

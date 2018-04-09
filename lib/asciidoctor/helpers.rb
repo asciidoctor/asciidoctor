@@ -39,6 +39,7 @@ module Helpers
         warn %(asciidoctor: WARNING: #{e.message.chomp '.'}. Functionality disabled.)
       end
     end
+    nil
   end
 
   # Public: Normalize the data to prepare for parsing

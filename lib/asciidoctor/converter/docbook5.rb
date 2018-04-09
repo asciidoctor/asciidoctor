@@ -524,6 +524,7 @@ module Asciidoctor
         %(<anchor#{common_attributes node.id, nil, (text = node.text)}/>#{text})
       else
         warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
+        nil
       end
     end
 

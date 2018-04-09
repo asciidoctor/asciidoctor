@@ -230,6 +230,7 @@ class Parser
     else
       warn %(asciidoctor: ERROR: #{reader.prev_line_info}: name section expected)
     end
+    nil
   end
 
   # Public: Return the next section from the Reader.
