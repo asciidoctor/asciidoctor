@@ -14,6 +14,41 @@ This document provides a high-level view of the changes introduced in Asciidocto
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
 // tag::compact[]
+== 1.5.6.2 (2018-03-20) - @mojavelinux
+
+Bug fixes::
+
+  * fix match for multiple xref macros w/ implicit text in same line (#2450)
+  * PathResolver#root? returns true for absolute URL in browser env (#2595)
+
+Improvements / Refactoring::
+
+  * resolve include target correctly in browser (xmlhttprequest IO module) (#2599, #2602)
+  * extract method to resolve include path (allowing Asciidoctor.js to override) (#2610)
+  * don't expand docdir value passed to API (#2518)
+  * check mandatory attributes when creating an image block (#2349)
+  * drop is_ prefix from boolean methods in PathResolver (PR #2587)
+  * change Reader#replace_next_line to return true
+  * organize methods in AbstractNode
+
+Build / Infrastructure::
+
+  * clean up dependencies
+  * add Ruby 2.5.0 to CI build matrix (PR #2528)
+  * update nokogiri to 1.8.0 for ruby >= 2.1 (PR #2380)
+
+Distribution Packages::
+
+  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+
+https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.2[issues resolved] |
+https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.2[git tag] |
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.6.1...v1.5.6.2[full diff]
+// end::compact[]
+
 == 1.5.6.1 (2017-07-23) - @mojavelinux
 
 Bug fixes::
@@ -64,7 +99,6 @@ Distribution Packages::
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.1[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.1[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v1.5.6\...v1.5.6.1[full diff]
-// end::compact[]
 
 == 1.5.6 (2017-07-12) - @mojavelinux
 
