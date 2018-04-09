@@ -694,7 +694,7 @@ Your browser does not support the audio tag.
 </div>)
         end
       elsif style == 'partintro' && (node.level > 0 || node.parent.context != :section || node.document.doctype != 'book')
-        warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a book part. Excluding block content.'
+        warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
         ''
       else
           id_attr = node.id ? %( id="#{node.id}") : ''
