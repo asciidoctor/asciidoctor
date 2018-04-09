@@ -258,9 +258,14 @@ class Minitest::Test
   def redirect_streams
     old_stdout, $stdout = $stdout, (tmp_stdout = ::StringIO.new)
     old_stderr, $stderr = $stderr, (tmp_stderr = ::StringIO.new)
+    old_logger = Asciidoctor::LoggerManager.logger
+    old_logger_level = old_logger.level
+    new_logger = (Asciidoctor::LoggerManager.logger = Asciidoctor::Logger.new $stderr)
+    new_logger.level = old_logger_level
     yield tmp_stdout, tmp_stderr
   ensure
     $stdout, $stderr = old_stdout, old_stderr
+    Asciidoctor::LoggerManager.logger = old_logger
   end
 
   def resolve_localhost
@@ -271,9 +276,12 @@ class Minitest::Test
   def in_verbose_mode
     begin
       old_verbose, $VERBOSE = $VERBOSE, true
+      old_logger_level = Asciidoctor::LoggerManager.logger.level
+      Asciidoctor::LoggerManager.logger.level = Logger::Severity::DEBUG
       yield
     ensure
       $VERBOSE = old_verbose
+      Asciidoctor::LoggerManager.logger.level = old_logger_level
     end
   end
 
