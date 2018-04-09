@@ -366,15 +366,15 @@ class AbstractNode
       image_path = normalize_system_path(target_image)
     end
 
-    unless ::File.readable? image_path
+    if ::File.readable? image_path
+      # NOTE base64 is autoloaded by reference to ::Base64
+      %(data:#{mimetype};base64,#{::Base64.encode64(::IO.binread image_path).delete LF})
+    else
       warn %(asciidoctor: WARNING: image to embed not found or not readable: #{image_path})
-      return %(data:#{mimetype};base64,)
+      %(data:#{mimetype};base64,)
       # uncomment to return 1 pixel white dot instead
-      #return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      #'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     end
-
-    # NOTE base64 is autoloaded by reference to ::Base64
-    %(data:#{mimetype};base64,#{::Base64.encode64(::IO.binread image_path).delete LF})
   end
 
   # Public: Read the image data from the specified URI and generate a data URI
