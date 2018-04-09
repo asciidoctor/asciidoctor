@@ -691,7 +691,7 @@ last line
         end
       end
       # Safe Mode is not required here
-      document = empty_document :base_dir => File.expand_path(File.dirname(__FILE__)), :extension_registry => registry
+      document = empty_document :base_dir => testdir, :extension_registry => registry
       reader = Asciidoctor::PreprocessorReader.new document, input, nil, :normalize => true
       lines = []
       lines << reader.read_line

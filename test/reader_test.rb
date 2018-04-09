@@ -5,7 +5,7 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
 end
 
 class ReaderTest < Minitest::Test
-  DIRNAME = File.expand_path(File.dirname(__FILE__))
+  DIRNAME = File.expand_path File.dirname __FILE__
 
   SAMPLE_DATA = <<-EOS.chomp.split(::Asciidoctor::LF)
 first line

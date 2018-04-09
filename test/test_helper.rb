@@ -220,7 +220,6 @@ class Minitest::Test
     end
     if (template_dir = ENV['TEMPLATE_DIR'])
       opts[:template_dir] = template_dir unless opts.has_key? :template_dir
-      #opts[:template_dir] = File.join(File.dirname(__FILE__), '..', '..', 'asciidoctor-backends', 'erb') unless opts.has_key? :template_dir
     end
     nil
   end
@@ -239,14 +238,13 @@ class Minitest::Test
   end
 
   def invoke_cli_with_filenames(argv = [], filenames = [], &block)
-
     filepaths = Array.new
 
-    filenames.each { |filename|
-      if filenames.nil?|| ::Pathname.new(filename).absolute?
-        filepaths.push(filename)
+    filenames.each {|filename|
+      if filenames.nil? || ::Pathname.new(filename).absolute?
+        filepaths << filename
       else
-        filepaths.push(File.join(File.dirname(__FILE__), 'fixtures', filename))
+        filepaths << (fixture_path filename)
       end
     }
 
@@ -264,7 +262,7 @@ class Minitest::Test
     if filename.nil? || filename == '-' || ::Pathname.new(filename).absolute?
       filepath = filename
     else
-      filepath = File.join(File.dirname(__FILE__), 'fixtures', filename)
+      filepath = fixture_path filename
     end
     invoker = Asciidoctor::Cli::Invoker.new(argv + [filepath])
     if buffers

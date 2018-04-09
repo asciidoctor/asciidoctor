@@ -44,7 +44,7 @@ context "Text" do
     input = <<-EOS
 include::fixtures/encoding.asciidoc[tags=romé]
     EOS
-    doc = empty_safe_document :base_dir => File.expand_path(File.dirname(__FILE__))
+    doc = empty_safe_document :base_dir => testdir
     reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
     block = Asciidoctor::Parser.next_block(reader, doc)
     output = block.convert
