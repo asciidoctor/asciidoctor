@@ -1716,7 +1716,9 @@ image::circle.svg[Tiger,100]
 image::no-such-image.svg[Alt Text]
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER), err.string] }
+      output, warnings = redirect_streams do |_, err|
+        [(render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER), err.string]
+      end
       assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
       assert_includes warnings, 'SVG does not exist or cannot be read'
     end
