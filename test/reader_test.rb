@@ -1065,16 +1065,12 @@ end)
 include::fixtures/include-file.asciidoc[tag=snippetZ]
         EOS
 
-        old_stderr = $stderr
-        $stderr = StringIO.new
-        begin
+        warnings = redirect_streams do |_, err|
           render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
-          warning = $stderr.tap(&:rewind).read
-          refute_nil warning
-          assert_match(/WARNING.*snippetZ/, warning)
-        ensure
-          $stderr = old_stderr
+          err.string
         end
+        refute_nil warnings
+        assert_match(/WARNING.*snippetZ/, warnings)
       end
 
       test 'should warn if end tag in included file is mismatched' do
