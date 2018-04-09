@@ -314,7 +314,7 @@ module Asciidoctor
         end
       when 'partintro'
         unless node.level == 0 && node.parent.context == :section && node.document.doctype == 'book'
-          warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a part section. Excluding block content.'
+          warn 'asciidoctor: ERROR: partintro block can only be used when doctype is book and it\'s a child of a book part. Excluding block content.'
           ''
         else
           %(<partintro#{common_attributes node.id, node.role, node.reftext}>

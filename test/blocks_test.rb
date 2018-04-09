@@ -3207,7 +3207,7 @@ part intro paragraph
 
       output, warnings = redirect_streams {|_, err| [(render_string input, :backend => 'docbook'), err.string] }
       assert_css 'partintro', output, 0
-      assert_includes warnings, 'partintro block can only be used when doctype is book and it\'s a child of a part section'
+      assert_includes warnings, 'partintro block can only be used when doctype is book and it\'s a child of a book part'
     end
 
     test 'should not allow partintro unless doctype is book rendered to DocBook' do
@@ -3218,7 +3218,7 @@ part intro paragraph
 
       output, warnings = redirect_streams {|_, err| [(render_string input, :backend => 'docbook'), err.string] }
       assert_css 'partintro', output, 0
-      assert_includes warnings, 'partintro block can only be used when doctype is book and it\'s a child of a part section'
+      assert_includes warnings, 'partintro block can only be used when doctype is book and it\'s a child of a book part'
     end
   end
 
