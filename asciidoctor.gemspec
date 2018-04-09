@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   rescue
     Dir['**/*']
   end
-  s.files = files.grep(/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|LICENSE|(?:CHANGELOG|CONTRIBUTINGREADME(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/)
+  s.files = files.grep(/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|LICENSE|(?:CHANGELOG|CONTRIBUTING|README(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/)
   s.executables = files.grep(/^bin\//).map {|f| File.basename f }
   s.require_paths = ['lib']
   s.test_files = files.grep(/^(?:(?:features|test)\/.+)$/)
