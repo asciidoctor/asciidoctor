@@ -1296,6 +1296,10 @@ module Asciidoctor
       timings.start :read
     end
 
+    if (logger = options[:logger]) && logger != LoggerManager.logger
+      LoggerManager.logger = logger
+    end
+
     if !(attrs = options[:attributes])
       attrs = {}
     elsif ::Hash === attrs || (::RUBY_ENGINE_JRUBY && ::Java::JavaUtil::Map === attrs)

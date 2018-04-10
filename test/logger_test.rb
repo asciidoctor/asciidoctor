@@ -15,9 +15,8 @@ context 'Logger' do
     end
 
     test 'allows logger instance to be changed' do
-      class MyLoggerA < Logger; end
       old_logger = Asciidoctor::LoggerManager.logger
-      new_logger = MyLoggerA.new $stdout
+      new_logger = MyLogger.new $stdout
       begin
         Asciidoctor::LoggerManager.logger = new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
@@ -27,10 +26,9 @@ context 'Logger' do
     end
 
     test 'setting logger instance to falsy value resets instance to default logger' do
-      class MyLoggerB < Logger; end
       old_logger = Asciidoctor::LoggerManager.logger
       begin
-        Asciidoctor::LoggerManager.logger = MyLoggerB.new $stdout
+        Asciidoctor::LoggerManager.logger = MyLogger.new $stdout
         Asciidoctor::LoggerManager.logger = nil
         refute_nil Asciidoctor::LoggerManager.logger
         assert_kind_of Logger, Asciidoctor::LoggerManager.logger
@@ -40,14 +38,13 @@ context 'Logger' do
     end
 
     test 'creates logger instance from static logger_class property' do
-      class MyLoggerC < Logger; end
       old_logger_class = Asciidoctor::LoggerManager.logger_class
       old_logger = Asciidoctor::LoggerManager.logger
       begin
-        Asciidoctor::LoggerManager.logger_class = MyLoggerC
+        Asciidoctor::LoggerManager.logger_class = MyLogger
         Asciidoctor::LoggerManager.logger = nil
         refute_nil Asciidoctor::LoggerManager.logger
-        assert_kind_of MyLoggerC, Asciidoctor::LoggerManager.logger
+        assert_kind_of MyLogger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger_class = old_logger_class
         Asciidoctor::LoggerManager.logger = old_logger
@@ -56,11 +53,11 @@ context 'Logger' do
   end
 
   context 'Logger' do
-    test 'configures default logger with progname equal to asciidoctor' do
+    test 'configures default logger with progname set to asciidoctor' do
       assert_equal 'asciidoctor', Asciidoctor::LoggerManager.logger.progname
     end
 
-    test 'configures default logger with level equal to WARN' do
+    test 'configures default logger with level set to WARN' do
       assert_equal Logger::Severity::WARN, Asciidoctor::LoggerManager.logger.level
     end
 
@@ -82,6 +79,52 @@ context 'Logger' do
       end
       assert_includes err_string, %(asciidoctor: WARNING: this is a call)
       assert_includes err_string, %(asciidoctor: FAILED: it cannot be done)
+    end
+  end
+
+  context ':logger API option' do
+    test 'should be able to set logger when invoking load API' do
+      old_logger = Asciidoctor::LoggerManager.logger
+      new_logger = MyLogger.new $stdout
+      begin
+        Asciidoctor.load 'contents', :logger => new_logger
+        assert_same new_logger, Asciidoctor::LoggerManager.logger
+      ensure
+        Asciidoctor::LoggerManager.logger = old_logger
+      end
+    end
+
+    test 'should be able to set logger when invoking load_file API' do
+      old_logger = Asciidoctor::LoggerManager.logger
+      new_logger = MyLogger.new $stdout
+      begin
+        Asciidoctor.load_file fixture_path('basic.asciidoc'), :logger => new_logger
+        assert_same new_logger, Asciidoctor::LoggerManager.logger
+      ensure
+        Asciidoctor::LoggerManager.logger = old_logger
+      end
+    end
+
+    test 'should be able to set logger when invoking convert API' do
+      old_logger = Asciidoctor::LoggerManager.logger
+      new_logger = MyLogger.new $stdout
+      begin
+        Asciidoctor.convert 'contents', :logger => new_logger
+        assert_same new_logger, Asciidoctor::LoggerManager.logger
+      ensure
+        Asciidoctor::LoggerManager.logger = old_logger
+      end
+    end
+
+    test 'should be able to set logger when invoking convert_file API' do
+      old_logger = Asciidoctor::LoggerManager.logger
+      new_logger = MyLogger.new $stdout
+      begin
+        Asciidoctor.convert_file fixture_path('basic.asciidoc'), :to_file => false, :logger => new_logger
+        assert_same new_logger, Asciidoctor::LoggerManager.logger
+      ensure
+        Asciidoctor::LoggerManager.logger = old_logger
+      end
     end
   end
 
