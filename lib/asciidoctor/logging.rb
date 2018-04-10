@@ -17,6 +17,12 @@ class Logger < ::Logger
     end
   end
 
+  module AutoFormattingMessage
+    def inspect
+      (sloc = self[:source_location]) ? %(#{sloc}: #{self[:text]}) : self[:text]
+    end
+  end
+
   class NullLogger < ::Logger
     def initialize; end
 
@@ -63,6 +69,10 @@ module Logging
   private
   def logger
     LoggerManager.logger
+  end
+
+  def enrich_message text, context = {}
+    ({ :text => text }.merge context).extend Logger::AutoFormattingMessage
   end
 end
 end

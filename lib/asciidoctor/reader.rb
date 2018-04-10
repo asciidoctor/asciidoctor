@@ -509,8 +509,12 @@ class Reader
     @lines.unshift(*lines)
   end
 
-  def cursor
-    Cursor.new @file, @dir, @path, @lineno
+  def cursor lineno = nil
+    Cursor.new @file, @dir, @path, (lineno || @lineno)
+  end
+
+  def prev_line_cursor
+    Cursor.new @file, @dir, @path, (@lineno - 1)
   end
 
   # Public: Get information about the last line read, including file name and line number.
@@ -546,9 +550,7 @@ class Reader
   #
   #
   # Returns A string summary of this reader, which contains the path and line information
-  def to_s
-    line_info
-  end
+  alias to_s line_info
 end
 
 # Public: Methods for retrieving lines from AsciiDoc source files, evaluating preprocessor
@@ -716,12 +718,12 @@ class PreprocessorReader < Reader
 
     if keyword == 'endif'
       if @conditional_stack.empty?
-        logger.error %(#{line_info}: unmatched macro: endif::#{target}[])
+        logger.error enrich_message %(unmatched macro: endif::#{target}[]), :source_location => cursor
       elsif no_target || target == (pair = @conditional_stack[-1])[:target]
         @conditional_stack.pop
         @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
       else
-        logger.error %(#{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[])
+        logger.error enrich_message %(mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]), :source_location => cursor
       end
       return true
     end
@@ -837,7 +839,7 @@ class PreprocessorReader < Reader
       replace_next_line %(link:#{expanded_target}[])
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0
       if @include_stack.size >= abs_maxdepth
-        logger.error %(#{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
+        logger.error enrich_message %(maximum include depth of #{@maxdepth[:rel]} exceeded), :source_location => cursor
         return
       end
 
@@ -903,7 +905,7 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          logger.error %(#{line_info}: include #{target_type} not readable: #{inc_path})
+          logger.error enrich_message %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         shift
@@ -942,9 +944,9 @@ class PreprocessorReader < Reader
                   elsif inc_tags.key? this_tag
                     if (idx = tag_stack.rindex {|key, _| key == this_tag })
                       idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
-                      logger.warn %(#{expanded_target}: line #{inc_lineno}: mismatched end tag in include: expected #{active_tag}, found #{this_tag})
+                      logger.warn enrich_message %(mismatched end tag in include: expected #{active_tag}, found #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
                     else
-                      logger.warn %(#{expanded_target}: line #{inc_lineno}: unexpected end tag in include: #{this_tag})
+                      logger.warn enrich_message %(unexpected end tag in include: #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
                     end
                   end
                 elsif inc_tags.key?(this_tag = $2)
@@ -963,11 +965,11 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          logger.error %(#{line_info}: include #{target_type} not readable: #{inc_path})
+          logger.error enrich_message %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
-          logger.warn %(#{line_info}: tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path})
+          logger.warn enrich_message %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
         end
         shift
         # FIXME not accounting for skipped lines in reader line numbering
@@ -979,7 +981,7 @@ class PreprocessorReader < Reader
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attributes
         rescue
-          logger.error %(#{line_info}: include #{target_type} not readable: #{inc_path})
+          logger.error enrich_message %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
       end
@@ -1025,7 +1027,7 @@ class PreprocessorReader < Reader
           shift
           return true
         else
-          logger.error %(#{line_info}: include file not found: #{inc_path})
+          logger.error enrich_message %(include file not found: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
         end
       end

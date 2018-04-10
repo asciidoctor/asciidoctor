@@ -5,6 +5,8 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
 end
 
 context 'Logger' do
+  MyLogger = Class.new Logger
+
   context 'LoggerManager' do
     test 'provides access to logger via static logger method' do
       logger = Asciidoctor::LoggerManager.logger
@@ -84,7 +86,7 @@ context 'Logger' do
   end
 
   context 'Logging' do
-    test 'including Logging gives instance methods on module access to logger via private logger method' do
+    test 'including Logging gives instance methods on module access to logging infrastructure' do
       module SampleModuleA
         include Asciidoctor::Logging
         def get_logger
@@ -99,7 +101,7 @@ context 'Logger' do
       assert SampleClassA.private_method_defined? :logger
     end
 
-    test 'including Logging gives static methods on module access to logger via logger method' do
+    test 'including Logging gives static methods on module access to logging infrastructure' do
       module SampleModuleB
         include Asciidoctor::Logging
         def self.get_logger
@@ -110,7 +112,7 @@ context 'Logger' do
       assert_same Asciidoctor::LoggerManager.logger, SampleModuleB.get_logger
     end
 
-    test 'including Logging gives instance methods on class access to logger via private logger method' do
+    test 'including Logging gives instance methods on class access to logging infrastructure' do
       class SampleClassC
         include Asciidoctor::Logging
         def get_logger
@@ -122,7 +124,7 @@ context 'Logger' do
       assert SampleClassC.private_method_defined? :logger
     end
 
-    test 'including Logging gives static methods on class access to logger via logger method' do
+    test 'including Logging gives static methods on class access to logging infrastructure' do
       class SampleClassD
         include Asciidoctor::Logging
         def self.get_logger
@@ -131,6 +133,21 @@ context 'Logger' do
       end
 
       assert_same Asciidoctor::LoggerManager.logger, SampleClassD.get_logger
+    end
+
+    test 'can enrich and auto-format message' do
+      class SampleClassE
+        include Asciidoctor::Logging
+        def create_message cursor
+          enrich_message 'Asciidoctor was here', :source_location => cursor
+        end
+      end
+
+      cursor = Asciidoctor::Reader::Cursor.new 'file.adoc', fixturedir, 'file.adoc', 5
+      message = SampleClassE.new.create_message cursor
+      assert_equal 'Asciidoctor was here', message[:text]
+      assert_same cursor, message[:source_location]
+      assert_equal 'file.adoc: line 5: Asciidoctor was here', message.inspect
     end
   end
 end

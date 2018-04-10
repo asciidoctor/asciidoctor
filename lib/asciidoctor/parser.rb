@@ -194,7 +194,7 @@ class Parser
       document.attributes['mantitle'] = document.sub_attributes $1.downcase
       document.attributes['manvolnum'] = $2
     else
-      logger.error %(#{reader.prev_line_info}: malformed manpage title)
+      logger.error enrich_message 'malformed manpage title', :source_location => reader.prev_line_cursor
       # provide sensible fallbacks
       document.attributes['mantitle'] = document.attributes['doctitle']
       document.attributes['manvolnum'] = '1'
@@ -223,13 +223,13 @@ class Parser
             document.attributes['outfilesuffix'] = %(.#{document.attributes['manvolnum']})
           end
         else
-          logger.error %(#{reader.prev_line_info}: malformed name section body)
+          logger.error enrich_message 'malformed name section body', :source_location => reader.prev_line_cursor
         end
       else
-        logger.error %(#{reader.prev_line_info}: name section title must be at level 1)
+        logger.error enrich_message 'name section title must be at level 1', :source_location => reader.prev_line_cursor
       end
     else
-      logger.error %(#{reader.prev_line_info}: name section expected)
+      logger.error enrich_message 'name section expected', :source_location => reader.prev_line_cursor
     end
     nil
   end
@@ -325,9 +325,9 @@ class Parser
         next_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
         if next_level > current_level || (next_level == 0 && section.context == :document)
           if next_level == 0 && doctype != 'book'
-            logger.error %(#{reader.line_info}: only book doctypes can contain level 0 sections)
+            logger.error enrich_message 'only book doctypes can contain level 0 sections', :source_location => reader.cursor
           elsif expected_next_levels && !expected_next_levels.include?(next_level)
-            logger.warn %(#{reader.line_info}: section title out of sequence: expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, got level #{next_level})
+            logger.warn enrich_message %(section title out of sequence: expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, got level #{next_level}), :source_location => reader.cursor
           end
           # the attributes returned are those that are orphaned
           new_section, attributes = next_section reader, section, attributes
@@ -335,14 +335,14 @@ class Parser
           section.blocks << new_section
         else
           if next_level == 0 && doctype != 'book'
-            logger.error %(#{reader.line_info}: only book doctypes can contain level 0 sections)
+            logger.error enrich_message 'only book doctypes can contain level 0 sections', :source_location => reader.cursor
           end
           # close this section (and break out of the nesting) to begin a new one
           break
         end
       else
         # just take one block or else we run the risk of overrunning section boundaries
-        block_line_info = reader.line_info
+        block_cursor = reader.cursor
         if (new_block = next_block reader, intro || section, attributes, :parse_metadata => false)
           # REVIEW this may be doing too much
           if part
@@ -364,7 +364,7 @@ class Parser
               first_block = section.blocks[0]
               # open the [partintro] open block for appending
               if !intro && first_block.content_model == :compound
-                logger.error %(#{block_line_info}: illegal block content outside of partintro block)
+                logger.error enrich_message 'illegal block content outside of partintro block', :source_location => block_cursor
               # rebuild [partintro] paragraph as an open block
               elsif first_block.content_model != :compound
                 new_block.parent = (intro = Block.new section, :open, :content_model => :compound)
@@ -393,7 +393,7 @@ class Parser
 
     if part
       unless section.blocks? && section.blocks[-1].context == :section
-        logger.error %(#{reader.line_info}: invalid part, must have at least one section (e.g., chapter, appendix, etc.))
+        logger.error enrich_message 'invalid part, must have at least one section (e.g., chapter, appendix, etc.)', :source_location => reader.cursor
       end
     # NOTE we could try to avoid creating a preamble in the first place, though
     # that would require reworking assumptions in next_section since the preamble
@@ -469,8 +469,7 @@ class Parser
     end
 
     # QUESTION should we introduce a parsing context object?
-    source_location = reader.cursor if document.sourcemap
-    this_path, this_lineno, this_line, doc_attrs = reader.path, reader.lineno, reader.read_line, document.attributes
+    this_file, this_dir, this_path, this_lineno, this_line, doc_attrs = reader.file, reader.dir, reader.path, reader.lineno, reader.read_line, document.attributes
     block = block_context = cloaked_context = terminator = nil
     style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
 
@@ -487,7 +486,7 @@ class Parser
         elsif block_extensions && extensions.registered_for_block?(style, block_context)
           block_context = style.to_sym
         else
-          logger.warn %(#{this_path}: line #{this_lineno}: invalid style for #{block_context} block: #{style})
+          logger.warn enrich_message %(invalid style for #{block_context} block: #{style}), :source_location => (Reader::Cursor.new this_file, this_dir, this_path, this_lineno)
           style = block_context.to_s
         end
       end
@@ -616,12 +615,12 @@ class Parser
           list_item_lineno = reader.lineno
           # might want to move this check to a validate method
           unless match[1] == expected_index.to_s
-            logger.warn %(#{reader.path}: line #{list_item_lineno}: callout list item index: expected #{expected_index} got #{match[1]})
+            logger.warn enrich_message %(callout list item index: expected #{expected_index} got #{match[1]}), :source_location => (reader.cursor list_item_lineno)
           end
           if (list_item = next_list_item reader, block, match)
             block.items << list_item
             if (coids = document.callouts.callout_ids block.items.size).empty?
-              logger.warn %(#{reader.path}: line #{list_item_lineno}: no callouts refer to list item #{block.items.size})
+              logger.warn enrich_message %(no callouts refer to list item #{block.items.size}), :source_location => (reader.cursor list_item_lineno)
             else
               list_item.attributes['coids'] = coids
             end
@@ -698,7 +697,7 @@ class Parser
           # advance to block parsing =>
           break
         else
-          logger.warn %(#{this_path}: line #{this_lineno}: invalid style for paragraph: #{style})
+          logger.warn enrich_message %(invalid style for paragraph: #{style}), :source_location => (Reader::Cursor.new this_file, this_dir, this_path, this_lineno)
           style = nil
           # continue to process paragraph
         end
@@ -892,7 +891,7 @@ class Parser
     end
 
     # FIXME we've got to clean this up, it's horrible!
-    block.source_location = source_location if source_location
+    block.source_location = Reader::Cursor.new this_file, this_dir, this_path, this_lineno if document.sourcemap
     # FIXME title should be assigned when block is constructed
     block.title = attributes.delete 'title' if attributes.key? 'title'
     # TODO eventually remove the style attribute from the attributes hash
@@ -900,7 +899,7 @@ class Parser
     block.style = attributes['style']
     if (block_id = (block.id ||= attributes['id']))
       unless document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
-        logger.warn %(#{this_path}: line #{this_lineno}: id assigned to block already in use: #{block_id})
+        logger.warn enrich_message %(id assigned to block already in use: #{block_id}), :source_location => (Reader::Cursor.new this_file, this_dir, this_path, this_lineno)
       end
     end
     # FIXME remove the need for this update!
@@ -1190,7 +1189,7 @@ class Parser
         end
       end
       unless document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :id => id), reftext]
-        logger.warn %(#{document.reader.path}: id assigned to anchor already in use: #{id})
+        logger.warn enrich_message %(id assigned to anchor already in use: #{id}), :source_location => document.reader.prev_line_cursor
       end
     end if (text.include? '[[') || (text.include? 'or:')
     nil
@@ -1207,7 +1206,7 @@ class Parser
     if InlineBiblioAnchorRx =~ text
       # QUESTION should we sub attributes in reftext (like with regular anchors)?
       unless document.register :refs, [(id = $1), (Inline.new block, :anchor, (reftext = %([#{$2 || id}])), :type => :bibref, :id => id), reftext]
-        logger.warn %(#{document.reader.path}: id assigned to bibliography anchor already in use: #{id})
+        logger.warn enrich_message %(id assigned to bibliography anchor already in use: #{id}), :source_location => document.reader.prev_line_cursor
       end
     end
     nil
@@ -1586,7 +1585,7 @@ class Parser
     # generate an ID if one was not embedded or specified as anchor above section title
     if (id = section.id ||= ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
       unless document.register :refs, [id, section, sect_reftext || section.title]
-        logger.warn %(#{reader.path}: line #{reader.lineno - (sect_atx ? 1 : 2)}: id assigned to section already in use: #{id})
+        logger.warn enrich_message %(id assigned to section already in use: #{id}), :source_location => (reader.cursor reader.lineno - (sect_atx ? 1 : 2))
       end
     end
 
@@ -2213,7 +2212,7 @@ class Parser
     end
 
     if validate && expected != actual
-      logger.warn %(#{reader.line_info}: list item index: expected #{expected}, got #{actual})
+      logger.warn enrich_message %(list item index: expected #{expected}, got #{actual}), :source_location => reader.cursor
     end
 
     marker
@@ -2537,7 +2536,11 @@ class Parser
       save_current = lambda {
         if collector.empty?
           unless type == :style
-            logger.warn %(#{reader ? " #{reader.prev_line_info}:" : ''} invalid empty #{type} detected in style attribute)
+            if reader
+              logger.warn enrich_message %(invalid empty #{type} detected in style attribute), :source_location => reader.prev_line_cursor
+            else
+              logger.warn %(invalid empty #{type} detected in style attribute)
+            end
           end
         else
           case type
@@ -2545,7 +2548,11 @@ class Parser
             (parsed[type] ||= []) << collector.join
           when :id
             if parsed.key? :id
-              logger.warn %(#{reader ? " #{reader.prev_line_info}:" : ''} multiple ids detected in style attribute)
+              if reader
+                logger.warn enrich_message 'multiple ids detected in style attribute', :source_location => reader.prev_line_cursor
+              else
+                logger.warn 'multiple ids detected in style attribute'
+              end
             end
             parsed[type] = collector.join
           else
