@@ -684,6 +684,14 @@ class Document < AbstractBlock
     doctitle
   end
 
+  # Public: Set the title on the document header
+  #
+  # Set the title of the document header to the specified value. If the header
+  # does not exist, it is first created.
+  #
+  # title - the String title to assign as the title of the document header
+  #
+  # Returns the new [String] title assigned to the document header
   def title= title
     unless (sect = @header)
       (sect = (@header = Section.new self, 0, false)).sectname = 'header'

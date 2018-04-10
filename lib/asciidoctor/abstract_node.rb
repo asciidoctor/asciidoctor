@@ -70,10 +70,9 @@ class AbstractNode
   #
   # parent - The Block to set as the parent of this Block
   #
-  # Returns nothing
+  # Returns the new parent Block associated with this Block
   def parent= parent
     @parent, @document = parent, parent.document
-    nil
   end
 
   # Public: Get the value of the specified attribute

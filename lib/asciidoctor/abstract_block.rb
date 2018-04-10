@@ -82,11 +82,13 @@ class AbstractBlock < AbstractNode
 
   # Public: Update the context of this block.
   #
-  # This method changes the context of this block. It also
-  # updates the node name accordingly.
-  def context=(context)
-    @context = context
-    @node_name = context.to_s
+  # This method changes the context of this block. It also updates the node name accordingly.
+  #
+  # context - the context Symbol context to assign to this block
+  #
+  # Returns the new context Symbol assigned to this block
+  def context= context
+    @node_name = (@context = context).to_s
   end
 
   # Public: Append a content block to this block's list of blocks.
