@@ -3,7 +3,6 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :keywords: check list
-:example-caption!:
 ////
 Included in:
 - user-manual: Unordered lists: Checklists

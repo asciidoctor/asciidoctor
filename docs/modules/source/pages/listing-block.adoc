@@ -1,0 +1,82 @@
+= Listing Paragraphs and Blocks
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:keywords: source code snippets
+////
+From listing.adoc, included in:
+- user-manual: Listing and Source Code Blocks
+////
+
+Like literal blocks, the content in listing blocks is displayed exactly as you entered it.
+Listing block content is converted to `<pre>` text.
+The content in listing blocks is only subject to #special character# and callout substitutions.
+// <<user-manual#special-characters,special character>>
+
+The `listing` block name can be applied to content two ways.
+
+. Set the `listing` attribute on the element.
+. Contain the content within a delimited listing block.
+
+The listing block name is applied to an element, such as a paragraph, by setting the `listing` attribute on that element.
+
+.Listing paragraph syntax
+[source]
+----
+include::{partialsdir}/ex-listing.adoc[tag=para]
+----
+
+.Result: Listing paragraph
+====
+include::{partialsdir}/ex-listing.adoc[tag=para]
+====
+
+A delimited listing block is surrounded by lines composed of four hyphens (`----`).
+
+.Delimited listing block syntax
+[source]
+....
+include::{partialsdir}/ex-listing.adoc[tag=bl]
+....
+
+Here's how the block above appears when rendered as HTML.
+
+.Result: Listing block
+====
+include::{partialsdir}/ex-listing.adoc[tag=bl]
+====
+
+You should notice a few things about how the content is processed.
+
+* the HTML tag `<pre>` is escaped
+* then endlines are preserved
+* the phrase _listing block_ is not italicized, despite having underscores around it.
+
+Listing blocks are good for displaying raw source code, especially when used in tandem with the `source` and `source-highlighter` attributes.
+The example below shows a listing block with `source` and the language `ruby` applied to its content.
+
+.Source block syntax
+[source]
+....
+include::{partialsdir}/ex-src.adoc[tag=src-base]
+....
+
+.Result: Listing block with the source attribute set
+====
+include::{partialsdir}/ex-src.adoc[tag=src-base]
+====
+
+Detailed instructions for using the xref:source-block.adoc[source and source-highlighter attributes] are provided on the source code paragraphs and blocks page.
+
+[listing]
+.Listing block with custom substitutions syntax
+....
+include::{partialsdir}/ex-listing.adoc[tag=subs]
+....
+
+.Result: Listing block with custom substitutions applied
+====
+// the attribute value is hard-coded in this result since the example depends
+// on a hypothetical document attribute
+include::{partialsdir}/ex-listing.adoc[tag=subs-out]
+====
