@@ -1,3 +1,10 @@
 * xref:setup:platforms.adoc[Platform Requirements]
 * xref:setup:upgrade-syntax.adoc[Modified & Deprecated Syntax]
+* Lists
+** xref:lists:ordered.adoc[Ordered]
+** xref:lists:unordered.adoc[Unordered]
+** xref:lists:definition.adoc[Definition]
+** xref:lists:complex.adoc[Complex]
+** xref:lists:task.adoc[Task]
+** xref:lists:qanda.adoc[Question & Answer]
 * xref:project/version-and-lifecycle-policies.adoc[Version & Lifecycle Policies]
