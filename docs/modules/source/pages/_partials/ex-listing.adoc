@@ -1,0 +1,76 @@
+////
+Included in:
+- user-manual: Listing
+- quick-ref
+////
+
+// tag::para[]
+[listing]
+This is an example of a paragraph styled with `listing`.
+Notice that the monospace markup is preserved in the output.
+// end::para[]
+
+// tag::bl[]
+----
+This is an example of a _listing block_.
+The content inside is displayed as <pre> text.
+----
+// end::bl[]
+
+// tag::b-base[]
+.Gemfile.lock
+----
+GEM
+  remote: https://rubygems.org/
+  specs:
+    asciidoctor (1.5.7)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  asciidoctor (~> 1.5.7)
+----
+// end::b-base[]
+
+// tag::subs[]
+:version: 1.5.7
+
+[source,xml,subs="verbatim,attributes"]
+----
+<dependency>
+  <groupId>org.asciidoctor</groupId>
+  <artifactId>asciidoctor-java-integration</artifactId>
+  <version>{version}</version>
+</dependency>
+----
+// end::subs[]
+
+// tag::subs-out[]
+[source,xml]
+----
+<dependency>
+  <groupId>org.asciidoctor</groupId>
+  <artifactId>asciidoctor-java-integration</artifactId>
+  <version>1.5.7</version>
+</dependency>
+----
+// end::subs-out[]
+
+// tag::nowrap[]
+[source%nowrap,java]
+----
+public class ApplicationConfigurationProvider extends HttpConfigurationProvider
+{
+   @Override
+   public Configuration getConfiguration(ServletContext context)
+   {
+      return ConfigurationBuilder.begin()
+               .addRule()
+               .when(Direction.isInbound().and(Path.matches("/{path}")))
+               .perform(Log.message(Level.INFO, "Client requested path: {path}"))
+               .where("path").matches(".*");
+   }
+}
+----
+// end::nowrap[]

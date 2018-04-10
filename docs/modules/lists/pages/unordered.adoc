@@ -3,7 +3,6 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :keywords: bulleted list
-:example-caption!:
 ////
 From first p to nested section, included in:
 - user-manual: Unordered lists: Introduction
@@ -126,6 +125,7 @@ NOTE: These styles are supported by the default Asciidoctor stylesheet.
 When present, the style name is assigned to the unordered list element as follows:
 
 For HTML:: the style name is assigned to the `class` attribute on the `<ul>` element.
+
 For DocBook:: the style name is assigned to the `mark` attribute on the `<itemizedlist>` element.
 
 Here's an unordered list that has square bullets:

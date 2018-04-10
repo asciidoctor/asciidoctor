@@ -2,17 +2,12 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-// URLs
-:url-project: https://asciidoctor.org
-:url-org: https://github.com/asciidoctor
-:url-rubygem: https://rubygems.org/gems/asciidoctor
-:url-repo: {url-org}/asciidoctor
 
 [caption="IN MIGRATION"]
 TIP: This documentation is in migration.
 If you're looking for the current Asciidoctor documentation, visit https://asciidoctor.org/docs.
 
-{url-project}[Asciidoctor] is a fast text processor and publishing toolchain for converting AsciiDoc content to HTML5, DocBook 5 (or 4.5) and other formats.
-Asciidoctor is written in Ruby, packaged as a RubyGem and published to {url-rubygem}[RubyGems.org].
+{url-project}[Asciidoctor^] is a fast text processor and publishing toolchain for converting AsciiDoc content to HTML5, DocBook 5 (or 4.5) and other formats.
+Asciidoctor is written in Ruby, packaged as a RubyGem and published to {url-rubygem}[RubyGems.org^].
 The gem is also included in several Linux distributions, including Fedora, Debian, Ubuntu, and Alpine.
-Asciidoctor is open source, {url-repo}[hosted on GitHub] and released under the MIT license.
+Asciidoctor is open source, {url-repo}[hosted on GitHub^] and released under the MIT license.

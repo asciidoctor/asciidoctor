@@ -1,0 +1,41 @@
+site:
+  title: Asciidoctor Docs
+# url: https://docs.asciidoctor.org
+  start_page: asciidoctor::index.adoc
+asciidoc:
+  attributes:
+    experimental: ''
+    example-caption: ~
+    hide-uri-scheme: ''
+    idprefix: ''
+    idseparator: '-'
+    linkattrs: ''
+    source-language: asciidoc
+    table-caption: ~
+    url-project: https://asciidoctor.org
+    url-org: https://github.com/asciidoctor
+    url-rubygem: https://rubygems.org/gems/asciidoctor
+    url-repo: https://github.com/asciidoctor/asciidoctor
+    url-coderay: http://coderay.rubychan.de/
+    url-coderay-gem: https://rubygems.org/gems/coderay
+    url-highlightjs: https://highlightjs.org/
+    url-highlightjs-lang: https://highlightjs.org/download/
+    url-highlightjs-cdn: https://cdnjs.com/libraries/highlight.js
+    url-prettify: https://code.google.com/p/google-code-prettify
+    url-pygments: http://pygments.org
+    url-pygments-lang: http://pygments.org/languages/
+    url-pygments-gem: https://rubygems.org/gems/pygments.rb
+    url-python: https://www.python.org
+    url-rouge: http://rouge.jneen.net
+content:
+  sources:
+  - url: /home/apex/projects/asciidoctor
+    branches: HEAD
+    start_path: docs
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+#  supplemental_files: ./supplemental-ui
+output:
+  dir: ./public

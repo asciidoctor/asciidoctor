@@ -3,7 +3,6 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :keywords: numbered list
-:example-caption!:
 ////
 From first p to nested section, included in:
 - user-manual: Ordered lists: Introduction
@@ -101,8 +100,7 @@ include::{partialsdir}/ex-olist.adoc[tag=nest]
 Like with the asterisks in an unordered list, the number of dots in an ordered list doesn't represent the nesting level.
 However, it's much more intuitive to follow this convention:
 
-[quote]
-# of dots = level of nesting
+*# of dots = level of nesting*
 
 Again, we are shooting for plain text markup that is readable _as is_.
 ====

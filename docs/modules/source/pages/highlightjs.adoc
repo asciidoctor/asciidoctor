@@ -1,0 +1,34 @@
+= Highlight.js
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From src-highlightjs.adoc, included in:
+- user-manual: Source Code Syntax Highlighting: highlight.js installation
+- {highlightjs-org} is now {url-highlightjs}
+- {highlightjs-lang} is now {url-highlightjs-lang}
+////
+
+{url-highlightjs}[Highlight.js^] is a popular client-side syntax highlighter that supports a broad range of {url-highlightjs-lang}[languages^].
+
+To use highlight.js, simply add the following attribute entry to the header of your AsciiDoc file:
+
+[source]
+----
+:source-highlighter: highlightjs
+----
+
+By default, Asciidoctor will link to the highlight.js library and stylesheet hosted on {url-highlightjs-cdn}[cdnjs^].
+
+The version of the highlight.js library hosted on cdnjs only includes the basic language bundle.
+To enable support for a wider range of languages (or to use a different version), follow these steps:
+
+. Create your custom bundle on the {url-highlightjs-lang}[download page^].
+. Download and unpack the zip into a folder called [.path]_highlight_ adjacent to your AsciiDoc file (or in the output directory, if different)
+. Rename [.path]_highlight/highlight.pack.js_ to [.path]_highlight/highlight.min.js_
+. Rename [.path]_highlight/styles/github.css_ to [.path]_highlight/styles/github.min.css_
+** Replace `github` with the name of the `highlightjs-theme` you are using, if different.
+. Add the attribute entry `:highlightjsdir: highlight` to the header of your AsciiDoc file.
+** Alternatively, you can pass the `-a highlightjsdir=highlight` flag when invoking the Asciidoctor CLI.
+
+The output file will use your personal copy of the highlight.js library and stylesheet instead of the one hosted on cdnjs.

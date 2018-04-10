@@ -7,4 +7,13 @@
 ** xref:lists:complex.adoc[Complex]
 ** xref:lists:task.adoc[Task]
 ** xref:lists:qanda.adoc[Question & Answer]
+* Source Code & Listings
+** xref:source:listing-block.adoc[Listing Paragraphs & Blocks]
+** xref:source:source-block.adoc[Source Code Paragraphs & Blocks]
+** Syntax Highlighting
+*** xref:source:coderay.adoc[CodeRay]
+*** xref:source:highlightjs.adoc[Highlight.js]
+*** xref:source:pygments.adoc[Pygments]
+*** xref:source:highlight-php.adoc[Highlight PHP Code]
+** xref:source:listing-wrap.adoc[Wrap or Scroll]
 * xref:project/version-and-lifecycle-policies.adoc[Version & Lifecycle Policies]

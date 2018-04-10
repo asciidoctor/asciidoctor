@@ -1,0 +1,110 @@
+= CodeRay
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From src-coderay.adoc, included in:
+- user-manual: Source Code Highlighting: CodeRay installation
+- {coderay-uri} is now {url-coderay}
+- {coderay-gem} is now {url-coderay-gem}
+////
+
+{url-coderay}[CodeRay^] is an encoding-aware, syntax highlighter that supports the languages listed below.
+
+[cols=3,grid=none,frame=none]
+|===
+
+| C
+| C++
+| Clojure
+
+| CSS
+| Delphi
+| diff
+
+| ERB
+| Go
+| Groovy
+
+| HAML
+| HTML
+| Java
+
+| JavaScript
+| JSON
+| Lua
+
+| PHP
+| Python
+| Ruby
+
+| Sass
+| SQL
+| Taskpaper
+
+| XML
+| YAML
+|
+
+|===
+
+In order to use CodeRay with Asciidoctor, you need the {url-coderay-gem}[coderay RubyGem^].
+You can use one of the following methods to install CodeRay.
+
+Install using `gem` (all systems)::
++
+ $ gem install coderay
+
+Install using `apt-get` (Debian-based systems)::
++
+ $ sudo apt-get install coderay
+
+Install using `dnf` (Fedora-based systems)::
++
+ $ sudo dnf install rubygem-coderay
+
+Once you've installed the RubyGem, assign the `coderay` value to the `source-highlighter` attribute in the document header to activate it.
+
+[source]
+----
+:source-highlighter: coderay
+----
+
+You can further customize the source block output with additional CodeRay attributes.
+
+coderay-css::
+Controls what method is used for applying CSS to the tokens.
+Can be `class` or `style`.
+Default: `class`.
+
+coderay-linenums-mode::
+Controls how line numbers are laid out.
+Can be `table` or `inline`.
+Default: `table`.
+
+.Customizing a source block with CodeRay line numbers
+[source]
+....
+:source-highlighter: coderay
+:coderay-linenums-mode: inline
+
+[source,ruby,linenums]
+----
+ORDERED_LIST_KEYWORDS = {
+  'loweralpha' => 'a',
+  'lowerroman' => 'i',
+  'upperalpha' => 'A',
+  'upperroman' => 'I'
+   #'lowergreek' => 'a'
+   #'arabic'     => '1'
+   #'decimal'    => '1'
+}
+----
+....
+
+See the #CodeRay stylesheet section# to learn about the `coderay-css` attribute.
+// <<user-manual#hl-css,CodeRay stylesheet section>>
+
+////
+Note: I'm not getting this to work. Need to come back and do some quality assurance.
+////
