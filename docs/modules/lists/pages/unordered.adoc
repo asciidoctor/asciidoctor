@@ -1,0 +1,140 @@
+= Unordered Lists
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:keywords: bulleted list
+:example-caption!:
+////
+From first p to nested section, included in:
+- user-manual: Unordered lists: Introduction
+- writers-guide: lists of things
+////
+
+If you were to create a list in an e-mail, how would you do it?
+Chances are, you'd mark list items using the same characters that Asciidoctor uses to find list items.
+
+== Basic unordered list
+
+In the example below, each list item is marked using an asterisk (`+*+`), the AsciiDoc syntax specifying an unordered list item.
+
+[source]
+----
+include::{partialsdir}/ex-ulist.adoc[tag=base]
+----
+
+A list item's first line of text must be offset from the marker (`+*+`) by at least one space.
+If you prefer, you can indent list items.
+Blank lines are required before and after a list.
+Additionally, blank lines are permitted, but not required, between list items.
+
+.Rendered unordered list
+====
+include::{partialsdir}/ex-ulist.adoc[tag=base]
+====
+
+You can add a title to a list by prefixing the title with a period (`.`).
+
+[source]
+----
+include::{partialsdir}/ex-ulist.adoc[tag=base-t]
+----
+
+.Rendered unordered list with a title
+====
+include::{partialsdir}/ex-ulist.adoc[tag=base-t]
+====
+
+Was your instinct to use a hyphen (`-`) instead of an asterisk to mark list items?
+Guess what?
+That works too!
+
+[source]
+----
+include::{partialsdir}/ex-ulist.adoc[tag=base-alt]
+----
+
+You should reserve the hyphen for lists that only have a single level because the hyphen marker (`-`) doesn't work for nested lists.
+Now that we've mentioned nested lists, let's go to the next section and learn how to create lists with multiple levels.
+
+[#separating-lists]
+.Separating Lists
+****
+If you have adjacent lists, they have the tendency to want to fuse together.
+To force lists apart, insert a line comment (`//`) surrounded by blank lines between the two lists.
+Here's an example, where the `-` text in the line comment indicates the line serves as an "`end of list`" marker:
+
+[source]
+----
+include::{partialsdir}/ex-ulist.adoc[tag=divide]
+----
+****
+
+== Nested unordered list
+////
+Included in:
+- user-manual: Unordered lists: Nested
+- writers guide
+////
+
+To nest an item, just add another asterisk (`+*+`) in front of it.
+
+[source]
+----
+include::{partialsdir}/ex-ulist.adoc[tag=nest]
+----
+
+.Rendered nested, unordered list
+====
+include::{partialsdir}/ex-ulist.adoc[tag=nest]
+====
+
+You can have up to five levels of nesting.
+
+[source]
+----
+include::{partialsdir}/ex-ulist.adoc[tag=max]
+----
+
+====
+include::{partialsdir}/ex-ulist.adoc[tag=max]
+====
+
+While it would seem as though the number of asterisks represents the nesting level, that's not how depth is determined.
+A new level is created for each unique marker encountered.
+However, it's much more intuitive to follow the convention that the number of asterisks equals the level of nesting.
+After all, we are shooting for plain text markup that is readable _as is_.
+
+== Custom markers
+////
+Included in:
+- user-manual: Unordered lists: Custom markers
+////
+
+Asciidoctor offers numerous bullet styles for lists.
+The list marker (bullet) is set using the list's block style.
+
+The unordered list marker can be set using any of the following block styles:
+
+* square
+* circle
+* disc
+* none or no-bullet (indented, but no bullet)
+* unstyled (no indentation or bullet) (HTML only)
+
+NOTE: These styles are supported by the default Asciidoctor stylesheet.
+
+When present, the style name is assigned to the unordered list element as follows:
+
+For HTML:: the style name is assigned to the `class` attribute on the `<ul>` element.
+For DocBook:: the style name is assigned to the `mark` attribute on the `<itemizedlist>` element.
+
+Here's an unordered list that has square bullets:
+
+[source]
+----
+include::{partialsdir}/ex-ulist.adoc[tag=square]
+----
+
+====
+include::{partialsdir}/ex-ulist.adoc[tag=square]
+====

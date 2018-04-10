@@ -1,0 +1,219 @@
+= Ordered Lists
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:keywords: numbered list
+:example-caption!:
+////
+From first p to nested section, included in:
+- user-manual: Ordered lists: Introduction
+- writers guide: ordering the things
+////
+
+== Basic ordered list
+
+Sometimes, we need to number the items in a list.
+Instinct might tell you to prefix each item with a number, like in this next list:
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=base-num]
+----
+
+The above works, but since the numbering is obvious, the AsciiDoc processor will insert the numbers for you if you omit them:
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=base]
+----
+
+====
+include::{partialsdir}/ex-olist.adoc[tag=base]
+====
+
+If you decide to use number for your ordered list, you have to keep them sequential.
+This differs from other lightweight markup languages.
+It's one way to adjust the numbering offset of a list.
+For instance, you can type:
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=base-num-start]
+----
+
+However, in general the best practice is to use the `start` attribute to configure this sort of thing:
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=base-start]
+----
+
+To present the items in reverse order, add the `reversed` option:
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=reversed]
+----
+
+====
+include::{partialsdir}/ex-olist.adoc[tag=reversed]
+====
+
+You can give a list a title by prefixing the line with a dot immediately followed by the text (without leaving any space after the dot).
+
+Here's an example of a list with a title:
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=base-t]
+----
+
+====
+include::{partialsdir}/ex-olist.adoc[tag=base-t]
+====
+
+== Nested ordered list
+////
+Included in:
+- user-manual: Ordered lists: Nested
+- writers guide: ordering the things
+////
+
+// tag::basic[]
+You create a nested item by using one or more dots in front of each the item.
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=nest]
+----
+
+AsciiDoc selects a different number scheme for each level of nesting.
+Here's how the previous list renders:
+
+.A nested ordered list
+====
+include::{partialsdir}/ex-olist.adoc[tag=nest]
+====
+// end::basic[]
+
+[TIP]
+====
+Like with the asterisks in an unordered list, the number of dots in an ordered list doesn't represent the nesting level.
+However, it's much more intuitive to follow this convention:
+
+[quote]
+# of dots = level of nesting
+
+Again, we are shooting for plain text markup that is readable _as is_.
+====
+
+You can mix and match the three list types, ordered, xref:unordered.adoc[unordered], and xref:definition.adoc[definition], within a single hybrid list.
+Asciidoctor works hard to infer the relationships between the items that are most intuitive to us humans.
+
+Here's an example of nesting an unordered list inside of an ordered list:
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=mix]
+----
+
+====
+include::{partialsdir}/ex-olist.adoc[tag=mix]
+====
+
+You can spread the items out and indent the nested lists if that makes it more readable for you:
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=mix-alt]
+----
+
+The definition list page demonstrates how to xref:definition.adoc#three-hybrid[combine all three list types].
+
+== Number styles
+////
+Included in:
+- user-manual: Ordered lists: Numbering styles
+////
+
+For ordered lists, Asciidoctor supports the numeration styles such as lowergreek and decimal-leading-zero.
+
+The full list of numeration styles that can be applied to an ordered list are as follows:
+
+[cols="2,3", width="50%"]
+|===
+|Block style |CSS list-style-type
+
+|arabic
+|decimal
+
+|decimal ^[1]^
+|decimal-leading-zero
+
+|loweralpha
+|lower-alpha
+
+|upperalpha
+|upper-alpha
+
+|lowerroman
+|lower-roman
+
+|upperroman
+|upper-roman
+
+|lowergreek ^[1]^
+|lower-greek
+|===
+^[1]^ These styles are only supported by the HTML converters.
+
+Here are a few examples showing various numeration styles as defined by the block style shown in the header row:
+
+|===
+|[arabic] ^[2]^ |[decimal] |[loweralpha] |[lowergreek]
+
+a|
+. one
+. two
+. three
+
+a|
+[decimal]
+. one
+. two
+. three
+
+a|
+[loweralpha]
+. one
+. two
+. three
+
+a|
+[lowergreek]
+. one
+. two
+. three
+|===
+^[2]^ Default numeration if block style is not specified
+
+TIP: Custom numeration styles can be implemented using a custom role.
+Define a new class selector (e.g., `.custom`) in your stylesheet that sets the `list-style-type` property to the value of your choice.
+Then, assign the name of that class as a role on any list to which you want that numeration applied.
+
+When the role shorthand (`.custom`) is used on an ordered list, the numeration style is no longer omitted.
+
+You can override the number scheme for any level by setting its style (the first positional entry in a block attribute list).
+You can also set the starting number using the `start` attribute:
+
+[source]
+----
+include::{partialsdir}/ex-olist.adoc[tag=num]
+----
+
+====
+include::{partialsdir}/ex-olist.adoc[tag=num]
+====
+
+IMPORTANT: The start attribute must be a number, even when using a different numeration style.
+For instance, to start an alphabetic list at letter "c", set the numeration style to loweralpha and the start attribute to 3.
