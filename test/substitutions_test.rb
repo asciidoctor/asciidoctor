@@ -837,12 +837,11 @@ context 'Substitutions' do
 == image:{iconsdir}/dot.gif[dot] Title
       EOS
 
-      sect, warnings = redirect_streams do |_, err|
-        [(block_from_string input, :attributes => { 'data-uri' => '', 'iconsdir' => 'fixtures', 'docdir' => testdir }, :safe => :server, :catalog_assets => true), err.string]
+      using_memory_logger do |logger|
+        sect = block_from_string input, :attributes => { 'data-uri' => '', 'iconsdir' => 'fixtures', 'docdir' => testdir }, :safe => :server, :catalog_assets => true
+        assert_includes sect.document.catalog[:images], 'fixtures/dot.gif'
+        assert logger.messages.empty?
       end
-      assert_includes sect.document.catalog[:images], 'fixtures/dot.gif'
-      refute_nil warnings
-      assert_empty warnings
     end
 
     test 'an icon macro should be interpreted as an icon if icons are enabled' do

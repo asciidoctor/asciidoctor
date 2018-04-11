@@ -273,6 +273,18 @@ class Minitest::Test
         Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
   end
 
+  def using_memory_logger debug = false
+    old_logger = Asciidoctor::LoggerManager.logger
+    memory_logger = Asciidoctor::Logger::MemoryLogger.new
+    memory_logger.level = Logger::Severity::DEBUG if debug
+    begin
+      Asciidoctor::LoggerManager.logger = memory_logger
+      yield memory_logger
+    ensure
+      Asciidoctor::LoggerManager.logger = old_logger
+    end
+  end
+
   def in_verbose_mode
     begin
       old_verbose, $VERBOSE = $VERBOSE, true

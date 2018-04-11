@@ -1770,9 +1770,16 @@ List
 I) one
 III) three
     EOS
-    output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
-    assert_xpath '//ol/li', output, 2
-    assert_includes warnings, 'line 2: list item index: expected II, got III'
+    using_memory_logger do |logger|
+      output = render_embedded_string input
+      assert_xpath '//ol/li', output, 2
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      refute_kind_of String, message[:message]
+      refute_nil message[:message][:source_location]
+      assert_equal '<stdin>: line 2: list item index: expected II, got III', message[:message].inspect
+    end
   end
 
   test 'should warn if explicit lowercase roman numerals in list are out of sequence' do
@@ -1780,9 +1787,16 @@ III) three
 i) one
 iii) three
     EOS
-    output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
-    assert_xpath '//ol/li', output, 2
-    assert_includes warnings, 'line 2: list item index: expected ii, got iii'
+    using_memory_logger do |logger|
+      output = render_embedded_string input
+      assert_xpath '//ol/li', output, 2
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      refute_kind_of String, message[:message]
+      refute_nil message[:message][:source_location]
+      assert_equal '<stdin>: line 2: list item index: expected ii, got iii', message[:message].inspect
+    end
   end
 end
 
@@ -4227,11 +4241,18 @@ foo::
 
 <1> Not pointing to a callout
     EOS
-    output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
-    assert_xpath '//dl//b', output, 0
-    assert_xpath '//dl/dd/p[text()="bar <1>"]', output, 1
-    assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
-    assert_includes warnings, 'line 4: no callouts refer to list item 1'
+    using_memory_logger do |logger|
+      output = render_embedded_string input
+      assert_xpath '//dl//b', output, 0
+      assert_xpath '//dl/dd/p[text()="bar <1>"]', output, 1
+      assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      refute_kind_of String, message[:message]
+      refute_nil message[:message][:source_location]
+      assert_equal '<stdin>: line 4: no callouts refer to list item 1', message[:message].inspect
+    end
   end
 
   test 'should not recognize callouts in an indented outline list paragraph' do
@@ -4241,11 +4262,18 @@ foo::
 
 <1> Not pointing to a callout
     EOS
-    output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
-    assert_xpath '//ul//b', output, 0
-    assert_xpath %(//ul/li/p[text()="foo\nbar <1>"]), output, 1
-    assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
-    assert_includes warnings, 'line 4: no callouts refer to list item 1'
+    using_memory_logger do |logger|
+      output = render_embedded_string input
+      assert_xpath '//ul//b', output, 0
+      assert_xpath %(//ul/li/p[text()="foo\nbar <1>"]), output, 1
+      assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      refute_kind_of String, message[:message]
+      refute_nil message[:message][:source_location]
+      assert_equal '<stdin>: line 4: no callouts refer to list item 1', message[:message].inspect
+    end
   end
 
   test 'should warn if numbers in callout list are out of sequence' do
@@ -4259,10 +4287,21 @@ foo::
 Beans are fun.
 <3> An actual bean.
     EOS
-    output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
-    assert_xpath '//ol/li', output, 2
-    assert_includes warnings, 'line 8: callout list item index: expected 2 got 3'
-    assert_includes warnings, 'line 8: no callouts refer to list item 2'
+    using_memory_logger do |logger|
+      output = render_embedded_string input
+      assert_xpath '//ol/li', output, 2
+      assert_equal 2, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      refute_kind_of String, message[:message]
+      refute_nil message[:message][:source_location]
+      assert_equal '<stdin>: line 8: callout list item index: expected 2 got 3', message[:message].inspect
+      message = logger.messages[1]
+      assert_equal :WARN, message[:severity]
+      refute_kind_of String, message[:message]
+      refute_nil message[:message][:source_location]
+      assert_equal '<stdin>: line 8: no callouts refer to list item 2', message[:message].inspect
+    end
   end
 
   test 'should remove line comment chars that precedes callout number' do

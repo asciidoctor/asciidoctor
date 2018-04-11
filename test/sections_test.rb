@@ -235,11 +235,18 @@ content
 content
       EOS
 
-      doc, warnings = redirect_streams {|_, err| [(document_from_string input), err.string]}
-      reftext = doc.catalog[:ids]['install']
-      refute_nil reftext
-      assert_equal 'First Install', reftext
-      assert_includes warnings, 'line 7: id assigned to section already in use: install'
+      using_memory_logger do |logger|
+        doc = document_from_string input
+        reftext = doc.catalog[:ids]['install']
+        refute_nil reftext
+        assert_equal 'First Install', reftext
+        assert_equal 1, logger.messages.size
+        message = logger.messages[0]
+        assert_equal :WARN, message[:severity]
+        refute_kind_of String, message[:message]
+        refute_nil message[:message][:source_location]
+        assert_equal '<stdin>: line 7: id assigned to section already in use: install', message[:message].inspect
+      end
     end
 
     test 'duplicate block id should not overwrite existing section id entry in references table' do
@@ -253,11 +260,18 @@ content
 content
       EOS
 
-      doc, warnings = redirect_streams {|_, err| [(document_from_string input), err.string] }
-      reftext = doc.catalog[:ids]['install']
-      refute_nil reftext
-      assert_equal 'First Install', reftext
-      assert_includes warnings, 'line 7: id assigned to block already in use: install'
+      using_memory_logger do |logger|
+        doc = document_from_string input
+        reftext = doc.catalog[:ids]['install']
+        refute_nil reftext
+        assert_equal 'First Install', reftext
+        assert_equal 1, logger.messages.size
+        message = logger.messages[0]
+        assert_equal :WARN, message[:severity]
+        refute_kind_of String, message[:message]
+        refute_nil message[:message][:source_location]
+        assert_equal '<stdin>: line 7: id assigned to block already in use: install', message[:message].inspect
+      end
     end
   end
 
@@ -862,14 +876,15 @@ text in standalone
 // end simulated include::[]
       EOS
 
-      warnings = nil
-      redirect_streams do |out, err|
+      using_memory_logger do |logger|
         render_string input
-        warnings = err.string
+        assert_equal 1, logger.messages.size
+        message = logger.messages[0]
+        assert_equal :ERROR, message[:severity]
+        refute_kind_of String, message[:message]
+        refute_nil message[:message][:source_location]
+        assert_equal '<stdin>: line 7: only book doctypes can contain level 0 sections', message[:message].inspect
       end
-
-      refute_empty warnings
-      assert_match(/only book doctypes can contain level 0 sections/, warnings)
     end
 
     test 'should add level offset to section level' do
@@ -899,13 +914,12 @@ Standalone section text.
 Master section text.
       EOS
 
-      output = warnings = nil
-      redirect_streams do |out, err|
+      output = nil
+      using_memory_logger do |logger|
         output = render_string input
-        warnings = err.string
+        assert logger.messages.empty?
       end
 
-      assert_empty warnings
       assert_match(/Master document written by Doc Writer/, output)
       assert_match(/Standalone document written by Junior Writer/, output)
       assert_xpath '//*[@class="sect1"]/h2[text() = "Standalone Document"]', output, 1
@@ -2948,15 +2962,15 @@ more part intro
 intro
       EOS
 
-      warnings = nil
-      redirect_streams do |out, err|
+      using_memory_logger do |logger|
         document_from_string input
-        warnings = err.string
+        assert_equal 1, logger.messages.size
+        message = logger.messages[0]
+        assert_equal :ERROR, message[:severity]
+        refute_kind_of String, message[:message]
+        refute_nil message[:message][:source_location]
+        assert_equal '<stdin>: line 8: invalid part, must have at least one section (e.g., chapter, appendix, etc.)', message[:message].inspect
       end
-
-      refute_nil warnings
-      refute_empty warnings
-      assert_match(/ERROR:.*section/, warnings)
     end
 
     test 'should create parts and chapters in docbook backend' do
@@ -3037,12 +3051,11 @@ Appendix content
 Appendix subsection content
       EOS
 
-      output = warnings = nil
-      redirect_streams do |out, err|
+      output = nil
+      using_memory_logger do |logger|
         output = render_string input, :backend => 'docbook'
-        warnings = err.string
+        assert logger.messages.empty?
       end
-      assert_empty warnings
       assert_xpath '/book/preface', output, 1
       assert_xpath '/book/preface/section', output, 1
       assert_xpath '/book/part', output, 1

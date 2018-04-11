@@ -23,6 +23,23 @@ class Logger < ::Logger
     end
   end
 
+  class MemoryLogger < ::Logger
+    SEVERITY_LABELS = ::Hash[Severity.constants.map {|c| [(Severity.const_get c), c.to_sym] }]
+
+    attr_reader :messages
+
+    def initialize
+      self.level = WARN
+      @messages = []
+    end
+
+    def add severity, message = nil, progname = nil
+      message = block_given? ? yield : progname unless message
+      @messages << { :severity => SEVERITY_LABELS[severity], :message => message }
+      true
+    end
+  end
+
   class NullLogger < ::Logger
     def initialize; end
 

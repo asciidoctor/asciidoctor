@@ -4,7 +4,19 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
   require 'test_helper'
 end
 
-context "Blocks" do
+context 'Blocks' do
+  logger = Asciidoctor::Logger::MemoryLogger.new
+  default_logger = Asciidoctor::LoggerManager.logger
+
+  setup do
+    logger.messages.clear
+    Asciidoctor::LoggerManager.logger = logger
+  end
+
+  teardown do
+    Asciidoctor::LoggerManager.logger = default_logger
+  end
+
   context 'Layout Breaks' do
     test 'horizontal rule' do
       %w(''' '''' '''''').each do |line|
@@ -637,9 +649,14 @@ ____
 <1> Not pointing to a callout
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+      output = render_embedded_string input
       assert_xpath '//pre[text()="La la la <1>"]', output, 1
-      assert_includes warnings, 'line 5: no callouts refer to list item 1'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      refute_kind_of String, message[:message]
+      refute_nil message[:message][:source_location]
+      assert_equal '<stdin>: line 5: no callouts refer to list item 1', message[:message].inspect
     end
 
     test 'should perform normal subs on a verse block' do
@@ -1621,18 +1638,18 @@ paragraph
 
 section paragraph
       EOS
-      output, errors = nil
-      redirect_streams do |stdout, stderr|
-        output = render_string input
-        errors = stderr.string
-      end
+      output = render_string input
       assert_xpath '//*[@id="header"]/*', output, 0
       assert_xpath '//*[@id="preamble"]/*', output, 0
       assert_xpath '//*[@id="content"]/h1[text()="Section Title"]', output, 1
       assert_xpath '//*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
-      refute_empty errors
-      assert_match(/only book doctypes can contain level 0 sections/, errors)
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :ERROR, message[:severity]
+      refute_kind_of String, message[:message]
+      refute_nil message[:message][:source_location]
+      assert_equal '<stdin>: line 2: only book doctypes can contain level 0 sections', message[:message].inspect
     end
 
     test 'block title above document title gets carried over to first block in first section if no preamble' do
@@ -1790,11 +1807,13 @@ image::circle.svg[Tiger,100]
 image::no-such-image.svg[Alt Text]
       EOS
 
-      output, warnings = redirect_streams do |_, err|
-        [(render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER), err.string]
-      end
+      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER
       assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
-      assert_includes warnings, 'SVG does not exist or cannot be read'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'SVG does not exist or cannot be read'
     end
 
     test 'can render block image with alt text defined in macro containing square bracket' do
@@ -2027,9 +2046,13 @@ image::images/sunset.jpg[Sunset,scaledwidth=25]
 image::{bogus}[]
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+      output = render_embedded_string input
       assert_includes output, 'image::{bogus}[]'
-      assert_includes warnings, 'dropping line containing reference to missing attribute'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'dropping line containing reference to missing attribute: bogus'
     end
 
     test 'drops line if image target is missing attribute reference and attribute-missing is drop' do
@@ -2039,9 +2062,13 @@ image::{bogus}[]
 image::{bogus}[]
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+      output = render_embedded_string input
       assert_empty output.strip
-      assert_includes warnings, 'dropping line containing reference to missing attribute'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'dropping line containing reference to missing attribute: bogus'
     end
 
     test 'drops line if image target is missing attribute reference and attribute-missing is drop-line' do
@@ -2051,9 +2078,13 @@ image::{bogus}[]
 image::{bogus}[]
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+      output = render_embedded_string input
       assert_empty output.strip
-      assert_includes warnings, 'dropping line containing reference to missing attribute'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'dropping line containing reference to missing attribute: bogus'
     end
 
     test 'dropped image does not break processing of following section and attribute-missing is drop-line' do
@@ -2065,11 +2096,15 @@ image::{bogus}[]
 == Section Title
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+      output = render_embedded_string input
       assert_css 'img', output, 0
       assert_css 'h2', output, 1
       refute_includes output, '== Section Title'
-      assert_includes warnings, 'dropping line containing reference to missing attribute'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'dropping line containing reference to missing attribute: bogus'
     end
 
     test 'should pass through image that references uri' do
@@ -2127,9 +2162,13 @@ image::unreadable.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => testdir }
       assert_equal 'fixtures', doc.attributes['imagesdir']
-      output, warnings = redirect_streams {|_, err| [doc.convert, err.string] }
+      output = doc.convert
       assert_xpath '//img[@src="data:image/gif;base64,"]', output, 1
-      assert_includes warnings, 'image to embed not found or not readable'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'image to embed not found or not readable'
     end
 
     test 'embeds base64-encoded data uri for remote image when data-uri attribute is set' do
@@ -2169,16 +2208,16 @@ image::dot.gif[Dot]
 image::#{image_uri}[Missing image]
       EOS
 
-      output = warnings = nil
-      redirect_streams do |_, err|
-        output = using_test_webserver do
-          render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
-        end
-        warnings = err.string
+      output = using_test_webserver do
+        render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
       end
 
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Missing image"]), output, 1
-      assert_includes warnings, 'could not retrieve image data from URI'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'could not retrieve image data from URI'
     end
 
     test 'uses remote image uri when data-uri attribute is set and allow-uri-read is not set' do
@@ -2226,11 +2265,15 @@ image::dot.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => testdir }
       assert_equal '../..//fixtures/./../../fixtures', doc.attributes['imagesdir']
-      output, warnings = redirect_streams {|_, err| [doc.convert, err.string] }
+      output = doc.convert
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
-      assert_includes warnings, 'image has illegal reference to ancestor of jail'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'image has illegal reference to ancestor of jail'
     end
 
     test 'cleans reference to ancestor directories in target before reading image if safe mode level is at least SAFE' do
@@ -2243,11 +2286,15 @@ image::../..//fixtures/./../../fixtures/dot.gif[Dot]
 
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
       assert_equal './', doc.attributes['imagesdir']
-      output, warnings = redirect_streams {|_, err| [doc.convert, err.string] }
+      output = doc.convert
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
-      assert_includes warnings, 'image has illegal reference to ancestor of jail'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'image has illegal reference to ancestor of jail'
     end
   end
 
@@ -2534,11 +2581,13 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output, warnings = redirect_streams do |_, err|
-        [(render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }), err.string]
-      end
+      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
-      assert_includes warnings, 'image has illegal reference to ancestor of jail'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'image has illegal reference to ancestor of jail'
     end
 
     test 'should import Font Awesome and use font-based icons when value of icons attribute is font' do
@@ -2604,8 +2653,7 @@ puts "AsciiDoc, FTW!"
   end
 
   context 'Image paths' do
-
-    test 'restricts access to ancestor directories when safe mode level is at least SAFE' do
+    test 'wip restricts access to ancestor directories when safe mode level is at least SAFE' do
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
@@ -2615,8 +2663,8 @@ image::asciidoctor.png[Asciidoctor]
       assert doc.safe >= Asciidoctor::SafeMode::SAFE
 
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
-      assert_equal File.join(basedir, 'etc/images'), redirect_streams { block.normalize_asset_path("#{disk_root}etc/images") }
-      assert_equal File.join(basedir, 'images'), redirect_streams { block.normalize_asset_path('../../images') }
+      assert_equal File.join(basedir, 'etc/images'), block.normalize_asset_path("#{disk_root}etc/images")
+      assert_equal File.join(basedir, 'images'), block.normalize_asset_path('../../images')
     end
 
     test 'does not restrict access to ancestor directories when safe mode is disabled' do
@@ -3063,15 +3111,13 @@ Abstract for book with title is valid
 Abstract for book without title is invalid.
       EOS
 
-      warnings = nil
-      output = nil
-      redirect_streams do |stdout, stderr|
-        output = render_string input
-        warnings = stderr.string
-      end
+      output = render_string input
       assert_css '.abstract', output, 0
-      refute_nil warnings
-      assert_match(/WARNING:.*abstract block/, warnings)
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'abstract block cannot be used in a document without a title when doctype is book'
     end
 
     test 'should make abstract on open block without title rendered to DocBook' do
@@ -3129,15 +3175,13 @@ Abstract for book with title is valid
 Abstract for book is invalid.
       EOS
 
-      output = nil
-      warnings = nil
-      redirect_streams do |stdout, stderr|
-        output = render_string input, :backend => 'docbook'
-        warnings = stderr.string
-      end
+      output = render_string input, :backend => 'docbook'
       assert_css 'abstract', output, 0
-      refute_nil warnings
-      assert_match(/WARNING:.*abstract block/, warnings)
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :WARN, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'abstract block cannot be used in a document without a title when doctype is book'
     end
 
     # TODO partintro shouldn't be recognized if doctype is not book, should be in proper place
@@ -3206,9 +3250,13 @@ content
 part intro paragraph
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_string input), err.string] }
+      output = render_string input
       assert_css '.partintro', output, 0
-      assert_includes warnings, 'partintro block can only be used when doctype is book and must be a child of a book part'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :ERROR, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'partintro block can only be used when doctype is book and must be a child of a book part'
     end
 
     test 'should not allow partintro unless doctype is book' do
@@ -3217,9 +3265,13 @@ part intro paragraph
 part intro paragraph
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_string input), err.string] }
+      output = render_string input
       assert_css '.partintro', output, 0
-      assert_includes warnings, 'partintro block can only be used when doctype is book and must be a child of a book part'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :ERROR, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'partintro block can only be used when doctype is book and must be a child of a book part'
     end
 
     test 'should accept partintro on open block without title rendered to DocBook' do
@@ -3281,9 +3333,13 @@ content
 part intro paragraph
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_string input, :backend => 'docbook'), err.string] }
+      output = render_string input, :backend => 'docbook'
       assert_css 'partintro', output, 0
-      assert_includes warnings, 'partintro block can only be used when doctype is book and must be a child of a book part'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :ERROR, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'partintro block can only be used when doctype is book and must be a child of a book part'
     end
 
     test 'should not allow partintro unless doctype is book rendered to DocBook' do
@@ -3292,9 +3348,13 @@ part intro paragraph
 part intro paragraph
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_string input, :backend => 'docbook'), err.string] }
+      output = render_string input, :backend => 'docbook'
       assert_css 'partintro', output, 0
-      assert_includes warnings, 'partintro block can only be used when doctype is book and must be a child of a book part'
+      assert_equal 1, logger.messages.size
+      message = logger.messages[0]
+      assert_equal :ERROR, message[:severity]
+      assert_kind_of String, message[:message]
+      assert_includes message[:message], 'partintro block can only be used when doctype is book and must be a child of a book part'
     end
   end
 

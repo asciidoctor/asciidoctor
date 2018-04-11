@@ -551,13 +551,15 @@ Wise words from a wise person.
 
       test 'should output nil and warn if first block is not a paragraph' do
         input = '* bullet'
-        output = nil
-        warnings = redirect_streams do |_, err|
+        using_memory_logger do |logger|
           output =  render_string input, :doctype => 'inline'
-          err.string
+          assert_nil output
+          assert_equal 1, logger.messages.size
+          message = logger.messages[0]
+          assert_equal :WARN, message[:severity]
+          assert_kind_of String, message[:message]
+          assert_includes message[:message], 'no inline candidate'
         end
-        assert_nil output
-        assert_includes warnings, 'no inline candidate'
       end
     end
   end

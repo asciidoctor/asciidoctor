@@ -192,5 +192,20 @@ context 'Logger' do
       assert_same cursor, message[:source_location]
       assert_equal 'file.adoc: line 5: Asciidoctor was here', message.inspect
     end
+
+    test 'writes message prefixed with program name and source location to stderr' do
+      input = <<-EOS
+[#first]
+first paragraph
+
+[#first]
+another first paragraph
+      EOS
+      messages = redirect_streams do |_, err|
+        render_embedded_string input
+        err.string
+      end
+      assert_equal 'asciidoctor: WARNING: <stdin>: line 5: id assigned to block already in use: first', messages.chomp
+    end
   end
 end

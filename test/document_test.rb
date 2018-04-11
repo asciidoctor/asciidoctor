@@ -336,18 +336,21 @@ content
 
     test 'should substitute attributes in docinfo files by default' do
       sample_input_path = fixture_path 'subs.adoc'
-      output, warnings = redirect_streams do |_, err|
+      using_memory_logger do |logger|
         output = Asciidoctor.convert_file sample_input_path,
             :to_file => false,
             :header_footer => true,
             :safe => :server,
             :attributes => { 'docinfo' => '', 'bootstrap-version' => nil, 'linkcss' => '', 'attribute-missing' => 'drop-line' }
-        [output, err.string]
+        refute_empty output
+        assert_css 'script', output, 0
+        assert_xpath %(//meta[@name="copyright"][@content="(C) OpenDevise"]), output, 1
+        assert_equal 1, logger.messages.size
+        message = logger.messages[0]
+        assert_equal :WARN, message[:severity]
+        assert_kind_of String, message[:message]
+        assert_includes message[:message], 'dropping line containing reference to missing attribute: bootstrap-version'
       end
-      refute_empty output
-      assert_css 'script', output, 0
-      assert_xpath %(//meta[@name="copyright"][@content="(C) OpenDevise"]), output, 1
-      assert_includes warnings, 'dropping line containing reference to missing attribute'
     end
 
     test 'should apply explicit substitutions to docinfo files' do
@@ -1749,10 +1752,12 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
     test 'keeps naughty relative paths from getting outside' do
       naughty_path = 'safe/ok/../../../../../etc/passwd'
-      doc = empty_document
-      secure_path = redirect_streams { doc.normalize_asset_path(naughty_path) }
-      refute_equal naughty_path, secure_path
-      assert_match(/^#{doc.base_dir}/, secure_path)
+      using_memory_logger do
+        doc = empty_document
+        secure_path = doc.normalize_asset_path naughty_path
+        refute_equal naughty_path, secure_path
+        assert_match(/^#{doc.base_dir}/, secure_path)
+      end
     end
 
     test 'should raise an exception when a converter cannot be resolved before conversion' do
