@@ -49,7 +49,7 @@ module Helpers
   #
   # returns a String Array of normalized lines
   def self.normalize_lines data
-    data.class == ::String ? (normalize_lines_from_string data) : (normalize_lines_array data)
+    ::String === data ? (normalize_lines_from_string data) : (normalize_lines_array data)
   end
 
   # Public: Normalize the array of lines to prepare them for parsing
