@@ -67,7 +67,7 @@ module Asciidoctor
             when 0
               $VERBOSE = nil
               old_logger = LoggerManager.logger
-              LoggerManager.logger = Logger::NullLogger.new
+              LoggerManager.logger = NullLogger.new
             when 1
               $VERBOSE = false
             when 2

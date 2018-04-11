@@ -5,7 +5,7 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
 end
 
 context 'Attributes' do
-  logger = Asciidoctor::Logger::MemoryLogger.new
+  logger = Asciidoctor::MemoryLogger.new
   default_logger = Asciidoctor::LoggerManager.logger
 
   setup do

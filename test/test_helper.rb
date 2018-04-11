@@ -275,7 +275,7 @@ class Minitest::Test
 
   def using_memory_logger debug = false
     old_logger = Asciidoctor::LoggerManager.logger
-    memory_logger = Asciidoctor::Logger::MemoryLogger.new
+    memory_logger = Asciidoctor::MemoryLogger.new
     memory_logger.level = Logger::Severity::DEBUG if debug
     begin
       Asciidoctor::LoggerManager.logger = memory_logger

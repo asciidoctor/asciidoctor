@@ -22,30 +22,31 @@ class Logger < ::Logger
       (sloc = self[:source_location]) ? %(#{sloc}: #{self[:text]}) : self[:text]
     end
   end
+end
 
-  class MemoryLogger < ::Logger
-    SEVERITY_LABELS = ::Hash[Severity.constants.map {|c| [(Severity.const_get c), c.to_sym] }]
+class MemoryLogger < ::Logger
+  # NOTE Ruby 1.8.7 returns constants as strings instead of symbols
+  SEVERITY_LABELS = ::Hash[Severity.constants.map {|c| [(Severity.const_get c), c.to_sym] }]
 
-    attr_reader :messages
+  attr_reader :messages
 
-    def initialize
-      self.level = WARN
-      @messages = []
-    end
-
-    def add severity, message = nil, progname = nil
-      message = block_given? ? yield : progname unless message
-      @messages << { :severity => SEVERITY_LABELS[severity], :message => message }
-      true
-    end
+  def initialize
+    self.level = WARN
+    @messages = []
   end
 
-  class NullLogger < ::Logger
-    def initialize; end
+  def add severity, message = nil, progname = nil
+    message = block_given? ? yield : progname unless message
+    @messages << { :severity => SEVERITY_LABELS[severity], :message => message }
+    true
+  end
+end
 
-    def add *args
-      true
-    end
+class NullLogger < ::Logger
+  def initialize; end
+
+  def add *args
+    true
   end
 end
 
