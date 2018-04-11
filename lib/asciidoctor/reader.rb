@@ -1052,8 +1052,8 @@ class PreprocessorReader < Reader
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
     if file
       @file = file
-      path ||= ::File.basename file
       @dir = ::URI === file ? (::URI.parse ::File.dirname(file = file.to_s)) : (::File.dirname file)
+      path ||= ::File.basename file
       # only process lines in AsciiDoc files
       @process_lines = ASCIIDOC_EXTENSIONS[::File.extname file]
     else
