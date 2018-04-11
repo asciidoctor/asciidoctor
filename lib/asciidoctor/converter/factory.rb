@@ -211,7 +211,7 @@ module Asciidoctor
         # NOTE .to_s hides require from Opal
         require 'asciidoctor/converter/template'.to_s unless defined? ::Asciidoctor::Converter::TemplateConverter
         template_converter = TemplateConverter.new backend, opts[:template_dirs], opts
-        
+
         # NOTE .to_s hides require from Opal
         require 'asciidoctor/converter/composite'.to_s unless defined? ::Asciidoctor::Converter::CompositeConverter
         # QUESTION should we omit the composite converter if built_in_converter is nil?

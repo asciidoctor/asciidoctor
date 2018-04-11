@@ -2725,7 +2725,7 @@ class Parser
   #
   # Returns the String Roman numeral for this integer
   def self.int_to_roman_numeral value
-    ROMAN_NUMERALS.map {|l, i| 
+    ROMAN_NUMERALS.map {|l, i|
       repeat, value = value.divmod i
       l * repeat
     }.join

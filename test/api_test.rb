@@ -490,7 +490,7 @@ term without description::
       refute_equal timings.read_parse, timings.total
     end
   end
-  
+
   context 'Convert' do
     test 'render_file is aliased to convert_file' do
       assert_equal Asciidoctor.method(:convert_file), Asciidoctor.method(:render_file)

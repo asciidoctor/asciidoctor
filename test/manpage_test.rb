@@ -67,7 +67,7 @@ When you need to put some foo on the bar.
       EOS
 
       doc = Asciidoctor.load input, :backend => :manpage, :header_footer => true
-      assert_equal 'puts some foo on the bar', (doc.attr 'manpurpose') 
+      assert_equal 'puts some foo on the bar', (doc.attr 'manpurpose')
     end
 
     test 'should define default linkstyle' do
