@@ -515,6 +515,16 @@ preamble
         assert_equal dir_uri, reader.dir
         assert_equal 'file.adoc', reader.path
       end
+
+      test 'PreprocessorReader#push_include method should accept file as a top-level URI and compute dir and path' do
+        file_uri = ::URI.parse 'http://example.com/index.adoc'
+        dir_uri = ::URI.parse 'http://example.com'
+        reader = empty_document.reader
+        reader.push_include %w(one two three), file_uri
+        assert_same file_uri, reader.file
+        assert_equal dir_uri, reader.dir
+        assert_equal 'index.adoc', reader.path
+      end
     end
 
     context 'Include Directive' do

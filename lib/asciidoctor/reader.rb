@@ -1050,14 +1050,22 @@ class PreprocessorReader < Reader
   # Returns this Reader object.
   def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
-    if file
-      @file = file
-      @dir = ::URI === file ? (::URI.parse ::File.dirname(file = file.to_s)) : (::File.dirname file)
+    if (@file = file)
+      if ::URI === file
+        if ::RUBY_ENGINE_OPAL
+          @dir = ::URI.parse ::File.dirname(file = file.to_s)
+        else
+          # NOTE this intentionally throws an error if URI has no path
+          (@dir = file.dup).path = (dir = ::File.dirname file.path) == '/' ? '' : dir
+          file = file.to_s
+        end
+      else
+        @dir = ::File.dirname file
+      end
       path ||= ::File.basename file
       # only process lines in AsciiDoc files
       @process_lines = ASCIIDOC_EXTENSIONS[::File.extname file]
     else
-      @file = nil
       @dir = '.'
       # we don't know what file type we have, so assume AsciiDoc
       @process_lines = true
