@@ -523,11 +523,6 @@ class Reader
   def line_info
     %(#{@path}: line #{@lineno})
   end
-  alias next_line_info line_info
-
-  def prev_line_info
-    %(#{@path}: line #{@lineno - 1})
-  end
 
   # Public: Get a copy of the remaining Array of String lines managed by this Reader
   #

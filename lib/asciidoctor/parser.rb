@@ -885,7 +885,7 @@ class Parser
           end
         else
           # this should only happen if there's a misconfiguration
-          raise %(Unsupported block type #{block_context} at #{reader.line_info})
+          raise %(Unsupported block type #{block_context} at #{reader.cursor})
         end
       end
     end
@@ -1728,7 +1728,7 @@ class Parser
       end unless sect_id
       reader.shift
     else
-      raise %(Unrecognized section at #{reader.prev_line_info})
+      raise %(Unrecognized section at #{reader.prev_line_cursor})
     end
     sect_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
     [sect_id, sect_reftext, sect_title, sect_level, atx]
