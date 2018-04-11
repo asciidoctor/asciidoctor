@@ -23,12 +23,22 @@ context 'Options' do
   end
 
   test 'should dump man page and return error code 0 when help topic is manpage' do
+    skip 'this test should run only in a gem install context' if ENV['ASCIIDOCTOR_MANPAGE_ABSENT_FROM_TEST']
     exitval, output = redirect_streams do |out, _|
       [Asciidoctor::Cli::Options.parse!(%w(-h manpage)), out.string]
     end
     assert_equal 0, exitval
     assert_includes output, 'Manual: Asciidoctor Manual'
     assert_includes output, '.TH "ASCIIDOCTOR"'
+  end
+
+  test 'should print a message and return error code 1 when help topic is manpage' do
+    skip 'this test should run outside of the gem context' unless ENV['ASCIIDOCTOR_MANPAGE_ABSENT_FROM_TEST']
+    redirect_streams do |out, stderr|
+      exitval = Asciidoctor::Cli::Options.parse!(%w(-h manpage))
+      assert_equal 1, exitval
+      assert_equal 'asciidoctor: FAILED: man page not found; try `man asciidoctor`', stderr.string.chomp
+    end
   end
 
   test 'should return error code 1 when invalid option present' do
