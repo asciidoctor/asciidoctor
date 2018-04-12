@@ -1,6 +1,6 @@
 site:
   title: Asciidoctor Docs
-# url: https://docs.asciidoctor.org
+  url: https://asciidoctor.org/docs
   start_page: asciidoctor::index.adoc
 asciidoc:
   attributes:
@@ -31,6 +31,8 @@ content:
   sources:
   - url: /home/apex/projects/asciidoctor
     branches: HEAD
+#  - url: git@github.com:asciidoctor/asciidoctor.git
+#    branches:
     start_path: docs
 ui:
   bundle:

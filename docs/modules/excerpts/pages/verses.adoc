@@ -1,0 +1,35 @@
+= Verses
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From verse.adoc, included in:
+- user-manual: verse
+////
+
+== Verse paragraph and block syntax
+
+When you need to preserve indents and line breaks, use the `verse` block name.
+Verses are defined by setting `verse` on a paragraph or an excerpt block delimited by four underscores (`+____+`).
+
+.Verse paragraph syntax
+[source]
+----
+include::{partialsdir}/ex-verse.adoc[tag=para]
+----
+
+The verse paragraph rendered:
+
+include::{partialsdir}/ex-verse.adoc[tag=para]
+
+When the verse content includes blank or indented lines, enclose it in an excerpt block.
+
+.Verse delimited block syntax
+[source]
+----
+include::{partialsdir}/ex-verse.adoc[tag=bl]
+----
+
+The delimited verse block rendered:
+
+include::{partialsdir}/ex-verse.adoc[tag=bl]

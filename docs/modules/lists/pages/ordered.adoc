@@ -30,7 +30,7 @@ include::{partialsdir}/ex-olist.adoc[tag=base]
 include::{partialsdir}/ex-olist.adoc[tag=base]
 ====
 
-If you decide to use number for your ordered list, you have to keep them sequential.
+If you decide to manually number your ordered list, you have to keep them sequential.
 This differs from other lightweight markup languages.
 It's one way to adjust the numbering offset of a list.
 For instance, you can type:

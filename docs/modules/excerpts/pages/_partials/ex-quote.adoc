@@ -1,0 +1,98 @@
+////
+Included in:
+
+- user-manual: Quotes
+- quick-ref
+////
+
+// tag::bl[]
+[quote, Abraham Lincoln, Address delivered at the dedication of the Cemetery at Gettysburg]
+____
+Four score and seven years ago our fathers brought forth
+on this continent a new nation...
+____
+// end::bl[]
+
+// tag::bl-alt[]
+[quote, Thomas Jefferson, Papers of Thomas Jefferson: Volume 11]
+____
+I hold it that a little rebellion now and then is a good thing,
+and as necessary in the political world as storms in the physical.
+____
+// end::bl-alt[]
+
+// tag::para[]
+[quote, Albert Einstein]
+A person who never made a mistake never tried anything new.
+// end::para[]
+
+// tag::para2-c[]
+.After landing the cloaked Klingon bird of prey in Golden Gate park: // <1>
+[quote, Captain James T. Kirk, Star Trek IV: The Voyage Home] // <2> <3> <4>
+Everybody remember where we parked. // <5>
+// end::para2-c[]
+
+// tag::para2[]
+.After landing the cloaked Klingon bird of prey in Golden Gate park:
+[quote, Captain James T. Kirk, Star Trek IV: The Voyage Home]
+Everybody remember where we parked.
+// end::para2[]
+
+// tag::comp[]
+[quote, Monty Python and the Holy Grail]
+____
+Dennis: Come and see the violence inherent in the system. Help! Help! I'm being repressed!
+
+King Arthur: Bloody peasant!
+
+Dennis: Oh, what a giveaway! Did you hear that? Did you hear that, eh? That's what I'm on about! Did you see him repressing me? You saw him, Didn't you?
+____
+// end::comp[]
+
+// tag::no-cite[]
+____
+A person who never made a mistake never tried anything new.
+____
+// end::no-cite[]
+
+// tag::abbr[]
+"I hold it that a little rebellion now and then is a good thing,
+and as necessary in the political world as storms in the physical."
+-- Thomas Jefferson, Papers of Thomas Jefferson: Volume 11
+// end::abbr[]
+
+// tag::air[]
+[, Richard M. Nixon]
+""
+When the President does it, that means that it's not illegal.
+""
+// end::air[]
+
+// tag::md[]
+> I hold it that a little rebellion now and then is a good thing,
+> and as necessary in the political world as storms in the physical.
+> -- Thomas Jefferson, Papers of Thomas Jefferson: Volume 11
+// end::md[]
+
+// tag::md-alt[]
+> > What's new?
+>
+> I've got Markdown in my AsciiDoc!
+>
+> > Like what?
+>
+> * Blockquotes
+> * Headings
+> * Fenced code blocks
+>
+> > Is there more?
+>
+> Yep. AsciiDoc and Markdown share a lot of common syntax already.
+// end::md-alt[]
+
+// tag::link-text[]
+[quote, Charles Lutwidge Dodgson, 'Mathematician and author, also known as http://en.wikipedia.org/wiki/Lewis_Carroll[Lewis Carroll]']
+____
+If you don't know where you are going, any road will get you there.
+____
+// end::link-text[]

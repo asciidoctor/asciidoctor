@@ -1,0 +1,166 @@
+= Table Reference
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From sum-table.adoc, included in:
+- user-manual: tables: summary
+////
+
+== Table syntax, attributes, and values
+
+[cols="1m,2,1m,2,2"]
+|===
+|Attribute |Description |Value |Description |Notes
+
+|cols
+|comma-separated list of column specifiers
+d|specifiers
+|see cols for details
+|
+
+.4+|format
+.4+|data format of the table's contents
+|psv
+|cells are delimited by `separator` (default `{vbar}`) (aka prefix-separated values)
+.4+|
+
+|dsv
+|cells are delimited by a colon (`:`) (aka delimiter-separated values)
+
+|csv
+|cells are delimited by a comma (`,`) (aka comma-separated values)
+
+|tsv
+|cells are delimited by a tab character (aka tab-separated values)
+
+.3+|separator
+.3+|character used to separate cells
+|{vbar}
+|default for top-level tables
+.3+|
+|!
+|default for nested tables
+d|user-defined
+|any sequence of literal characters (e.g., `{brvbar}` or `][`).
+_Ideally a pattern not found in the cell content._
+
+.4+|frame
+.4+|draws a border around the table
+|all
+|border on all sides (default)
+.4+|
+
+|topbot
+|border on top and bottom
+
+|none
+|no borders
+
+|sides
+|border on left and right sides
+
+.4+|grid
+.4+|draws boundary lines between rows and columns
+|all
+|draws boundary lines around each cell (default)
+.4+|
+
+|cols
+|draws boundary lines between columns
+
+|rows
+|draws boundary lines between rows
+
+|none
+|no boundary lines
+
+.3+|align
+.3+|horizontally aligns table within page width
+|left
+|aligns to left side of page (default)
+.3+|Not yet implemented in Asciidoctor.
+Applies to HTML output only.
+The `align` and `float` attributes are mutually exclusive.
+
+|right
+|aligns to right side of page
+
+|center
+|horizontally aligns to center of page
+
+.2+|float
+.2+|floats the table to the specified side of the page
+|left
+|floats the table to the left side of the page (default)
+.2+|Applies to HTML output only.
+Must be used in conjunction with the table's `width` attribute to take effect.
+The `float` and `align` attributes are mutually exclusive.
+
+|right
+|floats the table to the right side of the page
+
+.3+|halign
+.3+|horizontally aligns all of the cell contents in a table
+|left
+|aligns the contents of the cells to the left (default)
+.3+|Not implemented in Asciidoctor.
+Define instead using column or cell specifiers (e.g., `3*>`), which take precedence over this value.
+
+|right
+|aligns the contents of the cells to the right
+
+|center
+|aligns the contents to the cell centers
+
+.3+|valign
+.3+|vertically aligns all of the cell contents in a table
+|top
+|aligns the cell contents to the top of the cell (default)
+.3+|Define instead using column or cell specifiers (e.g., `3*.>`), which take precedence over this value.
+
+|bottom
+|aligns the cell contents to the bottom of the cell
+
+|middle
+|aligns the cell contents to the middle of the cell
+
+|orientation
+|rotates the table
+|landscape
+|rotated 90 degrees counterclockwise
+|Equivalent to setting the rotate option, which is preferred.
+DocBook only.
+
+.6+|options
+.6+|comma separated list of option names
+|header
+|promotes first row to the table header
+.2+d|header and footer rows are omitted by default
+
+|footer
+|promotes last row to the table footer
+
+|breakable
+|allows the table to split across a page (default)
+.2+d|Mutually exclusive.
+DocBook only (specifically for generating PDF output).
+
+|unbreakable
+|prevents the table from being split across a page
+
+|autowidth
+|disables explicit column widths (ignores `cols` attribute)
+|
+
+|rotate
+|Prints the table in landscape
+d|Equivalent to setting the orientation to landscape.
+DocBook only.
+
+|width
+|the table width relative to the available page width
+d|user defined value
+|a percentage value between 0% and 100%
+|
+|===
