@@ -77,23 +77,6 @@ class Minitest::Test
     document_from_string IO.read(sample_doc_path(name)), opts
   end
 
-  def assert_difference(expression, difference = 1, message = nil, &block)
-    expressions = [expression]
-
-    exps = expressions.map { |e|
-      e.respond_to?(:call) ? e : lambda { eval(e, block.binding) }
-    }
-    before = exps.map { |e| e.call }
-
-    yield
-
-    expressions.zip(exps).each_with_index do |(code, e), i|
-      error  = "#{code.inspect} didn't change by #{difference}"
-      error  = "#{message}.\n#{error}" if message
-      assert_equal(before[i] + difference, e.call, error)
-    end
-  end
-
   def xmlnodes_at_css(css, content, count = nil)
     xmlnodes_at_path(:css, css, content, count)
   end
