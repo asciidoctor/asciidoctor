@@ -1,0 +1,24 @@
+////
+Included in:
+
+- user-manual: Quotes
+////
+
+// tag::para[]
+[verse, Carl Sandburg, two lines from the poem Fog]
+The fog comes
+on little cat feet.
+// end::para[]
+
+// tag::bl[]
+[verse, Carl Sandburg, Fog]
+____
+The fog comes
+on little cat feet.
+
+It sits looking
+over harbor and city
+on silent haunches
+and then moves on.
+____
+// end::bl[]

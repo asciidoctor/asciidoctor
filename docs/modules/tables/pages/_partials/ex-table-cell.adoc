@@ -1,0 +1,157 @@
+////
+Examples for table sections, cell specifiers
+////
+
+// tag::3dup[]
+|===
+
+|Cell in column 1, row 1 |Cell in column 2, row 1 |Cell in column 3, row 1
+
+3*|Same cell content in columns 1, 2, and 3
+
+|Cell in column 1, row 3
+|Cell in column 2, row 3
+|Cell in column 3, row 3
+
+|===
+// end::3dup[]
+
+// tag::3span[]
+|===
+
+|Cell in column 1, row 1 |Cell in column 2, row 1 |Cell in column 3, row 1
+
+3+|Content in a single cell that spans columns 1, 2, and 3
+
+|Cell in column 1, row 3
+|Cell in column 2, row 3
+|Cell in column 3, row 3
+
+|===
+// end::3span[]
+
+// tag::2span-r[]
+|===
+
+|Cell in column 1, row 1 |Cell in column 2, row 1 |Cell in column 3, row 1
+
+.2+|Content in a single cell that spans rows 2 and 3
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+
+|Cell in column 2, row 3
+|Cell in column 3, row 3
+
+|===
+// end::2span-r[]
+
+// tag::span-cr[]
+|===
+
+|Column 1, row 1 |Column 2, row 1 |Column 3, row 1 |Column 4, row 1
+
+|Column 1, row 2
+2.3+|Content in a single cell that spans over rows and columns
+|Column 4, row 2
+
+|Column 1, row 3
+|Column 4, row 3
+
+|Column 1, row 4
+|Column 4, row 4
+|===
+// end::span-cr[]
+
+// tag::cell-align[]
+[cols="3"]
+|===
+^|Prefix the `{vbar}` with `{caret}` to center content horizontally
+<|Prefix the `{vbar}` with `<` to align the content to the left horizontally
+>|Prefix the `{vbar}` with `>` to align the content to the right horizontally
+
+.^|Prefix the `{vbar}` with a `.` and `{caret}` to center the content in the cell vertically
+.<|Prefix the `{vbar}` with a `.` and `<` to align the content to the top of the cell
+.>|Prefix the `{vbar}` with a `.` and `>` to align the content to the bottom of the cell
+
+3+^.^|This content spans three columns (`3{plus}`) and is centered horizontally (`{caret}`) and vertically (`.{caret}`) within the cell.
+
+|===
+// end::cell-align[]
+
+// tag::cell-ad[]
+[cols="2"]
+|===
+
+a|This cell is prefixed with an `a`, so the processor interpets the following lines as an AsciiDoc list.
+
+* List item 1
+* List item 2
+* List item 3
+|This cell *is not* prefixed with an `a`, so the processor does not interpret the following lines as an AsciiDoc list.
+
+* List item 1
+* List item 2
+* List item 3
+
+a|This cell is prefixed with an `a`, so the processor honors the `lead` style on the following paragraph.
+
+[.lead]
+I am a paragraph styled with the lead attribute.
+|This cell *is not* prefixed with an `a`, so the processor does not honor the `lead` style on the following paragraph.
+
+[.lead]
+I am a paragraph styled with the lead attribute.
+|===
+// end::cell-ad[]
+
+// tag::cell-v[]
+|===
+
+2*>m|This content is duplicated across two columns.
+
+It is aligned right horizontally.
+
+And it is monospaced.
+
+.3+^.>s|This cell spans 3 rows. The content is centered horizontally, aligned to the bottom of the cell, and strong.
+e|This content is emphasized.
+
+.^l|This content is aligned to the top of the cell and literal.
+
+v|This cell contains a verse
+that may one day expound on the
+wonders of tables in an
+epic sonnet.
+
+|===
+// end::cell-v[]
+
+// tag::b-spec[]
+[cols="e,m,^,>s", width="25%"]
+|===
+|1 >s|2 |3 |4
+^|5 2.2+^.^|6 .3+<.>m|7
+^|8
+|9 2+>|10
+|===
+// end::b-spec[]
+
+// tag::cell-src[]
+|===
+|Source Code 1 |Source Code 2
+
+a|
+[source,python]
+----
+import os
+print "%s" %(os.uname())
+----
+
+a|
+[source,python]
+----
+import os
+print ("%s" %(os.uname()))
+----
+|===
+// end::cell-src[]

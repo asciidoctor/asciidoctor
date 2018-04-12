@@ -1,0 +1,17 @@
+= Quotes, Prose Excerpts, and Verses
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From quote.adoc, included in:
+- user-manual: Quote
+////
+
+// tag::intro[]
+Prose excerpts, quotes and verses share the same syntax structure, including:
+
+* block name, either `quote` or `verse`
+* name of who the content is attributed to
+* bibliographical information of the book, speech, play, poem, etc., where the content was drawn from
+* excerpt text
+// end::intro[]

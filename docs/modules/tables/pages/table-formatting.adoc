@@ -1,0 +1,208 @@
+= Table Width, Borders, & Orientation
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From table-formatting.adoc, included in:
+- user-manual: tables: header
+////
+
+== Table Width
+
+By default, a table will span the width of the content area.
+To constrain the width of the table to a fixed value, set the `width` attribute in the table's attribute list.
+The width is an integer percentage value ranging from 1 to 100.
+The `%` sign is optional.
+
+.Table with width set to 75%
+[source]
+----
+[width=75%]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+----
+
+.Result: Table rendered with a width of 75%
+[width=75%]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+
+Alternately, you can make the width fit the content by setting the `autowidth` option.
+The columns inherit this setting, so individual columns will also be sized according to the content.
+
+.Table using autowidth
+[source]
+----
+[%autowidth]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+----
+
+.Result: The width of the table is sized to accommodate the automatic column widths
+[%autowidth]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+
+If you want each column to have an automatic width, but want the table to span the width of the content area, add the `spread` role to the table (or, as of 1.5.5, set the `width` attribute to `100%`).
+
+.Full-width table with autowidth columns
+[source]
+----
+[%autowidth.spread]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+----
+
+.Result: Columns are sized to the content, but table spans the width of the page
+[%autowidth.spread]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+
+WARNING: The `autowidth` option is not recognized by the DocBook converter.
+
+[NOTE]
+====
+A design for enabling autowidth for individual columns is underway.
+(See https://github.com/asciidoctor/asciidoctor/issues/1844[issue #1844]).
+In the meantime, it's still possible to apply a style to a column when using the `autowidth` option, as the following attribute list shows:
+
+[source]
+----
+[%autowidth.spread,cols="~h,~"]
+----
+
+In this case, the relative column widths are ignored.
+====
+
+== Table Borders
+
+The borders on a table are controlled using the `frame` and `grid` attributes.
+You can combine these two attributes to achieve a variety of border styles for your tables.
+
+=== Frame
+
+The border around a table is controlled using the `frame` attribute.
+By default, the frame attribute is assigned the `all` value, which draws a border on each side of the table.
+If you set the frame attribute, you can override the default value with the values `topbot`, `sides` or `none`.
+
+The `topbot` value draws a border on the top and bottom of the table.
+
+[source]
+----
+[frame=topbot]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+----
+
+.Result: Table rendered with frame=topbot
+[width=90, frame=topbot]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+
+The `sides` value draws a border on the right and left side of the table.
+
+[source]
+----
+[frame=sides]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+----
+
+.Result: Table rendered with frame=sides
+[width=90, frame=sides]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+
+The `none` value removes the borders around the table.
+
+[source]
+----
+[frame=none]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+----
+
+.Result: Table rendered with frame=none
+[width=90, frame=none]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+
+=== Grid
+
+The borders between the cells in a table are controlled using the `grid` attribute.
+By default, the grid attribute is assigned the `all` value, which draws a border between all cells.
+If you set the `grid` attribute, you can override the default value with the values `rows`, `cols` or `none`.
+
+The `rows` value draws a border between the rows of the table.
+
+[source]
+----
+[grid=rows]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+----
+
+.Result: Table rendered with grid=rows
+[width=90, grid=rows]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+
+The `cols` value draws borders between the columns.
+
+[source]
+----
+[grid=cols]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+----
+
+.Result: Table rendered with grid=cols
+[width=90, grid=cols]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+
+The `none` value removes all borders between the cells.
+
+[source]
+----
+[grid=none]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+----
+
+.Result: Table rendered with grid=none
+[width=90, grid=none]
+include::{partialsdir}/ex-table.adoc[tag=base-h]
+
+== Orientation
+
+A table can be displayed in landscape (rotated 90 degrees counterclockwise) using the `rotate` option (preferred).
+
+[source]
+----
+[%rotate]
+|===
+|a |b
+|c |d
+|===
+----
+
+A table can also be displayed in landscape using the `orientation` attribute.
+
+[source]
+----
+[orientation=landscape]
+|===
+|a |b
+|c |d
+|===
+----
+
+Currently, this is only implemented by the DocBook backend (it sets the attribute `orient="land"`).
+
+== Nested Tables
+
+Table cells marked with the AsciiDoc table style (`a`) support nested tables in addition to normal block content.
+To distinguish the inner table from the enclosing one, you need to use `!===` as the table delimiter and a cell separator that differs from that used for the enclosing table.
+The default cell separator for a nested table is `!`, though you can choose another character by defining the `separator` attribute on the table.
+
+NOTE: Although nested tables are not technically valid in DocBook 5.0, the DocBook toolchain processes them anyway.
+
+The following example contains a nested table in the last cell.
+Notice the nested table has its own format, independent of that of the outer table:
+
+[source]
+----
+include::{partialsdir}/ex-table.adoc[tag=nested]
+----
+
+.Result: A nested table
+include::{partialsdir}/ex-table.adoc[tag=nested]
+
+We recommend using nested tables sparingly.
+There's usually a better way to present the information.
+
+//NOTE: At this time, Asciidoctor has not implemented the `align`, `halign`, or `valign` attributes.
