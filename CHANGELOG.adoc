@@ -13,6 +13,22 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
+== Unreleased
+
+Bug fixes::
+
+  * fix behavior of PathResolver#descends_from? when base path equals /
+  * automatically recover if start path passed to PathResolver#system_path is outside of jail path
+  * enforce that absolute start path passed to PathResolver#system_path is inside of jail path
+
+Improvements / Refactoring::
+
+  * resolve / expand parent references in start path passed to PathResolver#system_path (#2642)
+  * update PathResolver#expand_path to resolve parent references
+  * allow start path passed to PathResolver#system_path to be outside jail if target brings resolved path back inside jail
+  * don't run File.expand_path on Dir.pwd (assume Dir.pwd is absolute)
+  * posixify working_dir passed to PathResolver constructor if absolute
+
 // tag::compact[]
 == 1.5.6.2 (2018-03-20) - @mojavelinux
 

@@ -199,9 +199,9 @@ class PathResolver
     if base == path
       0
     elsif base == SLASH
-      (path.start_with? SLASH) ? 1 : false
+      (path.start_with? SLASH) && 1
     else
-      (path.start_with? base + SLASH) ? base.length + 1 : false
+      (path.start_with? base + SLASH) && (base.length + 1)
     end
   end
 
@@ -231,11 +231,7 @@ class PathResolver
     if path.include? DOT_DOT
       resolved_segments = []
       path_segments.each do |segment|
-        if segment == DOT_DOT
-          resolved_segments.pop
-        else
-          resolved_segments << segment
-        end
+        segment == DOT_DOT ? resolved_segments.pop : resolved_segments << segment
       end
       join_path resolved_segments, path_root
     else
@@ -421,7 +417,8 @@ class PathResolver
     end
 
     if recheck
-      if descends_from?((target_path = join_path resolved_segments, jail_root), jail)
+      target_path = join_path resolved_segments, jail_root
+      if descends_from? target_path, jail
         target_path
       elsif opts.fetch :recover, true
         warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
