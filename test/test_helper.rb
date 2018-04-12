@@ -135,6 +135,35 @@ class Minitest::Test
     end
   end
 
+  def assert_message logger, severity, expected_message, kind = String, idx = nil
+    unless idx
+      assert_equal 1, logger.messages.size
+      idx = 0
+    end
+    message = logger.messages[idx]
+    assert_equal severity, message[:severity]
+    assert_kind_of kind, message[:message]
+    if kind == String
+      actual_message = message[:message]
+    else
+      refute_nil message[:message][:source_location]
+      actual_message = message[:message].inspect
+    end
+    if expected_message.start_with? '~'
+      assert_includes actual_message, expected_message[1..-1]
+    else
+      assert_equal expected_message, actual_message
+    end
+  end
+
+  def assert_messages logger, expected_messages
+    assert_equal expected_messages.size, logger.messages.size
+    expected_messages.each_with_index do |expected_message_details, idx|
+      severity, expected_message, kind = expected_message_details
+      assert_message logger, severity, expected_message, (kind || String), idx
+    end
+  end
+
   def xmldoc_from_string(content)
     if content.match(RE_XMLNS_ATTRIBUTE)
       Nokogiri::XML::Document.parse(content)

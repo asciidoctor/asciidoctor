@@ -5,12 +5,10 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
 end
 
 context 'Attributes' do
-  logger = Asciidoctor::MemoryLogger.new
   default_logger = Asciidoctor::LoggerManager.logger
 
   setup do
-    logger.messages.clear
-    Asciidoctor::LoggerManager.logger = logger
+    Asciidoctor::LoggerManager.logger = (@logger = Asciidoctor::MemoryLogger.new)
   end
 
   teardown do
@@ -147,11 +145,7 @@ linus.torvalds@example.com
     test 'assigns attribute to empty string if substitution fails to resolve attribute' do
       input = ':release: Asciidoctor {version}'
       document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_equal 'dropping line containing reference to missing attribute: version', message[:message]
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: version'
     end
 
     test 'assigns multi-line attribute to empty string if substitution fails to resolve attribute' do
@@ -161,11 +155,7 @@ linus.torvalds@example.com
       EOS
       doc = document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }
       assert_equal '', doc.attributes['release']
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_equal 'dropping line containing reference to missing attribute: version', message[:message]
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: version'
     end
 
     test 'resolves attributes inside attribute value within header' do
@@ -621,11 +611,7 @@ all there is.
       output = render_embedded_string input
       para = xmlnodes_at_css 'p', output, 1
       refute_includes 'blah blah', para.content
-      assert_equal logger.messages.size, 1
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_equal 'dropping line containing reference to missing attribute: foobarbaz', message[:message]
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: foobarbaz'
     end
 
     test "attribute value gets interpretted when rendering" do
@@ -646,11 +632,7 @@ Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
       output = render_embedded_string input
       assert_match(/Line 1/, output)
       refute_match(/Line 2/, output)
-      assert_equal logger.messages.size, 1
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_equal 'dropping line containing reference to missing attribute: bogus-attribute', message[:message]
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus-attribute'
     end
 
     test 'should not drop line with reference to missing attribute by default' do

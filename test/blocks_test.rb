@@ -5,12 +5,10 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
 end
 
 context 'Blocks' do
-  logger = Asciidoctor::MemoryLogger.new
   default_logger = Asciidoctor::LoggerManager.logger
 
   setup do
-    logger.messages.clear
-    Asciidoctor::LoggerManager.logger = logger
+    Asciidoctor::LoggerManager.logger = (@logger = Asciidoctor::MemoryLogger.new)
   end
 
   teardown do
@@ -651,12 +649,7 @@ ____
 
       output = render_embedded_string input
       assert_xpath '//pre[text()="La la la <1>"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      refute_kind_of String, message[:message]
-      refute_nil message[:message][:source_location]
-      assert_equal '<stdin>: line 5: no callouts refer to list item 1', message[:message].inspect
+      assert_message @logger, :WARN, '<stdin>: line 5: no callouts refer to list item 1', Hash
     end
 
     test 'should perform normal subs on a verse block' do
@@ -1644,12 +1637,7 @@ section paragraph
       assert_xpath '//*[@id="content"]/h1[text()="Section Title"]', output, 1
       assert_xpath '//*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :ERROR, message[:severity]
-      refute_kind_of String, message[:message]
-      refute_nil message[:message][:source_location]
-      assert_equal '<stdin>: line 2: only book doctypes can contain level 0 sections', message[:message].inspect
+      assert_message @logger, :ERROR, '<stdin>: line 2: only book doctypes can contain level 0 sections', Hash
     end
 
     test 'block title above document title gets carried over to first block in first section if no preamble' do
@@ -1809,11 +1797,7 @@ image::no-such-image.svg[Alt Text]
 
       output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER
       assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'SVG does not exist or cannot be read'
+      assert_message @logger, :WARN, '~SVG does not exist or cannot be read'
     end
 
     test 'can render block image with alt text defined in macro containing square bracket' do
@@ -2048,11 +2032,7 @@ image::{bogus}[]
 
       output = render_embedded_string input
       assert_includes output, 'image::{bogus}[]'
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'dropping line containing reference to missing attribute: bogus'
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus'
     end
 
     test 'drops line if image target is missing attribute reference and attribute-missing is drop' do
@@ -2064,11 +2044,7 @@ image::{bogus}[]
 
       output = render_embedded_string input
       assert_empty output.strip
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'dropping line containing reference to missing attribute: bogus'
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus'
     end
 
     test 'drops line if image target is missing attribute reference and attribute-missing is drop-line' do
@@ -2080,11 +2056,7 @@ image::{bogus}[]
 
       output = render_embedded_string input
       assert_empty output.strip
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'dropping line containing reference to missing attribute: bogus'
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus'
     end
 
     test 'dropped image does not break processing of following section and attribute-missing is drop-line' do
@@ -2100,11 +2072,7 @@ image::{bogus}[]
       assert_css 'img', output, 0
       assert_css 'h2', output, 1
       refute_includes output, '== Section Title'
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'dropping line containing reference to missing attribute: bogus'
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus'
     end
 
     test 'should pass through image that references uri' do
@@ -2164,11 +2132,7 @@ image::unreadable.gif[Dot]
       assert_equal 'fixtures', doc.attributes['imagesdir']
       output = doc.convert
       assert_xpath '//img[@src="data:image/gif;base64,"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'image to embed not found or not readable'
+      assert_message @logger, :WARN, '~image to embed not found or not readable'
     end
 
     test 'embeds base64-encoded data uri for remote image when data-uri attribute is set' do
@@ -2213,11 +2177,7 @@ image::#{image_uri}[Missing image]
       end
 
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Missing image"]), output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'could not retrieve image data from URI'
+      assert_message @logger, :WARN, '~could not retrieve image data from URI'
     end
 
     test 'uses remote image uri when data-uri attribute is set and allow-uri-read is not set' do
@@ -2269,11 +2229,7 @@ image::dot.gif[Dot]
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'image has illegal reference to ancestor of jail'
+      assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail, auto-recovering'
     end
 
     test 'cleans reference to ancestor directories in target before reading image if safe mode level is at least SAFE' do
@@ -2290,11 +2246,7 @@ image::../..//fixtures/./../../fixtures/dot.gif[Dot]
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'image has illegal reference to ancestor of jail'
+      assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail, auto-recovering'
     end
   end
 
@@ -2583,11 +2535,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'image has illegal reference to ancestor of jail'
+      assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail, auto-recovering'
     end
 
     test 'should import Font Awesome and use font-based icons when value of icons attribute is font' do
@@ -2653,7 +2601,7 @@ puts "AsciiDoc, FTW!"
   end
 
   context 'Image paths' do
-    test 'wip restricts access to ancestor directories when safe mode level is at least SAFE' do
+    test 'restricts access to ancestor directories when safe mode level is at least SAFE' do
       input = <<-EOS
 image::asciidoctor.png[Asciidoctor]
       EOS
@@ -3113,11 +3061,7 @@ Abstract for book without title is invalid.
 
       output = render_string input
       assert_css '.abstract', output, 0
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'abstract block cannot be used in a document without a title when doctype is book'
+      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
     end
 
     test 'should make abstract on open block without title rendered to DocBook' do
@@ -3177,11 +3121,7 @@ Abstract for book is invalid.
 
       output = render_string input, :backend => 'docbook'
       assert_css 'abstract', output, 0
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'abstract block cannot be used in a document without a title when doctype is book'
+      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
     end
 
     # TODO partintro shouldn't be recognized if doctype is not book, should be in proper place
@@ -3252,11 +3192,7 @@ part intro paragraph
 
       output = render_string input
       assert_css '.partintro', output, 0
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :ERROR, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'partintro block can only be used when doctype is book and must be a child of a book part'
+      assert_message @logger, :ERROR, 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
     end
 
     test 'should not allow partintro unless doctype is book' do
@@ -3267,11 +3203,7 @@ part intro paragraph
 
       output = render_string input
       assert_css '.partintro', output, 0
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :ERROR, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'partintro block can only be used when doctype is book and must be a child of a book part'
+      assert_message @logger, :ERROR, 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
     end
 
     test 'should accept partintro on open block without title rendered to DocBook' do
@@ -3335,11 +3267,7 @@ part intro paragraph
 
       output = render_string input, :backend => 'docbook'
       assert_css 'partintro', output, 0
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :ERROR, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'partintro block can only be used when doctype is book and must be a child of a book part'
+      assert_message @logger, :ERROR, 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
     end
 
     test 'should not allow partintro unless doctype is book rendered to DocBook' do
@@ -3350,11 +3278,7 @@ part intro paragraph
 
       output = render_string input, :backend => 'docbook'
       assert_css 'partintro', output, 0
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :ERROR, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_includes message[:message], 'partintro block can only be used when doctype is book and must be a child of a book part'
+      assert_message @logger, :ERROR, 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
     end
   end
 

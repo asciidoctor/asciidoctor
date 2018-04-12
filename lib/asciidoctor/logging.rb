@@ -40,6 +40,14 @@ class MemoryLogger < ::Logger
     @messages << { :severity => SEVERITY_LABELS[severity], :message => message }
     true
   end
+
+  def empty?
+    @messages.empty?
+  end
+
+  def clear
+    @messages.clear
+  end
 end
 
 class NullLogger < ::Logger

@@ -1773,12 +1773,7 @@ III) three
     using_memory_logger do |logger|
       output = render_embedded_string input
       assert_xpath '//ol/li', output, 2
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      refute_kind_of String, message[:message]
-      refute_nil message[:message][:source_location]
-      assert_equal '<stdin>: line 2: list item index: expected II, got III', message[:message].inspect
+      assert_message logger, :WARN, '<stdin>: line 2: list item index: expected II, got III', Hash
     end
   end
 
@@ -1790,12 +1785,7 @@ iii) three
     using_memory_logger do |logger|
       output = render_embedded_string input
       assert_xpath '//ol/li', output, 2
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      refute_kind_of String, message[:message]
-      refute_nil message[:message][:source_location]
-      assert_equal '<stdin>: line 2: list item index: expected ii, got iii', message[:message].inspect
+      assert_message logger, :WARN, '<stdin>: line 2: list item index: expected ii, got iii', Hash
     end
   end
 end
@@ -4246,12 +4236,7 @@ foo::
       assert_xpath '//dl//b', output, 0
       assert_xpath '//dl/dd/p[text()="bar <1>"]', output, 1
       assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      refute_kind_of String, message[:message]
-      refute_nil message[:message][:source_location]
-      assert_equal '<stdin>: line 4: no callouts refer to list item 1', message[:message].inspect
+      assert_message logger, :WARN, '<stdin>: line 4: no callouts refer to list item 1', Hash
     end
   end
 
@@ -4267,12 +4252,7 @@ foo::
       assert_xpath '//ul//b', output, 0
       assert_xpath %(//ul/li/p[text()="foo\nbar <1>"]), output, 1
       assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      refute_kind_of String, message[:message]
-      refute_nil message[:message][:source_location]
-      assert_equal '<stdin>: line 4: no callouts refer to list item 1', message[:message].inspect
+      assert_message logger, :WARN, '<stdin>: line 4: no callouts refer to list item 1', Hash
     end
   end
 
@@ -4290,17 +4270,10 @@ Beans are fun.
     using_memory_logger do |logger|
       output = render_embedded_string input
       assert_xpath '//ol/li', output, 2
-      assert_equal 2, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      refute_kind_of String, message[:message]
-      refute_nil message[:message][:source_location]
-      assert_equal '<stdin>: line 8: callout list item index: expected 2 got 3', message[:message].inspect
-      message = logger.messages[1]
-      assert_equal :WARN, message[:severity]
-      refute_kind_of String, message[:message]
-      refute_nil message[:message][:source_location]
-      assert_equal '<stdin>: line 8: no callouts refer to list item 2', message[:message].inspect
+      assert_messages logger, [
+        [:WARN, '<stdin>: line 8: callout list item index: expected 2 got 3', Hash],
+        [:WARN, '<stdin>: line 8: no callouts refer to list item 2', Hash]
+      ]
     end
   end
 

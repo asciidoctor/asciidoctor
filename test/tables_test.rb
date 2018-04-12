@@ -162,13 +162,8 @@ A | here| a | there
         assert_xpath '/table/tbody/tr/td[2]/p[text()="here"]', output, 1
         assert_xpath '/table/tbody/tr/td[3]/p[text()="a"]', output, 1
         assert_xpath '/table/tbody/tr/td[4]/p[text()="there"]', output, 1
-        assert_equal 1, logger.messages.size
-        message = logger.messages[0]
-        assert_equal :ERROR, message[:severity]
-        refute_equal String, message[:message]
-        refute_nil message[:message][:source_location]
         # FIXME line number is wrong
-        assert_includes message[:message].inspect, 'table missing leading separator'
+        assert_message logger, :ERROR, '~table missing leading separator', Hash
       end
     end
 
@@ -884,13 +879,8 @@ more C
         output = render_embedded_string input
         assert_css 'table', output, 1
         assert_css 'table *', output, 0
-        assert_equal 1, logger.messages.size
-        message = logger.messages[0]
-        assert_equal :ERROR, message[:severity]
-        refute_equal String, message[:message]
-        refute_nil message[:message][:source_location]
         # FIXME line number is wrong
-        assert_includes message[:message].inspect, 'exceeds specified number of columns'
+        assert_message logger, :ERROR, '~exceeds specified number of columns', Hash
       end
     end
 

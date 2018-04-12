@@ -240,12 +240,7 @@ content
         reftext = doc.catalog[:ids]['install']
         refute_nil reftext
         assert_equal 'First Install', reftext
-        assert_equal 1, logger.messages.size
-        message = logger.messages[0]
-        assert_equal :WARN, message[:severity]
-        refute_kind_of String, message[:message]
-        refute_nil message[:message][:source_location]
-        assert_equal '<stdin>: line 7: id assigned to section already in use: install', message[:message].inspect
+        assert_message logger, :WARN, '<stdin>: line 7: id assigned to section already in use: install', Hash
       end
     end
 
@@ -265,12 +260,7 @@ content
         reftext = doc.catalog[:ids]['install']
         refute_nil reftext
         assert_equal 'First Install', reftext
-        assert_equal 1, logger.messages.size
-        message = logger.messages[0]
-        assert_equal :WARN, message[:severity]
-        refute_kind_of String, message[:message]
-        refute_nil message[:message][:source_location]
-        assert_equal '<stdin>: line 7: id assigned to block already in use: install', message[:message].inspect
+        assert_message logger, :WARN, '<stdin>: line 7: id assigned to block already in use: install', Hash
       end
     end
   end
@@ -878,12 +868,7 @@ text in standalone
 
       using_memory_logger do |logger|
         render_string input
-        assert_equal 1, logger.messages.size
-        message = logger.messages[0]
-        assert_equal :ERROR, message[:severity]
-        refute_kind_of String, message[:message]
-        refute_nil message[:message][:source_location]
-        assert_equal '<stdin>: line 7: only book doctypes can contain level 0 sections', message[:message].inspect
+        assert_message logger, :ERROR, '<stdin>: line 7: only book doctypes can contain level 0 sections', Hash
       end
     end
 
@@ -917,7 +902,7 @@ Master section text.
       output = nil
       using_memory_logger do |logger|
         output = render_string input
-        assert logger.messages.empty?
+        assert logger.empty?
       end
 
       assert_match(/Master document written by Doc Writer/, output)
@@ -2964,12 +2949,7 @@ intro
 
       using_memory_logger do |logger|
         document_from_string input
-        assert_equal 1, logger.messages.size
-        message = logger.messages[0]
-        assert_equal :ERROR, message[:severity]
-        refute_kind_of String, message[:message]
-        refute_nil message[:message][:source_location]
-        assert_equal '<stdin>: line 8: invalid part, must have at least one section (e.g., chapter, appendix, etc.)', message[:message].inspect
+        assert_message logger, :ERROR, '<stdin>: line 8: invalid part, must have at least one section (e.g., chapter, appendix, etc.)', Hash
       end
     end
 
@@ -3054,7 +3034,7 @@ Appendix subsection content
       output = nil
       using_memory_logger do |logger|
         output = render_string input, :backend => 'docbook'
-        assert logger.messages.empty?
+        assert logger.empty?
       end
       assert_xpath '/book/preface', output, 1
       assert_xpath '/book/preface/section', output, 1

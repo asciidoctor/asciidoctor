@@ -554,11 +554,7 @@ Wise words from a wise person.
         using_memory_logger do |logger|
           output =  render_string input, :doctype => 'inline'
           assert_nil output
-          assert_equal 1, logger.messages.size
-          message = logger.messages[0]
-          assert_equal :WARN, message[:severity]
-          assert_kind_of String, message[:message]
-          assert_includes message[:message], 'no inline candidate'
+          assert_message logger, :WARN, '~no inline candidate'
         end
       end
     end

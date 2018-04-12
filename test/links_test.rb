@@ -462,11 +462,7 @@ anchor:foo[b[a\]r]text'
       doc.catalog[:includes] << 'tigers'
       output = doc.convert
       assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_equal 'invalid reference: about', message[:message]
+      assert_message logger, :WARN, 'invalid reference: about'
     end
   end
 
@@ -476,11 +472,7 @@ anchor:foo[b[a\]r]text'
       doc.catalog[:includes] << 'part1/tigers'
       output = doc.convert
       assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_equal 'invalid reference: about', message[:message]
+      assert_message logger, :WARN, 'invalid reference: about'
     end
   end
 
@@ -640,11 +632,7 @@ See <<foobaz>>.
     using_memory_logger true do |logger|
       output = render_embedded_string input
       assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_equal 'invalid reference: foobaz', message[:message]
+      assert_message logger, :WARN, 'invalid reference: foobaz'
     end
   end
 
@@ -660,11 +648,7 @@ See <<test.adoc#foobaz>>.
     using_memory_logger true do |logger|
       output = render_embedded_string input, :attributes => { 'docname' => 'test' }
       assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-      assert_equal 1, logger.messages.size
-      message = logger.messages[0]
-      assert_equal :WARN, message[:severity]
-      assert_kind_of String, message[:message]
-      assert_equal 'invalid reference: foobaz', message[:message]
+      assert_message logger, :WARN, 'invalid reference: foobaz'
     end
   end
 
