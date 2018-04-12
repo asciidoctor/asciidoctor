@@ -1004,7 +1004,8 @@ class PreprocessorReader < Reader
   # Returns An Array containing the resolved (absolute) include path, the target type, and the path
   # relative to the outermost document. May also return a boolean to halt processing of the include.
   def resolve_include_path target, attrlist, attributes
-    if (Helpers.uriish? target) || ((::URI === @dir) && (target = %(#{@dir}/#{target})))
+    # NOTE the _ assignment is necessary to avoid a warning in JRuby
+    if (_ = (Helpers.uriish? target) || (::URI === @dir && (target = %(#{@dir}/#{target}))))
       return replace_next_line %(link:#{target}[#{attrlist}]) unless @document.attributes.key? 'allow-uri-read'
       if @document.attributes.key? 'cache-uri'
         # caching requires the open-uri-cached gem to be installed
