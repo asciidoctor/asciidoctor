@@ -1004,8 +1004,7 @@ class PreprocessorReader < Reader
   # Returns An Array containing the resolved (absolute) include path, the target type, and the path
   # relative to the outermost document. May also return a boolean to halt processing of the include.
   def resolve_include_path target, attrlist, attributes
-    # NOTE the _ assignment is necessary to avoid a warning in JRuby
-    if (_ = (Helpers.uriish? target) || (::URI === @dir && (target = %(#{@dir}/#{target}))))
+    if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
       return replace_next_line %(link:#{target}[#{attrlist}]) unless @document.attributes.key? 'allow-uri-read'
       if @document.attributes.key? 'cache-uri'
         # caching requires the open-uri-cached gem to be installed
@@ -1052,16 +1051,15 @@ class PreprocessorReader < Reader
   def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
     @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
     if (@file = file)
-      if ::URI === file
-        if ::RUBY_ENGINE_OPAL
-          @dir = ::URI.parse ::File.dirname(file = file.to_s)
-        else
-          # NOTE this intentionally throws an error if URI has no path
-          (@dir = file.dup).path = (dir = ::File.dirname file.path) == '/' ? '' : dir
-          file = file.to_s
-        end
-      else
+      # NOTE if file is not a string, assume it's a URI
+      if ::String === file
         @dir = ::File.dirname file
+      elsif ::RUBY_ENGINE_OPAL
+        @dir = ::URI.parse ::File.dirname(file = file.to_s)
+      else
+        # NOTE this intentionally throws an error if URI has no path
+        (@dir = file.dup).path = (dir = ::File.dirname file.path) == '/' ? '' : dir
+        file = file.to_s
       end
       path ||= ::File.basename file
       # only process lines in AsciiDoc files
