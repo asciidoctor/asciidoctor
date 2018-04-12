@@ -7,7 +7,7 @@ module Asciidoctor
 # The main emphasis of the class is on creating clean and secure paths. Clean
 # paths are void of duplicate parent and current directory references in the
 # path name. Secure paths are paths which are restricted from accessing
-# directories outside of a jail root, if specified.
+# directories outside of a jail path, if specified.
 #
 # Since joining two paths can result in an insecure path, this class also
 # handles the task of joining a parent (start) and child (target) path.
@@ -94,11 +94,11 @@ module Asciidoctor
 #     => '/path/to/docs/images'
 #
 #     begin
-#       resolver.system_path('images', '/etc', '/path/to/docs')
+#       resolver.system_path('images', '/etc', '/path/to/docs', recover: false)
 #     rescue SecurityError => e
 #       puts e.message
 #     end
-#     => Start path /etc is outside of jail: /path/to/docs'
+#     => start path /etc is outside of jail: /path/to/docs'
 #
 class PathResolver
   DOT = '.'
@@ -124,9 +124,9 @@ class PathResolver
   def initialize file_separator = nil, working_dir = nil
     @file_separator = file_separator ? file_separator : (::File::ALT_SEPARATOR || ::File::SEPARATOR)
     if working_dir
-      @working_dir = (root? working_dir) ? working_dir : (::File.expand_path working_dir)
+      @working_dir = (root? working_dir) ? (posixify working_dir) : (::File.expand_path working_dir)
     else
-      @working_dir = ::File.expand_path ::Dir.pwd
+      @working_dir = ::Dir.pwd
     end
     @_partition_path_sys, @_partition_path_web = {}, {}
   end
@@ -196,7 +196,13 @@ class PathResolver
   #
   # returns If path descends from base, return the offset, otherwise false.
   def descends_from? path, base
-    base == path ? 0 : ((path.start_with? base + '/') ? base.length + 1 : false)
+    if base == path
+      0
+    elsif base == SLASH
+      (path.start_with? SLASH) && 1
+    else
+      (path.start_with? base + SLASH) && (base.length + 1)
+    end
   end
 
   # Public: Normalize path by converting any backslashes to forward slashes
@@ -213,35 +219,38 @@ class PathResolver
   end
   alias posixfy posixify
 
-  # Public: Expand the path by resolving any parent references (..)
-  # and cleaning self references (.).
-  #
-  # The result will be relative if the path is relative and
-  # absolute if the path is absolute. The file separator used
-  # in the expanded path is the one specified when the class
-  # was constructed.
+  # Public: Expand the specified path by converting the path to a posix path, resolving parent
+  # references (..), and removing self references (.).
   #
   # path - the String path to expand
   #
-  # returns a String path with any parent or self references resolved.
+  # returns a String path as a posix path with parent references resolved and self references removed.
+  # The result will be relative if the path is relative and absolute if the path is absolute.
   def expand_path path
-    path_segments, path_root, _ = partition_path path
-    join_path path_segments, path_root
+    path_segments, path_root = partition_path path
+    if path.include? DOT_DOT
+      resolved_segments = []
+      path_segments.each do |segment|
+        segment == DOT_DOT ? resolved_segments.pop : resolved_segments << segment
+      end
+      join_path resolved_segments, path_root
+    else
+      join_path path_segments, path_root
+    end
   end
 
-  # Public: Partition the path into path segments and remove any empty segments
-  # or segments that are self references (.). The path is converted to a posix
-  # path before being partitioned.
+  # Public: Partition the path into path segments and remove self references (.) and the trailing
+  # slash, if present. Prior to being partitioned, the path is converted to a posix path.
+  #
+  # Parent references are not resolved by this method since the consumer often needs to handle this
+  # resolution in a certain context (checking for the breach of a jail, for instance).
   #
   # path - the String path to partition
   # web  - a Boolean indicating whether the path should be handled
   #        as a web path (optional, default: false)
   #
-  # Returns a 3-item Array containing the Array of String path segments, the
-  # path root (e.g., '/', './', 'c:/') if the path is absolute and the posix
-  # version of the path.
-  #--
-  # QUESTION is it worth it to normalize slashes? it doubles the time elapsed
+  # Returns a 2-item Array containing the Array of String path segments and the
+  # path root (e.g., '/', './', 'c:/', or '//'), which is nil unless the path is absolute.
   def partition_path path, web = nil
     if (result = (cache = web ? @_partition_path_web : @_partition_path_sys)[path])
       return result
@@ -275,24 +284,10 @@ class PathResolver
     # else ex. sample/path
     end
 
-    path_segments = posix_path.split SLASH
-    # shift twice for a UNC path
-    if root == DOUBLE_SLASH
-      path_segments = path_segments[2..-1]
-    # shift twice for a file:/// path and adjust root
-    # NOTE technically file:/// paths work without this adjustment
-    #elsif ::RUBY_ENGINE_OPAL && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest' && root == 'file:/'
-    #  root = 'file://'
-    #  path_segments = path_segments[2..-1]
-    # shift once for any other root
-    elsif root
-      path_segments.shift
-    end
+    path_segments = (root ? (posix_path.slice root.length, posix_path.length) : posix_path).split SLASH
     # strip out all dot entries
     path_segments.delete DOT
-    # QUESTION should we chop trailing /? (we pay a small fraction)
-    #posix_path = posix_path.chop if posix_path.end_with? SLASH
-    cache[path] = [path_segments, root, posix_path]
+    cache[path] = [path_segments, root]
   end
 
   # Public: Join the segments using the posix file separator (since Ruby knows
@@ -309,110 +304,132 @@ class PathResolver
     root ? %(#{root}#{segments * SLASH}) : segments * SLASH
   end
 
-  # Public: Resolve a system path from the target and start paths. If a jail
-  # path is specified, enforce that the resolved directory is contained within
-  # the jail path. If a jail path is not provided, the resolved path may be
-  # any location on the system. If the resolved path is absolute, use it as is.
-  # If the resolved path is relative, resolve it relative to the working_dir
-  # specified in the constructor.
+  # Public: Securely resolve a system path
+  #
+  # Resolve a system path from the target relative to the start path, jail path, or working
+  # directory (specified in the constructor), in that order. If a jail path is specified, enforce
+  # that the resolved path descends from the jail path. If a jail path is not provided, the resolved
+  # path may be any location on the system. If the resolved path is absolute, use it as is (unless
+  # it breaches the jail path). Expand all parent and self references in the resolved path.
   #
   # target - the String target path
-  # start  - the String start (i.e., parent) path (default: nil)
-  # jail   - the String jail path to confine the resolved path (default: nil)
+  # start  - the String start path from which to resolve a relative target; falls back to jail, if
+  #          specified, or the working directory specified in the constructor (default: nil)
+  # jail   - the String jail path to which to confine the resolved path, if specified; must be an
+  #          absolute path (default: nil)
   # opts   - an optional Hash of options to control processing (default: {}):
-  #          * :recover is used to control whether the processor should auto-recover
-  #              when an illegal path is encountered
+  #          * :recover is used to control whether the processor should auto-recover when an illegal
+  #              path is encountered
   #          * :target_name is used in messages to refer to the path being resolved
   #
-  # returns a String path that joins the target path with the start path with
-  # any parent references resolved and self references removed and enforces
-  # that the resolved path be contained within the jail, if provided
+  # returns a String path relative to the start path, if specified, and confined to the jail path,
+  # if specified. The path is posixified and all parent and self references in the path are expanded.
   def system_path target, start = nil, jail = nil, opts = {}
     if jail
-      unless root? jail
-        raise ::SecurityError, %(Jail is not an absolute path: #{jail})
-      end
+      raise ::SecurityError, %(Jail is not an absolute path: #{jail}) unless root? jail
+      #raise ::SecurityError, %(Jail is not a canonical path: #{jail}) if jail.include? DOT_DOT
       jail = posixify jail
     end
 
-    if target.nil_or_empty?
-      target_segments = []
+    if target
+      if root? target
+        target_path = expand_path target
+        if jail && !(descends_from? target_path, jail)
+          if opts.fetch :recover, true
+            warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
+            target_segments, _ = partition_path target_path
+            jail_segments, jail_root = partition_path jail
+            return join_path jail_segments + target_segments, jail_root
+          else
+            raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} is outside of jail: #{jail} (disallowed in safe mode))
+          end
+        end
+        return target_path
+      else
+        target_segments, _ = partition_path target
+      end
     else
-      target_segments, target_root, _ = partition_path target
+      target_segments = []
     end
 
     if target_segments.empty?
       if start.nil_or_empty?
-        return jail ? jail : @working_dir
+        return jail || @working_dir
       elsif root? start
-        unless jail
+        if jail
+          start = posixify start
+        else
           return expand_path start
         end
       else
-        return system_path start, jail, jail, opts
+        target_segments, _ = partition_path start
+        start = jail || @working_dir
       end
-    end
-
-    if target_root && target_root != DOT_SLASH
-      resolved_target = join_path target_segments, target_root
-      # if target is absolute and a sub-directory of jail, or
-      # a jail is not in place, let it slide
-      if !jail || (resolved_target.start_with? jail)
-        return resolved_target
-      end
-    end
-
-    if start.nil_or_empty?
-      start = jail ? jail : @working_dir
+    elsif start.nil_or_empty?
+      start = jail || @working_dir
     elsif root? start
-      start = posixify start
+      start = posixify start if jail
     else
-      start = system_path start, jail, jail, opts
+      #start = system_path start, jail, jail, opts
+      start = %(#{(jail || @working_dir).chomp '/'}/#{start})
     end
 
-    # both jail and start have been posixfied at this point
-    if jail == start
-      jail_segments, jail_root, _ = partition_path jail
-      start_segments = jail_segments.dup
-    elsif jail
-      unless start.start_with? jail
-        raise ::SecurityError, %(#{opts[:target_name] || 'Start path'} #{start} is outside of jail: #{jail} (disallowed in safe mode))
-      end
-
-      start_segments, start_root, _ = partition_path start
-      jail_segments, jail_root, _ = partition_path jail
-
-      # Already checked for this condition
-      #if start_root != jail_root
-      #  raise ::SecurityError, %(Jail root #{jail_root} does not match root of #{opts[:target_name] || 'start path'}: #{start_root})
-      #end
-    else
-      start_segments, start_root, _ = partition_path start
-      jail_root = start_root
-    end
-
-    resolved_segments = start_segments.dup
-    warned = false
-    target_segments.each do |segment|
-      if segment == DOT_DOT
-        if jail
-          if resolved_segments.size > jail_segments.size
-            resolved_segments.pop
-          elsif !(recover ||= (opts.fetch :recover, true))
-            raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode))
-          elsif !warned
-            warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering)
-            warned = true
-          end
+    # both jail and start have been posixified at this point if jail is set
+    if jail && (recheck = !(descends_from? start, jail)) && @file_separator == BACKSLASH
+      start_segments, start_root = partition_path start
+      jail_segments, jail_root = partition_path jail
+      if start_root != jail_root
+        if opts.fetch :recover, true
+          warn %(asciidoctor: WARNING: start path for #{opts[:target_name] || 'path'} is outside of jail root, auto-recovering)
+          start_segments = jail_segments
+          recheck = false
         else
-          resolved_segments.pop
+          raise ::SecurityError, %(start path for #{opts[:target_name] || 'path'} #{start} refers to location outside jail root: #{jail} (disallowed in safe mode))
+        end
+      end
+    else
+      start_segments, jail_root = partition_path start
+    end
+
+    if (resolved_segments = start_segments + target_segments).include? DOT_DOT
+      unresolved_segments, resolved_segments = resolved_segments, []
+      if jail
+        jail_segments, _ = partition_path jail unless jail_segments
+        warned = false
+        unresolved_segments.each do |segment|
+          if segment == DOT_DOT
+            if resolved_segments.size > jail_segments.size
+              resolved_segments.pop
+            elsif opts.fetch :recover, true
+              warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering) unless warned
+            else
+              raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} refers to location outside jail: #{jail} (disallowed in safe mode))
+            end
+          else
+            resolved_segments << segment
+          end
         end
       else
-        resolved_segments << segment
+        unresolved_segments.each do |segment|
+          segment == DOT_DOT ? resolved_segments.pop : resolved_segments << segment
+        end
       end
     end
 
-    join_path resolved_segments, jail_root
+    if recheck
+      target_path = join_path resolved_segments, jail_root
+      if descends_from? target_path, jail
+        target_path
+      elsif opts.fetch :recover, true
+        warn %(asciidoctor: WARNING: #{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
+        jail_segments, _ = partition_path jail unless jail_segments
+        join_path jail_segments + target_segments, jail_root
+      else
+        raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} is outside of jail: #{jail} (disallowed in safe mode))
+      end
+    else
+      join_path resolved_segments, jail_root
+    end
   end
 
   # Public: Resolve a web path from the target and start paths.
@@ -452,7 +469,7 @@ class PathResolver
     #  end
     #end
 
-    target_segments, target_root, _ = partition_path target, true
+    target_segments, target_root = partition_path target, true
     resolved_segments = []
     target_segments.each do |segment|
       if segment == DOT_DOT
