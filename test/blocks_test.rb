@@ -309,6 +309,42 @@ ____
       assert_equal "#{decode_char 8212} Famous Person", author.text.strip
     end
 
+    test 'quote block with attribution in DocBook' do
+      input = <<-EOS
+[quote, Famous Person, Famous Book (1999)]
+____
+A famous quote.
+____
+      EOS
+      output = render_string input, :backend => :docbook
+      assert_css 'blockquote', output, 1
+      assert_css 'blockquote > simpara', output, 1
+      assert_css 'blockquote > attribution', output, 1
+      assert_css 'blockquote > attribution > citetitle', output, 1
+      assert_xpath '//blockquote/attribution/citetitle[text() = "Famous Book (1999)"]', output, 1
+      attribution = xmlnodes_at_xpath '//blockquote/attribution', output, 1
+      author = attribution.children.first
+      assert_equal "Famous Person", author.text.strip
+    end
+
+    test 'epigraph quote block with attribution in DocBook' do
+      input = <<-EOS
+[quote.epigraph, Famous Person, Famous Book (1999)]
+____
+A famous quote.
+____
+      EOS
+      output = render_string input, :backend => :docbook
+      assert_css 'epigraph', output, 1
+      assert_css 'epigraph > simpara', output, 1
+      assert_css 'epigraph > attribution', output, 1
+      assert_css 'epigraph > attribution > citetitle', output, 1
+      assert_xpath '//epigraph/attribution/citetitle[text() = "Famous Book (1999)"]', output, 1
+      attribution = xmlnodes_at_xpath '//epigraph/attribution', output, 1
+      author = attribution.children.first
+      assert_equal "Famous Person", author.text.strip
+    end
+
     test 'quote block with attribute and id and role shorthand' do
       input = <<-EOS
 [quote#justice-to-all.solidarity, Martin Luther King, Jr.]
@@ -505,6 +541,44 @@ ____
       attribution = xmlnodes_at_xpath '//*[@class = "verseblock"]/*[@class = "attribution"]', output, 1
       author = attribution.children.first
       assert_equal "#{decode_char 8212} Famous Poet", author.text.strip
+    end
+
+    test 'single-line verse block with attribution in DocBook' do
+      input = <<-EOS
+[verse, Famous Poet, Famous Poem]
+____
+A famous verse.
+____
+      EOS
+      output = render_string input, :backend => :docbook
+      assert_css 'blockquote', output, 1
+      assert_css 'blockquote simpara', output, 0
+      assert_css 'blockquote > literallayout', output, 1
+      assert_css 'blockquote > attribution', output, 1
+      assert_css 'blockquote > attribution > citetitle', output, 1
+      assert_xpath '//blockquote/attribution/citetitle[text() = "Famous Poem"]', output, 1
+      attribution = xmlnodes_at_xpath '//blockquote/attribution', output, 1
+      author = attribution.children.first
+      assert_equal "Famous Poet", author.text.strip
+    end
+
+    test 'single-line epigraph verse block with attribution in DocBook' do
+      input = <<-EOS
+[verse.epigraph, Famous Poet, Famous Poem]
+____
+A famous verse.
+____
+      EOS
+      output = render_string input, :backend => :docbook
+      assert_css 'epigraph', output, 1
+      assert_css 'epigraph simpara', output, 0
+      assert_css 'epigraph > literallayout', output, 1
+      assert_css 'epigraph > attribution', output, 1
+      assert_css 'epigraph > attribution > citetitle', output, 1
+      assert_xpath '//epigraph/attribution/citetitle[text() = "Famous Poem"]', output, 1
+      attribution = xmlnodes_at_xpath '//epigraph/attribution', output, 1
+      author = attribution.children.first
+      assert_equal "Famous Poet", author.text.strip
     end
 
     test 'multi-stanza verse block' do
