@@ -1,0 +1,162 @@
+= Include Content Selected by Lines or Tags
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+aka Select Portions of a Document to Include
+From include-lines-tags.adoc, included in:
+- User manual
+////
+
+The include directive supports selecting only portions of the document to include.
+Using the `tags` attribute (or `tag` attribute for the singular case), you can select lines that fall between regions marked with user-defined tags.
+Using the `lines` attribute, you can include ranges of line numbers.
+
+When including multiple line ranges or multiple tags, each entry in the list must be separated by either a comma or a semi-colon.
+If commas are used, the entire value must be enclosed in quotes.
+Using the semi-colon as the data separator eliminates this requirement.
+
+== By tagged regions
+
+Tags are useful when you want to display specific regions of content from an include file instead of all of its content.
+You can select regions of content between tag/end directives using the `tags` attribute.
+The example below shows how you tag a region of content inside a file containing multiple code examples.
+
+.Tagged code snippets in a file named core.rb
+[source,ruby]
+----
+include::{partialsdir}/ex-include.adoc[tag=tag-co]
+----
+<1> To indicate the start of a tagged region, insert a comment line in the code.
+<2> Assign a unique name to the `tag` directive. In this example the tag is called _timings_.
+<3> Insert another comment line where you want the tagged region to end.
+<4> Assign the name of the region you want to terminate to the `end` directive.
+<5> This is the start a tagged snippet named _parse_.
+<6> This is the end of the tagged snippet named _parse_.
+
+IMPORTANT: The `tag::[]` and `end::[]` directives should be placed after a line comment as defined by the language of the source file.
+The directives must also appear at the _end_ of the line.
+In the previous example, we choose to prefix the lines with a hash (`#`) because that's the start of a line comment in Ruby.
+
+TIP: For languages that only have circumfix comments, such as XML, you can enclose the tag and end directives in the respective circumfix comment markers.
+For example, in XML files, you can use `+<!-- tag::name[] -->+` and `+<!-- end::name[] -->+` (the spaces around the tag are required).
+
+In the next example, the tagged region named _parse_ is selected by the `include` directive.
+
+.Selecting the _parse_ code snippet from a document
+[source]
+....
+include::{partialsdir}/ex-include.adoc[tag=target-co]
+....
+<1> In the directive's brackets, set the `tag` attribute and assign it the unique name of the code snippet you tagged in your code file.
+
+You can include multiple tags from the same file.
+
+.Selecting the _timings_ and the _parse_ code snippets from a document
+[source]
+....
+include::{partialsdir}/ex-include.adoc[tag=target-co-multiple]
+....
+
+It is also possible to have fine-grained tagged regions inside larger tagged regions.
+
+For example, if your include file has the following content:
+
+[source]
+----
+// tag::snippets[]
+// tag::snippet-a[]
+snippet a
+// end::snippet-a[]
+
+// tag::snippet-b[]
+snippet b
+// end::snippet-b[]
+// end::snippets[]
+----
+
+And you include this file using the following include directive:
+
+[source]
+----
+\include::file-with-snippets.adoc[tag=snippets]
+----
+
+The following lines will be selected and displayed:
+
+[source]
+----
+snippet a
+
+snippet b
+----
+
+Notice that none of the lines with the tag directives are displayed.
+
+=== Tag filtering
+
+The previous section showed how to select tagged regions explicitly, but you can also use wildcards and exclusions:
+
+`*`::
+Select all tagged regions.
+
+`**`::
+Select all the lines in the document.
+
+`!`::
+Negate the match.
+
+The wildcards are applied first, then the exclusions are applied.
+Technically, the order you list them doesn't matter, but it's customary to list them in this order.
+
+Here are some of the permutations that you can use:
+
+`**`:: Selects all the lines in the document; matches the default behavior of the include directive.
+
+`*`:: Selects all tagged regions in the document.
+
+`+**;*+`:: Selects all the lines outside and inside of tagged regions, but not the lines containing a tag directive.
+
+`foo;!bar`:: Selects regions tagged _foo_, but excludes any nested regions tagged _bar_.
+
+`*;!foo`:: Selects all tagged regions, but excludes any regions tagged _foo_ (nested or otherwise).
+
+`**;!foo`:: Selects all the lines of the document except for regions tagged _foo_.
+
+`+**;!*+`:: Selects only the regions of the document outside of tags (i.e., non-tagged regions).
+
+There are also some shorthands if only exclusions are specified:
+
+`!foo`:: Equivalent to `**;!foo`; an exclusion without an inclusion implicitly starts by selecting all the lines.
+`!*`:: Equivalent to `+**;!*+`; only selects regions that are not tagged.
+
+== By line ranges
+
+To include content by line range, assign a starting line number and an ending line number separated by a pair of dots (e.g., `lines=1..5`) to the `lines` attribute.
+
+[source]
+----
+include::{partialsdir}/ex-include.adoc[tag=line]
+----
+
+You can specify multiple ranges by separating each range by a comma.
+Since commas are normally used to separate individual attributes, you must quote the comma-separated list of ranges.
+
+[source]
+----
+include::{partialsdir}/ex-include.adoc[tag=m-line-comma]
+----
+
+To avoid having to quote the list of ranges, you can instead separate them using semi-colons.
+
+[source]
+----
+include::{partialsdir}/ex-include.adoc[tag=m-line]
+----
+
+If you don't know the number of lines in the document, or you don't want to couple the range to the length of the file, you can refer to the last line of the document using the value -1.
+
+[source]
+----
+include::{partialsdir}/ex-include.adoc[tag=last]
+----

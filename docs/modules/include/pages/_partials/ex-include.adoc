@@ -1,0 +1,96 @@
+////
+Included in:
+
+- user-manual: Include Directive
+- quick-ref
+////
+
+// tag::base[]
+= Reference Documentation
+Lead Developer
+
+This is documentation for project X.
+
+\include::basics.adoc[]
+
+\include::installation.adoc[]
+
+\include::example.adoc[]
+// end::base[]
+
+// tag::line[]
+\include::filename.txt[lines=5..10]
+// end::line[]
+
+// tag::m-line-comma[]
+\include::filename.txt[lines="1..10,15..20"]
+// end::m-line-comma[]
+
+// tag::m-line[]
+\include::filename.txt[lines=7;14..25;28..43]
+// end::m-line[]
+
+// tag::last[]
+\include::filename.txt[lines=12..-1]
+// end::last[]
+
+[source,ruby]
+----
+// tag::tag-co[]
+# tag::timings[] # <1> <2>
+if timings
+  timings.record :read
+  timings.start :parse
+end
+# end::timings[] # <3> <4>
+# tag::parse[] # <5>
+doc = (options[:parse] == false ? (Document.new lines, options) :
+    (Document.new lines,options).parse)
+timings.record :parse if timings
+doc
+# end::parse[] # <6>
+// end::tag-co[]
+----
+
+// tag::target-co[]
+[source,ruby]
+----
+include::core.rb[tag=parse] // <1>
+----
+// end::target-co[]
+
+// tag::target-co-multiple[]
+[source,ruby]
+----
+\include::core.rb[tags=timings;parse]
+----
+// end::target-co-multiple[]
+
+// tag::tag[]
+[source,groovy]
+--
+\include::example.groovy[tag=classdef]
+--
+// end::tag[]
+
+// tag::target[]
+import foo
+// tag::classdef[]
+class Bar {
+  // ...
+}
+// end::classdef[]
+// end::target[]
+
+// tag::out[]
+[source,groovy]
+--
+class Bar {
+  // ...
+}
+--
+// end::out[]
+
+// tag::uri[]
+\include::https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/README.adoc[]
+// end::uri[]

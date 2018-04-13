@@ -1,0 +1,249 @@
+= Include Directive
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From include-directive.adoc, included in:
+- user-manual
+////
+
+The include directive (`include::path[attributes]`) let's you import content from another file into the current document.
+You can use it multiple times in the same document.
+
+This directive is useful if you want to:
+
+* partition a large document into smaller files (for better organization and to make restructuring simpler),
+* insert snippets of source code (so your examples are kept up-to-date with the latest source files),
+* populate tables with output from other programs (e.g., CSV data),
+* create document variants by combining the include directive with preprocessor conditionals (e.g., `ifdef`), and
+* reuse fragments and boilerplate content multiple times within the same document.
+
+CAUTION: The include directive is _disabled_ when Asciidoctor is run in secure mode.
+In this mode, the include directive is converted to a link in the output document.
+To learn more about secure mode, refer to the section #Running Asciidoctor Securely#.
+
+//<<Running Asciidoctor Securely>>
+
+[#include-anatomy]
+== Anatomy
+
+The include directive has the following anatomy:
+
+[source,subs=+quotes]
+----
+\include::path[leveloffset=__offset__,lines=__ranges__,tag(s)=__name(s)__,indent=__depth__]
+----
+
+The leveloffset, lines, tag(s) and indent attributes are optional, making the simplest case look like:
+
+[source]
+----
+\include::content.adoc[]
+----
+
+The sections that follows go into detail about when the include is processed, how the include file is resolved, and how each attribute is used.
+
+[#include-processing]
+== Processing
+
+Although the include directive shares the same syntax as a block macro, it is not a block macro and not processed like one.
+Instead, it's a _preprocessor_ directive, like `ifdef` and `ifeval`.
+It's important that you understand the distinction between the two.
+
+A preprocessor directive is processed when the lines are read and before the document structure is parsed.
+Therefore, it's _not_ aware of the surrounding document structure.
+A preprocessor directive merely adds lines to the reader or takes lines away.
+The include directive always adds lines.
+
+The best way to think of the include directive is to imagine that it is being replaced by the lines from the include file (i.e., the imported lines).
+Only then does the parser read and interpret those lines.
+That's also why it's important to surround the include directive by blank lines if it imports in a discrete structure.
+You only want to place include files directly adjacent to one another if the imported content should be directly adjacent.
+
+[#include-resolution]
+== File resolution
+
+The path used in an include directive may be either relative or absolute.
+
+If the path relative, the processor resolves the path using the following rules:
+
+* If the include directive is used in the main (top-level) document, relative paths are resolved relative to the base directory.
+(The base directory defaults to the directory of the main document and can be overridden from the CLI or API).
+* If the include directive is used in a file that has itself been included, the path is resolved relative to the including (i.e., current) file.
+
+//TODO show examples to contrast a relative vs an absolute include
+
+These defaults makes it easy to reason about how the path to the include file is resolved.
+
+If the processor cannot locate the file (perhaps because you mistyped the path), you'll still be able to convert the document.
+However, you will get the following warning message during conversion:
+
+ asciidoctor: WARNING: master.adoc: line 3: include file not found: /.../content.adoc
+
+The following message will also be inserted into the output:
+
+ Unresolved directive in master.adoc - include::content.adoc[]
+
+To fix the problem, edit the file path and run the converter again.
+
+If you store your AsciiDoc files in nested folders at different levels, relative file paths can quickly become awkward and inflexible.
+A common pattern to help here is to define the paths in attributes defined in the header, then prefix all include paths with a reference to one of these attributes:
+
+[listing]
+....
+:includedir: _includes
+:sourcedir: ../src/main/java
+
+\include::{includedir}/fragment1.adoc[]
+
+[source,java]
+----
+\include::{sourcedir}/org/asciidoctor/Asciidoctor.java[]
+----
+....
+
+Keep in mind that no matter how Asciidoctor resolves the path to the file, access to that file is limited by the safe mode setting under which Asciidoctor is run.
+If a path violates the security restrictions, it may be truncated.
+
+[#include-partitioning]
+== Partitioning large documents and using leveloffset
+
+When your document gets large, you can split it up into subsections for easier editing as follows:
+
+----
+= My book
+
+\include::chapter01.adoc[]
+
+\include::chapter02.adoc[]
+
+\include::chapter03.adoc[]
+----
+
+TIP: Note the blank lines before and after the include directives.
+This practice is recommended whenever including AsciiDoc content to avoid unexpected results (e.g., a section title getting interpreted as a line at the end of a previous paragraph).
+
+The leveloffset attribute can help here by pushing all headings in the included document down by the specified number of levels.
+This allows you to publish each chapter as a standalone document (complete with a document title), but still be able to include the chapters into a master document (which has its own document title).
+
+You can easily assemble your book so that the chapter document titles become level 1 headings using:
+
+----
+= My Book
+
+\include::chapter01.adoc[leveloffset=+1]
+
+\include::chapter02.adoc[leveloffset=+1]
+
+\include::chapter03.adoc[leveloffset=+1]
+----
+
+Because the leveloffset is _relative_ (it begins with + or -), this works even if the included document has its own includes and leveloffsets.
+
+If you have lots of chapters to include and want them all to have the same offset, you can save some typing by setting leveloffset around the includes:
+
+----
+= My book
+
+:leveloffset: +1
+
+\include::chapter01.adoc[]
+
+\include::chapter02.adoc[]
+
+\include::chapter03.adoc[]
+
+:leveloffset: -1
+----
+
+The final line returns the leveloffset to 0.
+
+Alternatively, you could use absolute levels:
+
+----
+:leveloffset: 1
+
+//includes
+
+:leveloffset: 0
+----
+
+Relative levels are preferred.
+Absolute levels become awkward when you have nested includes since they aren't context aware.
+
+[#include-nonasciidoc]
+== AsciiDoc vs non-AsciiDoc files
+
+The include directive performs a simple file merge, so it works with any text file.
+// NOTE this point about normalization should probably be moved to an earlier section
+The content of all included content is normalized.
+This means that the encoding is forced to UTF-8 (or converted from UTF-16 to UTF-8 if the file contains a BOM) and trailing whitespace and endlines are removed from each line and replaced with a Unix line feed.
+This normalization is important to how Asciidoctor works.
+
+If the file is recognized as an AsciiDoc file (i.e., it has one of the following extensions: `.asciidoc`, `.adoc`, `.ad`, `.asc`, or `.txt`), Asciidoctor runs the preprocessor on the lines, looking for and interpreting the following directives:
+
+* includes
+* preprocessor conditionals (e.g., `ifdef`)
+//* front matter (if enabled)
+
+This allows includes to be nested, and provides lot of flexibility in constructing radically different documents with a single master document and a few command line attributes.
+
+Including non-AsciiDoc files is normally done to merge output from other programs or populate table data:
+
+[source]
+----
+.2016 Sales Results
+,===
+\include::sales/2016/results.csv[]
+,===
+----
+
+In this case, the include directive does not do any processing of AsciiDoc directives.
+The content is inserted as is (after being normalized).
+
+////
+CAUTION: You *can* put AsciiDoc content in a non-AsciiDoc file.
+Its content will still be processed as AsciiDoc, but any include statements will be ignored, and therefore cause errors later in processing.
+It is likely to cause confusion, so best avoided.
+////
+
+[#include-multiple]
+== Include a File Multiple Times in the Same Document
+// Title and anchor are from user-manual.adoc
+// Section content from multiple-include.adoc
+
+A document can include the same file any number of times.
+The problem comes if there are IDs in the included file; the output document (HTML or DocBook) will then have duplicate IDs which will make it not well-formed.
+To fix this, you can reference a dynamic variable from the main document in the ID.
+
+For example, let's say you want to include the same subsection describing a bike chain in both the operation and maintenance chapters:
+
+[source]
+----
+= Bike Manual
+
+:chapter: operation
+== Operation
+
+\include::fragment-chain.adoc[]
+
+:chapter: maintenance
+== Maintenance
+
+\include::fragment-chain.adoc[]
+----
+
+Write [.path]_fragment-chain.adoc_ as:
+
+----
+[id='chain-{chapter}']
+=== Chain
+
+See xref:chain-{chapter}[].
+----
+
+The first time the [.path]_fragment-chain.adoc_ file is included, the ID of the included section resolves to `chain-operation`.
+The second time the file included, the ID resolves to `chain-maintenance`.
+
+In order for this to work, you must use the long-hand forms of both the ID assignment and the cross-reference.
+The single quotes around the variable name in the assignment are required to force variable substitution (aka interpolation).
