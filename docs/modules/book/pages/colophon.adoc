@@ -1,0 +1,16 @@
+= Colophon
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+Included in:
+- user-manual
+////
+
+Book colophons list information such as the ISBN, publishing house, edition and copyright dates, legal notices and disclaimers, cover art, design, and book layout credits, and any significant production notes.
+In most mass market books, the colophon is on the verso (back side) of the title page, but it can also be located at the end of the book.
+
+[source]
+----
+include::{partialsdir}/multi-special-ex.adoc[tag=colophon]
+----

@@ -1,0 +1,80 @@
+= Index
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+anchor from user manual: user-index
+Included in:
+- user-manual
+////
+
+You can mark index terms explicitly in AsciiDoc content.
+Index terms form a controlled vocabulary that can be used to navigate the document by keyword starting from an index.
+
+== Index Terms
+
+There are two types of index terms in AsciiDoc:
+
+flow index term:: `\indexterm2:[<primary>]` or `\((<primary>))`
++
+An index term that appears in the flow of text (i.e., a visible term) and in the index.
+This type of index term can only be used to define a primary entry.
+
+concealed index term:: `\indexterm:[<primary>, <secondary>, <tertiary>]` or `\(((<primary>, <secondary>, <tertiary>)))`
++
+A group of index terms that appear only in the index.
+This type of index term can be used to define a primary entry as well as optional secondary and tertiary entries.
+
+Here's an example that shows the two forms in use.
+
+[source]
+----
+The Lady of the Lake, her arm clad in the purest shimmering samite,
+held aloft Excalibur from the bosom of the water,
+signifying by divine providence that I, ((Arthur)), // <1>
+was to carry Excalibur (((Sword, Broadsword, Excalibur))). // <2>
+That is why I am your king. Shut up! Will you shut up?!
+Burn her anyway! I'm not a witch.
+Look, my liege! We found them.
+
+indexterm2:[Lancelot] was one of the Knights of the Round Table. // <3>
+indexterm:[knight, Knight of the Round Table, Lancelot] // <4>
+----
+<1> The double parenthesis form adds a primary index term and includes the term in the generated output.
+<2> The triple parenthesis form allows for an optional second and third index term and _does not_ include the terms in the generated output (i.e., concealed index term).
+<3> The inline macro `\indexterm2:[primary]` is equivalent to the double parenthesis form.
+<4> The inline macro `\indexterm:[primary, secondary, tertiary]` is equivalent to the triple parenthesis form.
+
+If you're defining a concealed index term (i.e., the `indexterm` macro), and one of the terms contains a comma, you must surround that segment in double quotes so the comma is treated as content.
+For example:
+
+[source]
+----
+I, King Arthur.
+indexterm:[knight, "Arthur, King"]
+----
+
+or
+
+[source]
+----
+I, King Arthur.
+(((knight, "Arthur, King")))
+----
+
+== Index Catalog
+
+Although index terms are always processed, only Asciidoctor PDF and the DocBook toolchain support creating an index catalog automatically.
+To create an index, define a level-1 section marked with the style `index` at the end of your document.
+
+[source]
+----
+[index]
+== Index
+----
+
+Both Asciidoctor PDF and the DocBook toolchain will automatically populate an index into this seed section.
+
+WARNING: The built-in HTML5 converter in Asciidoctor does not generate an index.
+
+//Follow https://github.com/asciidoctor/asciidoctor/issues/450[issue #450] to track the progress of this feature.
