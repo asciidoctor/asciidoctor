@@ -1,0 +1,61 @@
+= Normalize Block Indentation
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+aka Normalize Block Indentation
+From indent-include.adoc, included in:
+- user manual
+////
+
+Source code snippets from external files are often padded with a leading block indent.
+This leading block indent is relevant in its original context.
+However, once inside the documentation, this leading block indent is no longer needed.
+
+== The indent attribute
+
+The attribute `indent` allows the leading block indent to be stripped and, optionally, a new block indent to be set for blocks with verbatim content (listing, literal, source, verse, etc.).
+
+* When `indent` is 0, the leading block indent is stripped
+* When `indent` is > 0, the leading block indent is first stripped, then the content is indented by the number of columns equal to this value.
+
+If the `tabsize` attribute is set on the block or the document, tabs are also replaced with the number of spaces specified by that attribute, regardless of whether the `indent` attribute is set.
+
+For example, this AsciiDoc source:
+
+[source]
+....
+[source,ruby,indent=0]
+----
+    def names
+      @name.split ' '
+    end
+----
+....
+
+Produces:
+
+....
+def names
+  @name.split ' '
+end
+....
+
+This AsciiDoc source:
+
+....
+[indent=2]
+----
+    def names
+      @name.split ' '
+    end
+----
+....
+
+Produces:
+
+----
+  def names
+    @name.split ' '
+  end
+----

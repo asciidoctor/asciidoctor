@@ -16,6 +16,7 @@ asciidoc:
     url-org: https://github.com/asciidoctor
     url-rubygem: https://rubygems.org/gems/asciidoctor
     url-repo: https://github.com/asciidoctor/asciidoctor
+    url-uri: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
     url-coderay: http://coderay.rubychan.de/
     url-coderay-gem: https://rubygems.org/gems/coderay
     url-highlightjs: https://highlightjs.org/
