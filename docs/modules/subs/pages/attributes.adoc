@@ -1,0 +1,57 @@
+= Attribute Reference Substitutions
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:y: Yes
+//icon:check[role="green"]
+:n: No
+//icon:times[role="red"]
+////
+From subs-attr.adoc, included in:
+- user-manual: Text Substitutions: Attributes
+////
+
+Attribute references are replaced with their values when they're processed by the `attributes` substitution.
+
+.Elements subject to attributes text substitution
+[width="40%", cols="3,^2"]
+|===
+|Element | `attributes` substitution
+
+|Attribute Entry Value |{y}
+
+|Comment |{n}
+
+|Example |{y}
+
+|Fenced |{n}
+
+|Header |{y}
+
+|Literal |{n}
+
+|Listing |{n}
+
+|Macro |{y}
+
+|Open |Varies
+
+|Paragraph |{y}
+
+|Passthrough |{n}
+
+|Quote |{y}
+
+|Sidebar |{y}
+
+|Source |{n}
+
+|Special sections |{y}
+
+|Table |Varies
+
+|Title |{y}
+
+|Verse |{y}
+
+|===

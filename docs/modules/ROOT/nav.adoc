@@ -1,5 +1,6 @@
 * xref:setup:platforms.adoc[Platform Requirements]
 * xref:setup:upgrade-syntax.adoc[Modified & Deprecated Syntax]
+
 * Lists
 ** xref:lists:ordered.adoc[Ordered]
 ** xref:lists:unordered.adoc[Unordered]
@@ -7,6 +8,7 @@
 ** xref:lists:complex.adoc[Complex]
 ** xref:lists:task.adoc[Task]
 ** xref:lists:qanda.adoc[Question & Answer]
+
 * xref:tables:index.adoc[Tables]
 ** xref:tables:rows.adoc[Rows]
 ** xref:tables:columns.adoc[Columns]
@@ -17,6 +19,7 @@
 * xref:excerpts:index.adoc[Quotes, Excerpts, & Verses]
 ** xref:excerpts:quotes.adoc[Quotes & Excerpts]
 ** xref:excerpts:verses.adoc[Verses]
+
 * Source Code & Listings
 ** xref:source:listing-block.adoc[Listing Paragraphs & Blocks]
 ** xref:source:source-block.adoc[Source Code Paragraphs & Blocks]
@@ -27,10 +30,24 @@
 *** xref:source:pygments.adoc[Pygments]
 *** xref:source:highlight-php.adoc[Highlight PHP Code]
 ** xref:source:listing-wrap.adoc[Wrap or Scroll]
+
 * xref:include:include-directive.adoc[Include Directives]
 ** xref:include:lines-and-tags.adoc[Include by Lines or Tags]
 ** xref:include:indent.adoc[Normalize Indentation]
 ** xref:include:uri.adoc[Include by URI]
+
+* xref:subs:substitutions.adoc[Substitutions & Passthroughs]
+** xref:subs:special-characters.adoc[Special Characters]
+** xref:subs:quotes.adoc[Inline Formatting Syntax]
+** xref:subs:attributes.adoc[Attribute References]
+** xref:subs:replacements.adoc[Character Replacements]
+** xref:subs:macros.adoc[Macros]
+** xref:subs:post.adoc[Post Replacements]
+** xref:subs:apply.adoc[Apply Substitutions]
+** xref:subs:prevent.adoc[Prevent Substitutions]
+** xref:subs:pass-macro.adoc[Inline Pass Macros]
+** xref:subs:pass-block.adoc[Passthrough Blocks]
+
 * xref:book:structure.adoc[Books]
 ** xref:book:parts-and-chapters.adoc[Parts & Chapters]
 ** xref:book:colophon.adoc[Colophon]
@@ -42,4 +59,5 @@
 ** xref:book:bibliography.adoc[Bibliography]
 ** xref:book:index.adoc[Index]
 ** xref:book:footnotes.adoc[Footnotes]
+
 * xref:project/version-and-lifecycle-policies.adoc[Version & Lifecycle Policies]

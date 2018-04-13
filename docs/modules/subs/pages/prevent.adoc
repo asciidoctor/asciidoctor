@@ -1,0 +1,27 @@
+= Prevent Substitutions
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From subs-prevent.adoc, included in:
+- user-manual: Text Substitutions: Preventing substitutions
+- writers-guide: preventing subs
+////
+
+Asciidoctor provides several approaches for preventing substitutions.
+
+== Escape with a backslash
+
+// tag::backslash[]
+To prevent punctuation from being interpreted as formatting markup, precede it with a backslash (`\`).
+If the formatting punctuation begins with two characters (e.g., `+__+`), you need to precede it with two backslashes (`+\\+`).
+This is also how you can prevent character and attribute references from substitution.
+When your document is processed, the backslash is removed so it doesn't display in your output.
+
+[source]
+----
+include::{partialsdir}/ex-subs.adoc[tag=slash]
+----
+
+// end::backslash[]
+You can also control and prevent substitutions with the xref:pass-macro.adoc[inline passthrough macros] and the xref:pass-block.adoc[block passthrough].

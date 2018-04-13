@@ -1,0 +1,182 @@
+= Inline Passthroughs
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+user manual anchor: pass-macros
+From pass-macro.adoc, included in:
+- user-manual: Passthroughs Macros
+- writers-guide: preventing subs
+////
+
+Asciidoctor supports several forms of the passthrough macro.
+
+== Inline passthrough macros
+
+single plus:: A special syntax for preventing text from being formatted.
+Only escapes special characters and doesn't support explicit substitutions.
+
+triple plus:: A special syntax for designating passthrough content.
+Does not apply any substitutions and doesn't support explicit substitutions.
+
+pass macro:: An inline macro named `pass` that can be used to passthrough content.
+Supports an optional set of substitutions.
++
+[source]
+----
+pass:[content like #{variable} passed directly to the output] followed by normal content.
+
+content with only select substitutions applied: pass:c,a[__<{email}>__]
+----
+
+TIP: When you need to prevent or control the substitutions on one or more blocks of content, use a xref:pass-block.adoc[delimited passthrough block or the pass block style].
+
+== Triple plus macro
+
+The triple plus passthrough excludes content enclosed in a set of triple pluses (pass:[+++]) from all substitutions.
+
+ +++content passed directly to the output+++ followed by normal content.
+
+The triple plus macro is often used to output custom HTML or XML.
+
+[source]
+----
+include::{partialsdir}/ex-pass.adoc[tag=3p]
+----
+
+====
+include::{partialsdir}/ex-pass.adoc[tag=3p]
+====
+
+[#pass-subs]
+== Inline pass macro and explicit substitutions
+
+To exclude inline content from substitutions and disable escaping of special characters, enclose it in the inline pass macro.
+For example, here's one way to format text as underline when generating HTML from AsciiDoc:
+
+[source]
+----
+include::{partialsdir}/ex-pass.adoc[tag=in-macro]
+----
+
+====
+include::{partialsdir}/ex-pass.adoc[tag=in-macro]
+====
+
+If you want to enable ad-hoc `quotes` substitution, then assign the `macros` value to `subs` and use the inline pass macro.
+
+....
+include::{partialsdir}/ex-pass.adoc[tag=sub-in]
+....
+<1> `macros` is assigned to `subs`, which allows any macros within the block to be processed.
+<2> The pass macro is assigned the `quotes` value. Text within the square brackets will be formatted.
+
+The inline pass macro does introduce additional markup into the source code that could make it invalid in raw form.
+However, the output it produces will be valid when viewed in a viewer (HTML, PDF, etc.).
+
+====
+include::{partialsdir}/ex-pass.adoc[tag=sub-out]
+====
+
+The inline pass macro also accepts shorthand values for specifying substitutions.
+
+* `c` = special characters
+* `q` = quotes
+* `a` = attributes
+* `r` = replacements
+* `m` = macros
+* `p` = post replacements
+
+For example, the quotes text substitution value is assigned in the inline passthrough macro below:
+
+[source]
+----
+include::{partialsdir}/ex-pass.adoc[tag=s-macro]
+----
+
+====
+include::{partialsdir}/ex-pass.adoc[tag=s-macro]
+====
+
+WARNING: Using passthroughs to pass content (without substitutions) can couple your content to a specific output format, such as HTML.
+In these cases, you should use conditional preprocessor directives to route passthrough content for different output formats based on the current backend.
+
+== Nesting blocks and passthroughs
+// directly from user manual, took out mentions to backticks and double dollar signs and added single-plus
+
+When you're using passthroughs inside literal and listing blocks, it can be easy to forget that the single plus and triple plus passthroughs are macros substitutions (not quotes).
+If you want to enable the passthroughs, make sure to assign the `macros` value to the `subs` attribute.
+
+[source]
+....
+[source,java,subs="+quotes,+macros"]
+----
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .authorizeRequests()
+            **.antMatchers("/resources/+++**+++").permitAll()**
+            .anyRequest().authenticated()
+            .and()
+        .formLogin()
+            .loginPage("/login")
+            .permitAll();
+----
+....
+
+
+[source,java,subs="+quotes,+macros"]
+----
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .authorizeRequests()
+            **.antMatchers("/resources/+++**+++").permitAll()**
+            .anyRequest().authenticated()
+            .and()
+        .formLogin()
+            .loginPage("/login")
+            .permitAll();
+----
+
+////
+This content needs to be sorted and added to the deprecation and migration docs as needed.
+
+CAUTION: Asciidoctor does not implement the block pass macro.
+Instead, you should use a xref:pass-block.adoc[pass block].
+
+double dollar (deprecated):: A deprecated special syntax for designating passthrough content.
+Like the triple plus, does not apply any substitutions and doesn't support explicit substitutions.
+
+.Double-dollar passthrough
+
+The double-dollar passthrough behaves like the triple-plus passthrough, but it allows <<user-manual#special-characters,special characters>> in its content to be replaced.
+Passthrough content is enclosed by double dollar signs (+$$+).
+
+ $$Content passed directly to the output$$ followed by normal content.
+
+[source]
+----
+include::ex-pass.adoc[tag=dollar]
+----
+
+====
+include::ex-pass.adoc[tag=dollar]
+====
+
+[#back-pass]
+.Backtick passthrough
+
+Content enclosed in a backtick passthrough is subject to <<user-manual#special-characters,special characters>> substition and displayed as monospace text.
+
+ `Content in a line that is passed directly to the output` followed by normal content.
+
+Backticks (+`+) are commonly used around inline code containing markup.
+
+[source]
+----
+include::ex-pass.adoc[tag=tick]
+----
+
+====
+include::ex-pass.adoc[tag=tick]
+====
+////

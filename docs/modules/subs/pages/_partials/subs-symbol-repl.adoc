@@ -1,0 +1,75 @@
+////
+Included in:
+
+- user-manual: Text Substitutions: Replacements
+- quick-ref
+- writers-guide: replacements
+////
+
+[cols="2,^1l,^1l,^1,2"]
+.Textual symbol replacements
+|===
+|Name |Syntax |Unicode Replacement |Rendered |Notes
+
+|Copyright
+|(C)
+|&#169;
+|(C)
+|
+
+|Registered
+|(R)
+|&#174;
+|(R)
+|
+
+|Trademark
+|(TM)
+|&#8482;
+|(TM)
+|
+
+|Em dash
+|--
+|&#8212;
+|{empty}--{empty}
+|Only replaced if between two word characters, between a word character and a line boundary, or flanked by spaces.
+
+When flanked by space characters (e.g., `+a -- b+`), the normal spaces are replaced by thin spaces (\&#8201;).
+
+|ellipses
+|...
+|&#8230;
+|...
+|
+
+|right single arrow
+|->
+|&#8594;
+|->
+|
+
+|right double arrow
+|=>
+|&#8658;
+|=>
+|
+
+|left single arrow
+|<-
+|&#8592;
+|<-
+|
+
+|left double arrow
+|<=
+|&#8656;
+|<=
+|
+
+|apostrophe
+|Sam's
+|Sam&#8217;s
+|Sam's
+|The vertical form apostrophe is replaced with the curved form apostrophe.
+|===

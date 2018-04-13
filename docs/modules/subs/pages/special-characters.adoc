@@ -1,0 +1,26 @@
+= Special Character Substitutions
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From subs-specchar.adoc, included in:
+- user-manual: Text Substitutions: Special characters
+////
+
+When applicable, the first text substitution to occur is the replacement of any special characters.
+This process is handled by the `specialchars` element.
+The specialchars element searches for three characters (`<`, `>`, `&`) and replaces them with their #character entity references#.
+// <<char-ref-sidebar,character entity references>>.
+
+* The less than symbol, `<`, is replaced with the `\&lt;` character entity reference.
+* The greater than symbol, `>`, is replaced with the `\&gt;` character entity reference.
+* An ampersand, `&`, is replaced with the `\&amp;` character entity reference.
+
+By default, the special characters substitution occurs on all inline and block elements except for comments and certain passthroughs.
+The substitution of special characters can be controlled on blocks using the xref:apply.adoc[subs attribute] and on inline elements using the xref:pass-macro.adoc#pass-subs[passthrough macro].
+
+[NOTE]
+====
+Special character substitution precedes attribute substitution, so you will need to manually escape any attributes containing special characters that you set in the CLI or API.
+For example, on the command line, type `-a toc-title="Sections, Tables \&amp; Figures"` instead of `-a toc-title="Sections, Tables & Figures"`.
+====
