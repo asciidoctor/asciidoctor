@@ -682,7 +682,7 @@ module Substitutors
       }
     end
 
-    if ((result.include? '((') && (result.include? '))')) || (found_macroish_short && (result.include? 'indexterm'))
+    if ((result.include? '((') && (result.include? '))')) || (found_macroish_short && (result.include? 'dexterm'))
       # (((Tigers,Big cats)))
       # indexterm:[Tigers,Big cats]
       # ((Tigers))
@@ -927,7 +927,7 @@ module Substitutors
       }
     end
 
-    if found_macroish_short && (result.include? 'footnote')
+    if found_macroish && (result.include? 'tnote')
       result = result.gsub(InlineFootnoteMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -935,36 +935,34 @@ module Substitutors
         if m[0].start_with? RS
           next m[0][1..-1]
         end
-        if m[1] == 'footnote'
-          id = nil
-          # REVIEW it's a dirty job, but somebody's gotta do it
-          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string m[2], true)), false)
-          index = @document.counter('footnote-number')
-          @document.register(:footnotes, Document::Footnote.new(index, id, text))
-          type = nil
-          target = nil
+        if m[1] # footnoteref (legacy)
+          id, text = (m[3] || '').split(',', 2)
         else
-          id, text = m[2].split(',', 2)
-          id = id.strip
+          id, text = m[2], m[3]
+        end
+        if id
           if text
             # REVIEW it's a dirty job, but somebody's gotta do it
             text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), false)
             index = @document.counter('footnote-number')
             @document.register(:footnotes, Document::Footnote.new(index, id, text))
-            type = :ref
-            target = nil
+            type, target = :ref, nil
           else
-            if (footnote = @document.footnotes.find {|fn| fn.id == id })
-              index = footnote.index
-              text = footnote.text
+            if (footnote = @document.footnotes.find {|candidate| candidate.id == id })
+              index, text = footnote.index, footnote.text
             else
-              index = nil
-              text = id
+              index, text = nil, id
             end
-            target = id
-            id = nil
-            type = :xref
+            type, target, id = :xref, id, nil
           end
+        elsif text
+          # REVIEW it's a dirty job, but somebody's gotta do it
+          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), false)
+          index = @document.counter('footnote-number')
+          @document.register(:footnotes, Document::Footnote.new(index, id, text))
+          type = target = nil
+        else
+          next m[0]
         end
         Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).convert
       }

@@ -871,11 +871,13 @@ module Asciidoctor
     # Matches an inline footnote macro, which is allowed to span multiple lines.
     #
     # Examples
-    #   footnote:[text]
-    #   footnoteref:[id,text]
-    #   footnoteref:[id]
+    #   footnote:[text] (not referenceable)
+    #   footnote:id[text] (referenceable)
+    #   footnote:id[] (reference)
+    #   footnoteref:[id,text] (legacy)
+    #   footnoteref:[id] (legacy)
     #
-    InlineFootnoteMacroRx = /\\?(footnote(?:ref)?):\[(#{CC_ALL}*?[^\\])\]/m
+    InlineFootnoteMacroRx = /\\?footnote(?:(ref):|:([\w\-]+)?)\[(?:|(#{CC_ALL}*?[^\\]))\]/m
 
     # Matches an image or icon inline macro.
     #
