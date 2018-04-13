@@ -1,0 +1,53 @@
+= Passthrough Blocks
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+user-manual anchor: pass-blocks
+From pass-block, included in:
+- user-manual: Macro and Block Passthroughs: Block passthroughs
+////
+
+The `pass` style and delimited passthrough block exclude the block's content from all substitutions unless the `subs` attribute is set.
+
+== Pass style syntax
+
+The `pass` style can also be set on a paragraph or an open block.
+
+[source]
+----
+include::{partialsdir}/ex-pass.adoc[tag=pass-style]
+----
+
+== Delimited passthrough block syntax
+
+A passthrough block is delimited by four plus signs (`pass:[++++]`).
+
+[source]
+----
+include::{partialsdir}/ex-pass.adoc[tag=bl]
+----
+
+(Keep in mind that AsciiDoc has a video macro, so this example is merely for demonstration.
+However, a passthrough could come in handy if you need to output more sophisticated markup than what the built-in HTML converter produces).
+
+== Control substitutions on a passthrough block
+
+You can use the `subs` attribute to specify a comma-separated list of substitutions.
+These substitutions will be applied to the content prior to it being reintroduced to the output document.
+
+[source]
+----
+include::{partialsdir}/ex-pass.adoc[tag=subs-bl]
+----
+
+The content of the pass block does not get wrapped in a paragraph.
+Therefore, you can use the `pass` style in combination with the `normal` substitution category to output content without generating a paragraph.
+
+[source]
+----
+include::{partialsdir}/ex-pass.adoc[tag=no-para]
+----
+
+WARNING: Using passthroughs to pass content (without substitutions) can couple your content to a specific output format, such as HTML.
+In these cases, you should use conditional preprocessor directives to route passthrough content for different output formats based on the current backend.

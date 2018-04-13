@@ -1,0 +1,57 @@
+= Post Replacement Substitutions
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:y: Yes
+//icon:check[role="green"]
+:n: No
+//icon:times[role="red"]
+////
+From subs-post.adoc, included in:
+- user-manual: Text Substitutions: Post Replacements
+////
+
+The line break character, `{plus}`, is replaced when the `post_replacements` process runs.
+
+.Elements subject to post replacements text substitution
+[width="40%", cols="3,^2"]
+|===
+|Element | `post_replacements` substitution
+
+|Attribute Entry Value |{n}
+
+|Comment |{n}
+
+|Example |{y}
+
+|Fenced |{n}
+
+|Header |{n}
+
+|Literal |{n}
+
+|Listing |{n}
+
+|Macro |{y}
+
+|Open |Varies
+
+|Paragraph |{y}
+
+|Passthrough |{n}
+
+|Quote |{y}
+
+|Sidebar |{y}
+
+|Source |{n}
+
+|Special sections |{y}
+
+|Table |Varies
+
+|Title |{y}
+
+|Verse |{y}
+
+|===

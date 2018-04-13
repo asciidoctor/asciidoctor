@@ -1,0 +1,59 @@
+= Inline Macro Substitutions
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:y: Yes
+//icon:check[role="green"]
+:n: No
+//icon:times[role="red"]
+////
+user manual anchor: subs-mac
+From subs-macro.adoc, included in:
+- user-manual: Text Substitutions: Macros
+////
+
+Macros are processed by the `macros` element.
+The macros substitution replaces a macro's content with the appropriate built-in and user-defined configuration.
+
+.Elements subject to macros substitution
+[width="40%", cols="3,^2"]
+|===
+|Element | `macros` substitution
+
+|Attribute Entry Value |inline pass macro only
+
+|Comment |{n}
+
+|Example |{y}
+
+|Fenced |{n}
+
+|Header |{n}
+
+|Literal |{n}
+
+|Listing |{n}
+
+|Macro |{y}
+
+|Open |Varies
+
+|Paragraph |{y}
+
+|Passthrough |{y}
+
+|Quote |{y}
+
+|Sidebar |{y}
+
+|Source |{n}
+
+|Special sections |{y}
+
+|Table |Varies
+
+|Title |{y}
+
+|Verse |{y}
+
+|===

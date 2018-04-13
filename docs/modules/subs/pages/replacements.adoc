@@ -1,0 +1,108 @@
+= Character Substitutions
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:y: Yes
+//icon:check[role="green"]
+:n: No
+//icon:times[role="red"]
+////
+From subs-repl.adoc, included in:
+- user-manual: Text Substitutions: Replacements
+uri-xml was changed to url-html-ref and added to site.yml
+uri-unicode was changed to url-unicode and added to site.yml
+////
+
+The replacements substitution processes textual characters such as marks, arrows and dashes and replaces them with the decimal format of their Unicode code point, i.e., their <<char-ref-sidebar,numeric character reference>>.
+
+// Table of Textual symbol replacements is inserted below
+include::{partialsdir}/subs-symbol-repl.adoc[]
+
+WARNING: The `replacements` element depends on the substitutions completed by the `specialcharacters` element.
+This is important to keep in mind when applying custom substitutions to a block.
+See xref:apply.adoc[applying substitutions] for more information.
+
+The replacements substitution also recognizes {url-html-ref}[HTML and XML character entity references] as well as {url-unicode}[decimal and hexadecimal Unicode code points] and substitutes them for their corresponding decimal form Unicode code point.
+
+For example, to produce the `&sect;` symbol you could write `\&sect;`, `\&#x00A7;`, or `\&#167;`.
+When the document is processed, `replacements` will replace the section symbol reference, regardless of whether it is a character entity reference or a numeric character reference, with `\&#167;`.
+In turn, `\&#167;` will display as `&sect;`.
+
+[#char-ref-sidebar]
+.Anatomy of a character entity reference and a numeric character reference
+****
+A character reference is a standard sequence of characters that is substituted for a single character when Asciidoctor processes a document.
+There are two types of character references: character entity references and numeric character references.
+
+A character entity reference is the name of an entity which refers to a character.
+The name must be prefixed with an ampersand (`&`) and end with a semicolon (`;`).
+
+For example:
+
+* `\&dagger;` displays as &dagger;
+* `\&euro;` displays as &euro;
+* `\&loz;` displays as &loz;
+
+Numeric character references are the decimal or hexadecimal Universal Character Set/Unicode code points which refer to a character.
+
+* The decimal code point references are prefixed with an ampersand (`&`), followed by a hash (`&#35;`), and end with a semicolon (`;`).
+* Hexadecimal code point references are prefixed with an ampersand (`&`), followed by a hash (`&#35;`), followed by a lowercase `x`, and end with a semicolon (`;`).
+
+For example:
+
+* `\&#x2020;` or `\&#8224;` displays as &#8224;
+* `\&#x20AC;` or `\&#8364;` displays as &#8364;
+* `\&#x25CA;` or `\&#9674;` displays as &#x25CA;
+
+Developers may be more familiar with using *Unicode escape sequences* to perform text substitutions.
+For example, to produce an `&#64;` sign using a Unicode escape sequence, you would prefix the hexadecimal Unicode code point with a backslash (`\`) and an uppercase or lowercase `u`, i.e. `u0040`.
+However, Asciidoctor doesn't process and replace Unicode escape sequences at this time.
+****
+
+TIP: Asciidoctor also provides numerous built-in attributes for representing characters and symbols.
+These attributes and their corresponding output are listed in #charref-attributes-table#.
+
+The replacements substitution occurs within title, paragraph, example, quote, sidebar, and verse blocks.
+
+.Elements subject to replacements text substitution
+[width="40%", cols="3,^2"]
+|===
+|Element | `replacements` substitution
+
+|Attribute Entry Value |{n}
+
+|Comment |{n}
+
+|Example |{y}
+
+|Fenced |{n}
+
+|Header |{n}
+
+|Literal |{n}
+
+|Listing |{n}
+
+|Macro |{y}
+
+|Open |Varies
+
+|Paragraph |{y}
+
+|Passthrough |{n}
+
+|Quote |{y}
+
+|Sidebar |{y}
+
+|Source |{n}
+
+|Special sections |{y}
+
+|Table |Varies
+
+|Title |{y}
+
+|Verse |{y}
+
+|===

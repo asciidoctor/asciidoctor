@@ -1,0 +1,78 @@
+////
+Included in:
+
+- user-manual: Text Substitutions: Preventing substitutions
+- quick-ref
+////
+
+// tag::slash[]
+\*Stars* will appear as *Stars*, not as bold text.
+
+\&sect; will appear as an entity, not the &sect; symbol.
+
+\\__func__ will appear as __func__, not as emphasized text.
+
+\{two-semicolons} will appear {two-semicolons}, not resolved as ;;.
+// end::slash[]
+
+// tag::b-slash[]
+\*Stars* is not rendered as bold text.
+The asterisks around the word are preserved.
+
+\{author} is not resolved to the author name.
+The curly brackets around the word are preserved.
+
+`A\--Z` connects A to Z in monospace using two dashes.
+The dashes are not replaced by an em dash.
+
+In these cases, the backslash character is automatically removed.
+// end::b-slash[]
+
+// tag::subs-in[]
+[source,java,subs="verbatim,quotes"] <1>
+----
+System.out.println("Hello *bold* text"). <2>
+----
+// end::subs-in[]
+
+// tag::subs-out[]
+[source,java,subs="verbatim,quotes"]
+----
+System.out.println("Hello *bold* text"). <1> <2>
+----
+// end::subs-out[]
+
+// tag::subs-add[]
+[source,xml,subs="attributes+"]
+----
+<version>{version}</version>
+----
+// end::subs-add[]
+
+// tag::subs-sub[]
+[source,xml,subs="-callouts"]
+.An illegal XML tag
+----
+<1>foo</1>
+----
+// end::subs-sub[]
+
+// tag::subs-multi[]
+[source,xml,subs="attributes+,+replacements,-callouts"]
+----
+<version>{version}</version>
+<copyright>(C) ACME</copyright>
+<1>
+content in 1 element
+</1>
+----
+// end::subs-multi[]
+
+// tag::subs-attr[]
+:markup-in-source: verbatim,quotes
+
+[source,java,subs="{markup-in-source}"]
+----
+System.out.println("Hello *bold* text").
+----
+// end::subs-attr[]

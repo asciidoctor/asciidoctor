@@ -1,0 +1,85 @@
+= Substitutions and Passthroughs
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:y: Yes
+//icon:check[role="green"]
+:n: No
+//icon:times[role="red"]
+////
+user manual anchor: subs
+From subs.adoc, included in:
+- user-manual: Text Substitutions
+
+This page needs to become a more user friendly overview of what substitutions can do, how to leverage them and how to escape them and/or prevent them with a pass through.
+
+The groups and individual substitution categories (and tables) needs to be reorganized into a more cohesive body (and then squashed into a single reference page maybe?).
+The apply, prevent, and control pages need to be organized into a logical flow with clear statements of ... I have this problem: I need to get this attribute reference in this block to be replaced by not have the other <whatever> replaced, what do I use?
+All the groups and subs need to be hooked up to clear use cases.
+The single plus macro has no explanation (at least not in this module).
+The deprecate syntax needs to be moved to the deprecated table and/or migration docs.
+////
+
+== Substitutions
+
+Text substitution elements replace characters, markup, attribute references, and macros with converter specific styles and values.
+When Asciidoctor processes a document it uses a set of six text substitution elements.
+The processor runs the text substitution elements in the following order.
+
+. xref:special-characters.adoc[Special characters]
+. xref:quotes.adoc[Inline formatting syntax (i.e., `quotes`)]
+. xref:attributes.adoc[Attribute references]
+. xref:replacements.adoc[Character replacements]
+. xref:macros.adoc[Inline macros]
+. xref:post.adoc[Post replacements]
+
+In turn, these substitutions are organized into composite value groups.
+The table below shows which substitution elements are included in each group.
+
+include::{partialsdir}/subs-group-table.adoc[]
+
+By default, the `normal` substitution group is applied to most block and inline elements.
+However, there are a few exceptions.
+
+The `header` substitution group is applied to metadata lines (author and revision information) in the document header.
+This group is also applied to the values of attribute entries, regardless of whether those entries are defined in the header or elsewhere in the document.
+In the header, only special characters and attribute references are replaced.
+In attribute entries, you can also use the xref:pass-macro.adoc[inline pass macro].
+
+Fenced, literal, listing, and source blocks are processed with the `verbatim` substitution group.
+Only special characters are replaced in these blocks.
+
+The `pass` substitution group can only be applied to passthrough elements.
+Attribute references and macros are replaced in passthroughs.
+
+The `none` substitution group is applied to comment blocks.
+
+.The title substitution group
+****
+The `title` substitution group includes the same text substitutions as the normal group.
+However, the order that the substitutions are executed is slightly different.
+Text substitutions are applied to titles in the following sequence:
+
+. Special characters
+. Quotes
+. Replacements
+. Inline macros
+. Attribute references
+. Post replacements
+****
+
+== Passthroughs and Escapes
+// This paragraph is all new
+Asciidoctor provides several approaches for preventing substitutions depending on the situation.
+When you want to prevent punctuation from being interpreted as formatting markup, [.term]_escaping_ the punctuation with a backslash may be sufficient.
+For more comprehensive escape and substitution control, you can use a passthrough.
+
+////
+From pass-intro.adoc, included in:
+- user-manual: Macro and Block Passthroughs
+////
+The passthrough is the primary mechanism by which to escape content in AsciiDoc.
+As the name implies, a passthrough passes content directly through to the output document.
+In some forms, it's possible to apply a custom set of substitutions before the content is reintroduced.
+Otherwise, the content is excluded from all substitutions.
+AsciiDoc provides a number of xref:pass-macro.adoc[inline passthrough mechanisms] and a xref:pass-block.adoc[passthrough block].
