@@ -1,0 +1,44 @@
+= Bibliography
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+from file biblio.adoc
+anchor from user manual: user-biblio
+Included in:
+- user-manual: Bibliography
+////
+
+AsciiDoc has basic support for bibliographies.
+While the structure of the bibliography entry is entirely freeform, AsciiDoc provides a way to reference the entries from the text and outputs the bibliography with proper semantics for processing by other toolchains (such as DocBook).
+
+AsciiDoc allows you to assign an anchor to a bibliography entry by prefixing the entry with a label enclosed in triple square brackets (e.g., `+[[[label]]]+`).
+With this anchor, you can reference the entry from anywhere in the text using a normal cross reference macro (e.g., `+<<label>>+`).
+
+By default, the reference to bibliography entry is converted to [<label>], where <label> is the ID of the entry.
+If you specify xreftext on the bibliography anchor (e.g., `+[[[label,xreftext]]]+`), the reference to the bibliography entry converts to [<xreftext>] instead.
+
+The bibliography entries themselves are declared as items in an unordered list.
+You promote a normal unordered list to a bibliography list by adding the `bibliography` style.
+However, to be conforming, bibliography lists must be contained inside a bibliography section.
+A bibliography section is a section with the special `bibliography` style.
+By adding the `bibliography` style to the section, you implicitly add it to each unordered list in that section.
+
+WARNING: If the bibliography style is used on an unordered list outside of a bibliography section, the resulting behavior is undefined.
+
+Let's consider an example.
+
+.Bibliography with inbound references
+[source]
+----
+include::{partialsdir}/ex-biblio.adoc[tag=base]
+----
+
+This renders as:
+
+|===
+a|
+include::{partialsdir}/ex-biblio.adoc[tag=base]
+|===
+
+If you want more advanced features such as automatic numbering and custom citation styles, try the {url-org}/asciidoctor-bibtex[asciidoctor-bibtex] project.

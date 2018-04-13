@@ -1,0 +1,16 @@
+= Dedication
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+anchor from user manual: user-dedication
+Included in:
+- user-manual
+////
+
+The dedication page is where the author expresses gratitude toward a person.
+
+[source]
+----
+include::{partialsdir}/multi-special-ex.adoc[tag=dedicate]
+----

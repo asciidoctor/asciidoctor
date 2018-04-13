@@ -1,0 +1,80 @@
+= Abstract
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+anchor from user manual: user-abstract
+Included in:
+- user-manual
+////
+
+An abstract is a concise overview of an article or of a chapter in a book.
+They are frequently found in the frontmatter of academic, research, and analytical papers.
+//Abstracts with subheadings are structured abstracts, whereas abstracts without subheadings are unstructured.
+//^ Not relevant for AsciiDoc
+A complete (i.e., informative) abstract states the key topics and findings while a limited (i.e., descriptive) abstract briefly describes the structure of the content.
+
+The abstract may be written using a section, open block, or paragraph and must bear the abstract style.
+If used, the abstract must appear before the first section of an article (at the start of the <<Preamble,preamble>>) or at the start of a chapter in a book.
+An abstract may not be used _before_ a part or chapter in a book.
+
+Here's an example of an abstract at the beginning of an article, defined using a section:
+
+[source]
+----
+= Article Title
+
+[abstract]
+== Abstract
+
+Documentation is a distillation of many long, squiggly adventures.
+
+== First Section
+----
+
+Here's an example of the same abstract defined using a paragraph:
+
+[source]
+----
+= Article Title
+
+[abstract]
+.Abstract
+Documentation is a distillation of many long, squiggly adventures.
+
+== First Section
+----
+
+In the book doctype, the abstract section must be a level below the chapter.
+
+[source]
+----
+== Chapter Title
+
+[abstract]
+=== Chapter Abstract
+
+Documentation is a distillation of many long, squiggly adventures.
+
+=== First Section
+----
+
+An abstract defined using an open block or paragraph does not require a title and does not depend on a subsequent section to terminate.
+
+[source]
+----
+= Article Title
+
+[abstract]
+.Optional Abstract Title
+--
+This article will take you on a wonderful adventure of knowledge.
+
+You'll start with the basics.
+Beyond that, where you go is up to you.
+--
+
+Your journey begins here.
+----
+
+TIP: To include a quote at the beginning of a chapter in a book, wrap the quote block inside an abstract block.
