@@ -1925,6 +1925,19 @@ The corresponding definition.
       assert_xpath '//glossary/title[text()="Glossary A"]', output, 1
       assert_xpath '//glossary/glossentry', output, 2
     end
+
+    test 'should drop title on special section in DocBook output if untitled option is set' do
+      input = <<-EOS
+[dedication%untitled]
+== Dedication
+
+content
+      EOS
+
+      output = render_embedded_string input, :backend => :docbook
+      assert_xpath '/dedication', output, 1
+      assert_xpath '/dedication/title', output, 0
+    end
   end
 
   context "heading patterns in blocks" do

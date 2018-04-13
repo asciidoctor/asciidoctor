@@ -16,6 +16,10 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 // tag::compact[]
 == 1.5.6.1 (2017-07-23) - @mojavelinux
 
+Enhancements::
+
+  * Don't include title of special section in DocBook output if untitled option is set (e.g., dedication%untitled)
+
 Bug fixes::
 
   * continue to read blocks inside a delimited block after content is skipped (PR #2318)
