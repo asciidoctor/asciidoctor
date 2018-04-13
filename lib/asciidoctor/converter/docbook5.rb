@@ -352,7 +352,7 @@ module Asciidoctor
     end
 
     def quote node
-      blockquote_tag(node) { resolve_content node }
+      blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { resolve_content node }
     end
 
     def thematic_break node
@@ -470,7 +470,7 @@ module Asciidoctor
     end
 
     def verse node
-      blockquote_tag(node) { %(<literallayout>#{node.content}</literallayout>) }
+      blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { %(<literallayout>#{node.content}</literallayout>) }
     end
 
     alias video skip
@@ -768,9 +768,13 @@ module Asciidoctor
       end
     end
 
-    def blockquote_tag node
-      result = []
-      result << %(<blockquote#{common_attributes node.id, node.role, node.reftext}>)
+    def blockquote_tag node, tag_name = nil
+      if tag_name
+        start_tag, end_tag = %(<#{tag_name}), %(</#{tag_name}>)
+      else
+        start_tag, end_tag = '<blockquote', '</blockquote>'
+      end
+      result = [%(#{start_tag}#{common_attributes node.id, node.role, node.reftext}>)]
       result << %(<title>#{node.title}</title>) if node.title?
       if (node.attr? 'attribution') || (node.attr? 'citetitle')
         result << '<attribution>'
@@ -779,7 +783,7 @@ module Asciidoctor
         result << '</attribution>'
       end
       result << yield
-      result << '</blockquote>'
+      result << end_tag
       result * LF
     end
   end

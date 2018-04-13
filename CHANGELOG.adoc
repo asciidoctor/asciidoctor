@@ -38,6 +38,7 @@ Enhancements::
   * parse credit line of shorthand quote block as block attributes; apply normal subs to credit line in shorthand quote blocks (#1667, PR #2452)
   * preserve directories if source dir and destination dir are set (#1394, PR #2421)
   * allow linkcss to be disabled from API when safe mode is secure
+  * convert quote to epigraph element in DocBook output if block has epigraph role (#1195, PR #2664) (*@bk2204*)
 
 Bug fixes::
 
