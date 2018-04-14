@@ -19,8 +19,9 @@ Enhancements::
 
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
   * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI
-  * interpret false attribute value defined using API as a soft unset
   * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font)
+  * interpret false attribute value defined using API as a soft unset
+  * allow footnote macro to define or reference footnote reference (footnoteref macro now considered deprecated)
   * allow manpage path for manpage help topic to be specified using ASCIIDOCTOR_MANPAGE_PATH environment variable
   * if manpage cannot be found in default path inside gem, use `man -w asciidoctor` to resolve installed path
   * uncompress contents of manpage for manpage help topic if path ends with .gz
@@ -80,6 +81,7 @@ Improvements / Refactoring::
   * allow start path passed to PathResolver#system_path to be outside jail if target brings resolved path back inside jail
   * don't run File.expand_path on Dir.pwd (assume Dir.pwd is absolute)
   * posixify working_dir passed to PathResolver constructor if absolute
+  * optimize detection for footnote* and indexterm* macros
   * coerce value of template_dirs option to an Array (PR #2621)
   * allow paragraph to masquerade as open block (PR #2412)
   * move callouts into document catalog (PR #2394)
