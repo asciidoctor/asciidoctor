@@ -31,6 +31,24 @@ context 'Options' do
     assert_includes output, '.TH "ASCIIDOCTOR"'
   end
 
+  test 'should print message and return error code 1 when manpage is not found' do
+    old_manpage_path = ENV['ASCIIDOCTOR_MANPAGE_PATH']
+    begin
+      ENV['ASCIIDOCTOR_MANPAGE_PATH'] = (manpage_path = fixture_path 'no-such-file.1')
+      redirect_streams do |out, stderr|
+        exitval = Asciidoctor::Cli::Options.parse!(%w(-h manpage))
+        assert_equal 1, exitval
+        assert_equal %(asciidoctor: FAILED: manual page not found: #{manpage_path}), stderr.string.chomp
+      end
+    ensure
+      if old_manpage_path
+        ENV['ASCIIDOCTOR_MANPAGE_PATH'] = old_manpage_path
+      else
+        ENV.delete 'ASCIIDOCTOR_MANPAGE_PATH'
+      end
+    end
+  end
+
   test 'should return error code 1 when invalid option present' do
     redirect_streams do |stdout, stderr|
       exitval = Asciidoctor::Cli::Options.parse!(%w(--foobar))

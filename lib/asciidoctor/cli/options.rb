@@ -136,11 +136,32 @@ Example: asciidoctor -b html5 source.asciidoc
               'show the command usage if TOPIC is not specified (or not recognized)',
               'dump the Asciidoctor man page (in troff/groff format) if TOPIC is manpage') do |topic|
             if topic == 'manpage'
-              if ::File.exist?(manpage_path = (::File.join ::Asciidoctor::ROOT_PATH, 'man', 'asciidoctor.1'))
-                $stdout.puts(::IO.read manpage_path)
+              if (manpage_path = ENV['ASCIIDOCTOR_MANPAGE_PATH'])
+                if ::File.exist? manpage_path
+                  if manpage_path.end_with? '.gz'
+                    require 'zlib' unless defined? ::Zlib
+                    $stdout.puts ::Zlib::GzipReader.open(manpage_path) {|gz| gz.read }
+                  else
+                    $stdout.puts ::IO.read manpage_path
+                  end
+                else
+                  $stderr.puts %(asciidoctor: FAILED: manual page not found: #{manpage_path})
+                  return 1
+                end
+              elsif ::File.exist?(manpage_path = (::File.join ::Asciidoctor::ROOT_PATH, 'man', 'asciidoctor.1'))
+                $stdout.puts ::IO.read manpage_path
               else
-                $stderr.puts 'asciidoctor: FAILED: man page not found; try `man asciidoctor`'
-                return 1
+                require 'open3' unless defined? ::Open3
+                manpage_path = ::Open3.popen3('man -w asciidoctor') {|_, out| out.read }.chop rescue ''
+                if manpage_path.empty?
+                  $stderr.puts 'asciidoctor: FAILED: manual page not found; try `man asciidoctor`'
+                  return 1
+                elsif manpage_path.end_with? '.gz'
+                  require 'zlib' unless defined? ::Zlib
+                  $stdout.puts ::Zlib::GzipReader.open(manpage_path) {|gz| gz.read }
+                else
+                  $stdout.puts ::IO.read manpage_path
+                end
               end
             else
               $stdout.puts opts
