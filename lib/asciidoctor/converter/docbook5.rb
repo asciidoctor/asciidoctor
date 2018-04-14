@@ -31,7 +31,7 @@ module Asciidoctor
       end
       lang_attribute = (node.attr? 'nolang') ? '' : %( #{lang_attribute_name}="#{node.attr 'lang', 'en'}")
       result << %(<#{root_tag_name}#{document_ns_attributes node}#{lang_attribute}>)
-      result << (document_info_element node, root_tag_name) unless node.noheader
+      result << (document_info_tag node, root_tag_name) unless node.noheader
       result << node.content if node.blocks?
       unless (footer_docinfo = node.docinfo :footer).empty?
         result << footer_docinfo
@@ -352,22 +352,7 @@ module Asciidoctor
     end
 
     def quote node
-      result = []
-      result << %(<blockquote#{common_attributes node.id, node.role, node.reftext}>)
-      result << %(<title>#{node.title}</title>) if node.title?
-      if (node.attr? 'attribution') || (node.attr? 'citetitle')
-        result << '<attribution>'
-        if node.attr? 'attribution'
-          result << (node.attr 'attribution')
-        end
-        if node.attr? 'citetitle'
-          result << %(<citetitle>#{node.attr 'citetitle'}</citetitle>)
-        end
-        result << '</attribution>'
-      end
-      result << (resolve_content node)
-      result << '</blockquote>'
-      result * LF
+      blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { resolve_content node }
     end
 
     def thematic_break node
@@ -485,22 +470,7 @@ module Asciidoctor
     end
 
     def verse node
-      result = []
-      result << %(<blockquote#{common_attributes node.id, node.role, node.reftext}>)
-      result << %(<title>#{node.title}</title>) if node.title?
-      if (node.attr? 'attribution') || (node.attr? 'citetitle')
-        result << '<attribution>'
-        if node.attr? 'attribution'
-          result << (node.attr 'attribution')
-        end
-        if node.attr? 'citetitle'
-          result << %(<citetitle>#{node.attr 'citetitle'}</citetitle>)
-        end
-        result << '</attribution>'
-      end
-      result << %(<literallayout>#{node.content}</literallayout>)
-      result << '</blockquote>'
-      result * LF
+      blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { %(<literallayout>#{node.content}</literallayout>) }
     end
 
     alias video skip
@@ -643,7 +613,24 @@ module Asciidoctor
       end
     end
 
-    def author_element doc, index = nil
+    def common_attributes id, role = nil, reftext = nil
+      attrs = id ? %( xml:id="#{id}") : ''
+      attrs = %(#{attrs} role="#{role}") if role
+      if reftext
+        if (reftext.include? '<') && ((reftext = reftext.gsub XmlSanitizeRx, '').include? ' ')
+          reftext = (reftext.squeeze ' ').strip
+        end
+        reftext = (reftext.gsub '"', '&quot;') if reftext.include? '"'
+        attrs = %(#{attrs} xreflabel="#{reftext}")
+      end
+      attrs
+    end
+
+    def doctype_declaration root_tag_name
+      nil
+    end
+
+    def author_tag doc, index = nil
       firstname_key = index ? %(firstname_#{index}) : 'firstname'
       middlename_key = index ? %(middlename_#{index}) : 'middlename'
       lastname_key = index ? %(lastname_#{index}) : 'lastname'
@@ -662,24 +649,7 @@ module Asciidoctor
       result * LF
     end
 
-    def common_attributes id, role = nil, reftext = nil
-      attrs = id ? %( xml:id="#{id}") : ''
-      attrs = %(#{attrs} role="#{role}") if role
-      if reftext
-        if (reftext.include? '<') && ((reftext = reftext.gsub XmlSanitizeRx, '').include? ' ')
-          reftext = (reftext.squeeze ' ').strip
-        end
-        reftext = (reftext.gsub '"', '&quot;') if reftext.include? '"'
-        attrs = %(#{attrs} xreflabel="#{reftext}")
-      end
-      attrs
-    end
-
-    def doctype_declaration root_tag_name
-      nil
-    end
-
-    def document_info_element doc, info_tag_prefix, use_info_tag_prefix = false
+    def document_info_tag doc, info_tag_prefix, use_info_tag_prefix = false
       info_tag_prefix = '' unless use_info_tag_prefix
       result = []
       result << %(<#{info_tag_prefix}info>)
@@ -690,12 +660,12 @@ module Asciidoctor
       if doc.has_header?
         if doc.attr? 'author'
           if (authorcount = (doc.attr 'authorcount').to_i) < 2
-            result << (author_element doc)
+            result << (author_tag doc)
             result << %(<authorinitials>#{doc.attr 'authorinitials'}</authorinitials>) if doc.attr? 'authorinitials'
           else
             result << '<authorgroup>'
             authorcount.times do |index|
-              result << (author_element doc, index + 1)
+              result << (author_tag doc, index + 1)
             end
             result << '</authorgroup>'
           end
@@ -796,6 +766,25 @@ module Asciidoctor
       elsif use_placeholder
         %(<cover role="#{face}"/>)
       end
+    end
+
+    def blockquote_tag node, tag_name = nil
+      if tag_name
+        start_tag, end_tag = %(<#{tag_name}), %(</#{tag_name}>)
+      else
+        start_tag, end_tag = '<blockquote', '</blockquote>'
+      end
+      result = [%(#{start_tag}#{common_attributes node.id, node.role, node.reftext}>)]
+      result << %(<title>#{node.title}</title>) if node.title?
+      if (node.attr? 'attribution') || (node.attr? 'citetitle')
+        result << '<attribution>'
+        result << (node.attr 'attribution') if node.attr? 'attribution'
+        result << %(<citetitle>#{node.attr 'citetitle'}</citetitle>) if node.attr? 'citetitle'
+        result << '</attribution>'
+      end
+      result << yield
+      result << end_tag
+      result * LF
     end
   end
 end

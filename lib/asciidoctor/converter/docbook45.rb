@@ -52,7 +52,7 @@ module Asciidoctor
       end
     end
 
-    def author_element doc, index = nil
+    def author_tag doc, index = nil
       if index
         firstname_key = %(firstname_#{index})
         middlename_key = %(middlename_#{index})
@@ -87,7 +87,7 @@ module Asciidoctor
       %(<!DOCTYPE #{root_tag_name} PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">)
     end
 
-    def document_info_element doc, info_tag_prefix
+    def document_info_tag doc, info_tag_prefix
       super doc, info_tag_prefix, true
     end
 
