@@ -1,0 +1,71 @@
+= Paragraphs
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From para.adoc, included in:
+- user-manual: paragraphs
+- writers-guide: content is king
+////
+
+The bulk of the content in a document is paragraph text.
+This is why Asciidoctor doesn't require any special markup or attributes to specify paragraph content.
+You can just start typing.
+
+== Create a paragraph
+
+In Asciidoctor, adjacent or consecutive lines of text form a paragraph element.
+To start a new paragraph after another element, such as a section title or table, hit the kbd:[RETURN] key twice to insert a blank line, and then continue typing your content.
+
+.Two paragraphs in an AsciiDoc document
+[source]
+----
+include::{partialsdir}/ex-text.adoc[tag=para]
+----
+
+.The two paragraphs rendered using the default (html5) converter and stylesheet (asciidoctor.css)
+include::{partialsdir}/ex-text.adoc[tag=para]
+
+[#hardbreaks]
+== Line breaks
+////
+From para-line-breaks.adoc, included in:
+- user-manual: Line breaks
+- writers-guide: Wrapped text and hard line breaks
+////
+
+Since adjacent lines of text are combined into a single paragraph when Asciidoctor converts a document, that means you can wrap paragraph text or put each sentence or phrase on a separate line.
+The line breaks won't appear in the output.
+
+However, if you want the line breaks in a paragraph to be preserved, you can either use a space followed by a plus sign (`{plus}`) or the `hardbreaks` attribute.
+This results in a visible line break (e.g., `<br>`) following each line.
+
+[source]
+.Line breaks preserved using a space followed by the plus sign ({plus})
+----
+include::{partialsdir}/ex-text.adoc[tag=hb]
+----
+
+====
+include::{partialsdir}/ex-text.adoc[tag=hb]
+====
+
+[source]
+.Line breaks preserved using the hardbreaks attribute
+----
+include::{partialsdir}/ex-text.adoc[tag=hb-p]
+----
+
+====
+include::{partialsdir}/ex-text.adoc[tag=hb-p]
+====
+
+Alternatively, you can preserve line breaks throughout your whole document by adding the `hardbreaks` attribute to the document's header.
+
+.Line breaks preserved throughout the document using the hardbreaks attribute
+[source]
+----
+include::{partialsdir}/ex-text.adoc[tag=hb-attr]
+----
+
+You can also preserve line breaks using #literal blocks#, xref:source:listing-block.adoc[listing blocks], and xref:excerpts:verses.adoc[verses].

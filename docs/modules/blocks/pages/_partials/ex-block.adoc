@@ -1,0 +1,36 @@
+////
+Generic Block example snippets
+
+User Manual: Blocks
+////
+
+// tag::list-title[]
+.TODO list
+- Learn the AsciiDoc syntax
+- Install Asciidoctor
+- Write my document
+// end::list-title[]
+
+// tag::meta-co[]
+.Gettysburg Address // <1>
+[#gettysburg] // <2>
+[quote, Abraham Lincoln, Address delivered at the dedication of the Cemetery at Gettysburg] // <3> <4> <5>
+____
+Four score and seven years ago our fathers brought forth
+on this continent a new nation...
+
+Now we are engaged in a great civil war, testing whether
+that nation, or any nation so conceived and so dedicated,
+can long endure. ...
+____
+// end::meta-co[]
+
+// tag::opt-listing[]
+[listing]
+sudo dnf install asciidoc
+// end::opt-listing[]
+
+// tag::quote-name[]
+[quote]
+Never do today what you can put off `'til tomorrow.
+// end::quote-name[]

@@ -1,0 +1,30 @@
+////
+Included in:
+
+- user-manual: Open Block
+- quick-ref
+////
+
+// tag::base[]
+--
+An open block can be an anonymous container,
+or it can masquerade as any other block.
+--
+// end::base[]
+
+// tag::src[]
+[source]
+--
+puts "I'm a source block!"
+--
+// end::src[]
+
+// tag::sb[]
+[sidebar]
+.Related information
+--
+This is aside text.
+
+It is used to present information related to the main content.
+--
+// end::sb[]

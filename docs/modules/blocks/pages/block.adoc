@@ -1,0 +1,152 @@
+= Blocks
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From block.adoc, included in:
+User manual: Blocks
+////
+
+== Title
+
+You can assign a title to any paragraph, list, delimited block, or block macro.
+In most cases, the title is displayed immediately above the content.
+If the content is a figure or image, the title is displayed below the content.
+
+A block title is defined on a line above the element.
+The line must begin with a dot (`.`) and be followed immediately by the title text.
+
+Here's an example of a list with a title:
+
+[source]
+----
+include::{partialsdir}/ex-block.adoc[tag=list-title]
+----
+
+== Metadata
+
+In addition to a title, a block can be assigned additional metadata including:
+
+* Id (i.e., anchor)
+* Block name (first positional attribute)
+* Block attributes
+
+Here's an example of a quote block with metadata:
+
+[source]
+----
+include::{partialsdir}/ex-block.adoc[tag=meta-co]
+----
+<1> Title: Gettysburg Address
+<2> ID: gettysburg, see #anchordef#
+<3> Block name: quote
+<4> attribution: Abraham Lincoln (Named block attribute)
+<5> citetitle: Address delivered at the dedication of the Cemetery at Gettysburg (Named block attribute)
+
+TIP: A block can have multiple block attribute lines.
+The attributes will be aggregated.
+If there is a name conflict, the last attribute defined wins.
+
+Some metadata is used as supplementary content, such as the title, whereas other metadata controls how the block is converted, such as the block name.
+
+////
+Block id
+
+NOTE: Pending
+
+Block Style
+
+A block style is the first positional attribute in the block attribute list.
+////
+
+== Delimited blocks
+
+The AsciiDoc syntax provides a set of components for including non-paragraph text, such as block quotes, source code listings, sidebars and tables, in your document.
+These components are referred to as [.term]_delimited blocks_ because they are surrounded by delimiter lines (e.g., `+****+`).
+
+Here's an example of a sidebar block:
+
+----
+****
+sidebar block
+****
+----
+
+Within the boundaries of a delimited block, you can enter any content or blank lines.
+The block doesn't end until the ending delimiter is found.
+The delimiters around the block determine the type of block, how the content is processed and converted, and what elements are used to wrap the content in the output.
+
+=== Delimiter lines
+
+The boundaries of a delimited block _must be balanced_.
+In other words, the opening delimiter line must be the same length as the closing delimiter line.
+
+For example, the following delimited block is not balanced and therefore invalid:
+
+----
+********
+invalid sidebar block
+****
+----
+
+When the processor encounters the previous example, it will put the remainder of the content in the document inside the delimited block (without warning, currently).
+As far as the processor is concerned, the closing delimiter is just a line of content.
+If you want the closing delimiter to be matched, it must be the same length as the opening delimiter.
+
+----
+****
+valid sidebar block
+****
+----
+
+The AsciiDoc Python processor did not require the delimiters to be balanced, but also never documented that this was permissible.
+We view AsciiDoc Python's behavior of matching unbalanced delimited blocks to be a bug and therefore do not allow it in Asciidoctor.
+
+=== Optional delimiters
+
+If the content is contiguous (not interrupted by blank lines), you can forgo the use of the block delimiters and instead use the block name above a paragraph to repurpose it as one of the delimited block types.
+
+This format is often used for single-line listings:
+
+[source]
+....
+include::{partialsdir}/ex-block.adoc[tag=opt-listing]
+....
+
+or single-line quotes:
+
+[source]
+----
+include::{partialsdir}/ex-block.adoc[tag=quote-name]
+----
+
+=== Masquerading blocks
+
+Some blocks can masquerade as other blocks, a feature which is controlled by the block name.
+
+=== Nesting blocks
+
+You can nest blocks inside each other.
+To nest blocks of the same type, add a pair of extra symbols to the delimiter.
+For example:
+
+----
+====
+This is an example
+======
+This is an example inside an example
+======
+====
+----
+
+== Built-in blocks summary
+
+The following table identifies the built-in block names and delimited blocks syntax, their purposes, and the substitutions performed on their contents.
+
+include::{partialsdir}/block-name-table.adoc[]
+
+This table shows the substitutions performed by each substitution group referenced in the previous table.
+
+include::{partialsdir}/subs-group-table.adoc[]
+
+TIP: Surround an attribute value with single quotes in order to apply normal substitutions.

@@ -1,6 +1,21 @@
 * xref:setup:platforms.adoc[Platform Requirements]
 * xref:setup:upgrade-syntax.adoc[Modified & Deprecated Syntax]
 
+* Key Concepts
+** xref:blocks:block.adoc[Blocks]
+** xref:comment.adoc[Comments]
+
+* xref:blocks:paragraphs.adoc[Paragraphs]
+** xref:blocks:preamble.adoc[Preamble & Lead]
+
+* xref:text.adoc[Text & Punctuation Formatting]
+** xref:bold-and-italic.adoc[Bold & Italic]
+** xref:monospace.adoc[Monospace]
+** xref:highlight.adoc[Highlight]
+** xref:css-and-custom.adoc[Custom Styles]
+** xref:quote-marks.adoc[Quotes & Apostrophes]
+** xref:sub-and-sup.adoc[Subscript & Superscript]
+
 * xref:sections:sections.adoc[Sections]
 ** xref:sections:levels-and-titles.adoc[Levels & Titles]
 *** xref:sections:numbers.adoc[Numbers]
@@ -24,13 +39,17 @@
 ** xref:tables:data-formats.adoc[CSV, TSV, & DSV Data]
 ** xref:tables:table-ref.adoc[Table Reference]
 
-* xref:excerpts:index.adoc[Quotes, Excerpts, & Verses]
+* xref:excerpts:index.adoc[Quote, Excerpt, & Verse Blocks]
 ** xref:excerpts:quotes.adoc[Quotes & Excerpts]
 ** xref:excerpts:verses.adoc[Verses]
 
+* xref:blocks:example.adoc[Example Blocks]
+* xref:blocks:open.adoc[Open Blocks]
+* xref:blocks:sidebar.adoc[Sidebar Blocks]
+
 * Source Code & Listings
-** xref:source:listing-block.adoc[Listing Paragraphs & Blocks]
-** xref:source:source-block.adoc[Source Code Paragraphs & Blocks]
+** xref:source:listing-block.adoc[Listing Blocks]
+** xref:source:source-block.adoc[Source Code Blocks]
 ** xref:source:callouts.adoc[Callouts]
 ** Syntax Highlighting
 *** xref:source:coderay.adoc[CodeRay]
@@ -55,6 +74,8 @@
 ** xref:subs:prevent.adoc[Prevent Substitutions]
 ** xref:subs:pass-macro.adoc[Inline Pass Macros]
 ** xref:subs:pass-block.adoc[Passthrough Blocks]
+
+* xref:hr-and-break.adoc[Horizontal Rules & Page Breaks]
 
 * xref:book:structure.adoc[Books]
 ** xref:book:parts-and-chapters.adoc[Parts & Chapters]

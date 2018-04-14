@@ -1,0 +1,26 @@
+= Bold and Italic
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+text-bold-italic.adoc, included in:
+- user-manual: text formatting: Bold and italic
+////
+
+The two most common ways of emphasizing a word is to format it as bold or italic.
+To apply bold styling to a word or phrase, place an asterisk (`+*+`) at the beginning and end of the text you wish to format.
+To bold a letter or letters in a string of text, place two asterisks (`+**+`) before and after the letter or letters.
+
+Letters and words are italicized using one (`+_+`) or two (`+__+`) underscores.
+When you want to bold and italicize a letter or word, the bold markup must be the outermost markup.
+
+.Bold and italic text formatting syntax
+[source,subs=replacements]
+----
+include::{partialsdir}/ex-text.adoc[tag=b-i]
+----
+
+.Result: bold and italic text
+====
+include::{partialsdir}/ex-text.adoc[tag=b-i-n]
+====
