@@ -196,7 +196,7 @@ module Asciidoctor
   #LIB_PATH = ::File.join ROOT_PATH, 'lib'
 
   # The absolute data path of the Asciidoctor RubyGem
-  DATA_PATH = ::File.join ROOT_PATH, 'data'
+  DATA_PATH = ::ENV['ASCIIDOCTOR_DATA_PATH'] || (::File.join ROOT_PATH, 'data')
 
   # The user's home directory, as best we can determine it
   # NOTE not using infix rescue for performance reasons, see: https://github.com/jruby/jruby/issues/1816
