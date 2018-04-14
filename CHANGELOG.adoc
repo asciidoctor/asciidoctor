@@ -15,6 +15,12 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 == Unreleased
 
+Enhancements::
+
+  * allow manpage path for manpage help topic to be specified using ASCIIDOCTOR_MANPAGE_PATH environment variable
+  * if manpage cannot be found in default path inside gem, use `man -w asciidoctor` to resolve installed path
+  * uncompress contents of manpage for manpage help topic if path ends with .gz
+
 Bug fixes::
 
   * fix behavior of PathResolver#descends_from? when base path equals /
