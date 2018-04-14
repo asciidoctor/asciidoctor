@@ -1,0 +1,41 @@
+= Discrete Titles
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+um anchor: discrete-headings
+um section title: Discrete Headings (aka Floating Titles)
+From discrete-heading.adoc, included in:
+- user-manual
+////
+
+To make a discrete heading, aka floating title, you add the `discrete` attribute to any section title.
+A discrete heading is styled in a manner similar to a section title, but:
+
+* it's not part of the section hierarchy,
+* it's excluded from section nesting requirements,
+* it doesn't enclose subsequent blocks, and
+* it's not included in the table of contents.
+
+The `discrete` style effectively demotes the section title to a normal heading.
+
+NOTE: Alternately, you may use the `float` attribute to identify a discrete heading.
+In this context, the term "`float`" does not imply layout, meaning it does not float to the left or right of other content blocks.
+It just means it's not anchored to the section hierarchy.
+
+Here's an example of a discrete heading in use.
+
+[source]
+----
+**** // <1>
+Discrete headings are useful for making headings inside of other blocks, like this sidebar.
+
+[discrete] // <2>
+== Discrete Heading // <3>
+
+Discrete headings can be used where sections are not permitted.
+****
+----
+<1> A delimiter line that indicates the start of a sidebar block.
+<2> Set the `discrete` attribute above the section title to demote it to a discrete heading.
+<3> The discrete heading title is designated by one to six equal signs, just like a section title.

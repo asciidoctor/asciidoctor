@@ -1,0 +1,25 @@
+= Preamble
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+um anchor: doc-preamble
+From preamble-tut.adoc, included in:
+- user-manual
+////
+
+Content between the document header and the first section title is called the preamble.
+The preamble is optional.
+
+.Preamble
+[source]
+----
+include::{partialsdir}/preamble.adoc[]
+----
+
+When using the default Asciidoctor stylesheet, the #`lead` attribute# is applied to the first paragraph of the preamble.
+//<<lead-style,`lead` attribute>>
+
+.Result: Rendered preamble
+Rendered or image output goes here.
+// image::preamble.png[Preamble with lead attribute applied]

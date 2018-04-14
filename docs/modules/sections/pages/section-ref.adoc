@@ -1,0 +1,52 @@
+= Section Reference
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From sum-section.adoc, included in:
+- user-manual: sections
+////
+
+== Section attributes and values
+
+[cols="1m,1,2m,2"]
+|===
+|Attribute |Value(s) |Example Syntax |Comments
+
+|sectids
+|n/a
+|`:sectids!:`
+|Set to auto-generate section IDs by default.
+
+|idprefix
+|`_`, or user defined text
+|`:idprefix: id_`
+|Set to prepend string to generated section ID.
+
+|idseparator
+|`_`, or user defined character
+|`:idseparator: -`
+|Set to insert character between words in generated section ID.
+
+|sectanchors
+|n/a
+|`:sectanchors:`
+|Asciidoctor only
+
+|sectlinks
+|n/a
+|`:sectlinks:`
+|Asciidoctor only
+
+|sectnums
+|n/a
+|`:sectnums:`
+|Section numbering is off by default.
+Can be toggled on or off in the flow of the document.
+
+|sectnumlevels
+|0-5
+|`:sectnumlevels: 3`
+|Set to autogenerate section numbers up to level three by default.
+Setting a value of `0` has the same effect as setting `sectnums!`.
+|===

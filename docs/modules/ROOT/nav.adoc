@@ -1,6 +1,13 @@
 * xref:setup:platforms.adoc[Platform Requirements]
 * xref:setup:upgrade-syntax.adoc[Modified & Deprecated Syntax]
 
+* xref:sections:sections.adoc[Sections]
+** xref:sections:levels-and-titles.adoc[Levels & Titles]
+*** xref:sections:numbers.adoc[Numbers]
+*** xref:sections:discrete.adoc[Discrete Titles]
+** xref:sections:ids.adoc[IDs, Anchors, & Links]
+** xref:sections:section-ref.adoc[Section Reference]
+
 * Lists
 ** xref:lists:ordered.adoc[Ordered]
 ** xref:lists:unordered.adoc[Unordered]
@@ -16,6 +23,7 @@
 ** xref:tables:table-formatting.adoc[Width, Borders, & Orientation]
 ** xref:tables:data-formats.adoc[CSV, TSV, & DSV Data]
 ** xref:tables:table-ref.adoc[Table Reference]
+
 * xref:excerpts:index.adoc[Quotes, Excerpts, & Verses]
 ** xref:excerpts:quotes.adoc[Quotes & Excerpts]
 ** xref:excerpts:verses.adoc[Verses]
