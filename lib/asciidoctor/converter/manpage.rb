@@ -597,17 +597,18 @@ allbox tab(:);'
       target = node.target
       case node.type
       when :link
+        if target.start_with? 'mailto:'
+          macro = 'MTO'
+          target = target.slice 7, target.length
+        else
+          macro = 'URL'
+        end
         if (text = node.text) == target
           text = ''
         else
           text = text.gsub '"', %[#{ESC_BS}(dq]
         end
-        if target.start_with? 'mailto:'
-          macro = 'MTO'
-          target = target[7..-1].sub '@', %[#{ESC_BS}(at]
-        else
-          macro = 'URL'
-        end
+        target = target.sub '@', %[#{ESC_BS}(at] if macro == 'MTO'
         %(#{ESC_BS}c#{LF}#{ESC_FS}#{macro} "#{target}" "#{text}" )
       when :xref
         refid = (node.attr 'refid') || target

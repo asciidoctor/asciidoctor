@@ -282,6 +282,14 @@ First paragraph.
 .sp
 .MTO "doc\\(atexample.org" "Contact the doc" ""', output.lines.entries[-4..-1].join
     end
+
+    test 'should set text of MTO macro to blank for implicit email' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+Bugs fixed daily by doc@example.org.)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert output.end_with? 'Bugs fixed daily by \\c
+.MTO "doc\\(atexample.org" "" "."'
+    end
   end
 
   context 'Table' do
