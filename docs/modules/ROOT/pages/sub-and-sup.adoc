@@ -1,0 +1,32 @@
+= Subscript and Superscript
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+text-sub-sup.adoc, included in:
+- user-manual: text formatting: Superscript and subscript
+////
+
+Subscript and superscript text is common in mathematical expressions and chemical formulas.
+When rendered, the size of subscripted and superscripted text is reduced.
+Subscripted text is placed at the baseline and superscripted text above the baseline.
+The size and precise placement of the text depends on the font and other stylesheet parameters applied to the converted document.
+
+== Subscript and superscript syntax
+
+Text is subscripted when you enclose it in a set of tildes (`{tilde}`) and superscripted with a set of carets (`{caret}`)
+
+Subscript:: One tilde (`{tilde}`) on either side of a word or phrase makes it subscript.
+Superscript:: One caret (`{caret}`) on either side of a word or phrase makes it superscript.
+
+[source]
+----
+include::{partialsdir}/ex-text.adoc[tag=sub-sup]
+----
+
+====
+include::{partialsdir}/ex-text.adoc[tag=sub-sup]
+====
+
+NOTE: You can #write and render equations and formulas# in AsciiDoc documents using MathJax.
+//<<stem,write and render equations and formulas>>

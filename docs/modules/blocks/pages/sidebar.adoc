@@ -1,0 +1,27 @@
+= Sidebar Blocks
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+sidebar.adoc, included in:
+- user-manual: sidebar
+////
+
+Use a sidebar for ancillary content that doesn't fit into the flow of the document's narrative.
+
+== Sidebar block syntax
+
+A sidebar can be titled and contain any type of content such as source code and images.
+
+.Sidebar syntax
+[source]
+----
+include::{partialsdir}/ex-sidebar.adoc[tag=base-c]
+----
+<1> A title is optional.
+<2> A sidebar is delimited by four asterisks (`+****+`).
+
+.Result: Sidebar with title
+--
+include::{partialsdir}/ex-sidebar.adoc[tag=base]
+--

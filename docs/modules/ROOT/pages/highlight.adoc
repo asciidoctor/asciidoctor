@@ -1,0 +1,29 @@
+= Highlight
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+New page, content from text-css.adoc, included in:
+- user-manual: text formatting: Custom styling with attributes
+////
+
+== Highlight syntax
+
+When text is enclosed in a set of single or double hash symbols (`#`), and no style is assigned to it, the text will be rendered as highlighted text (text wrapped in `<mark>`).
+
+.Highlighted style syntax
+[source]
+----
+include::{partialsdir}/ex-text.adoc[tag=highlight]
+----
+
+.Highlighted text HTML output
+[source,html]
+----
+include::{partialsdir}/ex-text.adoc[tag=highlight-html]
+----
+
+.Rendered highlighted text
+====
+include::{partialsdir}/ex-text.adoc[tag=highlight]
+====

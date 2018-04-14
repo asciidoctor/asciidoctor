@@ -1,0 +1,34 @@
+= Text Formatting
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+text.adoc, included in:
+- user-manual: text formatting
+////
+
+Just as we emphasize certain words and phrases when we speak, we can emphasize them in text with formatting.
+This formatting, such as bold or monospace, is indicated by surrounding letters, words, or phrases with simple markup.
+When Asciidoctor processes text enclosed by formatting markup, the markup is replaced by the corresponding HTML or XML tags, depending on your backend, during the xref:subs:quotes.adoc[quotes substitution phase].
+
+.Text formatting versus quotes
+****
+The original AsciiDoc processor calls this markup and its related features _quotes_, _quotes substitutions_, and _quoted text_.
+However, in the Asciidoctor documentation, we refer to the text formatting markup as, you guessed it, text formatting.
+When you need to control when text formatting is applied to certain blocks, the substitution attribute is still named `quotes`, but we're considering changing this to a more semantic name in a future Asciidoctor version.
+****
+
+Continue reading to learn how to format letters, words or phrases with the following styles:
+
+- [x] bold
+- [x] italic
+- [x] monospace
+- [x] highlighted
+- [x] built-in and custom CSS styles
+- [x] smart quotation marks and apostrophes
+- [x] subscript and superscript
+
+////
+CAUTION: You may not always want these symbols to indicate text formatting.
+In those cases, you'll need to use additional markup to xref:subs:prevent.adoc[escape the text formatting markup].
+////

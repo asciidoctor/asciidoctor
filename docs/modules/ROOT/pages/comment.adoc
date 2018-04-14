@@ -1,0 +1,28 @@
+= Comment Lines and Blocks
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+comment.adoc, included in:
+- user-manual: comments
+////
+
+== Comment lines
+
+.Line comment syntax
+----
+// A single-line comment.
+----
+
+Single-line comments can be used to divide elements, such as two adjacent lists.
+
+== Comment blocks
+
+.Block comment syntax
+----
+////
+A multi-line comment.
+
+Notice it's a delimited block.
+////
+----

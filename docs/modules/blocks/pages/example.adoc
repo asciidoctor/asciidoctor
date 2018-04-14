@@ -1,0 +1,21 @@
+= Example Blocks
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From example.adoc, included in:
+- user-manual: example
+////
+
+== Example block sytax
+
+.Example syntax
+[source]
+----
+include::{partialsdir}/ex-example.adoc[tag=base]
+----
+
+.Result: Example block
+--
+include::{partialsdir}/ex-example.adoc[tag=base]
+--

@@ -1,0 +1,20 @@
+////
+Included in:
+
+- user-manual: Horizontal Rule
+- quick-ref
+////
+
+// tag::base[]
+'''
+// end::base[]
+
+// tag::md[]
+---
+
+- - -
+
+***
+
+* * *
+// end::md[]

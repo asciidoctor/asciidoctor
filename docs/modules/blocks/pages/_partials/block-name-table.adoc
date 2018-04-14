@@ -1,0 +1,94 @@
+////
+Table of blocks, block names, block delimiters, and their substitutions
+
+User Manual: Blocks
+////
+
+[cols="1,1m,1m,3,1"]
+|===
+|Block |Block Name |Delimiter |Purpose |Substitutions
+
+|Admonition
+|++[<LABEL>]++
+d|Any delimiter
+|Content labeled with a tag or icon, can masquerade as any delimited block type
+|Varies
+
+|Comment
+d|N/A
+|++////++
+|Private notes that are not displayed in the output
+|None
+
+|Example
+|++[example]++
+|++====++
+|Designates example content or defines an admonition block
+|Normal
+
+|Fenced
+d|N/A
+|++```++
+|Source code or keyboard input is displayed as entered
+|Verbatim
+
+|Listing
+|++[listing]++
+|++----++
+|Source code or keyboard input is displayed as entered
+|Verbatim
+
+|Literal
+|++[literal]++
+|++....++
+|Output text is displayed exactly as entered
+|Verbatim
+
+|Open
+d|Most block names
+|++--++
+|Anonymous block that can act as any block except _passthrough_ or _table_ blocks
+|Varies
+
+|Passthrough
+|++[pass]++
+|pass:[++++]
+|Unprocessed content that is sent directly to the output
+|None
+
+|Quote
+|++[quote]++
+|++____++
+|A quotation with optional attribution
+|Normal
+
+|Sidebar
+|++[sidebar]++
+|++****++
+|Aside text and content displayed outside the flow of the document
+|Normal
+
+|Source
+|++[source]++
+|++----++
+|Source code or keyboard input to be displayed as entered
+|Verbatim
+
+|Stem
+|++[stem]++
+|pass:[++++]
+|Unprocessed content that is sent directly to an interpreter (such as AsciiMath or LaTeX math)
+|None
+
+|Table
+d|N/A
+|++\|===++
+|Displays tabular content
+|Varies
+
+|Verse
+|++[verse]++
+|++____++
+|A verse with optional attribution
+|Normal
+|===
