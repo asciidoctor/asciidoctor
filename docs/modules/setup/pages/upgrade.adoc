@@ -1,0 +1,40 @@
+= Upgrade Asciidoctor
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+from install-upgrade-asciidoctor.adoc
+included in the install-toolchain and user-manual
+////
+
+//tag::upgrade[]
+You can upgrade Asciidoctor using the gem `upgrade` command:
+
+ $ gem update asciidoctor
+
+[TIP]
+====
+If you accidentally use `gem install` instead of `gem update`, then you'll end up with both versions installed.
+To remove the older version, use the following `gem` command:
+
+ $ gem cleanup asciidoctor
+====
+
+On Fedora, you can update the package using:
+
+ $ sudo dnf update asciidoctor
+
+TIP: Your Fedora system is probably configured to automatically update packages, in which case no further action is required by you.
+
+On Debian or Ubuntu, you can update the package using:
+
+ $ sudo apt-get upgrade asciidoctor
+
+On Alpine Linux, you can update the package using:
+
+ $ sudo apk add --upgrade asciidoctor
+
+NOTE: The Linux packages may not be available immediately after a release of the gem.
+It may take several weeks for the packages to be updated.
+If you need to upgrade to the latest version immediately, use the `gem` install option documented above.
+//end::upgrade[]

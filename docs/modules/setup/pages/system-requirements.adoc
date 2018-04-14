@@ -1,4 +1,4 @@
-= Platform Requirements
+= System Requirements
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
@@ -26,6 +26,9 @@ While we only test Asciidoctor on Alpine, Debian, and Fedora, it should operate 
 2.5
 2.4
 2.3
+
+|JRuby
+|9000
 
 |Alpine
 |[%hardbreaks]
@@ -91,3 +94,19 @@ The following platforms are only required of you're using certain Asciidoctor fe
 |Font Awesome Icons
 |?
 |===
+
+////
+This content was from install-upgrade-asciidoctor.adoc and was tagged as systemreq[]
+
+Asciidoctor works on Linux, macOS and Windows.
+
+Asciidoctor requires one of the following implementations of Ruby:
+
+* Ruby 1.8.7
+* Ruby 1.9.3
+* Ruby 2 (2.0.0 or better)
+* JRuby 1.7 (Ruby 1.8 and 1.9 modes)
+* JRuby 9000
+* Rubinius 2.0 (Ruby 1.8 and 1.9 modes)
+* Opal (Javascript)
+////
