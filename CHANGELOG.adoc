@@ -40,6 +40,7 @@ Enhancements::
   * preserve directories if source dir and destination dir are set (#1394, PR #2421)
   * allow linkcss to be disabled from API when safe mode is secure
   * convert quote to epigraph element in DocBook output if block has epigraph role (#1195, PR #2664) (*@bk2204*)
+  * number special sections in addition to regular sections when sectnums=all (#661, PR #2463)
 
 Bug fixes::
 

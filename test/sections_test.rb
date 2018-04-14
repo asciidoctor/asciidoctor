@@ -1771,6 +1771,93 @@ Terms
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Glossary"]', output, 1
     end
 
+    test 'should number special sections and their subsections when sectnums is all' do
+      input = <<-EOS
+:sectnums: all
+
+[dedication]
+== Dedication
+
+=== Dedication Subsection
+
+content
+
+== Section One
+
+[appendix]
+== Attribute Options
+
+Details
+
+[appendix]
+== Migration
+
+Details
+
+=== Gotchas
+
+Details
+
+[glossary]
+== Glossary
+
+Terms
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '(//h2)[1][text()="1. Dedication"]', output, 1
+      assert_xpath '(//h3)[1][text()="1.1. Dedication Subsection"]', output, 1
+      assert_xpath '(//h2)[2][text()="2. Section One"]', output, 1
+      assert_xpath '(//h2)[3][text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '(//h2)[4][text()="Appendix B: Migration"]', output, 1
+      assert_xpath '(//h3)[2][text()="B.1. Gotchas"]', output, 1
+      assert_xpath '(//h2)[5][text()="3. Glossary"]', output, 1
+    end
+
+    test 'should number special sections and their subsections in toc when sectnums is all' do
+      input = <<-EOS
+:sectnums: all
+:toc:
+
+[dedication]
+== Dedication
+
+=== Dedication Subsection
+
+content
+
+== Section One
+
+[appendix]
+== Attribute Options
+
+Details
+
+[appendix]
+== Migration
+
+Details
+
+=== Gotchas
+
+Details
+
+[glossary]
+== Glossary
+
+Terms
+      EOS
+
+      output = render_string input
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="1. Dedication"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="1.1. Dedication Subsection"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="2. Section One"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix A: Attribute Options"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix B: Migration"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="B.1. Gotchas"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="3. Glossary"]', output, 1
+    end
+
     test 'level 0 special sections in multipart book should be rendered as level 1' do
       input = <<-EOS
 = Multipart Book

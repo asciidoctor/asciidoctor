@@ -1535,26 +1535,28 @@ class Parser
   # reader     - the source reader
   # parent     - the parent Section or Document of this Section
   # attributes - a Hash of attributes to assign to this section (default: {})
+  #
+  # Returns the section [Block]
   def self.initialize_section reader, parent, attributes = {}
     document = parent.document
     source_location = reader.cursor if document.sourcemap
-    # parse style, id, and role attributes from first positional attribute if present
-    style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
-    sect_id, sect_reftext, sect_title, sect_level, atx = parse_section_title reader, document, attributes['id']
+    # extract id, role, and options from first positional attribute, if present
+    sect_style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
+    sect_id, sect_reftext, sect_title, sect_level, sect_atx = parse_section_title reader, document, attributes['id']
 
     if sect_reftext
       attributes['reftext'] = sect_reftext
-    elsif attributes.key? 'reftext'
+    else
       sect_reftext = attributes['reftext']
     end
 
-    if style
-      if style == 'abstract' && document.doctype == 'book'
+    if sect_style
+      if sect_style == 'abstract' && document.doctype == 'book'
         sect_name, sect_level = 'chapter', 1
       else
-        sect_name, sect_special = style, true
+        sect_name, sect_special = sect_style, true
         sect_level = 1 if sect_level == 0
-        sect_numbered_force = style == 'appendix'
+        sect_numbered = sect_style == 'appendix'
       end
     else
       case document.doctype
@@ -1573,10 +1575,9 @@ class Parser
 
     section = Section.new parent, sect_level, false
     section.id, section.title, section.sectname, section.source_location = sect_id, sect_title, sect_name, source_location
-    # TODO honor special section numbering option (#661)
     if sect_special
       section.special = true
-      section.numbered = true if sect_numbered_force
+      section.numbered = true if sect_numbered || document.attributes['sectnums'] == 'all'
     elsif sect_level > 0 && (document.attributes.key? 'sectnums')
       section.numbered = section.special ? (parent.context == :section && parent.numbered) : true
     end
@@ -1584,7 +1585,7 @@ class Parser
     # generate an ID if one was not embedded or specified as anchor above section title
     if (id = section.id ||= ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
       unless document.register :refs, [id, section, sect_reftext || section.title]
-        warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - (atx ? 1 : 2)}: id assigned to section already in use: #{id})
+        warn %(asciidoctor: WARNING: #{reader.path}: line #{reader.lineno - (sect_atx ? 1 : 2)}: id assigned to section already in use: #{id})
       end
     end
 
