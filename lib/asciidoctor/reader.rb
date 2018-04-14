@@ -331,41 +331,39 @@ class Reader
     end
   end
 
-  # Public: Skip consecutive comment lines and block comments and return them.
+  # Public: Skip consecutive comment lines and block comments.
   #
   # Examples
   #   @lines
   #   => ["// foo", "bar"]
   #
   #   comment_lines = skip_comment_lines
-  #   => ["// foo"]
+  #   => nil
   #
   #   @lines
   #   => ["bar"]
   #
-  # Returns the Array of lines that were skipped
+  # Returns nothing
   def skip_comment_lines
-    return [] if empty?
+    return if empty?
 
-    comment_lines = []
     while (next_line = peek_line) && !next_line.empty?
       if next_line.start_with? '//'
         if next_line.start_with? '///'
           if (ll = next_line.length) > 3 && next_line == '/' * ll
-            comment_lines << shift
-            comment_lines.push(*(read_lines_until(:terminator => next_line, :read_last_line => true, :skip_processing => true)))
+            read_lines_until :terminator => next_line, :skip_first_line => true, :read_last_line => true, :skip_processing => true
           else
             break
           end
         else
-          comment_lines << shift
+          shift
         end
       else
         break
       end
     end
 
-    comment_lines
+    nil
   end
 
   # Public: Skip consecutive comment lines and return them.

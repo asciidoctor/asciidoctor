@@ -1382,10 +1382,13 @@ include::fixtures/no-such-file.adoc[]
 ////
         EOS
 
-        doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
-        result = reader.skip_comment_lines
-        assert_equal lines.map {|l| l.chomp}, result
+        using_memory_logger do |logger|
+          doc = empty_safe_document :base_dir => DIRNAME
+          reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
+          reader.skip_comment_lines
+          assert reader.empty?
+          assert logger.empty?
+        end
       end
     end
 

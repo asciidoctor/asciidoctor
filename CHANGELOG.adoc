@@ -121,6 +121,7 @@ Improvements / Refactoring::
   * rename enumerate_section to assign_numeral; update API docs
   * drop deprecated compact option from CLI; remove from manpage
   * use more robust mechanism for lazy loading the asciimath gem
+  * change Reader#skip_comment_lines to not return skipped lines
   * purge render method from test suite (except to verify alias)
 
 Documentation::
