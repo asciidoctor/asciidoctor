@@ -211,7 +211,7 @@ class AbstractNode
   # in the list of roles on this node
   def has_role?(name)
     # NOTE center + include? is faster than split + include?
-    (val = @attributes['role'] || @document.attributes['role']).nil_or_empty? ? false : %( #{val} ).include?(%( #{name} ))
+    (val = @attributes['role'] || @document.attributes['role']) ? %( #{val} ).include?(%( #{name} )) : false
   end
 
   # Public: A convenience method that adds the given role directly to this node
