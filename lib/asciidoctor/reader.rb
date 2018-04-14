@@ -37,6 +37,9 @@ class Reader
   # Public: Control whether lines are processed using Reader#process_line on first visit (default: true)
   attr_accessor :process_lines
 
+  # Public: Indicates that the end of the reader was reached with a delimited block still open.
+  attr_accessor :unterminated
+
   # Public: Initialize the Reader object
   def initialize data = nil, cursor = nil, opts = {}
     if !cursor
@@ -63,6 +66,7 @@ class Reader
     @look_ahead = 0
     @process_lines = true
     @unescape_next_line = false
+    @unterminated = nil
   end
 
   # Internal: Prepare the lines from the provided data
@@ -327,7 +331,7 @@ class Reader
     end
   end
 
-  # Public: Skip consecutive lines containing line comments and return them.
+  # Public: Skip consecutive comment lines and block comments and return them.
   #
   # Examples
   #   @lines
@@ -364,7 +368,7 @@ class Reader
     comment_lines
   end
 
-  # Public: Skip consecutive lines that are line comments and return them.
+  # Public: Skip consecutive comment lines and return them.
   #
   # This method assumes the reader only contains simple lines (no blocks).
   def skip_line_comments
@@ -474,11 +478,11 @@ class Reader
         end
       end
     end
-
     if restore_process_lines
       @process_lines = true
       @look_ahead -= 1 if line_restored && !terminator
     end
+    @unterminated = true if terminator && terminator != line
     result
   end
 

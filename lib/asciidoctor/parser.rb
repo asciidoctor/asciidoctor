@@ -852,6 +852,7 @@ class Parser
 
       when :table
         block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true), reader.cursor
+        report_unterminated_block 'table', reader.prev_line_cursor if reader.unterminated
         # NOTE it's very rare that format is set when using a format hint char, so short-circuit
         unless terminator.start_with? '|', '!'
           # NOTE infer dsv once all other format hint chars are ruled out
@@ -1022,6 +1023,7 @@ class Parser
       block_reader = nil
     elsif parse_as_content_model != :compound
       lines = reader.read_lines_until :terminator => terminator, :skip_processing => skip_processing
+      report_unterminated_block block_context, reader.prev_line_cursor if reader.unterminated
       block_reader = nil
     # terminator is false when reader has already been prepared
     elsif terminator == false
@@ -1030,6 +1032,7 @@ class Parser
     else
       lines = nil
       block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing), reader.cursor
+      report_unterminated_block block_context, reader.prev_line_cursor if reader.unterminated
     end
 
     if content_model == :verbatim
@@ -2036,6 +2039,7 @@ class Parser
         elsif normal && '/' * (ll = next_line.length) == next_line
           unless ll == 3
             reader.read_lines_until :skip_first_line => true, :preserve_last_line => true, :terminator => next_line, :skip_processing => true
+            report_unterminated_block 'comment', reader.prev_line_cursor if reader.unterminated
             return true
           end
         else
@@ -2049,6 +2053,9 @@ class Parser
     end
   end
 
+  # Process consecutive attribute entry lines, ignoring adjacent line comments and comment blocks.
+  #
+  # Returns nothing
   def self.process_attribute_entries reader, document, attributes = nil
     reader.skip_comment_lines
     while process_attribute_entry reader, document, attributes
@@ -2056,6 +2063,7 @@ class Parser
       reader.shift
       reader.skip_comment_lines
     end
+    report_unterminated_block 'comment', reader.prev_line_cursor if reader.unterminated
   end
 
   def self.process_attribute_entry reader, document, attributes = nil, match = nil
@@ -2735,6 +2743,14 @@ class Parser
       repeat, value = value.divmod i
       l * repeat
     }.join
+  end
+
+  # Internal: Report that a delimited block with the specified context is unterminated.
+  #
+  # Returns nothing
+  def self.report_unterminated_block block_context, source_location
+    logger.warn message_with_context %(unterminated #{block_context} block), :source_location => source_location
+    nil
   end
 end
 end
