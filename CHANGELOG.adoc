@@ -18,13 +18,13 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Enhancements::
 
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
-  * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI
-  * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font)
-  * interpret false attribute value defined using API as a soft unset
-  * allow footnote macro to define or reference footnote reference (footnoteref macro now considered deprecated)
-  * allow manpage path for manpage help topic to be specified using ASCIIDOCTOR_MANPAGE_PATH environment variable
-  * if manpage cannot be found in default path inside gem, use `man -w asciidoctor` to resolve installed path
-  * uncompress contents of manpage for manpage help topic if path ends with .gz
+  * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI (#642, PR #2649)
+  * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font) (#642, PR #2649)
+  * interpret false attribute value defined using API as a soft unset (#642, PR #2649)
+  * allow footnote macro to define or reference footnote reference (footnoteref macro now considered deprecated) (#2347, PR #2362)
+  * allow manpage path for manpage help topic to be specified using ASCIIDOCTOR_MANPAGE_PATH environment variable (PR #2653) (*@aerostitch*)
+  * if manpage cannot be found in default path inside gem, use `man -w asciidoctor` to resolve installed path (PR #2653)
+  * uncompress contents of manpage for manpage help topic if path ends with .gz (PR #2653) (*@aerostitch*)
   * define source and manual refmiscinfo entries in manpage output if manual and source attributes are defined (PR #2636) (*@tiwai*)
   * add syntax for adding hard line breaks in block AsciiMath equations (#2497, PR #2579) (*@dimztimz*)
   * add positioning option to sectanchors attribute (before or after) (#2485, PR #2486)
@@ -47,9 +47,9 @@ Bug fixes::
   * fix typo in gemspec that removed README and CONTRIBUTING files from the generated gem (PR #2650) (*@aerostitch*)
   * don't turn bare URI scheme (no host) into a link (#2609, PR #2611)
   * fix em dash replacement in manpage converter (#2604, PR #2607)
-  * fix behavior of PathResolver#descends_from? when base path equals /
-  * automatically recover if start path passed to PathResolver#system_path is outside of jail path
-  * enforce that absolute start path passed to PathResolver#system_path is inside of jail path
+  * enforce that absolute start path passed to PathResolver#system_path is inside of jail path (#2642, PR #2644)
+  * fix behavior of PathResolver#descends_from? when base path equals / (#2642, PR #2644)
+  * automatically recover if start path passed to PathResolver#system_path is outside of jail path (#2642, PR #2644)
   * re-enable left justification after invoking tmac URL macro (#2400, PR #2409)
   * record timings when calling convert and write on Document (#2574, PR #2575)
   * duplicate header attributes when restoring; allows header attributes to be restored an arbitrary number of times (#2567, PR #2570)
@@ -72,16 +72,16 @@ Bug fixes::
   * set outfilesuffix to match file extension of output file (#2258, PR #2367)
   * add block title to dlist in manpage output (#1611, PR #2434)
   * scale text to 80% in print styles (#1484, PR #2576)
-  * output non-breaking space for man manual if absent in DocBook output
+  * output non-breaking space for man manual if absent in DocBook output (PR #2636)
 
 Improvements / Refactoring::
 
-  * resolve / expand parent references in start path passed to PathResolver#system_path (#2642)
-  * update PathResolver#expand_path to resolve parent references
-  * allow start path passed to PathResolver#system_path to be outside jail if target brings resolved path back inside jail
-  * don't run File.expand_path on Dir.pwd (assume Dir.pwd is absolute)
-  * posixify working_dir passed to PathResolver constructor if absolute
-  * optimize detection for footnote* and indexterm* macros
+  * resolve / expand parent references in start path passed to PathResolver#system_path (#2642, PR #2644)
+  * update PathResolver#expand_path to resolve parent references (#2642, PR #2644)
+  * allow start path passed to PathResolver#system_path to be outside jail if target brings resolved path back inside jail (#2642, PR #2644)
+  * don't run File.expand_path on Dir.pwd (assume Dir.pwd is absolute) (#2642, PR #2644)
+  * posixify working_dir passed to PathResolver constructor if absolute (#2642, PR #2644)
+  * optimize detection for footnote* and indexterm* macros (#2347, PR #2362)
   * coerce value of template_dirs option to an Array (PR #2621)
   * allow paragraph to masquerade as open block (PR #2412)
   * move callouts into document catalog (PR #2394)
