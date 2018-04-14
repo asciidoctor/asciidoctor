@@ -279,21 +279,26 @@ class Document < AbstractBlock
       # attribute overrides are attributes that can only be set from the commandline
       # a direct assignment effectively makes the attribute a constant
       # a nil value or name with leading or trailing ! will result in the attribute being unassigned
-      attr_overrides = {}
-      (options[:attributes] || {}).each do |key, value|
-        if key.start_with? '!'
-          key = key.slice 1, key.length
-          value = nil
+      @attribute_overrides = attr_overrides = {}
+      (options[:attributes] || {}).each do |key, val|
+        if key.end_with? '@'
+          if key.start_with? '!'
+            key, val = (key.slice 1, key.length - 1), false
+          elsif key.end_with? '!@'
+            key, val = (key.slice 0, key.length - 2), false
+          else
+            key, val = key.chop, %(#{val}@)
+          end
+        elsif key.start_with? '!'
+          key, val = (key.slice 1, key.length), val == '@' ? false : nil
         elsif key.end_with? '!'
-          key = key.chop
-          value = nil
+          key, val = key.chop, val == '@' ? false : nil
         end
-        attr_overrides[key.downcase] = value
+        attr_overrides[key.downcase] = val
       end
       if (to_file = options[:to_file])
         attr_overrides['outfilesuffix'] = ::File.extname to_file
       end
-      @attribute_overrides = attr_overrides
       # safely resolve the safe mode from const, int or string
       if !(safe_mode = options[:safe])
         @safe = SafeMode::SECURE
@@ -429,18 +434,16 @@ class Document < AbstractBlock
     @max_attribute_value_size = (size = (attr_overrides['max-attribute-value-size'] ||= nil)) ? size.to_i.abs : nil
 
     attr_overrides.delete_if do |key, val|
-      verdict = false
-      # a nil value undefines the attribute
-      if val.nil?
-        attrs.delete(key)
-      else
-        # a value ending in @ indicates this attribute does not override
-        # an attribute with the same key in the document source
+      if val
+        # a value ending in @ allows document to override value
         if ::String === val && (val.end_with? '@')
-          val = val.chop
-          verdict = true
+          val, verdict = val.chop, true
         end
         attrs[key] = val
+      else
+        # a nil or false value both unset the attribute; only a nil value locks it
+        attrs.delete key
+        verdict = val == false
       end
       verdict
     end

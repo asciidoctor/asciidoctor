@@ -295,22 +295,60 @@ endif::holygrail[]
       assert_xpath '(//p)[2][text() = "Buggers! What happened to the grail?"]', output, 1
     end
 
-    # Validates requirement: "Header attributes are overridden by command-line attributes."
-    test 'attribute defined in document options overrides attribute in document' do
+    test 'attribute set via API overrides attribute set in document' do
       doc = document_from_string(':cash: money', :attributes => {'cash' => 'heroes'})
       assert_equal 'heroes', doc.attributes['cash']
     end
 
-    test 'attribute defined in document options cannot be unassigned in document' do
+    test 'attribute set via API cannot be unset by document' do
       doc = document_from_string(':cash!:', :attributes => {'cash' => 'heroes'})
       assert_equal 'heroes', doc.attributes['cash']
     end
 
-    test 'attribute undefined in document options cannot be assigned in document' do
-      doc = document_from_string(':cash: money', :attributes => {'cash!' => '' })
+    test 'attribute soft set via API using modifier on name can be overridden by document' do
+      doc = document_from_string(':cash: money', :attributes => {'cash@' => 'heroes'})
+      assert_equal 'money', doc.attributes['cash']
+    end
+
+    test 'attribute soft set via API using modifier on value can be overridden by document' do
+      doc = document_from_string(':cash: money', :attributes => {'cash' => 'heroes@'})
+      assert_equal 'money', doc.attributes['cash']
+    end
+
+    test 'attribute soft set via API using modifier on name can be unset by document' do
+      doc = document_from_string(':cash!:', :attributes => {'cash@' => 'heroes'})
       assert_nil doc.attributes['cash']
-      doc = document_from_string(':cash: money', :attributes => {'cash' => nil })
+      doc = document_from_string(':cash!:', :attributes => {'cash@' => true})
       assert_nil doc.attributes['cash']
+    end
+
+    test 'attribute soft set via API using modifier on value can be unset by document' do
+      doc = document_from_string(':cash!:', :attributes => {'cash' => 'heroes@'})
+      assert_nil doc.attributes['cash']
+    end
+
+    test 'attribute unset via API cannot be set by document' do
+      [
+        { 'cash!' => '' },
+        { '!cash' => '' },
+        { 'cash' => nil },
+      ].each do |attributes|
+        doc = document_from_string(':cash: money', :attributes => attributes)
+        assert_nil doc.attributes['cash']
+      end
+    end
+
+    test 'attribute soft unset via API can be set by document' do
+      [
+        { 'cash!@' => '' },
+        { '!cash@' => '' },
+        { 'cash!' => '@' },
+        { '!cash' => '@' },
+        { 'cash' => false },
+      ].each do |attributes|
+        doc = document_from_string(':cash: money', :attributes => attributes)
+        assert_equal 'money', doc.attributes['cash']
+      end
     end
 
     test 'backend and doctype attributes are set by default in default configuration' do
