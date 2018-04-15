@@ -5,6 +5,9 @@
 
 * xref:cli:cli.adoc[Asciidoctor CLI]
 ** xref:cli:cli-options.adoc[CLI Options]
+* xref:api:api.adoc[Asciidoctor API]
+** xref:api:api-options.adoc[API Options]
+
 * Key Concepts
 ** xref:blocks:block.adoc[Blocks]
 ** xref:comment.adoc[Comments]
