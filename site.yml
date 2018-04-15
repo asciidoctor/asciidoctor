@@ -17,6 +17,7 @@ asciidoc:
     url-org: https://github.com/asciidoctor
     url-repo: https://github.com/asciidoctor/asciidoctor
     url-tests: https://github.com/asciidoctor/asciidoctor/tree/master/test
+    url-exten-lab: https://github.com/asciidoctor/asciidoctor-extensions-lab
     url-rubygem: https://rubygems.org/gems/asciidoctor
     url-tilt: https://github.com/rtomayko/tilt
     url-uri: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier

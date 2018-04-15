@@ -1,0 +1,54 @@
+= Inline Macro Processor Extension Example
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+exten-in-macro.adoc, included in:
+- user-manual: Extensions: Inline macro processor example
+////
+
+Purpose::
+Create an inline macro named `man` that links to a manpage.
+
+== sample-with-man-link.adoc
+
+```
+See man:gittutorial[7] to get started.
+```
+
+== ManpageInlineMacro
+
+```ruby
+require 'asciidoctor'
+require 'asciidoctor/extensions'
+
+class ManInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
+  use_dsl
+
+  named :man
+  name_positional_attributes 'volnum'
+
+  def process parent, target, attrs
+    text = manname = target
+    suffix = ''
+    target = %(#{manname}.html)
+    suffix = if (volnum = attrs['volnum'])
+      "(#{volnum})"
+    else
+      nil
+    end
+    parent.document.register :links, target
+    %(#{(create_anchor parent, text, type: :link, target: target).convert}#{suffix})
+  end
+end
+```
+
+== Usage
+
+```ruby
+Asciidoctor::Extensions.register do
+  inline_macro ManInlineMacro
+end
+
+Asciidoctor.convert_file 'sample-with-man-link.adoc', :safe => :safe
+```

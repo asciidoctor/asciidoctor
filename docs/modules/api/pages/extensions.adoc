@@ -1,0 +1,108 @@
+= Extensions
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+exten-intro.adoc, included in:
+- user-manual: Extensions
+uri-org/asciidoctor-extensions-lab in now url-exten-lab
+////
+
+Extensions have proven to be central to the success of AsciiDoc because they open up the language to new use cases.
+However, the way extensions are implemented in AsciiDoc Python presents a number of problems:
+
+* They are challenging to write because they work at such a low-level (read as: nasty regular expressions).
+* They are fragile since they often rely on system commands to do anything significant.
+* They are hard to distribute due to the lack of integration with a formal distribution system.
+
+Asciidoctor addresses these issues by introducing a proper extension API that offers a superset of the extension points that AsciiDoc Python provides.
+As a result, extensions in Asciidoctor are easier to write, more powerful, and simpler to distribute.
+
+The goal for Asciidoctor has always been to allow extensions to be written using the full power of a programming language (whether it be Ruby, Java, Groovy or JavaScript), similar to what we've done with the backend (conversion) mechanism.
+That way, you don't have to shave yaks to get the functionality you want, and you can distribute the extension using defacto-standard packaging mechanisms like RubyGems or JARs.
+
+WARNING: The extension API in Asciidoctor is stable with the exception of inline macros.
+Since inline content is not parsed until the convert phase, the inline macro processor must return converted text (e.g., HTML) rather than an AST node.
+Once Asciidoctor is changed to https://github.com/asciidoctor/asciidoctor/issues/61[process inline content during the parse phase], the inline macro processor will need to return an inline node.
+When that switch occurs, there will either be some sort of adapter or required migration for inline macro processors, but that has yet to be determined.
+
+== Extension Points
+////
+exten-point.adoc, included in:
+- user-manual: Extensions: Extension Points
+////
+
+//Here are the extension points that are available in Asciidoctor 0.1.4.
+
+These extension points are currently available.
+
+Preprocessor::
+Processes the raw source lines before they are passed to the parser.
+See xref:preprocessor.adoc[Preprocessor Example].
+
+Tree processor::
+Processes the [.class]#Asciidoctor::Document# (AST) once parsing is complete.
+See xref:tree-processor.adoc[Tree Processor Example].
+
+Postprocessor::
+Processes the output after the document has been converted, but before it's written to disk.
+See xref:postprocessor.adoc[Postprocessor Example].
+
+Docinfo Processor::
+Adds additional content to the header or footer regions of the generated document.
+See xref:docinfo-processor.adoc[Docinfo Processor Example].
+
+Block processor::
+Processes a block of content marked with a custom block style (i.e., `[custom]`). (similar to an AsciiDoc filter)
+See xref:block-processor.adoc[Block Processor Example].
+
+Block macro processor::
+Registers a custom block macro and processes it (e.g., `gist::12345[]`).
+See xref:block-macro-processor.adoc[Block Macro Processor Example].
+
+Inline macro processor::
+Registers a custom inline macro and processes it (e.g., `btn:[Save]`).
+See xref:inline-macro-processor.adoc[Inline Macro Processor Example].
+
+Include processor::
+Processes the `include::<filename>[]` directive.
+See xref:include-processor.adoc[Include Processor Example].
+
+These extensions are registered per document using a callback that feels sort of like a DSL:
+
+```ruby
+Asciidoctor::Extensions.register do |document|
+  preprocessor FrontMatterPreprocessor
+  tree_processor ShellSessionTreeProcessor
+  postprocessor CopyrightFooterPostprocessor
+  docinfo_processor TrackingCodeDocinfoProcessor if document.basebackend? 'html'
+  block ShoutBlock
+  block_macro GistBlockMacro if document.basebackend? 'html'
+  inline_macro ManInlineMacro
+  include_processor UriIncludeProcessor
+end
+```
+
+CAUTION: Extension classes must be defined outside of the register block.
+Once an extension class is registered, it is frozen, preventing further modification.
+If you define an extension class inside the register block, it will result in an error on subsequent invocations.
+
+You can register more than one processor of each type, though you can only have one processor per custom block or macro.
+Each registered class is instantiated when the [.class]#Asciidoctor::Document# is created.
+
+NOTE: There is currently no extension point for processing a built-in block, such as a normal paragraph.
+Look for that feature in a future Asciidoctor release.
+
+You can see additional extension examples in the {url-exten-lab}[Asciidoctor extensions lab].
+
+////
+For now, you need to use the Asciidoctor API (not the CLI) in order to register the extensions and invoke Asciidoctor.
+Eventually, we'll be able to load extensions packaged in a RubyGem (Ruby) or JAR (Java) by scanning
+the LOAD_PATH (Ruby) or classpath (Java), respectively.
+We may also ship some built-in extensions that can be enabled using an attribute named `extensions`, similar to how Markdown processors work.
+
+TIP: For those of you on the JVM, yes, you can write extensions in Java.
+We've prototyped it and it works.
+We're still sorting out a few technical challenges and documentation to make it completely smooth, but we'll get there.
+For details, follow the discussion in issue {issue-ref}/79[#79].
+////
