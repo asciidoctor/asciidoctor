@@ -1525,7 +1525,8 @@ sqrt(3x-1)+(1+x)^2 < y
       assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
     end
 
-    test 'should render asciimath block in textobject of equation in DocBook backend' do
+    test 'should convert contents of asciimath block to MathML in DocBook output if asciimath gem is available' do
+      asciimath_available = !(Asciidoctor::Helpers.require_library 'asciimath', true, :ignore).nil?
       input = <<-'EOS'
 [asciimath]
 ++++
@@ -1537,9 +1538,17 @@ x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
 <mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:mfrac><mml:mi>b</mml:mi><mml:mrow><mml:mn>2</mml:mn><mml:mi>a</mml:mi></mml:mrow></mml:mfrac><mml:mo>&#x003C;</mml:mo><mml:mo>&#x00B1;</mml:mo><mml:msqrt><mml:mrow><mml:mfrac><mml:msup><mml:mi>b</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mrow><mml:mn>4</mml:mn><mml:msup><mml:mi>a</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:mrow></mml:mfrac><mml:mo>&#x2212;</mml:mo><mml:mfrac><mml:mi>c</mml:mi><mml:mi>a</mml:mi></mml:mfrac></mml:mrow></mml:msqrt></mml:math>
 </informalequation>)
 
-      doc = document_from_string input, :backend => :docbook, :header_footer => false
-      assert_equal expect.strip, doc.convert.strip
-      assert_equal :loaded, doc.converter.instance_variable_get(:@asciimath)
+      using_memory_logger do |logger|
+        doc = document_from_string input, :backend => :docbook, :header_footer => false
+        actual = doc.convert
+        if asciimath_available
+          assert_equal expect.strip, actual.strip
+          assert_equal :loaded, doc.converter.instance_variable_get(:@asciimath)
+        else
+          assert_message logger, :WARN, 'optional gem \'asciimath\' is not installed. Functionality disabled.'
+          assert_equal :unavailable, doc.converter.instance_variable_get(:@asciimath)
+        end
+      end
     end
 
     test 'should output title for latexmath block if defined' do
