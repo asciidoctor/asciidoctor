@@ -1539,7 +1539,7 @@ x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
 
       doc = document_from_string input, :backend => :docbook, :header_footer => false
       assert_equal expect.strip, doc.convert.strip
-      assert_equal true, doc.converter.instance_variable_get(:@asciimath_available)
+      assert_equal :loaded, doc.converter.instance_variable_get(:@asciimath)
     end
 
     test 'should output title for latexmath block if defined' do

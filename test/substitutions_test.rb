@@ -1661,7 +1661,7 @@ EOS
         input = 'asciimath:[a < b]'
         para = block_from_string input, :backend => :docbook
         assert_equal '<inlineequation><mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>a</mml:mi><mml:mo>&#x003C;</mml:mo><mml:mi>b</mml:mi></mml:math></inlineequation>', para.content
-        assert_equal true, para.document.converter.instance_variable_get(:@asciimath_available)
+        assert_equal :loaded, para.document.converter.instance_variable_get(:@asciimath)
       end
 
       test 'should honor explicit subslist on asciimath macro' do

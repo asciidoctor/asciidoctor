@@ -260,8 +260,7 @@ module Asciidoctor
         equation = node.content
       end
       if node.style == 'asciimath'
-        if ((defined? ::AsciiMath) || ((defined? @asciimath_available) ? @asciimath_available :
-            (@asciimath_available = !(Helpers.require_library 'asciimath', true, :warn).nil?)))
+        if (@asciimath ||= ((defined? ::AsciiMath) || (Helpers.require_library 'asciimath', true, :warn)).nil? ? :unavailable : :loaded) == :loaded
           # NOTE fop requires jeuclid to process raw mathml
           equation_data = (::AsciiMath.parse equation).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML'
         else
@@ -586,8 +585,7 @@ module Asciidoctor
 
     def inline_quoted node
       if (type = node.type) == :asciimath
-        if ((defined? ::AsciiMath) || ((defined? @asciimath_available) ? @asciimath_available :
-            (@asciimath_available = !(Helpers.require_library 'asciimath', true, :warn).nil?)))
+        if (@asciimath ||= ((defined? ::AsciiMath) || (Helpers.require_library 'asciimath', true, :warn)).nil? ? :unavailable : :loaded) == :loaded
           # NOTE fop requires jeuclid to process raw mathml
           %(<inlineequation>#{(::AsciiMath.parse node.text).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML'}</inlineequation>)
         else
