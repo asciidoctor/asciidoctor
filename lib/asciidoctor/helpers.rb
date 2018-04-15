@@ -16,9 +16,9 @@ module Helpers
   #              (default: true)
   # on_failure - a Symbol that indicates how to handle a load failure (:abort, :warn, :ignore) (default: :abort)
   #
-  # returns The return value of Kernel#require if the library is available and can be, or was previously, loaded.
-  # Otherwise, Kernel#raise is called with an appropriate message if on_failure is :abort.
-  # Otherwise, Kernel#warn is called with an appropriate message and nil returned if on_failure is :warn.
+  # Returns The [Boolean] return value of Kernel#require if the library can be loaded.
+  # Otherwise, if on_failure is :abort, Kernel#raise is called with an appropriate message.
+  # Otherwise, if on_failure is :warn, Kernel#warn is called with an appropriate message and nil returned.
   # Otherwise, nil is returned.
   def self.require_library name, gem_name = true, on_failure = :abort
     require name
@@ -31,7 +31,6 @@ module Helpers
         raise ::LoadError, %(asciidoctor: FAILED: required gem '#{gem_name}' is not installed. Processing aborted.)
       when :warn
         logger.warn %(optional gem '#{gem_name}' is not installed. Functionality disabled.)
-        return
       end
     else
       case on_failure
@@ -39,7 +38,6 @@ module Helpers
         raise ::LoadError, %(asciidoctor: FAILED: #{e.message.chomp '.'}. Processing aborted.)
       when :warn
         logger.warn %(#{e.message.chomp '.'}. Functionality disabled.)
-        return
       end
     end
     nil
