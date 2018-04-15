@@ -400,8 +400,12 @@ class Reader
   #   a line for which the given block evals to true.
   #
   # options - an optional Hash of processing options:
+  #           * :terminator may be used to specify the contents of the line
+  #               at which the reader should stop
   #           * :break_on_blank_lines may be used to specify to break on
   #               blank lines
+  #           * :break_on_list_continuation may be used to specify to break
+  #               on a list continuation line
   #           * :skip_first_line may be used to tell the reader to advance
   #               beyond the first line before beginning the scan
   #           * :preserve_last_line may be used to specify that the String
@@ -410,6 +414,10 @@ class Reader
   #           * :read_last_line may be used to specify that the String
   #               causing the method to stop processing lines should be
   #               included in the lines being returned
+  #           * :skip_line_comments may be used to look for and skip
+  #               line comments
+  #           * :skip_processing is used to disable line (pre)processing
+  #               for the duration of this method
   #
   # Returns the Array of lines forming the next segment.
   #
