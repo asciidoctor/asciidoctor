@@ -1,0 +1,181 @@
+= Author, Version, and Date
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// from author.adoc and revision.adoc
+
+== Author syntax
+
+The author of a document is listed on the line beneath the document's title.
+An optional email address or URL can follow an author's name inside angle brackets.
+
+Let's add an author with her email address to the document below.
+
+[source]
+----
+include::{partialsdir}/ex-author.adoc[tag=base]
+----
+
+.Result: Rendered author and email information displayed on the byline and referenced in the document's body
+====
+#Fix ex#
+//image::author-email.png[Author and email attributes]
+====
+
+As you can see in the example above, Asciidoctor uses the author's name and email to assign values to a number of built-in attributes that can be used throughout the document's body.
+These attributes include:
+
+`author`::
+The author's full name, which includes all of the characters or words prior to a semicolon (`;`), angle bracket (`<`) or the end of the line.
+
+`firstname`::
+The first word in the author attribute.
+
+`lastname`::
+The last word in the author attribute.
+
+`middlename`::
+If a firstname and lastname are present, any remaining words or characters found between these attributes are assigned to the middlename attribute.
+
+`authorinitials`::
+The first character of the firstname, middlename, and lastname attributes.
+
+`email`::
+An email address, delimited by angle brackets (`<>`).
+
+If one or more of the author's names consists of more than one word, use an underscore (`_`) between the words you want to adjoin.
+For example, the author of the following document has a compound last name.
+
+[source]
+----
+include::{partialsdir}/ex-author.adoc[tag=2-mid]
+----
+
+.Result: Rendered author information when author has a compound name
+====
+#Fix ex#
+//image::author-compound.png[Compound author name attributes]
+====
+
+Alternatively, the author and email attributes can be set explicitly in the header.
+
+[source]
+----
+include::{partialsdir}/ex-author.adoc[tag=attr]
+----
+
+.Result: Rendered author information when author and email attributes are explicitly set
+====
+#Fix ex#
+//image::author-email-long.png[Author and email attributes]
+====
+
+The `html5` and `docbook` converters can convert documents with multiple authors.
+Multiple authors and their emails are separated by semicolons (`;`) when they're listed on the same line.
+
+[source]
+----
+include::{partialsdir}/ex-author.adoc[tag=multi]
+----
+<1> To reference the additional authors in the document body, the author attributes are appended with an underscore (`+_+`) followed by the position of the author in the author information list (i.e. Lazarus het Draeke is the second author in the list so his author attributes are appended with a 2).
+
+.Result: Rendered author information when document has multiple authors
+====
+#Fix ex#
+//image::multi-author.png[Multiple author and email attributes]
+====
+
+////
+If you want to enter multiple authors and their emails as attribute entries, the attribute names are as follows:
+
+[source]
+----
+include::multi-author-email-long.adoc[]
+----
+
+.Result
+====
+image::multi-author-email-long.png[Multiple author and email attributes]
+====
+
+Where does `authored` (empty string '' if {author} or {email} defined) fit in?
+////
+
+=== Attribute references in the author line
+
+The implicit author line was not intended to support arbitrary placement of attribute references.
+While attribute references are replaced in the author line (as part of the header substitution group), they aren't substituted until _after_ the line is parsed.
+This ordering can sometimes produce undesirable or surprising results.
+It's best to use the author line strictly as a shorthand for defining a fixed author and email.
+
+If you do need to use attribute references in the author or email value, you should revert to defining the attributes explicitly using attribute entries.
+
+.Using attribute references to set author and email
+[source]
+----
+= Document Title
+:author_name: ACME Industries
+:author_email: info@acme.com
+:author: {author_name}
+:email: {author_email}
+----
+
+Just remember that the author line is for static text.
+Once you graduate beyond static text, you should switch to using attribute entries to define the built-in author attributes, which will give you much more power.
+
+== Version, revision, and date syntax
+
+The revision information is read from the third (non-attribute) line of the header, beneath the author information line.
+A document's revision information has slots for three implicit attributes.
+
+`revnumber`::
+The document's version number.
+In order to be recognized, the version number must contain at least one numeric character.
+Any letters or symbols preceding the numeric character are ignored.
+If the implicit `revnumber` is on a line by itself, it must begin with the "`v`" character (e.g., `v1.0`) or be followed by a comma (e.g., `1.0,`)
+If the implicit `revdate` is present, it must be separated from the `revnumber` by a comma (e.g., `2020-10-10, v78.1`).
+
+`revdate`::
+The date the document version was completed.
+When the `revnumber` or `revremark` attributes are set, but `revdate` is not, then `revdate` will be assigned the `docdate` value.
+
+`revremark`::
+Information about this version of the document.
+
+Here's an example of a revision line.
+
+[source]
+----
+include::{partialsdir}/ex-rev.adoc[tag=base]
+----
+<1> revnumber and revdate must be separated by a comma (`,`).
+<2> revdate can contain words, letters, numbers, and symbols.
+<3> The revremark attribute must be preceded by a colon (`:`), regardless of whether revnumber or revdate are set.
+
+.Result: Rendered revision information displayed on the byline and referenced in the document's body
+====
+#Fix ex#
+//image::rev.png[Revision attributes]
+====
+
+The revnumber in the byline is prefixed by the word _Version_; however, when referenced in the body of the document, only the numerical value is displayed.
+The `version-label` attribute controls the version number label in the byline.
+The revision information attributes can also be explicitly set in the header.
+
+[source]
+----
+include::{partialsdir}/ex-rev.adoc[tag=attr]
+----
+<1> When explicitly set, any characters preceding the version number are *not* dropped.
+<2> The revremark can contain attribute references.
+<3> The version-label attribute is unset so that the word _Version_ does not precede the revnumber in the byline.
+
+.Result: Rendered revision information when revision attributes are explicitly set
+====
+#Fix ex#
+//image::rev-long.png[Explicitly set revision attributes]
+====
+
+In the converted document, notice that the _V_ preceding the revnumber is capitalized in the byline but not when the attribute is referenced in the body of the document.
+
+//NOTE: Revision extraction information and an extraction example are pending.
