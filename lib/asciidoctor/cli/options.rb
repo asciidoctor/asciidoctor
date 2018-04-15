@@ -139,7 +139,7 @@ Example: asciidoctor -b html5 source.asciidoc
               if (manpage_path = ENV['ASCIIDOCTOR_MANPAGE_PATH'])
                 if ::File.exist? manpage_path
                   if manpage_path.end_with? '.gz'
-                    require 'zlib' unless defined? ::Zlib
+                    require 'zlib' unless defined? ::Zlib::GzipReader
                     $stdout.puts ::Zlib::GzipReader.open(manpage_path) {|gz| gz.read }
                   else
                     $stdout.puts ::IO.read manpage_path
@@ -151,13 +151,13 @@ Example: asciidoctor -b html5 source.asciidoc
               elsif ::File.exist?(manpage_path = (::File.join ::Asciidoctor::ROOT_PATH, 'man', 'asciidoctor.1'))
                 $stdout.puts ::IO.read manpage_path
               else
-                require 'open3' unless defined? ::Open3
+                require 'open3' unless defined? ::Open3.popen3
                 manpage_path = ::Open3.popen3('man -w asciidoctor') {|_, out| out.read }.chop rescue ''
                 if manpage_path.empty?
                   $stderr.puts 'asciidoctor: FAILED: manual page not found; try `man asciidoctor`'
                   return 1
                 elsif manpage_path.end_with? '.gz'
-                  require 'zlib' unless defined? ::Zlib
+                  require 'zlib' unless defined? ::Zlib::GzipReader
                   $stdout.puts ::Zlib::GzipReader.open(manpage_path) {|gz| gz.read }
                 else
                   $stdout.puts ::IO.read manpage_path
@@ -239,7 +239,7 @@ Example: asciidoctor -b html5 source.asciidoc
 
         if self[:template_dirs]
           begin
-            require 'tilt' unless defined? ::Tilt
+            require 'tilt' unless defined? ::Tilt::VERSION
           rescue ::LoadError
             raise $! if self[:trace]
             $stderr.puts 'asciidoctor: FAILED: \'tilt\' could not be loaded'
