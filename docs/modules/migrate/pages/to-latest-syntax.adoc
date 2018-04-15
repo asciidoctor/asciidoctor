@@ -1,0 +1,246 @@
+= Migrate from Asciidoctor 0.1.4 to Asciidoctor 1.5.0
+//Dan Allen
+//v1.1, 2014-08-10
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+//:page-layout!:
+:description: A guide that assists with migration from Asciidoctor 0.1.4 to 1.5.0.
+:keywords: Asciidoctor 1.5, migrate to Asciidoctor 1.5, Asciidoctor 1.5 migration, migrating to Asciidoctor 1.5, migrating to Asciidoctor, compat mode, Asciidoctor compat mode, compat-mode
+
+We decided to rework some of the AsciiDoc syntax in Asciidoctor 1.5.0 in an effort to make it more consistent, deterministic and easy to learn.
+You can learn more about the changes in the link:/release-notes/asciidoctor-1-5-0[Asciidoctor 1.5.0 release notes].
+
+Compatibility is very important to us, so we've added a compatibility mode as well as a transitional syntax to ease migration from Asciidoctor 0.1.4 to Asciidoctor 1.5.0.
+This document explains how to enable <<Compat mode,compat(ibility) mode>>, if you're not yet ready to migrate, as well as the <<Migration scenarios,migration scenarios>>, for when you are ready to make the switch.
+It also draws your attention to a few minor changes you'll need to be aware of that could affect your content.
+
+== Compat mode
+
+If you can't migrate right now, you can activate compatibility mode by setting the document-level `compat-mode` attribute or by using a setext-style (i.e., two-line) document title.
+
+In compat mode, most of Asciidoctor 1.5.0's _syntax modifications_ that deviate from the legacy AsciiDoc syntax are reverted.
+This mode does not disable syntax unique to Asciidoctor, such as inline icons (e.g., pass:[icon:fire[\]]).
+
+You can define the `compat-mode` attribute in the document header:
+
+ :compat-mode:
+
+using the `-a` commandline flag:
+
+ -a compat-mode
+
+or using the `attributes` option in the API:
+
+ attributes: %w(compat-mode)
+
+Alternatively, you can enable compat mode by using a setext-style (i.e., two-line) section title:
+
+----
+Document Title
+==============
+
+Content parsed in compat-mode by default.
+----
+
+Since setext-style headings are typically used in older AsciiDoc documents, this convention allows Asciidoctor to accomodate these older documents without having to wake any sleeping giants ;)
+
+You can set `compat-mode` anywhere in the flow of a document.
+
+.Setting and unsetting compat-mode in a document
+-----
+:compat-mode: // <1>
+
+Sometimes you feel 'compat'.
+
+:compat-mode!: // <2>
+
+Sometimes you _don't_.
+-----
+<1> Set compat-mode within the body of a document.
+<2> Unset compat-mode using a bang (`!`) within the body of a document.
+
+Compat mode will be supported for the foreseeable future to avoid unnecessary disruption to your content.
+
+If you want to begin migration to the modern syntax, read on.
+
+== Migration scenarios
+
+There are several scenarios that are affected by Asciidoctor 1.5.0's changes to the AsciiDoc syntax:
+
+* Monospaced normal text (text that doesn't contain any AsciiDoc syntax)
+* Monospaced text without substitutions (you want to prevent the monospaced text from being interpreted)
+* Monospaced text with substitutions (you want the monospaced text to be interpreted)
+* Smart quote shorthand
+
+Let's first consider the legacy syntax used in each of these examples.
+
+=== Legacy syntax
+
+Here's the legacy syntax (Asciidoctor 0.1.4 and earlier) for the scenarios listed above.
+
+* pass:[+monospaced normal text+ or `monospaced normal text`]
+* pass:[`{asciidoctor-version} holds the version`] (attribute is not replaced)
+* pass:[+The Asciidoctor version is {asciidoctor-version}+] (attribute is replaced)
+* pass:[``double quoted'' and `single quoted'] (quotes are curved)
+
+=== New syntax
+
+Here are those same three scenarios using the syntax in Asciidoctor 1.5.0.
+
+* pass:[`monospaced normal text`]
+* pass:[`+{asciidoctor-version} holds the version+`] (attribute is not replaced)
+* pass:[`The Asciidoctor version is {asciidoctor-version}`] (attribute is replaced)
+* pass:["`double quoted`" and '`single quoted`'] (quotes are curved)
+
+WARNING: To escape single smart quotes in the legacy syntax, you place a single backslash in front of the start quote (e.g., pass:[\``single quoted'']).
+In the new syntax, you need to use a backslash before the start quote and before the end quote (e.g., pass:[\'`single quoted\`']).
+That's because pass:[`'] is an unconstrained (anywhere) right smart quote replacement.
+
+Before jumping to the new syntax, you need to understand that it won't be parsed correctly by Asciidoctor 0.1.4.
+Unfortunately, we can't control when Asciidoctor is upgraded on services like GitHub, so there will be a period of time when you will need to use a syntax that works on both versions.
+So what do we do?
+The answer, use the transitional syntax.
+
+=== Transitional syntax
+
+The transitional syntax allows you to pin-point the locations in your document that you'll eventually want to migrate to the modern syntax, but can't yet until Asciidoctor 0.1.4 is phased out.
+
+To use the transitional syntax, simply add the role `x-` in front of the legacy syntax to indicate that you want Asciidoctor 1.5.0 to use the old behavior.
+Naturally, Asciidoctor 0.1.4 already understands the old syntax and will simply ignore the role.
+
+.Transitional syntax
+* pass:[`monospaced normal text`] (*No transitional syntax necessary!*)
+* pass:[[x-\]`{asciidoctor-version} holds the version`] (attribute is not replaced)
+* pass:[[x-\]+The Asciidoctor version is {asciidoctor-version}+] (attribute is replaced)
+* “double quotes” and ‘single quotes’
+
+[NOTE]
+====
+There isn't transitional syntax for curved (i.e., smart) quotes.
+Instead, we encourage you to enter the smart quotes directly into your document.
+It is UTF-8 after all!
+
+Refer to http://smartquotesforsmartpeople.com[Smart Quotes for Smart People], http://www.kryogenix.org/days/2013/10/17/smart-quotes-for-smart-ubuntu-people[Smart Quotes for Smart Ubuntu (Linux) People] or http://fsymbols.com/keyboard/linux/compose/[Linux Keyboard Shortcuts for Text Symbols] for instructions on how to type these characters.
+====
+
+Let's consider an example.
+
+.Using the transitional syntax
+[caption="Example: "]
+====
+Assume you want to put italics inside of monospaced text.
+If you want the syntax to work in both Asciidoctor and AsciiDoc Python, you need to do one of the following:
+
+[loweralpha]
+. Enable the `compat-mode` attribute on the document and enter the text as:
+
+ +cat _filename_+
+
+. Don't enable the `compat-mode` attribute and enter the text as:
+
+ [x-]+cat _filename_+
+
+You can think of `[x-]` as a local compat mode setting.
+====
+
+If you aren't worried about how the document renders on services like GitHub, you can start using the modern syntax immediately.
+
+== Migration cheatsheet
+
+The following table provides a migration cheatsheet that compares the legacy, transitional and modern syntax side-by-side.
+
+.Syntax migration cheatsheet
+[cols="1m,1m,1m,1"]
+|===
+|Legacy |Transitional |Modern |Rendered
+
+|pass:['italic text']
+d|N/A
+|pass:[_single quoted_]
+|_italic text_
+
+|pass:[+monospaced text+]
+d|N/A
+|pass:[`monospaced text`]
+|`monospaced text`
+
+|pass:[`monospaced text`]
+d|N/A
+|pass:[`monospaced text`]
+|`monospaced text`
+
+|pass:[`{asciidoctor-version}`]
+|pass:[[x-\]`{asciidoctor-version}`]
+|pass:[`+{asciidoctor-version}+`]
+|[x-]`{asciidoctor-version}`
+
+|pass:[+{asciidoctor-version}+]
+|pass:[[x-\]+{asciidoctor-version}+]
+|pass:[`{asciidoctor-version}`]
+|[x-]+{asciidoctor-version}+
+
+|pass:[``double quoted'']
+|pass:[“double quoted”]
+|pass:["`double quoted`"]
+|“double quoted”
+
+|pass:[`single quoted']
+|pass:[‘single quoted’]
+|pass:['`single quoted`']
+|‘single quoted’
+|===
+
+== TOC (Table of Contents) positioning
+
+Say goodbye to the `toc2` attribute.
+It's deprecated!
+
+As of Asciidoctor 1.5.0, the `toc2`, `toc-placement` and `toc-position` attributes have been combined into a more expressive `toc` attribute.
+The `toc` attribute does it all!
+It's now responsible for enabling the table of contents and specifying the location where it should appear.
+
+For example, to activate the table of contents in the left sidebar, define the `toc` attribute _in the document header_ with the value of `left`.
+
+.Enable the (left) sidebar table of contents
+----
+= Document Title
+Author Name
+:toc: left
+----
+
+If you want to position the table of contents manually, then you'd set the value of the `toc` attribute to `macro` (_not_ `manual`) and use the `toc::[]` macro to indicate the location where the table of contents should appear.
+
+.Position the sidebar explicitly
+----
+= Document Title
+Author Name
+:toc: macro
+
+some content
+
+toc::[]
+
+more content
+----
+
+The following list shows the permitted values for the `toc` attribute:
+
+* auto (default value when the `toc` attribute value is blank)
+* left
+* right
+* preamble
+* macro
+
+We recommend you remove all other attributes that affect the positioning of the toc from your document or launch scripts (i.e., `toc2`, `toc-placement` and `toc-position`).
+
+For more information about the table of contents, see the #user-toc,Table of Contents# section of the user manual.
+
+== Font Awesome upgrade (3.2.1 -> 4.1)
+
+The Asciidoctor 1.5.0 release brought an upgrade from Font Awesome 3.2.1 to 4.1.
+Font Awesome 4 introduced a new naming pattern for icons.
+This won't affect any of the built-in use of Font Awesome, such as admonition icons, but it does affect the inline icon macro.
+If you use the inline icon macro, consult the https://github.com/FortAwesome/Font-Awesome/wiki/Upgrading-from-3.2.1-to-4#new-icon-names[mapping between old and new names] to ensure you don't have any broken images.
+
+If you want to continue to use the old icon names, you can incorporate the https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/compat/font-awesome-3-compat.css[font-awesome-3-compat.css] file from the Asciidoctor repository into your generated HTML using a #docinfo-file,docinfo file#.
