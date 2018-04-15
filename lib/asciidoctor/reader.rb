@@ -713,12 +713,12 @@ class PreprocessorReader < Reader
 
     if keyword == 'endif'
       if @conditional_stack.empty?
-        logger.error enrich_message %(unmatched macro: endif::#{target}[]), :source_location => cursor
+        logger.error message_with_context %(unmatched macro: endif::#{target}[]), :source_location => cursor
       elsif no_target || target == (pair = @conditional_stack[-1])[:target]
         @conditional_stack.pop
         @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
       else
-        logger.error enrich_message %(mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]), :source_location => cursor
+        logger.error message_with_context %(mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]), :source_location => cursor
       end
       return true
     end
@@ -834,7 +834,7 @@ class PreprocessorReader < Reader
       replace_next_line %(link:#{expanded_target}[])
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0
       if @include_stack.size >= abs_maxdepth
-        logger.error enrich_message %(maximum include depth of #{@maxdepth[:rel]} exceeded), :source_location => cursor
+        logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), :source_location => cursor
         return
       end
 
@@ -900,7 +900,7 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          logger.error enrich_message %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
+          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         shift
@@ -939,9 +939,9 @@ class PreprocessorReader < Reader
                   elsif inc_tags.key? this_tag
                     if (idx = tag_stack.rindex {|key, _| key == this_tag })
                       idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
-                      logger.warn enrich_message %(mismatched end tag in include: expected #{active_tag}, found #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
+                      logger.warn message_with_context %(mismatched end tag in include: expected #{active_tag}, found #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
                     else
-                      logger.warn enrich_message %(unexpected end tag in include: #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
+                      logger.warn message_with_context %(unexpected end tag in include: #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
                     end
                   end
                 elsif inc_tags.key?(this_tag = $2)
@@ -960,11 +960,11 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          logger.error enrich_message %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
+          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
-          logger.warn enrich_message %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
+          logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
         end
         shift
         # FIXME not accounting for skipped lines in reader line numbering
@@ -976,7 +976,7 @@ class PreprocessorReader < Reader
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attributes
         rescue
-          logger.error enrich_message %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
+          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
       end
@@ -1022,7 +1022,7 @@ class PreprocessorReader < Reader
           shift
           return true
         else
-          logger.error enrich_message %(include file not found: #{inc_path}), :source_location => cursor
+          logger.error message_with_context %(include file not found: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
         end
       end

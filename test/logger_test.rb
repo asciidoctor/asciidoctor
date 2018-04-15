@@ -178,11 +178,11 @@ context 'Logger' do
       assert_same Asciidoctor::LoggerManager.logger, SampleClassD.get_logger
     end
 
-    test 'can enrich and auto-format message' do
+    test 'can create an auto-formatting message with context' do
       class SampleClassE
         include Asciidoctor::Logging
         def create_message cursor
-          enrich_message 'Asciidoctor was here', :source_location => cursor
+          message_with_context 'Asciidoctor was here', :source_location => cursor
         end
       end
 

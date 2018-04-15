@@ -97,7 +97,7 @@ module Logging
     LoggerManager.logger
   end
 
-  def enrich_message text, context = {}
+  def message_with_context text, context = {}
     ({ :text => text }.merge context).extend Logger::AutoFormattingMessage
   end
 end

@@ -367,7 +367,7 @@ class Table::ParserContext
           xsv = '!sv'
         end
       else
-        logger.error enrich_message %(illegal table format: #{xsv}), :source_location => reader.prev_line_cursor
+        logger.error message_with_context %(illegal table format: #{xsv}), :source_location => reader.prev_line_cursor
         @format, xsv = 'psv', (table.document.nested? ? '!sv' : 'psv')
       end
     else
@@ -521,7 +521,7 @@ class Table::ParserContext
       if (cellspec = take_cellspec)
         repeat = cellspec.delete('repeatcol') || 1
       else
-        logger.error enrich_message 'table missing leading separator, recovering automatically', :source_location => @last_cursor
+        logger.error message_with_context 'table missing leading separator, recovering automatically', :source_location => @last_cursor
         cellspec = {}
         repeat = 1
       end
@@ -558,7 +558,7 @@ class Table::ParserContext
       else
         # QUESTION is this right for cells that span columns?
         unless (column = @table.columns[@current_row.size])
-          logger.error enrich_message 'dropping cell because it exceeds specified number of columns', :source_location => @last_cursor
+          logger.error message_with_context 'dropping cell because it exceeds specified number of columns', :source_location => @last_cursor
           return
         end
       end
