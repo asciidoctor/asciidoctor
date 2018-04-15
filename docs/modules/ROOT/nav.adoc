@@ -3,6 +3,8 @@
 * xref:setup:upgrade.adoc[Upgrade Asciidoctor]
 * xref:setup:upgrade-syntax.adoc[Modified & Deprecated Syntax]
 
+* xref:cli:cli.adoc[Asciidoctor CLI]
+** xref:cli:cli-options.adoc[CLI Options]
 * Key Concepts
 ** xref:blocks:block.adoc[Blocks]
 ** xref:comment.adoc[Comments]
