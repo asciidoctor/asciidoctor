@@ -2831,12 +2831,7 @@ That's all she wrote!
 
       using_memory_logger do |logger|
         render_string input
-        # FIXME see #2572
-        assert_messages logger, [
-          [:ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash],
-          [:ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash],
-          [:ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash]
-        ]
+        assert_message logger, :ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash
       end
     end
 
