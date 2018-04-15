@@ -5,8 +5,6 @@
 
 * xref:cli:cli.adoc[Asciidoctor CLI]
 ** xref:cli:cli-options.adoc[CLI Options]
-* xref:api:api.adoc[Asciidoctor API]
-** xref:api:api-options.adoc[API Options]
 
 * Key Concepts
 ** xref:blocks:block.adoc[Blocks]
@@ -70,6 +68,8 @@
 ** xref:include:indent.adoc[Normalize Indentation]
 ** xref:include:uri.adoc[Include by URI]
 
+* xref:stem:stem.adoc[Equations & Formulas]
+
 * xref:subs:substitutions.adoc[Substitutions & Passthroughs]
 ** xref:subs:special-characters.adoc[Special Characters]
 ** xref:subs:quotes.adoc[Inline Formatting Syntax]
@@ -95,5 +95,10 @@
 ** xref:book:bibliography.adoc[Bibliography]
 ** xref:book:index.adoc[Index]
 ** xref:book:footnotes.adoc[Footnotes]
+
+* xref:api:api.adoc[Asciidoctor API]
+** xref:api:api-options.adoc[API Options]
+** xref:api:strings.adoc[Convert Strings]
+** xref:api:templates.adoc[Load Custom Templates]
 
 * xref:project/version-and-lifecycle-policies.adoc[Version & Lifecycle Policies]
