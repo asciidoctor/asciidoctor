@@ -2818,6 +2818,28 @@ That's all she wrote!
       assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
     end
 
+    test 'should print error if level 0 section comes after nested section and doctype is not book' do
+      input = <<-EOS
+= Document Title
+
+== Level 1 Section
+
+=== Level 2 Section
+
+= Level 0 Section
+      EOS
+
+      using_memory_logger do |logger|
+        render_string input
+        # FIXME see #2572
+        assert_messages logger, [
+          [:ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash],
+          [:ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash],
+          [:ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash]
+        ]
+      end
+    end
+
     test 'should add class matching role to part' do
       input = <<-EOS
 = Book Title
