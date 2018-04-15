@@ -1,0 +1,51 @@
+= Document Metadata
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// meta.adoc
+
+Document metadata, such as a description of the document, keywords, and the title, can be assigned to attributes in the header.
+When converted to HTML, the values of these attributes will correspond to tags contained in the `<head>` section of an HTML document.
+
+== Description
+
+You can include a description of the document using the `description` attribute.
+
+[source]
+----
+include::{partialsdir}/ex-desc.adoc[tag=desc-base]
+----
+<1> If the document's description is long, you can break the attribute's value across several lines by ending each line with a backslash `\` that is preceded by a space.
+
+When converted to HTML, the document description value is assigned to the HTML `<meta>` tag.
+
+.HTML output
+====
+include::{partialsdir}/ex-desc.adoc[tag=desc-html]
+====
+
+// TODO: Add attribute continuation documentation to attributes section
+
+== Keywords
+
+The `keywords` attribute contains a list of comma separated values that are assigned to the HTML `<meta>` tag.
+
+[source]
+----
+include::{partialsdir}/ex-keyword.adoc[tag=key-base]
+----
+
+.HTML output
+====
+include::{partialsdir}/ex-keyword.adoc[tag=key-html]
+====
+
+== Alternate title
+
+By default, Asciidoctor uses the text of the document title as the value of the HTML `<title>` tag.
+You can override this behavior by setting the `title` attribute in the document header.
+
+== Custom metadata, styles and functions
+
+You can add content, such as custom metadata, stylesheet, and script information, to the header of the output document using docinfo ("`document information`") files.
+The #docinfo-file,docinfo file# section details what these files can contain and how to use them.

@@ -1,0 +1,82 @@
+////
+Example
+
+Included in:
+
+- user-manual: Header
+- quick-ref
+////
+
+// tag::base[]
+= The Dangerous and Thrilling Documentation Chronicles
+Kismet Rainbow Chameleon <kismet@asciidoctor.org>
+
+This journey begins...
+
+== About the Author
+
+You can contact {author} at {email}.
+{firstname} loves to hear from other chroniclers.
+
+P.S. And yes, my middle name really is {middlename}.
+What else would you expect from a member of the Rocky Mountain {lastname} Clan?
+
+{authorinitials}
+// end::base[]
+
+// tag::b-base[]
+= My Document's Title
+Doc Writer <doc.writer@asciidoctor.org>
+
+My document provides...
+// end::b-base[]
+
+// tag::2-mid[]
+= The Unbearable Lightness of Nomenclature
+Jan Hendrik van_den_Berg
+
+My first name is {firstname}.
+
+My middle name is {middlename}.
+
+My last name is {lastname}.
+
+My initials are {authorinitials}.
+// end::2-mid[]
+
+// tag::attr[]
+= The Dangerous and Thrilling Documentation Chronicles
+:author: Kismet Rainbow Chameleon
+:email: kismet@asciidoctor.org
+
+This journey begins...
+
+== About the Author
+
+You can contact {author} at {email}.
+{firstname} loves to hear from other chroniclers.
+
+P.S. And yes, my middle name really is {middlename}.
+What else would you expect from a member of the Rocky Mountain {lastname} Clan?
+
+{authorinitials}
+// end::attr[]
+
+// tag::multi[]
+= The Dangerous and Thrilling Documentation Chronicles
+Kismet Rainbow Chameleon <kismet@asciidoctor.org>; Lazarus het_Draeke <lazarus@asciidoctor.org>
+
+This journey begins...
+
+== About the Authors
+
+You can contact {author} at {email}.
+{firstname} loves to hear from other chroniclers.
+
+{author_2} specializes in burning down automation obstacles. // <1>
+Email {lastname_2} at {email_2}.
+
+Until our next adventure!
+
+{authorinitials} & {authorinitials_2}
+// end::multi[]

@@ -1,0 +1,183 @@
+= Document Titles and Subtitles
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+header-title.adoc, included in:
+////
+
+The document title resembles a level-0 section title, which is written using a single equal sign followed by at least one space (i.e., `={sp}`), then the text of the title.
+The document title must be the first level-0 section title in the document.
+The only content permitted above the document title are blank lines, comment lines and document-wide attribute entries.
+
+Here's an example of a document title followed by a short paragraph.
+Notice the blank line between the document title and the first line of prose.
+That blank line is what offsets the document header from the body.
+
+.Document with a title
+[source]
+----
+include::{partialsdir}/ex-header-title.adoc[tag=base]
+----
+
+.Result: Rendered document title
+====
+#Converted title or image of rendered title#
+//image::sect0-title.png[Title of document]
+====
+
+When the `doctype` is `article` or `manpage`, the document can only have one level-0 section title.
+In contrast, the `book` document type permits multiple level-0 section titles.
+When the `doctype` is `book`, the first level-0 section title, located in the header, is the document's title and subsequent level-0 section titles are the part titles.
+
+== doctitle attribute
+
+A document's title is assigned to the built-in `doctitle` attribute.
+//Its value is identical to the value returned by `Document#doctitle`.
+The doctitle attribute can be referenced anywhere in a document and resolves to the document's title when displayed.
+
+.Referencing the doctitle attribute
+[source]
+----
+include::{partialsdir}/ex-header-title.adoc[tag=doc]
+----
+
+.Result: doctitle output
+====
+#Converted doctitle or image#
+//image::doctitle.png[Doctitle attribute]
+====
+
+The `doctitle` attribute can also be used to set the document title instead of using a level-0 section title.
+However, the attribute must still be set in the document header.
+
+== Title visibility
+
+You can control whether or not the document title appears in the converted document using the `showtitle` attribute.
+
+When converting a standalone document, the document title is shown by default.
+If you don't want the title to be shown in this case, unset the `showtitle` attribute using `showtitle!` in the document header or via the CLI or API.
+
+When converted to an embeddable document, the document title is _not_ shown by default.
+If you want the title to be shown, set the `showtitle` attribute in the document header or via the CLI or API.
+The author and revision information is not shown below the document title in the embeddable version of the document like it is in the standalone document, even when the `showtitle` attribute is set.
+
+Let's look at how to add additional metadata to the document header, including an author and her email address.
+
+== Document subtitle
+
+Asciidoctor recognizes a subtitle in the primary level-0 heading.
+If the primary title contains at least one colon followed by a space (i.e, `:{sp}`), Asciidoctor treats the text after the final colon-space sequence as the subtitle.
+
+NOTE: The subtitle is not distinguished from the main title in the `html5` output.
+It's only distinguished from the main title when using the `docbook`, `epub3`, and `pdf` converters.
+
+.Document with a subtitle
+[source]
+----
+include::{partialsdir}/ex-header-title.adoc[tag=sub-1]
+----
+
+In this example, the following is true:
+
+Main title:: The Dangerous and Thrilling Documentation Chronicles
+Subtitle:: A Tale of Caffeine and Words
+
+.Document with a subtitle and multiple colons
+[source]
+----
+include::{partialsdir}/ex-header-title.adoc[tag=sub-2]
+----
+
+In this example, the following is true:
+
+Main title:: A Cautionary Tale: The Dangerous and Thrilling Documentation Chronicles
+Subtitle:: A Tale of Caffeine and Words
+
+Instead of using a colon followed by a space as the separator characters between the main title and the subtitle, you can specify a custom separator using the `title-separator` attribute.
+
+.Document with a subtitle using a custom separator
+[source]
+----
+include::{partialsdir}/ex-header-title.adoc[tag=sub-3]
+----
+
+Note that a space is always appended to the value of the `title-separator` (making the default value of the `title-separator` effectively a single colon).
+
+=== Subtitle partitioning
+// from subtitle.adoc
+// this is mixing so many use cases and is a version snarl
+
+By default, the document title is separated into a main title and subtitle using the industry standard, a colon followed by a space.
+
+NOTE: As of Asciidoctor 1.5.2, subtitle partitioning is not implemented in the HTML 5 backend.
+
+.A document title that contains a subtitle
+[source]
+----
+= Main Title: Subtitle
+----
+
+The separator is searched from the end of the text.
+Therefore, only the last occurrence of the separator is used for partitioning the title.
+
+.A document title that contains a subtitle and more than one separator
+[source]
+----
+= Main Title: Main Title Continued: Subtitle
+----
+
+You can modify the title separator by specifying the `separator` block attribute explicitly above the document title (since Asciidoctor 1.5.3).
+Note that a space will automatically be appended to the separator value.
+
+.A document title with an explicit title separator
+[source]
+----
+[separator=::]
+= Main Title:: Subtitle
+----
+
+You can also set the separator using a document attribute, either in the document:
+
+.A document title with an explicit title separator
+[source]
+----
+= Main Title:: Subtitle
+:title-separator: ::
+----
+
+or from the API or CLI (shown here):
+
+....
+$ asciidoctor -a title-separator=:: document.adoc
+....
+
+You can partition the title from the API when calling the `doctitle` method on Document:
+
+.Retrieving a partitioned document title
+[source,ruby]
+----
+title_parts = document.doctitle partition: true
+puts title_parts.title
+puts title_parts.subtitle
+----
+
+You can partition the title in an arbitrary way by passing the separator as a value to the partition option.
+In this case, the partition option both activates subtitle partitioning and passes in a custom separator.
+
+.Retrieving a partitioned document title with a custom separator
+[source,ruby]
+----
+title_parts = document.doctitle partition: '::'
+puts title_parts.title
+puts title_parts.subtitle
+----
+
+////
+This content needs to be moved or reconsidered:
+
+Asciidoctor also provides an API for extracting the title and subtitle.
+See the API docs for the http://www.rubydoc.info/gems/asciidoctor/Asciidoctor/Document/Title[Document::Title] for more information.
+Support for subtitle functionality for other sections is being considered.
+Refer to https://github.com/asciidoctor/asciidoctor/issues/1493[issue #1493].
+////

@@ -53,4 +53,3 @@ Asciidoctor.convert_file 'mysample.adoc', backend: 'docbook'
 The command will output to the file [.path]_mysample.xml_ in the same directory.
 
 You can also use the API to xref:strings.adoc[convert strings] and xref:templates.adoc[load custom templates].
-//<<user-manual#convert-strings,convert strings>> and <<user-manual#provide-custom-templates,load custom templates>>.

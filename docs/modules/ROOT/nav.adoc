@@ -21,6 +21,12 @@
 ** xref:quote-marks.adoc[Quotes & Apostrophes]
 ** xref:sub-and-sup.adoc[Subscript & Superscript]
 
+* xref:header:header-intro.adoc[Document Header]
+** xref:header:titles.adoc[Titles & Subtitles]
+** xref:header:author-and-version.adoc[Author, Version, & Date]
+** xref:header:metadata.adoc[Metadata]
+** xref:header:header-ref.adoc[Header Reference]
+
 * xref:sections:sections.adoc[Sections]
 ** xref:sections:levels-and-titles.adoc[Levels & Titles]
 *** xref:sections:numbers.adoc[Numbers]

@@ -1,0 +1,51 @@
+////
+Example
+
+Included in:
+
+- user-manual: Header
+- quick-ref
+////
+
+// tag::base[]
+= The Dangerous and Thrilling Documentation Chronicles
+Kismet Chameleon <kismet@asciidoctor.org>
+v1.0, October 2, 2013: First incarnation // <1> <2> <3>
+
+This journey begins...
+
+== Colophon
+
+Version: {revnumber}
+
+Version Date: {revdate}
+
+Version Notes: {revremark}
+// end::base[]
+
+// tag::b-base[]
+= My Document's Title
+Doc Writer <doc.writer@asciidoctor.org>
+v1.0, 2014-01-01
+
+My document provides...
+// end::b-base[]
+
+// tag::attr[]
+= The Dangerous and Thrilling Documentation Chronicles
+Kismet Chameleon <kismet@asciidoctor.org>
+:revnumber: 1.0 // <1>
+:revdate: 10-02-2013
+:revremark: The first incarnation of {doctitle} // <2>
+:version-label!: // <3>
+
+This journey begins...
+
+== Colophon
+
+Version: {revnumber}
+
+Version Date: {revdate}
+
+Version Notes: {revremark}
+// end::attr[]
