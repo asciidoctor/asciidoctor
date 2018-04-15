@@ -2,6 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:stem:
 ////
 um anchor: stem
 stem.adoc, used in:

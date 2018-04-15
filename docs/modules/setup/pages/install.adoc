@@ -54,7 +54,7 @@ To install Asciidoctor for a project using Bundler:
 == Install on Fedora
 
 //tag::yum[]
-To install Asciidoctor on Fedora (or RHEL via EPEL) using the https://apps.fedoraproject.org/packages/rubygem-asciidoctor[rubygem-asciidoctor] package:
+To install Asciidoctor on Fedora (or RHEL via EPEL) using the {url-fedora}[rubygem-asciidoctor] package:
 
 . Open a terminal
 . Run the installation command on Fedora:
@@ -80,7 +80,7 @@ The benefit of installing the gem via `apt-get` is that the package manager will
 == Install on Alpine Linux
 
 //tag::apk[]
-To install Asciidoctor on Alpine Linux using the https://pkgs.alpinelinux.org/packages?name=asciidoctor[asciidoctor] package:
+To install Asciidoctor on Alpine Linux using the {url-alpine}[asciidoctor package]:
 
 . Open a terminal
 . Type the following `apk` command using sudo:
