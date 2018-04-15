@@ -15,11 +15,17 @@ asciidoc:
     url-project: https://asciidoctor.org
     url-manpage: https://asciidoctor.org/man/asciidoctor
     url-org: https://github.com/asciidoctor
-    url-rubygem: https://rubygems.org/gems/asciidoctor
     url-repo: https://github.com/asciidoctor/asciidoctor
+    url-tests: https://github.com/asciidoctor/asciidoctor/tree/master/test
+    url-rubygem: https://rubygems.org/gems/asciidoctor
+    url-tilt: https://github.com/rtomayko/tilt
     url-uri: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
     url-html-ref: https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
     url-unicode: https://en.wikipedia.org/wiki/List_of_Unicode_characters
+    url-asciimath: https://docs.mathjax.org/en/latest/asciimath.html
+    url-latexmath: https://docs.mathjax.org/en/latest/tex.html
+    url-mathjax: https://www.mathjax.org
+    url-mathjax-docs: https://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference
     url-coderay: http://coderay.rubychan.de/
     url-coderay-gem: https://rubygems.org/gems/coderay
     url-highlightjs: https://highlightjs.org/
