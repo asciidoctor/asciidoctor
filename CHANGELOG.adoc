@@ -117,6 +117,7 @@ Improvements / Refactoring::
   * only warn if thread_safe gem is missing when using built-in template cache
   * rename enumerate_section to assign_numeral; update API docs
   * drop deprecated compact option from CLI; remove from manpage
+  * use more robust mechanism for lazy loading the asciimath gem
   * purge render method from test suite (except to verify alias)
 
 Documentation::
