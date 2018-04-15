@@ -13,6 +13,7 @@ asciidoc:
     source-language: asciidoc
     table-caption: ~
     url-project: https://asciidoctor.org
+    url-manpage: https://asciidoctor.org/man/asciidoctor
     url-org: https://github.com/asciidoctor
     url-rubygem: https://rubygems.org/gems/asciidoctor
     url-repo: https://github.com/asciidoctor/asciidoctor
