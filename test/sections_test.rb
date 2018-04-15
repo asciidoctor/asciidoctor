@@ -868,7 +868,7 @@ text in standalone
 
       using_memory_logger do |logger|
         render_string input
-        assert_message logger, :ERROR, '<stdin>: line 7: only book doctypes can contain level 0 sections', Hash
+        assert_message logger, :ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash
       end
     end
 

@@ -1638,7 +1638,7 @@ section paragraph
       assert_xpath '//*[@id="content"]/h1[text()="Section Title"]', output, 1
       assert_xpath '//*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
-      assert_message @logger, :ERROR, '<stdin>: line 2: only book doctypes can contain level 0 sections', Hash
+      assert_message @logger, :ERROR, '<stdin>: line 2: level 0 sections can only be used when doctype is book', Hash
     end
 
     test 'block title above document title gets carried over to first block in first section if no preamble' do

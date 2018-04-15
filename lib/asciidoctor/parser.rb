@@ -325,7 +325,7 @@ class Parser
         next_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
         if next_level > current_level || (next_level == 0 && section.context == :document)
           if next_level == 0 && doctype != 'book'
-            logger.error message_with_context 'only book doctypes can contain level 0 sections', :source_location => reader.cursor
+            logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor
           elsif expected_next_levels && !expected_next_levels.include?(next_level)
             logger.warn message_with_context %(section title out of sequence: expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, got level #{next_level}), :source_location => reader.cursor
           end
@@ -335,7 +335,7 @@ class Parser
           section.blocks << new_section
         else
           if next_level == 0 && doctype != 'book'
-            logger.error message_with_context 'only book doctypes can contain level 0 sections', :source_location => reader.cursor
+            logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor
           end
           # close this section (and break out of the nesting) to begin a new one
           break

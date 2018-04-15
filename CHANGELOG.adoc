@@ -113,6 +113,7 @@ Improvements / Refactoring::
   * automatically assign parent reference when adding node to parent (#2398, PR #2403)
   * leave inline anchor in section title as is if section has ID (#2243, PR #2427)
   * align and improve error message about invalid use of partintro between HTML5 and DocBook converters
+  * rephrase warning when level 0 sections are found and the doctype is not book
   * only warn if thread_safe gem is missing when using built-in template cache
   * rename enumerate_section to assign_numeral; update API docs
   * drop deprecated compact option from CLI; remove from manpage
