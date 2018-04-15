@@ -135,6 +135,35 @@ class Minitest::Test
     end
   end
 
+  def assert_message logger, severity, expected_message, kind = String, idx = nil
+    unless idx
+      assert_equal 1, logger.messages.size
+      idx = 0
+    end
+    message = logger.messages[idx]
+    assert_equal severity, message[:severity]
+    assert_kind_of kind, message[:message]
+    if kind == String
+      actual_message = message[:message]
+    else
+      refute_nil message[:message][:source_location]
+      actual_message = message[:message].inspect
+    end
+    if expected_message.start_with? '~'
+      assert_includes actual_message, expected_message[1..-1]
+    else
+      assert_equal expected_message, actual_message
+    end
+  end
+
+  def assert_messages logger, expected_messages
+    assert_equal expected_messages.size, logger.messages.size
+    expected_messages.each_with_index do |expected_message_details, idx|
+      severity, expected_message, kind = expected_message_details
+      assert_message logger, severity, expected_message, (kind || String), idx
+    end
+  end
+
   def xmldoc_from_string(content)
     if content.match(RE_XMLNS_ATTRIBUTE)
       Nokogiri::XML::Document.parse(content)
@@ -258,9 +287,14 @@ class Minitest::Test
   def redirect_streams
     old_stdout, $stdout = $stdout, (tmp_stdout = ::StringIO.new)
     old_stderr, $stderr = $stderr, (tmp_stderr = ::StringIO.new)
+    old_logger = Asciidoctor::LoggerManager.logger
+    old_logger_level = old_logger.level
+    new_logger = (Asciidoctor::LoggerManager.logger = Asciidoctor::Logger.new $stderr)
+    new_logger.level = old_logger_level
     yield tmp_stdout, tmp_stderr
   ensure
     $stdout, $stderr = old_stdout, old_stderr
+    Asciidoctor::LoggerManager.logger = old_logger
   end
 
   def resolve_localhost
@@ -268,12 +302,27 @@ class Minitest::Test
         Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
   end
 
+  def using_memory_logger debug = false
+    old_logger = Asciidoctor::LoggerManager.logger
+    memory_logger = Asciidoctor::MemoryLogger.new
+    memory_logger.level = Logger::Severity::DEBUG if debug
+    begin
+      Asciidoctor::LoggerManager.logger = memory_logger
+      yield memory_logger
+    ensure
+      Asciidoctor::LoggerManager.logger = old_logger
+    end
+  end
+
   def in_verbose_mode
     begin
       old_verbose, $VERBOSE = $VERBOSE, true
+      old_logger_level = Asciidoctor::LoggerManager.logger.level
+      Asciidoctor::LoggerManager.logger.level = Logger::Severity::DEBUG
       yield
     ensure
       $VERBOSE = old_verbose
+      Asciidoctor::LoggerManager.logger.level = old_logger_level
     end
   end
 

@@ -152,16 +152,19 @@ context 'Tables' do
 A | here| a | there
 |===
       EOS
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
-      assert_css 'table', output, 1
-      assert_css 'table > colgroup > col', output, 4
-      assert_css 'table > tbody > tr', output, 1
-      assert_css 'table > tbody > tr > td', output, 4
-      assert_xpath '/table/tbody/tr/td[1]/p[text()="A"]', output, 1
-      assert_xpath '/table/tbody/tr/td[2]/p[text()="here"]', output, 1
-      assert_xpath '/table/tbody/tr/td[3]/p[text()="a"]', output, 1
-      assert_xpath '/table/tbody/tr/td[4]/p[text()="there"]', output, 1
-      assert_includes warnings, 'table missing leading separator'
+      using_memory_logger do |logger|
+        output = render_embedded_string input
+        assert_css 'table', output, 1
+        assert_css 'table > colgroup > col', output, 4
+        assert_css 'table > tbody > tr', output, 1
+        assert_css 'table > tbody > tr > td', output, 4
+        assert_xpath '/table/tbody/tr/td[1]/p[text()="A"]', output, 1
+        assert_xpath '/table/tbody/tr/td[2]/p[text()="here"]', output, 1
+        assert_xpath '/table/tbody/tr/td[3]/p[text()="a"]', output, 1
+        assert_xpath '/table/tbody/tr/td[4]/p[text()="there"]', output, 1
+        # FIXME line number is wrong
+        assert_message logger, :ERROR, '~table missing leading separator', Hash
+      end
     end
 
     test 'performs normal substitutions on cell content' do
@@ -872,10 +875,13 @@ a|C
 more C
 |===
       EOS
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
-      assert_css 'table', output, 1
-      assert_css 'table *', output, 0
-      assert_includes warnings, 'exceeds specified number of columns'
+      using_memory_logger do |logger|
+        output = render_embedded_string input
+        assert_css 'table', output, 1
+        assert_css 'table *', output, 0
+        # FIXME line number is wrong
+        assert_message logger, :ERROR, '~exceeds specified number of columns', Hash
+      end
     end
 
     test 'paragraph, verse and literal content' do

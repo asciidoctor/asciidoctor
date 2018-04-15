@@ -2,6 +2,8 @@
 module Asciidoctor
 # Public: Methods for retrieving lines from AsciiDoc source files
 class Reader
+  include Logging
+
   class Cursor
     attr_accessor :file
     attr_accessor :dir
@@ -507,8 +509,12 @@ class Reader
     @lines.unshift(*lines)
   end
 
-  def cursor
-    Cursor.new @file, @dir, @path, @lineno
+  def cursor lineno = nil
+    Cursor.new @file, @dir, @path, (lineno || @lineno)
+  end
+
+  def prev_line_cursor
+    Cursor.new @file, @dir, @path, (@lineno - 1)
   end
 
   # Public: Get information about the last line read, including file name and line number.
@@ -516,11 +522,6 @@ class Reader
   # Returns A String summary of the last line read
   def line_info
     %(#{@path}: line #{@lineno})
-  end
-  alias next_line_info line_info
-
-  def prev_line_info
-    %(#{@path}: line #{@lineno - 1})
   end
 
   # Public: Get a copy of the remaining Array of String lines managed by this Reader
@@ -544,9 +545,7 @@ class Reader
   #
   #
   # Returns A string summary of this reader, which contains the path and line information
-  def to_s
-    line_info
-  end
+  alias to_s line_info
 end
 
 # Public: Methods for retrieving lines from AsciiDoc source files, evaluating preprocessor
@@ -714,12 +713,12 @@ class PreprocessorReader < Reader
 
     if keyword == 'endif'
       if @conditional_stack.empty?
-        warn %(asciidoctor: ERROR: #{line_info}: unmatched macro: endif::#{target}[])
+        logger.error message_with_context %(unmatched macro: endif::#{target}[]), :source_location => cursor
       elsif no_target || target == (pair = @conditional_stack[-1])[:target]
         @conditional_stack.pop
         @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
       else
-        warn %(asciidoctor: ERROR: #{line_info}: mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[])
+        logger.error message_with_context %(mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]), :source_location => cursor
       end
       return true
     end
@@ -835,7 +834,7 @@ class PreprocessorReader < Reader
       replace_next_line %(link:#{expanded_target}[])
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0
       if @include_stack.size >= abs_maxdepth
-        warn %(asciidoctor: ERROR: #{line_info}: maximum include depth of #{@maxdepth[:rel]} exceeded)
+        logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), :source_location => cursor
         return
       end
 
@@ -901,7 +900,7 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          warn %(asciidoctor: ERROR: #{line_info}: include #{target_type} not readable: #{inc_path})
+          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         shift
@@ -940,9 +939,9 @@ class PreprocessorReader < Reader
                   elsif inc_tags.key? this_tag
                     if (idx = tag_stack.rindex {|key, _| key == this_tag })
                       idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
-                      warn %(asciidoctor: WARNING: #{expanded_target}: line #{inc_lineno}: mismatched end tag in include: expected #{active_tag}, found #{this_tag})
+                      logger.warn message_with_context %(mismatched end tag in include: expected #{active_tag}, found #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
                     else
-                      warn %(asciidoctor: WARNING: #{expanded_target}: line #{inc_lineno}: unexpected end tag in include: #{this_tag})
+                      logger.warn message_with_context %(unexpected end tag in include: #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
                     end
                   end
                 elsif inc_tags.key?(this_tag = $2)
@@ -961,11 +960,11 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          warn %(asciidoctor: ERROR: #{line_info}: include #{target_type} not readable: #{inc_path})
+          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
-          warn %(asciidoctor: WARNING: #{line_info}: tag#{missing_tags.size > 1 ? 's' : nil} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path})
+          logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
         end
         shift
         # FIXME not accounting for skipped lines in reader line numbering
@@ -977,7 +976,7 @@ class PreprocessorReader < Reader
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attributes
         rescue
-          warn %(asciidoctor: ERROR: #{line_info}: include #{target_type} not readable: #{inc_path})
+          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
       end
@@ -1023,7 +1022,7 @@ class PreprocessorReader < Reader
           shift
           return true
         else
-          warn %(asciidoctor: ERROR: #{line_info}: include file not found: #{inc_path})
+          logger.error message_with_context %(include file not found: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
         end
       end

@@ -457,26 +457,22 @@ anchor:foo[b[a\]r]text'
   end
 
   test 'xref using angled bracket syntax with path which has been included in this document' do
-    in_verbose_mode do
-      output, warnings = redirect_streams do |_, err|
-        doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
-        doc.catalog[:includes] << 'tigers'
-        [doc.convert, err.string]
-      end
+    using_memory_logger true do |logger|
+      doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
+      doc.catalog[:includes] << 'tigers'
+      output = doc.convert
       assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-      assert_includes warnings, 'invalid reference: about'
+      assert_message logger, :WARN, 'invalid reference: about'
     end
   end
 
   test 'xref using angled bracket syntax with nested path which has been included in this document' do
-    in_verbose_mode do
-      output, warnings = redirect_streams do |_, err|
-        doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
-        doc.catalog[:includes] << 'part1/tigers'
-        [doc.convert, err.string]
-      end
+    using_memory_logger true do |logger|
+      doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
+      doc.catalog[:includes] << 'part1/tigers'
+      output = doc.convert
       assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-      assert_includes warnings, 'invalid reference: about'
+      assert_message logger, :WARN, 'invalid reference: about'
     end
   end
 
@@ -633,11 +629,10 @@ see <<foo>>'
 
 See <<foobaz>>.
     EOS
-    in_verbose_mode do
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+    using_memory_logger true do |logger|
+      output = render_embedded_string input
       assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-      refute_empty warnings
-      assert_includes warnings, 'asciidoctor: WARNING: invalid reference: foobaz'
+      assert_message logger, :WARN, 'invalid reference: foobaz'
     end
   end
 
@@ -650,11 +645,10 @@ See <<foobaz>>.
 
 See <<test.adoc#foobaz>>.
     EOS
-    in_verbose_mode do
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input, :attributes => { 'docname' => 'test' }), err.string] }
+    using_memory_logger true do |logger|
+      output = render_embedded_string input, :attributes => { 'docname' => 'test' }
       assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-      refute_empty warnings
-      assert_includes warnings, 'asciidoctor: WARNING: invalid reference: foobaz'
+      assert_message logger, :WARN, 'invalid reference: foobaz'
     end
   end
 

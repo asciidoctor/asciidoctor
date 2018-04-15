@@ -17,6 +17,11 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Enhancements::
 
+  * route messages through a logger instead of using Kernel#warn (#44, PR #2660)
+  * add MemoryLogger for capturing messages sent to logger into memory (#44, PR #2660)
+  * add NullLogger to prevent messages from being logged (#44, PR #2660)
+  * log message containing source location / cursor as an object; provides more context (#44, PR #2660)
+  * add :logger option to API to set logger instance (#44, PR #2660)
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
   * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI (#642, PR #2649)
   * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font) (#642, PR #2649)
@@ -84,6 +89,7 @@ Improvements / Refactoring::
   * don't run File.expand_path on Dir.pwd (assume Dir.pwd is absolute) (#2642, PR #2644)
   * posixify working_dir passed to PathResolver constructor if absolute (#2642, PR #2644)
   * optimize detection for footnote* and indexterm* macros (#2347, PR #2362)
+  * set logger to DEBUG when verbose is enabled; check logger.debug? instead of $VERBOSE
   * coerce value of template_dirs option to an Array (PR #2621)
   * allow paragraph to masquerade as open block (PR #2412)
   * move callouts into document catalog (PR #2394)

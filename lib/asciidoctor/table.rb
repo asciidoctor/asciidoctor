@@ -314,6 +314,8 @@ end
 # instantiated, the row is closed if the cell satisifies the column count and,
 # finally, a new buffer is allocated to track the next cell.
 class Table::ParserContext
+  include Logging
+
   # Public: An Array of String keys that represent the table formats in AsciiDoc
   #--
   # QUESTION should we recognize !sv as a valid format value?
@@ -365,7 +367,7 @@ class Table::ParserContext
           xsv = '!sv'
         end
       else
-        warn %(asciidoctor: ERROR: #{reader.prev_line_info}: illegal table format: #{xsv})
+        logger.error message_with_context %(illegal table format: #{xsv}), :source_location => reader.prev_line_cursor
         @format, xsv = 'psv', (table.document.nested? ? '!sv' : 'psv')
       end
     else
@@ -519,7 +521,7 @@ class Table::ParserContext
       if (cellspec = take_cellspec)
         repeat = cellspec.delete('repeatcol') || 1
       else
-        warn %(asciidoctor: ERROR: #{@last_cursor.line_info}: table missing leading separator, recovering automatically)
+        logger.error message_with_context 'table missing leading separator, recovering automatically', :source_location => @last_cursor
         cellspec = {}
         repeat = 1
       end
@@ -556,7 +558,7 @@ class Table::ParserContext
       else
         # QUESTION is this right for cells that span columns?
         unless (column = @table.columns[@current_row.size])
-          warn %(asciidoctor: ERROR: #{@last_cursor.line_info}: dropping cell because it exceeds specified number of columns)
+          logger.error message_with_context 'dropping cell because it exceeds specified number of columns', :source_location => @last_cursor
           return
         end
       end

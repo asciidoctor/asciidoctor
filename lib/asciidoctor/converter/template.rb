@@ -75,7 +75,7 @@ module Asciidoctor
       end
       case opts[:template_cache]
       when true
-        warn 'asciidoctor: WARNING: gem \'thread_safe\' is not installed. This gem is recommended when using the built-in template cache.' unless defined? ::ThreadSafe
+        logger.warn 'gem \'thread_safe\' is not installed. This gem is recommended when using the built-in template cache.' unless defined? ::ThreadSafe
         @caches = self.class.caches
       when ::Hash
         @caches = opts[:template_cache]

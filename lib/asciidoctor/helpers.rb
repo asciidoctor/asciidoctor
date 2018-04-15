@@ -23,20 +23,23 @@ module Helpers
   def self.require_library name, gem_name = true, on_failure = :abort
     require name
   rescue ::LoadError => e
+    include Logging unless include? Logging
     if gem_name
       gem_name = name if gem_name == true
       case on_failure
       when :abort
         raise ::LoadError, %(asciidoctor: FAILED: required gem '#{gem_name}' is not installed. Processing aborted.)
       when :warn
-        warn %(asciidoctor: WARNING: optional gem '#{gem_name}' is not installed. Functionality disabled.)
+        logger.warn %(optional gem '#{gem_name}' is not installed. Functionality disabled.)
+        return
       end
     else
       case on_failure
       when :abort
         raise ::LoadError, %(asciidoctor: FAILED: #{e.message.chomp '.'}. Processing aborted.)
       when :warn
-        warn %(asciidoctor: WARNING: #{e.message.chomp '.'}. Functionality disabled.)
+        logger.warn %(#{e.message.chomp '.'}. Functionality disabled.)
+        return
       end
     end
     nil

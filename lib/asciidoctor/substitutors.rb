@@ -131,7 +131,7 @@ module Substitutors
       when :post_replacements
         text = sub_post_replacements text
       else
-        warn %(asciidoctor: WARNING: unknown substitution type #{type})
+        logger.warn %(unknown substitution type #{type})
       end
     end
     text = restore_passthroughs text if has_passthroughs
@@ -509,11 +509,11 @@ module Substitutors
             reject_if_empty = true
             ''
           when 'drop-line'
-            warn %(asciidoctor: WARNING: dropping line containing reference to missing attribute: #{key})
+            logger.warn %(dropping line containing reference to missing attribute: #{key})
             reject = true
             break ''
           when 'warn'
-            warn %(asciidoctor: WARNING: skipping reference to missing attribute: #{key})
+            logger.warn %(skipping reference to missing attribute: #{key})
             $&
           else # 'skip'
             $&
@@ -1051,8 +1051,8 @@ module Substitutors
           if @document.attributes['docname'] == path || @document.catalog[:includes].include?(path)
             if fragment
               refid, path, target = fragment, nil, %(##{fragment})
-              if $VERBOSE
-                warn %(asciidoctor: WARNING: invalid reference: #{fragment}) unless @document.catalog[:ids].key? fragment
+              if logger.debug?
+                logger.warn %(invalid reference: #{fragment}) unless @document.catalog[:ids].key? fragment
               end
             else
               refid, path, target = nil, nil, '#'
@@ -1070,8 +1070,8 @@ module Substitutors
                 ((fragment.include? ' ') || fragment.downcase != fragment) &&
                 (resolved_id = @document.catalog[:ids].key fragment)
               fragment = resolved_id
-            elsif $VERBOSE
-              warn %(asciidoctor: WARNING: invalid reference: #{fragment})
+            elsif logger.debug?
+              logger.warn %(invalid reference: #{fragment})
             end
           end
           refid, target = fragment, %(##{fragment})
@@ -1339,7 +1339,7 @@ module Substitutors
     resolved = candidates & SUB_OPTIONS[type]
     unless (candidates - resolved).empty?
       invalid = candidates - resolved
-      warn %(asciidoctor: WARNING: invalid substitution type#{invalid.size > 1 ? 's' : ''}#{subject ? ' for ' : nil}#{subject}: #{invalid * ', '})
+      logger.warn %(invalid substitution type#{invalid.size > 1 ? 's' : ''}#{subject ? ' for ' : ''}#{subject}: #{invalid * ', '})
     end
     resolved
   end

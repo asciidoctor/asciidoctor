@@ -5,6 +5,16 @@ unless defined? ASCIIDOCTOR_PROJECT_DIR
 end
 
 context 'Attributes' do
+  default_logger = Asciidoctor::LoggerManager.logger
+
+  setup do
+    Asciidoctor::LoggerManager.logger = (@logger = Asciidoctor::MemoryLogger.new)
+  end
+
+  teardown do
+    Asciidoctor::LoggerManager.logger = default_logger
+  end
+
   context 'Assignment' do
     test 'creates an attribute' do
       doc = document_from_string(':frog: Tanglefoot')
@@ -134,11 +144,8 @@ linus.torvalds@example.com
 
     test 'assigns attribute to empty string if substitution fails to resolve attribute' do
       input = ':release: Asciidoctor {version}'
-      doc, warnings = redirect_streams do |_, err|
-        [(document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }), err.string]
-      end
-      assert_equal '', doc.attributes['release']
-      assert_includes warnings, 'dropping line containing reference to missing attribute'
+      document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: version'
     end
 
     test 'assigns multi-line attribute to empty string if substitution fails to resolve attribute' do
@@ -146,11 +153,9 @@ linus.torvalds@example.com
 :release: Asciidoctor +
           {version}
       EOS
-      doc, warnings = redirect_streams do |_, err|
-        [(document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }), err.string]
-      end
+      doc = document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }
       assert_equal '', doc.attributes['release']
-      assert_includes warnings, 'dropping line containing reference to missing attribute'
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: version'
     end
 
     test 'resolves attributes inside attribute value within header' do
@@ -603,10 +608,10 @@ This is
 blah blah {foobarbaz}
 all there is.
       EOS
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+      output = render_embedded_string input
       para = xmlnodes_at_css 'p', output, 1
       refute_includes 'blah blah', para.content
-      assert_includes warnings, 'dropping line containing reference to missing attribute'
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: foobarbaz'
     end
 
     test "attribute value gets interpretted when rendering" do
@@ -624,10 +629,10 @@ Line 1: This line should appear in the output.
 Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
       EOS
 
-      output, warnings = redirect_streams {|_, err| [(render_embedded_string input), err.string] }
+      output = render_embedded_string input
       assert_match(/Line 1/, output)
       refute_match(/Line 2/, output)
-      assert_includes warnings, 'dropping line containing reference to missing attribute'
+      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus-attribute'
     end
 
     test 'should not drop line with reference to missing attribute by default' do
@@ -897,7 +902,7 @@ of the attribute named foo in your document.
 {set:foo!}
 {foo}yes
       EOS
-      output = redirect_streams { render_embedded_string input }
+      output = render_embedded_string input
       assert_xpath '//p', output, 1
       assert_xpath '//p/child::text()', output, 0
     end

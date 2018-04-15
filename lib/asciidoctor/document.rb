@@ -396,7 +396,7 @@ class Document < AbstractBlock
     elsif attr_overrides['docdir']
       @base_dir = attr_overrides['docdir']
     else
-      #warn 'asciidoctor: WARNING: setting base_dir is recommended when working with string documents' unless nested?
+      #logger.warn 'setting base_dir is recommended when working with string documents' unless nested?
       @base_dir = attr_overrides['docdir'] = ::Dir.pwd
     end
 
@@ -511,7 +511,7 @@ class Document < AbstractBlock
 
       if initialize_extensions
         if (ext_registry = options[:extension_registry])
-          # QUESTION should we warn the value type of the option is not a registry
+          # QUESTION should we warn if the value type of this option is not a registry
           if Extensions::Registry === ext_registry || (::RUBY_ENGINE_JRUBY &&
               ::AsciidoctorJ::Extensions::ExtensionRegistry === ext_registry)
             @extensions = ext_registry.activate self
@@ -1126,7 +1126,7 @@ class Document < AbstractBlock
     if doctype == 'inline'
       if (block = @blocks[0] || @header)
         if block.content_model == :compound || block.content_model == :empty
-          warn 'asciidoctor: WARNING: no inline candidate; use the inline doctype to convert a single paragragh, verbatim, or raw block'
+          logger.warn 'no inline candidate; use the inline doctype to convert a single paragragh, verbatim, or raw block'
         else
           output = block.content
         end

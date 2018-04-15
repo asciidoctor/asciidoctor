@@ -9,11 +9,15 @@ module Asciidoctor
   # Concrete subclasses must implement the {#convert} method and, optionally,
   # the {#convert_with_options} method.
   class Converter::Base
+    include Logging
     include Converter
   end
 
   # An abstract base class for built-in {Converter} classes.
+  # Does not inherit from Converter.
   class Converter::BuiltIn
+    include Logging
+
     def initialize backend, opts = {}
     end
 

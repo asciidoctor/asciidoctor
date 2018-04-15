@@ -22,6 +22,8 @@ end
 # ideally we should use require_relative instead of modifying the LOAD_PATH
 $:.unshift File.dirname __FILE__
 
+require 'asciidoctor/logging'
+
 # Public: Methods for parsing AsciiDoc input files and converting documents
 # using eRuby templates.
 #
@@ -1292,6 +1294,10 @@ module Asciidoctor
 
     if (timings = options[:timings])
       timings.start :read
+    end
+
+    if (logger = options[:logger]) && logger != LoggerManager.logger
+      LoggerManager.logger = logger
     end
 
     if !(attrs = options[:attributes])

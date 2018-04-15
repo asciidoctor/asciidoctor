@@ -30,10 +30,10 @@ module Asciidoctor
       end
 
       def invoke!
-        old_verbose = -1
         return unless @options
 
         old_verbose = $VERBOSE
+        old_logger = old_logger_level = nil
         opts = {}
         infiles = []
         outfile = nil
@@ -66,10 +66,14 @@ module Asciidoctor
             case val
             when 0
               $VERBOSE = nil
+              old_logger = LoggerManager.logger
+              LoggerManager.logger = NullLogger.new
             when 1
               $VERBOSE = false
             when 2
               $VERBOSE = true
+              old_logger_level = LoggerManager.logger.level
+              LoggerManager.logger.level = ::Logger::Severity::DEBUG
             end
           else
             opts[key] = val unless val.nil?
@@ -147,7 +151,12 @@ module Asciidoctor
         end
         nil
       ensure
-        $VERBOSE = old_verbose unless old_verbose == -1
+        $VERBOSE = old_verbose
+        if old_logger
+          LoggerManager.logger = old_logger
+        elsif old_logger_level
+          LoggerManager.logger.level = old_logger_level
+        end
       end
 
       def document

@@ -67,7 +67,7 @@ module Asciidoctor
     end
 
     def skip_with_warning node, name = nil
-      warn %(asciidoctor: WARNING: converter missing for #{name || node.node_name} node in manpage backend)
+      logger.warn %(converter missing for #{name || node.node_name} node in manpage backend)
       nil
     end
 
@@ -617,7 +617,7 @@ allbox tab(:);'
         # These are anchor points, which shouldn't be visible
         ''
       else
-        warn %(asciidoctor: WARNING: unknown anchor type: #{node.type.inspect})
+        logger.warn %(unknown anchor type: #{node.type.inspect})
         nil
       end
     end

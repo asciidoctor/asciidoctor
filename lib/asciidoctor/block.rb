@@ -124,7 +124,7 @@ class Block < AbstractBlock
         result * LF
       end
     else
-      warn %(Unknown content model '#{@content_model}' for block: #{to_s}) unless @content_model == :empty
+      logger.warn %(Unknown content model '#{@content_model}' for block: #{to_s}) unless @content_model == :empty
       nil
     end
   end
