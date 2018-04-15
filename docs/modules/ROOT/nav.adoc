@@ -1,7 +1,11 @@
-* xref:setup:system-requirements.adoc[System Requirements]
-* xref:setup:install.adoc[Install Asciidoctor]
-* xref:setup:upgrade.adoc[Upgrade Asciidoctor]
-* xref:setup:upgrade-syntax.adoc[Modified & Deprecated Syntax]
+* xref:benefits.adoc[Why AsciiDoc & Asciidoctor]
+** xref:asciidoc-vs-markdown.adoc[AsciiDoc vs Markdown]
+
+* Get Asciidoctor
+** xref:setup:system-requirements.adoc[System Requirements]
+** xref:setup:install.adoc[Install Asciidoctor]
+** xref:setup:upgrade.adoc[Upgrade Asciidoctor]
+** xref:setup:upgrade-syntax.adoc[Modified & Deprecated Syntax]
 
 * xref:cli:cli.adoc[Asciidoctor CLI]
 ** xref:cli:multiple-files.adoc[Process Multiple Files]
@@ -15,7 +19,7 @@
 ** xref:comment.adoc[Comments]
 ** xref:attributes:safe-modes.adoc[Run Securely with Safe Modes]
 
-* xref:blocks:paragraphs.adoc[Paragraphs]
+* xref:blocks:paragraph.adoc[Paragraphs]
 ** xref:blocks:preamble.adoc[Preamble & Lead]
 
 * xref:text.adoc[Text & Punctuation Formatting]

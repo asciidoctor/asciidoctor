@@ -1,0 +1,25 @@
+admonition:: a callout paragraph or block that has a label or icon indicating its priority.
+
+backend:: a moniker for the expected output format; used as a key to select which converter to use; often used interchangeably with the name of a converter (i.e., the "html5" backend").
+
+block attribute:: an attribute associated with a delimited block or paragraph; these attributes can affect processing of the block, and are available to block processors, but cannot be referenced using an attribute reference.
+
+built-in attribute:: a document attribute that controls processing, integrations, styling, and localization.
+
+cross reference:: a link from one location in the document to another location marked by an anchor.
+
+document attribute:: an attribute associated with the document (node); in other words, an attribute in the global document attributes dictionary; the value of these attributes can be referenced using an attribute reference; if defined in the header, the document attribute is known as a header attribute.
+
+environment attribute:: a dynamic document attribute that pertains to, or gives information about, the runtime environment.
+
+header attribute:: a document attribute defined in the document header; visible from all nodes in the document; often required for global settings such as the source highlighter or icons mode.
+
+list continuation:: a plus sign (`+`) on a line by itself that connects adjacent lines of text to a list item.
+
+macro attribute:: an attribute associated with a block or inline macro; these attributes can affect processing of the macro, and are available to macro processors, but cannot be referenced using an attribute reference.
+
+predefined attribute:: a document attribute defined for convenience; often used for inserting special content characters.
+
+quoted text:: text which is enclosed in special punctuation to give it emphasis or special meaning.
+
+user-defined attribute:: a document attribute defined by the content author; used for storing reusable content, and controlling conditional inclusion.

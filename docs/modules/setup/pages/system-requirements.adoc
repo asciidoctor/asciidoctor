@@ -2,6 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:adoc-version: 1.5.7
 
 Asciidoctor Core operates on macOS, Windows, and most Linux distributions.
 //AsciidoctorJ, Asciidoctor.js, as well as the Asciidoctor build integrations, alternate converters, and extensions may have additional requirements.
@@ -16,7 +17,7 @@ Platform support is specific to each major Asciidoctor version.
 While we only test Asciidoctor on Alpine, Debian, and Fedora, it should operate as expected on most Linux distributions.
 ====
 
-.Asciidoctor 2.x
+.Asciidoctor {adoc-version}
 [cols="20,25a",width="45%"]
 |===
 |Supported Platform |Supported Version(s)
@@ -68,7 +69,7 @@ Windows Server 2012 R2
 
 The following platforms are only required of you're using certain Asciidoctor features such as source code highlighting.
 
-.Asciidoctor 2.x
+.Asciidoctor {adoc-version}
 [cols="20,25a",width="45%"]
 |===
 |Supported Platform |Supported Version(s)

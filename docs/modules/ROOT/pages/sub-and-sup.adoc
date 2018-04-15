@@ -28,5 +28,4 @@ include::{partialsdir}/ex-text.adoc[tag=sub-sup]
 include::{partialsdir}/ex-text.adoc[tag=sub-sup]
 ====
 
-NOTE: You can #write and render equations and formulas# in AsciiDoc documents using MathJax.
-//<<stem,write and render equations and formulas>>
+NOTE: You can write equations and formulas in xref:stem:stem.adoc[AsciiDoc documents using MathJax].

@@ -2,6 +2,8 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:y: Yes
+:n: No
 ////
 From block.adoc, included in:
 User manual: Blocks

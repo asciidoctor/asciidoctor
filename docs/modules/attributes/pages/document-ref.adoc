@@ -1,4 +1,10 @@
 = Document Attributes Reference
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:y: Yes
+:n: No
+:en: &#8211;
 ////
 attrs-builtin.adoc
 doc anchor: builtin-attributes
@@ -17,7 +23,7 @@ Need to update the compatibility guide with:
 Built-in document attributes can be set anywhere in the document using an attribute entry line.
 However, there are some rules to keep in mind regarding the impact of that assignment.
 
-* Many attributes can only be defined in the #xref:header:header.adoc[document header]# or via the API or CLI.
+* Many attributes can only be defined in the xref:header:header-intro.adoc[document header] or via the API or CLI.
 Otherwise, they won't have the desired impact.
 These are called _header attributes_.
 This requirement is marked in the table below.
@@ -443,7 +449,7 @@ _Since this is a reserved attribute that has special behavior, you should avoid 
 |leveloffset
 |Pushes the level of subsequent headings down, to make file inclusion more useful.
 |0
-|(+/-)0{endash}5. (A leading + or - makes it relative).
+|(+/-)0{en}5. (A leading + or - makes it relative).
 |
 |<<include-partitioning>>
 
@@ -478,7 +484,7 @@ _Since this is a reserved attribute that has special behavior, you should avoid 
 |sectnumlevels
 |controls the depth of section numbering
 |3
-|0{endash}5
+|0{en}5
 |{y}
 |<<numbering-depth>>
 
@@ -499,7 +505,7 @@ _Since this is a reserved attribute that has special behavior, you should avoid 
 |toclevels
 |Maximum section level to display.
 |2
-|1{endash}5
+|1{en}5
 |{y}
 |<<user-toc>>
 

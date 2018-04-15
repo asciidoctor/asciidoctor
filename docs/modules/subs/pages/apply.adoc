@@ -57,8 +57,7 @@ If you are applying the same set of substitutions to numerous blocks, you should
 include::{partialsdir}/ex-subs.adoc[tag=subs-attr]
 ....
 
-Another way to ensure consistency and keep your documents clean and simple is to use the #TreeProcessor extension#.
-// <<user-manual#tree-processor-example,TreeProcessor extension>>.
+Another way to ensure consistency and keep your documents clean and simple is to use the xref:api:tree-processor.adoc[Tree Processor extension].
 ====
 
 == Incremental substitutions

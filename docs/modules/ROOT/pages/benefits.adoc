@@ -1,0 +1,70 @@
+= Asciidoctor's Most Notable Benefits
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+Included in:
+- user-manual: Asciidoctor's most notable benefits
+The primary benefits and supporting features of the application.
+////
+
+While Asciidoctor aims to offer full compliance with the AsciiDoc syntax, it's more than just a clone.
+
+.Built-in and custom templates
+Asciidoctor uses a set of built-in ERB templates to generate HTML 5 and DocBook output that is structurally equivalent to what AsciiDoc produces.
+Any of these templates can be replaced by a custom template written in any template language available in the Ruby ecosystem.
+Custom template rendering is handled by the {url-tilt}[Tilt^] template abstraction library.
+Tilt is one of the most popular gems in the Ruby ecosystem.
+
+.Parser and object model
+Leveraging the Ruby stack isn't the only benefit of Asciidoctor.
+Unlike the AsciiDoc Python implementation, Asciidoctor parses and converts the source document in discrete steps.
+This makes conversion optional and gives Ruby programs the opportunity to extract, add or replace information in the document by interacting with the document object model Asciidoctor assembles.
+Developers can use the full power of the Ruby programming language to play with the content in the document.
+
+.Performance and security
+No coverage of Asciidoctor would be complete without mention of its _speed_.
+Despite not being an original goal of the project, Asciidoctor has proven startlingly fast.
+It loads, parses, and converts documents a *100 times as fast* as the Python implementation.
+That's good news for developer productivity and good news for GitHub or any server-side application that needs to render AsciiDoc markup.
+Asciidoctor also offers several levels of security, further justifying its suitability for server-side deployments.
+
+.Beyond Ruby
+Asciidoctor's usage is not limited to the Ruby community.
+Thanks to {url-jruby}[JRuby^], a port of Ruby to the JVM, Asciidoctor can be used inside Java applications as well.
+Plugins are available for #asciidoctor-maven-plugin Apache Maven#, #asciidoctor-gradle-plugin Gradle#, and {url-rewrite}[Rewrite^].
+These plugins are based on the #AsciidoctorJ# for Asciidoctor.
+
+Asciidoctor also ships with a command line interface (CLI).
+The Asciidoctor CLI, {url-manpage}[asciidoctor^], is a drop-in replacement for the `asciidoc.py` script from the AsciiDoc Python distribution.
+
+////
+
+AsciiDoc is about being able to focus on expressing your ideas, writing with ease and passing on knowledge without the distraction of complex applications or angle brackets.
+In other words, it's about discovering _writing zen_.
+
+AsciiDoc works because:
+
+- It's readable
+- It's concise
+- It's comprehensive
+- It's extensible
+- It produces beautiful output (HTML, DocBook, PDF, ePub and more)
+
+AsciiDoc is both easy to write and easy to read (in raw form).
+It's also easy to proof and edit.
+After all, it's plain text, just like that familiar e-mail.
+
+The AsciiDoc syntax is intuitive because it recognizes time-tested, plain text conventions for marking up or structuring the text.
+The punctuation was carefully chosen to look like what it means.
+A user unfamiliar with AsciiDoc can figure out the structure and semantics (i.e., what you mean) just by looking at it.
+Best of all, *it only requires a text editor to read or write*.
+
+AsciiDoc allows you to focus on the actual writing and only worry about tweaking the output when you are ready to render the document.
+The plain-text of an AsciiDoc document is easily converted into a variety of output formats, beautifully formatted, without having to rewrite the content.
+
+Copy text from an e-mail into a document and see how quickly you can turn it into documentation.
+Almost immediately, you'll find your writing zen and enjoy the rewarding experience of sharing knowledge.
+
+Live or die by documentation? Live.
+////

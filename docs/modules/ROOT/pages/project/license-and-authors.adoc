@@ -1,0 +1,43 @@
+= License
+//License and Contributors
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:mojavelinux: https://github.com/mojavelinux
+:erebor: https://github.com/erebor
+:lightguard: https://github.com/lightguard
+:nickh: https://github.com/nickh
+:graphitefriction: https://github.com/graphitefriction
+:contributors: https://github.com/asciidoctor/asciidoctor/graphs/contributors
+:gitscm-next: https://github.com/github/gitscm-next
+:seed-contribution: https://github.com/github/gitscm-next/commits/master/lib/asciidoc.rb
+
+== License
+
+Copyright (C) 2012-2018 Dan Allen, Sarah White, and Ryan Waldron.
+Free use of this software is granted under the terms of the MIT License.
+
+See the {url-license}[LICENSE] file for details.
+
+== Authors and Contributors
+
+*Asciidoctor* was written by Dan Allen, Sarah White, Ryan Waldron, Jason Porter, Nick Hengeveld and many other contributors.
+
+The initial code from which Asciidoctor emerged was written by Nick Hengeveld to process the git man pages for the Git project site.
+Refer to the commit history of asciidoc.rb to view the initial contributions.
+
+*AsciiDoc* was written by Stuart Rackham and has received contributions from many other individuals.
+
+// TODO fill in this section and enable
+// Thanks, acknowledgments, and credits
+
+////
+Put links back in when reorganized
+
+*Asciidoctor* was written by {mojavelinux}[Dan Allen], {graphitefriction}[Sarah White], {erebor}[Ryan Waldron], {lightguard}[Jason Porter], {nickh}[Nick Hengeveld] and {contributors}[many other contributors].
+
+The initial code from which Asciidoctor emerged was written by {nickh}[Nick Hengeveld] to process the git man pages for the {gitscm-next}[Git project site].
+Refer to the commit history of {seed-contribution}[asciidoc.rb] to view the initial contributions.
+
+*AsciiDoc* was written by Stuart Rackham and has received contributions from many other individuals.
+////
