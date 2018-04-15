@@ -1,0 +1,149 @@
+= Character Replacement Attributes Reference
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+attrs-charref.adoc
+doc anchor: charref-attributes
+////
+
+[#charref-attributes-table]
+// tag::table[]
+[width="75%", cols="^4l,^3l,^3"]
+|===
+|Attribute name |Replacement text |Appearance
+
+|blank
+|_nothing_
+|{empty}
+
+|empty
+|_nothing_
+|{empty}
+
+|sp
+|_single space_
+|{sp}
+
+|nbsp
+|&#160;
+|{nbsp}
+
+|zwsp^[4]^
+|&#8203;
+|{zwsp}
+
+|wj^[5]^
+|&#8288;
+|{wj}
+
+|apos
+|&#39;
+|{apos}
+
+|quot
+|&#34;
+|{quot}
+
+|lsquo
+|&#8216;
+|{lsquo}
+
+|rsquo
+|&#8217;
+|{rsquo}
+
+|ldquo
+|&#8220;
+|{ldquo}
+
+|rdquo
+|&#8221;
+|{rdquo}
+
+|deg
+|&#176;
+|{deg}
+
+|plus
+|&#43;
+|{plus}
+
+|brvbar
+|&#166;
+|&#166;
+
+|vbar
+|\|
+|{vbar}
+
+|amp
+|&
+|&
+
+|lt
+|<
+|<
+
+|gt
+|>
+|>
+
+|startsb
+|[
+|[
+
+|endsb
+|]
+|]
+
+|caret
+|^
+|^
+
+|asterisk
+|*
+|*
+
+|tilde
+|~
+|~
+
+|backslash
+|\
+|\
+
+|backtick
+|`
+|`
+
+|two-colons
+|::
+|::
+
+|two-semicolons
+|;;
+|;;
+
+|cpp
+|C++
+|C++
+|===
+
+^[1]^ Some replacements are Unicode characters, whereas others are numeric character references (e.g., \&#34;).
+These character references are used whenever the use of the Unicode character could interfere with the AsciiDoc syntax or confuse the renderer (i.e., the browser).
+It's up to the converter to transform the reference into something the renderer understands (something both the manpage and PDF converter handle).
+
+^[2]^ Asciidoctor does not prevent you from reassigning predefined attributes.
+However, it's best to treat them as read-only unless the output format requires the use of a different encoding scheme.
+These attributes are an effective tool for decoupling content and presentation.
+
+^[3]^ Asciidoctor allows you to use any of the named character references (aka named entities) defined in HTML (e.g., \&euro; resolves to &euro;).
+However, using named character references can cause problems when generating non-HTML output such as PDF because the lookup table needed to resolve these names may not be defined.
+Our recommendation is avoid using named character references--with the exception of those defined in XML (i.e., lt, gt, amp, quot and apos).
+Instead, use numeric character references (e.g., \&#8364;).
+
+^[4]^ The Zero Width Space (ZWSP) is a code point in Unicode that shows where a long word can be split if necessary.
+
+^[5]^ The word joiner (WJ) is a code point in Unicode prevents a line break at its position.
+// end::table[]
