@@ -4,12 +4,16 @@
 * xref:setup:upgrade-syntax.adoc[Modified & Deprecated Syntax]
 
 * xref:cli:cli.adoc[Asciidoctor CLI]
+** xref:cli:multiple-files.adoc[Process Multiple Files]
+** xref:cli:file-output.adoc[Specify an Output File]
+** xref:cli:set-safe-mode.adoc[Set the Safe Mode]
 ** xref:cli:cli-options.adoc[CLI Options]
 ** xref:cli:messages.adoc[CLI Messages]
 
 * Key Concepts
 ** xref:blocks:block.adoc[Blocks]
 ** xref:comment.adoc[Comments]
+** xref:attributes:safe-modes.adoc[Run Securely with Safe Modes]
 
 * xref:blocks:paragraphs.adoc[Paragraphs]
 ** xref:blocks:preamble.adoc[Preamble & Lead]
@@ -102,3 +106,8 @@
 ** xref:book:bibliography.adoc[Bibliography]
 ** xref:book:index.adoc[Index]
 ** xref:book:footnotes.adoc[Footnotes]
+
+* Reference Tables
+** xref:attributes:environment-ref.adoc[Environment Attributes]
+** xref:attributes:document-ref.adoc[Document Attributes]
+** xref:attributes:character-ref.adoc[Character Replacement Attributes]

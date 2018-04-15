@@ -1,0 +1,155 @@
+= Environment Attributes Reference
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+doc anchor: env-attributes
+attrs-env.adoc, included in:
+- user-manual appendix B attribute calatog
+////
+
+Asciidoctor automatically assigns values to various document attributes whenever a document is loaded or converted.
+These attributes, termed [.term]_environment attributes_, provide information about the runtime environment, such as how, where and when the document is being processed.
+Like other document attributes, environment attributes can be referenced whereever attribute references are permitted.
+It's recommended that you treat these attributes as read only.
+
+[#env-attributes-table]
+// tag::table[]
+[cols="1m,2a,1m"]
+|===
+|Attribute |Description |Example Value
+
+|asciidoctor
+|Set if the current processor is Asciidoctor.
+|{asciidoctor}
+
+|asciidoctor-version
+|Asciidoctor version.
+|{asciidoctor-version}
+
+|backend
+|Backend used to create the output file.
+|html5
+
+|basebackend
+|The backend value minus any trailing numbers.
+For example, if the backend is `docbook5`, the basebackend is `docbook`.
+|html
+
+|docdate
+|Last modified date of the source document.^[<<note_docdatetime,1>>,<<note_sourcedateepoch,2>>]^
+|2019-01-04
+
+|docdatetime
+|Last modified date and time of the source document.^[<<note_docdatetime,1>>,<<note_sourcedateepoch,2>>]^
+|2019-01-04 19:26:06 GMT+0000
+
+|docdir
+|Full path of the directory that contains the source document.
+|/home/user/docs
+
+|docfile
+|Full path of the source document.
+|/home/user/docs/userguide.adoc
+
+|docfilesuffix
+|File extension of the source document, including the leading period.
+_Introduced in 1.5.6._
+|.adoc
+
+|docname
+|Root name of the source document (no leading path or file extension).
+|userguide
+
+|doctime
+|Last modified time of the source document.^[<<note_docdatetime,1>>,<<note_sourcedateepoch,2>>]^
+|19:26:06 GMT+0000
+
+|doctype
+|Document type (article, book or manpage).
+|article
+
+|docyear
+|Year that the document was last modified.^[1,2]^
+|2018
+
+|embedded
+|Set if content is being converted to an embeddable document (body only).
+|
+
+|filetype
+|File extension of the output file name (without leading period).
+|html
+
+|htmlsyntax
+|Syntax used when generating the HTML output (html or xhtml).
+|html
+
+|localdate
+|Date when the document was converted.^[<<note_sourcedateepoch,2>>]^
+|2019-02-17
+
+|localdatetime
+|Date and time when the document was converted.^[<<note_sourcedateepoch,2>>]^
+|2019-02-17 19:31:05 GMT+0000
+
+|localtime
+|Time when the document was converted.^[<<note_sourcedateepoch,2>>]^
+|19:31:05 GMT+0000
+
+|localyear
+|Year when the document was converted.^[2]^
+|2018
+
+|outdir
+|Full path of the output directory.
+|/home/user/docs/dist
+
+|outfile
+|Full path of the output file.
+|/home/user/docs/dist/userguide.html
+
+|outfilesuffix
+|File extension of the output file (starting with a period) as determined by the backend (`.html` for `html`, `.xml` for `docbook`, etc.).
+(The value is not updated to match the file extension of the output file when one is specified explicitly).
+_Safe to modify._
+|.html
+
+|safe-mode-level
+|Numeric value of the safe mode setting.
+(UNSAFE=0, SAFE=10, SERVER=10, SECURE=20).
+|20
+
+|safe-mode-name
+|Textual value of the safe mode setting.
+|SERVER
+
+|safe-mode-unsafe
+|Set if the safe mode is UNSAFE.
+|
+
+|safe-mode-safe
+|Set if the safe mode is SAFE.
+|
+
+|safe-mode-server
+|Set if the safe mode is SERVER.
+|
+
+|safe-mode-secure
+|Set if the safe mode is SECURE.
+|
+
+|user-home
+|Home directory of the current user.
+Resolves to `.` if the safe mode is SERVER or greater.
+|/home/user
+|===
+
+[[note_docdatetime]]^[1]^ Only reflects the last modified time of the source document file.
+It does not consider the last modified time of files which are included.
+
+[[note_sourcedateepoch]]^[2]^ If the SOURCE_DATE_EPOCH environment variable is set, the value assigned to this attribute is built from a UTC date object that corresponds to the timestamp (as an integer) stored in that environment variable.
+This override offers one way to make the conversion reproducible.
+See https://reproducible-builds.org/specs/source-date-epoch/ for more information about the SOURCE_DATE_EPOCH environment variable.
+// end::table[]
