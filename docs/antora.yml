@@ -1,5 +1,7 @@
 name: asciidoctor
 title: Asciidoctor
-version: dev
+version: '1.5.7'
 nav:
 - modules/ROOT/nav.adoc
+- modules/api/nav.adoc
+- modules/ROOT/nav-project.adoc

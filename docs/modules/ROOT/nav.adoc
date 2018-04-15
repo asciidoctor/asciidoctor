@@ -5,6 +5,7 @@
 
 * xref:cli:cli.adoc[Asciidoctor CLI]
 ** xref:cli:cli-options.adoc[CLI Options]
+** xref:cli:messages.adoc[CLI Messages]
 
 * Key Concepts
 ** xref:blocks:block.adoc[Blocks]
@@ -101,10 +102,3 @@
 ** xref:book:bibliography.adoc[Bibliography]
 ** xref:book:index.adoc[Index]
 ** xref:book:footnotes.adoc[Footnotes]
-
-* xref:api:api.adoc[Asciidoctor API]
-** xref:api:api-options.adoc[API Options]
-** xref:api:strings.adoc[Convert Strings]
-** xref:api:templates.adoc[Load Custom Templates]
-
-* xref:project/version-and-lifecycle-policies.adoc[Version & Lifecycle Policies]
