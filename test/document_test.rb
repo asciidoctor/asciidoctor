@@ -1737,13 +1737,13 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
     test 'keeps naughty absolute paths from getting outside' do
       naughty_path = "#{disk_root}etc/passwd"
-      doc = empty_document
-      secure_path, warnings = redirect_streams do |_, err|
-        [(doc.normalize_asset_path naughty_path), err.string]
+      using_memory_logger do |logger|
+        doc = empty_document
+        secure_path = doc.normalize_asset_path naughty_path
+        refute_equal naughty_path, secure_path
+        assert_equal (::File.join doc.base_dir, 'etc/passwd'), secure_path
+        assert_message logger, :WARN, 'path is outside of jail, auto-recovering'
       end
-      refute_equal naughty_path, secure_path
-      assert_equal (::File.join doc.base_dir, 'etc/passwd'), secure_path
-      assert_includes warnings, 'path is outside of jail'
     end
 
     test 'keeps naughty relative paths from getting outside' do
