@@ -334,9 +334,6 @@ class Parser
           section.assign_numeral new_section
           section.blocks << new_section
         else
-          if next_level == 0 && doctype != 'book'
-            logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor
-          end
           # close this section (and break out of the nesting) to begin a new one
           break
         end

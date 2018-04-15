@@ -58,6 +58,7 @@ Bug fixes::
   * fix behavior of PathResolver#descends_from? when base path equals / (#2642, PR #2644)
   * automatically recover if start path passed to PathResolver#system_path is outside of jail path (#2642, PR #2644)
   * re-enable left justification after invoking tmac URL macro (#2400, PR #2409)
+  * don't report warning about same level 0 section multiple times (#2572)
   * record timings when calling convert and write on Document (#2574, PR #2575)
   * duplicate header attributes when restoring; allows header attributes to be restored an arbitrary number of times (#2567, PR #2570)
   * propagate catalog_assets option to nested document (#2564, PR #2565)
