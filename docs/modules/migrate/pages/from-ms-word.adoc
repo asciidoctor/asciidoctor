@@ -1,0 +1,195 @@
+= Migrate from MS Word
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:description: This document presents various tools and strategies for migrating from MS Word to AsciiDoc.
+//:page-layout: docs
+//:page-description: {description}
+:uri-pandoc: http://pandoc.org
+:uri-ant: http://ant.apache.org/
+:uri-google-asciidoc: https://chrome.google.com/webstore/detail/asciidoc-processor/eghlmnhjljbjodpeehjjcgfcjegcfbhk/
+:uri-google-asciidoc-source:  https://github.com/Mogztter/asciidoc-googledocs-addon/
+// from migrating-from-msword.adoc
+
+== Pandoc
+
+{uri-pandoc}[Pandoc] is a swiss army knife for converting one markup format to another.
+It does an admirable job converting simple docx files to AsciiDoc.
+
+NOTE: Generally, we don't like to recommend pandoc because it doesn't create AsciiDoc the way we prefer.
+However, in this case, it's a good choice.
+
+To perform the conversion from MS Word docx to AsciiDoc, you need to perform the following command:
+
+ $ pandoc --from=docx --to=asciidoc --wrap=none --atx-headers \
+   --normalize --extract-media=extracted-media input.docx > output.adoc
+
+Then, edit the output file to tidy it up.
+
+The conversions you can expect are shown in the following table (tested using MS Word 2010 and Pandoc 1.17 (Windows)):
+
+.Pandoc MS Word to AsciiDoc conversions
+|====
+|MS Word Feature |Conversion
+
+|Headings (using MS Word Heading styles 1-5)
+|Yes
+
+|Tables
+|Yes.
+Merged cells are unmerged.
+Column widths are ignored.
+
+|Bulleted or numbered lists
+|Yes
+
+|Footnotes
+|Yes
+
+|Figure and table captions
+|Normal paragraph
+
+|Any other MS Word styled paragraphs
+|Normal paragraph
+
+|Embedded images
+|Yes
+
+|Character formatting (bold, underline and italic)
+|Yes
+
+|Document automation (fields, auto-generated figure and table numbers)
+|No - ignored
+
+|Internal references (e.g. "See Figure 3")
+|Plain text
+
+|Drawing canvas
+|Ignored
+
+|Text boxes
+|Ignored
+
+|Linked (not embedded) images
+|Ignored
+
+|Vector graphics (MS Word "insert shape")
+|Ignored
+|====
+
+=== Optimizing for Pandoc
+
+The basic usage documented above is fine for one-off imports.
+If you have a lot to do, it's worth while cleaning the input document first, and automating the post-conversion tidy up.
+
+. Clean up the MS Word document:
+// Title pages are usually easier to recreate manually
+** Remove non-essential material (title pages, headers and footers, table of contents etc); it is usually easiest to copy just the body text into a new blank document
+// Technically not necessary as pandoc ignores them by default, but it simplifies the document, which is a good thing in principle
+** Switch off tracking and accept all changes
+// Important - pandoc recognizes the style name to define headings
+** Ensure you have used Heading styles for headings
+// bug in 1.16.0.2
+// fixed in 1.17
+//** Remove automatic heading numbering (this limitation may be removed in the next release of pandoc)
+// So you can turn them back into captions just with a .
+** Ensure table titles are immediately *above* their table
+// So you can turn them back into captions just with a .
+** Ensure figure titles are immediately *above* their figure
+// linked images are ignored (according to my testing)
+** Ensure images are inserted as embedded files, not as links
+// canvases are ignored (according to my testing)
+** Remove canvases and put any images they contained into the main flow as paragraph images (this limitation may be removed in the next release of pandoc)
+// results of SEQ formulas are ignored (MS Word inserts them to generate figure and table numbers)
+** Replace all internal references and auto-generated sequence numbers with their literal values (kbd:[Ctrl+A], kbd:[Ctrl+Shift+F9])
+// No - this will turn manually applied list formatting back to plain text. Fine if you have used a list style though.
+// * Remove all non style-based formatting (kbd:[Ctrl+A], kbd:[Ctrl+space], kbd:[Ctrl+Q])
+// text boxes are ignored (according to my testing)
+** Remove text boxes and put their text into the main flow
+// Back to plain text.
+// Not sure about this - they don't show properly in PSPad, but look fine when converted to HTML.
+** Replace special characters: smart quotes with simple quotes, non-breaking hyphens with normal hyphens.
+** Remove all character formatting (kbd:[Ctrl+A], kbd:[Ctrl+B], kbd:[Ctrl+B], kbd:[Ctrl+I], kbd:[Ctrl+I], kbd:[Ctrl+U], kbd:[Ctrl+U])
+// pandoc just treats them as plain text as passes them through.
+** Optional: insert ids and cross references using AsciiDoc notation
+(You might find it easier doing it now rather than in the AsciiDoc document later.)
+// Not sure if it is significant, but pandoc seems to be designed against this spec, rather than the normal docx.
+** Save as "Strict Open-xml document (docx)"
+. Convert using pandoc as shown above.
+. Check that the output document looks OK, and that all images have been extracted.
++
+[NOTE]
+====
+If for some reason pandoc is not extracting images, you can always extract them by using unzip tool.
+Docx is just a zip file with a docx file extension. Embedded images are located in word/media directory.
+
+ $ unzip input.docx -d input-docx
+   ls input-docx/word/media/
+
+====
+. Fix up the output, preferably with an editor that can do regular expressions:
+// tocs and cross refs introduce dozens of these. They are just noise.
+** Delete automatic ids (those beginning with underscore)
+// Style issue - pandoc seems to extend the line to cover the longest row
+** Replace long table delimiters with short ones.
+// Style issue
+** Insert line-breaks to get to 1 sentence per paragraph.
+// can do this with a regexp, but is depends on exactly what format you used for them
+** Re-insert images and turn caption paragraphs back into Asciidoctor captions.
+// can do this with a regexp, but is depends on exactly what format you used for them
+** Replace the hard cross references with AsciiDoc references.
+// checked vertical merge, assume h merge same
+** Fix tables - merged cells will have unmerged, column widths need putting back.
+. Try to convert it, and fix any errors that come up.
+// pandoc supposedly only uses UTF-8, and the xml file is windows encoded, but I haven't found any problems so far.
+// You definitely do get encoding errors if you go via HTML.
+
+The following are posix shell one-liners to automate some of these steps (adjust the regexps to match your particular document):
+
+* Delete automatically inserted ids
+
+ $ perl -W -pe  's!\[\[_.*]]!!g' -i output.adoc
+
+* Shorten table delimiters
+
+ $ perl -W -pe  's!\|==*!|====!g' -i output.adoc
+
+* 1 sentence per line.
+Be careful not to match lists.
+It will get confused by abbreviations, but there is no way around that.
+
+ $ perl -W -pe 's!(\w\w+)\.\s+(\w)!$1.\n$2!g' -i output.adoc
+
+* Replace figure captions with id and title
+
+ $ perl -W -pe 's!^Figure (\d+)\s?(.*)![[fig-$1]]\n.$2\n!g' -i output.adoc
+
+* Replace references to figures with asciidoc xref
+
+ $ perl -W -pe 's!Figure (\d+)!<<fig-$1>>!g' -i output.adoc
+
+== Google Docs
+
+Google Docs can already upload and edit MS Word docx files.
+Using the {uri-google-asciidoc}[AsciiDoc Processor add-on] by Guillaume Grossetie, you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
+The features that it can handle seem to be substantially fewer than pandoc but expect further development.
+The source for the add-on is at {uri-google-asciidoc-source}.
+
+== Plain Text
+
+This method is only useful for very small files or if the other methods are not available.
+
+It keeps the text, and _fixes_ fields like auto-numbered lists and cross references.
+
+It loses tables (converted to plain paragraphs), images, symbols, form fields, and textboxes.
+
+In MS Word, use "Save as > Plain text", then when the File Conversion dialog appears, set:
+
+* Other encoding: UTF-8
+* Do not insert line breaks
+* Allow character substition
+
+Save the file then apply AsciiDoc markup manually.
+
+Experiment with the encoding.
+Try UTF-8 first, but if you get problems you can always revert to US-ASCII.

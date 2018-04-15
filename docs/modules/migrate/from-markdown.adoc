@@ -1,0 +1,8 @@
+= Migrate from Markdown
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+
+Asciidoctor recognizes a fair amount of Markdown syntax, thus allowing you to migrate from Markdown to AsciiDoc gradually.
+See #asciidoc-syntax-quick-reference/markdown-compatibility,Markdown Compatibility# to learn what syntax is shared.
+The syntax you must change is listed in #asciidoc-vs-markdown#.
