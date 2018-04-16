@@ -123,6 +123,10 @@ Matching templates found in subsequent directories override ones previously disc
 
 === Processing Information
 
+*--failure-level*=_LEVEL_::
+  The minimum logging level that triggers a non-zero exit code (failure).
+  If this option is not set (default: FATAL), the program exits with a status code zero even if warnings or errors have been logged.
+
 *-q, --quiet*::
   Silence warnings.
 
