@@ -835,6 +835,28 @@ Hi there!
       end
     end
 
+    test 'should invoke processor for custom block in an AsciiDoc table cell' do
+      input = <<-EOS
+|===
+a|
+[yell]
+Hi there!
+|===
+      EOS
+
+      begin
+        Asciidoctor::Extensions.register do
+          block UppercaseBlock
+        end
+
+        output = render_embedded_string input
+        assert_xpath '/table//p', output, 1
+        assert_xpath '/table//p[text()="HI THERE!"]', output, 1
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should pass cloaked context in attributes passed to process method of custom block' do
       input = <<-EOS
 [custom]
@@ -874,6 +896,29 @@ snippet::12345[mode=edit]
 
         output = render_embedded_string input
         assert_includes output, '<script src="http://example.com/12345.js?_mode=edit"></script>'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should invoke processor for custom block macro in an AsciiDoc table cell' do
+      input = <<-EOS
+|===
+a|message::hi[]
+|===
+      EOS
+
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro :message do
+            process do |parent, target, attrs|
+              create_paragraph parent, target.upcase, {}
+            end
+          end
+        end
+
+        output = render_embedded_string input
+        assert_xpath '/table//p[text()="HI"]', output, 1
       ensure
         Asciidoctor::Extensions.unregister_all
       end
