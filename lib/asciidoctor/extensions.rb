@@ -1172,7 +1172,7 @@ module Extensions
     #   inline_macro ChromeInlineMacro
     #
     #   # as an InlineMacroProcessor subclass with an explicit macro name
-    #   inline_macro ChromeInineMacro, :chrome
+    #   inline_macro ChromeInlineMacro, :chrome
     #
     #   # as an instance of an InlineMacroProcessor subclass
     #   inline_macro ChromeInlineMacro.new
@@ -1184,7 +1184,7 @@ module Extensions
     #   inline_macro 'ChromeInlineMacro'
     #
     #   # as a name of an InlineMacroProcessor subclass with an explicit macro name
-    #   inline_macro 'ChromeInineMacro', :chrome
+    #   inline_macro 'ChromeInlineMacro', :chrome
     #
     #   # as a method block
     #   inline_macro do
