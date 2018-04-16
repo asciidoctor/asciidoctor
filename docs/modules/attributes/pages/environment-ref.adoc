@@ -10,7 +10,7 @@ attrs-env.adoc, included in:
 
 Asciidoctor automatically assigns values to various document attributes whenever a document is loaded or converted.
 These attributes, termed [.term]_environment attributes_, provide information about the runtime environment, such as how, where and when the document is being processed.
-Like other document attributes, environment attributes can be referenced whereever attribute references are permitted.
+Like other document attributes, environment attributes can be referenced where ever attribute references are permitted.
 It's recommended that you treat these attributes as read only.
 
 [#env-attributes-table]

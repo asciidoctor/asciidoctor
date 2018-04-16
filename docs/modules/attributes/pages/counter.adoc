@@ -1,0 +1,95 @@
+= Counters
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+Included in:
+- user-manual: Counters
+////
+
+// document attributes and counters are NOT the same thing, but modifying a document attribute with the same name as the counter modifies the counter at the same time.
+
+Counters are used to store and display ad-hoc sequences of numbers or latin characters.
+They are designed for simple use cases.
+Possible uses include inline itemized lists, paragraph numbers and serial item numbers.
+
+A counter is implemented as a specialized document attribute.
+You declare and display a counter using an augmented attribute reference, in which the attribute name is prefixed with `counter:` (e.g., `+{counter:name}+`).
+Since counters are attributes, counter names follow the same rules as xref:attribute.adoc#restrictions[attribute names].
+The most important rule to note is that letters in counter names _must be lowercase_.
+
+The counter value is incremented and displayed every time the `counter:` attribute reference is used.
+The term [.term]_increment_ means advance to the next value in the sequence.
+If the counter value is an integer, add 1.
+If the counter value is a character, move to the next letter in the Latin alphabet.
+The default start value of a counter is 1.
+
+To create a sequence starting at 1, use the simple form `+{counter:name}+` as shown here:
+
+[source]
+The salad calls for {counter:seq1}) apples, {counter:seq1}) oranges and {counter:seq1}) pears.
+
+Here's the resulting output:
+
+====
+:!seq1:
+The salad calls for {counter:seq1}) apples, {counter:seq1}) oranges and {counter:seq1}) pears.
+====
+
+To increment the counter without displaying it (i.e., to skip an item in the sequence), use the `counter2` prefix instead:
+
+[source]
+{counter2:seq1}
+
+WARNING: A `counter2` attribute reference on a line by itself will produce an empty paragraph.
+You'll need to adjoin it to the nearest content to avoid this side effect.
+
+To display the current value of the counter without incrementing it, reference the counter name as you would any other attribute:
+
+[source]
+{counter2:pnum}This is paragraph {pnum}.
+
+To create a character sequence, or start a number sequence with a value other than 1, specify a start value by appending it to the first use of the counter:
+
+[source]
+Dessert calls for {counter:seq1:A}) mangoes, {counter:seq1}) grapes and {counter:seq1}) cherries.
+
+CAUTION: Character sequences either run from a,b,c,...x,y,z,{,|... or A,B,C,...,X,Y,Z,[,... depending on the start value.
+Therefore, they aren't really useful for more than 26 items.
+
+The start value of a counter is only recognized if the counter is _unset_ at that point in the document.
+Otherwise, the start value is ignored.
+
+To reset a counter attribute, unset the corresponding attribute using an attribute entry.
+The attribute entry must be adjacent to a block or else it is ignored.
+
+[source]
+----
+The salad calls for {counter:seq1:1}) apples, {counter:seq1}) oranges and {counter:seq1}) pears.
+
+:!seq1:
+Dessert calls for {counter:seq1:A}) mangoes, {counter:seq1}) grapes and {counter:seq1}) cherries.
+----
+
+This gives:
+
+====
+:!seq1:
+The salad calls for {counter:seq1:1}) apples, {counter:seq1}) oranges and {counter:seq1}) pears.
+
+:!seq1:
+Dessert calls for {counter:seq1:A}) mangoes, {counter:seq1}) grapes and {counter:seq1}) cherries.
+====
+
+Here's a full example that shows how to use a counter for part numbers in a table.
+
+[source]
+----
+include::{partialsdir}/ex-counter.adoc[tag=base]
+----
+
+Here's the output of that table:
+
+====
+include::{partialsdir}/ex-counter.adoc[tag=base]
+====

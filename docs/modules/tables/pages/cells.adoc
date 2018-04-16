@@ -76,6 +76,7 @@ include::{partialsdir}/ex-table-cell.adoc[tag=span-cr]
 [width="90"]
 include::{partialsdir}/ex-table-cell.adoc[tag=span-cr]
 
+[#align-cell]
 == Align cell content
 
 The alignment component for cells works the same as the xref:columns.adoc#cols-align[column specifier alignment component].

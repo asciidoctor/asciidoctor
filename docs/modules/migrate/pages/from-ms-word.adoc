@@ -5,15 +5,15 @@ endif::[]
 :description: This document presents various tools and strategies for migrating from MS Word to AsciiDoc.
 //:page-layout: docs
 //:page-description: {description}
-:uri-pandoc: http://pandoc.org
-:uri-ant: http://ant.apache.org/
-:uri-google-asciidoc: https://chrome.google.com/webstore/detail/asciidoc-processor/eghlmnhjljbjodpeehjjcgfcjegcfbhk/
-:uri-google-asciidoc-source:  https://github.com/Mogztter/asciidoc-googledocs-addon/
+:url-pandoc: https://pandoc.org
+//:uri-ant: http://ant.apache.org/
+:url-google-asciidoc: https://chrome.google.com/webstore/detail/asciidoc-processor/eghlmnhjljbjodpeehjjcgfcjegcfbhk/
+:url-google-asciidoc-source:  https://github.com/Mogztter/asciidoc-googledocs-addon/
 // from migrating-from-msword.adoc
 
 == Pandoc
 
-{uri-pandoc}[Pandoc] is a swiss army knife for converting one markup format to another.
+{url-pandoc}[Pandoc] is a swiss army knife for converting one markup format to another.
 It does an admirable job converting simple docx files to AsciiDoc.
 
 NOTE: Generally, we don't like to recommend pandoc because it doesn't create AsciiDoc the way we prefer.
@@ -29,14 +29,14 @@ Then, edit the output file to tidy it up.
 The conversions you can expect are shown in the following table (tested using MS Word 2010 and Pandoc 1.17 (Windows)):
 
 .Pandoc MS Word to AsciiDoc conversions
-|====
+|===
 |MS Word Feature |Conversion
 
 |Headings (using MS Word Heading styles 1-5)
 |Yes
 
 |Tables
-|Yes.
+|Yes
 Merged cells are unmerged.
 Column widths are ignored.
 
@@ -59,9 +59,9 @@ Column widths are ignored.
 |Yes
 
 |Document automation (fields, auto-generated figure and table numbers)
-|No - ignored
+|Ignored
 
-|Internal references (e.g. "See Figure 3")
+|Internal references (e.g., "`See Figure 3`")
 |Plain text
 
 |Drawing canvas
@@ -75,22 +75,20 @@ Column widths are ignored.
 
 |Vector graphics (MS Word "insert shape")
 |Ignored
-|====
+|===
 
-=== Optimizing for Pandoc
+== Optimizing for Pandoc
 
 The basic usage documented above is fine for one-off imports.
 If you have a lot to do, it's worth while cleaning the input document first, and automating the post-conversion tidy up.
 
 . Clean up the MS Word document:
 // Title pages are usually easier to recreate manually
-** Remove non-essential material (title pages, headers and footers, table of contents etc); it is usually easiest to copy just the body text into a new blank document
+** Remove non-essential material (title pages, headers and footers, table of contents etc.); it is usually easiest to copy just the body text into a new blank document
 // Technically not necessary as pandoc ignores them by default, but it simplifies the document, which is a good thing in principle
 ** Switch off tracking and accept all changes
 // Important - pandoc recognizes the style name to define headings
 ** Ensure you have used Heading styles for headings
-// bug in 1.16.0.2
-// fixed in 1.17
 //** Remove automatic heading numbering (this limitation may be removed in the next release of pandoc)
 // So you can turn them back into captions just with a .
 ** Ensure table titles are immediately *above* their table
@@ -121,12 +119,14 @@ If you have a lot to do, it's worth while cleaning the input document first, and
 [NOTE]
 ====
 If for some reason pandoc is not extracting images, you can always extract them by using unzip tool.
-Docx is just a zip file with a docx file extension. Embedded images are located in word/media directory.
+Docx is just a zip file with a docx file extension.
+Embedded images are located in word/media directory.
 
  $ unzip input.docx -d input-docx
    ls input-docx/word/media/
 
 ====
+
 . Fix up the output, preferably with an editor that can do regular expressions:
 // tocs and cross refs introduce dozens of these. They are just noise.
 ** Delete automatic ids (those beginning with underscore)
@@ -171,9 +171,9 @@ It will get confused by abbreviations, but there is no way around that.
 == Google Docs
 
 Google Docs can already upload and edit MS Word docx files.
-Using the {uri-google-asciidoc}[AsciiDoc Processor add-on] by Guillaume Grossetie, you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
+Using the {url-google-asciidoc}[AsciiDoc Processor add-on] by Guillaume Grossetie, you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
 The features that it can handle seem to be substantially fewer than pandoc but expect further development.
-The source for the add-on is at {uri-google-asciidoc-source}.
+The source for the add-on is at {url-google-asciidoc-source}.
 
 == Plain Text
 
