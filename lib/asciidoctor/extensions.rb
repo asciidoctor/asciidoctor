@@ -709,7 +709,7 @@ module Extensions
     #
     #   # as a method block
     #   preprocessor do
-    #     process |doc, reader|
+    #     process do |doc, reader|
     #       ...
     #     end
     #   end
@@ -761,7 +761,7 @@ module Extensions
     #
     #   # as a method block
     #   tree_processor do
-    #     process |document|
+    #     process do |document|
     #       ...
     #     end
     #   end
@@ -818,7 +818,7 @@ module Extensions
     #
     #   # as a method block
     #   postprocessor do
-    #     process |document, output|
+    #     process do |document, output|
     #       ...
     #     end
     #   end
@@ -870,7 +870,7 @@ module Extensions
     #
     #   # as a method block
     #   include_processor do
-    #     process |document, output|
+    #     process do |document, output|
     #       ...
     #     end
     #   end
@@ -922,7 +922,7 @@ module Extensions
     #
     #   # as a method block
     #   docinfo_processor do
-    #     process |doc|
+    #     process do |doc|
     #       at_location :footer
     #       'footer content'
     #     end
@@ -1011,14 +1011,14 @@ module Extensions
     #   # as a method block
     #   block do
     #     named :shout
-    #     process |parent, reader, attrs|
+    #     process do |parent, reader, attrs|
     #       ...
     #     end
     #   end
     #
     #   # as a method block with an explicit block name
     #   block :shout do
-    #     process |parent, reader, attrs|
+    #     process do |parent, reader, attrs|
     #       ...
     #     end
     #   end
@@ -1100,14 +1100,14 @@ module Extensions
     #   # as a method block
     #   block_macro do
     #     named :gist
-    #     process |parent, target, attrs|
+    #     process do |parent, target, attrs|
     #       ...
     #     end
     #   end
     #
     #   # as a method block with an explicit macro name
     #   block_macro :gist do
-    #     process |parent, target, attrs|
+    #     process do |parent, target, attrs|
     #       ...
     #     end
     #   end
@@ -1189,14 +1189,14 @@ module Extensions
     #   # as a method block
     #   inline_macro do
     #     named :chrome
-    #     process |parent, target, attrs|
+    #     process do |parent, target, attrs|
     #       ...
     #     end
     #   end
     #
     #   # as a method block with an explicit macro name
     #   inline_macro :chrome do
-    #     process |parent, target, attrs|
+    #     process do |parent, target, attrs|
     #       ...
     #     end
     #   end
