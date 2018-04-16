@@ -291,20 +291,20 @@ class Parser
 
       current_level = 0
       if parent.attributes.key? 'fragment'
-        expected_next_levels = nil
+        expected_next_level = nil
       # small tweak to allow subsequent level-0 sections for book doctype
       elsif doctype == 'book'
-        expected_next_levels = [0, 1]
+        expected_next_level, expected_next_level_alt = 1, 0
       else
-        expected_next_levels = [1]
+        expected_next_level = 1
       end
     else
       doctype = (document = parent.document).doctype
       section = initialize_section reader, parent, attributes
       # clear attributes except for title attribute, which must be carried over to next content block
       attributes = (title = attributes['title']) ? { 'title' => title } : {}
-      part = section.sectname == 'part'
-      expected_next_levels = [(current_level = section.level) + 1]
+      expected_next_level = (current_level = section.level) + 1
+      part = current_level == 0 && doctype == 'book'
     end
 
     reader.skip_blank_lines
@@ -326,8 +326,11 @@ class Parser
         if next_level > current_level || (next_level == 0 && section.context == :document)
           if next_level == 0 && doctype != 'book'
             logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor
-          elsif expected_next_levels && !expected_next_levels.include?(next_level)
-            logger.warn message_with_context %(section title out of sequence: expected #{expected_next_levels.size > 1 ? 'levels' : 'level'} #{expected_next_levels * ' or '}, got level #{next_level}), :source_location => reader.cursor
+          elsif expected_next_level
+            unless next_level == expected_next_level || (expected_next_level_alt && next_level == expected_next_level_alt)
+              expected_condition = expected_next_level_alt ? %(expected levels #{expected_next_level_alt} or #{expected_next_level}) : %(expected level #{expected_next_level})
+              logger.warn message_with_context %(section title out of sequence: #{expected_condition}, got level #{next_level}), :source_location => reader.cursor
+            end
           end
           # the attributes returned are those that are orphaned
           new_section, attributes = next_section reader, section, attributes
