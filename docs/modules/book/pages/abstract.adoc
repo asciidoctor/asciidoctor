@@ -15,7 +15,7 @@ They are frequently found in the frontmatter of academic, research, and analytic
 A complete (i.e., informative) abstract states the key topics and findings while a limited (i.e., descriptive) abstract briefly describes the structure of the content.
 
 The abstract may be written using a section, open block, or paragraph and must bear the abstract style.
-If used, the abstract must appear before the first section of an article (at the start of the <<Preamble,preamble>>) or at the start of a chapter in a book.
+If used, the abstract must appear before the first section of an article (at the start of the xref:blocks:preamble.adoc[preamble]) or at the start of a chapter in a book.
 An abstract may not be used _before_ a part or chapter in a book.
 
 Here's an example of an abstract at the beginning of an article, defined using a section:

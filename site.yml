@@ -17,6 +17,7 @@ asciidoc:
     url-org: https://github.com/asciidoctor
     url-license: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE
     url-repo: https://github.com/asciidoctor/asciidoctor
+    url-diagram: https://github.com/asciidoctor/asciidoctor-diagram
     url-tests: https://github.com/asciidoctor/asciidoctor/tree/master/test
     url-exten-lab: https://github.com/asciidoctor/asciidoctor-extensions-lab
     url-rubygem: https://rubygems.org/gems/asciidoctor

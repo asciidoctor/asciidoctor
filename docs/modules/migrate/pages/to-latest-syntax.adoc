@@ -43,7 +43,7 @@ Document Title
 Content parsed in compat-mode by default.
 ----
 
-Since setext-style headings are typically used in older AsciiDoc documents, this convention allows Asciidoctor to accomodate these older documents without having to wake any sleeping giants ;)
+Since setext-style headings are typically used in older AsciiDoc documents, this convention allows Asciidoctor to accommodate these older documents without having to wake any sleeping giants ;)
 
 You can set `compat-mode` anywhere in the flow of a document.
 

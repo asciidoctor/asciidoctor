@@ -20,7 +20,7 @@ Need to update the compatibility guide with:
 * encoding = ignored always UTF-8
 ////
 
-Built-in document attributes can be set anywhere in the document using an attribute entry line.
+Built-in document attributes can be set anywhere in the document using an attribute entry .
 However, there are some rules to keep in mind regarding the impact of that assignment.
 
 * Many attributes can only be defined in the xref:header:header-intro.adoc[document header] or via the API or CLI.
@@ -32,7 +32,7 @@ This requirement is marked in the table below.
 (The one exception to this rule is the `sectnums` attribute, which can always be changed).
 * If you set an attribute in the body (anywhere after the document header), the attribute is visible from the point it is set until it is unset (assuming it is not locked as a result of being set from the command line or API).
 
-NOTE: Several attributes from AsciiDoc Python have been removed (or deprecated) in Asciidoctor and therefore are not included in this section.
+NOTE: Several attributes from AsciiDoc Python have been deprecated in Asciidoctor and therefore are not included in this section.
 See #migrating-from-asciidoc-python# if you are updating an older document.
 
 [#builtin-attributes-table]

@@ -16,9 +16,18 @@
 ** xref:cli:messages.adoc[CLI Messages]
 
 * Key Concepts
+** xref:attributes:attribute.adoc[Attributes]
+*** xref:attributes:set-and-reference.adoc[Set, Assign, & Reference Attributes]
+*** xref:attributes:attribute-entries.adoc[Set Global Attributes]
+**** xref:attributes:advanced-entries.adoc[Advanced Attribute Values]
+*** xref:attributes:attribute-lists.adoc[Set Element Attributes]
+**** xref:attributes:style.adoc[Style]
+**** xref:attributes:id.adoc[ID]
+**** xref:attributes:option.adoc[Options]
+**** xref:attributes:role.adoc[Role]
+*** xref:attributes:safe-modes.adoc[Run Securely with Safe Modes]
 ** xref:blocks:block.adoc[Blocks]
 ** xref:comment.adoc[Comments]
-** xref:attributes:safe-modes.adoc[Run Securely with Safe Modes]
 
 * xref:blocks:paragraph.adoc[Paragraphs]
 ** xref:blocks:preamble.adoc[Preamble & Lead]
@@ -117,7 +126,7 @@
 ** xref:migrate:from-docbook-xml.adoc[Migrate from DocBook XML]
 ** xref:migrate:from-markdown.adoc[Migrate from Markdown]
 ** xref:migrate:from-confluence-xhtml.adoc[Migrate from Confluence XHTML]
-** xref:migrate:from-msword.adoc[Migrate from MS Word]
+** xref:migrate:from-ms-word.adoc[Migrate from MS Word]
 
 * Reference Tables
 ** xref:attributes:environment-ref.adoc[Environment Attributes]

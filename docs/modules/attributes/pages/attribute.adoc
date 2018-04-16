@@ -1,0 +1,76 @@
+= Attributes
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+attr.adoc, included in:
+- user-manual: Attributes
+////
+
+Attributes set Asciidoctor apart from other lightweight markup languages.
+They can activate features, such as behaviors, styles, and integrations, or hold replacement (variable) content.
+
+In Asciidoctor, attributes are classified as:
+
+* Document attributes
+//* User-defined attributes
+* Element attributes
+//setting-attributes-on-an-element
+* Environment attributes
+* API and command line attributes
+* Character replacement attributes
+//attribute-assignment-precedence
+
+[#restrictions]
+== Attribute restrictions
+
+All attributes have a name and a value (though the value may be implicit).
+// Need a basic example of a name and a value here for document, element, and cli
+
+The attribute name:
+
+- must be at least one character long,
+- must begin with a word character (A-Z, a-z, 0-9 or _), and
+- must only contain word characters and hyphens.
+
+In other words, the name cannot contain dots or spaces.
+
+Although uppercase characters are permitted in an attribute entry (the place where an attribute is defined), the attribute name is converted to lowercase before being stored.
+The attribute name in an attribute reference is also converted to lowercase before the attribute is resolved.
+For example, `URI`, `Uri` and `uRI` are all treated as `uri`.
+A best practice is to only use lowercase for letters in the name and avoid starting the name with a number.
+
+//(See https://github.com/asciidoctor/asciidoctor/issues/509[issue #509] for a proposed change to this restriction).
+
+The attribute value:
+
+- can be any inline content and
+- can only contain line breaks if an explicit line continuation is used.
+
+Certain attributes have a restricted range of allowable values.
+See the entries in the #attribute-catalog# for details.
+
+== Attribute assignment precedence
+
+By default, the attribute assignment precedence, from highest to lowest, is as follows:
+
+- Attribute passed to the API or CLI
+- Attribute defined in the document
+- Default value
+
+Let's use the `doctype` attribute to show how precedence works.
+
+The default value for the doctype attribute is `article`.
+Therefore, if doctype is not set and assigned a value in the document, API or CLI it will be assigned the article value at runtime.
+However, if doctype is set in the document and assigned a new value, such as `book`, the book value will override the default value.
+Finally, a value assigned to doctype via the API or CLI, will overrule the value in the document.
+
+You can adjust the precedence of attribute values passed to the API or CLI.
+By adding an `@` symbol to the end of an attribute value passed to the API or CLI, it makes that assignment have a lower precedence than an assignment in the document.
+
+Let's add that to the precedence list defined earlier.
+
+- Attribute passed to the API or CLI that does not end in `@`
+- Attribute defined in the document
+- Attribute passed to the API or CLI that ends in `@`
+- Default value

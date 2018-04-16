@@ -1,0 +1,65 @@
+= The ID Attribute
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// from attr-style.adoc
+
+
+The id attribute specifies a unique name for an element.
+That name can only be used once in a document.
+
+An id has two purposes:
+
+. to provide an internal link or cross reference anchor for the element
+. to reference a style or script used by the output processor
+
+////
+BlockId
+
+NOTE: Section pending
+////
+
+== Block assignment
+// tag::bl[]
+In an attribute list, there are two ways to assign an id attribute to a block element.
+
+. Prefixing the name with a hash (`#`).
+. Specifying the name with `id=<name>`.
+
+[source]
+----
+[#goals]
+* Goal 1
+* Goal 2
+----
+
+Let's say you want to create a blockquote from an open block and assign it an ID and role.
+You add `quote` (the block style) in front of the `#` (the ID) in the first attribute position, as this example shows:
+
+[source]
+----
+[quote#roads, Dr. Emmett Brown]
+____
+Roads? Where we're going, we don't need roads.
+____
+----
+
+TIP: The order of ID and role values in the shorthand syntax does not matter.
+// end::bl[]
+
+== Inline assignment
+// tag::in[]
+The id (`#`) shorthand can be used on inline quoted text.
+
+.Quoted text block with id assignment using Asciidoctor shorthand
+----
+[#free_the_world]*free the world*
+----
+// end::in[]
+
+////
+.Quoted text block with `id` assignment using traditional AsciiDoc syntax
+----
+[[free_the_world]]*free the world*
+----
+////

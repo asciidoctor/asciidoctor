@@ -1,0 +1,32 @@
+= The Style Attribute
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+attr-style.adoc, included in:
+- user-manual: Attributes: Style
+////
+
+The style attribute is the first positional attribute in an attribute list.
+It specifies a predefined set of characteristics to apply to a block element or macro.
+
+For example, a paragraph block can be assigned one of the following built-in style attributes:
+
+* normal (default, so does not need to be set)
+* literal
+* verse
+* quote
+* listing
+* TIP
+* NOTE
+* IMPORTANT
+* WARNING
+* CAUTION
+* abstract
+* partintro
+* comment
+* example
+* sidebar
+* source
+
+// Needs examples!

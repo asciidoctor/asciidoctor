@@ -1,0 +1,58 @@
+= The Options Attribute
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// directly from um
+
+The options attribute is a versatile named attribute that can contain a comma-separated list of values.
+It can also be defined globally as an attribute entry.
+
+== Block Assignment
+
+In an attribute list, there are three ways to assign an options attribute to a block element.
+
+. Prefixing the value with a percent sign (`%`).
+. Specifying the value with `opts=<name>`
+. Specifying the value with `options=<name>`.
+
+Consider a table block with the three option values `header`, `footer`, and `autowidth`.
+
+Here's how the options are assigned to the table using `options`.
+
+.Formal syntax
+[source]
+----
+[options="header,footer,autowidth"]
+|===
+| Cell A | Cell B
+|===
+----
+
+Here's how the options are assigned to the table using the shorthand notation (`%`).
+
+.Shorthand syntax
+[source]
+----
+[%header%footer%autowidth]
+|===
+| Cell A | Cell B
+|===
+----
+
+Let's consider the options when combined with other attributes.
+
+.Shorthand syntax
+[source]
+----
+[horizontal.properties%step]
+property 1:: does stuff
+property 2:: does different stuff
+----
+
+.Formal syntax
+[source]
+----
+[horizontal, role="properties", options="step"]
+property 1:: does stuff
+property 2:: does different stuff
+----

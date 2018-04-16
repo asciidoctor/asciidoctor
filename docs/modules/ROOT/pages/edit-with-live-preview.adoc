@@ -1,0 +1,249 @@
+= Editing AsciiDoc with Live Preview
+Dan Allen; Guillaume Grossetie
+:url-chrome-extension: https://chrome.google.com/webstore/detail/asciidoctorjs-live-previe/iaalpfgpbocpdfblpnhhgllgbdbchmia
+:url-firefox-addon: https://addons.mozilla.org/en/firefox/addon/asciidoctorjs-live-preview
+:url-opera-extension: https://addons.opera.com/fr/extensions/details/asciidoctorjs-live-preview
+:url-chrome-extension-dd: https://github.com/asciidoctor/asciidoctor-chrome-extension/releases/download/v1.5.4.100/asciidoctor-chrome-extension.nex
+:url-firefox-addon-dd: https://github.com/asciidoctor/asciidoctor-firefox-addon/releases/download/v0.5.3/asciidoctor-firefox-addon-0.5.3-signed.xpi
+:url-opera-extension-dd: https://github.com/asciidoctor/asciidoctor-chrome-extension/releases/download/v1.5.4.100/asciidoctor-chrome-extension.nex
+:url-intellij-plugin: https://github.com/asciidoctor/asciidoctor-intellij-plugin
+//:page-layout: docs
+//:imagesdir: ../images
+// from editing-asciidoc-with-live-preview
+
+Here's an overview of the different ways to setup live preview of AsciiDoc.
+
+== Using a web browser (preview only)
+
+All you need to preview an AsciiDoc document in a web browser is to install the {url-chrome-extension}[Chrome extension], the {url-firefox-addon}[Firefox add-on] or the {url-opera-extension}[Opera extension].
+Then you can see the AsciiDoc file rendered as HTML just by visiting it!
+
+=== Installing the development versions
+
+The validation process of a browser extension / addon can take a long time.
+If you want the latest and greatest version you can use the direct download links below.
+
+==== Chrome
+
+. Download {url-chrome-extension-dd}[asciidoctor-chrome-extension.nex]
+. Open chrome://extensions
+. Drag'n'drop the `.nex` file into the page to install
+
+==== Firefox
+
+. Download {url-firefox-addon-dd}[asciidoctor-firefox-addon.xpi]
+. Open the file with Firefox to install
+
+==== Opera
+
+. Dowload {url-opera-extension-dd}[asciidoctor-chrome-extension.nex]
+. Open opera://extensions
+. Drag'n'drop the `.nex` file into the page to install
+
+== Using a modern text editor or IDE
+
+The following editors/IDEs support both syntax highlighting and preview rendering (in alphabetic order):
+
+=== AsciiDocFX
+
+To run AsciiDocFX, you will need to:
+
+. Install http://www.oracle.com/technetwork/java/javase/downloads/index.html[JDK 8]
+. Download the latest https://github.com/rahmanusta/AsciidocFX/releases[AsciidocFX.zip] and extract it
+. Run `bin/asciidocfx.bat` or `bin/asciidocfx.sh`
+
+More information:
+
+ * http://www.asciidocfx.com/[AsciiDocFX homepage]
+
+=== Atom
+
+Install https://atom.io/[Atom].
+Then from the Atom editor menus, navigate to menu:Atom[Preferences].
+From there, open the menu:Packages[] tab and install:
+
+https://atom.io/packages/asciidoc-preview[AsciiDoc Preview] :: enables live preview
+https://atom.io/packages/language-asciidoc[AsciiDoc Language] :: enables syntax highlighting (AsciiDoc language support)
+https://atom.io/packages/asciidoc-image-helper[AsciiDoc Image Helper] :: provides the ability to paste images from the clipboard
+https://atom.io/packages/autocomplete-asciidoc[AsciiDoc Autocomplete] :: automatically completes AsciiDoc language items
+https://atom.io/packages/asciidoc-assistant[AsciiDoc Assistant] :: Installs useful components to Atom for editing AsciiDoc files (including the above packages)
+
+=== Brackets
+
+Install http://brackets.io/[Brackets].
+Then from the Brackets file menu, open the extension manager.
+Browse available extensions and install `AsciiDoc Preview`.
+
+More information:
+
+* https://github.com/asciidoctor/brackets-asciidoc-preview[AsciiDoc Preview for Brackets]
+
+=== IntelliJ IDEA
+
+Install the community plugin {uri-intellij-plugin}[`AsciiDoc`].
+
+== Using a system monitor
+
+The first step is to setup a file monitor to watch for changes.
+We'll use http://rubydoc.info/gems/guard/frames[Guard] for that task.
+Install Guard and the shell file monitor using:
+
+ gem install guard guard-shell
+
+You'll need Asciidoctor to process the document.
+Install Asciidoctor using:
+
+ gem install asciidoctor
+
+Next, create a file named `Guardfile` in the same directory as your document.
+Configure `Guardfile` to monitor the file (or files) you are editing and then regenerate the HTML file whenever a change is detected.
+
+Here's an example of a basic Guard configuration for monitoring a single file:
+
+.Guardfile
+[source, ruby]
+----
+require 'asciidoctor'
+
+guard 'shell' do
+  watch(/^mydoc\.adoc$/) {|m|
+    Asciidoctor.convert_file m[0]
+  }
+end
+----
+
+Now start Guard:
+
+ guard start
+
+Whenever Guard detects a change in the [.path]_mydoc.adoc_ file, Asciidoctor will process it using its convert API and update (overwrite) the [.path]_mydoc.html_ file.
+
+TIP: Instead of monitoring a single file, you can monitor all files matching a regular expression.
+In the `watch` block, replace [.path]_mydoc.adoc_ with `.*\.adoc` to monitor all files that end in `.adoc` in the current directory.
+
+=== Using Bundler
+
+An alternative way to do retrieve all the required gems is to use http://gembundler.com[Bundler].
+Bundler is a dependency management system for ruby.
+The easiest way to get started is to follow the steps below:
+
+. Install the bundler gem
++
+ gem install bundler
++
+
+. Start a basic `Gemfile`
++
+ bundle init
++
+
+. Edit the `Gemfile` to add all the required gems
++
+[source,ruby]
+----
+source 'https://rubygems.org'
+
+gem 'guard'
+gem 'guard-shell'
+gem 'asciidoctor'
+----
+
+. Install the bundle
++
+ bundle install
++
+
+. Create Guardfile
++
+Create a file named `Guardfile` in the same directory as your document.
+Configure `Guardfile` to monitor the file (or files) you are editing and then regenerate the HTML file whenever a change is detected.
++
+Here's an example of a basic Guard configuration for monitoring a single file:
++
+.Guardfile
+[source, ruby]
+----
+Bundler.require :default
+
+guard 'shell' do
+  watch(/^mydoc\.adoc$/) {|m|
+    Asciidoctor.convert_file m[0]
+  }
+end
+----
+
+. Run
++
+ bundle exec guard
+
+== Web preview
+
+Next, install http://projects.gnome.org/epiphany/[Epiphany] (now called Web).
+
+TIP: Alternatively, you can use any browser with an auto-refresh plugin.
+Epiphany just happens to do it out of the box by monitoring the file system for changes (similar to how Guard works).
+
+Open Epiphany (Web) (or your web browser of choice w/ the auto-refresh plugin) and navigate to the [.path]_mydoc.html_ file.
+Also open up the source file in your editor.
+Put the windows side-by-side so that you can see both of them.
+(Use Alt+F5 to unmaximize Epiphany (Web) if you don't see the draggable window frame).
+
+#Tiled editor and web preview image goes here#
+//image::tiled-editor-and-web-preview.png[Tiled editor and web preview, 100%]
+
+Once the two windows are tiled, make a change to the source document.
+Observe that the preview is automatically updated without affecting the scroll offset.
+
+== Survey says...
+
+Asciidoctor + Guard + Epiphany (Web) == Doc writing pleasure!
+
+== Alternative options
+
+Below are some other tools you can use to setup a similar environment to the one described above.
+
+=== LiveReload
+
+If you want to use Chrome or Firefox instead of Epiphany, check out http://livereload.com/[LiveReload]. It describes itself as:
+
+[quote]
+*The Web Developer Wonderland* +
+(a happy land where browsers don't need a Refresh button)
+
+LiveReload monitors changes in the file system. As soon as a file is saved, it is sent to the browser using a WebSocket. In addition to reloading the HTML, it supports live updating of CSS and JavaScript in the page.
+
+You can setup LiveReload (for free) on any operating system using the https://github.com/guard/guard-livereload[Guard::LiveReload] plugin and the companion http://livereload.com/extensions/[LiveReload extension] for Chrome or Firefox.
+
+Here's the command to install the Guard::LiveReload plugin:
+
+ gem install guard-livereload yajl-ruby
+
+Next, install one of the two browser extensions.
+
+IMPORTANT: After installing the Chrome LiveReload extension, you need to check the "Allow access to file URLs" checkbox in Tools > Extensions > LiveReload in order for it to work with local files.
+
+Add the following stanza at the bottom of the `Guardfile` you created above.
+
+.Guardfile, LiveReload block
+[source,ruby]
+----
+guard 'livereload' do
+  watch(%r{^.+\.(css|js|html)$})
+end
+----
+
+Start Guard, navigate to the HTML file in your browser, then activate the LiveReload on that page by clicking the LiveReload button in the toolbar.
+
+Whenever the AsciiDoc file is changed, first the Guard "shell" plugin will be triggered to generate the HTML file, then the "livereload" plugin will be triggered to send the HTML to the browser.
+
+Asciidoctor + Guard + LiveReload + Chrome or Firefox == The Documentation Writer Wonderland
+
+////
+Directly from Previewing your content section in user manual
+
+Guard::
+AsciiDoc is a plugin for https://github.com/guard/guard[Guard] that converts watched AsciiDoc files to the specified output format whenever they change using Asciidoctor.
+
+Instructions for using the Guard/Live viewer are documented in the project's {guard-doc-ref}[README].
+:guard-doc-ref: https://github.com/asciidoctor/guard-asciidoc/blob/master/README.asciidoc
+////

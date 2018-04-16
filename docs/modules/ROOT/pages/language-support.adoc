@@ -1,0 +1,163 @@
+= Language Support
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+um anchor: language-support
+Included in:
+- user-manual: Using Asciidoctor with Other Languages
+////
+
+The built-in labels, messages, and syntax keywords in Asciidoctor are English by default.
+However, Asciidoctor is not restricted to working with English-only content.
+Asciidoctor can process the full range of the UTF-8 character set.
+That means you can write your document in any language, save the file with UTF-8 encoding, and expect Asciidoctor to convert the text properly.
+Furthermore, you can customize the built-in labels (e.g., "`Appendix`") to match the language in which you are writing.
+
+There are some caveats to know about:
+
+* Currently, the official HTML and PDF converters only fully support left-to-right (and top-to-bottom) reading.
+Support for right-to-left (RTL) is being worked on.
+See {url-org}/asciidoctor/issues/1601[issue #1601] for details.
+In the interim, you can leverage the DocBook toolchain to get right-to-left support.
+* Attributes that store dates and times (e.g., `docdatetime`) are always formatted like `2019-01-04 19:26:06 GMT+0000`.
+* Message (aka logging) strings are always in English.
+* Asciidoctor does not support the language conf files used by AsciiDoc Python.
+However, Asciidoctor does provide https://github.com/asciidoctor/asciidoctor/blob/master/data/locale/attributes.adoc[a translation file] that can be used for a similar purpose.
+
+[#customizing-labels]
+== Translating built-in labels
+
+When converting to DocBook, you can rely on the DocBook toolchain to translate (most) built-in labels.
+To activate this feature, simply set the `lang` attribute to a valid country code (which defaults to `en` for English).
+For example:
+
+----
+$ asciidoctor -a lang=es -b docbook article.adoc
+----
+
+The list of supported languages, as well as additional language considerations for DocBook, are described in http://www.sagehill.net/docbookxsl/Localizations.html[DocBook XSL: The Complete Guide].
+
+The `lang` attribute _does not_ enable automatic translation of built-in labels when converting directly to HTML or PDF.
+It's merely a hint to configure the DocBook toolchain.
+If you're not using the DocBook toolchain for publishing, you must translate each built-in label yourself.
+One way is to set the following attributes in the document header or by passing the attributes via the API or CLI:
+
+.Attributes that control built-in labels
+[cols="10,20,10",width="80%"]
+|===
+|Attribute name |Used for |Default
+
+|appendix-caption
+|Appendix titles.
+|Appendix
+
+|caution-caption
+|CAUTION admonitions (when icons are not in use).
+|Caution
+
+|chapter-label
+|Prefix added to chapter titles (i.e., level-1 section titles when doctype is book). _(pdf converter only)_
+|Chapter
+
+|example-caption
+|Example titles.
+|Example
+
+|figure-caption
+|Automatically prefixed to figure titles.
+|Figure
+
+|important-caption
+|IMPORTANT admonitions (when icons are not in use).
+|Important
+
+|last-update-label
+|Label for when the document was last updated.
+|Last updated
+
+|listing-caption
+|The label for listing blocks.
+By default, listing blocks do not have captions.
+If you specify `listing-caption`, then you also turn on captions for listing blocks.
+|_not set_
+
+|manname-title
+|Label for the program name section in the manpage.
+|NAME
+
+|note-caption
+|NOTE admonitions (when icons are not in use).
+|Note
+
+|preface-title
+|Title text used for the anonymous preface (when the `doctype` is book).
+|_not set_
+
+|table-caption
+|Automatically prefixed to table titles.
+|Table
+
+|tip-caption
+|TIP admonitions (when icons are not in use).
+|Tip
+
+|toc-title
+|Title of the table of contents.
+|Table of Contents
+
+|untitled-label
+|The document title, for documents that have only body content.
+|Untitled
+
+|version-label
+|The label preceding the revnumber in the document's byline.
+|Version
+
+|warning-caption
+|WARNING admonitions (when icons are not in use).
+|Warning
+|===
+
+If you plan to support multiple languages, you'll want to define the attributes for each language inside a conditional preprocessor directive.
+For example:
+
+[source]
+----
+\ifeval::["{lang}" == "de"]
+:caution-caption: Achtung
+...
+\endif::[]
+----
+
+Of course, you're probably hoping this has already been done for you.
+Indeed, it has!
+
+You can find an https://github.com/asciidoctor/asciidoctor/blob/master/data/locale/attributes.adoc[AsciiDoc file] in the Asciidoctor repository that provides translations of these attributes for most major languages.
+The translations are defined using AsciiDoc attribute entries inside conditional preprocessor blocks, just as suggested above.
+
+To use this file to translate the built-in labels according the the value of the `lang` attribute (just like the DocBook toolchain does), follow these steps:
+
+. Download the AsciiDoc file https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/data/locale/attributes.adoc[attributes.adoc] from the Asciidoctor repository.
+. Put the file in the folder [.path]_locale_ relative to your document.
+. Add the following line to the header of your AsciiDoc document:
++
+[source]
+----
+\include::locale/attributes.adoc[]
+----
+. Set the language using the `lang` attribute.
+This attribute must be set before the include directive gets processed.
+For example:
+
+ -a lang=es
+
+The built-in labels will now be translated automatically based on the value of the `lang` attribute.
+
+There's an ongoing discussion about how to make language support even simpler ({url-org}/asciidoctor/issues/1129[issue #1129]).
+Input is welcome.
+
+== Translation
+
+Asciidoctor (or DocBook) currently does not support translation of content out of the box.
+There's a proposal to integrate gettext (http://discuss.asciidoctor.org/Professional-providers-translating-Asciidoc-tt2692.html#none[discussion]), and suggestions are welcome.

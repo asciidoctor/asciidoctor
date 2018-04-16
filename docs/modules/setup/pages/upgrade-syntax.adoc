@@ -1,269 +1,152 @@
-= Syntax, Commands, and Options: What's Changed?
+= Syntax, Attributes, and Commands: What's Changed?
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-// Migration Status: incomplete
-// Migration Source: /asciidoctor.org/docs/_includes/migrating-from-asciidoc-python.adoc
 
-IMPORTANT: This page if for users upgrading from a previous version of Asciidoctor to the current version of Asciidoctor.
-If your migrating from AsciiDoc Python, please see the documentation for migrating from AsciiDoc Python to Asciidoctor for additional information and instructions.
+The syntax, attributes, and commands listed below have been updated or deprecated.
+In most cases, they've been replaced with a new feature that provides improved functionality.
 
-*To minimize wordiness, on this page, any AsciiDoc and Asciidoctor syntax, commands, options, variables, classes, methods, etc., are collectively referred to as "`syntax`".*
+IMPORTANT: This page if for users upgrading from a previous version of Asciidoctor to the latest stable version of Asciidoctor.
+If your migrating from AsciiDoc Python, see the xref:migrate:from-asciidoc-python.adoc[documentation for migrating from AsciiDoc Python to Asciidoctor].
 
-The syntax listed below has been modified or deprecated.
-In most cases, it has been replaced with new syntax or behavior that provides improved functionality.
-We highly recommend that you update your documents and extensions to use the new syntax.
+== Updated and deprecated syntax
+
+The tables below list the features that have changed in recent versions.
+
+.Inline Formatting
+[cols="15,20,20,5,20"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|_italic text_
+|pass:['italic text']
+|pass:[_italic text_]
+|1.5.0
+|Allowed with `compat-mode`
+
+|`monospace text`
+|pass:[+monospace text+]
+|pass:[`monospace text`]
+|1.5.0
+|Allowed with `compat-mode`
+
+|`+literal monospace text+`
+|pass:[`literal monospace text`]
+|pass:[`+literal monospace text+`]
+|1.5.0
+|Allowed with `compat-mode`
+
+|Curved "`double quotes`"
+|pass:[``double quotes'']
+|pass:["`double quotes`"], editor keybinding, or the Unicode character in numeric character reference form (e.g., \&#8220;)
+|1.5.0
+|
+
+|Curved '`single quotes`'
+|pass:[`single quotes']
+|pass:['`single quotes`'], editor keybinding, or the Unicode character in numeric character reference form (e.g., \&#8217;)
+|1.5.0
+|
+|===
+
+.Table of Contents
+[cols="15,20,20,5,20"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|Scrollable, left margin ToC
+|`toc2`
+|`+:toc: left+`
+|1.5.0
+|
+
+|ToC location
+|`toc-placement` and `toc-position`
+|`+:toc: <value>+`
+|1.5.0
+|
+
+|User-specified ToC location
+|`+:toc-placement: manual+`
+|`+:toc: macro+`
+|1.5.0
+|
+
+|===
+
+.Document Header
+[cols="15,20,20,5,20"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|Implicit document title attribute
+|First content line at document top is set as title
+|pass:[= Title]
+|
+|Allowed with `compat-mode`
+
+|Two-line style document title
+|pass:[= Title] +
+pass:[=====]
+|pass:[= Title]
+|
+|Asciidoctor accepts the two-line heading style to set the document title.
+However, by using it, you implicitly set `compat-mode`.
+If you want to use the new Asciidoctor syntax, make sure to use `= Title` or explicitly unset the `compat-mode` attribute.
+|===
+
+.API
+[cols="15,20,20,5,20"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|render class method
+|+.render(input, options = {}) ⇒ Object+
+|+.convert(input, options = {}) ⇒ Object+
+|1.5.7
+|
+|===
+
+=== Compatibility mode
 
 When it isn't feasibly to update your documents prior to upgrading Asciidoctor, you can run Asciidoctor in compatibility mode.
 Compatibility mode is activated by setting the `compat-mode` attribute and allows Asciidoctor to accept and apply the deprecated syntax and/or behavior.
 However, *not all deprecated syntax or behavior is available under the compatibility mode*.
 
-== Modified Syntax
+== Proposed Changes for Future Versions
 
-The behavior or requirements of the following syntax has changed.
-
-[cols="1,2,1,2,1"]
+[cols="15,20,30,5"]
 |===
-|Feature |Deprecated Behavior / Requirements |Available with `compat-mode` |New Behavior / Requirements |As of Version
-
-|Link attributes
-|Set `linkattrs` to use link attribute syntax
-|Under discussion
-|`linkattrs` is set implicitly so link attributes are available automatically
-|2.0 ^[1]^
-
-|UI macros
-|Set `experimental` to use the UI macros
-|Under discussion
-|UI macros are available automatically
-|2.0 ^[1]^
-
-|Document roles
-|Document roles are inherited
-//can't reify, what was the intention?
-|Under discussion
-|Proposed: Roles are not inherited
-|?
-
-|Set backend
-|Set the backend from a document
-|Under discussion
-|Proposed: Backends can only be set in the CLI, environment, ...?
-|2.0 ^[1]^
-
-|===
-
-^[1]^ Proposed version when change would take affect.
-
-== Deprecated Syntax
-
-The following syntax has been deprecated.
-
-[cols="15,20,15,30,5"]
-|===
-|Feature |Deprecated Syntax |Available with `compat-mode` |New Syntax |As of Version
+|Feature |Deprecated |New |As of Version
 
 |Delimited open block
 |pass:[--] +
 open block content +
 pass:[--]
-|Under discussion
 |New syntax will allow for nested delimited open blocks
-|2.0 ^[2]^
+|2.0
 
-|_italic text_
-|pass:['italic text']
-|Yes
-|pass:[_italic text_]
-|
+|Set backend
+|Set the backend from a document
+|Proposed: Backends can only be set in the CLI, environment, ...?
+|2.0
 
-|`monospace text`
-|pass:[+monospace text+]
-|Yes
-|pass:[`monospace text`]
-|
+|Link attributes
+|Set `linkattrs` to use link attribute syntax
+|`linkattrs` is set implicitly so link attributes are available automatically
+|2.0
 
-|`literal monospace text`
-|pass:[`literal monospace text`]
-|Yes
-|pass:[`+literal monospace text+`]
-|
+|UI macros
+|Set `experimental` to use the UI macros
+|UI macros are available automatically
+|2.0
 
-|Curved "`double quotes`"
-|pass:[``double quotes'']
-|No
-|pass:["`double quotes`"], editor keybinding, or the Unicode character in numeric character reference form (e.g., \&#8220;)
-|
-
-|Curved '`single quotes`'
-|pass:[`single quotes']
-|No
-|pass:['`single quotes`'], editor keybinding, or the Unicode character in numeric character reference form (e.g., \&#8217;)
-|
-
-|Implicit document title attribute
-|First content line at document top is set as title
-|Yes
-|pass:[= Title]
-|
-
-|Two-line style document title
-|pass:[= Title] +
-pass:[=====]
-|See ^[3]^
-|pass:[= Title]
-|
-
-|render class method (API)
-|+.render(input, options = {}) ⇒ Object+
-|No
-|+.convert(input, options = {}) ⇒ Object+
-|
+|Document roles
+|Roles are inherited; roles don't wrap the document
+|Roles aren't inherited; roles wrap the document
+|2.0
 |===
 
-^[2]^ Proposed version when deprecation would take affect.
+//*To minimize wordiness, on this page, any AsciiDoc and Asciidoctor syntax, commands, options, variables, classes, methods, etc., are collectively referred to as "`syntax`".*
 
-^[3]^ Asciidoctor accepts the two-line heading style to set the document title.
-However, by using it, you implicitly set `compat-mode`.
-If you want to use the new Asciidoctor syntax, make sure to use `= Title` or explicitly unset the `compat-mode` attribute.
-
-////
-Consult the {uri-migrate}[Migration Guide] to get the full details and learn how to migrate smoothly.
-
-The following changes are not affected by the `compat-mode` attribute:
-
-.AsciiDoc syntax not affected by compat mode
-[cols="1,1,2"]
-|====
-|Feature |{adp} |{adr}
-
-// NO deprecated in ad 8 so no need to mention it (covered by comment at top)
-//|Index terms
-//|pass:[`++`] and pass:[`+++`]
-//|pass:[((Sword))] and pass:[(((Sword, Broadsword, Excalibur)))]
-
-|Underlined titles
-|Underline length must match title length +/- 2 characters.
-|Underline length must match title length +/- 1 character (Underlined titles are deprecated anyway. See <<sections>>.)
-
-|+ifeval::[]+
-|Evaluates any Python expression.
-|Evaluates simple logical expressions testing the value of attributes.
-See <<ifeval-directive>>.
-
-|Block delimiters
-|Delimiter lines do not have to match in length.
-|The length of start and end delimiter lines must match exactly.
-
-|AsciiDoc table cell
-|`a\|` or `asciidoc\|`
-|`a\|` only
-
-|Table cell separator
-|A Python regular expression.
-|One or more literal characters or \t for tab.
-|====
-
-[#migrate-deprecated]
-=== Deleted and Deprecated Syntax and Attributes
-
-These are attributes that either no longer exist, work differently, or have better alternatives.
-
-.Deleted and deprecated syntax and attributes
-[cols="2,2,6"]
-|====
-|{adp} |{adr} |Notes
-
-|`big`, `small`, `underline`, `overline`, `line-through`, colors
-|_deprecated_
-|Character attributes to apply formatting directly.
-Usually better to apply a role, then apply the formatting based on that role by using a stylesheet.
-
-|`halign`, `valign` for table cells
-|Column and cell specifiers
-|See <<cell>>.
-
-|`infile`
-.2+|_not implemented_
-.2+|Provides the name and directory of the current document.
-(Distinct from `docfile`, because `infile` may be an included document, and `docfile` is always the master document.)
-No {adr} equivalent.
-
-|`indir`
-
-|`asciidoc`
-|`asciidoctor`
-|{adp} sets `asciidoc` to show that it is the current processor.
-{adr} sets `asciidoctor` instead.
-
-// Ref migration guide
-|`toc2`
-.3+|`toc`
-.3+|Combined in a single attribute, see <<user-toc>>.
-
-// Ref migration guide
-|`toc-placement`
-|`toc-position`
-
-// Not checked
-|`options="pgwide"`
-|_not implemented_
-|DocBook attribute to make tables full page width, whatever the current indent.
-No {adr} equivalent.
-
-// Ref ap UG. I know it works in ad tables; no ref to ad paragraphs so assume not implemented.
-|options="unbreakable"
-|
-|In {adr}, this only works for tables, not paragraphs.
-
-// http://www.methods.co.nz/asciidoc/userguide.html#X39
-// an ugly hack so not implemented
-|`plaintext`
-|_not implemented_
-|{adp} uses this to suppress inline substitutions and retain block indents when importing large blocks of plain text.
-{adr} deliberately does not implement it; the closest {adr} equivalent is a passthrough block.
-
-// old table
-|`replacements2`
-|`post_replacements`
-|Renamed.
-
-// does this need an explanation?
-|`presubs`
-|-
-|Not required.
-
-// rarely used so dont mention it
-//|`sgml`
-//|_not implemented_
-//|SGML is archaic and has been replaced by XML.
-
-// It may be a perversion, but it is a useful perversion!
-|`showcomments`
-|_not implemented_
-a|In {adp}, turns single line comments into DocBook `<remark>` elements.
-{adr} considers this an inappropriate use of comments.
-If you want to send remarks to the output, use an extension, or:
-
-----
- ifdef::showcomments+basebackend-docbook[]
- ++++
- <remark>Your comment here</remark>
- ++++
- endif::[]
-----
-
-|`specialwords`
-|_not implemented_
-|In {adp}, applies special formatting to named text.
-In {adr} this could be implemented using an extension.
-
-|`tabsize` (in-document and include directive)
-|in-document only
-|{adp} replaces tabs with spaces in all text, using a default tab size of 8.
-{adr} only replaces tabs with spaces in verbatim content blocks (listing, literal, etc), and the attribute has no default.
-In other words, tabs are not expanded in verbatim content blocks unless this attribute is set on the block or the document.
-For all other text, {adr} tabs are fixed at 4 spaces by the CSS.
-See <<normalize-block-indentation>> for more detail.
-|====
-////
+//We highly recommend that you update your documents and extensions to use the new syntax.

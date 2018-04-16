@@ -1,0 +1,127 @@
+= Advanced Attribute Entries
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// taken from attr-doc.adoc
+
+== Split attribute values over multiple lines
+
+When an attribute value is very long, it's possible to split it (i.e., soft-wrap) across multiple lines.
+
+Let's assume we are working with the following attribute entry:
+
+.A long, single-line attribute
+[source]
+----
+:long-value: If you have a very long line of text that you need to substitute regularly in a document, you may find it easier to split it neatly in the header so it remains readable to the next person reading your docs code.
+----
+
+You can split the value over multiple lines to make it more readable by inserting a space followed by a backslash (i.e., `{sp}\`) at the end of each continuing line.
+
+.A long, multiline attribute (soft wrapped)
+[source]
+----
+:long-value: If you have a very long line of text \
+that you need to substitute regularly in a document, \
+you may find it easier to split it neatly in the header \
+so it remains readable to folks reading your docs code.
+----
+
+The backslash and the newline that follows will be removed from the attribute value when the attribute entry is parsed, making this second example effectively the same as the first.
+The space before the backslash is preserved, so you have to use this technique at a natural break point in the content.
+
+You can force an attribute value to hard wrap by adding a plus surrounded by spaces before the backslash.
+
+.An attribute value with hard line breaks
+[source]
+----
+:haiku: Write your docs in text, + \
+AsciiDoc makes it easy, + \
+Now get back to work!
+----
+
+This syntax ensures that the newlines are preserved in the output document as hard line breaks.
+
+== Substitutions in an attribute entry
+
+When Asciidoctor processes a document, it uses a set of six text substitution elements.
+#subs,Text substitution elements# replace characters, markup, attribute references, and macros with converter-specific styles and values.
+
+The header substitution group replaces #special-characters,special characters# and #attributes-2,attribute references# in text.
+This group gets applied to metadata lines (author and revision information) in the document header.
+It also gets applied to values of attribute entries, regardless of whether those entries are defined in the header or elsewhere in the document.
+
+=== Attribute entry limitations
+
+Attributes let you do a surprising amount of formatting for what is fundamentally a text replacement tool.
+
+Supported::
+Basic inline AsciiDoc markup is permitted in attribute values, such as:
++
+* attribute references
+* text formatting (usually wrapped in a pass macro)
+* inline macros (usually wrapped in a pass macro)
+
+Unsupported::
+Complex AsciiDoc markup is not permitted in attribute values, such as:
++
+* lists
+* multiple paragraphs
+* other whitespace-dependent markup types
+
+=== Altering attribute entry substitutions
+
+If you want different substitutions to be applied to the value of an attribute entry, you can use the #pass-macros,inline pass macro#.
+The inline pass macro accepts a list of substitutions in the target slot, which can be used to control which substitutions are applied to the value.
+
+In order for the inline macro to work in this context, it must completely surround the attribute value.
+If it's used anywhere else in the value, it is ignored.
+
+Here's how we can apply the #quotes,quotes substitution# to the value of an attribute entry:
+
+[source]
+----
+:app-name: pass:quotes[MyApp^2^]
+----
+
+Internally, the value is stored as `MyApp<sup>2</sup>`.
+You can inspect the value stored in an attribute using this trick:
+
+[source]
+----
+[subs=attributes+]
+------
+{app-name}
+------
+----
+
+You can also specify the substitution using the single-character alias, `q`.
+
+[source]
+----
+:app-name: pass:q[MyApp^2^]
+----
+
+The inline pass macro kind of works like an attribute value preprocessor.
+If the processor detects that an inline pass macro completely surrounds the attribute value, it:
+
+. reads the list of substitutions from the target slot of the macro
+. unwraps the value from the macro
+. applies the substitutions to the value
+
+If the macro is absent, the value is processed with the header substitution group.
+
+You can also change the substitutions that are applied to an attribute at the time it is resolved.
+This is done by manipulating the substitutions applied to the text where it is referenced.
+For example, here's how we could get the processor to apply quote substitutions to the value of an attribute:
+
+[source]
+----
+:app-name: MyApp^2^
+
+[subs="specialchars,attributes,quotes,replacements,macros,post_replacements"]
+The application is called {app-name}.
+----
+
+Notice that we've swapped the order of the `attributes` and `quotes` substitutions.
+This strategy is akin to post-processing the attribute value.
