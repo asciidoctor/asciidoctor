@@ -1494,6 +1494,36 @@ C1,C2
       assert_xpath '/table/tbody/tr[2]/td[1]/p[text()="B1"]', output, 1
     end
 
+    test 'should preserve newlines in quoted CSV values' do
+      input = <<-EOS
+[cols="1,1,1l"]
+,===
+"A
+B
+C","one
+
+two
+
+three","do
+
+re
+
+me"
+,===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 3
+      assert_css 'table > tbody > tr', output, 1
+      assert_xpath '/table/tbody/tr[1]/td', output, 3
+      assert_xpath %(/table/tbody/tr[1]/td[1]/p[text()="A\nB\nC"]), output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p', output, 3
+      assert_xpath '/table/tbody/tr[1]/td[2]/p[1][text()="one"]', output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p[2][text()="two"]', output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p[3][text()="three"]', output, 1
+      assert_xpath %(/table/tbody/tr[1]/td[3]//pre[text()="do\n\nre\n\nme"]), output, 1
+    end
+
     test 'mixed unquoted records and quoted records with escaped quotes, commas, and wrapped lines' do
       input = <<-EOS
 [format="csv",options="header"]
@@ -1515,7 +1545,7 @@ air, moon roof, loaded",4799.00
       assert_css 'table > tbody > tr', output, 6
       assert_xpath '((//tbody/tr)[1]/td)[4]/p[text()="ac, abs, moon"]', output, 1
       assert_xpath %(((//tbody/tr)[2]/td)[3]/p[text()='Venture "Extended Edition"']), output, 1
-      assert_xpath '((//tbody/tr)[4]/td)[4]/p[text()="MUST SELL! air, moon roof, loaded"]', output, 1
+      assert_xpath %(((//tbody/tr)[4]/td)[4]/p[text()="MUST SELL!\nair, moon roof, loaded"]), output, 1
       assert_xpath %(((//tbody/tr)[5]/td)[4]/p[text()='"This one#{decode_char 8217}s gonna to blow you#{decode_char 8217}re socks off," per the sticker']), output, 1
       assert_xpath %(((//tbody/tr)[6]/td)[4]/p[text()='Check it, "this one#{decode_char 8217}s gonna to blow you#{decode_char 8217}re socks off", per the sticker']), output, 1
     end
@@ -1668,7 +1698,7 @@ single cell
 
     test 'no implicit header row if cell in first line is quoted and spans multiple lines' do
       input = <<-EOS
-[cols=2*]
+[cols=2*l]
 ,===
 "A1
 
@@ -1682,7 +1712,7 @@ A2,B2
       assert_css 'table > thead', output, 0
       assert_css 'table > tbody', output, 1
       assert_css 'table > tbody > tr', output, 2
-      assert_xpath '(//td)[1]/p[text()="A1 A1 continued"]', output, 1
+      assert_xpath %((//td)[1]//pre[text()="A1\n\nA1 continued"]), output, 1
     end
   end
 end
