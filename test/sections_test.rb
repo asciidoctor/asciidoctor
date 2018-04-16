@@ -579,6 +579,74 @@ content
   end
 
   context 'Nesting' do
+    test 'should warn if section title is out of sequence' do
+      input = <<-EOS
+= Document Title
+
+== Section A
+
+==== Nested Section
+
+content
+
+== Section B
+
+content
+      EOS
+
+      using_memory_logger do |logger|
+        result = render_embedded_string input
+        assert_xpath '//h4[text()="Nested Section"]', result, 1
+        assert_message logger, :WARN, '<stdin>: line 5: section title out of sequence: expected level 2, got level 3', Hash
+      end
+    end
+
+    test 'should warn if chapter title is out of sequence' do
+      input = <<-EOS
+= Document Title
+:doctype: book
+
+=== Not a Chapter
+
+content
+      EOS
+
+      using_memory_logger do |logger|
+        result = render_embedded_string input
+        assert_xpath '//h3[text()="Not a Chapter"]', result, 1
+        assert_message logger, :WARN, '<stdin>: line 4: section title out of sequence: expected levels 0 or 1, got level 2', Hash
+      end
+    end
+
+    test 'should not warn if top-level section title is out of sequence when fragment attribute is set on document' do
+      input = <<-EOS
+= Document Title
+
+=== First Section
+
+content
+      EOS
+
+      using_memory_logger do |logger|
+        render_embedded_string input, :attributes => { 'fragment' => '' }
+        assert logger.empty?
+      end
+    end
+
+    test 'should warn if nested section title is out of sequence when fragment attribute is set on document' do
+      input = <<-EOS
+= Document Title
+
+=== First Section
+
+===== Nested Section
+      EOS
+
+      using_memory_logger do |logger|
+        render_embedded_string input, :attributes => { 'fragment' => '' }
+        assert_message logger, :WARN, '<stdin>: line 5: section title out of sequence: expected level 3, got level 4', Hash
+      end
+    end
     test 'should log error if subsections are found in special sections in article that do not support subsections' do
       input = <<-EOS
 = Document Title
