@@ -351,7 +351,7 @@ class Reader
       if next_line.start_with? '//'
         if next_line.start_with? '///'
           if (ll = next_line.length) > 3 && next_line == '/' * ll
-            read_lines_until :terminator => next_line, :skip_first_line => true, :read_last_line => true, :skip_processing => true
+            read_lines_until :terminator => next_line, :skip_first_line => true, :read_last_line => true, :skip_processing => true, :context => :comment
           else
             break
           end
@@ -488,7 +488,10 @@ class Reader
       @process_lines = true
       @look_ahead -= 1 if line_restored && !terminator
     end
-    @unterminated = true if terminator && terminator != line
+    if terminator && terminator != line
+      logger.warn message_with_context %(unterminated #{options[:context] || terminator} block), :source_location => prev_line_cursor
+      @unterminated = true
+    end
     result
   end
 

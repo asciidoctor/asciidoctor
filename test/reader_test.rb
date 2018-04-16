@@ -401,12 +401,15 @@ captured yet again
 
         expected = lines[1..-1].map {|l| l.chomp }
 
-        doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
-        terminator = reader.read_line
-        result = reader.read_lines_until :terminator => terminator, :skip_processing => true
-        assert_equal expected, result
-        assert reader.unterminated
+        using_memory_logger do |logger|
+          doc = empty_safe_document :base_dir => DIRNAME
+          reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
+          terminator = reader.read_line
+          result = reader.read_lines_until :terminator => terminator, :skip_processing => true
+          assert_equal expected, result
+          assert reader.unterminated
+          assert_message logger, :WARN, '<stdin>: line 6: unterminated **** block', Hash
+        end
       end
     end
   end
