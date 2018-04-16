@@ -291,7 +291,7 @@ class Parser
 
       current_level = 0
       if parent.attributes.key? 'fragment'
-        expected_next_level = nil
+        expected_next_level = -1
       # small tweak to allow subsequent level-0 sections for book doctype
       elsif doctype == 'book'
         expected_next_level, expected_next_level_alt = 1, 0
@@ -304,7 +304,14 @@ class Parser
       # clear attributes except for title attribute, which must be carried over to next content block
       attributes = (title = attributes['title']) ? { 'title' => title } : {}
       expected_next_level = (current_level = section.level) + 1
-      part = current_level == 0 && doctype == 'book'
+      if current_level == 0
+        part = doctype == 'book'
+      elsif current_level == 1 && section.special
+        # NOTE preface and abstract sections are only permitted in the book doctype
+        unless (sectname = section.sectname) == 'appendix' || sectname == 'preface' || sectname == 'abstract'
+          expected_next_level = nil
+        end
+      end
     end
 
     reader.skip_blank_lines
@@ -327,10 +334,12 @@ class Parser
           if next_level == 0 && doctype != 'book'
             logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor
           elsif expected_next_level
-            unless next_level == expected_next_level || (expected_next_level_alt && next_level == expected_next_level_alt)
+            unless next_level == expected_next_level || (expected_next_level_alt && next_level == expected_next_level_alt) || expected_next_level < 0
               expected_condition = expected_next_level_alt ? %(expected levels #{expected_next_level_alt} or #{expected_next_level}) : %(expected level #{expected_next_level})
               logger.warn message_with_context %(section title out of sequence: #{expected_condition}, got level #{next_level}), :source_location => reader.cursor
             end
+          else
+            logger.error message_with_context %(#{sectname} sections do not support nested sections), :source_location => reader.cursor
           end
           # the attributes returned are those that are orphaned
           new_section, attributes = next_section reader, section, attributes
