@@ -434,7 +434,9 @@ class Table::ParserContext
   # returns true if the buffer has unclosed quotes, false if it doesn't or it
   # isn't quoted data
   def buffer_has_unclosed_quotes? append = nil
-    if (record = append ? (buffer + append).strip : buffer.strip).start_with? '"'
+    if (record = append ? (@buffer + append).strip : @buffer.strip) == '"'
+      true
+    elsif record.start_with? '"'
       if ((trailing_quote = record.end_with? '"') && (record.end_with? '""')) || (record.start_with? '""')
         ((record = record.gsub '""', '').start_with? '"') && !(record.end_with? '"')
       else
@@ -536,7 +538,7 @@ class Table::ParserContext
           # this may not be perfect logic, but it hits the 99%
           if cell_text.start_with?('"') && cell_text.end_with?('"')
             # unquote
-            cell_text = cell_text[1...-1].strip
+            cell_text = cell_text.slice(1, cell_text.length - 2).strip
           end
 
           # collapse escaped quotes

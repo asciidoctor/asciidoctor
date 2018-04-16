@@ -1550,6 +1550,26 @@ air, moon roof, loaded",4799.00
       assert_xpath %(((//tbody/tr)[6]/td)[4]/p[text()='Check it, "this one#{decode_char 8217}s gonna to blow you#{decode_char 8217}re socks off", per the sticker']), output, 1
     end
 
+    test 'should allow quotes around a CSV value to be on their own lines' do
+      input = <<-EOS
+[cols=2*]
+,===
+"
+A
+","
+B
+"
+,===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > tbody > tr', output, 1
+      assert_xpath '/table/tbody/tr[1]/td', output, 2
+      assert_xpath '/table/tbody/tr[1]/td[1]/p[text()="A"]', output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p[text()="B"]', output, 1
+    end
+
     test 'csv format shorthand' do
       input = <<-EOS
 ,===
