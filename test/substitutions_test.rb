@@ -1018,9 +1018,13 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
       assert_equal 'An example footnote.', footnote.text
     end
 
-    test 'an unresolved footnoteref should not crash the processor' do
-      para = block_from_string('Sentence text footnoteref:[ex1].')
-      para.sub_macros para.source
+    test 'an unresolved footnote reference should produce a warning message' do
+      input = 'Sentence text.footnote:ex1[]'
+      using_memory_logger do |logger|
+        para = block_from_string input
+        para.sub_macros para.source
+        assert_message logger, :WARN, 'invalid footnote reference: ex1'
+      end
     end
 
     test 'inline footnote macro can be used to define and reference a footnote reference' do

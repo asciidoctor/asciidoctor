@@ -951,6 +951,7 @@ module Substitutors
             if (footnote = @document.footnotes.find {|candidate| candidate.id == id })
               index, text = footnote.index, footnote.text
             else
+              logger.warn %(invalid footnote reference: #{id})
               index, text = nil, id
             end
             type, target, id = :xref, id, nil
