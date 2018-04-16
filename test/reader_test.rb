@@ -367,6 +367,50 @@ This is a paragraph outside the block.
         assert_equal lines[1, 4], result
         assert_equal '--', reader.peek_line
       end
+
+      test 'read lines until terminator' do
+        lines = <<-EOS.each_line.to_a
+****
+captured
+
+also captured
+****
+
+not captured
+        EOS
+
+        expected = ['captured', '', 'also captured']
+
+        doc = empty_safe_document :base_dir => DIRNAME
+        reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
+        terminator = reader.read_line
+        result = reader.read_lines_until :terminator => terminator, :skip_processing => true
+        assert_equal expected, result
+        refute reader.unterminated
+      end
+
+      test 'should mark reader as unterminated if reader reaches end of source without finding terminator' do
+        lines = <<-EOS.each_line.to_a
+****
+captured
+
+also captured
+
+captured yet again
+        EOS
+
+        expected = lines[1..-1].map {|l| l.chomp }
+
+        using_memory_logger do |logger|
+          doc = empty_safe_document :base_dir => DIRNAME
+          reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
+          terminator = reader.read_line
+          result = reader.read_lines_until :terminator => terminator, :skip_processing => true
+          assert_equal expected, result
+          assert reader.unterminated
+          assert_message logger, :WARN, '<stdin>: line 6: unterminated **** block', Hash
+        end
+      end
     end
   end
 
@@ -1341,10 +1385,13 @@ include::fixtures/no-such-file.adoc[]
 ////
         EOS
 
-        doc = empty_safe_document :base_dir => DIRNAME
-        reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
-        result = reader.skip_comment_lines
-        assert_equal lines.map {|l| l.chomp}, result
+        using_memory_logger do |logger|
+          doc = empty_safe_document :base_dir => DIRNAME
+          reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
+          reader.skip_comment_lines
+          assert reader.empty?
+          assert logger.empty?
+        end
       end
     end
 

@@ -304,21 +304,39 @@ preamble
     test "not enough chars for a multiline document title" do
       title = "My Title"
       chars = "=" * (title.length - 2)
-      assert_xpath '//h1', render_string(title + "\n" + chars), 0
-      assert_xpath '//h1', render_string(title + "\n" + chars + "\n"), 0
+      using_memory_logger do |logger|
+        output = render_string(title + "\n" + chars)
+        assert_xpath '//h1', output, 0
+        refute logger.empty?
+        logger.clear
+        output = render_string(title + "\n" + chars + "\n")
+        assert_xpath '//h1', output, 0
+        refute logger.empty?
+      end
     end
 
     test "too many chars for a multiline document title" do
       title = "My Title"
       chars = "=" * (title.length + 2)
-      assert_xpath '//h1', render_string(title + "\n" + chars), 0
-      assert_xpath '//h1', render_string(title + "\n" + chars + "\n"), 0
+      using_memory_logger do |logger|
+        output = render_string(title + "\n" + chars)
+        assert_xpath '//h1', output, 0
+        refute logger.empty?
+        logger.clear
+        output = render_string(title + "\n" + chars + "\n")
+        assert_xpath '//h1', output, 0
+        refute logger.empty?
+      end
     end
 
     test "document title with multiline syntax cannot begin with a dot" do
       title = ".My Title"
       chars = "=" * title.length
-      assert_xpath '//h1', render_string(title + "\n" + chars), 0
+      using_memory_logger do |logger|
+        output = render_string(title + "\n" + chars)
+        assert_xpath '//h1', output, 0
+        refute logger.empty?
+      end
     end
 
     test "document title with atx syntax" do
@@ -443,7 +461,11 @@ endif::[]
     test "heading title with multiline syntax cannot begin with a dot" do
       title = ".My Title"
       chars = "-" * title.length
-      assert_xpath '//h2', render_string(title + "\n" + chars), 0
+      using_memory_logger do |logger|
+        output = render_string(title + "\n" + chars)
+        assert_xpath '//h2', output, 0
+        refute logger.empty?
+      end
     end
 
     test "with atx syntax" do

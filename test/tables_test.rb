@@ -1381,6 +1381,26 @@ plain
       assert_xpath '(/table/tbody/tr/td)[1][@style="background-color: red;"]', output, 1
       assert_xpath '(/table/tbody/tr/td)[2][@style="background-color: green;"]', output, 0
     end
+
+    test 'should warn if table block is not terminated' do
+      input = <<-EOS
+outside
+
+|===
+|
+inside
+
+still inside
+
+eof
+      EOS
+
+      using_memory_logger do |logger|
+        output = render_embedded_string input
+        assert_xpath '/table', output, 1
+        assert_message logger, :WARN, '<stdin>: line 9: unterminated table block', Hash
+      end
+    end
   end
 
   context 'DSV' do

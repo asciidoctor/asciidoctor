@@ -37,6 +37,9 @@ class Reader
   # Public: Control whether lines are processed using Reader#process_line on first visit (default: true)
   attr_accessor :process_lines
 
+  # Public: Indicates that the end of the reader was reached with a delimited block still open.
+  attr_accessor :unterminated
+
   # Public: Initialize the Reader object
   def initialize data = nil, cursor = nil, opts = {}
     if !cursor
@@ -63,6 +66,7 @@ class Reader
     @look_ahead = 0
     @process_lines = true
     @unescape_next_line = false
+    @unterminated = nil
   end
 
   # Internal: Prepare the lines from the provided data
@@ -327,44 +331,42 @@ class Reader
     end
   end
 
-  # Public: Skip consecutive lines containing line comments and return them.
+  # Public: Skip consecutive comment lines and block comments.
   #
   # Examples
   #   @lines
   #   => ["// foo", "bar"]
   #
   #   comment_lines = skip_comment_lines
-  #   => ["// foo"]
+  #   => nil
   #
   #   @lines
   #   => ["bar"]
   #
-  # Returns the Array of lines that were skipped
+  # Returns nothing
   def skip_comment_lines
-    return [] if empty?
+    return if empty?
 
-    comment_lines = []
     while (next_line = peek_line) && !next_line.empty?
       if next_line.start_with? '//'
         if next_line.start_with? '///'
           if (ll = next_line.length) > 3 && next_line == '/' * ll
-            comment_lines << shift
-            comment_lines.push(*(read_lines_until(:terminator => next_line, :read_last_line => true, :skip_processing => true)))
+            read_lines_until :terminator => next_line, :skip_first_line => true, :read_last_line => true, :skip_processing => true, :context => :comment
           else
             break
           end
         else
-          comment_lines << shift
+          shift
         end
       else
         break
       end
     end
 
-    comment_lines
+    nil
   end
 
-  # Public: Skip consecutive lines that are line comments and return them.
+  # Public: Skip consecutive comment lines and return them.
   #
   # This method assumes the reader only contains simple lines (no blocks).
   def skip_line_comments
@@ -398,8 +400,12 @@ class Reader
   #   a line for which the given block evals to true.
   #
   # options - an optional Hash of processing options:
+  #           * :terminator may be used to specify the contents of the line
+  #               at which the reader should stop
   #           * :break_on_blank_lines may be used to specify to break on
   #               blank lines
+  #           * :break_on_list_continuation may be used to specify to break
+  #               on a list continuation line
   #           * :skip_first_line may be used to tell the reader to advance
   #               beyond the first line before beginning the scan
   #           * :preserve_last_line may be used to specify that the String
@@ -408,6 +414,10 @@ class Reader
   #           * :read_last_line may be used to specify that the String
   #               causing the method to stop processing lines should be
   #               included in the lines being returned
+  #           * :skip_line_comments may be used to look for and skip
+  #               line comments
+  #           * :skip_processing is used to disable line (pre)processing
+  #               for the duration of this method
   #
   # Returns the Array of lines forming the next segment.
   #
@@ -474,10 +484,13 @@ class Reader
         end
       end
     end
-
     if restore_process_lines
       @process_lines = true
       @look_ahead -= 1 if line_restored && !terminator
+    end
+    if terminator && terminator != line
+      logger.warn message_with_context %(unterminated #{options[:context] || terminator} block), :source_location => prev_line_cursor
+      @unterminated = true
     end
     result
   end

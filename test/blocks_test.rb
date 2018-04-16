@@ -191,6 +191,36 @@ line should be rendered
       assert_xpath '//p[text() = "line should be rendered"]', output, 1
     end
 
+    test 'should warn if unterminated comment block is detected in body' do
+      input = <<-EOS
+before comment block
+
+////
+content that has been disabled
+
+supposed to be after comment block, except it got swallowed by block comment
+      EOS
+
+      render_embedded_string input
+      assert_message @logger, :WARN, '<stdin>: line 6: unterminated comment block', Hash
+    end
+
+    test 'should warn if unterminated comment block is detected inside another block' do
+      input = <<-EOS
+before sidebar block
+
+****
+////
+content that has been disabled
+****
+
+supposed to be after sidebar block, except it got swallowed by block comment
+      EOS
+
+      render_embedded_string input
+      assert_message @logger, :WARN, '<stdin>: line 8: unterminated comment block', Hash
+    end
+
     # WARNING if first line of content is a directive, it will get interpretted before we know it's a comment block
     # it happens because we always look a line ahead...not sure what we can do about it
     test 'preprocessor directives should not be processed within comment open block' do
@@ -779,6 +809,23 @@ yet another example
       assert_xpath '(/*[@class="exampleblock"])[1]/*[@class="title"][starts-with(text(), "Example ")]', output, 1
       assert_xpath '(/*[@class="exampleblock"])[2]/*[@class="title"][text()="second example"]', output, 1
       assert_xpath '(/*[@class="exampleblock"])[3]/*[@class="title"][starts-with(text(), "Exhibit ")]', output, 1
+    end
+
+    test 'should warn if example block is not terminated' do
+      input = <<-EOS
+outside
+
+====
+inside
+
+still inside
+
+eof
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/*[@class="exampleblock"]', output, 1
+      assert_message @logger, :WARN, '<stdin>: line 8: unterminated example block', Hash
     end
   end
 
@@ -2996,6 +3043,23 @@ puts HTML::Pipeline.new(filters, {}).call(input)[:output]
       EOS
       doc = document_from_string input, :safe => Asciidoctor::SafeMode::SERVER
       assert_nil doc.attributes['source-highlighter']
+    end
+
+    test 'should warn if listing block is not terminated' do
+      input = <<-EOS
+outside
+
+----
+inside
+
+still inside
+
+eof
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/*[@class="listingblock"]', output, 1
+      assert_message @logger, :WARN, '<stdin>: line 8: unterminated listing block', Hash
     end
   end
 

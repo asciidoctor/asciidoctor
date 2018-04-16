@@ -751,6 +751,20 @@ v1.0, 2010-01-01: First release!
       assert_includes output, '2010-01-01 == 2010-01-01'
     end
 
+    test 'should warn if unterminated block comment is detected in document header' do
+      input = <<-EOS
+= Document Title
+:foo: bar
+////
+:hey: there
+
+content
+      EOS
+      doc = document_from_string input
+      assert_nil doc.attr('hey')
+      assert_message @logger, :WARN, '<stdin>: line 6: unterminated comment block', Hash
+    end
+
     test 'substitutes inside block title' do
       input = <<-EOS
 :gem_name: asciidoctor
