@@ -13,9 +13,9 @@ There's also the concept of a multi-part book, but the distinction from a regula
 A book only has chapters and special sections, whereas a multi-part book is divided by parts that each contain one or more chapters or special sections.
 
 Man page (keyword: `manpage`)::
-Used for producing a roff or HTML-formatted https://en.wikipedia.org/wiki/Man_page[man page] (short for manual page) for Unix and Unix-like operating systems.
-This doctype instructs the parser to recognize a special document header and section naming conventions for organizing the AsciiDoc content as a manual page.
-Refer to <<man-pages>> for details on how to compose AsciiDoc for this purpose.
+Used for producing a roff or HTML-formatted manual page (man page) for Unix and Unix-like operating systems.
+This doctype instructs the parser to recognize a special document header and section naming conventions for organizing the AsciiDoc content as a man page.
+See xref:manpage:index.adoc[Man Pages] for details on how structure a man page using AsciiDoc and generate it with Asciidoctor.
 
 Inline (keyword: `inline`)::
 Asciidoctor only.
@@ -34,11 +34,11 @@ The rules for the inline doctype are as follows:
 Given the following input:
 
 [source]
-http://asciidoc.org[AsciiDoc] is a _lightweight_ markup language...
+https://asciidoctor.org[AsciiDoc] is a _lightweight_ markup language...
 
 Processing it with the options `doctype=inline` and `backend=html5` produces:
 
 [source,html]
-<a href="http://asciidoc.org">AsciiDoc</a> is a <em>lightweight</em> markup language&#8230;
+<a href="https://asciidoctor.org">AsciiDoc</a> is a <em>lightweight</em> markup language&#8230;
 
 The inline doctype allows the Asciidoctor processor to cover the full range of applications, from unstructured (inline) text to full, standalone documents!
