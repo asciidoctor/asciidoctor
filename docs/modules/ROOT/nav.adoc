@@ -114,6 +114,9 @@
 
 * xref:hr-and-break.adoc[Horizontal Rules & Page Breaks]
 
+* xref:docbook:index.adoc[DocBook]
+* xref:manpage:index.adoc[Man Page]
+
 * xref:book:structure.adoc[Books]
 ** xref:book:parts-and-chapters.adoc[Parts & Chapters]
 ** xref:book:colophon.adoc[Colophon]
