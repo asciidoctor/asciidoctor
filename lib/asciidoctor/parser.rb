@@ -2347,8 +2347,6 @@ class Parser
           parser_ctx.buffer = %(#{parser_ctx.buffer}#{line}#{LF})
           case format
           when 'csv'
-            # QUESTION make stripping endlines in csv data an option? (unwrap-option?)
-            parser_ctx.buffer = %(#{parser_ctx.buffer.rstrip} )
             if parser_ctx.buffer_has_unclosed_quotes?
               implicit_header, implicit_header_boundary = false, nil if implicit_header_boundary && loop_idx == 0
               parser_ctx.keep_cell_open

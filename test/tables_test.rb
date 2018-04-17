@@ -109,11 +109,11 @@ context 'Tables' do
     test 'preserves escaped delimiters at the end of the line' do
       input = <<-EOS
 [%header,cols="1,1"]
-|====
+|===
 |A |B\\|
 |A1 |B1\\|
 |A2 |B2\\|
-|====
+|===
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
@@ -130,11 +130,11 @@ context 'Tables' do
 
     test 'should treat trailing pipe as an empty cell' do
       input = <<-EOS
-|====
+|===
 |A1 |
 |B1 |B2
 |C1 |C2
-|====
+|===
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
@@ -261,11 +261,11 @@ three
 
     test 'first row sets number of columns when not specified' do
       input = <<-EOS
-|====
+|===
 |first |second |third |fourth
 |1 |2 |3
 |4
-|====
+|===
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
@@ -620,11 +620,11 @@ just text
     test 'styles not applied to header cells' do
       input = <<-EOS
 [cols="1h,1s,1e",options="header,footer"]
-|====
+|===
 |Name |Occupation| Website
 |Octocat |Social coding| https://github.com
 |Name |Occupation| Website
-|====
+|===
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
@@ -646,7 +646,7 @@ just text
     test 'vertical table headers use th element instead of header class' do
       input = <<-EOS
 [cols="1h,1s,1e"]
-|====
+|===
 
 |Name |Occupation| Website
 
@@ -654,7 +654,7 @@ just text
 
 |Name |Occupation| Website
 
-|====
+|===
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
@@ -844,12 +844,12 @@ d|9 2+>|10
 
     test 'assigns unique column names for table with implicit column count and colspans in first row' do
       input = <<-EOS
-|====
+|===
 |                 2+| Node 0          2+| Node 1
 
 | Host processes    | Core 0 | Core 1   | Core 4 | Core 5
 | Guest processes   | Core 2 | Core 3   | Core 6 | Core 7
-|====
+|===
       EOS
 
       output = render_embedded_string input, :backend => 'docbook'
@@ -1135,25 +1135,25 @@ a|AsciiDoc footnote:[A lightweight markup language.]
 
 == Section 1
 
-|====
+|===
 a|
 [source, yaml]
 ----
 key: value <1>
 ----
 <1> First callout
-|====
+|===
 
 == Section 2
 
-|====
+|===
 a|
 [source, yaml]
 ----
 key: value <1>
 ----
 <1> Second callout
-|====
+|===
 
 == Section 3
 
@@ -1457,11 +1457,11 @@ single cell
 
     test 'should treat trailing colon as an empty cell' do
       input = <<-EOS
-:====
+:===
 A1:
 B1:B2
 C1:C2
-:====
+:===
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
@@ -1478,11 +1478,11 @@ C1:C2
 
     test 'should treat trailing comma as an empty cell' do
       input = <<-EOS
-,====
+,===
 A1,
 B1,B2
 C1,C2
-,====
+,===
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
@@ -1492,6 +1492,36 @@ C1,C2
       assert_xpath '/table/tbody/tr[1]/td[1]/p[text()="A1"]', output, 1
       assert_xpath '/table/tbody/tr[1]/td[2]/p', output, 0
       assert_xpath '/table/tbody/tr[2]/td[1]/p[text()="B1"]', output, 1
+    end
+
+    test 'should preserve newlines in quoted CSV values' do
+      input = <<-EOS
+[cols="1,1,1l"]
+,===
+"A
+B
+C","one
+
+two
+
+three","do
+
+re
+
+me"
+,===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 3
+      assert_css 'table > tbody > tr', output, 1
+      assert_xpath '/table/tbody/tr[1]/td', output, 3
+      assert_xpath %(/table/tbody/tr[1]/td[1]/p[text()="A\nB\nC"]), output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p', output, 3
+      assert_xpath '/table/tbody/tr[1]/td[2]/p[1][text()="one"]', output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p[2][text()="two"]', output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p[3][text()="three"]', output, 1
+      assert_xpath %(/table/tbody/tr[1]/td[3]//pre[text()="do\n\nre\n\nme"]), output, 1
     end
 
     test 'mixed unquoted records and quoted records with escaped quotes, commas, and wrapped lines' do
@@ -1515,9 +1545,29 @@ air, moon roof, loaded",4799.00
       assert_css 'table > tbody > tr', output, 6
       assert_xpath '((//tbody/tr)[1]/td)[4]/p[text()="ac, abs, moon"]', output, 1
       assert_xpath %(((//tbody/tr)[2]/td)[3]/p[text()='Venture "Extended Edition"']), output, 1
-      assert_xpath '((//tbody/tr)[4]/td)[4]/p[text()="MUST SELL! air, moon roof, loaded"]', output, 1
+      assert_xpath %(((//tbody/tr)[4]/td)[4]/p[text()="MUST SELL!\nair, moon roof, loaded"]), output, 1
       assert_xpath %(((//tbody/tr)[5]/td)[4]/p[text()='"This one#{decode_char 8217}s gonna to blow you#{decode_char 8217}re socks off," per the sticker']), output, 1
       assert_xpath %(((//tbody/tr)[6]/td)[4]/p[text()='Check it, "this one#{decode_char 8217}s gonna to blow you#{decode_char 8217}re socks off", per the sticker']), output, 1
+    end
+
+    test 'should allow quotes around a CSV value to be on their own lines' do
+      input = <<-EOS
+[cols=2*]
+,===
+"
+A
+","
+B
+"
+,===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > tbody > tr', output, 1
+      assert_xpath '/table/tbody/tr[1]/td', output, 2
+      assert_xpath '/table/tbody/tr[1]/td[1]/p[text()="A"]', output, 1
+      assert_xpath '/table/tbody/tr[1]/td[2]/p[text()="B"]', output, 1
     end
 
     test 'csv format shorthand' do
@@ -1668,7 +1718,7 @@ single cell
 
     test 'no implicit header row if cell in first line is quoted and spans multiple lines' do
       input = <<-EOS
-[cols=2*]
+[cols=2*l]
 ,===
 "A1
 
@@ -1682,7 +1732,7 @@ A2,B2
       assert_css 'table > thead', output, 0
       assert_css 'table > tbody', output, 1
       assert_css 'table > tbody > tr', output, 2
-      assert_xpath '(//td)[1]/p[text()="A1 A1 continued"]', output, 1
+      assert_xpath %((//td)[1]//pre[text()="A1\n\nA1 continued"]), output, 1
     end
   end
 end

@@ -62,6 +62,8 @@ Bug fixes::
   * record timings when calling convert and write on Document (#2574, PR #2575)
   * duplicate header attributes when restoring; allows header attributes to be restored an arbitrary number of times (#2567, PR #2570)
   * propagate catalog_assets option to nested document (#2564, PR #2565)
+  * preserve newlines in quoted CSV data (#2041)
+  * allow opening quote around quoted CSV field to be on a line by itself
   * output table footer after body rows (#2556, PR #2566) (*@PauloFrancaLacerda*)
   * move @page outside of @media print in default stylesheet (#2531, PR #2532)
   * don't throw exception if text of dd node is nil (#2529, PR #2530)
