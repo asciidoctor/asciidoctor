@@ -1,4 +1,4 @@
-= Listing Paragraphs and Blocks
+= Listing Blocks
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
@@ -8,10 +8,9 @@ From listing.adoc, included in:
 - user-manual: Listing and Source Code Blocks
 ////
 
-Like literal blocks, the content in listing blocks is displayed exactly as you entered it.
+Like xref:literal-block.adoc[literal blocks], the content in listing blocks is displayed exactly as you entered it.
 Listing block content is converted to `<pre>` text.
-The content in listing blocks is only subject to #special character# and callout substitutions.
-// <<user-manual#special-characters,special character>>
+The content in listing blocks is only subject to xref:subs:special-characters.adoc[special character] and callout substitutions.
 
 The `listing` block name can be applied to content two ways.
 
