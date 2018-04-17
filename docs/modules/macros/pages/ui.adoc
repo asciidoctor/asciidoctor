@@ -1,0 +1,58 @@
+= User Interface Macros
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+
+IMPORTANT: You *must* set the `experimental` attribute to enable the UI macros.
+
+== Button
+
+It can be equally difficult to communicate to the reader that they need to press a button.
+They can't tell if you are saying "`OK`" or they are supposed to look for a button labeled *OK*.
+It's all about getting the semantics right.
+The `btn` macro to the rescue!
+
+.Button macro syntax
+[source]
+----
+include::{partialsdir}/ex-ui.adoc[tag=button]
+----
+
+.Result: Button macros displaying UI buttons
+====
+include::{partialsdir}/ex-ui.adoc[tag=button]
+====
+
+== Keyboard
+
+Asciidoctor recognizes a macro for creating keyboard shortcuts using the syntax `+kbd:[key(+key)*]+`.
+
+.Keyboard macro syntax
+[source]
+----
+include::{partialsdir}/ex-ui.adoc[tag=key]
+----
+
+.Result: Keyboard macros displaying common browser keyboard shortcuts
+[width="50%"]
+include::{partialsdir}/ex-ui.adoc[tag=key]
+
+You no longer have to struggle to explain to users what keys they are supposed to press.
+
+== Menu
+
+Trying to explain to someone how to select a menu item can be a pain.
+With the `menu` macro, the symbols do the work.
+
+.Menu macro syntax
+[source]
+----
+include::{partialsdir}/ex-ui.adoc[tag=menu]
+----
+
+The instructions in the example above appear below.
+
+.Result: Menu macros displaying menu selections
+====
+include::{partialsdir}/ex-ui.adoc[tag=menu]
+====

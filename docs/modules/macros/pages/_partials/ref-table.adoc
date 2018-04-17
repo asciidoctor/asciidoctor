@@ -1,0 +1,65 @@
+== Audio and video attributes and options
+
+.Audio attributes and values
+[cols="1m,1,2,2"]
+|===
+|Attribute |Value(s) |Example Syntax |Notes
+
+|options
+|`autoplay`, `loop`, `controls`, `nocontrols`
+|`audio::ocean_waves.mp3[options="autoplay,loop"]`
+|The controls value is enabled by default
+|===
+
+.Video attributes and values
+[cols="1m,1,2m,2"]
+|===
+|Attribute |Value(s) |Example Syntax |Notes
+
+|title
+|User defined text
+|.An ocean sunset
+|
+
+|poster
+|A URL to an image to show until the user plays or seeks.
+|poster=sunset.jpg
+|Can be specified as the first positional (unnamed) attribute.
+Also used to specify the service when referring to a video hosted on YouTube (youtube) or Vimeo (vimeo).
+
+|width
+|User-defined size in pixels.
+|width=640
+|Can be specified as the second positional (unnamed) attribute.
+
+|height
+|User-defined size in pixels.
+|height=480
+|Can be specified as the third positional (unnamed) attribute.
+
+|options
+|autoplay, loop, modest, nocontrols, nofullscreen
+|opts="autoplay,loop"
+|The controls are enabled by default.
+The modest option enables modest branding for a YouTube video.
+
+|start
+|User-defined playback start time in seconds.
+|start=30
+|
+
+|end
+|User-defined playback end time in seconds.
+|end=90
+|
+
+|theme
+|The YouTube theme to use for the frame.
+|theme=light
+|Valid values are dark (the default) and light.
+
+|lang
+|The language used in the YouTube frame.
+|lang=fr
+|A two-letter language code or fully specified locale.
+|===

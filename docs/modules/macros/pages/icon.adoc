@@ -1,0 +1,319 @@
+= Icons
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// icons.adoc
+
+Icons are used for admonition labels, callout numbers and inline symbols.
+Asciidoctor provides three strategies for display icons: as text, as images, or as characters selected from an icon font.
+The strategy is controlled using the `icons` attribute.
+When an image or font-base icon isn't available, Asciidoctor displays the  icon macro's fallback text.
+
+== Images as icons
+
+If you want icons to display using images, set the `icons` attribute to an empty value in the document header.
+This strategy is recommended if you are converting to DocBook or you want an easy way to make HTML for viewing offline.
+The DocBook toolchain provides images for the admonition and callout icons, which you can replace with your own custom icons.
+If you use the inline icon macro, you'll need to provide the images for those icons.
+
+== Font-based icons
+
+Alternatively, you can have Asciidoctor "`draw`" icons using the {fontawesome-ref}[Font Awesome^] font-based icon set.
+To use this feature, set the value of the `icons` document attribute to `font` in the document header.
+You can see the available icons on the {fontawesome-ref}/icons/[icons page].
+Using Font Awesome provides many more images, but requires online access by default.
+
+IMPORTANT: The default CSS stylesheet is required when using font-based icons.
+
+=== Admonition Icons
+
+Here's an example using font icons, starting with the AsciiDoc source:
+
+.Set icons attribute in the document header
+[source]
+----
+= Document Title
+:icons: font
+
+NOTE: Asciidoctor supports font-based admonition icons, powered by Font Awesome!
+----
+
+Asciidoctor will then emit HTML markup that selects an appropriate font character from the Font Awesome font for each admonition block:
+
+.Result: HTML output when the icons attribute is set
+[source,html]
+----
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Asciidoctor supports font-based admonition icons, powered by Font Awesome!
+</td>
+</tr>
+</table>
+</div>
+----
+
+This is how the admonition looks rendered.
+
+.Result: Admonition block label is displayed as an icon when the icons attribute is set
+====
+NOTE: Asciidoctor supports font-based admonition icons, powered by Font Awesome!
+====
+
+Asciidoctor adds a reference to the Font Awesome stylesheet and font files served from a CDN to the document header:
+
+[source,html]
+----
+<link rel="stylesheet"
+  href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css">
+----
+
+== Unicode admonition icons
+
+Instead of image or font-based icons, it's possible to use Unicode glyphs for admonition icons by applying a little trick.
+
+If the `icons` attribute is not set on the document, Asciidoctor outputs a textual label that identifies the admonition type.
+The text for this label comes from an AsciiDoc attribute.
+The name of the attribute is `<type>-caption`, where `<type>` is the admonition type in lowercase.
+For example, the attribute for a tip admonition is `tip-caption`.
+
+Instead of a word, you can assign a Unicode glyph to this attribute:
+
+[source]
+----
+:tip-caption: 💡
+
+[TIP]
+It's possible to use Unicode glyphs as admonition icons.
+----
+
+Here's the HTML that Asciidoctor outputs for the icon cell:
+
+[source,html]
+----
+<td class="icon">
+<div class="title">💡</div>
+</td>
+----
+
+Instead of entering the glyph directly, you can enter a character reference instead.
+However, since you're defining the character reference in an attribute entry, you (currently) have to disable substitutions on the value.
+
+[source]
+----
+:tip-caption: pass:[&#128161;]
+
+[TIP]
+It's possible to use Unicode glyphs as admonition icons.
+----
+
+On GitHub, the HTML output that Asciidoctor emits is run through a postprocessing filter that substitutes emoji shortcodes with emoji symbols.
+That means you can use these shortcodes in the value of the attribute:
+
+[source]
+----
+\ifdef::env-github[]
+:tip-caption: :bulb:
+\endif::[]
+
+[TIP]
+It's possible to use emojis as admonition icons on GitHub.
+----
+
+When the document is processed through the GitHub interface, the shortcodes get replaced with real emojis.
+This is the only known way to get admonition icons to work on GitHub.
+Give it a try!
+
+== Inline icon macro
+
+An icon can be inserted at an arbitrary place in paragraph content with an inline macro.
+
+Here's an example that inserts the Font Awesome tags icon in front of a list of tag names.
+
+.Inline icon macro syntax
+[source]
+----
+icon:tags[] ruby, asciidoctor
+----
+
+Here's how the HTML converter converts the above syntax when the `icons` attribute is assigned the `font` value.
+
+.Result: HTML output
+[source,xml]
+----
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-tags"></i></span> ruby, asciidoctor</p>
+</div>
+----
+
+More importantly, here's how it looks!
+
+.Result: Inline icon macro
+====
+icon:tags[] ruby, asciidoctor
+====
+
+You can even give the icon color by assigning it a role.
+
+.Inline icon macro and role syntax
+[source]
+----
+icon:tags[role="blue"] ruby, asciidoctor
+----
+
+.Result: Inline icon macro and role
+====
+icon:tags[role=blue] ruby, asciidoctor
+====
+
+If you aren't using font-based icons, Asciidoctor looks for icon images on disk, in the `iconsdir`, naturally.
+Here's how the HTML converter converts an icon macro when the `icons` attribute is not set or empty.
+
+.Result: HTML output
+[source,html]
+----
+<div class="paragraph">
+<p><span class="image"><img src="./images/icons/tags.png" alt="tags"></span> ruby, asciidoctor</p>
+</div>
+----
+
+Here's how the DocBook converter converts to icon macro.
+DocBook does not support font-based icons, so the DocBook output is not affected by the value of the `icons` attribute.
+
+.Result: DocBook output
+[source,xml]
+----
+<inlinemediaobject>
+  <imageobject>
+    <imagedata fileref="./images/icons/tags.png"/>
+  </imageobject>
+  <textobject><phrase>tags</phrase></textobject>
+</inlinemediaobject> ruby, asciidoctor
+----
+
+.Relationship to the inline image macro
+--
+The inline icon macro is similar to the inline image macro with a few exceptions:
+
+* If the icons attribute has the value font, the macro will translate to a font-based icon in the HTML converter (e.g., `<i class="icon-tags"></i>`)
+* If the icons attribute does not have the value font, or the converter is DocBook, the macro will insert an image into the document that resolves to a file in the iconsdir directory (e.g., `<img src="./images/icons/tags.png">`)
+
+The file resolution strategy when using image-based icons is the same used to locate images for the admonition icons.
+The file extension is set using the `icontype` attribute, which defaults to PNG (`png`).
+--
+
+=== Size, rotate, and flip attributes
+
+The icon macro has a few attributes that can be used to modify the size and orientation of the icon.
+At the moment, these are specific to Font Awesome and therefore only apply to HTML output when icon fonts are enabled.
+
+`size`::
+First positional attribute; scales the icon; values: `1x` (default), `2x`, `3x`, `4x`, `5x`, `lg`, `fw`
+
+`rotate`::
+Rotates the icon; values: `90`, `180`, `270`
+
+`flip`::
+Flips the icon; values: `horizontal`, `vertical`
+
+The first unnamed attribute is assumed to be the size.
+For instance, to make the icon twice the size as the default, simply add `2x` inside the square brackets.
+
+[source]
+----
+icon:heart[2x]
+----
+
+This is equivalent to:
+
+[source]
+----
+icon:heart[size=2x]
+----
+
+And this is how the icon:heart[size=2x] displays.
+
+The previous example emits the following HTML:
+
+[source,html]
+----
+<span class="icon"><i class="fa fa-heart fa-2x"></i></span>
+----
+
+[TIP]
+====
+If you want to line up icons so that you can use them as bullets in a list, use the `fw` size as follows:
+
+----
+[%hardbreaks]
+icon:bolt[fw] bolt
+icon:heart[fw] heart
+----
+====
+
+To rotate and flip the icon, specify these options using attributes:
+
+[source]
+----
+icon:shield[rotate=90, flip=vertical]
+----
+
+The icon:shield[rotate=90, flip=vertical] looks like this.
+
+The previous example emits the following HTML:
+
+[source,xml]
+----
+<span class="icon"><i class="fa-shield fa-rotate-90 fa-flip-vertical"></i></span>
+----
+
+=== Link and window
+
+Like an inline image, it's possible to add additional metadata to an inline icon.
+
+Below are the possible attributes that apply to both font-based and image-based icons:
+
+`link`::
+The URI target used for the icon, which will wrap the converted icon in a link
+
+`window`::
+The target window of the link (when the `link` attribute is specified) (HTML converter)
+
+Here's an example of an icon with a link:
+
+[source]
+----
+icon:download[link="http://rubygems.org/downloads/asciidoctor-1.5.2.gem"]
+----
+
+The previous example emits the following HTML:
+
+[source,html]
+----
+<span class="icon"><a class="image" href="http://rubygems.org/downloads/asciidoctor-1.5.2.gem"><i class="fa-download"></i></a></span>
+----
+
+== Image Icon Attributes
+
+Below are the possible attributes that apply in the case that font-based icons are *not* in use:
+
+`alt`::
+The alternative text on the `<img>` tag (HTML backend) or text for `<inlinemediaobject>` (DocBook converter)
+
+`width`::
+The width applied to the image
+
+`height`::
+The height applied to the image
+
+`title`::
+The title of the image displayed when the mouse hovers over it (HTML converter)
+
+`role`::
+The role applied to the element that surrounds the icon
+
+Currently, the inline icon macro doesn't support any options to change its physical position (such as alignment left or right).
