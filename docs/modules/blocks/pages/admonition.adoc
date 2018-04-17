@@ -1,0 +1,79 @@
+= Admonitions
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+Included in:
+- user-manual: Admonition
+- writers-guide: admonition
+////
+
+// tag::intro[]
+There are certain statements that you may want to draw attention to by taking them out of the content's flow and labeling them with a priority.
+These are called admonitions.
+It's rendered style is determined by the assigned label (i.e., value).
+Asciidoctor provides five admonition style labels:
+
+* `NOTE`
+* `TIP`
+* `IMPORTANT`
+* `CAUTION`
+* `WARNING`
+
+When you want to call attention to a single paragraph, start the first line of the paragraph with the label you want to use.
+The label must be uppercase and followed by a colon (`:`).
+
+.Admonition paragraph syntax
+[source]
+----
+include::{partialsdir}/ex-admon.adoc[tag=para-c]
+----
+<1> The label must be uppercase and immediately followed by a colon (`:`).
+<2> Separate the first line of the paragraph from the label by a single space.
+// end::intro[]
+
+:icons!:
+// tag::icon[]
+.Result: Admonition paragraph
+====
+include::{partialsdir}/ex-admon.adoc[tag=para]
+====
+// end::icon[]
+:icons: font
+
+When you want to apply an admonition to complex content, set the label as a style attribute on a block.
+As seen in the next example, admonition labels are commonly set on example blocks.
+This behavior is referred to as *masquerading*.
+The label must be uppercase when set as an attribute on a block.
+
+.Admonition block syntax
+[source]
+----
+include::{partialsdir}/ex-admon.adoc[tag=bl-c]
+----
+<1> Set the label in an attribute list on a delimited block. The label must be uppercase.
+<2> Admonition styles are commonly set on example blocks. Example blocks are delimited by four equal signs (`====`).
+
+:icons!:
+.Result: Admonition block
+====
+include::{partialsdir}/ex-admon.adoc[tag=bl-nest]
+====
+:icons: font
+
+In the examples above, the admonition is rendered in a callout box with the style label in the gutter.
+You can replace the textual labels with icons by setting the `icons` attribute on the document.
+This is how the WARNING admonition paragraph renders when icons is set and assigned the `font` value.
+
+.Admonition paragraph with icons set
+[source]
+----
+include::{partialsdir}/ex-admon.adoc[tag=para]
+----
+
+.Result: Admonition paragraph with icons set
+====
+include::{partialsdir}/ex-admon.adoc[tag=para]
+====
+
+Learn more about using Font Awesome or custom icons with admonitions in the #icons,icons# section.

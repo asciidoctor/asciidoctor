@@ -1,0 +1,82 @@
+////
+Included in:
+- user-manual: Admonition
+- quick-ref
+////
+
+// tag::para-c[]
+WARNING: Wolpertingers are known to nest in server racks. // <1> <2>
+Enter at your own risk.
+// end::para-c[]
+
+// tag::para[]
+WARNING: Wolpertingers are known to nest in server racks.
+Enter at your own risk.
+// end::para[]
+
+// tag::bl[]
+[IMPORTANT]
+.Feeding the Werewolves
+====
+While werewolves are hardy community members, keep in mind the following dietary concerns:
+
+. They are allergic to cinnamon.
+. More than two glasses of orange juice in 24 hours makes them howl in harmony with alarms and sirens.
+. Celery makes them sad.
+====
+// end::bl[]
+
+// tag::bl-c[]
+[IMPORTANT] // <1>
+.Feeding the Werewolves
+==== // <2>
+While werewolves are hardy community members, keep in mind the following dietary concerns:
+
+. They are allergic to cinnamon.
+. More than two glasses of orange juice in 24 hours makes them howl in harmony with alarms and sirens.
+. Celery makes them sad.
+====
+// end::bl-c[]
+
+// tag::bl-nest[]
+[IMPORTANT]
+.Feeding the Werewolves
+======
+While werewolves are hardy community members, keep in mind the following dietary concerns:
+
+. They are allergic to cinnamon.
+. More than two glasses of orange juice in 24 hours makes them howl in harmony with alarms and sirens.
+. Celery makes them sad.
+======
+// end::bl-nest[]
+
+// tag::b-para[]
+NOTE: An admonition paragraph draws the reader's attention to
+auxiliary information.
+Its purpose is determined by the label
+at the beginning of the paragraph.
+
+Here are the other built-in admonition types:
+
+TIP: Pro tip...
+
+IMPORTANT: Don't forget...
+
+WARNING: Watch out for...
+
+CAUTION: Ensure that...
+// end::b-para[]
+
+// tag::b-bl[]
+[NOTE]
+====
+An admonition block may contain complex content.
+
+.A list
+- one
+- two
+- three
+
+Another paragraph.
+====
+// end::b-bl[]
