@@ -27,6 +27,7 @@ Enhancements::
   * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font) (#642, PR #2649)
   * interpret false attribute value defined using API as a soft unset (#642, PR #2649)
   * allow footnote macro to define or reference footnote reference (footnoteref macro now considered deprecated) (#2347, PR #2362)
+  * allow custom converter to be used with custom templates; converter must declare that it supports templates (#2619)
   * allow manpage path for manpage help topic to be specified using ASCIIDOCTOR_MANPAGE_PATH environment variable (PR #2653) (*@aerostitch*)
   * if manpage cannot be found in default path inside gem, use `man -w asciidoctor` to resolve installed path (PR #2653)
   * uncompress contents of manpage for manpage help topic if path ends with .gz (PR #2653) (*@aerostitch*)

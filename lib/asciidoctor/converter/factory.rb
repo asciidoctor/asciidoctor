@@ -185,26 +185,27 @@ module Asciidoctor
       # Returns the [Converter] object
       def create backend, opts = {}
         if (converter = resolve backend)
-          return ::Class === converter ? (converter.new backend, opts) : converter
-        end
-
-        base_converter = case backend
-        when 'html5'
-          # NOTE .to_s hides require from Opal
-          require 'asciidoctor/converter/html5'.to_s unless defined? ::Asciidoctor::Converter::Html5Converter
-          Html5Converter.new backend, opts
-        when 'docbook5'
-          # NOTE .to_s hides require from Opal
-          require 'asciidoctor/converter/docbook5'.to_s unless defined? ::Asciidoctor::Converter::DocBook5Converter
-          DocBook5Converter.new backend, opts
-        when 'docbook45'
-          # NOTE .to_s hides require from Opal
-          require 'asciidoctor/converter/docbook45'.to_s unless defined? ::Asciidoctor::Converter::DocBook45Converter
-          DocBook45Converter.new backend, opts
-        when 'manpage'
-          # NOTE .to_s hides require from Opal
-          require 'asciidoctor/converter/manpage'.to_s unless defined? ::Asciidoctor::Converter::ManPageConverter
-          ManPageConverter.new backend, opts
+          base_converter = ::Class === converter ? (converter.new backend, opts) : converter
+          return base_converter unless Converter::BackendInfo === base_converter && base_converter.supports_templates?
+        else
+          case backend
+          when 'html5'
+            # NOTE .to_s hides require from Opal
+            require 'asciidoctor/converter/html5'.to_s unless defined? ::Asciidoctor::Converter::Html5Converter
+            base_converter = Html5Converter.new backend, opts
+          when 'docbook5'
+            # NOTE .to_s hides require from Opal
+            require 'asciidoctor/converter/docbook5'.to_s unless defined? ::Asciidoctor::Converter::DocBook5Converter
+            base_converter = DocBook5Converter.new backend, opts
+          when 'docbook45'
+            # NOTE .to_s hides require from Opal
+            require 'asciidoctor/converter/docbook45'.to_s unless defined? ::Asciidoctor::Converter::DocBook45Converter
+            base_converter = DocBook45Converter.new backend, opts
+          when 'manpage'
+            # NOTE .to_s hides require from Opal
+            require 'asciidoctor/converter/manpage'.to_s unless defined? ::Asciidoctor::Converter::ManPageConverter
+            base_converter = ManPageConverter.new backend, opts
+          end
         end
 
         return base_converter unless opts.key? :template_dirs

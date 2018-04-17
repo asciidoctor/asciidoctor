@@ -124,6 +124,14 @@ module Asciidoctor
           backend_info[:htmlsyntax]
         end
       end
+
+      def supports_templates
+        backend_info[:supports_templates] = true
+      end
+
+      def supports_templates?
+        backend_info[:supports_templates]
+      end
     end
 
     class << self
