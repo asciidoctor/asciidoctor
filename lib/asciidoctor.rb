@@ -529,7 +529,7 @@ module Asciidoctor
     AttributeEntryRx = /^:(!?#{CG_WORD}[^:]*):(?:[ \t]+(.*))?$/
 
     # Matches invalid characters in an attribute name.
-    InvalidAttributeNameCharsRx = /[^#{CC_WORD}\-]/
+    InvalidAttributeNameCharsRx = /[^#{CC_WORD}-]/
 
     # Matches a pass inline macro that surrounds the value of an attribute
     # entry once it has been parsed.
@@ -664,7 +664,7 @@ module Asciidoctor
     # Matches invalid ID characters in a section title.
     #
     # NOTE uppercase chars not included since expression is only run on a lowercase string
-    InvalidSectionIdCharsRx = /<[^>]+>|&(?:[a-z][a-z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-f][\da-f][\da-f]{0,3});|[^ #{CC_WORD}\-]+?/
+    InvalidSectionIdCharsRx = /<[^>]+>|&(?:[a-z][a-z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-f][\da-f][\da-f]{0,3});|[^ #{CC_WORD}-]+?/
 
     # Matches the block style used to designate a discrete (aka free-floating) heading.
     #
@@ -879,7 +879,7 @@ module Asciidoctor
     #   footnoteref:[id,text] (legacy)
     #   footnoteref:[id] (legacy)
     #
-    InlineFootnoteMacroRx = /\\?footnote(?:(ref):|:([\w\-]+)?)\[(?:|(#{CC_ALL}*?[^\\]))\]/m
+    InlineFootnoteMacroRx = /\\?footnote(?:(ref):|:([\w-]+)?)\[(?:|(#{CC_ALL}*?[^\\]))\]/m
 
     # Matches an image or icon inline macro.
     #
