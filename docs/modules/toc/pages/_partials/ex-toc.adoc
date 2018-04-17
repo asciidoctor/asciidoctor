@@ -1,0 +1,20 @@
+////
+Included in:
+
+- user-manual:
+- quick-ref
+////
+
+// tag::base[]
+= AsciiDoc Writer's Guide
+Doc Writer <doc.writer@asciidoctor.org>
+v1.0, 2013-08-01
+:toc:
+// end::base[]
+
+// tag::pos[]
+= AsciiDoc Writer's Guide
+Doc Writer <doc.writer@asciidoctor.org>
+v1.0, 2014-08-01
+:toc: right
+// end::pos[]

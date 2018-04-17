@@ -1,0 +1,10 @@
+= The Dangerous and Thrilling Documentation Chronicles
+Kismet Chameleon
+:toc: // <1>
+:toc-title: Table of Adventures // <2>
+
+This journey begins on a bleary...
+
+== Cavern Glow
+
+The river rages through the cavern, rattling its content...

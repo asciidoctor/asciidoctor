@@ -27,7 +27,9 @@
 **** xref:attributes:role.adoc[Role]
 *** xref:attributes:safe-modes.adoc[Run Securely with Safe Modes]
 ** xref:blocks:block.adoc[Blocks]
+*** xref:blocks:index.adoc[Block Styles]
 ** xref:comment.adoc[Comments]
+** xref:language-support.adoc[Language Support]
 
 * xref:blocks:paragraph.adoc[Paragraphs]
 ** xref:blocks:preamble.adoc[Preamble & Lead]
@@ -69,16 +71,15 @@
 ** xref:tables:data-formats.adoc[CSV, TSV, & DSV Data]
 ** xref:tables:table-ref.adoc[Table Reference]
 
-* xref:excerpts:index.adoc[Quote, Excerpt, & Verse Blocks]
-** xref:excerpts:quotes.adoc[Quotes & Excerpts]
-** xref:excerpts:verses.adoc[Verses]
+** xref:blocks:example.adoc[Example Blocks]
+** xref:blocks:quotes.adoc[Quote & Excerpt Blocks]
+** xref:blocks:verses.adoc[Verse Blocks]
+** xref:blocks:sidebar.adoc[Sidebar Blocks]
+** xref:blocks:open.adoc[Open Blocks]
 
-* xref:blocks:example.adoc[Example Blocks]
-* xref:blocks:open.adoc[Open Blocks]
-* xref:blocks:sidebar.adoc[Sidebar Blocks]
-
-* Source Code & Listings
+* Source, Listing, & Literal Blocks
 ** xref:source:listing-block.adoc[Listing Blocks]
+** xref:source:literal-block.adoc[Literal Blocks]
 ** xref:source:source-block.adoc[Source Code Blocks]
 ** xref:source:callouts.adoc[Callouts]
 ** Syntax Highlighting
@@ -87,6 +88,10 @@
 *** xref:source:pygments.adoc[Pygments]
 *** xref:source:highlight-php.adoc[Highlight PHP Code]
 ** xref:source:listing-wrap.adoc[Wrap or Scroll]
+
+* xref:toc:toc.adoc[Table of Contents]
+** xref:toc:toc-postion.adoc[Positioning]
+** xref:toc:toc-ref.adoc[TOC Reference]
 
 * xref:include:include-directive.adoc[Include Directives]
 ** xref:include:lines-and-tags.adoc[Include by Lines or Tags]

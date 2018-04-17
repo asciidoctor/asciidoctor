@@ -1,0 +1,11 @@
+= The Dangerous and Thrilling Documentation Chronicles
+Kismet Chameleon
+:toc: macro // <1>
+
+This journey begins on a bleary...
+
+== Cavern Glow
+
+toc::[] // <2>
+
+The river rages through the cavern, rattling its content...
