@@ -20,7 +20,7 @@ module Asciidoctor
   #       super
   #       outfilesuffix '.txt'
   #     end
-  #     def convert node, transform = nil
+  #     def convert node, transform = nil, opts = {}
   #       case (transform ||= node.node_name)
   #       when 'document'
   #         node.content
