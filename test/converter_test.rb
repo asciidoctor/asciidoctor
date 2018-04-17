@@ -355,6 +355,19 @@ content
       end
     end
 
+    test 'should map handles? method on converter to respond_to? by default' do
+      class CustomConverterC
+        include Asciidoctor::Converter
+        def paragraph node
+          'paragraph'
+        end
+      end
+
+      converter = CustomConverterC.new 'myhtml'
+      assert_respond_to converter, :handles?
+      assert converter.handles?(:paragraph)
+    end
+
     test 'should fall back to catch all converter' do
       input = <<-EOS
 content
@@ -363,7 +376,7 @@ content
       begin
         Asciidoctor::Converter::Factory.unregister_all
 
-        class CustomConverterC
+        class CustomConverterD
           include Asciidoctor::Converter
           register_for '*'
           def convert node, name = nil
@@ -372,7 +385,7 @@ content
         end
 
         converters = Asciidoctor::Converter::Factory.converters
-        assert converters['*'] == CustomConverterC
+        assert converters['*'] == CustomConverterD
         output = render_string input, :backend => 'foobaz'
         assert 'foobaz content', output
       ensure

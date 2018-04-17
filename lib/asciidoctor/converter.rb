@@ -183,6 +183,8 @@ module Asciidoctor
       raise ::NotImplementedError
     end
 
+    alias handles? respond_to?
+
     # Alias for backward compatibility.
     alias convert_with_options convert
   end
