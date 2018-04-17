@@ -42,7 +42,7 @@ context 'Sections' do
     end
 
     test 'synthetic id prefix is stripped from beginning of id if set to blank' do
-      sec = block_from_string(":idprefix:\n\n== & More")
+      sec = block_from_string(":idprefix:\n\n== & ! More")
       assert_equal 'more', sec.id
     end
 

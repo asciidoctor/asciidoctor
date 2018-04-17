@@ -195,10 +195,8 @@ class Section < AbstractBlock
       # remove repeat and trailing separator characters
       gen_id = gen_id.tr_s sep, sep
       gen_id = gen_id.chop if gen_id.end_with? sep
-      # ensure id doesn't begin with idseparator if idprefix is empty and idseparator is not empty
-      if pre.empty?
-        gen_id = gen_id.slice 1, gen_id.length while gen_id.start_with? sep
-      end
+      # ensure id doesn't begin with idseparator if idprefix is empty (assuming idseparator is not empty)
+      gen_id = gen_id.slice 1, gen_id.length if pre.empty? && (gen_id.start_with? sep)
     end
     if document.catalog[:ids].key? gen_id
       ids, cnt = document.catalog[:ids], Compliance.unique_id_start_index
