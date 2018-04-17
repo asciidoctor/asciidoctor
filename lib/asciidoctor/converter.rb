@@ -86,42 +86,42 @@ module Asciidoctor
           syntax = 'html'
         end
         {
-          'basebackend' => base,
-          'outfilesuffix' => ext,
-          'filetype' => type,
-          'htmlsyntax' => syntax
+          :basebackend => base,
+          :outfilesuffix => ext,
+          :filetype => type,
+          :htmlsyntax => syntax
         }
       end
 
       def filetype value = nil
         if value
-          backend_info['filetype'] = value
+          backend_info[:filetype] = value
         else
-          backend_info['filetype']
+          backend_info[:filetype]
         end
       end
 
       def basebackend value = nil
         if value
-          backend_info['basebackend'] = value
+          backend_info[:basebackend] = value
         else
-          backend_info['basebackend']
+          backend_info[:basebackend]
         end
       end
 
       def outfilesuffix value = nil
         if value
-          backend_info['outfilesuffix'] = value
+          backend_info[:outfilesuffix] = value
         else
-          backend_info['outfilesuffix']
+          backend_info[:outfilesuffix]
         end
       end
 
       def htmlsyntax value = nil
         if value
-          backend_info['htmlsyntax'] = value
+          backend_info[:htmlsyntax] = value
         else
-          backend_info['htmlsyntax']
+          backend_info[:htmlsyntax]
         end
       end
     end
