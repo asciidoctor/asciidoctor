@@ -2750,6 +2750,61 @@ It only has content.
         assert_css '#toctitle', output, 0
       end
     end
+
+    test 'should drop anchors from contents of entries in table of contents' do
+      input = <<-EOS
+= Document Title
+:toc:
+
+== [[un]]Section One
+
+content
+
+== [[two]][[deux]]Section Two
+
+content
+
+== Plant Trees by https://ecosia.org[Searching]
+
+content
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/*[@id="toc"]', output, 1
+      toc_links = xmlnodes_at_xpath '/*[@id="toc"]//li', output
+      assert_equal 3, toc_links.size
+      toc_links.each do |toc_link|
+        assert_equal 1, toc_link.inner_html.scan('<a').size
+      end
+    end
+
+    test 'should not remove non-anchor tags from contents of entries in table of contents' do
+      input = <<-EOS
+= Document Title
+:toc:
+:icons: font
+
+== `run` command
+
+content
+
+== icon:bug[] Issues
+
+content
+
+== https://ecosia.org[_Sustainable_ Searches]
+
+content
+      EOS
+
+      output = render_embedded_string input, :safe => :safe
+      assert_xpath '/*[@id="toc"]', output, 1
+      toc_links = xmlnodes_at_xpath '/*[@id="toc"]//li', output
+      assert_equal 3, toc_links.size
+      assert_match(/^<a[^>]+><code>run<\/code> command<\/a>$/, toc_links[0].inner_html)
+      assert_match(/^<a[^>]+><span class="icon"><i class="fa fa-bug"><\/i><\/span> Issues<\/a>$/, toc_links[1].inner_html)
+      assert_match(/^<a[^>]+><em>Sustainable<\/em> Searches<\/a>/, toc_links[2].inner_html)
+    end
   end
 
   context 'article doctype' do

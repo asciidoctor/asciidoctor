@@ -19,6 +19,7 @@ module Asciidoctor
       #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
     }).default = ['', '', false]
 
+    DropAnchorRx = /<(?:a[^>+]+|\/a)>/
     StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
     SvgPreambleRx = /\A.*?(?=<svg\b)/m
     SvgStartTagRx = /\A<svg[^>]*>/
@@ -305,6 +306,7 @@ MathJax.Hub.Config({
         else
           stitle = section.title
         end
+        stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
         if slevel < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :secnumlevels => sectnumlevels)
           result << %(<li><a href="##{section.id}">#{stitle}</a>)
           result << child_toc_level
