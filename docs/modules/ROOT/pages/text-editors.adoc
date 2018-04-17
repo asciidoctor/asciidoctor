@@ -21,4 +21,4 @@ For those that work on multiple platforms, *Atom* is a consistent choice with ma
 The key feature all these editors share is syntax highlighting for AsciiDoc.
 
 TIP: Previewing the output of the document while editing can be helpful.
-To learn how to setup instant preview, check out the #Editing AsciiDoc with Live Preview# tutorial.
+To learn how to setup instant preview, check out the xref:edit-with-live-preview.adoc[Editing AsciiDoc with Live Preview tutorial].

@@ -14,6 +14,7 @@ asciidoc:
     table-caption: ~
     url-project: https://asciidoctor.org
     url-manpage: https://asciidoctor.org/man/asciidoctor
+    url-manpage-raw: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/man/asciidoctor.adoc
     url-org: https://github.com/asciidoctor
     url-license: https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE
     url-repo: https://github.com/asciidoctor/asciidoctor
