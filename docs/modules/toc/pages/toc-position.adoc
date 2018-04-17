@@ -1,0 +1,85 @@
+= Table of Contents Positioning
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+toc-layout.adoc, included in:
+- user-manual
+////
+
+[#left-or-right-column-layout]
+== Side column
+
+// tag::column[]
+When converting to HTML, you can position the TOC to the left or right of the main content column by assigning the value `left` or `right` to the `toc` attribute, respectively.
+In this case, the sidebar column containing the TOC is both fixed and scrollable.
+
+.Assigning the left value to `toc`
+[source]
+----
+include::{partialsdir}/toc-left.adoc[]
+----
+
+.Result: Assigning the left value to `toc`
+====
+#Fix image#
+//image::toc-left.png[Table of contents using left value]
+====
+
+This positioning is achieved using CSS, which means it depends on support from the stylesheet.
+However, it's only honored if there's sufficient room on the screen for a sidebar column.
+If there isn't sufficient room available (i.e., the screen width falls below a certain breakpoint), the TOC will automatically shift back to the center, appearing directly below the document title.
+
+IMPORTANT: The TOC is always placed in the center in an embeddable HTML document, regardless of the value of the `toc` attribute.
+// end::column[]
+
+[#manual-placement]
+== Document body
+
+// tag::place[]
+`toc` values of `auto` (the default), `preamble`, and `macro` place the TOC in the main document area.
+
+When the value of `toc` attribute is unspecified or `auto`, the TOC is inserted directly below the document header (document title, author and revision lines).
+
+When `toc` is set to `preamble`, the TOC is placed immediately below the preamble.
+
+CAUTION: When using the preamble placement, the TOC will not appear if your document does not have a xref:blocks:preamble.adoc[preamble].
+To fix this problem, just set the `toc` attribute to an empty value (or `auto`).
+
+To place the TOC anywhere else in the document, set the `toc` attribute to `macro`.
+Then, put the block toc macro (`toc::[]`) at the location in the document where you want the TOC to appear.
+The toc macro should appear at most once in any document.
+
+If `toc` is not set to `macro`, any toc macro in the document will be silently ignored.
+
+.Setting toc value to macro and using the block toc macro
+[source]
+----
+include::{partialsdir}/toc-macro.adoc[]
+----
+<1> The toc attribute must be set to `macro` in order to enable the use of the toc macro.
+<2> In this example, the toc macro is placed below the first section's title, indicating that this is the location where the TOC will be displayed once the document is rendered.
+
+.Result: Setting toc value to macro and using the block toc macro
+====
+#Fix image#
+//image::toc-macro.png[Manual placement of the table of contents]
+====
+// end::place[]
+
+== Embeddable HTML, editor, and previewer limitations
+
+When AsciiDoc is converted to embeddable HTML (i.e., the `header_footer` option is `false`), there are only three valid values for the `toc` attribute:
+
+* auto (or unspecified value)
+* preamble
+* macro
+
+All of the following environments convert AsciiDoc to embeddable HTML:
+
+* the file viewer on GitHub and GitLab
+* the AsciiDoc preview in an editor like Atom, Brackets or AsciidocFX
+* the Asciidoctor browser extensions
+
+IMPORTANT: The side column placement (left or right) isn't available in this mode.
+That's because the embeddable HTML doesn't have the outer framing (or the CSS) necessary to support a side column TOC.

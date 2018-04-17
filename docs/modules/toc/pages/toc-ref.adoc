@@ -1,0 +1,52 @@
+= Table of Contents Reference
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+sum-toc.adoc, included in:
+- user-manual
+////
+
+== Table of contents attributes and values
+
+[cols="1m,1,2,2,1"]
+|===
+|Attribute |Values |Example Syntax |Notes |Backends
+
+.4+|toc
+|auto, left, right, macro, preamble
+m|:toc: left
+|Not set by default.
+Defaults to `auto` if value is unspecified.
+|html
+
+|auto, macro, preamble
+m|:toc: macro
+|Not set by default.
+Defaults to `auto` if value is unspecified.
+|html (embeddable)
+
+|auto
+m|:toc:
+|Not set by default.
+The table of contents is placed after the title page (See https://github.com/asciidoctor/asciidoctor-pdf/issues/233[issue #233] for developments).
+|pdf
+
+|auto
+m|:toc:
+|Not set by default.
+The placement and styling of the table of contents is determined by the DocBook toolchain configuration.
+|docbook
+
+|toclevels
+|1–5
+m|:toclevels: 4
+|Default value is `2`.
+|html, pdf
+
+|toc-title
+|<text>
+m|:toc-title: Contents
+|Default value is _Table of Contents_.
+|html, pdf
+|===

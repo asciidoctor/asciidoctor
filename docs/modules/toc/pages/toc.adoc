@@ -1,0 +1,83 @@
+= Table of Contents
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+um anchor: user-toc
+toc-intro.adoc, included in:
+- user-manual
+////
+
+A table of contents (TOC) is an index of section and subsection titles that is automatically generated from the document's structure.
+
+== Set the toc attribute
+
+To enable the auto-generated TOC, you must set the `toc` attribute.
+
+The `toc` attribute can be specified via the command line (`-a toc`),
+
+.TOC enabled via the CLI
+ $ asciidoctor -a toc adventure.adoc
+
+or in the document header (`:toc:`).
+
+.TOC enabled via the document header
+[source]
+----
+include::{partialsdir}/toc.adoc[]
+----
+
+When no other options are specified, the TOC is inserted directly below the document header (document title, author, and revision lines), it has the title _Table of Contents_, and contains section 1 and section 2 level titles only.
+
+.Result: Setting the toc attribute
+====
+#Fix image#
+//image::toc.png[Default table of contents]
+====
+
+//following sections from toc-custom.adoc
+== Title
+//um anchor: user-toc-title
+// tag::title[]
+The `toc-title` attribute allows you to change the title of the table of contents.
+
+.Define a new TOC title
+[source]
+----
+include::{partialsdir}/toc-title.adoc[]
+----
+<1> The `toc` attribute must be set in order to use `toc-title`.
+<2> The `toc-title` is set and assigned the value `Table of Adventures` in the document's header.
+
+.Result: Define a new TOC title
+====
+#Fix ex#
+//image::toc-title.png[Table of contents title]
+====
+// end::title[]
+
+== Levels
+//um anchor: user-toc-levels
+// tag::level[]
+By default, the TOC will display level 1 and level 2 section titles.
+You can set a different depth with the `toclevels` attribute.
+
+.Define a new toclevels value
+[source]
+----
+include::{partialsdir}/toc-level.adoc[]
+----
+<1> The `toc` attribute must be set in order to use `toclevels`.
+<2> `toclevels` is set and assigned the value `4` in the document header.
+The TOC will list the titles of the section 1, 2, 3, and 4 levels when the document is rendered.
+
+.Result: Define a new toclevels value
+====
+#fix ex#
+//image::toc-level.png[Table of contents display levels]
+====
+// end::level[]
+
+Asciidoctor allows you to customize the title, number of levels, and xref:toc-position.adoc[document position] of the table of contents.
+However, not all of the attributes are supported by all converters.
+See the xref:toc-ref.adoc[table-of-contents-summary] to find out which attributes are available to each backend.
