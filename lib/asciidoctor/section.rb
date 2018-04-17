@@ -169,31 +169,41 @@ class Section < AbstractBlock
   # Public: Generate a String ID from the given section title.
   #
   # The generated ID is prefixed with value of the 'idprefix' attribute, which
-  # is an underscore by default. Invalid characters are replaced with the
-  # value of the 'idseparator' attribute, which is an underscore by default.
+  # is an underscore (_) by default. Invalid characters are then removed and
+  # spaces are replaced with the value of the 'idseparator' attribute, which is
+  # an underscore (_) by default.
   #
-  # If the generated ID is already in use in the document, a count is appended
-  # until a unique id is found.
+  # If the generated ID is already in use in the document, a count is appended,
+  # offset by the separator, until a unique ID is found.
   #
-  # Section ID generation can be disabled by undefining the 'sectids' attribute.
+  # Section ID generation can be disabled by unsetting the 'sectids' document attribute.
   #
   # Examples
   #
   #   Section.generate_id 'Foo', document
   #   => "_foo"
   #
+  # Returns the generated [String] ID.
   def self.generate_id title, document
     attrs = document.attributes
-    if (sep = attrs['idseparator'])
-      sep, sep_len = (attrs['idseparator'] = sep.chr), sep.length > 0 ? 1 : 0
-    else
-      sep, sep_len = '_', 1
-    end
     pre = attrs['idprefix'] || '_'
-    gen_id = %(#{pre}#{title.downcase.gsub InvalidSectionIdCharsRx, sep})
-    if sep_len > 0
-      # remove repeat and trailing separator characters
-      gen_id = gen_id.tr_s sep, sep
+    if (sep = attrs['idseparator'])
+      if sep.length == 1
+        sep_sub = sep == '-' ? ' -' : %( #{sep}-)
+      elsif sep.empty?
+        no_sep = true
+      else
+        sep_sub = (sep = attrs['idseparator'] = sep.chr) == '-' ? ' -' : %( #{sep}-)
+      end
+    else
+      sep, sep_sub = '_', ' _-'
+    end
+    gen_id = %(#{pre}#{title.downcase.gsub InvalidSectionIdCharsRx, ''})
+    if no_sep
+      gen_id = gen_id.delete ' '
+    else
+      # replace space with separator and remove repeating and trailing separator characters
+      gen_id = gen_id.tr_s sep_sub, sep
       gen_id = gen_id.chop if gen_id.end_with? sep
       # ensure id doesn't begin with idseparator if idprefix is empty (assuming idseparator is not empty)
       gen_id = gen_id.slice 1, gen_id.length if pre.empty? && (gen_id.start_with? sep)

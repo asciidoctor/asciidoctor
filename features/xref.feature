@@ -669,14 +669,14 @@ Feature: Cross References
     Then the result should match the HTML structure
       """
       .sect1
-        h2#_section_strong_one_strong
+        h2#_section_one
           |Section <strong>One</strong>
         .sectionbody: .paragraph: p content
       .sect1
         h2#_section_two Section Two
         .sectionbody: .paragraph: p
           |refer to
-          a< href='#_section_strong_one_strong' Section <strong>One</strong>
+          a< href='#_section_one' Section <strong>One</strong>
       """
 
     Scenario: Does not process a natural cross reference in compat mode
