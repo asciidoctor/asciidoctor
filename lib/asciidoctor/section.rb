@@ -185,7 +185,7 @@ class Section < AbstractBlock
   def self.generate_id title, document
     attrs = document.attributes
     if (sep = attrs['idseparator'])
-      sep, sep_len = (attrs['idseparator'] = sep.chr), 1 if (sep_len = sep.length) > 1
+      sep, sep_len = (attrs['idseparator'] = sep.chr), sep.length > 0 ? 1 : 0
     else
       sep, sep_len = '_', 1
     end
