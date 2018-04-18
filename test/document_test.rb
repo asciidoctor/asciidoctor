@@ -1208,6 +1208,7 @@ content
 Author Name
 v1.0, 2001-01-01
 :icons:
+:favicon:
 
 image:tiger.png[]
 
