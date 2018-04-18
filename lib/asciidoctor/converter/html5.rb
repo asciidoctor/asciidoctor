@@ -58,7 +58,7 @@ module Asciidoctor
         else
           icon_type = (icon_ext = ::File.extname icon_href) == '.ico' ? 'image/x-icon' : %(image/#{icon_ext[1..-1]})
         end
-        result << %(<link rel="icon" type="#{icon_type}" href="#{icon_href}">)
+        result << %(<link rel="icon" type="#{icon_type}" href="#{icon_href}"#{slash}>)
       end
       result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
 
