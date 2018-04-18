@@ -1,0 +1,11 @@
+= My First Experience with the Dangers of Documentation
+:linkcss:
+
+In my world, we don't have to worry about mutant, script-injecting warlocks.
+No.
+We have something far worse.
+We're plagued by Wolpertingers.
+
+== Origins
+
+You may not be familiar with these http://en.wikipedia.org/wiki/Wolpertinger[ravenous beasts], but, trust me, they'll eat your shorts and suck the loops from your code.

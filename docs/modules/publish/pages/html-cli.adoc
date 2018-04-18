@@ -1,0 +1,52 @@
+= Convert to HTML using the Command Line
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// html-command-line.adoc, included in convert-documents and user-manual
+
+== HTML
+
+Asciidoctor's default output format is HTML.
+
+`html5`:: HTML 5 markup styled with CSS3.
+
+In this section, we'll create a sample document, then process and convert it with Asciidoctor's `html5` converter.
+
+. Create an AsciiDoc file like the one below
+. Save the file as [.path]_mysample.adoc_
+
+[source]
+----
+include::{partialsdir}/mysample.adoc[]
+----
+
+To convert [.path]_mysample.adoc_ to HTML from the command line:
+
+. Open a console
+. Switch to the directory that contains the [.path]_mysample.adoc_ document
+. Call the Asciidoctor processor with the `asciidoctor` command, followed by the name of the document you want to convert
+
+//^
+
+ $ asciidoctor mysample.adoc
+
+Remember, Asciidoctor's default converter is html5, so it isn't necessary to specify it with the `-b` command.
+
+You won't see any messages printed to the console.
+If you type `ls` or view the directory in a file manager, there is a new file named [.path]_mysample.html_.
+
+ $ ls
+ mysample.adoc  mysample.html
+
+Asciidoctor derives the name of the output document from the name of the input document.
+
+Open [.path]_mysample.html_ in your web browser.
+Your document should look like the image below.
+
+====
+#fix ex#
+//image::mysample.png[]
+====
+
+The document's text, titles, and link is styled by the default Asciidoctor stylesheet, which is embedded in the HTML output.
+As a result, you could save [.path]_mysample.html_ to any computer and it will look the same.
