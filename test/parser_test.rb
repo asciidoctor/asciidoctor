@@ -351,7 +351,7 @@ context "Parser" do
     attributes = {1 => '%header', 'options' => 'footer', 'footer-option' => ''}
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
-    assert_equal 'header,footer', attributes['options']
+    assert_equal 'footer,header', attributes['options']
     assert_equal '', attributes['header-option']
     assert_equal '', attributes['footer-option']
   end

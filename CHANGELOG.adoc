@@ -52,6 +52,7 @@ Enhancements::
 Bug fixes::
 
   * set :to_dir option correctly when output file is specified (#2382)
+  * using the shorthand syntax to set block attributes (id, roles, options) doesn't reset block style (#2174)
   * fix typo in gemspec that removed README and CONTRIBUTING files from the generated gem (PR #2650) (*@aerostitch*)
   * don't turn bare URI scheme (no host) into a link (#2609, PR #2611)
   * fix em dash replacement in manpage converter (#2604, PR #2607)
@@ -99,6 +100,7 @@ Improvements / Refactoring::
   * log a warning if a footnote reference cannot be resolved (#2669)
   * set logger to DEBUG when verbose is enabled; check logger.debug? instead of $VERBOSE
   * coerce value of template_dirs option to an Array (PR #2621)
+  * block roles specified using shorthand syntax are additive (#2174)
   * allow paragraph to masquerade as open block (PR #2412)
   * move callouts into document catalog (PR #2394)
   * document ID defined in block attribute line takes precedence over ID defined inside document title line

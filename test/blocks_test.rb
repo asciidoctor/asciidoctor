@@ -363,6 +363,21 @@ ____
       assert_css '.quoteblock > .attribution', output, 1
     end
 
+    test 'setting ID using style shorthand should not reset block style' do
+      input = <<-EOS
+[quote]
+[#justice-to-all.solidarity, Martin Luther King, Jr.]
+____
+Injustice anywhere is a threat to justice everywhere.
+____
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '#justice-to-all.quoteblock.solidarity', output, 1
+      assert_css '.quoteblock > .attribution', output, 1
+    end
+
     test 'quote block with complex content' do
       input = <<-EOS
 ____

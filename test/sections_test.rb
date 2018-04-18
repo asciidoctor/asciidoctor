@@ -106,6 +106,26 @@ context 'Sections' do
       assert_equal 'one', sec.id
     end
 
+    test 'explicit id in block attributes above section title overrides synthetic id' do
+      sec = block_from_string("[id=one]\n== Section One")
+      assert_equal 'one', sec.id
+    end
+
+    test 'explicit id set using shorthand in style above section title overrides synthetic id' do
+      sec = block_from_string("[#one]\n== Section One")
+      assert_equal 'one', sec.id
+    end
+
+    test 'should use explicit id from last block attribute line above section title that defines an explicit id' do
+      input = <<-EOS
+[#un]
+[#one]
+== Section One
+      EOS
+      sec = block_from_string input
+      assert_equal 'one', sec.id
+    end
+
     test 'explicit id can be defined using an embedded anchor' do
       sec = block_from_string("== Section One [[one]] ==")
       assert_equal 'one', sec.id
@@ -1680,6 +1700,32 @@ Details
 
       output = render_embedded_string input
       assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
+    end
+
+    test 'should use style from last block attribute line above section that defines a style' do
+      input = <<-EOS
+[glossary]
+[appendix]
+== Attribute Options
+
+Details
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
+    end
+
+    test 'setting ID using style shorthand should not clear section style' do
+      input = <<-EOS
+[appendix]
+[#attribute-options]
+== Attribute Options
+
+Details
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '//h2[@id="attribute-options"][text()="Appendix A: Attribute Options"]', output, 1
     end
 
     test 'should use custom appendix caption if specified' do
