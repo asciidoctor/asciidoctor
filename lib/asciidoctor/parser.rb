@@ -1604,10 +1604,11 @@ class Parser
   def self.is_next_line_section?(reader, attributes)
     if (style = attributes[1]) && (style == 'discrete' || style == 'float')
       return
-    elsif reader.has_more_lines?
-      Compliance.underline_style_section_titles ?
-          is_section_title?(*reader.peek_lines(2, style && style == 'comment')) :
-          atx_section_title?(reader.peek_line)
+    elsif Compliance.underline_style_section_titles
+      next_lines = reader.peek_lines 2, style && style == 'comment'
+      is_section_title?(next_lines[0] || '', next_lines[1])
+    else
+      atx_section_title?(reader.peek_line || '')
     end
   end
 
