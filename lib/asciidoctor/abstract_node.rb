@@ -367,7 +367,7 @@ class AbstractNode
 
     if ::File.readable? image_path
       # NOTE base64 is autoloaded by reference to ::Base64
-      %(data:#{mimetype};base64,#{::Base64.encode64(::IO.binread image_path).delete LF})
+      %(data:#{mimetype};base64,#{::Base64.strict_encode64 ::IO.binread image_path})
     else
       logger.warn %(image to embed not found or not readable: #{image_path})
       %(data:#{mimetype};base64,)
@@ -400,12 +400,12 @@ class AbstractNode
 
     begin
       mimetype = nil
-      bindata = open(image_uri, 'rb') {|fd|
+      bindata = open image_uri, 'rb' do |fd|
         mimetype = fd.content_type
         fd.read
-      }
+      end
       # NOTE base64 is autoloaded by reference to ::Base64
-      %(data:#{mimetype};base64,#{::Base64.encode64(bindata).delete LF})
+      %(data:#{mimetype};base64,#{::Base64.strict_encode64 bindata})
     rescue
       logger.warn %(could not retrieve image data from URI: #{image_uri})
       image_uri

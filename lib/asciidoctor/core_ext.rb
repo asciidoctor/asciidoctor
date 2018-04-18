@@ -4,6 +4,7 @@ if RUBY_MIN_VERSION_1_9
   require 'asciidoctor/core_ext/string/limit_bytesize'
   require 'asciidoctor/core_ext/1.8.7/io/write' if RUBY_ENGINE == 'opal'
 elsif RUBY_ENGINE != 'opal'
+  require 'asciidoctor/core_ext/1.8.7/base64/strict_encode64'
   require 'asciidoctor/core_ext/1.8.7/hash/key'
   require 'asciidoctor/core_ext/1.8.7/io/binread'
   require 'asciidoctor/core_ext/1.8.7/io/write'
