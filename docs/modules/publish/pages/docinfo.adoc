@@ -1,0 +1,248 @@
+= Docinfo Files
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:url-docbook-info-ref: http://www.docbook.org/tdg5/en/html/info.html
+:url-richfaces-docinfo: https://github.com/richfaces/richfaces-docs/blob/master/Developer_Guide/src/main/docbook/en-US/Developer_Guide-docinfo.xml
+// um anchor: docinfo-file
+
+You can add custom content to the head or footer of an output document using docinfo files.
+Docinfo files are useful for injecting auxiliary metadata, stylesheet, and script information into the output not added by the converter.
+
+Different docinfo files get used depending on whether you are converting to HTML or DocBook.
+
+== Head docinfo files
+
+The content of head docinfo files gets injected into the top of the document.
+For HTML, the content is append to the `<head>` element.
+For DocBook, the content is appended to the root `<info>` element.
+
+The docinfo file for HTML output may contain valid elements to populate the HTML `<head>` element, including:
+
+* `<base>`
+* `<link>`
+* `<meta>`
+* `<noscript>`
+* `<script>`
+* `<style>`
+
+CAUTION: Use of the `<title>` element is not recommend as it's already emitted by the converter.
+
+You do not need to include the enclosing `<head>` tag as it's assumed to be the envelop.
+
+Here's an example:
+
+.A head docinfo file for HTML output
+[source,html]
+----
+<meta name="keywords" content="open source, documentation">
+<meta name="description" content="The dangerous and thrilling adventures of an open source documentation team.">
+<link rel="stylesheet" href="basejump.css">
+<script src="map.js"></script>
+----
+
+Docinfo files for HTML output must be saved with the `.html` file extension.
+See <<Naming docinfo files>> for more details.
+
+The docinfo file for DocBook 5.0 output may include any of the {url-docbook-info-ref}[`<info>` element's children], such as:
+
+* `<address>`
+* `<copyright>`
+* `<edition>`
+* `<keywordset>`
+* `<publisher>`
+* `<subtitle>`
+* `<revhistory>`
+
+The following example shows some of the content a docinfo file for DocBook might contain.
+
+.A docinfo file for DocBook 5.0 output
+[source,xml]
+----
+<author>
+  <personname>
+    <firstname>Karma</firstname>
+    <surname>Chameleon</surname>
+  </personname>
+  <affiliation>
+    <jobtitle>Word SWAT Team Leader</jobtitle>
+  </affiliation>
+</author>
+
+<keywordset>
+  <keyword>open source</keyword>
+  <keyword>documentation</keyword>
+  <keyword>adventure</keyword>
+</keywordset>
+
+<printhistory>
+  <para>April, 2019. Twenty-sixth printing.</para>
+</printhistory>
+----
+
+Docinfo files for DocBook output must be saved with the `.xml` file extension.
+See <<Naming docinfo files>> for more details.
+
+To see a real-world example of a docinfo file for DocBook, checkout the {url-richfaces-docinfo}[RichFaces Developer Guide docinfo file].
+
+== Footer docinfo files
+
+Footer docinfo files are differentiated from head docinfo files by the addition of `-footer` to the file name.
+In the HTML output, the footer content is inserted immediately after the footer div (i.e., `<div id="footer">`).
+In the DocBook output, the footer content is inserted immediately before the ending tag (e.g., `</article>` or `</book>`).
+
+TIP: One possible use of the footer docinfo file is to completely replace the default footer in the standard stylesheet.
+Just set the attribute `nofooter`, then apply a custom footer docinfo file.
+
+// Not here! Good info, but does nothing to clarify the previous paragraphs and could confuse.
+////
+TIP: To change the text in the "Last updated" line in the footer, set the text in the attribute `last-update-label` (for example, `:last-update-label: <your text> Last Updated`). +
+To disable the "Last updated" line in the footer, unassign the attribute `last-update-label` (however, this leaves an empty footer div). +
+To disable the footer completely, set the attribute `nofooter`. Then having a footer docinfo file effectively replaces the default footer with your custom footer.
+////
+
+== Naming docinfo files
+
+The file that gets selected to provide the docinfo depends on which converter is in use (html, docbook, etc) and whether the docinfo scope is configured for a specific document ("`private`") or for all documents in the same directory ("`shared`").
+The file extension of the docinfo file must match the file extension of the output file (as specified by the `outfilesuffix` attribute, a value which always begins with a period (`.`)).
+
+.Docinfo file naming
+[cols="<10,<20,<30,<30"]
+|===
+|Mode |Location |Behavior |Docinfo file name
+
+.2+|Private
+|Head
+|Adds content to `<head>`/`<info>` for <docname>.adoc files.
+|`<docname>-docinfo<outfilesuffix>`
+
+|Footer
+|Adds content to end of document for <docname>.adoc files.
+|`<docname>-docinfo-footer<outfilesuffix>`
+
+.2+|Shared
+|Head
+|Adds content to `<head>`/`<info>` for any document in same directory.
+|`docinfo<outfilesuffix>`
+
+|Footer
+|Adds content to end of document for any document in same directory.
+|`docinfo-footer<outfilesuffix>`
+|===
+
+To specify which file(s) you want to apply, set the `docinfo` attribute to any combination of these values:
+
+* `private-head`
+* `private-footer`
+* `private` (alias for `private-head,private-footer`)
+* `shared-head`
+* `shared-footer`
+* `shared` (alias for `shared-head,shared-footer`)
+
+Setting `docinfo` with no value is equivalent to setting the value to `private`.
+
+For example:
+
+[source]
+----
+:docinfo: shared,private-footer
+----
+
+This docinfo configuration will apply the shared docinfo head and footer files, if they exist, as well as the private footer file, if it exists.
+
+// NOTE migrate this NOTE to the migration guide once 1.6 is released
+[NOTE]
+====
+
+`docinfo` attribute values were introduced in Asciidoctor 1.5.5 to replace the less descriptive `docinfo1` and `docinfo2` attributes.
+Here are the equivalents of the old attributes using the new values:
+
+* `:docinfo:` = `:docinfo: private`
+* `:docinfo1:` = `:docinfo: shared`
+* `:docinfo2:` = `:docinfo: shared,private`
+====
+
+Let's apply this to an example:
+
+You have two AsciiDoc documents, adventure.adoc and insurance.adoc, saved in the same folder.
+You want to add the same content to the head of both documents when they're converted to HTML.
+
+. Create a docinfo file containing `<head>` elements.
+. Save it as docinfo.html.
+. Set the `docinfo` attribute in adventure.adoc and insurance.adoc to `shared`.
+
+You also want to include some additional content, but only to the head of adventure.adoc.
+
+. Create *another* docinfo file containing `<head>` elements.
+. Save it as adventure-docinfo.html.
+. Set the `docinfo` attribute in adventure.adoc to `shared,private-head`
+
+If other AsciiDoc files are added to the same folder, and `docinfo` is set to `shared` in those files, only the docinfo.html file will be added when converting those files.
+
+== Locating docinfo files
+
+By default, docinfo files are searched for in the same folder as the document file.
+If you want to keep them anywhere else, set the `docinfodir` attribute to their location:
+
+[source]
+----
+:docinfodir: common/meta
+----
+
+Note that if you use this attribute, only the specified folder will be searched; docinfo files in the document folder will no longer be found.
+
+== Attribute substitution in docinfo files
+
+Docinfo files may include attribute references.
+Which substitutions get applied is controlled by the `docinfosubs` attribute, which takes a comma-separated list of substitution names.
+The value of this attribute defaults to `attributes`.
+
+For example, if you created the following docinfo file:
+
+.Docinfo file containing a revnumber attribute reference
+[source,xml]
+----
+<edition>{revnumber}</edition>
+----
+
+And this source document:
+
+.Source document including a revision number
+[source]
+----
+= Document Title
+Author Name
+v1.0, 2019-06-01
+:doctype: book
+:backend: docbook
+:docinfo:
+----
+
+Then the converted DocBook output would be:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<book xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" lang="en">
+  <info>
+    <title>Document Title</title>
+    <date>2019-06-01</date>
+    <author>
+      <personname>
+        <firstname>Author</firstname>
+        <surname>Name</surname>
+      </personname>
+    </author>
+    <authorinitials>AN</authorinitials>
+    <revhistory>
+      <revision>
+        <revnumber>1.0</revnumber> <!--1-->
+        <date>2019-06-01</date>
+        <authorinitials>AN</authorinitials>
+      </revision>
+    </revhistory>
+  </info>
+</book>
+----
+<1> The revnumber attribute reference was replaced by the source document's revision number in the converted output.

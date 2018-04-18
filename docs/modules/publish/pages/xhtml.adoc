@@ -1,0 +1,32 @@
+= XHTML
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// xhtml.adoc, included in convert-documents and user-manual
+
+To convert AsciiDoc to XHTML, set the backend to `xhtml5`.
+
+.Produce XHTML using the built-in HTML converter
+[source,console]
+----
+asciidoctor -b xhtml5 document.adoc
+----
+
+To produce XHTML instead of HTML when using converter templates, set the `htmlsyntax` attribute to `xml` in addition to the backend option:
+
+.Produce XHTML using custom templates
+[source,console]
+----
+asciidoctor -T /path/to/templates -b slides -a htmlsyntax=xml document.adoc
+----
+
+.Black Box Decoded: XHTML and htmlsyntax
+****
+XHTML output is a special mode of the built-in HTML5 converter.
+It is activated by prefixing the backend value with `x` (e.g., `xhtml` or `xhtml5`).
+This hint implicitly assigns the `htmlsyntax` attribute to the value `xml`, which normally has the value `html`.
+
+For all other converters, the `htmlsyntax` attribute is not set explicitly.
+If you want a converter template that's written in Slim or Haml to output XHTML instead of the default HTML, you simply need to set the `htmlsyntax` attribute to `xml` explicitly.
+Asciidoctor will pass on this preference to the Slim or Haml template engine by setting the `:format` option to `:html5`.
+****

@@ -1,0 +1,22 @@
+= CodeRay and Pygments Stylesheets
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// um anchor: hl-css
+// html-code-styles.adoc, included in convert-documents and the user-manual.
+
+Asciidoctor will also embed the theme stylesheet for the CodeRay or Pygments syntax highlighter.
+
+== CodeRay
+
+If the `source-highlighter` attribute is `coderay` and the `coderay-css` attribute is `class`, the CodeRay stylesheet is:
+
+* _embedded_ by default
+* _copied_ to the file [.path]_asciidoctor-coderay.css_ inside the `stylesdir` folder within the output directory if `linkcss` is set
+
+== Pygments
+
+If the `source-highlighter` attribute is `pygments` and the `pygments-css` attribute is `class`, the Pygments stylesheet is:
+
+* _embedded_ by default
+* _copied_ to the file [.path]_asciidoctor-pygments.css_ inside the `stylesdir` folder within the output directory if `linkcss` is set

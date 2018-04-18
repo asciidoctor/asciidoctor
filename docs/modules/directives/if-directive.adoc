@@ -1,0 +1,206 @@
+= If Conditional Preprocessor Directives
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// conditional-preprocessor-directives.adoc
+
+You can include or exclude lines of text in your document using one of the following conditional preprocessor directives:
+
+* ifdef
+* ifndef
+* ifeval
+
+These directives tell the processor whether to include the enclosed content based on certain conditions.
+The conditions are based on the presence or value of document attributes.
+
+For example, say you want to include a certain section of content only when converting to HTML.
+Conditional preprocessor directives make this possible.
+You simply check for the presence of the `basebackend-html` attribute using an `ifdef` directive.
+Details of this example, as well as others, are described in the following sections.
+
+== ifdef directive
+
+Content between the `ifdef` and `endif` directives gets included if the specified attribute is set:
+
+.ifdef example
+[source]
+----
+\ifdef::env-github[]
+This content is for GitHub only.
+\endif::[]
+----
+
+The syntax of the start directive is `ifdef::<attribute>[]`, where `<attribute>` is the name of an attribute.
+
+Keep in mind that the content is not limited to a single line.
+You can have any amount of content between the `ifdef` and `endif` directives.
+
+If you have a large amount of content inside the `ifdef` directive, you may find it more readable to use the long-form version of the directive, in which the attribute (aka condition) is referenced again in the `endif` directive.
+
+.ifdef long-form example
+[source]
+----
+\ifdef::env-github[]
+This content is for GitHub only.
+
+So much content in this section, I'd get confused reading the source without the closing `ifdef` directive.
+
+It isn't necessary for short blocks, but if you are conditionally including a section it may be something worth considering.
+
+Other readers reviewing your docs source code may go cross-eyed when reading your source docs if you don't.
+\endif::env-github[]
+----
+
+TIP: A great example of long-form conditional formatting is the source of this user manual!
+We use it to show and hide entire sections when building individual content for separate guides.
+
+If you're only dealing with a single line of text, you can put the content directly inside the square brackets and drop the `endif` directive.
+
+.ifdef single line example
+[source]
+----
+\ifdef::revnumber[This document has a version number of {revnumber}.]
+----
+
+The single-line block above is equivalent to this formal `ifdef` directive:
+
+[source]
+----
+\ifdef::revnumber[]
+This document has a version number of {revnumber}.
+\endif::[]
+----
+
+== ifndef directive
+
+`ifndef` is the logical opposite of `ifdef`.
+Content between `ifndef` and `endif` gets included only if the specified attribute is _not_ set:
+
+.ifndef example
+[source]
+----
+\ifndef::env-github[]
+This content is not shown on GitHub.
+\endif::[]
+----
+
+The syntax of the start directive is `ifndef::<attribute>[]`, where `<attribute>` is the name of an attribute.
+
+The `ifndef` directive supports the same single-line and long-form variants as `ifdef`.
+
+== Checking multiple attributes (ifdef and ifndef only)
+
+Both the `ifdef` and `ifndef` directives accept multiple attribute names.
+The combinator can be "`and`" or "`or`".
+
+Any attribute (or)::
+Multiple comma-separated (,) directive names evaluate to true, allowing the content to be included, if one or more of the directives is defined.
+Otherwise the content is not included.
++
+.Any attribute example
+[source]
+----
+\ifdef::backend-html5,backend-docbook5[Only shown when converting to HTML5 or DocBook 5.]
+----
+
+All attributes (and)::
+Multiple plus-separated (+) directive names evaluate to true, allowing the content to be included, if all of the directives are defined.
+Otherwise the content is not included.
++
+.All attributes example
+[source]
+----
+\ifdef::env-github+backend-html5[Only shown when converting to HTML5 on GitHub.]
+----
+
+The `ifndef` directive negates the results of the expression.
+
+WARNING: Starting in Asciidoctor 1.5.6, the operator logic in the `ifndef` directive changed to align with the behavior of AsciiDoc Python.
+Specifically, when attributes are separated by commas, content is only included if none of the attributes are defined.
+When attributes are separated by pluses, content is included if at least one of the attributes is undefined.
+See https://github.com/asciidoctor/asciidoctor/issues/1983[issue #1983] to find the discussion about this behavior and the rationale for the change.
+
+== ifeval directive
+
+Content between `ifeval` and `endif` gets included if the expression inside the square brackets evaluates to true.
+
+.ifeval example
+[source]
+----
+\ifeval::[{sectnumlevels} == 3]
+If the `sectnumlevels` attribute has the value 3, this sentence is included.
+\endif::[]
+----
+
+The `ifeval` directive does not have a single-line or long-form variant like `ifdef` and `ifndef`.
+
+=== Anatomy
+
+The expression consists of a left-hand value and a right-hand value with an operator in between.
+
+.ifeval expression examples
+[source]
+----
+\ifeval::[2 > 1]
+...
+\endif::[]
+
+\ifeval::["{backend}" == "html5"]
+...
+\endif::[]
+
+\ifeval::[{sectnumlevels} == 3]
+...
+\endif::[]
+
+// the value of outfilesuffix includes a leading period (e.g., .html)
+\ifeval::["{docname}{outfilesuffix}" == "master.html"]
+...
+\endif::[]
+----
+
+=== Values
+
+Each expression value can reference the name of zero or more AsciiDoc attribute using the attribute reference syntax (for example, `+{backend}+`).
+
+Attribute references are resolved (substituted) first.
+Once attributes references have been resolved, each value is coerced to a recognized type.
+
+When the expected value is a string (i.e., a string of characters), we recommend that you enclose the expression in quotes.
+
+The following values types are recognized:
+
+number:: Either an integer or floating-point value.
+quoted string:: Enclosed in either single (`'`) or double (`"`) quotes.
+boolean:: Literal value of `true` or `false`.
+
+==== How value type coercion works
+
+If a value is enclosed in quotes, the characters between the quotes are preserved and coerced to a string.
+
+If a value is not enclosed in quotes, it is subject to the following type coercion rules:
+
+* an empty value becomes nil (aka null).
+* a value of `true` or `false` becomes a boolean value.
+* a value of only repeating whitespace becomes a single whitespace string.
+* a value containing a period becomes a floating-point number.
+* any other value is coerced to an integer value.
+
+=== Operators
+
+The value on each side is compared using the operator to derive an outcome.
+
+`==`::
+Checks if the two values are equal.
+`!=`::
+Checks if the two values are not equal.
+`<`::
+Checks whether the left-hand side is less than the right-hand side.
+`+<=+`::
+Checks whether the left-hand side is less than or equal to the right-hand side.
+`>`::
+Checks whether the left-hand side is greater than the right-hand side.
+`+>=+`::
+Checks whether the left-hand side is greater than or equal to the right-hand side.
+
+NOTE: The operators follow the same rules as operators in Ruby.
