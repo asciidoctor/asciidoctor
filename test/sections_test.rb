@@ -397,7 +397,7 @@ content
       assert_css 'body#idname', output, 1
     end
 
-    test 'should use inline id instead of id defined in block attributes' do
+    test 'should use ID defined in block attributes instead of ID defined inline' do
       input = <<-EOS
 [#idname-block]
 = Document Title [[idname-inline]]
@@ -405,7 +405,7 @@ content
 content
       EOS
       output = render_string input
-      assert_css 'body#idname-inline', output, 1
+      assert_css 'body#idname-block', output, 1
     end
 
     test 'block id above document title sets id on document' do

@@ -152,17 +152,14 @@ class Parser
       end
       document.header.source_location = source_location if source_location
       document.attributes['doctitle'] = section_title = doctitle
-      # QUESTION: should the id assignment on Document be encapsulated in the Document class?
-      if (doc_id = document.id)
-        block_attributes.delete 1
-        block_attributes.delete 'id'
+      if (style = block_attributes.delete 1)
+        style_attrs = { 1 => style }
+        parse_style_attribute style_attrs, reader
+        document.id = (doc_id = style_attrs['id'] || document.id)
+      elsif (doc_id = block_attributes.delete 'id')
+        document.id = doc_id
       else
-        if (style = block_attributes.delete 1)
-          style_attrs = { 1 => style }
-          parse_style_attribute style_attrs, reader
-          block_attributes['id'] = style_attrs['id'] if style_attrs.key? 'id'
-        end
-        document.id = (doc_id = block_attributes.delete 'id')
+        doc_id = document.id
       end
       if (doc_reftext = block_attributes.delete 'reftext')
         document.attributes['reftext'] = doc_reftext
