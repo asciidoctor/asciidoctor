@@ -281,33 +281,32 @@ class Parser
     # that we are at a section title (so we don't have to check)
     if parent.context == :document && parent.blocks.empty? && ((has_header = parent.has_header?) ||
         (attributes.delete 'invalid-header') || !(is_next_line_section? reader, attributes))
-      doctype = (document = parent).doctype
-      if has_header || (doctype == 'book' && attributes[1] != 'abstract')
+      book = (document = parent).doctype == 'book'
+      if has_header || (book && attributes[1] != 'abstract')
         preamble = intro = (Block.new parent, :preamble, :content_model => :compound)
-        preamble.title = parent.attr 'preface-title' if doctype == 'book' && (parent.attr? 'preface-title')
+        preamble.title = parent.attr 'preface-title' if book && (parent.attr? 'preface-title')
         parent.blocks << preamble
       end
       section = parent
-
       current_level = 0
       if parent.attributes.key? 'fragment'
         expected_next_level = -1
       # small tweak to allow subsequent level-0 sections for book doctype
-      elsif doctype == 'book'
+      elsif book
         expected_next_level, expected_next_level_alt = 1, 0
       else
         expected_next_level = 1
       end
     else
-      doctype = (document = parent.document).doctype
+      book = (document = parent.document).doctype == 'book'
       section = initialize_section reader, parent, attributes
       # clear attributes except for title attribute, which must be carried over to next content block
       attributes = (title = attributes['title']) ? { 'title' => title } : {}
       expected_next_level = (current_level = section.level) + 1
       if current_level == 0
-        part = doctype == 'book'
+        part = book
       elsif current_level == 1 && section.special
-        # NOTE preface and abstract sections are only permitted in the book doctype
+        # NOTE technically preface and abstract sections are only permitted in the book doctype
         unless (sectname = section.sectname) == 'appendix' || sectname == 'preface' || sectname == 'abstract'
           expected_next_level = nil
         end
@@ -342,9 +341,7 @@ class Parser
           section.assign_numeral new_section
           section.blocks << new_section
         elsif next_level == 0 && section == document
-          unless doctype == 'book'
-            logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor
-          end
+          logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor unless book
           new_section, attributes = next_section reader, section, attributes
           section.assign_numeral new_section
           section.blocks << new_section
@@ -412,8 +409,8 @@ class Parser
     # is treated like an untitled section
     elsif preamble # implies parent == document
       if preamble.blocks?
-        # unwrap standalone preamble (i.e., no sections), if permissible
-        if Compliance.unwrap_standalone_preamble && document.blocks.size == 1 && doctype != 'book'
+        # unwrap standalone preamble (i.e., document has no sections) except for books, if permissible
+        unless book || document.blocks[1] || !Compliance.unwrap_standalone_preamble
           document.blocks.shift
           while (child_block = preamble.blocks.shift)
             document << child_block
