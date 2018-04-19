@@ -421,6 +421,22 @@ Free use of this software is granted under the terms of the MIT License.
 
 See the {uri-license}[LICENSE] file for details.
 
+ifndef::env-site[]
+== Sponsors
+
+We want to recognize our generous sponsors, without whose support Asciidoctor would not be possible.
+Thank you for your dedication to improving the state of technical documentation!
+
+image:https://www.okta.com/sites/all/themes/Okta/images/blog/Logos/Okta_Logo_BrightBlue_Medium.png[Okta,280,link=https://developer.okta.com/signup?utm_source=JHipster&utm_medium=logo&utm_campaign=Gold-Sponsor]
+&nbsp; &nbsp; &nbsp;
+image:https://secure.gravatar.com/avatar/823717a797dbd78ceff7b26aa397f383.png?size=200[OpenDevise,100,link=https://opendevise.com]
+
+Major funding for Asciidoctor is provided by our *Change Makers*, https://developer.okta.com/blog/2017/10/20/oidc-with-jhipster?utm_source=JHipster&utm_medium=text-link&utm_campaign=Gold-Sponsor[Okta] and https://opendevise.com[OpenDevise], and our *Strategy Sponsors*, Khronos Group and Linda Roberts.
+Additional funding is provided by our https://asciidoctor.org/supporters[Community Backers].
+
+You can support this project by becoming a sponsor on https://opencollective.com/asciidoctor[OpenCollective].
+endif::[]
+
 == Authors
 
 *Asciidoctor* is led by https://github.com/mojavelinux[Dan Allen] and https://github.com/graphitefriction[Sarah White] and has received contributions from {uri-contributors}[many other individuals] in Asciidoctor's awesome community.
