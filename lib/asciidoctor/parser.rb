@@ -122,19 +122,19 @@ class Parser
   # returns the Hash of orphan block attributes captured above the header
   def self.parse_document_header(reader, document)
     # capture lines of block-level metadata and plow away comment lines that precede first block
-    block_attributes = parse_block_metadata_lines reader, document
+    block_attrs = parse_block_metadata_lines reader, document
+    doc_attrs = document.attributes
 
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
-    if (implicit_doctitle = is_next_line_doctitle? reader, block_attributes, document.attributes['leveloffset']) &&
-        (block_attributes.key? 'title')
-      return document.finalize_header block_attributes, false
+    if (implicit_doctitle = is_next_line_doctitle? reader, block_attrs, doc_attrs['leveloffset']) && block_attrs['title']
+      return document.finalize_header block_attrs, false
     end
 
     # yep, document title logic in AsciiDoc is just insanity
     # definitely an area for spec refinement
     assigned_doctitle = nil
-    unless (val = document.attributes['doctitle']).nil_or_empty?
+    unless (val = doc_attrs['doctitle']).nil_or_empty?
       document.title = assigned_doctitle = val
     end
 
@@ -142,45 +142,43 @@ class Parser
     if implicit_doctitle
       source_location = reader.cursor if document.sourcemap
       document.id, _, doctitle, _, atx = parse_section_title reader, document
-      unless assigned_doctitle
-        document.title = assigned_doctitle = doctitle
-      end
-      # default to compat-mode if document uses atx-style doctitle
-      document.set_attr 'compat-mode' unless atx || (document.attribute_locked? 'compat-mode')
-      if (separator = block_attributes['separator'])
-        document.set_attr 'title-separator', separator unless document.attribute_locked? 'title-separator'
-      end
+      document.title = assigned_doctitle = doctitle unless assigned_doctitle
       document.header.source_location = source_location if source_location
-      document.attributes['doctitle'] = section_title = doctitle
-      if (doc_id = block_attributes['id'])
+      # default to compat-mode if document uses atx-style doctitle
+      doc_attrs['compat-mode'] = '' unless atx || (document.attribute_locked? 'compat-mode')
+      if (separator = block_attrs['separator'])
+        doc_attrs['title-separator'] = separator unless document.attribute_locked? 'title-separator'
+      end
+      doc_attrs['doctitle'] = section_title = doctitle
+      if (doc_id = block_attrs['id'])
         document.id = doc_id
       else
         doc_id = document.id
       end
-      if (doc_role = block_attributes['role'])
-        document.attributes['docrole'] = doc_role
+      if (doc_role = block_attrs['role'])
+        doc_attrs['docrole'] = doc_role
       end
-      if (doc_reftext = block_attributes['reftext'])
-        document.attributes['reftext'] = doc_reftext
+      if (doc_reftext = block_attrs['reftext'])
+        doc_attrs['reftext'] = doc_reftext
       end
-      block_attributes = {}
+      block_attrs = {}
       parse_header_metadata reader, document
       document.register :refs, [doc_id, document] if doc_id
     end
 
-    unless (val = document.attributes['doctitle']).nil_or_empty? || val == section_title
+    unless (val = doc_attrs['doctitle']).nil_or_empty? || val == section_title
       document.title = assigned_doctitle = val
     end
 
     # restore doctitle attribute to original assignment
-    document.attributes['doctitle'] = assigned_doctitle if assigned_doctitle
+    doc_attrs['doctitle'] = assigned_doctitle if assigned_doctitle
 
     # parse title and consume name section of manpage document
     parse_manpage_header(reader, document) if document.doctype == 'manpage'
 
-    # NOTE block_attributes are the block-level attributes (not document attributes) that
+    # NOTE block_attrs are the block-level attributes (not document attributes) that
     # precede the first line of content (document title, first section or first block)
-    document.finalize_header block_attributes
+    document.finalize_header block_attrs
   end
 
   # Public: Parses the manpage header of the AsciiDoc source read from the Reader
