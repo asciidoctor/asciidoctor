@@ -861,7 +861,7 @@ class PreprocessorReader < Reader
           parsed_attributes['lines'].split(DataDelimiterRx).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..', 2).map {|it| it.to_i }
-              inc_linenos += to < 0 ? [from, MAX_INTEGER] : ::Range.new(from, to).to_a
+              inc_linenos += to < 0 ? [from, 1.0/0.0] : ::Range.new(from, to).to_a
             else
               inc_linenos << linedef.to_i
             end
@@ -888,14 +888,15 @@ class PreprocessorReader < Reader
         inc_lines, inc_offset, inc_lineno = [], nil, 0
         begin
           open(inc_path, 'r') do |f|
+            select_remaining = nil
             f.each_line do |l|
               inc_lineno += 1
-              if (select = inc_linenos[0]) == MAX_INTEGER
+              if select_remaining || (::Float === (select = inc_linenos[0]) && (select_remaining = select.infinite?))
                 # NOTE record line where we started selecting
                 inc_offset ||= inc_lineno
                 inc_lines << l
               else
-                if inc_lineno == select
+                if select == inc_lineno
                   # NOTE record line where we started selecting
                   inc_offset ||= inc_lineno
                   inc_lines << l
