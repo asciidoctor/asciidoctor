@@ -565,7 +565,6 @@ end
 # directives as each line is read off the Array of lines.
 class PreprocessorReader < Reader
   attr_reader :include_stack
-  attr_reader :includes
 
   # Public: Initialize the PreprocessorReader object
   def initialize document, data = nil, cursor = nil, opts = {}
