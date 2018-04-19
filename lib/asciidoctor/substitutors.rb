@@ -1013,13 +1013,16 @@ module Substitutors
         if m[0].start_with? RS
           next m[0][1..-1]
         end
+        attrs = {}
         if (id = m[1])
           id, reftext = id.split ',', 2
           reftext = reftext.lstrip if reftext
         else
           id = m[2]
-          if (reftext = m[3]) && (reftext.include? R_SB)
-            reftext = reftext.gsub ESC_R_SB, R_SB
+          if (reftext = m[3])
+            reftext = reftext.gsub ESC_R_SB, R_SB if reftext.include? R_SB
+            # NOTE if an equal sign (=) is present, parse reftext as attributes
+            reftext = (parse_attributes reftext, [], :into => attrs)[1] if (reftext.include? '=') && !@document.compat_mode
           end
         end
 
@@ -1076,7 +1079,8 @@ module Substitutors
           end
           refid, target = fragment, %(##{fragment})
         end
-        Inline.new(self, :anchor, reftext, :type => :xref, :target => target, :attributes => {'path' => path, 'fragment' => fragment, 'refid' => refid}).convert
+        attrs['path'], attrs['fragment'], attrs['refid'] = path, fragment, refid
+        Inline.new(self, :anchor, reftext, :type => :xref, :target => target, :attributes => attrs).convert
       }
     end
 

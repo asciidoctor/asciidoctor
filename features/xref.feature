@@ -846,3 +846,129 @@ Feature: Cross References
           |refer to
           a< href='#Section One' [Section One]
       """
+
+    Scenario: Parses text of xref macro as attributes if attribute signature found
+    Given the AsciiDoc source
+      """
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to xref:_section_one[role=next]
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_section_one
+          |Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#_section_one' class='next' Section One
+      """
+
+    Scenario: Does not parse text of xref macro as attribute if attribute signature not found
+    Given the AsciiDoc source
+      """
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to xref:_section_one[One, Section One]
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_section_one
+          |Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#_section_one' One, Section One
+      """
+
+    Scenario: Uses whole text of xref macro as link text if attribute signature found and text is enclosed in double quotes
+    Given the AsciiDoc source
+      """
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to xref:_section_one["Section One == Starting Point"]
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_section_one
+          |Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#_section_one'
+            |Section One == Starting Point
+      """
+
+    Scenario: Does not parse text of xref macro as text if enclosed in double quotes but attribute signature not found
+    Given the AsciiDoc source
+      """
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to xref:_section_one["The Premier Section"]
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_section_one
+          |Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#_section_one' "The Premier Section"
+      """
+
+    Scenario: Can escape double quotes in text of xref macro using backslashes when text is parsed as attributes
+    Given the AsciiDoc source
+      """
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to xref:_section_one["\"The Premier Section\"",role=spotlight]
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_section_one
+          |Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#_section_one' class='spotlight' "The Premier Section"
+      """
