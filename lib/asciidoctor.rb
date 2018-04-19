@@ -666,15 +666,6 @@ module Asciidoctor
     # NOTE uppercase chars not included since expression is only run on a lowercase string
     InvalidSectionIdCharsRx = /<[^>]+>|&(?:[a-z][a-z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-f][\da-f][\da-f]{0,3});|[^ #{CC_WORD}-]+?/
 
-    # Matches the block style used to designate a discrete (aka free-floating) heading.
-    #
-    # Examples
-    #
-    #   [discrete]
-    #   = Discrete Heading
-    #
-    DiscreteHeadingStyleRx = /^(?:discrete|float)\b/
-
     ## Lists
 
     # Detects the start of any list item.

@@ -147,26 +147,20 @@ class Parser
       end
       # default to compat-mode if document uses atx-style doctitle
       document.set_attr 'compat-mode' unless atx || (document.attribute_locked? 'compat-mode')
-      if (separator = block_attributes.delete 'separator')
+      if (separator = block_attributes['separator'])
         document.set_attr 'title-separator', separator unless document.attribute_locked? 'title-separator'
       end
       document.header.source_location = source_location if source_location
       document.attributes['doctitle'] = section_title = doctitle
-      # QUESTION: should the id assignment on Document be encapsulated in the Document class?
-      if (doc_id = document.id)
-        block_attributes.delete 1
-        block_attributes.delete 'id'
+      if (doc_id = block_attributes['id'])
+        document.id = doc_id
       else
-        if (style = block_attributes.delete 1)
-          style_attrs = { 1 => style }
-          parse_style_attribute style_attrs, reader
-          block_attributes['id'] = style_attrs['id'] if style_attrs.key? 'id'
-        end
-        document.id = (doc_id = block_attributes.delete 'id')
+        doc_id = document.id
       end
-      if (doc_reftext = block_attributes.delete 'reftext')
+      if (doc_reftext = block_attributes['reftext'])
         document.attributes['reftext'] = doc_reftext
       end
+      block_attributes = {}
       parse_header_metadata reader, document
       document.register :refs, [doc_id, document] if doc_id
     end
@@ -273,8 +267,6 @@ class Parser
   # returns a two-element Array containing the Section and Hash of orphaned attributes
   def self.next_section reader, parent, attributes = {}
     preamble = intro = part = false
-
-    # FIXME if attributes[1] is a verbatim style, then don't check for section
 
     # check if we are at the start of processing the document
     # NOTE we could drop a hint in the attributes to indicate
@@ -480,7 +472,7 @@ class Parser
     # QUESTION should we introduce a parsing context object?
     this_file, this_dir, this_path, this_lineno, this_line, doc_attrs = reader.file, reader.dir, reader.path, reader.lineno, reader.read_line, document.attributes
     block = block_context = cloaked_context = terminator = nil
-    style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
+    style = attributes[1]
 
     if (delimited_block = is_delimited_block? this_line, true)
       block_context = cloaked_context = delimited_block.context
@@ -1549,8 +1541,7 @@ class Parser
   def self.initialize_section reader, parent, attributes = {}
     document = parent.document
     source_location = reader.cursor if document.sourcemap
-    # extract id, role, and options from first positional attribute, if present
-    sect_style = attributes[1] ? (parse_style_attribute attributes, reader) : nil
+    sect_style = attributes[1]
     sect_id, sect_reftext, sect_title, sect_level, sect_atx = parse_section_title reader, document, attributes['id']
 
     if sect_reftext
@@ -1611,12 +1602,13 @@ class Parser
   #
   # Returns the Integer section level if the Reader is positioned at a section title or nil otherwise
   def self.is_next_line_section?(reader, attributes)
-    if (style = attributes[1]) && (style.start_with? 'discrete', 'float') && (DiscreteHeadingStyleRx.match? style)
+    if (style = attributes[1]) && (style == 'discrete' || style == 'float')
       return
-    elsif reader.has_more_lines?
-      Compliance.underline_style_section_titles ?
-          is_section_title?(*reader.peek_lines(2, style && style == 'comment')) :
-          atx_section_title?(reader.peek_line)
+    elsif Compliance.underline_style_section_titles
+      next_lines = reader.peek_lines 2, style && style == 'comment'
+      is_section_title?(next_lines[0] || '', next_lines[1])
+    else
+      atx_section_title?(reader.peek_line || '')
     end
   end
 
@@ -2032,7 +2024,11 @@ class Parser
             return true
           end
         elsif (next_line.end_with? ']') && BlockAttributeListRx =~ next_line
-          document.parse_attributes $1, [], :sub_input => true, :into => attributes
+          current_style = attributes[1]
+          # extract id, role, and options from first positional attribute and remove, if present
+          if (document.parse_attributes $1, [], :sub_input => true, :into => attributes)[1]
+            attributes[1] = (parse_style_attribute attributes, reader) || current_style
+          end
           return true
         end
       elsif normal && (next_line.start_with? '.')
@@ -2598,15 +2594,13 @@ class Parser
 
         attributes['id'] = parsed[:id] if parsed.key? :id
 
-        attributes['role'] = parsed[:role] * ' ' if parsed.key? :role
+        if parsed.key? :role
+          attributes['role'] = (existing_role = attributes['role']).nil_or_empty? ? (parsed[:role].join ' ') : %(#{existing_role} #{parsed[:role].join ' '})
+        end
 
         if parsed.key? :option
-          (options = parsed[:option]).each {|option| attributes[%(#{option}-option)] = '' }
-          if (existing_opts = attributes['options'])
-            attributes['options'] = (options + existing_opts.split(',')) * ','
-          else
-            attributes['options'] = options * ','
-          end
+          (opts = parsed[:option]).each {|opt| attributes[%(#{opt}-option)] = '' }
+          attributes['options'] = (existing_opts = attributes['options']).nil_or_empty? ? (opts.join ',') : %(#{existing_opts},#{opts.join ','})
         end
 
         parsed_style
