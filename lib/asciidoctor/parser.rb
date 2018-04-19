@@ -327,13 +327,10 @@ class Parser
     # otherwise subsequent metadata lines get interpreted as block content
     while reader.has_more_lines?
       parse_block_metadata_lines reader, document, attributes
-
       if (next_level = is_next_line_section?(reader, attributes))
         next_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
-        if next_level > current_level || (next_level == 0 && section.context == :document)
-          if next_level == 0 && doctype != 'book'
-            logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor
-          elsif expected_next_level
+        if next_level > current_level
+          if expected_next_level
             unless next_level == expected_next_level || (expected_next_level_alt && next_level == expected_next_level_alt) || expected_next_level < 0
               expected_condition = expected_next_level_alt ? %(expected levels #{expected_next_level_alt} or #{expected_next_level}) : %(expected level #{expected_next_level})
               logger.warn message_with_context %(section title out of sequence: #{expected_condition}, got level #{next_level}), :source_location => reader.cursor
@@ -341,7 +338,13 @@ class Parser
           else
             logger.error message_with_context %(#{sectname} sections do not support nested sections), :source_location => reader.cursor
           end
-          # the attributes returned are those that are orphaned
+          new_section, attributes = next_section reader, section, attributes
+          section.assign_numeral new_section
+          section.blocks << new_section
+        elsif next_level == 0 && section == document
+          unless doctype == 'book'
+            logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor
+          end
           new_section, attributes = next_section reader, section, attributes
           section.assign_numeral new_section
           section.blocks << new_section
