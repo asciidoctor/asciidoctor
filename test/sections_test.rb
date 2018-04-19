@@ -2088,14 +2088,13 @@ Terms
       EOS
 
       output = render_embedded_string input
-      # FIXME numbering is borked
       assert_xpath '(//h2)[1][text()="1. Preface"]', output, 1
       assert_xpath '(//h3)[1][text()="1.1. Preface Subsection"]', output, 1
-      assert_xpath '(//h2)[2][text()="1. Section One"]', output, 1
+      assert_xpath '(//h2)[2][text()="2. Section One"]', output, 1
       assert_xpath '(//h2)[3][text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '(//h2)[4][text()="Appendix B: Migration"]', output, 1
       assert_xpath '(//h3)[2][text()="B.1. Gotchas"]', output, 1
-      assert_xpath '(//h2)[5][text()="2. Glossary"]', output, 1
+      assert_xpath '(//h2)[5][text()="3. Glossary"]', output, 1
     end
 
     test 'should number special sections and their subsections in toc when sectnums is all' do
@@ -2113,7 +2112,7 @@ content
 
 == Section One
 
-contennt
+content
 
 [appendix]
 == Attribute Options
@@ -2136,14 +2135,13 @@ Terms
       EOS
 
       output = render_string input
-      # FIXME numbering is borked
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="1. Preface"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="1.1. Preface Subsection"]', output, 1
-      assert_xpath '//*[@id="toc"]/ul//li/a[text()="1. Section One"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="2. Section One"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix B: Migration"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="B.1. Gotchas"]', output, 1
-      assert_xpath '//*[@id="toc"]/ul//li/a[text()="2. Glossary"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="3. Glossary"]', output, 1
     end
 
     test 'level 0 special sections in multipart book should be rendered as level 1' do

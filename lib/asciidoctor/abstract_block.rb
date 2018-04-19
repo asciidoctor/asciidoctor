@@ -415,19 +415,21 @@ class AbstractBlock < AbstractNode
   # Returns nothing
   def assign_numeral section
     @next_section_index = (section.index = @next_section_index) + 1
-    if (sectname = section.sectname) == 'appendix'
-      section.number = @document.counter 'appendix-number', 'A'
-      if (caption = @document.attributes['appendix-caption'])
-        section.caption = %(#{caption} #{section.number}: )
+    if (like = section.numbered)
+      if (sectname = section.sectname) == 'appendix'
+        section.number = @document.counter 'appendix-number', 'A'
+        if (caption = @document.attributes['appendix-caption'])
+          section.caption = %(#{caption} #{section.number}: )
+        else
+          section.caption = %(#{section.number}. )
+        end
+      # NOTE currently chapters in a book doctype are sequential even for multi-part books (see #979)
+      elsif sectname == 'chapter' || like == :chapter
+        section.number = @document.counter 'chapter-number', 1
       else
-        section.caption = %(#{section.number}. )
+        @next_section_number = (section.number = @next_section_number) + 1
       end
-    # NOTE currently chapters in a book doctype are sequential even for multi-part books (see #979)
-    elsif sectname == 'chapter'
-      section.number = @document.counter 'chapter-number', 1
-    else
-      @next_section_number = (section.number = @next_section_number) + 1
-    end if section.numbered
+    end
     nil
   end
 

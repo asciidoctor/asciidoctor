@@ -1578,9 +1578,14 @@ class Parser
     section.id, section.title, section.sectname, section.source_location = sect_id, sect_title, sect_name, source_location
     if sect_special
       section.special = true
-      section.numbered = true if sect_numbered || document.attributes['sectnums'] == 'all'
+      if sect_numbered
+        section.numbered = true
+      elsif document.attributes['sectnums'] == 'all'
+        section.numbered = sect_level == 1 && document.doctype == 'book' ? :chapter : true
+      end
     elsif sect_level > 0 && (document.attributes.key? 'sectnums')
-      section.numbered = section.special ? (parent.context == :section && parent.numbered) : true
+      # NOTE a special section here is guaranteed to be nested in another section
+      section.numbered = section.special ? parent.numbered && true : true
     end
 
     # generate an ID if one was not embedded or specified as anchor above section title
