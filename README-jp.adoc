@@ -381,7 +381,7 @@ Twitter:: #asciidoctor hashtag or @asciidoctor mention
 Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
 
 ifdef::env-github[]
-Further information and documentation about Asciidoctor can be found on the project's website.
+以下のプロジェクトサイトに、Asciidoctorに関するさらに詳しい情報やドキュメントがあります。
 
 {uri-project}/[Home] | {uri-news}[News] | {uri-docs}[Docs]
 endif::[]
