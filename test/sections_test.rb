@@ -11,12 +11,12 @@ context 'Sections' do
       assert_equal '_section_one', sec.id
     end
 
-    test 'synthetic id replaces non-word characters with underscores' do
+    test 'synthetic id removes non-word characters' do
       sec = block_from_string("== We're back!")
-      assert_equal '_we_re_back', sec.id
+      assert_equal '_were_back', sec.id
     end
 
-    test 'synthetic id removes repeating underscores' do
+    test 'synthetic id removes repeating separators' do
       sec = block_from_string('== Section $ One')
       assert_equal '_section_one', sec.id
     end
@@ -29,6 +29,21 @@ context 'Sections' do
     test 'synthetic id removes adjacent entities with mixed case' do
       sec = block_from_string('== a &#xae;&AMP;&#xA9; b')
       assert_equal '_a_b', sec.id
+    end
+
+    test 'synthetic id removes XML tags' do
+      sec = block_from_string('== Use the `run` command to make it icon:gear[]')
+      assert_equal '_use_the_run_command_to_make_it_gear', sec.id
+    end
+
+    test 'synthetic id collapses repeating spaces' do
+      sec = block_from_string('== Go    Far')
+      assert_equal '_go_far', sec.id
+    end
+
+    test 'synthetic id replaces hyphens with separator' do
+      sec = block_from_string('== State-of-the-art design')
+      assert_equal '_state_of_the_art_design', sec.id
     end
 
     test 'synthetic id prefix can be customized' do
@@ -49,6 +64,11 @@ context 'Sections' do
     test 'synthetic id separator can be customized' do
       sec = block_from_string(":idseparator: -\n\n== Section One")
       assert_equal '_section-one', sec.id
+    end
+
+    test 'synthetic id separator can be hyphen and hyphens are preserved' do
+      sec = block_from_string(":idseparator: -\n\n== State-of-the-art design")
+      assert_equal '_state-of-the-art-design', sec.id
     end
 
     test 'synthetic id separator can only be one character' do
@@ -481,11 +501,11 @@ endif::[]
     end
 
     test "with XML entity" do
-      assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where#{decode_char 8217}s the love?\"]", render_string("== Where's the love?")
+      assert_xpath "//h2[@id='_whats_new'][text() = \"What#{decode_char 8217}s new?\"]", render_string("== What's new?")
     end
 
     test "with non-word character" do
-      assert_xpath "//h2[@id='_where_s_the_love'][text() = \"Where’s the love?\"]", render_string("== Where’s the love?")
+      assert_xpath "//h2[@id='_whats_new'][text() = \"What’s new?\"]", render_string("== What’s new?")
     end
 
     test "with sequential non-word characters" do
@@ -2972,9 +2992,9 @@ content
       assert_xpath '/*[@id="toc"]', output, 1
       toc_links = xmlnodes_at_xpath '/*[@id="toc"]//li', output
       assert_equal 3, toc_links.size
-      toc_links.each do |toc_link|
-        assert_equal 1, toc_link.inner_html.scan('<a').size
-      end
+      assert_equal '<a href="#_section_one">Section One</a>', toc_links[0].inner_html
+      assert_equal '<a href="#_section_two">Section Two</a>', toc_links[1].inner_html
+      assert_equal '<a href="#_plant_trees_by_searching">Plant Trees by Searching</a>', toc_links[2].inner_html
     end
 
     test 'should not remove non-anchor tags from contents of entries in table of contents' do
@@ -3000,9 +3020,9 @@ content
       assert_xpath '/*[@id="toc"]', output, 1
       toc_links = xmlnodes_at_xpath '/*[@id="toc"]//li', output
       assert_equal 3, toc_links.size
-      assert_match(/^<a[^>]+><code>run<\/code> command<\/a>$/, toc_links[0].inner_html)
-      assert_match(/^<a[^>]+><span class="icon"><i class="fa fa-bug"><\/i><\/span> Issues<\/a>$/, toc_links[1].inner_html)
-      assert_match(/^<a[^>]+><em>Sustainable<\/em> Searches<\/a>/, toc_links[2].inner_html)
+      assert_equal '<a href="#_run_command"><code>run</code> command</a>', toc_links[0].inner_html
+      assert_equal '<a href="#_issues"><span class="icon"><i class="fa fa-bug"></i></span> Issues</a>', toc_links[1].inner_html
+      assert_equal '<a href="#_sustainable_searches"><em>Sustainable</em> Searches</a>', toc_links[2].inner_html
     end
   end
 

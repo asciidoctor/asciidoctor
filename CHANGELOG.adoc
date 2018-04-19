@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Enhancements::
 
+  * BREAKING: drop XML tags, character refs, and non-word characters (except hyphen and space) when generating ID for section (#794)
   * route messages through a logger instead of using Kernel#warn (#44, PR #2660)
   * add MemoryLogger for capturing messages sent to logger into memory (#44, PR #2660)
   * add NullLogger to prevent messages from being logged (#44, PR #2660)
