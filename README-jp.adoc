@@ -59,7 +59,7 @@ endif::[]
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
-{uri-project}/[Asciidoctor]は _高速な_ テキストプロセッサで {uri-what-is-asciidoc}[Asciidoc] をHTML5, DocBook 5(4.5)や他のフォーマットに変換するツールチェインを配布しています.
+{uri-project}/[Asciidoctor]は _高速な_ テキストプロセッサで {uri-what-is-asciidoc}[AsciiDoc] をHTML5, DocBook 5(4.5)や他のフォーマットに変換するツールチェインを配布しています.
 AsciidoctorはRubyで書かれており, RubyGemとしてパッケージされ,  {uri-rubygem}[RubyGems.org] で配布されています.
 gemはいくつかのLinuxディストリビューション, Fedora, Debian, Ubuntuにも含まれています.
 Asciidoctorはオープンソース {uri-repo}[hosted on Github] で {uri-license}[the MIT licence]のもとに配布されます.
@@ -74,7 +74,7 @@ endif::[]
 
 .Key documentation
 [.compact]
-* {uri-docs}/what-is-asciidoc[What is Asciidoc?]
+* {uri-docs}/what-is-asciidoc[What is AsciiDoc?]
 * {uri-docs}/asciidoc-writers-guide[AsciiDoc Writer's Guide]
 * {uri-docs}/asciidoc-syntax-quick-reference[AsciiDoc Syntax Reference]
 * {uri-docs}/user-manual[Asciidoctor User Manual]

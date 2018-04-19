@@ -73,7 +73,7 @@ endif::[]
 
 .Key documentation
 [.compact]
-* {uri-docs}/what-is-asciidoc[What is Asciidoc?]
+* {uri-docs}/what-is-asciidoc[What is AsciiDoc?]
 * {uri-docs}/asciidoc-writers-guide[AsciiDoc Writer's Guide]
 * {uri-docs}/asciidoc-syntax-quick-reference[AsciiDoc Syntax Reference]
 * {uri-docs}/user-manual[Asciidoctor User Manual]
