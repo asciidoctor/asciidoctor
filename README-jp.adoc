@@ -127,7 +127,7 @@ AsciidoctorはLinux, OS X (Mac)とWindowsで動き, 下記の {uri-ruby}[Ruby]�
 
 [CAUTION]
 ====
-もし非英語環境のWindowsを使っているなら, Asciidoctorを起動した時に`Encoding::UndefinedConversionError`に遭遇するでしょう.
+もし非英語環境のWindowsを使っているなら, Asciidoctorを起動した時に `Encoding::UndefinedConversionError` に遭遇するでしょう.
 これを解決するには使っているコンソールの有効なコードページをUTF-8:
 
  chcp 65001
@@ -148,7 +148,7 @@ TIP: Linuxパッケージマネージャを用いてインストールするこ�
 
 === (a) gem install
 
-ターミナルを開, 入力しましょう (先頭の`$`は除く):
+ターミナルを開き, 入力しましょう (先頭の`$`は除く):
 
  $ gem install asciidoctor
 
@@ -381,7 +381,7 @@ Twitter:: #asciidoctor hashtag or @asciidoctor mention
 Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
 
 ifdef::env-github[]
-Further information and documentation about Asciidoctor can be found on the project's website.
+以下のプロジェクトサイトに、Asciidoctorに関するさらに詳しい情報やドキュメントがあります。
 
 {uri-project}/[Home] | {uri-news}[News] | {uri-docs}[Docs]
 endif::[]
