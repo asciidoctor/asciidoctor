@@ -1,4 +1,5 @@
 = My First Experience with the Dangers of Documentation
+:url-wolpertinger: https://en.wikipedia.org/wiki/Wolpertinger
 :stylesheet: mystyles.css
 
 In my world, we don't have to worry about mutant, script-injecting warlocks.
@@ -8,4 +9,5 @@ We're plagued by Wolpertingers.
 
 == Origins
 
-You may not be familiar with these https://en.wikipedia.org/wiki/Wolpertinger[ravenous beasts], but, trust me, they'll eat your shorts and suck the loops from your code.
+You may not be familiar with these {url-wolpertinger}[ravenous beasts],
+but, trust me, they'll eat your shorts and suck the loops from your code.

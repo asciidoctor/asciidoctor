@@ -1,0 +1,45 @@
+////
+Included in:
+- user-manual: URL: Internal cross References
+- quick-ref
+////
+
+// tag::base[]
+The section <<images>> describes how to insert images into your document.
+// end::base[]
+
+// tag::xref-title[]
+Refer to <<Internal Cross References>>.
+// end::xref-title[]
+
+// tag::text[]
+Learn how to <<link-macro-attributes,use attributes within the link macro>>.
+// end::text[]
+
+// tag::xref-macro[]
+Learn how to xref:link-macro-attributes[use attributes within the link macro].
+// end::xref-macro[]
+
+// tag::bad[]
+Refer to link:document-b.html#section-b[Section B] for more information.
+// end::bad[]
+
+// tag::base-inter[]
+Refer to <<document-b.adoc#section-b,Section B>> for more information.
+// end::base-inter[]
+
+// tag::base-inter-top[]
+Refer to <<document-b.adoc#,Document B>> for more information.
+// end::base-inter-top[]
+
+// tag::b-base[]
+See <<paragraphs>> to learn how to write paragraphs.
+
+Learn how to organize the document into <<section-titles,sections>>.
+// end::b-base[]
+
+// tag::b-inter[]
+Refer to <<document-b.adoc#section-b,Section B>> for more information.
+
+See you when you get back from <<document-b#section-b,Section B>>!
+// end::b-inter[]

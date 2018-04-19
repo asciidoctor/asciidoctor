@@ -49,6 +49,7 @@ The attribute value:
 
 Certain attributes have a restricted range of allowable values.
 See the entries in the #attribute-catalog# for details.
+// attribute catalog went to appendix A and the 3 attribute tables currently listed under the Reference Table nav category
 
 == Attribute assignment precedence
 

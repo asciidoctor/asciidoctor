@@ -60,7 +60,7 @@ However, Asciidoctor doesn't process and replace Unicode escape sequences at thi
 ****
 
 TIP: Asciidoctor also provides numerous built-in attributes for representing characters and symbols.
-These attributes and their corresponding output are listed in #charref-attributes-table#.
+These attributes and their corresponding output are listed in the xref:attributes:character-ref.adoc[Character Replacement Attributes Reference Table].
 
 The replacements substitution occurs within title, paragraph, example, quote, sidebar, and verse blocks.
 

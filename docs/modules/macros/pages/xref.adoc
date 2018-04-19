@@ -1,0 +1,88 @@
+= Cross References
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// direct for um, um anchor: xref
+
+A link to another location within the current AsciiDoc document or in another AsciiDoc document is called a [.term]_cross reference_ (also referred to as an [.term]_xref_).
+To create a cross reference, you first need to define the location where the reference will point (i.e., the anchor).
+Then, you need to use one of the forms of the inline xref macro to create a reference to that location.
+From there, you can customize the text of the reference in various ways.
+
+== Automatic anchors
+
+It's important to understand that many anchors are already defined for you.
+Using default settings, Asciidoctor automatically creates an anchor for every section and discrete heading.
+It does so by generating an ID for that section (or discrete heading) and registering that ID in the references catalog.
+You can then use that ID as the target of an cross reference.
+
+For example, considering the following section.
+
+[source]
+----
+= Section Title
+----
+
+Asciidoctor automatically assigns the ID `_section_title` to this section, which you can then use as the target of an xref to create a reference to this section.
+You can also customize how this ID is generated.
+Refer to xref:sections:ids.adoc#auto-id[auto-generated IDs] for more information about how Asciidoctor generates these IDs.
+
+If you're referring to a content element other than a section, you'll need to define an anchor on that element explicitly.
+
+== Internal cross references
+
+In Asciidoctor, the inline xref macro is used to create cross references (also called in-text or page citations) to content elements (sections, blocks, or phrases) that have an ID (regardless of whether that ID is explicit or auto-generated).
+
+You create a cross reference by enclosing the ID of the target block or section (or the path of another document with an optional anchor) in double angled brackets.
+
+.Cross reference using the ID of the target section
+[source]
+----
+include::{partialsdir}/ex-xref.adoc[tag=base]
+----
+
+.Rendered cross reference using the ID of the target section
+====
+include::{partialsdir}/ex-xref.adoc[tag=base]
+====
+
+You can also link to a block or section using the title by referencing its title, referred to as a [.term]_natural cross reference_.
+The title must contain at least one space character or contain at least one uppercase letter.
+(If you are using Ruby < 2.4, that uppercase letter is restricted to the basic Latin charset).
+
+.Cross reference using a section's title
+[source]
+----
+include::{partialsdir}/ex-xref.adoc[tag=xref-title]
+----
+
+.Rendered cross reference using a section's title
+====
+include::{partialsdir}/ex-xref.adoc[tag=xref-title]
+====
+
+Converters usually use the reftext of the target as the default text of the link.
+When the document is parsed, attribute references in the reftext are substituted immediately.
+When the reftext is displayed, additional reftext substitutions are applied to the text (specialchars, quotes, and replacements).
+
+You can override the reftext of the target by specifying alternative text at the location of the cross reference.
+After the ID, add a comma and then enter the custom text you want the cross reference to display.
+
+.Cross reference with custom xreflabel text
+[source]
+----
+include::{partialsdir}/ex-xref.adoc[tag=text]
+----
+
+.Rendered cross reference using custom xreflabel text
+====
+include::{partialsdir}/ex-xref.adoc[tag=text]
+====
+
+You can also use the inline xref macro as an alternative to the double angled bracket form.
+
+.Inline xref macro
+[source]
+----
+include::{partialsdir}/ex-xref.adoc[tag=xref-macro]
+----

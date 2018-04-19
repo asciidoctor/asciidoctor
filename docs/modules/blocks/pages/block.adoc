@@ -29,7 +29,7 @@ include::{partialsdir}/ex-block.adoc[tag=list-title]
 
 In addition to a title, a block can be assigned additional metadata including:
 
-* Id (i.e., anchor)
+* ID (i.e., anchor)
 * Block name (first positional attribute)
 * Block attributes
 
@@ -40,7 +40,7 @@ Here's an example of a quote block with metadata:
 include::{partialsdir}/ex-block.adoc[tag=meta-co]
 ----
 <1> Title: Gettysburg Address
-<2> ID: gettysburg, see #anchordef#
+<2> ID: gettysburg, see xref:attributes:id.adoc#anchor[anchor]
 <3> Block name: quote
 <4> attribution: Abraham Lincoln (Named block attribute)
 <5> citetitle: Address delivered at the dedication of the Cemetery at Gettysburg (Named block attribute)

@@ -1,0 +1,96 @@
+////
+Included in:
+- user-manual: URL
+- quick-ref
+////
+
+// tag::base[]
+The homepage for the Asciidoctor Project is https://asciidoctor.org.
+
+Chat with other Asciidoctor users in the irc://irc.freenode.org/#asciidoctor[Asciidoctor IRC channel].
+
+Ask questions on the http://discuss.asciidoctor.org/[*mailing list*].
+// end::base[]
+
+// tag::base-co[]
+The homepage for the Asciidoctor Project is https://www.asciidoctor.org. // <1>
+// end::base-co[]
+
+// tag::irc[]
+Chat with other Asciidoctor users in the irc://irc.freenode.org/#asciidoctor[Asciidoctor IRC channel].
+// end::irc[]
+
+// tag::text[]
+Ask questions on the http://discuss.asciidoctor.org/[*mailing list*].
+// end::text[]
+
+// tag::scheme[]
+To see information about your browser, navigate to the link:about:[About Page].
+// end::scheme[]
+
+// tag::unconstrained[]
+search/link:https://ecosia.org[Ecosia]
+// end::unconstrained[]
+
+// tag::linkattrs-h[]
+= Asciidoctor Document Title
+:linkattrs:
+
+Let's view the raw HTML of the link:view-source:asciidoctor.org[Asciidoctor homepage, window="_blank"].
+// end::linkattrs-h[]
+
+// tag::linkattrs[]
+Let's view the raw HTML of the link:view-source:asciidoctor.org[Asciidoctor homepage, window="_blank"].
+// end::linkattrs[]
+
+// tag::linkattrs-s[]
+Let's view the raw HTML of the link:view-source:asciidoctor.org[Asciidoctor homepage^].
+// end::linkattrs-s[]
+
+// tag::css[]
+Chat with other Asciidoctor users in the irc://irc.freenode.org/#asciidoctor[Asciidoctor IRC channel] or on the http://discuss.asciidoctor.org/[*mailing list*^, role="green"].
+// end::css[]
+
+// tag::link[]
+link:protocol.json[Open the JSON file]
+// end::link[]
+
+// tag::hash[]
+link:external.html#livereload[LiveReload]
+// end::hash[]
+
+// tag::b-base[]
+https://asciidoctor.org - automatic!
+
+https://asciidoctor.org[Asciidoctor]
+
+https://github.com/asciidoctor[Asciidoctor @ *GitHub*]
+// end::b-base[]
+
+// tag::b-scheme[]
+devel@discuss.arquillian.org
+
+mailto:devel@discuss.arquillian.org[Discuss Arquillian]
+
+mailto:devel-join@discuss.arquillian.org[Subscribe, Subscribe me, I want to join!]
+
+irc://irc.freenode.org/#asciidoctor
+// end::b-scheme[]
+
+// tag::b-linkattrs[]
+http://discuss.asciidoctor.org[Discuss Asciidoctor, role="external", window="_blank"]
+
+http://discuss.asciidoctor.org[Discuss Asciidoctor^]
+
+https://example.org["Google, Yahoo, Bing^", role="teal"]
+// end::b-linkattrs[]
+
+// tag::b-spaces[]
+link:++https://example.org/?q=[a b]++[URL with special characters]
+
+link:https://example.org/?q=%5Ba%20b%5D[URL with special characters]
+// end::b-spaces[]
+
+// tag::b-windows[]
+link:\\server\share\whitepaper.pdf[Whitepaper]
+// end::b-windows[]

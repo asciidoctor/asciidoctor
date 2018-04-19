@@ -1,0 +1,36 @@
+= Link to Relative Files
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+url-relative.adoc, included in:
+- user-manual: relative links
+- writers-guide
+////
+
+If you want to link to an external file relative to the current document, use the `link` macro in front of the file name.
+
+[source]
+----
+include::{partialsdir}/ex-url.adoc[tag=link]
+----
+
+If your file is an HTML file, you can link directly to a section in the document, append a hash (`#`) followed by the section's ID to the end of the file name.
+
+[source]
+----
+include::{partialsdir}/ex-url.adoc[tag=hash]
+----
+
+////
+You can also create links that refer to sections within the current document.
+
+[source]
+----
+link:user-manual.html[URLs]
+----
+
+====
+link:user-manual.html[URLs]
+====
+////

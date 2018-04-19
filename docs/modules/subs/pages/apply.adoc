@@ -60,6 +60,7 @@ include::{partialsdir}/ex-subs.adoc[tag=subs-attr]
 Another way to ensure consistency and keep your documents clean and simple is to use the xref:api:tree-processor.adoc[Tree Processor extension].
 ====
 
+[#incremental]
 == Incremental substitutions
 
 When you set the subs attribute on a block, you automatically remove all of its default substitutions.

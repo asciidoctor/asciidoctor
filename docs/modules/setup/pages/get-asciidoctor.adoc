@@ -1,55 +1,44 @@
-= System Requirements
+= Get Asciidoctor
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :adoc-version: 1.5.7
 
-Asciidoctor Core operates on macOS, Windows, and most Linux distributions.
+Asciidoctor is distributed as a RubyGem and operates on macOS, Windows, and Linux.
 //AsciidoctorJ, Asciidoctor.js, as well as the Asciidoctor build integrations, alternate converters, and extensions may have additional requirements.
 
-== Supported Platforms
+== System requirements for Asciidoctor {adoc-version}
 
 Platform support is specific to each major Asciidoctor version.
 
-[NOTE]
-.Linux Distributions
-====
-While we only test Asciidoctor on Alpine, Debian, and Fedora, it should operate as expected on most Linux distributions.
-====
+TIP: While we only test on Alpine Linux, Debian, and Fedora, Asciidoctor should operate as expected on most Linux distributions.
 
-.Asciidoctor {adoc-version}
 [cols="20,25a",width="45%"]
 |===
 |Supported Platform |Supported Version(s)
 
 |Ruby
-|[%hardbreaks]
-2.5
-2.4
-2.3
+|2.3 &#8805;
 
 |JRuby
-|9000
+|9.0 &#8805;
 
-|Alpine
-|[%hardbreaks]
-3.7
+|Alpine Linux
+|3.7 &#8805;
 
 |Debian
-|9.3
+|9.3 &#8805;
 
 |Fedora
-|[%hardbreaks]
-27
+|27
 
 |macOS
 |High Sierra
 
 |Microsoft
-|[%hardbreaks]
-Windows 10
-Windows 8.1
-Windows Server 2016
+|Windows 10 +
+Windows 8.1 +
+Windows Server 2016 +
 Windows Server 2012 R2
 
 |Chrome
@@ -65,35 +54,31 @@ Windows Server 2012 R2
 |Latest stable version
 |===
 
-== Feature-specific Platforms
+=== Feature requirements
 
-The following platforms are only required of you're using certain Asciidoctor features such as source code highlighting.
+The following platforms *are only required if you're using certain AsciiDoc features*.
 
-.Asciidoctor {adoc-version}
-[cols="20,25a",width="45%"]
+[cols="30,20,15a",width="55%"]
 |===
-|Supported Platform |Supported Version(s)
+|Feature |Supported Platform |Supported Version(s)
 
+|Stem equations and formulas
 |MathJax
-|?
+|2.7.4
 
+.3+|Server-side syntax highlighting for source code blocks
 |CodeRay
-|?
-
-|highlight.js
-|?
-
-|prettify
-|?
+|1.1.2
 
 |Pygments
-|?
+|2.2.0
 
 |Rouge
-|?
+|3.1.1
 
-|Font Awesome Icons
-|?
+|Inline, admonition or callout font-based icons
+|Font Awesome
+|4.7
 |===
 
 ////

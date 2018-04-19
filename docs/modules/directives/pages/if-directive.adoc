@@ -120,6 +120,7 @@ Specifically, when attributes are separated by commas, content is only included 
 When attributes are separated by pluses, content is included if at least one of the attributes is undefined.
 See https://github.com/asciidoctor/asciidoctor/issues/1983[issue #1983] to find the discussion about this behavior and the rationale for the change.
 
+[#ifeval]
 == ifeval directive
 
 Content between `ifeval` and `endif` gets included if the expression inside the square brackets evaluates to true.

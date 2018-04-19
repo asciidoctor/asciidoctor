@@ -33,7 +33,7 @@ AsciiDoc.py provided a theming mechanism that encapsulated CSS, JavaScript, and 
 The `--theme` option activated one of these themes, which was resolved from your home directory.
 In Asciidoctor, you control the theme using CSS stylesheets, which you specify using `-a stylesheet=<stylesheet>`.
 
-If you require more advanced theming, you can inject additional resources using a #docinfo-file,docinfo file# or a xref:api:postprocessor.adoc[postprocessor extension].
+If you require more advanced theming, you can inject additional resources using a xref:publish:docinfo.adoc[docinfo file] or a xref:api:postprocessor.adoc[postprocessor extension].
 
 [#migrate-stylesheet]
 === Default HTML stylesheet
@@ -192,7 +192,7 @@ pass:[===== Level 4 section title]
 |+ifeval::[]+
 |Evaluates any Python expression.
 |Evaluates simple logical expressions testing the value of attributes.
-|See #ifeval-directive#
+|See xref:directives:if-directive.adoc#ifeval[ifeval-directive]
 
 |Provide name of current document
 |`infile`
@@ -238,7 +238,7 @@ a|If you want to send remarks to the output, use an extension, or:
 |Asciidoctor only replaces tabs with spaces in verbatim content blocks (listing, literal, etc.), and the attribute has no default.
 In other words, tabs are not expanded in verbatim content blocks unless this attribute is set on the block or the document.
 For all other text, Asciidoctor tabs are fixed at 4 spaces by the CSS.
-See xref:include:indent.adoc[normalize block indentation] for more detail.
+See xref:directives:indent.adoc[normalize block indentation] for more detail.
 |===
 
 == Mathematical expressions
@@ -255,7 +255,7 @@ Instead, Asciidoctor provides an xref:api:extensions.adoc[extension API] that re
 
 AsciiDoc.py had built-in [.path]_.conf_ files that translated built-in labels.
 In Asciidoctor, you must define the translations for these labels explicitly.
-See #language-support# for details.
+See xref:ROOT:language-support.adoc[language support] for details.
 
 [#migrate-extensions]
 == AsciiDoc.py extensions
@@ -340,10 +340,12 @@ These are some of the more interesting ones when migrating:
 
 * xref:include:lines-and-tags.adoc[Partial includes]
 * xref:attributes:safe-modes.adoc[Additional safe modes]
-* #Icon-based fonts and inline icons#
+* xref:macros:icon.adoc[Icon-based fonts and inline icons]
 * {url-diagram}[Asciidoctor Diagram]
 
-A detailed list of the improvements is shown in {uri-diffs}[Differences between Asciidoctor and AsciiDoc.py].
+A detailed list of the improvements is shown in #Differences between Asciidoctor and AsciiDoc.py#.
+
+//{uri-diffs}
 
 ////
 These changes are not backward-compatible, but if you set the `compat-mode` attribute, Asciidoctor will accept the AsciiDoc.py syntax.

@@ -1,60 +1,75 @@
-= Editing AsciiDoc with Live Preview
+= Edit and Preview Tools
 Dan Allen; Guillaume Grossetie
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:y: Yes
+:n: No
 :url-chrome-extension: https://chrome.google.com/webstore/detail/asciidoctorjs-live-previe/iaalpfgpbocpdfblpnhhgllgbdbchmia
 :url-firefox-addon: https://addons.mozilla.org/en/firefox/addon/asciidoctorjs-live-preview
-:url-opera-extension: https://addons.opera.com/fr/extensions/details/asciidoctorjs-live-preview
-:url-chrome-extension-dd: https://github.com/asciidoctor/asciidoctor-chrome-extension/releases/download/v1.5.4.100/asciidoctor-chrome-extension.nex
-:url-firefox-addon-dd: https://github.com/asciidoctor/asciidoctor-firefox-addon/releases/download/v0.5.3/asciidoctor-firefox-addon-0.5.3-signed.xpi
-:url-opera-extension-dd: https://github.com/asciidoctor/asciidoctor-chrome-extension/releases/download/v1.5.4.100/asciidoctor-chrome-extension.nex
-:url-intellij-plugin: https://github.com/asciidoctor/asciidoctor-intellij-plugin
-//:page-layout: docs
-//:imagesdir: ../images
-// from editing-asciidoc-with-live-preview
+:url-opera-extension: https://addons.opera.com/en/extensions/details/asciidoctorjs-live-preview/
+:url-intellij-plugin: https://plugins.jetbrains.com/plugin/7391-asciidoc
+:url-asciidocfx: https://www.asciidocfx.com
+:url-asciidocfx-docs: https://www.asciidocfx.com/#truehow-to-install-asciidocfx
+// text-editor.adoc, included in the install-toolchain document and user manual
 
-Here's an overview of the different ways to setup live preview of AsciiDoc.
+Since AsciiDoc syntax is just plain text, you can write an AsciiDoc document using any text editor.
+You don't need complex word processing programs like Microsoft Word or Google Docs.
+In fact, you shouldn't use these programs because they add cruft to your document that you can't see that makes conversion tedious.
 
-== Using a web browser (preview only)
+== Text editors and IDEs
 
-All you need to preview an AsciiDoc document in a web browser is to install the {url-chrome-extension}[Chrome extension], the {url-firefox-addon}[Firefox add-on] or the {url-opera-extension}[Opera extension].
-Then you can see the AsciiDoc file rendered as HTML just by visiting it!
+While it's true any text editor will do, an editor that supports source highlighting for the AsciiDoc syntax may be more helpful.
 
-=== Installing the development versions
+[cols="2,1,1",width="50%"]
+|===
+| |Highlighting |Preview
 
-The validation process of a browser extension / addon can take a long time.
-If you want the latest and greatest version you can use the direct download links below.
+|AsciiDocFX
+|{y}
+|{y}
 
-==== Chrome
+|Atom
+|{y}
+|{y}
 
-. Download {url-chrome-extension-dd}[asciidoctor-chrome-extension.nex]
-. Open chrome://extensions
-. Drag'n'drop the `.nex` file into the page to install
+|Brackets
+|{y}
+|{y}
 
-==== Firefox
+|Emacs
+|{y}
+|{n}
 
-. Download {url-firefox-addon-dd}[asciidoctor-firefox-addon.xpi]
-. Open the file with Firefox to install
+|GEdit
+|{y}
+|{n}
 
-==== Opera
+|IntelliJ
+|{y}
+|{y}
 
-. Dowload {url-opera-extension-dd}[asciidoctor-chrome-extension.nex]
-. Open opera://extensions
-. Drag'n'drop the `.nex` file into the page to install
+|Notepad++
+|{y}
+|{n}
 
-== Using a modern text editor or IDE
+|Sublime Text
+|{y}
+|{n}
 
-The following editors/IDEs support both syntax highlighting and preview rendering (in alphabetic order):
+|TextMate
+|{y}
+|{n}
 
-=== AsciiDocFX
+|Vim
+|{y}
+|{n}
+|===
 
-To run AsciiDocFX, you will need to:
+=== AsciiDoc FX
 
-. Install http://www.oracle.com/technetwork/java/javase/downloads/index.html[JDK 8]
-. Download the latest https://github.com/rahmanusta/AsciidocFX/releases[AsciidocFX.zip] and extract it
-. Run `bin/asciidocfx.bat` or `bin/asciidocfx.sh`
-
-More information:
-
- * http://www.asciidocfx.com/[AsciiDocFX homepage]
+{url-asciidocfx}[AsciiDoc FX] is an editor and terminal emulator written with JavaFX 8.
+See its documentation for {url-asciidocfx-docs}[download and installation instructions].
 
 === Atom
 
@@ -80,7 +95,44 @@ More information:
 
 === IntelliJ IDEA
 
-Install the community plugin {uri-intellij-plugin}[`AsciiDoc`].
+Install the community plugin {url-intellij-plugin}[`AsciiDoc`].
+
+== Preview with a web browser
+
+All you need to preview an AsciiDoc document in a web browser is to install the {url-chrome-extension}[Chrome extension], {url-firefox-addon}[Firefox add-on] or {url-opera-extension}[Opera extension].
+Then you can see the AsciiDoc file rendered as HTML just by visiting it!
+
+////
+:url-chrome-extension-dd: https://github.com/asciidoctor/asciidoctor-chrome-extension/releases/download/v1.5.4.100/asciidoctor-chrome-extension.nex
+:url-firefox-addon-dd: https://github.com/asciidoctor/asciidoctor-firefox-addon/releases/download/v0.5.3/asciidoctor-firefox-addon-0.5.3-signed.xpi
+:url-opera-extension-dd: https://github.com/asciidoctor/asciidoctor-chrome-extension/releases/download/v1.5.4.100/asciidoctor-chrome-extension.nex
+
+=== Installing the development versions
+
+The validation process of a browser extension or add-on can take a long time.
+If you want the latest and greatest version you can use the direct download links below.
+
+==== Chrome
+
+. Download {url-chrome-extension-dd}[asciidoctor-chrome-extension.nex]
+. Open chrome://extensions
+. Drag'n'drop the `.nex` file into the page to install
+
+==== Firefox
+
+. Download {url-firefox-addon-dd}[asciidoctor-firefox-addon.xpi]
+. Open the file with Firefox to install
+
+==== Opera
+
+. Dowload {url-opera-extension-dd}[asciidoctor-chrome-extension.nex]
+. Open opera://extensions
+. Drag'n'drop the `.nex` file into the page to install
+
+Previewing the output of the document while editing can be helpful.
+To learn how to setup instant preview, check out the xref:edit-with-live-preview.adoc[Editing AsciiDoc with Live Preview tutorial].
+
+Here's an overview of the different ways to setup live preview of AsciiDoc.
 
 == Using a system monitor
 
@@ -189,7 +241,7 @@ Put the windows side-by-side so that you can see both of them.
 (Use Alt+F5 to unmaximize Epiphany (Web) if you don't see the draggable window frame).
 
 #Tiled editor and web preview image goes here#
-//image::tiled-editor-and-web-preview.png[Tiled editor and web preview, 100%]
+image::tiled-editor-and-web-preview.png[Tiled editor and web preview, 100%]
 
 Once the two windows are tiled, make a change to the source document.
 Observe that the preview is automatically updated without affecting the scroll offset.
@@ -238,7 +290,7 @@ Whenever the AsciiDoc file is changed, first the Guard "shell" plugin will be tr
 
 Asciidoctor + Guard + LiveReload + Chrome or Firefox == The Documentation Writer Wonderland
 
-////
+~~~
 Directly from Previewing your content section in user manual
 
 Guard::

@@ -80,4 +80,4 @@ The TOC will list the titles of the section 1, 2, 3, and 4 levels when the docum
 
 Asciidoctor allows you to customize the title, number of levels, and xref:toc-position.adoc[document position] of the table of contents.
 However, not all of the attributes are supported by all converters.
-See the xref:toc-ref.adoc[table-of-contents-summary] to find out which attributes are available to each backend.
+See the xref:toc-ref.adoc[TOC reference table] to find out which attributes are available to each backend.

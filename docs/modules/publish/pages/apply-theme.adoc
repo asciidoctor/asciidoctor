@@ -23,6 +23,7 @@ If the stylesheet is in the same directory as your document, you can apply it wh
 
 Alternatively, let's set the `stylesheet` attribute in the header of [.path]_mysample.adoc_.
 
+[source]
 ----
 include::{partialsdir}/mysample-stylesheet.adoc[]
 ----
@@ -37,6 +38,7 @@ Asciidoctor uses the relative or absolute path you assign to the `stylesdir` att
 Let's move [.path]_mystyles.css_ into [.path]_mydocuments/mystylesheets_.
 Our AsciiDoc document, [.path]_mysample.adoc_, is saved in the [.path]_mydocuments_ directory.
 
+[source]
 ----
 include::{partialsdir}/mysample-stylesdir.adoc[]
 ----
@@ -54,6 +56,7 @@ You can also set `stylesdir` in the CLI.
 
 If you don't want to embed the [.path]_mystyles.css_ stylesheet into your HTML output, make sure to set `linkcss`.
 
+[source]
 ----
 include::{partialsdir}/mysample-stylesdir-link.adoc[]
 ----
@@ -61,7 +64,7 @@ include::{partialsdir}/mysample-stylesdir-link.adoc[]
 After your document is converted, notice that a copy of [.path]_mystyles.css_ was not created in the [.path]_mydocuments_ directory.
 Unlike when you link to the default Asciidoctor stylesheet, any custom stylesheets you link to are not copied to the directory where your output is saved.
 
-[#style-nest-doc]
+[#style-nested]
 .Stylesheets and processing multiple nested documents
 ****
 When you are xref:cli:multiple-files.adoc[running Asciidoctor once across a nested set of documents], it's currently not possible to specify a single relative path for the `stylesdir` attribute that would work for all of the documents.
@@ -81,12 +84,14 @@ Let's say you have three AsciiDoc documents saved in the following directory str
 
 For [.path]_a.adoc_ and [.path]_b.adoc_, set `stylesdir` to:
 
+[source]
 ----
 :stylesdir: mystylesheets
 ----
 
 For [.path]_c.adoc_, set `stylesdir` to:
 
+[source]
 ----
 :stylesdir: ../mystylesheets
 ----

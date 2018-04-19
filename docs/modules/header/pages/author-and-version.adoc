@@ -1,4 +1,4 @@
-= Author, Version, and Date
+= Author, Version and Date
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
@@ -41,9 +41,9 @@ If a firstname and lastname are present, any remaining words or characters found
 The first character of the firstname, middlename, and lastname attributes.
 
 `email`::
-An email address, delimited by angle brackets (`<>`).
+An email address, delimited by angle brackets (`< >`).
 
-If one or more of the author's names consists of more than one word, use an underscore (`_`) between the words you want to adjoin.
+If one or more of the author's names consists of more than one word, use an underscore (`+_+`) between the words you want to adjoin.
 For example, the author of the following document has a compound last name.
 
 [source]
@@ -77,7 +77,7 @@ Multiple authors and their emails are separated by semicolons (`;`) when they're
 ----
 include::{partialsdir}/ex-author.adoc[tag=multi]
 ----
-<1> To reference the additional authors in the document body, the author attributes are appended with an underscore (`+_+`) followed by the position of the author in the author information list (i.e. Lazarus het Draeke is the second author in the list so his author attributes are appended with a 2).
+<1> To reference the additional authors in the document body, the author attributes are appended with an underscore (`+_+`) followed by the position of the author in the author information list (i.e., Lazarus het Draeke is the second author in the list so his author attributes are appended with a 2).
 
 .Result: Rendered author information when document has multiple authors
 ====
@@ -123,7 +123,7 @@ If you do need to use attribute references in the author or email value, you sho
 Just remember that the author line is for static text.
 Once you graduate beyond static text, you should switch to using attribute entries to define the built-in author attributes, which will give you much more power.
 
-== Version, revision, and date syntax
+== Version, revision and date syntax
 
 The revision information is read from the third (non-attribute) line of the header, beneath the author information line.
 A document's revision information has slots for three implicit attributes.
@@ -132,7 +132,7 @@ A document's revision information has slots for three implicit attributes.
 The document's version number.
 In order to be recognized, the version number must contain at least one numeric character.
 Any letters or symbols preceding the numeric character are ignored.
-If the implicit `revnumber` is on a line by itself, it must begin with the "`v`" character (e.g., `v1.0`) or be followed by a comma (e.g., `1.0,`)
+If the implicit `revnumber` is on a line by itself, it must begin with the "`v`" character (e.g., `v7.0.6`) or be followed by a comma (e.g., `2.3,`)
 If the implicit `revdate` is present, it must be separated from the `revnumber` by a comma (e.g., `2020-10-10, v78.1`).
 
 `revdate`::

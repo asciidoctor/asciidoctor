@@ -1,0 +1,54 @@
+// Included in:
+//
+// - user-manual: URLs, URL Troubleshooting sidebar
+// - troubleshoot
+// - faq: troubleshoot
+Why don't URLs containing underscores (`_`) or carets (`{caret}`) work after they're converted?::
++
+--
+// tag::sb[]
+This problem occurs because the markup parser interprets parts of the URL (i.e., the link target) as valid text formatting markup.
+Most lightweight markup languages have this issue because they don't use a grammar-based parser.
+Asciidoctor plans to handle URLs more carefully in the future (see https://github.com/asciidoctor/asciidoctor/issues/281[issue #281]), which may be solved by moving to a grammar-based parser (see https://github.com/asciidoctor/asciidoctor/issues/61[issue #61]).
+Thankfully, there are many ways to include URLs of arbitrary complexity using the AsciiDoc passthrough mechanisms.
+
+.Solution A
+====
+The simplest way to get a link to behave is to assign it to an attribute.
+
+[source]
+----
+= Document Title
+:link-with-underscores: https://asciidoctor.org/now_this__link_works.html
+
+This URL has repeating underscores {link-with-underscores}.
+----
+Asciidoctor won't break links with underscores when they are assigned to an attribute because #quotes,inline formatting markup is substituted before attributes#.
+The URL remains hidden while the rest of the document is being formatted (strong, emphasis, monospace, etc.).
+====
+
+.Solution B
+====
+Another way to solve formatting glitches is to explicitly specify the formatting you want to have applied to a span of text.
+This can be done by using the xref:subs:pass-macro.adoc[inline pass macro].
+If you want to display a URL, and have it preserved, put it inside the pass macro and enable the #subs-mac,macros substitution#, which is what substitutes links.
+
+[source]
+----
+This URL has repeating underscores pass:macros[https://asciidoctor.org/now_this__link_works.html].
+----
+
+The pass macro removes the URL from the document, applies the `macros` substitution to the URL, and then restores the processed URL to its original location once the substitutions are complete on the whole document.
+
+Alternatively, you can use `pass:[++]` around the URL only.
+However, when you use this approach, Asciidoctor won't recognize it as a URL any more, so you have to use the explicit `link` prefix.
+
+[source]
+----
+This URL has repeating underscores link:++https://asciidoctor.org/now_this__link_works.html++[].
+----
+====
+
+For more information, see https://github.com/asciidoctor/asciidoctor/issues/625[issue #625].
+// end::sb[]
+--

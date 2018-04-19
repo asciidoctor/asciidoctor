@@ -1,0 +1,107 @@
+= Document to Document Cross References
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+xref-interfoc.adoc, included in:
+- user-manual: Inter-document cross references
+////
+
+The inline xref macro can also link to IDs in other AsciiDoc documents.
+This eliminates the need to use direct links between documents that are coupled to a particular converter (e.g., HTML links).
+It also captures the intent of the author to establish a reference to a section in another document.
+
+Here's how a cross reference is normally defined in Asciidoctor:
+
+[source]
+----
+include::{partialsdir}/ex-xref.adoc[tag=base]
+----
+
+This cross reference creates a link to the section with the ID _images_.
+
+Let's assume the cross reference is defined in the document [.path]_document-a.adoc_.
+If the target section is in a separate document, [.path]_document-b.adoc_, the author may be tempted to write:
+
+[source]
+----
+include::{partialsdir}/ex-xref.adoc[tag=bad]
+----
+
+However, this link is coupled to HTML output.
+What's worse, if [.path]_document-b.adoc_ is included in the same document as [.path]_document-a.adoc_, the link will refer to a document that doesn't even exist!
+
+These problems can be alleviated by using an inter-document xref:
+
+[source]
+----
+include::{partialsdir}/ex-xref.adoc[tag=base-inter]
+----
+
+The ID of the target is now placed behind a hash symbol (`#`).
+Preceding the hash is the name of the reference document (the file extension is optional).
+We've also added a label since Asciidoctor cannot (yet) resolve the section title in a separate document.
+
+When Asciidoctor generates the link for this cross reference, it first checks to see if [.path]_document-b.adoc_ is included in the same document as [.path]_document-a.doc_.
+If not, it will generate a link to [.path]_document-b.html_, intelligently substituting the original file extension with the file extension of the output file.
+
+[source,html]
+----
+<a href="document-b.html#section-b">Section B</a>
+----
+
+If [.path]_document-b.adoc_ is included in the same document as [.path]_document-a.doc_, then the document will be dropped in the link target and look like the output of a normal cross reference:
+
+[source,html]
+----
+<a href="#section-b">Section B</a>
+----
+
+Now you can create inter-document cross references without the headache.
+
+== Navigating between source files
+// all content from xref-source-to-source.adoc
+
+In certain environments, such as a source repository or the browser preview extensions, you view the generated HTML through the AsciiDoc source URL.
+This has consequences for inter-document cross references.
+
+Since the default suffix for relative links in the `html5` backend is `.html`, the inter-document cross references in these environments end up pointing to non-existent HTML files.
+In this case, you need to change the inter-document cross references to refer to other AsciiDoc source files instead.
+You can achieve this behavior by setting the `outfilesuffix` attribute to the value as `.adoc`, as the example below shows.
+
+[source]
+----
+= Document Title
+\ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+
+See the <<README#,README>>.
+
+We could also write the link as link:README{outfilesuffix}[README].
+----
+
+The links in the generated document will now point to [.path]_README.adoc_ instead of the default, [.path]_README.html_.
+
+TIP: This configuration is no longer necessary on GitHub since GitHub now sets the value of `outfilesuffix` to match the file extension of the source file.
+However, it's still required in GitHub-like environments such as GitLab.
+
+CAUTION: You probably don't want to set `outfilesuffix` to `.adoc` without the `ifdef` condition as it could result in Asciidoctor overwriting input files when you run it locally (though there's some protection against this).
+
+While `outfilesuffix` gives you control over the end of the resolved path for an inter-document cross reference, the `relfileprefix` attribute gives you control over the beginning of the path.
+When resolving the path of an inter-document cross reference, if the `relfileprefix` attribute is set, the value of this attribute gets prepended to the path.
+Let's look at an example of when these two attributes are used together.
+
+A common practice in website architecture is to move files into their own folder to make the path format agnostic (called "`indexify`").
+For example, the path [.path]_filename.html_ becomes [.path]_filename_ (which targets [.path]_filename/index.html_).
+However, this is problematic for inter-document cross references.
+Any cross reference that resolves to the path [.path]_filename.html_ is now invalid since the file has moved to a subfolder (and thus no longer a sibling of the referencing document).
+
+To solve this problem, you can define the following two attributes:
+
+[source]
+----
+:relfileprefix: ../
+:outfilesuffix: /
+----
+
+Now, the cross reference `+<<filename#,Label>>+` will resolve to [.path]_../filename_ instead of [.path]_filename.html_.
+Since this change is specific to the website architecture described, you want to be sure to only set these attributes in that particular environment (either using an ifdef directive or via the API).
