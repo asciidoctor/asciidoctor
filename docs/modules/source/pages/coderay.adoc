@@ -102,8 +102,7 @@ ORDERED_LIST_KEYWORDS = {
 ----
 ....
 
-See the #CodeRay stylesheet section# to learn about the `coderay-css` attribute.
-// <<user-manual#hl-css,CodeRay stylesheet section>>
+See the xref:publish:html-code-styles.adoc#coderay[CodeRay stylesheet section] to learn about the `coderay-css` attribute.
 
 ////
 Note: I'm not getting this to work. Need to come back and do some quality assurance.

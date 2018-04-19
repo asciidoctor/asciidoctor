@@ -1,19 +1,22 @@
-= Syntax, Attributes, and Commands: What's Changed?
+= Upgrade Syntax, Attributes and Commands
+//Syntax, Attributes, and Commands: What's Changed?
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 
+IMPORTANT: This page if for users upgrading from a previous version of Asciidoctor to the latest stable version of Asciidoctor.
+If your migrating from AsciiDoc Python, see the xref:ROOT:migrate/from-asciidoc-python.adoc[documentation for migrating from AsciiDoc Python to Asciidoctor].
+
+When you upgrade Asciidoctor you may also need to update some of the syntax and attributes in your AsciiDoc documents.
+Major version releases can include reworkings of some of the AsciiDoc syntax in an effort to make it more consistent, deterministic and easy to learn.
+
+== Updated and deprecated features
+
 The syntax, attributes, and commands listed below have been updated or deprecated.
 In most cases, they've been replaced with a new feature that provides improved functionality.
 
-IMPORTANT: This page if for users upgrading from a previous version of Asciidoctor to the latest stable version of Asciidoctor.
-If your migrating from AsciiDoc Python, see the xref:migrate:from-asciidoc-python.adoc[documentation for migrating from AsciiDoc Python to Asciidoctor].
+=== Inline formatting
 
-== Updated and deprecated syntax
-
-The tables below list the features that have changed in recent versions.
-
-.Inline Formatting
 [cols="15,20,20,5,20"]
 |===
 |Feature |Deprecated |New |As of Version |Notes
@@ -49,24 +52,25 @@ The tables below list the features that have changed in recent versions.
 |
 |===
 
-.Table of Contents
+=== Table of contents
+
 [cols="15,20,20,5,20"]
 |===
 |Feature |Deprecated |New |As of Version |Notes
 
-|Scrollable, left margin ToC
+|Scrollable, left margin TOC
 |`toc2`
 |`+:toc: left+`
 |1.5.0
 |
 
-|ToC location
+|TOC location
 |`toc-placement` and `toc-position`
 |`+:toc: <value>+`
 |1.5.0
 |
 
-|User-specified ToC location
+|User-specified TOC location
 |`+:toc-placement: manual+`
 |`+:toc: macro+`
 |1.5.0
@@ -74,8 +78,9 @@ The tables below list the features that have changed in recent versions.
 
 |===
 
-.Document Header
-[cols="15,20,20,5,20"]
+=== Document header
+
+[cols="15,20,15,5,25"]
 |===
 |Feature |Deprecated |New |As of Version |Notes
 
@@ -95,7 +100,8 @@ However, by using it, you implicitly set `compat-mode`.
 If you want to use the new Asciidoctor syntax, make sure to use `= Title` or explicitly unset the `compat-mode` attribute.
 |===
 
-.API
+=== API
+
 [cols="15,20,20,5,20"]
 |===
 |Feature |Deprecated |New |As of Version |Notes
@@ -107,17 +113,15 @@ If you want to use the new Asciidoctor syntax, make sure to use `= Title` or exp
 |
 |===
 
-=== Compatibility mode
+== New features
 
-When it isn't feasibly to update your documents prior to upgrading Asciidoctor, you can run Asciidoctor in compatibility mode.
-Compatibility mode is activated by setting the `compat-mode` attribute and allows Asciidoctor to accept and apply the deprecated syntax and/or behavior.
-However, *not all deprecated syntax or behavior is available under the compatibility mode*.
+Visit #What's New# for a complete list of new Asciidoctor and AsciiDoc features.
 
-== Proposed Changes for Future Versions
+== Proposed changes for future versions
 
-[cols="15,20,30,5"]
+[cols="15,20,20,5,20"]
 |===
-|Feature |Deprecated |New |As of Version
+|Feature |Deprecated |New |As of Version |Notes
 
 |Delimited open block
 |pass:[--] +
@@ -125,28 +129,37 @@ open block content +
 pass:[--]
 |New syntax will allow for nested delimited open blocks
 |2.0
+|
 
 |Set backend
 |Set the backend from a document
-|Proposed: Backends can only be set in the CLI, environment, ...?
+|Backends can only be set in the CLI, environment, and API
 |2.0
+|
 
 |Link attributes
 |Set `linkattrs` to use link attribute syntax
 |`linkattrs` is set implicitly so link attributes are available automatically
 |2.0
+|
 
 |UI macros
 |Set `experimental` to use the UI macros
 |UI macros are available automatically
 |2.0
+|
 
 |Document roles
 |Roles are inherited; roles don't wrap the document
 |Roles aren't inherited; roles wrap the document
 |2.0
+|
 |===
 
-//*To minimize wordiness, on this page, any AsciiDoc and Asciidoctor syntax, commands, options, variables, classes, methods, etc., are collectively referred to as "`syntax`".*
+////
+== Compatibility mode
 
-//We highly recommend that you update your documents and extensions to use the new syntax.
+When it isn't feasibly to update your documents prior to upgrading Asciidoctor, you can run Asciidoctor in compatibility mode.
+Compatibility mode is activated by setting the `compat-mode` attribute and allows Asciidoctor to accept and apply the deprecated syntax and/or behavior.
+However, *not all deprecated syntax or behavior is available under the compatibility mode*.
+////

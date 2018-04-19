@@ -1,0 +1,9 @@
+If the Asciidoctor gem installed successfully, the `asciidoctor` command line interface (CLI) will be available on your PATH.
+To confirm that Asciidoctor is available, execute:
+
+ $ asciidoctor --version
+
+The following output should appear in your terminal:
+
+ Asciidoctor 1.5.7 [https://asciidoctor.org]
+ Runtime Environment (ruby 2.3.0p0 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)

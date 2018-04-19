@@ -1,6 +1,5 @@
 ////
 Table of blocks, block names, block delimiters, and their substitutions
-
 User Manual: Blocks
 ////
 

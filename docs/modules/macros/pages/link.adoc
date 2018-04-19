@@ -1,0 +1,161 @@
+= URLs and Links
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+um anchor: url
+url.adoc, included in:
+- user-manual: url
+- writers-guide: External links
+////
+
+A Uniform Resource Link (URL) represents the location of a resource on the web.
+Typical URLs contain a scheme, domain name, file name, and extension.
+
+#move image#
+//image::url.png[]
+
+// tag::basic[]
+Asciidoctor recognizes the following common schemes without the help of any markup.
+
+[#schemes]
+* http
+* https
+* ftp
+* irc
+* mailto
+* \email@email.com
+
+You can think of these like implicit macro names.
+Since the URL in the example below begins with a protocol (in this case _https_ followed by a colon), Asciidoctor will automatically turn it into a hyperlink when it is processed.
+
+[source]
+----
+include::{partialsdir}/ex-url.adoc[tag=base-co]
+----
+<1> The trailing period will not get caught up in the link.
+
+To prevent automatic linking of an URL, prepend it with a backslash (`\`).
+
+== Hide URI schemes
+
+If you prefer URLs to be shown without a visible scheme, set the `hide-uri-scheme` attribute in the document's header.
+
+[source]
+----
+:hide-uri-scheme:
+
+https://asciidoctor.org
+----
+
+When the hide-uri-scheme attribute is set, the above URL will render as follows:
+
+[source,xml]
+----
+<a href="https://asciidoctor.org">asciidoctor.org</a>
+----
+
+Note the absence of _http_ inside the `<a>` element.
+
+== Link text
+
+To attach a URL to text, enclose the text in square brackets at the end of the URL.
+
+[source]
+----
+include::{partialsdir}/ex-url.adoc[tag=irc]
+----
+// end::basic[]
+
+Additionally, you can format the linked text.
+
+[source]
+----
+include::{partialsdir}/ex-url.adoc[tag=text]
+----
+
+.Rendered URLs
+====
+include::{partialsdir}/ex-url.adoc[tag=base]
+====
+
+== The link macro
+
+// tag::link[]
+When a URL does not start with one of the <<schemes,common schemes>>, or the URL is not surrounded by word boundaries, you must use the `link` macro.
+The `link` macro is a stronger version of a URI macro, which you can think of like an unconstrained macro.
+The URL is preceded by `link:` and followed by square brackets.
+The square brackets may include optional link text.
+The URL is used for the text of the link if link text is not specified.
+If the `linkattrs` document attribute is set, the square brackets also accepts attributes, which allows a window name or role to be specified.
+
+.Anatomy of a link macro
+[source]
+----
+link:url[optional link text, optional target attribute, optional role attribute]
+----
+
+Let's consider a case where we need to use the link macro (instead of just a URI macro) to expand a link when it's not adjacent to a word boundary (i.e., unconstrained).
+
+[source]
+----
+include::{partialsdir}/ex-url.adoc[tag=unconstrained]
+----
+
+====
+include::{partialsdir}/ex-url.adoc[tag=unconstrained]
+====
+
+If we didn't use the `link:` prefix in this case, the URL macro would not be detected by the parser.
+// end::link[]
+
+[#complex-urls]
+.Troubleshooting Complex URLs
+****
+A URL may not display correctly when it contains characters such as underscores (`+_+`) or carets (`+^`).
+include::{partialsdir}/ts-url-format.adoc[tag=sb]
+****
+
+Next, we'll add a target and role to a link macro.
+
+// tag::attr[]
+[#link-macro-attributes]
+=== Link macro attributes
+
+Remember, when you use attributes in the link macro, you must also set the `linkattrs` document attribute in the header.
+Asciidoctor _does not_ parse attributes in the link macro by default.
+Once you've activated the `linkattrs` attribute, you can then specify the name of the target window using the `window` attribute.
+
+[source]
+----
+include::{partialsdir}/ex-url.adoc[tag=linkattrs-h]
+----
+
+====
+include::{partialsdir}/ex-url.adoc[tag=linkattrs]
+====
+
+Since `_blank` is the most common window name, we've introduced shorthand for it.
+Just end the link text with a caret (`+^+`):
+
+[source]
+----
+include::{partialsdir}/ex-url.adoc[tag=linkattrs-s]
+----
+
+CAUTION: If you use the caret syntax more than once in a single paragraph, you may need to escape the first occurrence with a backslash.
+
+When the `linkattrs` attribute is set, you can add a role (i.e., CSS class) to the link.
+
+[source]
+----
+include::{partialsdir}/ex-url.adoc[tag=css]
+----
+
+====
+include::{partialsdir}/ex-url.adoc[tag=css]
+====
+
+TIP: Links with attributes (including the subject and body segments on mailto links) are a feature unique to Asciidoctor.
+When they're enabled, you must surround the link text in double quotes if it contains a comma.
+// end::attr[]

@@ -69,4 +69,4 @@ include::{partialsdir}/ex-video.adoc[tag=you]
 include::{partialsdir}/ex-video.adoc[tag=vim]
 ----
 
-include::{partialsdir}/ref-table.adoc
+include::{partialsdir}/ref-table.adoc[]

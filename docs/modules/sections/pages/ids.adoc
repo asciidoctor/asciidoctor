@@ -1,4 +1,4 @@
-= Section IDs, Anchors, and Links
+= Section IDs, Anchors and Links
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
@@ -8,6 +8,7 @@ endif::[]
 New page, content taken from sections.adoc
 ////
 
+[#auto-id]
 == Auto-generated IDs
 
 // tag::autoid[]
@@ -19,7 +20,7 @@ The ID is derived from the section title as follows:
 * All characters are converted to lowercase.
 * The value of the `idprefix` attribute (`+_+` by default) is prepended.
 * Character references and invalid ID characters are replaced with the value of the `idseparator` attribute (`+_+` by default).
- ** Refer to the {url-ntname}[NT-Name] section of the XML specification for a list of valid ID characters.
+ ** Refer to the {url-ntname}[NT Name] section of the XML specification for a list of valid ID characters.
 * Repeating separator characters are consolidated.
 * If necessary, a sequence number is appended until the ID is unique within the document.
 
@@ -77,7 +78,7 @@ WARNING: If you disable auto-generated section IDs, and you don't assign a custo
 == Custom IDs
 
 // tag::custom-id[]
-You can assign a custom ID and reference text (i.e., label) to a section (see #anchordef#).
+You can assign a custom ID and reference text (i.e., label) to a section (see xref:attributes:id.adoc#anchor[anchor]).
 The custom ID is used in place of the auto-generated ID.
 This can be useful when you want to define a stable anchor for linking to a section using a cross reference.
 It also centralizes the reference text used to refer to that section.

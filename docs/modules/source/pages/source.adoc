@@ -1,4 +1,4 @@
-= Source Code Paragraphs and Blocks
+= Source Code Blocks
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
@@ -30,7 +30,6 @@ You can set this attribute in the document or from the CLI or API.
 //Others, like highlight.js and prettify, load the library at runtime from a CDN or from a custom URL or file path.
 
 If you set the attribute in the document, it _must_ be defined in the #document header#.
-// <<user-manual#doc-header,document header>>
 
 [source]
 ----
@@ -96,12 +95,10 @@ To apply highlighting to source code, you must add the `source` block style to a
 include::{partialsdir}/ex-src.adoc[tag=src-base-co]
 ....
 <1> An optional title can be added to the block.
-<2> An optional ID can be added to the block. See #anchordef#.
+<2> An optional ID can be added to the block. See xref:attributes:id.adoc#anchor[anchor].
 <3> Assign the block name `source` to the first position in the attribute list.
 <4> Assign a source language to the second position.
 <5> The source block name is typically assigned to listing and literal blocks.
-
-// <<anchordef>>
 
 .Result: Source block with title and syntax highlighting
 ====
@@ -129,9 +126,7 @@ If the majority of your source blocks use the same source language, you can set 
 include::{partialsdir}/ex-src.adoc[tag=src-lang]
 ....
 
-Additionally, you can use an #include directive# to insert source code into an AsciiDoc document directly from a file.
-
-// <<user-manual#include-directive,include directive>>
+Additionally, you can use an xref:directives:include-directive.adoc[include directive] to insert source code into an AsciiDoc document directly from a file.
 
 [listing]
 .Code block inserted from another file
@@ -142,7 +137,6 @@ include::{partialsdir}/ex-src.adoc[tag=src-inc]
 //TODO mention the use of AsciiDoc tags to include code snippets and the indent flag to reset indentation
 
 TIP: If you specify custom substitutions on the source block using the `subs` attribute, make sure to include the `specialcharacters` substitution if you want to preserve syntax highlighting.
-However, if you do plan to modify the substitutions, we recommend using #incremental substitutions# instead.
+However, if you do plan to modify the substitutions, we recommend using xref:subs:apply.adoc#incremental[incremental substitutions] instead.
 
-//<<incremental-substitutions,incremental substitutions>>
 // Highlight PHP sidebar was taken from end of page and made its own page

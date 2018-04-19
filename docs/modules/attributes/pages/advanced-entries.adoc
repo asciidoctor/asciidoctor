@@ -71,7 +71,7 @@ Complex AsciiDoc markup is not permitted in attribute values, such as:
 
 === Altering attribute entry substitutions
 
-If you want different substitutions to be applied to the value of an attribute entry, you can use the #pass-macros,inline pass macro#.
+If you want different substitutions to be applied to the value of an attribute entry, you can use the xref:subs:pass-macro.adoc[inline pass macro].
 The inline pass macro accepts a list of substitutions in the target slot, which can be used to control which substitutions are applied to the value.
 
 In order for the inline macro to work in this context, it must completely surround the attribute value.

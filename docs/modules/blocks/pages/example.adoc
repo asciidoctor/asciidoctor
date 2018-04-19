@@ -15,7 +15,4 @@ From example.adoc, included in:
 include::{partialsdir}/ex-example.adoc[tag=base]
 ----
 
-.Result: Example block
---
 include::{partialsdir}/ex-example.adoc[tag=base]
---

@@ -76,4 +76,4 @@ include::{partialsdir}/ex-admon.adoc[tag=para]
 include::{partialsdir}/ex-admon.adoc[tag=para]
 ====
 
-Learn more about using Font Awesome or custom icons with admonitions in the #icons,icons# section.
+Learn more about using Font Awesome or custom icons with admonitions in the xref:macros:icon.adoc[icons section].

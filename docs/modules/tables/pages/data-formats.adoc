@@ -96,7 +96,7 @@ include::{partialsdir}/ex-table-data.adoc[tag=csv]
 include::{partialsdir}/ex-table-data.adoc[tag=csv]
 
 This feature is particularly useful when you want to populate a table in your manuscript from data stored in a separate file.
-You can do so using the #include directive# between the table delimiters, as shown here:
+You can do so using the xref:directives:include-directive.adoc[include directive] between the table delimiters, as shown here:
 // <<user-manual#include-directive,include directive>>
 
 [source]

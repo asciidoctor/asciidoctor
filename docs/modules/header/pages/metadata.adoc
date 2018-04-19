@@ -48,4 +48,4 @@ You can override this behavior by setting the `title` attribute in the document 
 == Custom metadata, styles and functions
 
 You can add content, such as custom metadata, stylesheet, and script information, to the header of the output document using docinfo ("`document information`") files.
-The #docinfo-file,docinfo file# section details what these files can contain and how to use them.
+The xref:publish:docinfo.adoc[docinfo file] section details what these files can contain and how to use them.

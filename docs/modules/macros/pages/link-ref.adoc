@@ -1,0 +1,35 @@
+= Link Attributes Reference
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+//sum-url.adoc
+
+[cols="1l,1,2,2"]
+|===
+|Attribute |Value(s) |Example Syntax |Comments
+
+|linkattrs
+|
+|`:linkattrs:`
+|Must be set in the header to parse link macro attributes.
+
+|window
+|blank
+|+++http://discuss.asciidoctor.org[Discuss Asciidoctor, window="_blank"]+++
+|The blank value can also be specified using `^`. Requires `linkattrs`.
+
+|window
+|+^+
+|+++http://example.org["Google, Yahoo, Bing^"]+++ and +++http://discuss.asciidoctor.org[Discuss Asciidoctor^]+++
+|Requires `linkattrs`.
+
+|role
+|CSS classes available to inline elements
+|+++http://discuss.asciidoctor.org[Discuss Asciidoctor, role="teal"]+++
+|Requires `linkattrs`.
+
+|id
+|name of element, custom link text
+|+++<<section-title,cross reference text>>+++
+|Applies to cross references.
+|===

@@ -68,4 +68,4 @@ Alternatively, you can preserve line breaks throughout your whole document by ad
 include::{partialsdir}/ex-text.adoc[tag=hb-attr]
 ----
 
-You can also preserve line breaks using #literal blocks#, xref:source:listing-block.adoc[listing blocks], and xref:excerpts:verses.adoc[verses].
+You can also preserve line breaks using xref:source:literal.adoc[literal blocks], xref:source:listing.adoc[listing blocks], and xref:verse.adoc[verses].

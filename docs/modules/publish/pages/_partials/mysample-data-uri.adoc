@@ -1,4 +1,5 @@
 = My First Experience with the Dangers of Documentation
+:url-wolpertinger: https://en.wikipedia.org/wiki/Wolpertinger
 :imagesdir: myimages
 :data-uri:
 
@@ -12,4 +13,5 @@ We're plagued by Wolpertingers.
 [.left.text-center]
 image::wolpertinger.jpg[Wolpertinger]
 
-You may not be familiar with these https://en.wikipedia.org/wiki/Wolpertinger[ravenous beasts], but, trust me, they'll eat your shorts and suck the loops from your code.
+You may not be familiar with these {url-wolpertinger}[ravenous beasts],
+but, trust me, they'll eat your shorts and suck the loops from your code.

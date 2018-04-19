@@ -33,7 +33,7 @@ This requirement is marked in the table below.
 * If you set an attribute in the body (anywhere after the document header), the attribute is visible from the point it is set until it is unset (assuming it is not locked as a result of being set from the command line or API).
 
 NOTE: Several attributes from AsciiDoc Python have been deprecated in Asciidoctor and therefore are not included in this section.
-See #migrating-from-asciidoc-python# if you are updating an older document.
+See xref:migrate:from-asciidoc-python.adoc[Migrating from AsciiDoc Python to Asciidoctor] if you are updating an older document.
 
 [#builtin-attributes-table]
 // tag::table[]
