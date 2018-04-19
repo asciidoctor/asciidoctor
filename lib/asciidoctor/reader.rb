@@ -196,7 +196,7 @@ class Reader
   def peek_lines num = nil, direct = false
     old_look_ahead = @look_ahead
     result = []
-    (num || ::Float::MAX.to_i).times do
+    (num || MAX_INTEGER).times do
       if (line = direct ? shift : read_line)
         result << line
       else
@@ -861,12 +861,7 @@ class PreprocessorReader < Reader
           parsed_attributes['lines'].split(DataDelimiterRx).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..', 2).map {|it| it.to_i }
-              if to == -1
-                inc_linenos << from
-                inc_linenos << 1.0/0.0
-              else
-                inc_linenos.concat ::Range.new(from, to).to_a
-              end
+              inc_linenos += to < 0 ? [from, MAX_INTEGER] : ::Range.new(from, to).to_a
             else
               inc_linenos << linedef.to_i
             end
@@ -895,8 +890,7 @@ class PreprocessorReader < Reader
           open(inc_path, 'r') do |f|
             f.each_line do |l|
               inc_lineno += 1
-              select = inc_linenos[0]
-              if ::Float === select && select.infinite?
+              if (select = inc_linenos[0]) == MAX_INTEGER
                 # NOTE record line where we started selecting
                 inc_offset ||= inc_lineno
                 inc_lines << l
