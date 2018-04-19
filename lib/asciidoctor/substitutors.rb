@@ -1049,7 +1049,7 @@ module Substitutors
         # handles: path#, path.adoc#, path#id, path.adoc#id, or path (from path.adoc)
         elsif path
           # the referenced path is this document, or its contents has been included in this document
-          if @document.attributes['docname'] == path || @document.catalog[:includes].include?(path)
+          if @document.attributes['docname'] == path || @document.catalog[:includes][path]
             if fragment
               refid, path, target = fragment, nil, %(##{fragment})
               if logger.debug?

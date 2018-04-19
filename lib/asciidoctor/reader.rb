@@ -912,7 +912,10 @@ class PreprocessorReader < Reader
         end
         shift
         # FIXME not accounting for skipped lines in reader line numbering
-        push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes if inc_offset
+        if inc_offset
+          parsed_attributes['partial-option'] = true
+          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes
+        end
       elsif inc_tags
         inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
         if inc_tags.key? '**'
@@ -974,8 +977,11 @@ class PreprocessorReader < Reader
           logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
         end
         shift
-        # FIXME not accounting for skipped lines in reader line numbering
-        push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes if inc_offset
+        if inc_offset
+          parsed_attributes['partial-option'] = true unless base_select && wildcard && inc_tags.empty?
+          # FIXME not accounting for skipped lines in reader line numbering
+          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes
+        end
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
@@ -1077,7 +1083,8 @@ class PreprocessorReader < Reader
     end
 
     if path
-      @includes << Helpers.rootname(@path = path)
+      @path = path
+      @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true if @process_lines
     else
       @path = '<stdin>'
     end

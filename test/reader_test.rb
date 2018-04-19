@@ -589,6 +589,18 @@ include::fixtures/include-file.asciidoc[]
         doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         output = doc.convert
         assert_match(/included content/, output)
+        assert doc.catalog[:includes]['fixtures/include-file']
+      end
+
+      test 'should not track include in catalog for non-AsciiDoc include files' do
+        input = <<-EOS
+----
+include::fixtures/circle.svg[]
+----
+        EOS
+
+        doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        assert doc.catalog[:includes].empty?
       end
 
       test 'include directive should resolve file with spaces in name' do

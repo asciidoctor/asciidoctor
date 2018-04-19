@@ -273,7 +273,7 @@ class Document < AbstractBlock
         :images => [],
         :indexterms => [],
         :callouts => Callouts.new,
-        :includes => ::Set.new,
+        :includes => {},
       }
       # copy attributes map and normalize keys
       # attribute overrides are attributes that can only be set from the commandline

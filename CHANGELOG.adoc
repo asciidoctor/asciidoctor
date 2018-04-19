@@ -55,6 +55,7 @@ Bug fixes::
   * using the shorthand syntax to set block attributes (id, roles, options) doesn't reset block style (#2174)
   * fix typo in gemspec that removed README and CONTRIBUTING files from the generated gem (PR #2650) (*@aerostitch*)
   * don't turn bare URI scheme (no host) into a link (#2609, PR #2611)
+  * don't convert inter-document xref to internal anchor unless entire target file is included into current file (#2200)
   * fix em dash replacement in manpage converter (#2604, PR #2607)
   * don't output e-mail address twice when replacing bare e-mail address in manpage output (#2654, PR #2665)
   * enforce that absolute start path passed to PathResolver#system_path is inside of jail path (#2642, PR #2644)
