@@ -115,13 +115,14 @@ module Asciidoctor
       end
 
       result << '</head>'
-      body_attrs = []
-      body_attrs << %(id="#{node.id}") if node.id
+      body_attrs = node.id ? [%(id="#{node.id}")] : []
       if (sectioned = node.sections?) && (node.attr? 'toc-class') && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
-        body_attrs << %(class="#{node.doctype} #{node.attr 'toc-class'} toc-#{node.attr 'toc-position', 'header'}")
+        classes = [node.doctype, (node.attr 'toc-class'), %(toc-#{node.attr 'toc-position', 'header'})]
       else
-        body_attrs << %(class="#{node.doctype}")
+        classes = [node.doctype]
       end
+      classes << (node.attr 'docrole') if node.attr? 'docrole'
+      body_attrs << %(class="#{classes * ' '}")
       body_attrs << %(style="max-width: #{node.attr 'max-width'};") if node.attr? 'max-width'
       result << %(<body #{body_attrs * ' '}>)
 

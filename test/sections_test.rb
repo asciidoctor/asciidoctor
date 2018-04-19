@@ -466,8 +466,10 @@ content
       doc = document_from_string input
       assert_empty doc.blocks[0].attributes
       output = doc.convert
+      assert_css '#idname', output, 1
       assert_css 'body#idname', output, 1
-      assert_css '.rolename', output, 0
+      assert_css '.rolename', output, 1
+      assert_css 'body.rolename', output, 1
     end
   end
 
