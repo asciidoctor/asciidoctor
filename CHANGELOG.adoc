@@ -88,6 +88,7 @@ Bug fixes::
 Improvements / Refactoring::
 
   * log a warning message if an unterminated delimited block is detected (#1133, PR #2612)
+  * log a warning when nested section is found inside special section that doesn't support nested sections (#2433, PR #2672)
   * resolve / expand parent references in start path passed to PathResolver#system_path (#2642, PR #2644)
   * update PathResolver#expand_path to resolve parent references (#2642, PR #2644)
   * allow start path passed to PathResolver#system_path to be outside jail if target brings resolved path back inside jail (#2642, PR #2644)
