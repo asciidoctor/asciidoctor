@@ -127,7 +127,7 @@ AsciidoctorはLinux, OS X (Mac)とWindowsで動き, 下記の {uri-ruby}[Ruby]�
 
 [CAUTION]
 ====
-もし非英語環境のWindowsを使っているなら, Asciidoctorを起動した時に`Encoding::UndefinedConversionError`に遭遇するでしょう.
+もし非英語環境のWindowsを使っているなら, Asciidoctorを起動した時に `Encoding::UndefinedConversionError` に遭遇するでしょう.
 これを解決するには使っているコンソールの有効なコードページをUTF-8:
 
  chcp 65001
@@ -148,7 +148,7 @@ TIP: Linuxパッケージマネージャを用いてインストールするこ�
 
 === (a) gem install
 
-ターミナルを開, 入力しましょう (先頭の`$`は除く):
+ターミナルを開き, 入力しましょう (先頭の`$`は除く):
 
  $ gem install asciidoctor
 
