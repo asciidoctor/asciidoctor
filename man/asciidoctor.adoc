@@ -89,7 +89,7 @@ This option may be specified more than once.
 
 *-n, --section-numbers*::
   Auto-number section titles.
-  Synonym for *--attribute numbered*.
+  Synonym for *--attribute sectnums*.
 
 *-o, --out-file*=_OUT_FILE_::
   Write output to file _OUT_FILE_.
