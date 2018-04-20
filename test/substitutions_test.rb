@@ -766,6 +766,12 @@ context 'Substitutions' do
           para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'rel=nofollow should be added to an image with a link when the nofollow option is set' do
+      para = block_from_string 'image:tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,opts=nofollow]'
+      assert_equal %{<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger" rel="nofollow"><img src="tiger.png" alt="Tiger"></a></span>},
+          para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'a multi-line image macro with text and dimensions should be interpreted as an image with alt text and dimensions' do
       para = block_from_string(%(image:tiger.png[Another\nAwesome\nTiger, 200,\n100]))
       assert_equal %{<span class="image"><img src="tiger.png" alt="Another Awesome Tiger" width="200" height="100"></span>},

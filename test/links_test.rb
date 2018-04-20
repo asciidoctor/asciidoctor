@@ -236,6 +236,10 @@ context 'Links' do
     assert_xpath '//a[@href="http://google.com"][@rel="noopener"]', result, 0
   end
 
+  test 'rel=nofollow should be added to a link when the nofollow option is set' do
+    assert_xpath '//a[@href="http://google.com"][@target="name"][@rel="nofollow noopener"]', render_embedded_string('http://google.com[Google,window=name,opts="nofollow,noopener"]', :attributes => {'linkattrs' => ''}), 1
+  end
+
   test 'id attribute on link are processed when linkattrs is set' do
     assert_xpath '//a[@href="http://google.com"][@id="link-1"]', render_embedded_string('http://google.com[Google, id="link-1"]', :attributes => {'linkattrs' => ''}), 1
   end
