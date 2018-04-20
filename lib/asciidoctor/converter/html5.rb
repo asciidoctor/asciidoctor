@@ -557,9 +557,8 @@ Your browser does not support the audio tag.
         end
       end
       img ||= %(<img src="#{node.image_uri target}" alt="#{encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
-      if node.attr? 'link'
-        window_attr = %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window'
-        img = %(<a class="image" href="#{node.attr 'link'}"#{window_attr}>#{img}</a>)
+      if node.attr? 'link', nil, false
+        img = %(<a class="image" href="#{node.attr 'link'}"#{(append_anchor_constraint_attrs node).join}>#{img}</a>)
       end
       id_attr = node.id ? %( id="#{node.id}") : ''
       classes = ['imageblock', node.role].compact
@@ -1056,8 +1055,7 @@ Your browser does not support the video tag.
           attrs << %( class="#{role}")
         end
         attrs << %( title="#{node.attr 'title'}") if node.attr? 'title', nil, false
-        attrs << %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window', nil, false
-        %(<a href="#{node.target}"#{attrs.join}>#{node.text}</a>)
+        %(<a href="#{node.target}"#{(append_anchor_constraint_attrs node, attrs).join}>#{node.text}</a>)
       when :bibref
         # NOTE technically node.text should be node.reftext, but subs have already been applied to text
         %(<a id="#{node.id}"></a>#{node.text})
@@ -1123,9 +1121,8 @@ Your browser does not support the video tag.
         end
         img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{encode_quotes node.alt}"#{attrs}#{@void_element_slash}>)
       end
-      if node.attr? 'link'
-        window_attr = %( target="#{window = node.attr 'window'}"#{window == '_blank' || (node.option? 'noopener') ? ' rel="noopener"' : ''}) if node.attr? 'window'
-        img = %(<a class="image" href="#{node.attr 'link'}"#{window_attr}>#{img}</a>)
+      if node.attr? 'link', nil, false
+        img = %(<a class="image" href="#{node.attr 'link'}"#{(append_anchor_constraint_attrs node).join}>#{img}</a>)
       end
       class_attr_val = (role = node.role) ? %(#{type} #{role}) : type
       style_attr = (node.attr? 'float') ? %( style="float: #{node.attr 'float'}") : ''
@@ -1192,6 +1189,17 @@ Your browser does not support the video tag.
 <div class="sectionbody">
 <p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
 </div>)
+    end
+
+    def append_anchor_constraint_attrs node, attrs = []
+      rel = 'nofollow' if node.option? 'nofollow'
+      if node.attr? 'window', nil, false
+        attrs << %( target="#{window = node.attr 'window'}")
+        attrs << (rel ? %( rel="#{rel} noopener") : ' rel="noopener"') if window == '_blank' || (node.option? 'noopener')
+      elsif rel
+        attrs << %( rel="#{rel}")
+      end
+      attrs
     end
 
     def read_svg_contents node, target

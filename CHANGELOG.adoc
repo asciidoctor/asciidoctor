@@ -37,6 +37,7 @@ Enhancements::
   * add syntax for adding hard line breaks in block AsciiMath equations (#2497, PR #2579) (*@dimztimz*)
   * add positioning option to sectanchors attribute (before or after) (#2485, PR #2486)
   * allow table stripes to be configured using stripe attribute or stripe roles on table; valid values are even, odd, all, and none (#1365, PR #2588)
+  * allow nofollow rel property to be added to links and linked images by setting the nofollow option (#2605, PR #2692)
   * assign Document#source_location when sourcemap option is enabled (#2478, PR #2488)
   * allow local include to be flagged as optional by setting optional option (#2389, PR #2413)
   * allow attribute name to contain word characters as defined by Unicode (#2376, PR #2393)
@@ -106,6 +107,7 @@ Improvements / Refactoring::
   * allow paragraph to masquerade as open block (PR #2412)
   * move callouts into document catalog (PR #2394)
   * document ID defined in block attribute line takes precedence over ID defined inside document title line
+  * don't look for link and window attributes on document when resolving these attributes for an image
   * when linkattrs is set, only parse attributes in link macro if equals follows first comma
   * skip line comments in name section of manpage (#2584, PR #2585)
   * always activate extension registry passed to processor (PR #2379)
