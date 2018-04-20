@@ -178,7 +178,7 @@ Refer to the *Asciidoctor* issue tracker at https://github.com/asciidoctor/ascii
 
 == RESOURCES
 
-*Project web site:* http://asciidoctor.org
+*Project web site:* https://asciidoctor.org
 
 *Git source repository on GitHub:* https://github.com/asciidoctor/asciidoctor
 
