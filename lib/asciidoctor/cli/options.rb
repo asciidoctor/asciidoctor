@@ -28,6 +28,7 @@ module Asciidoctor
         self[:base_dir] = options[:base_dir]
         self[:source_dir] = options[:source_dir] || nil
         self[:destination_dir] = options[:destination_dir] || nil
+        self[:failure_level] = ::Logger::Severity::FATAL
         self[:trace] = false
         self[:timings] = false
       end
@@ -118,6 +119,10 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-rLIBRARY', '--require LIBRARY', 'require the specified library before executing the processor (using require)',
               'may be specified more than once') do |path|
             (self[:requires] ||= []).concat(path.split ',')
+          end
+          opts.on('--failure-level LEVEL', %w(warning WARNING error ERROR), 'set minimum logging level that triggers a non-zero exit code: [WARN, ERROR] (default: FATAL)') do |level|
+            level = 'WARN' if (level = level.upcase) == 'WARNING'
+            self[:failure_level] = ::Logger::Severity.const_get level
           end
           opts.on('-q', '--quiet', 'suppress warnings (default: false)') do |verbose|
             self[:verbose] = 0

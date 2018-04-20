@@ -23,6 +23,7 @@ Enhancements::
   * add NullLogger to prevent messages from being logged (#44, PR #2660)
   * log message containing source location / cursor as an object; provides more context (#44, PR #2660)
   * add :logger option to API to set logger instance (#44, PR #2660)
+  * add --failure-level=LEVEL option to CLI to force non-zero exit code if specified logging level is reached (#2003, PR #2674)
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
   * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI (#642, PR #2649)
   * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font) (#642, PR #2649)
