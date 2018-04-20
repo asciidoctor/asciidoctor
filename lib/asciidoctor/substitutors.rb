@@ -804,11 +804,11 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless text.empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if (doc_attrs.key? 'linkattrs') && ((text.start_with? '"') || ((text.include? ',') && (text.include? '=')))
+          if (text.start_with? '"') || ((comma_idx = text.index ',') && (text.index '=', comma_idx))
             attrs = parse_attributes text, []
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
             text = attrs[1] || ''
-          end
+          end if doc_attrs.key? 'linkattrs'
 
           # TODO enable in Asciidoctor 1.6.x
           # support pipe-separated text and title
@@ -857,7 +857,7 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless (text = m[3]).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if (doc_attrs.key? 'linkattrs') && ((text.start_with? '"') || ((text.include? ',') && (mailto || (text.include? '='))))
+          if (text.start_with? '"') || ((comma_idx = text.index ',') && (mailto || (text.index '=', comma_idx)))
             attrs = parse_attributes text, []
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
             if mailto
@@ -870,7 +870,7 @@ module Substitutors
               end
             end
             text = attrs[1] || ''
-          end
+          end if doc_attrs.key? 'linkattrs'
 
           # TODO enable in Asciidoctor 1.6.x
           # support pipe-separated text and title

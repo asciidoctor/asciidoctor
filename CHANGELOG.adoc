@@ -105,6 +105,7 @@ Improvements / Refactoring::
   * allow paragraph to masquerade as open block (PR #2412)
   * move callouts into document catalog (PR #2394)
   * document ID defined in block attribute line takes precedence over ID defined inside document title line
+  * when linkattrs is set, only parse attributes in link macro if equals follows first comma
   * skip line comments in name section of manpage (#2584, PR #2585)
   * always activate extension registry passed to processor (PR #2379)
   * skip extension registry activation if no groups are registered (PR #2373)
