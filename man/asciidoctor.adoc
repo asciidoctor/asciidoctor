@@ -65,7 +65,7 @@ This option may be specified more than once.
   The _inline_ document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element.
   Defaults to _article_.
 
-=== Rendering Control
+=== Document Conversion
 
 *-D, --destination-dir*=_DIR_::
   Destination output directory.
