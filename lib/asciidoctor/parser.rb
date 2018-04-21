@@ -1267,31 +1267,18 @@ class Parser
       has_text = !match[3].nil_or_empty?
     else
       # Create list item using first line as the text of the list item
-      text = match[2]
-      checkbox = false
-      if list_type == :ulist && text.start_with?('[')
-        if text.start_with?('[ ] ')
-          checkbox = true
-          checked = false
-          text = text[3..-1].lstrip
-        elsif text.start_with?('[x] ', '[*] ')
-          checkbox = true
-          checked = true
-          text = text[3..-1].lstrip
-        end
-      end
-      list_item = ListItem.new(list_block, text)
+      list_item = ListItem.new(list_block, (text = match[2]))
+      list_item.marker = (sibling_trait ||= resolve_list_marker(list_type, match[1], list_block.items.size, true, reader))
+      has_text = true
 
-      if checkbox
-        # FIXME checklist never makes it into the options attribute
+      if list_type == :ulist && text.start_with?('[') && text.start_with?('[ ] ', '[x] ', '[*] ')
+        # FIXME next_block wipes out update to options attribute
+        #list_block.set_option 'checklist' unless list_block.attributes['checklist-option']
         list_block.attributes['checklist-option'] = ''
         list_item.attributes['checkbox'] = ''
-        list_item.attributes['checked'] = '' if checked
+        list_item.attributes['checked'] = '' unless text.start_with? '[ '
+        list_item.text = text.slice(4, text.length)
       end
-
-      sibling_trait ||= resolve_list_marker(list_type, match[1], list_block.items.size, true, reader)
-      list_item.marker = sibling_trait
-      has_text = true
     end
 
     # first skip the line with the marker / term

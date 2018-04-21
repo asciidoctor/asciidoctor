@@ -4411,7 +4411,17 @@ context 'Checklists' do
 - plain
     EOS
 
-    output = render_embedded_string input
+    doc = document_from_string input
+    checklist = doc.blocks[0]
+    assert checklist.option?('checklist')
+    #assert_equal 'checklist', checklist.attributes['options']
+    assert checklist.items[0].attr?('checkbox')
+    refute checklist.items[0].attr?('checked')
+    assert checklist.items[1].attr?('checkbox')
+    assert checklist.items[1].attr?('checked')
+    refute checklist.items[4].attr?('checkbox')
+
+    output = doc.convert :header_footer => false
     assert_css '.ulist.checklist', output, 1
     assert_xpath %((/*[@class="ulist checklist"]/ul/li)[1]/p[text()="#{decode_char 10063} todo"]), output, 1
     assert_xpath %((/*[@class="ulist checklist"]/ul/li)[2]/p[text()="#{decode_char 10003} done"]), output, 1
@@ -4438,12 +4448,17 @@ context 'Checklists' do
     input = <<-EOS
 :icons: font
 
-[options="interactive"]
+[%interactive]
 - [ ] todo
 - [x] done
     EOS
 
-    output = render_embedded_string input
+    doc = document_from_string input
+    checklist = doc.blocks[0]
+    assert checklist.option?('checklist')
+    assert checklist.option?('interactive')
+
+    output = doc.convert :header_footer => false
     assert_css '.ulist.checklist', output, 1
     assert_css '.ulist.checklist li input[type="checkbox"]', output, 2
     assert_css '.ulist.checklist li input[type="checkbox"][disabled]', output, 0
