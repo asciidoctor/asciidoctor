@@ -956,6 +956,17 @@ include::fixtures/include-file.asciidoc[tag=snippetA]
         refute_match(/included content/, output)
       end
 
+      test 'should warn if tag specified in include directive is missing' do
+        input = <<-EOS
+include::fixtures/include-file.asciidoc[tag=no-such-tag]
+        EOS
+
+        using_memory_logger do |logger|
+          render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          assert_message logger, :WARN, '~<stdin>: line 1: tag \'no-such-tag\' not found in include file', Hash
+        end
+      end
+
       test 'include directive supports selecting lines by multiple tags' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
@@ -966,6 +977,17 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         assert_match(/snippetB content/, output)
         refute_match(/non-tagged content/, output)
         refute_match(/included content/, output)
+      end
+
+      test 'should warn if tags specified in include directive are missing' do
+        input = <<-EOS
+include::fixtures/include-file.asciidoc[tags=no-such-tag;another-missing-tag]
+        EOS
+
+        using_memory_logger do |logger|
+          render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          assert_message logger, :WARN, '~<stdin>: line 1: tags \'no-such-tag, another-missing-tag\' not found in include file', Hash
+        end
       end
 
       test 'include directive supports selecting lines by tag in language that uses circumfix comments' do

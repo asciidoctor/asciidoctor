@@ -969,7 +969,7 @@ class PreprocessorReader < Reader
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
-          logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
+          logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags.join ', '}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
         end
         shift
         if inc_offset
