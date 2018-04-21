@@ -1098,6 +1098,7 @@ class Parser
   # reader    - The Reader from which to retrieve the outline list
   # list_type - A Symbol representing the list type (:olist for ordered, :ulist for unordered)
   # parent    - The parent Block to which this outline list belongs
+  # style     - The block style assigned to this list (optional, default: nil)
   #
   # Returns the Block encapsulating the parsed outline (unordered or ordered) list
   def self.next_item_list(reader, list_type, parent)
@@ -1165,6 +1166,25 @@ class Parser
       found = true
     } if text.include? '<'
     found
+  end
+
+  # Internal: Catalog a matched inline anchor.
+  #
+  # id       - The String id of the anchor
+  # reftext  - The optional String reference text of the anchor
+  # node     - The AbstractNode parent node of the anchor node
+  # location - The source location (file and line) where the anchor was found
+  # doc      - The document to which the node belongs; computed from node if not specified
+  #
+  # Returns nothing
+  def self.catalog_inline_anchor id, reftext, node, location, doc = nil
+    doc ||= node.document
+    reftext = doc.sub_attributes reftext if reftext && (reftext.include? ATTR_REF_HEAD)
+    unless doc.register :refs, [id, (Inline.new node, :anchor, reftext, :type => :ref, :id => id), reftext]
+      location = location.cursor if Reader === location
+      logger.warn message_with_context %(id assigned to anchor already in use: #{id}), :source_location => location
+    end
+    nil
   end
 
   # Internal: Catalog any inline anchors found in the text (but don't convert)
@@ -1253,16 +1273,20 @@ class Parser
   # reader        - The Reader from which to retrieve the next list item
   # list_block    - The parent list Block of this ListItem. Also provides access to the list type.
   # match         - The match Array which contains the marker and text (first-line) of the ListItem
-  # sibling_trait - The list marker or the Regexp to match a sibling item
+  # sibling_trait - The list marker or the Regexp to match a sibling item (optional, default: nil)
+  # style         - The block style assigned to this list (optional, default: nil)
   #
   # Returns the next ListItem or ListItem pair (depending on the list type)
   # for the parent list Block.
   def self.next_list_item(reader, list_block, match, sibling_trait = nil)
     if (list_type = list_block.context) == :dlist
       dlist = true
-      has_text = true if (text = match[3])
-      list_term = ListItem.new(list_block, match[1])
-      list_item = ListItem.new(list_block, text)
+      list_term = ListItem.new(list_block, (term_text = match[1]))
+      if term_text.start_with?('[[') && LeadingInlineAnchorRx =~ term_text
+        catalog_inline_anchor $1, ($2 || $'.lstrip), list_term, reader
+      end
+      has_text = true if (item_text = match[3])
+      list_item = ListItem.new(list_block, item_text)
       if list_block.document.sourcemap
         list_term.source_location = reader.cursor
         if has_text
@@ -1273,17 +1297,21 @@ class Parser
       end
     else
       has_text = true
-      list_item = ListItem.new(list_block, (text = match[2]))
+      list_item = ListItem.new(list_block, (item_text = match[2]))
       list_item.source_location = reader.cursor if list_block.document.sourcemap
       if list_type == :ulist
         list_item.marker = (sibling_trait ||= match[1])
-        if text.start_with?('[') && text.start_with?('[ ] ', '[x] ', '[*] ')
-          # FIXME next_block wipes out update to options attribute
-          #list_block.set_option 'checklist' unless list_block.attributes['checklist-option']
-          list_block.attributes['checklist-option'] = ''
-          list_item.attributes['checkbox'] = ''
-          list_item.attributes['checked'] = '' unless text.start_with? '[ '
-          list_item.text = text.slice(4, text.length)
+        if item_text.start_with?('[')
+          if item_text.start_with?('[ ] ', '[x] ', '[*] ')
+            # FIXME next_block wipes out update to options attribute
+            #list_block.set_option 'checklist' unless list_block.attributes['checklist-option']
+            list_block.attributes['checklist-option'] = ''
+            list_item.attributes['checkbox'] = ''
+            list_item.attributes['checked'] = '' unless item_text.start_with? '[ '
+            list_item.text = item_text.slice(4, item_text.length)
+          elsif item_text.start_with?('[[') && LeadingInlineAnchorRx =~ item_text
+            catalog_inline_anchor $1, $2, list_item, reader
+          end
         end
       elsif list_type == :olist
         list_item.marker = (sibling_trait ||= resolve_ordered_list_marker(match[1], list_block.items.size, true, reader))

@@ -700,6 +700,26 @@ B. And it ends here.
       assert_xpath '//ol', output, 1
       assert_xpath '//ol/li', output, 2
     end
+
+    test 'should discover anchor at start of list item text and register it as a reference' do
+      input = <<-EOS
+The highest peak in the Front Range is <<grays-peak>>, which tops <<mount-evans>> by just a few feet.
+
+* [[mount-evans,Mount Evans]]At 14,271 feet, Mount Evans is the highest summit of the Chicago Peaks in the Front Range of the Rocky Mountains.
+* [[grays-peak,Grays Peak]]
+Grays Peak rises to 14,278 feet, making it the highest summit in the Front Range of the Rocky Mountains.
+* Longs Peak is a 14,259-foot high, prominent mountain summit in the northern Front Range of the Rocky Mountains.
+* Pikes Peak is the highest summit of the southern Front Range of the Rocky Mountains at 14,115 feet.
+      EOS
+
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('mount-evans')
+      assert refs.key?('grays-peak')
+      output = doc.convert :header_footer => false
+      assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
+      assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
+    end
   end
 
   context "Nested lists" do
@@ -2102,16 +2122,24 @@ def2
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "element with anchor" do
+    test 'should discover anchor at start of description term text and register it as a reference' do
       input = <<-EOS
-[[term1]]term1:: def1
-[[term2]]term2:: def2
+The highest peak in the Front Range is <<grays-peak>>, which tops <<mount-evans>> by just a few feet.
+
+[[mount-evans,Mount Evans]]Mount Evans:: 14,271 feet
+[[grays-peak]]Grays Peak:: 14,278 feet
       EOS
-      output = render_string input
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('mount-evans')
+      assert refs.key?('grays-peak')
+      output = doc.convert :header_footer => false
+      assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
+      assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
       assert_xpath '//dl', output, 1
       assert_xpath '//dl/dt', output, 2
-      assert_xpath '(//dl/dt)[1]/a[@id = "term1"]', output, 1
-      assert_xpath '(//dl/dt)[2]/a[@id = "term2"]', output, 1
+      assert_xpath '(//dl/dt)[1]/a[@id="mount-evans"]', output, 1
+      assert_xpath '(//dl/dt)[2]/a[@id="grays-peak"]', output, 1
     end
 
     test "missing space before term does not produce description list" do

@@ -237,7 +237,8 @@ class Table::Cell < AbstractNode
         cell_style = attributes['style'] || cell_style unless in_header_row
         update_attributes attributes
       end
-      if (asciidoc = cell_style == :asciidoc)
+      if cell_style == :asciidoc
+        asciidoc = true
         inner_document_cursor = opts[:cursor]
         if (cell_text = cell_text.rstrip).start_with? LF
           lines_advanced = 1
@@ -252,6 +253,7 @@ class Table::Cell < AbstractNode
         # QUESTION should we use same logic as :asciidoc cell? strip leading space if text doesn't start with newline?
         cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF
       else
+        normal_psv = true
         cell_text = cell_text.strip
       end
     else
@@ -281,6 +283,9 @@ class Table::Cell < AbstractNode
     elsif literal
       @subs = BASIC_SUBS
     else
+      if normal_psv && (cell_text.start_with? '[[') && LeadingInlineAnchorRx =~ cell_text
+        Parser.catalog_inline_anchor $1, $2, self, opts[:cursor], @document
+      end
       @subs = NORMAL_SUBS
     end
     @text = cell_text
@@ -651,6 +656,5 @@ class Table::ParserContext
   def advance
     @linenum += 1
   end
-
 end
 end

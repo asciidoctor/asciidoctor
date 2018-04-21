@@ -1150,6 +1150,31 @@ content
       assert_xpath '//a[@href="#_more"][text()="More"]', result, 1
     end
 
+    test 'should discover anchor at start of cell and register it as a reference' do
+      input = <<-EOS
+The highest peak in the Front Range is <<grays-peak>>, which tops <<mount-evans>> by just a few feet.
+
+[cols="1s,1"]
+|===
+|[[mount-evans,Mount Evans]]Mount Evans
+|14,271 feet
+
+h|[[grays-peak,Grays Peak]]
+Grays Peak
+|14,278 feet
+|===
+      EOS
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('mount-evans')
+      assert refs.key?('grays-peak')
+      output = doc.convert :header_footer => false
+      assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
+      assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
+      assert_xpath '(//table/tbody/tr)[1]//td//a[@id="mount-evans"]', output, 1
+      assert_xpath '(//table/tbody/tr)[2]//th//a[@id="grays-peak"]', output, 1
+    end
+
     test 'footnotes should not be shared between an AsciiDoc table cell and the main document' do
       input = <<-EOS
 |===
