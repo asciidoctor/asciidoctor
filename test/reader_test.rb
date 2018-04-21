@@ -981,12 +981,14 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
 
       test 'should warn if tags specified in include directive are missing' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[tags=no-such-tag;another-missing-tag]
+include::fixtures/include-file.asciidoc[tags=no-such-tag-b;no-such-tag-a]
         EOS
 
         using_memory_logger do |logger|
           render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
-          assert_message logger, :WARN, '~<stdin>: line 1: tags \'no-such-tag, another-missing-tag\' not found in include file', Hash
+          # NOTE Ruby 1.8 swaps the order of the list for some silly reason
+          expected_tags = ::RUBY_MIN_VERSION_1_9 ? 'no-such-tag-b, no-such-tag-a' : 'no-such-tag-a, no-such-tag-b'
+          assert_message logger, :WARN, %(~<stdin>: line 1: tags '#{expected_tags}' not found in include file), Hash
         end
       end
 
