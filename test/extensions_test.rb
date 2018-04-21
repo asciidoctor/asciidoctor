@@ -1223,6 +1223,7 @@ content
             process do |parent, target, attrs|
               opts = (level = attrs.delete 'level') ? { :level => level.to_i } : {}
               attrs['id'] = false if attrs['id'] == 'false'
+              parent = parent.parent if parent.context == :preamble
               sect = create_section parent, 'Section Title', attrs, opts
               nil
             end
