@@ -971,12 +971,13 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
       test 'include directive supports tagged selection in language that uses circumfix comments' do
         {
           'include-file.xml' => '<snippet>content</snippet>',
-          'include-file.ml' => 'let s = SS.empty;;'
+          'include-file.ml' => 'let s = SS.empty;;',
+          'include-file.jsx' => '<p>Welcome to the club.</p>'
         }.each do |filename, expect|
           input = <<-EOS
-[source,xml,indent=0]
+[source,xml]
 ----
-include::fixtures/#{filename}[tag=snippet]
+include::fixtures/#{filename}[tag=snippet,indent=0]
 ----
           EOS
 

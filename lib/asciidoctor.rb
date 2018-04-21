@@ -373,17 +373,6 @@ module Asciidoctor
   # header) because it has semantic meaning; ex. sectnums
   FLEXIBLE_ATTRIBUTES = ['sectnums']
 
-  # map of file extension to comment affixes for languages that only support circumfix comments
-  CIRCUMFIX_COMMENTS = {
-    ['/*', '*/'] => ['.css'],
-    ['(*', '*)'] => ['.ml', '.mli', '.nb'],
-    ['<!--', '-->'] => ['.html', '.xhtml', '.xml', '.xsl', '.plist'],
-    ['<%--', '--%>'] => ['.asp', '.jsp']
-  }.inject({}) {|accum, (affixes, exts)|
-    exts.each {|ext| accum[ext] = { :prefix => affixes[0], :suffix => affixes[-1] } }
-    accum
-  }
-
   # A collection of regular expressions used by the parser.
   #
   # NOTE: The following pattern, which appears frequently, captures the
@@ -512,7 +501,11 @@ module Asciidoctor
     #     log(e);
     #   }
     #   // end::try-catch[]
-    TagDirectiveRx = /\b(?:tag|(end))::(\S+)\[\]$/
+    if RUBY_ENGINE == 'opal'
+      TagDirectiveRx = /\b(?:tag|(e)nd)::(\S+)\[\](?=$| )/m
+    else
+      TagDirectiveRx = /\b(?:tag|(e)nd)::(\S+)\[\](?=$| )/
+    end
 
     ## Attribute entries and references
 
