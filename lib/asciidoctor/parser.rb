@@ -1111,8 +1111,8 @@ class Parser
       list_block.level = 1
     end
 
-    while reader.has_more_lines? && (match = ListRxMap[list_type].match(reader.peek_line))
-      marker = resolve_list_marker(list_type, match[1])
+    while reader.has_more_lines? && ListRxMap[list_type] =~ reader.peek_line
+      match, marker = $~, resolve_list_marker(list_type, $1)
 
       # if we are moving to the next item, and the marker is different
       # determine if we are moving up or down in nesting
@@ -1264,34 +1264,26 @@ class Parser
     if (list_type = list_block.context) == :dlist
       list_term = ListItem.new(list_block, match[1])
       list_item = ListItem.new(list_block, match[3])
-      has_text = !match[3].nil_or_empty?
+      has_text = true unless match[3].nil_or_empty?
     else
       # Create list item using first line as the text of the list item
-      text = match[2]
-      checkbox = false
-      if list_type == :ulist && text.start_with?('[')
-        if text.start_with?('[ ] ')
-          checkbox = true
-          checked = false
-          text = text[3..-1].lstrip
-        elsif text.start_with?('[x] ', '[*] ')
-          checkbox = true
-          checked = true
-          text = text[3..-1].lstrip
-        end
-      end
-      list_item = ListItem.new(list_block, text)
-
-      if checkbox
-        # FIXME checklist never makes it into the options attribute
-        list_block.attributes['checklist-option'] = ''
-        list_item.attributes['checkbox'] = ''
-        list_item.attributes['checked'] = '' if checked
-      end
-
-      sibling_trait ||= resolve_list_marker(list_type, match[1], list_block.items.size, true, reader)
-      list_item.marker = sibling_trait
+      list_item = ListItem.new(list_block, (text = match[2]))
       has_text = true
+      if list_type == :ulist
+        list_item.marker = (sibling_trait ||= match[1])
+        if text.start_with?('[') && text.start_with?('[ ] ', '[x] ', '[*] ')
+          # FIXME next_block wipes out update to options attribute
+          #list_block.set_option 'checklist' unless list_block.attributes['checklist-option']
+          list_block.attributes['checklist-option'] = ''
+          list_item.attributes['checkbox'] = ''
+          list_item.attributes['checked'] = '' unless text.start_with? '[ '
+          list_item.text = text.slice(4, text.length)
+        end
+      elsif list_type == :olist
+        list_item.marker = (sibling_trait ||= resolve_ordered_list_marker(match[1], list_block.items.size, true, reader))
+      else # :colist
+        list_item.marker = (sibling_trait ||= '<1>')
+      end
     end
 
     # first skip the line with the marker / term
@@ -1306,8 +1298,8 @@ class Parser
           content_adjacent = false
         else
           content_adjacent = true
-          # treat lines as paragraph text if continuation does not connect first block (i.e., has_text = false)
-          has_text = false unless list_type == :dlist
+          # treat lines as paragraph text if continuation does not connect first block (i.e., has_text = nil)
+          has_text = nil unless list_type == :dlist
         end
       else
         # NOTE we have no use for any trailing comment lines we might have found
@@ -2160,12 +2152,12 @@ class Parser
   #
   # Returns the String 0-index marker for this list item
   def self.resolve_list_marker(list_type, marker, ordinal = 0, validate = false, reader = nil)
-    if list_type == :olist
-      (marker.start_with? '.') ? marker : (resolve_ordered_list_marker marker, ordinal, validate, reader)
-    elsif list_type == :colist
-      '<1>'
-    else
+    if list_type == :ulist
       marker
+    elsif list_type == :olist
+      resolve_ordered_list_marker(marker, ordinal, validate, reader)
+    else # :colist
+      '<1>'
     end
   end
 
@@ -2191,6 +2183,7 @@ class Parser
   #
   # Returns the String of the first marker in this number series
   def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
+    return marker if marker.start_with? '.'
     expected = actual = nil
     case ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker }
     when :arabic
@@ -2244,18 +2237,13 @@ class Parser
   def self.is_sibling_list_item?(line, list_type, sibling_trait)
     if ::Regexp === sibling_trait
       matcher = sibling_trait
-      expected_marker = false
     else
       matcher = ListRxMap[list_type]
       expected_marker = sibling_trait
     end
 
-    if (m = matcher.match(line))
-      if expected_marker
-        expected_marker == resolve_list_marker(list_type, m[1])
-      else
-        true
-      end
+    if matcher =~ line
+      expected_marker ? expected_marker == resolve_list_marker(list_type, $1) : true
     else
       false
     end
