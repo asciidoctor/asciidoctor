@@ -668,7 +668,7 @@ class Parser
       elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
           (is_section_title? this_line, reader.peek_line) : !indented && (atx_section_title? this_line))
         reader.unshift_line this_line
-        float_id, float_reftext, float_title, float_level, _ = parse_section_title reader, document, attributes['id']
+        float_id, float_reftext, float_title, float_level = parse_section_title reader, document, attributes['id']
         attributes['reftext'] = float_reftext if float_reftext
         block = Block.new(parent, :floating_title, :content_model => :empty)
         block.title = float_title
