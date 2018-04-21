@@ -17,7 +17,6 @@ class Dog
       'woof woof'
     #end::bark-other[]
     #tag::bark-all[]
-    #tag::bark-all[]
     end
     #end::bark-all[]
   end

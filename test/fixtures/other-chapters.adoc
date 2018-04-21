@@ -3,7 +3,7 @@
 == Chapter 2
 
 The plot thickens.
-// tag::ch2[]
+// end::ch2[]
 
 [#ch3]
 == Chapter 3

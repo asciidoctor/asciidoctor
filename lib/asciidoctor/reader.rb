@@ -952,10 +952,10 @@ class PreprocessorReader < Reader
                 elsif inc_tags.key?(this_tag = $2)
                   tags_used << this_tag
                   # QUESTION should we prevent tag from being selected when enclosing tag is excluded?
-                  tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag])]
+                  tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag]), inc_lineno]
                 elsif !wildcard.nil?
                   select = active_tag && !select ? false : wildcard
-                  tag_stack << [(active_tag = this_tag), select]
+                  tag_stack << [(active_tag = this_tag), select, inc_lineno]
                 end
               elsif select
                 # NOTE record the line where we started selecting
@@ -967,6 +967,11 @@ class PreprocessorReader < Reader
         rescue
           logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
+        end
+        unless tag_stack.empty?
+          tag_stack.each do |tag_name, _, tag_lineno|
+            logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor
+          end
         end
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
           logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags.join ', '}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
