@@ -363,7 +363,7 @@ class Document < AbstractBlock
     attrs['toc-title'] = 'Table of Contents'
     #attrs['preface-title'] = 'Preface'
     attrs['section-refsig'] = 'Section'
-    #attrs['part-refsig'] = 'Part'
+    attrs['part-refsig'] = 'Part'
     attrs['chapter-refsig'] = 'Chapter'
     attrs['appendix-caption'] = attrs['appendix-refsig'] = 'Appendix'
     attrs['untitled-label'] = 'Untitled'

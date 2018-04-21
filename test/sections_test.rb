@@ -1354,6 +1354,31 @@ text
       assert_xpath '//h3[@id="_section_2_2"][starts-with(text(), "2.2. ")]', output, 1
     end
 
+    test 'should number parts when doctype is book and partnums attributes is set' do
+      input = <<-EOS
+= Book Title
+:doctype: book
+:sectnums:
+:partnums:
+
+= Language
+
+== Syntax
+
+content
+
+= Processor
+
+== CLI
+
+content
+      EOS
+
+      output = render_string input
+      assert_xpath '//h1[@id="_language"][text() = "I. Language"]', output, 1
+      assert_xpath '//h1[@id="_processor"][text() = "II. Processor"]', output, 1
+    end
+
     test 'blocks should have level' do
       input = <<-EOS
 = Title

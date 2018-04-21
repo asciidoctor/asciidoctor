@@ -263,6 +263,147 @@ Feature: Cross References
     |to find a complete list of features.
     """
 
+  Scenario: Create a full cross reference to a numbered part
+  Given the AsciiDoc source
+    """
+    :doctype: book
+    :sectnums:
+    :partnums:
+    :xrefstyle: full
+
+    [preface]
+    = Preface
+
+    See <<p1>> for an introduction to the language.
+
+    [#p1]
+    = Language
+
+    == Syntax
+
+    This chapter covers the syntax.
+    """
+  When it is converted to html
+  Then the result should contain the HTML structure
+    """
+    |See
+    a<> href='#p1' Part I, &#8220;Language&#8221;
+    |for an introduction to the language.
+    """
+
+  Scenario: Create a short cross reference to a numbered part
+  Given the AsciiDoc source
+    """
+    :doctype: book
+    :sectnums:
+    :partnums:
+    :xrefstyle: short
+
+    [preface]
+    = Preface
+
+    See <<p1>> for an introduction to the language.
+
+    [#p1]
+    = Language
+
+    == Syntax
+
+    This chapter covers the syntax.
+    """
+  When it is converted to html
+  Then the result should contain the HTML structure
+    """
+    |See
+    a<> href='#p1' Part I
+    |for an introduction to the language.
+    """
+
+  Scenario: Create a basic cross reference to a numbered part
+  Given the AsciiDoc source
+    """
+    :doctype: book
+    :sectnums:
+    :partnums:
+    :xrefstyle: basic
+
+    [preface]
+    = Preface
+
+    See <<p1>> for an introduction to the language.
+
+    [#p1]
+    = Language
+
+    == Syntax
+
+    This chapter covers the syntax.
+    """
+  When it is converted to html
+  Then the result should contain the HTML structure
+    """
+    |See
+    a<> href='#p1' Language
+    |for an introduction to the language.
+    """
+
+  Scenario: Create a basic cross reference to an unnumbered part
+  Given the AsciiDoc source
+    """
+    :doctype: book
+    :sectnums:
+    :xrefstyle: full
+
+    [preface]
+    = Preface
+
+    See <<p1>> for an introduction to the language.
+
+    [#p1]
+    = Language
+
+    == Syntax
+
+    This chapter covers the syntax.
+    """
+  When it is converted to html
+  Then the result should contain the HTML structure
+    """
+    |See
+    a<> href='#p1' Language
+    |for an introduction to the language.
+    """
+
+  @wip
+  Scenario: Create a cross reference to a part using a custom chapter reference signifier
+  Given the AsciiDoc source
+    """
+    :doctype: book
+    :sectnums:
+    :partnums:
+    :xrefstyle: full
+    :part-refsig: P
+
+    [preface]
+    = Preface
+
+    See <<p1>> for an introduction to the language.
+
+    [#p1]
+    = Language
+
+    == Syntax
+
+    This chapter covers the syntax.
+    """
+  When it is converted to html
+  Then the result should contain the HTML structure
+    """
+    |See
+    a<> href='#p1' P I, &#8220;Language&#8221;
+    |for an introduction to the language.
+    """
+
   Scenario: Create a full cross reference to a numbered appendix
   Given the AsciiDoc source
     """
