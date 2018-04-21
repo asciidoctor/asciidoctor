@@ -887,7 +887,7 @@ class PreprocessorReader < Reader
       if inc_linenos
         inc_lines, inc_offset, inc_lineno = [], nil, 0
         begin
-          open(inc_path, 'r') do |f|
+          open(inc_path, 'rb') do |f|
             select_remaining = nil
             f.each_line do |l|
               inc_lineno += 1
@@ -930,12 +930,13 @@ class PreprocessorReader < Reader
           wildcard = inc_tags.delete '*'
         end
         begin
-          open(inc_path, 'r') do |f|
+          open(inc_path, 'rb') do |f|
             dbl_co, dbl_sb = '::', '[]'
+            encoding = ::Encoding::UTF_8 if COERCE_ENCODING
             f.each_line do |l|
               inc_lineno += 1
               # must force encoding since we're performing String operations on line
-              l.force_encoding ::Encoding::UTF_8 if FORCE_ENCODING
+              l.force_encoding encoding if encoding
               if (l.include? dbl_co) && (l.include? dbl_sb) && TagDirectiveRx =~ l
                 if $1 # end tag
                   if (this_tag = $2) == active_tag
@@ -985,7 +986,7 @@ class PreprocessorReader < Reader
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
-          inc_content = target_type == :file ? (::IO.read inc_path) : open(inc_path, 'r') {|f| f.read }
+          inc_content = target_type == :file ? (::IO.binread inc_path) : open(inc_path, 'rb') {|f| f.read }
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attributes
         rescue
