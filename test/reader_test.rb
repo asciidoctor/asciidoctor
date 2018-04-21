@@ -956,18 +956,7 @@ include::fixtures/include-file.asciidoc[tag=snippetA]
         refute_match(/included content/, output)
       end
 
-      test 'should warn if tag specified in include directive is missing' do
-        input = <<-EOS
-include::fixtures/include-file.asciidoc[tag=no-such-tag]
-        EOS
-
-        using_memory_logger do |logger|
-          render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
-          assert_message logger, :WARN, '~<stdin>: line 1: tag \'no-such-tag\' not found in include file', Hash
-        end
-      end
-
-      test 'include directive supports selecting lines by multiple tags' do
+      test 'include directive supports selecting lines by tags' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         EOS
@@ -977,19 +966,6 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         assert_match(/snippetB content/, output)
         refute_match(/non-tagged content/, output)
         refute_match(/included content/, output)
-      end
-
-      test 'should warn if tags specified in include directive are missing' do
-        input = <<-EOS
-include::fixtures/include-file.asciidoc[tags=no-such-tag-b;no-such-tag-a]
-        EOS
-
-        using_memory_logger do |logger|
-          render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
-          # NOTE Ruby 1.8 swaps the order of the list for some silly reason
-          expected_tags = ::RUBY_MIN_VERSION_1_9 ? 'no-such-tag-b, no-such-tag-a' : 'no-such-tag-a, no-such-tag-b'
-          assert_message logger, :WARN, %(~<stdin>: line 1: tags '#{expected_tags}' not found in include file), Hash
-        end
       end
 
       test 'include directive supports selecting lines by tag in language that uses circumfix comments' do
@@ -1157,14 +1133,41 @@ end)
         assert_includes output, expected
       end
 
-      test 'should warn if tag is not found in include file' do
+      test 'should warn if specified tag is not found in include file' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[tag=snippetZ]
+include::fixtures/include-file.asciidoc[tag=no-such-tag]
         EOS
 
         using_memory_logger do |logger|
           render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
-          assert_message logger, :WARN, '~<stdin>: line 1: tag \'snippetZ\' not found in include file', Hash
+          assert_message logger, :WARN, %(~<stdin>: line 1: tag 'no-such-tag' not found in include file), Hash
+        end
+      end
+
+      test 'should warn if specified tags are not found in include file' do
+        input = <<-EOS
+include::fixtures/include-file.asciidoc[tags=no-such-tag-b;no-such-tag-a]
+        EOS
+
+        using_memory_logger do |logger|
+          render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          # NOTE Ruby 1.8 swaps the order of the list for some silly reason
+          expected_tags = ::RUBY_MIN_VERSION_1_9 ? 'no-such-tag-b, no-such-tag-a' : 'no-such-tag-a, no-such-tag-b'
+          assert_message logger, :WARN, %(~<stdin>: line 1: tags '#{expected_tags}' not found in include file), Hash
+        end
+      end
+
+      test 'should warn if specified tag in include file is not closed' do
+        input = <<-EOS
+++++
+include::fixtures/unclosed-tag.adoc[tag=a]
+++++
+        EOS
+
+        using_memory_logger do |logger|
+          result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          assert_equal 'a', result
+          assert_message logger, :WARN, %(~<stdin>: line 2: detected unclosed tag 'a' starting at line 2 of include file), Hash
         end
       end
 
