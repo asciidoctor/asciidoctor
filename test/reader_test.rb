@@ -898,7 +898,7 @@ include::#{url}[]
         end
       end
 
-      test 'include directive supports line selection' do
+      test 'include directive supports selecting lines by line number' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         EOS
@@ -915,7 +915,7 @@ include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         assert_match(/last line of included content/, output)
       end
 
-      test 'include directive supports line selection using quoted attribute value' do
+      test 'include directive supports line ranges specified in quoted attribute value' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         EOS
@@ -944,7 +944,7 @@ include::fixtures/include-file.asciidoc[lines=]
         assert_includes output, 'last line of included content'
       end
 
-      test 'include directive supports tagged selection' do
+      test 'include directive supports selecting lines by tag' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tag=snippetA]
         EOS
@@ -956,7 +956,7 @@ include::fixtures/include-file.asciidoc[tag=snippetA]
         refute_match(/included content/, output)
       end
 
-      test 'include directive supports multiple tagged selection' do
+      test 'include directive supports selecting lines by multiple tags' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         EOS
@@ -968,7 +968,7 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         refute_match(/included content/, output)
       end
 
-      test 'include directive supports tagged selection in language that uses circumfix comments' do
+      test 'include directive supports selecting lines by tag in language that uses circumfix comments' do
         {
           'include-file.xml' => '<snippet>content</snippet>',
           'include-file.ml' => 'let s = SS.empty;;',
@@ -986,7 +986,7 @@ include::fixtures/#{filename}[tag=snippet,indent=0]
         end
       end
 
-      test 'include directive does not select lines with tag directives inside tagged selection' do
+      test 'include directive does not select lines with tag directives within selected tag region' do
         input = <<-EOS
 ++++
 include::fixtures/include-file.asciidoc[tags=snippet]
