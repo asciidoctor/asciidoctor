@@ -516,12 +516,16 @@ class Reader
     @lines.unshift(*lines)
   end
 
-  def cursor lineno = nil
-    Cursor.new @file, @dir, @path, (lineno || @lineno)
+  def cursor
+    Cursor.new @file, @dir, @path, @lineno
+  end
+
+  def cursor_at lineno
+    Cursor.new @file, @dir, @path, lineno
   end
 
   def prev_line_cursor
-    Cursor.new @file, @dir, @path, (@lineno - 1)
+    cursor_at @lineno - 1
   end
 
   # Public: Get information about the last line read, including file name and line number.

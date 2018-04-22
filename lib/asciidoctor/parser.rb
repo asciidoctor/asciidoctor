@@ -612,12 +612,12 @@ class Parser
           list_item_lineno = reader.lineno
           # might want to move this check to a validate method
           unless match[1] == expected_index.to_s
-            logger.warn message_with_context %(callout list item index: expected #{expected_index} got #{match[1]}), :source_location => (reader.cursor list_item_lineno)
+            logger.warn message_with_context %(callout list item index: expected #{expected_index} got #{match[1]}), :source_location => (reader.cursor_at list_item_lineno)
           end
           if (list_item = next_list_item reader, block, match)
             block.items << list_item
             if (coids = document.callouts.callout_ids block.items.size).empty?
-              logger.warn message_with_context %(no callouts refer to list item #{block.items.size}), :source_location => (reader.cursor list_item_lineno)
+              logger.warn message_with_context %(no callouts refer to list item #{block.items.size}), :source_location => (reader.cursor_at list_item_lineno)
             else
               list_item.attributes['coids'] = coids
             end
@@ -1574,7 +1574,7 @@ class Parser
     # generate an ID if one was not embedded or specified as anchor above section title
     if (id = section.id ||= ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
       unless document.register :refs, [id, section, sect_reftext || section.title]
-        logger.warn message_with_context %(id assigned to section already in use: #{id}), :source_location => (reader.cursor reader.lineno - (sect_atx ? 1 : 2))
+        logger.warn message_with_context %(id assigned to section already in use: #{id}), :source_location => (reader.cursor_at reader.lineno - (sect_atx ? 1 : 2))
       end
     end
 
