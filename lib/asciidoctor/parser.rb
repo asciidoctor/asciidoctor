@@ -1325,11 +1325,7 @@ class Parser
     end
 
     if dlist
-      if list_item.text? || list_item.blocks?
-        [list_term, list_item]
-      else
-        [list_term]
-      end
+      list_item.text? || list_item.blocks? ? [list_term, list_item] : [list_term]
     else
       list_item
     end
