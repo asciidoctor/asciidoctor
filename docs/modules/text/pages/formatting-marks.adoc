@@ -1,0 +1,214 @@
+= Formatting Marks
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+
+There are two categories of formatting marks for applying styles (i.e., formatting) to text, _constrained_ and _unconstrained_.
+These formatting marks are referred to as _quotes_ in the AsciiDoc syntax.
+This section covers their purpose, their differences and how to apply them.
+
+== Constrained quotes
+
+In short, "`constrained`" means *around* a word or sequence of words.
+
+Constrained quotes are single characters (often symbols) placed around a word.
+The "`around`" is defined by the fact that word characters do not appear immediately outside the enclosing marks.
+
+You use this form to format a word that stands alone,
+
+.When the word stands alone
+[source]
+----
+That is *strong* stuff!
+----
+
+to format a sequence of words,
+
+.When there are multiple words
+[source]
+----
+That is *really strong* stuff!
+----
+
+or to format a word adjacent to punctuation, like an exclamation mark.
+
+.When the word is adjacent to punctuation
+[source]
+----
+This stuff sure is *strong*!
+----
+
+== Unconstrained quotes
+
+In short, "`unconstrained`" means anywhere, including *within* a word.
+
+Unconstrained quotes are repeated characters (often symbols) placed anywhere in the text, including within a word.
+The "`within`" is defined by the fact that a word character may appear directly outside one of the enclosing marks.
+
+.Unconstrained formatting
+[source]
+----
+She spells her name with an "`h`", as in Sara**h**.
+----
+
+== When should I use unconstrained quotes?
+
+Consider the following questions:
+
+* Is there a letter, number, underscore directly outside the formatting marks (on either side)?
+* Is there a colon, semi-colon, or closing curly bracket directly before the starting formatting mark?
+* Is there a space directly inside of the formatting mark?
+
+If you answered "`yes`" to any of these questions, you need to switch to unconstrained (double formatting) quotes.
+
+To help you determine whether a particular syntax pattern requires unconstrained quotes, consider the following scenarios:
+
+.Constrained or Unconstrained?
+[#constrained-or-unconstrained,cols=4*]
+|===
+|AsciiDoc |Result |Quote type |Reason
+
+|`+Sara__h__+`
+|Sara__h__
+|Unconstrained
+|The `a` is directly adjacent to (the left of) a formatting mark.
+
+|`+**B**old+`
+|**B**old
+|Unconstrained
+|The `o` is directly adjacent to (the right of) a formatting mark.
+
+|`+&ndash;**2016**+`
+|&ndash;**2016**
+|Unconstrained
+|`;` is directly adjacent to (the left of) a formatting mark.
+
+|`+** bold **+`
+|** bold **
+|Unconstrained
+|There are spaces directly inside the formatting marks.
+
+|`+*2016*&ndash;+`
+|*2016*&ndash;
+|Constrained
+|The adjacent `&` is not a letter, number, underscore, colon, or semicolon.
+
+|`+*9*-to-*5*+`
+|*9*-to-*5*
+|Constrained
+|The adjacent hyphen is not a letter, number, underscore, colon, or semi-colon.
+|===
+
+== Unconstrained formatting edge cases
+
+There are cases when it might seem logical to use constrained quotes, however unconstrained quotes are required.
+Substitutions may be applied by the parser before getting to the formatting marks, in which case the characters adjacent to those marks may not be what you see in the original source.
+
+One such example is enclosing monospaced text inside quotation marks, such as "```endpoints```".
+
+.Monospaced text inside quotes
+[source]
+----
+"```endpoints```"
+----
+
+You might start with the following syntax:
+
+[source]
+----
+"`endpoints`"
+----
+
+That only gives you "`endpoints`", since the backticks are contributing to the enclosing smart quotes.
+
+Adding another backtick gets closer, but the parser still ignores the constrained formatting marks and interprets the backticks literally:
+
+[source]
+----
+"``endpoints``"
+----
+
+So you have to double up the marks to coerce it into formatting the text to monospace.
+
+[source]
+----
+"```endpoints```"
+----
+
+////
+NOTE: This situation may improve in the future when Asciidoctor is switched to using a parsing expression grammar for inline formatting instead of the current regular expression-based strategy.
+For details, follow https://github.com/asciidoctor/asciidoctor/issues/61[issue #61].
+////
+
+== Escaping unconstrained quotes
+
+Unconstrained quotes are meant to match anywhere in the text, context free.
+However, that means you catch them formatting when you don't intend them to.
+Admittedly, these symbols are a bit tricky to type literally when the content calls for it.
+But being able to do so is just a matter of knowing the tricks, which this section will cover.
+
+Let's assume you are typing the following two lines:
+
+----
+The __kernel qualifier can be used with the __attribute__ keyword...
+
+#`CB###2`# and #`CB###3`#
+----
+
+In the first sentence, you aren't looking for any text formatting, but you're certainly going to get it.
+Double underscore is an unconstrained formatting mark.
+In the second sentence, you might expect `+CB###2+` and `+CB###3+` to be formatted in monospace and highlighted.
+However, what you get is a scrambled mess.
+The mix of constrained and unconstrained formatting marks in the line is ambiguous.
+
+There are two (reliable) solutions for escaping unconstrained formatting marks:
+
+* Use an attribute reference to insert the unconstrained formatting mark verbatim
+* Wrap the text you don't want formatted in an inline passthrough
+
+The attribute reference is preferred because it's the easiest to read:
+
+----
+:dbl_: __
+:3H: ###
+
+The {dbl_}kernel qualifier can be used with the {dbl_}attribute{dbl_} keyword...
+
+#`CB{3H}2`# and #`CB{3H}3`#
+----
+
+This works because attribute expansion is performed _after_ text formatting (i.e., quotes substitution) under normal substitution order.
+(Recall that backticks around text format the text in monospace but permit the use of attribute references).
+
+Here's how you'd write these lines using the inline passthrough to escape the unconstrained formatting marks instead:
+
+----
+The +__kernel+ qualifier can be used with the +__attribute__+ keyword...
+
+#`+CB###2+`# and #`+CB###3+`#
+----
+
+Notice the addition of the plus symbols.
+That's the closest thing to a text formatting escape.
+Everything between the plus symbols is escaped from interpolation (attribute references, text formatting, etc.).
+However, the text still receives proper output escaping for HTML (e.g., `<` becomes `\&lt;`).
+
+The enclosure `pass:[`+TEXT+`]` (text enclosed in pluses surrounded by backticks) is a special formatting combination in Asciidoctor.
+It means to format TEXT as monospace, but don't interpolate formatting marks or attribute references in TEXT.
+It's roughly equivalent to Markdown's backticks.
+Since AsciiDoc offers more advanced formatting, the double enclosure is necessary.
+
+The more brute-force solution to the inline passthrough approach is to use the pass:q[`pass:c[\]`] macro, which is a more verbose (and flexible) version of the plus formatting marks.
+
+----
+The pass:c[__kernel] qualifier can be used with the pass:c[__attribute__] keyword...
+
+#`pass:c[CB###2]`# and #`pass:c[CB###3]`#
+----
+
+As you can see, however, the macro is not quite as elegant or concise.
+In case you're wondering, the c in the target slot of the pass:q[`pass:c[\]`] macro applies output escaping for HTML.
+Though not always required, it's best to include this flag so you don't forget to when it is needed.
+
+Backslashes for escaping aren't very reliable in AsciiDoc.
+While they can be used, they have to be placed so strategically that they are rather finicky.

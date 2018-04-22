@@ -1,0 +1,51 @@
+////
+Included in:
+
+- user-manual: Blocks, Substitutions
+////
+
+.Substitution groups
+[cols="2h,6*^"]
+|===
+|Group |Special characters |Quotes |Attributes |Replacements |Macros |Post replacements
+
+|Header
+|{y}
+|{n}
+|{y}
+|{n}
+|{n}
+|{n}
+
+|None
+|{n}
+|{n}
+|{n}
+|{n}
+|{n}
+|{n}
+
+|Normal
+|{y}
+|{y}
+|{y}
+|{y}
+|{y}
+|{y}
+
+|Pass
+|{n}
+|{n}
+|{n}
+|{n}
+|{n}
+|{n}
+
+|Verbatim
+|{y}
+|{n}
+|{n}
+|{n}
+|{n}
+|{n}
+|===

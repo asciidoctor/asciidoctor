@@ -1,0 +1,100 @@
+////
+Included in:
+- user-manual: Labeled list
+- quick-ref
+
+.Definition list
+[source]
+----
+CPU:: <1>
+The brain of the computer. <2>
+<3>
+Hard drive::
+Permanent storage for operating system and/or user files.
+----
+<1> Follow each term with two colons.
+<2> Enter the definition text on a new line below the term.
+<3> Enter a single blank line between each term/definition pair.
+
+////
+
+// tag::base[]
+CPU:: The brain of the computer.
+Hard drive:: Permanent storage for operating system and/or user files.
+RAM:: Temporarily stores information the CPU uses during operation.
+Keyboard:: Used to enter text or control items on the screen.
+Mouse:: Used to point to and select items on your computer screen.
+Monitor:: Displays information in visual form using text and graphics.
+// end::base[]
+
+// tag::base-horz[]
+[horizontal]
+CPU:: The brain of the computer.
+Hard drive:: Permanent storage for operating system and/or user files.
+RAM:: Temporarily stores information the CPU uses during operation.
+// end::base-horz[]
+
+// tag::b-base[]
+first term:: definition of first term
+second term:: definition of second term
+// end::b-base[]
+
+// tag::b-base-multi[]
+first term::
+definition of first term
+section term::
+definition of second term
+// end::b-base-multi[]
+
+// tag::base-mix[]
+Dairy::
+* Milk
+* Eggs
+Bakery::
+* Bread
+Produce::
+* Bananas
+// end::base-mix[]
+
+// tag::base-mix-alt[]
+Dairy::
+
+  * Milk
+  * Eggs
+
+Bakery::
+
+  * Bread
+
+Produce::
+
+  * Bananas
+// end::base-mix-alt[]
+
+// tag::3-mix[]
+Operating Systems::
+  Linux:::
+    . Fedora
+      * Desktop
+    . Ubuntu
+      * Desktop
+      * Server
+  BSD:::
+    . FreeBSD
+    . NetBSD
+
+Cloud Providers::
+  PaaS:::
+    . OpenShift
+    . CloudBees
+  IaaS:::
+    . Amazon EC2
+    . Rackspace
+// end::3-mix[]
+
+// tag::qa[]
+[qanda]
+What is Asciidoctor?::
+  An implementation of the AsciiDoc processor in Ruby.
+What is the answer to the Ultimate Question?:: 42
+// end::qa[]

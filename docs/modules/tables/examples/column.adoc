@@ -1,0 +1,49 @@
+// tag::2col-alt[]
+|===
+
+|Cell in column 1, row 1 |Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+
+|===
+// end::2col-alt[]
+
+// tag::2col[]
+[cols="2*"]
+|===
+
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+
+|===
+// end::2col[]
+
+// tag::base-xtr[]
+|===
+|Cell in column 1, row 1 with lots and lots and lots and lots of content
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2 and another bucket of content, and then a jelly roll of content
+|===
+// end::base-xtr[]
+
+// tag::4col[]
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+|Cell in column 4, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+|Cell in column 4, row 2
+|===
+// end::4col[]

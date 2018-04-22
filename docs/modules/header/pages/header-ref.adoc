@@ -1,0 +1,132 @@
+= Header Attributes and Values
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// sum-header.adoc
+
+[cols="1m,1,2,2,1"]
+|===
+|Attribute |Values |Description |Notes |Converters
+
+|author
+|
+|Author's full name
+|
+|all
+
+|authorinitials
+|
+|First character of each word in the `author` attribute
+|
+|all
+
+|description
+|
+|Text describing the document
+|
+|html
+
+d|`docinfo`, `docinfo1`, `docinfo2`
+|
+|Adds content from a docinfo file to header
+|
+|html, docbook
+
+|doctitle
+|Text entered by user
+|Title of document
+|Identical to the value returned by `Document#doctitle`
+|all
+
+|email
+|
+|Email address
+|
+|all
+
+|firstname
+|
+|First word of `author` attribute
+|
+|all
+
+|keywords
+|
+|A list of comma-separated values that describe the document
+|
+|html
+
+
+|lastname
+|
+|Last word of `author` attribute
+|
+|all
+
+|middlename
+|
+|Middle word of `author` attribute
+|
+|all
+
+d|`no-header-footer`, `-s`
+|
+|Generate an embeddable document; exclude the document frame
+|
+|all
+
+|noheader
+|
+|Suppresses the output of the header
+|
+|all
+
+|nofooter
+|
+|Suppresses the output of the footer
+|
+|all
+
+|notitle
+|
+|Toggles the display of a document's title
+|
+|all
+
+|revdate
+|
+|Date of document version
+|
+|all
+
+|revnumber
+|
+|Version number of the document
+|
+|all
+
+|revremark
+|
+|Version comments
+|
+|all
+
+|showtitle
+|
+|Toggles the display of an embedded document's title
+|
+|all
+
+|title
+|
+|Alternative title of the document
+|
+|html
+
+|version-label
+|`Version`, User defined
+|The label preceding the `revnumber` in a converted document's byline
+|
+|html
+
+|===

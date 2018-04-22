@@ -1,0 +1,27 @@
+////
+Included in:
+- user-manual: Footnotes
+- quick-ref
+////
+
+// tag::base-c[]
+The hail-and-rainbow protocol can be initiated at five levels: double, tertiary, supernumerary, supermassive, and apocalyptic party.footnote:[The double hail-and-rainbow level makes my toes tingle.] // <1> <2>
+A bold statement!footnoteref:[disclaimer,Opinions are my own.] // <3> <4>
+
+Another outrageous statement.footnoteref:[disclaimer] // <5>
+// end::base-c[]
+
+// tag::base-x[]
+The hail-and-rainbow protocol can be initiated at five levels: double, tertiary, supernumerary, supermassive, and apocalyptic party.footnote:[The double hail-and-rainbow level makes my toes tingle.]
+A bold statement!footnoteref:[disclaimer,Opinions are my own.]
+
+Another outrageous statement.footnoteref:[disclaimer]
+// end::base-x[]
+
+// tag::base[]
+A statement.footnote:[Clarification about this statement.]
+
+A bold statement!footnoteref:[disclaimer,Opinions are my own.]
+
+Another bold statement.footnoteref:[disclaimer]
+// end::base[]

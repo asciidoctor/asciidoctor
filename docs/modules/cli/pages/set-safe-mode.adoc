@@ -1,0 +1,25 @@
+= Set the Safe Mode Using the CLI
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+content from secure-cli.adoc, included in:
+- user-manual: Running Asciidoctor Securely: Set the safe mode in the CLI
+////
+
+When Asciidoctor is invoked via the CLI, the safe mode is set to `UNSAFE` by default.
+You can change the safe level by executing one of the following commands in the CLI.
+
+`-S`, `--safe-mode=SAFE_MODE`::
+Sets the safe mode level of the document according to the assigned level (`UNSAFE`, `SAFE`, `SERVER`, `SECURE`).
+
+`--safe`, `asciidoctor-safe`::
+Sets the safe mode level to `SAFE`.
+Provided for compatibility with the python AsciiDoc `safe` command.
+
+////
+-B, --base-dir=DIR
+Base directory containing the document and resources. Defaults to the directory containing the source file, or the working directory if the source is read from a stream. Can be used as a way to chroot the execution of the program.
+////
+
+You can also set the xref:api:set-safe-mode.adoc[safe mode from the API] and xref:attributes:safe-modes.adoc#set-safe-attrs[manage attributes by safe mode].

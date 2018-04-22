@@ -1,0 +1,152 @@
+= Set Global Attributes on a Document
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+attr-doc.adoc, included in:
+- user-manual: Attributes: Setting attributes on a document
+////
+
+// Change this to document attributes? entries seems too high-level and I don't think we really care what it's called technically
+
+== Attribute entries
+
+An attribute entry is the primary mechanism for defining an attribute on a document.
+Attribute entries act like global variables or settings and can be assigned to a document in the document's body, in the document's header, and through the CLI or API.
+
+Additionally, attributes entries can: ::
+* be unset (turned off) with a leading (or trailing) `!` added to its name
+* have default and alternate values in the case of built-in attributes
+* span multiple, contiguous lines
+* include inline AsciiDoc content
+
+Attribute entries can not: ::
+* override locked attributes assigned from the command line
+* include AsciiDoc block content, such as ordered lists or other types of whitespace-dependent markup
+
+=== Attribute entry anatomy
+
+An attribute entry consists of two parts: an attribute name and the attribute's value.
+When set in a document header, the attribute entry takes the following form:
+
+[source]
+----
+:name: value
+----
+
+The attribute's name comes first, must be at the start of the line, and must be enclosed in colons (e.g., `:name:`).
+If present, the attribute's value is offset from the name part by at least one space.
+The value is optional.
+A blank value is often used to set ("`turn on`") a boolean attribute.
+//(making a blank value implicitly true)
+
+Attributes are typically defined in the document header, though they may also be defined in the body of the document.
+Once set, an attribute's value is available for use throughout the remainder of the document.
+Unless locked by the API, attributes may be reassigned at any subsequent point in the document.
+
+== Built-in attributes
+
+Some attribute names are reserved for built-in attributes.
+Built-in attributes are used to easily add common features, such as the table of contents, or control the generated output, such as selecting a converter.
+Many of the built-in attributes only take effect when defined in the document header.
+
+To enable the table of contents, you can set the `toc` attribute using an attribute entry in the document header as follows:
+
+[source]
+----
+:toc:
+----
+
+When the attribute's value is empty, as it is in the example above, the default value will be assigned.
+The default value for `toc` is `auto`; therefore, the table of contents will be placed in the default location (below the document's title) when the document is rendered.
+
+A few of the built-in attributes have more than one built-in value.
+If you want the table of contents to be placed on the right side of the document, you can assign it the built-in value, `right`.
+
+[source]
+----
+:toc: right
+----
+
+The `right` value will override the default value.
+The value assigned to an attribute in the document header will replace the default value (assuming the attribute is not locked).
+
+== User-defined attributes
+
+When you find yourself typing the same text repeatedly, or text that often needs to be updated, consider creating your own attribute.
+// assigning it to a document attribute and use that instead.
+
+For example, attributes can store URLs.
+
+.User-defined URL attribute entry
+[source]
+----
+:url-fedpkg: https://apps.fedoraproject.org/packages/rubygem-asciidoctor
+----
+
+Now you can refer to this attribute throughout the document by surrounding its name in curly braces, i.e., referencing it.
+
+.url-fedpkg attribute usage example
+[source]
+----
+Did you know there's an {url-fedpkg}[Asciidoctor package for Fedora]?
+----
+
+To save even more typing, you could store the whole link in the attribute value.
+
+.Link attribute entry
+[source]
+----
+:link-fedpkg: https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Asciidoctor package for Fedora]
+----
+
+Now you can reference the attribute where ever you want this link inserted.
+
+.link-fedpkg attribute usage example
+[source]
+----
+Did you know there's an {link-fedpkg}?
+----
+
+//Note that the link substitution occurs after the attribute reference is resolved.
+//This works thanks to the default order of substitutions in a paragraph.
+
+You can also use attributes to set the base path to images (default: `_empty_`), icons (default: `./images/icons`), stylesheets (default: `./stylesheets`) and JavaScript files (default: `./javascripts`).
+
+.Base path config example
+[source]
+----
+:imagesdir: ./images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+----
+
+NOTE: If you're familiar with writing in XML, you'll recognize document attributes as user-defined entities.
+
+== Assigning document attributes inline
+// directly from um
+
+Document attributes can be assigned using the following syntax:
+
+ {set:<attrname>[!][:<value>]}
+
+For example:
+
+[source]
+{set:sourcedir:src/main/java}
+
+is effectively the same as:
+
+ :sourcedir: src/main/java
+
+This is important for being able to assign document attributes in places where attribute entry lines are not normally processed, such as in a table cell.
+
+////
+TODO: This section might make more sense in the header section.
+
+The main focus of the learning for this documentation is how to use inline formatting in an attribute value. Normally, inline formatting in an attribute value is not interpreted because:
+
+a. Inline formatting is not applied when an attribute is set (attribute holds raw value)
+b. Inline formatting is not applied when an attribute is referenced since the relevant substitutions come before attributes are resolved
+////

@@ -1,0 +1,87 @@
+= Description Lists
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:keywords: labeled list, definition list
+////
+Included in:
+- user-manual: Labeled lists
+- writers-guide: labeled lists
+- writers-guide: hybrid lists
+////
+
+// tag::label[]
+Description lists are useful when you need to include a description, definition, or supporting text for each item in a list.
+Each item in a description list consists of a term or phrase followed by:
+
+* a separator (typically a double colon, `::`)
+* at least one space or endline
+* the item's content
+
+Here's an example of a description list that identifies parts of a computer:
+
+[source]
+----
+include::{examplesdir}/description.adoc[tag=base]
+----
+
+By default, the content of each item is displayed below the label when rendered.
+Here's a preview of how this list is rendered:
+
+.A basic description list
+====
+include::{examplesdir}/description.adoc[tag=base]
+====
+
+If you want the label and content to appear on the same line, add the horizontal style to the list.
+
+[source]
+----
+include::{examplesdir}/description.adoc[tag=base-horz]
+----
+
+====
+include::{examplesdir}/description.adoc[tag=base-horz]
+====
+
+The content of a description list can be any AsciiDoc element.
+For instance, we could rewrite the grocery list from above so that each aisle is a label rather than a parent outline list item.
+
+[source]
+----
+include::{examplesdir}/description.adoc[tag=base-mix]
+----
+
+====
+include::{examplesdir}/description.adoc[tag=base-mix]
+====
+
+Description lists are quite lenient about whitespace, so you can spread the items out and even indent the content if that makes it more readable for you:
+
+[source]
+----
+include::{examplesdir}/description.adoc[tag=base-mix-alt]
+----
+// end::label[]
+
+// tag::hybrid[]
+[#three-hybrid]
+Finally, you can mix and match the three list types within a single hybrid list.
+Asciidoctor works hard to infer the relationships between the items that are most intuitive to us humans.
+
+Here's a list that mixes description, ordered, and unordered list items:
+
+[source]
+----
+include::{examplesdir}/description.adoc[tag=3-mix]
+----
+
+Here's how the list is rendered:
+
+.A hybrid list
+====
+include::{examplesdir}/description.adoc[tag=3-mix]
+====
+
+You can include more xref:complex.adoc[complex content in a list item] as well.
+// end::hybrid[]

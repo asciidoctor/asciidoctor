@@ -1,0 +1,4 @@
+* Reference Tables
+** xref:environment-ref.adoc[Environment Attributes]
+** xref:document-ref.adoc[Document Attributes]
+** xref:character-ref.adoc[Character Replacement Attributes]

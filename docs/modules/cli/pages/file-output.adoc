@@ -1,0 +1,37 @@
+= Specify an Output File from the CLI
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+Included in:
+- user-manual: Specifying an output file
+////
+
+Using the `-` flag, you can pipe content to the `asciidoctor` command.
+This flag tells Asciidoctor read the source from standard input (STDIN).
+For example:
+
+ $ echo 'content' | asciidoctor -
+
+NOTE: Any variation of STDIN will work.
+
+This command is effectively the same as:
+
+ $ echo 'content' | asciidoctor -o - -
+
+When reading source from STDIN, Asciidoctor doesn't have a reference to an input file.
+Therefore, it sends the converted text to standard output (STDOUT) by default.
+
+If, instead, you want to write the full document to an output file, you specify it using the `-o` flag.
+For example, the following command writes a standalone HTML document to [.path]_output.html_ instead of STDOUT:
+
+ $ echo "content" | asciidoctor -o output.html -
+
+When piping source from STDIN to STDOUT through the `asciidoctor` command, you often just want the converted body (i.e., embeddable HTML).
+To produce that variant, add the `-s` flag:
+
+ $ echo 'content' | asciidoctor -s -
+
+Or perhaps you want to include the doctitle as well:
+
+ $ echo -e '= Document Title\n\ncontent' | asciidoctor -s -a showtitle -

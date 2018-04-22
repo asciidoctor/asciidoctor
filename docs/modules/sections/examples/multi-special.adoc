@@ -1,0 +1,76 @@
+= A Book with Multiple Parts and Special Sections
+
+// tag::colophon[]
+[colophon]
+= Colophon
+
+The Asciidoctor Press, Ceres and Denver
+
+(C) 2018 by The Asciidoctor Press
+
+Published in the Milky Way Galaxy
+
+This book is designed by Dagger Flush, Denver, Colorado.
+The types are handset Chinchilla and Dust, designed by Leeloo.
+Leeloo designed the typefaces to soften the bluntness of documentation.
+Created in Asciidoctor and Fedora 27.
+The printing and binding is by Ceres Lithographing, Inc., Ceres, Milky Way.
+// end::colophon[]
+
+[preface]
+= Preface
+
+The basis for this book germinated when I awoke one morning and was confronted by the dark and stormy eyes of the chinchilla.
+She had conquered the mountain of government reports that, over the course of six months, had eroded into several minor foothills and a creeping alluvial plain of loose papers.
+
+== Acknowledgments
+
+I would like to thank the Big Bang and String Theory.
+
+// tag::dedicate[]
+[dedication]
+= Dedication
+
+For S.S.T.--
+
+thank you for the plague of archetypes.
+// end::dedicate[]
+
+// tag::part[]
+= Title of Part 1
+
+[partintro]
+--
+This is the introduction to the first part of our mud-encrusted journey.
+--
+
+== Chapter 1
+
+There was mud...
+
+== Chapter 2
+
+Great gobs of mud...
+
+[glossary]
+== Part 1 Glossary
+
+[glossary]
+mud:: wet, cold dirt
+
+= Part 2
+
+[preface]
+== Part 2 Preface
+
+This part was written because...
+
+== Chapter 1
+
+The mud had turned to cement...
+
+// end::part[]
+
+= Appendix for whole Book
+
+=== Appendix sub

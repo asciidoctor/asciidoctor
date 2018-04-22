@@ -1,0 +1,57 @@
+= Set, Assign, and Reference Attributes
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+attr-use.adoc, included in:
+- user-manual: Using attributes: set, assign, and reference
+////
+
+== Set an attribute and assign it a value
+
+Before you can use an attribute in your document, it must be set.
+This is sometimes referred to as "`turning on`" the attribute.
+
+Some attributes are automatically set when Asciidoctor processes a document.
+These include environment attributes and some built-in document attributes with default values.
+
+You can also set additional attributes and override built-in attributes using an attribute entries.
+//(or override)
+For example:
+
+ :sectnums:
+
+Many attributes can be assigned a value at the same time:
+
+ :leveloffset: 3
+
+The value may be empty, a number, or a string of characters.
+A string value may include references to other attributes.
+
+== Unset an attribute
+
+Attributes can be unset  using the bang symbol (`!`).
+The `!` can be placed either before or after the attribute's name.
+
+For example, both:
+
+ :sectnums!:
+
+and
+
+ :!sectnums:
+
+unsets, "`turns off`", the `sectnums` attribute.
+In this example, by unsetting `sectnums`, Asciidoctor knows not to number the sections.
+
+== Reference an attribute
+
+An [.term]_attribute reference_ is an inline element composed of the name of the attribute enclosed in curly brackets.
+For example:
+
+ The value of leveloffset is {leveloffset}.
+
+The attribute reference is replaced by the attribute's value when Asciidoctor processes the document.
+Referencing an attribute that is xref:missing-and-undefined.adoc[undefined or missing] is considered an error and is handled specially by Asciidoctor.
+
+//The following sections will show you how to use attributes on your whole document, individual blocks, and inline elements.

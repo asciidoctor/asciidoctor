@@ -1,0 +1,98 @@
+= Get Asciidoctor
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+:adoc-version: 1.5.7
+
+Asciidoctor is distributed as a RubyGem and operates on macOS, Windows, and Linux.
+//AsciidoctorJ, Asciidoctor.js, as well as the Asciidoctor build integrations, alternate converters, and extensions may have additional requirements.
+
+== System requirements for Asciidoctor {adoc-version}
+
+Platform support is specific to each major Asciidoctor version.
+
+TIP: While we only test on Alpine Linux, Debian, and Fedora, Asciidoctor should operate as expected on most Linux distributions.
+
+[cols="20,25a",width="45%"]
+|===
+|Supported Platform |Supported Version(s)
+
+|Ruby
+|2.3 &#8805;
+
+|JRuby
+|9.0 &#8805;
+
+|Alpine Linux
+|3.7 &#8805;
+
+|Debian
+|9.3 &#8805;
+
+|Fedora
+|27
+
+|macOS
+|High Sierra
+
+|Microsoft
+|Windows 10 +
+Windows 8.1 +
+Windows Server 2016 +
+Windows Server 2012 R2
+
+|Chrome
+|Latest stable version
+
+|Firefox
+|Latest stable version
+
+|Internet Explorer
+|11
+
+|MS Edge
+|Latest stable version
+|===
+
+=== Feature requirements
+
+The following platforms *are only required if you're using certain AsciiDoc features*.
+
+[cols="30,20,15a",width="55%"]
+|===
+|Feature |Supported Platform |Supported Version(s)
+
+|Stem equations and formulas
+|MathJax
+|2.7.4
+
+.3+|Server-side syntax highlighting for source code blocks
+|CodeRay
+|1.1.2
+
+|Pygments
+|2.2.0
+
+|Rouge
+|3.1.1
+
+|Inline, admonition or callout font-based icons
+|Font Awesome
+|4.7
+|===
+
+////
+This content was from install-upgrade-asciidoctor.adoc and was tagged as systemreq[]
+
+Asciidoctor works on Linux, macOS and Windows.
+
+Asciidoctor requires one of the following implementations of Ruby:
+
+* Ruby 1.8.7
+* Ruby 1.9.3
+* Ruby 2 (2.0.0 or better)
+* JRuby 1.7 (Ruby 1.8 and 1.9 modes)
+* JRuby 9000
+* Rubinius 2.0 (Ruby 1.8 and 1.9 modes)
+* Opal (Javascript)
+////

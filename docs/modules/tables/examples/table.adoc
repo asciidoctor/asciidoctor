@@ -1,0 +1,230 @@
+// tag::base-co[]
+|=== // <1>
+// <2>
+| Cell in column 1, row 1 | Cell in column 2, row 1  // <3>
+// <4>
+| Cell in column 1, row 2 | Cell in column 2, row 2
+
+| Cell in column 1, row 3 | Cell in column 2, row 3
+
+|=== // <1>
+// end::base-co[]
+
+// tag::base-alt[]
+[width="90"]
+|===
+
+| Cell in column 1, row 1 | Cell in column 2, row 1
+
+| Cell in column 1, row 2 | Cell in column 2, row 2
+
+| Cell in column 1, row 3 | Cell in column 2, row 3
+
+|===
+// end::base-alt[]
+
+// tag::base-rolename[]
+[.rolename]
+|===
+
+| Cell in column 1, row 1 | Cell in column 2, row 1 | Cell in column 3, row 1
+
+| Cell in column 1, row 2 | Cell in column 2, row 2 | Cell in column 3, row 2
+
+|===
+// end::base-rolename[]
+
+// tag::base[]
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+|===
+// end::base[]
+
+// tag::cell1[]
+|===
+
+|Cell in column 1, row 1|Cell in column 2, row 1
+
+|===
+// end::cell1[]
+
+// tag::cell2[]
+|===
+
+| Cell in column 1, row 1        |          Cell in column 2, row 1
+
+|===
+// end::cell2[]
+
+// tag::indv-co[]
+[cols="3*"] // <1>
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+|===
+// end::indv-co[]
+
+// tag::indv[]
+[cols="3*"]
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+|===
+// end::indv[]
+
+// tag::b-base-h-co[]
+.Table Title
+|===
+|Name of Column 1 |Name of Column 2 |Name of Column 3 <1>
+<2>
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+|===
+// end::b-base-h-co[]
+
+// tag::b-base-h[]
+.Table Title
+|===
+|Name of Column 1 |Name of Column 2 |Name of Column 3
+
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+|===
+// end::b-base-h[]
+
+// tag::b-col-h-co[]
+[%header,cols=2*] <1>
+|===
+|Name of Column 1
+|Name of Column 2
+
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|===
+// end::b-col-h-co[]
+
+// tag::b-col-h[]
+[%header,cols=2*]
+|===
+|Name of Column 1
+|Name of Column 2
+
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|===
+// end::b-col-h[]
+
+// tag::b-col-indv-co[]
+[cols="1,1,2", options="header"] <1>
+.Applications
+|===
+|Name
+|Category
+|Description
+
+|Firefox
+|Browser
+|Mozilla Firefox is an open-source web browser.
+It's designed for standards compliance,
+performance, portability.
+
+|Arquillian
+|Testing
+|An innovative and highly extensible testing platform.
+Empowers developers to easily create real, automated tests.
+|===
+// end::b-col-indv-co[]
+
+// tag::b-col-indv[]
+[cols="1,1,2", options="header"]
+.Applications
+|===
+|Name
+|Category
+|Description
+
+|Firefox
+|Browser
+|Mozilla Firefox is an open-source web browser.
+It's designed for standards compliance,
+performance, portability.
+
+|Arquillian
+|Testing
+|An innovative and highly extensible testing platform.
+Empowers developers to easily create real, automated tests.
+|===
+// end::b-col-indv[]
+
+// tag::b-col-a[]
+[cols="2,2,5a"]
+|===
+|Firefox
+|Browser
+|Mozilla Firefox is an open-source web browser.
+
+It's designed for:
+
+* standards compliance
+* performance
+* portability
+
+https://getfirefox.com[Get Firefox]!
+|===
+// end::b-col-a[]
+
+
+// tag::nested[]
+[cols="1,2a"]
+|===
+| Col 1 | Col 2
+
+| Cell 1.1
+| Cell 1.2
+
+| Cell 2.1
+| Cell 2.2
+
+[cols="2,1"]
+!===
+! Col1 ! Col2
+
+! C11
+! C12
+
+!===
+
+|===
+// end::nested[]

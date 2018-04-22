@@ -1,0 +1,131 @@
+= Table Cells
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+
+[#cell]
+== Cell formatting
+
+In addition to sharing many of the column specifier capabilities, cell specifiers allow cells to span rows and columns.
+Like a column specifier, a cell specifier is made up of components.
+These components, listed and defined below, are all optional.
+
+* span
+* align
+* style
+
+A cell specifier is prefixed directly to the cell delimiter (`|`) preceding the content you want to customize.
+
+The span component can duplicate a cell or have it span multiple rows or columns.
+
+== Duplicate cell content
+
+To duplicate a cell in multiple, consecutive columns, prefix the `|` with the multiplication factor and the `+*+` operator.
+
+.Cell duplicated across three columns
+[source]
+----
+include::{examplesdir}/cell.adoc[tag=3dup]
+----
+
+.Result: Rendered table where cell was duplicated across three columns
+[width="90"]
+include::{examplesdir}/cell.adoc[tag=3dup]
+
+[#span]
+== Span columns and rows
+
+To have a cell span multiple, consecutive columns, prefix the `|` with the span factor and the `{plus}` operator.
+
+.Cell spanning three columns
+[source]
+----
+include::{examplesdir}/cell.adoc[tag=3span]
+----
+
+.Result: Rendered table where cell spans three columns
+[width="90"]
+include::{examplesdir}/cell.adoc[tag=3span]
+
+If you want to have a cell span multiple, consecutive rows, prefix the span factor with a dot (`.`).
+
+.Cell spanning two rows
+[source]
+----
+include::{examplesdir}/cell.adoc[tag=2span-r]
+----
+
+.Result: Rendered table where a cell spans two rows
+[width="90"]
+include::{examplesdir}/cell.adoc[tag=2span-r]
+
+Of course you can combine spanning over columns and rows.
+The number before the dot (`.`) is the number of columns to span and the number after the dot (`.`) is the number of rows to span.
+
+.Cell spanning columns and rows
+[source]
+----
+include::{examplesdir}/cell.adoc[tag=span-cr]
+----
+
+.Result: Rendered table where a cell spans over columns and rows
+[width="90"]
+include::{examplesdir}/cell.adoc[tag=span-cr]
+
+[#align-cell]
+== Align cell content
+
+The alignment component for cells works the same as the xref:column.adoc#cols-align[column specifier alignment component].
+
+.Cells aligned horizontally, vertically, and across a span of three columns
+[source]
+----
+include::{examplesdir}/cell.adoc[tag=cell-align]
+----
+
+.Result: Rendered cells aligned horizontally, vertically, and across a span of three columns
+[width="90"]
+include::{examplesdir}/cell.adoc[tag=cell-align]
+
+[#pipe-in-table-cell]
+IMPORTANT: To use a pipe (`|`) within the content of a cell without creating a new cell, you must use the `+{vbar}+` attribute.
+
+== Style cell content
+
+The xref:column.adoc#cols-style[style component] can also be applied to individual cells.
+For example, you can apply the AsciiDoc element styles to an individual cell by prefixing the vertical bar with an `a`.
+
+.Comparing cells using AsciiDoc styles and no AsciiDoc styles
+[source]
+----
+include::{examplesdir}/cell.adoc[tag=cell-ad]
+----
+
+.Result: Rendered table comparing cells using AsciiDoc styles and no AsciiDoc styles
+[width="90"]
+include::{examplesdir}/cell.adoc[tag=cell-ad]
+
+Source code listing can be placed inside cells by using the listing syntax.
+
+.Cells with source code listing
+....
+include::{examplesdir}/cell.adoc[tag=cell-src]
+....
+
+.Result: Rendered table with cells containing source code listing
+[width="90"]
+====
+include::{examplesdir}/cell.adoc[tag=cell-src]
+====
+
+For the grand finale, let's apply a variety of specifiers to individual cells.
+
+.Building a variety of cell specifiers
+[source]
+----
+include::{examplesdir}/cell.adoc[tag=cell-v]
+----
+
+.Result: Rendered table featuring a variety of cell specifiers
+[width="90"]
+include::{examplesdir}/cell.adoc[tag=cell-v]

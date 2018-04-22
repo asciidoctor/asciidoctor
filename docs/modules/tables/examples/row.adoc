@@ -1,0 +1,102 @@
+// tag::same[]
+|===
+
+|Cell in column 1, row 1 |Cell in column 2, row 1 |Cell in column 3, row 1
+
+|Cell in column 1, row 2 |Cell in column 2, row 2 |Cell in column 3, row 2
+
+|===
+// end::same[]
+
+// tag::indv-co[]
+[cols="3*"] // <1>
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+|===
+// end::indv-co[]
+
+// tag::indv[]
+[cols="3*"]
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+|===
+// end::indv[]
+
+// tag::same-indv[]
+[cols="3*"]
+|===
+|Cell in column 1, row 1 |Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2 |Cell in column 3, row 2
+|===
+// end::same-indv[]
+
+// tag::opt-h[]
+[cols=2*,options="header"]
+|===
+|Name of Column 1
+|Name of Column 2
+
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|===
+// end::opt-h[]
+
+// tag::impl-h[]
+|===
+|Name of Column 1 |Name of Column 2
+
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|===
+// end::impl-h[]
+
+// tag::opt-f[]
+[options="footer"]
+|===
+|Name of Column 1 |Name of Column 2
+
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+
+|Footer in column 1, row 3
+|Footer in column 2, row 3
+|===
+// end::opt-f[]
+
+// tag::base-h[]
+|===
+|Name of Column 1 |Name of Column 2 |Name of Column 3
+
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+|Cell in column 3, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+|===
+// end::base-h[]

@@ -1,0 +1,51 @@
+= Highlight PHP Source Code
+//Highlighting PHP source code
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From src.adoc, was originally a sidebar at the bottom of the page, included in:
+- user-manual: Syntax Highlighting Source Code
+////
+
+The PHP language has two modes.
+It can either be used as a standalone language (pure mode) or it can be mixed with HTML (mixed mode) by putting it inside PHP tags (a form that resembles an XML processing instruction).
+This presents some challenges for the syntax highlighter.
+
+If the code in the source block is pure PHP, you should use the language tag `php`.
+For example:
+
+[listing]
+....
+[source,php]
+----
+echo "Hello, World!";
+----
+....
+
+If the PHP source is mixed with HTML, you should either use the language tag `html+php`, as shown here:
+
+[listing]
+....
+[source,html+php]
+----
+<p>
+<?php echo "Hello, World!"; ?>
+</p>
+----
+....
+
+Or you should use the language tag `php` and set the `mixed` option on the source block, as shown here:
+
+[listing]
+....
+[source%mixed,php]
+----
+<p>
+<?php echo "Hello, World!"; ?>
+</p>
+----
+....
+
+Under the covers, the syntax highlighter is configured to assume an implicit start PHP tag is present when the language tag is `php`.
+Both the `mixed` option and the language tag `html+php` disable this setting.

@@ -1,0 +1,43 @@
+= Sections
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+From sections.adoc, included in:
+- user-manual
+
+The tag "intro" begins on this page, at "Sections partition the document into a content hierarchy." and ends on the levels-and-titles.adoc page right before Titles as HTML headings.
+////
+
+Sections partition the document into a content hierarchy.
+
+With Asciidoctor you can:
+
+* xref:level-and-title.adoc[Nest sections]
+* xref:id.adoc[Control and assign section IDs, anchors, and linking]
+* xref:number.adoc[Control and assign section numbering]
+* xref:discrete.adoc[Create floating (discrete) sections]
+
+== Section styles for technical content and books
+////
+This is the content for section-styles.adoc, included in:
+- user-manual: sections: section styles
+////
+
+Asciidoctor provides styles for the front matter and back matter sections commonly found in journal articles, academic papers, and books.
+The styles are:
+
+* Dedication
+* Table of Contents
+* Abstract
+* Preface
+* Multi-book parts
+* Chapter labels
+* Appendix
+* Glossary
+* Bibliography
+* Index
+* Colophon
+
+These styles are available to the `article` and `book` document types, with the exception of the part introduction style which is exclusive to books.
+//The structure and usage rules for each section style is explained in the Book documentation.

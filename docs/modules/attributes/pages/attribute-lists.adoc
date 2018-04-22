@@ -1,0 +1,66 @@
+= Set Attributes on an Element
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+////
+attr-element.adoc, included in:
+- user-manual: Attributes: Setting attributes on an element
+also element.adoc
+////
+
+In addition to the document attributes, which generally apply to a whole document, you can assign attributes to individual elements within a document.
+
+== Block and inline elements
+
+There are two kinds of elements in AsciiDoc, block and inline.
+
+In a document, one or more lines of text is defined as a block element.
+Examples of block elements are tables, callout lists, block macros such as `image::[]`, verse block titles, paragraphs, an attribute entry in the header, and the header as a whole.
+Block elements can be nested within block elements.
+
+An inline element performs an operation on a subset of the content within a block element.
+Inline elements are text marked up by inline formatting (italic, bold, etc.), inline macros, and attribute references.
+
+Attributes can be assigned to block and inline elements using an [.term]_attribute list_.
+
+== Attribute lists
+
+Attribute lists:
+
+. apply to blocks, macros, and inline elements
+. can contain positional and named attributes
+. take precedence over document attributes (attribute entries)
+
+.Anatomy of an attribute list
+ [positional attribute,positional attribute,named attribute="value"]
+
+Let's break down the difference between positional and named attributes.
+
+=== Positional attribute
+// tag::pos[]
+Values placed in a specific order in an attribute list don't require an attribute name.
+The attribute that the value is assigned to depends on the type of the element:
+
+* `icon:` (1) size
+* `image:` and `image::` (1) alt text, (2) width, (3) height
+* Delimited blocks: (1) block name (aka style)
+* Other inline quoted text: (1) role
+
+For example, `+image:sunset.jpg[Sunset,300,400]+` is equivalent to `+image:sunset.jpg[alt=Sunset, width=300, height=400]+`.
+// end::pos[]
+
+=== Named attribute
+// tag::name[]
+A named attribute consists of a name and a value separated by an `=` character.
+
+If the value contains spaces, commas, or a quote characters, it must be enclosed in double or single quotes.
+Otherwise, the surrounding quotes are optional.
+If used, the surrounding quotes are stripped from the parsed value.
+
+If the value is enclosed in single quotes, normal substitutions get applied to the value at assignment time.
+No special processing is performed if the value is enclosed in double quotes.
+
+To use the same quote character in the value that's used to enclose the value, escape the character in the value by prefixing it with a backslash (e.g., `value="the song \"Dark Horse\""`).
+
+To undefine a named attribute, set the value to `None` (case sensitive).
+// end::name[]

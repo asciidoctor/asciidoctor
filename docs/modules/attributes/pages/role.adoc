@@ -1,0 +1,92 @@
+= The Role Attribute
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// directly from um
+
+An element can be assigned numerous roles.
+
+== Block Assignment
+
+In an attribute list, there are two ways to assign a role attribute to a block element.
+
+. Prefixing the name with a dot (`.`).
+. Specifying the name with `role=<name>`.
+
+.Shorthand syntax
+[source]
+----
+[.summary]
+* Review 1
+* Review 2
+----
+
+.Formal syntax
+[source]
+----
+[role="summary"]
+* Review 1
+* Review 2
+----
+
+To specify multiple roles using the shorthand syntax, separate them by dots.
+
+[source]
+----
+[.summary.incremental]
+* Review 1
+* Review 2
+----
+
+[source]
+----
+[role="summary,incremental"]
+* Review 1
+* Review 2
+----
+
+== Inline Assignment
+
+The role (`.`) shorthand can be used on inline text.
+
+.Inline text with role assignments using formal syntax
+[source]
+----
+[big goal]*free the world*
+----
+
+.Inline text with role assignments using shorthand syntax
+[source]
+----
+[.big.goal]*free the world*
+----
+
+TIP: The attribute list preceding formatted text can be escaped using a backslash (e.g., `+\[role]*bold*+`).
+In this case, the text will still be formatted, but the attribute list will be unescaped and output verbatim.
+
+.Role-playing for text enclosed in backticks
+To align with other formatted (i.e., quoted) text in AsciiDoc, roles can now be assigned to text enclosed in backticks.
+
+Given:
+
+```
+[.rolename]`monospace text`
+```
+
+the following HTML is produced:
+
+```html
+<code class="rolename">monospace text</code>
+```
+
+Using the shorthand notation, an id (i.e., anchor) can also be specified:
+
+```
+[#idname.rolename]`monospace text`
+```
+
+which produces:
+
+```html
+<a id="idname"></a><code class="rolename">monospace text</code>
+```

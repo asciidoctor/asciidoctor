@@ -1,0 +1,18 @@
+= Glossary
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// anchor from um: user-glossary
+
+You can include a glossary of definitions by including the `[glossary]` marker before the section header and before the first definition.
+
+[source]
+----
+[glossary]
+== Glossary
+
+[glossary]
+mud:: wet, cold dirt
+rain::
+	water falling from the sky
+----
