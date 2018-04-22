@@ -828,8 +828,7 @@ text
       fixture_parent_path = File.dirname fixture_base_path
       sample_output_relpath = File.join 'fixtures', 'basic.html'
       begin
-        # FIXME we shouldn't need unsafe here since combined file is within jail
-        doc = Asciidoctor.convert_file sample_input_path, :to_dir => fixture_parent_path, :to_file => sample_output_relpath, :safe => :unsafe
+        doc = Asciidoctor.convert_file sample_input_path, :to_dir => fixture_parent_path, :to_file => sample_output_relpath
         assert_equal fixture_base_path, doc.options[:to_dir]
       ensure
         FileUtils.rm(sample_output_path)
