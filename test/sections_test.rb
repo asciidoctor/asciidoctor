@@ -1227,19 +1227,25 @@ content
 
   context 'Section Numbering' do
     test 'should create section number with one entry for level 1' do
+      doc = empty_document
       sect1 = Asciidoctor::Section.new
+      doc << sect1
       assert_equal '1.', sect1.sectnum
     end
 
     test 'should create section number with two entries for level 2' do
+      doc = empty_document
       sect1 = Asciidoctor::Section.new
+      doc << sect1
       sect1_1 = Asciidoctor::Section.new(sect1)
       sect1 << sect1_1
       assert_equal '1.1.', sect1_1.sectnum
     end
 
     test 'should create section number with three entries for level 3' do
+      doc = empty_document
       sect1 = Asciidoctor::Section.new
+      doc << sect1
       sect1_1 = Asciidoctor::Section.new(sect1)
       sect1 << sect1_1
       sect1_1_1 = Asciidoctor::Section.new(sect1_1)
@@ -1248,7 +1254,9 @@ content
     end
 
     test 'should create section number for second section in level' do
+      doc = empty_document
       sect1 = Asciidoctor::Section.new
+      doc << sect1
       sect1_1 = Asciidoctor::Section.new(sect1)
       sect1 << sect1_1
       sect1_2 = Asciidoctor::Section.new(sect1)
@@ -1257,7 +1265,9 @@ content
     end
 
     test 'sectnum should use specified delimiter and append string' do
+      doc = empty_document
       sect1 = Asciidoctor::Section.new
+      doc << sect1
       sect1_1 = Asciidoctor::Section.new(sect1)
       sect1 << sect1_1
       sect1_1_1 = Asciidoctor::Section.new(sect1_1)
