@@ -62,10 +62,12 @@ class Section < AbstractBlock
 
   # Public: Get the section number for the current Section
   #
-  # The section number is a unique, dot separated String
-  # where each entry represents one level of nesting and
-  # the value of each entry is the 1-based outline number
-  # of the Section amongst its numbered sibling Sections
+  # The section number is a dot-separated String that uniquely describes the position of this
+  # Section in the document. Each entry represents a level of nesting. The value of each entry is
+  # the 1-based outline number of the Section amongst its numbered sibling Sections.
+  #
+  # This method assumes that both the @level and @parent instance variables have been assigned.
+  # The method also assumes that the value of @parent is either a Document or Section.
   #
   # delimiter - the delimiter to separate the number for each level
   # append    - the String to append at the end of the section number
@@ -105,7 +107,7 @@ class Section < AbstractBlock
   # Returns the section number as a String
   def sectnum(delimiter = '.', append = nil)
     append ||= (append == false ? '' : delimiter)
-    if @level && @level > 1 && @parent && @parent.context == :section
+    if @level > 1 && @parent != @document
       %(#{@parent.sectnum(delimiter)}#{@number}#{append})
     else
       %(#{@number}#{append})
