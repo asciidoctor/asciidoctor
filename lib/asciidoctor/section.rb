@@ -45,7 +45,6 @@ class Section < AbstractBlock
     @numbered = numbered && @level > 0
     @special = parent && parent.context == :section && parent.special
     @index = 0
-    @number = 1
   end
 
   # Public: The name of this section, an alias of the section title
