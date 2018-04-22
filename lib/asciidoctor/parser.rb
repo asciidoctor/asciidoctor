@@ -850,7 +850,8 @@ class Parser
         block = build_block(block_context, :compound, terminator, parent, reader, attributes)
 
       when :table
-        block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true, :context => :table), reader.cursor
+        block_cursor = reader.cursor
+        block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true, :context => :table), block_cursor
         # NOTE it's very rare that format is set when using a format hint char, so short-circuit
         unless terminator.start_with? '|', '!'
           # NOTE infer dsv once all other format hint chars are ruled out
@@ -1028,7 +1029,8 @@ class Parser
       block_reader = reader
     else
       lines = nil
-      block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing, :context => block_context), reader.cursor
+      block_cursor = reader.cursor
+      block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing, :context => block_context), block_cursor
     end
 
     if content_model == :verbatim
@@ -1282,7 +1284,8 @@ class Parser
 
     # first skip the line with the marker / term
     reader.shift
-    list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), reader.cursor
+    block_cursor = reader.cursor
+    list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), block_cursor
     if list_item_reader.has_more_lines?
       # NOTE peek on the other side of any comment lines
       comment_lines = list_item_reader.skip_line_comments
