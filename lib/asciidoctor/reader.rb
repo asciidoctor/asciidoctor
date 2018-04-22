@@ -5,20 +5,14 @@ class Reader
   include Logging
 
   class Cursor
-    attr_accessor :file
-    attr_accessor :dir
-    attr_accessor :path
-    attr_accessor :lineno
+    attr_reader :file, :dir, :path, :lineno
 
     def initialize file, dir = nil, path = nil, lineno = nil
-      @file = file
-      @dir = dir
-      @path = path
-      @lineno = lineno
+      @file, @dir, @path, @lineno = file, dir, path, lineno
     end
 
     def line_info
-      %(#{path}: line #{lineno})
+      %(#{@path}: line #{@lineno})
     end
 
     alias to_s line_info
