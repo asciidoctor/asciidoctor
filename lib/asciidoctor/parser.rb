@@ -1258,13 +1258,22 @@ class Parser
   # for the parent list Block.
   def self.next_list_item(reader, list_block, match, sibling_trait = nil)
     if (list_type = list_block.context) == :dlist
+      dlist = true
+      has_text = true unless match[3].nil_or_empty?
       list_term = ListItem.new(list_block, match[1])
       list_item = ListItem.new(list_block, match[3])
-      has_text = true unless match[3].nil_or_empty?
+      if list_block.document.sourcemap
+        list_term.source_location = reader.cursor
+        if has_text
+          list_item.source_location = list_term.source_location
+        else
+          sourcemap_assignment_deferred = true
+        end
+      end
     else
-      # Create list item using first line as the text of the list item
-      list_item = ListItem.new(list_block, (text = match[2]))
       has_text = true
+      list_item = ListItem.new(list_block, (text = match[2]))
+      list_item.source_location = reader.cursor if list_block.document.sourcemap
       if list_type == :ulist
         list_item.marker = (sibling_trait ||= match[1])
         if text.start_with?('[') && text.start_with?('[ ] ', '[x] ', '[*] ')
@@ -1282,11 +1291,12 @@ class Parser
       end
     end
 
-    # first skip the line with the marker / term
+    # first skip the line with the marker / term (it gets put back onto the reader by next_block)
     reader.shift
     block_cursor = reader.cursor
     list_item_reader = Reader.new read_lines_for_list_item(reader, list_type, sibling_trait, has_text), block_cursor
     if list_item_reader.has_more_lines?
+      list_item.source_location = block_cursor if sourcemap_assignment_deferred
       # NOTE peek on the other side of any comment lines
       comment_lines = list_item_reader.skip_line_comments
       if (subsequent_line = list_item_reader.peek_line)
@@ -1296,7 +1306,7 @@ class Parser
         else
           content_adjacent = true
           # treat lines as paragraph text if continuation does not connect first block (i.e., has_text = nil)
-          has_text = nil unless list_type == :dlist
+          has_text = nil unless dlist
         end
       else
         # NOTE we have no use for any trailing comment lines we might have found
@@ -1304,19 +1314,17 @@ class Parser
         content_adjacent = false
       end
 
-      # only relevant for :dlist
-      options = {:text => !has_text}
+      attrs, opts = {}, { :text => !has_text }
 
       # we can look for blocks until lines are exhausted without worrying about
       # sections since reader is confined to boundaries of list
-      while ((block = next_block list_item_reader, list_item, {}, options) && list_item.blocks << block) ||
-          list_item_reader.has_more_lines?
+      while ((block = next_block list_item_reader, list_item, attrs, opts) && list_item.blocks << block) || list_item_reader.has_more_lines?
       end
 
       list_item.fold_first(continuation_connects_first_block, content_adjacent)
     end
 
-    if list_type == :dlist
+    if dlist
       if list_item.text? || list_item.blocks?
         [list_term, list_item]
       else

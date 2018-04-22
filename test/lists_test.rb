@@ -4628,5 +4628,11 @@ listing block in list item 1
     assert_equal 1, lists[0].lineno
     assert_equal 2, lists[1].lineno
     assert_equal 3, lists[2].lineno
+
+    list_items = doc.find_by :context => :list_item
+    assert_equal 1, list_items[0].lineno
+    assert_equal 2, list_items[1].lineno
+    assert_equal 3, list_items[2].lineno
+    assert_equal 4, list_items[3].lineno
   end
 end

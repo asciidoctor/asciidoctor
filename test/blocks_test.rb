@@ -218,7 +218,7 @@ supposed to be after sidebar block, except it got swallowed by block comment
       EOS
 
       render_embedded_string input
-      assert_message @logger, :WARN, '<stdin>: line 8: unterminated comment block', Hash
+      assert_message @logger, :WARN, '<stdin>: line 5: unterminated comment block', Hash
     end
 
     # WARNING if first line of content is a directive, it will get interpretted before we know it's a comment block
