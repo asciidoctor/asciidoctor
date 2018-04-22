@@ -1,8 +1,8 @@
 * Lists & Counters
 ** xref:ordered.adoc[Ordered]
 ** xref:unordered.adoc[Unordered]
-** xref:definition.adoc[Definition]
+** xref:description.adoc[Description]
 ** xref:complex.adoc[Complex]
-** xref:task.adoc[Task]
+** xref:checklist.adoc[Checklist]
 ** xref:qanda.adoc[Question & Answer]
 ** xref:attributes:counter.adoc[Counter]

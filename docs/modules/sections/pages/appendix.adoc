@@ -2,11 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-anchor from user manual: user-appendix
-Included in:
-- user-manual
-////
+// anchor um: user-appendix
 
 You can indicate that a section, part, or chapter is an appendix by adding an `[appendix]` line above the section title.
 
@@ -53,14 +49,14 @@ For example:
 
 [source]
 ----
-include::{partialsdir}/ex-appendix.adoc[tag=appx-article]
+include::{examplesdir}/appendix.adoc[tag=appx-article]
 ----
 
 The table of contents will appear as follows:
 
 [source]
 ----
-include::{partialsdir}/ex-appendix.adoc[tag=appx-article-out]
+include::{examplesdir}/appendix.adoc[tag=appx-article-out]
 ----
 
 For books, the appendix must be defined as a level-1 section if you want the appendix to be a adjacent to other chapters (and in the current part if the book has multiple parts).
@@ -72,12 +68,12 @@ The following example shows how to define an appendix for a multi-book (take awa
 
 [source]
 ----
-include::{partialsdir}/ex-appendix.adoc[tag=appx-book]
+include::{examplesdir}/appendix.adoc[tag=appx-book]
 ----
 
 The table of contents will appear as follows:
 
 [source]
 ----
-include::{partialsdir}/ex-appendix.adoc[tag=appx-book-out]
+include::{examplesdir}/appendix.adoc[tag=appx-book-out]
 ----

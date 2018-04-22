@@ -2,10 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-From open.adoc, included in:
-- user-manual: Open Blocks
-////
+// open.adoc, included in user-manual
 
 The most versatile block of all is the open block.
 
@@ -14,12 +11,12 @@ The most versatile block of all is the open block.
 .Open block syntax
 [source]
 ----
-include::{partialsdir}/ex-open.adoc[tag=base]
+include::{examplesdir}/open.adoc[tag=base]
 ----
 
 .Result: Open block
 ====
-include::{partialsdir}/ex-open.adoc[tag=base]
+include::{examplesdir}/open.adoc[tag=base]
 ====
 
 An open block can act as any other block, with the exception of _pass_ and _table_.
@@ -28,12 +25,12 @@ Here's an example of an open block acting as a sidebar.
 .Open block masquerading as a sidebar syntax
 [source]
 ----
-include::{partialsdir}/ex-open.adoc[tag=sb]
+include::{examplesdir}/open.adoc[tag=sb]
 ----
 
 .Result: Open block masquerading as a sidebar
 ====
-include::{partialsdir}/ex-open.adoc[tag=sb]
+include::{examplesdir}/open.adoc[tag=sb]
 ====
 
 This is an open block acting as a source block.
@@ -41,10 +38,10 @@ This is an open block acting as a source block.
 .Open block masquerading as a source block syntax
 [source]
 ----
-include::{partialsdir}/ex-open.adoc[tag=src]
+include::{examplesdir}/open.adoc[tag=src]
 ----
 
 .Result: Open block masquerading as a source block
 ====
-include::{partialsdir}/ex-open.adoc[tag=src]
+include::{examplesdir}/open.adoc[tag=src]
 ====

@@ -2,18 +2,15 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-Included in:
-- user-manual: Asciidoctor's most notable benefits
-The primary benefits and supporting features of the application.
-////
+// user-manual: Asciidoctor's most notable benefits
+// The primary benefits and supporting features of the application.
 
 While Asciidoctor aims to offer full compliance with the AsciiDoc syntax, it's more than just a clone.
 
 .Built-in and custom templates
 Asciidoctor uses a set of built-in ERB templates to generate HTML 5 and DocBook output that is structurally equivalent to what AsciiDoc produces.
 Any of these templates can be replaced by a custom template written in any template language available in the Ruby ecosystem.
-Custom template rendering is handled by the {url-tilt}[Tilt^] template abstraction library.
+Custom template rendering is handled by the Tilt template abstraction library.
 Tilt is one of the most popular gems in the Ruby ecosystem.
 
 .Parser and object model

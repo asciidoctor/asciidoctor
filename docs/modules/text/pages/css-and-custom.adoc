@@ -2,25 +2,22 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-text-css.adoc, included in:
-- user-manual: text formatting: Custom styling with attributes
-////
+// text-css.adoc
 
-== Size and color formatting
+== Custom style syntax
 
-Additionally, text marked with hash symbols can be assigned built-in styles, such as `big` and `green`.
+Additionally, text marked with hash symbols can be assigned built-in styles, such as `big` or `underline`.
 
 .Built-in CSS class syntax
 [source]
 ----
-include::{partialsdir}/ex-text.adoc[tag=css-co]
+include::{examplesdir}/text.adoc[tag=css-co]
 ----
 <1> The first positional attribute is treated as a role. You can assign it a custom or built-in CSS class.
 
 .Rendered CSS class styled text
 ====
-include::{partialsdir}/ex-text.adoc[tag=css]
+include::{examplesdir}/text.adoc[tag=css]
 ====
 
 You can format text with custom styles that you define as well.
@@ -28,7 +25,7 @@ You can format text with custom styles that you define as well.
 .Custom CSS class syntax
 [source]
 ----
-include::{partialsdir}/ex-text.adoc[tag=css-custom]
+include::{examplesdir}/text.adoc[tag=css-custom]
 ----
 
 When converted to HTML, the word _asciidoctor_ is wrapped in `<span>` tags and the role `userinput` is used as the element's CSS class.
@@ -36,7 +33,7 @@ When converted to HTML, the word _asciidoctor_ is wrapped in `<span>` tags and t
 .HTML output
 [source,html]
 ----
-include::{partialsdir}/ex-text.adoc[tag=css-custom-html]
+include::{examplesdir}/text.adoc[tag=css-custom-html]
 ----
 
 ////

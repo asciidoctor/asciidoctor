@@ -6,10 +6,6 @@ endif::[]
 //icon:check[role="green"]
 :n: No
 //icon:times[role="red"]
-////
-From subs-quote.adoc, included in:
-- user-manual: Text Substitutions: quotes
-////
 
 The `quotes` substitution replaces the formatting markup on inline elements.
 

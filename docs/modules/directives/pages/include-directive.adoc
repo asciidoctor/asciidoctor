@@ -2,10 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-From include-directive.adoc, included in:
-- user-manual
-////
+// include-directive.adoc, included in user-manual
 
 The include directive (`include::path[attributes]`) let's you import content from another file into the current document.
 You can use it multiple times in the same document.
@@ -140,6 +137,7 @@ Because the leveloffset is _relative_ (it begins with + or -), this works even i
 
 If you have lots of chapters to include and want them all to have the same offset, you can save some typing by setting leveloffset around the includes:
 
+[source]
 ----
 = My book
 
@@ -158,6 +156,7 @@ The final line returns the leveloffset to 0.
 
 Alternatively, you could use absolute levels:
 
+[source]
 ----
 :leveloffset: 1
 

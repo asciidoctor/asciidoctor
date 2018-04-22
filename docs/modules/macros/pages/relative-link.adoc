@@ -12,14 +12,14 @@ If you want to link to an external file relative to the current document, use th
 
 [source]
 ----
-include::{partialsdir}/ex-url.adoc[tag=link]
+include::{examplesdir}/url.adoc[tag=link]
 ----
 
 If your file is an HTML file, you can link directly to a section in the document, append a hash (`#`) followed by the section's ID to the end of the file name.
 
 [source]
 ----
-include::{partialsdir}/ex-url.adoc[tag=hash]
+include::{examplesdir}/url.adoc[tag=hash]
 ----
 
 ////

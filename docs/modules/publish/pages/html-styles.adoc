@@ -20,15 +20,15 @@ To have your document link to the stylesheet, set the `linkcss` attribute in the
 
 [source]
 ----
-include::{partialsdir}/mysample-link.adoc[]
+include::{examplesdir}/mysample-link.adoc[]
 ----
 
 You can also set linkcss with the CLI.
 
  $ asciidoctor -a linkcss mysample.adoc
 
-Now, when you view the directory, you should see the file [.path]_asciidoctor.css_ in addition to[.path]_mysample.adoc_ and [.path]_mysample.html_.
-The linkcss attribute automatically copies asciidoctor.css to the output directory.
+Now, when you view the directory, you should see the file [.path]_asciidoctor.css_ in addition to [.path]_mysample.adoc_ and [.path]_mysample.html_.
+The linkcss attribute automatically copies [.path]_asciidoctor.css_ to the output directory.
 Additionally, you can inspect [.path]_mysample.html_ in your browser and see `<link rel="stylesheet" href="./asciidoctor.css">` inside the `<head>` tags.
 
 ====

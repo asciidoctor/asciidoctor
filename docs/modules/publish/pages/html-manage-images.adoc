@@ -13,7 +13,7 @@ As an alternative, you can embed the images directly into the document by settin
 
 [source]
 ----
-include::{partialsdir}/mysample-data-uri.adoc[]
+include::{examplesdir}/mysample-data-uri.adoc[]
 ----
 
 ====

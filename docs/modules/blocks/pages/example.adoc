@@ -2,17 +2,14 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-From example.adoc, included in:
-- user-manual: example
-////
+// example.adoc, included in user-manual
 
 == Example block sytax
 
 .Example syntax
 [source]
 ----
-include::{partialsdir}/ex-example.adoc[tag=base]
+include::{examplesdir}/example.adoc[tag=base]
 ----
 
-include::{partialsdir}/ex-example.adoc[tag=base]
+include::{examplesdir}/example.adoc[tag=base]

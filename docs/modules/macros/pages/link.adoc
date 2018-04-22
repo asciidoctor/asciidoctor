@@ -31,7 +31,7 @@ Since the URL in the example below begins with a protocol (in this case _https_ 
 
 [source]
 ----
-include::{partialsdir}/ex-url.adoc[tag=base-co]
+include::{examplesdir}/url.adoc[tag=base-co]
 ----
 <1> The trailing period will not get caught up in the link.
 
@@ -63,7 +63,7 @@ To attach a URL to text, enclose the text in square brackets at the end of the U
 
 [source]
 ----
-include::{partialsdir}/ex-url.adoc[tag=irc]
+include::{examplesdir}/url.adoc[tag=irc]
 ----
 // end::basic[]
 
@@ -71,12 +71,12 @@ Additionally, you can format the linked text.
 
 [source]
 ----
-include::{partialsdir}/ex-url.adoc[tag=text]
+include::{examplesdir}/url.adoc[tag=text]
 ----
 
 .Rendered URLs
 ====
-include::{partialsdir}/ex-url.adoc[tag=base]
+include::{examplesdir}/url.adoc[tag=base]
 ====
 
 == The link macro
@@ -99,11 +99,11 @@ Let's consider a case where we need to use the link macro (instead of just a URI
 
 [source]
 ----
-include::{partialsdir}/ex-url.adoc[tag=unconstrained]
+include::{examplesdir}/url.adoc[tag=unconstrained]
 ----
 
 ====
-include::{partialsdir}/ex-url.adoc[tag=unconstrained]
+include::{examplesdir}/url.adoc[tag=unconstrained]
 ====
 
 If we didn't use the `link:` prefix in this case, the URL macro would not be detected by the parser.
@@ -128,11 +128,11 @@ Once you've activated the `linkattrs` attribute, you can then specify the name o
 
 [source]
 ----
-include::{partialsdir}/ex-url.adoc[tag=linkattrs-h]
+include::{examplesdir}/url.adoc[tag=linkattrs-h]
 ----
 
 ====
-include::{partialsdir}/ex-url.adoc[tag=linkattrs]
+include::{examplesdir}/url.adoc[tag=linkattrs]
 ====
 
 Since `_blank` is the most common window name, we've introduced shorthand for it.
@@ -140,7 +140,7 @@ Just end the link text with a caret (`+^+`):
 
 [source]
 ----
-include::{partialsdir}/ex-url.adoc[tag=linkattrs-s]
+include::{examplesdir}/url.adoc[tag=linkattrs-s]
 ----
 
 CAUTION: If you use the caret syntax more than once in a single paragraph, you may need to escape the first occurrence with a backslash.
@@ -149,11 +149,11 @@ When the `linkattrs` attribute is set, you can add a role (i.e., CSS class) to t
 
 [source]
 ----
-include::{partialsdir}/ex-url.adoc[tag=css]
+include::{examplesdir}/url.adoc[tag=css]
 ----
 
 ====
-include::{partialsdir}/ex-url.adoc[tag=css]
+include::{examplesdir}/url.adoc[tag=css]
 ====
 
 TIP: Links with attributes (including the subject and body segments on mailto links) are a feature unique to Asciidoctor.

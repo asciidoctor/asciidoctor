@@ -2,10 +2,8 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-partinro from Processing your content and all content from output-format.adoc and HTML
-output-format.adoc is included in convert-documents and the user-manual.
-////
+// partinro from Processing your content and all content from output-format.adoc and HTML
+// output-format.adoc is included in convert-documents and the user-manual
 
 While the AsciiDoc syntax is designed to be readable in raw form, the intended audience for that format are writers and editors.
 Readers aren't going to appreciate the raw text nearly as much.
@@ -44,19 +42,19 @@ These converters are mapped to the following backend names:
 
 pdf::
 PDF, a portable document format.
-Requires the https://rubygems.org/gems/asciidoctor-pdf[asciidoctor-pdf] gem.
+Requires the https://rubygems.org/gems/asciidoctor-pdf[asciidoctor-pdf^] gem.
 
 epub3::
 EPUB3, a distribution and interchange format standard for digital publications and documents.
-Requires the https://rubygems.org/gems/asciidoctor-epub3[asciidoctor-epub3] gem.
+Requires the https://rubygems.org/gems/asciidoctor-epub3[asciidoctor-epub3^] gem.
 
 latex::
 LaTeX, a document preparation system for high-quality typesetting.
-Requires the https://rubygems.org/gems/asciidoctor-latex[asciidoctor-latex] gem.
+Requires the https://rubygems.org/gems/asciidoctor-latex[asciidoctor-latex^] gem.
 
 mallard::
  Mallard 1.0 XML.
-Requires the https://github.com/asciidoctor/asciidoctor-mallard[asciidoctor-mallard] gem (not yet released).
+Requires the https://github.com/asciidoctor/asciidoctor-mallard[asciidoctor-mallard^] gem (not yet released).
 
 == HTML slide decks
 // directly from um
@@ -67,8 +65,8 @@ However, nothing in this structure restricts you from still being able to publis
 
 The conversion from AsciiDoc to an HTML-based slide deck is handled by one of the following converters from the Asciidoctor ecosystem:
 
-* https://github.com/asciidoctor/asciidoctor-reveal.js[Asciidoctor Reveal.js] -- Converts an AsciiDoc document into a Reveal.js presentation
-* https://github.com/asciidoctor/asciidoctor-bespoke[Asciidoctor Bespoke] -- Converts an AsciiDoc document into a Bespoke presentation
+* https://github.com/asciidoctor/asciidoctor-reveal.js[Asciidoctor Reveal.js^] -- Converts an AsciiDoc document into a Reveal.js presentation
+* https://github.com/asciidoctor/asciidoctor-bespoke[Asciidoctor Bespoke^] -- Converts an AsciiDoc document into a Bespoke presentation
 
 There's also a converter for making deck.js slide decks, but we discourage using it as deck.js itself is very outdated.
 

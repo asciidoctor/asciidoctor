@@ -6,7 +6,7 @@ endif::[]
 
 You can convert Atlassian Confluence XHTML pages to Asciidoctor using this Groovy script.
 
-The script calls {url-pandoc}[Pandoc] to convert single or multiple HTML files exported from Confluence to AsciiDoc files.
+The script calls {url-pandoc}[Pandoc^] to convert single or multiple HTML files exported from Confluence to AsciiDoc files.
 You'll need Pandoc installed before running this script.
 If you have trouble running this script, you can use the Pandoc command referenced inside the script to convert XHTML files to AsciiDoc manually.
 

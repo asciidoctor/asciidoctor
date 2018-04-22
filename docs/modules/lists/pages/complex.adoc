@@ -18,11 +18,11 @@ For example:
 
 [source]
 ----
-include::{partialsdir}/ex-ulist.adoc[tag=indent]
+include::{examplesdir}/complex.adoc[tag=indent]
 ----
 
 ====
-include::{partialsdir}/ex-ulist.adoc[tag=indent]
+include::{examplesdir}/complex.adoc[tag=indent]
 ====
 
 TIP: When items contain more than one line of text, leave a blank line before the next item to make the list easier to read.
@@ -39,11 +39,11 @@ Here's an example:
 
 [source]
 ----
-include::{partialsdir}/ex-ulist.adoc[tag=cont]
+include::{examplesdir}/complex.adoc[tag=cont]
 ----
 
 ====
-include::{partialsdir}/ex-ulist.adoc[tag=cont]
+include::{examplesdir}/complex.adoc[tag=cont]
 ====
 
 Using the list continuation, you can attach any number of block elements to a list item.
@@ -53,14 +53,14 @@ Here's an example that attaches both a listing block and an admonition paragraph
 
 [source]
 ....
-include::{partialsdir}/ex-ulist.adoc[tag=complex]
+include::{examplesdir}/complex.adoc[tag=complex]
 ....
 
 Here's how the source is rendered:
 
 .A list with complex content
 ====
-include::{partialsdir}/ex-ulist.adoc[tag=complex]
+include::{examplesdir}/complex.adoc[tag=complex]
 ====
 
 If you're attaching more than one block to a list item, you're strongly encouraged to wrap the content inside an open block.
@@ -71,14 +71,14 @@ Here's an example of wrapping complex list content in an open block:
 
 [source]
 ....
-include::{partialsdir}/ex-ulist.adoc[tag=complex-o]
+include::{examplesdir}/complex.adoc[tag=complex-o]
 ....
 
 Here's how that content is rendered:
 
 .A list with complex content wrapped in an open block
 ====
-include::{partialsdir}/ex-ulist.adoc[tag=complex-o]
+include::{examplesdir}/complex.adoc[tag=complex-o]
 ====
 
 The open block wrapper is also useful if you're including content from a shared file into a list item.
@@ -107,7 +107,7 @@ Here's an example of a list that has items with _only_ complex content.
 
 [source]
 ....
-include::{partialsdir}/ex-ulist.adoc[tag=complex-only]
+include::{examplesdir}/complex.adoc[tag=complex-only]
 ....
 
 Here's how the source is rendered:
@@ -117,7 +117,7 @@ Here's how the source is rendered:
 :prewrap:
 .A list with complex content
 ====
-include::{partialsdir}/ex-ulist.adoc[tag=complex-only]
+include::{examplesdir}/complex.adoc[tag=complex-only]
 ====
 :!prewrap:
 
@@ -132,14 +132,14 @@ Here's an example of a paragraph that's attached to the parent list item, placin
 
 [source]
 ....
-include::{partialsdir}/ex-ulist.adoc[tag=complex-parent]
+include::{examplesdir}/complex.adoc[tag=complex-parent]
 ....
 
 Here's how the source is rendered:
 
 .A block attached to the parent list item
 ====
-include::{partialsdir}/ex-ulist.adoc[tag=complex-parent]
+include::{examplesdir}/complex.adoc[tag=complex-parent]
 ====
 
 Each blank line that precedes the list continuation signals a move up one level of nesting.
@@ -147,14 +147,14 @@ Here's an example that shows how to attach a paragraph to a grandparent list ite
 
 [source]
 ....
-include::{partialsdir}/ex-ulist.adoc[tag=complex-grandparent]
+include::{examplesdir}/complex.adoc[tag=complex-grandparent]
 ....
 
 Here's how the source is rendered:
 
 .A block attached to the grandparent list item
 ====
-include::{partialsdir}/ex-ulist.adoc[tag=complex-grandparent]
+include::{examplesdir}/complex.adoc[tag=complex-grandparent]
 ====
 
 Using blank lines to back out of the nesting may feel fragile.
@@ -163,14 +163,14 @@ That way, it's clear where the nested list ends and the enclosing list continues
 
 [source]
 ....
-include::{partialsdir}/ex-ulist.adoc[tag=complex-enclosed]
+include::{examplesdir}/complex.adoc[tag=complex-enclosed]
 ....
 
 Here's how the source is rendered:
 
 .A nested block enclosed in an open block
 ====
-include::{partialsdir}/ex-ulist.adoc[tag=complex-enclosed]
+include::{examplesdir}/complex.adoc[tag=complex-enclosed]
 ====
 
 As you've learned in this section, the primary text of a list item can wrap to any number of adjacent lines.

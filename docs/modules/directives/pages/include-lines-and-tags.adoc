@@ -2,11 +2,8 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-aka Select Portions of a Document to Include
-From include-lines-tags.adoc, included in:
-- User manual
-////
+// aka Select Portions of a Document to Include
+// include-lines-tags.adoc, included in user manual
 
 The include directive supports selecting only portions of the document to include.
 Using the `tags` attribute (or `tag` attribute for the singular case), you can select lines that fall between regions marked with user-defined tags.
@@ -25,7 +22,7 @@ The example below shows how you tag a region of content inside a file containing
 .Tagged code snippets in a file named core.rb
 [source,ruby]
 ----
-include::{partialsdir}/ex-include.adoc[tag=tag-co]
+include::{examplesdir}/include.adoc[tag=tag-co]
 ----
 <1> To indicate the start of a tagged region, insert a comment line in the code.
 <2> Assign a unique name to the `tag` directive. In this example the tag is called _timings_.
@@ -46,7 +43,7 @@ In the next example, the tagged region named _parse_ is selected by the `include
 .Selecting the _parse_ code snippet from a document
 [source]
 ....
-include::{partialsdir}/ex-include.adoc[tag=target-co]
+include::{examplesdir}/include.adoc[tag=target-co]
 ....
 <1> In the directive's brackets, set the `tag` attribute and assign it the unique name of the code snippet you tagged in your code file.
 
@@ -55,7 +52,7 @@ You can include multiple tags from the same file.
 .Selecting the _timings_ and the _parse_ code snippets from a document
 [source]
 ....
-include::{partialsdir}/ex-include.adoc[tag=target-co-multiple]
+include::{examplesdir}/include.adoc[tag=target-co-multiple]
 ....
 
 It is also possible to have fine-grained tagged regions inside larger tagged regions.
@@ -84,12 +81,11 @@ And you include this file using the following include directive:
 
 The following lines will be selected and displayed:
 
-[source]
-----
+....
 snippet a
 
 snippet b
-----
+....
 
 Notice that none of the lines with the tag directives are displayed.
 
@@ -136,7 +132,7 @@ To include content by line range, assign a starting line number and an ending li
 
 [source]
 ----
-include::{partialsdir}/ex-include.adoc[tag=line]
+include::{examplesdir}/include.adoc[tag=line]
 ----
 
 You can specify multiple ranges by separating each range by a comma.
@@ -144,19 +140,19 @@ Since commas are normally used to separate individual attributes, you must quote
 
 [source]
 ----
-include::{partialsdir}/ex-include.adoc[tag=m-line-comma]
+include::{examplesdir}/include.adoc[tag=m-line-comma]
 ----
 
 To avoid having to quote the list of ranges, you can instead separate them using semi-colons.
 
 [source]
 ----
-include::{partialsdir}/ex-include.adoc[tag=m-line]
+include::{examplesdir}/include.adoc[tag=m-line]
 ----
 
 If you don't know the number of lines in the document, or you don't want to couple the range to the length of the file, you can refer to the last line of the document using the value -1.
 
 [source]
 ----
-include::{partialsdir}/ex-include.adoc[tag=last]
+include::{examplesdir}/include.adoc[tag=last]
 ----

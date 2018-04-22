@@ -3,17 +3,14 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :description: This document presents various tools and strategies for migrating from MS Word to AsciiDoc.
-//:page-layout: docs
-//:page-description: {description}
 :url-pandoc: https://pandoc.org
-//:uri-ant: http://ant.apache.org/
 :url-google-asciidoc: https://chrome.google.com/webstore/detail/asciidoc-processor/eghlmnhjljbjodpeehjjcgfcjegcfbhk/
 :url-google-asciidoc-source:  https://github.com/Mogztter/asciidoc-googledocs-addon/
 // from migrating-from-msword.adoc
 
 == Pandoc
 
-{url-pandoc}[Pandoc] is a swiss army knife for converting one markup format to another.
+{url-pandoc}[Pandoc^] is a swiss army knife for converting one markup format to another.
 It does an admirable job converting simple docx files to AsciiDoc.
 
 NOTE: Generally, we don't like to recommend pandoc because it doesn't create AsciiDoc the way we prefer.
@@ -36,11 +33,11 @@ The conversions you can expect are shown in the following table (tested using MS
 |Yes
 
 |Tables
-|Yes
+|Yes. +
 Merged cells are unmerged.
 Column widths are ignored.
 
-|Bulleted or numbered lists
+|Unordered and ordered lists
 |Yes
 
 |Footnotes
@@ -49,7 +46,7 @@ Column widths are ignored.
 |Figure and table captions
 |Normal paragraph
 
-|Any other MS Word styled paragraphs
+|Other MS Word styled paragraphs
 |Normal paragraph
 
 |Embedded images
@@ -73,7 +70,7 @@ Column widths are ignored.
 |Linked (not embedded) images
 |Ignored
 
-|Vector graphics (MS Word "insert shape")
+|Vector graphics (MS Word "`insert shape`")
 |Ignored
 |===
 
@@ -112,7 +109,7 @@ If you have a lot to do, it's worth while cleaning the input document first, and
 ** Optional: insert ids and cross references using AsciiDoc notation
 (You might find it easier doing it now rather than in the AsciiDoc document later.)
 // Not sure if it is significant, but pandoc seems to be designed against this spec, rather than the normal docx.
-** Save as "Strict Open-xml document (docx)"
+** Save as "`Strict Open-xml document (docx)``"
 . Convert using pandoc as shown above.
 . Check that the output document looks OK, and that all images have been extracted.
 +
@@ -120,7 +117,7 @@ If you have a lot to do, it's worth while cleaning the input document first, and
 ====
 If for some reason pandoc is not extracting images, you can always extract them by using unzip tool.
 Docx is just a zip file with a docx file extension.
-Embedded images are located in word/media directory.
+Embedded images are located in [.path}_word/media_ directory.
 
  $ unzip input.docx -d input-docx
    ls input-docx/word/media/
@@ -171,11 +168,11 @@ It will get confused by abbreviations, but there is no way around that.
 == Google Docs
 
 Google Docs can already upload and edit MS Word docx files.
-Using the {url-google-asciidoc}[AsciiDoc Processor add-on] by Guillaume Grossetie, you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
+Using the {url-google-asciidoc}[AsciiDoc Processor add-on^] by Guillaume Grossetie, you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
 The features that it can handle seem to be substantially fewer than pandoc but expect further development.
-The source for the add-on is at {url-google-asciidoc-source}.
+The source for the add-on can be found in {url-google-asciidoc-source}[its repository].
 
-== Plain Text
+== Plain text
 
 This method is only useful for very small files or if the other methods are not available.
 

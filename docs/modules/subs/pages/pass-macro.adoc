@@ -3,8 +3,8 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 ////
-user manual anchor: pass-macros
-From pass-macro.adoc, included in:
+um anchor: pass-macros
+pass-macro.adoc, included in:
 - user-manual: Passthroughs Macros
 - writers-guide: preventing subs
 ////
@@ -41,11 +41,11 @@ The triple plus macro is often used to output custom HTML or XML.
 
 [source]
 ----
-include::{partialsdir}/ex-pass.adoc[tag=3p]
+include::{examplesdir}/pass.adoc[tag=3p]
 ----
 
 ====
-include::{partialsdir}/ex-pass.adoc[tag=3p]
+include::{examplesdir}/pass.adoc[tag=3p]
 ====
 
 [#pass-subs]
@@ -56,17 +56,17 @@ For example, here's one way to format text as underline when generating HTML fro
 
 [source]
 ----
-include::{partialsdir}/ex-pass.adoc[tag=in-macro]
+include::{examplesdir}/pass.adoc[tag=in-macro]
 ----
 
 ====
-include::{partialsdir}/ex-pass.adoc[tag=in-macro]
+include::{examplesdir}/pass.adoc[tag=in-macro]
 ====
 
 If you want to enable ad-hoc `quotes` substitution, then assign the `macros` value to `subs` and use the inline pass macro.
 
 ....
-include::{partialsdir}/ex-pass.adoc[tag=sub-in]
+include::{examplesdir}/pass.adoc[tag=sub-in]
 ....
 <1> `macros` is assigned to `subs`, which allows any macros within the block to be processed.
 <2> The pass macro is assigned the `quotes` value. Text within the square brackets will be formatted.
@@ -75,7 +75,7 @@ The inline pass macro does introduce additional markup into the source code that
 However, the output it produces will be valid when viewed in a viewer (HTML, PDF, etc.).
 
 ====
-include::{partialsdir}/ex-pass.adoc[tag=sub-out]
+include::{examplesdir}/pass.adoc[tag=sub-out]
 ====
 
 The inline pass macro also accepts shorthand values for specifying substitutions.
@@ -91,11 +91,11 @@ For example, the quotes text substitution value is assigned in the inline passth
 
 [source]
 ----
-include::{partialsdir}/ex-pass.adoc[tag=s-macro]
+include::{examplesdir}/pass.adoc[tag=s-macro]
 ----
 
 ====
-include::{partialsdir}/ex-pass.adoc[tag=s-macro]
+include::{examplesdir}/pass.adoc[tag=s-macro]
 ====
 
 WARNING: Using passthroughs to pass content (without substitutions) can couple your content to a specific output format, such as HTML.

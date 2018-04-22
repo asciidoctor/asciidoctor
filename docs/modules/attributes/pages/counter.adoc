@@ -85,11 +85,11 @@ Here's a full example that shows how to use a counter for part numbers in a tabl
 
 [source]
 ----
-include::{partialsdir}/ex-counter.adoc[tag=base]
+include::{examplesdir}/counter.adoc[tag=base]
 ----
 
 Here's the output of that table:
 
 ====
-include::{partialsdir}/ex-counter.adoc[tag=base]
+include::{examplesdir}/counter.adoc[tag=base]
 ====

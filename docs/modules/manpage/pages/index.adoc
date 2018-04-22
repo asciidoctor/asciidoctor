@@ -4,10 +4,6 @@ include::_attributes.adoc[]
 endif::[]
 :url-man7: http://man7.org/linux/man-pages/man7/roff.7.html
 :url-docbook-refmisc: https://www.docbook.org/tdg5/en/html/refmiscinfo.html
-////
-Included in:
-- user-manual: Man pages
-////
 
 One of the more specialized uses of AsciiDoc is to serve as a shorthand for generating man pages (short for manual pages) for Unix and Unix-like operating systems.
 
@@ -32,7 +28,7 @@ When converting to the man page format, Asciidoctor uppercases the titles of all
 This saves you from having to type section titles in all uppercase.
 It also makes the document portable to other output formats since this style is only needed in the man page output to align with conventions.
 
-CAUTION: If you're use Ruby 2.4 or better, Asciidoctor will uppercase any letter in the title that is recognized by the Unicode specification as having an uppercase equivalent (which includes non-Latin letters).
+CAUTION: If you're using Ruby 2.4 or greater, Asciidoctor will uppercase any letter in the title that is recognized by the Unicode specification as having an uppercase equivalent (which includes non-Latin letters).
 Prior to Ruby 2.4, Ruby could only uppercase Latin letters.
 
 Asciidoctor can also produce HTML and PDF versions similar to the `manpage` output for viewing in other contexts.
@@ -44,7 +40,7 @@ Here is an example man page composed in AsciiDoc for the `eve` command:
 
 [source]
 ----
-include::{partialsdir}/ex-manpage.adoc[]
+include::{examplesdir}/manpage.adoc[]
 ----
 
 == Man page doctype
@@ -66,7 +62,7 @@ The second manpage section is mandatory and must be titled "`SYNOPSIS`".
 
 Subsequent sections are optional, but typical sections include "`SEE ALSO`", "`BUGS REPORTS`", "`AUTHORS`" and "`COPYRIGHT`".
 
-=== Man page attributes
+== Man page attributes
 
 There are several built-in document attributes that affect only manpages.
 If used, they must be set in the document header.

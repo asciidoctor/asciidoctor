@@ -2,16 +2,12 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-anchor from user manual: user-index
-Included in:
-- user-manual
-////
+// anchor from um: user-index
 
 You can mark index terms explicitly in AsciiDoc content.
 Index terms form a controlled vocabulary that can be used to navigate the document by keyword starting from an index.
 
-== Index Terms
+== Index terms
 
 There are two types of index terms in AsciiDoc:
 
@@ -62,7 +58,7 @@ I, King Arthur.
 (((knight, "Arthur, King")))
 ----
 
-== Index Catalog
+== Index catalog
 
 Although index terms are always processed, only Asciidoctor PDF and the DocBook toolchain support creating an index catalog automatically.
 To create an index, define a level-1 section marked with the style `index` at the end of your document.

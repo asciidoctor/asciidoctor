@@ -13,10 +13,10 @@ uri-latexmath is now url-latexmath
 uri-mathjax-docs is now url-mathjax-docs
 ////
 
-If you need to get technical in your writing, Asciidoctor integrates with {url-mathjax}[MathJax].
+If you need to get technical in your writing, Asciidoctor integrates with {url-mathjax}[MathJax^].
 MathJax is the standard library for displaying Science, Technology, Engineering and Math (STEM) expressions in the browser.
 
-Thanks to {url-mathjax}[MathJax JavaScript library], Asciidoctor supports both {url-asciimath}[AsciiMathML] and {url-latexmath}[TeX and LaTeX] math notation in the same document.
+Thanks to {url-mathjax}[MathJax JavaScript library^], Asciidoctor supports both {url-asciimath}[AsciiMathML^] and {url-latexmath}[TeX and LaTeX^] math notation in the same document.
 
 == Activating STEM support
 
@@ -25,7 +25,7 @@ To activate equation and formula support, simply set the `stem` attribute in the
 .Setting the stem attribute
 [source]
 ----
-include::{partialsdir}/ex-stem.adoc[tag=base-co]
+include::{examplesdir}/stem.adoc[tag=base-co]
 ----
 <1> The default interpreter value, `asciimath`, is assigned implicitly.
 
@@ -37,7 +37,7 @@ The html backend will just use mathjax client-side to render math notation, wher
 .Assigning an alternative interpreter to the stem attribute
 [source]
 ----
-include::{partialsdir}/ex-stem.adoc[tag=base-alt]
+include::{examplesdir}/stem.adoc[tag=base-alt]
 ----
 
 TIP: You can still use both interpreters in the same document.
@@ -55,14 +55,14 @@ The best way to mark up an inline formula is to use the `stem` macro.
 .Inline stem macro syntax
 [source]
 ----
-include::{partialsdir}/ex-stem.adoc[tag=in-co]
+include::{examplesdir}/stem.adoc[tag=in-co]
 ----
 <1> The inline stem macro contains only one colon (`:`).
-<2> Place the content you want interpreted within the square brackets (`[]`) of the macro.
+<2> Place the content you want interpreted within the square brackets (`[ ]`) of the macro.
 
 .Rendered inline stem content
 ====
-include::{partialsdir}/ex-stem.adoc[tag=in]
+include::{examplesdir}/stem.adoc[tag=in]
 ====
 
 [#stem-bl]
@@ -73,7 +73,7 @@ Block formulas are marked up by assigning the `stem` style to a delimited passth
 .Delimited stem block syntax
 [source]
 ----
-include::{partialsdir}/ex-stem.adoc[tag=bl-co]
+include::{examplesdir}/stem.adoc[tag=bl-co]
 ----
 <1> Assign the stem style to the passthrough block.
 <2> A passthrough block is delimited by a line of four consecutive plus signs (`pass:[++++]`).
@@ -82,10 +82,10 @@ The result is rendered beautifully in the browser thanks to MathJax!
 
 .Rendered delimited stem block
 ====
-include::{partialsdir}/ex-stem.adoc[tag=bl]
+include::{examplesdir}/stem.adoc[tag=bl]
 ====
 
-TIP: You don't need to add special delimiters around the expression as the {url-mathjax-docs}[MathJax documentation] suggests.
+TIP: You don't need to add special delimiters around the expression as the {url-mathjax-docs}[MathJax documentation^] suggests.
 Asciidoctor handles that for you automatically!
 
 [#multi-stem]
@@ -98,12 +98,12 @@ For example, if you want LaTeXMath to interpret an inline equation, name the mac
 .Inline latexmath macro syntax
 [source]
 ----
-include::{partialsdir}/ex-stem.adoc[tag=multi-l]
+include::{examplesdir}/stem.adoc[tag=multi-l]
 ----
 
 .Rendered latexmath content
 ====
-include::{partialsdir}/ex-stem.adoc[tag=multi-l]
+include::{examplesdir}/stem.adoc[tag=multi-l]
 ====
 
 The name that maps to the interpreter you want to use can also be applied to block stem content.
@@ -111,11 +111,11 @@ The name that maps to the interpreter you want to use can also be applied to blo
 .Delimited asciimath block syntax
 [source]
 ----
-include::{partialsdir}/ex-stem.adoc[tag=multi-a]
+include::{examplesdir}/stem.adoc[tag=multi-a]
 ----
 
 [#stem-docbook]
-== Enabling STEM expressions in the DocBook Toolchain
+== Enabling STEM expressions in the DocBook toolchain
 
 When converting to HTML, Asciidoctor relies on MathJax to parse and render the STEM expressions in the browser.
 We can't rely on MathJax when converting to DocBook, so Asciidoctor must explicitly convert the expressions into something the DocBook toolchain can understand.
@@ -133,7 +133,7 @@ The asciimath gem converts AsciiMath to MathML.
 If you're generating a PDF from the DocBook, the MathML needs to be interpreted and drawn into the PDF.
 In the DocBook FOP pipeline, this is handled by JEuclid.
 
-//{uri-org}/asciidoctor-fopub[fopub]
+//{url-org}/asciidoctor-fopub[fopub]
 Fortunately, #fopub# is already configured to use the JEuclid integration.
 When fopub generates the PDF, the JEuclid FOP plugin processes any MathML found in the DocBook file, including the expressions transformed from AsciiMath to MathML by the asciimath gem.
 As a result, AsciiMath stem expressions in the AsciiDoc file will render as expected in the generated PDF.

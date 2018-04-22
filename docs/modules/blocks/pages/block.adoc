@@ -4,10 +4,7 @@ include::_attributes.adoc[]
 endif::[]
 :y: Yes
 :n: No
-////
-From block.adoc, included in:
-User manual: Blocks
-////
+// block.adoc, included in um
 
 == Title
 
@@ -22,14 +19,14 @@ Here's an example of a list with a title:
 
 [source]
 ----
-include::{partialsdir}/ex-block.adoc[tag=list-title]
+include::{examplesdir}/block.adoc[tag=list-title]
 ----
 
 == Metadata
 
 In addition to a title, a block can be assigned additional metadata including:
 
-* ID (i.e., anchor)
+* ID (xref:attributes:id.adoc#anchor[anchor])
 * Block name (first positional attribute)
 * Block attributes
 
@@ -37,10 +34,10 @@ Here's an example of a quote block with metadata:
 
 [source]
 ----
-include::{partialsdir}/ex-block.adoc[tag=meta-co]
+include::{examplesdir}/block.adoc[tag=meta-co]
 ----
 <1> Title: Gettysburg Address
-<2> ID: gettysburg, see xref:attributes:id.adoc#anchor[anchor]
+<2> ID: gettysburg
 <3> Block name: quote
 <4> attribution: Abraham Lincoln (Named block attribute)
 <5> citetitle: Address delivered at the dedication of the Cemetery at Gettysburg (Named block attribute)
@@ -112,14 +109,14 @@ This format is often used for single-line listings:
 
 [source]
 ....
-include::{partialsdir}/ex-block.adoc[tag=opt-listing]
+include::{examplesdir}/block.adoc[tag=opt-listing]
 ....
 
 or single-line quotes:
 
 [source]
 ----
-include::{partialsdir}/ex-block.adoc[tag=quote-name]
+include::{examplesdir}/block.adoc[tag=quote-name]
 ----
 
 === Masquerading blocks

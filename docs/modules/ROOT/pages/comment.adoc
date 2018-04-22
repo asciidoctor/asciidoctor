@@ -2,10 +2,6 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-comment.adoc, included in:
-- user-manual: comments
-////
 
 == Comment lines
 

@@ -25,7 +25,7 @@ Alternatively, let's set the `stylesheet` attribute in the header of [.path]_mys
 
 [source]
 ----
-include::{partialsdir}/mysample-stylesheet.adoc[]
+include::{examplesdir}/mysample-stylesheet.adoc[]
 ----
 
 ====
@@ -40,7 +40,7 @@ Our AsciiDoc document, [.path]_mysample.adoc_, is saved in the [.path]_mydocumen
 
 [source]
 ----
-include::{partialsdir}/mysample-stylesdir.adoc[]
+include::{examplesdir}/mysample-stylesdir.adoc[]
 ----
 
 After processing [.path]_mysample.adoc_, its HTML output ([.path]_mysample.html_), which includes the embedded [.path]_mystyles.css_ stylesheet, is created in the [.path]_mydocuments_ directory.
@@ -58,7 +58,7 @@ If you don't want to embed the [.path]_mystyles.css_ stylesheet into your HTML o
 
 [source]
 ----
-include::{partialsdir}/mysample-stylesdir-link.adoc[]
+include::{examplesdir}/mysample-stylesdir-link.adoc[]
 ----
 
 After your document is converted, notice that a copy of [.path]_mystyles.css_ was not created in the [.path]_mydocuments_ directory.

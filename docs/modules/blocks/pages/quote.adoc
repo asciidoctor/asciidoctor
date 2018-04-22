@@ -1,12 +1,9 @@
-= Quotes and Excerpts
+= Quote and Excerpt Blocks
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :url-air: http://en.wikipedia.org/wiki/Air_quotes
-////
-From quote-alt.adoc, included in:
-- user-manual: quote: Quoted paragraph
-////
+// quote-alt.adoc, included in user-manual: quote: Quoted paragraph
 
 == Basic quote syntax
 
@@ -26,7 +23,7 @@ If the quote is a single line or paragraph, you can place the attribute list dir
 .Quote paragraph syntax
 [source]
 ----
-include::{partialsdir}/ex-quote.adoc[tag=para2-c]
+include::{examplesdir}/quote.adoc[tag=para2-c]
 ----
 <1> Mark lead-in text explaining the context or setting of the quote using a period (`.`). (optional)
 <2> For content that doesn't require the preservation of line breaks, set `quote` in the first position of the attribute list.
@@ -36,7 +33,7 @@ include::{partialsdir}/ex-quote.adoc[tag=para2-c]
 
 .Result: Quote paragraph
 ====
-include::{partialsdir}/ex-quote.adoc[tag=para2]
+include::{examplesdir}/quote.adoc[tag=para2]
 ====
 
 == Quoted block
@@ -46,12 +43,12 @@ If the quote or excerpt is more than one paragraph, place the text between delim
 .Quote block syntax
 [source]
 ----
-include::{partialsdir}/ex-quote.adoc[tag=comp]
+include::{examplesdir}/quote.adoc[tag=comp]
 ----
 
 .Result: Quote block
 ====
-include::{partialsdir}/ex-quote.adoc[tag=comp]
+include::{examplesdir}/quote.adoc[tag=comp]
 ====
 
 Asciidoctor also provides three alternative ways to markup quotes and prose excerpts.
@@ -67,12 +64,12 @@ You can turn a single paragraph into a blockquote by:
 .Quoted paragraph syntax
 [source]
 ----
-include::{partialsdir}/ex-quote.adoc[tag=abbr]
+include::{examplesdir}/quote.adoc[tag=abbr]
 ----
 
 .Result: Quoted paragraph
 ====
-include::{partialsdir}/ex-quote.adoc[tag=abbr]
+include::{examplesdir}/quote.adoc[tag=abbr]
 ====
 
 === Air quotes
@@ -81,12 +78,12 @@ include::{partialsdir}/ex-quote.adoc[tag=abbr]
 
 [source]
 ----
-include::{partialsdir}/ex-quote.adoc[tag=air]
+include::{examplesdir}/quote.adoc[tag=air]
 ----
 
 .Result: Air quotes
 ====
-include::{partialsdir}/ex-quote.adoc[tag=air]
+include::{examplesdir}/quote.adoc[tag=air]
 ====
 
 === Markdown-style blockquotes
@@ -96,12 +93,12 @@ Asciidoctor supports Markdown-style blockquotes.
 .Markdown-style blockquote syntax
 [source,markdown]
 ----
-include::{partialsdir}/ex-quote.adoc[tag=md]
+include::{examplesdir}/quote.adoc[tag=md]
 ----
 
 .Result: Markdown-style blockquote
 ====
-include::{partialsdir}/ex-quote.adoc[tag=md]
+include::{examplesdir}/quote.adoc[tag=md]
 ====
 
 Like Markdown, Asciidoctor supports block content inside the blockquote, including nested blockquotes.
@@ -109,12 +106,12 @@ Like Markdown, Asciidoctor supports block content inside the blockquote, includi
 [source,markdown]
 .Markdown-style blockquote containing block content
 ....
-include::{partialsdir}/ex-quote.adoc[tag=md-alt]
+include::{examplesdir}/quote.adoc[tag=md-alt]
 ....
 
 Here's how this conversation renders.
 
 .Result: Markdown-style blockquote with block content
 ====
-include::{partialsdir}/ex-quote.adoc[tag=md-alt]
+include::{examplesdir}/quote.adoc[tag=md-alt]
 ====
