@@ -466,9 +466,8 @@ class Parser
     end
 
     # QUESTION should we introduce a parsing context object?
-    this_file, this_dir, this_path, this_lineno, this_line, doc_attrs = reader.file, reader.dir, reader.path, reader.lineno, reader.read_line, document.attributes
+    cursor_data, this_line, doc_attrs, style = reader.cursor_data, reader.read_line, document.attributes, attributes[1]
     block = block_context = cloaked_context = terminator = nil
-    style = attributes[1]
 
     if (delimited_block = is_delimited_block? this_line, true)
       block_context = cloaked_context = delimited_block.context
@@ -483,7 +482,7 @@ class Parser
         elsif block_extensions && extensions.registered_for_block?(style, block_context)
           block_context = style.to_sym
         else
-          logger.warn message_with_context %(invalid style for #{block_context} block: #{style}), :source_location => (Reader::Cursor.new this_file, this_dir, this_path, this_lineno)
+          logger.warn message_with_context %(invalid style for #{block_context} block: #{style}), :source_location => Reader::Cursor.new(*cursor_data)
           style = block_context.to_s
         end
       end
@@ -694,7 +693,7 @@ class Parser
           # advance to block parsing =>
           break
         else
-          logger.warn message_with_context %(invalid style for paragraph: #{style}), :source_location => (Reader::Cursor.new this_file, this_dir, this_path, this_lineno)
+          logger.warn message_with_context %(invalid style for paragraph: #{style}), :source_location => Reader::Cursor.new(*cursor_data)
           style = nil
           # continue to process paragraph
         end
@@ -888,7 +887,7 @@ class Parser
     end
 
     # FIXME we've got to clean this up, it's horrible!
-    block.source_location = Reader::Cursor.new this_file, this_dir, this_path, this_lineno if document.sourcemap
+    block.source_location = Reader::Cursor.new(*cursor_data) if document.sourcemap
     # FIXME title should be assigned when block is constructed
     block.title = attributes.delete 'title' if attributes.key? 'title'
     # TODO eventually remove the style attribute from the attributes hash
@@ -896,7 +895,7 @@ class Parser
     block.style = attributes['style']
     if (block_id = (block.id ||= attributes['id']))
       unless document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
-        logger.warn message_with_context %(id assigned to block already in use: #{block_id}), :source_location => (Reader::Cursor.new this_file, this_dir, this_path, this_lineno)
+        logger.warn message_with_context %(id assigned to block already in use: #{block_id}), :source_location => Reader::Cursor.new(*cursor_data)
       end
     end
     # FIXME remove the need for this update!

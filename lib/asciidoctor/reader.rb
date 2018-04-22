@@ -524,6 +524,10 @@ class Reader
     Cursor.new @file, @dir, @path, lineno
   end
 
+  def cursor_data
+    [@file, @dir, @path, @lineno]
+  end
+
   def prev_line_cursor
     cursor_at @lineno - 1
   end
