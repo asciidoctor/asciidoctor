@@ -396,6 +396,7 @@ Bug fixes::
   * don't allow table borders to cascade to nested tables (#2151)
   * escape special characters in reftext of anchor (#1694)
   * sanitize content of authors meta tag in HTML output (#2112)
+  * use correct line number in warning for invalid callout item reference (#2275)
   * fix stray marks added when unescaping unconstrained passthroughs (PR #2079)
   * don't confuse escaped quotes in CSV data as enclosing quotes (#2008)
   * don't activate implicit header if cell in first line of table contains a blank line (#1284, #644)
