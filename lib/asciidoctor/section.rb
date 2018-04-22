@@ -38,7 +38,10 @@ class Section < AbstractBlock
 
   # Public: Initialize an Asciidoctor::Section object.
   #
-  # parent - The parent Asciidoc Object.
+  # parent   - The parent AbstractBlock. If set, must be a Document or Section object (default: nil)
+  # level    - The Integer level of this section (default: 1)
+  # numbered - A Boolean indicating whether numbering is enabled for this Section
+  # opts     - An optional Hash of options (default: {})
   def initialize parent = nil, level = nil, numbered = true, opts = {}
     super parent, :section, opts
     if parent && parent != @document
