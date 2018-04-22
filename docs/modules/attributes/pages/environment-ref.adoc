@@ -2,6 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:url-epoch: https://reproducible-builds.org/specs/source-date-epoch
 ////
 doc anchor: env-attributes
 attrs-env.adoc, included in:
@@ -151,5 +152,5 @@ It does not consider the last modified time of files which are included.
 
 [[note_sourcedateepoch]]^[2]^ If the SOURCE_DATE_EPOCH environment variable is set, the value assigned to this attribute is built from a UTC date object that corresponds to the timestamp (as an integer) stored in that environment variable.
 This override offers one way to make the conversion reproducible.
-See https://reproducible-builds.org/specs/source-date-epoch/ for more information about the SOURCE_DATE_EPOCH environment variable.
+See the {url-epoch}[source date epoch specification] for more information about the SOURCE_DATE_EPOCH environment variable.
 // end::table[]

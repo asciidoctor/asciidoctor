@@ -53,7 +53,7 @@ The benefit of installing Asciidoctor using a package manager is that the manage
 === Fedora or RHEL
 
 // tag::yum[]
-To install Asciidoctor on Fedora or RHEL via EPEL using the {url-fedora}[rubygem-asciidoctor] package:
+To install Asciidoctor on Fedora or RHEL via EPEL using the {url-fedora}[rubygem-asciidoctor^] package:
 
 . Open a terminal
 . Run the installation command on Fedora:
@@ -81,7 +81,7 @@ include::{partialsdir}/success.adoc[]
 === Alpine Linux
 
 // tag::apk[]
-To install Asciidoctor on Alpine Linux using the {url-alpine}[asciidoctor package]:
+To install Asciidoctor on Alpine Linux using the {url-alpine}[asciidoctor package^]:
 
 . Open a terminal
 . Type the following `apk` command using sudo:

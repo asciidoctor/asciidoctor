@@ -164,20 +164,20 @@ Here are the equivalents of the old attributes using the new values:
 
 Let's apply this to an example:
 
-You have two AsciiDoc documents, adventure.adoc and insurance.adoc, saved in the same folder.
+You have two AsciiDoc documents, [.path]_adventure.adoc_ and [.path]_insurance.adoc_, saved in the same folder.
 You want to add the same content to the head of both documents when they're converted to HTML.
 
 . Create a docinfo file containing `<head>` elements.
 . Save it as docinfo.html.
-. Set the `docinfo` attribute in adventure.adoc and insurance.adoc to `shared`.
+. Set the `docinfo` attribute in [.path]_adventure.adoc_ and [.path]_insurance.adoc_ to `shared`.
 
-You also want to include some additional content, but only to the head of adventure.adoc.
+You also want to include some additional content, but only to the head of [.path]_adventure.adoc_.
 
 . Create *another* docinfo file containing `<head>` elements.
-. Save it as adventure-docinfo.html.
-. Set the `docinfo` attribute in adventure.adoc to `shared,private-head`
+. Save it as [.path]_adventure-docinfo.html_.
+. Set the `docinfo` attribute in [.path]_adventure.adoc_ to `shared,private-head`
 
-If other AsciiDoc files are added to the same folder, and `docinfo` is set to `shared` in those files, only the docinfo.html file will be added when converting those files.
+If other AsciiDoc files are added to the same folder, and `docinfo` is set to `shared` in those files, only the [.path]_docinfo.html_ file will be added when converting those files.
 
 == Locating docinfo files
 

@@ -1,13 +1,8 @@
-= Table of Contents Reference
+= Table of Contents Syntax and Attributes Reference
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-sum-toc.adoc, included in:
-- user-manual
-////
-
-== Table of contents attributes and values
+// sum-toc.adoc
 
 [cols="1m,1,2,2,1"]
 |===
@@ -29,7 +24,7 @@ Defaults to `auto` if value is unspecified.
 |auto
 m|:toc:
 |Not set by default.
-The table of contents is placed after the title page (See https://github.com/asciidoctor/asciidoctor-pdf/issues/233[issue #233] for developments).
+The table of contents is placed after the title page (See https://github.com/asciidoctor/asciidoctor-pdf/issues/233[issue #233^] for developments).
 |pdf
 
 |auto

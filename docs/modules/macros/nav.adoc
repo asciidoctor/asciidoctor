@@ -3,7 +3,7 @@
 ** xref:xref.adoc[Cross References]
 *** xref:inter-document-xref.adoc[Document to Document]
 *** xref:xref-text-and-style.adoc[Text & Styles]
-** xref:footnotes.adoc[Footnotes]
+** xref:footnote.adoc[Footnotes]
 ** xref:link-ref.adoc[Link, Xref & Footnote Reference]
 
 //Images, Multimedia & Visualizations

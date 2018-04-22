@@ -23,7 +23,7 @@ That way, you don't have to shave yaks to get the functionality you want, and yo
 
 WARNING: The extension API in Asciidoctor is stable with the exception of inline macros.
 Since inline content is not parsed until the convert phase, the inline macro processor must return converted text (e.g., HTML) rather than an AST node.
-Once Asciidoctor is changed to https://github.com/asciidoctor/asciidoctor/issues/61[process inline content during the parse phase], the inline macro processor will need to return an inline node.
+Once Asciidoctor is changed to https://github.com/asciidoctor/asciidoctor/issues/61[process inline content during the parse phase^], the inline macro processor will need to return an inline node.
 When that switch occurs, there will either be some sort of adapter or required migration for inline macro processors, but that has yet to be determined.
 
 == Extension Points
@@ -93,7 +93,7 @@ Each registered class is instantiated when the [.class]#Asciidoctor::Document# i
 NOTE: There is currently no extension point for processing a built-in block, such as a normal paragraph.
 Look for that feature in a future Asciidoctor release.
 
-You can see additional extension examples in the {url-exten-lab}[Asciidoctor extensions lab].
+You can see additional extension examples in the {url-exten-lab}[Asciidoctor extensions lab^].
 
 ////
 For now, you need to use the Asciidoctor API (not the CLI) in order to register the extensions and invoke Asciidoctor.

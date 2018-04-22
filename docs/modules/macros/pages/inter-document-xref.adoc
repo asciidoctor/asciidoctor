@@ -2,10 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-xref-interfoc.adoc, included in:
-- user-manual: Inter-document cross references
-////
+//xref-interdoc.adoc, included in user-manual: Inter-document cross references
 
 The inline xref macro can also link to IDs in other AsciiDoc documents.
 This eliminates the need to use direct links between documents that are coupled to a particular converter (e.g., HTML links).
@@ -15,7 +12,7 @@ Here's how a cross reference is normally defined in Asciidoctor:
 
 [source]
 ----
-include::{partialsdir}/ex-xref.adoc[tag=base]
+include::{examplesdir}/xref.adoc[tag=base]
 ----
 
 This cross reference creates a link to the section with the ID _images_.
@@ -25,7 +22,7 @@ If the target section is in a separate document, [.path]_document-b.adoc_, the a
 
 [source]
 ----
-include::{partialsdir}/ex-xref.adoc[tag=bad]
+include::{examplesdir}/xref.adoc[tag=base][tag=bad]
 ----
 
 However, this link is coupled to HTML output.
@@ -35,7 +32,7 @@ These problems can be alleviated by using an inter-document xref:
 
 [source]
 ----
-include::{partialsdir}/ex-xref.adoc[tag=base-inter]
+include::{examplesdir}/xref.adoc[tag=base][tag=base-inter]
 ----
 
 The ID of the target is now placed behind a hash symbol (`#`).

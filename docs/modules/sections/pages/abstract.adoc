@@ -2,14 +2,10 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-anchor from user manual: user-abstract
-Included in:
-- user-manual
-////
+// anchor um: user-abstract
 
 An abstract is a concise overview of an article or of a chapter in a book.
-They are frequently found in the frontmatter of academic, research, and analytical papers.
+They are frequently found in the front matter of academic, research, and analytical papers.
 //Abstracts with subheadings are structured abstracts, whereas abstracts without subheadings are unstructured.
 //^ Not relevant for AsciiDoc
 A complete (i.e., informative) abstract states the key topics and findings while a limited (i.e., descriptive) abstract briefly describes the structure of the content.

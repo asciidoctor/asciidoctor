@@ -1,0 +1,63 @@
+////
+Included in:
+- user-manual: Paragraphs
+- quick-syntax
+////
+
+// tag::para[]
+This journey begins one late Monday afternoon in Antwerp.
+Our team desperately needs coffee, but none of us dare open the office door.
+
+To leave means code dismemberment and certain death.
+// end::para[]
+
+// tag::b-para[]
+Paragraphs don't require any special markup in AsciiDoc.
+A paragraph is just one or more lines of consecutive text.
+
+To begin a new paragraph, separate it by at least one blank line.
+Newlines within a paragraph are not displayed.
+// end::b-para[]
+
+// tag::hb-all[]
+Rubies are red, +
+Topazes are blue.
+
+[%hardbreaks]
+Ruby is red.
+Java is black.
+// end::hb-all[]
+
+// tag::hb[]
+Rubies are red, +
+Topazes are blue.
+// end::hb[]
+
+// tag::hb-p[]
+[%hardbreaks]
+Ruby is red.
+Java is black.
+// end::hb-p[]
+
+// tag::b-hb[]
+To preserve a line break, end the line in a space followed by a plus sign. +
+This results in a visible line break (e.g., `<br>`) between the lines.
+// end::b-hb[]
+
+// tag::hb-attr[]
+= Line Break Doc Title
+:hardbreaks:
+
+Rubies are red,
+Topazes are blue.
+// end::hb-attr[]
+
+// tag::lead[]
+[.lead]
+This is the ultimate paragraph.
+// end::lead[]
+
+// tag::b-lead[]
+[.lead]
+This text will be styled as a lead paragraph (i.e., larger font).
+// end::b-lead[]

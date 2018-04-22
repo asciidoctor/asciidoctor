@@ -14,7 +14,7 @@ A character bounded by other characters must be enclosed in a double set of back
 
 [source]
 ----
-include::{partialsdir}/ex-text.adoc[tag=mono]
+include::{examplesdir}/text.adoc[tag=mono]
 ----
 
 Monospaced text can be bold and italicized, as long as the markup sets are entered in the right order.
@@ -22,7 +22,7 @@ The monospace markup must be the outermost set, then the bold set, and the itali
 
 .Rendered monospace formatted text
 ====
-include::{partialsdir}/ex-text.adoc[tag=mono]
+include::{examplesdir}/text.adoc[tag=mono]
 ====
 
 ////

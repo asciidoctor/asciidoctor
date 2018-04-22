@@ -16,18 +16,18 @@ Instinct might tell you to prefix each item with a number, like in this next lis
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=base-num]
+include::{examplesdir}/ordered.adoc[tag=base-num]
 ----
 
 The above works, but since the numbering is obvious, the AsciiDoc processor will insert the numbers for you if you omit them:
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=base]
+include::{examplesdir}/ordered.adoc[tag=base]
 ----
 
 ====
-include::{partialsdir}/ex-olist.adoc[tag=base]
+include::{examplesdir}/ordered.adoc[tag=base]
 ====
 
 If you decide to manually number your ordered list, you have to keep them sequential.
@@ -37,25 +37,25 @@ For instance, you can type:
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=base-num-start]
+include::{examplesdir}/ordered.adoc[tag=base-num-start]
 ----
 
 However, in general the best practice is to use the `start` attribute to configure this sort of thing:
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=base-start]
+include::{examplesdir}/ordered.adoc[tag=base-start]
 ----
 
 To present the items in reverse order, add the `reversed` option:
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=reversed]
+include::{examplesdir}/ordered.adoc[tag=reversed]
 ----
 
 ====
-include::{partialsdir}/ex-olist.adoc[tag=reversed]
+include::{examplesdir}/ordered.adoc[tag=reversed]
 ====
 
 You can give a list a title by prefixing the line with a dot immediately followed by the text (without leaving any space after the dot).
@@ -64,11 +64,11 @@ Here's an example of a list with a title:
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=base-t]
+include::{examplesdir}/ordered.adoc[tag=base-t]
 ----
 
 ====
-include::{partialsdir}/ex-olist.adoc[tag=base-t]
+include::{examplesdir}/ordered.adoc[tag=base-t]
 ====
 
 == Nested ordered list
@@ -83,7 +83,7 @@ You create a nested item by using one or more dots in front of each the item.
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=nest]
+include::{examplesdir}/ordered.adoc[tag=nest]
 ----
 
 AsciiDoc selects a different number scheme for each level of nesting.
@@ -91,7 +91,7 @@ Here's how the previous list renders:
 
 .A nested ordered list
 ====
-include::{partialsdir}/ex-olist.adoc[tag=nest]
+include::{examplesdir}/ordered.adoc[tag=nest]
 ====
 // end::basic[]
 
@@ -105,28 +105,28 @@ However, it's much more intuitive to follow this convention:
 Again, we are shooting for plain text markup that is readable _as is_.
 ====
 
-You can mix and match the three list types, ordered, xref:unordered.adoc[unordered], and xref:definition.adoc[definition], within a single hybrid list.
+You can mix and match the three list types, ordered, xref:unordered.adoc[unordered], and xref:description.adoc[description], within a single hybrid list.
 Asciidoctor works hard to infer the relationships between the items that are most intuitive to us humans.
 
 Here's an example of nesting an unordered list inside of an ordered list:
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=mix]
+include::{examplesdir}/ordered.adoc[tag=mix]
 ----
 
 ====
-include::{partialsdir}/ex-olist.adoc[tag=mix]
+include::{examplesdir}/ordered.adoc[tag=mix]
 ====
 
 You can spread the items out and indent the nested lists if that makes it more readable for you:
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=mix-alt]
+include::{examplesdir}/ordered.adoc[tag=mix-alt]
 ----
 
-The definition list page demonstrates how to xref:definition.adoc#three-hybrid[combine all three list types].
+The description list page demonstrates how to xref:description.adoc#three-hybrid[combine all three list types].
 
 == Number styles
 ////
@@ -206,11 +206,11 @@ You can also set the starting number using the `start` attribute:
 
 [source]
 ----
-include::{partialsdir}/ex-olist.adoc[tag=num]
+include::{examplesdir}/ordered.adoc[tag=num]
 ----
 
 ====
-include::{partialsdir}/ex-olist.adoc[tag=num]
+include::{examplesdir}/ordered.adoc[tag=num]
 ====
 
 IMPORTANT: The start attribute must be a number, even when using a different numeration style.

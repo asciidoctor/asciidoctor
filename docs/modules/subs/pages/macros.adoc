@@ -6,11 +6,7 @@ endif::[]
 //icon:check[role="green"]
 :n: No
 //icon:times[role="red"]
-////
-user manual anchor: subs-mac
-From subs-macro.adoc, included in:
-- user-manual: Text Substitutions: Macros
-////
+// um anchor: subs-mac
 
 Macros are processed by the `macros` element.
 The macros substitution replaces a macro's content with the appropriate built-in and user-defined configuration.

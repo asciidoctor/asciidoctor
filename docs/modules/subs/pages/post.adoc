@@ -6,10 +6,7 @@ endif::[]
 //icon:check[role="green"]
 :n: No
 //icon:times[role="red"]
-////
-From subs-post.adoc, included in:
-- user-manual: Text Substitutions: Post Replacements
-////
+// subs-post.adoc
 
 The line break character, `{plus}`, is replaced when the `post_replacements` process runs.
 

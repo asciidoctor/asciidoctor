@@ -5,11 +5,8 @@ endif::[]
 // new page
 
 == Preamble
-////
-um anchor: doc-preamble
-From preamble-tut.adoc, included in:
-- user-manual
-////
+// um anchor: doc-preamble
+// preamble-tut.adoc, included in user-manual
 
 Content between the document header and the first section title is called the preamble.
 The preamble is optional.
@@ -17,7 +14,7 @@ The preamble is optional.
 .Preamble
 [source]
 ----
-include::{partialsdir}/ex-preamble.adoc[]
+include::{examplesdir}/preamble.adoc[]
 ----
 
 When using the default Asciidoctor stylesheet, the `lead` attribute is applied to the first paragraph of the preamble.
@@ -28,11 +25,8 @@ When using the default Asciidoctor stylesheet, the `lead` attribute is applied t
 // image::preamble.png[Preamble with lead attribute applied]
 --
 
-== Lead paragraphs
-////
-From para-lead.adoc, included in:
-- user-manual: paragraphs: lead
-////
+== Lead style
+// para-lead.adoc, included in: user-manual: paragraphs: lead
 
 Apply the `lead` style to any paragraph, and it will render using a larger font size.
 The lead style is assigned to the xref:attributes:role.adoc[role attribute].
@@ -41,12 +35,12 @@ You can set `role` using the long- or shorthand method.
 .Setting role using shorthand (`.`) and assigning it the lead value
 [source]
 ----
-include::{partialsdir}/ex-text.adoc[tag=lead]
+include::{examplesdir}/paragraph.adoc[tag=lead]
 ----
 
 .Result: Lead paragraph
 --
-include::{partialsdir}/ex-text.adoc[tag=lead]
+include::{examplesdir}/paragraph.adoc[tag=lead]
 --
 
 When you convert a document to HTML and view it using the default stylesheet, the first paragraph of the preamble is automatically styled as a lead paragraph.

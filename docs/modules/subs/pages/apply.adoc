@@ -2,10 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-From subs-apply.adoc, included in:
-- user-manual: Text Substitutions: Applying substitutions
-////
+// subs-apply.adoc, included in user-manual: Text Substitutions: Applying substitutions
 
 == The subs attribute
 
@@ -37,13 +34,13 @@ By default, literal blocks are only subject to special characters substitution.
 But you can change this behavior by setting the `subs` attribute in the block's attribute list.
 
 ....
-include::{partialsdir}/ex-subs.adoc[tag=subs-in]
+include::{examplesdir}/subs.adoc[tag=subs-in]
 ....
 <1> The subs attribute is set in the attribute list and assigned the `verbatim` and `quotes` values.
 <2> The formatting markup in this line will be replaced when the quotes substitution runs.
 
 ====
-include::{partialsdir}/ex-subs.adoc[tag=subs-out]
+include::{examplesdir}/subs.adoc[tag=subs-out]
 ====
 <1> The `verbatim` value enables the callouts to be processed.
 <2> The `quotes` value enables the text formatting to be processed.
@@ -54,7 +51,7 @@ If you are applying the same set of substitutions to numerous blocks, you should
 
 [source]
 ....
-include::{partialsdir}/ex-subs.adoc[tag=subs-attr]
+include::{examplesdir}/subs.adoc[tag=subs-attr]
 ....
 
 Another way to ensure consistency and keep your documents clean and simple is to use the xref:api:tree-processor.adoc[Tree Processor extension].
@@ -85,7 +82,7 @@ For example, you can add the `attributes` substitution to a listing block's defa
 .Add attributes substitution to a default substitution list
 [source]
 ....
-include::{partialsdir}/ex-subs.adoc[tag=subs-add]
+include::{examplesdir}/subs.adoc[tag=subs-add]
 ....
 
 Similarly, you can remove the `callouts` substitution.
@@ -93,7 +90,7 @@ Similarly, you can remove the `callouts` substitution.
 .Remove callouts substitution from a default substitution list
 [source]
 ....
-include::{partialsdir}/ex-subs.adoc[tag=subs-sub]
+include::{examplesdir}/subs.adoc[tag=subs-sub]
 ....
 
 You can also specify whether the substitution is placed at the beginning or end of the substitution list.
@@ -101,7 +98,7 @@ If a `+` comes before the name of the substitution, then it's added to the end o
 
 [source]
 ....
-include::{partialsdir}/ex-subs.adoc[tag=subs-multi]
+include::{examplesdir}/subs.adoc[tag=subs-multi]
 ....
 
 In the above example, the quotes, then the special characters, and then the attributes substitutions will be applied to the listing block.
@@ -116,9 +113,9 @@ For example, the quotes text substitution value is assigned in the inline pass m
 
 [source]
 ----
-include::{partialsdir}/ex-pass.adoc[tag=s-macro]
+include::{examplesdir}/pass.adoc[tag=s-macro]
 ----
 
 ====
-include::{partialsdir}/ex-pass.adoc[tag=s-macro]
+include::{examplesdir}/pass.adoc[tag=s-macro]
 ====

@@ -3,7 +3,7 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :url-doctest: https://github.com/asciidoctor/asciidoctor-doctest
-:uri-diffs: {uri-home}/docs/asciidoc-asciidoctor-diffs/
+//:uri-diffs: {uri-home}/docs/asciidoc-asciidoctor-diffs/
 // um anchor: migrating-from-asciidoc-python
 
 In order to take advantage of the new features and syntax in Asciidoctor, you'll
@@ -88,7 +88,7 @@ There are similar attributes to control how additional resources are resolved.
 |Sizes, lines, and colors
 |`big`, `small`, `underline`, `overline`, `line-through`, colors
 |user-specified `+[.<role-name>]+` and associated formatting in stylesheet
-|See xref:ROOT:css-and-custom.adoc[custom text styles]
+|See xref:text:css-and-custom.adoc[custom text styles]
 |===
 
 .Table of Contents
@@ -113,7 +113,7 @@ There are similar attributes to control how additional resources are resolved.
 |===
 
 .Document Header
-[cols="15,20,30,15"]
+[cols="15,20,15,35"]
 |===
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
@@ -138,23 +138,22 @@ If you want to use the new Asciidoctor syntax, make sure to use `= Title` or exp
 
 |Underlined titles
 |Underline length must match title length +/- 2 characters.
-a|[%hardbreaks]
-pass:[== Level 1 section title]
-pass:[=== Level 2 section title]
-pass:[==== Level 3 section title]
-pass:[===== Level 4 section title]
-|See xref:sections:levels-and-titles.adoc[section levels and titles]
+|pass:[== Level 1 section title] +
+pass:[=== Level 2 section title] +
+pass:[==== Level 3 section title] +
+pass:[===== Level 4 section title] +
+|See xref:sections:level-and-title.adoc[section levels and titles]
 
 |===
 
 .Tables
-[cols="15,20,30,15"]
+[cols="15,20,20,20"]
 |===
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
 |AsciiDoc table cell
-|`a\|` or `asciidoc\|`
-|`a\|` only
+|`a{vbar}` or `asciidoc{vbar}`
+|`a{vbar}` only
 |
 
 |Table cell separator
@@ -165,7 +164,7 @@ pass:[===== Level 4 section title]
 |Horizontal and vertical alignment for tables cells
 |`halign`, `valign`
 |Column and cell specifiers
-|See xref:tables:columns.adoc#cols-align[align column content] or xref:tables:columns.adoc#align-cell[cell content].
+|See xref:tables:column.adoc#cols-align[align column content] or xref:tables:column.adoc#align-cell[cell content].
 
 |Make tables full page width in DocBook
 |`options="pgwide"`
@@ -262,14 +261,13 @@ See xref:ROOT:language-support.adoc[language support] for details.
 
 The extension mechanism is completely different in Asciidoctor, but the most of the standard extensions have been re-implemented, so they should work with minor changes.
 
-.Standard extensions
 [cols="<20,<80"]
 |===
 |AsciiDoc.py |Asciidoctor
 
 |source
 a|
-* You can choose from a number of xref:source:source-block.adoc[syntax highlighters].
+* You can choose from a number of xref:source:source.adoc[syntax highlighters].
 * Highlighters are built-in, not separately installed.
 * `src_numbered`, `src_tab`, `args` are not implemented directly, but check the highlighter you are using for what features it has and how to configure them.
 
@@ -291,8 +289,8 @@ Depending on the Asciidoctor processor you choose, you can re-write your xref:ap
 == Doctest
 
 AsciiDoc.py `--doctest` ran its unit tests.
-See the {url-tests}[test suite] for how to run the Asciidoctor unit tests.
-Asciidoctor also has a {url-doctest}[doctest tool] which you can use when creating custom HTML or XML-based converters.
+See the {url-tests}[test suite^] for how to run the Asciidoctor unit tests.
+Asciidoctor also has a {url-doctest}[doctest tool^] which you can use when creating custom HTML or XML-based converters.
 
 == Help
 
@@ -307,9 +305,12 @@ If you installed Asciidoctor using RubyGems, you have to tell the `man` command 
 
  $ man "`gem which asciidoctor | xargs dirname`/../man/asciidoctor.1"
 
-You can also view the {url-manpage}[manpage online].
+You can also view the {url-manpage}[manpage online^].
 
 //To get help with the AsciiDoc syntax in Asciidoctor, refer to the #AsciiDoc Syntax Quick Reference#.
+
+////
+This content needs to be move to the specific subject docs pages if applicable
 
 == Features Introduced by Asciidoctor
 
@@ -338,16 +339,15 @@ The longhand forms still work, but you should use the new forms for future compa
 There are lots of new features and improvements Asciidoctor.
 These are some of the more interesting ones when migrating:
 
-* xref:include:lines-and-tags.adoc[Partial includes]
+* xref:directives:include-lines-and-tags.adoc[Partial includes]
 * xref:attributes:safe-modes.adoc[Additional safe modes]
 * xref:macros:icon.adoc[Icon-based fonts and inline icons]
-* {url-diagram}[Asciidoctor Diagram]
+* {url-diagram}[Asciidoctor Diagram^]
 
 A detailed list of the improvements is shown in #Differences between Asciidoctor and AsciiDoc.py#.
 
-//{uri-diffs}
+This is the compat mode summary which needs a page.
 
-////
 These changes are not backward-compatible, but if you set the `compat-mode` attribute, Asciidoctor will accept the AsciiDoc.py syntax.
 For the long term, you should update to the Asciidoctor syntax.
 Consult the {uri-migrate}[Migration Guide] to get the full details and learn how to migrate smoothly.

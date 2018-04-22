@@ -5,8 +5,7 @@ endif::[]
 ////
 um anchor: discrete-headings
 um section title: Discrete Headings (aka Floating Titles)
-From discrete-heading.adoc, included in:
-- user-manual
+From discrete-heading.adoc, included in user-manual
 ////
 
 To make a discrete heading, aka floating title, you add the `discrete` attribute to any section title.

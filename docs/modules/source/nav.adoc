@@ -2,10 +2,10 @@
 ** xref:listing.adoc[Listing Blocks]
 ** xref:literal.adoc[Literal Blocks]
 ** xref:source.adoc[Source Code Blocks]
-** xref:callouts.adoc[Callouts]
+** xref:callout.adoc[Callouts]
 ** Syntax Highlighting
 *** xref:coderay.adoc[CodeRay]
 *** xref:highlightjs.adoc[Highlight.js]
 *** xref:pygments.adoc[Pygments]
 *** xref:highlight-php.adoc[Highlight PHP Code]
-** xref:listing-wrap.adoc[Wrap or Scroll]
+** xref:wrap.adoc[Wrap or Scroll]

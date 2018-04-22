@@ -2,11 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-anchor from user manual: user-preface
-Included in:
-- user-manual
-////
+// anchor from um: user-preface
 
 The preface is a special section of a book that precedes the first part or chapter of the book (or the first chapter of a part).
 The preface can contain subsections.

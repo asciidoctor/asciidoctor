@@ -3,17 +3,13 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :keywords: Q&A, Q and A
-////
-from dlist-qa.adic file, included in:
-- user-manual: Question and answer style list
-////
+//dlist-qa.adic file, included in user-manual: Question and answer style list
 
-.Q&A
+== Question and answer list syntax
+
 [source]
 ----
-include::{partialsdir}/ex-dlist.adoc[tag=qa]
+include::{examplesdir}/description.adoc[tag=qa]
 ----
 
-====
-include::{partialsdir}/ex-dlist.adoc[tag=qa]
-====
+include::{examplesdir}/description.adoc[tag=qa]

@@ -18,7 +18,7 @@ This technique is known as [.term]_syntax highlighting_ source code (or [.term]_
 Since this technique is so prevalent--one could say expected--Asciidoctor integrates a wealth of libraries to syntax highlight source code blocks in your document.
 This list includes CodeRay, Pygments, highlight.js, and prettify.
 
-== Enabling Source Highlighting
+== Enabling source highlighting
 
 When enabled, syntax highlighting gets applied to listing or literal blocks that have the `source` block style and a source language.
 However, syntax highlighting is _not_ enabled by default.
@@ -45,7 +45,7 @@ For example, here's how to enable syntax highlighting using CodeRay:
 :source-highlighter: coderay
 ----
 
-== Available Source Highlighters
+== Available source highlighters
 
 The following table lists the recognized values for the `source-highlighter` attribute.
 
@@ -85,37 +85,37 @@ On the other hand, if you're using a client-side syntax highlighting library lik
 The generated HTML will load the required source files from a CDN (or custom URL or file path).
 ====
 
-== Applying Source Highlighting
+== Applying source highlighting
 
 To apply highlighting to source code, you must add the `source` block style to a listing block, literal block, or paragraph and also specify a source language.
 
 [listing]
 .Code block with title and syntax highlighting
 ....
-include::{partialsdir}/ex-src.adoc[tag=src-base-co]
+include::{examplesdir}/source.adoc[tag=src-base-co]
 ....
 <1> An optional title can be added to the block.
-<2> An optional ID can be added to the block. See xref:attributes:id.adoc#anchor[anchor].
+<2> An optional ID can be added to the block.
 <3> Assign the block name `source` to the first position in the attribute list.
 <4> Assign a source language to the second position.
 <5> The source block name is typically assigned to listing and literal blocks.
 
 .Result: Source block with title and syntax highlighting
 ====
-include::{partialsdir}/ex-src.adoc[tag=src-base-co-res]
+include::{examplesdir}/source.adoc[tag=src-base-co-res]
 ====
 
-.Source paragraph
+.Source style
 [source]
 ----
-include::{partialsdir}/ex-src.adoc[tag=src-para-co]
+include::{examplesdir}/source.adoc[tag=src-para-co]
 ----
 <1> Place the attribute list directly on the paragraph
 <2> Once an empty line is encountered the syntax highlighting is unset.
 
-.Result: Source paragraph
+.Result: Source style
 ====
-include::{partialsdir}/ex-src.adoc[tag=src-para]
+include::{examplesdir}/source.adoc[tag=src-para]
 ====
 
 If the majority of your source blocks use the same source language, you can set the `source-language` attribute in the document header and assign a language to it.
@@ -123,7 +123,7 @@ If the majority of your source blocks use the same source language, you can set 
 [listing]
 .Source language attribute
 ....
-include::{partialsdir}/ex-src.adoc[tag=src-lang]
+include::{examplesdir}/source.adoc[tag=src-lang]
 ....
 
 Additionally, you can use an xref:directives:include-directive.adoc[include directive] to insert source code into an AsciiDoc document directly from a file.
@@ -131,7 +131,7 @@ Additionally, you can use an xref:directives:include-directive.adoc[include dire
 [listing]
 .Code block inserted from another file
 ....
-include::{partialsdir}/ex-src.adoc[tag=src-inc]
+include::{examplesdir}/source.adoc[tag=src-inc]
 ....
 
 //TODO mention the use of AsciiDoc tags to include code snippets and the indent flag to reset indentation

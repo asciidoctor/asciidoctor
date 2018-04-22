@@ -3,7 +3,7 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 ////
-From subs-prevent.adoc, included in:
+subs-prevent.adoc, included in:
 - user-manual: Text Substitutions: Preventing substitutions
 - writers-guide: preventing subs
 ////
@@ -20,7 +20,7 @@ When your document is processed, the backslash is removed so it doesn't display 
 
 [source]
 ----
-include::{partialsdir}/ex-subs.adoc[tag=slash]
+include::{examplesdir}/subs.adoc[tag=slash]
 ----
 
 // end::backslash[]

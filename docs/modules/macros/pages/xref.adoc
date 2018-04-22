@@ -25,7 +25,7 @@ For example, considering the following section.
 
 Asciidoctor automatically assigns the ID `_section_title` to this section, which you can then use as the target of an xref to create a reference to this section.
 You can also customize how this ID is generated.
-Refer to xref:sections:ids.adoc#auto-id[auto-generated IDs] for more information about how Asciidoctor generates these IDs.
+Refer to xref:sections:id.adoc#auto-id[auto-generated IDs] for more information about how Asciidoctor generates these IDs.
 
 If you're referring to a content element other than a section, you'll need to define an anchor on that element explicitly.
 
@@ -38,12 +38,12 @@ You create a cross reference by enclosing the ID of the target block or section 
 .Cross reference using the ID of the target section
 [source]
 ----
-include::{partialsdir}/ex-xref.adoc[tag=base]
+include::{examplesdir}/xref.adoc[tag=base]
 ----
 
 .Rendered cross reference using the ID of the target section
 ====
-include::{partialsdir}/ex-xref.adoc[tag=base]
+include::{examplesdir}/xref.adoc[tag=base]
 ====
 
 You can also link to a block or section using the title by referencing its title, referred to as a [.term]_natural cross reference_.
@@ -53,12 +53,12 @@ The title must contain at least one space character or contain at least one uppe
 .Cross reference using a section's title
 [source]
 ----
-include::{partialsdir}/ex-xref.adoc[tag=xref-title]
+include::{examplesdir}/xref.adoc[tag=xref-title]
 ----
 
 .Rendered cross reference using a section's title
 ====
-include::{partialsdir}/ex-xref.adoc[tag=xref-title]
+include::{examplesdir}/xref.adoc[tag=xref-title]
 ====
 
 Converters usually use the reftext of the target as the default text of the link.
@@ -71,12 +71,12 @@ After the ID, add a comma and then enter the custom text you want the cross refe
 .Cross reference with custom xreflabel text
 [source]
 ----
-include::{partialsdir}/ex-xref.adoc[tag=text]
+include::{examplesdir}/xref.adoc[tag=text]
 ----
 
 .Rendered cross reference using custom xreflabel text
 ====
-include::{partialsdir}/ex-xref.adoc[tag=text]
+include::{examplesdir}/xref.adoc[tag=text]
 ====
 
 You can also use the inline xref macro as an alternative to the double angled bracket form.
@@ -84,5 +84,5 @@ You can also use the inline xref macro as an alternative to the double angled br
 .Inline xref macro
 [source]
 ----
-include::{partialsdir}/ex-xref.adoc[tag=xref-macro]
+include::{examplesdir}/xref.adoc[tag=xref-macro]
 ----

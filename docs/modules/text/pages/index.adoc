@@ -2,10 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-text.adoc, included in:
-- user-manual: text formatting
-////
+// text.adoc
 
 Just as we emphasize certain words and phrases when we speak, we can emphasize them in text with formatting.
 This formatting, such as bold or monospace, is indicated by surrounding letters, words, or phrases with simple markup.
@@ -24,7 +21,7 @@ Continue reading to learn how to format letters, words or phrases with the follo
 - [x] italic
 - [x] monospace
 - [x] highlighted
-- [x] built-in and custom CSS styles
+- [x] custom styles
 - [x] smart quotation marks and apostrophes
 - [x] subscript and superscript
 

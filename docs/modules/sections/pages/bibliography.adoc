@@ -2,12 +2,8 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-from file biblio.adoc
-anchor from user manual: user-biblio
-Included in:
-- user-manual: Bibliography
-////
+// biblio.adoc
+// anchor from um: user-biblio
 
 AsciiDoc has basic support for bibliographies.
 While the structure of the bibliography entry is entirely freeform, AsciiDoc provides a way to reference the entries from the text and outputs the bibliography with proper semantics for processing by other toolchains (such as DocBook).
@@ -31,14 +27,14 @@ Let's consider an example.
 .Bibliography with inbound references
 [source]
 ----
-include::{partialsdir}/ex-biblio.adoc[tag=base]
+include::{examplesdir}/bibliography.adoc[tag=base]
 ----
 
 This renders as:
 
 |===
 a|
-include::{partialsdir}/ex-biblio.adoc[tag=base]
+include::{examplesdir}/bibliography.adoc[tag=base]
 |===
 
-If you want more advanced features such as automatic numbering and custom citation styles, try the {url-org}/asciidoctor-bibtex[asciidoctor-bibtex] project.
+If you want more advanced features such as automatic numbering and custom citation styles, try the {url-org}/asciidoctor-bibtex[asciidoctor-bibtex^] project.

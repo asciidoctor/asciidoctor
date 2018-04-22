@@ -7,8 +7,7 @@ endif::[]
 :n: No
 //icon:times[role="red"]
 ////
-From subs-repl.adoc, included in:
-- user-manual: Text Substitutions: Replacements
+subs-repl.adoc, included in user-manual: Text Substitutions: Replacements
 uri-xml was changed to url-html-ref and added to site.yml
 uri-unicode was changed to url-unicode and added to site.yml
 ////
@@ -22,7 +21,7 @@ WARNING: The `replacements` element depends on the substitutions completed by th
 This is important to keep in mind when applying custom substitutions to a block.
 See xref:apply.adoc[applying substitutions] for more information.
 
-The replacements substitution also recognizes {url-html-ref}[HTML and XML character entity references] as well as {url-unicode}[decimal and hexadecimal Unicode code points] and substitutes them for their corresponding decimal form Unicode code point.
+The replacements substitution also recognizes {url-html-ref}[HTML and XML character entity references^] as well as {url-unicode}[decimal and hexadecimal Unicode code points^] and substitutes them for their corresponding decimal form Unicode code point.
 
 For example, to produce the `&sect;` symbol you could write `\&sect;`, `\&#x00A7;`, or `\&#167;`.
 When the document is processed, `replacements` will replace the section symbol reference, regardless of whether it is a character entity reference or a numeric character reference, with `\&#167;`.

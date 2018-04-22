@@ -17,7 +17,7 @@ This example demonstrates how to include an AsciiDoc file from a GitHub reposito
 
 [source]
 ----
-include::{partialsdir}/ex-include.adoc[tag=uri]
+include::{examplesdir}/include.adoc[tag=uri]
 ----
 
 For security reasons, this capability is *not enabled by default*.
@@ -53,7 +53,7 @@ As far as Asciidoctor is concerned, all URIs share the same restriction, whether
 
 The same restriction described in this section applies when embedding an image referenced from a URI, such as when `data-uri` is set or when converting to PDF using Asciidoctor PDF.
 
-=== Caching URI Content
+=== Caching URI content
 
 Reading content from a URI is obviously much slower than reading it from a local file.
 

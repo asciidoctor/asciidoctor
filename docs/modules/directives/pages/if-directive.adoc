@@ -104,7 +104,7 @@ Otherwise the content is not included.
 ----
 
 All attributes (and)::
-Multiple plus-separated (+) directive names evaluate to true, allowing the content to be included, if all of the directives are defined.
+Multiple plus-separated (`+``) directive names evaluate to true, allowing the content to be included, if all of the directives are defined.
 Otherwise the content is not included.
 +
 .All attributes example

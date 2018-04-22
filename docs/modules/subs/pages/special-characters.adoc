@@ -2,10 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-From subs-specchar.adoc, included in:
-- user-manual: Text Substitutions: Special characters
-////
+//subs-specchar.adoc, included in um: Text Substitutions: Special characters
 
 When applicable, the first text substitution to occur is the replacement of any special characters.
 This process is handled by the `specialchars` element.

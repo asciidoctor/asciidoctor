@@ -1,0 +1,61 @@
+////
+Included in:
+- user-manual: Unordered list
+- user-manual: checklist
+- quick-ref
+- writers guide
+////
+
+// tag::base[]
+* Edgar Allen Poe
+* Sheri S. Tepper
+* Bill Bryson
+// end::base[]
+
+// tag::base-t[]
+.Kizmet's Favorite Authors
+* Edgar Allen Poe
+* Sheri S. Tepper
+* Bill Bryson
+// end::base-t[]
+
+// tag::base-alt[]
+- Edgar Allen Poe
+- Sheri S. Tepper
+- Bill Bryson
+// end::base-alt[]
+
+// tag::divide[]
+* Apples
+* Oranges
+
+//-
+
+* Walnuts
+* Almonds
+// end::divide[]
+
+// tag::nest[]
+.Possible DefOps manual locations
+* West wood maze
+** Maze heart
+*** Reflection pool
+** Secret exit
+* Untracked file in git repository
+// end::nest[]
+
+// tag::max[]
+* level 1
+** level 2
+*** level 3
+**** level 4
+***** level 5
+* level 1
+// end::max[]
+
+// tag::square[]
+[square]
+* one
+* two
+* three
+// end::square[]

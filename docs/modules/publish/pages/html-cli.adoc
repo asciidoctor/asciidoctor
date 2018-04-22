@@ -1,4 +1,4 @@
-= Convert to HTML using the Command Line
+= Convert to HTML using the CLI
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
@@ -17,7 +17,7 @@ In this section, we'll create a sample document, then process and convert it wit
 
 [source]
 ----
-include::{partialsdir}/mysample.adoc[]
+include::{examplesdir}/mysample.adoc[]
 ----
 
 To convert [.path]_mysample.adoc_ to HTML from the command line:

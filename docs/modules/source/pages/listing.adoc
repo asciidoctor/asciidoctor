@@ -17,33 +17,33 @@ The `listing` block name can be applied to content two ways.
 . Set the `listing` attribute on the element.
 . Contain the content within a delimited listing block.
 
+== Listing style syntax
+
 The listing block name is applied to an element, such as a paragraph, by setting the `listing` attribute on that element.
 
-.Listing paragraph syntax
+.Listing style syntax
 [source]
 ----
-include::{partialsdir}/ex-listing.adoc[tag=para]
+include::{examplesdir}/listing.adoc[tag=para]
 ----
 
-.Result: Listing paragraph
-====
-include::{partialsdir}/ex-listing.adoc[tag=para]
-====
+.Result: Listing style
+include::{examplesdir}/listing.adoc[tag=para]
+
+== Delimited listing block
 
 A delimited listing block is surrounded by lines composed of four hyphens (`----`).
 
 .Delimited listing block syntax
 [source]
 ....
-include::{partialsdir}/ex-listing.adoc[tag=bl]
+include::{examplesdir}/listing.adoc[tag=bl]
 ....
 
 Here's how the block above appears when rendered as HTML.
 
-.Result: Listing block
-====
-include::{partialsdir}/ex-listing.adoc[tag=bl]
-====
+.Result: Delimited listing block
+include::{examplesdir}/listing.adoc[tag=bl]
 
 You should notice a few things about how the content is processed.
 
@@ -57,12 +57,12 @@ The example below shows a listing block with `source` and the language `ruby` ap
 .Source block syntax
 [source]
 ....
-include::{partialsdir}/ex-src.adoc[tag=src-base]
+include::{examplesdir}/source.adoc[tag=src-base]
 ....
 
 .Result: Listing block with the source attribute set
 ====
-include::{partialsdir}/ex-src.adoc[tag=src-base]
+include::{examplesdir}/source.adoc[tag=src-base]
 ====
 
 Detailed instructions for using the xref:source.adoc[source and source-highlighter attributes] are provided on the source code paragraphs and blocks page.
@@ -70,12 +70,10 @@ Detailed instructions for using the xref:source.adoc[source and source-highlight
 [listing]
 .Listing block with custom substitutions syntax
 ....
-include::{partialsdir}/ex-listing.adoc[tag=subs]
+include::{examplesdir}/listing.adoc[tag=subs]
 ....
 
 .Result: Listing block with custom substitutions applied
-====
 // the attribute value is hard-coded in this result since the example depends
 // on a hypothetical document attribute
-include::{partialsdir}/ex-listing.adoc[tag=subs-out]
-====
+include::{examplesdir}/listing.adoc[tag=subs-out]

@@ -2,6 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:url-yelp: https://wiki.gnome.org/action/show/Apps/Yelp
 // docbook.adoc
 
 Asciidoctor can produce DocBook 5.0 and 4.5 output.

@@ -2,11 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-user-manual anchor: pass-blocks
-From pass-block, included in:
-- user-manual: Macro and Block Passthroughs: Block passthroughs
-////
+// um anchor: pass-blocks
 
 The `pass` style and delimited passthrough block exclude the block's content from all substitutions unless the `subs` attribute is set.
 
@@ -16,7 +12,7 @@ The `pass` style can also be set on a paragraph or an open block.
 
 [source]
 ----
-include::{partialsdir}/ex-pass.adoc[tag=pass-style]
+include::{examplesdir}/pass.adoc[tag=pass-style]
 ----
 
 == Delimited passthrough block syntax
@@ -25,7 +21,7 @@ A passthrough block is delimited by four plus signs (`pass:[++++]`).
 
 [source]
 ----
-include::{partialsdir}/ex-pass.adoc[tag=bl]
+include::{examplesdir}/pass.adoc[tag=bl]
 ----
 
 (Keep in mind that AsciiDoc has a video macro, so this example is merely for demonstration.
@@ -38,7 +34,7 @@ These substitutions will be applied to the content prior to it being reintroduce
 
 [source]
 ----
-include::{partialsdir}/ex-pass.adoc[tag=subs-bl]
+include::{examplesdir}/pass.adoc[tag=subs-bl]
 ----
 
 The content of the pass block does not get wrapped in a paragraph.
@@ -46,7 +42,7 @@ Therefore, you can use the `pass` style in combination with the `normal` substit
 
 [source]
 ----
-include::{partialsdir}/ex-pass.adoc[tag=no-para]
+include::{examplesdir}/pass.adoc[tag=no-para]
 ----
 
 WARNING: Using passthroughs to pass content (without substitutions) can couple your content to a specific output format, such as HTML.

@@ -2,10 +2,6 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-A comparison between AsciiDoc and Markdown.
-This file is included in the user-manual document
-////
 
 The most compelling reason to choose a lightweight markup language for writing is to minimize the number of technical concepts an author must grasp in order to be immediately productive.
 In other words, the goal is to be able to _write without friction_.
@@ -19,7 +15,7 @@ As soon as authors need something slightly more complex (tables, cross reference
 Markdown has become a maze of different implementations, termed "`flavors`", which make a universal definition evasive.
 
 NOTE: The IETF has declared "`there is no such thing as "invalid" Markdown.`"
-See https://tools.ietf.org/html/rfc7763#section-1.1[This Is Markdown! Or: Markup and Its Discontents].
+See https://tools.ietf.org/html/rfc7763#section-1.1[This Is Markdown! Or: Markup and Its Discontents^].
 
 Here's how the story inevitably goes.
 You start out with Markdown.
@@ -44,7 +40,7 @@ And yet, AsciiDoc is simple enough to stand in as a better flavor of Markdown.
 But what truly makes AsciiDoc the right investment is that its syntax was designed to be extended as a core feature.
 This extensibility not only means that AsciiDoc has a more to offer, with room to grow, it also fulfills the objective of ensuring your content is maximally reusable.
 
-// This section originated from the discussion in {uri-org}/asciidoctor.org/issues/34[issue #34].
+// This section originated from the discussion in {url-org}/asciidoctor.org/issues/34[issue #34].
 
 == Comparison by example
 
@@ -129,12 +125,12 @@ a|
 a|
 [source,markdown]
 ----
-[AsciiDoc](http://asciidoc.org)
+[Asciidoctor](https://asciidoctor.org)
 ----
 a|
 [source,asciidoc]
 ----
-http://asciidoc.org[AsciiDoc]
+https://asciidoctor.org[Asciidoctor]
 ----
 
 |Relative link
@@ -367,7 +363,7 @@ a|
 ----
 |===
 
-{asterisk} Asciidoctor also supports the Markdown syntax for this language feature.
++*+ Asciidoctor also supports the Markdown syntax for this language feature.
 
 You can see that AsciiDoc has the following advantages over Markdown:
 
@@ -380,15 +376,16 @@ NOTE: Certain Markdown flavors support additional features, such as tables and d
 However, since these features don't appear in plain Markdown, they are not included in the comparison table.
 
 Asciidoctor, which is used for converting AsciiDoc on GitHub and GitLab, emulates "`the good parts`" of the Markdown syntax, like headings, blockquotes and fenced code blocks, making migration from Markdown to AsciiDoc fairly simple.
-For details about migration, see {uri-home}/docs/asciidoc-syntax-quick-reference/#markdown-compatibility[Markdown Compatibility].
+For details about migration, see #url-home/docs/asciidoc-syntax-quick-reference/#markdown-compatibility[Markdown Compatibility#.
 
+////
 To read more about the shortcomings of Markdown, see these opinion pieces:
 
 * http://ericholscher.com/blog/2016/mar/15/dont-use-markdown-for-technical-docs/[Why You Shouldn't Use "`Markdown`" for Documentation]
 * https://medium.com/@bbirdiman/markdown-considered-harmful-495ccfe24a52[Markdown Considered Harmful]
 * https://www.simple-talk.com/blogs/2014/02/28/sundown-on-markdown/[Sundown on Markdown?]
 
-////
+
 ===== Description Lists in AsciiDoc
 
 [source,asciidoc]

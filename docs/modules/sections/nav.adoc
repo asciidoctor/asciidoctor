@@ -1,9 +1,9 @@
-* xref:sections.adoc[Sections]
-** xref:levels-and-titles.adoc[Levels & Titles]
-*** xref:numbers.adoc[Numbers]
+* xref:section.adoc[Sections]
+** xref:level-and-title.adoc[Levels & Titles]
+*** xref:number.adoc[Numbers]
 *** xref:discrete.adoc[Discrete Titles]
 *** xref:hr-and-break.adoc[Horizontal Rules & Page Breaks]
-** xref:ids.adoc[IDs, Anchors & Links]
+** xref:id.adoc[IDs, Anchors & Links]
 ** xref:structure.adoc[Section Styles]
 // Front matter
 *** xref:dedication.adoc[Dedication]
@@ -13,7 +13,7 @@
 **** xref:toc:toc-ref.adoc[TOC Reference]
 *** xref:abstract.adoc[Abstract]
 *** xref:preface.adoc[Preface]
-*** xref:parts-and-chapters.adoc[Parts & Chapters]
+*** xref:part-and-chapter.adoc[Parts & Chapters]
 // Back matter
 *** xref:appendix.adoc[Appendix]
 *** xref:glossary.adoc[Glossary]

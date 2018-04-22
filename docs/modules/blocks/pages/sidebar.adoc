@@ -16,12 +16,12 @@ A sidebar can be titled and contain any type of content such as source code and 
 .Sidebar syntax
 [source]
 ----
-include::{partialsdir}/ex-sidebar.adoc[tag=base-c]
+include::{examplesdir}/sidebar.adoc[tag=base-c]
 ----
 <1> A title is optional.
 <2> A sidebar is delimited by four asterisks (`+****+`).
 
 .Result: Sidebar with title
 --
-include::{partialsdir}/ex-sidebar.adoc[tag=base]
+include::{examplesdir}/sidebar.adoc[tag=base]
 --

@@ -14,16 +14,16 @@ When text is enclosed in a set of single or double hash symbols (`#`), and no st
 .Highlighted style syntax
 [source]
 ----
-include::{partialsdir}/ex-text.adoc[tag=highlight]
+include::{examplesdir}/text.adoc[tag=highlight]
 ----
 
 .Highlighted text HTML output
 [source,html]
 ----
-include::{partialsdir}/ex-text.adoc[tag=highlight-html]
+include::{examplesdir}/text.adoc[tag=highlight-html]
 ----
 
 .Rendered highlighted text
 ====
-include::{partialsdir}/ex-text.adoc[tag=highlight]
+include::{examplesdir}/text.adoc[tag=highlight]
 ====

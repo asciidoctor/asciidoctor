@@ -74,10 +74,7 @@ Asciidoctor provides several approaches for preventing substitutions depending o
 When you want to prevent punctuation from being interpreted as formatting markup, [.term]_escaping_ the punctuation with a backslash may be sufficient.
 For more comprehensive escape and substitution control, you can use a passthrough.
 
-////
-From pass-intro.adoc, included in:
-- user-manual: Macro and Block Passthroughs
-////
+// From pass-intro.adoc, included in user-manual: Macro and Block Passthroughs
 The passthrough is the primary mechanism by which to escape content in AsciiDoc.
 As the name implies, a passthrough passes content directly through to the output document.
 In some forms, it's possible to apply a custom set of substitutions before the content is reintroduced.

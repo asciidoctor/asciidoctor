@@ -81,7 +81,7 @@ You can enclose the ID in double square brackets:
 .Assigning an ID to a paragraph
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=block-id-brackets]
+include::{examplesdir}/id.adoc[tag=block-id-brackets]
 ----
 
 or use the ID shorthand syntax:
@@ -89,7 +89,7 @@ or use the ID shorthand syntax:
 .Assigning an ID to a paragraph using shorthand syntax
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=block-id-shorthand]
+include::{examplesdir}/id.adoc[tag=block-id-shorthand]
 ----
 
 You can also define an anchor anywhere in content that receives normal substitutions (specifically the macro substitution).
@@ -98,7 +98,7 @@ You can enclose the ID in double square brackets:
 .Defining an inline anchor
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=anchor-brackets]
+include::{examplesdir}/id.adoc[tag=anchor-brackets]
 ----
 
 or using the shorthand ID syntax.
@@ -106,7 +106,7 @@ or using the shorthand ID syntax.
 .Defining an inline anchor using shorthand syntax
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=anchor-shorthand]
+include::{examplesdir}/id.adoc[tag=anchor-shorthand]
 ----
 
 In addition to being able to define anchors on sections and blocks, anchors can be defined inline where ever you can type normal text (anchors are a macro substitution).
@@ -117,7 +117,7 @@ For example, you would not put an anchor in front of a list item:
 .Wrong position for an anchor ID in front of a list item.
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=anchor-wrong]
+include::{examplesdir}/id.adoc[tag=anchor-wrong]
 ----
 
 Instead, you would put it at the very start of the text of the list item:
@@ -125,7 +125,7 @@ Instead, you would put it at the very start of the text of the list item:
 .Defining an inline anchor on a list item
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=anchor-list]
+include::{examplesdir}/id.adoc[tag=anchor-list]
 ----
 
 Here's how you can define the ID for a section using an inline anchor:
@@ -133,7 +133,7 @@ Here's how you can define the ID for a section using an inline anchor:
 .Defining the ID of a section using an inline anchor
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=anchor-header]
+include::{examplesdir}/id.adoc[tag=anchor-header]
 ----
 
 To add additional anchors to a section, place them in front of the title.
@@ -141,7 +141,7 @@ To add additional anchors to a section, place them in front of the title.
 .Adding additional anchors to a section
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=anchor-header-extra]
+include::{examplesdir}/id.adoc[tag=anchor-header-extra]
 ----
 
 CAUTION: If you add additional anchors to a section title, make sure you also assign an explicit ID to that section.
@@ -163,7 +163,7 @@ To define the `xreflabel`, add it in the anchor definition right after the ID (s
 .An anchor ID with a defined xreflabel. The caption will not be used as link text.
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=anchor-xreflabel]
+include::{examplesdir}/id.adoc[tag=anchor-xreflabel]
 ----
 
 Instead of the bracket form, you can use the macro `anchor` to achieve the same goal.
@@ -171,5 +171,5 @@ Instead of the bracket form, you can use the macro `anchor` to achieve the same 
 .Setting an anchor ID using the macro form
 [source]
 ----
-include::{partialsdir}/ex-id.adoc[tag=anchor-macro]
+include::{examplesdir}/id.adoc[tag=anchor-macro]
 ----

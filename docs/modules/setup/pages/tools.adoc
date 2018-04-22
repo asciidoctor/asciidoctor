@@ -68,38 +68,38 @@ While it's true any text editor will do, an editor that supports source highligh
 
 === AsciiDoc FX
 
-{url-asciidocfx}[AsciiDoc FX] is an editor and terminal emulator written with JavaFX 8.
-See its documentation for {url-asciidocfx-docs}[download and installation instructions].
+{url-asciidocfx}[AsciiDoc FX^] is an editor and terminal emulator written with JavaFX 8.
+See its documentation for {url-asciidocfx-docs}[download and installation instructions^].
 
 === Atom
 
-Install https://atom.io/[Atom].
+Install https://atom.io/[Atom^].
 Then from the Atom editor menus, navigate to menu:Atom[Preferences].
 From there, open the menu:Packages[] tab and install:
 
-https://atom.io/packages/asciidoc-preview[AsciiDoc Preview] :: enables live preview
-https://atom.io/packages/language-asciidoc[AsciiDoc Language] :: enables syntax highlighting (AsciiDoc language support)
-https://atom.io/packages/asciidoc-image-helper[AsciiDoc Image Helper] :: provides the ability to paste images from the clipboard
-https://atom.io/packages/autocomplete-asciidoc[AsciiDoc Autocomplete] :: automatically completes AsciiDoc language items
-https://atom.io/packages/asciidoc-assistant[AsciiDoc Assistant] :: Installs useful components to Atom for editing AsciiDoc files (including the above packages)
+https://atom.io/packages/asciidoc-preview[AsciiDoc Preview^] :: enables live preview
+https://atom.io/packages/language-asciidoc[AsciiDoc Language^] :: enables syntax highlighting (AsciiDoc language support)
+https://atom.io/packages/asciidoc-image-helper[AsciiDoc Image Helper^] :: provides the ability to paste images from the clipboard
+https://atom.io/packages/autocomplete-asciidoc[AsciiDoc Autocomplete^] :: automatically completes AsciiDoc language items
+https://atom.io/packages/asciidoc-assistant[AsciiDoc Assistant^] :: Installs useful components to Atom for editing AsciiDoc files (including the above packages)
 
 === Brackets
 
-Install http://brackets.io/[Brackets].
+Install http://brackets.io/[Brackets^].
 Then from the Brackets file menu, open the extension manager.
 Browse available extensions and install `AsciiDoc Preview`.
 
 More information:
 
-* https://github.com/asciidoctor/brackets-asciidoc-preview[AsciiDoc Preview for Brackets]
+* https://github.com/asciidoctor/brackets-asciidoc-preview[AsciiDoc Preview for Brackets^]
 
 === IntelliJ IDEA
 
-Install the community plugin {url-intellij-plugin}[`AsciiDoc`].
+Install the community plugin {url-intellij-plugin}[AsciiDoc^].
 
 == Preview with a web browser
 
-All you need to preview an AsciiDoc document in a web browser is to install the {url-chrome-extension}[Chrome extension], {url-firefox-addon}[Firefox add-on] or {url-opera-extension}[Opera extension].
+All you need to preview an AsciiDoc document in a web browser is to install the {url-chrome-extension}[Chrome extension^], {url-firefox-addon}[Firefox add-on^] or {url-opera-extension}[Opera extension^].
 Then you can see the AsciiDoc file rendered as HTML just by visiting it!
 
 ////

@@ -1,13 +1,8 @@
-= Section Reference
+= Section Syntax and Attributes Reference
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-From sum-section.adoc, included in:
-- user-manual: sections
-////
-
-== Section attributes and values
+//sum-section.adoc, included in:
 
 [cols="1m,1,2m,2"]
 |===

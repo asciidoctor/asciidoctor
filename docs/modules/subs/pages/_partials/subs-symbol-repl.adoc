@@ -1,6 +1,5 @@
 ////
 Included in:
-
 - user-manual: Text Substitutions: Replacements
 - quick-ref
 - writers-guide: replacements

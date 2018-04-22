@@ -6,10 +6,7 @@ endif::[]
 //icon:check[role="green"]
 :n: No
 //icon:times[role="red"]
-////
-From subs-attr.adoc, included in:
-- user-manual: Text Substitutions: Attributes
-////
+// subs-attr.adoc, included in um: Text Substitutions: Attributes
 
 Attribute references are replaced with their values when they're processed by the `attributes` substitution.
 

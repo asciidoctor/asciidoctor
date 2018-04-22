@@ -2,10 +2,6 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-From table.adoc, included in:
-- user-manual: tables
-////
 
 Tables are one of the most intricate, yet refined areas of the AsciiDoc syntax.
 Armed with a bit of knowledge, you should discover that they are both easy to create and easy to read in raw form.
@@ -17,7 +13,7 @@ A table is delimited by a vertical bar and three equal signs (`|===`) and made u
 A cell is specified by a vertical bar (`|`).
 The default table data format is PSV (Prefix Separated Values); that means the processor creates a new cell each time it encounters a vertical bar.
 Cells are grouped into rows.
-Each row must share the same number of cells, taking into account any xref:cells.adoc#span[column or row spans].
+Each row must share the same number of cells, taking into account any xref:cell.adoc#span[column or row spans].
 Then, each consecutive cell in a row is placed in a separate column.
 
 The table example below consists of two columns and three rows.
@@ -26,7 +22,7 @@ The table example below consists of two columns and three rows.
 .Basic table
 [source]
 ----
-include::{partialsdir}/ex-table.adoc[tag=base-co]
+include::{examplesdir}/table.adoc[tag=base-co]
 ----
 <1> The table's content boundaries are defined by a vertical bar followed by three equal signs (`|===`).
 <2> Inserting a blank line before the first row is a trick to ensure the first row is not treated as the table header.
@@ -34,7 +30,7 @@ include::{partialsdir}/ex-table.adoc[tag=base-co]
 <4> Rows can optionally be separated by any number of blank lines.
 
 .Result: Rendered basic table
-include::{partialsdir}/ex-table.adoc[tag=base-alt]
+include::{examplesdir}/table.adoc[tag=base-alt]
 
 Like with all blocks, you can add a role to a table using the `role` attribute.
 The role attribute becomes a CSS class when converted to HTML.
@@ -42,7 +38,7 @@ The preferred shorthand for assigning the role attribute is to put the role name
 
 [source]
 ----
-include::{partialsdir}/ex-table.adoc[tag=base-rolename]
+include::{examplesdir}/table.adoc[tag=base-rolename]
 ----
 
 Leading and trailing spaces around cell content is stripped and, therefore, doesn't affect the table's layout when rendered.
@@ -58,13 +54,13 @@ By default, the title of a formal table is prefixed with the label `Table <n>.` 
 [source]
 ----
 .A formal table
-include::{partialsdir}/ex-table.adoc[tag=impl-h]
+include::{examplesdir}/row.adoc[tag=impl-h]
 ----
 
 .Result: Table rendered with a title
 [width=90]
 .A table with a title
-include::{partialsdir}/ex-table.adoc[tag=impl-h]
+include::{examplesdir}/row.adoc[tag=impl-h]
 
 You can customize the caption label by specifying the `caption` attribute.
 If you want a space between the label and the title, you must add a trailing space to the value of the caption attribute.
@@ -75,13 +71,13 @@ The caption attribute only sets the caption's label, not the whole caption line)
 ----
 [caption="Table A. "]
 .A formal table
-include::{partialsdir}/ex-table.adoc[tag=impl-h]
+include::{examplesdir}/row.adoc[tag=impl-h]
 ----
 
 .Result: Table rendered with a title and custom label
 [width=90, caption="Table A. "]
 .A formal table
-include::{partialsdir}/ex-table.adoc[tag=impl-h]
+include::{examplesdir}/row.adoc[tag=impl-h]
 
 If you want to exclude the caption label altogether, simply assign a blank value to the `caption` attribute.
 
@@ -89,13 +85,13 @@ If you want to exclude the caption label altogether, simply assign a blank value
 ----
 [caption=]
 .A formal table
-include::{partialsdir}/ex-table.adoc[tag=impl-h]
+include::{examplesdir}/row.adoc[tag=impl-h]
 ----
 
 .Result: Table rendered with a title and no label
 [width=90, caption=]
 .A formal table
-include::{partialsdir}/ex-table.adoc[tag=impl-h]
+include::{examplesdir}/row.adoc[tag=impl-h]
 
 :table-caption!:
 
