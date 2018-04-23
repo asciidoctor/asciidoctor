@@ -1228,49 +1228,49 @@ content
   context 'Section Numbering' do
     test 'should create section number with one entry for level 1' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
       assert_equal '1.', sect1.sectnum
     end
 
     test 'should create section number with two entries for level 2' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
       assert_equal '1.1.', sect1_1.sectnum
     end
 
     test 'should create section number with three entries for level 3' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
-      sect1_1_1 = Asciidoctor::Section.new(sect1_1)
+      sect1_1_1 = Asciidoctor::Section.new sect1_1, nil, true
       sect1_1 << sect1_1_1
       assert_equal '1.1.1.', sect1_1_1.sectnum
     end
 
     test 'should create section number for second section in level' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
-      sect1_2 = Asciidoctor::Section.new(sect1)
+      sect1_2 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_2
       assert_equal '1.2.', sect1_2.sectnum
     end
 
     test 'sectnum should use specified delimiter and append string' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
-      sect1_1_1 = Asciidoctor::Section.new(sect1_1)
+      sect1_1_1 = Asciidoctor::Section.new sect1_1, nil, true
       sect1_1 << sect1_1_1
       assert_equal '1,1,1,', sect1_1_1.sectnum(',')
       assert_equal '1:1:1', sect1_1_1.sectnum(':', false)
@@ -1352,6 +1352,31 @@ text
       assert_xpath '//h2[@id="_section_2"][starts-with(text(), "2. ")]', output, 1
       assert_xpath '//h3[@id="_section_2_1"][starts-with(text(), "2.1. ")]', output, 1
       assert_xpath '//h3[@id="_section_2_2"][starts-with(text(), "2.2. ")]', output, 1
+    end
+
+    test 'should number parts when doctype is book and partnums attributes is set' do
+      input = <<-EOS
+= Book Title
+:doctype: book
+:sectnums:
+:partnums:
+
+= Language
+
+== Syntax
+
+content
+
+= Processor
+
+== CLI
+
+content
+      EOS
+
+      output = render_string input
+      assert_xpath '//h1[@id="_language"][text() = "I. Language"]', output, 1
+      assert_xpath '//h1[@id="_processor"][text() = "II. Processor"]', output, 1
     end
 
     test 'blocks should have level' do
@@ -1613,7 +1638,7 @@ content
       EOS
 
       doc = document_from_string input
-      second_section = Asciidoctor::Section.new doc
+      second_section = Asciidoctor::Section.new doc, nil, true
       doc.blocks.insert 1, second_section
       doc.reindex_sections
       sections = doc.sections

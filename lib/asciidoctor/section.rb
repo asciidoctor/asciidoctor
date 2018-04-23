@@ -39,17 +39,17 @@ class Section < AbstractBlock
   # Public: Initialize an Asciidoctor::Section object.
   #
   # parent   - The parent AbstractBlock. If set, must be a Document or Section object (default: nil)
-  # level    - The Integer level of this section (default: 1)
-  # numbered - A Boolean indicating whether numbering is enabled for this Section
+  # level    - The Integer level of this section (default: 1 more than parent level or 1 if parent not defined)
+  # numbered - A Boolean indicating whether numbering is enabled for this Section (default: false)
   # opts     - An optional Hash of options (default: {})
-  def initialize parent = nil, level = nil, numbered = true, opts = {}
+  def initialize parent = nil, level = nil, numbered = false, opts = {}
     super parent, :section, opts
-    if parent && parent != @document
+    if Section === parent
       @level, @special = level || (parent.level + 1), parent.special
     else
       @level, @special = level || 1, false
     end
-    @numbered = numbered && @level > 0
+    @numbered = numbered
     @index = 0
   end
 
@@ -110,7 +110,9 @@ class Section < AbstractBlock
   # Returns the section number as a String
   def sectnum(delimiter = '.', append = nil)
     append ||= (append == false ? '' : delimiter)
-    if @level > 1 && @parent != @document
+    if @level == 0
+      %(#{Helpers.int_to_roman @number}#{append})
+    elsif @level > 1 && Section === @parent
       %(#{@parent.sectnum(delimiter)}#{@number}#{append})
     else
       %(#{@number}#{append})

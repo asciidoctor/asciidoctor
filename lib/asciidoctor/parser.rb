@@ -70,11 +70,6 @@ class Parser
     'a' => :asciidoc
   }
 
-  ROMAN_NUMERALS = ::Hash[
-    'M', 1000, 'CM', 900, 'D', 500, 'CD', 400, 'C', 100, 'XC', 90,
-    'L', 50, 'XL', 40, 'X', 10, 'IX', 9, 'V', 5, 'IV', 4, 'I', 1
-  ]
-
   # Public: Make sure the Parser object doesn't get initialized.
   #
   # Raises RuntimeError if this constructor is invoked.
@@ -1533,6 +1528,7 @@ class Parser
   # Returns the section [Block]
   def self.initialize_section reader, parent, attributes = {}
     document = parent.document
+    book = (doctype = document.doctype) == 'book'
     source_location = reader.cursor if document.sourcemap
     sect_style = attributes[1]
     sect_id, sect_reftext, sect_title, sect_level, sect_atx = parse_section_title reader, document, attributes['id']
@@ -1544,40 +1540,35 @@ class Parser
     end
 
     if sect_style
-      if sect_style == 'abstract' && document.doctype == 'book'
+      if book && sect_style == 'abstract'
         sect_name, sect_level = 'chapter', 1
       else
         sect_name, sect_special = sect_style, true
         sect_level = 1 if sect_level == 0
         sect_numbered = sect_style == 'appendix'
       end
+    elsif book
+      sect_name = sect_level == 0 ? 'part' : (sect_level > 1 ? 'section' : 'chapter')
+    elsif doctype == 'manpage' && (sect_title.casecmp 'synopsis') == 0
+      sect_name, sect_special = 'synopsis', true
     else
-      case document.doctype
-      when 'book'
-        sect_name = sect_level == 0 ? 'part' : (sect_level == 1 ? 'chapter' : 'section')
-      when 'manpage'
-        if (sect_title.casecmp 'synopsis') == 0
-          sect_name, sect_special = 'synopsis', true
-        else
-          sect_name = 'section'
-        end
-      else
-        sect_name = 'section'
-      end
+      sect_name = 'section'
     end
 
-    section = Section.new parent, sect_level, false
+    section = Section.new parent, sect_level
     section.id, section.title, section.sectname, section.source_location = sect_id, sect_title, sect_name, source_location
     if sect_special
       section.special = true
       if sect_numbered
         section.numbered = true
       elsif document.attributes['sectnums'] == 'all'
-        section.numbered = sect_level == 1 && document.doctype == 'book' ? :chapter : true
+        section.numbered = book && sect_level == 1 ? :chapter : true
       end
-    elsif sect_level > 0 && (document.attributes.key? 'sectnums')
+    elsif document.attributes['sectnums'] && sect_level > 0
       # NOTE a special section here is guaranteed to be nested in another section
       section.numbered = section.special ? parent.numbered && true : true
+    elsif book && sect_level == 0 && document.attributes['partnums']
+      section.numbered = true
     end
 
     # generate an ID if one was not embedded or specified as anchor above section title
@@ -2206,13 +2197,13 @@ class Parser
       marker = 'A.'
     when :lowerroman
       if validate
-        expected = int_to_roman_numeral(ordinal + 1).downcase
+        expected = Helpers.int_to_roman(ordinal + 1).downcase
         actual = marker.chop # remove trailing )
       end
       marker = 'i)'
     when :upperroman
       if validate
-        expected = int_to_roman_numeral(ordinal + 1)
+        expected = Helpers.int_to_roman(ordinal + 1)
         actual = marker.chop # remove trailing )
       end
       marker = 'I)'
@@ -2724,18 +2715,6 @@ class Parser
   #   => 'foo3-billy'
   def self.sanitize_attribute_name(name)
     name.gsub(InvalidAttributeNameCharsRx, '').downcase
-  end
-
-  # Internal: Converts an integer to a Roman numeral.
-  #
-  # value - The integer to convert
-  #
-  # Returns the String Roman numeral for this integer
-  def self.int_to_roman_numeral value
-    ROMAN_NUMERALS.map {|l, i|
-      repeat, value = value.divmod i
-      l * repeat
-    }.join
   end
 end
 end

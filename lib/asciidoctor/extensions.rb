@@ -116,31 +116,40 @@ module Extensions
     # Returns a [Section] node with all properties properly initialized.
     def create_section parent, title, attrs, opts = {}
       doc = parent.document
-      doctype, level = doc.doctype, (opts[:level] || parent.level + 1)
+      book = (doctype = doc.doctype) == 'book'
+      level = opts[:level] || parent.level + 1
       if (style = attrs.delete 'style')
-        if style == 'abstract' && doctype == 'book'
+        if book && style == 'abstract'
           sectname, level = 'chapter', 1
         else
           sectname, special = style, true
           level = 1 if level == 0
         end
-      elsif doctype == 'book'
-        sectname = level == 0 ? 'part' : (level == 1 ? 'chapter' : 'section')
+      elsif book
+        sectname = level == 0 ? 'part' : (level > 1 ? 'section' : 'chapter')
       elsif doctype == 'manpage' && (title.casecmp 'synopsis') == 0
         sectname, special = 'synopsis', true
       else
         sectname = 'section'
       end
-      sect = Section.new parent, level, false
+      sect = Section.new parent, level
       sect.title, sect.sectname = title, sectname
       if special
         sect.special = true
-        sect.numbered = true if opts.fetch :numbered, (style == 'appendix')
-      elsif opts.fetch :numbered, (level > 0 && (doc.attributes.key? 'sectnums'))
-        sect.numbered = sect.special ? (parent.context == :section && parent.numbered) : true
+        if opts.fetch :numbered, (style == 'appendix')
+          sect.numbered = true
+        elsif !(opts.key? :numbered) && (doc.attr? 'sectnums', 'all')
+          sect.numbered = book && level == 1 ? :chapter : true
+        end
+      elsif level > 0
+        if opts.fetch :numbered, (doc.attr? 'sectnums')
+          sect.numbered = sect.special ? parent.numbered && true : true
+        end
+      else
+        sect.numbered = true if opts.fetch :numbered, (book && (doc.attr? 'partnums'))
       end
       unless (id = attrs.delete 'id') == false
-        sect.id = attrs['id'] = id || ((doc.attributes.key? 'sectids') ? (Section.generate_id sect.title, doc) : nil)
+        sect.id = attrs['id'] = id || ((doc.attr? 'sectids') ? (Section.generate_id sect.title, doc) : nil)
       end
       sect.update_attributes attrs
       sect

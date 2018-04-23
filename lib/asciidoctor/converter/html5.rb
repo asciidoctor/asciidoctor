@@ -322,11 +322,10 @@ MathJax.Hub.Config({
 
     def section node
       if (level = node.level) == 0
-        title = node.title
         sect0 = true
+        title = node.numbered && level <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} #{node.title}) : node.title
       else
-        num = node.numbered && !node.caption && level <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} ) : ''
-        title = %(#{num}#{node.captioned_title})
+        title = node.numbered && !node.caption && level <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} #{node.title}) : node.captioned_title
       end
       if node.id
         id_attr = %( id="#{id = node.id}")

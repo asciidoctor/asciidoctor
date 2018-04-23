@@ -210,12 +210,12 @@ class AbstractBlock < AbstractNode
   #
   # Examples
   #
-  #   doc << (sect1 = Section.new doc, 1, false)
+  #   doc << (sect1 = Section.new doc, 1)
   #   sect1.title = 'Section 1'
   #   para1 = Block.new sect1, :paragraph, :source => 'Paragraph 1'
   #   para2 = Block.new sect1, :paragraph, :source => 'Paragraph 2'
   #   sect1 << para1 << para2
-  #   sect1 << (sect1_1 = Section.new sect1, 2, false)
+  #   sect1 << (sect1_1 = Section.new sect1, 2)
   #   sect1_1.title = 'Section 1.1'
   #   sect1_1 << (Block.new sect1_1, :paragraph, :source => 'Paragraph 3')
   #   sect1.blocks?
