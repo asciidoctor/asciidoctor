@@ -1,5 +1,3 @@
-// Included in:
-//
 // - user-manual: URLs, URL Troubleshooting sidebar
 // - troubleshoot
 // - faq: troubleshoot
@@ -9,7 +7,7 @@ Why don't URLs containing underscores (`_`) or carets (`{caret}`) work after the
 // tag::sb[]
 This problem occurs because the markup parser interprets parts of the URL (i.e., the link target) as valid text formatting markup.
 Most lightweight markup languages have this issue because they don't use a grammar-based parser.
-Asciidoctor plans to handle URLs more carefully in the future (see https://github.com/asciidoctor/asciidoctor/issues/281[issue #281]), which may be solved by moving to a grammar-based parser (see https://github.com/asciidoctor/asciidoctor/issues/61[issue #61]).
+Asciidoctor plans to handle URLs more carefully in the future (see {url-org}/asciidoctor/issues/281[issue #281^]), which may be solved by moving to a grammar-based parser (see {url-org}/asciidoctor/issues/61[issue #61^]).
 Thankfully, there are many ways to include URLs of arbitrary complexity using the AsciiDoc passthrough mechanisms.
 
 .Solution A
@@ -49,6 +47,6 @@ This URL has repeating underscores link:++https://asciidoctor.org/now_this__link
 ----
 ====
 
-For more information, see https://github.com/asciidoctor/asciidoctor/issues/625[issue #625].
+For more information, see {url-org}/asciidoctor/issues/625[issue #625^].
 // end::sb[]
 --

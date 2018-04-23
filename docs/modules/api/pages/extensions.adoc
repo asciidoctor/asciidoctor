@@ -2,11 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-exten-intro.adoc, included in:
-- user-manual: Extensions
-uri-org/asciidoctor-extensions-lab in now url-exten-lab
-////
+// exten-intro.adoc, included in user-manual: Extensions
 
 Extensions have proven to be central to the success of AsciiDoc because they open up the language to new use cases.
 However, the way extensions are implemented in AsciiDoc Python presents a number of problems:

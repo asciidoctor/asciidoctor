@@ -12,10 +12,10 @@ The block video macro enables you to embed videos into your documentation.
 You can embed self-hosted videos or videos shared on popular video hosting sites such as YouTube and Vimeo.
 
 The video formats Asciidoctor supports is dictated by the formats supported by the browser (and, in turn, the user's system).
-While this was once a precarious ordeal, HTML5 has brought sanity to video support in the browser by adding a dedicated {url-video-element}[`<video>`] element and by introducing several standard video formats.
+While this was once a precarious ordeal, HTML5 has brought sanity to video support in the browser by adding a dedicated {url-video-element}[`<video>`^] element and by introducing several standard video formats.
 Those formats are now widely supported across browsers and systems.
 
-For a canonical list of supported web video formats and their interaction with modern browsers, see the {url-video-browsers}[Mozilla Developer Supported Media Formats] documentation.
+For a canonical list of supported web video formats and their interaction with modern browsers, see the {url-video-browsers}[Mozilla Developer Supported Media Formats^] documentation.
 
 .A recommendation for serving video to browsers
 ****

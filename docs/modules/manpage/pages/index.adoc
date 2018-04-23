@@ -4,6 +4,7 @@ include::_attributes.adoc[]
 endif::[]
 :url-man7: http://man7.org/linux/man-pages/man7/roff.7.html
 :url-docbook-refmisc: https://www.docbook.org/tdg5/en/html/refmiscinfo.html
+:url-manpage-raw: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/man/asciidoctor.adoc
 
 One of the more specialized uses of AsciiDoc is to serve as a shorthand for generating man pages (short for manual pages) for Unix and Unix-like operating systems.
 
@@ -12,7 +13,7 @@ One of the more specialized uses of AsciiDoc is to serve as a shorthand for gene
 A man page is coded in the roff typesetting language.
 By adhering to a specific structure in the man page file, the `man` command can parse the content and present a formatted document in a textual (command line) pager.
 Manual pages provide a unified help catalog for all commands in the system.
-For a full description, see the {url-man7}[roff man page] (or type `man roff` or `man 7 man`).
+For a full description, see the {url-man7}[roff man page^] (or type `man roff` or `man 7 man`).
 
 == Generate a man page with the manpage converter
 
@@ -96,22 +97,22 @@ A valid link format sequence.
 
 |mansource
 |The source to which the manpage pertains.
-When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo] attribute and appears in the footer.
+When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^] attribute and appears in the footer.
 |Asciidoctor
 
 |manversion
 |The version of the man page.
 Defaults to revnumber if not specified.
-When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo] attribute and appears in the footer.
+When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^] attribute and appears in the footer.
 Not used by Asciidoctor.
 |1.5.4
 
 |manmanual
 |Manual name.
-When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo] attribute and appears in the footer.
+When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^] attribute and appears in the footer.
 |Asciidoctor Manual
 |===
 
-Refer to {url-manpage-raw}[the AsciiDoc source of the Asciidoctor man page] to see a complete example.
+Refer to {url-manpage-raw}[the AsciiDoc source of the Asciidoctor man page^] to see a complete example.
 The man page for Asciidoctor is produced using its built-in manpage converter.
 The man pages for git are also produced from AsciiDoc documents, so you can use those as another example to follow.

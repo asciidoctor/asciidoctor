@@ -689,7 +689,7 @@ The value populates the `family` query string parameter in the Google Fonts URL.
 |_empty_ (use default fonts)
 |_empty_ or a Google Fonts collection spec
 |{y}
-|<<applying-a-theme>> and https://github.com/asciidoctor/asciidoctor.org/issues/410[issue #410]
+|<<applying-a-theme>> and {url-org}/asciidoctor.org/issues/410[issue #410^]
 
 |xmlns
 |The XML namespace to add to the DocBook 4.5 document. (The DocBook 5 document always declares a namespace).

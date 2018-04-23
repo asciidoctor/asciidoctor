@@ -5,8 +5,6 @@ endif::[]
 ////
 From src-coderay.adoc, included in:
 - user-manual: Source Code Highlighting: CodeRay installation
-- {coderay-uri} is now {url-coderay}
-- {coderay-gem} is now {url-coderay-gem}
 ////
 
 {url-coderay}[CodeRay^] is an encoding-aware, syntax highlighter that supports the languages listed below.

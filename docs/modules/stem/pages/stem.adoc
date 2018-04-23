@@ -3,20 +3,13 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 :stem:
-////
-um anchor: stem
-stem.adoc, used in:
-- User manual: Equations and Formulas
-uri-mathjax is now url-mathjax
-uri-asciimath is now url-asciimath
-uri-latexmath is now url-latexmath
-uri-mathjax-docs is now url-mathjax-docs
-////
+// um anchor: stem
+// stem.adoc, used in user manual: Equations and Formulas
 
 If you need to get technical in your writing, Asciidoctor integrates with {url-mathjax}[MathJax^].
 MathJax is the standard library for displaying Science, Technology, Engineering and Math (STEM) expressions in the browser.
 
-Thanks to {url-mathjax}[MathJax JavaScript library^], Asciidoctor supports both {url-asciimath}[AsciiMathML^] and {url-latexmath}[TeX and LaTeX^] math notation in the same document.
+Thanks to MathJax JavaScript library, Asciidoctor supports both {url-asciimath}[AsciiMathML^] and {url-latexmath}[TeX and LaTeX^] math notation in the same document.
 
 == Activating STEM support
 
