@@ -110,12 +110,12 @@ class Section < AbstractBlock
   # Returns the section number as a String
   def sectnum(delimiter = '.', append = nil)
     append ||= (append == false ? '' : delimiter)
-    if @level == 0
-      %(#{Helpers.int_to_roman @number}#{append})
-    elsif @level > 1 && Section === @parent
-      %(#{@parent.sectnum(delimiter)}#{@number}#{append})
-    else
+    if @level == 1
       %(#{@number}#{append})
+    elsif @level > 1
+      Section === @parent ? %(#{@parent.sectnum(delimiter)}#{@number}#{append}) : %(#{@number}#{append})
+    else # @level == 0
+      %(#{Helpers.int_to_roman @number}#{append})
     end
   end
 
