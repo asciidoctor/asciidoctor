@@ -697,7 +697,7 @@ class Document < AbstractBlock
   # Returns the new [String] title assigned to the document header
   def title= title
     unless (sect = @header)
-      (sect = (@header = Section.new self, 0, false)).sectname = 'header'
+      (sect = (@header = Section.new self, 0)).sectname = 'header'
     end
     sect.title = title
   end

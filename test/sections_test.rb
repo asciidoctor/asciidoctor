@@ -1228,49 +1228,49 @@ content
   context 'Section Numbering' do
     test 'should create section number with one entry for level 1' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
       assert_equal '1.', sect1.sectnum
     end
 
     test 'should create section number with two entries for level 2' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
       assert_equal '1.1.', sect1_1.sectnum
     end
 
     test 'should create section number with three entries for level 3' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
-      sect1_1_1 = Asciidoctor::Section.new(sect1_1)
+      sect1_1_1 = Asciidoctor::Section.new sect1_1, nil, true
       sect1_1 << sect1_1_1
       assert_equal '1.1.1.', sect1_1_1.sectnum
     end
 
     test 'should create section number for second section in level' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
-      sect1_2 = Asciidoctor::Section.new(sect1)
+      sect1_2 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_2
       assert_equal '1.2.', sect1_2.sectnum
     end
 
     test 'sectnum should use specified delimiter and append string' do
       doc = empty_document
-      sect1 = Asciidoctor::Section.new
+      sect1 = Asciidoctor::Section.new nil, nil, true
       doc << sect1
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
-      sect1_1_1 = Asciidoctor::Section.new(sect1_1)
+      sect1_1_1 = Asciidoctor::Section.new sect1_1, nil, true
       sect1_1 << sect1_1_1
       assert_equal '1,1,1,', sect1_1_1.sectnum(',')
       assert_equal '1:1:1', sect1_1_1.sectnum(':', false)
@@ -1638,7 +1638,7 @@ content
       EOS
 
       doc = document_from_string input
-      second_section = Asciidoctor::Section.new doc
+      second_section = Asciidoctor::Section.new doc, nil, true
       doc.blocks.insert 1, second_section
       doc.reindex_sections
       sections = doc.sections

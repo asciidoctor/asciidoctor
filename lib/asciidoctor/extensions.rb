@@ -132,7 +132,7 @@ module Extensions
       else
         sectname = 'section'
       end
-      sect = Section.new parent, level, false
+      sect = Section.new parent, level
       sect.title, sect.sectname = title, sectname
       if special
         sect.special = true

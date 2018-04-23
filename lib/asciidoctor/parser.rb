@@ -1555,7 +1555,7 @@ class Parser
       sect_name = 'section'
     end
 
-    section = Section.new parent, sect_level, false
+    section = Section.new parent, sect_level
     section.id, section.title, section.sectname, section.source_location = sect_id, sect_title, sect_name, source_location
     if sect_special
       section.special = true
