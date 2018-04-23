@@ -1549,12 +1549,8 @@ class Parser
       end
     elsif book
       sect_name = sect_level == 0 ? 'part' : (sect_level > 1 ? 'section' : 'chapter')
-    elsif doctype == 'manpage'
-      if (sect_title.casecmp 'synopsis') == 0
-        sect_name, sect_special = 'synopsis', true
-      else
-        sect_name = 'section'
-      end
+    elsif doctype == 'manpage' && (sect_title.casecmp 'synopsis') == 0
+      sect_name, sect_special = 'synopsis', true
     else
       sect_name = 'section'
     end
