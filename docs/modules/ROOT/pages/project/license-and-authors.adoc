@@ -3,6 +3,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:url-license: {url-org}/asciidoctor/blob/master/LICENSE
 :mojavelinux: https://github.com/mojavelinux
 :erebor: https://github.com/erebor
 :lightguard: https://github.com/lightguard
@@ -17,7 +18,7 @@ endif::[]
 Copyright (C) 2012-2018 Dan Allen, Sarah White, and Ryan Waldron.
 Free use of this software is granted under the terms of the MIT License.
 
-See the {url-license}[LICENSE] file for details.
+See the {url-license}[LICENSE^] file for details.
 
 == Authors and Contributors
 

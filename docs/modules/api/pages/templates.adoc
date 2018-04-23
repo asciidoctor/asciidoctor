@@ -2,10 +2,8 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-templates-api.adoc
-user-manual
-////
+:url-tests: {url-org}/asciidoctor/tree/master/test
+// templates-api.adoc
 
 Asciidoctor allows you to override the converter methods used to convert almost any individual AsciiDoc element.
 If you provide a directory of {url-tilt}[Tilt^]-compatible templates, named in such a way that Asciidoctor can figure out which template goes with which element, Asciidoctor will use the templates in this directory instead of its built-in templates for any elements for which it finds a matching template.

@@ -103,32 +103,6 @@ All you need to preview an AsciiDoc document in a web browser is to install the 
 Then you can see the AsciiDoc file rendered as HTML just by visiting it!
 
 ////
-:url-chrome-extension-dd: https://github.com/asciidoctor/asciidoctor-chrome-extension/releases/download/v1.5.4.100/asciidoctor-chrome-extension.nex
-:url-firefox-addon-dd: https://github.com/asciidoctor/asciidoctor-firefox-addon/releases/download/v0.5.3/asciidoctor-firefox-addon-0.5.3-signed.xpi
-:url-opera-extension-dd: https://github.com/asciidoctor/asciidoctor-chrome-extension/releases/download/v1.5.4.100/asciidoctor-chrome-extension.nex
-
-=== Installing the development versions
-
-The validation process of a browser extension or add-on can take a long time.
-If you want the latest and greatest version you can use the direct download links below.
-
-==== Chrome
-
-. Download {url-chrome-extension-dd}[asciidoctor-chrome-extension.nex]
-. Open chrome://extensions
-. Drag'n'drop the `.nex` file into the page to install
-
-==== Firefox
-
-. Download {url-firefox-addon-dd}[asciidoctor-firefox-addon.xpi]
-. Open the file with Firefox to install
-
-==== Opera
-
-. Dowload {url-opera-extension-dd}[asciidoctor-chrome-extension.nex]
-. Open opera://extensions
-. Drag'n'drop the `.nex` file into the page to install
-
 Previewing the output of the document while editing can be helpful.
 To learn how to setup instant preview, check out the xref:edit-with-live-preview.adoc[Editing AsciiDoc with Live Preview tutorial].
 

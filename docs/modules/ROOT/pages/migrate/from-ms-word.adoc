@@ -170,7 +170,7 @@ It will get confused by abbreviations, but there is no way around that.
 Google Docs can already upload and edit MS Word docx files.
 Using the {url-google-asciidoc}[AsciiDoc Processor add-on^] by Guillaume Grossetie, you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
 The features that it can handle seem to be substantially fewer than pandoc but expect further development.
-The source for the add-on can be found in {url-google-asciidoc-source}[its repository].
+The source for the add-on can be found in {url-google-asciidoc-source}[its repository^].
 
 == Plain text
 

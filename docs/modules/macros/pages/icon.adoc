@@ -21,7 +21,7 @@ If you use the inline icon macro, you'll need to provide the images for those ic
 
 Alternatively, you can have Asciidoctor "`draw`" icons using the Font Awesome font-based icon set.
 To use this feature, set the value of the `icons` document attribute to `font` in the document header.
-You can see the available icons on the {url-fontawesome-icons}[icons page].
+You can see the available icons on the {url-fontawesome-icons}[icons page^].
 Using Font Awesome provides many more images, but requires online access by default.
 
 IMPORTANT: The default CSS stylesheet is required when using font-based icons.
