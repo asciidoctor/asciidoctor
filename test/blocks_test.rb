@@ -2006,6 +2006,15 @@ image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=nam
       assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"][@target="name"][@rel="noopener"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
+    test 'adds rel=nofollow attribute to block image with a link when the nofollow option is set' do
+      input = <<-EOS
+image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,opts=nofollow]
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"][@rel="nofollow"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
     test 'can render block image with caption' do
       input = <<-EOS
 .The AsciiDoc Tiger

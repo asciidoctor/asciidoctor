@@ -589,6 +589,18 @@ include::fixtures/include-file.asciidoc[]
         doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
         output = doc.convert
         assert_match(/included content/, output)
+        assert doc.catalog[:includes]['fixtures/include-file']
+      end
+
+      test 'should not track include in catalog for non-AsciiDoc include files' do
+        input = <<-EOS
+----
+include::fixtures/circle.svg[]
+----
+        EOS
+
+        doc = document_from_string input, :safe => :safe, :header_footer => false, :base_dir => DIRNAME
+        assert doc.catalog[:includes].empty?
       end
 
       test 'include directive should resolve file with spaces in name' do
@@ -886,7 +898,7 @@ include::#{url}[]
         end
       end
 
-      test 'include directive supports line selection' do
+      test 'include directive supports selecting lines by line number' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         EOS
@@ -903,7 +915,7 @@ include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         assert_match(/last line of included content/, output)
       end
 
-      test 'include directive supports line selection using quoted attribute value' do
+      test 'include directive supports line ranges specified in quoted attribute value' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         EOS
@@ -932,7 +944,7 @@ include::fixtures/include-file.asciidoc[lines=]
         assert_includes output, 'last line of included content'
       end
 
-      test 'include directive supports tagged selection' do
+      test 'include directive supports selecting lines by tag' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tag=snippetA]
         EOS
@@ -944,7 +956,7 @@ include::fixtures/include-file.asciidoc[tag=snippetA]
         refute_match(/included content/, output)
       end
 
-      test 'include directive supports multiple tagged selection' do
+      test 'include directive supports selecting lines by tags' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         EOS
@@ -956,15 +968,16 @@ include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         refute_match(/included content/, output)
       end
 
-      test 'include directive supports tagged selection in language that uses circumfix comments' do
+      test 'include directive supports selecting lines by tag in language that uses circumfix comments' do
         {
           'include-file.xml' => '<snippet>content</snippet>',
-          'include-file.ml' => 'let s = SS.empty;;'
+          'include-file.ml' => 'let s = SS.empty;;',
+          'include-file.jsx' => '<p>Welcome to the club.</p>'
         }.each do |filename, expect|
           input = <<-EOS
-[source,xml,indent=0]
+[source,xml]
 ----
-include::fixtures/#{filename}[tag=snippet]
+include::fixtures/#{filename}[tag=snippet,indent=0]
 ----
           EOS
 
@@ -973,7 +986,7 @@ include::fixtures/#{filename}[tag=snippet]
         end
       end
 
-      test 'include directive does not select lines with tag directives inside tagged selection' do
+      test 'include directive does not select lines with tag directives within selected tag region' do
         input = <<-EOS
 ++++
 include::fixtures/include-file.asciidoc[tags=snippet]
@@ -1120,14 +1133,41 @@ end)
         assert_includes output, expected
       end
 
-      test 'should warn if tag is not found in include file' do
+      test 'should warn if specified tag is not found in include file' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[tag=snippetZ]
+include::fixtures/include-file.asciidoc[tag=no-such-tag]
         EOS
 
         using_memory_logger do |logger|
           render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
-          assert_message logger, :WARN, '~<stdin>: line 1: tag \'snippetZ\' not found in include file', Hash
+          assert_message logger, :WARN, %(~<stdin>: line 1: tag 'no-such-tag' not found in include file), Hash
+        end
+      end
+
+      test 'should warn if specified tags are not found in include file' do
+        input = <<-EOS
+include::fixtures/include-file.asciidoc[tags=no-such-tag-b;no-such-tag-a]
+        EOS
+
+        using_memory_logger do |logger|
+          render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          # NOTE Ruby 1.8 swaps the order of the list for some silly reason
+          expected_tags = ::RUBY_MIN_VERSION_1_9 ? 'no-such-tag-b, no-such-tag-a' : 'no-such-tag-a, no-such-tag-b'
+          assert_message logger, :WARN, %(~<stdin>: line 1: tags '#{expected_tags}' not found in include file), Hash
+        end
+      end
+
+      test 'should warn if specified tag in include file is not closed' do
+        input = <<-EOS
+++++
+include::fixtures/unclosed-tag.adoc[tag=a]
+++++
+        EOS
+
+        using_memory_logger do |logger|
+          result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          assert_equal 'a', result
+          assert_message logger, :WARN, %(~<stdin>: line 2: detected unclosed tag 'a' starting at line 2 of include file), Hash
         end
       end
 

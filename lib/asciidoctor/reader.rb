@@ -196,7 +196,7 @@ class Reader
   def peek_lines num = nil, direct = false
     old_look_ahead = @look_ahead
     result = []
-    (num || ::Float::MAX.to_i).times do
+    (num || MAX_INTEGER).times do
       if (line = direct ? shift : read_line)
         result << line
       else
@@ -861,12 +861,7 @@ class PreprocessorReader < Reader
           parsed_attributes['lines'].split(DataDelimiterRx).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..', 2).map {|it| it.to_i }
-              if to == -1
-                inc_linenos << from
-                inc_linenos << 1.0/0.0
-              else
-                inc_linenos.concat ::Range.new(from, to).to_a
-              end
+              inc_linenos += to < 0 ? [from, 1.0/0.0] : ::Range.new(from, to).to_a
             else
               inc_linenos << linedef.to_i
             end
@@ -892,16 +887,16 @@ class PreprocessorReader < Reader
       if inc_linenos
         inc_lines, inc_offset, inc_lineno = [], nil, 0
         begin
-          open(inc_path, 'r') do |f|
+          open(inc_path, 'rb') do |f|
+            select_remaining = nil
             f.each_line do |l|
               inc_lineno += 1
-              select = inc_linenos[0]
-              if ::Float === select && select.infinite?
+              if select_remaining || (::Float === (select = inc_linenos[0]) && (select_remaining = select.infinite?))
                 # NOTE record line where we started selecting
                 inc_offset ||= inc_lineno
                 inc_lines << l
               else
-                if inc_lineno == select
+                if select == inc_lineno
                   # NOTE record line where we started selecting
                   inc_offset ||= inc_lineno
                   inc_lines << l
@@ -917,7 +912,10 @@ class PreprocessorReader < Reader
         end
         shift
         # FIXME not accounting for skipped lines in reader line numbering
-        push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes if inc_offset
+        if inc_offset
+          parsed_attributes['partial-option'] = true
+          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes
+        end
       elsif inc_tags
         inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
         if inc_tags.key? '**'
@@ -931,19 +929,15 @@ class PreprocessorReader < Reader
           select = base_select = !(inc_tags.value? true)
           wildcard = inc_tags.delete '*'
         end
-        inc_path_str = target_type == :uri ? inc_path.path : inc_path
-        if (ext_idx = inc_path_str.rindex '.') && (circ_cmt = CIRCUMFIX_COMMENTS[inc_path_str.slice ext_idx, inc_path_str.length])
-          cmt_suffix_len = (tag_suffix = %([] #{circ_cmt[:suffix]})).length - 2
-        end
         begin
-          open(inc_path, 'r') do |f|
+          open(inc_path, 'rb') do |f|
+            dbl_co, dbl_sb = '::', '[]'
+            encoding = ::Encoding::UTF_8 if COERCE_ENCODING
             f.each_line do |l|
               inc_lineno += 1
               # must force encoding since we're performing String operations on line
-              l.force_encoding ::Encoding::UTF_8 if FORCE_ENCODING
-              if (((tl = l.chomp).end_with? '[]') ||
-                  (tag_suffix && (tl.end_with? tag_suffix) && (tl = tl.slice 0, tl.length - cmt_suffix_len))) &&
-                  TagDirectiveRx =~ tl
+              l.force_encoding encoding if encoding
+              if (l.include? dbl_co) && (l.include? dbl_sb) && TagDirectiveRx =~ l
                 if $1 # end tag
                   if (this_tag = $2) == active_tag
                     tag_stack.pop
@@ -959,10 +953,10 @@ class PreprocessorReader < Reader
                 elsif inc_tags.key?(this_tag = $2)
                   tags_used << this_tag
                   # QUESTION should we prevent tag from being selected when enclosing tag is excluded?
-                  tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag])]
+                  tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag]), inc_lineno]
                 elsif !wildcard.nil?
                   select = active_tag && !select ? false : wildcard
-                  tag_stack << [(active_tag = this_tag), select]
+                  tag_stack << [(active_tag = this_tag), select, inc_lineno]
                 end
               elsif select
                 # NOTE record the line where we started selecting
@@ -975,16 +969,24 @@ class PreprocessorReader < Reader
           logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
+        unless tag_stack.empty?
+          tag_stack.each do |tag_name, _, tag_lineno|
+            logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor
+          end
+        end
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
-          logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags * ','}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
+          logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags.join ', '}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
         end
         shift
-        # FIXME not accounting for skipped lines in reader line numbering
-        push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes if inc_offset
+        if inc_offset
+          parsed_attributes['partial-option'] = true unless base_select && wildcard && inc_tags.empty?
+          # FIXME not accounting for skipped lines in reader line numbering
+          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes
+        end
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
-          inc_content = target_type == :file ? (::IO.read inc_path) : open(inc_path, 'r') {|f| f.read }
+          inc_content = target_type == :file ? (::IO.binread inc_path) : open(inc_path, 'rb') {|f| f.read }
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attributes
         rescue
@@ -1082,7 +1084,8 @@ class PreprocessorReader < Reader
     end
 
     if path
-      @includes << Helpers.rootname(@path = path)
+      @path = path
+      @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true if @process_lines
     else
       @path = '<stdin>'
     end

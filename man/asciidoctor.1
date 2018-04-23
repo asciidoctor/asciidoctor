@@ -2,12 +2,12 @@
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White, Ryan Waldron
 .\" Generator: Asciidoctor 1.5.7.dev
-.\"      Date: 2018-04-07
+.\"      Date: 2018-04-20
 .\"    Manual: Asciidoctor Manual
 .\"    Source: Asciidoctor 1.5.6.2
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2018-04-07" "Asciidoctor 1.5.6.2" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2018-04-20" "Asciidoctor 1.5.6.2" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -92,7 +92,7 @@ The \fImanpage\fP document type enables parsing of metadata necessary to produce
 The \fIinline\fP document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element.
 Defaults to \fIarticle\fP.
 .RE
-.SS "Rendering Control"
+.SS "Document Conversion"
 .sp
 \fB\-D, \-\-destination\-dir\fP=\fIDIR\fP
 .RS 4
@@ -125,7 +125,7 @@ This option may be specified more than once.
 \fB\-n, \-\-section\-numbers\fP
 .RS 4
 Auto\-number section titles.
-Synonym for \fB\-\-attribute numbered\fP.
+Synonym for \fB\-\-attribute sectnums\fP.
 .RE
 .sp
 \fB\-o, \-\-out\-file\fP=\fIOUT_FILE\fP
@@ -168,6 +168,12 @@ This option may be specified more than once.
 Matching templates found in subsequent directories override ones previously discovered.
 .RE
 .SS "Processing Information"
+.sp
+\fB\-\-failure\-level\fP=\fILEVEL\fP
+.RS 4
+The minimum logging level that triggers a non\-zero exit code (failure).
+If this option is not set (default: FATAL), the program exits with a status code zero even if warnings or errors have been logged.
+.RE
 .sp
 \fB\-q, \-\-quiet\fP
 .RS 4
@@ -234,7 +240,7 @@ Refer to the \fBAsciidoctor\fP issue tracker at \c
 .SH "RESOURCES"
 .sp
 \fBProject web site:\fP \c
-.URL "http://asciidoctor.org" "" ""
+.URL "https://asciidoctor.org" "" ""
 .sp
 \fBGit source repository on GitHub:\fP \c
 .URL "https://github.com/asciidoctor/asciidoctor" "" ""

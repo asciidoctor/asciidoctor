@@ -273,7 +273,7 @@ class Document < AbstractBlock
         :images => [],
         :indexterms => [],
         :callouts => Callouts.new,
-        :includes => ::Set.new,
+        :includes => {},
       }
       # copy attributes map and normalize keys
       # attribute overrides are attributes that can only be set from the commandline
@@ -363,7 +363,7 @@ class Document < AbstractBlock
     attrs['toc-title'] = 'Table of Contents'
     #attrs['preface-title'] = 'Preface'
     attrs['section-refsig'] = 'Section'
-    #attrs['part-refsig'] = 'Part'
+    attrs['part-refsig'] = 'Part'
     attrs['chapter-refsig'] = 'Chapter'
     attrs['appendix-caption'] = attrs['appendix-refsig'] = 'Appendix'
     attrs['untitled-label'] = 'Untitled'
@@ -697,7 +697,7 @@ class Document < AbstractBlock
   # Returns the new [String] title assigned to the document header
   def title= title
     unless (sect = @header)
-      (sect = (@header = Section.new self, 0, false)).sectname = 'header'
+      (sect = (@header = Section.new self, 0)).sectname = 'header'
     end
     sect.title = title
   end

@@ -72,8 +72,7 @@ module Asciidoctor
               $VERBOSE = false
             when 2
               $VERBOSE = true
-              old_logger_level = LoggerManager.logger.level
-              LoggerManager.logger.level = ::Logger::Severity::DEBUG
+              old_logger_level, LoggerManager.logger.level = LoggerManager.logger.level, ::Logger::Severity::DEBUG
             end
           else
             opts[key] = val unless val.nil?
@@ -131,6 +130,7 @@ module Asciidoctor
             end
           end
         end
+        @code = 1 if ((logger = LoggerManager.logger).respond_to? :max_severity) && logger.max_severity && logger.max_severity >= opts[:failure_level]
       rescue ::Exception => e
         if ::SignalException === e
           @code = e.signo

@@ -209,5 +209,22 @@ module Helpers
       end
     end
   end
+
+  ROMAN_NUMERALS = {
+    'M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90,
+    'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1
+  }
+
+  # Converts an integer to a Roman numeral.
+  #
+  # val - the [Integer] value to convert
+  #
+  # Returns the [String] roman numeral for this integer
+  def self.int_to_roman val
+    ROMAN_NUMERALS.map {|l, i|
+      repeat, val = val.divmod i
+      l * repeat
+    }.join
+  end
 end
 end

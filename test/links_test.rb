@@ -236,6 +236,10 @@ context 'Links' do
     assert_xpath '//a[@href="http://google.com"][@rel="noopener"]', result, 0
   end
 
+  test 'rel=nofollow should be added to a link when the nofollow option is set' do
+    assert_xpath '//a[@href="http://google.com"][@target="name"][@rel="nofollow noopener"]', render_embedded_string('http://google.com[Google,window=name,opts="nofollow,noopener"]', :attributes => {'linkattrs' => ''}), 1
+  end
+
   test 'id attribute on link are processed when linkattrs is set' do
     assert_xpath '//a[@href="http://google.com"][@id="link-1"]', render_embedded_string('http://google.com[Google, id="link-1"]', :attributes => {'linkattrs' => ''}), 1
   end
@@ -459,7 +463,7 @@ anchor:foo[b[a\]r]text'
   test 'xref using angled bracket syntax with path which has been included in this document' do
     using_memory_logger true do |logger|
       doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
-      doc.catalog[:includes] << 'tigers'
+      doc.catalog[:includes]['tigers'] = true
       output = doc.convert
       assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
       assert_message logger, :WARN, 'invalid reference: about'
@@ -469,7 +473,7 @@ anchor:foo[b[a\]r]text'
   test 'xref using angled bracket syntax with nested path which has been included in this document' do
     using_memory_logger true do |logger|
       doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
-      doc.catalog[:includes] << 'part1/tigers'
+      doc.catalog[:includes]['part1/tigers'] = true
       output = doc.convert
       assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
       assert_message logger, :WARN, 'invalid reference: about'
@@ -636,7 +640,70 @@ See <<foobaz>>.
     end
   end
 
-  test 'should warn and create link if verbose flag is set, inter-doc xref points to current document, and reference is not found' do
+  test 'should produce an internal anchor from an inter-document xref to file included into current file' do
+    input = <<-'EOS'
+= Book Title
+:doctype: book
+
+[#ch1]
+== Chapter 1
+
+So it begins.
+
+Read <<other-chapters.adoc#ch2>> to find out what happens next!
+
+include::other-chapters.adoc[]
+    EOS
+
+    doc = document_from_string input, :safe => :safe, :base_dir => fixturedir
+    assert doc.catalog[:includes].key?('other-chapters')
+    assert doc.catalog[:includes]['other-chapters']
+    output = doc.convert
+    assert_xpath '//a[@href="#ch2"][text()="Chapter 2"]', output, 1
+  end
+
+  test 'should produce an internal anchor from an inter-document xref to file included entirely into current file using tags' do
+    input = <<-'EOS'
+= Book Title
+:doctype: book
+
+[#ch1]
+== Chapter 1
+
+So it begins.
+
+Read <<other-chapters.adoc#ch2>> to find out what happens next!
+
+include::other-chapters.adoc[tags=**]
+    EOS
+
+    output = render_embedded_string input, :safe => :safe, :base_dir => fixturedir
+    assert_xpath '//a[@href="#ch2"][text()="Chapter 2"]', output, 1
+  end
+
+  test 'should not produce an internal anchor for inter-document xref to file partially included into current file' do
+    input = <<-'EOS'
+= Book Title
+:doctype: book
+
+[#ch1]
+== Chapter 1
+
+So it begins.
+
+Read <<other-chapters.adoc#ch2,the next chapter>> to find out what happens next!
+
+include::other-chapters.adoc[tags=ch2]
+    EOS
+
+    doc = document_from_string input, :safe => :safe, :base_dir => fixturedir
+    assert doc.catalog[:includes].key?('other-chapters')
+    refute doc.catalog[:includes]['other-chapters']
+    output = doc.convert
+    assert_xpath '//a[@href="other-chapters.html#ch2"][text()="the next chapter"]', output, 1
+  end
+
+  test 'should warn and create link if debug mode is enabled, inter-document xref points to current doc, and reference not found' do
     input = <<-EOS
 [#foobar]
 == Foobar

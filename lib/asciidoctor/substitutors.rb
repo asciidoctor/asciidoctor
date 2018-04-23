@@ -804,11 +804,11 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless text.empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if (doc_attrs.key? 'linkattrs') && ((text.start_with? '"') || ((text.include? ',') && (text.include? '=')))
+          if (text.start_with? '"') || ((comma_idx = text.index ',') && (text.index '=', comma_idx))
             attrs = parse_attributes text, []
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
             text = attrs[1] || ''
-          end
+          end if doc_attrs.key? 'linkattrs'
 
           # TODO enable in Asciidoctor 1.6.x
           # support pipe-separated text and title
@@ -857,7 +857,7 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless (text = m[3]).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if (doc_attrs.key? 'linkattrs') && ((text.start_with? '"') || ((text.include? ',') && (mailto || (text.include? '='))))
+          if (text.start_with? '"') || ((comma_idx = text.index ',') && (mailto || (text.index '=', comma_idx)))
             attrs = parse_attributes text, []
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
             if mailto
@@ -870,7 +870,7 @@ module Substitutors
               end
             end
             text = attrs[1] || ''
-          end
+          end if doc_attrs.key? 'linkattrs'
 
           # TODO enable in Asciidoctor 1.6.x
           # support pipe-separated text and title
@@ -1005,8 +1005,7 @@ module Substitutors
 
   # Internal: Substitute cross reference links
   def sub_inline_xrefs(text, found = nil)
-    if ((found ? found[:macroish] : (text.include? '[')) && (text.include? 'xref:')) ||
-        ((text.include? '&') && (text.include? '&lt;&lt;'))
+    if ((found ? found[:macroish] : (text.include? '[')) && (text.include? 'xref:')) || ((text.include? '&') && (text.include? 'lt;&'))
       text = text.gsub(InlineXrefMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
@@ -1049,7 +1048,7 @@ module Substitutors
         # handles: path#, path.adoc#, path#id, path.adoc#id, or path (from path.adoc)
         elsif path
           # the referenced path is this document, or its contents has been included in this document
-          if @document.attributes['docname'] == path || @document.catalog[:includes].include?(path)
+          if @document.attributes['docname'] == path || @document.catalog[:includes][path]
             if fragment
               refid, path, target = fragment, nil, %(##{fragment})
               if logger.debug?

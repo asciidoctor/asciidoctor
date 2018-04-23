@@ -1,0 +1,11 @@
+// tag::ch2[]
+[#ch2]
+== Chapter 2
+
+The plot thickens.
+// end::ch2[]
+
+[#ch3]
+== Chapter 3
+
+The plot runs its course, predictably.

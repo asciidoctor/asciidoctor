@@ -23,6 +23,7 @@ Enhancements::
   * add NullLogger to prevent messages from being logged (#44, PR #2660)
   * log message containing source location / cursor as an object; provides more context (#44, PR #2660)
   * add :logger option to API to set logger instance (#44, PR #2660)
+  * add --failure-level=LEVEL option to CLI to force non-zero exit code if specified logging level is reached (#2003, PR #2674)
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
   * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI (#642, PR #2649)
   * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font) (#642, PR #2649)
@@ -36,6 +37,7 @@ Enhancements::
   * add syntax for adding hard line breaks in block AsciiMath equations (#2497, PR #2579) (*@dimztimz*)
   * add positioning option to sectanchors attribute (before or after) (#2485, PR #2486)
   * allow table stripes to be configured using stripe attribute or stripe roles on table; valid values are even, odd, all, and none (#1365, PR #2588)
+  * allow nofollow rel property to be added to links and linked images by setting the nofollow option (#2605, PR #2692)
   * assign Document#source_location when sourcemap option is enabled (#2478, PR #2488)
   * allow local include to be flagged as optional by setting optional option (#2389, PR #2413)
   * allow attribute name to contain word characters as defined by Unicode (#2376, PR #2393)
@@ -52,9 +54,12 @@ Enhancements::
 Bug fixes::
 
   * set :to_dir option correctly when output file is specified (#2382)
-  * using the shorthand syntax to set block attributes (id, roles, options) doesn't reset block style (#2174)
+  * using the shorthand syntax on the style to set block attributes (id, roles, options) no longer resets block style (#2174)
+  * match include tags anywhere on line as long as offset by word boundary on left and space or newline on right (#2369, PR #2683)
+  * warn if an include tag specified in the include directive is unclosed in the included file (#2361, PR #2696)
   * fix typo in gemspec that removed README and CONTRIBUTING files from the generated gem (PR #2650) (*@aerostitch*)
   * don't turn bare URI scheme (no host) into a link (#2609, PR #2611)
+  * don't convert inter-document xref to internal anchor unless entire target file is included into current file (#2200)
   * fix em dash replacement in manpage converter (#2604, PR #2607)
   * don't output e-mail address twice when replacing bare e-mail address in manpage output (#2654, PR #2665)
   * enforce that absolute start path passed to PathResolver#system_path is inside of jail path (#2642, PR #2644)
@@ -91,6 +96,7 @@ Improvements / Refactoring::
 
   * log a warning message if an unterminated delimited block is detected (#1133, PR #2612)
   * log a warning when nested section is found inside special section that doesn't support nested sections (#2433, PR #2672)
+  * read files in binary mode to disable automatic endline coercion (then explicitly coerce to UTF-8) (PR #2583, PR #2694)
   * resolve / expand parent references in start path passed to PathResolver#system_path (#2642, PR #2644)
   * update PathResolver#expand_path to resolve parent references (#2642, PR #2644)
   * allow start path passed to PathResolver#system_path to be outside jail if target brings resolved path back inside jail (#2642, PR #2644)
@@ -104,6 +110,8 @@ Improvements / Refactoring::
   * allow paragraph to masquerade as open block (PR #2412)
   * move callouts into document catalog (PR #2394)
   * document ID defined in block attribute line takes precedence over ID defined inside document title line
+  * don't look for link and window attributes on document when resolving these attributes for an image
+  * when linkattrs is set, only parse attributes in link macro if equals follows first comma
   * skip line comments in name section of manpage (#2584, PR #2585)
   * always activate extension registry passed to processor (PR #2379)
   * skip extension registry activation if no groups are registered (PR #2373)
@@ -388,6 +396,7 @@ Bug fixes::
   * don't allow table borders to cascade to nested tables (#2151)
   * escape special characters in reftext of anchor (#1694)
   * sanitize content of authors meta tag in HTML output (#2112)
+  * use correct line number in warning for invalid callout item reference (#2275)
   * fix stray marks added when unescaping unconstrained passthroughs (PR #2079)
   * don't confuse escaped quotes in CSV data as enclosing quotes (#2008)
   * don't activate implicit header if cell in first line of table contains a blank line (#1284, #644)

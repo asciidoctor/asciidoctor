@@ -2,11 +2,20 @@ require 'logger'
 
 module Asciidoctor
 class Logger < ::Logger
+  attr_reader :max_severity
+
   def initialize *args
     super
     self.progname = 'asciidoctor'
     self.formatter = BasicFormatter.new
     self.level = WARN
+  end
+
+  def add severity, message = nil, progname = nil
+    if (severity ||= UNKNOWN) > (@max_severity ||= severity)
+      @max_severity = severity
+    end
+    super
   end
 
   class BasicFormatter < Formatter
@@ -37,23 +46,32 @@ class MemoryLogger < ::Logger
 
   def add severity, message = nil, progname = nil
     message = block_given? ? yield : progname unless message
-    @messages << { :severity => SEVERITY_LABELS[severity], :message => message }
+    @messages << { :severity => SEVERITY_LABELS[severity || UNKNOWN], :message => message }
     true
+  end
+
+  def clear
+    @messages.clear
   end
 
   def empty?
     @messages.empty?
   end
 
-  def clear
-    @messages.clear
+  def max_severity
+    empty? ? nil : @messages.map {|m| Severity.const_get m[:severity] }.max
   end
 end
 
 class NullLogger < ::Logger
+  attr_reader :max_severity
+
   def initialize; end
 
-  def add *args
+  def add severity, message = nil, progname = nil
+    if (severity ||= UNKNOWN) > (@max_severity ||= severity)
+      @max_severity = severity
+    end
     true
   end
 end

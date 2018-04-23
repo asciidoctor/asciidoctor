@@ -73,7 +73,7 @@ endif::[]
 
 .Key documentation
 [.compact]
-* {uri-docs}/what-is-asciidoc[What is Asciidoc?]
+* {uri-docs}/what-is-asciidoc[What is AsciiDoc?]
 * {uri-docs}/asciidoc-writers-guide[AsciiDoc Writer's Guide]
 * {uri-docs}/asciidoc-syntax-quick-reference[AsciiDoc Syntax Reference]
 * {uri-docs}/user-manual[Asciidoctor User Manual]
@@ -420,6 +420,22 @@ Copyright (C) 2012-2018 Dan Allen, Ryan Waldron and the Asciidoctor Project.
 Free use of this software is granted under the terms of the MIT License.
 
 See the {uri-license}[LICENSE] file for details.
+
+ifndef::env-site[]
+== Sponsors
+
+We want to recognize our generous sponsors, without whose support Asciidoctor would not be possible.
+Thank you for your dedication to improving the state of technical documentation!
+
+image:https://www.okta.com/sites/all/themes/Okta/images/blog/Logos/Okta_Logo_BrightBlue_Medium.png[Okta,280,link=https://developer.okta.com/signup?utm_source=asciidoctor&utm_medium=logo&utm_campaign=sponsor]
+&nbsp; &nbsp; &nbsp;
+image:https://secure.gravatar.com/avatar/823717a797dbd78ceff7b26aa397f383.png?size=200[OpenDevise,100,link=https://opendevise.com]
+
+Major funding for Asciidoctor is provided by our *Change Makers*, https://developer.okta.com/blog/2017/10/20/oidc-with-jhipster?utm_source=Asciidoctor&utm_medium=text-link&utm_campaign=Gold-Sponsor[Okta] and https://opendevise.com[OpenDevise], and our *Strategy Sponsors*, Khronos Group and Linda Roberts.
+Additional funding is provided by our https://asciidoctor.org/supporters[Community Backers].
+
+You can support this project by becoming a sponsor on https://opencollective.com/asciidoctor[OpenCollective].
+endif::[]
 
 == Authors
 

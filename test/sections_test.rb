@@ -1227,40 +1227,50 @@ content
 
   context 'Section Numbering' do
     test 'should create section number with one entry for level 1' do
-      sect1 = Asciidoctor::Section.new
+      doc = empty_document
+      sect1 = Asciidoctor::Section.new nil, nil, true
+      doc << sect1
       assert_equal '1.', sect1.sectnum
     end
 
     test 'should create section number with two entries for level 2' do
-      sect1 = Asciidoctor::Section.new
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      doc = empty_document
+      sect1 = Asciidoctor::Section.new nil, nil, true
+      doc << sect1
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
       assert_equal '1.1.', sect1_1.sectnum
     end
 
     test 'should create section number with three entries for level 3' do
-      sect1 = Asciidoctor::Section.new
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      doc = empty_document
+      sect1 = Asciidoctor::Section.new nil, nil, true
+      doc << sect1
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
-      sect1_1_1 = Asciidoctor::Section.new(sect1_1)
+      sect1_1_1 = Asciidoctor::Section.new sect1_1, nil, true
       sect1_1 << sect1_1_1
       assert_equal '1.1.1.', sect1_1_1.sectnum
     end
 
     test 'should create section number for second section in level' do
-      sect1 = Asciidoctor::Section.new
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      doc = empty_document
+      sect1 = Asciidoctor::Section.new nil, nil, true
+      doc << sect1
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
-      sect1_2 = Asciidoctor::Section.new(sect1)
+      sect1_2 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_2
       assert_equal '1.2.', sect1_2.sectnum
     end
 
     test 'sectnum should use specified delimiter and append string' do
-      sect1 = Asciidoctor::Section.new
-      sect1_1 = Asciidoctor::Section.new(sect1)
+      doc = empty_document
+      sect1 = Asciidoctor::Section.new nil, nil, true
+      doc << sect1
+      sect1_1 = Asciidoctor::Section.new sect1, nil, true
       sect1 << sect1_1
-      sect1_1_1 = Asciidoctor::Section.new(sect1_1)
+      sect1_1_1 = Asciidoctor::Section.new sect1_1, nil, true
       sect1_1 << sect1_1_1
       assert_equal '1,1,1,', sect1_1_1.sectnum(',')
       assert_equal '1:1:1', sect1_1_1.sectnum(':', false)
@@ -1342,6 +1352,31 @@ text
       assert_xpath '//h2[@id="_section_2"][starts-with(text(), "2. ")]', output, 1
       assert_xpath '//h3[@id="_section_2_1"][starts-with(text(), "2.1. ")]', output, 1
       assert_xpath '//h3[@id="_section_2_2"][starts-with(text(), "2.2. ")]', output, 1
+    end
+
+    test 'should number parts when doctype is book and partnums attributes is set' do
+      input = <<-EOS
+= Book Title
+:doctype: book
+:sectnums:
+:partnums:
+
+= Language
+
+== Syntax
+
+content
+
+= Processor
+
+== CLI
+
+content
+      EOS
+
+      output = render_string input
+      assert_xpath '//h1[@id="_language"][text() = "I. Language"]', output, 1
+      assert_xpath '//h1[@id="_processor"][text() = "II. Processor"]', output, 1
     end
 
     test 'blocks should have level' do
@@ -1603,7 +1638,7 @@ content
       EOS
 
       doc = document_from_string input
-      second_section = Asciidoctor::Section.new doc
+      second_section = Asciidoctor::Section.new doc, nil, true
       doc.blocks.insert 1, second_section
       doc.reindex_sections
       sections = doc.sections
@@ -2088,14 +2123,13 @@ Terms
       EOS
 
       output = render_embedded_string input
-      # FIXME numbering is borked
       assert_xpath '(//h2)[1][text()="1. Preface"]', output, 1
       assert_xpath '(//h3)[1][text()="1.1. Preface Subsection"]', output, 1
-      assert_xpath '(//h2)[2][text()="1. Section One"]', output, 1
+      assert_xpath '(//h2)[2][text()="2. Section One"]', output, 1
       assert_xpath '(//h2)[3][text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '(//h2)[4][text()="Appendix B: Migration"]', output, 1
       assert_xpath '(//h3)[2][text()="B.1. Gotchas"]', output, 1
-      assert_xpath '(//h2)[5][text()="2. Glossary"]', output, 1
+      assert_xpath '(//h2)[5][text()="3. Glossary"]', output, 1
     end
 
     test 'should number special sections and their subsections in toc when sectnums is all' do
@@ -2113,7 +2147,7 @@ content
 
 == Section One
 
-contennt
+content
 
 [appendix]
 == Attribute Options
@@ -2136,14 +2170,13 @@ Terms
       EOS
 
       output = render_string input
-      # FIXME numbering is borked
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="1. Preface"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="1.1. Preface Subsection"]', output, 1
-      assert_xpath '//*[@id="toc"]/ul//li/a[text()="1. Section One"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="2. Section One"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix B: Migration"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="B.1. Gotchas"]', output, 1
-      assert_xpath '//*[@id="toc"]/ul//li/a[text()="2. Glossary"]', output, 1
+      assert_xpath '//*[@id="toc"]/ul//li/a[text()="3. Glossary"]', output, 1
     end
 
     test 'level 0 special sections in multipart book should be rendered as level 1' do

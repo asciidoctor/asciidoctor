@@ -65,7 +65,7 @@ This option may be specified more than once.
   The _inline_ document type allows the content of a single paragraph to be formatted and returned without wrapping it in a containing element.
   Defaults to _article_.
 
-=== Rendering Control
+=== Document Conversion
 
 *-D, --destination-dir*=_DIR_::
   Destination output directory.
@@ -89,7 +89,7 @@ This option may be specified more than once.
 
 *-n, --section-numbers*::
   Auto-number section titles.
-  Synonym for *--attribute numbered*.
+  Synonym for *--attribute sectnums*.
 
 *-o, --out-file*=_OUT_FILE_::
   Write output to file _OUT_FILE_.
@@ -122,6 +122,10 @@ This option may be specified more than once.
 Matching templates found in subsequent directories override ones previously discovered.
 
 === Processing Information
+
+*--failure-level*=_LEVEL_::
+  The minimum logging level that triggers a non-zero exit code (failure).
+  If this option is not set (default: FATAL), the program exits with a status code zero even if warnings or errors have been logged.
 
 *-q, --quiet*::
   Silence warnings.
@@ -174,7 +178,7 @@ Refer to the *Asciidoctor* issue tracker at https://github.com/asciidoctor/ascii
 
 == RESOURCES
 
-*Project web site:* http://asciidoctor.org
+*Project web site:* https://asciidoctor.org
 
 *Git source repository on GitHub:* https://github.com/asciidoctor/asciidoctor
 

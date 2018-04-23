@@ -202,6 +202,33 @@ context 'Options' do
     end
   end
 
+  test 'should set failure level to FATAL by default' do
+    options = Asciidoctor::Cli::Options.parse! %W(test/fixtures/sample.asciidoc)
+    assert_equal ::Logger::Severity::FATAL, options[:failure_level]
+  end
+
+  test 'should allow failure level to be set to WARN' do
+    %w(w warn WARN warning WARNING).each do |val|
+      options = Asciidoctor::Cli::Options.parse!(%W(--failure-level=#{val} test/fixtures/sample.asciidoc))
+      assert_equal ::Logger::Severity::WARN, options[:failure_level]
+    end
+  end
+
+  test 'should allow failure level to be set to ERROR' do
+    %w(e err ERR error ERROR).each do |val|
+      options = Asciidoctor::Cli::Options.parse!(%W(--failure-level=#{val} test/fixtures/sample.asciidoc))
+      assert_equal ::Logger::Severity::ERROR, options[:failure_level]
+    end
+  end
+
+  test 'should not allow failure level to be set to unknown value' do
+    exit_code, messages = redirect_streams do |_, err|
+      [(Asciidoctor::Cli::Options.parse! %W(--failure-level=foobar test/fixtures/sample.asciidoc)), err.string]
+    end
+    assert_equal 1, exit_code
+    assert_includes messages, 'invalid argument: --failure-level=foobar'
+  end
+
   test 'should set verbose to 2 when -v flag is specified' do
     options = Asciidoctor::Cli::Options.parse!(%w(-v test/fixtures/sample.asciidoc))
     assert_equal 2, options[:verbose]

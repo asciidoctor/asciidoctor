@@ -179,6 +179,18 @@ context 'Invoker' do
     assert_equal '', warnings
   end
 
+  test 'should return non-zero exit code if failure level is reached' do
+    input = <<-EOS
+2. second
+3. third
+    EOS
+    exit_code, messages = redirect_streams do |_, err|
+      [invoke_cli(%w(-q --failure-level=WARN -o /dev/null), '-') { input }.code, err.string]
+    end
+    assert_equal 1, exit_code
+    assert messages.empty?
+  end
+
   test 'should report usage if no input file given' do
     redirect_streams do |out, err|
       invoke_cli [], nil
