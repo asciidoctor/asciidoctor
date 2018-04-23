@@ -44,7 +44,7 @@ Here's an example:
 Docinfo files for HTML output must be saved with the `.html` file extension.
 See <<Naming docinfo files>> for more details.
 
-The docinfo file for DocBook 5.0 output may include any of the {url-docbook-info-ref}[`<info>` element's children], such as:
+The docinfo file for DocBook 5.0 output may include any of the {url-docbook-info-ref}[`<info>` element's children^], such as:
 
 * `<address>`
 * `<copyright>`
@@ -83,7 +83,7 @@ The following example shows some of the content a docinfo file for DocBook might
 Docinfo files for DocBook output must be saved with the `.xml` file extension.
 See <<Naming docinfo files>> for more details.
 
-To see a real-world example of a docinfo file for DocBook, checkout the {url-richfaces-docinfo}[RichFaces Developer Guide docinfo file].
+To see a real-world example of a docinfo file for DocBook, checkout the {url-richfaces-docinfo}[RichFaces Developer Guide docinfo file^].
 
 == Footer docinfo files
 

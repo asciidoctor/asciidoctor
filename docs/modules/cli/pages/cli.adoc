@@ -2,12 +2,11 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:url-manpage: {url-project}/man/asciidoctor
 ////
 command-line-usage.adoc
 Command line usage quick start for Asciidoctor
 included in the install-toolchain and user-manual documents
-
-uri-man is now url-manpage
 ////
 
 Asciidoctor's command line interface (CLI) is a drop-in replacement for the `asciidoc.py` command from the Python implementation.
@@ -29,7 +28,7 @@ This will use the built-in defaults for options and create a new file in the sam
 
 There are numerous, available options listed in xref:cli-options.adoc[Asciidoctor CLI options reference].
 
-Full help is provided in the {url-manpage}[Asciidoctor man page] or via:
+Full help is provided in the {url-manpage}[Asciidoctor man page^] or via:
 
  $ asciidoctor --help
 

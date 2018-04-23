@@ -2,6 +2,8 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:url-fedora: https://apps.fedoraproject.org/packages/rubygem-asciidoctor
+:url-alpine: https://pkgs.alpinelinux.org/packages?name=asciidoctor
 //from install-upgrade-asciidoctor.adoc
 //included in the install-toolchain and user-manual
 //macOS? Windows?

@@ -18,7 +18,7 @@ The ID is derived from the section title as follows:
 * All characters are converted to lowercase.
 * The value of the `idprefix` attribute (`+_+` by default) is prepended.
 * Character references and invalid ID characters are replaced with the value of the `idseparator` attribute (`+_+` by default).
- ** Refer to the {url-ntname}[NT Name] section of the XML specification for a list of valid ID characters.
+ ** Refer to the {url-ntname}[NT Name^] section of the XML specification for a list of valid ID characters.
 * Repeating separator characters are consolidated.
 * If necessary, a sequence number is appended until the ID is unique within the document.
 
@@ -96,7 +96,7 @@ include::{examplesdir}/section.adoc[tag=with-anchor-shorthand]
 ----
 
 IMPORTANT: Asciidoctor permits all valid UTF-8 characters in section IDs.
-If you're generating a PDF from AsciiDoc using a2x and dblatex, see {url-adoc-a2x}[Using UTF-8 titles with a2x] to learn about the required `latex.encoding=utf8` switch.
+If you're generating a PDF from AsciiDoc using a2x and dblatex, see {url-adoc-a2x}[Using UTF-8 titles with a2x^] to learn about the required `latex.encoding=utf8` switch.
 // end::custom-id[]
 
 == Links

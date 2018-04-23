@@ -2,7 +2,10 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:url-diagram: {url-org}/asciidoctor-diagram
+:url-tests: {url-org}/asciidoctor/tree/master/test
 :url-doctest: https://github.com/asciidoctor/asciidoctor-doctest
+:url-manpage: {url-project}/man/asciidoctor
 //:uri-diffs: {uri-home}/docs/asciidoc-asciidoctor-diffs/
 // um anchor: migrating-from-asciidoc-python
 
@@ -278,7 +281,7 @@ a|
 |Use a xref:stem:stem.adoc#stem-bl[stem block].
 
 |graphviz
-|Use {url-diagram}[Asciidoctor Diagram].
+|Use {url-diagram}[Asciidoctor Diagram^].
 |===
 
 === Custom extensions

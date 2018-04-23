@@ -23,7 +23,7 @@ Asciidoctor adds a default stylesheet to the HTML5 document, as shown, to provid
 // directly from user-manual
 
 Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the parse tree into a set of built-in templates to produce HTML5, PDF, DocBook 5, etc.
-You have the option of writing your own converter or providing {url-tilt}[Tilt^]-supported templates to customize the generated output or produce alternative formats.
+You have the option of writing your own converter or providing Tilt-supported templates to customize the generated output or produce alternative formats.
 
 NOTE: Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor (`asciidoc.py`).
 The Asciidoctor test suite has > 1,500 tests to ensure compatibility with the AsciiDoc syntax.
@@ -39,7 +39,7 @@ You can also use #AsciidoctorJ# to invoke Asciidoctor's APIs from Java and other
 == Asciidoctor.js
 
 Asciidoctor can be used in JavaScript.
-Opal is used to transcompile the code from Ruby to JavaScript to make #Asciidoctor.js#, which can be used wherever JavaScript runs, such as in a web browser or on Node.js.
+Opal is used to transcompile the code from Ruby to JavaScript to make xref:asciidoctor.js::index.adoc[Asciidoctor.js], which can be used wherever JavaScript runs, such as in a web browser or on Node.js.
 
 ////
 From preamble of user-manual.adoc

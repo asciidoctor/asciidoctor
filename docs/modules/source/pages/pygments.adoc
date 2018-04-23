@@ -2,15 +2,9 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-////
-From src-pygments.adoc, included in:
-- user-manual: Source Code Syntax Highlighting: Pygments installation
-- {pygments-org} is now {url-pygments}
-- {pygments-gem} is now {url-pygments-gem}
-- {pygments-lang} is now {url-pygments-lang}
-////
+// src-pygments.adoc, included in user-manual: Source Code Syntax Highlighting: Pygments installation
 
-{url-pygments}[Pygments^] is a popular syntax highlighter that supports a broad range of {url-pygments-lang}[programming, template and markup languages^].
+{url-pygments}[Pygments^] is a popular syntax highlighter that supports a broad range of {url-pygments-lang}[programming and template languages^].
 
 == Install Pygments
 
