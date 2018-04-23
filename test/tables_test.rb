@@ -1399,7 +1399,7 @@ eof
       using_memory_logger do |logger|
         output = render_embedded_string input
         assert_xpath '/table', output, 1
-        assert_message logger, :WARN, '<stdin>: line 9: unterminated table block', Hash
+        assert_message logger, :WARN, '<stdin>: line 3: unterminated table block', Hash
       end
     end
   end

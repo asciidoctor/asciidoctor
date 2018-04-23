@@ -1540,6 +1540,23 @@ Item one, paragraph two
     end
 =end
 
+    test 'should warn if unterminated block is detected in list item' do
+      input = <<-EOS
+* item
++
+====
+example
+* swallowed item
+      EOS
+
+      using_memory_logger do |logger|
+        output = render_embedded_string input
+        assert_xpath '//ul/li', output, 1
+        assert_xpath '//ul/li/*[@class="exampleblock"]', output, 1
+        assert_xpath %(//p[text()="example\n* swallowed item"]), output, 1
+        assert_message logger, :WARN, '<stdin>: line 3: unterminated example block', Hash
+      end
+    end
   end
 end
 

@@ -202,7 +202,7 @@ supposed to be after comment block, except it got swallowed by block comment
       EOS
 
       render_embedded_string input
-      assert_message @logger, :WARN, '<stdin>: line 6: unterminated comment block', Hash
+      assert_message @logger, :WARN, '<stdin>: line 3: unterminated comment block', Hash
     end
 
     test 'should warn if unterminated comment block is detected inside another block' do
@@ -218,7 +218,7 @@ supposed to be after sidebar block, except it got swallowed by block comment
       EOS
 
       render_embedded_string input
-      assert_message @logger, :WARN, '<stdin>: line 5: unterminated comment block', Hash
+      assert_message @logger, :WARN, '<stdin>: line 4: unterminated comment block', Hash
     end
 
     # WARNING if first line of content is a directive, it will get interpretted before we know it's a comment block
@@ -840,7 +840,7 @@ eof
 
       output = render_embedded_string input
       assert_xpath '/*[@class="exampleblock"]', output, 1
-      assert_message @logger, :WARN, '<stdin>: line 8: unterminated example block', Hash
+      assert_message @logger, :WARN, '<stdin>: line 3: unterminated example block', Hash
     end
   end
 
@@ -3083,7 +3083,7 @@ eof
 
       output = render_embedded_string input
       assert_xpath '/*[@class="listingblock"]', output, 1
-      assert_message @logger, :WARN, '<stdin>: line 8: unterminated listing block', Hash
+      assert_message @logger, :WARN, '<stdin>: line 3: unterminated listing block', Hash
     end
   end
 

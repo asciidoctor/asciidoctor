@@ -466,7 +466,8 @@ class Parser
     end
 
     # QUESTION should we introduce a parsing context object?
-    cursor_data, this_line, doc_attrs, style = reader.cursor_data, reader.read_line, document.attributes, attributes[1]
+    reader.mark
+    this_line, doc_attrs, style = reader.read_line, document.attributes, attributes[1]
     block = block_context = cloaked_context = terminator = nil
 
     if (delimited_block = is_delimited_block? this_line, true)
@@ -482,7 +483,7 @@ class Parser
         elsif block_extensions && extensions.registered_for_block?(style, block_context)
           block_context = style.to_sym
         else
-          logger.warn message_with_context %(invalid style for #{block_context} block: #{style}), :source_location => Reader::Cursor.new(*cursor_data)
+          logger.warn message_with_context %(invalid style for #{block_context} block: #{style}), :source_location => reader.cursor_at_mark
           style = block_context.to_s
         end
       end
@@ -693,7 +694,7 @@ class Parser
           # advance to block parsing =>
           break
         else
-          logger.warn message_with_context %(invalid style for paragraph: #{style}), :source_location => Reader::Cursor.new(*cursor_data)
+          logger.warn message_with_context %(invalid style for paragraph: #{style}), :source_location => reader.cursor_at_mark
           style = nil
           # continue to process paragraph
         end
@@ -851,7 +852,7 @@ class Parser
 
       when :table
         block_cursor = reader.cursor
-        block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true, :context => :table), block_cursor
+        block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true, :context => :table, :cursor => :at_mark), block_cursor
         # NOTE it's very rare that format is set when using a format hint char, so short-circuit
         unless terminator.start_with? '|', '!'
           # NOTE infer dsv once all other format hint chars are ruled out
@@ -888,7 +889,7 @@ class Parser
     end
 
     # FIXME we've got to clean this up, it's horrible!
-    block.source_location = Reader::Cursor.new(*cursor_data) if document.sourcemap
+    block.source_location = reader.cursor_at_mark if document.sourcemap
     # FIXME title should be assigned when block is constructed
     block.title = attributes.delete 'title' if attributes.key? 'title'
     # TODO eventually remove the style attribute from the attributes hash
@@ -896,7 +897,7 @@ class Parser
     block.style = attributes['style']
     if (block_id = (block.id ||= attributes['id']))
       unless document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
-        logger.warn message_with_context %(id assigned to block already in use: #{block_id}), :source_location => Reader::Cursor.new(*cursor_data)
+        logger.warn message_with_context %(id assigned to block already in use: #{block_id}), :source_location => reader.cursor_at_mark
       end
     end
     # FIXME remove the need for this update!
@@ -1021,7 +1022,7 @@ class Parser
       end
       block_reader = nil
     elsif parse_as_content_model != :compound
-      lines = reader.read_lines_until :terminator => terminator, :skip_processing => skip_processing, :context => block_context
+      lines = reader.read_lines_until :terminator => terminator, :skip_processing => skip_processing, :context => block_context, :cursor => :at_mark
       block_reader = nil
     # terminator is false when reader has already been prepared
     elsif terminator == false
@@ -1030,7 +1031,7 @@ class Parser
     else
       lines = nil
       block_cursor = reader.cursor
-      block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing, :context => block_context), block_cursor
+      block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing, :context => block_context, :cursor => :at_mark), block_cursor
     end
 
     if content_model == :verbatim
@@ -1398,7 +1399,7 @@ class Parser
           buffer << this_line
           # grab all the lines in the block, leaving the delimiters in place
           # we're being more strict here about the terminator, but I think that's a good thing
-          buffer.concat reader.read_lines_until(:terminator => match.terminator, :read_last_line => true)
+          buffer.concat reader.read_lines_until(:terminator => match.terminator, :read_last_line => true, :context => nil)
           continuation = :inactive
         else
           break

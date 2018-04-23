@@ -389,7 +389,7 @@ not captured
         refute reader.unterminated
       end
 
-      test 'should mark reader as unterminated if reader reaches end of source without finding terminator' do
+      test 'should flag reader as unterminated if reader reaches end of source without finding terminator' do
         lines = <<-EOS.each_line.to_a
 ****
 captured
@@ -404,11 +404,11 @@ captured yet again
         using_memory_logger do |logger|
           doc = empty_safe_document :base_dir => DIRNAME
           reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
-          terminator = reader.read_line
-          result = reader.read_lines_until :terminator => terminator, :skip_processing => true
+          terminator = reader.peek_line
+          result = reader.read_lines_until :terminator => terminator, :skip_first_line => true, :skip_processing => true
           assert_equal expected, result
           assert reader.unterminated
-          assert_message logger, :WARN, '<stdin>: line 6: unterminated **** block', Hash
+          assert_message logger, :WARN, '<stdin>: line 1: unterminated **** block', Hash
         end
       end
     end

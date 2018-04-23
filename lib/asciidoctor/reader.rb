@@ -57,6 +57,7 @@ class Reader
     end
     @lines = data ? (prepare_lines data, opts) : []
     @source_lines = @lines.dup
+    @mark = nil
     @look_ahead = 0
     @process_lines = true
     @unescape_next_line = false
@@ -429,15 +430,12 @@ class Reader
   #   => ["First line", "Second line"]
   def read_lines_until options = {}
     result = []
-    shift if options[:skip_first_line]
     if @process_lines && options[:skip_processing]
       @process_lines = false
       restore_process_lines = true
-    else
-      restore_process_lines = false
     end
-
     if (terminator = options[:terminator])
+      start_cursor = options[:cursor] || cursor
       break_on_blank_lines = false
       break_on_list_continuation = false
     else
@@ -445,10 +443,8 @@ class Reader
       break_on_list_continuation = options[:break_on_list_continuation]
     end
     skip_comments = options[:skip_line_comments]
-    line_read = false
-    line_restored = false
-
-    complete = false
+    complete = line_read = line_restored = nil
+    shift if options[:skip_first_line]
     while !complete && (line = read_line)
       complete = while true
         break true if terminator && line == terminator
@@ -461,7 +457,6 @@ class Reader
         break true if block_given? && (yield line)
         break false
       end
-
       if complete
         if options[:read_last_line]
           result << line
@@ -482,8 +477,9 @@ class Reader
       @process_lines = true
       @look_ahead -= 1 if line_restored && !terminator
     end
-    if terminator && terminator != line
-      logger.warn message_with_context %(unterminated #{options[:context] || terminator} block), :source_location => prev_line_cursor
+    if terminator && terminator != line && (context = options.fetch :context, terminator)
+      start_cursor = cursor_at_mark if start_cursor == :at_mark
+      logger.warn message_with_context %(unterminated #{context} block), :source_location => start_cursor
       @unterminated = true
     end
     result
@@ -524,12 +520,20 @@ class Reader
     Cursor.new @file, @dir, @path, lineno
   end
 
-  def cursor_data
-    [@file, @dir, @path, @lineno]
+  def cursor_at_mark
+    @mark ? Cursor.new(*@mark) : cursor
   end
 
   def prev_line_cursor
     cursor_at @lineno - 1
+  end
+
+  def cursor_data
+    [@file, @dir, @path, @lineno]
+  end
+
+  def mark
+    @mark = [@file, @dir, @path, @lineno]
   end
 
   # Public: Get information about the last line read, including file name and line number.
