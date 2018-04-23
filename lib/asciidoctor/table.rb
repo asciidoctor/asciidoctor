@@ -365,7 +365,7 @@ class Table::ParserContext
           xsv = '!sv'
         end
       else
-        logger.error message_with_context %(illegal table format: #{xsv}), :source_location => reader.prev_line_cursor
+        logger.error message_with_context %(illegal table format: #{xsv}), :source_location => reader.cursor_at_prev_line
         @format, xsv = 'psv', (table.document.nested? ? '!sv' : 'psv')
       end
     else

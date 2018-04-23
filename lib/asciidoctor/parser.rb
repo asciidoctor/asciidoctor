@@ -184,7 +184,7 @@ class Parser
       document.attributes['mantitle'] = document.sub_attributes $1.downcase
       document.attributes['manvolnum'] = $2
     else
-      logger.error message_with_context 'malformed manpage title', :source_location => reader.prev_line_cursor
+      logger.error message_with_context 'malformed manpage title', :source_location => reader.cursor_at_prev_line
       # provide sensible fallbacks
       document.attributes['mantitle'] = document.attributes['doctitle']
       document.attributes['manvolnum'] = '1'
@@ -213,13 +213,13 @@ class Parser
             document.attributes['outfilesuffix'] = %(.#{document.attributes['manvolnum']})
           end
         else
-          logger.error message_with_context 'malformed name section body', :source_location => reader.prev_line_cursor
+          logger.error message_with_context 'malformed name section body', :source_location => reader.cursor_at_prev_line
         end
       else
-        logger.error message_with_context 'name section title must be at level 1', :source_location => reader.prev_line_cursor
+        logger.error message_with_context 'name section title must be at level 1', :source_location => reader.cursor_at_prev_line
       end
     else
-      logger.error message_with_context 'name section expected', :source_location => reader.prev_line_cursor
+      logger.error message_with_context 'name section expected', :source_location => reader.cursor_at_prev_line
     end
     nil
   end
@@ -612,12 +612,12 @@ class Parser
           list_item_lineno = reader.lineno
           # might want to move this check to a validate method
           unless match[1] == expected_index.to_s
-            logger.warn message_with_context %(callout list item index: expected #{expected_index} got #{match[1]}), :source_location => (reader.cursor_at list_item_lineno)
+            logger.warn message_with_context %(callout list item index: expected #{expected_index} got #{match[1]}), :source_location => (reader.cursor_at_line list_item_lineno)
           end
           if (list_item = next_list_item reader, block, match)
             block.items << list_item
             if (coids = document.callouts.callout_ids block.items.size).empty?
-              logger.warn message_with_context %(no callouts refer to list item #{block.items.size}), :source_location => (reader.cursor_at list_item_lineno)
+              logger.warn message_with_context %(no callouts refer to list item #{block.items.size}), :source_location => (reader.cursor_at_line list_item_lineno)
             else
               list_item.attributes['coids'] = coids
             end
@@ -1188,7 +1188,7 @@ class Parser
         end
       end
       unless document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :id => id), reftext]
-        logger.warn message_with_context %(id assigned to anchor already in use: #{id}), :source_location => document.reader.prev_line_cursor
+        logger.warn message_with_context %(id assigned to anchor already in use: #{id}), :source_location => document.reader.cursor_at_prev_line
       end
     end if (text.include? '[[') || (text.include? 'or:')
     nil
@@ -1205,7 +1205,7 @@ class Parser
     if InlineBiblioAnchorRx =~ text
       # QUESTION should we sub attributes in reftext (like with regular anchors)?
       unless document.register :refs, [(id = $1), (Inline.new block, :anchor, (reftext = %([#{$2 || id}])), :type => :bibref, :id => id), reftext]
-        logger.warn message_with_context %(id assigned to bibliography anchor already in use: #{id}), :source_location => document.reader.prev_line_cursor
+        logger.warn message_with_context %(id assigned to bibliography anchor already in use: #{id}), :source_location => document.reader.cursor_at_prev_line
       end
     end
     nil
@@ -1581,7 +1581,7 @@ class Parser
     # generate an ID if one was not embedded or specified as anchor above section title
     if (id = section.id ||= ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
       unless document.register :refs, [id, section, sect_reftext || section.title]
-        logger.warn message_with_context %(id assigned to section already in use: #{id}), :source_location => (reader.cursor_at reader.lineno - (sect_atx ? 1 : 2))
+        logger.warn message_with_context %(id assigned to section already in use: #{id}), :source_location => (reader.cursor_at_line reader.lineno - (sect_atx ? 1 : 2))
       end
     end
 
@@ -1725,7 +1725,7 @@ class Parser
       end unless sect_id
       reader.shift
     else
-      raise %(Unrecognized section at #{reader.prev_line_cursor})
+      raise %(Unrecognized section at #{reader.cursor_at_prev_line})
     end
     sect_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
     [sect_id, sect_reftext, sect_title, sect_level, atx]
@@ -2535,7 +2535,7 @@ class Parser
         if collector.empty?
           unless type == :style
             if reader
-              logger.warn message_with_context %(invalid empty #{type} detected in style attribute), :source_location => reader.prev_line_cursor
+              logger.warn message_with_context %(invalid empty #{type} detected in style attribute), :source_location => reader.cursor_at_prev_line
             else
               logger.warn %(invalid empty #{type} detected in style attribute)
             end
@@ -2547,7 +2547,7 @@ class Parser
           when :id
             if parsed.key? :id
               if reader
-                logger.warn message_with_context 'multiple ids detected in style attribute', :source_location => reader.prev_line_cursor
+                logger.warn message_with_context 'multiple ids detected in style attribute', :source_location => reader.cursor_at_prev_line
               else
                 logger.warn 'multiple ids detected in style attribute'
               end
