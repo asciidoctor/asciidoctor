@@ -524,6 +524,15 @@ class Reader
     @mark ? Cursor.new(*@mark) : cursor
   end
 
+  def cursor_before_mark
+    if @mark
+      m_file, m_dir, m_path, m_lineno = @mark
+      Cursor.new m_file, m_dir, m_path, m_lineno - 1
+    else
+      prev_line_cursor
+    end
+  end
+
   def prev_line_cursor
     cursor_at @lineno - 1
   end
