@@ -375,7 +375,7 @@ Feature: Cross References
     """
 
   @wip
-  Scenario: Create a cross reference to a part using a custom chapter reference signifier
+  Scenario: Create a cross reference to a part using a custom part reference signifier
   Given the AsciiDoc source
     """
     :doctype: book
@@ -971,4 +971,69 @@ Feature: Cross References
         .sectionbody: .paragraph: p
           |refer to
           a< href='#_section_one' class='spotlight' "The Premier Section"
+      """
+
+    Scenario: Override xrefstyle for a given part of the document
+    Given the AsciiDoc source
+      """
+      :xrefstyle: full
+      :doctype: book
+      :sectnums:
+
+      == Foo
+
+      refer to <<#_bar>>
+
+      == Bar
+      :xrefstyle: short
+
+      refer to xref:#_foo[xrefstyle=short]
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_foo 1. Foo
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#_bar' Chapter 2, <em>Bar</em>
+      .sect1
+        h2#_bar 2. Bar
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#_foo' Chapter 1
+      """
+
+    Scenario: Override xrefstyle for a specific reference by assigning the xrefstyle attribute on the xref macro
+    Given the AsciiDoc source
+      """
+      :xrefstyle: full
+      :doctype: book
+      :sectnums:
+
+      == Foo
+
+      content
+
+      == Bar
+
+      refer to <<#_foo>>
+
+      refer to xref:#_foo[xrefstyle=short]
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#_foo 1. Foo
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_bar 2. Bar
+        .sectionbody
+          .paragraph: p
+            |refer to
+            a< href='#_foo' Chapter 1, <em>Foo</em>
+          .paragraph: p
+            |refer to
+            a< href='#_foo' Chapter 1
       """
