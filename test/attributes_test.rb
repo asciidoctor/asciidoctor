@@ -762,7 +762,7 @@ content
       EOS
       doc = document_from_string input
       assert_nil doc.attr('hey')
-      assert_message @logger, :WARN, '<stdin>: line 6: unterminated comment block', Hash
+      assert_message @logger, :WARN, '<stdin>: line 3: unterminated comment block', Hash
     end
 
     test 'substitutes inside block title' do

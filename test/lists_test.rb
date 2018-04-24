@@ -1540,6 +1540,23 @@ Item one, paragraph two
     end
 =end
 
+    test 'should warn if unterminated block is detected in list item' do
+      input = <<-EOS
+* item
++
+====
+example
+* swallowed item
+      EOS
+
+      using_memory_logger do |logger|
+        output = render_embedded_string input
+        assert_xpath '//ul/li', output, 1
+        assert_xpath '//ul/li/*[@class="exampleblock"]', output, 1
+        assert_xpath %(//p[text()="example\n* swallowed item"]), output, 1
+        assert_message logger, :WARN, '<stdin>: line 3: unterminated example block', Hash
+      end
+    end
   end
 end
 
@@ -4614,5 +4631,25 @@ listing block in list item 1
     assert_equal [:specialcharacters], list.items[2].subs
     assert_equal '`three`', list.items[2].text
     assert_equal '<mark>four</mark>', list.items[3].text
+  end
+
+  test 'should set lineno to line number in source where list starts' do
+    input = <<-EOS
+* bullet 1
+** bullet 1.1
+*** bullet 1.1.1
+* bullet 2
+    EOS
+    doc = document_from_string input, :sourcemap => true
+    lists = doc.find_by :context => :ulist
+    assert_equal 1, lists[0].lineno
+    assert_equal 2, lists[1].lineno
+    assert_equal 3, lists[2].lineno
+
+    list_items = doc.find_by :context => :list_item
+    assert_equal 1, list_items[0].lineno
+    assert_equal 2, list_items[1].lineno
+    assert_equal 3, list_items[2].lineno
+    assert_equal 4, list_items[3].lineno
   end
 end

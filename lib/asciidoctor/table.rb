@@ -353,10 +353,8 @@ class Table::ParserContext
   attr_reader :delimiter_re
 
   def initialize reader, table, attributes = {}
-    @reader = reader
+    @start_cursor_data = (@reader = reader).mark
     @table = table
-    # IMPORTANT if reader.cursor becomes a reference, this assignment would require .dup
-    @last_cursor = reader.cursor
 
     if attributes.key? 'format'
       if FORMATS.include?(xsv = attributes['format'])
@@ -367,7 +365,7 @@ class Table::ParserContext
           xsv = '!sv'
         end
       else
-        logger.error message_with_context %(illegal table format: #{xsv}), :source_location => reader.prev_line_cursor
+        logger.error message_with_context %(illegal table format: #{xsv}), :source_location => reader.cursor_at_prev_line
         @format, xsv = 'psv', (table.document.nested? ? '!sv' : 'psv')
       end
     else
@@ -523,7 +521,7 @@ class Table::ParserContext
       if (cellspec = take_cellspec)
         repeat = cellspec.delete('repeatcol') || 1
       else
-        logger.error message_with_context 'table missing leading separator, recovering automatically', :source_location => @last_cursor
+        logger.error message_with_context 'table missing leading separator, recovering automatically', :source_location => Reader::Cursor.new(*@start_cursor_data)
         cellspec = {}
         repeat = 1
       end
@@ -560,13 +558,13 @@ class Table::ParserContext
       else
         # QUESTION is this right for cells that span columns?
         unless (column = @table.columns[@current_row.size])
-          logger.error message_with_context 'dropping cell because it exceeds specified number of columns', :source_location => @last_cursor
+          logger.error message_with_context 'dropping cell because it exceeds specified number of columns', :source_location => @reader.cursor_before_mark
           return
         end
       end
 
-      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @last_cursor, :strip_text => strip_text)
-      @last_cursor = @reader.cursor
+      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @reader.cursor_before_mark, :strip_text => strip_text)
+      @reader.mark
       unless !cell.rowspan || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))
       end

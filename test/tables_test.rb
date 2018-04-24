@@ -150,20 +150,22 @@ context 'Tables' do
       input = <<-EOS
 |===
 A | here| a | there
+| x
+| y
+| z
+| end
 |===
       EOS
       using_memory_logger do |logger|
         output = render_embedded_string input
         assert_css 'table', output, 1
-        assert_css 'table > colgroup > col', output, 4
-        assert_css 'table > tbody > tr', output, 1
-        assert_css 'table > tbody > tr > td', output, 4
-        assert_xpath '/table/tbody/tr/td[1]/p[text()="A"]', output, 1
-        assert_xpath '/table/tbody/tr/td[2]/p[text()="here"]', output, 1
-        assert_xpath '/table/tbody/tr/td[3]/p[text()="a"]', output, 1
-        assert_xpath '/table/tbody/tr/td[4]/p[text()="there"]', output, 1
-        # FIXME line number is wrong
-        assert_message logger, :ERROR, '~table missing leading separator', Hash
+        assert_css 'table > tbody > tr', output, 2
+        assert_css 'table > tbody > tr > td', output, 8
+        assert_xpath '/table/tbody/tr[1]/td[1]/p[text()="A"]', output, 1
+        assert_xpath '/table/tbody/tr[1]/td[2]/p[text()="here"]', output, 1
+        assert_xpath '/table/tbody/tr[1]/td[3]/p[text()="a"]', output, 1
+        assert_xpath '/table/tbody/tr[1]/td[4]/p[text()="there"]', output, 1
+        assert_message logger, :ERROR, '<stdin>: line 2: table missing leading separator, recovering automatically', Hash
       end
     end
 
@@ -866,7 +868,7 @@ d|9 2+>|10
 
     test 'ignores cell with colspan that exceeds colspec' do
       input = <<-EOS
-[cols="1,1"]
+[cols=2*]
 |===
 3+|A
 |B
@@ -879,8 +881,7 @@ more C
         output = render_embedded_string input
         assert_css 'table', output, 1
         assert_css 'table *', output, 0
-        # FIXME line number is wrong
-        assert_message logger, :ERROR, '~exceeds specified number of columns', Hash
+        assert_message logger, :ERROR, '<stdin>: line 5: dropping cell because it exceeds specified number of columns', Hash
       end
     end
 
@@ -1055,9 +1056,11 @@ doctype={doctype}
 |badges |xhtml11, html5 |
 Link badges ('XHTML 1.1' and 'CSS') in document footers.
 
-NOTE: The path names of images, icons and scripts are relative path
+[NOTE]
+====
+The path names of images, icons and scripts are relative path
 names to the output document not the source document.
-
+====
 |[[X97]] docinfo, docinfo1, docinfo2 |All backends |
 These three attributes control which document information
 files will be included in the the header of the output file:
@@ -1072,7 +1075,7 @@ DocBook outputs. If the input file is the standard input then the
 output file name is used.
 |===
       EOS
-      doc = document_from_string input
+      doc = document_from_string input, :sourcemap => true
       table = doc.blocks.first
       refute_nil table
       tbody = table.rows.body
@@ -1082,6 +1085,10 @@ output file name is used.
       assert body_cell_1_3.inner_document.nested?
       assert_equal doc, body_cell_1_3.inner_document.parent_document
       assert_equal doc.converter, body_cell_1_3.inner_document.converter
+      assert_equal 5, body_cell_1_3.inner_document.lineno
+      note = (body_cell_1_3.inner_document.find_by :context => :admonition)[0]
+      # NOTE lineno is off by one due to leading blank line being stripped
+      assert_equal 8, note.lineno
       output = doc.convert
 
       assert_css 'table > tbody > tr', output, 2
@@ -1398,7 +1405,31 @@ eof
       using_memory_logger do |logger|
         output = render_embedded_string input
         assert_xpath '/table', output, 1
-        assert_message logger, :WARN, '<stdin>: line 9: unterminated table block', Hash
+        assert_message logger, :WARN, '<stdin>: line 3: unterminated table block', Hash
+      end
+    end
+
+    test 'should show correct line number in warning about unterminated block inside AsciiDoc table cell' do
+      input = <<-EOS
+outside
+
+* list item
++
+|===
+|cell
+a|inside
+
+====
+unterminated example block
+|===
+
+eof
+      EOS
+
+      using_memory_logger do |logger|
+        output = render_embedded_string input
+        assert_xpath '//ul//table', output, 1
+        assert_message logger, :WARN, '<stdin>: line 9: unterminated example block', Hash
       end
     end
   end

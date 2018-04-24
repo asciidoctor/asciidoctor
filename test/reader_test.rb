@@ -260,10 +260,10 @@ third line
         assert_equal 'sample.adoc: line 2', reader.cursor.to_s
       end
 
-      test 'prev_line_cursor should return file name and line number of previous line read' do
+      test 'cursor_at_prev_line should return file name and line number of previous line read' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA, 'sample.adoc'
         reader.read_line
-        assert_equal 'sample.adoc: line 1', reader.prev_line_cursor.to_s
+        assert_equal 'sample.adoc: line 1', reader.cursor_at_prev_line.to_s
       end
     end
 
@@ -389,7 +389,7 @@ not captured
         refute reader.unterminated
       end
 
-      test 'should mark reader as unterminated if reader reaches end of source without finding terminator' do
+      test 'should flag reader as unterminated if reader reaches end of source without finding terminator' do
         lines = <<-EOS.each_line.to_a
 ****
 captured
@@ -404,11 +404,11 @@ captured yet again
         using_memory_logger do |logger|
           doc = empty_safe_document :base_dir => DIRNAME
           reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, :normalize => true
-          terminator = reader.read_line
-          result = reader.read_lines_until :terminator => terminator, :skip_processing => true
+          terminator = reader.peek_line
+          result = reader.read_lines_until :terminator => terminator, :skip_first_line => true, :skip_processing => true
           assert_equal expected, result
           assert reader.unterminated
-          assert_message logger, :WARN, '<stdin>: line 6: unterminated **** block', Hash
+          assert_message logger, :WARN, '<stdin>: line 1: unterminated **** block', Hash
         end
       end
     end
@@ -657,7 +657,7 @@ include::fixtures/parent-include.adoc[]
 
         assert_equal 'first line of parent', reader.read_line
 
-        assert_equal 'fixtures/parent-include.adoc: line 1', reader.prev_line_cursor.to_s
+        assert_equal 'fixtures/parent-include.adoc: line 1', reader.cursor_at_prev_line.to_s
         assert_equal parent_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/parent-include.adoc', reader.path
@@ -666,7 +666,7 @@ include::fixtures/parent-include.adoc[]
 
         assert_equal 'first line of child', reader.read_line
 
-        assert_equal 'fixtures/child-include.adoc: line 1', reader.prev_line_cursor.to_s
+        assert_equal 'fixtures/child-include.adoc: line 1', reader.cursor_at_prev_line.to_s
         assert_equal child_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/child-include.adoc', reader.path
@@ -675,7 +675,7 @@ include::fixtures/parent-include.adoc[]
 
         assert_equal 'first line of grandchild', reader.read_line
 
-        assert_equal 'fixtures/grandchild-include.adoc: line 1', reader.prev_line_cursor.to_s
+        assert_equal 'fixtures/grandchild-include.adoc: line 1', reader.cursor_at_prev_line.to_s
         assert_equal grandchild_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/grandchild-include.adoc', reader.path
@@ -692,7 +692,7 @@ include::fixtures/parent-include.adoc[]
 
         assert_equal 'last line of parent', reader.read_line
 
-        assert_equal 'fixtures/parent-include.adoc: line 5', reader.prev_line_cursor.to_s
+        assert_equal 'fixtures/parent-include.adoc: line 5', reader.cursor_at_prev_line.to_s
         assert_equal parent_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/parent-include.adoc', reader.path
