@@ -277,24 +277,42 @@ content
       assert_equal 'sample.asciidoc', section_2.file
       assert_equal 18, section_2.lineno
 
+      table_block = section_2.blocks[1]
+      assert_equal :table, table_block.context
+      refute_nil table_block.source_location
+      assert_equal 'sample.asciidoc', table_block.file
+      assert_equal 22, table_block.lineno
+      first_cell = table_block.rows.body[0][0]
+      refute_nil first_cell.source_location
+      assert_equal 'sample.asciidoc', first_cell.file
+      assert_equal 23, first_cell.lineno
+      second_cell = table_block.rows.body[0][1]
+      refute_nil second_cell.source_location
+      assert_equal 'sample.asciidoc', second_cell.file
+      assert_equal 23, second_cell.lineno
+      last_cell = table_block.rows.body[-1][-1]
+      refute_nil last_cell.source_location
+      assert_equal 'sample.asciidoc', last_cell.file
+      assert_equal 24, last_cell.lineno
+
       last_block = section_2.blocks[-1]
       assert_equal :ulist, last_block.context
       refute_nil last_block.source_location
       assert_equal 'sample.asciidoc', last_block.file
-      assert_equal 23, last_block.lineno
+      assert_equal 28, last_block.lineno
 
       list_items = last_block.blocks
       refute_nil list_items[0].source_location
       assert_equal 'sample.asciidoc', list_items[0].file
-      assert_equal 23, list_items[0].lineno
+      assert_equal 28, list_items[0].lineno
 
       refute_nil list_items[1].source_location
       assert_equal 'sample.asciidoc', list_items[1].file
-      assert_equal 24, list_items[1].lineno
+      assert_equal 29, list_items[1].lineno
 
       refute_nil list_items[2].source_location
       assert_equal 'sample.asciidoc', list_items[2].file
-      assert_equal 25, list_items[2].lineno
+      assert_equal 30, list_items[2].lineno
 
       doc = Asciidoctor.load_file fixture_path('master.adoc'), :sourcemap => true, :safe => :safe
 
@@ -305,7 +323,7 @@ content
       assert_equal 1, section_1.lineno
     end
 
-    test 'wip should track file and line information on list items if sourcemap option is set' do
+    test 'should track file and line information on list items if sourcemap option is set' do
       doc = Asciidoctor.load_file fixture_path('lists.adoc'), :sourcemap => true
 
       first_section = doc.blocks[1]

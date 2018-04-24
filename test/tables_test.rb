@@ -1080,16 +1080,18 @@ output file name is used.
       refute_nil table
       tbody = table.rows.body
       assert_equal 2, tbody.size
+      body_cell_1_2 = tbody[0][1]
+      assert_equal 5, body_cell_1_2.lineno
       body_cell_1_3 = tbody[0][2]
       refute_nil body_cell_1_3.inner_document
       assert body_cell_1_3.inner_document.nested?
       assert_equal doc, body_cell_1_3.inner_document.parent_document
       assert_equal doc.converter, body_cell_1_3.inner_document.converter
-      # TODO assert that body_cell_1_3.lineno is 5 once source_location is available on cell
+      assert_equal 5, body_cell_1_3.lineno
       assert_equal 6, body_cell_1_3.inner_document.lineno
       note = (body_cell_1_3.inner_document.find_by :context => :admonition)[0]
       assert_equal 9, note.lineno
-      output = doc.convert
+      output = doc.convert :header_footer => false
 
       assert_css 'table > tbody > tr', output, 2
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(3) div.admonitionblock', output, 1
@@ -1104,7 +1106,14 @@ a|
 a| paragraph
 |===
       EOS
-      output = render_embedded_string input
+      doc = document_from_string input, :sourcemap => true
+      table = doc.blocks[0]
+      tbody = table.rows.body
+      assert_equal 1, table.lineno
+      assert_equal 2, tbody[0][0].lineno
+      assert_equal 3, tbody[0][0].inner_document.lineno
+      assert_equal 4, tbody[1][0].lineno
+      output = doc.convert :header_footer => false
       assert_css 'td', output, 2
       assert_xpath '(//td)[1]//*[@class="literalblock"]', output, 1
       assert_xpath '(//td)[2]//*[@class="paragraph"]', output, 1
