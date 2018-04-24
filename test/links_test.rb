@@ -11,7 +11,7 @@ context 'Links' do
   end
 
   test 'qualified url with role inline with text' do
-    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", render_string("The AsciiDoc project is located at http://asciidoc.org[,role=project].", :attributes => {'linkattrs' => ''})
+    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", render_string("The AsciiDoc project is located at http://asciidoc.org[role=project].")
   end
 
   test 'qualified http url inline with hide-uri-scheme set' do
@@ -43,7 +43,7 @@ context 'Links' do
   end
 
   test 'qualified url with role using link macro' do
-    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", render_string("We're parsing link:http://asciidoc.org[,role=project] markup", :attributes => {'linkattrs' => ''})
+    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", render_string("We're parsing link:http://asciidoc.org[role=project] markup")
   end
 
   test 'qualified url using macro syntax with multi-line label inline with text' do
@@ -196,26 +196,35 @@ context 'Links' do
     assert_xpath '//a[@href="https://github.com/asciidoctor"]', render_string('Asciidoctor GitHub organization: <**https://github.com/asciidoctor**>'), 1
   end
 
-  test 'link with quoted text should not be separated into attributes when linkattrs is set' do
-    assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing = Search Engines"]', render_embedded_string('http://search.example.com["Google, Yahoo, Bing = Search Engines"]', :attributes => {'linkattrs' => ''}), 1
+  test 'link with quoted text should not be separated into attributes when text contains an equal sign' do
+    assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing = Search Engines"]', render_embedded_string('http://search.example.com["Google, Yahoo, Bing = Search Engines"]'), 1
   end
 
-  test 'link with comma in text but no equal sign should not be separated into attributes when linkattrs is set' do
-    assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing"]', render_embedded_string('http://search.example.com[Google, Yahoo, Bing]', :attributes => {'linkattrs' => ''}), 1
+  test 'link with quoted text but no equal sign should carry quotes over to output' do
+    assert_xpath %(//a[@href="http://search.example.com"][text()='"Google, Yahoo, Bing"']), render_embedded_string('http://search.example.com["Google, Yahoo, Bing"]'), 1
   end
 
-  test 'role and window attributes on link are processed when linkattrs is set' do
-    assert_xpath '//a[@href="http://google.com"][@class="external"][@target="_blank"]', render_embedded_string('http://google.com[Google, role="external", window="_blank"]', :attributes => {'linkattrs' => ''}), 1
+  test 'link with comma in text but no equal sign should not be separated into attributes' do
+    assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing"]', render_embedded_string('http://search.example.com[Google, Yahoo, Bing]'), 1
   end
 
-  test 'link macro with attributes but no text should use URL as text when linkattrs is set' do
+  test 'role and window attributes on link are processed' do
+    assert_xpath '//a[@href="http://google.com"][@class="external"][@target="_blank"]', render_embedded_string('http://google.com[Google, role=external, window="_blank"]'), 1
+  end
+
+  test 'link macro with attributes but no text should use URL as text' do
     url = 'https://fonts.googleapis.com/css?family=Roboto:400,400italic,'
-    assert_xpath %(//a[@href="#{url}"][text()="#{url}"]), render_embedded_string(%(link:#{url}[family=Roboto,weight=400]), :attributes => {'linkattrs' => ''}), 1
+    assert_xpath %(//a[@href="#{url}"][text()="#{url}"]), render_embedded_string(%(link:#{url}[family=Roboto,weight=400])), 1
   end
 
-  test 'link macro with comma but no explicit attributes in text should not parse text when linkattrs is set' do
+  test 'link macro with attributes but blank text should use URL as text' do
     url = 'https://fonts.googleapis.com/css?family=Roboto:400,400italic,'
-    assert_xpath %(//a[@href="#{url}"][text()="Roboto,400"]), render_embedded_string(%(link:#{url}[Roboto,400]), :attributes => {'linkattrs' => ''}), 1
+    assert_xpath %(//a[@href="#{url}"][text()="#{url}"]), render_embedded_string(%(link:#{url}[,family=Roboto,weight=400])), 1
+  end
+
+  test 'link macro with comma but no explicit attributes in text should not parse text' do
+    url = 'https://fonts.googleapis.com/css?family=Roboto:400,400italic,'
+    assert_xpath %(//a[@href="#{url}"][text()="Roboto,400"]), render_embedded_string(%(link:#{url}[Roboto,400])), 1
   end
 
   test 'link text that ends in ^ should set link window to _blank' do
@@ -227,25 +236,25 @@ context 'Links' do
   end
 
   test 'rel=noopener should be added to a link that targets a named window when the noopener option is set' do
-    assert_xpath '//a[@href="http://google.com"][@target="name"][@rel="noopener"]', render_embedded_string('http://google.com[Google,window=name,opts=noopener]', :attributes => {'linkattrs' => ''}), 1
+    assert_xpath '//a[@href="http://google.com"][@target="name"][@rel="noopener"]', render_embedded_string('http://google.com[Google,window=name,opts=noopener]'), 1
   end
 
   test 'rel=noopener should not be added to a link if it does not target a window' do
-    result = render_embedded_string 'http://google.com[Google,opts=noopener]', :attributes => {'linkattrs' => ''}
+    result = render_embedded_string 'http://google.com[Google,opts=noopener]'
     assert_xpath '//a[@href="http://google.com"]', result, 1
     assert_xpath '//a[@href="http://google.com"][@rel="noopener"]', result, 0
   end
 
   test 'rel=nofollow should be added to a link when the nofollow option is set' do
-    assert_xpath '//a[@href="http://google.com"][@target="name"][@rel="nofollow noopener"]', render_embedded_string('http://google.com[Google,window=name,opts="nofollow,noopener"]', :attributes => {'linkattrs' => ''}), 1
+    assert_xpath '//a[@href="http://google.com"][@target="name"][@rel="nofollow noopener"]', render_embedded_string('http://google.com[Google,window=name,opts="nofollow,noopener"]'), 1
   end
 
-  test 'id attribute on link are processed when linkattrs is set' do
-    assert_xpath '//a[@href="http://google.com"][@id="link-1"]', render_embedded_string('http://google.com[Google, id="link-1"]', :attributes => {'linkattrs' => ''}), 1
+  test 'id attribute on link is processed' do
+    assert_xpath '//a[@href="http://google.com"][@id="link-1"]', render_embedded_string('http://google.com[Google, id="link-1"]'), 1
   end
 
-  test 'title attribute on link are processed when linkattrs is set' do
-    assert_xpath '//a[@href="http://google.com"][@title="title-1"]', render_embedded_string('http://google.com[Google, title="title-1"]', :attributes => {'linkattrs' => ''}), 1
+  test 'title attribute on link is processed' do
+    assert_xpath '//a[@href="http://google.com"][@title="title-1"]', render_embedded_string('http://google.com[Google, title="title-1"]'), 1
   end
 
   test 'inline irc link' do
