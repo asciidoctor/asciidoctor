@@ -1004,42 +1004,45 @@ module Substitutors
   end
 
   # Internal: Substitute cross reference links
-  def sub_inline_xrefs(text, found = nil)
-    if ((found ? found[:macroish] : (text.include? '[')) && (text.include? 'xref:')) || ((text.include? '&') && (text.include? 'lt;&'))
-      text = text.gsub(InlineXrefMacroRx) {
+  def sub_inline_xrefs(content, found = nil)
+    if ((found ? found[:macroish] : (content.include? '[')) && (content.include? 'xref:')) || ((content.include? '&') && (content.include? 'lt;&'))
+      content = content.gsub(InlineXrefMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
         if m[0].start_with? RS
           next m[0][1..-1]
         end
-        if (id = m[1])
-          id, reftext = id.split ',', 2
-          reftext = reftext.lstrip if reftext
+        attrs = {}
+        if (refid = m[1])
+          refid, text = refid.split ',', 2
+          text = text.lstrip if text
         else
-          id = m[2]
-          if (reftext = m[3]) && (reftext.include? R_SB)
-            reftext = reftext.gsub ESC_R_SB, R_SB
+          refid = m[2]
+          if (text = m[3])
+            text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
+            # NOTE if an equal sign (=) is present, parse text as attributes
+            text = ((AttributeList.new text, self).parse_into attrs)[1] if (text.include? '=') && !@document.compat_mode
           end
         end
 
-        if (hash_idx = id.index '#')
+        if (hash_idx = refid.index '#')
           if hash_idx > 0
-            if (fragment_len = id.length - hash_idx - 1) > 0
-              path, fragment = (id.slice 0, hash_idx), (id.slice hash_idx + 1, fragment_len)
+            if (fragment_len = refid.length - hash_idx - 1) > 0
+              path, fragment = (refid.slice 0, hash_idx), (refid.slice hash_idx + 1, fragment_len)
             else
-              path = id.slice 0, hash_idx
+              path = refid.slice 0, hash_idx
             end
             if (ext_idx = path.rindex '.') && ASCIIDOC_EXTENSIONS[path.slice ext_idx, path.length]
               path = path.slice 0, ext_idx
             end
           else
-            target, fragment = id, (id.slice 1, id.length)
+            target, fragment = refid, (refid.slice 1, refid.length)
           end
-        elsif (ext_idx = id.rindex '.') && ASCIIDOC_EXTENSIONS[id.slice ext_idx, id.length]
-          path = id.slice 0, ext_idx
+        elsif (ext_idx = refid.rindex '.') && ASCIIDOC_EXTENSIONS[refid.slice ext_idx, refid.length]
+          path = refid.slice 0, ext_idx
         else
-          fragment = id
+          fragment = refid
         end
 
         # handles: #id
@@ -1062,9 +1065,9 @@ module Substitutors
             path = %(#{@document.attributes['relfileprefix']}#{path}#{@document.attributes.fetch 'outfilesuffix', '.html'})
             target = fragment ? %(#{path}##{fragment}) : path
           end
-        # handles: id or Section Title
+        # handles: id or Node Title or Reference Text
         else
-          # resolve fragment as reftext if it's not a known ID and resembles reftext (includes space or has uppercase char)
+          # do reverse lookup on fragment if not a known ID and resembles reftext (contains a space or uppercase char)
           unless @document.catalog[:ids].key? fragment
             if Compliance.natural_xrefs && !@document.compat_mode &&
                 ((fragment.include? ' ') || fragment.downcase != fragment) &&
@@ -1076,11 +1079,12 @@ module Substitutors
           end
           refid, target = fragment, %(##{fragment})
         end
-        Inline.new(self, :anchor, reftext, :type => :xref, :target => target, :attributes => {'path' => path, 'fragment' => fragment, 'refid' => refid}).convert
+        attrs['path'], attrs['fragment'], attrs['refid'] = path, fragment, refid
+        Inline.new(self, :anchor, text, :type => :xref, :target => target, :attributes => attrs).convert
       }
     end
 
-    text
+    content
   end
 
   # Public: Substitute callout source references
@@ -1217,7 +1221,7 @@ module Substitutors
     end
   end
 
-  # Internal: Strip bounding whitespace, fold endlines and unescaped closing
+  # Internal: Strip bounding whitespace, fold endlines and unescape closing
   # square brackets from text extracted from brackets
   def unescape_bracketed_text text
     if (text = text.strip.tr LF, ' ').include? R_SB
