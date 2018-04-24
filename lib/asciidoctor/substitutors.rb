@@ -1022,7 +1022,7 @@ module Substitutors
           if (text = m[3])
             text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
             # NOTE if an equal sign (=) is present, parse text as attributes
-            text = (parse_attributes text, [], :into => attrs)[1] if (text.include? '=') && !@document.compat_mode
+            text = ((AttributeList.new text, self).parse_into attrs)[1] if (text.include? '=') && !@document.compat_mode
           end
         end
 
