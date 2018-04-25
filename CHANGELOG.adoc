@@ -55,6 +55,7 @@ Enhancements::
 Bug fixes::
 
   * set :to_dir option correctly when output file is specified (#2382)
+  * preserve leading indentation in contents of AsciiDoc table cell if contents starts with a newline (#2712)
   * using the shorthand syntax on the style to set block attributes (id, roles, options) no longer resets block style (#2174)
   * match include tags anywhere on line as long as offset by word boundary on left and space or newline on right (#2369, PR #2683)
   * warn if an include tag specified in the include directive is unclosed in the included file (#2361, PR #2696)

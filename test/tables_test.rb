@@ -1096,6 +1096,22 @@ output file name is used.
       assert_css 'table > tbody > tr:nth-child(2) > td:nth-child(3) div.dlist', output, 1
     end
 
+    test 'should preserve leading indentation in contents of AsciiDoc table cell if contents starts with newline' do
+      input = <<-EOS
+|===
+a|
+ $ command
+a| paragraph
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'td', output, 2
+      assert_xpath '(//td)[1]//*[@class="literalblock"]', output, 1
+      assert_xpath '(//td)[2]//*[@class="paragraph"]', output, 1
+      assert_xpath '(//pre)[1][text()="$ command"]', output, 1
+      assert_xpath '(//p)[1][text()="paragraph"]', output, 1
+    end
+
     test 'preprocessor directive on first line of an AsciiDoc table cell should be processed' do
       input = <<-EOS
 |===

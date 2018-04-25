@@ -226,13 +226,20 @@ class Table::Cell < AbstractNode
         @colspan = @rowspan = nil
       else
         @colspan, @rowspan = (attributes.delete 'colspan'), (attributes.delete 'rowspan')
-        # TODO eventually remove the style attribute from the attributes hash
-        #cell_style = (attributes.delete 'style') || cell_style unless in_header_row
+        # TODO delete style attribute from @attributes if set
         cell_style = attributes['style'] || cell_style unless in_header_row
         update_attributes attributes
       end
-      if cell_style == :literal || cell_style == :verse
+      if (asciidoc = cell_style == :asciidoc)
+        if (cell_text = cell_text.rstrip).start_with? LF
+          while (cell_text = cell_text.slice 1, cell_text.length).start_with? LF
+          end
+        else
+          cell_text = cell_text.lstrip
+        end
+      elsif cell_style == :literal || cell_style == :verse
         cell_text = cell_text.rstrip
+        # QUESTION should we use same logic as :asciidoc cell? strip leading space if text doesn't start with newline?
         cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF
       else
         cell_text = cell_text.strip
@@ -241,7 +248,7 @@ class Table::Cell < AbstractNode
       @colspan = @rowspan = nil
     end
     # NOTE only true for non-header rows
-    if cell_style == :asciidoc
+    if asciidoc
       # FIXME hide doctitle from nested document; temporary workaround to fix
       # nested document seeing doctitle and assuming it has its own document title
       parent_doctitle = @document.attributes.delete('doctitle')
