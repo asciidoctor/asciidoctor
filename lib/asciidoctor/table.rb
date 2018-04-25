@@ -216,30 +216,29 @@ class Table::Cell < AbstractNode
   def initialize column, cell_text, attributes = {}, opts = {}
     super column, :cell
     if column
-      cell_style = (in_header_row = column.table.header_row?) ? nil : column.attributes['style']
+      cell_style = column.attributes['style'] unless (in_header_row = column.table.header_row?)
       # REVIEW feels hacky to inherit all attributes from column
       update_attributes column.attributes
-    else
-      in_header_row = cell_style = nil
     end
+    # NOTE if attributes is defined, we know this is a psv cell; implies text should be stripped
     if attributes
-      @colspan = attributes.delete 'colspan'
-      @rowspan = attributes.delete 'rowspan'
-      # TODO eventually remove the style attribute from the attributes hash
-      #cell_style = attributes.delete 'style' unless in_header_row || !(attributes.key? 'style')
-      cell_style = attributes['style'] unless in_header_row || !(attributes.key? 'style')
-      if opts[:strip_text]
-        if cell_style == :literal || cell_style == :verse
-          cell_text = cell_text.rstrip
-          cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF
-        else
-          cell_text = cell_text.strip
-        end
+      if attributes.empty?
+        @colspan = @rowspan = nil
+      else
+        @colspan, @rowspan = (attributes.delete 'colspan'), (attributes.delete 'rowspan')
+        # TODO eventually remove the style attribute from the attributes hash
+        #cell_style = (attributes.delete 'style') || cell_style unless in_header_row
+        cell_style = attributes['style'] || cell_style unless in_header_row
+        update_attributes attributes
       end
-      update_attributes attributes
+      if cell_style == :literal || cell_style == :verse
+        cell_text = cell_text.rstrip
+        cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF
+      else
+        cell_text = cell_text.strip
+      end
     else
-      @colspan = nil
-      @rowspan = nil
+      @colspan = @rowspan = nil
     end
     # NOTE only true for non-header rows
     if cell_style == :asciidoc
@@ -515,7 +514,6 @@ class Table::ParserContext
   # returns nothing
   def close_cell(eol = false)
     if @format == 'psv'
-      strip_text = true
       cell_text = @buffer
       @buffer = ''
       if (cellspec = take_cellspec)
@@ -526,7 +524,6 @@ class Table::ParserContext
         repeat = 1
       end
     else
-      strip_text = false
       cell_text = @buffer.strip
       @buffer = ''
       cellspec = nil
@@ -563,7 +560,7 @@ class Table::ParserContext
         end
       end
 
-      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @reader.cursor_before_mark, :strip_text => strip_text)
+      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @reader.cursor_before_mark)
       @reader.mark
       unless !cell.rowspan || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))
