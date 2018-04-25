@@ -201,6 +201,9 @@ class Table::Cell < AbstractNode
   # Public: Get/Set the Symbol style for this cell (default: nil)
   attr_accessor :style
 
+  # Public: Substitutions to be applied to content in this cell
+  attr_accessor :subs
+
   # Public: An Integer of the number of columns this cell will span (default: nil)
   attr_accessor :colspan
 
@@ -216,33 +219,42 @@ class Table::Cell < AbstractNode
   def initialize column, cell_text, attributes = {}, opts = {}
     super column, :cell
     if column
-      cell_style = (in_header_row = column.table.header_row?) ? nil : column.attributes['style']
+      cell_style = column.attributes['style'] unless (in_header_row = column.table.header_row?)
       # REVIEW feels hacky to inherit all attributes from column
       update_attributes column.attributes
-    else
-      in_header_row = cell_style = nil
     end
+    # NOTE if attributes is defined, we know this is a psv cell; implies text should be stripped
     if attributes
-      @colspan = attributes.delete 'colspan'
-      @rowspan = attributes.delete 'rowspan'
-      # TODO eventually remove the style attribute from the attributes hash
-      #cell_style = attributes.delete 'style' unless in_header_row || !(attributes.key? 'style')
-      cell_style = attributes['style'] unless in_header_row || !(attributes.key? 'style')
-      if opts[:strip_text]
-        if cell_style == :literal || cell_style == :verse
-          cell_text = cell_text.rstrip
-          cell_text = cell_text.slice 1, cell_text.length - 1 while cell_text.start_with? LF
-        else
-          cell_text = cell_text.strip
-        end
+      if attributes.empty?
+        @colspan = @rowspan = nil
+      else
+        @colspan, @rowspan = (attributes.delete 'colspan'), (attributes.delete 'rowspan')
+        # TODO delete style attribute from @attributes if set
+        cell_style = attributes['style'] || cell_style unless in_header_row
+        update_attributes attributes
       end
-      update_attributes attributes
+      if (asciidoc = cell_style == :asciidoc)
+        inner_document_cursor = opts[:cursor]
+        if (cell_text = cell_text.rstrip).start_with? LF
+          lines_advanced = 1
+          lines_advanced += 1 while (cell_text = cell_text.slice 1, cell_text.length).start_with? LF
+          # NOTE this only works if we remain in the same file
+          inner_document_cursor.advance lines_advanced
+        else
+          cell_text = cell_text.lstrip
+        end
+      elsif (literal = cell_style == :literal) || cell_style == :verse
+        cell_text = cell_text.rstrip
+        # QUESTION should we use same logic as :asciidoc cell? strip leading space if text doesn't start with newline?
+        cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF
+      else
+        cell_text = cell_text.strip
+      end
     else
-      @colspan = nil
-      @rowspan = nil
+      @colspan = @rowspan = nil
     end
     # NOTE only true for non-header rows
-    if cell_style == :asciidoc
+    if asciidoc
       # FIXME hide doctitle from nested document; temporary workaround to fix
       # nested document seeing doctitle and assuming it has its own document title
       parent_doctitle = @document.attributes.delete('doctitle')
@@ -259,8 +271,13 @@ class Table::Cell < AbstractNode
           inner_document_lines.unshift(*preprocessed_lines) unless preprocessed_lines.empty?
         end
       end unless inner_document_lines.empty?
-      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => opts[:cursor])
+      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => inner_document_cursor)
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
+      @subs = nil
+    elsif literal
+      @subs = BASIC_SUBS
+    else
+      @subs = NORMAL_SUBS
     end
     @text = cell_text
     @style = cell_style
@@ -275,7 +292,7 @@ class Table::Cell < AbstractNode
   #
   # Returns the converted String text for this Cell
   def text
-    apply_subs @text, (@style == :literal ? BASIC_SUBS : NORMAL_SUBS)
+    apply_subs @text, @subs
   end
 
   # Public: Set the String text.
@@ -515,7 +532,6 @@ class Table::ParserContext
   # returns nothing
   def close_cell(eol = false)
     if @format == 'psv'
-      strip_text = true
       cell_text = @buffer
       @buffer = ''
       if (cellspec = take_cellspec)
@@ -526,7 +542,6 @@ class Table::ParserContext
         repeat = 1
       end
     else
-      strip_text = false
       cell_text = @buffer.strip
       @buffer = ''
       cellspec = nil
@@ -563,7 +578,7 @@ class Table::ParserContext
         end
       end
 
-      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @reader.cursor_before_mark, :strip_text => strip_text)
+      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @reader.cursor_before_mark)
       @reader.mark
       unless !cell.rowspan || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))
