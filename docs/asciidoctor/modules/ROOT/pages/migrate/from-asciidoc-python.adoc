@@ -150,6 +150,10 @@ pass:[==== Level 3 section title] +
 pass:[===== Level 4 section title] +
 |See xref:asciidoc:sections:level-and-title.adoc[section levels and titles]
 
+|Section numbers
+|`numbered`
+|`sectnums`
+|
 |===
 
 === Tables
