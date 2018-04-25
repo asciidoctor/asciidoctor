@@ -1,0 +1,8 @@
+= Special Section Styles for Articles and Books
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+// Included in user-manual partintro
+
+Asciidoctor provides built-in styles for the specialized front matter and back matter sections commonly found in journal articles, academic papers, and books.
+In the following sections, you'll learn the dependency, structure, and output rules for each special section.

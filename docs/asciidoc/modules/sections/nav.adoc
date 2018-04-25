@@ -4,7 +4,7 @@
 *** xref:discrete.adoc[Discrete Titles]
 *** xref:hr-and-break.adoc[Horizontal Rules & Page Breaks]
 ** xref:id.adoc[IDs, Anchors & Links]
-** xref:structure.adoc[Section Styles]
+** xref:special.adoc[Special Section Styles]
 // Front matter
 *** xref:dedication.adoc[Dedication]
 // & Epigraph
