@@ -7,7 +7,7 @@ class Reader
   class Cursor
     attr_reader :file, :dir, :path, :lineno
 
-    def initialize file, dir = nil, path = nil, lineno = nil
+    def initialize file, dir = nil, path = nil, lineno = 1
       @file, @dir, @path, @lineno = file, dir, path, lineno
     end
 
