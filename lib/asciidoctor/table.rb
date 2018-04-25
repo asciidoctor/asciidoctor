@@ -198,8 +198,14 @@ end
 
 # Public: Methods for managing the a cell in an AsciiDoc table.
 class Table::Cell < AbstractNode
+  # Public: Gets/Sets the location in the AsciiDoc source where this cell begins
+  attr_reader :source_location
+
   # Public: Get/Set the Symbol style for this cell (default: nil)
   attr_accessor :style
+
+  # Public: Substitutions to be applied to content in this cell
+  attr_accessor :subs
 
   # Public: An Integer of the number of columns this cell will span (default: nil)
   attr_accessor :colspan
@@ -215,34 +221,44 @@ class Table::Cell < AbstractNode
 
   def initialize column, cell_text, attributes = {}, opts = {}
     super column, :cell
+    @source_location = opts[:cursor].dup if @document.sourcemap
     if column
-      cell_style = (in_header_row = column.table.header_row?) ? nil : column.attributes['style']
+      cell_style = column.attributes['style'] unless (in_header_row = column.table.header_row?)
       # REVIEW feels hacky to inherit all attributes from column
       update_attributes column.attributes
-    else
-      in_header_row = cell_style = nil
     end
+    # NOTE if attributes is defined, we know this is a psv cell; implies text should be stripped
     if attributes
-      @colspan = attributes.delete 'colspan'
-      @rowspan = attributes.delete 'rowspan'
-      # TODO eventually remove the style attribute from the attributes hash
-      #cell_style = attributes.delete 'style' unless in_header_row || !(attributes.key? 'style')
-      cell_style = attributes['style'] unless in_header_row || !(attributes.key? 'style')
-      if opts[:strip_text]
-        if cell_style == :literal || cell_style == :verse
-          cell_text = cell_text.rstrip
-          cell_text = cell_text.slice 1, cell_text.length - 1 while cell_text.start_with? LF
-        else
-          cell_text = cell_text.strip
-        end
+      if attributes.empty?
+        @colspan = @rowspan = nil
+      else
+        @colspan, @rowspan = (attributes.delete 'colspan'), (attributes.delete 'rowspan')
+        # TODO delete style attribute from @attributes if set
+        cell_style = attributes['style'] || cell_style unless in_header_row
+        update_attributes attributes
       end
-      update_attributes attributes
+      if (asciidoc = cell_style == :asciidoc)
+        inner_document_cursor = opts[:cursor]
+        if (cell_text = cell_text.rstrip).start_with? LF
+          lines_advanced = 1
+          lines_advanced += 1 while (cell_text = cell_text.slice 1, cell_text.length).start_with? LF
+          # NOTE this only works if we remain in the same file
+          inner_document_cursor.advance lines_advanced
+        else
+          cell_text = cell_text.lstrip
+        end
+      elsif (literal = cell_style == :literal) || cell_style == :verse
+        cell_text = cell_text.rstrip
+        # QUESTION should we use same logic as :asciidoc cell? strip leading space if text doesn't start with newline?
+        cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF
+      else
+        cell_text = cell_text.strip
+      end
     else
-      @colspan = nil
-      @rowspan = nil
+      @colspan = @rowspan = nil
     end
     # NOTE only true for non-header rows
-    if cell_style == :asciidoc
+    if asciidoc
       # FIXME hide doctitle from nested document; temporary workaround to fix
       # nested document seeing doctitle and assuming it has its own document title
       parent_doctitle = @document.attributes.delete('doctitle')
@@ -259,8 +275,13 @@ class Table::Cell < AbstractNode
           inner_document_lines.unshift(*preprocessed_lines) unless preprocessed_lines.empty?
         end
       end unless inner_document_lines.empty?
-      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => opts[:cursor])
+      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => inner_document_cursor)
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
+      @subs = nil
+    elsif literal
+      @subs = BASIC_SUBS
+    else
+      @subs = NORMAL_SUBS
     end
     @text = cell_text
     @style = cell_style
@@ -275,7 +296,7 @@ class Table::Cell < AbstractNode
   #
   # Returns the converted String text for this Cell
   def text
-    apply_subs @text, (@style == :literal ? BASIC_SUBS : NORMAL_SUBS)
+    apply_subs @text, @subs
   end
 
   # Public: Set the String text.
@@ -300,6 +321,16 @@ class Table::Cell < AbstractNode
         !@style || @style == :header ? p : Inline.new(parent, :quoted, p, :type => @style).convert
       end
     end
+  end
+
+  # Public: Get the source file where this block started
+  def file
+    @source_location && @source_location.file
+  end
+
+  # Public: Get the source line number where this block started
+  def lineno
+    @source_location && @source_location.lineno
   end
 
   def to_s
@@ -353,10 +384,8 @@ class Table::ParserContext
   attr_reader :delimiter_re
 
   def initialize reader, table, attributes = {}
-    @reader = reader
+    @start_cursor_data = (@reader = reader).mark
     @table = table
-    # IMPORTANT if reader.cursor becomes a reference, this assignment would require .dup
-    @last_cursor = reader.cursor
 
     if attributes.key? 'format'
       if FORMATS.include?(xsv = attributes['format'])
@@ -367,7 +396,7 @@ class Table::ParserContext
           xsv = '!sv'
         end
       else
-        logger.error message_with_context %(illegal table format: #{xsv}), :source_location => reader.prev_line_cursor
+        logger.error message_with_context %(illegal table format: #{xsv}), :source_location => reader.cursor_at_prev_line
         @format, xsv = 'psv', (table.document.nested? ? '!sv' : 'psv')
       end
     else
@@ -517,18 +546,16 @@ class Table::ParserContext
   # returns nothing
   def close_cell(eol = false)
     if @format == 'psv'
-      strip_text = true
       cell_text = @buffer
       @buffer = ''
       if (cellspec = take_cellspec)
         repeat = cellspec.delete('repeatcol') || 1
       else
-        logger.error message_with_context 'table missing leading separator, recovering automatically', :source_location => @last_cursor
+        logger.error message_with_context 'table missing leading separator, recovering automatically', :source_location => Reader::Cursor.new(*@start_cursor_data)
         cellspec = {}
         repeat = 1
       end
     else
-      strip_text = false
       cell_text = @buffer.strip
       @buffer = ''
       cellspec = nil
@@ -560,13 +587,13 @@ class Table::ParserContext
       else
         # QUESTION is this right for cells that span columns?
         unless (column = @table.columns[@current_row.size])
-          logger.error message_with_context 'dropping cell because it exceeds specified number of columns', :source_location => @last_cursor
+          logger.error message_with_context 'dropping cell because it exceeds specified number of columns', :source_location => @reader.cursor_before_mark
           return
         end
       end
 
-      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @last_cursor, :strip_text => strip_text)
-      @last_cursor = @reader.cursor
+      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @reader.cursor_before_mark)
+      @reader.mark
       unless !cell.rowspan || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))
       end

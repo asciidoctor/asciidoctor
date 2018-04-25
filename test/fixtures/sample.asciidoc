@@ -19,8 +19,12 @@ NOTE: This is test, only a test.
 
 *Section B* paragraph.
 
+|===
+|a |b |c
+|1 |2 |3
+|===
+
 .Section B list
 * Item 1
 * Item 2
 * Item 3
-

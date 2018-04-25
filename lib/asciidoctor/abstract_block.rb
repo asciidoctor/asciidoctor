@@ -54,12 +54,12 @@ class AbstractBlock < AbstractNode
 
   # Public: Get the source file where this block started
   def file
-    @source_location ? @source_location.file : nil
+    @source_location && @source_location.file
   end
 
   # Public: Get the source line number where this block started
   def lineno
-    @source_location ? @source_location.lineno : nil
+    @source_location && @source_location.lineno
   end
 
   # Public: Get the converted String content for this Block.  If the block

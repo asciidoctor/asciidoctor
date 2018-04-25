@@ -1,0 +1,96 @@
+= Document Title
+Doc Writer <thedoc@asciidoctor.org>
+
+Preamble paragraph.
+
+NOTE: This is test, only a test.
+
+== Lists
+
+.Unordered, basic
+* Edgar Allen Poe
+* Sheri S. Tepper
+* Bill Bryson
+
+.Unordered, max nesting
+* level 1
+** level 2
+*** level 3
+**** level 4
+***** level 5
+* level 1
+
+.Checklist
+- [*] checked
+- [x] also checked
+- [ ] not checked
+-     normal list item
+
+.Ordered, basic
+. Step 1
+. Step 2
+. Step 3
+
+.Ordered, nested
+. Step 1
+. Step 2
+.. Step 2a
+.. Step 2b
+. Step 3
+
+.Ordered, max nesting
+. level 1
+.. level 2
+... level 3
+.... level 4
+..... level 5
+. level 1
+
+.Labeled, single-line
+first term:: definition of first term
+section term:: definition of second term
+
+.Labeled, multi-line
+first term::
+definition of first term
+second term::
+definition of second term
+
+.Q&A
+[qanda]
+What is Asciidoctor?::
+  An implementation of the AsciiDoc processor in Ruby.
+What is the answer to the Ultimate Question?:: 42
+
+.Mixed
+Operating Systems::
+  Linux:::
+    . Fedora
+      * Desktop
+    . Ubuntu
+      * Desktop
+      * Server
+  BSD:::
+    . FreeBSD
+    . NetBSD
+
+Cloud Providers::
+  PaaS:::
+    . OpenShift
+    . CloudBees
+  IaaS:::
+    . Amazon EC2
+    . Rackspace
+
+.Unordered, complex
+* level 1
+** level 2
+*** level 3
+This is a new line inside an unordered list using {plus} symbol.
+We can even force content to start on a separate line... +
+Amazing, isn't it?
+**** level 4
++
+The {plus} symbol is on a new line.
+
+***** level 5

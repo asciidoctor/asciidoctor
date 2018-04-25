@@ -24,6 +24,8 @@ Enhancements::
   * log message containing source location / cursor as an object; provides more context (#44, PR #2660)
   * add :logger option to API to set logger instance (#44, PR #2660)
   * add --failure-level=LEVEL option to CLI to force non-zero exit code if specified logging level is reached (#2003, PR #2674)
+  * parse text of xref macro as attributes if attribute signature found (equal sign) (#2381)
+  * allow xrefstyle to be specified per xref by assigning the xrefstyle attribute on the xref macro (#2365)
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
   * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI (#642, PR #2649)
   * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font) (#642, PR #2649)
@@ -38,7 +40,9 @@ Enhancements::
   * add positioning option to sectanchors attribute (before or after) (#2485, PR #2486)
   * allow table stripes to be configured using stripe attribute or stripe roles on table; valid values are even, odd, all, and none (#1365, PR #2588)
   * allow nofollow rel property to be added to links and linked images by setting the nofollow option (#2605, PR #2692)
-  * assign Document#source_location when sourcemap option is enabled (#2478, PR #2488)
+  * populate Document#source_location when sourcemap option is enabled (#2478, PR #2488)
+  * populate source_location property on list items when sourcemap option is set on document (PR #2069) (@mogztter)
+  * populate Table::Cell#source_location when sourcemap option is enabled (#2705)
   * allow local include to be flagged as optional by setting optional option (#2389, PR #2413)
   * allow attribute name to contain word characters as defined by Unicode (#2376, PR #2393)
   * allow block title to begin with a period (#2358, PR #2359)
@@ -54,6 +58,7 @@ Enhancements::
 Bug fixes::
 
   * set :to_dir option correctly when output file is specified (#2382)
+  * preserve leading indentation in contents of AsciiDoc table cell if contents starts with a newline (#2712)
   * using the shorthand syntax on the style to set block attributes (id, roles, options) no longer resets block style (#2174)
   * match include tags anywhere on line as long as offset by word boundary on left and space or newline on right (#2369, PR #2683)
   * warn if an include tag specified in the include directive is unclosed in the included file (#2361, PR #2696)
@@ -94,6 +99,7 @@ Bug fixes::
 
 Improvements / Refactoring::
 
+  * use cursor marks to track lines more accurately; record cursor at the start of each block, list item, or table cell (PR #2701, PR #2547) (@seikichi)
   * log a warning message if an unterminated delimited block is detected (#1133, PR #2612)
   * log a warning when nested section is found inside special section that doesn't support nested sections (#2433, PR #2672)
   * read files in binary mode to disable automatic endline coercion (then explicitly coerce to UTF-8) (PR #2583, PR #2694)
