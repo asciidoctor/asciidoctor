@@ -18,13 +18,14 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Enhancements::
 
   * BREAKING: drop XML tags, character refs, and non-word characters (except hyphen and space) when generating ID for section (#794)
-  * parse text of xref macro as attributes if attribute signature found (equal sign) (#2381)
   * route messages through a logger instead of using Kernel#warn (#44, PR #2660)
   * add MemoryLogger for capturing messages sent to logger into memory (#44, PR #2660)
   * add NullLogger to prevent messages from being logged (#44, PR #2660)
   * log message containing source location / cursor as an object; provides more context (#44, PR #2660)
   * add :logger option to API to set logger instance (#44, PR #2660)
   * add --failure-level=LEVEL option to CLI to force non-zero exit code if specified logging level is reached (#2003, PR #2674)
+  * parse text of xref macro as attributes if attribute signature found (equal sign) (#2381)
+  * allow xrefstyle to be specified per xref by assigning the xrefstyle attribute on the xref macro (#2365)
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
   * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI (#642, PR #2649)
   * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font) (#642, PR #2649)

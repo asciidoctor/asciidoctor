@@ -1044,8 +1044,9 @@ Your browser does not support the video tag.
         else
           attrs = node.role ? %( class="#{node.role}") : ''
           unless (text = node.text)
-            if AbstractNode === (ref = node.document.catalog[:refs][refid = node.attributes['refid']])
-              text = ref.xreftext((@xrefstyle ||= node.document.attributes['xrefstyle'])) || %([#{refid}])
+            refid = node.attributes['refid']
+            if AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid])
+              text = (ref.xreftext node.attr('xrefstyle')) || %([#{refid}])
             else
               text = %([#{refid}])
             end
