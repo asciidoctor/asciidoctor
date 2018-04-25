@@ -529,12 +529,12 @@ class Reader
       m_file, m_dir, m_path, m_lineno = @mark
       Cursor.new m_file, m_dir, m_path, m_lineno - 1
     else
-      cursor_at_prev_line
+      Cursor.new @file, @dir, @path, @lineno - 1
     end
   end
 
   def cursor_at_prev_line
-    cursor_at_line @lineno - 1
+    Cursor.new @file, @dir, @path, @lineno - 1
   end
 
   def cursor_data
