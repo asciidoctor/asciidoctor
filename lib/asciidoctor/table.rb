@@ -201,6 +201,9 @@ class Table::Cell < AbstractNode
   # Public: Get/Set the Symbol style for this cell (default: nil)
   attr_accessor :style
 
+  # Public: Substitutions to be applied to content in this cell
+  attr_accessor :subs
+
   # Public: An Integer of the number of columns this cell will span (default: nil)
   attr_accessor :colspan
 
@@ -240,7 +243,7 @@ class Table::Cell < AbstractNode
         else
           cell_text = cell_text.lstrip
         end
-      elsif cell_style == :literal || cell_style == :verse
+      elsif (literal = cell_style == :literal) || cell_style == :verse
         cell_text = cell_text.rstrip
         # QUESTION should we use same logic as :asciidoc cell? strip leading space if text doesn't start with newline?
         cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF
@@ -270,6 +273,11 @@ class Table::Cell < AbstractNode
       end unless inner_document_lines.empty?
       @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => inner_document_cursor)
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
+      @subs = nil
+    elsif literal
+      @subs = BASIC_SUBS
+    else
+      @subs = NORMAL_SUBS
     end
     @text = cell_text
     @style = cell_style
@@ -284,7 +292,7 @@ class Table::Cell < AbstractNode
   #
   # Returns the converted String text for this Cell
   def text
-    apply_subs @text, (@style == :literal ? BASIC_SUBS : NORMAL_SUBS)
+    apply_subs @text, @subs
   end
 
   # Public: Set the String text.
