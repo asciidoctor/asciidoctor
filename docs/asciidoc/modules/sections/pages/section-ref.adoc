@@ -6,42 +6,51 @@ endif::[]
 
 [cols="1m,1,2m,2"]
 |===
-|Attribute |Value(s) |Example Syntax |Comments
+|Attribute |Value(s) |Example Syntax |Notes
 
 |sectids
-|n/a
+|N/A
 |`:sectids!:`
-|Set to auto-generate section IDs by default.
+|Set to autogenerate section IDs by default
 
 |idprefix
 |`_`, or user defined text
 |`:idprefix: id_`
-|Set to prepend string to generated section ID.
+|Set to prepend string to generated section ID
 
 |idseparator
 |`_`, or user defined character
 |`:idseparator: -`
-|Set to insert character between words in generated section ID.
+|Set to insert character between words in generated section ID
+
+|options; %
+|`untitled`
+|`[colophon%untitled]`
+|DocBook only; can only be set on special sections
+//Asciidoctor only
 
 |sectanchors
-|n/a
+|N/A
 |`:sectanchors:`
-|Asciidoctor only
+|
+//Asciidoctor only
 
 |sectlinks
-|n/a
+|N/A
 |`:sectlinks:`
-|Asciidoctor only
+|
+//Asciidoctor only
 
 |sectnums
-|n/a
+|N/A
 |`:sectnums:`
-|Section numbering is off by default.
-Can be toggled on or off in the flow of the document.
+|Off by default;
+can be toggled on or off in the flow of the document
+// replaces numbered in AsciiDoc.py
 
 |sectnumlevels
 |0-5
 |`:sectnumlevels: 3`
-|Set to autogenerate section numbers up to level three by default.
-Setting a value of `0` has the same effect as setting `sectnums!`.
+|Autogenerate section numbers up to level three by default;
+value of `0` is the same as `sectnums!`
 |===

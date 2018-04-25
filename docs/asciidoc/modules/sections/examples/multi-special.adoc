@@ -28,7 +28,7 @@ She had conquered the mountain of government reports that, over the course of si
 I would like to thank the Big Bang and String Theory.
 
 // tag::dedicate[]
-[dedication]
+[dedication%untitled]
 = Dedication
 
 For S.S.T.--

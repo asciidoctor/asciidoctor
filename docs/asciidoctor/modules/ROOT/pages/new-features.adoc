@@ -1,0 +1,8 @@
+= New Features
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+
+== AsciiDoc syntax and attributes
+
+Hide the titles of special sections, such as the Dedication and Colophon, with `untitled` (DocBook backend only).

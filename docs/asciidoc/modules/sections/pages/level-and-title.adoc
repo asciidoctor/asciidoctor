@@ -24,7 +24,7 @@ include::{examplesdir}/section.adoc[tag=base]
 include::{examplesdir}/section.adoc[tag=b-base]
 ====
 
-TIP: In addition to the equals sign marker used for defining single-line section titles, Asciidoctor recognizes the hash symbol (`#`) from Markdown.
+TIP: In addition to the equals sign marker used for defining section titles, Asciidoctor recognizes the hash symbol (`#`) from Markdown.
 That means the outline of a Markdown document will be converted just fine as an AsciiDoc document.
 
 Section levels must be nested logically.
@@ -49,8 +49,18 @@ Once the first section title is reached, content is associated with the section 
 include::{examplesdir}/section.adoc[tag=content]
 ----
 
-=== Titles as HTML headings
+== Titles as HTML headings
 // tag::heading[]
 When the document is converted to HTML 5 (using the built-in `html5` backend), each section title becomes a heading element where the heading level matches the number of equal signs.
 For example, a level 1 section (`==`) maps to an `<h2>` element.
 // end::heading[]
+
+== Hide special section titles
+
+The titles of xref:special.adoc[special sections], such as the Dedication and Colophon, can be turned off by assigning `untitled` to the section's options attribute.
+This feature is only available for the DocBook backend.
+
+[source]
+----
+include::{examplesdir}/multi-special.adoc[tag=dedicate]
+----
