@@ -13,8 +13,7 @@ if RUBY_ENGINE == 'opal'
   require 'asciidoctor/js'
 else
   autoload :Base64, 'base64'
-  # autoload open-uri instead of uri for URI since OpenURI is what we use URI for
-  autoload :URI, 'open-uri'
+  autoload :URI, 'uri'
   autoload :OpenURI, 'open-uri'
   autoload :StringScanner, 'strscan'
 end
