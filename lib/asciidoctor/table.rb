@@ -231,7 +231,7 @@ class Table::Cell < AbstractNode
       if opts[:strip_text]
         if cell_style == :literal || cell_style == :verse
           cell_text = cell_text.rstrip
-          cell_text = cell_text.slice 1, cell_text.length - 1 while cell_text.start_with? LF
+          cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF
         else
           cell_text = cell_text.strip
         end
