@@ -804,11 +804,10 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless text.empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if (text.start_with? '"') || ((comma_idx = text.index ',') && (text.index '=', comma_idx))
-            attrs = parse_attributes text, []
+          if (text.include? '=') && !@document.compat_mode
+            text = (attrs = (AttributeList.new text, self).parse)[1] || ''
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
-            text = attrs[1] || ''
-          end if doc_attrs.key? 'linkattrs'
+          end
 
           # TODO enable in Asciidoctor 1.6.x
           # support pipe-separated text and title
@@ -857,10 +856,10 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless (text = m[3]).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if (text.start_with? '"') || ((comma_idx = text.index ',') && (mailto || (text.index '=', comma_idx)))
-            attrs = parse_attributes text, []
-            link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
-            if mailto
+          if mailto
+            if (text.include? ',') && !@document.compat_mode
+              text = (attrs = (AttributeList.new text, self).parse)[1] || ''
+              link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
               if attrs.key? 2
                 if attrs.key? 3
                   target = %(#{target}?subject=#{Helpers.uri_encode attrs[2]}&amp;body=#{Helpers.uri_encode attrs[3]})
@@ -869,8 +868,10 @@ module Substitutors
                 end
               end
             end
-            text = attrs[1] || ''
-          end if doc_attrs.key? 'linkattrs'
+          elsif (text.include? '=') && !@document.compat_mode
+            text = (attrs = (AttributeList.new text, self).parse)[1] || ''
+            link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
+          end
 
           # TODO enable in Asciidoctor 1.6.x
           # support pipe-separated text and title
