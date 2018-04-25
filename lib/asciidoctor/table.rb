@@ -231,9 +231,12 @@ class Table::Cell < AbstractNode
         update_attributes attributes
       end
       if (asciidoc = cell_style == :asciidoc)
+        inner_document_cursor = opts[:cursor]
         if (cell_text = cell_text.rstrip).start_with? LF
-          while (cell_text = cell_text.slice 1, cell_text.length).start_with? LF
-          end
+          lines_advanced = 1
+          lines_advanced += 1 while (cell_text = cell_text.slice 1, cell_text.length).start_with? LF
+          # NOTE this only works if we remain in the same file
+          inner_document_cursor.advance lines_advanced
         else
           cell_text = cell_text.lstrip
         end
@@ -265,7 +268,7 @@ class Table::Cell < AbstractNode
           inner_document_lines.unshift(*preprocessed_lines) unless preprocessed_lines.empty?
         end
       end unless inner_document_lines.empty?
-      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => opts[:cursor])
+      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => inner_document_cursor)
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
     end
     @text = cell_text

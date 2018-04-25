@@ -1085,10 +1085,10 @@ output file name is used.
       assert body_cell_1_3.inner_document.nested?
       assert_equal doc, body_cell_1_3.inner_document.parent_document
       assert_equal doc.converter, body_cell_1_3.inner_document.converter
-      assert_equal 5, body_cell_1_3.inner_document.lineno
+      # TODO assert that body_cell_1_3.lineno is 5 once source_location is available on cell
+      assert_equal 6, body_cell_1_3.inner_document.lineno
       note = (body_cell_1_3.inner_document.find_by :context => :admonition)[0]
-      # NOTE lineno is off by one due to leading blank line being stripped
-      assert_equal 8, note.lineno
+      assert_equal 9, note.lineno
       output = doc.convert
 
       assert_css 'table > tbody > tr', output, 2

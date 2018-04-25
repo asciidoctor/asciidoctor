@@ -11,6 +11,10 @@ class Reader
       @file, @dir, @path, @lineno = file, dir, path, lineno
     end
 
+    def advance num
+      @lineno += num
+    end
+
     def line_info
       %(#{@path}: line #{@lineno})
     end
