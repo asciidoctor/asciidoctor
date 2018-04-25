@@ -40,7 +40,9 @@ Enhancements::
   * add positioning option to sectanchors attribute (before or after) (#2485, PR #2486)
   * allow table stripes to be configured using stripe attribute or stripe roles on table; valid values are even, odd, all, and none (#1365, PR #2588)
   * allow nofollow rel property to be added to links and linked images by setting the nofollow option (#2605, PR #2692)
-  * assign Document#source_location when sourcemap option is enabled (#2478, PR #2488)
+  * populate Document#source_location when sourcemap option is enabled (#2478, PR #2488)
+  * populate source_location property on list items when sourcemap option is set on document (PR #2069) (@mogztter)
+  * populate Table::Cell#source_location when sourcemap option is enabled (#2705)
   * allow local include to be flagged as optional by setting optional option (#2389, PR #2413)
   * allow attribute name to contain word characters as defined by Unicode (#2376, PR #2393)
   * allow block title to begin with a period (#2358, PR #2359)
@@ -98,7 +100,6 @@ Bug fixes::
 Improvements / Refactoring::
 
   * use cursor marks to track lines more accurately; record cursor at the start of each block, list item, or table cell (PR #2701, PR #2547) (@seikichi)
-  * populate source_location property on list items when sourcemap option is set on document (PR #2069) (@mogztter)
   * log a warning message if an unterminated delimited block is detected (#1133, PR #2612)
   * log a warning when nested section is found inside special section that doesn't support nested sections (#2433, PR #2672)
   * read files in binary mode to disable automatic endline coercion (then explicitly coerce to UTF-8) (PR #2583, PR #2694)

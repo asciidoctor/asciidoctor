@@ -198,6 +198,9 @@ end
 
 # Public: Methods for managing the a cell in an AsciiDoc table.
 class Table::Cell < AbstractNode
+  # Public: Gets/Sets the location in the AsciiDoc source where this cell begins
+  attr_reader :source_location
+
   # Public: Get/Set the Symbol style for this cell (default: nil)
   attr_accessor :style
 
@@ -218,6 +221,7 @@ class Table::Cell < AbstractNode
 
   def initialize column, cell_text, attributes = {}, opts = {}
     super column, :cell
+    @source_location = opts[:cursor].dup if @document.sourcemap
     if column
       cell_style = column.attributes['style'] unless (in_header_row = column.table.header_row?)
       # REVIEW feels hacky to inherit all attributes from column
@@ -317,6 +321,16 @@ class Table::Cell < AbstractNode
         !@style || @style == :header ? p : Inline.new(parent, :quoted, p, :type => @style).convert
       end
     end
+  end
+
+  # Public: Get the source file where this block started
+  def file
+    @source_location && @source_location.file
+  end
+
+  # Public: Get the source line number where this block started
+  def lineno
+    @source_location && @source_location.lineno
   end
 
   def to_s

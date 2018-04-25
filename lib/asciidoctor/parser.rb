@@ -2272,7 +2272,7 @@ class Parser
     implicit_header = true unless skipped > 0 || (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
 
     while (line = table_reader.read_line)
-      if (loop_idx += 1) > 0 && line.empty?
+      if (beyond_first = (loop_idx += 1) > 0) && line.empty?
         line = nil
         implicit_header_boundary += 1 if implicit_header_boundary
       elsif format == 'psv'
@@ -2294,12 +2294,15 @@ class Parser
         end
       end
 
-      # NOTE implicit header is offset by at least one blank line; implicit_header_boundary tracks size of gap
-      if loop_idx == 0 && implicit_header
-        if table_reader.has_more_lines? && table_reader.peek_line.empty?
-          implicit_header_boundary = 1
-        else
-          implicit_header = false
+      unless beyond_first
+        table_reader.mark
+        # NOTE implicit header is offset by at least one blank line; implicit_header_boundary tracks size of gap
+        if implicit_header
+          if table_reader.has_more_lines? && table_reader.peek_line.empty?
+            implicit_header_boundary = 1
+          else
+            implicit_header = false
+          end
         end
       end
 
