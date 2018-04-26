@@ -1824,6 +1824,21 @@ term2:: def2
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
+    test 'should parse sibling items using same rules' do
+      input = <<-EOS
+term1;; ;; def1
+term2;; ;; def2
+      EOS
+      output = render_string input
+      assert_xpath '//dl', output, 1
+      assert_xpath '//dl/dt', output, 2
+      assert_xpath '//dl/dt/following-sibling::dd', output, 2
+      assert_xpath '(//dl/dt)[1][normalize-space(text()) = "term1"]', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = ";; def1"]', output, 1
+      assert_xpath '(//dl/dt)[2][normalize-space(text()) = "term2"]', output, 1
+      assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = ";; def2"]', output, 1
+    end
+
     test "single-line indented adjacent elements" do
       input = <<-EOS
 term1:: def1
