@@ -65,11 +65,12 @@ Asciidoctor also runs on the JVM using AsciidoctorJ and in JavaScript environmen
 Asciidoctor is open source, {uri-repo}[hosted on GitHub] and released under {uri-license}[the MIT license].
 
 ifndef::env-site[]
-Translations of this document are available in the following languages:
-
-* {uri-rel-file-base}README-zh_CN.adoc[汉语]
-* {uri-rel-file-base}README-fr.adoc[Français]
-* {uri-rel-file-base}README-jp.adoc[日本語]
+This document is also available in the following languages: +
+{uri-rel-file-base}README-zh_CN.adoc[汉语]
+|
+{uri-rel-file-base}README-fr.adoc[Français]
+|
+{uri-rel-file-base}README-jp.adoc[日本語]
 endif::[]
 
 .Key documentation
