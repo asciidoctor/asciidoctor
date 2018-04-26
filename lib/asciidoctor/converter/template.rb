@@ -161,7 +161,7 @@ module Asciidoctor
         end
       else
         metaclass.send :define_method, name do |node|
-          (template.render node).chomp
+          (template.render node).rstrip
         end
       end
     end
@@ -193,7 +193,7 @@ module Asciidoctor
       if template_name == 'document'
         (template.render node, opts).strip
       else
-        (template.render node, opts).chomp
+        (template.render node, opts).rstrip
       end
     end
 

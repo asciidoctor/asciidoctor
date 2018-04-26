@@ -24,7 +24,7 @@ class Stylesheets
   #
   # returns the [String] Asciidoctor stylesheet data
   def primary_stylesheet_data
-    @primary_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DATA_PATH, 'asciidoctor-default.css')).chomp
+    @primary_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DATA_PATH, 'asciidoctor-default.css')).rstrip
   end
 
   def embed_primary_stylesheet
@@ -49,7 +49,7 @@ class Stylesheets
     # unless load_coderay.nil?
     #   ::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
     # end
-    @coderay_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DATA_PATH, 'coderay-asciidoctor.css')).chomp
+    @coderay_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DATA_PATH, 'coderay-asciidoctor.css')).rstrip
   end
 
   def embed_coderay_stylesheet
