@@ -2870,6 +2870,23 @@ last question::
       assert_css 'bibliodiv > bibliomixed:nth-child(2) > bibliomisc > anchor[xreflabel="[walsh-muellner]"]', output, 1
     end
 
+    test 'should warn if a bibliography ID is already in use' do
+      input = <<-EOS
+[bibliography]
+* [[[Fowler]]] Fowler M. _Analysis Patterns: Reusable Object Models_.
+Addison-Wesley. 1997.
+* [[[Fowler]]] Fowler M. _Analysis Patterns: Reusable Object Models_.
+Addison-Wesley. 1997.
+      EOS
+      using_memory_logger do |logger|
+        output = render_embedded_string input
+        assert_css '.ulist.bibliography', output, 1
+        assert_css '.ulist.bibliography ul li:nth-child(1) p a#Fowler', output, 1
+        assert_css '.ulist.bibliography ul li:nth-child(2) p a#Fowler', output, 1
+        assert_message logger, :WARN, '<stdin>: line 4: id assigned to bibliography anchor already in use: Fowler', Hash
+      end
+    end
+
     test 'should automatically add bibliography style to top-level lists in bibliography section' do
       input = <<-EOS
 [bibliography]

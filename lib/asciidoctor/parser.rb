@@ -631,11 +631,10 @@ class Parser
 
       elsif UnorderedListRx.match? this_line
         reader.unshift_line this_line
-        block = next_item_list(reader, :ulist, parent)
-        if (style || (Section === parent && parent.sectname)) == 'bibliography'
-          attributes['style'] = 'bibliography' unless style
-          block.items.each {|item| catalog_inline_biblio_anchor item.instance_variable_get(:@text), item, document }
-        end
+        if Section === parent && parent.sectname == 'bibliography'
+          style = attributes['style'] = 'bibliography'
+        end unless style
+        block = next_item_list(reader, :ulist, parent, style)
         break
 
       elsif (match = OrderedListRx.match(this_line))
@@ -1101,13 +1100,9 @@ class Parser
   # style     - The block style assigned to this list (optional, default: nil)
   #
   # Returns the Block encapsulating the parsed outline (unordered or ordered) list
-  def self.next_item_list(reader, list_type, parent)
+  def self.next_item_list(reader, list_type, parent, style = nil)
     list_block = List.new(parent, list_type)
-    if parent.context == list_type
-      list_block.level = parent.level + 1
-    else
-      list_block.level = 1
-    end
+    list_block.level = parent.context == list_type ? (parent.level + 1) : 1
 
     while reader.has_more_lines? && ListRxMap[list_type] =~ reader.peek_line
       match, marker = $~, resolve_list_marker(list_type, $1)
@@ -1131,7 +1126,7 @@ class Parser
       end
 
       if !list_block.items? || this_item_level == list_block.level
-        list_item = next_list_item(reader, list_block, match)
+        list_item = next_list_item(reader, list_block, match, nil, style)
       elsif this_item_level < list_block.level
         # leave this block
         break
@@ -1216,17 +1211,16 @@ class Parser
 
   # Internal: Catalog the bibliography inline anchor found in the start of the list item (but don't convert)
   #
-  # text     - The String text in which to look for an inline bibliography anchor
-  # block    - The ListItem block in which the reference should be searched
-  # document - The current document in which the reference is stored
+  # id      - The String id of the anchor
+  # reftext - The optional String reference text of the anchor
+  # node    - The AbstractNode parent node of the anchor node
+  # reader  - The source Reader for the current Document, positioned at the current list item
   #
   # Returns nothing
-  def self.catalog_inline_biblio_anchor text, block, document
-    if InlineBiblioAnchorRx =~ text
-      # QUESTION should we sub attributes in reftext (like with regular anchors)?
-      unless document.register :refs, [(id = $1), (Inline.new block, :anchor, (reftext = %([#{$2 || id}])), :type => :bibref, :id => id), reftext]
-        logger.warn message_with_context %(id assigned to bibliography anchor already in use: #{id}), :source_location => document.reader.cursor_at_prev_line
-      end
+  def self.catalog_inline_biblio_anchor id, reftext, node, reader
+    # QUESTION should we sub attributes in reftext (like with regular anchors)?
+    unless node.document.register :refs, [id, (Inline.new node, :anchor, (styled_reftext = %([#{reftext || id}])), :type => :bibref, :id => id), styled_reftext]
+      logger.warn message_with_context %(id assigned to bibliography anchor already in use: #{id}), :source_location => reader.cursor
     end
     nil
   end
@@ -1278,7 +1272,7 @@ class Parser
   #
   # Returns the next ListItem or ListItem pair (depending on the list type)
   # for the parent list Block.
-  def self.next_list_item(reader, list_block, match, sibling_trait = nil)
+  def self.next_list_item(reader, list_block, match, sibling_trait = nil, style = nil)
     if (list_type = list_block.context) == :dlist
       dlist = true
       list_term = ListItem.new(list_block, (term_text = match[1]))
@@ -1302,15 +1296,21 @@ class Parser
       if list_type == :ulist
         list_item.marker = (sibling_trait ||= match[1])
         if item_text.start_with?('[')
-          if item_text.start_with?('[ ] ', '[x] ', '[*] ')
+          if style && style == 'bibliography'
+            if InlineBiblioAnchorRx =~ item_text
+              catalog_inline_biblio_anchor $1, $2, list_item, reader
+            end
+          elsif item_text.start_with?('[[')
+            if LeadingInlineAnchorRx =~ item_text
+              catalog_inline_anchor $1, $2, list_item, reader
+            end
+          elsif item_text.start_with?('[ ] ', '[x] ', '[*] ')
             # FIXME next_block wipes out update to options attribute
             #list_block.set_option 'checklist' unless list_block.attributes['checklist-option']
             list_block.attributes['checklist-option'] = ''
             list_item.attributes['checkbox'] = ''
             list_item.attributes['checked'] = '' unless item_text.start_with? '[ '
             list_item.text = item_text.slice(4, item_text.length)
-          elsif item_text.start_with?('[[') && LeadingInlineAnchorRx =~ item_text
-            catalog_inline_anchor $1, $2, list_item, reader
           end
         end
       elsif list_type == :olist
