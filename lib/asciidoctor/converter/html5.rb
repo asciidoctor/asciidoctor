@@ -507,8 +507,25 @@ Your browser does not support the audio tag.
         result << '<dl>'
         dt_style_attribute = node.style ? '' : ' class="hdlist1"'
         node.items.each do |terms, dd|
+          dtanchor_prefix = nil
+          if node.document.attr?('dtanchors') && node.document.attr?('sectids')
+            if dd.level <= 1
+              begin
+                if dd.parent.parent.context == :section
+                  dtanchor_prefix = dd.parent.parent.id
+                end
+              rescue
+              end
+            end
+          end
           [*terms].each do |dt|
-            result << %(<dt#{dt_style_attribute}>#{dt.text}</dt>)
+            dtanchor = dtanchor_id = ''
+            if dtanchor_prefix
+              dtanchor_suffix = dt.text.downcase.gsub(InvalidSectionIdCharsRx, '_').tr_s('_', '_').chomp('_')
+              dtanchor_id = %( id="#{dtanchor_prefix}-#{dtanchor_suffix}" )
+              dtanchor = %(<a class="anchor" href="##{dtanchor_prefix}-#{dtanchor_suffix}"></a>)
+            end
+            result << %(<dt#{dtanchor_id}#{dt_style_attribute}>#{dtanchor}#{dt.text}</dt>)
           end
           if dd
             result << '<dd>'
