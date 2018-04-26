@@ -80,17 +80,6 @@ endif::[]
 * {uri-docs}/asciidoc-syntax-quick-reference[AsciiDoc Syntax Reference]
 * {uri-docs}/user-manual[Asciidoctor User Manual]
 
-.Where Ruby goes, Asciidoctor follows
-****
-You can run Asciidoctor on the JVM using JRuby.
-To invoke the Asciidoctor API directly from Java and other JVM languages, use {uri-asciidoctorj}[AsciidoctorJ].
-There are plugins available, based on AsciidoctorJ, that integrate the Asciidoctor processor into Apache Maven, Gradle or Javadoc builds.
-
-Asciidoctor also runs in JavaScript.
-We use https://opalrb.com[Opal] to transcompile the Ruby source to JavaScript to produce {uri-asciidoctorjs}[Asciidoctor.js], a fully-functional version of Asciidoctor that works in any JavaScript environment, such as a web browser or Node.js.
-Asciidoctor.js is used to power the AsciiDoc preview extensions for Chrome, Atom, Brackets and other web-based tooling.
-****
-
 ifdef::status[]
 .*Project health*
 image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor]
@@ -117,6 +106,16 @@ The Asciidoctor test suite has {uri-tests}[> 2,000 tests] to ensure compatibilit
 
 In addition to the classic AsciiDoc syntax, Asciidoctor recognizes additional markup and formatting options, such as font-based icons (e.g., `+icon:fire[]+`) and UI elements (e.g., `+button:[Save]+`).
 Asciidoctor also offers a modern, responsive theme based on {uri-foundation}[Foundation] to style the HTML5 output.
+
+== Where Ruby goes, Asciidoctor follows
+
+You can run Asciidoctor on the JVM using JRuby.
+To invoke the Asciidoctor API directly from Java and other JVM languages, use {uri-asciidoctorj}[AsciidoctorJ].
+There are plugins available, based on AsciidoctorJ, that integrate the Asciidoctor processor into Apache Maven, Gradle or Javadoc builds.
+
+Asciidoctor also runs in JavaScript.
+We use https://opalrb.com[Opal] to transcompile the Ruby source to JavaScript to produce {uri-asciidoctorjs}[Asciidoctor.js], a fully-functional version of Asciidoctor that works in any JavaScript environment, such as a web browser or Node.js.
+Asciidoctor.js is used to power the AsciiDoc preview extensions for Chrome, Atom, Brackets and other web-based tooling.
 
 == Requirements
 
