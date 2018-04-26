@@ -159,10 +159,11 @@ Build / Infrastructure::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
 
 // tag::compact[]
 == 1.5.6.2 (2018-03-20) - @mojavelinux
@@ -190,10 +191,11 @@ Build / Infrastructure::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.2[git tag] |
@@ -246,10 +248,11 @@ Build / Infrastructure::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.1[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.1[git tag] |
@@ -462,10 +465,11 @@ Build / Infrastructure::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6[git tag] |
@@ -526,10 +530,11 @@ Infrastructure::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.5[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.5[git tag] |
@@ -585,10 +590,10 @@ Infrastructure::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.4[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.4[git tag] |
@@ -693,10 +698,10 @@ Infrastructure::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.3[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.3[git tag] |
@@ -747,10 +752,10 @@ Bug fixes::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.2[git tag] |
@@ -778,10 +783,10 @@ Improvements::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.1[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.1[git tag] |
@@ -968,10 +973,10 @@ Infrastructure::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?milestone=8&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.0[git tag] |
@@ -1102,10 +1107,10 @@ Improvements::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
-  * http://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-  * http://packages.ubuntu.com/saucy/asciidoctor[Ubuntu (asciidoctor)]
+  * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+  * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?milestone=7&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.4[git tag] |
@@ -1172,7 +1177,7 @@ Improvements::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
 
 http://asciidoctor.org/news/2013/05/31/asciidoctor-0-1-3-released[release notes] |
@@ -1228,7 +1233,7 @@ Bug Fixes::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
 
 http://asciidoctor.org/news/2013/04/25/asciidoctor-0-1-2-released[release notes] |
 https://github.com/asciidoctor/asciidoctor/issues?milestone=3&state=closed[issues resolved] |
@@ -1284,7 +1289,7 @@ Improvements::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?milestone=1&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.1[git tag] |
@@ -1336,7 +1341,7 @@ Improvements::
 
 Distribution Packages::
 
-  * http://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
+  * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?milestone=12&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.0[git tag] |
