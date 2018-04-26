@@ -89,7 +89,6 @@ image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master
 image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="https://inch-ci.org/github/asciidoctor/asciidoctor"]
 endif::[]
 
-ifndef::env-site[]
 == Sponsors
 
 We want to recognize our generous sponsors, without whose support Asciidoctor would not be possible.
@@ -103,7 +102,6 @@ Major funding for Asciidoctor is provided by our *Change Makers*, https://develo
 Additional funding is provided by our https://asciidoctor.org/supporters[Community Backers].
 
 You can support this project by becoming a sponsor on https://opencollective.com/asciidoctor[OpenCollective].
-endif::[]
 
 == The Big Picture
 
