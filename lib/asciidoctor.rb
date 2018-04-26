@@ -666,7 +666,7 @@ module Asciidoctor
     # Detects the start of any list item.
     #
     # NOTE we only have to check as far as the blank character because we know it means non-whitespace follows.
-    AnyListRx = /^(?:[ \t]*(?:-|\*\*{0,4}|\.\.{0,4}|\u2022\u2022{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|[ \t]*.*?(?::{2,4}|;;)(?:$|[ \t])|<?\d+>[ \t])/
+    AnyListRx = /^(?:[ \t]*(?:-|\*\*{0,4}|\.\.{0,4}|\u2022\u2022{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|[ \t]*.*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t])/
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -709,35 +709,34 @@ module Asciidoctor
     # Examples
     #
     #   foo::
-    #   foo:::
-    #   foo::::
-    #   foo;;
+    #   bar:::
+    #   baz::::
+    #   blah;;
     #
-    #   # the term can be followed by a description on the same line...
+    #   # the term may be followed by a description on the same line...
     #
-    #   foo:: That which precedes 'bar' (see also, <<bar>>)
+    #   foo:: The metasyntactic variable that commonly accompanies 'bar' (see also, <<bar>>).
     #
-    #   # ...or on a separate line (optionally indented)
+    #   # ...or on a separate line, which may optionally be indented
     #
     #   foo::
-    #     That which precedes 'bar' (see also, <<bar>>)
+    #     The metasyntactic variable that commonly accompanies 'bar' (see also, <<bar>>).
     #
-    #   # the term or description may be an attribute reference
+    #   # attribute references may be used in both the term and the description
     #
-    #   {foo_term}:: {foo_def}
+    #   {foo-term}:: {foo-desc}
     #
+    # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
     # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
     # TODO check for line comment when scanning lines instead of in regex
-    #
-    DescriptionListRx = %r(^(?!//)[ \t]*(.*?)(:{2,4}|;;)(?:[ \t]+(.*))?$)
+    DescriptionListRx = %r(^(?!//)[ \t]*(.*?)(:::{0,2}|;;)(?:$|[ \t]+(.*)$))
 
     # Matches a sibling description list item (which does not include the type in the key).
     DescriptionListSiblingRx = {
-      # (?:.*?[^:])? - a non-capturing group which grabs longest sequence of characters that doesn't end w/ colon
-      '::' => %r(^(?!//)[ \t]*((?:.*[^:])?)(::)(?:[ \t]+(.*))?$),
-      ':::' => %r(^(?!//)[ \t]*((?:.*[^:])?)(:::)(?:[ \t]+(.*))?$),
-      '::::' => %r(^(?!//)[ \t]*((?:.*[^:])?)(::::)(?:[ \t]+(.*))?$),
-      ';;' => %r(^(?!//)[ \t]*(.*)(;;)(?:[ \t]+(.*))?$)
+      '::' => %r(^(?!//)[ \t]*(.*[^:]|)(::)(?:$|[ \t]+(.*)$)),
+      ':::' => %r(^(?!//)[ \t]*(.*[^:]|)(:::)(?:$|[ \t]+(.*)$)),
+      '::::' => %r(^(?!//)[ \t]*(.*[^:]|)(::::)(?:$|[ \t]+(.*)$)),
+      ';;' => %r(^(?!//)[ \t]*(.*?)(;;)(?:$|[ \t]+(.*)$))
     }
 
     # Matches a callout list item.

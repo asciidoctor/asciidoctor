@@ -1260,9 +1260,9 @@ class Parser
   def self.next_list_item(reader, list_block, match, sibling_trait = nil)
     if (list_type = list_block.context) == :dlist
       dlist = true
-      has_text = true unless match[3].nil_or_empty?
+      has_text = true if (text = match[3])
       list_term = ListItem.new(list_block, match[1])
-      list_item = ListItem.new(list_block, match[3])
+      list_item = ListItem.new(list_block, text)
       if list_block.document.sourcemap
         list_term.source_location = reader.cursor
         if has_text
