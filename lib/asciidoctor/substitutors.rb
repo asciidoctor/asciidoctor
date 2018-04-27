@@ -1055,7 +1055,7 @@ module Substitutors
           if @document.attributes['docname'] == path || @document.catalog[:includes][path]
             if fragment
               refid, path, target = fragment, nil, %(##{fragment})
-              if logger.debug?
+              if $VERBOSE
                 logger.warn %(invalid reference: #{fragment}) unless @document.catalog[:ids].key? fragment
               end
             else
@@ -1074,7 +1074,7 @@ module Substitutors
                 ((fragment.include? ' ') || fragment.downcase != fragment) &&
                 (resolved_id = @document.catalog[:ids].key fragment)
               fragment = resolved_id
-            elsif logger.debug?
+            elsif $VERBOSE
               logger.warn %(invalid reference: #{fragment})
             end
           end

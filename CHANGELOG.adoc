@@ -110,7 +110,7 @@ Improvements / Refactoring::
   * posixify working_dir passed to PathResolver constructor if absolute (#2642, PR #2644)
   * optimize detection for footnote* and indexterm* macros (#2347, PR #2362)
   * log a warning if a footnote reference cannot be resolved (#2669)
-  * set logger to DEBUG when verbose is enabled; check logger.debug? instead of $VERBOSE
+  * set logger level to DEBUG when verbose is enabled
   * coerce value of template_dirs option to an Array (PR #2621)
   * block roles specified using shorthand syntax are additive (#2174)
   * allow paragraph to masquerade as open block (PR #2412)
