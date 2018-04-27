@@ -444,18 +444,18 @@ class Table::ParserContext
 
   # Public: Skip past the matched delimiter because it's inside quoted text.
   #
-  # returns the String after the match
-  def skip_past_delimiter(match)
-    @buffer = %(#{@buffer}#{match.pre_match}#{@delimiter})
-    match.post_match
+  # Returns nothing
+  def skip_past_delimiter(pre)
+    @buffer = %(#{@buffer}#{pre}#{@delimiter})
+    nil
   end
 
   # Public: Skip past the matched delimiter because it's escaped.
   #
-  # returns the String after the match
-  def skip_past_escaped_delimiter(match)
-    @buffer = %(#{@buffer}#{match.pre_match.chop}#{@delimiter})
-    match.post_match
+  # Returns nothing
+  def skip_past_escaped_delimiter(pre)
+    @buffer = %(#{@buffer}#{pre.chop}#{@delimiter})
+    nil
   end
 
   # Public: Determines whether the buffer has unclosed quotes. Used for CSV data.
