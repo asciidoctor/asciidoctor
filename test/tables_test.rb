@@ -229,7 +229,7 @@ three
       assert_equal %(<div class="verse">  one\n  two\nthree</div>), result.to_s
     end
 
-    test 'table and col width not assigned when autowidth option is specified' do
+    test 'table and column width not assigned when autowidth option is specified' do
       input = <<-EOS
 [options="autowidth"]
 |=======
@@ -240,6 +240,7 @@ three
       EOS
       output = render_embedded_string input
       assert_css 'table', output, 1
+      assert_css 'table.fit-content', output, 1
       assert_css 'table[style*="width"]', output, 0
       assert_css 'table colgroup col', output, 3
       assert_css 'table colgroup col[style*="width"]', output, 0

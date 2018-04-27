@@ -103,6 +103,7 @@ Bug fixes::
   * add block title to dlist in manpage output (#1611, PR #2434)
   * scale text to 80% in print styles (#1484, PR #2576)
   * fix alignment of abstract title when using default stylesheet (PR #2732)
+  * only set nowrap style on table caption for auto-width table (#2392)
   * output non-breaking space for man manual if absent in DocBook output (PR #2636)
 
 Improvements / Refactoring::
@@ -143,6 +144,7 @@ Improvements / Refactoring::
   * add compliance setting to disable natural cross references (#2405, PR #2460)
   * make hash in inter-document xref target optional if target has extension (#2404, PR #2406)
   * add CSS class to part that matches role (#2401, PR #2402)
+  * add fit-content class to auto-width table (#2392)
   * automatically assign parent reference when adding node to parent (#2398, PR #2403)
   * leave inline anchor in section title as is if section has ID (#2243, PR #2427)
   * align and improve error message about invalid use of partintro between HTML5 and DocBook converters

@@ -790,12 +790,12 @@ Your browser does not support the audio tag.
         classes << %(stripe-#{stripe})
       end
       styles = []
-      unless (node.option? 'autowidth') && !(node.attr? 'width', nil, false)
-        if node.attr? 'tablepcwidth', 100
-          classes << 'stretch'
-        else
-          styles << %(width: #{node.attr 'tablepcwidth'}%;)
-        end
+      if (node.option? 'autowidth') && !(node.attr? 'width', nil, false)
+        classes << 'fit-content'
+      elsif (pcwidth = node.attr 'tablepcwidth') == 100
+        classes << 'stretch'
+      else
+        styles << %(width: #{pcwidth}%;)
       end
       if (role = node.role)
         classes << role
