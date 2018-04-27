@@ -302,7 +302,7 @@ Improvements::
   * process include directive inside text of short form preprocessor conditional (#2146)
   * add support for include tags in languages that only support only circumfix comments (#1729)
   * allow spaces in target of block image; target must start and end with non-space (#1943)
-  * add warning in verbose mode if xref is not found (@fap-) (#2268)
+  * add warning in verbose mode if xref is not found (@fapdash) (#2268)
   * add warning if duplicate ID is detected (#2244)
   * validate that output file will not overwrite input file (#1956)
   * include docfile in warning when stylesheet cannot be read (#2089)
@@ -439,7 +439,7 @@ Bug fixes::
 
 Documentation::
   * enable admonition icons in README when displayed on GitHub
-  * add German translation of chapter-label (PR #1920) (@fap-)
+  * add German translation of chapter-label (PR #1920) (@fapdash)
   * add Ukrainian translation of built-in attributes (PR #1955) (@hedrok)
   * add Norwegian Nynorsk translation; updated Norwegian Bokmål translation of built-in attributes (PR #2142) (@huftis)
   * add Polish translation of built-in attributes (PR #2131) (@ldziedziul)
