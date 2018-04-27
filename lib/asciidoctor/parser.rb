@@ -634,13 +634,13 @@ class Parser
         if Section === parent && parent.sectname == 'bibliography'
           style = attributes['style'] = 'bibliography'
         end unless style
-        block = next_item_list(reader, :ulist, parent, style)
+        block = next_list(reader, :ulist, parent, style)
         break
 
       elsif (match = OrderedListRx.match(this_line))
         reader.unshift_line this_line
-        block = next_item_list(reader, :olist, parent)
-        # FIXME move this logic into next_item_list
+        block = next_list(reader, :olist, parent)
+        # FIXME move this logic into next_list
         unless style
           marker = block.items[0].marker
           if marker.start_with? '.'
@@ -1092,15 +1092,15 @@ class Parser
     end
   end
 
-  # Internal: Parse and construct an item list (ordered or unordered) from the current position of the Reader
+  # Internal: Parse and construct an ordered or unordered list at the current position of the Reader
   #
-  # reader    - The Reader from which to retrieve the outline list
+  # reader    - The Reader from which to retrieve the list
   # list_type - A Symbol representing the list type (:olist for ordered, :ulist for unordered)
-  # parent    - The parent Block to which this outline list belongs
+  # parent    - The parent Block to which this list belongs
   # style     - The block style assigned to this list (optional, default: nil)
   #
-  # Returns the Block encapsulating the parsed outline (unordered or ordered) list
-  def self.next_item_list(reader, list_type, parent, style = nil)
+  # Returns the Block encapsulating the parsed unordered or ordered list
+  def self.next_list(reader, list_type, parent, style = nil)
     list_block = List.new(parent, list_type)
     list_block.level = parent.context == list_type ? (parent.level + 1) : 1
 
@@ -1254,9 +1254,9 @@ class Parser
     list_block
   end
 
-  # Internal: Parse and construct the next ListItem for the current bulleted
-  # (unordered or ordered) list Block, callout lists included, or the next
-  # term ListItem and description ListItem pair for the description list Block.
+  # Internal: Parse and construct the next ListItem for the current list Block
+  # (unordered, ordered, or callout list) or the term ListItem and description
+  # ListItem pair for the description list Block.
   #
   # First collect and process all the lines that constitute the next list
   # item for the parent list (according to its type). Next, parse those lines
