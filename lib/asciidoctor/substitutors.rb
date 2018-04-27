@@ -1052,7 +1052,7 @@ module Substitutors
           logger.warn %(invalid reference: #{refid}) if $VERBOSE && !(doc.catalog[:ids].key? refid)
         # handles: path#, path.adoc#, path#id, path.adoc#id, or path (from path.adoc)
         elsif path
-          # the referenced path is this document, or its contents has been included in this document
+          # the referenced path is the current document, or its contents have been included in the current document
           if doc.attributes['docname'] == path || doc.catalog[:includes][path]
             if fragment
               refid, path, target = fragment, nil, %(##{fragment})
@@ -1061,23 +1061,28 @@ module Substitutors
               refid, path, target = nil, nil, '#'
             end
           else
-            refid = fragment ? %(#{path}##{fragment}) : path
+            refid = path
             path = %(#{doc.attributes['relfileprefix']}#{path}#{doc.attributes.fetch 'outfilesuffix', '.html'})
-            target = fragment ? %(#{path}##{fragment}) : path
-          end
-        # handles: id or Node Title or Reference Text
-        else
-          # do reverse lookup on fragment if not a known ID and resembles reftext (contains a space or uppercase char)
-          unless doc.catalog[:ids].key? fragment
-            if Compliance.natural_xrefs && !doc.compat_mode &&
-                ((fragment.include? ' ') || fragment.downcase != fragment) &&
-                (resolved_id = doc.catalog[:ids].key fragment)
-              fragment = resolved_id
-            elsif $VERBOSE
-              logger.warn %(invalid reference: #{fragment})
+            if fragment
+              refid, target = %(#{refid}##{fragment}), %(#{path}##{fragment})
+            else
+              target = path
             end
           end
+        # handles: id (in compat mode or when natural xrefs are disabled)
+        elsif doc.compat_mode || !Compliance.natural_xrefs
           refid, target = fragment, %(##{fragment})
+          logger.warn %(invalid reference: #{refid}) if $VERBOSE && !(doc.catalog[:ids].key? refid)
+        # handles: id
+        elsif doc.catalog[:ids].key? fragment
+          refid, target = fragment, %(##{fragment})
+        # handles: Node Title or Reference Text
+        # do reverse lookup on fragment if not a known ID and resembles reftext (contains a space or uppercase char)
+        elsif (refid = doc.catalog[:ids].key fragment) && ((fragment.include? ' ') || fragment.downcase != fragment)
+          fragment, target = refid, %(##{refid})
+        else
+          refid, target = fragment, %(##{fragment})
+          logger.warn %(invalid reference: #{refid}) if $VERBOSE
         end
         attrs['path'], attrs['fragment'], attrs['refid'] = path, fragment, refid
         Inline.new(self, :anchor, text, :type => :xref, :target => target, :attributes => attrs).convert
