@@ -302,10 +302,9 @@ class Minitest::Test
         Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
   end
 
-  def using_memory_logger debug = false
+  def using_memory_logger
     old_logger = Asciidoctor::LoggerManager.logger
     memory_logger = Asciidoctor::MemoryLogger.new
-    memory_logger.level = Logger::Severity::DEBUG if debug
     begin
       Asciidoctor::LoggerManager.logger = memory_logger
       yield memory_logger
@@ -317,12 +316,9 @@ class Minitest::Test
   def in_verbose_mode
     begin
       old_verbose, $VERBOSE = $VERBOSE, true
-      old_logger_level = Asciidoctor::LoggerManager.logger.level
-      Asciidoctor::LoggerManager.logger.level = Logger::Severity::DEBUG
       yield
     ensure
       $VERBOSE = old_verbose
-      Asciidoctor::LoggerManager.logger.level = old_logger_level
     end
   end
 

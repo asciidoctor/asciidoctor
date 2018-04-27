@@ -470,22 +470,26 @@ anchor:foo[b[a\]r]text'
   end
 
   test 'xref using angled bracket syntax with path which has been included in this document' do
-    using_memory_logger true do |logger|
-      doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
-      doc.catalog[:includes]['tigers'] = true
-      output = doc.convert
-      assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-      assert_message logger, :WARN, 'invalid reference: about'
+    using_memory_logger do |logger|
+      in_verbose_mode do
+        doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false
+        doc.catalog[:includes]['tigers'] = true
+        output = doc.convert
+        assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
+        assert_message logger, :WARN, 'invalid reference: about'
+      end
     end
   end
 
   test 'xref using angled bracket syntax with nested path which has been included in this document' do
-    using_memory_logger true do |logger|
-      doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
-      doc.catalog[:includes]['part1/tigers'] = true
-      output = doc.convert
-      assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-      assert_message logger, :WARN, 'invalid reference: about'
+    using_memory_logger do |logger|
+      in_verbose_mode do
+        doc = document_from_string '<<part1/tigers#about,About Tigers>>', :header_footer => false
+        doc.catalog[:includes]['part1/tigers'] = true
+        output = doc.convert
+        assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
+        assert_message logger, :WARN, 'invalid reference: about'
+      end
     end
   end
 
@@ -642,10 +646,30 @@ see <<foo>>'
 
 See <<foobaz>>.
     EOS
-    using_memory_logger true do |logger|
-      output = render_embedded_string input
-      assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-      assert_message logger, :WARN, 'invalid reference: foobaz'
+    using_memory_logger do |logger|
+      in_verbose_mode do
+        output = render_embedded_string input
+        assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
+        assert_message logger, :WARN, 'invalid reference: foobaz'
+      end
+    end
+  end
+
+  test 'should warn and create link if verbose flag is set and reference using # notation is not found' do
+    input = <<-EOS
+[#foobar]
+== Foobar
+
+== Section B
+
+See <<#foobaz>>.
+    EOS
+    using_memory_logger do |logger|
+      in_verbose_mode do
+        output = render_embedded_string input
+        assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
+        assert_message logger, :WARN, 'invalid reference: foobaz'
+      end
     end
   end
 
@@ -721,10 +745,12 @@ include::other-chapters.adoc[tags=ch2]
 
 See <<test.adoc#foobaz>>.
     EOS
-    using_memory_logger true do |logger|
-      output = render_embedded_string input, :attributes => { 'docname' => 'test' }
-      assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-      assert_message logger, :WARN, 'invalid reference: foobaz'
+    using_memory_logger do |logger|
+      in_verbose_mode do
+        output = render_embedded_string input, :attributes => { 'docname' => 'test' }
+        assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
+        assert_message logger, :WARN, 'invalid reference: foobaz'
+      end
     end
   end
 
