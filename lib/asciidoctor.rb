@@ -841,6 +841,9 @@ module Asciidoctor
     # Scans for a non-escaped anchor (i.e., id + optional reference text) in the flow of text.
     InlineAnchorScanRx = /(?:^|[^\\\[])\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]|(?:^|[^\\])anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\])/
 
+    # Scans for a leading, non-escaped anchor (i.e., id + optional reference text).
+    LeadingInlineAnchorRx = /^\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]/
+
     # Matches a bibliography anchor at the start of the list item text (in a bibliography list).
     #
     # Examples
