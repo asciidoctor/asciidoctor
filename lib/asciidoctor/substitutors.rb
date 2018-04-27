@@ -1049,15 +1049,14 @@ module Substitutors
         # handles: #id
         if target
           refid = fragment
+          logger.warn %(invalid reference: #{refid}) if $VERBOSE && !(@document.catalog[:ids].key? refid)
         # handles: path#, path.adoc#, path#id, path.adoc#id, or path (from path.adoc)
         elsif path
           # the referenced path is this document, or its contents has been included in this document
           if @document.attributes['docname'] == path || @document.catalog[:includes][path]
             if fragment
               refid, path, target = fragment, nil, %(##{fragment})
-              if $VERBOSE
-                logger.warn %(invalid reference: #{fragment}) unless @document.catalog[:ids].key? fragment
-              end
+              logger.warn %(invalid reference: #{refid}) if $VERBOSE && !(@document.catalog[:ids].key? refid)
             else
               refid, path, target = nil, nil, '#'
             end

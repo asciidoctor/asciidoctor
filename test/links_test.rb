@@ -655,6 +655,24 @@ See <<foobaz>>.
     end
   end
 
+  test 'should warn and create link if verbose flag is set and reference using # notation is not found' do
+    input = <<-EOS
+[#foobar]
+== Foobar
+
+== Section B
+
+See <<#foobaz>>.
+    EOS
+    using_memory_logger do |logger|
+      in_verbose_mode do
+        output = render_embedded_string input
+        assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
+        assert_message logger, :WARN, 'invalid reference: foobaz'
+      end
+    end
+  end
+
   test 'should produce an internal anchor from an inter-document xref to file included into current file' do
     input = <<-'EOS'
 = Book Title
