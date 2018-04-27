@@ -320,8 +320,8 @@ class PathResolver
   # jail   - the String jail path to which to confine the resolved path, if specified; must be an
   #          absolute path (default: nil)
   # opts   - an optional Hash of options to control processing (default: {}):
-  #          * :recover is used to control whether the processor should auto-recover when an illegal
-  #              path is encountered
+  #          * :recover is used to control whether the processor should
+  #            automatically recover when an illegal path is encountered
   #          * :target_name is used in messages to refer to the path being resolved
   #
   # returns a String path relative to the start path, if specified, and confined to the jail path,
@@ -338,7 +338,7 @@ class PathResolver
         target_path = expand_path target
         if jail && !(descends_from? target_path, jail)
           if opts.fetch :recover, true
-            logger.warn %(#{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
+            logger.warn %(#{opts[:target_name] || 'path'} is outside of jail; recovering automatically)
             target_segments, _ = partition_path target_path
             jail_segments, jail_root = partition_path jail
             return join_path jail_segments + target_segments, jail_root
@@ -382,7 +382,7 @@ class PathResolver
       jail_segments, jail_root = partition_path jail
       if start_root != jail_root
         if opts.fetch :recover, true
-          logger.warn %(start path for #{opts[:target_name] || 'path'} is outside of jail root, auto-recovering)
+          logger.warn %(start path for #{opts[:target_name] || 'path'} is outside of jail root; recovering automatically)
           start_segments = jail_segments
           recheck = false
         else
@@ -404,7 +404,7 @@ class PathResolver
               resolved_segments.pop
             elsif opts.fetch :recover, true
               unless warned
-                logger.warn %(#{opts[:target_name] || 'path'} has illegal reference to ancestor of jail, auto-recovering)
+                logger.warn %(#{opts[:target_name] || 'path'} has illegal reference to ancestor of jail; recovering automatically)
                 warned = true
               end
             else
@@ -426,7 +426,7 @@ class PathResolver
       if descends_from? target_path, jail
         target_path
       elsif opts.fetch :recover, true
-        logger.warn %(#{opts[:target_name] || 'path'} is outside of jail, auto-recovering)
+        logger.warn %(#{opts[:target_name] || 'path'} is outside of jail; recovering automatically)
         jail_segments, _ = partition_path jail unless jail_segments
         join_path jail_segments + target_segments, jail_root
       else

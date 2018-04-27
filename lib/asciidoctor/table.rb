@@ -556,7 +556,7 @@ class Table::ParserContext
       if (cellspec = take_cellspec)
         repeat = cellspec.delete('repeatcol') || 1
       else
-        logger.error message_with_context 'table missing leading separator, recovering automatically', :source_location => Reader::Cursor.new(*@start_cursor_data)
+        logger.error message_with_context 'table missing leading separator; recovering automatically', :source_location => Reader::Cursor.new(*@start_cursor_data)
         cellspec = {}
         repeat = 1
       end

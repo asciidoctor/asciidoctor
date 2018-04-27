@@ -165,7 +165,7 @@ A | here| a | there
         assert_xpath '/table/tbody/tr[1]/td[2]/p[text()="here"]', output, 1
         assert_xpath '/table/tbody/tr[1]/td[3]/p[text()="a"]', output, 1
         assert_xpath '/table/tbody/tr[1]/td[4]/p[text()="there"]', output, 1
-        assert_message logger, :ERROR, '<stdin>: line 2: table missing leading separator, recovering automatically', Hash
+        assert_message logger, :ERROR, '<stdin>: line 2: table missing leading separator; recovering automatically', Hash
       end
     end
 
