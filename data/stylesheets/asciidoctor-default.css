@@ -397,8 +397,8 @@ p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
 h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
 #toc,.sidebarblock,.exampleblock>.content{background:none!important}
 #toc{border-bottom:1px solid #ddddd8!important;padding-bottom:0!important}
-.sect1{padding-bottom:0!important}
-.sect1+.sect1{border:0!important}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
 #header>h1:first-child{margin-top:1.25rem}
 body.book #header{text-align:center}
 body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em 0}
@@ -409,11 +409,15 @@ body.book #header .details br+span::before{content:none!important}
 body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
 body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
 .listingblock code[data-lang]::before{display:block}
-#footer{background:none!important;padding:0 .9375em}
-#footer-text{color:rgba(0,0,0,.6)!important;font-size:.9em}
+#footer{background:none;padding:0 .9375em}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}
 .hide-on-print{display:none!important}
 .print-only{display:block!important}
 .hide-for-print{display:none!important}
 .show-for-print{display:inherit!important}}
-@media amzn-kf8{p{line-height:1}
-#header,#content,#footnotes,#footer{padding-left:0em;padding-right:0em}}
+@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0;max-width:none}
+#header>h1:first-child{margin-top:1.25rem}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
+#footer{background:none}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
