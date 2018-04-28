@@ -2337,38 +2337,42 @@ class Parser
       # this loop is used for flow control; internal logic controls how many times it executes
       while true
         if line && (m = parser_ctx.match_delimiter line)
+          pre_match, post_match = m.pre_match, m.post_match
           case format
           when 'csv'
-            if parser_ctx.buffer_has_unclosed_quotes? m.pre_match
-              break if (line = parser_ctx.skip_past_delimiter m).empty?
+            if parser_ctx.buffer_has_unclosed_quotes? pre_match
+              parser_ctx.skip_past_delimiter pre_match
+              break if (line = post_match).empty?
               redo
             end
-            parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
+            parser_ctx.buffer = %(#{parser_ctx.buffer}#{pre_match})
           when 'dsv'
-            if m.pre_match.end_with? '\\'
-              if (line = parser_ctx.skip_past_escaped_delimiter m).empty?
+            if pre_match.end_with? '\\'
+              parser_ctx.skip_past_escaped_delimiter pre_match
+              if (line = post_match).empty?
                 parser_ctx.buffer = %(#{parser_ctx.buffer}#{LF})
                 parser_ctx.keep_cell_open
                 break
               end
               redo
             end
-            parser_ctx.buffer = %(#{parser_ctx.buffer}#{m.pre_match})
+            parser_ctx.buffer = %(#{parser_ctx.buffer}#{pre_match})
           else # psv
-            if m.pre_match.end_with? '\\'
-              if (line = parser_ctx.skip_past_escaped_delimiter m).empty?
+            if pre_match.end_with? '\\'
+              parser_ctx.skip_past_escaped_delimiter pre_match
+              if (line = post_match).empty?
                 parser_ctx.buffer = %(#{parser_ctx.buffer}#{LF})
                 parser_ctx.keep_cell_open
                 break
               end
               redo
             end
-            next_cellspec, cell_text = parse_cellspec m.pre_match
+            next_cellspec, cell_text = parse_cellspec pre_match
             parser_ctx.push_cellspec next_cellspec
             parser_ctx.buffer = %(#{parser_ctx.buffer}#{cell_text})
           end
           # don't break if empty to preserve empty cell found at end of line (see issue #1106)
-          line = nil if (line = m.post_match).empty?
+          line = nil if (line = post_match).empty?
           parser_ctx.close_cell
         else
           # no other delimiters to see here; suck up this line into the buffer and move on
