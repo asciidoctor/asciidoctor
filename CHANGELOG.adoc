@@ -919,7 +919,7 @@ Compliance::
   * automatically wrap part intro content in partintro block, emit warning if part is invalid (#768)
   * force encoding of docinfo content to UTF-8 (#773)
   * add scaling & alignment attributes to block image in DocBook backend (#763)
-  * add support for pass:[anchor:<id>[<reftext>\]] macro (#531)
+  * add support for \anchor:<id>[<reftext>] macro (#531)
   * substitute anchor and xref macros in footnotes (#676)
   * remove all string mutation operations for compatibility with Opal (#735)
   * honor reftext defined in embedded section title anchor (#697)
