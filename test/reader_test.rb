@@ -986,6 +986,23 @@ include::fixtures/#{filename}[tag=snippet,indent=0]
         end
       end
 
+      test 'include directive supports selecting tagged lines in file that has CRLF endlines' do
+        begin
+          tmp_include = Tempfile.new %w(include- .adoc)
+          tmp_include_dir, tmp_include_path = File.split tmp_include.path
+          tmp_include.write %(do not include\r\ntag::include-me[]\r\nincluded line\r\nend::include-me[]\r\ndo not include\r\n)
+          tmp_include.close
+          input = <<-EOS
+include::#{tmp_include_path}[tag=include-me]
+          EOS
+          output = render_embedded_string input, :safe => :safe, :base_dir => tmp_include_dir
+          assert_includes output, 'included line'
+          refute_includes output, 'do not include'
+        ensure
+          tmp_include.close!
+        end 
+      end
+
       test 'include directive does not select lines with tag directives within selected tag region' do
         input = <<-EOS
 ++++

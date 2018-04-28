@@ -500,11 +500,7 @@ module Asciidoctor
     #     log(e);
     #   }
     #   // end::try-catch[]
-    if RUBY_ENGINE == 'opal'
-      TagDirectiveRx = /\b(?:tag|(e)nd)::(\S+)\[\](?=$| )/m
-    else
-      TagDirectiveRx = /\b(?:tag|(e)nd)::(\S+)\[\](?=$| )/
-    end
+    TagDirectiveRx = /\b(?:tag|(e)nd)::(\S+?)\[\][\n \r]/
 
     ## Attribute entries and references
 

@@ -13,6 +13,7 @@ require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
 
 require 'socket'
 require 'nokogiri'
+require 'tempfile'
 require 'tmpdir'
 
 autoload :FileUtils, 'fileutils'
