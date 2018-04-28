@@ -955,6 +955,46 @@ content
       assert_xpath '(//articleinfo/authorgroup/author)[2]/email[text() = "junior@asciidoc.org"]', output, 1
     end
 
+    test 'should populate copyright element in DocBook output if copyright attribute is defined' do
+      input = <<-EOS
+= Jet Bike
+:copyright: ACME, Inc.
+
+Essential for catching road runners.
+      EOS
+      output = render_string input, :backend => 'docbook5'
+      assert_xpath '/article/info/copyright', output, 1
+      assert_xpath '/article/info/copyright/holder[text()="ACME, Inc."]', output, 1
+    end
+
+    test 'should populate copyright element in DocBook output if copyright attribute is defined with year' do
+      input = <<-EOS
+= Jet Bike
+:copyright: ACME, Inc. 1956
+
+Essential for catching road runners.
+      EOS
+      output = render_string input, :backend => 'docbook5'
+      assert_xpath '/article/info/copyright', output, 1
+      assert_xpath '/article/info/copyright/holder[text()="ACME, Inc."]', output, 1
+      assert_xpath '/article/info/copyright/year', output, 1
+      assert_xpath '/article/info/copyright/year[text()="1956"]', output, 1
+    end
+
+    test 'should populate copyright element in DocBook output if copyright attribute is defined with year range' do
+      input = <<-EOS
+= Jet Bike
+:copyright: ACME, Inc. 1956-2018
+
+Essential for catching road runners.
+      EOS
+      output = render_string input, :backend => 'docbook5'
+      assert_xpath '/article/info/copyright', output, 1
+      assert_xpath '/article/info/copyright/holder[text()="ACME, Inc."]', output, 1
+      assert_xpath '/article/info/copyright/year', output, 1
+      assert_xpath '/article/info/copyright/year[text()="1956-2018"]', output, 1
+    end
+
     test 'with header footer' do
       doc = document_from_string "= Title\n\nparagraph"
       refute doc.attr?('embedded')
