@@ -246,6 +246,73 @@ three
       assert_css 'table colgroup col[style*="width"]', output, 0
     end
 
+    test 'does not assign column width for autowidth columns in HTML output' do
+      input = <<-EOS
+[cols="15%,3*~"]
+|=======
+|A |B |C |D
+|a |b |c |d
+|1 |2 |3 |4
+|=======
+      EOS
+      doc = document_from_string input
+      table_row0 = doc.blocks[0].rows.body[0]
+      assert_equal 15, table_row0[0].attributes['width']
+      assert_equal 15, table_row0[0].attributes['colpcwidth']
+      refute_equal '', table_row0[0].attributes['autowidth-option']
+      expected_pcwidths = { 1 => 28.3333, 2 => 28.3333, 3 => 28.3334 }
+      (1..3).each do |i|
+        assert_equal 28.3333, table_row0[i].attributes['width']
+        assert_equal expected_pcwidths[i], table_row0[i].attributes['colpcwidth']
+        assert_equal '', table_row0[i].attributes['autowidth-option']
+      end
+      output = doc.convert :header_footer => false
+      assert_css 'table', output, 1
+      assert_css 'table colgroup col', output, 4
+      assert_css 'table colgroup col[style]', output, 1
+      assert_css 'table colgroup col[style*="width: 15%"]', output, 1
+    end
+
+    test 'can assign autowidth to all columns' do
+      input = <<-EOS
+[cols="4*~"]
+|=======
+|A |B |C |D
+|a |b |c |d
+|1 |2 |3 |4
+|=======
+      EOS
+      doc = document_from_string input
+      table_row0 = doc.blocks[0].rows.body[0]
+      (0..3).each do |i|
+        assert_equal 25, table_row0[i].attributes['width']
+        assert_equal 25, table_row0[i].attributes['colpcwidth']
+        assert_equal '', table_row0[i].attributes['autowidth-option']
+      end
+      output = doc.convert :header_footer => false
+      assert_css 'table', output, 1
+      assert_css 'table colgroup col', output, 4
+      assert_css 'table colgroup col[style]', output, 0
+    end
+
+    test 'equally distributes remaining column width to autowidth columns in DocBook output' do
+      input = <<-EOS
+[cols="15%,3*~"]
+|=======
+|A |B |C |D
+|a |b |c |d
+|1 |2 |3 |4
+|=======
+      EOS
+      output = render_embedded_string input, :backend => 'docbook5'
+      assert_css 'tgroup[cols="4"]', output, 1
+      assert_css 'tgroup colspec', output, 4
+      assert_css 'tgroup colspec[colwidth]', output, 4
+      assert_css 'tgroup colspec[colwidth="15*"]', output, 1
+      assert_css 'tgroup colspec[colwidth="28.3333*"]', output, 2
+      assert_css 'tgroup colspec[colwidth="28.3334*"]', output, 1
+    end
+
     test 'explicit table width is used even when autowidth option is specified' do
       input = <<-EOS
 [%autowidth,width=75%]

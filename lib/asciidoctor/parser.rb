@@ -2457,9 +2457,12 @@ class Parser
           end
         end
 
-        # to_i permits us to support percentage width by stripping the %
-        # NOTE this is slightly out of compliance w/ AsciiDoc, but makes way more sense
-        spec['width'] = (m[3] ? m[3].to_i : 1)
+        if (width = m[3])
+          # to_i will strip the optional %
+          spec['width'] = width == '~' ? -1 : width.to_i
+        else
+          spec['width'] = 1
+        end
 
         # make this an operation
         if m[4] && TableCellStyles.key?(m[4])

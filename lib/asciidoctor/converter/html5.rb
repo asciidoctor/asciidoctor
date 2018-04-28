@@ -790,12 +790,12 @@ Your browser does not support the audio tag.
         classes << %(stripe-#{stripe})
       end
       styles = []
-      if (node.option? 'autowidth') && !(node.attr? 'width', nil, false)
+      if (autowidth = node.attributes['autowidth-option']) && !(node.attr? 'width', nil, false)
         classes << 'fit-content'
-      elsif (pcwidth = node.attr 'tablepcwidth') == 100
+      elsif (tablewidth = node.attr 'tablepcwidth') == 100
         classes << 'stretch'
       else
-        styles << %(width: #{pcwidth}%;)
+        styles << %(width: #{tablewidth}%;)
       end
       if (role = node.role)
         classes << role
@@ -809,11 +809,11 @@ Your browser does not support the audio tag.
       if (node.attr 'rowcount') > 0
         slash = @void_element_slash
         result << '<colgroup>'
-        if node.option? 'autowidth'
+        if autowidth
           result += (Array.new node.columns.size, %(<col#{slash}>))
         else
           node.columns.each do |col|
-            result << %(<col style="width: #{col.attr 'colpcwidth'}%;"#{slash}>)
+            result << (col.attributes['autowidth-option'] ? %(<col#{slash}>) : %(<col style="width: #{col.attr 'colpcwidth'}%;"#{slash}>))
           end
         end
         result << '</colgroup>'

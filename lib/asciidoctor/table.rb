@@ -3,6 +3,8 @@ module Asciidoctor
 # Public: Methods and constants for managing AsciiDoc table content in a document.
 # It supports all three of AsciiDoc's table formats: psv, dsv and csv.
 class Table < AbstractBlock
+  # multipler / divisor for tuning precision of calculated result
+  DEFAULT_PRECISION_FACTOR = 10000.0
 
   # Public: A data object that encapsulates the collection of rows (head, foot, body) for a table
   class Rows
@@ -79,14 +81,21 @@ class Table < AbstractBlock
   # returns nothing
   def create_columns colspecs
     cols = []
+    autowidth_cols = nil
     width_base = 0
     colspecs.each do |colspec|
-      width_base += colspec['width']
+      colwidth = colspec['width']
       cols << (Column.new self, cols.size, colspec)
+      if colwidth < 0
+        (autowidth_cols ||= []) << cols[-1]
+      else
+        width_base += colwidth
+      end
     end
-    unless (@columns = cols).empty?
-      @attributes['colcount'] = cols.size
-      assign_column_widths(width_base == 0 ? nil : width_base)
+    if (num_cols = (@columns = cols).size) > 0
+      @attributes['colcount'] = num_cols
+      width_base = nil unless width_base > 0 || autowidth_cols
+      assign_column_widths width_base, autowidth_cols
     end
     nil
   end
@@ -101,11 +110,23 @@ class Table < AbstractBlock
   # width_base - the total of the relative column values used for calculating percentage widths (default: nil)
   #
   # returns nothing
-  def assign_column_widths width_base = nil
-    pf = 10.0 ** 4 # precision factor (multipler / divisor) for managing precision of calculated result
+  def assign_column_widths width_base = nil, autowidth_cols = nil
+    pf = DEFAULT_PRECISION_FACTOR
     total_width = col_pcwidth = 0
 
     if width_base
+      if autowidth_cols
+        if width_base > 100
+          autowidth = 0
+          logger.warn %(total column width must not exceed 100% when using autowidth columns; got #{width_base}%)
+        else
+          autowidth = ((100.0 - width_base) / autowidth_cols.size * pf).to_i / pf
+          autowidth = autowidth.to_i if autowidth.to_i == autowidth
+          width_base = 100
+        end
+        autowidth_attrs = { 'width' => autowidth, 'autowidth-option' => '' }
+        autowidth_cols.each {|col| col.update_attributes autowidth_attrs }
+      end
       @columns.each {|col| total_width += (col_pcwidth = col.assign_width nil, width_base, pf) }
     else
       col_pcwidth = ((100 * pf / @columns.size).to_i) / pf

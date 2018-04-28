@@ -50,6 +50,7 @@ Enhancements::
   * allow block title to begin with a period (#2358, PR #2359)
   * catalog inline anchor at start of list item in ordered and unordered lists, description list term, and table cell (#2257)
   * register document in catalog if id is set; assign reftext to document attributes if specified in a block attribute line (#2301, PR #2428)
+  * allow automatic width to be applied to individual columns in a table using the special value `~` (#1844)
   * use the quote element in DocBook converter for smart quotes (#2272, PR #2356) (*@bk2204*)
   * parse and pass all manpage names to output document master (shadow man pages) (#1811, #2543, PR #2414)
   * parse credit line of shorthand quote block as block attributes; apply normal subs to credit line in shorthand quote blocks (#1667, PR #2452)
