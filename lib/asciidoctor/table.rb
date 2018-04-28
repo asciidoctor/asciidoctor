@@ -48,7 +48,7 @@ class Table < AbstractBlock
 
     @has_header_option = attributes.key? 'header-option'
 
-    # smell like we need a utility method here
+    # smells like we need a utility method here
     # to resolve an integer width from potential bogus input
     if (pcwidth = attributes['width'])
       if (pcwidth_intval = pcwidth.to_i) > 100 || pcwidth_intval < 1

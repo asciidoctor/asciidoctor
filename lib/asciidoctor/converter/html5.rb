@@ -810,10 +810,7 @@ Your browser does not support the audio tag.
         slash = @void_element_slash
         result << '<colgroup>'
         if node.option? 'autowidth'
-          tag = %(<col#{slash}>)
-          node.columns.size.times do
-            result << tag
-          end
+          result += (Array.new node.columns.size, %(<col#{slash}>))
         else
           node.columns.each do |col|
             result << %(<col style="width: #{col.attr 'colpcwidth'}%;"#{slash}>)
