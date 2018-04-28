@@ -134,17 +134,17 @@ context 'Path Resolver' do
     test 'prevents access to paths outside of jail' do
       result = @resolver.system_path '../../../../../css', %(#{JAIL}/assets/stylesheets), JAIL
       assert_equal %(#{JAIL}/css), result
-      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail; recovering automatically'
 
       @logger.clear
       result = @resolver.system_path '/../../../../../css', %(#{JAIL}/assets/stylesheets), JAIL
       assert_equal %(#{JAIL}/css), result
-      assert_message @logger, :WARN, 'path is outside of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path is outside of jail; recovering automatically'
 
       @logger.clear
       result = @resolver.system_path '../../../css', '../../..', JAIL
       assert_equal %(#{JAIL}/css), result
-      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail; recovering automatically'
     end
 
     test 'throws exception for illegal path access if recover is false' do
@@ -176,23 +176,23 @@ context 'Path Resolver' do
     test 'treats absolute target outside of jail as relative when jail is specified' do
       result = @resolver.system_path '/', "#{JAIL}/assets/stylesheets", JAIL
       assert_equal JAIL, result
-      assert_message @logger, :WARN, 'path is outside of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path is outside of jail; recovering automatically'
 
       @logger.clear
       result = @resolver.system_path '/foo', "#{JAIL}/assets/stylesheets", JAIL
       assert_equal "#{JAIL}/foo", result
-      assert_message @logger, :WARN, 'path is outside of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path is outside of jail; recovering automatically'
 
       @logger.clear
       result = @resolver.system_path '/../foo', "#{JAIL}/assets/stylesheets", JAIL
       assert_equal "#{JAIL}/foo", result
-      assert_message @logger, :WARN, 'path is outside of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path is outside of jail; recovering automatically'
 
       @logger.clear
       @resolver.file_separator = '\\'
       result = @resolver.system_path 'baz.adoc', 'C:/foo', 'C:/bar'
       assert_equal 'C:/bar/baz.adoc', result
-      assert_message @logger, :WARN, 'path is outside of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path is outside of jail; recovering automatically'
     end
 
     test 'allows use of absolute target or start if resolved path is sub-path of jail' do
@@ -214,18 +214,18 @@ context 'Path Resolver' do
     test 'warns if start is not contained within jail' do
       result = @resolver.system_path 'images/tiger.png', '/etc', JAIL
       assert_equal %(#{JAIL}/images/tiger.png), result
-      assert_message @logger, :WARN, 'path is outside of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path is outside of jail; recovering automatically'
 
       @logger.clear
       result = @resolver.system_path '.', '/etc', JAIL
       assert_equal JAIL, result
-      assert_message @logger, :WARN, 'path is outside of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path is outside of jail; recovering automatically'
 
       @logger.clear
       @resolver.file_separator = '\\'
       result = @resolver.system_path '.', 'C:/foo', 'C:/bar'
       assert_equal 'C:/bar', result
-      assert_message @logger, :WARN, 'path is outside of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path is outside of jail; recovering automatically'
     end
 
     test 'allows start path to be parent of jail if resolved target is inside jail' do
@@ -237,7 +237,7 @@ context 'Path Resolver' do
     test 'relocates target to jail if resolved value fails outside of jail' do
       result = @resolver.system_path 'bar/baz.adoc', JAIL, "#{JAIL}/foo"
       assert_equal %(#{JAIL}/foo/bar/baz.adoc), result
-      assert_message @logger, :WARN, 'path is outside of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path is outside of jail; recovering automatically'
 
       @logger.clear
       @resolver.file_separator = '\\'
@@ -301,7 +301,7 @@ context 'Path Resolver' do
       assert_equal '/home/doctor/docs', (@resolver.system_path nil, '/home/doctor/./docs')
       assert_equal %(#{pwd}/assets/images), (@resolver.system_path nil, 'assets/images')
       @resolver.system_path '', '../assets/images', JAIL
-      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail; recovering automatically'
     end
 
     test 'posixifies windows paths' do
@@ -316,12 +316,12 @@ context 'Path Resolver' do
 
       result = @resolver.system_path '..\\..', 'C:\\data\\docs\\assets', 'C:\\data\\docs'
       assert_equal 'C:/data/docs', result
-      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail; recovering automatically'
 
       @logger.clear
       result = @resolver.system_path '..\\..\\css', 'C:\\data\\docs\\assets', 'C:\\data\\docs'
       assert_equal 'C:/data/docs/css', result
-      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail, auto-recovering'
+      assert_message @logger, :WARN, 'path has illegal reference to ancestor of jail; recovering automatically'
     end
 
     test 'should calculate relative path' do

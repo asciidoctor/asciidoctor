@@ -2310,7 +2310,7 @@ image::dot.gif[Dot]
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
-      assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail, auto-recovering'
+      assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail; recovering automatically'
     end
 
     test 'cleans reference to ancestor directories in target before reading image if safe mode level is at least SAFE' do
@@ -2327,7 +2327,7 @@ image::../..//fixtures/./../../fixtures/dot.gif[Dot]
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
       # the reference cannot fall outside of the document directory in safe mode
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
-      assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail, auto-recovering'
+      assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail; recovering automatically'
     end
   end
 
@@ -2616,7 +2616,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 
       output = render_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
-      assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail, auto-recovering'
+      assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail; recovering automatically'
     end
 
     test 'should import Font Awesome and use font-based icons when value of icons attribute is font' do

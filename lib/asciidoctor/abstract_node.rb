@@ -440,8 +440,8 @@ class AbstractNode
   # start  - the String start (i.e., parent) path
   # jail   - the String jail path to confine the resolved path
   # opts   - an optional Hash of options to control processing (default: {}):
-  #          * :recover is used to control whether the processor should auto-recover
-  #              when an illegal path is encountered
+  #          * :recover is used to control whether the processor should
+  #            automatically recover when an illegal path is encountered
   #          * :target_name is used in messages to refer to the path being resolved
   #
   # raises a SecurityError if a jail is specified and the resolved path is
