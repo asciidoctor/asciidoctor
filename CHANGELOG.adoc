@@ -159,6 +159,7 @@ Documentation::
 
 Build / Infrastructure::
 
+  * create an official logo for the project (#48) (*@mmajko*)
   * update Ruby versions in appveyor build matrix (PR #2388) (*@miltador*)
   * add mailinglist, changelog, source, and issues URI to gem spec
   * allow blocks and substitutions tests to be run directly
