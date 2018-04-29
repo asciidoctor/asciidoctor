@@ -1056,13 +1056,13 @@ finally a reference to the second footnote footnoteref:[note2].
       output = render_string input
       assert_css '#footnotes', output, 1
       assert_css '#footnotes .footnote', output, 2
-      assert_css '#footnotes .footnote#_footnote_1', output, 1
-      assert_xpath '//div[@id="footnotes"]/div[@id="_footnote_1"]/a[@href="#_footnoteref_1"][text()="1"]', output, 1
-      text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnote_1"]/text()', output
+      assert_css '#footnotes .footnote#_footnotedef_1', output, 1
+      assert_xpath '//div[@id="footnotes"]/div[@id="_footnotedef_1"]/a[@href="#_footnoteref_1"][text()="1"]', output, 1
+      text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnotedef_1"]/text()', output
       assert_equal '. An example footnote.', text.text.strip
-      assert_css '#footnotes .footnote#_footnote_2', output, 1
-      assert_xpath '//div[@id="footnotes"]/div[@id="_footnote_2"]/a[@href="#_footnoteref_2"][text()="2"]', output, 1
-      text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnote_2"]/text()', output
+      assert_css '#footnotes .footnote#_footnotedef_2', output, 1
+      assert_xpath '//div[@id="footnotes"]/div[@id="_footnotedef_2"]/a[@href="#_footnoteref_2"][text()="2"]', output, 1
+      text = xmlnodes_at_xpath '//div[@id="footnotes"]/div[@id="_footnotedef_2"]/text()', output
       assert_equal '. Second footnote.', text.text.strip
     end
 
@@ -1074,9 +1074,9 @@ Text that has supporting information{empty}footnote:[An example footnote.].
       output = render_embedded_string input
       assert_css '#footnotes', output, 1
       assert_css '#footnotes .footnote', output, 1
-      assert_css '#footnotes .footnote#_footnote_1', output, 1
-      assert_xpath '/div[@id="footnotes"]/div[@id="_footnote_1"]/a[@href="#_footnoteref_1"][text()="1"]', output, 1
-      text = xmlnodes_at_xpath '/div[@id="footnotes"]/div[@id="_footnote_1"]/text()', output
+      assert_css '#footnotes .footnote#_footnotedef_1', output, 1
+      assert_xpath '/div[@id="footnotes"]/div[@id="_footnotedef_1"]/a[@href="#_footnoteref_1"][text()="1"]', output, 1
+      text = xmlnodes_at_xpath '/div[@id="footnotes"]/div[@id="_footnotedef_1"]/text()', output
       assert_equal '. An example footnote.', text.text.strip
     end
 

@@ -90,6 +90,7 @@ Bug fixes::
   * fix race condition in Helpers.mkdir_p (#2457, PR #2458)
   * correctly process nested passthrough inside unconstrained monospaced (#2442, PR #2443)
   * add test to ensure ampersand in author line is not double escaped (#2439, PR #2440)
+  * prevent footnote ID from clashing with auto-generated footnote IDs (#2019)
   * fix alignment of icons in footnote (#2415, PR #2416)
   * add graceful fallback if pygments.rb fails to return a value (#2341, PR #2342)
   * escape specialchars in source if pygments fails to highlight (#2341)
