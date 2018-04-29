@@ -22,6 +22,7 @@ Enhancements::
   * add MemoryLogger for capturing messages sent to logger into memory (#44, PR #2660)
   * add NullLogger to prevent messages from being logged (#44, PR #2660)
   * log message containing source location / cursor as an object; provides more context (#44, PR #2660)
+  * pass cursor for include file to :include_location key in message context (PR #2729)
   * add :logger option to API to set logger instance (#44, PR #2660)
   * add --failure-level=LEVEL option to CLI to force non-zero exit code if specified logging level is reached (#2003, PR #2674)
   * parse text of xref macro as attributes if attribute signature found (equal sign) (#2381)

@@ -962,11 +962,12 @@ class PreprocessorReader < Reader
                     tag_stack.pop
                     active_tag, select = tag_stack.empty? ? [nil, base_select] : tag_stack[-1]
                   elsif inc_tags.key? this_tag
+                    include_cursor = create_include_cursor inc_path, expanded_target, inc_lineno
                     if (idx = tag_stack.rindex {|key, _| key == this_tag })
                       idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
-                      logger.warn message_with_context %(mismatched end tag in include: expected #{active_tag}, found #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
+                      logger.warn message_with_context %(mismatched end tag (expected '#{active_tag}' but found '#{this_tag}') at line #{inc_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => include_cursor
                     else
-                      logger.warn message_with_context %(unexpected end tag in include: #{this_tag}), :source_location => (Cursor.new inc_path, nil, expanded_target, inc_lineno)
+                      logger.warn message_with_context %(unexpected end tag '#{this_tag}' at line #{inc_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => include_cursor
                     end
                   end
                 elsif inc_tags.key?(this_tag = $2)
@@ -990,7 +991,7 @@ class PreprocessorReader < Reader
         end
         unless tag_stack.empty?
           tag_stack.each do |tag_name, _, tag_lineno|
-            logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor
+            logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => (create_include_cursor inc_path, expanded_target, tag_lineno)
           end
         end
         unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
@@ -1141,6 +1142,18 @@ class PreprocessorReader < Reader
       @look_ahead = 0
     end
     self
+  end
+
+  def create_include_cursor file, path, lineno
+    if ::String === file
+      dir = ::File.dirname file
+    elsif ::RUBY_ENGINE_OPAL
+      dir = ::File.dirname(file = file.to_s)
+    else
+      dir = (dir = ::File.dirname file.path) == '' ? '/' : dir
+      file = file.to_s
+    end
+    Cursor.new file, dir, path, lineno
   end
 
   def pop_include
