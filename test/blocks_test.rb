@@ -1335,6 +1335,111 @@ ____
       assert_xpath '//*[@class="openblock"]//p', output, 3
       assert_xpath '//*[@class="openblock"]//*[@class="quoteblock"]', output, 1
     end
+
+    test 'should transfer id and reftext on open block to DocBook output' do
+      input = <<-EOS
+Check out that <<open>>!
+
+[[open,Open Block]]
+--
+This is an open block.
+
+TIP: An open block can have other blocks inside of it.
+--
+
+Back to our regularly scheduled programming.
+      EOS
+
+      output = render_string input, :backend => :docbook, :keep_namespaces => true
+      assert_css 'article > simpara', output, 2
+      assert_css 'article > para', output, 1
+      assert_css 'article > para > simpara', output, 1
+      assert_css 'article > para > tip', output, 1
+      open = xmlnodes_at_xpath '/xmlns:article/xmlns:para', output, 1
+      # nokogiri can't make up its mind
+      id = open.attribute('id') || open.attribute('xml:id')
+      refute_nil id
+      assert_equal 'open', id.value
+      xreflabel = open.attribute('xreflabel')
+      refute_nil xreflabel
+      assert_equal 'Open Block', xreflabel.value
+    end
+
+    test 'should transfer id and reftext on open paragraph to DocBook output' do
+      input = <<-EOS
+[open#openpara,reftext="Open Paragraph"]
+This is an open paragraph.
+      EOS
+
+      output = render_string input, :backend => :docbook, :keep_namespaces => true
+      assert_css 'article > simpara', output, 1
+      open = xmlnodes_at_xpath '/xmlns:article/xmlns:simpara', output, 1
+      open = xmlnodes_at_xpath '/xmlns:article/xmlns:simpara[text()="This is an open paragraph."]', output, 1
+      # nokogiri can't make up its mind
+      id = open.attribute('id') || open.attribute('xml:id')
+      refute_nil id
+      assert_equal 'openpara', id.value
+      xreflabel = open.attribute('xreflabel')
+      refute_nil xreflabel
+      assert_equal 'Open Paragraph', xreflabel.value
+    end
+
+    test 'should transfer title on open block to DocBook output' do
+      input = <<-EOS
+.Behold the open
+--
+This is an open block with a title.
+--
+      EOS
+
+      output = render_string input, :backend => :docbook
+      assert_css 'article > formalpara', output, 1
+      assert_css 'article > formalpara > *', output, 2
+      assert_css 'article > formalpara > title', output, 1
+      assert_xpath '/article/formalpara/title[text()="Behold the open"]', output, 1
+      assert_css 'article > formalpara > para', output, 1
+      assert_css 'article > formalpara > para > simpara', output, 1
+    end
+
+    test 'should transfer title on open paragraph to DocBook output' do
+      input = <<-EOS
+.Behold the open
+This is an open paragraph with a title.
+      EOS
+
+      output = render_string input, :backend => :docbook
+      assert_css 'article > formalpara', output, 1
+      assert_css 'article > formalpara > *', output, 2
+      assert_css 'article > formalpara > title', output, 1
+      assert_xpath '/article/formalpara/title[text()="Behold the open"]', output, 1
+      assert_css 'article > formalpara > para', output, 1
+      assert_css 'article > formalpara > para[text()="This is an open paragraph with a title."]', output, 1
+    end
+
+    test 'should transfer role on open block to DocBook output' do
+      input = <<-EOS
+[.container]
+--
+This is an open block.
+It holds stuff.
+--
+      EOS
+
+      output = render_string input, :backend => :docbook
+      assert_css 'article > para[role=container]', output, 1
+      assert_css 'article > para[role=container] > simpara', output, 1
+    end
+
+    test 'should transfer role on open paragraph to DocBook output' do
+      input = <<-EOS
+[.container]
+This is an open block.
+It holds stuff.
+      EOS
+
+      output = render_string input, :backend => :docbook
+      assert_css 'article > simpara[role=container]', output, 1
+    end
   end
 
   context 'Passthrough Blocks' do

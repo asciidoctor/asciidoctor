@@ -321,7 +321,24 @@ module Asciidoctor
 </partintro>)
         end
       else
-        resolve_content node
+        reftext = node.reftext if (id = node.id)
+        role = node.role
+        if node.title?
+          %(<formalpara#{common_attributes id, role, reftext}>
+<title>#{node.title}</title>
+<para>#{content_spacer = node.content_model == :compound ? LF : ''}#{node.content}#{content_spacer}</para>
+</formalpara>)
+        elsif id || role
+          if node.content_model == :compound
+            %(<para#{common_attributes id, role, reftext}>
+#{node.content}
+</para>)
+          else
+            %(<simpara#{common_attributes id, role, reftext}>#{node.content}</simpara>)
+          end
+        else
+          resolve_content node
+        end
       end
     end
 
