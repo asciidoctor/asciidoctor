@@ -1,48 +1,52 @@
 = A Book with Multiple Parts and Special Sections
 
-// tag::colophon[]
 [colophon]
 = Colophon
-
-The Asciidoctor Press, Ceres and Denver
+// tag::colophon[]
+The Asciidoctor Press, Ceres and Denver.
 
 (C) 2018 by The Asciidoctor Press
 
-Published in the Milky Way Galaxy
+Published in the Milky Way Galaxy.
 
 This book is designed by Dagger Flush, Denver, Colorado.
-The types are handset Chinchilla and Dust, designed by Leeloo.
-Leeloo designed the typefaces to soften the bluntness of documentation.
-Created in Asciidoctor and Fedora 27.
-The printing and binding is by Ceres Lithographing, Inc., Ceres, Milky Way.
+The types are handset Volcano Dust and Papaya, designed by Leeloo.
+Leeloo created the typefaces to soften the bluntness of documentation.
+
+Built with Asciidoctor on Fedora 28.
+
+Printing and binding by Ceres Lithographing, Inc., Ceres, Milky Way.
 // end::colophon[]
 
 [preface]
 = Preface
 
-The basis for this book germinated when I awoke one morning and was confronted by the dark and stormy eyes of the chinchilla.
-She had conquered the mountain of government reports that, over the course of six months, had eroded into several minor foothills and a creeping alluvial plain of loose papers.
+I awoke one morning and was confronted by the dark and stormy eyes of the chinchilla.
+She had conquered the mountain of government reports that had eroded into several minor foothills and a creeping alluvial plain of loose papers.
 
-== Acknowledgments
+=== Preface Subsection
 
-I would like to thank the Big Bang and String Theory.
+Chinchillas rule the world.
 
-// tag::dedicate[]
-[dedication%untitled]
 = Dedication
-
+// tag::dedicate[]
 For S.S.T.--
 
 thank you for the plague of archetypes.
 // end::dedicate[]
 
 // tag::part[]
-= Title of Part 1
+= Book Title
+:doctype: book
 
-[partintro]
---
+[preface]
+= Forward
+
+This is the preface for the whole book.
+
+= Part 1
+
 This is the introduction to the first part of our mud-encrusted journey.
---
 
 == Chapter 1
 
@@ -63,9 +67,9 @@ mud:: wet, cold dirt
 [preface]
 == Part 2 Preface
 
-This part was written because...
+This is a preface for part 2.
 
-== Chapter 1
+== Chapter 3
 
 The mud had turned to cement...
 

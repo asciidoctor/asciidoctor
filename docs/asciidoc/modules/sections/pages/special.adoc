@@ -4,5 +4,39 @@ include::_attributes.adoc[]
 endif::[]
 // Included in user-manual partintro
 
-Asciidoctor provides built-in styles for the specialized front matter and back matter sections commonly found in journal articles, academic papers, and books.
-In the following sections, you'll learn the dependency, structure, and output rules for each special section.
+Asciidoctor provides built-in styles for the specialized front matter and back matter sections found in journal articles, academic papers, and books.
+
+The following special section styles are permitted in the `book` document type:
+
+// front matter
+* colophon
+* dedication
+* acknowledgments
+//(translated into a chapter)
+* preface
+// matter
+* part
+// back matter
+* appendix
+* glossary
+* bibliography
+* index
+//(placeholder only)
+
+The following special section styles are permitted in the `article` document type:
+
+* abstract
+* appendix
+* glossary
+* bibliography
+* index
+//(placeholder only)
+
+Only these special sections can have subsections:
+
+// front matter
+* abstract
+//(translated into a chapter)
+* preface
+// back matter
+* appendix

@@ -1,12 +1,43 @@
-= Dedication
+= Dedication Section Style
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:keywords: respect, homage, front matter
 // anchor from um: user-dedication
 
-The dedication page is where the author expresses gratitude toward a person.
+A dedication page is used to express gratitude.
+
+== Dedication syntax
+
+To use the `dedication` section style, the document type must be `book`.
+The dedication section must be a level 1 section (`==`), unless the book has parts.
 
 [source]
 ----
+[dedication]
+== Dedication
+
+include::{examplesdir}/multi-special.adoc[tag=dedicate]
+----
+
+If the book has parts, the dedication section must be a level 0 section (`=`).
+
+[source]
+----
+[dedication]
+= Dedication
+
+include::{examplesdir}/multi-special.adoc[tag=dedicate]
+----
+
+=== Hide the section title
+
+include::{partialsdir}/untitled.adoc[]
+
+[source]
+----
+[dedication%untitled]
+== Dedication
+
 include::{examplesdir}/multi-special.adoc[tag=dedicate]
 ----

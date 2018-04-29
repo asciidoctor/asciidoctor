@@ -1,50 +1,15 @@
-= Appendix
+= Appendix Section Style
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 // anchor um: user-appendix
 
-You can indicate that a section, part, or chapter is an appendix by adding an `[appendix]` line above the section title.
+The `appendix` section style can be used in books and articles, and it can have subsections.
+While the AsciiDoc structure allows appendices to be placed anywhere, it's customary to place them near the end of the document.
 
-[source]
-----
-[appendix]
-== Copyright and License
-----
+== Appendix syntax
 
-While the AsciiDoc structure allows appendices to be placed anywhere, it's customary to place them at the end of the document, after all other sections.
-
-Sections marked as appendix have a different title, which is built as follows:
-
-* A fixed prefix (taken from the value of the `appendix-caption` attribute, which defaults to "`Appendix`")
-* A letter that represents the number of this appendix within the sequence of appendices (A, B, C, ...)
-* A colon
-* The original section title
-
-For example:
-
- Appendix A: Copyright and License
-
-The prefix can be modified by defining the `appendix-caption` attribute.
-This value can be changed using:
-
-[source]
-----
-:appendix-caption: Appx
-----
-
-Or it can be unset using:
-
-[source]
-----
-:appendix-caption!:
-----
-
-Appendices can have subsections.
-However, there are some rules to follow depending on which type of document you are creating.
-
-For articles, the appendix must be defined as a level-1 section.
-(If a level-0 section is used, a level-1 section is implied).
+For articles, the appendix must be defined as a level 1 section (`==`).
 For example:
 
 [source]
@@ -54,17 +19,15 @@ include::{examplesdir}/appendix.adoc[tag=appx-article]
 
 The table of contents will appear as follows:
 
-[source]
 ----
 include::{examplesdir}/appendix.adoc[tag=appx-article-out]
 ----
 
-For books, the appendix must be defined as a level-1 section if you want the appendix to be a adjacent to other chapters (and in the current part if the book has multiple parts).
-In a multi-part book, if you want the appendix to be adjacent to other parts, the appendix must be defined as a level-0 section.
-In either case, the first subsection of the appendix must be a level-3 section, not a level-2 section.
-That's because an appendix cannot contain chapters.
+For books, the appendix must be defined as a level 1 section (`==`) if you want the appendix to be a adjacent to the chapters.
+In a multi-part book, if you want the appendix to be adjacent to other parts, the appendix must be defined as a level 0 section (`=`).
+In either case, the first subsection of the appendix must be a level 2 section (`===`).
 
-The following example shows how to define an appendix for a multi-book (take away the part title if you're creating a simple book):
+The following example shows how to define an appendix for a multi-part book.
 
 [source]
 ----
@@ -73,7 +36,34 @@ include::{examplesdir}/appendix.adoc[tag=appx-book]
 
 The table of contents will appear as follows:
 
-[source]
 ----
 include::{examplesdir}/appendix.adoc[tag=appx-book-out]
+----
+
+[#caption]
+== Appendix prefix
+
+When rendered, the titles of sections marked as `appendix` will include:
+
+* A prefix, taken from the value of the `appendix-caption` attribute, which defaults to "`Appendix`"
+* A letter that represents the order of the appendix within the sequence of appendices (A, B, ...)
+* A colon
+* The section title
+
+For example:
+
+ Appendix A: Data Access Matrix
+
+The prefix can be modified by setting the `appendix-caption` attribute and overriding the default value with a custom value.
+
+[source]
+----
+:appendix-caption: Exhibit
+----
+
+Unset the attribute to remove the prefix.
+
+[source]
+----
+:appendix-caption!:
 ----

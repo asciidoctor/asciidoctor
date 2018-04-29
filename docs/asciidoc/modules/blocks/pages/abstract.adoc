@@ -1,0 +1,40 @@
+= Abstract Block Style
+ifndef::env-site,env-github[]
+include::_attributes.adoc[]
+endif::[]
+
+An abstract is a concise overview of a document.
+The `abstract` block style can be placed on an open block or paragraph.
+Here's an example of the abstract block style set on a paragraph:
+
+[source]
+----
+= Document Title
+
+[abstract]
+.Abstract
+Documentation is a distillation of many long adventures.
+
+== First Section
+----
+
+The abstract block style does not require the open block or paragraph to have a title, and it does not depend on a subsequent section to terminate it.
+
+[source]
+----
+= Document Title
+
+[abstract]
+--
+This article will take you on a wonderful adventure of knowledge.
+
+You'll start with the basics.
+Beyond that, where you go is up to you.
+--
+
+Your journey begins here.
+----
+
+TIP: To include a quote at the beginning of a chapter in a book, wrap a quote block inside an abstract block.
+
+There's also an xref:sections:abstract.adoc[abstract section style].

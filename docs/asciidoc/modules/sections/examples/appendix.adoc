@@ -1,15 +1,10 @@
-////
-Included in:
-- user-manual: Appendix
-////
-
 // tag::appx-article[]
 = Article Title
-:appendix-caption: Appx
+:appendix-caption: Exhibit
 :sectnums:
 :toc:
 
-== First Section
+== Section
 
 === Subsection
 
@@ -26,27 +21,30 @@ Included in:
 
 ....
 // tag::appx-article-out[]
-1. First Section
+1. Section
   1.1. Subsection
-Appx A: First Appendix
-  1.1. First Subsection
-  1.2. Second Subsection
-Appx B: Second Appendix
+Exhibit A: First Appendix
+  A.1. First Subsection
+  A.2. Second Subsection
+Exhibit B: Second Appendix
 // end::appx-article-out[]
 ....
 
 // tag::appx-book[]
 = Book Title
 :doctype: book
-:appendix-caption: Appx
 :sectnums:
 :toc:
 
 = First Part
 
-== First Chapter
+== Chapter
 
 === Subsection
+
+== Second Part
+
+== Chapter
 
 [appendix]
 = First Appendix
@@ -62,11 +60,13 @@ Appx B: Second Appendix
 ....
 // tag::appx-book-out[]
 First Part
-1. First Chapter
+1. Chapter
   1.1. Subsection
-Appx A: First Appendix
-  1.1. First Subsection
-  1.2. Second Subsection
-Appx B: Second Appendix
+Second Part
+2. Chapter
+Appendix A: First Appendix
+  A.1. First Subsection
+  A.2. Second Subsection
+Appendix B: Second Appendix
 // end::appx-book-out[]
 ....
