@@ -17,22 +17,24 @@ With Asciidoctor you can:
 * xref:number.adoc[Control and assign section numbering]
 * xref:discrete.adoc[Create floating (discrete) sections]
 
-== Section styles for technical content and books
+== Section styles for articles and books
 // section-styles.adoc,
 
-Asciidoctor provides xref:special.adoc[built-in styles] for the front matter and back matter sections commonly found in journal articles, academic papers, and books.
+AsciiDoc provides xref:special.adoc[built-in styles], commonly referred to as [.term]_special sections_ for front matter, book parts, and back matter sections found in journal articles, academic papers, and books.
 These special section styles are:
 
 * Dedication
-* Table of Contents
+* Acknowledgments
+//* Table of Contents
 * Abstract
 * Preface
 * Part
-* Chapter
+//* Chapter
 * Appendix
 * Glossary
 * Bibliography
 * Index
 * Colophon
 
-These styles are available to the `article` and `book` document types, with the exception of the part introduction style which is exclusive to books.
+The document type, `article` or `book`, determines which section styles are available for use.
+//These styles are available to the `article` and `book` document types, with the exception of the part introduction style which is exclusive to books.

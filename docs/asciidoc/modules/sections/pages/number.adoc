@@ -51,6 +51,7 @@ The `sectnums` attribute is a unique attribute.
 It's a "`flexible attribute`", which means it can be changed midstream in a document, even if it is enabled through the API or CLI.
 ****
 
+[#numlevels]
 == Numbering depth
 
 You can restrict section numbering depth by defining the `sectnumlevels` attribute.

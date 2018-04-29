@@ -19,13 +19,9 @@ The number of equal signs in front of the title represents the nesting level (us
 include::{examplesdir}/section.adoc[tag=base]
 ----
 
-.Render section titles
-====
-include::{examplesdir}/section.adoc[tag=b-base]
-====
+The section titles are rendered as:
 
-TIP: In addition to the equals sign marker used for defining section titles, Asciidoctor recognizes the hash symbol (`#`) from Markdown.
-That means the outline of a Markdown document will be converted just fine as an AsciiDoc document.
+include::{examplesdir}/section.adoc[tag=b-base]
 
 Section levels must be nested logically.
 There are two rules you must follow:
@@ -49,18 +45,25 @@ Once the first section title is reached, content is associated with the section 
 include::{examplesdir}/section.adoc[tag=content]
 ----
 
+TIP: In addition to the equals sign marker used for defining section titles, Asciidoctor recognizes the hash symbol (`#`) from Markdown.
+That means the outline of a Markdown document will be converted just fine as an AsciiDoc document.
+
 == Titles as HTML headings
 // tag::heading[]
 When the document is converted to HTML 5 (using the built-in `html5` backend), each section title becomes a heading element where the heading level matches the number of equal signs.
 For example, a level 1 section (`==`) maps to an `<h2>` element.
 // end::heading[]
 
+[#untitled]
 == Hide special section titles
 
-The titles of xref:special.adoc[special sections], such as the Dedication and Colophon, can be turned off by assigning `untitled` to the section's options attribute.
+The titles of xref:special.adoc[special sections], such as the dedication, can be turned off by assigning `untitled` to the section's options attribute (`%` or `options=untitled`).
 This feature is only available for the DocBook backend.
 
 [source]
 ----
+[dedication%untitled]
+== Dedication
+
 include::{examplesdir}/multi-special.adoc[tag=dedicate]
 ----

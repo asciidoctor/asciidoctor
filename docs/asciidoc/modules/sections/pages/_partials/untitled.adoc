@@ -1,0 +1,4 @@
+If you don't want the section title to be displayed, use the xref:level-and-title.adoc#untitled[untitled option].
+This option only works with the Docbook backend.
+
+The section still needs a title in the source, otherwise you can't assign the special section style to it or link to the section with a cross reference.

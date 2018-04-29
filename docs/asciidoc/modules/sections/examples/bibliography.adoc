@@ -1,8 +1,4 @@
-////
-Included in:
-- user-manual: Bibliography
-- quick-ref
-////
+// Included in user-manual: Bibliography and quick-ref
 
 // tag::base[]
 _The Pragmatic Programmer_ <<pp>> should be required reading for all developers.
@@ -11,8 +7,8 @@ To learn all about design patterns, refer to the book by the "`Gang of Four`" <<
 [bibliography]
 == References
 
-- [[[pp]]] Andy Hunt & Dave Thomas. The Pragmatic Programmer:
-  From Journeyman to Master. Addison-Wesley. 1999.
-- [[[gof,2]]] Erich Gamma, Richard Helm, Ralph Johnson & John Vlissides. Design Patterns:
-  Elements of Reusable Object-Oriented Software. Addison-Wesley. 1994.
+* [[[pp]]] Andy Hunt & Dave Thomas. The Pragmatic Programmer:
+From Journeyman to Master. Addison-Wesley. 1999.
+* [[[gof,gang]]] Erich Gamma, Richard Helm, Ralph Johnson & John Vlissides.
+Design Patterns: Elements of Reusable Object-Oriented Software. Addison-Wesley. 1994.
 // end::base[]

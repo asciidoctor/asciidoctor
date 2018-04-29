@@ -1,63 +1,38 @@
-= Preface
+= Preface Section Style
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:keywords: front matter, forward, introduction, proem, pref
 // anchor from um: user-preface
 
-The preface is a special section of a book that precedes the first part or chapter of the book (or the first chapter of a part).
-The preface can contain subsections.
+A preface is a special section that precedes the first chapter of a book or a book part.
 
-An author explains how the idea behind her book manifested and developed in the preface.
-The preface can include acknowledgments and may be signed by the author with her name, writing date and location.
+== Preface for a book
 
-For multi-part books, the preface must be defined as a level-0 section and any subsections must start at level 2.
-
-[source]
-----
-= Book Title
-:doctype: book
-
-[preface]
-= Documentation Preface
-
-The basis for this documentation germinated when I awoke one morning and was confronted by the dark and stormy eyes of the chinchilla.
-She had conquered the mountain of government reports that, over the course of six months, had eroded into several minor foothills and a creeping alluvial plain of loose papers.
-
-=== Acknowledgments in Preface
-
-I'd like to thank the Big Bang and String Theory.
-Would we be without them?
-
-= Part 1
-
-...
-----
-
-For books without parts, the preface must be defined as a level-1 section and any subsections must start at level 2.
+The `preface` section style can only be used when the doctype is `book`.
+A preface can contain subsections.
+When a book doesn't contain parts, the preface must be defined as a level 1 section (`==`) and any preface subsections must start at level 2 (`===`).
 
 [source]
 ----
-= Book Title
-:doctype: book
-
-[preface]
-== Documentation Preface
-
-The basis for this documentation germinated when I awoke one morning and was confronted by the dark and stormy eyes of the chinchilla.
-She had conquered the mountain of government reports that, over the course of six months, had eroded into several minor foothills and a creeping alluvial plain of loose papers.
-
-=== Acknowledgments in Preface
-
-I'd like to thank the Big Bang and String Theory.
-Would we be without them?
-
-== Chapter 1
-
-...
+include::{examplesdir}/preface.adoc[tag=book]
 ----
 
-The same structure can be used to define a preface for a part.
+== Preface for a book part
 
+To create a preface for a book part, the preface must be defined as a level 1 section (`==`) and any subsections must start at level 2 (`===`).
+The preface must be the first section in the part.
+
+[source]
+----
+include::{examplesdir}/preface.adoc[tag=part]
+----
+
+== Hide the section title
+
+include::{partialsdir}/untitled.adoc[]
+
+////
 As an alternative to a special section, Asciidoctor will automatically promote the preamble to a preface.
 The title of the preface is set using the `preface-title` document attribute.
 When defined this way, the preface may not contain subsections.
@@ -77,3 +52,4 @@ She had conquered the mountain of government reports that, over the course of si
 ----
 
 The special section is the preferred way of defining a preface.
+////

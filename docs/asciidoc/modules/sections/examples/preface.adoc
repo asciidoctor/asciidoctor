@@ -1,0 +1,38 @@
+// tag::book[]
+= Book Title
+:doctype: book
+
+[preface]
+== Our Preface
+
+I awoke one morning and was confronted by the dark and stormy eyes of the chinchilla.
+She had conquered the mountain of government reports that had eroded into several minor foothills and a creeping alluvial plain of loose papers.
+
+=== Preface Subsection
+
+Chinchillas rule the world.
+
+== Chapter 1
+
+...
+// end::book[]
+
+// tag::part[]
+= Book Title
+:doctype: book
+
+= Part 1
+
+[preface]
+== Part 1 Preface
+
+The preface for part 1.
+
+=== Preface Subsection
+
+More part 1 prefacing.
+
+== Chapter 1
+
+...
+// end::part[]
