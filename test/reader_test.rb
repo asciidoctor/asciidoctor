@@ -1163,14 +1163,16 @@ include::fixtures/include-file.asciidoc[tag=no-such-tag]
 
       test 'should warn if specified tags are not found in include file' do
         input = <<-EOS
+++++
 include::fixtures/include-file.asciidoc[tags=no-such-tag-b;no-such-tag-a]
+++++
         EOS
 
         using_memory_logger do |logger|
           render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
           # NOTE Ruby 1.8 swaps the order of the list for some silly reason
           expected_tags = ::RUBY_MIN_VERSION_1_9 ? 'no-such-tag-b, no-such-tag-a' : 'no-such-tag-a, no-such-tag-b'
-          assert_message logger, :WARN, %(~<stdin>: line 1: tags '#{expected_tags}' not found in include file), Hash
+          assert_message logger, :WARN, %(~<stdin>: line 2: tags '#{expected_tags}' not found in include file), Hash
         end
       end
 
@@ -1185,6 +1187,7 @@ include::fixtures/unclosed-tag.adoc[tag=a]
           result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
           assert_equal 'a', result
           assert_message logger, :WARN, %(~<stdin>: line 2: detected unclosed tag 'a' starting at line 2 of include file), Hash
+          refute_nil logger.messages[0][:message][:include_location]
         end
       end
 
@@ -1200,6 +1203,7 @@ include::fixtures/mismatched-end-tag.adoc[tags=a;b]
           result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
           assert_equal %(a\nb), result
           assert_message logger, :WARN, %(<stdin>: line 2: mismatched end tag (expected 'b' but found 'a') at line 5 of include file: #{inc_path}), Hash
+          refute_nil logger.messages[0][:message][:include_location]
         end
       end
 
@@ -1215,6 +1219,7 @@ include::fixtures/unexpected-end-tag.adoc[tags=a]
           result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
           assert_equal 'a', result
           assert_message logger, :WARN, %(<stdin>: line 2: unexpected end tag 'a' at line 4 of include file: #{inc_path}), Hash
+          refute_nil logger.messages[0][:message][:include_location]
         end
       end
 
