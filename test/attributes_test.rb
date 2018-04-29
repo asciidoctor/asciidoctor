@@ -675,6 +675,28 @@ Line 2: {set:a!}This line should appear in the output.
       refute_match(/\{set:a!\}/, output)
     end
 
+    test 'should drop line that only contains attribute assignment' do
+      input = <<-EOS
+Line 1
+{set:a}
+Line 2
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath %(//p[text()="Line 1\nLine 2"]), output, 1
+    end
+
+    test 'should drop line that only contains unresolved attribute when attribute-missing is drop' do
+      input = <<-EOS
+Line 1
+{unresolved}
+Line 2
+      EOS
+
+      output = render_embedded_string input, :attributes => { 'attribute-missing' => 'drop' }
+      assert_xpath %(//p[text()="Line 1\nLine 2"]), output, 1
+    end
+
     test "substitutes inside unordered list items" do
       html = render_string(":foo: bar\n* snort at the {foo}\n* yawn")
       result = Nokogiri::HTML(html)

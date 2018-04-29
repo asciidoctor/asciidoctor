@@ -43,14 +43,24 @@ module Substitutors
 
   SUB_HIGHLIGHT = ['coderay', 'pygments']
 
-  # Delimiters and matchers for the passthrough placeholder
-  # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
+  if ::RUBY_MIN_VERSION_1_9
+    CAN = %(\u0018)
+    DEL = %(\u007f)
 
-  # SPA, start of guarded protected area (\u0096)
-  PASS_START = %(\u0096)
+    # Delimiters and matchers for the passthrough placeholder
+    # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
 
-  # EPA, end of guarded protected area (\u0097)
-  PASS_END = %(\u0097)
+    # SPA, start of guarded protected area (\u0096)
+    PASS_START = %(\u0096)
+
+    # EPA, end of guarded protected area (\u0097)
+    PASS_END = %(\u0097)
+  else
+    CAN = 24.chr
+    DEL = 127.chr
+    PASS_START = 150.chr
+    PASS_END = 151.chr
+  end
 
   # match passthrough slot
   PassSlotRx = /#{PASS_START}(\d+)#{PASS_END}/
@@ -119,7 +129,7 @@ module Substitutors
       when :quotes
         text = sub_quotes text
       when :attributes
-        text = sub_attributes(text.split LF, -1) * LF if text.include? ATTR_REF_HEAD
+        text = sub_attributes text if text.include? ATTR_REF_HEAD
       when :replacements
         text = sub_replacements text
       when :macros
@@ -457,74 +467,78 @@ module Substitutors
     end
   end
 
-  # Public: Substitute attribute references
+  # Public: Substitutes attribute references in the specified text
   #
   # Attribute references are in the format +{name}+.
   #
-  # If an attribute referenced in the line is missing, the line is dropped.
+  # If an attribute referenced in the line is missing or undefined, the line may be dropped
+  # based on the attribute-missing or attribute-undefined setting, respectively.
   #
-  # text     - The String text to process
+  # text - The String text to process
+  # opts - A Hash of options to control processing: (default: {})
+  #        * :attribute_missing controls how to handle a missing attribute
   #
-  # returns The String text with the attribute references replaced with attribute values
-  #--
-  # NOTE it's necessary to perform this substitution line-by-line
-  # so that a missing key doesn't wipe out the whole block of data
-  # when attribute-undefined and/or attribute-missing is drop-line
-  def sub_attributes data, opts = {}
-    # normalizes data type to an array (string becomes single-element array)
-    data = [data] if (input_is_string = ::String === data)
-    doc_attrs, result = @document.attributes, []
-    data.each do |line|
-      reject = reject_if_empty = false
-      line = line.gsub(AttributeReferenceRx) {
-        # escaped attribute, return unescaped
-        if $1 == RS || $4 == RS
-          %({#{$2}})
-        elsif $3
-          case (args = $2.split ':', 3).shift
-          when 'set'
-            _, value = Parser.store_attribute args[0], args[1] || '', @document
-            # since this is an assignment, only drop-line applies here (skip and drop imply the same result)
-            if (doc_attrs.fetch 'attribute-undefined', Compliance.attribute_undefined) == 'drop-line'
-              reject = true
-              break ''
-            end unless value
-            reject_if_empty = true
-            ''
-          when 'counter2'
-            @document.counter(*args)
-            reject_if_empty = true
-            ''
-          else # 'counter'
-            @document.counter(*args)
+  # Returns the [String] text with the attribute references replaced with resolved values
+  def sub_attributes text, opts = {}
+    doc_attrs = @document.attributes
+    drop = drop_line = drop_empty_line = attribute_undefined = attribute_missing = nil
+    result = text.gsub AttributeReferenceRx do
+      # escaped attribute, return unescaped
+      if $1 == RS || $4 == RS
+        %({#{$2}})
+      elsif $3
+        case (args = $2.split ':', 3).shift
+        when 'set'
+          _, value = Parser.store_attribute args[0], args[1] || '', @document
+          # NOTE since this is an assignment, only drop-line applies here (skip and drop imply the same result)
+          if value || (attribute_undefined ||= doc_attrs['attribute-undefined'] || Compliance.attribute_undefined) != 'drop-line'
+            drop = drop_empty_line = DEL
+          else
+            drop = drop_line = CAN
           end
-        elsif doc_attrs.key?(key = $2.downcase)
-          doc_attrs[key]
-        elsif INTRINSIC_ATTRIBUTES.key? key
-          INTRINSIC_ATTRIBUTES[key]
-        else
-          case (attribute_missing ||= opts[:attribute_missing] || (doc_attrs.fetch 'attribute-missing', Compliance.attribute_missing))
-          when 'drop'
-            # QUESTION should we warn in this case?
-            reject_if_empty = true
-            ''
-          when 'drop-line'
-            logger.warn %(dropping line containing reference to missing attribute: #{key})
-            reject = true
-            break ''
-          when 'warn'
-            logger.warn %(skipping reference to missing attribute: #{key})
-            $&
-          else # 'skip'
-            $&
-          end
+        when 'counter2'
+          @document.counter(*args)
+          drop = drop_empty_line = DEL
+        else # 'counter'
+          @document.counter(*args)
         end
-      } if line.include? ATTR_REF_HEAD
-
-      result << line unless reject || (reject_if_empty && line.empty?)
+      elsif doc_attrs.key?(key = $2.downcase)
+        doc_attrs[key]
+      elsif (value = INTRINSIC_ATTRIBUTES[key])
+        value
+      else
+        case (attribute_missing ||= opts[:attribute_missing] || doc_attrs['attribute-missing'] || Compliance.attribute_missing)
+        when 'drop'
+          drop = drop_empty_line = DEL
+        when 'drop-line'
+          logger.warn %(dropping line containing reference to missing attribute: #{key})
+          drop = drop_line = CAN
+        when 'warn'
+          logger.warn %(skipping reference to missing attribute: #{key})
+          $&
+        else # 'skip'
+          $&
+        end
+      end
     end
 
-    input_is_string ? result * LF : result
+    if drop
+      # drop lines from result
+      if drop_empty_line
+        lines = (result.tr_s DEL, DEL).split LF, -1
+        if drop_line
+          (lines.reject {|line| line == DEL || line == CAN || (line.start_with? CAN) || (line.include? CAN) }.join LF).delete DEL
+        else
+          (lines.reject {|line| line == DEL }.join LF).delete DEL
+        end
+      elsif result.include? LF
+        (result.split LF, -1).reject {|line| line == CAN || (line.start_with? CAN) || (line.include? CAN) }.join LF
+      else
+        ''
+      end
+    else
+      result
+    end
   end
 
   # Public: Substitute inline macros (e.g., links, images, etc)
@@ -1172,7 +1186,7 @@ module Substitutors
   # Returns a Hash of attributes (role and id only)
   def parse_quoted_text_attributes str
     # NOTE attributes are typically resolved after quoted text, so substitute eagerly
-    str = sub_attributes str if str.include? ATTR_REF_HEAD
+    str = sub_attributes str, :multiline => true if str.include? ATTR_REF_HEAD
     # for compliance, only consider first positional attribute
     str = str.slice 0, (str.index ',') if str.include? ','
 
@@ -1215,8 +1229,8 @@ module Substitutors
   def parse_attributes(attrline, posattrs = ['role'], opts = {})
     return unless attrline
     return {} if attrline.empty?
-    attrline = @document.sub_attributes(attrline) if opts[:sub_input] && (attrline.include? ATTR_REF_HEAD)
-    attrline = unescape_bracketed_text(attrline) if opts[:unescape_input]
+    attrline = @document.sub_attributes attrline if opts[:sub_input] && (attrline.include? ATTR_REF_HEAD)
+    attrline = unescape_bracketed_text attrline if opts[:unescape_input]
     # substitutions are only performed on attribute values if block is not nil
     block = opts.fetch(:sub_result, true) ? self : nil
     if (into = opts[:into])

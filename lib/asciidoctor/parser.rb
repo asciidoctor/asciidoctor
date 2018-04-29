@@ -181,7 +181,7 @@ class Parser
   # returns Nothing
   def self.parse_manpage_header(reader, document)
     if ManpageTitleVolnumRx =~ document.attributes['doctitle']
-      document.attributes['mantitle'] = document.sub_attributes $1.downcase
+      document.attributes['mantitle'] = (($1.include? ATTR_REF_HEAD) ? (document.sub_attributes $1) : $1).downcase
       document.attributes['manvolnum'] = $2
     else
       logger.error message_with_context 'malformed manpage title', :source_location => reader.cursor_at_prev_line
@@ -200,8 +200,8 @@ class Parser
           document.attributes['manname-title'] ||= name_section.title
           document.attributes['manname-id'] = name_section.id if name_section.id
           document.attributes['manpurpose'] = $2
-          if (manname = document.sub_attributes $1).include? ','
-            manname = (mannames = (manname.split ',').map {|n| n.strip })[0]
+          if (manname = ($1.include? ATTR_REF_HEAD) ? (document.sub_attributes $1) : $1).include? ','
+            manname = (mannames = (manname.split ',').map {|n| n.lstrip })[0]
           else
             mannames = [manname]
           end
@@ -548,7 +548,7 @@ class Parser
               attributes.delete 'style' if attributes.key? 'style'
               if (target.include? ATTR_REF_HEAD) && (target = block.sub_attributes target, :attribute_missing => 'drop-line').empty?
                 # retain as unparsed if attribute-missing is skip
-                if doc_attrs.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
+                if (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'skip'
                   return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
                 # otherwise, drop the line
                 else

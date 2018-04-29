@@ -845,7 +845,7 @@ class PreprocessorReader < Reader
     if ((expanded_target = target).include? ATTR_REF_HEAD) &&
         (expanded_target = @document.sub_attributes target, :attribute_missing => 'drop-line').empty?
       shift
-      if @document.attributes.fetch('attribute-missing', Compliance.attribute_missing) == 'skip'
+      if (@document.attributes['attribute-missing'] || Compliance.attribute_missing) == 'skip'
         unshift %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
       end
       true

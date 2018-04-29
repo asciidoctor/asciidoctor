@@ -1656,7 +1656,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       input = <<-EOS
 = {app}(1)
 :doctype: manpage
-:app: asciidoctor
+:app: Asciidoctor
 
 == NAME
 
