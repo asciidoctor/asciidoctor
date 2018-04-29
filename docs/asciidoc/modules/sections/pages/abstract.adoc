@@ -1,76 +1,44 @@
-= Abstract
+= Abstract Section Style
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 // anchor um: user-abstract
 
-An abstract is a concise overview of an article or of a chapter in a book.
-They are frequently found in the front matter of academic, research, and analytical papers.
-//Abstracts with subheadings are structured abstracts, whereas abstracts without subheadings are unstructured.
-//^ Not relevant for AsciiDoc
-A complete (i.e., informative) abstract states the key topics and findings while a limited (i.e., descriptive) abstract briefly describes the structure of the content.
+An abstract is a concise overview of an article.
+The abstract section style can be used in the `article` document type.
 
-The abstract may be written using a section, open block, or paragraph and must bear the abstract style.
-If used, the abstract must appear before the first section of an article (at the start of the xref:blocks:preamble.adoc[preamble]) or at the start of a chapter in a book.
+== Article abstract syntax
+
+The `abstract` section style must be set on the first section of the article, as seen in the example below:
+
+[source]
+----
+include::{examplesdir}/abstract.adoc[]
+----
+
+If you want to style a paragraph or an open block as an abstract, instead of a whole section, see the xref:blocks:abstract.adoc[abstract block style] documentation.
+
+////
+There's some sort of funkiness with book and abstract so we're putting this section on hold.
+
+== Book abstract syntax
+
+When the document type is book, the `abstract` section style must be placed on the first section _inside_ the chapter section.
+The section must be one section level below the chapter, that is, the chapter is marked up as level 1 (`==`) so its abstract must be marked up as level 2 (`===`).
 An abstract may not be used _before_ a part or chapter in a book.
 
-Here's an example of an abstract at the beginning of an article, defined using a section:
-
 [source]
 ----
-= Article Title
+= Book Title
+:doctype: book
 
-[abstract]
-== Abstract
-
-Documentation is a distillation of many long, squiggly adventures.
-
-== First Section
-----
-
-Here's an example of the same abstract defined using a paragraph:
-
-[source]
-----
-= Article Title
-
-[abstract]
-.Abstract
-Documentation is a distillation of many long, squiggly adventures.
-
-== First Section
-----
-
-In the book doctype, the abstract section must be a level below the chapter.
-
-[source]
-----
 == Chapter Title
 
 [abstract]
-=== Chapter Abstract
+=== Summary
 
-Documentation is a distillation of many long, squiggly adventures.
+Documentation is a distillation of many long adventures.
 
-=== First Section
+=== Section
 ----
-
-An abstract defined using an open block or paragraph does not require a title and does not depend on a subsequent section to terminate.
-
-[source]
-----
-= Article Title
-
-[abstract]
-.Optional Abstract Title
---
-This article will take you on a wonderful adventure of knowledge.
-
-You'll start with the basics.
-Beyond that, where you go is up to you.
---
-
-Your journey begins here.
-----
-
-TIP: To include a quote at the beginning of a chapter in a book, wrap the quote block inside an abstract block.
+////

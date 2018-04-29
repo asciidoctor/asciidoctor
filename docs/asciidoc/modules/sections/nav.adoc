@@ -6,18 +6,18 @@
 ** xref:id.adoc[IDs, Anchors & Links]
 ** xref:special.adoc[Special Section Styles]
 // Front matter
+*** xref:colophon.adoc[Colophon]
 *** xref:dedication.adoc[Dedication]
 // & Epigraph
-*** xref:toc:toc.adoc[Table of Contents]
-**** xref:toc:toc-position.adoc[Positioning]
-**** xref:toc:toc-ref.adoc[TOC Reference]
 *** xref:abstract.adoc[Abstract]
 *** xref:preface.adoc[Preface]
-*** xref:part-and-chapter.adoc[Parts & Chapters]
+*** xref:part-and-chapter.adoc[Chapters & Parts]
 // Back matter
 *** xref:appendix.adoc[Appendix]
 *** xref:glossary.adoc[Glossary]
 *** xref:bibliography.adoc[Bibliography]
 *** xref:index.adoc[Index]
-*** xref:colophon.adoc[Colophon]
+** xref:toc:toc.adoc[Table of Contents]
+*** xref:toc:toc-position.adoc[Positioning]
+*** xref:toc:toc-ref.adoc[TOC Reference]
 ** xref:section-ref.adoc[Section Reference]

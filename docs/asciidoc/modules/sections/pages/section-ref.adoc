@@ -1,56 +1,122 @@
-= Section Syntax and Attributes Reference
+= Section Attributes Reference
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 //sum-section.adoc, included in:
 
-[cols="1m,1,2m,2"]
+[cols="1,2,1,1"]
 |===
-|Attribute |Value(s) |Example Syntax |Notes
+|Feature |Attribute |Value(s) |Notes
 
-|sectids
+|xref:abstract.adoc[Abstract]
+|`abstract`
 |N/A
-|`:sectids!:`
-|Set to autogenerate section IDs by default
+|Can have subsections
 
-|idprefix
-|`_`, or user defined text
-|`:idprefix: id_`
-|Set to prepend string to generated section ID
-
-|idseparator
-|`_`, or user defined character
-|`:idseparator: -`
-|Set to insert character between words in generated section ID
-
-|options; %
-|`untitled`
-|`[colophon%untitled]`
-|DocBook only; can only be set on special sections
-//Asciidoctor only
-
-|sectanchors
+|Acknowledgments
+|`acknowledgments`
 |N/A
-|`:sectanchors:`
+|`book` doctype only
+
+|xref:appendix.adoc[Appendix]
+|`appendix`
+|N/A
+|Can have subsections
+
+|xref:appendix.adoc#prefix[Appendix label]
+|`appendix-caption`
+|_Appendix_ (default) or user defined text
+|
+
+|xref:bibliography.adoc[Bibliography]
+|`bibliography`
+|N/A
+|
+
+|xref:part-and-chapter.adoc#chapter-label[Chapter label]
+|`chapter-label`
+|_Chapter_ (default) or user defined text
+|`book` doctype only; Asciidoctor PDF only
+
+|xref:colophon.adoc[Colophon; copyright page]
+|`colophon`
+|N/A
+|`book` doctype only
+
+|xref:dedication.adoc[Dedication]
+|`dedication`
+|N/A
+|`book` doctype only
+
+|xref:discrete.adoc[Discrete section style]
+|`discrete`
+|N/A
+|
+
+|xref:glossary.adoc[Glossary]
+|`glossary`
+|N/A
+|
+
+|xref:id.adoc#prefix[Section ID prefix]
+|`idprefix`
+|`_` (default) or user defined text
+|Set by default
+//Set to prepend string to generated section ID
+
+|xref:id.adoc#separator[Section ID word separator]
+|`idseparator`
+|`_` (default) or user defined character
+|Set by default
+//Set to insert character between words in generated section ID
+
+|xref:index.adoc[Index]
+|`index`
+|N/A
+|DocBook only
+
+|xref:part-and-chapter.adoc#part-label[Part label]
+|`part-label`
+|_Part_ (default) or user defined text
+|`book` doctype only
+
+|xref:preface.adoc[Preface]
+|`preface`
+|N/A
+|`book` doctype only; can have subsections
+
+|xref:id.adoc#anchor[Section anchor]
+|`sectanchors`
+|N/A
 |
 //Asciidoctor only
 
-|sectlinks
+|xref:id.adoc#auto-id[Section ID]
+|`sectids`
 |N/A
-|`:sectlinks:`
+|Set by default
+//Autogenerates section IDs by default
+
+|xref:id.adoc#link[Section link]
+|`sectlinks`
+|N/A
 |
 //Asciidoctor only
 
-|sectnums
+|xref:number.adoc[Section numbers]
+|`sectnums`
 |N/A
-|`:sectnums:`
-|Off by default;
-can be toggled on or off in the flow of the document
+|Can be toggled on or off in the flow of the document
 // replaces numbered in AsciiDoc.py
 
-|sectnumlevels
-|0-5
-|`:sectnumlevels: 3`
-|Autogenerate section numbers up to level three by default;
-value of `0` is the same as `sectnums!`
+|xref:number.adoc#numlevels[Section numbers level depth]
+|`sectnumlevels`
+|`3` (default) when `sectnums` is set; 0 through 5
+|Value of `0` is the same as `sectnums!`
+
+|xref:level-and-title.adoc#untitled[Untitled section option]
+|`options` or `%`
+|`untitled`
+|DocBook only; can only be set on special sections
+//Asciidoctor only
 |===
