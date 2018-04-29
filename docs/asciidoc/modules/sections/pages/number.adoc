@@ -4,19 +4,31 @@ include::_attributes.adoc[]
 endif::[]
 // New page, content taken from sections.adoc
 
-== Numbering
-
+== Turn on section numbers
 // tag::number[]
-Section numbering can be toggled on and off throughout a document.
-You can enable section numbers using the `sectnums` attribute.
+Sections aren't numbered by default.
+However, you can enable this feature by setting the attribute `sectnums`.
 
 [source]
 ----
+= Title
 :sectnums:
 ----
 
-You can also use `sectnums` above any section title in the document to toggle the auto-numbering setting.
-When you want to turn off the numbering, add an exclamation point to the end of the attribute name:
+When `sectnums` is set, level 1 (`==`) through level 3 (`====`) section titles are prefixed with arabic numbers in the form of _1._, _1.1._, etc.
+Section numbers can be set and unset via the document header, CLI, and API.
+Once you've set `sectnums`, you can reduce or increase the section levels that get numbered in the whole document with the <<numlevels,sectnumlevels attribute>>.
+You can also control whether a section is numbered on a section by section basis.
+
+=== Toggle section numbers on or off per section
+
+The `sectnums` attribute is a unique attribute.
+It's a [.term]_flexible attribute_, which means it can be set and unset midstream in a document, even if it is enabled through the API or CLI.
+This allows you to toggle numbering on and off throughout a document.
+
+//You can also use `sectnums` above any section title in the document to toggle the auto-numbering setting.
+To turn off numbering for one or more sections, insert the attribute above the section where you want numbering to cease and unset it by adding an exclamation point to the end of its name.
+To turn section numbering back on midstream, reset the attribute above the section where numbering should resume.
 
 [source]
 ----
@@ -24,44 +36,51 @@ include::{examplesdir}/section.adoc[tag=num-off]
 ----
 
 For regions of the document where section numbering is turned off, the section numbering will not be incremented.
+Given the above example, the sections will be numbered as follows:
 
-Given:
-
-[source]
-----
-include::{examplesdir}/section.adoc[tag=num]
-----
-
-The sections will be numbered as follows:
-
-[source]
-----
+....
 include::{examplesdir}/section.adoc[tag=num-out]
+....
+
+The section number does not increment in regions of the document where section numbers are turned off.
+
+=== sectnums order of precedence
+
+If `sectnums` is set on the command line or API, it overrides the value set in the document header, but it does not prevent the document from toggling the value for regions of the document.
+
+If it is unset (`sectnums!`) on the command line or API, then the numbers are disabled regardless of the setting within the document.
+
+== Number special sections
+
+Sections that are assigned a built-in special style are not numbered by default.
+To number regular sections as well as special sections, set `sectnums` and assign it a value of `all`.
+
+[source]
+----
+= Title
+:sectnums: all
 ----
 
-Asciidoctor will always curtail incrementing the section number in regions of the document where section numbers are off.
+The assignment of appendix numbers isn't affected by `sectnums` as their section title prefixes are controlled by the attribute xref:appendix.adoc#caption[appendix-caption].
+Book parts aren't numbered by `sectnums` either, instead, they're controlled by `partnums`.
 
-If `sectnums` is set on the command line or API, that overrides the value set in the document header, but it does not prevent the document from toggling the value for regions of the document.
+== Number book parts
 
-If `sectnums!` is set on the command line or API, then the numbers are disabled regardless of the setting within the document.
-
-.Flexible attributes
-****
-The `sectnums` attribute is a unique attribute.
-It's a "`flexible attribute`", which means it can be changed midstream in a document, even if it is enabled through the API or CLI.
-****
+include::{partialsdir}/part-number.adoc[]
 
 [#numlevels]
-== Numbering depth
+== Specify the section levels that are numbered
 
-You can restrict section numbering depth by defining the `sectnumlevels` attribute.
-Sectnumlevels can only be set in the document header.
+When `sectnums` is set, level 1 (`==`) through level 3 (`====`) section titles are numbered by default.
+You can increase or reduce the section level limit be setting the `sectnumlevels` attribute and assigning it the section level you want it to number.
+The `sectnumlevels` attribute accepts a value of 0 through 5, and it can only be set in the document header.
 
 [source]
 ----
 include::{examplesdir}/section.adoc[tag=sectnuml]
 ----
-<1> When the `sectnumlevels` attribute is assigned a value of `2`, section titles with levels 3 through 5 are not numbered (i.e., not prefixed with a number).
+<1> When the `sectnumlevels` attribute is assigned a value of `2`, level 3 through 5 section titles are not numbered.
+// (i.e., not prefixed with a number).
 
 Assigning `sectnumlevels` a value of `0` is effectively the same as disabling section numbering (`sectnums!`).
 // end::number[]

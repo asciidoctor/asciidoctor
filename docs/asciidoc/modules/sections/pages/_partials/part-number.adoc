@@ -1,0 +1,23 @@
+Book parts are assigned roman numerals when the attribute `partnums` is set.
+
+[source]
+----
+= The Secret Manual
+:doctype: book
+:sectnums:
+:partnums:
+
+= Defensive Operations
+
+== An Introduction to DefenceOps
+
+= Managing Werewolves
+----
+
+When rendered, part numbers are displayed as roman numerals.
+
+....
+I. Defensive Operations
+1. An Introduction to DefenceOps
+II. Managing Werewolves
+....

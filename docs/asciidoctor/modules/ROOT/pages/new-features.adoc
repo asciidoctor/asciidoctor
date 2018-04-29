@@ -3,6 +3,10 @@ ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
 
-== AsciiDoc syntax and attributes
+== Sections and parts
 
-Hide the titles of special sections, such as the Dedication, with `untitled` (DocBook backend only).
+Hide the titles of special sections, such as the dedication, with `untitled` (DocBook backend only).
+
+Number all sections, including special sections, with `:sectnums: all`.
+
+Number book parts with `:partnums:`.

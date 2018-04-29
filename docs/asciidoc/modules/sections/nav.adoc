@@ -11,7 +11,7 @@
 // & Epigraph
 *** xref:abstract.adoc[Abstract]
 *** xref:preface.adoc[Preface]
-*** xref:part-and-chapter.adoc[Chapters & Parts]
+*** xref:part-and-chapter.adoc[Parts & Chapters]
 // Back matter
 *** xref:appendix.adoc[Appendix]
 *** xref:glossary.adoc[Glossary]
