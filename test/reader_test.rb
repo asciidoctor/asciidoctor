@@ -1195,10 +1195,26 @@ include::fixtures/mismatched-end-tag.adoc[tags=a;b]
 ++++
         EOS
 
+        inc_path = File.join DIRNAME, 'fixtures/mismatched-end-tag.adoc'
         using_memory_logger do |logger|
           result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
           assert_equal %(a\nb), result
-          assert_message logger, :WARN, 'fixtures/mismatched-end-tag.adoc: line 5: mismatched end tag in include: expected b, found a', Hash
+          assert_message logger, :WARN, %(<stdin>: line 2: mismatched end tag (expected 'b' but found 'a') at line 5 of include file: #{inc_path}), Hash
+        end
+      end
+
+      test 'should warn if unexpected end tag is found in included file' do
+        input = <<-EOS
+++++
+include::fixtures/unexpected-end-tag.adoc[tags=a]
+++++
+        EOS
+
+        inc_path = File.join DIRNAME, 'fixtures/unexpected-end-tag.adoc'
+        using_memory_logger do |logger|
+          result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          assert_equal 'a', result
+          assert_message logger, :WARN, %(<stdin>: line 2: unexpected end tag 'a' at line 4 of include file: #{inc_path}), Hash
         end
       end
 
