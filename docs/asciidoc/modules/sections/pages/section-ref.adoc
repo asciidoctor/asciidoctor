@@ -75,9 +75,9 @@ endif::[]
 |N/A
 |DocBook only
 
-|xref:part-and-chapter.adoc#part-label[Part label]
-|`part-label`
-|_Part_ (default) or user defined text
+|xref:part-and-chapter.adoc#partnums[Part numbers]
+|`partnums`
+|N/A
 |`book` doctype only
 
 |xref:preface.adoc[Preface]
@@ -105,7 +105,7 @@ endif::[]
 
 |xref:number.adoc[Section numbers]
 |`sectnums`
-|N/A
+|empty (default) or `all`
 |Can be toggled on or off in the flow of the document
 // replaces numbered in AsciiDoc.py
 
@@ -120,3 +120,10 @@ endif::[]
 |DocBook only; can only be set on special sections
 //Asciidoctor only
 |===
+
+////
+|xref:part-and-chapter.adoc#part-label[Part label]
+|`part-label`
+|_Part_ (default) or user defined text
+|`book` doctype only
+////
