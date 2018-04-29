@@ -1183,7 +1183,7 @@ a|AsciiDoc footnote:[A lightweight markup language.]
       EOS
 
       result = render_string input
-      assert_css '#_footnote_1', result, 1
+      assert_css '#_footnotedef_1', result, 1
     end
 
     test 'callout numbers should be globally unique, including AsciiDoc table cells' do

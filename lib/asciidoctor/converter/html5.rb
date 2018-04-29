@@ -189,7 +189,7 @@ module Asciidoctor
         result << %(<div id="footnotes">
 <hr#{slash}>)
         node.footnotes.each do |footnote|
-          result << %(<div class="footnote" id="_footnote_#{footnote.index}">
+          result << %(<div class="footnote" id="_footnotedef_#{footnote.index}">
 <a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a>. #{footnote.text}
 </div>)
         end
@@ -281,7 +281,7 @@ MathJax.Hub.Config({
         result << %(<div id="footnotes">
 <hr#{@void_element_slash}>)
         node.footnotes.each do |footnote|
-          result << %(<div class="footnote" id="_footnote_#{footnote.index}">
+          result << %(<div class="footnote" id="_footnotedef_#{footnote.index}">
 <a href="#_footnoteref_#{footnote.index}">#{footnote.index}</a>. #{footnote.text}
 </div>)
         end
@@ -1088,10 +1088,10 @@ Your browser does not support the video tag.
     def inline_footnote node
       if (index = node.attr 'index', nil, false)
         if node.type == :xref
-          %(<sup class="footnoteref">[<a class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</sup>)
+          %(<sup class="footnoteref">[<a class="footnote" href="#_footnotedef_#{index}" title="View footnote.">#{index}</a>]</sup>)
         else
           id_attr = node.id ? %( id="_footnote_#{node.id}") : ''
-          %(<sup class="footnote"#{id_attr}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnote_#{index}" title="View footnote.">#{index}</a>]</sup>)
+          %(<sup class="footnote"#{id_attr}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnotedef_#{index}" title="View footnote.">#{index}</a>]</sup>)
         end
       elsif node.type == :xref
         %(<sup class="footnoteref red" title="Unresolved footnote reference.">[#{node.text}]</sup>)
