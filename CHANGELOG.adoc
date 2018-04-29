@@ -100,6 +100,7 @@ Bug fixes::
   * set outfilesuffix to match file extension of output file (#2258, PR #2367)
   * add block title to dlist in manpage output (#1611, PR #2434)
   * scale text to 80% in print styles (#1484, PR #2576)
+  * fix alignment of abstract title when using default stylesheet (PR #2732)
   * output non-breaking space for man manual if absent in DocBook output (PR #2636)
 
 Improvements / Refactoring::
