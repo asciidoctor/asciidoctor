@@ -119,9 +119,22 @@ Content of second section
 // end::with-anchor-shorthand[]
 
 // tag::num-off[]
+= Title
+:sectnums:
+
+== Numbered Section
+
 :sectnums!:
 
 == Unnumbered Section
+
+== Unnumbered Section
+
+=== Unnumbered Section
+
+:sectnums:
+
+== Numbered Section
 // end::num-off[]
 
 // tag::num[]
@@ -145,20 +158,20 @@ Content of second section
 // end::num[]
 
 // tag::num-out[]
-Colophon Section
+1. Numbered Section
 
-Another Colophon Section
+Unnumbered Section
 
-Last Colophon Section
+Unnumbered Section
 
-1. Section One
+Unnumbered Section
 
-2. Section Two
-
-3. Section Three
+2. Numbered Section
 // end::num-out[]
 
 // tag::sectnuml[]
+= Title
+:sectnums:
 :sectnumlevels: 2 // <1>
 // end::sectnuml[]
 
