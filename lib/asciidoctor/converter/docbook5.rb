@@ -4,6 +4,7 @@ module Asciidoctor
   # similar to the docbook45 backend from AsciiDoc Python, but migrated to the
   # DocBook 5 specification.
   class Converter::DocBook5Converter < Converter::BuiltIn
+    CopyrightRx = /^(.+?)(?: ((?:\d{4}\-)?\d{4}))?$/
     ImageMacroRx = /^image::?(.+?)\[(.*?)\]$/
 
     def document node
@@ -671,6 +672,13 @@ module Asciidoctor
       result << document_title_tags(doc.doctitle :partition => true, :use_fallback => true) unless doc.notitle
       if (date = (doc.attr? 'revdate') ? (doc.attr 'revdate') : ((doc.attr? 'reproducible') ? nil : (doc.attr 'docdate')))
         result << %(<date>#{date}</date>)
+      end
+      if doc.attr? 'copyright'
+        CopyrightRx =~ (doc.attr 'copyright')
+        result << '<copyright>'
+        result << %(<holder>#{$1}</holder>)
+        result << %(<year>#{$2}</year>) if $2
+        result << '</copyright>'
       end
       if doc.has_header?
         if doc.attr? 'author'
