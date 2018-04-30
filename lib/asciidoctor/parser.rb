@@ -1343,11 +1343,15 @@ class Parser
         content_adjacent = false
       end
 
-      attrs, opts = {}, { :text => !has_text }
+      # reader is confined to boundaries of list, which means only blocks will be found (no sections)
+      if (block = next_block(list_item_reader, list_item, (attrs = {}), :text => !has_text))
+        list_item.blocks << block
+      end
 
-      # we can look for blocks until lines are exhausted without worrying about
-      # sections since reader is confined to boundaries of list
-      while ((block = next_block list_item_reader, list_item, attrs, opts) && list_item.blocks << block) || list_item_reader.has_more_lines?
+      while list_item_reader.has_more_lines?
+        if (block = next_block(list_item_reader, list_item, attrs))
+          list_item.blocks << block
+        end
       end
 
       list_item.fold_first(continuation_connects_first_block, content_adjacent)
