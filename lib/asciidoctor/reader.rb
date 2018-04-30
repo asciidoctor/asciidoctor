@@ -546,7 +546,7 @@ class Reader
   end
 
   def mark
-    @mark = [@file, @dir, @path, @lineno]
+    @mark = @file, @dir, @path, @lineno
   end
 
   # Public: Get information about the last line read, including file name and line number.
