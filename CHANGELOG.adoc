@@ -188,7 +188,7 @@ Improvements / Refactoring::
   * resolve include target correctly in browser (xmlhttprequest IO module) (#2599, #2602)
   * extract method to resolve include path (allowing Asciidoctor.js to override) (#2610)
   * don't expand docdir value passed to API (#2518)
-  * check mandatory attributes when creating an image block (#2349, PR #2355) (@mogztter)
+  * check mandatory attributes when creating an image block (#2349, PR #2355) (*@mogztter*)
   * drop is_ prefix from boolean methods in PathResolver (PR #2587)
   * change Reader#replace_next_line to return true
   * organize methods in AbstractNode
@@ -197,7 +197,7 @@ Build / Infrastructure::
 
   * clean up dependencies
   * add Ruby 2.5.0 to CI build matrix (PR #2528)
-  * update nokogiri to 1.8.0 for ruby >= 2.1 (PR #2380) (@miltador)
+  * update nokogiri to 1.8.0 for ruby >= 2.1 (PR #2380) (*@miltador*)
 
 Distribution Packages::
 
@@ -283,7 +283,7 @@ Enhancements::
   * allow extension groups to be unregistered individually (#1701)
   * catalog bibliography anchors and capture reftext (#560, #1562)
   * automatically add bibliography style to unordered list in bibliography section (#1924)
-  * disable startinline option when highlighting PHP if mixed option is set on source block (PR #2015) (@ricpelo)
+  * disable startinline option when highlighting PHP if mixed option is set on source block (PR #2015) (*@ricpelo*)
   * configure Slim to resolve includes in specified template dirs (#2214)
   * dump manpage when -h manpage flag is passed to CLI (#2302)
   * add resolves_attributes method to DSL for macros (#2122)
@@ -311,7 +311,7 @@ Improvements::
   * process include directive inside text of short form preprocessor conditional (#2146)
   * add support for include tags in languages that only support only circumfix comments (#1729)
   * allow spaces in target of block image; target must start and end with non-space (#1943)
-  * add warning in verbose mode if xref is not found (@fapdash) (#2268)
+  * add warning in verbose mode if xref is not found (#2268) (*@fapdash*)
   * add warning if duplicate ID is detected (#2244)
   * validate that output file will not overwrite input file (#1956)
   * include docfile in warning when stylesheet cannot be read (#2089)
@@ -347,7 +347,7 @@ Improvements::
   * be more precise about splitting kbd characters (#1660)
   * rename limit method on String to limit_bytesize (#1889)
   * leverage Ruby's match? method to speed up non-capturing regexps (PR #1938)
-  * preserve inline break in manpages (@letheed)
+  * preserve inline break in manpages (*@letheed*)
   * check for presence of SOURCE_DATE_EPOCH instead of value; fail if value is malformed
   * add Rows#by_section method to return table sections (#2219)
   * cache which template engines have been loaded to avoid unnecessary processing
@@ -428,7 +428,7 @@ Bug fixes::
   * fix regression of not matching short form of custom block macro
   * encode double quotes in image alt text when used in an attribute (#2061)
   * encode double quote and strip XML tags in value of xreflabel attribute in DocBook converter (PR #2220)
-  * fix typo in base64 data (PR #2094) (@mogztter)
+  * fix typo in base64 data (PR #2094) (*@mogztter*)
   * permit pass macro to surround a multi-line attribute value with hard line breaks (#2211)
   * fix sequential inline anchor macros with empty reftext (#1689)
   * don't mangle compound names when document has multiple authors (#663)
@@ -438,8 +438,8 @@ Bug fixes::
   * remove max-width on the callout number icon (#1895)
   * eagerly add hljs class for highlight.js (#2221)
   * fix SOURCE_DATE_EPOCH lookup in Opal
-  * fix paths with file URI scheme are inevitably absolute (PR #1925) (@mogztter)
-  * only resolve file URLs when JavaScript IO module is xmlhttprequest (PR #1898) (@mogztter)
+  * fix paths with file URI scheme are inevitably absolute (PR #1925) (*@mogztter*)
+  * only resolve file URLs when JavaScript IO module is xmlhttprequest (PR #1898) (*@mogztter*)
   * fix formatting of video title in manpage converter
   * don't increment line number if peek_lines overruns buffer (fixes some cases when line number is off)
   * freeze extension processor instance, not class
@@ -448,30 +448,30 @@ Bug fixes::
 
 Documentation::
   * enable admonition icons in README when displayed on GitHub
-  * add German translation of chapter-label (PR #1920) (@fapdash)
-  * add Ukrainian translation of built-in attributes (PR #1955) (@hedrok)
-  * add Norwegian Nynorsk translation; updated Norwegian Bokmål translation of built-in attributes (PR #2142) (@huftis)
-  * add Polish translation of built-in attributes (PR #2131) (@ldziedziul)
-  * add Romanian translation of built-in attributes (PR #2125) (@vitaliel)
-  * fix Japanese translation of built-in attributes (PR #2116) (@haradats)
-  * add Bahasa Indonesia translation of built-in labels (@triyanwn)
+  * add German translation of chapter-label (PR #1920) (*@fapdash*)
+  * add Ukrainian translation of built-in attributes (PR #1955) (*@hedrok*)
+  * add Norwegian Nynorsk translation; updated Norwegian Bokmål translation of built-in attributes (PR #2142) (*@huftis*)
+  * add Polish translation of built-in attributes (PR #2131) (*@ldziedziul*)
+  * add Romanian translation of built-in attributes (PR #2125) (*@vitaliel*)
+  * fix Japanese translation of built-in attributes (PR #2116) (*@haradats*)
+  * add Bahasa Indonesia translation of built-in labels (*@triyanwn*)
 
 Build / Infrastructure::
   * upgrade highlight.js to 9.12.0 (#1652)
-  * include entire test suite in gem (PR #1952) (@voxik)
-  * upgrade Slim development dependency to 3.0.x (PR #1953) (@voxik)
+  * include entire test suite in gem (PR #1952) (*@voxik*)
+  * upgrade Slim development dependency to 3.0.x (PR #1953) (*@voxik*)
   * upgrade Haml development dependency to 5.0.x
   * upgrade Nokogiri to 1.6.x (except on Ruby 1.8) (PR #1213)
   * add Ruby 2.4 to CI test matrix (PR #1980)
   * upgrade cucumber and JRuby in CI build (PR #2005)
-  * fix reference to documentation in attributes.adoc (PR #1901) (@stonio)
+  * fix reference to documentation in attributes.adoc (PR #1901) (*@stonio*)
   * trap and verify all warnings when tests are run with warnings enabled
   * set default task in build to test:all
   * configure run-tests.sh script to run all tests
   * configure feature tests to only show progress
   * configure Slim in feature tests to use html as format instead of deprecated html5
   * lock version of yard to fix invalid byte sequence in Ruby 1.9.3
-  * modify rake build to trigger dependent builds (specifically, Asciidoctor.js) (@mogztter) (PR #2305)
+  * modify rake build to trigger dependent builds (specifically, Asciidoctor.js) (PR #2305) (*@mogztter*)
 
 Distribution Packages::
 
@@ -489,14 +489,14 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.5\...v1.5.6[full diff]
 
 Enhancements::
   * Add preference to limit the maximum size of an attribute value (#1861)
-  * Honor SOURCE_DATE_EPOCH environment variable to accomodate reproducible builds (@JojoBoulix) (#1721)
+  * Honor SOURCE_DATE_EPOCH environment variable to accomodate reproducible builds (#1721) (*@JojoBoulix*)
   * Add reversed attribute to ordered list if reversed option is enabled (#1830)
   * Add support for additional docinfo locations (e.g., :header)
   * Configure default stylesheet to break monospace word if exceeds length of line; add roles to prevent breaks (#1814)
-  * Introduce translation file for built-in labels (@ciampix)
-  * Provide translations for built-in labels (@JmyL - kr, @ciampix - it, @ivannov - bg, @maxandersen - da, @radcortez - pt, @eddumelendez - es, @leathersole - jp, @aslakknutsen - no, @shahryareiv - fa, @AlexanderZobkov - ru, @dongwq - zh, @rmpestano - pt_BR, @ncomet - fr, @lgvz - fi, @patoi - hu, @BojanStipic - sr, @fwilhe - de, @rahmanusta - tr, @abelsromero - ca, @aboullaite - ar, @roelvs - nl)
-  * Translate README to Chinese (@diguage)
-  * Translate README to Japanese (@Mizuho32)
+  * Introduce translation file for built-in labels (*@ciampix*)
+  * Provide translations for built-in labels (*@JmyL* - kr, *@ciampix* - it, *@ivannov* - bg, *@maxandersen* - da, *@radcortez* - pt, *@eddumelendez* - es, *@leathersole* - jp, *@aslakknutsen* - no, *@shahryareiv* - fa, *@AlexanderZobkov* - ru, *@dongwq* - zh, *@rmpestano* - pt_BR, *@ncomet* - fr, *@lgvz* - fi, *@patoi* - hu, *@BojanStipic* - sr, *@fwilhe* - de, *@rahmanusta* - tr, *@abelsromero* - ca, *@aboullaite* - ar, *@roelvs* - nl)
+  * Translate README to Chinese (*@diguage*)
+  * Translate README to Japanese (*@Mizuho32*)
 
 Improvements::
   * Style nested emphasized phrases properly when using default stylesheet (#1691)
@@ -508,12 +508,12 @@ Improvements::
   * Enable font smoothing on Firefox on OSX (#1837)
   * Support combined use of sectanchors and sectlinks in HTML5 output (#1806)
   * fix API docs for find_by
-  * Upgrade to Font Awesome 4.6.3 (@allenan, @mogztter) (#1723)
+  * Upgrade to Font Awesome 4.6.3 (#1723) (*@allenan*, *@mogztter*)
   * README: add install instructions for Alpine Linux
   * README: Switch yum commands to dnf in README
   * README: Mention Mint as a Debian distro that packages Asciidoctor
-  * README: Add caution advising against using gem update to update a system-managed gem (@oddhack)
-  * README: sync French version with English version (@flashcode)
+  * README: Add caution advising against using gem update to update a system-managed gem (*@oddhack*)
+  * README: sync French version with English version (*@flashcode*)
   * Add missing endline after title element when converting open block to HTML
   * Move list_marker_keyword method from AbstractNode to AbstractBlock
   * Rename definition list to description list internally
@@ -536,7 +536,7 @@ Bug fixes::
 
 Infrastructure::
   * Build gem properly in the absense of a git workspace, make compatible with JRuby (#1779)
-  * Run tests in CI using latest versions of Ruby, including Ruby 2.3 (@ferdinandrosario)
+  * Run tests in CI using latest versions of Ruby, including Ruby 2.3 (*@ferdinandrosario*)
 
 Distribution Packages::
 
@@ -553,7 +553,7 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.4\...v1.5.5[full diff]
 == 1.5.4 (2016-01-03) - @mojavelinux
 
 Enhancements::
-  * translate README into French (@anthonny, @mogztter, @gscheibel, @mgreau) (#1630)
+  * translate README into French (#1630) (*@anthonny*, *@mogztter*, *@gscheibel*, *@mgreau*)
   * allow linkstyle in manpage output to be configured (#1610)
 
 Improvements::
@@ -561,9 +561,9 @@ Improvements::
   * upgrade to Font Awesome 4.5.0
   * disable toc if document has no sections (#1633)
   * convert inline asciimath to MathML (using asciimath gem) in DocBook converter (#1622)
-  * add attribute to control build reproducibility (@bk2204) (#1453)
+  * add attribute to control build reproducibility (#1453) (*@bk2204*)
   * recognize \file:/// as a file root in Opal browser env (#1561)
-  * honor icon attribute on admonition block when font-based icons are enabled (@robertpanzer) (#1593)
+  * honor icon attribute on admonition block when font-based icons are enabled (#1593) (*@robertpanzer*)
   * resolve custom icon relative to iconsdir; add file extension if absent (#1634)
   * allow asciidoctor cli to resolve library path when invoked without leading ./
 
@@ -579,13 +579,13 @@ Bug fixes::
   * don't swallow trailing line when include file is not readable (#1602)
   * change xlink namespace to xl in DocBook 5 output to prevent parse error (#1597)
   * make callouts globally unique within document, including AsciiDoc table cells (#1626)
-  * initialize Slim-related attributes regardless of when Slim was loaded (@terceiro) (#1576)
-  * differentiate literal backslash from escape sequence in manpage output (@ds26gte) (#1604)
-  * don't mistake line beginning with \. for troff macro in manpage output (@ds26gte) (#1589)
-  * escape leading dots so user content doesn't trigger troff macros in manpage output (@ds26gte) (#1631)
-  * use \c after .URL macro to remove extraneous space in manpage output (@ds26gte) (#1590)
+  * initialize Slim-related attributes regardless of when Slim was loaded (#1576) (*@terceiro*)
+  * differentiate literal backslash from escape sequence in manpage output (#1604) (*@ds26gte*)
+  * don't mistake line beginning with \. for troff macro in manpage output (#1589) (*@ds26gte*)
+  * escape leading dots so user content doesn't trigger troff macros in manpage output (#1631) (*@ds26gte*)
+  * use \c after .URL macro to remove extraneous space in manpage output (#1590) (*@ds26gte*)
   * fix missing endline after .URL macro in manpage output (#1613)
-  * properly handle spacing around .URL/.MTO macro in manpage output (@ds26gte) (#1641)
+  * properly handle spacing around .URL/.MTO macro in manpage output (#1641) (*@ds26gte*)
   * don't swallow doctitle attribute followed by block title (#1587)
   * change strategy for splitting names of author; fixes bug in Opal/Asciidoctor.js
   * don't fail if library is loaded more than once
@@ -613,23 +613,23 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.3\...v1.5.4[full diff]
 
 Enhancements::
   * add support for interactive & inline SVGs (#1301, #1224)
-  * add built-in manpage backend (@davidgamba) (#651)
-  * create Mallard backend; asciidoctor/asciidoctor-mallard (@bk2204) (#425)
-  * add AsciiMath to MathML converter to support AsciiMath in DocBook converter (@pepijnve) (#954)
+  * add built-in manpage backend (#651) (*@davidgamba*)
+  * create Mallard backend; asciidoctor/asciidoctor-mallard (#425) (*@bk2204*)
+  * add AsciiMath to MathML converter to support AsciiMath in DocBook converter (#954) (*@pepijnve*)
   * allow text of selected lines to be highlighted in source block by Pygments or CodeRay (#1429)
   * use value of `docinfo` attribute to control docinfo behavior (#1510)
-  * add `docinfosubs` attribute to control which substitutions are performed on docinfo files (@mogztter) (#405)
-  * drop ability to specify multiple attributes with a single `-a` flag when using the CLI (@mogztter) (#405)
-  * make subtitle separator chars for document title configurable (@rmannibucau) (#1350)
+  * add `docinfosubs` attribute to control which substitutions are performed on docinfo files (#405) (*@mogztter*)
+  * drop ability to specify multiple attributes with a single `-a` flag when using the CLI (#405) (*@mogztter*)
+  * make subtitle separator chars for document title configurable (#1350) (*@rmannibucau*)
   * make XrefInlineRx regexp more permissive (Mathieu Boespflug) (#844)
 
 Improvements::
-  * load JavaScript and CSS at bottom of HTML document (@mogztter) (#1238)
-  * list available backends in help text (@plaindocs) (#1271)
+  * load JavaScript and CSS at bottom of HTML document (#1238) (*@mogztter*)
+  * list available backends in help text (#1271) (*@plaindocs*)
   * properly expand tabs in literal text (#1170, #841)
-  * add `source-indent` as document attribute (@mogztter) (#1169)
+  * add `source-indent` as document attribute (#1169) (*@mogztter*)
   * upgrade MathJax to 2.5.3 (#1329)
-  * upgrade Font Awesome to 4.4.0 (@mogztter) (#1465)
+  * upgrade Font Awesome to 4.4.0 (#1465) (*@mogztter*)
   * upgrade highlight.js to 8.6 (now 8.9.1) (#1390)
   * don't abort if syntax highlighter isn't available (#1253)
   * insert docinfo footer below footer div (#1503)
@@ -638,10 +638,10 @@ Improvements::
   * restore attributes to header attributes after parse (#1255)
   * allow docdate and doctime to be overridden (#1495)
   * add CSS class `.center` for center block alignment (#1456)
-  * recognize U+2022 (bullet) as alternative marker for unordered lists (@mogztter) (#1177)
+  * recognize U+2022 (bullet) as alternative marker for unordered lists (#1177) (*@mogztter*)
   * allow videos to work for local files by prepending asset-uri-scheme (Chris) (#1320)
   * always assign playlist param when loop option is enabled for YouTube video
-  * parse isolated version in revision line (@bk2204) (#790)
+  * parse isolated version in revision line (#790) (*@bk2204*)
   * autoload Tilt when template converter is instantiated (#1313)
   * don't overwrite existing id entry in references table (#1256)
   * use outfilesuffix attribute defined in header when resolving outfile (#1412)
@@ -652,15 +652,15 @@ Improvements::
   * load Droid Sans Mono 700 in default stylesheet
   * set line height of table cells used for syntax highlighting
   * set font-family of kbd; refine styling (#1423)
-  * extract condition into `quote_lines?` method (@mogztter)
-  * extract inline code into `read_paragraph` method (@mogztter)
+  * extract condition into `quote_lines?` method (*@mogztter*)
+  * extract inline code into `read_paragraph` method (*@mogztter*)
   * parent of block in ListItem should be ListItem (#1359)
   * add helper methods to List and ListItem (#1551)
-  * add method `AbstractNode#add_role` and `AbstractNode#remove_role` (@robertpanzer) (#1366)
+  * add method `AbstractNode#add_role` and `AbstractNode#remove_role` (#1366) (*@robertpanzer*)
   * introduce helper methods for sniffing URIs (#1422)
   * add helper to calculate basename without file extension
-  * document `-I` and `-r` options in the manual page (@bk2204)
-  * fix `+--help+` output text for `-I` (@bk2204)
+  * document `-I` and `-r` options in the manual page (*@bk2204*)
+  * fix `+--help+` output text for `-I` (*@bk2204*)
   * don't require open-uri-cached if already loaded
   * do not attempt to scan pattern of non-existent directory in template converter
   * prevent CodeRay from bolding every 10th line number
@@ -675,7 +675,7 @@ Compliance::
 
 Bug fixes::
   * don't truncate exception stack in `Asciidoctor.load` (#1248)
-  * don't fail to save cause of Java exception (@robertpanzer) (#1458)
+  * don't fail to save cause of Java exception (#1458) (*@robertpanzer*)
   * fix precision error in timings report (#1342)
   * resolve regexp for inline macro lazily (#1336)
   * block argument to `find_by` should filter results (#1393)
@@ -692,7 +692,7 @@ Bug fixes::
   * fix invalid color value in default CodeRay theme
   * built-in writer no longer fails if output is nil (#1544)
   * custom template engine options should take precedence
-  * fallback to require with a non-relative path to support Debian package (@mogztter)
+  * fallback to require with a non-relative path to support Debian package (*@mogztter*)
   * pass opts to recursive invocations of `PathResolver#system_path`
   * fix and test external links in docbook backend
   * use format symbol `:html` instead of `:html5` for Slim to fix warnings
@@ -721,15 +721,15 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.2\...v1.5.3[full diff]
 
 Enhancements::
 
-  * add docinfo extension (@mogztter) (#1162)
-  * allow docinfo to be in separate directory from content, specified by `docinfodir` attribute (@mogztter) (#511)
-  * enable TeX equation auto-numbering if `eqnums` attribute is set (@jxxcarlson) (#1110)
+  * add docinfo extension (#1162) (*@mogztter*)
+  * allow docinfo to be in separate directory from content, specified by `docinfodir` attribute (#511) (*@mogztter*)
+  * enable TeX equation auto-numbering if `eqnums` attribute is set (#1110) (*@jxxcarlson*)
 
 Improvements::
 
   * recognize `--` as valid line comment for callout numbers; make line comment configurable (#1068)
   * upgrade highlight.js to version 8.4 (#1216)
-  * upgrade Font Awesome to version 4.2.0 (@clojens) (#1201)
+  * upgrade Font Awesome to version 4.2.0 (#1201) (*@clojens*)
   * define JAVASCRIPT_PLATFORM constant to simplify conditional logic in the JavaScript environment (#897)
   * provide access to destination directory, outfile and outdir via Document object (#1203)
   * print encoding information in version report produced by `asciidoctor -v` (#1210)
@@ -740,13 +740,13 @@ Improvements::
   * make start number for unique id generation configurable (#1148)
   * normalize and force UTF-8 encoding of docinfo content (#831)
   * allow subs and default_subs to be specified in Block constructor (#749)
-  * enhance error message when reading binary input files (@mogztter) (#1158)
+  * enhance error message when reading binary input files (#1158) (*@mogztter*)
   * add `append` method as alias to `<<` method on AbstractBlock (#1085)
   * assign value of `preface-title` as title of preface node (#1090)
   * fix spacing around checkbox in checklist (#1138)
-  * automatically load Slim's include plugin when using slim templates (@jirutka) (#1151)
-  * mixin Slim helpers into execution scope of slim templates (@jirutka) (#1143)
-  * improve DocBook output for manpage doctype (@bk2204) (#1134, #1142)
+  * automatically load Slim's include plugin when using slim templates (#1151) (*@jirutka*)
+  * mixin Slim helpers into execution scope of slim templates (#1143) (*@jirutka*)
+  * improve DocBook output for manpage doctype (#1134, #1142) (*@bk2204*)
 
 Compliance::
 
@@ -822,10 +822,10 @@ Enhancements::
   * {star} switch to open source fonts (Open Sans, Noto Serif and Droid Sans Mono) in default stylesheet, major refinements to theme (#879)
   * {star} embed remote images when data-uri and allow-uri-read attributes are set (#612)
   * {star} support leveloffset on include directive and honor relative leveloffset values (#530)
-  * {star} switch default docbook backend to docbook5 (@bk2204) (#554)
+  * {star} switch default docbook backend to docbook5 (#554) (*@bk2204*)
   * {star} added hide-uri-scheme attribute to hide uri scheme in automatic links (#800)
   * {star} allow substitutions to be incrementally added & removed (#522)
-  * {star} add compatibility with Opal, add shim compat library, use compatibility regexp, require libraries properly (@mogztter) (#679, #836, #846)
+  * {star} add compatibility with Opal, add shim compat library, use compatibility regexp, require libraries properly (#679, #836, #846) (*@mogztter*)
   * {star} output XHTML when backend is xhtml or xhtml5 (#494)
   * {star} add shorthand subs and specialchars as an alias for specialcharacters (#579)
   * {star} deprecate toc2 attribute in favor of position and placement values on toc attribute (e.g., toc=left) (#706)
@@ -848,9 +848,9 @@ Improvements::
 
   * {star} don't select lines that contain a tag directive when including tagged lines, make tag regexp more strict (#1027)
   * {star} use https scheme for assets by default
-  * {star} upgrade to Font Awesome 4.1 (@mogztter) (#752)
-  * {star} improve print styles, add print styles for book doctype (@leif81) (#997, #952)
-  * {star} add proper grid and frame styles for tables (@leif81) (#569)
+  * {star} upgrade to Font Awesome 4.1 (#752) (*@mogztter*)
+  * {star} improve print styles, add print styles for book doctype (#997, #952) (*@leif81*)
+  * {star} add proper grid and frame styles for tables (#569) (*@leif81*)
   * {star} use glyphs for checkboxes when not using font icons (#878)
   * {star} prefer source-language attribute over language attribute for defining default source language (#888)
   * {star} pass document as first argument to process method on Preprocessor
@@ -863,15 +863,15 @@ Improvements::
   * constrain subscript & superscript markup (#564, #936)
   * match cell specs when cell separator is customized (#985)
   * use stylesheet to set default table width (#975)
-  * display nested elements correctly in toc (@kenfinnigan) (#967)
-  * add support for id attribute on links (@mogztter) (#935)
-  * add support for title attribute on links (@aslakknutsen)
-  * add -t flag to cli to control output of timing information (@mogztter) (#909)
+  * display nested elements correctly in toc (#967) (*@kenfinnigan*)
+  * add support for id attribute on links (#935) (*@mogztter*)
+  * add support for title attribute on links (*@aslakknutsen*)
+  * add -t flag to cli to control output of timing information (#909) (*@mogztter*)
   * rewrite converter API (#778)
   * rewrite extensions to support extension instances for AsciidoctorJ (#804)
   * integrate thread_safe gem (#638)
   * allow inline macro extensions that define a custom regexp to be matched (#792)
-  * make Reader#push_include work with default file, path and dir (@bk2204) (#743)
+  * make Reader#push_include work with default file, path and dir (#743) (*@bk2204*)
   * honor custom outfilesuffix and introduce relfileprefix (#801)
   * add author and copyright to meta in HTML5 backend (#838)
   * output attribution in front of citetitle for quote and verse blocks
@@ -883,7 +883,7 @@ Improvements::
   * remove trailing endlines from source data (#727)
   * add flag to cli to suppress warnings (#557)
   * emit warning if tag(s) not found in include file (#639)
-  * use <th> element for vertical table headers instead of header class (@davidgamba) (#738)
+  * use <th> element for vertical table headers instead of header class (#738) (*@davidgamba*)
   * share select references between AsciiDoc-style cell & main document (#729)
   * number chapters sequentially, always (#685)
   * add vbar attribute, make brvbar resolve properly (#643)
@@ -891,20 +891,20 @@ Improvements::
   * enable sidebar toc for small screens (#628)
   * add square brackets around button in HTML output (#631)
   * make language hover text work for all languages in listing block
-  * set background color on toc2 to cover scrolling content (@neher)
+  * set background color on toc2 to cover scrolling content (*@neher*)
   * make document parsing a discrete step, make Reader accessible as property on Document
   * allow custom converter to set backend info such as outfilesuffix and htmlsyntax
-  * report an informative error message when a converter cannot be resolved (@mogztter)
+  * report an informative error message when a converter cannot be resolved (*@mogztter*)
   * add conum class to b element when icons are disabled, make conum CSS selector more specific
-  * expose Document object to extension point IncludeProcessor (@aslakknutsen)
+  * expose Document object to extension point IncludeProcessor (*@aslakknutsen*)
   * style audioblock title, simplify rules for block titles
   * alias :name_attributes to :positional_attributes in extension DSL
-  * upgrade to highlight.js 7.4 (and later 8.0) (@mogztter) (#756)
+  * upgrade to highlight.js 7.4 (and later 8.0) (#756) (*@mogztter*)
 
 Compliance::
 
   * only include xmlns in docbook45 backend if xmlns attribute is specified (#929)
-  * add xmlns attribute for xhtml output (@bk2204)
+  * add xmlns attribute for xhtml output (*@bk2204*)
   * warn if table without a body is converted to DocBook (#961)
   * wrap <para> around admonition inside example block in DocBook 4.5 (#931)
   * use <informalfigure> if block image doesn't have a title (#927)
@@ -913,13 +913,13 @@ Compliance::
   * add compliance setting to control use of shorthand property syntax (#789)
   * wrap top-level content inside preamble in DocBook backend when doctype is book (#971)
   * escape special chars in image alt text (#972)
-  * set starting number in ordered list for docbook (@megathaum) (#925)
+  * set starting number in ordered list for docbook (#925) (*@megathaum*)
   * match word characters in regular expressions as defined by Unicode (#892)
   * put source language class names on child code element of pre element (#921)
   * ignore case of attribute in conditional directives (#903)
   * allow attribute entry to reset / reseed counter (#870)
   * allow doctype to be set in AsciiDoc table cell (#863)
-  * match URL macro following entity (@jmbruel) (#819)
+  * match URL macro following entity (#819) (*@jmbruel*)
   * handle BOM when normalizing source (#824)
   * don't output revhistory if revdate is not set (#802)
   * perform normal subs on verse content (#799)
@@ -960,18 +960,18 @@ Bug Fixes::
   * fixed broken passthroughs caused by source highlighting (#720)
   * copy custom stylesheet if linkcss is set (#300)
   * honor list continuations for indented, nested list items (#664)
-  * fix syntax errors in converters (@jljouannic)
+  * fix syntax errors in converters (*@jljouannic*)
   * fix iconfont-remote setting
-  * fix syntax error (target -> node.target) in Docbook 5 converter (@jf647)
+  * fix syntax error (target -> node.target) in Docbook 5 converter (*@jf647*)
   * output and style HTML for toc macro correctly
 
 Infrastructure::
 
   * add Ruby 2.1 to list of supported platforms
   * reenable rbx in Travis build
-  * switch tests to minitest (@ktdreyer)
-  * update RPM for Fedora Rawhide (@ktdreyer)
-  * refactor unit tests so they work in RubyMine (@cmoulliard)
+  * switch tests to minitest (*@ktdreyer*)
+  * update RPM for Fedora Rawhide (*@ktdreyer*)
+  * refactor unit tests so they work in RubyMine (*@cmoulliard*)
   * add preliminary benchmark files to repository (#1021)
   * clean out old fixtures from test suite (#960)
   * add initial Cucumber test infrastructure (#731)
@@ -979,7 +979,7 @@ Infrastructure::
   * build gemspec files using git ls-tree (#653)
   * use in-process web server for URI tests
   * update manpage to reflect updates in 1.5.0
-  * rework README (@mogztter) (#651)
+  * rework README (#651) (*@mogztter*)
 
 Distribution Packages::
 
@@ -1025,11 +1025,11 @@ Enhancements::
   * ignore front matter used by static site generators if skip-front-matter attribute is set (#502)
   * sanitize contents of HTML title element in html5 backend (#504)
   * support toc position for toc2 (#467)
-  * cli accepts multiple files as input (@lordofthejars) (#227)
+  * cli accepts multiple files as input (#227) (*@lordofthejars*)
   * added Markdown-style horizontal rules and pass Markdown tests (#455)
   * added float clearing classes (.clearfix, .float-group) (#602)
   * don't disable syntax highlighting when explicit subs is used on listing block
-  * asciidoctor package now available in Debian Sid and Ubuntu Saucy (@avtobiff) (#216)
+  * asciidoctor package now available in Debian Sid and Ubuntu Saucy (#216) (*@avtobiff*)
 
 Compliance::
 
@@ -1088,7 +1088,7 @@ Improvements::
   * output multiple authors in HTML backend (#399)
   * allow multiple template directories to be specified, document in usage and manpage (#437)
   * added option to cli to specify template engine (#406)
-  * added support for external video hosting services in video block macro (@xcoulon) (#587)
+  * added support for external video hosting services in video block macro (#587) (*@xcoulon*)
   * strip leading separator(s) on section id if idprefix is blank (#551)
   * customized styling of toc placed inside body content (#507)
   * consolidate toc attribute so toc with or without toc-position can make sidebar toc (#618)
@@ -1141,8 +1141,8 @@ Enhancements::
   * support Markdown-style quote blocks
   * added section level 5 (maps to h6 element in the html5 backend) (#334)
   * added btn inline macro (#259)
-  * added menu inline menu to identify a menu selection (@bleathem) (#173)
-  * added kbd inline macro to identify a key or key combination (@bleathem) (#172)
+  * added menu inline menu to identify a menu selection (#173) (*@bleathem*)
+  * added kbd inline macro to identify a key or key combination (#172) (*@bleathem*)
   * support alternative quote forms (#196)
   * added indent attribute to verbatim blocks (#365)
   * added prettify source-highlighter (#202)
@@ -1169,7 +1169,7 @@ Compliance::
   * assign caption even if no title (#321)
   * horizontal dlist layout in docbook backend (#298)
   * set doctitle attribute (#337)
-  * allow any backend to be specified in cli (@lightguard) (#320)
+  * allow any backend to be specified in cli (#320) (*@lightguard*)
   * support for abstract and partintro (#297)
 
 Bug Fixes::
@@ -1183,7 +1183,7 @@ Bug Fixes::
 Improvements::
 
   * added tests for all special sections (#80)
-  * added test for attributes defined as string or string array (@lightguard) (#291)
+  * added test for attributes defined as string or string array (#291) (*@lightguard*)
 
 Distribution Packages::
 
