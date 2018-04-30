@@ -355,6 +355,48 @@ NOTE: This is a note.
       assert_xpath '//ul/li/*[@class="admonitionblock note"]//td[@class="content"][normalize-space(text())="This is a note."]', output, 1
     end
 
+    test 'paragraph-like blocks attached to an ancestory list item by a list continuation should produce blocks' do
+      input = <<-EOS
+* parent
+ ** child
+
++
+NOTE: This is a note.
+
+* another parent
+ ** another child
+
++
+'''
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ul ul .admonitionblock.note', output, 0
+      assert_xpath '(//ul)[1]/li/*[@class="admonitionblock note"]', output, 1
+      assert_css 'ul ul hr', output, 0
+      assert_xpath '(//ul)[1]/li/hr', output, 1
+    end
+
+    test 'should continue to parse blocks attached by a list continuation after block is dropped' do
+      input = <<-EOS
+* item
++
+paragraph
++
+[comment]
+comment
++
+====
+example
+====
+'''
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'ul > li > .paragraph', output, 1
+      assert_css 'ul > li > .exampleblock', output, 1
+    end
+
     test 'appends line as paragraph if attached by continuation following line comment' do
       input = <<-EOS
 - list item 1
