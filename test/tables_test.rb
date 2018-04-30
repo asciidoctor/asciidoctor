@@ -242,7 +242,7 @@ three
       assert_css 'table', output, 1
       assert_css 'table[style*="width"]', output, 0
       assert_css 'table colgroup col', output, 3
-      assert_css 'table colgroup col[width]', output, 0
+      assert_css 'table colgroup col[style*="width"]', output, 0
     end
 
     test 'explicit table width is used even when autowidth option is specified' do
@@ -258,7 +258,7 @@ three
       assert_css 'table', output, 1
       assert_css 'table[style*="width"]', output, 1
       assert_css 'table colgroup col', output, 3
-      assert_css 'table colgroup col[width]', output, 0
+      assert_css 'table colgroup col[style*="width"]', output, 0
     end
 
     test 'first row sets number of columns when not specified' do
