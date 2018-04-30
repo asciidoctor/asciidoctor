@@ -4313,7 +4313,7 @@ foo::
       assert_xpath '//dl//b', output, 0
       assert_xpath '//dl/dd/p[text()="bar <1>"]', output, 1
       assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
-      assert_message logger, :WARN, '<stdin>: line 4: no callouts refer to list item 1', Hash
+      assert_message logger, :WARN, '<stdin>: line 4: no callout found for <1>', Hash
     end
   end
 
@@ -4329,7 +4329,7 @@ foo::
       assert_xpath '//ul//b', output, 0
       assert_xpath %(//ul/li/p[text()="foo\nbar <1>"]), output, 1
       assert_xpath '//ol/li/p[text()="Not pointing to a callout"]', output, 1
-      assert_message logger, :WARN, '<stdin>: line 4: no callouts refer to list item 1', Hash
+      assert_message logger, :WARN, '<stdin>: line 4: no callout found for <1>', Hash
     end
   end
 
@@ -4348,8 +4348,8 @@ Beans are fun.
       output = render_embedded_string input
       assert_xpath '//ol/li', output, 2
       assert_messages logger, [
-        [:WARN, '<stdin>: line 8: callout list item index: expected 2 got 3', Hash],
-        [:WARN, '<stdin>: line 8: no callouts refer to list item 2', Hash]
+        [:WARN, '<stdin>: line 8: callout list item index: expected 2, got 3', Hash],
+        [:WARN, '<stdin>: line 8: no callout found for <2>', Hash]
       ]
     end
   end

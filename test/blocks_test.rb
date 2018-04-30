@@ -694,7 +694,7 @@ ____
 
       output = render_embedded_string input
       assert_xpath '//pre[text()="La la la <1>"]', output, 1
-      assert_message @logger, :WARN, '<stdin>: line 5: no callouts refer to list item 1', Hash
+      assert_message @logger, :WARN, '<stdin>: line 5: no callout found for <1>', Hash
     end
 
     test 'should perform normal subs on a verse block' do
