@@ -606,23 +606,22 @@ class Parser
         block = List.new(parent, :colist)
         attributes['style'] = 'arabic'
         reader.unshift_line this_line
-        expected_index = 1
+        next_index = 1
         # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
-        while match || (reader.has_more_lines? && (match = CalloutListRx.match(reader.peek_line)))
-          list_item_lineno = reader.lineno
+        while match || ((match = CalloutListRx.match reader.peek_line) && reader.mark)
           # might want to move this check to a validate method
-          unless match[1] == expected_index.to_s
-            logger.warn message_with_context %(callout list item index: expected #{expected_index} got #{match[1]}), :source_location => (reader.cursor_at_line list_item_lineno)
+          unless match[1] == next_index.to_s
+            logger.warn message_with_context %(callout list item index: expected #{next_index}, got #{match[1]}), :source_location => reader.cursor_at_mark
           end
           if (list_item = next_list_item reader, block, match)
             block.items << list_item
             if (coids = document.callouts.callout_ids block.items.size).empty?
-              logger.warn message_with_context %(no callouts refer to list item #{block.items.size}), :source_location => (reader.cursor_at_line list_item_lineno)
+              logger.warn message_with_context %(no callout found for <#{block.items.size}>), :source_location => reader.cursor_at_mark
             else
               list_item.attributes['coids'] = coids
             end
           end
-          expected_index += 1
+          next_index += 1
           match = nil
         end
 
