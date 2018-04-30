@@ -541,10 +541,6 @@ class Reader
     Cursor.new @file, @dir, @path, @lineno - 1
   end
 
-  def cursor_data
-    [@file, @dir, @path, @lineno]
-  end
-
   def mark
     @mark = @file, @dir, @path, @lineno
   end
