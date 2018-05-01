@@ -799,7 +799,7 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless text.empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if (text.include? '=') && !@document.compat_mode
+          if !@document.compat_mode && (text.include? '=')
             text = (attrs = (AttributeList.new text, self).parse)[1] || ''
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
           end
@@ -852,7 +852,7 @@ module Substitutors
         unless (text = m[3]).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if mailto
-            if (text.include? ',') && !@document.compat_mode
+            if !@document.compat_mode && (text.include? ',')
               text = (attrs = (AttributeList.new text, self).parse)[1] || ''
               link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
               if attrs.key? 2
@@ -863,7 +863,7 @@ module Substitutors
                 end
               end
             end
-          elsif (text.include? '=') && !@document.compat_mode
+          elsif !@document.compat_mode && (text.include? '=')
             text = (attrs = (AttributeList.new text, self).parse)[1] || ''
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
           end
@@ -1018,7 +1018,7 @@ module Substitutors
           if (text = m[3])
             text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
             # NOTE if an equal sign (=) is present, parse text as attributes
-            text = ((AttributeList.new text, self).parse_into attrs)[1] if (text.include? '=') && !doc.compat_mode
+            text = ((AttributeList.new text, self).parse_into attrs)[1] if !doc.compat_mode && (text.include? '=')
           end
         end
 
