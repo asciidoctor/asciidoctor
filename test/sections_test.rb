@@ -46,9 +46,9 @@ context 'Sections' do
       assert_equal '_state_of_the_art_design', sec.id
     end
 
-    test 'synthetic id drops dots' do
+    test 'synthetic id replaces dots with separator' do
       sec = block_from_string("== Section 1.1.1")
-      assert_equal '_section_111', sec.id
+      assert_equal '_section_1_1_1', sec.id
     end
 
     test 'synthetic id prefix can be customized' do
@@ -76,9 +76,9 @@ context 'Sections' do
       assert_equal '_state-of-the-art-design', sec.id
     end
 
-    test 'synthetic id separator can be dot' do
+    test 'synthetic id separator can be dot and dots are preserved' do
       sec = block_from_string(":idseparator: .\n\n== Version 5.0.1")
-      assert_equal '_version.501', sec.id
+      assert_equal '_version.5.0.1', sec.id
     end
 
     test 'synthetic id separator can only be one character' do
