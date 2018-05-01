@@ -37,6 +37,20 @@ context 'Tables' do
       }
     end
 
+    test 'should set stripes class if stripes option is set' do
+      input = <<-EOS
+[stripes=odd]
+|=======
+|A |B |C
+|a |b |c
+|1 |2 |3
+|=======
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'table.stripes-odd', output, 1
+    end
+
     test 'renders caption on simple psv table' do
       input = <<-EOS
 .Simple psv table
