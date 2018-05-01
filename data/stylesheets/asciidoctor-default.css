@@ -257,7 +257,7 @@ table.grid-all>*>tr>.tableblock:last-child,table.grid-cols>*>tr>.tableblock:last
 table.grid-all>tbody>tr:last-child>.tableblock,table.grid-all>thead:last-child>tr>.tableblock,table.grid-rows>tbody>tr:last-child>.tableblock,table.grid-rows>thead:last-child>tr>.tableblock{border-bottom-width:0}
 table.frame-all{border-width:1px}
 table.frame-sides{border-width:0 1px}
-table.frame-topbot{border-width:1px 0}
+table.frame-topbot,table.frame-ends{border-width:1px 0}
 table.stripes-all tr,table.stripes-odd tr:nth-of-type(odd){background:#f8f8f7}
 table.stripes-none tr,table.stripes-odd tr:nth-of-type(even){background:none}
 th.halign-left,td.halign-left{text-align:left}

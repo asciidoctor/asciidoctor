@@ -42,6 +42,7 @@ Enhancements::
   * add syntax for adding hard line breaks in block AsciiMath equations (#2497, PR #2579) (*@dimztimz*)
   * add positioning option to sectanchors attribute (sectanchors=before or sectanchors=after) (#2485, PR #2486)
   * allow table striping to be configured using stripes attribute (even, odd, all, or none) or stripes roles on table (#1365, PR #2588)
+  * recognize `ends` as an alias to `topbot` for configuring the table frame
   * add rel=nofollow property to links (text or image) when nofollow option is set (#2605, PR #2692)
   * populate Document#source_location when sourcemap option is enabled (#2478, PR #2488)
   * populate source_location property on list items when sourcemap option is set on document (PR #2069) (*@mogztter*)

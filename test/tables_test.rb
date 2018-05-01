@@ -519,6 +519,17 @@ three
       assert_equal %w(thead tbody tfoot), table_section_names
     end
 
+    test 'should recognize ends as an alias to topbot for frame when converting to DocBook' do
+      input = <<-EOS
+[frame=ends]
+|===
+|A |B |C
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook'
+      assert_css 'informaltable[frame="topbot"]', output, 1
+    end
+
     test 'table with landscape orientation in DocBook' do
       ['orientation=landscape', '%rotate'].each do |attrs|
         input = <<-EOS
