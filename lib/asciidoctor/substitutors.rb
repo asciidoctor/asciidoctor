@@ -84,17 +84,18 @@ module Substitutors
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs
 
-  # Public: Apply the specified substitutions to the source.
+  # Public: Apply the specified substitutions to the text.
   #
-  # source  - The String or String Array of text to process; must not be nil.
-  # subs    - The substitutions to perform; must be a Symbol Array or nil (default: NORMAL_SUBS).
+  # text  - The String or String Array of text to process; must not be nil.
+  # subs  - The substitutions to perform; must be a Symbol Array or nil (default: NORMAL_SUBS).
   #
-  # Returns a String or String Array with substitutions applied, matching the type of source argument.
-  def apply_subs source, subs = NORMAL_SUBS
-    #return source unless subs
-    return source if source.empty? || !subs
+  # Returns a String or String Array to match the type of the text argument with substitutions applied.
+  def apply_subs text, subs = NORMAL_SUBS
+    return text if text.empty? || !subs
 
-    text = (multiline = ::Array === source) ? source * LF : source
+    if (multiline = ::Array === text)
+      text = text.join LF
+    end
 
     if (has_passthroughs = subs.include? :macros)
       text = extract_passthroughs text
