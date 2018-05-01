@@ -207,6 +207,19 @@ class PathResolver
     end
   end
 
+  # Public: Calculate the relative path to this absolute path from the specified base directory
+  #
+  # If neither path or base are absolute paths, or the path is not contained
+  # within the base directory, no work is done.
+  #
+  # path - [String] an absolute filename.
+  # base - [String] an absolute base directory.
+  #
+  # Return the [String] relative path of the specified path calculated from the base directory.
+  def relative_path path, base
+    (root? path) && (offset = descends_from? path, base) ? (path.slice offset, path.length) : path
+  end
+
   # Public: Normalize path by converting any backslashes to forward slashes
   #
   # path - the String path to normalize
@@ -497,23 +510,6 @@ class PathResolver
     end
 
     uri_prefix ? %(#{uri_prefix}#{resolved_path}) : resolved_path
-  end
-
-  # Public: Calculate the relative path to this absolute filename from the specified base directory
-  #
-  # If either the filename or the base_directory are not absolute paths, or the
-  # filename is not contained within the base directory, no work is done.
-  #
-  # filename       - [String] an absolute filename.
-  # base_directory - [String] an absolute base directory.
-  #
-  # Return the [String] relative path of the filename calculated from the base directory.
-  def relative_path filename, base_directory
-    if (root? filename) && (filename.start_with? base_directory)
-      filename.slice base_directory.length + 1, filename.length
-    else
-      filename
-    end
   end
 end
 end
