@@ -84,38 +84,18 @@ module Substitutors
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs
 
-  # Public: Apply the specified substitutions to the source.
+  # Public: Apply the specified substitutions to the text.
   #
-  # source  - The String or String Array of text to process; must not be nil.
-  # subs    - The substitutions to perform; can be a Symbol, Symbol Array or nil (default: NORMAL_SUBS).
-  # expand  - A Boolean (or nil) to control whether substitution aliases are expanded (default: nil).
+  # text  - The String or String Array of text to process; must not be nil.
+  # subs  - The substitutions to perform; must be a Symbol Array or nil (default: NORMAL_SUBS).
   #
-  # Returns a String or String Array with substitutions applied, matching the type of source argument.
-  def apply_subs source, subs = NORMAL_SUBS, expand = nil
-    if source.empty? || !subs
-      return source
-    elsif expand
-      if ::Symbol === subs
-        subs = SUB_GROUPS[subs] || [subs]
-      else
-        effective_subs = []
-        subs.each do |key|
-          if (sub_group = SUB_GROUPS[key])
-            effective_subs += sub_group unless sub_group.empty?
-          else
-            effective_subs << key
-          end
-        end
+  # Returns a String or String Array to match the type of the text argument with substitutions applied.
+  def apply_subs text, subs = NORMAL_SUBS
+    return text if text.empty? || !subs
 
-        if (subs = effective_subs).empty?
-          return source
-        end
-      end
-    elsif subs.empty?
-      return source
+    if (multiline = ::Array === text)
+      text = text.join LF
     end
-
-    text = (multiline = ::Array === source) ? source * LF : source
 
     if (has_passthroughs = subs.include? :macros)
       text = extract_passthroughs text
@@ -1237,6 +1217,32 @@ module Substitutors
       AttributeList.new(attrline, block).parse_into(into, posattrs)
     else
       AttributeList.new(attrline, block).parse(posattrs)
+    end
+  end
+
+  # Expand all groups in the subs list and return. If no subs are resolve, return nil.
+  #
+  # subs - The substitutions to expand; can be a Symbol, Symbol Array or nil
+  #
+  # Returns a Symbol Array of substitutions to pass to apply_subs or nil if no substitutions were resolved.
+  def expand_subs subs
+    if ::Symbol === subs
+      unless subs == :none
+        SUB_GROUPS[subs] || [subs]
+      end
+    else
+      expanded_subs = []
+      subs.each do |key|
+        unless key == :none
+          if (sub_group = SUB_GROUPS[key])
+            expanded_subs += sub_group
+          else
+            expanded_subs << key
+          end
+        end
+      end
+
+      expanded_subs.empty? ? nil : expanded_subs
     end
   end
 

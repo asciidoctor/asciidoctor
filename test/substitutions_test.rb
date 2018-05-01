@@ -37,15 +37,12 @@ context 'Substitutions' do
       assert_equal %(this<br>\nis<br>\n&#8594; Asciidoctor<br>\n<br>\n), result
     end
 
-    test 'should expand subs passed to apply_subs when expand argument is set' do
+    test 'should expand subs passe to expand_subs' do
       para = block_from_string %({program}\n*bold*\n2 > 1)
       para.document.attributes['program'] = 'Asciidoctor'
-      result = para.apply_subs para.lines, [:specialchars], true
-      assert_equal ['{program}', '*bold*', '2 &gt; 1'], result
-      result = para.apply_subs para.lines, [:none], true
-      assert_equal ['{program}', '*bold*', '2 > 1'], result
-      result = para.apply_subs para.lines, [:normal], true
-      assert_equal ['Asciidoctor', '<strong>bold</strong>', '2 &gt; 1'], result
+      assert_equal [:specialcharacters], (para.expand_subs [:specialchars])
+      refute para.expand_subs([:none])
+      assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], (para.expand_subs [:normal])
     end
 
     test 'apply_subs should allow the subs argument to be nil' do
@@ -1900,25 +1897,25 @@ foo&#8201;&#8212;&#8201;'
   context 'Post replacements' do
     test 'line break inserted after line with line break character' do
       para = block_from_string("First line +\nSecond line")
-      result = para.apply_subs(para.lines, :post_replacements, true)
+      result = para.apply_subs para.lines, (para.expand_subs :post_replacements)
       assert_equal 'First line<br>', result.first
     end
 
     test 'line break inserted after line wrap with hardbreaks enabled' do
       para = block_from_string("First line\nSecond line", :attributes => {'hardbreaks' => ''})
-      result = para.apply_subs(para.lines, :post_replacements, true)
+      result = para.apply_subs para.lines, (para.expand_subs :post_replacements)
       assert_equal 'First line<br>', result.first
     end
 
     test 'line break character stripped from end of line with hardbreaks enabled' do
       para = block_from_string("First line +\nSecond line", :attributes => {'hardbreaks' => ''})
-      result = para.apply_subs(para.lines, :post_replacements, true)
+      result = para.apply_subs para.lines, (para.expand_subs :post_replacements)
       assert_equal 'First line<br>', result.first
     end
 
     test 'line break not inserted for single line with hardbreaks enabled' do
       para = block_from_string('First line', :attributes => {'hardbreaks' => ''})
-      result = para.apply_subs(para.lines, :post_replacements, true)
+      result = para.apply_subs para.lines, (para.expand_subs :post_replacements)
       assert_equal 'First line', result.first
     end
   end
