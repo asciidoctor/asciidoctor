@@ -273,9 +273,9 @@ three
       assert_css 'table colgroup col[style*="width: 15%"]', output, 1
     end
 
-    test 'can assign autowidth to all columns' do
+    test 'can assign autowidth to all columns even when table has a width' do
       input = <<-EOS
-[cols="4*~"]
+[cols="4*~",width=50%]
 |=======
 |A |B |C |D
 |a |b |c |d
@@ -291,6 +291,7 @@ three
       end
       output = doc.convert :header_footer => false
       assert_css 'table', output, 1
+      assert_css 'table[style*="width: 50%;"]', output, 1
       assert_css 'table colgroup col', output, 4
       assert_css 'table colgroup col[style]', output, 0
     end
