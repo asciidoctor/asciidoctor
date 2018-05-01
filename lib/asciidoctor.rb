@@ -779,7 +779,7 @@ module Asciidoctor
     #
     #   1*h,2*,^3e
     #
-    ColumnSpecRx = /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+%?)?([a-z])?$/
+    ColumnSpecRx = /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+%?|~)?([a-z])?$/
 
     # Parses the start and end of a cell spec (i.e., cellspec) for a table.
     #
