@@ -94,7 +94,8 @@ module Substitutors
     return text if text.empty? || !subs
 
     if (multiline = ::Array === text)
-      text = text.join LF
+      #text = text.size > 1 ? (text.join LF) : text[0]
+      text = text[1] ? (text.join LF) : text[0]
     end
 
     if (has_passthroughs = subs.include? :macros)
