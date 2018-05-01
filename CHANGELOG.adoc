@@ -17,22 +17,23 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Enhancements::
 
-  * BREAKING: drop XML tags, character refs, and non-word characters (except hyphen and space) when generating ID for section (#794)
-  * route messages through a logger instead of using Kernel#warn (#44, PR #2660)
+  * BREAKING: drop XML tags, character refs, and non-word characters (except hyphen and space) when auto-generating section IDs (#794)
+  * allow attribute names to contain any word character defined by Unicode (#2376, PR #2393)
+  * route all processor messages through a logger instead of using Kernel#warn (#44, PR #2660)
   * add MemoryLogger for capturing messages sent to logger into memory (#44, PR #2660)
   * add NullLogger to prevent messages from being logged (#44, PR #2660)
   * log message containing source location / cursor as an object; provides more context (#44, PR #2660)
-  * pass cursor for include file to :include_location key in message context (PR #2729)
-  * add :logger option to API to set logger instance (#44, PR #2660)
-  * add --failure-level=LEVEL option to CLI to force non-zero exit code if specified logging level is reached (#2003, PR #2674)
+  * pass cursor for include file to `:include_location` key in message context (PR #2729)
+  * add `:logger` option to API to set logger instance (#44, PR #2660)
+  * add `--failure-level=LEVEL` option to CLI to force non-zero exit code if specified logging level is reached (#2003, PR #2674)
   * parse text of xref macro as attributes if attribute signature found (equal sign) (#2381)
   * allow xrefstyle to be specified per xref by assigning the xrefstyle attribute on the xref macro (#2365)
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
-  * support name!@, !name@, name!=@, and !name=@ syntax to soft unset attribute from API or CLI (#642, PR #2649)
-  * allow modifier to be placed at end of name to soft set an attribute (e.g., icons@=font) (#642, PR #2649)
-  * interpret false attribute value defined using API as a soft unset (#642, PR #2649)
-  * number parts if partnums attribute is set (#2298)
-  * allow footnote macro to define or reference footnote reference (footnoteref macro now considered deprecated) (#2347, PR #2362)
+  * support `!name@` (preferred), `!name=@`, `name!@`, and `name!=@` syntax to soft unset attribute from API or CLI (#642, PR #2649)
+  * allow modifier to be placed at end of name to soft set an attribute (e.g., `icons@=font`) (#642, PR #2649)
+  * interpret `false` attribute value defined using API as a soft unset (#642, PR #2649)
+  * number parts if `partnums` attribute is set (#2298)
+  * allow footnote macro to define or reference footnote reference (footnoteref macro now deprecated) (#2347, PR #2362)
   * allow custom converter to be used with custom templates; converter must declare that it supports templates (#2619)
   * allow manpage path for manpage help topic to be specified using ASCIIDOCTOR_MANPAGE_PATH environment variable (PR #2653) (*@aerostitch*)
   * if manpage cannot be found in default path inside gem, use `man -w asciidoctor` to resolve installed path (PR #2653)
@@ -40,31 +41,30 @@ Enhancements::
   * define source and manual refmiscinfo entries in manpage output if manual and source attributes are defined (PR #2636) (*@tiwai*)
   * add syntax for adding hard line breaks in block AsciiMath equations (#2497, PR #2579) (*@dimztimz*)
   * add positioning option to sectanchors attribute (sectanchors=before or sectanchors=after) (#2485, PR #2486)
-  * allow table striping to be configured using stripe attribute or stripe roles on table; valid values are even, odd, all, and none (#1365, PR #2588)
-  * allow nofollow rel property to be added to links and linked images by setting the nofollow option (#2605, PR #2692)
+  * allow table striping to be configured using stripe attribute (even, odd, all, or none) or stripe roles on table (#1365, PR #2588)
+  * add rel=nofollow property to links (text or image) when nofollow option is set (#2605, PR #2692)
   * populate Document#source_location when sourcemap option is enabled (#2478, PR #2488)
   * populate source_location property on list items when sourcemap option is set on document (PR #2069) (*@mogztter*)
   * populate Table::Cell#source_location when sourcemap option is enabled (#2705)
   * allow local include to be flagged as optional by setting optional option (#2389, PR #2413)
-  * allow attribute name to contain word characters as defined by Unicode (#2376, PR #2393)
   * allow block title to begin with a period (#2358, PR #2359)
-  * catalog inline anchor at start of list item in ordered and unordered lists, description list term, and table cell (#2257)
+  * catalog inline anchor at start of list items in ordered and unordered lists, description list terms, and table cells (#2257)
   * register document in catalog if id is set; assign reftext to document attributes if specified in a block attribute line (#2301, PR #2428)
   * allow automatic width to be applied to individual columns in a table using the special value `~` (#1844)
-  * use the quote element in DocBook converter for smart quotes (#2272, PR #2356) (*@bk2204*)
-  * parse and pass all manpage names to output document master (shadow man pages) (#1811, #2543, PR #2414)
+  * use the quote element in DocBook converter to represent smart quotes (#2272, PR #2356) (@bk2204)
+  * parse and pass all manpage names to output document master (i.e., shadow man pages) (#1811, #2543, PR #2414)
   * parse credit line of shorthand quote block as block attributes; apply normal subs to credit line in shorthand quote blocks (#1667, PR #2452)
   * populate copyright element in DocBook output from value of copyright attribute (#2728)
   * preserve directories if source dir and destination dir are set (#1394, PR #2421)
-  * allow linkcss to be disabled from API when safe mode is secure
+  * allow linkcss to be unset from API or CLI when safe mode is secure
   * convert quote to epigraph element in DocBook output if block has epigraph role (#1195, PR #2664) (*@bk2204*)
   * number special sections in addition to regular sections when sectnums=all (#661, PR #2463)
 
 Bug fixes::
 
-  * set :to_dir option correctly when output file is specified (#2382)
+  * set `:to_dir` option value correctly when output file is specified (#2382)
   * preserve leading indentation in contents of AsciiDoc table cell if contents starts with a newline (#2712)
-  * using the shorthand syntax on the style to set block attributes (id, roles, options) no longer resets block style (#2174)
+  * the shorthand syntax on the style to set block attributes (id, roles, options) no longer resets block style (#2174)
   * match include tags anywhere on line as long as offset by word boundary on left and space or newline on right (#2369, PR #2683)
   * warn if an include tag specified in the include directive is unclosed in the included file (#2361, PR #2696)
   * use correct parse mode when parsing blocks attached to list item (#1926)
@@ -81,7 +81,7 @@ Bug fixes::
   * don't report warning about same level 0 section multiple times (#2572)
   * record timings when calling convert and write on Document (#2574, PR #2575)
   * duplicate header attributes when restoring; allows header attributes to be restored an arbitrary number of times (#2567, PR #2570)
-  * propagate catalog_assets option to nested document (#2564, PR #2565)
+  * propagate `:catalog_assets` option to nested document (#2564, PR #2565)
   * preserve newlines in quoted CSV data (#2041)
   * allow opening quote around quoted CSV field to be on a line by itself
   * output table footer after body rows (#2556, PR #2566) (*@PauloFrancaLacerda*)
@@ -109,6 +109,7 @@ Bug fixes::
 
 Improvements / Refactoring::
 
+  * BREAKING: rename table spread role to stretch (#2589, PR #2591)
   * use cursor marks to track lines more accurately; record cursor at the start of each block, list item, or table cell (PR #2701, PR #2547) (*@seikichi*)
   * log a warning message if an unterminated delimited block is detected (#1133, PR #2612)
   * log a warning when nested section is found inside special section that doesn't support nested sections (#2433, PR #2672)
@@ -121,19 +122,18 @@ Improvements / Refactoring::
   * optimize detection for footnote* and indexterm* macros (#2347, PR #2362)
   * log a warning if a footnote reference cannot be resolved (#2669)
   * set logger level to DEBUG when verbose is enabled
-  * coerce value of template_dirs option to an Array (PR #2621)
-  * block roles specified using shorthand syntax are additive (#2174)
+  * coerce value of `:template_dirs` option to an Array (PR #2621)
+  * make block roles specified using shorthand syntax additive (#2174)
   * allow paragraph to masquerade as open block (PR #2412)
   * move callouts into document catalog (PR #2394)
   * document ID defined in block attribute line takes precedence over ID defined inside document title line
   * don't look for link and window attributes on document when resolving these attributes for an image
-  * when linkattrs is set, only parse attributes in link macro if equals follows first comma
+  * when linkattrs is set, only parse attributes in link macro if equals is present
   * skip line comments in name section of manpage (#2584, PR #2585)
   * always activate extension registry passed to processor (PR #2379)
   * skip extension registry activation if no groups are registered (PR #2373)
-  * don't apply lead style to first paragraph if role is present (#2624, PR #2625)
+  * don't apply lead styling to first paragraph if role is present (#2624, PR #2625)
   * raise clearer exception when extension class cannot be resolved (#2622, PR #2623)
-  * rename table spread role to stretch (#2589, PR #2591)
   * add methods to read results from timings (#2578, PR #2580)
   * collapse bottom margin of last block in AsciiDoc table cell (#2568, PR #2593)
   * set authorcount to 0 if there are no authors (#2519, PR #2520)
@@ -176,10 +176,11 @@ Build / Infrastructure::
 Distribution Packages::
 
   * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
-  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+  * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (asciidoctor)]
   * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
   * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
-  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
+  * https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
 
 // tag::compact[]
 == 1.5.6.2 (2018-03-20) - @mojavelinux
@@ -211,7 +212,7 @@ Distribution Packages::
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
   * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
   * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
-  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.2[git tag] |
@@ -268,7 +269,8 @@ Distribution Packages::
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
   * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
   * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
-  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
+  * https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.1[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.1[git tag] |
@@ -485,7 +487,7 @@ Distribution Packages::
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
   * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
   * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
-  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6[git tag] |
@@ -550,7 +552,7 @@ Distribution Packages::
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
   * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
   * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
-  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine (asciidoctor)]
+  * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.5[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.5[git tag] |
