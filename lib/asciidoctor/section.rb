@@ -197,12 +197,8 @@ class Section < AbstractBlock
     attrs = document.attributes
     pre = attrs['idprefix'] || '_'
     if (sep = attrs['idseparator'])
-      if sep.length == 1
+      if sep.length == 1 || (!(no_sep = sep.empty?) && (sep = attrs['idseparator'] = sep.chr))
         sep_sub = sep == '-' ? ' -' : %( #{sep}-)
-      elsif sep.empty?
-        no_sep = true
-      else
-        sep_sub = (sep = attrs['idseparator'] = sep.chr) == '-' ? ' -' : %( #{sep}-)
       end
     else
       sep, sep_sub = '_', ' _-'

@@ -12,7 +12,7 @@ context 'Sections' do
     end
 
     test 'synthetic id removes non-word characters' do
-      sec = block_from_string("== We're back!")
+      sec = block_from_string("== We’re back!")
       assert_equal '_were_back', sec.id
     end
 
@@ -46,6 +46,11 @@ context 'Sections' do
       assert_equal '_state_of_the_art_design', sec.id
     end
 
+    test 'synthetic id drops dots' do
+      sec = block_from_string("== Section 1.1.1")
+      assert_equal '_section_111', sec.id
+    end
+
     test 'synthetic id prefix can be customized' do
       sec = block_from_string(":idprefix: id_\n\n== Section One")
       assert_equal 'id_section_one', sec.id
@@ -69,6 +74,11 @@ context 'Sections' do
     test 'synthetic id separator can be hyphen and hyphens are preserved' do
       sec = block_from_string(":idseparator: -\n\n== State-of-the-art design")
       assert_equal '_state-of-the-art-design', sec.id
+    end
+
+    test 'synthetic id separator can be dot' do
+      sec = block_from_string(":idseparator: .\n\n== Version 5.0.1")
+      assert_equal '_version.501', sec.id
     end
 
     test 'synthetic id separator can only be one character' do
