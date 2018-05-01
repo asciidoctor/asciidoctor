@@ -270,10 +270,10 @@ module Asciidoctor
 
   # Set of file extensions recognized as AsciiDoc documents (stored as a truth hash)
   ASCIIDOC_EXTENSIONS = {
-    '.asciidoc' => true,
     '.adoc' => true,
-    '.ad' => true,
+    '.asciidoc' => true,
     '.asc' => true,
+    '.ad' => true,
     # TODO .txt should be deprecated
     '.txt' => true
   }

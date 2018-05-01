@@ -411,14 +411,26 @@ anchor:foo[b[a\]r]text'
     assert_xpath %q(//a[@href="#tigers"][text() = '"About Tigers"']), render_string(input), 1
   end
 
+  test 'should not interpret path sans extension in xref with angled bracket syntax in compat mode' do
+    using_memory_logger do |logger|
+      doc = document_from_string '<<tigers#>>', :header_footer => false, :attributes => { 'compat-mode' => '' }
+      assert_xpath '//a[@href="#tigers#"][text() = "[tigers#]"]', doc.convert, 1
+    end
+  end
+
   test 'xref using angled bracket syntax with path sans extension' do
     doc = document_from_string '<<tigers#>>', :header_footer => false
     assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
-  test 'inter-document xref should not truncate after period if path has no extension' do
-    result = render_embedded_string '<<using-.net-web-services#,Using .NET web services>>'
-    assert_xpath '//a[@href="using-.net-web-services.html"][text() = "Using .NET web services"]', result, 1
+  test 'inter-document xref should not add outfilesuffix to path with a recognized extension' do
+    {
+      'using-.net-web-services' => 'Using .NET web services',
+      '../file.pdf' => 'Download the .pdf file'
+    }.each do |path, text|
+      result = render_embedded_string %(<<#{path}#,#{text}>>)
+      assert_xpath %(//a[@href="#{path}"][text() = "#{text}"]), result, 1
+    end
   end
 
   test 'inter-document xref should only remove the file extension part if the path contains a period elsewhere' do
@@ -443,13 +455,32 @@ anchor:foo[b[a\]r]text'
     assert_xpath '//a[@href="/path/to/tigers.html"][text() = "tigers"]', doc.convert, 1
   end
 
+  test 'xref using angled bracket syntax with path and extension' do
+    using_memory_logger do |logger|
+      doc = document_from_string '<<tigers.adoc>>', :header_footer => false
+      assert_xpath '//a[@href="#tigers.adoc"][text() = "[tigers.adoc]"]', doc.convert, 1
+    end
+  end
+
   test 'xref using angled bracket syntax with path and extension with hash' do
     doc = document_from_string '<<tigers.adoc#>>', :header_footer => false
     assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
-  test 'xref using angled bracket syntax with path and extension' do
-    doc = document_from_string '<<tigers.adoc>>', :header_footer => false
+  test 'xref using angled bracket syntax with path and extension with fragment' do
+    doc = document_from_string '<<tigers.adoc#id>>', :header_footer => false
+    assert_xpath '//a[@href="tigers.html#id"][text() = "tigers.html"]', doc.convert, 1
+  end
+
+  test 'xref using macro syntax with path and extension in compat mode' do
+    using_memory_logger do |logger|
+      doc = document_from_string 'xref:tigers.adoc[]', :header_footer => false, :attributes => { 'compat-mode' => '' }
+      assert_xpath '//a[@href="#tigers.adoc"][text() = "[tigers.adoc]"]', doc.convert, 1
+    end
+  end
+
+  test 'xref using macro syntax with path and extension' do
+    doc = document_from_string 'xref:tigers.adoc[]', :header_footer => false
     assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
