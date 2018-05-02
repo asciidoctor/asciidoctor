@@ -423,7 +423,7 @@ anchor:foo[b[a\]r]text'
     assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
-  test 'inter-document xref should not add outfilesuffix to path with a recognized extension' do
+  test 'inter-document xref should not add suffix to path with a non-AsciiDoc extension' do
     {
       'using-.net-web-services' => 'Using .NET web services',
       '../file.pdf' => 'Download the .pdf file'
@@ -498,6 +498,12 @@ anchor:foo[b[a\]r]text'
     attributes = {'relfileprefix' => '../', 'outfilesuffix' => '/'}
     doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false, :attributes => attributes
     assert_xpath '//a[@href="../tigers/#about"][text() = "About Tigers"]', doc.convert, 1
+  end
+
+  test 'xref using angled bracket syntax with path and custom relfilesuffix' do
+    attributes = { 'relfilesuffix' => '/' }
+    doc = document_from_string '<<tigers#about,About Tigers>>', :header_footer => false, :attributes => attributes
+    assert_xpath '//a[@href="tigers/#about"][text() = "About Tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path which has been included in this document' do
