@@ -198,10 +198,10 @@ class Section < AbstractBlock
     pre = attrs['idprefix'] || '_'
     if (sep = attrs['idseparator'])
       if sep.length == 1 || (!(no_sep = sep.empty?) && (sep = attrs['idseparator'] = sep.chr))
-        sep_sub = sep == '-' ? ' -' : %( #{sep}-)
+        sep_sub = sep == '-' || sep == '.' ? ' .-' : %( #{sep}.-)
       end
     else
-      sep, sep_sub = '_', ' _-'
+      sep, sep_sub = '_', ' _.-'
     end
     gen_id = %(#{pre}#{title.downcase.gsub InvalidSectionIdCharsRx, ''})
     if no_sep

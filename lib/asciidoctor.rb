@@ -655,7 +655,7 @@ module Asciidoctor
     # Matches invalid ID characters in a section title.
     #
     # NOTE uppercase chars not included since expression is only run on a lowercase string
-    InvalidSectionIdCharsRx = /<[^>]+>|&(?:[a-z][a-z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-f][\da-f][\da-f]{0,3});|[^ #{CC_WORD}-]+?/
+    InvalidSectionIdCharsRx = /<[^>]+>|&(?:[a-z][a-z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-f][\da-f][\da-f]{0,3});|[^ #{CC_WORD}\-.]+?/
 
     ## Lists
 
