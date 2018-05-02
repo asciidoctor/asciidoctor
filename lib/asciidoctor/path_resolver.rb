@@ -120,17 +120,14 @@ class PathResolver
   # expanded to an absolute path inside the constructor.
   #
   # file_separator - the String file separator to use for path operations
-  #                  (optional, default: File::SEPARATOR)
+  #                  (optional, default: File::ALT_SEPARATOR or File::SEPARATOR)
   # working_dir    - the String working directory (optional, default: Dir.pwd)
   #
   def initialize file_separator = nil, working_dir = nil
-    @file_separator = file_separator ? file_separator : (::File::ALT_SEPARATOR || ::File::SEPARATOR)
-    if working_dir
-      @working_dir = (root? working_dir) ? (posixify working_dir) : (::File.expand_path working_dir)
-    else
-      @working_dir = ::Dir.pwd
-    end
-    @_partition_path_sys, @_partition_path_web = {}, {}
+    @file_separator = file_separator || ::File::ALT_SEPARATOR || ::File::SEPARATOR
+    @working_dir = working_dir ? ((root? working_dir) ? (posixify working_dir) : (::File.expand_path working_dir)) : ::Dir.pwd
+    @_partition_path_sys = {}
+    @_partition_path_web = {}
   end
 
   # Public: Check whether the specified path is an absolute path.
