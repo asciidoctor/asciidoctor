@@ -31,7 +31,7 @@ Enhancements::
   * allow xrefstyle to be specified per xref by assigning the xrefstyle attribute on the xref macro (#2365)
   * recognize target with .adoc extension in xref macro as an interdocument xref
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
-  * allow `relfilesuffix` attribute to control file extension for interdoc xrefs (#1273)
+  * allow `relfilesuffix` attribute to control file extension used for interdoc xrefs (#1273)
   * support `!name@` (preferred), `!name=@`, `name!@`, and `name!=@` syntax to soft unset attribute from API or CLI (#642, PR #2649)
   * allow modifier to be placed at end of name to soft set an attribute (e.g., `icons@=font`) (#642, PR #2649)
   * interpret `false` attribute value defined using API as a soft unset (#642, PR #2649)
