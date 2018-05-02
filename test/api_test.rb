@@ -986,4 +986,19 @@ text
       refute_equal timings.read_parse, timings.total
     end
   end
+
+  context 'AST' do
+    test 'should not crash if nil cell text is passed to Cell constructor' do
+      input = <<-EOS
+|===
+|a
+|===
+      EOS
+      table = (document_from_string input).blocks[0]
+      cell = Asciidoctor::Table::Cell.new table.rows.body[0][0].column, nil, {}
+      refute cell.style
+      assert_same Asciidoctor::AbstractNode::NORMAL_SUBS, cell.subs
+      assert_equal '', cell.text
+    end
+  end
 end

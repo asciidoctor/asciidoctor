@@ -275,7 +275,8 @@ class Table::Cell < AbstractNode
         cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF
       else
         normal_psv = true
-        cell_text = cell_text.strip
+        # NOTE AsciidoctorJ uses nil cell_text to create an empty cell
+        cell_text = cell_text ? cell_text.strip : ''
       end
     else
       @colspan = @rowspan = nil
