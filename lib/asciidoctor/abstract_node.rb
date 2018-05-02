@@ -451,10 +451,9 @@ class AbstractNode
   # parent references resolved and self references removed. If a jail is provided,
   # this path will be guaranteed to be contained within the jail.
   def normalize_system_path target, start = nil, jail = nil, opts = {}
-    path_resolver = (@path_resolver ||= PathResolver.new)
     if (doc = @document).safe < SafeMode::SAFE
       if start
-        start = ::File.join doc.base_dir, start unless path_resolver.root? start
+        start = ::File.join doc.base_dir, start unless doc.path_resolver.root? start
       else
         start = doc.base_dir
       end
@@ -462,7 +461,7 @@ class AbstractNode
       start = doc.base_dir unless start
       jail = doc.base_dir unless jail
     end
-    path_resolver.system_path target, start, jail, opts
+    doc.path_resolver.system_path target, start, jail, opts
   end
 
   # Public: Normalize the web path using the PathResolver.
@@ -478,7 +477,7 @@ class AbstractNode
     if preserve_uri_target && (Helpers.uriish? target)
       uri_encode_spaces target
     else
-      (@path_resolver ||= PathResolver.new).web_path target, start
+      @document.path_resolver.web_path target, start
     end
   end
 
@@ -530,7 +529,7 @@ class AbstractNode
   def read_contents target, opts = {}
     doc = @document
     if (Helpers.uriish? target) || ((start = opts[:start]) && (Helpers.uriish? start) &&
-        (target = (@path_resolver ||= PathResolver.new).web_path target, start))
+        (target = doc.path_resolver.web_path target, start))
       if doc.attr? 'allow-uri-read'
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
         begin

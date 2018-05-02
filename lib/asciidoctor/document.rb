@@ -218,6 +218,9 @@ class Document < AbstractBlock
   # Public: Get the Reader associated with this document
   attr_reader :reader
 
+  # Public: Get/Set the PathResolver instance used to resolve paths in this Document.
+  attr_reader :path_resolver
+
   # Public: Get the Converter associated with this document
   attr_reader :converter
 
@@ -260,6 +263,7 @@ class Document < AbstractBlock
       @attributes['compat-mode'] = '' if (@compat_mode = parent_doc.compat_mode)
       @sourcemap = parent_doc.sourcemap
       @timings = nil
+      @path_resolver = parent_doc.path_resolver
       @converter = parent_doc.converter
       initialize_extensions = false
       @extensions = parent_doc.extensions
@@ -316,6 +320,7 @@ class Document < AbstractBlock
       @compat_mode = attr_overrides.key? 'compat-mode'
       @sourcemap = options[:sourcemap]
       @timings = options.delete :timings
+      @path_resolver = PathResolver.new
       @converter = nil
       initialize_extensions = defined? ::Asciidoctor::Extensions
       @extensions = nil # initialize furthur down
