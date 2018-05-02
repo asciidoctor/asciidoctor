@@ -15,6 +15,7 @@ else
   autoload :Base64, 'base64'
   autoload :URI, 'uri'
   autoload :OpenURI, 'open-uri'
+  autoload :Pathname, 'pathname'
   autoload :StringScanner, 'strscan'
 end
 
