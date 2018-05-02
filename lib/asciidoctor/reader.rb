@@ -1033,9 +1033,10 @@ class PreprocessorReader < Reader
   # Returns An Array containing the resolved (absolute) include path, the target type, and the path
   # relative to the outermost document. May also return a boolean to halt processing of the include.
   def resolve_include_path target, attrlist, attributes
+    doc = @document
     if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
-      return replace_next_line %(link:#{target}[#{attrlist}]) unless @document.attributes.key? 'allow-uri-read'
-      if @document.attributes.key? 'cache-uri'
+      return replace_next_line %(link:#{target}[#{attrlist}]) unless doc.attributes.key? 'allow-uri-read'
+      if doc.attributes.key? 'cache-uri'
         # caching requires the open-uri-cached gem to be installed
         # processing will be automatically aborted if these libraries can't be opened
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
@@ -1046,7 +1047,7 @@ class PreprocessorReader < Reader
       [(::URI.parse target), :uri, target]
     else
       # include file is resolved relative to dir of current include, or base_dir if within original docfile
-      inc_path = @document.normalize_system_path target, @dir, nil, :target_name => 'include file'
+      inc_path = doc.normalize_system_path target, @dir, nil, :target_name => 'include file'
       unless ::File.file? inc_path
         if attributes.key? 'optional-option'
           shift
@@ -1058,7 +1059,7 @@ class PreprocessorReader < Reader
       end
       # NOTE relpath is the path relative to the root document (or base_dir, if set)
       # QUESTION should we move relative_path method to Document
-      relpath = (@path_resolver ||= PathResolver.new).relative_path inc_path, @document.base_dir
+      relpath = doc.path_resolver.relative_path inc_path, doc.base_dir
       [inc_path, :file, relpath]
     end
   end
