@@ -195,7 +195,7 @@ class Reader
   def peek_lines num = nil, direct = false
     old_look_ahead = @look_ahead
     result = []
-    (num || MAX_INTEGER).times do
+    (num || MAX_INT).times do
       if (line = direct ? shift : read_line)
         result << line
       else
