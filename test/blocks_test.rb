@@ -1752,7 +1752,7 @@ a//b
       assert_xpath '//*[@class="title"][text()="Simple fraction"]', output, 1
     end
 
-    test 'should add AsciiMath delimiters around stem block content if stem attribute != latexmath' do
+    test 'should add AsciiMath delimiters around stem block content if stem attribute is asciimath, empty, or not set' do
       input = <<-'EOS'
 [stem]
 ++++
@@ -1763,7 +1763,8 @@ sqrt(3x-1)+(1+x)^2 < y
       [
         {},
         {'stem' => ''},
-        {'stem' => 'asciimath'}
+        {'stem' => 'asciimath'},
+        {'stem' => 'bogus'}
       ].each do |attributes|
         output = render_embedded_string input, :attributes => attributes
         assert_css '.stemblock', output, 1
@@ -1772,7 +1773,7 @@ sqrt(3x-1)+(1+x)^2 < y
       end
     end
 
-    test 'should add LaTeX math delimiters around stem block content if stem attribute is latexmath' do
+    test 'should add LaTeX math delimiters around stem block content if stem attribute is latexmath, latex, or tex' do
       input = <<-'EOS'
 [stem]
 ++++
@@ -1780,10 +1781,36 @@ sqrt(3x-1)+(1+x)^2 < y
 ++++
       EOS
 
-      output = render_embedded_string input, :attributes => {'stem' => 'latexmath'}
+      [
+        {'stem' => 'latexmath'},
+        {'stem' => 'latex'},
+        {'stem' => 'tex'}
+      ].each do |attributes|
+        output = render_embedded_string input, :attributes => attributes
+        assert_css '.stemblock', output, 1
+        nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
+        assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
+      end
+    end
+
+    test 'should allow stem style to be set using second positional argument of block attributes' do
+      input = <<-EOS
+:stem: latexmath
+
+[stem,asciimath]
+++++
+sqrt(3x-1)+(1+x)^2 < y
+++++
+      EOS
+
+      doc = document_from_string input
+      stemblock = doc.blocks[0]
+      assert_equal :stem, stemblock.context
+      assert_equal 'asciimath', stemblock.attributes['style']
+      output = doc.convert :header_footer => false
       assert_css '.stemblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
-      assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
+      assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
     end
   end
 

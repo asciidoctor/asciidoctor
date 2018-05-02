@@ -63,6 +63,8 @@ Enhancements::
   * allow linkcss to be unset from API or CLI when safe mode is secure
   * convert quote to epigraph element in DocBook output if block has epigraph role (#1195, PR #2664) (*@bk2204*)
   * number special sections in addition to regular sections when sectnums=all (#661, PR #2463)
+  * upgrade to Font Awesome 4.7.0 (#2569)
+  * upgrade to MathJax 4.7.4
 
 Bug fixes::
 
@@ -110,6 +112,7 @@ Bug fixes::
   * fix alignment of abstract title when using default stylesheet (PR #2732)
   * only set nowrap style on table caption for auto-width table (#2392)
   * output non-breaking space for man manual if absent in DocBook output (PR #2636)
+  * don't crash if stem type is not recognized (instead, fallback to asciimath)
 
 Improvements / Refactoring::
 

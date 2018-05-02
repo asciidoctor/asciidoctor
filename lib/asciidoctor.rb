@@ -368,6 +368,12 @@ module Asciidoctor
     :latexmath => ['\(', '\)'],
   }
 
+  (STEM_TYPE_ALIASES = {
+    'latexmath' => 'latexmath',
+    'latex' => 'latexmath',
+    'tex' => 'latexmath'
+  }).default = 'asciimath'
+
   FONT_AWESOME_VERSION = '4.7.0'
 
   # attributes which be changed within the content of the document (but not
