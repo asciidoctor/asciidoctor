@@ -537,9 +537,10 @@ module Substitutors
     found_colon = source.include? ':'
     found_macroish = found[:macroish] = found_square_bracket && found_colon
     found_macroish_short = found_macroish && (source.include? ':[')
+    doc_attrs = (doc = @document).attributes
     result = source
 
-    if (doc_attrs = @document.attributes).key? 'experimental'
+    if doc_attrs.key? 'experimental'
       if found_macroish_short && ((result.include? 'kbd:') || (result.include? 'btn:'))
         result = result.gsub(InlineKbdBtnMacroRx) {
           # honor the escape
@@ -616,7 +617,7 @@ module Substitutors
 
     # FIXME this location is somewhat arbitrary, probably need to be able to control ordering
     # TODO this handling needs some cleanup
-    if (extensions = @document.extensions) && extensions.inline_macros? # && found_macroish
+    if (extensions = doc.extensions) && extensions.inline_macros? # && found_macroish
       extensions.inline_macros.each do |extension|
         result = result.gsub(extension.instance.regexp) {
           # alias match for Ruby 1.8.7 compat
@@ -670,7 +671,7 @@ module Substitutors
           # TODO remove this special case once titles use normal substitution order
           target = sub_attributes target
         end
-        @document.register(:images, target) unless type == 'icon'
+        doc.register(:images, target) unless type == 'icon'
         attrs = parse_attributes(m[2], posattrs, :unescape_input => true)
         attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
         Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
@@ -692,7 +693,7 @@ module Substitutors
           end
           # indexterm:[Tigers,Big cats]
           terms = split_simple_csv normalize_string text, true
-          @document.register :indexterms, terms
+          doc.register :indexterms, terms
           (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
         when 'indexterm2'
           text = $2
@@ -702,7 +703,7 @@ module Substitutors
           end
           # indexterm2:[Tigers]
           term = normalize_string text, true
-          @document.register :indexterms, [term]
+          doc.register :indexterms, [term]
           (Inline.new self, :indexterm, term, :type => :visible).convert
         else
           text = $3
@@ -730,12 +731,12 @@ module Substitutors
           if visible
             # ((Tigers))
             term = normalize_string text
-            @document.register :indexterms, [term]
+            doc.register :indexterms, [term]
             result = (Inline.new self, :indexterm, term, :type => :visible).convert
           else
             # (((Tigers,Big cats)))
             terms = split_simple_csv(normalize_string text)
-            @document.register :indexterms, terms
+            doc.register :indexterms, terms
             result = (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
           end
           before ? %(#{before}#{result}#{after}) : result
@@ -799,7 +800,7 @@ module Substitutors
         attrs, link_opts = nil, { :type => :link }
         unless text.empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if !@document.compat_mode && (text.include? '=')
+          if !doc.compat_mode && (text.include? '=')
             text = (attrs = (AttributeList.new text, self).parse)[1] || ''
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
           end
@@ -832,7 +833,7 @@ module Substitutors
           end
         end
 
-        @document.register :links, (link_opts[:target] = target)
+        doc.register :links, (link_opts[:target] = target)
         link_opts[:attributes] = attrs if attrs
         %(#{prefix}#{Inline.new(self, :anchor, text, link_opts).convert}#{suffix})
       }
@@ -852,7 +853,7 @@ module Substitutors
         unless (text = m[3]).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if mailto
-            if !@document.compat_mode && (text.include? ',')
+            if !doc.compat_mode && (text.include? ',')
               text = (attrs = (AttributeList.new text, self).parse)[1] || ''
               link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
               if attrs.key? 2
@@ -863,7 +864,7 @@ module Substitutors
                 end
               end
             end
-          elsif !@document.compat_mode && (text.include? '=')
+          elsif !doc.compat_mode && (text.include? '=')
             text = (attrs = (AttributeList.new text, self).parse)[1] || ''
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
           end
@@ -902,7 +903,7 @@ module Substitutors
         end
 
         # QUESTION should a mailto be registered as an e-mail address?
-        @document.register :links, (link_opts[:target] = target)
+        doc.register :links, (link_opts[:target] = target)
         link_opts[:attributes] = attrs if attrs
         Inline.new(self, :anchor, text, link_opts).convert
       }
@@ -917,7 +918,7 @@ module Substitutors
 
         target = %(mailto:#{address})
         # QUESTION should this be registered as an e-mail address?
-        @document.register(:links, target)
+        doc.register(:links, target)
 
         Inline.new(self, :anchor, address, :type => :link, :target => target).convert
       }
@@ -940,11 +941,11 @@ module Substitutors
           if text
             # REVIEW it's a dirty job, but somebody's gotta do it
             text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), false)
-            index = @document.counter('footnote-number')
-            @document.register(:footnotes, Document::Footnote.new(index, id, text))
+            index = doc.counter('footnote-number')
+            doc.register(:footnotes, Document::Footnote.new(index, id, text))
             type, target = :ref, nil
           else
-            if (footnote = @document.footnotes.find {|candidate| candidate.id == id })
+            if (footnote = doc.footnotes.find {|candidate| candidate.id == id })
               index, text = footnote.index, footnote.text
             else
               logger.warn %(invalid footnote reference: #{id})
@@ -955,8 +956,8 @@ module Substitutors
         elsif text
           # REVIEW it's a dirty job, but somebody's gotta do it
           text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), false)
-          index = @document.counter('footnote-number')
-          @document.register(:footnotes, Document::Footnote.new(index, id, text))
+          index = doc.counter('footnote-number')
+          doc.register(:footnotes, Document::Footnote.new(index, id, text))
           type = target = nil
         else
           next m[0]
