@@ -244,7 +244,7 @@ MathJax.Hub.Config({
   TeX: {#{eqnums_opt}}
 });
 </script>
-<script src="#{cdn_base}/mathjax/2.6.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+<script src="#{cdn_base}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
       end
 
       result << '</body>'

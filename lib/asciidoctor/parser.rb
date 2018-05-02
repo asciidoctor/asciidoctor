@@ -834,15 +834,7 @@ class Parser
         block = build_block(block_context, :raw, terminator, parent, reader, attributes)
 
       when :stem, :latexmath, :asciimath
-        if block_context == :stem
-          attributes['style'] = if (explicit_stem_syntax = attributes[2])
-            explicit_stem_syntax.include?('tex') ? 'latexmath' : 'asciimath'
-          elsif (default_stem_syntax = doc_attrs['stem']).nil_or_empty?
-            'asciimath'
-          else
-            default_stem_syntax
-          end
-        end
+        attributes['style'] = STEM_TYPE_ALIASES[attributes[2] || doc_attrs['stem']] if block_context == :stem
         block = build_block(:stem, :raw, terminator, parent, reader, attributes)
 
       when :open, :sidebar

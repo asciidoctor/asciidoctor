@@ -356,6 +356,8 @@ module Asciidoctor
 
   LINE_CONTINUATION_LEGACY = ' +'
 
+  MATHJAX_VERSION = '2.7.4'
+
   BLOCK_MATH_DELIMITERS = {
     :asciimath => ['\$', '\$'],
     :latexmath => ['\[', '\]'],
@@ -365,6 +367,12 @@ module Asciidoctor
     :asciimath => ['\$', '\$'],
     :latexmath => ['\(', '\)'],
   }
+
+  (STEM_TYPE_ALIASES = {
+    'latexmath' => 'latexmath',
+    'latex' => 'latexmath',
+    'tex' => 'latexmath'
+  }).default = 'asciimath'
 
   FONT_AWESOME_VERSION = '4.7.0'
 

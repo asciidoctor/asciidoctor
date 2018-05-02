@@ -1773,11 +1773,12 @@ EOS
         assert_equal input, para.content
       end
 
-      test 'should passthrough text in stem macro and surround with AsciiMath delimiters if stem attribute != latexmath' do
+      test 'should passthrough text in stem macro and surround with AsciiMath delimiters if stem attribute is asciimath, empty, or not set' do
         [
           {},
           {'stem' => ''},
-          {'stem' => 'asciimath'}
+          {'stem' => 'asciimath'},
+          {'stem' => 'bogus'}
         ].each do |attributes|
           input = 'stem:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
           para = block_from_string input, :attributes => attributes
@@ -1785,10 +1786,16 @@ EOS
         end
       end
 
-      test 'should passthrough text in stem macro and surround with LaTeX math delimiters if stem attribute = latexmath' do
-        input = 'stem:[C = \alpha + \beta Y^{\gamma} + \epsilon]'
-        para = block_from_string input, :attributes => {'stem' => 'latexmath'}
-        assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
+      test 'should passthrough text in stem macro and surround with LaTeX math delimiters if stem attribute is latexmath, latex, or tex' do
+        [
+          {'stem' => 'latexmath'},
+          {'stem' => 'latex'},
+          {'stem' => 'tex'}
+        ].each do |attributes|
+          input = 'stem:[C = \alpha + \beta Y^{\gamma} + \epsilon]'
+          para = block_from_string input, :attributes => attributes
+          assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
+        end
       end
 
       test 'should apply substitutions specified on stem macro' do
