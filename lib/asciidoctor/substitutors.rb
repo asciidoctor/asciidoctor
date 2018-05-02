@@ -1014,6 +1014,7 @@ module Substitutors
           refid, text = refid.split ',', 2
           text = text.lstrip if text
         else
+          macro = true
           refid = m[2]
           if (text = m[3])
             text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
@@ -1022,21 +1023,25 @@ module Substitutors
           end
         end
 
-        if (hash_idx = refid.index '#')
+        if doc.compat_mode
+          fragment = refid
+        elsif (hash_idx = refid.index '#')
           if hash_idx > 0
             if (fragment_len = refid.length - hash_idx - 1) > 0
               path, fragment = (refid.slice 0, hash_idx), (refid.slice hash_idx + 1, fragment_len)
             else
               path = refid.slice 0, hash_idx
             end
-            if (ext_idx = path.rindex '.') && ASCIIDOC_EXTENSIONS[path.slice ext_idx, path.length]
-              path = path.slice 0, ext_idx
+            if (ext = ::File.extname path).empty?
+              src2src = path
+            elsif ASCIIDOC_EXTENSIONS[ext]
+              src2src = (path = path.slice 0, path.length - ext.length)
             end
           else
             target, fragment = refid, (refid.slice 1, refid.length)
           end
-        elsif (ext_idx = refid.rindex '.') && ASCIIDOC_EXTENSIONS[refid.slice ext_idx, refid.length]
-          path = refid.slice 0, ext_idx
+        elsif macro && (refid.end_with? '.adoc')
+          src2src = (path = refid.slice 0, refid.length - 5)
         else
           fragment = refid
         end
@@ -1045,10 +1050,10 @@ module Substitutors
         if target
           refid = fragment
           logger.warn %(invalid reference: #{refid}) if $VERBOSE && !(doc.catalog[:ids].key? refid)
-        # handles: path#, path.adoc#, path#id, path.adoc#id, or path (from path.adoc)
         elsif path
+          # handles: path#, path#id, path.adoc#, path.adoc#id, or path.adoc (xref macro only)
           # the referenced path is the current document, or its contents have been included in the current document
-          if doc.attributes['docname'] == path || doc.catalog[:includes][path]
+          if src2src && (doc.attributes['docname'] == path || doc.catalog[:includes][path])
             if fragment
               refid, path, target = fragment, nil, %(##{fragment})
               logger.warn %(invalid reference: #{refid}) if $VERBOSE && !(doc.catalog[:ids].key? refid)
@@ -1056,8 +1061,7 @@ module Substitutors
               refid, path, target = nil, nil, '#'
             end
           else
-            refid = path
-            path = %(#{doc.attributes['relfileprefix']}#{path}#{doc.attributes.fetch 'outfilesuffix', '.html'})
+            refid, path = path, %(#{doc.attributes['relfileprefix']}#{path}#{src2src ? (doc.attributes.fetch 'outfilesuffix', '.html') : ''})
             if fragment
               refid, target = %(#{refid}##{fragment}), %(#{path}##{fragment})
             else
