@@ -80,6 +80,7 @@ Bug fixes::
   * don't convert inter-document xref to internal anchor unless entire target file is included into current file (#2200)
   * fix em dash replacement in manpage converter (#2604, PR #2607)
   * don't output e-mail address twice when replacing bare e-mail address in manpage output (#2654, PR #2665)
+  * use alternate macro for monospaced text in manpage output to not conflict w/ AsciiDoc macros (#2751)
   * enforce that absolute start path passed to PathResolver#system_path is inside of jail path (#2642, PR #2644)
   * fix behavior of PathResolver#descends_from? when base path equals / (#2642, PR #2644)
   * automatically recover if start path passed to PathResolver#system_path is outside of jail path (#2642, PR #2644)

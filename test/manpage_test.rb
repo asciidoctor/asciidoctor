@@ -150,7 +150,7 @@ BBB this line and the one above it should be visible)
 
 "`hello`" '`goodbye`' *strong* _weak_ `even`)
       output = Asciidoctor.convert input, :backend => :manpage
-      assert_equal '\(lqhello\(rq \(oqgoodbye\(cq \fBstrong\fP \fIweak\fP \f[CR]even\fP', output.lines.entries.last.chomp
+      assert_equal '\(lqhello\(rq \(oqgoodbye\(cq \fBstrong\fP \fIweak\fP \f(CReven\fP', output.lines.entries.last.chomp
     end
 
     test 'should escape backslashes in content' do
@@ -267,6 +267,17 @@ Please search |link:http://discuss.asciidoctor.org[the forums]| before asking.)
 Please search |\c
 .URL "http://discuss.asciidoctor.org" "the forums" "|"
 before asking.', output.lines.entries[-4..-1].join
+    end
+
+    test 'should be able to use monospaced text inside a link' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+Enter the link:cat[`cat`] command.)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_equal '.sp
+Enter the \c
+.URL "cat" "\f(CRcat\fP" " "
+command.', output.lines.entries[-4..-1].join
     end
   end
 
