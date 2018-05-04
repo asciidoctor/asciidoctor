@@ -220,9 +220,9 @@ To upgrade the gem, use:
 
 TIP: Your system may be configured to automatically update rpm packages, in which case no action is required by you to update the gem.
 
-==== apt-get (Debian, Ubuntu, or Mint)
+==== apt-get (Debian or Ubuntu)
 
-To install the gem on Debian, Ubuntu or Mint, open a terminal and type:
+To install the gem on Debian or Ubuntu, open a terminal and type:
 
  $ sudo apt-get install -y asciidoctor
 
@@ -237,7 +237,6 @@ Consult the package repository for your distribution to find out which version i
 
 * https://packages.debian.org/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Debian release]
 * https://packages.ubuntu.com/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Ubuntu release]
-* https://community.linuxmint.com/software/view/asciidoctor[asciidoctor package by Mint release]
 
 [CAUTION]
 ====
