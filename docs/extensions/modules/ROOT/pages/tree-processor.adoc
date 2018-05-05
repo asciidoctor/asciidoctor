@@ -64,8 +64,8 @@ end
 == Usage
 
 ```ruby
-Asciidoctor::Extensions.register do |document|
-  treeprocessor ShellSessionTreeProcessor
+Asciidoctor::Extensions.register do
+  tree_processor ShellSessionTreeProcessor
 end
 
 Asciidoctor.convert_file 'sample-with-shell-session.adoc', :safe => :safe
