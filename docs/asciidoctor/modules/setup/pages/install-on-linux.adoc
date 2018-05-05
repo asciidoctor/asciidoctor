@@ -6,61 +6,59 @@ endif::[]
 :url-fedora: https://apps.fedoraproject.org/packages/rubygem-asciidoctor
 :url-alpine: https://pkgs.alpinelinux.org/packages?name=asciidoctor
 
-The benefit of installing Asciidoctor using a Linux package manager is that the manager will also install Ruby and RubyGems if they're not already on your machine.
+When you install Asciidoctor using your Linux distribution's package manager, the manager will also install Ruby and RubyGems if they're not already on your machine.
 
-== dnf
+== DNF
 
-//Fedora or RHEL
+On RPM-based Linux distributions, such as Fedora, CentOS, and RHEL, use the DNF package manager to install Asciidoctor.
+To install the package, open a terminal and type:
 
-To install Asciidoctor on Fedora or RHEL via EPEL using the {url-fedora}[rubygem-asciidoctor^] package:
-
-. Open a terminal
-. Run the installation command on Fedora:
-+
- $ sudo dnf install asciidoctor
+ $ sudo dnf install -y asciidoctor
 
 include::{partialsdir}/success.adoc[]
 
-== apt-get
+== APT
 
-//Debian or Ubuntu
+On Debian and Debian-based distributions such as Ubuntu, use the Advanced Packaging Tool (APT) to install Asciidoctor.
+To install the package, open a terminal and type:
 
-To install Asciidoctor on Debian or Ubuntu via `apt-get`:
-
-. Open a terminal
-. Type the following `apt-get` command using sudo:
-
- $ sudo apt-get install asciidoctor
+ $ sudo apt-get install -y asciidoctor
 
 include::{partialsdir}/success.adoc[]
 
-== apk
-// Alpine Linux
+== Alpine Linux
 
-To install Asciidoctor on Alpine Linux using the {url-alpine}[asciidoctor package^]:
-
-. Open a terminal
-. Type the following `apk` command using sudo:
+Alpine Linux uses the apk took to install and manage packages.
+To install the Asciidoctor package, open a terminal and type:
 
  $ sudo apk add asciidoctor
 
 include::{partialsdir}/success.adoc[]
 
+== The package manager versus the gem command
+
+The benefit of installing Asciidoctor using a Linux package manager is that it will install and manage the corresponding Ruby and RubyGems versions if they're not already on your machine.
+However, some Linux distributions don't have the latest version of Asciidoctor packaged immediately after a new Asciidoctor gem is released.
+If you need the latest version of Asciidoctor immediately, you'll have to use the `gem` command.
+You'll also use the gem command to use a <<pre-release,pre-release version of Asciidoctor>>.
+
+[#gem]
 == gem install
 
-To install Asciidoctor using the `gem` command:
+If you plan to install Asciidoctor using the `gem` command, you should use https://rvm.io[RVM] to install Ruby in your home directory (i.e., user space) first.
+Then, you can safely use the `gem` command to install or update the Asciidoctor gem.
+When using RVM, gems are installed in a location isolated from the system.
 
-. Open a terminal and type:
+To install Asciidoctor using the `gem` command, open a terminal and type:
 
  $ gem install asciidoctor
 
 include::{partialsdir}/success.adoc[]
 
-== Install a pre-release version
+[#pre-release]
+=== Install a pre-release version
 
-To install a pre-release version of Asciidoctor:
-
-. Open a terminal and type:
+To install a pre-release version of Asciidoctor, open a terminal and type:
 
  $ gem install asciidoctor --pre
 
