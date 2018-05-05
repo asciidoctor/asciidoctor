@@ -82,5 +82,9 @@ include::{examplesdir}/section.adoc[tag=sectnuml]
 <1> When the `sectnumlevels` attribute is assigned a value of `2`, level 3 through 5 section titles are not numbered.
 // (i.e., not prefixed with a number).
 
+Recall that when the `doctype` is `book`, level-1 sections become chapters.
+Therefore, a `sectnumlevels` of `4` translates to 3 levels of numbered sections inside each chapter.
+
 Assigning `sectnumlevels` a value of `0` is effectively the same as disabling section numbering (`sectnums!`).
+However, if your document is a multi-part book with part numbering enabled, then you'd have to set `sectnumlevels` to `-1` to disable part numbering too (the equivalent of `partnums!`).
 // end::number[]
