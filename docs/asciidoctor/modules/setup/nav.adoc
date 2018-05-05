@@ -1,7 +1,11 @@
-* xref:asciidoctor::new-features.adoc[New Features]
+* xref:asciidoctor::new-features.adoc[What's New]
 
 * xref:get-asciidoctor.adoc[Get Asciidoctor]
-** xref:install.adoc[Install Asciidoctor]
+//** xref:install-with-gem.adoc[Install with gem]
+** xref:install-on-linux.adoc[Install on Linux]
+** xref:install-on-macos.adoc[Install on macOS]
+//** Install on Windows
+//** xref:install-with-bundler.adoc[Install with Bundler]
 ** xref:upgrade.adoc[Upgrade Asciidoctor]
 *** xref:upgrade-syntax.adoc[Upgrade Syntax, Attributes & Commands]
 
