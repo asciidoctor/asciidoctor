@@ -13,6 +13,12 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
+== Unreleased
+
+Improvements::
+
+  * use CSS class instead of hard-coded input float style on tables and images (#2753)
+
 == 1.5.7 (2018-05-02) - @mojavelinux
 
 Enhancements::

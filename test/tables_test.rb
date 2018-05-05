@@ -37,6 +37,20 @@ context 'Tables' do
       }
     end
 
+    test 'should add direction CSS class if float attribute is set on table' do
+      input = <<-EOS
+[float=left]
+|=======
+|A |B |C
+|a |b |c
+|1 |2 |3
+|=======
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'table.left', output, 1
+    end
+
     test 'should set stripes class if stripes option is set' do
       input = <<-EOS
 [stripes=odd]
