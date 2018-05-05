@@ -2,6 +2,7 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:release-version: 1.5.7
 :url-fedora: https://apps.fedoraproject.org/packages/rubygem-asciidoctor
 :url-alpine: https://pkgs.alpinelinux.org/packages?name=asciidoctor
 

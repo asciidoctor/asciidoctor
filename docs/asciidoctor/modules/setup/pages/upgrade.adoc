@@ -6,6 +6,36 @@ endif::[]
 //included in the install-toolchain and user-manual
 // macOS? Windows?
 
+== Upgrade on Linux
+
+The Linux packages may not be available immediately after a release of a new Asciidoctor gem.
+It may take several weeks for the packages to be updated.
+If you need to upgrade to the latest version immediately, use the xref:install.adoc#gem[gem install option].
+
+=== apk
+
+On Alpine Linux, you can update the package using:
+
+ $ sudo apk add --upgrade asciidoctor
+
+=== apt-get
+
+On Debian or Ubuntu, you can update the package using:
+
+ $ sudo apt-get upgrade asciidoctor
+
+=== dnf
+
+TIP: Your Fedora system is probably configured to automatically update packages, in which case no further action is required by you.
+
+On Fedora, you can update the package using:
+
+ $ sudo dnf update asciidoctor
+
+== Upgrade on macOS with Homebrew
+
+include::{partialsdir}/upgrade-on-macos.adoc[]
+
 == Upgrade using gem
 
 You can upgrade Asciidoctor using the gem `upgrade` command:
@@ -19,29 +49,3 @@ To remove the older version, use the following `gem` command:
 
  $ gem cleanup asciidoctor
 ====
-
-== Upgrade on Linux
-
-The Linux packages may not be available immediately after a release of a new Asciidoctor gem.
-It may take several weeks for the packages to be updated.
-If you need to upgrade to the latest version immediately, use the xref:install.adoc#gem[gem install option].
-
-=== Fedora
-
-TIP: Your Fedora system is probably configured to automatically update packages, in which case no further action is required by you.
-
-On Fedora, you can update the package using:
-
- $ sudo dnf update asciidoctor
-
-=== Debian or Ubuntu
-
-On Debian or Ubuntu, you can update the package using:
-
- $ sudo apt-get upgrade asciidoctor
-
-=== Alpine Linux
-
-On Alpine Linux, you can update the package using:
-
- $ sudo apk add --upgrade asciidoctor

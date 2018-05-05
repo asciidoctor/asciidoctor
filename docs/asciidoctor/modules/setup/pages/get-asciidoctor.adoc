@@ -2,12 +2,12 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-:adoc-version: 1.5.7
+:release-version: 1.5.7
 
 Asciidoctor operates on macOS, Windows, and Linux.
 //AsciidoctorJ, Asciidoctor.js, as well as the Asciidoctor build integrations, alternate converters, and extensions may have additional requirements.
 
-== System requirements for Asciidoctor {adoc-version}
+== System requirements for Asciidoctor {release-version}
 
 TIP: While we only test on Alpine Linux, Debian, and Fedora, Asciidoctor should operate as expected on most Linux distributions.
 
@@ -69,10 +69,8 @@ The following platforms *are only required if you're using certain AsciiDoc feat
 
 == What's next?
 
-Asciidoctor operates on macOS, Windows, and Linux.
-
 xref:install-on-linux.adoc[Linux]::
-Install Asciidoctor using the package manager on many Linux distributions including Fedora, RHEL, Debian, Ubuntu, Alpine Linux, and Mint.
+Install Asciidoctor using the package manager on many Linux distributions including Fedora, RHEL, Debian, Ubuntu, and Alpine Linux.
 
 xref:install-on-macos.adoc[macOS]::
 Install Asciidoctor using Homebrew on macOS.
@@ -81,20 +79,3 @@ Install Asciidoctor using Homebrew on macOS.
 //Install Asciidoctor using Chocolatey on Windows.
 
 //Bundler::
-
-
-////
-This content was from install-upgrade-asciidoctor.adoc and was tagged as systemreq[]
-
-Asciidoctor works on Linux, macOS and Windows.
-
-Asciidoctor requires one of the following implementations of Ruby:
-
-* Ruby 1.8.7
-* Ruby 1.9.3
-* Ruby 2 (2.0.0 or better)
-* JRuby 1.7 (Ruby 1.8 and 1.9 modes)
-* JRuby 9000
-* Rubinius 2.0 (Ruby 1.8 and 1.9 modes)
-* Opal (Javascript)
-////

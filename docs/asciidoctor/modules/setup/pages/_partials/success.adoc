@@ -3,7 +3,10 @@ To confirm that Asciidoctor is available, execute:
 
  $ asciidoctor --version
 
-The following output should appear in your terminal:
+You should see information about the Asciidoctor version and your Ruby environment printed in the terminal.
 
- Asciidoctor 1.5.7 [https://asciidoctor.org]
- Runtime Environment (ruby 2.3.0p0 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+[.output,subs=attributes+]
+....
+Asciidoctor {release-version} [https://asciidoctor.org]
+Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+....
