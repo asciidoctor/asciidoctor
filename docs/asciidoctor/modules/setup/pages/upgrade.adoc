@@ -6,7 +6,6 @@ endif::[]
 //included in the install-toolchain and user-manual
 // macOS? Windows?
 
-//tag::upgrade[]
 == Upgrade using gem
 
 You can upgrade Asciidoctor using the gem `upgrade` command:
@@ -46,5 +45,3 @@ On Debian or Ubuntu, you can update the package using:
 On Alpine Linux, you can update the package using:
 
  $ sudo apk add --upgrade asciidoctor
- 
-//end::upgrade[]

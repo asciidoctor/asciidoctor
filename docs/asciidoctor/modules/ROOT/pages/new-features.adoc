@@ -1,9 +1,10 @@
-= New Features
+= What's New in {adoc-version}
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
+:adoc-version: 1.5.7
 
-== Sections and parts
+== Sections and book parts
 
 Hide the titles of special sections, such as the dedication, with `untitled` (DocBook backend only).
 

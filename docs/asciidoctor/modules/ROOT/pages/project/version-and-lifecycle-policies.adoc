@@ -59,28 +59,26 @@ Dates are formatted as year/month/day.
 |===
 |	|Status |GA |GS	|EOL |EOGS
 
-|Asciidoctor 1.5.6.x
-|GA/GS
-|2017/07/23
-|2017/07/23
-|2018/06 ^[1]^
-|2018/06 ^[1]^
-
-|Asciidoctor 1.5.7
-|Scheduling pre-release
-|2018/06 ^[1]^
-|2018/06 ^[1]^
-|2018/12 ^[1]^
-|2018/12 ^[1]^
-
 |Asciidoctor 2.0
 |In planning
 |
 |
 |
 |
-|===
 
-^[1]^ Date is estimated and subject to change.
+|Asciidoctor 1.5.7
+|GA/GS
+|2018/05/02
+|2018/05/02
+|2018/12/31
+|2018/12/31
+
+|Asciidoctor 1.5.6.2
+|EOL/EOGS
+|2017/07/23
+|2017/07/23
+|2018/05/02
+|2018/05/02
+|===
 
 The information on this page is believed to be accurate as of the date of publication, but updates and revisions may be posted periodically and without notice.
