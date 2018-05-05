@@ -55,7 +55,7 @@ When the hide-uri-scheme attribute is set, the above URL will render as follows:
 <a href="https://asciidoctor.org">asciidoctor.org</a>
 ----
 
-Note the absence of _http_ inside the `<a>` element.
+Note the absence of _https_ in the contents of the `<a>` element.
 
 == Link text
 
