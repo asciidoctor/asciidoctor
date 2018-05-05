@@ -9,7 +9,7 @@ Asciidoctor operates on macOS, Windows, and Linux.
 
 == System requirements for Asciidoctor {release-version}
 
-TIP: While we only test on Alpine Linux, Debian, and Fedora, Asciidoctor should operate as expected on most Linux distributions.
+While we only test on Alpine Linux, Debian, and Fedora, Asciidoctor should operate as expected on most Linux distributions.
 
 [cols="20,25a",width="45%"]
 |===

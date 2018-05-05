@@ -2,43 +2,51 @@
 ifndef::env-site,env-github[]
 include::_attributes.adoc[]
 endif::[]
-//from install-upgrade-asciidoctor.adoc
-//included in the install-toolchain and user-manual
-// macOS? Windows?
 
 == Upgrade on Linux
 
-The Linux packages may not be available immediately after a release of a new Asciidoctor gem.
-It may take several weeks for the packages to be updated.
-If you need to upgrade to the latest version immediately, use the xref:install.adoc#gem[gem install option].
+Some Linux distributions may not have the latest stable version of Asciidoctor packaged immediately after a release of a new gem.
+If you need to upgrade to the latest version immediately, use xref:install-on-linux.adoc#gem[gem install] instead of the package manager.
 
-=== apk
+TIP: Your Linux system may be configured to automatically update packages, in which case the latest Asciidoctor package will be installed as soon as it becomes available.
+No further action is required by you.
 
-On Alpine Linux, you can update the package using:
+=== Alpine Linux
 
- $ sudo apk add --upgrade asciidoctor
+On Alpine Linux, update the Asciidoctor package using:
 
-=== apt-get
+ $ sudo apk add -u asciidoctor
 
-On Debian or Ubuntu, you can update the package using:
+=== APT
 
- $ sudo apt-get upgrade asciidoctor
+On Debian and Debian-based distributions, update the Asciidoctor package using:
 
-=== dnf
+ $ sudo apt-get upgrade -y asciidoctor
 
-TIP: Your Fedora system is probably configured to automatically update packages, in which case no further action is required by you.
+=== DNF
 
-On Fedora, you can update the package using:
+On Fedora and other RPM-based distributions, you can update the package using:
 
- $ sudo dnf update asciidoctor
+ $ sudo dnf update -y asciidoctor
 
 == Upgrade on macOS with Homebrew
 
 include::{partialsdir}/upgrade-on-macos.adoc[]
 
-== Upgrade using gem
+== Update using gem
 
-You can upgrade Asciidoctor using the gem `upgrade` command:
+[CAUTION]
+====
+You're advised against using the `gem update` command to update a gem managed by the package manager.
+Doing so puts the system into an inconsistent state as the package manager can no longer track the files (which get installed under [.path]_/usr/local_).
+Simply put, system gems should only be managed by the package manager.
+
+If you want to use a version of Asciidoctor that is newer than what is installed by the package manager, you should use https://rvm.io[RVM] to install Ruby in your home directory (i.e., user space).
+Then, you can safely use the `gem` command to install or update the Asciidoctor gem.
+When using RVM, gems are installed in a location isolated from the system.
+====
+
+You can upgrade Asciidoctor using the gem `update` command:
 
  $ gem update asciidoctor
 
