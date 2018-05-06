@@ -1,5 +1,10 @@
 # encoding: UTF-8
-require File.expand_path '../lib/asciidoctor/version', __FILE__
+begin
+  require File.expand_path '../lib/asciidoctor/version', __FILE__
+rescue LoadError
+  require 'asciidoctor/version'
+end
+
 require 'open3' unless defined? Open3
 
 Gem::Specification.new do |s|
