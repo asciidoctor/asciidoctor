@@ -1,5 +1,3 @@
-require File.expand_path '../lib/asciidoctor/version', __FILE__
-
 def prepare_test_env
   # rather than hardcoding gc settings in test task,
   # could use https://gist.github.com/benders/788695
@@ -65,16 +63,6 @@ end
 
 begin
   require 'bundler/gem_tasks'
-
-  # Enhance the release task to create an explicit commit for the release
-  #Rake::Task[:release].enhance [:commit_release]
-
-  # NOTE you don't need to push after updating version and committing locally
-  # WARNING no longer works; it's now necessary to get master in a state ready for tagging
-  task :commit_release do
-    Bundler::GemHelper.new.send(:guard_clean)
-    sh "git commit --allow-empty -a -m 'Release #{Asciidoctor::VERSION}'"
-  end
 rescue LoadError
 end
 
