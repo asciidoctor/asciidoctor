@@ -947,7 +947,10 @@ Your browser does not support the audio tag.
     def video node
       xml = @xml_mode
       id_attribute = node.id ? %( id="#{node.id}") : ''
-      classes = ['videoblock', node.role].compact
+      classes = ['videoblock']
+      classes << (node.attr 'float') if node.attr? 'float'
+      classes << %(text-#{node.attr 'align'}) if node.attr? 'align'
+      classes << node.role if node.role
       class_attribute = %( class="#{classes * ' '}")
       title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
       width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
