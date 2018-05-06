@@ -2064,6 +2064,16 @@ image::images/tiger.png[{alt-text}]
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
+    test 'should set direction CSS class on image if float attribute is set' do
+      input = <<-EOS
+[float=left]
+image::images/tiger.png[Tiger]
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.imageblock.left', output, 1
+    end
+
     test 'style attribute is dropped from image macro' do
       input = <<-EOS
 [style=value]

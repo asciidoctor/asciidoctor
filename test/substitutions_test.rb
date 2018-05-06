@@ -783,7 +783,7 @@ context 'Substitutions' do
 
     test 'an inline image macro with a float attribute should be interpreted as a floating image' do
       para = block_from_string %(image:http://example.com/images/tiger.png[tiger, float="right"] Beware of the tigers!)
-      assert_equal %{<span class="image" style="float: right"><img src="http://example.com/images/tiger.png" alt="tiger"></span> Beware of the tigers!},
+      assert_equal %{<span class="image right"><img src="http://example.com/images/tiger.png" alt="tiger"></span> Beware of the tigers!},
           para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 

@@ -560,11 +560,10 @@ Your browser does not support the audio tag.
         img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
       end
       id_attr = node.id ? %( id="#{node.id}") : ''
-      classes = ['imageblock', node.role].compact
+      classes = ['imageblock', node.role, (node.attr 'float')].compact
       class_attr = %( class="#{classes * ' '}")
       styles = []
       styles << %(text-align: #{node.attr 'align'}) if node.attr? 'align'
-      styles << %(float: #{node.attr 'float'}) if node.attr? 'float'
       style_attr = styles.empty? ? '' : %( style="#{styles * ';'}")
       title_el = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : ''
       %(<div#{id_attr}#{class_attr}#{style_attr}>
@@ -800,8 +799,8 @@ Your browser does not support the audio tag.
       if (role = node.role)
         classes << role
       end
+      classes << (node.attr 'float') if node.attr? 'float'
       class_attribute = %( class="#{classes * ' '}")
-      styles << %(float: #{node.attr 'float'};) if node.attr? 'float'
       style_attribute = styles.empty? ? '' : %( style="#{styles * ' '}")
 
       result << %(<table#{id_attribute}#{class_attribute}#{style_attribute}>)
@@ -1125,9 +1124,18 @@ Your browser does not support the video tag.
       if node.attr? 'link', nil, false
         img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
       end
-      class_attr_val = (role = node.role) ? %(#{type} #{role}) : type
-      style_attr = (node.attr? 'float') ? %( style="float: #{node.attr 'float'}") : ''
-      %(<span class="#{class_attr_val}"#{style_attr}>#{img}</span>)
+      if (role = node.role)
+        if node.attr? 'float'
+          class_attr_val = %(#{type} #{role} #{node.attr 'float'})
+        else
+          class_attr_val = %(#{type} #{role})
+        end
+      elsif node.attr? 'float'
+        class_attr_val = %(#{type} #{node.attr 'float'})
+      else
+        class_attr_val = type
+      end
+      %(<span class="#{class_attr_val}">#{img}</span>)
     end
 
     def inline_indexterm node
