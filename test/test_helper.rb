@@ -1,6 +1,7 @@
 # encoding: UTF-8
 ASCIIDOCTOR_TEST_DIR = File.expand_path File.dirname __FILE__
 ASCIIDOCTOR_PROJECT_DIR = File.dirname ASCIIDOCTOR_TEST_DIR
+ASCIIDOCTOR_LIB_PATH = ENV['ASCIIDOCTOR_LIB_PATH'] || File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
 Dir.chdir ASCIIDOCTOR_PROJECT_DIR
 
 if RUBY_VERSION < '1.9'
@@ -9,7 +10,11 @@ end
 
 require 'simplecov' if ENV['COVERAGE'] == 'true'
 
-require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
+if File.exist? ASCIIDOCTOR_LIB_PATH
+    require ASCIIDOCTOR_LIB_PATH
+else
+    require 'asciidoctor'
+end
 
 require 'socket'
 require 'nokogiri'
