@@ -21,7 +21,8 @@ Enhancements::
 
 Improvements::
 
-  * use CSS class instead of hard-coded input float style on tables and images (#2753)
+  * use CSS class instead of hard-coded inline float style on tables and images (#2753)
+  * use CSS class instead of hard-coded inline text-align style on block images (#2753)
 
 == 1.5.7 (2018-05-02) - @mojavelinux
 

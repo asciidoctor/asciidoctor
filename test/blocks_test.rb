@@ -2072,6 +2072,18 @@ image::images/tiger.png[Tiger]
 
       output = render_embedded_string input
       assert_css '.imageblock.left', output, 1
+      assert_css '.imageblock[style]', output, 0
+    end
+
+    test 'should set text alignment CSS class on image if align attribute is set' do
+      input = <<-EOS
+[align=center]
+image::images/tiger.png[Tiger]
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.imageblock.text-center', output, 1
+      assert_css '.imageblock[style]', output, 0
     end
 
     test 'style attribute is dropped from image macro' do
