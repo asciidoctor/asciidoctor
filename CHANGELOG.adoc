@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Enhancements::
 
+  * if set, add value of part-signifier and chapter-signifier attributes to part and chapter titles (#2738)
   * allow position (float) and alignment (align) to be set on video block (#2425)
   * substitute attribute references in attrlist of include directive (#2761)
   * add Document#set_header_attribute method for adding method directly to document header during parsing (#2820)
@@ -65,6 +66,7 @@ Fixes::
 
 Improvements::
 
+  * change trailing delimiter on part number to colon (:) (#2738)
   * interpret open line range as infinite (#2914)
   * rename number property on AbstractBlock to numeral, but keep number as deprecated alias
   * use CSS class instead of hard-coded inline float style on tables and images (#2753)

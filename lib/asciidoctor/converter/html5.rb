@@ -285,15 +285,30 @@ MathJax.Hub.Config({
 
     def outline node, opts = {}
       return unless node.sections?
-      sectnumlevels = opts[:sectnumlevels] || (node.document.attr 'sectnumlevels', 3).to_i
-      toclevels = opts[:toclevels] || (node.document.attr 'toclevels', 2).to_i
+      sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
+      toclevels = opts[:toclevels] || (node.document.attributes['toclevels'] || 2).to_i
       sections = node.sections
       # FIXME top level is incorrect if a multipart book starts with a special section defined at level 0
       result = [%(<ul class="sectlevel#{sections[0].level}">)]
       sections.each do |section|
         slevel = section.level
-        stitle = section.caption && slevel > 0 ? section.captioned_title :
-          (section.numbered && slevel <= sectnumlevels ? %(#{section.sectnum} #{section.title}) : section.title)
+        if section.caption
+          stitle = section.captioned_title
+        elsif section.numbered && slevel <= sectnumlevels
+          if slevel < 2 && node.document.doctype == 'book'
+            if section.sectname == 'chapter'
+              stitle =  %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum} #{section.title})
+            elsif section.sectname == 'part'
+              stitle =  %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'} #{section.title})
+            else
+              stitle = %(#{section.sectnum} #{section.title})
+            end
+          else
+            stitle = %(#{section.sectnum} #{section.title})
+          end
+        else
+          stitle = section.title
+        end
         stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
         if slevel < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :sectnumlevels => sectnumlevels)
           result << %(<li><a href="##{section.id}">#{stitle}</a>)
@@ -308,15 +323,31 @@ MathJax.Hub.Config({
     end
 
     def section node
-      sect0 = (level = node.level) == 0
-      title = node.caption && !sect0 ? node.captioned_title :
-        (node.numbered && level <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} #{node.title}) : node.title)
+      doc_attrs = node.document.attributes
+      level = node.level
+      if node.caption
+        title = node.captioned_title
+      elsif node.numbered && level <= (doc_attrs['sectnumlevels'] || 3).to_i
+        if level < 2 && node.document.doctype == 'book'
+          if node.sectname == 'chapter'
+            title = %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}#{node.sectnum} #{node.title})
+          elsif node.sectname == 'part'
+            title = %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}#{node.sectnum nil, ':'} #{node.title})
+          else
+            title = %(#{node.sectnum} #{node.title})
+          end
+        else
+          title = %(#{node.sectnum} #{node.title})
+        end
+      else
+        title = node.title
+      end
       if node.id
         id_attr = %( id="#{id = node.id}")
-        if (doc_attrs = node.document.attributes).key? 'sectlinks'
+        if doc_attrs['sectlinks']
           title = %(<a class="link" href="##{id}">#{title}</a>)
         end
-        if doc_attrs.key? 'sectanchors'
+        if doc_attrs['sectanchors']
           # QUESTION should we add a font-based icon in anchor if icons=font?
           if doc_attrs['sectanchors'] == 'after'
             title = %(#{title}<a class="anchor" href="##{id}"></a>)
@@ -327,8 +358,7 @@ MathJax.Hub.Config({
       else
         id_attr = ''
       end
-
-      if sect0
+      if level == 0
         %(<h1#{id_attr} class="sect0#{(role = node.role) ? " #{role}" : ''}">#{title}</h1>
 #{node.content})
       else
