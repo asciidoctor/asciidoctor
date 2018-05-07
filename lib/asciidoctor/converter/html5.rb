@@ -560,13 +560,13 @@ Your browser does not support the audio tag.
         img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
       end
       id_attr = node.id ? %( id="#{node.id}") : ''
-      classes = ['imageblock', node.role, (node.attr 'float')].compact
+      classes = ['imageblock']
+      classes << (node.attr 'float') if node.attr? 'float'
+      classes << %(text-#{node.attr 'align'}) if node.attr? 'align'
+      classes << node.role if node.role
       class_attr = %( class="#{classes * ' '}")
-      styles = []
-      styles << %(text-align: #{node.attr 'align'}) if node.attr? 'align'
-      style_attr = styles.empty? ? '' : %( style="#{styles * ';'}")
       title_el = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : ''
-      %(<div#{id_attr}#{class_attr}#{style_attr}>
+      %(<div#{id_attr}#{class_attr}>
 <div class="content">
 #{img}
 </div>#{title_el}
@@ -796,10 +796,10 @@ Your browser does not support the audio tag.
       else
         styles << %(width: #{tablewidth}%;)
       end
+      classes << (node.attr 'float') if node.attr? 'float'
       if (role = node.role)
         classes << role
       end
-      classes << (node.attr 'float') if node.attr? 'float'
       class_attribute = %( class="#{classes * ' '}")
       style_attribute = styles.empty? ? '' : %( style="#{styles * ' '}")
 
@@ -947,7 +947,10 @@ Your browser does not support the audio tag.
     def video node
       xml = @xml_mode
       id_attribute = node.id ? %( id="#{node.id}") : ''
-      classes = ['videoblock', node.role].compact
+      classes = ['videoblock']
+      classes << (node.attr 'float') if node.attr? 'float'
+      classes << %(text-#{node.attr 'align'}) if node.attr? 'align'
+      classes << node.role if node.role
       class_attribute = %( class="#{classes * ' '}")
       title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
       width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
@@ -1126,7 +1129,7 @@ Your browser does not support the video tag.
       end
       if (role = node.role)
         if node.attr? 'float'
-          class_attr_val = %(#{type} #{role} #{node.attr 'float'})
+          class_attr_val = %(#{type} #{node.attr 'float'} #{role})
         else
           class_attr_val = %(#{type} #{role})
         end

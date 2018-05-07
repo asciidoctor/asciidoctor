@@ -2072,6 +2072,18 @@ image::images/tiger.png[Tiger]
 
       output = render_embedded_string input
       assert_css '.imageblock.left', output, 1
+      assert_css '.imageblock[style]', output, 0
+    end
+
+    test 'should set text alignment CSS class on image if align attribute is set' do
+      input = <<-EOS
+[align=center]
+image::images/tiger.png[Tiger]
+      EOS
+
+      output = render_embedded_string input
+      assert_css '.imageblock.text-center', output, 1
+      assert_css '.imageblock[style]', output, 0
     end
 
     test 'style attribute is dropped from image macro' do
@@ -2495,6 +2507,28 @@ video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]
       assert_css 'video[poster="cats-and-dogs.png"]', output, 1
       assert_css 'video[width="200"]', output, 1
       assert_css 'video[height="300"]', output, 1
+    end
+
+    test 'should set direction CSS class on video block if float attribute is set' do
+      input = <<-EOS
+video::cats-vs-dogs.avi[cats-and-dogs.png,float=right]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
+      assert_css '.videoblock.right', output, 1
+    end
+
+    test 'should set text alignment CSS class on video block if align attribute is set' do
+      input = <<-EOS
+video::cats-vs-dogs.avi[cats-and-dogs.png,align=center]
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'video', output, 1
+      assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
+      assert_css '.videoblock.text-center', output, 1
     end
 
     test 'video macro should honor all options' do
