@@ -852,8 +852,9 @@ class PreprocessorReader < Reader
     elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
       shift
       # FIXME parse attributes only if requested by extension
-      parsed_attributes = attrlist ? AttributeList.new((attrlist.include? ATTR_REF_HEAD) ? (@document.sub_attributes attrlist) : attrlist).parse : {}
-      ext.process_method[@document, self, expanded_target, parsed_attributes]
+      # QUESTION should we use (@document.parse_attributes attrlist, [])?
+      parsed_attrs = attrlist ? AttributeList.new((attrlist.include? ATTR_REF_HEAD) ? (@document.sub_attributes attrlist) : attrlist).parse : {}
+      ext.process_method[@document, self, expanded_target, parsed_attrs]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
@@ -867,15 +868,15 @@ class PreprocessorReader < Reader
       end
 
       # QUESTION should we use (@document.parse_attributes attrlist, [])?
-      parsed_attributes = attrlist ? AttributeList.new((attrlist.include? ATTR_REF_HEAD) ? (@document.sub_attributes attrlist) : attrlist).parse : {}
-      inc_path, target_type, relpath = resolve_include_path expanded_target, attrlist, parsed_attributes
+      parsed_attrs = attrlist ? AttributeList.new((attrlist.include? ATTR_REF_HEAD) ? (@document.sub_attributes attrlist) : attrlist).parse : {}
+      inc_path, target_type, relpath = resolve_include_path expanded_target, attrlist, parsed_attrs
       return inc_path unless target_type
 
       inc_linenos = inc_tags = nil
       if attrlist
-        if parsed_attributes.key? 'lines'
+        if parsed_attrs.key? 'lines'
           inc_linenos = []
-          parsed_attributes['lines'].split(DataDelimiterRx).each do |linedef|
+          parsed_attrs['lines'].split(DataDelimiterRx).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..', 2).map {|it| it.to_i }
               inc_linenos += to < 0 ? [from, 1.0/0.0] : ::Range.new(from, to).to_a
@@ -884,13 +885,13 @@ class PreprocessorReader < Reader
             end
           end
           inc_linenos = inc_linenos.empty? ? nil : inc_linenos.sort.uniq
-        elsif parsed_attributes.key? 'tag'
-          unless (tag = parsed_attributes['tag']).empty? || tag == '!'
+        elsif parsed_attrs.key? 'tag'
+          unless (tag = parsed_attrs['tag']).empty? || tag == '!'
             inc_tags = (tag.start_with? '!') ? { (tag.slice 1, tag.length) => false } : { tag => true }
           end
-        elsif parsed_attributes.key? 'tags'
+        elsif parsed_attrs.key? 'tags'
           inc_tags = {}
-          parsed_attributes['tags'].split(DataDelimiterRx).each do |tagdef|
+          parsed_attrs['tags'].split(DataDelimiterRx).each do |tagdef|
             if tagdef.start_with? '!'
               inc_tags[tagdef.slice 1, tagdef.length] = false
             else
@@ -930,8 +931,8 @@ class PreprocessorReader < Reader
         shift
         # FIXME not accounting for skipped lines in reader line numbering
         if inc_offset
-          parsed_attributes['partial-option'] = true
-          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes
+          parsed_attrs['partial-option'] = true
+          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end
       elsif inc_tags
         inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
@@ -997,16 +998,16 @@ class PreprocessorReader < Reader
         end
         shift
         if inc_offset
-          parsed_attributes['partial-option'] = true unless base_select && wildcard && inc_tags.empty?
+          parsed_attrs['partial-option'] = true unless base_select && wildcard && inc_tags.empty?
           # FIXME not accounting for skipped lines in reader line numbering
-          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attributes
+          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
           inc_content = target_type == :file ? (::IO.binread inc_path) : open(inc_path, 'rb') {|f| f.read }
           shift
-          push_include inc_content, inc_path, relpath, 1, parsed_attributes
+          push_include inc_content, inc_path, relpath, 1, parsed_attrs
         rescue
           logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
