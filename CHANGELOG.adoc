@@ -13,6 +13,19 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
+== Unreleased
+
+Fixes::
+
+  * fix regression where block attributes where being inherited by sibling blocks in a complex list item (#2771)
+  * don't apply lead styling to first paragraph in nested document (AsciiDoc table cell) if role is present (#2624)
+
+Build / Infrastructure::
+
+  * drop obsolete logic in rake build
+  * allow lib dir to be overridden for tests using an environment variable (PR #2758)
+  * load asciidoctor/version from LOAD_PATH in gemspec if not found locally (PR #2760)
+
 == 1.5.7 (2018-05-02) - @mojavelinux
 
 Enhancements::
