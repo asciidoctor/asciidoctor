@@ -1814,11 +1814,12 @@ class Parser
       # NOTE this will discard any comment lines, but not skip blank lines
       process_attribute_entries reader, document
 
-      rev_metadata = {}
+      revision_list = []
 
-      if reader.has_more_lines? && !reader.next_line_empty?
+      while reader.has_more_lines? && !reader.next_line_empty?
         rev_line = reader.read_line
         if (match = RevisionInfoLineRx.match(rev_line))
+          rev_metadata = {}
           rev_metadata['revnumber'] = match[1].rstrip if match[1]
           unless (component = match[2].strip).empty?
             # version must begin with 'v' if date is absent
@@ -1828,24 +1829,36 @@ class Parser
               rev_metadata['revdate'] = component
             end
           end
-          rev_metadata['revremark'] = match[3].rstrip if match[3]
+
+          rev_metadata['author'] = match[3].rstrip if match[3] && match[4]
+          rev_metadata['revremark'] = match[4].rstrip if match[3] && match[4]
+          rev_metadata['revremark'] = match[3].rstrip if match[3] && !match[4]
+          revision_list.push rev_metadata
         else
           # throw it back
           reader.unshift_line rev_line
+          break
         end
       end
 
-      unless rev_metadata.empty?
+      unless revision_list.empty?
         if document
           # apply header subs and assign to document
-          rev_metadata.each do |key, val|
+          revision_list[0].each do |key, val|
             unless document.attributes.key? key
               document.attributes[key] = document.apply_header_subs(val)
             end
           end
+          document.attributes['revision_list'] = revision_list
+        end
+        
+        if revision_list[0]['author'] == nil
+          revision_list[0]['author'] = author_metadata['author']
         end
 
-        metadata.update rev_metadata
+        
+        metadata.update revision_list[0]
+        metadata['revision_list'] = revision_list
       end
 
       # NOTE this will discard any comment lines, but not skip blank lines

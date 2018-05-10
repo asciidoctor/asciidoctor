@@ -597,7 +597,7 @@ Ryan Waldron
 v0.0.7, 2013-12-18: The first release you can stand on
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 9, metadata.size
+    assert_equal 10, metadata.size
     assert_equal '0.0.7', metadata['revnumber']
     assert_equal '2013-12-18', metadata['revdate']
     assert_equal 'The first release you can stand on', metadata['revremark']
@@ -609,7 +609,7 @@ Ryan Waldron
 2013-12-18
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 7, metadata.size
+    assert_equal 8, metadata.size
     assert_equal '2013-12-18', metadata['revdate']
   end
 
@@ -619,7 +619,7 @@ Stuart Rackham
 v8.6.8,
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 7, metadata.size
+    assert_equal 8, metadata.size
     assert_equal '8.6.8', metadata['revnumber']
     refute metadata.has_key?('revdate')
   end
@@ -631,7 +631,7 @@ Stuart Rackham
 v8.6.8
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 7, metadata.size
+    assert_equal 8, metadata.size
     assert_equal '8.6.8', metadata['revnumber']
     refute metadata.has_key?('revdate')
   end
@@ -643,7 +643,7 @@ Ryan Waldron
 foobar
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 7, metadata.size
+    assert_equal 8, metadata.size
     assert_equal 'foobar', metadata['revdate']
   end
 
@@ -653,7 +653,7 @@ Ryan Waldron
 2013-12-18:  The first release you can stand on
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 8, metadata.size
+    assert_equal 9, metadata.size
     assert_equal '2013-12-18', metadata['revdate']
     assert_equal 'The first release you can stand on', metadata['revremark']
   end
@@ -720,13 +720,68 @@ release info
 v0.0.7, 2013-12-18
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 8, metadata.size
+    assert_equal 9, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Ryan Waldron', metadata['author']
     assert_equal '0.0.7', metadata['revnumber']
     assert_equal '2013-12-18', metadata['revdate']
   end
 
+  #multiple revision list test
+  test "decoding of multiple revision line without author" do
+    input = <<-EOS
+Ryan Waldron
+v1.0.0, 2016-09-07: The big 1 OH!
+v0.9.0, 2016-06-03: We're getting there
+
+content    
+    EOS
+    metadata, _ = parse_header_metadata input
+
+    assert_equal 10, metadata.size
+    assert_equal 1, metadata['authorcount']
+    assert_equal 'Ryan Waldron', metadata['author']
+    assert_equal '1.0.0', metadata['revnumber']
+    assert_equal '2016-09-07', metadata['revdate']
+    assert_equal 2, metadata['revision_list'].size
+    assert_equal '1.0.0', metadata['revision_list'][0]['revnumber']
+    assert_equal '2016-09-07', metadata['revision_list'][0]['revdate']
+    assert_equal 'The big 1 OH!', metadata['revision_list'][0]['revremark']
+    assert_equal '0.9.0', metadata['revision_list'][1]['revnumber']
+    assert_equal '2016-06-03', metadata['revision_list'][1]['revdate']
+    assert_equal "We're getting there", metadata['revision_list'][1]['revremark']
+  end
+  
+
+  test "decoding of multiple revision line with author (set default author)" do
+    input = <<-EOS
+Ryan Waldron
+v1.0.0, 2016-09-07: The big 1 OH! 
+v0.9.0, 2016-06-03: John Doe : We're getting there
+
+content    
+    EOS
+    metadata, _ = parse_header_metadata input
+
+    assert_equal 10, metadata.size
+    assert_equal 1, metadata['authorcount']
+    assert_equal 'Ryan Waldron', metadata['author']
+    assert_equal '1.0.0', metadata['revnumber']
+    assert_equal '2016-09-07', metadata['revdate']
+    
+    assert_equal 2, metadata['revision_list'].size
+    assert_equal '1.0.0', metadata['revision_list'][0]['revnumber']
+    assert_equal '2016-09-07', metadata['revision_list'][0]['revdate']
+    assert_equal 'The big 1 OH!', metadata['revision_list'][0]['revremark']
+    assert_equal 'Ryan Waldron', metadata['revision_list'][0]['author']
+    
+    assert_equal '0.9.0', metadata['revision_list'][1]['revnumber']
+    assert_equal '2016-06-03', metadata['revision_list'][1]['revdate']
+    assert_equal "We're getting there", metadata['revision_list'][1]['revremark']
+    assert_equal 'John Doe', metadata['revision_list'][1]['author']
+  end
+
+  
   test 'break header at line with three forward slashes' do
     input = <<-EOS
 Joe Cool
@@ -735,7 +790,7 @@ v1.0
 stuff
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 7, metadata.size
+    assert_equal 8, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Joe Cool', metadata['author']
     assert_equal '1.0', metadata['revnumber']
