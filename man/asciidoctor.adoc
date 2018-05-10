@@ -2,7 +2,7 @@
 Dan Allen; Sarah White; Ryan Waldron
 :doctype: manpage
 :man manual: Asciidoctor Manual
-:man source: Asciidoctor 1.5.7
+:man source: Asciidoctor 1.5.7.1
 :page-layout: base
 
 == NAME

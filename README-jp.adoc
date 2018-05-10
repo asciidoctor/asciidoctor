@@ -1,5 +1,6 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>; Ryan Waldron <https://github.com/erebor[@erebor]>
+v1.5.7.1, 2018-05-10
 v1.5.7, 2018-05-02
 // settings:
 :page-layout: base
@@ -18,7 +19,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 // Variables:
-:release-version: 1.5.7
+:release-version: 1.5.7.1
 // URIs:
 :uri-org: https://github.com/asciidoctor
 :uri-repo: {uri-org}/asciidoctor
