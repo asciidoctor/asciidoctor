@@ -377,6 +377,29 @@ NOTE: This is a note.
       assert_xpath '(//ul)[1]/li/hr', output, 1
     end
 
+    test 'should not inherit block attributes from previous block when block is attached using a list continuation' do
+      input = <<-EOS
+* complex list item
++
+[source,xml]
+----
+<name>value</name> <!--1-->
+----
+<1> a configuration value
+      EOS
+
+      doc = document_from_string input
+      colist = doc.blocks[0].items[0].blocks[-1]
+      assert_equal :colist, colist.context
+      refute_equal 'source', colist.style
+      output = doc.convert :header_footer => false
+      assert_css 'ul', output, 1
+      assert_css 'ul > li', output, 1
+      assert_css 'ul > li > p', output, 1
+      assert_css 'ul > li > .listingblock', output, 1
+      assert_css 'ul > li > .colist', output, 1
+    end
+
     test 'should continue to parse blocks attached by a list continuation after block is dropped' do
       input = <<-EOS
 * item

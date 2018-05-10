@@ -1335,12 +1335,12 @@ class Parser
       end
 
       # reader is confined to boundaries of list, which means only blocks will be found (no sections)
-      if (block = next_block(list_item_reader, list_item, (attrs = {}), :text => !has_text))
+      if (block = next_block(list_item_reader, list_item, {}, :text => !has_text))
         list_item.blocks << block
       end
 
       while list_item_reader.has_more_lines?
-        if (block = next_block(list_item_reader, list_item, attrs))
+        if (block = next_block(list_item_reader, list_item))
           list_item.blocks << block
         end
       end
