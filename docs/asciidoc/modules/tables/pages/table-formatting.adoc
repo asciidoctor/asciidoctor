@@ -36,34 +36,32 @@ include::{examplesdir}/row.adoc[tag=base-h]
 [%autowidth]
 include::{examplesdir}/row.adoc[tag=base-h]
 
-If you want each column to have an automatic width, but want the table to span the width of the content area, add the `spread` role to the table (or, as of 1.5.5, set the `width` attribute to `100%`).
+If you want each column to have an automatic width, but want the table to span the width of the content area, add the `stretch` role to the table (or, as of 1.5.5, set the `width` attribute to `100%`).
 
 .Full-width table with autowidth columns
 [source]
 ----
-[%autowidth.spread]
+[%autowidth.stretch]
 include::{examplesdir}/row.adoc[tag=base-h]
 ----
 
 .Result: Columns are sized to the content, but table spans the width of the page
-[%autowidth.spread]
+[%autowidth.stretch]
 include::{examplesdir}/row.adoc[tag=base-h]
 
 WARNING: The `autowidth` option is not recognized by the DocBook converter.
 
-[NOTE]
-====
-A design for enabling autowidth for individual columns is underway.
-(See https://github.com/asciidoctor/asciidoctor/issues/1844[issue #1844^]).
-In the meantime, it's still possible to apply a style to a column when using the `autowidth` option, as the following attribute list shows:
+If you want to apply autowidth only to certain columns, use the special value `~` as the width of the column.
+In this case, width values are assumed to be a percentage value (i.e., 100-based).
 
+.Table with fixed and autowidth columns
 [source]
 ----
-[%autowidth.spread,cols="~h,~"]
+[cols="25h,~,~"]
+|===
+|small |as big as the column needs to be |the rest
+|===
 ----
-
-In this case, the relative column widths are ignored.
-====
 
 == Table borders
 
