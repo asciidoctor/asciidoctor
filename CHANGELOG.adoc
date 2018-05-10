@@ -24,6 +24,19 @@ Improvements::
   * use CSS class instead of hard-coded inline float style on tables and images (#2753)
   * use CSS class instead of hard-coded inline text-align style on block images (#2753)
 
+== 1.5.7.1 (2018-05-10) - @mojavelinux
+
+Fixes::
+
+  * fix regression where block attributes where being inherited by sibling blocks in a complex list item (#2771)
+  * don't apply lead styling to first paragraph in nested document (AsciiDoc table cell) if role is present (#2624)
+
+Build / Infrastructure::
+
+  * drop obsolete logic in rake build (*@aerostitch*)
+  * allow lib dir to be overridden for tests using an environment variable (PR #2758) (*@aerostitch*)
+  * load asciidoctor/version from LOAD_PATH in gemspec if not found locally (PR #2760) (*@aerostitch*)
+
 == 1.5.7 (2018-05-02) - @mojavelinux
 
 Enhancements::
