@@ -1260,6 +1260,19 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
         assert_equal "<year>2013</year>\n<holder>Acme™, Inc.</holder>", result
       end
 
+      test 'should substitute attribute references in attrlist' do
+        input = <<-EOS
+:name-of-tag: snippetA
+include::fixtures/include-file.asciidoc[tag={name-of-tag}]
+        EOS
+
+        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        assert_match(/snippetA content/, output)
+        refute_match(/snippetB content/, output)
+        refute_match(/non-tagged content/, output)
+        refute_match(/included content/, output)
+      end
+
       test 'should fall back to built-in include directive behavior when not handled by include processor' do
         input = <<-EOS
 include::fixtures/include-file.asciidoc[]
