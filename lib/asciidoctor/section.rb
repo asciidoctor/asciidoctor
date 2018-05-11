@@ -30,7 +30,8 @@ class Section < AbstractBlock
   # Public: Get/Set the flag to indicate whether this is a special section or a child of one
   attr_accessor :special
 
-  # Public: Get the state of the numbered attribute at this section (need to preserve for creating TOC)
+  # Public: Get/Set the flag to indicate whether this section should be numbered.
+  # The sectnum method should only be called if this flag is true.
   attr_accessor :numbered
 
   # Public: Get the caption for this section (only relevant for appendices)
