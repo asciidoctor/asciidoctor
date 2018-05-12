@@ -926,7 +926,7 @@ a|message::hi[]
 
     test 'should match short form of block macro' do
       input = <<-EOS
-custom_toc::[]
+custom-toc::[]
       EOS
 
       resolved_target = nil
@@ -934,7 +934,7 @@ custom_toc::[]
       begin
         Asciidoctor::Extensions.register do
           block_macro do
-            named :custom_toc
+            named 'custom-toc'
             process do |parent, target, attrs|
               resolved_target = target
               create_pass_block parent, '<!-- custom toc goes here -->', {}, :content_model => :raw
@@ -1008,7 +1008,7 @@ custom_toc::[]
           end
 
           inline_macro do
-            named :full_attributes
+            named :'full-attributes'
             resolves_attributes '1:name' => nil
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
@@ -1016,7 +1016,7 @@ custom_toc::[]
           end
 
           inline_macro do
-            named :full_text
+            named :'full-text'
             resolves_attributes false
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
@@ -1040,10 +1040,10 @@ short_attributes:[]
 short_attributes:[value,key=val]
 short_text:[]
 short_text:[[text\\]]
-full_attributes:target[]
-full_attributes:target[value,key=val]
-full_text:target[]
-full_text:target[[text\\]]
+full-attributes:target[]
+full-attributes:target[value,key=val]
+full-text:target[]
+full-text:target[[text\\]]
 @target
 ++++
         EOS
@@ -1087,11 +1087,11 @@ target="target", attributes=[]
       end
     end
 
-    test 'should not carry over attributes if block processor returns nil' do
+    test 'wip should not carry over attributes if block processor returns nil' do
       begin
         Asciidoctor::Extensions.register do
           block do
-            named :skipme
+            named 'skip-me'
             on_context :paragraph
             parses_content_as :raw
             process do |parent, reader, attrs|
@@ -1101,7 +1101,7 @@ target="target", attributes=[]
         end
         input = <<-EOS
 .unused title
-[skipme]
+[skip-me]
 not rendered
 
 --
