@@ -528,7 +528,7 @@ module Asciidoctor
     AttributeEntryRx = /^:(!?#{CG_WORD}[^:]*):(?:[ \t]+(.*))?$/
 
     # Matches invalid characters in an attribute name.
-    InvalidAttributeNameCharsRx = /[^#{CC_WORD}-]/
+    InvalidAttributeNameCharsRx = /[^-#{CC_WORD}]/
 
     # Matches a pass inline macro that surrounds the value of an attribute
     # entry once it has been parsed.
@@ -554,7 +554,7 @@ module Asciidoctor
     #   {set:foo:bar}
     #   {set:name!}
     #
-    AttributeReferenceRx = /(\\)?\{(#{CG_WORD}+[-#{CC_WORD}]*|(set|counter2?):.+?)(\\)?\}/
+    AttributeReferenceRx = /(\\)?\{(#{CG_WORD}[-#{CC_WORD}]*|(set|counter2?):.+?)(\\)?\}/
 
     ## Paragraphs and delimited blocks
 
@@ -649,7 +649,7 @@ module Asciidoctor
 
     # Matches the title only (first line) of an Setext (two-line) section title.
     # The title cannot begin with a dot and must have at least one alphanumeric character.
-    SetextSectionTitleRx = /^((?=.*#{CG_WORD}+.*)[^.].*?)$/
+    SetextSectionTitleRx = /^((?=.*#{CG_WORD}.*)[^.].*?)$/
 
     # Matches an anchor (i.e., id + optional reference text) inside a section title.
     #
