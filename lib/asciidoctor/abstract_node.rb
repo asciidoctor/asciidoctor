@@ -162,14 +162,25 @@ class AbstractNode
     @attributes.key? %(#{name}-option)
   end
 
-  # TODO document me
+  # Public: Set the specified option on this node.
+  #
+  # This method sets the specified option on this node if not already set.
+  # It will add the name to the options attribute and set the <name>-option
+  # attribute.
+  #
+  # name - the String name of the option
+  #
+  # returns truthy if the option was set or falsey if the option was already set
   def set_option(name)
-    if @attributes.key? 'options'
-      @attributes['options'] = %(#{@attributes['options']},#{name})
+    if (attrs = @attributes)['options']
+      unless attrs[key = %(#{name}-option)]
+        attrs['options'] += %(,#{name})
+        attrs[key] = ''
+      end
     else
-      @attributes['options'] = name
+      attrs['options'] = name
+      attrs[%(#{name}-option)] = ''
     end
-    @attributes[%(#{name}-option)] = ''
   end
 
   # Public: Update the attributes of this node with the new values in
