@@ -809,7 +809,7 @@ module Asciidoctor
     #
     #--
     # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
-    CustomBlockMacroRx = /^(#{CG_WORD}+)::(|\S|\S.*?\S)\[(.+)?\]$/
+    CustomBlockMacroRx = /^(#{CG_WORD}[-#{CC_WORD}]*)::(|\S|\S.*?\S)\[(.+)?\]$/
 
     # Matches an image, video or audio block macro.
     #
@@ -932,7 +932,7 @@ module Asciidoctor
 
     # Matches the name of a macro.
     #
-    MacroNameRx = /^#{CG_WORD}+$/
+    MacroNameRx = /^#{CG_WORD}[-#{CC_WORD}]*$/
 
     # Matches a stem (and alternatives, asciimath and latexmath) inline macro, which may span multiple lines.
     #
