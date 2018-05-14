@@ -1000,5 +1000,46 @@ text
       assert_same Asciidoctor::AbstractNode::NORMAL_SUBS, cell.subs
       assert_equal '', cell.text
     end
+
+    test 'should set option on node when set_option is called' do
+      input = <<-EOS
+. three
+. two
+. one
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      assert block.set_option('reversed')
+      refute block.set_option('reversed')
+      assert block.option?('reversed')
+      assert_equal '', block.attributes['reversed-option']
+      assert_equal 'reversed', block.attributes['options']
+    end
+
+    test 'should append option to existing options' do
+      input = <<-EOS
+[%fancy]
+. three
+. two
+. one
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      assert block.set_option('reversed')
+      assert_equal 'fancy,reversed', block.attributes['options']
+    end
+
+    test 'should not append option if option is already set' do
+      input = <<-EOS
+[%reversed]
+. three
+. two
+. one
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      refute block.set_option('reversed')
+      assert_equal 'reversed', block.attributes['options']
+    end
   end
 end
