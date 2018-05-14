@@ -122,9 +122,9 @@ module Asciidoctor
         classes = [node.doctype]
       end
       classes << (node.attr 'docrole') if node.attr? 'docrole'
-      body_attrs << %(class="#{classes * ' '}")
+      body_attrs << %(class="#{classes.join ' '}")
       body_attrs << %(style="max-width: #{node.attr 'max-width'};") if node.attr? 'max-width'
-      result << %(<body #{body_attrs * ' '}>)
+      result << %(<body #{body_attrs.join ' '}>)
 
       unless node.noheader
         result << '<div id="header">'
@@ -249,7 +249,7 @@ MathJax.Hub.Config({
 
       result << '</body>'
       result << '</html>'
-      result * LF
+      result.join LF
     end
 
     def embedded node
@@ -288,7 +288,7 @@ MathJax.Hub.Config({
         result << '</div>'
       end
 
-      result * LF
+      result.join LF
     end
 
     def outline node, opts = {}
@@ -317,7 +317,7 @@ MathJax.Hub.Config({
         end
       end
       result << '</ul>'
-      result * LF
+      result.join LF
     end
 
     def section node
@@ -388,7 +388,7 @@ MathJax.Hub.Config({
       xml = @xml_mode
       id_attribute = node.id ? %( id="#{node.id}") : ''
       classes = ['audioblock', node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
+      class_attribute = %( class="#{classes.join ' '}")
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
       start_t = node.attr 'start', nil, false
       end_t = node.attr 'end', nil, false
@@ -406,7 +406,7 @@ Your browser does not support the audio tag.
       result = []
       id_attribute = node.id ? %( id="#{node.id}") : ''
       classes = ['colist', node.style, node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
+      class_attribute = %( class="#{classes.join ' '}")
 
       result << %(<div#{id_attribute}#{class_attribute}>)
       result << %(<div class="title">#{node.title}</div>) if node.title?
@@ -438,7 +438,7 @@ Your browser does not support the audio tag.
       end
 
       result << '</div>'
-      result * LF
+      result.join LF
     end
 
     def dlist node
@@ -454,7 +454,7 @@ Your browser does not support the audio tag.
         ['dlist', node.style, node.role]
       end.compact
 
-      class_attribute = %( class="#{classes * ' '}")
+      class_attribute = %( class="#{classes.join ' '}")
 
       result << %(<div#{id_attribute}#{class_attribute}>)
       result << %(<div class="title">#{node.title}</div>) if node.title?
@@ -521,7 +521,7 @@ Your browser does not support the audio tag.
       end
 
       result << '</div>'
-      result * LF
+      result.join LF
     end
 
     def example node
@@ -539,7 +539,7 @@ Your browser does not support the audio tag.
       tag_name = %(h#{node.level + 1})
       id_attribute = node.id ? %( id="#{node.id}") : ''
       classes = [node.style, node.role].compact
-      %(<#{tag_name}#{id_attribute} class="#{classes * ' '}">#{node.title}</#{tag_name}>)
+      %(<#{tag_name}#{id_attribute} class="#{classes.join ' '}">#{node.title}</#{tag_name}>)
     end
 
     def image node
@@ -564,7 +564,7 @@ Your browser does not support the audio tag.
       classes << (node.attr 'float') if node.attr? 'float'
       classes << %(text-#{node.attr 'align'}) if node.attr? 'align'
       classes << node.role if node.role
-      class_attr = %( class="#{classes * ' '}")
+      class_attr = %( class="#{classes.join ' '}")
       title_el = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : ''
       %(<div#{id_attr}#{class_attr}>
 <div class="content">
@@ -657,7 +657,7 @@ Your browser does not support the audio tag.
       result = []
       id_attribute = node.id ? %( id="#{node.id}") : ''
       classes = ['olist', node.style, node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
+      class_attribute = %( class="#{classes.join ' '}")
 
       result << %(<div#{id_attribute}#{class_attribute}>)
       result << %(<div class="title">#{node.title}</div>) if node.title?
@@ -676,7 +676,7 @@ Your browser does not support the audio tag.
 
       result << '</ol>'
       result << '</div>'
-      result * LF
+      result.join LF
     end
 
     def open node
@@ -748,7 +748,7 @@ Your browser does not support the audio tag.
     def quote node
       id_attribute = node.id ? %( id="#{node.id}") : ''
       classes = ['quoteblock', node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
+      class_attribute = %( class="#{classes.join ' '}")
       title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
       attribution = (node.attr? 'attribution') ? (node.attr 'attribution') : nil
       citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
@@ -800,8 +800,8 @@ Your browser does not support the audio tag.
       if (role = node.role)
         classes << role
       end
-      class_attribute = %( class="#{classes * ' '}")
-      style_attribute = styles.empty? ? '' : %( style="#{styles * ' '}")
+      class_attribute = %( class="#{classes.join ' '}")
+      style_attribute = styles.empty? ? '' : %( style="#{styles.join ' '}")
 
       result << %(<table#{id_attribute}#{class_attribute}#{style_attribute}>)
       result << %(<caption class="title">#{node.captioned_title}</caption>) if node.title?
@@ -833,7 +833,7 @@ Your browser does not support the audio tag.
                 when :literal
                   cell_content = %(<div class="literal"><pre>#{cell.text}</pre></div>)
                 else
-                  cell_content = (cell_content = cell.content).empty? ? '' : %(<p class="tableblock">#{cell_content * '</p>
+                  cell_content = (cell_content = cell.content).empty? ? '' : %(<p class="tableblock">#{cell_content.join '</p>
 <p class="tableblock">'}</p>)
                 end
               end
@@ -851,7 +851,7 @@ Your browser does not support the audio tag.
         end
       end
       result << '</table>'
-      result * LF
+      result.join LF
     end
 
     def toc node
@@ -904,7 +904,7 @@ Your browser does not support the audio tag.
       else
         ul_class_attribute = node.style ? %( class="#{node.style}") : ''
       end
-      result << %(<div#{id_attribute} class="#{div_classes * ' '}">)
+      result << %(<div#{id_attribute} class="#{div_classes.join ' '}">)
       result << %(<div class="title">#{node.title}</div>) if node.title?
       result << %(<ul#{ul_class_attribute}>)
 
@@ -921,13 +921,13 @@ Your browser does not support the audio tag.
 
       result << '</ul>'
       result << '</div>'
-      result * LF
+      result.join LF
     end
 
     def verse node
       id_attribute = node.id ? %( id="#{node.id}") : ''
       classes = ['verseblock', node.role].compact
-      class_attribute = %( class="#{classes * ' '}")
+      class_attribute = %( class="#{classes.join ' '}")
       title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
       attribution = (node.attr? 'attribution') ? (node.attr 'attribution') : nil
       citetitle = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
@@ -951,7 +951,7 @@ Your browser does not support the audio tag.
       classes << (node.attr 'float') if node.attr? 'float'
       classes << %(text-#{node.attr 'align'}) if node.attr? 'align'
       classes << node.role if node.role
-      class_attribute = %( class="#{classes * ' '}")
+      class_attribute = %( class="#{classes.join ' '}")
       title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
       width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
       height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
@@ -1149,7 +1149,7 @@ Your browser does not support the video tag.
       if (keys = node.attr 'keys').size == 1
         %(<kbd>#{keys[0]}</kbd>)
       else
-        %(<span class="keyseq"><kbd>#{keys * '</kbd>+<kbd>'}</kbd></span>)
+        %(<span class="keyseq"><kbd>#{keys.join '</kbd>+<kbd>'}</kbd></span>)
       end
     end
 
@@ -1164,7 +1164,7 @@ Your browser does not support the video tag.
           %(<b class="menuref">#{menu}</b>)
         end
       else
-        %(<span class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="submenu">#{submenus * submenu_joiner}</b>#{caret}<b class="menuitem">#{node.attr 'menuitem'}</b></span>)
+        %(<span class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="submenu">#{submenus.join submenu_joiner}</b>#{caret}<b class="menuitem">#{node.attr 'menuitem'}</b></span>)
       end
     end
 

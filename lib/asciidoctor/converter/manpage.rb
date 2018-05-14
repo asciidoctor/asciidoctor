@@ -132,7 +132,7 @@ module Asciidoctor
         if node.attr? 'manpurpose'
           mannames = node.attr 'mannames', [manname]
           result << %(.SH "#{(node.attr 'manname-title').upcase}"
-#{mannames.map {|n| manify n } * ', '} \\- #{manify node.attr 'manpurpose'})
+#{mannames.map {|n| manify n }.join ', '} \\- #{manify node.attr 'manpurpose'})
         end
       end
 
@@ -159,7 +159,7 @@ module Asciidoctor
         end
       end
 
-      result * LF
+      result.join LF
     end
 
     # NOTE embedded doesn't really make sense in the manpage backend
@@ -173,7 +173,7 @@ module Asciidoctor
 
       # QUESTION should we add an AUTHOR(S) section?
 
-      result * LF
+      result.join LF
     end
 
     def section node
@@ -188,7 +188,7 @@ module Asciidoctor
       end
       result << %(.#{macro} "#{manify stitle}"
 #{node.content})
-      result * LF
+      result.join LF
     end
 
     def admonition node
@@ -206,7 +206,7 @@ module Asciidoctor
 #{resolve_content node}
 .sp .5v
 .RE)
-      result * LF
+      result.join LF
     end
 
     alias audio skip_with_warning
@@ -228,7 +228,7 @@ r lw(\n(.lu*75u/100u).'
         result << 'T}'
       end
       result << '.TE'
-      result * LF
+      result.join LF
     end
 
     # TODO implement horizontal (if it makes sense)
@@ -243,11 +243,11 @@ r lw(\n(.lu*75u/100u).'
         case node.style
         when 'qanda'
           result << %(.sp
-#{counter}. #{manify([*terms].map {|dt| dt.text } * ' ')}
+#{counter}. #{manify([*terms].map {|dt| dt.text }.join ' ')}
 .RS 4)
         else
           result << %(.sp
-#{manify([*terms].map {|dt| dt.text } * ', ')}
+#{manify([*terms].map {|dt| dt.text }.join ', ')}
 .RS 4)
         end
         if dd
@@ -256,7 +256,7 @@ r lw(\n(.lu*75u/100u).'
         end
         result << '.RE'
       end
-      result * LF
+      result.join LF
     end
 
     def example node
@@ -267,7 +267,7 @@ r lw(\n(.lu*75u/100u).'
       result << %(.RS 4
 #{resolve_content node}
 .RE)
-      result * LF
+      result.join LF
     end
 
     def floating_title node
@@ -287,7 +287,7 @@ r lw(\n(.lu*75u/100u).'
 #{manify node.content}
 .fi
 .if n .RE)
-      result * LF
+      result.join LF
     end
 
     def literal node
@@ -301,7 +301,7 @@ r lw(\n(.lu*75u/100u).'
 #{manify node.content}
 .fi
 .if n .RE)
-      result * LF
+      result.join LF
     end
 
     def olist node
@@ -324,7 +324,7 @@ r lw(\n(.lu*75u/100u).'
         result << item.content if item.blocks?
         result << '.RE'
       end
-      result * LF
+      result.join LF
     end
 
     def open node
@@ -379,7 +379,7 @@ r lw(\n(.lu*75u/100u).'
 .in
 .ll)
       end
-      result * LF
+      result.join LF
     end
 
     alias sidebar skip_with_warning
@@ -517,7 +517,7 @@ allbox tab(:);'
       #end
       # FIXME temporary fix to get basic table to display
       result << LF
-      result << row_header[0].map { 'lt' } * ' '
+      result << ('lt ' * row_header[0].size).chop
 
       result << %(.#{LF})
       row_text.each do |row|
@@ -554,7 +554,7 @@ allbox tab(:);'
         result << item.content if item.blocks?
         result << '.RE'
       }
-      result * LF
+      result.join LF
     end
 
     # FIXME git uses [verse] for the synopsis; detect this special case
@@ -579,7 +579,7 @@ allbox tab(:);'
 .in
 .ll)
       end
-      result * LF
+      result.join LF
     end
 
     def video node
@@ -590,7 +590,7 @@ allbox tab(:);'
 .B #{manify node.title}
 .br) if node.title?
       result << %(<#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}> (video))
-      result * LF
+      result.join LF
     end
 
     def inline_anchor node
@@ -655,7 +655,7 @@ allbox tab(:);'
       if (keys = node.attr 'keys').size == 1
         keys[0]
       else
-        keys * %(#{ESC_BS}0+#{ESC_BS}0)
+        keys.join %(#{ESC_BS}0+#{ESC_BS}0)
       end
     end
 
@@ -663,7 +663,7 @@ allbox tab(:);'
       caret = %[#{ESC_BS}0#{ESC_BS}(fc#{ESC_BS}0]
       menu = node.attr 'menu'
       if !(submenus = node.attr 'submenus').empty?
-        submenu_path = submenus.map {|item| %(#{ESC_BS}fI#{item}#{ESC_BS}fP) } * caret
+        submenu_path = submenus.map {|item| %(#{ESC_BS}fI#{item}#{ESC_BS}fP) }.join caret
         %(#{ESC_BS}fI#{menu}#{ESC_BS}fP#{caret}#{submenu_path}#{caret}#{ESC_BS}fI#{node.attr 'menuitem'}#{ESC_BS}fP)
       elsif (menuitem = node.attr 'menuitem')
         %(#{ESC_BS}fI#{menu}#{caret}#{menuitem}#{ESC_BS}fP)

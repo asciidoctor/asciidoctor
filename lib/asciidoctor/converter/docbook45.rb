@@ -29,7 +29,7 @@ module Asciidoctor
         result << '</listitem>'
       end
       result << %(</orderedlist>)
-      result * LF
+      result.join LF
     end
 
     def inline_anchor node
@@ -72,8 +72,7 @@ module Asciidoctor
       result << %(<surname>#{doc.attr lastname_key}</surname>) if doc.attr? lastname_key
       result << %(<email>#{doc.attr email_key}</email>) if doc.attr? email_key
       result << '</author>'
-
-      result * LF
+      result.join LF
     end
 
     def common_attributes id, role = nil, reftext = nil
