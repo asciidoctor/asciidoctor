@@ -19,10 +19,15 @@ Enhancements::
 
   * allow position (float) and alignment (align) to be set on video block (#2425)
 
+Fixes::
+
+  * AbstractNode#set_option does nothing if option is already set (PR #2778)
+
 Improvements::
 
   * use CSS class instead of hard-coded inline float style on tables and images (#2753)
   * use CSS class instead of hard-coded inline text-align style on block images (#2753)
+  * allow hyphen to be used custom block macro name as long as it's not the first character (#2620)
 
 == 1.5.7.1 (2018-05-10) - @mojavelinux
 
