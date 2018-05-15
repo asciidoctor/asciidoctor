@@ -1331,13 +1331,13 @@ module Asciidoctor
       if (docdate = attrs['docdate'])
         attrs['docyear'] ||= ((docdate.index '-') == 4 ? (docdate.slice 0, 4) : nil)
       else
-        docdate = attrs['docdate'] = (input_mtime.strftime '%Y-%m-%d')
+        docdate = attrs['docdate'] = (input_mtime.strftime '%F')
         attrs['docyear'] ||= input_mtime.year.to_s
       end
       doctime = (attrs['doctime'] ||= begin
-          input_mtime.strftime '%H:%M:%S %Z'
+          input_mtime.strftime '%T %Z'
         rescue # Asciidoctor.js fails if timezone string has characters outside basic Latin (see asciidoctor.js#23)
-          input_mtime.strftime '%H:%M:%S %z'
+          input_mtime.strftime '%T %z'
         end)
       attrs['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to? :readlines

@@ -493,13 +493,13 @@ class Document < AbstractBlock
       if (localdate = attrs['localdate'])
         localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? (localdate.slice 0, 4) : nil))
       else
-        localdate = attrs['localdate'] = (now.strftime '%Y-%m-%d')
+        localdate = attrs['localdate'] = (now.strftime '%F')
         localyear = (attrs['localyear'] ||= now.year.to_s)
       end
       localtime = (attrs['localtime'] ||= begin
-          now.strftime '%H:%M:%S %Z'
+          now.strftime '%T %Z'
         rescue # Asciidoctor.js fails if timezone string has characters outside basic Latin (see asciidoctor.js#23)
-          now.strftime '%H:%M:%S %z'
+          now.strftime '%T %z'
         end)
       attrs['localdatetime'] ||= %(#{localdate} #{localtime})
 
