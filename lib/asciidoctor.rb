@@ -1334,7 +1334,11 @@ module Asciidoctor
         docdate = attrs['docdate'] = (input_mtime.strftime '%Y-%m-%d')
         attrs['docyear'] ||= input_mtime.year.to_s
       end
-      doctime = (attrs['doctime'] ||= input_mtime.strftime('%H:%M:%S %Z'))
+      doctime = (attrs['doctime'] ||= begin
+          input_mtime.strftime '%H:%M:%S %Z'
+        rescue # Asciidoctor.js fails if timezone string has characters outside basic Latin (see asciidoctor.js#23)
+          input_mtime.strftime '%H:%M:%S %z'
+        end)
       attrs['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to? :readlines
       # NOTE tty, pipes & sockets can't be rewound, but can't be sniffed easily either
