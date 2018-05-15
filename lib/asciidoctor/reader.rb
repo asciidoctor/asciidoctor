@@ -1005,7 +1005,7 @@ class PreprocessorReader < Reader
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
-          inc_content = target_type == :file ? (::IO.binread inc_path) : open(inc_path, 'rb') {|f| f.read }
+          inc_content = target_type == :file ? ::File.open(inc_path, 'rb') {|f| f.read } : open(inc_path, 'rb') {|f| f.read }
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attrs
         rescue
