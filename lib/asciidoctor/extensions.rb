@@ -1490,7 +1490,7 @@ module Extensions
     # Public: Resolves the Class object for the qualified name.
     #
     # Returns Class
-    if RUBY_MIN_VERSION_2
+    if ::RUBY_MIN_VERSION_2
       def class_for_name qualified_name
         resolved = ::Object.const_get qualified_name, false
         raise unless ::Class === resolved
@@ -1498,7 +1498,7 @@ module Extensions
       rescue
         raise ::NameError, %(Could not resolve class for name: #{qualified_name})
       end
-    elsif RUBY_MIN_VERSION_1_9
+    elsif ::RUBY_MIN_VERSION_1_9
       def class_for_name qualified_name
         resolved = (qualified_name.split '::').reduce ::Object do |current, name|
           name.empty? ? current : (current.const_get name, false)
