@@ -511,7 +511,7 @@ allbox tab(:);'
       #row_header.each do |row|
       #  result << LF
       #  row.each_with_index do |cell, i|
-      #    result << (cell * ' ')
+      #    result << (cell.join ' ')
       #    result << ' ' if row.size > i + 1
       #  end
       #end

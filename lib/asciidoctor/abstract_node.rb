@@ -251,7 +251,7 @@ class AbstractNode
       if val.empty?
         @attributes.delete('role')
       else
-        @attributes['role'] = val * ' '
+        @attributes['role'] = val.join ' '
       end
       true
     else
@@ -510,7 +510,7 @@ class AbstractNode
     opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
     if ::File.readable? path
       if opts[:normalize]
-        Helpers.normalize_lines_from_string(::IO.read path) * LF
+        Helpers.normalize_lines_from_string(::IO.read path).join LF
       else
         # QUESTION should we chomp or rstrip content?
         ::IO.read path
@@ -545,7 +545,7 @@ class AbstractNode
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
         begin
           data = ::OpenURI.open_uri(target) {|fd| fd.read }
-          data = (Helpers.normalize_lines_from_string data) * LF if opts[:normalize]
+          data = (Helpers.normalize_lines_from_string data).join LF if opts[:normalize]
           return data
         rescue
           logger.warn %(could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true

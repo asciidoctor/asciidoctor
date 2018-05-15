@@ -25,7 +25,7 @@ module Asciidoctor
   #       when 'document'
   #         node.content
   #       when 'section'
-  #         [node.title, node.content] * "\n\n"
+  #         [node.title, node.content].join "\n\n"
   #       when 'paragraph'
   #         node.content.tr("\n", ' ') << "\n"
   #       else

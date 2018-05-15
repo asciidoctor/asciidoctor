@@ -1265,7 +1265,7 @@ class Document < AbstractBlock
         content += @docinfo_processor_extensions[location].map {|ext| ext.process_method[self] }.compact
       end
 
-      content * LF
+      content.join LF
     end
   end
 

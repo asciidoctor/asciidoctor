@@ -602,7 +602,7 @@ module Asciidoctor
     #   NOTE: Just a little note.
     #   TIP: Don't forget!
     #
-    AdmonitionParagraphRx = /^(#{ADMONITION_STYLES.to_a * '|'}):[ \t]+/
+    AdmonitionParagraphRx = /^(#{ADMONITION_STYLES.to_a.join '|'}):[ \t]+/
 
     # Matches a literal paragraph, which is a line of text preceded by at least one space.
     #
@@ -1313,7 +1313,7 @@ module Asciidoctor
       # convert it to a Hash as we know it
       attrs = ::Hash[attrs.keys.map {|k| [k, attrs[k]] }]
     else
-      raise ::ArgumentError, %(illegal type for attributes option: #{attrs.class.ancestors * ' < '})
+      raise ::ArgumentError, %(illegal type for attributes option: #{attrs.class.ancestors.join ' < '})
     end
 
     lines = nil

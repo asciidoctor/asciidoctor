@@ -245,7 +245,7 @@ class Reader
   #
   # Returns the lines read joined as a String
   def read
-    read_lines * LF
+    read_lines.join LF
   end
 
   # Public: Advance to the next line by discarding the line at the front of the stack
@@ -561,12 +561,12 @@ class Reader
 
   # Public: Get a copy of the remaining lines managed by this Reader joined as a String
   def string
-    @lines * LF
+    @lines.join LF
   end
 
   # Public: Get the source lines for this Reader joined as a String
   def source
-    @source_lines * LF
+    @source_lines.join LF
   end
 
   # Public: Get a summary of this Reader.
@@ -602,7 +602,7 @@ class PreprocessorReader < Reader
     # QUESTION should this work for AsciiDoc table cell content? Currently it does not.
     if @document && @document.attributes['skip-front-matter']
       if (front_matter = skip_front_matter! result)
-        @document.attributes['front-matter'] = front_matter * LF
+        @document.attributes['front-matter'] = front_matter.join LF
       end
     end
 
@@ -1292,7 +1292,7 @@ class PreprocessorReader < Reader
   end
 
   def to_s
-    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s } * ', '}]}>)
+    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s }.join ', '}]}>)
   end
 end
 end

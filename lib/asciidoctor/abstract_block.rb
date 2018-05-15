@@ -77,7 +77,7 @@ class AbstractBlock < AbstractNode
   # Public: Get the converted result of the child blocks by converting the
   # children appropriate to content model that this block supports.
   def content
-    @blocks.map {|b| b.convert } * LF
+    @blocks.map {|b| b.convert }.join LF
   end
 
   # Public: Update the context of this block.

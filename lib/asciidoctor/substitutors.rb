@@ -1121,7 +1121,7 @@ module Substitutors
       last = lines.pop
       (lines.map {|line|
         Inline.new(self, :break, (line.end_with? HARD_LINE_BREAK) ? (line.slice 0, line.length - 2) : line, :type => :line).convert
-      } << last) * LF
+      } << last).join LF
     elsif (text.include? PLUS) && (text.include? HARD_LINE_BREAK)
       text.gsub(HardLineBreakRx) { Inline.new(self, :break, $1, :type => :line).convert }
     else
@@ -1199,7 +1199,7 @@ module Substitutors
 
       attrs = {}
       attrs['id'] = id if id
-      attrs['role'] = roles * ' ' unless roles.empty?
+      attrs['role'] = roles.join ' ' unless roles.empty?
       attrs
     else
       {'role' => str}
@@ -1374,7 +1374,7 @@ module Substitutors
     resolved = candidates & SUB_OPTIONS[type]
     unless (candidates - resolved).empty?
       invalid = candidates - resolved
-      logger.warn %(invalid substitution type#{invalid.size > 1 ? 's' : ''}#{subject ? ' for ' : ''}#{subject}: #{invalid * ', '})
+      logger.warn %(invalid substitution type#{invalid.size > 1 ? 's' : ''}#{subject ? ' for ' : ''}#{subject}: #{invalid.join ', '})
     end
     resolved
   end
@@ -1451,7 +1451,7 @@ module Substitutors
             nil
           end
         }
-      } * LF
+      }.join LF
       callout_on_last = (last == lineno)
       callout_marks = nil if callout_marks.empty?
     else
@@ -1484,7 +1484,7 @@ module Substitutors
       end
       if attr? 'highlight', nil, false
         unless (highlight_lines = resolve_highlight_lines(attr 'highlight', nil, false)).empty?
-          opts[:hl_lines] = highlight_lines * ' '
+          opts[:hl_lines] = highlight_lines.join ' '
         end
       end
       # NOTE highlight can return nil if something goes wrong; fallback to source if this happens
@@ -1529,13 +1529,13 @@ module Substitutors
           if conums.size == 1
             %(#{line}#{Inline.new(self, :callout, conums[0], :id => @document.callouts.read_next_id).convert}#{tail})
           else
-            conums_markup = conums.map {|conum| Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).convert } * ' '
+            conums_markup = conums.map {|conum| Inline.new(self, :callout, conum, :id => @document.callouts.read_next_id).convert }.join ' '
             %(#{line}#{conums_markup}#{tail})
           end
         else
           line
         end
-      } * LF
+      }.join LF
     else
       result
     end

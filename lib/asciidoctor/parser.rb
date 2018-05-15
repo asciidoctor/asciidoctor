@@ -195,7 +195,7 @@ class Parser
     if is_next_line_section? reader, {}
       name_section = initialize_section reader, document, {}
       if name_section.level == 1
-        name_section_buffer = (reader.read_lines_until :break_on_blank_lines => true, :skip_line_comments => true) * ' '
+        name_section_buffer = (reader.read_lines_until :break_on_blank_lines => true, :skip_line_comments => true).join ' '
         if ManpageNamePurposeRx =~ name_section_buffer
           document.attributes['manname-title'] ||= name_section.title
           document.attributes['manname-id'] = name_section.id if name_section.id
@@ -757,7 +757,7 @@ class Parser
           block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
         end
 
-        catalog_inline_anchors lines * LF, block, document
+        catalog_inline_anchors((lines.join LF), block, document)
       end
 
       break # forbid loop from executing more than once
@@ -1540,7 +1540,7 @@ class Parser
     # a blank line would have served the same purpose in the document
     buffer.pop if !buffer.empty? && buffer[-1] == LIST_CONTINUATION
 
-    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer * LF}<BUFFER"
+    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join LF}<BUFFER"
     #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
 
     buffer
@@ -1881,7 +1881,7 @@ class Parser
                 author_metadata[%(firstname_#{name_idx = idx + 1})],
                 author_metadata[%(middlename_#{name_idx})],
                 author_metadata[%(lastname_#{name_idx})]
-              ].compact.map {|it| it.tr ' ', '_' } * ' '
+              ].compact.map {|it| it.tr ' ', '_' }.join ' '
             end
           end if sparse
           # process as names only
@@ -2658,7 +2658,7 @@ class Parser
   #   source.split "\n"
   #   # => ["    def names", "      @names.split", "    end"]
   #
-  #   puts Parser.adjust_indentation!(source.split "\n") * "\n"
+  #   puts Parser.adjust_indentation!(source.split "\n").join "\n"
   #   # => def names
   #   # =>   @names.split
   #   # => end
