@@ -788,6 +788,65 @@ content
       assert_css 'revhistory > revision > revremark', output, 1
     end
 
+    #multiple revision tests
+    
+    test 'should insert multiple revision line when is set' do
+      input = <<-EOS
+= Document Title
+Ryan Waldron
+v1.0.0, 2016-09-07: The big 1 OH!
+v0.9.0, 2016-06-03: We're getting there
+
+content    
+      EOS
+      
+      output = render_string input, :backend => 'docbook'
+      assert_xpath '/article/info', output, 1
+      assert_xpath '/article/info/title[text() = "Document Title"]', output, 1
+      assert_xpath '/article/info/author/personname', output, 1
+      assert_xpath '/article/info/author/personname/firstname[text() = "Ryan"]', output, 1
+      assert_xpath '/article/info/author/personname/surname[text() = "Waldron"]', output, 1
+
+      assert_xpath '/article/info/revhistory', output, 1
+      assert_xpath '/article/info/revhistory/revision', output, 2
+      assert_xpath '/article/info/revhistory/revision[1]/revnumber[text() = "1.0.0"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[1]/date[text() = "2016-09-07"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[1]/revremark[text() = "The big 1 OH!"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[2]/revnumber[text() = "0.9.0"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[2]/date[text() = "2016-06-03"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[2]/revremark[text() = "We\'re getting there"]', output, 1
+    end
+    
+
+  test "should decode multiple revision line with author and set default author" do
+    input = <<-EOS
+= My new document
+Ryan Waldron
+v1.0.0, 2016-09-07: The big 1 OH! 
+v0.9.0, 2016-06-03: John Doe : We're getting there
+
+content    
+    EOS
+
+      output = render_string input, :backend => 'docbook'
+      assert_xpath '/article/info', output, 1
+      assert_xpath '/article/info/title[text() = "My new document"]', output, 1
+      assert_xpath '/article/info/author/personname', output, 1
+      assert_xpath '/article/info/author/personname/firstname[text() = "Ryan"]', output, 1
+      assert_xpath '/article/info/author/personname/surname[text() = "Waldron"]', output, 1
+
+      assert_xpath '/article/info/revhistory', output, 1
+      assert_xpath '/article/info/revhistory/revision', output, 2
+      assert_xpath '/article/info/revhistory/revision[1]/revnumber[text() = "1.0.0"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[1]/date[text() = "2016-09-07"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[1]/authorinitials[text() = "Ryan Waldron"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[1]/revremark[text() = "The big 1 OH!"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[2]/revnumber[text() = "0.9.0"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[2]/date[text() = "2016-06-03"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[2]/authorinitials[text() = "John Doe"]', output, 1
+      assert_xpath '/article/info/revhistory/revision[2]/revremark[text() = "We\'re getting there"]', output, 1
+  end
+    
     test 'should not include revision history if revdate is not set' do
       input = <<-EOS
 = Document Title
