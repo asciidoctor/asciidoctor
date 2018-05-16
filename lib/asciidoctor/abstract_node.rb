@@ -510,9 +510,8 @@ class AbstractNode
     opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
     if ::File.readable? path
       if opts[:normalize]
-        # NOTE Opal does not support File#readlines
-        #(Helpers.normalize_lines_array ::File.open(path, 'rb') {|f| f.readlines }).join LF
-        (Helpers.normalize_lines_from_string ::File.open(path, 'rb') {|f| f.read }).join LF
+        # NOTE Opal does not yet support File#readlines
+        (Helpers.normalize_lines_array ::File.open(path, 'rb') {|f| f.each_line.to_a }).join LF
       else
         # QUESTION should we chomp or rstrip content?
         ::IO.read path
