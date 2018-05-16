@@ -411,9 +411,9 @@ class AbstractNode
 
     begin
       mimetype = nil
-      bindata = open image_uri, 'rb' do |fd|
-        mimetype = fd.content_type
-        fd.read
+      bindata = open image_uri, 'rb' do |f|
+        mimetype = f.content_type
+        f.read
       end
       # NOTE base64 is autoloaded by reference to ::Base64
       %(data:#{mimetype};base64,#{::Base64.strict_encode64 bindata})
@@ -546,9 +546,12 @@ class AbstractNode
       if doc.attr? 'allow-uri-read'
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
         begin
-          data = ::OpenURI.open_uri(target) {|fd| fd.read }
-          data = (Helpers.normalize_lines_from_string data).join LF if opts[:normalize]
-          return data
+          if opts[:normalize]
+            # NOTE Opal does not yet support File#readlines
+            (Helpers.normalize_lines_array ::OpenURI.open_uri(target) {|f| f.each_line.to_a }).join LF
+          else
+            ::OpenURI.open_uri(target) {|f| f.read }
+          end
         rescue
           logger.warn %(could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
           return
@@ -559,7 +562,7 @@ class AbstractNode
       end
     else
       target = normalize_system_path target, opts[:start], nil, :target_name => (opts[:label] || 'asset')
-      return read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true), :label => opts[:label]
+      read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true), :label => opts[:label]
     end
   end
 
