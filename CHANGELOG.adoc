@@ -22,6 +22,7 @@ Enhancements::
 Fixes::
 
   * AbstractNode#set_option does nothing if option is already set (PR #2778)
+  * allow revnumber to be an attribute reference in revision info line (#2785)
 
 Improvements::
 
