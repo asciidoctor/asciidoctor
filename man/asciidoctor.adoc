@@ -109,7 +109,8 @@ This option may be specified more than once.
   This option may be specified more than once.
 
 *-s, --no-header-footer*::
-  Suppress the document header and footer in the output.
+  Output an embeddable document, which excludes the header, the footer, and everything outside the body of the document.
+  This option is useful for producing documents that can be inserted into an external template.
 
 *-T, --template-dir*=_DIR_::
   A directory containing custom converter templates that override one or more templates from the built-in set.
