@@ -26,12 +26,12 @@ WARNING: The built-in HTML5 converter in Asciidoctor does not generate an index.
 
 There are two types of index terms in AsciiDoc:
 
-flow index term:: `\indexterm2:[<primary>]` or `\((<primary>))`
+flow index term:: `\indexterm2:[<primary>]` or `+((<primary>))+`
 +
 An index term that appears in the flow of text (i.e., a visible term) and in the index.
 This type of index term can only be used to define a primary entry.
 
-concealed index term:: `\indexterm:[<primary>, <secondary>, <tertiary>]` or `\(((<primary>, <secondary>, <tertiary>)))`
+concealed index term:: `\indexterm:[<primary>, <secondary>, <tertiary>]` or `+(((<primary>, <secondary>, <tertiary>)))+`
 +
 A group of index terms that appear only in the index.
 This type of index term can be used to define a primary entry as well as optional secondary and tertiary entries.
