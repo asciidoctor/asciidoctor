@@ -14,12 +14,14 @@ If you don't specify a custom ID for a section, Asciidoctor automatically genera
 
 The ID is derived from the section title as follows:
 
-* Inline formatting is applied.
+* Inline formatting is applied (in title substitution order).
 * All characters are converted to lowercase.
 * The value of the `idprefix` attribute (`+_+` by default) is prepended.
-* Character references and invalid ID characters are replaced with the value of the `idseparator` attribute (`+_+` by default).
- ** Refer to the {url-ntname}[NT Name^] section of the XML specification for a list of valid ID characters.
-* Repeating separator characters are consolidated.
+* Character references, HTML/XML tags, and invalid ID characters are removed.
+ ** Refer to the {url-ntname}[NT-Name^] section of the XML specification for a list of valid ID characters.
+ ** Prior to 1.5.7, HTML/XML tags were not removed and character references and invalid ID characters were replaced with the value of the `idseparator` attribute (`+_+` by default).
+* Spaces, hyphens, and periods are replaced with the value of the `idseparator` attribute (`+_+` by default)
+* Repeating separator characters are condensed.
 * If necessary, a sequence number is appended until the ID is unique within the document.
 
 For example, the section title `Wiley & Sons, Inc.` produces the ID `_wiley_sons_inc`.
@@ -29,7 +31,7 @@ You can customize the replacement characters or toggle ID autogeneration using d
 === Change the ID prefix
 
 You can change the ID prefix by setting the `idprefix` attribute.
-The value of the `idprefix` attribute must begin with a valid ID start character, must continue with only valid ID characters, and can have any length.
+The value of the `idprefix` attribute must begin with a valid ID start character and can have any number of additional valid ID characters.
 
 [source]
 ----
@@ -43,8 +45,8 @@ If you want to remove the prefix, set the attribute to an empty value.
 :idprefix:
 ----
 
-//WARNING: If you remove the `idprefix`, you could end up with an ID that matches a reserved ID, such as `header`.
-//If this happens, adding a custom ID is recommended.
+WARNING: If you set the `idprefix` to blank, you could end up generating IDs that are invalid in DocBook output (e.g., an ID that begins with a number) or that match a built-in ID in the HTML output (e.g., `header`).
+In this case, we recommend either using a non-empty value of `idprefix` or assigning explicit IDs to your sections.
 
 [#separator]
 === Change the ID word separator
