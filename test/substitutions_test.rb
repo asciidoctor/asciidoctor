@@ -1131,6 +1131,14 @@ You can download the software from the product page.footnote:1[Option only avail
       end
     end
 
+    test 'should escape concealed index term if second bracket is preceded by a backslash' do
+      input = %[National Institute of Science and Technology (#{BACKSLASH}((NIST)))]
+      doc = document_from_string input, :header_footer => false
+      output = doc.convert
+      assert_xpath '//p[text()="National Institute of Science and Technology (((NIST)))"]', output, 1
+      assert doc.catalog[:indexterms].empty?
+    end
+
     test 'should only escape enclosing brackets if concealed index term is preceded by a backslash' do
       input = %[National Institute of Science and Technology #{BACKSLASH}(((NIST)))]
       doc = document_from_string input, :header_footer => false
@@ -1265,6 +1273,14 @@ EOS
       assert_equal 2, para.document.catalog[:indexterms].size
       assert_equal ['tiger'], para.document.catalog[:indexterms][0]
       assert_equal ['cat'], para.document.catalog[:indexterms][1]
+    end
+
+    test 'should escape visible index term if preceded by a backslash' do
+      sentence = "The #{BACKSLASH}((tiger)) (Panthera tigris) is the largest #{BACKSLASH}((cat)) species."
+      para = block_from_string(sentence)
+      output = para.sub_macros(para.source)
+      assert_equal 'The ((tiger)) (Panthera tigris) is the largest ((cat)) species.', output
+      assert para.document.catalog[:indexterms].empty?
     end
 
     test 'normal substitutions are performed on an index term 2 macro' do
