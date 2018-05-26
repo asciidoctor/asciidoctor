@@ -26,6 +26,7 @@ Fixes::
   * allow revnumber to be an attribute reference in revision info line (#2785)
   * use ::File.open instead of ::IO.binread in Reader for Asciidoctor.js compatibility
   * add fallback for timezone when setting doctime
+  * fix formatting of quote block (indentation) in manpage output (#2792)
 
 Improvements::
 
