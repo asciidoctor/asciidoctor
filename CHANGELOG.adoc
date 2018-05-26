@@ -18,17 +18,22 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Enhancements::
 
   * allow position (float) and alignment (align) to be set on video block (#2425)
+  * substitute attribute references in attrlist of include directive (#2761)
 
 Fixes::
 
   * AbstractNode#set_option does nothing if option is already set (PR #2778)
   * allow revnumber to be an attribute reference in revision info line (#2785)
+  * use ::File.open instead of ::IO.binread in Reader for Asciidoctor.js compatibility
+  * add fallback for timezone when setting doctime
 
 Improvements::
 
   * use CSS class instead of hard-coded inline float style on tables and images (#2753)
   * use CSS class instead of hard-coded inline text-align style on block images (#2753)
   * allow hyphen to be used custom block macro name as long as it's not the first character (#2620)
+  * use shorthands %F and %T instead of %Y-%m-%d and %H:%M:%S to format time
+  * read file in binary mode whenever contents are being normalized
 
 == 1.5.7.1 (2018-05-10) - @mojavelinux
 
