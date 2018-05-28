@@ -463,7 +463,7 @@ module Substitutors
   def sub_attributes text, opts = {}
     doc_attrs = @document.attributes
     drop = drop_line = drop_empty_line = attribute_undefined = attribute_missing = nil
-    result = text.gsub AttributeReferenceRx do
+    text = text.gsub AttributeReferenceRx do
       # escaped attribute, return unescaped
       if $1 == RS || $4 == RS
         %({#{$2}})
@@ -504,21 +504,21 @@ module Substitutors
     end
 
     if drop
-      # drop lines from result
+      # drop lines from text
       if drop_empty_line
-        lines = (result.tr_s DEL, DEL).split LF, -1
+        lines = (text.tr_s DEL, DEL).split LF, -1
         if drop_line
           (lines.reject {|line| line == DEL || line == CAN || (line.start_with? CAN) || (line.include? CAN) }.join LF).delete DEL
         else
           (lines.reject {|line| line == DEL }.join LF).delete DEL
         end
-      elsif result.include? LF
-        (result.split LF, -1).reject {|line| line == CAN || (line.start_with? CAN) || (line.include? CAN) }.join LF
+      elsif text.include? LF
+        (text.split LF, -1).reject {|line| line == CAN || (line.start_with? CAN) || (line.include? CAN) }.join LF
       else
         ''
       end
     else
-      result
+      text
     end
   end
 
@@ -529,20 +529,19 @@ module Substitutors
   # source - The String text to process
   #
   # returns The converted String text
-  def sub_macros(source)
-    #return source if source.nil_or_empty?
+  def sub_macros(text)
+    #return text if text.nil_or_empty?
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
-    found_square_bracket = found[:square_bracket] = (source.include? '[')
-    found_colon = source.include? ':'
+    found_square_bracket = found[:square_bracket] = (text.include? '[')
+    found_colon = text.include? ':'
     found_macroish = found[:macroish] = found_square_bracket && found_colon
-    found_macroish_short = found_macroish && (source.include? ':[')
+    found_macroish_short = found_macroish && (text.include? ':[')
     doc_attrs = (doc = @document).attributes
-    result = source
 
     if doc_attrs.key? 'experimental'
-      if found_macroish_short && ((result.include? 'kbd:') || (result.include? 'btn:'))
-        result = result.gsub(InlineKbdBtnMacroRx) {
+      if found_macroish_short && ((text.include? 'kbd:') || (text.include? 'btn:'))
+        text = text.gsub(InlineKbdBtnMacroRx) {
           # honor the escape
           if $1
             $&.slice 1, $&.length
@@ -570,8 +569,8 @@ module Substitutors
         }
       end
 
-      if found_macroish && (result.include? 'menu:')
-        result = result.gsub(InlineMenuMacroRx) {
+      if found_macroish && (text.include? 'menu:')
+        text = text.gsub(InlineMenuMacroRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -597,8 +596,8 @@ module Substitutors
         }
       end
 
-      if (result.include? '"') && (result.include? '&gt;')
-        result = result.gsub(InlineMenuRx) {
+      if (text.include? '"') && (text.include? '&gt;')
+        text = text.gsub(InlineMenuRx) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -619,7 +618,7 @@ module Substitutors
     # TODO this handling needs some cleanup
     if (extensions = doc.extensions) && extensions.inline_macros? # && found_macroish
       extensions.inline_macros.each do |extension|
-        result = result.gsub(extension.instance.regexp) {
+        text = text.gsub(extension.instance.regexp) {
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
@@ -652,9 +651,9 @@ module Substitutors
       end
     end
 
-    if found_macroish && ((result.include? 'image:') || (result.include? 'icon:'))
+    if found_macroish && ((text.include? 'image:') || (text.include? 'icon:'))
       # image:filename.png[Alt Text]
-      result = result.gsub(InlineImageMacroRx) {
+      text = text.gsub(InlineImageMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -678,12 +677,12 @@ module Substitutors
       }
     end
 
-    if ((result.include? '((') && (result.include? '))')) || (found_macroish_short && (result.include? 'dexterm'))
+    if ((text.include? '((') && (text.include? '))')) || (found_macroish_short && (text.include? 'dexterm'))
       # (((Tigers,Big cats)))
       # indexterm:[Tigers,Big cats]
       # ((Tigers))
       # indexterm2:[Tigers]
-      result = result.gsub(InlineIndextermMacroRx) {
+      text = text.gsub(InlineIndextermMacroRx) {
         case $1
         when 'indexterm'
           text = $2
@@ -732,21 +731,21 @@ module Substitutors
             # ((Tigers))
             term = normalize_string text
             doc.register :indexterms, [term]
-            result = (Inline.new self, :indexterm, term, :type => :visible).convert
+            subbed_term = (Inline.new self, :indexterm, term, :type => :visible).convert
           else
             # (((Tigers,Big cats)))
             terms = split_simple_csv(normalize_string text)
             doc.register :indexterms, terms
-            result = (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
+            subbed_term = (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
           end
-          before ? %(#{before}#{result}#{after}) : result
+          before ? %(#{before}#{subbed_term}#{after}) : subbed_term
         end
       }
     end
 
-    if found_colon && (result.include? '://')
+    if found_colon && (text.include? '://')
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
-      result = result.gsub(InlineLinkRx) {
+      text = text.gsub(InlineLinkRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -839,9 +838,9 @@ module Substitutors
       }
     end
 
-    if found_macroish && ((result.include? 'link:') || (result.include? 'mailto:'))
+    if found_macroish && ((text.include? 'link:') || (text.include? 'mailto:'))
       # inline link macros, link:target[text]
-      result = result.gsub(InlineLinkMacroRx) {
+      text = text.gsub(InlineLinkMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -909,8 +908,8 @@ module Substitutors
       }
     end
 
-    if result.include? '@'
-      result = result.gsub(InlineEmailRx) {
+    if text.include? '@'
+      text = text.gsub(InlineEmailRx) {
         address, tip = $&, $1
         if tip
           next (tip == RS ? address[1..-1] : address)
@@ -924,8 +923,8 @@ module Substitutors
       }
     end
 
-    if found_macroish && (result.include? 'tnote')
-      result = result.gsub(InlineFootnoteMacroRx) {
+    if found_macroish && (text.include? 'tnote')
+      text = text.gsub(InlineFootnoteMacroRx) {
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
@@ -966,7 +965,7 @@ module Substitutors
       }
     end
 
-    sub_inline_xrefs(sub_inline_anchors(result, found), found)
+    sub_inline_xrefs(sub_inline_anchors(text, found), found)
   end
 
   # Internal: Substitute normal and bibliographic anchors
